@@ -1,0 +1,110 @@
+<div id="surveyDetailsModal" class="fixed inset-0 flex items-center justify-center p-4 modal-overlay hidden z-[60]" data-state="closed">
+    <div class="bg-surface rounded-lg shadow-xl p-6 w-full max-w-2xl flex flex-col modal-content-transition max-h-[90vh]" data-state="closed">
+        <div class="flex justify-between items-center mb-6 flex-shrink-0">
+            <div class="flex items-center gap-4">
+                <h3 id="surveyDetailName" class="text-on-surface text-xl font-semibold break-words">アンケート名（動的に挿入）</h3>
+                <span id="surveyDetailStatusBadge" class="inline-flex items-center rounded-full text-xs px-2 py-1" title="ステータス説明">ステータス</span>
+            </div>
+            <button class="text-on-surface-variant hover:text-on-surface" onclick="closeModal('surveyDetailsModal')" aria-label="モーダルを閉じる">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+        <div class="space-y-6 overflow-y-auto flex-grow"> <!-- 中央コンテンツエリアのみスクロール -->
+            <div class="space-y-4">
+                <h4 class="text-on-surface text-lg font-semibold border-b border-outline-variant pb-2">基本情報</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-on-surface-variant text-sm font-medium">アンケートID</p>
+                        <p id="detail_surveyId" class="text-on-surface text-base"></p>
+                    </div>
+                    <div>
+                        <p class="text-on-surface-variant text-sm font-medium">アンケート名（社内管理用）</p>
+                        <p id="detail_surveyNameInternal" class="text-on-surface text-base"></p>
+                    </div>
+                    <div>
+                        <p class="text-on-surface-variant text-sm font-medium">表示タイトル</p>
+                        <p id="detail_displayTitle" class="text-on-surface text-base"></p>
+                    </div>
+                    <div>
+                        <p class="text-on-surface-variant text-sm font-medium">プラン</p>
+                        <p id="detail_plan" class="text-on-surface text-base"></p>
+                    </div>
+                    <div class="md:col-span-2">
+                        <p class="text-on-surface-variant text-sm font-medium">メモ</p>
+                        <p id="detail_surveyMemo" class="text-on-surface text-base whitespace-pre-wrap"></p>
+                    </div>
+                    <div>
+                        <p class="text-on-surface-variant text-sm font-medium">展示会会期</p>
+                        <p id="detail_surveyPeriod" class="text-on-surface text-base"></p>
+                    </div>
+                    <div>
+                        <p class="text-on-surface-variant text-sm font-medium">回答数</p>
+                        <p id="detail_answerCount" class="text-on-surface text-base"></p>
+                    </div>
+                    <div>
+                        <p class="text-on-surface-variant text-sm font-medium">データ化完了予定日</p>
+                        <p id="detail_dataCompletionDate" class="text-on-surface text-base"></p>
+                    </div>
+                    <div>
+                        <p class="text-on-surface-variant text-sm font-medium">ダウンロード期限</p>
+                        <p id="detail_deadline" class="text-on-surface text-base"></p>
+                    </div>
+                    <div>
+                        <p class="text-on-surface-variant text-sm font-medium">見込み請求額</p>
+                        <p id="detail_estimatedBillingAmount" class="text-on-surface text-base"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <h4 class="text-on-surface text-lg font-semibold border-b border-outline-variant pb-2">名刺データ設定</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-on-surface-variant text-sm font-medium">名刺データ化</p>
+                        <p id="detail_bizcardEnabled" class="text-on-surface text-base"></p>
+                    </div>
+                    <div>
+                        <p class="text-on-surface-variant text-sm font-medium">名刺データ化件数</p>
+                        <p id="detail_bizcardCompletionCount" class="text-on-surface text-base"></p>
+                    </div>
+                    <div>
+                        <p class="text-on-surface-variant text-sm font-medium">御礼メール設定</p>
+                        <p id="detail_thankYouEmailSettings" class="text-on-surface text-base"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <h4 class="text-on-surface text-lg font-semibold border-b border-outline-variant pb-2">アンケートアクセス情報</h4>
+                <div class="space-y-4">
+                    <div class="input-group">
+                        <!-- 変更点: onclickイベントを追加し、cursor-pointerクラスを追加 -->
+                        <input type="text" id="detail_surveyUrl" value="https://survey.speedad.com/qr/survey_id_xyz" readonly class="input-field-static cursor-pointer" onclick="copyUrl(this)" title="クリックしてURLをコピー">
+                        <label for="detail_surveyUrl" class="input-label-static">アンケートURL</label>
+                        <!-- 元々あったコピーボタンは、URLフィールド自体がコピー可能になるため削除 -->
+                        <!-- <button class="bg-primary text-on-primary rounded-md shadow-sm hover:bg-secondary transition-colors p-2" onclick="copyUrl()" aria-label="URLをコピー" title="URLをクリップボードにコピー"><span class="material-icons text-base">content_copy</span></button> -->
+                    </div>
+                    <div class="text-center">
+                        <p class="text-on-surface-variant text-sm font-medium mb-2">QRコード画像</p>
+                        <img id="detail_qrCodeImage" alt="QR Code" class="mx-auto mb-4 border border-outline-variant p-2 rounded" src="https://via.placeholder.com/200x200?text=QR+Code" />
+                        <button id="downloadQrCodeBtn" class="gradient-primary-bg text-on-primary py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal transition-colors w-full" aria-label="QRコードをダウンロード">
+                            <span class="material-icons text-lg">download</span>
+                            QRコードをダウンロード
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ボタンの順序は前回の変更から維持 -->
+        <div class="flex justify-end gap-3 pt-4 flex-shrink-0">
+            <button class="gradient-primary-bg text-on-primary py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal transition-colors" type="button" aria-label="アンケートを編集">編集</button>
+            <button class="gradient-primary-bg text-on-primary py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal transition-colors" type="button" aria-label="分析">
+                分析
+            </button>
+            <button class="gradient-primary-bg text-on-primary py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal transition-colors" type="button" id="detailDownloadBtn" aria-label="データダウンロード">
+                データダウンロード
+            </button>
+            <button class="bg-secondary-container text-on-secondary-container py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal tracking-wide transition-colors" onclick="closeModal('surveyDetailsModal')" type="button" aria-label="閉じる">閉じる</button>
+        </div>
+    </div>
+</div>

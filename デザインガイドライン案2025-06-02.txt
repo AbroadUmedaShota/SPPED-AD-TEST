@@ -1,0 +1,63 @@
+color_guideline:
+  overview:
+    - 全体トーン: "シンプル・クリーン。現場の使いやすさを最優先"
+    - 基本: "白・薄グレーをベース"
+    - アクセント: "濃い紫・蒼色を主要CTAや注目箇所に"
+    - 配色バランス: "主に白70%、アクセント20%、その他10%を目安"
+
+  palette:
+    base:
+      background: "#FFFFFF"           # メイン背景
+      background_sub: "#FAFAFA"       # 補助背景・カード外側
+      card: "#FFFFFF"                 # カード・フォーム
+      divider: "#E0E0E0"              # 境界線・分割線
+    accent:
+      primary_purple: "#4B2E83"       # プライマリー/重要アクション用濃紫
+      secondary_blue: "#2064A8"       # セカンダリー/ホバー用濃蒼
+      gradient: "linear-gradient(90deg, #4B2E83 0%, #2064A8 100%)" # ステータスバー等
+    text:
+      heading: "#222222"              # タイトル・見出し
+      body: "#444444"                 # 本文・ラベル
+      sub: "#888888"                  # サブテキスト・ヒント
+      disabled: "#AAAAAA"             # 非活性テキスト
+    state:
+      error: "#D32F2F"                # エラー用（例: 入力バリデーション）
+      success: "#388E3C"              # 成功用（例: 完了通知）
+      info: "#2785C7"                 # インフォ用
+    button:
+      primary_bg: "#4B2E83"
+      primary_text: "#FFFFFF"
+      primary_hover: "#2064A8"
+      secondary_bg: "#2064A8"
+      secondary_text: "#FFFFFF"
+      secondary_hover: "#4B2E83"
+      disabled_bg: "#E0E0E0"
+      disabled_text: "#AAAAAA"
+    input:
+      border: "#E0E0E0"
+      focus: "#4B2E83"
+      background: "#FFFFFF"
+      text: "#222222"
+      placeholder: "#888888"
+      error: "#D32F2F"
+      disabled_bg: "#F5F5F5"
+      disabled_text: "#AAAAAA"
+
+  usage_examples:
+    main_background: "body, app全体背景に base.background を適用"
+    card_or_form: "カード、ダイアログ、フォームは base.card を背景色に"
+    primary_action_button: "重要な送信や作成系ボタンに accent.primary_purple"
+    secondary_button: "補助/編集/詳細リンク等には accent.secondary_blue"
+    heading_text: "タイトルや主要ラベルには text.heading"
+    subtext_hint: "補助説明・プレースホルダー等には text.sub"
+    divider: "sectionやリストの区切りには base.divider"
+    input_focus: "入力欄選択時は input.focus で枠色変更"
+    error_message: "バリデーションエラー表示時は state.error"
+    progress_bar: "重要な進捗・ステータスには accent.gradient のグラデ可"
+
+  notes:
+    - "色コードはブランド戦略やロゴ等に応じて調整可"
+    - "配色比率は視認性・可読性の観点でホワイトスペースを十分に取る"
+    - "モバイル・PC双方でコントラスト十分なUI設計を心がける"
+    - "アイコンやイラストも紫～蒼トーンで統一するとブランド感が増す"
+

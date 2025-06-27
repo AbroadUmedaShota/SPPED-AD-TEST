@@ -1,0 +1,112 @@
+<div id="newGroupModal" class="fixed inset-0 flex items-center justify-center p-4 modal-overlay hidden z-[60]" data-state="closed">
+    <div class="bg-surface rounded-lg shadow-xl p-6 w-full max-w-3xl flex flex-col modal-content-transition max-h-[90vh]" data-state="closed">
+        <div class="flex justify-between items-center mb-6 flex-shrink-0">
+            <h3 class="text-on-surface text-xl font-semibold" id="newGroupModalTitle">グループ新規作成</h3>
+            <button class="text-on-surface-variant hover:text-on-surface" onclick="closeModal('newGroupModal')" aria-label="モーダルを閉じる">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+
+        <form class="space-y-4 overflow-y-auto flex-grow pr-2"> <!-- フォーム内容をスクロール可能にする -->
+            <!-- グループ基本情報 -->
+            <div class="section-card">
+                <button type="button" class="section-header" aria-expanded="true" aria-controls="groupBasicInfoContent">
+                    <h4 class="text-on-surface text-lg font-semibold">基本情報</h4>
+                    <span class="material-icons expand-icon">expand_less</span>
+                </button>
+                <div id="groupBasicInfoContent" class="section-content">
+                    <div class="input-group">
+                        <input class="input-field" id="groupName" name="groupName" placeholder=" " type="text"/>
+                        <label class="input-label" for="groupName">グループ名</label>
+                        <p class="error-message hidden" id="groupName-error"></p>
+                    </div>
+                    <div class="input-group">
+                        <textarea class="input-field" id="groupDescription" name="groupDescription" placeholder=" " rows="3"></textarea>
+                        <label class="input-label" for="groupDescription">グループ説明（任意）</label>
+                        <p class="error-message hidden" id="groupDescription-error"></p>
+                    </div>
+                    <div class="input-group" id="groupIdDisplay" style="display:none;"> <!-- 編集時に表示 -->
+                        <input class="input-field" id="groupId" name="groupId" readonly type="text"/>
+                        <label class="input-label" for="groupId">グループID</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- グループメンバー管理 -->
+            <div class="section-card">
+                <button type="button" class="section-header" aria-expanded="true" aria-controls="groupMembersContent">
+                    <h4 class="text-on-surface text-lg font-semibold">メンバー管理</h4>
+                    <span class="material-icons expand-icon">expand_less</span>
+                </button>
+                <div id="groupMembersContent" class="section-content">
+                    <div class="space-y-2 mb-4" id="groupMembersList">
+                        <!-- メンバーリストがJSで動的に挿入される -->
+                        <p class="text-on-surface-variant text-sm" id="noMembersMessage">現在メンバーはいません。</p>
+                    </div>
+
+                    <div class="border-t border-outline-variant my-4 pt-4">
+                        <h5 class="text-on-surface text-base font-semibold mb-3">メンバー追加</h5>
+                        <div class="space-y-3">
+                            <!-- 既存ユーザー招待 -->
+                            <div class="input-group flex items-center gap-2">
+                                <input class="input-field flex-grow" id="inviteExistingUserEmail" name="inviteExistingUserEmail" placeholder=" " type="email"/>
+                                <label class="input-label" for="inviteExistingUserEmail">既存ユーザーのメールアドレス</label>
+                                <button type="button" class="gradient-primary-bg text-on-primary py-2 px-4 rounded-md shadow-sm text-sm font-semibold whitespace-nowrap" id="inviteExistingUserBtn">追加</button>
+                                <p class="error-message hidden" id="inviteExistingUserEmail-error"></p>
+                            </div>
+                            <!-- 新規ユーザー招待 -->
+                            <div class="input-group flex items-center gap-2">
+                                <input class="input-field flex-grow" id="inviteNewUserEmail" name="inviteNewUserEmail" placeholder=" " type="email"/>
+                                <label class="input-label" for="inviteNewUserEmail">新規ユーザーのメールアドレス（招待）</label>
+                                <button type="button" class="gradient-primary-bg text-on-primary py-2 px-4 rounded-md shadow-sm text-sm font-semibold whitespace-nowrap" id="inviteNewUserBtn">招待</button>
+                                <p class="error-message hidden" id="inviteNewUserEmail-error"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- グループ権限設定 -->
+            <div class="section-card">
+                <button type="button" class="section-header" aria-expanded="true" aria-controls="groupPermissionsContent">
+                    <h4 class="text-on-surface text-lg font-semibold">グループ権限設定</h4>
+                    <span class="material-icons expand-icon">expand_less</span>
+                </button>
+                <div id="groupPermissionsContent" class="section-content">
+                    <div class="space-y-3">
+                        <div>
+                            <input type="checkbox" id="allowAllSurveyAccess" name="allowAllSurveyAccess" class="rounded text-primary focus:ring-primary">
+                            <label for="allowAllSurveyAccess" class="ml-2 text-sm font-medium text-on-surface">全てのアンケートデータにアクセス許可</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="allowBillingInfoView" name="allowBillingInfoView" class="rounded text-primary focus:ring-primary">
+                            <label for="allowBillingInfoView" class="ml-2 text-sm font-medium text-on-surface">請求情報の閲覧許可</label>
+                        </div>
+                        <!-- 将来的に詳細な権限設定へのリンクなどを追加可能 -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- グループ削除セクション (編集時のみ表示) -->
+            <div class="section-card hidden" id="deleteGroupSection">
+                <button type="button" class="section-header" aria-expanded="false" aria-controls="deleteGroupContent">
+                    <h4 class="text-on-surface text-lg font-semibold text-error">グループ削除</h4>
+                    <span class="material-icons expand-icon">expand_more</span>
+                </button>
+                <div id="deleteGroupContent" class="section-content hidden">
+                    <p class="text-on-surface-variant text-sm mb-4">この操作は元に戻せません。グループとその関連データが完全に削除されます。</p>
+                    <button type="button" class="bg-error text-on-error py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal" id="confirmDeleteGroupBtn">
+                        グループを削除する
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-4">
+                <button class="bg-secondary-container text-on-secondary-container py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal tracking-wide transition-colors" onclick="closeModal('newGroupModal')" type="button" aria-label="キャンセル">キャンセル</button>
+                <button class="gradient-primary-bg text-on-primary py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal transition-colors" type="submit" id="saveGroupBtn" aria-label="グループを保存">
+                    作成する
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,337 @@
+/* Custom CSS Variables based on Material 3 inspired color_guideline */
+:root {
+    /* Brand Colors (from guideline) */
+    --color-brand-primary: #4B2E83; /* brand_primary: 濃い紫 */
+    --color-brand-secondary: #2064A8; /* brand_secondary: 青 */
+
+    /* M3-inspired Tonal Palettes (example derivation) */
+    --color-primary: var(--color-brand-primary); /* Primary color */
+    --color-on-primary: #FFFFFF; /* Color for text/icons on primary */
+    --color-primary-container: #E8DFF3; /* Lightest tint of primary for containers */
+    --color-on-primary-container: #1C004F; /* Dark text on primary container */
+
+    --color-secondary: var(--color-brand-secondary); /* Secondary color */
+    --color-on-secondary: #FFFFFF; /* Color for text/icons on secondary */
+    --color-secondary-container: #DFF1FF; /* Lightest tint of secondary for containers */
+    --color-on-secondary-container: #001D35; /* Dark text on secondary container */
+
+    /* Surface Colors (Light Mode) */
+    --color-background: #FFFFFF; /* Main background */
+    --color-on-background: #1A1C1E; /* Text on main background */
+    --color-surface: #FFFFFF; /* General surface (cards, dialogs) */
+    --color-on-surface: #1A1C1E; /* Text on general surface */
+    --color-surface-variant: #F0F0F0; /* Subdued surface (e.g., table headers, sub-background) */
+    --color-on-surface-variant: #40484D; /* Text on subdued surface */
+    --color-surface-bright: #FFFFFF; /* Brightest surface variant (e.g., input fields) */
+    --color-surface-dim: #DCDCDC; /* Dimmest surface variant (e.g., disabled areas) */
+
+    /* Outline and Divider */
+    --color-outline: #70787D; /* General outline/border */
+    --color-outline-variant: #E0E0E0; /* Lighter outline/divider (matches border_divider) */
+
+    /* Error Colors */
+    --color-error: #BA1A1A; /* Error state color */
+    --color-on-error: #FFFFFF; /* Text on error color */
+    --color-error-container: #FFDAD6; /* Error container color */
+    --color-on-error-container: #410002; /* Text on error container */
+
+    /* Scrim Color (for modal overlays) */
+    --color-scrim: rgba(0, 0, 0, 0.6); /* Adjusted from 0.5 to 0.6 for better contrast */
+
+    /* Accent Gradient (from guideline) */
+    --gradient-accent: linear-gradient(90deg, var(--color-brand-primary) 0%, var(--color-brand-secondary) 100%);
+}
+
+/* Dark Mode Palette (example derivation - adjust values for optimal dark mode appearance) */
+body.dark-mode {
+    --color-background: #121212; /* Dark background */
+    --color-on-background: #E0E0E0; /* Light text on dark background */
+    --color-surface: #1E1E1E; /* Darker surface */
+    --color-on-surface: #E0E0E0; /* Light text on darker surface */
+    --color-surface-variant: #333333; /* Slightly lighter dark surface for subdued elements */
+    --color-on-surface-variant: #BBBBBB; /* Lighter text on subdued dark surface */
+    --color-surface-bright: #2C2C2C; /* For inputs/elements that need to stand out slightly */
+    --color-surface-dim: #000000; /* For elements that should be almost black */
+
+    /* Adjust primary/secondary container for dark mode if needed (e.g., darker background, lighter text) */
+    --color-primary-container: #3E1B6D; /* Darker primary container */
+    --color-on-primary-container: #FFFFFF; /* Maintain white text */
+    --color-secondary-container: #1A4670; /* Darker secondary container */
+    --color-on-secondary-container: #FFFFFF; /* Maintain white text */
+
+    --color-outline: #555555; /* Darker outline */
+    --color-outline-variant: #3A3A3A; /* Darker variant */
+}
+
+
+/* Custom utility classes (mapping CSS variables to Tailwind-like usage) */
+/* Backgrounds */
+.bg-background { background-color: var(--color-background); }
+.bg-surface { background-color: var(--color-surface); }
+.bg-surface-variant { background-color: var(--color-surface-variant); }
+.bg-surface-bright { background-color: var(--color-surface-bright); }
+.bg-primary-container { background-color: var(--color-primary-container); }
+.bg-secondary-container { background-color: var(--color-secondary-container); }
+.bg-error-container { background-color: var(--color-error-container); }
+.bg-scrim { background-color: var(--color-scrim); } /* for modal overlay */
+
+/* Texts */
+.text-on-background { color: var(--color-on-background); }
+.text-on-surface { color: var(--color-on-surface); }
+.text-on-surface-variant { color: var(--color-on-surface-variant); }
+.text-on-primary { color: var(--color-on-primary); }
+.text-on-secondary { color: var(--color-on-secondary); }
+.text-on-primary-container { color: var(--color-on-primary-container); }
+.text-on-secondary-container { color: var(--color-on-secondary-container); }
+.text-error { color: var(--color-error); }
+.text-on-error-container { color: var(--color-on-error-container); }
+.text-primary { color: var(--color-primary); } /* For links/icons that use primary color */
+.text-secondary { color: var(--color-secondary); } /* For links/icons that use secondary color */
+
+/* Borders */
+.border-outline { border-color: var(--color-outline); }
+.border-outline-variant { border-color: var(--color-outline-variant); }
+
+/* Gradients */
+.gradient-primary-bg { background: var(--gradient-accent); }
+
+/* Other custom styles */
+.shadow-soft { box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+.shadow-strong { box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2); }
+.text-shadow-sm { text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); }
+
+
+/* Global font family */
+body {
+    font-family: "Noto Sans JP", "Inter", sans-serif;
+}
+/* Prevent body scroll when mobile sidebar/modal is open */
+body.overflow-hidden {
+    overflow: hidden;
+}
+
+/* Custom scrollbar styles */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: var(--color-surface-variant);
+}
+::-webkit-scrollbar-thumb {
+    background: #94a3b8; /* slate-400 */
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #64748b; /* slate-500 */
+}
+
+/* --- Sidebar specific styles --- */
+.sidebar {
+    width: 0; /* Default hidden for screens smaller than lg */
+    transform: translateX(-100%);
+    transition: width 0.3s ease-in-out, transform 0.3s ease-in-out;
+    overflow-x: hidden; /* Hide labels by default */
+    z-index: 40; /* Ensure it's above main content, below header */
+    flex-shrink: 0; /* Prevent sidebar from shrinking */
+}
+/* Mobile: Sidebar opened by JS */
+.sidebar.is-open-mobile {
+    width: 16rem; /* Full width for mobile sidebar */
+    transform: translateX(0);
+}
+/* Mobile: Ensure profile block and labels are always visible */
+.sidebar.is-open-mobile .profile-block,
+.sidebar.is-open-mobile .sidebar-nav-label,
+.sidebar.is-open-mobile .sidebar-group-control { /* Include group control for mobile */
+    display: flex !important; /* Override media query display none */
+    opacity: 1;
+    transform: translateX(0);
+}
+
+
+/* PC (LG screens: 1024px to 1279px) */
+@media (min-width: 1024px) and (max-width: 1279px) {
+    .sidebar {
+        width: 16rem; /* Fixed expanded on LG */
+        transform: translateX(0); /* Always visible */
+    }
+    /* Profile block and labels are always visible on LG */
+    .sidebar .profile-block,
+    .sidebar .sidebar-nav-label,
+    .sidebar .sidebar-group-control { /* Include group control for LG */
+        display: flex; /* Profile block as flex */
+        opacity: 1;
+        transform: translateX(0);
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+    }
+}
+
+/* PC (XL screens: 1280px and above) */
+@media (min-width: 1280px) {
+    .sidebar {
+        width: 4rem; /* Default collapsed on XL */
+        transform: translateX(0); /* Always visible */
+    }
+    .sidebar:hover {
+        width: 16rem; /* Expand on hover */
+    }
+
+    /* Profile block visibility on XL */
+    .sidebar .profile-block,
+    .sidebar .sidebar-group-control { /* Include group control for XL */
+        display: none; /* Default hidden on XL */
+    }
+    .sidebar:hover .profile-block,
+    .sidebar:hover .sidebar-group-control { /* Show on hover */
+        display: flex; /* Show on hover */
+    }
+
+    /* Labels visibility on XL */
+    .sidebar .sidebar-nav-label {
+        opacity: 0; /* Default hidden on XL */
+        transform: translateX(-8px);
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+    }
+    .sidebar:hover .sidebar-nav-label {
+        opacity: 1; /* Show on hover */
+        transition-delay: 150ms; /* Delay for smoother reveal */
+    }
+}
+
+/* --- Main content and footer padding based on sidebar width --- */
+/* IMPORTANT: These paddings are fixed values for each breakpoint to avoid content shift */
+.main-content, .main-footer {
+    padding-left: 0; /* Default for screens smaller than lg */
+    transition: padding-left 0.3s ease-in-out; /* Smooth padding transition */
+}
+
+/* PC (LG screens: 1024px to 1279px) padding */
+@media (min-width: 1024px) and (max-width: 1279px) {
+    .main-content, .main-footer {
+        padding-left: 16rem; /* Fixed for expanded sidebar on LG */
+    }
+}
+
+/* PC (XL screens: 1280px and above) padding */
+@media (min-width: 1280px) {
+    .main-content, .main-footer {
+        padding-left: 16rem; /* Fixed: Always expanded sidebar's full width for content */
+    }
+}
+
+/* --- Mobile sidebar overlay --- */
+.mobile-sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--color-scrim);
+    z-index: 39; /* Below sidebar, above content */
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none; /* Do not block clicks by default */
+}
+.mobile-sidebar-overlay.is-visible {
+    opacity: 1;
+    pointer-events: auto; /* Block clicks when visible */
+}
+
+/* --- Modal transitions --- */
+/* Ensure modals are always centered */
+.modal-overlay {
+    display: flex; /* Use flex to center */
+    align-items: center; /* Vertical center */
+    justify-content: center; /* Horizontal center */
+    background-color: var(--color-scrim); /* Use scrim for consistent overlay */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 60; /* Higher than sidebar */
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none; /* Do not block clicks by default */
+}
+.modal-overlay[data-state="closed"] { opacity: 0; pointer-events: none; }
+.modal-overlay[data-state="open"] { opacity: 1; pointer-events: auto; } /* Make clickable when open */
+
+.modal-content-transition {
+    transform: translateY(20px) scale(0.95);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.modal-overlay[data-state="open"] .modal-content-transition {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+
+/* --- Responsive Table --- */
+@media (max-width: 768px) { /* md breakpoint for stacking table rows */
+    .survey-table, .survey-table thead, .survey-table tbody, .survey-table th, .survey-table td, .survey-table tr {
+        display: block;
+    }
+
+    .survey-table thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+
+    .survey-table tr {
+        margin-bottom: 1rem;
+        border: 1px solid var(--color-outline-variant);
+        border-radius: 0.8rem;
+        overflow: hidden;
+        box-shadow: var(--shadow-soft);
+    }
+
+    .survey-table td {
+        border-bottom: 1px solid var(--color-outline-variant);
+        position: relative;
+        padding-left: 50%;
+        text-align: right;
+    }
+
+    .survey-table td:last-child {
+        border-bottom: 0;
+    }
+
+    .survey-table td:before {
+        content: attr(data-label);
+        position: absolute;
+        left: 6px;
+        width: 45%;
+        padding-right: 10px;
+        white-space: nowrap;
+        text-align: left;
+        font-weight: bold;
+        color: var(--color-on-surface-variant);
+        font-size: 0.9rem;
+    }
+
+    .actions-cell {
+        justify-content: flex-end;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem; /* Reduced gap for smaller buttons */
+    }
+}
+
+/* --- Custom select appearance for removing default arrow --- */
+select.appearance-none {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2340484D'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1.25rem;
+    padding-right: 2.5rem; /* Ensure space for the custom icon */
+}
+/* Dark Mode Select Arrow adjustment */
+body.dark-mode select.appearance-none {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23BBBBBB'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); /* Lighter arrow for dark mode */
+}
