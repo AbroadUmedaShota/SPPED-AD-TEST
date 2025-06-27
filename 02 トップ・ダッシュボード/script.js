@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     initializeAccountInfoModalFunctionality(modalElement); 
                 }
                 if (modalId === 'surveyDetailsModal') {
-                    setupSurveyDetailsModalListeners();
+                    setupSurveyDetailsModalListeners(modalElement);
                 }
                 // --- End 変更点 ---
 
@@ -561,6 +561,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.stopPropagation();
                 showToast(`アンケートID: ${survey.id} を削除します。（実装はここから）`, 'info');
             });
+
+            // 行クリックで詳細モーダルを開く
+            row.addEventListener('click', (e) => {
+                // ボタンクリック時はモーダルを開かないようにする
+                if (e.target.closest('button')) {
+                    return;
+                }
+                window.handleOpenModal('surveyDetailsModal', 'modals/surveyDetailsModal.html')
+                    .then(() => {
+                        window.populateSurveyDetails(survey);
+                    })
+                    .catch(error => console.error("Failed to open survey details modal:", error));
+            });
         });
 
         surveyTableBody.appendChild(fragment);
@@ -942,6 +955,64 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
+     * Initializes elements specific to the Survey Details Modal.
+     * This is called after the modal's HTML is loaded into the DOM.
+     * @param {HTMLElement} modalElement The root element of the modal overlay.
+     */
+    function setupSurveyDetailsModalListeners(modalElement) {
+        if (!modalElement) {
+            console.warn("surveyDetailsModal element not provided to setupSurveyDetailsModalListeners.");
+            return;
+        }
+
+        const editSurveyBtn = modalElement.querySelector('#editSurveyBtn');
+        const cancelEditBtn = modalElement.querySelector('#cancelEditBtn');
+        const saveSurveyBtn = modalElement.querySelector('#saveSurveyBtn');
+        const detailDownloadBtn = modalElement.querySelector('#detailDownloadBtn');
+
+        // Remove existing listeners to prevent duplication
+        if (editSurveyBtn) editSurveyBtn.removeEventListener('click', handleEditSurvey);
+        if (cancelEditBtn) cancelEditBtn.removeEventListener('click', handleCancelEdit);
+        if (saveSurveyBtn) saveSurveyBtn.removeEventListener('click', handleSaveSurvey);
+        if (detailDownloadBtn) detailDownloadBtn.removeEventListener('click', handleDetailDownload);
+
+        // Add new listeners
+        if (editSurveyBtn) editSurveyBtn.addEventListener('click', handleEditSurvey);
+        if (cancelEditBtn) cancelEditBtn.addEventListener('click', handleCancelEdit);
+        if (saveSurveyBtn) saveSurveyBtn.addEventListener('click', handleSaveSurvey);
+        if (detailDownloadBtn) detailDownloadBtn.addEventListener('click', handleDetailDownload);
+
+        // Ensure it starts in view mode
+        setSurveyDetailsMode('view');
+    }
+
+    function handleEditSurvey() {
+        setSurveyDetailsMode('edit');
+    }
+
+    function handleCancelEdit() {
+        setSurveyDetailsMode('view');
+        // Optionally re-populate with original data if changes were made
+        if (currentEditingSurvey) {
+            populateSurveyDetails(currentEditingSurvey);
+        }
+    }
+
+    function handleSaveSurvey() {
+        // Implement save logic here
+        showToast('アンケート情報を保存します（未実装）', 'info');
+        setSurveyDetailsMode('view');
+    }
+
+    function handleDetailDownload() {
+        if (currentEditingSurvey) {
+            window.openDownloadModal('answer', currentEditingSurvey.periodStart, currentEditingSurvey.periodEnd);
+        } else {
+            showToast('ダウンロードするアンケート情報がありません。', 'error');
+        }
+    }
+
+    /**
      * セクションの展開/折りたたみを行う。
      * @param {Event} event クリックイベント
      */
@@ -1192,5 +1263,14 @@ document.addEventListener('DOMContentLoaded', () => {
         // --- Reset to View Mode --- 
         setSurveyDetailsMode('view');
     };
+
+    // Initial data fetch and render
+    fetchSurveyData().then(data => {
+        allSurveyData = data;
+        applyFiltersAndPagination();
+        console.log("Fetched survey data:", allSurveyData);
+        console.log("Current filtered data:", currentFilteredData);
+    });
+});
 
         

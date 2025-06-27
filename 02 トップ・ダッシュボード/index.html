@@ -41,10 +41,7 @@
             </div>
         </div>
         <div class="flex items-center gap-x-3 sm:gap-x-4">
-            <!-- テーマ切替 -->
-            <button id="themeToggle" class="header-theme-toggle text-on-primary hover:text-primary-container p-2 rounded-full transition-colors" aria-label="テーマを切り替える" onclick="window.toggleTheme()">
-                <span class="material-icons text-2xl" id="themeIcon">light_mode</span>
-            </button>
+            
             <!-- ユーザー情報 -->
             <a href="#" class="text-on-primary font-bold text-shadow-sm transition-opacity" aria-label="現在のユーザー情報" onclick="window.openAccountInfoModal(window.dummyUserData);">user@example.comさん</a>
         </div>
@@ -97,13 +94,7 @@
                     <span class="sidebar-nav-label whitespace-nowrap">ログアウト</span>
                 </a>
             </nav>
-            <!-- サイドバー内テーマ切替 -->
-            <div class="mt-auto p-2 border-t border-outline-variant">
-                <button id="sidebarThemeToggle" class="flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors w-full" aria-label="テーマを切り替える" onclick="window.toggleTheme()">
-                    <span class="material-icons text-lg" id="sidebarThemeIcon">light_mode</span>
-                    <span class="sidebar-nav-label whitespace-nowrap">テーマ切替</span>
-                </button>
-            </div>
+            
         </aside>
 
         <!-- 4. メインコンテンツ -->
