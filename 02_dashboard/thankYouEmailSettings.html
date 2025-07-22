@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SpeedAd - お礼メール設定</title>
+    <title>SpeedAd - アンケート『[アンケート名]』のお礼メール設定</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <!-- Material Icons CDN -->
@@ -117,7 +117,7 @@
 
                 <!-- タイトルエリア -->
                 <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant">
-                    <h1 class="text-on-background text-2xl sm:text-3xl font-bold leading-tight tracking-tight" id="pageTitle">アンケート『[アンケート名]』のお礼メール設定</h1>
+                    <h1 class="text-on-background text-2xl sm:text-3xl font-bold leading-tight tracking-tight" id="pageTitle">アンケート『<span id="surveyNameInTitle"></span>』のお礼メール設定</h1>
                 </div>
 
                 <!-- アンケート基本情報表示エリア -->
@@ -141,7 +141,7 @@
                         </label>
                     </div>
 
-                    <div id="thankYouEmailSettingsFields" class="space-y-6 hidden">
+                    <div id="thankYouEmailSettingsFields" class="space-y-6">
                         <!-- 送信方法 -->
                         <div class="space-y-2">
                             <label class="text-on-surface font-semibold">送信方法</label>
@@ -193,19 +193,35 @@
                                 </div>
                             </div>
                             <textarea id="emailBody" rows="10" placeholder=" " class="input-field"></textarea>
+                            <div id="emailBodyRealtimePreview" class="mt-4 p-4 bg-surface-container rounded-lg text-sm">
+                                <h4 class="font-bold mb-2 text-on-surface-variant">リアルタイムプレビュー</h4>
+                                <p class="text-on-surface-variant">ここにメール本文のリアルタイムプレビューが表示されます。</p>
+                            </div>
                         </div>
 
                         <!-- 送信対象者リスト -->
                         <div class="input-group">
-                            <div id="recipientList" class="input-field-static min-h-[100px]"></div>
+                            <div id="recipientList" class="input-field-static min-h-[100px]">
+                                <p class="text-on-surface-variant text-sm">送信対象者: <span id="recipientCount" class="font-bold">0件</span></p>
+                                <p id="recipientConditionMessage" class="text-sm text-on-surface-variant mt-2">会期終了後、名刺データ化が完了すると対象者が表示されます。</p>
+                            </div>
                             <label class="input-label-static">送信対象者リスト</label>
                         </div>
                     </div>
 
                     <div class="flex justify-end gap-4 pt-4">
                         <button id="cancelThankYouEmailSettings" class="min-w-[100px] px-6 py-2 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors">キャンセル</button>
-                        <button id="saveThankYouEmailSettingsBtn" class="min-w-[100px] px-6 py-2 rounded-full gradient-primary-bg text-on-primary font-semibold transition-colors">保存</button>
-                        <button id="sendThankYouEmailBtn" class="min-w-[100px] px-6 py-2 rounded-full gradient-primary-bg text-on-primary font-semibold transition-colors">お礼メール送信実行</button>
+                        <button id="saveThankYouEmailSettingsBtn" class="min-w-[100px] px-6 py-2 rounded-full gradient-primary-bg text-on-primary font-semibold transition-colors">
+                            <span id="saveThankYouEmailSettingsBtnText">設定を保存する</span>
+                            <span id="saveThankYouEmailSettingsBtnLoading" class="hidden material-icons animate-spin ml-2">sync</span>
+                        </button>
+                        <button id="sendThankYouEmailBtn" class="min-w-[100px] px-6 py-2 rounded-full gradient-primary-bg text-on-primary font-semibold transition-colors" disabled>
+                            <span id="sendThankYouEmailBtnText">お礼メールを送信する</span>
+                            <span id="sendThankYouEmailBtnLoading" class="hidden material-icons animate-spin ml-2">sync</span>
+                        </button>
+                    </div>
+                    <div id="sendEmailStatus" class="mt-4 text-center text-sm text-on-surface-variant">
+                        <!-- 送信ステータス: 送信中 / 送信完了 / 送信失敗 -->
                     </div>
                 </div>
 

@@ -179,8 +179,10 @@
                                 <input type="text" id="couponCode" placeholder=" " class="input-field pr-20">
                                 <label for="couponCode" class="input-label">クーポンコード</label>
                                 <button id="applyCouponBtn" class="absolute right-2 top-1/2 -translate-y-1/2 bg-primary text-on-primary rounded-md px-4 py-2 text-sm font-semibold hover:bg-primary-dark transition-colors shadow-sm">適用</button>
+                                <p class="input-error-message" id="couponCodeErrorMessage"></p>
                             </div>
                             <p id="couponMessage" class="text-sm -mt-4 text-secondary"></p>
+                            <div id="couponFeedback" class="hidden mt-2 p-2 rounded-md text-sm"></div>
 
                         </div>
 
@@ -200,7 +202,10 @@
 
                         <div class="flex justify-end gap-4 pt-4">
                             <button id="cancelBizcardSettings" class="min-w-[100px] px-6 py-2 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors">キャンセル</button>
-                            <button id="saveBizcardSettingsBtn" class="min-w-[100px] px-6 py-2 rounded-full gradient-primary-bg text-on-primary font-semibold transition-colors" disabled>設定を保存して依頼を確定する</button>
+                            <button id="saveBizcardSettingsBtn" class="min-w-[100px] px-6 py-2 rounded-full gradient-primary-bg text-on-primary font-semibold transition-colors" disabled>
+                                <span id="saveBizcardSettingsBtnText">設定を保存して依頼を確定する</span>
+                                <span id="saveBizcardSettingsBtnLoading" class="hidden material-icons animate-spin ml-2">sync</span>
+                            </button>
                         </div>
                     </div>
 
