@@ -104,12 +104,13 @@ document.addEventListener('DOMContentLoaded', () => {
         case 'surveyCreation.html':
             initSurveyCreation();
             break;
-        case 'bizcardSettings.html':
-            initBizcardSettings();
-            break;
-        case 'thankYouEmailSettings.html':
-            initThankYouEmailSettings();
-            break;
+    }
+
+    // Initialize page-specific settings functions after DOM is fully loaded
+    if (page === 'bizcardSettings.html') {
+        initBizcardSettings();
+    } else if (page === 'thankYouEmailSettings.html') {
+        initThankYouEmailSettings();
     }
 
     const openNewSurveyModalBtn = document.getElementById('openNewSurveyModalBtn');

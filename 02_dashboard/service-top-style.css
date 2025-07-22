@@ -16,6 +16,8 @@
     --color-primary: var(--color-brand-primary-purple);
     --color-text-disabled: #AAAAAA; /* 新規追加 */
 
+    --color-brand-primary-purple: #6200EE; /* デフォルトのプライマリカラーを定義 */
+
     /* Brand Colors */
     --color-brand-base-primary: #4285F4; /* ブランド基本プライマリ色 (Google Blue) */
     --color-brand-base-secondary: #BDBDBD; /* ブランド基本セカンダリ色 (Material Grey 400) */
