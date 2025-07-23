@@ -1,16 +1,15 @@
-feat: 名刺データ化設定とお礼メール設定ページのUI/UX改善
+feat: Implement mock UI for Bizcard and Thank You Email settings & Fix JS Syntax Error
 
-- 名刺データ化設定ページ:
-  - クーポンコード入力フィールドに「適用」ボタンを追加。
-  - 必須項目が入力されるまで保存ボタンを無効化。
-  - 保存成功時にトースト通知と画面遷移を実装。
-  - メモ欄の開閉機能を追加。
-  - バリデーションエラー表示を強化。
-- お礼メール設定ページ:
-  - ページヘッダーにアンケート基本情報を表示。
-  - 送信要否をトグルスイッチに変更。
-  - 送信方法のラジオボタンを追加。
-  - メールテンプレートのプレビュー機能を追加。
-  - 変数挿入機能を追加。
-  - 送信対象者リストの表示と送信ボタンの制御を実装。
-  - 送信処理と保存処理に冪等性制御とUIフィードバックを実装。
+This commit implements the initial mock UI for the Bizcard Data Conversion Settings page (bizcardSettings.html) and the Thank You Email Settings page (thankYouEmailSettings.html) based on the AI_Message.md specifications. It also includes a fix for a syntax error in thankYouEmailSettings.js.
+
+Changes include:
+- bizcardSettings.html:
+  - Added placeholder for coupon code feedback.
+  - Integrated loading state elements for the save button.
+- thankYouEmailSettings.html:
+  - Updated page title and H1 to dynamically display survey name.
+  - Added placeholder for real-time email body preview.
+  - Enhanced recipient list display with count and conditional messages.
+  - Integrated loading state elements for save and send email buttons.
+- src/thankYouEmailSettings.js:
+  - Fixed Uncaught SyntaxError: Unexpected end of input by adding a missing closing brace.

@@ -309,7 +309,7 @@ Information about the project is managed in the files defined in the YAML block 
 documentation:
   - file: "README.md"
     purpose: "Provides the information that new participants and external viewers will see first, as the face of the project. It includes the project overview, main features, technologies used, setup, basic usage, license, and contribution guidelines."
-    update_trigger: "When there are major changes to the project's basic information, technology stack, or setup method."
+    update_trigger: "When there are major changes to the project's basic information, technology stack, setup method, or significant new features are added (e.g., interactive survey creation, dynamic UI elements)."
   - file: "CONTRIBUTING.md"
     purpose: "Defines the process for contributing to the project, including how to create Issues and Pull Requests, and the code review process. Aims to lower the barrier for external and internal contributors."
     update_trigger: "When the contribution workflow or review process changes."

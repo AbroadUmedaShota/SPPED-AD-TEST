@@ -7,33 +7,13 @@ import { openDuplicateSurveyModal } from './duplicateSurveyModal.js';
 import { initBreadcrumbs } from './breadcrumb.js';
 import { initBizcardSettings } from './bizcardSettings.js';
 import { initThankYouEmailSettings } from './thankYouEmailSettings.js';
-import { initSurveyCreation } from './surveyCreation.js';
+
 import { showToast, copyTextToClipboard } from './utils.js';
 
 // script.js の最上部に移動 (DOMContentLoadedイベントリスナーの外側)
 // ダミーユーザーデータ (本来はAPIから取得)
 // windowオブジェクトにアタッチすることで、HTMLのonclickから参照可能にする
-window.dummyUserData = {
-    email: "user@example.com",
-    companyName: "株式会社SpeedAd", // テスト用に値を入れておく
-    departmentName: "開発部", // テスト用に値を入れておく
-    positionName: "エンジニア", // テスト用に値を入れておく
-    lastName: "田中",
-    firstName: "太郎",
-    phoneNumber: "09012345678",
-    postalCode: "100-0001",
-    address: "東京都千代田区千代田1-1",
-    buildingFloor: "皇居ビルディング 1F",
-    billingAddressType: "same", // or "different"
-    billingCompanyName: "",
-    billingDepartmentName: "",
-    billingLastName: "",
-    billingFirstName: "",
-    billingPhoneNumber: "",
-    billingPostalCode: "",
-    billingAddress: "",
-    billingBuildingFloor: "",
-};
+
 
 
 // Expose functions to global scope if needed by inline HTML (e.g., onclick attributes)
@@ -101,9 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
             break;
-        case 'surveyCreation.html':
-            initSurveyCreation();
-            break;
+        
     }
 
     // Initialize page-specific settings functions after DOM is fully loaded

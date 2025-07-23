@@ -17,7 +17,7 @@ Material Designの思想を参考にしつつ、ブランドカラーを効果�
 | :--- | :--- | :--- | :--- |
 | **プライマリブランド** | Brand Primary Blue | `#4285F4` | 最も重要なアクションやブランドロゴに使用。 |
 | **セカンダリブランド** | Brand Secondary Grey | `#BDBDBD` | リンクやフォーカス時のハイライトに使用。 |
-| **アクセント** | Header Background | `var(--color-brand-base-primary)` | ヘッダーの背景色。 |
+| **ヘッダー背景** | Header Background | `var(--color-brand-base-primary)` | ヘッダーの背景色。単色。 |
 | **背景 (メイン)** | Background Main | `#FFFFFF` | 画面全体の基本背景色。 |
 | **背景 (サブ)** | Background Sub | `#F8F8F8` | カードやセクションの背景など、少し区別したい場合に使用。 |
 | **テキスト (メイン)** | Text Main | `#1A1A1A` | 本文や主要なテキスト。 |

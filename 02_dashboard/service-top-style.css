@@ -13,10 +13,8 @@
     /* Text Colors */
     --color-text-main: #1A1A1A;
     --color-text-sub: #6B6B6B;
-    --color-primary: var(--color-brand-primary-purple);
+    --color-primary: var(--color-brand-base-primary); /* ガイドラインに合わせて変更 */
     --color-text-disabled: #AAAAAA; /* 新規追加 */
-
-    --color-brand-primary-purple: #6200EE; /* デフォルトのプライマリカラーを定義 */
 
     /* Brand Colors */
     --color-brand-base-primary: #4285F4; /* ブランド基本プライマリ色 (Google Blue) */
@@ -37,7 +35,7 @@
     --color-button-primary-bg: #4285F4;
     --color-button-primary-text: #FFFFFF;
     --color-button-primary-hover-bg: #3367D6; /* プライマリの濃い色 */
-    --color-button-secondary-bg: #F0F0F0;
+    --color-button-secondary-bg: #E0EDFF; /* プライマリブランドカラーの薄い色合いで視認性改善 */
     --color-button-secondary-text: #1A1A1A;
     --color-button-secondary-hover-bg: #9E9E9E; /* セカンダリの濃い色 */
     --color-button-danger-bg: #D32F2F;
@@ -58,7 +56,6 @@
     --color-input-disabled-text: #AAAAAA; /* 新規追加 */
 
     /* M3_CONTAINER_COLOR_MISMATCH: Material 3由来のコンテナカラーの定義残存と再マッピング */
-    --color-primary: var(--color-brand-base-primary);
     --color-secondary: var(--color-brand-base-secondary);
     --color-on-secondary: var(--color-state-on-info);
     --color-secondary-container: var(--color-button-secondary-bg); /* セカンダリーボタン背景色にマッピング */
@@ -72,18 +69,8 @@
     /* Scrim Color (for modal overlays) */
     --color-scrim: rgba(0, 0, 0, 0.15); /* ライトモードの透過度 */
 
-    --color-header-gradient-1: #d123b1;
-    --color-header-gradient-2: #ff428e;
-    --color-header-gradient-3: #df348f;
-    --color-header-gradient-4: #3711c0;
-    --color-header-gradient-1: #d123b1;
-    --color-header-gradient-2: #ff428e;
-    --color-header-gradient-3: #df348f;
-    --color-header-gradient-4: #3711c0;
-    --color-header-gradient-5: #0007d1;
-
     /* Accent Gradient (from guideline) */
-    --color-header-bg: var(--color-brand-base-primary); /* ヘッダーを単色に */
+    --gradient-primary-bg: var(--color-brand-base-primary); /* ヘッダーを単色に */
     --color-button-primary-solid-bg: var(--color-button-primary-bg); /* ボタンを単色に */
     --color-button-secondary-solid-bg: var(--color-brand-base-secondary); /* セカンダリグラデーションを単色に */
 
@@ -202,6 +189,11 @@ body.dark-mode {
 .button-gradient-bg { background: var(--gradient-button-bg); }
 .button-gradient-bg:hover {
     background: var(--color-button-primary-hover-bg);
+}
+
+.button-primary {
+    background-color: var(--color-button-primary-bg);
+    color: var(--color-button-primary-text);
 }
 
 .gradient-primary-bg {
@@ -768,6 +760,11 @@ input.input-field[readonly] {
     background-color: var(--color-primary-container);
     color: var(--color-on-primary-container);
     font-weight: 600; /* semibold */
+}
+
+/* Sidebar link default color */
+.sidebar nav a {
+    color: var(--color-text-main); /* デフォルトのテキスト色を保証 */
 }
 
 /* Sidebar link hover style */
