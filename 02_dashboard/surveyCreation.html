@@ -90,6 +90,10 @@
                     <span class="material-icons text-xl">add_box</span>
                     <span class="sidebar-nav-label whitespace-nowrap">アンケート新規作成</span>
                 </a>
+                <a class="flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors" href="invoiceList.html" aria-label="請求書一覧へ移動">
+                    <span class="material-icons text-xl">receipt_long</span>
+                    <span class="sidebar-nav-label whitespace-nowrap">請求書一覧</span>
+                </a>
                 <div class="border-t border-outline-variant my-2"></div>
                 <button type="button" id="openAccountInfoBtnSidebar" class="flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors w-full">
                     <span class="material-icons text-xl">account_circle</span>
@@ -117,7 +121,7 @@
                 <div id="breadcrumb-container" class="mb-4"></div>
 
                 <!-- タイトルエリア -->
-                <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant">
+                <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant" id="surveyTitleArea">
                     <h1 class="text-on-background text-2xl sm:text-3xl font-bold leading-tight tracking-tight">アンケート作成・編集</h1>
                 </div>
 
@@ -180,10 +184,10 @@
                         <h2 class="text-on-surface text-xl font-semibold mb-4">追加設定</h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="input-group">
-                                <a href="bizcardSettings.html" id="openBizcardSettingsModalLink" class="button-link">名刺データ化設定へ</a>
+                                <button type="button" id="openBizcardSettingsBtn" class="button-link">名刺データ化設定</button>
                             </div>
                             <div class="input-group">
-                                <a href="thankYouEmailSettings.html" id="openThankYouEmailSettingsModalLink" class="button-link">お礼メール設定へ</a>
+                                <button type="button" id="openThankYouEmailSettingsBtn" class="button-link">お礼メール設定</button>
                             </div>
                         </div>
                     </section>
@@ -202,43 +206,9 @@
                         <h2 class="text-on-surface text-xl font-semibold mb-4">質問項目設定</h2>
                         <div id="questionGroupsContainer" class="space-y-6 mb-6"></div>
                         
-                        <div id="floatingNavContainer" class="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2">
-    
-    <button id="openQuestionTypeSelectorBtn" class="w-14 h-14 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-lg hover:scale-105 transition-transform cursor-grab" aria-label="質問を追加">
-        <span class="material-icons text-3xl">add</span>
-    </button>
-</div>
+                        
 
-<div id="questionTypeSelector" class="fixed bottom-[120px] right-4 z-50 bg-surface p-4 rounded-lg shadow-xl hidden flex-col gap-2 w-64">
-    <button type="button" id="addQuestionGroupBtn" class="px-4 py-2 rounded-full bg-primary text-on-primary font-semibold transition-colors text-left">
-        <span class="material-icons text-lg align-middle mr-2">add_box</span> 質問グループを追加
-    </button>
-    <div class="border-t border-outline-variant my-2"></div>
-    <button type="button" id="addFreeAnswerBtn" class="px-4 py-2 rounded-full bg-secondary text-on-secondary font-semibold transition-colors text-left">
-        <span class="material-icons text-lg align-middle mr-2">short_text</span> フリーアンサー
-    </button>
-    <button type="button" id="addSingleAnswerBtn" class="px-4 py-2 rounded-full bg-secondary text-on-secondary font-semibold transition-colors text-left">
-        <span class="material-icons text-lg align-middle mr-2">radio_button_checked</span> シングルアンサー
-    </button>
-    <button type="button" id="addMultiAnswerBtn" class="px-4 py-2 rounded-full bg-secondary text-on-secondary font-semibold transition-colors text-left">
-        <span class="material-icons text-lg align-middle mr-2">check_box</span> マルチアンサー
-    </button>
-    <button type="button" id="addNumberAnswerBtn" class="px-4 py-2 rounded-full bg-secondary text-on-secondary font-semibold transition-colors text-left">
-        <span class="material-icons text-lg align-middle mr-2">pin</span> 数値回答
-    </button>
-    <button type="button" id="addMatrixSABtn" class="px-4 py-2 rounded-full bg-secondary text-on-secondary font-semibold transition-colors text-left">
-        <span class="material-icons text-lg align-middle mr-2">grid_on</span> マトリックス(SA)
-    </button>
-    <button type="button" id="addMatrixMABtn" class="px-4 py-2 rounded-full bg-secondary text-on-secondary font-semibold transition-colors text-left">
-        <span class="material-icons text-lg align-middle mr-2">grid_on</span> マトリックス(MA)
-    </button>
-    <button type="button" id="addDateTimeBtn" class="px-4 py-2 rounded-full bg-secondary text-on-secondary font-semibold transition-colors text-left">
-        <span class="material-icons text-lg align-middle mr-2">event</span> 日付/時間
-    </button>
-    <button type="button" id="addHandwritingBtn" class="px-4 py-2 rounded-full bg-secondary text-on-secondary font-semibold transition-colors text-left">
-        <span class="material-icons text-lg align-middle mr-2">brush</span> 手書きスペース
-    </button>
-</div>
+
                     </section>
 
                     
@@ -250,7 +220,7 @@
                         <button id="cancelCreateSurvey" class="min-w-[100px] px-6 py-3 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors">
                             キャンセル
                         </button>
-                        <button id="createSurveyBtn" class="min-w-[100px] px-6 py-3 rounded-full bg-primary text-on-primary font-semibold transition-colors shadow-md">
+                        <button id="createSurveyBtn" class="min-w-[100px] px-6 py-3 rounded-full bg-primary text-on-primary font-semibold transition-colors shadow-md" disabled>
                             アンケートを保存
                         </button>
                     </div>

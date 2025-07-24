@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>御請求書 - SPEED AD</title>
+    <link rel="stylesheet" href="service-top-style.css">
+    <style>
+        body {
+            font-family: 'Meiryo', 'メイリオ', 'Yu Gothic', '游ゴシック', sans-serif;
+            margin: 0;
+            padding: 20mm; /* A4余白に合わせて調整 */
+            font-size: 10pt;
+            line-height: 1.5;
+            box-sizing: border-box;
+            background-color: #fff;
+            -webkit-print-color-adjust: exact; /* 印刷時に背景色を保持 */
+            color-adjust: exact;
+        }
+
+        .container {
+            width: 190mm; /* A4 幅 (210mm) - 左右余白 (20mm*2) = 170mm. 実際のPDF幅に合わせて調整 */
+            margin: 0 auto;
+        }
+
+        .issue-info {
+            text-align: right;
+            margin-bottom: 8mm; /* PDFに合わせて調整 */
+            font-size: 9pt;
+        }
+
+        .issue-info div {
+            margin-bottom: 2px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20mm; /* PDFに合わせて調整 */
+        }
+
+        .header h1 {
+            font-size: 24pt;
+            margin: 0;
+            padding: 0;
+            display: inline-block;
+            border-bottom: 3px double black;
+            padding-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .recipient-sender-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20mm; /* PDFに合わせて調整 */
+        }
+
+        .recipient-details {
+            flex-grow: 1;
+            padding-right: 20mm; /* 送信者情報との間隔 */
+        }
+
+        .recipient-details div {
+            font-size: 14pt;
+            font-weight: bold;
+            margin-bottom: 7mm; /* "御中"と"様"の間隔 */
+        }
+
+        .sender-details {
+            text-align: right;
+            line-height: 1.3;
+        }
+
+        .sender-logos {
+            margin-bottom: 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end; /* 右寄せ */
+        }
+
+        .logo-abroad {
+            font-family: Arial, sans-serif; /* 欧文フォント */
+            font-size: 12pt;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            margin-bottom: 3px; /* ロゴ間のスペース */
+        }
+        .logo-abroad .text-part {
+            position: relative;
+            z-index: 1;
+        }
+        .logo-abroad .tm-symbol {
+            font-size: 8pt;
+            vertical-align: super;
+            margin-left: -2px; /* TMを少し近づける */
+        }
+        .logo-abroad .co-inc {
+            font-size: 8pt;
+            margin-left: 2px;
+        }
+        .logo-abroad .red-underline {
+            display: inline-block;
+            height: 2px;
+            background-color: #C00000; /* 赤色 */
+            width: 100%; /* テキスト幅に合わせる */
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            z-index: 0;
+        }
+
+        .logo-speedad {
+            font-size: 9pt;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .logo-kabushiki-kaisha {
+            display: inline-block;
+            background-color: #C00000; /* 赤色 */
+            color: white;
+            padding: 2px 4px;
+            font-size: 9pt;
+            font-weight: bold;
+            margin-left: 5px;
+            vertical-align: middle;
+            line-height: 1;
+            box-sizing: border-box;
+            white-space: nowrap; /* 折り返しを防ぐ */
+        }
+
+        .sender-name {
+            font-size: 12pt;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .sender-address, .sender-tel, .sender-registration {
+            font-size: 9pt;
+            line-height: 1.3;
+        }
+
+        .greeting {
+            margin-bottom: 15mm; /* PDFに合わせて調整 */
+            font-size: 10pt;
+        }
+
+        .main-content {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10mm;
+        }
+
+        .billing-summary-table, .bank-details-table {
+            width: 49%; /* ほぼ半々 */
+            border-collapse: collapse;
+            font-size: 9.5pt; /* 微調整 */
+        }
+
+        .billing-summary-table th, .billing-summary-table td,
+        .bank-details-table td {
+            border: 1px solid black;
+            padding: 6px 8px; /* パディング調整 */
+            text-align: left;
+            vertical-align: middle; /* 中央揃え */
+        }
+
+        .billing-summary-table th {
+            background-color: #f2f2f2;
+            white-space: nowrap;
+            width: 30%; /* 件名、小計の列幅 */
+        }
+
+        .billing-summary-table td:last-child {
+            text-align: right;
+            width: 70%;
+        }
+
+        .bank-details-table td:first-child {
+            width: 35%; /* ラベルの列幅 */
+            background-color: #f2f2f2;
+            white-space: nowrap;
+        }
+
+        .bank-details-table td:last-child {
+             width: 65%;
+        }
+
+        .total-amount-row {
+            font-weight: bold;
+            font-size: 12pt;
+        }
+
+        .total-amount-row th, .total-amount-row td {
+            background-color: #e0e0e0; /* 濃い目の灰色 */
+            padding: 8px; /* パディング調整 */
+        }
+
+        .notes {
+            font-size: 8pt;
+            margin-top: 5mm;
+            margin-bottom: 15mm; /* PDFに合わせて調整 */
+            line-height: 1.4;
+        }
+
+        .detail-table-title {
+            font-size: 11pt;
+            font-weight: bold;
+            margin-bottom: 5mm;
+            border-bottom: 1px solid black;
+            padding-bottom: 3px;
+        }
+
+        .detail-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10mm;
+            font-size: 9pt;
+        }
+
+        .detail-table th, .detail-table td {
+            border: 1px solid black;
+            padding: 5px;
+            text-align: left;
+            vertical-align: middle; /* 中央揃え */
+        }
+
+        .detail-table th {
+            background-color: #f2f2f2;
+            text-align: center;
+            white-space: nowrap; /* ヘッダーの折り返しを防ぐ */
+        }
+
+        .detail-table td:nth-child(1) { width: 4%; text-align: center; } /* No. */
+        .detail-table td:nth-child(2) { width: 25%; } /* 品名1 */
+        .detail-table td:nth-child(3) { width: 25%; } /* 品名2 */
+        .detail-table td:nth-child(4) { width: 10%; text-align: right; } /* 数量 */
+        .detail-table td:nth-child(5) { width: 15%; text-align: right; } /* 単価 */
+        .detail-table td:nth-child(6) { width: 21%; text-align: right; } /* 金額 */
+
+        .detail-table tr:empty-cells {
+            height: 18px; /* 空行の高さ調整 */
+        }
+
+        .page-number {
+            text-align: center;
+            margin-top: 5mm; /* PDFに合わせて調整 */
+            font-size: 9pt;
+        }
+
+        /* カスタム要素のスタイル */
+        .mask-val {
+            letter-spacing: 2px; /* ●間のスペース */
+        }
+    </style>
+</head>
+<body>
+    <div style="text-align: right; margin-bottom: 10mm;">
+        <button id="printButton" class="btn btn-outline-secondary"><i class="bi bi-printer"></i> 印刷</button>
+        <button id="downloadPdfButton" class="btn btn-primary"><i class="bi bi-download"></i> PDFダウンロード</button>
+    </div>
+    <div class="container">
+        <div class="issue-info">
+            <div>発行日: yyyy/mm/dd</div>
+            <div>請求書番号: 西暦下2ケタ+ユーザーID5ケタ+連番3ケタ</div>
+        </div>
+
+        <div class="header">
+            <h1>御請求書</h1>
+        </div>
+
+        <div class="recipient-sender-section">
+            <div class="recipient-details">
+                <div>${data.corporate_name} 御中</div>
+                <div>${data.seikyu_name} 様</div>
+            </div>
+            <div class="sender-details">
+                <div class="sender-logos">
+                    <div class="logo-abroad">
+                        <span class="text-part">Abroad Outsourcing Co.</span><span class="tm-symbol">TM</span><span class="co-inc">,Inc</span>
+                    </div>
+                    <div class="logo-speedad">SPEED AD運営会社</div>
+                    <div style="display: flex; align-items: center; margin-top: 5px;">
+                        <span class="sender-name">アブロードアウトソーシング</span><span class="logo-kabushiki-kaisha">株式会社</span>
+                    </div>
+                </div>
+                <div class="sender-address">東京都千代田区岩本町2-11-9 IT2ビル 8階</div>
+                <div class="sender-tel">TEL: 03-5835-0250</div>
+                <div class="sender-registration">登録番号:T9011701016647</div>
+            </div>
+        </div>
+
+        <div class="greeting">
+            平素より格別のお引き立てを賜り、誠にありがとうございます。下記の通りご請求申し上げます。
+        </div>
+
+        <div class="main-content">
+            <table class="billing-summary-table">
+                <tr>
+                    <th>件名</th>
+                    <td>SPEED AD利用料 ${data.利用年月(YYYY年MM月)}月分</td>
+                </tr>
+                <tr>
+                    <th>小計(課税対象)</th>
+                    <td class="mask-val">●●●●● 円</td>
+                </tr>
+                <tr>
+                    <th>消費税等</th>
+                    <td class="mask-val">●● 円</td>
+                </tr>
+                <tr>
+                    <th>小計(非課税)</th>
+                    <td>- 円</td>
+                </tr>
+                <tr class="total-amount-row">
+                    <th>合計ご請求金額</th>
+                    <td class="mask-val">●●●●● 円(税込)</td>
+                </tr>
+            </table>
+
+            <table class="bank-details-table">
+                <tr>
+                    <td>金融機関名</td>
+                    <td>三井住友銀行(0009)</td>
+                </tr>
+                <tr>
+                    <td>支店名</td>
+                    <td>小岩支店(643)</td>
+                </tr>
+                <tr>
+                    <td>口座種類</td>
+                    <td>普通</td>
+                </tr>
+                <tr>
+                    <td>口座番号</td>
+                    <td>7128447</td>
+                </tr>
+                <tr>
+                    <td>口座名義</td>
+                    <td>アブロードアウトソーシング株式会社</td>
+                </tr>
+                <tr>
+                    <td>お支払期日</td>
+                    <td>${data.支払期日(YYYY年MM月DD日)}</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="notes">
+            ※お振込手数料は御社でご負担頂けますようお願い申し上げます。<br>
+            ※お支払期日が休日の場合、前営業日までにお支払いください。
+        </div>
+
+        <div class="detail-table-title">ご請求明細</div>
+
+        <table class="detail-table">
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>品名1</th>
+                    <th>品名2</th>
+                    <th>数量</th>
+                    <th>単価</th>
+                    <th>金額</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>1</td><td>アンケート名A</td><td>名刺データ化費用</td><td class="mask-val">●●</td><td class="mask-val">●●</td><td class="mask-val">●●</td></tr>
+                <tr><td>2</td><td>アンケート名A</td><td>クーポンお値引き</td><td>1</td><td class="mask-val">●●</td><td class="mask-val">●●</td></tr>
+                <tr><td>3</td><td>アンケート名A</td><td>御礼メール送信</td><td class="mask-val">●●</td><td>1</td><td class="mask-val">●●</td></tr>
+                <tr><td>4</td><td>アンケート名A</td><td>小計</td><td></td><td></td><td class="mask-val">●●</td></tr>
+                <tr><td>5</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>6</td><td>アンケート名B</td><td>名刺データ化費用</td><td>560</td><td>200</td><td>112,000</td></tr>
+                <tr><td>7</td><td>アンケート名B</td><td>クーポンお値引き</td><td>1</td><td class="mask-val">●●</td><td class="mask-val">●●</td></tr>
+                <tr><td>8</td><td>アンケート名B</td><td>御礼メール送信</td><td>1,600</td><td>1</td><td>1,600</td></tr>
+                <tr><td>9</td><td>アンケート名B</td><td>小計</td><td></td><td></td><td class="mask-val">●●</td></tr>
+                <tr><td>10</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>11</td><td>月額費用</td><td>グループアカウント利用料</td><td class="mask-val">●●</td><td class="mask-val">●●</td><td class="mask-val">●●</td></tr>
+                <tr><td>12</td><td>月額費用</td><td>小計</td><td></td><td></td><td class="mask-val">●●</td></tr>
+                <tr><td>13</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>14</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>15</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>16</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>17</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>18</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>19</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>20</td><td></td><td></td><td></td><td></td><td></td></tr>
+            </tbody>
+        </table>
+
+        <div class="page-number">
+            1/0
+        </div>
+    </div>
+
+    <!-- Page 2 -->
+    <div class="container" style="page-break-before: always; margin-top: 20mm;">
+        <div class="detail-table-title">ご請求明細</div>
+        <table class="detail-table">
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>品名1</th>
+                    <th>品名2</th>
+                    <th>数量</th>
+                    <th>単価</th>
+                    <th>金額</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>21</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>22</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>23</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>24</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>25</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>26</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>27</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>28</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>29</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>30</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>31</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>32</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>33</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>34</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>35</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>36</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>37</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>38</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>39</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>40</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>41</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>42</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>43</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>44</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>45</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>46</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>47</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>48</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>49</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>50</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>51</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>52</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>53</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>54</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>55</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>56</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>57</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>58</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>59</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>60</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>61</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>62</td><td></td><td></td><td></td><td></td><td></td></tr>
+            </tbody>
+        </table>
+
+        <div class="page-number">
+            2/0
+        </div>
+    </div>
+    <script type="module" src="src/invoiceDetail.js"></script>
+</body>
+</html>

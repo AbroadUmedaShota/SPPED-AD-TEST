@@ -307,20 +307,6 @@ export function duplicateQuestion(originalQuestionElement) {
 }
 
 /**
- * 指定された質問に新しい選択肢を追加します。
- * @param {HTMLElement} questionElement - 選択肢を追加する質問のDOM要素
- */
-export function addOptionToQuestion(questionElement) {
-    const optionsContainer = questionElement.querySelector('.options-container');
-    if (!optionsContainer) return;
-
-    const optionFragment = optionTemplate.content.cloneNode(true);
-    const optionTextInput = optionFragment.querySelector('.option-text-input');
-    optionTextInput.value = '新しい選択肢'; // デフォルト値
-    optionsContainer.insertBefore(optionFragment, optionsContainer.lastElementChild); // 「+ 選択肢を追加」ボタンの前に挿入
-}
-
-/**
  * 新しい質問を既存の質問グループに追加します。
  * @param {string} questionType - 追加する質問のタイプ (例: 'free_answer', 'single_answer')
  * @param {string} targetGroupId - 質問を追加するグループのID。指定がない場合は最後のグループに追加。

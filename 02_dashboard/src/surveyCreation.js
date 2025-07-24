@@ -15,6 +15,11 @@ import {
     renderOutlineMap 
 } from './ui/surveyRenderer.js';
 
+// グローバルスコープで要素を宣言 (DOMContentLoaded内で初期化)
+let openQuestionTypeSelectorBtn;
+let questionTypeSelector;
+let addQuestionGroupBtn;
+
 // ダミーユーザーデータ (本来はAPIから取得)
 window.dummyUserData = {
     email: "user@example.com",
@@ -47,6 +52,15 @@ async function initializePage() {
         populateBasicInfo(surveyData);
         renderAllQuestionGroups(surveyData.questionGroups);
         renderOutlineMap(); // 初期ロード時にアウトラインマップを生成
+
+        // フローティングナビの初期位置を設定
+        const floatingNav = document.getElementById('floatingNavContainer');
+        if (floatingNav) {
+            floatingNav.style.top = '80px'; // ヘッダーの下あたり
+            floatingNav.style.right = '20px'; // 右端から少し内側
+            floatingNav.style.left = 'auto'; // leftをautoに設定してrightを優先
+        }
+
     } catch (error) {
         console.error('Failed to initialize page:', error);
         displayErrorMessage();
@@ -56,7 +70,7 @@ async function initializePage() {
 /**
  * イベントリスナーを登録する
  */
-function setupEventListeners() {
+function setupEventListeners(openQuestionTypeSelectorBtn, questionTypeSelector, addQuestionGroupBtn) {
     // アコーディオンの開閉処理
     document.body.addEventListener('click', (event) => {
         const header = event.target.closest('.accordion-header, .group-header');
@@ -97,29 +111,37 @@ function setupEventListeners() {
     document.getElementById('openAccountInfoBtnHeader').addEventListener('click', () => openAccountInfoModal(window.dummyUserData));
     document.getElementById('openAccountInfoBtnSidebar').addEventListener('click', () => openAccountInfoModal(window.dummyUserData));
     document.getElementById('openContactModalBtn').addEventListener('click', () => handleOpenModal('contactModal', 'modals/contactModal.html'));
+    document.getElementById('openBizcardSettingsBtn').addEventListener('click', () => handleOpenModal('bizcardSettingsModal', 'bizcardSettings.html'));
+    document.getElementById('openThankYouEmailSettingsBtn').addEventListener('click', () => handleOpenModal('thankYouEmailSettingsModal', 'thankYouEmailSettings.html'));
 
     // 「質問グループを追加」ボタンのイベントリスナー (フローティングメニュー内)
-    const addQuestionGroupBtn = document.getElementById('addQuestionGroupBtn');
     if (addQuestionGroupBtn) {
         addQuestionGroupBtn.addEventListener('click', () => {
             addNewQuestionGroup();
-            questionTypeSelector.classList.add('hidden'); // メニューを閉じる
+            if (questionTypeSelector) {
+                questionTypeSelector.classList.add('opacity-0', 'scale-95', 'pointer-events-none'); // メニューを閉じる
+            }
         });
     }
 
-    // 質問タイプ選択ボタンの表示/非表示
-    const openQuestionTypeSelectorBtn = document.getElementById('openQuestionTypeSelectorBtn');
-    const questionTypeSelector = document.getElementById('questionTypeSelector');
-
     if (openQuestionTypeSelectorBtn && questionTypeSelector) {
-        openQuestionTypeSelectorBtn.addEventListener('click', () => {
-            questionTypeSelector.classList.toggle('hidden');
+        
+        openQuestionTypeSelectorBtn.addEventListener('click', (e) => {
+            // ドラッグイベントと競合しないように、クリックイベントの伝播を停止
+            e.stopPropagation();
+            const isHidden = questionTypeSelector.classList.contains('opacity-0');
+            if (isHidden) {
+                updateQuestionTypeSelectorPosition();
+                questionTypeSelector.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
+            } else {
+                questionTypeSelector.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+            }
         });
 
         // 質問タイプ選択メニュー外をクリックで閉じる
         document.addEventListener('click', (event) => {
             if (!questionTypeSelector.contains(event.target) && !openQuestionTypeSelectorBtn.contains(event.target)) {
-                questionTypeSelector.classList.add('hidden');
+                questionTypeSelector.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
             }
         });
     }
@@ -127,35 +149,51 @@ function setupEventListeners() {
     // 各質問タイプボタンのイベントリスナー
     document.getElementById('addFreeAnswerBtn').addEventListener('click', () => {
         addNewQuestion('free_answer');
-        questionTypeSelector.classList.add('hidden');
+        if (questionTypeSelector) {
+            questionTypeSelector.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+        }
     });
     document.getElementById('addSingleAnswerBtn').addEventListener('click', () => {
         addNewQuestion('single_answer');
-        questionTypeSelector.classList.add('hidden');
+        if (questionTypeSelector) {
+            questionTypeSelector.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+        }
     });
     document.getElementById('addMultiAnswerBtn').addEventListener('click', () => {
         addNewQuestion('multi_answer');
-        questionTypeSelector.classList.add('hidden');
+        if (questionTypeSelector) {
+            questionTypeSelector.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+        }
     });
     document.getElementById('addNumberAnswerBtn').addEventListener('click', () => {
         addNewQuestion('number_answer');
-        questionTypeSelector.classList.add('hidden');
+        if (questionTypeSelector) {
+            questionTypeSelector.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+        }
     });
     document.getElementById('addMatrixSABtn').addEventListener('click', () => {
         addNewQuestion('matrix_sa');
-        questionTypeSelector.classList.add('hidden');
+        if (questionTypeSelector) {
+            questionTypeSelector.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+        }
     });
     document.getElementById('addMatrixMABtn').addEventListener('click', () => {
         addNewQuestion('matrix_ma');
-        questionTypeSelector.classList.add('hidden');
+        if (questionTypeSelector) {
+            questionTypeSelector.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+        }
     });
     document.getElementById('addDateTimeBtn').addEventListener('click', () => {
         addNewQuestion('date_time');
-        questionTypeSelector.classList.add('hidden');
+        if (questionTypeSelector) {
+            questionTypeSelector.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+        }
     });
     document.getElementById('addHandwritingBtn').addEventListener('click', () => {
         addNewQuestion('handwriting');
-        questionTypeSelector.classList.add('hidden');
+        if (questionTypeSelector) {
+            questionTypeSelector.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+        }
     });
 
     // 削除ボタンのイベントリスナー (イベントデリゲーション)
@@ -290,30 +328,20 @@ function setupEventListeners() {
     const dragHandle = document.getElementById('openQuestionTypeSelectorBtn'); // ドラッグハンドルをメインボタンに設定
     let isDragging = false;
     let offsetX, offsetY;
+    let startX, startY;
+    const clickThreshold = 5; // クリックとドラッグを判定する閾値 (px)
 
-    // 保存された位置を読み込む
-    const savedPosition = localStorage.getItem('floatingNavPosition');
-    if (savedPosition) {
-        const { top, left } = JSON.parse(savedPosition);
-        floatingNav.style.top = `${top}px`;
-        floatingNav.style.left = `${left}px`;
-        floatingNav.style.right = 'auto'; // bottom/rightを無効化
-        floatingNav.style.bottom = 'auto';
-    } else {
-        // 初期位置を絶対配置に変換
-        const rect = floatingNav.getBoundingClientRect();
-        floatingNav.style.top = `${rect.top}px`;
-        floatingNav.style.left = `${rect.left}px`;
-        floatingNav.style.right = 'auto';
-        floatingNav.style.bottom = 'auto';
-    }
+    // フローティングナビゲーションのドラッグ機能
+    // localStorageによる位置の保存・読み込みは行わない
 
     dragHandle.addEventListener('mousedown', (e) => {
         // メニューが開いている場合はドラッグしない
-        if (!questionTypeSelector.classList.contains('hidden')) {
+        if (!questionTypeSelector.classList.contains('opacity-0')) {
             return;
         }
         isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
         offsetX = e.clientX - floatingNav.getBoundingClientRect().left;
         offsetY = e.clientY - floatingNav.getBoundingClientRect().top;
         floatingNav.style.cursor = 'grabbing';
@@ -326,19 +354,185 @@ function setupEventListeners() {
         floatingNav.style.top = `${e.clientY - offsetY}px`;
     });
 
-    document.addEventListener('mouseup', () => {
+    document.addEventListener('mouseup', (e) => {
         if (isDragging) {
+            const moveX = Math.abs(e.clientX - startX);
+            const moveY = Math.abs(e.clientY - startY);
+            // 移動距離が閾値以下の場合はクリックとみなす
+            if (moveX < clickThreshold && moveY < clickThreshold) {
+                const isHidden = questionTypeSelector.classList.contains('opacity-0');
+                if (isHidden) {
+                    updateQuestionTypeSelectorPosition();
+                    questionTypeSelector.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
+                } else {
+                    questionTypeSelector.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+                }
+            }
+
             isDragging = false;
             floatingNav.style.cursor = 'grab';
-            // 位置を保存
-            const rect = floatingNav.getBoundingClientRect();
-            localStorage.setItem('floatingNavPosition', JSON.stringify({ top: rect.top, left: rect.left }));
+            // 位置を保存するロジックを削除
         }
     });
 }
 
-// DOMの読み込みが完了したら処理を開始
+/**
+ * フローティングメニュー（質問タイプセレクター）の位置を、
+ * 呼び出し元のボタンの位置に基づいて動的に調整する。
+ * メニューが画面外にはみ出さないように位置を計算する。
+ */
+function updateQuestionTypeSelectorPosition() {
+    const button = document.getElementById('openQuestionTypeSelectorBtn');
+    const menu = document.getElementById('questionTypeSelector');
+    const container = document.getElementById('floatingNavContainer');
+
+    if (!button || !menu || !container) return;
+
+    const buttonRect = button.getBoundingClientRect();
+    const menuRect = menu.getBoundingClientRect(); // メニューの実際のサイズを取得
+    const space = 12; // ボタンとメニューの間の余白
+
+    // デフォルトはボタンの直下
+    let top = buttonRect.bottom + space;
+    let left = buttonRect.left;
+
+    // 下にはみ出す場合は、ボタンの上に表示
+    if (top + menuRect.height > window.innerHeight - space) {
+        top = buttonRect.top - menuRect.height - space;
+    }
+
+    // 左右のはみ出しを最終調整
+    if (left < space) {
+        left = space;
+    }
+    if (left + menuRect.width > window.innerWidth - space) {
+        left = window.innerWidth - menuRect.width - space;
+    }
+    
+    // 上にはみ出す場合の最終防衛ライン
+    if (top < space) {
+        top = space;
+    }
+
+    menu.style.top = `${top}px`;
+    menu.style.left = `${left}px`;
+    menu.style.position = 'fixed'; // 常にfixedで表示
+}
+
+/**
+ * フォームの必須項目を検証し、保存ボタンの有効/無効を切り替える。
+ */
+function validateFormForSaveButton() {
+    const saveButton = document.getElementById('createSurveyBtn');
+    const requiredFields = [
+        document.getElementById('surveyName'),
+        document.getElementById('displayTitle'),
+        document.getElementById('periodStart'),
+        document.getElementById('periodEnd'),
+    ];
+
+    function checkValidation() {
+        const allValid = requiredFields.every(field => field.value.trim() !== '');
+        saveButton.disabled = !allValid;
+    }
+
+    requiredFields.forEach(field => {
+        field.addEventListener('input', checkValidation);
+    });
+
+    // 日付ピッカーの変更も監視する
+    const observer = new MutationObserver(checkValidation);
+    requiredFields.forEach(field => {
+        if (field.id.includes('period')) {
+            observer.observe(field, { attributes: true, attributeFilter: ['value'] });
+        }
+    });
+
+    checkValidation(); // 初期チェック
+}
+
+/**
+ * スクロールに合わせてアウトラインマップのアクティブ状態を更新する。
+ */
+function setupScrollSpy(fabButton, fabText) {
+    const mainContent = document.getElementById('main-content');
+    if (!mainContent) return;
+
+    // --- スクロールスパイ機能 ---
+    const outlineLinks = document.querySelectorAll('#outline-map-container a');
+    const sections = Array.from(outlineLinks).map(link => {
+        const id = link.getAttribute('href').substring(1);
+        return document.getElementById(id);
+    }).filter(section => section !== null);
+
+    if (outlineLinks.length > 0 && sections.length > 0) {
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                const id = entry.target.id;
+                const correspondingLink = document.querySelector(`#outline-map-container a[href="#${id}"]`);
+                if (entry.isIntersecting) {
+                    outlineLinks.forEach(link => link.classList.remove('active'));
+                    if (correspondingLink) {
+                        correspondingLink.classList.add('active');
+                    }
+                }
+            });
+        }, { root: mainContent, threshold: 0.5 });
+
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+    }
+
+    // --- FABのテキスト表示切り替え機能 ---
+    let lastScrollTop = mainContent.scrollTop;
+
+    mainContent.addEventListener('scroll', () => {
+        let scrollTop = mainContent.scrollTop;
+        if (scrollTop > lastScrollTop) {
+            // 下にスクロール
+            if (fabText) {
+                fabText.classList.add('w-0', 'opacity-0');
+                fabText.classList.remove('w-auto', 'opacity-100');
+            }
+            if (fabButton) {
+                fabButton.classList.remove('px-5');
+                fabButton.classList.add('px-4');
+            }
+        } else {
+            // 上にスクロール
+            if (fabText) {
+                fabText.classList.remove('w-0', 'opacity-0');
+                fabText.classList.add('w-auto', 'opacity-100');
+            }
+            if (fabButton) {
+                fabButton.classList.remove('px-4');
+                fabButton.classList.add('px-5');
+            }
+        }
+        lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; // For Mobile or negative scrolling
+    }, false);
+}
+
+    // DOMの読み込みが完了したら処理を開始
 document.addEventListener('DOMContentLoaded', () => {
+    // DOM要素の取得をDOMContentLoadedイベント内で行う
+    openQuestionTypeSelectorBtn = document.getElementById('openQuestionTypeSelectorBtn');
+    questionTypeSelector = document.getElementById('questionTypeSelector');
+    addQuestionGroupBtn = document.getElementById('addQuestionGroupBtn');
+
+    console.log('DOMContentLoaded: openQuestionTypeSelectorBtn', openQuestionTypeSelectorBtn);
+    console.log('DOMContentLoaded: questionTypeSelector', questionTypeSelector);
+    console.log('DOMContentLoaded: addQuestionGroupBtn', addQuestionGroupBtn);
+
     initializePage();
     setupEventListeners();
+    setupScrollSpy();
+
+    // ウィンドウのリサイズ時にフローティングボタンの位置を更新
+    window.addEventListener('resize', () => {
+        if (questionTypeSelector) {
+            questionTypeSelector.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+        }
+    }, true);
 });

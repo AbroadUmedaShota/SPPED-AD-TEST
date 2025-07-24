@@ -738,10 +738,7 @@ input.input-field[readonly] {
     border-radius: 0.375rem !important;
 }
 
-/* メインコンテンツの表示を拡大 */
-#main-content {
-    zoom: 1.2;
-}
+
 
 /* Drag and Drop styles */
 .question-item.dragging {

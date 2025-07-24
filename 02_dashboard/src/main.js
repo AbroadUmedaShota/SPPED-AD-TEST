@@ -7,6 +7,8 @@ import { openDuplicateSurveyModal } from './duplicateSurveyModal.js';
 import { initBreadcrumbs } from './breadcrumb.js';
 import { initBizcardSettings } from './bizcardSettings.js';
 import { initThankYouEmailSettings } from './thankYouEmailSettings.js';
+import { initInvoiceListPage } from './invoiceList.js';
+import { initInvoiceDetailPage } from './invoiceDetail.js';
 
 import { showToast, copyTextToClipboard } from './utils.js';
 
@@ -80,6 +82,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     endDatePicker.set('minDate', dateStr);
                 }
             });
+            break;
+        case 'invoiceList.html':
+            initInvoiceListPage();
+            break;
+        case 'invoiceDetail.html':
+            initInvoiceDetailPage();
             break;
         
     }
