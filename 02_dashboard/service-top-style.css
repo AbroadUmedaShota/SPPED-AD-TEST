@@ -802,3 +802,20 @@ input.input-field[readonly] {
 }
 
 
+/* 会社ロゴのスタイル */
+.company-logo {
+    width: 150px; /* ロゴの幅を調整 */
+    height: auto;
+    margin-bottom: 5px;
+    margin-right: 10px; /* 社判との間に余白を追加 */
+}
+
+/* 会社印のスタイル */
+.company-seal {
+    width: 60px; /* 社判のサイズを調整 */
+    height: auto;
+    opacity: 0.7; /* 透過度を調整 */
+    z-index: 1; /* 他の要素の上に表示 */
+}
+
+
