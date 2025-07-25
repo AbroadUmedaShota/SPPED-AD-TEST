@@ -20,6 +20,7 @@ export function initInvoiceListPage() {
         invoiceListBody.innerHTML = ''; // 既存の行をクリア
         invoices.forEach(invoice => {
             const row = document.createElement('tr');
+            row.classList.add('hover:bg-surface-variant', 'cursor-pointer');
 
             // 発行月 (issueDateからYYYY年MM月形式に変換)
             const issueDate = new Date(invoice.issueDate);
@@ -51,7 +52,7 @@ export function initInvoiceListPage() {
                 <td>¥${formattedAmount}</td>
                 <td>${statusBadge}</td>
                 <td>
-                    <button class="btn btn-outline-primary btn-sm view-detail-btn" data-invoice-id="${invoice.invoiceId}">
+                    <button class="button-secondary btn-sm view-detail-btn" data-invoice-id="${invoice.invoiceId}">
                         詳細
                     </button>
                 </td>

@@ -9,6 +9,10 @@ const breadcrumbPaths = {
         { name: 'アンケート作成・編集', link: '#' }, // surveyIdが必要なため、動的に設定
         { name: '名刺データ化設定', link: 'bizcardSettings.html' },
     ],
+    'invoiceList.html': [
+        { name: 'アンケート一覧', link: 'index.html' },
+        { name: '請求書一覧', link: 'invoiceList.html' },
+    ],
     'thankYouEmailSettings.html': [
         { name: 'アンケート一覧', link: 'index.html' },
         { name: 'アンケート作成・編集', link: '#' }, // surveyIdが必要なため、動的に設定
