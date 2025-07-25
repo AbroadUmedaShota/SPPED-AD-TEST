@@ -738,6 +738,13 @@ input.input-field[readonly] {
     color: var(--color-primary);
 }
 
+/* Table cell vertical alignment and padding */
+.survey-table td {
+    padding-top: 0.75rem; /* Equivalent to Tailwind's py-3 */
+    padding-bottom: 0.75rem; /* Equivalent to Tailwind's py-3 */
+    vertical-align: middle; /* Vertically align content in the middle */
+}
+
 /* flatpickrのテーマカスタマイズ */
 .flatpickr-calendar .flatpickr-day.selected,
 .flatpickr-calendar .flatpickr-day.startRange,
