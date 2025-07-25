@@ -1,5 +1,5 @@
 export function initInvoiceListPage() {
-    const invoiceListBody = document.getElementById('invoice-list-body');
+    const invoiceListBody = document.getElementById('invoice-table-body');
 
     // 仮のデータ読み込み関数
     async function fetchInvoices() {
