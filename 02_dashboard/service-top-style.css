@@ -196,6 +196,14 @@ body.dark-mode {
     color: var(--color-button-primary-text);
 }
 
+.button-primary:hover {
+    background-color: var(--color-button-primary-hover-bg);
+}
+
+.hover-bg-secondary-hover:hover {
+    background-color: var(--color-button-secondary-hover-bg);
+}
+
 .gradient-primary-bg {
     background: var(--gradient-primary-bg);
 }
@@ -259,51 +267,7 @@ body.overflow-hidden {
 }
 
 
-/* PC (1024px and above) */
-@media (min-width: 1024px) {
-    .sidebar {
-        width: 4rem; /* Default collapsed on XL */
-        transform: translateX(0); /* Always visible */
-    }
-    .sidebar:hover {
-        width: 16rem; /* Expand on hover */
-    }
-
-    /* Profile block visibility on XL */
-    /* サイドバーが折りたたまれているときは非表示 */
-    .sidebar .profile-block,
-    .sidebar .sidebar-group-control {
-        display: none; /* Default hidden on XL when collapsed */
-        opacity: 0; /* トランジションのためにopacityも初期値として設定 */
-        transform: translateX(-8px); /* トランジションのためにtransformも初期値として設定 */
-        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
-    }
-    /* サイドバーにホバーしたときに表示 */
-    .sidebar:hover .profile-block,
-    .sidebar:hover .sidebar-group-control {
-        display: flex; /* Show on hover */
-        flex-direction: column; /* SIDBAR LAYOUT FIX: Ensure column direction on hover */
-        align-items: flex-start; /* Ensure items start at the beginning */
-        gap: 8px; /* Add gap for consistency */
-        opacity: 1; /* フェードイン */
-        transform: translateX(0); /* スライドイン */
-        transition-delay: 150ms; /* Delay for smoother reveal */
-    }
-
-    /* Labels visibility on XL */
-    .sidebar .sidebar-nav-label {
-        opacity: 0; /* Default hidden on XL */
-        transform: translateX(-8px);
-        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
-    }
-    .sidebar:hover .sidebar-nav-label {
-        opacity: 1; /* Show on hover */
-        transition-delay: 150ms; /* Delay for smoother reveal */
-    }
-    /* Header mobile toggle should be hidden on XL+ */
-    .header-theme-toggle { display: block; } /* Show header theme toggle on XL+ */
-    .lg\\:hidden { display: none !important; } /* Hide mobile toggle button */
-}
+/* PC (1024px and above) */@media (min-width: 1024px) {    .sidebar {        width: 4rem; /* Default collapsed on XL */        transform: translateX(0); /* Always visible */    }    .sidebar:hover {        width: 16rem; /* Expand on hover */    }    /* Profile block visibility on XL */    /* サイドバーが折りたたまれているときは非表示 */    .sidebar .profile-block,    .sidebar .sidebar-group-control {        display: none; /* Default hidden on XL when collapsed */        opacity: 0; /* トランジションのためにopacityも初期値として設定 */        transform: translateX(-8px); /* トランジションのためにtransformも初期値として設定 */        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;    }    /* サイドバーにホバーしたときに表示 */    .sidebar:hover .profile-block,    .sidebar:hover .sidebar-group-control {        display: flex; /* Show on hover */        flex-direction: column; /* SIDBAR LAYOUT FIX: Ensure column direction on hover */        align-items: flex-start; /* Ensure items start at the beginning */        gap: 8px; /* Add gap for consistency */        opacity: 1; /* フェードイン */        transform: translateX(0); /* スライドイン */        transition-delay: 150ms; /* Delay for smoother reveal */    }    /* Labels visibility on XL */    .sidebar .sidebar-nav-label {        opacity: 0; /* Default hidden on XL */        transform: translateX(-8px);        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;    }    .sidebar:hover .sidebar-nav-label {        opacity: 1; /* Show on hover */        transition-delay: 150ms; /* Delay for smoother reveal */    }    /* Header mobile toggle should be hidden on XL+ */    .header-theme-toggle { display: block; } /* Show header theme toggle on XL+ */    .lg\:hidden { display: none !important; } /* Hide mobile toggle button */} 
 
 /* Mobile Screens (Small to Medium Tablets) */
 @media (max-width: 1023px) { /* Screens smaller than LG */

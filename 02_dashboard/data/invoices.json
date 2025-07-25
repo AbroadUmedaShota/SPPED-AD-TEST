@@ -1,0 +1,40 @@
+[
+  {
+    "invoiceId": "inv-202507-001",
+    "accountId": "acc-12345",
+    "issueDate": "2025-07-31",
+    "dueDate": "2025-08-31",
+    "totalAmount": 55000,
+    "tax": 5000,
+    "status": "unpaid",
+    "items": [
+      {
+        "itemName": "月額基本サービス料 (2025年7月分)",
+        "amount": 30000
+      },
+      {
+        "itemName": "アンケート「A展示会来場者アンケート」利用料",
+        "amount": 20000
+      }
+    ]
+  },
+  {
+    "invoiceId": "inv-202506-001",
+    "accountId": "acc-12345",
+    "issueDate": "2025-06-30",
+    "dueDate": "2025-07-30",
+    "totalAmount": 44000,
+    "tax": 4000,
+    "status": "paid",
+    "items": [
+      {
+        "itemName": "月額基本サービス料 (2025年6月分)",
+        "amount": 30000
+      },
+      {
+        "itemName": "アンケート「Bイベント参加者アンケート」利用料",
+        "amount": 10000
+      }
+    ]
+  }
+]

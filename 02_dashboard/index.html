@@ -45,7 +45,7 @@
         <div class="flex items-center gap-x-3 sm:gap-x-4">
             
             <!-- ユーザー情報 -->
-            <a href="#" class="text-on-primary font-bold transition-opacity" aria-label="現在のユーザー情報" onclick="window.openAccountInfoModal(window.dummyUserData);">user@example.comさん</a>
+            <a href="#" class="text-on-primary font-bold transition-opacity" aria-label="現在のユーザー情報" onclick="openAccountInfoModal();">user@example.comさん</a>
         </div>
     </header>
 
@@ -138,7 +138,7 @@
                             <input type="text" id="searchKeyword" placeholder=" " class="input-field pl-10 pr-10">
                             <label for="searchKeyword" class="input-label">キーワードで検索</label>
                             <span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl pointer-events-none">search</span>
-                            <button id="searchButton" class="absolute right-2 top-1/2 -translate-y-1/2 bg-primary text-on-primary rounded-md px-2 py-1 text-sm font-semibold hover:bg-primary-dark transition-colors" aria-label="検索を実行">
+                            <button id="searchButton" class="absolute right-2 top-1/2 -translate-y-1/2 bg-primary text-on-primary rounded-md h-10 px-5 text-sm font-semibold hover:bg-primary-dark transition-colors" aria-label="検索を実行">
                                 検索
                             </button>
                         </div>
@@ -179,7 +179,7 @@
                         </div>
                     </div>
                     <div class="flex justify-end mt-4">
-                        <button id="resetFiltersButton" class="px-4 py-2 rounded-md bg-secondary-container text-on-secondary-container font-semibold transition-colors shadow-sm hover:bg-secondary-container-dark" aria-label="フィルターをリセット">
+                        <button id="resetFiltersButton" class="px-4 py-2 rounded-md bg-secondary-container text-on-secondary-container font-semibold transition-colors shadow-sm hover-bg-secondary-hover-dark" aria-label="フィルターをリセット">
                             フィルターをリセット
                         </button>
                     </div>

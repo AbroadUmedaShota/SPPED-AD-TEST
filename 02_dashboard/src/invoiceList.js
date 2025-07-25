@@ -1,42 +1,74 @@
-
-const sampleInvoices = [
-    {
-        issueMonth: "2025年7月",
-        invoiceId: "2500123001",
-        dueDate: "2025-08-31",
-        amount: 55000,
-    },
-    {
-        issueMonth: "2025年6月",
-        invoiceId: "2500123000",
-        dueDate: "2025-07-31",
-        amount: 48000,
-    },
-    {
-        issueMonth: "2025年5月",
-        invoiceId: "2500122999",
-        dueDate: "2025-06-30",
-        amount: 52000,
-    }
-];
-
-function renderInvoiceTable(invoices) {
-    const tableBody = document.getElementById('invoice-table-body');
-    if (!tableBody) return;
-
-    tableBody.innerHTML = invoices.map(invoice => `
-        <tr class="hover:bg-surface-variant cursor-pointer" onclick="window.location.href='invoiceDetail.html?id=${invoice.invoiceId}'">
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-on-surface">${invoice.issueMonth}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-on-surface font-mono">${invoice.invoiceId}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-on-surface">${invoice.dueDate}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-on-surface text-right">${new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY' }).format(invoice.amount)}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <a href="invoiceDetail.html?id=${invoice.invoiceId}" class="text-primary hover:text-primary-dark">詳細</a>
-            </td>
-        </tr>
-    `).join('');
-}
-
 export function initInvoiceListPage() {
-    renderInvoiceTable(sampleInvoices);
+    const invoiceListBody = document.getElementById('invoice-list-body');
+
+    // 仮のデータ読み込み関数
+    async function fetchInvoices() {
+        try {
+            const response = await fetch('data/invoices.json');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const invoices = await response.json();
+            renderInvoices(invoices);
+        } catch (error) {
+            console.error('請求書データの読み込みに失敗しました:', error);
+            invoiceListBody.innerHTML = '<tr><td colspan="4">請求書データの読み込みに失敗しました。</td></tr>';
+        }
+    }
+
+    function renderInvoices(invoices) {
+        invoiceListBody.innerHTML = ''; // 既存の行をクリア
+        invoices.forEach(invoice => {
+            const row = document.createElement('tr');
+
+            // 発行月 (issueDateからYYYY年MM月形式に変換)
+            const issueDate = new Date(invoice.issueDate);
+            const year = issueDate.getFullYear();
+            const month = issueDate.getMonth() + 1; // 月は0から始まるため+1
+            const formattedMonth = `${year}年${month}月`;
+
+            // 請求金額 (カンマ区切りにフォーマット)
+            const formattedAmount = invoice.totalAmount.toLocaleString();
+
+            // 支払状況に応じたバッジ
+            let statusBadge = '';
+            switch (invoice.status) {
+                case 'unpaid':
+                    statusBadge = `<span class="badge bg-warning text-dark">未払</span>`;
+                    break;
+                case 'paid':
+                    statusBadge = `<span class="badge bg-success text-white">支払済</span>`;
+                    break;
+                case 'processing':
+                    statusBadge = `<span class="badge bg-info text-white">処理中</span>`;
+                    break;
+                default:
+                    statusBadge = `<span class="badge bg-secondary">不明</span>`;
+            }
+
+            row.innerHTML = `
+                <td>${formattedMonth}</td>
+                <td>¥${formattedAmount}</td>
+                <td>${statusBadge}</td>
+                <td>
+                    <button class="btn btn-outline-primary btn-sm view-detail-btn" data-invoice-id="${invoice.invoiceId}">
+                        詳細
+                    </button>
+                </td>
+            `;
+            invoiceListBody.appendChild(row);
+        });
+
+        // 詳細ボタンにイベントリスナーを追加
+        document.querySelectorAll('.view-detail-btn').forEach(button => {
+            button.addEventListener('click', (event) => {
+                const invoiceId = event.target.dataset.invoiceId;
+                // 請求書詳細画面へ遷移
+                window.location.href = `invoiceDetail.html?invoiceId=${invoiceId}`;
+            });
+        });
+    }
+
+    // 請求書データを読み込む
+    fetchInvoices();
 }

@@ -1,0 +1,38 @@
+[
+  {
+    "answerId": "6794",
+    "imageUrl": { "front": "images/sample_card_01_front.jpg", "back": "" },
+    "group1": { "email": "taro.yamada@sample.co.jp" },
+    "group2": { "lastName": "山田", "firstName": "太郎" },
+    "group3": { "companyName": "株式会社サンプル", "department": "営業部", "position": "部長" },
+    "group4": { "zipCode": "100-0001", "address1": "東京都千代田区千代田1-1", "address2": "サンプルビル1F" },
+    "group5": { "tel1": "03-1234-5678", "tel2": "", "mobile": "090-1234-5678", "fax": "03-1234-5679" },
+    "group6": { "url": "http://www.sample.co.jp" },
+    "group7": { "notes": "第一展示場のブースにて名刺交換。" },
+    "group8": { "freeInput": "" }
+  },
+  {
+    "answerId": "6795",
+    "imageUrl": { "front": "images/sample_card_02_front.jpg", "back": "images/sample_card_02_back.jpg" },
+    "group1": { "email": "hanako.suzuki@abc-shoji.co.jp" },
+    "group2": { "lastName": "鈴木", "firstName": "花子" },
+    "group3": { "companyName": "ABC商事株式会社", "department": "マーケティング部", "position": "課長" },
+    "group4": { "zipCode": "541-0041", "address1": "大阪府大阪市中央区北浜1-8-16", "address2": "ABCビル" },
+    "group5": { "tel1": "06-1234-5678", "tel2": "", "mobile": "080-1234-5678", "fax": "06-1234-5679" },
+    "group6": { "url": "http://www.abc-shoji.co.jp" },
+    "group7": { "notes": "" },
+    "group8": { "freeInput": "" }
+  },
+  {
+    "answerId": "6801",
+    "imageUrl": { "front": "images/sample_card_03_front.jpg", "back": "" },
+    "group1": { "email": "ichiro.sato@tech-sol.co.jp" },
+    "group2": { "lastName": "佐藤", "firstName": "一郎" },
+    "group3": { "companyName": "テックソリューションズ株式会社", "department": "開発部", "position": "主任" },
+    "group4": { "zipCode": "220-0012", "address1": "神奈川県横浜市西区みなとみらい2-2-1", "address2": "ランドマークタワー 10F" },
+    "group5": { "tel1": "045-123-4567", "tel2": "", "mobile": "070-1234-5678", "fax": "045-123-4568" },
+    "group6": { "url": "http://www.tech-sol.co.jp" },
+    "group7": { "notes": "テスト用データ" },
+    "group8": { "freeInput": "" }
+  }
+]
