@@ -22,12 +22,14 @@ export function setupSurveyDetailsModalListeners(modalElement) {
     const deleteSurveyBtn = modalElement.querySelector('#deleteSurveyBtn');
     const goToBizcardSettingsBtn = modalElement.querySelector('#goToBizcardSettingsBtn');
     const goToThankYouEmailSettingsBtn = modalElement.querySelector('#goToThankYouEmailSettingsBtn');
+    const goToSpeedReviewBtn = modalElement.querySelector('#goToSpeedReviewBtn');
 
     // Remove existing listeners to prevent duplication
     if (detailDownloadBtn) detailDownloadBtn.removeEventListener('click', handleDetailDownload);
     if (deleteSurveyBtn) deleteSurveyBtn.removeEventListener('click', handleDeleteSurvey);
     if (goToBizcardSettingsBtn) goToBizcardSettingsBtn.removeEventListener('click', handleGoToBizcardSettings);
     if (goToThankYouEmailSettingsBtn) goToThankYouEmailSettingsBtn.removeEventListener('click', handleGoToThankYouEmailSettings);
+    if (goToSpeedReviewBtn) goToSpeedReviewBtn.removeEventListener('click', handleGoToSpeedReview);
 
     // Add new listeners
     if (editSurveyBtn) editSurveyBtn.addEventListener('click', () => {
@@ -43,6 +45,7 @@ export function setupSurveyDetailsModalListeners(modalElement) {
     if (deleteSurveyBtn) deleteSurveyBtn.addEventListener('click', handleDeleteSurvey);
     if (goToBizcardSettingsBtn) goToBizcardSettingsBtn.addEventListener('click', handleGoToBizcardSettings);
     if (goToThankYouEmailSettingsBtn) goToThankYouEmailSettingsBtn.addEventListener('click', handleGoToThankYouEmailSettings);
+    if (goToSpeedReviewBtn) goToSpeedReviewBtn.addEventListener('click', handleGoToSpeedReview);
 
     
 }
@@ -58,6 +61,14 @@ function handleGoToBizcardSettings() {
 function handleGoToThankYouEmailSettings() {
     if (currentEditingSurvey && currentEditingSurvey.id) {
         window.location.href = `thankYouEmailSettings.html?surveyId=${currentEditingSurvey.id}`;
+    } else {
+        showToast('アンケート情報がありません。', 'error');
+    }
+}
+
+function handleGoToSpeedReview() {
+    if (currentEditingSurvey && currentEditingSurvey.id) {
+        window.location.href = `speed-review.html?surveyId=${currentEditingSurvey.id}`;
     } else {
         showToast('アンケート情報がありません。', 'error');
     }
