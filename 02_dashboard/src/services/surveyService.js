@@ -77,3 +77,32 @@ export function collectSurveyDataFromDOM() {
 
     return surveyData;
 }
+
+const LOCAL_STORAGE_KEY = 'surveyCreationData';
+
+/**
+ * 収集したアンケートデータをlocalStorageに保存します。
+ * @param {object} surveyData 保存するアンケートデータ
+ */
+export function saveSurveyDataToLocalStorage(surveyData) {
+    try {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(surveyData));
+        console.log('Survey data saved to localStorage.');
+    } catch (e) {
+        console.error('Error saving survey data to localStorage:', e);
+    }
+}
+
+/**
+ * localStorageからアンケートデータを読み込みます。
+ * @returns {object | null} 読み込んだアンケートデータ、または存在しない場合はnull
+ */
+export function loadSurveyDataFromLocalStorage() {
+    try {
+        const data = localStorage.getItem(LOCAL_STORAGE_KEY);
+        return data ? JSON.parse(data) : null;
+    } catch (e) {
+        console.error('Error loading survey data from localStorage:', e);
+        return null;
+    }
+}

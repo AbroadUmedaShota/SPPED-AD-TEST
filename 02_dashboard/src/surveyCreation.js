@@ -1,6 +1,6 @@
 import { handleOpenModal } from './modalHandler.js';
 import { openAccountInfoModal } from './accountInfoModal.js';
-import { fetchSurveyData, collectSurveyDataFromDOM } from './services/surveyService.js';
+import { fetchSurveyData, collectSurveyDataFromDOM, saveSurveyDataToLocalStorage, loadSurveyDataFromLocalStorage } from './services/surveyService.js';
 import { 
     populateBasicInfo, 
     renderAllQuestionGroups, 
@@ -48,9 +48,17 @@ window.dummyUserData = {
  */
 async function initializePage() {
     try {
-        const surveyData = await fetchSurveyData();
-        populateBasicInfo(surveyData);
-        renderAllQuestionGroups(surveyData.questionGroups);
+        let surveyData = loadSurveyDataFromLocalStorage();
+        if (surveyData) {
+            console.log('Loaded survey data from localStorage:', surveyData);
+            populateBasicInfo(surveyData);
+            renderAllQuestionGroups(surveyData.questionGroups);
+        } else {
+            console.log('No survey data in localStorage. Fetching initial data...');
+            surveyData = await fetchSurveyData();
+            populateBasicInfo(surveyData);
+            renderAllQuestionGroups(surveyData.questionGroups);
+        }
         renderOutlineMap(); // 初期ロード時にアウトラインマップを生成
 
         // フローティングナビの初期位置を設定
@@ -65,7 +73,6 @@ async function initializePage() {
         console.error('Failed to initialize page:', error);
         displayErrorMessage();
     }
-}
 
 /**
  * イベントリスナーを登録する
@@ -250,10 +257,9 @@ function setupEventListeners(openQuestionTypeSelectorBtn, questionTypeSelector, 
     if (createSurveyBtn) {
         createSurveyBtn.addEventListener('click', () => {
             const surveyData = collectSurveyDataFromDOM();
-            console.log('Collected Survey Data:', surveyData);
-            // ここにバリデーションロジックや、一時的なデータ保持ロジックを追加
-            // 現時点では永続化は行わないため、コンソール出力のみ
-            alert('アンケートデータがコンソールに出力されました。');
+            saveSurveyDataToLocalStorage(surveyData); // localStorageに保存
+            console.log('Collected Survey Data and saved to localStorage:', surveyData);
+            alert('アンケートデータがlocalStorageに保存されました！');
         });
     }
 
