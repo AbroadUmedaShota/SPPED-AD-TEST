@@ -1,0 +1,61 @@
+        <aside class="fixed inset-y-0 left-0 z-40 flex flex-col border-r border-outline-variant bg-surface pt-16 overflow-y-auto sidebar" id="sidebar">
+            <!-- プロファイルブロック -->
+            <div class="p-4 border-b border-outline-variant profile-block">
+                <div class="flex items-center gap-3">
+                    <div class="bg-on-primary-fixed-variant aspect-square rounded-full size-10 border-2 border-outline-variant flex items-center justify-center">
+                        <span class="material-icons text-primary text-4xl leading-none">account_circle</span>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-on-surface text-sm font-semibold">user@example.com</p>
+                        <p class="text-on-surface-variant text-xs">Current Group</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- グループ管理 -->
+            <div class="p-4 border-b border-outline-variant sidebar-group-control">
+                <select id="user_select" class="w-full rounded-md shadow-sm bg-on-primary-fixed-variant text-on-surface focus:ring-secondary focus:border-secondary transition-all text-sm py-2 px-3 appearance-none" aria-label="ユーザーグループを選択">
+                    <option value="current">Current Group</option>
+                    <option value="group_a">Group A</option>
+                    <option value="group_b">Group B</option>
+                </select>
+                <button class="w-full mt-2 button-primary text-on-primary py-2 px-3 rounded-md shadow-sm font-semibold text-sm" aria-label="グループを切り替える">
+                    切替
+                </button>
+                <button class="w-full mt-2 button-primary text-on-primary py-2 px-3 rounded-md shadow-sm font-semibold text-sm" aria-label="グループを新規作成" onclick="handleOpenModal('newGroupModal', 'modals/newGroupModal.html')">
+                    グループ新規作成
+                </button>
+            </div>
+
+            <!-- ナビゲーション -->
+            <nav class="flex-1 space-y-1 p-2">
+                <a class="flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors" href="index.html" aria-label="アンケート一覧へ移動">
+                    <span class="material-icons text-xl">list_alt</span>
+                    <span class="sidebar-nav-label whitespace-nowrap">アンケート一覧</span>
+                </a>
+                <a class="flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors" href="surveyCreation.html" aria-label="アンケート新規作成へ移動">
+                    <span class="material-icons text-xl">add_box</span>
+                    <span class="sidebar-nav-label whitespace-nowrap">アンケート新規作成</span>
+                </a>
+                <a class="flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors" href="invoiceList.html" aria-label="請求書一覧へ移動">
+                    <span class="material-icons text-xl">receipt_long</span>
+                    <span class="sidebar-nav-label whitespace-nowrap">ご請求内容一覧</span>
+                </a>
+                <div class="border-t border-outline-variant my-2"></div>
+                <a class="flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors" href="#" onclick="window.openAccountInfoModal(window.dummyUserData);" aria-label="アカウント情報を表示">
+                    <span class="material-icons text-xl">account_circle</span>
+                    <span class="sidebar-nav-label whitespace-nowrap">アカウント情報</span>
+                </a>
+                <a class="flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors" href="#" aria-label="ログアウトする" id="logoutButton">
+                    <span class="material-icons text-lg">logout</span>
+                    <span class="sidebar-nav-label whitespace-nowrap">ログアウト</span>
+                </a>
+            </nav>
+            <!-- テーマ切り替えボタン (サイドバー下部) -->
+            <div class="mt-auto p-2 border-t border-outline-variant">
+                <a class="flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors" href="#" aria-label="テーマを切り替える" id="sidebarThemeToggle">
+                    <span class="material-icons text-lg" id="sidebarThemeIcon">light_mode</span>
+                    <span class="sidebar-nav-label whitespace-nowrap">テーマ切替</span>
+                </a>
+            </div>
+        </aside>
