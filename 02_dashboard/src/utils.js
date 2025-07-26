@@ -130,7 +130,7 @@ export function downloadFile(url, filename) {
  * @param {string} placeholderId The ID of the HTML element to insert the content into.
  * @param {string} filePath The path to the HTML file to load.
  */
-export async function loadCommonHtml(placeholderId, filePath) {
+export async function loadCommonHtml(placeholderId, filePath, callback = null) {
     try {
         const response = await fetch(filePath);
         if (!response.ok) {
@@ -140,6 +140,9 @@ export async function loadCommonHtml(placeholderId, filePath) {
         const placeholder = document.getElementById(placeholderId);
         if (placeholder) {
             placeholder.innerHTML = html;
+            if (callback && typeof callback === 'function') {
+                callback();
+            }
         }
     } catch (error) {
         console.error(`Error loading common HTML from ${filePath}:`, error);

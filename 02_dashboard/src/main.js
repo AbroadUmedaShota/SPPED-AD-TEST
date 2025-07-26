@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 共通要素の読み込み
     await loadCommonHtml('header-placeholder', 'common/header.html');
-    await loadCommonHtml('sidebar-placeholder', 'common/sidebar.html');
+    await loadCommonHtml('sidebar-placeholder', 'common/sidebar.html', initSidebarHandler);
     await loadCommonHtml('footer-placeholder', 'common/footer.html');
 
     // --- Global Escape Key Listener for Modals & Sidebar ---
@@ -61,7 +61,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // Initialize common modules
-    initSidebarHandler();
     initThemeToggle();
     initBreadcrumbs();
 
