@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+// サンプルデータ（フォールバック用）
 const sampleInvoiceDetails = {
     "2500123001": {
         invoiceId: "2500123001",
@@ -42,201 +42,131 @@ export function initInvoiceDetailPage() {
     const invoiceId = urlParams.get('invoiceId');
 
     if (invoiceId) {
+        // URLにIDがある場合はJSONから取得を試みる
         fetchInvoiceDetails(invoiceId);
     } else {
-        // invoiceId がURLパラメータから見つからない場合、サンプルデータを使用
+        // URLにIDがない場合はサンプルデータを表示（開発用）
+        console.warn("URLに 'invoiceId' が指定されていません。サンプルデータを表示します。");
         const sampleId = "2500123001"; // デフォルトのサンプルID
         const invoice = sampleInvoiceDetails[sampleId];
         if (invoice) {
             renderInvoiceDetails(invoice);
         } else {
             console.error(`サンプル請求書ID ${sampleId} のデータが見つかりません。`);
+            displayNotFound();
         }
-    }
-
-    async function fetchInvoiceDetails(id) {
-        try {
-            const response = await fetch('data/invoices.json');
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const invoices = await response.json();
-            const invoice = invoices.find(inv => inv.invoiceId === id);
-
-            if (invoice) {
-                renderInvoiceDetails(invoice);
-            } else {
-                console.error(`請求書ID ${id} のデータが見つかりません。`);
-            }
-        } catch (error) {
-            console.error('請求書データの読み込みに失敗しました:', error);
-        }
-    }
-
-    function renderInvoiceDetails(invoice) {
-        if (!invoice) {
-            document.getElementById('invoiceIdDisplay').textContent = '請求書が見つかりません';
-            return;
-        }
-
-        document.getElementById('invoiceIdDisplay').textContent = invoice.invoiceId;
-        document.getElementById('issueDateDisplay').textContent = invoice.invoiceDate;
-        document.getElementById('corporateNameDisplay').textContent = `${invoice.corporateName} 御中`;
-        document.getElementById('contactPersonDisplay').textContent = `${invoice.contactPerson} 様`;
-        document.getElementById('usageMonthDisplay').textContent = invoice.usageMonth;
-        document.getElementById('subtotalTaxableDisplay').textContent = `${new Intl.NumberFormat('ja-JP').format(invoice.subtotalTaxable)} 円`;
-        document.getElementById('taxDisplay').textContent = `${new Intl.NumberFormat('ja-JP').format(invoice.tax)} 円`;
-        document.getElementById('subtotalNonTaxableDisplay').textContent = `${new Intl.NumberFormat('ja-JP').format(invoice.subtotalNonTaxable)} 円`;
-        document.getElementById('totalAmountDisplay').textContent = `${new Intl.NumberFormat('ja-JP').format(invoice.totalAmount)} 円(税込)`;
-        document.getElementById('dueDateDisplay').textContent = invoice.dueDate;
-
-        const itemsBody = document.getElementById('invoice-items-body');
-        itemsBody.innerHTML = invoice.items.map(item => `
-            <tr>
-                <td>${item.no}</td>
-                <td>${item.itemName1}</td>
-                <td>${item.itemName2}</td>
-                <td>${item.quantity}</td>
-                <td>${new Intl.NumberFormat('ja-JP').format(item.unitPrice)}</td>
-                <td>${new Intl.NumberFormat('ja-JP').format(item.amount)}</td>
-            </tr>
-        `).join('');
-
-        // 請求明細の空行を20行になるまで追加
-        const existingRows = invoice.items.length;
-        const rowsToAdd = 20 - existingRows;
-        if (rowsToAdd > 0) {
-            let emptyRowsHtml = '';
-            for (let i = 0; i < rowsToAdd; i++) {
-                emptyRowsHtml += `<tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>`;
-            }
-            itemsBody.innerHTML += emptyRowsHtml;
-        }
-
-        // 印刷ボタン
-        const printButton = document.getElementById('printButton');
-        if (printButton) {
-            printButton.addEventListener('click', () => {
-                window.print();
-            });
-        }
-
-        const downloadPdfButton = document.getElementById('downloadPdfButton');
-        if (downloadPdfButton) {
-            downloadPdfButton.addEventListener('click', () => {
-                window.print();
-            });
-        }
-    }
-
-    function formatDate(dateString) {
-        const date = new Date(dateString);
-        return `${date.getFullYear()}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}`;
-    }
-
-    function formatDateJP(dateString) {
-        const date = new Date(dateString);
-        return `${date.getFullYear()}年${(date.getMonth() + 1)}月${date.getDate()}日`;
     }
 }
->>>>>>> 13-invoice-list-detail-screen-creation
+
+async function fetchInvoiceDetails(id) {
+    try {
+        // 'data/invoices.json' のパスは実際の環境に合わせてください
+        const response = await fetch('data/invoices.json');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const invoices = await response.json();
+        // invoices.json が配列であることを想定
+        const invoice = invoices.find(inv => inv.invoiceId === id);
+
+        if (invoice) {
+            renderInvoiceDetails(invoice);
+        } else {
+            console.error(`請求書ID ${id} のデータが見つかりません。`);
+            displayNotFound();
+        }
+    } catch (error) {
+        console.error('請求書データの読み込みに失敗しました:', error);
+        displayNotFound();
+    }
+}
+
+function renderInvoiceDetails(invoice) {
+    // 各要素にデータを設定
+    document.getElementById('invoiceIdDisplay').textContent = invoice.invoiceId;
+    document.getElementById('issueDateDisplay').textContent = invoice.invoiceDate; // 必要に応じてformatDate関数を使用
+    document.getElementById('corporateNameDisplay').textContent = `${invoice.corporateName} 御中`;
+    document.getElementById('contactPersonDisplay').textContent = `${invoice.contactPerson} 様`;
+    document.getElementById('usageMonthDisplay').textContent = invoice.usageMonth;
+    document.getElementById('subtotalTaxableDisplay').textContent = `${new Intl.NumberFormat('ja-JP').format(invoice.subtotalTaxable)} 円`;
+    document.getElementById('taxDisplay').textContent = `${new Intl.NumberFormat('ja-JP').format(invoice.tax)} 円`;
+    document.getElementById('subtotalNonTaxableDisplay').textContent = `${new Intl.NumberFormat('ja-JP').format(invoice.subtotalNonTaxable)} 円`;
+    document.getElementById('totalAmountDisplay').textContent = `${new Intl.NumberFormat('ja-JP').format(invoice.totalAmount)} 円(税込)`;
+    document.getElementById('dueDateDisplay').textContent = invoice.dueDate; // 必要に応じてformatDateJP関数を使用
+
+    // 請求明細テーブルを描画
+    const itemsBody = document.getElementById('invoice-items-body');
+    itemsBody.innerHTML = invoice.items.map(item => `
+        <tr>
+            <td>${item.no}</td>
+            <td>${item.itemName1 || ''}</td>
+            <td>${item.itemName2 || ''}</td>
+            <td>${item.quantity}</td>
+            <td>${new Intl.NumberFormat('ja-JP').format(item.unitPrice)}</td>
+            <td>${new Intl.NumberFormat('ja-JP').format(item.amount)}</td>
+        </tr>
+    `).join('');
+
+    // 請求明細の空行を20行になるまで追加
+    const existingRows = invoice.items.length;
+    const rowsToAdd = 20 - existingRows;
+    if (rowsToAdd > 0) {
+        let emptyRowsHtml = '';
+        for (let i = 0; i < rowsToAdd; i++) {
+            emptyRowsHtml += `<tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>`;
         }
         itemsBody.innerHTML += emptyRowsHtml;
     }
+
+    // イベントリスナーを設定
+    setupButtons();
 }
 
-<<<<<<< HEAD
-    function renderInvoiceDetails(invoice) {
-        // ヘッダー情報
-        document.getElementById('issue-date').textContent = formatDate(invoice.issueDate);
-        document.getElementById('invoice-id').textContent = invoice.invoiceId;
+// 請求書が見つからない場合に表示を更新する関数
+function displayNotFound() {
+    document.getElementById('invoiceIdDisplay').textContent = '請求書が見つかりません';
+    // 他のフィールドもクリアまたはメッセージを表示
+    const fieldsToClear = [
+        'issueDateDisplay', 'corporateNameDisplay', 'contactPersonDisplay',
+        'usageMonthDisplay', 'subtotalTaxableDisplay', 'taxDisplay',
+        'subtotalNonTaxableDisplay', 'totalAmountDisplay', 'dueDateDisplay'
+    ];
+    fieldsToClear.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) element.textContent = '-';
+    });
+    document.getElementById('invoice-items-body').innerHTML = '';
+}
 
-        // 宛先情報 (仮データ)
-        const corporateName = "株式会社サンプル商事"; // 仮データ
-        const seikyuName = "経理部御担当者様"; // 仮データ
-        document.getElementById('corporate-name').textContent = `${corporateName} 御中`;
-        document.getElementById('seikyu-name').textContent = `${seikyuName} 様`;
-
-        // 請求概要テーブル
-        const issueDate = new Date(invoice.issueDate);
-        const usageMonth = `${issueDate.getFullYear()}年${issueDate.getMonth() + 1}月`;
-        document.getElementById('usage-month').textContent = `SPEED AD利用料 ${usageMonth}月分`;
-        document.getElementById('subtotal-taxable').textContent = `${invoice.totalAmount - invoice.tax} 円`;
-        document.getElementById('tax').textContent = `${invoice.tax} 円`;
-        document.getElementById('subtotal-non-taxable').textContent = `- 円`; // 仮で固定値
-        document.getElementById('total-amount').textContent = `${invoice.totalAmount} 円(税込)`;
-
-        // 振込先情報
-        document.getElementById('due-date').textContent = formatDateJP(invoice.dueDate);
-
-        // 請求明細テーブル
-        const invoiceItemsBody = document.getElementById('invoice-items-body');
-        invoiceItemsBody.innerHTML = '';
-
-        invoice.items.forEach((item, index) => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${index + 1}</td>
-                <td>${item.itemName}</td>
-                <td></td> <!-- 品名2は現在データにないので空 -->
-                <td></td> <!-- 数量は現在データにないので空 -->
-                <td></td> <!-- 単価は現在データにないので空 -->
-                <td class="text-end">${item.amount.toLocaleString()}</td>
-            `;
-            invoiceItemsBody.appendChild(row);
-=======
-export function initInvoiceDetailPage() {
-    const invoiceId = getInvoiceIdFromUrl();
-    const invoice = sampleInvoiceDetails[invoiceId];
-    renderInvoiceDetail(invoice);
-
-    // PDFダウンロードボタンのイベントリスナー
+// ボタンのイベントリスナーをまとめる関数
+function setupButtons() {
     const printButton = document.getElementById('printButton');
     if (printButton) {
         printButton.addEventListener('click', () => {
             window.print();
->>>>>>> 13-invoice-list-detail-screen-creation
         });
-
-        // 空行を最大20行まで追加
-        const existingRows = invoice.items.length;
-        for (let i = existingRows; i < 20; i++) {
-            const row = document.createElement('tr');
-            row.innerHTML = `<td>${i + 1}</td><td></td><td></td><td></td><td></td><td></td>`;
-            invoiceItemsBody.appendChild(row);
-        }
-
-        // ページ番号 (現状は固定)
-        document.getElementById('page-number').textContent = '1/1';
     }
 
-<<<<<<< HEAD
-    function formatDate(dateString) {
-        const date = new Date(dateString);
-        return `${date.getFullYear()}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}`;
-    }
-
-    function formatDateJP(dateString) {
-        const date = new Date(dateString);
-        return `${date.getFullYear()}年${(date.getMonth() + 1)}月${date.getDate()}日`;
-    }
-
-    // 印刷ボタン
-    document.getElementById('print-button').addEventListener('click', () => {
-        window.print();
-    });
-
-    // PDFダウンロードボタン
-    document.getElementById('download-pdf-button').addEventListener('click', () => {
-        const element = document.querySelector('.container'); // 請求書全体を対象
-        html2pdf().from(element).save('invoice.pdf');
-    });
-=======
     const downloadPdfButton = document.getElementById('downloadPdfButton');
     if (downloadPdfButton) {
         downloadPdfButton.addEventListener('click', () => {
-            window.print();
+            // PDFダウンロードのロジック。window.print()で代用するか、
+            // html2pdfのようなライブラリを使用します。
+            // 例: html2pdf().from(document.body).save('invoice.pdf');
+            window.print(); 
         });
     }
->>>>>>> 13-invoice-list-detail-screen-creation
 }
+
+// 日付フォーマット関数（必要であれば使用）
+/*
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return `${date.getFullYear()}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}`;
+}
+
+function formatDateJP(dateString) {
+    const date = new Date(dateString);
+    return `${date.getFullYear()}年${(date.getMonth() + 1)}月${date.getDate()}日`;
+}
+*/
