@@ -124,3 +124,24 @@ export function downloadFile(url, filename) {
     link.click();
     document.body.removeChild(link);
 }
+
+/**
+ * Loads HTML content from a specified file and inserts it into a placeholder element.
+ * @param {string} placeholderId The ID of the HTML element to insert the content into.
+ * @param {string} filePath The path to the HTML file to load.
+ */
+export async function loadCommonHtml(placeholderId, filePath) {
+    try {
+        const response = await fetch(filePath);
+        if (!response.ok) {
+            throw new Error(`Failed to load ${filePath}: ${response.statusText}`);
+        }
+        const html = await response.text();
+        const placeholder = document.getElementById(placeholderId);
+        if (placeholder) {
+            placeholder.innerHTML = html;
+        }
+    } catch (error) {
+        console.error(`Error loading common HTML from ${filePath}:`, error);
+    }
+}

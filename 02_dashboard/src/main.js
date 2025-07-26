@@ -10,7 +10,7 @@ import { initThankYouEmailSettings } from './thankYouEmailSettings.js';
 import { initInvoiceListPage } from './invoiceList.js';
 import { initInvoiceDetailPage } from './invoiceDetail.js';
 
-import { showToast, copyTextToClipboard } from './utils.js';
+import { showToast, copyTextToClipboard, loadCommonHtml } from './utils.js';
 
 // script.js の最上部に移動 (DOMContentLoadedイベントリスナーの外側)
 // ダミーユーザーデータ (本来はAPIから取得)
@@ -31,7 +31,12 @@ window.copyUrl = async function(inputElement) {
     }
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+
+    // 共通要素の読み込み
+    await loadCommonHtml('header-placeholder', 'common/header.html');
+    await loadCommonHtml('sidebar-placeholder', 'common/sidebar.html');
+    await loadCommonHtml('footer-placeholder', 'common/footer.html');
 
     // --- Global Escape Key Listener for Modals & Sidebar ---
     document.addEventListener('keydown', (event) => {

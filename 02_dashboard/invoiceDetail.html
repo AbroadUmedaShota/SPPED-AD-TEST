@@ -262,8 +262,8 @@
     </div>
     <div class="container">
         <div class="issue-info">
-            <div>発行日: yyyy/mm/dd</div>
-            <div>請求書番号: 西暦下2ケタ+ユーザーID5ケタ+連番3ケタ</div>
+            <div>発行日: <span id="issueDateDisplay"></span></div>
+            <div>請求書番号: <span id="invoiceIdDisplay"></span></div>
         </div>
 
         <div class="header">
@@ -272,8 +272,8 @@
 
         <div class="recipient-sender-section">
             <div class="recipient-details">
-                <div>${data.corporate_name} 御中</div>
-                <div>${data.seikyu_name} 様</div>
+                <div id="corporateNameDisplay"></div>
+                <div id="contactPersonDisplay"></div>
             </div>
             <div class="sender-details">
                 <div class="sender-details" style="position: relative;">
@@ -301,23 +301,23 @@
             <table class="billing-summary-table">
                 <tr>
                     <th>件名</th>
-                    <td>SPEED AD利用料 ${data.利用年月(YYYY年MM月)}月分</td>
+                    <td>SPEED AD利用料 <span id="usageMonthDisplay"></span>月分</td>
                 </tr>
                 <tr>
                     <th>小計(課税対象)</th>
-                    <td class="mask-val">●●●●● 円</td>
+                    <td id="subtotalTaxableDisplay"></td>
                 </tr>
                 <tr>
                     <th>消費税等</th>
-                    <td class="mask-val">●● 円</td>
+                    <td id="taxDisplay"></td>
                 </tr>
                 <tr>
                     <th>小計(非課税)</th>
-                    <td>- 円</td>
+                    <td id="subtotalNonTaxableDisplay"></td>
                 </tr>
                 <tr class="total-amount-row">
                     <th>合計ご請求金額</th>
-                    <td class="mask-val">●●●●● 円(税込)</td>
+                    <td id="totalAmountDisplay"></td>
                 </tr>
             </table>
 
@@ -344,7 +344,7 @@
                 </tr>
                 <tr>
                     <td>お支払期日</td>
-                    <td>${data.支払期日(YYYY年MM月DD日)}</td>
+                    <td id="dueDateDisplay"></td>
                 </tr>
             </table>
         </div>
@@ -367,7 +367,7 @@
                     <th>金額</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="invoice-items-body">
                 <tr><td>1</td><td>アンケート名A</td><td>名刺データ化費用</td><td class="mask-val">●●</td><td class="mask-val">●●</td><td class="mask-val">●●</td></tr>
                 <tr><td>2</td><td>アンケート名A</td><td>クーポンお値引き</td><td>1</td><td class="mask-val">●●</td><td class="mask-val">●●</td></tr>
                 <tr><td>3</td><td>アンケート名A</td><td>御礼メール送信</td><td class="mask-val">●●</td><td>1</td><td class="mask-val">●●</td></tr>
