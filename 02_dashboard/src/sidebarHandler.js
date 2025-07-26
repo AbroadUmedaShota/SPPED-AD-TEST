@@ -2,12 +2,14 @@ import { lockScroll, unlockScroll, showToast } from './utils.js';
 import { fetchGroups } from './groupService.js';
 import { setGroupFilter } from './tableManager.js';
 
-const sidebar = document.getElementById('sidebar');
-const sidebarToggleMobile = document.getElementById('sidebarToggleMobile');
-const mobileSidebarOverlay = document.getElementById('mobileSidebarOverlay');
+
 
 /** Handles opening/closing of the mobile sidebar. */
 export function toggleMobileSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const mobileSidebarOverlay = document.getElementById('mobileSidebarOverlay');
+    if (!sidebar || !mobileSidebarOverlay) return; // 要素が見つからない場合は処理を中断
+
     const isOpen = sidebar.classList.contains('is-open-mobile');
     if (isOpen) {
         sidebar.classList.remove('is-open-mobile');
@@ -23,6 +25,10 @@ export function toggleMobileSidebar() {
 /** Adjusts layout based on screen size (PC vs Mobile sidebar behavior). */
 /** Adjusts layout based on screen size (PC vs Mobile sidebar behavior). */
 export function adjustLayout() {
+    const sidebar = document.getElementById('sidebar');
+    const mobileSidebarOverlay = document.getElementById('mobileSidebarOverlay');
+    if (!sidebar || !mobileSidebarOverlay) return; // 要素が見つからない場合は処理を中断
+
     const isModalOpen = document.querySelector('.modal-overlay[data-state="open"]');
 
     if (window.innerWidth >= 1024) { // PC screens (LG and XL)
@@ -80,6 +86,15 @@ async function populateGroupSelect() {
 }
 
 export function initSidebarHandler() {
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggleMobile = document.getElementById('sidebarToggleMobile');
+    const mobileSidebarOverlay = document.getElementById('mobileSidebarOverlay');
+
+    if (!sidebar) {
+        console.error("Sidebar element not found. Sidebar initialization aborted.");
+        return;
+    }
+
     // Event listener for mobile hamburger menu
     if (sidebarToggleMobile) sidebarToggleMobile.addEventListener('click', toggleMobileSidebar);
     // Event listener for clicking on mobile overlay
