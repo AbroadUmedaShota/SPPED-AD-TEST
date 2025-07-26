@@ -61,6 +61,10 @@ To maintain the readability of this document, the following writing style is fol
     *   **Thorough Test-Driven Development (TDD):** When adding new features or refactoring, it is **mandatory** to start by creating or updating test cases under all circumstances.
         *   **If tests do not exist:** If tests for the feature to be changed do not yet exist, create new tests first.
         *   **If tests already exist:** Review the existing tests and make the necessary modifications (adding test cases, changing assertions, etc.) to cover the current changes.
+    *   **モック画面開発におけるデータ永続化の扱い:**
+        *   UI/UXの確認を主目的とするモック画面の開発においては、データの永続化（バックエンド連携、データベース保存など）は後回しとし、フロントエンドでのダミーデータや一時的な状態管理で対応する。
+        *   この方針は、UI/UXの迅速な検証とフィードバックサイクルを優先するために適用される。
+        *   永続化が必要な機能については、別途Issueを立てて対応する。
     *   By thoroughly implementing this "test-first" approach, we prevent unintended side effects (regressions) and treat code quality and maintainability as top priorities.
     *   **Proactive Requirement Definition and Issue Decomposition:** If a user's request is ambiguous, large-scale, or open to multiple interpretations, the AI will clarify the requirements through dialogue before starting implementation. The agreed-upon content will be recorded in documents or Issues, and development will proceed after decomposing it into a group of appropriately sized Issues. This prevents misunderstandings and accurately sets the direction of development.
 *   **Documentation Strategy:**

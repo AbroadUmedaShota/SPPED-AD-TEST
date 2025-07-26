@@ -35,6 +35,13 @@ export function collectSurveyDataFromDOM() {
     surveyData.deadline = document.getElementById('deadline').value;
     surveyData.memo = document.getElementById('memo').value;
 
+    // 名刺データ関連の収集
+    surveyData.bizcardEnabled = document.getElementById('bizcardEnabled') ? document.getElementById('bizcardEnabled').value : '';
+    surveyData.bizcardRequest = document.getElementById('bizcardRequest') ? document.getElementById('bizcardRequest').value : '';
+
+    // お礼メール設定の収集
+    surveyData.thankYouEmailSettings = document.getElementById('thankYouEmailSettings') ? document.getElementById('thankYouEmailSettings').value : '';
+
     // 質問グループの収集
     surveyData.questionGroups = [];
     document.querySelectorAll('.question-group').forEach(groupElement => {
@@ -47,24 +54,13 @@ export function collectSurveyDataFromDOM() {
         groupElement.querySelectorAll('.question-item').forEach(questionElement => {
             const question = {
                 questionId: questionElement.dataset.questionId,
-                type: '', // 後で判別
+                type: questionElement.dataset.questionType, // data-question-type属性から直接取得
                 text: questionElement.querySelector('.question-text-input').value,
                 required: questionElement.querySelector('.required-checkbox').checked
             };
 
-            // 質問タイプの判別 (question-titleから抽出)
-            const questionTitleText = questionElement.querySelector('.question-title').textContent;
-            if (questionTitleText.includes('フリーアンサー')) question.type = 'free_answer';
-            else if (questionTitleText.includes('シングルアンサー')) question.type = 'single_answer';
-            else if (questionTitleText.includes('マルチアンサー')) question.type = 'multi_answer';
-            else if (questionTitleText.includes('数値回答')) question.type = 'number_answer';
-            else if (questionTitleText.includes('マトリックス(SA)')) question.type = 'matrix_sa';
-            else if (questionTitleText.includes('マトリックス(MA)')) question.type = 'matrix_ma';
-            else if (questionTitleText.includes('日付/時間')) question.type = 'date_time';
-            else if (questionTitleText.includes('手書きスペース')) question.type = 'handwriting';
-
-            // 選択肢の収集 (シングルアンサー、マルチアンサーの場合)
-            if (question.type === 'single_answer' || question.type === 'multi_answer') {
+            // 選択肢の収集 (シングルアンサー、マルチアンサー、マトリックスの場合)
+            if (['single_answer', 'multi_answer', 'matrix_sa', 'matrix_ma'].includes(question.type)) {
                 question.options = [];
                 questionElement.querySelectorAll('.options-container .option-text-input').forEach((optionInput, index) => {
                     question.options.push({

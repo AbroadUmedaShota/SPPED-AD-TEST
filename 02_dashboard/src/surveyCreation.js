@@ -245,6 +245,18 @@ function setupEventListeners(openQuestionTypeSelectorBtn, questionTypeSelector, 
         }
     });
 
+    // アンケートを保存ボタンのイベントリスナー
+    const createSurveyBtn = document.getElementById('createSurveyBtn');
+    if (createSurveyBtn) {
+        createSurveyBtn.addEventListener('click', () => {
+            const surveyData = collectSurveyDataFromDOM();
+            console.log('Collected Survey Data:', surveyData);
+            // ここにバリデーションロジックや、一時的なデータ保持ロジックを追加
+            // 現時点では永続化は行わないため、コンソール出力のみ
+            alert('アンケートデータがコンソールに出力されました。');
+        });
+    }
+
     // Sortable.jsの初期化
     const questionGroupsContainer = document.getElementById('questionGroupsContainer');
 
