@@ -131,11 +131,14 @@ function renderInvoiceDetails(invoice) {
     }
 
     // 振込先情報エリア
-    document.getElementById('bank-name').textContent = invoice.bankInfo.bankName;
-    document.getElementById('branch-name').textContent = invoice.bankInfo.branchName;
-    document.getElementById('account-type').textContent = invoice.bankInfo.accountType;
-    document.getElementById('account-number').textContent = invoice.bankInfo.accountNumber;
-    document.getElementById('account-holder').textContent = invoice.bankInfo.accountHolder;
+    // 振込先情報エリア
+        if (invoice.bankInfo) {
+            document.getElementById('bank-name').textContent = invoice.bankInfo.bankName || '';
+            document.getElementById('branch-name').textContent = invoice.bankInfo.branchName || '';
+            document.getElementById('account-type').textContent = invoice.bankInfo.accountType || '';
+            document.getElementById('account-number').textContent = invoice.bankInfo.accountNumber || '';
+            document.getElementById('account-holder').textContent = invoice.bankInfo.accountHolder || '';
+        }
 
     // イベントリスナーを設定
     setupButtons();
