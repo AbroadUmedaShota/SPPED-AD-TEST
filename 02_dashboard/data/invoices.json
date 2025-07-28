@@ -1,12 +1,23 @@
 [
   {
-    "invoiceId": "inv-202507-001",
+    "invoiceId": "2500001001",
     "accountId": "acc-12345",
     "issueDate": "2025-07-31",
     "dueDate": "2025-08-31",
-    "totalAmount": 55000,
+    "corporateName": "株式会社サンプル商事",
+    "contactPerson": "経理部御担当者様",
+    "usageMonth": "2025年7月",
+    "subtotalTaxable": 50000,
     "tax": 5000,
-    "status": "unpaid",
+    "subtotalNonTaxable": 0,
+    "totalAmount": 55000,
+    "bankInfo": {
+      "bankName": "三井住友銀行(0009)",
+      "branchName": "小岩支店(643)",
+      "accountType": "普通",
+      "accountNumber": "7128447",
+      "accountHolder": "アブロードアウトソーシング株式会社"
+    },
     "items": [
       {
         "itemName": "月額基本サービス料 (2025年7月分)",
@@ -19,13 +30,24 @@
     ]
   },
   {
-    "invoiceId": "inv-202506-001",
+    "invoiceId": "2500001002",
     "accountId": "acc-12345",
     "issueDate": "2025-06-30",
     "dueDate": "2025-07-30",
-    "totalAmount": 44000,
+    "corporateName": "株式会社テストカンパニー",
+    "contactPerson": "田中 花子",
+    "usageMonth": "2025年6月",
+    "subtotalTaxable": 40000,
     "tax": 4000,
-    "status": "paid",
+    "subtotalNonTaxable": 0,
+    "totalAmount": 44000,
+    "bankInfo": {
+      "bankName": "三井住友銀行(0009)",
+      "branchName": "小岩支店(643)",
+      "accountType": "普通",
+      "accountNumber": "7128447",
+      "accountHolder": "アブロードアウトソーシング株式会社"
+    },
     "items": [
       {
         "itemName": "月額基本サービス料 (2025年6月分)",

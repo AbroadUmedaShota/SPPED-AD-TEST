@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>御請求書 - SPEED AD</title>
-    <link rel="stylesheet" href="service-top-style.css">
+    <title>御請求書</title>
     <style>
         body {
             font-family: 'Meiryo', 'メイリオ', 'Yu Gothic', '游ゴシック', sans-serif;
@@ -256,14 +255,10 @@
     </style>
 </head>
 <body>
-    <div style="text-align: right; margin-bottom: 10mm;">
-        <button id="printButton" class="btn btn-outline-secondary"><i class="bi bi-printer"></i> 印刷</button>
-        <button id="downloadPdfButton" class="btn btn-primary"><i class="bi bi-download"></i> PDFダウンロード</button>
-    </div>
     <div class="container">
         <div class="issue-info">
-            <div>発行日: <span id="issueDateDisplay"></span></div>
-            <div>請求書番号: <span id="invoiceIdDisplay"></span></div>
+            <div>発行日: <span id="issue-date"></span></div>
+            <div>請求書番号: <span id="invoice-number"></span></div>
         </div>
 
         <div class="header">
@@ -272,21 +267,17 @@
 
         <div class="recipient-sender-section">
             <div class="recipient-details">
-                <div id="corporateNameDisplay"></div>
-                <div id="contactPersonDisplay"></div>
+                <div id="corporate-name"></div>
+                <div id="contact-person"></div>
             </div>
             <div class="sender-details">
-                <div class="sender-details" style="position: relative;">
-                <img src="seikyu_logo.png" alt="会社ロゴ" class="company-logo">
-                <div class="logo-speedad">SPEED AD運営会社</div>
-                <div style="display: flex; align-items: center; margin-top: 5px; position: relative;">
-                    <span class="sender-name">アブロードアウトソーシング</span><span class="logo-kabushiki-kaisha">株式会社</span>
-                    <img src="seikyu_syaban.png" alt="会社印" class="company-seal">
+                <div class="sender-logos">
+                    <img src="seikyu_logo.png" alt="Abroad Outsourcing Co.,Inc." style="height: 20px; margin-bottom: 5px;">
+                    <img src="seikyu_syaban.png" alt="SPEED AD運営会社" style="height: 15px;">
+                    <div style="display: flex; align-items: center; margin-top: 5px;">
+                        <span class="sender-name">アブロードアウトソーシング</span><span class="logo-kabushiki-kaisha">株式会社</span>
+                    </div>
                 </div>
-                <div class="sender-address">東京都千代田区岩本町2-11-9 IT2ビル 8階</div>
-                <div class="sender-tel">TEL: 03-5835-0250</div>
-                <div class="sender-registration">登録番号:T9011701016647</div>
-            </div>
                 <div class="sender-address">東京都千代田区岩本町2-11-9 IT2ビル 8階</div>
                 <div class="sender-tel">TEL: 03-5835-0250</div>
                 <div class="sender-registration">登録番号:T9011701016647</div>
@@ -294,57 +285,58 @@
         </div>
 
         <div class="greeting">
-            平素より格別のお引き立てを賜り、誠にありがとうございます。下記の通りご請求申し上げます。
+            平素より格別のお引き立てを賜り、誠にありがとうございます。<br>
+            下記の通りご請求申し上げます。
         </div>
 
         <div class="main-content">
             <table class="billing-summary-table">
                 <tr>
                     <th>件名</th>
-                    <td>SPEED AD利用料 <span id="usageMonthDisplay"></span>月分</td>
+                    <td id="usage-month"></td>
                 </tr>
                 <tr>
                     <th>小計(課税対象)</th>
-                    <td id="subtotalTaxableDisplay"></td>
+                    <td id="subtotal-taxable"></td>
                 </tr>
                 <tr>
                     <th>消費税等</th>
-                    <td id="taxDisplay"></td>
+                    <td id="tax-amount"></td>
                 </tr>
                 <tr>
                     <th>小計(非課税)</th>
-                    <td id="subtotalNonTaxableDisplay"></td>
+                    <td id="subtotal-non-taxable"></td>
                 </tr>
                 <tr class="total-amount-row">
                     <th>合計ご請求金額</th>
-                    <td id="totalAmountDisplay"></td>
+                    <td id="total-amount"></td>
                 </tr>
             </table>
 
             <table class="bank-details-table">
                 <tr>
                     <td>金融機関名</td>
-                    <td>三井住友銀行(0009)</td>
+                    <td id="bank-name"></td>
                 </tr>
                 <tr>
                     <td>支店名</td>
-                    <td>小岩支店(643)</td>
+                    <td id="branch-name"></td>
                 </tr>
                 <tr>
                     <td>口座種類</td>
-                    <td>普通</td>
+                    <td id="account-type"></td>
                 </tr>
                 <tr>
                     <td>口座番号</td>
-                    <td>7128447</td>
+                    <td id="account-number"></td>
                 </tr>
                 <tr>
                     <td>口座名義</td>
-                    <td>アブロードアウトソーシング株式会社</td>
+                    <td id="account-holder"></td>
                 </tr>
                 <tr>
                     <td>お支払期日</td>
-                    <td id="dueDateDisplay"></td>
+                    <td id="due-date-bank"></td>
                 </tr>
             </table>
         </div>
@@ -367,99 +359,14 @@
                     <th>金額</th>
                 </tr>
             </thead>
-            <tbody id="invoice-items-body">
-                <tr><td>1</td><td>アンケート名A</td><td>名刺データ化費用</td><td class="mask-val">●●</td><td class="mask-val">●●</td><td class="mask-val">●●</td></tr>
-                <tr><td>2</td><td>アンケート名A</td><td>クーポンお値引き</td><td>1</td><td class="mask-val">●●</td><td class="mask-val">●●</td></tr>
-                <tr><td>3</td><td>アンケート名A</td><td>御礼メール送信</td><td class="mask-val">●●</td><td>1</td><td class="mask-val">●●</td></tr>
-                <tr><td>4</td><td>アンケート名A</td><td>小計</td><td></td><td></td><td class="mask-val">●●</td></tr>
-                <tr><td>5</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>6</td><td>アンケート名B</td><td>名刺データ化費用</td><td>560</td><td>200</td><td>112,000</td></tr>
-                <tr><td>7</td><td>アンケート名B</td><td>クーポンお値引き</td><td>1</td><td class="mask-val">●●</td><td class="mask-val">●●</td></tr>
-                <tr><td>8</td><td>アンケート名B</td><td>御礼メール送信</td><td>1,600</td><td>1</td><td>1,600</td></tr>
-                <tr><td>9</td><td>アンケート名B</td><td>小計</td><td></td><td></td><td class="mask-val">●●</td></tr>
-                <tr><td>10</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>11</td><td>月額費用</td><td>グループアカウント利用料</td><td class="mask-val">●●</td><td class="mask-val">●●</td><td class="mask-val">●●</td></tr>
-                <tr><td>12</td><td>月額費用</td><td>小計</td><td></td><td></td><td class="mask-val">●●</td></tr>
-                <tr><td>13</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>14</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>15</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>16</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>17</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>18</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>19</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>20</td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tbody id="invoice-detail-table-body">
+                <!-- JSにより動的に行が挿入されます -->
             </tbody>
         </table>
 
         <div class="page-number">
-            1/0
+            <span id="page-current">1</span>/<span id="page-total">0</span>
         </div>
     </div>
-
-    <!-- Page 2 -->
-    <div class="container" style="page-break-before: always; margin-top: 20mm;">
-        <div class="detail-table-title">ご請求明細</div>
-        <table class="detail-table">
-            <thead>
-                <tr>
-                    <th>No.</th>
-                    <th>品名1</th>
-                    <th>品名2</th>
-                    <th>数量</th>
-                    <th>単価</th>
-                    <th>金額</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>21</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>22</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>23</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>24</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>25</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>26</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>27</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>28</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>29</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>30</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>31</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>32</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>33</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>34</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>35</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>36</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>37</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>38</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>39</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>40</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>41</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>42</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>43</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>44</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>45</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>46</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>47</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>48</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>49</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>50</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>51</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>52</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>53</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>54</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>55</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>56</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>57</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>58</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>59</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>60</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>61</td><td></td><td></td><td></td><td></td><td></td></tr>
-                <tr><td>62</td><td></td><td></td><td></td><td></td><td></td></tr>
-            </tbody>
-        </table>
-
-        <div class="page-number">
-            2/0
-        </div>
-    </div>
-    <script type="module" src="src/invoiceDetail.js"></script>
 </body>
 </html>

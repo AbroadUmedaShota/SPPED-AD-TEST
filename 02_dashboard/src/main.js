@@ -8,7 +8,7 @@ import { initBreadcrumbs } from './breadcrumb.js';
 import { initBizcardSettings } from './bizcardSettings.js';
 import { initThankYouEmailSettings } from './thankYouEmailSettings.js';
 import { initInvoiceListPage } from './invoiceList.js';
-import { initInvoiceDetailPage } from './invoiceDetail.js';
+import initInvoiceDetailPage from './invoiceDetail.js';
 
 import { showToast, copyTextToClipboard, loadCommonHtml } from './utils.js';
 
