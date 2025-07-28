@@ -124,35 +124,15 @@
                     <h1 class="text-on-background text-2xl sm:text-3xl font-bold leading-tight tracking-tight">ご請求内容一覧</h1>
                 </div>
 
-                <!-- フィルタ/ソートエリア -->
-                <div class="rounded-xl border border-outline-variant bg-surface p-4 mb-6">
-                    <h2 class="text-on-surface text-lg font-semibold mb-4">フィルタ/ソート</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label for="startDate" class="block text-sm font-medium text-on-surface-variant">期間選択 (開始日)</label>
-                            <input type="date" id="startDate" class="mt-1 block w-full rounded-md border-outline-variant shadow-sm focus:border-primary focus:ring-primary bg-background text-on-background">
-                        </div>
-                        <div>
-                            <label for="endDate" class="block text-sm font-medium text-on-surface-variant">期間選択 (終了日)</label>
-                            <input type="date" id="endDate" class="mt-1 block w-full rounded-md border-outline-variant shadow-sm focus:border-primary focus:ring-primary bg-background text-on-background">
-                        </div>
-                        <div class="md:col-span-2">
-                            <label for="searchBox" class="block text-sm font-medium text-on-surface-variant">検索 (請求書IDなど)</label>
-                            <input type="text" id="searchBox" placeholder="請求書ID、金額などで検索" class="mt-1 block w-full rounded-md border-outline-variant shadow-sm focus:border-primary focus:ring-primary bg-background text-on-background">
-                        </div>
-                    </div>
-                    <div class="mt-4 text-right">
-                        <button id="applyFilterBtn" class="button-primary text-on-primary py-2 px-4 rounded-md shadow-sm font-semibold">適用</button>
-                    </div>
-                </div>
-
                 <!-- ご請求内容一覧テーブル -->
                 <div class="overflow-x-auto rounded-xl border border-outline-variant bg-surface relative min-h-[200px]">
                     <table class="w-full min-w-[900px] divide-y divide-outline-variant survey-table" id="invoiceTable">
                         <thead class="bg-surface-variant">
                             <tr>
                                 <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider">発行月</th>
+                                <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider">請求書番号</th>
                                 <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider">請求金額</th>
+                                <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider">詳細</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-outline-variant" id="invoice-table-body">
@@ -168,8 +148,6 @@
                         <p class="text-on-surface-variant text-lg"></p>
                     </div>
                 </div>
-                <!-- ページネーション (JSで動的に挿入) -->
-                <div id="invoice-pagination-container" class="mt-4 flex justify-center"></div>
             </div>
         </main>
     </div>

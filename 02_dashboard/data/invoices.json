@@ -1,6 +1,6 @@
 [
   {
-    "invoiceId": "inv-202507-001",
+    "invoiceId": "2500001001",
     "accountId": "acc-12345",
     "issueDate": "2025-07-31",
     "dueDate": "2025-08-31",
@@ -19,7 +19,7 @@
     ]
   },
   {
-    "invoiceId": "inv-202506-001",
+    "invoiceId": "2500001002",
     "accountId": "acc-12345",
     "issueDate": "2025-06-30",
     "dueDate": "2025-07-30",
