@@ -153,6 +153,23 @@ function setupButtons() {
             }
         });
     }
+
+    const downloadPdfButton = document.getElementById('downloadPdfBtn');
+    if (downloadPdfButton) {
+        downloadPdfButton.addEventListener('click', () => {
+            const element = document.getElementById('main-content'); // PDF化する要素
+            const urlParams = new URLSearchParams(window.location.search);
+            const invoiceId = urlParams.get('invoiceId');
+            const opt = {
+                margin:       [10, 10, 10, 10], // top, left, bottom, right
+                filename:     `invoice_${invoiceId || 'detail'}.pdf`, // invoiceIdがない場合は'detail'
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        });
+    }
 }
 
 // 日付フォーマット関数（必要であれば使用）

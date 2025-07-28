@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (!invoiceId) {
         console.error('請求書IDが指定されていません。');
-        // エラーメッセージ表示やリダイレクトなどの処理をここに追加
+        displayErrorPage('請求書IDが指定されていません。');
         return;
     }
 
@@ -22,11 +22,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             window.print();
         } else {
             console.error('指定された請求書が見つかりませんでした。');
-            // エラーメッセージ表示やリダイレクトなどの処理をここに追加
+            displayErrorPage('指定された請求書が見つかりませんでした。');
         }
     } catch (error) {
         console.error('請求書データの読み込みに失敗しました:', error);
-        // エラーメッセージ表示やリダイレクトなどの処理をここに追加
+        displayErrorPage('請求書データの読み込みに失敗しました。再試行してください。');
     }
 });
 
@@ -90,4 +90,14 @@ function renderInvoicePrint(invoice) {
     // ページ番号 (現状は固定値)
     document.getElementById('page-current').textContent = '1';
     document.getElementById('page-total').textContent = '1'; // 複数ページ対応時に動的に変更
+}
+
+function displayErrorPage(message) {
+    document.body.innerHTML = `
+        <div style="text-align: center; padding: 50px; font-size: 24px; color: red;">
+            <p>エラーが発生しました。</p>
+            <p>${message}</p>
+            <p>このページを閉じてください。</p>
+        </div>
+    `;
 }
