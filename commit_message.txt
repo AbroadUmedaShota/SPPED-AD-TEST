@@ -1,0 +1,1 @@
+\"fix: Dynamically load bank information in invoice detail\" 
