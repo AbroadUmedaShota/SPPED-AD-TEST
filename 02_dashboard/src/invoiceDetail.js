@@ -143,17 +143,14 @@ function setupButtons() {
     const printButton = document.getElementById('printButton');
     if (printButton) {
         printButton.addEventListener('click', () => {
-            window.print();
-        });
-    }
-
-    const downloadPdfButton = document.getElementById('downloadPdfButton');
-    if (downloadPdfButton) {
-        downloadPdfButton.addEventListener('click', () => {
-            // PDFダウンロードのロジック。window.print()で代用するか、
-            // html2pdfのようなライブラリを使用します。
-            // 例: html2pdf().from(document.body).save('invoice.pdf');
-            window.print(); 
+            const urlParams = new URLSearchParams(window.location.search);
+            const invoiceId = urlParams.get('invoiceId');
+            if (invoiceId) {
+                const printWindow = window.open(`invoice-print.html?invoiceId=${invoiceId}`, '_blank');
+                printWindow.onload = function() {
+                    printWindow.print();
+                };
+            }
         });
     }
 }

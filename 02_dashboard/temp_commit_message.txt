@@ -1,9 +1,1 @@
-feat: SPEEDレビュー画面の遷移ロジックと関連ドキュメントを更新
-
-- サイドバーからSPEEDレビュー画面への直接遷移を削除し、アンケート詳細モーダルからの遷移に変更しました。
-- `speed-review.html` からサイドバーのナビゲーションリンクを削除しました。
-- `modals/surveyDetailsModal.html` に「SPEEDレビュー」ボタンを追加しました。
-- `src/surveyDetailsModal.js` に、アンケート詳細モーダルからSPEEDレビュー画面へ遷移するロジックを実装しました。
-- `docs/specifications/01_screen_flow.md` を更新し、新しい画面遷移フローを反映させました。
-- `docs/specifications/06_speed_review.md` を新規作成し、SPEEDレビュー画面の機能要件と画面フローを定義しました。
-- `docs/02_CODING_STANDARDS.md` にHTML構造とコメントに関する規約を追加しました。
+feat: Refactor invoice file naming and roles

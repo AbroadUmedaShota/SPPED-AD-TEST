@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         case 'invoiceList.html':
             initInvoiceListPage();
             break;
-        case 'invoiceDetail.html':
+        case 'invoice-detail.html':
             initInvoiceDetailPage();
             break;
         
