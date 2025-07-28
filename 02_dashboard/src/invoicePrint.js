@@ -16,12 +16,12 @@ function renderInvoicePrint(invoice) {
     document.getElementById('subtotal-non-taxable').textContent = `${new Intl.NumberFormat('ja-JP').format(invoice.subtotalNonTaxable)} 円`;
     document.getElementById('total-amount').textContent = `${new Intl.NumberFormat('ja-JP').format(invoice.totalAmount)} 円(税込)`;
 
-    // 振込先情報テーブル (仮データ)
-    document.getElementById('bank-name').textContent = '三井住友銀行(0009)';
-    document.getElementById('branch-name').textContent = '小岩支店(643)';
-    document.getElementById('account-type').textContent = '普通';
-    document.getElementById('account-number').textContent = '7128447';
-    document.getElementById('account-holder').textContent = 'アブロードアウトソーシング株式会社';
+    // 振込先情報テーブル
+    document.getElementById('bank-name').textContent = invoice.bankInfo.bankName;
+    document.getElementById('branch-name').textContent = invoice.bankInfo.branchName;
+    document.getElementById('account-type').textContent = invoice.bankInfo.accountType;
+    document.getElementById('account-number').textContent = invoice.bankInfo.accountNumber;
+    document.getElementById('account-holder').textContent = invoice.bankInfo.accountHolder;
     document.getElementById('due-date-bank').textContent = invoice.dueDate; // 支払期日
 
     // 請求明細テーブル
