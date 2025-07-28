@@ -4,7 +4,7 @@
 本ドキュメントは、システムから出力される請求書（PDF出力および印刷用HTML）の構造、表示項目、およびデザインに関する詳細な仕様を定義する。
 
 #### 2. 基本情報
-*   **ファイル名:** `invoiceDetail.html` (表示用HTML)
+*   **ファイル名:** `invoice-print.html` (表示用HTML)
 *   **ベーステンプレート:** `seikyuusyo_sample.html`
 *   **出力形式:** 印刷、PDFダウンロードを想定したA4サイズレイアウト
 
@@ -68,7 +68,7 @@
 
 ##### 3.10. 動的データ項目 (Variables)
 
-`invoiceDetail.html` に埋め込まれる動的なデータ項目は以下の通り。これらは `src/invoiceDetail.js` の `sampleInvoiceDetails` オブジェクトのプロパティに対応する。
+`invoice-print.html` に埋め込まれる動的なデータ項目は以下の通り。これらは `src/invoiceDetail.js` の `sampleInvoiceDetails` オブジェクトのプロパティに対応する。
 
 | 変数名 (JSプロパティ名) | HTMLプレースホルダー | データ型 | 説明 | フォーマット例 |
 | :-------------------- | :------------------- | :------- | :--- | :------------- |

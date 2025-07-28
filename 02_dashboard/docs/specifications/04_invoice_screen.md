@@ -20,7 +20,7 @@
 - **操作**:
     - 各行をクリックすると、対応する月の請求書詳細画面に遷移する。
 
-### 3.2. 請求書詳細画面 (`invoiceDetail.html`)
+### 3.2. 請求書詳細画面 (`invoice-detail.html`)
 - **目的**: ユーザーが請求内容の詳細を確認し、必要に応じて出力できるようにする。
 - **レイアウト**: 一般的な請求書のフォーマットに準拠したレイアウト。
 - **表示項目**:
@@ -80,7 +80,7 @@
     - `処理中`: `<span class="badge bg-info text-white">処理中</span>`
 - **詳細ボタン**: `btn-outline-primary` スタイルを適用し、主要なアクションではないことを示す。
 
-### 5.2. 請求書詳細画面 (`invoiceDetail.html`)
+### 5.2. 請求書詳細画面 (`invoice-detail.html`)
 - **アクションボタン**:
     - `印刷`: `<button class="btn btn-outline-secondary"><i class="bi bi-printer"></i> 印刷</button>`
     - `PDFダウンロード`: `<button class="btn btn-primary"><i class="bi bi-download"></i> PDFダウンロード</button>` (プライマリアクション)
@@ -93,4 +93,4 @@
 3.  **[システム]** 作成した請求データを`invoices.json`に保存する。
 4.  **[システム]** ユーザーの登録メールアドレス宛に、請求書詳細画面へのユニークなURLを記載した通知メールを送信する。
 5.  **[ユーザー]** メール内のURLをクリックする。
-6.  **[ブラウザ]** 請求書詳細画面(`invoiceDetail.html`)を表示する。
+6.  **[ブラウザ]** 請求書詳細画面(`invoice-detail.html`)を表示する。

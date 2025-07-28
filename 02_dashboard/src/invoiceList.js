@@ -65,7 +65,7 @@ export function initInvoiceListPage() {
             button.addEventListener('click', (event) => {
                 const invoiceId = event.target.dataset.invoiceId;
                 // 請求書詳細画面へ遷移
-                window.location.href = `invoiceDetail.html?invoiceId=${invoiceId}`;
+                window.location.href = `invoice-detail.html?invoiceId=${invoiceId}`;
             });
         });
     }
