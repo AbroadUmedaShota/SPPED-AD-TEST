@@ -1,18 +1,31 @@
 export function initInvoiceListPage() {
     const invoiceListBody = document.getElementById('invoice-table-body');
+    const loadingOverlay = document.getElementById('invoice-loading-overlay');
+    const messageOverlay = document.getElementById('invoice-message-overlay');
+    const applyFilterBtn = document.getElementById('applyFilterBtn');
 
     // 仮のデータ読み込み関数
     async function fetchInvoices() {
+        loadingOverlay.classList.remove('hidden');
+        messageOverlay.classList.add('hidden');
+        invoiceListBody.innerHTML = ''; // 既存の行をクリア
+
         try {
             const response = await fetch('data/invoices.json');
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const invoices = await response.json();
-            renderInvoices(invoices);
+            if (invoices.length === 0) {
+                showMessage('表示する請求書がありません。');
+            } else {
+                renderInvoices(invoices);
+            }
         } catch (error) {
             console.error('請求書データの読み込みに失敗しました:', error);
-            invoiceListBody.innerHTML = '<tr><td colspan="4">請求書データの読み込みに失敗しました。</td></tr>';
+            showMessage('請求書データの読み込みに失敗しました。再試行してください。');
+        } finally {
+            loadingOverlay.classList.add('hidden');
         }
     }
 
@@ -31,27 +44,10 @@ export function initInvoiceListPage() {
             // 請求金額 (カンマ区切りにフォーマット)
             const formattedAmount = invoice.totalAmount.toLocaleString();
 
-            // 支払状況に応じたバッジ
-            let statusBadge = '';
-            switch (invoice.status) {
-                case 'unpaid':
-                    statusBadge = `<span class="badge bg-warning text-dark">未払</span>`;
-                    break;
-                case 'paid':
-                    statusBadge = `<span class="badge bg-success text-white">支払済</span>`;
-                    break;
-                case 'processing':
-                    statusBadge = `<span class="badge bg-info text-white">処理中</span>`;
-                    break;
-                default:
-                    statusBadge = `<span class="badge bg-secondary">不明</span>`;
-            }
-
             row.innerHTML = `
-                <td>${formattedMonth}</td>
-                <td>¥${formattedAmount}</td>
-                <td>${statusBadge}</td>
-                <td>
+                <td class="px-4 py-3 whitespace-nowrap">${formattedMonth}</td>
+                <td class="px-4 py-3 whitespace-nowrap">¥${formattedAmount}</td>
+                <td class="px-4 py-3 whitespace-nowrap">
                     <button class="button-secondary btn-sm view-detail-btn" data-invoice-id="${invoice.invoiceId}">
                         詳細
                     </button>
@@ -67,6 +63,21 @@ export function initInvoiceListPage() {
                 // 請求書詳細画面へ遷移
                 window.location.href = `invoice-detail.html?invoiceId=${invoiceId}`;
             });
+        });
+    }
+
+    function showMessage(msg) {
+        messageOverlay.classList.remove('hidden');
+        messageOverlay.querySelector('p').textContent = msg;
+    }
+
+    // フィルタ適用ボタンのイベントリスナー
+    if (applyFilterBtn) {
+        applyFilterBtn.addEventListener('click', () => {
+            // ここにフィルタリングロジックを実装
+            // 例: 期間や検索ボックスの値を取得し、fetchInvoicesに渡す
+            console.log('フィルタ適用ボタンがクリックされました。');
+            fetchInvoices(); // 仮で再フェッチ
         });
     }
 
