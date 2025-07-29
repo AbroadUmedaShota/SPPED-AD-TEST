@@ -150,7 +150,7 @@ function renderTableRows(surveysToRender) {
                 ${survey.name}
             </td>
             <td data-label="ステータス" class="px-4 py-3" data-sort-value="${survey.status}">
-                <span class="inline-flex items-center rounded-full text-xs px-2 py-1 ${statusColorClass}" title="${statusTitle}">${displayStatus}</span>
+                <span class="inline-flex items-center rounded-full text-xs px-2 py-1 whitespace-nowrap w-auto ${statusColorClass}" title="${statusTitle}">${displayStatus}</span>
             </td>
             <td data-label="回答数" class="px-4 py-3 text-on-surface-variant text-sm" data-sort-value="${survey.answerCount}">
                 ${survey.answerCount} ${realtimeAnswersDisplay}
