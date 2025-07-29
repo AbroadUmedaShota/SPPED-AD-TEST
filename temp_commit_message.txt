@@ -1,4 +1,14 @@
-feat: Update invoice detail page and data samples
+docs: UIコンポーネント統合に関するドキュメントを更新・追加
 
-- Updated `02_dashboard/invoice-detail.html` to use an `<img>` tag for the SpeedAd logo, consistent with previous SVG externalization efforts.
-- Updated `02_dashboard/data/名刺データサンプル.csv` and `02_dashboard/data/回答データサンプル.csv` with new sample data.
+### 概要
+
+UIコンポーネントのモジュール化と動的読み込みに関する設計原則の徹底に伴い、関連するドキュメントを更新・追加しました。
+
+### 変更内容
+
+- **`docs/01_ARCHITECTURE.md` の更新:**
+  - 「UIのモジュール化/コンポーネント化」セクションを更新し、すべての主要なアプリケーションページが共通コンポーネントを動的に読み込むようになったことを明記しました。
+
+- **`docs/design/02_UI_COMPONENT_INTEGRATION.md` の新規作成:**
+  - 共通UIコンポーネント（ヘッダー、サイドバー、フッター、モーダルなど）を新しいページや既存のページに統合するための具体的な方法を詳述するドキュメントを作成しました。
+  - プレースホルダーの使用方法、`src/main.js` での動的読み込みの仕組み、および関連するJavaScriptモジュールの役割について説明しています。

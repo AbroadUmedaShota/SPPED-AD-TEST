@@ -13,7 +13,7 @@ export function setupQrCodeModalListeners(modalElement) {
 
     const downloadQrCodeBtn = modalElement.querySelector('#downloadQrCodeBtn');
     const qrCodeImage = modalElement.querySelector('#qrCodeImage');
-    const surveyUrlInput = modalElement.querySelector('#surveyUrl');
+    const surveyUrlInput = modalElement.querySelector('#surveyUrlInput');
 
     // Remove existing listeners to prevent duplication
     if (downloadQrCodeBtn) downloadQrCodeBtn.removeEventListener('click', handleDownloadQrCode);
