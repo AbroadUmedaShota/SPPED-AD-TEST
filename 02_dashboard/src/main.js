@@ -93,6 +93,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         case 'invoice-detail.html':
             initInvoiceDetailPage();
             break;
+        case 'bizcardSettings.html':
+            initBizcardSettings();
+            break;
+        case 'thankYouEmailSettings.html':
+            initThankYouEmailSettings();
+            break;
+        case 'speed-review.html':
+            // initSpeedReviewPage(); // This function needs to be created and imported
+            break;
         
     }
 
