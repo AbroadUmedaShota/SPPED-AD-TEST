@@ -1,14 +1,21 @@
-docs: UIコンポーネント統合に関するドキュメントを更新・追加
+fix: QRコードモーダルが表示されない問題を修正
 
 ### 概要
 
-UIコンポーネントのモジュール化と動的読み込みに関する設計原則の徹底に伴い、関連するドキュメントを更新・追加しました。
+`index.html` のアンケート一覧からQRコードモーダルを開こうとした際に、モーダルが表示されず、コンソールに `TypeError: Cannot set properties of null (setting 'value')` エラーが発生する問題を修正しました。
 
-### 変更内容
+### 原因
 
-- **`docs/01_ARCHITECTURE.md` の更新:**
-  - 「UIのモジュール化/コンポーネント化」セクションを更新し、すべての主要なアプリケーションページが共通コンポーネントを動的に読み込むようになったことを明記しました。
+`src/qrCodeModal.js` 内で、QRコードモーダル内のURL入力フィールドのDOM要素を取得する際に、誤ったID (`#surveyUrl`) を使用していました。しかし、実際のHTML (`modals/qrCodeModal.html`) では、この入力フィールドのIDは `#surveyUrlInput` となっていました。
 
-- **`docs/design/02_UI_COMPONENT_INTEGRATION.md` の新規作成:**
-  - 共通UIコンポーネント（ヘッダー、サイドバー、フッター、モーダルなど）を新しいページや既存のページに統合するための具体的な方法を詳述するドキュメントを作成しました。
-  - プレースホルダーの使用方法、`src/main.js` での動的読み込みの仕組み、および関連するJavaScriptモジュールの役割について説明しています。
+このIDの不一致により、JavaScriptが要素を見つけられず、`null` に対して `value` プロパティを設定しようとしたため、エラーが発生していました。
+
+### 修正内容
+
+- `src/qrCodeModal.js` の `setupQrCodeModalListeners` 関数内で、`surveyUrlInput` を取得するセレクタを `#surveyUrlInput` に修正しました。
+
+### 影響範囲
+
+- `index.html` のアンケート一覧ページからQRコードモーダルを開く機能。
+
+Closes #21

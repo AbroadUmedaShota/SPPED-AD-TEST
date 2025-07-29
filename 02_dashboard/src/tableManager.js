@@ -15,15 +15,13 @@ let itemsPerPage = 10; // Default, will be updated from select element
 
 const STATUS_SORT_ORDER = {
     '会期前': 1,
-    '準備中': 2,
-    '会期中': 3,
-    'データ化中': 4,
-    'アップ待ち': 5,
-    'アップ完了': 6,
-    'データ化なし': 7,
-    '期限切れ': 8,
-    '削除済み': 9,
-    '終了': 10
+    '会期中': 2,
+    'データ化中': 3,
+    'データ化完了': 4,
+    'データ化なし': 5,
+    '終了': 6,
+    '削除済み': 7,
+    '不明': 8
 };
 
 let lastSortedHeader = null; // Tracks the last header clicked for sorting
@@ -94,34 +92,45 @@ function renderTableRows(surveysToRender) {
             case '会期中':
                 statusColorClass = 'bg-green-100 text-green-800';
                 statusTitle = '現在回答を受け付けている状態';
+                displayStatus = '会期中';
                 break;
-            case '準備中':
             case '会期前':
+            case '準備中': // 内部ステータス
                 displayStatus = '会期前';
                 statusColorClass = 'bg-yellow-100 text-yellow-800';
                 statusTitle = 'まだ回答を受け付けていない状態';
                 break;
             case 'データ化中':
-            case 'アップ待ち':
+            case 'アップ待ち': // 内部ステータス
                 displayStatus = 'データ化中';
                 statusColorClass = 'bg-blue-100 text-blue-800';
                 statusTitle = '名刺データの入力・照合作業が進行中';
                 break;
-            case 'アップ完了':
+            case 'アップ完了': // 内部ステータス
+                displayStatus = 'データ化完了';
                 statusColorClass = 'bg-blue-100 text-blue-800';
                 statusTitle = '名刺データがダウンロード可能になり、お礼メールも送信可能';
                 break;
-            case '期限切れ':
-            case '削除済み':
             case 'データ化なし':
+                displayStatus = 'データ化なし';
+                statusColorClass = 'bg-gray-100 text-gray-800';
+                statusTitle = '名刺データ化の依頼がないアンケートです';
+                break;
+            case '期限切れ': // 内部ステータス
             case '終了':
                 displayStatus = '終了';
                 statusColorClass = 'bg-red-100 text-red-800';
-                statusTitle = 'データへのアクセスが制限された重要な状態、または会期終了';
+                statusTitle = 'アンケートの回答期間が終了しました';
+                break;
+            case '削除済み':
+                displayStatus = '削除済み';
+                statusColorClass = 'bg-red-100 text-red-800';
+                statusTitle = 'このアンケートは削除されました';
                 break;
             default:
+                displayStatus = '不明';
                 statusColorClass = 'bg-gray-100 text-gray-800';
-                statusTitle = '不明なステータス';
+                statusTitle = 'ステータスが不明です。システム管理者にお問い合わせください。';
                 break;
         }
 
