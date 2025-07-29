@@ -41,10 +41,31 @@ window.dummyUserData = {
 };
 
 /**
+ * フッターを動的に読み込む
+ */
+async function loadFooter() {
+    try {
+        const response = await fetch('common/footer.html');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const footerHtml = await response.text();
+        document.getElementById('main-footer').innerHTML = footerHtml;
+
+        // フッター内の要素にイベントリスナーを設定
+        document.getElementById('openContactModalBtn').addEventListener('click', () => handleOpenModal('contactModal', 'modals/contactModal.html'));
+
+    } catch (error) {
+        console.error('Failed to load footer:', error);
+    }
+}
+
+/**
  * ページの初期化処理
  */
 async function initializePage() {
     try {
+        await loadFooter(); // フッターを読み込む
         let surveyData = loadSurveyDataFromLocalStorage();
         if (surveyData) {
             console.log('Loaded survey data from localStorage:', surveyData);
@@ -57,13 +78,42 @@ async function initializePage() {
             renderAllQuestionGroups(surveyData.questionGroups);
         }
         renderOutlineMap(); // 初期ロード時にアウトラインマップを生成
-
-        
+        restoreAccordionState(); // アコーディオンの状態を復元
 
     } catch (error) {
         console.error('Failed to initialize page:', error);
         displayErrorMessage();
     }
+}
+
+/**
+ * アコーディオンの開閉状態をlocalStorageに保存する
+ * @param {string} id - アコーディオンコンテンツのID
+ * @param {boolean} isOpen - 開いているかどうか
+ */
+function saveAccordionState(id, isOpen) {
+    localStorage.setItem(`accordionState_${id}`, isOpen);
+}
+
+/**
+ * localStorageからアコーディオンの開閉状態を復元する
+ */
+function restoreAccordionState() {
+    const accordionItems = document.querySelectorAll('.accordion-item');
+    accordionItems.forEach(item => {
+        const header = item.querySelector('.accordion-header');
+        const contentId = header.dataset.accordionTarget;
+        const content = document.getElementById(contentId);
+        const icon = header.querySelector('.expand-icon');
+        if (content && localStorage.getItem(`accordionState_${contentId}`) === 'false') {
+            content.style.display = 'none';
+            icon.textContent = 'expand_more';
+        } else if (content) {
+            content.style.display = 'block';
+            icon.textContent = 'expand_less';
+        }
+    });
+}
 
 /**
  * イベントリスナーを登録する
@@ -80,6 +130,7 @@ function setupEventListeners() {
                 const isVisible = getComputedStyle(content).display !== 'none';
                 content.style.display = isVisible ? 'none' : 'block';
                 icon.textContent = isVisible ? 'expand_more' : 'expand_less';
+                saveAccordionState(contentId, !isVisible); // 状態を保存
             }
         }
     });
@@ -373,7 +424,18 @@ function validateFormForSaveButton() {
     ];
 
     function checkValidation() {
-        const allValid = requiredFields.every(field => field.value.trim() !== '');
+        let allValid = true;
+        requiredFields.forEach(field => {
+            const errorMessage = field.closest('.input-group').querySelector('.error-message');
+            if (field.value.trim() === '') {
+                field.classList.add('is-invalid');
+                if (errorMessage) errorMessage.classList.remove('hidden');
+                allValid = false;
+            } else {
+                field.classList.remove('is-invalid');
+                if (errorMessage) errorMessage.classList.add('hidden');
+            }
+        });
         saveButton.disabled = !allValid;
     }
 
