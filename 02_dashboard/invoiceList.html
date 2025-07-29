@@ -25,90 +25,11 @@
     <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
 
     <!-- 2. ヘッダー -->
-    <header class="fixed top-0 left-0 right-0 z-50 flex h-16 items-center justify-between px-6  gradient-primary-bg">
-        <div class="flex items-center gap-3">
-            <!-- モバイル用サイドバートグル -->
-            <button class="lg:hidden text-on-primary hover:text-primary-container" id="sidebarToggleMobile" aria-label="モバイルメニューを開く">
-                <span class="material-icons text-3xl">menu</span>
-            </button>
-            <!-- ブランドロゴ -->
-            <div class="flex items-center gap-2">
-                <div class="size-8 text-on-primary" role="img" aria-label="SpeedAdロゴ">
-                    <img src="assets/svg/speedad_logo.svg" alt="SpeedAdロゴ" class="h-full w-full">
-                </div>
-                <span class="text-on-primary text-xl font-bold leading-tight tracking-tight">SPEED-AD</span>
-            </div>
-        </div>
-        <div class="flex items-center gap-x-3 sm:gap-x-4">
-            
-            <!-- ユーザー情報 -->
-            <a href="#" class="text-on-primary font-bold transition-opacity" aria-label="現在のユーザー情報" onclick="window.openAccountInfoModal(window.dummyUserData);">user@example.comさん</a>
-        </div>
-    </header>
+    <div id="header-placeholder"></div>
 
     <div class="flex flex-1 pt-16 bg-background">
         <!-- 3. サイドバー -->
-        <aside class="fixed inset-y-0 left-0 z-40 flex flex-col border-r border-outline-variant bg-surface pt-16 overflow-y-auto sidebar" id="sidebar">
-            <!-- プロファイルブロック -->
-            <div class="p-4 border-b border-outline-variant profile-block">
-                <div class="flex items-center gap-3">
-                    <div class="bg-on-primary-fixed-variant aspect-square rounded-full size-10 border-2 border-outline-variant flex items-center justify-center">
-                        <span class="material-icons text-primary text-4xl leading-none">account_circle</span>
-                    </div>
-                    <div class="flex-1">
-                        <p class="text-on-surface text-sm font-semibold">user@example.com</p>
-                        <p class="text-on-surface-variant text-xs">Current Group</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- グループ管理 -->
-            <div class="p-4 border-b border-outline-variant sidebar-group-control">
-                <select id="user_select" class="w-full rounded-md shadow-sm bg-on-primary-fixed-variant text-on-surface focus:ring-secondary focus:border-secondary transition-all text-sm py-2 px-3 appearance-none" aria-label="ユーザーグループを選択">
-                    <option value="current">Current Group</option>
-                    <option value="group_a">Group A</option>
-                    <option value="group_b">Group B</option>
-                </select>
-                <button class="w-full mt-2 button-primary text-on-primary py-2 px-3 rounded-md shadow-sm font-semibold text-sm" aria-label="グループを切り替える">
-                    切替
-                </button>
-                <button class="w-full mt-2 button-primary text-on-primary py-2 px-3 rounded-md shadow-sm font-semibold text-sm" aria-label="グループを新規作成" onclick="handleOpenModal('newGroupModal', 'modals/newGroupModal.html')">
-                    グループ新規作成
-                </button>
-            </div>
-
-            <!-- ナビゲーション -->
-            <nav class="flex-1 space-y-1 p-2">
-                <a class="flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors" href="index.html" aria-label="アンケート一覧へ移動">
-                    <span class="material-icons text-xl">list_alt</span>
-                    <span class="sidebar-nav-label whitespace-nowrap">アンケート一覧</span>
-                </a>
-                <a class="flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors" href="surveyCreation.html" aria-label="アンケート新規作成へ移動">
-                    <span class="material-icons text-xl">add_box</span>
-                    <span class="sidebar-nav-label whitespace-nowrap">アンケート新規作成</span>
-                </a>
-                <a class="flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors" href="invoiceList.html" aria-label="請求書一覧へ移動">
-                    <span class="material-icons text-xl">receipt_long</span>
-                    <span class="sidebar-nav-label whitespace-nowrap">ご請求内容一覧</span>
-                </a>
-                <div class="border-t border-outline-variant my-2"></div>
-                <a class="flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors" href="#" onclick="window.openAccountInfoModal(window.dummyUserData);" aria-label="アカウント情報を表示">
-                    <span class="material-icons text-xl">account_circle</span>
-                    <span class="sidebar-nav-label whitespace-nowrap">アカウント情報</span>
-                </a>
-                <a class="flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors" href="#" aria-label="ログアウトする" id="logoutButton">
-                    <span class="material-icons text-lg">logout</span>
-                    <span class="sidebar-nav-label whitespace-nowrap">ログアウト</span>
-                </a>
-            </nav>
-            <!-- テーマ切り替えボタン (サイドバー下部) -->
-            <div class="mt-auto p-2 border-t border-outline-variant">
-                <a class="flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors" href="#" aria-label="テーマを切り替える" id="sidebarThemeToggle">
-                    <span class="material-icons text-lg" id="sidebarThemeIcon">light_mode</span>
-                    <span class="sidebar-nav-label whitespace-nowrap">テーマ切替</span>
-                </a>
-            </div>
-        </aside>
+        <div id="sidebar-placeholder"></div>
 
         <!-- 4. メインコンテンツ -->
         <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
@@ -150,57 +71,7 @@
     </div>
 
     <!-- 5. フッター -->
-    <footer class="border-t border-outline-variant bg-surface-variant" id="main-footer">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
-                <div class="col-span-2 md:col-span-4 lg:col-span-1">
-                    <div class="flex items-center gap-2 text-on-surface mb-4">
-                        <div class="size-7 text-primary">
-                             <img src="assets/svg/speedad_logo.svg" alt="SpeedAdロゴ" class="h-full w-full">
-                        </div>
-                        <h2 class="text-on-surface text-lg font-bold leading-tight tracking-tight">SPEED-AD</h2>
-                    </div>
-                    <p class="text-on-surface-variant text-sm leading-relaxed">アンケート作成から分析まで、<br/>オールインワンで提供します。</p>
-                </div>
-                <div>
-                    <h3 class="text-on-surface text-sm font-semibold mb-4">サービス</h3>
-                    <ul class="space-y-2">
-                        <li><a class="text-on-surface-variant hover:text-primary text-sm transition-colors" href="#">アンケート作成</a></li>
-                        <li><a class="text-on-surface-variant hover:text-primary text-sm transition-colors" href="#">アンケート配信</a></li>
-                        <li><a class="text-on-surface-variant hover:text-primary text-sm transition-colors" href="#">回答分析</a></li>
-                        <li><a class="text-on-surface-variant hover:text-primary text-sm transition-colors" href="#">レポート機能</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="text-on-surface text-sm font-semibold mb-4">サポート</h3>
-                    <ul class="space-y-2">
-                        <li><a class="text-on-surface-variant hover:text-primary text-sm transition-colors" href="#">ヘルプセンター</a></li>
-                        <li><a class="text-on-surface-variant hover:text-primary text-sm transition-colors" href="#">よくある質問</a></li>
-                        <li><a class="text-on-surface-variant hover:text-primary text-sm transition-colors" href="#" onclick="handleOpenModal('contactModal', 'modals/contactModal.html')">お問い合わせ</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="text-on-surface text-sm font-semibold mb-4">会社情報</h3>
-                    <ul class="space-y-2">
-                        <li><a class="text-on-surface-variant hover:text-primary text-sm transition-colors" href="#">会社概要</a></li>
-                        <li><a class="text-on-surface-variant hover:text-primary text-sm transition-colors" href="#">採用情報</a></li>
-                        <li><a class="text-on-surface-variant hover:text-primary text-sm transition-colors" href="#">プレスリリース</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="text-on-surface text-sm font-semibold mb-4">規約等</h3>
-                    <ul class="space-y-2">
-                        <li><a class="text-on-surface-variant hover:text-primary text-sm transition-colors" href="#">利用規約</a></li>
-                        <li><a class="text-on-surface-variant hover:text-primary text-sm transition-colors" href="#">プライバシーポリシー</a></li>
-                        <li><a class="text-on-surface-variant hover:text-primary text-sm transition-colors" href="#">特定商取引法に基づく表示</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="mt-8 pt-8 border-t border-outline-variant text-center">
-                <p class="text-on-surface-variant text-sm">© 2025 Abroad Outsourcing Co.,Inc. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
+    <div id="footer-placeholder"></div>
 
 </div>
 

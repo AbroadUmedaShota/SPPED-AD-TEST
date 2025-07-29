@@ -1,0 +1,38 @@
+### Implementation Proposal
+
+To resolve this Issue, I will proceed with the implementation according to the following plan.
+
+**Files to be reviewed:**
+- All HTML and JavaScript files under the `02_dashboard/` directory that were listed in the previous step.
+
+#### 1. **Contribution to Project Goals**
+- This review will improve the project's overall maintainability and scalability by ensuring the existing codebase adheres to the established design principles. This will reduce future development costs and prevent technical debt.
+
+#### 2. **Overview of Review Process**
+- The review will be conducted in two main phases for each screen/feature.
+    1.  **UI Modularization Analysis:** Verify that common UI elements (header, sidebar, modals) are implemented as reusable components and loaded dynamically, rather than being duplicated in each HTML file.
+    2.  **Separation of Concerns Analysis:** Verify that a layered architecture is in place, with a clear distinction between the UI layer (DOM manipulation, user events), the Service layer (business logic, data handling), and the Utility layer (common functions).
+
+#### 3. **Specific Work Content for Each File Group**
+
+I will analyze the files, grouped by feature, based on the following criteria:
+
+- **Core/Common (`index.html`, `common/`, `src/main.js`, `src/sidebarHandler.js`, etc.):**
+    - Confirm that `main.js` is responsible for initializing modules and that common components like the header and sidebar are loaded dynamically into the main content pages.
+- **Survey Management (`surveyCreation.html`, `src/surveyCreation.js`, `src/services/surveyService.js`, etc.):**
+    - Check if `surveyCreation.js` (UI layer) properly calls `surveyService.js` (Service layer) for data operations, separating UI logic from business logic.
+    - Verify that `surveyRenderer.js` is used for the single responsibility of rendering survey elements.
+- **Invoice Management (`invoiceList.html`, `src/invoiceList.js`, etc.):**
+    - Analyze if the JavaScript files contain mixed logic (DOM manipulation and data fetching/processing) or if they are properly separated.
+- **Modals (`modals/`, `src/modalHandler.js`, etc.):**
+    - Confirm that `modalHandler.js` dynamically loads and manages all modal dialogs, promoting reusability.
+- **Other Screens (`bizcardSettings.html`, `speed-review.html`, etc.):**
+    - Apply the same UI modularization and separation of concerns checks to all remaining screens.
+
+#### 4. **Definition of Done**
+- [ ] A complete review of all screens under `02_dashboard` is finished.
+- [ ] A list of deviations from the design principles and their corresponding problems has been created.
+- [ ] A refactoring plan based on the list above has been formulated and agreed upon in this Issue.
+
+---
+If you approve, please reply to this comment with "Approve".

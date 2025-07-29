@@ -1,0 +1,4 @@
+feat: Update invoice detail page and data samples
+
+- Updated `02_dashboard/invoice-detail.html` to use an `<img>` tag for the SpeedAd logo, consistent with previous SVG externalization efforts.
+- Updated `02_dashboard/data/名刺データサンプル.csv` and `02_dashboard/data/回答データサンプル.csv` with new sample data.
