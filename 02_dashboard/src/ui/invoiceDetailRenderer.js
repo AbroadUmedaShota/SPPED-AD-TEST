@@ -60,8 +60,8 @@ export function renderInvoiceDetails(invoice) {
             <td class="px-4 py-2">${item.itemName1 || ''}</td>
             <td class="px-4 py-2">${item.itemName2 || ''}</td>
             <td class="px-4 py-2 text-right">${item.quantity}</td>
-            <td class="px-4 py-2 text-right">${item.unitPrice.toLocaleString()}</td>
-            <td class="px-4 py-2 text-right">${item.amount.toLocaleString()}</td>
+            <td class="px-4 py-2 text-right">${(item.unitPrice ?? 0).toLocaleString()}</td>
+            <td class="px-4 py-2 text-right">${(item.amount ?? 0).toLocaleString()}</td>
         </tr>
     `).join('');
 }
