@@ -1,6 +1,6 @@
 import { initTableManager, applyFiltersAndPagination } from './tableManager.js';
 import flatpickr from 'https://cdn.jsdelivr.net/npm/flatpickr';
-import { Japanese } from 'https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js';
+
 
 /**
  * アンケート一覧ページを初期化します。
