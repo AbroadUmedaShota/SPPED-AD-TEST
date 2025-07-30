@@ -1,12 +1,13 @@
-import { loadHTML, setupSidebar, setupBreadcrumb, showLoading, hideLoading, showMessage } from './main.js';
+import { loadCommonHtml, showLoading, hideLoading, showMessage } from './utils.js';
+import { initSidebarHandler } from './sidebarHandler.js';
+import { initBreadcrumbs } from './breadcrumb.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    await loadHTML('header-placeholder', 'common/header.html');
-    await loadHTML('sidebar-placeholder', 'common/sidebar.html');
-    await loadHTML('footer-placeholder', 'common/footer.html');
+    await loadCommonHtml('header-placeholder', 'common/header.html');
+    await loadCommonHtml('sidebar-placeholder', 'common/sidebar.html', initSidebarHandler);
+    await loadCommonHtml('footer-placeholder', 'common/footer.html');
 
-    setupSidebar();
-    setupBreadcrumb([
+    initBreadcrumbs([
         { name: 'ダッシュボード', href: 'index.html' },
         { name: '請求書一覧', href: 'invoiceList.html' },
         { name: '請求書詳細', href: '#' }
