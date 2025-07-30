@@ -81,10 +81,11 @@ function populateInvoiceData(invoice) {
 
     // Mock data generation for details (for visual representation)
     const mockItems = [
-        { no: 1, name1: '月額基本サービス料', name2: '2025年7月分', quantity: 1, price: 30000, total: 30000 },
+        { no: 1, name1: '月額サービス利用料', name2: 'プレミアムプラン (グループアカウント利用料)', quantity: 1, price: 30000, total: 30000 },
         { no: 2, name1: 'アンケート利用料', name2: 'A展示会来場者アンケート', quantity: 1, price: 20000, total: 20000 },
-        { no: 3, name1: 'オプションサービス', name2: 'データ分析レポート', quantity: 1, price: 5000, total: 5000 },
-        { no: 4, name1: 'オプションサービス', name2: '追加アンケート作成', quantity: 2, price: 2000, total: 4000 },
+        { no: 3, name1: '名刺データ化プラン', name2: 'スタンダードプラン (10項目) 500件', quantity: 500, price: 50, total: 25000 },
+        { no: 4, name1: '御礼メール一斉配信機能利用料', name2: '1展示会で101件以上 (200件)', quantity: 200, price: 1, total: 200 },
+        { no: 5, name1: 'アンケート利用料', name2: 'Bイベント参加者アンケート', quantity: 1, price: 15000, total: 15000 },
     ];
 
     mockItems.forEach(item => {
