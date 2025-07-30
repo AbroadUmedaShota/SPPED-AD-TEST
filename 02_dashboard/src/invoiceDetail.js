@@ -16,11 +16,11 @@ async function initInvoiceDetailPage() {
 
     try {
         const invoice = await fetchInvoiceById(invoiceId);
-        if (invoice) {
+        if (invoice && invoice.items) {
             renderInvoiceDetails(invoice);
             setupActionButtons(invoiceId);
         } else {
-            console.error(`請求書ID ${invoiceId} のデータが見つかりません。`);
+            console.error(`請求書ID ${invoiceId} のデータが見つからないか、データが不正です。`);
             displayNotFound();
         }
     } catch (error) {
