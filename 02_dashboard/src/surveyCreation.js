@@ -14,6 +14,7 @@ import {
     addOptionToQuestion, 
     renderOutlineMap 
 } from './ui/surveyRenderer.js';
+import { loadCommonHtml } from './utils.js';
 
 
 
@@ -41,31 +42,18 @@ window.dummyUserData = {
 };
 
 /**
- * フッターを動的に読み込む
- */
-async function loadFooter() {
-    try {
-        const response = await fetch('common/footer.html');
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const footerHtml = await response.text();
-        document.getElementById('main-footer').innerHTML = footerHtml;
-
-        // フッター内の要素にイベントリスナーを設定
-        document.getElementById('openContactModalBtn').addEventListener('click', () => handleOpenModal('contactModal', 'modals/contactModal.html'));
-
-    } catch (error) {
-        console.error('Failed to load footer:', error);
-    }
-}
-
-/**
  * ページの初期化処理
  */
 async function initializePage() {
     try {
-        await loadFooter(); // フッターを読み込む
+        await Promise.all([
+            loadCommonHtml('main-header', 'common/header.html'),
+            loadCommonHtml('sidebar', 'common/sidebar.html'),
+            loadCommonHtml('main-footer', 'common/footer.html', () => {
+                document.getElementById('openContactModalBtn').addEventListener('click', () => handleOpenModal('contactModal', 'modals/contactModal.html'));
+            })
+        ]);
+
         let surveyData = loadSurveyDataFromLocalStorage();
         if (surveyData) {
             console.log('Loaded survey data from localStorage:', surveyData);
@@ -77,8 +65,8 @@ async function initializePage() {
             populateBasicInfo(surveyData);
             renderAllQuestionGroups(surveyData.questionGroups);
         }
-        renderOutlineMap(); // 初期ロード時にアウトラインマップを生成
         restoreAccordionState(); // アコーディオンの状態を復元
+        renderOutlineMap(); // 初期ロード時にアウトラインマップを生成
 
     } catch (error) {
         console.error('Failed to initialize page:', error);
@@ -119,42 +107,9 @@ function restoreAccordionState() {
  * イベントリスナーを登録する
  */
 function setupEventListeners() {
-    // アコーディオンの開閉処理
-    document.body.addEventListener('click', (event) => {
-        const header = event.target.closest('.accordion-header, .group-header');
-        if (header) {
-            const contentId = header.dataset.accordionTarget;
-            const content = document.getElementById(contentId);
-            const icon = header.querySelector('.expand-icon');
-            if (content) {
-                const isVisible = getComputedStyle(content).display !== 'none';
-                content.style.display = isVisible ? 'none' : 'block';
-                icon.textContent = isVisible ? 'expand_more' : 'expand_less';
-                saveAccordionState(contentId, !isVisible); // 状態を保存
-            }
-        }
-    });
+    initializeAccordion();
 
-    // flatpickrの初期化
-    flatpickr.localize(flatpickr.l10ns.ja);
-
-    const endDatePicker = flatpickr("#periodEndWrapper", {
-        wrap: true,
-        dateFormat: "Y-m-d",
-    });
-
-    flatpickr("#periodStartWrapper", {
-        wrap: true,
-        dateFormat: "Y-m-d",
-        onChange: function(selectedDates, dateStr) {
-            endDatePicker.set('minDate', dateStr);
-        }
-    });
-
-    flatpickr("#deadlineWrapper", {
-        wrap: true,
-        dateFormat: "Y-m-d",
-    });
+    initializeDatepickers();
 
     // モーダルを開くボタンのイベントリスナー
     document.getElementById('openAccountInfoBtnHeader').addEventListener('click', () => openAccountInfoModal(window.dummyUserData));
@@ -278,83 +233,7 @@ function setupEventListeners() {
         });
     }
 
-    // Sortable.jsの初期化
-    const questionGroupsContainer = document.getElementById('questionGroupsContainer');
-
-    // 質問グループの並べ替え
-    new Sortable(questionGroupsContainer, {
-        animation: 150,
-        handle: '.group-header .handle', // ドラッグハンドル
-        ghostClass: 'blue-background-class', // ドラッグ中のスタイル
-        onEnd: function (evt) {
-            // 並べ替え後の処理（必要であれば）
-            console.log('Group moved:', evt.oldIndex, evt.newIndex);
-        },
-    });
-
-    // 各質問グループ内の質問項目の並べ替え
-    // MutationObserverを使って、動的に追加される質問グループにもSortableを適用
-    const observer = new MutationObserver(mutations => {
-        mutations.forEach(mutation => {
-            if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-                mutation.addedNodes.forEach(node => {
-                    if (node.nodeType === 1 && node.classList.contains('question-group')) {
-                        const questionsList = node.querySelector('.questions-list');
-                        if (questionsList) {
-                            new Sortable(questionsList, {
-                                animation: 150,
-                                handle: '.question-item .handle', // ドラッグハンドル
-                                ghostClass: 'blue-background-class', // ドラッグ中のスタイル
-                                onEnd: function (evt) {
-                                    // 並べ替え後の処理（必要であれば）
-                                    console.log('Question moved:', evt.oldIndex, evt.newIndex);
-                                    // 質問番号を振り直す
-                                    const parentQuestionsList = evt.to;
-                                    const remainingQuestions = parentQuestionsList.querySelectorAll('.question-item');
-                                    remainingQuestions.forEach((q, i) => {
-                                        const questionTitle = q.querySelector('.question-title');
-                                        if (questionTitle) {
-                                            const currentTitle = questionTitle.textContent;
-                                            const typeMatch = currentTitle.match(/Q\d+:\s*(.*)/);
-                                            const questionType = typeMatch ? typeMatch[1].trim() : '';
-                                            questionTitle.textContent = `Q${i + 1}: ${questionType}`;
-                                        }
-                                    });
-                                },
-                            });
-                        }
-                    }
-                });
-            }
-        });
-    });
-
-    observer.observe(questionGroupsContainer, { childList: true });
-
-    // 既存の質問グループにもSortableを適用
-    questionGroupsContainer.querySelectorAll('.questions-list').forEach(questionsList => {
-        new Sortable(questionsList, {
-            animation: 150,
-            handle: '.question-item .handle', // ドラッグハンドル
-            ghostClass: 'blue-background-class', // ドラッグ中のスタイル
-            onEnd: function (evt) {
-                // 並べ替え後の処理（必要であれば）
-                console.log('Question moved:', evt.oldIndex, evt.newIndex);
-                // 質問番号を振り直す
-                const parentQuestionsList = evt.to;
-                const remainingQuestions = parentQuestionsList.querySelectorAll('.question-item');
-                remainingQuestions.forEach((q, i) => {
-                    const questionTitle = q.querySelector('.question-title');
-                    if (questionTitle) {
-                        const currentTitle = questionTitle.textContent;
-                        const typeMatch = currentTitle.match(/Q\d+:\s*(.*)/);
-                        const questionType = typeMatch ? typeMatch[1].trim() : '';
-                        questionTitle.textContent = `Q${i + 1}: ${questionType}`;
-                    }
-                });
-            },
-        });
-    });
+    initializeDraggable();
 
     // フローティングナビゲーションのドラッグ機能
     const floatingNav = document.getElementById('floatingNavContainer');

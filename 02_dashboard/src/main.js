@@ -69,23 +69,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     switch (page) {
         case 'index.html':
         case '': // root path
-            initTableManager();
-
-            // flatpickrの初期化
-            flatpickr.localize(flatpickr.l10ns.ja);
-
-            const endDatePicker = flatpickr("#endDatePickerWrapper", {
-                wrap: true,
-                dateFormat: "Y-m-d",
-            });
-
-            const startDatePicker = flatpickr("#startDatePickerWrapper", {
-                wrap: true,
-                dateFormat: "Y-m-d",
-                onChange: function(selectedDates, dateStr, instance) {
-                    endDatePicker.set('minDate', dateStr);
-                }
-            });
+            initIndexPage();
             break;
         case 'invoiceList.html':
             initInvoiceListPage();
@@ -133,8 +117,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Adjust on window resize
     window.addEventListener('resize', adjustLayout);
 
-    // Update pagination visibility on layout change (after initial data fetch)
-    // This might need to be called after fetchSurveyData completes in tableManager
-    // For now, calling it here, but consider a callback from tableManager.
-    applyFiltersAndPagination();
+    
 });

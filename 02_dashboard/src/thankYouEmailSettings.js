@@ -1,177 +1,157 @@
-// src/thankYouEmailSettings.js
+import {
+    getInitialData,
+    saveThankYouEmailSettings,
+    sendThankYouEmails
+} from './services/thankYouEmailService.js';
+import {
+    renderSurveyInfo,
+    setInitialFormValues,
+    populateTemplates,
+    populateVariables,
+    updateUI,
+    updateTemplatePreview,
+    setButtonLoading
+} from './ui/thankYouEmailRenderer.js';
+import { showToast } from './utils.js';
+import { insertTextAtCursor } from './utils.js';
 
 export function initThankYouEmailSettings() {
-    // DOM Elements
-    const pageTitle = document.getElementById('pageTitle');
-    const surveyNameDisplay = document.getElementById('surveyNameDisplay');
-    const surveyIdDisplay = document.getElementById('surveyIdDisplay');
-    const surveyPeriodDisplay = document.getElementById('surveyPeriodDisplay');
+    // --- DOM Elements ---
     const thankYouEmailEnabledToggle = document.getElementById('thankYouEmailEnabledToggle');
-    const thankYouEmailEnabledStatus = document.getElementById('thankYouEmailEnabledStatus');
-    const thankYouEmailSettingsFields = document.getElementById('thankYouEmailSettingsFields');
     const sendMethodRadios = document.querySelectorAll('input[name="sendMethod"]');
     const emailTemplateSelect = document.getElementById('emailTemplate');
-    const emailSubjectInput = document.getElementById('emailSubject');
     const emailBodyTextarea = document.getElementById('emailBody');
-    const recipientListDiv = document.getElementById('recipientList');
-    const sendEmailButton = document.getElementById('sendThankYouEmailBtn');
-    const saveButton = document.getElementById('saveThankYouEmailSettingsBtn');
-    const cancelButton = document.getElementById('cancelThankYouEmailSettings');
-    const templatePreview = document.getElementById('templatePreview');
     const insertVariableBtn = document.getElementById('insertVariableBtn');
     const variableList = document.getElementById('variableList');
+    const saveButton = document.getElementById('saveThankYouEmailSettingsBtn');
+    const sendEmailButton = document.getElementById('sendThankYouEmailBtn');
+    const cancelButton = document.getElementById('cancelThankYouEmailSettings');
 
-    // State
-    const urlParams = new URLSearchParams(window.location.search);
-    const surveyId = urlParams.get('surveyId');
-    let surveyState = { // APIから取得する想定のデータ
-        isEventFinished: true,
-        isBizcardDataReady: true,
-        recipientCount: 150,
+    // --- State ---
+    let state = {
+        surveyId: null,
+        surveyData: {},
+        emailSettings: {},
+        emailTemplates: [],
+        variables: []
     };
 
-    // --- 仮のデータ ---
-    const emailTemplates = {
-        'default': { subject: 'ご来場ありがとうございました', body: '本日はご来場いただき、誠にありがとうございました。\n\n株式会社〇〇\n{会社名} {氏名}様' },
-        'special': { subject: '【特別オファー】ご来場者様限定', body: '先日は、弊社ブースにお立ち寄りいただき、誠にありがとうございました。\n\n{会社名} {氏名}様\n\n特別なご案内がございます。' },
-    };
-    const variables = ['会社名', '氏名', '部署名', '役職'];
+    /**
+     * Initializes the page, fetches data, and sets up event listeners.
+     */
+    async function initializePage() {
+        const urlParams = new URLSearchParams(window.location.search);
+        state.surveyId = urlParams.get('surveyId');
 
-    // --- 初期化処理 ---
-    if (surveyId) {
-        loadInitialData();
-    } else {
-        displayEmptyState();
-    }
-    populateTemplates();
-    populateVariables();
-    addEventListeners();
-    updateUI();
+        if (!state.surveyId) {
+            document.getElementById('pageTitle').textContent = 'アンケートIDが見つかりません';
+            showToast('有効なアンケートIDが指定されていません。', 'error');
+            return;
+        }
 
-    function loadInitialData() {
-        // ... (loadInitialData の実装は変更なし)
-    }
+        try {
+            const initialData = await getInitialData(state.surveyId);
+            state = { ...state, ...initialData };
 
-    function displayEmptyState() {
-        // ... (displayEmptyState の実装は変更なし)
-    }
+            renderSurveyInfo(state.surveyData, state.surveyId);
+            populateTemplates(state.emailTemplates);
+            populateVariables(state.variables, handleVariableClick);
+            setInitialFormValues(state.emailSettings);
 
-    function populateTemplates() {
-        for (const [key, template] of Object.entries(emailTemplates)) {
-            const option = document.createElement('option');
-            option.value = key;
-            option.textContent = template.subject;
-            emailTemplateSelect.appendChild(option);
+            setupEventListeners();
+            updateUI(state.emailSettings.thankYouEmailEnabled, state.surveyData);
+            updateTemplatePreview(state.emailTemplates.find(t => t.id === state.emailSettings.emailTemplateId));
+
+        } catch (error) {
+            console.error('初期化エラー:', error);
+            showToast('ページの読み込みに失敗しました。', 'error');
         }
     }
 
-    function populateVariables() {
-        variables.forEach(variable => {
-            const item = document.createElement('a');
-            item.href = '#';
-            item.className = 'block px-4 py-2 text-sm text-on-surface hover:bg-surface-variant';
-            item.textContent = `{${variable}}`;
-            item.addEventListener('click', (e) => {
-                e.preventDefault();
-                insertTextAtCursor(emailBodyTextarea, `{${variable}}`);
-                variableList.classList.add('hidden');
-            });
-            variableList.appendChild(item);
+    /**
+     * Sets up all event listeners for the page.
+     */
+    function setupEventListeners() {
+        thankYouEmailEnabledToggle.addEventListener('change', handleFormChange);
+        sendMethodRadios.forEach(radio => radio.addEventListener('change', handleFormChange));
+        emailTemplateSelect.addEventListener('change', handleTemplateChange);
+        insertVariableBtn.addEventListener('click', () => variableList.classList.toggle('hidden'));
+        saveButton.addEventListener('click', handleSaveSettings);
+        sendEmailButton.addEventListener('click', handleSendEmails);
+        cancelButton.addEventListener('click', () => {
+            if (confirm('変更を破棄してアンケート一覧に戻りますか？')) {
+                window.location.href = 'index.html';
+            }
         });
     }
 
-    function addEventListeners() {
-        thankYouEmailEnabledToggle.addEventListener('change', updateUI);
-        sendMethodRadios.forEach(radio => radio.addEventListener('change', updateUI));
-        emailTemplateSelect.addEventListener('change', updateTemplatePreview);
-        insertVariableBtn.addEventListener('click', () => variableList.classList.toggle('hidden'));
-        saveButton.addEventListener('click', saveSettings);
-        sendEmailButton.addEventListener('click', sendEmail);
-        cancelButton.addEventListener('click', () => window.location.href = 'index.html');
-    }
+    // --- Event Handlers ---
 
-    function updateUI() {
+    function handleFormChange() {
         const isEnabled = thankYouEmailEnabledToggle.checked;
-        thankYouEmailEnabledStatus.textContent = isEnabled ? '有効' : '無効';
-        thankYouEmailSettingsFields.style.display = isEnabled ? 'block' : 'none';
-
-        if (isEnabled) {
-            updateRecipientList();
-            updateSendButtonState();
-        }
-        updateTemplatePreview();
+        updateUI(isEnabled, state.surveyData);
     }
 
-    function updateRecipientList() {
-        if (!surveyState.isEventFinished || !surveyState.isBizcardDataReady) {
-            recipientListDiv.innerHTML = '<p class="text-on-surface-variant">会期終了後、名刺データ化が完了すると対象者が表示されます。</p>';
-        } else {
-            recipientListDiv.innerHTML = `<p class="font-semibold">送信対象者: <span class="text-primary text-lg">${surveyState.recipientCount}</span> 件</p>`;
-        }
+    function handleTemplateChange() {
+        const selectedTemplate = state.emailTemplates.find(t => t.id === emailTemplateSelect.value);
+        updateTemplatePreview(selectedTemplate);
     }
 
-    function updateSendButtonState() {
-        const selectedMethod = document.querySelector('input[name="sendMethod"]:checked').value;
-        const conditionsMet = selectedMethod === 'manual' &&
-                              surveyState.isEventFinished &&
-                              surveyState.isBizcardDataReady &&
-                              surveyState.recipientCount > 0;
-        sendEmailButton.disabled = !conditionsMet;
+    function handleVariableClick(variable) {
+        insertTextAtCursor(emailBodyTextarea, `{${variable}}`);
+        variableList.classList.add('hidden');
     }
 
-    function updateTemplatePreview() {
-        const selectedKey = emailTemplateSelect.value;
-        const template = emailTemplates[selectedKey];
-        if (template) {
-            templatePreview.innerHTML = `<h4 class="font-bold mb-2 text-on-surface-variant">テンプレートプレビュー</h4><p class="text-on-surface-variant whitespace-pre-wrap">${template.body}</p>`;
-            emailSubjectInput.value = template.subject;
-            emailBodyTextarea.value = template.body;
-        }
-    }
-
-    function insertTextAtCursor(textarea, text) {
-        const start = textarea.selectionStart;
-        const end = textarea.selectionEnd;
-        const newText = textarea.value.substring(0, start) + text + textarea.value.substring(end);
-        textarea.value = newText;
-        textarea.selectionStart = textarea.selectionEnd = start + text.length;
-        textarea.focus();
-    }
-
-    async function saveSettings() {
-        saveButton.disabled = true;
-        const originalText = saveButton.textContent;
-        saveButton.textContent = '保存中...';
+    async function handleSaveSettings() {
+        setButtonLoading(saveButton, true);
+        const settingsToSave = {
+            surveyId: state.surveyId,
+            thankYouEmailEnabled: thankYouEmailEnabledToggle.checked,
+            sendMethod: document.querySelector('input[name="sendMethod"]:checked').value,
+            emailTemplateId: document.getElementById('emailTemplate').value,
+            emailSubject: document.getElementById('emailSubject').value,
+            emailBody: document.getElementById('emailBody').value,
+        };
 
         try {
-            console.log('Saving settings...');
-            await new Promise(r => setTimeout(r, 1500)); // Simulate API call
-            showToast('設定を保存しました！', 'success');
-        } catch (err) {
-            showToast('設定の保存に失敗しました。', 'error');
+            const result = await saveThankYouEmailSettings(settingsToSave);
+            if (result.success) {
+                showToast(result.message, 'success');
+            } else {
+                showToast(result.message || '設定の保存に失敗しました。', 'error');
+            }
+        } catch (error) {
+            console.error('設定保存エラー:', error);
+            showToast('設定の保存中にエラーが発生しました。', 'error');
         } finally {
-            saveButton.disabled = false;
-            saveButton.textContent = originalText;
+            setButtonLoading(saveButton, false);
         }
     }
 
-    async function sendEmail() {
-        if (confirm(`本当に${surveyState.recipientCount}件のお礼メールを送信しますか？`)) {
-            sendEmailButton.disabled = true;
-            const originalText = sendEmailButton.textContent;
-            sendEmailButton.textContent = '送信中...';
-
+    async function handleSendEmails() {
+        const recipientCount = state.surveyData.recipientCount || 0;
+        if (recipientCount === 0) {
+            showToast('送信対象者がいません。', 'info');
+            return;
+        }
+        if (confirm(`本当に${recipientCount}件のお礼メールを送信しますか？`)) {
+            setButtonLoading(sendEmailButton, true);
             try {
-                console.log('Sending email...');
-                await new Promise(r => setTimeout(r, 2500)); // Simulate API call
-                showToast('お礼メールの送信を開始しました！', 'success');
-                // Potentially update a status area on the page
-            } catch (err) {
-                showToast('メールの送信に失敗しました。', 'error');
+                const result = await sendThankYouEmails(state.surveyId);
+                if (result.success) {
+                    showToast(result.message, 'success');
+                } else {
+                    showToast(result.message || 'メールの送信に失敗しました。', 'error');
+                }
+            } catch (error) {
+                console.error('メール送信エラー:', error);
+                showToast('メールの送信中にエラーが発生しました。', 'error');
             } finally {
-                sendEmailButton.disabled = false;
-                sendEmailButton.textContent = originalText;
+                setButtonLoading(sendEmailButton, false);
             }
         }
     }
-} // Missing closing brace added here
+
+    // --- Initialize Page ---
+    initializePage();
+}
