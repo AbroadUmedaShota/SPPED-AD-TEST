@@ -1,5 +1,3 @@
-refactor: Refactor invoice detail screen for better readability and direct PDF download
+fix: Correct URL parameter name for invoice detail page
 
-- Redesigned `invoice-detail.html` to improve visual clarity of invoice items and sections.
-- Modified `invoiceDetail.js` to populate the new HTML structure and to directly download `seikyuusyo_sample.pdf`.
-- Updated `04_invoice_screen.md` to reflect the new screen layout and PDF download behavior.
+- Modified `invoiceRenderer.js` to use `id` as the URL parameter name when navigating to `invoice-detail.html`, aligning with the parameter expected by `invoiceDetail.js`.
