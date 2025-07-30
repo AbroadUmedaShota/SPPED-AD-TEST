@@ -8,79 +8,154 @@
     <link rel="stylesheet" href="service-top-style.css">
     <style>
         body {
+            font-family: 'Meiryo', 'メイリオ', 'Yu Gothic', '游ゴシック', sans-serif;
             background-color: white !important;
+            margin: 0;
+            padding: 20mm; /* A4余白に合わせて調整 */
+            font-size: 10pt;
+            line-height: 1.5;
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact; /* 印刷時に背景色を保持 */
+            color-adjust: exact;
         }
         .invoice-container {
-            width: 210mm;
-            height: 297mm;
+            width: 170mm; /* A4 幅 (210mm) - 左右余白 (20mm*2) = 170mm */
             margin: 0 auto;
-            padding: 15mm;
             box-sizing: border-box;
         }
         .invoice-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 2rem;
+            margin-bottom: 8mm; /* PDFに合わせて調整 */
         }
         .invoice-title {
-            font-size: 2rem;
+            font-size: 24pt;
             font-weight: bold;
+            margin: 0;
+            padding: 0;
+            display: inline-block;
+            border-bottom: 3px double black;
+            padding-bottom: 5px;
+        }
+        .invoice-header-info {
+            text-align: right;
+            font-size: 9pt;
         }
         .invoice-header-info p {
             margin: 0;
-            font-size: 0.875rem;
+            margin-bottom: 2px;
         }
         .invoice-to {
-            margin-bottom: 2rem;
+            margin-bottom: 15mm; /* PDFに合わせて調整 */
         }
         .invoice-to p {
             margin: 0;
+            font-size: 14pt;
+            font-weight: bold;
+        }
+        .invoice-to hr {
+            border-top: 1px solid black;
+            margin: 7mm 0;
+        }
+        .invoice-to .greeting {
+            font-size: 10pt;
+            margin-bottom: 15mm;
         }
         .invoice-from {
             position: relative;
             text-align: right;
+            line-height: 1.3;
         }
         .invoice-from img.logo {
-            width: 200px;
-            margin-bottom: 0.5rem;
+            width: 150px; /* PDFに合わせて調整 */
+            margin-bottom: 5px;
         }
         .invoice-from img.seal {
             position: absolute;
-            top: 20px;
-            right: -20px;
-            width: 80px;
-            opacity: 0.8;
+            top: 0px; /* PDFに合わせて調整 */
+            right: 0px; /* PDFに合わせて調整 */
+            width: 60px; /* PDFに合わせて調整 */
+            opacity: 1; /* PDFに合わせて調整 */
+        }
+        .invoice-from p {
+            font-size: 9pt;
+            margin: 0;
+        }
+        .invoice-from .company-name {
+            font-size: 12pt;
+            font-weight: bold;
+            margin-top: 5px;
         }
         .invoice-summary {
-            border: 1px solid #dee2e6;
-            padding: 1rem;
-            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10mm;
         }
         .invoice-summary table {
-            width: 100%;
+            width: 49%; /* ほぼ半々 */
+            border-collapse: collapse;
+            font-size: 9.5pt;
         }
         .invoice-summary th, .invoice-summary td {
-            padding: 0.5rem;
+            border: 1px solid black;
+            padding: 6px 8px;
+            text-align: left;
+            vertical-align: middle;
+        }
+        .invoice-summary th {
+            background-color: #f2f2f2;
+            white-space: nowrap;
+            width: 30%;
+        }
+        .invoice-summary td:last-child {
+            text-align: right;
+            width: 70%;
+        }
+        .invoice-summary .bank-details-table th {
+            width: 35%;
+        }
+        .invoice-summary .total-amount-row {
+            font-weight: bold;
+            font-size: 12pt;
+        }
+        .invoice-summary .total-amount-row th, .invoice-summary .total-amount-row td {
+            background-color: #e0e0e0;
+            padding: 8px;
+        }
+        .invoice-details {
+            margin-top: 10mm;
+        }
+        .invoice-details h2 {
+            font-size: 11pt;
+            font-weight: bold;
+            margin-bottom: 5mm;
+            border-bottom: 1px solid black;
+            padding-bottom: 3px;
         }
         .invoice-details table {
             width: 100%;
             border-collapse: collapse;
+            font-size: 9pt;
         }
         .invoice-details th, .invoice-details td {
-            border: 1px solid #dee2e6;
-            padding: 0.75rem;
-            font-size: 0.875rem;
+            border: 1px solid black;
+            padding: 5px;
+            text-align: left;
+            vertical-align: middle;
         }
         .invoice-details th {
-            background-color: #f8f9fa;
+            background-color: #f2f2f2;
+            text-align: center;
+            white-space: nowrap;
         }
-        .text-right {
-            text-align: right;
-        }
-        .font-bold {
-            font-weight: bold;
-        }
+        .invoice-details td:nth-child(1) { width: 4%; text-align: center; } /* No. */
+        .invoice-details td:nth-child(2) { width: 25%; } /* 品名1 */
+        .invoice-details td:nth-child(3) { width: 25%; } /* 品名2 */
+        .invoice-details td:nth-child(4) { width: 10%; text-align: right; } /* 数量 */
+        .invoice-details td:nth-child(5) { width: 15%; text-align: right; } /* 単価 */
+        .invoice-details td:nth-child(6) { width: 21%; text-align: right; } /* 金額 */
+
         @media print {
             body, html {
                 margin: 0;
