@@ -1,4 +1,4 @@
-import { loadCommonHtml, showLoading, hideLoading, showMessage } from './utils.js';
+import { loadCommonHtml, showLoading, hideLoading, showMessage, downloadFile } from './utils.js';
 import { initSidebarHandler } from './sidebarHandler.js';
 import { initBreadcrumbs } from './breadcrumb.js';
 
@@ -23,15 +23,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     document.getElementById('downloadPdfBtn').addEventListener('click', () => {
-        const invoiceContent = document.getElementById('invoice-content');
-        const opt = {
-            margin:       0.5,
-            filename:     `請求書_${invoiceId}.pdf`,
-            image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true },
-            jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
-        };
-        html2pdf().from(invoiceContent).set(opt).save();
+        // seikyuusyo_sample.pdf を直接ダウンロード
+        downloadFile('seikyusyo_sample.pdf', 'seikyusyo_sample.pdf');
     });
     
     document.getElementById('printInvoiceBtn').addEventListener('click', () => {
@@ -70,7 +63,7 @@ function populateInvoiceData(invoice) {
     document.getElementById('due-date').textContent = invoice.dueDate;
     document.getElementById('corporate-name').textContent = invoice.corporateName;
     document.getElementById('contact-person').textContent = invoice.contactPerson;
-    document.getElementById('usage-month').textContent = invoice.usageMonth;
+    // document.getElementById('usage-month').textContent = invoice.usageMonth; // 今回のレイアウトでは使用しない
 
     document.getElementById('subtotal-taxable').textContent = yen(invoice.subtotalTaxable);
     document.getElementById('tax-amount').textContent = yen(invoice.tax);
@@ -86,18 +79,12 @@ function populateInvoiceData(invoice) {
     const tableBody = document.getElementById('invoice-items-table-body');
     tableBody.innerHTML = ''; // Clear existing rows
 
-    // Mock data generation for details
+    // Mock data generation for details (for visual representation)
     const mockItems = [
-        { no: 1, name1: 'アンケート名A', name2: '名刺データ化費用', quantity: 1, price: 15000, total: 15000 },
-        { no: 2, name1: 'アンケート名A', name2: 'クーポンお値引き', quantity: 1, price: -1000, total: -1000 },
-        { no: 3, name1: 'アンケート名A', name2: '御礼メール送信', quantity: 1, price: 500, total: 500 },
-        { no: 4, name1: 'アンケート名A', name2: '小計', quantity: null, price: null, total: 14500 },
-        { no: 5, name1: 'アンケート名B', name2: '名刺データ化費用', quantity: 560, price: 200, total: 112000 },
-        { no: 6, name1: 'アンケート名B', name2: 'クーポンお値引き', quantity: 1, price: 0, total: 0 },
-        { no: 7, name1: 'アンケート名B', name2: '御礼メール送信', quantity: 1600, price: 1, total: 1600 },
-        { no: 8, name1: 'アンケート名B', name2: '小計', quantity: null, price: null, total: 113600 },
-        { no: 9, name1: '月額費用', name2: 'グループアカウント利用料', quantity: 1, price: 30000, total: 30000 },
-        { no: 10, name1: '月額費用', name2: '小計', quantity: null, price: null, total: 30000 },
+        { no: 1, name1: '月額基本サービス料', name2: '2025年7月分', quantity: 1, price: 30000, total: 30000 },
+        { no: 2, name1: 'アンケート利用料', name2: 'A展示会来場者アンケート', quantity: 1, price: 20000, total: 20000 },
+        { no: 3, name1: 'オプションサービス', name2: 'データ分析レポート', quantity: 1, price: 5000, total: 5000 },
+        { no: 4, name1: 'オプションサービス', name2: '追加アンケート作成', quantity: 2, price: 2000, total: 4000 },
     ];
 
     mockItems.forEach(item => {
@@ -110,9 +97,6 @@ function populateInvoiceData(invoice) {
             <td class="text-right">${item.price !== null ? yen(item.price) : ''}</td>
             <td class="text-right font-bold">${yen(item.total)}</td>
         `;
-        if (item.name2.includes('小計')) {
-            row.style.fontWeight = 'bold';
-        }
         tableBody.appendChild(row);
     });
 }

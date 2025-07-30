@@ -1,6 +1,4 @@
-fix: Resolve module import/export errors in JS
+feat: Further visual adjustments for invoice PDF
 
-- Corrected module import/export inconsistencies between `main.js`, `invoiceDetail.js`, and `utils.js`.
-- Moved loading and message utility functions (`showLoading`, `hideLoading`, `showMessage`) from `invoiceDetail.js` to `utils.js` to make them reusable.
-- Modified `invoiceDetail.js` to import dependencies directly from `utils.js` and other specific modules, removing the dependency on `main.js`.
-- Removed the unnecessary initialization call for `invoiceDetail.js` from `main.js`.
+- Applied detailed CSS adjustments to `invoice-print.html` to more closely match the layout and appearance of `seikyuusyo_sample.pdf`.
+- Adjusted fonts, margins, element positioning, sizes, and table styling for improved visual fidelity in the generated PDF.
