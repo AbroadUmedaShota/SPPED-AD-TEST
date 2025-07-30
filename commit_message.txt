@@ -1,3 +1,9 @@
+<<<<<<< HEAD
 fix: Correct URL parameter name for invoice detail page
 
 - Modified `invoiceRenderer.js` to use `id` as the URL parameter name when navigating to `invoice-detail.html`, aligning with the parameter expected by `invoiceDetail.js`.
+=======
+fix: Remove redundant main.js import from invoice-detail.html
+
+- Removed the import of `src/main.js` from `invoice-detail.html` as `invoiceDetail.js` now handles all necessary initializations directly, resolving potential timing issues and simplifying module dependencies.
+>>>>>>> 16722896ce24ba7efabe09023c24bf2467d1bf61
