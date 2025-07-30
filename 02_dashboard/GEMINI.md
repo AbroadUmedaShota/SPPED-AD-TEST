@@ -339,36 +339,36 @@ The AI uses the labels defined in the following YAML to clarify the status and t
 ```yaml
 labels:
   status:
-    - name: "status: planning"
+    - name: "status:planning"
       color: "FBCA04"
       description: "State where the AI is formulating an implementation plan"
       initial: true
-      valid_next_statuses: ["status: implementing"]
-    - name: "status: implementing"
+      valid_next_statuses: ["status:implementing"]
+    - name: "status:implementing"
       color: "1D76DB"
       description: "State where the AI is in the process of implementation"
-      valid_next_statuses: ["status: review"]
-    - name: "status: review"
+      valid_next_statuses: ["status:review"]
+    - name: "status:review"
       color: "8E44AD"
       description: "State where the Pull Request is awaiting review"
-      valid_next_statuses: ["status: done"]
-    - name: "status: done"
+      valid_next_statuses: ["status:done"]
+    - name: "status:done"
       color: "0E8A16"
       description: "State where the Issue has been addressed and merged"
   type:
-    - name: "type: bug"
+    - name: "type:bug"
       color: "D73A4A"
       description: "A bug in existing functionality"
-    - name: "type: feature"
+    - name: "type:feature"
       color: "0E8A16"
       description: "Addition of a new feature"
-    - name: "type: documentation"
+    - name: "type:documentation"
       color: "0075CA"
       description: "Creation or update of documentation"
-    - name: "type: refactor"
+    - name: "type:refactor"
       color: "A2EEEF"
       description: "Code improvement that does not change external behavior"
-    - name: "type: chore"
+    - name: "type:chore"
       color: "FFFFFF"
       description: "Tasks other than the above, such as changes to the build process or auxiliary tools"
 ```
