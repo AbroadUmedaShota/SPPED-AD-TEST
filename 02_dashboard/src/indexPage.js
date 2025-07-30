@@ -9,7 +9,7 @@ export function initIndexPage() {
     initTableManager();
 
     // flatpickrの初期化
-    flatpickr.localize(Japanese);
+    flatpickr.localize(flatpickr.l10ns.ja);
 
     const endDatePicker = flatpickr("#endDatePickerWrapper", {
         wrap: true,
