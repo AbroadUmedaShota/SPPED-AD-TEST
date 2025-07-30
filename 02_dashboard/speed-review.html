@@ -96,35 +96,7 @@
 
 </div>
 
-<!-- 詳細表示モーダル -->
-<div id="reviewDetailModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50">
-    <div class="modal-content bg-surface text-on-surface rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col">
-        <div class="flex justify-between items-center p-4 border-b border-outline-variant">
-            <h2 class="text-xl font-bold">回答詳細</h2>
-            <button id="closeDetailModalBtn" class="text-on-surface hover:text-primary"><span class="material-icons">close</span></button>
-        </div>
-        <div class="p-6 overflow-y-auto">
-            <!-- 名刺情報セクション -->
-            <section class="mb-8">
-                <h3 class="text-lg font-bold border-b border-primary pb-2 mb-4 text-primary">名刺情報</h3>
-                <div id="modal-business-card-details" class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                    <!-- JSで動的に生成 -->
-                </div>
-            </section>
 
-            <!-- アンケート回答セクション -->
-            <section>
-                <h3 class="text-lg font-bold border-b border-primary pb-2 mb-4 text-primary">アンケート回答</h3>
-                <div id="modal-survey-answer-details" class="space-y-6">
-                    <!-- JSで動的に生成 -->
-                </div>
-            </section>
-        </div>
-        <div class="p-4 border-t border-outline-variant text-right">
-            <button id="editDetailBtn" class="button-secondary py-2 px-4 rounded-md font-semibold">編集する</button>
-        </div>
-    </div>
-</div>
 
 <!-- JSファイル -->
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
