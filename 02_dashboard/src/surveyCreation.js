@@ -68,6 +68,9 @@ async function initializePage() {
         restoreAccordionState(); // アコーディオンの状態を復元
         renderOutlineMap(); // 初期ロード時にアウトラインマップを生成
 
+        // FABの初期化
+        initializeFab('fab-container', 'components/fab.html');
+
     } catch (error) {
         console.error('Failed to initialize page:', error);
         displayErrorMessage();
@@ -235,57 +238,7 @@ function setupEventListeners() {
 
     initializeDraggable();
 
-    // フローティングナビゲーションのドラッグ機能
-    const floatingNav = document.getElementById('floatingNavContainer');
-    const dragHandle = document.getElementById('openQuestionTypeSelectorBtn'); // ドラッグハンドルをメインボタンに設定
-    let isDragging = false;
-    let offsetX, offsetY;
-    let startX, startY;
-    const clickThreshold = 5; // クリックとドラッグを判定する閾値 (px)
-
-    // フローティングナビゲーションのドラッグ機能
-    // localStorageによる位置の保存・読み込みは行わない
-
-    dragHandle.addEventListener('mousedown', (e) => {
-        // メニューが開いている場合はドラッグしない
-        if (!questionTypeSelector.classList.contains('opacity-0')) {
-            return;
-        }
-        isDragging = true;
-        startX = e.clientX;
-        startY = e.clientY;
-        offsetX = e.clientX - floatingNav.getBoundingClientRect().left;
-        offsetY = e.clientY - floatingNav.getBoundingClientRect().top;
-        floatingNav.style.cursor = 'grabbing';
-        floatingNav.style.position = 'fixed'; // ドラッグ中はfixedに
-    });
-
-    document.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-        floatingNav.style.left = `${e.clientX - offsetX}px`;
-        floatingNav.style.top = `${e.clientY - offsetY}px`;
-    });
-
-    document.addEventListener('mouseup', (e) => {
-        if (isDragging) {
-            const moveX = Math.abs(e.clientX - startX);
-            const moveY = Math.abs(e.clientY - startY);
-            // 移動距離が閾値以下の場合はクリックとみなす
-            if (moveX < clickThreshold && moveY < clickThreshold) {
-                const isHidden = questionTypeSelector.classList.contains('opacity-0');
-                if (isHidden) {
-                    updateQuestionTypeSelectorPosition();
-                    questionTypeSelector.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
-                } else {
-                    questionTypeSelector.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
-                }
-            }
-
-            isDragging = false;
-            floatingNav.style.cursor = 'grab';
-            // 位置を保存するロジックを削除
-        }
-    });
+    
 }
 
 

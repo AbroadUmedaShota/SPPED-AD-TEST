@@ -1,1 +1,9 @@
-\"fix: Dynamically load bank information in invoice detail\" 
+feat(fab): add floating action button to survey creation page
+
+Re-implements the floating action button (FAB) for adding questions and question groups on the survey creation page.
+
+- Removes the old, non-functional drag-and-drop logic for the previous floating menu.
+- Creates a new, modular FAB component (`fab.html`, `fab.js`).
+- Dynamically loads the FAB component into the survey creation page.
+
+This change resolves issue #12 by providing a clean, user-friendly interface for adding questions, in line with the current application architecture.
