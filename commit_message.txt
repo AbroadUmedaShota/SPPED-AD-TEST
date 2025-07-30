@@ -1,9 +1,6 @@
-feat(fab): add floating action button to survey creation page
+fix: Resolve module import/export errors in JS
 
-Re-implements the floating action button (FAB) for adding questions and question groups on the survey creation page.
-
-- Removes the old, non-functional drag-and-drop logic for the previous floating menu.
-- Creates a new, modular FAB component (`fab.html`, `fab.js`).
-- Dynamically loads the FAB component into the survey creation page.
-
-This change resolves issue #12 by providing a clean, user-friendly interface for adding questions, in line with the current application architecture.
+- Corrected module import/export inconsistencies between `main.js`, `invoiceDetail.js`, and `utils.js`.
+- Moved loading and message utility functions (`showLoading`, `hideLoading`, `showMessage`) from `invoiceDetail.js` to `utils.js` to make them reusable.
+- Modified `invoiceDetail.js` to import dependencies directly from `utils.js` and other specific modules, removing the dependency on `main.js`.
+- Removed the unnecessary initialization call for `invoiceDetail.js` from `main.js`.
