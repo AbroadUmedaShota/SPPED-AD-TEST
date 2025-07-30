@@ -3,370 +3,251 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>御請求書</title>
+    <title>請求書</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="service-top-style.css">
     <style>
         body {
-            font-family: 'Meiryo', 'メイリオ', 'Yu Gothic', '游ゴシック', sans-serif;
-            margin: 0;
-            padding: 20mm; /* A4余白に合わせて調整 */
-            font-size: 10pt;
-            line-height: 1.5;
-            box-sizing: border-box;
-            background-color: #fff;
-            -webkit-print-color-adjust: exact; /* 印刷時に背景色を保持 */
-            color-adjust: exact;
+            background-color: white !important;
         }
-
-        .container {
-            width: 190mm; /* A4 幅 (210mm) - 左右余白 (20mm*2) = 170mm. 実際のPDF幅に合わせて調整 */
+        .invoice-container {
+            width: 210mm;
+            height: 297mm;
             margin: 0 auto;
+            padding: 15mm;
+            box-sizing: border-box;
         }
-
-        .issue-info {
-            text-align: right;
-            margin-bottom: 8mm; /* PDFに合わせて調整 */
-            font-size: 9pt;
-        }
-
-        .issue-info div {
-            margin-bottom: 2px;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 20mm; /* PDFに合わせて調整 */
-        }
-
-        .header h1 {
-            font-size: 24pt;
-            margin: 0;
-            padding: 0;
-            display: inline-block;
-            border-bottom: 3px double black;
-            padding-bottom: 5px;
-            font-weight: bold;
-        }
-
-        .recipient-sender-section {
+        .invoice-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 20mm; /* PDFに合わせて調整 */
+            margin-bottom: 2rem;
         }
-
-        .recipient-details {
-            flex-grow: 1;
-            padding-right: 20mm; /* 送信者情報との間隔 */
-        }
-
-        .recipient-details div {
-            font-size: 14pt;
+        .invoice-title {
+            font-size: 2rem;
             font-weight: bold;
-            margin-bottom: 7mm; /* "御中"と"様"の間隔 */
         }
-
-        .sender-details {
-            text-align: right;
-            line-height: 1.3;
+        .invoice-header-info p {
+            margin: 0;
+            font-size: 0.875rem;
         }
-
-        .sender-logos {
-            margin-bottom: 5px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end; /* 右寄せ */
+        .invoice-to {
+            margin-bottom: 2rem;
         }
-
-        .logo-abroad {
-            font-family: Arial, sans-serif; /* 欧文フォント */
-            font-size: 12pt;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            margin-bottom: 3px; /* ロゴ間のスペース */
+        .invoice-to p {
+            margin: 0;
         }
-        .logo-abroad .text-part {
+        .invoice-from {
             position: relative;
-            z-index: 1;
-        }
-        .logo-abroad .tm-symbol {
-            font-size: 8pt;
-            vertical-align: super;
-            margin-left: -2px; /* TMを少し近づける */
-        }
-        .logo-abroad .co-inc {
-            font-size: 8pt;
-            margin-left: 2px;
-        }
-        .logo-abroad .red-underline {
-            display: inline-block;
-            height: 2px;
-            background-color: #C00000; /* 赤色 */
-            width: 100%; /* テキスト幅に合わせる */
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            z-index: 0;
-        }
-
-        .logo-speedad {
-            font-size: 9pt;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .logo-kabushiki-kaisha {
-            display: inline-block;
-            background-color: #C00000; /* 赤色 */
-            color: white;
-            padding: 2px 4px;
-            font-size: 9pt;
-            font-weight: bold;
-            margin-left: 5px;
-            vertical-align: middle;
-            line-height: 1;
-            box-sizing: border-box;
-            white-space: nowrap; /* 折り返しを防ぐ */
-        }
-
-        .sender-name {
-            font-size: 12pt;
-            font-weight: bold;
-            margin-top: 5px;
-        }
-
-        .sender-address, .sender-tel, .sender-registration {
-            font-size: 9pt;
-            line-height: 1.3;
-        }
-
-        .greeting {
-            margin-bottom: 15mm; /* PDFに合わせて調整 */
-            font-size: 10pt;
-        }
-
-        .main-content {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10mm;
-        }
-
-        .billing-summary-table, .bank-details-table {
-            width: 49%; /* ほぼ半々 */
-            border-collapse: collapse;
-            font-size: 9.5pt; /* 微調整 */
-        }
-
-        .billing-summary-table th, .billing-summary-table td,
-        .bank-details-table td {
-            border: 1px solid black;
-            padding: 6px 8px; /* パディング調整 */
-            text-align: left;
-            vertical-align: middle; /* 中央揃え */
-        }
-
-        .billing-summary-table th {
-            background-color: #f2f2f2;
-            white-space: nowrap;
-            width: 30%; /* 件名、小計の列幅 */
-        }
-
-        .billing-summary-table td:last-child {
             text-align: right;
-            width: 70%;
         }
-
-        .bank-details-table td:first-child {
-            width: 35%; /* ラベルの列幅 */
-            background-color: #f2f2f2;
-            white-space: nowrap;
+        .invoice-from img.logo {
+            width: 200px;
+            margin-bottom: 0.5rem;
         }
-
-        .bank-details-table td:last-child {
-             width: 65%;
+        .invoice-from img.seal {
+            position: absolute;
+            top: 20px;
+            right: -20px;
+            width: 80px;
+            opacity: 0.8;
         }
-
-        .total-amount-row {
-            font-weight: bold;
-            font-size: 12pt;
+        .invoice-summary {
+            border: 1px solid #dee2e6;
+            padding: 1rem;
+            margin-bottom: 2rem;
         }
-
-        .total-amount-row th, .total-amount-row td {
-            background-color: #e0e0e0; /* 濃い目の灰色 */
-            padding: 8px; /* パディング調整 */
+        .invoice-summary table {
+            width: 100%;
         }
-
-        .notes {
-            font-size: 8pt;
-            margin-top: 5mm;
-            margin-bottom: 15mm; /* PDFに合わせて調整 */
-            line-height: 1.4;
+        .invoice-summary th, .invoice-summary td {
+            padding: 0.5rem;
         }
-
-        .detail-table-title {
-            font-size: 11pt;
-            font-weight: bold;
-            margin-bottom: 5mm;
-            border-bottom: 1px solid black;
-            padding-bottom: 3px;
-        }
-
-        .detail-table {
+        .invoice-details table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 10mm;
-            font-size: 9pt;
         }
-
-        .detail-table th, .detail-table td {
-            border: 1px solid black;
-            padding: 5px;
-            text-align: left;
-            vertical-align: middle; /* 中央揃え */
+        .invoice-details th, .invoice-details td {
+            border: 1px solid #dee2e6;
+            padding: 0.75rem;
+            font-size: 0.875rem;
         }
-
-        .detail-table th {
-            background-color: #f2f2f2;
-            text-align: center;
-            white-space: nowrap; /* ヘッダーの折り返しを防ぐ */
+        .invoice-details th {
+            background-color: #f8f9fa;
         }
-
-        .detail-table td:nth-child(1) { width: 4%; text-align: center; } /* No. */
-        .detail-table td:nth-child(2) { width: 25%; } /* 品名1 */
-        .detail-table td:nth-child(3) { width: 25%; } /* 品名2 */
-        .detail-table td:nth-child(4) { width: 10%; text-align: right; } /* 数量 */
-        .detail-table td:nth-child(5) { width: 15%; text-align: right; } /* 単価 */
-        .detail-table td:nth-child(6) { width: 21%; text-align: right; } /* 金額 */
-
-        .detail-table tr:empty-cells {
-            height: 18px; /* 空行の高さ調整 */
+        .text-right {
+            text-align: right;
         }
-
-        .page-number {
-            text-align: center;
-            margin-top: 5mm; /* PDFに合わせて調整 */
-            font-size: 9pt;
+        .font-bold {
+            font-weight: bold;
         }
-
-        /* カスタム要素のスタイル */
-        .mask-val {
-            letter-spacing: 2px; /* ●間のスペース */
+        @media print {
+            body, html {
+                margin: 0;
+                padding: 0;
+            }
+            .invoice-container {
+                border: none;
+                box-shadow: none;
+                margin: 0;
+                width: 100%;
+                height: auto;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="issue-info">
-            <div>発行日: <span id="issue-date"></span></div>
-            <div>請求書番号: <span id="invoice-number"></span></div>
-        </div>
 
-        <div class="header">
-            <h1>御請求書</h1>
-        </div>
+<div id="invoice-content" class="invoice-container">
+    <!-- Content will be dynamically populated by JS -->
+</div>
 
-        <div class="recipient-sender-section">
-            <div class="recipient-details">
-                <div id="corporate-name"></div>
-                <div id="contact-person"></div>
-            </div>
-            <div class="sender-details">
-                <div class="sender-logos">
-                    <img src="seikyu_logo.png" alt="Abroad Outsourcing Co.,Inc." style="height: 20px; margin-bottom: 5px;">
-                    <img src="seikyu_syaban.png" alt="SPEED AD運営会社" style="height: 15px;">
-                    <div style="display: flex; align-items: center; margin-top: 5px;">
-                        <span class="sender-name">アブロードアウトソーシング</span><span class="logo-kabushiki-kaisha">株式会社</span>
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const invoiceId = urlParams.get('id');
+
+        if (invoiceId) {
+            await loadAndPrintInvoice(invoiceId);
+        } else {
+            document.body.innerHTML = '<h1>請求書IDが指定されていません。</h1>';
+        }
+    });
+
+    async function loadAndPrintInvoice(invoiceId) {
+        try {
+            const response = await fetch('data/invoices.json');
+            if (!response.ok) throw new Error('Failed to load invoice data.');
+            const invoices = await response.json();
+            const invoice = invoices.find(inv => inv.invoiceId === invoiceId);
+
+            if (invoice) {
+                const invoiceContent = document.getElementById('invoice-content');
+                invoiceContent.innerHTML = generateInvoiceHTML(invoice);
+                setTimeout(() => window.print(), 500); // Wait for images to load
+            } else {
+                document.body.innerHTML = '<h1>該当する請求書が見つかりません。</h1>';
+            }
+        } catch (error) {
+            console.error('Error loading invoice for printing:', error);
+            document.body.innerHTML = `<h1>エラー: ${error.message}</h1>`;
+        }
+    }
+
+    function generateInvoiceHTML(invoice) {
+        const yen = (value) => value.toLocaleString('ja-JP', { style: 'currency', currency: 'JPY' });
+        const mockItems = [
+        { no: 1, name1: 'アンケート名A', name2: '名刺データ化費用', quantity: 1, price: 15000, total: 15000 },
+        { no: 2, name1: 'アンケート名A', name2: 'クーポンお値引き', quantity: 1, price: -1000, total: -1000 },
+        { no: 3, name1: 'アンケート名A', name2: '御礼メール送信', quantity: 1, price: 500, total: 500 },
+        { no: 4, name1: 'アンケート名A', name2: '小計', quantity: null, price: null, total: 14500 },
+        { no: 5, name1: 'アンケート名B', name2: '名刺データ化費用', quantity: 560, price: 200, total: 112000 },
+        { no: 6, name1: 'アンケート名B', name2: 'クーポンお値引き', quantity: 1, price: 0, total: 0 },
+        { no: 7, name1: 'アンケート名B', name2: '御礼メール送信', quantity: 1600, price: 1, total: 1600 },
+        { no: 8, name1: 'アンケート名B', name2: '小計', quantity: null, price: null, total: 113600 },
+        { no: 9, name1: '月額費用', name2: 'グループアカウント利用料', quantity: 1, price: 30000, total: 30000 },
+        { no: 10, name1: '月額費用', name2: '小計', quantity: null, price: null, total: 30000 },
+    ];
+
+        let itemsHTML = '';
+        mockItems.forEach(item => {
+            itemsHTML += `
+                <tr ${item.name2.includes('小計') ? 'style="font-weight: bold;"' : ''}>
+                    <td>${item.no}</td>
+                    <td>${item.name1}</td>
+                    <td>${item.name2}</td>
+                    <td class="text-right">${item.quantity !== null ? item.quantity : ''}</td>
+                    <td class="text-right">${item.price !== null ? yen(item.price) : ''}</td>
+                    <td class="text-right font-bold">${yen(item.total)}</td>
+                </tr>`;
+        });
+
+        return `
+            <div class="invoice-header">
+                <div>
+                    <h1 class="invoice-title">御請求書</h1>
+                    <div class="invoice-header-info">
+                        <p>発行日: ${invoice.issueDate}</p>
+                        <p>請求書番号: ${invoice.invoiceId}</p>
                     </div>
                 </div>
-                <div class="sender-address">東京都千代田区岩本町2-11-9 IT2ビル 8階</div>
-                <div class="sender-tel">TEL: 03-5835-0250</div>
-                <div class="sender-registration">登録番号:T9011701016647</div>
+                <div class="invoice-from">
+                    <img src="seikyu_logo.png" alt="SPEED AD運営会社" class="logo">
+                    <img src="seikyu_syaban.png" alt="社判" class="seal">
+                    <p>SPEED AD運営会社</p>
+                    <p>アブロードアウトソーシング株式会社</p>
+                    <p>東京都千代田区岩本町2-11-9 IT2ビル 8階</p>
+                    <p>TEL: 03-5835-0250</p>
+                    <p>登録番号: T9011701016647</p>
+                </div>
             </div>
-        </div>
+            <div class="invoice-to">
+                <p class="font-bold text-lg">${invoice.corporateName} 御中</p>
+                <p>${invoice.contactPerson} 様</p>
+                <hr class="my-3">
+                <p>平素より格別のお引き立てを賜り、誠にありがとうございます。</p>
+                <p>下記の通りご請求申し上げます。</p>
+            </div>
+            <div class="invoice-summary">
+                <table>
+                    <tr>
+                        <th>件名</th>
+                        <td>SPEED AD利用料 ${invoice.usageMonth}月分</td>
+                        <th>金融機関名</th>
+                        <td>${invoice.bankInfo.bankName}</td>
+                    </tr>
+                    <tr>
+                        <th>小計(課税対象)</th>
+                        <td class="text-right">${yen(invoice.subtotalTaxable)}</td>
+                        <th>支店名</th>
+                        <td>${invoice.bankInfo.branchName}</td>
+                    </tr>
+                    <tr>
+                        <th>消費税等</th>
+                        <td class="text-right">${yen(invoice.tax)}</td>
+                        <th>口座種類</th>
+                        <td>${invoice.bankInfo.accountType}</td>
+                    </tr>
+                    <tr>
+                        <th>小計(非課税)</th>
+                        <td class="text-right">${yen(invoice.subtotalNonTaxable)}</td>
+                        <th>口座番号</th>
+                        <td>${invoice.bankInfo.accountNumber}</td>
+                    </tr>
+                    <tr>
+                        <th class="font-bold">合計ご請求金額</th>
+                        <td class="font-bold text-right">${yen(invoice.totalAmount)}</td>
+                        <th>口座名義</th>
+                        <td>${invoice.bankInfo.accountHolder}</td>
+                    </tr>
+                     <tr>
+                        <th>お支払期日</th>
+                        <td>${invoice.dueDate}</td>
+                        <td colspan="2" class="text-xs">※お振込手数料は御社でご負担頂けますようお願い申し上げます。</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="invoice-details">
+                <h2 class="text-lg font-bold mb-3">ご請求明細</h2>
+                <table class="table-auto">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>品名1</th>
+                            <th>品名2</th>
+                            <th class="text-right">数量</th>
+                            <th class="text-right">単価</th>
+                            <th class="text-right">金額</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${itemsHTML}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+</script>
 
-        <div class="greeting">
-            平素より格別のお引き立てを賜り、誠にありがとうございます。<br>
-            下記の通りご請求申し上げます。
-        </div>
-
-        <div class="main-content">
-            <table class="billing-summary-table">
-                <tr>
-                    <th>件名</th>
-                    <td id="usage-month"></td>
-                </tr>
-                <tr>
-                    <th>小計(課税対象)</th>
-                    <td id="subtotal-taxable"></td>
-                </tr>
-                <tr>
-                    <th>消費税等</th>
-                    <td id="tax-amount"></td>
-                </tr>
-                <tr>
-                    <th>小計(非課税)</th>
-                    <td id="subtotal-non-taxable"></td>
-                </tr>
-                <tr class="total-amount-row">
-                    <th>合計ご請求金額</th>
-                    <td id="total-amount"></td>
-                </tr>
-            </table>
-
-            <table class="bank-details-table">
-                <tr>
-                    <td>金融機関名</td>
-                    <td id="bank-name"></td>
-                </tr>
-                <tr>
-                    <td>支店名</td>
-                    <td id="branch-name"></td>
-                </tr>
-                <tr>
-                    <td>口座種類</td>
-                    <td id="account-type"></td>
-                </tr>
-                <tr>
-                    <td>口座番号</td>
-                    <td id="account-number"></td>
-                </tr>
-                <tr>
-                    <td>口座名義</td>
-                    <td id="account-holder"></td>
-                </tr>
-                <tr>
-                    <td>お支払期日</td>
-                    <td id="due-date-bank"></td>
-                </tr>
-            </table>
-        </div>
-
-        <div class="notes">
-            ※お振込手数料は御社でご負担頂けますようお願い申し上げます。<br>
-            ※お支払期日が休日の場合、前営業日までにお支払いください。
-        </div>
-
-        <div class="detail-table-title">ご請求明細</div>
-
-        <table class="detail-table">
-            <thead>
-                <tr>
-                    <th>No.</th>
-                    <th>品名1</th>
-                    <th>品名2</th>
-                    <th>数量</th>
-                    <th>単価</th>
-                    <th>金額</th>
-                </tr>
-            </thead>
-            <tbody id="invoice-detail-table-body">
-                <!-- JSにより動的に行が挿入されます -->
-            </tbody>
-        </table>
-
-        <div class="page-number">
-            <span id="page-current">1</span>/<span id="page-total">0</span>
-        </div>
-    </div>
 </body>
 </html>
