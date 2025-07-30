@@ -1,5 +1,3 @@
-refactor: Refactor invoice detail screen for better readability and direct PDF download
+fix: Remove redundant main.js import from invoice-detail.html
 
-- Redesigned `invoice-detail.html` to improve visual clarity of invoice items and sections.
-- Modified `invoiceDetail.js` to populate the new HTML structure and to directly download `seikyuusyo_sample.pdf`.
-- Updated `04_invoice_screen.md` to reflect the new screen layout and PDF download behavior.
+- Removed the import of `src/main.js` from `invoice-detail.html` as `invoiceDetail.js` now handles all necessary initializations directly, resolving potential timing issues and simplifying module dependencies.
