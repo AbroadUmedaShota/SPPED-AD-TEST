@@ -148,3 +148,18 @@ export async function loadCommonHtml(placeholderId, filePath, callback = null) {
         console.error(`Error loading common HTML from ${filePath}:`, error);
     }
 }
+
+/**
+ * Inserts text at the current cursor position in a textarea.
+ * @param {HTMLTextAreaElement} textarea The target textarea element.
+ * @param {string} text The text to insert.
+ */
+export function insertTextAtCursor(textarea, text) {
+    if (!textarea) return;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const newText = textarea.value.substring(0, start) + text + textarea.value.substring(end);
+    textarea.value = newText;
+    textarea.selectionStart = textarea.selectionEnd = start + text.length;
+    textarea.focus();
+}
