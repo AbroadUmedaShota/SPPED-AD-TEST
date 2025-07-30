@@ -1,0 +1,46 @@
+<div id="fab-container" class="fixed bottom-8 right-8 z-50">
+    <button id="fab-main-button" class="w-16 h-16 bg-primary text-on-primary rounded-full flex items-center justify-center shadow-lg hover:bg-primary-dark transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-4 focus:ring-primary-container">
+        <span class="material-icons text-4xl transition-transform duration-300">add</span>
+    </button>
+    <div id="fab-menu" class="absolute bottom-20 right-0 w-72 bg-surface rounded-2xl shadow-2xl transition-all duration-300 transform scale-95 opacity-0 pointer-events-none origin-bottom-right">
+        <div class="py-2">
+            <button data-question-type="group" class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
+                <span class="material-icons mr-4 text-primary">add_box</span>
+                <span class="font-semibold">質問グループを追加</span>
+            </button>
+            <div class="border-t border-outline-variant my-2"></div>
+            <button data-question-type="free_answer" class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
+                <span class="material-icons-outlined mr-4 text-secondary">short_text</span>
+                <span>フリーアンサー</span>
+            </button>
+            <button data-question-type="single_answer" class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
+                <span class="material-icons-outlined mr-4 text-secondary">radio_button_checked</span>
+                <span>シングルアンサー</span>
+            </button>
+            <button data-question-type="multi_answer" class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
+                <span class="material-icons-outlined mr-4 text-secondary">check_box</span>
+                <span>マルチアンサー</span>
+            </button>
+            <button data-question-type="number_answer" class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
+                <span class="material-icons-outlined mr-4 text-secondary">pin</span>
+                <span>数値回答</span>
+            </button>
+            <button data-question-type="matrix_sa" class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
+                <span class="material-icons-outlined mr-4 text-secondary">grid_on</span>
+                <span>マトリックス(SA)</span>
+            </button>
+            <button data-question-type="matrix_ma" class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
+                <span class="material-icons-outlined mr-4 text-secondary">grid_on</span>
+                <span>マトリックス(MA)</span>
+            </button>
+            <button data-question-type="date_time" class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
+                <span class="material-icons-outlined mr-4 text-secondary">event</span>
+                <span>日付/時間</span>
+            </button>
+            <button data-question-type="handwriting" class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
+                <span class="material-icons-outlined mr-4 text-secondary">brush</span>
+                <span>手書きスペース</span>
+            </button>
+        </div>
+    </div>
+</div>
