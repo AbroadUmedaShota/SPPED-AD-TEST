@@ -12,77 +12,77 @@
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
     <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
     <style>
-        .invoice-container {
-            max-width: 800px;
-            margin: 2rem auto;
-            padding: 2rem;
-            border: 1px solid #e5e7eb;
-            border-radius: 0.5rem;
+        /* Custom styles for invoice detail page */
+        .invoice-section {
             background-color: white;
+            border-radius: 0.5rem;
+            border: 1px solid #e5e7eb;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
         }
-        .invoice-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 2rem;
+        .invoice-section h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #333;
         }
-        .invoice-title {
-            font-size: 2rem;
-            font-weight: bold;
+        .invoice-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
         }
-        .invoice-header-info p {
-            margin: 0;
-            font-size: 0.875rem;
-        }
-        .invoice-to {
-            margin-bottom: 2rem;
-        }
-        .invoice-to p {
-            margin: 0;
-        }
-        .invoice-from {
-            position: relative;
-            text-align: right;
-        }
-        .invoice-from img.logo {
-            width: 200px;
+        .invoice-info-item p {
             margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: #555;
         }
-        .invoice-from img.seal {
-            position: absolute;
-            top: 20px;
-            right: -20px;
-            width: 80px;
-            opacity: 0.8;
+        .invoice-info-item strong {
+            color: #333;
         }
-        .invoice-summary {
-            border: 1px solid #dee2e6;
-            padding: 1rem;
-            margin-bottom: 2rem;
+        .invoice-table-container {
+            overflow-x: auto;
         }
-        .invoice-summary table {
-            width: 100%;
-        }
-        .invoice-summary th, .invoice-summary td {
-            padding: 0.5rem;
-        }
-        .invoice-details table {
+        .invoice-table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 1rem;
         }
-        .invoice-details th, .invoice-details td {
-            border: 1px solid #dee2e6;
+        .invoice-table th, .invoice-table td {
+            border: 1px solid #e5e7eb;
             padding: 0.75rem;
-            font-size: 0.875rem;
+            text-align: left;
+            font-size: 0.9rem;
         }
-        .invoice-details th {
+        .invoice-table th {
             background-color: #f8f9fa;
+            font-weight: 600;
+            color: #333;
         }
-        .text-right {
+        .invoice-table tfoot tr:last-child {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+        .invoice-table .text-right {
             text-align: right;
         }
-        .font-bold {
+        .invoice-table .font-bold {
             font-weight: bold;
+        }
+        .message-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        .message-overlay p {
+            font-size: 1.2rem;
+            color: #666;
         }
     </style>
 </head>
@@ -95,7 +95,7 @@
     <div class="flex flex-1 pt-16 bg-background">
         <div id="sidebar-placeholder"></div>
         <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
-            <div class="flex flex-col w-full max-w-4xl mx-auto flex-1">
+            <div class="flex flex-col w-full max-w-6xl mx-auto flex-1">
                 <div id="breadcrumb-container" class="mb-4"></div>
                 
                 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -106,93 +106,92 @@
                     </div>
                 </div>
 
-                <div id="invoice-content" class="invoice-container">
-                    <div class="invoice-header">
-                        <div>
-                            <h1 class="invoice-title">御請求書</h1>
-                            <div class="invoice-header-info">
-                                <p>発行日: <span id="issue-date"></span></p>
-                                <p>請求書番号: <span id="invoice-number"></span></p>
-                            </div>
+                <!-- ローディング表示 -->
+                <div id="invoice-detail-loading-overlay" class="message-overlay hidden">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                </div>
+                <!-- エラー/データなしメッセージ -->
+                <div id="invoice-detail-message-overlay" class="message-overlay hidden">
+                    <p class="text-on-surface-variant text-lg"></p>
+                </div>
+
+                <!-- 請求書情報セクション -->
+                <div class="invoice-section">
+                    <h2>請求書情報</h2>
+                    <div class="invoice-info-grid">
+                        <div class="invoice-info-item">
+                            <p><strong>請求書番号:</strong> <span id="invoice-number"></span></p>
+                            <p><strong>発行日:</strong> <span id="issue-date"></span></p>
+                            <p><strong>支払期限:</strong> <span id="due-date"></span></p>
                         </div>
-                        <div class="invoice-from">
-                            <img src="seikyu_logo.png" alt="SPEED AD運営会社" class="logo">
-                            <img src="seikyu_syaban.png" alt="社判" class="seal">
-                            <p>SPEED AD運営会社</p>
-                            <p>アブロードアウトソーシング株式会社</p>
-                            <p>東京都千代田区岩本町2-11-9 IT2ビル 8階</p>
-                            <p>TEL: 03-5835-0250</p>
-                            <p>登録番号: T9011701016647</p>
+                        <div class="invoice-info-item">
+                            <p><strong>請求先:</strong> <span id="corporate-name"></span> 御中</p>
+                            <p><strong>ご担当者様:</strong> <span id="contact-person"></span> 様</p>
                         </div>
-                    </div>
-
-                    <div class="invoice-to">
-                        <p class="font-bold text-lg"><span id="corporate-name"></span> 御中</p>
-                        <p><span id="contact-person"></span> 様</p>
-                        <hr class="my-3">
-                        <p>平素より格別のお引き立てを賜り、誠にありがとうございます。</p>
-                        <p>下記の通りご請求申し上げます。</p>
-                    </div>
-
-                    <div class="invoice-summary">
-                        <table>
-                            <tr>
-                                <th>件名</th>
-                                <td>SPEED AD利用料 <span id="usage-month"></span>月分</td>
-                                <th>金融機関名</th>
-                                <td id="bank-name"></td>
-                            </tr>
-                            <tr>
-                                <th>小計(課税対象)</th>
-                                <td id="subtotal-taxable" class="text-right"></td>
-                                <th>支店名</th>
-                                <td id="branch-name"></td>
-                            </tr>
-                            <tr>
-                                <th>消費税等</th>
-                                <td id="tax-amount" class="text-right"></td>
-                                <th>口座種類</th>
-                                <td id="account-type"></td>
-                            </tr>
-                            <tr>
-                                <th>小計(非課税)</th>
-                                <td id="subtotal-non-taxable" class="text-right"></td>
-                                <th>口座番号</th>
-                                <td id="account-number"></td>
-                            </tr>
-                            <tr>
-                                <th class="font-bold">合計ご請求金額</th>
-                                <td class="font-bold text-right" id="total-amount"></td>
-                                <th>口座名義</th>
-                                <td id="account-holder"></td>
-                            </tr>
-                             <tr>
-                                <th>お支払期日</th>
-                                <td id="due-date"></td>
-                                <td colspan="2" class="text-xs">※お振込手数料は御社でご負担頂けますようお願い申し上げます。</td>
-                            </tr>
-                        </table>
-                    </div>
-
-                    <div class="invoice-details">
-                        <h2 class="text-lg font-bold mb-3">ご請求明細</h2>
-                        <table class="table-auto">
-                            <thead>
-                                <tr>
-                                    <th>No.</th>
-                                    <th>品名1</th>
-                                    <th>品名2</th>
-                                    <th class="text-right">数量</th>
-                                    <th class="text-right">単価</th>
-                                    <th class="text-right">金額</th>
-                                </tr>
-                            </thead>
-                            <tbody id="invoice-items-table-body">
-                                <!-- JSにより動的に行が挿入されます -->
-                            </tbody>
-                        </table>
                     </div>
                 </div>
+
+                <!-- 請求明細セクション -->
+                <div class="invoice-section invoice-table-container">
+                    <h2>請求明細</h2>
+                    <table class="invoice-table">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>品名1</th>
+                                <th>品名2</th>
+                                <th class="text-right">数量</th>
+                                <th class="text-right">単価</th>
+                                <th class="text-right">金額</th>
+                            </tr>
+                        </thead>
+                        <tbody id="invoice-items-table-body">
+                            <!-- JSにより動的に行が挿入されます -->
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="5" class="text-right">小計(課税対象)</th>
+                                <td class="text-right" id="subtotal-taxable"></td>
+                            </tr>
+                            <tr>
+                                <th colspan="5" class="text-right">消費税等</th>
+                                <td class="text-right" id="tax-amount"></td>
+                            </tr>
+                            <tr>
+                                <th colspan="5" class="text-right">小計(非課税)</th>
+                                <td class="text-right" id="subtotal-non-taxable"></td>
+                            </tr>
+                            <tr>
+                                <th colspan="5" class="text-right font-bold">合計ご請求金額 (税込)</th>
+                                <td class="text-right font-bold" id="total-amount"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <!-- 振込先情報セクション -->
+                <div class="invoice-section">
+                    <h2>振込先情報</h2>
+                    <div class="invoice-info-grid">
+                        <div class="invoice-info-item">
+                            <p><strong>金融機関名:</strong> <span id="bank-name"></span></p>
+                            <p><strong>支店名:</strong> <span id="branch-name"></span></p>
+                            <p><strong>口座種類:</strong> <span id="account-type"></span></p>
+                        </div>
+                        <div class="invoice-info-item">
+                            <p><strong>口座番号:</strong> <span id="account-number"></span></p>
+                            <p><strong>口座名義:</strong> <span id="account-holder"></span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 注意事項セクション -->
+                <div class="invoice-section">
+                    <h2>注意事項</h2>
+                    <p class="text-sm text-on-surface-variant">※お振込手数料は御社でご負担頂けますようお願い申し上げます。</p>
+                    <p class="text-sm text-on-surface-variant">※お支払期日が休日の場合、前営業日までにお支払いください。</p>
+                </div>
+
             </div>
         </main>
     </div>
