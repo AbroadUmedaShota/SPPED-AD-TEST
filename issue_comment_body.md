@@ -1,1 +1,1 @@
-User approval confirmed on the CLI
+User approval confirmed on the CLI.

@@ -11,123 +11,191 @@
     <link rel="stylesheet" href="service-top-style.css">
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
     <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+    <style>
+        .invoice-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background-color: white;
+        }
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+        }
+        .invoice-title {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        .invoice-header-info p {
+            margin: 0;
+            font-size: 0.875rem;
+        }
+        .invoice-to {
+            margin-bottom: 2rem;
+        }
+        .invoice-to p {
+            margin: 0;
+        }
+        .invoice-from {
+            position: relative;
+            text-align: right;
+        }
+        .invoice-from img.logo {
+            width: 200px;
+            margin-bottom: 0.5rem;
+        }
+        .invoice-from img.seal {
+            position: absolute;
+            top: 20px;
+            right: -20px;
+            width: 80px;
+            opacity: 0.8;
+        }
+        .invoice-summary {
+            border: 1px solid #dee2e6;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+        .invoice-summary table {
+            width: 100%;
+        }
+        .invoice-summary th, .invoice-summary td {
+            padding: 0.5rem;
+        }
+        .invoice-details table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .invoice-details th, .invoice-details td {
+            border: 1px solid #dee2e6;
+            padding: 0.75rem;
+            font-size: 0.875rem;
+        }
+        .invoice-details th {
+            background-color: #f8f9fa;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .font-bold {
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body class="bg-background text-on-background">
 
 <div class="relative flex min-h-screen flex-col overflow-x-hidden">
     <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
-    <!-- ヘッダー (共通コンポーネント) -->
     <div id="header-placeholder"></div>
 
     <div class="flex flex-1 pt-16 bg-background">
-        <!-- サイドバー (共通コンポーネント) -->
         <div id="sidebar-placeholder"></div>
         <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
-            <div class="flex flex-col w-full max-w-6xl mx-auto flex-1">
-                <!-- パンくずリスト -->
+            <div class="flex flex-col w-full max-w-4xl mx-auto flex-1">
                 <div id="breadcrumb-container" class="mb-4"></div>
                 
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <!-- タイトル -->
                     <h1 class="text-on-background text-2xl sm:text-3xl font-bold leading-tight tracking-tight">請求書詳細</h1>
-                    <!-- アクションボタン -->
                     <div>
                         <button class="btn btn-outline-secondary" id="printInvoiceBtn"><i class="bi bi-printer"></i> 印刷</button>
                         <button class="btn btn-primary" id="downloadPdfBtn"><i class="bi bi-download"></i> PDFダウンロード</button>
                     </div>
                 </div>
 
-                <!-- 請求書情報エリア -->
-                <div class="rounded-xl border border-outline-variant bg-surface p-4 mb-6">
-                    <h2 class="text-on-surface text-lg font-semibold mb-4">請求書情報</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div id="invoice-content" class="invoice-container">
+                    <div class="invoice-header">
                         <div>
-                            <p class="text-on-surface-variant text-sm"><strong>請求書番号:</strong> <span id="invoice-number"></span></p>
-                            <p class="text-on-surface-variant text-sm"><strong>発行日:</strong> <span id="issue-date"></span></p>
-                            <p class="text-on-surface-variant text-sm"><strong>支払期限:</strong> <span id="due-date"></span></p>
+                            <h1 class="invoice-title">御請求書</h1>
+                            <div class="invoice-header-info">
+                                <p>発行日: <span id="issue-date"></span></p>
+                                <p>請求書番号: <span id="invoice-number"></span></p>
+                            </div>
                         </div>
-                        <div>
-                            <h3 class="text-on-surface text-base font-semibold mb-2">請求先情報</h3>
-                            <p class="text-on-surface-variant text-sm" id="corporate-name"></p>
-                            <p class="text-on-surface-variant text-sm" id="contact-person"></p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 請求明細テーブル -->
-                <div class="overflow-x-auto rounded-xl border border-outline-variant bg-surface p-4 mb-6">
-                    <h2 class="text-on-surface text-lg font-semibold mb-4">請求明細</h2>
-                    <table class="w-full min-w-[600px] divide-y divide-outline-variant table-bordered">
-                        <thead>
-                            <tr>
-                                <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider">No.</th>
-                                <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider">品名1</th>
-                                <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider">品名2</th>
-                                <th class="px-4 py-3 text-right text-on-surface-variant text-xs font-semibold uppercase tracking-wider">数量</th>
-                                <th class="px-4 py-3 text-right text-on-surface-variant text-xs font-semibold uppercase tracking-wider">単価</th>
-                                <th class="px-4 py-3 text-right text-on-surface-variant text-xs font-semibold uppercase tracking-wider">金額</th>
-                            </tr>
-                        </thead>
-                        <tbody id="invoice-items-table-body">
-                            <!-- JSにより動的に行が挿入されます -->
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <th colspan="5" class="px-4 py-3 text-right text-on-surface-variant text-sm font-semibold">小計(課税対象)</th>
-                                <td class="px-4 py-3 text-right text-on-surface-variant text-sm" id="subtotal-taxable"></td>
-                            </tr>
-                            <tr>
-                                <th colspan="5" class="px-4 py-3 text-right text-on-surface-variant text-sm font-semibold">消費税等</th>
-                                <td class="px-4 py-3 text-right text-on-surface-variant text-sm" id="tax-amount"></td>
-                            </tr>
-                            <tr>
-                                <th colspan="5" class="px-4 py-3 text-right text-on-surface-variant text-sm font-semibold">小計(非課税)</th>
-                                <td class="px-4 py-3 text-right text-on-surface-variant text-sm" id="subtotal-non-taxable"></td>
-                            </tr>
-                            <tr class="bg-surface-variant">
-                                <th colspan="5" class="px-4 py-3 text-right text-on-surface text-base font-bold">合計ご請求金額 (税込)</th>
-                                <td class="px-4 py-3 text-right text-on-surface text-base font-bold" id="total-amount"></td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-
-                <!-- 振込先情報エリア -->
-                <div class="rounded-xl border border-outline-variant bg-surface p-4 mb-6">
-                    <h2 class="text-on-surface text-lg font-semibold mb-4">振込先情報</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <p class="text-on-surface-variant text-sm"><strong>金融機関名:</strong> <span id="bank-name"></span></p>
-                            <p class="text-on-surface-variant text-sm"><strong>支店名:</strong> <span id="branch-name"></span></p>
-                            <p class="text-on-surface-variant text-sm"><strong>口座種類:</strong> <span id="account-type"></span></p>
-                        </div>
-                        <div>
-                            <p class="text-on-surface-variant text-sm"><strong>口座番号:</strong> <span id="account-number"></span></p>
-                            <p class="text-on-surface-variant text-sm"><strong>口座名義:</strong> <span id="account-holder"></span></p>
+                        <div class="invoice-from">
+                            <img src="seikyu_logo.png" alt="SPEED AD運営会社" class="logo">
+                            <img src="seikyu_syaban.png" alt="社判" class="seal">
+                            <p>SPEED AD運営会社</p>
+                            <p>アブロードアウトソーシング株式会社</p>
+                            <p>東京都千代田区岩本町2-11-9 IT2ビル 8階</p>
+                            <p>TEL: 03-5835-0250</p>
+                            <p>登録番号: T9011701016647</p>
                         </div>
                     </div>
-                </div>
 
-                <!-- 注意事項エリア -->
-                <div class="rounded-xl border border-outline-variant bg-surface p-4 mb-6">
-                    <h2 class="text-on-surface text-lg font-semibold mb-4">注意事項</h2>
-                    <p class="text-on-surface-variant text-sm">※お振込手数料は御社でご負担頂けますようお願い申し上げます。</p>
-                    <p class="text-on-surface-variant text-sm">※お支払期日が休日の場合、前営業日までにお支払いください。</p>
-                </div>
+                    <div class="invoice-to">
+                        <p class="font-bold text-lg"><span id="corporate-name"></span> 御中</p>
+                        <p><span id="contact-person"></span> 様</p>
+                        <hr class="my-3">
+                        <p>平素より格別のお引き立てを賜り、誠にありがとうございます。</p>
+                        <p>下記の通りご請求申し上げます。</p>
+                    </div>
 
-                <!-- ローディング表示 -->
-                <div id="invoice-detail-loading-overlay" class="absolute inset-0 bg-surface bg-opacity-75 flex items-center justify-center hidden">
-                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-                </div>
-                <!-- エラー/データなしメッセージ -->
-                <div id="invoice-detail-message-overlay" class="absolute inset-0 bg-surface bg-opacity-75 flex items-center justify-center hidden">
-                    <p class="text-on-surface-variant text-lg"></p>
-                </div>
+                    <div class="invoice-summary">
+                        <table>
+                            <tr>
+                                <th>件名</th>
+                                <td>SPEED AD利用料 <span id="usage-month"></span>月分</td>
+                                <th>金融機関名</th>
+                                <td id="bank-name"></td>
+                            </tr>
+                            <tr>
+                                <th>小計(課税対象)</th>
+                                <td id="subtotal-taxable" class="text-right"></td>
+                                <th>支店名</th>
+                                <td id="branch-name"></td>
+                            </tr>
+                            <tr>
+                                <th>消費税等</th>
+                                <td id="tax-amount" class="text-right"></td>
+                                <th>口座種類</th>
+                                <td id="account-type"></td>
+                            </tr>
+                            <tr>
+                                <th>小計(非課税)</th>
+                                <td id="subtotal-non-taxable" class="text-right"></td>
+                                <th>口座番号</th>
+                                <td id="account-number"></td>
+                            </tr>
+                            <tr>
+                                <th class="font-bold">合計ご請求金額</th>
+                                <td class="font-bold text-right" id="total-amount"></td>
+                                <th>口座名義</th>
+                                <td id="account-holder"></td>
+                            </tr>
+                             <tr>
+                                <th>お支払期日</th>
+                                <td id="due-date"></td>
+                                <td colspan="2" class="text-xs">※お振込手数料は御社でご負担頂けますようお願い申し上げます。</td>
+                            </tr>
+                        </table>
+                    </div>
 
+                    <div class="invoice-details">
+                        <h2 class="text-lg font-bold mb-3">ご請求明細</h2>
+                        <table class="table-auto">
+                            <thead>
+                                <tr>
+                                    <th>No.</th>
+                                    <th>品名1</th>
+                                    <th>品名2</th>
+                                    <th class="text-right">数量</th>
+                                    <th class="text-right">単価</th>
+                                    <th class="text-right">金額</th>
+                                </tr>
+                            </thead>
+                            <tbody id="invoice-items-table-body">
+                                <!-- JSにより動的に行が挿入されます -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
-    <!-- フッター (共通コンポーネント) -->
     <div id="footer-placeholder"></div>
 </div>
 
