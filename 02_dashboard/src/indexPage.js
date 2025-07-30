@@ -1,5 +1,5 @@
 import { initTableManager, applyFiltersAndPagination } from './tableManager.js';
-import flatpickr from 'https://cdn.jsdelivr.net/npm/flatpickr';
+
 
 
 /**
