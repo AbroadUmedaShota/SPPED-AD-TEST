@@ -1,4 +1,5 @@
-feat: Further visual adjustments for invoice PDF
+refactor: Refactor invoice detail screen for better readability and direct PDF download
 
-- Applied detailed CSS adjustments to `invoice-print.html` to more closely match the layout and appearance of `seikyuusyo_sample.pdf`.
-- Adjusted fonts, margins, element positioning, sizes, and table styling for improved visual fidelity in the generated PDF.
+- Redesigned `invoice-detail.html` to improve visual clarity of invoice items and sections.
+- Modified `invoiceDetail.js` to populate the new HTML structure and to directly download `seikyuusyo_sample.pdf`.
+- Updated `04_invoice_screen.md` to reflect the new screen layout and PDF download behavior.
