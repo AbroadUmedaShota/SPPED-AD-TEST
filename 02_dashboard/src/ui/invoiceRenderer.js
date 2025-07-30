@@ -37,7 +37,7 @@ export function renderInvoices(invoices) {
     document.querySelectorAll('.view-detail-btn').forEach(button => {
         button.addEventListener('click', (event) => {
             const invoiceId = event.target.dataset.invoiceId;
-            window.location.href = `invoice-detail.html?invoiceId=${invoiceId}`;
+            window.location.href = `invoice-detail.html?id=${invoiceId}`;
         });
     });
 }
