@@ -40,10 +40,10 @@ export function renderInvoiceDetails(invoice) {
     dom.dueDate.textContent = invoice.dueDate;
     dom.corporateName.textContent = `${invoice.corporateName} 御中`;
     dom.contactPerson.textContent = `${invoice.contactPerson} 様`;
-    dom.subtotalTaxable.textContent = `¥${invoice.subtotalTaxable.toLocaleString()}`;
-    dom.taxAmount.textContent = `¥${invoice.tax.toLocaleString()}`;
-    dom.subtotalNonTaxable.textContent = `¥${invoice.subtotalNonTaxable.toLocaleString()}`;
-    dom.totalAmount.textContent = `¥${invoice.totalAmount.toLocaleString()}`;
+    dom.subtotalTaxable.textContent = `¥${(invoice.subtotalTaxable ?? 0).toLocaleString()}`;
+    dom.taxAmount.textContent = `¥${(invoice.tax ?? 0).toLocaleString()}`;
+    dom.subtotalNonTaxable.textContent = `¥${(invoice.subtotalNonTaxable ?? 0).toLocaleString()}`;
+    dom.totalAmount.textContent = `¥${(invoice.totalAmount ?? 0).toLocaleString()}`;
 
     if (invoice.bankInfo) {
         dom.bankName.textContent = invoice.bankInfo.bankName || '';
