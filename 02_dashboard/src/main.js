@@ -75,9 +75,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         case 'invoiceList.html':
             initInvoiceListPage();
             break;
-        case 'invoice-detail.html':
-            initInvoiceDetailPage();
-            break;
         case 'bizcardSettings.html':
             initBizcardSettings();
             break;

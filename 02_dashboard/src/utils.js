@@ -163,3 +163,41 @@ export function insertTextAtCursor(textarea, text) {
     textarea.selectionStart = textarea.selectionEnd = start + text.length;
     textarea.focus();
 }
+
+/**
+ * Shows a loading overlay.
+ * @param {string} overlayId The ID of the loading overlay element.
+ */
+export function showLoading(overlayId) {
+    const overlay = document.getElementById(overlayId);
+    if (overlay) {
+        overlay.classList.remove('hidden');
+    }
+}
+
+/**
+ * Hides a loading overlay.
+ * @param {string} overlayId The ID of the loading overlay element.
+ */
+export function hideLoading(overlayId) {
+    const overlay = document.getElementById(overlayId);
+    if (overlay) {
+        overlay.classList.add('hidden');
+    }
+}
+
+/**
+ * Shows a message in an overlay.
+ * @param {string} overlayId The ID of the message overlay element.
+ * @param {string} message The message to display.
+ */
+export function showMessage(overlayId, message) {
+    const overlay = document.getElementById(overlayId);
+    if (overlay) {
+        const messageElement = overlay.querySelector('p');
+        if (messageElement) {
+            messageElement.textContent = message;
+        }
+        overlay.classList.remove('hidden');
+    }
+}
