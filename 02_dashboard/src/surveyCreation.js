@@ -14,6 +14,7 @@ import {
     addOptionToQuestion, 
     renderOutlineMap 
 } from './ui/surveyRenderer.js';
+import { initializeFab } from './ui/fab.js';
 import { loadCommonHtml } from './utils.js';
 
 
@@ -102,6 +103,27 @@ function restoreAccordionState() {
         } else if (content) {
             content.style.display = 'block';
             icon.textContent = 'expand_less';
+        }
+    });
+}
+
+/**
+ * アコーディオンの初期化処理
+ */
+function initializeAccordion() {
+    document.body.addEventListener('click', (event) => {
+        const header = event.target.closest('.accordion-header');
+        if (!header) return;
+
+        const contentId = header.dataset.accordionTarget;
+        const content = document.getElementById(contentId);
+        const icon = header.querySelector('.expand-icon');
+
+        if (content) {
+            const isOpen = content.style.display === 'block';
+            content.style.display = isOpen ? 'none' : 'block';
+            icon.textContent = isOpen ? 'expand_more' : 'expand_less';
+            saveAccordionState(contentId, !isOpen);
         }
     });
 }
@@ -325,9 +347,9 @@ function setupScrollSpy() {
     // DOMの読み込みが完了したら処理を開始
 document.addEventListener('DOMContentLoaded', () => {
     // DOM要素の取得をDOMContentLoadedイベント内で行う
-    openQuestionTypeSelectorBtn = document.getElementById('openQuestionTypeSelectorBtn');
-    questionTypeSelector = document.getElementById('questionTypeSelector');
-    addQuestionGroupBtn = document.getElementById('addQuestionGroupBtn');
+    let openQuestionTypeSelectorBtn = document.getElementById('openQuestionTypeSelectorBtn');
+    let questionTypeSelector = document.getElementById('questionTypeSelector');
+    let addQuestionGroupBtn = document.getElementById('addQuestionGroupBtn');
 
     console.log('DOMContentLoaded: openQuestionTypeSelectorBtn', openQuestionTypeSelectorBtn);
     console.log('DOMContentLoaded: questionTypeSelector', questionTypeSelector);
@@ -343,4 +365,4 @@ document.addEventListener('DOMContentLoaded', () => {
             questionTypeSelector.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
         }
     }, true);
-});}
+});
