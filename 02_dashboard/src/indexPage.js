@@ -26,4 +26,9 @@ export function initIndexPage() {
 
     // フィルターとページネーションを適用
     applyFiltersAndPagination();
+
+    // Listen for language changes and re-apply filters and pagination
+    document.addEventListener('languagechange', () => {
+        applyFiltersAndPagination();
+    });
 }

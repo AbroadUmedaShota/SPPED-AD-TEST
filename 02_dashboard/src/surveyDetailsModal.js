@@ -4,6 +4,14 @@ import { updateSurveyData } from './tableManager.js'; // tableManagerからイ�
 
 let currentEditingSurvey = null; // 現在編集中のアンケートデータを保持する変数
 
+// Listen for language changes to update the modal if it's open
+document.addEventListener('languagechange', () => {
+    const modal = document.getElementById('surveyDetailsModal');
+    if (currentEditingSurvey && modal && modal.dataset.state === 'open') {
+        populateSurveyDetails(currentEditingSurvey);
+    }
+});
+
 /**
  * Initializes elements specific to the Survey Details Modal.
  * This is called after the modal's HTML is loaded into the DOM.
@@ -145,6 +153,8 @@ export function populateSurveyDetails(survey) {
     const modal = document.getElementById('surveyDetailsModal');
     if (!modal) return;
 
+    const lang = window.getCurrentLanguage();
+
     // --- Get All View and Edit Elements ---
     const surveyDetailName = document.getElementById('surveyDetailName');
     const surveyDetailStatusBadge = document.getElementById('surveyDetailStatusBadge');
@@ -164,21 +174,15 @@ export function populateSurveyDetails(survey) {
     const detail_bizcardCompletionCount_view = document.getElementById('detail_bizcardCompletionCount');
     const detail_thankYouEmailSettings_view = document.getElementById('detail_thankYouEmailSettings_view');
 
-    // Edit mode elements (これらはHTMLから削除されたため、参照は不要になる)
-    // const detail_plan_edit = document.getElementById('detail_plan');
-    // const detail_surveyNameInternal_edit = document.getElementById('detail_surveyNameInternal');
-    // const detail_displayTitle_edit = document.getElementById('detail_displayTitle');
-    // const detail_surveyMemo_edit = document.getElementById('detail_surveyMemo');
-    // const detail_periodStart_edit = document.getElementById('detail_periodStart');
-    // const detail_periodEnd_edit = document.getElementById('detail_periodEnd');
-    // const detail_bizcardEnabled_edit = document.getElementById('detail_bizcardEnabled');
-    // const detail_thankYouEmailSettings_edit = document.getElementById('detail_thankYouEmailSettings');
-
     // Non-editable fields
     const detail_surveyUrl = document.getElementById('detail_surveyUrl');
     const detail_qrCodeImage = document.getElementById('detail_qrCodeImage');
 
     // --- Populate View and Edit Fields ---
+    const surveyName = (survey.name && typeof survey.name === 'object') ? survey.name[lang] || survey.name.ja : survey.name;
+    const displayTitle = (survey.displayTitle && typeof survey.displayTitle === 'object') ? survey.displayTitle[lang] || survey.displayTitle.ja : survey.displayTitle;
+    const description = (survey.description && typeof survey.description === 'object') ? survey.description[lang] || survey.description.ja : survey.description;
+
     // Status Badge
     let statusColorClass = '';
     let displayStatus = survey.status;
@@ -190,16 +194,16 @@ export function populateSurveyDetails(survey) {
         case '期限切れ': case '削除済み': case 'データ化なし': case '終了': displayStatus = '終了'; statusColorClass = 'bg-red-100 text-red-800'; break;
         default: statusColorClass = 'bg-gray-100 text-gray-800'; break;
     }
-    surveyDetailName.textContent = survey.name;
+    surveyDetailName.textContent = surveyName;
     surveyDetailStatusBadge.className = `inline-flex items-center rounded-full text-xs px-2 py-1 ${statusColorClass}`;
     surveyDetailStatusBadge.textContent = displayStatus;
 
     // Populate view fields
     detail_surveyId_view.textContent = survey.id;
     detail_plan_view.textContent = survey.plan || 'N/A';
-    detail_surveyNameInternal_view.textContent = survey.name;
-    detail_displayTitle_view.textContent = survey.displayTitle || 'なし';
-    detail_surveyMemo_view.textContent = survey.memo || survey.description || 'なし';
+    detail_surveyNameInternal_view.textContent = surveyName;
+    detail_displayTitle_view.textContent = displayTitle || 'なし';
+    detail_surveyMemo_view.textContent = survey.memo || description || 'なし';
     detail_surveyPeriod_view.textContent = `${survey.periodStart} ~ ${survey.periodEnd}`;
     const realtimeAnswersDisplay = survey.realtimeAnswers > 0 ? ` (+${survey.realtimeAnswers})` : '';
     detail_answerCount_view.textContent = `${survey.answerCount}${realtimeAnswersDisplay}`;
@@ -209,16 +213,6 @@ export function populateSurveyDetails(survey) {
     detail_bizcardEnabled_view.textContent = survey.bizcardEnabled ? '利用する' : '利用しない';
     detail_bizcardCompletionCount_view.textContent = survey.bizcardEnabled ? `${survey.bizcardCompletionCount || 0}件` : 'N/A';
     detail_thankYouEmailSettings_view.textContent = survey.thankYouEmailSettings || '設定なし';
-
-    // Populate edit fields (これらはHTMLから削除されたため、コメントアウト)
-    // detail_plan_edit.value = survey.plan || '';
-    // detail_surveyNameInternal_edit.value = survey.name;
-    // detail_displayTitle_edit.value = survey.displayTitle || '';
-    // detail_surveyMemo_edit.value = survey.memo || survey.description || '';
-    // detail_periodStart_edit.value = survey.periodStart;
-    // detail_periodEnd_edit.value = survey.periodEnd;
-    // detail_bizcardEnabled_edit.value = String(survey.bizcardEnabled); // Convert boolean to string for select
-    // detail_thankYouEmailSettings_edit.value = survey.thankYouEmailSettings || '';
 
     // Non-editable fields
     const qrUrl = `https://survey.speedad.com/qr/${survey.id}`;

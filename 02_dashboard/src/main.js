@@ -12,6 +12,58 @@ import { initIndexPage } from './indexPage.js';
 
 import { showToast, copyTextToClipboard, loadCommonHtml } from './utils.js';
 
+// --- Language Switcher ---
+function initLanguageSwitcher() {
+    const languageSwitcherButton = document.getElementById('language-switcher-button');
+    const languageSwitcherDropdown = document.getElementById('language-switcher-dropdown');
+    const currentLanguageText = document.getElementById('current-language-text');
+
+    if (!languageSwitcherButton || !languageSwitcherDropdown || !currentLanguageText) {
+        // Elements might not be present on all pages, so we exit gracefully.
+        return;
+    }
+
+    const setLanguage = (lang) => {
+        localStorage.setItem('language', lang);
+        currentLanguageText.textContent = lang === 'ja' ? '日本語' : 'English';
+        document.documentElement.lang = lang; // Update the lang attribute of the <html> tag
+        
+        // Dispatch a custom event to notify other parts of the app
+        document.dispatchEvent(new CustomEvent('languagechange', { detail: { lang } }));
+        
+        languageSwitcherDropdown.classList.add('hidden');
+    };
+
+    languageSwitcherButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        languageSwitcherDropdown.classList.toggle('hidden');
+    });
+
+    document.addEventListener('click', () => {
+        if (!languageSwitcherDropdown.classList.contains('hidden')) {
+            languageSwitcherDropdown.classList.add('hidden');
+        }
+    });
+
+    languageSwitcherDropdown.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const target = e.target.closest('a[data-lang]');
+        if (target) {
+            const lang = target.getAttribute('data-lang');
+            setLanguage(lang);
+        }
+    });
+
+    // Set initial language from storage or default to Japanese
+    const currentLang = localStorage.getItem('language') || 'ja';
+    setLanguage(currentLang);
+}
+
+window.getCurrentLanguage = () => {
+    return localStorage.getItem('language') || 'ja';
+};
+
+
 // script.js の最上部に移動 (DOMContentLoadedイベントリスナーの外側)
 // ダミーユーザーデータ (本来はAPIから取得)
 // windowオブジェクトにアタッチすることで、HTMLのonclickから参照可能にする
@@ -37,6 +89,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadCommonHtml('header-placeholder', 'common/header.html');
     await loadCommonHtml('sidebar-placeholder', 'common/sidebar.html', initSidebarHandler);
     await loadCommonHtml('footer-placeholder', 'common/footer.html');
+
+    // Initialize the language switcher after the header is loaded
+    initLanguageSwitcher();
 
     // --- Global Escape Key Listener for Modals & Sidebar ---
     document.addEventListener('keydown', (event) => {
