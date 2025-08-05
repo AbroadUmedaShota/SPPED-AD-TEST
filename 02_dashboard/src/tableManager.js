@@ -71,12 +71,14 @@ function renderTableRows(surveysToRender) {
     }
 
     const fragment = document.createDocumentFragment();
+    const lang = window.getCurrentLanguage();
 
     surveysToRender.forEach(survey => {
         const row = document.createElement('tr');
         row.className = 'cursor-pointer hover:bg-surface-variant transition-colors';
         row.dataset.id = survey.id;
-        row.dataset.name = survey.name;
+        const surveyName = (survey.name && typeof survey.name === 'object') ? survey.name[lang] || survey.name.ja : survey.name;
+        row.dataset.name = surveyName;
         row.dataset.status = survey.status;
         row.dataset.periodStart = survey.periodStart;
         row.dataset.periodEnd = survey.periodEnd;
@@ -146,8 +148,8 @@ function renderTableRows(surveysToRender) {
             <td data-label="アンケートID" class="px-4 py-3 text-on-surface-variant text-sm font-medium" data-sort-value="${survey.id}">
                 ${survey.id}
             </td>
-            <td data-label="アンケート名" class="px-4 py-3 text-on-surface text-sm font-medium" data-sort-value="${survey.name}">
-                ${survey.name}
+            <td data-label="アンケート名" class="px-4 py-3 text-on-surface text-sm font-medium" data-sort-value="${surveyName}">
+                ${surveyName}
             </td>
             <td data-label="ステータス" class="px-4 py-3" data-sort-value="${survey.status}">
                 <span class="inline-flex items-center rounded-full text-xs px-2 py-1 whitespace-nowrap w-auto ${statusColorClass}" title="${statusTitle}">${displayStatus}</span>
@@ -364,9 +366,12 @@ export function applyFiltersAndPagination() {
 
     const startDate = startDateInputVal ? new Date(startDateInputVal) : null;
     const endDate = endDateInputVal ? new Date(endDateInputVal) : null;
+    const lang = window.getCurrentLanguage();
 
     currentFilteredData = allSurveyData.filter(survey => {
-        const surveyName = survey.name ? survey.name.toLowerCase() : '';
+        const surveyName = (survey.name && typeof survey.name === 'object') 
+            ? (survey.name[lang] || survey.name.ja || '').toLowerCase() 
+            : (survey.name || '').toLowerCase();
         const surveyStatus = survey.status;
         const surveyPeriodStart = survey.periodStart ? new Date(survey.periodStart) : null;
         const surveyPeriodEnd = survey.periodEnd ? new Date(survey.periodEnd) : null;

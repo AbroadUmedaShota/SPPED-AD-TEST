@@ -2,9 +2,18 @@
   {
     "id": "SURVEY8j2l0x",
     "groupId": "GROUP001",
-    "name": "新商品に関する満足度調査",
-    "displayTitle": "お客様アンケートにご協力ください",
-    "description": "製品Xのリリース後の顧客満足度を測定します。",
+    "name": {
+      "ja": "新商品に関する満足度調査",
+      "en": "New Product Satisfaction Survey"
+    },
+    "displayTitle": {
+      "ja": "お客様アンケートにご協力ください",
+      "en": "Please Cooperate with the Customer Survey"
+    },
+    "description": {
+      "ja": "製品Xのリリース後の顧客満足度を測定します。",
+      "en": "This survey measures customer satisfaction after the release of Product X."
+    },
     "memo": "営業部Aチームからの依頼。ターゲット層：20代〜30代のビジネスパーソン。",
     "status": "会期中",
     "answerCount": 143,
@@ -23,9 +32,18 @@
   {
     "id": "SURVEYp91ebz",
     "groupId": "GROUP001",
-    "name": "既存顧客サービス利用状況調査",
-    "displayTitle": "サービスご利用に関するアンケート",
-    "description": "既存顧客のサービス利用状況を把握するための調査です。",
+    "name": {
+      "ja": "既存顧客サービス利用状況調査",
+      "en": "Existing Customer Service Usage Survey"
+    },
+    "displayTitle": {
+      "ja": "サービスご利用に関するアンケート",
+      "en": "Survey on Service Usage"
+    },
+    "description": {
+      "ja": "既存顧客のサービス利用状況を把握するための調査です。",
+      "en": "This survey is to understand the service usage of existing customers."
+    },
     "memo": "CSチーム依頼。リピーター中心。",
     "status": "アップ完了",
     "answerCount": 210,
@@ -44,9 +62,18 @@
   {
     "id": "SURVEY5t7v9q",
     "groupId": "GROUP001",
-    "name": "市場動向調査",
-    "displayTitle": "最新の市場トレンド調査アンケート",
-    "description": "市場のトレンドや動向を調査するためのアンケートです。",
+    "name": {
+      "ja": "市場動向調査",
+      "en": "Market Trend Survey"
+    },
+    "displayTitle": {
+      "ja": "最新の市場トレンド調査アンケート",
+      "en": "Latest Market Trend Survey"
+    },
+    "description": {
+      "ja": "市場のトレンドや動向を調査するためのアンケートです。",
+      "en": "This survey is to investigate market trends and movements."
+    },
     "memo": "営業企画部より依頼。競合分析目的。",
     "status": "期限切れ",
     "answerCount": 80,
@@ -65,9 +92,18 @@
   {
     "id": "SURVEYq0hv93",
     "groupId": "GROUP001",
-    "name": "ユーザー行動分析アンケート",
-    "displayTitle": "ユーザー行動に関するアンケート",
-    "description": "ユーザーの行動や嗜好を分析するための調査です。",
+    "name": {
+      "ja": "ユーザー行動分析アンケート",
+      "en": "User Behavior Analysis Survey"
+    },
+    "displayTitle": {
+      "ja": "ユーザー行動に関するアンケート",
+      "en": "Survey on User Behavior"
+    },
+    "description": {
+      "ja": "ユーザーの行動や嗜好を分析するための調査です。",
+      "en": "This survey is to analyze user behavior and preferences."
+    },
     "memo": "マーケティング部依頼。ターゲット：30代〜40代。",
     "status": "データ化中",
     "answerCount": 95,
@@ -86,9 +122,18 @@
   {
     "id": "SURVEYxejp37",
     "groupId": "GROUP001",
-    "name": "オンラインセミナー参加者アンケート",
-    "displayTitle": "オンラインセミナーご参加の皆様へ",
-    "description": "オンラインセミナー後の参加者アンケートです。",
+    "name": {
+      "ja": "オンラインセミナー参加者アンケート",
+      "en": "Online Seminar Participant Survey"
+    },
+    "displayTitle": {
+      "ja": "オンラインセミナーご参加の皆様へ",
+      "en": "To All Participants of the Online Seminar"
+    },
+    "description": {
+      "ja": "オンラインセミナー後の参加者アンケートです。",
+      "en": "This is a survey for participants after the online seminar."
+    },
     "memo": "マーケティング部。フォローアップ用。",
     "status": "会期中",
     "answerCount": 65,
@@ -107,9 +152,18 @@
   {
     "id": "SURVEYrjfh20",
     "groupId": "GROUP001",
-    "name": "新規リード獲得キャンペーン",
-    "displayTitle": "新規リード獲得アンケート",
-    "description": "新規潜在顧客の情報収集を目的としたアンケートです。",
+    "name": {
+      "ja": "新規リード獲得キャンペーン",
+      "en": "New Lead Generation Campaign"
+    },
+    "displayTitle": {
+      "ja": "新規リード獲得アンケート",
+      "en": "New Lead Generation Survey"
+    },
+    "description": {
+      "ja": "新規潜在顧客の情報収集を目的としたアンケートです。",
+      "en": "This survey is for collecting information on new potential customers."
+    },
     "memo": "営業企画部案件。主に若年層対象。",
     "status": "会期前",
     "answerCount": 0,
@@ -128,9 +182,18 @@
   {
     "id": "SURVEYhbtmw2",
     "groupId": "GROUP001",
-    "name": "サービス解約理由調査",
-    "displayTitle": "サービスご解約理由について",
-    "description": "解約理由を把握し、サービス改善に役立てる調査です。",
+    "name": {
+      "ja": "サービス解約理由調査",
+      "en": "Service Cancellation Reason Survey"
+    },
+    "displayTitle": {
+      "ja": "サービスご解約理由について",
+      "en": "Regarding the Reason for Service Cancellation"
+    },
+    "description": {
+      "ja": "解約理由を把握し、サービス改善に役立てる調査です。",
+      "en": "This survey is to understand the reasons for cancellation and use them for service improvement."
+    },
     "memo": "業務改善チーム。匿名回答対応。",
     "status": "削除済み",
     "answerCount": 18,
@@ -149,9 +212,18 @@
   {
     "id": "SURVEYkm0w1a",
     "groupId": "GROUP001",
-    "name": "社内満足度アンケート",
-    "displayTitle": "従業員の満足度調査",
-    "description": "従業員の職場環境に対する満足度を測定します。",
+    "name": {
+      "ja": "社内満足度アンケート",
+      "en": "Internal Satisfaction Survey"
+    },
+    "displayTitle": {
+      "ja": "従業員の満足度調査",
+      "en": "Employee Satisfaction Survey"
+    },
+    "description": {
+      "ja": "従業員の職場環境に対する満足度を測定します。",
+      "en": "This survey measures employee satisfaction with the work environment."
+    },
     "memo": "人事部案件。全社対象。",
     "status": "データ化なし",
     "answerCount": 450,
@@ -170,9 +242,18 @@
   {
     "id": "SURVEYu2q9md",
     "groupId": "GROUP001",
-    "name": "製品ベータテストフィードバック",
-    "displayTitle": "ベータテストご協力のお願い",
-    "description": "新機能のベータテストに関するユーザーからのフィードバックを集めます。",
+    "name": {
+      "ja": "製品ベータテストフィードバック",
+      "en": "Product Beta Test Feedback"
+    },
+    "displayTitle": {
+      "ja": "ベータテストご協力のお願い",
+      "en": "Request for Cooperation in Beta Test"
+    },
+    "description": {
+      "ja": "新機能のベータテストに関するユーザーからのフィードバックを集めます。",
+      "en": "This survey collects feedback from users regarding the beta test of new features."
+    },
     "memo": "製品開発部。ベータ参加者限定。",
     "status": "期限切れ",
     "answerCount": 95,
@@ -191,9 +272,18 @@
   {
     "id": "SURVEYf63p4g",
     "groupId": "GROUP001",
-    "name": "市場動向調査",
-    "displayTitle": "市場トレンド調査アンケート",
-    "description": "市場のトレンドや動向を調査するためのアンケートです。",
+    "name": {
+      "ja": "市場動向調査",
+      "en": "Market Trend Survey"
+    },
+    "displayTitle": {
+      "ja": "市場トレンド調査アンケート",
+      "en": "Market Trend Survey"
+    },
+    "description": {
+      "ja": "市場のトレンドや動向を調査するためのアンケートです。",
+      "en": "This survey is to investigate market trends and movements."
+    },
     "memo": "営業企画部より依頼。新規市場開拓用。",
     "status": "会期中",
     "answerCount": 130,
@@ -212,9 +302,18 @@
   {
     "id": "SURVEYdw40ra",
     "groupId": "GROUP001",
-    "name": "顧客満足度調査",
-    "displayTitle": "製品満足度アンケート",
-    "description": "製品の満足度に関するアンケートです。",
+    "name": {
+      "ja": "顧客満足度調査",
+      "en": "Customer Satisfaction Survey"
+    },
+    "displayTitle": {
+      "ja": "製品満足度アンケート",
+      "en": "Product Satisfaction Survey"
+    },
+    "description": {
+      "ja": "製品の満足度に関するアンケートです。",
+      "en": "This is a survey regarding product satisfaction."
+    },
     "memo": "マーケティング部。新規顧客中心。",
     "status": "アップ完了",
     "answerCount": 180,
@@ -233,9 +332,18 @@
   {
     "id": "SURVEYm4ld2f",
     "groupId": "GROUP001",
-    "name": "新規リード獲得キャンペーン",
-    "displayTitle": "リード獲得アンケート",
-    "description": "新規顧客情報収集のためのアンケートです。",
+    "name": {
+      "ja": "新規リード獲得キャンペーン",
+      "en": "New Lead Generation Campaign"
+    },
+    "displayTitle": {
+      "ja": "リード獲得アンケート",
+      "en": "Lead Generation Survey"
+    },
+    "description": {
+      "ja": "新規顧客情報収集のためのアンケートです。",
+      "en": "This is a survey for collecting new customer information."
+    },
     "memo": "営業企画部。20代〜30代対象。",
     "status": "会期前",
     "answerCount": 0,
@@ -254,9 +362,18 @@
   {
     "id": "SURVEYpysvcj",
     "groupId": "GROUP001",
-    "name": "サービス解約理由調査",
-    "displayTitle": "解約理由アンケート",
-    "description": "サービス解約の理由を把握し、改善に役立てます。",
+    "name": {
+      "ja": "サービス解約理由調査",
+      "en": "Service Cancellation Reason Survey"
+    },
+    "displayTitle": {
+      "ja": "解約理由アンケート",
+      "en": "Cancellation Reason Survey"
+    },
+    "description": {
+      "ja": "サービス解約の理由を把握し、改善に役立てます。",
+      "en": "This survey is to understand the reasons for service cancellation and use them for improvement."
+    },
     "memo": "業務改善チーム。匿名対応。",
     "status": "削除済み",
     "answerCount": 25,
@@ -275,9 +392,18 @@
   {
     "id": "SURVEY69ydwc",
     "groupId": "GROUP001",
-    "name": "社内満足度アンケート",
-    "displayTitle": "従業員満足度調査",
-    "description": "職場環境に関する従業員満足度を測定します。",
+    "name": {
+      "ja": "社内満足度アンケート",
+      "en": "Internal Satisfaction Survey"
+    },
+    "displayTitle": {
+      "ja": "従業員満足度調査",
+      "en": "Employee Satisfaction Survey"
+    },
+    "description": {
+      "ja": "職場環境に関する従業員満足度を測定します。",
+      "en": "This survey measures employee satisfaction with the work environment."
+    },
     "memo": "人事部。全社対象。",
     "status": "データ化なし",
     "answerCount": 400,
@@ -296,9 +422,18 @@
   {
     "id": "SURVEY8x0b6m",
     "groupId": "GROUP001",
-    "name": "ユーザー行動分析アンケート",
-    "displayTitle": "ユーザー行動に関する調査",
-    "description": "ユーザーの行動や嗜好を分析します。",
+    "name": {
+      "ja": "ユーザー行動分析アンケート",
+      "en": "User Behavior Analysis Survey"
+    },
+    "displayTitle": {
+      "ja": "ユーザー行動に関する調査",
+      "en": "Survey on User Behavior"
+    },
+    "description": {
+      "ja": "ユーザーの行動や嗜好を分析します。",
+      "en": "This survey analyzes user behavior and preferences."
+    },
     "memo": "マーケティング部。若年層対象。",
     "status": "会期中",
     "answerCount": 170,
@@ -316,9 +451,18 @@
   },
   {
     "id": "SURVEYu9b8kx",
-    "name": "製品ベータテストフィードバック",
-    "displayTitle": "ベータテスト参加者アンケート",
-    "description": "ベータテストに関するフィードバックを収集します。",
+    "name": {
+      "ja": "製品ベータテストフィードバック",
+      "en": "Product Beta Test Feedback"
+    },
+    "displayTitle": {
+      "ja": "ベータテスト参加者アンケート",
+      "en": "Beta Test Participant Survey"
+    },
+    "description": {
+      "ja": "ベータテストに関するフィードバックを収集します。",
+      "en": "This survey collects feedback regarding the beta test."
+    },
     "memo": "製品開発部。限定参加者。",
     "status": "期限切れ",
     "answerCount": 90,
@@ -336,9 +480,18 @@
   },
   {
     "id": "SURVEYmz19vh",
-    "name": "新商品ニーズ調査",
-    "displayTitle": "新商品のニーズ調査アンケート",
-    "description": "新商品のニーズ把握のためのアンケートです。",
+    "name": {
+      "ja": "新商品ニーズ調査",
+      "en": "New Product Needs Survey"
+    },
+    "displayTitle": {
+      "ja": "新商品のニーズ調査アンケート",
+      "en": "New Product Needs Survey"
+    },
+    "description": {
+      "ja": "新商品のニーズ把握のためのアンケートです。",
+      "en": "This survey is to understand the needs for new products."
+    },
     "memo": "営業企画部。ターゲット層20代。",
     "status": "アップ完了",
     "answerCount": 110,
@@ -356,9 +509,18 @@
   },
   {
     "id": "SURVEYv3q4kt",
-    "name": "オンラインセミナー参加者アンケート",
-    "displayTitle": "セミナー参加者へのアンケート",
-    "description": "オンラインセミナー後の参加者に実施するアンケートです。",
+    "name": {
+      "ja": "オンラインセミナー参加者アンケート",
+      "en": "Online Seminar Participant Survey"
+    },
+    "displayTitle": {
+      "ja": "セミナー参加者へのアンケート",
+      "en": "Survey for Seminar Participants"
+    },
+    "description": {
+      "ja": "オンラインセミナー後の参加者に実施するアンケートです。",
+      "en": "This is a survey for participants after the online seminar."
+    },
     "memo": "マーケティング部。フォローアップ用。",
     "status": "会期中",
     "answerCount": 50,
@@ -376,9 +538,18 @@
   },
   {
     "id": "SURVEYlnr0wb",
-    "name": "サービス解約理由調査",
-    "displayTitle": "解約理由に関するアンケート",
-    "description": "サービス解約理由の分析を目的とした調査です。",
+    "name": {
+      "ja": "サービス解約理由調査",
+      "en": "Service Cancellation Reason Survey"
+    },
+    "displayTitle": {
+      "ja": "解約理由に関するアンケート",
+      "en": "Survey on Cancellation Reason"
+    },
+    "description": {
+      "ja": "サービス解約理由の分析を目的とした調査です。",
+      "en": "This survey is for analyzing the reasons for service cancellation."
+    },
     "memo": "業務改善チーム。匿名対応。",
     "status": "削除済み",
     "answerCount": 15,
@@ -396,9 +567,18 @@
   },
   {
     "id": "SURVEY9elvw2",
-    "name": "社内満足度アンケート",
-    "displayTitle": "職場環境満足度調査",
-    "description": "従業員の職場環境に対する満足度を測定します。",
+    "name": {
+      "ja": "社内満足度アンケート",
+      "en": "Internal Satisfaction Survey"
+    },
+    "displayTitle": {
+      "ja": "職場環境満足度調査",
+      "en": "Work Environment Satisfaction Survey"
+    },
+    "description": {
+      "ja": "従業員の職場環境に対する満足度を測定します。",
+      "en": "This survey measures employee satisfaction with the work environment."
+    },
     "memo": "人事部。全社員対象。",
     "status": "データ化なし",
     "answerCount": 430,
@@ -416,9 +596,18 @@
   },
   {
     "id": "SURVEY7xnt21",
-    "name": "顧客満足度調査",
-    "displayTitle": "お客様満足度アンケート",
-    "description": "新製品に関する顧客の満足度を測定します。",
+    "name": {
+      "ja": "顧客満足度調査",
+      "en": "Customer Satisfaction Survey"
+    },
+    "displayTitle": {
+      "ja": "お客様満足度アンケート",
+      "en": "Customer Satisfaction Survey"
+    },
+    "description": {
+      "ja": "新製品に関する顧客の満足度を測定します。",
+      "en": "This survey measures customer satisfaction with new products."
+    },
     "memo": "マーケティング部。主に30代〜40代対象。",
     "status": "会期中",
     "answerCount": 180,
@@ -436,9 +625,18 @@
   },
   {
     "id": "SURVEYzdv6mc",
-    "name": "新規リード獲得キャンペーン",
-    "displayTitle": "新規リード獲得アンケート",
-    "description": "新規顧客情報を収集するための調査です。",
+    "name": {
+      "ja": "新規リード獲得キャンペーン",
+      "en": "New Lead Generation Campaign"
+    },
+    "displayTitle": {
+      "ja": "新規リード獲得アンケート",
+      "en": "New Lead Generation Survey"
+    },
+    "description": {
+      "ja": "新規顧客情報を収集するための調査です。",
+      "en": "This survey is for collecting new customer information."
+    },
     "memo": "営業企画部。若年層向け。",
     "status": "会期前",
     "answerCount": 0,
@@ -456,9 +654,18 @@
   },
   {
     "id": "SURVEYfw0jcl",
-    "name": "サービス利用状況調査",
-    "displayTitle": "サービス利用に関するアンケート",
-    "description": "既存顧客のサービス利用状況を把握します。",
+    "name": {
+      "ja": "サービス利用状況調査",
+      "en": "Service Usage Survey"
+    },
+    "displayTitle": {
+      "ja": "サービス利用に関するアンケート",
+      "en": "Survey on Service Usage"
+    },
+    "description": {
+      "ja": "既存顧客のサービス利用状況を把握します。",
+      "en": "This survey is to understand the service usage of existing customers."
+    },
     "memo": "CS部。リピーター中心。",
     "status": "アップ完了",
     "answerCount": 220,
@@ -476,9 +683,18 @@
   },
   {
     "id": "SURVEY8m1xqo",
-    "name": "解約理由調査",
-    "displayTitle": "サービス解約理由アンケート",
-    "description": "解約理由を分析し改善に役立てます。",
+    "name": {
+      "ja": "解約理由調査",
+      "en": "Cancellation Reason Survey"
+    },
+    "displayTitle": {
+      "ja": "サービス解約理由アンケート",
+      "en": "Service Cancellation Reason Survey"
+    },
+    "description": {
+      "ja": "解約理由を分析し改善に役立てます。",
+      "en": "This survey is to analyze the reasons for cancellation and use them for improvement."
+    },
     "memo": "業務改善チーム。匿名回答対応。",
     "status": "期限切れ",
     "answerCount": 30,
@@ -496,9 +712,18 @@
   },
   {
     "id": "SURVEYfhrw67",
-    "name": "社内満足度調査",
-    "displayTitle": "従業員満足度アンケート",
-    "description": "従業員の職場環境満足度を測定します。",
+    "name": {
+      "ja": "社内満足度調査",
+      "en": "Internal Satisfaction Survey"
+    },
+    "displayTitle": {
+      "ja": "従業員満足度アンケート",
+      "en": "Employee Satisfaction Survey"
+    },
+    "description": {
+      "ja": "従業員の職場環境満足度を測定します。",
+      "en": "This survey measures employee satisfaction with the work environment."
+    },
     "memo": "人事部。全社対象。",
     "status": "データ化なし",
     "answerCount": 420,
@@ -516,9 +741,18 @@
   },
   {
     "id": "SURVEY7yabjp",
-    "name": "オンラインセミナーアンケート",
-    "displayTitle": "セミナー参加者向けアンケート",
-    "description": "オンラインセミナー参加者へのフィードバック収集用。",
+    "name": {
+      "ja": "オンラインセミナーアンケート",
+      "en": "Online Seminar Survey"
+    },
+    "displayTitle": {
+      "ja": "セミナー参加者向けアンケート",
+      "en": "Survey for Seminar Participants"
+    },
+    "description": {
+      "ja": "オンラインセミナー参加者へのフィードバック収集用。",
+      "en": "For collecting feedback from online seminar participants."
+    },
     "memo": "マーケティング部。フォローアップ。",
     "status": "会期中",
     "answerCount": 60,
@@ -536,9 +770,18 @@
   },
   {
     "id": "SURVEY6zgx4t",
-    "name": "新規商品ニーズ調査",
-    "displayTitle": "新商品ニーズ調査アンケート",
-    "description": "新商品の需要を把握するための調査です。",
+    "name": {
+      "ja": "新規商品ニーズ調査",
+      "en": "New Product Needs Survey"
+    },
+    "displayTitle": {
+      "ja": "新商品ニーズ調査アンケート",
+      "en": "New Product Needs Survey"
+    },
+    "description": {
+      "ja": "新商品の需要を把握するための調査です。",
+      "en": "This survey is to understand the demand for new products."
+    },
     "memo": "営業企画部。20代中心。",
     "status": "アップ完了",
     "answerCount": 100,
@@ -556,9 +799,18 @@
   },
   {
     "id": "SURVEYx4pr9o",
-    "name": "ユーザー行動分析調査",
-    "displayTitle": "ユーザー行動に関する調査",
-    "description": "ユーザーの行動パターンを分析します。",
+    "name": {
+      "ja": "ユーザー行動分析調査",
+      "en": "User Behavior Analysis Survey"
+    },
+    "displayTitle": {
+      "ja": "ユーザー行動に関する調査",
+      "en": "Survey on User Behavior"
+    },
+    "description": {
+      "ja": "ユーザーの行動パターンを分析します。",
+      "en": "This survey analyzes user behavior patterns."
+    },
     "memo": "マーケティング部。若年層対象。",
     "status": "会期中",
     "answerCount": 150,
@@ -576,9 +828,18 @@
   },
   {
     "id": "SURVEYz8x0vn",
-    "name": "製品ベータテストフィードバック",
-    "displayTitle": "ベータテスト参加者アンケート",
-    "description": "製品のベータテストに関するフィードバックを収集します。",
+    "name": {
+      "ja": "製品ベータテストフィードバック",
+      "en": "Product Beta Test Feedback"
+    },
+    "displayTitle": {
+      "ja": "ベータテスト参加者アンケート",
+      "en": "Beta Test Participant Survey"
+    },
+    "description": {
+      "ja": "製品のベータテストに関するフィードバックを収集します。",
+      "en": "This survey collects feedback regarding the product beta test."
+    },
     "memo": "製品開発部。限定参加者対象。",
     "status": "期限切れ",
     "answerCount": 85,
@@ -596,9 +857,18 @@
   },
   {
     "id": "SURVEYjt4e39",
-    "name": "市場動向調査",
-    "displayTitle": "市場トレンドアンケート",
-    "description": "市場のトレンドを調査するアンケートです。",
+    "name": {
+      "ja": "市場動向調査",
+      "en": "Market Trend Survey"
+    },
+    "displayTitle": {
+      "ja": "市場トレンドアンケート",
+      "en": "Market Trend Survey"
+    },
+    "description": {
+      "ja": "市場のトレンドを調査するアンケートです。",
+      "en": "This survey is to investigate market trends."
+    },
     "memo": "営業企画部。新規事業向け。",
     "status": "アップ完了",
     "answerCount": 125,
@@ -617,9 +887,18 @@
   {
     "id": "SURVEYabc123",
     "groupId": "GROUP002",
-    "name": "新サービス評価アンケート",
-    "displayTitle": "新サービスに関するご意見をお聞かせください",
-    "description": "新サービスのユーザー評価を収集します。",
+    "name": {
+      "ja": "新サービス評価アンケート",
+      "en": "New Service Evaluation Survey"
+    },
+    "displayTitle": {
+      "ja": "新サービスに関するご意見をお聞かせください",
+      "en": "Please give us your opinion on the new service"
+    },
+    "description": {
+      "ja": "新サービスのユーザー評価を収集します。",
+      "en": "This survey collects user evaluations of the new service."
+    },
     "memo": "企画部。早期フィードバック目的。",
     "status": "会期中",
     "answerCount": 75,
@@ -638,9 +917,18 @@
   {
     "id": "SURVEYdef456",
     "groupId": "GROUP002",
-    "name": "ウェブサイト改善アンケート",
-    "displayTitle": "ウェブサイトに関するアンケート",
-    "description": "ウェブサイトのユーザビリティ改善のためのアンケートです。",
+    "name": {
+      "ja": "ウェブサイト改善アンケート",
+      "en": "Website Improvement Survey"
+    },
+    "displayTitle": {
+      "ja": "ウェブサイトに関するアンケート",
+      "en": "Survey on the Website"
+    },
+    "description": {
+      "ja": "ウェブサイトのユーザビリティ改善のためのアンケートです。",
+      "en": "This survey is for improving the usability of the website."
+    },
     "memo": "広報部。UI/UX改善。",
     "status": "会期前",
     "answerCount": 0,
@@ -659,9 +947,18 @@
   {
     "id": "SURVEYghi789",
     "groupId": "GROUP003",
-    "name": "イベント参加者満足度調査",
-    "displayTitle": "イベントご参加ありがとうございました",
-    "description": "イベントの満足度を測定し、次回の改善に役立てます。",
+    "name": {
+      "ja": "イベント参加者満足度調査",
+      "en": "Event Participant Satisfaction Survey"
+    },
+    "displayTitle": {
+      "ja": "イベントご参加ありがとうございました",
+      "en": "Thank you for participating in the event"
+    },
+    "description": {
+      "ja": "イベントの満足度を測定し、次回の改善に役立てます。",
+      "en": "This survey measures the satisfaction of the event and helps to improve the next one."
+    },
     "memo": "イベント運営部。来場者向け。",
     "status": "アップ完了",
     "answerCount": 300,

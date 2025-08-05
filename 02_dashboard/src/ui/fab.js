@@ -1,11 +1,12 @@
-import { addNewQuestion, addNewQuestionGroup } from './surveyRenderer.js';
-
 /**
  * FAB (Floating Action Button)をページに読み込んで初期化する
  * @param {string} containerId - FABをマウントするコンテナのID
  * @param {string} htmlPath - FABのHTMLファイルのパス
+ * @param {object} actions - FABの各アクションに対応するコールバック関数のオブジェクト
+ * @param {function} actions.onAddQuestion - 質問追加ボタンクリック時のコールバック
+ * @param {function} actions.onAddGroup - グループ追加ボタンクリック時のコールバック
  */
-export async function initializeFab(containerId, htmlPath) {
+export async function initializeFab(containerId, htmlPath, actions) {
     try {
         const response = await fetch(htmlPath);
         if (!response.ok) {
@@ -19,7 +20,7 @@ export async function initializeFab(containerId, htmlPath) {
         }
         fabContainer.innerHTML = fabHtml;
 
-        setupFabEventListeners();
+        setupFabEventListeners(actions);
     } catch (error) {
         console.error('Failed to initialize FAB:', error);
     }
@@ -27,8 +28,9 @@ export async function initializeFab(containerId, htmlPath) {
 
 /**
  * FABのイベントリスナーをセットアップする
+ * @param {object} actions - コールバック関数のオブジェクト
  */
-function setupFabEventListeners() {
+function setupFabEventListeners(actions) {
     const mainButton = document.getElementById('fab-main-button');
     const menu = document.getElementById('fab-menu');
     const icon = mainButton.querySelector('.material-icons');
@@ -58,17 +60,17 @@ function setupFabEventListeners() {
         }
     });
 
-    // メニュー内のボタンクリックで質問を追加
+    // メニュー内のボタンクリックで対応するアクションを実行
     menu.addEventListener('click', (event) => {
         const button = event.target.closest('button[data-question-type]');
         if (!button) return;
 
         const questionType = button.dataset.questionType;
 
-        if (questionType === 'group') {
-            addNewQuestionGroup();
-        } else {
-            addNewQuestion(questionType);
+        if (questionType === 'group' && actions.onAddGroup) {
+            actions.onAddGroup();
+        } else if (actions.onAddQuestion) {
+            actions.onAddQuestion(questionType);
         }
 
         // メニューを閉じる

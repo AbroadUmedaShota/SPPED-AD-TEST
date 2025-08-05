@@ -1,23 +1,22 @@
 import { handleOpenModal } from './modalHandler.js';
 import { openAccountInfoModal } from './accountInfoModal.js';
-import { fetchSurveyData, collectSurveyDataFromDOM, saveSurveyDataToLocalStorage, loadSurveyDataFromLocalStorage } from './services/surveyService.js';
+import { fetchSurveyData, saveSurveyDataToLocalStorage, loadSurveyDataFromLocalStorage } from './services/surveyService.js';
 import { 
     populateBasicInfo, 
     renderAllQuestionGroups, 
     displayErrorMessage, 
-    addNewQuestionGroup, 
-    addNewQuestion, 
-    deleteQuestionGroup, 
-    deleteQuestion, 
-    duplicateQuestionGroup, 
-    duplicateQuestion, 
-    addOptionToQuestion, 
     renderOutlineMap 
 } from './ui/surveyRenderer.js';
 import { initializeFab } from './ui/fab.js';
 import { loadCommonHtml } from './utils.js';
 
+// --- Global State ---
+let surveyData = {};
+let currentLang = 'ja';
 
+// --- Utility Functions ---
+window.getCurrentLanguage = () => currentLang;
+window.getSurveyData = () => surveyData;
 
 // ダミーユーザーデータ (本来はAPIから取得)
 window.dummyUserData = {
@@ -43,6 +42,36 @@ window.dummyUserData = {
 };
 
 /**
+ * Re-renders the entire form based on the current state (surveyData, currentLang)
+ */
+function updateAndRenderAll() {
+    populateBasicInfo(surveyData, currentLang);
+    renderAllQuestionGroups(surveyData.questionGroups, currentLang);
+    renderOutlineMap();
+    // After rendering, re-validate the form to enable/disable the save button
+    validateFormForSaveButton();
+}
+
+/**
+ * Switches the current language and updates the UI.
+ * @param {string} newLang - The new language code ('ja' or 'en').
+ */
+function switchLanguage(newLang) {
+    currentLang = newLang;
+    // Update all language tabs in the document
+    document.querySelectorAll('.lang-tab-button').forEach(btn => {
+        if (btn.dataset.lang === newLang) {
+            btn.classList.add('border-primary', 'text-primary');
+            btn.classList.remove('border-transparent', 'text-on-surface-variant', 'hover:border-outline-variant', 'hover:text-on-surface');
+        } else {
+            btn.classList.remove('border-primary', 'text-primary');
+            btn.classList.add('border-transparent', 'text-on-surface-variant', 'hover:border-outline-variant', 'hover:text-on-surface');
+        }
+    });
+    updateAndRenderAll();
+}
+
+/**
  * ページの初期化処理
  */
 async function initializePage() {
@@ -55,28 +84,33 @@ async function initializePage() {
             })
         ]);
 
-        let surveyData = loadSurveyDataFromLocalStorage();
-        if (surveyData) {
-            console.log('Loaded survey data from localStorage:', surveyData);
-            populateBasicInfo(surveyData);
-            renderAllQuestionGroups(surveyData.questionGroups);
+        const loadedData = loadSurveyDataFromLocalStorage();
+        if (loadedData) {
+            console.log('Loaded survey data from localStorage:', loadedData);
+            surveyData = loadedData;
         } else {
             console.log('No survey data in localStorage. Fetching initial data...');
             surveyData = await fetchSurveyData();
-            populateBasicInfo(surveyData);
-            renderAllQuestionGroups(surveyData.questionGroups);
         }
-        restoreAccordionState(); // アコーディオンの状態を復元
-        renderOutlineMap(); // 初期ロード時にアウトラインマップを生成
+        
+        // Set initial language from global state
+        currentLang = window.getCurrentLanguage ? window.getCurrentLanguage() : 'ja';
+        switchLanguage(currentLang);
 
-        // FABの初期化
-        initializeFab('fab-container', 'components/fab.html');
+        restoreAccordionState(); // アコーディオンの状態を復元
+        // FABの初期化とアクションの紐付け
+        const fabActions = {
+            onAddQuestion: (questionType) => handleAddNewQuestion(null, questionType), // グループIDはnullで渡す（最後のグループに追加するロジック）
+            onAddGroup: () => handleAddNewQuestionGroup()
+        };
+        initializeFab('fab-container', 'components/fab.html', fabActions);
 
     } catch (error) {
         console.error('Failed to initialize page:', error);
         displayErrorMessage();
     }
 }
+
 
 /**
  * アコーディオンの開閉状態をlocalStorageに保存する
@@ -134,116 +168,74 @@ function initializeAccordion() {
 function setupEventListeners() {
     initializeAccordion();
 
-    initializeDatepickers();
-
-    // モーダルを開くボタンのイベントリスナー
-    document.getElementById('openAccountInfoBtnHeader').addEventListener('click', () => openAccountInfoModal(window.dummyUserData));
-    document.getElementById('openAccountInfoBtnSidebar').addEventListener('click', () => openAccountInfoModal(window.dummyUserData));
-    document.getElementById('openContactModalBtn').addEventListener('click', () => handleOpenModal('contactModal', 'modals/contactModal.html'));
-    document.getElementById('openBizcardSettingsBtn').addEventListener('click', () => handleOpenModal('bizcardSettingsModal', 'bizcardSettings.html'));
-    document.getElementById('openThankYouEmailSettingsBtn').addEventListener('click', () => handleOpenModal('thankYouEmailSettingsModal', 'thankYouEmailSettings.html'));
-
-    // 「質問グループを追加」ボタンのイベントリスナー (フローティングメニュー内)
-    
-
-    
-
-    // 各質問タイプボタンのイベントリスナー
-    document.getElementById('addFreeAnswerBtn').addEventListener('click', () => {
-        addNewQuestion('free_answer');
-        if (questionTypeSelector) {
-            questionTypeSelector.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
-        }
-    });
-    document.getElementById('addSingleAnswerBtn').addEventListener('click', () => {
-        addNewQuestion('single_answer');
-        if (questionTypeSelector) {
-            questionTypeSelector.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
-        }
-    });
-    document.getElementById('addMultiAnswerBtn').addEventListener('click', () => {
-        addNewQuestion('multi_answer');
-        if (questionTypeSelector) {
-            questionTypeSelector.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
-        }
-    });
-    document.getElementById('addNumberAnswerBtn').addEventListener('click', () => {
-        addNewQuestion('number_answer');
-        if (questionTypeSelector) {
-            questionTypeSelector.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
-        }
-    });
-    document.getElementById('addMatrixSABtn').addEventListener('click', () => {
-        addNewQuestion('matrix_sa');
-        if (questionTypeSelector) {
-            questionTypeSelector.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
-        }
-    });
-    document.getElementById('addMatrixMABtn').addEventListener('click', () => {
-        addNewQuestion('matrix_ma');
-        if (questionTypeSelector) {
-            questionTypeSelector.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
-        }
-    });
-    document.getElementById('addDateTimeBtn').addEventListener('click', () => {
-        addNewQuestion('date_time');
-        if (questionTypeSelector) {
-            questionTypeSelector.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
-        }
-    });
-    document.getElementById('addHandwritingBtn').addEventListener('click', () => {
-        addNewQuestion('handwriting');
-        if (questionTypeSelector) {
-            questionTypeSelector.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
-        }
+    // --- Global Language Change Listener ---
+    document.addEventListener('languagechange', (e) => {
+        switchLanguage(e.detail.lang);
     });
 
-    // 削除ボタンのイベントリスナー (イベントデリゲーション)
+    // --- Delegated Click-to-Action Listeners ---
     document.body.addEventListener('click', (event) => {
         const target = event.target;
-        // 質問グループの削除ボタン
-        const deleteGroupBtn = target.closest('.group-header .icon-button .material-icons');
-        if (deleteGroupBtn && deleteGroupBtn.textContent === 'delete') {
-            const groupElement = deleteGroupBtn.closest('.question-group');
-            if (groupElement) {
-                deleteQuestionGroup(groupElement);
-            }
-        }
+        const langTabButton = target.closest('.lang-tab-button');
+        const addGroupBtn = target.closest('#addQuestionGroupBtn'); // Assuming a button with this ID exists
+        const deleteGroupBtn = target.closest('.delete-group-btn');
+        const duplicateGroupBtn = target.closest('.duplicate-group-btn');
+        const addQuestionBtn = target.closest('.add-question-btn');
+        const deleteQuestionBtn = target.closest('.delete-question-btn');
+        const duplicateQuestionBtn = target.closest('.duplicate-question-btn');
+        const addOptionBtn = target.closest('.add-option-btn');
+        const deleteOptionBtn = target.closest('.delete-option-btn');
 
-        // 質問項目の削除ボタン
-        const deleteQuestionBtn = target.closest('.question-item .icon-button .material-icons');
-        if (deleteQuestionBtn && deleteQuestionBtn.textContent === 'delete') {
-            const questionElement = deleteQuestionBtn.closest('.question-item');
-            if (questionElement) {
-                deleteQuestion(questionElement);
-            }
+        if (langTabButton) {
+            switchLanguage(langTabButton.dataset.lang);
+            return; // Stop further processing
         }
-
-        // 質問グループの複製ボタン
-        const duplicateGroupBtn = target.closest('.group-header .icon-button .material-icons');
-        if (duplicateGroupBtn && duplicateGroupBtn.textContent === 'content_copy') {
-            const groupElement = duplicateGroupBtn.closest('.question-group');
-            if (groupElement) {
-                duplicateQuestionGroup(groupElement);
-            }
+        if (addGroupBtn) {
+            handleAddNewQuestionGroup();
+            return;
         }
-
-        // 質問項目の複製ボタン
-        const duplicateQuestionBtn = target.closest('.question-item .icon-button .material-icons');
-        if (duplicateQuestionBtn && duplicateQuestionBtn.textContent === 'content_copy') {
-            const questionElement = duplicateQuestionBtn.closest('.question-item');
-            if (questionElement) {
-                duplicateQuestion(questionElement);
-            }
+        if (deleteGroupBtn) {
+            const groupId = deleteGroupBtn.closest('.question-group').dataset.groupId;
+            handleDeleteQuestionGroup(groupId);
+            return;
         }
-
-        // 選択肢追加ボタン
-        const addOptionBtn = target.closest('.options-container .text-sm.text-primary');
-        if (addOptionBtn && addOptionBtn.textContent.includes('+ 選択肢を追加')) {
-            const questionElement = addOptionBtn.closest('.question-item');
-            if (questionElement) {
-                addOptionToQuestion(questionElement);
-            }
+        if (duplicateGroupBtn) {
+            const groupId = duplicateGroupBtn.closest('.question-group').dataset.groupId;
+            handleDuplicateQuestionGroup(groupId);
+            return;
+        }
+        if (addQuestionBtn) {
+            const groupId = addQuestionBtn.closest('.question-group').dataset.groupId;
+            const questionType = 'free_answer'; // Example type, should be determined from UI
+            handleAddNewQuestion(groupId, questionType);
+            return;
+        }
+        if (deleteQuestionBtn) {
+            const groupId = deleteQuestionBtn.closest('.question-group').dataset.groupId;
+            const questionId = deleteQuestionBtn.closest('.question-item').dataset.questionId;
+            handleDeleteQuestion(groupId, questionId);
+            return;
+        }
+        if (duplicateQuestionBtn) {
+            const groupId = duplicateQuestionBtn.closest('.question-group').dataset.groupId;
+            const questionId = duplicateQuestionBtn.closest('.question-item').dataset.questionId;
+            handleDuplicateQuestion(groupId, questionId);
+            return;
+        }
+        if (addOptionBtn) {
+            const groupId = addOptionBtn.closest('.question-group').dataset.groupId;
+            const questionId = addOptionBtn.closest('.question-item').dataset.questionId;
+            handleAddOption(groupId, questionId);
+            return;
+        }
+        if (deleteOptionBtn) {
+            const groupId = deleteOptionBtn.closest('.question-group').dataset.groupId;
+            const questionId = deleteOptionBtn.closest('.question-item').dataset.questionId;
+            // This needs index, which is harder with delegation. A direct listener in render might be better here.
+            // For now, let's assume we can get it.
+            const optionIndex = Array.from(deleteOptionBtn.closest('.options-container').children).indexOf(deleteOptionBtn.closest('.option-item'));
+            handleDeleteOption(groupId, questionId, optionIndex);
+            return;
         }
     });
 
@@ -251,118 +243,127 @@ function setupEventListeners() {
     const createSurveyBtn = document.getElementById('createSurveyBtn');
     if (createSurveyBtn) {
         createSurveyBtn.addEventListener('click', () => {
-            const surveyData = collectSurveyDataFromDOM();
-            saveSurveyDataToLocalStorage(surveyData); // localStorageに保存
-            console.log('Collected Survey Data and saved to localStorage:', surveyData);
+            saveSurveyDataToLocalStorage(surveyData);
+            console.log('Saved Survey Data to localStorage:', surveyData);
             alert('アンケートデータがlocalStorageに保存されました！');
         });
     }
-
-    initializeDraggable();
-
-    
 }
 
+// --- Data Manipulation Handlers ---
 
+function handleAddNewQuestionGroup() {
+    if (!surveyData.questionGroups) surveyData.questionGroups = [];
+    const newGroup = {
+        groupId: `group_${Date.now()}`,
+        title: { ja: '新しい質問グループ', en: 'New Question Group' },
+        questions: []
+    };
+    surveyData.questionGroups.push(newGroup);
+    updateAndRenderAll();
+}
+
+function handleDeleteQuestionGroup(groupId) {
+    if (!confirm('この質問グループを削除してもよろしいですか？')) return;
+    surveyData.questionGroups = surveyData.questionGroups.filter(g => g.groupId !== groupId);
+    updateAndRenderAll();
+}
+
+function handleDuplicateQuestionGroup(groupId) {
+    const groupToDuplicate = surveyData.questionGroups.find(g => g.groupId === groupId);
+    if (!groupToDuplicate) return;
+    const newGroup = JSON.parse(JSON.stringify(groupToDuplicate)); // Deep copy
+    newGroup.groupId = `group_${Date.now()}`;
+    newGroup.questions.forEach(q => q.questionId = `q_${Date.now()}_${Math.random()}`);
+    const index = surveyData.questionGroups.findIndex(g => g.groupId === groupId);
+    surveyData.questionGroups.splice(index + 1, 0, newGroup);
+    updateAndRenderAll();
+}
+
+function handleAddNewQuestion(groupId, questionType) {
+    const group = surveyData.questionGroups.find(g => g.groupId === groupId);
+    if (!group) return;
+    if (!group.questions) group.questions = [];
+    const newQuestion = {
+        questionId: `q_${Date.now()}`,
+        type: questionType,
+        text: { ja: '新しい質問', en: 'New Question' },
+        required: false,
+        options: (questionType === 'single_answer' || questionType === 'multi_answer') ? [] : undefined
+    };
+    group.questions.push(newQuestion);
+    updateAndRenderAll();
+}
+
+function handleDeleteQuestion(groupId, questionId) {
+    const group = surveyData.questionGroups.find(g => g.groupId === groupId);
+    if (group && confirm('この質問を削除してもよろしいですか？')) {
+        group.questions = group.questions.filter(q => q.questionId !== questionId);
+        updateAndRenderAll();
+    }
+}
+
+function handleDuplicateQuestion(groupId, questionId) {
+    const group = surveyData.questionGroups.find(g => g.groupId === groupId);
+    if (!group) return;
+    const questionToDuplicate = group.questions.find(q => q.questionId === questionId);
+    if (!questionToDuplicate) return;
+    const newQuestion = JSON.parse(JSON.stringify(questionToDuplicate));
+    newQuestion.questionId = `q_${Date.now()}`;
+    const index = group.questions.findIndex(q => q.questionId === questionId);
+    group.questions.splice(index + 1, 0, newQuestion);
+    updateAndRenderAll();
+}
+
+function handleAddOption(groupId, questionId) {
+    const question = surveyData.questionGroups.find(g => g.groupId === groupId)?.questions.find(q => q.questionId === questionId);
+    if (question && question.options) {
+        question.options.push({ text: { ja: '新しい選択肢', en: 'New Option' } });
+        updateAndRenderAll();
+    }
+}
+
+function handleDeleteOption(groupId, questionId, optionIndex) {
+    const question = surveyData.questionGroups.find(g => g.groupId === groupId)?.questions.find(q => q.questionId === questionId);
+    if (question && question.options) {
+        question.options.splice(optionIndex, 1);
+        updateAndRenderAll();
+    }
+}
 
 /**
  * フォームの必須項目を検証し、保存ボタンの有効/無効を切り替える。
  */
 function validateFormForSaveButton() {
     const saveButton = document.getElementById('createSurveyBtn');
+    if (!saveButton) return;
+
+    // For multilingual, we check the required fields in the default language (e.g., Japanese)
     const requiredFields = [
-        document.getElementById('surveyName'),
-        document.getElementById('displayTitle'),
-        document.getElementById('periodStart'),
-        document.getElementById('periodEnd'),
+        surveyData.name?.ja,
+        surveyData.displayTitle?.ja,
+        surveyData.periodStart,
+        surveyData.periodEnd
     ];
 
-    function checkValidation() {
-        let allValid = true;
-        requiredFields.forEach(field => {
-            const errorMessage = field.closest('.input-group').querySelector('.error-message');
-            if (field.value.trim() === '') {
-                field.classList.add('is-invalid');
-                if (errorMessage) errorMessage.classList.remove('hidden');
-                allValid = false;
-            } else {
-                field.classList.remove('is-invalid');
-                if (errorMessage) errorMessage.classList.add('hidden');
+    let allValid = requiredFields.every(fieldValue => fieldValue && fieldValue.trim() !== '');
+    
+    // Also check required questions
+    surveyData.questionGroups?.forEach(group => {
+        group.questions?.forEach(question => {
+            if (question.required) {
+                if (!question.text?.ja || question.text.ja.trim() === '') {
+                    allValid = false;
+                }
             }
         });
-        saveButton.disabled = !allValid;
-    }
-
-    requiredFields.forEach(field => {
-        field.addEventListener('input', checkValidation);
     });
 
-    // 日付ピッカーの変更も監視する
-    const observer = new MutationObserver(checkValidation);
-    requiredFields.forEach(field => {
-        if (field.id.includes('period')) {
-            observer.observe(field, { attributes: true, attributeFilter: ['value'] });
-        }
-    });
-
-    checkValidation(); // 初期チェック
+    saveButton.disabled = !allValid;
 }
 
-/**
- * スクロールに合わせてアウトラインマップのアクティブ状態を更新する。
- */
-function setupScrollSpy() {
-    const mainContent = document.getElementById('main-content');
-    if (!mainContent) return;
-
-    // --- スクロールスパイ機能 ---
-    const outlineLinks = document.querySelectorAll('#outline-map-container a');
-    const sections = Array.from(outlineLinks).map(link => {
-        const id = link.getAttribute('href').substring(1);
-        return document.getElementById(id);
-    }).filter(section => section !== null);
-
-    if (outlineLinks.length > 0 && sections.length > 0) {
-        const observer = new IntersectionObserver(entries => {
-            entries.forEach(entry => {
-                const id = entry.target.id;
-                const correspondingLink = document.querySelector(`#outline-map-container a[href="#${id}"]`);
-                if (entry.isIntersecting) {
-                    outlineLinks.forEach(link => link.classList.remove('active'));
-                    if (correspondingLink) {
-                        correspondingLink.classList.add('active');
-                    }
-                }
-            });
-        }, { root: mainContent, threshold: 0.5 });
-
-        sections.forEach(section => {
-            observer.observe(section);
-        });
-    }
-
-    
-}
-
-    // DOMの読み込みが完了したら処理を開始
+// DOMの読み込みが完了したら処理を開始
 document.addEventListener('DOMContentLoaded', () => {
-    // DOM要素の取得をDOMContentLoadedイベント内で行う
-    let openQuestionTypeSelectorBtn = document.getElementById('openQuestionTypeSelectorBtn');
-    let questionTypeSelector = document.getElementById('questionTypeSelector');
-    let addQuestionGroupBtn = document.getElementById('addQuestionGroupBtn');
-
-    console.log('DOMContentLoaded: openQuestionTypeSelectorBtn', openQuestionTypeSelectorBtn);
-    console.log('DOMContentLoaded: questionTypeSelector', questionTypeSelector);
-    console.log('DOMContentLoaded: addQuestionGroupBtn', addQuestionGroupBtn);
-
     initializePage();
     setupEventListeners();
-    setupScrollSpy();
-
-    // ウィンドウのリサイズ時にフローティングボタンの位置を更新
-    window.addEventListener('resize', () => {
-        if (questionTypeSelector) {
-            questionTypeSelector.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
-        }
-    }, true);
 });
