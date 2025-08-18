@@ -84,20 +84,27 @@ export function initializeFloatingLabelsForModal(containerElement) {
  * @param {string} modalId The ID of the modal element to open.
  * @param {string} filePath The path to the modal's HTML file.
  */
-export async function handleOpenModal(modalId, filePath) {
+export async function handleOpenModal(modalId, filePath, callback) {
     const modal = document.getElementById(modalId);
+
+    const openAndCallback = () => {
+        openModal(modalId);
+        if (callback && typeof callback === 'function') {
+            callback();
+        }
+    };
+
     if (!modal) {
         try {
             await loadModalFromFile(modalId, filePath);
-            openModal(modalId);
+            openAndCallback();
         } catch (error) {
-            // Error already handled by loadModalFromFile and shown to user.
-            // No further action needed here, just prevent opening.
+            // Error is handled in loadModalFromFile
         }
     } else {
-        openModal(modalId);
+        openAndCallback();
     }
-};
+}
 
 /**
  * Opens a modal window.

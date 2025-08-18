@@ -155,8 +155,25 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const createSurveyBtn = document.getElementById('createSurveyFromModalBtn');
                 if (createSurveyBtn) {
                     createSurveyBtn.addEventListener('click', (e) => {
-                        e.preventDefault(); // フォームのデフォルト送信を防ぐ
-                        window.location.href = 'surveyCreation.html';
+                        e.preventDefault(); // Prevent default form submission
+
+                        // Get values from the modal form
+                        const surveyName = document.getElementById('surveyName').value;
+                        const displayTitle = document.getElementById('displayTitle').value;
+                        const surveyMemo = document.getElementById('surveyMemo').value;
+                        const surveyStartDate = document.getElementById('surveyStartDate').value;
+                        const surveyEndDate = document.getElementById('surveyEndDate').value;
+
+                        // Build query parameters
+                        const params = new URLSearchParams();
+                        if (surveyName) params.set('surveyName', surveyName);
+                        if (displayTitle) params.set('displayTitle', displayTitle);
+                        if (surveyMemo) params.set('memo', surveyMemo);
+                        if (surveyStartDate) params.set('periodStart', surveyStartDate);
+                        if (surveyEndDate) params.set('periodEnd', surveyEndDate);
+
+                        // Redirect to the creation page with parameters
+                        window.location.href = `surveyCreation.html?${params.toString()}`;
                     });
                 }
             });

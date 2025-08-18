@@ -92,7 +92,37 @@ async function initializePage() {
             console.log('No survey data in localStorage. Fetching initial data...');
             surveyData = await fetchSurveyData();
         }
-        
+
+        // --- New: Process URL Query Parameters ---
+        const params = new URLSearchParams(window.location.search);
+        const surveyName = params.get('surveyName');
+        const displayTitle = params.get('displayTitle');
+        const memo = params.get('memo');
+        const periodStart = params.get('periodStart');
+        const periodEnd = params.get('periodEnd');
+
+        if (surveyName) {
+            surveyData.name.ja = surveyName;
+            document.getElementById('surveyName').value = surveyName;
+        }
+        if (displayTitle) {
+            surveyData.displayTitle.ja = displayTitle;
+            document.getElementById('displayTitle').value = displayTitle;
+        }
+        if (memo) {
+            surveyData.memo = memo;
+            document.getElementById('memo').value = memo;
+        }
+        if (periodStart) {
+            surveyData.periodStart = periodStart;
+            document.getElementById('periodStart').value = periodStart;
+        }
+        if (periodEnd) {
+            surveyData.periodEnd = periodEnd;
+            document.getElementById('periodEnd').value = periodEnd;
+        }
+        // --- End New ---
+
         // Set initial language from global state
         currentLang = window.getCurrentLanguage ? window.getCurrentLanguage() : 'ja';
         switchLanguage(currentLang);
