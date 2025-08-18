@@ -102,10 +102,12 @@ async function initializePage() {
         const periodEnd = params.get('periodEnd');
 
         if (surveyName) {
+            if (typeof surveyData.name !== 'object' || surveyData.name === null) surveyData.name = {};
             surveyData.name.ja = surveyName;
             document.getElementById('surveyName').value = surveyName;
         }
         if (displayTitle) {
+            if (typeof surveyData.displayTitle !== 'object' || surveyData.displayTitle === null) surveyData.displayTitle = {};
             surveyData.displayTitle.ja = displayTitle;
             document.getElementById('displayTitle').value = displayTitle;
         }
