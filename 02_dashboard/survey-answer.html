@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpeedAd - アンケート回答</title>
+    <link rel="icon" href="assets/svg/speedad_logo.svg" type="image/svg+xml">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Material Icons CDN -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="service-top-style.css">
+    <!-- Custom Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+</head>
+<body class="bg-background text-on-background">
+
+<!-- 1. アプリケーション全体構造 -->
+<div class="relative flex min-h-screen flex-col overflow-x-hidden">
+
+    <!-- サイドバー用オーバーレイ -->
+    <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
+
+    <!-- 2. ヘッダー -->
+    <div id="header-placeholder"></div>
+
+    <div class="flex flex-1 pt-16 bg-background">
+        <!-- 3. サイドバー -->
+        <div id="sidebar-placeholder"></div>
+
+        <!-- 4. メインコンテンツ -->
+        <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
+            <div class="flex flex-col w-full max-w-2xl mx-auto flex-1">
+                <!-- パンくずリストコンテナ -->
+                <div id="breadcrumb-container" class="mb-4"></div>
+
+                <!-- アンケートコンテナ -->
+                <div id="survey-container" class="bg-surface p-6 sm:p-8 rounded-xl shadow-md">
+                    <!-- アンケートのタイトルや説明がここに挿入されます -->
+                    <div id="survey-header"></div>
+                    <!-- アンケートフォームがここに挿入されます -->
+                    <form id="survey-form"></form>
+                    <!-- 完了メッセージ -->
+                    <div id="completion-message" class="hidden text-center py-10">
+                        <span class="material-icons text-6xl text-primary">check_circle</span>
+                        <h2 class="text-2xl font-bold mt-4">ご回答ありがとうございます</h2>
+                        <p class="text-on-surface-variant mt-2">ご協力に感謝いたします。</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 5. フッター -->
+    <div id="footer-placeholder"></div>
+
+</div>
+
+<!-- JSファイル -->
+<script type="module" src="src/main.js"></script>
+<script type="module" src="src/survey-answer.js"></script>
+</body>
+</html>
