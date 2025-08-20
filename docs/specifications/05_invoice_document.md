@@ -1,87 +1,72 @@
-### 請求書ドキュメント仕様書 (案)
+### 請求書ドキュメント仕様書
 
 #### 1. 概要
 本ドキュメントは、システムから出力される請求書（PDF出力および印刷用HTML）の構造、表示項目、およびデザインに関する詳細な仕様を定義する。
 
 #### 2. 基本情報
 *   **ファイル名:** `invoice-print.html` (表示用HTML)
-*   **ベーステンプレート:** `seikyuusyo_sample.html` (このファイルはデザインの参考であり、`invoice-print.html` はこのテンプレートを直接利用するのではなく、独立したHTMLファイルとして構築され、動的なデータはJavaScript (`src/invoiceDetail.js`) によってレンダリングされる。)
-*   **出力形式:** 印刷、PDFダウンロードを想定したA4サイズレイアウト
+*   **出力形式:** 印刷、PDFダウンロードを想定したA4縦サイズレイアウト
 
-#### 2.2. 主要UI要素と動作
-*   **動的データ表示**: `invoice-print.html` は、URLパラメータから受け取った `invoiceId` に基づき、`src/invoiceDetail.js` からデータを取得し、HTML要素にレンダリングする。
-    *   `invoiceId`, `issueDate`, `dueDate`, `corporateName`, `contactPerson`, `usageMonth`, `subtotalTaxable`, `tax`, `subtotalNonTaxable`, `totalAmount` などの請求書情報。
-    *   `items` 配列から請求明細テーブルを動的に生成。
-    *   `seikyuusyo_sample.html` にある `mask-val` クラス（`●` で値を隠す）は、動的な値に置き換えられるため、実装時には使用しない。
-*   **デザイン・レイアウト**:
-    *   `docs/specifications/05_invoice_document.md` に記載されているフォント、余白、罫線、背景色、文字装飾、改ページルールを厳密に適用する。
-    *   **`seikyuusyo_sample.html` のCSSをベースとする**: `seikyuusyo_sample.html` に記述されているインラインCSS (`<style>` タグ内) を `invoice-print.html` のスタイリングの基礎とする。特に、A4サイズへの最適化、余白、フォントサイズ、行間、テーブルの罫線、背景色、文字装飾（太字、赤背景白文字、二重線など）は、このサンプルHTMLのスタイルを忠実に再現する。
-    *   **`seikyuusyo_sample.pdf` を最終的な視覚ガイドラインとする**: PDFの出力結果を参考に、要素の配置、ロゴのサイズ、テキストの揃え、全体的なバランスを調整し、視覚的な完成度を高める。
-    *   **ロゴの扱い**: `seikyu_logo.png` や `seikyu_syaban.png` などの画像ファイルが提供されている場合、それらを適切に配置する。
-*   **印刷トリガー**: ページロード完了後、JavaScriptで `window.print()` を自動的に呼び出す。
-*   **エラーハンドリング**:
-    *   データ取得失敗時や無効な `invoiceId` の場合、エラーメッセージを表示するか、空白ページを表示するなどの対応を検討する。この画面はユーザーが直接操作するものではないため、エラーメッセージはコンソール出力やログに記録する形でも良い。
-
-#### 2.3. 非機能要件への考慮
-*   **パフォーマンス**:
-    *   印刷ダイアログの表示を妨げないよう、データレンダリングは高速に行う。
-    *   画像（ロゴなど）は最適化された形式で提供し、ロード時間を短縮する。
-*   **セキュリティ**:
-    *   `invoiceId` を介して不正なデータが注入されないよう、サーバーサイドでの厳密な検証を前提とする。
-    *   この画面自体はユーザー入力を持たないため、XSSなどのクライアントサイドの脆弱性リスクは低いが、データ表示におけるサニタイズは引き続き重要。
-*   **アクセシビリティ**:
-    *   印刷物としての可読性を最優先する。
-*   **互換性**:
-    *   主要なブラウザ（Chrome, Firefox, Edge, Safari）での印刷結果の一貫性を確認する。
-
-#### 3. 請求書構成要素と表示項目
-
-
-請求書は以下の主要なセクションで構成される。各項目は、`src/invoiceDetail.js` の `sampleInvoiceDetails` データ構造を基に、動的に表示される。
-
-##### 3.1. ヘッダー情報
-*   **発行日:** `yyyy/mm/dd` 形式で表示。
-*   **請求書番号:** 合計10桁（西暦下2桁+企業番号5桁+発行連番3桁）の形式で表示。
-
-...
-
-##### 3.10. 動的データ項目 (Variables)
+#### 3. 動的データ項目 (Variables)
 
 `invoice-print.html` に埋め込まれる動的なデータ項目は以下の通り。これらは `src/invoiceDetail.js` の `sampleInvoiceDetails` オブジェクトのプロパティに対応する。
 
-| 変数名 (JSプロパティ名) | HTMLプレースホルダー | データ型 | 説明 | フォーマット例 |
-| :-------------------- | :------------------- | :------- | :--- | :------------- |
-| `invoiceId`           | `請求書番号: ${data.invoiceId}` | String   | 請求書の一意な識別子。合計10桁（西暦下2桁+企業番号5桁+発行連番3桁）。 | `2500123001`   |
-| `issueDate`           | `発行日: ${data.issueDate}` | String   | 請求書の発行日。 | `2025/07/31`   |
-| `dueDate`             | `お支払期日: ${data.dueDate}` | String   | 請求書の支払期日。 | `2025年08月31日` |
-| `corporateName`       | `${data.corporate_name} 御中` | String   | 請求先の会社名。 | `株式会社サンプル商事` |
-| `seikyuName`          | `${data.seikyu_name} 様` | String   | 請求先の担当者名。 | `経理部御担当者様` |
-| `usageMonth`          | `SPEED AD利用料 ${data.利用年月(YYYY年MM月)}月分` | String   | 請求対象の利用年月。 | `2025年7月`    |
-| `subtotalTaxable`     | `小計(課税対象)` の値 | Number   | 課税対象の小計金額。 | `50000`        |
-| `tax`                 | `消費税等` の値      | Number   | 消費税額。       | `5000`         |
-| `subtotalNonTaxable`  | `小計(非課税)` の値  | Number   | 非課税の小計金額。 | `0`            |
-| `totalAmount`         | `合計ご請求金額` の値 | Number   | 合計請求金額（税込）。 | `55000`        |
-| `items`               | 請求明細テーブルの行   | Array    | 請求明細の配列。各要素は以下のプロパティを持つオブジェクト。 |                |
-| `items[].no`          | `No.` 列             | Number   | 明細の連番。     | `1`            |
-| `items[].itemName1`   | `品名1` 列           | String   | 明細の品名1。    | `アンケート名A` |
-| `items[].itemName2`   | `品名2` 列           | String   | 明細の品名2。    | `名刺データ化費用` |
-| `items[].quantity`    | `数量` 列            | Number / String | 数量。小計行では空文字。 | `100` / `""`   |
-| `items[].unitPrice`   | `単価` 列            | Number / String | 単価。小計行では空文字。 | `200` / `""`   |
-| `items[].amount`      | `金額` 列            | Number / String | 金額。小計行では空文字。 | `20000` / `""` |
+| 変数名 (JSプロパティ名) | 説明 | フォーマット例 |
+| :--- | :--- | :--- |
+| `invoiceId` | 請求書の一意な識別子。 | `2500123001` |
+| `issueDate` | 請求書の発行日。 | `2025/07/31` |
+| `dueDate` | 請求書の支払期日。 | `2025年08月31日` |
+| `corporateName` | 請求先の会社名。 | `株式会社サンプル商事` |
+| `seikyuName` | 請求先の担当者名。 | `経理部御担当者様` |
+| `totalAmount` | 合計請求金額（税込）。 | `55000` |
+| `items` | 請求明細の配列。 | (下記参照) |
 
-#### 4. デザイン・レイアウト
-*   **フォント:** Meiryo, Yu Gothic, sans-serif を優先。
-*   **余白:** A4サイズ（210mm x 297mm）を基準に、上下左右20mm程度の余白を確保。
-*   **罫線:** 各テーブルは黒色の1px実線で罫線を引く。
-*   **背景色:**
-    *   テーブルヘッダー、振込先情報のラベル列: `#f2f2f2`
-    *   合計ご請求金額行: `#e0e0e0`
-*   **文字装飾:**
-    *   請求書タイトル、宛先会社名・担当者名、合計ご請求金額は太字。
-    *   請求書タイトル下には二重線。
-    *   「アブロードアウトソーシング株式会社」の「株式会社」は赤背景白文字。
-*   **改ページ:** 複数ページにわたる場合、`page-break-before: always;` を使用して明細テーブルの途中で改ページされないように制御。
+**`items` 配列の構造:**
 
-#### 5. 印刷・PDF出力機能
-*   **印刷ボタン:** ブラウザの印刷ダイアログを呼び出す。
-*   **PDFダウンロードボタン:** 画面内容をPDFとしてダウンロードする（実装は別途。クライアントサイドでの`html2pdf.js`のようなライブラリの利用、またはサーバーサイドでのPDF生成APIの利用を検討する）。
+| プロパティ名 | データ型 | 説明 |
+| :--- | :--- | :--- |
+| `no` | Number | 明細の連番。 |
+| `itemName1` | String | 明細の品名1。 |
+| `itemName2` | String | 明細の品名2。 |
+| `quantity` | Number / String | 数量。小計行では空文字。 |
+| `unitPrice` | Number / String | 単価。小計行では空文字。 |
+| `amount` | Number / String | 金額。小計行では空文字。 |
+
+
+#### 4. デザイン・レイアウト詳細仕様
+
+`seikyuusyo_sample.html` および `seikyuusyo_sample.pdf` を視覚的ガイドラインとし、以下の具体的なCSSスタイルを適用することでレイアウトを再現する。
+
+| セレクタ / 要素 | CSSプロパティ | 値 | 備考 |
+| :--- | :--- | :--- | :--- |
+| `body` | `font-family` | `'Meiryo', 'Yu Gothic', sans-serif` | 基本フォント |
+| | `font-size` | `10pt` | 基本フォントサイズ |
+| | `color` | `#333333` | 基本文字色 |
+| `.container` | `width` | `210mm` | A4横幅 |
+| | `padding` | `20mm` | 上下左右の余白 |
+| `h1.invoice-title` | `font-size` | `24pt`| 請求書タイトル |
+| | `font-weight` | `bold` | |
+| | `text-align` | `center` | |
+| | `border-bottom` | `3px double #333333` | |
+| | `margin-bottom` | `30px` | |
+| `#customer-info` | `font-size` | `12pt` | 宛先情報 |
+| | `border-bottom` | `1px solid #cccccc` | |
+| | `padding-bottom` | `10px` | |
+| `#customer-info .company-name` | `font-weight` | `bold` | 宛先の会社名 |
+| `#total-amount-table` | `background-color`| `#e0e0e0` | 合計請求額テーブル |
+| | `font-weight` | `bold` | |
+| `#total-amount-table td:last-child` | `font-size` | `18pt` | 合計請求額の金額 |
+| `#invoice-items-table` | `width` | `100%` | 明細テーブル |
+| | `border-collapse`| `collapse` | |
+| `#invoice-items-table th, td` | `border` | `1px solid #cccccc` | |
+| | `padding` | `8px` | |
+| `#invoice-items-table thead th` | `background-color`| `#f2f2f2` | 明細テーブルヘッダー |
+| `#company-info .special-char` | `background-color`| `red` | 発行元情報の「株式会社」など |
+| | `color` | `white` | |
+| | `padding` | `2px` | |
+
+#### 5. 印刷とPDF出力
+
+- **印刷トリガー**: `invoice-print.html` のページロード完了後、JavaScriptで `window.print()` を自動的に呼び出す。
+- **改ページ制御**: 複数ページにわたる場合、CSSの `page-break-inside: avoid;` をテーブルの行 (`tr`) に適用し、行の途中で改ページされるのを防ぐ。
+- **PDFダウンロード**: `invoice-detail.html` の「PDFダウンロード」ボタンは、現時点ではサンプルPDF (`seikyuusyo_sample.pdf`) へのリンクとする。将来的には、表示されているHTMLから動的にPDFを生成するライブラリ（例: `html2pdf.js`）の導入を検討する。
