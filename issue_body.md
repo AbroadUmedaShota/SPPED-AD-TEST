@@ -1,9 +1,19 @@
-### Summary
-This task is to update the project documentation to reflect the recently implemented features:
-1.  The new Survey Answering Page.
-2.  The data persistence feature from the New Survey Modal to the Survey Creation Page.
+### 事前調査の要約
+`docs/specifications/` 以下の以下のファイルにコミットされていない変更があります。
+- `docs/specifications/00_screen_requirements.md`
+- `docs/specifications/01_screen_flow.md`
+- `docs/specifications/02_survey_creation.md`
+- `docs/specifications/03_ux_group_creation_modal.md`
+- `docs/specifications/04_invoice_screen.md`
+- `docs/specifications/05_invoice_document.md`
+- `docs/specifications/06_speed_review.md`
 
-### Scope of Work
-- **`docs/00_PROJECT_OVERVIEW.md`**: Add the "Survey Answering Functionality" to the list of main features.
-- **`docs/specifications/00_screen_requirements.md`**: Add the "Survey Answering Page" to the list of screens.
-- **`docs/specifications/02_survey_creation.md`**: Update the description of the new survey modal to reflect that it now passes data to the creation page via query parameters.
+これらの変更は現在 `main` ブランチでコミットされていません。
+
+### 説明
+このIssueは、`docs/specifications/` ディレクトリ内のコミットされていない変更をコミットし、`main` ブランチにマージすることを目的としています。これらの変更は仕様書ドキュメントの更新に関連しています。
+
+### 完了の定義
+- [ ] `docs/specifications/` 内のコミットされていないすべての変更がコミットされる。
+- [ ] これらの変更に対して新しいPull Requestが作成される。
+- [ ] Pull Requestが `main` ブランチにマージされる。
