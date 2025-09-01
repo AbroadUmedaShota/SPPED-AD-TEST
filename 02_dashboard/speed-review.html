@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="service-top-style.css">
+    <link rel="stylesheet" href="../sample/style.css">
     <!-- Custom Fonts -->
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
     <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
@@ -26,6 +27,7 @@
     <div class="flex flex-1 pt-16 bg-background">
         <div id="sidebar-placeholder"></div>
         <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
+            
             <div class="flex flex-col w-full max-w-7xl mx-auto flex-1">
                 <!-- パンくずリストコンテナ -->
                 <div id="breadcrumb-container" class="mb-4"></div>
@@ -34,6 +36,7 @@
                 <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant">
                     <h1 class="text-on-background text-2xl sm:text-3xl font-bold leading-tight tracking-tight">SPEEDレビュー</h1>
                     <p id="review-survey-name" class="text-sm text-on-surface-variant">アンケート名: (ここにアンケート名が入ります)</p>
+                    
                 </div>
 
                 <!-- ツールバーエリア -->
@@ -50,8 +53,8 @@
                 </div>
 
                 <!-- 回答データテーブル -->
-                <div class="overflow-x-auto rounded-xl border border-outline-variant bg-surface relative min-h-[300px]">
-                    <table class="w-full min-w-[1000px] divide-y divide-outline-variant review-table" id="reviewTable">
+                <div class="rounded-xl border border-outline-variant bg-surface relative min-h-[300px]">
+                    <table class="w-full divide-y divide-outline-variant review-table" id="reviewTable">
                         <thead class="bg-surface-variant">
                             <tr>
                                 <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-28">アクション</th>
@@ -59,10 +62,26 @@
                                 <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider">回答日時</th>
                                 <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider">氏名</th>
                                 <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider">会社名</th>
-                                <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider">主な業界(Q.02)</th>
-                                <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider">緊急度(Q.06)</th>
-                            </tr>
-                        </thead>
+                                <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider">
+                                    <select id="industryQuestionSelect" class="bg-transparent border-none text-on-surface-variant text-xs font-semibold uppercase tracking-wider focus:ring-0 focus:outline-none pr-2">
+                                        <option value="Q.01_社員CD（8桁）">Q.01_社員CD（8桁）</option>
+                                        <option value="Q.02_お客様の主な業界" selected>Q.02_お客様の主な業界</option>
+                                        <option value="Q.03_打ち合わせ種類（複数選択可）">Q.03_打ち合わせ種類（複数選択可）</option>
+                                        <option value="Q.04_【打合せ内容】フリー入力">Q.04_【打合せ内容】フリー入力</option>
+                                        <option value="Q.05_【打合せ内容】イメージ図・ポンチ絵">Q.05_【打合せ内容】イメージ図・ポンチ絵</option>
+                                        <option value="Q.06_【打合せ内容】緊急度（複数選択可）">Q.06_【打合せ内容】緊急度（複数選択可）</option>
+                                        <option value="Q.07_【打合せ内容】営業フォロー担当者（例：支店名＋営業氏名）">Q.07_【打合せ内容】営業フォロー担当者（例：支店名＋営業氏名）</option>
+                                        <option value="Q.08_【案件情報】案件名（ライン名・装置名など）">Q.08_【案件情報】案件名（ライン名・装置名など）</option>
+                                        <option value="Q.09_【案件情報】必要時期(見込時期)">Q.09_【案件情報】必要時期(見込時期)</option>
+                                        <option value="Q.10_【案件情報】案件種別">Q.10_【案件情報】案件種別</option>
+                                        <option value="Q.11_【案件情報】開発要望（THKに対する新製品の開発要望があればチェックを入れてください。）">Q.11_【案件情報】開発要望（THKに対する新製品の開発要望があればチェックを入れてください。）</option>
+                                        <option value="Q.12_カタログの請求：総合">Q.12_カタログの請求：総合</option>
+                                        <option value="Q.13_カタログ請求：要素部品">Q.13_カタログ請求：要素部品</option>
+                                        <option value="Q.14_カタログ請求：事業開発">Q.14_カタログ請求：事業開発</option>
+                                        <option value="Q.15_カタログ請求：IMT">Q.15_カタログ請求：IMT</option>
+                                        <option value="Q.16_カタログの請求：フリー入力(上記カタログ以外の場合)">Q.16_カタログの請求：フリー入力(上記カタログ以外の場合)</option>
+                                    </select>
+                                </th>
                         <tbody class="divide-y divide-outline-variant" id="reviewTableBody">
                             <!-- JSにより動的に行が挿入されます -->
                         </tbody>

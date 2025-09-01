@@ -7,7 +7,7 @@ let groups = []; // メモリ上のグループデータ
  */
 export async function fetchGroups() {
     try {
-        const response = await fetch('data/groups.json');
+        const response = await fetch('../02_dashboard/data/groups.json');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }

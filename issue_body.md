@@ -17,3 +17,7 @@
 - `docs/architecture/02_data_model.md` が更新され、フロントエンド用のデータオブジェクトとバックエンドのDBスキーマが定義されました。
 - 既存のモックデータは `02_dashboard/data/` に格納されています。
 - これらの整合性を確認し、実装に反映させる必要があります。
+
+`speed-review.html`に表示される「詳細」ボタンをクリックした際に、`reviewDetailModal.html`をモーダルとして表示します。
+
+モーダルの内容は、`C:\Users\user\Desktop\workspace20\SPPED-AD-TEST\sample\0008000154.csv` ファイルを読み込み、そのアンケート回答を縦スクロール可能な形式で表示するように実装します。
