@@ -1,8 +1,8 @@
-This commit introduces the foundational elements for multilingual support within the application.
+Closes #45
 
-- **New Documentation:** Added initial planning and requirements documents for multilingualization under `docs/99.多言語化対応にむけて/`.
-- **Core Feature Changes:** Modified `02_dashboard/surveyCreation.html`, `data/sample_survey.json`, `src/surveyCreation.js`, and `src/ui/surveyRenderer.js` to support dynamic content loading and rendering for multiple languages.
-- **Project Documentation:** Updated `docs/00_PROJECT_OVERVIEW.md` and `docs/01_ARCHITECTURE.md` to reflect the inclusion of multilingual capabilities and their architectural implications.
-- **Repository Setup:** Added `.gitignore` and `README.md` for proper version control and project overview.
+### Description
 
-Closes #33
+Implement functionality to read survey answers from a CSV file and display them in a modal when the 'Details' button is clicked on the speed-review page.
+
+- Modified `reviewDetailModal.html` to create a container for the CSV data and enable vertical scrolling.
+- Updated `speed-review.js` to fetch and parse the CSV file, generate an HTML table, and inject it into the modal.
