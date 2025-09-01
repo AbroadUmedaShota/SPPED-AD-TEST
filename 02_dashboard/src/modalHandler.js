@@ -116,7 +116,6 @@ export function openModal(modalId) {
         modal.classList.remove('hidden');
         requestAnimationFrame(() => {
             modal.dataset.state = 'open';
-            modal.querySelector('.modal-content-transition').dataset.state = 'open';
         });
         lockScroll();
 
