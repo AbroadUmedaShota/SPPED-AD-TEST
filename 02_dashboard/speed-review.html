@@ -11,6 +11,7 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="service-top-style.css">
     <link rel="stylesheet" href="../sample/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <!-- Custom Fonts -->
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
     <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
@@ -48,6 +49,12 @@
                             <label for="searchKeyword" class="input-label">キーワードで検索</label>
                             <span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl pointer-events-none">search</span>
                         </div>
+                        <!-- 日時フィルター -->
+                        <div class="input-group lg:col-span-1 relative max-w-xs">
+                            <input type="text" id="dateFilterInput" placeholder=" " class="input-field pl-10 pr-10">
+                            <label for="dateFilterInput" class="input-label">日時で絞り込み</label>
+                            <span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl pointer-events-none">event</span>
+                        </div>
                         <!-- 他のフィルター（例：日付）はここに追加 -->
                     </div>
                 </div>
@@ -58,10 +65,10 @@
                         <thead class="bg-surface-variant">
                             <tr>
                                 <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-28">アクション</th>
-                                <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider">回答ID</th>
-                                <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider">回答日時</th>
-                                <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider">氏名</th>
-                                <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider">会社名</th>
+                                <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-1/6">回答ID</th>
+                                <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-1/6">回答日時</th>
+                                <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-1/6">氏名</th>
+                                <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-1/6">会社名</th>
                                 <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider">
                                     <select id="industryQuestionSelect" class="bg-transparent border-none text-on-surface-variant text-xs font-semibold uppercase tracking-wider focus:ring-0 focus:outline-none pr-2">
                                         <option value="Q.01_社員CD（8桁）">Q.01_社員CD（8桁）</option>

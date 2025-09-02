@@ -23,26 +23,28 @@ export function populateTable(data, onDetailClick, selectedIndustryQuestion) {
         const row = document.createElement('tr');
         row.className = 'hover:bg-surface-bright transition-colors';
 
-                const lastName = item.businessCard?.group2?.lastName || '';
+        const formatCell = (value) => (value === null || value === undefined || value === '') ? '-' : value;
+
+        const lastName = item.businessCard?.group2?.lastName || '';
         const firstName = item.businessCard?.group2?.firstName || '';
-        const fullName = lastName; // 姓のみを表示
+        const fullName = `${lastName} ${firstName}`.trim();
         const companyName = item.businessCard?.group3?.companyName || '';
 
         const getAnswer = (questionText) => {
             const detail = item.details.find(d => d.question === questionText);
-            if (!detail) return '不明'; // 回答が見つからない場合は「不明」を返す
+            if (!detail) return '-'; // 回答が見つからない場合は「-」を返す
             const answer = Array.isArray(detail.answer) ? detail.answer.join(', ') : detail.answer;
-            return answer === '' ? '不明' : answer; // 回答が空文字列の場合も「不明」を返す
+            return answer === '' ? '-' : answer; // 回答が空文字列の場合も「-」を返す
         };
 
         row.innerHTML = `
             <td class="px-4 py-3 whitespace-nowrap">
                 <button data-answer-id="${item.answerId}" class="detail-btn text-primary hover:text-primary-dark text-sm font-semibold">詳細</button>
             </td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-on-surface overflow-hidden text-ellipsis">${item.answerId}</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-on-surface overflow-hidden text-ellipsis">${item.answeredAt}</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-on-surface overflow-hidden text-ellipsis">${lastName} ${firstName}</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-on-surface overflow-hidden text-ellipsis">${companyName}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-sm text-on-surface overflow-hidden text-ellipsis">${formatCell(item.answerId)}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-sm text-on-surface overflow-hidden text-ellipsis">${formatCell(item.answeredAt)}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-sm text-on-surface overflow-hidden text-ellipsis">${formatCell(fullName)}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-sm text-on-surface overflow-hidden text-ellipsis">${formatCell(companyName)}</td>
             <td class="px-4 py-3 whitespace-nowrap text-sm text-on-surface overflow-hidden text-ellipsis">${(() => {
                 const answer = getAnswer(selectedIndustryQuestion);
                 return answer.length > 25 ? answer.substring(0, 25) + '...' : answer;
@@ -67,30 +69,60 @@ export function populateModal(item) {
 
     if (!cardDetailsContainer || !answerDetailsContainer) return;
 
-    // 名刺情報
+    // Clear previous content
     cardDetailsContainer.innerHTML = '';
+    answerDetailsContainer.innerHTML = '';
+
+    // --- Business Card Details ---
     if (item.businessCard) {
         const card = item.businessCard;
+        
         const fields = {
-            '会社名': card.group3?.companyName,
-            '氏名': `${card.group2?.lastName || ''} ${card.group2?.firstName || ''}`,
-            '部署・役職': `${card.group3?.department || ''} ${card.group3?.position || ''}`,
-            'メールアドレス': card.group1?.email,
-            '電話番号': card.group5?.mobile || card.group5?.tel1,
-            '住所': `${card.group4?.address1 || ''} ${card.group4?.address2 || ''}`
+            '会社名': { value: card.group3?.companyName, key: 'companyName' },
+            '氏名': { value: `${card.group2?.lastName || ''} ${card.group2?.firstName || ''}`.trim(), key: 'fullName' }, // Note: split logic needed for editing
+            '部署': { value: card.group3?.department, key: 'department' },
+            '役職': { value: card.group3?.position, key: 'position' },
+            'メールアドレス': { value: card.group1?.email, key: 'email' },
+            '住所': { value: `${card.group4?.address1 || ''} ${card.group4?.address2 || ''}`.trim(), key: 'address' }, // Note: split logic needed for editing
         };
 
-        for (const [label, value] of Object.entries(fields)) {
+        for (const [label, field] of Object.entries(fields)) {
+            if (field.value && field.value.trim() !== '') {
+                cardDetailsContainer.innerHTML += `
+                    <div class="py-2">
+                        <p class="text-sm text-on-surface-variant">${label}</p>
+                        <div data-field="${field.key}" class="text-lg font-semibold text-on-surface">${field.value}</div>
+                    </div>`;
+            }
+        }
+
+        const phoneNumbers = [
+            { label: '携帯', number: card.group5?.mobile, key: 'mobile' },
+            { label: 'TEL1', number: card.group5?.tel1, key: 'tel1' },
+            { label: 'TEL2', number: card.group5?.tel2, key: 'tel2' },
+            { label: 'FAX', number: card.group5?.fax, key: 'fax' },
+        ].filter(p => p.number);
+
+        if (phoneNumbers.length > 0) {
+            let phoneHtml = '<div class="py-2"><p class="text-sm text-on-surface-variant">電話番号</p><div class="text-lg font-semibold text-on-surface">';
+            phoneNumbers.forEach(p => {
+                phoneHtml += `<div data-field="${p.key}"><span class="text-sm">${p.label}:</span> ${p.number}</div>`;
+            });
+            phoneHtml += '</div></div>';
+            cardDetailsContainer.innerHTML += phoneHtml;
+        }
+
+        const url = card.group6?.url;
+        if (url && url.trim() !== '') {
             cardDetailsContainer.innerHTML += `
-                <div>
-                    <p class="text-sm text-on-surface-variant">${label}</p>
-                    <p class="text-lg font-semibold text-on-surface">${value || '-'}</p>
+                <div class="py-2">
+                    <p class="text-sm text-on-surface-variant">URL</p>
+                    <div data-field="url"><a href="${url}" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">${url}</a></div>
                 </div>`;
         }
     }
 
-    // アンケート回答
-    answerDetailsContainer.innerHTML = '';
+    // --- Survey Answer Details ---
     item.details.forEach(detail => {
         const answer = Array.isArray(detail.answer) ? detail.answer.join(', ') : detail.answer;
         answerDetailsContainer.innerHTML += `
