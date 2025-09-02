@@ -1,217 +1,1135 @@
-/**
- * @file speedReviewService.js
- * SPEEDレビュー画面に関するデータ操作を扱うモジュール
- */
-
-/**
- * CSV文字列をパースしてオブジェクトの配列に変換します。
- * @param {string} csvString - パースするCSV文字列。
- * @returns {Array<Object>} パースされたオブジェクトの配列。
- */
-function parseCsv(csvString) {
-    // BOM (Byte Order Mark) を削除する
-    if (csvString.charCodeAt(0) === 0xFEFF) {
-        csvString = csvString.slice(1);
+class SpeedReviewService {
+    constructor() {
+        this.surveys = [];
+        this.surveyAnswers = [];
+        this.businessCards = [];
     }
-    const lines = csvString.split(/\r\n|\n/).filter(line => line.trim() !== '');
-    if (lines.length === 0) return [];
 
-    const headers = lines[0].split(',').map(header => header.trim().replace(/^"|"$/g, ''));
-    console.log('parseCsv: Headers:', headers);
-    const data = [];
+    async loadJsonData(surveyFilePath, surveyAnswersFilePath, businessCardsFilePath) {
+        try {
+            // Temporarily hardcode JSON data to bypass server issues
+            this.surveys = [
+  {
+    "id": "SURVEY8j2l0x",
+    "groupId": "GROUP001",
+    "name": {
+      "ja": "新商品に関する満足度調査",
+      "en": "New Product Satisfaction Survey"
+    },
+    "displayTitle": {
+      "ja": "お客様アンケートにご協力ください",
+      "en": "Please Cooperate with the Customer Survey"
+    },
+    "description": {
+      "ja": "製品Xのリリース後の顧客満足度を測定します。",
+      "en": "This survey measures customer satisfaction after the release of Product X."
+    },
+    "memo": "営業部Aチームからの依頼。ターゲット層：20代〜30代のビジネスパーソン。",
+    "status": "会期中",
+    "answerCount": 143,
+    "realtimeAnswers": 7,
+    "periodStart": "2025-05-01",
+    "periodEnd": "2025-05-31",
+    "dataCompletionDate": "2025-06-10",
+    "plan": "Standard",
+    "deadline": "2025-06-30",
+    "estimatedBillingAmount": 60000,
+    "bizcardEnabled": true,
+    "bizcardRequest": 160,
+    "bizcardCompletionCount": 140,
+    "thankYouEmailSettings": "自動送信"
+  },
+  {
+    "id": "SURVEYp91ebz",
+    "groupId": "GROUP001",
+    "name": {
+      "ja": "既存顧客サービス利用状況調査",
+      "en": "Existing Customer Service Usage Survey"
+    },
+    "displayTitle": {
+      "ja": "サービスご利用に関するアンケート",
+      "en": "Survey on Service Usage"
+    },
+    "description": {
+      "ja": "既存顧客のサービス利用状況を把握するための調査です。",
+      "en": "This survey is to understand the service usage of existing customers."
+    },
+    "memo": "CSチーム依頼。リピーター中心。",
+    "status": "アップ完了",
+    "answerCount": 210,
+    "realtimeAnswers": 3,
+    "periodStart": "2025-04-10",
+    "periodEnd": "2025-04-20",
+    "dataCompletionDate": "2025-04-30",
+    "plan": "Premium",
+    "deadline": "2025-05-15",
+    "estimatedBillingAmount": 75000,
+    "bizcardEnabled": true,
+    "bizcardRequest": 210,
+    "bizcardCompletionCount": 205,
+    "thankYouEmailSettings": "手動"
+  },
+  {
+    "id": "SURVEY5t7v9q",
+    "groupId": "GROUP001",
+    "name": {
+      "ja": "市場動向調査",
+      "en": "Market Trend Survey"
+    },
+    "displayTitle": {
+      "ja": "最新の市場トレンド調査アンケート",
+      "en": "Latest Market Trend Survey"
+    },
+    "description": {
+      "ja": "市場のトレンドや動向を調査するためのアンケートです。",
+      "en": "This survey is to investigate market trends and movements."
+    },
+    "memo": "営業企画部より依頼。競合分析目的。",
+    "status": "期限切れ",
+    "answerCount": 80,
+    "realtimeAnswers": 0,
+    "periodStart": "2025-03-01",
+    "periodEnd": "2025-03-15",
+    "dataCompletionDate": "2025-03-25",
+    "plan": "Standard",
+    "deadline": "2025-04-10",
+    "estimatedBillingAmount": 40000,
+    "bizcardEnabled": true,
+    "bizcardRequest": 85,
+    "bizcardCompletionCount": 80,
+    "thankYouEmailSettings": "自動送信"
+  },
+  {
+    "id": "SURVEYq0hv93",
+    "groupId": "GROUP001",
+    "name": {
+      "ja": "ユーザー行動分析アンケート",
+      "en": "User Behavior Analysis Survey"
+    },
+    "displayTitle": {
+      "ja": "ユーザー行動に関するアンケート",
+      "en": "Survey on User Behavior"
+    },
+    "description": {
+      "ja": "ユーザーの行動や嗜好を分析するための調査です。",
+      "en": "This survey is to analyze user behavior and preferences."
+    },
+    "memo": "マーケティング部依頼。ターゲット：30代〜40代。",
+    "status": "データ化中",
+    "answerCount": 95,
+    "realtimeAnswers": 4,
+    "periodStart": "2025-05-10",
+    "periodEnd": "2025-05-20",
+    "dataCompletionDate": "2025-05-30",
+    "plan": "Premium",
+    "deadline": "2025-06-15",
+    "estimatedBillingAmount": 50000,
+    "bizcardEnabled": true,
+    "bizcardRequest": 100,
+    "bizcardCompletionCount": 90,
+    "thankYouEmailSettings": "設定なし"
+  },
+  {
+    "id": "SURVEYxejp37",
+    "groupId": "GROUP001",
+    "name": {
+      "ja": "オンラインセミナー参加者アンケート",
+      "en": "Online Seminar Participant Survey"
+    },
+    "displayTitle": {
+      "ja": "オンラインセミナーご参加の皆様へ",
+      "en": "To All Participants of the Online Seminar"
+    },
+    "description": {
+      "ja": "オンラインセミナー後の参加者アンケートです。",
+      "en": "This is a survey for participants after the online seminar."
+    },
+    "memo": "マーケティング部。フォローアップ用。",
+    "status": "会期中",
+    "answerCount": 65,
+    "realtimeAnswers": 2,
+    "periodStart": "2025-05-25",
+    "periodEnd": "2025-05-25",
+    "dataCompletionDate": "2025-06-05",
+    "plan": "Standard",
+    "deadline": "2025-06-25",
+    "estimatedBillingAmount": 30000,
+    "bizcardEnabled": true,
+    "bizcardRequest": 70,
+    "bizcardCompletionCount": 65,
+    "thankYouEmailSettings": "自動送信"
+  },
+  {
+    "id": "SURVEYrjfh20",
+    "groupId": "GROUP001",
+    "name": {
+      "ja": "新規リード獲得キャンペーン",
+      "en": "New Lead Generation Campaign"
+    },
+    "displayTitle": {
+      "ja": "新規リード獲得アンケート",
+      "en": "New Lead Generation Survey"
+    },
+    "description": {
+      "ja": "新規潜在顧客の情報収集を目的としたアンケートです。",
+      "en": "This survey is for collecting new potential customers."
+    },
+    "memo": "営業企画部案件。主に若年層対象。",
+    "status": "会期前",
+    "answerCount": 0,
+    "realtimeAnswers": 0,
+    "periodStart": "2025-06-10",
+    "periodEnd": "2025-06-20",
+    "dataCompletionDate": "未定",
+    "plan": "Standard",
+    "deadline": "2025-07-20",
+    "estimatedBillingAmount": "N/A",
+    "bizcardEnabled": false,
+    "bizcardRequest": 0,
+    "bizcardCompletionCount": 100,
+    "thankYouEmailSettings": "設定なし"
+  },
+  {
+    "id": "SURVEYhbtmw2",
+    "groupId": "GROUP001",
+    "name": {
+      "ja": "サービス解約理由調査",
+      "en": "Service Cancellation Reason Survey"
+    },
+    "displayTitle": {
+      "ja": "サービスご解約理由について",
+      "en": "Regarding the Reason for Service Cancellation"
+    },
+    "description": {
+      "ja": "解約理由を把握し、サービス改善に役立てる調査です。",
+      "en": "This survey is to understand the reasons for cancellation and use them for improvement."
+    },
+    "memo": "業務改善チーム。匿名回答対応。",
+    "status": "削除済み",
+    "answerCount": 18,
+    "realtimeAnswers": 0,
+    "periodStart": "2025-01-01",
+    "periodEnd": "2025-01-05",
+    "dataCompletionDate": "未定",
+    "plan": "Standard",
+    "deadline": "2025-02-05",
+    "estimatedBillingAmount": "N/A",
+    "bizcardEnabled": false,
+    "bizcardRequest": 0,
+    "bizcardCompletionCount": 100,
+    "thankYouEmailSettings": "設定なし"
+  },
+  {
+    "id": "SURVEYkm0w1a",
+    "groupId": "GROUP001",
+    "name": {
+      "ja": "社内満足度アンケート",
+      "en": "Internal Satisfaction Survey"
+    },
+    "displayTitle": {
+      "ja": "従業員の満足度調査",
+      "en": "Employee Satisfaction Survey"
+    },
+    "description": {
+      "ja": "従業員の職場環境に対する満足度を測定します。",
+      "en": "This survey measures employee satisfaction with the work environment."
+    },
+    "memo": "人事部案件。全社対象。",
+    "status": "データ化なし",
+    "answerCount": 450,
+    "realtimeAnswers": 0,
+    "periodStart": "2025-03-01",
+    "periodEnd": "2025-03-10",
+    "dataCompletionDate": "未定",
+    "plan": "Standard",
+    "deadline": "未定",
+    "estimatedBillingAmount": "N/A",
+    "bizcardEnabled": false,
+    "bizcardRequest": 0,
+    "bizcardCompletionCount": 100,
+    "thankYouEmailSettings": "設定なし"
+  },
+  {
+    "id": "SURVEYu2q9md",
+    "groupId": "GROUP001",
+    "name": {
+      "ja": "製品ベータテストフィードバック",
+      "en": "Product Beta Test Feedback"
+    },
+    "displayTitle": {
+      "ja": "ベータテストご協力のお願い",
+      "en": "Request for Cooperation in Beta Test"
+    },
+    "description": {
+      "ja": "新機能のベータテストに関するユーザーからのフィードバックを集めます。",
+      "en": "This survey collects feedback from users regarding the beta test of new features."
+    },
+    "memo": "製品開発部。ベータ参加者限定。",
+    "status": "期限切れ",
+    "answerCount": 95,
+    "realtimeAnswers": 0,
+    "periodStart": "2024-11-01",
+    "periodEnd": "2024-11-15",
+    "dataCompletionDate": "2024-11-30",
+    "plan": "Standard",
+    "deadline": "2025-12-15",
+    "estimatedBillingAmount": 40000,
+    "bizcardEnabled": true,
+    "bizcardRequest": 100,
+    "bizcardCompletionCount": 95,
+    "thankYouEmailSettings": "手動"
+  },
+  {
+    "id": "SURVEYf63p4g",
+    "groupId": "GROUP001",
+    "name": {
+      "ja": "市場動向調査",
+      "en": "Market Trend Survey"
+    },
+    "displayTitle": {
+      "ja": "市場トレンド調査アンケート",
+      "en": "Market Trend Survey"
+    },
+    "description": {
+      "ja": "市場のトレンドや動向を調査するためのアンケートです。",
+      "en": "This survey is to investigate market trends and movements."
+    },
+    "memo": "営業企画部より依頼。新規市場開拓用。",
+    "status": "会期中",
+    "answerCount": 130,
+    "realtimeAnswers": 5,
+    "periodStart": "2025-04-01",
+    "periodEnd": "2025-04-15",
+    "dataCompletionDate": "2025-04-25",
+    "plan": "Premium",
+    "deadline": "2025-05-10",
+    "estimatedBillingAmount": 55000,
+    "bizcardEnabled": true,
+    "bizcardRequest": 135,
+    "bizcardCompletionCount": 130,
+    "thankYouEmailSettings": "自動送信"
+  },
+  {
+    "id": "SURVEYdw40ra",
+    "groupId": "GROUP001",
+    "name": {
+      "ja": "顧客満足度調査",
+      "en": "Customer Satisfaction Survey"
+    },
+    "displayTitle": {
+      "ja": "製品満足度アンケート",
+      "en": "Product Satisfaction Survey"
+    },
+    "description": {
+      "ja": "製品の満足度に関するアンケートです。",
+      "en": "This survey is to understand the service usage of existing customers."
+    },
+    "memo": "マーケティング部。新規顧客中心。",
+    "status": "アップ完了",
+    "answerCount": 180,
+    "realtimeAnswers": 6,
+    "periodStart": "2025-05-01",
+    "periodEnd": "2025-05-20",
+    "dataCompletionDate": "2025-06-01",
+    "plan": "Standard",
+    "deadline": "2025-06-15",
+    "estimatedBillingAmount": 65000,
+    "bizcardEnabled": true,
+    "bizcardRequest": 185,
+    "bizcardCompletionCount": 180,
+    "thankYouEmailSettings": "手動"
+  },
+  {
+    "id": "SURVEYm4ld2f",
+    "groupId": "GROUP001",
+    "name": {
+      "ja": "新規リード獲得キャンペーン",
+      "en": "New Lead Generation Campaign"
+    },
+    "displayTitle": {
+      "ja": "リード獲得アンケート",
+      "en": "Lead Generation Survey"
+    },
+    "description": {
+      "ja": "新規顧客情報収集のためのアンケートです。",
+      "en": "This survey is for collecting new customer information."
+    },
+    "memo": "営業企画部。20代〜30代対象。",
+    "status": "会期前",
+    "answerCount": 0,
+    "realtimeAnswers": 0,
+    "periodStart": "2025-06-10",
+    "periodEnd": "2025-06-20",
+    "dataCompletionDate": "未定",
+    "plan": "Standard",
+    "deadline": "2025-07-20",
+    "estimatedBillingAmount": "N/A",
+    "bizcardEnabled": false,
+    "bizcardRequest": 0,
+    "bizcardCompletionCount": 100,
+    "thankYouEmailSettings": "設定なし"
+  },
+  {
+    "id": "SURVEYpysvcj",
+    "groupId": "GROUP001",
+    "name": {
+      "ja": "サービス解約理由調査",
+      "en": "Service Cancellation Reason Survey"
+    },
+    "displayTitle": {
+      "ja": "解約理由アンケート",
+      "en": "Cancellation Reason Survey"
+    },
+    "description": {
+      "ja": "サービス解約の理由を把握し、改善に役立てます。",
+      "en": "This survey is to understand the reasons for cancellation and use them for improvement."
+    },
+    "memo": "業務改善チーム。匿名対応。",
+    "status": "削除済み",
+    "answerCount": 25,
+    "realtimeAnswers": 0,
+    "periodStart": "2025-01-01",
+    "periodEnd": "2025-01-05",
+    "dataCompletionDate": "未定",
+    "plan": "Standard",
+    "deadline": "2025-02-05",
+    "estimatedBillingAmount": "N/A",
+    "bizcardEnabled": false,
+    "bizcardRequest": 0,
+    "bizcardCompletionCount": 100,
+    "thankYouEmailSettings": "設定なし"
+  },
+  {
+    "id": "SURVEY69ydwc",
+    "groupId": "GROUP001",
+    "name": {
+      "ja": "社内満足度アンケート",
+      "en": "Internal Satisfaction Survey"
+    },
+    "displayTitle": {
+      "ja": "従業員満足度調査",
+      "en": "Employee Satisfaction Survey"
+    },
+    "description": {
+      "ja": "職場環境に関する従業員満足度を測定します。",
+      "en": "This survey measures employee satisfaction with the work environment."
+    },
+    "memo": "人事部。全社対象。",
+    "status": "データ化なし",
+    "answerCount": 400,
+    "realtimeAnswers": 0,
+    "periodStart": "2025-03-01",
+    "periodEnd": "2025-03-10",
+    "dataCompletionDate": "未定",
+    "plan": "Standard",
+    "deadline": "未定",
+    "estimatedBillingAmount": "N/A",
+    "bizcardEnabled": false,
+    "bizcardRequest": 0,
+    "bizcardCompletionCount": 100,
+    "thankYouEmailSettings": "設定なし"
+  },
+  {
+    "id": "SURVEY8x0b6m",
+    "groupId": "GROUP001",
+    "name": {
+      "ja": "ユーザー行動分析アンケート",
+      "en": "User Behavior Analysis Survey"
+    },
+    "displayTitle": {
+      "ja": "ユーザー行動に関する調査",
+      "en": "Survey on User Behavior"
+    },
+    "description": {
+      "ja": "ユーザーの行動や嗜好を分析します。",
+      "en": "This survey is to analyze user behavior and preferences."
+    },
+    "memo": "マーケティング部。若年層対象。",
+    "status": "会期中",
+    "answerCount": 170,
+    "realtimeAnswers": 8,
+    "periodStart": "2025-04-15",
+    "periodEnd": "2025-04-30",
+    "dataCompletionDate": "2025-05-10",
+    "plan": "Premium",
+    "deadline": "2025-05-31",
+    "estimatedBillingAmount": 58000,
+    "bizcardEnabled": true,
+    "bizcardRequest": 180,
+    "bizcardCompletionCount": 170,
+    "thankYouEmailSettings": "自動送信"
+  },
+  {
+    "id": "SURVEYu9b8kx",
+    "groupId": "GROUP001",
+    "name": {
+      "ja": "製品ベータテストフィードバック",
+      "en": "Product Beta Test Feedback"
+    },
+    "displayTitle": {
+      "ja": "ベータテスト参加者アンケート",
+      "en": "Beta Test Participant Survey"
+    },
+    "description": {
+      "ja": "ベータテストに関するフィードバックを収集します。",
+      "en": "This survey collects feedback regarding the beta test."
+    },
+    "memo": "製品開発部。限定参加者。",
+    "status": "期限切れ",
+    "answerCount": 90,
+    "realtimeAnswers": 0,
+    "periodStart": "2024-11-10",
+    "periodEnd": "2024-11-20",
+    "dataCompletionDate": "2024-11-30",
+    "plan": "Standard",
+    "deadline": "2025-01-10",
+    "estimatedBillingAmount": 40000,
+    "bizcardEnabled": true,
+    "bizcardRequest": 100,
+    "bizcardCompletionCount": 90,
+    "thankYouEmailSettings": "手動"
+  },
+  {
+    "id": "SURVEYmz19vh",
+    "groupId": "GROUP001",
+    "name": {
+      "ja": "新商品ニーズ調査",
+      "en": "New Product Needs Survey"
+    },
+    "displayTitle": {
+      "ja": "新商品のニーズ調査アンケート",
+      "en": "New Product Needs Survey"
+    },
+    "description": {
+      "ja": "新商品のニーズ把握のためのアンケートです。",
+      "en": "This survey is to understand the needs for new products."
+    },
+    "memo": "営業企画部。ターゲット層20代。",
+    "status": "アップ完了",
+    "answerCount": 110,
+    "realtimeAnswers": 2,
+    "periodStart": "2025-05-05",
+    "periodEnd": "2025-05-15",
+    "dataCompletionDate": "2025-05-25",
+    "plan": "Premium",
+    "deadline": "2025-06-05",
+    "estimatedBillingAmount": 45000,
+    "bizcardEnabled": true,
+    "bizcardRequest": 115,
+    "bizcardCompletionCount": 110,
+    "thankYouEmailSettings": "自動送信"
+  },
+  {
+    "id": "SURVEYv3q4kt",
+    "groupId": "GROUP001",
+    "name": {
+      "ja": "オンラインセミナー参加者アンケート",
+      "en": "Online Seminar Participant Survey"
+    },
+    "displayTitle": {
+      "ja": "セミナー参加者へのアンケート",
+      "en": "Survey for Seminar Participants"
+    },
+    "description": {
+      "ja": "オンラインセミナー後の参加者に実施するアンケートです。",
+      "en": "This survey is for participants after the online seminar."
+    },
+    "memo": "マーケティング部。フォローアップ用。",
+    "status": "会期中",
+    "answerCount": 50,
+    "realtimeAnswers": 1,
+    "periodStart": "2025-05-20",
+    "periodEnd": "2025-05-20",
+    "dataCompletionDate": "2025-05-30",
+    "plan": "Standard",
+    "deadline": "2025-06-10",
+    "estimatedBillingAmount": 25000,
+    "bizcardEnabled": true,
+    "bizcardRequest": 55,
+    "bizcardCompletionCount": 50,
+    "thankYouEmailSettings": "手動"
+  },
+  {
+    "id": "SURVEYlnr0wb",
+    "groupId": "GROUP001",
+    "name": {
+      "ja": "サービス解約理由調査",
+      "en": "Service Cancellation Reason Survey"
+    },
+    "displayTitle": {
+      "ja": "解約理由に関するアンケート",
+      "en": "Survey on Cancellation Reason"
+    },
+    "description": {
+      "ja": "サービス解約理由の分析を目的とした調査です。",
+      "en": "This survey is for analyzing the reasons for service cancellation."
+    },
+    "memo": "業務改善チーム。匿名対応。",
+    "status": "削除済み",
+    "answerCount": 15,
+    "realtimeAnswers": 0,
+    "periodStart": "2025-01-05",
+    "periodEnd": "2025-01-10",
+    "dataCompletionDate": "未定",
+    "plan": "Standard",
+    "deadline": "2025-02-05",
+    "estimatedBillingAmount": "N/A",
+    "bizcardEnabled": false,
+    "bizcardRequest": 0,
+    "bizcardCompletionCount": 100,
+    "thankYouEmailSettings": "設定なし"
+  },
+  {
+    "id": "SURVEY9elvw2",
+    "groupId": "GROUP001",
+    "name": {
+      "ja": "社内満足度アンケート",
+      "en": "Internal Satisfaction Survey"
+    },
+    "displayTitle": {
+      "ja": "職場環境満足度調査",
+      "en": "Work Environment Satisfaction Survey"
+    },
+    "description": {
+      "ja": "従業員の職場環境に対する満足度を測定します。",
+      "en": "This survey measures employee satisfaction with the work environment."
+    },
+    "memo": "人事部。全社員対象。",
+    "status": "データ化なし",
+    "answerCount": 430,
+    "realtimeAnswers": 0,
+    "periodStart": "2025-03-05",
+    "periodEnd": "2025-03-15",
+    "dataCompletionDate": "未定",
+    "plan": "Standard",
+    "deadline": "未定",
+    "estimatedBillingAmount": "N/A",
+    "bizcardEnabled": false,
+    "bizcardRequest": 0,
+    "bizcardCompletionCount": 100,
+    "thankYouEmailSettings": "設定なし"
+  },
+  {
+    "id": "SURVEY7xnt21",
+    "groupId": "GROUP001",
+    "name": {
+      "ja": "顧客満足度調査",
+      "en": "Customer Satisfaction Survey"
+    },
+    "displayTitle": {
+      "ja": "お客様満足度アンケート",
+      "en": "Customer Satisfaction Survey"
+    },
+    "description": {
+      "ja": "新製品に関する顧客の満足度を測定します。",
+      "en": "This survey measures customer satisfaction with new products."
+    },
+    "memo": "マーケティング部。主に30代〜40代対象。",
+    "status": "会期中",
+    "answerCount": 180,
+    "realtimeAnswers": 10,
+    "periodStart": "2025-05-10",
+    "periodEnd": "2025-06-05",
+    "dataCompletionDate": "2025-06-20",
+    "plan": "Standard",
+    "deadline": "2025-07-10",
+    "estimatedBillingAmount": 70000,
+    "bizcardEnabled": true,
+    "bizcardRequest": 190,
+    "bizcardCompletionCount": 180,
+    "thankYouEmailSettings": "自動送信"
+  },
+  {
+    "id": "SURVEYzdv6mc",
+    "groupId": "GROUP001",
+    "name": {
+      "ja": "新規リード獲得キャンペーン",
+      "en": "New Lead Generation Campaign"
+    },
+    "displayTitle": {
+      "ja": "新規リード獲得アンケート",
+      "en": "New Lead Generation Survey"
+    },
+    "description": {
+      "ja": "新規顧客情報を収集するための調査です。",
+      "en": "This survey is for collecting new customer information."
+    },
+    "memo": "営業企画部。若年層向け。",
+    "status": "会期前",
+    "answerCount": 0,
+    "realtimeAnswers": 0,
+    "periodStart": "2025-06-15",
+    "periodEnd": "2025-06-25",
+    "dataCompletionDate": "未定",
+    "plan": "Standard",
+    "deadline": "2025-07-25",
+    "estimatedBillingAmount": "N/A",
+    "bizcardEnabled": false,
+    "bizcardRequest": 0,
+    "bizcardCompletionCount": 100,
+    "thankYouEmailSettings": "設定なし"
+  },
+  {
+    "id": "SURVEYfw0jcl",
+    "groupId": "GROUP001",
+    "name": {
+      "ja": "サービス利用状況調査",
+      "en": "Service Usage Survey"
+    },
+    "displayTitle": {
+      "ja": "サービス利用に関するアンケート",
+      "en": "Survey on Service Usage"
+    },
+    "description": {
+      "ja": "既存顧客のサービス利用状況を把握します。",
+      "en": "This survey is to understand the service usage of existing customers."
+    },
+    "memo": "CS部。リピーター中心。",
+    "status": "アップ完了",
+    "answerCount": 220,
+    "realtimeAnswers": 5,
+    "periodStart": "2025-04-01",
+    "periodEnd": "2025-04-15",
+    "dataCompletionDate": "2025-04-25",
+    "plan": "Premium",
+    "deadline": "2025-05-10",
+    "estimatedBillingAmount": 80000,
+    "bizcardEnabled": true,
+    "bizcardRequest": 230,
+    "bizcardCompletionCount": 220,
+    "thankYouEmailSettings": "手動"
+  },
+  {
+    "id": "SURVEY8m1xqo",
+    "groupId": "GROUP001",
+    "name": {
+      "ja": "解約理由調査",
+      "en": "Cancellation Reason Survey"
+    },
+    "displayTitle": {
+      "ja": "サービス解約理由アンケート",
+      "en": "Service Cancellation Reason Survey"
+    },
+    "description": {
+      "ja": "解約理由を分析し改善に役立てます。",
+      "en": "This survey is to analyze the reasons for cancellation and use them for improvement."
+    },
+    "memo": "業務改善チーム。匿名回答対応。",
+    "status": "期限切れ",
+    "answerCount": 30,
+    "realtimeAnswers": 0,
+    "periodStart": "2025-01-05",
+    "periodEnd": "2025-01-12",
+    "dataCompletionDate": "2025-01-25",
+    "plan": "Standard",
+    "deadline": "2025-02-20",
+    "estimatedBillingAmount": 15000,
+    "bizcardEnabled": false,
+    "bizcardRequest": 0,
+    "bizcardCompletionCount": 0,
+    "thankYouEmailSettings": "設定なし"
+  },
+  {
+    "id": "SURVEYfhrw67",
+    "groupId": "GROUP001",
+    "name": {
+      "ja": "社内満足度調査",
+      "en": "Internal Satisfaction Survey"
+    },
+    "displayTitle": {
+      "ja": "従業員満足度アンケート",
+      "en": "Employee Satisfaction Survey"
+    },
+    "description": {
+      "ja": "従業員の職場環境満足度を測定します。",
+      "en": "This survey measures employee satisfaction with the work environment."
+    },
+    "memo": "人事部。全社対象。",
+    "status": "データ化なし",
+    "answerCount": 420,
+    "realtimeAnswers": 0,
+    "periodStart": "2025-03-01",
+    "periodEnd": "2025-03-15",
+    "dataCompletionDate": "未定",
+    "plan": "Standard",
+    "deadline": "未定",
+    "estimatedBillingAmount": "N/A",
+    "bizcardEnabled": false,
+    "bizcardRequest": 0,
+    "bizcardCompletionCount": 0,
+    "thankYouEmailSettings": "設定なし"
+  },
+  {
+    "id": "SURVEY7yabjp",
+    "groupId": "GROUP001",
+    "name": {
+      "ja": "オンラインセミナーアンケート",
+      "en": "Online Seminar Survey"
+    },
+    "displayTitle": {
+      "ja": "セミナー参加者向けアンケート",
+      "en": "Survey for Seminar Participants"
+    },
+    "description": {
+      "ja": "オンラインセミナー参加者へのフィードバック収集用。",
+      "en": "For collecting feedback from online seminar participants."
+    },
+    "memo": "マーケティング部。フォローアップ。",
+    "status": "会期中",
+    "answerCount": 60,
+    "realtimeAnswers": 3,
+    "periodStart": "2025-05-25",
+    "periodEnd": "2025-05-25",
+    "dataCompletionDate": "2025-06-05",
+    "plan": "Standard",
+    "deadline": "2025-06-20",
+    "estimatedBillingAmount": 28000,
+    "bizcardEnabled": true,
+    "bizcardRequest": 65,
+    "bizcardCompletionCount": 60,
+    "thankYouEmailSettings": "自動送信"
+  },
+  {
+    "id": "SURVEY6zgx4t",
+    "groupId": "GROUP001",
+    "name": {
+      "ja": "新規商品ニーズ調査",
+      "en": "New Product Needs Survey"
+    },
+    "displayTitle": {
+      "ja": "新商品ニーズ調査アンケート",
+      "en": "New Product Needs Survey"
+    },
+    "description": {
+      "ja": "新商品の需要を把握するための調査です。",
+      "en": "This survey is to understand the demand for new products."
+    },
+    "memo": "営業企画部。20代中心。",
+    "status": "アップ完了",
+    "answerCount": 100,
+    "realtimeAnswers": 4,
+    "periodStart": "2025-04-10",
+    "periodEnd": "2025-04-20",
+    "dataCompletionDate": "2025-04-30",
+    "plan": "Premium",
+    "deadline": "2025-05-15",
+    "estimatedBillingAmount": 48000,
+    "bizcardEnabled": true,
+    "bizcardRequest": 105,
+    "bizcardCompletionCount": 100,
+    "thankYouEmailSettings": "手動"
+  },
+  {
+    "id": "SURVEYx4pr9o",
+    "groupId": "GROUP001",
+    "name": {
+      "ja": "ユーザー行動分析調査",
+      "en": "User Behavior Analysis Survey"
+    },
+    "displayTitle": {
+      "ja": "ユーザー行動に関する調査",
+      "en": "Survey on User Behavior"
+    },
+    "description": {
+      "ja": "ユーザーの行動パターンを分析します。",
+      "en": "This survey analyzes user behavior patterns."
+    },
+    "memo": "マーケティング部。若年層対象。",
+    "status": "会期中",
+    "answerCount": 150,
+    "realtimeAnswers": 6,
+    "periodStart": "2025-05-01",
+    "periodEnd": "2025-05-15",
+    "dataCompletionDate": "2025-05-25",
+    "plan": "Standard",
+    "deadline": "2025-06-10",
+    "estimatedBillingAmount": 55000,
+    "bizcardEnabled": true,
+    "bizcardRequest": 160,
+    "bizcardCompletionCount": 150,
+    "thankYouEmailSettings": "自動送信"
+  },
+  {
+    "id": "SURVEYz8x0vn",
+    "groupId": "GROUP001",
+    "name": {
+      "ja": "製品ベータテストフィードバック",
+      "en": "Product Beta Test Feedback"
+    },
+    "displayTitle": {
+      "ja": "ベータテスト参加者アンケート",
+      "en": "Beta Test Participant Survey"
+    },
+    "description": {
+      "ja": "製品のベータテストに関するフィードバックを収集します。",
+      "en": "This survey collects feedback regarding the product beta test."
+    },
+    "memo": "製品開発部。限定参加者対象。",
+    "status": "期限切れ",
+    "answerCount": 85,
+    "realtimeAnswers": 0,
+    "periodStart": "2024-11-10",
+    "periodEnd": "2024-11-20",
+    "dataCompletionDate": "2024-11-30",
+    "plan": "Standard",
+    "deadline": "2024-12-15",
+    "estimatedBillingAmount": 38000,
+    "bizcardEnabled": true,
+    "bizcardRequest": 90,
+    "bizcardCompletionCount": 85,
+    "thankYouEmailSettings": "手動"
+  },
+  {
+    "id": "SURVEYjt4e39",
+    "groupId": "GROUP001",
+    "name": {
+      "ja": "市場動向調査",
+      "en": "Market Trend Survey"
+    },
+    "displayTitle": {
+      "ja": "市場トレンドアンケート",
+      "en": "Market Trend Survey"
+    },
+    "description": {
+      "ja": "市場のトレンドを調査するアンケートです。",
+      "en": "This survey is to investigate market trends."
+    },
+    "memo": "営業企画部。新規事業向け。",
+    "status": "アップ完了",
+    "answerCount": 125,
+    "realtimeAnswers": 5,
+    "periodStart": "2025-03-15",
+    "periodEnd": "2025-03-30",
+    "dataCompletionDate": "2025-04-10",
+    "plan": "Premium",
+    "deadline": "2025-04-25",
+    "estimatedBillingAmount": 57000,
+    "bizcardEnabled": true,
+    "bizcardRequest": 130,
+    "bizcardCompletionCount": 125,
+    "thankYouEmailSettings": "自動送信"
+  },
+  {
+    "id": "SURVEYabc123",
+    "groupId": "GROUP002",
+    "name": {
+      "ja": "新サービス評価アンケート",
+      "en": "New Service Evaluation Survey"
+    },
+    "displayTitle": {
+      "ja": "新サービスに関するご意見をお聞かせください",
+      "en": "Please give us your opinion on the new service"
+    },
+    "description": {
+      "ja": "新サービスのユーザー評価を収集します。",
+      "en": "This survey collects user evaluations of the new service."
+    },
+    "memo": "企画部。早期フィードバック目的。",
+    "status": "会期中",
+    "answerCount": 75,
+    "realtimeAnswers": 5,
+    "periodStart": "2025-07-01",
+    "periodEnd": "2025-07-15",
+    "dataCompletionDate": "2025-07-25",
+    "plan": "Standard",
+    "deadline": "2025-08-10",
+    "estimatedBillingAmount": 35000,
+    "bizcardEnabled": true,
+    "bizcardRequest": 80,
+    "bizcardCompletionCount": 70,
+    "thankYouEmailSettings": "自動送信"
+  },
+  {
+    "id": "SURVEYdef456",
+    "groupId": "GROUP002",
+    "name": {
+      "ja": "ウェブサイト改善アンケート",
+      "en": "Website Improvement Survey"
+    },
+    "displayTitle": {
+      "ja": "ウェブサイトに関するアンケート",
+      "en": "Survey on the Website"
+    },
+    "description": {
+      "ja": "ウェブサイトのユーザビリティ改善のためのアンケートです。",
+      "en": "This survey is for improving the usability of the website."
+    },
+    "memo": "広報部。UI/UX改善。",
+    "status": "会期前",
+    "answerCount": 0,
+    "realtimeAnswers": 0,
+    "periodStart": "2025-08-01",
+    "periodEnd": "2025-08-10",
+    "dataCompletionDate": "未定",
+    "plan": "Standard",
+    "deadline": "2025-09-01",
+    "estimatedBillingAmount": "N/A",
+    "bizcardEnabled": false,
+    "bizcardRequest": 0,
+    "bizcardCompletionCount": 0,
+    "thankYouEmailSettings": "設定なし"
+  },
+  {
+    "id": "SURVEYghi789",
+    "groupId": "GROUP003",
+    "name": {
+      "ja": "イベント参加者満足度調査",
+      "en": "Event Participant Satisfaction Survey"
+    },
+    "displayTitle": {
+      "ja": "イベントご参加ありがとうございました",
+      "en": "Thank you for participating in the event"
+    },
+    "description": {
+      "ja": "イベントの満足度を測定し、次回の改善に役立てます。",
+      "en": "This survey measures the satisfaction of the event and helps to improve the next one."
+    },
+    "memo": "イベント運営部。来場者向け。",
+    "status": "アップ完了",
+    "answerCount": 300,
+    "realtimeAnswers": 10,
+    "periodStart": "2025-06-20",
+    "periodEnd": "2025-06-22",
+    "dataCompletionDate": "2025-07-05",
+    "plan": "Premium",
+    "deadline": "2025-07-20",
+    "estimatedBillingAmount": 90000,
+    "bizcardEnabled": true,
+    "bizcardRequest": 320,
+    "bizcardCompletionCount": 290,
+    "thankYouEmailSettings": "手動"
+  }
+];
+                this.surveyAnswers = [
+  {
+    "answerId": "6794",
+    "surveyId": "SURVEY8j2l0x",
+    "answeredAt": "2025-07-04 11:17",
+    "isTest": false,
+    "details": [
+      { "question": "Q.01_社員CD（8桁）", "answer": "S001" },
+      { "question": "Q.02_お客様の主な業界", "answer": "一般産業機械" },
+      { "question": "Q.03_打ち合わせ種類（複数選択可）", "answer": ["機械要素部品"] },
+      { "question": "Q.04_【打合せ内容】フリー入力", "answer": "ガイド:ABC\nねじ:XYZ\nカムフォロア:QRS" },
+      { "question": "Q.06_【打合せ内容】緊急度（複数選択可）", "answer": ["カタログ希望", "情報収集", "挨拶・売込み"] },
+      { "question": "Q.08_【案件情報】案件名", "answer": "次期主力製品の部品選定" },
+      { "question": "Q.09_【案件情報】必要時期(見込時期)", "answer": "3ヶ月以内" }
+    ]
+  },
+  {
+    "answerId": "6795",
+    "surveyId": "SURVEY8j2l0x",
+    "answeredAt": "2025-07-04 12:03",
+    "isTest": false,
+    "details": [
+      { "question": "Q.01_社員CD（8桁）", "answer": "S002" },
+      { "question": "Q.02_お客様の主な業界", "answer": "一般産業機械" },
+      { "question": "Q.03_打ち合わせ種類（複数選択可）", "answer": ["製品デモ（体験デモ機）"] },
+      { "question": "Q.04_【打合せ内容】フリー入力", "answer": "" },
+      { "question": "Q.06_【打合せ内容】緊急度（複数選択可）", "answer": ["挨拶・売込み"] },
+      { "question": "Q.08_【案件情報】案件名", "answer": "" },
+      { "question": "Q.09_【案件情報】必要時期(見込時期)", "answer": "未定" }
+    ]
+  },
+  {
+    "answerId": "6801",
+    "surveyId": "SURVEY8j2l0x",
+    "answeredAt": "2025-07-04 12:33",
+    "isTest": true,
+    "details": [
+      { "question": "Q.01_社員CD（8桁）", "answer": "S001" },
+      { "question": "Q.02_お客様の主な業界", "answer": "商社" },
+      { "question": "Q.03_打ち合わせ種類（複数選択可）", "answer": ["機械要素部品"] },
+      { "question": "Q.04_【打合せ内容】フリー入力", "answer": "テスト用の回答です。" },
+      { "question": "Q.06_【打合せ内容】緊急度（複数選択可）", "answer": ["情報収集"] },
+      { "question": "Q.08_【案件情報】案件名", "answer": "テスト案件" },
+      { "question": "Q.09_【案件情報】必要時期(見込時期)", "answer": "1年以内" }
+    ]
+  }
+];
+                this.businessCards = [
+  {
+    "answerId": "6794",
+    "imageUrl": { "front": "images/sample_card_01_front.jpg", "back": "" },
+    "group1": { "email": "taro.yamada@sample.co.jp" },
+    "group2": { "lastName": "山田", "firstName": "太郎" },
+    "group3": { "companyName": "株式会社サンプル", "department": "営業部", "position": "部長" },
+    "group4": { "zipCode": "100-0001", "address1": "東京都千代田区千代田1-1", "address2": "サンプルビル1F" },
+    "group5": { "tel1": "03-1234-5678", "tel2": "", "mobile": "090-1234-5678", "fax": "03-1234-5679" },
+    "group6": { "url": "http://www.sample.co.jp" },
+    "group7": { "notes": "第一展示場のブースにて名刺交換。" },
+    "group8": { "freeInput": "" }
+  },
+  {
+    "answerId": "6795",
+    "imageUrl": { "front": "images/sample_card_02_front.jpg", "back": "images/sample_card_02_back.jpg" },
+    "group1": { "email": "hanako.suzuki@abc-shoji.co.jp" },
+    "group2": { "lastName": "鈴木", "firstName": "花子" },
+    "group3": { "companyName": "ABC商事株式会社", "department": "マーケティング部", "position": "課長" },
+    "group4": { "zipCode": "541-0041", "address1": "大阪府大阪市中央区北浜1-8-16", "address2": "ABCビル" },
+    "group5": { "tel1": "06-1234-5678", "tel2": "", "mobile": "080-1234-5678", "fax": "06-1234-5679" },
+    "group6": { "url": "http://www.abc-shoji.co.jp" },
+    "group7": { "notes": "" },
+    "group8": { "freeInput": "" }
+  },
+  {
+    "answerId": "6801",
+    "imageUrl": { "front": "images/sample_card_03_front.jpg", "back": "" },
+    "group1": { "email": "ichiro.sato@tech-sol.co.jp" },
+    "group2": { "lastName": "佐藤", "firstName": "一郎" },
+    "group3": { "companyName": "テックソリューションズ株式会社", "department": "開発部", "position": "主任" },
+    "group4": { "zipCode": "220-0012", "address1": "神奈川県横浜市西区みなとみらい2-2-1", "address2": "ランドマークタワー 10F" },
+    "group5": { "tel1": "045-123-4567", "tel2": "", "mobile": "070-1234-5678", "fax": "045-123-4568" },
+    "group6": { "url": "http://www.tech-sol.co.jp" },
+    "group7": { "notes": "テスト用データ" },
+    "group8": { "freeInput": "" }
+  }
+];
+                console.log('DEBUG: JSON data hardcoded in speedReviewService.');
 
-    for (let i = 1; i < lines.length; i++) {
-        const values = lines[i].split(/,(?=(?:(?:[^\"]*\"){2})*[^\"]*$)/).map(value => value.trim().replace(/^"|"$/g, ''));
-        console.log(`parseCsv: Line ${i} values:`, values);
-        const row = {};
-        headers.forEach((header, index) => {
-            if (values[index] !== undefined) {
-                row[header] = values[index];
-            } else {
-                row[header] = ''; // Handle missing values gracefully
+            } catch (error) {
+                console.error("Error loading or parsing JSON files:", error);
+                throw error;
             }
-        });
-        data.push(row);
-    }
-    return data;
-}
-
-/**
- * 回答データと名刺データを取得し、結合したレビューデータを返します。
- * @returns {Promise<Array>} 結合済みの回答データ配列。
- */
-export async function getCombinedReviewData() {
-    try {
-        const ncdCsvFilePath = '../../../sample/0008000154ncd.csv'; // 基本情報
-        const mainCsvFilePath = '../../../sample/0008000154.csv'; // 回答日時、業界、緊急度
-
-        const [ncdResponse, mainResponse] = await Promise.all([
-            fetch(ncdCsvFilePath),
-            fetch(mainCsvFilePath)
-        ]);
-
-        if (!ncdResponse.ok) {
-            throw new Error(`Failed to fetch NCD CSV: ${ncdResponse.statusText}`);
-        }
-        if (!mainResponse.ok) {
-            throw new Error(`Failed to fetch Main CSV: ${mainResponse.statusText}`);
         }
 
-        const ncdCsvText = await ncdResponse.text();
-        const mainCsvText = await mainResponse.text();
-
-        const parsedNcdData = parseCsv(ncdCsvText);
-        const parsedMainData = parseCsv(mainCsvText);
-
-        // mainCsvDataをIDでマップ化
-        const mainDataMap = new Map(parsedMainData.map(item => [item['ID'], item]));
-
-        // NCDデータをベースに、mainDataの情報を結合
-        const combinedData = parsedNcdData.map(ncdItem => {
-            const mainItem = mainDataMap.get(ncdItem['ID']);
-
-            const answerId = ncdItem['ID'];
-            const lastName = ncdItem['氏名（姓）'] || '';
-            const firstName = ncdItem['氏名（名）'] || '';
-            const companyName = ncdItem['会社名'] || '';
-            const department = ncdItem['部署名'] || '';
-            const position = ncdItem['役職名'] || '';
-            const postalCode = ncdItem['郵便番号'] || '';
-            const address1 = ncdItem['住所1'] || '';
-            const address2 = ncdItem['住所2（建物名）'] || '';
-            const phone1 = ncdItem['電話番号1'] || '';
-            const mobilePhone = ncdItem['携帯番号'] || '';
-            const fax = ncdItem['FAX番号'] || '';
-            const email = ncdItem['メールアドレス'] || '';
-            const url = ncdItem['URL'] || '';
-            const memo = ncdItem['その他（メモ等）'] || '';
-
-            // 0008000154.csvから取得
-            const answerTime = mainItem ? (mainItem['回答日時'] || '') : '';
-            const industry = mainItem ? (mainItem['Q.02_お客様の主な業界'] || '') : '';
-            const urgency = mainItem ? (mainItem['Q.06_【打合せ内容】緊急度（複数選択可）'] || '') : '';
-
-            return {
-                answerId: answerId,
-                answerTime: answerTime,
-                name: lastName, // 姓のみを表示
-                company: companyName,
-                industry: industry,
-                urgency: urgency,
-                businessCard: {
-                    answerId: answerId,
-                    group2: { lastName: lastName, firstName: firstName },
-                    group3: { companyName: companyName },
-                    department: department,
-                    position: position,
-                    postalCode: postalCode,
-                    address1: address1,
-                    address2: address2,
-                    phone1: phone1,
-                    mobilePhone: mobilePhone,
-                    fax: fax,
-                    email: email,
-                    url: url,
-                    memo: memo
-                },
-                details: [
-                    { question: 'Q.01_社員CD（8桁）', answer: mainItem ? (mainItem['Q.01_社員CD（8桁）'] || '') : '' },
-                    { question: 'Q.02_お客様の主な業界', answer: mainItem ? (mainItem['Q.02_お客様の主な業界'] || '') : '' },
-                    { question: 'Q.03_打ち合わせ種類（複数選択可）', answer: mainItem ? (mainItem['Q.03_打ち合わせ種類（複数選択可）'] || '') : '' },
-                    { question: 'Q.04_【打合せ内容】フリー入力', answer: mainItem ? (mainItem['Q.04_【打合せ内容】フリー入力'] || '') : '' },
-                    { question: 'Q.05_【打合せ内容】イメージ図・ポンチ絵', answer: mainItem ? (mainItem['Q.05_【打合せ内容】イメージ図・ポンチ絵'] || '') : '' },
-                    { question: 'Q.06_【打合せ内容】緊急度（複数選択可）', answer: mainItem ? (mainItem['Q.06_【打合せ内容】緊急度（複数選択可）'] || '') : '' },
-                    { question: 'Q.07_【打合せ内容】営業フォロー担当者（例：支店名＋営業氏名）', answer: mainItem ? (mainItem['Q.07_【打合せ内容】営業フォロー担当者（例：支店名＋営業氏名）'] || '') : '' },
-                    { question: 'Q.08_【案件情報】案件名（ライン名・装置名など）', answer: mainItem ? (mainItem['Q.08_【案件情報】案件名（ライン名・装置名など）'] || '') : '' },
-                    { question: 'Q.09_【案件情報】必要時期(見込時期)', answer: mainItem ? (mainItem['Q.09_【案件情報】必要時期(見込時期)'] || '') : '' },
-                    { question: 'Q.10_【案件情報】案件種別', answer: mainItem ? (mainItem['Q.10_【案件情報】案件種別'] || '') : '' },
-                    { question: 'Q.11_【案件情報】開発要望（THKに対する新製品の開発要望があればチェックを入れてください。）', answer: mainItem ? (mainItem['Q.11_【案件情報】開発要望（THKに対する新製品の開発要望があればチェックを入れてください。）'] || '') : '' },
-                    { question: 'Q.12_カタログの請求：総合', answer: mainItem ? (mainItem['Q.12_カタログの請求：総合'] || '') : '' },
-                    { question: 'Q.13_カタログ請求：要素部品', answer: mainItem ? (mainItem['Q.13_カタログ請求：要素部品'] || '') : '' },
-                    { question: 'Q.14_カタログ請求：事業開発', answer: mainItem ? (mainItem['Q.14_カタログ請求：事業開発'] || '') : '' },
-                    { question: 'Q.15_カタログ請求：IMT', answer: mainItem ? (mainItem['Q.15_カタログ請求：IMT'] || '') : '' },
-                    { question: 'Q.16_カタログの請求：フリー入力(上記カタログ以外の場合)', answer: mainItem ? (mainItem['Q.16_カタログの請求：フリー入力(上記カタログ以外の場合)'] || '') : '' },
-                ]
-            };
-        });
-
-        return combinedData;
-
-    } catch (error) {
-        console.error('レビューデータの処理中にエラーが発生しました:', error);
-        throw error; // 呼び出し元でエラーを処理できるように再スロー
-    }
-}
-
-/**
- * 指定されたanswerIdに基づいて、0008000154.csvからアンケート詳細データを取得します。
- * この関数は、モーダル表示のために使用されます。
- * @param {string} answerId - 取得する回答のID。
- * @returns {Promise<Object|null>} 整形されたアンケート詳細データ、または見つからない場合はnull。
- */
-export async function getSurveyDetailsFromMainCsv(answerId) {
-    try {
-        const mainCsvFilePath = '../../sample/0008000154.csv';
-        const response = await fetch(mainCsvFilePath);
-
-        if (!response.ok) {
-            throw new Error(`Failed to fetch Main CSV for details: ${response.statusText}`);
-        }
-
-        const csvText = await response.text();
-        const parsedData = parseCsv(csvText);
-        console.log('Parsed CSV Data (first 5 rows):', parsedData.slice(0, 5));
-        console.log('Searching for answerId:', answerId);
-
-        const item = parsedData.find(row => {
-            console.log('Comparing row ID:', String(row['ID']).trim(), 'with search ID:', String(answerId).trim());
-            return String(row['ID']).trim() === String(answerId).trim();
-        });
-
-        if (!item) {
-            console.warn(`Answer ID ${answerId} not found in ${mainCsvFilePath}`);
-            return null;
-        }
-
-        // businessCard 情報を構築 (0008000154.csvには詳細な名刺情報がないため、IDと回答日時を使用)
-        const businessCard = {
-            answerId: item['ID'],
-            group2: {
-                lastName: '回答者', // プレースホルダー
-                firstName: item['ID'] // IDを名前に使用
-            },
-            group3: {
-                companyName: '不明' // プレースホルダー
-            },
-            // 他のフィールドは必要に応じて追加または空にする
-        };
-
-        // details (surveyAnswers) 情報を構築
-        const details = [];
-        for (const key in item) {
-            if (key.startsWith('Q.')) {
-                details.push({
-                    question: key,
-                    answer: item[key] || 'N/A'
-                });
-            } else if (key === '回答日時') {
-                // 回答日時もdetailsに含める場合はここに追加
-                details.push({
-                    question: '回答日時',
-                    answer: item[key] || 'N/A'
-                });
+        getCombinedReviewData(surveyId) {
+            console.log('DEBUG: getCombinedReviewData called with surveyId:', surveyId);
+            if (!this.surveys || !this.surveyAnswers || !this.businessCards) {
+                console.error("JSON data not loaded yet.");
+                return [];
             }
+
+            const targetSurvey = this.surveys.find(s => s.id === surveyId);
+            console.log('DEBUG: targetSurvey found:', targetSurvey);
+            if (!targetSurvey) {
+                console.warn(`Survey with ID ${surveyId} not found.`);
+                return [];
+            }
+
+            const businessCardMap = new Map(this.businessCards.map(card => [card.answerId, card]));
+
+            const combinedData = this.surveyAnswers
+                .filter(answer => {
+                    console.log(`DEBUG: Comparing answer.surveyId: '${answer.surveyId}' with target surveyId: '${surveyId}'`);
+                    return answer.surveyId === surveyId;
+                })
+                .map(answer => {
+                    const businessCard = businessCardMap.get(answer.answerId);
+                    return {
+                        answerId: answer.answerId,
+                        surveyId: answer.surveyId,
+                        answeredAt: answer.answeredAt,
+                        isTest: answer.isTest,
+                        details: answer.details,
+                        businessCard: businessCard || null,
+                        survey: targetSurvey // Include the survey object for question details
+                    };
+                });
+
+            console.log('DEBUG: Combined data before return:', combinedData);
+            return combinedData;
         }
-
-        return {
-            answerId: item['ID'],
-            timestamp: item['回答日時'], // 回答日時をtimestampとして使用
-            businessCard: businessCard,
-            details: details
-        };
-
-    } catch (error) {
-        console.error('CSVからのアンケート詳細取得中にエラーが発生しました:', error);
-        return null;
-    }
 }
+
+export const speedReviewService = new SpeedReviewService();

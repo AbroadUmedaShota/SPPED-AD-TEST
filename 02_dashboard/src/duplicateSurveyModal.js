@@ -12,35 +12,42 @@ export async function openDuplicateSurveyModal(survey) {
     const newPeriodStartInput = document.getElementById('newPeriodStart');
     const newPeriodEndInput = document.getElementById('newPeriodEnd');
     const confirmBtn = document.getElementById('duplicateSurveyConfirmBtn');
+    const cancelBtn = document.getElementById('duplicateSurveyCancelBtn');
+    const closeBtn = document.getElementById('closeDuplicateSurveyModalBtn');
 
-    // Set initial values
-    if (newSurveyNameInput) newSurveyNameInput.value = `${survey.name}のコピー`;
-
-    // Set default start date to tomorrow
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const tomorrowString = tomorrow.toISOString().split('T')[0];
-    if (newPeriodStartInput) newPeriodStartInput.value = tomorrowString;
-
-    // Set default end date to tomorrow as well
-    if (newPeriodEndInput) newPeriodEndInput.value = tomorrowString;
-
-    // Remove any existing event listeners to prevent duplicates
-    const newConfirmBtn = confirmBtn.cloneNode(true);
-    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
-
-    newConfirmBtn.addEventListener('click', () => {
+    // --- Event Listeners ---
+    const handleConfirm = () => {
         const newName = newSurveyNameInput ? newSurveyNameInput.value : '';
         const newStart = newPeriodStartInput ? newPeriodStartInput.value : '';
         const newEnd = newPeriodEndInput ? newPeriodEndInput.value : '';
 
-        // Basic validation
         if (!newName || !newStart || !newEnd) {
-            alert('全てのフィールドを入力してください。'); // Replace with a more user-friendly toast later
+            showToast('全てのフィールドを入力してください。', 'error');
             return;
         }
 
         duplicateSurvey(survey.id, newName, newStart, newEnd);
         closeModal('duplicateSurveyModal');
-    });
+    };
+
+    const handleCancel = () => {
+        closeModal('duplicateSurveyModal');
+    };
+
+    // Clone and replace to ensure old listeners are removed
+    const newConfirmBtn = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+    newConfirmBtn.addEventListener('click', handleConfirm);
+
+    if (cancelBtn) {
+        const newCancelBtn = cancelBtn.cloneNode(true);
+        cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+        newCancelBtn.addEventListener('click', handleCancel);
+    }
+
+    if (closeBtn) {
+        const newCloseBtn = closeBtn.cloneNode(true);
+        closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+        newCloseBtn.addEventListener('click', handleCancel);
+    }
 }

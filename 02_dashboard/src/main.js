@@ -9,6 +9,7 @@ import { initBizcardSettings } from './bizcardSettings.js';
 import { initThankYouEmailSettings } from './thankYouEmailSettings.js';
 import { initInvoiceListPage } from './invoiceList.js';
 import { initIndexPage } from './indexPage.js';
+import { initializePage as initSpeedReviewPage } from './speed-review.js'; // Import initializePage from speed-review.js
 
 import { showToast, copyTextToClipboard, loadCommonHtml } from './utils.js';
 
@@ -136,7 +137,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             initThankYouEmailSettings();
             break;
         case 'speed-review.html':
-            // initSpeedReviewPage(); // This function needs to be created and imported
+            initSpeedReviewPage(); // Call the imported function
             break;
         
     }

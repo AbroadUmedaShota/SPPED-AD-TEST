@@ -1,14 +1,27 @@
-import { getCombinedReviewData, getSurveyDetailsFromMainCsv } from './services/speedReviewService.js';
+console.log("SCRIPT LOADED: speed-review.js");
+
+import { speedReviewService } from './services/speedReviewService.js';
 import { populateTable, populateModal } from './ui/speedReviewRenderer.js';
-import { handleOpenModal } from './modalHandler.js';
+import { handleOpenModal, closeModal } from './modalHandler.js';
 
 // --- State ---
 let allCombinedData = [];
 let currentPage = 1;
-let rowsPerPage = 10; // デフォルトの表示件数
-let currentIndustryQuestion = 'Q.02_お客様の主な業界'; // デフォルトの質問
+let rowsPerPage = 10; // Default items per page
+let currentIndustryQuestion = 'Q.02_お客様の主な業界'; // Default selected industry question
+let currentSearchTerm = ''; // Stores the current search keyword
+let currentDateFilter = ''; // Stores the current date filter
 
 // --- Functions ---
+
+/**
+ * キーワード検索の変更を処理します。
+ * @param {Event} e - inputイベントオブジェクト。
+ */
+function handleSearch(e) {
+    currentSearchTerm = e.target.value;
+    applyFilters(); // フィルターを再適用
+}
 
 /**
  * 業界質問プルダウンの変更を処理します。
@@ -16,7 +29,94 @@ let currentIndustryQuestion = 'Q.02_お客様の主な業界'; // デフォル�
  */
 function handleIndustryQuestionChange(e) {
     currentIndustryQuestion = e.target.value;
-    displayPage(1); // 質問変更時は1ページ目に戻る
+
+    const getAnswer = (item, questionText) => {
+        if (!item.details) return '-';
+        const detail = item.details.find(d => d.question === questionText);
+        if (!detail || !detail.answer || detail.answer.length === 0) return '-';
+        const answer = Array.isArray(detail.answer) ? detail.answer.join(', ') : String(detail.answer);
+        return answer.trim() === '' ? '-' : answer;
+    };
+
+    // Sort data: unanswered items ('-') go to the bottom
+    allCombinedData.sort((a, b) => {
+        const answerA = getAnswer(a, currentIndustryQuestion);
+        const answerB = getAnswer(b, currentIndustryQuestion);
+
+        const aIsUnanswered = answerA === '-';
+        const bIsUnanswered = answerB === '-';
+
+        if (aIsUnanswered && !bIsUnanswered) {
+            return 1; // a comes after b
+        }
+        if (!aIsUnanswered && bIsUnanswered) {
+            return -1; // a comes before b
+        }
+        return 0; // Keep original order for other cases
+    });
+
+    applyFilters(); // Re-apply filters and pagination with the sorted data
+}
+
+/**
+ * 詳細ボタンクリック時の処理。
+ * @param {string} answerId - クリックされた回答のID。
+ */
+function handleDetailClick(answerId) {
+    const item = allCombinedData.find(data => data.answerId === answerId);
+    if (item) {
+        populateModal(item);
+        handleOpenModal('reviewDetailModal', 'modals/reviewDetailModal.html'); // Assuming reviewDetailModal exists
+    } else {
+        console.warn('Item not found for answerId:', answerId);
+    }
+}
+
+/**
+ * 全てのフィルターを適用し、テーブルを更新します。
+ */
+function applyFilters() {
+    let filteredData = allCombinedData;
+
+    // キーワードフィルター
+    if (currentSearchTerm) {
+        const searchTermLower = currentSearchTerm.toLowerCase();
+        filteredData = filteredData.filter(item => {
+            // businessCard can be null, handle gracefully
+            const lastName = item.businessCard?.group2?.lastName || '';
+            const firstName = item.businessCard?.group2?.firstName || '';
+            const fullName = `${lastName} ${firstName}`.toLowerCase();
+            const companyName = item.businessCard?.group3?.companyName?.toLowerCase() || '';
+
+            // Get the answer for the currently selected question in the dropdown
+            let selectedQuestionAnswer = '';
+            if (item.details) {
+                const detail = item.details.find(d => d.question === currentIndustryQuestion);
+                if (detail && detail.answer) {
+                    selectedQuestionAnswer = Array.isArray(detail.answer) ? detail.answer.join(', ').toLowerCase() : String(detail.answer).toLowerCase();
+                }
+            }
+
+            return fullName.includes(searchTermLower) || 
+                   companyName.includes(searchTermLower) ||
+                   selectedQuestionAnswer.includes(searchTermLower);
+        });
+    }
+
+    // 日付フィルター
+    if (currentDateFilter) {
+        const filterDate = new Date(currentDateFilter);
+        filteredData = filteredData.filter(item => {
+            if (!item.answeredAt) return false;
+            const itemDate = new Date(item.answeredAt);
+            // 日付部分のみを比較（時間情報は無視）
+            return itemDate.getFullYear() === filterDate.getFullYear() &&
+                   itemDate.getMonth() === filterDate.getMonth() &&
+                   itemDate.getDate() === filterDate.getDate();
+        });
+    }
+
+    displayPage(1, filteredData);
 }
 
 /**
@@ -131,9 +231,30 @@ function setupPagination(currentData = allCombinedData) {
 /**
  * ページの初期化処理
  */
-async function initializePage() {
+export async function initializePage() {
     try {
-        allCombinedData = await getCombinedReviewData();
+        const urlParams = new URLSearchParams(window.location.search);
+        const surveyId = urlParams.get('surveyId');
+        console.log('DEBUG: Survey ID from URL:', surveyId);
+
+        if (!surveyId) {
+            console.error('Survey ID not found in URL.');
+            const tableBody = document.getElementById('reviewTableBody');
+            if (tableBody) {
+                tableBody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-error">アンケートIDが見つかりません。</td></tr>`;
+            }
+            return;
+        }
+
+        await speedReviewService.loadJsonData(
+            '../data/surveys.json',
+            '../data/survey-answers.json',
+            '../data/business-cards.json'
+        );
+        console.log('DEBUG: JSON data loaded by speedReviewService.');
+
+        allCombinedData = await speedReviewService.getCombinedReviewData(surveyId);
+        console.log('DEBUG: Combined data for table:', allCombinedData);
         displayPage(1); // 初期表示は1ページ目
         setupEventListeners();
     } catch (error) {
@@ -154,102 +275,22 @@ function setupEventListeners() {
         searchInput.addEventListener('input', handleSearch);
     }
 
+    const dateFilterInput = document.getElementById('dateFilterInput');
+    if (dateFilterInput) {
+        flatpickr(dateFilterInput, {
+            dateFormat: "Y-m-d",
+            locale: "ja",
+            onChange: function(selectedDates, dateStr, instance) {
+                currentDateFilter = dateStr; // Store the selected date string
+                applyFilters(); // Apply all filters when date changes
+            }
+        });
+    }
+
     const industryQuestionSelect = document.getElementById('industryQuestionSelect');
     if (industryQuestionSelect) {
         industryQuestionSelect.addEventListener('change', handleIndustryQuestionChange);
     }
-
-    // ページネーションの初期設定
-    setupPagination();
 }
 
-/**
- * 検索入力に基づいてテーブルをフィルタリングします。
- * @param {Event} e - inputイベントオブジェクト。
- */
-function handleSearch(e) {
-    const searchTerm = e.target.value.toLowerCase();
-    const filteredData = allCombinedData.filter(item => {
-        if (!item.businessCard) return false;
-        const fullName = `${item.businessCard.group2?.lastName || ''} ${item.businessCard.group2?.firstName || ''}`.toLowerCase();
-        const companyName = item.businessCard.group3?.companyName?.toLowerCase() || '';
-        return fullName.includes(searchTerm) || companyName.includes(searchTerm);
-    });
-    populateTable(filteredData, handleDetailClick);
-}
-
-/**
- * 詳細ボタンがクリックされたときの処理
- * @param {string} answerId - 表示する回答のID (今回は未使用)。
- */
-async function handleDetailClick(answerId) {
-    try {
-        const response = await fetch('/sample/0008000154.csv');
-        if (!response.ok) {
-            throw new Error(`CSVファイルの読み込みに失敗しました: ${response.statusText}`);
-        }
-        const csvText = await response.text();
-        
-        // PapaParseライブラリが見つからないため、簡易的なパーサーを実装
-        const parseCSV = (text) => {
-            const lines = text.trim().split('\n');
-            const header = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
-            const rows = lines.slice(1).map(line => {
-                const values = line.split(',').map(v => v.trim().replace(/^"|"$/g, ''));
-                let obj = {};
-                header.forEach((h, i) => {
-                    obj[h] = values[i];
-                });
-                return obj;
-            });
-            return { header, rows };
-        };
-
-        const { header, rows } = parseCSV(csvText);
-
-        const tableHtml = `
-            <table class="w-full text-sm text-left text-gray-500">
-                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
-                    <tr>
-                        ${header.map(h => `<th scope="col" class="px-6 py-3">${h}</th>`).join('')}
-                    </tr>
-                </thead>
-                <tbody>
-                    ${rows.map(row => `
-                        <tr class="bg-white border-b">
-                            ${header.map(h => `<td class="px-6 py-4">${row[h] || ''}</td>`).join('')}
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-        `;
-
-        handleOpenModal('reviewDetailModal', 'modals/reviewDetailModal.html', () => {
-            const contentArea = document.getElementById('csv-content-area');
-            if (contentArea) {
-                contentArea.innerHTML = tableHtml;
-            }
-            
-            // 閉じるボタンのイベントリスナーを設定
-            const closeModalBtn = document.getElementById('closeDetailModalBtn');
-            if(closeModalBtn) {
-                // 既存のリスナーを削除して重複を避ける
-                const newBtn = closeModalBtn.cloneNode(true);
-                closeModalBtn.parentNode.replaceChild(newBtn, closeModalBtn);
-                
-                newBtn.addEventListener('click', () => {
-                    const modal = document.getElementById('reviewDetailModal');
-                    if(modal) {
-                        modal.classList.add('hidden');
-                    }
-                });
-            }
-        });
-
-    } catch (error) {
-        console.error('詳細の表示に失敗しました:', error);
-    }
-}
-
-// --- Initialization ---
-document.addEventListener('DOMContentLoaded', initializePage);
+    

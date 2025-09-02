@@ -1,4 +1,5 @@
 import { showToast, downloadFile } from './utils.js';
+import { closeModal } from './modalHandler.js';
 
 /**
  * Initializes elements specific to the QR Code Modal.
@@ -20,6 +21,15 @@ export function setupQrCodeModalListeners(modalElement) {
 
     // Add new listeners
     if (downloadQrCodeBtn) downloadQrCodeBtn.addEventListener('click', handleDownloadQrCode);
+
+    const closeBtn = modalElement.querySelector('#closeQrCodeModalBtn');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => closeModal('qrCodeModal'));
+    }
+    const footerCloseBtn = modalElement.querySelector('#footerCloseQrCodeModalBtn');
+    if (footerCloseBtn) {
+        footerCloseBtn.addEventListener('click', () => closeModal('qrCodeModal'));
+    }
 
     // Populate with dummy data for now
     // In a real application, this would be populated dynamically based on the selected survey

@@ -2,7 +2,7 @@
     <div class="bg-surface rounded-lg p-6 w-full max-w-lg modal-content-transition" data-state="closed">
         <div class="flex justify-between items-center mb-6">
             <h3 class="text-on-surface text-xl font-semibold">ダウンロードオプション</h3>
-            <button class="text-on-surface-variant hover:text-on-surface" onclick="closeModal('downloadOptionsModal')" aria-label="モーダルを閉じる">
+            <button class="text-on-surface-variant hover:text-on-surface" id="closeDownloadOptionsModalBtn" aria-label="モーダルを閉じる">
                 <span class="material-icons">close</span>
             </button>
         </div>
@@ -57,7 +57,7 @@
                 <p class="error-message hidden" id="download_period-error"></p>
             </div>
             <div class="flex justify-end gap-3 pt-4">
-                <button class="bg-secondary-container text-on-secondary-container py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal tracking-wide transition-colors" onclick="closeModal('downloadOptionsModal')" type="button" aria-label="キャンセル">キャンセル</button>
+                <button id="cancelDownloadBtn" class="bg-secondary-container text-on-secondary-container py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal tracking-wide transition-colors" type="button" aria-label="キャンセル">キャンセル</button>
                 <button class="gradient-primary-bg text-on-primary py-2 px-4 rounded-md text-sm font-semibold leading-normal transition-colors" type="submit" aria-label="ダウンロード" onclick="showToast('データダウンロード機能は未実装です。', 'info'); return false;">
                     ダウンロード
                 </button>
