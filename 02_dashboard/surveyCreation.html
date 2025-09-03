@@ -52,12 +52,8 @@
                             <span class="material-icons expand-icon">expand_less</span>
                         </div>
                         <div id="basicInfoContent" class="accordion-content p-4 space-y-6">
-                            <div class="border-b border-outline-variant mb-4">
-                                <nav class="-mb-px flex space-x-4" aria-label="Tabs" id="basic-info-lang-tabs">
-                                    <button type="button" data-lang="ja" class="lang-tab-button whitespace-nowrap py-3 px-4 border-b-2 font-medium text-sm border-primary text-primary">日本語</button>
-                                    <button type="button" data-lang="en" class="lang-tab-button whitespace-nowrap py-3 px-4 border-b-2 font-medium text-sm border-transparent text-on-surface-variant hover:border-outline-variant hover:text-on-surface">English</button>
-                                </nav>
-                            </div>
+                            
+                            
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div class="input-group">
                                     <input type="text" id="surveyName" placeholder=" " class="input-field">
@@ -179,20 +175,16 @@
             <div class="flex-grow flex items-center gap-2">
                 <span class="material-icons text-on-surface-variant handle cursor-move">drag_indicator</span>
                 <input type="text" class="input-field w-full bg-transparent focus:bg-surface text-lg font-semibold group-title-input" placeholder="質問グループのタイトル">
+                
             </div>
             <div class="flex items-center gap-2">
-                <button class="icon-button" aria-label="グループを複製" title="グループを複製"><span class="material-icons">content_copy</span></button>
-                <button class="icon-button" aria-label="グループを削除" title="グループを削除"><span class="material-icons text-error">delete</span></button>
+                <button class="icon-button duplicate-group-btn" aria-label="グループを複製" title="グループを複製"><span class="material-icons">content_copy</span></button>
+                <button class="icon-button delete-group-btn" aria-label="グループを削除" title="グループを削除"><span class="material-icons text-error">delete</span></button>
                 <span class="material-icons expand-icon">expand_less</span>
             </div>
         </div>
         <div class="questions-list p-4 space-y-4 accordion-content" id="">
-            <div class="border-b border-outline-variant mb-4">
-                <nav class="-mb-px flex space-x-4" aria-label="Tabs" id="question-group-lang-tabs">
-                    <button type="button" data-lang="ja" class="lang-tab-button whitespace-nowrap py-3 px-4 border-b-2 font-medium text-sm border-primary text-primary">日本語</button>
-                    <button type="button" data-lang="en" class="lang-tab-button whitespace-nowrap py-3 px-4 border-b-2 font-medium text-sm border-transparent text-on-surface-variant hover:border-outline-variant hover:text-on-surface">English</button>
-                </nav>
-            </div>
+            
     </div>
 </template>
 
@@ -204,20 +196,16 @@
                 <span class="font-semibold text-on-surface question-title"></span>
             </div>
             <div class="flex items-center gap-2">
-                <button class="icon-button" aria-label="質問を複製" title="質問を複製"><span class="material-icons">content_copy</span></button>
-                <button class="icon-button" aria-label="質問を削除" title="質問を削除"><span class="material-icons text-error">delete</span></button>
+                <button class="icon-button duplicate-question-btn" aria-label="質問を複製" title="質問を複製"><span class="material-icons">content_copy</span></button>
+                <button class="icon-button delete-question-btn" aria-label="質問を削除" title="質問を削除"><span class="material-icons text-error">delete</span></button>
             </div>
         </div>
         <div class="space-y-4">
-            <div class="border-b border-outline-variant mb-4">
-                <nav class="-mb-px flex space-x-4" aria-label="Tabs" id="question-lang-tabs">
-                    <button type="button" data-lang="ja" class="lang-tab-button whitespace-nowrap py-3 px-4 border-b-2 font-medium text-sm border-primary text-primary">日本語</button>
-                    <button type="button" data-lang="en" class="lang-tab-button whitespace-nowrap py-3 px-4 border-b-2 font-medium text-sm border-transparent text-on-surface-variant hover:border-outline-variant hover:text-on-surface">English</button>
-                </nav>
-            </div>
+            
             <div class="input-group">
                 <input type="text" class="input-field question-text-input">
                 <label class="input-label">質問文</label>
+                
             </div>
             <div class="options-container space-y-2">
                 <!-- 選択肢が必要な質問タイプの場合、ここに選択肢が挿入されます -->
@@ -234,6 +222,7 @@
     <div class="flex items-center gap-2 option-item">
         <input type="text" class="input-field flex-grow option-text-input">
         <button class="icon-button delete-option-btn" aria-label="選択肢を削除"><span class="material-icons text-error">remove_circle_outline</span></button>
+        
     </div>
 </template>
 <!-- ▲▲▲ テンプレート ▲▲▲ -->
