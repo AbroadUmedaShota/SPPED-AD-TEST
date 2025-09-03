@@ -44,7 +44,7 @@ export function populateTable(data, onDetailClick, selectedIndustryQuestion) {
             <td class="px-4 py-3 whitespace-nowrap text-sm text-on-surface overflow-hidden text-ellipsis">${formatCell(item.answerId)}</td>
             <td class="px-4 py-3 whitespace-nowrap text-sm text-on-surface overflow-hidden text-ellipsis">${formatCell(item.answeredAt)}</td>
             <td class="px-4 py-3 whitespace-nowrap text-sm text-on-surface overflow-hidden text-ellipsis">${formatCell(fullName)}</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-on-surface overflow-hidden text-ellipsis">${formatCell(companyName)}</td>
+            <td class="px-4 py-3 text-sm text-on-surface truncate max-w-[200px]" title="${formatCell(companyName)}">${formatCell(companyName)}</td>
             <td class="px-4 py-3 whitespace-nowrap text-sm text-on-surface overflow-hidden text-ellipsis">${(() => {
                 const answer = getAnswer(selectedIndustryQuestion);
                 return answer.length > 25 ? answer.substring(0, 25) + '...' : answer;

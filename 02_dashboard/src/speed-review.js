@@ -65,8 +65,9 @@ function handleIndustryQuestionChange(e) {
 function handleDetailClick(answerId) {
     const item = allCombinedData.find(data => data.answerId === answerId);
     if (item) {
-        populateModal(item);
-        handleOpenModal('reviewDetailModal', 'modals/reviewDetailModal.html'); // Assuming reviewDetailModal exists
+        handleOpenModal('reviewDetailModalOverlay', 'modals/reviewDetailModal.html', () => {
+            populateModal(item);
+        });
     } else {
         console.warn('Item not found for answerId:', answerId);
     }
@@ -86,7 +87,7 @@ function applyFilters() {
             const lastName = item.businessCard?.group2?.lastName || '';
             const firstName = item.businessCard?.group2?.firstName || '';
             const fullName = `${lastName} ${firstName}`.toLowerCase();
-            const companyName = item.businessCard?.group3?.companyName?.toLowerCase() || '';
+            const companyName = (item.businessCard?.group3?.companyName || '').trim().toLowerCase();
 
             // Get the answer for the currently selected question in the dropdown
             let selectedQuestionAnswer = '';
@@ -116,7 +117,7 @@ function applyFilters() {
         });
     }
 
-    displayPage(1, filteredData);
+    displayPage(currentPage, filteredData);
 }
 
 /**
@@ -234,7 +235,10 @@ function setupPagination(currentData = allCombinedData) {
 export async function initializePage() {
     try {
         const urlParams = new URLSearchParams(window.location.search);
-        const surveyId = urlParams.get('surveyId');
+        let surveyId = urlParams.get('surveyId');
+        if (!surveyId) {
+            surveyId = 'SURVEY8j2l0x';
+        }
         console.log('DEBUG: Survey ID from URL:', surveyId);
 
         if (!surveyId) {
@@ -246,14 +250,23 @@ export async function initializePage() {
             return;
         }
 
-        await speedReviewService.loadJsonData(
-            '../data/surveys.json',
-            '../data/survey-answers.json',
-            '../data/business-cards.json'
-        );
-        console.log('DEBUG: JSON data loaded by speedReviewService.');
-
-        allCombinedData = await speedReviewService.getCombinedReviewData(surveyId);
+        if (surveyId === 'SURVEY8j2l0x') {
+            const csvPaths = [
+                '../sample/0008000154.csv',
+                '../sample/0008000154ncd.csv'
+            ];
+            const csvData = await speedReviewService.loadAndCombineCsvData(csvPaths);
+            allCombinedData = speedReviewService.transformCsvToCombinedData(csvData, surveyId);
+            console.log('DEBUG: CSV data loaded and transformed:', allCombinedData);
+        } else {
+            await speedReviewService.loadJsonData(
+                './data/surveys.json',
+                './data/survey-answers.json',
+                './data/business-cards.json'
+            );
+            console.log('DEBUG: JSON data loaded by speedReviewService.');
+            allCombinedData = await speedReviewService.getCombinedReviewData(surveyId);
+        }
         console.log('DEBUG: Combined data for table:', allCombinedData);
         displayPage(1); // 初期表示は1ページ目
         setupEventListeners();

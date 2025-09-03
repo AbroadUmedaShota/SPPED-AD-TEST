@@ -41,6 +41,12 @@ async function loadModalFromFile(modalId, filePath) {
             if (modalId === 'qrCodeModal') {
                 setupQrCodeModalListeners(modalElement);
             }
+            if (modalId === 'reviewDetailModalOverlay') {
+                const closeBtn = modalElement.querySelector('#closeDetailModalBtn');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => closeModal(modalId));
+                }
+            }
 
         } else {
             console.error(`Error: Modal ID mismatch or invalid HTML structure for ${modalId} from ${filePath}.`);
