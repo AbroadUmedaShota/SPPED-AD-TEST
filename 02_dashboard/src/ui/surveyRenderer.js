@@ -78,8 +78,8 @@ function renderQuestion(question, lang, index) {
     const questionTextInput = fragment.querySelector('.question-text-input');
     const optionsContainer = fragment.querySelector('.options-container');
     const requiredCheckbox = fragment.querySelector('.required-checkbox');
-    const duplicateBtn = fragment.querySelector('[aria-label="質問を複製"]');
-    const deleteBtn = fragment.querySelector('[aria-label="質問を削除"]');
+    const duplicateBtn = fragment.querySelector('.duplicate-question-btn');
+    const deleteBtn = fragment.querySelector('.delete-question-btn');
 
     duplicateBtn.classList.add('duplicate-question-btn');
     deleteBtn.classList.add('delete-question-btn');
@@ -103,11 +103,11 @@ function renderQuestion(question, lang, index) {
             const optionFragment = optionTemplate.content.cloneNode(true);
             const optionItem = optionFragment.querySelector('.option-item');
             const optionInput = optionFragment.querySelector('.option-text-input');
-            const deleteOptionBtn = optionFragment.querySelector('.delete-option-btn');
             
             optionItem.dataset.optionIndex = optIndex;
             optionInput.value = getText(opt.text, lang);
             optionInput.oninput = (e) => { opt.text[lang] = e.target.value; };
+
             optionsContainer.appendChild(optionFragment);
         });
         const addOptionButton = document.createElement('button');
@@ -131,8 +131,8 @@ function renderQuestionGroup(group, lang) {
     const groupItem = fragment.querySelector('.question-group');
     const titleInput = fragment.querySelector('.group-title-input');
     const questionsList = fragment.querySelector('.questions-list');
-    const duplicateBtn = fragment.querySelector('[aria-label="グループを複製"]');
-    const deleteBtn = fragment.querySelector('[aria-label="グループを削除"]');
+    const duplicateBtn = fragment.querySelector('.duplicate-group-btn');
+    const deleteBtn = fragment.querySelector('.delete-group-btn');
 
     duplicateBtn.classList.add('duplicate-group-btn');
     deleteBtn.classList.add('delete-group-btn');

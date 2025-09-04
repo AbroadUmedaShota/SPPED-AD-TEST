@@ -9,10 +9,12 @@ import {
 } from './ui/surveyRenderer.js';
 import { initializeFab } from './ui/fab.js';
 import { loadCommonHtml } from './utils.js';
+import { showToast } from './utils.js';
 
 // --- Global State ---
 let surveyData = {};
 let currentLang = 'ja';
+let currentSurveyId = null;
 
 // --- Utility Functions ---
 window.getCurrentLanguage = () => currentLang;
@@ -50,25 +52,8 @@ function updateAndRenderAll() {
     renderOutlineMap();
     // After rendering, re-validate the form to enable/disable the save button
     validateFormForSaveButton();
-}
-
-/**
- * Switches the current language and updates the UI.
- * @param {string} newLang - The new language code ('ja' or 'en').
- */
-function switchLanguage(newLang) {
-    currentLang = newLang;
-    // Update all language tabs in the document
-    document.querySelectorAll('.lang-tab-button').forEach(btn => {
-        if (btn.dataset.lang === newLang) {
-            btn.classList.add('border-primary', 'text-primary');
-            btn.classList.remove('border-transparent', 'text-on-surface-variant', 'hover:border-outline-variant', 'hover:text-on-surface');
-        } else {
-            btn.classList.remove('border-primary', 'text-primary');
-            btn.classList.add('border-transparent', 'text-on-surface-variant', 'hover:border-outline-variant', 'hover:text-on-surface');
-        }
-    });
-    updateAndRenderAll();
+    // Initialize Sortable after rendering
+    setupSortables();
 }
 
 /**
@@ -84,13 +69,29 @@ async function initializePage() {
             })
         ]);
 
-        const loadedData = loadSurveyDataFromLocalStorage();
-        if (loadedData) {
-            console.log('Loaded survey data from localStorage:', loadedData);
-            surveyData = loadedData;
-        } else {
-            console.log('No survey data in localStorage. Fetching initial data...');
-            surveyData = await fetchSurveyData();
+        // Load keyed data by surveyId if present (local-only)
+        try {
+            currentSurveyId = (new URLSearchParams(window.location.search)).get('surveyId');
+            if (currentSurveyId) {
+                const keyed = localStorage.getItem(`surveyData_${currentSurveyId}`);
+                if (keyed) {
+                    surveyData = JSON.parse(keyed);
+                    console.log('Loaded survey data (by surveyId) from localStorage:', currentSurveyId);
+                }
+            }
+        } catch (e) {
+            console.warn('Failed to load keyed survey data:', e);
+        }
+
+        if (!surveyData || Object.keys(surveyData).length === 0) {
+            const loadedData = loadSurveyDataFromLocalStorage();
+            if (loadedData) {
+                console.log('Loaded survey data from localStorage:', loadedData);
+                surveyData = loadedData;
+            } else {
+                console.log('No survey data in localStorage. Fetching initial data...');
+                surveyData = await fetchSurveyData();
+            }
         }
 
         // --- New: Process URL Query Parameters ---
@@ -104,30 +105,23 @@ async function initializePage() {
         if (surveyName) {
             if (typeof surveyData.name !== 'object' || surveyData.name === null) surveyData.name = {};
             surveyData.name.ja = surveyName;
-            document.getElementById('surveyName').value = surveyName;
         }
         if (displayTitle) {
             if (typeof surveyData.displayTitle !== 'object' || surveyData.displayTitle === null) surveyData.displayTitle = {};
             surveyData.displayTitle.ja = displayTitle;
-            document.getElementById('displayTitle').value = displayTitle;
         }
         if (memo) {
             surveyData.memo = memo;
-            document.getElementById('memo').value = memo;
         }
         if (periodStart) {
             surveyData.periodStart = periodStart;
-            document.getElementById('periodStart').value = periodStart;
         }
         if (periodEnd) {
             surveyData.periodEnd = periodEnd;
-            document.getElementById('periodEnd').value = periodEnd;
         }
         // --- End New ---
 
-        // Set initial language from global state
-        currentLang = window.getCurrentLanguage ? window.getCurrentLanguage() : 'ja';
-        switchLanguage(currentLang);
+        updateAndRenderAll();
 
         restoreAccordionState(); // アコーディオンの状態を復元
         // FABの初期化とアクションの紐付け
@@ -200,16 +194,9 @@ function initializeAccordion() {
 function setupEventListeners() {
     initializeAccordion();
 
-    // --- Global Language Change Listener ---
-    document.addEventListener('languagechange', (e) => {
-        switchLanguage(e.detail.lang);
-    });
-
     // --- Delegated Click-to-Action Listeners ---
     document.body.addEventListener('click', (event) => {
         const target = event.target;
-        const langTabButton = target.closest('.lang-tab-button');
-        const addGroupBtn = target.closest('#addQuestionGroupBtn'); // Assuming a button with this ID exists
         const deleteGroupBtn = target.closest('.delete-group-btn');
         const duplicateGroupBtn = target.closest('.duplicate-group-btn');
         const addQuestionBtn = target.closest('.add-question-btn');
@@ -218,14 +205,6 @@ function setupEventListeners() {
         const addOptionBtn = target.closest('.add-option-btn');
         const deleteOptionBtn = target.closest('.delete-option-btn');
 
-        if (langTabButton) {
-            switchLanguage(langTabButton.dataset.lang);
-            return; // Stop further processing
-        }
-        if (addGroupBtn) {
-            handleAddNewQuestionGroup();
-            return;
-        }
         if (deleteGroupBtn) {
             const groupId = deleteGroupBtn.closest('.question-group').dataset.groupId;
             handleDeleteQuestionGroup(groupId);
@@ -263,8 +242,6 @@ function setupEventListeners() {
         if (deleteOptionBtn) {
             const groupId = deleteOptionBtn.closest('.question-group').dataset.groupId;
             const questionId = deleteOptionBtn.closest('.question-item').dataset.questionId;
-            // This needs index, which is harder with delegation. A direct listener in render might be better here.
-            // For now, let's assume we can get it.
             const optionIndex = Array.from(deleteOptionBtn.closest('.options-container').children).indexOf(deleteOptionBtn.closest('.option-item'));
             handleDeleteOption(groupId, questionId, optionIndex);
             return;
@@ -276,6 +253,13 @@ function setupEventListeners() {
     if (createSurveyBtn) {
         createSurveyBtn.addEventListener('click', () => {
             saveSurveyDataToLocalStorage(surveyData);
+            if (currentSurveyId) {
+                try {
+                    localStorage.setItem(`surveyData_${currentSurveyId}`, JSON.stringify(surveyData));
+                } catch (e) {
+                    console.error('Failed to save keyed survey data:', e);
+                }
+            }
             console.log('Saved Survey Data to localStorage:', surveyData);
             alert('アンケートデータがlocalStorageに保存されました！');
         });
@@ -288,7 +272,7 @@ function handleAddNewQuestionGroup() {
     if (!surveyData.questionGroups) surveyData.questionGroups = [];
     const newGroup = {
         groupId: `group_${Date.now()}`,
-        title: { ja: '新しい質問グループ', en: 'New Question Group' },
+        title: { ja: '新しい質問グループ', en: '' },
         questions: []
     };
     surveyData.questionGroups.push(newGroup);
@@ -313,17 +297,28 @@ function handleDuplicateQuestionGroup(groupId) {
 }
 
 function handleAddNewQuestion(groupId, questionType) {
-    const group = surveyData.questionGroups.find(g => g.groupId === groupId);
-    if (!group) return;
-    if (!group.questions) group.questions = [];
+    let targetGroup;
+    if (groupId) {
+        targetGroup = surveyData.questionGroups.find(g => g.groupId === groupId);
+    } else {
+        // If groupId is null, add to the last group
+        if (!surveyData.questionGroups || surveyData.questionGroups.length === 0) {
+            handleAddNewQuestionGroup(); // Create a new group if none exist
+        }
+        targetGroup = surveyData.questionGroups[surveyData.questionGroups.length - 1];
+    }
+
+    if (!targetGroup) return; // Should not happen if handleAddNewQuestionGroup is called
+
+    if (!targetGroup.questions) targetGroup.questions = [];
     const newQuestion = {
         questionId: `q_${Date.now()}`,
         type: questionType,
-        text: { ja: '新しい質問', en: 'New Question' },
+        text: { ja: '新しい質問', en: '' },
         required: false,
         options: (questionType === 'single_answer' || questionType === 'multi_answer') ? [] : undefined
     };
-    group.questions.push(newQuestion);
+    targetGroup.questions.push(newQuestion);
     updateAndRenderAll();
 }
 
@@ -350,7 +345,7 @@ function handleDuplicateQuestion(groupId, questionId) {
 function handleAddOption(groupId, questionId) {
     const question = surveyData.questionGroups.find(g => g.groupId === groupId)?.questions.find(q => q.questionId === questionId);
     if (question && question.options) {
-        question.options.push({ text: { ja: '新しい選択肢', en: 'New Option' } });
+        question.options.push({ text: { ja: '新しい選択肢', en: '' } });
         updateAndRenderAll();
     }
 }
@@ -370,7 +365,6 @@ function validateFormForSaveButton() {
     const saveButton = document.getElementById('createSurveyBtn');
     if (!saveButton) return;
 
-    // For multilingual, we check the required fields in the default language (e.g., Japanese)
     const requiredFields = [
         surveyData.name?.ja,
         surveyData.displayTitle?.ja,
@@ -398,4 +392,129 @@ function validateFormForSaveButton() {
 document.addEventListener('DOMContentLoaded', () => {
     initializePage();
     setupEventListeners();
+    attachPreviewListener();
 });
+
+// プレビューのイベントを付与
+function attachPreviewListener() {
+    const previewBtn = document.getElementById('showPreviewBtn');
+    if (!previewBtn) return;
+    previewBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        try {
+            await handleOpenModal('surveyPreviewModal', 'modals/surveyPreviewModal.html');
+            renderSurveyPreview();
+        } catch (err) {
+            console.error('Failed to open preview modal:', err);
+        }
+    });
+}
+
+// --- Drag & Drop (Sortable) ---
+function arrayMove(arr, from, to) {
+    if (!arr || from === to || from < 0 || to < 0 || from >= arr.length || to >= arr.length) return;
+    const item = arr.splice(from, 1)[0];
+    arr.splice(to, 0, item);
+}
+
+function setupSortables() {
+    if (typeof Sortable === 'undefined') return;
+
+    // Group sorting
+    const groupsContainer = document.getElementById('questionGroupsContainer');
+    if (groupsContainer) {
+        new Sortable(groupsContainer, {
+            animation: 150,
+            handle: '.handle',
+            draggable: '.question-group',
+            onEnd: (evt) => {
+                arrayMove(surveyData.questionGroups, evt.oldIndex, evt.newIndex);
+                updateAndRenderAll();
+            }
+        });
+    }
+
+    // For each group: question sorting and option sorting
+    document.querySelectorAll('.question-group').forEach(groupEl => {
+        const groupId = groupEl.dataset.groupId;
+        const questionsList = groupEl.querySelector('.questions-list');
+        if (questionsList) {
+            new Sortable(questionsList, {
+                animation: 150,
+                handle: '.handle',
+                draggable: '.question-item',
+                onEnd: (evt) => {
+                    const group = surveyData.questionGroups.find(g => g.groupId === groupId);
+                    if (!group || !group.questions) return;
+                    arrayMove(group.questions, evt.oldIndex, evt.newIndex);
+                    updateAndRenderAll();
+                }
+            });
+        }
+
+        // Option sorting per question (if options exist)
+        groupEl.querySelectorAll('.question-item').forEach(qItem => {
+            const questionId = qItem.dataset.questionId;
+            const optionsContainer = qItem.querySelector('.options-container');
+            if (!optionsContainer) return;
+            new Sortable(optionsContainer, {
+                animation: 150,
+                draggable: '.option-item',
+                onEnd: (evt) => {
+                    const group = surveyData.questionGroups.find(g => g.groupId === groupId);
+                    const question = group?.questions?.find(q => q.questionId === questionId);
+                    if (!question || !question.options) return;
+                    arrayMove(question.options, evt.oldIndex, evt.newIndex);
+                    updateAndRenderAll();
+                }
+            });
+        });
+    });
+}
+
+// --- Preview Rendering ---
+function getTextLocal(field, lang = 'ja') {
+    if (typeof field === 'object' && field !== null) {
+        return field[lang] || field.ja || '';
+    }
+    return field || '';
+}
+
+function renderSurveyPreview() {
+    const container = document.getElementById('modalSurveyPreviewContainer');
+    if (!container) return;
+
+    const lang = 'ja';
+    const lines = [];
+    lines.push(`<div class="space-y-3">`);
+    lines.push(`<div>
+        <div class=\"text-xl font-semibold text-on-surface\">${getTextLocal(surveyData.displayTitle, lang) || getTextLocal(surveyData.name, lang) || '（無題アンケート）'}</div>
+        <div class=\"text-on-surface-variant text-sm\">${surveyData.periodStart || ''} ${(surveyData.periodStart || surveyData.periodEnd) ? '〜' : ''} ${surveyData.periodEnd || ''}</div>
+    </div>`);
+    if (surveyData.description) {
+        lines.push(`<p class=\"text-on-surface-variant\">${getTextLocal(surveyData.description, lang)}</p>`);
+    }
+
+    (surveyData.questionGroups || []).forEach((g, gi) => {
+        lines.push(`<div class=\"mt-4\">
+            <h3 class=\"text-on-surface font-bold mb-2\">${getTextLocal(g.title, lang) || `グループ${gi + 1}`}</h3>
+        </div>`);
+        (g.questions || []).forEach((q, qi) => {
+            const qTitle = getTextLocal(q.text, lang) || `設問${qi + 1}`;
+            lines.push(`<div class=\"mb-3\">
+                <div class=\"text-on-surface font-medium\">Q${qi + 1}. ${qTitle} ${q.required ? '<span class=\"text-error text-xs\"(必須)</span>' : ''}</div>`);
+            if (q.options && q.options.length) {
+                lines.push('<ul class="list-disc ml-6 text-on-surface-variant">');
+                q.options.forEach(opt => {
+                    lines.push(`<li>${getTextLocal(opt.text, lang)}</li>`);
+                });
+                lines.push('</ul>');
+            }
+            lines.push(`</div>`);
+        });
+    });
+    lines.push(`</div>`);
+
+    container.innerHTML = lines.join('
+');
+}
