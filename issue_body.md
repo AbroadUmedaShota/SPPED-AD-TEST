@@ -1,19 +1,15 @@
-### 事前調査の要約
-`docs/specifications/` 以下の以下のファイルにコミットされていない変更があります。
-- `docs/specifications/00_screen_requirements.md`
-- `docs/specifications/01_screen_flow.md`
-- `docs/specifications/02_survey_creation.md`
-- `docs/specifications/03_ux_group_creation_modal.md`
-- `docs/specifications/04_invoice_screen.md`
-- `docs/specifications/05_invoice_document.md`
-- `docs/specifications/06_speed_review.md`
+プロジェクトのデザインガイドライン、CSS実装、HTMLマークアップの間で確認された以下の不整合を解消し、ドキュメントと実装の一貫性を確保します。
 
-これらの変更は現在 `main` ブランチでコミットされていません。
+**修正対象の不整合点:**
 
-### 説明
-このIssueは、`docs/specifications/` ディレクトリ内のコミットされていない変更をコミットし、`main` ブランチにマージすることを目的としています。これらの変更は仕様書ドキュメントの更新に関連しています。
+1.  **ダークモードのカラー定義:**
+    *   **問題:** `service-top-style.css` のダークモード実装と `00_design_guideline.md` の定義が一致していません。
+    *   **解決策:** CSSの実装を正とし、ドキュメントを更新します。
 
-### 完了の定義
-- [ ] `docs/specifications/` 内のコミットされていないすべての変更がコミットされる。
-- [ ] これらの変更に対して新しいPull Requestが作成される。
-- [ ] Pull Requestが `main` ブランチにマージされる。
+2.  **タイポグラフィ:**
+    *   **問題:** `index.html` の見出しサイズが、ガイドラインで定義されたピクセル値と異なっています。
+    *   **解決策:** ガイドラインに沿ってHTMLのクラスを修正するか、実装に合わせてガイドラインを更新します。
+
+3.  **コンポーネントの色の使い方:**
+    *   **問題:** 「フィルターをリセット」ボタンに、意図しないコンテナ用の色 (`bg-secondary-container`) が使われています。
+    *   **解決策:** ガイドラインに従い、ボタン専用のスタイルクラスに修正します。
