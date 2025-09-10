@@ -1,10 +1,14 @@
 [
   {
     "id": "GROUP001",
-    "name": "営業部"
+    "name": "営業部",
+    "description": "",
+    "members": []
   },
   {
     "id": "GROUP002",
-    "name": "マーケティング部"
+    "name": "マーケティング部",
+    "description": "",
+    "members": []
   }
 ]
