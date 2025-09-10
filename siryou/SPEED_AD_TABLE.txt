@@ -1,0 +1,1305 @@
+document_title: テーブル定義書
+document_date: '2025-05-21'
+table_list:
+  - no: 1
+    logical_name: ''
+    physical_name: speedad.admin_user
+    remarks: ''
+  - no: 2
+    logical_name: ''
+    physical_name: speedad.answer
+    remarks: アンケート回答
+  - no: 3
+    logical_name: ''
+    physical_name: speedad.answer_detail
+    remarks: ''
+  - no: 4
+    logical_name: ''
+    physical_name: speedad.corporate
+    remarks: 企業(有料機能利用時に登録)
+  - no: 5
+    logical_name: ''
+    physical_name: speedad.corporate_assign
+    remarks: ''
+  - no: 6
+    logical_name: ''
+    physical_name: speedad.coupon
+    remarks: ''
+  - no: 7
+    logical_name: ''
+    physical_name: speedad.coupon_detail
+    remarks: ''
+  - no: 8
+    logical_name: ''
+    physical_name: speedad.groups
+    remarks: オペレーターが所属するグループ情報管理
+  - no: 9
+    logical_name: ''
+    physical_name: speedad.input_business_cards
+    remarks: OCR, オペレーターなど、アンケート回答者以外が入力した名刺情報を管理するテーブル。
+  - no: 10
+    logical_name: ''
+    physical_name: speedad.invoice
+    remarks: ''
+  - no: 11
+    logical_name: ''
+    physical_name: speedad.m_business_card_groups
+    remarks: 名刺入力のグループ管理マスターテーブル
+  - no: 12
+    logical_name: ''
+    physical_name: speedad.m_business_day
+    remarks: ''
+  - no: 13
+    logical_name: ''
+    physical_name: speedad.m_business_day2
+    remarks: ''
+  - no: 14
+    logical_name: ''
+    physical_name: speedad.m_reward_rates
+    remarks: 報酬レートマスターテーブル
+  - no: 15
+    logical_name: ''
+    physical_name: speedad.m_templates
+    remarks: ''
+  - no: 16
+    logical_name: ''
+    physical_name: speedad.mail_templates
+    remarks: ''
+  - no: 17
+    logical_name: ''
+    physical_name: speedad.reward_histories
+    remarks: 報酬履歴
+  - no: 18
+    logical_name: ''
+    physical_name: speedad.survey
+    remarks: ''
+  - no: 19
+    logical_name: ''
+    physical_name: speedad.survey_detail
+    remarks: ''
+  - no: 20
+    logical_name: ''
+    physical_name: speedad.token_password_reset
+    remarks: ''
+  - no: 21
+    logical_name: ''
+    physical_name: speedad.token_tmp_register
+    remarks: ''
+  - no: 22
+    logical_name: ''
+    physical_name: speedad.users
+    remarks: ''
+tables:
+  - table_information:
+      system_name: ''
+      subsystem_name: ''
+      schema_name: speedad
+      logical_table_name: ''
+      physical_table_name: admin_user
+      remarks: ''
+      creator: suzuki
+      creation_date: '2025/02/13'
+      update_date: ''
+      rdbms: 8.0.31
+    column_information:
+      - no: 1
+        logical_name: ''
+        physical_name: id
+        data_type: int auto_increment
+        not_null: 'Yes (PK)'
+        default: ''
+        remarks: ''
+      - no: 2
+        logical_name: ''
+        physical_name: login_id
+        data_type: text
+        not_null: 'Yes'
+        default: ''
+        remarks: ''
+      - no: 3
+        logical_name: ''
+        physical_name: password
+        data_type: text
+        not_null: 'Yes'
+        default: ''
+        remarks: ''
+      - no: 4
+        logical_name: ''
+        physical_name: authority
+        data_type: int
+        not_null: 'Yes'
+        default: ''
+        remarks: 管理画面権限(MasterAdmin:1, Admin:2, Operator:3, Operator_Admin:4)
+      - no: 5
+        logical_name: ''
+        physical_name: company_name
+        data_type: text
+        not_null: 'Yes'
+        default: ''
+        remarks: ''
+      - no: 6
+        logical_name: ''
+        physical_name: group_id
+        data_type: int
+        not_null: ''
+        default: ''
+        remarks: 所属グループID (operetor, operetor_adminがどのグループに所属しているかを判定するためのID)
+      - no: 7
+        logical_name: ''
+        physical_name: user_post
+        data_type: text
+        not_null: 'Yes'
+        default: ''
+        remarks: ''
+      - no: 8
+        logical_name: ''
+        physical_name: user_name
+        data_type: text
+        not_null: 'Yes'
+        default: ''
+        remarks: ''
+      - no: 9
+        logical_name: ''
+        physical_name: status
+        data_type: int
+        not_null: 'Yes'
+        default: ''
+        remarks: 0:稼働 1:停止
+      - no: 10
+        logical_name: ''
+        physical_name: create_date
+        data_type: text
+        not_null: 'Yes'
+        default: ''
+        remarks: ''
+      - no: 11
+        logical_name: ''
+        physical_name: last_login_at
+        data_type: datetime
+        not_null: ''
+        default: ''
+        remarks: 最終ログイン日時
+      - no: 12
+        logical_name: ''
+        physical_name: created_at
+        data_type: datetime
+        not_null: ''
+        default: CURRENT_TIMESTAMP
+        remarks: ''
+      - no: 13
+        logical_name: ''
+        physical_name: updated_at
+        data_type: datetime on update CURRENT_TIMESTAMP
+        not_null: ''
+        default: CURRENT_TIMESTAMP
+        remarks: ''
+    index_information:
+      - no: 1
+        index_name: PRIMARY
+        column_list: id
+        primary_key: 'Yes'
+        unique: 'Yes'
+        option: ''
+    constraint_information:
+      - no: 1
+        constraint_name: PRIMARY
+        type: PRIMARY KEY
+        constraint_definition: id
+    rdbms_specific_information:
+      - no: 1
+        property_name: TABLE_CATALOG
+        property_value: def
+      - no: 2
+        property_name: TABLE_SCHEMA
+        property_value: speedad
+      - no: 3
+        property_name: TABLE_NAME
+        property_value: admin_user
+      - no: 4
+        property_name: TABLE_TYPE
+        property_value: BASE TABLE
+      - no: 5
+        property_name: ENGINE
+        property_value: InnoDB
+      - no: 6
+        property_name: VERSION
+        property_value: 10
+      - no: 7
+        property_name: ROW_FORMAT
+        property_value: Dynamic
+      - no: 8
+        property_name: TABLE_ROWS
+        property_value: 2
+      - no: 9
+        property_name: AVG_ROW_LENGTH
+        property_value: 8192
+      - no: 10
+        property_name: DATA_LENGTH
+        property_value: 16384
+      - no: 11
+        property_name: MAX_DATA_LENGTH
+        property_value: 0
+      - no: 12
+        property_name: INDEX_LENGTH
+        property_value: 0
+      - no: 13
+        property_name: DATA_FREE
+        property_value: 0
+      - no: 14
+        property_name: AUTO_INCREMENT
+        property_value: 5
+      - no: 15
+        property_name: CREATE_TIME
+        property_value: '2025/02/12 4:25:11'
+      - no: 18
+        property_name: TABLE_COLLATION
+        property_value: utf8mb3_unicode_ci
+  - table_information:
+      system_name: ''
+      subsystem_name: ''
+      schema_name: speedad
+      logical_table_name: ''
+      physical_table_name: answer
+      remarks: アンケート回答
+      creator: suzuki
+      creation_date: '2025/02/13'
+      update_date: ''
+      rdbms: 8.0.31
+    column_information:
+      - no: 1
+        logical_name: ''
+        physical_name: id
+        data_type: int auto_increment
+        not_null: 'Yes (PK)'
+        default: ''
+        remarks: 回答アンケートID
+      - no: 2
+        logical_name: ''
+        physical_name: survey_id
+        data_type: int
+        not_null: 'Yes'
+        default: ''
+        remarks: ''
+      - no: 3
+        logical_name: ''
+        physical_name: photo_1
+        data_type: text
+        not_null: ''
+        default: ''
+        remarks: 名刺画像表面パス
+      - no: 4
+        logical_name: ''
+        physical_name: photo_2
+        data_type: text
+        not_null: ''
+        default: ''
+        remarks: 名刺画像裏面パス
+      - no: 5
+        logical_name: ''
+        physical_name: company_name
+        data_type: text
+        not_null: ''
+        default: ''
+        remarks: 名刺情報(会社名)※手入力用
+      - no: 6
+        logical_name: ''
+        physical_name: busyo_name
+        data_type: text
+        not_null: ''
+        default: ''
+        remarks: 名刺情報(部署名)※手入力用
+      - no: 7
+        logical_name: ''
+        physical_name: yakusyoku_name
+        data_type: text
+        not_null: ''
+        default: ''
+        remarks: 名刺情報(役職名)※手入力用
+      - no: 8
+        logical_name: ''
+        physical_name: name
+        data_type: text
+        not_null: ''
+        default: ''
+        remarks: 名刺情報(氏名)※手入力用
+      - no: 9
+        logical_name: ''
+        physical_name: email
+        data_type: text
+        not_null: ''
+        default: ''
+        remarks: 名刺情報(メールアドレス)※手入力用
+      - no: 10
+        logical_name: ''
+        physical_name: tel
+        data_type: text
+        not_null: ''
+        default: ''
+        remarks: 名刺情報(電話番号)※手入力用
+      - no: 11
+        logical_name: ''
+        physical_name: zip_code
+        data_type: text
+        not_null: ''
+        default: ''
+        remarks: 名刺情報(郵便番号)※手入力用
+      - no: 12
+        logical_name: ''
+        physical_name: address
+        data_type: text
+        not_null: ''
+        default: ''
+        remarks: 名刺情報(住所)※手入力用
+      - no: 13
+        logical_name: ''
+        physical_name: test_flag
+        data_type: int
+        not_null: ''
+        default: ''
+        remarks: テスト回答フラグ(1:テスト回答)
+      - no: 14
+        logical_name: ''
+        physical_name: mail_flag
+        data_type: int
+        not_null: 'Yes'
+        default: '1'
+        remarks: 0:送信しない 1:送信する
+      - no: 15
+        logical_name: ''
+        physical_name: corrected_first_name
+        data_type: varchar(255)
+        not_null: ''
+        default: ''
+        remarks: ''
+      - no: 30
+        logical_name: ''
+        physical_name: created_at
+        data_type: datetime
+        not_null: ''
+        default: CURRENT_TIMESTAMP
+        remarks: ''
+      - no: 31
+        logical_name: ''
+        physical_name: updated_at
+        data_type: datetime
+        not_null: ''
+        default: CURRENT_TIMESTAMP
+        remarks: ''
+    index_information:
+      - no: 1
+        index_name: PRIMARY
+        column_list: id
+        primary_key: 'Yes'
+        unique: 'Yes'
+        option: ''
+    constraint_information:
+      - no: 1
+        constraint_name: PRIMARY
+        type: PRIMARY KEY
+        constraint_definition: id
+    rdbms_specific_information:
+      - no: 3
+        property_name: TABLE_NAME
+        property_value: answer
+      - no: 4
+        property_name: TABLE_TYPE
+        property_value: BASE TABLE
+      - no: 5
+        property_name: ENGINE
+        property_value: InnoDB
+      - no: 8
+        property_name: TABLE_ROWS
+        property_value: 3
+      - no: 9
+        property_name: AVG_ROW_LENGTH
+        property_value: 5461
+      - no: 14
+        property_name: AUTO_INCREMENT
+        property_value: 4
+      - no: 15
+        property_name: CREATE_TIME
+        property_value: '2025/02/12 6:36:12'
+      - no: 18
+        property_name: TABLE_COLLATION
+        property_value: utf8mb3_unicode_ci
+      - no: 21
+        property_name: TABLE_COMMENT
+        property_value: アンケート回答
+  - table_information:
+      system_name: ''
+      subsystem_name: ''
+      schema_name: speedad
+      logical_table_name: ''
+      physical_table_name: answer_detail
+      remarks: ''
+      creator: suzuki
+      creation_date: '2025/02/13'
+      update_date: ''
+      rdbms: 8.0.31
+    column_information:
+      - no: 1
+        logical_name: ''
+        physical_name: id
+        data_type: int auto_increment
+        not_null: 'Yes (PK)'
+        default: ''
+        remarks: アンケート詳細ID
+      - no: 2
+        logical_name: ''
+        physical_name: survey_detail_id
+        data_type: int
+        not_null: 'Yes'
+        default: ''
+        remarks: ''
+      - no: 3
+        logical_name: ''
+        physical_name: answer
+        data_type: text
+        not_null: ''
+        default: ''
+        remarks: 回答内容
+      - no: 4
+        logical_name: ''
+        physical_name: answer_free_text
+        data_type: longtext
+        not_null: ''
+        default: ''
+        remarks: その他回答時のフリーテキスト
+      - no: 5
+        logical_name: ''
+        physical_name: test_flag
+        data_type: tinyint
+        not_null: ''
+        default: ''
+        remarks: テスト回答フラグ (1:テスト回答)
+      - no: 6
+        logical_name: ''
+        physical_name: created_at
+        data_type: datetime
+        not_null: ''
+        default: ''
+        remarks: ''
+      - no: 7
+        logical_name: ''
+        physical_name: updated_at
+        data_type: datetime
+        not_null: ''
+        default: ''
+        remarks: ''
+    index_information:
+      - no: 1
+        index_name: PRIMARY
+        column_list: id
+        primary_key: 'Yes'
+        unique: 'Yes'
+        option: ''
+    constraint_information:
+      - no: 1
+        constraint_name: PRIMARY
+        type: PRIMARY KEY
+        constraint_definition: id
+    rdbms_specific_information:
+      - no: 3
+        property_name: TABLE_NAME
+        property_value: answer_detail
+      - no: 8
+        property_name: TABLE_ROWS
+        property_value: 19
+      - no: 9
+        property_name: AVG_ROW_LENGTH
+        property_value: 862
+      - no: 14
+        property_name: AUTO_INCREMENT
+        property_value: 20
+      - no: 15
+        property_name: CREATE_TIME
+        property_value: '2025/02/05 17:01:35'
+  - table_information:
+      system_name: ''
+      subsystem_name: ''
+      schema_name: speedad
+      logical_table_name: ''
+      physical_table_name: corporate
+      remarks: 企業(有料機能利用時に登録)
+      creator: suzuki
+      creation_date: '2025/02/13'
+      update_date: ''
+      rdbms: 8.0.31
+    column_information:
+      - no: 1
+        logical_name: ''
+        physical_name: id
+        data_type: int auto_increment
+        not_null: 'Yes (PK)'
+        default: ''
+        remarks: ''
+      - no: 2
+        logical_name: ''
+        physical_name: corporate_name
+        data_type: text
+        not_null: ''
+        default: ''
+        remarks: 会社名
+      - no: 11
+        logical_name: ''
+        physical_name: group_flag
+        data_type: int
+        not_null: 'Yes'
+        default: '0'
+        remarks: 0:個人,1:グループ
+      - no: 12
+        logical_name: ''
+        physical_name: seikyu_flag
+        data_type: tinyint
+        not_null: ''
+        default: ''
+        remarks: 請求フラグ(0:上記と同じ, 1:上記と異なる)
+    index_information:
+      - no: 1
+        index_name: PRIMARY
+        column_list: id
+        primary_key: 'Yes'
+        unique: 'Yes'
+        option: ''
+    rdbms_specific_information:
+      - no: 3
+        property_name: TABLE_NAME
+        property_value: corporate
+      - no: 8
+        property_name: TABLE_ROWS
+        property_value: 80
+      - no: 9
+        property_name: AVG_ROW_LENGTH
+        property_value: 204
+      - no: 14
+        property_name: AUTO_INCREMENT
+        property_value: 81
+      - no: 15
+        property_name: CREATE_TIME
+        property_value: '2025/02/05 17:01:36'
+      - no: 21
+        property_name: TABLE_COMMENT
+        property_value: 企業(有料機能利用時に登録)
+  - table_information:
+      system_name: ''
+      subsystem_name: ''
+      schema_name: speedad
+      logical_table_name: ''
+      physical_table_name: corporate_assign
+      remarks: ''
+      creator: suzuki
+      creation_date: '2025/02/13'
+      update_date: ''
+      rdbms: 8.0.31
+    column_information:
+      - no: 2
+        logical_name: ''
+        physical_name: user_id
+        data_type: int
+        not_null: 'Yes'
+        default: ''
+        remarks: ''
+      - no: 3
+        logical_name: ''
+        physical_name: authority
+        data_type: int
+        not_null: 'Yes'
+        default: ''
+        remarks: 1:管理,2:ユーザー
+      - no: 4
+        logical_name: ''
+        physical_name: status
+        data_type: int
+        not_null: 'Yes'
+        default: ''
+        remarks: 0:所属,99:脱退済
+    rdbms_specific_information:
+      - no: 3
+        property_name: TABLE_NAME
+        property_value: corporate_assign
+      - no: 8
+        property_name: TABLE_ROWS
+        property_value: 43
+      - no: 9
+        property_name: AVG_ROW_LENGTH
+        property_value: 381
+      - no: 14
+        property_name: AUTO_INCREMENT
+        property_value: 44
+      - no: 15
+        property_name: CREATE_TIME
+        property_value: '2025/02/05 17:01:41'
+      - no: 18
+        property_name: TABLE_COLLATION
+        property_value: utf8mb3_general_ci
+  - table_information:
+      system_name: ''
+      subsystem_name: ''
+      schema_name: speedad
+      logical_table_name: ''
+      physical_table_name: coupon
+      remarks: ''
+      creator: suzuki
+      creation_date: '2025/02/13'
+      update_date: ''
+      rdbms: 8.0.31
+    column_information:
+      - no: 2
+        logical_name: ''
+        physical_name: name
+        data_type: varchar(128)
+        not_null: 'Yes'
+        default: ''
+        remarks: クーポン名
+      - no: 4
+        logical_name: ''
+        physical_name: expire_date
+        data_type: date
+        not_null: ''
+        default: ''
+        remarks: 使用可能期限
+      - no: 5
+        logical_name: ''
+        physical_name: discount_rate
+        data_type: float
+        not_null: 'Yes'
+        default: ''
+        remarks: 割引率(%)
+    rdbms_specific_information:
+      - no: 3
+        property_name: TABLE_NAME
+        property_value: coupon
+      - no: 14
+        property_name: AUTO_INCREMENT
+        property_value: 1
+      - no: 15
+        property_name: CREATE_TIME
+        property_value: '2025/02/05 17:01:42'
+  - table_information:
+      system_name: ''
+      subsystem_name: ''
+      schema_name: speedad
+      logical_table_name: ''
+      physical_table_name: coupon_detail
+      remarks: ''
+      creator: suzuki
+      creation_date: '2025/02/13'
+      update_date: ''
+      rdbms: 8.0.31
+    column_information:
+      - no: 2
+        logical_name: ''
+        physical_name: coupon_id
+        data_type: text
+        not_null: 'Yes'
+        default: ''
+        remarks: 親クーポンID
+      - no: 3
+        logical_name: ''
+        physical_name: code
+        data_type: text
+        not_null: 'Yes'
+        default: ''
+        remarks: クーポンコード
+      - no: 4
+        logical_name: ''
+        physical_name: used_date
+        data_type: date
+        not_null: ''
+        default: ''
+        remarks: 使用日(使用日が入力されている=使用済み)
+    rdbms_specific_information:
+      - no: 3
+        property_name: TABLE_NAME
+        property_value: coupon_detail
+      - no: 15
+        property_name: CREATE_TIME
+        property_value: '2025/02/05 17:01:44'
+  - table_information:
+      system_name: ''
+      subsystem_name: ''
+      schema_name: speedad
+      logical_table_name: ''
+      physical_table_name: groups
+      remarks: オペレーターが所属するグループ情報管理
+      creator: suzuki
+      creation_date: '2025/02/13'
+      update_date: ''
+      rdbms: 8.0.31
+    column_information:
+      - no: 2
+        logical_name: ''
+        physical_name: name
+        data_type: varchar(255)
+        not_null: 'Yes'
+        default: ''
+        remarks: グループ名称
+    index_information:
+      - no: 2
+        index_name: id_UNIQUE
+        column_list: id
+        primary_key: ''
+        unique: 'Yes'
+        option: ''
+      - no: 3
+        index_name: name_UNIQUE
+        column_list: name
+        primary_key: ''
+        unique: ''
+        option: ''
+    rdbms_specific_information:
+      - no: 3
+        property_name: TABLE_NAME
+        property_value: groups
+      - no: 12
+        property_name: INDEX_LENGTH
+        property_value: 32768
+      - no: 15
+        property_name: CREATE_TIME
+        property_value: '2025/02/13 12:10:30'
+      - no: 18
+        property_name: TABLE_COLLATION
+        property_value: utf8mb4_0900_ai_ci
+      - no: 21
+        property_name: TABLE_COMMENT
+        property_value: オペレーターが所属するグループ情報管理
+  - table_information:
+      system_name: ''
+      subsystem_name: ''
+      schema_name: speedad
+      logical_table_name: ''
+      physical_table_name: input_business_cards
+      remarks: OCR, オペレーターなど、アンケート回答者以外が入力した名刺情報を管理するテーブル。
+      creator: suzuki
+      creation_date: '2025/02/13'
+      update_date: ''
+      rdbms: 8.0.31
+    column_information:
+      - no: 2
+        logical_name: ''
+        physical_name: answer_id
+        data_type: int
+        not_null: 'Yes'
+        default: ''
+        remarks: どの名刺データに対してのデータ入力かを示すアンケート回答ID
+      - no: 6
+        logical_name: ''
+        physical_name: is_skipped
+        data_type: tinyint
+        not_null: ''
+        default: '0'
+        remarks: スキップしたかどうか。(TRUE:スキップした)
+      - no: 9
+        logical_name: ''
+        physical_name: is_corrected
+        data_type: tinyint
+        not_null: ''
+        default: '0'
+        remarks: 運営者確認結果と一致しているか(TRUE:正解)
+      - no: 11
+        logical_name: ''
+        physical_name: created_by
+        data_type: int
+        not_null: ''
+        default: ''
+        remarks: 作成者ID (ID=0をOCR入力とみなす)
+    rdbms_specific_information:
+      - no: 3
+        property_name: TABLE_NAME
+        property_value: input_business_cards
+      - no: 12
+        property_name: INDEX_LENGTH
+        property_value: 16384
+      - no: 15
+        property_name: CREATE_TIME
+        property_value: '2025/02/13 12:10:42'
+      - no: 21
+        property_name: TABLE_COMMENT
+        property_value: OCR, オペレーターなど、アンケート回答者以外が入力した名刺情報を管理するテーブル。
+  - table_information:
+      system_name: ''
+      subsystem_name: ''
+      schema_name: speedad
+      logical_table_name: ''
+      physical_table_name: invoice
+      remarks: ''
+      creator: suzuki
+      creation_date: '2025/02/13'
+      update_date: ''
+      rdbms: 8.0.31
+    column_information:
+      - no: 2
+        logical_name: ''
+        physical_name: corporate_id
+        data_type: int
+        not_null: 'Yes'
+        default: ''
+        remarks: ''
+      - no: 11
+        logical_name: ''
+        physical_name: all_fee
+        data_type: int
+        not_null: 'Yes'
+        default: ''
+        remarks: ''
+    rdbms_specific_information:
+      - no: 3
+        property_name: TABLE_NAME
+        property_value: invoice
+      - no: 15
+        property_name: CREATE_TIME
+        property_value: '2025/02/05 17:01:45'
+  - table_information:
+      system_name: ''
+      subsystem_name: ''
+      schema_name: speedad
+      logical_table_name: ''
+      physical_table_name: m_business_card_groups
+      remarks: 名刺入力のグループ管理マスターテーブル
+      creator: suzuki
+      creation_date: '2025/02/13'
+      update_date: ''
+      rdbms: 8.0.31
+    column_information:
+      - no: 1
+        logical_name: ''
+        physical_name: id
+        data_type: int auto_increment
+        not_null: 'Yes (PK)'
+        default: ''
+        remarks: ''
+      - no: 2
+        logical_name: ''
+        physical_name: name
+        data_type: varchar(255)
+        not_null: ''
+        default: ''
+        remarks: 名刺データ入力グループ名
+    rdbms_specific_information:
+      - no: 3
+        property_name: TABLE_NAME
+        property_value: m_business_card_groups
+      - no: 15
+        property_name: CREATE_TIME
+        property_value: '2025/02/12 5:54:48'
+      - no: 21
+        property_name: TABLE_COMMENT
+        property_value: 名刺入力のグループ管理マスターテーブル
+  - table_information:
+      system_name: ''
+      subsystem_name: ''
+      schema_name: speedad
+      logical_table_name: ''
+      physical_table_name: m_business_day
+      remarks: ''
+      creator: suzuki
+      creation_date: '2025/02/13'
+      update_date: ''
+      rdbms: 8.0.31
+    column_information:
+      - no: 4
+        logical_name: ''
+        physical_name: holiday
+        data_type: int
+        not_null: 'Yes'
+        default: ''
+        remarks: 祝日
+    rdbms_specific_information:
+      - no: 3
+        property_name: TABLE_NAME
+        property_value: m_business_day
+      - no: 14
+        property_name: AUTO_INCREMENT
+        property_value: 2
+      - no: 15
+        property_name: CREATE_TIME
+        property_value: '2025/02/05 17:01:51'
+  - table_information:
+      system_name: ''
+      subsystem_name: ''
+      schema_name: speedad
+      logical_table_name: ''
+      physical_table_name: m_business_day2
+      remarks: ''
+      creator: suzuki
+      creation_date: '2025/02/13'
+      update_date: ''
+      rdbms: 8.0.31
+    column_information:
+      - no: 2
+        logical_name: ''
+        physical_name: holiday_date
+        data_type: date
+        not_null: 'Yes'
+        default: ''
+        remarks: ''
+    rdbms_specific_information:
+      - no: 3
+        property_name: TABLE_NAME
+        property_value: m_business_day2
+      - no: 9
+        property_name: AVG_ROW_LENGTH
+        property_value: 5461
+      - no: 14
+        property_name: AUTO_INCREMENT
+        property_value: 74
+      - no: 15
+        property_name: CREATE_TIME
+        property_value: '2025/02/05 17:01:52'
+  - table_information:
+      system_name: ''
+      subsystem_name: ''
+      schema_name: speedad
+      logical_table_name: ''
+      physical_table_name: m_reward_rates
+      remarks: 報酬レートマスターテーブル
+      creator: suzuki
+      creation_date: '2025/02/13'
+      update_date: ''
+      rdbms: 8.0.31
+    column_information:
+      - no: 2
+        logical_name: ''
+        physical_name: rate
+        data_type: float
+        not_null: 'Yes'
+        default: ''
+        remarks: 1件当たりの報酬額(単位:円)
+      - no: 3
+        logical_name: ''
+        physical_name: description
+        data_type: varchar(45)
+        not_null: ''
+        default: ''
+        remarks: 説明文
+    rdbms_specific_information:
+      - no: 3
+        property_name: TABLE_NAME
+        property_value: m_reward_rates
+      - no: 15
+        property_name: CREATE_TIME
+        property_value: '2025/02/13 12:11:53'
+      - no: 21
+        property_name: TABLE_COMMENT
+        property_value: 報酬レートマスターテーブル
+  - table_information:
+      system_name: ''
+      subsystem_name: ''
+      schema_name: speedad
+      logical_table_name: ''
+      physical_table_name: m_templates
+      remarks: ''
+      creator: suzuki
+      creation_date: '2025/02/13'
+      update_date: ''
+      rdbms: 8.0.31
+    column_information:
+      - no: 2
+        logical_name: ''
+        physical_name: template_subject
+        data_type: text
+        not_null: 'Yes'
+        default: ''
+        remarks: ''
+    rdbms_specific_information:
+      - no: 3
+        property_name: TABLE_NAME
+        property_value: m_templates
+      - no: 9
+        property_name: AVG_ROW_LENGTH
+        property_value: 5461
+      - no: 14
+        property_name: AUTO_INCREMENT
+        property_value: 4
+      - no: 15
+        property_name: CREATE_TIME
+        property_value: '2025/02/05 17:01:56'
+  - table_information:
+      system_name: ''
+      subsystem_name: ''
+      schema_name: speedad
+      logical_table_name: ''
+      physical_table_name: mail_templates
+      remarks: ''
+      creator: suzuki
+      creation_date: '2025/02/13'
+      update_date: ''
+      rdbms: 8.0.31
+    column_information:
+      - no: 2
+        logical_name: ''
+        physical_name: corporate_id
+        data_type: int
+        not_null: 'Yes'
+        default: ''
+        remarks: ''
+    rdbms_specific_information:
+      - no: 3
+        property_name: TABLE_NAME
+        property_value: mail_templates
+      - no: 9
+        property_name: AVG_ROW_LENGTH
+        property_value: 2340
+      - no: 14
+        property_name: AUTO_INCREMENT
+        property_value: 9
+      - no: 15
+        property_name: CREATE_TIME
+        property_value: '2025/02/05 17:01:49'
+  - table_information:
+      system_name: ''
+      subsystem_name: ''
+      schema_name: speedad
+      logical_table_name: ''
+      physical_table_name: reward_histories
+      remarks: 報酬履歴
+      creator: suzuki
+      creation_date: '2025/02/13'
+      update_date: ''
+      rdbms: 8.0.31
+    column_information:
+      - no: 2
+        logical_name: ''
+        physical_name: user_id
+        data_type: int
+        not_null: 'Yes'
+        default: ''
+        remarks: オペレーターID
+      - no: 4
+        logical_name: ''
+        physical_name: rate_id
+        data_type: float
+        not_null: 'Yes'
+        default: ''
+        remarks: 該当年月の報酬額計算時に利用された報酬レート(単位:件)
+    rdbms_specific_information:
+      - no: 3
+        property_name: TABLE_NAME
+        property_value: reward_histories
+      - no: 15
+        property_name: CREATE_TIME
+        property_value: '2025/02/13 13:41:42'
+      - no: 21
+        property_name: TABLE_COMMENT
+        property_value: 報酬履歴
+  - table_information:
+      system_name: ''
+      subsystem_name: ''
+      schema_name: speedad
+      logical_table_name: ''
+      physical_table_name: survey
+      remarks: ''
+      creator: suzuki
+      creation_date: '2025/02/13'
+      update_date: ''
+      rdbms: 8.0.31
+    column_information:
+      - no: 2
+        logical_name: ''
+        physical_name: create_group_id
+        data_type: int
+        not_null: ''
+        default: ''
+        remarks: 作成グループID
+      - no: 4
+        logical_name: ''
+        physical_name: status
+        data_type: tinyint
+        not_null: 'Yes'
+        default: ''
+        remarks: 作業ステータス (1:会期前, 2:会期中, 3:データ化中, 4:アップ待ち, 5:アップ完了, 6:データ化なし)
+      - no: 16
+        logical_name: ''
+        physical_name: data_flag
+        data_type: tinyint
+        not_null: 'Yes'
+        default: '1'
+        remarks: ''
+      - no: 19
+        logical_name: ''
+        physical_name: data_count
+        data_type: int
+        not_null: 'Yes'
+        default: '100'
+        remarks: データ化想定件数
+      - no: 21
+        logical_name: ''
+        physical_name: seikyu_status
+        data_type: tinyint
+        not_null: ''
+        default: ''
+        remarks: 請求ステータス (0:請求対象外, 1:0円請求, 2:請求前, 3:請求後, 4:入金完了, 5:未納)
+      - no: 27
+        logical_name: ''
+        physical_name: exceeded
+        data_type: int
+        not_null: 'Yes'
+        default: '0'
+        remarks: 超過メールフラグ 0:未 1:80%送信済 99:100%送信済
+      - no: 31
+        logical_name: ''
+        physical_name: survey_mail_flag
+        data_type: int
+        not_null: 'Yes'
+        default: '0'
+        remarks: 0:未送信 1:送信済
+    rdbms_specific_information:
+      - no: 3
+        property_name: TABLE_NAME
+        property_value: survey
+      - no: 9
+        property_name: AVG_ROW_LENGTH
+        property_value: 2340
+      - no: 14
+        property_name: AUTO_INCREMENT
+        property_value: 9
+      - no: 15
+        property_name: CREATE_TIME
+        property_value: '2025/02/05 17:01:57'
+  - table_information:
+      system_name: ''
+      subsystem_name: ''
+      schema_name: speedad
+      logical_table_name: ''
+      physical_table_name: survey_detail
+      remarks: ''
+      creator: suzuki
+      creation_date: '2025/02/13'
+      update_date: ''
+      rdbms: 8.0.31
+    column_information:
+      - no: 2
+        logical_name: ''
+        physical_name: survey_id
+        data_type: int
+        not_null: 'Yes'
+        default: ''
+        remarks: アンケートID
+      - no: 4
+        logical_name: ''
+        physical_name: type
+        data_type: int
+        not_null: 'Yes'
+        default: ''
+        remarks: アンケート種別 (1:シングルアンサー, 2:マルチアンサー, 3:フリーアンサー, 4:年月, 5:時間, 6:年月と時間, 7:マトリックス(シングルアンサー), 8:マトリックス(マルチアンサー))
+      - no: 9
+        logical_name: ''
+        physical_name: answer_max_count
+        data_type: int
+        not_null: ''
+        default: '999'
+        remarks: 複数選択可能な項目の際の回答上限。999(=いくつでも)
+    rdbms_specific_information:
+      - no: 3
+        property_name: TABLE_NAME
+        property_value: survey_detail
+      - no: 9
+        property_name: AVG_ROW_LENGTH
+        property_value: 356
+      - no: 14
+        property_name: AUTO_INCREMENT
+        property_value: 355
+      - no: 15
+        property_name: CREATE_TIME
+        property_value: '2025/02/05 17:01:59'
+  - table_information:
+      system_name: ''
+      subsystem_name: ''
+      schema_name: speedad
+      logical_table_name: ''
+      physical_table_name: token_password_reset
+      remarks: ''
+      creator: suzuki
+      creation_date: '2025/02/13'
+      update_date: ''
+      rdbms: 8.0.31
+    column_information:
+      - no: 2
+        logical_name: ''
+        physical_name: login_id
+        data_type: text
+        not_null: 'Yes'
+        default: ''
+        remarks: ''
+    rdbms_specific_information:
+      - no: 3
+        property_name: TABLE_NAME
+        property_value: token_password_reset
+      - no: 15
+        property_name: CREATE_TIME
+        property_value: '2025/02/05 17:02:02'
+  - table_information:
+      system_name: ''
+      subsystem_name: ''
+      schema_name: speedad
+      logical_table_name: ''
+      physical_table_name: token_tmp_register
+      remarks: ''
+      creator: suzuki
+      creation_date: '2025/02/13'
+      update_date: ''
+      rdbms: 8.0.31
+    column_information:
+      - no: 4
+        logical_name: ''
+        physical_name: corporate_id
+        data_type: int
+        not_null: 'Yes'
+        default: '0'
+        remarks: ループから招待した時用
+    rdbms_specific_information:
+      - no: 3
+        property_name: TABLE_NAME
+        property_value: token_tmp_register
+      - no: 14
+        property_name: AUTO_INCREMENT
+        property_value: 2
+      - no: 15
+        property_name: CREATE_TIME
+        property_value: '2025/02/05 17:02:03'
+  - table_information:
+      system_name: ''
+      subsystem_name: ''
+      schema_name: speedad
+      logical_table_name: ''
+      physical_table_name: users
+      remarks: ''
+      creator: suzuki
+      creation_date: '2025/02/13'
+      update_date: ''
+      rdbms: 8.0.31
+    column_information:
+      - no: 2
+        logical_name: ''
+        physical_name: email
+        data_type: text
+        not_null: 'Yes'
+        default: ''
+        remarks: ''
+      - no: 4
+        logical_name: ''
+        physical_name: corporate_ids
+        data_type: text
+        not_null: ''
+        default: ''
+        remarks: 所属企業ID。複数所属を許容するため、カンマ区切りのテキストで保持。※1stリリース時は複数所属なし
+      - no: 6
+        logical_name: ''
+        physical_name: manage_flag
+        data_type: tinyint
+        not_null: 'Yes'
+        default: ''
+        remarks: 管理フラグ (0:フラグ無, 1:重要, 2:要注意, 99:関係者)
+    rdbms_specific_information:
+      - no: 3
+        property_name: TABLE_NAME
+        property_value: users
+      - no: 9
+        property_name: AVG_ROW_LENGTH
+        property_value: 348
+      - no: 14
+        property_name: AUTO_INCREMENT
+        property_value: 48
+      - no: 15
+        property_name: CREATE_TIME
+        property_value: '2025/02/05 17:02:05'
