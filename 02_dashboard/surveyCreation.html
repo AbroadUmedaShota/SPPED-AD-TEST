@@ -1,230 +1,218 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SpeedAd - アンケート作成</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <!-- Material Icons CDN -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <!-- flatpickr CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="service-top-style.css">
-    <!-- Custom Fonts -->
-    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
-    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SpeedAd - アンケート作成</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <!-- Material Icons CDN -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <!-- flatpickr CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="service-top-style.css">
+  <!-- Custom Fonts -->
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+  <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
 </head>
 <body class="bg-background text-on-background">
 
-<!-- 1. アプリケーション全体構造 -->
-<div class="relative flex min-h-screen flex-col overflow-x-hidden">
+  <!-- 1. アプリケーション全体のラッパー -->
+  <div class="relative flex min-h-screen flex-col overflow-x-hidden">
 
-    <!-- サイドバー用オーバーレイ -->
+    <!-- サイドバー用オーバーレイ（モバイル） -->
     <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
 
     <!-- 2. ヘッダー -->
-    <header id="main-header"></header>
+    <div id="header-placeholder"></div>
 
     <div class="flex flex-1 pt-16 bg-background">
-        <!-- 3. サイドバー -->
-        <aside id="sidebar"></aside>
+      <!-- 3. サイドバー -->
+      <div id="sidebar-placeholder"></div>
 
-        <!-- 4. メインコンテンツ -->
-        <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8 relative">
-            <div id="outline-map-container" class="hidden lg:block fixed right-0 top-16 h-[calc(100vh-64px)] w-64 bg-surface border-l border-outline-variant p-4 overflow-y-auto z-40"></div>
-            <div class="flex flex-col w-full max-w-6xl mx-auto flex-1">
-                <!-- パンくずリストコンテナ -->
-                <div id="breadcrumb-container" class="mb-4"></div>
+      <!-- 4. メインコンテンツ -->
+      <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8 relative">
+        <div id="outline-map-container" class="hidden lg:block fixed right-0 top-16 h-[calc(100vh-64px)] w-64 bg-surface border-l border-outline-variant p-4 overflow-y-auto z-40"></div>
+        <div class="flex flex-col w-full max-w-6xl mx-auto flex-1">
+          <!-- パンくず -->
+          <div id="breadcrumb-container" class="mb-4"></div>
 
-                <!-- タイトルエリア -->
-                <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant" id="surveyTitleArea">
-                    <h1 class="text-on-background text-2xl sm:text-3xl font-bold leading-tight tracking-tight">アンケート作成・編集</h1>
-                </div>
+          <!-- タイトルエリア -->
+          <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant" id="surveyTitleArea">
+            <h1 class="text-on-background text-2xl sm:text-3xl font-bold leading-tight tracking-tight">アンケート作成・編集</h1>
+          </div>
 
-                <!-- アンケート作成フォーム -->
-                <div class="bg-surface p-6 rounded-xl space-y-6">
-                    <!-- 基本情報 -->
-                    <div class="accordion-item border border-outline-variant rounded-lg mb-4">
-                        <div class="accordion-header flex justify-between items-center cursor-pointer p-4 bg-surface-variant rounded-t-lg" data-accordion-target="basicInfoContent">
-                            <h2 class="text-on-surface text-xl font-semibold">基本情報</h2>
-                            <span class="material-icons expand-icon">expand_less</span>
-                        </div>
-                        <div id="basicInfoContent" class="accordion-content p-4 space-y-6">
-                            
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="input-group">
-                                    <input type="text" id="surveyName" placeholder=" " class="input-field">
-                                    <label for="surveyName" class="input-label">アンケート名（社内管理用）<span class="text-error">*</span></label>
-                                    <div class="error-message text-error text-sm mt-1 hidden">この項目は必須です</div>
-                                </div>
-                                <div class="input-group">
-                                    <input type="text" id="displayTitle" placeholder=" " class="input-field">
-                                    <label for="displayTitle" class="input-label">表示タイトル（回答者向け）<span class="text-error">*</span></label>
-                                    <div class="error-message text-error text-sm mt-1 hidden">この項目は必須です</div>
-                                </div>
-                                <div class="input-group md:col-span-2">
-                                    <textarea id="description" placeholder=" " class="input-field h-24 resize-y"></textarea>
-                                    <label for="description" class="input-label">説明</label>
-                                </div>
-                                <div class="input-group relative">
-                                    <div id="periodStartWrapper">
-                                        <input type="text" id="periodStart" class="input-field" placeholder=" " data-input>
-                                        <label for="periodStart" class="input-label">回答受付開始日<span class="text-error">*</span></label>
-                                        <span class="material-icons absolute top-1/2 right-3 -translate-y-1/2 text-on-surface-variant cursor-pointer" data-toggle>calendar_today</span>
-                                    </div>
-                                    <div class="error-message text-error text-sm mt-1 hidden">この項目は必須です</div>
-                                </div>
-                                <div class="input-group relative">
-                                    <div id="periodEndWrapper">
-                                        <input type="text" id="periodEnd" class="input-field" placeholder=" " data-input>
-                                        <label for="periodEnd" class="input-label">回答受付終了日<span class="text-error">*</span></label>
-                                        <span class="material-icons absolute top-1/2 right-3 -translate-y-1/2 text-on-surface-variant cursor-pointer" data-toggle>calendar_today</span>
-                                    </div>
-                                    <div class="error-message text-error text-sm mt-1 hidden">この項目は必須です</div>
-                                </div>
-                                <div class="input-group">
-                                    <select id="plan" class="input-field">
-                                        <option value="Standard">Standard</option>
-                                        <option value="Premium">Premium</option>
-                                    </select>
-                                    <label for="plan" class="input-label">プラン<span class="text-error">*</span></label>
-                                </div>
-                                <div class="input-group relative">
-                                    <div id="deadlineWrapper">
-                                        <input type="text" id="deadline" class="input-field" placeholder=" " data-input>
-                                        <label for="deadline" class="input-label">データ化完了希望日</label>
-                                        <span class="material-icons absolute top-1/2 right-3 -translate-y-1/2 text-on-surface-variant cursor-pointer" data-toggle>calendar_today</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+          <!-- アンケート作成フォーム -->
+          <div class="bg-surface p-6 rounded-xl space-y-6">
+            <!-- 基本情報 -->
+            <div class="accordion-item border border-outline-variant rounded-lg mb-4">
+              <div class="accordion-header flex justify-between items-center cursor-pointer p-4 bg-surface-variant rounded-t-lg" data-accordion-target="basicInfoContent">
+                <h2 class="text-on-surface text-xl font-semibold">基本情報</h2>
+                <span class="material-icons expand-icon">expand_less</span>
+              </div>
+              <div id="basicInfoContent" class="accordion-content p-4 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="input-group">
+                    <input type="text" id="surveyName" placeholder=" " class="input-field" required aria-required="true" aria-describedby="surveyNameError">
+                    <label for="surveyName" class="input-label">アンケート名（社内管理用）<span class="text-error">*</span></label>
+                    <div id="surveyNameError" class="error-message text-error text-sm mt-1 hidden">この入力は必須です</div>
+                  </div>
+                  <div class="input-group">
+                    <input type="text" id="displayTitle" placeholder=" " class="input-field" required aria-required="true" aria-describedby="displayTitleError">
+                    <label for="displayTitle" class="input-label">表示タイトル（回答者向け）<span class="text-error">*</span></label>
+                    <div id="displayTitleError" class="error-message text-error text-sm mt-1 hidden">この入力は必須です</div>
+                  </div>
+                  <div class="input-group md:col-span-2">
+                    <textarea id="description" placeholder=" " class="input-field h-24 resize-y"></textarea>
+                    <label for="description" class="input-label">説明</label>
+                  </div>
+                  <div class="input-group relative">
+                    <div id="periodStartWrapper">
+                      <input type="text" id="periodStart" class="input-field" placeholder=" " data-input required aria-required="true" aria-describedby="periodStartError">
+                      <label for="periodStart" class="input-label">受付開始日<span class="text-error">*</span></label>
+                      <span class="material-icons absolute top-1/2 right-3 -translate-y-1/2 text-on-surface-variant cursor-pointer" data-toggle>calendar_today</span>
                     </div>
-
-                    <!-- 名刺データ関連とメール設定へのリンク -->
-                    <section>
-                        <h2 class="text-on-surface text-xl font-semibold mb-4">追加設定</h2>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="input-group">
-                                <button type="button" id="openBizcardSettingsBtn" class="button-link">名刺データ化設定</button>
-                            </div>
-                            <div class="input-group">
-                                <button type="button" id="openThankYouEmailSettingsBtn" class="button-link">お礼メール設定</button>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- メモ -->
-                    <section>
-                        <h2 class="text-on-surface text-xl font-semibold mb-4">メモ</h2>
-                        <div class="input-group">
-                            <textarea id="memo" placeholder=" " class="input-field h-24 resize-y"></textarea>
-                            <label for="memo" class="input-label">メモ</label>
-                        </div>
-                    </section>
-
-                    <!-- 質問項目設定 -->
-                    <section>
-                        <h2 class="text-on-surface text-xl font-semibold mb-4">質問項目設定</h2>
-                        <div id="questionGroupsContainer" class="space-y-6 mb-6"></div>
-                        
-                        
-
-
-                    </section>
-
-                    
-
-                    <div class="flex justify-end gap-4 pt-4">
-                        <button id="showPreviewBtn" class="min-w-[100px] px-6 py-3 rounded-full bg-secondary text-on-secondary font-semibold transition-colors">
-                            プレビューを表示
-                        </button>
-                        <button id="cancelCreateSurvey" class="min-w-[100px] px-6 py-3 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors">
-                            キャンセル
-                        </button>
-                        <button id="createSurveyBtn" class="min-w-[100px] px-6 py-3 rounded-full bg-primary text-on-primary font-semibold transition-colors shadow-md" disabled>
-                            アンケートを保存
-                        </button>
+                    <div id="periodStartError" class="error-message text-error text-sm mt-1 hidden">この入力は必須です</div>
+                  </div>
+                  <div class="input-group relative">
+                    <div id="periodEndWrapper">
+                      <input type="text" id="periodEnd" class="input-field" placeholder=" " data-input required aria-required="true" aria-describedby="periodEndError">
+                      <label for="periodEnd" class="input-label">受付終了日<span class="text-error">*</span></label>
+                      <span class="material-icons absolute top-1/2 right-3 -translate-y-1/2 text-on-surface-variant cursor-pointer" data-toggle>calendar_today</span>
                     </div>
+                    <div id="periodEndError" class="error-message text-error text-sm mt-1 hidden">この入力は必須です</div>
+                  </div>
+                  <div class="input-group">
+                    <select id="plan" class="input-field" required aria-required="true">
+                      <option value="Standard">Standard</option>
+                      <option value="Premium">Premium</option>
+                    </select>
+                    <label for="plan" class="input-label">プラン<span class="text-error">*</span></label>
+                  </div>
+                  <div class="input-group relative">
+                    <div id="deadlineWrapper">
+                      <input type="text" id="deadline" class="input-field" placeholder=" " data-input>
+                      <label for="deadline" class="input-label">データ提出期限</label>
+                      <span class="material-icons absolute top-1/2 right-3 -translate-y-1/2 text-on-surface-variant cursor-pointer" data-toggle>calendar_today</span>
+                    </div>
+                  </div>
                 </div>
-
+              </div>
             </div>
-        </main>
+
+            <!-- 追加設定 -->
+            <section>
+              <h2 class="text-on-surface text-xl font-semibold mb-4">追加設定</h2>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="input-group">
+                  <a id="openBizcardSettingsBtn" class="button-link" href="bizcardSettings.html" role="button">名刺データ化設定</a>
+                </div>
+                <div class="input-group">
+                  <a id="openThankYouEmailSettingsBtn" class="button-link" href="thankYouEmailSettings.html" role="button">お礼メール設定</a>
+                </div>
+              </div>
+            </section>
+
+            <!-- メモ -->
+            <section>
+              <h2 class="text-on-surface text-xl font-semibold mb-4">メモ</h2>
+              <div class="input-group">
+                <textarea id="memo" placeholder=" " class="input-field h-24 resize-y"></textarea>
+                <label for="memo" class="input-label">メモ</label>
+              </div>
+            </section>
+
+            <!-- 設問設定 -->
+            <section>
+              <h2 class="text-on-surface text-xl font-semibold mb-4">設問設定</h2>
+              <div id="questionGroupsContainer" class="space-y-6 mb-6"></div>
+            </section>
+
+            <div class="flex justify-end gap-4 pt-4">
+              <button type="button" id="showPreviewBtn" class="min-w-[100px] px-6 py-3 rounded-full bg-secondary text-on-secondary font-semibold transition-colors">
+                プレビュー表示
+              </button>
+              <button type="button" id="cancelCreateSurvey" class="min-w-[100px] px-6 py-3 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors">
+                キャンセル
+              </button>
+              <button type="button" id="createSurveyBtn" class="min-w-[100px] px-6 py-3 rounded-full bg-primary text-on-primary font-semibold transition-colors shadow-md" disabled>
+                アンケートを保存
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
 
     <div id="fab-container"></div>
 
-    <footer id="main-footer"></footer>
+    <div id="footer-placeholder"></div>
+  </div>
 
-</div>
+  <!-- flatpickr JS -->
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
+  <!-- Sortable.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
-<!-- flatpickr JS -->
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
-<!-- Sortable.js CDN -->
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  <!-- ページJS -->
+  <script type="module" src="src/surveyCreation.js"></script>
 
-<!-- JSファイル -->
-<script type="module" src="src/surveyCreation.js"></script>
-<!-- ▼▼▼ テンプレート ▼▼▼ -->
-<template id="questionGroupTemplate">
+  <!-- テンプレート: 質問グループ -->
+  <template id="questionGroupTemplate">
     <div class="question-group border border-outline-variant rounded-lg bg-surface-container-lowest" data-group-id="">
-        <div class="group-header flex justify-between items-center p-4 bg-surface-variant rounded-t-lg cursor-pointer" data-accordion-target="">
-            <div class="flex-grow flex items-center gap-2">
-                <span class="material-icons text-on-surface-variant handle cursor-move">drag_indicator</span>
-                <input type="text" class="input-field w-full bg-transparent focus:bg-surface text-lg font-semibold group-title-input" placeholder="質問グループのタイトル">
-                
-            </div>
-            <div class="flex items-center gap-2">
-                <button class="icon-button duplicate-group-btn" aria-label="グループを複製" title="グループを複製"><span class="material-icons">content_copy</span></button>
-                <button class="icon-button delete-group-btn" aria-label="グループを削除" title="グループを削除"><span class="material-icons text-error">delete</span></button>
-                <span class="material-icons expand-icon">expand_less</span>
-            </div>
+      <div class="group-header flex justify-between items-center p-4 bg-surface-variant rounded-t-lg cursor-pointer" data-accordion-target="">
+        <div class="flex-grow flex items-center gap-2">
+          <span class="material-icons text-on-surface-variant handle cursor-move">drag_indicator</span>
+          <input type="text" class="input-field w-full bg-transparent focus:bg-surface text-lg font-semibold group-title-input" placeholder="グループのタイトル">
         </div>
-        <div class="questions-list p-4 space-y-4 accordion-content" id="">
-            
+        <div class="flex items-center gap-2">
+          <button type="button" class="icon-button duplicate-group-btn" aria-label="グループを複製" title="グループを複製"><span class="material-icons">content_copy</span></button>
+          <button type="button" class="icon-button delete-group-btn" aria-label="グループを削除" title="グループを削除"><span class="material-icons text-error">delete</span></button>
+          <span class="material-icons expand-icon">expand_less</span>
+        </div>
+      </div>
+      <div class="questions-list p-4 space-y-4 accordion-content"></div>
     </div>
-</template>
+  </template>
 
-<template id="questionTemplate">
+  <!-- テンプレート: 設問 -->
+  <template id="questionTemplate">
     <div class="question-item p-4 border border-outline-variant rounded-md bg-surface" data-question-id="" data-question-type="">
-        <div class="flex justify-between items-center mb-4">
-            <div class="flex items-center gap-2">
-                <span class="material-icons text-on-surface-variant handle cursor-move">drag_indicator</span>
-                <span class="font-semibold text-on-surface question-title"></span>
-            </div>
-            <div class="flex items-center gap-2">
-                <button class="icon-button duplicate-question-btn" aria-label="質問を複製" title="質問を複製"><span class="material-icons">content_copy</span></button>
-                <button class="icon-button delete-question-btn" aria-label="質問を削除" title="質問を削除"><span class="material-icons text-error">delete</span></button>
-            </div>
+      <div class="flex justify-between items-center mb-4">
+        <div class="flex items-center gap-2">
+          <span class="material-icons text-on-surface-variant handle cursor-move">drag_indicator</span>
+          <span class="font-semibold text-on-surface question-title"></span>
         </div>
-        <div class="space-y-4">
-            
-            <div class="input-group">
-                <input type="text" class="input-field question-text-input">
-                <label class="input-label">質問文</label>
-                
-            </div>
-            <div class="options-container space-y-2">
-                <!-- 選択肢が必要な質問タイプの場合、ここに選択肢が挿入されます -->
-            </div>
-            <div class="flex items-center">
-                <input type="checkbox" class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary required-checkbox">
-                <label class="ml-2 block text-sm text-on-surface required-label">必須回答にする</label>
-            </div>
+        <div class="flex items-center gap-2">
+          <button type="button" class="icon-button duplicate-question-btn" aria-label="設問を複製" title="設問を複製"><span class="material-icons">content_copy</span></button>
+          <button type="button" class="icon-button delete-question-btn" aria-label="設問を削除" title="設問を削除"><span class="material-icons text-error">delete</span></button>
         </div>
+      </div>
+      <div class="space-y-4">
+        <div class="input-group">
+          <input type="text" class="input-field question-text-input">
+          <label class="input-label">設問文</label>
+        </div>
+        <div class="options-container space-y-2">
+          <!-- 単一/複数選択タイプの場合、ここに選択肢を並べる -->
+        </div>
+        <div class="flex items-center">
+          <input type="checkbox" class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary required-checkbox" id="requiredCheck">
+          <label class="ml-2 block text-sm text-on-surface required-label" for="requiredCheck">必須回答にする</label>
+        </div>
+      </div>
     </div>
-</template>
+  </template>
 
-<template id="optionTemplate">
+  <!-- テンプレート: 選択肢 -->
+  <template id="optionTemplate">
     <div class="flex items-center gap-2 option-item">
-        <input type="text" class="input-field flex-grow option-text-input">
-        <button class="icon-button delete-option-btn" aria-label="選択肢を削除"><span class="material-icons text-error">remove_circle_outline</span></button>
-        
+      <input type="text" class="input-field flex-grow option-text-input">
+      <button type="button" class="icon-button delete-option-btn" aria-label="選択肢を削除"><span class="material-icons text-error">remove_circle_outline</span></button>
     </div>
-</template>
-<!-- ▲▲▲ テンプレート ▲▲▲ -->
+  </template>
+
 </body>
 </html>

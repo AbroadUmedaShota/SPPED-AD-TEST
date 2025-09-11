@@ -1,5 +1,8 @@
 import { handleOpenModal } from './modalHandler.js';
 import { openAccountInfoModal } from './accountInfoModal.js';
+import { initSidebarHandler } from './sidebarHandler.js';
+import { initBreadcrumbs } from './breadcrumb.js';
+import { initThemeToggle } from './themeToggle.js';
 import { fetchSurveyData, saveSurveyDataToLocalStorage, loadSurveyDataFromLocalStorage } from './services/surveyService.js';
 import { 
     populateBasicInfo, 
@@ -19,6 +22,56 @@ let currentSurveyId = null;
 // --- Utility Functions ---
 window.getCurrentLanguage = () => currentLang;
 window.getSurveyData = () => surveyData;
+// Expose commonly used handlers for inline HTML in common partials
+window.openAccountInfoModal = openAccountInfoModal;
+window.handleOpenModal = handleOpenModal;
+
+// --- Language Switcher ---
+function initLanguageSwitcher() {
+    const languageSwitcherButton = document.getElementById('language-switcher-button');
+    const languageSwitcherDropdown = document.getElementById('language-switcher-dropdown');
+    const currentLanguageText = document.getElementById('current-language-text');
+
+    if (!languageSwitcherButton || !languageSwitcherDropdown || !currentLanguageText) {
+        return;
+    }
+
+    const setLanguage = (lang) => {
+        localStorage.setItem('language', lang);
+        document.documentElement.lang = lang;
+        currentLanguageText.textContent = lang === 'ja' ? '日本語' : 'English';
+        // update local state then notify
+        currentLang = lang;
+        document.dispatchEvent(new CustomEvent('languagechange', { detail: { lang } }));
+        languageSwitcherDropdown.classList.add('hidden');
+    };
+
+    languageSwitcherButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        languageSwitcherDropdown.classList.toggle('hidden');
+        languageSwitcherButton.setAttribute('aria-expanded', languageSwitcherDropdown.classList.contains('hidden') ? 'false' : 'true');
+    });
+
+    document.addEventListener('click', () => {
+        if (!languageSwitcherDropdown.classList.contains('hidden')) {
+            languageSwitcherDropdown.classList.add('hidden');
+            languageSwitcherButton.setAttribute('aria-expanded', 'false');
+        }
+    });
+
+    languageSwitcherDropdown.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const target = e.target.closest('a[data-lang]');
+        if (target) {
+            const lang = target.getAttribute('data-lang');
+            setLanguage(lang);
+        }
+    });
+
+    // initial
+    const initial = localStorage.getItem('language') || 'ja';
+    setLanguage(initial);
+}
 
 // ダミーユーザーデータ (本来はAPIから取得)
 window.dummyUserData = {
@@ -62,12 +115,18 @@ function updateAndRenderAll() {
 async function initializePage() {
     try {
         await Promise.all([
-            loadCommonHtml('main-header', 'common/header.html'),
-            loadCommonHtml('sidebar', 'common/sidebar.html'),
-            loadCommonHtml('main-footer', 'common/footer.html', () => {
-                document.getElementById('openContactModalBtn').addEventListener('click', () => handleOpenModal('contactModal', 'modals/contactModal.html'));
+            loadCommonHtml('header-placeholder', 'common/header.html'),
+            loadCommonHtml('sidebar-placeholder', 'common/sidebar.html', initSidebarHandler),
+            loadCommonHtml('footer-placeholder', 'common/footer.html', () => {
+                const btn = document.getElementById('openContactModalBtn');
+                if (btn) btn.addEventListener('click', () => handleOpenModal('contactModal', 'modals/contactModal.html'));
             })
         ]);
+
+        // Initialize global UI helpers present across pages
+        initThemeToggle();
+        initBreadcrumbs();
+        initLanguageSwitcher();
 
         // Load keyed data by surveyId if present (local-only)
         try {
@@ -133,6 +192,7 @@ async function initializePage() {
 
     } catch (error) {
         console.error('Failed to initialize page:', error);
+        console.error('Error details:', error.message, error.stack); // エラーの詳細を追加
         displayErrorMessage();
     }
 }
@@ -390,9 +450,28 @@ function validateFormForSaveButton() {
 
 // DOMの読み込みが完了したら処理を開始
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOMContentLoaded event fired. Initializing page...'); // 追加
     initializePage();
+    console.log('Page initialized. Setting up event listeners...'); // 追加
     setupEventListeners();
+    console.log('Event listeners set up. Attaching preview listener...'); // 追加
     attachPreviewListener();
+    // Re-render on language change
+    document.addEventListener('languagechange', (e) => {
+        const lang = (e && e.detail && e.detail.lang) ? e.detail.lang : (localStorage.getItem('language') || 'ja');
+        currentLang = lang;
+        try {
+            if (window.flatpickr) {
+                if (lang === 'ja' && window.flatpickr.l10ns && window.flatpickr.l10ns.ja) {
+                    window.flatpickr.localize(window.flatpickr.l10ns.ja);
+                } else {
+                    // Reset to default (en)
+                    window.flatpickr.localize(window.flatpickr.l10ns.default || {});
+                }
+            }
+        } catch (_) { /* noop */ }
+        updateAndRenderAll();
+    });
 });
 
 // プレビューのイベントを付与
@@ -515,6 +594,6 @@ function renderSurveyPreview() {
     });
     lines.push(`</div>`);
 
-    container.innerHTML = lines.join('
-');
+        container.innerHTML = lines.join('\n');
+
 }
