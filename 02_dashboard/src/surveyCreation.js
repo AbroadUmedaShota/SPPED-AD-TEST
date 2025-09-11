@@ -192,6 +192,7 @@ async function initializePage() {
 
     } catch (error) {
         console.error('Failed to initialize page:', error);
+        console.error('Error details:', error.message, error.stack); // エラーの詳細を追加
         displayErrorMessage();
     }
 }
@@ -449,8 +450,11 @@ function validateFormForSaveButton() {
 
 // DOMの読み込みが完了したら処理を開始
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOMContentLoaded event fired. Initializing page...'); // 追加
     initializePage();
+    console.log('Page initialized. Setting up event listeners...'); // 追加
     setupEventListeners();
+    console.log('Event listeners set up. Attaching preview listener...'); // 追加
     attachPreviewListener();
     // Re-render on language change
     document.addEventListener('languagechange', (e) => {
@@ -590,7 +594,6 @@ function renderSurveyPreview() {
     });
     lines.push(`</div>`);
 
-        container.innerHTML = lines.join('
-');
+        container.innerHTML = lines.join('\n');
 
 }
