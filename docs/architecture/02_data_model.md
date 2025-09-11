@@ -84,13 +84,336 @@
 
 ---
 
-## 5. データベーススキーマ
+### 5.1. テーブル一覧
 
-このセクションでは、アプリケーションのバックエンドで利用されるデータベースのテーブル構造を定義します。
+| No | 物理テーブル名 | 備考 |
+| :--- | :--- | :--- |
+| 1 | `speedad.admin_user` |  |
+| 2 | `speedad.answer` | アンケート回答 |
+| 3 | `speedad.answer_detail` |  |
+| 4 | `speedad.corporate` | 企業(有料機能利用時に登録) |
+| 5 | `speedad.corporate_assign` |  |
+| 6 | `speedad.coupon` |  |
+| 7 | `speedad.coupon_detail` |  |
+| 8 | `speedad.groups` | オペレーターが所属するグループ情報管理 |
+| 9 | `speedad.input_business_cards` | OCR, オペレーターなど、アンケート回答者以外が入力した名刺情報を管理するテーブル。 |
+| 10 | `speedad.invoice` |  |
+| 11 | `speedad.m_business_card_groups` | 名刺入力のグループ管理マスターテーブル |
+| 12 | `speedad.m_business_day` |  |
+| 13 | `speedad.m_business_day2` |  |
+| 14 | `speedad.m_reward_rates` | 報酬レートマスターテーブル |
+| 15 | `speedad.m_templates` |  |
+| 16 | `speedad.mail_templates` |  |
+| 17 | `speedad.reward_histories` | 報酬履歴 |
+| 18 | `speedad.survey` |  |
+| 19 | `speedad.survey_detail` |  |
+| 20 | `speedad.token_password_reset` |  |
+| 21 | `speedad.token_tmp_register` |  |
+| 22 | `speedad.users` |  |
 
-（中略）
+### 5.2. テーブル詳細
+
+#### `speedad.admin_user`
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 1 | `id` | `int auto_increment` | Yes (PK) | `` |  |
+| 2 | `login_id` | `text` | Yes | `` |  |
+| 3 | `password` | `text` | Yes | `` |  |
+| 4 | `authority` | `int` | Yes | `` | 管理画面権限(MasterAdmin:1, Admin:2, Operator:3, Operator_Admin:4) |
+| 5 | `company_name` | `text` | Yes | `` |  |
+| 6 | `group_id` | `int` |  | `` | 所属グループID (operetor, operetor_adminがどのグループに所属しているかを判定するためのID) |
+| 7 | `user_post` | `text` | Yes | `` |  |
+| 8 | `user_name` | `text` | Yes | `` |  |
+| 9 | `status` | `int` | Yes | `` | 0:稼働 1:停止 |
+| 10 | `create_date` | `text` | Yes | `` |  |
+| 11 | `last_login_at` | `datetime` |  | `` | 最終ログイン日時 |
+| 12 | `created_at` | `datetime` |  | `CURRENT_TIMESTAMP` |  |
+| 13 | `updated_at` | `datetime` |  | `CURRENT_TIMESTAMP` |  |
+
+**インデックス情報**
+
+| No | インデックス名 | カラム | 主キー | ユニーク |
+| :--- | :--- | :--- | :--- | :--- |
+| 1 | `PRIMARY` | `id` | Yes | Yes |
 
 ---
+#### `speedad.answer`
+
+アンケート回答
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 1 | `id` | `int auto_increment` | Yes (PK) | `` | 回答アンケートID |
+| 2 | `survey_id` | `int` | Yes | `` |  |
+| 3 | `photo_1` | `text` |  | `` | 名刺画像表面パス |
+| 4 | `photo_2` | `text` |  | `` | 名刺画像裏面パス |
+| 5 | `company_name` | `text` |  | `` | 名刺情報(会社名)※手入力用 |
+| 6 | `busyo_name` | `text` |  | `` | 名刺情報(部署名)※手入力用 |
+| 7 | `yakusyoku_name` | `text` |  | `` | 名刺情報(役職名)※手入力用 |
+| 8 | `name` | `text` |  | `` | 名刺情報(氏名)※手入力用 |
+| 9 | `email` | `text` |  | `` | 名刺情報(メールアドレス)※手入力用 |
+| 10 | `tel` | `text` |  | `` | 名刺情報(電話番号)※手入力用 |
+| 11 | `zip_code` | `text` |  | `` | 名刺情報(郵便番号)※手入力用 |
+| 12 | `address` | `text` |  | `` | 名刺情報(住所)※手入力用 |
+| 13 | `test_flag` | `int` |  | `` | テスト回答フラグ(1:テスト回答) |
+| 14 | `mail_flag` | `int` | Yes | `1` | 0:送信しない 1:送信する |
+| 15 | `corrected_first_name` | `varchar(255)` |  | `` |  |
+| 30 | `created_at` | `datetime` |  | `CURRENT_TIMESTAMP` |  |
+| 31 | `updated_at` | `datetime` |  | `CURRENT_TIMESTAMP` |  |
+
+**インデックス情報**
+
+| No | インデックス名 | カラム | 主キー | ユニーク |
+| :--- | :--- | :--- | :--- | :--- |
+| 1 | `PRIMARY` | `id` | Yes | Yes |
+
+---
+#### `speedad.answer_detail`
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 1 | `id` | `int auto_increment` | Yes (PK) | `` | アンケート詳細ID |
+| 2 | `survey_detail_id` | `int` | Yes | `` |  |
+| 3 | `answer` | `text` |  | `` | 回答内容 |
+| 4 | `answer_free_text` | `longtext` |  | `` | その他回答時のフリーテキスト |
+| 5 | `test_flag` | `tinyint` |  | `` | テスト回答フラグ (1:テスト回答) |
+| 6 | `created_at` | `datetime` |  | `` |  |
+| 7 | `updated_at` | `datetime` |  | `` |  |
+
+**インデックス情報**
+
+| No | インデックス名 | カラム | 主キー | ユニーク |
+| :--- | :--- | :--- | :--- | :--- |
+| 1 | `PRIMARY` | `id` | Yes | Yes |
+
+---
+#### `speedad.corporate`
+
+企業(有料機能利用時に登録)
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 1 | `id` | `int auto_increment` | Yes (PK) | `` |  |
+| 2 | `corporate_name` | `text` |  | `` | 会社名 |
+| 11 | `group_flag` | `int` | Yes | `0` | 0:個人,1:グループ |
+| 12 | `seikyu_flag` | `tinyint` |  | `` | 請求フラグ(0:上記と同じ, 1:上記と異なる) |
+
+**インデックス情報**
+
+| No | インデックス名 | カラム | 主キー | ユニーク |
+| :--- | :--- | :--- | :--- | :--- |
+| 1 | `PRIMARY` | `id` | Yes | Yes |
+
+---
+#### `speedad.corporate_assign`
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 2 | `user_id` | `int` | Yes | `` |  |
+| 3 | `authority` | `int` | Yes | `` | 1:管理,2:ユーザー |
+| 4 | `status` | `int` | Yes | `` | 0:所属,99:脱退済 |
+
+---
+#### `speedad.coupon`
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 2 | `name` | `varchar(128)` | Yes | `` | クーポン名 |
+| 4 | `expire_date` | `date` |  | `` | 使用可能期限 |
+| 5 | `discount_rate` | `float` | Yes | `` | 割引率(%) |
+
+---
+#### `speedad.coupon_detail`
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 2 | `coupon_id` | `text` | Yes | `` | 親クーポンID |
+| 3 | `code` | `text` | Yes | `` | クーポンコード |
+| 4 | `used_date` | `date` |  | `` | 使用日(使用日が入力されている=使用済み) |
+
+---
+#### `speedad.groups`
+
+オペレーターが所属するグループ情報管理
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 2 | `name` | `varchar(255)` | Yes | `` | グループ名称 |
+
+**インデックス情報**
+
+| No | インデックス名 | カラム | 主キー | ユニーク |
+| :--- | :--- | :--- | :--- | :--- |
+| 2 | `id_UNIQUE` | `id` |  | Yes |
+| 3 | `name_UNIQUE` | `name` |  |  |
+
+---
+#### `speedad.input_business_cards`
+
+OCR, オペレーターなど、アンケート回答者以外が入力した名刺情報を管理するテーブル。
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 2 | `answer_id` | `int` | Yes | `` | どの名刺データに対してのデータ入力かを示すアンケート回答ID |
+| 6 | `is_skipped` | `tinyint` |  | `0` | スキップしたかどうか。(TRUE:スキップした) |
+| 9 | `is_corrected` | `tinyint` |  | `0` | 運営者確認結果と一致しているか(TRUE:正解) |
+| 11 | `created_by` | `int` |  | `` | 作成者ID (ID=0をOCR入力とみなす) |
+
+---
+#### `speedad.invoice`
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 2 | `corporate_id` | `int` | Yes | `` |  |
+| 11 | `all_fee` | `int` | Yes | `` |  |
+
+---
+#### `speedad.m_business_card_groups`
+
+名刺入力のグループ管理マスターテーブル
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 1 | `id` | `int auto_increment` | Yes (PK) | `` |  |
+| 2 | `name` | `varchar(255)` |  | `` | 名刺データ入力グループ名 |
+
+---
+#### `speedad.m_business_day`
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 4 | `holiday` | `int` | Yes | `` | 祝日 |
+
+---
+#### `speedad.m_business_day2`
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 2 | `holiday_date` | `date` | Yes | `` |  |
+
+---
+#### `speedad.m_reward_rates`
+
+報酬レートマスターテーブル
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 2 | `rate` | `float` | Yes | `` | 1件当たりの報酬額(単位:円) |
+| 3 | `description` | `varchar(45)` |  | `` | 説明文 |
+
+---
+#### `speedad.m_templates`
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 2 | `template_subject` | `text` | Yes | `` |  |
+
+---
+#### `speedad.mail_templates`
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 2 | `corporate_id` | `int` | Yes | `` |  |
+
+---
+#### `speedad.reward_histories`
+
+報酬履歴
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 2 | `user_id` | `int` | Yes | `` | オペレーターID |
+| 4 | `rate_id` | `float` | Yes | `` | 該当年月の報酬額計算時に利用された報酬レート(単位:件) |
+
+---
+#### `speedad.survey`
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 2 | `create_group_id` | `int` |  | `` | 作成グループID |
+| 4 | `status` | `tinyint` | Yes | `` | 作業ステータス (1:会期前, 2:会期中, 3:データ化中, 4:アップ待ち, 5:アップ完了, 6:データ化なし) |
+| 16 | `data_flag` | `tinyint` | Yes | `1` |  |
+| 19 | `data_count` | `int` | Yes | `100` | データ化想定件数 |
+| 21 | `seikyu_status` | `tinyint` |  | `` | 請求ステータス (0:請求対象外, 1:0円請求, 2:請求前, 3:請求後, 4:入金完了, 5:未納) |
+| 27 | `exceeded` | `int` | Yes | `0` | 超過メールフラグ 0:未 1:80%送信済 99:100%送信済 |
+| 31 | `survey_mail_flag` | `int` | Yes | `0` | 0:未送信 1:送信済 |
+
+---
+#### `speedad.survey_detail`
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 2 | `survey_id` | `int` | Yes | `` | アンケートID |
+| 4 | `type` | `int` | Yes | `` | アンケート種別 (1:シングルアンサー, 2:マルチアンサー, 3:フリーアンサー, 4:年月, 5:時間, 6:年月と時間, 7:マトリックス(シングルアンサー), 8:マトリックス(マルチアンサー)) |
+| 9 | `answer_max_count` | `int` |  | `999` | 複数選択可能な項目の際の回答上限。999(=いくつでも) |
+
+---
+#### `speedad.token_password_reset`
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 2 | `login_id` | `text` | Yes | `` |  |
+
+---
+#### `speedad.token_tmp_register`
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 4 | `corporate_id` | `int` | Yes | `0` | ループから招待した時用 |
+
+---
+#### `speedad.users`
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 2 | `email` | `text` | Yes | `` |  |
+| 4 | `corporate_ids` | `text` |  | `` | 所属企業ID。複数所属を許容するため、カンマ区切りのテキストで保持。※1stリリース時は複数所属なし |
+| 6 | `manage_flag` | `tinyint` | Yes | `` | 管理フラグ (0:フラグ無, 1:重要, 2:要注意, 99:関係者) |
 
 ## 6. 名刺オブジェクト (`BusinessCard`)
 
@@ -131,3 +454,377 @@
 | `answeredAt` | String | 回答日時。 |
 | `isTest` | Boolean | テスト回答かどうかのフラグ。 |
 | `details` | Array<Object> | 質問と回答のペアの配列。`{ "question": "...", "answer": "..." }` の形式。 |
+
+
+## 6. 名刺オブジェクト (`BusinessCard`)
+
+`speed-review`画面などで利用される名刺情報を表すオブジェクトです。主に `data/business-cards.json` に格納されます。
+
+| プロパティ名 | データ型 | 説明 |
+| :--- | :--- | :--- |
+| `answerId` | String | 対応するアンケート回答のID。 |
+| `imageUrl` | Object | 名刺画像のURL。`{ "front": "...", "back": "..." }` の形式。 |
+| `group1` - `group8` | Object | 名刺の項目グループ。各グループが特定の情報（メール、氏名、会社情報など）を持つ。 |
+
+---
+
+## 7. 請求書オブジェクト (`Invoice`)
+
+請求情報の一覧や詳細画面で利用されるオブジェクトです。主に `data/invoices.json` に格納されます。
+
+| プロパティ名 | データ型 | 説明 |
+| :--- | :--- | :--- |
+| `invoiceId` | String | 請求書の一意なID。 |
+| `accountId` | String | 請求先アカウントのID。 |
+| `issueDate` | String | 発行日 (`YYYY-MM-DD`)。 |
+| `dueDate` | String | 支払期日 (`YYYY-MM-DD`)。 |
+| `corporateName` | String | 請求先企業名。 |
+| `totalAmount` | Number | 合計請求額。 |
+| `items` | Array<Object> | 請求項目の配列。 |
+
+---
+
+## 8. アンケート回答オブジェクト (`SurveyAnswer`)
+
+アンケートの個別の回答データを表すオブジェクトです。主に `data/survey-answers.json` に格納されます。
+
+| プロパティ名 | データ型 | 説明 |
+| :--- | :--- | :--- |
+| `answerId` | String | 回答の一意なID。 |
+| `surveyId` | String | 対応するアンケートのID。 |
+| `answeredAt` | String | 回答日時。 |
+| `isTest` | Boolean | テスト回答かどうかのフラグ。 |
+| `details` | Array<Object> | 質問と回答のペアの配列。`{ "question": "...", "answer": "..." }` の形式。 |
+=======
+### 5.1. テーブル一覧
+
+| No | 物理テーブル名 | 備考 |
+| :--- | :--- | :--- |
+| 1 | `speedad.admin_user` |  |
+| 2 | `speedad.answer` | アンケート回答 |
+| 3 | `speedad.answer_detail` |  |
+| 4 | `speedad.corporate` | 企業(有料機能利用時に登録) |
+| 5 | `speedad.corporate_assign` |  |
+| 6 | `speedad.coupon` |  |
+| 7 | `speedad.coupon_detail` |  |
+| 8 | `speedad.groups` | オペレーターが所属するグループ情報管理 |
+| 9 | `speedad.input_business_cards` | OCR, オペレーターなど、アンケート回答者以外が入力した名刺情報を管理するテーブル。 |
+| 10 | `speedad.invoice` |  |
+| 11 | `speedad.m_business_card_groups` | 名刺入力のグループ管理マスターテーブル |
+| 12 | `speedad.m_business_day` |  |
+| 13 | `speedad.m_business_day2` |  |
+| 14 | `speedad.m_reward_rates` | 報酬レートマスターテーブル |
+| 15 | `speedad.m_templates` |  |
+| 16 | `speedad.mail_templates` |  |
+| 17 | `speedad.reward_histories` | 報酬履歴 |
+| 18 | `speedad.survey` |  |
+| 19 | `speedad.survey_detail` |  |
+| 20 | `speedad.token_password_reset` |  |
+| 21 | `speedad.token_tmp_register` |  |
+| 22 | `speedad.users` |  |
+
+### 5.2. テーブル詳細
+
+#### `speedad.admin_user`
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 1 | `id` | `int auto_increment` | Yes (PK) | `` |  |
+| 2 | `login_id` | `text` | Yes | `` |  |
+| 3 | `password` | `text` | Yes | `` |  |
+| 4 | `authority` | `int` | Yes | `` | 管理画面権限(MasterAdmin:1, Admin:2, Operator:3, Operator_Admin:4) |
+| 5 | `company_name` | `text` | Yes | `` |  |
+| 6 | `group_id` | `int` |  | `` | 所属グループID (operetor, operetor_adminがどのグループに所属しているかを判定するためのID) |
+| 7 | `user_post` | `text` | Yes | `` |  |
+| 8 | `user_name` | `text` | Yes | `` |  |
+| 9 | `status` | `int` | Yes | `` | 0:稼働 1:停止 |
+| 10 | `create_date` | `text` | Yes | `` |  |
+| 11 | `last_login_at` | `datetime` |  | `` | 最終ログイン日時 |
+| 12 | `created_at` | `datetime` |  | `CURRENT_TIMESTAMP` |  |
+| 13 | `updated_at` | `datetime on update CURRENT_TIMESTAMP` |  | `CURRENT_TIMESTAMP` |  |
+
+**インデックス情報**
+
+| No | インデックス名 | カラム | 主キー | ユニーク |
+| :--- | :--- | :--- | :--- | :--- |
+| 1 | `PRIMARY` | `id` | Yes | Yes |
+
+---
+#### `speedad.answer`
+
+アンケート回答
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 1 | `id` | `int auto_increment` | Yes (PK) | `` | 回答アンケートID |
+| 2 | `survey_id` | `int` | Yes | `` |  |
+| 3 | `photo_1` | `text` |  | `` | 名刺画像表面パス |
+| 4 | `photo_2` | `text` |  | `` | 名刺画像裏面パス |
+| 5 | `company_name` | `text` |  | `` | 名刺情報(会社名)※手入力用 |
+| 6 | `busyo_name` | `text` |  | `` | 名刺情報(部署名)※手入力用 |
+| 7 | `yakusyoku_name` | `text` |  | `` | 名刺情報(役職名)※手入力用 |
+| 8 | `name` | `text` |  | `` | 名刺情報(氏名)※手入力用 |
+| 9 | `email` | `text` |  | `` | 名刺情報(メールアドレス)※手入力用 |
+| 10 | `tel` | `text` |  | `` | 名刺情報(電話番号)※手入力用 |
+| 11 | `zip_code` | `text` |  | `` | 名刺情報(郵便番号)※手入力用 |
+| 12 | `address` | `text` |  | `` | 名刺情報(住所)※手入力用 |
+| 13 | `test_flag` | `int` |  | `` | テスト回答フラグ(1:テスト回答) |
+| 14 | `mail_flag` | `int` | Yes | `1` | 0:送信しない 1:送信する |
+| 15 | `corrected_first_name` | `varchar(255)` |  | `` |  |
+| 30 | `created_at` | `datetime` |  | `CURRENT_TIMESTAMP` |  |
+| 31 | `updated_at` | `datetime` |  | `CURRENT_TIMESTAMP` |  |
+
+**インデックス情報**
+
+| No | インデックス名 | カラム | 主キー | ユニーク |
+| :--- | :--- | :--- | :--- | :--- |
+| 1 | `PRIMARY` | `id` | Yes | Yes |
+
+---
+#### `speedad.answer_detail`
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 1 | `id` | `int auto_increment` | Yes (PK) | `` | アンケート詳細ID |
+| 2 | `survey_detail_id` | `int` | Yes | `` |  |
+| 3 | `answer` | `text` |  | `` | 回答内容 |
+| 4 | `answer_free_text` | `longtext` |  | `` | その他回答時のフリーテキスト |
+| 5 | `test_flag` | `tinyint` |  | `` | テスト回答フラグ (1:テスト回答) |
+| 6 | `created_at` | `datetime` |  | `` |  |
+| 7 | `updated_at` | `datetime` |  | `` |  |
+
+**インデックス情報**
+
+| No | インデックス名 | カラム | 主キー | ユニーク |
+| :--- | :--- | :--- | :--- | :--- |
+| 1 | `PRIMARY` | `id` | Yes | Yes |
+
+---
+#### `speedad.corporate`
+
+企業(有料機能利用時に登録)
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 1 | `id` | `int auto_increment` | Yes (PK) | `` |  |
+| 2 | `corporate_name` | `text` |  | `` | 会社名 |
+| 11 | `group_flag` | `int` | Yes | `0` | 0:個人,1:グループ |
+| 12 | `seikyu_flag` | `tinyint` |  | `` | 請求フラグ(0:上記と同じ, 1:上記と異なる) |
+
+**インデックス情報**
+
+| No | インデックス名 | カラム | 主キー | ユニーク |
+| :--- | :--- | :--- | :--- | :--- |
+| 1 | `PRIMARY` | `id` | Yes | Yes |
+
+---
+#### `speedad.corporate_assign`
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 2 | `user_id` | `int` | Yes | `` |  |
+| 3 | `authority` | `int` | Yes | `` | 1:管理,2:ユーザー |
+| 4 | `status` | `int` | Yes | `` | 0:所属,99:脱退済 |
+
+---
+#### `speedad.coupon`
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 2 | `name` | `varchar(128)` | Yes | `` | クーポン名 |
+| 4 | `expire_date` | `date` |  | `` | 使用可能期限 |
+| 5 | `discount_rate` | `float` | Yes | `` | 割引率(%) |
+
+---
+#### `speedad.coupon_detail`
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 2 | `coupon_id` | `text` | Yes | `` | 親クーポンID |
+| 3 | `code` | `text` | Yes | `` | クーポンコード |
+| 4 | `used_date` | `date` |  | `` | 使用日(使用日が入力されている=使用済み) |
+
+---
+#### `speedad.groups`
+
+オペレーターが所属するグループ情報管理
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 2 | `name` | `varchar(255)` | Yes | `` | グループ名称 |
+
+**インデックス情報**
+
+| No | インデックス名 | カラム | 主キー | ユニーク |
+| :--- | :--- | :--- | :--- | :--- |
+| 2 | `id_UNIQUE` | `id` |  | Yes |
+| 3 | `name_UNIQUE` | `name` |  |  |
+
+---
+#### `speedad.input_business_cards`
+
+OCR, オペレーターなど、アンケート回答者以外が入力した名刺情報を管理するテーブル。
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 2 | `answer_id` | `int` | Yes | `` | どの名刺データに対してのデータ入力かを示すアンケート回答ID |
+| 6 | `is_skipped` | `tinyint` |  | `0` | スキップしたかどうか。(TRUE:スキップした) |
+| 9 | `is_corrected` | `tinyint` |  | `0` | 運営者確認結果と一致しているか(TRUE:正解) |
+| 11 | `created_by` | `int` |  | `` | 作成者ID (ID=0をOCR入力とみなす) |
+
+---
+#### `speedad.invoice`
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 2 | `corporate_id` | `int` | Yes | `` |  |
+| 11 | `all_fee` | `int` | Yes | `` |  |
+
+---
+#### `speedad.m_business_card_groups`
+
+名刺入力のグループ管理マスターテーブル
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 1 | `id` | `int auto_increment` | Yes (PK) | `` |  |
+| 2 | `name` | `varchar(255)` |  | `` | 名刺データ入力グループ名 |
+
+---
+#### `speedad.m_business_day`
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 4 | `holiday` | `int` | Yes | `` | 祝日 |
+
+---
+#### `speedad.m_business_day2`
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 2 | `holiday_date` | `date` | Yes | `` |  |
+
+---
+#### `speedad.m_reward_rates`
+
+報酬レートマスターテーブル
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 2 | `rate` | `float` | Yes | `` | 1件当たりの報酬額(単位:円) |
+| 3 | `description` | `varchar(45)` |  | `` | 説明文 |
+
+---
+#### `speedad.m_templates`
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 2 | `template_subject` | `text` | Yes | `` |  |
+
+---
+#### `speedad.mail_templates`
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 2 | `corporate_id` | `int` | Yes | `` |  |
+
+---
+#### `speedad.reward_histories`
+
+報酬履歴
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 2 | `user_id` | `int` | Yes | `` | オペレーターID |
+| 4 | `rate_id` | `float` | Yes | `` | 該当年月の報酬額計算時に利用された報酬レート(単位:件) |
+
+---
+#### `speedad.survey`
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 2 | `create_group_id` | `int` |  | `` | 作成グループID |
+| 4 | `status` | `tinyint` | Yes | `` | 作業ステータス (1:会期前, 2:会期中, 3:データ化中, 4:アップ待ち, 5:アップ完了, 6:データ化なし) |
+| 16 | `data_flag` | `tinyint` | Yes | `1` |  |
+| 19 | `data_count` | `int` | Yes | `100` | データ化想定件数 |
+| 21 | `seikyu_status` | `tinyint` |  | `` | 請求ステータス (0:請求対象外, 1:0円請求, 2:請求前, 3:請求後, 4:入金完了, 5:未納) |
+| 27 | `exceeded` | `int` | Yes | `0` | 超過メールフラグ 0:未 1:80%送信済 99:100%送信済 |
+| 31 | `survey_mail_flag` | `int` | Yes | `0` | 0:未送信 1:送信済 |
+
+---
+#### `speedad.survey_detail`
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 2 | `survey_id` | `int` | Yes | `` | アンケートID |
+| 4 | `type` | `int` | Yes | `` | アンケート種別 (1:シングルアンサー, 2:マルチアンサー, 3:フリーアンサー, 4:年月, 5:時間, 6:年月と時間, 7:マトリックス(シングルアンサー), 8:マトリックス(マルチアンサー)) |
+| 9 | `answer_max_count` | `int` |  | `999` | 複数選択可能な項目の際の回答上限。999(=いくつでも) |
+
+---
+#### `speedad.token_password_reset`
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 2 | `login_id` | `text` | Yes | `` |  |
+
+---
+#### `speedad.token_tmp_register`
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 4 | `corporate_id` | `int` | Yes | `0` | ループから招待した時用 |
+
+---
+#### `speedad.users`
+
+**カラム情報**
+
+| No | 物理名 | データ型 | Not Null | デフォルト | 備考 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 2 | `email` | `text` | Yes | `` |  |
+| 4 | `corporate_ids` | `text` |  | `` | 所属企業ID。複数所属を許容するため、カンマ区切りのテキストで保持。※1stリリース時は複数所属なし |
+| 6 | `manage_flag` | `tinyint` | Yes | `` | 管理フラグ (0:フラグ無, 1:重要, 2:要注意, 99:関係者) |
+
+>>>>>>> 0ccedf3 (WIP: Commit uncommitted changes before rebase)

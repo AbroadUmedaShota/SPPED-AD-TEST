@@ -3,7 +3,7 @@
     <div class="modal-content-transition w-full max-w-lg p-6 bg-surface rounded-xl">
         <div class="flex justify-between items-center pb-4 border-b border-outline-variant">
             <h2 class="text-lg font-semibold text-on-surface">アンケートを複製</h2>
-            <button class="text-on-surface-variant hover:text-primary" onclick="closeModal('duplicateSurveyModal')" aria-label="閉じる">
+            <button id="closeDuplicateSurveyModalBtn" class="text-on-surface-variant hover:text-primary" aria-label="閉じる">
                 <span class="material-icons">close</span>
             </button>
         </div>
@@ -25,7 +25,7 @@
             </div>
         </div>
         <div class="flex justify-end gap-3 pt-4 border-t border-outline-variant">
-            <button id="duplicateSurveyCancelBtn" class="min-w-[80px] px-4 py-2 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors" onclick="closeModal('duplicateSurveyModal')">
+            <button id="duplicateSurveyCancelBtn" class="min-w-[80px] px-4 py-2 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors">
                 キャンセル
             </button>
             <button id="duplicateSurveyConfirmBtn" class="min-w-[80px] px-4 py-2 rounded-full bg-primary text-on-primary font-semibold transition-colors">
