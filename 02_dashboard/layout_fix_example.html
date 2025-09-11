@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>レイアウト修正サンプル</title>
+    <style>
+        /* 基本的なリセットとbodyスタイル */
+        body {
+            margin: 0;
+            font-family: sans-serif;
+            background-color: #f8f8f8;
+        }
+        /* ヘッダー */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4rem; /* 64px */
+            background-color: #4285F4; /* プロジェクトのプライマリカラー */
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            z-index: 50;
+            box-sizing: border-box;
+        }
+        /* サイドバー */
+        .sidebar {
+            position: fixed; /* 画面に固定 */
+            top: 0;
+            left: 0;
+            height: 100%;
+            padding-top: 4rem; /* ヘッダーの高さ分を下げる */
+            width: 4rem; /* 折りたたみ時の幅 */
+            background-color: #f0f0f0; /* プロジェクトの背景色に近い色 */
+            z-index: 40;
+            transition: width 0.2s ease; /* 幅の変更をアニメーション */
+            overflow: hidden; /* はみ出したコンテンツを隠す */
+            box-sizing: border-box;
+        }
+        /* サイドバーのホバー時 */
+        .sidebar:hover {
+            width: 16rem; /* 展開時の幅 */
+        }
+        /* メインコンテンツ */
+        .main-content {
+            /* ヘッダーとサイドバーの固定表示領域を確保 */
+            padding-top: 4rem; /* ヘッダーの高さ */
+            padding-left: 4rem; /* 折りたたみ時のサイドバーの幅 */
+            box-sizing: border-box;
+        }
+        /* コンテンツを中央に配置するためのラッパー */
+        .content-wrapper {
+            max-width: 1152px; /* プロジェクトのmax-w-7xlに対応 */
+            margin: 0 auto; /* 水平方向の中央揃え */
+            padding: 2rem;
+            background-color: white;
+        }
+        h1 {
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        ヘッダー
+    </header>
+
+    <aside class="sidebar">
+        <div style="padding: 1rem; white-space: nowrap;">
+            <p>サイドバー</p>
+            <p>ナビゲーション</p>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <h1>メインコンテンツ</h1>
+            <p>このコンテンツは、サイドバーにカーソルを合わせても、中央に固定されたまま移動したり縮んだりしません。</p>
+            <div style="height: 200px; border: 2px dashed #ccc; display:flex; align-items:center; justify-content:center; margin-top: 1rem;">
+                テーブルなどのコンテンツがここに配置されます
+            </div>
+        </div>
+    </main>
+</body>
+</html>

@@ -138,15 +138,3 @@ tbody tr:last-child td {
      white-space: normal;
 }
 
-@media (min-width: 1024px) { /* Desktop */
-    #main-content {
-        transition: margin-left 0.3s ease-in-out;
-    }
-    body {
-        padding-left: 4rem;
-        transition: padding-left 0.3s ease-in-out;
-    }
-    body.sidebar-hovered {
-        padding-left: 16rem;
-    }
-}
