@@ -160,6 +160,32 @@ class SpeedReviewService {
             const dummySurvey = {
                 id: surveyId,
                 name: { ja: "CSVデータからのアンケート", en: "Survey from CSV Data" },
+                details: [
+                    {
+                        id: "q2_csv",
+                        text: "Q.02_お客様の主な業界",
+                        type: "single_choice",
+                        options: ["一般産業機械", "商社", "食品・医療", "半導体・液晶", "その他"]
+                    },
+                    {
+                        id: "q3_csv",
+                        text: "Q.03_打ち合わせ種類（複数選択可）",
+                        type: "multi_choice",
+                        options: ["機械要素部品", "製品デモ（体験デモ機）", "技術相談", "見積依頼", "その他"]
+                    },
+                    {
+                        id: "q6_csv",
+                        text: "Q.06_【打合せ内容】緊急度（複数選択可）",
+                        type: "multi_choice",
+                        options: ["至急", "カタログ希望", "情報収集", "挨拶・売込み"]
+                    },
+                    {
+                        id: "q9_csv",
+                        text: "Q.09_【案件情報】必要時期(見込時期)",
+                        type: "single_choice",
+                        options: ["即時", "3ヶ月以内", "半年以内", "1年以内", "未定"]
+                    }
+                ]
             };
 
             return {

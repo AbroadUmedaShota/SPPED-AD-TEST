@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>グラフ分析 - SpeedAd</title>
+    <link rel="icon" href="../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Material Icons CDN -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../02_dashboard/service-top-style.css">
+    <!-- Custom Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+</head>
+<body class="bg-background text-on-background">
+
+<div class="relative flex min-h-screen flex-col overflow-x-hidden">
+    <!-- Common Components Placeholders -->
+    <div id="header-placeholder"></div>
+    <div id="sidebar-placeholder"></div>
+    <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
+
+    <div class="flex flex-1 pt-16 bg-background">
+        <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
+            <div class="flex flex-col w-full max-w-6xl mx-auto flex-1">
+                <!-- Breadcrumb -->
+                <div id="breadcrumb-container" class="mb-4"></div>
+
+                <!-- Header -->
+                <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant">
+                    <h1 id="survey-title" class="text-on-background text-headline-large font-bold leading-tight tracking-tight">グラフ分析</h1>
+                </div>
+
+                <!-- Filters -->
+                <div class="bg-surface p-4 rounded-xl mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-end">
+                        <div class="flex items-end gap-2 lg:col-span-1">
+                            <div id="startDatePickerWrapper" class="input-group flex-1 relative">
+                                <input type="text" id="filterStartDate" class="input-field pr-10" placeholder=" " readonly data-input>
+                                <label for="filterStartDate" class="input-label">開始日</label>
+                                <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors" data-toggle>
+                                    <span class="material-icons text-xl">calendar_today</span>
+                                </button>
+                            </div>
+                            <span class="pb-2 text-on-surface-variant">～</span>
+                            <div id="endDatePickerWrapper" class="input-group flex-1 relative">
+                                <input type="text" id="filterEndDate" class="input-field pr-10" placeholder=" " readonly data-input>
+                                <label for="filterEndDate" class="input-label">終了日</label>
+                                <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors" data-toggle>
+                                    <span class="material-icons text-xl">calendar_today</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Loading Indicator -->
+                <div id="loading-indicator" class="text-center py-16">
+                    <div class="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent mx-auto"></div>
+                    <p class="mt-4 text-on-surface-variant">グラフを生成しています...</p>
+                </div>
+
+                <!-- Error Display -->
+                <div id="error-display" class="hidden bg-error-container text-on-error-container p-4 rounded-md">
+                    <p id="error-message"></p>
+                </div>
+
+                <!-- Charts Container -->
+                <div id="charts-container" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Charts will be dynamically inserted here -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="footer-placeholder"></div>
+</div>
+
+<!-- JS Libraries -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
+<!-- App Scripts -->
+<script type="module" src="../02_dashboard/src/main.js"></script>
+<script type="module" src="./graph-page.js"></script>
+
+</body>
+</html>
