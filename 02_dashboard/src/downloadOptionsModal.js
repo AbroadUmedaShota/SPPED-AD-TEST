@@ -1,4 +1,4 @@
-import { handleOpenModal } from './modalHandler.js';
+import { handleOpenModal, closeModal } from './modalHandler.js';
 
 let currentSurveyPeriod = { start: '', end: '' }; // Stores survey specific period for date picker limits
 
@@ -21,6 +21,15 @@ function initializeDownloadOptionsModal() {
         // Ensure listeners are not duplicated if called multiple times
         downloadForm.removeEventListener('change', handleDownloadFormChange); // Remove if already attached
         downloadForm.addEventListener('change', handleDownloadFormChange);
+    }
+
+    const closeBtn = modal.querySelector('#closeDownloadOptionsModalBtn');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => closeModal('downloadOptionsModal'));
+    }
+    const cancelBtn = modal.querySelector('#cancelDownloadBtn');
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => closeModal('downloadOptionsModal'));
     }
 }
 

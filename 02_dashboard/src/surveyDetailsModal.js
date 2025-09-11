@@ -1,6 +1,7 @@
 import { showToast } from './utils.js';
 import { openDownloadModal } from './downloadOptionsModal.js';
 import { updateSurveyData } from './tableManager.js'; // tableManagerからインポート
+import { closeModal } from './modalHandler.js';
 
 let currentEditingSurvey = null; // 現在編集中のアンケートデータを保持する変数
 
@@ -55,7 +56,14 @@ export function setupSurveyDetailsModalListeners(modalElement) {
     if (goToThankYouEmailSettingsBtn) goToThankYouEmailSettingsBtn.addEventListener('click', handleGoToThankYouEmailSettings);
     if (goToSpeedReviewBtn) goToSpeedReviewBtn.addEventListener('click', handleGoToSpeedReview);
 
-    
+    const closeBtn = modalElement.querySelector('#closeSurveyDetailsModalBtn');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => closeModal('surveyDetailsModal'));
+    }
+    const footerCloseBtn = modalElement.querySelector('#footerCloseSurveyDetailsModalBtn');
+    if (footerCloseBtn) {
+        footerCloseBtn.addEventListener('click', () => closeModal('surveyDetailsModal'));
+    }
 }
 
 function handleGoToBizcardSettings() {

@@ -4,7 +4,7 @@ import { setupSurveyDetailsModalListeners, populateSurveyDetails } from './surve
 import { initGroupManagementModal } from './groupManagementModal.js';
 import { setupQrCodeModalListeners } from './qrCodeModal.js';
 
-const loadedModals = new Set(); // Keep track of loaded modal IDs
+
 
 /**
  * Loads a modal's HTML content from a file and appends it to the body.
@@ -14,10 +14,6 @@ const loadedModals = new Set(); // Keep track of loaded modal IDs
  * @returns {Promise<void>} A promise that resolves when the modal is loaded.
  */
 async function loadModalFromFile(modalId, filePath) {
-    if (loadedModals.has(modalId)) {
-        return; // Modal already loaded
-    }
-    
     try {
         const response = await fetch(filePath);
         if (!response.ok) {
@@ -31,7 +27,6 @@ async function loadModalFromFile(modalId, filePath) {
 
         if (modalElement && modalElement.id === modalId) {
             document.body.appendChild(modalElement);
-            loadedModals.add(modalId);
             attachModalEventListeners(modalElement);
 
             if (modalId === 'accountInfoModal') {
@@ -45,6 +40,12 @@ async function loadModalFromFile(modalId, filePath) {
             }
             if (modalId === 'qrCodeModal') {
                 setupQrCodeModalListeners(modalElement);
+            }
+            if (modalId === 'reviewDetailModalOverlay') {
+                const closeBtn = modalElement.querySelector('#closeDetailModalBtn');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => closeModal(modalId));
+                }
             }
 
         } else {
@@ -85,8 +86,6 @@ export function initializeFloatingLabelsForModal(containerElement) {
  * @param {string} filePath The path to the modal's HTML file.
  */
 export async function handleOpenModal(modalId, filePath, callback) {
-    const modal = document.getElementById(modalId);
-
     const openAndCallback = () => {
         openModal(modalId);
         if (callback && typeof callback === 'function') {
@@ -94,15 +93,11 @@ export async function handleOpenModal(modalId, filePath, callback) {
         }
     };
 
-    if (!modal) {
-        try {
-            await loadModalFromFile(modalId, filePath);
-            openAndCallback();
-        } catch (error) {
-            // Error is handled in loadModalFromFile
-        }
-    } else {
+    try {
+        await loadModalFromFile(modalId, filePath);
         openAndCallback();
+    } catch (error) {
+        // Error is handled in loadModalFromFile
     }
 }
 
@@ -116,9 +111,14 @@ export function openModal(modalId) {
         modal.classList.remove('hidden');
         requestAnimationFrame(() => {
             modal.dataset.state = 'open';
-            modal.querySelector('.modal-content-transition').dataset.state = 'open';
         });
         lockScroll();
+
+        // Ensure mobile sidebar overlay is hidden when a modal opens
+        const mobileSidebarOverlay = document.getElementById('mobileSidebarOverlay');
+        if (mobileSidebarOverlay) {
+            mobileSidebarOverlay.classList.remove('is-visible');
+        }
 
         // Specific handler for newSurveyModal to set default dates
         if (modalId === 'newSurveyModal') {
@@ -154,15 +154,39 @@ export function openModal(modalId) {
  */
 export function closeModal(modalId) {
     const modal = document.getElementById(modalId);
+    console.log('Attempting to close modal:', modalId, modal);
     if (modal) {
         modal.dataset.state = 'closed';
         const modalContent = modal.querySelector('.modal-content-transition');
-        modalContent.dataset.state = 'closed';
+        if (modalContent) {
+            modalContent.dataset.state = 'closed';
+        }
 
-        unlockScroll(); // ここに移動
+        unlockScroll();
 
-        modalContent.addEventListener('transitionend', () => {
-            modal.classList.add('hidden');
+        // Explicitly reset body styles in case of lingering effects
+        document.body.style.backgroundColor = '';
+        document.body.style.opacity = '';
+        document.body.style.overflow = '';
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+
+        // Ensure mobile sidebar overlay is hidden when a modal closes
+        const mobileSidebarOverlay = document.getElementById('mobileSidebarOverlay');
+        if (mobileSidebarOverlay) {
+            mobileSidebarOverlay.classList.remove('is-visible');
+            mobileSidebarOverlay.dataset.state = 'closed'; // Explicitly set data-state
+            console.log('mobileSidebarOverlay state on close:', mobileSidebarOverlay.dataset.state);
+        }
+
+        // Wait for the opacity transition to complete before removing from DOM
+        modal.addEventListener('transitionend', (e) => {
+            console.log('Transition ended:', e.propertyName);
+            if (e.propertyName === 'opacity') {
+                modal.remove();
+                console.log('Modal removed via transitionend.');
+            }
         }, { once: true });
     }
 }

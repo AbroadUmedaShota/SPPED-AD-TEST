@@ -9,6 +9,7 @@ import { initBizcardSettings } from './bizcardSettings.js';
 import { initThankYouEmailSettings } from './thankYouEmailSettings.js';
 import { initInvoiceListPage } from './invoiceList.js';
 import { initIndexPage } from './indexPage.js';
+import { initializePage as initSpeedReviewPage } from './speed-review.js'; // Import initializePage from speed-review.js
 
 import { showToast, copyTextToClipboard, loadCommonHtml } from './utils.js';
 
@@ -86,9 +87,9 @@ window.copyUrl = async function(inputElement) {
 document.addEventListener('DOMContentLoaded', async () => {
 
     // 共通要素の読み込み
-    await loadCommonHtml('header-placeholder', 'common/header.html');
-    await loadCommonHtml('sidebar-placeholder', 'common/sidebar.html', initSidebarHandler);
-    await loadCommonHtml('footer-placeholder', 'common/footer.html');
+    await loadCommonHtml('header-placeholder', '/02_dashboard/common/header.html');
+    await loadCommonHtml('sidebar-placeholder', '/02_dashboard/common/sidebar.html', initSidebarHandler);
+    await loadCommonHtml('footer-placeholder', '/02_dashboard/common/footer.html');
 
     // Initialize the language switcher after the header is loaded
     initLanguageSwitcher();
@@ -136,7 +137,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             initThankYouEmailSettings();
             break;
         case 'speed-review.html':
-            // initSpeedReviewPage(); // This function needs to be created and imported
+            initSpeedReviewPage(); // Call the imported function
             break;
         
     }
