@@ -1,62 +1,287 @@
 [
   {
-    "invoiceId": "2500001001",
-    "accountId": "acc-12345",
-    "issueDate": "2025-07-31",
-    "dueDate": "2025-08-31",
-    "corporateName": "株式会社サンプル商事",
-    "contactPerson": "経理部御担当者様",
-    "usageMonth": "2025年7月",
+    "invoiceId": "INV-2025-06-001",
+    "accountId": "ACC-001",
+    "issueDate": "2025-06-01",
+    "dueDate": "2025-06-30",
+    "corporateName": "株式会社スピードアド",
+    "contactPerson": "山田 太郎",
+    "subtotalTaxable": 70000,
+    "tax": 7000,
+    "subtotalNonTaxable": 0,
+    "totalAmount": 77000,
+    "bankInfo": {
+      "bankName": "みずほ銀行",
+      "branchName": "新宿支店",
+      "accountType": "普通",
+      "accountNumber": "1234567",
+      "accountHolder": "カ）スピードアド"
+    }
+  },
+  {
+    "invoiceId": "INV-2025-07-001",
+    "accountId": "ACC-001",
+    "issueDate": "2025-07-01",
+    "dueDate": "2025-07-31",
+    "corporateName": "株式会社スピードアド",
+    "contactPerson": "佐藤 花子",
+    "subtotalTaxable": 60000,
+    "tax": 6000,
+    "subtotalNonTaxable": 0,
+    "totalAmount": 66000,
+    "bankInfo": {
+      "bankName": "三井住友銀行",
+      "branchName": "渋谷支店",
+      "accountType": "普通",
+      "accountNumber": "7654321",
+      "accountHolder": "カ）スピードアド"
+    }
+  },
+  {
+    "invoiceId": "INV-2025-08-001",
+    "accountId": "ACC-002",
+    "issueDate": "2025-08-01",
+    "dueDate": "2025-08-30",
+    "corporateName": "株式会社スピードアド",
+    "contactPerson": "田中 一郎",
+    "subtotalTaxable": 82000,
+    "tax": 8200,
+    "subtotalNonTaxable": 0,
+    "totalAmount": 90200,
+    "bankInfo": {
+      "bankName": "三菱UFJ銀行",
+      "branchName": "池袋支店",
+      "accountType": "普通",
+      "accountNumber": "1111222",
+      "accountHolder": "カ）スピードアド"
+    }
+  },
+  {
+    "invoiceId": "INV-2025-08-002",
+    "accountId": "ACC-003",
+    "issueDate": "2025-08-15",
+    "dueDate": "2025-09-14",
+    "corporateName": "株式会社スピードアド",
+    "contactPerson": "鈴木 次郎",
+    "subtotalTaxable": 45000,
+    "tax": 4500,
+    "subtotalNonTaxable": 0,
+    "totalAmount": 49500,
+    "bankInfo": {
+      "bankName": "りそな銀行",
+      "branchName": "日本橋支店",
+      "accountType": "普通",
+      "accountNumber": "3333444",
+      "accountHolder": "カ）スピードアド"
+    }
+  },
+  {
+    "invoiceId": "INV-2025-09-001",
+    "accountId": "ACC-001",
+    "issueDate": "2025-09-01",
+    "dueDate": "2025-09-30",
+    "corporateName": "株式会社スピードアド",
+    "contactPerson": "山本 美咲",
     "subtotalTaxable": 50000,
     "tax": 5000,
     "subtotalNonTaxable": 0,
     "totalAmount": 55000,
     "bankInfo": {
-      "bankName": "三井住友銀行(0009)",
-      "branchName": "小岩支店(643)",
+      "bankName": "みずほ銀行",
+      "branchName": "新宿支店",
       "accountType": "普通",
-      "accountNumber": "7128447",
-      "accountHolder": "アブロードアウトソーシング株式会社"
-    },
-    "items": [
-      {
-        "itemName": "月額基本サービス料 (2025年7月分)",
-        "amount": 30000
-      },
-      {
-        "itemName": "アンケート「A展示会来場者アンケート」利用料",
-        "amount": 20000
-      }
-    ]
+      "accountNumber": "1234567",
+      "accountHolder": "カ）スピードアド"
+    }
   },
   {
-    "invoiceId": "2500001002",
-    "accountId": "acc-12345",
-    "issueDate": "2025-06-30",
-    "dueDate": "2025-07-30",
-    "corporateName": "株式会社テストカンパニー",
-    "contactPerson": "田中 花子",
-    "usageMonth": "2025年6月",
-    "subtotalTaxable": 40000,
-    "tax": 4000,
+    "invoiceId": "INV-2025-09-002",
+    "accountId": "ACC-004",
+    "issueDate": "2025-09-18",
+    "dueDate": "2025-10-18",
+    "corporateName": "株式会社A",
+    "contactPerson": "渡辺 健",
+    "subtotalTaxable": 104500,
+    "tax": 10450,
     "subtotalNonTaxable": 0,
-    "totalAmount": 44000,
+    "totalAmount": 114950,
     "bankInfo": {
-      "bankName": "三井住友銀行(0009)",
-      "branchName": "小岩支店(643)",
+      "bankName": "三井住友銀行",
+      "branchName": "渋谷支店",
       "accountType": "普通",
-      "accountNumber": "7128447",
-      "accountHolder": "アブロードアウトソーシング株式会社"
-    },
-    "items": [
-      {
-        "itemName": "月額基本サービス料 (2025年6月分)",
-        "amount": 30000
-      },
-      {
-        "itemName": "アンケート「Bイベント参加者アンケート」利用料",
-        "amount": 10000
-      }
-    ]
+      "accountNumber": "7654321",
+      "accountHolder": "カ）スピードアド"
+    }
+  },
+  {
+    "invoiceId": "INV-2025-09-003",
+    "accountId": "ACC-002",
+    "issueDate": "2025-09-02",
+    "dueDate": "2025-10-02",
+    "corporateName": "株式会社スピードアド",
+    "contactPerson": "伊藤 誠",
+    "subtotalTaxable": 118300,
+    "tax": 11830,
+    "subtotalNonTaxable": 0,
+    "totalAmount": 130130,
+    "bankInfo": {
+      "bankName": "三菱UFJ銀行",
+      "branchName": "池袋支店",
+      "accountType": "普通",
+      "accountNumber": "1111222",
+      "accountHolder": "カ）スピードアド"
+    }
+  },
+  {
+    "invoiceId": "INV-2025-09-004",
+    "accountId": "ACC-005",
+    "issueDate": "2025-09-11",
+    "dueDate": "2025-10-11",
+    "corporateName": "株式会社C",
+    "contactPerson": "中村 優子",
+    "subtotalTaxable": 131500,
+    "tax": 13150,
+    "subtotalNonTaxable": 0,
+    "totalAmount": 144650,
+    "bankInfo": {
+      "bankName": "三菱UFJ銀行",
+      "branchName": "池袋支店",
+      "accountType": "普通",
+      "accountNumber": "1111222",
+      "accountHolder": "カ）スピードアド"
+    }
+  },
+  {
+    "invoiceId": "INV-2025-09-005",
+    "accountId": "ACC-001",
+    "issueDate": "2025-09-01",
+    "dueDate": "2025-10-01",
+    "corporateName": "株式会社スピードアド",
+    "contactPerson": "小林 直樹",
+    "subtotalTaxable": 34500,
+    "tax": 3450,
+    "subtotalNonTaxable": 0,
+    "totalAmount": 37950,
+    "bankInfo": {
+      "bankName": "みずほ銀行",
+      "branchName": "新宿支店",
+      "accountType": "普通",
+      "accountNumber": "1234567",
+      "accountHolder": "カ）スピードアド"
+    }
+  },
+  {
+    "invoiceId": "INV-2025-10-002",
+    "accountId": "ACC-003",
+    "issueDate": "2025-10-18",
+    "dueDate": "2025-11-17",
+    "corporateName": "株式会社A",
+    "contactPerson": "加藤 美穂",
+    "subtotalTaxable": 142500,
+    "tax": 14250,
+    "subtotalNonTaxable": 0,
+    "totalAmount": 156750,
+    "bankInfo": {
+      "bankName": "りそな銀行",
+      "branchName": "日本橋支店",
+      "accountType": "普通",
+      "accountNumber": "3333444",
+      "accountHolder": "カ）スピードアド"
+    }
+  },
+  {
+    "invoiceId": "INV-2025-10-003",
+    "accountId": "ACC-004",
+    "issueDate": "2025-10-01",
+    "dueDate": "2025-10-31",
+    "corporateName": "株式会社C",
+    "contactPerson": "吉田 翔太",
+    "subtotalTaxable": 131800,
+    "tax": 13180,
+    "subtotalNonTaxable": 0,
+    "totalAmount": 144980,
+    "bankInfo": {
+      "bankName": "三井住友銀行",
+      "branchName": "渋谷支店",
+      "accountType": "普通",
+      "accountNumber": "7654321",
+      "accountHolder": "カ）スピードアド"
+    }
+  },
+  {
+    "invoiceId": "INV-2025-10-004",
+    "accountId": "ACC-001",
+    "issueDate": "2025-10-03",
+    "dueDate": "2025-11-02",
+    "corporateName": "株式会社スピードアド",
+    "contactPerson": "山口 恵",
+    "subtotalTaxable": 108500,
+    "tax": 10850,
+    "subtotalNonTaxable": 0,
+    "totalAmount": 119350,
+    "bankInfo": {
+      "bankName": "みずほ銀行",
+      "branchName": "新宿支店",
+      "accountType": "普通",
+      "accountNumber": "1234567",
+      "accountHolder": "カ）スピードアド"
+    }
+  },
+  {
+    "invoiceId": "INV-2025-10-005",
+    "accountId": "ACC-001",
+    "issueDate": "2025-10-04",
+    "dueDate": "2025-11-03",
+    "corporateName": "合同会社B",
+    "contactPerson": "松本 拓也",
+    "subtotalTaxable": 149900,
+    "tax": 14990,
+    "subtotalNonTaxable": 0,
+    "totalAmount": 164890,
+    "bankInfo": {
+      "bankName": "りそな銀行",
+      "branchName": "日本橋支店",
+      "accountType": "普通",
+      "accountNumber": "3333444",
+      "accountHolder": "カ）スピードアド"
+    }
+  },
+  {
+    "invoiceId": "INV-2025-11-002",
+    "accountId": "ACC-003",
+    "issueDate": "2025-11-06",
+    "dueDate": "2025-12-06",
+    "corporateName": "株式会社A",
+    "contactPerson": "井上 あゆみ",
+    "subtotalTaxable": 112100,
+    "tax": 11210,
+    "subtotalNonTaxable": 0,
+    "totalAmount": 123310,
+    "bankInfo": {
+      "bankName": "三菱UFJ銀行",
+      "branchName": "池袋支店",
+      "accountType": "普通",
+      "accountNumber": "1111222",
+      "accountHolder": "カ）スピードアド"
+    }
+  },
+  {
+    "invoiceId": "INV-2025-11-003",
+    "accountId": "ACC-001",
+    "issueDate": "2025-11-18",
+    "dueDate": "2025-12-18",
+    "corporateName": "有限会社D",
+    "contactPerson": "木村 大輔",
+    "subtotalTaxable": 135500,
+    "tax": 13550,
+    "subtotalNonTaxable": 0,
+    "totalAmount": 149050,
+    "bankInfo": {
+      "bankName": "三井住友銀行",
+      "branchName": "渋谷支店",
+      "accountType": "普通",
+      "accountNumber": "7654321",
+      "accountHolder": "カ）スピードアド"
+    }
   }
 ]

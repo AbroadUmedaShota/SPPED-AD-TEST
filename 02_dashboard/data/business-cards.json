@@ -34,5 +34,205 @@
     "group6": { "url": "http://www.tech-sol.co.jp" },
     "group7": { "notes": "テスト用データ" },
     "group8": { "freeInput": "" }
+  },
+  {
+    "answerId": "6802",
+    "imageUrl": { "front": "images/sample_card_04_front.jpg", "back": "" },
+    "group1": { "email": "kenta.takahashi@example.com" },
+    "group2": { "lastName": "高橋", "firstName": "健太" },
+    "group3": { "companyName": "グローバルシステムズ", "department": "営業企画部", "position": "マネージャー" },
+    "group4": { "zipCode": "101-0021", "address1": "東京都千代田区外神田", "address2": "秋葉原ビル" },
+    "group5": { "tel1": "03-5555-1111", "mobile": "090-5555-1111" },
+    "group6": { "url": "http://www.globalsystems.co.jp" }
+  },
+  {
+    "answerId": "6803",
+    "imageUrl": { "front": "images/sample_card_05_front.jpg", "back": "" },
+    "group1": { "email": "tsubasa.tanaka@example.com" },
+    "group2": { "lastName": "田中", "firstName": "翼" },
+    "group3": { "companyName": "ネクストステップソリューションズ", "department": "製品開発部", "position": "リーダー" },
+    "group4": { "zipCode": "150-0002", "address1": "東京都渋谷区渋谷", "address2": "渋谷ヒカリエ" },
+    "group5": { "tel1": "03-5555-2222", "mobile": "090-5555-2222" },
+    "group6": { "url": "http://www.nextstep.co.jp" }
+  },
+  {
+    "answerId": "6804",
+    "imageUrl": { "front": "images/sample_card_06_front.jpg", "back": "" },
+    "group1": { "email": "daisuke.watanabe@example.com" },
+    "group2": { "lastName": "渡辺", "firstName": "大輔" },
+    "group3": { "companyName": "イノベートテクノロジー", "department": "広報部", "position": "シニアスタッフ" },
+    "group4": { "zipCode": "160-0023", "address1": "東京都新宿区西新宿", "address2": "新宿パークタワー" },
+    "group5": { "tel1": "03-5555-3333", "mobile": "090-5555-3333" },
+    "group6": { "url": "http://www.innovate-tech.co.jp" }
+  },
+  {
+    "answerId": "6805",
+    "imageUrl": { "front": "images/sample_card_07_front.jpg", "back": "" },
+    "group1": { "email": "makoto.ito@example.com" },
+    "group2": { "lastName": "伊藤", "firstName": "誠" },
+    "group3": { "companyName": "フューチャーアーキテクト", "department": "事業開発部", "position": "スタッフ" },
+    "group4": { "zipCode": "141-0032", "address1": "東京都品川区大崎", "address2": "ゲートシティ大崎" },
+    "group5": { "tel1": "03-5555-4444", "mobile": "090-5555-4444" },
+    "group6": { "url": "http://www.futurearchitect.co.jp" }
+  },
+  {
+    "answerId": "6806",
+    "imageUrl": { "front": "images/sample_card_08_front.jpg", "back": "" },
+    "group1": { "email": "naoki.nakamura@example.com" },
+    "group2": { "lastName": "中村", "firstName": "直樹" },
+    "group3": { "companyName": "クラウドエース", "department": "カスタマーサクセス部", "position": "アナリスト" },
+    "group4": { "zipCode": "100-6924", "address1": "東京都千代田区丸の内", "address2": "JPタワー" },
+    "group5": { "tel1": "03-5555-5555", "mobile": "090-5555-5555" },
+    "group6": { "url": "http://www.cloud-ace.co.jp" }
+  },
+  {
+    "answerId": "6807",
+    "imageUrl": { "front": "images/sample_card_09_front.jpg", "back": "" },
+    "group1": { "email": "shota.kobayashi@example.com" },
+    "group2": { "lastName": "小林", "firstName": "翔太" },
+    "group3": { "companyName": "データドライブ", "department": "営業企画部", "position": "マネージャー" },
+    "group4": { "zipCode": "105-0021", "address1": "東京都港区東新橋", "address2": "汐留シティセンター" },
+    "group5": { "tel1": "03-5555-6666", "mobile": "090-5555-6666" },
+    "group6": { "url": "http://www.datadrive.co.jp" }
+  },
+  {
+    "answerId": "6808",
+    "imageUrl": { "front": "images/sample_card_10_front.jpg", "back": "" },
+    "group1": { "email": "takuya.kato@example.com" },
+    "group2": { "lastName": "加藤", "firstName": "拓也" },
+    "group3": { "companyName": "エンタープライズブレイン", "department": "製品開発部", "position": "リーダー" },
+    "group4": { "zipCode": "108-0075", "address1": "東京都港区港南", "address2": "品川インターシティ" },
+    "group5": { "tel1": "03-5555-7777", "mobile": "090-5555-7777" },
+    "group6": { "url": "http://www.enterprise-brain.co.jp" }
+  },
+  {
+    "answerId": "6809",
+    "imageUrl": { "front": "images/sample_card_11_front.jpg", "back": "" },
+    "group1": { "email": "ren.yoshida@example.com" },
+    "group2": { "lastName": "吉田", "firstName": "蓮" },
+    "group3": { "companyName": "パシフィックリンク", "department": "広報部", "position": "シニアスタッフ" },
+    "group4": { "zipCode": "106-6113", "address1": "東京都港区六本木", "address2": "六本木ヒルズ森タワー" },
+    "group5": { "tel1": "03-5555-8888", "mobile": "090-5555-8888" },
+    "group6": { "url": "http://www.pacificlink.co.jp" }
+  },
+  {
+    "answerId": "6810",
+    "imageUrl": { "front": "images/sample_card_12_front.jpg", "back": "" },
+    "group1": { "email": "hina.yamaguchi@example.com" },
+    "group2": { "lastName": "山口", "firstName": "陽菜" },
+    "group3": { "companyName": "サンライズコンサルティング", "department": "事業開発部", "position": "スタッフ" },
+    "group4": { "zipCode": "100-0005", "address1": "東京都千代田区丸の内", "address2": "丸の内ビルディング" },
+    "group5": { "tel1": "03-5555-9999", "mobile": "090-5555-9999" },
+    "group6": { "url": "http://www.sunrise-consulting.co.jp" }
+  },
+  {
+    "answerId": "6811",
+    "imageUrl": { "front": "images/sample_card_13_front.jpg", "back": "" },
+    "group1": { "email": "misaki.matsumoto@example.com" },
+    "group2": { "lastName": "松本", "firstName": "美咲" },
+    "group3": { "companyName": "オーシャンビューシステム", "department": "カスタマーサクセス部", "position": "アナリスト" },
+    "group4": { "zipCode": "135-0091", "address1": "東京都港区台場", "address2": "フジテレビ本社ビル" },
+    "group5": { "tel1": "03-5555-0000", "mobile": "090-5555-0000" },
+    "group6": { "url": "http://www.oceanview.co.jp" }
+  },
+  {
+    "answerId": "6812",
+    "imageUrl": { "front": "images/sample_card_14_front.jpg", "back": "" },
+    "group1": { "email": "yuko.inoue@example.com" },
+    "group2": { "lastName": "井上", "firstName": "優子" },
+    "group3": { "companyName": "グローバルシステムズ", "department": "製品開発部", "position": "リーダー" },
+    "group4": { "zipCode": "101-0021", "address1": "東京都千代田区外神田", "address2": "秋葉原ビル" },
+    "group5": { "tel1": "03-1111-1111", "mobile": "090-1111-1111" },
+    "group6": { "url": "http://www.globalsystems.co.jp" }
+  },
+  {
+    "answerId": "6813",
+    "imageUrl": { "front": "images/sample_card_15_front.jpg", "back": "" },
+    "group1": { "email": "ayumi.kimura@example.com" },
+    "group2": { "lastName": "木村", "firstName": "あゆみ" },
+    "group3": { "companyName": "ネクストステップソリューションズ", "department": "広報部", "position": "シニアスタッフ" },
+    "group4": { "zipCode": "150-0002", "address1": "東京都渋谷区渋谷", "address2": "渋谷ヒカリエ" },
+    "group5": { "tel1": "03-2222-2222", "mobile": "090-2222-2222" },
+    "group6": { "url": "http://www.nextstep.co.jp" }
+  },
+  {
+    "answerId": "6814",
+    "imageUrl": { "front": "images/sample_card_16_front.jpg", "back": "" },
+    "group1": { "email": "megumi.hayashi@example.com" },
+    "group2": { "lastName": "林", "firstName": "恵" },
+    "group3": { "companyName": "イノベートテクノロジー", "department": "事業開発部", "position": "スタッフ" },
+    "group4": { "zipCode": "160-0023", "address1": "東京都新宿区西新宿", "address2": "新宿パークタワー" },
+    "group5": { "tel1": "03-3333-3333", "mobile": "090-3333-3333" },
+    "group6": { "url": "http://www.innovate-tech.co.jp" }
+  },
+  {
+    "answerId": "6815",
+    "imageUrl": { "front": "images/sample_card_17_front.jpg", "back": "" },
+    "group1": { "email": "daiki.saito@example.com" },
+    "group2": { "lastName": "斎藤", "firstName": "大輝" },
+    "group3": { "companyName": "フューチャーアーキテクト", "department": "カスタマーサクセス部", "position": "アナリスト" },
+    "group4": { "zipCode": "141-0032", "address1": "東京都品川区大崎", "address2": "ゲートシティ大崎" },
+    "group5": { "tel1": "03-4444-4444", "mobile": "090-4444-4444" },
+    "group6": { "url": "http://www.futurearchitect.co.jp" }
+  },
+  {
+    "answerId": "6816",
+    "imageUrl": { "front": "images/sample_card_18_front.jpg", "back": "" },
+    "group1": { "email": "kazuya.shimizu@example.com" },
+    "group2": { "lastName": "清水", "firstName": "和也" },
+    "group3": { "companyName": "クラウドエース", "department": "営業企画部", "position": "マネージャー" },
+    "group4": { "zipCode": "100-6924", "address1": "東京都千代田区丸の内", "address2": "JPタワー" },
+    "group5": { "tel1": "03-6666-6666", "mobile": "090-6666-6666" },
+    "group6": { "url": "http://www.cloud-ace.co.jp" }
+  },
+  {
+    "answerId": "6817",
+    "imageUrl": { "front": "images/sample_card_19_front.jpg", "back": "" },
+    "group1": { "email": "tatsuya.yamazaki@example.com" },
+    "group2": { "lastName": "山崎", "firstName": "竜也" },
+    "group3": { "companyName": "データドライブ", "department": "製品開発部", "position": "リーダー" },
+    "group4": { "zipCode": "105-0021", "address1": "東京都港区東新橋", "address2": "汐留シティセンター" },
+    "group5": { "tel1": "03-7777-7777", "mobile": "090-7777-7777" },
+    "group6": { "url": "http://www.datadrive.co.jp" }
+  },
+  {
+    "answerId": "6818",
+    "imageUrl": { "front": "images/sample_card_20_front.jpg", "back": "" },
+    "group1": { "email": "yuki.mori@example.com" },
+    "group2": { "lastName": "森", "firstName": "勇気" },
+    "group3": { "companyName": "エンタープライズブレイン", "department": "広報部", "position": "シニアスタッフ" },
+    "group4": { "zipCode": "108-0075", "address1": "東京都港区港南", "address2": "品川インターシティ" },
+    "group5": { "tel1": "03-8888-8888", "mobile": "090-8888-8888" },
+    "group6": { "url": "http://www.enterprise-brain.co.jp" }
+  },
+  {
+    "answerId": "6819",
+    "imageUrl": { "front": "images/sample_card_21_front.jpg", "back": "" },
+    "group1": { "email": "naoto.ikeda@example.com" },
+    "group2": { "lastName": "池田", "firstName": "直人" },
+    "group3": { "companyName": "パシフィックリンク", "department": "事業開発部", "position": "スタッフ" },
+    "group4": { "zipCode": "106-6113", "address1": "東京都港区六本木", "address2": "六本木ヒルズ森タワー" },
+    "group5": { "tel1": "03-9999-9999", "mobile": "090-9999-9999" },
+    "group6": { "url": "http://www.pacificlink.co.jp" }
+  },
+  {
+    "answerId": "6820",
+    "imageUrl": { "front": "images/sample_card_22_front.jpg", "back": "" },
+    "group1": { "email": "koji.hashimoto@example.com" },
+    "group2": { "lastName": "橋本", "firstName": "浩二" },
+    "group3": { "companyName": "サンライズコンサルティング", "department": "カスタマーサクセス部", "position": "アナリスト" },
+    "group4": { "zipCode": "100-0005", "address1": "東京都千代田区丸の内", "address2": "丸の内ビルディング" },
+    "group5": { "tel1": "03-0000-0000", "mobile": "090-0000-0000" },
+    "group6": { "url": "http://www.sunrise-consulting.co.jp" }
+  },
+  {
+    "answerId": "6821",
+    "imageUrl": { "front": "images/sample_card_23_front.jpg", "back": "" },
+    "group1": { "email": "jun.abe@example.com" },
+    "group2": { "lastName": "阿部", "firstName": "純" },
+    "group3": { "companyName": "オーシャンビューシステム", "department": "営業企画部", "position": "マネージャー" },
+    "group4": { "zipCode": "135-0091", "address1": "東京都港区台場", "address2": "フジテレビ本社ビル" },
+    "group5": { "tel1": "03-1010-1010", "mobile": "090-1010-1010" },
+    "group6": { "url": "http://www.oceanview.co.jp" }
   }
 ]

@@ -1,0 +1,39 @@
+[
+  {
+    "answerId": "A001",
+    "businessCard": {
+      "imageUrl": { "front": "", "back": "" },
+      "group1": { "email": "taro.tanaka@example.com" },
+      "group2": { "lastName": "田中", "firstName": "太郎" },
+      "group3": { "companyName": "テスト株式会社", "department": "営業部", "position": "主任" },
+      "group4": { "postalCode": "100-0001", "address1": "東京都千代田区", "address2": "1-1-1" },
+      "group5": { "mobile": "090-1111-2222", "tel1": "03-1234-5678", "tel2": "", "fax": "03-1234-5679" },
+      "group6": { "url": "https://example.com" }
+    }
+  },
+  {
+    "answerId": "A002",
+    "businessCard": {
+      "imageUrl": { "front": "", "back": "" },
+      "group1": { "email": "hanako.sato@example.com" },
+      "group2": { "lastName": "佐藤", "firstName": "花子" },
+      "group3": { "companyName": "アカウント株式会社", "department": "マーケティング部", "position": "担当" },
+      "group4": { "postalCode": "150-0001", "address1": "東京都渋谷区", "address2": "2-2-2" },
+      "group5": { "mobile": "080-3333-4444", "tel1": "03-8765-4321", "tel2": "", "fax": "" },
+      "group6": { "url": "https://corp.example.jp" }
+    }
+  },
+  {
+    "answerId": "A003",
+    "businessCard": {
+      "imageUrl": { "front": "", "back": "" },
+      "group1": { "email": "other.user@example.com" },
+      "group2": { "lastName": "鈴木", "firstName": "次郎" },
+      "group3": { "companyName": "サンプル商事", "department": "サービス部", "position": "スタッフ" },
+      "group4": { "postalCode": "530-0001", "address1": "大阪府大阪市北区", "address2": "3-3-3" },
+      "group5": { "mobile": "070-5555-6666", "tel1": "06-2222-3333", "tel2": "", "fax": "" },
+      "group6": { "url": "" }
+    }
+  }
+]
+

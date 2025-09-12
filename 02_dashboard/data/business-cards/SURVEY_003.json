@@ -1,0 +1,27 @@
+[
+  {
+    "answerId": "C001",
+    "businessCard": {
+      "imageUrl": { "front": "", "back": "" },
+      "group1": { "email": "brand.user1@example.com" },
+      "group2": { "lastName": "小林", "firstName": "優" },
+      "group3": { "companyName": "ブランド電機", "department": "企画部", "position": "担当" },
+      "group4": { "postalCode": "060-0001", "address1": "北海道札幌市中央区", "address2": "1-2-3" },
+      "group5": { "mobile": "090-1111-3333", "tel1": "011-123-4567", "tel2": "", "fax": "" },
+      "group6": { "url": "" }
+    }
+  },
+  {
+    "answerId": "C002",
+    "businessCard": {
+      "imageUrl": { "front": "", "back": "" },
+      "group1": { "email": "brand.user2@example.com" },
+      "group2": { "lastName": "渡辺", "firstName": "直子" },
+      "group3": { "companyName": "ブランド食品", "department": "営業部", "position": "主任" },
+      "group4": { "postalCode": "980-0001", "address1": "宮城県仙台市青葉区", "address2": "2-3-4" },
+      "group5": { "mobile": "080-2222-4444", "tel1": "022-987-6543", "tel2": "", "fax": "" },
+      "group6": { "url": "https://brand.example.jp" }
+    }
+  }
+]
+

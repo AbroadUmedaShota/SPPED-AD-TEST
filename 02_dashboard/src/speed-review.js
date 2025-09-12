@@ -435,6 +435,30 @@ export async function initializePage() {
             })
         ]);
 
+        // Fallback to local data if sample-3 files are unavailable
+        let answersData = answers;
+        let personalInfoData = personalInfo;
+        let enqueteDetailsData = enqueteDetails;
+
+        try {
+            if (!Array.isArray(answersData) || answersData.length === 0) {
+                const r1 = await fetch(`./data/answers/${surveyId}.json`);
+                answersData = r1.ok ? await r1.json() : [];
+            }
+        } catch {}
+        try {
+            if (!Array.isArray(personalInfoData) || personalInfoData.length === 0) {
+                const r2 = await fetch(`./data/business-cards/${surveyId}.json`);
+                personalInfoData = r2.ok ? await r2.json() : [];
+            }
+        } catch {}
+        try {
+            if (!enqueteDetailsData || !enqueteDetailsData.details) {
+                const r3 = await fetch(`./data/enquete/${surveyId}.json`);
+                enqueteDetailsData = r3.ok ? await r3.json() : {};
+            }
+        } catch {}
+
         // 2. Find the survey definition
         currentSurvey = surveys.find(s => s.id === surveyId);
         if (!currentSurvey) {
@@ -448,10 +472,12 @@ export async function initializePage() {
         }
 
         // 3. Create a map for quick lookup of personal info
-        const personalInfoMap = new Map(personalInfo.map(info => [info.answerId, info.businessCard]));
+        const personalInfoArr = (Array.isArray(personalInfoData) && personalInfoData.length > 0) ? personalInfoData : personalInfo;
+        const answersArr = (Array.isArray(answersData) && answersData.length > 0) ? answersData : answers;
+        const personalInfoMap = new Map(personalInfoArr.map(info => [info.answerId, info.businessCard]));
 
         // 4. Combine answers with personal info and survey definition
-        allCombinedData = answers.map(answer => {
+        allCombinedData = answersArr.map(answer => {
             const businessCard = personalInfoMap.get(answer.answerId) || {
                 group2: { lastName: '(情報なし)' },
                 group3: { companyName: '(情報なし)' }
@@ -463,7 +489,7 @@ export async function initializePage() {
             };
         });
         
-        if (answers.length === 0) {
+        if (answersArr.length === 0) {
              console.warn(`アンケートID「${surveyId}」に対する回答データが見つかりませんでした。`);
         }
 

@@ -1,0 +1,27 @@
+[
+  {
+    "answerId": "B001",
+    "businessCard": {
+      "imageUrl": { "front": "", "back": "" },
+      "group1": { "email": "ichiro.tanaka@example.com" },
+      "group2": { "lastName": "田中", "firstName": "一郎" },
+      "group3": { "companyName": "ニュー製品社", "department": "開発部", "position": "係長" },
+      "group4": { "postalCode": "460-0001", "address1": "愛知県名古屋市中区", "address2": "4-4-4" },
+      "group5": { "mobile": "090-7777-8888", "tel1": "052-444-5555", "tel2": "", "fax": "" },
+      "group6": { "url": "https://new.example.co.jp" }
+    }
+  },
+  {
+    "answerId": "B002",
+    "businessCard": {
+      "imageUrl": { "front": "", "back": "" },
+      "group1": { "email": "misa.yamamoto@example.com" },
+      "group2": { "lastName": "山本", "firstName": "美咲" },
+      "group3": { "companyName": "ニュー製品社", "department": "営業部", "position": "担当" },
+      "group4": { "postalCode": "220-0001", "address1": "神奈川県横浜市西区", "address2": "5-5-5" },
+      "group5": { "mobile": "080-9999-0000", "tel1": "045-999-0000", "tel2": "", "fax": "" },
+      "group6": { "url": "" }
+    }
+  }
+]
+

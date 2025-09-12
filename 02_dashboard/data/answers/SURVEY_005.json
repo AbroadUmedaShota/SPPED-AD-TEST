@@ -1,0 +1,25 @@
+[
+  {
+    "answerId": "E001",
+    "surveyId": "SURVEY_005",
+    "answeredAt": "2025-04-03 08:30:00",
+    "isTest": false,
+    "details": [
+      { "question": "Q.01_性別", "answer": "男性" },
+      { "question": "Q.02_業種", "answer": "金融" },
+      { "question": "Q.03_満足度", "answer": "不満" }
+    ]
+  },
+  {
+    "answerId": "E002",
+    "surveyId": "SURVEY_005",
+    "answeredAt": "2025-04-10 18:05:00",
+    "isTest": true,
+    "details": [
+      { "question": "Q.01_性別", "answer": "その他" },
+      { "question": "Q.02_業種", "answer": "製造" },
+      { "question": "Q.03_満足度", "answer": "普通" }
+    ]
+  }
+]
+
