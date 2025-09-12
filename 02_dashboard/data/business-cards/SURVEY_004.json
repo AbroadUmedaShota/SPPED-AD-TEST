@@ -1,0 +1,27 @@
+[
+  {
+    "answerId": "D001",
+    "businessCard": {
+      "imageUrl": { "front": "", "back": "" },
+      "group1": { "email": "event.user1@example.com" },
+      "group2": { "lastName": "内田", "firstName": "健" },
+      "group3": { "companyName": "イベント社", "department": "運営部", "position": "スタッフ" },
+      "group4": { "postalCode": "460-0008", "address1": "愛知県名古屋市中区", "address2": "錦1-1-1" },
+      "group5": { "mobile": "070-1212-3434", "tel1": "052-000-1111", "tel2": "", "fax": "" },
+      "group6": { "url": "" }
+    }
+  },
+  {
+    "answerId": "D002",
+    "businessCard": {
+      "imageUrl": { "front": "", "back": "" },
+      "group1": { "email": "event.user2@example.com" },
+      "group2": { "lastName": "藤本", "firstName": "瑞季" },
+      "group3": { "companyName": "イベント社", "department": "広報部", "position": "担当" },
+      "group4": { "postalCode": "530-0003", "address1": "大阪府大阪市北区", "address2": "堂島2-2-2" },
+      "group5": { "mobile": "080-3434-5656", "tel1": "06-000-2222", "tel2": "", "fax": "" },
+      "group6": { "url": "https://event.example.jp" }
+    }
+  }
+]
+

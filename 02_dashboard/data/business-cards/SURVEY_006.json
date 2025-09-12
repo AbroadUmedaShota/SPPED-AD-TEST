@@ -1,0 +1,27 @@
+[
+  {
+    "answerId": "F001",
+    "businessCard": {
+      "imageUrl": { "front": "", "back": "" },
+      "group1": { "email": "emp.user1@example.com" },
+      "group2": { "lastName": "石田", "firstName": "悠人" },
+      "group3": { "companyName": "スピードアド", "department": "人事部", "position": "担当" },
+      "group4": { "postalCode": "101-0021", "address1": "東京都千代田区", "address2": "外神田1-1-1" },
+      "group5": { "mobile": "070-1212-7878", "tel1": "03-1234-0000", "tel2": "", "fax": "" },
+      "group6": { "url": "" }
+    }
+  },
+  {
+    "answerId": "F002",
+    "businessCard": {
+      "imageUrl": { "front": "", "back": "" },
+      "group1": { "email": "emp.user2@example.com" },
+      "group2": { "lastName": "伊藤", "firstName": "茜" },
+      "group3": { "companyName": "スピードアド", "department": "総務部", "position": "主任" },
+      "group4": { "postalCode": "105-0004", "address1": "東京都港区", "address2": "新橋1-2-3" },
+      "group5": { "mobile": "080-3434-7878", "tel1": "03-2222-0000", "tel2": "", "fax": "" },
+      "group6": { "url": "https://speedad.example.jp" }
+    }
+  }
+]
+

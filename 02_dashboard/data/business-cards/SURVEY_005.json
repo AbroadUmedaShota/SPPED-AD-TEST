@@ -1,0 +1,27 @@
+[
+  {
+    "answerId": "E001",
+    "businessCard": {
+      "imageUrl": { "front": "", "back": "" },
+      "group1": { "email": "campaign.user1@example.com" },
+      "group2": { "lastName": "三浦", "firstName": "翔" },
+      "group3": { "companyName": "アドキャンプ", "department": "広告部", "position": "担当" },
+      "group4": { "postalCode": "810-0001", "address1": "福岡県福岡市中央区", "address2": "天神1-1-1" },
+      "group5": { "mobile": "090-5555-2323", "tel1": "092-111-2222", "tel2": "", "fax": "" },
+      "group6": { "url": "" }
+    }
+  },
+  {
+    "answerId": "E002",
+    "businessCard": {
+      "imageUrl": { "front": "", "back": "" },
+      "group1": { "email": "campaign.user2@example.com" },
+      "group2": { "lastName": "高橋", "firstName": "楓" },
+      "group3": { "companyName": "アドキャンプ", "department": "広報部", "position": "主任" },
+      "group4": { "postalCode": "064-0804", "address1": "北海道札幌市中央区", "address2": "南4条西1-1-1" },
+      "group5": { "mobile": "080-6666-9898", "tel1": "011-222-3333", "tel2": "", "fax": "" },
+      "group6": { "url": "https://adcamp.example.com" }
+    }
+  }
+]
+
