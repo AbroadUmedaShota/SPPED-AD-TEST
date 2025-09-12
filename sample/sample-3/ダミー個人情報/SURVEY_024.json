@@ -1,0 +1,62 @@
+[
+  {
+    "answerId": "ANS_SURVEY_024_001",
+    "businessCard": {
+      "group1": {
+        "email": "sato.ichiro@example.com"
+      },
+      "group2": {
+        "lastName": "佐藤",
+        "firstName": "一郎"
+      },
+      "group3": {
+        "companyName": "人材開発株式会社",
+        "department": "人材開発部",
+        "position": "キャリアコンサルタント"
+      },
+      "group4": {
+        "postalCode": "100-0014",
+        "address1": "東京都千代田区永田町2-10-3",
+        "address2": "東急キャピトルタワー 10F"
+      },
+      "group5": {
+        "mobile": "040-2345-6789",
+        "tel1": "03-2345-6789",
+        "fax": "03-2345-6790"
+      },
+      "group6": {
+        "url": "https://hr-dev-corp.example.com"
+      }
+    }
+  },
+  {
+    "answerId": "ANS_SURVEY_024_002",
+    "businessCard": {
+      "group1": {
+        "email": "suzuki.hanako@example.com"
+      },
+      "group2": {
+        "lastName": "鈴木",
+        "firstName": "花子"
+      },
+      "group3": {
+        "companyName": "キャリア支援株式会社",
+        "department": "キャリア支援部",
+        "position": "キャリアアドバイザー"
+      },
+      "group4": {
+        "postalCode": "163-0230",
+        "address1": "東京都新宿区西新宿2-6-1",
+        "address2": "新宿住友ビル 30F"
+      },
+      "group5": {
+        "mobile": "040-9876-5432",
+        "tel1": "03-3456-7890",
+        "fax": "03-3456-7891"
+      },
+      "group6": {
+        "url": "https://career-support.example.com"
+      }
+    }
+  }
+]

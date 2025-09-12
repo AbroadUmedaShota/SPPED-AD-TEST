@@ -1,0 +1,58 @@
+[
+  {
+    "answerId": "ANS_SURVEY_012_001",
+    "surveyId": "SURVEY_012",
+    "answeredAt": "2025-08-25T10:00:00Z",
+    "isTest": false,
+    "details": [
+      { "question": "Q1. 製品の利用頻度を教えてください。", "answer": "毎日" },
+      { "question": "Q2. 製品のどの機能を最もよく利用しますか？", "answer": "データ分析" },
+      { "question": "Q3. 製品の利用目的を教えてください。", "answer": "業務効率化" },
+      { "question": "Q4. 製品の利用時間帯を教えてください。", "answer": ["午前中"] },
+      { "question": "Q5. 製品の利用場所を教えてください。", "answer": ["職場"] },
+      { "question": "Q6. 製品の利用期間を教えてください。", "answer": "1年未満" },
+      { "question": "Q7. 製品の利用に関する課題はありますか？", "answer": "特になし" },
+      { "question": "Q8. 製品の利用に関する改善点があれば教えてください。", "answer": "UIの改善" },
+      { "question": "Q9. 製品の全体的な満足度を教えてください。", "answer": "非常に満足" },
+      { "question": "Q10. 製品の利用頻度を教えてください。", "answer": "毎日" },
+      { "question": "Q11. 製品の操作性は直感的ですか？", "answer": "はい" },
+      { "question": "Q12. 製品の起動速度は速いですか？", "answer": "はい" },
+      { "question": "Q13. 製品のバッテリー持ちは良いですか？", "answer": "はい" },
+      { "question": "Q14. 製品のデザインは魅力的ですか？", "answer": "はい" },
+      { "question": "Q15. 製品の耐久性についてどう思いますか？", "answer": "良い" },
+      { "question": "Q16. 製品のセキュリティ対策は適切ですか？", "answer": "はい" },
+      { "question": "Q17. 製品のデータ管理は容易ですか？", "answer": "はい" },
+      { "question": "Q18. 製品のカスタマイズ性は高いですか？", "answer": "はい" },
+      { "question": "Q19. 製品のヘルプドキュメントは分かりやすいですか？", "answer": "はい" },
+      { "question": "Q20. 製品のトレーニングは必要ですか？", "answer": "いいえ" }
+    ]
+  },
+  {
+    "answerId": "ANS_SURVEY_012_002",
+    "surveyId": "SURVEY_012",
+    "answeredAt": "2025-08-25T10:05:00Z",
+    "isTest": false,
+    "details": [
+      { "question": "Q1. 製品の利用頻度を教えてください。", "answer": "ほとんど使わない" },
+      { "question": "Q2. 製品のどの機能を最もよく利用しますか？", "answer": "なし" },
+      { "question": "Q3. 製品の利用目的を教えてください。", "answer": "情報収集" },
+      { "question": "Q4. 製品の利用時間帯を教えてください。", "answer": ["夜間"] },
+      { "question": "Q5. 製品の利用場所を教えてください。", "answer": ["自宅"] },
+      { "question": "Q6. 製品の利用期間を教えてください。", "answer": "5年以上" },
+      { "question": "Q7. 製品の利用に関する課題はありますか？", "answer": "操作が複雑" },
+      { "question": "Q8. 製品の利用に関する改善点があれば教えてください。", "answer": "機能の簡素化" },
+      { "question": "Q9. 製品の全体的な満足度を教えてください。", "answer": "不満" },
+      { "question": "Q10. 製品の利用頻度を教えてください。", "answer": "ほとんど使わない" },
+      { "question": "Q11. 製品の操作性は直感的ですか？", "answer": "いいえ" },
+      { "question": "Q12. 製品の起動速度は速いですか？", "answer": "いいえ" },
+      { "question": "Q13. 製品のバッテリー持ちは良いですか？", "answer": "いいえ" },
+      { "question": "Q14. 製品のデザインは魅力的ですか？", "answer": "いいえ" },
+      { "question": "Q15. 製品の耐久性についてどう思いますか？", "answer": "悪い" },
+      { "question": "Q16. 製品のセキュリティ対策は適切ですか？", "answer": "いいえ" },
+      { "question": "Q17. 製品のデータ管理は容易ですか？", "answer": "いいえ" },
+      { "question": "Q18. 製品のカスタマイズ性は高いですか？", "answer": "いいえ" },
+      { "question": "Q19. 製品のヘルプドキュメントは分かりやすいですか？", "answer": "いいえ" },
+      { "question": "Q20. 製品のトレーニングは必要ですか？", "answer": "はい" }
+    ]
+  }
+]

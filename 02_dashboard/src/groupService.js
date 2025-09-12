@@ -6,8 +6,11 @@ let groups = []; // メモリ上のグループデータ
  * @returns {Promise<Array>} グループデータの配列
  */
 export async function fetchGroups() {
+    const isSamplePage = window.location.pathname.includes('/sample/');
+    const dataPath = isSamplePage ? '../../02_dashboard/data/groups.json' : 'data/groups.json';
+
     try {
-        const response = await fetch('../02_dashboard/data/groups.json');
+        const response = await fetch(dataPath);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }

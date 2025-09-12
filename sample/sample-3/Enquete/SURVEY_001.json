@@ -1,0 +1,25 @@
+{
+  "id": "SURVEY_001",
+  "groupId": "GROUP001",
+  "name": { "ja": "新製品に関するアンケート", "en": "New Product Survey" },
+  "displayTitle": { "ja": "新製品のご意見をお聞かせください", "en": "Please give us your opinion on our new product" },
+  "description": { "ja": "新製品の満足度に関するアンケートです。", "en": "This is a survey about satisfaction with our new product." },
+  "status": "会期中",
+  "answerCount": 10,
+  "realtimeAnswers": 5,
+  "periodStart": "2025-07-01",
+  "periodEnd": "2025-07-31",
+  "bizcardEnabled": true,
+  "details": [
+    { "id": "Q1", "text": "Q1. 新製品の総合的な満足度を教えてください。", "type": "single_choice", "options": ["非常に満足", "満足", "普通", "不満", "非常に不満"] },
+    { "id": "Q2", "text": "Q2. 新製品のどの機能が最も魅力的でしたか？", "type": "text" },
+    { "id": "Q3", "text": "Q3. 新製品の価格についてどう思いますか？", "type": "single_choice", "options": ["高い", "適切", "安い"] },
+    { "id": "Q4", "text": "Q4. 新製品を友人や同僚に勧めたいと思いますか？", "type": "single_choice", "options": ["はい", "いいえ"] },
+    { "id": "Q5", "text": "Q5. 新製品に今後追加してほしい機能はありますか？", "type": "text" },
+    { "id": "Q6", "text": "Q6. 新製品を知ったきっかけは何ですか？", "type": "multi_choice", "options": ["SNS", "広告", "友人からの紹介", "店頭", "その他"] },
+    { "id": "Q7", "text": "Q7. 新製品のパッケージデザインについてどう思いますか？", "type": "single_choice", "options": ["良い", "普通", "悪い"] },
+    { "id": "Q8", "text": "Q8. 新製品の購入を検討する際に重視した点は何ですか？", "answer": "機能性" },
+    { "id": "Q9", "text": "Q9. 新製品の改善点があれば教えてください。", "answer": "特になし" },
+    { "id": "Q10", "text": "Q10. 新製品の利用頻度を教えてください。", "answer": "毎日" }
+  ]
+}

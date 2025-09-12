@@ -139,7 +139,33 @@ export async function loadCommonHtml(placeholderId, filePath, callback = null) {
         const html = await response.text();
         const placeholder = document.getElementById(placeholderId);
         if (placeholder) {
-            placeholder.innerHTML = html;
+            // Create a parser to manipulate the fetched HTML
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            // Determine the correct base path for assets
+            const isSamplePage = window.location.pathname.includes('/sample/');
+            const assetBasePath = isSamplePage ? '../../02_dashboard/' : ''; // Use empty string for root pages
+
+            // Select elements with src or href attributes that might need rewriting
+            const elementsToFix = doc.querySelectorAll('img[src], link[href], a[href]');
+
+            elementsToFix.forEach(el => {
+                const attribute = el.hasAttribute('src') ? 'src' : 'href';
+                const originalPath = el.getAttribute(attribute);
+
+                // Check if it's a relative path that needs correction and not an anchor link
+                if (originalPath && !originalPath.startsWith('http') && !originalPath.startsWith('/') && !originalPath.startsWith('#')) {
+                    // Avoid rewriting the path if it already seems correct (for cases where logic might run twice)
+                    if (!originalPath.startsWith(assetBasePath)) {
+                         el.setAttribute(attribute, `${assetBasePath}${originalPath}`);
+                    }
+                }
+            });
+
+            // Use the modified HTML from the body of the parsed document
+            placeholder.innerHTML = doc.body.innerHTML;
+
             if (callback && typeof callback === 'function') {
                 callback();
             }

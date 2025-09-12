@@ -1,0 +1,31 @@
+{
+  "id": "SURVEY_007",
+  "groupId": "GROUP001",
+  "name": { "ja": "サービス利用状況調査", "en": "Service Usage Survey" },
+  "displayTitle": { "ja": "サービスご利用に関するアンケート", "en": "Survey on Service Usage" },
+  "description": { "ja": "当社のサービス利用状況を把握するためのアンケートです。", "en": "This survey is to understand the usage of our services." },
+  "status": "会期中",
+  "answerCount": 110,
+  "realtimeAnswers": 18,
+  "periodStart": "2025-08-01",
+  "periodEnd": "2025-08-31",
+  "bizcardEnabled": true,
+  "details": [
+    { "id": "Q1", "text": "Q1. どのサービスを最も頻繁に利用しますか？", "type": "text" },
+    { "id": "Q2", "text": "Q2. サービスの利用頻度を教えてください。", "type": "single_choice", "options": ["毎日", "週に数回", "月に数回", "ほとんど使わない"] },
+    { "id": "Q3", "text": "Q3. サービスの使いやすさについてどう思いますか？", "type": "single_choice", "options": ["使いやすい", "普通", "使いにくい"] },
+    { "id": "Q4", "text": "Q4. サービスの機能は充実していますか？", "type": "single_choice", "options": ["はい", "いいえ"] },
+    { "id": "Q5", "text": "Q5. サービスに今後追加してほしい機能はありますか？", "type": "text" },
+    { "id": "Q6", "text": "Q6. サービスを知ったきっかけは何ですか？", "type": "multi_choice", "options": ["SNS", "広告", "友人からの紹介", "ウェブサイト", "その他"] },
+    { "id": "Q7", "text": "Q7. サービスのサポート体制についてどう思いますか？", "type": "single_choice", "options": ["良い", "普通", "悪い"] },
+    { "id": "Q8", "text": "Q8. サービスの価格についてどう思いますか？", "type": "single_choice", "options": ["高い", "適切", "安い"] },
+    { "id": "Q9", "text": "Q9. サービスの全体的な満足度を教えてください。", "type": "single_choice", "options": ["非常に満足", "満足", "普通", "不満", "非常に不満"] },
+    { "id": "Q10", "text": "Q10. サービスの利用目的を教えてください。", "type": "text" },
+    { "id": "Q11", "text": "Q11. サービスの操作性は直感的ですか？", "type": "single_choice", "options": ["はい", "いいえ"] },
+    { "id": "Q12", "text": "Q12. サービスの起動速度は速いですか？", "type": "single_choice", "options": ["はい", "いいえ"] },
+    { "id": "Q13", "text": "Q13. サービスの安定性についてどう思いますか？", "type": "single_choice", "options": ["良い", "普通", "悪い"] },
+    { "id": "Q14", "text": "Q14. サービスのセキュリティ対策は適切ですか？", "type": "single_choice", "options": ["はい", "いいえ"] },
+    { "id": "Q15", "text": "Q15. サービスのデータ管理は容易ですか？", "type": "single_choice", "options": ["はい", "いいえ"] },
+    { "id": "Q16", "text": "Q16. サービスのカスタマイズ性は高いですか？", "type": "single_choice", "options": ["はい", "いいえ"] }
+  ]
+}

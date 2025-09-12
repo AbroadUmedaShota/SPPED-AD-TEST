@@ -1,4 +1,5 @@
 import { speedReviewService } from '../02_dashboard/src/services/speedReviewService.js';
+import { initBreadcrumbs } from '../02_dashboard/src/breadcrumb.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     initGraphPage();
@@ -14,8 +15,9 @@ let dateRangePicker = null;
  * Initializes the graph page.
  */
 async function initGraphPage() {
+    initBreadcrumbs(); // Add this line
     const urlParams = new URLSearchParams(window.location.search);
-    const surveyId = urlParams.get('surveyId') || 'SURVEY8j2l0x'; // Default to CSV demo
+    const surveyId = urlParams.get('surveyId') || 'SURVEY_001'; // Default to SURVEY_001
 
     initializeDatePicker();
     await loadAndRenderCharts(surveyId);
@@ -73,28 +75,35 @@ function triggerChartUpdate() {
 async function loadAndRenderCharts(surveyId) {
     showLoading(true);
     try {
-        if (surveyId === 'SURVEY8j2l0x') {
-            const csvPaths = [
-                './0008000154.csv',
-                './0008000154ncd.csv'
-            ];
-            const csvData = await speedReviewService.loadAndCombineCsvData(csvPaths);
-            const transformedData = speedReviewService.transformCsvToCombinedData(csvData, surveyId);
-            currentSurvey = transformedData.length > 0 ? transformedData[0].survey : null;
-            originalAnswers = transformedData;
-        } else {
-            const [surveys, answers] = await Promise.all([
-                fetch('../02_dashboard/data/surveys-with-details.json').then(res => res.json()),
-                fetch('../02_dashboard/data/survey-answers.json').then(res => res.json())
-            ]);
-            currentSurvey = surveys.find(s => s.id === surveyId);
-            originalAnswers = answers.filter(a => a.surveyId === surveyId);
+        if (!surveyId) {
+            throw new Error("アンケートIDが指定されていません。");
         }
 
+        // 1. Fetch survey definition and answer data in parallel
+        const [surveyDefinition, answers] = await Promise.all([
+            fetch(`../sample/sample-3/Enquete/${surveyId}.json`).then(res => {
+                if (!res.ok) throw new Error(`アンケート定義ファイルが見つかりません: ${surveyId}.json`);
+                return res.json();
+            }),
+            fetch(`../sample/sample-3/Answer/${surveyId}.json`).then(res => {
+                if (!res.ok) return [];
+                return res.json();
+            })
+        ]);
+
+        // 2. Set the current survey definition
+        currentSurvey = surveyDefinition;
         if (!currentSurvey) {
             throw new Error(`アンケートID「${surveyId}」の定義が見つかりません。`);
         }
+        
+        originalAnswers = answers;
 
+        if (originalAnswers.length === 0) {
+             console.warn(`アンケートID「${surveyId}」に対する回答データが見つかりませんでした。`);
+        }
+
+        // 3. Set survey name and render charts
         document.getElementById('survey-title').textContent = `グラフ分析: ${currentSurvey.name.ja}`;
         
         const chartData = processDataForCharts(currentSurvey, originalAnswers);
@@ -120,11 +129,8 @@ function processDataForCharts(survey, answers) {
 
     return graphableQuestions.map(question => {
         const counts = {};
-        if (question.options) {
-            question.options.forEach(opt => counts[opt] = 0);
-        }
-
         let answeredCount = 0;
+
         answers.forEach(answer => {
             const answerDetail = answer.details.find(d => d.question === question.text);
             
@@ -133,19 +139,34 @@ function processDataForCharts(survey, answers) {
                 const answerValue = answerDetail.answer;
                 if (Array.isArray(answerValue)) { // Multi-choice
                     answerValue.forEach(ans => {
-                        if (counts[ans] !== undefined) counts[ans]++;
+                        if (ans) { // Ensure the answer string is not empty
+                           counts[ans] = (counts[ans] || 0) + 1;
+                        }
                     });
                 } else { // Single-choice
-                    if (counts[answerValue] !== undefined) counts[answerValue]++;
+                    if (answerValue) { // Ensure the answer string is not empty
+                        counts[answerValue] = (counts[answerValue] || 0) + 1;
+                    }
                 }
             }
         });
 
+        // Ensure all predefined options are present in the chart, even with 0 count
+        if (question.options) {
+            question.options.forEach(opt => {
+                if (!counts.hasOwnProperty(opt)) {
+                    counts[opt] = 0;
+                }
+            });
+        }
+
+        const sortedLabels = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+
         return {
             questionId: question.id,
             questionText: question.text,
-            labels: Object.keys(counts),
-            data: Object.values(counts),
+            labels: sortedLabels,
+            data: sortedLabels.map(label => counts[label]),
             totalAnswers: answeredCount
         };
     });
@@ -170,7 +191,12 @@ function renderCharts(chartsData) {
         card.className = 'bg-surface p-6 rounded-xl border border-outline-variant';
 
         card.innerHTML = `
-            <h3 class="text-lg font-bold mb-4">${chartData.questionText}</h3>
+            <div class="flex justify-between items-start mb-4">
+                <h3 class="text-lg font-bold">${chartData.questionText}</h3>
+                <button type="button" data-chart-id="${chartId}" data-question-text="${chartData.questionText}" class="download-btn button-secondary p-2 rounded-md" title="グラフをダウンロード">
+                    <span class="material-icons">download</span>
+                </button>
+            </div>
             <div class="mb-4">
                 <div class="inline-flex rounded-md shadow-sm" role="group">
                     <button type="button" data-chart-id="${chartId}" data-chart-type="bar" class="chart-type-btn active px-4 py-2 text-sm font-medium text-primary bg-surface border border-primary rounded-l-lg hover:bg-primary hover:text-on-primary focus:z-10 focus:ring-2 focus:ring-primary">
@@ -192,6 +218,7 @@ function renderCharts(chartsData) {
         renderChartSummary(`summary-${chartId}`, chartData);
     });
 
+    // Add event listeners for chart type buttons
     document.querySelectorAll('.chart-type-btn').forEach(button => {
         button.addEventListener('click', (e) => {
             const { chartId, chartType } = e.currentTarget.dataset;
@@ -199,6 +226,24 @@ function renderCharts(chartsData) {
             createChart(chartId, data, chartType);
             e.currentTarget.parentElement.querySelectorAll('.chart-type-btn').forEach(btn => btn.classList.remove('active'));
             e.currentTarget.classList.add('active');
+        });
+    });
+
+    // Add event listeners for download buttons
+    document.querySelectorAll('.download-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const { chartId, questionText } = e.currentTarget.dataset;
+            const chartInstance = chartInstances[chartId];
+            if (chartInstance) {
+                const dataUrl = chartInstance.toBase64Image();
+                const link = document.createElement('a');
+                link.href = dataUrl;
+                const sanitizedQuestion = questionText.replace(/[^a-z0-9_\-]/gi, '_').substring(0, 50);
+                link.download = `chart-${sanitizedQuestion}.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
         });
     });
 }
@@ -216,6 +261,18 @@ function createChart(chartId, chartData, type) {
     }
 
     const colors = ['#4285F4', '#DB4437', '#F4B400', '#0F9D58', '#AB47BC', '#00ACC1', '#FF7043', '#9E9D24'];
+
+    const whiteBgPlugin = {
+        id: 'whiteBg',
+        beforeDraw: (chart) => {
+            const {ctx} = chart;
+            ctx.save();
+            ctx.globalCompositeOperation = 'destination-over';
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, chart.width, chart.height);
+            ctx.restore();
+        }
+    };
 
     chartInstances[chartId] = new Chart(ctx, {
         type: type,
@@ -244,7 +301,8 @@ function createChart(chartId, chartData, type) {
                     ticks: { stepSize: 1 }
                 }
             } : {}
-        }
+        },
+        plugins: [whiteBgPlugin]
     });
 }
 

@@ -1,977 +1,392 @@
 [
   {
-    "id": "SURVEY8j2l0x",
+    "id": "SURVEY_001",
     "groupId": "GROUP001",
-    "name": {
-      "ja": "新商品に関する満足度調査",
-      "en": "New Product Satisfaction Survey"
-    },
-    "displayTitle": {
-      "ja": "お客様アンケートにご協力ください",
-      "en": "Please Cooperate with the Customer Survey"
-    },
-    "description": {
-      "ja": "製品Xのリリース後の顧客満足度を測定します。",
-      "en": "This survey measures customer satisfaction after the release of Product X."
-    },
-    "memo": "営業部Aチームからの依頼。ターゲット層：20代〜30代のビジネスパーソン。",
-    "status": "会期中",
-    "answerCount": 143,
-    "realtimeAnswers": 7,
-    "periodStart": "2025-05-01",
-    "periodEnd": "2025-05-31",
-    "dataCompletionDate": "2025-06-10",
-    "plan": "Standard",
-    "deadline": "2025-06-30",
-    "estimatedBillingAmount": 60000,
-    "bizcardEnabled": true,
-    "bizcardRequest": 160,
-    "bizcardCompletionCount": 140,
-    "thankYouEmailSettings": "自動送信"
-  },
-  {
-    "id": "SURVEYp91ebz",
-    "groupId": "GROUP001",
-    "name": {
-      "ja": "既存顧客サービス利用状況調査",
-      "en": "Existing Customer Service Usage Survey"
-    },
-    "displayTitle": {
-      "ja": "サービスご利用に関するアンケート",
-      "en": "Survey on Service Usage"
-    },
-    "description": {
-      "ja": "既存顧客のサービス利用状況を把握するための調査です。",
-      "en": "This survey is to understand the service usage of existing customers."
-    },
-    "memo": "CSチーム依頼。リピーター中心。",
-    "status": "アップ完了",
-    "answerCount": 210,
-    "realtimeAnswers": 3,
-    "periodStart": "2025-04-10",
-    "periodEnd": "2025-04-20",
-    "dataCompletionDate": "2025-04-30",
-    "plan": "Premium",
-    "deadline": "2025-05-15",
-    "estimatedBillingAmount": 75000,
-    "bizcardEnabled": true,
-    "bizcardRequest": 210,
-    "bizcardCompletionCount": 205,
-    "thankYouEmailSettings": "手動"
-  },
-  {
-    "id": "SURVEY5t7v9q",
-    "groupId": "GROUP001",
-    "name": {
-      "ja": "市場動向調査",
-      "en": "Market Trend Survey"
-    },
-    "displayTitle": {
-      "ja": "最新の市場トレンド調査アンケート",
-      "en": "Latest Market Trend Survey"
-    },
-    "description": {
-      "ja": "市場のトレンドや動向を調査するためのアンケートです。",
-      "en": "This survey is to investigate market trends and movements."
-    },
-    "memo": "営業企画部より依頼。競合分析目的。",
-    "status": "期限切れ",
-    "answerCount": 80,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-03-01",
-    "periodEnd": "2025-03-15",
-    "dataCompletionDate": "2025-03-25",
-    "plan": "Standard",
-    "deadline": "2025-04-10",
-    "estimatedBillingAmount": 40000,
-    "bizcardEnabled": true,
-    "bizcardRequest": 85,
-    "bizcardCompletionCount": 80,
-    "thankYouEmailSettings": "自動送信"
-  },
-  {
-    "id": "SURVEYq0hv93",
-    "groupId": "GROUP001",
-    "name": {
-      "ja": "ユーザー行動分析アンケート",
-      "en": "User Behavior Analysis Survey"
-    },
-    "displayTitle": {
-      "ja": "ユーザー行動に関するアンケート",
-      "en": "Survey on User Behavior"
-    },
-    "description": {
-      "ja": "ユーザーの行動や嗜好を分析するための調査です。",
-      "en": "This survey is to analyze user behavior and preferences."
-    },
-    "memo": "マーケティング部依頼。ターゲット：30代〜40代。",
-    "status": "データ化中",
-    "answerCount": 95,
-    "realtimeAnswers": 4,
-    "periodStart": "2025-05-10",
-    "periodEnd": "2025-05-20",
-    "dataCompletionDate": "2025-05-30",
-    "plan": "Premium",
-    "deadline": "2025-06-15",
-    "estimatedBillingAmount": 50000,
-    "bizcardEnabled": true,
-    "bizcardRequest": 100,
-    "bizcardCompletionCount": 90,
-    "thankYouEmailSettings": "設定なし"
-  },
-  {
-    "id": "SURVEYxejp37",
-    "groupId": "GROUP001",
-    "name": {
-      "ja": "オンラインセミナー参加者アンケート",
-      "en": "Online Seminar Participant Survey"
-    },
-    "displayTitle": {
-      "ja": "オンラインセミナーご参加の皆様へ",
-      "en": "To All Participants of the Online Seminar"
-    },
-    "description": {
-      "ja": "オンラインセミナー後の参加者アンケートです。",
-      "en": "This is a survey for participants after the online seminar."
-    },
-    "memo": "マーケティング部。フォローアップ用。",
-    "status": "会期中",
-    "answerCount": 65,
-    "realtimeAnswers": 2,
-    "periodStart": "2025-05-25",
-    "periodEnd": "2025-05-25",
-    "dataCompletionDate": "2025-06-05",
-    "plan": "Standard",
-    "deadline": "2025-06-25",
-    "estimatedBillingAmount": 30000,
-    "bizcardEnabled": true,
-    "bizcardRequest": 70,
-    "bizcardCompletionCount": 65,
-    "thankYouEmailSettings": "自動送信"
-  },
-  {
-    "id": "SURVEYrjfh20",
-    "groupId": "GROUP001",
-    "name": {
-      "ja": "新規リード獲得キャンペーン",
-      "en": "New Lead Generation Campaign"
-    },
-    "displayTitle": {
-      "ja": "新規リード獲得アンケート",
-      "en": "New Lead Generation Survey"
-    },
-    "description": {
-      "ja": "新規潜在顧客の情報収集を目的としたアンケートです。",
-      "en": "This survey is for collecting information on new potential customers."
-    },
-    "memo": "営業企画部案件。主に若年層対象。",
-    "status": "会期前",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-06-10",
-    "periodEnd": "2025-06-20",
-    "dataCompletionDate": "未定",
-    "plan": "Standard",
-    "deadline": "2025-07-20",
-    "estimatedBillingAmount": "N/A",
-    "bizcardEnabled": false,
-    "bizcardRequest": 0,
-    "bizcardCompletionCount": 100,
-    "thankYouEmailSettings": "設定なし"
-  },
-  {
-    "id": "SURVEYhbtmw2",
-    "groupId": "GROUP001",
-    "name": {
-      "ja": "サービス解約理由調査",
-      "en": "Service Cancellation Reason Survey"
-    },
-    "displayTitle": {
-      "ja": "サービスご解約理由について",
-      "en": "Regarding the Reason for Service Cancellation"
-    },
-    "description": {
-      "ja": "解約理由を把握し、サービス改善に役立てる調査です。",
-      "en": "This survey is to understand the reasons for cancellation and use them for service improvement."
-    },
-    "memo": "業務改善チーム。匿名回答対応。",
-    "status": "削除済み",
-    "answerCount": 18,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-01-01",
-    "periodEnd": "2025-01-05",
-    "dataCompletionDate": "未定",
-    "plan": "Standard",
-    "deadline": "2025-02-05",
-    "estimatedBillingAmount": "N/A",
-    "bizcardEnabled": false,
-    "bizcardRequest": 0,
-    "bizcardCompletionCount": 100,
-    "thankYouEmailSettings": "設定なし"
-  },
-  {
-    "id": "SURVEYkm0w1a",
-    "groupId": "GROUP001",
-    "name": {
-      "ja": "社内満足度アンケート",
-      "en": "Internal Satisfaction Survey"
-    },
-    "displayTitle": {
-      "ja": "従業員の満足度調査",
-      "en": "Employee Satisfaction Survey"
-    },
-    "description": {
-      "ja": "従業員の職場環境に対する満足度を測定します。",
-      "en": "This survey measures employee satisfaction with the work environment."
-    },
-    "memo": "人事部案件。全社対象。",
-    "status": "データ化なし",
-    "answerCount": 450,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-03-01",
-    "periodEnd": "2025-03-10",
-    "dataCompletionDate": "未定",
-    "plan": "Standard",
-    "deadline": "未定",
-    "estimatedBillingAmount": "N/A",
-    "bizcardEnabled": false,
-    "bizcardRequest": 0,
-    "bizcardCompletionCount": 100,
-    "thankYouEmailSettings": "設定なし"
-  },
-  {
-    "id": "SURVEYu2q9md",
-    "groupId": "GROUP001",
-    "name": {
-      "ja": "製品ベータテストフィードバック",
-      "en": "Product Beta Test Feedback"
-    },
-    "displayTitle": {
-      "ja": "ベータテストご協力のお願い",
-      "en": "Request for Cooperation in Beta Test"
-    },
-    "description": {
-      "ja": "新機能のベータテストに関するユーザーからのフィードバックを集めます。",
-      "en": "This survey collects feedback from users regarding the beta test of new features."
-    },
-    "memo": "製品開発部。ベータ参加者限定。",
-    "status": "期限切れ",
-    "answerCount": 95,
-    "realtimeAnswers": 0,
-    "periodStart": "2024-11-01",
-    "periodEnd": "2024-11-15",
-    "dataCompletionDate": "2024-11-30",
-    "plan": "Standard",
-    "deadline": "2024-12-15",
-    "estimatedBillingAmount": 40000,
-    "bizcardEnabled": true,
-    "bizcardRequest": 100,
-    "bizcardCompletionCount": 95,
-    "thankYouEmailSettings": "手動"
-  },
-  {
-    "id": "SURVEYf63p4g",
-    "groupId": "GROUP001",
-    "name": {
-      "ja": "市場動向調査",
-      "en": "Market Trend Survey"
-    },
-    "displayTitle": {
-      "ja": "市場トレンド調査アンケート",
-      "en": "Market Trend Survey"
-    },
-    "description": {
-      "ja": "市場のトレンドや動向を調査するためのアンケートです。",
-      "en": "This survey is to investigate market trends and movements."
-    },
-    "memo": "営業企画部より依頼。新規市場開拓用。",
-    "status": "会期中",
-    "answerCount": 130,
-    "realtimeAnswers": 5,
-    "periodStart": "2025-04-01",
-    "periodEnd": "2025-04-15",
-    "dataCompletionDate": "2025-04-25",
-    "plan": "Premium",
-    "deadline": "2025-05-10",
-    "estimatedBillingAmount": 55000,
-    "bizcardEnabled": true,
-    "bizcardRequest": 135,
-    "bizcardCompletionCount": 130,
-    "thankYouEmailSettings": "自動送信"
-  },
-  {
-    "id": "SURVEYdw40ra",
-    "groupId": "GROUP001",
-    "name": {
-      "ja": "顧客満足度調査",
-      "en": "Customer Satisfaction Survey"
-    },
-    "displayTitle": {
-      "ja": "製品満足度アンケート",
-      "en": "Product Satisfaction Survey"
-    },
-    "description": {
-      "ja": "製品の満足度に関するアンケートです。",
-      "en": "This is a survey regarding product satisfaction."
-    },
-    "memo": "マーケティング部。新規顧客中心。",
-    "status": "アップ完了",
-    "answerCount": 180,
-    "realtimeAnswers": 6,
-    "periodStart": "2025-05-01",
-    "periodEnd": "2025-05-20",
-    "dataCompletionDate": "2025-06-01",
-    "plan": "Standard",
-    "deadline": "2025-06-15",
-    "estimatedBillingAmount": 65000,
-    "bizcardEnabled": true,
-    "bizcardRequest": 185,
-    "bizcardCompletionCount": 180,
-    "thankYouEmailSettings": "手動"
-  },
-  {
-    "id": "SURVEYm4ld2f",
-    "groupId": "GROUP001",
-    "name": {
-      "ja": "新規リード獲得キャンペーン",
-      "en": "New Lead Generation Campaign"
-    },
-    "displayTitle": {
-      "ja": "リード獲得アンケート",
-      "en": "Lead Generation Survey"
-    },
-    "description": {
-      "ja": "新規顧客情報収集のためのアンケートです。",
-      "en": "This is a survey for collecting new customer information."
-    },
-    "memo": "営業企画部。20代〜30代対象。",
-    "status": "会期前",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-06-10",
-    "periodEnd": "2025-06-20",
-    "dataCompletionDate": "未定",
-    "plan": "Standard",
-    "deadline": "2025-07-20",
-    "estimatedBillingAmount": "N/A",
-    "bizcardEnabled": false,
-    "bizcardRequest": 0,
-    "bizcardCompletionCount": 100,
-    "thankYouEmailSettings": "設定なし"
-  },
-  {
-    "id": "SURVEYpysvcj",
-    "groupId": "GROUP001",
-    "name": {
-      "ja": "サービス解約理由調査",
-      "en": "Service Cancellation Reason Survey"
-    },
-    "displayTitle": {
-      "ja": "解約理由アンケート",
-      "en": "Cancellation Reason Survey"
-    },
-    "description": {
-      "ja": "サービス解約の理由を把握し、改善に役立てます。",
-      "en": "This survey is to understand the reasons for service cancellation and use them for improvement."
-    },
-    "memo": "業務改善チーム。匿名対応。",
-    "status": "削除済み",
-    "answerCount": 25,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-01-01",
-    "periodEnd": "2025-01-05",
-    "dataCompletionDate": "未定",
-    "plan": "Standard",
-    "deadline": "2025-02-05",
-    "estimatedBillingAmount": "N/A",
-    "bizcardEnabled": false,
-    "bizcardRequest": 0,
-    "bizcardCompletionCount": 100,
-    "thankYouEmailSettings": "設定なし"
-  },
-  {
-    "id": "SURVEY69ydwc",
-    "groupId": "GROUP001",
-    "name": {
-      "ja": "社内満足度アンケート",
-      "en": "Internal Satisfaction Survey"
-    },
-    "displayTitle": {
-      "ja": "従業員満足度調査",
-      "en": "Employee Satisfaction Survey"
-    },
-    "description": {
-      "ja": "職場環境に関する従業員満足度を測定します。",
-      "en": "This survey measures employee satisfaction with the work environment."
-    },
-    "memo": "人事部。全社対象。",
-    "status": "データ化なし",
-    "answerCount": 400,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-03-01",
-    "periodEnd": "2025-03-10",
-    "dataCompletionDate": "未定",
-    "plan": "Standard",
-    "deadline": "未定",
-    "estimatedBillingAmount": "N/A",
-    "bizcardEnabled": false,
-    "bizcardRequest": 0,
-    "bizcardCompletionCount": 100,
-    "thankYouEmailSettings": "設定なし"
-  },
-  {
-    "id": "SURVEY8x0b6m",
-    "groupId": "GROUP001",
-    "name": {
-      "ja": "ユーザー行動分析アンケート",
-      "en": "User Behavior Analysis Survey"
-    },
-    "displayTitle": {
-      "ja": "ユーザー行動に関する調査",
-      "en": "Survey on User Behavior"
-    },
-    "description": {
-      "ja": "ユーザーの行動や嗜好を分析します。",
-      "en": "This survey analyzes user behavior and preferences."
-    },
-    "memo": "マーケティング部。若年層対象。",
-    "status": "会期中",
-    "answerCount": 170,
-    "realtimeAnswers": 8,
-    "periodStart": "2025-04-15",
-    "periodEnd": "2025-04-30",
-    "dataCompletionDate": "2025-05-10",
-    "plan": "Premium",
-    "deadline": "2025-05-31",
-    "estimatedBillingAmount": 58000,
-    "bizcardEnabled": true,
-    "bizcardRequest": 180,
-    "bizcardCompletionCount": 170,
-    "thankYouEmailSettings": "自動送信"
-  },
-  {
-    "id": "SURVEYu9b8kx",
-    "name": {
-      "ja": "製品ベータテストフィードバック",
-      "en": "Product Beta Test Feedback"
-    },
-    "displayTitle": {
-      "ja": "ベータテスト参加者アンケート",
-      "en": "Beta Test Participant Survey"
-    },
-    "description": {
-      "ja": "ベータテストに関するフィードバックを収集します。",
-      "en": "This survey collects feedback regarding the beta test."
-    },
-    "memo": "製品開発部。限定参加者。",
-    "status": "期限切れ",
-    "answerCount": 90,
-    "realtimeAnswers": 0,
-    "periodStart": "2024-11-10",
-    "periodEnd": "2024-11-20",
-    "dataCompletionDate": "2024-11-30",
-    "plan": "Standard",
-    "deadline": "2025-01-10",
-    "estimatedBillingAmount": 40000,
-    "bizcardEnabled": true,
-    "bizcardRequest": 100,
-    "bizcardCompletionCount": 90,
-    "thankYouEmailSettings": "手動"
-  },
-  {
-    "id": "SURVEYmz19vh",
-    "name": {
-      "ja": "新商品ニーズ調査",
-      "en": "New Product Needs Survey"
-    },
-    "displayTitle": {
-      "ja": "新商品のニーズ調査アンケート",
-      "en": "New Product Needs Survey"
-    },
-    "description": {
-      "ja": "新商品のニーズ把握のためのアンケートです。",
-      "en": "This survey is to understand the needs for new products."
-    },
-    "memo": "営業企画部。ターゲット層20代。",
-    "status": "アップ完了",
-    "answerCount": 110,
-    "realtimeAnswers": 2,
-    "periodStart": "2025-05-05",
-    "periodEnd": "2025-05-15",
-    "dataCompletionDate": "2025-05-25",
-    "plan": "Premium",
-    "deadline": "2025-06-05",
-    "estimatedBillingAmount": 45000,
-    "bizcardEnabled": true,
-    "bizcardRequest": 115,
-    "bizcardCompletionCount": 110,
-    "thankYouEmailSettings": "自動送信"
-  },
-  {
-    "id": "SURVEYv3q4kt",
-    "name": {
-      "ja": "オンラインセミナー参加者アンケート",
-      "en": "Online Seminar Participant Survey"
-    },
-    "displayTitle": {
-      "ja": "セミナー参加者へのアンケート",
-      "en": "Survey for Seminar Participants"
-    },
-    "description": {
-      "ja": "オンラインセミナー後の参加者に実施するアンケートです。",
-      "en": "This is a survey for participants after the online seminar."
-    },
-    "memo": "マーケティング部。フォローアップ用。",
+    "name": { "ja": "新製品に関するアンケート", "en": "New Product Survey" },
+    "displayTitle": { "ja": "新製品のご意見をお聞かせください", "en": "Please give us your opinion on our new product" },
+    "description": { "ja": "新製品の満足度に関するアンケートです。", "en": "This is a survey about satisfaction with our new product." },
     "status": "会期中",
     "answerCount": 50,
-    "realtimeAnswers": 1,
-    "periodStart": "2025-05-20",
-    "periodEnd": "2025-05-20",
-    "dataCompletionDate": "2025-05-30",
-    "plan": "Standard",
-    "deadline": "2025-06-10",
-    "estimatedBillingAmount": 25000,
-    "bizcardEnabled": true,
-    "bizcardRequest": 55,
-    "bizcardCompletionCount": 50,
-    "thankYouEmailSettings": "手動"
-  },
-  {
-    "id": "SURVEYlnr0wb",
-    "name": {
-      "ja": "サービス解約理由調査",
-      "en": "Service Cancellation Reason Survey"
-    },
-    "displayTitle": {
-      "ja": "解約理由に関するアンケート",
-      "en": "Survey on Cancellation Reason"
-    },
-    "description": {
-      "ja": "サービス解約理由の分析を目的とした調査です。",
-      "en": "This survey is for analyzing the reasons for service cancellation."
-    },
-    "memo": "業務改善チーム。匿名対応。",
-    "status": "削除済み",
-    "answerCount": 15,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-01-05",
-    "periodEnd": "2025-01-10",
-    "dataCompletionDate": "未定",
-    "plan": "Standard",
-    "deadline": "2025-02-05",
-    "estimatedBillingAmount": "N/A",
-    "bizcardEnabled": false,
-    "bizcardRequest": 0,
-    "bizcardCompletionCount": 100,
-    "thankYouEmailSettings": "設定なし"
-  },
-  {
-    "id": "SURVEY9elvw2",
-    "name": {
-      "ja": "社内満足度アンケート",
-      "en": "Internal Satisfaction Survey"
-    },
-    "displayTitle": {
-      "ja": "職場環境満足度調査",
-      "en": "Work Environment Satisfaction Survey"
-    },
-    "description": {
-      "ja": "従業員の職場環境に対する満足度を測定します。",
-      "en": "This survey measures employee satisfaction with the work environment."
-    },
-    "memo": "人事部。全社員対象。",
-    "status": "データ化なし",
-    "answerCount": 430,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-03-05",
-    "periodEnd": "2025-03-15",
-    "dataCompletionDate": "未定",
-    "plan": "Standard",
-    "deadline": "未定",
-    "estimatedBillingAmount": "N/A",
-    "bizcardEnabled": false,
-    "bizcardRequest": 0,
-    "bizcardCompletionCount": 100,
-    "thankYouEmailSettings": "設定なし"
-  },
-  {
-    "id": "SURVEY7xnt21",
-    "name": {
-      "ja": "顧客満足度調査",
-      "en": "Customer Satisfaction Survey"
-    },
-    "displayTitle": {
-      "ja": "お客様満足度アンケート",
-      "en": "Customer Satisfaction Survey"
-    },
-    "description": {
-      "ja": "新製品に関する顧客の満足度を測定します。",
-      "en": "This survey measures customer satisfaction with new products."
-    },
-    "memo": "マーケティング部。主に30代〜40代対象。",
-    "status": "会期中",
-    "answerCount": 180,
-    "realtimeAnswers": 10,
-    "periodStart": "2025-05-10",
-    "periodEnd": "2025-06-05",
-    "dataCompletionDate": "2025-06-20",
-    "plan": "Standard",
-    "deadline": "2025-07-10",
-    "estimatedBillingAmount": 70000,
-    "bizcardEnabled": true,
-    "bizcardRequest": 190,
-    "bizcardCompletionCount": 180,
-    "thankYouEmailSettings": "自動送信"
-  },
-  {
-    "id": "SURVEYzdv6mc",
-    "name": {
-      "ja": "新規リード獲得キャンペーン",
-      "en": "New Lead Generation Campaign"
-    },
-    "displayTitle": {
-      "ja": "新規リード獲得アンケート",
-      "en": "New Lead Generation Survey"
-    },
-    "description": {
-      "ja": "新規顧客情報を収集するための調査です。",
-      "en": "This survey is for collecting new customer information."
-    },
-    "memo": "営業企画部。若年層向け。",
-    "status": "会期前",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-06-15",
-    "periodEnd": "2025-06-25",
-    "dataCompletionDate": "未定",
-    "plan": "Standard",
-    "deadline": "2025-07-25",
-    "estimatedBillingAmount": "N/A",
-    "bizcardEnabled": false,
-    "bizcardRequest": 0,
-    "bizcardCompletionCount": 100,
-    "thankYouEmailSettings": "設定なし"
-  },
-  {
-    "id": "SURVEYfw0jcl",
-    "name": {
-      "ja": "サービス利用状況調査",
-      "en": "Service Usage Survey"
-    },
-    "displayTitle": {
-      "ja": "サービス利用に関するアンケート",
-      "en": "Survey on Service Usage"
-    },
-    "description": {
-      "ja": "既存顧客のサービス利用状況を把握します。",
-      "en": "This survey is to understand the service usage of existing customers."
-    },
-    "memo": "CS部。リピーター中心。",
-    "status": "アップ完了",
-    "answerCount": 220,
-    "realtimeAnswers": 5,
-    "periodStart": "2025-04-01",
-    "periodEnd": "2025-04-15",
-    "dataCompletionDate": "2025-04-25",
-    "plan": "Premium",
-    "deadline": "2025-05-10",
-    "estimatedBillingAmount": 80000,
-    "bizcardEnabled": true,
-    "bizcardRequest": 230,
-    "bizcardCompletionCount": 220,
-    "thankYouEmailSettings": "手動"
-  },
-  {
-    "id": "SURVEY8m1xqo",
-    "name": {
-      "ja": "解約理由調査",
-      "en": "Cancellation Reason Survey"
-    },
-    "displayTitle": {
-      "ja": "サービス解約理由アンケート",
-      "en": "Service Cancellation Reason Survey"
-    },
-    "description": {
-      "ja": "解約理由を分析し改善に役立てます。",
-      "en": "This survey is to analyze the reasons for cancellation and use them for improvement."
-    },
-    "memo": "業務改善チーム。匿名回答対応。",
-    "status": "期限切れ",
-    "answerCount": 30,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-01-05",
-    "periodEnd": "2025-01-12",
-    "dataCompletionDate": "2025-01-25",
-    "plan": "Standard",
-    "deadline": "2025-02-20",
-    "estimatedBillingAmount": 15000,
-    "bizcardEnabled": false,
-    "bizcardRequest": 0,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "設定なし"
-  },
-  {
-    "id": "SURVEYfhrw67",
-    "name": {
-      "ja": "社内満足度調査",
-      "en": "Internal Satisfaction Survey"
-    },
-    "displayTitle": {
-      "ja": "従業員満足度アンケート",
-      "en": "Employee Satisfaction Survey"
-    },
-    "description": {
-      "ja": "従業員の職場環境満足度を測定します。",
-      "en": "This survey measures employee satisfaction with the work environment."
-    },
-    "memo": "人事部。全社対象。",
-    "status": "データ化なし",
-    "answerCount": 420,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-03-01",
-    "periodEnd": "2025-03-15",
-    "dataCompletionDate": "未定",
-    "plan": "Standard",
-    "deadline": "未定",
-    "estimatedBillingAmount": "N/A",
-    "bizcardEnabled": false,
-    "bizcardRequest": 0,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "設定なし"
-  },
-  {
-    "id": "SURVEY7yabjp",
-    "name": {
-      "ja": "オンラインセミナーアンケート",
-      "en": "Online Seminar Survey"
-    },
-    "displayTitle": {
-      "ja": "セミナー参加者向けアンケート",
-      "en": "Survey for Seminar Participants"
-    },
-    "description": {
-      "ja": "オンラインセミナー参加者へのフィードバック収集用。",
-      "en": "For collecting feedback from online seminar participants."
-    },
-    "memo": "マーケティング部。フォローアップ。",
-    "status": "会期中",
-    "answerCount": 60,
-    "realtimeAnswers": 3,
-    "periodStart": "2025-05-25",
-    "periodEnd": "2025-05-25",
-    "dataCompletionDate": "2025-06-05",
-    "plan": "Standard",
-    "deadline": "2025-06-20",
-    "estimatedBillingAmount": 28000,
-    "bizcardEnabled": true,
-    "bizcardRequest": 65,
-    "bizcardCompletionCount": 60,
-    "thankYouEmailSettings": "自動送信"
-  },
-  {
-    "id": "SURVEY6zgx4t",
-    "name": {
-      "ja": "新規商品ニーズ調査",
-      "en": "New Product Needs Survey"
-    },
-    "displayTitle": {
-      "ja": "新商品ニーズ調査アンケート",
-      "en": "New Product Needs Survey"
-    },
-    "description": {
-      "ja": "新商品の需要を把握するための調査です。",
-      "en": "This survey is to understand the demand for new products."
-    },
-    "memo": "営業企画部。20代中心。",
-    "status": "アップ完了",
-    "answerCount": 100,
-    "realtimeAnswers": 4,
-    "periodStart": "2025-04-10",
-    "periodEnd": "2025-04-20",
-    "dataCompletionDate": "2025-04-30",
-    "plan": "Premium",
-    "deadline": "2025-05-15",
-    "estimatedBillingAmount": 48000,
-    "bizcardEnabled": true,
-    "bizcardRequest": 105,
-    "bizcardCompletionCount": 100,
-    "thankYouEmailSettings": "手動"
-  },
-  {
-    "id": "SURVEYx4pr9o",
-    "name": {
-      "ja": "ユーザー行動分析調査",
-      "en": "User Behavior Analysis Survey"
-    },
-    "displayTitle": {
-      "ja": "ユーザー行動に関する調査",
-      "en": "Survey on User Behavior"
-    },
-    "description": {
-      "ja": "ユーザーの行動パターンを分析します。",
-      "en": "This survey analyzes user behavior patterns."
-    },
-    "memo": "マーケティング部。若年層対象。",
-    "status": "会期中",
-    "answerCount": 150,
-    "realtimeAnswers": 6,
-    "periodStart": "2025-05-01",
-    "periodEnd": "2025-05-15",
-    "dataCompletionDate": "2025-05-25",
-    "plan": "Standard",
-    "deadline": "2025-06-10",
-    "estimatedBillingAmount": 55000,
-    "bizcardEnabled": true,
-    "bizcardRequest": 160,
-    "bizcardCompletionCount": 150,
-    "thankYouEmailSettings": "自動送信"
-  },
-  {
-    "id": "SURVEYz8x0vn",
-    "name": {
-      "ja": "製品ベータテストフィードバック",
-      "en": "Product Beta Test Feedback"
-    },
-    "displayTitle": {
-      "ja": "ベータテスト参加者アンケート",
-      "en": "Beta Test Participant Survey"
-    },
-    "description": {
-      "ja": "製品のベータテストに関するフィードバックを収集します。",
-      "en": "This survey collects feedback regarding the product beta test."
-    },
-    "memo": "製品開発部。限定参加者対象。",
-    "status": "期限切れ",
-    "answerCount": 85,
-    "realtimeAnswers": 0,
-    "periodStart": "2024-11-10",
-    "periodEnd": "2024-11-20",
-    "dataCompletionDate": "2024-11-30",
-    "plan": "Standard",
-    "deadline": "2024-12-15",
-    "estimatedBillingAmount": 38000,
-    "bizcardEnabled": true,
-    "bizcardRequest": 90,
-    "bizcardCompletionCount": 85,
-    "thankYouEmailSettings": "手動"
-  },
-  {
-    "id": "SURVEYjt4e39",
-    "name": {
-      "ja": "市場動向調査",
-      "en": "Market Trend Survey"
-    },
-    "displayTitle": {
-      "ja": "市場トレンドアンケート",
-      "en": "Market Trend Survey"
-    },
-    "description": {
-      "ja": "市場のトレンドを調査するアンケートです。",
-      "en": "This survey is to investigate market trends."
-    },
-    "memo": "営業企画部。新規事業向け。",
-    "status": "アップ完了",
-    "answerCount": 125,
-    "realtimeAnswers": 5,
-    "periodStart": "2025-03-15",
-    "periodEnd": "2025-03-30",
-    "dataCompletionDate": "2025-04-10",
-    "plan": "Premium",
-    "deadline": "2025-04-25",
-    "estimatedBillingAmount": 57000,
-    "bizcardEnabled": true,
-    "bizcardRequest": 130,
-    "bizcardCompletionCount": 125,
-    "thankYouEmailSettings": "自動送信"
-  },
-  {
-    "id": "SURVEYabc123",
-    "groupId": "GROUP002",
-    "name": {
-      "ja": "新サービス評価アンケート",
-      "en": "New Service Evaluation Survey"
-    },
-    "displayTitle": {
-      "ja": "新サービスに関するご意見をお聞かせください",
-      "en": "Please give us your opinion on the new service"
-    },
-    "description": {
-      "ja": "新サービスのユーザー評価を収集します。",
-      "en": "This survey collects user evaluations of the new service."
-    },
-    "memo": "企画部。早期フィードバック目的。",
-    "status": "会期中",
-    "answerCount": 75,
     "realtimeAnswers": 5,
     "periodStart": "2025-07-01",
-    "periodEnd": "2025-07-15",
-    "dataCompletionDate": "2025-07-25",
-    "plan": "Standard",
-    "deadline": "2025-08-10",
-    "estimatedBillingAmount": 35000,
-    "bizcardEnabled": true,
-    "bizcardRequest": 80,
-    "bizcardCompletionCount": 70,
-    "thankYouEmailSettings": "自動送信"
+    "periodEnd": "2025-07-31",
+    "bizcardEnabled": true
   },
   {
-    "id": "SURVEYdef456",
-    "groupId": "GROUP002",
-    "name": {
-      "ja": "ウェブサイト改善アンケート",
-      "en": "Website Improvement Survey"
-    },
-    "displayTitle": {
-      "ja": "ウェブサイトに関するアンケート",
-      "en": "Survey on the Website"
-    },
-    "description": {
-      "ja": "ウェブサイトのユーザビリティ改善のためのアンケートです。",
-      "en": "This survey is for improving the usability of the website."
-    },
-    "memo": "広報部。UI/UX改善。",
-    "status": "会期前",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-08-01",
-    "periodEnd": "2025-08-10",
-    "dataCompletionDate": "未定",
-    "plan": "Standard",
-    "deadline": "2025-09-01",
-    "estimatedBillingAmount": "N/A",
-    "bizcardEnabled": false,
-    "bizcardRequest": 0,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "設定なし"
+    "id": "SURVEY_002",
+    "groupId": "GROUP001",
+    "name": { "ja": "ウェブサイトの使いやすさに関するアンケート", "en": "Website Usability Survey" },
+    "displayTitle": { "ja": "ウェブサイト改善にご協力ください", "en": "Please help us improve our website" },
+    "description": { "ja": "当社のウェブサイトの使いやすさに関するアンケートです。", "en": "This survey is about the usability of our website." },
+    "status": "会期中",
+    "answerCount": 60,
+    "realtimeAnswers": 7,
+    "periodStart": "2025-07-05",
+    "periodEnd": "2025-08-04",
+    "bizcardEnabled": false
   },
   {
-    "id": "SURVEYghi789",
-    "groupId": "GROUP003",
-    "name": {
-      "ja": "イベント参加者満足度調査",
-      "en": "Event Participant Satisfaction Survey"
-    },
-    "displayTitle": {
-      "ja": "イベントご参加ありがとうございました",
-      "en": "Thank you for participating in the event"
-    },
-    "description": {
-      "ja": "イベントの満足度を測定し、次回の改善に役立てます。",
-      "en": "This survey measures the satisfaction of the event and helps to improve the next one."
-    },
-    "memo": "イベント運営部。来場者向け。",
-    "status": "アップ完了",
-    "answerCount": 300,
+    "id": "SURVEY_003",
+    "groupId": "GROUP001",
+    "name": { "ja": "イベント参加者満足度調査", "en": "Event Participant Satisfaction Survey" },
+    "displayTitle": { "ja": "イベントご参加ありがとうございました", "en": "Thank you for participating in our event" },
+    "description": { "ja": "イベントの満足度を測定し、次回の改善に役立てます。", "en": "This survey measures event satisfaction to improve future events." },
+    "status": "会期中",
+    "answerCount": 70,
+    "realtimeAnswers": 8,
+    "periodStart": "2025-07-10",
+    "periodEnd": "2025-08-09",
+    "bizcardEnabled": true
+  },
+  {
+    "id": "SURVEY_004",
+    "groupId": "GROUP001",
+    "name": { "ja": "顧客サービス満足度調査", "en": "Customer Service Satisfaction Survey" },
+    "displayTitle": { "ja": "顧客サービスに関するアンケート", "en": "Survey on Customer Service" },
+    "description": { "ja": "当社の顧客サービスの満足度を測定します。", "en": "This survey measures satisfaction with our customer service." },
+    "status": "会期中",
+    "answerCount": 80,
     "realtimeAnswers": 10,
-    "periodStart": "2025-06-20",
-    "periodEnd": "2025-06-22",
-    "dataCompletionDate": "2025-07-05",
-    "plan": "Premium",
-    "deadline": "2025-07-20",
-    "estimatedBillingAmount": 90000,
-    "bizcardEnabled": true,
-    "bizcardRequest": 320,
-    "bizcardCompletionCount": 290,
-    "thankYouEmailSettings": "手動"
+    "periodStart": "2025-07-15",
+    "periodEnd": "2025-08-14",
+    "bizcardEnabled": true
+  },
+  {
+    "id": "SURVEY_005",
+    "groupId": "GROUP001",
+    "name": { "ja": "従業員満足度調査", "en": "Employee Satisfaction Survey" },
+    "displayTitle": { "ja": "従業員の皆様へアンケート", "en": "Survey for Employees" },
+    "description": { "ja": "従業員の職場環境に関する満足度を測定します。", "en": "This survey measures employee satisfaction with the work environment." },
+    "status": "会期中",
+    "answerCount": 90,
+    "realtimeAnswers": 12,
+    "periodStart": "2025-07-20",
+    "periodEnd": "2025-08-19",
+    "bizcardEnabled": false
+  },
+  {
+    "id": "SURVEY_006",
+    "groupId": "GROUP001",
+    "name": { "ja": "製品改善に関するアンケート", "en": "Product Improvement Survey" },
+    "displayTitle": { "ja": "製品改善にご協力ください", "en": "Please help us improve our product" },
+    "description": { "ja": "製品の改善点に関するアンケートです。", "en": "This survey is about areas for product improvement." },
+    "status": "会期中",
+    "answerCount": 100,
+    "realtimeAnswers": 15,
+    "periodStart": "2025-07-25",
+    "periodEnd": "2025-08-24",
+    "bizcardEnabled": true
+  },
+  {
+    "id": "SURVEY_007",
+    "groupId": "GROUP001",
+    "name": { "ja": "サービス利用状況調査", "en": "Service Usage Survey" },
+    "displayTitle": { "ja": "サービスご利用に関するアンケート", "en": "Survey on Service Usage" },
+    "description": { "ja": "当社のサービス利用状況を把握するためのアンケートです。", "en": "This survey is to understand the usage of our services." },
+    "status": "会期中",
+    "answerCount": 110,
+    "realtimeAnswers": 18,
+    "periodStart": "2025-08-01",
+    "periodEnd": "2025-08-31",
+    "bizcardEnabled": true
+  },
+  {
+    "id": "SURVEY_008",
+    "groupId": "GROUP001",
+    "name": { "ja": "市場トレンド調査", "en": "Market Trend Survey" },
+    "displayTitle": { "ja": "最新の市場トレンドに関するアンケート", "en": "Survey on Latest Market Trends" },
+    "description": { "ja": "市場のトレンドや動向を調査するためのアンケートです。", "en": "This survey is to investigate market trends and movements." },
+    "status": "会期中",
+    "answerCount": 120,
+    "realtimeAnswers": 20,
+    "periodStart": "2025-08-05",
+    "periodEnd": "2025-09-04",
+    "bizcardEnabled": true
+  },
+  {
+    "id": "SURVEY_009",
+    "groupId": "GROUP001",
+    "name": { "ja": "新サービスニーズ調査", "en": "New Service Needs Survey" },
+    "displayTitle": { "ja": "新サービスに関するニーズ調査", "en": "New Service Needs Survey" },
+    "description": { "ja": "新サービスのニーズを把握するためのアンケートです。", "en": "This survey is to understand the needs for new services." },
+    "status": "会期中",
+    "answerCount": 130,
+    "realtimeAnswers": 22,
+    "periodStart": "2025-08-10",
+    "periodEnd": "2025-09-09",
+    "bizcardEnabled": true
+  },
+  {
+    "id": "SURVEY_010",
+    "groupId": "GROUP001",
+    "name": { "ja": "オンラインセミナー参加者アンケート", "en": "Online Seminar Participant Survey" },
+    "displayTitle": { "ja": "オンラインセミナーご参加の皆様へ", "en": "To All Participants of the Online Seminar" },
+    "description": { "ja": "オンラインセミナー後の参加者アンケートです。", "en": "This is a survey for participants after the online seminar." },
+    "status": "会期中",
+    "answerCount": 140,
+    "realtimeAnswers": 25,
+    "periodStart": "2025-08-15",
+    "periodEnd": "2025-09-14",
+    "bizcardEnabled": true
+  },
+  {
+    "id": "SURVEY_011",
+    "groupId": "GROUP001",
+    "name": { "ja": "新機能に関するフィードバック", "en": "New Feature Feedback" },
+    "displayTitle": { "ja": "新機能のご意見をお聞かせください", "en": "Please give us your feedback on the new feature" },
+    "description": { "ja": "新機能の使いやすさに関するフィードバックを収集します。", "en": "This survey collects feedback on the usability of the new feature." },
+    "status": "会期中",
+    "answerCount": 150,
+    "realtimeAnswers": 28,
+    "periodStart": "2025-08-20",
+    "periodEnd": "2025-09-19",
+    "bizcardEnabled": true
+  },
+  {
+    "id": "SURVEY_012",
+    "groupId": "GROUP001",
+    "name": { "ja": "製品の利用実態調査", "en": "Product Usage Survey" },
+    "displayTitle": { "ja": "製品のご利用状況に関するアンケート", "en": "Survey on Product Usage" },
+    "description": { "ja": "製品の利用実態を把握するためのアンケートです。", "en": "This survey is to understand the actual usage of our product." },
+    "status": "会期中",
+    "answerCount": 160,
+    "realtimeAnswers": 30,
+    "periodStart": "2025-08-25",
+    "periodEnd": "2025-09-24",
+    "bizcardEnabled": true
+  },
+  {
+    "id": "SURVEY_013",
+    "groupId": "GROUP001",
+    "name": { "ja": "顧客ロイヤルティ調査", "en": "Customer Loyalty Survey" },
+    "displayTitle": { "ja": "顧客ロイヤルティに関するアンケート", "en": "Survey on Customer Loyalty" },
+    "description": { "ja": "顧客のロイヤルティを測定するためのアンケートです。", "en": "This survey measures customer loyalty." },
+    "status": "会期中",
+    "answerCount": 170,
+    "realtimeAnswers": 32,
+    "periodStart": "2025-09-01",
+    "periodEnd": "2025-09-30",
+    "bizcardEnabled": true
+  },
+  {
+    "id": "SURVEY_014",
+    "groupId": "GROUP001",
+    "name": { "ja": "新入社員研修フィードバック", "en": "New Employee Training Feedback" },
+    "displayTitle": { "ja": "新入社員研修に関するアンケート", "en": "Survey on New Employee Training" },
+    "description": { "ja": "新入社員研修の改善点に関するフィードバックを収集します。", "en": "This survey collects feedback for improving new employee training." },
+    "status": "会期中",
+    "answerCount": 180,
+    "realtimeAnswers": 35,
+    "periodStart": "2025-09-05",
+    "periodEnd": "2025-10-04",
+    "bizcardEnabled": false
+  },
+  {
+    "id": "SURVEY_015",
+    "groupId": "GROUP001",
+    "name": { "ja": "製品の機能に関するアンケート", "en": "Product Feature Survey" },
+    "displayTitle": { "ja": "製品の機能についてお聞かせください", "en": "Please tell us about product features" },
+    "description": { "ja": "製品の各機能に関する満足度を測定します。", "en": "This survey measures satisfaction with each product feature." },
+    "status": "会期中",
+    "answerCount": 190,
+    "realtimeAnswers": 38,
+    "periodStart": "2025-09-10",
+    "periodEnd": "2025-10-09",
+    "bizcardEnabled": true
+  },
+  {
+    "id": "SURVEY_016",
+    "groupId": "GROUP001",
+    "name": { "ja": "ウェブサイトのコンテンツに関するアンケート", "en": "Website Content Survey" },
+    "displayTitle": { "ja": "ウェブサイトのコンテンツについてお聞かせください", "en": "Please tell us about our website content" },
+    "description": { "ja": "ウェブサイトのコンテンツに関する満足度を測定します。", "en": "This survey measures satisfaction with our website content." },
+    "status": "会期中",
+    "answerCount": 200,
+    "realtimeAnswers": 40,
+    "periodStart": "2025-09-15",
+    "periodEnd": "2025-10-14",
+    "bizcardEnabled": false
+  },
+  {
+    "id": "SURVEY_017",
+    "groupId": "GROUP001",
+    "name": { "ja": "イベントの企画に関するアンケート", "en": "Event Planning Survey" },
+    "displayTitle": { "ja": "イベント企画についてお聞かせください", "en": "Please tell us about event planning" },
+    "description": { "ja": "イベントの企画に関するフィードバックを収集します。", "en": "This survey collects feedback on event planning." },
+    "status": "会期中",
+    "answerCount": 210,
+    "realtimeAnswers": 42,
+    "periodStart": "2025-09-20",
+    "periodEnd": "2025-10-19",
+    "bizcardEnabled": true
+  },
+  {
+    "id": "SURVEY_018",
+    "groupId": "GROUP001",
+    "name": { "ja": "新サービスの価格に関するアンケート", "en": "New Service Pricing Survey" },
+    "displayTitle": { "ja": "新サービスの価格についてお聞かせください", "en": "Please tell us about the pricing of our new service" },
+    "description": { "ja": "新サービスの価格に関するフィードバックを収集します。", "en": "This survey collects feedback on the pricing of our new service." },
+    "status": "会期中",
+    "answerCount": 220,
+    "realtimeAnswers": 45,
+    "periodStart": "2025-09-25",
+    "periodEnd": "2025-10-24",
+    "bizcardEnabled": true
+  },
+  {
+    "id": "SURVEY_019",
+    "groupId": "GROUP001",
+    "name": { "ja": "顧客サポートの品質に関するアンケート", "en": "Customer Support Quality Survey" },
+    "displayTitle": { "ja": "顧客サポートの品質についてお聞かせください", "en": "Please tell us about the quality of our customer support" },
+    "description": { "ja": "顧客サポートの品質に関するフィードバックを収集します。", "en": "This survey collects feedback on the quality of our customer support." },
+    "status": "会期中",
+    "answerCount": 230,
+    "realtimeAnswers": 48,
+    "periodStart": "2025-10-01",
+    "periodEnd": "2025-10-30",
+    "bizcardEnabled": true
+  },
+  {
+    "id": "SURVEY_020",
+    "groupId": "GROUP001",
+    "name": { "ja": "製品の新規機能に関するアンケート", "en": "New Product Feature Survey" },
+    "displayTitle": { "ja": "製品の新規機能についてお聞かせください", "en": "Please tell us about new product features" },
+    "description": { "ja": "製品の新規機能に関するフィードバックを収集します。", "en": "This survey collects feedback on new product features." },
+    "status": "会期中",
+    "answerCount": 240,
+    "realtimeAnswers": 50,
+    "periodStart": "2025-10-05",
+    "periodEnd": "2025-11-04",
+    "bizcardEnabled": true
+  },
+  {
+    "id": "SURVEY_021",
+    "groupId": "GROUP001",
+    "name": { "ja": "顧客の購買行動に関するアンケート", "en": "Customer Purchasing Behavior Survey" },
+    "displayTitle": { "ja": "顧客の購買行動についてお聞かせください", "en": "Please tell us about customer purchasing behavior" },
+    "description": { "ja": "顧客の購買行動に関するフィードバックを収集します。", "en": "This survey collects feedback on customer purchasing behavior." },
+    "status": "会期中",
+    "answerCount": 250,
+    "realtimeAnswers": 52,
+    "periodStart": "2025-10-10",
+    "periodEnd": "2025-11-09",
+    "bizcardEnabled": true
+  },
+  {
+    "id": "SURVEY_022",
+    "groupId": "GROUP001",
+    "name": { "ja": "従業員の健康に関するアンケート", "en": "Employee Health Survey" },
+    "displayTitle": { "ja": "従業員の健康についてお聞かせください", "en": "Please tell us about employee health" },
+    "description": { "ja": "従業員の健康状態に関するフィードバックを収集します。", "en": "This survey collects feedback on employee health." },
+    "status": "会期中",
+    "answerCount": 260,
+    "realtimeAnswers": 55,
+    "periodStart": "2025-10-15",
+    "periodEnd": "2025-11-14",
+    "bizcardEnabled": false
+  },
+  {
+    "id": "SURVEY_023",
+    "groupId": "GROUP001",
+    "name": { "ja": "製品の改善点に関するアンケート", "en": "Product Improvement Survey" },
+    "displayTitle": { "ja": "製品の改善点についてお聞かせください", "en": "Please tell us about product improvements" },
+    "description": { "ja": "製品の改善点に関するフィードバックを収集します。", "en": "This survey collects feedback on product improvements." },
+    "status": "会期中",
+    "answerCount": 270,
+    "realtimeAnswers": 58,
+    "periodStart": "2025-10-20",
+    "periodEnd": "2025-11-19",
+    "bizcardEnabled": true
+  },
+  {
+    "id": "SURVEY_024",
+    "groupId": "GROUP001",
+    "name": { "ja": "従業員のキャリア開発に関するアンケート", "en": "Employee Career Development Survey" },
+    "displayTitle": { "ja": "従業員のキャリア開発についてお聞かせください", "en": "Please tell us about employee career development" },
+    "description": { "ja": "従業員のキャリア開発に関するフィードバックを収集します。", "en": "This survey collects feedback on employee career development." },
+    "status": "会期中",
+    "answerCount": 280,
+    "realtimeAnswers": 60,
+    "periodStart": "2025-10-25",
+    "periodEnd": "2025-11-24",
+    "bizcardEnabled": false
+  },
+  {
+    "id": "SURVEY_025",
+    "groupId": "GROUP001",
+    "name": { "ja": "製品の利用目的に関するアンケート", "en": "Product Usage Purpose Survey" },
+    "displayTitle": { "ja": "製品の利用目的についてお聞かせください", "en": "Please tell us about the purpose of product usage" },
+    "description": { "ja": "製品の利用目的に関するフィードバックを収集します。", "en": "This survey collects feedback on the purpose of product usage." },
+    "status": "会期中",
+    "answerCount": 290,
+    "realtimeAnswers": 62,
+    "periodStart": "2025-10-30",
+    "periodEnd": "2025-11-29",
+    "bizcardEnabled": true
+  },
+  {
+    "id": "SURVEY_026",
+    "groupId": "GROUP001",
+    "name": { "ja": "顧客のフィードバックに関するアンケート", "en": "Customer Feedback Survey" },
+    "displayTitle": { "ja": "顧客のフィードバックについてお聞かせください", "en": "Please tell us about customer feedback" },
+    "description": { "ja": "顧客のフィードバックに関するフィードバックを収集します。", "en": "This survey collects feedback on customer feedback." },
+    "status": "会期中",
+    "answerCount": 300,
+    "realtimeAnswers": 65,
+    "periodStart": "2025-11-05",
+    "periodEnd": "2025-12-04",
+    "bizcardEnabled": true
+  },
+  {
+    "id": "SURVEY_027",
+    "groupId": "GROUP001",
+    "name": { "ja": "従業員のエンゲージメントに関するアンケート", "en": "Employee Engagement Survey" },
+    "displayTitle": { "ja": "従業員のエンゲージメントについてお聞かせください", "en": "Please tell us about employee engagement" },
+    "description": { "ja": "従業員のエンゲージメントに関するフィードバックを収集します。", "en": "This survey collects feedback on employee engagement." },
+    "status": "会期中",
+    "answerCount": 310,
+    "realtimeAnswers": 68,
+    "periodStart": "2025-11-10",
+    "periodEnd": "2025-12-09",
+    "bizcardEnabled": false
+  },
+  {
+    "id": "SURVEY_028",
+    "groupId": "GROUP001",
+    "name": { "ja": "製品の利用頻度に関するアンケート", "en": "Product Usage Frequency Survey" },
+    "displayTitle": { "ja": "製品の利用頻度についてお聞かせください", "en": "Please tell us about product usage frequency" },
+    "description": { "ja": "製品の利用頻度に関するフィードバックを収集します。", "en": "This survey collects feedback on product usage frequency." },
+    "status": "会期中",
+    "answerCount": 320,
+    "realtimeAnswers": 70,
+    "periodStart": "2025-11-15",
+    "periodEnd": "2025-12-14",
+    "bizcardEnabled": true
+  },
+  {
+    "id": "SURVEY_029",
+    "groupId": "GROUP001",
+    "name": { "ja": "顧客のニーズに関するアンケート", "en": "Customer Needs Survey" },
+    "displayTitle": { "ja": "顧客のニーズについてお聞かせください", "en": "Please tell us about customer needs" },
+    "description": { "ja": "顧客のニーズに関するフィードバックを収集します。", "en": "This survey collects feedback on customer needs." },
+    "status": "会期中",
+    "answerCount": 330,
+    "realtimeAnswers": 72,
+    "periodStart": "2025-11-20",
+    "periodEnd": "2025-12-19",
+    "bizcardEnabled": true
+  },
+  {
+    "id": "SURVEY_030",
+    "groupId": "GROUP001",
+    "name": { "ja": "従業員のスキルアップに関するアンケート", "en": "Employee Skill Development Survey" },
+    "displayTitle": { "ja": "従業員のスキルアップについてお聞かせください", "en": "Please tell us about employee skill development" },
+    "description": { "ja": "従業員のスキルアップに関するフィードバックを収集します。", "en": "This survey collects feedback on employee skill development." },
+    "status": "会期中",
+    "answerCount": 340,
+    "realtimeAnswers": 75,
+    "periodStart": "2025-11-25",
+    "periodEnd": "2025-12-24",
+    "bizcardEnabled": false
   }
 ]

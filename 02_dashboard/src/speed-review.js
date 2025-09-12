@@ -3,53 +3,89 @@ console.log("SCRIPT LOADED: speed-review.js");
 import { speedReviewService } from './services/speedReviewService.js';
 import { populateTable, renderModalContent } from './ui/speedReviewRenderer.js';
 import { handleOpenModal } from './modalHandler.js';
+import { initBreadcrumbs } from './breadcrumb.js';
 
 // --- State ---
 let allCombinedData = [];
 let currentPage = 1;
 let rowsPerPage = 25;
-let currentIndustryQuestion = 'Q.02_お客様の主な業界';
+let currentIndustryQuestion = '';
 let currentSearchTerm = '';
 let currentDateFilter = '';
+let currentAnswerFilter = '';
 let datePickerInstance = null;
 let currentItemInModal = null;
 let isModalInEditMode = false;
+let currentSurvey = null;
 
 // --- Functions ---
-
-async function displaySurveyName(surveyId) {
-    const surveyNameEl = document.getElementById('review-survey-name');
-    if (!surveyNameEl) return;
-
-    if (surveyId === 'SURVEY8j2l0x') {
-        surveyNameEl.textContent = `アンケート名: CSVデータからのアンケート`;
-        return;
-    }
-
-    try {
-        const response = await fetch('./data/surveys.json');
-        if (!response.ok) {
-            throw new Error('Failed to load survey data.');
-        }
-        const surveys = await response.json();
-        const survey = surveys.find(s => s.id === surveyId);
-        const surveyName = survey?.name?.ja || '不明なアンケート';
-        surveyNameEl.textContent = `アンケート名: ${surveyName}`;
-    } catch (error) {
-        console.error('Error displaying survey name:', error);
-        surveyNameEl.textContent = 'アンケート名の取得に失敗しました';
-    }
-}
 
 function truncateQuestion(questionText) {
     if (!questionText) {
         return '';
     }
     let truncatedText = questionText.replace(/（.*?）/g, '').replace(/\(.*?\)/g, '');
-    if (truncatedText.length > 19) {
-        truncatedText = truncatedText.substring(0, 19) + '...';
+    if (truncatedText.length > 17) {
+        truncatedText = truncatedText.substring(0, 17) + '...';
     }
     return truncatedText;
+}
+
+function updateAnswerFilterAvailability() {
+    const answerFilterSelect = document.getElementById('answerFilter');
+    if (!answerFilterSelect) return;
+
+    const questionDef = currentSurvey?.details?.find(d => d.text === currentIndustryQuestion);
+    const filterableTypes = ['single_choice', 'multi_choice', 'matrix_single', 'matrix_multi'];
+
+    if (questionDef && filterableTypes.includes(questionDef.type)) {
+        answerFilterSelect.disabled = false;
+        populateAnswerFilterDropdown();
+    } else {
+        answerFilterSelect.innerHTML = '<option value="">(対象外の設問)</option>';
+        answerFilterSelect.disabled = true;
+    }
+}
+
+function populateAnswerFilterDropdown() {
+    const answerFilterSelect = document.getElementById('answerFilter');
+    if (!answerFilterSelect) return;
+
+    const answers = new Set();
+    allCombinedData.forEach(item => {
+        const detail = item.details?.find(d => d.question === currentIndustryQuestion);
+        const answer = detail?.answer;
+        
+        if (Array.isArray(answer)) {
+            answer.forEach(a => {
+                if (a !== '') answers.add(a);
+            });
+        } else {
+            answers.add(answer);
+        }
+    });
+
+    const uniqueAnswers = Array.from(answers);
+    answerFilterSelect.innerHTML = '<option value="">全ての回答</option>';
+
+    let hasUnansweredOption = false;
+    uniqueAnswers.forEach(answer => {
+        const option = document.createElement('option');
+        if (answer === '' || answer == null || answer === '-') {
+            if (!hasUnansweredOption) {
+                option.value = 'unanswered';
+                option.textContent = '未回答';
+                answerFilterSelect.appendChild(option);
+                hasUnansweredOption = true;
+            }
+        } else {
+            option.value = answer;
+            option.textContent = answer;
+            answerFilterSelect.appendChild(option);
+        }
+    });
+
+    answerFilterSelect.value = currentAnswerFilter;
 }
 
 function handleSearch(e) {
@@ -70,6 +106,8 @@ function handleQuestionSelectClick(newQuestion) {
             button.classList.toggle('active', button.title === newQuestion);
         });
     }
+    currentAnswerFilter = '';
+    updateAnswerFilterAvailability();
     applyFilters();
 }
 
@@ -91,14 +129,13 @@ function setupModalEventListeners() {
     const footer = document.querySelector('#reviewDetailModal .p-4.border-t');
     if (!footer) return;
 
-    // Use event delegation to handle clicks on dynamically added buttons
     footer.addEventListener('click', (e) => {
         if (e.target.id === 'editDetailBtn') {
             handleEditToggle();
         } else if (e.target.id === 'saveDetailBtn') {
             handleSave();
         } else if (e.target.id === 'cancelEditBtn') {
-            handleEditToggle(); // Simply toggle back to view mode
+            handleEditToggle();
         }
     });
 }
@@ -111,13 +148,8 @@ function handleEditToggle() {
 
 function handleSave() {
     if (!isModalInEditMode) return;
-
-    // In a real app, you would collect and validate data.
-    // For this demo, we'll just log a success message.
     console.log('Saving data for answerId:', currentItemInModal.answerId);
     alert('データが保存されました。（実際には保存されません）');
-
-    // Revert to view mode
     handleEditToggle();
 }
 
@@ -140,6 +172,8 @@ function updateModalFooter() {
 function handleResetFilters() {
     currentSearchTerm = '';
     currentDateFilter = '';
+    currentAnswerFilter = '';
+
     const searchInput = document.getElementById('searchKeyword');
     if (searchInput) {
         searchInput.value = '';
@@ -147,11 +181,17 @@ function handleResetFilters() {
     if (datePickerInstance) {
         datePickerInstance.clear();
     }
+    const answerFilterSelect = document.getElementById('answerFilter');
+    if (answerFilterSelect) {
+        answerFilterSelect.value = '';
+    }
+
     applyFilters();
 }
 
 function applyFilters() {
     let filteredData = allCombinedData;
+
     if (currentSearchTerm) {
         const searchTermLower = currentSearchTerm.toLowerCase();
         filteredData = filteredData.filter(item => {
@@ -171,6 +211,7 @@ function applyFilters() {
                    selectedQuestionAnswer.includes(searchTermLower);
         });
     }
+
     if (currentDateFilter) {
         const filterDate = new Date(currentDateFilter);
         filteredData = filteredData.filter(item => {
@@ -181,6 +222,24 @@ function applyFilters() {
                    itemDate.getDate() === filterDate.getDate();
         });
     }
+
+    if (currentAnswerFilter) {
+        filteredData = filteredData.filter(item => {
+            const detail = item.details?.find(d => d.question === currentIndustryQuestion);
+            const answer = detail?.answer;
+
+            if (currentAnswerFilter === 'unanswered') {
+                return answer === '' || answer == null || answer === '-' || (Array.isArray(answer) && answer.length === 0);
+            }
+            
+            if (Array.isArray(answer)) {
+                return answer.includes(currentAnswerFilter);
+            } else {
+                return answer === currentAnswerFilter;
+            }
+        });
+    }
+
     displayPage(1, filteredData);
 }
 
@@ -334,37 +393,92 @@ function setupEventListeners() {
             const urlParams = new URLSearchParams(window.location.search);
             let surveyId = urlParams.get('surveyId');
             if (!surveyId) {
-                surveyId = 'SURVEY8j2l0x'; // Fallback to default
+                surveyId = 'SURVEY_001'; // Fallback to default
             }
             window.location.href = `../sample/graph-page.html?surveyId=${surveyId}`;
+        });
+    }
+
+    const answerFilterSelect = document.getElementById('answerFilter');
+    if (answerFilterSelect) {
+        answerFilterSelect.addEventListener('change', (e) => {
+            currentAnswerFilter = e.target.value;
+            applyFilters();
         });
     }
 }
 
 export async function initializePage() {
     try {
+        initBreadcrumbs();
         const urlParams = new URLSearchParams(window.location.search);
-        let surveyId = urlParams.get('surveyId');
+        const surveyId = urlParams.get('surveyId');
+
         if (!surveyId) {
-            surveyId = 'SURVEY8j2l0x';
+            throw new Error("アンケートIDが指定されていません。");
         }
 
-        await displaySurveyName(surveyId);
+        // 1. Fetch all data sources in parallel
+        const [surveys, answers, personalInfo, enqueteDetails] = await Promise.all([
+            fetch('./data/surveys.json').then(res => res.json()),
+            fetch(`../../sample/sample-3/Answer/${surveyId}.json`).then(res => {
+                if (!res.ok) return []; // Return empty array if answer file not found
+                return res.json();
+            }),
+            fetch(`../../sample/sample-3/ダミー個人情報/${surveyId}.json`).then(res => {
+                if (!res.ok) return []; // Return empty array if personal info file not found
+                return res.json();
+            }),
+            fetch(`../../sample/sample-3/Enquete/${surveyId}.json`).then(res => {
+                if (!res.ok) return {}; // Return empty object if enquete file not found
+                return res.json();
+            })
+        ]);
 
-        if (surveyId === 'SURVEY8j2l0x') {
-            const csvPaths = [
-                '../sample/0008000154.csv',
-                '../sample/0008000154ncd.csv'
-            ];
-            const csvData = await speedReviewService.loadAndCombineCsvData(csvPaths);
-            allCombinedData = speedReviewService.transformCsvToCombinedData(csvData, surveyId);
+        // 2. Find the survey definition
+        currentSurvey = surveys.find(s => s.id === surveyId);
+        if (!currentSurvey) {
+            throw new Error(`アンケートID「${surveyId}」の定義が見つかりません。`);
+        }
+        // 設問詳細情報を結合
+        if (enqueteDetails && enqueteDetails.details) {
+            currentSurvey.details = enqueteDetails.details;
         } else {
-            await speedReviewService.loadJsonData(
-                './data/surveys.json',
-                './data/survey-answers.json',
-                './data/business-cards.json'
-            );
-            allCombinedData = await speedReviewService.getCombinedReviewData(surveyId);
+            currentSurvey.details = []; // 詳細情報がない場合は空の配列を設定
+        }
+
+        // 3. Create a map for quick lookup of personal info
+        const personalInfoMap = new Map(personalInfo.map(info => [info.answerId, info.businessCard]));
+
+        // 4. Combine answers with personal info and survey definition
+        allCombinedData = answers.map(answer => {
+            const businessCard = personalInfoMap.get(answer.answerId) || {
+                group2: { lastName: '(情報なし)' },
+                group3: { companyName: '(情報なし)' }
+            };
+            return {
+                ...answer,
+                survey: currentSurvey,
+                businessCard: businessCard
+            };
+        });
+        
+        if (answers.length === 0) {
+             console.warn(`アンケートID「${surveyId}」に対する回答データが見つかりませんでした。`);
+        }
+
+
+        // 5. Render the page with the combined data
+        const surveyNameEl = document.getElementById('review-survey-name');
+        if (surveyNameEl) {
+            surveyNameEl.textContent = `アンケート名: ${currentSurvey.name.ja}`;
+        }
+
+        // 最初の設問をデフォルトの表示設問とする
+        if (currentSurvey.details && currentSurvey.details.length > 0) {
+            currentIndustryQuestion = currentSurvey.details[0].text;
+        } else {
+            currentIndustryQuestion = '設問情報なし'; // 設問がない場合のデフォルト
         }
 
         const dynamicHeader = document.getElementById('dynamic-question-header');
@@ -373,6 +487,7 @@ export async function initializePage() {
         }
 
         populateQuestionSelector(allCombinedData);
+        updateAnswerFilterAvailability();
         displayPage(1, allCombinedData);
         setupEventListeners();
 
@@ -380,7 +495,7 @@ export async function initializePage() {
         console.error('SPEEDレビューページの初期化に失敗しました:', error);
         const tableBody = document.getElementById('reviewTableBody');
         if (tableBody) {
-            tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-error">データの読み込みに失敗しました。</td></tr>`;
+            tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-error">${error.message}</td></tr>`;
         }
     }
 }

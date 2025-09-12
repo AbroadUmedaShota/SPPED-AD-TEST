@@ -10,6 +10,7 @@ import { initThankYouEmailSettings } from './thankYouEmailSettings.js';
 import { initInvoiceListPage } from './invoiceList.js';
 import { initIndexPage } from './indexPage.js';
 import { initializePage as initSpeedReviewPage } from './speed-review.js'; // Import initializePage from speed-review.js
+import { initGroupEditPage } from '../../sample/sample-2/group-edit.js';
 
 import { showToast, copyTextToClipboard, loadCommonHtml } from './utils.js';
 
@@ -86,10 +87,13 @@ window.copyUrl = async function(inputElement) {
 
 document.addEventListener('DOMContentLoaded', async () => {
 
-    // 共通要素の読み込み
-    await loadCommonHtml('header-placeholder', '/02_dashboard/common/header.html');
-    await loadCommonHtml('sidebar-placeholder', '/02_dashboard/common/sidebar.html', initSidebarHandler);
-    await loadCommonHtml('footer-placeholder', '/02_dashboard/common/footer.html');
+    // 共通要素の読み込み（動的パス解決）
+    const isSamplePage = window.location.pathname.includes('/sample/');
+    const commonPath = isSamplePage ? '../../02_dashboard/common/' : 'common/';
+
+    await loadCommonHtml('header-placeholder', `${commonPath}header.html`);
+    await loadCommonHtml('sidebar-placeholder', `${commonPath}sidebar.html`, initSidebarHandler);
+    await loadCommonHtml('footer-placeholder', `${commonPath}footer.html`);
 
     // Initialize the language switcher after the header is loaded
     initLanguageSwitcher();
@@ -138,6 +142,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             break;
         case 'speed-review.html':
             initSpeedReviewPage(); // Call the imported function
+            break;
+        case 'group-edit.html':
+            initGroupEditPage();
             break;
         
     }

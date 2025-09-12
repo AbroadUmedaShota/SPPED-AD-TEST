@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>グループ編集 - SpeedAd</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="../../02_dashboard/service-top-style.css">
+    <style>
+        /* Sortable.jsのゴースト要素のスタイル */
+        .sortable-ghost {
+            opacity: 0.4;
+            background-color: #c8ebfb;
+        }
+        .sortable-drag {
+            opacity: 1 !important;
+        }
+        .drag-handle {
+            cursor: grab;
+        }
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background">
+
+    <div class="relative flex min-h-screen flex-col overflow-x-hidden">
+        <!-- ヘッダーのプレースホルダー -->
+        <div id="header-placeholder"></div>
+
+        <div class="flex flex-1 pt-16 bg-background">
+            <!-- サイドバーのプレースホルダー -->
+            <div id="sidebar-placeholder"></div>
+
+            <!-- メインコンテンツ -->
+            <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
+                <div class="flex flex-col w-full max-w-6xl mx-auto flex-1">
+                    <!-- パンくずリスト -->
+                    <div id="breadcrumb-container" class="mb-4">
+                        <nav class="flex" aria-label="Breadcrumb">
+                            <ol class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
+                                <li class="inline-flex items-center">
+                                    <a href="../../02_dashboard/index.html" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">
+                                        <span class="material-icons text-base mr-1">home</span>
+                                        ダッシュボード
+                                    </a>
+                                </li>
+                                <li>
+                                    <div class="flex items-center">
+                                        <span class="material-icons text-base">chevron_right</span>
+                                        <span class="ms-1 text-sm font-medium text-gray-500 md:ms-2 dark:text-gray-400">グループ編集</span>
+                                    </div>
+                                </li>
+                            </ol>
+                        </nav>
+                    </div>
+
+                    <h1 class="text-2xl font-bold text-on-background mb-6">グループ編集</h1>
+
+                    <!-- グループ情報編集フォーム -->
+                    <div class="bg-surface p-6 rounded-lg shadow-md mb-8">
+                        <h2 class="text-xl font-semibold mb-4">グループ情報</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- グループ名 -->
+                            <div class="input-group">
+                                <input type="text" id="groupName" class="input-field" placeholder=" " required>
+                                <label for="groupName" class="input-label">グループ名</label>
+                                <div id="groupNameError" class="text-red-500 text-xs mt-1 hidden">必須項目です。</div>
+                            </div>
+                            <!-- 説明文 -->
+                            <div class="input-group md:col-span-2">
+                                <textarea id="groupDescription" class="input-field" placeholder=" " rows="3"></textarea>
+                                <label for="groupDescription" class="input-label">説明文</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- メンバー管理セクション -->
+                    <div class="bg-surface p-6 rounded-lg shadow-md">
+                        <h2 class="text-xl font-semibold mb-4">メンバー管理</h2>
+                        
+                        <!-- メンバー招待 -->
+                        <div class="bg-background p-4 rounded-md mb-6 border border-divider">
+                            <h3 class="font-semibold mb-3">新しいメンバーを招待</h3>
+                            <div class="flex flex-wrap items-start gap-4">
+                                <div class="input-group flex-grow">
+                                    <input type="email" id="newMemberEmail" class="input-field" placeholder=" ">
+                                    <label for="newMemberEmail" class="input-label">メールアドレス</label>
+                                    <div id="newMemberEmailError" class="text-red-500 text-xs mt-1 hidden"></div>
+                                </div>
+                                <div class="input-group">
+                                    <select id="newMemberRole" class="input-field">
+                                        <option value="member">一般メンバー</option>
+                                        <option value="admin">管理者</option>
+                                    </select>
+                                    <label for="newMemberRole" class="input-label">権限</label>
+                                </div>
+                                <button id="add-member-btn" class="h-10 px-5 rounded-md font-semibold transition-colors button-secondary">招待する</button>
+                            </div>
+                        </div>
+
+                        <!-- メンバー一覧 -->
+                        <h3 class="font-semibold mb-3">メンバー一覧</h3>
+                        <div id="member-list" class="space-y-3">
+                            <!-- JSで動的にメンバーがここに追加されます -->
+                            <p id="no-member-message" class="text-center text-gray-500 py-4">メンバーがいません。</p>
+                        </div>
+                    </div>
+
+                    <!-- フッターアクションボタン -->
+                    <div class="flex justify-end gap-4 mt-8">
+                        <button id="cancel-btn" class="h-10 px-5 rounded-md font-semibold transition-colors button-secondary">キャンセル</button>
+                        <button id="save-btn" class="h-10 px-5 rounded-md font-semibold transition-colors button-primary" disabled>保存</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- フッターのプレースホルダー -->
+        <div id="footer-placeholder"></div>
+    </div>
+    
+    <!-- 確認モーダル (汎用) -->
+    <div id="confirmationModal-placeholder"></div>
+    <div id="memberDetailModal-placeholder"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script type="module" src="../../02_dashboard/src/main.js"></script>
+    <script type="module" src="./group-edit.js"></script>
+</body>
+</html>

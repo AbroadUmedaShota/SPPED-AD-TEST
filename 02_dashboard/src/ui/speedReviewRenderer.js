@@ -21,7 +21,7 @@ export function populateTable(data, onDetailClick, selectedIndustryQuestion) {
 
     data.forEach(item => {
         const row = document.createElement('tr');
-        row.className = 'hover:bg-surface-bright transition-colors cursor-pointer'; // Add cursor-pointer for UX
+        row.className = 'transition-colors cursor-pointer'; // Add cursor-pointer for UX
         row.dataset.answerId = item.answerId; // Add data-answer-id to the row
 
         const formatCell = (value) => (value === null || value === undefined || value === '') ? '-' : value;

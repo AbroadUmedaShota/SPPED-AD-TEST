@@ -115,12 +115,19 @@ class SpeedReviewService {
         }
     }
 
-    transformCsvToCombinedData(csvData, surveyId) {
+    transformCsvToCombinedData(csvData, surveyId, allSurveys) {
+        const surveyDefinition = allSurveys.find(s => s.id === surveyId);
+
         return csvData.map(row => {
             const details = [];
             for (const key in row) {
                 if (key.startsWith('Q.')) {
-                    details.push({ question: key, answer: row[key] || '' });
+                    const questionDef = surveyDefinition?.details?.find(d => d.text === key);
+                    let answer = row[key] || '';
+                    if (questionDef && questionDef.type === 'multi_choice' && typeof answer === 'string') {
+                        answer = answer.split(/[,/]/).map(s => s.trim()).filter(s => s);
+                    }
+                    details.push({ question: key, answer: answer });
                 }
             }
 
@@ -157,35 +164,10 @@ class SpeedReviewService {
                 }
             };
 
-            const dummySurvey = {
+            const surveyForThisRow = surveyDefinition || {
                 id: surveyId,
                 name: { ja: "CSVデータからのアンケート", en: "Survey from CSV Data" },
-                details: [
-                    {
-                        id: "q2_csv",
-                        text: "Q.02_お客様の主な業界",
-                        type: "single_choice",
-                        options: ["一般産業機械", "商社", "食品・医療", "半導体・液晶", "その他"]
-                    },
-                    {
-                        id: "q3_csv",
-                        text: "Q.03_打ち合わせ種類（複数選択可）",
-                        type: "multi_choice",
-                        options: ["機械要素部品", "製品デモ（体験デモ機）", "技術相談", "見積依頼", "その他"]
-                    },
-                    {
-                        id: "q6_csv",
-                        text: "Q.06_【打合せ内容】緊急度（複数選択可）",
-                        type: "multi_choice",
-                        options: ["至急", "カタログ希望", "情報収集", "挨拶・売込み"]
-                    },
-                    {
-                        id: "q9_csv",
-                        text: "Q.09_【案件情報】必要時期(見込時期)",
-                        type: "single_choice",
-                        options: ["即時", "3ヶ月以内", "半年以内", "1年以内", "未定"]
-                    }
-                ]
+                details: [] // Ensure details exist to prevent errors
             };
 
             return {
@@ -195,7 +177,107 @@ class SpeedReviewService {
                 isTest: row['テスト回答'] === 'テスト回答',
                 details: details,
                 businessCard: businessCard,
-                survey: dummySurvey,
+                survey: surveyForThisRow,
+            };
+        });
+    }
+
+    async loadAndCombineJsonData(jsonFilePaths) {
+        if (jsonFilePaths.length < 2) {
+            throw new Error("Expected at least two JSON file paths for combining.");
+        }
+
+        try {
+            const answerDataPath = jsonFilePaths.find(p => !p.includes('ncd'));
+            const nameCardDataPath = jsonFilePaths.find(p => p.includes('ncd'));
+
+            if (!answerDataPath || !nameCardDataPath) {
+                throw new Error("Could not find both answer and name card JSON files.");
+            }
+
+            const [answerData, nameCardData] = await Promise.all([
+                fetch(answerDataPath).then(res => res.json()),
+                fetch(nameCardDataPath).then(res => res.json())
+            ]);
+
+            const nameCardMap = new Map(nameCardData.map(item => [item.ID, item]));
+
+            const combined = answerData.map(answer => {
+                const nameCardInfo = nameCardMap.get(answer.ID);
+                return { ...answer, ...nameCardInfo };
+            });
+
+            return combined;
+
+        } catch (error) {
+            console.error("Error loading and combining JSON files:", error);
+            throw error;
+        }
+    }
+
+    transformJsonToCombinedData(jsonData, surveyId, allSurveys) {
+        const surveyDefinition = allSurveys.find(s => s.id === surveyId);
+
+        return jsonData.map(row => {
+            const details = [];
+            for (const key in row) {
+                if (key.startsWith('Q.')) {
+                    const questionDef = surveyDefinition?.details?.find(d => d.text === key);
+                    let answer = row[key] || '';
+                    if (questionDef && questionDef.type === 'multi_choice' && typeof answer === 'string') {
+                        answer = answer.split(/[,/]/).map(s => s.trim()).filter(s => s);
+                    }
+                    details.push({ question: key, answer: answer });
+                }
+            }
+
+            const businessCard = {
+                imageUrl: {
+                    front: row['名刺画像ファイル名（表）'] || '',
+                    back: row['名刺画像ファイル名（裏）'] || ''
+                },
+                group1: {
+                    email: row['メールアドレス'] || ''
+                },
+                group2: {
+                    lastName: row['氏名（姓）'] || '',
+                    firstName: '' // No first name in the new JSON structure
+                },
+                group3: {
+                    companyName: row['会社名'] || '',
+                    department: row['部署名'] || '',
+                    position: row['役職名'] || ''
+                },
+                group4: {
+                    postalCode: row['郵便番号'] || '',
+                    address1: row['住所1'] || '',
+                    address2: row['住所2（建物名）'] || ''
+                },
+                group5: {
+                    mobile: row['携帯番号'] || '',
+                    tel1: row['電話番号1'] || '',
+                    tel2: row['電話番号2'] || '',
+                    fax: row['FAX番号'] || ''
+                },
+                group6: {
+                    url: row['URL'] || ''
+                }
+            };
+
+            const surveyForThisRow = surveyDefinition || {
+                id: surveyId,
+                name: { ja: "JSONデータからのアンケート", en: "Survey from JSON Data" },
+                details: [] // Ensure details exist to prevent errors
+            };
+
+            return {
+                answerId: row['ID'],
+                surveyId: surveyId,
+                answeredAt: row['回答日時'] || '',
+                isTest: row['テスト回答'] === 'テスト回答',
+                details: details,
+                businessCard: businessCard,
+                survey: surveyForThisRow,
             };
         });
     }

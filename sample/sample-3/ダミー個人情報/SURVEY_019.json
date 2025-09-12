@@ -1,0 +1,62 @@
+[
+  {
+    "answerId": "ANS_SURVEY_019_001",
+    "businessCard": {
+      "group1": {
+        "email": "ono.koji@example.com"
+      },
+      "group2": {
+        "lastName": "小野",
+        "firstName": "浩二"
+      },
+      "group3": {
+        "companyName": "顧客サポート株式会社",
+        "department": "顧客サポート部",
+        "position": "カスタマーサポートエンジニア"
+      },
+      "group4": {
+        "postalCode": "141-0032",
+        "address1": "東京都品川区大崎1-2-2",
+        "address2": "アートヴィレッジ大崎セントラルタワー 10F"
+      },
+      "group5": {
+        "mobile": "090-2345-6789",
+        "tel1": "03-1234-5678",
+        "fax": "03-1234-5679"
+      },
+      "group6": {
+        "url": "https://customer-support-corp.example.com"
+      }
+    }
+  },
+  {
+    "answerId": "ANS_SURVEY_019_002",
+    "businessCard": {
+      "group1": {
+        "email": "fujita.mika@example.com"
+      },
+      "group2": {
+        "lastName": "藤田",
+        "firstName": "美香"
+      },
+      "group3": {
+        "companyName": "カスタマーサービス株式会社",
+        "department": "カスタマーサービス",
+        "position": "エスカレーションマネージャー"
+      },
+      "group4": {
+        "postalCode": "550-0002",
+        "address1": "大阪府大阪市西区江戸堀1-3-15",
+        "address2": "新大阪MTビル2号館 5F"
+      },
+      "group5": {
+        "mobile": "090-9876-5432",
+        "tel1": "06-2345-6789",
+        "fax": "06-2345-6790"
+      },
+      "group6": {
+        "url": "https://customer-service-inc.example.com"
+      }
+    }
+  }
+]

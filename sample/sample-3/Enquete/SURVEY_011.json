@@ -1,0 +1,30 @@
+{
+  "id": "SURVEY_011",
+  "groupId": "GROUP001",
+  "name": { "ja": "新機能に関するフィードバック", "en": "New Feature Feedback" },
+  "displayTitle": { "ja": "新機能のご意見をお聞かせください", "en": "Please give us your feedback on the new feature" },
+  "description": { "ja": "新機能の使いやすさに関するフィードバックを収集します。", "en": "This survey collects feedback on the usability of the new feature." },
+  "status": "会期中",
+  "answerCount": 150,
+  "realtimeAnswers": 28,
+  "periodStart": "2025-08-20",
+  "periodEnd": "2025-09-19",
+  "bizcardEnabled": true,
+  "details": [
+    { "id": "Q1", "text": "Q1. 新機能の使いやすさについてどう思いますか？", "type": "single_choice", "options": ["非常に使いやすい", "使いやすい", "普通", "使いにくい", "非常に使いにくい"] },
+    { "id": "Q2", "text": "Q2. 新機能のどの点が最も便利でしたか？", "type": "text" },
+    { "id": "Q3", "text": "Q3. 新機能の改善点があれば教えてください。", "type": "text" },
+    { "id": "Q4", "text": "Q4. 新機能はあなたの業務に役立ちましたか？", "type": "single_choice", "options": ["はい", "いいえ"] },
+    { "id": "Q5", "text": "Q5. 新機能に今後追加してほしい機能はありますか？", "type": "text" },
+    { "id": "Q6", "text": "Q6. 新機能を知ったきっかけは何ですか？", "type": "multi_choice", "options": ["社内通知", "同僚からの紹介", "マニュアル", "その他"] },
+    { "id": "Q7", "text": "Q7. 新機能の全体的な満足度を教えてください。", "type": "single_choice", "options": ["非常に満足", "満足", "普通", "不満", "非常に不満"] },
+    { "id": "Q8", "text": "Q8. 新機能の操作性は直感的ですか？", "type": "single_choice", "options": ["はい", "いいえ"] },
+    { "id": "Q9", "text": "Q9. 新機能の起動速度は速いですか？", "type": "single_choice", "options": ["はい", "いいえ"] },
+    { "id": "Q10", "text": "Q10. 新機能の安定性についてどう思いますか？", "type": "single_choice", "options": ["良い", "普通", "悪い"] },
+    { "id": "Q11", "text": "Q11. 新機能のセキュリティ対策は適切ですか？", "type": "single_choice", "options": ["はい", "いいえ"] },
+    { "id": "Q12", "text": "Q12. 新機能のデータ管理は容易ですか？", "type": "single_choice", "options": ["はい", "いいえ"] },
+    { "id": "Q13", "text": "Q13. 新機能のカスタマイズ性は高いですか？", "type": "single_choice", "options": ["はい", "いいえ"] },
+    { "id": "Q14", "text": "Q14. 新機能のヘルプドキュメントは分かりやすいですか？", "type": "single_choice", "options": ["はい", "いいえ"] },
+    { "id": "Q15", "text": "Q15. 新機能のトレーニングは必要ですか？", "type": "single_choice", "options": ["はい", "いいえ"] }
+  ]
+}

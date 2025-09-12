@@ -1,0 +1,62 @@
+[
+  {
+    "answerId": "ANS_SURVEY_014_001",
+    "businessCard": {
+      "group1": {
+        "email": "murakami.hiroshi@example.com"
+      },
+      "group2": {
+        "lastName": "村上",
+        "firstName": "浩"
+      },
+      "group3": {
+        "companyName": "研修企画株式会社",
+        "department": "研修企画部",
+        "position": "研修プランナー"
+      },
+      "group4": {
+        "postalCode": "105-7123",
+        "address1": "東京都港区東新橋1-5-2",
+        "address2": "汐留シティセンター 23F"
+      },
+      "group5": {
+        "mobile": "050-1234-5678",
+        "tel1": "03-1234-9876",
+        "fax": "03-1234-9877"
+      },
+      "group6": {
+        "url": "https://training-planning.example.com"
+      }
+    }
+  },
+  {
+    "answerId": "ANS_SURVEY_014_002",
+    "businessCard": {
+      "group1": {
+        "email": "sakamoto.yuki@example.com"
+      },
+      "group2": {
+        "lastName": "坂本",
+        "firstName": "由紀"
+      },
+      "group3": {
+        "companyName": "人材開発株式会社",
+        "department": "人材開発部",
+        "position": "トレーナー"
+      },
+      "group4": {
+        "postalCode": "163-1030",
+        "address1": "東京都新宿区西新宿3-7-1",
+        "address2": "新宿パークタワー 30F"
+      },
+      "group5": {
+        "mobile": "050-8765-4321",
+        "tel1": "03-2345-6789",
+        "fax": "03-2345-6790"
+      },
+      "group6": {
+        "url": "https://hr-development.example.com"
+      }
+    }
+  }
+]
