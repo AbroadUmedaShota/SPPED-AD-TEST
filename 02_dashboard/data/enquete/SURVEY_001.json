@@ -1,0 +1,8 @@
+{
+  "details": [
+    { "text": "Q.01_性別", "type": "single_choice", "options": ["男性", "女性", "その他"] },
+    { "text": "Q.02_業種", "type": "single_choice", "options": ["製造", "IT・ソフトウェア", "サービス", "小売", "金融"] },
+    { "text": "Q.03_満足度", "type": "single_choice", "options": ["満足", "普通", "不満"] }
+  ]
+}
+

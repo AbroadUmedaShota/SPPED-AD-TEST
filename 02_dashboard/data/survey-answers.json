@@ -1,7 +1,7 @@
 [
   {
     "answerId": "6794",
-    "surveyId": "SURVEY8j2l0x",
+    "surveyId": "SURVEY_001",
     "answeredAt": "2025-07-04 11:17",
     "isTest": false,
     "details": [
@@ -16,7 +16,7 @@
   },
   {
     "answerId": "6795",
-    "surveyId": "SURVEY8j2l0x",
+    "surveyId": "SURVEY_001",
     "answeredAt": "2025-07-04 12:03",
     "isTest": false,
     "details": [
@@ -31,7 +31,7 @@
   },
   {
     "answerId": "6801",
-    "surveyId": "SURVEY8j2l0x",
+    "surveyId": "SURVEY_002",
     "answeredAt": "2025-07-04 12:33",
     "isTest": true,
     "details": [

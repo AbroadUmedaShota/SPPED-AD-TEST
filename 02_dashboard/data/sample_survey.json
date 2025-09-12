@@ -1,54 +1,37 @@
 {
   "surveyId": "svy_12345",
-  "name": {
-    "ja": "サンプルアンケート",
-    "en": "Sample Survey"
-  },
-  "displayTitle": {
-    "ja": "サンプルアンケート（回答者向け）",
-    "en": "Sample Survey (for Respondents)"
-  },
-  "description": {
-    "ja": "これはサンプルアンケートの説明です。",
-    "en": "This is a description of the sample survey."
-  },
+  "name": "サンプルアンケート",
+  "displayTitle": "サンプルアンケート（回答者向け）",
+  "description": "これはサンプルアンケートの説明です。",
   "periodStart": "2025-08-01",
   "periodEnd": "2025-08-31",
   "plan": "Standard",
   "deadline": "2025-09-15",
-  "memo": "これは社内用のメモです。",
+  "memo": "これは日本語用のメモです。",
   "questionGroups": [
     {
       "groupId": "group1",
-      "title": {
-        "ja": "質問グループ 1",
-        "en": "Question Group 1"
-      },
+      "title": "基本情報",
       "questions": [
         {
           "questionId": "q101",
           "type": "free_answer",
-          "text": {
-            "ja": "ご意見・ご感想をお聞かせください。",
-            "en": "Please share your opinions and impressions."
-          },
+          "text": "自由記述でご意見・ご要望をご入力ください。",
           "required": false
         },
         {
           "questionId": "q102",
           "type": "single_answer",
-          "text": {
-            "ja": "あなたの性別を教えてください。",
-            "en": "Please tell us your gender."
-          },
+          "text": "本サービスの満足度をお聞かせください。",
           "required": true,
           "options": [
-            { "optionId": "opt1", "text": { "ja": "男性", "en": "Male" } },
-            { "optionId": "opt2", "text": { "ja": "女性", "en": "Female" } },
-            { "optionId": "opt3", "text": { "ja": "その他", "en": "Other" } }
+            { "optionId": "opt1", "text": "満足" },
+            { "optionId": "opt2", "text": "普通" },
+            { "optionId": "opt3", "text": "不満" }
           ]
         }
       ]
     }
   ]
 }
+
