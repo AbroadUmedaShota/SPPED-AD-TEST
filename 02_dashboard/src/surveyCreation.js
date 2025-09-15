@@ -4,15 +4,16 @@ import { initSidebarHandler } from './sidebarHandler.js';
 import { initBreadcrumbs } from './breadcrumb.js';
 import { initThemeToggle } from './themeToggle.js';
 import { fetchSurveyData, saveSurveyDataToLocalStorage, loadSurveyDataFromLocalStorage } from './services/surveyService.js';
-import { 
-    populateBasicInfo, 
-    renderAllQuestionGroups, 
-    displayErrorMessage, 
-    renderOutlineMap 
+import {
+    populateBasicInfo,
+    renderAllQuestionGroups,
+    displayErrorMessage,
+    renderOutlineMap
 } from './ui/surveyRenderer.js';
 import { initializeFab } from './ui/fab.js';
 import { loadCommonHtml } from './utils.js';
 import { showToast } from './utils.js';
+import { showConfirmationModal } from './confirmationModal.js';
 
 // --- Global State ---
 let surveyData = {};
@@ -56,6 +57,21 @@ function initLanguageSwitcher() {
         if (!languageSwitcherDropdown.classList.contains('hidden')) {
             languageSwitcherDropdown.classList.add('hidden');
             languageSwitcherButton.setAttribute('aria-expanded', 'false');
+        }
+    });
+
+    // --- Delegated Change Listeners ---
+    document.body.addEventListener('change', (event) => {
+        const select = event.target.closest('.question-type-select');
+        if (select) {
+            const questionItem = select.closest('.question-item');
+            const groupEl = select.closest('.question-group');
+            if (!questionItem || !groupEl) return;
+            const groupId = groupEl.dataset.groupId;
+            const questionId = questionItem.dataset.questionId;
+            const newType = select.value;
+            handleChangeQuestionType(groupId, questionId, newType);
+            return;
         }
     });
 
@@ -109,6 +125,240 @@ function updateAndRenderAll() {
     setupSortables();
 }
 
+// --- Input Bindings ---
+function getStr(value) {
+    if (value && typeof value === 'object') {
+        return value.ja || value.en || '';
+    }
+    return value || '';
+}
+
+function deepNormalizeSurveyData(data) {
+    if (!data) return data;
+    data.name = getStr(data.name);
+    data.displayTitle = getStr(data.displayTitle);
+    data.description = getStr(data.description);
+    if (Array.isArray(data.questionGroups)) {
+        data.questionGroups.forEach(g => {
+            g.title = getStr(g.title);
+            if (Array.isArray(g.questions)) {
+                g.questions.forEach(q => {
+                    q.text = getStr(q.text);
+                    if (Array.isArray(q.options)) {
+                        q.options.forEach(o => { o.text = getStr(o.text); });
+                    }
+                    if (q.matrix) {
+                        if (Array.isArray(q.matrix.rows)) q.matrix.rows.forEach(r => { r.text = getStr(r.text); });
+                        if (Array.isArray(q.matrix.cols)) q.matrix.cols.forEach(c => { c.text = getStr(c.text); });
+                    }
+                });
+            }
+        });
+    }
+    return data;
+}
+function setDeep(target, path, value) {
+    if (!target || !path || path.length === 0) return;
+    let obj = target;
+    for (let i = 0; i < path.length - 1; i++) {
+        const key = path[i];
+        if (typeof obj[key] !== 'object' || obj[key] === null) obj[key] = {};
+        obj = obj[key];
+    }
+    obj[path[path.length - 1]] = value;
+}
+
+function setupInputBindings() {
+    // Basic info bindings (static DOM)
+    const bind = (id, path) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const handler = () => {
+            setDeep(surveyData, path, el.value || '');
+            validateFormForSaveButton();
+        };
+        el.addEventListener('input', handler);
+        el.addEventListener('change', handler);
+    };
+
+    // single-language: bind only JA fields into string properties
+    const bindStr = (id, key) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const handler = () => {
+            surveyData[key] = el.value || '';
+            validateFormForSaveButton();
+        };
+        el.addEventListener('input', handler);
+        el.addEventListener('change', handler);
+    };
+    bindStr('surveyName_ja', 'name');
+    bindStr('displayTitle_ja', 'displayTitle');
+    // descriptions may be optional
+    const descJa = document.getElementById('description_ja');
+    if (descJa) {
+        const h = () => { surveyData.description = descJa.value || ''; };
+        descJa.addEventListener('input', h);
+        descJa.addEventListener('change', h);
+    }
+    bind('periodStart', ['periodStart']);
+    bind('periodEnd', ['periodEnd']);
+    bind('deadline', ['deadline']);
+    bind('memo', ['memo']);
+
+    const planEl = document.getElementById('plan');
+    if (planEl) {
+        const onPlan = () => { surveyData.plan = planEl.value; validateFormForSaveButton(); };
+        planEl.addEventListener('change', onPlan);
+    }
+
+    // Dynamic bindings via delegation (groups/questions/options)
+    const container = document.getElementById('questionGroupsContainer');
+    if (!container) return;
+
+    container.addEventListener('input', (e) => {
+        const target = e.target;
+        // Group title
+        if (target.classList.contains('group-title-input')) {
+            const groupEl = target.closest('.question-group');
+            if (!groupEl) return;
+            const groupId = groupEl.dataset.groupId;
+            const group = (surveyData.questionGroups || []).find(g => g.groupId === groupId);
+            if (group) {
+                group.title = target.value || '';
+            }
+            return;
+        }
+
+        // Question text
+        if (target.classList.contains('question-text-input')) {
+            const qItem = target.closest('.question-item');
+            const groupEl = target.closest('.question-group');
+            if (!qItem || !groupEl) return;
+            const groupId = groupEl.dataset.groupId;
+            const questionId = qItem.dataset.questionId;
+            const group = (surveyData.questionGroups || []).find(g => g.groupId === groupId);
+            const question = group?.questions?.find(q => q.questionId === questionId);
+            if (question) {
+                question.text = target.value || '';
+            }
+            return;
+        }
+
+        // Option text
+        if (target.classList.contains('option-text-input')) {
+            const optionItem = target.closest('.option-item');
+            const qItem = target.closest('.question-item');
+            const groupEl = target.closest('.question-group');
+            if (!optionItem || !qItem || !groupEl) return;
+            const groupId = groupEl.dataset.groupId;
+            const questionId = qItem.dataset.questionId;
+            const optionItems = qItem.querySelectorAll('.options-container .option-item');
+            const optionIndex = Array.from(optionItems).indexOf(optionItem);
+            const group = (surveyData.questionGroups || []).find(g => g.groupId === groupId);
+            const question = group?.questions?.find(q => q.questionId === questionId);
+            if (question && Array.isArray(question.options) && optionIndex > -1 && optionIndex < question.options.length) {
+                question.options[optionIndex].text = target.value || '';
+            }
+            return;
+        }
+
+        // Matrix row input
+        if (target.classList.contains('matrix-row-input')) {
+            const groupEl = target.closest('.question-group');
+            const qItem = target.closest('.question-item');
+            if (!groupEl || !qItem) return;
+            const groupId = groupEl.dataset.groupId;
+            const questionId = qItem.dataset.questionId;
+            const index = parseInt(target.getAttribute('data-index'), 10) || 0;
+            const question = surveyData.questionGroups.find(g => g.groupId === groupId)?.questions.find(q => q.questionId === questionId);
+            if (question && question.matrix && question.matrix.rows && question.matrix.rows[index]) {
+                question.matrix.rows[index].text = target.value || '';
+            }
+            return;
+        }
+
+        // Matrix col input
+        if (target.classList.contains('matrix-col-input')) {
+            const groupEl = target.closest('.question-group');
+            const qItem = target.closest('.question-item');
+            if (!groupEl || !qItem) return;
+            const groupId = groupEl.dataset.groupId;
+            const questionId = qItem.dataset.questionId;
+            const index = parseInt(target.getAttribute('data-index'), 10) || 0;
+            const question = surveyData.questionGroups.find(g => g.groupId === groupId)?.questions.find(q => q.questionId === questionId);
+            if (question && question.matrix && question.matrix.cols && question.matrix.cols[index]) {
+                question.matrix.cols[index].text = target.value || '';
+            }
+            return;
+        }
+    });
+}
+
+// --- Data Fetching & Mapping Utilities ---
+async function fetchJson(url) {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            console.error(`Failed to fetch ${url}: ${response.statusText}`);
+            return null;
+        }
+        return await response.json();
+    } catch (error) {
+        console.error(`Error fetching or parsing ${url}:`, error);
+        return null;
+    }
+}
+
+const normalizeMultilingual = (field) => {
+    if (typeof field === 'string') {
+        return { ja: field, en: '' };
+    }
+    return field || { ja: '', en: '' };
+};
+
+const mapEnqueteToQuestions = (enqueteDetails) => {
+    if (!enqueteDetails || !Array.isArray(enqueteDetails.details)) {
+        return [];
+    }
+
+    const typeMapping = {
+        free_text: 'free_answer',
+        text: 'free_answer',
+        single_choice: 'single_answer',
+        multi_choice: 'multi_answer',
+        number: 'number_answer',
+        matrix_single: 'matrix_sa',
+        matrix_multi: 'matrix_ma',
+    };
+
+    const questions = enqueteDetails.details.map((item, index) => {
+        const questionId = `q_${Date.now()}_${index}`;
+        const mappedType = typeMapping[item.type] || 'free_answer';
+        const question = {
+            questionId,
+            type: mappedType,
+            text: normalizeMultilingual(item.text),
+            required: item.required || false,
+        };
+
+        if (item.options && Array.isArray(item.options)) {
+            question.options = item.options.map((opt, optIndex) => ({
+                optionId: `opt_${questionId}_${optIndex}`,
+                text: normalizeMultilingual(opt),
+            }));
+        }
+
+        return question;
+    });
+
+    return [{
+        groupId: 'group_from_enquete',
+        title: { ja: '取り込み設問', en: 'Imported Questions' },
+        questions: questions,
+    }];
+};
+
 /**
  * ページの初期化処理
  */
@@ -123,76 +373,138 @@ async function initializePage() {
             })
         ]);
 
-        // Initialize global UI helpers present across pages
         initThemeToggle();
         initBreadcrumbs();
         initLanguageSwitcher();
 
-        // Load keyed data by surveyId if present (local-only)
-        try {
-            currentSurveyId = (new URLSearchParams(window.location.search)).get('surveyId');
-            if (currentSurveyId) {
-                const keyed = localStorage.getItem(`surveyData_${currentSurveyId}`);
-                if (keyed) {
-                    surveyData = JSON.parse(keyed);
-                    console.log('Loaded survey data (by surveyId) from localStorage:', currentSurveyId);
-                }
-            }
-        } catch (e) {
-            console.warn('Failed to load keyed survey data:', e);
-        }
-
-        if (!surveyData || Object.keys(surveyData).length === 0) {
-            const loadedData = loadSurveyDataFromLocalStorage();
-            if (loadedData) {
-                console.log('Loaded survey data from localStorage:', loadedData);
-                surveyData = loadedData;
-            } else {
-                console.log('No survey data in localStorage. Fetching initial data...');
-                surveyData = await fetchSurveyData();
-            }
-        }
-
-        // --- New: Process URL Query Parameters ---
         const params = new URLSearchParams(window.location.search);
+        currentSurveyId = params.get('surveyId');
+
+        // 1. Try loading from localStorage keyed by surveyId
+        if (currentSurveyId) {
+            const keyedData = localStorage.getItem(`surveyData_${currentSurveyId}`);
+            if (keyedData) {
+                surveyData = JSON.parse(keyedData);
+                console.log('Loaded survey data (by surveyId) from localStorage:', currentSurveyId);
+            }
+        }
+
+        // 2. If not found, try loading generic data from localStorage
+        if (!surveyData || Object.keys(surveyData).length === 0) {
+            const genericData = loadSurveyDataFromLocalStorage(); // from surveyCreationData
+            if (genericData) {
+                surveyData = genericData;
+                console.log('Loaded generic survey data from localStorage.');
+            }
+        }
+
+        // 3. If still empty and surveyId is present, load from JSON files
+        if ((!surveyData || Object.keys(surveyData).length === 0) && currentSurveyId) {
+            console.log(`Fetching data for surveyId: ${currentSurveyId}`);
+
+            // Try 02_dashboard/data first
+            let surveysList = await fetchJson('./data/surveys.json');
+            let surveyInfo = surveysList?.find(s => s.id === currentSurveyId) || null;
+            let enqueteDetails = null;
+
+            if (surveyInfo) {
+                enqueteDetails = await fetchJson(`./data/enquete/${currentSurveyId}.json`);
+            }
+
+            // Fallback: root data/surveys.json (if exists)
+            if (!surveyInfo) {
+                surveysList = await fetchJson('../data/surveys.json');
+                surveyInfo = surveysList?.find(s => s.id === currentSurveyId) || null;
+            }
+
+            // Fallback: sample Enquete payloads
+            if (!enqueteDetails) {
+                enqueteDetails = await fetchJson(`../sample/sample-3/Enquete/${currentSurveyId}.json`);
+            }
+
+            if (enqueteDetails) {
+                // If meta not available, derive from details file
+                const name = enqueteDetails.name || { ja: currentSurveyId, en: '' };
+                const displayTitle = enqueteDetails.displayTitle || name;
+                const description = enqueteDetails.description || { ja: '', en: '' };
+                surveyData = {
+                    id: currentSurveyId,
+                    name: getStr(name),
+                    displayTitle: getStr(displayTitle),
+                    description: getStr(description),
+                    memo: surveyInfo?.memo || '',
+                    periodStart: surveyInfo?.periodStart || enqueteDetails.periodStart || '',
+                    periodEnd: surveyInfo?.periodEnd || enqueteDetails.periodEnd || '',
+                    plan: surveyInfo?.plan || 'Standard',
+                    deadline: surveyInfo?.deadline || '',
+                    questionGroups: mapEnqueteToQuestions(enqueteDetails),
+                };
+                // Ensure group title is readable Japanese by default
+                if (surveyData.questionGroups && surveyData.questionGroups.length > 0) {
+                    surveyData.questionGroups[0].title = surveyData.questionGroups[0].title || { ja: 'インポートされた設問', en: 'Imported Questions' };
+                    if (typeof surveyData.questionGroups[0].title === 'object') {
+                        surveyData.questionGroups[0].title.ja = surveyData.questionGroups[0].title.ja || 'インポートされた設問';
+                        surveyData.questionGroups[0].title.en = surveyData.questionGroups[0].title.en || 'Imported Questions';
+                    }
+                }
+                console.log('Successfully constructed survey data (with fallbacks).');
+                try { showToast(`Loaded survey: ${currentSurveyId}`, 'info', 2000); } catch (_) {}
+            } else if (surveyInfo) {
+                // Only list meta available
+                surveyData = {
+                    id: surveyInfo.id,
+                    name: getStr(surveyInfo.name),
+                    displayTitle: getStr(surveyInfo.displayTitle),
+                    description: getStr(surveyInfo.description),
+                    memo: surveyInfo.memo || '',
+                    periodStart: surveyInfo.periodStart || '',
+                    periodEnd: surveyInfo.periodEnd || '',
+                    plan: surveyInfo.plan || 'Standard',
+                    deadline: surveyInfo.deadline || '',
+                    questionGroups: [],
+                };
+                console.warn('Enquete details not found; loaded meta only.');
+                try { showToast(`Loaded survey meta only: ${currentSurveyId}`, 'info', 2500); } catch (_) {}
+            } else {
+                console.warn(`Survey with id "${currentSurveyId}" not found in any known source.`);
+                try { showToast(`Survey not found: ${currentSurveyId}`, 'error', 3000); } catch (_) {}
+            }
+        }
+
+        // 4. If still no data, fall back to the default template
+        if (!surveyData || Object.keys(surveyData).length === 0) {
+            console.log('No survey data found. Fetching fallback template...');
+            surveyData = await fetchSurveyData(); // Reads data/sample_survey.json
+        }
+
+        // Always apply URL query parameter overrides
         const surveyName = params.get('surveyName');
         const displayTitle = params.get('displayTitle');
         const memo = params.get('memo');
         const periodStart = params.get('periodStart');
         const periodEnd = params.get('periodEnd');
 
-        if (surveyName) {
-            if (typeof surveyData.name !== 'object' || surveyData.name === null) surveyData.name = {};
-            surveyData.name.ja = surveyName;
-        }
-        if (displayTitle) {
-            if (typeof surveyData.displayTitle !== 'object' || surveyData.displayTitle === null) surveyData.displayTitle = {};
-            surveyData.displayTitle.ja = displayTitle;
-        }
-        if (memo) {
-            surveyData.memo = memo;
-        }
-        if (periodStart) {
-            surveyData.periodStart = periodStart;
-        }
-        if (periodEnd) {
-            surveyData.periodEnd = periodEnd;
-        }
-        // --- End New ---
+        if (surveyName) surveyData.name = surveyName;
+        if (displayTitle) surveyData.displayTitle = displayTitle;
+        if (memo) surveyData.memo = memo;
+        if (periodStart) surveyData.periodStart = periodStart;
+        if (periodEnd) surveyData.periodEnd = periodEnd;
+
+        // Normalize any multilingual remnants to strings
+        deepNormalizeSurveyData(surveyData);
 
         updateAndRenderAll();
 
-        restoreAccordionState(); // アコーディオンの状態を復元
-        // FABの初期化とアクションの紐付け
+        restoreAccordionState();
         const fabActions = {
-            onAddQuestion: (questionType) => handleAddNewQuestion(null, questionType), // グループIDはnullで渡す（最後のグループに追加するロジック）
+            onAddQuestion: (questionType) => handleAddNewQuestion(null, questionType),
             onAddGroup: () => handleAddNewQuestionGroup()
         };
         initializeFab('fab-container', 'components/fab.html', fabActions);
 
     } catch (error) {
         console.error('Failed to initialize page:', error);
-        console.error('Error details:', error.message, error.stack); // エラーの詳細を追加
+        console.error('Error details:', error.message, error.stack);
         displayErrorMessage();
     }
 }
@@ -302,8 +614,43 @@ function setupEventListeners() {
         if (deleteOptionBtn) {
             const groupId = deleteOptionBtn.closest('.question-group').dataset.groupId;
             const questionId = deleteOptionBtn.closest('.question-item').dataset.questionId;
-            const optionIndex = Array.from(deleteOptionBtn.closest('.options-container').children).indexOf(deleteOptionBtn.closest('.option-item'));
+            const optionsContainer = deleteOptionBtn.closest('.options-container');
+            const items = optionsContainer ? Array.from(optionsContainer.querySelectorAll('.option-item')) : [];
+            const optionEl = deleteOptionBtn.closest('.option-item');
+            const optionIndex = items.indexOf(optionEl);
             handleDeleteOption(groupId, questionId, optionIndex);
+            return;
+        }
+
+        // Matrix add/delete
+        const addRowBtn = target.closest('.add-matrix-row-btn');
+        if (addRowBtn) {
+            const groupId = addRowBtn.closest('.question-group').dataset.groupId;
+            const questionId = addRowBtn.closest('.question-item').dataset.questionId;
+            handleAddMatrixRow(groupId, questionId);
+            return;
+        }
+        const addColBtn = target.closest('.add-matrix-col-btn');
+        if (addColBtn) {
+            const groupId = addColBtn.closest('.question-group').dataset.groupId;
+            const questionId = addColBtn.closest('.question-item').dataset.questionId;
+            handleAddMatrixCol(groupId, questionId);
+            return;
+        }
+        const delRowBtn = target.closest('.delete-matrix-row-btn');
+        if (delRowBtn) {
+            const groupId = delRowBtn.closest('.question-group').dataset.groupId;
+            const questionId = delRowBtn.closest('.question-item').dataset.questionId;
+            const idx = parseInt(delRowBtn.getAttribute('data-index'), 10) || 0;
+            handleDeleteMatrixRow(groupId, questionId, idx);
+            return;
+        }
+        const delColBtn = target.closest('.delete-matrix-col-btn');
+        if (delColBtn) {
+            const groupId = delColBtn.closest('.question-group').dataset.groupId;
+            const questionId = delColBtn.closest('.question-item').dataset.questionId;
+            const idx = parseInt(delColBtn.getAttribute('data-index'), 10) || 0;
+            handleDeleteMatrixCol(groupId, questionId, idx);
             return;
         }
     });
@@ -321,13 +668,26 @@ function setupEventListeners() {
                 }
             }
             console.log('Saved Survey Data to localStorage:', surveyData);
-            alert('アンケートデータがlocalStorageに保存されました！');
+            showToast('アンケートデータが保存されました。');
+        });
+    }
+
+    // キャンセルボタンのイベントリスナー
+    const cancelBtn = document.getElementById('cancelCreateSurvey');
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+            showConfirmationModal(
+                '編集中の内容は保存されませんが、ページを離れてもよろしいですか？',
+                () => {
+                    window.location.href = 'index.html'; // Redirect
+                },
+                '編集のキャンセル'
+            );
         });
     }
 }
 
 // --- Data Manipulation Handlers ---
-
 function handleAddNewQuestionGroup() {
     if (!surveyData.questionGroups) surveyData.questionGroups = [];
     const newGroup = {
@@ -340,9 +700,10 @@ function handleAddNewQuestionGroup() {
 }
 
 function handleDeleteQuestionGroup(groupId) {
-    if (!confirm('この質問グループを削除してもよろしいですか？')) return;
-    surveyData.questionGroups = surveyData.questionGroups.filter(g => g.groupId !== groupId);
-    updateAndRenderAll();
+    showConfirmationModal('この質問グループを削除してもよろしいですか？', () => {
+        surveyData.questionGroups = surveyData.questionGroups.filter(g => g.groupId !== groupId);
+        updateAndRenderAll();
+    }, 'グループの削除');
 }
 
 function handleDuplicateQuestionGroup(groupId) {
@@ -384,9 +745,11 @@ function handleAddNewQuestion(groupId, questionType) {
 
 function handleDeleteQuestion(groupId, questionId) {
     const group = surveyData.questionGroups.find(g => g.groupId === groupId);
-    if (group && confirm('この質問を削除してもよろしいですか？')) {
-        group.questions = group.questions.filter(q => q.questionId !== questionId);
-        updateAndRenderAll();
+    if (group) {
+        showConfirmationModal('この質問を削除してもよろしいですか？', () => {
+            group.questions = group.questions.filter(q => q.questionId !== questionId);
+            updateAndRenderAll();
+        }, '質問の削除');
     }
 }
 
@@ -418,6 +781,78 @@ function handleDeleteOption(groupId, questionId, optionIndex) {
     }
 }
 
+function handleAddMatrixRow(groupId, questionId) {
+    const q = surveyData.questionGroups.find(g => g.groupId === groupId)?.questions.find(q => q.questionId === questionId);
+    if (!q) return;
+    q.matrix = q.matrix || { rows: [], cols: [] };
+    q.matrix.rows = q.matrix.rows || [];
+    q.matrix.rows.push({ text: { ja: `行${q.matrix.rows.length + 1}`, en: '' } });
+    updateAndRenderAll();
+}
+
+function handleAddMatrixCol(groupId, questionId) {
+    const q = surveyData.questionGroups.find(g => g.groupId === groupId)?.questions.find(q => q.questionId === questionId);
+    if (!q) return;
+    q.matrix = q.matrix || { rows: [], cols: [] };
+    q.matrix.cols = q.matrix.cols || [];
+    q.matrix.cols.push({ text: { ja: `列${q.matrix.cols.length + 1}`, en: '' } });
+    updateAndRenderAll();
+}
+
+function handleDeleteMatrixRow(groupId, questionId, index) {
+    const q = surveyData.questionGroups.find(g => g.groupId === groupId)?.questions.find(q => q.questionId === questionId);
+    if (!q || !q.matrix || !Array.isArray(q.matrix.rows)) return;
+    q.matrix.rows.splice(index, 1);
+    updateAndRenderAll();
+}
+
+function handleDeleteMatrixCol(groupId, questionId, index) {
+    const q = surveyData.questionGroups.find(g => g.groupId === groupId)?.questions.find(q => q.questionId === questionId);
+    if (!q || !q.matrix || !Array.isArray(q.matrix.cols)) return;
+    q.matrix.cols.splice(index, 1);
+    updateAndRenderAll();
+}
+
+function handleChangeQuestionType(groupId, questionId, newType) {
+    const group = surveyData.questionGroups.find(g => g.groupId === groupId);
+    if (!group) return;
+    const question = group.questions.find(q => q.questionId === questionId);
+    if (!question) return;
+
+    question.type = newType;
+    const needsOptions = ['single_answer', 'multi_answer'].includes(newType);
+    if (needsOptions) {
+        if (!Array.isArray(question.options)) {
+            question.options = [
+                { text: { ja: '選択肢1', en: '' } },
+                { text: { ja: '選択肢2', en: '' } }
+            ];
+        }
+        if ('matrix' in question) delete question.matrix;
+    } else if (newType === 'matrix_sa' || newType === 'matrix_ma') {
+        // Initialize matrix rows/cols
+        delete question.options;
+        question.matrix = question.matrix || { rows: [], cols: [] };
+        if (!Array.isArray(question.matrix.rows) || question.matrix.rows.length === 0) {
+            question.matrix.rows = [
+                { text: { ja: '行1', en: '' } },
+                { text: { ja: '行2', en: '' } },
+            ];
+        }
+        if (!Array.isArray(question.matrix.cols) || question.matrix.cols.length === 0) {
+            question.matrix.cols = [
+                { text: { ja: '列1', en: '' } },
+                { text: { ja: '列2', en: '' } },
+            ];
+        }
+    } else {
+        if ('options' in question) delete question.options;
+        if ('matrix' in question) delete question.matrix;
+    }
+
+    updateAndRenderAll();
+}
+
 /**
  * フォームの必須項目を検証し、保存ボタンの有効/無効を切り替える。
  */
@@ -426,14 +861,14 @@ function validateFormForSaveButton() {
     if (!saveButton) return;
 
     const requiredFields = [
-        surveyData.name?.ja,
-        surveyData.displayTitle?.ja,
+        typeof surveyData.name === 'object' ? surveyData.name?.ja : surveyData.name,
+        typeof surveyData.displayTitle === 'object' ? surveyData.displayTitle?.ja : surveyData.displayTitle,
         surveyData.periodStart,
         surveyData.periodEnd
     ];
 
     let allValid = requiredFields.every(fieldValue => fieldValue && fieldValue.trim() !== '');
-    
+
     // Also check required questions
     surveyData.questionGroups?.forEach(group => {
         group.questions?.forEach(question => {
@@ -446,15 +881,25 @@ function validateFormForSaveButton() {
     });
 
     saveButton.disabled = !allValid;
+
+    // Inline error highlighting (single-language fields)
+    const elName = document.getElementById('surveyName_ja');
+    const elTitle = document.getElementById('displayTitle_ja');
+    const elStart = document.getElementById('periodStart');
+    const elEnd = document.getElementById('periodEnd');
+    if (elName) elName.classList.toggle('input-error', !(elName.value || '').trim());
+    if (elTitle) elTitle.classList.toggle('input-error', !(elTitle.value || '').trim());
+    if (elStart) elStart.classList.toggle('input-error', !(elStart.value || '').trim());
+    if (elEnd) elEnd.classList.toggle('input-error', !(elEnd.value || '').trim());
 }
 
 // DOMの読み込みが完了したら処理を開始
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOMContentLoaded event fired. Initializing page...'); // 追加
+    console.log('DOMContentLoaded event fired. Initializing page...');
     initializePage();
-    console.log('Page initialized. Setting up event listeners...'); // 追加
+    console.log('Page initialized. Setting up event listeners...');
     setupEventListeners();
-    console.log('Event listeners set up. Attaching preview listener...'); // 追加
+    console.log('Event listeners set up. Attaching preview listener...');
     attachPreviewListener();
     // Re-render on language change
     document.addEventListener('languagechange', (e) => {
@@ -548,17 +993,51 @@ function setupSortables() {
                 }
             });
         });
+
+        // Matrix rows/cols sorting per question (if matrix exists)
+        groupEl.querySelectorAll('.question-item').forEach(qItem => {
+            const qId = qItem.dataset.questionId;
+            const rowsList = qItem.querySelector('.matrix-rows-list');
+            const colsList = qItem.querySelector('.matrix-cols-list');
+            if (rowsList) {
+                new Sortable(rowsList, {
+                    animation: 150,
+                    handle: '.matrix-handle',
+                    draggable: '.matrix-row-item',
+                    chosenClass: 'matrix-chosen',
+                    dragClass: 'matrix-drag',
+                    ghostClass: 'matrix-ghost',
+                    onEnd: (evt) => {
+                        const group = surveyData.questionGroups.find(g => g.groupId === groupId);
+                        const question = group?.questions?.find(q => q.questionId === qId);
+                        if (!question || !question.matrix || !Array.isArray(question.matrix.rows)) return;
+                        arrayMove(question.matrix.rows, evt.oldIndex, evt.newIndex);
+                        updateAndRenderAll();
+                    }
+                });
+            }
+            if (colsList) {
+                new Sortable(colsList, {
+                    animation: 150,
+                    handle: '.matrix-handle',
+                    draggable: '.matrix-col-item',
+                    chosenClass: 'matrix-chosen',
+                    dragClass: 'matrix-drag',
+                    ghostClass: 'matrix-ghost',
+                    onEnd: (evt) => {
+                        const group = surveyData.questionGroups.find(g => g.groupId === groupId);
+                        const question = group?.questions?.find(q => q.questionId === qId);
+                        if (!question || !question.matrix || !Array.isArray(question.matrix.cols)) return;
+                        arrayMove(question.matrix.cols, evt.oldIndex, evt.newIndex);
+                        updateAndRenderAll();
+                    }
+                });
+            }
+        });
     });
 }
 
 // --- Preview Rendering ---
-function getTextLocal(field, lang = 'ja') {
-    if (typeof field === 'object' && field !== null) {
-        return field[lang] || field.ja || '';
-    }
-    return field || '';
-}
-
 function renderSurveyPreview() {
     const container = document.getElementById('modalSurveyPreviewContainer');
     if (!container) return;
@@ -567,33 +1046,72 @@ function renderSurveyPreview() {
     const lines = [];
     lines.push(`<div class="space-y-3">`);
     lines.push(`<div>
-        <div class=\"text-xl font-semibold text-on-surface\">${getTextLocal(surveyData.displayTitle, lang) || getTextLocal(surveyData.name, lang) || '（無題アンケート）'}</div>
-        <div class=\"text-on-surface-variant text-sm\">${surveyData.periodStart || ''} ${(surveyData.periodStart || surveyData.periodEnd) ? '〜' : ''} ${surveyData.periodEnd || ''}</div>
+        <div class="text-xl font-semibold text-on-surface">${getTextLocal(surveyData.displayTitle, lang) || getTextLocal(surveyData.name, lang) || '（無題アンケート）'}</div>
+        <div class="text-on-surface-variant text-sm">${surveyData.periodStart || ''} ${(surveyData.periodStart || surveyData.periodEnd) ? '〜' : ''} ${surveyData.periodEnd || ''}</div>
     </div>`);
     if (surveyData.description) {
-        lines.push(`<p class=\"text-on-surface-variant\">${getTextLocal(surveyData.description, lang)}</p>`);
+        lines.push(`<p class="text-on-surface-variant">${getTextLocal(surveyData.description, lang)}</p>`);
     }
 
     (surveyData.questionGroups || []).forEach((g, gi) => {
-        lines.push(`<div class=\"mt-4\">
-            <h3 class=\"text-on-surface font-bold mb-2\">${getTextLocal(g.title, lang) || `グループ${gi + 1}`}</h3>
+        lines.push(`<div class="mt-4">
+            <h3 class="text-on-surface font-bold mb-2">${getTextLocal(g.title, lang) || `グループ${gi + 1}`}</h3>
         </div>`);
         (g.questions || []).forEach((q, qi) => {
             const qTitle = getTextLocal(q.text, lang) || `設問${qi + 1}`;
-            lines.push(`<div class=\"mb-3\">
-                <div class=\"text-on-surface font-medium\">Q${qi + 1}. ${qTitle} ${q.required ? '<span class=\"text-error text-xs\"(必須)</span>' : ''}</div>`);
+            lines.push(`<div class="mb-3">
+                <div class="text-on-surface font-medium">Q${qi + 1}. ${qTitle} ${q.required ? '<span class="text-error text-xs">(必須)</span>' : ''}</div>`);
             if (q.options && q.options.length) {
                 lines.push('<ul class="list-disc ml-6 text-on-surface-variant">');
                 q.options.forEach(opt => {
                     lines.push(`<li>${getTextLocal(opt.text, lang)}</li>`);
                 });
                 lines.push('</ul>');
+            } else if (q.matrix && Array.isArray(q.matrix.rows) && Array.isArray(q.matrix.cols)) {
+                const cols = q.matrix.cols.map(c => getTextLocal(c.text, lang));
+                const rows = q.matrix.rows.map(r => getTextLocal(r.text, lang));
+                const isSA = q.type === 'matrix_sa';
+                lines.push('<div class="overflow-auto max-h-80 mt-2">');
+                lines.push('<table class="matrix-preview-table min-w-full text-sm border border-outline-variant">');
+                // thead
+                lines.push('<thead class="sticky top-0 z-10"><tr>');
+                lines.push('<th class="matrix-header border border-outline-variant px-2 py-1 bg-surface-variant text-on-surface sticky left-0 z-20">&nbsp;</th>');
+                cols.forEach(label => {
+                    lines.push(`<th class="matrix-header border border-outline-variant px-2 py-1 bg-surface-variant text-on-surface">${label || '&nbsp;'}</th>`);
+                });
+                lines.push('</tr></thead>');
+                // tbody
+                lines.push('<tbody>');
+                rows.forEach((rLabel, rIdx) => {
+                    lines.push('<tr>');
+                    lines.push(`<td class="matrix-row-header border border-outline-variant px-2 py-1 text-on-surface sticky left-0 z-10 bg-surface">${rLabel || '&nbsp;'}</td>`);
+                    cols.forEach((_, cIdx) => {
+                        const icon = isSA ? 'radio_button_unchecked' : 'check_box_outline_blank';
+                        lines.push(`<td class="matrix-cell border border-outline-variant px-2 py-1 text-center"><span class=\"material-icons-outlined matrix-icon\">${icon}</span></td>`);
+                    });
+                    lines.push('</tr>');
+                });
+                lines.push('</tbody>');
+                lines.push('</table>');
+                lines.push('</div>');
             }
             lines.push(`</div>`);
         });
     });
     lines.push(`</div>`);
 
-        container.innerHTML = lines.join('\n');
-
+    container.innerHTML = lines.join('\n');
 }
+
+// Ensure input bindings are attached once
+try {
+    if (!window.__surveyInputBound) {
+        const bindNow = () => { try { setupInputBindings(); } catch(_) {} };
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', bindNow, { once: true });
+        } else {
+            bindNow();
+        }
+        window.__surveyInputBound = true;
+    }
+} catch (_) { /* noop */ }

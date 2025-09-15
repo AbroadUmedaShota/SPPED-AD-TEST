@@ -200,6 +200,93 @@ body.dark-mode {
     background-color: var(--color-button-primary-hover-bg);
 }
 
+/* Matrix drag styles */
+.matrix-row-item,
+.matrix-col-item {
+    transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+.matrix-handle:hover,
+.handle:hover {
+    color: var(--color-primary);
+}
+
+.matrix-chosen {
+    background-color: var(--color-base-background-sub);
+    border: 1px dashed var(--color-primary);
+    border-radius: 8px;
+}
+
+.matrix-drag {
+    cursor: grabbing !important;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+.matrix-ghost {
+    opacity: 0.6;
+    background-color: var(--color-base-background-sub);
+}
+
+/* Matrix preview table styles */
+.matrix-preview-table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+.matrix-preview-table thead .matrix-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: var(--color-base-background-sub);
+}
+.matrix-preview-table tbody tr:nth-child(odd) {
+    background-color: rgba(0,0,0,0.02);
+}
+.matrix-preview-table .matrix-row-header {
+    position: sticky;
+    left: 0;
+    z-index: 5;
+    background-color: var(--color-base-card);
+    font-weight: 500;
+}
+.matrix-preview-table .matrix-cell {
+    vertical-align: middle;
+}
+.matrix-preview-table .matrix-cell:hover {
+    background-color: rgba(66,133,244,0.08); /* primary tint */
+}
+.matrix-icon {
+    font-size: 18px;
+    color: var(--color-text-sub);
+}
+
+/* ===== Temporary single-language mode (omit EN fields) ===== */
+/* Hide EN inputs and labels within multi-language input groups */
+.multi-lang-input-group input[data-lang="en"],
+.multi-lang-input-group input[data-lang="en"] + label {
+    display: none !important;
+}
+/* Hide EN option inputs and labels */
+.multi-lang-input-group .option-text-input[data-lang="en"],
+.multi-lang-input-group .option-text-input[data-lang="en"] + label {
+    display: none !important;
+}
+/* Hide basic-info EN fields and labels */
+#surveyName_en, label[for="surveyName_en"],
+#displayTitle_en, label[for="displayTitle_en"],
+#description_en, label[for="description_en"] {
+    display: none !important;
+}
+/* Hide language switcher in header */
+#language-switcher-button,
+#language-switcher-dropdown {
+    display: none !important;
+}
+
+/* Inline error styling for required fields */
+.input-error {
+    border-color: var(--color-input-border-error) !important;
+    box-shadow: 0 0 0 1px var(--color-input-border-error);
+}
+
 .hover-bg-secondary-hover:hover {
     background-color: var(--color-button-secondary-hover-bg);
 }
