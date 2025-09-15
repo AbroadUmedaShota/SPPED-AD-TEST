@@ -92,18 +92,22 @@ function renderTableRows(surveysToRender) {
 
         switch (survey.status) {
             case '会期中':
+            case '実施中':
                 statusColorClass = 'bg-green-100 text-green-800';
                 statusTitle = '現在回答を受け付けている状態';
                 displayStatus = '会期中';
                 break;
             case '会期前':
             case '準備中': // 内部ステータス
+            case '草稿':
                 displayStatus = '会期前';
                 statusColorClass = 'bg-yellow-100 text-yellow-800';
                 statusTitle = 'まだ回答を受け付けていない状態';
                 break;
             case 'データ化中':
             case 'アップ待ち': // 内部ステータス
+            case 'データ入力中':
+            case 'データ入力':
                 displayStatus = 'データ化中';
                 statusColorClass = 'bg-blue-100 text-blue-800';
                 statusTitle = '名刺データの入力・照合作業が進行中';
