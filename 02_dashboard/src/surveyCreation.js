@@ -11,6 +11,7 @@ import {
     renderOutlineMap
 } from './ui/surveyRenderer.js';
 import { initializeFab } from './ui/fab.js';
+import { initializeDatepickers } from './ui/datepicker.js';
 import { loadCommonHtml } from './utils.js';
 import { showToast } from './utils.js';
 import { showConfirmationModal } from './confirmationModal.js';
@@ -123,6 +124,8 @@ function updateAndRenderAll() {
     validateFormForSaveButton();
     // Initialize Sortable after rendering
     setupSortables();
+    // Ensure accordion headers are accessible (ARIA) after each render
+    enhanceAccordionA11y();
 }
 
 // --- Input Bindings ---
@@ -376,6 +379,8 @@ async function initializePage() {
         initThemeToggle();
         initBreadcrumbs();
         initLanguageSwitcher();
+        // Initialize date pickers for period/deadline fields
+        try { initializeDatepickers(); } catch (_) {}
 
         const params = new URLSearchParams(window.location.search);
         currentSurveyId = params.get('surveyId');
@@ -536,6 +541,14 @@ function restoreAccordionState() {
             content.style.display = 'block';
             icon.textContent = 'expand_less';
         }
+        // A11y attributes
+        if (header) {
+            header.setAttribute('role', 'button');
+            header.setAttribute('tabindex', '0');
+            if (contentId) header.setAttribute('aria-controls', contentId);
+            const isOpen = content ? (getComputedStyle(content).display !== 'none') : true;
+            header.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        }
     });
 }
 
@@ -543,20 +556,32 @@ function restoreAccordionState() {
  * アコーディオンの初期化処理
  */
 function initializeAccordion() {
-    document.body.addEventListener('click', (event) => {
-        const header = event.target.closest('.accordion-header');
+    const toggle = (header) => {
         if (!header) return;
-
-        const contentId = header.dataset.accordionTarget;
-        const content = document.getElementById(contentId);
+        const contentId = header.getAttribute('data-accordion-target');
+        const content = contentId ? document.getElementById(contentId) : null;
         const icon = header.querySelector('.expand-icon');
+        if (!content) return;
+        const isOpen = getComputedStyle(content).display !== 'none';
+        content.style.display = isOpen ? 'none' : 'block';
+        if (icon) icon.textContent = isOpen ? 'expand_more' : 'expand_less';
+        header.setAttribute('aria-expanded', (!isOpen) ? 'true' : 'false');
+        saveAccordionState(contentId, !isOpen);
+    };
 
-        if (content) {
-            const isOpen = content.style.display === 'block';
-            content.style.display = isOpen ? 'none' : 'block';
-            icon.textContent = isOpen ? 'expand_more' : 'expand_less';
-            saveAccordionState(contentId, !isOpen);
+    document.body.addEventListener('click', (event) => {
+        const header = event.target.closest('.accordion-header, .group-header');
+        if (header) {
+            toggle(header);
         }
+    });
+
+    document.body.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        const header = event.target.closest('.accordion-header, .group-header');
+        if (!header) return;
+        event.preventDefault();
+        toggle(header);
     });
 }
 
@@ -860,20 +885,26 @@ function validateFormForSaveButton() {
     const saveButton = document.getElementById('createSurveyBtn');
     if (!saveButton) return;
 
-    const requiredFields = [
-        typeof surveyData.name === 'object' ? surveyData.name?.ja : surveyData.name,
-        typeof surveyData.displayTitle === 'object' ? surveyData.displayTitle?.ja : surveyData.displayTitle,
-        surveyData.periodStart,
-        surveyData.periodEnd
-    ];
+    const nameVal = typeof surveyData.name === 'object' ? (surveyData.name?.ja || surveyData.name?.en || '') : (surveyData.name || '');
+    const titleVal = typeof surveyData.displayTitle === 'object' ? (surveyData.displayTitle?.ja || surveyData.displayTitle?.en || '') : (surveyData.displayTitle || '');
+    const periodStartVal = surveyData.periodStart || '';
+    const periodEndVal = surveyData.periodEnd || '';
 
-    let allValid = requiredFields.every(fieldValue => fieldValue && fieldValue.trim() !== '');
+    let allValid = [nameVal, titleVal, periodStartVal, periodEndVal].every(v => v && v.trim() !== '');
 
-    // Also check required questions
+    // Date order check (YYYY-MM-DD lexicographical works)
+    let dateOrderValid = true;
+    if (periodStartVal && periodEndVal) {
+        dateOrderValid = periodEndVal >= periodStartVal;
+        if (!dateOrderValid) allValid = false;
+    }
+
+    // Also check required questions (string/object safe)
     surveyData.questionGroups?.forEach(group => {
         group.questions?.forEach(question => {
             if (question.required) {
-                if (!question.text?.ja || question.text.ja.trim() === '') {
+                const qText = typeof question.text === 'object' ? (question.text?.ja || question.text?.en || '') : (question.text || '');
+                if (!qText || qText.trim() === '') {
                     allValid = false;
                 }
             }
@@ -882,15 +913,56 @@ function validateFormForSaveButton() {
 
     saveButton.disabled = !allValid;
 
-    // Inline error highlighting (single-language fields)
+    // Inline error highlighting and aria-invalid
     const elName = document.getElementById('surveyName_ja');
     const elTitle = document.getElementById('displayTitle_ja');
     const elStart = document.getElementById('periodStart');
     const elEnd = document.getElementById('periodEnd');
-    if (elName) elName.classList.toggle('input-error', !(elName.value || '').trim());
-    if (elTitle) elTitle.classList.toggle('input-error', !(elTitle.value || '').trim());
-    if (elStart) elStart.classList.toggle('input-error', !(elStart.value || '').trim());
-    if (elEnd) elEnd.classList.toggle('input-error', !(elEnd.value || '').trim());
+
+    const nameError = document.getElementById('surveyNameError');
+    const titleError = document.getElementById('displayTitleError');
+    const startError = document.getElementById('periodStartError');
+    const endError = document.getElementById('periodEndError');
+
+    const toggleErr = (el, errEl, condition, message) => {
+        if (!el || !errEl) return;
+        el.classList.toggle('input-error', condition);
+        el.setAttribute('aria-invalid', condition ? 'true' : 'false');
+        if (message) errEl.textContent = message;
+        errEl.classList.toggle('hidden', !condition);
+    };
+
+    toggleErr(elName, nameError, !(elName?.value || '').trim(), 'この入力は必須です');
+    toggleErr(elTitle, titleError, !(elTitle?.value || '').trim(), 'この入力は必須です');
+
+    const startMissing = !(elStart?.value || '').trim();
+    const endMissing = !(elEnd?.value || '').trim();
+    toggleErr(elStart, startError, startMissing, 'この入力は必須です');
+    toggleErr(elEnd, endError, endMissing, 'この入力は必須です');
+
+    // Order error on end field
+    const showOrderError = !startMissing && !endMissing && !dateOrderValid;
+    if (elEnd && endError) {
+        if (showOrderError) endError.textContent = '終了日は開始日以降にしてください。';
+        // Keep error visible if missing or order error
+        endError.classList.toggle('hidden', !(endMissing || showOrderError));
+        elEnd.setAttribute('aria-invalid', (endMissing || showOrderError) ? 'true' : 'false');
+        elEnd.classList.toggle('input-error', endMissing || showOrderError);
+    }
+}
+
+// Ensure accordion headers are keyboard/AT friendly
+function enhanceAccordionA11y() {
+    const headers = document.querySelectorAll('.accordion-header, .group-header');
+    headers.forEach(header => {
+        const contentId = header.getAttribute('data-accordion-target');
+        header.setAttribute('role', 'button');
+        header.setAttribute('tabindex', '0');
+        if (contentId) header.setAttribute('aria-controls', contentId);
+        const content = contentId ? document.getElementById(contentId) : null;
+        const isOpen = content ? (getComputedStyle(content).display !== 'none') : true;
+        header.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
 }
 
 // DOMの読み込みが完了したら処理を開始

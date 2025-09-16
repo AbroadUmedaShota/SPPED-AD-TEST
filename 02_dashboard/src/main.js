@@ -10,7 +10,7 @@ import { initThankYouEmailSettings } from './thankYouEmailSettings.js';
 import { initInvoiceListPage } from './invoiceList.js';
 import { initIndexPage } from './indexPage.js';
 import { initializePage as initSpeedReviewPage } from './speed-review.js'; // Import initializePage from speed-review.js
-import { initGroupEditPage } from '../../sample/sample-2/group-edit.js';
+import { initGroupEditPage } from '../data/sample-2/group-edit.js';
 
 import { showToast, copyTextToClipboard, loadCommonHtml } from './utils.js';
 
@@ -88,8 +88,8 @@ window.copyUrl = async function(inputElement) {
 document.addEventListener('DOMContentLoaded', async () => {
 
     // 共通要素の読み込み（動的パス解決）
-    const isSamplePage = window.location.pathname.includes('/sample/');
-    const commonPath = isSamplePage ? '../../02_dashboard/common/' : 'common/';
+    const isDataPage = window.location.pathname.includes('/data/');
+    const commonPath = isDataPage ? '../../common/' : 'common/';
 
     await loadCommonHtml('header-placeholder', `${commonPath}header.html`);
     await loadCommonHtml('sidebar-placeholder', `${commonPath}sidebar.html`, initSidebarHandler);
@@ -196,3 +196,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     
 });
+
+  
+});
+

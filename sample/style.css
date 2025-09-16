@@ -1,4 +1,0 @@
-/* SPEEDレビューページのテーブル行ホバーエフェクトを強化 */
-.review-table tbody tr:hover {
-    background-color: var(--color-button-secondary-bg, #E0EDFF);
-}
