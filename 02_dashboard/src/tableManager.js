@@ -35,7 +35,7 @@ export async function fetchSurveyData() {
     if (loadingIndicator) loadingIndicator.classList.remove('hidden');
 
     try {
-        const response = await fetch('data/surveys.json');
+        const response = await fetch('data/surveys-with-details.json');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
