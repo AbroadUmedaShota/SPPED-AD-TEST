@@ -131,7 +131,7 @@
 *   **使用技術:** HTML, CSS, JavaScriptおよび指定されたライブラリを使用します。
 
 ## フロントエンドの構造
-- 共通HTMLは `02_dashboard/common/` 配下に配置し、`loadCommonHtml` で読み込む。デモページから利用する場合は `window.__COMMON_BASE_PATH` を設定してから呼び出す。
+- 共通HTMLは  `02_dashboard/common/` 配下に配置し、`loadCommonHtml` で読み込む。デモページなど `02_dashboard/` 配下のサブディレクトリでは自動的にベースパスを計算するが、必要に応じて `window.__COMMON_BASE_PATH` を指定して補正できる。 
 - 画面モジュールは `02_dashboard/src/` に集約し、デモ専用コードは `02_dashboard/demos/` に配置。
 - ダッシュボード用モックデータは `data/dashboard/` 以下に整理されており、`resolveDashboardDataPath` を通じて参照する。
 

@@ -8,6 +8,9 @@
 - [2025-09-17] Survey list actions now expose SPEED Review and analytics demo shortcuts.
 - [2025-09-17] Moved group-edit demo under `02_dashboard/group-edit/` and linked it from the sidebar.
 - [2025-09-17] Added back-navigation guard (`pageshow`) to refresh survey list after bfcache restore.
+- [2025-09-18] Created `tools/` with a README and relocated automation helpers (`add_question_types.py`, `csv_to_json.*`, GitHub CLI scripts).
+- [2025-09-18] Moved issue/PR templates into `docs/templates/` and updated `tools/create_issue.sh` to consume the canonical `issue_body.md`.
+- [2025-09-18] Consolidated reference artefacts under `docs/resources/` and triaged temporary files into `archive/temp/`.
 
 ## Objectives
 - Consolidate duplicated source trees so the dashboard uses a single module set.
@@ -19,7 +22,7 @@
 - `src/` replicates older versions of files that also exist in `02_dashboard/src/`; timestamps show the `02_dashboard` copies are newer and include additional modules (`graph-page.js`, `indexPage.js`, etc.).
 - HTML fragments live in both `modals/` and `02_dashboard/modals/`, plus shared layout pieces under `02_dashboard/common/`; it is unclear which directory is authoritative.
 - Mock data recently migrated to `data/dashboard/`; audit for lingering hard-coded paths and ensure large dumps stay archived.
-- Project root contains helper scripts (`add_question_types.py`, `csv_to_json.*`), temp issue templates, and archives (`siryou/`, `06_other/`, `temp/`) alongside application code.
+- [Resolved 2025-09-18] Project root previously mixed helper scripts, templates, and archives. Assets now live under `tools/`, `docs/templates/`, and `docs/resources/`, with temp files archived in `archive/temp/`.
 
 ## Canonical Directories (target)
 - Dashboard app: keep everything under `02_dashboard/` (`index.html`, `src/`, `assets/`, `data/`).

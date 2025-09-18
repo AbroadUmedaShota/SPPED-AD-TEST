@@ -137,8 +137,29 @@ export function downloadFile(url, filename) {
  * @param {string} placeholderId The ID of the HTML element to insert the content into.
  * @param {string} filePath The path to the HTML file to load.
  */
+function resolveCommonBasePath() {
+    if (Object.prototype.hasOwnProperty.call(window, '__COMMON_BASE_PATH')) {
+        return typeof window.__COMMON_BASE_PATH === 'string' ? window.__COMMON_BASE_PATH : '';
+    }
+
+    const marker = '/02_dashboard/';
+    const pathname = window.location.pathname;
+    const markerIndex = pathname.lastIndexOf(marker);
+    if (markerIndex === -1) {
+        return '';
+    }
+
+    const subPath = pathname.slice(markerIndex + marker.length);
+    const segments = subPath.split('/').filter(Boolean);
+    if (segments.length <= 1) {
+        return '';
+    }
+
+    const depth = segments.length - 1;
+    return '../'.repeat(depth);
+}
 export async function loadCommonHtml(placeholderId, filePath, callback = null) {
-    const basePath = window.__COMMON_BASE_PATH || '';
+    const basePath = resolveCommonBasePath();
     const resolvedPath = filePath.startsWith('/') ? filePath : `${basePath}${filePath}`;
 
     try {
@@ -237,4 +258,5 @@ export function showMessage(overlayId, message) {
         overlay.classList.remove('hidden');
     }
 }
+
 

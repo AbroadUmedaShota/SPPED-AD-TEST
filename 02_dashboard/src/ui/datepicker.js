@@ -1,5 +1,5 @@
 import flatpickr from 'https://cdn.jsdelivr.net/npm/flatpickr';
-import { Japanese } from 'https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js';
+import { Japanese } from 'https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js?module';
 
 /**
  * 日付ピッカーを初期化する

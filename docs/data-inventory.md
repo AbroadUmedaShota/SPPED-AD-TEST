@@ -8,7 +8,7 @@
 - `services/surveyService.js`: now points to `data/dashboard/surveys/sample_survey.json`.
 - `groupService.js`: distinguishes between `data/dashboard/core/groups.json` (runtime) and `data/dashboard/core/groups.sample.json` (demo).
 - `graph-page.js`: consumes `data/dashboard/demos/sample-3/Enquete/<id>.json` and `.../Answer/<id>.json`.
-- `02_dashboard/group-edit/`: mock group-management screen (set `window.__COMMON_BASE_PATH` to `../` before loading common partials).
+-  `02_dashboard/group-edit/`: mock group-management screen. Base paths are auto-detected; override `window.__COMMON_BASE_PATH` (e.g., set to `../`) only if the assets live outside the standard structure. 
 ## Directory Structure
 - `data/dashboard/core/`: shared lookups (`surveys.json`, `groups.json`, `groups.sample.json`, `users.json`, `invoices.json`).
 - `data/dashboard/surveys/`: survey definitions (`surveys-with-details.json`, `sample_survey.json`, `enquete/`).
