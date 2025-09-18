@@ -12,8 +12,7 @@ import {
 } from './ui/surveyRenderer.js';
 import { initializeFab } from './ui/fab.js';
 import { initializeDatepickers } from './ui/datepicker.js';
-import { loadCommonHtml } from './utils.js';
-import { showToast } from './utils.js';
+import { loadCommonHtml, showToast, resolveDashboardDataPath } from './utils.js';
 import { showConfirmationModal } from './confirmationModal.js';
 
 // --- Global State ---
@@ -407,24 +406,24 @@ async function initializePage() {
         if ((!surveyData || Object.keys(surveyData).length === 0) && currentSurveyId) {
             console.log(`Fetching data for surveyId: ${currentSurveyId}`);
 
-            // Try 02_dashboard/data first
-            let surveysList = await fetchJson('./data/surveys.json');
+            // Load canonical dataset from `/data/dashboard/`
+            let surveysList = await fetchJson(resolveDashboardDataPath('core/surveys.json'));
             let surveyInfo = surveysList?.find(s => s.id === currentSurveyId) || null;
             let enqueteDetails = null;
 
             if (surveyInfo) {
-                enqueteDetails = await fetchJson(`./data/enquete/${currentSurveyId}.json`);
+                enqueteDetails = await fetchJson(resolveDashboardDataPath(`surveys/enquete/${currentSurveyId}.json`));
             }
 
-            // Fallback: root data/surveys.json (if exists)
+            // Re-fetch canonical surveys list to ensure metadata is available
             if (!surveyInfo) {
-                surveysList = await fetchJson('../data/surveys.json');
+                surveysList = await fetchJson(resolveDashboardDataPath('core/surveys.json'));
                 surveyInfo = surveysList?.find(s => s.id === currentSurveyId) || null;
             }
 
             // Fallback: sample Enquete payloads
             if (!enqueteDetails) {
-                enqueteDetails = await fetchJson(`../sample/sample-3/Enquete/${currentSurveyId}.json`);
+                enqueteDetails = await fetchJson(resolveDashboardDataPath(`demos/sample-3/Enquete/${currentSurveyId}.json`));
             }
 
             if (enqueteDetails) {
@@ -479,7 +478,7 @@ async function initializePage() {
         // 4. If still no data, fall back to the default template
         if (!surveyData || Object.keys(surveyData).length === 0) {
             console.log('No survey data found. Fetching fallback template...');
-            surveyData = await fetchSurveyData(); // Reads data/sample_survey.json
+            surveyData = await fetchSurveyData(); // Reads data/dashboard/surveys/sample_survey.json
         }
 
         // Always apply URL query parameter overrides

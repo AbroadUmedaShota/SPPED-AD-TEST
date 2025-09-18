@@ -1,4 +1,4 @@
-import { loadCommonHtml, showLoading, hideLoading, showMessage, downloadFile } from './utils.js';
+import { loadCommonHtml, showLoading, hideLoading, showMessage, downloadFile, resolveDashboardDataPath } from './utils.js';
 import { initSidebarHandler } from './sidebarHandler.js';
 import { initBreadcrumbs } from './breadcrumb.js';
 
@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function loadInvoiceDetail(invoiceId) {
     showLoading('invoice-detail-loading-overlay');
     try {
-        const response = await fetch('data/invoices.json');
+        const response = await fetch(resolveDashboardDataPath('core/invoices.json'));
         if (!response.ok) {
             throw new Error('請求書データの読み込みに失敗しました。');
         }

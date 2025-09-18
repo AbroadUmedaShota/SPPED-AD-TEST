@@ -191,7 +191,7 @@
 
     async function loadAndPrintInvoice(invoiceId) {
         try {
-            const response = await fetch('data/invoices.json');
+            const response = await fetch('/data/dashboard/core/invoices.json');
             if (!response.ok) throw new Error('Failed to load invoice data.');
             const invoices = await response.json();
             const invoice = invoices.find(inv => inv.invoiceId === invoiceId);

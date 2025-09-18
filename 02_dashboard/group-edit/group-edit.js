@@ -1,5 +1,5 @@
-import { showConfirmationModal } from '../../02_dashboard/src/confirmationModal.js';
-import { handleOpenModal, closeModal } from '../../02_dashboard/src/modalHandler.js';
+import { showConfirmationModal } from '../src/confirmationModal.js';
+import { handleOpenModal, closeModal } from '../src/modalHandler.js';
 
 export function initGroupEditPage() {
     // --- DOM要素の取得 ---

@@ -2,6 +2,13 @@
 let scrollPosition = 0; // Stores scroll position for `lockScroll`/`unlockScroll`
 let activeUIsCount = 0; // Tracks number of active UI overlays (modals, mobile sidebar)
 
+export const DASHBOARD_DATA_ROOT = '/data/dashboard';
+
+export function resolveDashboardDataPath(relativePath) {
+    const sanitized = relativePath.replace(/^\/+/, '');
+    return `${DASHBOARD_DATA_ROOT}/${sanitized}`;
+}
+
 /**
  * Prevents scrolling on the body element.
  * Captures current scroll position and applies fixed positioning.
@@ -131,10 +138,13 @@ export function downloadFile(url, filename) {
  * @param {string} filePath The path to the HTML file to load.
  */
 export async function loadCommonHtml(placeholderId, filePath, callback = null) {
+    const basePath = window.__COMMON_BASE_PATH || '';
+    const resolvedPath = filePath.startsWith('/') ? filePath : `${basePath}${filePath}`;
+
     try {
-        const response = await fetch(filePath);
+        const response = await fetch(resolvedPath);
         if (!response.ok) {
-            throw new Error(`Failed to load ${filePath}: ${response.statusText}`);
+            throw new Error(`Failed to load ${resolvedPath}: ${response.statusText}`);
         }
         const html = await response.text();
         const placeholder = document.getElementById(placeholderId);
@@ -227,3 +237,4 @@ export function showMessage(overlayId, message) {
         overlay.classList.remove('hidden');
     }
 }
+

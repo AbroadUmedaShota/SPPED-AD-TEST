@@ -1,3 +1,5 @@
+import { resolveDashboardDataPath } from './utils.js';
+
 document.addEventListener('DOMContentLoaded', async () => {
     const surveyContainer = document.getElementById('survey-container');
     const surveyHeader = document.getElementById('survey-header');
@@ -16,8 +18,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         // 2. 必要なJSONデータを並行して取得
         const [surveysRes, sampleSurveyRes] = await Promise.all([
-            fetch('data/surveys.json'),
-            fetch('data/sample_survey.json')
+            fetch(resolveDashboardDataPath('core/surveys.json')),
+            fetch(resolveDashboardDataPath('surveys/sample_survey.json'))
         ]);
 
         if (!surveysRes.ok || !sampleSurveyRes.ok) {

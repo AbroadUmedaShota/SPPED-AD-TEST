@@ -1,3 +1,4 @@
+import { resolveDashboardDataPath } from '../utils.js';
 /**
  * アンケートデータをサーバーやファイルから取得します。
  * @returns {Promise<object>} アンケートデータのJSONオブジェクト
@@ -6,7 +7,7 @@
 export async function fetchSurveyData() {
     try {
         // 現在はローカルのJSONを指していますが、将来的にはAPIエンドポイントに変更可能
-        const response = await fetch('../../data/sample_survey.json');
+        const response = await fetch(resolveDashboardDataPath('surveys/sample_survey.json'));
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }

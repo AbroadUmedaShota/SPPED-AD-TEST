@@ -1,11 +1,14 @@
+import { resolveDashboardDataPath } from '../utils.js';
+
 /**
  * 請求書データを取得します。
  * @returns {Promise<Array>} 請求書データの配列を返すPromise。
  * @throws {Error} データの取得に失敗した場合。
  */
+
 export async function fetchInvoices() {
     try {
-        const response = await fetch('data/invoices.json');
+        const response = await fetch(resolveDashboardDataPath('core/invoices.json'));
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }

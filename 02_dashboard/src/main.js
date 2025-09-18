@@ -1,3 +1,21 @@
+// Navigation state handling
+
+const INDEX_PAGE_PATHS = new Set(['index.html', '']);
+window.__INDEX_PAGE_SEEN = window.__INDEX_PAGE_SEEN || false;
+
+window.addEventListener('pageshow', async () => {
+    const page = window.location.pathname.split('/').pop();
+    if (INDEX_PAGE_PATHS.has(page)) {
+        if (window.__INDEX_PAGE_SEEN) {
+            const { reloadSurveyData } = await import('./tableManager.js');
+            await reloadSurveyData();
+        }
+        window.__INDEX_PAGE_SEEN = true;
+    }
+});
+// --- Imports ---
+
+
 import { handleOpenModal, closeModal, openModal } from './modalHandler.js';
 import { initTableManager, applyFiltersAndPagination } from './tableManager.js';
 import { initSidebarHandler, adjustLayout } from './sidebarHandler.js';
@@ -10,7 +28,7 @@ import { initThankYouEmailSettings } from './thankYouEmailSettings.js';
 import { initInvoiceListPage } from './invoiceList.js';
 import { initIndexPage } from './indexPage.js';
 import { initializePage as initSpeedReviewPage } from './speed-review.js'; // Import initializePage from speed-review.js
-import { initGroupEditPage } from '../data/sample-2/group-edit.js';
+import { initGroupEditPage } from './group-edit/group-edit.js';
 
 import { showToast, copyTextToClipboard, loadCommonHtml } from './utils.js';
 
@@ -88,12 +106,9 @@ window.copyUrl = async function(inputElement) {
 document.addEventListener('DOMContentLoaded', async () => {
 
     // 共通要素の読み込み（動的パス解決）
-    const isDataPage = window.location.pathname.includes('/data/');
-    const commonPath = isDataPage ? '../../common/' : 'common/';
-
-    await loadCommonHtml('header-placeholder', `${commonPath}header.html`);
-    await loadCommonHtml('sidebar-placeholder', `${commonPath}sidebar.html`, initSidebarHandler);
-    await loadCommonHtml('footer-placeholder', `${commonPath}footer.html`);
+    await loadCommonHtml('header-placeholder', 'common/header.html');
+    await loadCommonHtml('sidebar-placeholder', 'common/sidebar.html', initSidebarHandler);
+    await loadCommonHtml('footer-placeholder', 'common/footer.html');
 
     // Initialize the language switcher after the header is loaded
     initLanguageSwitcher();
@@ -190,13 +205,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Initial layout adjustment on load
     adjustLayout();
-    
+
     // Adjust on window resize
     window.addEventListener('resize', adjustLayout);
 
-    
 });
-
-  
-});
-

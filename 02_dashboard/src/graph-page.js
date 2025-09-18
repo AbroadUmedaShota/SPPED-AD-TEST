@@ -1,5 +1,6 @@
 import { speedReviewService } from '../02_dashboard/src/services/speedReviewService.js';
 import { initBreadcrumbs } from '../02_dashboard/src/breadcrumb.js';
+import { resolveDashboardDataPath } from './utils.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     initGraphPage();
@@ -81,11 +82,11 @@ async function loadAndRenderCharts(surveyId) {
 
         // 1. Fetch survey definition and answer data in parallel
         const [surveyDefinition, answers] = await Promise.all([
-            fetch(`data/sample-3/Enquete/${surveyId}.json`).then(res => {
+            fetch(resolveDashboardDataPath(`demos/sample-3/Enquete/${surveyId}.json`)).then(res => {
                 if (!res.ok) throw new Error(`アンケート定義ファイルが見つかりません: ${surveyId}.json`);
                 return res.json();
             }),
-            fetch(`data/sample-3/Answer/${surveyId}.json`).then(res => {
+            fetch(resolveDashboardDataPath(`demos/sample-3/Answer/${surveyId}.json`)).then(res => {
                 if (!res.ok) return [];
                 return res.json();
             })

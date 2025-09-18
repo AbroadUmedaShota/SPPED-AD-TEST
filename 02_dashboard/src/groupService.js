@@ -1,3 +1,5 @@
+import { resolveDashboardDataPath } from './utils.js';
+
 let groups = []; // メモリ上のグループデータ
 
 /**
@@ -7,7 +9,8 @@ let groups = []; // メモリ上のグループデータ
  */
 export async function fetchGroups() {
     const isSamplePage = window.location.pathname.includes('/sample/');
-    const dataPath = isSamplePage ? '../../02_dashboard/data/groups.json' : 'data/groups.json';
+    const dataFile = isSamplePage ? 'core/groups.sample.json' : 'core/groups.json';
+    const dataPath = resolveDashboardDataPath(dataFile);
 
     try {
         const response = await fetch(dataPath);

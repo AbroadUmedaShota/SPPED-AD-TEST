@@ -5,7 +5,7 @@
 - Source (ES modules): `02_dashboard/src/`, `src/`.
 - Services: `.../src/services/` (e.g., `invoiceService.js`, `surveyService.js`).
 - UI renderers: `.../src/ui/` (e.g., `invoiceRenderer.js`, `surveyRenderer.js`).
-- Shared helpers: `utils.js`. Data fixtures: `data/*.json`. Docs: `docs/` (start with `docs/README.md`).
+- Shared helpers: `utils.js`. Data fixtures: `data/dashboard/**/*.json` (legacy duplicates live under `archive/`). Docs: `docs/` (start with `docs/README.md`).
 
 ## Build, Test, and Development Commands
 - Static site; no build step.

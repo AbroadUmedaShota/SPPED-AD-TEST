@@ -1,5 +1,6 @@
 console.log("SCRIPT LOADED: speed-review.js");
 
+import { resolveDashboardDataPath } from './utils.js';
 import { speedReviewService } from './services/speedReviewService.js';
 import { populateTable, renderModalContent } from './ui/speedReviewRenderer.js';
 import { handleOpenModal } from './modalHandler.js';
@@ -420,16 +421,16 @@ export async function initializePage() {
 
         // 1. Fetch all data sources in parallel
         const [surveys, answers, personalInfo, enqueteDetails] = await Promise.all([
-            fetch('./data/surveys.json').then(res => res.json()),
-            fetch(`../../sample/sample-3/Answer/${surveyId}.json`).then(res => {
+            fetch(resolveDashboardDataPath('core/surveys.json')).then(res => res.json()),
+            fetch(resolveDashboardDataPath(`demos/sample-3/Answer/${surveyId}.json`)).then(res => {
                 if (!res.ok) return []; // Return empty array if answer file not found
                 return res.json();
             }),
-            fetch(`../../sample/sample-3/ダミー個人情報/${surveyId}.json`).then(res => {
+            fetch(resolveDashboardDataPath(`demos/sample-3/ダミー個人情報/${surveyId}.json`)).then(res => {
                 if (!res.ok) return []; // Return empty array if personal info file not found
                 return res.json();
             }),
-            fetch(`../../sample/sample-3/Enquete/${surveyId}.json`).then(res => {
+            fetch(resolveDashboardDataPath(`demos/sample-3/Enquete/${surveyId}.json`)).then(res => {
                 if (!res.ok) return {}; // Return empty object if enquete file not found
                 return res.json();
             })
@@ -442,19 +443,19 @@ export async function initializePage() {
 
         try {
             if (!Array.isArray(answersData) || answersData.length === 0) {
-                const r1 = await fetch(`./data/answers/${surveyId}.json`);
+                const r1 = await fetch(resolveDashboardDataPath(`responses/answers/${surveyId}.json`));
                 answersData = r1.ok ? await r1.json() : [];
             }
         } catch {}
         try {
             if (!Array.isArray(personalInfoData) || personalInfoData.length === 0) {
-                const r2 = await fetch(`./data/business-cards/${surveyId}.json`);
+                const r2 = await fetch(resolveDashboardDataPath(`responses/business-cards/${surveyId}.json`));
                 personalInfoData = r2.ok ? await r2.json() : [];
             }
         } catch {}
         try {
             if (!enqueteDetailsData || !enqueteDetailsData.details) {
-                const r3 = await fetch(`./data/enquete/${surveyId}.json`);
+                const r3 = await fetch(resolveDashboardDataPath(`surveys/enquete/${surveyId}.json`));
                 enqueteDetailsData = r3.ok ? await r3.json() : {};
             }
         } catch {}
