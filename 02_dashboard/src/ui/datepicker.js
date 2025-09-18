@@ -1,27 +1,36 @@
-import flatpickr from 'https://cdn.jsdelivr.net/npm/flatpickr';
-import { Japanese } from 'https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js?module';
+import 'https://cdn.jsdelivr.net/npm/flatpickr';
+import 'https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js';
+
+const flatpickrInstance = window.flatpickr;
+const JAPANESE_LOCALE = flatpickrInstance?.l10ns?.ja ?? flatpickrInstance?.l10ns?.default ?? {};
 
 /**
  * 日付ピッカーを初期化する
  */
 export function initializeDatepickers() {
-    flatpickr.localize(Japanese);
+    if (!flatpickrInstance) {
+        console.warn('flatpickr is not loaded.');
+        return;
+    }
+    if (Object.keys(JAPANESE_LOCALE).length > 0) {
+        flatpickrInstance.localize(JAPANESE_LOCALE);
+    }
 
-    const endDatePicker = flatpickr("#periodEndWrapper", {
+    const endDatePicker = flatpickrInstance('#periodEndWrapper', {
         wrap: true,
-        dateFormat: "Y-m-d",
+        dateFormat: 'Y-m-d',
     });
 
-    flatpickr("#periodStartWrapper", {
+    flatpickrInstance('#periodStartWrapper', {
         wrap: true,
-        dateFormat: "Y-m-d",
-        onChange: function(selectedDates, dateStr) {
+        dateFormat: 'Y-m-d',
+        onChange(selectedDates, dateStr) {
             endDatePicker.set('minDate', dateStr);
         }
     });
 
-    flatpickr("#deadlineWrapper", {
+    flatpickrInstance('#deadlineWrapper', {
         wrap: true,
-        dateFormat: "Y-m-d",
+        dateFormat: 'Y-m-d',
     });
 }

@@ -28,7 +28,7 @@ import { initThankYouEmailSettings } from './thankYouEmailSettings.js';
 import { initInvoiceListPage } from './invoiceList.js';
 import { initIndexPage } from './indexPage.js';
 import { initializePage as initSpeedReviewPage } from './speed-review.js'; // Import initializePage from speed-review.js
-import { initGroupEditPage } from '../group-edit/group-edit.js';
+import { initGroupEditPage } from './groupEdit.js';
 
 import { showToast, copyTextToClipboard, loadCommonHtml } from './utils.js';
 

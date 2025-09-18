@@ -1,5 +1,5 @@
-import { showConfirmationModal } from '../src/confirmationModal.js';
-import { handleOpenModal, closeModal } from '../src/modalHandler.js';
+import { showConfirmationModal } from './confirmationModal.js';
+import { handleOpenModal, closeModal } from './modalHandler.js';
 
 export function initGroupEditPage() {
     // --- DOM要素の取得 ---
@@ -159,7 +159,7 @@ export function initGroupEditPage() {
         const email = memberCard.dataset.id;
         const member = members.find(m => m.email === email);
         if (member) {
-            handleOpenModal('memberDetailModal', './member-detail-modal.html', () => {
+            handleOpenModal('memberDetailModal', 'modals/memberDetailModal.html', () => {
                 const contentEl = document.getElementById('member-details-content');
                 contentEl.innerHTML = `
                     <dl class="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-3 text-sm">
