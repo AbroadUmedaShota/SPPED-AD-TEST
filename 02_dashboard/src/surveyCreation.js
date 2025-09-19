@@ -19,6 +19,22 @@ import { showConfirmationModal } from './confirmationModal.js';
 let surveyData = {};
 let currentLang = 'ja';
 let currentSurveyId = null;
+let isDirty = false; // To track unsaved changes
+
+// --- Dirty State Management ---
+function setDirty(dirty) {
+    if (isDirty !== dirty) {
+        isDirty = dirty;
+        console.log(`Dirty state set to: ${isDirty}`);
+    }
+}
+
+window.addEventListener('beforeunload', (event) => {
+    if (isDirty) {
+        event.preventDefault();
+        event.returnValue = ''; // For legacy browsers
+    }
+});
 
 // --- Utility Functions ---
 window.getCurrentLanguage = () => currentLang;
@@ -178,6 +194,7 @@ function setupInputBindings() {
         const handler = () => {
             setDeep(surveyData, path, el.value || '');
             validateFormForSaveButton();
+            setDirty(true);
         };
         el.addEventListener('input', handler);
         el.addEventListener('change', handler);
@@ -190,6 +207,7 @@ function setupInputBindings() {
         const handler = () => {
             surveyData[key] = el.value || '';
             validateFormForSaveButton();
+            setDirty(true);
         };
         el.addEventListener('input', handler);
         el.addEventListener('change', handler);
@@ -199,7 +217,10 @@ function setupInputBindings() {
     // descriptions may be optional
     const descJa = document.getElementById('description_ja');
     if (descJa) {
-        const h = () => { surveyData.description = descJa.value || ''; };
+        const h = () => { 
+            surveyData.description = descJa.value || ''; 
+            setDirty(true);
+        };
         descJa.addEventListener('input', h);
         descJa.addEventListener('change', h);
     }
@@ -210,7 +231,11 @@ function setupInputBindings() {
 
     const planEl = document.getElementById('plan');
     if (planEl) {
-        const onPlan = () => { surveyData.plan = planEl.value; validateFormForSaveButton(); };
+        const onPlan = () => { 
+            surveyData.plan = planEl.value; 
+            validateFormForSaveButton(); 
+            setDirty(true);
+        };
         planEl.addEventListener('change', onPlan);
     }
 
@@ -228,6 +253,7 @@ function setupInputBindings() {
             const group = (surveyData.questionGroups || []).find(g => g.groupId === groupId);
             if (group) {
                 group.title = target.value || '';
+                setDirty(true);
             }
             return;
         }
@@ -243,6 +269,7 @@ function setupInputBindings() {
             const question = group?.questions?.find(q => q.questionId === questionId);
             if (question) {
                 question.text = target.value || '';
+                setDirty(true);
             }
             return;
         }
@@ -261,6 +288,7 @@ function setupInputBindings() {
             const question = group?.questions?.find(q => q.questionId === questionId);
             if (question && Array.isArray(question.options) && optionIndex > -1 && optionIndex < question.options.length) {
                 question.options[optionIndex].text = target.value || '';
+                setDirty(true);
             }
             return;
         }
@@ -276,6 +304,7 @@ function setupInputBindings() {
             const question = surveyData.questionGroups.find(g => g.groupId === groupId)?.questions.find(q => q.questionId === questionId);
             if (question && question.matrix && question.matrix.rows && question.matrix.rows[index]) {
                 question.matrix.rows[index].text = target.value || '';
+                setDirty(true);
             }
             return;
         }
@@ -291,6 +320,7 @@ function setupInputBindings() {
             const question = surveyData.questionGroups.find(g => g.groupId === groupId)?.questions.find(q => q.questionId === questionId);
             if (question && question.matrix && question.matrix.cols && question.matrix.cols[index]) {
                 question.matrix.cols[index].text = target.value || '';
+                setDirty(true);
             }
             return;
         }
@@ -504,7 +534,7 @@ async function initializePage() {
             onAddQuestion: (questionType) => handleAddNewQuestion(null, questionType),
             onAddGroup: () => handleAddNewQuestionGroup()
         };
-        initializeFab('fab-container', 'components/fab.html', fabActions);
+        initializeFab('fab-container', fabActions);
 
     } catch (error) {
         console.error('Failed to initialize page:', error);
@@ -693,6 +723,7 @@ function setupEventListeners() {
             }
             console.log('Saved Survey Data to localStorage:', surveyData);
             showToast('アンケートデータが保存されました。');
+            setDirty(false); // Reset dirty state after successful save
         });
     }
 
@@ -700,13 +731,18 @@ function setupEventListeners() {
     const cancelBtn = document.getElementById('cancelCreateSurvey');
     if (cancelBtn) {
         cancelBtn.addEventListener('click', () => {
-            showConfirmationModal(
-                '編集中の内容は保存されませんが、ページを離れてもよろしいですか？',
-                () => {
-                    window.location.href = 'index.html'; // Redirect
-                },
-                '編集のキャンセル'
-            );
+            if (isDirty) {
+                showConfirmationModal(
+                    '編集中の内容は保存されませんが、ページを離れてもよろしいですか？',
+                    () => {
+                        setDirty(false); // Clear dirty state before redirect
+                        window.location.href = 'index.html'; // Redirect
+                    },
+                    '編集のキャンセル'
+                );
+            } else {
+                window.location.href = 'index.html'; // Redirect directly if no changes
+            }
         });
     }
 }
@@ -720,12 +756,14 @@ function handleAddNewQuestionGroup() {
         questions: []
     };
     surveyData.questionGroups.push(newGroup);
+    setDirty(true);
     updateAndRenderAll();
 }
 
 function handleDeleteQuestionGroup(groupId) {
     showConfirmationModal('この質問グループを削除してもよろしいですか？', () => {
         surveyData.questionGroups = surveyData.questionGroups.filter(g => g.groupId !== groupId);
+        setDirty(true);
         updateAndRenderAll();
     }, 'グループの削除');
 }
@@ -738,6 +776,7 @@ function handleDuplicateQuestionGroup(groupId) {
     newGroup.questions.forEach(q => q.questionId = `q_${Date.now()}_${Math.random()}`);
     const index = surveyData.questionGroups.findIndex(g => g.groupId === groupId);
     surveyData.questionGroups.splice(index + 1, 0, newGroup);
+    setDirty(true);
     updateAndRenderAll();
 }
 
@@ -764,6 +803,7 @@ function handleAddNewQuestion(groupId, questionType) {
         options: (questionType === 'single_answer' || questionType === 'multi_answer') ? [] : undefined
     };
     targetGroup.questions.push(newQuestion);
+    setDirty(true);
     updateAndRenderAll();
 }
 
@@ -772,6 +812,7 @@ function handleDeleteQuestion(groupId, questionId) {
     if (group) {
         showConfirmationModal('この質問を削除してもよろしいですか？', () => {
             group.questions = group.questions.filter(q => q.questionId !== questionId);
+            setDirty(true);
             updateAndRenderAll();
         }, '質問の削除');
     }
@@ -786,6 +827,7 @@ function handleDuplicateQuestion(groupId, questionId) {
     newQuestion.questionId = `q_${Date.now()}`;
     const index = group.questions.findIndex(q => q.questionId === questionId);
     group.questions.splice(index + 1, 0, newQuestion);
+    setDirty(true);
     updateAndRenderAll();
 }
 
@@ -793,6 +835,7 @@ function handleAddOption(groupId, questionId) {
     const question = surveyData.questionGroups.find(g => g.groupId === groupId)?.questions.find(q => q.questionId === questionId);
     if (question && question.options) {
         question.options.push({ text: { ja: '新しい選択肢', en: '' } });
+        setDirty(true);
         updateAndRenderAll();
     }
 }
@@ -801,6 +844,7 @@ function handleDeleteOption(groupId, questionId, optionIndex) {
     const question = surveyData.questionGroups.find(g => g.groupId === groupId)?.questions.find(q => q.questionId === questionId);
     if (question && question.options) {
         question.options.splice(optionIndex, 1);
+        setDirty(true);
         updateAndRenderAll();
     }
 }
@@ -811,6 +855,7 @@ function handleAddMatrixRow(groupId, questionId) {
     q.matrix = q.matrix || { rows: [], cols: [] };
     q.matrix.rows = q.matrix.rows || [];
     q.matrix.rows.push({ text: { ja: `行${q.matrix.rows.length + 1}`, en: '' } });
+    setDirty(true);
     updateAndRenderAll();
 }
 
@@ -820,6 +865,7 @@ function handleAddMatrixCol(groupId, questionId) {
     q.matrix = q.matrix || { rows: [], cols: [] };
     q.matrix.cols = q.matrix.cols || [];
     q.matrix.cols.push({ text: { ja: `列${q.matrix.cols.length + 1}`, en: '' } });
+    setDirty(true);
     updateAndRenderAll();
 }
 
@@ -827,6 +873,7 @@ function handleDeleteMatrixRow(groupId, questionId, index) {
     const q = surveyData.questionGroups.find(g => g.groupId === groupId)?.questions.find(q => q.questionId === questionId);
     if (!q || !q.matrix || !Array.isArray(q.matrix.rows)) return;
     q.matrix.rows.splice(index, 1);
+    setDirty(true);
     updateAndRenderAll();
 }
 
@@ -834,6 +881,7 @@ function handleDeleteMatrixCol(groupId, questionId, index) {
     const q = surveyData.questionGroups.find(g => g.groupId === groupId)?.questions.find(q => q.questionId === questionId);
     if (!q || !q.matrix || !Array.isArray(q.matrix.cols)) return;
     q.matrix.cols.splice(index, 1);
+    setDirty(true);
     updateAndRenderAll();
 }
 
@@ -844,6 +892,7 @@ function handleChangeQuestionType(groupId, questionId, newType) {
     if (!question) return;
 
     question.type = newType;
+    setDirty(true); // Change of type is a modification
     const needsOptions = ['single_answer', 'multi_answer'].includes(newType);
     if (needsOptions) {
         if (!Array.isArray(question.options)) {
@@ -1022,8 +1071,24 @@ function setupSortables() {
             animation: 150,
             handle: '.handle',
             draggable: '.question-group',
+            // Ignore drag on inputs, buttons, and the expand icon itself
+            filter: 'input, button, .expand-icon, .group-title-input',
+            preventOnFilter: true,
+            onStart: () => {
+                // Close all accordions when starting to drag
+                document.querySelectorAll('.question-group .accordion-content').forEach(content => {
+                    if (getComputedStyle(content).display !== 'none') {
+                        const header = content.previousElementSibling;
+                        const icon = header ? header.querySelector('.expand-icon') : null;
+                        content.style.display = 'none';
+                        if (icon) icon.textContent = 'expand_more';
+                        if (header) header.setAttribute('aria-expanded', 'false');
+                    }
+                });
+            },
             onEnd: (evt) => {
                 arrayMove(surveyData.questionGroups, evt.oldIndex, evt.newIndex);
+                setDirty(true);
                 updateAndRenderAll();
             }
         });
@@ -1042,6 +1107,7 @@ function setupSortables() {
                     const group = surveyData.questionGroups.find(g => g.groupId === groupId);
                     if (!group || !group.questions) return;
                     arrayMove(group.questions, evt.oldIndex, evt.newIndex);
+                    setDirty(true);
                     updateAndRenderAll();
                 }
             });
@@ -1060,6 +1126,7 @@ function setupSortables() {
                     const question = group?.questions?.find(q => q.questionId === questionId);
                     if (!question || !question.options) return;
                     arrayMove(question.options, evt.oldIndex, evt.newIndex);
+                    setDirty(true);
                     updateAndRenderAll();
                 }
             });
@@ -1083,6 +1150,7 @@ function setupSortables() {
                         const question = group?.questions?.find(q => q.questionId === qId);
                         if (!question || !question.matrix || !Array.isArray(question.matrix.rows)) return;
                         arrayMove(question.matrix.rows, evt.oldIndex, evt.newIndex);
+                        setDirty(true);
                         updateAndRenderAll();
                     }
                 });
@@ -1100,6 +1168,7 @@ function setupSortables() {
                         const question = group?.questions?.find(q => q.questionId === qId);
                         if (!question || !question.matrix || !Array.isArray(question.matrix.cols)) return;
                         arrayMove(question.matrix.cols, evt.oldIndex, evt.newIndex);
+                        setDirty(true);
                         updateAndRenderAll();
                     }
                 });

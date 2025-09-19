@@ -35,7 +35,7 @@
       <!-- Main Content -->
       <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8 relative">
         <div id="outline-map-container" class="hidden lg:block fixed right-0 top-16 h-[calc(100vh-64px)] w-64 bg-surface border-l border-outline-variant p-4 overflow-y-auto z-40"></div>
-        <div class="flex flex-col w-full max-w-6xl mx-auto flex-1">
+        <div id="survey-content-area" class="flex flex-col w-full max-w-6xl mx-auto flex-1">
           <!-- Breadcrumb -->
           <div id="breadcrumb-container" class="mb-4"></div>
 
@@ -170,7 +170,52 @@
       </main>
     </div>
 
-    <div id="fab-container"></div>
+    <div id="fab-container" class="fixed bottom-8 right-8 z-[9999]">
+    <button id="fab-main-button" class="w-16 h-16 bg-primary text-on-primary rounded-full flex items-center justify-center shadow-lg hover:bg-primary-dark transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-4 focus:ring-primary-container">
+        <span class="material-icons text-4xl transition-transform duration-300">add</span>
+    </button>
+    <div id="fab-menu" class="absolute bottom-20 right-0 w-72 bg-surface rounded-2xl shadow-2xl transition-all duration-300 transform scale-95 opacity-0 pointer-events-none origin-bottom-right">
+        <div class="py-2">
+            <button data-question-type="group" class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
+                <span class="material-icons text-on-surface-variant mr-4">create_new_folder</span>
+                <span class="font-semibold">質問グループを追加</span>
+            </button>
+            <div class="border-t border-outline-variant my-2"></div>
+            <button data-question-type="free_answer" class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
+                <span class="material-icons text-on-surface-variant mr-4">short_text</span>
+                <span>フリーアンサー</span>
+            </button>
+            <button data-question-type="single_answer" class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
+                <span class="material-icons text-on-surface-variant mr-4">radio_button_checked</span>
+                <span>シングルアンサー</span>
+            </button>
+            <button data-question-type="multi_answer" class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
+                <span class="material-icons text-on-surface-variant mr-4">check_box</span>
+                <span>マルチアンサー</span>
+            </button>
+            <button data-question-type="number_answer" class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
+                <span class="material-icons text-on-surface-variant mr-4">pin</span>
+                <span>数値回答</span>
+            </button>
+            <button data-question-type="matrix_sa" class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
+                <span class="material-icons text-on-surface-variant mr-4">view_list</span>
+                <span>マトリックス(SA)</span>
+            </button>
+            <button data-question-type="matrix_ma" class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
+                <span class="material-icons text-on-surface-variant mr-4">grid_view</span>
+                <span>マトリックス(MA)</span>
+            </button>
+            <button data-question-type="date_time" class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
+                <span class="material-icons text-on-surface-variant mr-4">event</span>
+                <span>日付/時間</span>
+            </button>
+            <button data-question-type="handwriting" class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
+                <span class="material-icons text-on-surface-variant mr-4">draw</span>
+                <span>手書きスペース</span>
+            </button>
+        </div>
+    </div>
+</div>
 
     <div id="footer-placeholder"></div>
   </div>
@@ -279,6 +324,47 @@
       <div class="flex-grow multi-lang-input-group">
         <div class="input-group">
           <input type="text" data-lang="ja" class="input-field option-text-input" placeholder="(例) とても満足">
+          <label class="input-label">選択肢</label>
+        </div>
+        <div class="input-group">
+          <input type="text" data-lang="en" class="input-field option-text-input" placeholder=" ">
+          <label class="input-label">English</label>
+        </div>
+      </div>
+      <button type="button" class="icon-button delete-option-btn mt-2" aria-label="選択肢を削除"><span class="material-icons text-error">remove_circle_outline</span></button>
+    </div>
+  </template>
+��肢を削除"><span class="material-icons text-error">remove_circle_outline</span></button>
+    </div>
+  </template>
+
+</body>
+</html>
+"(例) とても満足">
+          <label class="input-label">選択肢</label>
+        </div>
+        <div class="input-group">
+          <input type="text" data-lang="en" class="input-field option-text-input" placeholder=" ">
+          <label class="input-label">English</label>
+        </div>
+      </div>
+      <button type="button" class="icon-button delete-option-btn mt-2" aria-label="選択肢を削除"><span class="material-icons text-error">remove_circle_outline</span></button>
+    </div>
+  </template>
+
+</body>
+</html>
+  </div>
+  </template>
+
+</body>
+</html>
+    </div>
+  </template>
+
+</body>
+</html>
+"(例) とても満足">
           <label class="input-label">選択肢</label>
         </div>
         <div class="input-group">

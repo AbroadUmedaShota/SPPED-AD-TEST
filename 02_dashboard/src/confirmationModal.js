@@ -28,6 +28,13 @@ export function showConfirmationModal(message, onConfirm, title = '確認') {
 
             newConfirmBtn.addEventListener('click', confirmAndClose);
 
+            // Add event listener for the cancel button
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', () => {
+                    closeModal('confirmationModal');
+                });
+            }
+
             // Also handle Enter key for confirmation
             const handleEnter = (event) => {
                 if (event.key === 'Enter') {

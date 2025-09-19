@@ -147,7 +147,8 @@ function renderQuestion(question, lang, index) {
     handwriting: '手書きスペース'
   };
   const labelJA = typeJaMap[question.type] || '不明なタイプ';
-  questionTitle.textContent = `Q${index + 1}: ${labelJA}`;
+    const questionText = ((v) => (v && typeof v === 'object') ? (v.ja || v.en || '') : (v || ''))(question.text);
+  questionTitle.textContent = questionText || `Q${index + 1}: (${labelJA})`;
 
   // Initialize type select
   if (typeSelect) {
@@ -339,10 +340,11 @@ export function renderOutlineMap() {
   const outlineMapContainer = document.getElementById('outline-map-container');
   if (!outlineMapContainer) return;
 
-  const main = document.querySelector('main');
-  if (!main) return;
+  const mainContent = document.getElementById('survey-content-area');
+  if (!mainContent) return;
 
-  const headings = Array.from(main.querySelectorAll('h2, h3'));
+  // Include question titles in the outline
+  const headings = Array.from(mainContent.querySelectorAll('h2, .question-title'));
   if (!headings.length) {
     outlineMapContainer.innerHTML = '';
     return;
@@ -350,24 +352,31 @@ export function renderOutlineMap() {
 
   let html = '<h3 class="text-lg font-semibold mb-4">目次</h3><ul class="space-y-2">';
   headings.forEach((h, idx) => {
-    if (!h.id) h.id = `section-${idx}`;
-    const level = parseInt(h.tagName.substring(1), 10) || 2;
-    const paddingLeft = (level - 2) * 16; // h2=0, h3=16
+    const isQuestion = h.classList.contains('question-title');
+    const targetElement = isQuestion ? h.closest('.question-item') : h;
+
+    if (!targetElement) return; // Skip if target not found
+
+    // Ensure the target has an ID for the anchor link
+    if (!targetElement.id) {
+        targetElement.id = `section-gen-${idx}`;
+    }
+    const targetId = targetElement.id;
+
+    // Determine heading level for indentation
+    const level = isQuestion ? 3 : (parseInt(h.tagName.substring(1), 10) || 2);
+    const paddingLeft = (level - 2) * 16; // h2=0, questions=16
     const text = h.textContent || '';
+    if (!text.trim()) return; // Skip empty titles
+
     html += `
       <li>
-        <a href="#${h.id}" class="block text-on-surface-variant hover:text-primary text-sm" style="padding-left: ${paddingLeft}px;">${text}</a>
+        <a href="#${targetId}" class="block text-on-surface-variant hover:text-primary text-sm truncate" style="padding-left: ${paddingLeft}px;" title="${text}">${text}</a>
       </li>
     `;
   });
   html += '</ul>';
   outlineMapContainer.innerHTML = html;
-
-  // Override heading text to ASCII-safe label to avoid encoding issues
-  try {
-    const h3 = outlineMapContainer.querySelector('h3');
-    if (h3) h3.textContent = 'Outline';
-  } catch (_) { /* noop */ }
 }
 
 /**
