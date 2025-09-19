@@ -1,22 +1,658 @@
 [
   {
     "id": "GROUP001",
-    "name": "営業部"
+    "name": "営業部",
+    "description": "新規顧客開拓と既存顧客フォローを担うコアチーム。",
+    "members": [
+      {
+        "email": "sato@example.com",
+        "role": "admin",
+        "name": "佐藤 太郎",
+        "company": "株式会社サンプル",
+        "department": "営業部",
+        "title": "マネージャー",
+        "phone": "03-1234-5678",
+        "postalCode": "100-0001",
+        "address": "東京都千代田区千代田1-1"
+      },
+      {
+        "email": "suzuki@example.com",
+        "role": "member",
+        "name": "鈴木 花子",
+        "company": "株式会社サンプル",
+        "department": "営業部",
+        "title": "スタッフ",
+        "phone": "03-1234-5679",
+        "postalCode": "100-0002",
+        "address": "東京都千代田区皇居外苑1-2"
+      },
+      {
+        "email": "takahashi@example.com",
+        "role": "member",
+        "name": "高橋 一郎",
+        "company": "株式会社サンプル",
+        "department": "マーケティング部",
+        "title": "リーダー",
+        "phone": "03-1234-5680",
+        "postalCode": "100-0003",
+        "address": "東京都千代田区大手町1-1"
+      },
+      {
+        "email": "tanaka@example.com",
+        "role": "member",
+        "name": "田中 裕子",
+        "company": "株式会社テスト",
+        "department": "開発部",
+        "title": "エンジニア",
+        "phone": "03-2345-6789",
+        "postalCode": "200-0001",
+        "address": "神奈川県横浜市中区日本大通1"
+      },
+      {
+        "email": "watanabe@example.com",
+        "role": "member",
+        "name": "渡辺 健",
+        "company": "株式会社サンプル",
+        "department": "営業部",
+        "title": "スタッフ",
+        "phone": "03-1234-5681",
+        "postalCode": "100-0004",
+        "address": "東京都千代田区丸の内1-1"
+      },
+      {
+        "email": "ito@example.com",
+        "role": "admin",
+        "name": "伊藤 さくら",
+        "company": "株式会社デモ",
+        "department": "人事部",
+        "title": "部長",
+        "phone": "03-3456-7890",
+        "postalCode": "300-0001",
+        "address": "埼玉県さいたま市浦和区高砂3-15-1"
+      },
+      {
+        "email": "yamamoto@example.com",
+        "role": "member",
+        "name": "山本 浩二",
+        "company": "株式会社テスト",
+        "department": "開発部",
+        "title": "シニアエンジニア",
+        "phone": "03-2345-6790",
+        "postalCode": "200-0002",
+        "address": "神奈川県横浜市西区みなとみらい2-2-1"
+      },
+      {
+        "email": "nakamura@example.com",
+        "role": "member",
+        "name": "中村 美咲",
+        "company": "株式会社サンプル",
+        "department": "マーケティング部",
+        "title": "スタッフ",
+        "phone": "03-1234-5682",
+        "postalCode": "100-0005",
+        "address": "東京都千代田区霞が関1-1"
+      },
+      {
+        "email": "kobayashi@example.com",
+        "role": "member",
+        "name": "小林 誠",
+        "company": "株式会社デモ",
+        "department": "総務部",
+        "title": "スタッフ",
+        "phone": "03-3456-7891",
+        "postalCode": "300-0002",
+        "address": "埼玉県川口市青木2-1-1"
+      },
+      {
+        "email": "kato@example.com",
+        "role": "member",
+        "name": "加藤 あゆみ",
+        "company": "株式会社サンプル",
+        "department": "営業部",
+        "title": "リーダー",
+        "phone": "03-1234-5683",
+        "postalCode": "100-0006",
+        "address": "東京都港区赤坂1-1-1"
+      }
+    ]
   },
   {
     "id": "GROUP002",
-    "name": "マーケティング部"
+    "name": "マーケティング部",
+    "description": "ブランド戦略とキャンペーン企画を統括。",
+    "members": [
+      {
+        "email": "marketing.lead@example.com",
+        "role": "admin",
+        "name": "三浦 真央",
+        "company": "株式会社サンプル",
+        "department": "マーケティング部",
+        "title": "部長",
+        "phone": "03-5555-1101",
+        "postalCode": "150-0001",
+        "address": "東京都渋谷区神宮前1-4-5"
+      },
+      {
+        "email": "seo.specialist@example.com",
+        "role": "member",
+        "name": "石井 俊介",
+        "company": "株式会社サンプル",
+        "department": "マーケティング部",
+        "title": "SEOスペシャリスト",
+        "phone": "03-5555-1102",
+        "postalCode": "150-0002",
+        "address": "東京都渋谷区渋谷2-21-1"
+      },
+      {
+        "email": "ads.planner@example.com",
+        "role": "member",
+        "name": "松本 ゆり",
+        "company": "株式会社サンプル",
+        "department": "マーケティング部",
+        "title": "広告プランナー",
+        "phone": "03-5555-1103",
+        "postalCode": "150-0003",
+        "address": "東京都渋谷区恵比寿南1-5-5"
+      },
+      {
+        "email": "event.coord@example.com",
+        "role": "member",
+        "name": "大野 真帆",
+        "company": "株式会社サンプル",
+        "department": "マーケティング部",
+        "title": "イベントコーディネーター",
+        "phone": "03-5555-1104",
+        "postalCode": "150-0004",
+        "address": "東京都渋谷区広尾5-6-6"
+      }
+    ]
   },
   {
     "id": "GROUP003",
-    "name": "開発部"
+    "name": "開発部",
+    "description": "プロダクトの設計と開発をリードするエンジニア組織。",
+    "members": [
+      {
+        "email": "dev.lead@example.com",
+        "role": "admin",
+        "name": "藤田 陽介",
+        "company": "株式会社テスト",
+        "department": "開発部",
+        "title": "開発マネージャー",
+        "phone": "045-300-2001",
+        "postalCode": "220-0012",
+        "address": "神奈川県横浜市西区みなとみらい3-3-1"
+      },
+      {
+        "email": "frontend.eng@example.com",
+        "role": "member",
+        "name": "山田 彩",
+        "company": "株式会社テスト",
+        "department": "開発部",
+        "title": "フロントエンドエンジニア",
+        "phone": "045-300-2002",
+        "postalCode": "220-0013",
+        "address": "神奈川県横浜市西区高島2-18-1"
+      },
+      {
+        "email": "backend.eng@example.com",
+        "role": "member",
+        "name": "近藤 慎",
+        "company": "株式会社テスト",
+        "department": "開発部",
+        "title": "バックエンドエンジニア",
+        "phone": "045-300-2003",
+        "postalCode": "220-0014",
+        "address": "神奈川県横浜市西区北幸1-11-1"
+      },
+      {
+        "email": "qa.eng@example.com",
+        "role": "member",
+        "name": "城戸 里奈",
+        "company": "株式会社テスト",
+        "department": "開発部",
+        "title": "QAエンジニア",
+        "phone": "045-300-2004",
+        "postalCode": "220-0015",
+        "address": "神奈川県横浜市西区南幸2-8-1"
+      },
+      {
+        "email": "infra.eng@example.com",
+        "role": "member",
+        "name": "大橋 亮太",
+        "company": "株式会社テスト",
+        "department": "開発部",
+        "title": "インフラエンジニア",
+        "phone": "045-300-2005",
+        "postalCode": "220-0016",
+        "address": "神奈川県横浜市西区桜木町1-1-1"
+      }
+    ]
   },
   {
     "id": "GROUP004",
-    "name": "人事部"
+    "name": "人事部",
+    "description": "採用から評価制度まで人材マネジメントを担当。",
+    "members": [
+      {
+        "email": "hr.manager@example.com",
+        "role": "admin",
+        "name": "吉田 奈津",
+        "company": "株式会社デモ",
+        "department": "人事部",
+        "title": "マネージャー",
+        "phone": "03-6000-3101",
+        "postalCode": "100-0011",
+        "address": "東京都千代田区内幸町2-2-2"
+      },
+      {
+        "email": "talent.dev@example.com",
+        "role": "member",
+        "name": "浅野 航",
+        "company": "株式会社デモ",
+        "department": "人事部",
+        "title": "人材開発担当",
+        "phone": "03-6000-3102",
+        "postalCode": "100-0012",
+        "address": "東京都千代田区日比谷公園1-2"
+      },
+      {
+        "email": "recruiter@example.com",
+        "role": "member",
+        "name": "井上 久美",
+        "company": "株式会社デモ",
+        "department": "人事部",
+        "title": "リクルーター",
+        "phone": "03-6000-3103",
+        "postalCode": "100-0013",
+        "address": "東京都千代田区霞が関2-3-2"
+      }
+    ]
   },
   {
     "id": "GROUP005",
-    "name": "広報部"
+    "name": "広報部",
+    "description": "社外コミュニケーションとメディアリレーションを統括。",
+    "members": [
+      {
+        "email": "pr.director@example.com",
+        "role": "admin",
+        "name": "川口 涼",
+        "company": "株式会社サンプル",
+        "department": "広報部",
+        "title": "部長",
+        "phone": "03-7000-4101",
+        "postalCode": "107-0052",
+        "address": "東京都港区赤坂2-11-5"
+      },
+      {
+        "email": "press.officer@example.com",
+        "role": "member",
+        "name": "西村 梓",
+        "company": "株式会社サンプル",
+        "department": "広報部",
+        "title": "プレスオフィサー",
+        "phone": "03-7000-4102",
+        "postalCode": "107-0051",
+        "address": "東京都港区赤坂1-12-32"
+      },
+      {
+        "email": "social.media@example.com",
+        "role": "member",
+        "name": "花田 遼",
+        "company": "株式会社サンプル",
+        "department": "広報部",
+        "title": "SNS担当",
+        "phone": "03-7000-4103",
+        "postalCode": "107-0053",
+        "address": "東京都港区赤坂9-7-1"
+      },
+      {
+        "email": "csr.coord@example.com",
+        "role": "member",
+        "name": "片山 真子",
+        "company": "株式会社サンプル",
+        "department": "広報部",
+        "title": "CSRコーディネーター",
+        "phone": "03-7000-4104",
+        "postalCode": "107-0054",
+        "address": "東京都港区赤坂7-2-21"
+      }
+    ]
+  },
+  {
+    "id": "GROUP006",
+    "name": "カスタマーサクセス部",
+    "description": "導入企業の活用支援と継続率向上を支えるチーム。",
+    "members": [
+      {
+        "email": "cs.lead@example.com",
+        "role": "admin",
+        "name": "杉山 拓",
+        "company": "株式会社サンプル",
+        "department": "カスタマーサクセス部",
+        "title": "部長",
+        "phone": "03-7100-5101",
+        "postalCode": "160-0022",
+        "address": "東京都新宿区新宿6-27-30"
+      },
+      {
+        "email": "onboarding.specialist@example.com",
+        "role": "member",
+        "name": "秋山 里穂",
+        "company": "株式会社サンプル",
+        "department": "カスタマーサクセス部",
+        "title": "オンボーディングスペシャリスト",
+        "phone": "03-7100-5102",
+        "postalCode": "160-0021",
+        "address": "東京都新宿区歌舞伎町1-1-17"
+      },
+      {
+        "email": "renewal.manager@example.com",
+        "role": "member",
+        "name": "永井 正樹",
+        "company": "株式会社サンプル",
+        "department": "カスタマーサクセス部",
+        "title": "リニューアルマネージャー",
+        "phone": "03-7100-5103",
+        "postalCode": "160-0023",
+        "address": "東京都新宿区西新宿2-8-1"
+      },
+      {
+        "email": "support.advisor@example.com",
+        "role": "member",
+        "name": "黒田 夏実",
+        "company": "株式会社サンプル",
+        "department": "カスタマーサクセス部",
+        "title": "サポートアドバイザー",
+        "phone": "03-7100-5104",
+        "postalCode": "160-0021",
+        "address": "東京都新宿区歌舞伎町2-44-1"
+      }
+    ]
+  },
+  {
+    "id": "GROUP007",
+    "name": "プロダクト企画部",
+    "description": "市場調査とロードマップ策定を担う。",
+    "members": [
+      {
+        "email": "pm.director@example.com",
+        "role": "admin",
+        "name": "大谷 翔",
+        "company": "株式会社テスト",
+        "department": "プロダクト企画部",
+        "title": "部長",
+        "phone": "03-7200-6101",
+        "postalCode": "105-0011",
+        "address": "東京都港区芝公園4-2-8"
+      },
+      {
+        "email": "ux.researcher@example.com",
+        "role": "member",
+        "name": "榊原 麗",
+        "company": "株式会社テスト",
+        "department": "プロダクト企画部",
+        "title": "UXリサーチャー",
+        "phone": "03-7200-6102",
+        "postalCode": "105-0012",
+        "address": "東京都港区芝大門2-5-5"
+      },
+      {
+        "email": "roadmap.planner@example.com",
+        "role": "member",
+        "name": "北村 涼子",
+        "company": "株式会社テスト",
+        "department": "プロダクト企画部",
+        "title": "ロードマッププランナー",
+        "phone": "03-7200-6103",
+        "postalCode": "105-0013",
+        "address": "東京都港区浜松町2-4-1"
+      },
+      {
+        "email": "market.analyst@example.com",
+        "role": "member",
+        "name": "千葉 悠斗",
+        "company": "株式会社テスト",
+        "department": "プロダクト企画部",
+        "title": "マーケットアナリスト",
+        "phone": "03-7200-6104",
+        "postalCode": "105-0014",
+        "address": "東京都港区芝3-23-1"
+      }
+    ]
+  },
+  {
+    "id": "GROUP008",
+    "name": "品質保証部",
+    "description": "テスト計画と不具合管理で品質を担保。",
+    "members": [
+      {
+        "email": "qa.manager@example.com",
+        "role": "admin",
+        "name": "森山 薫",
+        "company": "株式会社テスト",
+        "department": "品質保証部",
+        "title": "マネージャー",
+        "phone": "03-7300-7101",
+        "postalCode": "136-0071",
+        "address": "東京都江東区亀戸1-5-7"
+      },
+      {
+        "email": "test.engineer@example.com",
+        "role": "member",
+        "name": "江口 颯太",
+        "company": "株式会社テスト",
+        "department": "品質保証部",
+        "title": "テストエンジニア",
+        "phone": "03-7300-7102",
+        "postalCode": "136-0072",
+        "address": "東京都江東区大島7-38-1"
+      },
+      {
+        "email": "automation.specialist@example.com",
+        "role": "member",
+        "name": "畑山 彩花",
+        "company": "株式会社テスト",
+        "department": "品質保証部",
+        "title": "自動化スペシャリスト",
+        "phone": "03-7300-7103",
+        "postalCode": "136-0073",
+        "address": "東京都江東区北砂5-20-1"
+      },
+      {
+        "email": "bug.tracker@example.com",
+        "role": "member",
+        "name": "小坂 大地",
+        "company": "株式会社テスト",
+        "department": "品質保証部",
+        "title": "不具合トラッカー",
+        "phone": "03-7300-7104",
+        "postalCode": "136-0074",
+        "address": "東京都江東区東砂7-9-1"
+      }
+    ]
+  },
+  {
+    "id": "GROUP009",
+    "name": "経営企画室",
+    "description": "全社戦略とKPIモニタリングを推進。",
+    "members": [
+      {
+        "email": "strategy.chief@example.com",
+        "role": "admin",
+        "name": "真鍋 慎一",
+        "company": "株式会社サンプル",
+        "department": "経営企画室",
+        "title": "室長",
+        "phone": "03-7400-8101",
+        "postalCode": "100-0001",
+        "address": "東京都千代田区丸の内2-7-2"
+      },
+      {
+        "email": "biz.analyst@example.com",
+        "role": "member",
+        "name": "熊谷 佳奈",
+        "company": "株式会社サンプル",
+        "department": "経営企画室",
+        "title": "ビジネスアナリスト",
+        "phone": "03-7400-8102",
+        "postalCode": "100-0005",
+        "address": "東京都千代田区丸の内3-4-1"
+      },
+      {
+        "email": "okrs.lead@example.com",
+        "role": "member",
+        "name": "柿沼 真理",
+        "company": "株式会社サンプル",
+        "department": "経営企画室",
+        "title": "OKRリード",
+        "phone": "03-7400-8103",
+        "postalCode": "100-0004",
+        "address": "東京都千代田区大手町2-2-2"
+      }
+    ]
+  },
+  {
+    "id": "GROUP010",
+    "name": "情報システム部",
+    "description": "社内IT基盤の運用とセキュリティを管理。",
+    "members": [
+      {
+        "email": "it.manager@example.com",
+        "role": "admin",
+        "name": "矢野 和樹",
+        "company": "株式会社デモ",
+        "department": "情報システム部",
+        "title": "部長",
+        "phone": "03-7500-9101",
+        "postalCode": "162-0843",
+        "address": "東京都新宿区市谷田町2-19-1"
+      },
+      {
+        "email": "network.engineer@example.com",
+        "role": "member",
+        "name": "梅田 莉奈",
+        "company": "株式会社デモ",
+        "department": "情報システム部",
+        "title": "ネットワークエンジニア",
+        "phone": "03-7500-9102",
+        "postalCode": "162-0825",
+        "address": "東京都新宿区神楽坂5-1"
+      },
+      {
+        "email": "security.analyst@example.com",
+        "role": "member",
+        "name": "渋谷 海斗",
+        "company": "株式会社デモ",
+        "department": "情報システム部",
+        "title": "セキュリティアナリスト",
+        "phone": "03-7500-9103",
+        "postalCode": "162-0821",
+        "address": "東京都新宿区津久戸町1-1"
+      },
+      {
+        "email": "helpdesk@example.com",
+        "role": "member",
+        "name": "及川 美和",
+        "company": "株式会社デモ",
+        "department": "情報システム部",
+        "title": "ヘルプデスク",
+        "phone": "03-7500-9104",
+        "postalCode": "162-0842",
+        "address": "東京都新宿区市谷砂土原町1-2"
+      }
+    ]
+  },
+  {
+    "id": "GROUP011",
+    "name": "法務部",
+    "description": "契約審査とコンプライアンスを担当。",
+    "members": [
+      {
+        "email": "legal.director@example.com",
+        "role": "admin",
+        "name": "新垣 一真",
+        "company": "株式会社サンプル",
+        "department": "法務部",
+        "title": "部長",
+        "phone": "03-7600-1010",
+        "postalCode": "100-0014",
+        "address": "東京都千代田区永田町1-6-1"
+      },
+      {
+        "email": "contract.manager@example.com",
+        "role": "member",
+        "name": "名嘉 美里",
+        "company": "株式会社サンプル",
+        "department": "法務部",
+        "title": "契約マネージャー",
+        "phone": "03-7600-1011",
+        "postalCode": "100-0014",
+        "address": "東京都千代田区永田町2-2-1"
+      },
+      {
+        "email": "compliance.officer@example.com",
+        "role": "member",
+        "name": "金城 翔",
+        "company": "株式会社サンプル",
+        "department": "法務部",
+        "title": "コンプライアンスオフィサー",
+        "phone": "03-7600-1012",
+        "postalCode": "100-0014",
+        "address": "東京都千代田区永田町1-9-1"
+      }
+    ]
+  },
+  {
+    "id": "GROUP012",
+    "name": "財務統括部",
+    "description": "経理・予算管理・資金調達を横断で支援。",
+    "members": [
+      {
+        "email": "finance.cfo@example.com",
+        "role": "admin",
+        "name": "白石 隆",
+        "company": "株式会社サンプル",
+        "department": "財務統括部",
+        "title": "統括部長",
+        "phone": "03-7700-1111",
+        "postalCode": "100-0001",
+        "address": "東京都千代田区千代田1-6"
+      },
+      {
+        "email": "accounting.lead@example.com",
+        "role": "member",
+        "name": "前田 江里",
+        "company": "株式会社サンプル",
+        "department": "財務統括部",
+        "title": "経理リーダー",
+        "phone": "03-7700-1112",
+        "postalCode": "100-0002",
+        "address": "東京都千代田区皇居外苑3-1"
+      },
+      {
+        "email": "treasury.specialist@example.com",
+        "role": "member",
+        "name": "長谷川 大輔",
+        "company": "株式会社サンプル",
+        "department": "財務統括部",
+        "title": "資金管理スペシャリスト",
+        "phone": "03-7700-1113",
+        "postalCode": "100-0003",
+        "address": "東京都千代田区大手町1-9-2"
+      },
+      {
+        "email": "budget.controller@example.com",
+        "role": "member",
+        "name": "本田 知世",
+        "company": "株式会社サンプル",
+        "department": "財務統括部",
+        "title": "予算コントローラー",
+        "phone": "03-7700-1114",
+        "postalCode": "100-0004",
+        "address": "東京都千代田区大手町2-7-1"
+      }
+    ]
   }
 ]
