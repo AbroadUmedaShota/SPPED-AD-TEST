@@ -293,7 +293,7 @@ class SpeedReviewService {
             this.surveys = await surveysResponse.json();
             this.surveyAnswers = await surveyAnswersResponse.json();
             this.businessCards = await businessCardsResponse.json();
-            console.log('DEBUG: JSON data loaded by speedReviewService.');
+            
         } catch (error) {
             console.error("Error loading or parsing JSON files:", error);
             throw error;

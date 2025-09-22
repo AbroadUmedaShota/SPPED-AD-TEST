@@ -248,14 +248,18 @@ export function hideLoading(overlayId) {
  * @param {string} overlayId The ID of the message overlay element.
  * @param {string} message The message to display.
  */
-export function showMessage(overlayId, message) {
+export function showMessage(overlayId, message, show = true) {
     const overlay = document.getElementById(overlayId);
     if (overlay) {
         const messageElement = overlay.querySelector('p');
         if (messageElement) {
             messageElement.textContent = message;
         }
-        overlay.classList.remove('hidden');
+        if (show) {
+            overlay.classList.remove('hidden');
+        } else {
+            overlay.classList.add('hidden');
+        }
     }
 }
 

@@ -25,7 +25,9 @@ import { openDuplicateSurveyModal } from './duplicateSurveyModal.js';
 import { initBreadcrumbs } from './breadcrumb.js';
 import { initBizcardSettings } from './bizcardSettings.js';
 import { initThankYouEmailSettings } from './thankYouEmailSettings.js';
+import { initThankYouScreenSettings } from './thankYouScreenSettings.js';
 import { initInvoiceListPage } from './invoiceList.js';
+import { initInvoiceDetailPage } from './invoiceDetail.js';
 import { initIndexPage } from './indexPage.js';
 import { initializePage as initSpeedReviewPage } from './speed-review.js'; // Import initializePage from speed-review.js
 import { initGroupEditPage } from './groupEdit.js';
@@ -154,6 +156,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             break;
         case 'thankYouEmailSettings.html':
             initThankYouEmailSettings();
+            break;
+        case 'thankYouScreenSettings.html':
+            initThankYouScreenSettings();
+            break;
+        case 'invoice-detail.html':
+            initInvoiceDetailPage();
             break;
         case 'speed-review.html':
             initSpeedReviewPage(); // Call the imported function

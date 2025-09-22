@@ -154,7 +154,7 @@ export function openModal(modalId) {
  */
 export function closeModal(modalId) {
     const modal = document.getElementById(modalId);
-    console.log('Attempting to close modal:', modalId, modal);
+    
     if (modal) {
         modal.dataset.state = 'closed';
         const modalContent = modal.querySelector('.modal-content-transition');
@@ -177,15 +177,15 @@ export function closeModal(modalId) {
         if (mobileSidebarOverlay) {
             mobileSidebarOverlay.classList.remove('is-visible');
             mobileSidebarOverlay.dataset.state = 'closed'; // Explicitly set data-state
-            console.log('mobileSidebarOverlay state on close:', mobileSidebarOverlay.dataset.state);
+            
         }
 
         // Wait for the opacity transition to complete before removing from DOM
         modal.addEventListener('transitionend', (e) => {
-            console.log('Transition ended:', e.propertyName);
+            
             if (e.propertyName === 'opacity') {
                 modal.remove();
-                console.log('Modal removed via transitionend.');
+                
             }
         }, { once: true });
     }

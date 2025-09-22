@@ -1,5 +1,6 @@
 import { handleOpenModal, closeModal } from './modalHandler.js';
 import { duplicateSurvey } from './tableManager.js';
+import { showToast } from './utils.js';
 
 /**
  * Opens the duplicate survey modal and populates it with initial data.

@@ -1,5 +1,4 @@
-import 'https://cdn.jsdelivr.net/npm/flatpickr';
-import 'https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js';
+
 
 const flatpickrInstance = window.flatpickr;
 const JAPANESE_LOCALE = flatpickrInstance?.l10ns?.ja ?? flatpickrInstance?.l10ns?.default ?? {};

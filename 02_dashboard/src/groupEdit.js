@@ -2,8 +2,10 @@ import { showConfirmationModal } from './confirmationModal.js';
 import { handleOpenModal, closeModal } from './modalHandler.js';
 import { fetchGroups, updateGroup } from './groupService.js';
 import { showToast } from './utils.js';
+import { initBreadcrumbs } from './breadcrumb.js';
 
 export function initGroupEditPage() {
+    initBreadcrumbs();
     const groupNameInput = document.getElementById('groupName');
     const groupDescriptionInput = document.getElementById('groupDescription');
     const newMemberEmailInput = document.getElementById('newMemberEmail');
@@ -239,7 +241,7 @@ export function initGroupEditPage() {
         newMemberEmailInput.value = '';
         newMemberRoleSelect.value = 'member';
         newMemberEmailInput.focus();
-        console.log(`${newMember.email || newMember.__memberKey} を追加しました。`);
+        
     });
 
     memberListContainer.addEventListener('click', (e) => {
@@ -261,7 +263,7 @@ export function initGroupEditPage() {
                     members.splice(index, 1);
                     renderMemberList();
                     setDirty();
-                    console.log(`${member?.email || member?.__memberKey} を削除しました。`);
+                    
                 });
             }
             return;
@@ -318,7 +320,7 @@ export function initGroupEditPage() {
             const index = Number(e.target.dataset.index);
             members[index].role = e.target.value;
             setDirty();
-            console.log(`${members[index].email || members[index].__memberKey} の役割を ${e.target.value} に変更`);
+            
         }
     });
 
@@ -363,7 +365,7 @@ export function initGroupEditPage() {
     cancelBtn.addEventListener('click', () => {
         if (isDirty) {
             showConfirmationModal('編集中の内容があります。変更を保存せずに終了しますか？', () => {
-                alert('変更を破棄しました。');
+                showToast('変更を破棄しました。', 'info');
                 window.history.back();
             });
         } else {

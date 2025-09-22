@@ -12,6 +12,7 @@ import {
     updateTemplatePreview,
     setButtonLoading
 } from './ui/thankYouEmailRenderer.js';
+import { showConfirmationModal } from './confirmationModal.js';
 import { showToast } from './utils.js';
 import { insertTextAtCursor } from './utils.js';
 
@@ -79,9 +80,11 @@ export function initThankYouEmailSettings() {
         saveButton.addEventListener('click', handleSaveSettings);
         sendEmailButton.addEventListener('click', handleSendEmails);
         cancelButton.addEventListener('click', () => {
-            if (confirm('変更を破棄してアンケート一覧に戻りますか？')) {
-                window.location.href = 'index.html';
-            }
+            showConfirmationModal(
+                '変更を破棄してアンケート一覧に戻りますか？',
+                () => { window.location.href = 'index.html'; },
+                '変更の破棄'
+            );
         });
     }
 

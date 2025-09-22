@@ -15,6 +15,7 @@ import {
     setSaveButtonLoading
 } from './ui/bizcardSettingsRenderer.js';
 import { showToast } from './utils.js';
+import { showConfirmationModal } from './confirmationModal.js';
 
 export function initBizcardSettings() {
     // --- DOM Element Cache ---
@@ -84,9 +85,11 @@ export function initBizcardSettings() {
         applyCouponBtn.addEventListener('click', handleApplyCoupon);
         saveButton.addEventListener('click', handleSaveSettings);
         cancelButton.addEventListener('click', () => {
-            if (confirm('変更を破棄してアンケート一覧に戻りますか？')) {
-                window.location.href = 'index.html';
-            }
+            showConfirmationModal(
+                '変更を破棄してアンケート一覧に戻りますか？',
+                () => { window.location.href = 'index.html'; },
+                '変更の破棄'
+            );
         });
         toggleMemoSectionBtn.addEventListener('click', () => {
             memoSection.classList.toggle('hidden');

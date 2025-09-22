@@ -40,7 +40,7 @@ const mockVariables = ['会社名', '氏名', '部署名', '役職'];
  * @returns {Promise<object>} 関連データのオブジェクト。
  */
 export async function getInitialData(surveyId) {
-    console.log(`Fetching initial data for survey ID: ${surveyId}`);
+    
     // 複数のAPI呼び出しをシミュレート
     await new Promise(resolve => setTimeout(resolve, 400));
     const survey = mockSurveyData[surveyId];
@@ -64,7 +64,7 @@ export async function getInitialData(surveyId) {
  * @returns {Promise<object>} 保存結果。
  */
 export async function saveThankYouEmailSettings(settings) {
-    console.log('Saving thank you email settings:', settings);
+    
     await new Promise(resolve => setTimeout(resolve, 1500));
     mockEmailSettings[settings.surveyId] = settings;
     return { success: true, message: '設定を保存しました！' };
@@ -77,7 +77,7 @@ export async function saveThankYouEmailSettings(settings) {
  */
 export async function sendThankYouEmails(surveyId) {
     const recipientCount = mockSurveyData[surveyId]?.recipientCount || 0;
-    console.log(`Sending ${recipientCount} emails for survey ID: ${surveyId}`);
+    
     await new Promise(resolve => setTimeout(resolve, 2500));
     return { success: true, message: `お礼メールの送信を開始しました！ (${recipientCount}件)` };
 }

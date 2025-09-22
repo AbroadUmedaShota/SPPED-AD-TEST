@@ -88,7 +88,7 @@ const LOCAL_STORAGE_KEY = 'surveyCreationData';
 export function saveSurveyDataToLocalStorage(surveyData) {
     try {
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(surveyData));
-        console.log('Survey data saved to localStorage.');
+        
     } catch (e) {
         console.error('Error saving survey data to localStorage:', e);
     }

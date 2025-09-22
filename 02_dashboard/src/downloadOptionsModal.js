@@ -58,17 +58,13 @@ function handleDownloadFormChange(event) {
 export async function openDownloadModal(initialSelection, periodStart = '', periodEnd = '') {
     await handleOpenModal('downloadOptionsModal', 'modals/downloadOptionsModal.html');
     
-    // Ensure modal elements are available after loading and opening.
-    // It's crucial to call initializeDownloadOptionsModal *after* the modal content is in the DOM.
     initializeDownloadOptionsModal();
 
-    // Reset form to default state
     const periodAllRadio = document.getElementById('period_all');
     const customPeriodInputsEl = document.getElementById('customPeriodInputs');
     if (periodAllRadio) periodAllRadio.checked = true;
     if (customPeriodInputsEl) customPeriodInputsEl.classList.add('hidden');
 
-    // Set initial data type selection
     const initialRadio = document.getElementById(`download_${initialSelection}`);
     if (initialRadio) {
         initialRadio.checked = true;
@@ -77,16 +73,25 @@ export async function openDownloadModal(initialSelection, periodStart = '', peri
         if (defaultAnswerRadio) defaultAnswerRadio.checked = true;
     }
 
-    // Store survey period for custom date selection and set min/max attributes
     currentSurveyPeriod = { start: periodStart, end: periodEnd };
     const downloadStartDateInput = document.getElementById('download_start_date');
     const downloadEndDateInput = document.getElementById('download_end_date');
-    if (downloadStartDateInput) {
-        downloadStartDateInput.min = periodStart;
-        downloadStartDateInput.max = periodEnd;
-    }
-    if (downloadEndDateInput) {
-        downloadEndDateInput.min = periodStart;
-        downloadEndDateInput.max = periodEnd;
-    }
+
+    // Initialize flatpickr for the modal's date inputs
+    const endDatePicker = flatpickr(downloadEndDateInput, {
+        dateFormat: "Y-m-d",
+        minDate: periodStart,
+        maxDate: periodEnd,
+    });
+
+    const startDatePicker = flatpickr(downloadStartDateInput, {
+        dateFormat: "Y-m-d",
+        minDate: periodStart,
+        maxDate: periodEnd,
+        onChange: function(selectedDates) {
+            if (selectedDates[0]) {
+                endDatePicker.set('minDate', selectedDates[0]);
+            }
+        }
+    });
 }

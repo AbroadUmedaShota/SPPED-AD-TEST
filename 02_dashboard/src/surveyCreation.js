@@ -25,7 +25,6 @@ let isDirty = false; // To track unsaved changes
 function setDirty(dirty) {
     if (isDirty !== dirty) {
         isDirty = dirty;
-        console.log(`Dirty state set to: ${isDirty}`);
     }
 }
 
@@ -419,7 +418,7 @@ async function initializePage() {
             const keyedData = localStorage.getItem(`surveyData_${currentSurveyId}`);
             if (keyedData) {
                 surveyData = JSON.parse(keyedData);
-                console.log('Loaded survey data (by surveyId) from localStorage:', currentSurveyId);
+                
             }
         }
 
@@ -428,13 +427,13 @@ async function initializePage() {
             const genericData = loadSurveyDataFromLocalStorage(); // from surveyCreationData
             if (genericData) {
                 surveyData = genericData;
-                console.log('Loaded generic survey data from localStorage.');
+                
             }
         }
 
         // 3. If still empty and surveyId is present, load from JSON files
         if ((!surveyData || Object.keys(surveyData).length === 0) && currentSurveyId) {
-            console.log(`Fetching data for surveyId: ${currentSurveyId}`);
+            
 
             // Load canonical dataset from `/data/dashboard/`
             let surveysList = await fetchJson(resolveDashboardDataPath('core/surveys.json'));
@@ -481,8 +480,8 @@ async function initializePage() {
                         surveyData.questionGroups[0].title.en = surveyData.questionGroups[0].title.en || 'Imported Questions';
                     }
                 }
-                console.log('Successfully constructed survey data (with fallbacks).');
-                try { showToast(`Loaded survey: ${currentSurveyId}`, 'info', 2000); } catch (_) {}
+                
+                showToast(`Loaded survey: ${currentSurveyId}`, 'info', 2000);
             } else if (surveyInfo) {
                 // Only list meta available
                 surveyData = {
@@ -498,16 +497,16 @@ async function initializePage() {
                     questionGroups: [],
                 };
                 console.warn('Enquete details not found; loaded meta only.');
-                try { showToast(`Loaded survey meta only: ${currentSurveyId}`, 'info', 2500); } catch (_) {}
+                showToast(`Loaded survey meta only: ${currentSurveyId}`, 'info', 2500);
             } else {
                 console.warn(`Survey with id "${currentSurveyId}" not found in any known source.`);
-                try { showToast(`Survey not found: ${currentSurveyId}`, 'error', 3000); } catch (_) {}
+                showToast(`Survey not found: ${currentSurveyId}`, 'error', 3000);
             }
         }
 
         // 4. If still no data, fall back to the default template
         if (!surveyData || Object.keys(surveyData).length === 0) {
-            console.log('No survey data found. Fetching fallback template...');
+            
             surveyData = await fetchSurveyData(); // Reads data/dashboard/surveys/sample_survey.json
         }
 
@@ -721,7 +720,7 @@ function setupEventListeners() {
                     console.error('Failed to save keyed survey data:', e);
                 }
             }
-            console.log('Saved Survey Data to localStorage:', surveyData);
+            
             showToast('アンケートデータが保存されました。');
             setDirty(false); // Reset dirty state after successful save
         });
@@ -1015,11 +1014,11 @@ function enhanceAccordionA11y() {
 
 // DOMの読み込みが完了したら処理を開始
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOMContentLoaded event fired. Initializing page...');
+    
     initializePage();
-    console.log('Page initialized. Setting up event listeners...');
+    
     setupEventListeners();
-    console.log('Event listeners set up. Attaching preview listener...');
+    
     attachPreviewListener();
     // Re-render on language change
     document.addEventListener('languagechange', (e) => {
@@ -1178,6 +1177,14 @@ function setupSortables() {
 }
 
 // --- Preview Rendering ---
+function getTextLocal(field, lang) {
+    if (typeof field === 'string') return field;
+    if (field && typeof field === 'object') {
+        return field[lang] || field.ja || field.en || '';
+    }
+    return '';
+}
+
 function renderSurveyPreview() {
     const container = document.getElementById('modalSurveyPreviewContainer');
     if (!container) return;

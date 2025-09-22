@@ -1,6 +1,6 @@
-console.log("SCRIPT LOADED: speed-review.js");
 
-import { resolveDashboardDataPath } from './utils.js';
+
+import { resolveDashboardDataPath, showToast } from './utils.js';
 import { speedReviewService } from './services/speedReviewService.js';
 import { populateTable, renderModalContent } from './ui/speedReviewRenderer.js';
 import { handleOpenModal } from './modalHandler.js';
@@ -150,7 +150,7 @@ function handleEditToggle() {
 function handleSave() {
     if (!isModalInEditMode) return;
     console.log('Saving data for answerId:', currentItemInModal.answerId);
-    alert('データが保存されました。（実際には保存されません）');
+    showToast('データが保存されました。（実際には保存されません）', 'success');
     handleEditToggle();
 }
 
@@ -396,7 +396,7 @@ function setupEventListeners() {
             if (!surveyId) {
                 surveyId = 'SURVEY_001'; // Fallback to default
             }
-            window.location.href = `../sample/graph-page.html?surveyId=${surveyId}`;
+            window.location.href = `graph-page.html?surveyId=${surveyId}`;
         });
     }
 
@@ -441,24 +441,18 @@ export async function initializePage() {
         let personalInfoData = personalInfo;
         let enqueteDetailsData = enqueteDetails;
 
-        try {
-            if (!Array.isArray(answersData) || answersData.length === 0) {
-                const r1 = await fetch(resolveDashboardDataPath(`responses/answers/${surveyId}.json`));
-                answersData = r1.ok ? await r1.json() : [];
-            }
-        } catch {}
-        try {
-            if (!Array.isArray(personalInfoData) || personalInfoData.length === 0) {
-                const r2 = await fetch(resolveDashboardDataPath(`responses/business-cards/${surveyId}.json`));
-                personalInfoData = r2.ok ? await r2.json() : [];
-            }
-        } catch {}
-        try {
-            if (!enqueteDetailsData || !enqueteDetailsData.details) {
-                const r3 = await fetch(resolveDashboardDataPath(`surveys/enquete/${surveyId}.json`));
-                enqueteDetailsData = r3.ok ? await r3.json() : {};
-            }
-        } catch {}
+        if (!Array.isArray(answersData) || answersData.length === 0) {
+            const r1 = await fetch(resolveDashboardDataPath(`responses/answers/${surveyId}.json`));
+            answersData = r1.ok ? await r1.json() : [];
+        }
+        if (!Array.isArray(personalInfoData) || personalInfoData.length === 0) {
+            const r2 = await fetch(resolveDashboardDataPath(`responses/business-cards/${surveyId}.json`));
+            personalInfoData = r2.ok ? await r2.json() : [];
+        }
+        if (!enqueteDetailsData || !enqueteDetailsData.details) {
+            const r3 = await fetch(resolveDashboardDataPath(`surveys/enquete/${surveyId}.json`));
+            enqueteDetailsData = r3.ok ? await r3.json() : {};
+        }
 
         // 2. Find the survey definition
         currentSurvey = surveys.find(s => s.id === surveyId);

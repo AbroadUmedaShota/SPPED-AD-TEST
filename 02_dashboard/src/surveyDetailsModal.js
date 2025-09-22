@@ -100,12 +100,7 @@ function handleDeleteSurvey() {
 }
 
 function handleCancelEdit() {
-    // モーダルを閉じる
-    const modal = document.getElementById('surveyDetailsModal');
-    if (modal) {
-        modal.classList.add('hidden');
-        modal.dataset.state = 'closed';
-    }
+    closeModal('surveyDetailsModal');
 }
 
 function handleSaveSurvey() {

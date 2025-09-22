@@ -1,18 +1,6 @@
-import { loadCommonHtml, showLoading, hideLoading, showMessage, downloadFile, resolveDashboardDataPath } from './utils.js';
-import { initSidebarHandler } from './sidebarHandler.js';
-import { initBreadcrumbs } from './breadcrumb.js';
+import { showLoading, hideLoading, showMessage, downloadFile, resolveDashboardDataPath } from './utils.js';
 
-document.addEventListener('DOMContentLoaded', async () => {
-    await loadCommonHtml('header-placeholder', 'common/header.html');
-    await loadCommonHtml('sidebar-placeholder', 'common/sidebar.html', initSidebarHandler);
-    await loadCommonHtml('footer-placeholder', 'common/footer.html');
-
-    initBreadcrumbs([
-        { name: 'ダッシュボード', href: 'index.html' },
-        { name: '請求書一覧', href: 'invoiceList.html' },
-        { name: '請求書詳細', href: '#' }
-    ]);
-
+export async function initInvoiceDetailPage() {
     const urlParams = new URLSearchParams(window.location.search);
     const invoiceId = urlParams.get('id');
 
@@ -30,7 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('printInvoiceBtn').addEventListener('click', () => {
         const printWindow = window.open(`invoice-print.html?id=${invoiceId}`, '_blank');
     });
-});
+}
 
 async function loadInvoiceDetail(invoiceId) {
     showLoading('invoice-detail-loading-overlay');

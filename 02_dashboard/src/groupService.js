@@ -36,7 +36,7 @@ export async function createGroup(newGroupData) {
     const groupToSave = { ...newGroupData, id: newId };
     groups.push(groupToSave);
     // TODO: 実際にはサーバーサイドAPIを呼び出す
-    console.log('Group created (in-memory):', groupToSave);
+    
     return groupToSave;
 }
 
@@ -51,7 +51,7 @@ export async function updateGroup(groupId, updatedGroupData) {
     if (index !== -1) {
         groups[index] = { ...groups[index], ...updatedGroupData };
         // TODO: 実際にはサーバーサイドAPIを呼び出す
-        console.log('Group updated (in-memory):', groups[index]);
+        
         return groups[index];
     }
     return null;
@@ -66,7 +66,7 @@ export async function deleteGroup(groupId) {
     const initialLength = groups.length;
     groups = groups.filter(g => g.id !== groupId);
     // TODO: 実際にはサーバーサイドAPIを呼び出す
-    console.log('Group deleted (in-memory):', groupId);
+    
     return groups.length < initialLength;
 }
 
