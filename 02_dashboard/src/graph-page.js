@@ -1,5 +1,5 @@
-import { speedReviewService } from '../services/speedReviewService.js';
-import { initBreadcrumbs } from '../breadcrumb.js';
+import { speedReviewService } from './services/speedReviewService.js';
+import { initBreadcrumbs } from './breadcrumb.js';
 import { resolveDashboardDataPath } from './utils.js';
 
 document.addEventListener('DOMContentLoaded', () => {

@@ -481,23 +481,7 @@ async function initializePage() {
                     }
                 }
                 
-                showToast(`Loaded survey: ${currentSurveyId}`, 'info', 2000);
-            } else if (surveyInfo) {
-                // Only list meta available
-                surveyData = {
-                    id: surveyInfo.id,
-                    name: getStr(surveyInfo.name),
-                    displayTitle: getStr(surveyInfo.displayTitle),
-                    description: getStr(surveyInfo.description),
-                    memo: surveyInfo.memo || '',
-                    periodStart: surveyInfo.periodStart || '',
-                    periodEnd: surveyInfo.periodEnd || '',
-                    plan: surveyInfo.plan || 'Standard',
-                    deadline: surveyInfo.deadline || '',
-                    questionGroups: [],
-                };
-                console.warn('Enquete details not found; loaded meta only.');
-                showToast(`Loaded survey meta only: ${currentSurveyId}`, 'info', 2500);
+
             } else {
                 console.warn(`Survey with id "${currentSurveyId}" not found in any known source.`);
                 showToast(`Survey not found: ${currentSurveyId}`, 'error', 3000);

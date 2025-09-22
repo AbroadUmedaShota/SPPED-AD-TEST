@@ -175,8 +175,7 @@ export async function loadCommonHtml(placeholderId, filePath, callback = null) {
             const doc = parser.parseFromString(html, 'text/html');
             
             // Determine the correct base path for assets
-            const isSamplePage = window.location.pathname.includes('/sample/');
-            const assetBasePath = isSamplePage ? '../../02_dashboard/' : ''; // Use empty string for root pages
+            const assetBasePath = resolveCommonBasePath();
 
             // Select elements with src or href attributes that might need rewriting
             const elementsToFix = doc.querySelectorAll('img[src], link[href], a[href]');

@@ -38,25 +38,7 @@ const I18N = {
     }
   }
 };
-// Ensure labels are readable even if source encoding is broken
-try {
-  if (I18N.labels?.ja) {
-    I18N.labels.ja.addOption = '+ Add option';
-    I18N.labels.ja.noQuestions = 'No questions.';
-    I18N.labels.ja.noGroups = 'No question groups.';
-    I18N.labels.ja.unknownType = 'Unknown type';
-  }
-  if (I18N.questionTypes?.ja) {
-    I18N.questionTypes.ja.free_answer = 'Free Text';
-    I18N.questionTypes.ja.single_answer = 'Single Choice';
-    I18N.questionTypes.ja.multi_answer = 'Multiple Choice';
-    I18N.questionTypes.ja.number_answer = 'Number';
-    I18N.questionTypes.ja.matrix_sa = 'Matrix (Single)';
-    I18N.questionTypes.ja.matrix_ma = 'Matrix (Multiple)';
-    if (!I18N.questionTypes.ja.date_time) I18N.questionTypes.ja.date_time = 'Date/Time';
-    if (!I18N.questionTypes.ja.handwriting) I18N.questionTypes.ja.handwriting = 'Handwriting';
-  }
-} catch (_) { /* noop */ }
+
 // Complete missing type labels (fallback; ASCII-safe)
 try {
   if (!I18N.questionTypes?.ja?.date_time) I18N.questionTypes.ja.date_time = 'Date/Time';

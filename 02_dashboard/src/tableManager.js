@@ -204,7 +204,8 @@ function renderTableRows(surveysToRender) {
 
         row.querySelector('button[title="アンケートを編集"]').addEventListener('click', (e) => {
             e.stopPropagation();
-            window.location.href = `surveyCreation.html?surveyId=${survey.id}`;
+            const surveyNameForUrl = encodeURIComponent(surveyName);
+            window.location.href = `surveyCreation.html?surveyId=${survey.id}&surveyName=${surveyNameForUrl}`;
         });
 
         row.querySelector('button[title="QRコードを表示"]').addEventListener('click', (e) => {
