@@ -23,6 +23,16 @@ export async function initGroupManagementModal(modalElement, groupId = null) {
     const deleteGroupBtn = modalElement.querySelector('#deleteGroupBtn');
     const modalTitle = modalElement.querySelector('#newGroupModalTitle');
     const submitButton = groupForm.querySelector('button[type="submit"]');
+    const closeBtn = modalElement.querySelector('#closeNewGroupModalBtn');
+    const cancelBtn = modalElement.querySelector('#cancelNewGroupModalBtn');
+
+    // モーダルを閉じるイベント
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => closeModal('newGroupModal'));
+    }
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => closeModal('newGroupModal'));
+    }
 
     // イベントリスナーの重複登録を防ぐために、既存のリスナーを削除してから追加
     if (groupForm) groupForm.removeEventListener('submit', handleGroupFormSubmit);

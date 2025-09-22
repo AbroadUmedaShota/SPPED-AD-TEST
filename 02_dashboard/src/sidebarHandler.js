@@ -154,4 +154,9 @@ export function initSidebarHandler() {
             link.classList.add('active');
         }
     });
+
+    // If a page-specific navigation guard exists, attach it.
+    if (typeof window.attachPasswordChangeNavGuard === 'function') {
+        window.attachPasswordChangeNavGuard();
+    }
 }

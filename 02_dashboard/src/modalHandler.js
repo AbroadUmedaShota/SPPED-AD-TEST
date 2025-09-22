@@ -41,6 +41,16 @@ async function loadModalFromFile(modalId, filePath) {
             if (modalId === 'qrCodeModal') {
                 setupQrCodeModalListeners(modalElement);
             }
+            if (modalId === 'newSurveyModal') {
+                const closeBtn = modalElement.querySelector('#closeNewSurveyModalBtn');
+                const cancelBtn = modalElement.querySelector('#cancelNewSurveyModalBtn');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => closeModal(modalId));
+                }
+                if (cancelBtn) {
+                    cancelBtn.addEventListener('click', () => closeModal(modalId));
+                }
+            }
             if (modalId === 'reviewDetailModalOverlay') {
                 const closeBtn = modalElement.querySelector('#closeDetailModalBtn');
                 if (closeBtn) {

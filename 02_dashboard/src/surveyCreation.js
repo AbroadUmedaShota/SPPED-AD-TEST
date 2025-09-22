@@ -441,7 +441,7 @@ async function initializePage() {
             let enqueteDetails = null;
 
             if (surveyInfo) {
-                enqueteDetails = await fetchJson(resolveDashboardDataPath(`surveys/enquete/${currentSurveyId}.json`));
+                enqueteDetails = await fetchJson(resolveDashboardDataPath(`demos/sample-3/Enquete/${currentSurveyId}.json`));
             }
 
             // Re-fetch canonical surveys list to ensure metadata is available

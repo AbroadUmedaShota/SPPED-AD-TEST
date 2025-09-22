@@ -29,7 +29,7 @@ const breadcrumbPaths = {
     ],
     'thankYouScreenSettings.html': [
         { name: 'アンケート一覧', link: 'index.html' },
-        { name: 'アンケート作成・編集', link: '#' },
+        { name: 'アンケート作成・編集', link: 'surveyCreation.html' },
         { name: 'サンクス画面設定' },
     ],
     'group-edit.html': [
