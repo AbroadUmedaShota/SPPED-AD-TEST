@@ -14,13 +14,13 @@
 -  `02_dashboard/` 直下以外（例: `group-edit` デモ）では自動的にベースパスを算出します。特殊な配置で補正が必要なときのみ `window.__COMMON_BASE_PATH` を上書きして `loadCommonHtml` の参照先を調整してください。 
 
 ## データ参照の原則
-- ダッシュボード向けの JSON は `data/dashboard/` に集約されています。
+- ダッシュボード向けの JSON は `data/` に集約されています。
 - フェッチ時は `resolveDashboardDataPath('core/surveys.json')` のように `resolveDashboardDataPath` を経由し、相対パスのずれを防ぎます。
 - 大容量ダンプは `archive/data-dumps/` に退避しており、ランタイムでは使用しません。
 
 ## デモとモック
-- `02_dashboard/group-edit/` : グループ管理デモ画面。サイドバーの「グループ管理デモ」リンクからアクセスできます。
-- `data/dashboard/demos/sample-3/` : グラフ・回答分析用のモックデータ。`speed-review.js` や `graph-page.js` が参照します。
+- `02_dashboard/group-edit/` : グループ管理画面。サイドバーの「グループ管理」リンクからアクセスできます。
+- `data/demo_surveys/`, `data/demo_answers/`, `data/demo_business-cards/` : グラフ・回答分析用のモックデータ。`speed-review.js` や `graph-page.js` が参照します。
 
 詳細は各ドキュメントを参照してください。
 

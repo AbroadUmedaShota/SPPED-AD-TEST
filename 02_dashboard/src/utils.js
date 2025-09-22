@@ -2,11 +2,16 @@
 let scrollPosition = 0; // Stores scroll position for `lockScroll`/`unlockScroll`
 let activeUIsCount = 0; // Tracks number of active UI overlays (modals, mobile sidebar)
 
-export const DASHBOARD_DATA_ROOT = '/data/dashboard';
+export const DATA_ROOT = '/data';
 
 export function resolveDashboardDataPath(relativePath) {
     const sanitized = relativePath.replace(/^\/+/, '');
-    return `${DASHBOARD_DATA_ROOT}/${sanitized}`;
+    return `${DATA_ROOT}/${sanitized}`;
+}
+
+export function resolveDemoDataPath(relativePath) {
+    const sanitized = relativePath.replace(/^\/+/, '');
+    return `${DATA_ROOT}/demo_${sanitized}`;
 }
 
 /**

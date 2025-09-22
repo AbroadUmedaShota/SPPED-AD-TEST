@@ -1,1 +1,11 @@
-feat: Refactor invoice file naming and roles
+refactor(data): dataディレクトリ構造をリファクタリングしデモデータを分離
+
+data/dashboardディレクトリを廃止し、すべてのモックデータをプロジェクトルートのdataディレクトリに再編成しました。
+これにより、パスの冗長性が減り、データ構造がより直感的になりました。
+
+主な変更点:
+- すべてのデータパスを`data/dashboard/`から`data/`に変更。
+- デモ用のデータセットを`data/demo_*`フォルダに分離。
+- データパス解決のため、`utils.js`に`resolveDemoDataPath`を追加し、既存の`resolveDashboardDataPath`を更新。
+- 関連するすべてのドキュメントとソースコードのパス参照を修正。
+- アンケート一覧から不要になったアクションボタンを削除。

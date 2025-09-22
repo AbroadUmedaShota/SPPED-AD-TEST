@@ -1,6 +1,6 @@
 import { speedReviewService } from '../02_dashboard/src/services/speedReviewService.js';
 import { initBreadcrumbs } from '../02_dashboard/src/breadcrumb.js';
-import { resolveDashboardDataPath } from './utils.js';
+import { resolveDemoDataPath } from './utils.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     initGraphPage();
@@ -18,7 +18,7 @@ let dateRangePicker = null;
 async function initGraphPage() {
     initBreadcrumbs(); // Add this line
     const urlParams = new URLSearchParams(window.location.search);
-    const surveyId = urlParams.get('surveyId') || 'SURVEY_001'; // Default to SURVEY_001
+    const surveyId = urlParams.get('surveyId') || 'sv_20250701_001'; // Default to sample survey ID
 
     initializeDatePicker();
     await loadAndRenderCharts(surveyId);
@@ -82,11 +82,11 @@ async function loadAndRenderCharts(surveyId) {
 
         // 1. Fetch survey definition and answer data in parallel
         const [surveyDefinition, answers] = await Promise.all([
-            fetch(resolveDashboardDataPath(`demos/sample-3/Enquete/${surveyId}.json`)).then(res => {
+            fetch(resolveDemoDataPath(`surveys/${surveyId}.json`)).then(res => {
                 if (!res.ok) throw new Error(`アンケート定義ファイルが見つかりません: ${surveyId}.json`);
                 return res.json();
             }),
-            fetch(resolveDashboardDataPath(`demos/sample-3/Answer/${surveyId}.json`)).then(res => {
+            fetch(resolveDemoDataPath(`answers/${surveyId}.json`)).then(res => {
                 if (!res.ok) return [];
                 return res.json();
             })

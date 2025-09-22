@@ -1,0 +1,207 @@
+{
+  "id": "sv_20251010_001",
+  "groupId": "GROUP001",
+  "name": {
+    "ja": "顧客の購買行動に関するアンケート",
+    "en": "Customer Purchasing Behavior Survey"
+  },
+  "displayTitle": {
+    "ja": "顧客の購買行動についてお聞かせください",
+    "en": "Please tell us about customer purchasing behavior"
+  },
+  "description": {
+    "ja": "顧客の購買行動に関するフィードバックを収集します。",
+    "en": "This survey collects feedback on customer purchasing behavior."
+  },
+  "status": "会期中",
+  "answerCount": 250,
+  "realtimeAnswers": 52,
+  "periodStart": "2025-10-10",
+  "periodEnd": "2025-11-09",
+  "bizcardEnabled": true,
+  "details": [
+    {
+      "id": "Q1",
+      "text": "Q1. どのような商品をよく購入しますか？",
+      "type": "text"
+    },
+    {
+      "id": "Q2",
+      "text": "Q2. 商品の購入を検討する際に重視する点は何ですか？",
+      "type": "text"
+    },
+    {
+      "id": "Q3",
+      "text": "Q3. どこで商品の情報を得ますか？",
+      "type": "multi_choice",
+      "options": [
+        "SNS",
+        "広告",
+        "友人からの紹介",
+        "店頭",
+        "ウェブサイト",
+        "その他"
+      ]
+    },
+    {
+      "id": "Q4",
+      "text": "Q4. 商品の購入頻度を教えてください。",
+      "type": "single_choice",
+      "options": [
+        "毎日",
+        "週に数回",
+        "月に数回",
+        "ほとんど購入しない"
+      ]
+    },
+    {
+      "id": "Q5",
+      "text": "Q5. 商品の購入場所を教えてください。",
+      "type": "multi_choice",
+      "options": [
+        "オンラインストア",
+        "実店舗",
+        "その他"
+      ]
+    },
+    {
+      "id": "Q6",
+      "text": "Q6. 商品の購入を決定するまでにどのくらいの時間がかかりますか？",
+      "type": "single_choice",
+      "options": [
+        "即日",
+        "数日",
+        "1週間以内",
+        "1ヶ月以内",
+        "1ヶ月以上"
+      ]
+    },
+    {
+      "id": "Q7",
+      "text": "Q7. 商品の購入に関する課題はありますか？",
+      "type": "text"
+    },
+    {
+      "id": "Q8",
+      "text": "Q8. 商品の購入に関する改善点があれば教えてください。",
+      "type": "text"
+    },
+    {
+      "id": "Q9",
+      "text": "Q9. 商品の全体的な満足度を教えてください。",
+      "type": "single_choice",
+      "options": [
+        "非常に満足",
+        "満足",
+        "普通",
+        "不満",
+        "非常に不満"
+      ]
+    },
+    {
+      "id": "Q10",
+      "text": "Q10. 商品の価格についてどう思いますか？",
+      "type": "single_choice",
+      "options": [
+        "高い",
+        "適切",
+        "安い"
+      ]
+    },
+    {
+      "id": "Q11",
+      "text": "Q11. 商品の品質についてどう思いますか？",
+      "type": "single_choice",
+      "options": [
+        "良い",
+        "普通",
+        "悪い"
+      ]
+    },
+    {
+      "id": "Q12",
+      "text": "Q12. 商品のデザインは魅力的ですか？",
+      "type": "single_choice",
+      "options": [
+        "はい",
+        "いいえ"
+      ]
+    },
+    {
+      "id": "Q13",
+      "text": "Q13. 商品のパッケージデザインについてどう思いますか？",
+      "type": "single_choice",
+      "options": [
+        "良い",
+        "普通",
+        "悪い"
+      ]
+    },
+    {
+      "id": "Q14",
+      "text": "Q14. 商品のブランドイメージについてどう思いますか？",
+      "type": "single_choice",
+      "options": [
+        "良い",
+        "普通",
+        "悪い"
+      ]
+    },
+    {
+      "id": "Q15",
+      "text": "Q15. 商品の購入後のサポート体制についてどう思いますか？",
+      "type": "single_choice",
+      "options": [
+        "良い",
+        "普通",
+        "悪い"
+      ]
+    },
+    {
+      "id": "Q16",
+      "text": "Q16. 商品の購入後の満足度は高いですか？",
+      "type": "single_choice",
+      "options": [
+        "はい",
+        "いいえ"
+      ]
+    },
+    {
+      "id": "Q17",
+      "text": "Q17. 商品の購入後のリピート意欲は高いですか？",
+      "type": "single_choice",
+      "options": [
+        "はい",
+        "いいえ"
+      ]
+    },
+    {
+      "id": "Q18",
+      "text": "Q18. 商品の購入後の口コミ意欲は高いですか？",
+      "type": "single_choice",
+      "options": [
+        "はい",
+        "いいえ"
+      ]
+    },
+    {
+      "id": "Q19",
+      "text": "Q19. 商品の購入後の推奨意欲は高いですか？",
+      "type": "single_choice",
+      "options": [
+        "はい",
+        "いいえ"
+      ]
+    },
+    {
+      "id": "Q20",
+      "text": "Q20. 商品の購入後の利用継続意欲は高いですか？",
+      "type": "single_choice",
+      "options": [
+        "はい",
+        "いいえ"
+      ]
+    }
+  ],
+  "createdAt": "2025-10-10T00:00:00+09:00"
+}

@@ -1,6 +1,6 @@
 console.log("SCRIPT LOADED: speed-review.js");
 
-import { resolveDashboardDataPath } from './utils.js';
+import { resolveDemoDataPath, resolveDashboardDataPath } from './utils.js';
 import { speedReviewService } from './services/speedReviewService.js';
 import { populateTable, renderModalContent } from './ui/speedReviewRenderer.js';
 import { handleOpenModal } from './modalHandler.js';
@@ -394,7 +394,7 @@ function setupEventListeners() {
             const urlParams = new URLSearchParams(window.location.search);
             let surveyId = urlParams.get('surveyId');
             if (!surveyId) {
-                surveyId = 'SURVEY_001'; // Fallback to default
+                surveyId = 'sv_20250701_001'; // Fallback to default
             }
             window.location.href = `../sample/graph-page.html?surveyId=${surveyId}`;
         });
@@ -422,21 +422,21 @@ export async function initializePage() {
         // 1. Fetch all data sources in parallel
         const [surveys, answers, personalInfo, enqueteDetails] = await Promise.all([
             fetch(resolveDashboardDataPath('core/surveys.json')).then(res => res.json()),
-            fetch(resolveDashboardDataPath(`demos/sample-3/Answer/${surveyId}.json`)).then(res => {
+            fetch(resolveDemoDataPath(`answers/${surveyId}.json`)).then(res => {
                 if (!res.ok) return []; // Return empty array if answer file not found
                 return res.json();
             }),
-            fetch(resolveDashboardDataPath(`demos/sample-3/ダミー個人情報/${surveyId}.json`)).then(res => {
+            fetch(resolveDemoDataPath(`business-cards/${surveyId}.json`)).then(res => {
                 if (!res.ok) return []; // Return empty array if personal info file not found
                 return res.json();
             }),
-            fetch(resolveDashboardDataPath(`demos/sample-3/Enquete/${surveyId}.json`)).then(res => {
+            fetch(resolveDemoDataPath(`surveys/${surveyId}.json`)).then(res => {
                 if (!res.ok) return {}; // Return empty object if enquete file not found
                 return res.json();
             })
         ]);
 
-        // Fallback to local data if sample-3 files are unavailable
+        // Fallback to local data if demo dataset files are unavailable
         let answersData = answers;
         let personalInfoData = personalInfo;
         let enqueteDetailsData = enqueteDetails;

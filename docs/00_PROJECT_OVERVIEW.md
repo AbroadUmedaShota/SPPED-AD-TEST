@@ -76,7 +76,7 @@
 
 ### 3. 機能要件（モックアップ対象）
 
-本フェーズでは、以下の機能を持つ画面のUIを実装します。データのやり取りは `data/dashboard/` 内のJSONファイルを用いてシミュレートします。
+本フェーズでは、以下の機能を持つ画面のUIを実装します。データのやり取りは `data/` 内のJSONファイルを用いてシミュレートします。
 
 **3.1. ユーザー向け機能**
 *   **アカウント管理:** ログイン/ログアウト、情報編集画面のUI
@@ -122,7 +122,7 @@
 
 ### 6. データモデル（フロントエンド用）
 
-本フェーズでは、`docs/architecture/02_data_model.md` に定義されたデータ構造に基づき、`data/dashboard/` ディレクトリ内に配置された静的なJSONファイル（例: `surveys.json`, `invoices.json`）をデータソースとして使用します。
+本フェーズでは、`docs/architecture/02_data_model.md` に定義されたデータ構造に基づき、`data/` ディレクトリ内に配置された静的なJSONファイル（例: `surveys.json`, `invoices.json`）をデータソースとして使用します。
 
 ### 7. 制約事項
 
@@ -133,5 +133,5 @@
 ## フロントエンドの構造
 - 共通HTMLは  `02_dashboard/common/` 配下に配置し、`loadCommonHtml` で読み込む。デモページなど `02_dashboard/` 配下のサブディレクトリでは自動的にベースパスを計算するが、必要に応じて `window.__COMMON_BASE_PATH` を指定して補正できる。 
 - 画面モジュールは `02_dashboard/src/` に集約し、デモ専用コードは `02_dashboard/demos/` に配置。
-- ダッシュボード用モックデータは `data/dashboard/` 以下に整理されており、`resolveDashboardDataPath` を通じて参照する。
+- ダッシュボード用モックデータは `data/` 以下に整理されており、`resolveDashboardDataPath` を通じて参照する。
 

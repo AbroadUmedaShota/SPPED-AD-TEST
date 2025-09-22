@@ -3,7 +3,7 @@
 ## Project Structure & Module Organization
 - Entry points `01_login/login-top.html` and `02_dashboard/index.html` load ES modules from `02_dashboard/src/` and shared `src/`.
 - Business logic stays in `src/services/` (e.g., `invoiceService.js`); UI-only DOM work belongs in `src/ui/`; shared helpers live in `utils.js`.
-- Mock datasets are under `data/dashboard/`; legacy references in `archive/` should not be edited unless you are migrating data.
+- Mock datasets are under `data/`; legacy references in `archive/` should not be edited unless you are migrating data.
 - Docs start at `docs/README.md`; review them before broad refactors or adding modules.
 
 ## Build, Test, and Development Commands

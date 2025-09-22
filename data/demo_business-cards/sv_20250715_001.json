@@ -1,0 +1,62 @@
+[
+  {
+    "answerId": "ANS_sv_20250715_001_001",
+    "businessCard": {
+      "group1": {
+        "email": "sasaki.satoru@example.com"
+      },
+      "group2": {
+        "lastName": "佐々木",
+        "firstName": "悟"
+      },
+      "group3": {
+        "companyName": "顧客サービス株式会社",
+        "department": "サポート部",
+        "position": "チームリーダー"
+      },
+      "group4": {
+        "postalCode": "101-0021",
+        "address1": "東京都千代田区外神田4-14-1",
+        "address2": "秋葉原UDX 8F"
+      },
+      "group5": {
+        "mobile": "060-1111-2222",
+        "tel1": "03-8888-9999",
+        "fax": "03-8888-9990"
+      },
+      "group6": {
+        "url": "https://customer-service.example.com"
+      }
+    }
+  },
+  {
+    "answerId": "ANS_sv_20250715_001_002",
+    "businessCard": {
+      "group1": {
+        "email": "watanabe.ayumi@example.com"
+      },
+      "group2": {
+        "lastName": "渡辺",
+        "firstName": "あゆみ"
+      },
+      "group3": {
+        "companyName": "サポートセンター合同会社",
+        "department": "テクニカルサポート",
+        "position": "スタッフ"
+      },
+      "group4": {
+        "postalCode": "542-0076",
+        "address1": "大阪府大阪市中央区難波5-1-60",
+        "address2": "なんばスカイオ 15F"
+      },
+      "group5": {
+        "mobile": "060-3333-4444",
+        "tel1": "06-1111-2222",
+        "fax": "06-1111-2223"
+      },
+      "group6": {
+        "url": "https://support-center.example.com"
+      }
+    }
+  }
+]

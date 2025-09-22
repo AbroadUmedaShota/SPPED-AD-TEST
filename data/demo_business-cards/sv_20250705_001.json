@@ -1,0 +1,92 @@
+[
+  {
+    "answerId": "ANS_sv_20250705_001_001",
+    "businessCard": {
+      "group1": {
+        "email": "yamamoto.daisuke@example.com"
+      },
+      "group2": {
+        "lastName": "山本",
+        "firstName": "大輔"
+      },
+      "group3": {
+        "companyName": "株式会社ウェブ",
+        "department": "開発部",
+        "position": "リードエンジニア"
+      },
+      "group4": {
+        "postalCode": "150-0002",
+        "address1": "東京都渋谷区渋谷2-2-2",
+        "address2": "渋谷ダミービル8F"
+      },
+      "group5": {
+        "mobile": "080-1111-2222",
+        "tel1": "03-2222-3333",
+        "fax": "03-2222-3334"
+      },
+      "group6": {
+        "url": "https://web-corp.example.com"
+      }
+    }
+  },
+  {
+    "answerId": "ANS_sv_20250705_001_002",
+    "businessCard": {
+      "group1": {
+        "email": "nakamura.yuko@example.com"
+      },
+      "group2": {
+        "lastName": "中村",
+        "firstName": "優子"
+      },
+      "group3": {
+        "companyName": "ウェブデザイン株式会社",
+        "department": "デザイン部",
+        "position": "UI/UXデザイナー"
+      },
+      "group4": {
+        "postalCode": "160-0022",
+        "address1": "東京都新宿区新宿3-3-3",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "080-3333-4444",
+        "tel1": "03-4444-5555",
+        "fax": "03-4444-5556"
+      },
+      "group6": {
+        "url": "https://web-design.example.com"
+      }
+    }
+  },
+  {
+    "answerId": "ANS_sv_20250705_001_003",
+    "businessCard": {
+      "group1": {
+        "email": "kato.takuya@example.com"
+      },
+      "group2": {
+        "lastName": "加藤",
+        "firstName": "拓也"
+      },
+      "group3": {
+        "companyName": "ウェブソリューションズ",
+        "department": "営業部",
+        "position": "アカウントマネージャー"
+      },
+      "group4": {
+        "postalCode": "104-0061",
+        "address1": "東京都中央区銀座4-4-4",
+        "address2": "銀座ダミービル7F"
+      },
+      "group5": {
+        "mobile": "080-5555-6666",
+        "tel1": "03-6666-7777",
+        "fax": "03-6666-7778"
+      },
+      "group6": {
+        "url": "https://web-solutions.example.com"
+      }
+    }
+  }
+]

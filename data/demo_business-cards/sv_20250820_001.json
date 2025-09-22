@@ -1,0 +1,62 @@
+[
+  {
+    "answerId": "ANS_sv_20250820_001_001",
+    "businessCard": {
+      "group1": {
+        "email": "nakano.shingo@example.com"
+      },
+      "group2": {
+        "lastName": "中野",
+        "firstName": "慎吾"
+      },
+      "group3": {
+        "companyName": "システム開発株式会社",
+        "department": "システム開発部",
+        "position": "ソフトウェアエンジニア"
+      },
+      "group4": {
+        "postalCode": "150-0043",
+        "address1": "東京都渋谷区道玄坂1-1-1",
+        "address2": "渋谷マークシティ 22F"
+      },
+      "group5": {
+        "mobile": "080-1234-5678",
+        "tel1": "03-2222-3333",
+        "fax": "03-2222-3334"
+      },
+      "group6": {
+        "url": "https://system-dev.example.com"
+      }
+    }
+  },
+  {
+    "answerId": "ANS_sv_20250820_001_002",
+    "businessCard": {
+      "group1": {
+        "email": "harada.yumi@example.com"
+      },
+      "group2": {
+        "lastName": "原田",
+        "firstName": "由美"
+      },
+      "group3": {
+        "companyName": "IT推進部株式会社",
+        "department": "IT推進部",
+        "position": "ITコンサルタント"
+      },
+      "group4": {
+        "postalCode": "100-6990",
+        "address1": "東京都千代田区丸の内2-7-2",
+        "address2": "JPタワー 30F"
+      },
+      "group5": {
+        "mobile": "080-8765-4321",
+        "tel1": "03-4444-5555",
+        "fax": "03-4444-5556"
+      },
+      "group6": {
+        "url": "https://it-promotion.example.com"
+      }
+    }
+  }
+]

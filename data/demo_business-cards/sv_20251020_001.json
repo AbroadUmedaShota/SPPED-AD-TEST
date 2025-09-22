@@ -1,0 +1,62 @@
+[
+  {
+    "answerId": "ANS_sv_20251020_001_001",
+    "businessCard": {
+      "group1": {
+        "email": "watanabe.kenta@example.com"
+      },
+      "group2": {
+        "lastName": "渡辺",
+        "firstName": "健太"
+      },
+      "group3": {
+        "companyName": "製品開発株式会社",
+        "department": "製品開発部",
+        "position": "ソフトウェアアーキテクト"
+      },
+      "group4": {
+        "postalCode": "108-0073",
+        "address1": "東京都港区三田1-4-28",
+        "address2": "三田国際ビル 20F"
+      },
+      "group5": {
+        "mobile": "050-2345-6789",
+        "tel1": "03-0123-4567",
+        "fax": "03-0123-4568"
+      },
+      "group6": {
+        "url": "https://product-dev-inc.example.com"
+      }
+    }
+  },
+  {
+    "answerId": "ANS_sv_20251020_001_002",
+    "businessCard": {
+      "group1": {
+        "email": "tanaka.misaki@example.com"
+      },
+      "group2": {
+        "lastName": "田中",
+        "firstName": "美咲"
+      },
+      "group3": {
+        "companyName": "品質管理株式会社",
+        "department": "品質管理部",
+        "position": "テストエンジニア"
+      },
+      "group4": {
+        "postalCode": "220-6215",
+        "address1": "神奈川県横浜市西区みなとみらい2-3-5",
+        "address2": "クイーンズタワーC 15F"
+      },
+      "group5": {
+        "mobile": "050-9876-5432",
+        "tel1": "045-123-4567",
+        "fax": "045-123-4568"
+      },
+      "group6": {
+        "url": "https://quality-control-inc.example.com"
+      }
+    }
+  }
+]

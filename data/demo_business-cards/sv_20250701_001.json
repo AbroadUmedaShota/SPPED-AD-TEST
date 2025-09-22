@@ -1,0 +1,302 @@
+[
+  {
+    "answerId": "ANS_sv_20250701_001_001",
+    "businessCard": {
+      "group1": {
+        "email": "tanaka.taro@example.com"
+      },
+      "group2": {
+        "lastName": "田中",
+        "firstName": "太郎"
+      },
+      "group3": {
+        "companyName": "株式会社ダミー",
+        "department": "営業部",
+        "position": "課長"
+      },
+      "group4": {
+        "postalCode": "100-0001",
+        "address1": "東京都千代田区千代田1-1",
+        "address2": "ダミービル5F"
+      },
+      "group5": {
+        "mobile": "090-1111-2222",
+        "tel1": "03-1234-5678",
+        "fax": "03-1234-5679"
+      },
+      "group6": {
+        "url": "https://dummy-corp.example.com"
+      }
+    }
+  },
+  {
+    "answerId": "ANS_sv_20250701_001_002",
+    "businessCard": {
+      "group1": {
+        "email": "sato.hanako@example.com"
+      },
+      "group2": {
+        "lastName": "佐藤",
+        "firstName": "花子"
+      },
+      "group3": {
+        "companyName": "ダミー商事",
+        "department": "人事部",
+        "position": "部長"
+      },
+      "group4": {
+        "postalCode": "530-0001",
+        "address1": "大阪府大阪市北区梅田1-1-1",
+        "address2": "大阪ダミービル10F"
+      },
+      "group5": {
+        "mobile": "090-3333-4444",
+        "tel1": "06-9876-5432",
+        "fax": "06-9876-5433"
+      },
+      "group6": {
+        "url": "https://dummy-shoji.example.com"
+      }
+    }
+  },
+  {
+    "answerId": "ANS_sv_20250701_001_003",
+    "businessCard": {
+      "group1": {
+        "email": "suzuki.ichiro@example.com"
+      },
+      "group2": {
+        "lastName": "鈴木",
+        "firstName": "一郎"
+      },
+      "group3": {
+        "companyName": "ダミー工業",
+        "department": "技術部",
+        "position": "エンジニア"
+      },
+      "group4": {
+        "postalCode": "450-0002",
+        "address1": "愛知県名古屋市中村区名駅1-1-1",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "090-5555-6666",
+        "tel1": "052-111-2222",
+        "fax": "052-111-2223"
+      },
+      "group6": {
+        "url": "https://dummy-kogyo.example.com"
+      }
+    }
+  },
+  {
+    "answerId": "ANS_sv_20250701_001_004",
+    "businessCard": {
+      "group1": {
+        "email": "takahashi.misaki@example.com"
+      },
+      "group2": {
+        "lastName": "高橋",
+        "firstName": "美咲"
+      },
+      "group3": {
+        "companyName": "ダミーサービス",
+        "department": "マーケティング部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "810-0001",
+        "address1": "福岡県福岡市中央区天神1-1-1",
+        "address2": "天神ダミービル3F"
+      },
+      "group5": {
+        "mobile": "090-7777-8888",
+        "tel1": "092-333-4444",
+        "fax": "092-333-4445"
+      },
+      "group6": {
+        "url": "https://dummy-service.example.com"
+      }
+    }
+  },
+  {
+    "answerId": "ANS_sv_20250701_001_005",
+    "businessCard": {
+      "group1": {
+        "email": "kobayashi.kenta@example.com"
+      },
+      "group2": {
+        "lastName": "小林",
+        "firstName": "健太"
+      },
+      "group3": {
+        "companyName": "ダミーシステム",
+        "department": "開発部",
+        "position": "シニアエンジニア"
+      },
+      "group4": {
+        "postalCode": "060-0001",
+        "address1": "北海道札幌市中央区北1条西1-1",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "090-9999-0000",
+        "tel1": "011-555-6666",
+        "fax": "011-555-6667"
+      },
+      "group6": {
+        "url": "https://dummy-system.example.com"
+      }
+    }
+  },
+  {
+    "answerId": "ANS_sv_20250701_001_006",
+    "businessCard": {
+      "group1": {
+        "email": "watanabe.kenichi@future.co.jp"
+      },
+      "group2": {
+        "lastName": "渡辺",
+        "firstName": "健一"
+      },
+      "group3": {
+        "companyName": "フューチャー株式会社",
+        "department": "経営企画部",
+        "position": "アナリスト"
+      },
+      "group4": {
+        "postalCode": "100-0001",
+        "address1": "東京都千代田区1-2-3",
+        "address2": "ビル4F"
+      },
+      "group5": {
+        "mobile": "090-1234-5678",
+        "tel1": "03-1111-2222",
+        "fax": "03-1111-2223"
+      },
+      "group6": {
+        "url": "https://www.future.co.jp"
+      }
+    }
+  },
+  {
+    "answerId": "ANS_sv_20250701_001_007",
+    "businessCard": {
+      "group1": {
+        "email": "ito.misaki@next.com"
+      },
+      "group2": {
+        "lastName": "伊藤",
+        "firstName": "美咲"
+      },
+      "group3": {
+        "companyName": "株式会社ネクスト",
+        "department": "DX推進室",
+        "position": "コンサルタント"
+      },
+      "group4": {
+        "postalCode": "550-0001",
+        "address1": "大阪府大阪市西区4-5-6",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "090-2345-6789",
+        "tel1": "06-2222-3333",
+        "fax": "06-2222-3334"
+      },
+      "group6": {
+        "url": "https://www.next.com"
+      }
+    }
+  },
+  {
+    "answerId": "ANS_sv_20250701_001_008",
+    "businessCard": {
+      "group1": {
+        "email": "yamamoto.makoto@globalsys.jp"
+      },
+      "group2": {
+        "lastName": "山本",
+        "firstName": "誠"
+      },
+      "group3": {
+        "companyName": "グローバルシステムズ",
+        "department": "新規事業開発部",
+        "position": "プロジェクトマネージャー"
+      },
+      "group4": {
+        "postalCode": "450-0002",
+        "address1": "愛知県名古屋市中村区7-8-9",
+        "address2": "ビル12F"
+      },
+      "group5": {
+        "mobile": "090-3456-7890",
+        "tel1": "052-333-4444",
+        "fax": "052-333-4445"
+      },
+      "group6": {
+        "url": "https://www.globalsys.jp"
+      }
+    }
+  },
+  {
+    "answerId": "ANS_sv_20250701_001_009",
+    "businessCard": {
+      "group1": {
+        "email": "nakamura.rena@innovate.com"
+      },
+      "group2": {
+        "lastName": "中村",
+        "firstName": "玲奈"
+      },
+      "group3": {
+        "companyName": "イノベートソリューションズ",
+        "department": "広報部",
+        "position": "ジェネラルマネージャー"
+      },
+      "group4": {
+        "postalCode": "812-0011",
+        "address1": "福岡県福岡市博多区10-11-12",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "090-4567-8901",
+        "tel1": "092-444-5555",
+        "fax": "092-444-5556"
+      },
+      "group6": {
+        "url": "https://www.innovate.com"
+      }
+    }
+  },
+  {
+    "answerId": "ANS_sv_20250701_001_010",
+    "businessCard": {
+      "group1": {
+        "email": "kobayashi.shu@techlead.co.jp"
+      },
+      "group2": {
+        "lastName": "小林",
+        "firstName": "修"
+      },
+      "group3": {
+        "companyName": "株式会社テックリード",
+        "department": "経理部",
+        "position": "アシスタント"
+      },
+      "group4": {
+        "postalCode": "980-0021",
+        "address1": "宮城県仙台市青葉区13-14-15",
+        "address2": "ビル8F"
+      },
+      "group5": {
+        "mobile": "090-5678-9012",
+        "tel1": "022-555-6666",
+        "fax": "022-555-6667"
+      },
+      "group6": {
+        "url": "https://www.techlead.co.jp"
+      }
+    }
+  }
+]

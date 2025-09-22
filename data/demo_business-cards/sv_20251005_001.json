@@ -1,0 +1,62 @@
+[
+  {
+    "answerId": "ANS_sv_20251005_001_001",
+    "businessCard": {
+      "group1": {
+        "email": "okada.ken@example.com"
+      },
+      "group2": {
+        "lastName": "岡田",
+        "firstName": "健"
+      },
+      "group3": {
+        "companyName": "製品開発株式会社",
+        "department": "製品開発部",
+        "position": "リードデザイナー"
+      },
+      "group4": {
+        "postalCode": "100-6613",
+        "address1": "東京都千代田区丸の内1-9-2",
+        "address2": "グラントウキョウノースタワー 13F"
+      },
+      "group5": {
+        "mobile": "080-2345-6789",
+        "tel1": "03-3456-7890",
+        "fax": "03-3456-7891"
+      },
+      "group6": {
+        "url": "https://product-dev-corp.example.com"
+      }
+    }
+  },
+  {
+    "answerId": "ANS_sv_20251005_001_002",
+    "businessCard": {
+      "group1": {
+        "email": "uchida.saori@example.com"
+      },
+      "group2": {
+        "lastName": "内田",
+        "firstName": "沙織"
+      },
+      "group3": {
+        "companyName": "R&D部門株式会社",
+        "department": "R&D部門",
+        "position": "リサーチアシスタント"
+      },
+      "group4": {
+        "postalCode": "220-0012",
+        "address1": "神奈川県横浜市西区みなとみらい3-6-1",
+        "address2": "みなとみらいセンタービル 10F"
+      },
+      "group5": {
+        "mobile": "080-9876-5432",
+        "tel1": "045-567-8901",
+        "fax": "045-567-8902"
+      },
+      "group6": {
+        "url": "https://research-and-dev-inc.example.com"
+      }
+    }
+  }
+]

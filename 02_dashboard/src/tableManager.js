@@ -147,8 +147,6 @@ function renderTableRows(surveysToRender) {
         row.innerHTML = `
             <td data-label="アクション" class="px-4 py-3 whitespace-nowrap actions-cell flex gap-1">
                 <button class="bg-secondary-container text-on-secondary-container hover:bg-secondary-container hover:text-on-secondary-container rounded-full p-2 w-9 h-9 transition-all shadow-sm shadow-lg border border-secondary flex items-center justify-center" title="アンケートを編集" aria-label="アンケートを編集"><span class="material-icons text-lg">edit</span></button>
-                <button class="bg-secondary-container text-on-secondary-container hover:bg-secondary-container hover:text-on-secondary-container rounded-full p-2 w-9 h-9 transition-all shadow-sm shadow-lg border border-secondary flex items-center justify-center" title="SPEEDレビュー" aria-label="SPEEDレビュー"><span class="material-icons text-lg">bolt</span></button>
-                <button class="bg-secondary-container text-on-secondary-container hover:bg-secondary-container hover:text-on-secondary-container rounded-full p-2 w-9 h-9 transition-all shadow-sm shadow-lg border border-secondary flex items-center justify-center" title="分析ダッシュボード" aria-label="分析ダッシュボード"><span class="material-icons text-lg">insights</span></button>
                 <button class="bg-secondary-container text-on-secondary-container hover:bg-secondary-container hover:text-on-secondary-container rounded-full p-2 w-9 h-9 transition-all shadow-sm shadow-lg border border-secondary flex items-center justify-center" title="QRコードを表示" aria-label="QRコードを表示"><span class="material-icons text-lg">qr_code_2</span></button>
                 <button class="bg-secondary-container text-on-secondary-container hover:bg-secondary-container hover:text-on-secondary-container rounded-full p-2 w-9 h-9 transition-all shadow-sm shadow-lg border border-secondary flex items-center justify-center" title="アンケートを複製" aria-label="アンケートを複製"><span class="material-icons text-lg">content_copy</span></button>
                 <button class="bg-secondary-container text-on-secondary-container hover:bg-secondary-container hover:text-on-secondary-container rounded-full p-2 w-9 h-9 transition-all shadow-sm shadow-lg border border-secondary flex items-center justify-center" title="データダウンロード" aria-label="データダウンロード"><span class="material-icons text-lg">download</span></button>
@@ -171,22 +169,6 @@ function renderTableRows(surveysToRender) {
         `;
 
         fragment.appendChild(row);
-
-        const speedReviewButton = row.querySelector('button[title="SPEEDレビュー"]');
-        if (speedReviewButton) {
-            speedReviewButton.addEventListener('click', (e) => {
-                e.stopPropagation();
-                window.location.href = `speed-review.html?surveyId=${survey.id}`;
-            });
-        }
-
-        const analyticsButton = row.querySelector('button[title="分析ダッシュボード"]');
-        if (analyticsButton) {
-            analyticsButton.addEventListener('click', (e) => {
-                e.stopPropagation();
-                window.location.href = `graph-page.html?surveyId=${survey.id}`;
-            });
-        }
 
         row.querySelector('button[title="アンケートを複製"]').addEventListener('click', (e) => {
             e.stopPropagation();

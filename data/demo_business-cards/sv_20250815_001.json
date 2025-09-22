@@ -1,0 +1,62 @@
+[
+  {
+    "answerId": "ANS_sv_20250815_001_001",
+    "businessCard": {
+      "group1": {
+        "email": "ishida.kenta@example.com"
+      },
+      "group2": {
+        "lastName": "石田",
+        "firstName": "健太"
+      },
+      "group3": {
+        "companyName": "セミナー運営事務局株式会社",
+        "department": "セミナー運営事務局",
+        "position": "運営スタッフ"
+      },
+      "group4": {
+        "postalCode": "100-0004",
+        "address1": "東京都千代田区大手町1-1-1",
+        "address2": "大手町ファーストスクエア 10F"
+      },
+      "group5": {
+        "mobile": "090-1234-5678",
+        "tel1": "03-1111-2222",
+        "fax": "03-1111-2223"
+      },
+      "group6": {
+        "url": "https://seminar-ops.example.com"
+      }
+    }
+  },
+  {
+    "answerId": "ANS_sv_20250815_001_002",
+    "businessCard": {
+      "group1": {
+        "email": "matsumoto.aya@example.com"
+      },
+      "group2": {
+        "lastName": "松本",
+        "firstName": "彩"
+      },
+      "group3": {
+        "companyName": "イベント事業部株式会社",
+        "department": "イベント事業部",
+        "position": "コーディネーター"
+      },
+      "group4": {
+        "postalCode": "530-0001",
+        "address1": "大阪府大阪市北区梅田2-2-2",
+        "address2": "ヒルトンプラザウエスト 10F"
+      },
+      "group5": {
+        "mobile": "090-8765-4321",
+        "tel1": "06-3333-4444",
+        "fax": "06-3333-4445"
+      },
+      "group6": {
+        "url": "https://event-division.example.com"
+      }
+    }
+  }
+]

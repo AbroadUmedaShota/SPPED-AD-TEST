@@ -1,0 +1,42 @@
+[
+  {
+    "answerId": "B001",
+    "surveyId": "sv_20250705_001",
+    "answeredAt": "2025-08-12 11:20:00",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_性別",
+        "answer": "男性"
+      },
+      {
+        "question": "Q.02_業種",
+        "answer": "小売"
+      },
+      {
+        "question": "Q.03_満足度",
+        "answer": "満足"
+      }
+    ]
+  },
+  {
+    "answerId": "B002",
+    "surveyId": "sv_20250705_001",
+    "answeredAt": "2025-08-13 16:45:00",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_性別",
+        "answer": "女性"
+      },
+      {
+        "question": "Q.02_業種",
+        "answer": "金融"
+      },
+      {
+        "question": "Q.03_満足度",
+        "answer": "普通"
+      }
+    ]
+  }
+]

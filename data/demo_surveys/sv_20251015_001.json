@@ -1,0 +1,198 @@
+{
+  "id": "sv_20251015_001",
+  "groupId": "GROUP001",
+  "name": {
+    "ja": "従業員の健康に関するアンケート",
+    "en": "Employee Health Survey"
+  },
+  "displayTitle": {
+    "ja": "従業員の健康についてお聞かせください",
+    "en": "Please tell us about employee health"
+  },
+  "description": {
+    "ja": "従業員の健康状態に関するフィードバックを収集します。",
+    "en": "This survey collects feedback on employee health."
+  },
+  "status": "会期中",
+  "answerCount": 260,
+  "realtimeAnswers": 55,
+  "periodStart": "2025-10-15",
+  "periodEnd": "2025-11-14",
+  "bizcardEnabled": false,
+  "details": [
+    {
+      "id": "Q1",
+      "text": "Q1. 普段の睡眠時間はどのくらいですか？",
+      "type": "single_choice",
+      "options": [
+        "4時間未満",
+        "4～6時間",
+        "6～8時間",
+        "8時間以上"
+      ]
+    },
+    {
+      "id": "Q2",
+      "text": "Q2. 普段の運動習慣はありますか？",
+      "type": "single_choice",
+      "options": [
+        "はい",
+        "いいえ"
+      ]
+    },
+    {
+      "id": "Q3",
+      "text": "Q3. 普段の食生活は健康的だと思いますか？",
+      "type": "single_choice",
+      "options": [
+        "はい",
+        "いいえ"
+      ]
+    },
+    {
+      "id": "Q4",
+      "text": "Q4. ストレスを感じることはありますか？",
+      "type": "single_choice",
+      "options": [
+        "はい",
+        "いいえ"
+      ]
+    },
+    {
+      "id": "Q5",
+      "text": "Q5. ストレスを感じる原因は何ですか？",
+      "type": "text"
+    },
+    {
+      "id": "Q6",
+      "text": "Q6. ストレス解消法を教えてください。",
+      "type": "text"
+    },
+    {
+      "id": "Q7",
+      "text": "Q7. 会社の健康診断は受けていますか？",
+      "type": "single_choice",
+      "options": [
+        "はい",
+        "いいえ"
+      ]
+    },
+    {
+      "id": "Q8",
+      "text": "Q8. 会社の健康診断の結果についてどう思いますか？",
+      "type": "single_choice",
+      "options": [
+        "良い",
+        "普通",
+        "悪い"
+      ]
+    },
+    {
+      "id": "Q9",
+      "text": "Q9. 会社の健康に関する取り組みに満足していますか？",
+      "type": "single_choice",
+      "options": [
+        "非常に満足",
+        "満足",
+        "普通",
+        "不満",
+        "非常に不満"
+      ]
+    },
+    {
+      "id": "Q10",
+      "text": "Q10. 会社の健康に関する取り組みに今後追加してほしい内容はありますか？",
+      "type": "text"
+    },
+    {
+      "id": "Q11",
+      "text": "Q11. 会社の健康に関する取り組みの改善点があれば教えてください。",
+      "type": "text"
+    },
+    {
+      "id": "Q12",
+      "text": "Q12. 会社の健康に関する取り組みの全体的な満足度を教えてください。",
+      "type": "single_choice",
+      "options": [
+        "非常に満足",
+        "満足",
+        "普通",
+        "不満",
+        "非常に不満"
+      ]
+    },
+    {
+      "id": "Q13",
+      "text": "Q13. 会社の健康に関する取り組みのアイデアは豊富ですか？",
+      "type": "single_choice",
+      "options": [
+        "はい",
+        "いいえ"
+      ]
+    },
+    {
+      "id": "Q14",
+      "text": "Q14. 会社の健康に関する取り組みの実現可能性は高いですか？",
+      "type": "single_choice",
+      "options": [
+        "はい",
+        "いいえ"
+      ]
+    },
+    {
+      "id": "Q15",
+      "text": "Q15. 会社の健康に関する取り組みの独自性は高いですか？",
+      "type": "single_choice",
+      "options": [
+        "はい",
+        "いいえ"
+      ]
+    },
+    {
+      "id": "Q16",
+      "text": "Q16. 会社の健康に関する取り組みのターゲット層は明確ですか？",
+      "type": "single_choice",
+      "options": [
+        "はい",
+        "いいえ"
+      ]
+    },
+    {
+      "id": "Q17",
+      "text": "Q17. 会社の健康に関する取り組みの予算は適切ですか？",
+      "type": "single_choice",
+      "options": [
+        "はい",
+        "いいえ"
+      ]
+    },
+    {
+      "id": "Q18",
+      "text": "Q18. 会社の健康に関する取り組みのスケジュールは適切ですか？",
+      "type": "single_choice",
+      "options": [
+        "はい",
+        "いいえ"
+      ]
+    },
+    {
+      "id": "Q19",
+      "text": "Q19. 会社の健康に関する取り組みのプロモーション戦略は適切ですか？",
+      "type": "single_choice",
+      "options": [
+        "はい",
+        "いいえ"
+      ]
+    },
+    {
+      "id": "Q20",
+      "text": "Q20. 会社の健康に関する取り組みの成功指標は明確ですか？",
+      "type": "single_choice",
+      "options": [
+        "はい",
+        "いいえ"
+      ]
+    }
+  ],
+  "createdAt": "2025-10-15T00:00:00+09:00"
+}
