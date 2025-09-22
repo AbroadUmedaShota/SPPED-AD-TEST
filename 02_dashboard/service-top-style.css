@@ -166,6 +166,9 @@ body.dark-mode {
 .bg-secondary-container { background-color: var(--color-secondary-container); } /* M3_CONTAINER_COLOR_MISMATCH 考慮 */
 .bg-error-container { background-color: var(--color-error-container); } /* M3_CONTAINER_COLOR_MISMATCH 考慮 */
 .bg-scrim { background-color: var(--color-scrim); } /* for modal overlay */
+.bg-error { background-color: var(--color-state-error); }
+.bg-warning { background-color: var(--color-state-warning); }
+.bg-success { background-color: var(--color-state-success); }
 
 /* Texts */
 .text-on-background { color: var(--color-text-main); } /* text.mainにマッピング */

@@ -4,16 +4,7 @@
  */
 
 // --- Mock Data ---
-const mockSurveyData = {
-    "123": {
-        surveyName: `サンプルアンケート`,
-        periodStart: '2025-07-01',
-        periodEnd: '2025-07-31',
-        isEventFinished: true,
-        isBizcardDataReady: true,
-        recipientCount: 150,
-    }
-};
+
 
 const mockEmailSettings = {
     "123": {
@@ -40,22 +31,45 @@ const mockVariables = ['会社名', '氏名', '部署名', '役職'];
  * @returns {Promise<object>} 関連データのオブジェクト。
  */
 export async function getInitialData(surveyId) {
-    
-    // 複数のAPI呼び出しをシミュレート
-    await new Promise(resolve => setTimeout(resolve, 400));
-    const survey = mockSurveyData[surveyId];
-    const settings = mockEmailSettings[surveyId];
+    try {
+        console.log('Attempting to fetch surveys.json...');
+        const response = await fetch('/data/dashboard/core/surveys.json');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const surveys = await response.json();
+        const survey = surveys.find(s => s.id === surveyId);
 
-    if (!survey) {
-        throw new Error('Survey not found');
+        if (!survey) {
+            throw new Error('Survey not found');
+        }
+
+        // Note: Some data is still mocked as it's not in surveys.json
+        const surveyData = {
+            surveyName: survey.name.ja,
+            periodStart: survey.periodStart,
+            periodEnd: survey.periodEnd,
+            isEventFinished: survey.status === '終了',
+            isBizcardDataReady: survey.bizcardCompletionCount > 0,
+            recipientCount: survey.answerCount, // Assuming recipient count is answer count
+        };
+
+        const settings = mockEmailSettings[surveyId] || { 
+            thankYouEmailEnabled: false, 
+            sendMethod: 'manual' 
+        };
+
+        return {
+            surveyData: surveyData,
+            emailSettings: settings,
+            emailTemplates: Object.values(mockEmailTemplates),
+            variables: mockVariables
+        };
+
+    } catch (error) {
+        console.error('Failed to get initial data:', error);
+        throw new Error('Failed to load initial data.');
     }
-
-    return {
-        surveyData: survey,
-        emailSettings: settings || { thankYouEmailEnabled: false, sendMethod: 'manual' },
-        emailTemplates: Object.values(mockEmailTemplates),
-        variables: mockVariables
-    };
 }
 
 /**

@@ -35,6 +35,7 @@ export function initBizcardSettings() {
     let state = {
         surveyId: null,
         settings: {},
+        initialSettings: {},
         appliedCoupon: null
     };
 
@@ -58,6 +59,8 @@ export function initBizcardSettings() {
             ]);
 
             state.settings = settingsData;
+            // Deep copy for initial state comparison
+            state.initialSettings = JSON.parse(JSON.stringify(settingsData)); 
 
             renderSurveyInfo(surveyData, state.surveyId);
             setInitialFormValues(state.settings);
@@ -84,17 +87,54 @@ export function initBizcardSettings() {
 
         applyCouponBtn.addEventListener('click', handleApplyCoupon);
         saveButton.addEventListener('click', handleSaveSettings);
-        cancelButton.addEventListener('click', () => {
-            showConfirmationModal(
-                '変更を破棄してアンケート一覧に戻りますか？',
-                () => { window.location.href = 'index.html'; },
-                '変更の破棄'
-            );
-        });
+        cancelButton.addEventListener('click', handleCancel);
         toggleMemoSectionBtn.addEventListener('click', () => {
             memoSection.classList.toggle('hidden');
             toggleMemoSectionBtn.querySelector('.material-icons').classList.toggle('rotate-180');
         });
+    }
+
+    /**
+     * Checks if the form has been modified compared to its initial state.
+     * @returns {boolean} True if the form has changed, false otherwise.
+     */
+    function hasFormChanged() {
+        const currentSettings = {
+            bizcardEnabled: bizcardEnabledToggle.checked,
+            bizcardRequest: parseInt(bizcardRequestInput.value, 10) || 0,
+            dataConversionPlan: document.querySelector('input[name="dataConversionPlan"]:checked')?.value,
+            dataConversionSpeed: document.querySelector('input[name="dataConversionSpeed"]:checked')?.value,
+            internalMemo: internalMemoInput.value || ''
+        };
+
+        const initial = state.initialSettings;
+
+        // Compare each value. Note the loose equality for number/string conversion.
+        if (currentSettings.bizcardEnabled != initial.bizcardEnabled) return true;
+        if (currentSettings.bizcardRequest != initial.bizcardRequest) return true;
+        if (currentSettings.dataConversionPlan != initial.dataConversionPlan) return true;
+        if (currentSettings.dataConversionSpeed != initial.dataConversionSpeed) return true;
+        if (currentSettings.internalMemo.trim() !== (initial.internalMemo || '').trim()) return true;
+        
+        // Also check if a coupon was applied or changed
+        if ((couponCodeInput.value || '') !== (initial.couponCode || '')) return true;
+
+        return false;
+    }
+
+    /**
+     * Handles the cancel button click.
+     */
+    function handleCancel() {
+        if (hasFormChanged()) {
+            showConfirmationModal(
+                '変更が保存されていません。破棄してアンケート一覧に戻りますか？',
+                () => { window.location.href = 'index.html'; },
+                '変更を破棄'
+            );
+        } else {
+            window.location.href = 'index.html';
+        }
     }
 
     /**

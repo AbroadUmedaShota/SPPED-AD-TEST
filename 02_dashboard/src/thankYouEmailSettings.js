@@ -33,6 +33,7 @@ export function initThankYouEmailSettings() {
         surveyId: null,
         surveyData: {},
         emailSettings: {},
+        initialEmailSettings: {},
         emailTemplates: [],
         variables: []
     };
@@ -53,6 +54,9 @@ export function initThankYouEmailSettings() {
         try {
             const initialData = await getInitialData(state.surveyId);
             state = { ...state, ...initialData };
+
+            // Deep copy for initial state comparison
+            state.initialEmailSettings = JSON.parse(JSON.stringify(state.emailSettings));
 
             renderSurveyInfo(state.surveyData, state.surveyId);
             populateTemplates(state.emailTemplates);
@@ -79,13 +83,46 @@ export function initThankYouEmailSettings() {
         insertVariableBtn.addEventListener('click', () => variableList.classList.toggle('hidden'));
         saveButton.addEventListener('click', handleSaveSettings);
         sendEmailButton.addEventListener('click', handleSendEmails);
-        cancelButton.addEventListener('click', () => {
+        cancelButton.addEventListener('click', handleCancel);
+    }
+
+    /**
+     * Checks if the form has been modified compared to its initial state.
+     * @returns {boolean} True if the form has changed, false otherwise.
+     */
+    function hasFormChanged() {
+        const currentSettings = {
+            thankYouEmailEnabled: thankYouEmailEnabledToggle.checked,
+            sendMethod: document.querySelector('input[name="sendMethod"]:checked')?.value,
+            emailTemplateId: document.getElementById('emailTemplate').value,
+            emailSubject: document.getElementById('emailSubject').value,
+            emailBody: document.getElementById('emailBody').value,
+        };
+
+        const initial = state.initialEmailSettings;
+
+        if (currentSettings.thankYouEmailEnabled !== initial.thankYouEmailEnabled) return true;
+        if (currentSettings.sendMethod !== initial.sendMethod) return true;
+        if (currentSettings.emailTemplateId !== initial.emailTemplateId) return true;
+        if (currentSettings.emailSubject.trim() !== (initial.emailSubject || '').trim()) return true;
+        if (currentSettings.emailBody.trim() !== (initial.emailBody || '').trim()) return true;
+
+        return false;
+    }
+
+    /**
+     * Handles the cancel button click.
+     */
+    function handleCancel() {
+        if (hasFormChanged()) {
             showConfirmationModal(
-                '変更を破棄してアンケート一覧に戻りますか？',
+                '変更が保存されていません。破棄してアンケート一覧に戻りますか？',
                 () => { window.location.href = 'index.html'; },
-                '変更の破棄'
+                '変更を破棄'
             );
-        });
+        } else {
+            window.location.href = 'index.html';
+        }
     }
 
     // --- Event Handlers ---

@@ -1,4 +1,4 @@
-import { handleOpenModal } from './modalHandler.js';
+import { handleOpenModal, closeModal } from './modalHandler.js';
 import { showToast } from './utils.js';
 
 // ダミーユーザーデータ (本来はAPIから取得)
@@ -52,6 +52,25 @@ export function initializeAccountInfoModalFunctionality(modalElement) {
     // 請求先住所の表示切り替え
     const billingAddressTypeRadios = modalElement.querySelectorAll('input[name="billingAddressType"]'); // modalElement から探索
     const billingDetailsSection = modalElement.querySelector('#billingDetailsSection'); // modalElement から探索
+    const closeBtn = modalElement.querySelector('#closeAccountInfoModalBtn');
+    const changePasswordBtn1 = modalElement.querySelector('#changePasswordBtn1');
+    const changePasswordBtn2 = modalElement.querySelector('#changePasswordBtn2');
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => closeModal('accountInfoModal'));
+    }
+
+    const goToPasswordChange = () => {
+        window.location.href = 'password_change.html';
+    };
+
+    if (changePasswordBtn1) {
+        changePasswordBtn1.addEventListener('click', goToPasswordChange);
+    }
+    if (changePasswordBtn2) {
+        changePasswordBtn2.addEventListener('click', goToPasswordChange);
+    }
+
     
     if (billingAddressTypeRadios.length > 0 && billingDetailsSection) {
         // 重複登録防止のため、一度リスナーを削除してから追加
