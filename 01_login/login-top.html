@@ -625,7 +625,7 @@
     </div>
     <div class="form-container">
       <h1 class="form-container__title">SPEED AD ログイン</h1>
-      <form id="login-form">
+      <form id="login-form" novalidate>
         <div class="form-group">
           <label for="email" class="form-group__label">メールアドレス</label>
           <input type="email" id="email" name="email" class="form-group__input" required aria-required="true" autocomplete="email" aria-describedby="email-error">
@@ -641,6 +641,14 @@
             <input type="checkbox" name="remember" class="form-options__checkbox-input" aria-label="ログイン状態を保持する"> ログイン状態を保持する
           </label>
           <a href="#" class="form-options__link">パスワードを忘れた方</a>
+        </div>
+        <div class="scenario-accounts">
+          <p class="scenario-accounts__title">シュミレーション用アカウント（クリックで入力）:</p>
+          <ul class="scenario-accounts__list">
+            <li><a href="#" class="scenario-accounts__link" data-email="user">user (通常)</a></li>
+            <li><a href="#" class="scenario-accounts__link" data-email="new">new (初回)</a></li>
+            <li><a href="#" class="scenario-accounts__link" data-email="admin">admin (管理者)</a></li>
+          </ul>
         </div>
         <button class="button button--filled" type="submit">
           <span class="button__spinner"></span>
@@ -748,6 +756,22 @@
       const signupAccountButton = signupForm.querySelector('.button--filled');
       const googleButtonModal = modalContent.querySelector('.button--google');
 
+
+      // --- シナリオアカウントのクリック処理 ---
+      const scenarioLinks = document.querySelectorAll('.scenario-accounts__link');
+      scenarioLinks.forEach(link => {
+        link.addEventListener('click', (event) => {
+          event.preventDefault();
+          const email = event.target.dataset.email;
+          if (emailInput && email) {
+            emailInput.value = email;
+            // パスワードが不要なので、ログインボタンにフォーカスを移す
+            loginButton.focus();
+            // 表示されている可能性のあるエラーメッセージをクリア
+            clearLoginFormErrors();
+          }
+        });
+      });
 
       // --- 初期フォーカス ---
       if (emailInput) {
@@ -909,10 +933,29 @@
 
           showLoading(loginButton, 'ログイン中...');
           try {
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            // ログイン処理をシミュレート
+            await new Promise(resolve => setTimeout(resolve, 1000));
 
-            alert('ログイン成功！ダッシュボードへ移動します。');
-            window.location.href = '../02_dashboard/index.html';
+            // ボタンのテキストを変更して通知
+            const textNode = Array.from(loginButton.childNodes).find(node => node.nodeType === Node.TEXT_NODE && node.nodeValue.trim() !== '');
+            if (textNode) {
+              textNode.nodeValue = 'モックです。3秒後に遷移します...';
+            }
+
+            // 3秒待ってから画面遷移
+            await new Promise(resolve => setTimeout(resolve, 3000));
+
+            const userEmail = emailInput.value.trim();
+            let targetUrl = '../02_dashboard/index.html'; // デフォルト
+
+            if (userEmail === 'new') {
+              targetUrl = '../02_dashboard/index_first_login.html';
+            } else if (userEmail === 'admin') {
+              targetUrl = '../03_admin/index.html';
+            }
+            // 'user' またはその他の場合はデフォルトのURLを使用
+
+            window.location.href = targetUrl;
           } catch (error) {
             console.error('ログインエラー:', error);
             displayError(passwordInput, passwordError, 'メールアドレスまたはパスワードが正しくありません。');
@@ -926,20 +969,26 @@
         let isValid = true;
         clearLoginFormErrors();
 
-        if (!emailInput.value.trim()) {
+        const emailValue = emailInput.value.trim();
+        const allowedTestUsers = ['user', 'new', 'admin'];
+
+        if (!emailValue) {
             displayError(emailInput, emailError, "メールアドレスを入力してください。");
             isValid = false;
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value)) {
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue) && !allowedTestUsers.includes(emailValue)) {
           displayError(emailInput, emailError, "有効なメールアドレスを入力してください。");
           isValid = false;
         }
 
-        if (!passwordInput.value) {
-             displayError(passwordInput, passwordError, "パスワードを入力してください。");
-             isValid = false;
-        } else if (passwordInput.value.length < 8) {
-          displayError(passwordInput, passwordError, "パスワードは8文字以上である必要があります。");
-          isValid = false;
+        // テスト用アカウントでない場合のみ、パスワードの検証を行う
+        if (!allowedTestUsers.includes(emailValue)) {
+          if (!passwordInput.value) {
+               displayError(passwordInput, passwordError, "パスワードを入力してください。");
+               isValid = false;
+          } else if (passwordInput.value.length < 8) {
+            displayError(passwordInput, passwordError, "パスワードは8文字以上である必要があります。");
+            isValid = false;
+          }
         }
 
         return isValid;
@@ -1066,5 +1115,7 @@
 <!-- ランドマーク OK: role="main", role="dialog", aria-labelledby, aria-modal, aria-describedby など WAI-ARIA ロールを適切に配置 -->
 <!-- レスポンシブ OK: @media クエリにより、sm, md, lg, xl のブレークポイントでレイアウトが適切に変化することを確認 -->
 <!-- 4px グリッド OK: margin, padding, font-size, border-radius など主要なサイズを4の倍数で定義・調整 -->
+<!-- 浮動ラベル削除 OK: 浮動ラベルのHTML構造とCSSルールを削除し、標準的なラベル配置に戻っていることを確認 -->
+<!-- BEM OK: クラス名が Block__Element--Modifier の規則に従って定義されていることを確認 -->�で定義・調整 -->
 <!-- 浮動ラベル削除 OK: 浮動ラベルのHTML構造とCSSルールを削除し、標準的なラベル配置に戻っていることを確認 -->
 <!-- BEM OK: クラス名が Block__Element--Modifier の規則に従って定義されていることを確認 -->
