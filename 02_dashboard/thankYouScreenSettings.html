@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="service-top-style.css">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-background text-on-background">
+<body class="bg-background text-on-background thank-you-screen-settings-page">
 
     <div class="relative flex min-h-screen flex-col overflow-x-hidden">
         <!-- サイドバー用オーバーレイ (モバイル用) -->
@@ -37,6 +37,10 @@
                             <label for="thankYouMessage" class="input-label">サンクスメッセージ</label>
                         </div>
                         <p class="text-sm text-text-sub mt-2">アンケート回答後に表示されるメッセージです。空欄の場合、デフォルトのメッセージが表示されます。</p>
+                        <div class="mt-1 flex justify-end text-xs text-text-sub">
+                            <span id="thankYouMessageCounter">0/500</span>
+                        </div>
+                        <p id="thankYouMessageError" class="mt-1 text-sm text-error hidden"></p>
                     </section>
 
                     <!-- 連続回答機能の可否 -->
@@ -68,6 +72,7 @@
                             </label>
                         </div>
                         <p class="text-sm text-text-sub mt-2">※この設定をオフにすると、お礼メール設定と名刺データ化設定が利用できなくなります。</p>
+                        <p id="bizcardDisabledNotice" class="text-sm text-error mt-2 hidden">名刺撮影を依頼しない場合、名刺データ設定とサンクスメール設定は利用できません。</p>
                     </section>
 
                     <!-- アクションボタン -->
@@ -88,3 +93,4 @@
     <script type="module" src="src/main.js"></script>
 </body>
 </html>
+

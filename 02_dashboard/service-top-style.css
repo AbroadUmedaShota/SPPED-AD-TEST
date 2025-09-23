@@ -203,6 +203,15 @@ body.dark-mode {
     background-color: var(--color-button-primary-hover-bg);
 }
 
+.additional-settings-button[disabled] {
+    background-color: var(--color-button-disabled-bg) !important;
+    color: var(--color-button-disabled-text) !important;
+    cursor: not-allowed;
+    opacity: 1;
+}
+.additional-settings-button[disabled]:hover {
+    background-color: var(--color-button-disabled-bg) !important;
+}
 /* Matrix drag styles */
 .matrix-row-item,
 .matrix-col-item {
@@ -344,6 +353,14 @@ body.overflow-hidden {
     will-change: width;
 }
 
+/* Page-specific tweaks */
+.thank-you-screen-settings-page #main-content {
+    background-color: var(--color-base-background-sub);
+}
+.thank-you-screen-settings-page #main-content > .max-w-4xl {
+    background-color: var(--color-base-card);
+}
+
 /* --- Main content Layout Adjustment (for Fixed Sidebar) --- */
 #main-content {
     transition: none; /* No transition on the main content */
@@ -362,9 +379,13 @@ body.overflow-hidden {
     #main-content {
         padding-left: 4rem; /* Permanent padding for collapsed sidebar */
     }
+    body.sidebar-hovered #main-content {
+        padding-left: 16rem; /* Match expanded sidebar width to avoid overlap */
+    }
     .header-theme-toggle { display: block; } /* Show header theme toggle on XL+ */
     .lg\:hidden { display: none !important; } /* Hide mobile toggle button */
 }
+
 
 /* Mobile Screens (smaller than 1024px) */
 @media (max-width: 1023px) {

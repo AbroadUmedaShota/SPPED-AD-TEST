@@ -20,6 +20,12 @@ let surveyData = {};
 let currentLang = 'ja';
 let currentSurveyId = null;
 let isDirty = false; // To track unsaved changes
+const ADDITIONAL_SETTINGS_CONFIG = [
+    { id: 'openBizcardSettingsBtn', path: 'bizcardSettings.html', feature: 'bizcard' },
+    { id: 'openThankYouEmailSettingsBtn', path: 'thankYouEmailSettings.html', feature: 'thankYouEmail' },
+    { id: 'openThankYouScreenSettingsBtn', path: 'thankYouScreenSettings.html', feature: 'thankYouScreen' }
+];
+const additionalSettingsButtons = new Map();
 
 // --- Dirty State Management ---
 function setDirty(dirty) {
@@ -104,7 +110,103 @@ function initLanguageSwitcher() {
     setLanguage(initial);
 }
 
-// ダミーユーザーデータ (本来はAPIから取得)
+function registerAdditionalSettingsLinks() {
+    ADDITIONAL_SETTINGS_CONFIG.forEach(({ id, path, feature }) => {
+        const button = document.getElementById(id);
+        if (!button) {
+            return;
+        }
+        if (!additionalSettingsButtons.has(feature)) {
+            additionalSettingsButtons.set(feature, button);
+        }
+        if (button.dataset.settingsLinkInitialized === 'true') {
+            return;
+        }
+        button.dataset.settingsLinkInitialized = 'true';
+        button.addEventListener('click', (event) => {
+            event.preventDefault();
+            if (!currentSurveyId) {
+                showToast('アンケートIDが未設定です。先にアンケートを保存してください。', 'error');
+                return;
+            }
+            const url = `${path}?surveyId=${encodeURIComponent(currentSurveyId)}`;
+            window.location.href = url;
+        });
+    });
+    updateAdditionalSettingsAvailability();
+}
+
+const ADDITIONAL_SETTINGS_MESSAGES = {
+    requireSurveyId: 'アンケートIDを発行後に利用できます。',
+    requireBizcard: '名刺撮影依頼を有効にすると利用できます。'
+};
+
+window.addEventListener('storage', (event) => {
+    if (!currentSurveyId) {
+        return;
+    }
+    if (event && event.key === `thankYouScreenSettings_${currentSurveyId}`) {
+        updateAdditionalSettingsAvailability();
+    }
+});
+
+function loadThankYouScreenSettingsFromStorage(surveyId) {
+    if (!surveyId) {
+        return null;
+    }
+    try {
+        const raw = localStorage.getItem(`thankYouScreenSettings_${surveyId}`);
+        return raw ? JSON.parse(raw) : null;
+    } catch (error) {
+        console.warn('Failed to parse thank-you screen settings from storage:', error);
+        return null;
+    }
+}
+
+function setAdditionalSettingsButtonState(feature, disabled, message) {
+    const button = additionalSettingsButtons.get(feature);
+    if (!button) {
+        return;
+    }
+    button.disabled = !!disabled;
+    if (disabled) {
+        button.setAttribute('aria-disabled', 'true');
+        if (message) {
+            button.setAttribute('title', message);
+        } else {
+            button.removeAttribute('title');
+        }
+    } else {
+        button.removeAttribute('aria-disabled');
+        button.removeAttribute('title');
+    }
+}
+
+function updateAdditionalSettingsAvailability() {
+    if (!currentSurveyId) {
+        additionalSettingsButtons.forEach((_, feature) => {
+            setAdditionalSettingsButtonState(feature, true, ADDITIONAL_SETTINGS_MESSAGES.requireSurveyId);
+        });
+        return;
+    }
+
+    const storedSettings = loadThankYouScreenSettingsFromStorage(currentSurveyId);
+    const bizcardEnabled = storedSettings ? storedSettings.requestBusinessCardPhoto !== false : true;
+
+    additionalSettingsButtons.forEach((_, feature) => {
+        if (feature === 'thankYouScreen') {
+            setAdditionalSettingsButtonState(feature, false);
+            return;
+        }
+        if (!bizcardEnabled && (feature === 'bizcard' || feature === 'thankYouEmail')) {
+            setAdditionalSettingsButtonState(feature, true, ADDITIONAL_SETTINGS_MESSAGES.requireBizcard);
+        } else {
+            setAdditionalSettingsButtonState(feature, false);
+        }
+    });
+}
+
+// ダミ'ーユーザーデータ (本来はAPIから取得)
 window.dummyUserData = {
     email: "user@example.com",
     companyName: "株式会社SpeedAd",
@@ -412,6 +514,9 @@ async function initializePage() {
 
         const params = new URLSearchParams(window.location.search);
         currentSurveyId = params.get('surveyId');
+
+        registerAdditionalSettingsLinks();
+        updateAdditionalSettingsAvailability();
 
         // 1. Try loading from localStorage keyed by surveyId
         if (currentSurveyId) {
