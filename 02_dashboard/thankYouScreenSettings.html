@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpeedAd - サンクス画面設定</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="service-top-style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-background text-on-background">
+
+    <div class="relative flex min-h-screen flex-col overflow-x-hidden">
+        <!-- サイドバー用オーバーレイ (モバイル用) -->
+        <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
+
+        <!-- ヘッダーのプレースホルダー -->
+        <div id="header-placeholder"></div>
+
+        <div class="flex flex-1 pt-16 bg-background">
+            <!-- サイドバーのプレースホルダー -->
+            <div id="sidebar-placeholder"></div>
+
+            <!-- メインコンテンツ -->
+            <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
+                <div id="breadcrumb-container" class="mb-4"></div>
+                <h1 class="text-2xl font-bold text-text-main mb-6" id="pageTitle">サンクス画面設定</h1>
+
+                <div class="max-w-4xl mx-auto p-8 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+
+                    <!-- 回答後の文言設定 -->
+                    <section class="mb-8">
+                        <h2 class="text-xl font-semibold text-text-main mb-4">回答後の文言設定</h2>
+                        <div class="relative">
+                            <textarea id="thankYouMessage" class="input-field h-32" placeholder=" "></textarea>
+                            <label for="thankYouMessage" class="input-label">サンクスメッセージ</label>
+                        </div>
+                        <p class="text-sm text-text-sub mt-2">アンケート回答後に表示されるメッセージです。空欄の場合、デフォルトのメッセージが表示されます。</p>
+                    </section>
+
+                    <!-- 連続回答機能の可否 -->
+                    <section class="mb-8">
+                        <h2 class="text-xl font-semibold text-text-main mb-4">連続回答機能</h2>
+                        <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                            <div>
+                                <h3 class="font-medium text-text-main">連続回答を許可する</h3>
+                                <p class="text-sm text-text-sub mt-1">回答完了後、同じ端末で続けて別の回答ができるようにします。</p>
+                            </div>
+                            <label for="allowContinuousAnswer" class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="allowContinuousAnswer" role="switch" class="sr-only peer" checked>
+                                <div class="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-500"></div>
+                            </label>
+                        </div>
+                    </section>
+
+                    <!-- 名刺撮影機能の可否 -->
+                    <section>
+                        <h2 class="text-xl font-semibold text-text-main mb-4">名刺撮影機能</h2>
+                        <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                            <div>
+                                <h3 class="font-medium text-text-main">名刺の撮影を依頼する</h3>
+                                <p class="text-sm text-text-sub mt-1">アンケート回答時に、名刺の撮影を依頼するステップを追加します。</p>
+                            </div>
+                            <label for="requestBusinessCardPhoto" class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="requestBusinessCardPhoto" role="switch" class="sr-only peer" checked>
+                                <div class="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-500"></div>
+                            </label>
+                        </div>
+                        <p class="text-sm text-text-sub mt-2">※この設定をオフにすると、お礼メール設定と名刺データ化設定が利用できなくなります。</p>
+                    </section>
+
+                    <!-- アクションボタン -->
+                    <div class="flex justify-end mt-12 space-x-4">
+                        <button id="cancelButton" class="h-10 px-5 rounded-md font-semibold transition-colors button-secondary">キャンセル</button>
+                        <button id="saveButton" class="h-10 px-5 rounded-md font-semibold transition-colors button-primary">保存する</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- フッターのプレースホルダー -->
+        <div id="footer-placeholder"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/ja.js"></script>
+    <script type="module" src="src/main.js"></script>
+</body>
+</html>

@@ -31,3 +31,4 @@ yarn-error.log*
 # Custom
 *.bak
 tmp_marker.txt
+data/dashboard/user_credentials.json 

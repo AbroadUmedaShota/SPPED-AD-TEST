@@ -4,13 +4,7 @@
  */
 
 // --- Mock Data ---
-const mockSurveys = {
-    "123": {
-        surveyName: `サンプルアンケート`,
-        periodStart: '2025-07-01',
-        periodEnd: '2025-07-31',
-    }
-};
+
 
 const mockSettings = {
     "123": {
@@ -34,14 +28,27 @@ const mockCoupons = {
  * @returns {Promise<object>} アンケートデータ。
  */
 export async function fetchSurveyData(surveyId) {
-    console.log(`Fetching survey data for ID: ${surveyId}`);
-    // API呼び出しをシミュレート
-    await new Promise(resolve => setTimeout(resolve, 300));
-    const data = mockSurveys[surveyId];
-    if (data) {
-        return data;
+    try {
+        const response = await fetch('/data/dashboard/core/surveys.json');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const surveys = await response.json();
+        console.log('Fetched surveys:', surveys);
+        const survey = surveys.find(s => s.id === surveyId);
+
+        if (survey) {
+            return {
+                surveyName: survey.name.ja,
+                periodStart: survey.periodStart,
+                periodEnd: survey.periodEnd,
+            };
+        }
+        throw new Error('Survey not found');
+    } catch (error) {
+        console.error('Failed to fetch survey data:', error);
+        throw new Error('Failed to load survey data file.');
     }
-    throw new Error('Survey not found');
 }
 
 /**
@@ -50,7 +57,7 @@ export async function fetchSurveyData(surveyId) {
  * @returns {Promise<object>} 設定データ。
  */
 export async function fetchBizcardSettings(surveyId) {
-    console.log(`Fetching bizcard settings for ID: ${surveyId}`);
+    
     // API呼び出しをシミュレート
     await new Promise(resolve => setTimeout(resolve, 300));
     return mockSettings[surveyId] || {
@@ -69,7 +76,7 @@ export async function fetchBizcardSettings(surveyId) {
  * @returns {Promise<object>} クーポン情報。
  */
 export async function validateCoupon(code) {
-    console.log(`Validating coupon: ${code}`);
+    
     await new Promise(resolve => setTimeout(resolve, 500));
     const coupon = mockCoupons[code];
     if (coupon) {
@@ -84,7 +91,7 @@ export async function validateCoupon(code) {
  * @returns {Promise<object>} 保存結果。
  */
 export async function saveBizcardSettings(settings) {
-    console.log('Saving bizcard settings:', settings);
+    
     // API呼び出しをシミュレート
     await new Promise(resolve => setTimeout(resolve, 1500));
     // ここで実際にデータを保存する処理

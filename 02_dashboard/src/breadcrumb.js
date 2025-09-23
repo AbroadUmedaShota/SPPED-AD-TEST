@@ -27,6 +27,20 @@ const breadcrumbPaths = {
         { name: 'アンケート作成・編集', link: '#' },
         { name: 'お礼メール設定' },
     ],
+    'thankYouScreenSettings.html': [
+        { name: 'アンケート一覧', link: 'index.html' },
+        { name: 'アンケート作成・編集', link: 'surveyCreation.html' },
+        { name: 'サンクス画面設定' },
+    ],
+    'group-edit.html': [
+        { name: 'アンケート一覧', link: 'index.html' },
+        { name: 'グループ編集' },
+    ],
+    'invoice-detail.html': [
+        { name: 'アンケート一覧', link: 'index.html' },
+        { name: '請求書一覧', link: 'invoiceList.html' },
+        { name: '請求書詳細' },
+    ],
 };
 
 function generateBreadcrumbs(currentPage, surveyId = null) {

@@ -186,7 +186,8 @@ function renderTableRows(surveysToRender) {
 
         row.querySelector('button[title="アンケートを編集"]').addEventListener('click', (e) => {
             e.stopPropagation();
-            window.location.href = `surveyCreation.html?surveyId=${survey.id}`;
+            const surveyNameForUrl = encodeURIComponent(surveyName);
+            window.location.href = `surveyCreation.html?surveyId=${survey.id}&surveyName=${surveyNameForUrl}`;
         });
 
         row.querySelector('button[title="QRコードを表示"]').addEventListener('click', (e) => {
@@ -520,9 +521,9 @@ export function initTableManager() {
     // Initial data fetch and render
     fetchSurveyData().then(data => {
         allSurveyData = data;
-        console.log("DEBUG: Fetched survey data:", allSurveyData);
+        
         applyFiltersAndPagination();
-        console.log("DEBUG: Current filtered data after initial load:", currentFilteredData);
+        
     }).catch(error => {
         console.error("DEBUG: Error during initial data fetch or rendering:", error);
     });
