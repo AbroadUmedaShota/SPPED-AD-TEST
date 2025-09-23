@@ -17,6 +17,7 @@ export function initGroupEditPage() {
     const cancelBtn = document.getElementById('cancel-btn');
     const groupNameError = document.getElementById('groupNameError');
     const newMemberEmailError = document.getElementById('newMemberEmailError');
+    const groupSelector = document.getElementById('groupSelector');
 
     const memberActionControls = [
         newMemberEmailInput,
@@ -57,9 +58,30 @@ export function initGroupEditPage() {
         return cloned;
     };
 
+    const populateGroupSelector = () => {
+        if (!groupSelector) return;
+        groupSelector.innerHTML = '';
+        if (allGroups.length === 0) {
+            groupSelector.innerHTML = '<option>グループがありません</option>';
+            groupSelector.disabled = true;
+            return;
+        }
+
+        allGroups.forEach(group => {
+            const option = document.createElement('option');
+            option.value = group.id;
+            option.textContent = group.name;
+            if (group.id === currentGroupId) {
+                option.selected = true;
+            }
+            groupSelector.appendChild(option);
+        });
+        groupSelector.disabled = isLoading;
+    };
+
     const updateFormAvailability = () => {
         const disableGroupFields = isLoading || !currentGroupId;
-        [groupNameInput, groupDescriptionInput].forEach((el) => {
+        [groupNameInput, groupDescriptionInput, groupSelector].forEach((el) => {
             if (el) {
                 el.disabled = disableGroupFields;
             }
@@ -98,6 +120,52 @@ export function initGroupEditPage() {
         isDirty = false;
     };
 
+    const createMemberCardElement = (member, index) => {
+        const memberCard = document.createElement('div');
+        memberCard.className = 'flex items-center justify-between p-3 bg-background rounded-md border border-divider cursor-pointer hover:bg-gray-50';
+        memberCard.dataset.memberKey = member.__memberKey;
+        memberCard.dataset.id = member.__memberKey;
+        memberCard.dataset.index = String(index);
+
+        const leftContainer = document.createElement('div');
+        leftContainer.className = 'flex items-center gap-3';
+
+        leftContainer.innerHTML = `
+            <span class="material-icons drag-handle text-gray-400 cursor-grab">drag_indicator</span>
+            <span class="material-icons text-gray-400 w-8 h-8 flex items-center justify-center">account_circle</span>
+            <div class="max-w-[240px]">
+                <p class="font-semibold truncate">${member.name || '未設定'} <span class="text-xs text-gray-500">${member.company || ''}</span></p>
+                <p class="text-sm text-gray-600 truncate" title="${member.email || 'メール未登録'}">${member.email || 'メール未登録'}</p>
+            </div>
+        `;
+
+        const rightContainer = document.createElement('div');
+        rightContainer.className = 'flex items-center gap-4';
+
+        const roleSelect = document.createElement('select');
+        roleSelect.dataset.index = index;
+        roleSelect.className = 'role-select input-field text-sm py-1 w-32';
+        roleSelect.innerHTML = `
+            <option value="member">一般メンバー</option>
+            <option value="admin">管理者</option>
+        `;
+        roleSelect.value = member.role === 'admin' ? 'admin' : 'member';
+
+        const deleteButton = document.createElement('button');
+        deleteButton.dataset.index = index;
+        deleteButton.className = 'delete-member-btn text-gray-400 hover:text-red-500';
+        deleteButton.setAttribute('aria-label', 'メンバーを削除');
+        deleteButton.innerHTML = '<span class="material-icons">delete_outline</span>';
+
+        rightContainer.appendChild(roleSelect);
+        rightContainer.appendChild(deleteButton);
+
+        memberCard.appendChild(leftContainer);
+        memberCard.appendChild(rightContainer);
+
+        return memberCard;
+    };
+
     const renderMemberList = () => {
         memberListContainer.innerHTML = '';
         memberListContainer.appendChild(noMemberMessage);
@@ -123,31 +191,7 @@ export function initGroupEditPage() {
         noMemberMessage.classList.add('hidden');
 
         members.forEach((member, index) => {
-            const memberCard = document.createElement('div');
-            memberCard.className = 'flex items-center justify-between p-3 bg-background rounded-md border border-divider cursor-pointer hover:bg-gray-50';
-            memberCard.dataset.memberKey = member.__memberKey;
-            memberCard.dataset.id = member.__memberKey;
-            memberCard.dataset.index = String(index);
-            const avatarSeed = encodeURIComponent(member.email || member.name || member.__memberKey);
-            memberCard.innerHTML = `
-                <div class="flex items-center gap-3">
-                    <span class="material-icons drag-handle text-gray-400 cursor-grab">drag_indicator</span>
-                    <img class="w-8 h-8 rounded-full" src="https://i.pravatar.cc/40?u=${avatarSeed}" alt="avatar">
-                    <div class="max-w-[240px]">
-                        <p class="font-semibold truncate">${member.name || '未設定'} <span class="text-xs text-gray-500">${member.company || ''}</span></p>
-                        <p class="text-sm text-gray-600 truncate" title="${member.email || 'メール未登録'}">${member.email || 'メール未登録'}</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-4">
-                    <select data-index="${index}" class="role-select input-field text-sm py-1 w-32">
-                        <option value="member" ${member.role === 'member' ? 'selected' : ''}>一般メンバー</option>
-                        <option value="admin" ${member.role === 'admin' ? 'selected' : ''}>管理者</option>
-                    </select>
-                    <button data-index="${index}" class="delete-member-btn text-gray-400 hover:text-red-500" aria-label="メンバーを削除">
-                        <span class="material-icons">delete_outline</span>
-                    </button>
-                </div>
-            `;
+            const memberCard = createMemberCardElement(member, index);
             memberListContainer.appendChild(memberCard);
         });
     };
@@ -209,10 +253,12 @@ export function initGroupEditPage() {
             }
 
             applyGroupToForm(targetGroup || null);
+            populateGroupSelector();
         } catch (error) {
             console.error('Failed to load group data:', error);
             showToast('グループデータの読み込みに失敗しました。', 'error');
             applyGroupToForm(null);
+            populateGroupSelector();
         } finally {
             isLoading = false;
             updateFormAvailability();
@@ -227,13 +273,13 @@ export function initGroupEditPage() {
         const newMember = cloneMember({
             email: newMemberEmailInput.value.trim(),
             role: newMemberRoleSelect.value,
-            name: '新しいメンバー',
-            company: '所属会社',
-            department: '未設定',
-            title: '未設定',
-            phone: '未設定',
-            postalCode: '未設定',
-            address: '未設定',
+            name: '',
+            company: '',
+            department: '',
+            title: '',
+            phone: '',
+            postalCode: '',
+            address: '',
         });
         members.push(newMember);
         renderMemberList();
@@ -373,6 +419,33 @@ export function initGroupEditPage() {
         }
     });
 
+    const handleGroupChange = (e) => {
+        const newGroupId = e.target.value;
+        if (newGroupId === currentGroupId) return;
+
+        const navigate = () => {
+            const newUrl = `${window.location.pathname}?groupId=${newGroupId}`;
+            history.pushState({ groupId: newGroupId }, '', newUrl);
+            
+            const targetGroup = allGroups.find(g => g.id === newGroupId);
+            applyGroupToForm(targetGroup);
+            renderMemberList();
+            updateFormAvailability();
+            // 変更を破棄したので、isDirtyフラグをリセットし、ドロップダウンを再描画
+            isDirty = false; 
+            populateGroupSelector();
+            updateSaveButtonState();
+        };
+
+        if (isDirty) {
+            showConfirmationModal('編集中の内容があります。変更を保存せずにグループを切り替えますか？', () => {
+                navigate();
+            });
+        } else {
+            navigate();
+        }
+    };
+
     window.addEventListener('beforeunload', (e) => {
         if (isDirty) {
             e.preventDefault();
@@ -381,6 +454,7 @@ export function initGroupEditPage() {
     });
 
     const init = async () => {
+        groupSelector.addEventListener('change', handleGroupChange);
         await loadGroups();
         new Sortable(memberListContainer, {
             animation: 150,
