@@ -13,15 +13,67 @@ let currentFilteredData = []; // Data array: holds filtered and sorted data
 let currentPage = 1;
 let itemsPerPage = 10; // Default, will be updated from select element
 
+/**
+ * 仕様に基づいてアンケートの表示ステータスを決定します。
+ * @param {object} survey - アンケートオブジェクト
+ * @returns {string} - 表示用のステータス文字列
+ */
+function getSurveyStatus(survey) {
+    const now = new Date();
+    // 時刻部分をリセットして日付のみで比較
+    now.setHours(0, 0, 0, 0); 
+    
+    const periodStart = survey.periodStart ? new Date(survey.periodStart) : null;
+    const periodEnd = survey.periodEnd ? new Date(survey.periodEnd) : null;
+
+    // '削除済み'などの特別なステータスを優先
+    if (survey.status === '削除済み') {
+        return '削除済み';
+    }
+    // 「草稿」はUI上「会期前」として扱う
+    if (survey.status === '草稿') {
+        return '会期前';
+    }
+
+    if (periodStart && now < periodStart) {
+        return '会期前';
+    }
+
+    if (periodStart && periodEnd && now >= periodStart && now <= periodEnd) {
+        return '会期中';
+    }
+
+    if (periodEnd && now > periodEnd) {
+        // bizcardEnabledがfalseの場合は、データ化作業が発生しない
+        if (survey.bizcardEnabled === false) {
+            return 'データ化なし';
+        }
+        
+        // データ化関連のステータスをチェック
+        if (survey.status === 'データ入力中' || survey.status === 'データ精査中') {
+            return 'データ化中';
+        }
+        if (survey.status === 'データ精査完了' || (survey.dataCompletionDate && survey.dataCompletionDate !== '')) {
+            return 'データ化完了';
+        }
+        
+        // 上記以外はすべて「終了」
+        return '終了';
+    }
+
+    // 不明なケース
+    return '不明';
+}
+
 const STATUS_SORT_ORDER = {
     '会期前': 1,
     '会期中': 2,
     'データ化中': 3,
     'データ化完了': 4,
-    'データ化なし': 5,
-    '終了': 6,
+    '終了': 5,
+    'データ化なし': 6,
     '削除済み': 7,
-    '不明': 8
+    '不明': 99
 };
 
 let lastSortedHeader = null; // Tracks the last header clicked for sorting
@@ -73,7 +125,6 @@ function renderTableRows(surveysToRender) {
     const fragment = document.createDocumentFragment();
     const lang = window.getCurrentLanguage();
 
-    currentFilteredData = surveysToRender.slice();
 
     surveysToRender.forEach(survey => {
         const row = document.createElement('tr');
@@ -81,7 +132,8 @@ function renderTableRows(surveysToRender) {
         row.dataset.id = survey.id;
         const surveyName = (survey.name && typeof survey.name === 'object') ? survey.name[lang] || survey.name.ja : survey.name;
         row.dataset.name = surveyName;
-        row.dataset.status = survey.status;
+        const displayStatus = getSurveyStatus(survey);
+        row.dataset.status = displayStatus;
         row.dataset.periodStart = survey.periodStart;
         row.dataset.periodEnd = survey.periodEnd;
         row.dataset.deadline = survey.deadline;
@@ -89,54 +141,38 @@ function renderTableRows(surveysToRender) {
         row.dataset.dataCompletionDate = survey.dataCompletionDate || '';
 
         let statusColorClass = '';
-        let displayStatus = survey.status;
         let statusTitle = '';
 
-        switch (survey.status) {
-            case '会期中':
-            case '実施中':
-                statusColorClass = 'bg-green-100 text-green-800';
-                statusTitle = '現在回答を受け付けている状態';
-                displayStatus = '会期中';
-                break;
+        switch (displayStatus) {
             case '会期前':
-            case '準備中': // 内部ステータス
-            case '草稿':
-                displayStatus = '会期前';
                 statusColorClass = 'bg-yellow-100 text-yellow-800';
-                statusTitle = 'まだ回答を受け付けていない状態';
+                statusTitle = 'アンケートの公開準備が進行中です。';
+                break;
+            case '会期中':
+                statusColorClass = 'bg-green-100 text-green-800';
+                statusTitle = 'アンケートが公開されており、回答を受け付けています。';
                 break;
             case 'データ化中':
-            case 'アップ待ち': // 内部ステータス
-            case 'データ入力中':
-            case 'データ入力':
-                displayStatus = 'データ化中';
                 statusColorClass = 'bg-blue-100 text-blue-800';
-                statusTitle = '名刺データの入力・照合作業が進行中';
+                statusTitle = '回答された名刺データの入力・照合を行っています。';
                 break;
-            case 'アップ完了': // 内部ステータス
-                displayStatus = 'データ化完了';
-                statusColorClass = 'bg-blue-100 text-blue-800';
-                statusTitle = '名刺データがダウンロード可能になり、お礼メールも送信可能';
+            case 'データ化完了':
+                statusColorClass = 'bg-indigo-100 text-indigo-800';
+                statusTitle = '名刺データが利用可能です。ダウンロードやお礼メール送信ができます。';
                 break;
             case 'データ化なし':
-                displayStatus = 'データ化なし';
-                statusColorClass = 'bg-gray-100 text-gray-800';
-                statusTitle = '名刺データ化の依頼がないアンケートです';
+                statusColorClass = 'bg-gray-200 text-gray-700';
+                statusTitle = '名刺データ化の依頼がないアンケートです。';
                 break;
-            case '期限切れ': // 内部ステータス
             case '終了':
-                displayStatus = '終了';
-                statusColorClass = 'bg-red-100 text-red-800';
-                statusTitle = 'アンケートの回答期間が終了しました';
+                statusColorClass = 'bg-emerald-100 text-emerald-800';
+                statusTitle = 'アンケートの回答期間が終了しました。';
                 break;
             case '削除済み':
-                displayStatus = '削除済み';
                 statusColorClass = 'bg-red-100 text-red-800';
-                statusTitle = 'このアンケートは削除されました';
+                statusTitle = 'このアンケートは削除されました。';
                 break;
-            default:
-                displayStatus = '不明';
+            default: // 不明
                 statusColorClass = 'bg-gray-100 text-gray-800';
                 statusTitle = 'ステータスが不明です。システム管理者にお問い合わせください。';
                 break;
@@ -266,8 +302,8 @@ function updatePagination() {
         currentPage = 1;
     }
 
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = currentPage * itemsPerPage;
+    const startIndex = Math.max(0, (currentPage - 1) * itemsPerPage);
+    const endIndex = Math.min(totalItems, startIndex + itemsPerPage);
     const surveysForCurrentPage = currentFilteredData.slice(startIndex, endIndex);
 
     renderTableRows(surveysForCurrentPage);
@@ -276,12 +312,13 @@ function updatePagination() {
     const pageInfoSpan = document.getElementById('pageInfo');
     if (pageInfoSpan) {
         if (totalItems === 0) {
-            pageInfoSpan.textContent = `全 0件`;
+            pageInfoSpan.textContent = '全 0件';
         } else {
-            pageInfoSpan.textContent = `${Math.min(totalItems, startIndex + 1)} - ${Math.min(totalItems, endIndex)} / 全 ${totalItems}件`;
+            const displayStart = startIndex + 1;
+            const displayEnd = endIndex;
+            pageInfoSpan.textContent = `${displayStart} - ${displayEnd} / 全 ${totalItems}件`;
         }
     }
-
     // Update Pagination Buttons
     const prevPageBtn = document.getElementById('prevPageBtn');
     const nextPageBtn = document.getElementById('nextPageBtn');
@@ -379,12 +416,13 @@ export function applyFiltersAndPagination() {
         const surveyName = (survey.name && typeof survey.name === 'object') 
             ? (survey.name[lang] || survey.name.ja || '').toLowerCase() 
             : (survey.name || '').toLowerCase();
-        const surveyStatus = survey.status;
+        
+        const displayStatus = getSurveyStatus(survey);
         const surveyPeriodStart = survey.periodStart ? new Date(survey.periodStart) : null;
         const surveyPeriodEnd = survey.periodEnd ? new Date(survey.periodEnd) : null;
 
         const matchesKeyword = keyword === '' || surveyName.includes(keyword);
-        const matchesStatus = status === 'all' || surveyStatus === status;
+        const matchesStatus = status === 'all' || displayStatus === status;
         const matchesGroup = currentGroupId === null || survey.groupId === currentGroupId; // グループIDによるフィルタリング
         
         const matchesPeriod = 
