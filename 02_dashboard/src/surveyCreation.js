@@ -645,26 +645,23 @@ function saveAccordionState(id, isOpen) {
  * localStorageからアコーディオンの開閉状態を復元する
  */
 function restoreAccordionState() {
-    const accordionItems = document.querySelectorAll('.accordion-item');
+    const accordionItems = document.querySelectorAll('.accordion-item, .question-group');
     accordionItems.forEach(item => {
-        const header = item.querySelector('.accordion-header');
+        const header = item.querySelector('.accordion-header, .group-header');
+        if (!header) return;
+
         const contentId = header.dataset.accordionTarget;
-        const content = document.getElementById(contentId);
+        const content = contentId ? document.getElementById(contentId) : item.querySelector('.accordion-content');
         const icon = header.querySelector('.expand-icon');
-        if (content && localStorage.getItem(`accordionState_${contentId}`) === 'false') {
-            content.style.display = 'none';
-            icon.textContent = 'expand_more';
-        } else if (content) {
-            content.style.display = 'block';
-            icon.textContent = 'expand_less';
-        }
-        // A11y attributes
-        if (header) {
-            header.setAttribute('role', 'button');
-            header.setAttribute('tabindex', '0');
-            if (contentId) header.setAttribute('aria-controls', contentId);
-            const isOpen = content ? (getComputedStyle(content).display !== 'none') : true;
-            header.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+
+        if (content) {
+            const isStoredOpen = localStorage.getItem(`accordionState_${contentId || item.dataset.groupId}`) !== 'false';
+            
+            content.classList.toggle('hidden', !isStoredOpen);
+            if (icon) {
+                icon.textContent = isStoredOpen ? 'expand_less' : 'expand_more';
+            }
+            header.setAttribute('aria-expanded', isStoredOpen ? 'true' : 'false');
         }
     });
 }
@@ -676,19 +673,38 @@ function initializeAccordion() {
     const toggle = (header) => {
         if (!header) return;
         const contentId = header.getAttribute('data-accordion-target');
-        const content = contentId ? document.getElementById(contentId) : null;
+        // 動的に生成されるグループヘッダーの場合、contentIdがないことがあるので、親要素からコンテンツを探す
+        const content = contentId 
+            ? document.getElementById(contentId) 
+            : header.closest('.question-group')?.querySelector('.accordion-content');
+
         const icon = header.querySelector('.expand-icon');
         if (!content) return;
-        const isOpen = getComputedStyle(content).display !== 'none';
-        content.style.display = isOpen ? 'none' : 'block';
-        if (icon) icon.textContent = isOpen ? 'expand_more' : 'expand_less';
-        header.setAttribute('aria-expanded', (!isOpen) ? 'true' : 'false');
-        saveAccordionState(contentId, !isOpen);
+
+        const isOpen = !content.classList.contains('hidden');
+        
+        content.classList.toggle('hidden');
+        const isNowOpen = !content.classList.contains('hidden');
+
+        if (icon) {
+            icon.textContent = isNowOpen ? 'expand_less' : 'expand_more';
+        }
+        header.setAttribute('aria-expanded', isNowOpen ? 'true' : 'false');
+        
+        // 動的グループの場合はgroupIdを、静的な場合はcontentIdをキーにする
+        const storageKey = contentId || header.closest('.question-group')?.dataset.groupId;
+        if (storageKey) {
+            saveAccordionState(storageKey, isNowOpen);
+        }
     };
 
     document.body.addEventListener('click', (event) => {
         const header = event.target.closest('.accordion-header, .group-header');
         if (header) {
+            // inputやbuttonなど、ヘッダー内のインタラクティブな要素は除外
+            if (event.target.closest('input, button, select')) {
+                return;
+            }
             toggle(header);
         }
     });
@@ -697,6 +713,10 @@ function initializeAccordion() {
         if (event.key !== 'Enter' && event.key !== ' ') return;
         const header = event.target.closest('.accordion-header, .group-header');
         if (!header) return;
+        // inputやbuttonなど、ヘッダー内のインタラクティブな要素は除外
+        if (event.target.closest('input, button, select')) {
+            return;
+        }
         event.preventDefault();
         toggle(header);
     });
@@ -1159,9 +1179,6 @@ function setupSortables() {
             animation: 150,
             handle: '.handle',
             draggable: '.question-group',
-            // Ignore drag on inputs, buttons, and the expand icon itself
-            filter: 'input, button, .expand-icon, .group-title-input',
-            preventOnFilter: true,
             onStart: () => {
                 // Close all accordions when starting to drag
                 document.querySelectorAll('.question-group .accordion-content').forEach(content => {

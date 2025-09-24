@@ -275,34 +275,52 @@ function createChart(chartId, chartData, type) {
         }
     };
 
-    chartInstances[chartId] = new Chart(ctx, {
-        type: type,
-        data: {
+    let chartConfigData;
+    let chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'top',
+                display: true
+            }
+        },
+        scales: {}
+    };
+
+    if (type === 'pie') {
+        chartConfigData = {
             labels: chartData.labels,
             datasets: [{
-                label: '回答数',
                 data: chartData.data,
-                backgroundColor: colors,
-                borderColor: type === 'bar' ? colors : '#fff',
-                borderWidth: type === 'bar' ? 0 : 2
+                backgroundColor: chartData.labels.map((_, index) => colors[index % colors.length]),
             }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: type === 'pie' ? 'right' : 'top',
-                    display: type === 'pie' || chartData.data.length > 1
+        };
+        chartOptions.plugins.legend.position = 'right';
+    } else { // type === 'bar'
+        chartConfigData = {
+            labels: [chartData.questionText], // X軸のラベルは質問名など一つに
+            datasets: chartData.labels.map((label, index) => ({
+                label: label, // これが凡例になる
+                data: [chartData.data[index]],
+                backgroundColor: colors[index % colors.length]
+            }))
+        };
+        chartOptions.scales = {
+            y: {
+                beginAtZero: true,
+                ticks: { 
+                    stepSize: 1,
+                    precision: 0
                 }
-            },
-            scales: type === 'bar' ? {
-                y: {
-                    beginAtZero: true,
-                    ticks: { stepSize: 1 }
-                }
-            } : {}
-        },
+            }
+        };
+    }
+
+    chartInstances[chartId] = new Chart(ctx, {
+        type: type,
+        data: chartConfigData,
+        options: chartOptions,
         plugins: [whiteBgPlugin]
     });
 }

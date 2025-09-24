@@ -1047,3 +1047,12 @@ input.input-field[readonly] {
 }
 
 
+
+/* surveyCreation.html のページ内ジャンプでヘッダーが被るのを防ぐオフセット */
+#section-basic-info,
+#section-additional-settings,
+#section-memo,
+#section-question-settings,
+.question-item {
+    scroll-margin-top: 5rem !important; /* 80px */
+}
