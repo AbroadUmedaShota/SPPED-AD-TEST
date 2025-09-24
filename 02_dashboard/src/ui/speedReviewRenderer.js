@@ -76,101 +76,78 @@ export function renderModalContent(item, isEditMode = false) {
 
     if (!cardDetailsContainer || !answerDetailsContainer) return;
 
-    // --- Business Card Details ---
+    // --- Business Card Details (always in view mode) ---
     let cardHtml = '';
     if (item.businessCard) {
         const card = item.businessCard;
-        if (isEditMode) {
-            // EDIT MODE: Render input fields
-            cardHtml = `
-                <div class="py-2 space-y-1">
-                    <p class="text-sm text-on-surface-variant">会社名</p>
-                    <input type="text" id="edit-companyName" class="input-field w-full" value="${card.group3?.companyName || ''}">
-                </div>
-                <div class="py-2 space-y-1">
-                    <p class="text-sm text-on-surface-variant">氏名</p>
-                    <div class="flex gap-2">
-                        <input type="text" id="edit-lastName" class="input-field w-full" value="${card.group2?.lastName || ''}" placeholder="姓">
-                        <input type="text" id="edit-firstName" class="input-field w-full" value="${card.group2?.firstName || ''}" placeholder="名">
-                    </div>
-                </div>
-                <div class="py-2 space-y-1"><p class="text-sm text-on-surface-variant">部署</p><input type="text" id="edit-department" class="input-field w-full" value="${card.group3?.department || ''}"></div>
-                <div class="py-2 space-y-1"><p class="text-sm text-on-surface-variant">役職</p><input type="text" id="edit-position" class="input-field w-full" value="${card.group3?.position || ''}"></div>
-                <div class="py-2 space-y-1"><p class="text-sm text-on-surface-variant">メールアドレス</p><input type="email" id="edit-email" class="input-field w-full" value="${card.group1?.email || ''}"></div>
-                <div class="py-2 space-y-1">
-                    <p class="text-sm text-on-surface-variant">住所</p>
-                    <input type="text" id="edit-address1" class="input-field w-full" value="${card.group4?.address1 || ''}" placeholder="住所1">
-                    <input type="text" id="edit-address2" class="input-field w-full mt-1" value="${card.group4?.address2 || ''}" placeholder="住所2（建物名）">
-                </div>
-                <div class="py-2 space-y-1">
-                    <p class="text-sm text-on-surface-variant">電話番号</p>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div><label for="edit-mobile" class="text-xs">携帯</label><input type="tel" id="edit-mobile" class="input-field w-full" value="${card.group5?.mobile || ''}"></div>
-                        <div><label for="edit-tel1" class="text-xs">TEL1</label><input type="tel" id="edit-tel1" class="input-field w-full" value="${card.group5?.tel1 || ''}"></div>
-                        <div><label for="edit-tel2" class="text-xs">TEL2</label><input type="tel" id="edit-tel2" class="input-field w-full" value="${card.group5?.tel2 || ''}"></div>
-                        <div><label for="edit-fax" class="text-xs">FAX</label><input type="tel" id="edit-fax" class="input-field w-full" value="${card.group5?.fax || ''}"></div>
-                    </div>
-                </div>
-                <div class="py-2 space-y-1"><p class="text-sm text-on-surface-variant">URL</p><input type="url" id="edit-url" class="input-field w-full" value="${card.group6?.url || ''}"></div>
-            `;
-        } else {
-            // VIEW MODE: Render text content
-            const fields = {
-                '会社名': { value: card.group3?.companyName, key: 'companyName' },
-                '氏名': { value: `${card.group2?.lastName || ''} ${card.group2?.firstName || ''}`.trim(), key: 'fullName' },
-                '部署': { value: card.group3?.department, key: 'department' },
-                '役職': { value: card.group3?.position, key: 'position' },
-                'メールアドレス': { value: card.group1?.email, key: 'email' },
-                '住所': { value: `${card.group4?.address1 || ''} ${card.group4?.address2 || ''}`.trim(), key: 'address' },
-            };
+        const fields = {
+            '会社名': { value: card.group3?.companyName, key: 'companyName' },
+            '氏名': { value: `${card.group2?.lastName || ''} ${card.group2?.firstName || ''}`.trim(), key: 'fullName' },
+            '部署': { value: card.group3?.department, key: 'department' },
+            '役職': { value: card.group3?.position, key: 'position' },
+            'メールアドレス': { value: card.group1?.email, key: 'email' },
+            '住所': { value: `${card.group4?.address1 || ''} ${card.group4?.address2 || ''}`.trim(), key: 'address' },
+        };
 
-            for (const [label, field] of Object.entries(fields)) {
-                if (field.value && field.value.trim() !== '') {
-                    cardHtml += `
-                        <div class="py-2">
-                            <p class="text-sm text-on-surface-variant">${label}</p>
-                            <div data-field="${field.key}" class="text-lg font-semibold text-on-surface">${field.value}</div>
-                        </div>`;
-                }
-            }
-
-            const phoneNumbers = [
-                { label: '携帯', number: card.group5?.mobile, key: 'mobile' },
-                { label: 'TEL1', number: card.group5?.tel1, key: 'tel1' },
-                { label: 'TEL2', number: card.group5?.tel2, key: 'tel2' },
-                { label: 'FAX', number: card.group5?.fax, key: 'fax' },
-            ].filter(p => p.number);
-
-            if (phoneNumbers.length > 0) {
-                let phoneHtml = '<div class="py-2"><p class="text-sm text-on-surface-variant">電話番号</p><div class="text-lg font-semibold text-on-surface">';
-                phoneNumbers.forEach(p => {
-                    phoneHtml += `<div data-field="${p.key}"><span class="text-sm">${p.label}:</span> ${p.number}</div>`;
-                });
-                phoneHtml += '</div></div>';
-                cardHtml += phoneHtml;
-            }
-            
-            const url = card.group6?.url;
-            if (url && url.trim() !== '') {
+        for (const [label, field] of Object.entries(fields)) {
+            if (field.value && field.value.trim() !== '') {
                 cardHtml += `
                     <div class="py-2">
-                        <p class="text-sm text-on-surface-variant">URL</p>
-                        <div data-field="url"><a href="${url}" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">${url}</a></div>
+                        <p class="text-sm text-on-surface-variant">${label}</p>
+                        <div data-field="${field.key}" class="text-lg font-semibold text-on-surface">${field.value}</div>
                     </div>`;
             }
+        }
+
+        const phoneNumbers = [
+            { label: '携帯', number: card.group5?.mobile, key: 'mobile' },
+            { label: 'TEL1', number: card.group5?.tel1, key: 'tel1' },
+            { label: 'TEL2', number: card.group5?.tel2, key: 'tel2' },
+            { label: 'FAX', number: card.group5?.fax, key: 'fax' },
+        ].filter(p => p.number);
+
+        if (phoneNumbers.length > 0) {
+            let phoneHtml = '<div class="py-2"><p class="text-sm text-on-surface-variant">電話番号</p><div class="text-lg font-semibold text-on-surface">';
+            phoneNumbers.forEach(p => {
+                phoneHtml += `<div data-field="${p.key}"><span class="text-sm">${p.label}:</span> ${p.number}</div>`;
+            });
+            phoneHtml += '</div></div>';
+            cardHtml += phoneHtml;
+        }
+        
+        const url = card.group6?.url;
+        if (url && url.trim() !== '') {
+            cardHtml += `
+                <div class="py-2">
+                    <p class="text-sm text-on-surface-variant">URL</p>
+                    <div data-field="url"><a href="${url}" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">${url}</a></div>
+                </div>`;
         }
     }
     cardDetailsContainer.innerHTML = cardHtml;
 
-    // --- Survey Answer Details (always in view mode) ---
+    // --- Survey Answer Details (editable in edit mode) ---
     let answerHtml = '';
-    item.details.forEach(detail => {
-        const answer = Array.isArray(detail.answer) ? detail.answer.join(', ') : detail.answer;
-        answerHtml += `
-            <div>
-                <p class="font-semibold text-on-surface">${detail.question}</p>
-                <p class="mt-1 p-3 bg-surface-bright rounded-md text-on-surface">${answer || '（無回答）'}</p>
-            </div>`;
-    });
+    if (isEditMode) {
+        // EDIT MODE: Render input fields for answers
+        item.details.forEach(detail => {
+            const answer = Array.isArray(detail.answer) ? detail.answer.join(', ') : detail.answer;
+            answerHtml += `
+                <div class="py-2 space-y-1">
+                    <p class="font-semibold text-on-surface">${detail.question}</p>
+                    <input type="text" class="input-field w-full mt-1" value="${answer || ''}" data-question="${detail.question}">
+                </div>`;
+        });
+    } else {
+        // VIEW MODE: Render text content for answers
+        item.details.forEach(detail => {
+            const answer = Array.isArray(detail.answer) ? detail.answer.join(', ') : detail.answer;
+            answerHtml += `
+                <div>
+                    <p class="font-semibold text-on-surface">${detail.question}</p>
+                    <p class="mt-1 p-3 bg-surface-bright rounded-md text-on-surface">${answer || '（無回答）'}</p>
+                </div>`;
+        });
+    }
     answerDetailsContainer.innerHTML = answerHtml;
 }

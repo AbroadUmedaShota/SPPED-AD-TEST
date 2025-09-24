@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>グループ編集 - SpeedAd</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="service-top-style.css">
     <style>
@@ -55,7 +56,7 @@
                         <h2 class="text-xl font-semibold mb-4">グループ情報</h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <!-- グループ名 -->
-                            <div class="input-group">
+                            <div class="input-group md:col-span-2">
                                 <input type="text" id="groupName" class="input-field" placeholder=" " required>
                                 <label for="groupName" class="input-label">グループ名</label>
                                 <div id="groupNameError" class="text-red-500 text-xs mt-1 hidden">必須項目です。</div>
@@ -64,6 +65,78 @@
                             <div class="input-group md:col-span-2">
                                 <textarea id="groupDescription" class="input-field" placeholder=" " rows="3"></textarea>
                                 <label for="groupDescription" class="input-label">説明文</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 請求先情報セクション -->
+                    <div class="bg-surface p-6 rounded-lg shadow-md mb-8">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-xl font-semibold">請求先情報</h2>
+                            <!-- 切り替えスイッチ -->
+                            <div class="flex border border-gray-300 rounded-lg overflow-hidden">
+                                <button id="use-creator-billing-btn" class="px-4 py-2 text-sm font-semibold transition-colors">
+                                    グループ作成者の情報を利用
+                                </button>
+                                <button id="use-group-billing-btn" class="px-4 py-2 text-sm font-semibold transition-colors">
+                                    グループ専用の請求先を設定
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- グループ作成者の請求先情報 (表示のみ) -->
+                        <div id="creator-billing-info">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 p-4 border rounded-md bg-gray-50">
+                                <div>
+                                    <p class="text-sm text-gray-500">請求書送付先_氏名</p>
+                                    <p id="creator-billing-contact-name" class="font-medium">-</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">請求先部署名</p>
+                                    <p id="creator-billing-department" class="font-medium">-</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">請求書送付先_電話番号</p>
+                                    <p id="creator-billing-phone" class="font-medium">-</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">請求書送付先_郵便番号</p>
+                                    <p id="creator-billing-postal-code" class="font-medium">-</p>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <p class="text-sm text-gray-500">請求書送付先_住所</p>
+                                    <p id="creator-billing-address" class="font-medium">-</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- グループ専用の請求先情報 (入力フォーム) -->
+                        <div id="group-billing-info" class="hidden">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="input-group">
+                                    <input type="text" id="group-billing-contact-name" class="input-field" placeholder=" ">
+                                    <label for="group-billing-contact-name" class="input-label">請求書送付先_氏名</label>
+                                </div>
+                                <div class="input-group">
+                                    <input type="text" id="group-billing-department" class="input-field" placeholder=" ">
+                                    <label for="group-billing-department" class="input-label">請求先部署名</label>
+                                </div>
+                                <div class="input-group">
+                                    <input type="text" id="group-billing-phone" class="input-field" placeholder=" ">
+                                    <label for="group-billing-phone" class="input-label">請求書送付先_電話番号</label>
+                                </div>
+                                <div class="input-group">
+                                    <input type="text" id="group-billing-postal-code" class="input-field" placeholder=" ">
+                                    <label for="group-billing-postal-code" class="input-label">請求書送付先_郵便番号</label>
+                                </div>
+                                <div class="input-group md:col-span-2">
+                                    <input type="text" id="group-billing-address1" class="input-field" placeholder=" ">
+                                    <label for="group-billing-address1" class="input-label">請求書送付先_住所1</label>
+                                </div>
+                                <div class="input-group md:col-span-2">
+                                    <input type="text" id="group-billing-address2" class="input-field" placeholder=" ">
+                                    <label for="group-billing-address2" class="input-label">請求書送付先_住所2</label>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -119,7 +192,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script type="module" src="src/main.js"></script>
-    <script type="module" src="src/groupEdit.js"></script>
 </body>
 </html>
 
