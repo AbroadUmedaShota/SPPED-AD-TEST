@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ダッシュボード</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .chevron-down {
+            position: absolute;
+            right: 0.75rem;
+            top: 0.625rem;
+            height: 1.25rem;
+            width: 1.25rem;
+            color: gray;
+            pointer-events: none;
+        }
+
+        /* 中央コンテンツのグループ表示の改善 */
+        .group-container {
+            border: 1px solid #e2e8f0; /* 枠線 */
+            margin-bottom: 0.5rem; /* 下部の余白 */
+        }
+
+        .group-container:nth-child(odd) {
+            background-color: #f8fafc; /* 奇数行の背景色 */
+        }
+
+        .group-container:nth-child(even) {
+            background-color: #ffffff; /* 偶数行の背景色 */
+        }
+
+         .group-header {
+            display: flex;
+            justify-content: space-between; /* グループタイトルと件数を左右に配置 */
+            align-items: center; /* 垂直方向に中央揃え */
+         }
+        .group-count{
+           font-size: 0.875rem;
+        }
+
+        /* 中央コンテンツの項目表示の改善 */
+        .group-items {
+            flex-wrap: wrap; /* 折り返し表示 */
+        }
+
+        .group-item {
+            min-width: 150px; /* 項目名の最小幅 */
+            margin-right: 0.5rem; /* 項目の右の余白 */
+            margin-bottom: 0.5rem; /* 項目の下の余白 */
+        }
+
+        /* 右側サイドバーの改善 */
+         .select-group {
+            width: 100%; /* プルダウンメニューの幅を調整 */
+         }
+
+         .start-button {
+             font-weight: bold; /* ボタンテキストを太字に */
+             padding: 0.75rem 1rem; /* ボタンのパディング */
+             transition: background-color 0.3s; /* ホバー時のアニメーション */
+         }
+
+         .start-button:hover {
+            background-color: #2563eb; /* ホバー時の背景色 */
+         }
+         .select-group-label {
+            margin-bottom: 0.3rem; /* ラベルの下マージン */
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        <!-- 左サイドナビゲーション -->
+        <nav class="w-64 bg-gray-800 text-white">
+            <div class="p-4">
+                <h1 class="text-2xl font-bold mb-8">SPEED AD</h1>
+                 <ul>
+                     <li class="mb-2">
+                         <button class="w-full text-left py-2 px-4 hover:bg-gray-700 rounded flex items-center">
+                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                           ユーザー(利用者)管理
+                         </button>
+                     </li>
+                     <li class="mb-2">
+                         <button class="w-full text-left py-2 px-4 hover:bg-gray-700 rounded flex items-center">
+                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                           アンケート管理
+                         </button>
+                    </li>
+                     <li class="mb-2">
+                        <button class="w-full text-left py-2 px-4 hover:bg-gray-700 rounded flex items-center">
+                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+                           請求管理
+                        </button>
+                     </li>
+                    <li class="mb-2">
+                         <button class="w-full text-left py-2 px-4 hover:bg-gray-700 rounded flex items-center">
+                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2"><path d="M12 22s-4-7-10-9V5c6-2 10 3 10 3s4-5 10-3v8c-6 2-10 9-10 9z"/></svg>
+                           クーポン管理
+                         </button>
+                    </li>
+                    <li class="mb-2">
+                         <button class="w-full text-left py-2 px-4 hover:bg-gray-700 rounded flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            営業日カレンダー
+                         </button>
+                    </li>
+                     <li class="mb-2">
+                         <button class="w-full text-left py-2 px-4 hover:bg-gray-700 rounded flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+                           請求書管理
+                        </button>
+                    </li>
+                      <li class="mb-2">
+                         <button class="w-full text-left py-2 px-4 hover:bg-gray-700 rounded flex items-center">
+                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2"><path d="M2 3h20v6H2V3zM2 15h20v6H2v-6z"/></svg>
+                             名刺入力画面
+                         </button>
+                     </li>
+                      <li class="mb-2">
+                         <button class="w-full text-left py-2 px-4 hover:bg-gray-700 rounded flex items-center">
+                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                             照合画面
+                         </button>
+                      </li>
+                      <li class="mb-2">
+                         <button class="w-full text-left py-2 px-4 hover:bg-gray-700 rounded flex items-center">
+                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2"><path d="M4 4h16v2H4zM4 10h16v2H4zM4 16h16v2H4z"/></svg>
+                           オペレーター管理
+                         </button>
+                     </li>
+                    <li class="mb-2">
+                         <button class="w-full text-left py-2 px-4 hover:bg-gray-700 rounded flex items-center">
+                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                           オペレーター実績確認
+                         </button>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+       <!-- メインコンテンツ -->
+       <div class="flex-1 flex">
+         <div class="flex-1 p-8 overflow-auto">
+              <h2 class="text-2xl font-bold mb-6">データ入力対象一覧</h2>
+              <div class="flex flex-col space-y-4">
+                <div class="group-container bg-white p-6 rounded-lg shadow">
+                     <div class="group-header">
+                       <h3 class="text-lg font-semibold mb-4">グループ1</h3>
+                       <div class="group-count">作業可能件数 1件</div>
+                      </div>
+                      <ul class="flex flex-wrap gap-x-8 gap-y-2 group-items">
+                         <li class="flex gap-4 min-w-[200px] group-item">
+                             <span>メールアドレス</span>
+                         </li>
+                      </ul>
+                   </div>
+                  <div class="group-container bg-white p-6 rounded-lg shadow">
+                       <div class="group-header">
+                            <h3 class="text-lg font-semibold mb-4">グループ2</h3>
+                            <div class="group-count">作業可能件数 2件</div>
+                       </div>
+                       <ul class="flex flex-wrap gap-x-8 gap-y-2 group-items">
+                            <li class="flex gap-4 min-w-[200px] group-item">
+                              <span>氏名（姓）</span>
+                             </li>
+                            <li class="flex gap-4 min-w-[200px] group-item">
+                              <span>氏名（名）</span>
+                             </li>
+                        </ul>
+                   </div>
+                  <div class="group-container bg-white p-6 rounded-lg shadow">
+                       <div class="group-header">
+                         <h3 class="text-lg font-semibold mb-4">グループ3</h3>
+                           <div class="group-count">作業可能件数 3件</div>
+                       </div>
+                       <ul class="flex flex-wrap gap-x-8 gap-y-2 group-items">
+                            <li class="flex gap-4 min-w-[200px] group-item">
+                                <span>会社名</span>
+                            </li>
+                            <li class="flex gap-4 min-w-[200px] group-item">
+                                <span>部署名</span>
+                             </li>
+                           <li class="flex gap-4 min-w-[200px] group-item">
+                                <span>役職名</span>
+                             </li>
+                        </ul>
+                  </div>
+                 <div class="group-container bg-white p-6 rounded-lg shadow">
+                   <div class="group-header">
+                       <h3 class="text-lg font-semibold mb-4">グループ4</h3>
+                       <div class="group-count">作業可能件数 3件</div>
+                     </div>
+                     <ul class="flex flex-wrap gap-x-8 gap-y-2 group-items">
+                        <li class="flex gap-4 min-w-[200px] group-item">
+                             <span>郵便番号</span>
+                         </li>
+                       <li class="flex gap-4 min-w-[200px] group-item">
+                             <span>住所1</span>
+                         </li>
+                         <li class="flex gap-4 min-w-[200px] group-item">
+                             <span>住所2（建物名）</span>
+                         </li>
+                     </ul>
+                 </div>
+                 <div class="group-container bg-white p-6 rounded-lg shadow">
+                    <div class="group-header">
+                        <h3 class="text-lg font-semibold mb-4">グループ5</h3>
+                        <div class="group-count">作業可能件数 4件</div>
+                    </div>
+                     <ul class="flex flex-wrap gap-x-8 gap-y-2 group-items">
+                        <li class="flex gap-4 min-w-[200px] group-item">
+                             <span>電話番号1</span>
+                         </li>
+                         <li class="flex gap-4 min-w-[200px] group-item">
+                           <span>電話番号2</span>
+                         </li>
+                        <li class="flex gap-4 min-w-[200px] group-item">
+                             <span>携帯番号</span>
+                        </li>
+                         <li class="flex gap-4 min-w-[200px] group-item">
+                             <span>FAX番号</span>
+                         </li>
+                       </ul>
+                 </div>
+                  <div class="group-container bg-white p-6 rounded-lg shadow">
+                     <div class="group-header">
+                         <h3 class="text-lg font-semibold mb-4">グループ6</h3>
+                          <div class="group-count">作業可能件数 1件</div>
+                     </div>
+                     <ul class="flex flex-wrap gap-x-8 gap-y-2 group-items">
+                           <li class="flex gap-4 min-w-[200px] group-item">
+                            <span>URL</span>
+                           </li>
+                      </ul>
+                  </div>
+                 <div class="group-container bg-white p-6 rounded-lg shadow">
+                      <div class="group-header">
+                         <h3 class="text-lg font-semibold mb-4">グループ7</h3>
+                         <div class="group-count">作業可能件数 1件</div>
+                      </div>
+                     <ul class="flex flex-wrap gap-x-8 gap-y-2 group-items">
+                        <li class="flex gap-4 min-w-[200px] group-item">
+                            <span>その他（メモ等）</span>
+                        </li>
+                     </ul>
+                 </div>
+                <div class="group-container bg-white p-6 rounded-lg shadow">
+                     <div class="group-header">
+                        <h3 class="text-lg font-semibold mb-4">グループ8</h3>
+                        <div class="group-count">作業可能件数 1件</div>
+                      </div>
+                    <ul class="flex flex-wrap gap-x-8 gap-y-2 group-items">
+                         <li class="flex gap-4 min-w-[200px] group-item">
+                             <span>フリー入力</span>
+                         </li>
+                    </ul>
+                </div>
+              </div>
+          </div>
+           <!-- 右サイドバー -->
+           <div class="w-64 bg-white p-6 border-l self-center">
+                <div class="mb-6">
+                     <label class="block text-sm font-medium text-gray-700 mb-2 select-group-label">
+                        グループを選択してください
+                    </label>
+                    <div class="relative">
+                        <select
+                            class="w-full bg-white border border-gray-300 rounded-md py-2 pl-3 pr-10 text-sm select-group"
+                        >
+                            <option>グループ1</option>
+                            <option>グループ2</option>
+                            <option>グループ3</option>
+                            <option>グループ4</option>
+                            <option>グループ5</option>
+                            <option>グループ6</option>
+                            <option>グループ7</option>
+                            <option>グループ8</option>
+                        </select>
+                      <div class="chevron-down">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                    </div>
+                    </div>
+                </div>
+                <button class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 start-button">
+                    スタート
+                </button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

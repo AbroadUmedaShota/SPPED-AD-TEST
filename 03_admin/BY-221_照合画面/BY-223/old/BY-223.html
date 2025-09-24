@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>名刺情報照合</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <h1 id="page-title">名刺情報照合</h1>
+            <p>
+              初回修正時間: <span id="first-edit-time"></span>
+            </p>
+               <p>
+              最終修正時間: <span id="last-edit-time"></span>
+            </p>
+             <p>
+              最終修正者: <span id="last-editor"></span>
+            </p>
+        </div>
+          <div class="header-right button-area">
+             <button id="save-button">保存</button>
+             <button id="escalate-button">エスカレ</button>
+             <button id="cancel-button">キャンセル</button>
+         </div>
+    </header>
+    <main>
+         <div class="image-display-area">
+           <div class="card-container">
+           <div class="card-image-wrapper front">
+             <img src="dummy_card_front.png" alt="名刺画像(表)" class="card-image">
+           </div>
+           </div>
+          <div class="card-container">
+          <div class="card-image-wrapper back">
+              <img src="dummy_card_back.png" alt="名刺画像(裏)" class="card-image" >
+             </div>
+        </div>
+         </div>
+      <div class="image-area">
+      </div>
+      <div class="table-area">
+           <table>
+                <thead>
+                    <tr>
+                        <th>項目名称</th>
+                        <th>OCR</th>
+                        <th>DB</th>
+                        <th>入力1</th>
+                        <th>入力2</th>
+                        <th>入力3</th>
+                        <th>修正入力</th>
+                        <th>完成内容</th>
+                    </tr>
+                </thead>
+              <tbody id="table-body">
+              </tbody>
+            </table>
+        </div>
+    </main>
+   <footer>
+    </footer>
+
+    <!-- モーダル表示用オーバーレイ -->
+   <div class="modal-overlay" id="modal-overlay">
+        <div class="modal-content" id="modal-content">
+           <div class="modal-header">
+             <h2 id="modal-title"></h2>
+             <span class="close-button" id="close-modal-button">×</span>
+           </div>
+            <div class="modal-body">
+              <p id="modal-message"></p>
+            </div>
+        </div>
+   </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

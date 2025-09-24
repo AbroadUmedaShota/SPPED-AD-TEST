@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>オペレーター管理</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        <!-- 左サイドナビゲーション -->
+        <nav class="w-64 bg-gray-800 text-white">
+            <div class="p-4">
+                <h1 class="text-2xl font-bold mb-8">SPEED AD</h1>
+                <ul>
+                    <li class="mb-2">
+                         <button class="w-full text-left py-2 px-4 hover:bg-gray-700 rounded flex items-center">
+                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                           ユーザー(利用者)管理
+                         </button>
+                     </li>
+                     <li class="mb-2">
+                         <button class="w-full text-left py-2 px-4 hover:bg-gray-700 rounded flex items-center">
+                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                           アンケート管理
+                         </button>
+                    </li>
+                     <li class="mb-2">
+                        <button class="w-full text-left py-2 px-4 hover:bg-gray-700 rounded flex items-center">
+                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+                           請求管理
+                        </button>
+                     </li>
+                    <li class="mb-2">
+                         <button class="w-full text-left py-2 px-4 hover:bg-gray-700 rounded flex items-center">
+                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2"><path d="M12 22s-4-7-10-9V5c6-2 10 3 10 3s4-5 10-3v8c-6 2-10 9-10 9z"/></svg>
+                           クーポン管理
+                         </button>
+                    </li>
+                    <li class="mb-2">
+                         <button class="w-full text-left py-2 px-4 hover:bg-gray-700 rounded flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            営業日カレンダー
+                         </button>
+                    </li>
+                     <li class="mb-2">
+                         <button class="w-full text-left py-2 px-4 hover:bg-gray-700 rounded flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+                           請求書管理
+                        </button>
+                    </li>
+                      <li class="mb-2">
+                         <button class="w-full text-left py-2 px-4 hover:bg-gray-700 rounded flex items-center">
+                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2"><path d="M2 3h20v6H2V3zM2 15h20v6H2v-6z"/></svg>
+                             名刺入力画面
+                         </button>
+                     </li>
+                       <li class="mb-2">
+                         <button class="w-full text-left py-2 px-4 hover:bg-gray-700 rounded flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                            照合画面ダッシュボード
+                         </button>
+                    </li>
+                      <li class="mb-2">
+                         <button class="w-full text-left py-2 px-4 hover:bg-gray-700 rounded flex items-center">
+                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2"><path d="M4 4h16v2H4zM4 10h16v2H4zM4 16h16v2H4z"/></svg>
+                           オペレーター管理
+                         </button>
+                    </li>
+                      <li class="mb-2">
+                         <button class="w-full text-left py-2 px-4 hover:bg-gray-700 rounded flex items-center">
+                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            オペレーター実績確認
+                         </button>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <!-- メインコンテンツ -->
+        <div class="flex-1 p-8 overflow-auto">
+            <div class="flex justify-between items-center mb-6">
+               <h2 class="text-2xl font-bold">オペレーター管理</h2>
+              <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2">
+                    <path d="M12 5v14m-7-7h14"/>
+                </svg>
+                   新規作成
+             </button>
+          </div>
+            <!-- 検索フォーム -->
+           <details class="search-form mb-4">
+             <summary class="font-bold cursor-pointer">検索条件</summary>
+                <div class="p-4">
+                    <form class="flex flex-wrap">
+                      <div class="search-form-column">
+                            <div class="search-form-row">
+                                <label for="operatorId" class="search-form-label">オペレータID</label>
+                                <input type="text" id="operatorId" class="search-input" >
+                            </div>
+                            <div class="search-form-row">
+                                <label for="affiliation" class="search-form-label">所属</label>
+                                <select id="affiliation" class="search-input">
+                                    <option value="">全て</option>
+                                    <option value="グループ1">グループ1</option>
+                                    <option value="グループ2">グループ2</option>
+                                    <option value="グループ3">グループ3</option>
+                                    <option value="グループ4">グループ4</option>
+                                     <option value="グループ5">グループ5</option>
+                                 </select>
+                            </div>
+                      </div>
+                       <div class="search-form-column">
+                            <div class="search-form-row">
+                                <label for="operatorName" class="search-form-label">オペレータ名</label>
+                                <input type="text" id="operatorName" class="search-input">
+                            </div>
+                             <div class="search-form-row">
+                                 <label  class="search-form-label">ステータス</label>
+                                <div class="search-status-group">
+                                    <div class="search-status">
+                                       <input type="checkbox" id="status1">
+                                        <label for="status1" class="search-status-label">有効</label>
+                                    </div>
+                                    <div class="search-status">
+                                        <input type="checkbox" id="status2">
+                                        <label for="status2" class="search-status-label">無効</label>
+                                    </div>
+                                </div>
+                            </div>
+                       </div>
+                      <div class="search-button-area">
+                            <button type="submit" class="search-button">検索</button>
+                            <button type="reset" class="reset-button">リセット</button>
+                      </div>
+                  </form>
+              </div>
+          </details>
+            <!-- アカウント一覧テーブル -->
+            <table class="min-w-full bg-white border border-gray-300 shadow-md rounded-lg">
+                 <thead>
+                     <tr class="bg-gray-100">
+                         <th class="py-2 px-4 border-b relative" data-sort="id">ID
+                            <span class="sort-icon"></span></th>
+                          <th class="py-2 px-4 border-b relative" data-sort="affiliation">所属
+                             <span class="sort-icon"></span></th>
+                        <th class="py-2 px-4 border-b relative" data-sort="name">オペレータ名
+                           <span class="sort-icon"></span></th>
+                          <th class="py-2 px-4 border-b relative" data-sort="email">メールアドレス
+                           <span class="sort-icon"></span></th>
+                         <th class="py-2 px-4 border-b relative" data-sort="status">ステータス
+                           <span class="sort-icon"></span></th>
+                          <th class="py-2 px-4 border-b relative" data-sort="createdAt">作成日時
+                            <span class="sort-icon"></span></th>
+                         <th class="py-2 px-4 border-b relative" data-sort="lastLogin">最終ログイン
+                           <span class="sort-icon"></span></th>
+                         <th class="py-2 px-4 border-b">操作</th>
+                     </tr>
+                  </thead>
+                <tbody>
+                    <!-- ここにJavaScriptでテーブルの行を生成 -->
+                 </tbody>
+            </table>
+            <!-- ページネーション -->
+            <div class="flex justify-center mt-4">
+                <button class="px-4 py-2 mx-1 bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed"><</button>
+                <span class="px-4 py-2 mx-1">1 / 2</span>
+                <button class="px-4 py-2 mx-1 bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed">></button>
+            </div>
+         </div>
+            <!-- モーダル -->
+       <div id="modal-container" class="fixed hidden inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+            <div id="modal" class="relative top-20 left-1/2 transform -translate-x-1/2 p-5 border w-1/2 shadow-lg rounded-md bg-white">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 id="modal-title" class="text-xl font-bold">新規オペレーター登録</h2>
+                     <button id="modal-close-button" class="text-gray-500 hover:text-gray-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                         </svg>
+                     </button>
+                </div>
+                 <form id="modal-form" class="space-y-4">
+                     <div>
+                        <label for="editOperatorId" class="block text-sm font-medium text-gray-700">オペレーターID</label>
+                         <input type="text" id="editOperatorId" class="mt-1 p-2 border rounded w-full bg-gray-100" value="自動採番" readonly>
+                    </div>
+                      <div>
+                        <label for="editAffiliation" class="block text-sm font-medium text-gray-700">所属</label>
+                         <select id="editAffiliation" class="mt-1 p-2 border rounded w-full">
+                             <option value="" disabled selected>選択してください</option>
+                             <option value="グループ1">グループ1</option>
+                            <option value="グループ2">グループ2</option>
+                             <option value="グループ3">グループ3</option>
+                              <option value="グループ4">グループ4</option>
+                             <option value="グループ5">グループ5</option>
+                        </select>
+                     </div>
+                      <div>
+                      <label for="authorityLevel" class="block text-sm font-medium text-gray-700">権限レベル</label>
+                         <select id="authorityLevel" class="mt-1 p-2 border rounded w-full">
+                              <option value="" disabled selected>選択してください</option>
+                             <option value="1">レベル1_オペレーター</option>
+                            <option value="2">レベル2_オペレーター管理者</option>
+                            <option value="3">レベル3_アブロードスタッフ</option>
+                              <option value="4">レベル4_アブロードマネージャー</option>
+                        </select>
+                    </div>
+                       <div>
+                         <label for="editEmail" class="block text-sm font-medium text-gray-700">メールアドレス *</label>
+                         <input type="email" id="editEmail" class="mt-1 p-2 border rounded w-full" placeholder="例：taro.yamada@example.com" required>
+                     </div>
+                     <div>
+                         <label for="editOperatorName" class="block text-sm font-medium text-gray-700">オペレーター名 *</label>
+                         <input type="text" id="editOperatorName" class="mt-1 p-2 border rounded w-full" placeholder="例：山田 太郎" required>
+                     </div>
+
+                     <div class="flex justify-end gap-4">
+                          <button id="modal-cancel-button" type="button" class="px-4 py-2 text-gray-500 hover:bg-gray-100 rounded">キャンセル</button>
+                         <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">登録</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+     <script>
+         document.addEventListener('DOMContentLoaded', function () {
+            const operators = [];
+            for (let i = 1; i <= 15; i++) {
+                const groupNumber = (i % 5) + 1;
+                operators.push({
+                    id: i,
+                    name: `オペレーター${i}`,
+                     affiliation: `グループ${groupNumber}`,
+                    status: (i % 2 === 0) ? '無効' : '有効',
+                    lastLogin: `2024/08/${(i % 30) + 1} ${Math.floor(Math.random() * 24)}:${Math.floor(Math.random() * 60)}`,
+                      authorityLevel: (i % 4) + 1,
+                       email: `operator${i}@example.com`,
+                       createdAt: `2024/07/${(i % 30) + 1} ${Math.floor(Math.random() * 24)}:${Math.floor(Math.random() * 60)}`
+                });
+            }
+          const tableBody = document.querySelector('table tbody');
+             const modalTitle = document.getElementById('modal-title');
+             const editOperatorIdInput = document.getElementById('editOperatorId');
+             const editAffiliationSelect = document.getElementById('editAffiliation');
+             const editOperatorNameInput = document.getElementById('editOperatorName');
+             const modalContainer = document.getElementById('modal-container');
+             const modal = document.getElementById('modal');
+              const modalCloseButton = document.getElementById('modal-close-button');
+              const modalCancelButton = document.getElementById('modal-cancel-button');
+            const modalForm = document.getElementById('modal-form');
+            const newOperatorButton = document.querySelector('.bg-blue-500');
+              const authorityLevelSelect = document.getElementById('authorityLevel');
+               const editEmailInput = document.getElementById('editEmail');
+             // テーブルの行を生成する関数
+            function generateTableRows() {
+                 tableBody.innerHTML = '';
+                 operators.forEach(operator => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                         <td class="py-2 px-4 border-b">${operator.id}</td>
+                          <td class="py-2 px-4 border-b">${operator.affiliation}</td>
+                         <td class="py-2 px-4 border-b"><a href="#" class="text-blue-500 hover:text-blue-700">${operator.name}</a></td>
+                        <td class="py-2 px-4 border-b">${operator.email}</td>
+                         <td class="py-2 px-4 border-b">${operator.status}</td>
+                          <td class="py-2 px-4 border-b">${operator.createdAt}</td>
+                        <td class="py-2 px-4 border-b">${operator.lastLogin}</td>
+                        <td class="py-2 px-4 border-b">
+                            <div class="action-buttons">
+                                <button class="edit-button" data-id="${operator.id}">編集</button>
+                            </div>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                 });
+
+            }
+              generateTableRows();
+           //テーブルソート機能
+        const table = document.querySelector('table');
+        const headers = table.querySelectorAll('th[data-sort]');
+
+         headers.forEach(header => {
+            header.addEventListener('click', () => {
+                const column = header.getAttribute('data-sort');
+                const rows = Array.from(table.querySelectorAll('tbody tr'));
+                const isAscending = header.classList.contains('asc');
+
+              rows.sort((rowA, rowB) => {
+                  const cellA = rowA.querySelector(`td:nth-child(${Array.from(header.parentNode.children).indexOf(header)+1})`).textContent;
+                    const cellB = rowB.querySelector(`td:nth-child(${Array.from(header.parentNode.children).indexOf(header)+1})`).textContent;
+
+                if(column === 'id'){
+                   return isAscending ?  parseInt(cellA) - parseInt(cellB) : parseInt(cellB) - parseInt(cellA);
+                 }else if (column === 'email'){
+                       return isAscending ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
+                  }else if (column === 'lastLogin'){
+                   return isAscending ? new Date(cellA) - new Date(cellB) : new Date(cellB) - new Date(cellA);
+                  }
+                  else if (column === 'createdAt'){
+                   return isAscending ? new Date(cellA) - new Date(cellB) : new Date(cellB) - new Date(cellA);
+                }  else {
+                 return isAscending ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
+                  }
+                });
+
+             table.querySelector('tbody').innerHTML = '';
+              rows.forEach(row => table.querySelector('tbody').appendChild(row));
+
+               //ヘッダーのソート状態を更新
+                headers.forEach(h => {
+                   h.classList.remove('asc','desc');
+                   });
+                 if(header.classList.contains('asc')) {
+                     header.querySelector('.sort-icon').innerHTML = '▲';
+                 } else if(header.classList.contains('desc')) {
+                     header.querySelector('.sort-icon').innerHTML = '▼';
+                 } else {
+                     header.querySelector('.sort-icon').innerHTML = '▲▼';
+                 }
+                header.classList.toggle(isAscending ? 'desc':'asc');
+               });
+           });
+              // ヘッダーの初期アイコンを設定
+        headers.forEach(header => {
+           header.querySelector('.sort-icon').innerHTML = '▲▼';
+        });
+
+
+
+            // 新規作成ボタンがクリックされた時の処理
+           newOperatorButton.addEventListener('click', function() {
+               modalTitle.textContent = '新規オペレーター登録';
+                modalForm.reset();
+                 editOperatorIdInput.value ="自動採番";
+                   authorityLevelSelect.closest('div').classList.remove('hidden');
+                     editEmailInput.closest('div').classList.remove('hidden');
+                   authorityLevelSelect.value = "";
+               modalContainer.classList.remove('hidden'); // モーダルを表示
+           });
+
+            // モーダルを閉じる処理
+             function closeModal() {
+                 modalContainer.classList.add('hidden'); // モーダルを非表示
+             }
+
+            //閉じるボタンがクリックされたとき
+            modalCloseButton.addEventListener('click', closeModal);
+
+            //キャンセルボタンがクリックされたとき
+             modalCancelButton.addEventListener('click', closeModal);
+
+           // モーダル外部クリックで閉じる
+            window.addEventListener('click', function(event) {
+               if(event.target === modalContainer) {
+                    closeModal();
+                }
+            });
+           //編集ボタンをクリックした時の処理
+           tableBody.addEventListener('click',function(event){
+               if(event.target.classList.contains('edit-button')){
+                 const operatorId =  parseInt(event.target.getAttribute('data-id'));
+                 const operator = operators.find(operator => operator.id === operatorId);
+                     if(operator){
+                         modalTitle.textContent = 'オペレーター情報編集';
+                         editOperatorIdInput.value = operator.id;
+                         editAffiliationSelect.value = operator.affiliation;
+                          editOperatorNameInput.value = operator.name;
+                          editEmailInput.value = operator.email;
+                           authorityLevelSelect.value = operator.authorityLevel;
+                         modalContainer.classList.remove('hidden'); // モーダルを表示
+                          authorityLevelSelect.closest('div').classList.remove('hidden');
+                           editEmailInput.closest('div').classList.remove('hidden');
+                     }
+               }
+           });
+
+
+             // フォームの送信処理
+            modalForm.addEventListener('submit', function(event){
+                  event.preventDefault();
+                 const formData = new FormData(modalForm);
+                 //formDataから値を取得
+                   const operatorName = formData.get('editOperatorName');
+                   const affiliation = formData.get('editAffiliation');
+                   const operatorId = formData.get('editOperatorId')
+                   const authorityLevel = formData.get('authorityLevel');
+                    const editEmail = formData.get('editEmail');
+                 // ここにフォームの送信処理を記述（API連携など）
+                 console.log({operatorName:operatorName,affiliation:affiliation,operatorId:operatorId,authorityLevel:authorityLevel,email:editEmail});
+                 closeModal();// モーダルを閉じる
+                  modalForm.reset(); //フォームをリセット
+                  generateTableRows();//テーブルの再描画
+            });
+         });
+    </script>
+</body>
+</html>

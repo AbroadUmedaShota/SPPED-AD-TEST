@@ -1,0 +1,298 @@
+/* --- Reset & Base --- */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 16px;
+    height: 100%;
+}
+
+body {
+    font-family: 'Meiryo UI', 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', Meiryo, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f4f7f9;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* --- Layout --- */
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+header {
+    background-color: #e9edf0;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid #d1d9e0;
+    flex-shrink: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    min-height: 50px;
+    gap: 0.5rem 1rem;
+}
+
+main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+}
+
+footer {
+    background-color: #e9edf0;
+    padding: 0.5rem 1rem;
+    text-align: center;
+    border-top: 1px solid #d1d9e0;
+    flex-shrink: 0;
+    min-height: 40px;
+}
+
+/* --- Header --- */
+.header-left { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.header-left h1 { font-size: 1.25rem; font-weight: 600; color: #2c3e50; white-space: nowrap; }
+.header-left p { font-size: 0.8rem; color: #555; background-color: #fff; padding: 0.15rem 0.4rem; border-radius: 3px; border: 1px solid #d1d9e0; white-space: nowrap; }
+.header-right { margin-left: auto; display: flex; align-items: center; gap: 0.5rem; }
+
+/* --- Buttons --- */
+button { padding: 0.5rem 1rem; font-size: 0.875rem; border: none; border-radius: 4px; cursor: pointer; transition: background-color 0.2s ease, opacity 0.2s ease; font-weight: 500; line-height: 1.4; }
+button:disabled { opacity: 0.6; cursor: not-allowed; }
+#save-button { background-color: #27ae60; color: #fff; }
+#save-button:hover:not(:disabled) { background-color: #229954; }
+#escalate-button { background-color: #f39c12; color: #fff; }
+#escalate-button:hover:not(:disabled) { background-color: #e67e22; }
+#cancel-button { background-color: #bdc3c7; color: #fff; }
+#cancel-button:hover:not(:disabled) { background-color: #95a5a6; }
+
+/* --- Image Display Area (Fixed Height) --- */
+.image-display-area {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    height: 50%;
+    flex-shrink: 0;
+    background-color: #f4f7f9;
+}
+
+.card-container {
+    flex: 1 1 0;
+    background-color: #fff;
+    border: 1px solid #d1d9e0;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+}
+
+.card-image-wrapper {
+    width: 100%;
+    aspect-ratio: 1125 / 734;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 100%;
+    max-height: 100%;
+    position: relative;
+    cursor: zoom-in; /* ラッパーにもカーソルを設定 */
+}
+
+.card-image {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background-color: #eef2f5;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    /* transform-origin: center center; */ /* JSで制御するのでデフォルトで良い */
+    /* transform は JS で制御 */
+    pointer-events: none; /* 画像自体はマウスイベントを拾わないように */
+}
+
+/* --- 回転ボタン --- */
+.card-controls {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    display: flex;
+    gap: 5px;
+    background-color: rgba(255, 255, 255, 0.7);
+    padding: 3px;
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 25; /* 拡大画像より手前 */
+}
+
+.card-container:hover .card-controls { /* コンテナホバー時に表示 */
+    opacity: 1;
+}
+
+.rotate-button {
+    background-color: #555;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    font-size: 1.1rem;
+    line-height: 26px;
+    text-align: center;
+    padding: 0;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.rotate-button:hover {
+    background-color: #333;
+}
+
+/* --- Table Area (Scrollable) --- */
+.table-area {
+    flex-grow: 1;
+    overflow-y: auto;
+    overflow-x: auto;
+    border: 1px solid #d1d9e0;
+    background-color: #fff;
+    border-radius: 4px;
+    margin: 0 1rem 1rem 1rem;
+    height: 50%;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    min-width: 56rem;
+}
+
+thead th {
+    background-color: #f8f9fa;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    font-weight: 600;
+    white-space: nowrap;
+    border-bottom: 2px solid #d1d9e0;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.85rem;
+    text-align: left;
+    vertical-align: middle;
+}
+
+/* --- 列幅の指定 --- */
+thead th:nth-child(1), tbody td:nth-child(1) { width: 14%; min-width: 7rem; }
+thead th:nth-child(2), tbody td:nth-child(2),
+thead th:nth-child(3), tbody td:nth-child(3),
+thead th:nth-child(4), tbody td:nth-child(4),
+thead th:nth-child(5), tbody td:nth-child(5),
+thead th:nth-child(6), tbody td:nth-child(6) { width: 11%; min-width: 6rem; }
+thead th:nth-child(7), tbody td:nth-child(7) { width: 13%; min-width: 7rem; }
+thead th:nth-child(8), tbody td:nth-child(8) { width: 13%; min-width: 7rem; }
+thead th:nth-child(9), tbody td:nth-child(9) {
+    width: 5%;
+    min-width: 3rem;
+    text-align: center;
+    vertical-align: middle;
+    overflow: visible;
+    white-space: nowrap;
+}
+
+thead th:nth-child(9) { line-height: 1.2; }
+#confirm-all-check { vertical-align: middle; cursor: pointer; margin-top: 2px; }
+
+tbody td {
+    border: 1px solid #e0e6eb;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+    text-align: left;
+    vertical-align: middle;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+tbody td:last-child { text-align: center; overflow: visible; white-space: nowrap; }
+
+input[type="text"] { width: 100%; font-size: inherit; padding: 0.3rem 0.5rem; border: 1px solid #ccc; border-radius: 3px; background-color: #fff; transition: border-color 0.2s ease, box-shadow 0.2s ease; line-height: 1.4; }
+input[type="text"]:focus { outline: none; border-color: #85c1e9; box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2); }
+input[type="text"]:read-only, input[type="text"].complete-input { background-color: #f5f7f9; border-color: #d1d9e0; color: #555; cursor: default; box-shadow: none; }
+input[type="text"]:read-only:focus { border-color: #d1d9e0; }
+input[type="checkbox"].confirm-check { cursor: pointer; vertical-align: middle; width: 1rem; height: 1rem; }
+
+/* --- Table Row/Cell Styling Priority --- */
+tbody tr { transition: background-color 0.15s ease; }
+tbody tr:nth-child(even) { background-color: #f8f9fa; }
+tbody tr:hover { background-color: #eef2f5; }
+
+/* Readonly input style */
+input[type="text"]:read-only {
+    background-color: #f8f9fa;
+    border-color: #ced4da;
+    color: #495057;
+}
+
+/* Match/Unmatch/Value styles */
+.complete-input.matched-complete { background-color: #e0f5e9 !important; font-weight: 600; color: #1e8449; }
+tbody td.value-matched { background-color: #ddebf7; }
+tbody tr.unmatched { background-color: #fdecea; }
+
+/* --- Modal --- */
+.modal-overlay { position: fixed; inset: 0; background-color: rgba(40, 40, 40, 0.65); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 1rem; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s linear 0.3s; }
+.modal-overlay.active { opacity: 1; visibility: visible; transition: opacity 0.3s ease, visibility 0s linear 0s; }
+.modal-content { background-color: #fff; padding: 1.5rem 1.8rem; border-radius: 8px; max-width: 500px; width: 100%; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15); position: relative; transform: translateY(-20px); transition: transform 0.3s ease; }
+.modal-overlay.active .modal-content { transform: translateY(0); }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; padding-bottom: 1rem; border-bottom: 1px solid #e0e6eb; }
+.modal-header h2 { margin: 0; font-size: 1.3rem; font-weight: 600; color: #2c3e50; }
+.close-button { font-size: 1.6rem; line-height: 1; color: #95a5a6; background: none; border: none; cursor: pointer; padding: 0 0.3rem; transition: color 0.2s ease; }
+.close-button:hover { color: #e74c3c; }
+.modal-body { margin-bottom: 1.2rem; font-size: 0.95rem; color: #555; }
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+    html { font-size: 15px; }
+    body { overflow: auto; }
+    header { min-height: auto; }
+    main { height: auto; flex-grow: 0; }
+    .image-display-area { flex-direction: column; height: auto; max-height: none; padding: 0.8rem; }
+    .card-container { min-height: 150px; width: 100%; }
+    .card-controls { opacity: 1; }
+    .table-area { margin: 0 0.8rem 0.8rem 0.8rem; height: auto;}
+    table { min-width: 0; }
+    thead th { padding: 0.5rem 0.6rem; font-size: 0.8rem; }
+    thead th:nth-child(n), tbody td:nth-child(n) { width: auto; min-width: 0; white-space: normal; }
+    thead th:nth-child(1), tbody td:nth-child(1) { min-width: 5rem; }
+    thead th:nth-child(9), tbody td:nth-child(9) { width: 45px; min-width: 45px; white-space: nowrap; text-align: center; vertical-align: middle; }
+    tbody td { font-size: 0.8rem; padding: 0.4rem 0.6rem; }
+    button { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
+    .modal-content { padding: 1.2rem 1.5rem; }
+    .modal-header h2 { font-size: 1.1rem; }
+}
+
+@media (max-width: 480px) {
+     html { font-size: 14px; }
+     .header-left { gap: 0.5rem; }
+     .header-left p { font-size: 0.75rem; padding: 0.1rem 0.3rem; }
+     .header-right { gap: 0.3rem; }
+     button { padding: 0.3rem 0.6rem; font-size: 0.75rem; }
+     thead th, tbody td { font-size: 0.75rem; padding: 0.3rem 0.5rem; }
+     thead th:nth-child(9), tbody td:nth-child(9) { width: 40px; min-width: 40px; }
+     .rotate-button { width: 24px; height: 24px; font-size: 1rem; line-height: 22px;}
+}
+
+/* ホバーと回転を組み合わせるためのクラス (JSで制御) */
+.js-zoomed {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    position: relative; /* 必要に応じて維持 */
+    z-index: 20;
+    background-color: #fff; /* 拡大時に背景が透けないように */
+}

@@ -943,13 +943,13 @@
             }
 
             // 3秒待ってから画面遷移
-            await new Promise(resolve => setTimeout(resolve, 3000));
+            await new Promise(resolve => setTimeout(resolve, 2000));
 
             const userEmail = emailInput.value.trim();
             let targetUrl = '../02_dashboard/index.html'; // デフォルト
 
             if (userEmail === 'new') {
-              targetUrl = '../02_dashboard/index_first_login.html';
+              targetUrl = '../04_first-login/index.html';
             } else if (userEmail === 'admin') {
               targetUrl = '../03_admin/index.html';
             }

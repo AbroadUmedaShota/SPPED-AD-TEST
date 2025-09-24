@@ -1,0 +1,100 @@
+ /* 既存のスタイルを継承 */
+ .action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center; /* 中央揃え */
+}
+.edit-button,
+.delete-button {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+   font-weight: bold;
+   white-space: nowrap;
+  transition: background-color 0.3s;
+   min-width: 60px;
+}
+.edit-button {
+   background-color: #34d399; /* 緑色 */
+    color: white;
+}
+.edit-button:hover {
+    background-color: #22c55e;/* ホバー時の色 */
+}
+.delete-button {
+   background-color: #f97316; /* オレンジ色 */
+  color: white;
+}
+.delete-button:hover {
+  background-color: #ea580c;/* ホバー時の色 */
+}
+ /* 検索フォームのスタイル */
+.search-form {
+ margin-top: 1rem;
+   margin-bottom: 1rem;
+   display: flex;
+  border: 1px solid #e2e8f0;
+   border-radius: 0.375rem;
+   padding: 1rem;
+    background-color: white;
+}
+.search-form-column {
+   flex: 1;
+   padding: 0.5rem;
+   display: flex;
+   flex-direction: column;
+
+}
+.search-form-row{
+   display: flex;
+   align-items: center;
+   margin-bottom: 0.5rem;
+}
+.search-form-label {
+ font-weight: bold;
+  margin-right: 0.5rem;
+ min-width: 100px; /* ラベルの最小幅 */
+}
+.search-input {
+ padding: 0.5rem;
+  border: 1px solid #e2e8f0;
+ border-radius: 0.375rem;
+ width: 200px; /* 幅を調整 */
+}
+.search-button-area{
+ display: flex;
+ justify-content: flex-end;
+  margin-top: 0.5rem;
+ align-items: center;
+   gap: 0.5rem;
+}
+.search-button, .reset-button {
+ padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  font-weight: bold;
+   white-space: nowrap;
+ transition: background-color 0.3s;
+ min-width: 120px;
+}
+.search-button {
+   background-color: #9333ea; /* 紫色 */
+   color: white;
+}
+.search-button:hover {
+    background-color: #7e22ce;/* ホバー時の色 */
+}
+.reset-button {
+  background-color: #6b7280; /* グレー */
+    color: white;
+}
+ .reset-button:hover {
+    background-color: #52525b;/* ホバー時の色 */
+}
+table th, table td {
+  text-align: center;
+}
+  .sort-icon{
+      display: inline-block;
+      margin-left: 0.25rem;
+        pointer-events: none;
+        color: gray;
+  }

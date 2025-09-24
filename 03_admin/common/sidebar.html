@@ -1,0 +1,69 @@
+
+<aside class="fixed inset-y-0 left-0 z-40 flex flex-col border-r border-outline-variant bg-surface pt-16 overflow-y-auto sidebar" id="sidebar">
+    <!-- プロファイルブロック -->
+    <div class="p-4 border-b border-outline-variant profile-block">
+        <div class="flex items-center gap-3">
+            <div class="bg-on-primary-fixed-variant aspect-square rounded-full size-10 border-2 border-outline-variant flex items-center justify-center">
+                <span class="material-icons text-primary text-4xl leading-none">manage_accounts</span>
+            </div>
+            <div class="flex-1">
+                <p class="text-on-surface text-sm font-semibold">admin@example.com</p>
+                <p class="text-on-surface-variant text-xs">管理者</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ナビゲーション -->
+    <nav class="flex-1 space-y-1 p-2">
+        <a class="flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors" href="index.html" aria-label="ダッシュボードへ移動">
+            <span class="material-icons text-xl">dashboard</span>
+            <span class="sidebar-nav-label whitespace-nowrap">ダッシュボード</span>
+        </a>
+        <a class="flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors" href="user-management.html" aria-label="ユーザー管理へ移動">
+            <span class="material-icons text-xl">group</span>
+            <span class="sidebar-nav-label whitespace-nowrap">ユーザー管理</span>
+        </a>
+        <a class="flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors" href="survey-management.html" aria-label="アンケート管理へ移動">
+            <span class="material-icons text-xl">list_alt</span>
+            <span class="sidebar-nav-label whitespace-nowrap">アンケート管理</span>
+        </a>
+        <a class="flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors" href="billing-management.html" aria-label="請求管理へ移動">
+            <span class="material-icons text-xl">receipt_long</span>
+            <span class="sidebar-nav-label whitespace-nowrap">請求管理</span>
+        </a>
+        <a class="flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors" href="coupon-management.html" aria-label="クーポン管理へ移動">
+            <span class="material-icons text-xl">sell</span>
+            <span class="sidebar-nav-label whitespace-nowrap">クーポン管理</span>
+        </a>
+        <a class="flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors" href="calendar-management.html" aria-label="カレンダー管理へ移動">
+            <span class="material-icons text-xl">calendar_month</span>
+            <span class="sidebar-nav-label whitespace-nowrap">営業日カレンダー管理</span>
+        </a>
+        <a class="flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors" href="data-entry-management.html" aria-label="データ入力・照合管理へ移動">
+            <span class="material-icons text-xl">edit_document</span>
+            <span class="sidebar-nav-label whitespace-nowrap">データ入力・照合管理</span>
+        </a>
+        <a class="flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors" href="operator-management.html" aria-label="オペレーター管理へ移動">
+            <span class="material-icons text-xl">support_agent</span>
+            <span class="sidebar-nav-label whitespace-nowrap">オペレーター管理</span>
+        </a>
+        <a class="flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors" href="performance-management.html" aria-label="実績管理へ移動">
+            <span class="material-icons text-xl">analytics</span>
+            <span class="sidebar-nav-label whitespace-nowrap">実績管理</span>
+        </a>
+
+        <div class="border-t border-outline-variant my-2"></div>
+
+        <a class="flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors" href="#" aria-label="ログアウトする" id="logoutButton">
+            <span class="material-icons text-lg">logout</span>
+            <span class="sidebar-nav-label whitespace-nowrap">ログアウト</span>
+        </a>
+    </nav>
+    <!-- テーマ切り替えボタン (サイドバー下部) -->
+    <div class="mt-auto p-2 border-t border-outline-variant">
+        <a class="flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors" href="#" aria-label="テーマを切り替える" id="sidebarThemeToggle">
+            <span class="material-icons text-lg" id="sidebarThemeIcon">light_mode</span>
+            <span class="sidebar-nav-label whitespace-nowrap">テーマ切替</span>
+        </a>
+    </div>
+</aside>
