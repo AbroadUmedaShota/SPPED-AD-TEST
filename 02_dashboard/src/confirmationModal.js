@@ -13,6 +13,7 @@ export function showConfirmationModal(message, onConfirm, title = '確認') {
             const messageEl = document.getElementById('confirmationModalMessage');
             const confirmBtn = document.getElementById('confirmationModalConfirmBtn');
             const cancelBtn = document.getElementById('confirmationModalCancelBtn');
+            const closeBtn = document.getElementById('closeConfirmationModalBtn'); // ✕ボタンを取得
 
             if (titleEl) titleEl.textContent = title;
             if (messageEl) messageEl.textContent = message;
@@ -28,11 +29,13 @@ export function showConfirmationModal(message, onConfirm, title = '確認') {
 
             newConfirmBtn.addEventListener('click', confirmAndClose);
 
-            // Add event listener for the cancel button
+            // Add event listener for the cancel and close buttons
+            const cancelAction = () => closeModal('confirmationModal');
             if (cancelBtn) {
-                cancelBtn.addEventListener('click', () => {
-                    closeModal('confirmationModal');
-                });
+                cancelBtn.addEventListener('click', cancelAction);
+            }
+            if (closeBtn) { // ✕ボタンにイベントリスナーを追加
+                closeBtn.addEventListener('click', cancelAction);
             }
 
             // Also handle Enter key for confirmation

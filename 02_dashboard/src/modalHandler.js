@@ -58,6 +58,8 @@ async function loadModalFromFile(modalId, filePath) {
                 }
             }
 
+
+
         } else {
             console.error(`Error: Modal ID mismatch or invalid HTML structure for ${modalId} from ${filePath}.`);
             showToast(`モーダル (${modalId}) のHTML構造が不正です。`, "error");
@@ -74,10 +76,19 @@ async function loadModalFromFile(modalId, filePath) {
  * @param {HTMLElement} modalElement The root element of the modal overlay.
  */
 function attachModalEventListeners(modalElement) {
+    const modalId = modalElement.id;
+
+    // Close when clicking the background overlay
     modalElement.addEventListener('click', (e) => {
         if (e.target === modalElement) {
-            closeModal(modalElement.id);
+            closeModal(modalId);
         }
+    });
+
+    // Find and attach listeners to all close buttons within the modal
+    const closeButtons = modalElement.querySelectorAll(`[data-modal-close="${modalId}"]`);
+    closeButtons.forEach(btn => {
+        btn.addEventListener('click', () => closeModal(modalId));
     });
 }
 
