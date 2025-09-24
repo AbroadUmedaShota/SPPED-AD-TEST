@@ -337,7 +337,7 @@
     }
     .button--filled .button__spinner {
         border-top-color: var(--color-surface-bright);
-        border-color: rgba(var(--color-surface-bright-rgb), 0.3); /* CSS変数のRGB値取得が必要になるが、今回は簡易的に設定 */
+        border-color: rgba(255, 255, 255, 0.3);
     }
     .button--tonal .button__spinner {
         border-top: 3px solid var(--color-on-primary-container);
@@ -939,10 +939,10 @@
             // ボタンのテキストを変更して通知
             const textNode = Array.from(loginButton.childNodes).find(node => node.nodeType === Node.TEXT_NODE && node.nodeValue.trim() !== '');
             if (textNode) {
-              textNode.nodeValue = 'モックです。3秒後に遷移します...';
+              textNode.nodeValue = 'モックです。2秒後に遷移します...';
             }
 
-            // 3秒待ってから画面遷移
+            // 2秒待ってから画面遷移
             await new Promise(resolve => setTimeout(resolve, 2000));
 
             const userEmail = emailInput.value.trim();
