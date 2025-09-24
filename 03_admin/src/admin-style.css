@@ -1,0 +1,22 @@
+
+/* admin-style.css */
+
+/* スタイルがservice-top-style.cssの汎用ルールに上書きされないよう、詳細度を高く設定 */
+.admin-sidebar nav a.nav-link.active {
+    background-color: #EF4444; /* red-500 */
+    color: #FFFFFF;
+    font-weight: 600; /* semibold */
+}
+
+.admin-sidebar nav a.nav-link.active .material-icons {
+    color: #FFFFFF;
+}
+
+/* 通常時のアイコンの色がサイドバーの背景に負けないように調整 */
+.admin-sidebar nav a.nav-link .material-icons {
+    color: #e5e7eb; /* gray-200 */
+}
+
+.admin-sidebar nav a.nav-link:hover .material-icons {
+    color: #FFFFFF;
+}
