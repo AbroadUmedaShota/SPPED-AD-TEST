@@ -3,6 +3,8 @@
  * お礼メール設定に関するデータ操作を扱うモジュール
  */
 
+import { resolveDashboardDataPath } from '../utils.js';
+
 // --- Mock Data ---
 
 
@@ -33,7 +35,7 @@ const mockVariables = ['会社名', '氏名', '部署名', '役職'];
 export async function getInitialData(surveyId) {
     try {
         console.log('Attempting to fetch surveys.json...');
-        const response = await fetch('/data/dashboard/core/surveys.json');
+        const response = await fetch(resolveDashboardDataPath('core/surveys.json'));
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }

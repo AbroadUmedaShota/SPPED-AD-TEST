@@ -3,6 +3,8 @@
  * 名刺データ化設定に関するデータ操作を扱うモジュール
  */
 
+import { resolveDashboardDataPath } from '../utils.js';
+
 // --- Mock Data ---
 
 
@@ -29,7 +31,7 @@ const mockCoupons = {
  */
 export async function fetchSurveyData(surveyId) {
     try {
-        const response = await fetch('/data/dashboard/core/surveys.json');
+        const response = await fetch(resolveDashboardDataPath('core/surveys.json'));
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }

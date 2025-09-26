@@ -2,16 +2,43 @@
 let scrollPosition = 0; // Stores scroll position for `lockScroll`/`unlockScroll`
 let activeUIsCount = 0; // Tracks number of active UI overlays (modals, mobile sidebar)
 
-export const DATA_ROOT = '/data';
+const DEFAULT_DATA_ROOT = '/data';
+
+function resolveRepoBasePath() {
+    if (typeof window === 'undefined' || !window.location) {
+        return '';
+    }
+
+    const marker = '/02_dashboard/';
+    const { pathname } = window.location;
+    const markerIndex = pathname.indexOf(marker);
+    if (markerIndex === -1) {
+        return '';
+    }
+
+    return pathname.slice(0, markerIndex);
+}
+
+function getDashboardDataRoot() {
+    const basePath = resolveRepoBasePath();
+    if (!basePath) {
+        return DEFAULT_DATA_ROOT;
+    }
+    return `${basePath}${DEFAULT_DATA_ROOT}`;
+}
+
+function sanitizeRelativePath(relativePath) {
+    return relativePath.replace(/^\/+/, '');
+}
 
 export function resolveDashboardDataPath(relativePath) {
-    const sanitized = relativePath.replace(/^\/+/, '');
-    return `${DATA_ROOT}/${sanitized}`;
+    const sanitized = sanitizeRelativePath(relativePath);
+    return `${getDashboardDataRoot()}/${sanitized}`;
 }
 
 export function resolveDemoDataPath(relativePath) {
-    const sanitized = relativePath.replace(/^\/+/, '');
-    return `${DATA_ROOT}/demo_${sanitized}`;
+    const sanitized = sanitizeRelativePath(relativePath);
+    return `${getDashboardDataRoot()}/demo_${sanitized}`;
 }
 
 /**
