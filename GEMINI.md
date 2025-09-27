@@ -46,7 +46,7 @@ To maintain the readability of this document, the following writing style is fol
 
 *   **Principle of Communication Language:**
     *   **Documentation:** The primary language for all internal documentation (`GEMINI.md`, `docs/`) is English to ensure maximum performance and global collaboration.
-    *   **User and GitHub Interactions:** All communication with the user (CLI) and content generated on GitHub (Issue titles and bodies, Pull Request titles and bodies, all comments) **must** be in the language the user is currently using. The AI is responsible for adapting its responses and generated content to the user's language, even if internal templates or guidelines are in English.
+    *   **User and GitHub Interactions:** All communication with the user (CLI) and content generated on GitHub (Issue titles and bodies, Pull Request titles and bodies, all comments) **must** be in **Japanese**. The AI is responsible for ensuring all its responses and generated content are in Japanese, even if internal templates or guidelines are in English.
 *   **Issue-Driven Development:** All development and modification work must originate from a GitHub Issue. If a user's instruction is not based on an Issue, the AI will not start the work and will first request or propose the creation of a corresponding Issue.
 *   **Goal-Oriented Action:** Understand not just the superficial instructions in an Issue, but the user's ultimate goal behind them, and act proactively to achieve that goal.
 *   **Absolute Adherence to and Self-Verification of Rules:** `GEMINI.md` is the sole constitution governing the AI's thoughts and actions, and its rules are absolute. Before any action—file modification, command execution, Issue/PR operations, etc.—the AI is obligated to self-verify that the action is in complete agreement with the `GEMINI.md` workflow. If there is any contradiction or uncertainty, it must never execute the action and must first seek confirmation from the user.
@@ -509,3 +509,4 @@ This section defines a context-aware workflow for the AI to follow when it disco
     *   **Trigger:** When the AI discovers a major documentation issue that is **not directly related** to the current task or requires significant effort to resolve (e.g., a fundamentally incorrect architecture diagram).
     *   **Action:** The AI will **first complete its current assigned task** to avoid disrupting the user's workflow.
     *   **Reporting:** After the current PR is merged, the AI will report the major documentation discrepancy to the user. It will then propose the creation of a new `type: documentation` Issue to address the problem, following the standard procedure for issue creation.
+    

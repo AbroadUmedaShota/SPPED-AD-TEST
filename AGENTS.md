@@ -1,33 +1,26 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-- Entry points `01_login/login-top.html` and `02_dashboard/index.html` load ES modules from `02_dashboard/src/` and shared `src/`.
-- Business logic stays in `src/services/` (e.g., `invoiceService.js`); UI-only DOM work belongs in `src/ui/`; shared helpers live in `utils.js`.
-- Mock datasets are under `data/`; legacy references in `archive/` should not be edited unless you are migrating data.
-- Docs start at `docs/README.md`; review them before broad refactors or adding modules.
+The site serves static HTML with primary entry points at `02_dashboard/index.html` and `01_login/login-top.html`. JavaScript modules live in `02_dashboard/src/` and `src/`, with business logic under `services/` (for example `invoiceService.js`) and UI render helpers in `ui/` (such as `surveyRenderer.js`). Share cross-cutting utilities through `utils.js`, store fixtures in `data/*.json`, and keep reference material in `docs/` starting with `docs/README.md`. Preserve this layout when adding features to keep imports predictable.
 
 ## Build, Test, and Development Commands
-- Serve locally with `python -m http.server 8000` (root directory) then hit `http://localhost:8000/02_dashboard/index.html`.
-- Alternative: `npx serve .` and browse to `/02_dashboard`; stop the server with `Ctrl+C`.
-- Keep the browser console open; every change must load without errors and pull from the JSON fixtures.
+- `python -m http.server 8000` - serve the workspace root and browse to `http://localhost:8000/02_dashboard/index.html`.
+- `npx serve .` - alternative lightweight server; open `/02_dashboard` once running. No build step exists, so changes should appear immediately after refresh.
 
 ## Coding Style & Naming Conventions
-- JavaScript uses ES modules, 2-space indentation, semicolons, and single quotes; prefer small, composable functions.
-- Name files lowerCamelCase (`tableManager.js`), components camelCase, and classes PascalCase.
-- Do not add frameworks; rely on vanilla DOM APIs and helpers in `utils.js`.
-- Follow `docs/02_CODING_STANDARDS.md` when in doubt.
+Follow ES module syntax with 2-space indentation, semicolons, and single quotes. Use camelCase for variables and functions, PascalCase only for classes, and lowerCamelCase file names like `tableManager.js`. Keep business logic in `services/`, DOM work in `ui/`, and avoid frameworks in favor of small composable functions. Consult `docs/02_CODING_STANDARDS.md` before adding new patterns.
 
 ## Testing Guidelines
-- No automated suite yet; manually test in Chromium or Firefox.
-- After changes, reload both login and dashboard flows, verify network requests hit the mock `data/*.json`, and interact with widgets to confirm rendering.
-- Record manual verification steps in pull requests.
+Automated tests are not yet in place. Validate manually in Chromium or Firefox, ensuring the console stays clean and data flows correctly from `data/*.json`. Exercise interactive widgets end-to-end and note any gaps. Refer to `docs/03_TESTING_GUIDELINES.md` when planning manual coverage.
 
 ## Commit & Pull Request Guidelines
-- Use Conventional Commits (`feat:`, `fix:`, `refactor:`, `docs:`, `chore:`); keep subjects short and imperative.
-- Pull requests must summarize affected paths, link issues (e.g., `Closes #123`), and attach screenshots for UI updates.
-- Include manual test notes describing browsers used and data scenarios covered.
+Use Conventional Commit prefixes (`feat:`, `fix:`, `refactor:`, `docs:`, `chore:`). Keep subjects concise, add bullet highlights in the body, and link issues (for example `Closes #123`). Pull requests should outline affected paths such as `02_dashboard/src/ui/...`, include screenshots for visual changes, and document manual test steps.
 
 ## Security & Configuration Tips
-- Never commit secrets; JSON fixtures are mock-only.
-- Production endpoints must remain configurable; consult `docs/01_ARCHITECTURE.md` before hardcoding URLs.
-- Justify any third-party dependencies and scope them to the smallest surface area.
+Do not commit secrets; `data/*.json` contains mock data only. Keep production endpoints configurable as described in `docs/01_ARCHITECTURE.md`, and justify any third-party dependency additions in your pull request summary.
+
+## Agent-Specific Instructions
+- **Communication Language:** All interactions with the user, including CLI prompts and content generated on GitHub (Issues, Pull Requests, comments), must be conducted in **Japanese**.
+- Respect existing file roles and avoid unrelated refactors or dependency changes.
+- Preserve ASCII unless a file already relies on other encodings.
+- If unexpected repository changes appear, pause and confirm the desired resolution with the maintainer before proceeding.

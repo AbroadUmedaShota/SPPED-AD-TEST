@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="SPEED AD - 展示会やセミナー向けのWEBソリューションを提供するログイン/サインアップページ">
-  <meta name="keywords" content="ログイン, サインアップ, SPEED AD, イベント, 展示会, セミナー">
+  <meta name="description" content="SPEED AD - イベント運営と広告展開を支援するWEBソリューション向けログイン/サインアップページ">
+  <meta name="keywords" content="ログイン, サインアップ, SPEED AD, イベント, 広告, セミナー">
   <title>SPEED AD - ログイン / サインアップ</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -328,6 +328,72 @@
         100% { transform: rotate(360deg); }
     }
     /*
+      -- Scenario Accounts (BEM) --
+      テストアカウント案内
+    */
+    .scenario-accounts {
+      margin-top: var(--spacing-6);
+      padding: var(--spacing-5);
+      background: rgba(76, 201, 240, 0.08);
+      border: 1px solid rgba(76, 201, 240, 0.3);
+      border-radius: var(--border-radius-md);
+    }
+    .scenario-accounts__title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin: 0 0 var(--spacing-3);
+      color: var(--color-on-surface-variant);
+    }
+    .scenario-accounts__list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-2);
+      padding: var(--spacing-0);
+      margin: var(--spacing-0);
+    }
+    .scenario-accounts__list li {
+      margin: var(--spacing-0);
+      width: 100%;
+    }
+    .scenario-accounts__link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--spacing-2);
+      width: 100%;
+      text-decoration: none;
+      color: var(--color-on-surface);
+      border: 1px solid var(--color-outline);
+      border-radius: var(--border-radius-md);
+      background: var(--color-surface-dim);
+      padding: var(--spacing-2) var(--spacing-3);
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: border-color 0.2s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.2s cubic-bezier(0.2, 0, 0, 1), transform 0.2s cubic-bezier(0.2, 0, 0, 1);
+    }
+    .scenario-accounts__link:hover {
+      border-color: var(--color-primary);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-level-1);
+    }
+    .scenario-accounts__email {
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+    .scenario-accounts__badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0 var(--spacing-2);
+      border-radius: 999px;
+      background: rgba(123, 44, 191, 0.12);
+      color: var(--color-primary);
+      font-size: 0.75rem;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
+    /*
       -- Utility Classes (BEM) --
       汎用的なスタイル
     */
@@ -487,6 +553,16 @@
       }
     }
     @media (max-width: 768px) { /* md */
+      .scenario-accounts {
+        padding: var(--spacing-4); /* 16px */
+      }
+      .scenario-accounts__link {
+        font-size: 0.85rem;
+      }
+      .scenario-accounts__badge {
+        font-size: 0.7rem;
+      }
+
       body::before { /* 背景オーバーレイ調整 */
         backdrop-filter: brightness(0.5) blur(2px);
       }
@@ -577,7 +653,7 @@
 <body>
   <div class="page-wrapper" role="main">
     <div class="info-panel">
-      <h2 class="info-panel__title">SPEED AD 〜スピード アド〜</h2>
+      <h2 class="info-panel__title">SPEED AD とは？</h2>
       <p class="info-panel__description">
         SPEED ADは、展示会やセミナーなどのイベント向けソリューションです。<br>
         無料のWEBアンケート作成、名刺のデータ化、御礼メールの送信を一気通貫で提供し、
@@ -604,11 +680,26 @@
           <a href="#" class="form-options__link">パスワードを忘れた方</a>
         </div>
         <div class="scenario-accounts">
-          <p class="scenario-accounts__title">シュミレーション用アカウント（クリックで入力）:</p>
+          <p class="scenario-accounts__title">シナリオテスト用アカウント（クリックで自動入力）</p>
           <ul class="scenario-accounts__list">
-            <li><a href="#" class="scenario-accounts__link" data-email="user">user (通常)</a></li>
-            <li><a href="#" class="scenario-accounts__link" data-email="new">new (初回)</a></li>
-            <li><a href="#" class="scenario-accounts__link" data-email="admin">admin (管理者)</a></li>
+            <li>
+              <a href="#" class="scenario-accounts__link" data-email="user">
+                <span class="scenario-accounts__email">user</span>
+                <span class="scenario-accounts__badge">標準</span>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="scenario-accounts__link" data-email="new">
+                <span class="scenario-accounts__email">new</span>
+                <span class="scenario-accounts__badge">新規</span>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="scenario-accounts__link" data-email="admin">
+                <span class="scenario-accounts__email">admin</span>
+                <span class="scenario-accounts__badge">管理者</span>
+              </a>
+            </li>
           </ul>
         </div>
         <button class="button button--filled" type="submit">
@@ -623,7 +714,7 @@
         <img class="button--google__logo" src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo">
         Googleでログイン
       </button>
-      <button class="button button--tonal" type="button">無料ではじめる</button>
+      <button class="button button--tonal" type="button">新規アカウント作成</button>
       <div class="sub-links">
         <a href="#" class="sub-links__item">利用規約</a>｜<a href="#" class="sub-links__item">プライバシー</a>｜<a href="#" class="sub-links__item">サポート</a>
       </div>
@@ -731,7 +822,7 @@
       scenarioLinks.forEach(link => {
         link.addEventListener('click', (event) => {
           event.preventDefault();
-          const email = event.target.dataset.email;
+          const email = event.currentTarget?.dataset.email;
           if (emailInput && email) {
             emailInput.value = email;
             // パスワードが不要なので、ログインボタンにフォーカスを移す
@@ -1035,6 +1126,10 @@
 <!-- レスポンシブ OK: @media クエリにより、sm, md, lg, xl のブレークポイントでレイアウトが適切に変化することを確認 -->
 <!-- 4px グリッド OK: margin, padding, font-size, border-radius など主要なサイズを4の倍数で定義・調整 -->
 <!-- 浮動ラベル削除 OK: 浮動ラベルのHTML構造とCSSルールを削除し、標準的なラベル配置に戻っていることを確認 -->
-<!-- BEM OK: クラス名が Block__Element--Modifier の規則に従って定義されていることを確認 -->�で定義・調整 -->
+<!-- BEM OK: クラス名が Block__Element--Modifier の規則に従って定義されていることを確認 -->
 <!-- 浮動ラベル削除 OK: 浮動ラベルのHTML構造とCSSルールを削除し、標準的なラベル配置に戻っていることを確認 -->
 <!-- BEM OK: クラス名が Block__Element--Modifier の規則に従って定義されていることを確認 -->
+
+
+
+
