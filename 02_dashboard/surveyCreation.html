@@ -64,7 +64,7 @@
                   <div class="multi-lang-input-group" data-field-key="surveyName" data-input-type="input" data-label="アンケート名（管理用）" data-placeholder-ja="(例) 新製品調査" data-required="true">
                     <div class="input-group" data-lang="ja">
                       <input type="text" id="surveyName_ja" placeholder="(例) 新製品調査" class="input-field" required aria-required="true" aria-describedby="surveyNameError">
-                      <label for="surveyName_ja" class="input-label">アンケート名（管理用）</label>
+                      <label for="surveyName_ja" class="input-label">アンケート名（管理用）<span class="text-error">*</span></label>
                     </div>
                     <div id="surveyNameError" class="error-message text-error text-sm mt-1 hidden" aria-live="polite">この入力は必須です</div>
                   </div>
@@ -73,7 +73,7 @@
                   <div class="multi-lang-input-group" data-field-key="displayTitle" data-input-type="input" data-label="表示タイトル" data-placeholder-ja="(例) 新製品に関する満足度を教えてください" data-required="true">
                     <div class="input-group" data-lang="ja">
                       <input type="text" id="displayTitle_ja" placeholder="(例) 新製品に関する満足度を教えてください" class="input-field" required aria-required="true" aria-describedby="displayTitleError">
-                      <label for="displayTitle_ja" class="input-label">表示タイトル</label>
+                      <label for="displayTitle_ja" class="input-label">表示タイトル<span class="text-error">*</span></label>
                     </div>
                     <div id="displayTitleError" class="error-message text-error text-sm mt-1 hidden" aria-live="polite">この入力は必須です</div>
                   </div>
@@ -95,7 +95,7 @@
                   <div class="input-group relative md:col-span-2">
                     <input type="text" id="periodRange" class="input-field" placeholder=" " required aria-required="true" aria-describedby="periodRangeError">
                     <label for="periodRange" class="input-label">アンケート期間<span class="text-error">*</span></label>
-                    <span class="material-icons absolute top-1/2 right-3 -translate-y-1/2 text-on-surface-variant cursor-pointer">calendar_today</span>
+                    <span role="button" tabindex="0" class="material-icons absolute top-1/2 right-3 -translate-y-1/2 text-on-surface-variant cursor-pointer">calendar_today</span>
                     <div id="periodRangeError" class="error-message text-error text-sm mt-1 hidden" aria-live="polite">この入力は必須です</div>
                   </div>
 
@@ -113,7 +113,7 @@
                     <div id="deadlineWrapper">
                       <input type="text" id="deadline" class="input-field" placeholder=" " data-input>
                       <label for="deadline" class="input-label">データ締切</label>
-                      <span class="material-icons absolute top-1/2 right-3 -translate-y-1/2 text-on-surface-variant cursor-pointer" data-toggle>calendar_today</span>
+                      <span role="button" tabindex="0" class="material-icons absolute top-1/2 right-3 -translate-y-1/2 text-on-surface-variant cursor-pointer" data-toggle>calendar_today</span>
                     </div>
                   </div>
                 </div>
@@ -264,6 +264,7 @@
             <option value="date_time">日付/時刻</option>
             <option value="handwriting">手書きスペース</option>
           </select>
+        </div>
         <div class="flex items-center gap-2">
           <button type="button" class="icon-button duplicate-question-btn" aria-label="設問を複製" title="設問を複製"><span class="material-icons">content_copy</span></button>
           <button type="button" class="icon-button delete-question-btn" aria-label="設問を削除" title="設問を削除"><span class="material-icons text-error">delete</span></button>
