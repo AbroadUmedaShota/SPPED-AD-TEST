@@ -1,6 +1,7 @@
 import { lockScroll, unlockScroll, showToast } from './utils.js';
 import { fetchGroups } from './groupService.js';
 import { setGroupFilter } from './tableManager.js';
+import { showConfirmationModal } from './confirmationModal.js';
 
 
 
@@ -116,7 +117,18 @@ export function initSidebarHandler() {
     if (logoutButton) {
         logoutButton.addEventListener('click', (e) => {
             e.preventDefault();
-            showToast('ログアウト機能は未実装です。', 'info');
+            showConfirmationModal(
+                'ログアウトしますか？',
+                () => {
+                    // Clear session/local storage
+                    localStorage.clear();
+                    sessionStorage.clear();
+
+                    // Redirect to the login page at the project root
+                    window.location.href = '../../index.html';
+                },
+                'ログアウト'
+            );
         });
     }
 
