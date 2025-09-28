@@ -147,7 +147,10 @@
 
             <!-- 設問設定 -->
             <section>
-              <h2 id="section-question-settings" class="text-on-surface text-xl font-semibold mb-4">設問設定</h2>
+              <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+                <h2 id="section-question-settings" class="text-on-surface text-xl font-semibold">設問設定</h2>
+                <button type="button" id="addNewGroupBtn" class="min-w-[140px] px-4 py-2 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors hover:bg-secondary-container/80">設問グループを追加</button>
+              </div>
               <div id="questionGroupsContainer" class="space-y-6 mb-6"></div>
             </section>
 
@@ -168,6 +171,10 @@
     </button>
     <div id="fab-menu" class="absolute bottom-20 right-0 w-72 bg-surface rounded-2xl shadow-2xl transition-all duration-300 transform scale-95 opacity-0 pointer-events-none origin-bottom-right">
         <div class="py-2">
+            <button data-question-type="group" class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
+                <span class="material-icons text-on-surface-variant mr-4">view_sidebar</span>
+                <span>設問グループを追加</span>
+            </button>
 
             <button data-question-type="free_answer" class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
                 <span class="material-icons text-on-surface-variant mr-4">short_text</span>

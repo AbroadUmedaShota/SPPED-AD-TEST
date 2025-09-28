@@ -1002,7 +1002,8 @@ async function initializePage() {
 
         restoreAccordionState();
         const fabActions = {
-            onAddQuestion: (questionType) => handleAddNewQuestion(null, questionType)
+            onAddQuestion: (questionType) => handleAddNewQuestion(null, questionType),
+            onAddGroup: () => handleAddNewQuestionGroup()
         };
         initializeFab('fab-container', fabActions);
 
