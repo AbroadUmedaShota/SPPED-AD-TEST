@@ -1,0 +1,62 @@
+[
+  {
+    "answerId": "ANS_sv_0001_25049_001",
+    "businessCard": {
+      "group1": {
+        "email": "matsuda.takuya@example.com"
+      },
+      "group2": {
+        "lastName": "松田",
+        "firstName": "拓也"
+      },
+      "group3": {
+        "companyName": "イベント企画株式会社",
+        "department": "イベント企画部",
+        "position": "イベントディレクター"
+      },
+      "group4": {
+        "postalCode": "135-0063",
+        "address1": "東京都江東区有明3-11-1",
+        "address2": "東京ビッグサイト"
+      },
+      "group5": {
+        "mobile": "020-1234-5678",
+        "tel1": "03-7890-1234",
+        "fax": "03-7890-1235"
+      },
+      "group6": {
+        "url": "https://event-kikaku.example.com"
+      }
+    }
+  },
+  {
+    "answerId": "ANS_sv_0001_25049_002",
+    "businessCard": {
+      "group1": {
+        "email": "takeuchi.aya@example.com"
+      },
+      "group2": {
+        "lastName": "竹内",
+        "firstName": "彩"
+      },
+      "group3": {
+        "companyName": "イベント運営株式会社",
+        "department": "イベント運営部",
+        "position": "オペレーションマネージャー"
+      },
+      "group4": {
+        "postalCode": "261-8550",
+        "address1": "千葉県千葉市美浜区中瀬2-1",
+        "address2": "幕張メッセ"
+      },
+      "group5": {
+        "mobile": "020-8765-4321",
+        "tel1": "043-890-1234",
+        "fax": "043-890-1235"
+      },
+      "group6": {
+        "url": "https://event-unei.example.com"
+      }
+    }
+  }
+]

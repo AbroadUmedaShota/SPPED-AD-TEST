@@ -18,7 +18,7 @@ let dateRangePicker = null;
 async function initGraphPage() {
     initBreadcrumbs(); // Add this line
     const urlParams = new URLSearchParams(window.location.search);
-    const surveyId = urlParams.get('surveyId') || 'sv_20250701_001'; // Default to sample survey ID
+    const surveyId = urlParams.get('surveyId') || 'sv_0001_24001'; // Default to sample survey ID
 
     initializeDatePicker();
     await loadAndRenderCharts(surveyId);
@@ -365,3 +365,4 @@ function showError(message, show = true) {
         container.classList.add('hidden');
     }
 }
+

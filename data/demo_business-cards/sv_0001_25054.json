@@ -1,0 +1,62 @@
+[
+  {
+    "answerId": "ANS_sv_0001_25054_001",
+    "businessCard": {
+      "group1": {
+        "email": "kaneko.naoki@example.com"
+      },
+      "group2": {
+        "lastName": "金子",
+        "firstName": "直樹"
+      },
+      "group3": {
+        "companyName": "人事株式会社",
+        "department": "人事部",
+        "position": "人事担当"
+      },
+      "group4": {
+        "postalCode": "100-0011",
+        "address1": "東京都千代田区内幸町1-1-1",
+        "address2": "帝国ホテルタワー 10F"
+      },
+      "group5": {
+        "mobile": "060-2345-6789",
+        "tel1": "03-8901-2345",
+        "fax": "03-8901-2346"
+      },
+      "group6": {
+        "url": "https://jinji-corp.example.com"
+      }
+    }
+  },
+  {
+    "answerId": "ANS_sv_0001_25054_002",
+    "businessCard": {
+      "group1": {
+        "email": "noguchi.keiko@example.com"
+      },
+      "group2": {
+        "lastName": "野口",
+        "firstName": "恵子"
+      },
+      "group3": {
+        "companyName": "総務株式会社",
+        "department": "総務部",
+        "position": "総務担当"
+      },
+      "group4": {
+        "postalCode": "100-0005",
+        "address1": "東京都千代田区丸の内3-3-1",
+        "address2": "新東京ビル 5F"
+      },
+      "group5": {
+        "mobile": "060-9876-5432",
+        "tel1": "03-9012-3456",
+        "fax": "03-9012-3457"
+      },
+      "group6": {
+        "url": "https://soumu-corp.example.com"
+      }
+    }
+  }
+]

@@ -1,0 +1,42 @@
+[
+  {
+    "answerId": "F001",
+    "surveyId": "sv_0001_25027",
+    "answeredAt": "2025-09-05 13:15:00",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_性別",
+        "answer": "男性"
+      },
+      {
+        "question": "Q.02_業種",
+        "answer": "IT・ソフトウェア"
+      },
+      {
+        "question": "Q.03_満足度",
+        "answer": "満足"
+      }
+    ]
+  },
+  {
+    "answerId": "F002",
+    "surveyId": "sv_0001_25027",
+    "answeredAt": "2025-09-21 09:45:00",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_性別",
+        "answer": "女性"
+      },
+      {
+        "question": "Q.02_業種",
+        "answer": "サービス"
+      },
+      {
+        "question": "Q.03_満足度",
+        "answer": "普通"
+      }
+    ]
+  }
+]

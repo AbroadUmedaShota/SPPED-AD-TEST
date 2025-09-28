@@ -393,7 +393,7 @@ function setupEventListeners() {
             const urlParams = new URLSearchParams(window.location.search);
             let surveyId = urlParams.get('surveyId');
             if (!surveyId) {
-                surveyId = 'sv_20250701_001'; // Fallback to default
+                surveyId = 'sv_0001_24001'; // Fallback to default
             }
             window.location.href = `graph-page.html?surveyId=${surveyId}`;
         });
@@ -519,3 +519,4 @@ export async function initializePage() {
         }
     }
 }
+

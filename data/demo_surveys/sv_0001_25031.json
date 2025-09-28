@@ -1,0 +1,175 @@
+{
+  "id": "sv_0001_25031",
+  "groupId": "GROUP001",
+  "name": {
+    "ja": "市場トレンド調査",
+    "en": "Market Trend Survey"
+  },
+  "displayTitle": {
+    "ja": "最新の市場トレンドに関するアンケート",
+    "en": "Survey on Latest Market Trends"
+  },
+  "description": {
+    "ja": "市場のトレンドや動向を調査するためのアンケートです。",
+    "en": "This survey is to investigate market trends and movements."
+  },
+  "status": "会期中",
+  "answerCount": 120,
+  "realtimeAnswers": 20,
+  "periodStart": "2025-08-05",
+  "periodEnd": "2025-09-04",
+  "bizcardEnabled": true,
+  "details": [
+    {
+      "id": "Q1",
+      "text": "Q1. どの業界のトレンドに最も注目していますか？",
+      "type": "text"
+    },
+    {
+      "id": "Q2",
+      "text": "Q2. 今後成長が期待される分野は何だと思いますか？",
+      "type": "text"
+    },
+    {
+      "id": "Q3",
+      "text": "Q3. どのような情報源から市場トレンドを得ていますか？",
+      "type": "multi_choice",
+      "options": [
+        "ニュースサイト",
+        "専門誌",
+        "SNS",
+        "セミナー",
+        "その他"
+      ]
+    },
+    {
+      "id": "Q4",
+      "text": "Q4. 市場トレンドの変化がビジネスに与える影響についてどう思いますか？",
+      "type": "single_choice",
+      "options": [
+        "大きい",
+        "普通",
+        "小さい"
+      ]
+    },
+    {
+      "id": "Q5",
+      "text": "Q5. 市場トレンドに関する情報収集で困っていることはありますか？",
+      "type": "text"
+    },
+    {
+      "id": "Q6",
+      "text": "Q6. 市場トレンドに関するアンケートの全体的な満足度を教えてください。",
+      "type": "single_choice",
+      "options": [
+        "非常に満足",
+        "満足",
+        "普通",
+        "不満",
+        "非常に不満"
+      ]
+    },
+    {
+      "id": "Q7",
+      "text": "Q7. 市場トレンドに関する情報収集の頻度を教えてください。",
+      "type": "single_choice",
+      "options": [
+        "毎日",
+        "週に数回",
+        "月に数回",
+        "ほとんどしない"
+      ]
+    },
+    {
+      "id": "Q8",
+      "text": "Q8. 市場トレンドに関する情報収集の目的を教えてください。",
+      "type": "text"
+    },
+    {
+      "id": "Q9",
+      "text": "Q9. 市場トレンドに関する情報収集の改善点があれば教えてください。",
+      "type": "text"
+    },
+    {
+      "id": "Q10",
+      "text": "Q10. 市場トレンドに関する情報収集の効率性についてどう思いますか？",
+      "type": "single_choice",
+      "options": [
+        "良い",
+        "普通",
+        "悪い"
+      ]
+    },
+    {
+      "id": "Q11",
+      "text": "Q11. 市場トレンドに関する情報収集の信頼性についてどう思いますか？",
+      "type": "single_choice",
+      "options": [
+        "高い",
+        "普通",
+        "低い"
+      ]
+    },
+    {
+      "id": "Q12",
+      "text": "Q12. 市場トレンドに関する情報収集のコストについてどう思いますか？",
+      "type": "single_choice",
+      "options": [
+        "高い",
+        "適切",
+        "安い"
+      ]
+    },
+    {
+      "id": "Q13",
+      "text": "Q13. 市場トレンドに関する情報収集のスピードについてどう思いますか？",
+      "type": "single_choice",
+      "options": [
+        "速い",
+        "普通",
+        "遅い"
+      ]
+    },
+    {
+      "id": "Q14",
+      "text": "Q14. 市場トレンドに関する情報収集の網羅性についてどう思いますか？",
+      "type": "single_choice",
+      "options": [
+        "高い",
+        "普通",
+        "低い"
+      ]
+    },
+    {
+      "id": "Q15",
+      "text": "Q15. 市場トレンドに関する情報収集の専門性についてどう思いますか？",
+      "type": "single_choice",
+      "options": [
+        "高い",
+        "普通",
+        "低い"
+      ]
+    },
+    {
+      "id": "Q16",
+      "text": "Q16. 市場トレンドに関する情報収集の継続性についてどう思いますか？",
+      "type": "single_choice",
+      "options": [
+        "高い",
+        "普通",
+        "低い"
+      ]
+    },
+    {
+      "id": "Q17",
+      "text": "Q17. 市場トレンドに関する情報収集の活用度についてどう思いますか？",
+      "type": "single_choice",
+      "options": [
+        "高い",
+        "普通",
+        "低い"
+      ]
+    }
+  ],
+  "createdAt": "2025-08-05T00:00:00+09:00"
+}

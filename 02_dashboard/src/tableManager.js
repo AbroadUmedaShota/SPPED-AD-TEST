@@ -13,6 +13,10 @@ let currentFilteredData = []; // Data array: holds filtered and sorted data
 let currentPage = 1;
 let itemsPerPage = 10; // Default, will be updated from select element
 
+const SURVEY_ID_PATTERN = /^sv_(\d{4})_(\d{2})(\d{3})$/;
+const SURVEY_ID_DEFAULT_USER = '0001';
+const SURVEY_ID_MAX_SEQUENCE = 999;
+
 /**
  * 仕様に基づいてアンケートの表示ステータスを決定します。
  * @param {object} survey - アンケートオブジェクト
@@ -247,11 +251,137 @@ function renderTableRows(surveysToRender) {
 }
 
 /**
- * Generates a new unique survey ID.
+ * Survey ID generation helpers.
+ */
+function normalizeUserId(rawValue) {
+    if (!rawValue) {
+        return '';
+    }
+    const digits = String(rawValue).replace(/\D/g, '');
+    if (!digits) {
+        return '';
+    }
+    return digits.slice(-4).padStart(4, '0');
+}
+
+function getDatasetUserId() {
+    if (typeof document === 'undefined') {
+        return '';
+    }
+    const body = document.body;
+    if (body && body.dataset && body.dataset.userId) {
+        return body.dataset.userId;
+    }
+    return '';
+}
+
+function getMetaUserId() {
+    if (typeof document === 'undefined' || typeof document.querySelector !== 'function') {
+        return '';
+    }
+    const meta = document.querySelector('meta[name="current-user-id"]');
+    if (meta && meta.content) {
+        return meta.content;
+    }
+    return '';
+}
+
+function getGlobalUserId() {
+    if (typeof window === 'undefined') {
+        return '';
+    }
+    if (window.currentUserId) {
+        return window.currentUserId;
+    }
+    if (window.currentUser && window.currentUser.id) {
+        return window.currentUser.id;
+    }
+    if (window.appContext && window.appContext.userId) {
+        return window.appContext.userId;
+    }
+    return '';
+}
+
+function resolveActiveUserId(referenceSurveyId = '') {
+    const match = SURVEY_ID_PATTERN.exec(referenceSurveyId || '');
+    if (match) {
+        return match[1];
+    }
+
+    const datasetUserId = normalizeUserId(getDatasetUserId());
+    if (datasetUserId) {
+        return datasetUserId;
+    }
+
+    const metaUserId = normalizeUserId(getMetaUserId());
+    if (metaUserId) {
+        return metaUserId;
+    }
+
+    const globalUserId = normalizeUserId(getGlobalUserId());
+    if (globalUserId) {
+        return globalUserId;
+    }
+
+    return SURVEY_ID_DEFAULT_USER;
+}
+
+function extractSurveySequenceParts(surveyId) {
+    if (typeof surveyId !== 'string') {
+        return null;
+    }
+   
+    const match = SURVEY_ID_PATTERN.exec(surveyId);
+    if (!match) {
+        return null;
+    }
+    return {
+        userId: match[1],
+        year: match[2],
+        sequence: Number(match[3])
+    };
+}
+
+function findNextSurveySequence(userId, yearSuffix, referenceParts = null) {
+    const usedSequences = new Set();
+
+    if (referenceParts && referenceParts.userId === userId && referenceParts.year === yearSuffix) {
+        usedSequences.add(referenceParts.sequence);
+    }
+
+    allSurveyData.forEach((survey) => {
+        const parts = extractSurveySequenceParts(survey.id);
+        if (!parts) {
+            return;
+        }
+        if (parts.userId === userId && parts.year === yearSuffix) {
+            usedSequences.add(parts.sequence);
+        }
+    });
+
+    for (let i = 1; i <= SURVEY_ID_MAX_SEQUENCE; i += 1) {
+        if (!usedSequences.has(i)) {
+            return String(i).padStart(3, '0');
+        }
+    }
+
+    showToast('アンケートIDの連番が上限に達しました。管理者にお問い合わせください。', 'error');
+    console.error('Survey ID sequence exhausted for user %s and year %s', userId, yearSuffix);
+    return '000';
+}
+
+/**
+ * Generates a new unique survey ID following the SpeedAd rule.
+ * @param {string} [referenceSurveyId] Optional existing survey ID used to infer user context.
  * @returns {string} A new survey ID.
  */
-function generateNewSurveyId() {
-    return 'SURVEY' + Math.random().toString(36).substring(2, 10);
+function generateNewSurveyId(referenceSurveyId = '') {
+    const userId = resolveActiveUserId(referenceSurveyId);
+    const now = new Date();
+    const yearSuffix = String(now.getFullYear() % 100).padStart(2, '0');
+    const referenceParts = extractSurveySequenceParts(referenceSurveyId);
+    const sequence = findNextSurveySequence(userId, yearSuffix, referenceParts);
+    return `sv_${userId}_${yearSuffix}${sequence}`;
 }
 
 /**
@@ -270,7 +400,7 @@ export function duplicateSurvey(surveyId, newName, newPeriodStart, newPeriodEnd)
 
     const newSurvey = {
         ...surveyToDuplicate,
-        id: generateNewSurveyId(),
+        id: generateNewSurveyId(surveyToDuplicate.id),
         name: newName,
         periodStart: newPeriodStart,
         periodEnd: newPeriodEnd,
@@ -580,3 +710,9 @@ export function updateSurveyData(updatedSurvey) {
         applyFiltersAndPagination(); // Re-apply filters and pagination to update table
     }
 }
+
+
+
+
+
+

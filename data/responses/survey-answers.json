@@ -1,7 +1,7 @@
 [
   {
     "answerId": "6794",
-    "surveyId": "sv_20250701_001",
+    "surveyId": "sv_0001_25022",
     "answeredAt": "2025-07-04 11:17",
     "isTest": false,
     "details": [
@@ -43,7 +43,7 @@
   },
   {
     "answerId": "6795",
-    "surveyId": "sv_20250701_001",
+    "surveyId": "sv_0001_25022",
     "answeredAt": "2025-07-04 12:03",
     "isTest": false,
     "details": [
@@ -83,7 +83,7 @@
   },
   {
     "answerId": "6801",
-    "surveyId": "sv_20250705_001",
+    "surveyId": "sv_0001_25023",
     "answeredAt": "2025-07-04 12:33",
     "isTest": true,
     "details": [

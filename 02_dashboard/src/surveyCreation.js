@@ -946,9 +946,9 @@ async function initializePage() {
                 const description = enqueteDetails.description || { ja: '', en: '' };
                 surveyData = {
                     id: currentSurveyId,
-                    name: getStr(name),
-                    displayTitle: getStr(displayTitle),
-                    description: getStr(description),
+                    name: name,
+                    displayTitle: displayTitle,
+                    description: description,
                     memo: surveyInfo?.memo || '',
                     periodStart: surveyInfo?.periodStart || enqueteDetails.periodStart || '',
                     periodEnd: surveyInfo?.periodEnd || enqueteDetails.periodEnd || '',
