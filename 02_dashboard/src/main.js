@@ -187,6 +187,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (openNewSurveyModalBtn) {
         openNewSurveyModalBtn.addEventListener('click', () => {
             handleOpenModal('newSurveyModal', 'modals/newSurveyModal.html', () => {
+                // Initialize flatpickr for the new range input
+                const periodRangePicker = window.flatpickr('#newSurveyPeriodRange', {
+                    mode: 'range',
+                    dateFormat: 'Y-m-d',
+                    locale: 'ja'
+                });
+
                 const createSurveyBtn = document.getElementById('createSurveyFromModalBtn');
                 if (createSurveyBtn) {
                     createSurveyBtn.addEventListener('click', (e) => {
@@ -196,8 +203,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                         const surveyName = document.getElementById('surveyName').value;
                         const displayTitle = document.getElementById('displayTitle').value;
                         const surveyMemo = document.getElementById('surveyMemo').value;
-                        const surveyStartDate = document.getElementById('surveyStartDate').value;
-                        const surveyEndDate = document.getElementById('surveyEndDate').value;
+                        
+                        // Get dates from flatpickr instance
+                        const selectedDates = periodRangePicker.selectedDates;
+                        const surveyStartDate = selectedDates.length > 0 ? periodRangePicker.formatDate(selectedDates[0], 'Y-m-d') : '';
+                        const surveyEndDate = selectedDates.length > 1 ? periodRangePicker.formatDate(selectedDates[1], 'Y-m-d') : '';
 
                         // Build query parameters
                         const params = new URLSearchParams();

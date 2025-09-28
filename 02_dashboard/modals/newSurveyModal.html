@@ -22,22 +22,11 @@
                 <label class="input-label" for="surveyMemo">メモ（任意）</label>
                 <p class="error-message hidden" id="surveyMemo-error"></p>
             </div>
-            <div>
-                <label class="block text-sm font-medium text-on-surface mb-1">回答期間</label>
-                <div class="flex items-center gap-2 mt-4"> <!-- mt-4 を追加して上部との間隔を確保 -->
-                    <div class="input-group relative flex-1 mt-0 mb-0">
-                        <input type="date" id="surveyStartDate" name="surveyStartDate" placeholder=" " class="input-field w-full rounded-md border-outline-variant shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm p-2 text-on-surface bg-surface-bright" required>
-                        <label class="input-label" for="surveyStartDate">開始日</label>
-                        <p class="error-message hidden" id="surveyStartDate-error"></p>
-                    </div>
-                    <span class="text-on-surface-variant">～</span>
-                    <div class="input-group relative flex-1 mt-0 mb-0">
-                        <input type="date" id="surveyEndDate" name="surveyEndDate" placeholder=" " class="input-field w-full rounded-md border-outline-variant shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm p-2 text-on-surface bg-surface-bright" required>
-                        <label class="input-label" for="surveyEndDate">終了日</label>
-                        <p class="error-message hidden" id="surveyEndDate-error"></p>
-                    </div>
-                </div>
-                <p class="error-message hidden" id="surveyPeriod-error"></p>
+            <div class="input-group relative">
+                <input type="text" id="newSurveyPeriodRange" name="newSurveyPeriodRange" placeholder=" " class="input-field" required>
+                <label class="input-label" for="newSurveyPeriodRange">回答期間</label>
+                <span class="material-icons absolute top-1/2 right-3 -translate-y-1/2 text-on-surface-variant cursor-pointer">calendar_today</span>
+                <p class="error-message hidden" id="newSurveyPeriodRange-error"></p>
             </div>
             <div class="flex justify-end gap-3 pt-4">
                 <button class="bg-secondary-container text-on-secondary-container py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal tracking-wide transition-colors" id="cancelNewSurveyModalBtn" class="bg-secondary-container text-on-secondary-container py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal tracking-wide transition-colors" type="button" aria-label="キャンセル">キャンセル</button>
