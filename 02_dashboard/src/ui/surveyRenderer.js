@@ -3,16 +3,17 @@
  * Renders the survey creation UI based on the surveyData object.
  */
 
-// --- Simple i18n dictionaries for UI labels ---
 const I18N = {
   questionTypes: {
     ja: {
-      free_answer: '自由回答',
-      single_answer: '単一回答',
-      multi_answer: '複数回答',
+      free_answer: '自由記述',
+      single_answer: '単一選択',
+      multi_answer: '複数選択',
       number_answer: '数値入力',
       matrix_sa: 'マトリクス（単一）',
-      matrix_ma: 'マトリクス（複数）'
+      matrix_ma: 'マトリクス（複数）',
+      date_time: '日付/時刻',
+      handwriting: '手書きスペース'
     },
     en: {
       free_answer: 'Free Text',
@@ -20,14 +21,16 @@ const I18N = {
       multi_answer: 'Multiple Choice',
       number_answer: 'Number',
       matrix_sa: 'Matrix (Single)',
-      matrix_ma: 'Matrix (Multiple)'
+      matrix_ma: 'Matrix (Multiple)',
+      date_time: 'Date/Time',
+      handwriting: 'Handwriting'
     }
   },
   labels: {
     ja: {
       addOption: '+ 選択肢を追加',
-      noQuestions: '設問がありません。',
-      noGroups: '設問グループはありません。',
+      noQuestions: '設問はまだありません。',
+      noGroups: '質問グループはまだありません。',
       unknownType: '不明なタイプ'
     },
     en: {
@@ -39,66 +42,243 @@ const I18N = {
   }
 };
 
-// Complete missing type labels (fallback; ASCII-safe)
-try {
-  if (!I18N.questionTypes?.ja?.date_time) I18N.questionTypes.ja.date_time = 'Date/Time';
-  if (!I18N.questionTypes?.ja?.handwriting) I18N.questionTypes.ja.handwriting = 'Handwriting';
-  if (!I18N.questionTypes?.en?.date_time) I18N.questionTypes.en.date_time = 'Date/Time';
-  if (!I18N.questionTypes?.en?.handwriting) I18N.questionTypes.en.handwriting = 'Handwriting';
-} catch (_) { /* noop */ }
+const FALLBACK_LANGUAGE = 'ja';
+
+const DEFAULT_NUMERIC_META = { mode: 'integer', min: '', max: '', precision: 0, step: 1, unitLabel: '', unitSystem: 'metric' };
+const DEFAULT_DATETIME_META = { inputMode: 'date', timezone: 'Asia/Tokyo', minDateTime: '', maxDateTime: '', allowPast: true, allowFuture: true };
+const DEFAULT_HANDWRITING_META = { canvasWidth: 600, canvasHeight: 200, penColor: '#000000', penWidth: 2, backgroundPattern: 'plain' };
+
 
 function t(dict, key, lang) {
-  const d = I18N[dict]?.[lang] || I18N[dict]?.ja || {};
-  return d[key] || (I18N[dict]?.ja?.[key] || key);
+  const table = I18N[dict]?.[lang] || I18N[dict]?.ja || {};
+  return table[key] || I18N[dict]?.ja?.[key] || key;
 }
 
-/**
- * Populates the basic information section of the form.
- * @param {object} surveyData - The main survey data object.
- */
-function toML(value) {
-  if (typeof value === 'object' && value !== null) return value;
-  if (typeof value === 'string') return { ja: value, en: '' };
-  return { ja: '', en: '' };
+function getLocalizedText(value, lang) {
+  if (value && typeof value === 'object' && !Array.isArray(value)) {
+    const v = value[lang];
+    return typeof v === 'string' ? v : (v ?? '');
+  }
+  if (typeof value === 'string') {
+    return lang === 'ja' ? value : '';
+  }
+  return '';
 }
 
-export function populateBasicInfo(surveyData) {
+function getLanguageMeta(languageOptions = {}, code = FALLBACK_LANGUAGE) {
+  const { languageMap } = languageOptions;
+  if (languageMap && typeof languageMap.get === 'function') {
+    const meta = languageMap.get(code);
+    if (meta) {
+      return meta;
+    }
+  }
+  return { code, label: code, shortLabel: code };
+}
+
+function hydrateSingleLanguageField(container, value, languageOptions = {}, overrides = {}) {
+  if (!container) return;
+  const inputGroup = container.querySelector('.input-group');
+  if (!inputGroup) return;
+  const input = inputGroup.querySelector('input, textarea');
+  const label = inputGroup.querySelector('.input-label');
+  const defaultFieldKey = container.dataset.fieldKey || 'field';
+  const fieldKey = overrides.fieldKey || defaultFieldKey;
+  const placeholderJa = overrides.placeholderJa ?? container.dataset.placeholderJa ?? '';
+  const baseLabel = overrides.label ?? container.dataset.label ?? '';
+  const isRequired = overrides.required ?? (container.dataset.required === 'true');
+  const editorLanguage = languageOptions.editorLanguage || FALLBACK_LANGUAGE;
+  const langMeta = getLanguageMeta(languageOptions, editorLanguage);
+  const valueStr = getLocalizedText(value, editorLanguage);
+
+  if (input) {
+    input.value = valueStr;
+    input.dataset.lang = editorLanguage;
+    input.id = `${fieldKey}_${editorLanguage}`;
+    if (editorLanguage === 'ja') {
+      input.placeholder = placeholderJa || '';
+    } else {
+      const fallbackValue = getLocalizedText(value, 'ja');
+      input.placeholder = fallbackValue || placeholderJa || '';
+    }
+    if (isRequired && editorLanguage === 'ja') {
+      input.required = true;
+      input.setAttribute('aria-required', 'true');
+    } else {
+      input.required = false;
+      input.removeAttribute('aria-required');
+    }
+  }
+
+  inputGroup.dataset.lang = editorLanguage;
+
+  if (label) {
+    label.textContent = baseLabel ? `${baseLabel}（${langMeta.shortLabel || langMeta.label}）` : langMeta.label;
+    if (input?.id) {
+      label.setAttribute('for', input.id);
+    }
+  }
+
+  const badgeSelector = `[data-role="untranslated-badge"][data-for="${fieldKey}_${editorLanguage}"]`;
+  const currentBadge = container.querySelector(badgeSelector);
+  if (editorLanguage !== 'ja' && !valueStr) {
+    if (!currentBadge) {
+      const badge = document.createElement('p');
+      badge.dataset.role = 'untranslated-badge';
+      badge.dataset.for = `${fieldKey}_${editorLanguage}`;
+      badge.className = 'text-xs text-on-surface-variant italic mt-1';
+      badge.textContent = '未翻訳の状態です。';
+      container.appendChild(badge);
+    }
+  } else if (currentBadge) {
+    currentBadge.remove();
+  }
+}
+
+export function populateBasicInfo(surveyData, languageOptions = {}) {
   if (!surveyData) return;
 
-  // --- Get DOM Elements ---
-  const surveyNameInputJa = document.getElementById('surveyName_ja');
-  const surveyNameInputEn = document.getElementById('surveyName_en');
-  const displayTitleInputJa = document.getElementById('displayTitle_ja');
-  const displayTitleInputEn = document.getElementById('displayTitle_en');
-  const descriptionTextareaJa = document.getElementById('description_ja');
-  const descriptionTextareaEn = document.getElementById('description_en');
-  const periodStartInput = document.getElementById('periodStart');
-  const periodEndInput = document.getElementById('periodEnd');
+  const surveyNameGroup = document.querySelector('[data-field-key="surveyName"]');
+  hydrateSingleLanguageField(surveyNameGroup, surveyData.name, languageOptions, { fieldKey: 'surveyName' });
+
+  const displayTitleGroup = document.querySelector('[data-field-key="displayTitle"]');
+  hydrateSingleLanguageField(displayTitleGroup, surveyData.displayTitle, languageOptions, { fieldKey: 'displayTitle' });
+
+  const descriptionGroup = document.querySelector('[data-field-key="description"]');
+  hydrateSingleLanguageField(descriptionGroup, surveyData.description, languageOptions, { fieldKey: 'description' });
+
+  const periodRangeInput = document.getElementById('periodRange');
+  if (periodRangeInput && periodRangeInput._flatpickr) {
+    if (surveyData.periodStart && surveyData.periodEnd) {
+      periodRangeInput._flatpickr.setDate([surveyData.periodStart, surveyData.periodEnd], false);
+    } else {
+      periodRangeInput._flatpickr.clear(false);
+    }
+  }
+
   const planSelect = document.getElementById('plan');
   const deadlineInput = document.getElementById('deadline');
   const memoTextarea = document.getElementById('memo');
 
-  // --- Bind Data to View (single-language friendly) ---
-  const getStr = (v) => (v && typeof v === 'object') ? (v.ja || v.en || '') : (v || '');
-  if (surveyNameInputJa) surveyNameInputJa.value = getStr(surveyData.name);
-  if (displayTitleInputJa) displayTitleInputJa.value = getStr(surveyData.displayTitle);
-  if (descriptionTextareaJa) descriptionTextareaJa.value = getStr(surveyData.description);
-  
-  if (periodStartInput) periodStartInput.value = surveyData.periodStart || '';
-  if (periodEndInput) periodEndInput.value = surveyData.periodEnd || '';
   if (planSelect) planSelect.value = surveyData.plan || 'Standard';
   if (deadlineInput) deadlineInput.value = surveyData.deadline || '';
   if (memoTextarea) memoTextarea.value = surveyData.memo || '';
 }
 
-/**
- * Renders a single question.
- * @param {object} question - The question data object.
- * @param {string} lang - The current language code for UI labels.
- * @param {number} index - The index of the question in its group.
- * @returns {HTMLElement} - The rendered question element.
- */
-function renderQuestion(question, lang, index) {
+function createOptionElement(option, questionId, optionIndex, languageOptions, uiLang) {
+  const optionTemplate = document.getElementById('optionTemplate');
+  const optionFragment = optionTemplate.content.cloneNode(true);
+  const optionItem = optionFragment.querySelector('.option-item');
+  const optionGroup = optionItem.querySelector('.multi-lang-input-group');
+  hydrateSingleLanguageField(optionGroup, option.text, languageOptions, {
+    fieldKey: `option_${questionId}_${optionIndex}`,
+    label: '選択肢'
+  });
+  const optionInput = optionItem.querySelector('.option-text-input');
+  if (optionInput) {
+    optionInput.dataset.lang = languageOptions.editorLanguage || FALLBACK_LANGUAGE;
+    optionInput.dataset.index = optionIndex;
+  }
+  return optionFragment;
+}
+
+function createMatrixRowItem(row, rowIndex, questionId, languageOptions) {
+  const editorLanguage = languageOptions.editorLanguage || FALLBACK_LANGUAGE;
+  const langMeta = getLanguageMeta(languageOptions, editorLanguage);
+  const wrapper = document.createElement('div');
+  wrapper.className = 'matrix-row-item flex items-start gap-2';
+  wrapper.setAttribute('data-index', String(rowIndex));
+
+  const handle = document.createElement('span');
+  handle.className = 'material-icons text-on-surface-variant matrix-handle cursor-move mt-3';
+  handle.textContent = 'drag_indicator';
+  wrapper.appendChild(handle);
+
+  const inputGroup = document.createElement('div');
+  inputGroup.className = 'flex-grow input-group';
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'input-field matrix-row-input';
+  input.dataset.index = String(rowIndex);
+  input.dataset.lang = editorLanguage;
+  input.id = `matrix_row_${questionId}_${rowIndex}_${editorLanguage}`;
+  if (editorLanguage === 'ja') {
+    input.placeholder = `行${rowIndex + 1}`;
+  } else {
+    const fallbackValue = getLocalizedText(row.text, 'ja');
+    input.placeholder = fallbackValue || `行${rowIndex + 1}`;
+  }
+  input.value = getLocalizedText(row.text, editorLanguage);
+  inputGroup.appendChild(input);
+
+  const label = document.createElement('label');
+  label.className = 'input-label';
+  label.setAttribute('for', input.id);
+  label.textContent = `行（${langMeta.shortLabel || langMeta.label}）`;
+  inputGroup.appendChild(label);
+
+  wrapper.appendChild(inputGroup);
+
+  const deleteBtn = document.createElement('button');
+  deleteBtn.type = 'button';
+  deleteBtn.className = 'icon-button delete-matrix-row-btn mt-2';
+  deleteBtn.setAttribute('aria-label', '行を削除');
+  deleteBtn.setAttribute('data-index', String(rowIndex));
+  deleteBtn.innerHTML = '<span class="material-icons text-error">remove_circle_outline</span>';
+  wrapper.appendChild(deleteBtn);
+
+  return wrapper;
+}
+
+function createMatrixColItem(col, colIndex, questionId, languageOptions) {
+  const editorLanguage = languageOptions.editorLanguage || FALLBACK_LANGUAGE;
+  const langMeta = getLanguageMeta(languageOptions, editorLanguage);
+  const wrapper = document.createElement('div');
+  wrapper.className = 'matrix-col-item flex items-start gap-2';
+  wrapper.setAttribute('data-index', String(colIndex));
+
+  const handle = document.createElement('span');
+  handle.className = 'material-icons text-on-surface-variant matrix-handle cursor-move mt-3';
+  handle.textContent = 'drag_indicator';
+  wrapper.appendChild(handle);
+
+  const inputGroup = document.createElement('div');
+  inputGroup.className = 'flex-grow input-group';
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'input-field matrix-col-input';
+  input.dataset.index = String(colIndex);
+  input.dataset.lang = editorLanguage;
+  input.id = `matrix_col_${questionId}_${colIndex}_${editorLanguage}`;
+  if (editorLanguage === 'ja') {
+    input.placeholder = `列${colIndex + 1}`;
+  } else {
+    const fallbackValue = getLocalizedText(col.text, 'ja');
+    input.placeholder = fallbackValue || `列${colIndex + 1}`;
+  }
+  input.value = getLocalizedText(col.text, editorLanguage);
+  inputGroup.appendChild(input);
+
+  const label = document.createElement('label');
+  label.className = 'input-label';
+  label.setAttribute('for', input.id);
+  label.textContent = `列（${langMeta.shortLabel || langMeta.label}）`;
+  inputGroup.appendChild(label);
+
+  wrapper.appendChild(inputGroup);
+
+  const deleteBtn = document.createElement('button');
+  deleteBtn.type = 'button';
+  deleteBtn.className = 'icon-button delete-matrix-col-btn mt-2';
+  deleteBtn.setAttribute('aria-label', '列を削除');
+  deleteBtn.setAttribute('data-index', String(colIndex));
+  deleteBtn.innerHTML = '<span class="material-icons text-error">remove_circle_outline</span>';
+  wrapper.appendChild(deleteBtn);
+
+  return wrapper;
+}
+
+function renderQuestion(question, uiLang, index, languageOptions = {}) {
   const template = document.getElementById('questionTemplate');
   const fragment = template.content.cloneNode(true);
   const questionItem = fragment.querySelector('.question-item');
@@ -109,165 +289,172 @@ function renderQuestion(question, lang, index) {
   const matrixColsList = fragment.querySelector('.matrix-cols-list');
   const typeSelect = fragment.querySelector('.question-type-select');
 
+  const editorLanguage = languageOptions.editorLanguage || FALLBACK_LANGUAGE;
+
   questionItem.dataset.questionId = question.questionId;
   if (question.type) questionItem.dataset.questionType = question.type;
-  const fallbackType = (type, lang) => {
-    const map = {
-      date_time: { ja: '���t/����', en: 'Date/Time' },
-      handwriting: { ja: '�菑���X�y�[�X', en: 'Handwriting' }
-    };
-    return (map[type] && map[type][lang]) || (map[type]?.ja) || null;
-  };
-  const typeJaMap = {
-    free_answer: '自由記述',
-    single_answer: '単一選択',
-    multi_answer: '複数選択',
-    number_answer: '数値入力',
-    matrix_sa: 'マトリクス（単一）',
-    matrix_ma: 'マトリクス（複数）',
-    date_time: '日付/時刻',
-    handwriting: '手書きスペース'
-  };
-  const labelJA = typeJaMap[question.type] || '不明なタイプ';
-    const questionText = ((v) => (v && typeof v === 'object') ? (v.ja || v.en || '') : (v || ''))(question.text);
-  questionTitle.textContent = questionText || `Q${index + 1}: (${labelJA})`;
 
-  // Initialize type select
+  const labelText = getLocalizedText(question.text, editorLanguage) || getLocalizedText(question.text, FALLBACK_LANGUAGE);
+  const typeLabel = t('questionTypes', question.type || 'unknownType', 'ja');
+  questionTitle.textContent = labelText || `Q${index + 1}: (${typeLabel})`;
+
   if (typeSelect) {
-    const supported = [
-      'free_answer', 'single_answer', 'multi_answer', 'number_answer', 'matrix_sa', 'matrix_ma', 'date_time', 'handwriting'
-    ];
-    if (!supported.includes(question.type)) {
-      typeSelect.value = 'free_answer';
-    } else {
-      typeSelect.value = question.type;
+    const supported = ['free_answer', 'single_answer', 'multi_answer', 'number_answer', 'matrix_sa', 'matrix_ma', 'date_time', 'handwriting'];
+    typeSelect.value = supported.includes(question.type) ? question.type : 'free_answer';
+  }
+
+  const questionTextGroup = questionItem.querySelector('.multi-lang-input-group[data-field-key="questionText"]');
+  if (questionTextGroup) {
+    hydrateSingleLanguageField(questionTextGroup, question.text, languageOptions, {
+      fieldKey: `questionText_${question.questionId}`,
+      label: '設問文'
+    });
+    const textInput = questionTextGroup.querySelector('.question-text-input');
+    if (textInput) {
+      textInput.dataset.lang = editorLanguage;
     }
   }
 
-  const questionTextInputJa = questionItem.querySelector('.question-text-input[data-lang="ja"]');
-  const questionTextInputEn = questionItem.querySelector('.question-text-input[data-lang="en"]');
-  const getStr = (v) => (v && typeof v === 'object') ? (v.ja || v.en || '') : (v || '');
-  if (questionTextInputJa) questionTextInputJa.value = getStr(question.text);
-
-  // Assign unique id/for to avoid duplicate ids from template
-  const requiredLabel = fragment.querySelector('.required-label');
-  const requiredId = `q_${question.questionId}_required`;
-  if (requiredCheckbox) requiredCheckbox.id = requiredId;
-  if (requiredLabel) requiredLabel.setAttribute('for', requiredId);
-
-  if (requiredCheckbox) requiredCheckbox.checked = question.required;
-  if (requiredCheckbox) requiredCheckbox.onchange = (e) => { question.required = e.target.checked; };
+  if (requiredCheckbox) {
+    requiredCheckbox.checked = !!question.required;
+    const requiredLabel = fragment.querySelector('.required-label');
+    const checkboxId = `q_${question.questionId}_required`;
+    requiredCheckbox.id = checkboxId;
+    if (requiredLabel) {
+      requiredLabel.setAttribute('for', checkboxId);
+    }
+  }
 
   const optionsContainer = fragment.querySelector('.options-container');
-  // Render options for single/multi only (not for matrix)
-  if (question.options && !(question.type === 'matrix_sa' || question.type === 'matrix_ma')) {
-    question.options.forEach((opt) => {
-      const optionTemplate = document.getElementById('optionTemplate');
-      const optionFragment = optionTemplate.content.cloneNode(true);
-      const optionItem = optionFragment.querySelector('.option-item');
-      
-      const optionInputJa = optionItem.querySelector('.option-text-input[data-lang="ja"]');
-      const optionInputEn = optionItem.querySelector('.option-text-input[data-lang="en"]');
-      const getStr = (v) => (v && typeof v === 'object') ? (v.ja || v.en || '') : (v || '');
-      if (optionInputJa) optionInputJa.value = getStr(opt.text);
-
-      optionsContainer.appendChild(optionFragment);
-    });
-    const addOptionButton = document.createElement('button');
-    addOptionButton.type = 'button';
-    addOptionButton.className = 'text-sm text-primary hover:underline mt-2 add-option-btn';
-    addOptionButton.textContent = t('labels', 'addOption', lang);
-    optionsContainer.appendChild(addOptionButton);
+  if (optionsContainer) {
+    optionsContainer.innerHTML = '';
+    const supportsOptions = question.type === 'single_answer' || question.type === 'multi_answer';
+    if (supportsOptions) {
+      const list = Array.isArray(question.options) ? question.options : [];
+      list.forEach((opt, optIndex) => {
+        const optionFragment = createOptionElement(opt, question.questionId, optIndex, languageOptions, uiLang);
+        optionsContainer.appendChild(optionFragment);
+      });
+      const addOptionButton = document.createElement('button');
+      addOptionButton.type = 'button';
+      addOptionButton.className = 'text-sm text-primary hover:underline mt-2 add-option-btn';
+      addOptionButton.textContent = t('labels', 'addOption', uiLang);
+      optionsContainer.appendChild(addOptionButton);
+    }
   }
 
-  // Render matrix editor for matrix types
-  if (question.type === 'matrix_sa' || question.type === 'matrix_ma') {
-    // Ensure matrix structure exists
-    if (!question.matrix) {
-      question.matrix = { rows: [], cols: [] };
-    }
-    if (!Array.isArray(question.matrix.rows)) question.matrix.rows = [];
-    if (!Array.isArray(question.matrix.cols)) question.matrix.cols = [];
-
-    // Provide minimum defaults for usability
-    if (question.matrix.rows.length === 0) {
-      question.matrix.rows.push({ text: { ja: '行1', en: '' } }, { text: { ja: '行2', en: '' } });
-    }
-    if (question.matrix.cols.length === 0) {
-      question.matrix.cols.push({ text: { ja: '列1', en: '' } }, { text: { ja: '列2', en: '' } });
-    }
-
-    if (matrixEditor) {
-      // Clear lists
-      if (matrixRowsList) matrixRowsList.innerHTML = '';
-      if (matrixColsList) matrixColsList.innerHTML = '';
-
-      // Rows
-      if (matrixRowsList) {
-        question.matrix.rows.forEach((row, i) => {
-          const _text = (row && typeof row.text === 'object') ? (row.text.ja || row.text.en || '') : (row.text || '');
-          const wrapper = document.createElement('div');
-          wrapper.className = 'matrix-row-item flex items-start gap-2';
-          wrapper.setAttribute('data-index', String(i));
-          wrapper.innerHTML = `
-            <span class="material-icons text-on-surface-variant matrix-handle cursor-move mt-3">drag_indicator</span>
-            <div class="flex-grow multi-lang-input-group">
-              <div class="input-group">
-                <input type="text" class="input-field matrix-row-input" data-lang="ja" data-index="${i}" placeholder=" " value="${_text}">
-                <label class="input-label">行ラベル</label>
-              </div>
-              <div class="input-group">
-                <input type="text" class="input-field matrix-row-input" data-lang="en" data-index="${i}" placeholder=" " value="${row.text && row.text.en ? row.text.en : ''}">
-                <label class="input-label">English</label>
-              </div>
-            </div>
-            <button type="button" class="icon-button delete-matrix-row-btn mt-2" aria-label="行を削除" data-index="${i}"><span class="material-icons text-error">remove_circle_outline</span></button>
-          `;
-          matrixRowsList.appendChild(wrapper);
-        });
-      }
-
-      // Columns
-      if (matrixColsList) {
-        question.matrix.cols.forEach((col, j) => {
-          const _text = (col && typeof col.text === 'object') ? (col.text.ja || col.text.en || '') : (col.text || '');
-          const wrapper = document.createElement('div');
-          wrapper.className = 'matrix-col-item flex items-start gap-2';
-          wrapper.setAttribute('data-index', String(j));
-          wrapper.innerHTML = `
-            <span class="material-icons text-on-surface-variant matrix-handle cursor-move mt-3">drag_indicator</span>
-            <div class="flex-grow multi-lang-input-group">
-              <div class="input-group">
-                <input type="text" class="input-field matrix-col-input" data-lang="ja" data-index="${j}" placeholder=" " value="${_text}">
-                <label class="input-label">列ラベル</label>
-              </div>
-              <div class="input-group">
-                <input type="text" class="input-field matrix-col-input" data-lang="en" data-index="${j}" placeholder=" " value="${col.text && col.text.en ? col.text.en : ''}">
-                <label class="input-label">English</label>
-              </div>
-            </div>
-            <button type="button" class="icon-button delete-matrix-col-btn mt-2" aria-label="列を削除" data-index="${j}"><span class="material-icons text-error">remove_circle_outline</span></button>
-          `;
-          matrixColsList.appendChild(wrapper);
-        });
-      }
-    }
-  } else {
-    // Not matrix: clear editor area
-    if (matrixRowsList) matrixRowsList.innerHTML = '';
-    if (matrixColsList) matrixColsList.innerHTML = '';
+  const isMatrix = question.type === 'matrix_sa' || question.type === 'matrix_ma';
+  if (matrixEditor) {
+    matrixEditor.classList.toggle('hidden', !isMatrix);
   }
+  if (isMatrix) {
+    const matrix = question.matrix || { rows: [], cols: [] };
+    if (matrixRowsList) {
+      matrixRowsList.innerHTML = '';
+      (matrix.rows || []).forEach((row, rowIndex) => {
+        matrixRowsList.appendChild(createMatrixRowItem(row, rowIndex, question.questionId, languageOptions));
+      });
+    }
+    if (matrixColsList) {
+      matrixColsList.innerHTML = '';
+      (matrix.cols || []).forEach((col, colIndex) => {
+        matrixColsList.appendChild(createMatrixColItem(col, colIndex, question.questionId, languageOptions));
+      });
+    }
+  }
+
+  applyNumberConfig(questionItem, question);
+  applyDateTimeConfig(questionItem, question);
+  applyHandwritingConfig(questionItem, question);
 
   return questionItem;
 }
 
-/**
- * Renders a single question group.
- * @param {object} group - The question group data object.
- * @param {string} lang - The current language code for UI labels.
- * @returns {HTMLElement} - The rendered question group element.
- */
-function renderQuestionGroup(group, lang) {
+
+function applyNumberConfig(questionItem, question) {
+  const section = questionItem.querySelector('[data-config-section="number"]');
+  if (!section) return;
+  if (question.type !== 'number_answer') {
+    section.classList.add('hidden');
+    return;
+  }
+  section.classList.remove('hidden');
+  const numeric = (question.meta && question.meta.validation && question.meta.validation.numeric) || DEFAULT_NUMERIC_META;
+  const mode = numeric.mode || DEFAULT_NUMERIC_META.mode;
+  const modeSelect = section.querySelector('[data-config-field="mode"]');
+  if (modeSelect) modeSelect.value = mode;
+  const minInput = section.querySelector('[data-config-field="min"]');
+  if (minInput) minInput.value = numeric.min ?? '';
+  const maxInput = section.querySelector('[data-config-field="max"]');
+  if (maxInput) maxInput.value = numeric.max ?? '';
+  const precisionInput = section.querySelector('[data-config-field="precision"]');
+  if (precisionInput) {
+    precisionInput.value = numeric.precision ?? '';
+    precisionInput.disabled = mode !== 'decimal';
+  }
+  const stepInput = section.querySelector('[data-config-field="step"]');
+  if (stepInput) stepInput.value = numeric.step ?? (mode === 'decimal' ? 0.1 : 1);
+  const unitLabelInput = section.querySelector('[data-config-field="unitLabel"]');
+  if (unitLabelInput) unitLabelInput.value = numeric.unitLabel || '';
+  const unitSystemSelect = section.querySelector('[data-config-field="unitSystem"]');
+  if (unitSystemSelect) unitSystemSelect.value = numeric.unitSystem || DEFAULT_NUMERIC_META.unitSystem;
+}
+
+function applyDateTimeConfig(questionItem, question) {
+  const section = questionItem.querySelector('[data-config-section="date_time"]');
+  if (!section) return;
+  if (question.type !== 'date_time') {
+    section.classList.add('hidden');
+    return;
+  }
+  section.classList.remove('hidden');
+  const config = question.meta?.dateTimeConfig || DEFAULT_DATETIME_META;
+  const mode = config.inputMode || DEFAULT_DATETIME_META.inputMode;
+  const modeSelect = section.querySelector('[data-config-field="inputMode"]');
+  if (modeSelect) modeSelect.value = mode;
+  const timezoneSelect = section.querySelector('[data-config-field="timezone"]');
+  if (timezoneSelect) timezoneSelect.value = config.timezone || DEFAULT_DATETIME_META.timezone;
+  const minInput = section.querySelector('[data-config-field="minDateTime"]');
+  const maxInput = section.querySelector('[data-config-field="maxDateTime"]');
+  const typeMap = { date: 'date', time: 'time', datetime: 'datetime-local' };
+  const inputType = typeMap[mode] || 'datetime-local';
+  if (minInput) {
+    minInput.type = inputType;
+    minInput.value = config.minDateTime || '';
+  }
+  if (maxInput) {
+    maxInput.type = inputType;
+    maxInput.value = config.maxDateTime || '';
+  }
+  const allowPast = section.querySelector('[data-config-field="allowPast"]');
+  if (allowPast) allowPast.checked = config.allowPast !== false;
+  const allowFuture = section.querySelector('[data-config-field="allowFuture"]');
+  if (allowFuture) allowFuture.checked = config.allowFuture !== false;
+}
+
+function applyHandwritingConfig(questionItem, question) {
+  const section = questionItem.querySelector('[data-config-section="handwriting"]');
+  if (!section) return;
+  if (question.type !== 'handwriting') {
+    section.classList.add('hidden');
+    return;
+  }
+  section.classList.remove('hidden');
+  const config = question.meta?.handwritingConfig || DEFAULT_HANDWRITING_META;
+  const widthInput = section.querySelector('[data-config-field="canvasWidth"]');
+  if (widthInput) widthInput.value = config.canvasWidth ?? DEFAULT_HANDWRITING_META.canvasWidth;
+  const heightInput = section.querySelector('[data-config-field="canvasHeight"]');
+  if (heightInput) heightInput.value = config.canvasHeight ?? DEFAULT_HANDWRITING_META.canvasHeight;
+  const colorInput = section.querySelector('[data-config-field="penColor"]');
+  if (colorInput) colorInput.value = config.penColor || DEFAULT_HANDWRITING_META.penColor;
+  const penWidthInput = section.querySelector('[data-config-field="penWidth"]');
+  if (penWidthInput) penWidthInput.value = config.penWidth ?? DEFAULT_HANDWRITING_META.penWidth;
+  const bgSelect = section.querySelector('[data-config-field="backgroundPattern"]');
+  if (bgSelect) bgSelect.value = config.backgroundPattern || DEFAULT_HANDWRITING_META.backgroundPattern;
+}
+
+
+function renderQuestionGroup(group, uiLang, languageOptions = {}) {
   const template = document.getElementById('questionGroupTemplate');
   const fragment = template.content.cloneNode(true);
   const groupItem = fragment.querySelector('.question-group');
@@ -275,49 +462,52 @@ function renderQuestionGroup(group, lang) {
 
   groupItem.dataset.groupId = group.groupId;
 
-  group.title = toML(group.title);
-
-  const titleInputJa = groupItem.querySelector('.group-title-input[data-lang="ja"]');
-  const titleInputEn = groupItem.querySelector('.group-title-input[data-lang="en"]');
-  if (titleInputJa) titleInputJa.value = group.title.ja || '';
-  if (titleInputEn) titleInputEn.value = group.title.en || '';
-
-  questionsList.innerHTML = '';
-  if (group.questions && group.questions.length > 0) {
-    group.questions.forEach((q, i) => {
-      questionsList.appendChild(renderQuestion(q, lang, i));
+  const titleGroup = groupItem.querySelector('.multi-lang-input-group');
+  if (titleGroup) {
+    hydrateSingleLanguageField(titleGroup, group.title, languageOptions, {
+      fieldKey: `groupTitle_${group.groupId}`,
+      label: 'グループタイトル'
     });
-  } else {
-    const msg = t('labels', 'noQuestions', lang);
-    questionsList.innerHTML = `<p class="text-on-surface-variant text-sm p-4">${msg}</p>`;
+    const titleInput = titleGroup.querySelector('.group-title-input');
+    if (titleInput) {
+      titleInput.dataset.lang = languageOptions.editorLanguage || FALLBACK_LANGUAGE;
+    }
+  }
+
+  if (questionsList) {
+    questionsList.innerHTML = '';
+    if (Array.isArray(group.questions) && group.questions.length) {
+      group.questions.forEach((question, index) => {
+        questionsList.appendChild(renderQuestion(question, uiLang, index, languageOptions));
+      });
+    } else {
+      const empty = document.createElement('p');
+      empty.className = 'text-on-surface-variant text-sm p-4';
+      empty.textContent = t('labels', 'noQuestions', uiLang);
+      questionsList.appendChild(empty);
+    }
   }
 
   return groupItem;
 }
 
-/**
- * Renders all question groups into the container.
- * @param {Array<object>} groups - An array of question group objects.
- * @param {string} lang - The current language code for UI labels.
- */
-export function renderAllQuestionGroups(groups, lang) {
+export function renderAllQuestionGroups(groups, uiLang, languageOptions = {}) {
   const container = document.getElementById('questionGroupsContainer');
   if (!container) return;
-  container.innerHTML = '';
 
-  if (groups && groups.length > 0) {
-    groups.forEach(group => {
-      container.appendChild(renderQuestionGroup(group, lang));
+  container.innerHTML = '';
+  if (Array.isArray(groups) && groups.length) {
+    groups.forEach((group) => {
+      container.appendChild(renderQuestionGroup(group, uiLang, languageOptions));
     });
   } else {
-    const msg = t('labels', 'noGroups', lang);
-    container.innerHTML = `<p class="text-on-surface-variant p-4">${msg}</p>`;
+    const empty = document.createElement('p');
+    empty.className = 'text-on-surface-variant p-4';
+    empty.textContent = t('labels', 'noGroups', uiLang);
+    container.appendChild(empty);
   }
 }
 
-/**
- * Renders the outline map for navigation.
- */
 export function renderOutlineMap() {
   const outlineMapContainer = document.getElementById('outline-map-container');
   if (!outlineMapContainer) return;
@@ -325,7 +515,6 @@ export function renderOutlineMap() {
   const mainContent = document.getElementById('survey-content-area');
   if (!mainContent) return;
 
-  // Include question titles in the outline
   const headings = Array.from(mainContent.querySelectorAll('h2, .question-title'));
   if (!headings.length) {
     outlineMapContainer.innerHTML = '';
@@ -336,24 +525,17 @@ export function renderOutlineMap() {
   headings.forEach((h, idx) => {
     const isQuestion = h.classList.contains('question-title');
     const targetElement = isQuestion ? h.closest('.question-item') : h;
-
-    if (!targetElement) return; // Skip if target not found
-
-    // Ensure the target has an ID for the anchor link
+    if (!targetElement) return;
     if (!targetElement.id) {
-        targetElement.id = `section-gen-${idx}`;
+      targetElement.id = `section-gen-${idx}`;
     }
-    const targetId = targetElement.id;
-
-    // Determine heading level for indentation
     const level = isQuestion ? 3 : (parseInt(h.tagName.substring(1), 10) || 2);
-    const paddingLeft = (level - 2) * 16; // h2=0, questions=16
+    const paddingLeft = (level - 2) * 16;
     const text = h.textContent || '';
-    if (!text.trim()) return; // Skip empty titles
-
+    if (!text.trim()) return;
     html += `
       <li>
-        <a href="#${targetId}" class="block text-on-surface-variant hover:text-primary text-sm truncate" style="padding-left: ${paddingLeft}px;" title="${text}">${text}</a>
+        <a href="#${targetElement.id}" class="block text-on-surface-variant hover:text-primary text-sm truncate" style="padding-left: ${paddingLeft}px;" title="${text}">${text}</a>
       </li>
     `;
   });
@@ -361,9 +543,6 @@ export function renderOutlineMap() {
   outlineMapContainer.innerHTML = html;
 }
 
-/**
- * Displays a generic error message.
- */
 export function displayErrorMessage() {
   const container = document.getElementById('questionGroupsContainer');
   if (!container) return;

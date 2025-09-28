@@ -15,21 +15,16 @@ export function initializeDatepickers() {
         flatpickrInstance.localize(JAPANESE_LOCALE);
     }
 
-    const endDatePicker = flatpickrInstance('#periodEndWrapper', {
-        wrap: true,
+    // Initialize for the new period range input
+    flatpickrInstance('#periodRange', {
+        mode: 'range',
         dateFormat: 'Y-m-d',
+        locale: JAPANESE_LOCALE // Ensure locale is applied
     });
 
-    flatpickrInstance('#periodStartWrapper', {
-        wrap: true,
-        dateFormat: 'Y-m-d',
-        onChange(selectedDates, dateStr) {
-            endDatePicker.set('minDate', dateStr);
-        }
-    });
-
+    // Keep the deadline picker initialization
     flatpickrInstance('#deadlineWrapper', {
-        wrap: true,
+        wrap: true, // This one still uses a wrapper
         dateFormat: 'Y-m-d',
     });
 }

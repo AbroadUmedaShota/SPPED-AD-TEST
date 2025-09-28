@@ -25,6 +25,17 @@ const ADDITIONAL_SETTINGS_CONFIG = [
     { id: 'openThankYouEmailSettingsBtn', path: 'thankYouEmailSettings.html', feature: 'thankYouEmail' },
     { id: 'openThankYouScreenSettingsBtn', path: 'thankYouScreenSettings.html', feature: 'thankYouScreen' }
 ];
+const SUPPORTED_LANGUAGES = [
+    { code: 'ja', label: '日本語', shortLabel: '日本語', isBase: true },
+    { code: 'en', label: 'English', shortLabel: 'English' },
+    { code: 'zh-Hant', label: '中国語（繁体字）', shortLabel: '繁体字' },
+    { code: 'zh-Hans', label: '中国語（簡体字）', shortLabel: '簡体字' },
+    { code: 'vi', label: 'ベトナム語', shortLabel: 'ベトナム語' }
+];
+const LANGUAGE_MAP = new Map(SUPPORTED_LANGUAGES.map((lang) => [lang.code, lang]));
+let activeLanguages = ['ja'];
+let editorLanguage = 'ja';
+
 const additionalSettingsButtons = new Map();
 
 // --- Dirty State Management ---
@@ -47,6 +58,255 @@ window.getSurveyData = () => surveyData;
 // Expose commonly used handlers for inline HTML in common partials
 window.openAccountInfoModal = openAccountInfoModal;
 window.handleOpenModal = handleOpenModal;
+
+function getLanguageMeta(code) {
+    return LANGUAGE_MAP.get(code) || { code, label: code, shortLabel: code };
+}
+
+function normalizeActiveLanguages(langs = []) {
+    const normalized = ['ja'];
+    langs.forEach((lang) => {
+        if (!lang || lang === 'ja') return;
+        if (!LANGUAGE_MAP.has(lang)) return;
+        if (normalized.length >= 3) return;
+        if (!normalized.includes(lang)) {
+            normalized.push(lang);
+        }
+    });
+    return normalized;
+}
+
+function getActiveLanguages() {
+    activeLanguages = normalizeActiveLanguages(activeLanguages);
+    return [...activeLanguages];
+}
+
+function setActiveLanguages(langs) {
+    const normalized = normalizeActiveLanguages(langs);
+    const prev = getActiveLanguages();
+    const changed = normalized.join('|') !== prev.join('|');
+    activeLanguages = normalized;
+    surveyData.activeLanguages = [...activeLanguages];
+    if (!activeLanguages.includes(editorLanguage)) {
+        editorLanguage = 'ja';
+    }
+    return changed;
+}
+
+function getEditorLanguage() {
+    if (!getActiveLanguages().includes(editorLanguage)) {
+        editorLanguage = 'ja';
+    }
+    return editorLanguage;
+}
+
+function setEditorLanguage(lang) {
+    if (!lang || !LANGUAGE_MAP.has(lang)) return false;
+    if (!getActiveLanguages().includes(lang)) return false;
+    if (editorLanguage === lang) return false;
+    editorLanguage = lang;
+    surveyData.editorLanguage = editorLanguage;
+    return true;
+}
+
+function getLocalizedValue(value, lang) {
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+        const v = value[lang];
+        return typeof v === 'string' ? v : (v ?? '');
+    }
+    if (typeof value === 'string') {
+        return lang === 'ja' ? value : '';
+    }
+    return '';
+}
+
+function normalizeLocalization(value) {
+    const result = {};
+    const langs = getActiveLanguages();
+    langs.forEach((lang) => {
+        result[lang] = getLocalizedValue(value, lang);
+    });
+    return result;
+}
+
+function ensureLocalization(target, key) {
+    const current = target[key];
+    target[key] = normalizeLocalization(current);
+    return target[key];
+}
+
+
+function collectMissingTranslations(langs) {
+    const missing = [];
+    if (!Array.isArray(langs) || !langs.length) return missing;
+
+    const recordMissing = (value, pathLabel) => {
+        langs.forEach((lang) => {
+            const textValue = getLocalizedValue(value, lang).trim();
+            if (!textValue) {
+                missing.push({ lang, path: pathLabel });
+            }
+        });
+    };
+
+    recordMissing(surveyData.name, 'アンケート名');
+    recordMissing(surveyData.displayTitle, '表示タイトル');
+    recordMissing(surveyData.description, '説明');
+
+    (surveyData.questionGroups || []).forEach((group, groupIndex) => {
+        recordMissing(group.title, `質問グループ${groupIndex + 1}`);
+        (group.questions || []).forEach((question, questionIndex) => {
+            const questionLabel = `質問${questionIndex + 1}`;
+            recordMissing(question.text, questionLabel);
+            if (Array.isArray(question.options)) {
+                question.options.forEach((opt, optIndex) => {
+                    recordMissing(opt.text, `${questionLabel} - 選択肢${optIndex + 1}`);
+                });
+            }
+            if (question.matrix) {
+                (question.matrix.rows || []).forEach((row, rowIndex) => {
+                    recordMissing(row.text, `${questionLabel} - 行${rowIndex + 1}`);
+                });
+                (question.matrix.cols || []).forEach((col, colIndex) => {
+                    recordMissing(col.text, `${questionLabel} - 列${colIndex + 1}`);
+                });
+            }
+        });
+    });
+
+    return missing;
+}
+
+function syncSurveyLocalization() {
+    const langs = getActiveLanguages();
+    surveyData.name = normalizeLocalization(surveyData.name);
+    surveyData.displayTitle = normalizeLocalization(surveyData.displayTitle);
+    surveyData.description = normalizeLocalization(surveyData.description);
+    surveyData.memo = surveyData.memo || '';
+    if (Array.isArray(surveyData.questionGroups)) {
+        surveyData.questionGroups.forEach((group) => {
+            group.title = normalizeLocalization(group.title);
+            if (!Array.isArray(group.questions)) return;
+            group.questions.forEach((question) => {
+                question.text = normalizeLocalization(question.text);
+                if (Array.isArray(question.options)) {
+                    question.options.forEach((opt) => {
+                        opt.text = normalizeLocalization(opt.text);
+                    });
+                }
+                if (question.matrix) {
+                    const matrix = question.matrix;
+                    if (Array.isArray(matrix.rows)) {
+                        matrix.rows.forEach((row) => {
+                            row.text = normalizeLocalization(row.text);
+                        });
+                    }
+                    if (Array.isArray(matrix.cols)) {
+                        matrix.cols.forEach((col) => {
+                            col.text = normalizeLocalization(col.text);
+                        });
+                    }
+                }
+                initializeQuestionMeta(question);
+            });
+        });
+    }
+    surveyData.activeLanguages = [...langs];
+    surveyData.editorLanguage = getEditorLanguage();
+}
+
+function updateLocalization(target, key, lang, value) {
+    ensureLocalization(target, key);
+    target[key][lang] = value;
+}
+
+window.getActiveSurveyLanguages = () => [...getActiveLanguages()];
+window.getSupportedSurveyLanguages = () => SUPPORTED_LANGUAGES.map((lang) => ({ ...lang }));
+window.getEditorSurveyLanguage = () => getEditorLanguage();
+
+function ensureQuestionMeta(question) {
+    if (!question || typeof question !== 'object') return {};
+    if (!question.meta || typeof question.meta !== 'object') {
+        question.meta = {};
+    }
+    return question.meta;
+}
+
+function ensureNumericMeta(question) {
+    const meta = ensureQuestionMeta(question);
+    if (!meta.validation || typeof meta.validation !== 'object') {
+        meta.validation = {};
+    }
+    if (!meta.validation.numeric || typeof meta.validation.numeric !== 'object') {
+        meta.validation.numeric = {
+            mode: 'integer',
+            min: '',
+            max: '',
+            precision: 0,
+            step: 1,
+            unitLabel: '',
+            unitSystem: 'metric'
+        };
+    }
+    return meta.validation.numeric;
+}
+
+function ensureDateTimeMeta(question) {
+    const meta = ensureQuestionMeta(question);
+    if (!meta.dateTimeConfig || typeof meta.dateTimeConfig !== 'object') {
+        meta.dateTimeConfig = {
+            inputMode: 'date',
+            timezone: 'Asia/Tokyo',
+            minDateTime: '',
+            maxDateTime: '',
+            allowPast: true,
+            allowFuture: true
+        };
+    }
+    return meta.dateTimeConfig;
+}
+
+function ensureHandwritingMeta(question) {
+    const meta = ensureQuestionMeta(question);
+    if (!meta.handwritingConfig || typeof meta.handwritingConfig !== 'object') {
+        meta.handwritingConfig = {
+            canvasWidth: 600,
+            canvasHeight: 200,
+            penColor: '#000000',
+            penWidth: 2,
+            backgroundPattern: 'plain'
+        };
+    }
+    return meta.handwritingConfig;
+}
+
+function pruneQuestionMeta(question, type) {
+    if (!question || !question.meta || typeof question.meta !== 'object') return;
+    if (type !== 'number_answer' && question.meta.validation) {
+        delete question.meta.validation.numeric;
+        if (Object.keys(question.meta.validation).length === 0) {
+            delete question.meta.validation;
+        }
+    }
+    if (type !== 'date_time') {
+        delete question.meta.dateTimeConfig;
+    }
+    if (type !== 'handwriting') {
+        delete question.meta.handwritingConfig;
+    }
+}
+
+function initializeQuestionMeta(question) {
+    if (!question) return;
+    pruneQuestionMeta(question, question.type);
+    if (question.type === 'number_answer') {
+        ensureNumericMeta(question);
+    } else if (question.type === 'date_time') {
+        ensureDateTimeMeta(question);
+    } else if (question.type === 'handwriting') {
+        ensureHandwritingMeta(question);
+    }
+}
 
 // --- Language Switcher ---
 function initLanguageSwitcher() {
@@ -108,6 +368,111 @@ function initLanguageSwitcher() {
     // initial
     const initial = localStorage.getItem('language') || 'ja';
     setLanguage(initial);
+}
+
+function renderLanguageSettings({ activeLanguages, editorLanguage, languageMap }) {
+    const panel = document.getElementById('languageSelectionPanel');
+    const tabs = document.getElementById('languageEditorTabs');
+
+    if (panel) {
+        panel.innerHTML = '';
+        const selectable = SUPPORTED_LANGUAGES.filter((lang) => lang.code !== 'ja');
+        selectable.forEach((lang) => {
+            const isSelected = activeLanguages.includes(lang.code);
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.dataset.lang = lang.code;
+            button.dataset.selected = isSelected ? 'true' : 'false';
+            button.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
+            button.className = [
+                'px-3 py-1 rounded-full border text-sm transition-colors duration-150',
+                isSelected
+                    ? 'bg-primary-container text-on-primary-container border-primary-container font-medium'
+                    : 'border-outline-variant text-on-surface hover:border-primary hover:text-primary'
+            ].join(' ');
+            button.textContent = lang.label;
+            panel.appendChild(button);
+        });
+        if (!panel.children.length) {
+            const hint = document.createElement('p');
+            hint.className = 'text-xs text-on-surface-variant';
+            hint.textContent = '追加言語は選択されていません。';
+            panel.appendChild(hint);
+        }
+    }
+
+    if (tabs) {
+        tabs.innerHTML = '';
+        activeLanguages.forEach((code) => {
+            const lang = languageMap.get(code) || { code, shortLabel: code, label: code };
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.dataset.lang = code;
+            button.setAttribute('role', 'tab');
+            const isActive = code === editorLanguage;
+            button.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            button.className = [
+                'px-3 py-1 rounded-full border text-sm transition-colors duration-150',
+                isActive
+                    ? 'bg-primary text-on-primary border-primary shadow-sm'
+                    : 'border-outline-variant text-on-surface hover:border-primary hover:text-primary'
+            ].join(' ');
+            button.textContent = lang.shortLabel || lang.label;
+            tabs.appendChild(button);
+        });
+    }
+
+    bindLanguageControlEvents();
+}
+
+function bindLanguageControlEvents() {
+    const panel = document.getElementById('languageSelectionPanel');
+    if (panel && panel.dataset.bound !== 'true') {
+        panel.dataset.bound = 'true';
+        panel.addEventListener('click', (event) => {
+            const button = event.target.closest('button[data-lang]');
+            if (!button) return;
+            const lang = button.dataset.lang;
+            const selected = button.dataset.selected === 'true';
+            const extras = getActiveLanguages().filter((code) => code !== 'ja');
+            let next = [...extras];
+            if (selected) {
+                next = next.filter((code) => code !== lang);
+            } else {
+                if (next.length >= 2) {
+                    showToast('追加言語は最大2件までです。', 'warning');
+                    return;
+                }
+                next.push(lang);
+            }
+            const changed = setActiveLanguages(next);
+            if (changed) {
+                syncSurveyLocalization();
+                setDirty(true);
+                updateAndRenderAll();
+            } else {
+                renderLanguageSettings({
+                    activeLanguages: getActiveLanguages(),
+                    editorLanguage: getEditorLanguage(),
+                    languageMap: LANGUAGE_MAP
+                });
+            }
+        });
+    }
+
+    const tabs = document.getElementById('languageEditorTabs');
+    if (tabs && tabs.dataset.bound !== 'true') {
+        tabs.dataset.bound = 'true';
+        tabs.addEventListener('click', (event) => {
+            const button = event.target.closest('button[data-lang]');
+            if (!button) return;
+            const lang = button.dataset.lang;
+            if (setEditorLanguage(lang)) {
+                syncSurveyLocalization();
+                updateAndRenderAll();
+            }
+        });
+    }
 }
 
 function registerAdditionalSettingsLinks() {
@@ -233,49 +598,23 @@ window.dummyUserData = {
  * Re-renders the entire form based on the current state (surveyData, currentLang)
  */
 function updateAndRenderAll() {
-    populateBasicInfo(surveyData, currentLang);
-    renderAllQuestionGroups(surveyData.questionGroups, currentLang);
+    syncSurveyLocalization();
+    const languageOptions = {
+        activeLanguages: getActiveLanguages(),
+        editorLanguage: getEditorLanguage(),
+        languageMap: LANGUAGE_MAP
+    };
+
+    renderLanguageSettings(languageOptions);
+    populateBasicInfo(surveyData, languageOptions);
+    renderAllQuestionGroups(surveyData.questionGroups, currentLang, languageOptions);
     renderOutlineMap();
-    // After rendering, re-validate the form to enable/disable the save button
     validateFormForSaveButton();
-    // Initialize Sortable after rendering
     setupSortables();
-    // Ensure accordion headers are accessible (ARIA) after each render
     enhanceAccordionA11y();
 }
 
 // --- Input Bindings ---
-function getStr(value) {
-    if (value && typeof value === 'object') {
-        return value.ja || value.en || '';
-    }
-    return value || '';
-}
-
-function deepNormalizeSurveyData(data) {
-    if (!data) return data;
-    data.name = getStr(data.name);
-    data.displayTitle = getStr(data.displayTitle);
-    data.description = getStr(data.description);
-    if (Array.isArray(data.questionGroups)) {
-        data.questionGroups.forEach(g => {
-            g.title = getStr(g.title);
-            if (Array.isArray(g.questions)) {
-                g.questions.forEach(q => {
-                    q.text = getStr(q.text);
-                    if (Array.isArray(q.options)) {
-                        q.options.forEach(o => { o.text = getStr(o.text); });
-                    }
-                    if (q.matrix) {
-                        if (Array.isArray(q.matrix.rows)) q.matrix.rows.forEach(r => { r.text = getStr(r.text); });
-                        if (Array.isArray(q.matrix.cols)) q.matrix.cols.forEach(c => { c.text = getStr(c.text); });
-                    }
-                });
-            }
-        });
-    }
-    return data;
-}
 function setDeep(target, path, value) {
     if (!target || !path || path.length === 0) return;
     let obj = target;
@@ -301,36 +640,36 @@ function setupInputBindings() {
         el.addEventListener('change', handler);
     };
 
-    // single-language: bind only JA fields into string properties
-    const bindStr = (id, key) => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        const handler = () => {
-            surveyData[key] = el.value || '';
+        const basicInfoContainer = document.getElementById('basicInfoContent');
+    if (basicInfoContainer) {
+        const handleBasicInput = (event) => {
+            const target = event.target;
+            if (!target.matches('.multi-lang-input-group input, .multi-lang-input-group textarea')) return;
+            const container = target.closest('.multi-lang-input-group');
+            if (!container) return;
+            const fieldKey = container.dataset.fieldKey;
+            if (!fieldKey) return;
+            const lang = target.dataset.lang || getEditorLanguage();
+            const value = target.value || '';
+            if (fieldKey === 'surveyName') {
+                updateLocalization(surveyData, 'name', lang, value);
+            } else if (fieldKey === 'displayTitle') {
+                updateLocalization(surveyData, 'displayTitle', lang, value);
+            } else if (fieldKey === 'description') {
+                updateLocalization(surveyData, 'description', lang, value);
+            }
             validateFormForSaveButton();
             setDirty(true);
         };
-        el.addEventListener('input', handler);
-        el.addEventListener('change', handler);
-    };
-    bindStr('surveyName_ja', 'name');
-    bindStr('displayTitle_ja', 'displayTitle');
-    // descriptions may be optional
-    const descJa = document.getElementById('description_ja');
-    if (descJa) {
-        const h = () => { 
-            surveyData.description = descJa.value || ''; 
-            setDirty(true);
-        };
-        descJa.addEventListener('input', h);
-        descJa.addEventListener('change', h);
+        basicInfoContainer.addEventListener('input', handleBasicInput);
+        basicInfoContainer.addEventListener('change', handleBasicInput);
     }
-    bind('periodStart', ['periodStart']);
-    bind('periodEnd', ['periodEnd']);
+
+    // periodStart and periodEnd are now handled by the flatpickr onChange event in initializePage
     bind('deadline', ['deadline']);
     bind('memo', ['memo']);
 
-    const planEl = document.getElementById('plan');
+const planEl = document.getElementById('plan');
     if (planEl) {
         const onPlan = () => { 
             surveyData.plan = planEl.value; 
@@ -346,14 +685,19 @@ function setupInputBindings() {
 
     container.addEventListener('input', (e) => {
         const target = e.target;
+        if (target.dataset && target.dataset.configType) {
+            handleQuestionConfigInput(target);
+            return;
+        }
         // Group title
         if (target.classList.contains('group-title-input')) {
             const groupEl = target.closest('.question-group');
             if (!groupEl) return;
             const groupId = groupEl.dataset.groupId;
-            const group = (surveyData.questionGroups || []).find(g => g.groupId === groupId);
+            const group = (surveyData.questionGroups || []).find((g) => g.groupId === groupId);
             if (group) {
-                group.title = target.value || '';
+                const lang = target.dataset.lang || getEditorLanguage();
+                updateLocalization(group, 'title', lang, target.value || '');
                 setDirty(true);
             }
             return;
@@ -366,10 +710,11 @@ function setupInputBindings() {
             if (!qItem || !groupEl) return;
             const groupId = groupEl.dataset.groupId;
             const questionId = qItem.dataset.questionId;
-            const group = (surveyData.questionGroups || []).find(g => g.groupId === groupId);
-            const question = group?.questions?.find(q => q.questionId === questionId);
+            const lang = target.dataset.lang || getEditorLanguage();
+            const group = (surveyData.questionGroups || []).find((g) => g.groupId === groupId);
+            const question = group?.questions?.find((q) => q.questionId === questionId);
             if (question) {
-                question.text = target.value || '';
+                updateLocalization(question, 'text', lang, target.value || '');
                 setDirty(true);
             }
             return;
@@ -377,18 +722,19 @@ function setupInputBindings() {
 
         // Option text
         if (target.classList.contains('option-text-input')) {
-            const optionItem = target.closest('.option-item');
             const qItem = target.closest('.question-item');
             const groupEl = target.closest('.question-group');
-            if (!optionItem || !qItem || !groupEl) return;
+            const optionEl = target.closest('.option-item');
+            if (!qItem || !groupEl || !optionEl) return;
+            const optionIndex = Array.from(optionEl.parentNode.children).indexOf(optionEl);
             const groupId = groupEl.dataset.groupId;
             const questionId = qItem.dataset.questionId;
-            const optionItems = qItem.querySelectorAll('.options-container .option-item');
-            const optionIndex = Array.from(optionItems).indexOf(optionItem);
-            const group = (surveyData.questionGroups || []).find(g => g.groupId === groupId);
-            const question = group?.questions?.find(q => q.questionId === questionId);
+            const lang = target.dataset.lang || getEditorLanguage();
+            const group = (surveyData.questionGroups || []).find((g) => g.groupId === groupId);
+            const question = group?.questions?.find((q) => q.questionId === questionId);
             if (question && Array.isArray(question.options) && optionIndex > -1 && optionIndex < question.options.length) {
-                question.options[optionIndex].text = target.value || '';
+                question.options[optionIndex].text = normalizeLocalization(question.options[optionIndex].text);
+                question.options[optionIndex].text[lang] = target.value || '';
                 setDirty(true);
             }
             return;
@@ -402,9 +748,11 @@ function setupInputBindings() {
             const groupId = groupEl.dataset.groupId;
             const questionId = qItem.dataset.questionId;
             const index = parseInt(target.getAttribute('data-index'), 10) || 0;
-            const question = surveyData.questionGroups.find(g => g.groupId === groupId)?.questions.find(q => q.questionId === questionId);
-            if (question && question.matrix && question.matrix.rows && question.matrix.rows[index]) {
-                question.matrix.rows[index].text = target.value || '';
+            const lang = target.dataset.lang || getEditorLanguage();
+            const question = surveyData.questionGroups.find((g) => g.groupId === groupId)?.questions.find((q) => q.questionId === questionId);
+            if (question && question.matrix && Array.isArray(question.matrix.rows) && question.matrix.rows[index]) {
+                question.matrix.rows[index].text = normalizeLocalization(question.matrix.rows[index].text);
+                question.matrix.rows[index].text[lang] = target.value || '';
                 setDirty(true);
             }
             return;
@@ -418,12 +766,21 @@ function setupInputBindings() {
             const groupId = groupEl.dataset.groupId;
             const questionId = qItem.dataset.questionId;
             const index = parseInt(target.getAttribute('data-index'), 10) || 0;
-            const question = surveyData.questionGroups.find(g => g.groupId === groupId)?.questions.find(q => q.questionId === questionId);
-            if (question && question.matrix && question.matrix.cols && question.matrix.cols[index]) {
-                question.matrix.cols[index].text = target.value || '';
+            const lang = target.dataset.lang || getEditorLanguage();
+            const question = surveyData.questionGroups.find((g) => g.groupId === groupId)?.questions.find((q) => q.questionId === questionId);
+            if (question && question.matrix && Array.isArray(question.matrix.cols) && question.matrix.cols[index]) {
+                question.matrix.cols[index].text = normalizeLocalization(question.matrix.cols[index].text);
+                question.matrix.cols[index].text[lang] = target.value || '';
                 setDirty(true);
             }
             return;
+        }
+    });
+
+    container.addEventListener('change', (e) => {
+        const target = e.target;
+        if (target.dataset && target.dataset.configType) {
+            handleQuestionConfigInput(target);
         }
     });
 }
@@ -510,7 +867,29 @@ async function initializePage() {
         initBreadcrumbs();
         initLanguageSwitcher();
         // Initialize date pickers for period/deadline fields
-        try { initializeDatepickers(); } catch (_) {}
+        try {
+            initializeDatepickers();
+            const periodRangeEl = document.getElementById('periodRange');
+            if (periodRangeEl && periodRangeEl._flatpickr) {
+                periodRangeEl._flatpickr.config.onChange.push((selectedDates) => {
+                    if (selectedDates.length === 2) {
+                        const formatDate = (date) => {
+                            const y = date.getFullYear();
+                            const m = String(date.getMonth() + 1).padStart(2, '0');
+                            const d = String(date.getDate()).padStart(2, '0');
+                            return `${y}-${m}-${d}`;
+                        };
+                        surveyData.periodStart = formatDate(selectedDates[0]);
+                        surveyData.periodEnd = formatDate(selectedDates[1]);
+                    } else {
+                        surveyData.periodStart = '';
+                        surveyData.periodEnd = '';
+                    }
+                    validateFormForSaveButton();
+                    setDirty(true);
+                });
+            }
+        } catch (_) {}
 
         const params = new URLSearchParams(window.location.search);
         currentSurveyId = params.get('surveyId');
@@ -612,15 +991,18 @@ async function initializePage() {
         if (periodStart) surveyData.periodStart = periodStart;
         if (periodEnd) surveyData.periodEnd = periodEnd;
 
-        // Normalize any multilingual remnants to strings
-        deepNormalizeSurveyData(surveyData);
+        setActiveLanguages(Array.isArray(surveyData.activeLanguages) ? surveyData.activeLanguages : activeLanguages);
+        if (surveyData.editorLanguage) {
+            setEditorLanguage(surveyData.editorLanguage);
+        }
+
+        syncSurveyLocalization();
 
         updateAndRenderAll();
 
         restoreAccordionState();
         const fabActions = {
-            onAddQuestion: (questionType) => handleAddNewQuestion(null, questionType),
-            onAddGroup: () => handleAddNewQuestionGroup()
+            onAddQuestion: (questionType) => handleAddNewQuestion(null, questionType)
         };
         initializeFab('fab-container', fabActions);
 
@@ -725,8 +1107,129 @@ function initializeAccordion() {
 /**
  * イベントリスナーを登録する
  */
+function handleQuestionConfigInput(target) {
+    const configType = target.dataset.configType;
+    const field = target.dataset.configField;
+    if (!configType || !field) return;
+
+    const groupEl = target.closest('.question-group');
+    const qItem = target.closest('.question-item');
+    if (!groupEl || !qItem) return;
+
+    const groupId = groupEl.dataset.groupId;
+    const questionId = qItem.dataset.questionId;
+    const group = (surveyData.questionGroups || []).find((g) => g.groupId === groupId);
+    const question = group?.questions?.find((q) => q.questionId === questionId);
+    if (!question) return;
+
+    let requiresRerender = false;
+
+    if (configType === 'number') {
+        const numeric = ensureNumericMeta(question);
+        switch (field) {
+            case 'mode':
+                numeric.mode = target.value || 'integer';
+                if (numeric.mode !== 'decimal') {
+                    numeric.precision = 0;
+                    if (numeric.step === '' || Number.isNaN(Number(numeric.step))) {
+                        numeric.step = 1;
+                    }
+                } else if (numeric.step === '' || Number.isNaN(Number(numeric.step))) {
+                    numeric.step = 0.1;
+                }
+                requiresRerender = true;
+                break;
+            case 'min':
+            case 'max':
+            case 'step':
+                if (target.value === '') {
+                    numeric[field] = '';
+                } else {
+                    const numericValue = Number(target.value);
+                    numeric[field] = Number.isNaN(numericValue) ? '' : numericValue;
+                }
+                break;
+            case 'precision':
+                numeric.precision = target.value === '' ? '' : Math.max(0, parseInt(target.value, 10) || 0);
+                break;
+            case 'unitLabel':
+                numeric.unitLabel = target.value || '';
+                break;
+            case 'unitSystem':
+                numeric.unitSystem = target.value || 'metric';
+                break;
+            default:
+                break;
+        }
+    } else if (configType === 'date_time') {
+        const config = ensureDateTimeMeta(question);
+        switch (field) {
+            case 'inputMode':
+                config.inputMode = target.value || 'date';
+                requiresRerender = true;
+                break;
+            case 'timezone':
+                config.timezone = target.value || 'Asia/Tokyo';
+                break;
+            case 'minDateTime':
+            case 'maxDateTime':
+                config[field] = target.value || '';
+                break;
+            case 'allowPast':
+            case 'allowFuture':
+                config[field] = !!target.checked;
+                break;
+            default:
+                break;
+        }
+    } else if (configType === 'handwriting') {
+        const config = ensureHandwritingMeta(question);
+        switch (field) {
+            case 'canvasWidth':
+            case 'canvasHeight':
+                if (target.value === '') {
+                    config[field] = '';
+                } else {
+                    const sizeValue = parseInt(target.value, 10);
+                    config[field] = Number.isNaN(sizeValue) ? '' : Math.max(1, sizeValue);
+                }
+                break;
+            case 'penColor':
+                config.penColor = target.value || '#000000';
+                break;
+            case 'penWidth':
+                if (target.value === '') {
+                    config.penWidth = '';
+                } else {
+                    const widthValue = parseInt(target.value, 10);
+                    config.penWidth = Number.isNaN(widthValue) ? '' : Math.max(1, widthValue);
+                }
+                break;
+            case 'backgroundPattern':
+                config.backgroundPattern = target.value || 'plain';
+                break;
+            default:
+                break;
+        }
+    } else {
+        return;
+    }
+
+    setDirty(true);
+    if (requiresRerender) {
+        updateAndRenderAll();
+    }
+}
+
 function setupEventListeners() {
     initializeAccordion();
+
+    const addNewGroupBtn = document.getElementById('addNewGroupBtn');
+    if (addNewGroupBtn) {
+        addNewGroupBtn.addEventListener('click', () => {
+            handleAddNewQuestionGroup();
+        });
+    }
 
     // --- Delegated Click-to-Action Listeners ---
     document.body.addEventListener('click', (event) => {
@@ -821,17 +1324,49 @@ function setupEventListeners() {
     const createSurveyBtn = document.getElementById('createSurveyBtn');
     if (createSurveyBtn) {
         createSurveyBtn.addEventListener('click', () => {
-            saveSurveyDataToLocalStorage(surveyData);
-            if (currentSurveyId) {
-                try {
-                    localStorage.setItem(`surveyData_${currentSurveyId}`, JSON.stringify(surveyData));
-                } catch (e) {
-                    console.error('Failed to save keyed survey data:', e);
-                }
+            validateFormForSaveButton();
+            const baseLang = 'ja';
+            const baseName = getLocalizedValue(surveyData.name, baseLang).trim();
+            const baseTitle = getLocalizedValue(surveyData.displayTitle, baseLang).trim();
+            const periodStartVal = (surveyData.periodStart || '').trim();
+            const periodEndVal = (surveyData.periodEnd || '').trim();
+
+            if (!baseName || !baseTitle || !periodStartVal || !periodEndVal) {
+                showToast('必須項目を入力してください。', 'error');
+                return;
             }
-            
-            showToast('アンケートデータが保存されました。');
-            setDirty(false); // Reset dirty state after successful save
+
+            const extras = getActiveLanguages().filter((lang) => lang !== 'ja');
+            const missing = collectMissingTranslations(extras);
+
+            const performSave = () => {
+                saveSurveyDataToLocalStorage(surveyData);
+                if (currentSurveyId) {
+                    try {
+                        localStorage.setItem(`surveyData_${currentSurveyId}`, JSON.stringify(surveyData));
+                    } catch (e) {
+                        console.error('Failed to save keyed survey data:', e);
+                    }
+                }
+                showToast('アンケートデータを保存しました。');
+                setDirty(false);
+            };
+
+            if (missing.length > 0) {
+                const summary = extras.map((lang) => {
+                    const meta = getLanguageMeta(lang);
+                    const label = meta?.label || lang;
+                    const count = missing.filter((item) => item.lang === lang).length;
+                    return `${label}：${count}件`;
+                }).join(' / ');
+                const message = `選択された追加言語で未入力の項目があります。
+${summary}
+この状態で保存しますか？`;
+                showConfirmationModal(message, performSave, '未翻訳の確認');
+                return;
+            }
+
+            performSave();
         });
     }
 
@@ -860,7 +1395,7 @@ function handleAddNewQuestionGroup() {
     if (!surveyData.questionGroups) surveyData.questionGroups = [];
     const newGroup = {
         groupId: `group_${Date.now()}`,
-        title: { ja: '新しい質問グループ', en: '' },
+        title: normalizeLocalization({ ja: '新しい質問グループ' }),
         questions: []
     };
     surveyData.questionGroups.push(newGroup);
@@ -906,10 +1441,11 @@ function handleAddNewQuestion(groupId, questionType) {
     const newQuestion = {
         questionId: `q_${Date.now()}`,
         type: questionType,
-        text: { ja: '新しい質問', en: '' },
+        text: normalizeLocalization({ ja: '新しい設問' }),
         required: false,
         options: (questionType === 'single_answer' || questionType === 'multi_answer') ? [] : undefined
     };
+    initializeQuestionMeta(newQuestion);
     targetGroup.questions.push(newQuestion);
     setDirty(true);
     updateAndRenderAll();
@@ -942,7 +1478,7 @@ function handleDuplicateQuestion(groupId, questionId) {
 function handleAddOption(groupId, questionId) {
     const question = surveyData.questionGroups.find(g => g.groupId === groupId)?.questions.find(q => q.questionId === questionId);
     if (question && question.options) {
-        question.options.push({ text: { ja: '新しい選択肢', en: '' } });
+        question.options.push({ text: normalizeLocalization({ ja: '新しい選択肢' }) });
         setDirty(true);
         updateAndRenderAll();
     }
@@ -962,7 +1498,7 @@ function handleAddMatrixRow(groupId, questionId) {
     if (!q) return;
     q.matrix = q.matrix || { rows: [], cols: [] };
     q.matrix.rows = q.matrix.rows || [];
-    q.matrix.rows.push({ text: { ja: `行${q.matrix.rows.length + 1}`, en: '' } });
+    q.matrix.rows.push({ text: normalizeLocalization({ ja: `行${q.matrix.rows.length + 1}` }) });
     setDirty(true);
     updateAndRenderAll();
 }
@@ -972,7 +1508,7 @@ function handleAddMatrixCol(groupId, questionId) {
     if (!q) return;
     q.matrix = q.matrix || { rows: [], cols: [] };
     q.matrix.cols = q.matrix.cols || [];
-    q.matrix.cols.push({ text: { ja: `列${q.matrix.cols.length + 1}`, en: '' } });
+    q.matrix.cols.push({ text: normalizeLocalization({ ja: `列${q.matrix.cols.length + 1}` }) });
     setDirty(true);
     updateAndRenderAll();
 }
@@ -1005,8 +1541,8 @@ function handleChangeQuestionType(groupId, questionId, newType) {
     if (needsOptions) {
         if (!Array.isArray(question.options)) {
             question.options = [
-                { text: { ja: '選択肢1', en: '' } },
-                { text: { ja: '選択肢2', en: '' } }
+                { text: normalizeLocalization({ ja: '選択肢1' }) },
+                { text: normalizeLocalization({ ja: '選択肢2' }) }
             ];
         }
         if ('matrix' in question) delete question.matrix;
@@ -1016,14 +1552,14 @@ function handleChangeQuestionType(groupId, questionId, newType) {
         question.matrix = question.matrix || { rows: [], cols: [] };
         if (!Array.isArray(question.matrix.rows) || question.matrix.rows.length === 0) {
             question.matrix.rows = [
-                { text: { ja: '行1', en: '' } },
-                { text: { ja: '行2', en: '' } },
+                { text: normalizeLocalization({ ja: '行1' }) },
+                { text: normalizeLocalization({ ja: '行2' }) },
             ];
         }
         if (!Array.isArray(question.matrix.cols) || question.matrix.cols.length === 0) {
             question.matrix.cols = [
-                { text: { ja: '列1', en: '' } },
-                { text: { ja: '列2', en: '' } },
+                { text: normalizeLocalization({ ja: '列1' }) },
+                { text: normalizeLocalization({ ja: '列2' }) },
             ];
         }
     } else {
@@ -1041,71 +1577,79 @@ function validateFormForSaveButton() {
     const saveButton = document.getElementById('createSurveyBtn');
     if (!saveButton) return;
 
-    const nameVal = typeof surveyData.name === 'object' ? (surveyData.name?.ja || surveyData.name?.en || '') : (surveyData.name || '');
-    const titleVal = typeof surveyData.displayTitle === 'object' ? (surveyData.displayTitle?.ja || surveyData.displayTitle?.en || '') : (surveyData.displayTitle || '');
-    const periodStartVal = surveyData.periodStart || '';
-    const periodEndVal = surveyData.periodEnd || '';
+    const baseLang = 'ja';
+    const nameVal = getLocalizedValue(surveyData.name, baseLang).trim();
+    const titleVal = getLocalizedValue(surveyData.displayTitle, baseLang).trim();
+    const periodStartVal = (surveyData.periodStart || '').trim();
+    const periodEndVal = (surveyData.periodEnd || '').trim();
 
-    let allValid = [nameVal, titleVal, periodStartVal, periodEndVal].every(v => v && v.trim() !== '');
-
-    // Date order check (YYYY-MM-DD lexicographical works)
+    const startMissing = !periodStartVal;
+    const endMissing = !periodEndVal;
     let dateOrderValid = true;
-    if (periodStartVal && periodEndVal) {
+    if (!startMissing && !endMissing) {
         dateOrderValid = periodEndVal >= periodStartVal;
-        if (!dateOrderValid) allValid = false;
     }
 
-    // Also check required questions (string/object safe)
+    let allValid = nameVal && titleVal && !startMissing && !endMissing && dateOrderValid;
+
     surveyData.questionGroups?.forEach(group => {
         group.questions?.forEach(question => {
             if (question.required) {
-                const qText = typeof question.text === 'object' ? (question.text?.ja || question.text?.en || '') : (question.text || '');
-                if (!qText || qText.trim() === '') {
+                const qText = getLocalizedValue(question.text, baseLang).trim();
+                if (!qText) {
                     allValid = false;
                 }
             }
         });
     });
 
-    saveButton.disabled = !allValid;
-
-    // Inline error highlighting and aria-invalid
-    const elName = document.getElementById('surveyName_ja');
-    const elTitle = document.getElementById('displayTitle_ja');
-    const elStart = document.getElementById('periodStart');
-    const elEnd = document.getElementById('periodEnd');
-
-    const nameError = document.getElementById('surveyNameError');
-    const titleError = document.getElementById('displayTitleError');
-    const startError = document.getElementById('periodStartError');
-    const endError = document.getElementById('periodEndError');
-
-    const toggleErr = (el, errEl, condition, message) => {
-        if (!el || !errEl) return;
-        el.classList.toggle('input-error', condition);
-        el.setAttribute('aria-invalid', condition ? 'true' : 'false');
-        if (message) errEl.textContent = message;
-        errEl.classList.toggle('hidden', !condition);
+    const setFieldError = (fieldKey, hasError, message) => {
+        const container = document.querySelector(`[data-field-key="${fieldKey}"]`);
+        const input = container ? container.querySelector('input, textarea') : null;
+        const errorEl = document.getElementById(`${fieldKey}Error`);
+        if (input) {
+            input.classList.toggle('input-error', !!hasError);
+            if (hasError) {
+                input.setAttribute('aria-invalid', 'true');
+            } else {
+                input.removeAttribute('aria-invalid');
+            }
+        }
+        if (errorEl) {
+            if (message) errorEl.textContent = message;
+            errorEl.classList.toggle('hidden', !hasError);
+        }
     };
 
-    toggleErr(elName, nameError, !(elName?.value || '').trim(), 'この入力は必須です');
-    toggleErr(elTitle, titleError, !(elTitle?.value || '').trim(), 'この入力は必須です');
+    setFieldError('surveyName', !nameVal, 'この入力は必須です');
+    setFieldError('displayTitle', !titleVal, 'この入力は必須です');
 
-    const startMissing = !(elStart?.value || '').trim();
-    const endMissing = !(elEnd?.value || '').trim();
-    toggleErr(elStart, startError, startMissing, 'この入力は必須です');
-    toggleErr(elEnd, endError, endMissing, 'この入力は必須です');
+    const periodRangeInput = document.getElementById('periodRange');
+    const rangeError = document.getElementById('periodRangeError');
+    const hasRangeError = startMissing || endMissing || !dateOrderValid;
 
-    // Order error on end field
-    const showOrderError = !startMissing && !endMissing && !dateOrderValid;
-    if (elEnd && endError) {
-        if (showOrderError) endError.textContent = '終了日は開始日以降にしてください。';
-        // Keep error visible if missing or order error
-        endError.classList.toggle('hidden', !(endMissing || showOrderError));
-        elEnd.setAttribute('aria-invalid', (endMissing || showOrderError) ? 'true' : 'false');
-        elEnd.classList.toggle('input-error', endMissing || showOrderError);
+    if (periodRangeInput) {
+        periodRangeInput.classList.toggle('input-error', hasRangeError);
+        periodRangeInput.setAttribute('aria-invalid', hasRangeError ? 'true' : 'false');
     }
+    if (rangeError) {
+        if (startMissing || endMissing) {
+            rangeError.textContent = 'この入力は必須です';
+        } else if (!dateOrderValid) {
+            rangeError.textContent = '終了日は開始日以降に設定してください。';
+        }
+        rangeError.classList.toggle('hidden', !hasRangeError);
+    }
+
+    const memoInput = document.getElementById('memo');
+    if (memoInput) {
+        memoInput.classList.remove('input-error');
+        memoInput.removeAttribute('aria-invalid');
+    }
+
+    saveButton.disabled = !allValid;
 }
+
 
 // Ensure accordion headers are keyboard/AT friendly
 function enhanceAccordionA11y() {

@@ -53,61 +53,50 @@
                 <span class="material-icons expand-icon">expand_less</span>
               </div>
               <div id="basicInfoContent" class="accordion-content p-4 space-y-6">
+                <section class="space-y-3">
+                  <h3 class="text-on-surface text-lg font-semibold">言語設定</h3>
+                  <p class="text-sm text-on-surface-variant">日本語は必須言語です。必要に応じて追加言語を選択し、タブを切り替えて各言語の文言を編集してください。</p>
+                  <div id="languageSelectionPanel" class="flex flex-wrap gap-2" role="group" aria-label="追加言語"></div>
+                  <div id="languageEditorTabs" class="flex flex-wrap gap-2 pt-2" role="tablist" aria-label="入力言語タブ"></div>
+                </section>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <!-- アンケート名（管理用）: 多言語 -->
-                  <div class="multi-lang-input-group">
-                    <div class="input-group">
-                      <input type="text" id="surveyName_ja" placeholder="(例) 新商品満足度調査" class="input-field" required aria-required="true" aria-describedby="surveyNameError">
+                  <div class="multi-lang-input-group" data-field-key="surveyName" data-input-type="input" data-label="アンケート名（管理用）" data-placeholder-ja="(例) 新製品調査" data-required="true">
+                    <div class="input-group" data-lang="ja">
+                      <input type="text" id="surveyName_ja" placeholder="(例) 新製品調査" class="input-field" required aria-required="true" aria-describedby="surveyNameError">
                       <label for="surveyName_ja" class="input-label">アンケート名（管理用）</label>
                     </div>
-                    <div class="input-group">
-                      <input type="text" id="surveyName_en" placeholder=" " class="input-field" aria-describedby="surveyNameError">
-                      <label for="surveyName_en" class="input-label">English</label>
-                    </div>
-                    <div id="surveyNameError" class="error-message text-error text-sm mt-1 hidden">この入力は必須です</div>
+                    <div id="surveyNameError" class="error-message text-error text-sm mt-1 hidden" aria-live="polite">この入力は必須です</div>
                   </div>
 
                   <!-- 表示タイトル: 多言語 -->
-                  <div class="multi-lang-input-group">
-                    <div class="input-group">
-                      <input type="text" id="displayTitle_ja" placeholder="(例) 新商品に関するご意見をお聞かせください" class="input-field" required aria-required="true" aria-describedby="displayTitleError">
+                  <div class="multi-lang-input-group" data-field-key="displayTitle" data-input-type="input" data-label="表示タイトル" data-placeholder-ja="(例) 新製品に関する満足度を教えてください" data-required="true">
+                    <div class="input-group" data-lang="ja">
+                      <input type="text" id="displayTitle_ja" placeholder="(例) 新製品に関する満足度を教えてください" class="input-field" required aria-required="true" aria-describedby="displayTitleError">
                       <label for="displayTitle_ja" class="input-label">表示タイトル</label>
                     </div>
-                    <div class="input-group">
-                      <input type="text" id="displayTitle_en" placeholder=" " class="input-field" aria-describedby="displayTitleError">
-                      <label for="displayTitle_en" class="input-label">English</label>
-                    </div>
-                    <div id="displayTitleError" class="error-message text-error text-sm mt-1 hidden">この入力は必須です</div>
+                    <div id="displayTitleError" class="error-message text-error text-sm mt-1 hidden" aria-live="polite">この入力は必須です</div>
                   </div>
 
                   <!-- 説明: 多言語 -->
-                  <div class="multi-lang-input-group md:col-span-2">
-                    <div class="input-group">
-                      <textarea id="description_ja" placeholder="(例) 本調査は新商品の改善のために実施します。" class="input-field h-24 resize-y" aria-describedby="descriptionError"></textarea>
+                  <div class="multi-lang-input-group md:col-span-2" data-field-key="description" data-input-type="textarea" data-label="説明" data-placeholder-ja="(例) 本調査は新サービスの改善のためにご協力をお願いします。">
+                    <div class="input-group" data-lang="ja">
+                      <textarea id="description_ja" placeholder="(例) 本調査は新サービスの改善のためにご協力をお願いします。" class="input-field h-24 resize-y" aria-describedby="descriptionError"></textarea>
                       <label for="description_ja" class="input-label">説明</label>
                     </div>
-                    <div class="input-group">
-                      <textarea id="description_en" placeholder=" " class="input-field h-24 resize-y" aria-describedby="descriptionError"></textarea>
-                      <label for="description_en" class="input-label">English</label>
+                    <div class="input-group hidden" data-lang="en">
+                      <textarea id="description_en" placeholder="For example, we ask for your cooperation in improving our new service." class="input-field h-24 resize-y" aria-describedby="descriptionError"></textarea>
+                      <label for="description_en" class="input-label">Description</label>
                     </div>
+                    <div id="descriptionError" class="error-message text-error text-sm mt-1 hidden" aria-live="polite">この入力は必須です</div>
                   </div>
 
                   <!-- 期間 -->
-                  <div class="input-group relative">
-                    <div id="periodStartWrapper">
-                      <input type="text" id="periodStart" class="input-field" placeholder=" " data-input required aria-required="true" aria-describedby="periodStartError">
-                      <label for="periodStart" class="input-label">開始日<span class="text-error">*</span></label>
-                      <span class="material-icons absolute top-1/2 right-3 -translate-y-1/2 text-on-surface-variant cursor-pointer" data-toggle>calendar_today</span>
-                    </div>
-                    <div id="periodStartError" class="error-message text-error text-sm mt-1 hidden">この入力は必須です</div>
-                  </div>
-                  <div class="input-group relative">
-                    <div id="periodEndWrapper">
-                      <input type="text" id="periodEnd" class="input-field" placeholder=" " data-input required aria-required="true" aria-describedby="periodEndError">
-                      <label for="periodEnd" class="input-label">終了日<span class="text-error">*</span></label>
-                      <span class="material-icons absolute top-1/2 right-3 -translate-y-1/2 text-on-surface-variant cursor-pointer" data-toggle>calendar_today</span>
-                    </div>
-                    <div id="periodEndError" class="error-message text-error text-sm mt-1 hidden">この入力は必須です</div>
+                  <div class="input-group relative md:col-span-2">
+                    <input type="text" id="periodRange" class="input-field" placeholder=" " required aria-required="true" aria-describedby="periodRangeError">
+                    <label for="periodRange" class="input-label">アンケート期間<span class="text-error">*</span></label>
+                    <span class="material-icons absolute top-1/2 right-3 -translate-y-1/2 text-on-surface-variant cursor-pointer">calendar_today</span>
+                    <div id="periodRangeError" class="error-message text-error text-sm mt-1 hidden" aria-live="polite">この入力は必須です</div>
                   </div>
 
                   <!-- プラン -->
@@ -179,11 +168,7 @@
     </button>
     <div id="fab-menu" class="absolute bottom-20 right-0 w-72 bg-surface rounded-2xl shadow-2xl transition-all duration-300 transform scale-95 opacity-0 pointer-events-none origin-bottom-right">
         <div class="py-2">
-            <button data-question-type="group" class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
-                <span class="material-icons text-on-surface-variant mr-4">create_new_folder</span>
-                <span class="font-semibold">質問グループを追加</span>
-            </button>
-            <div class="border-t border-outline-variant my-2"></div>
+
             <button data-question-type="free_answer" class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
                 <span class="material-icons text-on-surface-variant mr-4">short_text</span>
                 <span>フリーアンサー</span>
@@ -238,15 +223,10 @@
       <div class="group-header flex justify-between items-center p-4 bg-surface-variant rounded-t-lg cursor-pointer" data-accordion-target="">
         <div class="flex-grow flex items-center gap-2">
           <span class="material-icons text-on-surface-variant handle cursor-move" title="ドラッグで並べ替え">drag_indicator</span>
-          <div class="flex-1 multi-lang-input-group">
-            <div class="input-group">
-              <input type="text" class="input-field w-full bg-transparent focus:bg-surface text-lg font-semibold group-title-input" data-lang="ja" placeholder="グループのタイトル (日本語)">
-              <label class="input-label">日本語</label>
-            </div>
-            <div class="input-group">
-              <input type="text" class="input-field w-full bg-transparent focus:bg-surface text-lg font-semibold group-title-input" data-lang="en" placeholder="Group title (English)">
-              <label class="input-label">English</label>
-            </div>
+          <div class="flex-1 multi-lang-input-group" data-field-key="groupTitle" data-input-type="input" data-label="グループタイトル" data-placeholder-ja="グループタイトル (日本語)">
+          <div class="input-group" data-lang="ja">
+            <input type="text" class="input-field w-full bg-transparent focus:bg-surface text-lg font-semibold group-title-input" data-lang="ja" placeholder="グループタイトル (日本語)">
+            <label class="input-label">グループタイトル</label>
           </div>
         </div>
         <div class="flex items-center gap-2">
@@ -264,7 +244,7 @@
     <div class="question-item p-4 border border-outline-variant rounded-md bg-surface" data-question-id="" data-question-type="">
       <div class="flex justify-between items-center mb-4">
         <div class="flex items-center gap-3 flex-wrap">
-          <span class="material-icons text-on-surface-variant handle cursor-move" title="ドラッグで並べ替え">drag_indicator</span>
+          <span class="material-icons text-on-surface-variant handle cursor-move" title="ドラッグで並び替え">drag_indicator</span>
           <span class="font-semibold text-on-surface question-title"></span>
           <select class="question-type-select border border-outline-variant rounded-md text-sm px-2 py-1 bg-surface text-on-surface" aria-label="設問タイプを選択">
             <option value="free_answer">自由記述</option>
@@ -276,62 +256,19 @@
             <option value="date_time">日付/時刻</option>
             <option value="handwriting">手書きスペース</option>
           </select>
-        </div>
         <div class="flex items-center gap-2">
           <button type="button" class="icon-button duplicate-question-btn" aria-label="設問を複製" title="設問を複製"><span class="material-icons">content_copy</span></button>
           <button type="button" class="icon-button delete-question-btn" aria-label="設問を削除" title="設問を削除"><span class="material-icons text-error">delete</span></button>
         </div>
       </div>
-      <div class="space-y-4">
-        <div class="multi-lang-input-group">
-          <div class="input-group">
-            <input type="text" class="input-field question-text-input" data-lang="ja" placeholder="(例) 当社サービスの満足度を教えてください">
-            <label class="input-label">設問文</label>
-          </div>
-          <div class="input-group">
-            <input type="text" class="input-field question-text-input" data-lang="en" placeholder=" ">
-            <label class="input-label">English</label>
-          </div>
-        </div>
-        <div class="options-container space-y-2">
-          <!-- 単一/複数選択の場合に選択肢をここへ -->
-        </div>
-        <!-- Matrix editor (for matrix_sa / matrix_ma) -->
-        <div class="matrix-editor space-y-4">
-          <div>
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-sm font-medium text-on-surface">行ラベル</span>
-              <button type="button" class="text-sm text-primary hover:underline add-matrix-row-btn">+ 行を追加</button>
-            </div>
-            <div class="matrix-rows-list space-y-2"></div>
-          </div>
-          <div>
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-sm font-medium text-on-surface">列ラベル</span>
-              <button type="button" class="text-sm text-primary hover:underline add-matrix-col-btn">+ 列を追加</button>
-            </div>
-            <div class="matrix-cols-list space-y-2"></div>
-          </div>
-        </div>
-        <div class="flex items-center">
-          <input type="checkbox" class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary required-checkbox" id="requiredCheck">
-          <label class="ml-2 block text-sm text-on-surface required-label" for="requiredCheck">必須にする</label>
-        </div>
-      </div>
-    </div>
-  </template>
 
   <!-- Template: Option -->
   <template id="optionTemplate">
     <div class="option-item flex items-start gap-2">
-      <div class="flex-grow multi-lang-input-group">
-        <div class="input-group">
+      <div class="flex-grow multi-lang-input-group" data-field-key="optionText" data-input-type="input" data-label="選択肢" data-placeholder-ja="(例) とても満足">
+        <div class="input-group" data-lang="ja">
           <input type="text" data-lang="ja" class="input-field option-text-input" placeholder="(例) とても満足">
           <label class="input-label">選択肢</label>
-        </div>
-        <div class="input-group">
-          <input type="text" data-lang="en" class="input-field option-text-input" placeholder=" ">
-          <label class="input-label">English</label>
         </div>
       </div>
       <button type="button" class="icon-button delete-option-btn mt-2" aria-label="選択肢を削除"><span class="material-icons text-error">remove_circle_outline</span></button>
