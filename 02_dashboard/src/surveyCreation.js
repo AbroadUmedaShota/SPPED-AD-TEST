@@ -651,7 +651,6 @@ function setupInputBindings() {
     }
 
     // periodStart and periodEnd are now handled by the flatpickr onChange event in initializePage
-    bind('deadline', ['deadline']);
     bind('memo', ['memo']);
 
 const planEl = document.getElementById('plan');
@@ -1023,7 +1022,6 @@ async function initializePage() {
                             periodStart: enqueteDetails.periodStart || surveyInfo?.periodStart || '',
                             periodEnd: enqueteDetails.periodEnd || '',
                             plan: enqueteDetails.plan || surveyInfo?.plan || 'Standard',
-                            deadline: enqueteDetails.deadline || surveyInfo?.deadline || '',
                             questionGroups: questionGroups,
                         };
                     }
@@ -1046,7 +1044,6 @@ async function initializePage() {
                 periodStart: '',
                 periodEnd: '',
                 plan: 'Standard',
-                deadline: '',
                 questionGroups: [],
                 activeLanguages: ['ja'],
                 editorLanguage: 'ja'
