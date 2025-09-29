@@ -196,26 +196,73 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 const createSurveyBtn = document.getElementById('createSurveyFromModalBtn');
                 if (createSurveyBtn) {
+                    const surveyNameInput = document.getElementById('surveyName');
+                    const displayTitleInput = document.getElementById('displayTitle');
+                    const periodRangeInput = document.getElementById('newSurveyPeriodRange');
+
+                    const surveyNameError = document.getElementById('surveyName-error');
+                    const displayTitleError = document.getElementById('displayTitle-error');
+                    const periodRangeError = document.getElementById('newSurveyPeriodRange-error');
+
+                    const inputs = [
+                        { input: surveyNameInput, error: surveyNameError },
+                        { input: displayTitleInput, error: displayTitleError },
+                        { input: periodRangeInput, error: periodRangeError }
+                    ];
+
+                    const hideAllErrors = () => {
+                        inputs.forEach(({ input, error }) => {
+                            input.classList.remove('border-red-500');
+                            error.classList.add('hidden');
+                            error.textContent = '';
+                        });
+                    };
+
+                    const showError = (input, error, message) => {
+                        input.classList.add('border-red-500');
+                        error.textContent = message;
+                        error.classList.remove('hidden');
+                    };
+
                     createSurveyBtn.addEventListener('click', (e) => {
                         e.preventDefault(); // Prevent default form submission
+                        hideAllErrors();
+                        let isValid = true;
 
-                        // Get values from the modal form
-                        const surveyName = document.getElementById('surveyName').value;
-                        const displayTitle = document.getElementById('displayTitle').value;
-                        const surveyMemo = document.getElementById('surveyMemo').value;
-                        
-                        // Get dates from flatpickr instance
+                        // Get values
+                        const surveyName = surveyNameInput.value.trim();
+                        const displayTitle = displayTitleInput.value.trim();
+                        const surveyMemo = document.getElementById('surveyMemo').value.trim();
                         const selectedDates = periodRangePicker.selectedDates;
-                        const surveyStartDate = selectedDates.length > 0 ? periodRangePicker.formatDate(selectedDates[0], 'Y-m-d') : '';
-                        const surveyEndDate = selectedDates.length > 1 ? periodRangePicker.formatDate(selectedDates[1], 'Y-m-d') : '';
+
+                        // --- Validation ---
+                        if (!surveyName) {
+                            showError(surveyNameInput, surveyNameError, 'アンケート名を入力してください。');
+                            isValid = false;
+                        }
+                        if (!displayTitle) {
+                            showError(displayTitleInput, displayTitleError, '表示タイトルを入力してください。');
+                            isValid = false;
+                        }
+                        if (selectedDates.length < 2) {
+                            showError(periodRangeInput, periodRangeError, '回答期間を選択してください。');
+                            isValid = false;
+                        }
+
+                        if (!isValid) {
+                            return;
+                        }
+
+                        const surveyStartDate = periodRangePicker.formatDate(selectedDates[0], 'Y-m-d');
+                        const surveyEndDate = periodRangePicker.formatDate(selectedDates[1], 'Y-m-d');
 
                         // Build query parameters
                         const params = new URLSearchParams();
-                        if (surveyName) params.set('surveyName', surveyName);
-                        if (displayTitle) params.set('displayTitle', displayTitle);
+                        params.set('surveyName', surveyName);
+                        params.set('displayTitle', displayTitle);
                         if (surveyMemo) params.set('memo', surveyMemo);
-                        if (surveyStartDate) params.set('periodStart', surveyStartDate);
-                        if (surveyEndDate) params.set('periodEnd', surveyEndDate);
+                        params.set('periodStart', surveyStartDate);
+                        params.set('periodEnd', surveyEndDate);
 
                         // Redirect to the creation page with parameters
                         window.location.href = `surveyCreation.html?${params.toString()}`;
