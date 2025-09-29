@@ -1,4 +1,4 @@
-import { handleOpenModal } from './modalHandler.js';
+import { handleOpenModal, closeModal } from './modalHandler.js';
 import { openAccountInfoModal } from './accountInfoModal.js';
 import { initSidebarHandler } from './sidebarHandler.js';
 import { initBreadcrumbs } from './breadcrumb.js';
@@ -338,21 +338,6 @@ function initLanguageSwitcher() {
         if (!languageSwitcherDropdown.classList.contains('hidden')) {
             languageSwitcherDropdown.classList.add('hidden');
             languageSwitcherButton.setAttribute('aria-expanded', 'false');
-        }
-    });
-
-    // --- Delegated Change Listeners ---
-    document.body.addEventListener('change', (event) => {
-        const select = event.target.closest('.question-type-select');
-        if (select) {
-            const questionItem = select.closest('.question-item');
-            const groupEl = select.closest('.question-group');
-            if (!questionItem || !groupEl) return;
-            const groupId = groupEl.dataset.groupId;
-            const questionId = questionItem.dataset.questionId;
-            const newType = select.value;
-            handleChangeQuestionType(groupId, questionId, newType);
-            return;
         }
     });
 
@@ -699,6 +684,8 @@ const planEl = document.getElementById('plan');
                 const lang = target.dataset.lang || getEditorLanguage();
                 updateLocalization(group, 'title', lang, target.value || '');
                 setDirty(true);
+                validateFormForSaveButton();
+                renderOutlineMap();
             }
             return;
         }
@@ -716,6 +703,8 @@ const planEl = document.getElementById('plan');
             if (question) {
                 updateLocalization(question, 'text', lang, target.value || '');
                 setDirty(true);
+                validateFormForSaveButton();
+                renderOutlineMap();
             }
             return;
         }
@@ -736,6 +725,7 @@ const planEl = document.getElementById('plan');
                 question.options[optionIndex].text = normalizeLocalization(question.options[optionIndex].text);
                 question.options[optionIndex].text[lang] = target.value || '';
                 setDirty(true);
+                validateFormForSaveButton();
             }
             return;
         }
@@ -754,6 +744,7 @@ const planEl = document.getElementById('plan');
                 question.matrix.rows[index].text = normalizeLocalization(question.matrix.rows[index].text);
                 question.matrix.rows[index].text[lang] = target.value || '';
                 setDirty(true);
+                validateFormForSaveButton();
             }
             return;
         }
@@ -772,6 +763,7 @@ const planEl = document.getElementById('plan');
                 question.matrix.cols[index].text = normalizeLocalization(question.matrix.cols[index].text);
                 question.matrix.cols[index].text[lang] = target.value || '';
                 setDirty(true);
+                validateFormForSaveButton();
             }
             return;
         }
@@ -835,8 +827,22 @@ const mapEnqueteToQuestions = (enqueteDetails) => {
         if (item.options && Array.isArray(item.options)) {
             question.options = item.options.map((opt, optIndex) => ({
                 optionId: `opt_${questionId}_${optIndex}`,
-                text: normalizeMultilingual(opt),
+                text: normalizeMultilingual(typeof opt === 'string' ? opt : opt.text || ''),
             }));
+        }
+
+        // Add mapping for matrix rows and columns
+        if (mappedType === 'matrix_sa' || mappedType === 'matrix_ma') {
+            question.matrix = {
+                rows: (item.rows || []).map((row, rowIndex) => ({
+                    rowId: `row_${questionId}_${rowIndex}`,
+                    text: normalizeMultilingual(typeof row === 'string' ? row : row.text || ''),
+                })),
+                cols: (item.columns || item.cols || []).map((col, colIndex) => ({
+                    colId: `col_${questionId}_${colIndex}`,
+                    text: normalizeMultilingual(typeof col === 'string' ? col : col.text || ''),
+                })),
+            };
         }
 
         return question;
@@ -1231,6 +1237,43 @@ function setupEventListeners() {
             handleAddNewQuestionGroup();
         });
     }
+
+    // --- Delegated Change Listeners ---
+    document.body.addEventListener('change', (event) => {
+        const target = event.target;
+
+        // Handle question type change
+        const select = target.closest('.question-type-select');
+        if (select) {
+            const questionItem = select.closest('.question-item');
+            const groupEl = select.closest('.question-group');
+            if (!questionItem || !groupEl) return;
+            const groupId = groupEl.dataset.groupId;
+            const questionId = questionItem.dataset.questionId;
+            const newType = select.value;
+            handleChangeQuestionType(groupId, questionId, newType);
+            return;
+        }
+
+        // Handle required checkbox change
+        const checkbox = target.closest('.required-checkbox');
+        if (checkbox) {
+            const qItem = checkbox.closest('.question-item');
+            const gItem = checkbox.closest('.question-group');
+            if (qItem && gItem) {
+                const groupId = gItem.dataset.groupId;
+                const questionId = qItem.dataset.questionId;
+                const group = surveyData.questionGroups.find(g => g.groupId === groupId);
+                const question = group?.questions.find(q => q.questionId === questionId);
+                if (question) {
+                    question.required = checkbox.checked;
+                    setDirty(true);
+                    validateFormForSaveButton();
+                }
+            }
+            return;
+        }
+    });
 
     // --- Delegated Click-to-Action Listeners ---
     document.body.addEventListener('click', (event) => {
@@ -1699,7 +1742,20 @@ function attachPreviewListener() {
     previewBtn.addEventListener('click', async (e) => {
         e.preventDefault();
         try {
-            await handleOpenModal('surveyPreviewModal', 'modals/surveyPreviewModal.html');
+            const setupEventListeners = () => {
+                const modal = document.getElementById('surveyPreviewModal');
+                if (!modal) return;
+
+                const closeButtons = modal.querySelectorAll('[data-modal-close="surveyPreviewModal"]');
+                closeButtons.forEach(btn => {
+                    if (!btn.dataset.listenerAttached) {
+                        btn.addEventListener('click', () => closeModal('surveyPreviewModal'));
+                        btn.dataset.listenerAttached = 'true';
+                    }
+                });
+            };
+            
+            await handleOpenModal('surveyPreviewModal', 'modals/surveyPreviewModal.html', setupEventListeners);
             renderSurveyPreview();
         } catch (err) {
             console.error('Failed to open preview modal:', err);
