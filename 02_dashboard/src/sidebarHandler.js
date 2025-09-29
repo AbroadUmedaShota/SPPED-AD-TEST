@@ -125,7 +125,7 @@ export function initSidebarHandler() {
                     sessionStorage.clear();
 
                     // Redirect to the login page at the project root
-                    window.location.href = '../../index.html';
+                    window.location.href = '/index.html';
                 },
                 'ログアウト'
             );
