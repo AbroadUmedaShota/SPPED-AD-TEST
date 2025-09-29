@@ -123,7 +123,34 @@ function hydrateSingleLanguageField(container, value, languageOptions = {}, over
         if (input) {
             input.value = getLocalizedText(value, langCode);
             const placeholderJa = overrides.placeholderJa ?? container.dataset.placeholderJa ?? ' ';
-            input.placeholder = (langCode === 'ja') ? placeholderJa : (getLocalizedText(value, 'ja') || placeholderJa);
+            const jaValue = getLocalizedText(value, 'ja');
+
+            if (langCode === 'ja') {
+                input.placeholder = placeholderJa;
+            } else {
+                input.placeholder = jaValue || placeholderJa;
+            }
+
+            // Add real-time placeholder updater for Japanese input
+            if (langCode === 'ja') {
+                const updater = (event) => {
+                    const currentJaValue = event.target.value || '';
+                    const otherInputGroups = container.querySelectorAll('.input-group:not([data-lang="ja"])');
+                    otherInputGroups.forEach(group => {
+                        const otherInput = group.querySelector('input, textarea');
+                        if (otherInput) {
+                            otherInput.placeholder = currentJaValue;
+                        }
+                    });
+                };
+
+                // Remove previous listener to avoid duplicates, then add the new one.
+                if (input._placeholderUpdater) {
+                    input.removeEventListener('input', input._placeholderUpdater);
+                }
+                input.addEventListener('input', updater);
+                input._placeholderUpdater = updater; // Store reference for removal
+            }
         }
 
         const label = group.querySelector('.input-label');

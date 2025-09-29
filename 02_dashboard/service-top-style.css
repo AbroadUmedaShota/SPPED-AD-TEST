@@ -567,9 +567,11 @@ body.dark-mode select.appearance-none {
     line-height: 1.25rem;
 }
 /* Placeholderを透明にして、ラベルが常に表示されるようにする */
+/*
 .input-field::placeholder {
-    color: transparent; /* プレースホルダーテキストを透明化 */
+    color: transparent;
 }
+*/
 
 .input-field:focus {
     outline: none;

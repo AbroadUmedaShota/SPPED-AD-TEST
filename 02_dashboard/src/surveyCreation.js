@@ -622,9 +622,27 @@ function updateAndRenderAll() {
     validateFormForSaveButton();
     setupSortables();
     enhanceAccordionA11y();
+
+    // Ensure placeholders are updated after rendering
+    Promise.resolve().then(() => {
+        updateAllPlaceholders();
+    });
 }
 
 // --- Input Bindings ---
+function updateAllPlaceholders() {
+    document.querySelectorAll('.multi-lang-input-group').forEach(container => {
+        const jaInput = container.querySelector('input[data-lang="ja"], textarea[data-lang="ja"]');
+        if (jaInput && jaInput.value) {
+            const value = jaInput.value;
+            const otherInputs = container.querySelectorAll('input[data-lang]:not([data-lang="ja"]), textarea[data-lang]:not([data-lang="ja"])');
+            otherInputs.forEach(input => {
+                input.placeholder = value;
+            });
+        }
+    });
+}
+
 function setDeep(target, path, value) {
     if (!target || !path || path.length === 0) return;
     let obj = target;
@@ -668,6 +686,14 @@ function setupInputBindings() {
             } else if (fieldKey === 'description') {
                 updateLocalization(surveyData, 'description', lang, value);
             }
+
+            if (lang === 'ja') {
+                const otherInputs = container.querySelectorAll('input[data-lang]:not([data-lang="ja"]), textarea[data-lang]:not([data-lang="ja"])');
+                otherInputs.forEach(input => {
+                    input.placeholder = value;
+                });
+            }
+
             validateFormForSaveButton();
             setDirty(true);
         };
@@ -694,6 +720,19 @@ const planEl = document.getElementById('plan');
 
     container.addEventListener('input', (e) => {
         const target = e.target;
+
+        // Update placeholders for other languages when Japanese input changes
+        if (target.dataset.lang === 'ja') {
+            const multiLangGroup = target.closest('.multi-lang-input-group');
+            if (multiLangGroup) {
+                const value = target.value || '';
+                const otherInputs = multiLangGroup.querySelectorAll('input[data-lang]:not([data-lang="ja"]), textarea[data-lang]:not([data-lang="ja"])');
+                otherInputs.forEach(input => {
+                    input.placeholder = value;
+                });
+            }
+        }
+
         if (target.dataset && target.dataset.configType) {
             handleQuestionConfigInput(target);
             return;
