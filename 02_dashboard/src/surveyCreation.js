@@ -1982,7 +1982,7 @@ function renderSurveyPreview() {
     const container = document.getElementById('modalSurveyPreviewContainer');
     if (!container) return;
 
-    const lang = 'ja';
+        const lang = (typeof getEditorLanguage === 'function' ? getEditorLanguage() : currentLang) || 'ja';
     const lines = [];
     lines.push(`<div class="space-y-3">`);
     lines.push(`<div>

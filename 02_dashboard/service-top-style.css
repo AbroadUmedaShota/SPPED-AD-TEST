@@ -270,29 +270,6 @@ body.dark-mode {
     color: var(--color-text-sub);
 }
 
-/* ===== Temporary single-language mode (omit EN fields) ===== */
-/* Hide EN inputs and labels within multi-language input groups */
-.multi-lang-input-group input[data-lang="en"],
-.multi-lang-input-group input[data-lang="en"] + label {
-    display: none !important;
-}
-/* Hide EN option inputs and labels */
-.multi-lang-input-group .option-text-input[data-lang="en"],
-.multi-lang-input-group .option-text-input[data-lang="en"] + label {
-    display: none !important;
-}
-/* Hide basic-info EN fields and labels */
-#surveyName_en, label[for="surveyName_en"],
-#displayTitle_en, label[for="displayTitle_en"],
-#description_en, label[for="description_en"] {
-    display: none !important;
-}
-/* Hide language switcher in header */
-#language-switcher-button,
-#language-switcher-dropdown {
-    display: none !important;
-}
-
 /* Inline error styling for required fields */
 .input-error {
     border-color: var(--color-input-border-error) !important;
