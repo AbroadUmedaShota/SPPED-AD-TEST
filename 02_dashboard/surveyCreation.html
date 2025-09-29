@@ -16,6 +16,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
   <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval'">
+  <!-- Papa Parse CSV Parser -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
 </head>
 <body class="bg-background text-on-background">
 
@@ -306,6 +308,9 @@
       <div data-config-section="handwriting" class="hidden mt-4 pt-4 border-t border-outline-variant space-y-3"></div>
     </div>
   </template>
+
+  <!-- Template: Option -->
+  <template id="optionTemplate">
     <div class="option-item flex items-start gap-2">
       <div class="flex-grow multi-lang-input-group" data-field-key="optionText" data-input-type="input" data-label="選択肢" data-placeholder-ja="(例) とても満足">
         <div class="input-group" data-lang="ja">

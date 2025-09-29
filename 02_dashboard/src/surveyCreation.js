@@ -792,6 +792,82 @@ async function fetchJson(url) {
     }
 }
 
+/**
+ * Loads question groups from a CSV string.
+ * @param {string} csvString The CSV content.
+ * @returns {Array|null} An array of question groups or null if parsing fails.
+ */
+function loadQuestionsFromCsv(csvString) {
+    if (!window.Papa) {
+        console.error('PapaParse is not loaded.');
+        showToast('CSV解析ライブラリが読み込まれていません。', 'error');
+        return null;
+    }
+
+    let questions = [];
+    try {
+        const results = Papa.parse(csvString, { header: true, skipEmptyLines: true });
+        const parsedData = results.data;
+
+        questions = parsedData.map((row, index) => {
+            const questionId = `q_csv_${Date.now()}_${index}`;
+            const type = (row.type || 'free_answer').trim();
+            const required = (row.required || 'FALSE').trim().toUpperCase() === 'TRUE';
+            const text = (row.text || '').trim();
+
+            if (!text) return null; // Skip rows without question text
+
+            const question = {
+                questionId,
+                type,
+                text: normalizeLocalization({ ja: text }),
+                required,
+            };
+
+            const optionsSource = (row['options/rows'] || '').trim();
+            const colsSource = (row.cols || '').trim();
+
+            if (type === 'single_answer' || type === 'multi_answer') {
+                if (optionsSource) {
+                    question.options = optionsSource.split(',').map((opt, optIndex) => ({
+                        optionId: `opt_${questionId}_${optIndex}`,
+                        text: normalizeLocalization({ ja: opt.trim() }),
+                    }));
+                }
+            } else if (type === 'matrix_sa' || type === 'matrix_ma') {
+                question.matrix = {
+                    rows: optionsSource ? optionsSource.split(',').map((r, rIndex) => ({
+                        rowId: `row_${questionId}_${rIndex}`,
+                        text: normalizeLocalization({ ja: r.trim() }),
+                    })) : [],
+                    cols: colsSource ? colsSource.split(',').map((c, cIndex) => ({
+                        colId: `col_${questionId}_${cIndex}`,
+                        text: normalizeLocalization({ ja: c.trim() }),
+                    })) : [],
+                };
+            }
+            
+            initializeQuestionMeta(question);
+            return question;
+
+        }).filter(q => q !== null); // Filter out invalid rows
+
+    } catch (error) {
+        console.error("CSV parsing error:", error);
+        throw error; // Re-throw to be caught by the event handler
+    }
+
+    if (questions.length === 0) {
+        return null;
+    }
+
+    return [{
+        groupId: 'group_from_csv_' + Date.now(),
+        title: normalizeLocalization({ ja: 'CSVから読み込んだ設問' }),
+        questions: questions,
+    }];
+}
+
 const normalizeMultilingual = (field) => {
     if (typeof field === 'string') {
         return { ja: field, en: '' };
@@ -903,99 +979,125 @@ async function initializePage() {
         registerAdditionalSettingsLinks();
         updateAdditionalSettingsAvailability();
 
+        let dataLoadedFromId = false; // Flag to check if data was loaded via surveyId
+
         // 1. Try loading from localStorage keyed by surveyId
         if (currentSurveyId) {
             const keyedData = localStorage.getItem(`surveyData_${currentSurveyId}`);
             if (keyedData) {
-                surveyData = JSON.parse(keyedData);
-                
+                try {
+                    const parsedData = JSON.parse(keyedData);
+                    // Check if the loaded data is valid and has question groups
+                    if (parsedData && Array.isArray(parsedData.questionGroups)) {
+                        surveyData = parsedData;
+                        dataLoadedFromId = true; // Mark as loaded
+                    }
+                } catch (e) {
+                    console.error('Failed to parse survey data from localStorage:', e);
+                    localStorage.removeItem(`surveyData_${currentSurveyId}`); // Remove corrupted data
+                }
             }
         }
 
         // 2. If not found, try loading generic data from localStorage
-        if (!surveyData || Object.keys(surveyData).length === 0) {
+        if (!dataLoadedFromId) {
             const genericData = loadSurveyDataFromLocalStorage(); // from surveyCreationData
             if (genericData) {
-                surveyData = genericData;
-                
+                // Check if the loaded data is valid and has question groups
+                if (genericData && Array.isArray(genericData.questionGroups)) {
+                    surveyData = genericData;
+                }
             }
         }
 
-        // 3. If still empty and surveyId is present, load from JSON files
-        if ((!surveyData || Object.keys(surveyData).length === 0) && currentSurveyId) {
-            
-
-            // Load canonical dataset from `/data/`
+        // 3. If still empty and surveyId is present, load from data files (CSV first)
+        if (!dataLoadedFromId && currentSurveyId) {
             let surveysList = await fetchJson(resolveDashboardDataPath('core/surveys.json'));
-            let surveyInfo = surveysList?.find(s => s.id === currentSurveyId) || null;
+            const surveyInfo = surveysList?.find(s => s.id === currentSurveyId) || null;
+
+            let questionGroups = null;
+
+            // --- Attempt to load from CSV first ---
+            try {
+                const csvPath = resolveDemoDataPath(`surveys/${currentSurveyId}.csv`);
+                const response = await fetch(csvPath);
+                if (response.ok) {
+                    const csvString = await response.text();
+                    questionGroups = loadQuestionsFromCsv(csvString);
+                    console.log(`Successfully loaded questions from ${csvPath}`);
+                } else {
+                    console.log(`No CSV file found at ${csvPath}, falling back to JSON.`);
+                }
+            } catch (error) {
+                console.error(`Error fetching CSV for surveyId ${currentSurveyId}:`, error);
+                // Proceed to JSON fallback
+            }
+
+            // --- If CSV loading fails, fall back to JSON ---
             let enqueteDetails = null;
+            if (!questionGroups) {
+                if (surveyInfo) {
+                    enqueteDetails = await fetchJson(resolveDashboardDataPath(`demos/sample-3/Enquete/${currentSurveyId}.json`));
+                }
+                if (!enqueteDetails) {
+                    enqueteDetails = await fetchJson(resolveDemoDataPath(`surveys/${currentSurveyId}.json`));
+                }
 
-            if (surveyInfo) {
-                enqueteDetails = await fetchJson(resolveDashboardDataPath(`demos/sample-3/Enquete/${currentSurveyId}.json`));
+                if (enqueteDetails) {
+                    questionGroups = mapEnqueteToQuestions(enqueteDetails);
+                }
             }
 
-            // Re-fetch canonical surveys list to ensure metadata is available
-            if (!surveyInfo) {
-                surveysList = await fetchJson(resolveDashboardDataPath('core/surveys.json'));
-                surveyInfo = surveysList?.find(s => s.id === currentSurveyId) || null;
-            }
+            // --- Construct surveyData if we have questions ---
+            if (questionGroups) {
+                const name = enqueteDetails?.name || surveyInfo?.name || { ja: currentSurveyId, en: '' };
+                const displayTitle = enqueteDetails?.displayTitle || surveyInfo?.displayTitle || name;
+                const description = enqueteDetails?.description || surveyInfo?.description || { ja: '', en: '' };
+                const periodStart = enqueteDetails?.periodStart || surveyInfo?.periodStart || '';
+                const periodEnd = enqueteDetails?.periodEnd || '';
+                const memo = enqueteDetails?.memo || surveyInfo?.memo || '';
+                const plan = enqueteDetails?.plan || surveyInfo?.plan || 'Standard';
+                const deadline = enqueteDetails?.deadline || surveyInfo?.deadline || '';
 
-            // Fallback: sample Enquete payloads
-            if (!enqueteDetails) {
-                enqueteDetails = await fetchJson(resolveDemoDataPath(`surveys/${currentSurveyId}.json`));
-            }
-
-            if (enqueteDetails) {
-                // If meta not available, derive from details file
-                const name = enqueteDetails.name || { ja: currentSurveyId, en: '' };
-                const displayTitle = enqueteDetails.displayTitle || name;
-                const description = enqueteDetails.description || { ja: '', en: '' };
                 surveyData = {
                     id: currentSurveyId,
                     name: name,
                     displayTitle: displayTitle,
                     description: description,
-                    memo: surveyInfo?.memo || '',
-                    periodStart: surveyInfo?.periodStart || enqueteDetails.periodStart || '',
-                    periodEnd: surveyInfo?.periodEnd || enqueteDetails.periodEnd || '',
-                    plan: surveyInfo?.plan || 'Standard',
-                    deadline: surveyInfo?.deadline || '',
-                    questionGroups: mapEnqueteToQuestions(enqueteDetails),
+                    memo: memo,
+                    periodStart: periodStart,
+                    periodEnd: periodEnd,
+                    plan: plan,
+                    deadline: deadline,
+                    questionGroups: questionGroups,
                 };
-                // Ensure group title is readable Japanese by default
-                if (surveyData.questionGroups && surveyData.questionGroups.length > 0) {
-                    surveyData.questionGroups[0].title = surveyData.questionGroups[0].title || { ja: 'インポートされた設問', en: 'Imported Questions' };
-                    if (typeof surveyData.questionGroups[0].title === 'object') {
-                        surveyData.questionGroups[0].title.ja = surveyData.questionGroups[0].title.ja || 'インポートされた設問';
-                        surveyData.questionGroups[0].title.en = surveyData.questionGroups[0].title.en || 'Imported Questions';
-                    }
-                }
-                
-
+                dataLoadedFromId = true; // Mark as loaded
             } else {
-                console.warn(`Survey with id "${currentSurveyId}" not found in any known source.`);
+                console.warn(`Survey with id "${currentSurveyId}" not found in any known source (CSV or JSON).`);
                 showToast(`Survey not found: ${currentSurveyId}`, 'error', 3000);
             }
         }
 
         // 4. If still no data, fall back to the default template
-        if (!surveyData || Object.keys(surveyData).length === 0) {
+        if (!dataLoadedFromId && Object.keys(surveyData).length === 0) {
             console.log('No survey data found. Fetching fallback template...');
             surveyData = await fetchSurveyData(); // Reads data/surveys/sample_survey.json
         }
 
-        // Always apply URL query parameter overrides
-        const surveyName = params.get('surveyName');
-        const displayTitle = params.get('displayTitle');
-        const memo = params.get('memo');
-        const periodStart = params.get('periodStart');
-        const periodEnd = params.get('periodEnd');
+        // Only apply URL query parameter overrides if no data was loaded by ID
+        if (!dataLoadedFromId) {
+            const surveyName = params.get('surveyName');
+            const displayTitle = params.get('displayTitle');
+            const memo = params.get('memo');
+            const periodStart = params.get('periodStart');
+            const periodEnd = params.get('periodEnd');
 
-        if (surveyName) surveyData.name = surveyName;
-        if (displayTitle) surveyData.displayTitle = displayTitle;
-        if (memo) surveyData.memo = memo;
-        if (periodStart) surveyData.periodStart = periodStart;
-        if (periodEnd) surveyData.periodEnd = periodEnd;
+            if (surveyName) surveyData.name = { ja: surveyName, en: '' };
+            if (displayTitle) surveyData.displayTitle = { ja: displayTitle, en: '' };
+            if (memo) surveyData.memo = memo;
+            if (periodStart) surveyData.periodStart = periodStart;
+            if (periodEnd) surveyData.periodEnd = periodEnd;
+        }
 
         setActiveLanguages(Array.isArray(surveyData.activeLanguages) ? surveyData.activeLanguages : activeLanguages);
         if (surveyData.editorLanguage) {

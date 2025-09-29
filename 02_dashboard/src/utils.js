@@ -38,7 +38,12 @@ export function resolveDashboardDataPath(relativePath) {
 
 export function resolveDemoDataPath(relativePath) {
     const sanitized = sanitizeRelativePath(relativePath);
-    return `${getDashboardDataRoot()}/demo_${sanitized}`;
+    const parts = sanitized.split('/');
+    if (parts.length > 0) {
+        parts[0] = `demo_${parts[0]}`;
+    }
+    const newPath = parts.join('/');
+    return `${getDashboardDataRoot()}/${newPath}`;
 }
 
 /**
