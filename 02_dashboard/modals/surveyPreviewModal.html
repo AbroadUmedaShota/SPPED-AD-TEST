@@ -2,7 +2,7 @@
     <div class="modal-content-transition modal-content w-full max-w-3xl p-6 rounded-xl bg-surface shadow-lg relative">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-on-surface text-2xl font-bold">アンケートプレビュー</h2>
-            <button onclick="closeModal('surveyPreviewModal')">
+            <button data-modal-close="surveyPreviewModal">
                 <span class="material-icons text-3xl">close</span>
             </button>
         </div>
@@ -12,7 +12,7 @@
             </div>
         </div>
         <div class="modal-footer flex justify-end gap-4 mt-6">
-            <button class="min-w-[100px] px-6 py-3 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors" onclick="handleCloseModal('surveyPreviewModal')">
+            <button class="min-w-[100px] px-6 py-3 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors" data-modal-close="surveyPreviewModal">
                 閉じる
             </button>
         </div>

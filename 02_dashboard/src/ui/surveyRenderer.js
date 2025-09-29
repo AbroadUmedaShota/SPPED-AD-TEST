@@ -285,8 +285,6 @@ function renderQuestion(question, uiLang, index, languageOptions = {}) {
   const questionTitle = fragment.querySelector('.question-title');
   const requiredCheckbox = fragment.querySelector('.required-checkbox');
   const matrixEditor = fragment.querySelector('.matrix-editor');
-  const matrixRowsList = fragment.querySelector('.matrix-rows-list');
-  const matrixColsList = fragment.querySelector('.matrix-cols-list');
   const typeSelect = fragment.querySelector('.question-type-select');
 
   const editorLanguage = languageOptions.editorLanguage || FALLBACK_LANGUAGE;
@@ -349,6 +347,8 @@ function renderQuestion(question, uiLang, index, languageOptions = {}) {
   }
   if (isMatrix) {
     const matrix = question.matrix || { rows: [], cols: [] };
+    const matrixRowsList = matrixEditor.querySelector('.matrix-rows-list');
+    const matrixColsList = matrixEditor.querySelector('.matrix-cols-list');
     if (matrixRowsList) {
       matrixRowsList.innerHTML = '';
       (matrix.rows || []).forEach((row, rowIndex) => {
@@ -515,7 +515,7 @@ export function renderOutlineMap() {
   const mainContent = document.getElementById('survey-content-area');
   if (!mainContent) return;
 
-  const headings = Array.from(mainContent.querySelectorAll('h2, .question-title'));
+  const headings = Array.from(mainContent.querySelectorAll('h2, .group-title-input, .question-title'));
   if (!headings.length) {
     outlineMapContainer.innerHTML = '';
     return;
@@ -524,15 +524,35 @@ export function renderOutlineMap() {
   let html = '<h3 class="text-lg font-semibold mb-4">目次</h3><ul class="space-y-2">';
   headings.forEach((h, idx) => {
     const isQuestion = h.classList.contains('question-title');
-    const targetElement = isQuestion ? h.closest('.question-item') : h;
+    const isGroup = h.classList.contains('group-title-input');
+    
+    let targetElement;
+    let text;
+    let level = 2;
+
+    if (isQuestion) {
+        targetElement = h.closest('.question-item');
+        const input = targetElement ? targetElement.querySelector('.question-text-input') : null;
+        text = input ? input.value : (h.textContent || '');
+        level = 3;
+    } else if (isGroup) {
+        targetElement = h.closest('.question-group');
+        text = h.value || '';
+        level = 2;
+    } else { // h2
+        targetElement = h;
+        text = h.textContent || '';
+        level = 1;
+    }
+
     if (!targetElement) return;
     if (!targetElement.id) {
       targetElement.id = `section-gen-${idx}`;
     }
-    const level = isQuestion ? 3 : (parseInt(h.tagName.substring(1), 10) || 2);
-    const paddingLeft = (level - 2) * 16;
-    const text = h.textContent || '';
+
+    const paddingLeft = (level - 1) * 16;
     if (!text.trim()) return;
+
     html += `
       <li>
         <a href="#${targetElement.id}" class="block text-on-surface-variant hover:text-primary text-sm truncate" style="padding-left: ${paddingLeft}px;" title="${text}">${text}</a>

@@ -1,4 +1,4 @@
-import { handleOpenModal } from './modalHandler.js';
+import { handleOpenModal, closeModal } from './modalHandler.js';
 import { openAccountInfoModal } from './accountInfoModal.js';
 import { initSidebarHandler } from './sidebarHandler.js';
 import { initBreadcrumbs } from './breadcrumb.js';
@@ -338,21 +338,6 @@ function initLanguageSwitcher() {
         if (!languageSwitcherDropdown.classList.contains('hidden')) {
             languageSwitcherDropdown.classList.add('hidden');
             languageSwitcherButton.setAttribute('aria-expanded', 'false');
-        }
-    });
-
-    // --- Delegated Change Listeners ---
-    document.body.addEventListener('change', (event) => {
-        const select = event.target.closest('.question-type-select');
-        if (select) {
-            const questionItem = select.closest('.question-item');
-            const groupEl = select.closest('.question-group');
-            if (!questionItem || !groupEl) return;
-            const groupId = groupEl.dataset.groupId;
-            const questionId = questionItem.dataset.questionId;
-            const newType = select.value;
-            handleChangeQuestionType(groupId, questionId, newType);
-            return;
         }
     });
 
@@ -699,6 +684,8 @@ const planEl = document.getElementById('plan');
                 const lang = target.dataset.lang || getEditorLanguage();
                 updateLocalization(group, 'title', lang, target.value || '');
                 setDirty(true);
+                validateFormForSaveButton();
+                renderOutlineMap();
             }
             return;
         }
@@ -716,6 +703,8 @@ const planEl = document.getElementById('plan');
             if (question) {
                 updateLocalization(question, 'text', lang, target.value || '');
                 setDirty(true);
+                validateFormForSaveButton();
+                renderOutlineMap();
             }
             return;
         }
@@ -736,6 +725,7 @@ const planEl = document.getElementById('plan');
                 question.options[optionIndex].text = normalizeLocalization(question.options[optionIndex].text);
                 question.options[optionIndex].text[lang] = target.value || '';
                 setDirty(true);
+                validateFormForSaveButton();
             }
             return;
         }
@@ -754,6 +744,7 @@ const planEl = document.getElementById('plan');
                 question.matrix.rows[index].text = normalizeLocalization(question.matrix.rows[index].text);
                 question.matrix.rows[index].text[lang] = target.value || '';
                 setDirty(true);
+                validateFormForSaveButton();
             }
             return;
         }
@@ -772,6 +763,7 @@ const planEl = document.getElementById('plan');
                 question.matrix.cols[index].text = normalizeLocalization(question.matrix.cols[index].text);
                 question.matrix.cols[index].text[lang] = target.value || '';
                 setDirty(true);
+                validateFormForSaveButton();
             }
             return;
         }
@@ -798,6 +790,82 @@ async function fetchJson(url) {
         console.error(`Error fetching or parsing ${url}:`, error);
         return null;
     }
+}
+
+/**
+ * Loads question groups from a CSV string.
+ * @param {string} csvString The CSV content.
+ * @returns {Array|null} An array of question groups or null if parsing fails.
+ */
+function loadQuestionsFromCsv(csvString) {
+    if (!window.Papa) {
+        console.error('PapaParse is not loaded.');
+        showToast('CSV解析ライブラリが読み込まれていません。', 'error');
+        return null;
+    }
+
+    let questions = [];
+    try {
+        const results = Papa.parse(csvString, { header: true, skipEmptyLines: true });
+        const parsedData = results.data;
+
+        questions = parsedData.map((row, index) => {
+            const questionId = `q_csv_${Date.now()}_${index}`;
+            const type = (row.type || 'free_answer').trim();
+            const required = (row.required || 'FALSE').trim().toUpperCase() === 'TRUE';
+            const text = (row.text || '').trim();
+
+            if (!text) return null; // Skip rows without question text
+
+            const question = {
+                questionId,
+                type,
+                text: normalizeLocalization({ ja: text }),
+                required,
+            };
+
+            const optionsSource = (row['options/rows'] || '').trim();
+            const colsSource = (row.cols || '').trim();
+
+            if (type === 'single_answer' || type === 'multi_answer') {
+                if (optionsSource) {
+                    question.options = optionsSource.split(',').map((opt, optIndex) => ({
+                        optionId: `opt_${questionId}_${optIndex}`,
+                        text: normalizeLocalization({ ja: opt.trim() }),
+                    }));
+                }
+            } else if (type === 'matrix_sa' || type === 'matrix_ma') {
+                question.matrix = {
+                    rows: optionsSource ? optionsSource.split(',').map((r, rIndex) => ({
+                        rowId: `row_${questionId}_${rIndex}`,
+                        text: normalizeLocalization({ ja: r.trim() }),
+                    })) : [],
+                    cols: colsSource ? colsSource.split(',').map((c, cIndex) => ({
+                        colId: `col_${questionId}_${cIndex}`,
+                        text: normalizeLocalization({ ja: c.trim() }),
+                    })) : [],
+                };
+            }
+            
+            initializeQuestionMeta(question);
+            return question;
+
+        }).filter(q => q !== null); // Filter out invalid rows
+
+    } catch (error) {
+        console.error("CSV parsing error:", error);
+        throw error; // Re-throw to be caught by the event handler
+    }
+
+    if (questions.length === 0) {
+        return null;
+    }
+
+    return [{
+        groupId: 'group_from_csv_' + Date.now(),
+        title: normalizeLocalization({ ja: 'CSVから読み込んだ設問' }),
+        questions: questions,
+    }];
 }
 
 const normalizeMultilingual = (field) => {
@@ -835,8 +903,22 @@ const mapEnqueteToQuestions = (enqueteDetails) => {
         if (item.options && Array.isArray(item.options)) {
             question.options = item.options.map((opt, optIndex) => ({
                 optionId: `opt_${questionId}_${optIndex}`,
-                text: normalizeMultilingual(opt),
+                text: normalizeMultilingual(typeof opt === 'string' ? opt : opt.text || ''),
             }));
+        }
+
+        // Add mapping for matrix rows and columns
+        if (mappedType === 'matrix_sa' || mappedType === 'matrix_ma') {
+            question.matrix = {
+                rows: (item.rows || []).map((row, rowIndex) => ({
+                    rowId: `row_${questionId}_${rowIndex}`,
+                    text: normalizeMultilingual(typeof row === 'string' ? row : row.text || ''),
+                })),
+                cols: (item.columns || item.cols || []).map((col, colIndex) => ({
+                    colId: `col_${questionId}_${colIndex}`,
+                    text: normalizeMultilingual(typeof col === 'string' ? col : col.text || ''),
+                })),
+            };
         }
 
         return question;
@@ -897,99 +979,92 @@ async function initializePage() {
         registerAdditionalSettingsLinks();
         updateAdditionalSettingsAvailability();
 
-        // 1. Try loading from localStorage keyed by surveyId
         if (currentSurveyId) {
+            // --- EDIT MODE ---
+            let dataLoadedFromId = false;
+
+            // 1. Try loading from localStorage keyed by surveyId
             const keyedData = localStorage.getItem(`surveyData_${currentSurveyId}`);
             if (keyedData) {
-                surveyData = JSON.parse(keyedData);
-                
-            }
-        }
-
-        // 2. If not found, try loading generic data from localStorage
-        if (!surveyData || Object.keys(surveyData).length === 0) {
-            const genericData = loadSurveyDataFromLocalStorage(); // from surveyCreationData
-            if (genericData) {
-                surveyData = genericData;
-                
-            }
-        }
-
-        // 3. If still empty and surveyId is present, load from JSON files
-        if ((!surveyData || Object.keys(surveyData).length === 0) && currentSurveyId) {
-            
-
-            // Load canonical dataset from `/data/`
-            let surveysList = await fetchJson(resolveDashboardDataPath('core/surveys.json'));
-            let surveyInfo = surveysList?.find(s => s.id === currentSurveyId) || null;
-            let enqueteDetails = null;
-
-            if (surveyInfo) {
-                enqueteDetails = await fetchJson(resolveDashboardDataPath(`demos/sample-3/Enquete/${currentSurveyId}.json`));
-            }
-
-            // Re-fetch canonical surveys list to ensure metadata is available
-            if (!surveyInfo) {
-                surveysList = await fetchJson(resolveDashboardDataPath('core/surveys.json'));
-                surveyInfo = surveysList?.find(s => s.id === currentSurveyId) || null;
-            }
-
-            // Fallback: sample Enquete payloads
-            if (!enqueteDetails) {
-                enqueteDetails = await fetchJson(resolveDemoDataPath(`surveys/${currentSurveyId}.json`));
-            }
-
-            if (enqueteDetails) {
-                // If meta not available, derive from details file
-                const name = enqueteDetails.name || { ja: currentSurveyId, en: '' };
-                const displayTitle = enqueteDetails.displayTitle || name;
-                const description = enqueteDetails.description || { ja: '', en: '' };
-                surveyData = {
-                    id: currentSurveyId,
-                    name: name,
-                    displayTitle: displayTitle,
-                    description: description,
-                    memo: surveyInfo?.memo || '',
-                    periodStart: surveyInfo?.periodStart || enqueteDetails.periodStart || '',
-                    periodEnd: surveyInfo?.periodEnd || enqueteDetails.periodEnd || '',
-                    plan: surveyInfo?.plan || 'Standard',
-                    deadline: surveyInfo?.deadline || '',
-                    questionGroups: mapEnqueteToQuestions(enqueteDetails),
-                };
-                // Ensure group title is readable Japanese by default
-                if (surveyData.questionGroups && surveyData.questionGroups.length > 0) {
-                    surveyData.questionGroups[0].title = surveyData.questionGroups[0].title || { ja: 'インポートされた設問', en: 'Imported Questions' };
-                    if (typeof surveyData.questionGroups[0].title === 'object') {
-                        surveyData.questionGroups[0].title.ja = surveyData.questionGroups[0].title.ja || 'インポートされた設問';
-                        surveyData.questionGroups[0].title.en = surveyData.questionGroups[0].title.en || 'Imported Questions';
+                try {
+                    const parsedData = JSON.parse(keyedData);
+                    if (parsedData && Array.isArray(parsedData.questionGroups)) {
+                        surveyData = parsedData;
+                        dataLoadedFromId = true;
                     }
+                } catch (e) {
+                    console.error('Failed to parse survey data from localStorage:', e);
+                    localStorage.removeItem(`surveyData_${currentSurveyId}`);
                 }
-                
-
-            } else {
-                console.warn(`Survey with id "${currentSurveyId}" not found in any known source.`);
-                showToast(`Survey not found: ${currentSurveyId}`, 'error', 3000);
             }
+
+            // 2. If not in localStorage, load from data files
+            if (!dataLoadedFromId) {
+                let surveysList = await fetchJson(resolveDashboardDataPath('core/surveys.json'));
+                const surveyInfo = surveysList?.find(s => s.id === currentSurveyId) || null;
+                let enqueteDetails = null;
+
+                if (surveyInfo) {
+                    enqueteDetails = await fetchJson(resolveDashboardDataPath(`demos/sample-3/Enquete/${currentSurveyId}.json`));
+                }
+                if (!enqueteDetails) {
+                    enqueteDetails = await fetchJson(resolveDemoDataPath(`surveys/${currentSurveyId}.json`));
+                }
+
+                if (enqueteDetails) {
+                    const questionGroups = mapEnqueteToQuestions(enqueteDetails);
+                    if (questionGroups) {
+                        surveyData = {
+                            id: currentSurveyId,
+                            name: enqueteDetails.name || surveyInfo?.name || { ja: currentSurveyId, en: '' },
+                            displayTitle: enqueteDetails.displayTitle || surveyInfo?.displayTitle || enqueteDetails.name,
+                            description: enqueteDetails.description || surveyInfo?.description || { ja: '', en: '' },
+                            memo: enqueteDetails.memo || surveyInfo?.memo || '',
+                            periodStart: enqueteDetails.periodStart || surveyInfo?.periodStart || '',
+                            periodEnd: enqueteDetails.periodEnd || '',
+                            plan: enqueteDetails.plan || surveyInfo?.plan || 'Standard',
+                            deadline: enqueteDetails.deadline || surveyInfo?.deadline || '',
+                            questionGroups: questionGroups,
+                        };
+                    }
+                } else {
+                    console.warn(`Survey with id "${currentSurveyId}" not found.`);
+                    showToast(`Survey not found: ${currentSurveyId}`, 'error', 3000);
+                    surveyData = await fetchSurveyData(); // Fallback to new survey template
+                }
+            }
+        } else {
+            // --- NEW SURVEY MODE ---
+            console.log('No surveyId found, initializing a new survey...');
+            // Initialize with a minimal, empty survey structure
+            surveyData = {
+                id: null,
+                name: {},
+                displayTitle: {},
+                description: {},
+                memo: '',
+                periodStart: '',
+                periodEnd: '',
+                plan: 'Standard',
+                deadline: '',
+                questionGroups: [],
+                activeLanguages: ['ja'],
+                editorLanguage: 'ja'
+            };
+
+            // Apply any URL parameters for pre-filling
+            const surveyName = params.get('surveyName');
+            const displayTitle = params.get('displayTitle');
+            const memo = params.get('memo');
+            const periodStart = params.get('periodStart');
+            const periodEnd = params.get('periodEnd');
+
+            if (surveyName) surveyData.name = { ja: surveyName, en: '' };
+            if (displayTitle) surveyData.displayTitle = { ja: displayTitle, en: '' };
+            if (memo) surveyData.memo = memo;
+            if (periodStart) surveyData.periodStart = periodStart;
+            if (periodEnd) surveyData.periodEnd = periodEnd;
         }
-
-        // 4. If still no data, fall back to the default template
-        if (!surveyData || Object.keys(surveyData).length === 0) {
-            console.log('No survey data found. Fetching fallback template...');
-            surveyData = await fetchSurveyData(); // Reads data/surveys/sample_survey.json
-        }
-
-        // Always apply URL query parameter overrides
-        const surveyName = params.get('surveyName');
-        const displayTitle = params.get('displayTitle');
-        const memo = params.get('memo');
-        const periodStart = params.get('periodStart');
-        const periodEnd = params.get('periodEnd');
-
-        if (surveyName) surveyData.name = surveyName;
-        if (displayTitle) surveyData.displayTitle = displayTitle;
-        if (memo) surveyData.memo = memo;
-        if (periodStart) surveyData.periodStart = periodStart;
-        if (periodEnd) surveyData.periodEnd = periodEnd;
 
         setActiveLanguages(Array.isArray(surveyData.activeLanguages) ? surveyData.activeLanguages : activeLanguages);
         if (surveyData.editorLanguage) {
@@ -1231,6 +1306,43 @@ function setupEventListeners() {
             handleAddNewQuestionGroup();
         });
     }
+
+    // --- Delegated Change Listeners ---
+    document.body.addEventListener('change', (event) => {
+        const target = event.target;
+
+        // Handle question type change
+        const select = target.closest('.question-type-select');
+        if (select) {
+            const questionItem = select.closest('.question-item');
+            const groupEl = select.closest('.question-group');
+            if (!questionItem || !groupEl) return;
+            const groupId = groupEl.dataset.groupId;
+            const questionId = questionItem.dataset.questionId;
+            const newType = select.value;
+            handleChangeQuestionType(groupId, questionId, newType);
+            return;
+        }
+
+        // Handle required checkbox change
+        const checkbox = target.closest('.required-checkbox');
+        if (checkbox) {
+            const qItem = checkbox.closest('.question-item');
+            const gItem = checkbox.closest('.question-group');
+            if (qItem && gItem) {
+                const groupId = gItem.dataset.groupId;
+                const questionId = qItem.dataset.questionId;
+                const group = surveyData.questionGroups.find(g => g.groupId === groupId);
+                const question = group?.questions.find(q => q.questionId === questionId);
+                if (question) {
+                    question.required = checkbox.checked;
+                    setDirty(true);
+                    validateFormForSaveButton();
+                }
+            }
+            return;
+        }
+    });
 
     // --- Delegated Click-to-Action Listeners ---
     document.body.addEventListener('click', (event) => {
@@ -1699,7 +1811,20 @@ function attachPreviewListener() {
     previewBtn.addEventListener('click', async (e) => {
         e.preventDefault();
         try {
-            await handleOpenModal('surveyPreviewModal', 'modals/surveyPreviewModal.html');
+            const setupEventListeners = () => {
+                const modal = document.getElementById('surveyPreviewModal');
+                if (!modal) return;
+
+                const closeButtons = modal.querySelectorAll('[data-modal-close="surveyPreviewModal"]');
+                closeButtons.forEach(btn => {
+                    if (!btn.dataset.listenerAttached) {
+                        btn.addEventListener('click', () => closeModal('surveyPreviewModal'));
+                        btn.dataset.listenerAttached = 'true';
+                    }
+                });
+            };
+            
+            await handleOpenModal('surveyPreviewModal', 'modals/surveyPreviewModal.html', setupEventListeners);
             renderSurveyPreview();
         } catch (err) {
             console.error('Failed to open preview modal:', err);

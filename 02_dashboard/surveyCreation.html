@@ -16,6 +16,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
   <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval'">
+  <!-- Papa Parse CSV Parser -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
 </head>
 <body class="bg-background text-on-background">
 
@@ -270,6 +272,42 @@
           <button type="button" class="icon-button delete-question-btn" aria-label="設問を削除" title="設問を削除"><span class="material-icons text-error">delete</span></button>
         </div>
       </div>
+
+      <div class="multi-lang-input-group mt-4" data-field-key="questionText" data-input-type="input" data-label="設問文" data-placeholder-ja="設問文を入力">
+        <div class="input-group" data-lang="ja">
+            <input type="text" class="input-field question-text-input" data-lang="ja" placeholder="設問文を入力">
+            <label class="input-label">設問文</label>
+        </div>
+      </div>
+
+      <div class="mt-4 space-y-2 options-container"></div>
+
+      <div class="matrix-editor hidden mt-4 space-y-4">
+        <div>
+            <h4 class="text-base font-medium text-on-surface-variant mb-2">行</h4>
+            <div class="matrix-rows-list space-y-2"></div>
+            <button type="button" class="text-sm text-primary hover:underline mt-2 add-matrix-row-btn">+ 行を追加</button>
+        </div>
+        <div>
+            <h4 class="text-base font-medium text-on-surface-variant mb-2">列</h4>
+            <div class="matrix-cols-list space-y-2"></div>
+            <button type="button" class="text-sm text-primary hover:underline mt-2 add-matrix-col-btn">+ 列を追加</button>
+        </div>
+      </div>
+
+      <div class="mt-4 border-t border-outline-variant pt-4 flex items-center justify-end">
+        <div class="flex items-center">
+          <input type="checkbox" class="required-checkbox h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary">
+          <label class="required-label ml-2 block text-sm text-on-surface-variant">必須回答にする</label>
+        </div>
+      </div>
+
+      <!-- Configuration Sections -->
+      <div data-config-section="number" class="hidden mt-4 pt-4 border-t border-outline-variant space-y-3"></div>
+      <div data-config-section="date_time" class="hidden mt-4 pt-4 border-t border-outline-variant space-y-3"></div>
+      <div data-config-section="handwriting" class="hidden mt-4 pt-4 border-t border-outline-variant space-y-3"></div>
+    </div>
+  </template>
 
   <!-- Template: Option -->
   <template id="optionTemplate">
