@@ -355,6 +355,20 @@ function initLanguageSwitcher() {
     setLanguage(initial);
 }
 
+function updateTabIndicator() {
+    const tabsContainer = document.getElementById('languageEditorTabs');
+    const indicator = document.getElementById('language-tab-indicator');
+    if (!tabsContainer || !indicator) return;
+
+    const activeButton = tabsContainer.querySelector('button[aria-selected="true"]');
+    if (activeButton) {
+        indicator.style.left = `${activeButton.offsetLeft}px`;
+        indicator.style.width = `${activeButton.offsetWidth}px`;
+    } else {
+        indicator.style.width = '0px';
+    }
+}
+
 function renderLanguageSettings({ activeLanguages, editorLanguage, languageMap }) {
     const panel = document.getElementById('languageSelectionPanel');
     const tabs = document.getElementById('languageEditorTabs');
@@ -362,28 +376,30 @@ function renderLanguageSettings({ activeLanguages, editorLanguage, languageMap }
     if (panel) {
         panel.innerHTML = '';
         const selectable = SUPPORTED_LANGUAGES.filter((lang) => lang.code !== 'ja');
+        
         selectable.forEach((lang) => {
             const isSelected = activeLanguages.includes(lang.code);
             const button = document.createElement('button');
             button.type = 'button';
             button.dataset.lang = lang.code;
-            button.dataset.selected = isSelected ? 'true' : 'false';
-            button.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
-            button.className = [
-                'px-3 py-1 rounded-full border text-sm transition-colors duration-150',
-                isSelected
-                    ? 'bg-primary-container text-on-primary-container border-primary-container font-medium'
-                    : 'border-outline-variant text-on-surface hover:border-primary hover:text-primary'
-            ].join(' ');
-            button.textContent = lang.label;
+            
+            if (isSelected) {
+                button.setAttribute('aria-label', `${lang.label}を削除`);
+                button.className = 'flex items-center gap-1.5 pl-3 pr-2 py-1.5 rounded-full border border-transparent bg-secondary-container text-on-secondary-container shadow-sm text-sm';
+                button.innerHTML = `
+                    <span>${lang.label}</span>
+                    <span class="material-icons text-base" data-action="remove">cancel</span>
+                `;
+            } else {
+                button.setAttribute('aria-label', `${lang.label}を追加`);
+                button.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-outline bg-surface-container-highest text-on-surface hover:bg-surface-variant text-sm';
+                button.innerHTML = `
+                    <span class="material-icons text-base" data-action="add">add</span>
+                    <span>${lang.label}</span>
+                `;
+            }
             panel.appendChild(button);
         });
-        if (!panel.children.length) {
-            const hint = document.createElement('p');
-            hint.className = 'text-xs text-on-surface-variant';
-            hint.textContent = '追加言語は選択されていません。';
-            panel.appendChild(hint);
-        }
     }
 
     if (tabs) {
@@ -396,18 +412,16 @@ function renderLanguageSettings({ activeLanguages, editorLanguage, languageMap }
             button.setAttribute('role', 'tab');
             const isActive = code === editorLanguage;
             button.setAttribute('aria-selected', isActive ? 'true' : 'false');
-            button.className = [
-                'px-3 py-1 rounded-full border text-sm transition-colors duration-150',
-                isActive
-                    ? 'bg-primary text-on-primary border-primary shadow-sm'
-                    : 'border-outline-variant text-on-surface hover:border-primary hover:text-primary'
-            ].join(' ');
+            button.className = `px-4 py-3 text-sm font-semibold transition-colors duration-200 ${isActive ? 'text-primary' : 'text-on-surface-variant hover:text-on-surface'}`;
             button.textContent = lang.shortLabel || lang.label;
             tabs.appendChild(button);
         });
     }
 
-    bindLanguageControlEvents();
+    Promise.resolve().then(() => {
+        updateTabIndicator();
+        bindLanguageControlEvents();
+    });
 }
 
 function bindLanguageControlEvents() {
@@ -417,30 +431,34 @@ function bindLanguageControlEvents() {
         panel.addEventListener('click', (event) => {
             const button = event.target.closest('button[data-lang]');
             if (!button) return;
+
             const lang = button.dataset.lang;
-            const selected = button.dataset.selected === 'true';
+            const actionTarget = event.target.closest('[data-action]');
+            const action = actionTarget ? actionTarget.dataset.action : 'add'; // Default to add if clicking the body
+
             const extras = getActiveLanguages().filter((code) => code !== 'ja');
             let next = [...extras];
-            if (selected) {
+            let editorLangShouldChange = false;
+
+            if (action === 'remove') {
                 next = next.filter((code) => code !== lang);
-            } else {
+            } else { // Add action
+                if (extras.includes(lang)) return; // Already added, do nothing
                 if (next.length >= 2) {
                     showToast('追加言語は最大2件までです。', 'warning');
                     return;
                 }
                 next.push(lang);
+                editorLangShouldChange = true; // Mark that the editor language should switch
             }
-            const changed = setActiveLanguages(next);
-            if (changed) {
+
+            const languagesChanged = setActiveLanguages(next);
+            const editorChanged = editorLangShouldChange ? setEditorLanguage(lang) : false;
+
+            if (languagesChanged || editorChanged) {
                 syncSurveyLocalization();
                 setDirty(true);
                 updateAndRenderAll();
-            } else {
-                renderLanguageSettings({
-                    activeLanguages: getActiveLanguages(),
-                    editorLanguage: getEditorLanguage(),
-                    languageMap: LANGUAGE_MAP
-                });
             }
         });
     }
@@ -449,10 +467,17 @@ function bindLanguageControlEvents() {
     if (tabs && tabs.dataset.bound !== 'true') {
         tabs.dataset.bound = 'true';
         tabs.addEventListener('click', (event) => {
-            const button = event.target.closest('button[data-lang]');
+            const button = event.target.closest('button[role="tab"]');
             if (!button) return;
+
             const lang = button.dataset.lang;
             if (setEditorLanguage(lang)) {
+                tabs.querySelectorAll('button').forEach(btn => {
+                    const isActive = btn.dataset.lang === lang;
+                    btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+                    btn.className = `px-4 py-3 text-sm font-semibold transition-colors duration-200 ${isActive ? 'text-primary' : 'text-on-surface-variant hover:text-on-surface'}`;
+                });
+                updateTabIndicator();
                 syncSurveyLocalization();
                 updateAndRenderAll();
             }
@@ -1003,12 +1028,7 @@ async function initializePage() {
                 const surveyInfo = surveysList?.find(s => s.id === currentSurveyId) || null;
                 let enqueteDetails = null;
 
-                if (surveyInfo) {
-                    enqueteDetails = await fetchJson(resolveDashboardDataPath(`demos/sample-3/Enquete/${currentSurveyId}.json`));
-                }
-                if (!enqueteDetails) {
-                    enqueteDetails = await fetchJson(resolveDemoDataPath(`surveys/${currentSurveyId}.json`));
-                }
+                enqueteDetails = await fetchJson(resolveDemoDataPath(`surveys/${currentSurveyId}.json`));
 
                 if (enqueteDetails) {
                     const questionGroups = mapEnqueteToQuestions(enqueteDetails);

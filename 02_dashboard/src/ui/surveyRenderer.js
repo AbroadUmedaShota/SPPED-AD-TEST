@@ -77,62 +77,70 @@ function getLanguageMeta(languageOptions = {}, code = FALLBACK_LANGUAGE) {
 }
 
 function hydrateSingleLanguageField(container, value, languageOptions = {}, overrides = {}) {
-  if (!container) return;
-  const inputGroup = container.querySelector('.input-group');
-  if (!inputGroup) return;
-  const input = inputGroup.querySelector('input, textarea');
-  const label = inputGroup.querySelector('.input-label');
-  const defaultFieldKey = container.dataset.fieldKey || 'field';
-  const fieldKey = overrides.fieldKey || defaultFieldKey;
-  const placeholderJa = overrides.placeholderJa ?? container.dataset.placeholderJa ?? '';
-  const baseLabel = overrides.label ?? container.dataset.label ?? '';
-  const isRequired = overrides.required ?? (container.dataset.required === 'true');
-  const editorLanguage = languageOptions.editorLanguage || FALLBACK_LANGUAGE;
-  const langMeta = getLanguageMeta(languageOptions, editorLanguage);
-  const valueStr = getLocalizedText(value, editorLanguage);
+    if (!container) return;
 
-  if (input) {
-    input.value = valueStr;
-    input.dataset.lang = editorLanguage;
-    input.id = `${fieldKey}_${editorLanguage}`;
-    if (editorLanguage === 'ja') {
-      input.placeholder = placeholderJa || '';
-    } else {
-      const fallbackValue = getLocalizedText(value, 'ja');
-      input.placeholder = fallbackValue || placeholderJa || '';
-    }
-    if (isRequired && editorLanguage === 'ja') {
-      input.required = true;
-      input.setAttribute('aria-required', 'true');
-    } else {
-      input.required = false;
-      input.removeAttribute('aria-required');
-    }
-  }
+    const { activeLanguages = ['ja'], editorLanguage = 'ja' } = languageOptions;
+    const errorElement = container.querySelector('.error-message');
 
-  inputGroup.dataset.lang = editorLanguage;
+    const existingGroups = new Map();
+    container.querySelectorAll('.input-group[data-lang]').forEach(group => {
+        existingGroups.set(group.dataset.lang, group);
+    });
 
-  if (label) {
-    label.textContent = baseLabel ? `${baseLabel}（${langMeta.shortLabel || langMeta.label}）` : langMeta.label;
-    if (input?.id) {
-      label.setAttribute('for', input.id);
+    const jaTemplate = existingGroups.get('ja');
+    if (!jaTemplate) {
+        console.warn('hydrateSingleLanguageField: Japanese template not found.');
+        return;
     }
-  }
 
-  const badgeSelector = `[data-role="untranslated-badge"][data-for="${fieldKey}_${editorLanguage}"]`;
-  const currentBadge = container.querySelector(badgeSelector);
-  if (editorLanguage !== 'ja' && !valueStr) {
-    if (!currentBadge) {
-      const badge = document.createElement('p');
-      badge.dataset.role = 'untranslated-badge';
-      badge.dataset.for = `${fieldKey}_${editorLanguage}`;
-      badge.className = 'text-xs text-on-surface-variant italic mt-1';
-      badge.textContent = '未翻訳の状態です。';
-      container.appendChild(badge);
-    }
-  } else if (currentBadge) {
-    currentBadge.remove();
-  }
+    activeLanguages.forEach(langCode => {
+        if (!existingGroups.has(langCode)) {
+            const fieldKey = overrides.fieldKey || container.dataset.fieldKey || 'field';
+            let newHtml = jaTemplate.outerHTML;
+            
+            newHtml = newHtml.replace(new RegExp(`(data-lang=)["']ja["']`, 'g'), `$1"${langCode}"`);
+            newHtml = newHtml.replace(new RegExp(`(id=)["']${fieldKey}_ja["']`, 'g'), `$1"${fieldKey}_${langCode}"`);
+            newHtml = newHtml.replace(new RegExp(`(for=)["']${fieldKey}_ja["']`, 'g'), `$1"${fieldKey}_${langCode}"`);
+
+            if (errorElement) {
+                errorElement.insertAdjacentHTML('beforebegin', newHtml);
+            } else {
+                container.insertAdjacentHTML('beforeend', newHtml);
+            }
+        }
+        existingGroups.delete(langCode);
+    });
+
+    existingGroups.forEach(group => group.remove());
+
+    container.querySelectorAll('.input-group[data-lang]').forEach(group => {
+        const langCode = group.dataset.lang;
+        if (!activeLanguages.includes(langCode)) return;
+
+        group.classList.toggle('hidden', langCode !== editorLanguage);
+
+        const input = group.querySelector('input, textarea');
+        if (input) {
+            input.value = getLocalizedText(value, langCode);
+            const placeholderJa = overrides.placeholderJa ?? container.dataset.placeholderJa ?? ' ';
+            input.placeholder = (langCode === 'ja') ? placeholderJa : (getLocalizedText(value, 'ja') || placeholderJa);
+        }
+
+        const label = group.querySelector('.input-label');
+        if (label) {
+            const langMeta = getLanguageMeta(languageOptions, langCode);
+            const baseLabel = overrides.label ?? container.dataset.label ?? '';
+            let labelText = baseLabel;
+            if (activeLanguages.length > 1) {
+                labelText += `（${langMeta.shortLabel || langMeta.label}）`;
+            }
+            const isRequired = overrides.required ?? (container.dataset.required === 'true');
+            if (isRequired && baseLabel) {
+                labelText += '<span class="text-error">*</span>';
+            }
+            label.innerHTML = labelText;
+        }
+    });
 }
 
 export function populateBasicInfo(surveyData, languageOptions = {}) {

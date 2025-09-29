@@ -55,11 +55,20 @@
                 <span class="material-icons expand-icon">expand_less</span>
               </div>
               <div id="basicInfoContent" class="accordion-content p-4 space-y-6">
-                <section class="space-y-3">
-                  <h3 class="text-on-surface text-lg font-semibold">言語設定</h3>
-                  <p class="text-sm text-on-surface-variant">日本語は必須言語です。必要に応じて追加言語を選択し、タブを切り替えて各言語の文言を編集してください。</p>
-                  <div id="languageSelectionPanel" class="flex flex-wrap gap-2" role="group" aria-label="追加言語"></div>
-                  <div id="languageEditorTabs" class="flex flex-wrap gap-2 pt-2" role="tablist" aria-label="入力言語タブ"></div>
+                <section id="language-settings-section" class="space-y-4">
+                  <div>
+                    <h3 class="text-on-surface text-lg font-semibold">追加言語</h3>
+                    <p class="text-sm text-on-surface-variant mb-2">アンケートで利用する言語を選択してください。</p>
+                    <div id="languageSelectionPanel" class="flex flex-wrap gap-2" role="group" aria-label="追加言語"></div>
+                  </div>
+                  <div class="mt-4">
+                     <h3 class="text-on-surface text-lg font-semibold">入力言語</h3>
+                     <p class="text-sm text-on-surface-variant mb-2">各項目のテキストを入力する言語を選択してください。</p>
+                    <div class="relative border-b border-outline-variant">
+                      <div id="languageEditorTabs" class="relative flex items-center gap-4" role="tablist" aria-label="入力言語タブ"></div>
+                      <span id="language-tab-indicator" class="absolute bottom-0 h-0.5 bg-primary transition-all duration-300"></span>
+                    </div>
+                  </div>
                 </section>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <!-- アンケート名（管理用）: 多言語 -->
@@ -85,10 +94,6 @@
                     <div class="input-group" data-lang="ja">
                       <textarea id="description_ja" placeholder="(例) 本調査は新サービスの改善のためにご協力をお願いします。" class="input-field h-24 resize-y" aria-describedby="descriptionError"></textarea>
                       <label for="description_ja" class="input-label">説明</label>
-                    </div>
-                    <div class="input-group hidden" data-lang="en">
-                      <textarea id="description_en" placeholder="For example, we ask for your cooperation in improving our new service." class="input-field h-24 resize-y" aria-describedby="descriptionError"></textarea>
-                      <label for="description_en" class="input-label">Description</label>
                     </div>
                     <div id="descriptionError" class="error-message text-error text-sm mt-1 hidden" aria-live="polite">この入力は必須です</div>
                   </div>
