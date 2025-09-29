@@ -979,63 +979,31 @@ async function initializePage() {
         registerAdditionalSettingsLinks();
         updateAdditionalSettingsAvailability();
 
-        let dataLoadedFromId = false; // Flag to check if data was loaded via surveyId
-
-        // 1. Try loading from localStorage keyed by surveyId
         if (currentSurveyId) {
+            // --- EDIT MODE ---
+            let dataLoadedFromId = false;
+
+            // 1. Try loading from localStorage keyed by surveyId
             const keyedData = localStorage.getItem(`surveyData_${currentSurveyId}`);
             if (keyedData) {
                 try {
                     const parsedData = JSON.parse(keyedData);
-                    // Check if the loaded data is valid and has question groups
                     if (parsedData && Array.isArray(parsedData.questionGroups)) {
                         surveyData = parsedData;
-                        dataLoadedFromId = true; // Mark as loaded
+                        dataLoadedFromId = true;
                     }
                 } catch (e) {
                     console.error('Failed to parse survey data from localStorage:', e);
-                    localStorage.removeItem(`surveyData_${currentSurveyId}`); // Remove corrupted data
+                    localStorage.removeItem(`surveyData_${currentSurveyId}`);
                 }
             }
-        }
 
-        // 2. If not found, try loading generic data from localStorage
-        if (!dataLoadedFromId) {
-            const genericData = loadSurveyDataFromLocalStorage(); // from surveyCreationData
-            if (genericData) {
-                // Check if the loaded data is valid and has question groups
-                if (genericData && Array.isArray(genericData.questionGroups)) {
-                    surveyData = genericData;
-                }
-            }
-        }
+            // 2. If not in localStorage, load from data files
+            if (!dataLoadedFromId) {
+                let surveysList = await fetchJson(resolveDashboardDataPath('core/surveys.json'));
+                const surveyInfo = surveysList?.find(s => s.id === currentSurveyId) || null;
+                let enqueteDetails = null;
 
-        // 3. If still empty and surveyId is present, load from data files (CSV first)
-        if (!dataLoadedFromId && currentSurveyId) {
-            let surveysList = await fetchJson(resolveDashboardDataPath('core/surveys.json'));
-            const surveyInfo = surveysList?.find(s => s.id === currentSurveyId) || null;
-
-            let questionGroups = null;
-
-            // --- Attempt to load from CSV first ---
-            try {
-                const csvPath = resolveDemoDataPath(`surveys/${currentSurveyId}.csv`);
-                const response = await fetch(csvPath);
-                if (response.ok) {
-                    const csvString = await response.text();
-                    questionGroups = loadQuestionsFromCsv(csvString);
-                    console.log(`Successfully loaded questions from ${csvPath}`);
-                } else {
-                    console.log(`No CSV file found at ${csvPath}, falling back to JSON.`);
-                }
-            } catch (error) {
-                console.error(`Error fetching CSV for surveyId ${currentSurveyId}:`, error);
-                // Proceed to JSON fallback
-            }
-
-            // --- If CSV loading fails, fall back to JSON ---
-            let enqueteDetails = null;
-            if (!questionGroups) {
                 if (surveyInfo) {
                     enqueteDetails = await fetchJson(resolveDashboardDataPath(`demos/sample-3/Enquete/${currentSurveyId}.json`));
                 }
@@ -1044,48 +1012,47 @@ async function initializePage() {
                 }
 
                 if (enqueteDetails) {
-                    questionGroups = mapEnqueteToQuestions(enqueteDetails);
+                    const questionGroups = mapEnqueteToQuestions(enqueteDetails);
+                    if (questionGroups) {
+                        surveyData = {
+                            id: currentSurveyId,
+                            name: enqueteDetails.name || surveyInfo?.name || { ja: currentSurveyId, en: '' },
+                            displayTitle: enqueteDetails.displayTitle || surveyInfo?.displayTitle || enqueteDetails.name,
+                            description: enqueteDetails.description || surveyInfo?.description || { ja: '', en: '' },
+                            memo: enqueteDetails.memo || surveyInfo?.memo || '',
+                            periodStart: enqueteDetails.periodStart || surveyInfo?.periodStart || '',
+                            periodEnd: enqueteDetails.periodEnd || '',
+                            plan: enqueteDetails.plan || surveyInfo?.plan || 'Standard',
+                            deadline: enqueteDetails.deadline || surveyInfo?.deadline || '',
+                            questionGroups: questionGroups,
+                        };
+                    }
+                } else {
+                    console.warn(`Survey with id "${currentSurveyId}" not found.`);
+                    showToast(`Survey not found: ${currentSurveyId}`, 'error', 3000);
+                    surveyData = await fetchSurveyData(); // Fallback to new survey template
                 }
             }
+        } else {
+            // --- NEW SURVEY MODE ---
+            console.log('No surveyId found, initializing a new survey...');
+            // Initialize with a minimal, empty survey structure
+            surveyData = {
+                id: null,
+                name: {},
+                displayTitle: {},
+                description: {},
+                memo: '',
+                periodStart: '',
+                periodEnd: '',
+                plan: 'Standard',
+                deadline: '',
+                questionGroups: [],
+                activeLanguages: ['ja'],
+                editorLanguage: 'ja'
+            };
 
-            // --- Construct surveyData if we have questions ---
-            if (questionGroups) {
-                const name = enqueteDetails?.name || surveyInfo?.name || { ja: currentSurveyId, en: '' };
-                const displayTitle = enqueteDetails?.displayTitle || surveyInfo?.displayTitle || name;
-                const description = enqueteDetails?.description || surveyInfo?.description || { ja: '', en: '' };
-                const periodStart = enqueteDetails?.periodStart || surveyInfo?.periodStart || '';
-                const periodEnd = enqueteDetails?.periodEnd || '';
-                const memo = enqueteDetails?.memo || surveyInfo?.memo || '';
-                const plan = enqueteDetails?.plan || surveyInfo?.plan || 'Standard';
-                const deadline = enqueteDetails?.deadline || surveyInfo?.deadline || '';
-
-                surveyData = {
-                    id: currentSurveyId,
-                    name: name,
-                    displayTitle: displayTitle,
-                    description: description,
-                    memo: memo,
-                    periodStart: periodStart,
-                    periodEnd: periodEnd,
-                    plan: plan,
-                    deadline: deadline,
-                    questionGroups: questionGroups,
-                };
-                dataLoadedFromId = true; // Mark as loaded
-            } else {
-                console.warn(`Survey with id "${currentSurveyId}" not found in any known source (CSV or JSON).`);
-                showToast(`Survey not found: ${currentSurveyId}`, 'error', 3000);
-            }
-        }
-
-        // 4. If still no data, fall back to the default template
-        if (!dataLoadedFromId && Object.keys(surveyData).length === 0) {
-            console.log('No survey data found. Fetching fallback template...');
-            surveyData = await fetchSurveyData(); // Reads data/surveys/sample_survey.json
-        }
-
-        // Only apply URL query parameter overrides if no data was loaded by ID
-        if (!dataLoadedFromId) {
+            // Apply any URL parameters for pre-filling
             const surveyName = params.get('surveyName');
             const displayTitle = params.get('displayTitle');
             const memo = params.get('memo');

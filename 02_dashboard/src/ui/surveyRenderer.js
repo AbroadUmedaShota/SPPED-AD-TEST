@@ -532,7 +532,8 @@ export function renderOutlineMap() {
 
     if (isQuestion) {
         targetElement = h.closest('.question-item');
-        text = h.textContent || '';
+        const input = targetElement ? targetElement.querySelector('.question-text-input') : null;
+        text = input ? input.value : (h.textContent || '');
         level = 3;
     } else if (isGroup) {
         targetElement = h.closest('.question-group');
