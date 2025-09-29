@@ -72,10 +72,7 @@ export function initPasswordChange() {
         window.location.href = 'index.html';
     }
 
-    function handleForgotPassword(e) {
-        e.preventDefault();
-        showToast('パスワードリセット機能は現在準備中です。管理者にお問い合わせください。', 'info');
-    }
+
 
     async function handleNextStep1() {
         const password = currentPasswordInput.value;
@@ -190,7 +187,6 @@ export function initPasswordChange() {
     function setupEventListeners() {
         cancelStep1Btn.addEventListener('click', handleCancel);
         nextStep1Btn.addEventListener('click', handleNextStep1);
-        forgotPasswordLink.addEventListener('click', handleForgotPassword);
 
         backStep2Btn.addEventListener('click', handleBackStep2);
         clearStep2Btn.addEventListener('click', handleClearStep2);
