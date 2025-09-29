@@ -99,10 +99,12 @@
                   </div>
 
                   <!-- 期間 -->
-                  <div class="input-group relative md:col-span-2">
-                    <input type="text" id="periodRange" class="input-field" placeholder=" " required aria-required="true" aria-describedby="periodRangeError">
-                    <label for="periodRange" class="input-label">アンケート期間<span class="text-error">*</span></label>
-                    <span role="button" tabindex="0" class="material-icons absolute top-1/2 right-3 -translate-y-1/2 text-on-surface-variant cursor-pointer">calendar_today</span>
+                  <div class="input-group md:col-span-2">
+                    <div class="relative">
+                        <input type="text" id="periodRange" class="input-field pr-10" placeholder=" " required aria-required="true" aria-describedby="periodRangeError">
+                        <label for="periodRange" class="input-label">アンケート期間<span class="text-error">*</span></label>
+                        <span role="button" tabindex="0" class="material-icons absolute top-1/2 right-3 -translate-y-1/2 text-on-surface-variant cursor-pointer">calendar_today</span>
+                    </div>
                     <div id="periodRangeError" class="error-message text-error text-sm mt-1 hidden" aria-live="polite">この入力は必須です</div>
                   </div>
 
