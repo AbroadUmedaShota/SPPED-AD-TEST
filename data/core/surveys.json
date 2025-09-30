@@ -23,10 +23,22 @@
     "plan": "Standard",
     "deadline": "2025-08-31",
     "estimatedBillingAmount": 50000,
-    "bizcardEnabled": true,
-    "bizcardRequest": 120,
     "bizcardCompletionCount": 110,
-    "thankYouEmailSettings": "送信済み",
+    "bizcardSettings": {
+      "bizcardEnabled": true,
+      "bizcardRequest": 120,
+      "dataConversionPlan": "standard",
+      "dataConversionSpeed": "normal",
+      "couponCode": "",
+      "internalMemo": "これは社内用のメモです。"
+    },
+    "thankYouEmailSettings": {
+      "thankYouEmailEnabled": true,
+      "sendMethod": "manual",
+      "emailTemplateId": "default",
+      "emailSubject": "ご来場ありがとうございました",
+      "emailBody": "本日はご来場いただき、誠にありがとうございました。\n\n株式会社〇〇\n{会社名} {氏名}様"
+    },
     "createdAt": "2025-07-01T00:00:00+09:00"
   },
   {
@@ -1313,10 +1325,22 @@
     "plan": "Free",
     "deadline": "2025-07-03",
     "estimatedBillingAmount": 161500,
-    "bizcardEnabled": false,
-    "bizcardRequest": 0,
     "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "未設定",
+    "bizcardSettings": {
+      "bizcardEnabled": false,
+      "bizcardRequest": 0,
+      "dataConversionPlan": "standard",
+      "dataConversionSpeed": "normal",
+      "couponCode": "",
+      "internalMemo": ""
+    },
+    "thankYouEmailSettings": {
+      "thankYouEmailEnabled": false,
+      "sendMethod": "manual",
+      "emailTemplateId": "default",
+      "emailSubject": "",
+      "emailBody": ""
+    },
     "createdAt": "2025-05-21T00:00:00+09:00"
   },
   {
@@ -1798,5 +1822,89 @@
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "未設定",
     "createdAt": "2025-01-11T00:00:00+09:00"
+  },
+  {
+    "id": "sv_0001_25019",
+    "groupId": "GROUP002",
+    "name": {
+      "ja": "追加アンケートA",
+      "en": "Additional Survey A"
+    },
+    "displayTitle": {
+      "ja": "追加アンケートA",
+      "en": "Additional Survey A"
+    },
+    "description": {
+      "ja": "データ追加テスト用のアンケートです。",
+      "en": "Survey for data addition test."
+    },
+    "status": "準備中",
+    "answerCount": 10,
+    "realtimeAnswers": 2,
+    "periodStart": "2025-08-01",
+    "periodEnd": "2025-08-31",
+    "dataCompletionDate": "",
+    "plan": "Premium",
+    "deadline": "2025-09-15",
+    "estimatedBillingAmount": 25000,
+    "bizcardCompletionCount": 0,
+    "bizcardSettings": {
+      "bizcardEnabled": true,
+      "bizcardRequest": 150,
+      "dataConversionPlan": "premium",
+      "dataConversionSpeed": "fast",
+      "couponCode": "SAVE10",
+      "internalMemo": "要優先対応"
+    },
+    "thankYouEmailSettings": {
+      "thankYouEmailEnabled": true,
+      "sendMethod": "auto",
+      "emailTemplateId": "special",
+      "emailSubject": "【特別オファー】ご来場ありがとうございます",
+      "emailBody": "先日はご来場いただき、誠にありがとうございました。"
+    },
+    "createdAt": "2025-07-20T00:00:00+09:00"
+  },
+  {
+    "id": "sv_0001_25020",
+    "groupId": "GROUP002",
+    "name": {
+      "ja": "追加アンケートB",
+      "en": "Additional Survey B"
+    },
+    "displayTitle": {
+      "ja": "追加アンケートB",
+      "en": "Additional Survey B"
+    },
+    "description": {
+      "ja": "データ追加テスト用のアンケートその2です。",
+      "en": "Survey for data addition test 2."
+    },
+    "status": "草稿",
+    "answerCount": 0,
+    "realtimeAnswers": 0,
+    "periodStart": "2025-09-01",
+    "periodEnd": "2025-09-30",
+    "dataCompletionDate": "",
+    "plan": "Free",
+    "deadline": "2025-10-15",
+    "estimatedBillingAmount": 0,
+    "bizcardCompletionCount": 0,
+    "bizcardSettings": {
+      "bizcardEnabled": false,
+      "bizcardRequest": 0,
+      "dataConversionPlan": "standard",
+      "dataConversionSpeed": "normal",
+      "couponCode": "",
+      "internalMemo": ""
+    },
+    "thankYouEmailSettings": {
+      "thankYouEmailEnabled": false,
+      "sendMethod": "manual",
+      "emailTemplateId": "default",
+      "emailSubject": "",
+      "emailBody": ""
+    },
+    "createdAt": "2025-07-21T00:00:00+09:00"
   }
 ]

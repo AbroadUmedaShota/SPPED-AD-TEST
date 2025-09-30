@@ -58,6 +58,9 @@ export function initBizcardSettings() {
                 fetchBizcardSettings(state.surveyId)
             ]);
 
+            // Set default value for the toggle
+            settingsData.bizcardEnabled = settingsData.bizcardEnabled ?? false;
+
             state.settings = settingsData;
             // Deep copy for initial state comparison
             state.initialSettings = JSON.parse(JSON.stringify(settingsData)); 
@@ -144,8 +147,14 @@ export function initBizcardSettings() {
         // Update state from form
         state.settings.bizcardEnabled = bizcardEnabledToggle.checked;
         state.settings.bizcardRequest = parseInt(bizcardRequestInput.value, 10) || 0;
-        state.settings.dataConversionPlan = document.querySelector('input[name="dataConversionPlan"]:checked').value;
-        state.settings.dataConversionSpeed = document.querySelector('input[name="dataConversionSpeed"]:checked').value;
+        const planChecked = document.querySelector('input[name="dataConversionPlan"]:checked');
+        if (planChecked) {
+            state.settings.dataConversionPlan = planChecked.value;
+        }
+        const speedChecked = document.querySelector('input[name="dataConversionSpeed"]:checked');
+        if (speedChecked) {
+            state.settings.dataConversionSpeed = speedChecked.value;
+        }
 
         updateFullUI();
     }
@@ -208,6 +217,18 @@ export function initBizcardSettings() {
      * Updates all relevant parts of the UI based on the current state.
      */
     function updateFullUI() {
+        const isEnabled = bizcardEnabledToggle.checked;
+        const settingsFields = document.getElementById('bizcardSettingsFields');
+        const statusSpan = document.getElementById('bizcardEnabledStatus');
+
+        if (isEnabled) {
+            settingsFields.classList.remove('hidden');
+            statusSpan.textContent = '有効';
+        } else {
+            settingsFields.classList.add('hidden');
+            statusSpan.textContent = '無効';
+        }
+
         updateSettingsVisibility();
         const estimate = calculateEstimate(state.settings, state.appliedCoupon);
         renderEstimate(estimate);

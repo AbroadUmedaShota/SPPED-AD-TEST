@@ -5,20 +5,7 @@
 
 import { resolveDashboardDataPath } from '../utils.js';
 
-// --- Mock Data ---
-
-
-const mockSettings = {
-    "123": {
-        bizcardEnabled: true,
-        bizcardRequest: 100,
-        dataConversionPlan: 'standard',
-        dataConversionSpeed: 'normal',
-        couponCode: '',
-        internalMemo: 'これは社内用のメモです。'
-    }
-};
-
+// --- Mock Data for Coupons (as backend is not implemented) ---
 const mockCoupons = {
     'SAVE10': { type: 'discount', value: 1000, message: 'クーポン「SAVE10」が適用されました (-¥1,000)。' },
     'SPEEDUP': { type: 'speedBoost', value: 1, message: 'クーポン「SPEEDUP」が適用されました (納期1営業日短縮)。' }
@@ -36,7 +23,6 @@ export async function fetchSurveyData(surveyId) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         const surveys = await response.json();
-        console.log('Fetched surveys:', surveys);
         const survey = surveys.find(s => s.id === surveyId);
 
         if (survey) {
@@ -59,17 +45,30 @@ export async function fetchSurveyData(surveyId) {
  * @returns {Promise<object>} 設定データ。
  */
 export async function fetchBizcardSettings(surveyId) {
-    
-    // API呼び出しをシミュレート
-    await new Promise(resolve => setTimeout(resolve, 300));
-    return mockSettings[surveyId] || {
-        bizcardEnabled: false,
-        bizcardRequest: 0,
-        dataConversionPlan: 'standard',
-        dataConversionSpeed: 'normal',
-        couponCode: '',
-        internalMemo: ''
-    };
+    try {
+        const response = await fetch(resolveDashboardDataPath('core/surveys.json'));
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const surveys = await response.json();
+        const survey = surveys.find(s => s.id === surveyId);
+
+        if (survey && typeof survey.bizcardSettings === 'object' && survey.bizcardSettings !== null) {
+            return survey.bizcardSettings;
+        }
+        // フォールバック用のデフォルト設定
+        return {
+            bizcardEnabled: false,
+            bizcardRequest: 0,
+            dataConversionPlan: 'standard',
+            dataConversionSpeed: 'normal',
+            couponCode: '',
+            internalMemo: ''
+        };
+    } catch (error) {
+        console.error('Failed to fetch bizcard settings:', error);
+        throw new Error('Failed to load bizcard settings data.');
+    }
 }
 
 /**
@@ -78,8 +77,7 @@ export async function fetchBizcardSettings(surveyId) {
  * @returns {Promise<object>} クーポン情報。
  */
 export async function validateCoupon(code) {
-    
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API call
     const coupon = mockCoupons[code];
     if (coupon) {
         return { success: true, ...coupon };
@@ -93,10 +91,9 @@ export async function validateCoupon(code) {
  * @returns {Promise<object>} 保存結果。
  */
 export async function saveBizcardSettings(settings) {
-    
-    // API呼び出しをシミュレート
+    // This is a mock function. In a real application, this would send data to a server.
+    console.log('Saving settings (mock):', settings);
     await new Promise(resolve => setTimeout(resolve, 1500));
-    // ここで実際にデータを保存する処理
-    mockSettings[settings.surveyId] = settings;
+    // In a real app, you'd update the data source. Here we just log it.
     return { success: true, message: '設定を保存しました。' };
 }

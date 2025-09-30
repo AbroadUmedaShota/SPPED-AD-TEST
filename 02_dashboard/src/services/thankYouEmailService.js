@@ -8,15 +8,7 @@ import { resolveDashboardDataPath } from '../utils.js';
 // --- Mock Data ---
 
 
-const mockEmailSettings = {
-    "123": {
-        thankYouEmailEnabled: true,
-        sendMethod: 'manual',
-        emailTemplateId: 'default',
-        emailSubject: 'ご来場ありがとうございました',
-        emailBody: '本日はご来場いただき、誠にありがとうございました。\n\n株式会社〇〇\n{会社名} {氏名}様'
-    }
-};
+
 
 const mockEmailTemplates = {
     'default': { id: 'default', name: 'デフォルトテンプレート', subject: 'ご来場ありがとうございました', body: '本日はご来場いただき、誠にありがとうございました。\n\n株式会社〇〇\n{会社名} {氏名}様' },
@@ -56,10 +48,15 @@ export async function getInitialData(surveyId) {
             recipientCount: survey.answerCount, // Assuming recipient count is answer count
         };
 
-        const settings = mockEmailSettings[surveyId] || { 
-            thankYouEmailEnabled: false, 
-            sendMethod: 'manual' 
-        };
+        const settings = (survey && typeof survey.thankYouEmailSettings === 'object' && survey.thankYouEmailSettings !== null) 
+            ? survey.thankYouEmailSettings 
+            : { 
+                thankYouEmailEnabled: false, 
+                sendMethod: 'manual',
+                emailTemplateId: '',
+                emailSubject: '',
+                emailBody: ''
+              };
 
         return {
             surveyData: surveyData,

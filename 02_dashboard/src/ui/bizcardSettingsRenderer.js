@@ -35,8 +35,9 @@ function cacheDOMElements() {
  */
 export function renderSurveyInfo(surveyData, surveyId) {
     if (!dom.pageTitle) cacheDOMElements(); // DOM要素がなければキャッシュ
-    dom.pageTitle.textContent = `アンケート『${surveyData.surveyName}』の名刺データ化設定`;
-    dom.surveyNameDisplay.textContent = surveyData.surveyName;
+    const surveyName = (surveyData.name && surveyData.name.ja) ? surveyData.name.ja : (surveyData.surveyName || '');
+    dom.pageTitle.textContent = `アンケート『${surveyName}』の名刺データ化設定`;
+    dom.surveyNameDisplay.textContent = surveyName;
     dom.surveyIdDisplay.textContent = surveyId;
     dom.surveyPeriodDisplay.textContent = `${surveyData.periodStart} - ${surveyData.periodEnd}`;
 }
@@ -66,6 +67,13 @@ export function updateSettingsVisibility() {
     const isEnabled = dom.bizcardEnabledToggle.checked;
     dom.bizcardSettingsFields.style.display = isEnabled ? '' : 'none';
     dom.bizcardEnabledStatus.textContent = isEnabled ? '有効' : '無効';
+
+    // Directly control toggle background color to avoid CSS class issues
+    const toggleBackground = dom.bizcardEnabledToggle.nextElementSibling;
+    if (toggleBackground) {
+        // Tailwind's blue-600 and gray-200
+        toggleBackground.style.backgroundColor = isEnabled ? '#2563EB' : '#E5E7EB';
+    }
 }
 
 /**

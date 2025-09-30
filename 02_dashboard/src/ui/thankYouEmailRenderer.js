@@ -34,8 +34,9 @@ function cacheDOMElements() {
  */
 export function renderSurveyInfo(surveyData, surveyId) {
     if (!dom.pageTitle) cacheDOMElements();
-    document.getElementById('surveyNameInTitle').textContent = surveyData.surveyName;
-    dom.surveyNameDisplay.textContent = surveyData.surveyName;
+    const surveyName = (surveyData.name && surveyData.name.ja) ? surveyData.name.ja : (surveyData.surveyName || '');
+    document.getElementById('surveyNameInTitle').textContent = surveyName;
+    dom.surveyNameDisplay.textContent = surveyName;
     dom.surveyIdDisplay.textContent = surveyId;
     dom.surveyPeriodDisplay.textContent = `${surveyData.periodStart} - ${surveyData.periodEnd}`;
 }
@@ -97,10 +98,13 @@ export function populateVariables(variables, onVariableClick) {
 export function updateUI(isEnabled, surveyData) {
     if (!dom.thankYouEmailEnabledToggle) cacheDOMElements();
     dom.thankYouEmailEnabledStatus.textContent = isEnabled ? '有効' : '無効';
-    dom.thankYouEmailSettingsFields.style.display = isEnabled ? 'block' : 'none';
+
     if (isEnabled) {
+        dom.thankYouEmailSettingsFields.classList.remove('hidden');
         updateRecipientList(surveyData);
         updateSendButtonState(surveyData);
+    } else {
+        dom.thankYouEmailSettingsFields.classList.add('hidden');
     }
 }
 
