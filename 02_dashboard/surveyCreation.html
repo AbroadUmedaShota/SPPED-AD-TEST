@@ -18,6 +18,32 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval'">
   <!-- Papa Parse CSV Parser -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+  <style>
+    #custom-tutorial-svg-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 10000;
+        pointer-events: none; /* オーバーレイ全体を透過させ、下の要素をクリック可能にする */
+    }
+    .custom-tutorial-highlight {
+        position: relative; /* ポップアップの位置基準のため */
+        box-shadow: 0 0 0 2px white, 0 0 0 4px var(--md-sys-color-primary, #6750A4);
+        border-radius: 8px;
+        transition: box-shadow 0.3s ease-in-out;
+    }
+    .custom-tutorial-highlight-light-bg {
+        position: relative;
+        box-shadow: 0 0 12px 3px rgba(255, 255, 255, 0.9); /* 白いグロー効果 */
+        border-radius: 8px;
+        transition: box-shadow 0.3s ease-in-out;
+    }
+    #custom-tutorial-popover {
+        z-index: 10002;
+    }
+  </style>
 </head>
 <body class="bg-background text-on-background">
 
@@ -220,6 +246,9 @@
   <!-- Sortable.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
+  <!-- Tutorial Scripts -->
+  <script src="./src/surveyCreationTutorial.js"></script>
+
   <!-- Page JS -->
   <script type="module" src="src/surveyCreation.js"></script>
 
@@ -319,5 +348,17 @@
     </div>
   </template>
 
+  <script>
+    document.addEventListener('pageInitialized', () => {
+        const tutorialStatus = localStorage.getItem('speedad-tutorial-status');
+        if (tutorialStatus === 'survey-creation-started') {
+            if (typeof startSurveyCreationTutorial === 'function') {
+                startSurveyCreationTutorial();
+            } else {
+                console.error('Tutorial function is not available.');
+            }
+        }
+    });
+  </script>
 </body>
 </html>

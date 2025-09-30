@@ -1,16 +1,18 @@
 
 /**
+ * チュートリアルの driver.js インスタンスを保持するための変数
+ */
+let mainTutorialDriver = null;
+
+/**
  * チュートリアルを開始するメイン関数
- * この関数はグローバルスコープに定義されます
  */
 function startTutorial() {
-    // グローバルスコープから driver と handleOpenModal を取得
     const driver = window.driver.js.driver;
     const handleOpenModal = window.handleOpenModal;
 
     if (!driver || !handleOpenModal) {
-        console.error("Tutorial dependencies (driver.js or handleOpenModal) not found.");
-        localStorage.setItem('speedad-tutorial-status', 'completed');
+        console.error("Tutorial dependencies not found.");
         return;
     }
 
@@ -18,63 +20,27 @@ function startTutorial() {
         setStatus: (status) => localStorage.setItem('speedad-tutorial-status', status),
     };
 
-    /**
-     * 新規アンケート作成モーダル内のチュートリアルを開始します。
-     */
-    function startNewSurveyModalTutorial() {
-        // モーダル内のコンポーネントが初期化されるのを少し待つ
-        setTimeout(() => {
-            const modalDriver = driver({
-                showProgress: false, // 進捗表記を非表示に
-                animate: true,
-                showButtons: ['next', 'previous', 'close'],
-                onDestroyed: () => {
-                    tutorialState.setStatus('completed');
-                    const modal = document.getElementById('newSurveyModal');
-                    if(modal) modal.remove();
-                },
-                steps: [
-                    {
-                        element: '#surveyName',
-                        popover: {
-                            title: 'アンケート名',
-                            description: '社内でアンケートを識別・管理するための名称です。管理しやすい名称をご入力ください。'
-                        }
-                    },
-                    {
-                        element: '#displayTitle',
-                        popover: {
-                            title: '表示タイトル',
-                            description: 'こちらが、アンケート画面で回答者様に表示される正式なタイトルとなります。'
-                        }
-                    },
-                    {
-                        element: '#newSurveyPeriodRange',
-                        popover: {
-                            title: '回答期間',
-                            description: 'アンケートを実施する期間をカレンダーより設定します。展示会の会期などをご指定ください。'
-                        }
-                    },
-                    {
-                        element: '#createSurveyFromModalBtn',
-                        popover: {
-                            title: '作成の実行',
-                            description: '基本情報の入力は以上です。これでチュートリアルは完了です。 (このトレーニングでは実際の作成は行われません)'
-                        }
-                    }
-                ]
-            });
-            modalDriver.drive();
-        }, 200);
-    }
+    const proceedToNextTutorial = () => {
+        if (mainTutorialDriver) {
+            mainTutorialDriver.destroy();
+        }
+        handleOpenModal('newSurveyModal', 'modals/newSurveyModal.html', () => {
+            startNewSurveyModalTutorial();
+        });
+    };
 
-    // メインのチュートリアル定義
-    const mainDriver = driver({
-        showProgress: false, // 進捗表記を非表示に
+    mainTutorialDriver = driver({
+        showProgress: false,
         animate: true,
-        showButtons: ['next', 'close'],
+        allowClose: false,
+        showButtons: ['close'],
+        nextBtnText: '次へ',
+        prevBtnText: '戻る',
+        doneBtnText: '完了',
+        closeBtnText: '閉じる',
         onDestroyed: () => {
             tutorialState.setStatus('completed');
+            mainTutorialDriver = null;
         },
         steps: [
             {
@@ -83,20 +49,152 @@ function startTutorial() {
                     title: 'アンケートの新規作成',
                     description: '新しいアンケートを作成するには、こちらのボタンをクリックします。'
                 },
-                onNextClick: (element, step, { moving, destroy }) => {
-                    moving.prevent(); // 自動で次のステップに進むのを防ぐ
-                    
-                    // モーダルを開き、そのコールバックでモーダル用チュートリアルを開始
-                    handleOpenModal('newSurveyModal', 'modals/newSurveyModal.html', () => {
-                        // メインのチュートリアルは役目を終えたので破棄
-                        destroy();
-                        // モーダル用のチュートリアルを開始
-                        startNewSurveyModalTutorial();
-                    });
+                onHighlightStarted: (element) => {
+                    element.addEventListener('click', () => {
+                        proceedToNextTutorial();
+                    }, { once: true });
                 }
             }
         ]
     });
 
-    mainDriver.drive();
+    mainTutorialDriver.drive();
+}
+
+
+/**
+ * 新規アンケート作成モーダル内のチュートリアル
+ */
+function startNewSurveyModalTutorial() {
+    const driver = window.driver.js.driver;
+    const tutorialState = {
+        setStatus: (status) => localStorage.setItem('speedad-tutorial-status', status),
+    };
+
+    setTimeout(() => {
+        let modalDriver;
+
+        const surveyModalSteps = [
+            { // Step 0: アンケート名
+                element: '#surveyName',
+                popover: {
+                    title: 'アンケート名',
+                    description: '社内でアンケートを識別・管理するための名称です。管理しやすい名称をご入力ください。'
+                },
+                showButtons: ['next', 'close'],
+            },
+            { // Step 1: 表示タイトル
+                element: '#displayTitle',
+                popover: {
+                    title: '表示タイトル',
+                    description: 'こちらが、アンケート画面で回答者様に表示される正式なタイトルとなります。'
+                },
+                showButtons: ['next', 'previous', 'close'],
+            },
+            { // Step 2: 回答期間の設定
+                element: '#newSurveyPeriodRange',
+                popover: {
+                    title: '回答期間の設定',
+                    description: '回答期間はこのように設定します。例として、本日から3日間の期間をカレンダー上で確認してみましょう。',
+                    side: 'top',
+                    align: 'start'
+                },
+                showButtons: ['next', 'previous', 'close'],
+                onHighlightStarted: (element) => {
+                    const flatpickrInstance = element._flatpickr;
+                    if (!flatpickrInstance) return;
+
+                    const today = new Date();
+                    const threeDaysLater = new Date();
+                    threeDaysLater.setDate(today.getDate() + 3);
+                    flatpickrInstance.setDate([today, threeDaysLater], true);
+
+                    setTimeout(() => {
+                        flatpickrInstance.open();
+
+                        const nextBtn = document.querySelector('.driver-popover-next-btn');
+                        if (nextBtn) {
+                            const newNextBtn = nextBtn.cloneNode(true);
+                            nextBtn.parentNode.replaceChild(newNextBtn, nextBtn);
+
+                            newNextBtn.addEventListener('click', () => {
+                                const currentFlatpickr = document.getElementById('newSurveyPeriodRange')._flatpickr;
+                                if (currentFlatpickr) {
+                                    currentFlatpickr.close();
+                                }
+                                setTimeout(() => {
+                                    modalDriver.moveNext();
+                                }, 50);
+                            });
+                        }
+                    }, 100);
+                },
+            },
+                {
+                    element: '#createSurveyFromModalBtn',
+                    popover: {
+                        title: '設問設定へ',
+                        description: 'それでは「作成の実行」ボタンをクリックし、設問設定へお進みください。'
+                    },
+                    showButtons: [], // ボタン非表示
+                    onHighlightStarted: (element) => {
+                        element.addEventListener('mousedown', (event) => {
+                            // 本来のクリックイベントと、main.jsのリスナーの実行を阻止
+                            event.preventDefault();
+                            event.stopPropagation();
+
+                            localStorage.setItem('speedad-tutorial-status', 'survey-creation-started');
+
+                            // main.jsのロジックを模倣し、入力値をURLパラメータで引き継ぐ
+                            const surveyName = document.getElementById('surveyName').value.trim();
+                            const displayTitle = document.getElementById('displayTitle').value.trim();
+                            const surveyMemo = document.getElementById('surveyMemo').value.trim();
+                            const periodInput = document.getElementById('newSurveyPeriodRange');
+                            
+                            const params = new URLSearchParams();
+                            // チュートリアル中は入力が空の可能性があるので、ダミーテキストを入れる
+                            params.set('surveyName', surveyName || 'チュートリアル・アンケート');
+                            params.set('displayTitle', displayTitle || 'チュートリアル・表示タイトル');
+                            if (surveyMemo) params.set('memo', surveyMemo);
+
+                            if (periodInput && periodInput._flatpickr && periodInput._flatpickr.selectedDates.length === 2) {
+                                const selectedDates = periodInput._flatpickr.selectedDates;
+                                const surveyStartDate = periodInput._flatpickr.formatDate(selectedDates[0], 'Y-m-d');
+                                const surveyEndDate = periodInput._flatpickr.formatDate(selectedDates[1], 'Y-m-d');
+                                params.set('periodStart', surveyStartDate);
+                                params.set('periodEnd', surveyEndDate);
+                            } else {
+                                // 日付が未選択の場合もダミーを入れる
+                                const today = new Date();
+                                const threeDaysLater = new Date();
+                                threeDaysLater.setDate(today.getDate() + 3);
+                                const formatDate = (date) => date.toISOString().split('T')[0];
+                                params.set('periodStart', formatDate(today));
+                                params.set('periodEnd', formatDate(threeDaysLater));
+                            }
+                            
+                            window.location.href = `surveyCreation.html?${params.toString()}`;
+                        }, { once: true });
+                    }
+                }
+        ];
+
+        modalDriver = driver({
+            showProgress: false,
+            animate: true,
+            allowClose: false,
+            nextBtnText: '次へ',
+            prevBtnText: '戻る',
+            doneBtnText: '完了',
+            closeBtnText: '閉じる',
+            onDestroyed: () => {
+                tutorialState.setStatus('completed');
+                const modal = document.getElementById('newSurveyModal');
+                if (modal) modal.remove();
+            },
+            steps: surveyModalSteps
+        });
+
+        modalDriver.drive();
+    }, 200);
 }

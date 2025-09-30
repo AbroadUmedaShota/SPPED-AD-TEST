@@ -105,6 +105,11 @@ window.copyUrl = async function(inputElement) {
         await copyTextToClipboard(inputElement.value);
     }
 };
+// チュートリアル関数をグローバルに公開
+window.startSurveyCreationTutorial = () => {
+    // この関数は surveyCreationTutorial.js で上書きされる
+    console.log('startSurveyCreationTutorial called from placeholder');
+};
 
 document.addEventListener('DOMContentLoaded', async () => {
 
@@ -117,13 +122,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     initLanguageSwitcher();
 
     // Check for tutorial status AFTER common elements are loaded
-    if (localStorage.getItem('speedad-tutorial-status') === 'pending') {
+    const tutorialStatus = localStorage.getItem('speedad-tutorial-status');
+    if (tutorialStatus === 'pending') {
         if (typeof startTutorial === 'function') {
             startTutorial();
-        } else {
-            console.error("Tutorial function 'startTutorial' not found. Skipping tutorial.");
-            // If tutorial function isn't available, mark as complete to avoid loops
-            localStorage.setItem('speedad-tutorial-status', 'completed');
         }
     }
 

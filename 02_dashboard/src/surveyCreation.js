@@ -1150,6 +1150,8 @@ async function initializePage() {
             }
         }, 100);
 
+        document.dispatchEvent(new CustomEvent('pageInitialized'));
+
     } catch (error) {
         console.error('Failed to initialize page:', error);
         console.error('Error details:', error.message, error.stack);
