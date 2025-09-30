@@ -704,15 +704,7 @@ function setupInputBindings() {
     // periodStart and periodEnd are now handled by the flatpickr onChange event in initializePage
     bind('memo', ['memo']);
 
-const planEl = document.getElementById('plan');
-    if (planEl) {
-        const onPlan = () => { 
-            surveyData.plan = planEl.value; 
-            validateFormForSaveButton(); 
-            setDirty(true);
-        };
-        planEl.addEventListener('change', onPlan);
-    }
+
 
     // Dynamic bindings via delegation (groups/questions/options)
     const container = document.getElementById('questionGroupsContainer');
@@ -1127,16 +1119,36 @@ async function initializePage() {
             setEditorLanguage(surveyData.editorLanguage);
         }
 
-        syncSurveyLocalization();
-
         updateAndRenderAll();
-
         restoreAccordionState();
         const fabActions = {
             onAddQuestion: (questionType) => handleAddNewQuestion(null, questionType),
             onAddGroup: () => handleAddNewQuestionGroup()
         };
         initializeFab('fab-container', fabActions);
+
+        // Force update bizcard plan display at the very end
+        setTimeout(() => {
+            try {
+                const surveyId = new URLSearchParams(window.location.search).get('surveyId');
+                const bizcardPlanValue = localStorage.getItem(`bizcardPlan_${surveyId}`);
+                const planDisplayEl = document.getElementById('selectedBizcardPlan');
+
+                if (planDisplayEl && bizcardPlanValue) {
+                    const planMap = {
+                        'normal': '通常作業プラン',
+                        'express': '特急作業プラン',
+                        'super-express': '超特急プラン',
+                        'ondemand': 'オンデマンドプラン'
+                    };
+                    planDisplayEl.textContent = planMap[bizcardPlanValue] || bizcardPlanValue;
+                } else if (planDisplayEl) {
+                    planDisplayEl.textContent = '未設定';
+                }
+            } catch (e) {
+                console.error('Failed to display bizcard plan:', e);
+            }
+        }, 100);
 
     } catch (error) {
         console.error('Failed to initialize page:', error);

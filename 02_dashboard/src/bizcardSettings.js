@@ -19,7 +19,6 @@ import { showConfirmationModal } from './confirmationModal.js';
 
 export function initBizcardSettings() {
     // --- DOM Element Cache ---
-    const bizcardEnabledToggle = document.getElementById('bizcardEnabledToggle');
     const bizcardRequestInput = document.getElementById('bizcardRequest');
     const dataConversionPlanSelection = document.getElementById('dataConversionPlanSelection');
     const dataConversionSpeedSelection = document.getElementById('dataConversionSpeedSelection');
@@ -58,8 +57,8 @@ export function initBizcardSettings() {
                 fetchBizcardSettings(state.surveyId)
             ]);
 
-            // Set default value for the toggle
-            settingsData.bizcardEnabled = settingsData.bizcardEnabled ?? false;
+            // Set default value for bizcardEnabled to true as the toggle is removed
+            settingsData.bizcardEnabled = true;
 
             state.settings = settingsData;
             // Deep copy for initial state comparison
@@ -81,20 +80,26 @@ export function initBizcardSettings() {
      * Sets up all event listeners for the page.
      */
     function setupEventListeners() {
+        const workPlanSelection = document.getElementById('workPlanSelection');
         const formElements = [
-            bizcardEnabledToggle, bizcardRequestInput,
-            dataConversionPlanSelection, dataConversionSpeedSelection
+            bizcardRequestInput,
+            dataConversionPlanSelection, dataConversionSpeedSelection, workPlanSelection
         ];
-        formElements.forEach(el => el.addEventListener('change', handleFormChange));
-        bizcardRequestInput.addEventListener('input', handleFormChange);
-
-        applyCouponBtn.addEventListener('click', handleApplyCoupon);
-        saveButton.addEventListener('click', handleSaveSettings);
-        cancelButton.addEventListener('click', handleCancel);
-        toggleMemoSectionBtn.addEventListener('click', () => {
-            memoSection.classList.toggle('hidden');
-            toggleMemoSectionBtn.querySelector('.material-icons').classList.toggle('rotate-180');
+        formElements.forEach(el => {
+            if(el) el.addEventListener('change', (e) => handleFormChange(e));
         });
+        if(bizcardRequestInput) bizcardRequestInput.addEventListener('input', (e) => handleFormChange(e));
+
+        if(applyCouponBtn) applyCouponBtn.addEventListener('click', handleApplyCoupon);
+        if(saveButton) saveButton.addEventListener('click', handleSaveSettings);
+        if(cancelButton) cancelButton.addEventListener('click', handleCancel);
+        if(toggleMemoSectionBtn) {
+            toggleMemoSectionBtn.addEventListener('click', () => {
+                if(memoSection) memoSection.classList.toggle('hidden');
+                const icon = toggleMemoSectionBtn.querySelector('.material-icons');
+                if(icon) icon.classList.toggle('rotate-180');
+            });
+        }
     }
 
     /**
@@ -103,7 +108,6 @@ export function initBizcardSettings() {
      */
     function hasFormChanged() {
         const currentSettings = {
-            bizcardEnabled: bizcardEnabledToggle.checked,
             bizcardRequest: parseInt(bizcardRequestInput.value, 10) || 0,
             dataConversionPlan: document.querySelector('input[name="dataConversionPlan"]:checked')?.value,
             dataConversionSpeed: document.querySelector('input[name="dataConversionSpeed"]:checked')?.value,
@@ -112,14 +116,11 @@ export function initBizcardSettings() {
 
         const initial = state.initialSettings;
 
-        // Compare each value. Note the loose equality for number/string conversion.
-        if (currentSettings.bizcardEnabled != initial.bizcardEnabled) return true;
         if (currentSettings.bizcardRequest != initial.bizcardRequest) return true;
         if (currentSettings.dataConversionPlan != initial.dataConversionPlan) return true;
         if (currentSettings.dataConversionSpeed != initial.dataConversionSpeed) return true;
         if (currentSettings.internalMemo.trim() !== (initial.internalMemo || '').trim()) return true;
         
-        // Also check if a coupon was applied or changed
         if ((couponCodeInput.value || '') !== (initial.couponCode || '')) return true;
 
         return false;
@@ -143,17 +144,23 @@ export function initBizcardSettings() {
     /**
      * Handles changes in form inputs and updates the UI accordingly.
      */
-    function handleFormChange() {
-        // Update state from form
-        state.settings.bizcardEnabled = bizcardEnabledToggle.checked;
-        state.settings.bizcardRequest = parseInt(bizcardRequestInput.value, 10) || 0;
-        const planChecked = document.querySelector('input[name="dataConversionPlan"]:checked');
-        if (planChecked) {
-            state.settings.dataConversionPlan = planChecked.value;
-        }
-        const speedChecked = document.querySelector('input[name="dataConversionSpeed"]:checked');
-        if (speedChecked) {
-            state.settings.dataConversionSpeed = speedChecked.value;
+    function handleFormChange(event) {
+        const target = event.target;
+        if (!target) return;
+
+        const name = target.name || target.id;
+        const value = target.type === 'checkbox' ? target.checked : target.value;
+
+        switch (name) {
+            case 'dataConversionPlan':
+                state.settings.dataConversionPlan = value;
+                break;
+            case 'dataConversionSpeed':
+                state.settings.dataConversionSpeed = value;
+                break;
+            case 'bizcardRequest':
+                state.settings.bizcardRequest = parseInt(value, 10) || 0;
+                break;
         }
 
         updateFullUI();
@@ -200,6 +207,8 @@ export function initBizcardSettings() {
         try {
             const result = await saveBizcardSettings(finalSettings);
             if (result.success) {
+
+
                 showToast('名刺データ化設定を保存し、依頼を確定しました！', 'success');
                 setTimeout(() => window.location.href = 'index.html', 1000);
             } else {
@@ -217,19 +226,11 @@ export function initBizcardSettings() {
      * Updates all relevant parts of the UI based on the current state.
      */
     function updateFullUI() {
-        const isEnabled = bizcardEnabledToggle.checked;
         const settingsFields = document.getElementById('bizcardSettingsFields');
-        const statusSpan = document.getElementById('bizcardEnabledStatus');
-
-        if (isEnabled) {
+        if(settingsFields) {
             settingsFields.classList.remove('hidden');
-            statusSpan.textContent = '有効';
-        } else {
-            settingsFields.classList.add('hidden');
-            statusSpan.textContent = '無効';
         }
 
-        updateSettingsVisibility();
         const estimate = calculateEstimate(state.settings, state.appliedCoupon);
         renderEstimate(estimate);
         validateForm();

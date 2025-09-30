@@ -108,14 +108,13 @@
                     <div id="periodRangeError" class="error-message text-error text-sm mt-1 hidden" aria-live="polite">この入力は必須です</div>
                   </div>
 
-                  <!-- プラン -->
+                  <!-- 選択中の作業プラン -->
                   <div class="input-group md:col-span-2">
-                    <select id="plan" class="input-field" required aria-required="true">
-                      <option value="Standard">Standard</option>
-                      <option value="Premium">Premium</option>
-                    </select>
-                    <label for="plan" class="input-label">プラン<span class="text-error">*</span></label>
+                    <div id="selectedBizcardPlan" class="input-field-static font-semibold text-on-surface">未設定</div>
+                    <label class="input-label-static">名刺データ化プラン</label>
                   </div>
+
+
                 </div>
               </div>
             </div>

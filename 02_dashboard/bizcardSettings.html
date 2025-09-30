@@ -53,37 +53,67 @@
                 <div class="flex flex-col lg:flex-row gap-6">
                     <!-- 名刺データ化設定フォーム -->
                     <div class="bg-surface p-6 rounded-xl space-y-6 lg:w-2/3">
-                        <div class="flex items-center justify-between p-4 bg-surface-container rounded-lg shadow-sm">
-                            <label for="bizcardEnabledToggle" class="text-on-surface font-semibold text-lg">名刺データ化</label>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" value="" id="bizcardEnabledToggle" class="sr-only peer">
-                                <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                                <span class="ml-3 text-sm font-medium text-on-surface-variant" id="bizcardEnabledStatus">無効</span>
-                            </label>
-                        </div>
-
                         <div id="bizcardSettingsFields" class="space-y-6">
 
                             <!-- データ化項目プラン -->
                             <div class="space-y-2">
-                                <label class="text-on-surface font-semibold">データ化項目プラン</label>
+                                
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="dataConversionPlanSelection">
                                     <!-- Plan cards will be dynamically inserted here -->
                                 </div>
                             </div>
 
+                            <!-- データ化作業プラン -->
+                            <div class="space-y-2">
+                                <h2 class="text-on-surface text-xl font-bold mb-4">作業プラン選択</h2>
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="workPlanSelection">
+                                    
+                                    <div class="relative">
+                                        <input class="sr-only peer" type="radio" id="normalPlan" name="dataConversionPlan" value="normal" checked>
+                                        <label class="flex flex-col items-center p-4 bg-surface-container rounded-lg border border-outline cursor-pointer peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-primary" for="normalPlan">
+                                            <span class="text-on-surface font-semibold">通常作業プラン</span>
+                                            <span class="text-on-surface-variant text-sm mt-1">納期目安: 6営業日</span>
+                                        </label>
+                                    </div>
+
+                                    <div class="relative">
+                                        <input class="sr-only peer" type="radio" id="expressPlan" name="dataConversionPlan" value="express">
+                                        <label class="flex flex-col items-center p-4 bg-surface-container rounded-lg border border-outline cursor-pointer peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-primary" for="expressPlan">
+                                            <span class="text-on-surface font-semibold">特急作業プラン</span>
+                                            <span class="text-on-surface-variant text-sm mt-1">納期目安: 3営業日</span>
+                                        </label>
+                                    </div>
+
+                                    <div class="relative">
+                                        <input class="sr-only peer" type="radio" id="superExpressPlan" name="dataConversionPlan" value="super-express">
+                                        <label class="flex flex-col items-center p-4 bg-surface-container rounded-lg border border-outline cursor-pointer peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-primary" for="superExpressPlan">
+                                            <span class="text-on-surface font-semibold">超特急プラン</span>
+                                            <span class="text-on-surface-variant text-sm mt-1">納期目安: 1営業日</span>
+                                        </label>
+                                    </div>
+
+                                    <div class="relative">
+                                        <input class="sr-only peer" type="radio" id="ondemandPlan" name="dataConversionPlan" value="ondemand">
+                                        <label class="flex flex-col items-center p-4 bg-surface-container rounded-lg border border-outline cursor-pointer peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-primary" for="ondemandPlan">
+                                            <span class="text-on-surface font-semibold whitespace-nowrap">オンデマンドプラン</span>
+                                            <span class="text-on-surface-variant text-sm mt-1">納期目安: 当日中</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
                             <!-- データ化スピードプラン -->
                             <div class="space-y-2">
-                                <label class="text-on-surface font-semibold">データ化スピードプラン</label>
+                                
                                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="dataConversionSpeedSelection">
                                     <!-- Speed plan cards will be dynamically inserted here -->
                                 </div>
                             </div>
 
-                            <!-- 名刺データ化依頼枚数 -->
+                            <!-- 見込み枚数 -->
                             <div class="input-group">
                                 <input type="number" id="bizcardRequest" min="1" placeholder=" " class="input-field">
-                                <label for="bizcardRequest" class="input-label">名刺データ化依頼枚数</label>
+                                <label for="bizcardRequest" class="input-label">見込み枚数</label>
                                 <span class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">枚</span>
                                 <p class="input-error-message"></p>
                             </div>

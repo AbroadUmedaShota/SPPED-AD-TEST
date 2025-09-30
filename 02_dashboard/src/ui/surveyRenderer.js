@@ -191,11 +191,11 @@ export function populateBasicInfo(surveyData, languageOptions = {}) {
     }
   }
 
-  const planSelect = document.getElementById('plan');
+
+
   const deadlineInput = document.getElementById('deadline');
   const memoTextarea = document.getElementById('memo');
 
-  if (planSelect) planSelect.value = surveyData.plan || 'Standard';
   if (deadlineInput) deadlineInput.value = surveyData.deadline || '';
   if (memoTextarea) memoTextarea.value = surveyData.memo || '';
 }

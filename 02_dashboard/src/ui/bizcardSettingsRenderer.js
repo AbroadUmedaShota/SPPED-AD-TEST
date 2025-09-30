@@ -14,8 +14,6 @@ function cacheDOMElements() {
     dom.surveyNameDisplay = document.getElementById('surveyNameDisplay');
     dom.surveyIdDisplay = document.getElementById('surveyIdDisplay');
     dom.surveyPeriodDisplay = document.getElementById('surveyPeriodDisplay');
-    dom.bizcardEnabledToggle = document.getElementById('bizcardEnabledToggle');
-    dom.bizcardEnabledStatus = document.getElementById('bizcardEnabledStatus');
     dom.bizcardSettingsFields = document.getElementById('bizcardSettingsFields');
     dom.bizcardRequestInput = document.getElementById('bizcardRequest');
     dom.couponCodeInput = document.getElementById('couponCode');
@@ -48,9 +46,8 @@ export function renderSurveyInfo(surveyData, surveyId) {
  */
 export function setInitialFormValues(settings) {
     if (!settings) return; // settings が null や undefined なら何もしない
-    if (!dom.bizcardEnabledToggle) cacheDOMElements();
+    if (!dom.bizcardRequestInput) cacheDOMElements();
 
-    dom.bizcardEnabledToggle.checked = settings.bizcardEnabled || false;
     dom.bizcardRequestInput.value = settings.bizcardRequest || 0;
     dom.couponCodeInput.value = settings.couponCode || '';
     dom.internalMemo.value = settings.internalMemo || '';
@@ -68,19 +65,10 @@ export function setInitialFormValues(settings) {
 
 /**
  * 名刺データ化設定エリアの表示/非表示を切り替えます。
+ * (関連するUIが削除されたため、この関数は現在何もしません)
  */
 export function updateSettingsVisibility() {
-    if (!dom.bizcardEnabledToggle) cacheDOMElements();
-    const isEnabled = dom.bizcardEnabledToggle.checked;
-    dom.bizcardSettingsFields.style.display = isEnabled ? '' : 'none';
-    dom.bizcardEnabledStatus.textContent = isEnabled ? '有効' : '無効';
-
-    // Directly control toggle background color to avoid CSS class issues
-    const toggleBackground = dom.bizcardEnabledToggle.nextElementSibling;
-    if (toggleBackground) {
-        // Tailwind's blue-600 and gray-200
-        toggleBackground.style.backgroundColor = isEnabled ? '#2563EB' : '#E5E7EB';
-    }
+    // No-op
 }
 
 /**
@@ -108,24 +96,20 @@ export function displayCouponResult(couponResult) {
  * @returns {boolean} 検証が成功したかどうか。
  */
 export function validateForm() {
-    if (!dom.bizcardEnabledToggle) cacheDOMElements();
+    if (!dom.bizcardRequestInput) cacheDOMElements();
     let isValid = true;
-    if (dom.bizcardEnabledToggle.checked) {
-        const value = parseInt(dom.bizcardRequestInput.value || 0, 10);
-        const errorEl = dom.bizcardRequestInput.parentElement.querySelector('.input-error-message');
-        if (value <= 0) {
-            errorEl.textContent = '依頼枚数は1以上の数値を入力してください。';
-            dom.bizcardRequestInput.classList.add('border-error');
-            isValid = false;
-        } else {
-            errorEl.textContent = '';
-            dom.bizcardRequestInput.classList.remove('border-error');
-        }
+    
+    const value = parseInt(dom.bizcardRequestInput.value || 0, 10);
+    const errorEl = dom.bizcardRequestInput.parentElement.querySelector('.input-error-message');
+    if (value <= 0) {
+        errorEl.textContent = '依頼枚数は1以上の数値を入力してください。';
+        dom.bizcardRequestInput.classList.add('border-error');
+        isValid = false;
     } else {
-        const errorEl = dom.bizcardRequestInput.parentElement.querySelector('.input-error-message');
-        if(errorEl) errorEl.textContent = '';
+        errorEl.textContent = '';
         dom.bizcardRequestInput.classList.remove('border-error');
     }
+
     dom.saveButton.disabled = !isValid;
     return isValid;
 }
