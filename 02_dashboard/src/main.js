@@ -116,6 +116,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initialize the language switcher after the header is loaded
     initLanguageSwitcher();
 
+    // Check for tutorial status AFTER common elements are loaded
+    if (localStorage.getItem('speedad-tutorial-status') === 'pending') {
+        if (typeof startTutorial === 'function') {
+            startTutorial();
+        } else {
+            console.error("Tutorial function 'startTutorial' not found. Skipping tutorial.");
+            // If tutorial function isn't available, mark as complete to avoid loops
+            localStorage.setItem('speedad-tutorial-status', 'completed');
+        }
+    }
+
     // --- Global Escape Key Listener for Modals & Sidebar ---
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape') {

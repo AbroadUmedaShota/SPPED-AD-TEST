@@ -1,14 +1,71 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>初回ログイン画面</title>
-  <style>
-    body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; }
-    h1 { color: #333; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPEED ADへようこそ</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+        }
+        .gradient-text {
+            background: linear-gradient(90deg, #4F46E5, #818CF8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
 </head>
-<body>
-  <h1>初回ログインユーザー向けのインデックスページ（未実装）</h1>
+<body class="bg-gray-50 flex items-center justify-center min-h-screen">
+
+    <div class="text-center p-8 max-w-2xl mx-auto">
+        <div class="mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold gradient-text mb-4">SPEED AD へようこそ！</h1>
+            <p class="text-gray-600 text-lg">アカウントの作成、ありがとうございます。</p>
+            <p class="text-gray-600 text-lg">サービスの基本的な使い方を学ぶための、簡単なチュートリアルをご用意しました。</p>
+        </div>
+
+        <div class="bg-white p-8 rounded-xl shadow-md border border-gray-200">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">利用開始の前に</h2>
+            <p class="text-gray-500 mb-8">アンケートの作成方法からアカウント設定まで、実際の画面を操作しながら確認できます。（所要時間：約3分）</p>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button id="start-tutorial-btn" class="w-full sm:w-auto inline-flex justify-center items-center px-8 py-3 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-transform transform hover:scale-105">
+                    チュートリアルを開始する
+                </button>
+                <button id="skip-tutorial-btn" class="w-full sm:w-auto inline-flex justify-center items-center px-8 py-3 border border-gray-300 text-base font-medium rounded-full shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    スキップする
+                </button>
+            </div>
+        </div>
+
+        <p class="mt-8 text-sm text-gray-400">※このチュートリアルは、後からいつでもサイドバーの「ヘルプ」よりご確認いただけます。</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const startBtn = document.getElementById('start-tutorial-btn');
+            const skipBtn = document.getElementById('skip-tutorial-btn');
+
+            // チュートリアルを開始する場合
+            startBtn.addEventListener('click', () => {
+                // フラグを立てて、チュートリアルを完了していないことを示す
+                localStorage.setItem('speedad-tutorial-status', 'pending');
+                // ダッシュボードページに遷移
+                window.location.href = '../02_dashboard/index.html';
+            });
+
+            // スキップする場合
+            skipBtn.addEventListener('click', () => {
+                // チュートリアルを完了（スキップ）したことを示すフラグを立てる
+                localStorage.setItem('speedad-tutorial-status', 'completed');
+                // ダッシュボードページに遷移
+                window.location.href = '../02_dashboard/index.html';
+            });
+        });
+    </script>
+
 </body>
 </html>
