@@ -47,16 +47,23 @@ export function renderSurveyInfo(surveyData, surveyId) {
  * @param {object} settings - 設定データ。
  */
 export function setInitialFormValues(settings) {
+    if (!settings) return; // settings が null や undefined なら何もしない
     if (!dom.bizcardEnabledToggle) cacheDOMElements();
-    dom.bizcardEnabledToggle.checked = settings.bizcardEnabled;
+
+    dom.bizcardEnabledToggle.checked = settings.bizcardEnabled || false;
     dom.bizcardRequestInput.value = settings.bizcardRequest || 0;
     dom.couponCodeInput.value = settings.couponCode || '';
     dom.internalMemo.value = settings.internalMemo || '';
+
     // ラジオボタンの選択
-    const planRadio = document.querySelector(`input[name="dataConversionPlan"][value="${settings.dataConversionPlan}"]`);
-    if (planRadio) planRadio.checked = true;
-    const speedRadio = document.querySelector(`input[name="dataConversionSpeed"][value="${settings.dataConversionSpeed}"]`);
-    if (speedRadio) speedRadio.checked = true;
+    if (settings.dataConversionPlan) {
+        const planRadio = document.querySelector(`input[name="dataConversionPlan"][value="${settings.dataConversionPlan}"]`);
+        if (planRadio) planRadio.checked = true;
+    }
+    if (settings.dataConversionSpeed) {
+        const speedRadio = document.querySelector(`input[name="dataConversionSpeed"][value="${settings.dataConversionSpeed}"]`);
+        if (speedRadio) speedRadio.checked = true;
+    }
 }
 
 /**

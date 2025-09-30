@@ -176,12 +176,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         
     }
 
-    // Initialize page-specific settings functions after DOM is fully loaded
-    if (page === 'bizcardSettings.html') {
-        initBizcardSettings();
-    } else if (page === 'thankYouEmailSettings.html') {
-        initThankYouEmailSettings();
-    }
+
 
     const openNewSurveyModalBtn = document.getElementById('openNewSurveyModalBtn');
     if (openNewSurveyModalBtn) {
