@@ -984,6 +984,8 @@
             let targetUrl = resolveAppPath('02_dashboard/index.html'); // デフォルト
             if (userEmail === 'admin') {
               targetUrl = resolveAppPath('03_admin/index.html');
+            } else if (userEmail === 'new') {
+              targetUrl = resolveAppPath('04_first-login/index.html');
             }
             // 'user' またはその他の場合はデフォルトのURLを使用
             window.location.href = targetUrl;
