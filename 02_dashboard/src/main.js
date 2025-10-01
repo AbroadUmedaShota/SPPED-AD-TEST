@@ -35,6 +35,62 @@ import { initPasswordChange } from './password_change.js';
 
 import { showToast, copyTextToClipboard, loadCommonHtml } from './utils.js';
 
+function showTutorialResumeBanner() {
+    if (document.getElementById('tutorialResumeBanner')) {
+        return;
+    }
+
+    const mainContent = document.getElementById('main-content');
+    const banner = document.createElement('div');
+    banner.id = 'tutorialResumeBanner';
+    banner.className = 'mb-6 rounded-xl border border-indigo-200 bg-indigo-50 p-5 shadow-sm';
+    banner.innerHTML = `
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div class="text-left">
+                <p class="text-base font-semibold text-indigo-900">作成チュートリアルが途中です</p>
+                <p class="text-sm text-indigo-900/80 mt-1">前回の続きから再開するか、チュートリアルを終了するか選択してください。</p>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-2">
+                <button type="button" data-action="resume" class="inline-flex items-center justify-center rounded-full bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition-colors">続きから再開</button>
+                <button type="button" data-action="dismiss" class="inline-flex items-center justify-center rounded-full border border-indigo-200 px-5 py-2 text-sm font-semibold text-indigo-700 bg-white hover:bg-indigo-50 transition-colors">終了する</button>
+            </div>
+        </div>
+    `;
+
+    if (mainContent) {
+        const firstChild = mainContent.firstElementChild;
+        if (firstChild) {
+            mainContent.insertBefore(banner, firstChild);
+        } else {
+            mainContent.appendChild(banner);
+        }
+    } else {
+        document.body.insertBefore(banner, document.body.firstChild);
+    }
+
+    const resumeBtn = banner.querySelector('[data-action="resume"]');
+    const dismissBtn = banner.querySelector('[data-action="dismiss"]');
+
+    if (resumeBtn) {
+        resumeBtn.addEventListener('click', () => {
+            const params = localStorage.getItem('speedad-tutorial-last-survey-params');
+            const targetUrl = params ? `surveyCreation.html?${params}` : 'surveyCreation.html';
+            banner.remove();
+            localStorage.setItem('speedad-tutorial-status', 'survey-creation-started');
+            window.location.href = targetUrl;
+        });
+    }
+
+    if (dismissBtn) {
+        dismissBtn.addEventListener('click', () => {
+            localStorage.setItem('speedad-tutorial-status', 'completed');
+            localStorage.removeItem('speedad-tutorial-last-survey-params');
+            banner.remove();
+            showToast('チュートリアルを終了しました', 'info');
+        });
+    }
+}
+
 // --- Language Switcher ---
 function initLanguageSwitcher() {
     const languageSwitcherButton = document.getElementById('language-switcher-button');
@@ -116,7 +172,10 @@ function openNewSurveyModalWithSetup(afterOpen) {
             const surveyName = surveyNameInput.value.trim();
             const displayTitle = displayTitleInput.value.trim();
             const surveyMemo = document.getElementById('surveyMemo').value.trim();
-            const selectedDates = periodRangePicker.selectedDates;
+            const fallbackFlatpickr = periodRangeInput && periodRangeInput._flatpickr;
+            const selectedDates = Array.isArray(periodRangePicker && periodRangePicker.selectedDates)
+                ? periodRangePicker.selectedDates
+                : (fallbackFlatpickr && Array.isArray(fallbackFlatpickr.selectedDates) ? fallbackFlatpickr.selectedDates : []);
 
             // --- Validation ---
             if (!surveyName) {
@@ -136,8 +195,22 @@ function openNewSurveyModalWithSetup(afterOpen) {
                 return;
             }
 
-            const surveyStartDate = periodRangePicker.formatDate(selectedDates[0], 'Y-m-d');
-            const surveyEndDate = periodRangePicker.formatDate(selectedDates[1], 'Y-m-d');
+            const activePicker = periodRangePicker || fallbackFlatpickr;
+            const formatDate = (date) => {
+                if (activePicker && typeof activePicker.formatDate === 'function') {
+                    return activePicker.formatDate(date, 'Y-m-d');
+                }
+                const safeDate = date instanceof Date ? date : new Date(date);
+                return Number.isNaN(safeDate.getTime()) ? '' : safeDate.toISOString().split('T')[0];
+            };
+
+            const surveyStartDate = formatDate(selectedDates[0]);
+            const surveyEndDate = formatDate(selectedDates[1]);
+
+            if (!surveyStartDate || !surveyEndDate) {
+                showError(periodRangeInput, periodRangeError, '�񓚊��Ԃ�I�����Ă��������B');
+                return;
+            }
 
             // Build query parameters
             const params = new URLSearchParams();
@@ -148,6 +221,7 @@ function openNewSurveyModalWithSetup(afterOpen) {
             params.set('periodEnd', surveyEndDate);
 
             // Redirect to the creation page with parameters
+            localStorage.setItem('speedad-tutorial-last-survey-params', params.toString());
             window.location.href = `surveyCreation.html?${params.toString()}`;
         });
 
@@ -218,12 +292,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initialize the language switcher after the header is loaded
     initLanguageSwitcher();
 
+    const currentPage = window.location.pathname.split('/').pop() || '';
+    const isIndexPage = currentPage === '' || currentPage === 'index.html';
+
     // Check for tutorial status AFTER common elements are loaded
-    const tutorialStatus = localStorage.getItem('speedad-tutorial-status');
-    if (tutorialStatus === 'pending') {
+    let tutorialStatus = localStorage.getItem('speedad-tutorial-status');
+
+    if (tutorialStatus === 'main-running' || tutorialStatus === 'modal-running') {
+        localStorage.setItem('speedad-tutorial-status', 'pending');
+        tutorialStatus = 'pending';
+    }
+
+    if (tutorialStatus === 'pending' && isIndexPage) {
         if (typeof startTutorial === 'function') {
             startTutorial();
         }
+    } else if (tutorialStatus === 'survey-creation-started' && isIndexPage) {
+        showTutorialResumeBanner();
     }
 
     // --- Global Escape Key Listener for Modals & Sidebar ---
@@ -253,8 +338,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     initBreadcrumbs();
 
     // Page-specific initializations
-    const page = window.location.pathname.split('/').pop();
-    switch (page) {
+    switch (currentPage) {
         case 'index.html':
         case '': // root path
             initIndexPage();

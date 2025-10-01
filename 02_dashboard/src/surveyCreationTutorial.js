@@ -91,6 +91,9 @@ function startSurveyCreationTutorial() {
         if (popover) popover.remove();
         const nextStatus = tutorialCompleted ? 'completed' : 'pending';
         localStorage.setItem('speedad-tutorial-status', nextStatus);
+        if (tutorialCompleted) {
+            localStorage.removeItem('speedad-tutorial-last-survey-params');
+        }
     }
 
     function showNextStep() {

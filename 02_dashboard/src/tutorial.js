@@ -159,6 +159,10 @@ function startNewSurveyModalTutorial() {
                     },
                     showButtons: [], // ボタン非表示
                     onHighlightStarted: (element) => {
+                        const periodInput = document.getElementById('newSurveyPeriodRange');
+                        if (periodInput && periodInput._flatpickr) {
+                            periodInput._flatpickr.close();
+                        }
                         const surveyNameInput = document.getElementById('surveyName');
                         const displayTitleInput = document.getElementById('displayTitle');
                         if (surveyNameInput && !surveyNameInput.value.trim()) {
@@ -189,8 +193,10 @@ function startNewSurveyModalTutorial() {
                 if (status === 'modal-running') {
                     tutorialState.setStatus('pending');
                 }
-                const modal = document.getElementById('newSurveyModal');
-                if (modal) modal.remove();
+                const periodInput = document.getElementById('newSurveyPeriodRange');
+                if (periodInput && periodInput._flatpickr) {
+                    periodInput._flatpickr.close();
+                }
             },
             steps: surveyModalSteps
         });

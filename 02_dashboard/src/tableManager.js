@@ -16,7 +16,7 @@ let itemsPerPage = 10; // Default, will be updated from select element
 
 function shouldSkipInitialSurveyLoad() {
     const status = localStorage.getItem('speedad-tutorial-status');
-    return ['pending', 'main-running', 'modal-running', 'survey-creation-started'].includes(status);
+    return ['pending', 'main-running', 'modal-running'].includes(status);
 }
 const SURVEY_ID_PATTERN = /^sv_(\d{4})_(\d{2})(\d{3})$/;
 const SURVEY_ID_DEFAULT_USER = '0001';
