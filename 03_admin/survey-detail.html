@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpeedAd - アンケート詳細</title>
+    <link rel="icon" href="../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="../02_dashboard/service-top-style.css">
+    <link rel="stylesheet" href="src/admin-style.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+</head>
+<body class="bg-background text-on-background">
+<div class="relative flex min-h-screen flex-col overflow-x-hidden">
+    <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
+    <div id="header-placeholder"></div>
+    <div class="flex flex-1 pt-16 bg-background">
+        <div id="sidebar-placeholder"></div>
+        <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
+            <div class="flex flex-col w-full max-w-6xl mx-auto flex-1">
+                <div id="breadcrumb-container" class="mb-4"></div>
+                <div class="flex flex-wrap justify-between items-start gap-4 mb-6 pb-4 border-b border-outline-variant">
+                    <div>
+                        <p class="text-on-surface-variant text-sm">アンケート管理 / sv_0001_25022</p>
+                        <h1 class="text-on-background text-headline-large font-bold leading-tight tracking-tight">サンプルアンケート 1</h1>
+                        <p class="text-on-surface-variant text-sm mt-1">顧客満足度調査 1（営業部）</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-3">
+                        <a href="survey-management.html" class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-2 text-sm text-on-surface">
+                            <span class="material-icons text-base">arrow_back</span>
+                            一覧へ戻る
+                        </a>
+                        <button class="inline-flex items-center gap-1 rounded-lg bg-secondary text-secondary-on px-3 py-2 text-sm font-semibold"><span class="material-icons text-base">save</span>変更を保存</button>
+                    </div>
+                </div>
+                <section class="space-y-6">
+                    <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+                        <div class="flex flex-wrap justify-between items-start gap-4 mb-6">
+                            <div>
+                                <h2 class="text-title-large font-semibold text-on-surface">基本情報</h2>
+                                <p class="text-on-surface-variant text-sm">`data/core/surveys.json` エントリ sv_0001_25022 の値を元に表示しています。</p>
+                            </div>
+                            <span class="inline-flex items-center gap-1 rounded-full bg-success/10 text-success px-3 py-1 text-sm"><span class="material-icons text-sm">play_circle</span>実施中</span>
+                        </div>
+                        <dl class="grid gap-x-6 gap-y-4 md:grid-cols-2 text-sm text-on-surface-variant">
+                            <div>
+                                <dt class="text-on-surface font-medium">アンケートID</dt>
+                                <dd class="mt-1 font-mono text-on-surface">sv_0001_25022</dd>
+                            </div>
+                            <div>
+                                <dt class="text-on-surface font-medium">表示タイトル</dt>
+                                <dd class="mt-1">顧客満足度調査 1</dd>
+                            </div>
+                            <div>
+                                <dt class="text-on-surface font-medium">担当グループ</dt>
+                                <dd class="mt-1">営業部 (GROUP001)</dd>
+                            </div>
+                            <div>
+                                <dt class="text-on-surface font-medium">プラン</dt>
+                                <dd class="mt-1">Standard</dd>
+                            </div>
+                            <div>
+                                <dt class="text-on-surface font-medium">会期</dt>
+                                <dd class="mt-1">2025/07/01 〜 2025/07/31</dd>
+                            </div>
+                            <div>
+                                <dt class="text-on-surface font-medium">回答数</dt>
+                                <dd class="mt-1">125件（リアルタイム12件）</dd>
+                            </div>
+                            <div>
+                                <dt class="text-on-surface font-medium">データ化完了日</dt>
+                                <dd class="mt-1">2025/08/05</dd>
+                            </div>
+                            <div>
+                                <dt class="text-on-surface font-medium">請求締切 / 見込み額</dt>
+                                <dd class="mt-1">2025/08/31 / ¥50,000</dd>
+                            </div>
+                        </dl>
+                        <div class="mt-6 flex flex-wrap gap-3 text-sm">
+                            <button class="inline-flex items-center gap-1 rounded-lg bg-primary text-primary-on px-3 py-2"><span class="material-icons text-sm">published_with_changes</span>ステータス変更</button>
+                            <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-2"><span class="material-icons text-sm">content_copy</span>複製</button>
+                            <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-2"><span class="material-icons text-sm">preview</span>プレビュー表示</button>
+                            <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-2 text-error"><span class="material-icons text-sm">delete</span>削除</button>
+                        </div>
+                    </div>
+                    <div class="grid gap-6 lg:grid-cols-3 items-start">
+                        <div class="lg:col-span-2 space-y-6">
+                            <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+                                <div class="flex items-center justify-between gap-3 mb-4">
+                                    <h2 class="text-title-large font-semibold text-on-surface">フォーム構成サマリ</h2>
+                                    <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-2 text-sm"><span class="material-icons text-base">manage_search</span>設問編集</button>
+                                </div>
+                                <div class="grid gap-4 lg:grid-cols-2 text-sm">
+                                    <div class="rounded-lg border border-outline p-4">
+                                        <h3 class="flex items-center gap-2 text-on-surface font-semibold mb-2"><span class="material-icons text-base text-primary">format_list_bulleted</span>セクション構成</h3>
+                                        <ul class="space-y-2 text-on-surface-variant">
+                                            <li>1. お客様基本情報（社員CD / 業界 / 商談種別）</li>
+                                            <li>2. 商談内容の緊急度（複数選択）</li>
+                                            <li>3. 案件情報・自由記述</li>
+                                            <li>4. フォロー希望 / サンクス連絡</li>
+                                        </ul>
+                                    </div>
+                                    <div class="rounded-lg border border-outline p-4">
+                                        <h3 class="flex items-center gap-2 text-on-surface font-semibold mb-2"><span class="material-icons text-base text-primary">rule</span>公開・回答設定</h3>
+                                        <ul class="space-y-2 text-on-surface-variant">
+                                            <li>公開方式: 招待URL + QRコード</li>
+                                            <li>回答制限: 1メールアドレスにつき1回</li>
+                                            <li>名刺連携: 標準データ化プラン / 通常速度</li>
+                                            <li>内部メモ: 「これは社内用のメモです。」</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="mt-4 rounded-lg border border-warning/40 bg-warning/5 p-4 text-sm text-warning">
+                                    <p class="font-semibold flex items-center gap-2"><span class="material-icons text-base">info</span>Webhook疎通確認が未実施です</p>
+                                    <p class="mt-1 text-on-surface-variant">公開前にMA連携先とテスト送信を行い、ログへ記録してください。</p>
+                                </div>
+                            </div>
+                            <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+                                <div class="flex justify-between items-start gap-4 mb-4">
+                                    <div>
+                                        <h2 class="text-title-large font-semibold text-on-surface">名刺データ・CSV取込状況</h2>
+                                        <p class="text-on-surface-variant text-sm">最終データ化: 2025/08/05 11:30（担当: 佐藤 花子）</p>
+                                    </div>
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-success/10 text-success px-3 py-1 text-sm"><span class="material-icons text-sm">cloud_done</span>正常完了</span>
+                                </div>
+                                <div class="grid gap-4 md:grid-cols-2 text-sm text-on-surface-variant">
+                                    <div class="rounded-lg border border-outline p-4 space-y-2">
+                                        <p class="text-on-surface font-semibold">名刺データ進捗</p>
+                                        <p>依頼件数 120件 / 完了 110件（91.7%）</p>
+                                        <p>データ化プラン: standard / 速度: normal</p>
+                                    </div>
+                                    <div class="rounded-lg border border-outline p-4 space-y-2">
+                                        <p class="text-on-surface font-semibold">回答データ</p>
+                                        <p>125件をCSVに反映済み。リアルタイム回答 12件。</p>
+                                        <p>ThankYouメール: 手動送信（テンプレート: default）</p>
+                                    </div>
+                                </div>
+                                <div class="mt-4 rounded-lg border border-success/40 bg-success/5 p-4 text-sm text-success">
+                                    <p class="font-semibold flex items-center gap-2"><span class="material-icons text-base">task_alt</span>取込エラーはありません</p>
+                                    <p class="mt-1 text-on-surface-variant">重複レコードは自動的にスキップし、監査ログに記録しました。</p>
+                                </div>
+                                <div class="mt-4 flex flex-wrap gap-3 text-sm">
+                                    <button class="inline-flex items-center gap-1 rounded-lg bg-primary text-primary-on px-3 py-2"><span class="material-icons text-sm">sync</span>再取込を実行</button>
+                                    <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-2"><span class="material-icons text-sm">download</span>CSVダウンロード</button>
+                                    <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-2"><span class="material-icons text-sm">note_add</span>対応メモを追加</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-6">
+                            <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+                                <h2 class="text-title-large font-semibold text-on-surface mb-4">運用タスク</h2>
+                                <ul class="space-y-3 text-sm text-on-surface-variant">
+                                    <li class="flex gap-3">
+                                        <span class="mt-0.5 inline-flex items-center justify-center rounded-full bg-success/10 text-success w-6 h-6"><span class="material-icons text-sm">done</span></span>
+                                        <div>
+                                            <p class="text-on-surface font-medium">サンクスメール文面レビュー</p>
+                                            <p>テンプレート default を営業部で確認済み。最終送信はイベント翌日。</p>
+                                        </div>
+                                    </li>
+                                    <li class="flex gap-3">
+                                        <span class="mt-0.5 inline-flex items-center justify-center rounded-full bg-warning/10 text-warning w-6 h-6"><span class="material-icons text-sm">schedule</span></span>
+                                        <div>
+                                            <p class="text-on-surface font-medium">Webhook疎通テスト</p>
+                                            <p>マーケティングシステム側の承認待ち。7/28までに完了報告。</p>
+                                        </div>
+                                    </li>
+                                    <li class="flex gap-3">
+                                        <span class="mt-0.5 inline-flex items-center justify-center rounded-full bg-outline/20 text-on-surface-variant w-6 h-6"><span class="material-icons text-sm">fact_check</span></span>
+                                        <div>
+                                            <p class="text-on-surface font-medium">請求メモ更新</p>
+                                            <p>見込み額 5万円。契約担当への共有フラグは未設定。</p>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+                                <h2 class="text-title-large font-semibold text-on-surface mb-4">操作ログ</h2>
+                                <ol class="space-y-3 text-sm text-on-surface-variant">
+                                    <li>
+                                        <p class="text-on-surface font-medium">2025/08/05 11:30 CSV取り込み完了</p>
+                                        <p>佐藤 花子が最終データ化を確認し、ThankYouメールの手動送信を予約しました。Idempotency-Key: 7fa2-5bce-11d2</p>
+                                    </li>
+                                    <li>
+                                        <p class="text-on-surface font-medium">2025/07/31 22:00 ステータスを「実施中」に維持</p>
+                                        <p>自動ジョブが終了予定時刻を確認し、アンケートを延長せず終了待機状態に遷移。</p>
+                                    </li>
+                                    <li>
+                                        <p class="text-on-surface font-medium">2025/07/01 09:00 公開開始</p>
+                                        <p>営業部オペレーターが公開処理を実行し、監査ログに初期設定を記録しました。</p>
+                                    </li>
+                                </ol>
+                                <div class="mt-4 flex items-center justify-between text-xs text-on-surface-variant">
+                                    <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-1.5"><span class="material-icons text-sm">history</span>すべて表示</button>
+                                    <span>監査ログ連携: 有効</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+    <div id="footer-placeholder"></div>
+</div>
+<script type="module" src="src/admin.js"></script>
+</body>
+</html>
