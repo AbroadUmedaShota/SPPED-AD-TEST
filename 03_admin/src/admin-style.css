@@ -1,5 +1,18 @@
-
 /* admin-style.css */
+
+/* 管理者画面のサイドバーの背景色と文字色を明確に設定し、他のCSSファイルによる上書きを防ぐ */
+.admin-sidebar {
+    background-color: #374151; /* gray-700 */
+}
+
+.admin-sidebar nav a.nav-link {
+    color: #e5e7eb; /* gray-200 */
+}
+
+.admin-sidebar nav a.nav-link:hover {
+    background-color: #4b5563; /* gray-600 */
+    color: #ffffff;
+}
 
 /* スタイルがservice-top-style.cssの汎用ルールに上書きされないよう、詳細度を高く設定 */
 .admin-sidebar nav a.nav-link.active {

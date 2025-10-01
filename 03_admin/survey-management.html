@@ -1,215 +1,390 @@
 <!DOCTYPE html>
-<html lang="ja" class="dark">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>アンケート管理 - SPEED AD 管理者ポータル</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>SpeedAd - アンケート管理</title>
+    <link rel="icon" href="../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="../02_dashboard/service-top-style.css">
     <link rel="stylesheet" href="src/admin-style.css">
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-        }
-    </script>
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-200">
-    <div class="flex h-screen">
-        <!-- Sidebar -->
-        <div id="sidebar-container"></div>
-
-        <!-- Main content -->
-        <div class="flex-1 flex flex-col overflow-hidden">
-            <!-- Header -->
-            <div id="header-container"></div>
-
-            <!-- Page Content -->
-            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 dark:bg-gray-900">
-                <div class="container mx-auto px-6 py-8">
-                    <h3 class="text-3xl font-medium">アンケート管理</h3>
-
-                    <div class="mt-8">
-                        <!-- Filters and Actions -->
-                        <div class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow">
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                <div class="col-span-1 lg:col-span-2">
-                                    <label for="search-keyword" class="text-sm font-medium text-gray-700 dark:text-gray-300">キーワード</label>
-                                    <input type="search" id="search-keyword" placeholder="アンケートID, 名称, 会社名..." class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700">
+<body class="bg-background text-on-background">
+<div class="relative flex min-h-screen flex-col overflow-x-hidden">
+    <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
+    <div id="header-placeholder"></div>
+    <div class="flex flex-1 pt-16 bg-background">
+        <div id="sidebar-placeholder"></div>
+        <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
+            <div class="flex flex-col w-full max-w-6xl mx-auto flex-1">
+                <div id="breadcrumb-container" class="mb-4"></div>
+                <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant">
+                    <div>
+                        <h1 class="text-on-background text-headline-large font-bold leading-tight tracking-tight">アンケート管理</h1>
+                        <p class="text-on-surface-variant text-sm mt-1">アンケートの稼働状況、公開設定、CSV取込結果を横断管理します。</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-2 text-sm text-on-surface"><span class="material-icons text-base">file_download</span>一覧CSV出力</button>
+                        <button class="inline-flex items-center gap-1 rounded-lg bg-secondary text-secondary-on px-3 py-2 text-sm font-semibold"><span class="material-icons text-base">add_circle</span>新規アンケート登録</button>
+                    </div>
+                </div>
+                <section class="space-y-6">
+                    <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+                        <div class="flex flex-wrap justify-between items-start gap-4">
+                            <div>
+                                <h2 class="text-title-large font-semibold text-on-surface">稼働サマリ</h2>
+                                <p class="text-on-surface-variant text-sm">公開状況と担当者アサインの状態を俯瞰します。</p>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm">
+                                <span class="inline-flex items-center gap-1 rounded-full bg-success/10 text-success px-3 py-1"><span class="material-icons text-sm">task_alt</span>稼働安定</span>
+                                <span class="inline-flex items-center gap-1 rounded-full bg-warning/10 text-warning px-3 py-1"><span class="material-icons text-sm">priority_high</span>要フォロー 3件</span>
+                            </div>
+                        </div>
+                        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mt-6">
+                            <div class="rounded-lg bg-surface-variant/40 p-4">
+                                <p class="text-on-surface-variant text-sm">公開中</p>
+                                <p class="text-title-large font-semibold text-on-surface">24件</p>
+                                <p class="text-xs text-on-surface-variant mt-1">本日公開開始 2件</p>
+                            </div>
+                            <div class="rounded-lg bg-surface-variant/40 p-4">
+                                <p class="text-on-surface-variant text-sm">要対応</p>
+                                <p class="text-title-large font-semibold text-warning">3件</p>
+                                <p class="text-xs text-on-surface-variant mt-1">CSVエラー 1件 / 承認待ち 2件</p>
+                            </div>
+                            <div class="rounded-lg bg-surface-variant/40 p-4">
+                                <p class="text-on-surface-variant text-sm">近日終了予定</p>
+                                <p class="text-title-large font-semibold text-on-surface">5件</p>
+                                <p class="text-xs text-on-surface-variant mt-1">終了3日前の通知送信済み</p>
+                            </div>
+                            <div class="rounded-lg bg-surface-variant/40 p-4">
+                                <p class="text-on-surface-variant text-sm">担当未設定</p>
+                                <p class="text-title-large font-semibold text-error">2件</p>
+                                <p class="text-xs text-on-surface-variant mt-1">早急にスタッフ割当が必要です</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+                        <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
+                            <h2 class="text-title-large font-semibold text-on-surface">検索条件</h2>
+                            <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-2 text-sm text-on-surface">
+                                <span class="material-icons text-base">bookmark_border</span>
+                                保存済み条件
+                            </button>
+                        </div>
+                        <form class="grid gap-4 md:grid-cols-3 xl:grid-cols-4" aria-label="アンケート検索フォーム">
+                            <label class="flex flex-col gap-1 text-sm text-on-surface-variant">
+                                <span>キーワード</span>
+                                <input type="search" class="form-input" placeholder="アンケートID・名称・会社名">
+                            </label>
+                            <label class="flex flex-col gap-1 text-sm text-on-surface-variant">
+                                <span>ステータス</span>
+                                <select class="form-select">
+                                    <option value="">すべて</option>
+                                    <option value="draft">下書き</option>
+                                    <option value="review">承認待ち</option>
+                                    <option value="published">公開中</option>
+                                    <option value="closed">終了</option>
+                                    <option value="attention">要対応</option>
+                                </select>
+                            </label>
+                            <label class="flex flex-col gap-1 text-sm text-on-surface-variant">
+                                <span>プラン</span>
+                                <select class="form-select">
+                                    <option value="">指定なし</option>
+                                    <option value="free">Free</option>
+                                    <option value="standard">Standard</option>
+                                    <option value="premium">Premium</option>
+                                    <option value="enterprise">Enterprise</option>
+                                </select>
+                            </label>
+                            <label class="flex flex-col gap-1 text-sm text-on-surface-variant">
+                                <span>担当者</span>
+                                <select class="form-select">
+                                    <option value="">すべて</option>
+                                    <option value="sato">佐藤 花子</option>
+                                    <option value="suzuki">鈴木 一郎</option>
+                                    <option value="tanaka">田中 美緒</option>
+                                    <option value="yamamoto">山本 蓮</option>
+                                </select>
+                            </label>
+                            <div class="flex flex-col gap-1 text-sm text-on-surface-variant">
+                                <span>会期（開始）</span>
+                                <input type="date" class="form-input">
+                            </div>
+                            <div class="flex flex-col gap-1 text-sm text-on-surface-variant">
+                                <span>会期（終了）</span>
+                                <input type="date" class="form-input">
+                            </div>
+                            <label class="flex flex-col gap-1 text-sm text-on-surface-variant">
+                                <span>CSV取込ステータス</span>
+                                <select class="form-select">
+                                    <option value="">すべて</option>
+                                    <option value="completed">正常完了</option>
+                                    <option value="warning">警告あり</option>
+                                    <option value="error">エラー</option>
+                                </select>
+                            </label>
+                            <label class="flex flex-col gap-1 text-sm text-on-surface-variant">
+                                <span>自動公開設定</span>
+                                <select class="form-select">
+                                    <option value="">指定なし</option>
+                                    <option value="enabled">自動公開ON</option>
+                                    <option value="manual">手動公開のみ</option>
+                                </select>
+                            </label>
+                            <div class="flex items-end gap-3 md:col-span-3 xl:col-span-4">
+                                <button type="submit" class="inline-flex items-center justify-center rounded-lg bg-primary text-primary-on px-4 py-2 text-sm font-medium">
+                                    <span class="material-icons text-base">search</span>
+                                    検索
+                                </button>
+                                <button type="reset" class="inline-flex items-center justify-center rounded-lg border border-outline px-4 py-2 text-sm text-on-surface-variant">
+                                    クリア
+                                </button>
+                                <button type="button" class="ml-auto inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-2 text-sm text-on-surface-variant">
+                                    <span class="material-icons text-base">filter_alt</span>
+                                    詳細フィルタ
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+                        <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
+                            <div>
+                                <h2 class="text-title-large font-semibold text-on-surface">アンケート一覧</h2>
+                                <p class="text-on-surface-variant text-sm">ステータス変更・CSV取込み・担当者変更などの操作を行えます。</p>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm">
+                                <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-2">
+                                    <span class="material-icons text-base">published_with_changes</span>
+                                    ステータス一括変更
+                                </button>
+                                <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-2">
+                                    <span class="material-icons text-base">cloud_upload</span>
+                                    CSV取込
+                                </button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-outline-variant text-sm" aria-label="アンケート一覧テーブル">
+                                <thead class="bg-surface-variant text-on-surface-variant text-xs uppercase tracking-wider">
+                                <tr>
+                                    <th scope="col" class="px-4 py-3 text-left">アンケートID</th>
+                                    <th scope="col" class="px-4 py-3 text-left">アンケート名称</th>
+                                    <th scope="col" class="px-4 py-3 text-left">会社名</th>
+                                    <th scope="col" class="px-4 py-3 text-left">会期</th>
+                                    <th scope="col" class="px-4 py-3 text-left">ステータス</th>
+                                    <th scope="col" class="px-4 py-3 text-left">プラン</th>
+                                    <th scope="col" class="px-4 py-3 text-left">担当者</th>
+                                    <th scope="col" class="px-4 py-3 text-left">CSV状況</th>
+                                    <th scope="col" class="px-4 py-3 text-right">操作</th>
+                                </tr>
+                                </thead>
+                                <tbody class="divide-y divide-outline-variant">
+                                <tr class="hover:bg-surface-variant/50 transition-colors">
+                                    <td class="px-4 py-3 font-mono text-on-surface">SV-30121</td>
+                                    <td class="px-4 py-3 text-on-surface font-medium">アブロードパートナーミート</td>
+                                    <td class="px-4 py-3 text-on-surface-variant">株式会社アブロード</td>
+                                    <td class="px-4 py-3 text-on-surface-variant">2025/10/05 - 2025/10/06</td>
+                                    <td class="px-4 py-3"><span class="inline-flex items-center gap-1 rounded-full bg-success/20 text-success px-2.5 py-1 text-xs">公開中</span></td>
+                                    <td class="px-4 py-3 text-on-surface-variant">Premium</td>
+                                    <td class="px-4 py-3 text-on-surface-variant">佐藤 花子</td>
+                                    <td class="px-4 py-3 text-on-surface-variant"><span class="inline-flex items-center gap-1 rounded-full bg-success/10 text-success px-2.5 py-1 text-xs">正常完了</span></td>
+                                    <td class="px-4 py-3 text-right space-x-2">
+                                        <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-1.5 text-xs"><span class="material-icons text-sm">visibility</span>詳細</button>
+                                        <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-1.5 text-xs"><span class="material-icons text-sm">download</span>名刺DL</button>
+                                        <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-1.5 text-xs"><span class="material-icons text-sm">more_vert</span></button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-surface-variant/50 transition-colors">
+                                    <td class="px-4 py-3 font-mono text-on-surface">SV-30118</td>
+                                    <td class="px-4 py-3 text-on-surface font-medium">新規事業セミナー</td>
+                                    <td class="px-4 py-3 text-on-surface-variant">テックカンパニー合同会社</td>
+                                    <td class="px-4 py-3 text-on-surface-variant">2025/11/15 - 2025/12/01</td>
+                                    <td class="px-4 py-3"><span class="inline-flex items-center gap-1 rounded-full bg-warning/20 text-warning px-2.5 py-1 text-xs">承認待ち</span></td>
+                                    <td class="px-4 py-3 text-on-surface-variant">Standard</td>
+                                    <td class="px-4 py-3 text-on-surface-variant">山本 蓮</td>
+                                    <td class="px-4 py-3 text-on-surface-variant"><span class="inline-flex items-center gap-1 rounded-full bg-warning/10 text-warning px-2.5 py-1 text-xs">警告あり</span></td>
+                                    <td class="px-4 py-3 text-right space-x-2">
+                                        <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-1.5 text-xs"><span class="material-icons text-sm">fact_check</span>承認</button>
+                                        <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-1.5 text-xs"><span class="material-icons text-sm">published_with_changes</span>ステータス</button>
+                                        <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-1.5 text-xs"><span class="material-icons text-sm">more_vert</span></button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-surface-variant/50 transition-colors">
+                                    <td class="px-4 py-3 font-mono text-on-surface">SV-29890</td>
+                                    <td class="px-4 py-3 text-on-surface font-medium">過去のイベントアーカイブ</td>
+                                    <td class="px-4 py-3 text-on-surface-variant">株式会社アーカイブ</td>
+                                    <td class="px-4 py-3 text-on-surface-variant">2024/12/20 - 2025/01/05</td>
+                                    <td class="px-4 py-3"><span class="inline-flex items-center gap-1 rounded-full bg-outline/20 text-on-surface-variant px-2.5 py-1 text-xs">終了</span></td>
+                                    <td class="px-4 py-3 text-on-surface-variant">Free</td>
+                                    <td class="px-4 py-3 text-on-surface-variant">鈴木 一郎</td>
+                                    <td class="px-4 py-3 text-on-surface-variant"><span class="inline-flex items-center gap-1 rounded-full bg-error/10 text-error px-2.5 py-1 text-xs">エラー</span></td>
+                                    <td class="px-4 py-3 text-right space-x-2">
+                                        <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-1.5 text-xs"><span class="material-icons text-sm">upload_file</span>再取込</button>
+                                        <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-1.5 text-xs"><span class="material-icons text-sm">delete</span>削除</button>
+                                        <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-1.5 text-xs"><span class="material-icons text-sm">more_vert</span></button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="flex flex-wrap items-center justify-between gap-3 mt-4 text-sm text-on-surface-variant">
+                            <p>全256件中 1 - 25件を表示</p>
+                            <div class="flex items-center gap-2">
+                                <button class="inline-flex items-center justify-center rounded-lg border border-outline px-3 py-1.5">前へ</button>
+                                <div class="flex items-center gap-1">
+                                    <button class="w-8 h-8 rounded-lg bg-primary text-primary-on">1</button>
+                                    <button class="w-8 h-8 rounded-lg border border-outline text-on-surface">2</button>
+                                    <button class="w-8 h-8 rounded-lg border border-outline text-on-surface">3</button>
                                 </div>
-                                <div>
-                                    <label for="status-filter" class="text-sm font-medium text-gray-700 dark:text-gray-300">ステータス</label>
-                                    <select id="status-filter" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700">
-                                        <option>すべて</option>
-                                        <option>下書き</option>
-                                        <option>公開中</option>
-                                        <option>終了</option>
-                                        <option>要対応</option>
-                                    </select>
+                                <button class="inline-flex items-center justify-center rounded-lg border border-outline px-3 py-1.5">次へ</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid gap-6 lg:grid-cols-3 items-start">
+                        <div class="lg:col-span-2 space-y-6">
+                            <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+                                <div class="flex flex-wrap justify-between items-start gap-4 mb-4">
+                                    <div>
+                                        <h2 class="text-title-large font-semibold text-on-surface">選択中アンケート詳細</h2>
+                                        <p class="text-on-surface-variant text-sm">アブロードパートナーミート（SV-30121）の設定情報です。</p>
+                                    </div>
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-success/10 text-success px-3 py-1 text-sm"><span class="material-icons text-sm">public</span>公開中</span>
                                 </div>
-                                <div>
-                                    <label for="plan-filter" class="text-sm font-medium text-gray-700 dark:text-gray-300">プラン</label>
-                                    <select id="plan-filter" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700">
-                                        <option>すべて</option>
-                                        <option>Free</option>
-                                        <option>Standard</option>
-                                        <option>Premium</option>
-                                    </select>
+                                <dl class="grid gap-x-6 gap-y-4 md:grid-cols-2 text-sm text-on-surface-variant">
+                                    <div>
+                                        <dt class="text-on-surface font-medium">アンケートID</dt>
+                                        <dd class="mt-1 font-mono text-on-surface">SV-30121</dd>
+                                    </div>
+                                    <div>
+                                        <dt class="text-on-surface font-medium">契約プラン</dt>
+                                        <dd class="mt-1">Premium（月額）</dd>
+                                    </div>
+                                    <div>
+                                        <dt class="text-on-surface font-medium">企業名</dt>
+                                        <dd class="mt-1">株式会社アブロード</dd>
+                                    </div>
+                                    <div>
+                                        <dt class="text-on-surface font-medium">担当者</dt>
+                                        <dd class="mt-1">佐藤 花子（manager@speedad.example）</dd>
+                                    </div>
+                                    <div>
+                                        <dt class="text-on-surface font-medium">公開期間</dt>
+                                        <dd class="mt-1">2025/10/05 09:00 〜 2025/10/06 23:59</dd>
+                                    </div>
+                                    <div>
+                                        <dt class="text-on-surface font-medium">回答目標</dt>
+                                        <dd class="mt-1">500件（現在 312件 / 62%）</dd>
+                                    </div>
+                                    <div>
+                                        <dt class="text-on-surface font-medium">自動公開設定</dt>
+                                        <dd class="mt-1">開催3日前に自動ON / 終了時自動OFF</dd>
+                                    </div>
+                                    <div>
+                                        <dt class="text-on-surface font-medium">通知設定</dt>
+                                        <dd class="mt-1">回答不足でアラート / CSV取込結果を担当へメール通知</dd>
+                                    </div>
+                                </dl>
+                                <div class="mt-6 flex flex-wrap gap-3 text-sm">
+                                    <button class="inline-flex items-center gap-1 rounded-lg bg-primary text-primary-on px-3 py-2"><span class="material-icons text-sm">published_with_changes</span>ステータス変更</button>
+                                    <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-2"><span class="material-icons text-sm">content_copy</span>複製</button>
+                                    <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-2"><span class="material-icons text-sm">preview</span>プレビュー表示</button>
+                                    <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-2"><span class="material-icons text-sm">delete</span>削除</button>
                                 </div>
-                                <div>
-                                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">会期</label>
-                                    <div class="flex items-center space-x-2 mt-1">
-                                        <input type="date" class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700">
-                                        <span class="text-gray-500">~</span>
-                                        <input type="date" class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700">
+                            </div>
+                            <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+                                <h2 class="text-title-large font-semibold text-on-surface mb-4">フォーム構成サマリ</h2>
+                                <div class="grid gap-4 lg:grid-cols-2 text-sm">
+                                    <div class="rounded-lg border border-outline p-4">
+                                        <h3 class="flex items-center gap-2 text-on-surface font-semibold mb-2"><span class="material-icons text-base text-primary">format_list_bulleted</span>セクション構成</h3>
+                                        <ul class="space-y-2 text-on-surface-variant">
+                                            <li>1. 参加者基本情報（氏名 / 会社 / 部署 / 役職）</li>
+                                            <li>2. 商談意欲ヒアリング（5段階評価）</li>
+                                            <li>3. 興味カテゴリ選択（最大3つ）</li>
+                                            <li>4. 自由記述（400文字）</li>
+                                        </ul>
+                                    </div>
+                                    <div class="rounded-lg border border-outline p-4">
+                                        <h3 class="flex items-center gap-2 text-on-surface font-semibold mb-2"><span class="material-icons text-base text-primary">rule</span>公開・回答設定</h3>
+                                        <ul class="space-y-2 text-on-surface-variant">
+                                            <li>公開方式: 招待URL + QRコード配布</li>
+                                            <li>回答制限: 1メールアドレスにつき1回</li>
+                                            <li>多言語対応: 日本語 / 英語</li>
+                                            <li>リマインド: 24時間間隔で最大3回送信</li>
+                                        </ul>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="mt-4 flex justify-between items-center">
-                                <div>
-                                    <button class="px-4 py-2 font-medium tracking-wide text-white capitalize transition-colors duration-200 transform bg-indigo-600 rounded-md hover:bg-indigo-500 focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-80">
-                                        <i class="material-icons align-middle text-sm">search</i> 検索
-                                    </button>
-                                    <button class="ml-2 px-4 py-2 font-medium tracking-wide text-gray-700 capitalize transition-colors duration-200 transform bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring focus:ring-gray-300 focus:ring-opacity-80 dark:text-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600">
-                                        リセット
-                                    </button>
-                                </div>
-                                <div>
-                                    <label for="csv-upload" class="cursor-pointer px-4 py-2 font-medium tracking-wide text-white capitalize transition-colors duration-200 transform bg-blue-600 rounded-md hover:bg-blue-500 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-80">
-                                        <i class="material-icons align-middle text-sm">upload_file</i> データ化完了CSVアップロード
-                                    </label>
-                                    <input type="file" id="csv-upload" class="hidden" accept=".csv">
+                                <div class="mt-4 rounded-lg border border-warning/40 bg-warning/5 p-4 text-sm text-warning">
+                                    <p class="font-semibold flex items-center gap-2"><span class="material-icons text-base">info</span>Webhookの接続テストが未実施です</p>
+                                    <p class="mt-1 text-on-surface-variant">外部MA連携を予定している場合は公開前に接続テストを完了してください。</p>
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Table -->
-                    <div class="mt-8 flex flex-col">
-                        <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                            <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-                                <div class="shadow overflow-hidden border-b border-gray-200 dark:border-gray-700 sm:rounded-lg">
-                                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                        <thead class="bg-gray-50 dark:bg-gray-800">
-                                            <tr>
-                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">アンケートID</th>
-                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">アンケート名称</th>
-                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">会社名</th>
-                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">会期</th>
-                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ステータス</th>
-                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">プラン</th>
-                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">担当者</th>
-                                                <th scope="col" class="relative px-6 py-3"><span class="sr-only">操作</span></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                            <tr>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">SV_0001</td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm">プロダクトEXPO 2025 秋</td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm">株式会社サンプル</td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm">2025-10-20 ~ 2025-10-22</td>
-                                                <td class="px-6 py-4 whitespace-nowrap">
-                                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">公開中</span>
-                                                </td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm">Premium</td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm">山田 太郎</td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                    <div class="relative inline-block text-left">
-                                                        <button type="button" class="inline-flex justify-center w-full rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-2 py-1 bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none" onclick="this.nextElementSibling.classList.toggle('hidden')">
-                                                            <i class="material-icons">more_vert</i>
-                                                        </button>
-                                                        <div class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-gray-700 ring-1 ring-black ring-opacity-5 focus:outline-none hidden z-10">
-                                                            <div class="py-1" role="menu" aria-orientation="vertical">
-                                                                <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600" role="menuitem"><i class="material-icons text-sm mr-3">edit</i>詳細・編集</a>
-                                                                <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600" role="menuitem"><i class="material-icons text-sm mr-3">published_with_changes</i>ステータス変更</a>
-                                                                <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600" role="menuitem"><i class="material-icons text-sm mr-3">download</i>名刺画像DL</a>
-                                                                <a href="#" class="flex items-center px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-600" role="menuitem"><i class="material-icons text-sm mr-3">delete</i>削除</a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">SV_0002</td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm">新規事業セミナー</td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm">テックカンパニー合同会社</td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm">2025-11-15</td>
-                                                <td class="px-6 py-4 whitespace-nowrap">
-                                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100">下書き</span>
-                                                </td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm">Standard</td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm">鈴木 一郎</td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                    <div class="relative inline-block text-left">
-                                                        <button type="button" class="inline-flex justify-center w-full rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-2 py-1 bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none" onclick="this.nextElementSibling.classList.toggle('hidden')">
-                                                            <i class="material-icons">more_vert</i>
-                                                        </button>
-                                                        <div class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-gray-700 ring-1 ring-black ring-opacity-5 focus:outline-none hidden z-10">
-                                                            <div class="py-1" role="menu" aria-orientation="vertical">
-                                                                <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600" role="menuitem"><i class="material-icons text-sm mr-3">edit</i>詳細・編集</a>
-                                                                <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600" role="menuitem"><i class="material-icons text-sm mr-3">published_with_changes</i>ステータス変更</a>
-                                                                <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600" role="menuitem"><i class="material-icons text-sm mr-3">download</i>名刺画像DL</a>
-                                                                <a href="#" class="flex items-center px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-600" role="menuitem"><i class="material-icons text-sm mr-3">delete</i>削除</a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">SV_0003</td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm">過去のイベント</td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm">株式会社アーカイブ</td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm">2024-08-01 ~ 2024-08-03</td>
-                                                <td class="px-6 py-4 whitespace-nowrap">
-                                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100">終了</span>
-                                                </td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm">Free</td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm">佐藤 次郎</td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                    <div class="relative inline-block text-left">
-                                                        <button type="button" class="inline-flex justify-center w-full rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-2 py-1 bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none" onclick="this.nextElementSibling.classList.toggle('hidden')">
-                                                            <i class="material-icons">more_vert</i>
-                                                        </button>
-                                                        <div class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-gray-700 ring-1 ring-black ring-opacity-5 focus:outline-none hidden z-10">
-                                                            <div class="py-1" role="menu" aria-orientation="vertical">
-                                                                <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600" role="menuitem"><i class="material-icons text-sm mr-3">edit</i>詳細・編集</a>
-                                                                <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600" role="menuitem"><i class="material-icons text-sm mr-3">published_with_changes</i>ステータス変更</a>
-                                                                <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600" role="menuitem"><i class="material-icons text-sm mr-3">download</i>名刺画像DL</a>
-                                                                <a href="#" class="flex items-center px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-600" role="menuitem"><i class="material-icons text-sm mr-3">delete</i>削除</a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                        <div class="space-y-6">
+                            <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+                                <div class="flex justify-between items-start gap-4 mb-4">
+                                    <div>
+                                        <h2 class="text-title-large font-semibold text-on-surface">最新CSV取込結果</h2>
+                                        <p class="text-on-surface-variant text-sm">2025/09/30 11:45 取込（担当: 山本 蓮）</p>
+                                    </div>
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-warning/10 text-warning px-3 py-1 text-sm"><span class="material-icons text-sm">error_outline</span>警告あり</span>
+                                </div>
+                                <div class="rounded-lg border border-outline p-4 text-sm space-y-3">
+                                    <p class="text-on-surface">名刺データ 200件 / 回答データ 198件を取り込みました。</p>
+                                    <div class="rounded-lg border border-warning/40 bg-warning/5 p-3">
+                                        <p class="font-semibold text-warning flex items-center gap-2"><span class="material-icons text-base">warning</span>警告2件</p>
+                                        <ul class="mt-2 space-y-1 text-on-surface-variant">
+                                            <li>行58: メールアドレス形式が不正のためスキップ。</li>
+                                            <li>行132: 参加者IDが既存データと重複。既存レコードを保持。</li>
+                                        </ul>
+                                    </div>
+                                    <div class="rounded-lg border border-error/40 bg-error/5 p-3">
+                                        <p class="font-semibold text-error flex items-center gap-2"><span class="material-icons text-base">highlight_off</span>エラー1件</p>
+                                        <p class="mt-1 text-on-surface-variant">行201: 必須項目「商談希望」の値が欠落。担当者による追加入力が必要です。</p>
+                                    </div>
+                                    <div class="grid gap-2 text-on-surface-variant">
+                                        <p class="flex items-center gap-2"><span class="material-icons text-base text-primary">history</span>前回取込: 2025/09/25 09:20 正常完了</p>
+                                        <p class="flex items-center gap-2"><span class="material-icons text-base text-primary">person</span>結果通知先: manager@speedad.example, ops-team@example.com</p>
+                                    </div>
+                                </div>
+                                <div class="mt-4 flex flex-wrap gap-3 text-sm">
+                                    <button class="inline-flex items-center gap-1 rounded-lg bg-primary text-primary-on px-3 py-2"><span class="material-icons text-sm">upload_file</span>再取込を実行</button>
+                                    <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-2"><span class="material-icons text-sm">download</span>結果レポートDL</button>
+                                    <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-2"><span class="material-icons text-sm">note_add</span>対応メモを追加</button>
+                                </div>
+                            </div>
+                            <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+                                <h2 class="text-title-large font-semibold text-on-surface mb-4">操作ログ</h2>
+                                <ol class="space-y-3 text-sm text-on-surface-variant">
+                                    <li>
+                                        <p class="text-on-surface font-medium">2025/09/30 12:10 ステータスを「公開中」に更新</p>
+                                        <p>佐藤 花子が承認後に公開を有効化しました。Idempotency-Key: 6d8f-23aa-90f4</p>
+                                    </li>
+                                    <li>
+                                        <p class="text-on-surface font-medium">2025/09/30 11:50 CSV取込結果を確認</p>
+                                        <p>山本 蓮がCSVを再取込し、警告内容をOpsチームへ連絡。</p>
+                                    </li>
+                                    <li>
+                                        <p class="text-on-surface font-medium">2025/09/28 17:05 公開設定を編集</p>
+                                        <p>システムが自動公開スケジュールを更新。監査ログに記録済み。</p>
+                                    </li>
+                                </ol>
+                                <div class="mt-4 flex items-center justify-between text-xs text-on-surface-variant">
+                                    <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-1.5"><span class="material-icons text-sm">history</span>すべて表示</button>
+                                    <span>監査ログ連携: 有効</span>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Pagination -->
-                    <div class="flex justify-between items-center mt-4">
-                        <span class="text-sm text-gray-700 dark:text-gray-400">
-                            10件中 <span class="font-medium">1</span> から <span class="font-medium">3</span> まで表示
-                        </span>
-                        <div class="flex items-center">
-                            <button class="px-3 py-1 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
-                                前へ
-                            </button>
-                            <button class="ml-2 px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
-                                次へ
-                            </button>
-                        </div>
-                    </div>
-
-                </div>
-            </main>
-
-            <!-- Footer -->
-            <div id="footer-container"></div>
-        </div>
+                </section>
+            </div>
+        </main>
     </div>
-
-    <script src="src/admin.js"></script>
+    <div id="footer-placeholder"></div>
+</div>
+<script type="module" src="src/admin.js"></script>
 </body>
 </html>
