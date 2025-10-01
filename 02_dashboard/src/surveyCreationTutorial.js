@@ -7,6 +7,7 @@ function startSurveyCreationTutorial() {
 
     // --- State ---
     let currentStepIndex = 0;
+    let tutorialCompleted = false;
     const steps = [
         { selector: '#addNewGroupBtn', title: '設問グループ作成', description: 'こちらは設問を編集する画面です。まず、関連する質問をまとめる『グループ』を作成します。内容を確認後、「次へ」ボタンをクリックしてください。', position: 'bottom', showButtons: true, advanceOnClick: false },
         { selector: '#fab-main-button', title: '設問の追加', description: 'グループが作成されました。次に、画面右下の『+』ボタンをクリックして、最初の質問を追加してください。', position: 'left', advanceOnClick: true },
@@ -88,13 +89,15 @@ function startSurveyCreationTutorial() {
         }
         if (svgOverlay) svgOverlay.remove();
         if (popover) popover.remove();
-        localStorage.setItem('speedad-tutorial-status', 'completed');
+        const nextStatus = tutorialCompleted ? 'completed' : 'pending';
+        localStorage.setItem('speedad-tutorial-status', nextStatus);
     }
 
     function showNextStep() {
         if (isTransitioning) return;
 
         if (currentStepIndex >= steps.length) {
+            tutorialCompleted = true;
             destroyTutorial();
             return;
         }
@@ -211,7 +214,10 @@ function startSurveyCreationTutorial() {
                 element.addEventListener('click', advanceHandler, { once: true });
                 if (index === steps.length - 1) {
                     nextButton.style.display = 'none';
-                    element.addEventListener('click', destroyTutorial, { once: true });
+                    element.addEventListener('click', () => {
+                        tutorialCompleted = true;
+                        destroyTutorial();
+                    }, { once: true });
                 }
             }
 

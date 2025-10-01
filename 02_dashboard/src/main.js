@@ -62,6 +62,103 @@ function initLanguageSwitcher() {
         languageSwitcherDropdown.classList.toggle('hidden');
     });
 
+function openNewSurveyModalWithSetup(afterOpen) {
+    handleOpenModal('newSurveyModal', 'modals/newSurveyModal.html', () => {
+        // Initialize flatpickr for the new range input
+        const periodRangePicker = window.flatpickr('#newSurveyPeriodRange', {
+            mode: 'range',
+            dateFormat: 'Y-m-d',
+            locale: 'ja'
+        });
+
+        const createSurveyBtn = document.getElementById('createSurveyFromModalBtn');
+        if (!createSurveyBtn) {
+            if (typeof afterOpen === 'function') {
+                afterOpen({ periodRangePicker: null, createSurveyBtn: null });
+            }
+            return;
+        }
+
+        const surveyNameInput = document.getElementById('surveyName');
+        const displayTitleInput = document.getElementById('displayTitle');
+        const periodRangeInput = document.getElementById('newSurveyPeriodRange');
+
+        const surveyNameError = document.getElementById('surveyName-error');
+        const displayTitleError = document.getElementById('displayTitle-error');
+        const periodRangeError = document.getElementById('newSurveyPeriodRange-error');
+
+        const inputs = [
+            { input: surveyNameInput, error: surveyNameError },
+            { input: displayTitleInput, error: displayTitleError },
+            { input: periodRangeInput, error: periodRangeError }
+        ];
+
+        const hideAllErrors = () => {
+            inputs.forEach(({ input, error }) => {
+                input.classList.remove('border-red-500');
+                error.classList.add('hidden');
+                error.textContent = '';
+            });
+        };
+
+        const showError = (input, error, message) => {
+            input.classList.add('border-red-500');
+            error.textContent = message;
+            error.classList.remove('hidden');
+        };
+
+        createSurveyBtn.addEventListener('click', (e) => {
+            e.preventDefault(); // Prevent default form submission
+            hideAllErrors();
+            let isValid = true;
+
+            // Get values
+            const surveyName = surveyNameInput.value.trim();
+            const displayTitle = displayTitleInput.value.trim();
+            const surveyMemo = document.getElementById('surveyMemo').value.trim();
+            const selectedDates = periodRangePicker.selectedDates;
+
+            // --- Validation ---
+            if (!surveyName) {
+                showError(surveyNameInput, surveyNameError, 'アンケート名を入力してください。');
+                isValid = false;
+            }
+            if (!displayTitle) {
+                showError(displayTitleInput, displayTitleError, '表示タイトルを入力してください。');
+                isValid = false;
+            }
+            if (selectedDates.length < 2) {
+                showError(periodRangeInput, periodRangeError, '回答期間を選択してください。');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                return;
+            }
+
+            const surveyStartDate = periodRangePicker.formatDate(selectedDates[0], 'Y-m-d');
+            const surveyEndDate = periodRangePicker.formatDate(selectedDates[1], 'Y-m-d');
+
+            // Build query parameters
+            const params = new URLSearchParams();
+            params.set('surveyName', surveyName);
+            params.set('displayTitle', displayTitle);
+            if (surveyMemo) params.set('memo', surveyMemo);
+            params.set('periodStart', surveyStartDate);
+            params.set('periodEnd', surveyEndDate);
+
+            // Redirect to the creation page with parameters
+            window.location.href = `surveyCreation.html?${params.toString()}`;
+        });
+
+        if (typeof afterOpen === 'function') {
+            afterOpen({ periodRangePicker, createSurveyBtn });
+        }
+    });
+}
+
+window.openNewSurveyModalWithSetup = openNewSurveyModalWithSetup;
+
     document.addEventListener('click', () => {
         if (!languageSwitcherDropdown.classList.contains('hidden')) {
             languageSwitcherDropdown.classList.add('hidden');
@@ -191,93 +288,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
 
+
     const openNewSurveyModalBtn = document.getElementById('openNewSurveyModalBtn');
     if (openNewSurveyModalBtn) {
-        openNewSurveyModalBtn.addEventListener('click', () => {
-            handleOpenModal('newSurveyModal', 'modals/newSurveyModal.html', () => {
-                // Initialize flatpickr for the new range input
-                const periodRangePicker = window.flatpickr('#newSurveyPeriodRange', {
-                    mode: 'range',
-                    dateFormat: 'Y-m-d',
-                    locale: 'ja'
-                });
-
-                const createSurveyBtn = document.getElementById('createSurveyFromModalBtn');
-                if (createSurveyBtn) {
-                    const surveyNameInput = document.getElementById('surveyName');
-                    const displayTitleInput = document.getElementById('displayTitle');
-                    const periodRangeInput = document.getElementById('newSurveyPeriodRange');
-
-                    const surveyNameError = document.getElementById('surveyName-error');
-                    const displayTitleError = document.getElementById('displayTitle-error');
-                    const periodRangeError = document.getElementById('newSurveyPeriodRange-error');
-
-                    const inputs = [
-                        { input: surveyNameInput, error: surveyNameError },
-                        { input: displayTitleInput, error: displayTitleError },
-                        { input: periodRangeInput, error: periodRangeError }
-                    ];
-
-                    const hideAllErrors = () => {
-                        inputs.forEach(({ input, error }) => {
-                            input.classList.remove('border-red-500');
-                            error.classList.add('hidden');
-                            error.textContent = '';
-                        });
-                    };
-
-                    const showError = (input, error, message) => {
-                        input.classList.add('border-red-500');
-                        error.textContent = message;
-                        error.classList.remove('hidden');
-                    };
-
-                    createSurveyBtn.addEventListener('click', (e) => {
-                        e.preventDefault(); // Prevent default form submission
-                        hideAllErrors();
-                        let isValid = true;
-
-                        // Get values
-                        const surveyName = surveyNameInput.value.trim();
-                        const displayTitle = displayTitleInput.value.trim();
-                        const surveyMemo = document.getElementById('surveyMemo').value.trim();
-                        const selectedDates = periodRangePicker.selectedDates;
-
-                        // --- Validation ---
-                        if (!surveyName) {
-                            showError(surveyNameInput, surveyNameError, 'アンケート名を入力してください。');
-                            isValid = false;
-                        }
-                        if (!displayTitle) {
-                            showError(displayTitleInput, displayTitleError, '表示タイトルを入力してください。');
-                            isValid = false;
-                        }
-                        if (selectedDates.length < 2) {
-                            showError(periodRangeInput, periodRangeError, '回答期間を選択してください。');
-                            isValid = false;
-                        }
-
-                        if (!isValid) {
-                            return;
-                        }
-
-                        const surveyStartDate = periodRangePicker.formatDate(selectedDates[0], 'Y-m-d');
-                        const surveyEndDate = periodRangePicker.formatDate(selectedDates[1], 'Y-m-d');
-
-                        // Build query parameters
-                        const params = new URLSearchParams();
-                        params.set('surveyName', surveyName);
-                        params.set('displayTitle', displayTitle);
-                        if (surveyMemo) params.set('memo', surveyMemo);
-                        params.set('periodStart', surveyStartDate);
-                        params.set('periodEnd', surveyEndDate);
-
-                        // Redirect to the creation page with parameters
-                        window.location.href = `surveyCreation.html?${params.toString()}`;
-                    });
-                }
-            });
-        });
+        openNewSurveyModalBtn.addEventListener('click', openNewSurveyModalWithSetup);
     }
 
     // Initial layout adjustment on load

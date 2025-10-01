@@ -13,6 +13,11 @@ let currentFilteredData = []; // Data array: holds filtered and sorted data
 let currentPage = 1;
 let itemsPerPage = 10; // Default, will be updated from select element
 
+
+function shouldSkipInitialSurveyLoad() {
+    const status = localStorage.getItem('speedad-tutorial-status');
+    return ['pending', 'main-running', 'modal-running', 'survey-creation-started'].includes(status);
+}
 const SURVEY_ID_PATTERN = /^sv_(\d{4})_(\d{2})(\d{3})$/;
 const SURVEY_ID_DEFAULT_USER = '0001';
 const SURVEY_ID_MAX_SEQUENCE = 999;
@@ -687,14 +692,17 @@ export function initTableManager() {
     }
 
     // Initial data fetch and render
-    fetchSurveyData().then(data => {
-        allSurveyData = data;
-        
+    if (shouldSkipInitialSurveyLoad()) {
+        allSurveyData = [];
         applyFiltersAndPagination();
-        
-    }).catch(error => {
-        console.error("DEBUG: Error during initial data fetch or rendering:", error);
-    });
+    } else {
+        fetchSurveyData().then(data => {
+            allSurveyData = data;
+            applyFiltersAndPagination();
+        }).catch(error => {
+            console.error("DEBUG: Error during initial data fetch or rendering:", error);
+        });
+    }
 }
 
 export async function reloadSurveyData() {
@@ -710,7 +718,6 @@ export function updateSurveyData(updatedSurvey) {
         applyFiltersAndPagination(); // Re-apply filters and pagination to update table
     }
 }
-
 
 
 
