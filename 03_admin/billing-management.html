@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpeedAd - 請求管理</title>
+    <link rel="icon" href="../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="../02_dashboard/service-top-style.css">
+    <link rel="stylesheet" href="src/admin-style.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+</head>
+<body class="bg-background text-on-background">
+<div class="relative flex min-h-screen flex-col overflow-x-hidden">
+    <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
+    <div id="header-placeholder"></div>
+    <div class="flex flex-1 pt-16 bg-background">
+        <div id="sidebar-placeholder"></div>
+        <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
+            <div class="flex flex-col w-full max-w-6xl mx-auto flex-1">
+                <div id="breadcrumb-container" class="mb-4"></div>
+                <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant">
+                    <h1 class="text-on-background text-headline-large font-bold leading-tight tracking-tight">請求管理</h1>
+                    <button class="inline-flex items-center gap-1 rounded-lg bg-secondary text-secondary-on px-4 py-2 text-sm font-semibold"><span class="material-icons text-base">schedule</span>自動バッチ設定</button>
+                </div>
+                <section class="space-y-6">
+    <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+        <div class="flex flex-wrap justify-between items-center gap-3">
+            <div>
+                <h2 class="text-title-large font-semibold text-on-surface">請求状況サマリ</h2>
+                <p class="text-on-surface-variant text-sm">アンケート単位と請求書単位を切り替えて管理します。</p>
+            </div>
+            <div class="flex items-center gap-2 text-sm">
+                <button class="px-3 py-1 rounded-full bg-primary/10 text-primary">アンケート単位</button>
+                <button class="px-3 py-1 rounded-full border border-outline">請求書単位</button>
+            </div>
+        </div>
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mt-6">
+            <div class="rounded-lg bg-surface-variant/40 p-4">
+                <p class="text-on-surface-variant text-sm">今月予定額</p>
+                <p class="text-title-large font-semibold text-on-surface">¥4,500,000</p>
+            </div>
+            <div class="rounded-lg bg-surface-variant/40 p-4">
+                <p class="text-on-surface-variant text-sm">未請求</p>
+                <p class="text-title-large font-semibold text-warning">¥1,200,000</p>
+            </div>
+            <div class="rounded-lg bg-surface-variant/40 p-4">
+                <p class="text-on-surface-variant text-sm">支払遅延</p>
+                <p class="text-title-large font-semibold text-error">2件</p>
+            </div>
+            <div class="rounded-lg bg-surface-variant/40 p-4">
+                <p class="text-on-surface-variant text-sm">直近入金</p>
+                <p class="text-title-large font-semibold text-on-surface">2025/09/29</p>
+            </div>
+        </div>
+    </div>
+    <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+        <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
+            <div>
+                <h2 class="text-title-large font-semibold text-on-surface">アンケート別請求一覧</h2>
+                <p class="text-on-surface-variant text-sm">請求ステータス・入金状況を確認できます。</p>
+            </div>
+            <div class="flex items-center gap-2 text-sm">
+                <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-2">
+                    <span class="material-icons text-base">file_download</span>
+                    CSV出力
+                </button>
+                <button class="inline-flex items-center gap-1 rounded-lg bg-secondary text-secondary-on px-3 py-2 font-semibold">
+                    <span class="material-icons text-base">add</span>
+                    新規請求書作成
+                </button>
+            </div>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-outline-variant text-sm" aria-label="請求一覧テーブル">
+                <thead class="bg-surface-variant text-on-surface-variant text-xs uppercase">
+                    <tr>
+                        <th class="px-4 py-3 text-left">アンケート</th>
+                        <th class="px-4 py-3 text-left">請求額</th>
+                        <th class="px-4 py-3 text-left">請求日</th>
+                        <th class="px-4 py-3 text-left">入金ステータス</th>
+                        <th class="px-4 py-3 text-left">担当者</th>
+                        <th class="px-4 py-3 text-left">メモ</th>
+                        <th class="px-4 py-3 text-right">操作</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-outline-variant">
+                    <tr class="hover:bg-surface-variant/60">
+                        <td class="px-4 py-3 font-medium text-on-surface">展示会2025春アンケート</td>
+                        <td class="px-4 py-3 text-on-surface-variant">¥1,200,000</td>
+                        <td class="px-4 py-3 text-on-surface-variant">2025/09/25</td>
+                        <td class="px-4 py-3"><span class="inline-flex items-center gap-1 rounded-full bg-success/20 text-success px-2.5 py-1 text-xs">入金済み</span></td>
+                        <td class="px-4 py-3 text-on-surface-variant">田中 太郎</td>
+                        <td class="px-4 py-3 text-on-surface-variant">特急対応</td>
+                        <td class="px-4 py-3 text-right space-x-2">
+                            <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs">詳細</button>
+                            <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs">ステータス更新</button>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-surface-variant/60">
+                        <td class="px-4 py-3 font-medium text-on-surface">オンラインセミナー問合せフォーム</td>
+                        <td class="px-4 py-3 text-on-surface-variant">¥380,000</td>
+                        <td class="px-4 py-3 text-on-surface-variant">2025/09/28</td>
+                        <td class="px-4 py-3"><span class="inline-flex items-center gap-1 rounded-full bg-warning/20 text-warning px-2.5 py-1 text-xs">入金待ち</span></td>
+                        <td class="px-4 py-3 text-on-surface-variant">佐藤 花子</td>
+                        <td class="px-4 py-3 text-on-surface-variant">10/10入金予定</td>
+                        <td class="px-4 py-3 text-right space-x-2">
+                            <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs">リマインド送信</button>
+                            <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs">編集</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <section class="grid gap-6 lg:grid-cols-2">
+        <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+            <h2 class="text-title-large font-semibold text-on-surface mb-4">請求詳細 (選択中)</h2>
+            <dl class="space-y-2 text-sm text-on-surface-variant">
+                <div class="flex justify-between"><dt class="text-on-surface font-medium">請求書番号</dt><dd>INV-20250928-001</dd></div>
+                <div class="flex justify-between"><dt class="text-on-surface font-medium">請求日</dt><dd>2025/09/28</dd></div>
+                <div class="flex justify-between"><dt class="text-on-surface font-medium">入金予定日</dt><dd>2025/10/10</dd></div>
+                <div class="flex justify-between"><dt class="text-on-surface font-medium">ステータス</dt><dd><span class="inline-flex items-center gap-1 rounded-full bg-warning/20 text-warning px-2.5 py-1 text-xs">入金待ち</span></dd></div>
+                <div class="flex justify-between"><dt class="text-on-surface font-medium">備考</dt><dd>先方稟議中</dd></div>
+            </dl>
+            <div class="mt-4 flex flex-wrap gap-2 text-sm">
+                <button class="inline-flex items-center gap-1 rounded-lg bg-primary text-primary-on px-4 py-2">更新を保存</button>
+                <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-4 py-2">入金確認</button>
+                <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-4 py-2">PDFプレビュー</button>
+            </div>
+        </div>
+        <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+            <h2 class="text-title-large font-semibold text-on-surface mb-4">ステータス遷移ログ</h2>
+            <ol class="space-y-3 text-sm text-on-surface-variant">
+                <li>
+                    <p class="text-on-surface font-medium">2025/09/30 10:00 入金予定日を更新</p>
+                    <p>佐藤 花子が入金予定を10/10に変更し、リマインドメールを送信しました。</p>
+                </li>
+                <li>
+                    <p class="text-on-surface font-medium">2025/09/28 18:30 請求書を発行</p>
+                    <p>システムが自動発行し、請求担当へメール通知しました。</p>
+                </li>
+            </ol>
+        </div>
+    </section>
+</section>
+
+            </div>
+        </main>
+    </div>
+    <div id="footer-placeholder"></div>
+</div>
+<script type="module" src="src/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpeedAd - エスカレーション対応</title>
+    <link rel="icon" href="../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="../02_dashboard/service-top-style.css">
+    <link rel="stylesheet" href="src/admin-style.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+</head>
+<body class="bg-background text-on-background">
+<div class="relative flex min-h-screen flex-col overflow-x-hidden">
+    <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
+    <div id="header-placeholder"></div>
+    <div class="flex flex-1 pt-16 bg-background">
+        <div id="sidebar-placeholder"></div>
+        <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
+            <div class="flex flex-col w-full max-w-6xl mx-auto flex-1">
+                <div id="breadcrumb-container" class="mb-4"></div>
+                <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant">
+                    <h1 class="text-on-background text-headline-large font-bold leading-tight tracking-tight">エスカレーション対応</h1>
+                    <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-2 text-sm"><span class="material-icons text-base">settings</span>通知設定</button>
+                </div>
+                <section class="space-y-6">
+    <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+        <div class="flex flex-wrap justify-between items-center gap-3">
+            <div>
+                <h2 class="text-title-large font-semibold text-on-surface">エスカレーション状況</h2>
+                <p class="text-sm text-on-surface-variant">種別ごとの件数と優先度を確認します。</p>
+            </div>
+            <div class="flex items-center gap-2 text-sm">
+                <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-2">
+                    <span class="material-icons text-base">refresh</span>
+                    最新化
+                </button>
+                <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-2">
+                    <span class="material-icons text-base">download</span>
+                    CSV出力
+                </button>
+            </div>
+        </div>
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mt-6">
+            <div class="rounded-lg bg-error/10 p-4">
+                <p class="text-sm text-on-surface-variant">画像不備</p>
+                <p class="text-title-large font-semibold text-error">8件</p>
+            </div>
+            <div class="rounded-lg bg-warning/10 p-4">
+                <p class="text-sm text-on-surface-variant">言語不一致</p>
+                <p class="text-title-large font-semibold text-warning">5件</p>
+            </div>
+            <div class="rounded-lg bg-secondary/10 p-4">
+                <p class="text-sm text-on-surface-variant">情報不足</p>
+                <p class="text-title-large font-semibold text-secondary">3件</p>
+            </div>
+            <div class="rounded-lg bg-success/10 p-4">
+                <p class="text-sm text-on-surface-variant">対応完了 (今週)</p>
+                <p class="text-title-large font-semibold text-success">12件</p>
+            </div>
+        </div>
+    </div>
+    <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+        <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
+            <div>
+                <h2 class="text-title-large font-semibold text-on-surface">エスカレーション一覧</h2>
+                <p class="text-sm text-on-surface-variant">受付日時の新しい順に表示しています。</p>
+            </div>
+            <div class="flex items-center gap-2 text-sm">
+                <label class="flex items-center gap-2"><input type="checkbox" class="form-checkbox" checked />未対応のみ</label>
+                <label class="flex items-center gap-2"><input type="checkbox" class="form-checkbox" />自分の担当</label>
+            </div>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-outline-variant text-sm" aria-label="エスカレーション一覧テーブル">
+                <thead class="bg-surface-variant text-on-surface-variant text-xs uppercase">
+                    <tr>
+                        <th class="px-4 py-3 text-left">発生元</th>
+                        <th class="px-4 py-3 text-left">種別</th>
+                        <th class="px-4 py-3 text-left">受付日時</th>
+                        <th class="px-4 py-3 text-left">優先度</th>
+                        <th class="px-4 py-3 text-left">担当</th>
+                        <th class="px-4 py-3 text-left">状態</th>
+                        <th class="px-4 py-3 text-right">操作</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-outline-variant">
+                    <tr class="hover:bg-surface-variant/60">
+                        <td class="px-4 py-3 text-on-surface">入力 #1241</td>
+                        <td class="px-4 py-3 text-on-surface-variant">画像不備</td>
+                        <td class="px-4 py-3 text-on-surface-variant">2025/09/30 11:12</td>
+                        <td class="px-4 py-3"><span class="inline-flex items-center gap-1 rounded-full bg-error/20 text-error px-2.5 py-1 text-xs">高</span></td>
+                        <td class="px-4 py-3 text-on-surface-variant">田中 太郎</td>
+                        <td class="px-4 py-3 text-on-surface-variant">未対応</td>
+                        <td class="px-4 py-3 text-right space-x-2">
+                            <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs">内容確認</button>
+                            <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs">再割当</button>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-surface-variant/60">
+                        <td class="px-4 py-3 text-on-surface">照合 #2215</td>
+                        <td class="px-4 py-3 text-on-surface-variant">言語不一致</td>
+                        <td class="px-4 py-3 text-on-surface-variant">2025/09/30 09:50</td>
+                        <td class="px-4 py-3"><span class="inline-flex items-center gap-1 rounded-full bg-warning/20 text-warning px-2.5 py-1 text-xs">中</span></td>
+                        <td class="px-4 py-3 text-on-surface-variant">佐藤 花子</td>
+                        <td class="px-4 py-3 text-on-surface-variant">対応中</td>
+                        <td class="px-4 py-3 text-right space-x-2">
+                            <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs">進捗更新</button>
+                            <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs">完了</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <section class="grid gap-6 lg:grid-cols-2">
+        <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm" aria-label="エスカレーション詳細">
+            <h2 class="text-title-large font-semibold text-on-surface mb-4">詳細パネル</h2>
+            <dl class="space-y-2 text-sm text-on-surface-variant">
+                <div class="flex justify-between"><dt class="text-on-surface font-medium">案件ID</dt><dd>#1241</dd></div>
+                <div class="flex justify-between"><dt class="text-on-surface font-medium">種別</dt><dd>画像不備 (解像度不足)</dd></div>
+                <div class="flex justify-between"><dt class="text-on-surface font-medium">発生元</dt><dd>入力 (オペレーター: 山田 向日葵)</dd></div>
+                <div class="flex justify-between"><dt class="text-on-surface font-medium">受付</dt><dd>2025/09/30 11:12</dd></div>
+                <div><dt class="text-on-surface font-medium">詳細</dt><dd class="mt-1">OCR結果と手入力値の差分が大きく、画像の再スキャンが必要です。</dd></div>
+            </dl>
+            <div class="mt-4 flex flex-wrap gap-2 text-sm">
+                <button class="inline-flex items-center gap-1 rounded-lg bg-primary text-primary-on px-4 py-2">対応結果登録</button>
+                <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-4 py-2">再割当</button>
+                <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-4 py-2">クローズ</button>
+            </div>
+        </div>
+        <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm" aria-label="対応履歴">
+            <h2 class="text-title-large font-semibold text-on-surface mb-4">対応履歴</h2>
+            <ol class="space-y-3 text-sm text-on-surface-variant">
+                <li>
+                    <p class="text-on-surface font-medium">2025/09/30 11:20 田中 太郎</p>
+                    <p>オペレーターへ追加情報を依頼。</p>
+                </li>
+                <li>
+                    <p class="text-on-surface font-medium">2025/09/30 11:15 山田 向日葵</p>
+                    <p>画像不鮮明のためエスカレーション登録。</p>
+                </li>
+            </ol>
+        </div>
+    </section>
+</section>
+
+            </div>
+        </main>
+    </div>
+    <div id="footer-placeholder"></div>
+</div>
+<script type="module" src="src/admin.js"></script>
+</body>
+</html>

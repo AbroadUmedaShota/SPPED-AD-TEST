@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpeedAd - 照合一覧</title>
+    <link rel="icon" href="../../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="../../02_dashboard/service-top-style.css">
+    <link rel="stylesheet" href="../src/admin-style.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+</head>
+<body class="bg-background text-on-background">
+<div class="relative flex min-h-screen flex-col overflow-x-hidden">
+    <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
+    <div id="header-placeholder"></div>
+    <div class="flex flex-1 pt-16 bg-background">
+        <div id="sidebar-placeholder"></div>
+        <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
+            <div class="flex flex-col w-full max-w-6xl mx-auto flex-1">
+                <div id="breadcrumb-container" class="mb-4"></div>
+                <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant">
+                    <h1 class="text-on-background text-headline-large font-bold leading-tight tracking-tight">照合一覧</h1>
+                    <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-2 text-sm"><span class="material-icons text-base">view_kanban</span>ボード表示</button>
+                </div>
+                <section class="space-y-6">
+    <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+        <div class="flex flex-wrap justify-between items-center gap-3">
+            <div>
+                <h2 class="text-title-large font-semibold text-on-surface">照合KPI</h2>
+                <p class="text-sm text-on-surface-variant">照合状況を把握し、対応漏れを防ぎます。</p>
+            </div>
+            <div class="flex items-center gap-2 text-sm">
+                <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-2">
+                    <span class="material-icons text-base">download</span>
+                    CSV出力
+                </button>
+                <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-2">
+                    <span class="material-icons text-base">rule</span>
+                    一致判定ルール
+                </button>
+            </div>
+        </div>
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mt-6">
+            <div class="rounded-lg bg-surface-variant/40 p-4">
+                <p class="text-sm text-on-surface-variant">総件数</p>
+                <p class="text-title-large font-semibold text-on-surface">860</p>
+            </div>
+            <div class="rounded-lg bg-success/10 p-4">
+                <p class="text-sm text-on-surface-variant">一致</p>
+                <p class="text-title-large font-semibold text-success">612</p>
+            </div>
+            <div class="rounded-lg bg-warning/10 p-4">
+                <p class="text-sm text-on-surface-variant">不一致</p>
+                <p class="text-title-large font-semibold text-warning">146</p>
+            </div>
+            <div class="rounded-lg bg-error/10 p-4">
+                <p class="text-sm text-on-surface-variant">エスカレーション</p>
+                <p class="text-title-large font-semibold text-error">18</p>
+            </div>
+        </div>
+    </div>
+    <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+        <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
+            <h2 class="text-title-large font-semibold text-on-surface">照合タスク一覧</h2>
+            <form class="flex flex-wrap gap-2 text-sm" aria-label="照合検索フォーム">
+                <input type="search" class="form-input" placeholder="アンケート名・IDで検索" />
+                <select class="form-select">
+                    <option>全ステータス</option>
+                    <option>一致済み</option>
+                    <option>差異あり</option>
+                    <option>要エスカレ</option>
+                </select>
+                <button class="inline-flex items-center gap-1 rounded-lg bg-primary text-primary-on px-3 py-2">検索</button>
+            </form>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-outline-variant text-sm" aria-label="照合タスク一覧テーブル">
+                <thead class="bg-surface-variant text-on-surface-variant text-xs uppercase">
+                    <tr>
+                        <th class="px-4 py-3 text-left">アンケート</th>
+                        <th class="px-4 py-3 text-left">対象</th>
+                        <th class="px-4 py-3 text-left">優先度</th>
+                        <th class="px-4 py-3 text-left">更新日時</th>
+                        <th class="px-4 py-3 text-left">担当</th>
+                        <th class="px-4 py-3 text-left">ステータス</th>
+                        <th class="px-4 py-3 text-right">操作</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-outline-variant">
+                    <tr class="hover:bg-surface-variant/60">
+                        <td class="px-4 py-3 text-on-surface">展示会2025春アンケート</td>
+                        <td class="px-4 py-3 text-on-surface-variant">名刺 #1241</td>
+                        <td class="px-4 py-3"><span class="inline-flex items-center gap-1 rounded-full bg-error/20 text-error px-2.5 py-1 text-xs">高</span></td>
+                        <td class="px-4 py-3 text-on-surface-variant">2025/09/30 11:10</td>
+                        <td class="px-4 py-3 text-on-surface-variant">田中 太郎</td>
+                        <td class="px-4 py-3 text-on-surface-variant">差異あり</td>
+                        <td class="px-4 py-3 text-right">
+                            <a href="detail.html" class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs">照合する</a>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-surface-variant/60">
+                        <td class="px-4 py-3 text-on-surface">オンラインセミナー問合せフォーム</td>
+                        <td class="px-4 py-3 text-on-surface-variant">名刺 #0981</td>
+                        <td class="px-4 py-3"><span class="inline-flex items-center gap-1 rounded-full bg-warning/20 text-warning px-2.5 py-1 text-xs">中</span></td>
+                        <td class="px-4 py-3 text-on-surface-variant">2025/09/30 09:40</td>
+                        <td class="px-4 py-3 text-on-surface-variant">佐藤 花子</td>
+                        <td class="px-4 py-3 text-on-surface-variant">一致済み</td>
+                        <td class="px-4 py-3 text-right">
+                            <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs">履歴</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+            </div>
+        </main>
+    </div>
+    <div id="footer-placeholder"></div>
+</div>
+<script type="module" src="../src/admin.js"></script>
+</body>
+</html>

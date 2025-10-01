@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpeedAd - 照合詳細</title>
+    <link rel="icon" href="../../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="../../02_dashboard/service-top-style.css">
+    <link rel="stylesheet" href="../src/admin-style.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+</head>
+<body class="bg-background text-on-background">
+<div class="relative flex min-h-screen flex-col overflow-x-hidden">
+    <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
+    <div id="header-placeholder"></div>
+    <div class="flex flex-1 pt-16 bg-background">
+        <div id="sidebar-placeholder"></div>
+        <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
+            <div class="flex flex-col w-full max-w-6xl mx-auto flex-1">
+                <div id="breadcrumb-container" class="mb-4"></div>
+                <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant">
+                    <h1 class="text-on-background text-headline-large font-bold leading-tight tracking-tight">照合詳細</h1>
+                    <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-2 text-sm"><span class="material-icons text-base">description</span>証跡ログ</button>
+                </div>
+                <section class="space-y-6">
+    <div class="grid gap-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
+        <section class="rounded-xl border border-outline-variant bg-surface p-4 shadow-sm" aria-label="名刺画像ビューア">
+            <header class="flex justify-between items-center mb-4">
+                <h2 class="text-title-medium font-semibold text-on-surface">名刺画像</h2>
+                <div class="flex items-center gap-2 text-sm">
+                    <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1"><span class="material-icons text-base">zoom_in</span>拡大</button>
+                    <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1"><span class="material-icons text-base">rotate_left</span>左回転</button>
+                    <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1"><span class="material-icons text-base">rotate_right</span>右回転</button>
+                </div>
+            </header>
+            <div class="relative aspect-[3/2] rounded-lg border border-outline-variant/60 bg-surface-variant/30 flex items-center justify-center overflow-hidden">
+                <span class="text-on-surface-variant">名刺画像プレビュー（モック）</span>
+            </div>
+            <div class="mt-4 flex justify-between text-sm text-on-surface-variant">
+                <span>案件ID: #1241</span>
+                <span>OCRスコア: 0.87</span>
+            </div>
+        </section>
+        <section class="rounded-xl border border-outline-variant bg-surface p-6 shadow-sm" aria-label="照合比較テーブル">
+            <header class="flex flex-wrap justify-between items-center gap-3 mb-4">
+                <div>
+                    <h2 class="text-title-large font-semibold text-on-surface">項目比較</h2>
+                    <p class="text-sm text-on-surface-variant">OCRと最大3名の入力結果を比較して確定値を選択します。</p>
+                </div>
+                <div class="flex items-center gap-2 text-sm">
+                    <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1">一致候補</button>
+                    <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1">差分ハイライト</button>
+                </div>
+            </header>
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-sm border border-outline-variant/60" aria-label="項目比較テーブル">
+                    <thead class="bg-surface-variant text-on-surface-variant">
+                        <tr>
+                            <th class="px-4 py-3 text-left">項目</th>
+                            <th class="px-4 py-3 text-left">OCR</th>
+                            <th class="px-4 py-3 text-left">オペレーター1</th>
+                            <th class="px-4 py-3 text-left">オペレーター2</th>
+                            <th class="px-4 py-3 text-left">オペレーター3</th>
+                            <th class="px-4 py-3 text-left">確定値</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-outline-variant">
+                        <tr>
+                            <th class="px-4 py-3 text-left font-medium text-on-surface">氏名</th>
+                            <td class="px-4 py-3 text-on-surface-variant">Yamada Taro</td>
+                            <td class="px-4 py-3 text-on-surface-variant">山田 太郎</td>
+                            <td class="px-4 py-3 text-on-surface-variant">山田 太郎</td>
+                            <td class="px-4 py-3 text-on-surface-variant">山田 太朗</td>
+                            <td class="px-4 py-3">
+                                <select class="form-select text-sm">
+                                    <option selected>山田 太郎</option>
+                                    <option>山田 太朗</option>
+                                    <option>カスタム入力</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="px-4 py-3 text-left font-medium text-on-surface">会社名</th>
+                            <td class="px-4 py-3 text-on-surface-variant">Abroad Inc.</td>
+                            <td class="px-4 py-3 text-on-surface-variant">株式会社アブロード</td>
+                            <td class="px-4 py-3 text-on-surface-variant">株式会社アブロード</td>
+                            <td class="px-4 py-3 text-on-surface-variant">株式会社アブロード</td>
+                            <td class="px-4 py-3">
+                                <select class="form-select text-sm">
+                                    <option selected>株式会社アブロード</option>
+                                    <option>カスタム入力</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="px-4 py-3 text-left font-medium text-on-surface">メール</th>
+                            <td class="px-4 py-3 text-on-surface-variant">t.yamada@example.com</td>
+                            <td class="px-4 py-3 text-on-surface-variant">t.yamada@example.com</td>
+                            <td class="px-4 py-3 text-on-surface-variant">t.yamada@example.com</td>
+                            <td class="px-4 py-3 text-on-surface-variant">t-yamada@example.com</td>
+                            <td class="px-4 py-3">
+                                <select class="form-select text-sm">
+                                    <option selected>t.yamada@example.com</option>
+                                    <option>カスタム入力</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+    <footer class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-outline-variant bg-surface p-4 shadow-sm">
+        <div class="flex items-center gap-3 text-sm text-on-surface-variant">
+            <span>差分: 氏名 (要確認)</span>
+            <span>エスカレーション履歴: 1件</span>
+        </div>
+        <div class="flex flex-wrap gap-2 text-sm">
+            <button class="inline-flex items-center gap-1 rounded border border-outline px-4 py-2">エスカレ登録</button>
+            <button class="inline-flex items-center gap-1 rounded border border-outline px-4 py-2">キャンセル</button>
+            <button class="inline-flex items-center gap-1 rounded bg-primary text-primary-on px-4 py-2">次へ</button>
+        </div>
+    </footer>
+</section>
+
+            </div>
+        </main>
+    </div>
+    <div id="footer-placeholder"></div>
+</div>
+<script type="module" src="../src/admin.js"></script>
+</body>
+</html>

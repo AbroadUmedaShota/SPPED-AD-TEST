@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpeedAd - オペレーター管理</title>
+    <link rel="icon" href="../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="../02_dashboard/service-top-style.css">
+    <link rel="stylesheet" href="src/admin-style.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+</head>
+<body class="bg-background text-on-background">
+<div class="relative flex min-h-screen flex-col overflow-x-hidden">
+    <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
+    <div id="header-placeholder"></div>
+    <div class="flex flex-1 pt-16 bg-background">
+        <div id="sidebar-placeholder"></div>
+        <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
+            <div class="flex flex-col w-full max-w-6xl mx-auto flex-1">
+                <div id="breadcrumb-container" class="mb-4"></div>
+                <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant">
+                    <h1 class="text-on-background text-headline-large font-bold leading-tight tracking-tight">オペレーター管理</h1>
+                    <button class="inline-flex items-center gap-1 rounded-lg bg-secondary text-secondary-on px-4 py-2 text-sm font-semibold"><span class="material-icons text-base">person_add_alt</span>オペレーター招待</button>
+                </div>
+                <section class="space-y-6">
+    <div class="grid gap-4 md:grid-cols-4">
+        <div class="rounded-xl border border-outline-variant bg-surface p-5 shadow-sm">
+            <p class="text-sm text-on-surface-variant">稼働中</p>
+            <p class="text-display-small font-bold text-success">48</p>
+        </div>
+        <div class="rounded-xl border border-outline-variant bg-surface p-5 shadow-sm">
+            <p class="text-sm text-on-surface-variant">待機中</p>
+            <p class="text-display-small font-bold text-warning">12</p>
+        </div>
+        <div class="rounded-xl border border-outline-variant bg-surface p-5 shadow-sm">
+            <p class="text-sm text-on-surface-variant">平均処理件数/日</p>
+            <p class="text-display-small font-bold text-on-surface">36.4</p>
+        </div>
+        <div class="rounded-xl border border-outline-variant bg-surface p-5 shadow-sm">
+            <p class="text-sm text-on-surface-variant">精度 (一致率)</p>
+            <p class="text-display-small font-bold text-primary">97.3%</p>
+        </div>
+    </div>
+    <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+        <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
+            <h2 class="text-title-large font-semibold text-on-surface">オペレーター一覧</h2>
+            <div class="flex items-center gap-2 text-sm">
+                <input type="search" class="form-input" placeholder="氏名・メールで検索" aria-label="オペレーター検索" />
+                <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-2">
+                    <span class="material-icons text-base">filter_list</span>
+                    フィルタ
+                </button>
+            </div>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-outline-variant text-sm" aria-label="オペレーター一覧テーブル">
+                <thead class="bg-surface-variant text-on-surface-variant text-xs uppercase">
+                    <tr>
+                        <th class="px-4 py-3 text-left">氏名</th>
+                        <th class="px-4 py-3 text-left">メール</th>
+                        <th class="px-4 py-3 text-left">権限</th>
+                        <th class="px-4 py-3 text-left">現在タスク</th>
+                        <th class="px-4 py-3 text-left">本日完了</th>
+                        <th class="px-4 py-3 text-left">精度</th>
+                        <th class="px-4 py-3 text-left">状態</th>
+                        <th class="px-4 py-3 text-right">操作</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-outline-variant">
+                    <tr class="hover:bg-surface-variant/60">
+                        <td class="px-4 py-3 font-medium text-on-surface">山田 向日葵</td>
+                        <td class="px-4 py-3 text-on-surface-variant">h.yamada@example.com</td>
+                        <td class="px-4 py-3 text-on-surface-variant">照合兼任</td>
+                        <td class="px-4 py-3 text-on-surface-variant">展示会2025春 #1241</td>
+                        <td class="px-4 py-3 text-on-surface-variant">18件</td>
+                        <td class="px-4 py-3 text-on-surface-variant">98.4%</td>
+                        <td class="px-4 py-3"><span class="inline-flex items-center gap-1 rounded-full bg-success/20 text-success px-2.5 py-1 text-xs">稼働中</span></td>
+                        <td class="px-4 py-3 text-right space-x-2">
+                            <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs">詳細</button>
+                            <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs">稼働停止</button>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-surface-variant/60">
+                        <td class="px-4 py-3 font-medium text-on-surface">鈴木 蒼</td>
+                        <td class="px-4 py-3 text-on-surface-variant">a.suzuki@example.com</td>
+                        <td class="px-4 py-3 text-on-surface-variant">入力専任</td>
+                        <td class="px-4 py-3 text-on-surface-variant">未割当</td>
+                        <td class="px-4 py-3 text-on-surface-variant">12件</td>
+                        <td class="px-4 py-3 text-on-surface-variant">96.2%</td>
+                        <td class="px-4 py-3"><span class="inline-flex items-center gap-1 rounded-full bg-warning/20 text-warning px-2.5 py-1 text-xs">待機中</span></td>
+                        <td class="px-4 py-3 text-right space-x-2">
+                            <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs">割当</button>
+                            <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs">削除</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <section class="grid gap-6 md:grid-cols-2">
+        <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+            <h2 class="text-title-large font-semibold text-on-surface mb-4">新規招待</h2>
+            <form class="space-y-3" aria-label="オペレーター招待フォーム">
+                <label class="flex flex-col gap-1 text-sm text-on-surface-variant">
+                    <span>メールアドレス</span>
+                    <input type="email" class="form-input" placeholder="operator@example.com" />
+                </label>
+                <label class="flex flex-col gap-1 text-sm text-on-surface-variant">
+                    <span>権限</span>
+                    <select class="form-select">
+                        <option>入力専任</option>
+                        <option>照合兼任</option>
+                        <option>管理者候補</option>
+                    </select>
+                </label>
+                <label class="flex flex-col gap-1 text-sm text-on-surface-variant">
+                    <span>グループ</span>
+                    <select class="form-select">
+                        <option>展示会2025春</option>
+                        <option>セミナーB</option>
+                        <option>キャンペーンC</option>
+                    </select>
+                </label>
+                <button class="inline-flex items-center gap-1 rounded-lg bg-primary text-primary-on px-4 py-2 text-sm">招待メール送信</button>
+            </form>
+        </div>
+        <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+            <h2 class="text-title-large font-semibold text-on-surface mb-4">最近の操作履歴</h2>
+            <ul class="space-y-3 text-sm text-on-surface-variant">
+                <li>
+                    <p class="text-on-surface font-medium">2025/09/30 09:15</p>
+                    <p>田中 太郎が山田 向日葵の権限を照合兼任に変更しました。</p>
+                </li>
+                <li>
+                    <p class="text-on-surface font-medium">2025/09/29 17:40</p>
+                    <p>佐藤 花子が新規オペレーターを招待しました (a.suzuki@example.com)。</p>
+                </li>
+            </ul>
+        </div>
+    </section>
+</section>
+
+            </div>
+        </main>
+    </div>
+    <div id="footer-placeholder"></div>
+</div>
+<script type="module" src="src/admin.js"></script>
+</body>
+</html>

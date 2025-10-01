@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpeedAd - 利用者詳細</title>
+    <link rel="icon" href="../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="../02_dashboard/service-top-style.css">
+    <link rel="stylesheet" href="src/admin-style.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+</head>
+<body class="bg-background text-on-background">
+<div class="relative flex min-h-screen flex-col overflow-x-hidden">
+    <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
+    <div id="header-placeholder"></div>
+    <div class="flex flex-1 pt-16 bg-background">
+        <div id="sidebar-placeholder"></div>
+        <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
+            <div class="flex flex-col w-full max-w-6xl mx-auto flex-1">
+                <div id="breadcrumb-container" class="mb-4"></div>
+                <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant">
+                    <div>
+                        <p class="text-on-surface-variant text-sm">ユーザー ID: USR-0001284</p>
+                        <h1 class="text-on-background text-headline-large font-bold leading-tight tracking-tight">田中 太郎</h1>
+                    </div>
+                    <div class="flex flex-wrap gap-2 text-sm">
+                        <a class="inline-flex items-center gap-1 rounded-lg border border-outline px-4 py-2" href="user-management.html">
+                            <span class="material-icons text-base">reply</span>
+                            一覧に戻る
+                        </a>
+                        <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-4 py-2">
+                            <span class="material-icons text-base">mail</span>
+                            初期化メール再送
+                        </button>
+                        <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-4 py-2">
+                            <span class="material-icons text-base">block</span>
+                            アカウント停止
+                        </button>
+                        <button class="inline-flex items-center gap-1 rounded-lg bg-secondary text-secondary-on px-4 py-2 font-semibold">
+                            <span class="material-icons text-base">save</span>
+                            変更を保存
+                        </button>
+                    </div>
+                </div>
+                <section class="space-y-6">
+                    <div class="grid gap-4 md:grid-cols-4">
+                        <div class="rounded-xl border border-outline-variant bg-surface p-5 shadow-sm">
+                            <p class="text-sm text-on-surface-variant">ステータス</p>
+                            <p class="text-title-large font-semibold text-success inline-flex items-center gap-2">
+                                <span class="material-icons text-base">verified</span>
+                                有効
+                            </p>
+                            <p class="text-xs text-on-surface-variant mt-1">最終ログイン: 2025/09/30 11:32</p>
+                        </div>
+                        <div class="rounded-xl border border-outline-variant bg-surface p-5 shadow-sm">
+                            <p class="text-sm text-on-surface-variant">契約プラン</p>
+                            <p class="text-title-large font-semibold text-on-surface">Pro (年間)</p>
+                            <p class="text-xs text-on-surface-variant mt-1">オプション: 名刺自動化 / OCR強化</p>
+                        </div>
+                        <div class="rounded-xl border border-outline-variant bg-surface p-5 shadow-sm">
+                            <p class="text-sm text-on-surface-variant">管理フラグ</p>
+                            <p class="text-title-large font-semibold text-warning inline-flex items-center gap-2">
+                                <span class="material-icons text-base">flag</span>
+                                要注意
+                            </p>
+                            <button class="mt-2 inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs">フラグを更新</button>
+                        </div>
+                        <div class="rounded-xl border border-outline-variant bg-surface p-5 shadow-sm">
+                            <p class="text-sm text-on-surface-variant">関連アンケート</p>
+                            <p class="text-title-large font-semibold text-on-surface">12件</p>
+                            <button class="mt-2 inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs">アンケート一覧を開く</button>
+                        </div>
+                    </div>
+                    <div class="grid gap-6 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+                        <section class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm" aria-label="基本情報">
+                            <h2 class="text-title-large font-semibold text-on-surface mb-4">基本情報</h2>
+                            <div class="grid gap-x-6 gap-y-4 md:grid-cols-2 text-sm text-on-surface-variant">
+                                <label class="flex flex-col gap-1"><span class="text-on-surface font-medium">氏名</span><input type="text" class="form-input" value="田中 太郎" /></label>
+                                <label class="flex flex-col gap-1"><span class="text-on-surface font-medium">氏名カナ</span><input type="text" class="form-input" value="タナカ タロウ" /></label>
+                                <label class="flex flex-col gap-1"><span class="text-on-surface font-medium">メールアドレス</span><input type="email" class="form-input" value="t.tanaka@example.com" /></label>
+                                <label class="flex flex-col gap-1"><span class="text-on-surface font-medium">電話番号</span><input type="tel" class="form-input" value="03-1234-5678" /></label>
+                                <label class="flex flex-col gap-1"><span class="text-on-surface font-medium">会社名</span><input type="text" class="form-input" value="株式会社アブロード" /></label>
+                                <label class="flex flex-col gap-1"><span class="text-on-surface font-medium">部署・役職</span><input type="text" class="form-input" value="マーケティング部 / マネージャー" /></label>
+                                <label class="flex flex-col gap-1 md:col-span-2"><span class="text-on-surface font-medium">内部メモ</span><textarea rows="3" class="form-textarea" placeholder="社内共有事項">契約更新交渉中。10月第1週に再連絡予定。</textarea></label>
+                            </div>
+                            <div class="mt-4 flex flex-wrap gap-2">
+                                <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs">パスワード初期化リンクを送信</button>
+                                <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs">アカウント権限を変更</button>
+                            </div>
+                        </section>
+                        <section class="space-y-6" aria-label="詳細設定">
+                            <details open class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+                                <summary class="flex cursor-pointer items-center justify-between gap-2 text-on-surface font-semibold text-title-medium">請求・連絡先情報<span class="material-icons text-base">expand_more</span></summary>
+                                <div class="mt-4 grid gap-x-6 gap-y-3 md:grid-cols-2 text-sm text-on-surface-variant">
+                                    <label class="flex flex-col gap-1"><span class="text-on-surface font-medium">請求書宛名</span><input type="text" class="form-input" value="株式会社アブロード 御中" /></label>
+                                    <label class="flex flex-col gap-1"><span class="text-on-surface font-medium">請求先メール</span><input type="email" class="form-input" value="billing@example.com" /></label>
+                                    <label class="flex flex-col gap-1"><span class="text-on-surface font-medium">郵便番号</span><input type="text" class="form-input" value="150-0001" /></label>
+                                    <label class="flex flex-col gap-1"><span class="text-on-surface font-medium">住所</span><input type="text" class="form-input" value="東京都渋谷区神宮前1-1-1" /></label>
+                                </div>
+                            </details>
+                            <details class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+                                <summary class="flex cursor-pointer items-center justify-between gap-2 text-on-surface font-semibold text-title-medium">サービス設定<span class="material-icons text-base">expand_more</span></summary>
+                                <div class="mt-4 grid gap-x-6 gap-y-3 md:grid-cols-2 text-sm text-on-surface-variant">
+                                    <label class="flex flex-col gap-1"><span class="text-on-surface font-medium">権限ロール</span><select class="form-select"><option>運用管理者</option><option>一般ユーザー</option><option>閲覧のみ</option></select></label>
+                                    <label class="flex flex-col gap-1"><span class="text-on-surface font-medium">利用モジュール</span><select class="form-select" multiple><option selected>アンケート作成</option><option selected>データ入力管理</option><option selected>ダッシュボード</option><option>請求管理</option></select></label>
+                                    <label class="flex flex-col gap-2 md:col-span-2"><span class="text-on-surface font-medium">通知設定</span><div class="grid gap-3 md:grid-cols-2"><div class="flex items-center gap-2"><input type="checkbox" class="form-checkbox" checked />メール通知</div><div class="flex items-center gap-2"><input type="checkbox" class="form-checkbox" checked />Slack (marketing-channel)</div><div class="flex items-center gap-2"><input type="checkbox" class="form-checkbox" />Webhook</div></div></label>
+                                    <label class="flex items-center gap-2 md:col-span-2"><input type="checkbox" class="form-checkbox" checked /><span class="text-on-surface-variant text-sm">MFA必須 / IP制限を有効化 (社内VPNのみ許可)</span></label>
+                                </div>
+                            </details>
+                            <details class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+                                <summary class="flex cursor-pointer items-center justify-between gap-2 text-on-surface font-semibold text-title-medium">操作履歴<span class="material-icons text-base">expand_more</span></summary>
+                                <ul class="mt-4 space-y-3 text-sm text-on-surface-variant" aria-label="操作履歴一覧">
+                                    <li class="flex gap-3"><span class="material-icons text-primary text-base">history</span><div><p class="text-on-surface font-medium">2025/09/30 10:05</p><p>田中 太郎 が 通知設定（Slack）を更新。</p></div></li>
+                                    <li class="flex gap-3"><span class="material-icons text-primary text-base">history</span><div><p class="text-on-surface font-medium">2025/09/18 15:40</p><p>自動処理により契約プランを Pro (年間) に更新。</p></div></li>
+                                    <li class="flex gap-3"><span class="material-icons text-primary text-base">history</span><div><p class="text-on-surface font-medium">2025/08/25 11:22</p><p>佐藤 花子 が 管理フラグを「要注意」に設定。</p></div></li>
+                                </ul>
+                            </details>
+                        </section>
+                    </div>
+                    <section class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm" aria-label="所有アンケート一覧">
+                        <header class="flex flex-wrap justify-between items-center gap-3 mb-4">
+                            <div><h2 class="text-title-large font-semibold text-on-surface">所有アンケート</h2><p class="text-sm text-on-surface-variant">このアカウントが作成・管理するアンケートの一覧です。</p></div>
+                            <div class="flex items-center gap-2 text-sm"><button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-2"><span class="material-icons text-base">add_circle</span>新規アンケート</button><button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-2"><span class="material-icons text-base">file_download</span>CSVエクスポート</button></div>
+                        </header>
+                        <div class="overflow-x-auto"><table class="min-w-full divide-y divide-outline-variant text-sm" aria-label="所有アンケートテーブル"><thead class="bg-surface-variant text-on-surface-variant text-xs uppercase"><tr><th class="px-4 py-3 text-left">アンケート名</th><th class="px-4 py-3 text-left">ステータス</th><th class="px-4 py-3 text-left">会期</th><th class="px-4 py-3 text-left">プラン</th><th class="px-4 py-3 text-left">未処理タスク</th><th class="px-4 py-3 text-right">操作</th></tr></thead><tbody class="divide-y divide-outline-variant"><tr class="hover:bg-surface-variant/60"><td class="px-4 py-3 text-on-surface font-medium">展示会2025春アンケート</td><td class="px-4 py-3"><span class="inline-flex items-center gap-1 rounded-full bg-success/20 text-success px-2.5 py-1 text-xs">公開中</span></td><td class="px-4 py-3 text-on-surface-variant">2025/03/10〜03/15</td><td class="px-4 py-3 text-on-surface-variant">Pro</td><td class="px-4 py-3 text-on-surface-variant">3件 (入力), 1件 (照合)</td><td class="px-4 py-3 text-right space-x-2"><button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs">詳細</button><button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs">タスクを見る</button></td></tr><tr class="hover:bg-surface-variant/60"><td class="px-4 py-3 text-on-surface font-medium">オンラインセミナー問合せフォーム</td><td class="px-4 py-3"><span class="inline-flex items-center gap-1 rounded-full bg-warning/20 text-warning px-2.5 py-1 text-xs">準備中</span></td><td class="px-4 py-3 text-on-surface-variant">2025/10/01〜10/05</td><td class="px-4 py-3 text-on-surface-variant">Enterprise</td><td class="px-4 py-3 text-on-surface-variant">2件 (入力待ち)</td><td class="px-4 py-3 text-right space-x-2"><button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs">詳細</button><button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs">照合へ</button></td></tr></tbody></table></div>
+                    </section>
+                </section>
+            </div>
+        </main>
+    </div>
+    <div id="footer-placeholder"></div>
+</div>
+<script type="module" src="src/admin.js"></script>
+</body>
+</html>

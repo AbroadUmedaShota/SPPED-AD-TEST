@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>00_admin_requirements_design.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="%E7%AE%A1%E7%90%86%E8%80%85%E7%94%BB%E9%9D%A2-%E8%A6%81%E4%BB%B6%E3%83%BB%E8%A8%AD%E8%A8%88%E3%82%B5%E3%83%9E%E3%83%AA-v01">管理者画面 要件・設計サマリ (v0.1)</h1>
+<ul>
+<li>作成日: 2025-09-24</li>
+<li>対象システム: SPEED AD 管理者ポータル</li>
+<li>参照元: 03_admin 配下モック &amp; <code>docs/resources/client-materials/reference-docs/【00.要件定義書】2025-05-21※Backlog転記済.txt</code> 等</li>
+</ul>
+<h2 id="1-%E8%83%8C%E6%99%AF%E3%81%A8%E7%9B%AE%E7%9A%84">1. 背景と目的</h2>
+<ul>
+<li>リード管理プロセス全体を管理者が統制できることを目的に、ユーザー側UIとは独立した管理者向けモックと要件を整理する。</li>
+<li>本書は既存モックの構造と要件定義書の「管理者向け機能 (3.3)」「横断要件 (3.5)」を抽出し、画面・機能・データ・運用観点を俯瞰できるようにする。</li>
+<li>ここで定義した内容を起点に、詳細仕様・実装タスク・バックエンドAPI設計に展開する。</li>
+</ul>
+<h2 id="2-%E7%AE%A1%E7%90%86%E8%80%85%E3%83%AD%E3%83%BC%E3%83%AB%E3%81%A8%E6%A8%A9%E9%99%90%E3%83%AC%E3%83%99%E3%83%AB">2. 管理者ロールと権限レベル</h2>
+<table>
+<thead>
+<tr>
+<th>ロール</th>
+<th>想定利用者</th>
+<th>主な権限/アクセス範囲</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>マネージャー</td>
+<td>アブロード社 管理責任者</td>
+<td>全メニューアクセス、請求・クーポン・営業日設定の更新権限。</td>
+</tr>
+<tr>
+<td>スタッフ</td>
+<td>アブロード社 運用担当</td>
+<td>ユーザー/アンケート/請求管理の閲覧・更新、カレンダー/クーポンは閲覧中心。</td>
+</tr>
+<tr>
+<td>オペレーター管理者</td>
+<td>BPOチームリード</td>
+<td>データ入力・照合・オペレーター管理・実績管理へのフルアクセス。請求関連は閲覧のみ。</td>
+</tr>
+<tr>
+<td>オペレーター</td>
+<td>名刺データ入力担当</td>
+<td>データ入力・照合メニューのみ（一覧→対象選択→入力/照合画面）。</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>サイドバー (<code>03_admin/common/sidebar.html</code>) は上記ロールに合わせてメニュー表示制御を行う想定。権限別のルーティング/機能制限を後続設計で詰める。</p>
+</blockquote>
+<h2 id="3-%E7%AE%A1%E7%90%86%E8%80%85%E7%94%BB%E9%9D%A2%E3%81%AE%E6%A7%8B%E9%80%A0">3. 管理者画面の構造</h2>
+<ul>
+<li>共通レイアウト: ヘッダー/サイドバー/フッターを動的読込 (<code>admin.js#loadCommonHtml</code>)。Tailwind + カスタムCSS (<code>src/admin-style.css</code>) + Material Icons を基盤とする。</li>
+<li>主要画面とモックソース:</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>画面カテゴリ</th>
+<th>モックID/ファイル</th>
+<th>想定URL</th>
+<th>主目的</th>
+<th>主な要素</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ダッシュボード</td>
+<td><code>index.html</code></td>
+<td><code>/admin/index.html</code></td>
+<td>管理者導線の入口 + 通知確認</td>
+<td>エスカレーション/処理状況アラート、主要指標カード（準備中）。</td>
+</tr>
+<tr>
+<td>ユーザー管理</td>
+<td>(未実装モック)</td>
+<td><code>/admin/user-management.html</code></td>
+<td>ユーザー検索・編集</td>
+<td>リスト + 詳細ドロワー想定。</td>
+</tr>
+<tr>
+<td>アンケート管理</td>
+<td>(未実装モック)</td>
+<td><code>/admin/survey-management.html</code></td>
+<td>アンケート一覧/詳細操作</td>
+<td>ステータス変更・CSV取込など。</td>
+</tr>
+<tr>
+<td>請求管理</td>
+<td>(未実装モック)</td>
+<td><code>/admin/billing-management.html</code></td>
+<td>依頼別/請求書別の管理</td>
+<td><code>docs/specifications/04_invoice_screen.md</code> 連携。</td>
+</tr>
+<tr>
+<td>クーポン管理</td>
+<td>(未実装モック)</td>
+<td><code>/admin/coupon-management.html</code></td>
+<td>割引コード発行・配布状況</td>
+<td>自動コード生成UIが必要。</td>
+</tr>
+<tr>
+<td>営業日カレンダー</td>
+<td>(未実装モック)</td>
+<td><code>/admin/calendar-management.html</code></td>
+<td>休業日の設定</td>
+<td>カレンダー + 追加/削除操作。</td>
+</tr>
+<tr>
+<td>データ入力管理 - 一覧</td>
+<td><code>BY-211_オペレーター入力画面/BY-212/BY-212.html</code></td>
+<td><code>/admin/data-entry-management.html</code></td>
+<td>入力対象の割当・遷移</td>
+<td>優先度別リスト、詳細へのリンク。</td>
+</tr>
+<tr>
+<td>データ入力管理 - 入力画面</td>
+<td><code>BY-211_オペレーター入力画面/BY-213/BY-213.html</code></td>
+<td><code>/admin/data-entry/form.html</code></td>
+<td>名刺情報の手入力</td>
+<td>左:名刺画像/回転、右:入力フォーム、下部操作群。</td>
+</tr>
+<tr>
+<td>照合管理 - 一覧</td>
+<td><code>BY-221_照合画面/BY-222/BY-222.html</code></td>
+<td><code>/admin/reconciliation/list.html</code></td>
+<td>照合ステータス確認</td>
+<td>KPIカード + テーブル。</td>
+</tr>
+<tr>
+<td>照合管理 - 詳細</td>
+<td><code>BY-221_照合画面/BY-223/BY-223.html</code></td>
+<td><code>/admin/reconciliation/detail.html</code></td>
+<td>入力データとOCRの突合</td>
+<td>画像ビューア + 項目比較テーブル + 操作ボタン。</td>
+</tr>
+<tr>
+<td>オペレーター管理</td>
+<td><code>BY-231_オペレーター管理/BY-231/BY-231.html</code></td>
+<td><code>/admin/operator-management.html</code></td>
+<td>アカウント一覧/招待</td>
+<td>モーダルで新規作成、ステータス表示。</td>
+</tr>
+<tr>
+<td>エスカレーション対応</td>
+<td>(計画中)</td>
+<td><code>/admin/escalations.html</code></td>
+<td>エスカレーション内容の確認・処理</td>
+<td>種別別キュー、対応履歴入力、再割当操作。</td>
+</tr>
+<tr>
+<td>実績管理</td>
+<td>(未実装モック)</td>
+<td><code>/admin/performance-management.html</code></td>
+<td>入力実績の集計可視化</td>
+<td>時系列/項目別グラフ想定。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-%E6%A9%9F%E8%83%BD%E8%A6%81%E4%BB%B6%E8%A9%B3%E7%B4%B0">4. 機能要件詳細</h2>
+<p>以下は要件定義書 3.3節からの抜粋/整理。**【冪等性制御適用対象】**は 3.5.1 の仕組みに従う。</p>
+<h3 id="41-%E3%82%A2%E3%82%AB%E3%82%A6%E3%83%B3%E3%83%88%E7%AE%A1%E7%90%86">4.1 アカウント管理</h3>
+<ul>
+<li>対象: 管理者画面にログインする管理者アカウント（マネージャー/スタッフ/オペレーター管理者/オペレーター）。</li>
+<li>一覧: 現在のログイン状態（オンライン/オフライン/ロック中）、権限グループ、最終ログイン日時、MFA設定状況を表示。</li>
+<li>詳細: プロフィール、所属組織、権限セット、セッション履歴、直近の操作ログを閲覧。</li>
+<li>操作:
+<ul>
+<li>アカウントステータス更新（有効化/停止/ロック解除/パスワード初期化）。</li>
+<li>権限グループ変更、MFAリセット。</li>
+<li>強制サインアウトやセッション終了。</li>
+</ul>
+</li>
+<li>監査/冪等性: すべての更新・強制操作で Idempotency-Key を付与し、監査ログへ記録。</li>
+</ul>
+<h3 id="42-%E5%88%A9%E7%94%A8%E8%80%85%E3%82%A2%E3%82%AB%E3%82%A6%E3%83%B3%E3%83%88%E7%AE%A1%E7%90%86%E3%83%A6%E3%83%BC%E3%82%B6%E3%83%BC%E7%AE%A1%E7%90%86">4.2 利用者アカウント管理（ユーザー管理）</h3>
+<ul>
+<li>対象: SPEED AD を利用する顧客/利用者アカウント。</li>
+<li>一覧: ページネーション付きテーブル。フィルタ（ID、氏名、会社名、契約ステータス、プラン種別）。</li>
+<li>詳細モーダル/画面: 基本情報、契約プラン、関連アンケート、利用状況を閲覧・編集。</li>
+<li>操作:
+<ul>
+<li>アカウント停止/再開。</li>
+<li>管理フラグ・内部メモ登録。</li>
+<li>初期化メール再送、プラン変更連携。</li>
+</ul>
+</li>
+<li>監査/冪等性: 各更新APIで Idempotency-Key を付与し、再試行時も同一キーを利用。</li>
+</ul>
+<h3 id="43-%E3%82%A2%E3%83%B3%E3%82%B1%E3%83%BC%E3%83%88%E7%AE%A1%E7%90%86">4.3 アンケート管理</h3>
+<ul>
+<li>一覧: アンケートID/名称/会社/会期/ステータス/プラン/担当者。</li>
+<li>検索: キーワード + ステータス + 期間フィルタ。</li>
+<li>詳細: ユーザー代行での設定変更（フォーム構成、公開設定、プラン変更）。</li>
+<li>操作: 手動ステータス変更、削除、名刺画像ダウンロード、データ化完了CSVアップロード。</li>
+<li>注意: CSV取り込み時は結果フィードバックUIを設ける。</li>
+</ul>
+<h3 id="44-%E8%AB%8B%E6%B1%82%E7%AE%A1%E7%90%86">4.4 請求管理</h3>
+<ul>
+<li>アンケート単位と請求書単位の2軸ビュー。</li>
+<li>詳細: 金額・請求日・入金日を手動調整。【冪等性】対象。</li>
+<li>出力: 請求書プレビュー/ダウンロード (PDF) は <code>docs/specifications/04_invoice_screen.md</code>/<code>05_invoice_document.md</code> を準拠。</li>
+<li>未決事項: 自動発行バッチとの連係/ステータス遷移ルール。</li>
+</ul>
+<h3 id="45-%E3%82%AF%E3%83%BC%E3%83%9D%E3%83%B3%E7%AE%A1%E7%90%86">4.5 クーポン管理</h3>
+<ul>
+<li>一覧 + 検索（コード/名称/状態/利用回数）。</li>
+<li>新規作成: コード自動生成、割引率、有効期限、利用回数制限、対象プラン設定。</li>
+<li>編集: 条件変更、利用停止。履歴表示検討。</li>
+<li>利用ログ: 一覧で利用日時/対象アンケート/適用金額を表示。</li>
+</ul>
+<h3 id="46-%E5%96%B6%E6%A5%AD%E6%97%A5%E3%82%AB%E3%83%AC%E3%83%B3%E3%83%80%E3%83%BC%E7%AE%A1%E7%90%86">4.6 営業日カレンダー管理</h3>
+<ul>
+<li>カレンダービュー（祝日API連携 or マスタ）</li>
+<li>土日祝以外の休業日追加/削除。</li>
+<li>補足: 休日設定はデータ入力SLA計算に影響。変更差分をログ化。</li>
+</ul>
+<h3 id="47-%E3%83%87%E3%83%BC%E3%82%BF%E5%85%A5%E5%8A%9B%E3%83%BB%E7%85%A7%E5%90%88%E7%AE%A1%E7%90%86">4.7 データ入力・照合管理</h3>
+<ul>
+<li><strong>入力一覧</strong>:
+<ul>
+<li>グループ/優先度別の残タスク表示。</li>
+<li>ロック制御: メール未入力時のグループ遷移禁止など内部ロジックあり。</li>
+<li>割当ルール: タイムアウト発生時は占有ロックを解除してキューへ戻し、スキップ選択時は別オペレーターに自動再割当。スキップしたオペレーターには同一名刺を再表示しない。</li>
+</ul>
+</li>
+<li><strong>入力画面 (BY-213)</strong>:
+<ul>
+<li>左パネル: 名刺画像(表/裏)、回転ボタン、スワップ。</li>
+<li>右パネル: 項目フォーム（必須/任意、バリデーション表示）、ステータスラベル。</li>
+<li>下部: 保存、スキップ（理由必須）、完了、次へ。経過時間表示。</li>
+<li>メモ: OCR結果は入力画面では表示しない（照合フェーズでのみ参照）。</li>
+<li>内部処理:
+<ul>
+<li>占有ロックと経過時間監視でタイムアウトを検知し再割当する。</li>
+<li>文字列一致判定は全角/半角を区別し、空白・改行は除去した上で比較する。</li>
+<li>スキップ理由を記録し、3回スキップでエスカレーション登録、3回完了で入力不可フラグを立てる。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>照合一覧 (BY-222)</strong>:
+<ul>
+<li>KPIカード: 総件数/一致/不一致/未入力/エスカレーション。</li>
+<li>テーブル: アンケート、優先度、更新日時、担当者等。フィルタ機構想定。</li>
+</ul>
+</li>
+<li><strong>照合画面 (BY-223)</strong>:
+<ul>
+<li>上部: 基本情報 + 保存/エスカレーション/キャンセルボタン。</li>
+<li>左: 名刺画像ビューア（拡大/回転/裏面切替、ホバーズーム領域）。</li>
+<li>右: 項目比較テーブル（項目名、OCR、入力1〜3、最終確定値、選択UI）。全候補を一覧表示し、既存値から選択または管理者が確定値を直接入力できる。</li>
+<li>下: コメント/履歴、次へボタン。</li>
+<li>判定補助: 差分ハイライト（全角/半角は区別、空白は無視）と自由記述コメント欄。</li>
+<li>内部処理: 確定結果を <code>input_business_cards.corrected_data</code> へ保存、CSVダウンロード用データに反映、オペレーター精度実績ログ記録。</li>
+</ul>
+</li>
+<li><strong>エスカレーション通知/対応</strong>:
+<ul>
+<li>エスカレーション発生時はダッシュボードにアラートカードを表示し、マネージャー/スタッフへ通知。</li>
+<li>種別（画像不備、言語不一致等）を付与し、専用画面で対応状況と履歴を管理。</li>
+</ul>
+</li>
+</ul>
+<h3 id="48-%E3%82%AA%E3%83%9A%E3%83%AC%E3%83%BC%E3%82%BF%E3%83%BC%E7%AE%A1%E7%90%86">4.8 オペレーター管理</h3>
+<ul>
+<li>一覧: 名前、メール、所属グループ、稼働状況、直近の処理件数。</li>
+<li>招待: モーダルでメール入力 → アカウント発行 &amp; 初期パスワード通知。</li>
+<li>編集: 権限変更（例: 入力専任/照合兼任）、稼働ステータス変更。</li>
+<li>削除: 論理削除 + 既存タスク再割当が必要。</li>
+</ul>
+<h3 id="49-%E5%AE%9F%E7%B8%BE%E7%AE%A1%E7%90%86">4.9 実績管理</h3>
+<ul>
+<li>集計指標: グループ別処理件数/正答率、オペレーター別件数・エラー数、期間比較。</li>
+<li>ビジュアル: 折れ線/棒グラフ + ダウンロード（CSV, PDF）。</li>
+<li>ドリルダウン: オペレーター→対象アンケート→入力履歴。</li>
+</ul>
+<h3 id="410-%E3%82%A8%E3%82%B9%E3%82%AB%E3%83%AC%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%E5%AF%BE%E5%BF%9C">4.10 エスカレーション対応</h3>
+<ul>
+<li>対象: 入力/照合でエスカレーションフラグが立った案件。</li>
+<li>一覧: 種別、発生元（入力 or 照合）、受付日時、優先度、担当者、対応状況を表示。</li>
+<li>詳細: 原因コメント、添付資料、操作履歴、再割当先を確認・編集。</li>
+<li>操作: 対応結果登録、再開、再割当、クローズ。完了時はダッシュボードアラートを自動消込。</li>
+<li>監査: 対応履歴は監査ログに記録し、対象案件へ紐付け。</li>
+</ul>
+<h2 id="5-%E3%83%87%E3%83%BC%E3%82%BF%E3%81%8A%E3%82%88%E3%81%B3api%E5%89%8D%E6%8F%90">5. データおよびAPI前提</h2>
+<ul>
+<li>主要テーブル (要件定義書6章より):
+<ul>
+<li><code>Input_business_cards</code>: 名刺入力データ (OCR結果, 入力値1〜3, フラグ類, 担当オペレーターID)。</li>
+<li><code>Users</code> / <code>Corporate</code>: 顧客ユーザー・企業マスタ。</li>
+<li><code>AdminUser</code>, <code>AdminUserGroup</code>: 管理者アカウントと権限グループ。</li>
+<li><code>Coupon</code>, <code>RewardHistory</code>, カレンダー管理テーブル 等。</li>
+</ul>
+</li>
+<li>冪等性制御 (3.5.1):
+<ul>
+<li><code>POST /api/idempotency-key</code> でキー発行 → 更新系APIの <code>Idempotency-Key</code> ヘッダーに付与。</li>
+<li>Redis でキーとレスポンスをキャッシュ、ユーザーID/操作種別/タイムスタンプを監査ログ化。</li>
+<li>フロントはフォーム送信毎に単一キーを払い出し、リトライ時も同一キーを使用。</li>
+</ul>
+</li>
+<li>ロック/競合対策: データ入力画面の占有ロックは時間制限付き。照合画面も同様の排他制御が必要。</li>
+<li>監査ログ: クリティカル操作（権限変更、請求編集、エスカレーション等）は操作履歴に記録。</li>
+<li>CSV方針: 名刺データ + 回答データはダウンロード対応（UTF-8, ヘッダ付き）。アップロード仕様とバリデーションは別途詳細設計で検討。</li>
+<li>通知/アラート: エスカレーション登録時に <code>/api/admin/escalations</code>（仮称）へ記録し、ダッシュボードカードの未読件数と連動。</li>
+</ul>
+<h2 id="6-ui%E8%A8%AD%E8%A8%88%E3%83%A1%E3%83%A2">6. UI設計メモ</h2>
+<ul>
+<li>共通部品: <code>common/header.html</code> (通知/ユーザー情報), <code>common/sidebar.html</code> (メニュー + ログアウト + テーマ切替), <code>common/footer.html</code> (コピーライト)。</li>
+<li>スタイル: Tailwindベースに <code>src/admin-style.css</code> を追加し、ダーク系配色。Material Icons を主要アイコンに採用。</li>
+<li>レスポンシブ: サイドバーはモバイルでオーバーレイ化 (<code>mobileSidebarOverlay</code>)。主要画面は最大幅 <code>max-w-6xl</code>。</li>
+<li>データ入力 (BY-213):
+<ul>
+<li>左パネル 40%、右パネル 60% レイアウト。画像拡大用ライトボックスあり。</li>
+<li>入力フォームはカテゴリごとにアコーディオン化。必須項目はラベル横に <code>必須</code> バッジ。</li>
+<li>操作ボタン: <code>保存</code>, <code>スキップ</code>, <code>完了</code>, <code>次の名刺へ</code>。</li>
+</ul>
+</li>
+<li>照合 (BY-223):
+<ul>
+<li>画像ビューアはドラッグで拡大移動。上部に表裏切替タブ。</li>
+<li>項目比較テーブルは列固定 + 水平スクロール。確定値はドロップダウン or ラジオ。</li>
+<li><code>エスカレ</code> ボタン押下時は理由入力モーダルを出す想定。</li>
+</ul>
+</li>
+<li>オペレーター管理 (BY-231):
+<ul>
+<li>上部KPIカード（稼働中人数、当日日報等）。</li>
+<li>テーブル列: 氏名/メール/権限/現在のタスク/直近完了件数。</li>
+<li><code>新規招待</code> ボタン→モーダル (メール, 権限, 初期パスワード)。</li>
+</ul>
+</li>
+</ul>
+<h2 id="7-%E6%9C%AA%E6%B1%BA%E4%BA%8B%E9%A0%85%E3%83%BB%E6%A4%9C%E8%A8%8E%E3%82%BF%E3%82%B9%E3%82%AF">7. 未決事項・検討タスク</h2>
+<ol>
+<li>OCR結果の入力画面表示可否 → 入力画面では非表示、照合画面のみ候補表示（2025-10-01 方針決定）。</li>
+<li>エスカレーション処理フロー → 上位権限宛のエスカレーション対応画面を新設し、ダッシュボードアラートで通知。詳細UI/通知頻度は要設計。</li>
+<li>CSVアップロード/ダウンロードのフォーマット → ダウンロード（名刺 + 回答データ）は決定。アップロード仕様・バリデーションは継続検討。</li>
+<li>ロール別メニュー制御・ルーティングの仕様書化。</li>
+<li>ダッシュボード指標の定義 (成約率、処理件数、 SLA 等)。</li>
+<li>監査ログ/操作履歴のUI (閲覧/検索) を設けるか。</li>
+<li>請求管理画面と自動バッチの連携（ステータス同期、メール通知タイミング）。</li>
+<li>オペレーター削除時のタスク再割当ロジック。</li>
+<li>実績管理画面のグラフライブラリ選定と API フォーマット。</li>
+</ol>
+<h2 id="8-%E5%8F%82%E7%85%A7%E8%B3%87%E6%96%99">8. 参照資料</h2>
+<ul>
+<li><code>03_admin/admin_requirements.md</code> (管理者機能要件リスト)</li>
+<li><code>03_admin/index.html</code>, <code>src/admin.js</code>, <code>common/*.html</code></li>
+<li><code>03_admin/BY-211_オペレーター入力画面/BY-213/BY-213.html</code></li>
+<li><code>03_admin/BY-221_照合画面/BY-223/BY-223.html</code></li>
+<li><code>03_admin/BY-231_オペレーター管理/BY-231/BY-231.html</code></li>
+<li><code>docs/specifications/04_invoice_screen.md</code>, <code>05_invoice_document.md</code></li>
+<li><code>docs/resources/client-materials/reference-docs/【00.要件定義書】2025-05-21※Backlog転記済.txt</code></li>
+</ul>
+
+</body>
+</html>

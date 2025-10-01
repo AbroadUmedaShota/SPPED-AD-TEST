@@ -1,4 +1,22 @@
 
+let adminBasePath = '';
+
+function resolveAdminBasePath() {
+    if (adminBasePath !== '') {
+        return adminBasePath;
+    }
+    const scriptElement = document.querySelector('script[type="module"][src*="admin.js"]');
+    const defaultSrc = 'src/admin.js';
+    const scriptSrc = scriptElement ? scriptElement.getAttribute('src') : defaultSrc;
+    const marker = 'src/admin.js';
+    const index = scriptSrc ? scriptSrc.lastIndexOf(marker) : -1;
+    adminBasePath = index !== -1 ? scriptSrc.slice(0, index) : '';
+    if (adminBasePath && !adminBasePath.endsWith('/')) {
+        adminBasePath += '/';
+    }
+    return adminBasePath;
+}
+
 /**
  * Loads HTML content from a specified file and inserts it into a placeholder element.
  * @param {string} placeholderId The ID of the HTML element to insert the content into.
@@ -7,7 +25,8 @@
  */
 async function loadCommonHtml(placeholderId, filePath, callback = null) {
     try {
-        const response = await fetch(filePath);
+        const basePath = resolveAdminBasePath();
+        const response = await fetch(`${basePath}${filePath}`);
         if (!response.ok) {
             throw new Error(`Failed to load ${filePath}: ${response.statusText}`);
         }

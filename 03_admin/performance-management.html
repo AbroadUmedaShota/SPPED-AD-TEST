@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpeedAd - 実績管理</title>
+    <link rel="icon" href="../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="../02_dashboard/service-top-style.css">
+    <link rel="stylesheet" href="src/admin-style.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+</head>
+<body class="bg-background text-on-background">
+<div class="relative flex min-h-screen flex-col overflow-x-hidden">
+    <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
+    <div id="header-placeholder"></div>
+    <div class="flex flex-1 pt-16 bg-background">
+        <div id="sidebar-placeholder"></div>
+        <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
+            <div class="flex flex-col w-full max-w-6xl mx-auto flex-1">
+                <div id="breadcrumb-container" class="mb-4"></div>
+                <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant">
+                    <h1 class="text-on-background text-headline-large font-bold leading-tight tracking-tight">実績管理</h1>
+                    <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-2 text-sm"><span class="material-icons text-base">settings</span>指標設定</button>
+                </div>
+                <section class="space-y-6">
+    <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+        <div class="flex flex-wrap justify-between items-start gap-4">
+            <div>
+                <h2 class="text-title-large font-semibold text-on-surface">集計条件</h2>
+                <p class="text-sm text-on-surface-variant">期間・グループ・担当者で絞り込み可能です。</p>
+            </div>
+            <form class="grid gap-4 md:grid-cols-4" aria-label="集計条件フォーム">
+                <label class="flex flex-col gap-1 text-sm text-on-surface-variant">
+                    <span>期間 (開始)</span>
+                    <input type="date" class="form-input" value="2025-09-01" />
+                </label>
+                <label class="flex flex-col gap-1 text-sm text-on-surface-variant">
+                    <span>期間 (終了)</span>
+                    <input type="date" class="form-input" value="2025-09-30" />
+                </label>
+                <label class="flex flex-col gap-1 text-sm text-on-surface-variant">
+                    <span>グループ</span>
+                    <select class="form-select">
+                        <option>全体</option>
+                        <option>展示会A</option>
+                        <option>セミナーB</option>
+                    </select>
+                </label>
+                <label class="flex flex-col gap-1 text-sm text-on-surface-variant">
+                    <span>指標</span>
+                    <select class="form-select">
+                        <option>処理件数</option>
+                        <option>一致率</option>
+                        <option>平均処理時間</option>
+                    </select>
+                </label>
+            </form>
+        </div>
+    </div>
+    <div class="grid gap-6 md:grid-cols-2">
+        <section class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm" aria-label="処理件数チャート">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-title-large font-semibold text-on-surface">処理件数の推移</h2>
+                <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs">CSVダウンロード</button>
+            </div>
+            <div class="h-64 rounded-lg border border-outline-variant/60 bg-surface-variant/30 flex items-center justify-center">
+                <p class="text-on-surface-variant text-sm">折れ線グラフ（モック）</p>
+            </div>
+        </section>
+        <section class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm" aria-label="一致率チャート">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-title-large font-semibold text-on-surface">一致率の推移</h2>
+                <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs">PDF出力</button>
+            </div>
+            <div class="h-64 rounded-lg border border-outline-variant/60 bg-surface-variant/30 flex items-center justify-center">
+                <p class="text-on-surface-variant text-sm">棒グラフ（モック）</p>
+            </div>
+        </section>
+    </div>
+    <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+        <h2 class="text-title-large font-semibold text-on-surface mb-4">オペレーター別実績</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-outline-variant text-sm" aria-label="オペレーター別実績テーブル">
+                <thead class="bg-surface-variant text-on-surface-variant text-xs uppercase">
+                    <tr>
+                        <th class="px-4 py-3 text-left">オペレーター</th>
+                        <th class="px-4 py-3 text-left">処理件数</th>
+                        <th class="px-4 py-3 text-left">一致率</th>
+                        <th class="px-4 py-3 text-left">平均処理時間</th>
+                        <th class="px-4 py-3 text-left">エスカレーション</th>
+                        <th class="px-4 py-3 text-right">詳細</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-outline-variant">
+                    <tr class="hover:bg-surface-variant/60">
+                        <td class="px-4 py-3 text-on-surface font-medium">山田 向日葵</td>
+                        <td class="px-4 py-3 text-on-surface-variant">420</td>
+                        <td class="px-4 py-3 text-on-surface-variant">98.4%</td>
+                        <td class="px-4 py-3 text-on-surface-variant">4分12秒</td>
+                        <td class="px-4 py-3 text-on-surface-variant">1件</td>
+                        <td class="px-4 py-3 text-right"><button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs">ドリルダウン</button></td>
+                    </tr>
+                    <tr class="hover:bg-surface-variant/60">
+                        <td class="px-4 py-3 text-on-surface font-medium">鈴木 蒼</td>
+                        <td class="px-4 py-3 text-on-surface-variant">315</td>
+                        <td class="px-4 py-3 text-on-surface-variant">97.1%</td>
+                        <td class="px-4 py-3 text-on-surface-variant">4分58秒</td>
+                        <td class="px-4 py-3 text-on-surface-variant">3件</td>
+                        <td class="px-4 py-3 text-right"><button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs">ドリルダウン</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+            </div>
+        </main>
+    </div>
+    <div id="footer-placeholder"></div>
+</div>
+<script type="module" src="src/admin.js"></script>
+</body>
+</html>
