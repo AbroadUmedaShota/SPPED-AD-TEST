@@ -17,6 +17,51 @@ function resolveAdminBasePath() {
     return adminBasePath;
 }
 
+function getAdminBaseUrl() {
+    const basePath = resolveAdminBasePath();
+    const normalizedBasePath = basePath || './';
+    return new URL(normalizedBasePath, window.location.href);
+}
+
+function isRelativeResourcePath(value) {
+    if (!value) {
+        return false;
+    }
+    return !/^(?:[a-z][a-z0-9+\-.]*:|[#/])/i.test(value);
+}
+
+function resolveResourcePath(value) {
+    const baseUrl = getAdminBaseUrl();
+    const normalizedValue = value.startsWith('./') ? value.slice(2) : value;
+    const resolvedUrl = new URL(normalizedValue, baseUrl);
+    return `${resolvedUrl.pathname}${resolvedUrl.search}${resolvedUrl.hash}`;
+}
+
+function adjustRelativePaths(container) {
+    if (!container) {
+        return;
+    }
+
+    const targets = [
+        { selector: 'a[href]', attribute: 'href' },
+        { selector: 'img[src]', attribute: 'src' },
+        { selector: 'link[href]', attribute: 'href' }
+    ];
+
+    targets.forEach(({ selector, attribute }) => {
+        container.querySelectorAll(selector).forEach(element => {
+            const originalValue = element.getAttribute(attribute);
+
+            if (!isRelativeResourcePath(originalValue)) {
+                return;
+            }
+
+            const adjustedValue = resolveResourcePath(originalValue);
+            element.setAttribute(attribute, adjustedValue);
+        });
+    });
+}
+
 /**
  * Loads HTML content from a specified file and inserts it into a placeholder element.
  * @param {string} placeholderId The ID of the HTML element to insert the content into.
@@ -34,12 +79,56 @@ async function loadCommonHtml(placeholderId, filePath, callback = null) {
         const placeholder = document.getElementById(placeholderId);
         if (placeholder) {
             placeholder.innerHTML = html;
+            adjustRelativePaths(placeholder);
             if (callback && typeof callback === 'function') {
                 callback();
             }
         }
     } catch (error) {
         console.error(`Error loading common HTML from ${filePath}:`, error);
+    }
+}
+
+function toggleMobileSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const mobileSidebarOverlay = document.getElementById('mobileSidebarOverlay');
+    if (!sidebar || !mobileSidebarOverlay) {
+        return;
+    }
+
+    const isOpen = sidebar.classList.contains('is-open-mobile');
+    if (isOpen) {
+        sidebar.classList.remove('is-open-mobile');
+        mobileSidebarOverlay.classList.remove('is-visible');
+        document.body.classList.remove('sidebar-locked');
+    } else {
+        sidebar.classList.add('is-open-mobile');
+        mobileSidebarOverlay.classList.add('is-visible');
+        document.body.classList.add('sidebar-locked');
+    }
+}
+
+function closeMobileSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const mobileSidebarOverlay = document.getElementById('mobileSidebarOverlay');
+    if (!sidebar || !mobileSidebarOverlay) {
+        return;
+    }
+
+    sidebar.classList.remove('is-open-mobile');
+    mobileSidebarOverlay.classList.remove('is-visible');
+    document.body.classList.remove('sidebar-locked');
+}
+
+function handleResizeForSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const mobileSidebarOverlay = document.getElementById('mobileSidebarOverlay');
+    if (!sidebar || !mobileSidebarOverlay) {
+        return;
+    }
+
+    if (window.innerWidth >= 1024) {
+        closeMobileSidebar();
     }
 }
 
@@ -63,8 +152,31 @@ function setActiveSidebarLink() {
  */
 function initAdminSidebarHandler() {
     setActiveSidebarLink();
-    // Placeholder for future logic like theme toggling
-    console.log("Admin sidebar handler initialized.");
+
+    const mobileToggleButton = document.getElementById('mobile-sidebar-toggle');
+    const mobileSidebarOverlay = document.getElementById('mobileSidebarOverlay');
+    const sidebar = document.getElementById('sidebar');
+
+    if (mobileToggleButton) {
+        mobileToggleButton.addEventListener('click', toggleMobileSidebar);
+    }
+
+    if (mobileSidebarOverlay) {
+        mobileSidebarOverlay.addEventListener('click', closeMobileSidebar);
+    }
+
+    if (sidebar) {
+        sidebar.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth < 1024) {
+                    closeMobileSidebar();
+                }
+            });
+        });
+    }
+
+    handleResizeForSidebar();
+    window.addEventListener('resize', handleResizeForSidebar);
 }
 
 document.addEventListener('DOMContentLoaded', async () => {

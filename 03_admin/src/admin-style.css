@@ -33,3 +33,6 @@
 .admin-sidebar nav a.nav-link:hover .material-icons {
     color: #FFFFFF;
 }
+body.sidebar-locked {
+    overflow: hidden;
+}

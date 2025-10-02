@@ -982,12 +982,20 @@
             await new Promise(resolve => setTimeout(resolve, 2000));
             const userEmail = emailInput.value.trim();
             let targetUrl = resolveAppPath('02_dashboard/index.html'); // デフォルト
+            let tutorialStatus = 'completed';
             if (userEmail === 'admin') {
               targetUrl = resolveAppPath('03_admin/index.html');
             } else if (userEmail === 'new') {
               targetUrl = resolveAppPath('04_first-login/index.html');
+              tutorialStatus = 'pending';
             }
-            // 'user' またはその他の場合はデフォルトのURLを使用
+            // ログイン種別ごとにチュートリアル状態を同期
+            try {
+              localStorage.setItem('speedad-tutorial-status', tutorialStatus);
+              localStorage.removeItem('speedad-tutorial-last-survey-params');
+            } catch (storageError) {
+              console.warn('ローカルストレージにチュートリアル状態を保存できませんでした:', storageError);
+            }
             window.location.href = targetUrl;
           } catch (error) {
             console.error('ログインエラー:', error);
