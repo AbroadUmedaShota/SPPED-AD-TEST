@@ -1,0 +1,73 @@
+{
+  "summary": {
+    "totalItems": 6520,
+    "escalatedItems": 48,
+    "lockedItems": 112,
+    "completedItems": 3580
+  },
+  "tasks": [
+    {
+      "id": "group1",
+      "name": "グループ 1",
+      "description": "メールアドレス",
+      "total": 1000,
+      "completed": 550,
+      "operatorCount": 10,
+      "lastUpdatedAt": "2025-10-03T10:30:00Z"
+    },
+    {
+      "id": "group2",
+      "name": "グループ 2",
+      "description": "氏名（姓名）",
+      "total": 1200,
+      "completed": 600,
+      "operatorCount": 12,
+      "lastUpdatedAt": "2025-10-03T10:25:00Z"
+    },
+    {
+      "id": "group3",
+      "name": "グループ 3",
+      "description": "会社名 / 部署名 / 役職名",
+      "total": 800,
+      "completed": 750,
+      "operatorCount": 8,
+      "lastUpdatedAt": "2025-10-03T10:15:00Z"
+    },
+    {
+      "id": "group4",
+      "name": "グループ 4",
+      "description": "郵便番号 / 住所１ / 住所２（建物名）",
+      "total": 1520,
+      "completed": 480,
+      "operatorCount": 15,
+      "lastUpdatedAt": "2025-10-03T09:45:00Z"
+    },
+    {
+      "id": "group5",
+      "name": "グループ 5",
+      "description": "電話番号１ / 電話番号２ / 携帯番号 / FAX番号",
+      "total": 1000,
+      "completed": 800,
+      "operatorCount": 10,
+      "lastUpdatedAt": "2025-10-02T18:00:00Z"
+    },
+    {
+      "id": "group6",
+      "name": "グループ 6",
+      "description": "URL",
+      "total": 1000,
+      "completed": 400,
+      "operatorCount": 10,
+      "lastUpdatedAt": "2025-10-02T17:30:00Z"
+    },
+    {
+      "id": "admin",
+      "name": "管理者入力用",
+      "description": "管理者専用の入力フォームです",
+      "total": 0,
+      "completed": 0,
+      "operatorCount": 0,
+      "lastUpdatedAt": "2025-10-03T11:00:00Z"
+    }
+  ]
+}
