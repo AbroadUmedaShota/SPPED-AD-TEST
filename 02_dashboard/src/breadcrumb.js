@@ -84,5 +84,12 @@ export function initBreadcrumbs() {
     const urlParams = new URLSearchParams(window.location.search);
     const surveyId = urlParams.get('surveyId');
 
-    container.innerHTML = generateBreadcrumbs(currentPage, surveyId);
+    const breadcrumbHtml = generateBreadcrumbs(currentPage, surveyId);
+    const shouldHideBreadcrumb = !breadcrumbHtml || (!breadcrumbHtml.includes('chevron_right') && /アンケート一覧/.test(breadcrumbHtml));
+    if (shouldHideBreadcrumb) {
+        container.innerHTML = '';
+        return;
+    }
+
+    container.innerHTML = breadcrumbHtml;
 }

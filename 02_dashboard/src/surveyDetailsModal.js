@@ -1,6 +1,6 @@
-import { showToast } from './utils.js';
+import { showToast, copyTextToClipboard } from './utils.js';
 import { openDownloadModal } from './downloadOptionsModal.js';
-import { updateSurveyData } from './tableManager.js'; // tableManagerからインポート
+import { updateSurveyData, getSurveyStatus } from './tableManager.js'; // tableManagerからインポート
 import { closeModal } from './modalHandler.js';
 
 let currentEditingSurvey = null; // 現在編集中のアンケートデータを保持する変数
@@ -39,6 +39,31 @@ export function setupSurveyDetailsModalListeners(modalElement) {
     if (goToBizcardSettingsBtn) goToBizcardSettingsBtn.removeEventListener('click', handleGoToBizcardSettings);
     if (goToThankYouEmailSettingsBtn) goToThankYouEmailSettingsBtn.removeEventListener('click', handleGoToThankYouEmailSettings);
     if (goToSpeedReviewBtn) goToSpeedReviewBtn.removeEventListener('click', handleGoToSpeedReview);
+
+    const surveyUrlInput = modalElement.querySelector('#detail_surveyUrl');
+
+    if (surveyUrlInput && surveyUrlInput.dataset.bound !== 'true') {
+        const copySurveyUrl = async () => {
+            if (!surveyUrlInput.value) {
+                return;
+            }
+            try {
+                await copyTextToClipboard(surveyUrlInput.value);
+                showToast('アンケートURLをコピーしました。', 'success');
+            } catch (error) {
+                console.error('Failed to copy survey URL:', error);
+                showToast('URLのコピーに失敗しました。', 'error');
+            }
+        };
+        surveyUrlInput.addEventListener('click', copySurveyUrl);
+        surveyUrlInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                copySurveyUrl();
+            }
+        });
+        surveyUrlInput.dataset.bound = 'true';
+    }
 
     // Add new listeners
     if (editSurveyBtn) editSurveyBtn.addEventListener('click', () => {
@@ -173,6 +198,7 @@ export function populateSurveyDetails(survey) {
     const detail_dataCompletionDate_view = document.getElementById('detail_dataCompletionDate_view');
     const detail_deadline_view = document.getElementById('detail_deadline_view');
     const detail_estimatedBillingAmount_view = document.getElementById('detail_estimatedBillingAmount_view');
+    const detail_billingAmount_label = document.getElementById('detail_billingAmount_label');
     const detail_bizcardEnabled_view = document.getElementById('detail_bizcardEnabled_view');
     const detail_bizcardCompletionCount_view = document.getElementById('detail_bizcardCompletionCount');
     const detail_thankYouEmailSettings_view = document.getElementById('detail_thankYouEmailSettings_view');
@@ -187,15 +213,33 @@ export function populateSurveyDetails(survey) {
     const description = (survey.description && typeof survey.description === 'object') ? survey.description[lang] || survey.description.ja : survey.description;
 
     // Status Badge
+    const displayStatus = getSurveyStatus(survey);
     let statusColorClass = '';
-    let displayStatus = survey.status;
-    switch (survey.status) {
-        case '会期中': statusColorClass = 'bg-green-100 text-green-800'; break;
-        case '準備中': case '会期前': displayStatus = '会期前'; statusColorClass = 'bg-yellow-100 text-yellow-800'; break;
-        case 'データ化中': case 'アップ待ち': displayStatus = 'データ化中'; statusColorClass = 'bg-blue-100 text-blue-800'; break;
-        case 'アップ完了': statusColorClass = 'bg-blue-100 text-blue-800'; break;
-        case '期限切れ': case '削除済み': case 'データ化なし': case '終了': displayStatus = '終了'; statusColorClass = 'bg-red-100 text-red-800'; break;
-        default: statusColorClass = 'bg-gray-100 text-gray-800'; break;
+    switch (displayStatus) {
+        case '開催中':
+            statusColorClass = 'bg-green-100 text-green-800';
+            break;
+        case '開催前':
+            statusColorClass = 'bg-yellow-100 text-yellow-800';
+            break;
+        case 'データ精査中':
+            statusColorClass = 'bg-blue-100 text-blue-800';
+            break;
+        case '完了':
+            statusColorClass = 'bg-indigo-100 text-indigo-800';
+            break;
+        case 'データ化なし':
+            statusColorClass = 'bg-gray-200 text-gray-700';
+            break;
+        case '終了':
+            statusColorClass = 'bg-emerald-100 text-emerald-800';
+            break;
+        case '削除済み':
+            statusColorClass = 'bg-red-100 text-red-800';
+            break;
+        default:
+            statusColorClass = 'bg-gray-100 text-gray-800';
+            break;
     }
     surveyDetailName.textContent = surveyName;
     surveyDetailStatusBadge.className = `inline-flex items-center rounded-full text-xs px-2 py-1 ${statusColorClass}`;
@@ -207,12 +251,28 @@ export function populateSurveyDetails(survey) {
     detail_surveyNameInternal_view.textContent = surveyName;
     detail_displayTitle_view.textContent = displayTitle || 'なし';
     detail_surveyMemo_view.textContent = survey.memo || description || 'なし';
-    detail_surveyPeriod_view.textContent = `${survey.periodStart} ~ ${survey.periodEnd}`;
+
+    const formattedPeriodStart = survey.periodStart || '―';
+    const formattedPeriodEnd = survey.periodEnd || '―';
+    detail_surveyPeriod_view.textContent = `${formattedPeriodStart} ~ ${formattedPeriodEnd}`;
     const realtimeAnswersDisplay = survey.realtimeAnswers > 0 ? ` (+${survey.realtimeAnswers})` : '';
     detail_answerCount_view.textContent = `${survey.answerCount}${realtimeAnswersDisplay}`;
     detail_dataCompletionDate_view.textContent = survey.dataCompletionDate || '未定';
     detail_deadline_view.textContent = survey.deadline || 'N/A';
-    detail_estimatedBillingAmount_view.textContent = survey.estimatedBillingAmount ? `¥${survey.estimatedBillingAmount.toLocaleString()}` : 'N/A';
+
+    const isBillingConfirmed = displayStatus === '完了' || Boolean(survey.dataCompletionDate);
+    if (detail_billingAmount_label) {
+        detail_billingAmount_label.textContent = isBillingConfirmed ? '確定請求額' : '見込み請求額';
+    }
+    const rawBillingAmount = survey.estimatedBillingAmount;
+    let billingAmountValue = null;
+    if (rawBillingAmount !== undefined && rawBillingAmount !== null && rawBillingAmount !== '') {
+        const parsedAmount = Number(rawBillingAmount);
+        billingAmountValue = Number.isFinite(parsedAmount) ? parsedAmount : null;
+    }
+    detail_estimatedBillingAmount_view.textContent = billingAmountValue !== null
+        ? `¥${billingAmountValue.toLocaleString()}`
+        : '―';
     detail_bizcardEnabled_view.textContent = survey.bizcardEnabled ? '利用する' : '利用しない';
     detail_bizcardCompletionCount_view.textContent = survey.bizcardEnabled ? `${survey.bizcardCompletionCount || 0}件` : 'N/A';
     detail_thankYouEmailSettings_view.textContent = survey.thankYouEmailSettings || '設定なし';
@@ -228,7 +288,7 @@ export function populateSurveyDetails(survey) {
     // 編集ボタンの表示/非表示をステータスに基づいて制御
     const editSurveyBtn = modal.querySelector('#editSurveyBtn');
     if (editSurveyBtn) {
-        if (survey.status === '会期前') {
+        if (displayStatus === '会期前') {
             editSurveyBtn.classList.remove('hidden');
         } else {
             editSurveyBtn.classList.add('hidden');

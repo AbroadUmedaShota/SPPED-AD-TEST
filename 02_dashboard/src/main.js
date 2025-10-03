@@ -121,10 +121,15 @@ function initLanguageSwitcher() {
 function openNewSurveyModalWithSetup(afterOpen) {
     handleOpenModal('newSurveyModal', 'modals/newSurveyModal.html', () => {
         // Initialize flatpickr for the new range input
+        const tomorrow = new Date();
+        tomorrow.setHours(0, 0, 0, 0);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
         const periodRangePicker = window.flatpickr('#newSurveyPeriodRange', {
             mode: 'range',
             dateFormat: 'Y-m-d',
-            locale: 'ja'
+            locale: 'ja',
+            minDate: tomorrow
         });
 
         const createSurveyBtn = document.getElementById('createSurveyFromModalBtn');
@@ -148,6 +153,33 @@ function openNewSurveyModalWithSetup(afterOpen) {
             { input: displayTitleInput, error: displayTitleError },
             { input: periodRangeInput, error: periodRangeError }
         ];
+
+        const helpMessages = {
+            surveyName: 'アンケート名は管理画面でのみ表示される内部向け名称です。',
+            displayTitle: '表示タイトルは回答者に表示されるアンケートの見出しです。'
+        };
+
+        document.querySelectorAll('#newSurveyModal .survey-help-trigger').forEach((button) => {
+            if (!button || button.dataset.bound === 'true') {
+                return;
+            }
+            const helpKey = button.dataset.helpKey;
+            const message = helpMessages[helpKey];
+            if (!message) {
+                return;
+            }
+            const showHelp = () => {
+                showToast(message, 'info');
+            };
+            button.addEventListener('click', showHelp);
+            button.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    showHelp();
+                }
+            });
+            button.dataset.bound = 'true';
+        });
 
         const hideAllErrors = () => {
             inputs.forEach(({ input, error }) => {
@@ -176,6 +208,8 @@ function openNewSurveyModalWithSetup(afterOpen) {
             const selectedDates = Array.isArray(periodRangePicker && periodRangePicker.selectedDates)
                 ? periodRangePicker.selectedDates
                 : (fallbackFlatpickr && Array.isArray(fallbackFlatpickr.selectedDates) ? fallbackFlatpickr.selectedDates : []);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
 
             // --- Validation ---
             if (!surveyName) {
@@ -189,6 +223,19 @@ function openNewSurveyModalWithSetup(afterOpen) {
             if (selectedDates.length < 2) {
                 showError(periodRangeInput, periodRangeError, '回答期間を選択してください。');
                 isValid = false;
+            } else {
+                const rangeStart = new Date(selectedDates[0]);
+                rangeStart.setHours(0, 0, 0, 0);
+                const rangeEnd = new Date(selectedDates[1]);
+                rangeEnd.setHours(0, 0, 0, 0);
+
+                if (rangeStart <= today) {
+                    showError(periodRangeInput, periodRangeError, '開始日は翌日以降を選択してください。');
+                    isValid = false;
+                } else if (rangeEnd <= rangeStart) {
+                    showError(periodRangeInput, periodRangeError, '終了日は開始日より後の日付を選択してください。');
+                    isValid = false;
+                }
             }
 
             if (!isValid) {

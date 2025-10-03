@@ -16,11 +16,11 @@
                     </div>
                     <div>
                         <input type="radio" id="download_business_card" name="download_type" value="business_card" class="rounded-full text-primary focus:ring-primary">
-                        <label for="download_business_card" class="ml-2 text-sm font-medium text-on-surface">名刺データ</label>
+                        <label for="download_business_card" class="ml-2 text-sm font-medium text-on-surface">名刺入力データ</label>
                     </div>
                     <div>
                         <input type="radio" id="download_both" name="download_type" value="both" class="rounded-full text-primary focus:ring-primary">
-                        <label for="download_both" class="ml-2 text-sm font-medium text-on-surface">回答 + 名刺データ</label>
+                        <label for="download_both" class="ml-2 text-sm font-medium text-on-surface">回答 + 名刺入力データ</label>
                     </div>
                     <div>
                         <input type="radio" id="download_image" name="download_type" value="image" class="rounded-full text-primary focus:ring-primary">
@@ -39,19 +39,20 @@
                     <div>
                         <input type="radio" id="period_custom" name="download_period" value="custom" class="rounded-full text-primary focus:ring-primary">
                         <label for="period_custom" class="ml-2 text-sm font-medium text-on-surface">期間指定</label>
-                        <div id="customPeriodInputs" class="flex items-center gap-2 mt-2 hidden">
+                        <div id="customPeriodInputs" class="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 mt-2 hidden">
                             <div class="relative flex-1">
-                                <input type="date" id="download_start_date" name="download_start_date" placeholder=" " class="class="input-field w-full rounded-md focus:border-secondary focus:ring-secondary sm:text-sm p-2 text-on-surface bg-surface-bright"">
-                                <label class="input-label" for="download_start_date">開始日</label>
+                                <input type="text" id="download_start_date" name="download_start_date" placeholder=" " class="input-field w-full pr-10">
+                                <label class="input-label" for="download_start_date">開始日時</label>
                                 <p class="error-message hidden" id="download_start_date-error"></p>
                             </div>
-                            <span class="text-on-surface-variant">～</span>
+                            <span class="text-on-surface-variant text-center">〜</span>
                             <div class="relative flex-1">
-                                <input type="date" id="download_end_date" name="download_end_date" placeholder=" " class="class="input-field w-full rounded-md focus:border-secondary focus:ring-secondary sm:text-sm p-2 text-on-surface bg-surface-bright"">
-                                <label class="input-label" for="download_end_date">終了日</label>
+                                <input type="text" id="download_end_date" name="download_end_date" placeholder=" " class="input-field w-full pr-10">
+                                <label class="input-label" for="download_end_date">終了日時</label>
                                 <p class="error-message hidden" id="download_end_date-error"></p>
                             </div>
                         </div>
+                    </div>
                     </div>
                 </div>
                 <p class="error-message hidden" id="download_period-error"></p>

@@ -11,11 +11,21 @@
                 <input class="input-field" id="surveyName" name="surveyName" placeholder=" " type="text" required/>
                 <label class="input-label" for="surveyName">アンケート名</label>
                 <p class="error-message hidden" id="surveyName-error"></p>
+                <button type="button" class="mt-1 flex items-center gap-1 text-xs text-on-surface-variant hover:text-primary transition-colors survey-help-trigger" data-help-key="surveyName" aria-describedby="surveyNameHelpText">
+                    <span class="material-icons text-sm">help_outline</span>
+                    <span>アンケート名と表示タイトルの違いとは？</span>
+                </button>
+                <span id="surveyNameHelpText" class="sr-only">アンケート名は管理画面のみで表示される内部用の名称です。</span>
             </div>
             <div class="input-group">
                 <input class="input-field" id="displayTitle" name="displayTitle" placeholder=" " type="text" required/>
                 <label class="input-label" for="displayTitle">表示タイトル</label>
                 <p class="error-message hidden" id="displayTitle-error"></p>
+                <button type="button" class="mt-1 flex items-center gap-1 text-xs text-on-surface-variant hover:text-primary transition-colors survey-help-trigger" data-help-key="displayTitle" aria-describedby="displayTitleHelpText">
+                    <span class="material-icons text-sm">help_outline</span>
+                    <span>表示タイトルに何が表示されますか？</span>
+                </button>
+                <span id="displayTitleHelpText" class="sr-only">表示タイトルは回答者に表示されるアンケートの見出しです。</span>
             </div>
             <div class="input-group">
                 <textarea class="input-field" id="surveyMemo" name="surveyMemo" placeholder=" " rows="3"></textarea>

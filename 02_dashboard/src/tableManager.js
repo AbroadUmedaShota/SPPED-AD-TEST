@@ -27,7 +27,7 @@ const SURVEY_ID_MAX_SEQUENCE = 999;
  * @param {object} survey - アンケートオブジェクト
  * @returns {string} - 表示用のステータス文字列
  */
-function getSurveyStatus(survey) {
+export function getSurveyStatus(survey) {
     const now = new Date();
     // 時刻部分をリセットして日付のみで比較
     now.setHours(0, 0, 0, 0); 
@@ -60,10 +60,10 @@ function getSurveyStatus(survey) {
         
         // データ化関連のステータスをチェック
         if (survey.status === 'データ入力中' || survey.status === 'データ精査中') {
-            return 'データ化中';
+            return 'データ精査中';
         }
         if (survey.status === 'データ精査完了' || (survey.dataCompletionDate && survey.dataCompletionDate !== '')) {
-            return 'データ化完了';
+            return '完了';
         }
         
         // 上記以外はすべて「終了」
@@ -77,8 +77,8 @@ function getSurveyStatus(survey) {
 const STATUS_SORT_ORDER = {
     '会期前': 1,
     '会期中': 2,
-    'データ化中': 3,
-    'データ化完了': 4,
+    'データ精査中': 3,
+    '完了': 4,
     '終了': 5,
     'データ化なし': 6,
     '削除済み': 7,
@@ -161,11 +161,11 @@ function renderTableRows(surveysToRender) {
                 statusColorClass = 'bg-green-100 text-green-800';
                 statusTitle = 'アンケートが公開されており、回答を受け付けています。';
                 break;
-            case 'データ化中':
+            case 'データ精査中':
                 statusColorClass = 'bg-blue-100 text-blue-800';
                 statusTitle = '回答された名刺データの入力・照合を行っています。';
                 break;
-            case 'データ化完了':
+            case '完了':
                 statusColorClass = 'bg-indigo-100 text-indigo-800';
                 statusTitle = '名刺データが利用可能です。ダウンロードやお礼メール送信ができます。';
                 break;
@@ -194,6 +194,7 @@ function renderTableRows(surveysToRender) {
                 <button class="bg-secondary-container text-on-secondary-container hover:bg-secondary-container hover:text-on-secondary-container rounded-full p-2 w-9 h-9 transition-all shadow-sm shadow-lg border border-secondary flex items-center justify-center" title="アンケートを編集" aria-label="アンケートを編集"><span class="material-icons text-lg">edit</span></button>
                 <button class="bg-secondary-container text-on-secondary-container hover:bg-secondary-container hover:text-on-secondary-container rounded-full p-2 w-9 h-9 transition-all shadow-sm shadow-lg border border-secondary flex items-center justify-center" title="QRコードを表示" aria-label="QRコードを表示"><span class="material-icons text-lg">qr_code_2</span></button>
                 <button class="bg-secondary-container text-on-secondary-container hover:bg-secondary-container hover:text-on-secondary-container rounded-full p-2 w-9 h-9 transition-all shadow-sm shadow-lg border border-secondary flex items-center justify-center" title="アンケートを複製" aria-label="アンケートを複製"><span class="material-icons text-lg">content_copy</span></button>
+                <button class="bg-secondary-container text-on-secondary-container hover:bg-secondary-container hover:text-on-secondary-container rounded-full p-2 w-9 h-9 transition-all shadow-sm shadow-lg border border-secondary flex items-center justify-center" title="SPEEDレビューを開く" aria-label="SPEEDレビューを開く"><span class="material-icons text-lg">bolt</span></button>
                 <button class="bg-secondary-container text-on-secondary-container hover:bg-secondary-container hover:text-on-secondary-container rounded-full p-2 w-9 h-9 transition-all shadow-sm shadow-lg border border-secondary flex items-center justify-center" title="データダウンロード" aria-label="データダウンロード"><span class="material-icons text-lg">download</span></button>
             </td>
             <td data-label="アンケートID" class="px-4 py-3 text-on-surface-variant text-sm font-medium" data-sort-value="${survey.id}">
@@ -221,6 +222,11 @@ function renderTableRows(surveysToRender) {
             if (surveyToDuplicate) {
                 openDuplicateSurveyModal(surveyToDuplicate);
             }
+        });
+
+        row.querySelector('button[title="SPEEDレビューを開く"]').addEventListener('click', (e) => {
+            e.stopPropagation();
+            window.location.href = `speed-review.html?surveyId=${survey.id}`;
         });
 
         row.querySelector('button[title="データダウンロード"]').addEventListener('click', (e) => {
