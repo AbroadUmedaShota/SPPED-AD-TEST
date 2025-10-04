@@ -54,7 +54,6 @@ export function initializeAccountInfoModalFunctionality(modalElement) {
     const billingDetailsSection = modalElement.querySelector('#billingDetailsSection'); // modalElement から探索
     const closeBtn = modalElement.querySelector('#closeAccountInfoModalBtn');
     const changePasswordBtn1 = modalElement.querySelector('#changePasswordBtn1');
-    const changePasswordBtn2 = modalElement.querySelector('#changePasswordBtn2');
 
     if (closeBtn) {
         closeBtn.addEventListener('click', () => closeModal('accountInfoModal'));
@@ -66,9 +65,6 @@ export function initializeAccountInfoModalFunctionality(modalElement) {
 
     if (changePasswordBtn1) {
         changePasswordBtn1.addEventListener('click', goToPasswordChange);
-    }
-    if (changePasswordBtn2) {
-        changePasswordBtn2.addEventListener('click', goToPasswordChange);
     }
 
     

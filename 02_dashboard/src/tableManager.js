@@ -13,6 +13,10 @@ let currentFilteredData = []; // Data array: holds filtered and sorted data
 let currentPage = 1;
 let itemsPerPage = 10; // Default, will be updated from select element
 
+function sanitizeSurveysForDisplay(surveys) {
+    if (!Array.isArray(surveys)) return [];
+    return surveys.filter((survey) => !HIDDEN_USER_STATUSES.has(getSurveyStatus(survey)));
+}
 
 function shouldSkipInitialSurveyLoad() {
     const status = localStorage.getItem('speedad-tutorial-status');
@@ -21,6 +25,8 @@ function shouldSkipInitialSurveyLoad() {
 const SURVEY_ID_PATTERN = /^sv_(\d{4})_(\d{2})(\d{3})$/;
 const SURVEY_ID_DEFAULT_USER = '0001';
 const SURVEY_ID_MAX_SEQUENCE = 999;
+const HIDDEN_USER_STATUSES = new Set(['削除済み']);
+
 
 /**
  * 仕様に基づいてアンケートの表示ステータスを決定します。
@@ -70,8 +76,8 @@ export function getSurveyStatus(survey) {
         return '終了';
     }
 
-    // 不明なケース
-    return '不明';
+    // 不明なケースはユーザー画面では「終了」として扱う
+    return '終了';
 }
 
 const STATUS_SORT_ORDER = {
@@ -81,8 +87,7 @@ const STATUS_SORT_ORDER = {
     '完了': 4,
     '終了': 5,
     'データ化なし': 6,
-    '削除済み': 7,
-    '不明': 99
+    '削除済み': 7
 };
 
 let lastSortedHeader = null; // Tracks the last header clicked for sorting
@@ -181,9 +186,9 @@ function renderTableRows(surveysToRender) {
                 statusColorClass = 'bg-red-100 text-red-800';
                 statusTitle = 'このアンケートは削除されました。';
                 break;
-            default: // 不明
+            default:
                 statusColorClass = 'bg-gray-100 text-gray-800';
-                statusTitle = 'ステータスが不明です。システム管理者にお問い合わせください。';
+                statusTitle = 'ステータス情報を取得できませんでした。';
                 break;
         }
 
@@ -559,6 +564,9 @@ export function applyFiltersAndPagination() {
             : (survey.name || '').toLowerCase();
         
         const displayStatus = getSurveyStatus(survey);
+        if (HIDDEN_USER_STATUSES.has(displayStatus)) {
+            return false;
+        }
         const surveyPeriodStart = survey.periodStart ? new Date(survey.periodStart) : null;
         const surveyPeriodEnd = survey.periodEnd ? new Date(survey.periodEnd) : null;
 
@@ -703,7 +711,7 @@ export function initTableManager() {
         applyFiltersAndPagination();
     } else {
         fetchSurveyData().then(data => {
-            allSurveyData = data;
+            allSurveyData = sanitizeSurveysForDisplay(data);
             applyFiltersAndPagination();
         }).catch(error => {
             console.error("DEBUG: Error during initial data fetch or rendering:", error);
@@ -713,16 +721,23 @@ export function initTableManager() {
 
 export async function reloadSurveyData() {
     const data = await fetchSurveyData();
-    allSurveyData = data;
+    allSurveyData = sanitizeSurveysForDisplay(data);
     applyFiltersAndPagination();
 }
 
 export function updateSurveyData(updatedSurvey) {
     const index = allSurveyData.findIndex(survey => survey.id === updatedSurvey.id);
     if (index !== -1) {
-        allSurveyData[index] = { ...allSurveyData[index], ...updatedSurvey };
-        applyFiltersAndPagination(); // Re-apply filters and pagination to update table
+        const mergedSurvey = { ...allSurveyData[index], ...updatedSurvey };
+        if (HIDDEN_USER_STATUSES.has(getSurveyStatus(mergedSurvey))) {
+            allSurveyData.splice(index, 1);
+        } else {
+            allSurveyData[index] = mergedSurvey;
+        }
+    } else if (!HIDDEN_USER_STATUSES.has(getSurveyStatus(updatedSurvey))) {
+        allSurveyData.push(updatedSurvey);
     }
+    applyFiltersAndPagination(); // Re-apply filters and pagination to update table
 }
 
 

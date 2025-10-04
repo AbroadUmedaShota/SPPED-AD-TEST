@@ -2,6 +2,7 @@ import { handleOpenModal, closeModal } from './modalHandler.js';
 import { openAccountInfoModal } from './accountInfoModal.js';
 import { initSidebarHandler } from './sidebarHandler.js';
 import { initBreadcrumbs } from './breadcrumb.js';
+import { showQrCodeModal } from './qrCodeModal.js';
 import { initThemeToggle } from './themeToggle.js';
 import { fetchSurveyData, saveSurveyDataToLocalStorage, loadSurveyDataFromLocalStorage } from './services/surveyService.js';
 import {
@@ -33,10 +34,20 @@ const SUPPORTED_LANGUAGES = [
     { code: 'vi', label: 'ベトナム語', shortLabel: 'ベトナム語' }
 ];
 const LANGUAGE_MAP = new Map(SUPPORTED_LANGUAGES.map((lang) => [lang.code, lang]));
-let activeLanguages = ['ja'];
-let editorLanguage = 'ja';
+const BASE_LANGUAGE = 'ja';
+const PRO_PLAN_KEYWORDS = ['premium', 'professional', 'pro'];
+
+let activeLanguages = [BASE_LANGUAGE];
+let editorLanguage = BASE_LANGUAGE;
 
 const additionalSettingsButtons = new Map();
+
+function toDateOnly(value) {
+    if (value === null || value === undefined || value === '') return null;
+    const source = value instanceof Date ? value : new Date(value);
+    if (Number.isNaN(source.getTime())) return null;
+    return new Date(source.getFullYear(), source.getMonth(), source.getDate());
+}
 
 // --- Dirty State Management ---
 function setDirty(dirty) {
@@ -64,9 +75,9 @@ function getLanguageMeta(code) {
 }
 
 function normalizeActiveLanguages(langs = []) {
-    const normalized = ['ja'];
+    const normalized = [BASE_LANGUAGE];
     langs.forEach((lang) => {
-        if (!lang || lang === 'ja') return;
+        if (!lang || lang === BASE_LANGUAGE) return;
         if (!LANGUAGE_MAP.has(lang)) return;
         if (normalized.length >= 3) return;
         if (!normalized.includes(lang)) {
@@ -74,6 +85,12 @@ function normalizeActiveLanguages(langs = []) {
         }
     });
     return normalized;
+}
+
+function isProPlan(plan) {
+    if (!plan) return false;
+    const normalized = String(plan).toLowerCase();
+    return PRO_PLAN_KEYWORDS.some((keyword) => normalized.includes(keyword));
 }
 
 function getActiveLanguages() {
@@ -88,14 +105,14 @@ function setActiveLanguages(langs) {
     activeLanguages = normalized;
     surveyData.activeLanguages = [...activeLanguages];
     if (!activeLanguages.includes(editorLanguage)) {
-        editorLanguage = 'ja';
+        editorLanguage = BASE_LANGUAGE;
     }
     return changed;
 }
 
 function getEditorLanguage() {
     if (!getActiveLanguages().includes(editorLanguage)) {
-        editorLanguage = 'ja';
+        editorLanguage = BASE_LANGUAGE;
     }
     return editorLanguage;
 }
@@ -419,6 +436,8 @@ function renderLanguageSettings({ activeLanguages, editorLanguage, languageMap }
     }
 
     Promise.resolve().then(() => {
+        updateAllPlaceholders();
+        updateOutlineActionsState();
         updateTabIndicator();
         bindLanguageControlEvents();
     });
@@ -608,24 +627,50 @@ window.dummyUserData = {
  * Re-renders the entire form based on the current state (surveyData, currentLang)
  */
 function updateAndRenderAll() {
+    const allowExtraLanguages = isProPlan(surveyData.plan);
+    if (!allowExtraLanguages) {
+        setActiveLanguages([BASE_LANGUAGE]);
+        setEditorLanguage(BASE_LANGUAGE);
+    }
+
     syncSurveyLocalization();
+
     const languageOptions = {
         activeLanguages: getActiveLanguages(),
         editorLanguage: getEditorLanguage(),
-        languageMap: LANGUAGE_MAP
+        languageMap: LANGUAGE_MAP,
+        allowMultilingual: allowExtraLanguages
     };
+
+    const languageSection = document.getElementById('language-settings-section');
+    if (languageSection) {
+        languageSection.classList.toggle('hidden', !allowExtraLanguages);
+        languageSection.setAttribute('aria-hidden', !allowExtraLanguages ? 'true' : 'false');
+    }
 
     renderLanguageSettings(languageOptions);
     populateBasicInfo(surveyData, languageOptions);
     renderAllQuestionGroups(surveyData.questionGroups, currentLang, languageOptions);
     renderOutlineMap();
+
     validateFormForSaveButton();
     setupSortables();
     enhanceAccordionA11y();
 
-    // Ensure placeholders are updated after rendering
+    const qrButton = document.getElementById('openQrModalBtn');
+    if (qrButton) {
+        const canOpenQr = Boolean(surveyData.id);
+        qrButton.disabled = !canOpenQr;
+        qrButton.setAttribute('aria-disabled', !canOpenQr ? 'true' : 'false');
+        qrButton.classList.toggle('opacity-50', !canOpenQr);
+    }
+
+    updateOutlineActionsState();
+
+    // Ensure placeholders and outline actions are updated after rendering
     Promise.resolve().then(() => {
         updateAllPlaceholders();
+        updateOutlineActionsState();
     });
 }
 
@@ -1508,7 +1553,7 @@ function setupEventListeners() {
     if (createSurveyBtn) {
         createSurveyBtn.addEventListener('click', () => {
             validateFormForSaveButton();
-            const baseLang = 'ja';
+            const baseLang = BASE_LANGUAGE;
             const baseName = getLocalizedValue(surveyData.name, baseLang).trim();
             const baseTitle = getLocalizedValue(surveyData.displayTitle, baseLang).trim();
             const periodStartVal = (surveyData.periodStart || '').trim();
@@ -1516,6 +1561,13 @@ function setupEventListeners() {
 
             if (!baseName || !baseTitle || !periodStartVal || !periodEndVal) {
                 showToast('必須項目を入力してください。', 'error');
+                return;
+            }
+
+            const startDateObj = toDateOnly(periodStartVal);
+            const today = toDateOnly(new Date());
+            if (!startDateObj || (today && startDateObj.getTime() <= today.getTime())) {
+                showToast('開始日は翌日以降の日付を選択してください。', 'error');
                 return;
             }
 
@@ -1760,7 +1812,7 @@ function validateFormForSaveButton() {
     const saveButton = document.getElementById('createSurveyBtn');
     if (!saveButton) return;
 
-    const baseLang = 'ja';
+    const baseLang = BASE_LANGUAGE;
     const nameVal = getLocalizedValue(surveyData.name, baseLang).trim();
     const titleVal = getLocalizedValue(surveyData.displayTitle, baseLang).trim();
     const periodStartVal = (surveyData.periodStart || '').trim();
@@ -1768,12 +1820,26 @@ function validateFormForSaveButton() {
 
     const startMissing = !periodStartVal;
     const endMissing = !periodEndVal;
+
+    const startDateObj = startMissing ? null : toDateOnly(periodStartVal);
+    const endDateObj = endMissing ? null : toDateOnly(periodEndVal);
+    const today = toDateOnly(new Date());
+
     let dateOrderValid = true;
-    if (!startMissing && !endMissing) {
-        dateOrderValid = periodEndVal >= periodStartVal;
+    if (startDateObj && endDateObj) {
+        dateOrderValid = endDateObj.getTime() >= startDateObj.getTime();
     }
 
-    let allValid = nameVal && titleVal && !startMissing && !endMissing && dateOrderValid;
+    let startDateValid = true;
+    if (!startMissing) {
+        if (!startDateObj) {
+            startDateValid = false;
+        } else if (today && startDateObj.getTime() <= today.getTime()) {
+            startDateValid = false;
+        }
+    }
+
+    let allValid = nameVal && titleVal && !startMissing && !endMissing && dateOrderValid && startDateValid;
 
     surveyData.questionGroups?.forEach(group => {
         group.questions?.forEach(question => {
@@ -1809,7 +1875,7 @@ function validateFormForSaveButton() {
 
     const periodRangeInput = document.getElementById('periodRange');
     const rangeError = document.getElementById('periodRangeError');
-    const hasRangeError = startMissing || endMissing || !dateOrderValid;
+    const hasRangeError = startMissing || endMissing || !dateOrderValid || !startDateValid;
 
     if (periodRangeInput) {
         periodRangeInput.classList.toggle('input-error', hasRangeError);
@@ -1818,6 +1884,8 @@ function validateFormForSaveButton() {
     if (rangeError) {
         if (startMissing || endMissing) {
             rangeError.textContent = 'この入力は必須です';
+        } else if (!startDateValid) {
+            rangeError.textContent = '開始日は翌日以降に設定してください。';
         } else if (!dateOrderValid) {
             rangeError.textContent = '終了日は開始日以降に設定してください。';
         }

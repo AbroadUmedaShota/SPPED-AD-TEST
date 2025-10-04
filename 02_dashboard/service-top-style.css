@@ -1099,6 +1099,58 @@ input.input-field[readonly] {
     border-right-color: var(--color-base-card);
 }
 
+/* Contextual help icon and popover */
+.help-icon-button {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: transparent;
+    border: none;
+    color: var(--color-text-sub);
+    width: 1.75rem;
+    height: 1.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: color 0.2s ease, background-color 0.2s ease;
+    z-index: 2;
+}
+.help-icon-button:hover,
+.help-icon-button:focus-visible {
+    color: var(--color-primary);
+    background-color: rgba(66, 133, 244, 0.08);
+    outline: none;
+}
+.help-popover {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    width: min(18rem, 90vw);
+    background-color: var(--color-base-card);
+    border: 1px solid var(--color-base-border-divider);
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    padding: 0.75rem;
+    z-index: 3;
+}
+.help-popover::before {
+    content: ;
+    position: absolute;
+    top: -0.35rem;
+    right: 1.5rem;
+    width: 0.7rem;
+    height: 0.7rem;
+    background-color: var(--color-base-card);
+    border-left: 1px solid var(--color-base-border-divider);
+    border-top: 1px solid var(--color-base-border-divider);
+    transform: rotate(45deg);
+}
+.help-popover p {
+    margin: 0;
+}
+
 /* --- Custom Tutorial --- */
 #custom-tutorial-overlay {
     position: fixed;

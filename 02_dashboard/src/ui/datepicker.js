@@ -16,10 +16,15 @@ export function initializeDatepickers() {
     }
 
     // Initialize for the new period range input
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+
     flatpickrInstance('#periodRange', {
         mode: 'range',
         dateFormat: 'Y-m-d',
-        locale: JAPANESE_LOCALE // Ensure locale is applied
+        locale: JAPANESE_LOCALE, // Ensure locale is applied
+        minDate: tomorrow
     });
 
     // Keep the deadline picker initialization

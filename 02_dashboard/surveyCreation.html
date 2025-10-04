@@ -62,7 +62,21 @@
 
       <!-- Main Content -->
       <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8 relative">
-        <div id="outline-map-container" class="hidden lg:block fixed right-0 top-16 h-[calc(100vh-64px)] w-64 bg-surface border-l border-outline-variant p-4 overflow-y-auto z-40"></div>
+        <div id="outline-map-container" class="hidden lg:flex fixed right-0 top-16 h-[calc(100vh-64px)] w-72 flex-col bg-surface border-l border-outline-variant p-4 overflow-hidden z-40">
+  <div id="outline-map-scroll" class="flex-1 overflow-y-auto">
+    <div id="outline-map-list" class="space-y-2"></div>
+  </div>
+  <div id="outline-action-buttons" class="mt-4 space-y-2 hidden">
+    <button type="button" data-outline-action="preview" class="w-full inline-flex items-center justify-center gap-2 rounded-full border border-outline-variant px-4 py-2 text-sm font-semibold text-on-surface hover:bg-surface-variant transition-colors">
+      <span class="material-icons text-base">visibility</span>
+      <span>プレビュー表示</span>
+    </button>
+    <button type="button" data-outline-action="save" class="w-full inline-flex items-center justify-center gap-2 rounded-full bg-primary text-on-primary px-4 py-2 text-sm font-semibold shadow-sm hover:bg-primary-dark transition-colors">
+      <span class="material-icons text-base">save</span>
+      <span>アンケート保存</span>
+    </button>
+  </div>
+</div>
         <div id="survey-content-area" class="flex flex-col w-full max-w-6xl mx-auto flex-1">
           <!-- Breadcrumb -->
           <div id="breadcrumb-container" class="mb-4"></div>
@@ -81,7 +95,7 @@
                 <span class="material-icons expand-icon">expand_less</span>
               </div>
               <div id="basicInfoContent" class="accordion-content p-4 space-y-6">
-                <section id="language-settings-section" class="space-y-4">
+                <section id="language-settings-section" class="space-y-4" data-pro-only="true">
                   <div>
                     <h3 class="text-on-surface text-lg font-semibold">追加言語</h3>
                     <p class="text-sm text-on-surface-variant mb-2">アンケートで利用する言語を選択してください。</p>
@@ -182,6 +196,7 @@
             <!-- Actions -->
             <div class="flex justify-end gap-4 pt-4">
               <button type="button" id="showPreviewBtn" class="min-w-[100px] px-6 py-3 rounded-full bg-secondary text-on-secondary font-semibold transition-colors">プレビュー表示</button>
+              <button type="button" id="openQrModalBtn" class="min-w-[100px] px-6 py-3 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors" disabled>QRコード</button>
               <button type="button" id="cancelCreateSurvey" class="min-w-[100px] px-6 py-3 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors">キャンセル</button>
               <button type="button" id="createSurveyBtn" class="min-w-[100px] px-6 py-3 rounded-full bg-primary text-on-primary font-semibold transition-colors shadow-md" disabled>アンケート保存</button>
             </div>
@@ -272,6 +287,12 @@
         </div>
       </div>
       <div class="questions-list p-4 space-y-4 accordion-content"></div>
+      <div class="mt-4 flex justify-end px-4 pb-4">
+        <button type="button" class="add-question-btn inline-flex items-center gap-2 px-4 py-2 rounded-full border border-outline-variant text-sm font-semibold text-on-surface hover:bg-surface-variant transition-colors" data-question-type="free_answer">
+          <span class="material-icons text-base">add</span>
+          <span>設問を追加</span>
+        </button>
+      </div>
     </div>
   </template>
 

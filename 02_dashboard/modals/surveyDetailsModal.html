@@ -32,11 +32,19 @@
                         <p id="detail_surveyNameInternal_view" class="text-on-surface text-base view-mode"></p>
                         <input type="text" id="detail_surveyNameInternal" name="name" class="input-field edit-mode hidden">
                         <label for="detail_surveyNameInternal" class="input-label font-bold">アンケート名（社内管理用）</label>
+                        <button type="button" class="help-icon-button material-icons" data-tooltip-id="survey-name-tooltip" aria-label="アンケート名と表示タイトルの違いを表示">help_outline</button>
+                        <div id="survey-name-tooltip" class="help-popover hidden" role="tooltip">
+                            <p class="text-xs leading-snug text-on-surface-variant">社内向けの管理名称です。回答者には表示されません。</p>
+                        </div>
                     </div>
                     <div class="md:col-span-2 input-group">
                         <p id="detail_displayTitle_view" class="text-on-surface text-base view-mode"></p>
                         <input type="text" id="detail_displayTitle" name="displayTitle" class="input-field edit-mode hidden">
                         <label for="detail_displayTitle" class="input-label font-bold">表示タイトル</label>
+                        <button type="button" class="help-icon-button material-icons" data-tooltip-id="display-title-tooltip" aria-label="表示タイトルの説明を表示">help_outline</button>
+                        <div id="display-title-tooltip" class="help-popover hidden" role="tooltip">
+                            <p class="text-xs leading-snug text-on-surface-variant">回答者に表示されるタイトルです。イベント名など外部向けの名称を設定してください。</p>
+                        </div>
                     </div>
                     <div class="md:col-span-2 input-group">
                         <p id="detail_surveyMemo_view" class="text-on-surface text-base whitespace-pre-wrap view-mode"></p>

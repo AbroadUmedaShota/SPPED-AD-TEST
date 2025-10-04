@@ -128,7 +128,7 @@ function loadSettings(surveyId) {
     const settingsKey = `thankYouScreenSettings_${surveyId}`;
     const settings = JSON.parse(localStorage.getItem(settingsKey)) || {
         thankYouMessage: 'アンケートのご回答ありがとうございました。ご協力いただきありがとうございました。',
-        allowContinuousAnswer: true,
+        allowContinuousAnswer: false,
         requestBusinessCardPhoto: true
     };
 
@@ -141,7 +141,7 @@ function loadSettings(surveyId) {
         updateThankYouMessageMeta(thankYouMessageInput);
     }
     if (allowContinuousAnswerInput) {
-        allowContinuousAnswerInput.checked = settings.allowContinuousAnswer !== false;
+        allowContinuousAnswerInput.checked = settings.allowContinuousAnswer === true;
     }
     const isBizcardEnabled = settings.requestBusinessCardPhoto !== false;
     if (requestBusinessCardPhotoInput) {

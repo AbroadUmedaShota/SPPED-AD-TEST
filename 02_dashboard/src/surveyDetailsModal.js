@@ -4,6 +4,51 @@ import { updateSurveyData, getSurveyStatus } from './tableManager.js'; // tableM
 import { closeModal } from './modalHandler.js';
 
 let currentEditingSurvey = null; // 現在編集中のアンケートデータを保持する変数
+let activeHelpPopover = null;
+
+function closeActiveHelpPopover() {
+    if (!activeHelpPopover) return;
+    const { button, popover } = activeHelpPopover;
+    popover.classList.add('hidden');
+    button.setAttribute('aria-expanded', 'false');
+    activeHelpPopover = null;
+}
+
+function toggleHelpPopover(button) {
+    if (!button) return;
+    const tooltipId = button.dataset.tooltipId;
+    if (!tooltipId) return;
+    const modalRoot = document.getElementById('surveyDetailsModal');
+    if (!modalRoot) return;
+    const popover = modalRoot.querySelector(`#${tooltipId}`);
+    if (!popover) return;
+
+    if (activeHelpPopover && activeHelpPopover.popover === popover) {
+        closeActiveHelpPopover();
+        return;
+    }
+
+    closeActiveHelpPopover();
+    popover.classList.remove('hidden');
+    button.setAttribute('aria-expanded', 'true');
+    activeHelpPopover = { button, popover };
+}
+
+function handleGlobalClick(event) {
+    if (!activeHelpPopover) return;
+    const { button, popover } = activeHelpPopover;
+    if (button.contains(event.target) || popover.contains(event.target)) {
+        return;
+    }
+    closeActiveHelpPopover();
+}
+
+document.addEventListener('click', handleGlobalClick);
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+        closeActiveHelpPopover();
+    }
+});
 
 // Listen for language changes to update the modal if it's open
 document.addEventListener('languagechange', () => {
@@ -23,6 +68,8 @@ export function setupSurveyDetailsModalListeners(modalElement) {
         console.warn("surveyDetailsModal element not provided to setupSurveyDetailsModalListeners.");
         return;
     }
+
+    closeActiveHelpPopover();
 
     const editSurveyBtn = modalElement.querySelector('#editSurveyBtn');
     const cancelEditBtn = modalElement.querySelector('#cancelEditBtn');
@@ -64,6 +111,23 @@ export function setupSurveyDetailsModalListeners(modalElement) {
         });
         surveyUrlInput.dataset.bound = 'true';
     }
+
+    const helpButtons = modalElement.querySelectorAll('.help-icon-button');
+    helpButtons.forEach((button) => {
+        if (button.dataset.bound === 'true') return;
+        button.setAttribute('aria-expanded', 'false');
+        button.addEventListener('click', (event) => {
+            event.stopPropagation();
+            toggleHelpPopover(button);
+        });
+        button.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggleHelpPopover(button);
+            }
+        });
+        button.dataset.bound = 'true';
+    });
 
     // Add new listeners
     if (editSurveyBtn) editSurveyBtn.addEventListener('click', () => {
@@ -176,6 +240,7 @@ function handleDetailDownload() {
  * @param {object} survey The survey data object.
  */
 export function populateSurveyDetails(survey) {
+    closeActiveHelpPopover();
     currentEditingSurvey = survey; // Store the survey object for editing
 
     const modal = document.getElementById('surveyDetailsModal');
@@ -216,10 +281,10 @@ export function populateSurveyDetails(survey) {
     const displayStatus = getSurveyStatus(survey);
     let statusColorClass = '';
     switch (displayStatus) {
-        case '開催中':
+        case '会期中':
             statusColorClass = 'bg-green-100 text-green-800';
             break;
-        case '開催前':
+        case '会期前':
             statusColorClass = 'bg-yellow-100 text-yellow-800';
             break;
         case 'データ精査中':

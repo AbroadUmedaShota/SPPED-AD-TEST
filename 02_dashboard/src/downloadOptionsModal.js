@@ -1,13 +1,13 @@
 import { handleOpenModal, closeModal } from './modalHandler.js';
 
 const DEFAULT_START_TIME = '00:00';
-const DEFAULT_END_TIME = '23:59';
+const DEFAULT_END_TIME = '24:00';
 
 let currentSurveyPeriod = {
     startDate: '',
     endDate: '',
-    startDefaultDateTime: '',
-    endDefaultDateTime: ''
+    startDefaultDate: '',
+    endDefaultDate: ''
 }; // Stores survey specific period for date picker limits
 
 /**
@@ -46,14 +46,16 @@ function handleDownloadFormChange(event) {
 
     const startInput = document.getElementById('download_start_date');
     const endInput = document.getElementById('download_end_date');
+    const startTimeInput = document.getElementById('download_start_time');
+    const endTimeInput = document.getElementById('download_end_time');
     const startPicker = startInput && startInput._flatpickr;
     const endPicker = endInput && endInput._flatpickr;
 
     if (event.target === periodCustomRadio) {
         if (periodCustomRadio.checked) {
             customPeriodInputs.classList.remove('hidden');
-            const startDefault = currentSurveyPeriod.startDefaultDateTime;
-            const endDefault = currentSurveyPeriod.endDefaultDateTime;
+            const startDefault = currentSurveyPeriod.startDefaultDate || currentSurveyPeriod.startDate;
+            const endDefault = currentSurveyPeriod.endDefaultDate || currentSurveyPeriod.endDate || currentSurveyPeriod.startDate;
 
             if (startPicker && startDefault) {
                 startPicker.setDate(startDefault, false);
@@ -66,6 +68,9 @@ function handleDownloadFormChange(event) {
             } else if (endInput && endDefault) {
                 endInput.value = endDefault;
             }
+
+            if (startTimeInput) startTimeInput.value = DEFAULT_START_TIME;
+            if (endTimeInput) endTimeInput.value = DEFAULT_END_TIME;
         } else {
             customPeriodInputs.classList.add('hidden');
         }
@@ -87,11 +92,15 @@ export async function openDownloadModal(initialSelection, periodStart = '', peri
     const customPeriodInputsEl = document.getElementById('customPeriodInputs');
     const startInput = document.getElementById('download_start_date');
     const endInput = document.getElementById('download_end_date');
+    const startTimeInput = document.getElementById('download_start_time');
+    const endTimeInput = document.getElementById('download_end_time');
 
     if (periodAllRadio) periodAllRadio.checked = true;
     if (customPeriodInputsEl) customPeriodInputsEl.classList.add('hidden');
     if (startInput) startInput.value = '';
     if (endInput) endInput.value = '';
+    if (startTimeInput) startTimeInput.value = DEFAULT_START_TIME;
+    if (endTimeInput) endTimeInput.value = DEFAULT_END_TIME;
 
     const initialRadio = document.getElementById(`download_${initialSelection}`);
     if (initialRadio) {
@@ -102,26 +111,23 @@ export async function openDownloadModal(initialSelection, periodStart = '', peri
     }
 
     const fallbackEndDate = periodEnd || periodStart || '';
-    const startDefaultDateTime = periodStart ? `${periodStart} ${DEFAULT_START_TIME}` : '';
-    const endDefaultDateTime = fallbackEndDate ? `${fallbackEndDate} ${DEFAULT_END_TIME}` : '';
 
     currentSurveyPeriod = {
         startDate: periodStart,
         endDate: periodEnd,
-        startDefaultDateTime,
-        endDefaultDateTime
+        startDefaultDate: periodStart || '',
+        endDefaultDate: fallbackEndDate || ''
     };
+
 
     let endDatePicker;
     let startDatePicker;
 
     if (startInput) {
         startDatePicker = flatpickr(startInput, {
-            enableTime: true,
-            time_24hr: true,
-            dateFormat: 'Y-m-d H:i',
-            minDate: startDefaultDateTime || null,
-            maxDate: endDefaultDateTime || null,
+            dateFormat: 'Y-m-d',
+            minDate: periodStart || null,
+            maxDate: fallbackEndDate || null,
             onChange(selectedDates) {
                 if (selectedDates[0] && endDatePicker) {
                     endDatePicker.set('minDate', selectedDates[0]);
@@ -133,11 +139,9 @@ export async function openDownloadModal(initialSelection, periodStart = '', peri
 
     if (endInput) {
         endDatePicker = flatpickr(endInput, {
-            enableTime: true,
-            time_24hr: true,
-            dateFormat: 'Y-m-d H:i',
-            minDate: startDefaultDateTime || null,
-            maxDate: endDefaultDateTime || null,
+            dateFormat: 'Y-m-d',
+            minDate: periodStart || null,
+            maxDate: fallbackEndDate || null,
             onChange(selectedDates) {
                 if (selectedDates[0] && startDatePicker) {
                     startDatePicker.set('maxDate', selectedDates[0]);
