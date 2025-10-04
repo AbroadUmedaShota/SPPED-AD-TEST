@@ -184,4 +184,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadCommonHtml('header-placeholder', 'common/header.html');
     await loadCommonHtml('sidebar-placeholder', 'common/sidebar.html', initAdminSidebarHandler);
     await loadCommonHtml('footer-placeholder', 'common/footer.html');
+
+    // Page-specific initialization
+    const page = window.location.pathname.split('/').pop();
+    switch (page) {
+        case 'data_entry.html':
+            const { initDataEntryPage } = await import('./data_entry.js');
+            initDataEntryPage();
+            break;
+        // Add other admin pages here
+        // case 'some_other_page.html':
+        //     const { initSomeOtherPage } = await import('./some_other_page.js');
+        //     initSomeOtherPage();
+        //     break;
+    }
 });

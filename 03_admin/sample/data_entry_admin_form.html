@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<!-- `dark` class will be toggled here -->
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>名刺データ入力画面</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="../../src/admin-style.css">
+    <script>
+        // Configure TailwindCSS for dark mode
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    <style>
+        /* For accordion */
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .accordion-content.open {
+            max-height: 1000px; /* Adjust as needed */
+        }
+        .timer.expired {
+            color: #D73A4A; /* Red */
+            font-weight: bold;
+        }
+        /* Modal styles */
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        .image-container.active {
+            border-color: #3B82F6; /* blue-500 */
+        }
+        .thumbnail-image img {
+            max-height: 100px; /* Adjust thumbnail height */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200 font-sans">
+
+    <div class="flex">
+        <!-- Sidebar Placeholder -->
+        <div id="sidebar-placeholder"></div>
+
+        <div class="flex-1 flex flex-col h-screen">
+            <!-- Header Placeholder -->
+            <div id="header-placeholder"></div>
+
+            <!-- Main Content -->
+            <main class="flex-1 p-4 md:p-6 overflow-y-auto">
+                <div class="max-w-7xl mx-auto">
+                    <div class="flex justify-between items-center mb-4">
+                                                                        <h1 class="text-xl font-bold">
+                            <span id="user-email">operator@example.com</span>：<span id="user-name">山田 太郎</span>
+                        </h1>
+                        <div class="flex items-center space-x-4">
+                            <div class="flex items-center space-x-2">
+                                <span class="material-icons">timer</span>
+                                <span id="timer" class="text-lg font-mono">00:00</span>
+                            </div>
+                            <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                                <span id="theme-toggle-icon" class="material-icons">light_mode</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col lg:flex-row gap-6">
+                        <!-- Left: Image Viewer -->
+                        <div class="lg:w-2/5 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg flex flex-col items-center">
+                            <div class="w-full mb-4 flex justify-center space-x-2">
+                                <button id="zoom-in" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 p-2 rounded-full"><span class="material-icons">zoom_in</span></button>
+                                <button id="zoom-out" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 p-2 rounded-full"><span class="material-icons">zoom_out</span></button>
+                                <button id="rotate-left" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 p-2 rounded-full"><span class="material-icons">rotate_left</span></button>
+                                <button id="rotate-right" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 p-2 rounded-full"><span class="material-icons">rotate_right</span></button>
+                            </div>
+                            
+                            <div id="image-viewer-container" class="w-full flex flex-col gap-6">
+                                <!-- Main Image -->
+                                <div id="main-image-wrapper" class="w-full h-80">
+                                    <div id="front-image-container" class="image-container w-full h-full">
+                                        <div class="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center rounded overflow-hidden">
+                                            <img id="card-image-front" src="./表.png" alt="名刺画像(表)" class="max-w-full max-h-full object-contain transition-transform duration-200">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Thumbnail Image -->
+                                <div id="thumbnail-wrapper" class="w-full h-24 flex justify-center items-center">
+                                     <div id="back-image-container" class="image-container thumbnail-image h-full cursor-pointer">
+                                        <div class="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center rounded overflow-hidden">
+                                            <img id="card-image-back" src="./裏.png" alt="名刺画像(裏)" class="max-w-full max-h-full object-contain transition-transform duration-200">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Input Form -->
+                        <div class="lg:w-3/5 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                            <div id="accordion" class="space-y-2">
+                                <!-- Accordion Items will be inserted here by JS, but for structure: -->
+                                <!-- Group: Email -->
+                                <div class="accordion-item">
+                                    <h3 class="accordion-header text-lg font-semibold p-3 bg-gray-200 dark:bg-gray-700 rounded cursor-pointer flex justify-between items-center">
+                                        <span>メールアドレス</span>
+                                        <span class="material-icons">expand_more</span>
+                                    </h3>
+                                    <div class="accordion-content bg-gray-200 dark:bg-gray-700 bg-opacity-50 rounded-b">
+                                        <div class="p-4">
+                                            <label for="email" class="block text-sm font-medium mb-1">メールアドレス</label>
+                                            <input type="email" id="email" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Other groups follow -->
+                                <div class="accordion-item">
+                                    <h3 class="accordion-header text-lg font-semibold p-3 bg-gray-200 dark:bg-gray-700 rounded cursor-pointer flex justify-between items-center">
+                                        <span>氏名</span>
+                                        <span class="material-icons">expand_more</span>
+                                    </h3>
+                                    <div class="accordion-content bg-gray-200 dark:bg-gray-700 bg-opacity-50 rounded-b">
+                                        <div class="p-4">
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div>
+                                                    <label for="last_name" class="block text-sm font-medium mb-1">姓</label>
+                                                    <input type="text" id="last_name" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded px-3 py-2">
+                                                </div>
+                                                <div>
+                                                    <label for="first_name" class="block text-sm font-medium mb-1">名</label>
+                                                    <input type="text" id="first_name" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded px-3 py-2">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h3 class="accordion-header text-lg font-semibold p-3 bg-gray-200 dark:bg-gray-700 rounded cursor-pointer flex justify-between items-center">
+                                        <span>会社情報</span>
+                                        <span class="material-icons">expand_more</span>
+                                    </h3>
+                                    <div class="accordion-content bg-gray-200 dark:bg-gray-700 bg-opacity-50 rounded-b">
+                                        <div class="p-4">
+                                            <div class="space-y-4">
+                                                <div>
+                                                    <label for="company_name" class="block text-sm font-medium mb-1">会社名</label>
+                                                    <input type="text" id="company_name" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded px-3 py-2">
+                                                </div>
+                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div>
+                                                        <label for="department" class="block text-sm font-medium mb-1">部署名</label>
+                                                        <input type="text" id="department" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded px-3 py-2">
+                                                    </div>
+                                                    <div>
+                                                        <label for="position" class="block text-sm font-medium mb-1">役職名</label>
+                                                        <input type="text" id="position" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded px-3 py-2">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h3 class="accordion-header text-lg font-semibold p-3 bg-gray-200 dark:bg-gray-700 rounded cursor-pointer flex justify-between items-center">
+                                        <span>住所</span>
+                                        <span class="material-icons">expand_more</span>
+                                    </h3>
+                                    <div class="accordion-content bg-gray-200 dark:bg-gray-700 bg-opacity-50 rounded-b">
+                                        <div class="p-4">
+                                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                <div class="md:col-span-1">
+                                                    <label for="zip_code" class="block text-sm font-medium mb-1">郵便番号</label>
+                                                    <input type="text" id="zip_code" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded px-3 py-2" placeholder="1234567">
+                                                </div>
+                                                <div class="md:col-span-2">
+                                                    <label for="address1" class="block text-sm font-medium mb-1">住所1 (都道府県・市区町村)</label>
+                                                    <input type="text" id="address1" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded px-3 py-2">
+                                                </div>
+                                                <div class="md:col-span-3">
+                                                    <label for="address2" class="block text-sm font-medium mb-1">住所2 (番地・建物名)</label>
+                                                    <input type="text" id="address2" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded px-3 py-2">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h3 class="accordion-header text-lg font-semibold p-3 bg-gray-200 dark:bg-gray-700 rounded cursor-pointer flex justify-between items-center">
+                                        <span>連絡先</span>
+                                        <span class="material-icons">expand_more</span>
+                                    </h3>
+                                    <div class="accordion-content bg-gray-200 dark:bg-gray-700 bg-opacity-50 rounded-b">
+                                        <div class="p-4">
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div>
+                                                    <label for="tel" class="block text-sm font-medium mb-1">電話番号</label>
+                                                    <input type="tel" id="tel" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded px-3 py-2">
+                                                </div>
+                                                <div>
+                                                    <label for="tel2" class="block text-sm font-medium mb-1">電話番号2</label>
+                                                    <input type="tel" id="tel2" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded px-3 py-2">
+                                                </div>
+                                                <div>
+                                                    <label for="mobile" class="block text-sm font-medium mb-1">携帯番号</label>
+                                                    <input type="tel" id="mobile" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded px-3 py-2">
+                                                </div>
+                                                <div>
+                                                    <label for="fax" class="block text-sm font-medium mb-1">FAX番号</label>
+                                                    <input type="tel" id="fax" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded px-3 py-2">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h3 class="accordion-header text-lg font-semibold p-3 bg-gray-200 dark:bg-gray-700 rounded cursor-pointer flex justify-between items-center">
+                                        <span>URL</span>
+                                        <span class="material-icons">expand_more</span>
+                                    </h3>
+                                    <div class="accordion-content bg-gray-200 dark:bg-gray-700 bg-opacity-50 rounded-b">
+                                        <div class="p-4">
+                                            <label for="url" class="block text-sm font-medium mb-1">URL</label>
+                                            <input type="url" id="url" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded px-3 py-2">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h3 class="accordion-header text-lg font-semibold p-3 bg-gray-200 dark:bg-gray-700 rounded cursor-pointer flex justify-between items-center">
+                                        <span>その他 (メモ)</span>
+                                        <span class="material-icons">expand_more</span>
+                                    </h3>
+                                    <div class="accordion-content bg-gray-200 dark:bg-gray-700 bg-opacity-50 rounded-b">
+                                        <div class="p-4">
+                                            <label for="memo" class="block text-sm font-medium mb-1">メモ</label>
+                                            <textarea id="memo" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded px-3 py-2 h-24"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h3 class="accordion-header text-lg font-semibold p-3 bg-gray-200 dark:bg-gray-700 rounded cursor-pointer flex justify-between items-center">
+                                        <span>フリー入力</span>
+                                        <span class="material-icons">expand_more</span>
+                                    </h3>
+                                    <div class="accordion-content bg-gray-200 dark:bg-gray-700 bg-opacity-50 rounded-b">
+                                        <div class="p-4">
+                                            <label for="free_input" class="block text-sm font-medium mb-1">フリー入力</label>
+                                            <textarea id="free_input" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded px-3 py-2 h-24"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="mt-6 flex justify-end space-x-4">
+                                <button id="end-work-btn" class="bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">作業終了</button>
+                                <button id="skip-btn" class="bg-yellow-500 hover:bg-yellow-600 dark:bg-yellow-600 dark:hover:bg-yellow-500 text-white font-bold py-2 px-4 rounded">スキップ</button>
+                                <button id="confirm-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 dark:disabled:bg-gray-500">入力完了</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Footer Placeholder -->
+            <div id="footer-placeholder"></div>
+        </div>
+    </div>
+
+    <!-- Skip Reason Modal -->
+    <div id="skip-modal" class="modal-overlay hidden fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center z-50">
+        <div class="modal-container bg-white dark:bg-gray-800 w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto p-6">
+            <h3 class="text-xl font-bold mb-4">スキップ理由</h3>
+            <div class="space-y-4">
+                <div>
+                    <input type="radio" id="reason-not-card" name="skip_reason" value="not_a_card" class="mr-2">
+                    <label for="reason-not-card">名刺ではない</label>
+                </div>
+                <div>
+                    <input type="radio" id="reason-language" name="skip_reason" value="unsupported_language" class="mr-2">
+                    <label for="reason-language">対応言語外</label>
+                </div>
+                <div>
+                    <input type="radio" id="reason-other" name="skip_reason" value="other" class="mr-2">
+                    <label for="reason-other">その他</label>
+                </div>
+                <textarea id="skip-memo" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded px-3 py-2 mt-2 h-24" placeholder="詳細を記入してください (100文字以内)" maxlength="100"></textarea>
+            </div>
+            <div class="mt-6 flex justify-end space-x-3">
+                <button id="cancel-skip-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white font-bold py-2 px-4 rounded">キャンセル</button>
+                <button id="confirm-skip-btn" class="bg-yellow-500 hover:bg-yellow-600 dark:bg-yellow-600 dark:hover:bg-yellow-500 text-white font-bold py-2 px-4 rounded">決定</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../src/admin.js"></script>
+    <script src="../src/data_entry_form.js"></script>
+</body>
+</html>
