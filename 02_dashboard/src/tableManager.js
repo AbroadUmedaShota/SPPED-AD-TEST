@@ -1,5 +1,5 @@
 import { showConfirmationModal } from './confirmationModal.js';
-import { showToast, copyTextToClipboard, resolveDashboardDataPath } from './utils.js';
+import { showToast, copyTextToClipboard, resolveDashboardDataPath, debounce } from './utils.js';
 import { handleOpenModal } from './modalHandler.js';
 import { populateSurveyDetails } from './surveyDetailsModal.js';
 import { openDownloadModal } from './downloadOptionsModal.js';
@@ -544,45 +544,54 @@ function isValidDate(date) {
 
 /** Applies filters to `allSurveyData` and updates `currentFilteredData`. */
 export function applyFiltersAndPagination() {
-    const searchKeywordInput = document.getElementById('searchKeyword');
-    const filterStatusSelect = document.getElementById('filterStatus');
-    const filterStartDateInput = document.getElementById('filterStartDate');
-    const filterEndDateInput = document.getElementById('filterEndDate');
+    const loadingIndicator = document.getElementById('loading-indicator');
+    if (loadingIndicator) loadingIndicator.classList.remove('hidden');
 
-    const keyword = searchKeywordInput ? searchKeywordInput.value.toLowerCase() : '';
-    const status = filterStatusSelect ? filterStatusSelect.value : 'all';
-    const startDateInputVal = filterStartDateInput ? filterStartDateInput.value : '';
-    const endDateInputVal = filterEndDateInput ? filterEndDateInput.value : '';
+    try {
+        const searchKeywordInput = document.getElementById('searchKeyword');
+        const filterStatusSelect = document.getElementById('filterStatus');
+        const filterStartDateInput = document.getElementById('filterStartDate');
+        const filterEndDateInput = document.getElementById('filterEndDate');
 
-    const startDate = startDateInputVal ? new Date(startDateInputVal) : null;
-    const endDate = endDateInputVal ? new Date(endDateInputVal) : null;
-    const lang = window.getCurrentLanguage();
+        const keyword = searchKeywordInput ? searchKeywordInput.value.toLowerCase() : '';
+        const status = filterStatusSelect ? filterStatusSelect.value : 'all';
+        const startDateInputVal = filterStartDateInput ? filterStartDateInput.value : '';
+        const endDateInputVal = filterEndDateInput ? filterEndDateInput.value : '';
 
-    currentFilteredData = allSurveyData.filter(survey => {
-        const surveyName = (survey.name && typeof survey.name === 'object') 
-            ? (survey.name[lang] || survey.name.ja || '').toLowerCase() 
-            : (survey.name || '').toLowerCase();
-        
-        const displayStatus = getSurveyStatus(survey);
-        if (HIDDEN_USER_STATUSES.has(displayStatus)) {
-            return false;
+        const startDate = startDateInputVal ? new Date(startDateInputVal) : null;
+        const endDate = endDateInputVal ? new Date(endDateInputVal) : null;
+        const lang = window.getCurrentLanguage();
+
+        currentFilteredData = allSurveyData.filter(survey => {
+            const surveyName = (survey.name && typeof survey.name === 'object') 
+                ? (survey.name[lang] || survey.name.ja || '').toLowerCase() 
+                : (survey.name || '').toLowerCase();
+            
+            const displayStatus = getSurveyStatus(survey);
+            if (HIDDEN_USER_STATUSES.has(displayStatus)) {
+                return false;
+            }
+            const surveyPeriodStart = survey.periodStart ? new Date(survey.periodStart) : null;
+            const surveyPeriodEnd = survey.periodEnd ? new Date(survey.periodEnd) : null;
+
+            const matchesKeyword = keyword === '' || surveyName.includes(keyword);
+            const matchesStatus = status === 'all' || displayStatus === status;
+            const matchesGroup = currentGroupId === null || survey.groupId === currentGroupId; // グループIDによるフィルタリング
+            
+            const matchesPeriod = 
+                (!startDate || !isValidDate(startDate) || (surveyPeriodStart && surveyPeriodStart >= startDate)) &&
+                (!endDate || !isValidDate(endDate) || (surveyPeriodEnd && surveyPeriodEnd <= endDate));
+            
+            return matchesKeyword && matchesStatus && matchesPeriod && matchesGroup;
+        });
+
+        currentPage = 1; // Reset to first page after filtering
+        updatePagination(); // Re-render table with filtered data and update pagination
+    } finally {
+        if (loadingIndicator) {
+            setTimeout(() => loadingIndicator.classList.add('hidden'), 100); // 短い遅延を追加してちらつきを軽減
         }
-        const surveyPeriodStart = survey.periodStart ? new Date(survey.periodStart) : null;
-        const surveyPeriodEnd = survey.periodEnd ? new Date(survey.periodEnd) : null;
-
-        const matchesKeyword = keyword === '' || surveyName.includes(keyword);
-        const matchesStatus = status === 'all' || displayStatus === status;
-        const matchesGroup = currentGroupId === null || survey.groupId === currentGroupId; // グループIDによるフィルタリング
-        
-        const matchesPeriod = 
-            (!startDate || !isValidDate(startDate) || (surveyPeriodStart && surveyPeriodStart >= startDate)) &&
-            (!endDate || !isValidDate(endDate) || (surveyPeriodEnd && surveyPeriodEnd <= endDate));
-        
-        return matchesKeyword && matchesStatus && matchesPeriod && matchesGroup;
-    });
-
-    currentPage = 1; // Reset to first page after filtering
-    updatePagination(); // Re-render table with filtered data and update pagination
+    }
 }
 
 export function setGroupFilter(groupId) {
@@ -603,66 +612,73 @@ export function initTableManager() {
     // Table Sort Logic
     document.querySelectorAll('.sortable-header').forEach(header => {
         header.addEventListener('click', () => {
-            const sortKey = header.dataset.sortKey;
-            let sortOrder = header.dataset.sortOrder; // 'asc' or 'desc'
+            const loadingIndicator = document.getElementById('loading-indicator');
+            if (loadingIndicator) loadingIndicator.classList.remove('hidden');
 
-            // Toggle sort order
-            sortOrder = (sortOrder === 'asc') ? 'desc' : 'asc';
-            header.dataset.sortOrder = sortOrder;
+            try {
+                const sortKey = header.dataset.sortKey;
+                let sortOrder = header.dataset.sortOrder; // 'asc' or 'desc'
 
-            // Update sort icons (reset previous, set current)
-            if (lastSortedHeader && lastSortedHeader !== header) {
-                const prevIcon = lastSortedHeader.querySelector('.sort-icon');
-                if (prevIcon) {
-                    prevIcon.textContent = 'unfold_more';
-                    prevIcon.classList.remove('opacity-100');
-                    prevIcon.classList.add('opacity-40');
+                // Toggle sort order
+                sortOrder = (sortOrder === 'asc') ? 'desc' : 'asc';
+                header.dataset.sortOrder = sortOrder;
+
+                // Update sort icons (reset previous, set current)
+                if (lastSortedHeader && lastSortedHeader !== header) {
+                    const prevIcon = lastSortedHeader.querySelector('.sort-icon');
+                    if (prevIcon) {
+                        prevIcon.textContent = 'unfold_more';
+                        prevIcon.classList.remove('opacity-100');
+                        prevIcon.classList.add('opacity-40');
+                    }
+                }
+                const currentSortIcon = header.querySelector('.sort-icon');
+                if (currentSortIcon) {
+                    currentSortIcon.textContent = (sortOrder === 'asc') ? 'arrow_upward' : 'arrow_downward';
+                    currentSortIcon.classList.remove('opacity-40');
+                    currentSortIcon.classList.add('opacity-100');
+                }
+                lastSortedHeader = header;
+
+                // Sorting on currentFilteredData directly
+                currentFilteredData.sort((a, b) => {
+                    let aValue = a[sortKey];
+                    let bValue = b[sortKey];
+
+                    // Type conversion for robust numerical/date sorting
+                    if (sortKey === 'answerCount' && aValue !== undefined && bValue !== undefined) {
+                        aValue = parseInt(aValue, 10);
+                        bValue = parseInt(bValue, 10);
+                    } else if ((sortKey === 'periodStart' || sortKey === 'deadline' || sortKey === 'dataCompletionDate') && aValue !== undefined && bValue !== undefined) {
+                        aValue = new Date(aValue); // Date objects for proper comparison
+                        bValue = new Date(bValue);
+                    } else if (sortKey === 'status') {
+                        // Custom sort order for status
+                        aValue = STATUS_SORT_ORDER[getSurveyStatus(a)] || 99;
+                        bValue = STATUS_SORT_ORDER[getSurveyStatus(b)] || 99;
+                    } else if (typeof aValue === 'string' && typeof bValue === 'string') {
+                        // Default string comparison (case-insensitive)
+                        return aValue.localeCompare(bValue, 'ja', { sensitivity: 'base' });
+                    }
+
+                    // Comparison logic
+                    if (aValue < bValue) return (sortOrder === 'asc') ? -1 : 1;
+                    if (aValue > bValue) return (sortOrder === 'asc') ? 1 : -1;
+                    return 0;
+                });
+
+                updatePagination(); // Re-render table with sorted data and update pagination
+            } finally {
+                if (loadingIndicator) {
+                    setTimeout(() => loadingIndicator.classList.add('hidden'), 100);
                 }
             }
-            const currentSortIcon = header.querySelector('.sort-icon');
-            if (currentSortIcon) {
-                currentSortIcon.textContent = (sortOrder === 'asc') ? 'arrow_upward' : 'arrow_downward';
-                currentSortIcon.classList.remove('opacity-40');
-                currentSortIcon.classList.add('opacity-100');
-            }
-            lastSortedHeader = header;
-
-            // Sorting on currentFilteredData directly
-            currentFilteredData.sort((a, b) => {
-                let aValue = a[sortKey];
-                let bValue = b[sortKey];
-
-                // Type conversion for robust numerical/date sorting
-                if (sortKey === 'answerCount' && aValue !== undefined && bValue !== undefined) {
-                    aValue = parseInt(aValue, 10);
-                    bValue = parseInt(bValue, 10);
-                } else if ((sortKey === 'periodStart' || sortKey === 'deadline' || sortKey === 'dataCompletionDate') && aValue !== undefined && bValue !== undefined) {
-                    aValue = new Date(aValue); // Date objects for proper comparison
-                    bValue = new Date(bValue);
-                } else if (sortKey === 'status') {
-                    // Custom sort order for status
-                    aValue = STATUS_SORT_ORDER[aValue] || 99;
-                    bValue = STATUS_SORT_ORDER[bValue] || 99;
-                } else if (typeof aValue === 'string' && typeof bValue === 'string') {
-                    // Default string comparison (case-insensitive)
-                    return aValue.localeCompare(bValue, 'ja', { sensitivity: 'base' });
-                }
-
-                // Comparison logic
-                if (aValue < bValue) return (sortOrder === 'asc') ? -1 : 1;
-                if (aValue > bValue) return (sortOrder === 'asc') ? 1 : -1;
-                return 0;
-            });
-
-            updatePagination(); // Re-render table with sorted data and update pagination
         });
     });
 
     // Filter Event Listeners
-    // if (searchKeywordInput) searchKeywordInput.addEventListener('input', applyFiltersAndPagination); // 検索ボタン追加に伴い削除
-    const searchButton = document.getElementById('searchButton');
-    if (searchButton) {
-        searchButton.addEventListener('click', applyFiltersAndPagination);
+    if (searchKeywordInput) {
+        searchKeywordInput.addEventListener('input', debounce(applyFiltersAndPagination, 300));
     }
     if (filterStatusSelect) filterStatusSelect.addEventListener('change', applyFiltersAndPagination);
     if (filterStartDateInput) filterStartDateInput.addEventListener('change', applyFiltersAndPagination);
@@ -675,6 +691,7 @@ export function initTableManager() {
             if (filterStartDateInput) filterStartDateInput.value = '';
             if (filterEndDateInput) filterEndDateInput.value = '';
             applyFiltersAndPagination();
+            showToast('フィルターをリセットしました', 'info');
         });
     }
 
@@ -712,6 +729,27 @@ export function initTableManager() {
     } else {
         fetchSurveyData().then(data => {
             allSurveyData = sanitizeSurveysForDisplay(data);
+            // 初期ソートをアンケートIDの降順に設定
+            currentFilteredData = [...allSurveyData]; // フィルタリング前の全データを対象にする
+            currentFilteredData.sort((a, b) => {
+                if (a.id < b.id) return 1;
+                if (a.id > b.id) return -1;
+                return 0;
+            });
+            
+            // ソートアイコンを更新
+            const idHeader = document.querySelector('.sortable-header[data-sort-key="id"]');
+            if (idHeader) {
+                idHeader.dataset.sortOrder = 'desc';
+                const icon = idHeader.querySelector('.sort-icon');
+                if (icon) {
+                    icon.textContent = 'arrow_downward';
+                    icon.classList.remove('opacity-40');
+                    icon.classList.add('opacity-100');
+                }
+                lastSortedHeader = idHeader;
+            }
+
             applyFiltersAndPagination();
         }).catch(error => {
             console.error("DEBUG: Error during initial data fetch or rendering:", error);
