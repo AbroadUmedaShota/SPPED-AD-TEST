@@ -368,18 +368,5 @@
       <button type="button" class="icon-button delete-option-btn mt-2" aria-label="選択肢を削除"><span class="material-icons text-error">remove_circle_outline</span></button>
     </div>
   </template>
-
-  <script>
-    document.addEventListener('pageInitialized', () => {
-        const tutorialStatus = localStorage.getItem('speedad-tutorial-status');
-        if (tutorialStatus === 'survey-creation-started') {
-            if (typeof startSurveyCreationTutorial === 'function') {
-                startSurveyCreationTutorial();
-            } else {
-                console.error('Tutorial function is not available.');
-            }
-        }
-    });
-  </script>
 </body>
 </html>

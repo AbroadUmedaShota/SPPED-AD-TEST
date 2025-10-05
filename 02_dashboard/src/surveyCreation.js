@@ -2,14 +2,15 @@ import { handleOpenModal, closeModal } from './modalHandler.js';
 import { openAccountInfoModal } from './accountInfoModal.js';
 import { initSidebarHandler } from './sidebarHandler.js';
 import { initBreadcrumbs } from './breadcrumb.js';
-import { showQrCodeModal } from './qrCodeModal.js';
+import { setupQrCodeModalListeners } from './qrCodeModal.js';
 import { initThemeToggle } from './themeToggle.js';
 import { fetchSurveyData, saveSurveyDataToLocalStorage, loadSurveyDataFromLocalStorage } from './services/surveyService.js';
 import {
     populateBasicInfo,
     renderAllQuestionGroups,
     displayErrorMessage,
-    renderOutlineMap
+    renderOutlineMap,
+    updateOutlineActionsState
 } from './ui/surveyRenderer.js';
 import { initializeFab } from './ui/fab.js';
 import { initializeDatepickers } from './ui/datepicker.js';
@@ -665,6 +666,12 @@ function updateAndRenderAll() {
         qrButton.classList.toggle('opacity-50', !canOpenQr);
     }
 
+    if (openQrModalBtn) {
+        openQrModalBtn.addEventListener('click', () => {
+            loadModal('qrCodeModal', setupQrCodeModalListeners);
+        });
+    }
+
     updateOutlineActionsState();
 
     // Ensure placeholders and outline actions are updated after rendering
@@ -1194,6 +1201,16 @@ async function initializePage() {
                 console.error('Failed to display bizcard plan:', e);
             }
         }, 100);
+
+        // チュートリアルの状態を確認して開始
+        const tutorialStatus = localStorage.getItem('speedad-tutorial-status');
+        if (tutorialStatus === 'survey-creation-started') {
+            if (typeof startSurveyCreationTutorial === 'function') {
+                startSurveyCreationTutorial();
+            } else {
+                console.error('Tutorial function is not available.');
+            }
+        }
 
         document.dispatchEvent(new CustomEvent('pageInitialized'));
 

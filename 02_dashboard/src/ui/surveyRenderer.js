@@ -603,3 +603,35 @@ export function displayErrorMessage() {
   if (!container) return;
   container.innerHTML = '<p class="text-error p-4">アンケートの読み込み時にエラーが発生しました。</p>';
 }
+
+export function updateOutlineActionsState() {
+    const outlineActions = document.getElementById('outline-action-buttons');
+    const outlineMapList = document.getElementById('outline-map-list');
+    if (!outlineActions || !outlineMapList) return;
+
+    const hasContent = outlineMapList.hasChildNodes();
+    outlineActions.classList.toggle('hidden', !hasContent);
+
+    if (!hasContent) return;
+
+    const mainSaveBtn = document.getElementById('createSurveyBtn');
+    const mainPreviewBtn = document.getElementById('showPreviewBtn');
+    const outlineSaveBtn = outlineActions.querySelector('[data-outline-action="save"]');
+    const outlinePreviewBtn = outlineActions.querySelector('[data-outline-action="preview"]');
+
+    if (mainSaveBtn && outlineSaveBtn) {
+        outlineSaveBtn.disabled = mainSaveBtn.disabled;
+        if (!outlineSaveBtn.dataset.listener) {
+            outlineSaveBtn.addEventListener('click', () => mainSaveBtn.click());
+            outlineSaveBtn.dataset.listener = 'true';
+        }
+    }
+
+    if (mainPreviewBtn && outlinePreviewBtn) {
+        outlinePreviewBtn.disabled = mainPreviewBtn.disabled;
+        if (!outlinePreviewBtn.dataset.listener) {
+            outlinePreviewBtn.addEventListener('click', () => mainPreviewBtn.click());
+            outlinePreviewBtn.dataset.listener = 'true';
+        }
+    }
+}
