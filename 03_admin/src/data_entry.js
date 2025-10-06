@@ -47,7 +47,7 @@ function renderTaskTable(tasks) {
     tasks.forEach(task => {
         const progress = task.total > 0 ? (task.completed / task.total) * 100 : 0;
         const row = document.createElement('tr');
-        row.className = 'hover:bg-gray-700 cursor-pointer';
+        row.className = 'hover:bg-surface-variant cursor-pointer';
         row.onclick = () => {
             if (task.id === 'admin') {
                 window.location.href = `sample/data_entry_admin_form.html`;
@@ -58,20 +58,20 @@ function renderTaskTable(tasks) {
 
         row.innerHTML = `
             <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm font-medium text-white">${task.name}</div>
-                <div class="text-xs text-gray-400">${task.description}</div>
+                <div class="text-sm font-medium text-on-surface">${task.name}</div>
+                <div class="text-xs text-on-surface-variant">${task.description}</div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center">
-                    <div class="w-24 bg-gray-600 rounded-full h-2.5 mr-3">
+                    <div class="w-24 bg-surface-variant rounded-full h-2.5 mr-3">
                         <div class="bg-blue-500 h-2.5 rounded-full" style="width: ${progress}%"></div>
                     </div>
-                    <span class="text-sm text-gray-300">${Math.round(progress)}%</span>
+                    <span class="text-sm text-on-surface-variant">${Math.round(progress)}%</span>
                 </div>
-                <div class="text-xs text-gray-400">${task.completed.toLocaleString()} / ${task.total.toLocaleString()} 件</div>
+                <div class="text-xs text-on-surface-variant">${task.completed.toLocaleString()} / ${task.total.toLocaleString()} 件</div>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${task.operatorCount}人</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${new Date(task.lastUpdatedAt).toLocaleString('ja-JP')}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-on-surface-variant">${task.operatorCount}人</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-on-surface-variant">${new Date(task.lastUpdatedAt).toLocaleString('ja-JP')}</td>
         `;
         tbody.appendChild(row);
     });
