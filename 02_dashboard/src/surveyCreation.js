@@ -2120,65 +2120,79 @@ function renderSurveyPreview() {
     const container = document.getElementById('modalSurveyPreviewContainer');
     if (!container) return;
 
-        const lang = (typeof getEditorLanguage === 'function' ? getEditorLanguage() : currentLang) || 'ja';
+    const lang = (typeof getEditorLanguage === 'function' ? getEditorLanguage() : currentLang) || 'ja';
     const lines = [];
-    lines.push(`<div class="space-y-3">`);
-    lines.push(`<div>
-        <div class="text-xl font-semibold text-on-surface">${getTextLocal(surveyData.displayTitle, lang) || getTextLocal(surveyData.name, lang) || '（無題アンケート）'}</div>
-        <div class="text-on-surface-variant text-sm">${surveyData.periodStart || ''} ${(surveyData.periodStart || surveyData.periodEnd) ? '〜' : ''} ${surveyData.periodEnd || ''}</div>
-    </div>`);
-    if (surveyData.description) {
-        lines.push(`<p class="text-on-surface-variant">${getTextLocal(surveyData.description, lang)}</p>`);
+    const periodHasStart = Boolean(surveyData.periodStart);
+    const periodHasEnd = Boolean(surveyData.periodEnd);
+    const periodText = (periodHasStart || periodHasEnd)
+        ? `${surveyData.periodStart || ''}${(surveyData.periodStart || surveyData.periodEnd) ? '〜' : ''}${surveyData.periodEnd || ''}`
+        : '';
+
+    lines.push('<div class="survey-preview-stack">');
+    lines.push('<header class="survey-preview-header">');
+    lines.push(`<div class="survey-preview-title text-on-surface">${getTextLocal(surveyData.displayTitle, lang) || getTextLocal(surveyData.name, lang) || '（無題アンケート）'}</div>`);
+    if (periodText) {
+        lines.push(`<div class="survey-preview-period text-on-surface-variant">${periodText}</div>`);
     }
+    const description = surveyData.description ? getTextLocal(surveyData.description, lang) : '';
+    if (description) {
+        lines.push(`<p class="survey-preview-description text-on-surface-variant">${description}</p>`);
+    }
+    lines.push('</header>');
 
     (surveyData.questionGroups || []).forEach((g, gi) => {
-        lines.push(`<div class="mt-4">
-            <h3 class="text-on-surface font-bold mb-2">${getTextLocal(g.title, lang) || `グループ${gi + 1}`}</h3>
-        </div>`);
+        const groupTitle = getTextLocal(g.title, lang) || `グループ${gi + 1}`;
+        lines.push('<section class="survey-preview-section">');
+        if (groupTitle) {
+            lines.push(`<h3 class="survey-preview-group-title text-on-surface-variant">${groupTitle}</h3>`);
+        }
         (g.questions || []).forEach((q, qi) => {
             const qTitle = getTextLocal(q.text, lang) || `設問${qi + 1}`;
-            lines.push(`<div class="mb-3">
-                <div class="text-on-surface font-medium">Q${qi + 1}. ${qTitle} ${q.required ? '<span class="text-error text-xs">(必須)</span>' : ''}</div>`);
+            const requiredTag = q.required ? '<span class="survey-preview-required text-error">(必須)</span>' : '';
+            lines.push('<div class="survey-preview-question">');
+            lines.push(`<div class="survey-preview-question-title">Q${qi + 1}. ${qTitle}${requiredTag}</div>`);
             if (q.options && q.options.length) {
-                lines.push('<ul class="list-disc ml-6 text-on-surface-variant">');
-                q.options.forEach(opt => {
-                    lines.push(`<li>${getTextLocal(opt.text, lang)}</li>`);
+                const optionIcon = q.type === 'multi_answer' ? 'check_box_outline_blank' : 'radio_button_unchecked';
+                lines.push('<div class="survey-preview-options">');
+                q.options.forEach((opt) => {
+                    lines.push(`<div class="survey-preview-option-row"><span class="material-icons-outlined survey-preview-option-icon">${optionIcon}</span><span class="survey-preview-option-text">${getTextLocal(opt.text, lang)}</span></div>`);
                 });
-                lines.push('</ul>');
+                lines.push('</div>');
             } else if (q.matrix && Array.isArray(q.matrix.rows) && Array.isArray(q.matrix.cols)) {
-                const cols = q.matrix.cols.map(c => getTextLocal(c.text, lang));
-                const rows = q.matrix.rows.map(r => getTextLocal(r.text, lang));
+                const cols = q.matrix.cols.map((c) => getTextLocal(c.text, lang));
+                const rows = q.matrix.rows.map((r) => getTextLocal(r.text, lang));
                 const isSA = q.type === 'matrix_sa';
-                lines.push('<div class="overflow-auto max-h-80 mt-2">');
-                lines.push('<table class="matrix-preview-table min-w-full text-sm border border-outline-variant">');
-                // thead
-                lines.push('<thead class="sticky top-0 z-10"><tr>');
-                lines.push('<th class="matrix-header border border-outline-variant px-2 py-1 bg-surface-variant text-on-surface sticky left-0 z-20">&nbsp;</th>');
-                cols.forEach(label => {
-                    lines.push(`<th class="matrix-header border border-outline-variant px-2 py-1 bg-surface-variant text-on-surface">${label || '&nbsp;'}</th>`);
+                lines.push('<div class="survey-preview-matrix">');
+                lines.push('<div class="survey-preview-matrix-scroll">');
+                lines.push('<table class="matrix-preview-table">');
+                lines.push('<thead><tr>');
+                lines.push('<th class="matrix-header">&nbsp;</th>');
+                cols.forEach((label) => {
+                    lines.push(`<th class="matrix-header">${label || '&nbsp;'}</th>`);
                 });
                 lines.push('</tr></thead>');
-                // tbody
                 lines.push('<tbody>');
-                rows.forEach((rLabel, rIdx) => {
+                rows.forEach((rLabel) => {
                     lines.push('<tr>');
-                    lines.push(`<td class="matrix-row-header border border-outline-variant px-2 py-1 text-on-surface sticky left-0 z-10 bg-surface">${rLabel || '&nbsp;'}</td>`);
-                    cols.forEach((_, cIdx) => {
+                    lines.push(`<td class="matrix-row-header">${rLabel || '&nbsp;'}</td>`);
+                    cols.forEach(() => {
                         const icon = isSA ? 'radio_button_unchecked' : 'check_box_outline_blank';
-                        lines.push(`<td class="matrix-cell border border-outline-variant px-2 py-1 text-center"><span class=\"material-icons-outlined matrix-icon\">${icon}</span></td>`);
+                        lines.push(`<td class="matrix-cell"><span class="material-icons-outlined matrix-icon">${icon}</span></td>`);
                     });
                     lines.push('</tr>');
                 });
                 lines.push('</tbody>');
                 lines.push('</table>');
                 lines.push('</div>');
+                lines.push('</div>');
             }
-            lines.push(`</div>`);
+            lines.push('</div>');
         });
+        lines.push('</section>');
     });
-    lines.push(`</div>`);
+    lines.push('</div>');
 
-    container.innerHTML = lines.join('\n');
+    container.innerHTML = lines.join('');
 }
 
 // Ensure input bindings are attached once
