@@ -6,6 +6,26 @@
 // DOM要素をこのモジュール内で管理
 const dom = {};
 
+function getLocalizedText(content, lang) {
+    if (!content) return '';
+    if (typeof content === 'string') return content;
+    if (typeof content === 'object') {
+        return content[lang] || content.ja || Object.values(content)[0] || '';
+    }
+    return String(content);
+}
+
+function getBadgeToneClass(tone) {
+    switch (tone) {
+        case 'limit':
+            return 'bg-tertiary-container text-on-tertiary-container';
+        case 'info':
+            return 'bg-secondary-container text-on-secondary-container';
+        default:
+            return 'bg-primary-container text-on-primary-container';
+    }
+}
+
 /**
  * レンダラーに必要なDOM要素をキャッシュします。
  */
@@ -15,6 +35,7 @@ function cacheDOMElements() {
     dom.surveyIdDisplay = document.getElementById('surveyIdDisplay');
     dom.surveyPeriodDisplay = document.getElementById('surveyPeriodDisplay');
     dom.bizcardSettingsFields = document.getElementById('bizcardSettingsFields');
+    dom.dataConversionPlanSelection = document.getElementById('dataConversionPlanSelection');
     dom.bizcardRequestInput = document.getElementById('bizcardRequest');
     dom.couponCodeInput = document.getElementById('couponCode');
     dom.couponMessage = document.getElementById('couponMessage');
@@ -79,6 +100,103 @@ export function renderEstimate(estimate) {
     if (!dom.estimatedAmountSpan) cacheDOMElements();
     dom.estimatedAmountSpan.textContent = `¥${estimate.amount.toLocaleString()}`;
     dom.estimatedCompletionDateSpan.textContent = estimate.completionDate;
+}
+
+/**
+ * データ化項目プランを描画します。
+ * @param {Array<object>} plans - 表示するプラン一覧。
+ * @param {string} selectedPlan - 選択中のプラン値。
+ */
+export function renderDataConversionPlans(plans, selectedPlan) {
+    if (!Array.isArray(plans)) return;
+    if (!dom.dataConversionPlanSelection) cacheDOMElements();
+    const container = dom.dataConversionPlanSelection;
+    if (!container) return;
+
+    const lang = document.documentElement.lang || 'ja';
+    container.innerHTML = '';
+
+    plans.forEach(plan => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'relative';
+
+        const input = document.createElement('input');
+        input.type = 'radio';
+        input.name = 'dataConversionPlan';
+        input.value = plan.value;
+        input.id = `data-plan-${plan.value}`;
+        input.className = 'sr-only peer';
+        if (plan.value === selectedPlan) {
+            input.checked = true;
+        }
+
+        const label = document.createElement('label');
+        label.setAttribute('for', input.id);
+        label.className = [
+            'flex h-full flex-col gap-3 rounded-xl border p-5 transition-all focus:outline-none',
+            plan.value === selectedPlan
+                ? 'border-primary bg-surface-container-highest shadow-lg'
+                : 'border-outline bg-surface-container hover:border-primary hover:shadow-sm'
+        ].join(' ');
+
+        const header = document.createElement('div');
+        header.className = 'flex items-start justify-between gap-2';
+
+        const title = document.createElement('p');
+        title.className = 'text-lg font-semibold text-on-surface';
+        title.textContent = getLocalizedText(plan.title, lang);
+
+        const price = document.createElement('div');
+        price.className = 'text-right';
+        const priceValue = document.createElement('p');
+        priceValue.className = 'text-2xl font-bold text-primary';
+        priceValue.textContent = getLocalizedText(plan.price, lang);
+        const priceNote = document.createElement('p');
+        priceNote.className = 'text-xs text-on-surface-variant';
+        priceNote.textContent = getLocalizedText(plan.priceNote, lang);
+        price.append(priceValue, priceNote);
+
+        header.append(title, price);
+        label.appendChild(header);
+
+        if (Array.isArray(plan.badges) && plan.badges.length > 0) {
+            const badgeWrapper = document.createElement('div');
+            badgeWrapper.className = 'flex flex-wrap gap-2';
+            plan.badges.forEach(badge => {
+                const badgeEl = document.createElement('span');
+                badgeEl.className = `inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${getBadgeToneClass(badge.tone)}`;
+                badgeEl.textContent = getLocalizedText(badge.text, lang);
+                badgeWrapper.appendChild(badgeEl);
+            });
+            label.appendChild(badgeWrapper);
+        }
+
+        const description = document.createElement('p');
+        description.className = 'text-sm text-on-surface-variant';
+        description.textContent = getLocalizedText(plan.description, lang);
+        label.appendChild(description);
+
+        if (Array.isArray(plan.highlights) && plan.highlights.length > 0) {
+            const list = document.createElement('ul');
+            list.className = 'space-y-1 text-sm text-on-surface-variant';
+            plan.highlights.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'flex items-start gap-2';
+                const icon = document.createElement('span');
+                icon.className = 'material-icons text-base text-primary mt-0.5';
+                icon.textContent = 'check_circle';
+                const text = document.createElement('span');
+                text.className = 'flex-1';
+                text.textContent = getLocalizedText(item, lang);
+                li.append(icon, text);
+                list.appendChild(li);
+            });
+            label.appendChild(list);
+        }
+
+        wrapper.append(input, label);
+        container.appendChild(wrapper);
+    });
 }
 
 /**
