@@ -12,10 +12,86 @@ import {
     renderEstimate,
     displayCouponResult,
     validateForm,
-    setSaveButtonLoading
+    setSaveButtonLoading,
+    renderDataConversionPlans
 } from './ui/bizcardSettingsRenderer.js';
 import { showToast } from './utils.js';
 import { showConfirmationModal } from './confirmationModal.js';
+
+const DATA_CONVERSION_PLANS = [
+    {
+        value: 'free',
+        title: { ja: '無料トライアル', en: 'Free Trial' },
+        price: { ja: '¥0', en: '¥0' },
+        priceNote: { ja: '月額・初期費用なし', en: 'No monthly or initial fee' },
+        badges: [
+            { text: { ja: '対象項目: 氏名 / 会社名 / メール', en: 'Fields: Name / Company / Email' }, tone: 'info' },
+            { text: { ja: '月間50枚まで', en: 'Up to 50 cards / month' }, tone: 'limit' }
+        ],
+        description: {
+            ja: '名刺データ化をまずは試したい方向け。OCRによる自動抽出のみ提供します。',
+            en: 'Entry plan with OCR-only extraction for teams trying the service.'
+        },
+        highlights: [
+            { ja: '納期目安: 3営業日', en: 'Turnaround: 3 business days' },
+            { ja: '納品形式: CSVダウンロード', en: 'Delivery: CSV download' }
+        ]
+    },
+    {
+        value: 'standard',
+        title: { ja: 'スタンダード', en: 'Standard' },
+        price: { ja: '¥5,000', en: '¥5,000' },
+        priceNote: { ja: '基本料金', en: 'Base charge' },
+        badges: [
+            { text: { ja: '対象項目: 氏名 / 会社名 / 部署 / 役職 / メール', en: 'Fields: Name / Company / Department / Title / Email' }, tone: 'info' },
+            { text: { ja: '月間300枚まで', en: 'Up to 300 cards / month' }, tone: 'limit' }
+        ],
+        description: {
+            ja: 'もっとも選ばれている標準プラン。有人によるダブルチェックで高精度なデータを納品します。',
+            en: 'Most popular plan with human double-checks for high accuracy.'
+        },
+        highlights: [
+            { ja: '納期目安: 2営業日', en: 'Turnaround: 2 business days' },
+            { ja: '納品形式: CSV / Excel', en: 'Delivery: CSV / Excel' }
+        ]
+    },
+    {
+        value: 'premium',
+        title: { ja: 'プレミアム', en: 'Premium' },
+        price: { ja: '¥12,000', en: '¥12,000' },
+        priceNote: { ja: '高度な名寄せ・重複排除込み', en: 'Includes advanced deduplication' },
+        badges: [
+            { text: { ja: '対象項目: スタンダード項目 + SNS・QR情報', en: 'Fields: Standard + Social / QR data' }, tone: 'info' },
+            { text: { ja: '月間1,000枚まで', en: 'Up to 1,000 cards / month' }, tone: 'limit' }
+        ],
+        description: {
+            ja: 'イベントや展示会で大量の名刺を扱う企業向け。CRM連携用の整形データを納品します。',
+            en: 'Ideal for events with high volume, delivering CRM-ready formatted data.'
+        },
+        highlights: [
+            { ja: '納期目安: 1営業日', en: 'Turnaround: 1 business day' },
+            { ja: '納品形式: CSV / Excel / Salesforce', en: 'Delivery: CSV / Excel / Salesforce' }
+        ]
+    },
+    {
+        value: 'enterprise',
+        title: { ja: 'エンタープライズ', en: 'Enterprise' },
+        price: { ja: '¥25,000〜', en: '¥25,000+' },
+        priceNote: { ja: 'ボリューム割引 & カスタム要件対応', en: 'Volume pricing & custom workflows' },
+        badges: [
+            { text: { ja: '対象項目: プレミアム項目 + カスタム項目', en: 'Fields: Premium + Custom fields' }, tone: 'info' },
+            { text: { ja: '月間無制限（個別見積り）', en: 'Unlimited (custom quote)' }, tone: 'limit' }
+        ],
+        description: {
+            ja: '専任オペレーターや機密保持契約など大規模運用に対応。ワークフロー連携も個別に設計します。',
+            en: 'Supports dedicated operators, NDAs, and bespoke workflow integrations.'
+        },
+        highlights: [
+            { ja: '納期目安: 個別スケジュール', en: 'Turnaround: Custom schedule' },
+            { ja: '納品形式: CRM / MAプラットフォーム連携', en: 'Delivery: CRM / MA platform integrations' }
+        ]
+    }
+];
 
 export function initBizcardSettings() {
     // --- DOM Element Cache ---
@@ -230,6 +306,12 @@ export function initBizcardSettings() {
         if(settingsFields) {
             settingsFields.classList.remove('hidden');
         }
+
+        if (!state.settings.dataConversionPlan && DATA_CONVERSION_PLANS.length > 0) {
+            state.settings.dataConversionPlan = DATA_CONVERSION_PLANS[0].value;
+        }
+
+        renderDataConversionPlans(DATA_CONVERSION_PLANS, state.settings.dataConversionPlan);
 
         const estimate = calculateEstimate(state.settings, state.appliedCoupon);
         renderEstimate(estimate);

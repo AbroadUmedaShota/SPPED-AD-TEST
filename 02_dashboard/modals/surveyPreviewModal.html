@@ -6,9 +6,13 @@
                 <span class="material-icons text-3xl">close</span>
             </button>
         </div>
-        <div class="modal-body max-h-[70vh] overflow-y-auto space-y-4">
-            <div id="modalSurveyPreviewContainer" class="bg-surface-variant p-6 rounded-lg border border-outline-variant min-h-[200px]">
-                <p class="text-on-surface-variant">プレビューコンテンツがここに表示されます。</p>
+        <div class="modal-body max-h-[70vh] overflow-y-auto flex justify-center">
+            <div class="survey-preview-viewport">
+                <div class="survey-preview-device">
+                    <div id="modalSurveyPreviewContainer" class="survey-preview-content">
+                        <p class="survey-preview-placeholder text-on-surface-variant">プレビューコンテンツがここに表示されます。</p>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="modal-footer flex justify-end gap-4 mt-6">
