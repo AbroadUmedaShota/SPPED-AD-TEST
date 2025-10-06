@@ -1,36 +1,51 @@
-<!-- Duplicate Survey Modal -->
-<div id="duplicateSurveyModal" class="modal-overlay" data-state="closed">
-    <div class="modal-content-transition w-full max-w-lg p-6 bg-surface rounded-xl">
-        <div class="flex justify-between items-center pb-4 border-b border-outline-variant">
-            <h2 class="text-lg font-semibold text-on-surface">アンケートを複製</h2>
-            <button id="closeDuplicateSurveyModalBtn" class="text-on-surface-variant hover:text-primary" aria-label="閉じる">
+<div id="duplicateSurveyModal" class="fixed inset-0 flex items-center justify-center p-4 modal-overlay hidden z-[60]" data-state="closed">
+    <div class="bg-surface rounded-lg shadow-xl p-6 w-full max-w-xl modal-content-transition" data-state="closed">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-on-surface text-xl font-semibold">アンケートを複製</h3>
+            <button class="text-on-surface-variant hover:text-on-surface" id="closeDuplicateSurveyModalBtn" aria-label="モーダルを閉じる">
                 <span class="material-icons">close</span>
             </button>
         </div>
-        <div class="py-6 space-y-4">
+        <form class="space-y-4">
             <div class="input-group">
-                <input type="text" id="newSurveyName" placeholder=" " class="input-field">
-                <label for="newSurveyName" class="input-label">新しいアンケート名</label>
+                <input class="input-field" id="duplicateSurveyName" name="duplicateSurveyName" placeholder=" " type="text" required/>
+                <label class="input-label" for="duplicateSurveyName">アンケート名</label>
+                <p class="error-message hidden" id="duplicateSurveyName-error"></p>
+                <button type="button" class="mt-1 flex items-center gap-1 text-xs text-on-surface-variant hover:text-primary transition-colors survey-help-trigger" data-help-key="surveyName" aria-describedby="duplicateSurveyNameHelpText">
+                    <span class="material-icons text-sm">help_outline</span>
+                    <span>アンケート名と表示タイトルの違いとは？</span>
+                </button>
+                <span id="duplicateSurveyNameHelpText" class="sr-only">アンケート名は管理画面のみで表示される内部用の名称です。</span>
             </div>
-            <div class="flex items-end gap-2">
-                <div class="input-group flex-1">
-                    <input type="date" id="newPeriodStart" class="input-field" placeholder=" ">
-                    <label for="newPeriodStart" class="input-label">新しい開始日</label>
-                </div>
-                <span class="pb-2 text-on-surface-variant">～</span>
-                <div class="input-group flex-1">
-                    <input type="date" id="newPeriodEnd" class="input-field" placeholder=" ">
-                    <label for="newPeriodEnd" class="input-label">新しい終了日</label>
-                </div>
+            <div class="input-group">
+                <input class="input-field" id="duplicateDisplayTitle" name="duplicateDisplayTitle" placeholder=" " type="text" required/>
+                <label class="input-label" for="duplicateDisplayTitle">表示タイトル</label>
+                <p class="error-message hidden" id="duplicateDisplayTitle-error"></p>
+                <button type="button" class="mt-1 flex items-center gap-1 text-xs text-on-surface-variant hover:text-primary transition-colors survey-help-trigger" data-help-key="displayTitle" aria-describedby="duplicateDisplayTitleHelpText">
+                    <span class="material-icons text-sm">help_outline</span>
+                    <span>表示タイトルに何が表示されますか？</span>
+                </button>
+                <span id="duplicateDisplayTitleHelpText" class="sr-only">表示タイトルは回答者に表示されるアンケートの見出しです。</span>
             </div>
-        </div>
-        <div class="flex justify-end gap-3 pt-4 border-t border-outline-variant">
-            <button id="duplicateSurveyCancelBtn" class="min-w-[80px] px-4 py-2 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors">
-                キャンセル
-            </button>
-            <button id="duplicateSurveyConfirmBtn" class="min-w-[80px] px-4 py-2 rounded-full bg-primary text-on-primary font-semibold transition-colors">
-                複製
-            </button>
-        </div>
+            <div class="input-group">
+                <textarea class="input-field" id="duplicateSurveyMemo" name="duplicateSurveyMemo" placeholder=" " rows="3"></textarea>
+                <label class="input-label" for="duplicateSurveyMemo">メモ（任意）</label>
+                <p class="error-message hidden" id="duplicateSurveyMemo-error"></p>
+            </div>
+            <div class="input-group">
+                <div class="relative">
+                    <input type="text" id="duplicateSurveyPeriodRange" name="duplicateSurveyPeriodRange" placeholder=" " class="input-field pr-10" required>
+                    <label class="input-label" for="duplicateSurveyPeriodRange">回答期間</label>
+                    <span class="material-icons absolute top-1/2 right-3 -translate-y-1/2 text-on-surface-variant cursor-pointer">calendar_today</span>
+                </div>
+                <p class="error-message hidden" id="duplicateSurveyPeriodRange-error"></p>
+            </div>
+            <div class="flex justify-end gap-3 pt-4">
+                <button class="bg-secondary-container text-on-secondary-container py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal tracking-wide transition-colors" id="cancelDuplicateSurveyModalBtn" type="button" aria-label="キャンセル">キャンセル</button>
+                <button id="confirmDuplicateSurveyBtn" class="button-primary text-on-primary py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal transition-colors" type="submit" aria-label="アンケートを複製して作成">
+                    複製して作成
+                </button>
+            </div>
+        </form>
     </div>
 </div>
