@@ -1,3 +1,4 @@
+import { initThemeToggle } from '../../02_dashboard/src/lib/themeToggle.js';
 
 let adminBasePath = '';
 
@@ -184,6 +185,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadCommonHtml('header-placeholder', 'common/header.html');
     await loadCommonHtml('sidebar-placeholder', 'common/sidebar.html', initAdminSidebarHandler);
     await loadCommonHtml('footer-placeholder', 'common/footer.html');
+
+    // Initialize theme toggle after common elements are loaded
+    initThemeToggle();
 
     // Page-specific initialization
     const page = window.location.pathname.split('/').pop();

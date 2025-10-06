@@ -19,7 +19,7 @@ window.addEventListener('pageshow', async () => {
 import { handleOpenModal, closeModal, openModal } from './modalHandler.js';
 import { initTableManager, applyFiltersAndPagination } from './tableManager.js';
 import { initSidebarHandler, adjustLayout } from './sidebarHandler.js';
-import { initThemeToggle } from './themeToggle.js';
+import { initThemeToggle } from './lib/themeToggle.js';
 import { openAccountInfoModal } from './accountInfoModal.js';
 import { openDuplicateSurveyModal } from './duplicateSurveyModal.js';
 import { initBreadcrumbs } from './breadcrumb.js';
