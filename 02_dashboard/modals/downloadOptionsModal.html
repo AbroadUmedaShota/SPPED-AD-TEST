@@ -1,78 +1,91 @@
 <div id="downloadOptionsModal" class="fixed inset-0 flex items-center justify-center p-4 modal-overlay hidden z-[60]" data-state="closed">
-    <div class="bg-surface rounded-lg p-6 w-full max-w-lg modal-content-transition" data-state="closed">
+    <div class="bg-surface rounded-lg p-6 w-full max-w-2xl modal-content-transition" data-state="closed">
         <div class="flex justify-between items-center mb-6">
             <h3 class="text-on-surface text-xl font-semibold">ダウンロードオプション</h3>
             <button class="text-on-surface-variant hover:text-on-surface" id="closeDownloadOptionsModalBtn" aria-label="モーダルを閉じる">
                 <span class="material-icons">close</span>
             </button>
         </div>
-        <form class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium text-on-surface mb-2">ダウンロードするデータ</label>
-                <div class="space-y-2">
-                    <div>
-                        <input type="radio" id="download_answer" name="download_type" value="answer" class="rounded-full text-primary focus:ring-primary" required>
-                        <label for="download_answer" class="ml-2 text-sm font-medium text-on-surface">回答データ</label>
+        <form>
+            <div class="grid md:grid-cols-2 md:gap-x-8 space-y-8 md:space-y-0">
+
+                <!-- Left Column: Data Type -->
+                <div>
+                    <label class="block text-sm font-medium text-on-surface mb-3">ダウンロードするデータ</label>
+                    <div class="grid grid-cols-2 gap-3" data-selection-group="download_type">
+                        <label for="download_answer" class="selection-card-label">
+                            <input type="radio" id="download_answer" name="download_type" value="answer" class="hidden" required>
+                            <span class="material-icons">description</span>
+                            <span class="selection-card-text">回答データ</span>
+                        </label>
+                        <label for="download_business_card" class="selection-card-label">
+                            <input type="radio" id="download_business_card" name="download_type" value="business_card" class="hidden">
+                            <span class="material-icons">contacts</span>
+                            <span class="selection-card-text">名刺入力データ</span>
+                        </label>
+                        <label for="download_both" class="selection-card-label">
+                            <input type="radio" id="download_both" name="download_type" value="both" class="hidden">
+                            <span class="material-icons">library_add</span>
+                            <span class="selection-card-text">名刺入力データ<br>＋回答データ</span>
+                        </label>
+                        <label for="download_image" class="selection-card-label">
+                            <input type="radio" id="download_image" name="download_type" value="image" class="hidden">
+                            <span class="material-icons">image</span>
+                            <span class="selection-card-text">名刺画像</span>
+                        </label>
                     </div>
-                    <div>
-                        <input type="radio" id="download_business_card" name="download_type" value="business_card" class="rounded-full text-primary focus:ring-primary">
-                        <label for="download_business_card" class="ml-2 text-sm font-medium text-on-surface">名刺入力データ</label>
-                    </div>
-                    <div>
-                        <input type="radio" id="download_both" name="download_type" value="both" class="rounded-full text-primary focus:ring-primary">
-                        <label for="download_both" class="ml-2 text-sm font-medium text-on-surface">回答 + 名刺入力データ</label>
-                    </div>
-                    <div>
-                        <input type="radio" id="download_image" name="download_type" value="image" class="rounded-full text-primary focus:ring-primary">
-                        <label for="download_image" class="ml-2 text-sm font-medium text-on-surface">名刺画像</label>
-                    </div>
+                    <p class="error-message hidden mt-2" id="download_type-error"></p>
                 </div>
-                <p class="error-message hidden" id="download_type-error"></p>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-on-surface mb-2">期間</label>
-                <div class="space-y-2">
-                    <div>
-                        <input type="radio" id="period_all" name="download_period" value="all" class="rounded-full text-primary focus:ring-primary" checked>
-                        <label for="period_all" class="ml-2 text-sm font-medium text-on-surface">全て</label>
+
+                <!-- Right Column: Period -->
+                <div>
+                    <label class="block text-sm font-medium text-on-surface mb-3">期間</label>
+                    <div class="grid grid-cols-2 gap-3 mb-4" data-selection-group="download_period">
+                        <label for="period_all" class="selection-card-label">
+                            <input type="radio" id="period_all" name="download_period" value="all" class="hidden" checked>
+                            <span class="material-icons">all_inclusive</span>
+                            <span class="selection-card-text">全て</span>
+                        </label>
+                        <label for="period_custom" class="selection-card-label">
+                            <input type="radio" id="period_custom" name="download_period" value="custom" class="hidden">
+                            <span class="material-icons">date_range</span>
+                            <span class="selection-card-text">期間指定</span>
+                        </label>
                     </div>
-                    <div>
-                        <input type="radio" id="period_custom" name="download_period" value="custom" class="rounded-full text-primary focus:ring-primary">
-                        <label for="period_custom" class="ml-2 text-sm font-medium text-on-surface">期間指定</label>
-                        <div id="customPeriodInputs" class="space-y-3 mt-2 hidden">
-                            <div class="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2">
-                                <div class="relative flex-1">
-                                    <input type="text" id="download_start_date" name="download_start_date" placeholder=" " class="input-field w-full">
-                                    <label class="input-label" for="download_start_date">開始日</label>
-                                    <p class="error-message hidden" id="download_start_date-error"></p>
-                                </div>
-                                <span class="text-on-surface-variant text-center">〜</span>
-                                <div class="relative flex-1">
-                                    <input type="text" id="download_end_date" name="download_end_date" placeholder=" " class="input-field w-full">
-                                    <label class="input-label" for="download_end_date">終了日</label>
-                                    <p class="error-message hidden" id="download_end_date-error"></p>
-                                </div>
+                    <div id="customPeriodInputs" class="space-y-3 hidden">
+                        <div class="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2">
+                            <div class="relative flex-1">
+                                <input type="text" id="download_start_date" name="download_start_date" placeholder=" " class="input-field w-full">
+                                <label class="input-label" for="download_start_date">開始日</label>
+                                <p class="error-message hidden" id="download_start_date-error"></p>
                             </div>
-                            <div class="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2">
-                                <div class="relative flex-1">
-                                    <input type="text" id="download_start_time" name="download_start_time" placeholder=" " class="input-field w-full" pattern="^(?:[01][0-9]|2[0-3]):[0-5][0-9]$" inputmode="numeric" autocomplete="off">
-                                    <label class="input-label" for="download_start_time">開始時刻</label>
-                                    <p class="error-message hidden" id="download_start_time-error"></p>
-                                </div>
-                                <span class="text-on-surface-variant text-center">〜</span>
-                                <div class="relative flex-1">
-                                    <input type="text" id="download_end_time" name="download_end_time" placeholder=" " class="input-field w-full" pattern="^(?:24:00|(?:[01][0-9]|2[0-3]):[0-5][0-9])$" inputmode="numeric" autocomplete="off">
-                                    <label class="input-label" for="download_end_time">終了時刻</label>
-                                    <p class="error-message hidden" id="download_end_time-error"></p>
-                                </div>
+                            <span class="text-on-surface-variant text-center">〜</span>
+                            <div class="relative flex-1">
+                                <input type="text" id="download_end_date" name="download_end_date" placeholder=" " class="input-field w-full">
+                                <label class="input-label" for="download_end_date">終了日</label>
+                                <p class="error-message hidden" id="download_end_date-error"></p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2">
+                            <div class="relative flex-1">
+                                <input type="text" id="download_start_time" name="download_start_time" placeholder=" " class="input-field w-full" pattern="^(?:[01][0-9]|2[0-3]):[0-5][0-9]$" inputmode="numeric" autocomplete="off">
+                                <label class="input-label" for="download_start_time">開始時刻</label>
+                                <p class="error-message hidden" id="download_start_time-error"></p>
+                            </div>
+                            <span class="text-on-surface-variant text-center">〜</span>
+                            <div class="relative flex-1">
+                                <input type="text" id="download_end_time" name="download_end_time" placeholder=" " class="input-field w-full" pattern="^(?:24:00|(?:[01][0-9]|2[0-3]):[0-5][0-9])$" inputmode="numeric" autocomplete="off">
+                                <label class="input-label" for="download_end_time">終了時刻</label>
+                                <p class="error-message hidden" id="download_end_time-error"></p>
                             </div>
                         </div>
                     </div>
-                    </div>
+                    <p class="error-message hidden mt-2" id="download_period-error"></p>
                 </div>
-                <p class="error-message hidden" id="download_period-error"></p>
             </div>
-            <div class="flex justify-end gap-3 pt-4">
+
+            <!-- Buttons -->
+            <div class="flex justify-end gap-3 mt-8">
                 <button id="cancelDownloadBtn" class="bg-secondary-container text-on-secondary-container py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal tracking-wide transition-colors" type="button" aria-label="キャンセル">キャンセル</button>
                 <button class="gradient-primary-bg text-on-primary py-2 px-4 rounded-md text-sm font-semibold leading-normal transition-colors" type="submit" aria-label="ダウンロード" onclick="showToast('データダウンロード機能は未実装です。', 'info'); return false;">
                     ダウンロード

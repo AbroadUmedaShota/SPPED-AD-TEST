@@ -1423,3 +1423,54 @@ input.input-field[readonly] {
 #custom-tutorial-popover button.tutorial-close-btn:hover {
     background-color: var(--color-base-background-sub);
 }
+
+/* --- Selection Card Styles --- */
+.selection-card-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    border: 1px solid var(--color-base-border-divider);
+    border-radius: 0.75rem; /* 12px */
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    background-color: var(--color-base-card);
+    text-align: center;
+    min-height: 100px; /* Ensure consistent height */
+}
+
+.selection-card-label:hover {
+    border-color: var(--color-primary);
+    background-color: var(--color-surface-variant);
+    transform: translateY(-2px);
+}
+
+.selection-card-label .material-icons {
+    font-size: 2rem; /* 32px */
+    margin-bottom: 0.5rem;
+    color: var(--color-text-sub);
+    transition: color 0.2s ease-in-out;
+}
+
+.selection-card-label .selection-card-text {
+    font-size: 0.875rem; /* 14px */
+    font-weight: 500;
+    color: var(--color-text-main);
+    transition: color 0.2s ease-in-out;
+}
+
+.selection-card-label.selected {
+    border-color: var(--color-primary);
+    background-color: var(--color-secondary-container);
+    box-shadow: 0 4px 12px rgba(var(--color-input-border-focus-rgb), 0.1);
+}
+
+.selection-card-label.selected .material-icons {
+    color: var(--color-primary);
+}
+
+.selection-card-label.selected .selection-card-text {
+    color: var(--color-on-secondary-container);
+    font-weight: 600;
+}

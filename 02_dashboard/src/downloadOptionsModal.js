@@ -11,21 +11,46 @@ let currentSurveyPeriod = {
 }; // Stores survey specific period for date picker limits
 
 /**
+ * Updates the visual state of selection cards within a group.
+ * @param {HTMLElement} groupElement The container element with [data-selection-group].
+ */
+function updateSelectionCards(groupElement) {
+    const radioButtons = groupElement.querySelectorAll('input[type="radio"]');
+    radioButtons.forEach(radio => {
+        const label = radio.closest('.selection-card-label');
+        if (label) {
+            if (radio.checked) {
+                label.classList.add('selected');
+            } else {
+                label.classList.remove('selected');
+            }
+        }
+    });
+}
+
+/**
  * Initializes elements specific to the Download Options Modal.
- * This is called after the modal's HTML is loaded into the DOM.
  */
 function initializeDownloadOptionsModal() {
     const modal = document.getElementById('downloadOptionsModal');
     if (!modal) {
         console.warn('Download Options Modal not found for initialization.');
-        return; // Modal not loaded yet
+        return;
     }
 
     const downloadForm = modal.querySelector('form');
     if (downloadForm) {
-        downloadForm.removeEventListener('change', handleDownloadFormChange);
         downloadForm.addEventListener('change', handleDownloadFormChange);
     }
+
+    // Setup selection cards
+    const selectionGroups = modal.querySelectorAll('[data-selection-group]');
+    selectionGroups.forEach(group => {
+        // Set initial state
+        updateSelectionCards(group);
+        // Add event listener for changes
+        group.addEventListener('change', () => updateSelectionCards(group));
+    });
 
     const closeBtn = modal.querySelector('#closeDownloadOptionsModalBtn');
     if (closeBtn) {
@@ -44,36 +69,61 @@ function handleDownloadFormChange(event) {
         return;
     }
 
+    // Only handle the logic for showing/hiding the custom period inputs
+    if (event.target.name === 'download_period') {
+        if (periodCustomRadio.checked) {
+            customPeriodInputs.classList.remove('hidden');
+            initializeDatepickers(); // Re-initialize datepickers if needed
+        } else {
+            customPeriodInputs.classList.add('hidden');
+        }
+    }
+}
+
+/**
+ * Initializes or re-initializes the date pickers for the modal.
+ */
+function initializeDatepickers() {
     const startInput = document.getElementById('download_start_date');
     const endInput = document.getElementById('download_end_date');
     const startTimeInput = document.getElementById('download_start_time');
     const endTimeInput = document.getElementById('download_end_time');
-    const startPicker = startInput && startInput._flatpickr;
-    const endPicker = endInput && endInput._flatpickr;
 
-    if (event.target === periodCustomRadio) {
-        if (periodCustomRadio.checked) {
-            customPeriodInputs.classList.remove('hidden');
-            const startDefault = currentSurveyPeriod.startDefaultDate || currentSurveyPeriod.startDate;
-            const endDefault = currentSurveyPeriod.endDefaultDate || currentSurveyPeriod.endDate || currentSurveyPeriod.startDate;
+    const startDefault = currentSurveyPeriod.startDefaultDate || currentSurveyPeriod.startDate;
+    const endDefault = currentSurveyPeriod.endDefaultDate || currentSurveyPeriod.endDate || currentSurveyPeriod.startDate;
 
-            if (startPicker && startDefault) {
-                startPicker.setDate(startDefault, false);
-            } else if (startInput && startDefault) {
-                startInput.value = startDefault;
+    if (startTimeInput) startTimeInput.value = DEFAULT_START_TIME;
+    if (endTimeInput) endTimeInput.value = DEFAULT_END_TIME;
+
+    let endDatePicker;
+    let startDatePicker;
+
+    if (startInput) {
+        startDatePicker = flatpickr(startInput, {
+            dateFormat: 'Y-m-d',
+            minDate: currentSurveyPeriod.startDate || null,
+            maxDate: endDefault || null,
+            defaultDate: startDefault,
+            onChange(selectedDates) {
+                if (selectedDates[0] && endDatePicker) {
+                    endDatePicker.set('minDate', selectedDates[0]);
+                }
             }
+        });
+    }
 
-            if (endPicker && endDefault) {
-                endPicker.setDate(endDefault, false);
-            } else if (endInput && endDefault) {
-                endInput.value = endDefault;
+    if (endInput) {
+        endDatePicker = flatpickr(endInput, {
+            dateFormat: 'Y-m-d',
+            minDate: currentSurveyPeriod.startDate || null,
+            maxDate: endDefault || null,
+            defaultDate: endDefault,
+            onChange(selectedDates) {
+                if (selectedDates[0] && startDatePicker) {
+                    startDatePicker.set('maxDate', selectedDates[0]);
+                }
             }
-
-            if (startTimeInput) startTimeInput.value = DEFAULT_START_TIME;
-            if (endTimeInput) endTimeInput.value = DEFAULT_END_TIME;
-        } else {
-            customPeriodInputs.classList.add('hidden');
-        }
+        });
     }
 }
 
@@ -86,21 +136,9 @@ function handleDownloadFormChange(event) {
 export async function openDownloadModal(initialSelection, periodStart = '', periodEnd = '') {
     await handleOpenModal('downloadOptionsModal', 'modals/downloadOptionsModal.html');
 
-    initializeDownloadOptionsModal();
-
+    // Set checked states before initializing
     const periodAllRadio = document.getElementById('period_all');
-    const customPeriodInputsEl = document.getElementById('customPeriodInputs');
-    const startInput = document.getElementById('download_start_date');
-    const endInput = document.getElementById('download_end_date');
-    const startTimeInput = document.getElementById('download_start_time');
-    const endTimeInput = document.getElementById('download_end_time');
-
     if (periodAllRadio) periodAllRadio.checked = true;
-    if (customPeriodInputsEl) customPeriodInputsEl.classList.add('hidden');
-    if (startInput) startInput.value = '';
-    if (endInput) endInput.value = '';
-    if (startTimeInput) startTimeInput.value = DEFAULT_START_TIME;
-    if (endTimeInput) endTimeInput.value = DEFAULT_END_TIME;
 
     const initialRadio = document.getElementById(`download_${initialSelection}`);
     if (initialRadio) {
@@ -110,44 +148,18 @@ export async function openDownloadModal(initialSelection, periodStart = '', peri
         if (defaultAnswerRadio) defaultAnswerRadio.checked = true;
     }
 
-    const fallbackEndDate = periodEnd || periodStart || '';
+    // Hide custom period inputs initially
+    const customPeriodInputsEl = document.getElementById('customPeriodInputs');
+    if (customPeriodInputsEl) customPeriodInputsEl.classList.add('hidden');
 
+    // Store survey period for date pickers
     currentSurveyPeriod = {
         startDate: periodStart,
         endDate: periodEnd,
         startDefaultDate: periodStart || '',
-        endDefaultDate: fallbackEndDate || ''
+        endDefaultDate: periodEnd || periodStart || ''
     };
 
-
-    let endDatePicker;
-    let startDatePicker;
-
-    if (startInput) {
-        startDatePicker = flatpickr(startInput, {
-            dateFormat: 'Y-m-d',
-            minDate: periodStart || null,
-            maxDate: fallbackEndDate || null,
-            onChange(selectedDates) {
-                if (selectedDates[0] && endDatePicker) {
-                    endDatePicker.set('minDate', selectedDates[0]);
-                }
-            }
-        });
-        startInput.value = '';
-    }
-
-    if (endInput) {
-        endDatePicker = flatpickr(endInput, {
-            dateFormat: 'Y-m-d',
-            minDate: periodStart || null,
-            maxDate: fallbackEndDate || null,
-            onChange(selectedDates) {
-                if (selectedDates[0] && startDatePicker) {
-                    startDatePicker.set('maxDate', selectedDates[0]);
-                }
-            }
-        });
-        endInput.value = '';
-    }
+    // Initialize all modal components, including selection cards and datepickers
+    initializeDownloadOptionsModal();
 }
