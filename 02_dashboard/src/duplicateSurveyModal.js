@@ -13,17 +13,7 @@ let cancelBtn;
 let closeBtn;
 let periodRangeInstance = null;
 
-// 仮のアンケートデータ取得関数 (将来的にはAPIを呼び出す)
-const getSurveyDetails = async (surveyId) => {
-    console.log(`Fetching data for surveyId: ${surveyId}`);
-    // ダミーデータ
-    return {
-        id: surveyId,
-        name: `サンプルアンケート ${surveyId}`,
-        displayTitle: `サンプル表示タイトル ${surveyId}`,
-        memo: `これはサンプルアンケートの説明（メモ）です。`,
-    };
-};
+
 
 
 /**
@@ -46,14 +36,19 @@ const initElements = () => {
  * @param {object} survey The survey object.
  */
 const populateForm = (survey) => {
+    const lang = window.getCurrentLanguage(); // 現在の言語を取得
+
     if (surveyNameInput) {
-        surveyNameInput.value = `${survey.name} のコピー`;
+        const surveyName = (survey.name && typeof survey.name === 'object') ? survey.name[lang] || survey.name.ja : survey.name;
+        surveyNameInput.value = `${surveyName} のコピー`;
     }
     if (displayTitleInput) {
-        displayTitleInput.value = survey.displayTitle;
+        const displayTitle = (survey.displayTitle && typeof survey.displayTitle === 'object') ? survey.displayTitle[lang] || survey.displayTitle.ja : survey.displayTitle;
+        displayTitleInput.value = displayTitle;
     }
     if (surveyMemoInput) {
-        surveyMemoInput.value = survey.memo;
+        const surveyMemo = (survey.memo && typeof survey.memo === 'object') ? survey.memo[lang] || survey.memo.ja : survey.memo;
+        surveyMemoInput.value = surveyMemo;
     }
     // 回答期間は空にする仕様
     if (periodRangeInput) {
@@ -68,13 +63,17 @@ const initDatepicker = () => {
     if (periodRangeInstance) {
         periodRangeInstance.destroy();
     }
-    // TODO: flatpickrがプロジェクトに導入されたら、以下のコメントアウトを解除して有効化する
-    // periodRangeInstance = flatpickr(periodRangeInput, {
-    //     mode: "range",
-    //     dateFormat: "Y-m-d",
-    //     locale: 'ja',
-    // });
-    console.log("Datepicker initialization skipped (flatpickr not integrated).");
+
+    const tomorrow = new Date();
+    tomorrow.setHours(0, 0, 0, 0);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    periodRangeInstance = flatpickr(periodRangeInput, {
+        mode: "range",
+        dateFormat: "Y-m-d",
+        locale: 'ja',
+        minDate: tomorrow
+    });
 };
 
 /**
@@ -122,19 +121,18 @@ const setupEventListeners = () => {
 
 /**
  * Opens the duplicate survey modal and populates it with data.
- * @param {string} surveyId The ID of the survey to be duplicated.
+ * @param {object} survey The survey object to be duplicated.
  */
-export async function openDuplicateSurveyModal(surveyId) {
+export async function openDuplicateSurveyModal(survey) {
     await handleOpenModal('duplicateSurveyModal', 'modals/duplicateSurveyModal.html');
     
     initElements();
 
     try {
-        const survey = await getSurveyDetails(surveyId);
         populateForm(survey);
     } catch (error) {
-        console.error('Failed to get survey details:', error);
-        showToast('アンケート情報の取得に失敗しました。', 'error');
+        console.error('Failed to populate form:', error);
+        showToast('アンケート情報の表示に失敗しました。', 'error');
         return;
     }
     
