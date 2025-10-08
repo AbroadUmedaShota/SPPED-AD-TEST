@@ -3,13 +3,41 @@ import { fetchGroups } from './groupService.js';
 import { setGroupFilter } from './tableManager.js';
 import { showConfirmationModal } from './confirmationModal.js';
 
+// --- Configuration ---
 
+const NAV_ITEMS = [
+    { id: 'survey-list', href: 'index.html', icon: 'list_alt', label: 'アンケート一覧' },
+    { id: 'invoice-list', href: 'invoiceList.html', icon: 'receipt_long', label: 'ご請求内容一覧' },
+    { id: 'group-management', href: 'group-edit.html', icon: 'groups', label: 'グループ管理' },
+    { isDivider: true },
+    { id: 'account-info', href: '#', icon: 'account_circle', label: 'アカウント情報', onClick: () => window.openAccountInfoModal(window.dummyUserData) },
+    { id: 'logout', href: '#', icon: 'logout', label: 'ログアウト' }
+];
 
-/** Handles opening/closing of the mobile sidebar. */
+const MEDIA_QUERY = window.matchMedia('(min-width: 1024px)');
+
+// --- DOM Elements ---
+
+let sidebar, mobileSidebarOverlay, sidebarToggleMobile, userSelect, navContainer;
+
+/**
+ * Cache all necessary DOM elements for the sidebar.
+ */
+function cacheDOMElements() {
+    sidebar = document.getElementById('sidebar');
+    mobileSidebarOverlay = document.getElementById('mobileSidebarOverlay');
+    sidebarToggleMobile = document.getElementById('sidebarToggleMobile');
+    userSelect = document.getElementById('user_select');
+    navContainer = document.getElementById('sidebar-nav');
+}
+
+// --- UI Logic ---
+
+/**
+ * Toggles the mobile sidebar open and closed.
+ */
 export function toggleMobileSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const mobileSidebarOverlay = document.getElementById('mobileSidebarOverlay');
-    if (!sidebar || !mobileSidebarOverlay) return; // 要素が見つからない場合は処理を中断
+    if (!sidebar || !mobileSidebarOverlay) return;
 
     const isOpen = sidebar.classList.contains('is-open-mobile');
     if (isOpen) {
@@ -23,33 +51,15 @@ export function toggleMobileSidebar() {
     }
 }
 
-/** Adjusts layout based on screen size (PC vs Mobile sidebar behavior). */
-/** Adjusts layout based on screen size (PC vs Mobile sidebar behavior). */
-export function adjustLayout() {
-    const sidebar = document.getElementById('sidebar');
-    const mobileSidebarOverlay = document.getElementById('mobileSidebarOverlay');
-    if (!sidebar || !mobileSidebarOverlay) return; // 要素が見つからない場合は処理を中断
-
-    const isModalOpen = document.querySelector('.modal-overlay[data-state="open"]');
-
-    if (window.innerWidth >= 1024) { // PC screens (LG and XL)
-        sidebar.classList.remove('is-open-mobile');
-        mobileSidebarOverlay.classList.remove('is-visible');
-        if (!isModalOpen) {
-            unlockScroll();
-        }
-    } else { // For screens smaller than LG (mobile/small tablet)
-        const isMobileSidebarOpen = sidebar.classList.contains('is-open-mobile');
-        if (!isMobileSidebarOpen && !isModalOpen) {
-            unlockScroll();
-        }
-    }
-    
-    if (window.innerWidth >= 1024) { // PC screens (LG and up)
+/**
+ * Adjusts sidebar behavior for PC (hover-to-expand).
+ * @param {boolean} isPcScreen - True if the screen matches the PC media query.
+ */
+function handlePcSidebarBehavior(isPcScreen) {
+    if (isPcScreen) {
         sidebar.onmouseenter = () => document.body.classList.add('sidebar-hovered');
         sidebar.onmouseleave = () => document.body.classList.remove('sidebar-hovered');
     } else {
-        // Clear listeners and class for smaller screens
         sidebar.onmouseenter = null;
         sidebar.onmouseleave = null;
         document.body.classList.remove('sidebar-hovered');
@@ -57,19 +67,78 @@ export function adjustLayout() {
 }
 
 /**
- * グループ選択ドロップダウンを動的に生成する。
+ * Handles layout adjustments based on screen size changes.
+ * @param {MediaQueryListEvent} e - The media query list event.
+ */
+function handleScreenChange(e) {
+    const isPcScreen = e.matches;
+    handlePcSidebarBehavior(isPcScreen);
+
+    if (isPcScreen && sidebar.classList.contains('is-open-mobile')) {
+        toggleMobileSidebar(); // Close mobile sidebar if switching to PC view
+    }
+    
+    const isModalOpen = document.querySelector('.modal-overlay[data-state="open"]');
+    if (!isModalOpen) {
+        unlockScroll();
+    }
+}
+
+// --- Data & Content Population ---
+
+/**
+ * Populates the navigation links in the sidebar.
+ */
+function populateNav() {
+    if (!navContainer) return;
+    navContainer.innerHTML = ''; // Clear existing links
+
+    const currentPageId = document.body.dataset.pageId;
+
+    NAV_ITEMS.forEach(item => {
+        if (item.isDivider) {
+            navContainer.innerHTML += '<div class="border-t border-outline-variant my-2"></div>';
+            return;
+        }
+
+        const link = document.createElement('a');
+        link.href = item.href;
+        link.className = 'flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors';
+        link.setAttribute('aria-label', item.label);
+        if (item.id) {
+            link.id = `${item.id}Button`; // e.g., logoutButton
+        }
+
+        if (item.id === currentPageId) {
+            link.classList.add('active');
+        }
+
+        link.innerHTML = `
+            <span class="material-icons text-xl">${item.icon}</span>
+            <span class="sidebar-nav-label whitespace-nowrap">${item.label}</span>
+        `;
+
+        if (item.onClick) {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                item.onClick();
+            });
+        }
+        
+        navContainer.appendChild(link);
+    });
+}
+
+/**
+ * Populates the group selection dropdown.
  */
 async function populateGroupSelect() {
-    const userSelect = document.getElementById('user_select');
     if (!userSelect) return;
+    userSelect.innerHTML = ''; // Clear existing options
 
-    // 既存のオプションをクリア
-    userSelect.innerHTML = '';
-
-    // デフォルトオプションを追加
     const defaultOption = document.createElement('option');
     defaultOption.value = 'current';
-    defaultOption.textContent = 'Current Group'; // または適切なデフォルト名
+    defaultOption.textContent = 'Current Group';
     userSelect.appendChild(defaultOption);
 
     try {
@@ -82,35 +151,27 @@ async function populateGroupSelect() {
         });
     } catch (error) {
         console.error('Failed to fetch groups for sidebar:', error);
-        showToast('グループの読み込みに失敗しました。 ', 'error');
+        showToast('グループの読み込みに失敗しました。', 'error');
     }
 }
 
-export function initSidebarHandler() {
-    const sidebar = document.getElementById('sidebar');
-    const sidebarToggleMobile = document.getElementById('sidebarToggleMobile');
-    const mobileSidebarOverlay = document.getElementById('mobileSidebarOverlay');
+// --- Event Listener Setup ---
 
-    if (!sidebar) {
-        console.error("Sidebar element not found. Sidebar initialization aborted.");
-        return;
-    }
-
-    // Event listener for mobile hamburger menu
+/**
+ * Attaches all necessary event listeners for sidebar functionality.
+ */
+function attachEventListeners() {
     if (sidebarToggleMobile) sidebarToggleMobile.addEventListener('click', toggleMobileSidebar);
-    // Event listener for clicking on mobile overlay
     if (mobileSidebarOverlay) mobileSidebarOverlay.addEventListener('click', toggleMobileSidebar);
 
-    // Close mobile sidebar if a nav item is clicked
-    sidebar.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', (event) => {
-            if (window.innerWidth < 1024) { // Only close on mobile
-                if (!event.target.closest('[onclick^="handleOpenModal("]')) {
-                    toggleMobileSidebar();
-                }
-            }
+    // Group selection change
+    if (userSelect) {
+        userSelect.addEventListener('change', () => {
+            const selectedGroupId = userSelect.value;
+            setGroupFilter(selectedGroupId === 'current' ? null : selectedGroupId);
+            showToast(`グループを切り替えました。`, 'info');
         });
-    });
+    }
 
     // Logout button
     const logoutButton = document.getElementById('logoutButton');
@@ -120,55 +181,52 @@ export function initSidebarHandler() {
             showConfirmationModal(
                 'ログアウトしますか？',
                 () => {
-                    // Clear session/local storage
                     localStorage.clear();
                     sessionStorage.clear();
-
-                    // Redirect to the login page at the project root
                     window.location.href = '/index.html';
                 },
                 'ログアウト'
             );
         });
     }
-
-    const newGroupButton = document.querySelector('.sidebar-group-control button[aria-label="グループを新規作成"]');
-    if (newGroupButton) {
-        newGroupButton.addEventListener('click', () => {
-            handleOpenModal('newGroupModal', 'modals/newGroupModal.html');
-        });
-    }
-
-    // Group switch button
-    const groupSwitchButton = document.querySelector('.sidebar-group-control button[aria-label="グループを切り替える"]');
-    if (groupSwitchButton) {
-        groupSwitchButton.addEventListener('click', () => {
-            const selectedGroupId = document.getElementById('user_select').value;
-            setGroupFilter(selectedGroupId === 'current' ? null : selectedGroupId); // 'current'の場合はnullを渡す
-            showToast(`グループを ${selectedGroupId} に切り替えました。`, 'info');
-        });
-    }
-
-    // Populate group select dropdown
-    populateGroupSelect();
-
-    // Initial adjustment on load
-    adjustLayout();
     
-    // Adjust on window resize
-    window.addEventListener('resize', adjustLayout);
-
-    // Set active state for the current page link
-    const currentPage = window.location.pathname.split('/').pop();
-    sidebar.querySelectorAll('nav a').forEach(link => {
-        const linkPage = link.getAttribute('href').split('/').pop();
-        if (linkPage === currentPage) {
-            link.classList.add('active');
+    // Close mobile sidebar on nav item click
+    navContainer.addEventListener('click', (event) => {
+        if (!MEDIA_QUERY.matches && event.target.closest('a')) {
+            // Don't close for modals triggered from sidebar
+            const link = event.target.closest('a');
+            if (!link.onclick) {
+                 toggleMobileSidebar();
+            }
         }
     });
 
-    // If a page-specific navigation guard exists, attach it.
+    // Listen for screen size changes
+    MEDIA_QUERY.addEventListener('change', handleScreenChange);
+}
+
+
+// --- Initialization ---
+
+/**
+ * Initializes the entire sidebar component.
+ */
+export function initSidebarHandler() {
+    cacheDOMElements();
+    if (!sidebar) {
+        console.error("Sidebar element not found. Initialization aborted.");
+        return;
+    }
+
+    populateNav();
+    populateGroupSelect();
+    attachEventListeners();
+    
+    // Initial layout setup
+    handleScreenChange(MEDIA_QUERY);
+
+    // Attach any page-specific guards
     if (typeof window.attachPasswordChangeNavGuard === 'function') {
-        window.attachPasswordChangeNavGuard();
+        window.attachPasswordChange_changeNavGuard();
     }
 }
