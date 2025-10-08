@@ -121,6 +121,7 @@ export function initBizcardSettings() {
             settingsData.bizcardRequest = Number.isFinite(parsedBizcardRequest) ? Math.max(0, parsedBizcardRequest) : 0;
 
             state.settings = settingsData;
+            state.surveyData = surveyData; // surveyDataをstateに保存
             // Deep copy for initial state comparison
             state.initialSettings = JSON.parse(JSON.stringify(settingsData));
 
@@ -158,6 +159,29 @@ export function initBizcardSettings() {
                 if(memoSection) memoSection.classList.toggle('hidden');
                 const icon = toggleMemoSectionBtn.querySelector('.material-icons');
                 if(icon) icon.classList.toggle('rotate-180');
+            });
+        }
+
+        // Accordion for plan details
+        if (dataConversionPlanSelection) {
+            dataConversionPlanSelection.addEventListener('click', (e) => {
+                const label = e.target.closest('label');
+                if (!label) return;
+
+                const inputId = label.getAttribute('for');
+                const input = document.getElementById(inputId);
+                if (!input || input.name !== 'dataConversionPlan') return;
+
+                // If the clicked one is already selected, do nothing extra
+                if (input.checked) {
+                    // Ensure its details are open
+                    const currentDetails = label.querySelector('.plan-details');
+                    if (currentDetails && currentDetails.classList.contains('max-h-0')) {
+                        currentDetails.classList.remove('max-h-0');
+                        currentDetails.classList.add('max-h-screen', 'pt-3');
+                    }
+                    return;
+                }
             });
         }
     }
@@ -316,7 +340,7 @@ export function initBizcardSettings() {
         }));
         renderDataConversionSpeeds(speedList, state.settings.dataConversionSpeed);
 
-        const estimate = calculateEstimate(state.settings, state.appliedCoupon);
+        const estimate = calculateEstimate(state.settings, state.appliedCoupon, state.surveyData?.periodEnd);
         renderEstimate(estimate);
         validateForm();
     }

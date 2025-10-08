@@ -143,6 +143,7 @@ export function renderDataConversionPlans(plans, selectedPlan) {
     container.innerHTML = '';
 
     plans.forEach(plan => {
+        const isSelected = plan.value === selectedPlan;
         const wrapper = document.createElement('div');
         wrapper.className = 'relative';
 
@@ -152,17 +153,17 @@ export function renderDataConversionPlans(plans, selectedPlan) {
         input.value = plan.value;
         input.id = `data-plan-${plan.value}`;
         input.className = 'sr-only peer';
-        if (plan.value === selectedPlan) {
+        if (isSelected) {
             input.checked = true;
         }
 
         const label = document.createElement('label');
         label.setAttribute('for', input.id);
         label.className = [
-            'flex h-full flex-col gap-3 rounded-xl border p-5 transition-all focus:outline-none',
-            plan.value === selectedPlan
-                ? 'border-green-500 ring-2 ring-green-500 bg-surface-container-highest shadow-lg'
-                : 'border-outline bg-surface-container hover:border-green-500 hover:shadow-sm'
+            'flex h-full flex-col gap-3 rounded-xl border p-5 transition-all focus:outline-none cursor-pointer',
+            isSelected
+                ? 'border-primary ring-2 ring-primary bg-primary-container'
+                : 'border-outline bg-surface-container hover:border-primary hover:shadow-sm'
         ].join(' ');
 
         const header = document.createElement('div');
@@ -185,6 +186,15 @@ export function renderDataConversionPlans(plans, selectedPlan) {
         header.append(title, price);
         label.appendChild(header);
 
+        // Accordion Content
+        const accordionContent = document.createElement('div');
+        accordionContent.className = 'plan-details transition-all duration-300 ease-in-out overflow-hidden';
+        if (!isSelected) {
+            accordionContent.classList.add('max-h-0');
+        } else {
+            accordionContent.classList.add('max-h-screen', 'pt-3');
+        }
+
         if (Array.isArray(plan.badges) && plan.badges.length > 0) {
             const badgeWrapper = document.createElement('div');
             badgeWrapper.className = 'flex flex-wrap gap-2';
@@ -194,17 +204,17 @@ export function renderDataConversionPlans(plans, selectedPlan) {
                 badgeEl.textContent = getLocalizedText(badge.text, lang);
                 badgeWrapper.appendChild(badgeEl);
             });
-            label.appendChild(badgeWrapper);
+            accordionContent.appendChild(badgeWrapper);
         }
 
         const description = document.createElement('p');
-        description.className = 'text-sm text-on-surface-variant';
+        description.className = 'text-sm text-on-surface-variant pt-3';
         description.textContent = getLocalizedText(plan.description, lang);
-        label.appendChild(description);
+        accordionContent.appendChild(description);
 
         const divider = document.createElement('div');
-        divider.className = 'border-t border-outline-variant my-2';
-        label.appendChild(divider);
+        divider.className = 'border-t border-outline-variant my-3';
+        accordionContent.appendChild(divider);
 
         if (Array.isArray(plan.highlights) && plan.highlights.length > 0) {
             const list = document.createElement('ul');
@@ -221,9 +231,10 @@ export function renderDataConversionPlans(plans, selectedPlan) {
                 li.append(icon, text);
                 list.appendChild(li);
             });
-            label.appendChild(list);
+            accordionContent.appendChild(list);
         }
 
+        label.appendChild(accordionContent);
         wrapper.append(input, label);
         container.appendChild(wrapper);
     });

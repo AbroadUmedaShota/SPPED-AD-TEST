@@ -25,7 +25,7 @@ export const SPEED_OPTIONS = {
  * @param {object|null} appliedCoupon - 適用されたクーポン情報。
  * @returns {object} 計算結果 { amount: number, completionDate: string }。
  */
-export function calculateEstimate(settings, appliedCoupon = null) {
+export function calculateEstimate(settings, appliedCoupon = null, surveyEndDate = null) {
     if (!settings.bizcardEnabled) {
         return { amount: 0, completionDate: '未定' };
     }
@@ -62,8 +62,8 @@ export function calculateEstimate(settings, appliedCoupon = null) {
     }
 
     // 4. 完了予定日を計算
-    const today = new Date();
-    const completionDate = new Date(today.setDate(today.getDate() + completionDays));
+    const startDate = surveyEndDate ? new Date(surveyEndDate) : new Date();
+    const completionDate = new Date(startDate.setDate(startDate.getDate() + completionDays));
     const formattedCompletionDate = completionDate.toLocaleDateString('ja-JP');
 
     const couponPercent = preDiscount > 0 ? Math.round((couponAmount / preDiscount) * 100) : 0;
