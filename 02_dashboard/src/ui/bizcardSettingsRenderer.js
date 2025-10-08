@@ -186,15 +186,6 @@ export function renderDataConversionPlans(plans, selectedPlan) {
         header.append(title, price);
         label.appendChild(header);
 
-        // Accordion Content
-        const accordionContent = document.createElement('div');
-        accordionContent.className = 'plan-details transition-all duration-300 ease-in-out overflow-hidden';
-        if (!isSelected) {
-            accordionContent.classList.add('max-h-0');
-        } else {
-            accordionContent.classList.add('max-h-screen', 'pt-3');
-        }
-
         if (Array.isArray(plan.badges) && plan.badges.length > 0) {
             const badgeWrapper = document.createElement('div');
             badgeWrapper.className = 'flex flex-wrap gap-2';
@@ -204,17 +195,17 @@ export function renderDataConversionPlans(plans, selectedPlan) {
                 badgeEl.textContent = getLocalizedText(badge.text, lang);
                 badgeWrapper.appendChild(badgeEl);
             });
-            accordionContent.appendChild(badgeWrapper);
+            label.appendChild(badgeWrapper);
         }
 
         const description = document.createElement('p');
-        description.className = 'text-sm text-on-surface-variant pt-3';
+        description.className = 'text-sm text-on-surface-variant';
         description.textContent = getLocalizedText(plan.description, lang);
-        accordionContent.appendChild(description);
+        label.appendChild(description);
 
         const divider = document.createElement('div');
-        divider.className = 'border-t border-outline-variant my-3';
-        accordionContent.appendChild(divider);
+        divider.className = 'border-t border-outline-variant my-2';
+        label.appendChild(divider);
 
         if (Array.isArray(plan.highlights) && plan.highlights.length > 0) {
             const list = document.createElement('ul');
@@ -231,10 +222,9 @@ export function renderDataConversionPlans(plans, selectedPlan) {
                 li.append(icon, text);
                 list.appendChild(li);
             });
-            accordionContent.appendChild(list);
+            label.appendChild(list);
         }
 
-        label.appendChild(accordionContent);
         wrapper.append(input, label);
         container.appendChild(wrapper);
     });

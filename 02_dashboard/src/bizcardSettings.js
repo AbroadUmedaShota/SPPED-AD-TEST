@@ -161,29 +161,6 @@ export function initBizcardSettings() {
                 if(icon) icon.classList.toggle('rotate-180');
             });
         }
-
-        // Accordion for plan details
-        if (dataConversionPlanSelection) {
-            dataConversionPlanSelection.addEventListener('click', (e) => {
-                const label = e.target.closest('label');
-                if (!label) return;
-
-                const inputId = label.getAttribute('for');
-                const input = document.getElementById(inputId);
-                if (!input || input.name !== 'dataConversionPlan') return;
-
-                // If the clicked one is already selected, do nothing extra
-                if (input.checked) {
-                    // Ensure its details are open
-                    const currentDetails = label.querySelector('.plan-details');
-                    if (currentDetails && currentDetails.classList.contains('max-h-0')) {
-                        currentDetails.classList.remove('max-h-0');
-                        currentDetails.classList.add('max-h-screen', 'pt-3');
-                    }
-                    return;
-                }
-            });
-        }
     }
 
     /**
