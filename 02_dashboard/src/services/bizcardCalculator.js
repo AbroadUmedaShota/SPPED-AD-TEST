@@ -5,17 +5,17 @@
 
 const PLAN_PRICES = {
     free: 0,
-    standard: 5000,
-    premium: 12000,
-    enterprise: 25000,
+    standard: 0,
+    premium: 30000,
+    enterprise: 0,
     custom: 0 // カスタムプランは別途計算
 };
 
 const SPEED_OPTIONS = {
-    normal: { days: 3, price_per_card: 10 },
-    express: { days: 1, price_per_card: 20 },
-    superExpress: { days: 0.5, price_per_card: 30 },
-    onDemand: { days: 0.1, price_per_card: 50 }
+    normal: { days: 6, price_per_card: 50 },
+    express: { days: 3, price_per_card: 100 },
+    superExpress: { days: 1, price_per_card: 150 },
+    onDemand: { days: 0, price_per_card: 200 }
 };
 
 /**
@@ -29,17 +29,21 @@ export function calculateEstimate(settings, appliedCoupon = null) {
         return { amount: 0, completionDate: '未定' };
     }
 
+    const selectedPlan = settings.dataConversionPlan || 'free';
+    const selectedSpeed = settings.dataConversionSpeed || 'normal';
+    const requestedCards = Math.max(0, parseInt(settings.bizcardRequest, 10) || 0);
+
     let amount = 0;
-    let completionDays = 3; // デフォルト
+    let completionDays = SPEED_OPTIONS.normal.days;
 
     // 1. プラン料金
-    amount += PLAN_PRICES[settings.dataConversionPlan] || 0;
+    amount += PLAN_PRICES[selectedPlan] || 0;
 
     // 2. スピード料金と納期
-    const speedOption = SPEED_OPTIONS[settings.dataConversionSpeed];
+    const speedOption = SPEED_OPTIONS[selectedSpeed];
     if (speedOption) {
         completionDays = speedOption.days;
-        amount += (settings.bizcardRequest || 0) * speedOption.price_per_card;
+        amount += requestedCards * speedOption.price_per_card;
     }
 
     // 3. クーポン適用

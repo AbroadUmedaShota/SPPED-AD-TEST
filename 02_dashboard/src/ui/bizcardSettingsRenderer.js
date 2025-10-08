@@ -69,19 +69,21 @@ export function setInitialFormValues(settings) {
     if (!settings) return; // settings が null や undefined なら何もしない
     if (!dom.bizcardRequestInput) cacheDOMElements();
 
-    dom.bizcardRequestInput.value = settings.bizcardRequest || 0;
+    const planValue = settings.dataConversionPlan || 'free';
+    const speedValue = settings.dataConversionSpeed || 'normal';
+    const parsedRequest = parseInt(settings.bizcardRequest, 10);
+    const requestCount = Number.isFinite(parsedRequest) ? Math.max(0, parsedRequest) : 0;
+
+    dom.bizcardRequestInput.value = requestCount;
     dom.couponCodeInput.value = settings.couponCode || '';
     dom.internalMemo.value = settings.internalMemo || '';
 
     // ラジオボタンの選択
-    if (settings.dataConversionPlan) {
-        const planRadio = document.querySelector(`input[name="dataConversionPlan"][value="${settings.dataConversionPlan}"]`);
-        if (planRadio) planRadio.checked = true;
-    }
-    if (settings.dataConversionSpeed) {
-        const speedRadio = document.querySelector(`input[name="dataConversionSpeed"][value="${settings.dataConversionSpeed}"]`);
-        if (speedRadio) speedRadio.checked = true;
-    }
+    const planRadio = document.querySelector(`input[name="dataConversionPlan"][value="${planValue}"]`);
+    if (planRadio) planRadio.checked = true;
+
+    const speedRadio = document.querySelector(`input[name="dataConversionSpeed"][value="${speedValue}"]`);
+    if (speedRadio) speedRadio.checked = true;
 }
 
 /**
