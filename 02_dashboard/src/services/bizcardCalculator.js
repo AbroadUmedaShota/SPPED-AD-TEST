@@ -4,8 +4,10 @@
  */
 
 const PLAN_PRICES = {
-    standard: 500,
-    premium: 1000,
+    free: 0,
+    standard: 5000,
+    premium: 12000,
+    enterprise: 25000,
     custom: 0 // カスタムプランは別途計算
 };
 

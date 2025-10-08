@@ -40,26 +40,33 @@
                     <h1 class="text-on-background text-2xl sm:text-3xl font-bold leading-tight tracking-tight" id="pageTitle">アンケート『[アンケート名]』の名刺データ化設定</h1>
                 </div>
 
-                <!-- アンケート基本情報表示エリア -->
-                <div class="bg-surface p-4 rounded-lg mb-6">
-                    <h2 class="text-on-surface text-xl font-bold mb-2">アンケート基本情報</h2>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-on-surface-variant">
-                        <div><span class="font-bold text-on-surface">アンケート名:</span> <span id="surveyNameDisplay"></span></div>
-                        <div><span class="font-bold text-on-surface">ID:</span> <span id="surveyIdDisplay"></span></div>
-                        <div><span class="font-bold text-on-surface">会期:</span> <span id="surveyPeriodDisplay"></span></div>
-                    </div>
-                </div>
+                <div class="flex flex-col lg:flex-row lg:items-start lg:gap-8">
+                    <div class="flex-1 min-w-0 space-y-6">
+                        <!-- アンケート基本情報表示エリア -->
+                        <div class="bg-surface p-4 rounded-lg">
+                            <h2 class="text-on-surface text-xl font-bold mb-2">アンケート基本情報</h2>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-on-surface-variant">
+                                <div><span class="font-bold text-on-surface">アンケート名:</span> <span id="surveyNameDisplay"></span></div>
+                                <div><span class="font-bold text-on-surface">ID:</span> <span id="surveyIdDisplay"></span></div>
+                                <div><span class="font-bold text-on-surface">会期:</span> <span id="surveyPeriodDisplay"></span></div>
+                            </div>
+                        </div>
 
-                <div class="flex flex-col lg:flex-row gap-6">
-                    <!-- 名刺データ化設定フォーム -->
-                    <div class="bg-surface p-6 rounded-xl space-y-6 lg:w-2/3">
-                        <div id="bizcardSettingsFields" class="space-y-6">
+                        <!-- 名刺データ化設定フォーム -->
+                        <div class="bg-surface p-6 rounded-xl space-y-6" id="bizcardSettingsCard">
+                            <div id="bizcardSettingsFields" class="space-y-6">
 
                             <!-- データ化項目プラン -->
-                            <div class="space-y-2">
-                                
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="dataConversionPlanSelection">
+                            <div class="space-y-4">
+                                <h2 class="text-on-surface text-xl font-bold">データ化項目プラン</h2>
+                                <p class="text-sm text-on-surface-variant">名刺データの読み取り範囲や課金方式をプランごとに選択できます。組織のワークフローにあわせて最適なプランをお選びください。</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4" id="dataConversionPlanSelection">
                                     <!-- Plan cards will be dynamically inserted here -->
+                                </div>
+                                <div class="space-y-1 text-xs leading-relaxed text-on-surface-variant" id="dataConversionPlanNotes">
+                                    <p>※ 名刺データ化プランの選択と見込み枚数の入力は必須項目です。未選択の場合は依頼を完了できません。</p>
+                                    <p>※ 請求は毎月末締め・翌月末払いでご案内します。表示料金は税抜金額で、別途消費税が加算されます。</p>
+                                    <p>※ 名刺データ化はOCRと有人チェックを組み合わせて実施します。手書きや特殊レイアウトの名刺は補正のため追加日数を頂く場合があります。</p>
                                 </div>
                             </div>
 
@@ -154,17 +161,19 @@
                     </div>
 
                     <!-- 見積もりサマリーエリア -->
-                    <div class="bg-surface p-6 rounded-xl space-y-6 lg:w-1/3 h-fit sticky top-24">
-                        <h2 class="text-on-surface text-xl font-bold mb-4">名刺データ化費用見積もり</h2>
-                        <div class="input-group">
-                            <div id="estimatedAmount" class="input-field-static text-right text-2xl font-bold text-primary">¥0</div>
-                            <label class="input-label-static">請求見込み金額</label>
+                    <aside class="w-full lg:w-80 xl:w-96 lg:flex-shrink-0 mt-6 lg:mt-0">
+                        <div class="bg-surface p-6 rounded-xl space-y-6 h-fit sticky top-24 shadow-sm" id="bizcardEstimatePanel">
+                            <h2 class="text-on-surface text-xl font-bold mb-4">名刺データ化費用見積もり</h2>
+                            <div class="input-group">
+                                <div id="estimatedAmount" class="input-field-static text-right text-2xl font-bold text-primary">¥0</div>
+                                <label class="input-label-static">請求見込み金額</label>
+                            </div>
+                            <div class="input-group">
+                                <div id="estimatedCompletionDate" class="input-field-static text-right text-lg font-bold">未定</div>
+                                <label class="input-label-static">データ化完了予定日</label>
+                            </div>
                         </div>
-                        <div class="input-group">
-                            <div id="estimatedCompletionDate" class="input-field-static text-right text-lg font-bold">未定</div>
-                            <label class="input-label-static">データ化完了予定日</label>
-                        </div>
-                    </div>
+                    </aside>
                 </div>
 
             </div>
