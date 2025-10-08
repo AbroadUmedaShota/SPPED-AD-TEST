@@ -500,7 +500,7 @@ body.overflow-hidden {
 
 /* --- Main content Layout Adjustment (for Fixed Sidebar) --- */
 #main-content {
-    transition: none; /* No transition on the main content */
+    transition: none; /* Revert to no transition */
     width: 100%;
 }
 
@@ -515,9 +515,6 @@ body.overflow-hidden {
     }
     #main-content {
         padding-left: 4rem; /* Permanent padding for collapsed sidebar */
-    }
-    body.sidebar-hovered #main-content {
-        padding-left: 16rem; /* Match expanded sidebar width to avoid overlap */
     }
     .header-theme-toggle { display: block; } /* Show header theme toggle on XL+ */
     .lg\:hidden { display: none !important; } /* Hide mobile toggle button */

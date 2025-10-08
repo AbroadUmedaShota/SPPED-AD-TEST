@@ -3,7 +3,7 @@ import { openAccountInfoModal } from './accountInfoModal.js';
 import { initSidebarHandler } from './sidebarHandler.js';
 import { initBreadcrumbs } from './breadcrumb.js';
 import { setupQrCodeModalListeners } from './qrCodeModal.js';
-import { initThemeToggle } from './themeToggle.js';
+import { initThemeToggle } from './lib/themeToggle.js';
 import { fetchSurveyData, saveSurveyDataToLocalStorage, loadSurveyDataFromLocalStorage } from './services/surveyService.js';
 import {
     populateBasicInfo,
