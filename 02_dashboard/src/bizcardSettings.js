@@ -23,9 +23,9 @@ const DATA_CONVERSION_PLANS = [
         value: 'free',
         title: { ja: '無料トライアル', en: 'Free Trial' },
         price: { ja: '¥0', en: '¥0' },
-        priceNote: { ja: '月額・初期費用なし', en: 'No monthly or initial fee' },
+        priceNote: { ja: '2項目対応（氏名・メールアドレス）', en: 'Includes 2 fields (Name & Email)' },
         badges: [
-            { text: { ja: '対象項目: 氏名 / 会社名 / メール', en: 'Fields: Name / Company / Email' }, tone: 'info' },
+            { text: { ja: '対象項目: 氏名 / メールアドレス', en: 'Fields: Name / Email' }, tone: 'info' },
             { text: { ja: '月間50枚まで', en: 'Up to 50 cards / month' }, tone: 'limit' }
         ],
         description: {
@@ -33,17 +33,17 @@ const DATA_CONVERSION_PLANS = [
             en: 'Entry plan with OCR-only extraction for teams trying the service.'
         },
         highlights: [
-            { ja: '納期目安: 3営業日', en: 'Turnaround: 3 business days' },
-            { ja: '納品形式: CSVダウンロード', en: 'Delivery: CSV download' }
+            { ja: '納期目安: 6営業日', en: 'Turnaround: 6 business days' },
+            { ja: 'データ保存期間: 90日間', en: 'Data retention: 90 days' }
         ]
     },
     {
         value: 'standard',
         title: { ja: 'スタンダード', en: 'Standard' },
-        price: { ja: '¥5,000', en: '¥5,000' },
-        priceNote: { ja: '基本料金', en: 'Base charge' },
+        price: { ja: '¥50/枚〜', en: '¥50/card〜' },
+        priceNote: { ja: '10項目データ化（通常作業 @50円）', en: 'Up to 10 fields (Normal @¥50/card)' },
         badges: [
-            { text: { ja: '対象項目: 氏名 / 会社名 / 部署 / 役職 / メール', en: 'Fields: Name / Company / Department / Title / Email' }, tone: 'info' },
+            { text: { ja: '対象項目: 氏名 / メール / 会社名 / 部署 / 役職 / 郵便番号 / 住所 / 電話 / 携帯 / Webサイト', en: 'Fields: Name / Email / Company / Department / Title / Zip / Address / Phone / Mobile / Website' }, tone: 'info' },
             { text: { ja: '月間300枚まで', en: 'Up to 300 cards / month' }, tone: 'limit' }
         ],
         description: {
@@ -51,15 +51,15 @@ const DATA_CONVERSION_PLANS = [
             en: 'Most popular plan with human double-checks for high accuracy.'
         },
         highlights: [
-            { ja: '納期目安: 2営業日', en: 'Turnaround: 2 business days' },
-            { ja: '納品形式: CSV / Excel', en: 'Delivery: CSV / Excel' }
+            { ja: '納期目安: 6営業日（通常作業）', en: 'Turnaround: 6 business days (Normal)' },
+            { ja: 'データ保存期間: 90日間', en: 'Data retention: 90 days' }
         ]
     },
     {
         value: 'premium',
         title: { ja: 'プレミアム', en: 'Premium' },
-        price: { ja: '¥12,000', en: '¥12,000' },
-        priceNote: { ja: '高度な名寄せ・重複排除込み', en: 'Includes advanced deduplication' },
+        price: { ja: '¥30,000/月', en: '¥30,000/mo' },
+        priceNote: { ja: 'プレミアム機能＋無制限保存込み', en: 'Premium features with unlimited retention' },
         badges: [
             { text: { ja: '対象項目: スタンダード項目 + SNS・QR情報', en: 'Fields: Standard + Social / QR data' }, tone: 'info' },
             { text: { ja: '月間1,000枚まで', en: 'Up to 1,000 cards / month' }, tone: 'limit' }
@@ -69,15 +69,15 @@ const DATA_CONVERSION_PLANS = [
             en: 'Ideal for events with high volume, delivering CRM-ready formatted data.'
         },
         highlights: [
-            { ja: '納期目安: 1営業日', en: 'Turnaround: 1 business day' },
-            { ja: '納品形式: CSV / Excel / Salesforce', en: 'Delivery: CSV / Excel / Salesforce' }
+            { ja: '納期目安: 最短当日〜6営業日', en: 'Turnaround: Same-day to 6 business days' },
+            { ja: 'データ保存期間: 無期限', en: 'Data retention: Unlimited' }
         ]
     },
     {
         value: 'enterprise',
         title: { ja: 'エンタープライズ', en: 'Enterprise' },
-        price: { ja: '¥25,000〜', en: '¥25,000+' },
-        priceNote: { ja: 'ボリューム割引 & カスタム要件対応', en: 'Volume pricing & custom workflows' },
+        price: { ja: '要お見積もり', en: 'Custom quote' },
+        priceNote: { ja: 'カスタマイズ要件は事前見積もり', en: 'Custom requirements priced via pre-quote' },
         badges: [
             { text: { ja: '対象項目: プレミアム項目 + カスタム項目', en: 'Fields: Premium + Custom fields' }, tone: 'info' },
             { text: { ja: '月間無制限（個別見積り）', en: 'Unlimited (custom quote)' }, tone: 'limit' }
@@ -88,7 +88,7 @@ const DATA_CONVERSION_PLANS = [
         },
         highlights: [
             { ja: '納期目安: 個別スケジュール', en: 'Turnaround: Custom schedule' },
-            { ja: '納品形式: CRM / MAプラットフォーム連携', en: 'Delivery: CRM / MA platform integrations' }
+            { ja: '事前ヒアリングで要件定義・御見積', en: 'Scope defined via pre-project discovery' }
         ]
     }
 ];
@@ -135,10 +135,14 @@ export function initBizcardSettings() {
 
             // Set default value for bizcardEnabled to true as the toggle is removed
             settingsData.bizcardEnabled = true;
+            settingsData.dataConversionPlan = settingsData.dataConversionPlan || 'free';
+            settingsData.dataConversionSpeed = settingsData.dataConversionSpeed || 'normal';
+            const parsedBizcardRequest = parseInt(settingsData.bizcardRequest, 10);
+            settingsData.bizcardRequest = Number.isFinite(parsedBizcardRequest) ? Math.max(0, parsedBizcardRequest) : 0;
 
             state.settings = settingsData;
             // Deep copy for initial state comparison
-            state.initialSettings = JSON.parse(JSON.stringify(settingsData)); 
+            state.initialSettings = JSON.parse(JSON.stringify(settingsData));
 
             renderSurveyInfo(surveyData, state.surveyId);
             setInitialFormValues(state.settings);
@@ -184,7 +188,7 @@ export function initBizcardSettings() {
      */
     function hasFormChanged() {
         const currentSettings = {
-            bizcardRequest: parseInt(bizcardRequestInput.value, 10) || 0,
+            bizcardRequest: Math.max(0, parseInt(bizcardRequestInput.value, 10) || 0),
             dataConversionPlan: document.querySelector('input[name="dataConversionPlan"]:checked')?.value,
             dataConversionSpeed: document.querySelector('input[name="dataConversionSpeed"]:checked')?.value,
             internalMemo: internalMemoInput.value || ''
@@ -235,7 +239,7 @@ export function initBizcardSettings() {
                 state.settings.dataConversionSpeed = value;
                 break;
             case 'bizcardRequest':
-                state.settings.bizcardRequest = parseInt(value, 10) || 0;
+                state.settings.bizcardRequest = Math.max(0, parseInt(value, 10) || 0);
                 break;
         }
 
@@ -310,6 +314,10 @@ export function initBizcardSettings() {
         if (!state.settings.dataConversionPlan && DATA_CONVERSION_PLANS.length > 0) {
             state.settings.dataConversionPlan = DATA_CONVERSION_PLANS[0].value;
         }
+        if (!state.settings.dataConversionSpeed) {
+            state.settings.dataConversionSpeed = 'normal';
+        }
+        state.settings.bizcardRequest = Math.max(0, parseInt(state.settings.bizcardRequest, 10) || 0);
 
         renderDataConversionPlans(DATA_CONVERSION_PLANS, state.settings.dataConversionPlan);
 
