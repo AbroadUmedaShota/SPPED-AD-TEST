@@ -36,11 +36,13 @@ function cacheDOMElements() {
     dom.surveyPeriodDisplay = document.getElementById('surveyPeriodDisplay');
     dom.bizcardSettingsFields = document.getElementById('bizcardSettingsFields');
     dom.dataConversionPlanSelection = document.getElementById('dataConversionPlanSelection');
+    dom.dataConversionSpeedSelection = document.getElementById('dataConversionSpeedSelection');
     dom.bizcardRequestInput = document.getElementById('bizcardRequest');
     dom.couponCodeInput = document.getElementById('couponCode');
     dom.couponMessage = document.getElementById('couponMessage');
     dom.estimatedAmountSpan = document.getElementById('estimatedAmount');
     dom.estimatedCompletionDateSpan = document.getElementById('estimatedCompletionDate');
+    dom.estimateBreakdown = document.getElementById('estimateBreakdown');
     dom.saveButton = document.getElementById('saveBizcardSettingsBtn');
     dom.saveButtonText = document.getElementById('saveBizcardSettingsBtnText');
     dom.saveButtonLoading = document.getElementById('saveBizcardSettingsBtnLoading');
@@ -102,6 +104,28 @@ export function renderEstimate(estimate) {
     if (!dom.estimatedAmountSpan) cacheDOMElements();
     dom.estimatedAmountSpan.textContent = `¥${estimate.amount.toLocaleString()}`;
     dom.estimatedCompletionDateSpan.textContent = estimate.completionDate;
+    if (dom.estimateBreakdown) {
+        const cards = estimate.requestedCards ?? 0;
+        const unit = estimate.unitPrice ?? 0;
+        const couponAmt = estimate.couponAmount ?? 0;
+        const couponPct = estimate.couponPercent ?? 0;
+        const minCharge = estimate.minCharge ?? 0;
+        dom.estimateBreakdown.innerHTML = `
+            <div class="space-y-1">
+              <div class="text-xs text-on-surface-variant">ご請求見込み金額</div>
+              <div class="grid grid-cols-2 text-sm">
+                <div class="text-on-surface-variant">想定件数</div>
+                <div class="text-right text-on-surface">${cards.toLocaleString()}件</div>
+              </div>
+              <div class="text-xs text-on-surface-variant">内訳</div>
+              <div class="text-sm text-on-surface">
+                ${cards.toLocaleString()}件 × データ化単価 ${unit.toLocaleString()}円 ー クーポンお値引き ${couponAmt.toLocaleString()}円（${couponPct}%相当）
+              </div>
+              <div class="text-sm font-semibold text-on-surface">＝ ご請求見込み金額 ¥${estimate.amount.toLocaleString()}（＋税）</div>
+              <div class="text-xs text-on-surface-variant">＝ ※最低ご請求金額 ¥${minCharge.toLocaleString()}（＋税）</div>
+            </div>
+        `;
+    }
 }
 
 /**
@@ -137,8 +161,8 @@ export function renderDataConversionPlans(plans, selectedPlan) {
         label.className = [
             'flex h-full flex-col gap-3 rounded-xl border p-5 transition-all focus:outline-none',
             plan.value === selectedPlan
-                ? 'border-primary bg-surface-container-highest shadow-lg'
-                : 'border-outline bg-surface-container hover:border-primary hover:shadow-sm'
+                ? 'border-green-500 ring-2 ring-green-500 bg-surface-container-highest shadow-lg'
+                : 'border-outline bg-surface-container hover:border-green-500 hover:shadow-sm'
         ].join(' ');
 
         const header = document.createElement('div');
@@ -178,6 +202,10 @@ export function renderDataConversionPlans(plans, selectedPlan) {
         description.textContent = getLocalizedText(plan.description, lang);
         label.appendChild(description);
 
+        const divider = document.createElement('div');
+        divider.className = 'border-t border-outline-variant my-2';
+        label.appendChild(divider);
+
         if (Array.isArray(plan.highlights) && plan.highlights.length > 0) {
             const list = document.createElement('ul');
             list.className = 'space-y-1 text-sm text-on-surface-variant';
@@ -196,6 +224,60 @@ export function renderDataConversionPlans(plans, selectedPlan) {
             label.appendChild(list);
         }
 
+        wrapper.append(input, label);
+        container.appendChild(wrapper);
+    });
+}
+
+/**
+ * データ化スピードプラン（@単価表示あり）を描画します。
+ * @param {Array<object>} speeds - 表示するスピードオプション一覧。
+ *  speeds[i]: { value, title: {ja,en}|string, unitPrice: number, days: number }
+ * @param {string} selectedSpeed - 選択中のスピード値。
+ */
+export function renderDataConversionSpeeds(speeds, selectedSpeed) {
+    if (!Array.isArray(speeds)) return;
+    if (!dom.dataConversionSpeedSelection) cacheDOMElements();
+    const container = dom.dataConversionSpeedSelection;
+    if (!container) return;
+
+    const lang = document.documentElement.lang || 'ja';
+    container.innerHTML = '';
+
+    speeds.forEach(speed => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'relative';
+
+        const input = document.createElement('input');
+        input.type = 'radio';
+        input.name = 'dataConversionSpeed';
+        input.value = speed.value;
+        input.id = `speed-${speed.value}`;
+        input.className = 'sr-only peer';
+        if (speed.value === selectedSpeed) input.checked = true;
+
+        const label = document.createElement('label');
+        label.setAttribute('for', input.id);
+        label.className = [
+            'flex h-full flex-col gap-2 rounded-xl border p-4 transition-all focus:outline-none',
+            speed.value === selectedSpeed
+                ? 'border-green-500 ring-2 ring-green-500 bg-surface-container-highest shadow-lg'
+                : 'border-outline bg-surface-container hover:border-green-500 hover:shadow-sm'
+        ].join(' ');
+
+        const title = document.createElement('p');
+        title.className = 'text-sm font-semibold text-on-surface';
+        title.textContent = getLocalizedText(speed.title, lang);
+
+        const unit = document.createElement('p');
+        unit.className = 'text-lg font-bold text-primary';
+        unit.textContent = `@${speed.unitPrice.toLocaleString()}円/枚`;
+
+        const note = document.createElement('p');
+        note.className = 'text-xs text-on-surface-variant';
+        note.textContent = speed.days === 0 ? '納期目安: 当日中' : `納期目安: ${speed.days}営業日`;
+
+        label.append(title, unit, note);
         wrapper.append(input, label);
         container.appendChild(wrapper);
     });

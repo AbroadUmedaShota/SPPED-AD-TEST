@@ -4,7 +4,7 @@ import {
     validateCoupon,
     saveBizcardSettings
 } from './services/bizcardSettingsService.js';
-import { calculateEstimate } from './services/bizcardCalculator.js';
+import { calculateEstimate, SPEED_OPTIONS } from './services/bizcardCalculator.js';
 import {
     renderSurveyInfo,
     setInitialFormValues,
@@ -13,7 +13,8 @@ import {
     displayCouponResult,
     validateForm,
     setSaveButtonLoading,
-    renderDataConversionPlans
+    renderDataConversionPlans,
+    renderDataConversionSpeeds
 } from './ui/bizcardSettingsRenderer.js';
 import { showToast } from './utils.js';
 import { showConfirmationModal } from './confirmationModal.js';
@@ -21,12 +22,11 @@ import { showConfirmationModal } from './confirmationModal.js';
 const DATA_CONVERSION_PLANS = [
     {
         value: 'free',
-        title: { ja: '無料トライアル', en: 'Free Trial' },
+        title: { ja: '無料プラン', en: 'Free Plan' },
         price: { ja: '¥0', en: '¥0' },
         priceNote: { ja: '2項目対応（氏名・メールアドレス）', en: 'Includes 2 fields (Name & Email)' },
         badges: [
-            { text: { ja: '対象項目: 氏名 / メールアドレス', en: 'Fields: Name / Email' }, tone: 'info' },
-            { text: { ja: '月間50枚まで', en: 'Up to 50 cards / month' }, tone: 'limit' }
+            { text: { ja: '対象項目: 氏名 / メールアドレス', en: 'Fields: Name / Email' }, tone: 'info' }
         ],
         description: {
             ja: '名刺データ化をまずは試したい方向け。OCRによる自動抽出のみ提供します。',
@@ -43,8 +43,7 @@ const DATA_CONVERSION_PLANS = [
         price: { ja: '¥50/枚〜', en: '¥50/card〜' },
         priceNote: { ja: '10項目データ化（通常作業 @50円）', en: 'Up to 10 fields (Normal @¥50/card)' },
         badges: [
-            { text: { ja: '対象項目: 氏名 / メール / 会社名 / 部署 / 役職 / 郵便番号 / 住所 / 電話 / 携帯 / Webサイト', en: 'Fields: Name / Email / Company / Department / Title / Zip / Address / Phone / Mobile / Website' }, tone: 'info' },
-            { text: { ja: '月間300枚まで', en: 'Up to 300 cards / month' }, tone: 'limit' }
+            { text: { ja: '対象項目: 氏名 / メール / 会社名 / 部署 / 役職 / 郵便番号 / 住所 / 電話 / 携帯 / Webサイト', en: 'Fields: Name / Email / Company / Department / Title / Zip / Address / Phone / Mobile / Website' }, tone: 'info' }
         ],
         description: {
             ja: 'もっとも選ばれている標準プラン。有人によるダブルチェックで高精度なデータを納品します。',
@@ -58,11 +57,10 @@ const DATA_CONVERSION_PLANS = [
     {
         value: 'premium',
         title: { ja: 'プレミアム', en: 'Premium' },
-        price: { ja: '¥30,000/月', en: '¥30,000/mo' },
-        priceNote: { ja: 'プレミアム機能＋無制限保存込み', en: 'Premium features with unlimited retention' },
+        price: { ja: '要お見積もり', en: 'Custom quote' },
+        priceNote: { ja: '月額契約（個別見積り）', en: 'Monthly contract (custom quote)' },
         badges: [
-            { text: { ja: '対象項目: スタンダード項目 + SNS・QR情報', en: 'Fields: Standard + Social / QR data' }, tone: 'info' },
-            { text: { ja: '月間1,000枚まで', en: 'Up to 1,000 cards / month' }, tone: 'limit' }
+            { text: { ja: '対象項目: スタンダード項目 + SNS・QR情報', en: 'Fields: Standard + Social / QR data' }, tone: 'info' }
         ],
         description: {
             ja: 'イベントや展示会で大量の名刺を扱う企業向け。CRM連携用の整形データを納品します。',
@@ -71,24 +69,6 @@ const DATA_CONVERSION_PLANS = [
         highlights: [
             { ja: '納期目安: 最短当日〜6営業日', en: 'Turnaround: Same-day to 6 business days' },
             { ja: 'データ保存期間: 無期限', en: 'Data retention: Unlimited' }
-        ]
-    },
-    {
-        value: 'enterprise',
-        title: { ja: 'エンタープライズ', en: 'Enterprise' },
-        price: { ja: '要お見積もり', en: 'Custom quote' },
-        priceNote: { ja: 'カスタマイズ要件は事前見積もり', en: 'Custom requirements priced via pre-quote' },
-        badges: [
-            { text: { ja: '対象項目: プレミアム項目 + カスタム項目', en: 'Fields: Premium + Custom fields' }, tone: 'info' },
-            { text: { ja: '月間無制限（個別見積り）', en: 'Unlimited (custom quote)' }, tone: 'limit' }
-        ],
-        description: {
-            ja: '専任オペレーターや機密保持契約など大規模運用に対応。ワークフロー連携も個別に設計します。',
-            en: 'Supports dedicated operators, NDAs, and bespoke workflow integrations.'
-        },
-        highlights: [
-            { ja: '納期目安: 個別スケジュール', en: 'Turnaround: Custom schedule' },
-            { ja: '事前ヒアリングで要件定義・御見積', en: 'Scope defined via pre-project discovery' }
         ]
     }
 ];
@@ -320,6 +300,21 @@ export function initBizcardSettings() {
         state.settings.bizcardRequest = Math.max(0, parseInt(state.settings.bizcardRequest, 10) || 0);
 
         renderDataConversionPlans(DATA_CONVERSION_PLANS, state.settings.dataConversionPlan);
+
+        // データ化スピードプラン（@単価表記）
+        const SPEED_LABELS = {
+            normal: { ja: '通常作業プラン', en: 'Normal' },
+            express: { ja: '特急作業プラン', en: 'Express' },
+            superExpress: { ja: '超特急作業プラン', en: 'Super Express' },
+            onDemand: { ja: 'オンデマンドプラン', en: 'On-Demand' }
+        };
+        const speedList = Object.entries(SPEED_OPTIONS).map(([key, val]) => ({
+            value: key,
+            title: SPEED_LABELS[key] || { ja: key, en: key },
+            unitPrice: val.price_per_card,
+            days: val.days
+        }));
+        renderDataConversionSpeeds(speedList, state.settings.dataConversionSpeed);
 
         const estimate = calculateEstimate(state.settings, state.appliedCoupon);
         renderEstimate(estimate);

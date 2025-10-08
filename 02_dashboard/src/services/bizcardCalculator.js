@@ -4,14 +4,15 @@
  */
 
 const PLAN_PRICES = {
-    free: 0,
-    standard: 0,
-    premium: 30000,
-    enterprise: 0,
-    custom: 0 // カスタムプランは別途計算
+  free: 0,
+  standard: 0,
+  // プレミアムは月額の個別見積りのため見積合計へは含めない
+  premium: 0,
+  enterprise: 0,
+  custom: 0 // カスタムプランは別途計算
 };
 
-const SPEED_OPTIONS = {
+export const SPEED_OPTIONS = {
     normal: { days: 6, price_per_card: 50 },
     express: { days: 3, price_per_card: 100 },
     superExpress: { days: 1, price_per_card: 150 },
@@ -47,9 +48,13 @@ export function calculateEstimate(settings, appliedCoupon = null) {
     }
 
     // 3. クーポン適用
+    const unitPrice = speedOption ? speedOption.price_per_card : 0;
+    const preDiscount = amount;
+    let couponAmount = 0;
     if (appliedCoupon) {
         if (appliedCoupon.type === 'discount') {
-            amount = Math.max(0, amount - appliedCoupon.value);
+            couponAmount = Math.min(preDiscount, Math.max(0, appliedCoupon.value || 0));
+            amount = Math.max(0, preDiscount - couponAmount);
         }
         if (appliedCoupon.type === 'speedBoost') {
             completionDays = Math.max(0.1, completionDays - appliedCoupon.value);
@@ -61,5 +66,17 @@ export function calculateEstimate(settings, appliedCoupon = null) {
     const completionDate = new Date(today.setDate(today.getDate() + completionDays));
     const formattedCompletionDate = completionDate.toLocaleDateString('ja-JP');
 
-    return { amount, completionDate: formattedCompletionDate };
+    const couponPercent = preDiscount > 0 ? Math.round((couponAmount / preDiscount) * 100) : 0;
+    const minCharge = Math.round(requestedCards * unitPrice * 0.5);
+
+    return {
+        amount,
+        completionDate: formattedCompletionDate,
+        unitPrice,
+        requestedCards,
+        preDiscount,
+        couponAmount,
+        couponPercent,
+        minCharge
+    };
 }
