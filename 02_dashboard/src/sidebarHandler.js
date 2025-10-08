@@ -68,10 +68,10 @@ function handlePcSidebarBehavior(isPcScreen) {
 
 /**
  * Handles layout adjustments based on screen size changes.
- * @param {MediaQueryListEvent} e - The media query list event.
+ * Now exported and callable without an event.
  */
-function handleScreenChange(e) {
-    const isPcScreen = e.matches;
+export function adjustLayout() {
+    const isPcScreen = MEDIA_QUERY.matches;
     handlePcSidebarBehavior(isPcScreen);
 
     if (isPcScreen && sidebar.classList.contains('is-open-mobile')) {
@@ -202,7 +202,7 @@ function attachEventListeners() {
     });
 
     // Listen for screen size changes
-    MEDIA_QUERY.addEventListener('change', handleScreenChange);
+    MEDIA_QUERY.addEventListener('change', adjustLayout);
 }
 
 
@@ -223,7 +223,7 @@ export function initSidebarHandler() {
     attachEventListeners();
     
     // Initial layout setup
-    handleScreenChange(MEDIA_QUERY);
+    adjustLayout();
 
     // Attach any page-specific guards
     if (typeof window.attachPasswordChangeNavGuard === 'function') {
