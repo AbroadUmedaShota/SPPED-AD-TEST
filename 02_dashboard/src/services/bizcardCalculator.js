@@ -67,7 +67,8 @@ export function calculateEstimate(settings, appliedCoupon = null, surveyEndDate 
     const formattedCompletionDate = completionDate.toLocaleDateString('ja-JP');
 
     const couponPercent = preDiscount > 0 ? Math.round((couponAmount / preDiscount) * 100) : 0;
-    const minCharge = Math.round(requestedCards * unitPrice * 0.5);
+    const minChargeCards = Math.ceil(requestedCards * 0.5);
+    const minCharge = minChargeCards > 0 ? minChargeCards * unitPrice : 0;
 
     return {
         amount,
@@ -77,6 +78,7 @@ export function calculateEstimate(settings, appliedCoupon = null, surveyEndDate 
         preDiscount,
         couponAmount,
         couponPercent,
-        minCharge
+        minCharge,
+        minChargeCards
     };
 }
