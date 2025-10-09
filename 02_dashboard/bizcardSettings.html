@@ -74,7 +74,7 @@
                             <div class="space-y-2">
                                 <h2 class="text-on-surface text-xl font-bold mb-4">データ化スピードプラン（納期オプション）</h2>
                                 <p class="text-sm text-on-surface-variant mb-2">作業スピードに応じて@単価が変動します。ご希望の納期に合わせて選択してください。</p>
-                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="workPlanSelection">
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="dataConversionSpeedSelection">
                                     
                                     <div class="relative">
                                         <input class="sr-only peer" type="radio" id="normalPlan" name="dataConversionSpeed" value="normal" checked>
@@ -93,7 +93,7 @@
                                     </div>
 
                                     <div class="relative">
-                                        <input class="sr-only peer" type="radio" id="superExpressPlan" name="dataConversionSpeed" value="super-express">
+                                        <input class="sr-only peer" type="radio" id="superExpressPlan" name="dataConversionSpeed" value="superExpress">
                                         <label class="flex flex-col items-center p-4 bg-surface-container rounded-lg border border-outline cursor-pointer peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-primary peer-disabled:opacity-50 peer-disabled:cursor-not-allowed" for="superExpressPlan">
                                             <span class="text-on-surface font-semibold">超特急プラン</span>
                                             <span class="text-on-surface-variant text-sm mt-1">納期目安: 1営業日</span>
@@ -101,7 +101,7 @@
                                     </div>
 
                                     <div class="relative">
-                                        <input class="sr-only peer" type="radio" id="ondemandPlan" name="dataConversionSpeed" value="ondemand">
+                                        <input class="sr-only peer" type="radio" id="ondemandPlan" name="dataConversionSpeed" value="onDemand">
                                         <label class="flex flex-col items-center p-4 bg-surface-container rounded-lg border border-outline cursor-pointer peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-primary peer-disabled:opacity-50 peer-disabled:cursor-not-allowed" for="ondemandPlan">
                                             <span class="text-on-surface font-semibold whitespace-nowrap">オンデマンドプラン</span>
                                             <span class="text-on-surface-variant text-sm mt-1">納期目安: 当日中</span>
@@ -112,7 +112,7 @@
 
                             <!-- 見込み枚数 -->
                             <div class="input-group">
-                                <input type="number" id="bizcardRequest" min="1" placeholder=" " class="input-field">
+                                <input type="number" id="bizcardRequest" min="1" placeholder=" " class="input-field" value="100">
                                 <label for="bizcardRequest" class="input-label">見込み枚数</label>
                                 <span class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">枚</span>
                                 <p class="input-error-message"></p>
