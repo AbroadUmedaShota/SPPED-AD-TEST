@@ -116,6 +116,7 @@
                                 <label for="bizcardRequest" class="input-label">見込み枚数</label>
                                 <span class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">枚</span>
                                 <p class="input-error-message"></p>
+                                <p id="minChargeNotice" class="mt-1 text-xs text-error/90 hidden" aria-live="polite"></p>
                             </div>
 
                             <!-- クーポンコード -->
@@ -184,15 +185,7 @@
                         <summary class="cursor-pointer text-on-surface font-semibold">ご請求に関する詳細</summary>
                         <ol class="list-decimal pl-5 text-sm text-on-surface-variant space-y-2 mt-2">
                             <li>ご請求は、実際の件数×データ化単価による実数精算となります。</li>
-                            <li>実際の件数が、想定件数の50％に満たない場合、想定件数の50％分の数量でご請求となります。<div class="mt-1 ml-2">
-                                【例】<br>
-                                想定件数：500件／スタンダード項目プラン＆通常作業プラン：データ化単価＠50円 でご依頼頂き、
-                                <ul class="list-disc pl-5 mt-1">
-                                    <li>実際の件数が700件だった場合、700件×＠50円＝35,000円（＋税）のご請求。</li>
-                                    <li>実際の件数が400件だった場合、400件×＠50円＝20,000円（＋税）のご請求。</li>
-                                    <li>実際の件数が200件だった場合、想定件数の50％に満たない為、想定件数500件×50％×＠50円＝12,500円（＋税）のご請求。</li>
-                                </ul>
-                            </div></li>
+                            <li>最低ご請求数量や金額に関する条件は、上部の「注意書き」および最新の料金表に準じます。</li>
                             <li>クーポンコードを入力頂いた場合、上記「2」のご請求金額に対して、お値引きを行います。</li>
                             <li>ご請求は、データ化完了後にメールでご請求書をお送りします。</li>
                             <li>お支払いは、銀行振込となります。なおお振込み手数料は、お客様のご負担でお願いいたします。</li>

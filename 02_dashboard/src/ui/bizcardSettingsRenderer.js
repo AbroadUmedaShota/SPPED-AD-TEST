@@ -43,6 +43,7 @@ function cacheDOMElements() {
     dom.estimatedAmountSpan = document.getElementById('estimatedAmount');
     dom.estimatedCompletionDateSpan = document.getElementById('estimatedCompletionDate');
     dom.estimateBreakdown = document.getElementById('estimateBreakdown');
+    dom.minChargeNotice = document.getElementById('minChargeNotice');
     dom.saveButton = document.getElementById('saveBizcardSettingsBtn');
     dom.saveButtonText = document.getElementById('saveBizcardSettingsBtnText');
     dom.saveButtonLoading = document.getElementById('saveBizcardSettingsBtnLoading');
@@ -110,6 +111,9 @@ export function renderEstimate(estimate) {
         const couponAmt = estimate.couponAmount ?? 0;
         const couponPct = estimate.couponPercent ?? 0;
         const minCharge = estimate.minCharge ?? 0;
+        const minChargeLine = minCharge > 0
+            ? `<div class="text-xs text-on-surface-variant">＝ ※最低ご請求金額 ¥${minCharge.toLocaleString()}（＋税）</div>`
+            : '';
         dom.estimateBreakdown.innerHTML = `
             <div class="space-y-1">
               <div class="text-xs text-on-surface-variant">ご請求見込み金額</div>
@@ -122,9 +126,22 @@ export function renderEstimate(estimate) {
                 ${cards.toLocaleString()}件 × データ化単価 ${unit.toLocaleString()}円 ー クーポンお値引き ${couponAmt.toLocaleString()}円（${couponPct}%相当）
               </div>
               <div class="text-sm font-semibold text-on-surface">＝ ご請求見込み金額 ¥${estimate.amount.toLocaleString()}（＋税）</div>
-              <div class="text-xs text-on-surface-variant">＝ ※最低ご請求金額 ¥${minCharge.toLocaleString()}（＋税）</div>
+              ${minChargeLine}
             </div>
         `;
+    }
+    if (dom.minChargeNotice) {
+        const requestedCards = estimate.requestedCards ?? 0;
+        const minChargeCards = estimate.minChargeCards ?? (requestedCards > 0 ? Math.ceil(requestedCards * 0.5) : 0);
+        if (requestedCards > 0 && (estimate.minCharge ?? 0) > 0 && minChargeCards > 0) {
+            const cardsText = minChargeCards.toLocaleString();
+            const amountText = (estimate.minCharge ?? 0).toLocaleString();
+            dom.minChargeNotice.textContent = `※ 実際の件数が${cardsText}枚に満たない場合でも${cardsText}枚分（¥${amountText}）をご請求します。`;
+            dom.minChargeNotice.classList.remove('hidden');
+        } else {
+            dom.minChargeNotice.textContent = '';
+            dom.minChargeNotice.classList.add('hidden');
+        }
     }
 }
 
