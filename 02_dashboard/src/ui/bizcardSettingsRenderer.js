@@ -15,15 +15,38 @@ function getLocalizedText(content, lang) {
     return String(content);
 }
 
-function getBadgeToneClass(tone) {
-    switch (tone) {
-        case 'limit':
-            return 'bg-tertiary-container text-on-tertiary-container';
-        case 'info':
-            return 'bg-secondary-container text-on-secondary-container';
-        default:
-            return 'bg-primary-container text-on-primary-container';
+function findPlanByValue(plans, value) {
+    if (!value) return null;
+    return plans.find(plan => plan.value === value) || null;
+}
+
+function dedupeFeatures(features = []) {
+    const seen = new Set();
+    return features.filter(feature => {
+        if (!feature) return false;
+        const key = feature.key || getLocalizedText(feature.text, 'ja');
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+    });
+}
+
+function collectPlanFeatures(plan, plans, visited = new Set()) {
+    if (!plan || visited.has(plan.value)) return [];
+    visited.add(plan.value);
+
+    const ownFeatures = dedupeFeatures([
+        ...(Array.isArray(plan.baseFeatures) ? plan.baseFeatures : []),
+        ...(Array.isArray(plan.additionalFeatures) ? plan.additionalFeatures : [])
+    ]);
+
+    if (!plan.basePlanKey) {
+        return ownFeatures;
     }
+
+    const basePlan = findPlanByValue(plans, plan.basePlanKey);
+    const inherited = collectPlanFeatures(basePlan, plans, visited);
+    return dedupeFeatures([...inherited, ...ownFeatures]);
 }
 
 /**
@@ -203,22 +226,97 @@ export function renderDataConversionPlans(plans, selectedPlan) {
         header.append(title, price);
         label.appendChild(header);
 
-        if (Array.isArray(plan.badges) && plan.badges.length > 0) {
-            const badgeWrapper = document.createElement('div');
-            badgeWrapper.className = 'flex flex-wrap gap-2';
-            plan.badges.forEach(badge => {
-                const badgeEl = document.createElement('span');
-                badgeEl.className = `inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${getBadgeToneClass(badge.tone)}`;
-                badgeEl.textContent = getLocalizedText(badge.text, lang);
-                badgeWrapper.appendChild(badgeEl);
-            });
-            label.appendChild(badgeWrapper);
-        }
-
         const description = document.createElement('p');
         description.className = 'text-sm text-on-surface-variant';
         description.textContent = getLocalizedText(plan.description, lang);
         label.appendChild(description);
+
+        const basePlan = findPlanByValue(plans, plan.basePlanKey);
+        const planName = getLocalizedText(plan.title, lang);
+        const intro = document.createElement('p');
+        intro.className = 'text-sm font-medium text-on-surface';
+        if (basePlan) {
+            const basePlanName = getLocalizedText(basePlan.title, lang);
+            intro.textContent = lang === 'ja'
+                ? `${planName}は${basePlanName}に加えて、次の機能が利用できます。`
+                : `${planName} adds the following on top of ${basePlanName}.`;
+        } else {
+            intro.textContent = lang === 'ja' ? 'このプランで利用可能' : 'Available in this plan';
+        }
+
+        const featureSection = document.createElement('div');
+        featureSection.className = 'space-y-2';
+        featureSection.appendChild(intro);
+
+        const featureList = document.createElement('ul');
+        featureList.className = 'flex flex-wrap gap-2';
+        featureList.setAttribute('role', 'list');
+
+        const featuresToRender = basePlan
+            ? dedupeFeatures(Array.isArray(plan.additionalFeatures) ? plan.additionalFeatures : [])
+            : dedupeFeatures([
+                ...(Array.isArray(plan.baseFeatures) ? plan.baseFeatures : []),
+                ...(Array.isArray(plan.additionalFeatures) ? plan.additionalFeatures : [])
+            ]);
+
+        featuresToRender.forEach(feature => {
+            const item = document.createElement('li');
+            item.className = 'flex';
+            item.setAttribute('role', 'listitem');
+
+            const pill = document.createElement('span');
+            pill.className = [
+                'inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold',
+                basePlan
+                    ? 'bg-secondary-container text-on-secondary-container'
+                    : 'bg-primary-container text-on-primary-container'
+            ].join(' ');
+
+            const badgeLabel = document.createElement('span');
+            badgeLabel.className = 'inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wide';
+            if (basePlan) {
+                badgeLabel.classList.add('bg-primary', 'text-on-primary');
+            } else {
+                badgeLabel.classList.add('bg-secondary', 'text-on-secondary');
+            }
+            badgeLabel.textContent = basePlan ? (lang === 'ja' ? '追加' : 'New') : (lang === 'ja' ? '基本' : 'Included');
+            badgeLabel.setAttribute('aria-hidden', 'true');
+
+            const srPrefix = document.createElement('span');
+            srPrefix.className = 'sr-only';
+            srPrefix.textContent = basePlan
+                ? (lang === 'ja' ? '追加機能: ' : 'Additional feature: ')
+                : (lang === 'ja' ? '含まれる機能: ' : 'Included feature: ');
+
+            const textSpan = document.createElement('span');
+            textSpan.textContent = getLocalizedText(feature.text, lang);
+
+            pill.append(badgeLabel, srPrefix, textSpan);
+            item.appendChild(pill);
+            featureList.appendChild(item);
+        });
+
+        if (featuresToRender.length > 0) {
+            featureSection.appendChild(featureList);
+        }
+
+        if (basePlan) {
+            const inheritedFeatures = collectPlanFeatures(basePlan, plans);
+            if (inheritedFeatures.length > 0) {
+                const srInherited = document.createElement('p');
+                srInherited.className = 'sr-only';
+                const inheritedTexts = inheritedFeatures
+                    .map(feature => getLocalizedText(feature.text, lang))
+                    .filter(Boolean);
+                const basePlanName = getLocalizedText(basePlan.title, lang);
+                srInherited.textContent = lang === 'ja'
+                    ? `${basePlanName}から継承される機能: ${inheritedTexts.join('、')}。`
+                    : `Inherited from ${basePlanName}: ${inheritedTexts.join(', ')}.`;
+                featureSection.appendChild(srInherited);
+            }
+        }
+
+        label.appendChild(featureSection);
 
         const divider = document.createElement('div');
         divider.className = 'border-t border-outline-variant my-2';

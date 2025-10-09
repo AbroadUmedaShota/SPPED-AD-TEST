@@ -19,12 +19,120 @@ import {
 import { showToast } from './utils.js';
 import { showConfirmationModal } from './confirmationModal.js';
 
+const DATA_CONVERSION_FEATURES = {
+    basicFields: {
+        key: 'basic-fields',
+        text: {
+            ja: '対象項目: 氏名 / メールアドレス',
+            en: 'Fields: Name / Email'
+        }
+    },
+    monthlyLimit50: {
+        key: 'monthly-limit-50',
+        text: {
+            ja: '月間50枚まで',
+            en: 'Up to 50 cards / month'
+        }
+    },
+    turnaround6Days: {
+        key: 'turnaround-6-days',
+        text: {
+            ja: '納期目安: 6営業日',
+            en: 'Turnaround: 6 business days'
+        }
+    },
+    retention90Days: {
+        key: 'retention-90-days',
+        text: {
+            ja: 'データ保存期間: 90日間',
+            en: 'Data retention: 90 days'
+        }
+    },
+    extendedFields: {
+        key: 'extended-fields',
+        text: {
+            ja: '対象項目: 氏名 / メール / 会社名 / 部署 / 役職 / 郵便番号 / 住所 / 電話 / 携帯 / Webサイト',
+            en: 'Fields: Name / Email / Company / Department / Title / Zip / Address / Phone / Mobile / Website'
+        }
+    },
+    doubleCheck: {
+        key: 'double-check',
+        text: {
+            ja: '有人ダブルチェックで高精度',
+            en: 'High accuracy with human double-checks'
+        }
+    },
+    socialQrFields: {
+        key: 'social-qr-fields',
+        text: {
+            ja: 'SNS・QRコードなどの追加項目',
+            en: 'Includes social and QR data'
+        }
+    },
+    crmReadyData: {
+        key: 'crm-ready-data',
+        text: {
+            ja: 'CRM連携向けの整形データ',
+            en: 'CRM-ready formatted data'
+        }
+    },
+    sameDaySupport: {
+        key: 'same-day-support',
+        text: {
+            ja: '最短当日納品に対応',
+            en: 'Same-day delivery available'
+        }
+    },
+    unlimitedRetention: {
+        key: 'unlimited-retention',
+        text: {
+            ja: 'データ保存期間: 無期限',
+            en: 'Data retention: Unlimited'
+        }
+    }
+};
+
+const FREE_PLAN_BASE_FEATURES = [
+    DATA_CONVERSION_FEATURES.basicFields,
+    DATA_CONVERSION_FEATURES.monthlyLimit50
+];
+
+const FREE_PLAN_ADDITIONAL_FEATURES = [
+    DATA_CONVERSION_FEATURES.turnaround6Days,
+    DATA_CONVERSION_FEATURES.retention90Days
+];
+
+const STANDARD_PLAN_BASE_FEATURES = [
+    ...FREE_PLAN_BASE_FEATURES,
+    ...FREE_PLAN_ADDITIONAL_FEATURES
+];
+
+const STANDARD_PLAN_ADDITIONAL_FEATURES = [
+    DATA_CONVERSION_FEATURES.extendedFields,
+    DATA_CONVERSION_FEATURES.doubleCheck
+];
+
+const PREMIUM_PLAN_BASE_FEATURES = [
+    ...STANDARD_PLAN_BASE_FEATURES,
+    ...STANDARD_PLAN_ADDITIONAL_FEATURES
+];
+
+const PREMIUM_PLAN_ADDITIONAL_FEATURES = [
+    DATA_CONVERSION_FEATURES.socialQrFields,
+    DATA_CONVERSION_FEATURES.crmReadyData,
+    DATA_CONVERSION_FEATURES.sameDaySupport,
+    DATA_CONVERSION_FEATURES.unlimitedRetention
+];
+
 const DATA_CONVERSION_PLANS = [
     {
         value: 'free',
         title: { ja: 'お試しプラン', en: 'Trial Plan' },
         price: { ja: '¥50/枚', en: '¥50/card' },
         priceNote: { ja: '2項目対応（氏名・メールアドレス）', en: 'Includes 2 fields (Name & Email)' },
+        basePlanKey: null,
+        baseFeatures: [...FREE_PLAN_BASE_FEATURES],
+        additionalFeatures: [...FREE_PLAN_ADDITIONAL_FEATURES],
         badges: [
             { text: { ja: '対象項目: 氏名 / メールアドレス', en: 'Fields: Name / Email' }, tone: 'info' },
             { text: { ja: '月間50枚まで', en: 'Up to 50 cards / month' }, tone: 'limit' }
@@ -43,6 +151,9 @@ const DATA_CONVERSION_PLANS = [
         title: { ja: 'スタンダード', en: 'Standard' },
         price: { ja: '¥50/枚〜', en: '¥50/card〜' },
         priceNote: { ja: '10項目データ化（通常作業 @50円）', en: 'Up to 10 fields (Normal @¥50/card)' },
+        basePlanKey: 'free',
+        baseFeatures: [...STANDARD_PLAN_BASE_FEATURES],
+        additionalFeatures: [...STANDARD_PLAN_ADDITIONAL_FEATURES],
         badges: [
             { text: { ja: '対象項目: 氏名 / メール / 会社名 / 部署 / 役職 / 郵便番号 / 住所 / 電話 / 携帯 / Webサイト', en: 'Fields: Name / Email / Company / Department / Title / Zip / Address / Phone / Mobile / Website' }, tone: 'info' }
         ],
@@ -60,6 +171,9 @@ const DATA_CONVERSION_PLANS = [
         title: { ja: 'プレミアム', en: 'Premium' },
         price: { ja: '要お見積もり', en: 'Custom quote' },
         priceNote: { ja: '月額契約（個別見積り）', en: 'Monthly contract (custom quote)' },
+        basePlanKey: 'standard',
+        baseFeatures: [...PREMIUM_PLAN_BASE_FEATURES],
+        additionalFeatures: [...PREMIUM_PLAN_ADDITIONAL_FEATURES],
         badges: [
             { text: { ja: '対象項目: スタンダード項目 + SNS・QR情報', en: 'Fields: Standard + Social / QR data' }, tone: 'info' }
         ],
