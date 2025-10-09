@@ -43,6 +43,23 @@
     #custom-tutorial-popover {
         z-index: 10002;
     }
+    @media (min-width: 100rem) {
+      .survey-creation-main {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) 18rem;
+        align-items: start;
+        gap: 1.5rem;
+      }
+      .survey-creation-main #survey-content-area {
+        margin-left: auto;
+        margin-right: auto;
+      }
+      #outline-map-container {
+        display: flex !important;
+        position: sticky;
+        top: 4rem;
+      }
+    }
   </style>
 </head>
 <body class="bg-background text-on-background">
@@ -187,7 +204,7 @@
             </div>
           </div>
         </div>
-        <div id="outline-map-container" class="hidden lg:flex lg:col-span-1 lg:sticky lg:top-16 h-[calc(100vh-64px)] w-72 flex-col bg-surface border border-outline-variant rounded-xl p-4 overflow-hidden">
+        <div id="outline-map-container" class="hidden h-[calc(100vh-64px)] w-72 flex-col bg-surface border border-outline-variant rounded-xl p-4 overflow-hidden">
   <div id="outline-map-scroll" class="flex-1 overflow-y-auto">
     <div id="outline-map-list" class="space-y-2"></div>
   </div>
