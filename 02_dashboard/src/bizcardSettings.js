@@ -22,15 +22,16 @@ import { showConfirmationModal } from './confirmationModal.js';
 const DATA_CONVERSION_PLANS = [
     {
         value: 'free',
-        title: { ja: '無料プラン', en: 'Free Plan' },
-        price: { ja: '¥0', en: '¥0' },
+        title: { ja: 'お試しプラン', en: 'Trial Plan' },
+        price: { ja: '¥50/枚', en: '¥50/card' },
         priceNote: { ja: '2項目対応（氏名・メールアドレス）', en: 'Includes 2 fields (Name & Email)' },
         badges: [
-            { text: { ja: '対象項目: 氏名 / メールアドレス', en: 'Fields: Name / Email' }, tone: 'info' }
+            { text: { ja: '対象項目: 氏名 / メールアドレス', en: 'Fields: Name / Email' }, tone: 'info' },
+            { text: { ja: '月間50枚まで', en: 'Up to 50 cards / month' }, tone: 'limit' }
         ],
         description: {
-            ja: '名刺データ化をまずは試したい方向け。OCRによる自動抽出のみ提供します。',
-            en: 'Entry plan with OCR-only extraction for teams trying the service.'
+            ja: '名刺データ化をまずは試したい方向け。',
+            en: 'For those who want to try business card digitization.'
         },
         highlights: [
             { ja: '納期目安: 6営業日', en: 'Turnaround: 6 business days' },
@@ -290,6 +291,22 @@ export function initBizcardSettings() {
         const settingsFields = document.getElementById('bizcardSettingsFields');
         if(settingsFields) {
             settingsFields.classList.remove('hidden');
+        }
+
+        // Speed plan restriction logic
+        const isTrialPlan = state.settings.dataConversionPlan === 'free';
+        const speedOptions = document.querySelectorAll('input[name="dataConversionSpeed"]');
+        
+        speedOptions.forEach(radio => {
+            if (radio.value !== 'normal') {
+                radio.disabled = isTrialPlan;
+            }
+        });
+
+        if (isTrialPlan) {
+            const normalPlanRadio = document.getElementById('normalPlan');
+            if (normalPlanRadio) normalPlanRadio.checked = true;
+            state.settings.dataConversionSpeed = 'normal';
         }
 
         if (!state.settings.dataConversionPlan && DATA_CONVERSION_PLANS.length > 0) {

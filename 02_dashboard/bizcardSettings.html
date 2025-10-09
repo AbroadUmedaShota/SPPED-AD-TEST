@@ -74,8 +74,39 @@
                             <div class="space-y-2">
                                 <h2 class="text-on-surface text-xl font-bold mb-4">データ化スピードプラン（納期オプション）</h2>
                                 <p class="text-sm text-on-surface-variant mb-2">作業スピードに応じて@単価が変動します。ご希望の納期に合わせて選択してください。</p>
-                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="dataConversionSpeedSelection">
-                                    <!-- Speed plan cards will be dynamically inserted here -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="workPlanSelection">
+                                    
+                                    <div class="relative">
+                                        <input class="sr-only peer" type="radio" id="normalPlan" name="dataConversionSpeed" value="normal" checked>
+                                        <label class="flex flex-col items-center p-4 bg-surface-container rounded-lg border border-outline cursor-pointer peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-primary peer-disabled:opacity-50 peer-disabled:cursor-not-allowed" for="normalPlan">
+                                            <span class="text-on-surface font-semibold">通常作業プラン</span>
+                                            <span class="text-on-surface-variant text-sm mt-1">納期目安: 6営業日</span>
+                                        </label>
+                                    </div>
+
+                                    <div class="relative">
+                                        <input class="sr-only peer" type="radio" id="expressPlan" name="dataConversionSpeed" value="express">
+                                        <label class="flex flex-col items-center p-4 bg-surface-container rounded-lg border border-outline cursor-pointer peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-primary peer-disabled:opacity-50 peer-disabled:cursor-not-allowed" for="expressPlan">
+                                            <span class="text-on-surface font-semibold">特急作業プラン</span>
+                                            <span class="text-on-surface-variant text-sm mt-1">納期目安: 3営業日</span>
+                                        </label>
+                                    </div>
+
+                                    <div class="relative">
+                                        <input class="sr-only peer" type="radio" id="superExpressPlan" name="dataConversionSpeed" value="super-express">
+                                        <label class="flex flex-col items-center p-4 bg-surface-container rounded-lg border border-outline cursor-pointer peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-primary peer-disabled:opacity-50 peer-disabled:cursor-not-allowed" for="superExpressPlan">
+                                            <span class="text-on-surface font-semibold">超特急プラン</span>
+                                            <span class="text-on-surface-variant text-sm mt-1">納期目安: 1営業日</span>
+                                        </label>
+                                    </div>
+
+                                    <div class="relative">
+                                        <input class="sr-only peer" type="radio" id="ondemandPlan" name="dataConversionSpeed" value="ondemand">
+                                        <label class="flex flex-col items-center p-4 bg-surface-container rounded-lg border border-outline cursor-pointer peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-primary peer-disabled:opacity-50 peer-disabled:cursor-not-allowed" for="ondemandPlan">
+                                            <span class="text-on-surface font-semibold whitespace-nowrap">オンデマンドプラン</span>
+                                            <span class="text-on-surface-variant text-sm mt-1">納期目安: 当日中</span>
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
 
