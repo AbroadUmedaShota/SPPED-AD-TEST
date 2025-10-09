@@ -236,7 +236,9 @@ export function initBizcardSettings() {
             settingsData.dataConversionPlan = settingsData.dataConversionPlan || 'free';
             settingsData.dataConversionSpeed = settingsData.dataConversionSpeed || 'normal';
             const parsedBizcardRequest = parseInt(settingsData.bizcardRequest, 10);
-            settingsData.bizcardRequest = Number.isFinite(parsedBizcardRequest) ? Math.max(0, parsedBizcardRequest) : 0;
+            settingsData.bizcardRequest = Number.isFinite(parsedBizcardRequest) && parsedBizcardRequest > 0
+                ? parsedBizcardRequest
+                : 100;
 
             const normalizedCouponCode = (settingsData.couponCode || '').trim();
             settingsData.couponCode = normalizedCouponCode;
@@ -288,10 +290,10 @@ export function initBizcardSettings() {
      * Sets up all event listeners for the page.
      */
     function setupEventListeners() {
-        const workPlanSelection = document.getElementById('workPlanSelection');
         const formElements = [
             bizcardRequestInput,
-            dataConversionPlanSelection, dataConversionSpeedSelection, workPlanSelection
+            dataConversionPlanSelection,
+            dataConversionSpeedSelection
         ];
         formElements.forEach(el => {
             if(el) el.addEventListener('change', (e) => handleFormChange(e));
@@ -500,7 +502,7 @@ export function initBizcardSettings() {
         });
 
         if (isTrialPlan) {
-            const normalPlanRadio = document.getElementById('normalPlan');
+            const normalPlanRadio = document.querySelector('input[name="dataConversionSpeed"][value="normal"]');
             if (normalPlanRadio) normalPlanRadio.checked = true;
             state.settings.dataConversionSpeed = 'normal';
         }
@@ -511,7 +513,14 @@ export function initBizcardSettings() {
         if (!state.settings.dataConversionSpeed) {
             state.settings.dataConversionSpeed = 'normal';
         }
-        state.settings.bizcardRequest = Math.max(0, parseInt(state.settings.bizcardRequest, 10) || 0);
+        const parsedBizcardRequest = parseInt(state.settings.bizcardRequest, 10);
+        state.settings.bizcardRequest = Number.isFinite(parsedBizcardRequest) && parsedBizcardRequest > 0
+            ? parsedBizcardRequest
+            : 100;
+
+        if (bizcardRequestInput) {
+            bizcardRequestInput.value = state.settings.bizcardRequest;
+        }
 
         renderDataConversionPlans(DATA_CONVERSION_PLANS, state.settings.dataConversionPlan);
 
