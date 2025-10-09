@@ -11,7 +11,7 @@ async function fetchData() {
     } catch (error) {
         console.error("Could not fetch data:", error);
         // Display an error message on the page
-        const mainContent = document.querySelector('main .max-w-7xl');
+        const mainContent = document.querySelector('main .max-w-6xl');
         if(mainContent) {
             mainContent.innerHTML = `
                 <div class="bg-gray-800 p-6 rounded-lg text-center">
