@@ -206,7 +206,10 @@ export function initBizcardSettings() {
         surveyId: null,
         settings: {},
         initialSettings: {},
-        appliedCoupon: null
+        appliedCoupon: null,
+        isCouponApplied: false,
+        couponButtonMode: 'apply',
+        isCouponProcessing: false
     };
 
     /**
@@ -235,6 +238,32 @@ export function initBizcardSettings() {
             const parsedBizcardRequest = parseInt(settingsData.bizcardRequest, 10);
             settingsData.bizcardRequest = Number.isFinite(parsedBizcardRequest) ? Math.max(0, parsedBizcardRequest) : 0;
 
+            const normalizedCouponCode = (settingsData.couponCode || '').trim();
+            settingsData.couponCode = normalizedCouponCode;
+
+            let initialCouponFeedback = null;
+            if (normalizedCouponCode) {
+                try {
+                    const validation = await validateCoupon(normalizedCouponCode);
+                    if (validation.success) {
+                        state.appliedCoupon = { ...validation, code: normalizedCouponCode };
+                        state.isCouponApplied = true;
+                    } else {
+                        state.appliedCoupon = null;
+                        state.isCouponApplied = false;
+                    }
+                    initialCouponFeedback = validation;
+                } catch (couponError) {
+                    console.error('初期クーポン検証エラー:', couponError);
+                    state.appliedCoupon = null;
+                    state.isCouponApplied = false;
+                    initialCouponFeedback = {
+                        success: false,
+                        message: '保存済みのクーポン確認に失敗しました。再度適用してください。'
+                    };
+                }
+            }
+
             state.settings = settingsData;
             state.surveyData = surveyData; // surveyDataをstateに保存
             // Deep copy for initial state comparison
@@ -242,6 +271,9 @@ export function initBizcardSettings() {
 
             renderSurveyInfo(surveyData, state.surveyId);
             setInitialFormValues(state.settings);
+            if (initialCouponFeedback) {
+                displayCouponResult(initialCouponFeedback);
+            }
 
             setupEventListeners();
             updateFullUI();
@@ -266,6 +298,9 @@ export function initBizcardSettings() {
         });
         if(bizcardRequestInput) bizcardRequestInput.addEventListener('input', (e) => handleFormChange(e));
 
+        if (couponCodeInput) {
+            couponCodeInput.addEventListener('input', handleCouponInputChange);
+        }
         if(applyCouponBtn) applyCouponBtn.addEventListener('click', handleApplyCoupon);
         if(saveButton) saveButton.addEventListener('click', handleSaveSettings);
         if(cancelButton) cancelButton.addEventListener('click', handleCancel);
@@ -342,23 +377,70 @@ export function initBizcardSettings() {
         updateFullUI();
     }
 
+    function handleCouponInputChange() {
+        updateCouponSectionUI();
+    }
+
     /**
      * Handles the coupon application logic.
      */
     async function handleApplyCoupon() {
+        if (state.isCouponProcessing) {
+            return;
+        }
+
+        const currentMode = state.couponButtonMode;
+
+        if (currentMode === 'remove' && state.appliedCoupon) {
+            state.appliedCoupon = null;
+            state.isCouponApplied = false;
+            state.settings.couponCode = '';
+            couponCodeInput.value = '';
+            displayCouponResult({ success: true, message: 'クーポンを削除しました' });
+            updateFullUI();
+            return;
+        }
+
         const code = couponCodeInput.value.trim();
         if (!code) {
             displayCouponResult({ success: false, message: 'クーポンコードを入力してください。' });
             return;
         }
-        const result = await validateCoupon(code);
-        displayCouponResult(result);
-        if (result.success) {
-            state.appliedCoupon = result;
-        } else {
-            state.appliedCoupon = null;
+
+        state.isCouponProcessing = true;
+        updateCouponSectionUI();
+
+        const previousCoupon = state.appliedCoupon;
+
+        try {
+            const result = await validateCoupon(code);
+            displayCouponResult(result);
+            if (result.success) {
+                state.appliedCoupon = { ...result, code };
+                state.settings.couponCode = code;
+            } else {
+                if (previousCoupon && previousCoupon.code && previousCoupon.code !== code) {
+                    state.appliedCoupon = previousCoupon;
+                    state.settings.couponCode = previousCoupon.code;
+                } else {
+                    state.appliedCoupon = null;
+                    state.settings.couponCode = '';
+                }
+            }
+        } catch (error) {
+            console.error('クーポン検証エラー:', error);
+            displayCouponResult({ success: false, message: 'クーポンの検証中にエラーが発生しました。再度お試しください。' });
+            if (previousCoupon && previousCoupon.code) {
+                state.appliedCoupon = previousCoupon;
+                state.settings.couponCode = previousCoupon.code;
+            } else {
+                state.appliedCoupon = null;
+                state.settings.couponCode = '';
+            }
+        } finally {
+            state.isCouponProcessing = false;
+            updateFullUI();
         }
-        updateFullUI();
     }
 
     /**
@@ -450,7 +532,59 @@ export function initBizcardSettings() {
 
         const estimate = calculateEstimate(state.settings, state.appliedCoupon, state.surveyData?.periodEnd);
         renderEstimate(estimate);
+        updateCouponSectionUI();
         validateForm();
+    }
+
+    function updateCouponSectionUI() {
+        if (!couponCodeInput || !applyCouponBtn) {
+            return;
+        }
+
+        const trimmedValue = couponCodeInput.value.trim();
+        const appliedCoupon = state.appliedCoupon;
+        const hasAppliedCoupon = Boolean(appliedCoupon);
+
+        let mode = 'apply';
+        if (hasAppliedCoupon) {
+            const appliedCode = appliedCoupon.code || '';
+            if (trimmedValue && trimmedValue !== appliedCode) {
+                mode = 'change';
+            } else {
+                mode = 'remove';
+            }
+        }
+
+        state.isCouponApplied = hasAppliedCoupon;
+        state.couponButtonMode = mode;
+
+        const labels = {
+            apply: '適用',
+            change: '変更',
+            remove: '削除'
+        };
+        const ariaLabels = {
+            apply: '入力したクーポンコードを適用する',
+            change: '入力したクーポンコードで適用内容を変更する',
+            remove: '適用済みのクーポンを削除する'
+        };
+
+        applyCouponBtn.textContent = labels[mode];
+        applyCouponBtn.setAttribute('aria-label', ariaLabels[mode]);
+        applyCouponBtn.setAttribute('aria-pressed', mode === 'remove' ? 'true' : 'false');
+
+        applyCouponBtn.classList.remove('coupon-action-button--apply', 'coupon-action-button--change', 'coupon-action-button--remove');
+        applyCouponBtn.classList.add(`coupon-action-button--${mode}`);
+
+        applyCouponBtn.disabled = state.isCouponProcessing;
+        applyCouponBtn.setAttribute('aria-busy', state.isCouponProcessing ? 'true' : 'false');
+        couponCodeInput.disabled = state.isCouponProcessing;
+        couponCodeInput.setAttribute('aria-disabled', state.isCouponProcessing ? 'true' : 'false');
+        if (state.isCouponProcessing) {
+            applyCouponBtn.classList.add('is-processing');
+        } else {
+            applyCouponBtn.classList.remove('is-processing');
+        }
     }
 
     // --- Initialize Page ---

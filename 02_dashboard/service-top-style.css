@@ -199,6 +199,60 @@ body.dark-mode {
     color: var(--color-button-primary-text);
 }
 
+.coupon-action-button {
+    background-color: transparent;
+    border: none;
+    box-sizing: border-box;
+    color: inherit;
+    cursor: pointer;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.coupon-action-button:focus {
+    outline: none;
+}
+
+.coupon-action-button:focus-visible {
+    box-shadow: 0 0 0 3px rgba(var(--color-input-border-focus-rgb), 0.35);
+}
+
+.coupon-action-button--apply {
+    background-color: var(--color-button-primary-bg);
+    color: var(--color-button-primary-text);
+}
+
+.coupon-action-button--apply:hover,
+.coupon-action-button--apply:focus-visible {
+    background-color: var(--color-button-primary-hover-bg);
+}
+
+.coupon-action-button--change {
+    background-color: var(--color-button-secondary-bg);
+    color: var(--color-button-secondary-text);
+    border: 1px solid var(--color-button-primary-bg);
+}
+
+.coupon-action-button--change:hover,
+.coupon-action-button--change:focus-visible {
+    background-color: var(--color-button-secondary-hover-bg);
+}
+
+.coupon-action-button--remove {
+    background-color: var(--color-button-danger-bg);
+    color: var(--color-button-danger-text);
+}
+
+.coupon-action-button--remove:hover,
+.coupon-action-button--remove:focus-visible {
+    background-color: var(--color-button-danger-hover-bg);
+    box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.25);
+}
+
+.coupon-action-button.is-processing {
+    cursor: wait;
+    opacity: 0.7;
+}
+
 .button-primary:hover {
     background-color: var(--color-button-primary-hover-bg);
 }
