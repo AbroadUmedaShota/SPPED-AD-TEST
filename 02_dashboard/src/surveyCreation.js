@@ -664,12 +664,14 @@ function updateAndRenderAll() {
         qrButton.disabled = !canOpenQr;
         qrButton.setAttribute('aria-disabled', !canOpenQr ? 'true' : 'false');
         qrButton.classList.toggle('opacity-50', !canOpenQr);
-    }
 
-    if (openQrModalBtn) {
-        openQrModalBtn.addEventListener('click', () => {
-            loadModal('qrCodeModal', setupQrCodeModalListeners);
-        });
+        if (!qrButton.dataset.qrModalListenerAttached) {
+            qrButton.addEventListener('click', () => {
+                if (qrButton.disabled) return;
+                handleOpenModal('qrCodeModal', 'modals/qrCodeModal.html', setupQrCodeModalListeners);
+            });
+            qrButton.dataset.qrModalListenerAttached = 'true';
+        }
     }
 
     updateOutlineActionsState();
