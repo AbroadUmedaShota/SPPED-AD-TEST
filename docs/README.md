@@ -25,9 +25,12 @@
 詳細は各ドキュメントを参照してください。
 
 ## 補助ディレクトリ
-- `docs/guides/`: AI運用メモやローカル開発ガイドなど、方針・手順ドキュメントを格納します。
-- `docs/templates/`: Issue/PR テンプレートの Markdown 置き場です。Pull Request 作成時はここからコピーしてください。
-- `docs/resources/`: クライアント提供資料や提出書式の置き場です。`client-materials/` と `forms/` に分類しています。
+- `docs/design/`: 画面仕様に紐づく UI ガイドラインやコンポーネント統合手順をまとめています。代表例は `docs/design/00_design_guideline.md` と `docs/design/02_UI_COMPONENT_INTEGRATION.md`。
+- `docs/specifications/`: 画面要件や機能仕様を詳細に記載したドキュメント群です。画面遷移を把握したい場合は `docs/specifications/01_screen_flow.md`、調査対象ごとの要件は `docs/specifications/06_speed_review.md` を参照してください。
+- `docs/processes/`: ビジネスプロセスや運用フローを整理した資料です。全体像は `docs/processes/README.md`、個別の業務手順は `docs/processes/04_operator_workflows.md` が入口になります。
+- `docs/resources/`: クライアント提供資料や提出書式の保管場所です。比較資料は `docs/resources/client-materials/service-plan-comparison.md`、フォーム類は `docs/resources/forms/` を参照します。
+- `docs/templates/`: Issue/PR テンプレートの Markdown 置き場です。Pull Request 用には `docs/templates/pr_body.md` を利用してください。
+- `docs/reviews/`: レビュー記録や振り返りメモを格納します。例えば `docs/reviews/bizcard-settings.md` で名刺設定のレビュー結果を確認できます。
 - `tools/`: 変換スクリプトや運用補助スクリプトをまとめています。利用方法は `tools/README.md` を参照してください。
 - `archive/temp/`: 一時ファイルの退避場所です。必要になった場合のみ参照し、基本的には新規作業では利用しません。
 
