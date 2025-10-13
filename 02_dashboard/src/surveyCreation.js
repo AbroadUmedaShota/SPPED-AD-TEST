@@ -10,7 +10,8 @@ import {
     renderAllQuestionGroups,
     displayErrorMessage,
     renderOutlineMap,
-    updateOutlineActionsState
+    updateOutlineActionsState,
+    setOutlinePanelCollapsed
 } from './ui/surveyRenderer.js';
 import { initializeFab } from './ui/fab.js';
 import { initializeDatepickers } from './ui/datepicker.js';
@@ -371,6 +372,38 @@ function initLanguageSwitcher() {
     // initial
     const initial = localStorage.getItem('language') || 'ja';
     setLanguage(initial);
+}
+
+function initOutlinePanelControls() {
+    const outlineContainer = document.getElementById('outline-map-container');
+    if (!outlineContainer) return;
+
+    const collapseButton = document.getElementById('outline-map-collapse-btn');
+    const openButton = document.getElementById('outline-map-open-btn');
+
+    if (collapseButton && collapseButton.dataset.listenerAttached !== 'true') {
+        collapseButton.addEventListener('click', () => {
+            setOutlinePanelCollapsed(true);
+            if (openButton) {
+                openButton.focus();
+            }
+        });
+        collapseButton.dataset.listenerAttached = 'true';
+    }
+
+    if (openButton && openButton.dataset.listenerAttached !== 'true') {
+        openButton.addEventListener('click', () => {
+            setOutlinePanelCollapsed(false);
+            try {
+                outlineContainer.focus({ preventScroll: true });
+            } catch (_) {
+                outlineContainer.focus();
+            }
+        });
+        openButton.dataset.listenerAttached = 'true';
+    }
+
+    setOutlinePanelCollapsed(outlineContainer.dataset.collapsed === 'true');
 }
 
 function updateTabIndicator() {
@@ -1056,6 +1089,7 @@ async function initializePage() {
 
         initThemeToggle();
         initBreadcrumbs();
+        initOutlinePanelControls();
         initLanguageSwitcher();
         // Initialize date pickers for period/deadline fields
         try {

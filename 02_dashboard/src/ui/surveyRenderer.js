@@ -543,59 +543,105 @@ export function renderAllQuestionGroups(groups, uiLang, languageOptions = {}) {
   }
 }
 
-export function renderOutlineMap() {
+export function setOutlinePanelCollapsed(collapsed) {
   const outlineMapContainer = document.getElementById('outline-map-container');
   if (!outlineMapContainer) return;
+
+  const hasItems = outlineMapContainer.dataset.hasItems === 'true';
+  outlineMapContainer.dataset.collapsed = collapsed ? 'true' : 'false';
+
+  if (collapsed || !hasItems) {
+    outlineMapContainer.classList.add('hidden');
+    outlineMapContainer.setAttribute('aria-hidden', 'true');
+  } else {
+    outlineMapContainer.classList.remove('hidden');
+    outlineMapContainer.setAttribute('aria-hidden', 'false');
+  }
+
+  const openButton = document.getElementById('outline-map-open-btn');
+  if (openButton) {
+    const shouldShow = collapsed && hasItems;
+    openButton.classList.toggle('hidden', !shouldShow);
+    openButton.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    openButton.setAttribute('aria-hidden', shouldShow ? 'false' : 'true');
+  }
+
+  const collapseButton = document.getElementById('outline-map-collapse-btn');
+  if (collapseButton) {
+    collapseButton.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+  }
+}
+
+export function renderOutlineMap() {
+  const outlineMapContainer = document.getElementById('outline-map-container');
+  const outlineMapList = document.getElementById('outline-map-list');
+  if (!outlineMapContainer || !outlineMapList) return;
+
+  const outlineEmpty = document.getElementById('outline-map-empty');
 
   const mainContent = document.getElementById('survey-content-area');
   if (!mainContent) return;
 
   const headings = Array.from(mainContent.querySelectorAll('h2, .group-title-input, .question-title'));
-  if (!headings.length) {
-    outlineMapContainer.innerHTML = '';
-    return;
-  }
+  outlineMapList.innerHTML = '';
 
-  let html = '<h3 class="text-lg font-semibold mb-4">目次</h3><ul class="space-y-2">';
-  headings.forEach((h, idx) => {
-    const isQuestion = h.classList.contains('question-title');
-    const isGroup = h.classList.contains('group-title-input');
-    
+  const fragment = document.createDocumentFragment();
+  let hasItems = false;
+
+  headings.forEach((heading, index) => {
+    const isQuestion = heading.classList.contains('question-title');
+    const isGroup = heading.classList.contains('group-title-input');
+
     let targetElement;
     let text;
     let level = 2;
 
     if (isQuestion) {
-        targetElement = h.closest('.question-item');
-        const input = targetElement ? targetElement.querySelector('.question-text-input') : null;
-        text = input ? input.value : (h.textContent || '');
-        level = 3;
+      targetElement = heading.closest('.question-item');
+      const input = targetElement ? targetElement.querySelector('.question-text-input') : null;
+      text = input ? input.value : (heading.textContent || '');
+      level = 3;
     } else if (isGroup) {
-        targetElement = h.closest('.question-group');
-        text = h.value || '';
-        level = 2;
-    } else { // h2
-        targetElement = h;
-        text = h.textContent || '';
-        level = 1;
+      targetElement = heading.closest('.question-group');
+      text = heading.value || '';
+      level = 2;
+    } else {
+      targetElement = heading;
+      text = heading.textContent || '';
+      level = 1;
     }
 
     if (!targetElement) return;
     if (!targetElement.id) {
-      targetElement.id = `section-gen-${idx}`;
+      targetElement.id = `section-gen-${index}`;
     }
 
-    const paddingLeft = (level - 1) * 16;
-    if (!text.trim()) return;
+    if (!text || !text.trim()) return;
 
-    html += `
-      <li>
-        <a href="#${targetElement.id}" class="block text-on-surface-variant hover:text-primary text-sm truncate" style="padding-left: ${paddingLeft}px;" title="${text}">${text}</a>
-      </li>
-    `;
+    const paddingLeft = (level - 1) * 16;
+
+    const item = document.createElement('li');
+    const link = document.createElement('a');
+    link.href = `#${targetElement.id}`;
+    link.className = 'flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-on-surface-variant transition-colors hover:bg-primary/10 hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary';
+    link.style.paddingLeft = `${paddingLeft}px`;
+    link.textContent = text;
+    link.title = text;
+
+    item.appendChild(link);
+    fragment.appendChild(item);
+    hasItems = true;
   });
-  html += '</ul>';
-  outlineMapContainer.innerHTML = html;
+
+  outlineMapList.appendChild(fragment);
+  outlineMapList.classList.toggle('hidden', !hasItems);
+
+  if (outlineEmpty) {
+    outlineEmpty.classList.toggle('hidden', hasItems);
+  }
+
+  outlineMapContainer.dataset.hasItems = hasItems ? 'true' : 'false';
+  setOutlinePanelCollapsed(outlineMapContainer.dataset.collapsed === 'true');
 }
 
 export function displayErrorMessage() {

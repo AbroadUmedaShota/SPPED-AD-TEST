@@ -43,21 +43,30 @@
     #custom-tutorial-popover {
         z-index: 10002;
     }
-    @media (min-width: 100rem) {
-      .survey-creation-main {
-        display: grid !important;
-        grid-template-columns: minmax(0, 1fr) 18rem;
-        align-items: start;
-        gap: 1.5rem;
-      }
-      .survey-creation-main #survey-content-area {
-        margin-left: auto;
-        margin-right: auto;
-      }
-      #outline-map-container {
-        display: flex !important;
-        position: sticky;
-        top: 4rem;
+    .outline-floating-panel {
+      position: fixed;
+      top: 6rem;
+      right: 1.5rem;
+      width: min(22rem, calc(100vw - 3rem));
+      max-height: calc(100vh - 7rem);
+      box-shadow: 0 24px 55px rgba(15, 23, 42, 0.18);
+      backdrop-filter: blur(12px);
+      z-index: 70;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    .outline-floating-panel.hidden {
+      display: none;
+    }
+
+    @media (max-width: 1023px) {
+      .outline-floating-panel {
+        top: auto;
+        bottom: 1rem;
+        right: 1rem;
+        left: 1rem;
+        width: auto;
+        max-height: min(32rem, calc(100vh - 6rem));
       }
     }
   </style>
@@ -78,149 +87,166 @@
       <div id="sidebar-placeholder"></div>
 
       <!-- Main Content -->
-      <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8 lg:grid lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start lg:gap-6">
-        <div id="survey-content-area" class="flex flex-col w-full max-w-6xl mx-auto flex-1 lg:mx-0 lg:col-span-1">
-          <!-- Breadcrumb -->
-          <div id="breadcrumb-container" class="mb-4"></div>
+      <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8">
+        <div class="survey-creation-main w-full max-w-5xl mx-auto flex flex-col gap-6">
+          <div id="survey-content-area" class="flex flex-col w-full max-w-4xl mx-auto flex-1">
+            <!-- Breadcrumb -->
+            <div id="breadcrumb-container" class="mb-4"></div>
 
-          <!-- Title Area -->
-          <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant" id="surveyTitleArea">
-            <h1 class="text-on-background text-2xl sm:text-3xl font-bold leading-tight tracking-tight">アンケート作成・編集</h1>
-          </div>
-
-          <!-- Form Card -->
-          <div class="bg-surface p-6 rounded-xl space-y-6">
-            <!-- 基本情報 -->
-            <div class="accordion-item border border-outline-variant rounded-lg mb-4">
-              <div class="accordion-header flex justify-between items-center cursor-pointer p-4 bg-surface-variant rounded-t-lg" data-accordion-target="basicInfoContent">
-                <h2 id="section-basic-info" class="text-on-surface text-xl font-semibold">基本情報</h2>
-                <span class="material-icons expand-icon">expand_less</span>
-              </div>
-              <div id="basicInfoContent" class="accordion-content p-4 space-y-6">
-                <section id="language-settings-section" class="space-y-4" data-pro-only="true">
-                  <div>
-                    <h3 class="text-on-surface text-lg font-semibold">追加言語</h3>
-                    <p class="text-sm text-on-surface-variant mb-2">アンケートで利用する言語を選択してください。</p>
-                    <div id="languageSelectionPanel" class="flex flex-wrap gap-2" role="group" aria-label="追加言語"></div>
-                  </div>
-                  <div class="mt-4">
-                     <h3 class="text-on-surface text-lg font-semibold">入力言語</h3>
-                     <p class="text-sm text-on-surface-variant mb-2">各項目のテキストを入力する言語を選択してください。</p>
-                    <div class="relative border-b border-outline-variant">
-                      <div id="languageEditorTabs" class="relative flex items-center gap-4" role="tablist" aria-label="入力言語タブ"></div>
-                      <span id="language-tab-indicator" class="absolute bottom-0 h-0.5 bg-primary transition-all duration-300"></span>
-                    </div>
-                  </div>
-                </section>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <!-- アンケート名（管理用）: 多言語 -->
-                  <div class="multi-lang-input-group" data-field-key="surveyName" data-input-type="input" data-label="アンケート名（管理用）" data-placeholder-ja="(例) 新製品調査" data-required="true">
-                    <div class="input-group" data-lang="ja">
-                      <input type="text" id="surveyName_ja" placeholder="(例) 新製品調査" class="input-field" required aria-required="true" aria-describedby="surveyNameError">
-                      <label for="surveyName_ja" class="input-label">アンケート名（管理用）<span class="text-error">*</span></label>
-                    </div>
-                    <div id="surveyNameError" class="error-message text-error text-sm mt-1 hidden" aria-live="polite">この入力は必須です</div>
-                  </div>
-
-                  <!-- 表示タイトル: 多言語 -->
-                  <div class="multi-lang-input-group" data-field-key="displayTitle" data-input-type="input" data-label="表示タイトル" data-placeholder-ja="(例) 新製品に関する満足度を教えてください" data-required="true">
-                    <div class="input-group" data-lang="ja">
-                      <input type="text" id="displayTitle_ja" placeholder="(例) 新製品に関する満足度を教えてください" class="input-field" required aria-required="true" aria-describedby="displayTitleError">
-                      <label for="displayTitle_ja" class="input-label">表示タイトル<span class="text-error">*</span></label>
-                    </div>
-                    <div id="displayTitleError" class="error-message text-error text-sm mt-1 hidden" aria-live="polite">この入力は必須です</div>
-                  </div>
-
-                  <!-- 説明: 多言語 -->
-                  <div class="multi-lang-input-group md:col-span-2" data-field-key="description" data-input-type="textarea" data-label="説明" data-placeholder-ja="(例) 本調査は新サービスの改善のためにご協力をお願いします。">
-                    <div class="input-group" data-lang="ja">
-                      <textarea id="description_ja" placeholder="(例) 本調査は新サービスの改善のためにご協力をお願いします。" class="input-field h-24 resize-y" aria-describedby="descriptionError"></textarea>
-                      <label for="description_ja" class="input-label">説明</label>
-                    </div>
-                    <div id="descriptionError" class="error-message text-error text-sm mt-1 hidden" aria-live="polite">この入力は必須です</div>
-                  </div>
-
-                  <!-- 期間 -->
-                  <div class="input-group md:col-span-2">
-                    <div class="relative">
-                        <input type="text" id="periodRange" class="input-field pr-10" placeholder=" " required aria-required="true" aria-describedby="periodRangeError">
-                        <label for="periodRange" class="input-label">アンケート期間<span class="text-error">*</span></label>
-                        <span role="button" tabindex="0" class="material-icons absolute top-1/2 right-3 -translate-y-1/2 text-on-surface-variant cursor-pointer">calendar_today</span>
-                    </div>
-                    <div id="periodRangeError" class="error-message text-error text-sm mt-1 hidden" aria-live="polite">この入力は必須です</div>
-                  </div>
-
-                  <!-- 選択中の作業プラン -->
-                  <div class="input-group md:col-span-2">
-                    <div id="selectedBizcardPlan" class="input-field-static font-semibold text-on-surface">未設定</div>
-                    <label class="input-label-static">名刺データ化プラン</label>
-                  </div>
-
-
-                </div>
-              </div>
+            <!-- Title Area -->
+            <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant" id="surveyTitleArea">
+              <h1 class="text-on-background text-2xl sm:text-3xl font-bold leading-tight tracking-tight">アンケート作成・編集</h1>
             </div>
 
-            <!-- 追加設定 -->
-            <section>
-              <h2 id="section-additional-settings" class="text-on-surface text-xl font-semibold mb-4">追加設定</h2>
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="input-group">
-                  <button type="button" id="openBizcardSettingsBtn" class="additional-settings-button min-w-[100px] px-6 py-3 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors">名刺データ設定</button>
+            <!-- Form Card -->
+            <div class="bg-surface p-6 rounded-xl space-y-6">
+              <!-- 基本情報 -->
+              <div class="accordion-item border border-outline-variant rounded-lg mb-4">
+                <div class="accordion-header flex justify-between items-center cursor-pointer p-4 bg-surface-variant rounded-t-lg" data-accordion-target="basicInfoContent">
+                  <h2 id="section-basic-info" class="text-on-surface text-xl font-semibold">基本情報</h2>
+                  <span class="material-icons expand-icon">expand_less</span>
                 </div>
-                <div class="input-group">
-                  <button type="button" id="openThankYouEmailSettingsBtn" class="additional-settings-button min-w-[100px] px-6 py-3 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors">お礼メール設定</button>
-                </div>
-                <div class="input-group">
-                  <button type="button" id="openThankYouScreenSettingsBtn" class="additional-settings-button text-center min-w-[100px] px-6 py-3 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors">サンクス画面設定</button>
+                <div id="basicInfoContent" class="accordion-content p-4 space-y-6">
+                  <section id="language-settings-section" class="space-y-4" data-pro-only="true">
+                    <div>
+                      <h3 class="text-on-surface text-lg font-semibold">追加言語</h3>
+                      <p class="text-sm text-on-surface-variant mb-2">アンケートで利用する言語を選択してください。</p>
+                      <div id="languageSelectionPanel" class="flex flex-wrap gap-2" role="group" aria-label="追加言語"></div>
+                    </div>
+                    <div class="mt-4">
+                       <h3 class="text-on-surface text-lg font-semibold">入力言語</h3>
+                       <p class="text-sm text-on-surface-variant mb-2">各項目のテキストを入力する言語を選択してください。</p>
+                      <div class="relative border-b border-outline-variant">
+                        <div id="languageEditorTabs" class="relative flex items-center gap-4" role="tablist" aria-label="入力言語タブ"></div>
+                        <span id="language-tab-indicator" class="absolute bottom-0 h-0.5 bg-primary transition-all duration-300"></span>
+                      </div>
+                    </div>
+                  </section>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- アンケート名（管理用）: 多言語 -->
+                    <div class="multi-lang-input-group" data-field-key="surveyName" data-input-type="input" data-label="アンケート名（管理用）" data-placeholder-ja="(例) 新製品調査" data-required="true">
+                      <div class="input-group" data-lang="ja">
+                        <input type="text" id="surveyName_ja" placeholder="(例) 新製品調査" class="input-field" required aria-required="true" aria-describedby="surveyNameError">
+                        <label for="surveyName_ja" class="input-label">アンケート名（管理用）<span class="text-error">*</span></label>
+                      </div>
+                      <div id="surveyNameError" class="error-message text-error text-sm mt-1 hidden" aria-live="polite">この入力は必須です</div>
+                    </div>
+
+                    <!-- 表示タイトル: 多言語 -->
+                    <div class="multi-lang-input-group" data-field-key="displayTitle" data-input-type="input" data-label="表示タイトル" data-placeholder-ja="(例) 新製品に関する満足度を教えてください" data-required="true">
+                      <div class="input-group" data-lang="ja">
+                        <input type="text" id="displayTitle_ja" placeholder="(例) 新製品に関する満足度を教えてください" class="input-field" required aria-required="true" aria-describedby="displayTitleError">
+                        <label for="displayTitle_ja" class="input-label">表示タイトル<span class="text-error">*</span></label>
+                      </div>
+                      <div id="displayTitleError" class="error-message text-error text-sm mt-1 hidden" aria-live="polite">この入力は必須です</div>
+                    </div>
+
+                    <!-- 説明: 多言語 -->
+                    <div class="multi-lang-input-group md:col-span-2" data-field-key="description" data-input-type="textarea" data-label="説明" data-placeholder-ja="(例) 本調査は新サービスの改善のためにご協力をお願いします。">
+                      <div class="input-group" data-lang="ja">
+                        <textarea id="description_ja" placeholder="(例) 本調査は新サービスの改善のためにご協力をお願いします。" class="input-field h-24 resize-y" aria-describedby="descriptionError"></textarea>
+                        <label for="description_ja" class="input-label">説明</label>
+                      </div>
+                      <div id="descriptionError" class="error-message text-error text-sm mt-1 hidden" aria-live="polite">この入力は必須です</div>
+                    </div>
+
+                    <!-- 期間 -->
+                    <div class="input-group md:col-span-2">
+                      <div class="relative">
+                          <input type="text" id="periodRange" class="input-field pr-10" placeholder=" " required aria-required="true" aria-describedby="periodRangeError">
+                          <label for="periodRange" class="input-label">アンケート期間<span class="text-error">*</span></label>
+                          <span role="button" tabindex="0" class="material-icons absolute top-1/2 right-3 -translate-y-1/2 text-on-surface-variant cursor-pointer">calendar_today</span>
+                      </div>
+                      <div id="periodRangeError" class="error-message text-error text-sm mt-1 hidden" aria-live="polite">この入力は必須です</div>
+                    </div>
+
+                    <!-- 選択中の作業プラン -->
+                    <div class="input-group md:col-span-2">
+                      <div id="selectedBizcardPlan" class="input-field-static font-semibold text-on-surface">未設定</div>
+                      <label class="input-label-static">名刺データ化プラン</label>
+                    </div>
+
+
+                  </div>
                 </div>
               </div>
-            </section>
 
-            <!-- メモ -->
-            <section>
-              <h2 id="section-memo" class="text-on-surface text-xl font-semibold mb-4">メモ</h2>
-              <div class="input-group">
-                <textarea id="memo" placeholder=" " class="input-field h-24 resize-y"></textarea>
-                <label for="memo" class="input-label">メモ</label>
+              <!-- 追加設定 -->
+              <section>
+                <h2 id="section-additional-settings" class="text-on-surface text-xl font-semibold mb-4">追加設定</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div class="input-group">
+                    <button type="button" id="openBizcardSettingsBtn" class="additional-settings-button min-w-[100px] px-6 py-3 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors">名刺データ設定</button>
+                  </div>
+                  <div class="input-group">
+                    <button type="button" id="openThankYouEmailSettingsBtn" class="additional-settings-button min-w-[100px] px-6 py-3 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors">お礼メール設定</button>
+                  </div>
+                  <div class="input-group">
+                    <button type="button" id="openThankYouScreenSettingsBtn" class="additional-settings-button text-center min-w-[100px] px-6 py-3 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors">サンクス画面設定</button>
+                  </div>
+                </div>
+              </section>
+
+              <!-- メモ -->
+              <section>
+                <h2 id="section-memo" class="text-on-surface text-xl font-semibold mb-4">メモ</h2>
+                <div class="input-group">
+                  <textarea id="memo" placeholder=" " class="input-field h-24 resize-y"></textarea>
+                  <label for="memo" class="input-label">メモ</label>
+                </div>
+              </section>
+
+              <!-- 設問設定 -->
+              <section>
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+                  <h2 id="section-question-settings" class="text-on-surface text-xl font-semibold">設問設定</h2>
+                  <button type="button" id="addNewGroupBtn" class="min-w-[140px] px-4 py-2 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors hover:bg-secondary-container/80">設問グループを追加</button>
+                </div>
+                <div id="questionGroupsContainer" class="space-y-6 mb-6"></div>
+              </section>
+
+              <!-- Actions -->
+              <div class="flex justify-end gap-4 pt-4">
+                <button type="button" id="showPreviewBtn" class="min-w-[100px] px-6 py-3 rounded-full bg-secondary text-on-secondary font-semibold transition-colors">プレビュー表示</button>
+                <button type="button" id="openQrModalBtn" class="min-w-[100px] px-6 py-3 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors" disabled>QRコード</button>
+                <button type="button" id="cancelCreateSurvey" class="min-w-[100px] px-6 py-3 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors">キャンセル</button>
+                <button type="button" id="createSurveyBtn" class="min-w-[100px] px-6 py-3 rounded-full bg-primary text-on-primary font-semibold transition-colors shadow-md" disabled>アンケート保存</button>
               </div>
-            </section>
-
-            <!-- 設問設定 -->
-            <section>
-              <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
-                <h2 id="section-question-settings" class="text-on-surface text-xl font-semibold">設問設定</h2>
-                <button type="button" id="addNewGroupBtn" class="min-w-[140px] px-4 py-2 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors hover:bg-secondary-container/80">設問グループを追加</button>
+            </div>
+          </div>
+          <div id="outline-map-container" role="complementary" aria-label="アンケート目次" aria-hidden="true" tabindex="-1" data-collapsed="false" data-has-items="false" class="outline-floating-panel hidden flex-col bg-surface border border-outline-variant rounded-2xl overflow-hidden">
+            <div class="flex items-start justify-between gap-3 border-b border-outline-variant/60 px-5 py-4">
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-wide text-on-surface-variant">ナビゲーション</p>
+                <h3 class="text-on-surface text-lg font-bold leading-snug">目次</h3>
               </div>
-              <div id="questionGroupsContainer" class="space-y-6 mb-6"></div>
-            </section>
-
-            <!-- Actions -->
-            <div class="flex justify-end gap-4 pt-4">
-              <button type="button" id="showPreviewBtn" class="min-w-[100px] px-6 py-3 rounded-full bg-secondary text-on-secondary font-semibold transition-colors">プレビュー表示</button>
-              <button type="button" id="openQrModalBtn" class="min-w-[100px] px-6 py-3 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors" disabled>QRコード</button>
-              <button type="button" id="cancelCreateSurvey" class="min-w-[100px] px-6 py-3 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors">キャンセル</button>
-              <button type="button" id="createSurveyBtn" class="min-w-[100px] px-6 py-3 rounded-full bg-primary text-on-primary font-semibold transition-colors shadow-md" disabled>アンケート保存</button>
+              <button type="button" id="outline-map-collapse-btn" aria-label="目次を閉じる" aria-expanded="true" class="inline-flex items-center justify-center rounded-full p-1.5 text-on-surface-variant hover:bg-surface-variant focus:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+                <span class="material-icons text-base">close</span>
+              </button>
+            </div>
+            <div id="outline-map-scroll" class="flex-1 overflow-y-auto px-5 py-4">
+              <p id="outline-map-empty" class="text-sm text-on-surface-variant/80">まだ目次に表示できる項目がありません。</p>
+              <ul id="outline-map-list" class="space-y-1 hidden" role="list"></ul>
+            </div>
+            <div id="outline-action-buttons" class="px-5 pb-5 space-y-2 hidden">
+              <button type="button" data-outline-action="preview" class="w-full inline-flex items-center justify-center gap-2 rounded-full border border-outline-variant px-4 py-2 text-sm font-semibold text-on-surface hover:bg-surface-variant transition-colors">
+                <span class="material-icons text-base">visibility</span>
+                <span>プレビュー表示</span>
+              </button>
+              <button type="button" data-outline-action="save" class="w-full inline-flex items-center justify-center gap-2 rounded-full bg-primary text-on-primary px-4 py-2 text-sm font-semibold shadow-sm hover:bg-primary-dark transition-colors">
+                <span class="material-icons text-base">save</span>
+                <span>アンケート保存</span>
+              </button>
             </div>
           </div>
         </div>
-        <div id="outline-map-container" class="hidden h-[calc(100vh-64px)] w-72 flex-col bg-surface border border-outline-variant rounded-xl p-4 overflow-hidden">
-  <div id="outline-map-scroll" class="flex-1 overflow-y-auto">
-    <div id="outline-map-list" class="space-y-2"></div>
-  </div>
-  <div id="outline-action-buttons" class="mt-4 space-y-2 hidden">
-    <button type="button" data-outline-action="preview" class="w-full inline-flex items-center justify-center gap-2 rounded-full border border-outline-variant px-4 py-2 text-sm font-semibold text-on-surface hover:bg-surface-variant transition-colors">
-      <span class="material-icons text-base">visibility</span>
-      <span>プレビュー表示</span>
-    </button>
-    <button type="button" data-outline-action="save" class="w-full inline-flex items-center justify-center gap-2 rounded-full bg-primary text-on-primary px-4 py-2 text-sm font-semibold shadow-sm hover:bg-primary-dark transition-colors">
-      <span class="material-icons text-base">save</span>
-      <span>アンケート保存</span>
-    </button>
-  </div>
-</div>
       </main>
     </div>
+
+    <button id="outline-map-open-btn" type="button" aria-label="目次を開く" aria-expanded="false" aria-controls="outline-map-container" aria-hidden="true" class="fixed bottom-28 right-8 z-[9998] inline-flex items-center gap-2 rounded-full border border-outline-variant bg-surface px-4 py-2 text-sm font-semibold text-on-surface shadow-lg transition-colors hover:bg-surface-variant focus:outline-none focus-visible:ring-2 focus-visible:ring-primary hidden">
+      <span class="material-icons text-base">menu_book</span>
+      <span>目次を開く</span>
+    </button>
 
     <div id="fab-container" class="fixed bottom-8 right-8 z-[9999]">
     <button id="fab-main-button" class="w-16 h-16 bg-primary text-on-primary rounded-full flex items-center justify-center shadow-lg hover:bg-primary-dark transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-4 focus:ring-primary-container">
