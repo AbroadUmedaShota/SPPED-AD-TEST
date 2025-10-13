@@ -1,205 +1,220 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>請求書詳細 - アンケート管理ダッシュボード</title>
-    <link rel="icon" href="assets/svg/speedad_logo.svg" type="image/svg+xml">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" href="service-top-style.css">
-    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
-    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
-    <style>
-        /* Custom styles for invoice detail page */
-        .invoice-section {
-            background-color: white;
-            border-radius: 0.5rem;
-            border: 1px solid #e5e7eb;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-        .invoice-section h2 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: #333;
-        }
-        .invoice-info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-        }
-        .invoice-info-item p {
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-            color: #555;
-        }
-        .invoice-info-item strong {
-            color: #333;
-        }
-        .invoice-table-container {
-            overflow-x: auto;
-        }
-        .invoice-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-        }
-        .invoice-table th, .invoice-table td {
-            border: 1px solid #e5e7eb;
-            padding: 0.75rem;
-            text-align: left;
-            font-size: 0.9rem;
-        }
-        .invoice-table th {
-            background-color: #f8f9fa;
-            font-weight: 600;
-            color: #333;
-        }
-        .invoice-table tfoot tr:last-child {
-            background-color: #f0f0f0;
-            font-weight: bold;
-        }
-        .invoice-table .text-right {
-            text-align: right;
-        }
-        .invoice-table .font-bold {
-            font-weight: bold;
-        }
-        .message-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(255, 255, 255, 0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-        }
-        .message-overlay p {
-            font-size: 1.2rem;
-            color: #666;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>請求書詳細 - SPEED AD</title>
+  <link rel="icon" href="assets/svg/speedad_logo.svg" type="image/svg+xml">
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="service-top-style.css">
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+  <link
+    as="style"
+    href="https://fonts.googleapis.com/css2?display=swap&family=Inter:wght@400;500;700;900&family=Noto+Sans+JP:wght@400;500;700;900"
+    onload="this.rel='stylesheet'"
+    rel="stylesheet">
+  <style>
+    .invoice-section {
+      background-color: white;
+      border-radius: 0.75rem;
+      border: 1px solid var(--outline-variant, #e5e7eb);
+      padding: 1.75rem;
+      margin-bottom: 1.75rem;
+    }
+    .invoice-info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem 1.5rem;
+    }
+    .invoice-table-container {
+      overflow-x: auto;
+    }
+    .invoice-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .invoice-table th,
+    .invoice-table td {
+      border: 1px solid var(--outline-variant, #e5e7eb);
+      padding: 0.75rem;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+    .invoice-table th {
+      background-color: var(--surface-variant, #f4f4f5);
+      font-weight: 600;
+    }
+    .invoice-table tfoot tr > th {
+      text-align: right;
+    }
+    .message-overlay {
+      position: absolute;
+      inset: 0;
+      background-color: rgba(255, 255, 255, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+  </style>
 </head>
-<body class="bg-background text-on-background">
-
-<div class="relative flex min-h-screen flex-col overflow-x-hidden">
+<body class="bg-background text-on-background" data-page-id="invoice-detail">
+  <div class="relative flex min-h-screen flex-col overflow-x-hidden">
     <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
     <div id="header-placeholder"></div>
 
     <div class="flex flex-1 pt-16 bg-background">
-        <div id="sidebar-placeholder"></div>
-        <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
-            <div class="flex flex-col w-full max-w-6xl mx-auto flex-1">
-                <div id="breadcrumb-container" class="mb-4"></div>
-                
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h1 class="text-on-background text-2xl sm:text-3xl font-bold leading-tight tracking-tight">請求書詳細</h1>
-                    <div>
-                        <button class="btn btn-outline-secondary" id="printInvoiceBtn"><i class="bi bi-printer"></i> 印刷</button>
-                        <button class="btn btn-primary" id="downloadPdfBtn"><i class="bi bi-download"></i> PDFダウンロード</button>
-                    </div>
-                </div>
+      <div id="sidebar-placeholder"></div>
 
-                <!-- ローディング表示 -->
-                <div id="invoice-detail-loading-overlay" class="message-overlay hidden">
-                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-                </div>
-                <!-- エラー/データなしメッセージ -->
-                <div id="invoice-detail-message-overlay" class="message-overlay hidden">
-                    <p class="text-on-surface-variant text-lg"></p>
-                </div>
+      <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
+        <div class="flex flex-col w-full max-w-6xl mx-auto flex-1">
+          <div id="breadcrumb-container" class="mb-4"></div>
 
-                <!-- 請求書情報セクション -->
-                <div class="invoice-section">
-                    <h2>請求書情報</h2>
-                    <div class="invoice-info-grid">
-                        <div class="invoice-info-item">
-                            <p><strong>請求書番号:</strong> <span id="invoice-number"></span></p>
-                            <p><strong>発行日:</strong> <span id="issue-date"></span></p>
-                            <p><strong>支払期限:</strong> <span id="due-date"></span></p>
-                        </div>
-                        <div class="invoice-info-item">
-                            <p><strong>請求先:</strong> <span id="corporate-name"></span> 御中</p>
-                            <p><strong>ご担当者様:</strong> <span id="contact-person"></span> 様</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 請求明細セクション -->
-                <div class="invoice-section invoice-table-container">
-                    <h2>請求明細</h2>
-                    <table class="invoice-table">
-                        <thead>
-                            <tr>
-                                <th>No.</th>
-                                <th>品名1</th>
-                                <th>品名2</th>
-                                <th class="text-right">数量</th>
-                                <th class="text-right">単価</th>
-                                <th class="text-right">金額</th>
-                            </tr>
-                        </thead>
-                        <tbody id="invoice-items-table-body">
-                            <!-- JSにより動的に行が挿入されます -->
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <th colspan="5" class="text-right">小計(課税対象)</th>
-                                <td class="text-right" id="subtotal-taxable"></td>
-                            </tr>
-                            <tr>
-                                <th colspan="5" class="text-right">消費税等</th>
-                                <td class="text-right" id="tax-amount"></td>
-                            </tr>
-                            <tr>
-                                <th colspan="5" class="text-right">小計(非課税)</th>
-                                <td class="text-right" id="subtotal-non-taxable"></td>
-                            </tr>
-                            <tr>
-                                <th colspan="5" class="text-right font-bold">合計ご請求金額 (税込)</th>
-                                <td class="text-right font-bold" id="total-amount"></td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-
-                <!-- 振込先情報セクション -->
-                <div class="invoice-section">
-                    <h2>振込先情報</h2>
-                    <div class="invoice-info-grid">
-                        <div class="invoice-info-item">
-                            <p><strong>金融機関名:</strong> <span id="bank-name"></span></p>
-                            <p><strong>支店名:</strong> <span id="branch-name"></span></p>
-                            <p><strong>口座種類:</strong> <span id="account-type"></span></p>
-                        </div>
-                        <div class="invoice-info-item">
-                            <p><strong>口座番号:</strong> <span id="account-number"></span></p>
-                            <p><strong>口座名義:</strong> <span id="account-holder"></span></p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 注意事項セクション -->
-                <div class="invoice-section">
-                    <h2>注意事項</h2>
-                    <p class="text-sm text-on-surface-variant">※お振込手数料は御社でご負担頂けますようお願い申し上げます。</p>
-                    <p class="text-sm text-on-surface-variant">※お支払期日が休日の場合、前営業日までにお支払いください。</p>
-                </div>
-
+          <header class="flex flex-wrap gap-4 justify-between items-center mb-6 pb-4 border-b border-outline-variant">
+            <div>
+              <h1 class="text-on-background text-2xl sm:text-3xl font-bold leading-tight tracking-tight">請求書詳細</h1>
+              <p class="text-sm text-on-surface-variant mt-2">
+                契約プランごとの請求内容と明細、振込先を確認できます。
+              </p>
             </div>
-        </main>
-    </div>
-    <div id="footer-placeholder"></div>
-</div>
+            <div class="flex gap-2 items-center">
+              <span id="invoice-status-badge"></span>
+              <button class="button-secondary inline-flex items-center px-3 py-1 text-sm font-semibold rounded-md" id="printInvoiceBtn">
+                <span class="material-icons text-base mr-1 align-middle">print</span>印刷
+              </button>
+              <button class="button-primary inline-flex items-center px-3 py-1 text-sm font-semibold rounded-md" id="downloadPdfBtn">
+                <span class="material-icons text-base mr-1 align-middle">download</span>帳票ダウンロード
+              </button>
+            </div>
+          </header>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script type="module" src="src/main.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+          <div id="invoice-detail-container" class="relative">
+            <div id="invoice-detail-loading-overlay" class="message-overlay hidden">
+              <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            </div>
+            <div id="invoice-detail-message-overlay" class="message-overlay hidden">
+              <p class="text-on-surface-variant text-lg"></p>
+            </div>
+
+            <section class="invoice-section">
+              <h2 class="text-lg font-semibold text-on-surface mb-4">請求情報</h2>
+              <div class="invoice-info-grid">
+                <div>
+                  <p class="text-xs text-on-surface-variant uppercase tracking-wide">請求書番号</p>
+                  <p id="invoice-number" class="text-base font-medium mt-1">-</p>
+                </div>
+                <div>
+                  <p class="text-xs text-on-surface-variant uppercase tracking-wide">請求日</p>
+                  <p id="issue-date" class="text-base mt-1">-</p>
+                </div>
+                <div>
+                  <p class="text-xs text-on-surface-variant uppercase tracking-wide">支払期限</p>
+                  <p id="due-date" class="text-base mt-1">-</p>
+                </div>
+                <div>
+                  <p class="text-xs text-on-surface-variant uppercase tracking-wide">対象期間</p>
+                  <p id="billing-period" class="text-base mt-1">-</p>
+                </div>
+                <div>
+                  <p class="text-xs text-on-surface-variant uppercase tracking-wide">契約プラン</p>
+                  <p id="plan-summary" class="text-base mt-1">-</p>
+                </div>
+                <div>
+                  <p class="text-xs text-on-surface-variant uppercase tracking-wide">追加オプション</p>
+                  <p id="addon-summary" class="text-base mt-1">-</p>
+                </div>
+              </div>
+            </section>
+
+            <section class="invoice-section">
+              <h2 class="text-lg font-semibold text-on-surface mb-4">請求先情報</h2>
+              <div class="invoice-info-grid">
+                <div>
+                  <p class="text-xs text-on-surface-variant uppercase tracking-wide">法人名</p>
+                  <p id="corporate-name" class="text-base mt-1">-</p>
+                </div>
+                <div>
+                  <p class="text-xs text-on-surface-variant uppercase tracking-wide">ご担当者</p>
+                  <p id="contact-person" class="text-base mt-1">-</p>
+                </div>
+              </div>
+            </section>
+
+            <section class="invoice-section invoice-table-container">
+              <h2 class="text-lg font-semibold text-on-surface mb-4">請求明細</h2>
+              <table class="invoice-table">
+                <thead>
+                  <tr>
+                    <th style="width: 56px;">No.</th>
+                    <th>項目</th>
+                    <th>内訳</th>
+                    <th style="width: 90px;">数量</th>
+                    <th style="width: 110px;">単価</th>
+                    <th style="width: 130px;">金額</th>
+                  </tr>
+                </thead>
+                <tbody id="invoice-items-table-body"></tbody>
+                <tfoot>
+                  <tr>
+                    <th colspan="5">小計（課税）</th>
+                    <td class="text-right font-medium" id="subtotal-taxable">-</td>
+                  </tr>
+                  <tr>
+                    <th colspan="5">小計（非課税）</th>
+                    <td class="text-right font-medium" id="subtotal-non-taxable">-</td>
+                  </tr>
+                  <tr>
+                    <th colspan="5">消費税</th>
+                    <td class="text-right font-medium" id="tax-amount">-</td>
+                  </tr>
+                  <tr>
+                    <th colspan="5" class="font-semibold">合計金額（税込）</th>
+                    <td class="text-right text-lg font-semibold" id="total-amount">-</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </section>
+
+            <section class="invoice-section">
+              <h2 class="text-lg font-semibold text-on-surface mb-4">振込先情報</h2>
+              <div class="invoice-info-grid">
+                <div>
+                  <p class="text-xs text-on-surface-variant uppercase tracking-wide">金融機関</p>
+                  <p id="bank-name" class="text-base mt-1">-</p>
+                </div>
+                <div>
+                  <p class="text-xs text-on-surface-variant uppercase tracking-wide">支店名</p>
+                  <p id="branch-name" class="text-base mt-1">-</p>
+                </div>
+                <div>
+                  <p class="text-xs text-on-surface-variant uppercase tracking-wide">口座種別</p>
+                  <p id="account-type" class="text-base mt-1">-</p>
+                </div>
+                <div>
+                  <p class="text-xs text-on-surface-variant uppercase tracking-wide">口座番号</p>
+                  <p id="account-number" class="text-base mt-1">-</p>
+                </div>
+                <div>
+                  <p class="text-xs text-on-surface-variant uppercase tracking-wide">口座名義</p>
+                  <p id="account-holder" class="text-base mt-1">-</p>
+                </div>
+              </div>
+            </section>
+
+            <section class="invoice-section" id="invoice-notes-section" hidden>
+              <h2 class="text-lg font-semibold text-on-surface mb-4">備考</h2>
+              <p id="invoice-notes" class="text-sm leading-relaxed text-on-surface-variant"></p>
+            </section>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <div id="footer-placeholder"></div>
+  </div>
+
+  <script type="module" src="src/main.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </body>
 </html>

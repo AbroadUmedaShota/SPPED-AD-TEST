@@ -1,71 +1,117 @@
-function renderInvoicePrint(invoice) {
-    // 発行情報
-    document.getElementById('issue-date').textContent = invoice.issueDate;
-    document.getElementById('invoice-number').textContent = invoice.invoiceId;
+const currencyFormatter = new Intl.NumberFormat('ja-JP', {
+  style: 'currency',
+  currency: 'JPY'
+});
 
-    // 宛先情報
-    document.getElementById('corporate-name').textContent = invoice.corporateName + ' 御中';
-    document.getElementById('contact-person').textContent = invoice.contactPerson + ' 様';
+export function renderInvoicePrint(invoice) {
+  setText('issue-date', formatDate(invoice.issueDate));
+  setText('invoice-number', invoice.invoiceId);
 
-    // 件名
-    document.getElementById('usage-month').textContent = `SPEED AD利用料 ${invoice.usageMonth}月分`;
+  setText('corporate-name', `${invoice.corporateName ?? '-'} 御中`);
+  setText('contact-person', `${invoice.contactPerson ?? '-'} 様`);
 
-    // 請求概要テーブル
-    document.getElementById('subtotal-taxable').textContent = `${new Intl.NumberFormat('ja-JP').format(invoice.subtotalTaxable)} 円`;
-    document.getElementById('tax-amount').textContent = `${new Intl.NumberFormat('ja-JP').format(invoice.tax)} 円`;
-    document.getElementById('subtotal-non-taxable').textContent = `${new Intl.NumberFormat('ja-JP').format(invoice.subtotalNonTaxable)} 円`;
-    document.getElementById('total-amount').textContent = `${new Intl.NumberFormat('ja-JP').format(invoice.totalAmount)} 円(税込)`;
+  setText('usage-month', formatBillingPeriod(invoice.billingPeriod));
 
-    // 振込先情報テーブル
-    document.getElementById('bank-name').textContent = invoice.bankInfo.bankName;
-    document.getElementById('branch-name').textContent = invoice.bankInfo.branchName;
-    document.getElementById('account-type').textContent = invoice.bankInfo.accountType;
-    document.getElementById('account-number').textContent = invoice.bankInfo.accountNumber;
-    document.getElementById('account-holder').textContent = invoice.bankInfo.accountHolder;
-    document.getElementById('due-date-bank').textContent = invoice.dueDate; // 支払期日
+  setCurrency('subtotal-taxable', invoice.subtotalTaxable);
+  setCurrency('tax-amount', invoice.tax);
+  setCurrency('subtotal-non-taxable', invoice.subtotalNonTaxable);
+  setCurrency('total-amount', invoice.totalAmount, true);
 
-    // 請求明細テーブル
-    const itemsBody = document.getElementById('invoice-detail-table-body');
-    itemsBody.innerHTML = ''; // 既存の行をクリア
-    invoice.items.forEach((item, index) => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${index + 1}</td>
-            <td>${item.itemName1 || ''}</td>
-            <td>${item.itemName2 || ''}</td>
-            <td class="text-right">${item.quantity !== undefined ? item.quantity.toLocaleString() : ''}</td>
-            <td class="text-right">${item.unitPrice !== undefined ? item.unitPrice.toLocaleString() : ''}</td>
-            <td class="text-right">¥${item.amount.toLocaleString()}</td>
-        `;
-        itemsBody.appendChild(row);
-    });
+  const bank = invoice.bankInfo ?? {};
+  setText('bank-name', bank.bankName ?? '-');
+  setText('branch-name', bank.branchName ?? '-');
+  setText('account-type', bank.accountType ?? '-');
+  setText('account-number', bank.accountNumber ?? '-');
+  setText('account-holder', bank.accountHolder ?? '-');
+  setText('due-date-bank', formatDate(invoice.dueDate));
 
-    // 請求明細の空行を最大20行まで追加
-    const maxRows = 20;
-    for (let i = invoice.items.length; i < maxRows; i++) {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        `;
-        itemsBody.appendChild(row);
-    }
+  renderItems(invoice.items ?? []);
+}
 
-    // ページ番号 (現状は固定値)
-    document.getElementById('page-current').textContent = '1';
-    document.getElementById('page-total').textContent = '1'; // 複数ページ対応時に動的に変更
+function renderItems(items) {
+  const body = document.getElementById('invoice-detail-table-body');
+  if (!body) return;
 
-    // 画像パスの修正
-    const logoAbroad = document.querySelector('.sender-details img[alt="Abroad Outsourcing Co.,Inc."]');
-    if (logoAbroad) {
-        logoAbroad.src = 'seikyu_logo.png';
-    }
-    const logoSpeedAd = document.querySelector('.sender-details img[alt="SPEED AD運営会社"]');
-    if (logoSpeedAd) {
-        logoSpeedAd.src = 'seikyu_syaban.png';
-    }
+  body.innerHTML = '';
+
+  if (!Array.isArray(items) || items.length === 0) {
+    body.innerHTML = `
+      <tr>
+        <td colspan="6" class="text-center">明細が登録されていません。</td>
+      </tr>
+    `;
+    return;
+  }
+
+  items.forEach((item, index) => {
+    const quantityText = formatQuantity(item.quantity, item.unit);
+    const unitPriceText = typeof item.unitPrice === 'number' ? currencyFormatter.format(item.unitPrice) : '';
+    const amountText = typeof item.amount === 'number' ? currencyFormatter.format(item.amount) : currencyFormatter.format(0);
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${index + 1}</td>
+      <td>${escapeHtml(item.itemName ?? item.itemName1 ?? '-')}</td>
+      <td>${escapeHtml(item.description ?? item.itemName2 ?? '')}</td>
+      <td class="text-right">${escapeHtml(quantityText)}</td>
+      <td class="text-right">${escapeHtml(unitPriceText)}</td>
+      <td class="text-right">${escapeHtml(amountText)}</td>
+    `;
+    body.appendChild(row);
+  });
+
+  const maxRows = 20;
+  for (let i = items.length; i < maxRows; i++) {
+    const row = document.createElement('tr');
+    row.innerHTML = '<td></td><td></td><td></td><td></td><td></td><td></td>';
+    body.appendChild(row);
+  }
+}
+
+function setText(id, value) {
+  const element = document.getElementById(id);
+  if (element) {
+    element.textContent = value ?? '-';
+  }
+}
+
+function setCurrency(id, value, emphasize = false) {
+  const element = document.getElementById(id);
+  if (!element) return;
+  const formatted = typeof value === 'number' ? currencyFormatter.format(value) : '-';
+  element.textContent = emphasize ? `${formatted}（税込）` : formatted;
+}
+
+function formatDate(value) {
+  if (!value) return '-';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return `${date.getFullYear()}年${String(date.getMonth() + 1).padStart(2, '0')}月${String(date.getDate()).padStart(2, '0')}日`;
+}
+
+function formatBillingPeriod(period) {
+  if (!period || (!period.from && !period.to)) {
+    return '請求対象期間: -';
+  }
+  const from = formatDate(period.from);
+  const to = formatDate(period.to);
+  if (from === '-' && to === '-') {
+    return '請求対象期間: -';
+  }
+  return `請求対象期間: ${from} 〜 ${to}`;
+}
+
+function formatQuantity(quantity, unit) {
+  if (typeof quantity !== 'number') return '';
+  const base = quantity.toLocaleString('ja-JP');
+  return unit ? `${base}${unit}` : base;
+}
+
+function escapeHtml(value) {
+  if (value == null) return '';
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }

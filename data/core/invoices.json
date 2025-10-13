@@ -1,287 +1,376 @@
 [
   {
-    "invoiceId": "INV-2025-06-001",
-    "accountId": "ACC-001",
-    "issueDate": "2025-06-01",
-    "dueDate": "2025-06-30",
-    "corporateName": "株式会社スピードアド",
-    "contactPerson": "山田 太郎",
-    "subtotalTaxable": 70000,
-    "tax": 7000,
-    "subtotalNonTaxable": 0,
-    "totalAmount": 77000,
-    "bankInfo": {
-      "bankName": "みずほ銀行",
-      "branchName": "新宿支店",
-      "accountType": "普通",
-      "accountNumber": "1234567",
-      "accountHolder": "カ）スピードアド"
-    }
-  },
-  {
-    "invoiceId": "INV-2025-07-001",
-    "accountId": "ACC-001",
-    "issueDate": "2025-07-01",
-    "dueDate": "2025-07-31",
-    "corporateName": "株式会社スピードアド",
-    "contactPerson": "佐藤 花子",
-    "subtotalTaxable": 60000,
-    "tax": 6000,
-    "subtotalNonTaxable": 0,
-    "totalAmount": 66000,
-    "bankInfo": {
-      "bankName": "三井住友銀行",
-      "branchName": "渋谷支店",
-      "accountType": "普通",
-      "accountNumber": "7654321",
-      "accountHolder": "カ）スピードアド"
-    }
-  },
-  {
-    "invoiceId": "INV-2025-08-001",
-    "accountId": "ACC-002",
-    "issueDate": "2025-08-01",
-    "dueDate": "2025-08-30",
-    "corporateName": "株式会社スピードアド",
-    "contactPerson": "田中 一郎",
-    "subtotalTaxable": 82000,
-    "tax": 8200,
-    "subtotalNonTaxable": 0,
-    "totalAmount": 90200,
-    "bankInfo": {
-      "bankName": "三菱UFJ銀行",
-      "branchName": "池袋支店",
-      "accountType": "普通",
-      "accountNumber": "1111222",
-      "accountHolder": "カ）スピードアド"
-    }
-  },
-  {
-    "invoiceId": "INV-2025-08-002",
-    "accountId": "ACC-003",
-    "issueDate": "2025-08-15",
-    "dueDate": "2025-09-14",
-    "corporateName": "株式会社スピードアド",
-    "contactPerson": "鈴木 次郎",
-    "subtotalTaxable": 45000,
-    "tax": 4500,
-    "subtotalNonTaxable": 0,
-    "totalAmount": 49500,
-    "bankInfo": {
-      "bankName": "りそな銀行",
-      "branchName": "日本橋支店",
-      "accountType": "普通",
-      "accountNumber": "3333444",
-      "accountHolder": "カ）スピードアド"
-    }
-  },
-  {
     "invoiceId": "INV-2025-09-001",
     "accountId": "ACC-001",
+    "plan": {
+      "code": "STANDARD",
+      "displayName": "Standard",
+      "billingType": "monthly"
+    },
+    "addOns": [],
     "issueDate": "2025-09-01",
     "dueDate": "2025-09-30",
-    "corporateName": "株式会社スピードアド",
-    "contactPerson": "山本 美咲",
-    "subtotalTaxable": 50000,
-    "tax": 5000,
+    "billingPeriod": {
+      "from": "2025-08-01",
+      "to": "2025-08-31"
+    },
+    "subtotalTaxable": 10000,
     "subtotalNonTaxable": 0,
-    "totalAmount": 55000,
+    "tax": 1000,
+    "totalAmount": 11000,
+    "status": "unpaid",
     "bankInfo": {
-      "bankName": "みずほ銀行",
-      "branchName": "新宿支店",
+      "bankName": "三都銀行",
+      "branchName": "渋谷支店",
       "accountType": "普通",
       "accountNumber": "1234567",
-      "accountHolder": "カ）スピードアド"
-    }
+      "accountHolder": "カニスピード株式会社"
+    },
+    "notes": null,
+    "items": [
+      {
+        "lineId": "INV-2025-09-001-BASE",
+        "category": "BASE",
+        "itemName": "月額基本サービス料 (Standardプラン)",
+        "description": "Standard プラン基本料金",
+        "quantity": 1,
+        "unit": "契約",
+        "unitPrice": 10000,
+        "amount": 10000,
+        "taxable": true
+      }
+    ]
   },
   {
     "invoiceId": "INV-2025-09-002",
-    "accountId": "ACC-004",
-    "issueDate": "2025-09-18",
-    "dueDate": "2025-10-18",
-    "corporateName": "株式会社A",
-    "contactPerson": "渡辺 健",
-    "subtotalTaxable": 104500,
-    "tax": 10450,
+    "accountId": "ACC-002",
+    "plan": {
+      "code": "PREMIUM",
+      "displayName": "Premium",
+      "billingType": "monthly"
+    },
+    "addOns": [
+      {
+        "code": "BIZCARD",
+        "displayName": "名刺データ化パック",
+        "quantity": 200,
+        "unit": "件"
+      }
+    ],
+    "issueDate": "2025-09-05",
+    "dueDate": "2025-10-05",
+    "billingPeriod": {
+      "from": "2025-08-01",
+      "to": "2025-08-31"
+    },
+    "subtotalTaxable": 50000,
     "subtotalNonTaxable": 0,
-    "totalAmount": 114950,
+    "tax": 5000,
+    "totalAmount": 55000,
+    "status": "paid",
     "bankInfo": {
-      "bankName": "三井住友銀行",
-      "branchName": "渋谷支店",
+      "bankName": "央海UFJ銀行",
+      "branchName": "品川支店",
       "accountType": "普通",
       "accountNumber": "7654321",
-      "accountHolder": "カ）スピードアド"
-    }
+      "accountHolder": "カニスピード株式会社"
+    },
+    "notes": "2025-09-15 入金済み",
+    "items": [
+      {
+        "lineId": "INV-2025-09-002-BASE",
+        "category": "BASE",
+        "itemName": "月額基本サービス料 (Premiumプラン)",
+        "description": "Premium プラン基本料金",
+        "quantity": 1,
+        "unit": "契約",
+        "unitPrice": 30000,
+        "amount": 30000,
+        "taxable": true
+      },
+      {
+        "lineId": "INV-2025-09-002-ADDON-1",
+        "category": "ADD_ON",
+        "itemName": "名刺データ化パック",
+        "description": "200件まで",
+        "quantity": 200,
+        "unit": "件",
+        "unitPrice": 50,
+        "amount": 10000,
+        "taxable": true
+      },
+      {
+        "lineId": "INV-2025-09-002-ADDON-2",
+        "category": "ADD_ON",
+        "itemName": "追加ユーザーライセンス",
+        "description": "3 ユーザー",
+        "quantity": 3,
+        "unit": "ユーザー",
+        "unitPrice": 3333,
+        "amount": 10000,
+        "taxable": true
+      }
+    ]
   },
   {
     "invoiceId": "INV-2025-09-003",
-    "accountId": "ACC-002",
-    "issueDate": "2025-09-02",
-    "dueDate": "2025-10-02",
-    "corporateName": "株式会社スピードアド",
-    "contactPerson": "伊藤 誠",
-    "subtotalTaxable": 118300,
-    "tax": 11830,
+    "accountId": "ACC-003",
+    "plan": {
+      "code": "PREMIUM_PLUS",
+      "displayName": "Premium+従量課金",
+      "billingType": "monthly"
+    },
+    "addOns": [
+      {
+        "code": "BIZCARD",
+        "displayName": "名刺データ化パック",
+        "quantity": 400,
+        "unit": "件"
+      },
+      {
+        "code": "SURVEY_EXTRA",
+        "displayName": "追加アンケートフォーム",
+        "quantity": 5,
+        "unit": "本"
+      }
+    ],
+    "issueDate": "2025-09-10",
+    "dueDate": "2025-10-10",
+    "billingPeriod": {
+      "from": "2025-08-01",
+      "to": "2025-08-31"
+    },
+    "subtotalTaxable": 96000,
     "subtotalNonTaxable": 0,
-    "totalAmount": 130130,
+    "tax": 9600,
+    "totalAmount": 105600,
+    "status": "overdue",
     "bankInfo": {
-      "bankName": "三菱UFJ銀行",
-      "branchName": "池袋支店",
+      "bankName": "東都信用金庫",
+      "branchName": "神田支店",
       "accountType": "普通",
-      "accountNumber": "1111222",
-      "accountHolder": "カ）スピードアド"
-    }
+      "accountNumber": "5544332",
+      "accountHolder": "カニスピード株式会社"
+    },
+    "notes": "9月30日時点で入金未確認。営業チームによるフォロー予定。",
+    "items": [
+      {
+        "lineId": "INV-2025-09-003-BASE",
+        "category": "BASE",
+        "itemName": "月額基本サービス料 (Premium+プラン)",
+        "description": "Premium+ プラン基本料金",
+        "quantity": 1,
+        "unit": "契約",
+        "unitPrice": 40000,
+        "amount": 40000,
+        "taxable": true
+      },
+      {
+        "lineId": "INV-2025-09-003-ADDON-1",
+        "category": "ADD_ON",
+        "itemName": "名刺データ化パック",
+        "description": "名刺スキャン 400件",
+        "quantity": 400,
+        "unit": "件",
+        "unitPrice": 50,
+        "amount": 20000,
+        "taxable": true
+      },
+      {
+        "lineId": "INV-2025-09-003-ADDON-2",
+        "category": "ADD_ON",
+        "itemName": "追加アンケートフォーム",
+        "description": "フォーム追加 5 本",
+        "quantity": 5,
+        "unit": "本",
+        "unitPrice": 6000,
+        "amount": 30000,
+        "taxable": true
+      },
+      {
+        "lineId": "INV-2025-09-003-ONE-1",
+        "category": "ONE_TIME",
+        "itemName": "導入支援トレーニング",
+        "description": "オンラインセッション 2 回",
+        "quantity": 2,
+        "unit": "回",
+        "unitPrice": 3000,
+        "amount": 6000,
+        "taxable": true
+      }
+    ]
   },
   {
-    "invoiceId": "INV-2025-09-004",
-    "accountId": "ACC-005",
-    "issueDate": "2025-09-11",
-    "dueDate": "2025-10-11",
-    "corporateName": "株式会社C",
-    "contactPerson": "中村 優子",
-    "subtotalTaxable": 131500,
-    "tax": 13150,
-    "subtotalNonTaxable": 0,
-    "totalAmount": 144650,
-    "bankInfo": {
-      "bankName": "三菱UFJ銀行",
-      "branchName": "池袋支店",
-      "accountType": "普通",
-      "accountNumber": "1111222",
-      "accountHolder": "カ）スピードアド"
-    }
-  },
-  {
-    "invoiceId": "INV-2025-09-005",
+    "invoiceId": "INV-2025-10-001",
     "accountId": "ACC-001",
-    "issueDate": "2025-09-01",
-    "dueDate": "2025-10-01",
-    "corporateName": "株式会社スピードアド",
-    "contactPerson": "小林 直樹",
-    "subtotalTaxable": 34500,
-    "tax": 3450,
+    "plan": {
+      "code": "STANDARD",
+      "displayName": "Standard",
+      "billingType": "monthly"
+    },
+    "addOns": [],
+    "issueDate": "2025-10-01",
+    "dueDate": "2025-10-31",
+    "billingPeriod": {
+      "from": "2025-09-01",
+      "to": "2025-09-30"
+    },
+    "subtotalTaxable": 10000,
     "subtotalNonTaxable": 0,
-    "totalAmount": 37950,
+    "tax": 1000,
+    "totalAmount": 11000,
+    "status": "paid",
     "bankInfo": {
-      "bankName": "みずほ銀行",
-      "branchName": "新宿支店",
+      "bankName": "三都銀行",
+      "branchName": "渋谷支店",
       "accountType": "普通",
       "accountNumber": "1234567",
-      "accountHolder": "カ）スピードアド"
-    }
+      "accountHolder": "カニスピード株式会社"
+    },
+    "notes": null,
+    "items": [
+      {
+        "lineId": "INV-2025-10-001-BASE",
+        "category": "BASE",
+        "itemName": "月額基本サービス料 (Standardプラン)",
+        "description": "Standard プラン基本料金",
+        "quantity": 1,
+        "unit": "契約",
+        "unitPrice": 10000,
+        "amount": 10000,
+        "taxable": true
+      }
+    ]
   },
   {
     "invoiceId": "INV-2025-10-002",
-    "accountId": "ACC-003",
-    "issueDate": "2025-10-18",
-    "dueDate": "2025-11-17",
-    "corporateName": "株式会社A",
-    "contactPerson": "加藤 美穂",
-    "subtotalTaxable": 142500,
-    "tax": 14250,
+    "accountId": "ACC-004",
+    "plan": {
+      "code": "PREMIUM",
+      "displayName": "Premium",
+      "billingType": "annual"
+    },
+    "addOns": [
+      {
+        "code": "SURVEY_EXTRA",
+        "displayName": "追加アンケートフォーム",
+        "quantity": 12,
+        "unit": "本"
+      }
+    ],
+    "issueDate": "2025-10-12",
+    "dueDate": "2025-11-12",
+    "billingPeriod": {
+      "from": "2025-10-01",
+      "to": "2026-09-30"
+    },
+    "subtotalTaxable": 372000,
     "subtotalNonTaxable": 0,
-    "totalAmount": 156750,
+    "tax": 37200,
+    "totalAmount": 409200,
+    "status": "unpaid",
     "bankInfo": {
-      "bankName": "りそな銀行",
-      "branchName": "日本橋支店",
-      "accountType": "普通",
-      "accountNumber": "3333444",
-      "accountHolder": "カ）スピードアド"
-    }
+      "bankName": "央海UFJ銀行",
+      "branchName": "品川支店",
+      "accountType": "当座",
+      "accountNumber": "9988776",
+      "accountHolder": "カニスピード株式会社"
+    },
+    "notes": "年額一括請求。12 ヶ月分を前倒し計上。",
+    "items": [
+      {
+        "lineId": "INV-2025-10-002-BASE",
+        "category": "BASE",
+        "itemName": "年額基本サービス料 (Premiumプラン)",
+        "description": "Premium プラン年額 (30,000円 × 12ヶ月)",
+        "quantity": 12,
+        "unit": "ヶ月",
+        "unitPrice": 30000,
+        "amount": 360000,
+        "taxable": true
+      },
+      {
+        "lineId": "INV-2025-10-002-ADDON-1",
+        "category": "ADD_ON",
+        "itemName": "追加アンケートフォーム年額",
+        "description": "フォーム追加 12 本（年間）",
+        "quantity": 12,
+        "unit": "本",
+        "unitPrice": 1000,
+        "amount": 12000,
+        "taxable": true
+      }
+    ]
   },
   {
     "invoiceId": "INV-2025-10-003",
-    "accountId": "ACC-004",
-    "issueDate": "2025-10-01",
-    "dueDate": "2025-10-31",
-    "corporateName": "株式会社C",
-    "contactPerson": "吉田 翔太",
-    "subtotalTaxable": 131800,
-    "tax": 13180,
+    "accountId": "ACC-005",
+    "plan": {
+      "code": "PREMIUM_PLUS",
+      "displayName": "Premium+従量課金",
+      "billingType": "monthly"
+    },
+    "addOns": [
+      {
+        "code": "BIZCARD",
+        "displayName": "名刺データ化パック",
+        "quantity": 150,
+        "unit": "件"
+      }
+    ],
+    "issueDate": "2025-10-15",
+    "dueDate": "2025-11-15",
+    "billingPeriod": {
+      "from": "2025-09-01",
+      "to": "2025-09-30"
+    },
+    "subtotalTaxable": 52000,
     "subtotalNonTaxable": 0,
-    "totalAmount": 144980,
+    "tax": 5200,
+    "totalAmount": 57200,
+    "status": "canceled",
     "bankInfo": {
-      "bankName": "三井住友銀行",
-      "branchName": "渋谷支店",
+      "bankName": "東都信用金庫",
+      "branchName": "神田支店",
       "accountType": "普通",
-      "accountNumber": "7654321",
-      "accountHolder": "カ）スピードアド"
-    }
-  },
-  {
-    "invoiceId": "INV-2025-10-004",
-    "accountId": "ACC-001",
-    "issueDate": "2025-10-03",
-    "dueDate": "2025-11-02",
-    "corporateName": "株式会社スピードアド",
-    "contactPerson": "山口 恵",
-    "subtotalTaxable": 108500,
-    "tax": 10850,
-    "subtotalNonTaxable": 0,
-    "totalAmount": 119350,
-    "bankInfo": {
-      "bankName": "みずほ銀行",
-      "branchName": "新宿支店",
-      "accountType": "普通",
-      "accountNumber": "1234567",
-      "accountHolder": "カ）スピードアド"
-    }
-  },
-  {
-    "invoiceId": "INV-2025-10-005",
-    "accountId": "ACC-001",
-    "issueDate": "2025-10-04",
-    "dueDate": "2025-11-03",
-    "corporateName": "合同会社B",
-    "contactPerson": "松本 拓也",
-    "subtotalTaxable": 149900,
-    "tax": 14990,
-    "subtotalNonTaxable": 0,
-    "totalAmount": 164890,
-    "bankInfo": {
-      "bankName": "りそな銀行",
-      "branchName": "日本橋支店",
-      "accountType": "普通",
-      "accountNumber": "3333444",
-      "accountHolder": "カ）スピードアド"
-    }
-  },
-  {
-    "invoiceId": "INV-2025-11-002",
-    "accountId": "ACC-003",
-    "issueDate": "2025-11-06",
-    "dueDate": "2025-12-06",
-    "corporateName": "株式会社A",
-    "contactPerson": "井上 あゆみ",
-    "subtotalTaxable": 112100,
-    "tax": 11210,
-    "subtotalNonTaxable": 0,
-    "totalAmount": 123310,
-    "bankInfo": {
-      "bankName": "三菱UFJ銀行",
-      "branchName": "池袋支店",
-      "accountType": "普通",
-      "accountNumber": "1111222",
-      "accountHolder": "カ）スピードアド"
-    }
-  },
-  {
-    "invoiceId": "INV-2025-11-003",
-    "accountId": "ACC-001",
-    "issueDate": "2025-11-18",
-    "dueDate": "2025-12-18",
-    "corporateName": "有限会社D",
-    "contactPerson": "木村 大輔",
-    "subtotalTaxable": 135500,
-    "tax": 13550,
-    "subtotalNonTaxable": 0,
-    "totalAmount": 149050,
-    "bankInfo": {
-      "bankName": "三井住友銀行",
-      "branchName": "渋谷支店",
-      "accountType": "普通",
-      "accountNumber": "7654321",
-      "accountHolder": "カ）スピードアド"
-    }
+      "accountNumber": "5544332",
+      "accountHolder": "カニスピード株式会社"
+    },
+    "notes": "契約解約に伴い請求取消（2025-10-20）",
+    "items": [
+      {
+        "lineId": "INV-2025-10-003-BASE",
+        "category": "BASE",
+        "itemName": "月額基本サービス料 (Premium+プラン)",
+        "description": "Premium+ プラン基本料金",
+        "quantity": 1,
+        "unit": "契約",
+        "unitPrice": 40000,
+        "amount": 40000,
+        "taxable": true
+      },
+      {
+        "lineId": "INV-2025-10-003-ADDON-1",
+        "category": "ADD_ON",
+        "itemName": "名刺データ化パック",
+        "description": "名刺スキャン 300件",
+        "quantity": 300,
+        "unit": "件",
+        "unitPrice": 50,
+        "amount": 15000,
+        "taxable": true
+      },
+      {
+        "lineId": "INV-2025-10-003-CREDIT-1",
+        "category": "CREDIT",
+        "itemName": "中途解約精算（返金）",
+        "description": "未提供期間分の返金",
+        "quantity": null,
+        "unit": null,
+        "unitPrice": null,
+        "amount": -3000,
+        "taxable": true
+      }
+    ]
   }
 ]

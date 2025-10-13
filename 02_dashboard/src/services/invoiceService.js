@@ -1,36 +1,24 @@
 import { resolveDashboardDataPath } from '../utils.js';
 
 /**
- * 請求書データを取得します。
- * @returns {Promise<Array>} 請求書データの配列を返すPromise。
- * @throws {Error} データの取得に失敗した場合。
+ * 請求書一覧を取得する。
+ * @returns {Promise<Array<object>>} 取得した請求書配列。
  */
-
 export async function fetchInvoices() {
-    try {
-        const response = await fetch(resolveDashboardDataPath('core/invoices.json'));
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return await response.json();
-    } catch (error) {
-        console.error('請求書データの読み込みに失敗しました:', error);
-        throw error; // エラーを呼び出し元に再スローする
-    }
+  const response = await fetch(resolveDashboardDataPath('core/invoices.json'));
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  const data = await response.json();
+  return Array.isArray(data) ? data : [];
 }
 
 /**
- * 指定されたIDの請求書データを取得します。
+ * 指定した ID の請求書を取得する。
  * @param {string} id - 請求書ID。
- * @returns {Promise<object|null>} 請求書データ、見つからない場合はnull。
+ * @returns {Promise<object | null>} 見つかった場合は請求書オブジェクト。存在しなければ null。
  */
 export async function fetchInvoiceById(id) {
-    try {
-        const invoices = await fetchInvoices();
-        const invoice = invoices.find(inv => inv.invoiceId === id);
-        return invoice || null;
-    } catch (error) {
-        console.error(`請求書ID ${id} のデータ取得に失敗しました:`, error);
-        throw error;
-    }
+  const invoices = await fetchInvoices();
+  return invoices.find(invoice => invoice.invoiceId === id) ?? null;
 }
