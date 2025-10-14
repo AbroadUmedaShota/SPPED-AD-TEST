@@ -33,19 +33,9 @@
             </div>
 
             <div class="flex flex-col gap-4 rounded-xl border border-outline-variant bg-surface p-5 shadow-sm">
-              <form id="invoice-filter-form" class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <label class="flex flex-col gap-1 text-sm text-on-surface-variant" for="invoice-status-filter">
-                  ステータスで絞り込み
-                  <select id="invoice-status-filter" name="invoiceStatus" class="mt-1 rounded-lg border border-outline-variant bg-surface px-3 py-2 text-sm text-on-background focus:border-primary focus:outline-none">
-                    <option value="all">すべて</option>
-                    <option value="unpaid">未入金</option>
-                    <option value="paid">入金済</option>
-                    <option value="overdue">延滞</option>
-                    <option value="canceled">取消</option>
-                  </select>
-                </label>
-                <p id="invoice-result-count" class="text-sm text-on-surface-variant sm:text-right">0件表示中</p>
-              </form>
+              <div class="flex items-center justify-between text-sm text-on-surface-variant">
+                <p id="invoice-result-count">0件表示中</p>
+              </div>
 
               <div id="invoice-status-message" role="status" aria-live="polite" class="hidden flex items-center gap-3 rounded-lg border px-4 py-3 text-sm"></div>
 

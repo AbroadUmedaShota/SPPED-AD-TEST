@@ -40,10 +40,9 @@ export async function initInvoiceListPage() {
 
   try {
     const invoices = await fetchInvoices();
-    allInvoices = Array.isArray(invoices) ? invoices : [];
-    hasLoadedInvoices = true;
+    const safeInvoices = Array.isArray(invoices) ? invoices : [];
 
-    if (allInvoices.length === 0) {
+    if (safeInvoices.length === 0) {
       showMessage('対象の請求書がありません。', {
         action: {
           label: '再読み込み',
@@ -52,8 +51,7 @@ export async function initInvoiceListPage() {
       });
       renderInvoices([]);
     } else {
-      const initialFilter = filterSelect ? filterSelect.value : 'all';
-      applyFilter(initialFilter);
+      renderInvoices(safeInvoices);
     }
   } catch (error) {
     console.error('Failed to load invoices:', error);
