@@ -54,9 +54,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function renderSurveyHeader(surveyInfo) {
         const headerHTML = `
-            <h1 class="text-2xl sm:text-3xl font-bold text-on-surface mb-2">${surveyInfo.displayTitle.ja}</h1>
+            <h1 class="text-2xl sm:text-3xl font-bold text-on-surface mb-4" id="survey-title">${surveyInfo.displayTitle.ja}</h1>
             <p class="text-on-surface-variant">${surveyInfo.description.ja}</p>
-            <hr class="my-6 border-outline-variant">
+            <hr class="my-6 border-outline-variant" aria-hidden="true">
         `;
         surveyHeader.innerHTML = headerHTML;
         document.title = `SpeedAd - ${surveyInfo.displayTitle.ja}`;
@@ -65,40 +65,85 @@ document.addEventListener('DOMContentLoaded', async () => {
     function renderQuestions(questionGroups) {
         let formHTML = '';
         questionGroups.forEach((group, groupIndex) => {
-            formHTML += `<div class="mb-8">
-                           <h2 class="text-xl font-bold text-on-surface mb-4 border-b-2 border-primary pb-2">${group.title.ja}</h2>`;
+            const groupHeadingId = `question-group-${group.groupId || groupIndex}`;
+            formHTML += `
+                <section class="mb-10" aria-labelledby="${groupHeadingId}">
+                    <h2 id="${groupHeadingId}" class="text-xl font-bold text-on-surface mb-4 border-b-2 border-primary pb-2">${group.title.ja}</h2>
+                    <div class="space-y-6">
+            `;
             group.questions.forEach((question, questionIndex) => {
                 formHTML += renderQuestion(question, groupIndex, questionIndex);
             });
-            formHTML += `</div>`;
+            formHTML += `
+                    </div>
+                </section>
+            `;
         });
         surveyForm.innerHTML = formHTML;
     }
 
     function renderQuestion(question, groupIndex, questionIndex) {
-        const isRequired = question.required ? '<span class="text-red-500 ml-2 text-sm">*必須</span>' : '';
+        const questionNumber = `Q${groupIndex + 1}-${questionIndex + 1}`;
+        const questionText = question.text?.ja || question.text || '';
+        const requirementHintId = `${question.questionId}-requirement`;
+        const ariaAttributes = [];
+        if (question.required) {
+            ariaAttributes.push('aria-required="true"');
+            ariaAttributes.push(`aria-describedby="${requirementHintId}"`);
+        }
+        const fieldsetAttributes = ariaAttributes.length ? ` ${ariaAttributes.join(' ')}` : '';
+        const requiredBadge = question.required
+            ? '<span class="ml-2 text-sm font-medium text-error" aria-hidden="true">必須</span>'
+            : '';
+        const requirementHint = question.required
+            ? `<p id="${requirementHintId}" class="sr-only">${questionNumber} ${questionText}は必須の設問です。</p>`
+            : '';
+
         let questionHTML = `
-            <div class="mb-6 p-4 border border-outline-variant rounded-lg">
-                <label class="block text-base font-semibold text-on-surface-variant mb-2">Q${groupIndex + 1}-${questionIndex + 1}. ${question.text.ja}${isRequired}</label>
+            <fieldset class="space-y-3 rounded-lg border border-outline-variant p-4"${fieldsetAttributes}>
+                <legend class="text-base font-semibold text-on-surface-variant">
+                    <span>${questionNumber}. ${questionText}</span>
+                    ${requiredBadge}
+                </legend>
+                ${requirementHint}
         `;
+
+        const controlIdBase = `${question.questionId}`;
 
         switch (question.type) {
             case 'free_answer':
-                questionHTML += `<textarea name="${question.questionId}" class="input-field w-full" rows="4" ${question.required ? 'required' : ''}></textarea>`;
+                {
+                    const textareaId = `${controlIdBase}-input`;
+                    const requirementAttrs = question.required
+                        ? ` required aria-required="true" aria-describedby="${requirementHintId}"`
+                        : '';
+                    questionHTML += `
+                        <label for="${textareaId}" class="sr-only">${questionText}への回答</label>
+                        <textarea id="${textareaId}" name="${question.questionId}" class="input-field w-full" rows="4"${requirementAttrs}></textarea>
+                    `;
+                }
                 break;
             case 'single_answer':
-                question.options.forEach(option => {
-                    questionHTML += `
-                        <div class="flex items-center mb-2">
-                            <input type="radio" id="${option.optionId}" name="${question.questionId}" value="${option.text.ja}" class="form-radio text-primary focus:ring-primary" ${question.required ? 'required' : ''}>
-                            <label for="${option.optionId}" class="ml-3 text-on-surface">${option.text.ja}</label>
-                        </div>
-                    `;
-                });
+                {
+                    const options = question.options || [];
+                    options.forEach((option, optionIndex) => {
+                        const optionText = option.text?.ja || option.text || '';
+                        const optionId = `${controlIdBase}-${option.optionId || optionIndex}`;
+                        const requiredAttribute = question.required ? 'required' : '';
+                        questionHTML += `
+                            <div class="flex items-center gap-3">
+                                <input type="radio" id="${optionId}" name="${question.questionId}" value="${optionText}" class="form-radio text-primary focus:ring-primary" ${requiredAttribute}>
+                                <label for="${optionId}" class="text-on-surface">${optionText}</label>
+                            </div>
+                        `;
+                    });
+                }
                 break;
             // 他の質問タイプ（multiple_answerなど）のケースもここに追加可能
         }
-        questionHTML += `</div>`;
+        questionHTML += `
+            </fieldset>
+        `;
         return questionHTML;
     }
 

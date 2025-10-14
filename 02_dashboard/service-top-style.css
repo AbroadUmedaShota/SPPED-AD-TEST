@@ -199,6 +199,12 @@ body.dark-mode {
     color: var(--color-button-primary-text);
 }
 
+.button-primary:focus-visible {
+    outline: 3px solid var(--color-button-primary-text);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(var(--color-input-border-focus-rgb), 0.35);
+}
+
 .coupon-action-button {
     background-color: transparent;
     border: none;
