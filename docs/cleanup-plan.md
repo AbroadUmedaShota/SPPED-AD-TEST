@@ -10,7 +10,7 @@
 - [2025-09-17] Added back-navigation guard (`pageshow`) to refresh survey list after bfcache restore.
 - [2025-09-18] Created `tools/` with a README and relocated automation helpers (`add_question_types.py`, `csv_to_json.*`, GitHub CLI scripts).
 - [2025-09-18] Moved issue/PR templates into `docs/templates/` and updated `tools/create_issue.sh` to consume the canonical `issue_body.md`.
-- [2025-09-18] Consolidated reference artefacts under `docs/resources/` and triaged temporary files into `archive/temp/`.
+- [2025-09-18] Consolidated reference artefacts under `docs/requirements/resources/` and triaged temporary files into `archive/temp/`.
 
 ## Objectives
 - Consolidate duplicated source trees so the dashboard uses a single module set.
@@ -22,7 +22,7 @@
 - `src/` replicates older versions of files that also exist in `02_dashboard/src/`; timestamps show the `02_dashboard` copies are newer and include additional modules (`graph-page.js`, `indexPage.js`, etc.).
 - HTML fragments live in both `modals/` and `02_dashboard/modals/`, plus shared layout pieces under `02_dashboard/common/`; it is unclear which directory is authoritative.
 - Mock data recently migrated to `data/`; audit for lingering hard-coded paths and ensure large dumps stay archived.
-- [Resolved 2025-09-18] Project root previously mixed helper scripts, templates, and archives. Assets now live under `tools/`, `docs/templates/`, and `docs/resources/`, with temp files archived in `archive/temp/`.
+- [Resolved 2025-09-18] Project root previously mixed helper scripts, templates, and archives. Assets now live under `tools/`, `docs/templates/`, and `docs/requirements/resources/`, with temp files archived in `archive/temp/`.
 
 ## Canonical Directories (target)
 - Dashboard app: keep everything under `02_dashboard/` (`index.html`, `src/`, `assets/`, `data/`).
@@ -59,7 +59,7 @@
 1. Create `tools/` for automation scripts (`add_question_types.py`, `csv_to_json.*`). Add short README for usage.
 2. Move issue/PR body markdown to `docs/templates/` (or similar) and update any documentation references.
 3. Gather temporary staging files (`temp/`, `temp_issue_body.txt`, `temp_review_comment.txt`) and either delete if obsolete or move to `archive/temp/`.
-4. Relocate client-provided reference materials currently under `siryou/` and `06_other/` into `docs/resources/` (or `archive/`) with descriptive filenames.
+4. Relocate client-provided reference materials currently under `siryou/` and `06_other/` into `docs/requirements/resources/` (or `archive/`) with descriptive filenames.
 
 ## Verification Checklist
 - Browser smoke tests: load `/02_dashboard/index.html`, `/02_dashboard/bizcardSettings.html`, `/02_dashboard/surveyCreation.html`, ensuring no 404s or console errors.

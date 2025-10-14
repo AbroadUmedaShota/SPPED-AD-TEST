@@ -57,7 +57,6 @@ flowchart TD
     A --> B --> C --> D --> E --> F --> G --> H --> I --> J
     J -- No --> L
     J -- Yes --> K --> B
-end
 ```
 
 ## データ項目（実装準拠）

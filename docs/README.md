@@ -1,36 +1,36 @@
 # ドキュメント案内
 
-プロジェクト構成や開発ルールに関する資料への入口です。
+プロジェクト構成や開発ルールに関する資料への入口です。  
+2025-10 時点で「何を実現するか（要件）」と「どう実現するか（設計）」で整理しています。
 
-## 主要ドキュメント
-- `docs/00_PROJECT_OVERVIEW.md` : 画面構成と主要機能の概要。
-- `docs/01_ARCHITECTURE.md` : データフローと依存関係の整理。
-- `docs/02_CODING_STANDARDS.md` : コーディング規約とレビュー方針。
-- `docs/data-inventory.md` : モックデータとデモ用データの配置。
-- `docs/cleanup-plan.md` : プロジェクト整理の進捗と残課題。
+## カテゴリ別インデックス
 
-## フロントエンドでの共通パーツ利用
-- 共通ヘッダー / サイドバー / フッターは `loadCommonHtml(placeholderId, 'common/header.html')` の形で読み込みます。
--  `02_dashboard/` 直下以外（例: `group-edit` デモ）では自動的にベースパスを算出します。特殊な配置で補正が必要なときのみ `window.__COMMON_BASE_PATH` を上書きして `loadCommonHtml` の参照先を調整してください。 
+### サービス要件 (`docs/requirements/`)
+- `docs/requirements/00_PROJECT_OVERVIEW.md`: 画面構成と機能スコープの概要。
+- `docs/requirements/data-inventory.md`: モックデータ配置と利用モジュールの対照表。
+- `docs/requirements/04_SETUP.md` / `05_DEPLOYMENT.md` / `06_OPERATIONS_GUIDE.md` / `07_SECURITY_GUIDELINES.md`: 導入・運用・セキュリティの前提条件。
+- `docs/requirements/processes/`: 業務プロセスと運用フロー。導入は `docs/requirements/processes/README.md`、詳細は `04_operator_workflows.md` などを参照。
+- `docs/requirements/specifications/`: 画面・機能の要件仕様。例: `01_screen_flow.md`, `06_speed_review.md`, `admin/00_admin_requirements_design.md`。
+- `docs/requirements/resources/`: クライアント提供資料やフォーム雛形。例: `client-materials/service-plan-comparison.md`。
+- `docs/requirements/testing/`: テスト指針とチェックリスト。例: `03_TESTING_GUIDELINES.md`, `invoice_manual_checklist.md`。
+- `docs/requirements/��ʐ��ڐ}.md`: 画面遷移図などの補足資料。
 
-## データ参照の原則
-- ダッシュボード向けの JSON は `data/` に集約されています。
-- フェッチ時は `resolveDashboardDataPath('core/surveys.json')` のように `resolveDashboardDataPath` を経由し、相対パスのずれを防ぎます。
-- 大容量ダンプは `archive/data-dumps/` に退避しており、ランタイムでは使用しません。
+### 設計・実装 (`docs/design/`)
+- `docs/design/01_ARCHITECTURE.md`: フロントエンド構成と将来のバックエンド連携方針。
+- `docs/design/architecture/02_data_model.md`: モックデータおよび将来のデータモデル定義。
+- `docs/design/02_CODING_STANDARDS.md`: コーディング規約、レビューの観点。
+- `docs/design/00_design_guideline.md` / `02_UI_COMPONENT_INTEGRATION.md`: UI ガイドラインとコンポーネント統合手順。
+- `docs/design/01_ui_messages.md`: UI メッセージの用語統一ガイド。
 
-## デモとモック
-- `02_dashboard/group-edit/` : グループ管理画面。サイドバーの「グループ管理」リンクからアクセスできます。
-- `data/demo_surveys/`, `data/demo_answers/`, `data/demo_business-cards/` : グラフ・回答分析用のモックデータ。`speed-review.js` や `graph-page.js` が参照します。
+## 共通リソース
+- `docs/cleanup-plan.md`: リポジトリ整理の進捗と残課題。
+- `docs/templates/`: Issue/PR テンプレート。例: `docs/templates/pr_body.md`。
+- `docs/reviews/`: レビュー記録。例: `docs/reviews/bizcard-settings.md`。
+- `tools/README.md`: 各種スクリプトの利用方法。
+- `archive/temp/`: 一時退避用。常用せず必要時のみ参照。
 
-詳細は各ドキュメントを参照してください。
-
-## 補助ディレクトリ
-- `docs/design/`: 画面仕様に紐づく UI ガイドラインやコンポーネント統合手順をまとめています。代表例は `docs/design/00_design_guideline.md` と `docs/design/02_UI_COMPONENT_INTEGRATION.md`。
-- `docs/specifications/`: 画面要件や機能仕様を詳細に記載したドキュメント群です。画面遷移を把握したい場合は `docs/specifications/01_screen_flow.md`、調査対象ごとの要件は `docs/specifications/06_speed_review.md` を参照してください。
-- `docs/processes/`: ビジネスプロセスや運用フローを整理した資料です。全体像は `docs/processes/README.md`、個別の業務手順は `docs/processes/04_operator_workflows.md` が入口になります。
-- `docs/resources/`: クライアント提供資料や提出書式の保管場所です。比較資料は `docs/resources/client-materials/service-plan-comparison.md`、フォーム類は `docs/resources/forms/` を参照します。
-- `docs/templates/`: Issue/PR テンプレートの Markdown 置き場です。Pull Request 用には `docs/templates/pr_body.md` を利用してください。
-- `docs/reviews/`: レビュー記録や振り返りメモを格納します。例えば `docs/reviews/bizcard-settings.md` で名刺設定のレビュー結果を確認できます。
-- `tools/`: 変換スクリプトや運用補助スクリプトをまとめています。利用方法は `tools/README.md` を参照してください。
-- `archive/temp/`: 一時ファイルの退避場所です。必要になった場合のみ参照し、基本的には新規作業では利用しません。
+## 開発の際に押さえておきたいポイント
+- 共通ヘッダー / サイドバー / フッターは `loadCommonHtml(placeholderId, 'common/header.html')` で読み込みます。特殊配置時のみ `window.__COMMON_BASE_PATH` を上書きしてください。
+- ダッシュボード用 JSON は `data/` に集約。`resolveDashboardDataPath` を経由して相対パスずれを防ぎます。
+- デモデータは `data/demo_surveys/`, `data/demo_answers/`, `data/demo_business-cards/` などに配置され、`speed-review.js` や `graph-page.js` が参照します。
 

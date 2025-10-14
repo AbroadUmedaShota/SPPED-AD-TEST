@@ -32,7 +32,7 @@
 
 -   `index.html` に `flatpickr` のCSSとJSがCDN経由で追加された。
 -   `src/main.js` に `flatpickr` の初期化ロジックが実装された。
--   `docs/02_CODING_STANDARDS.md` に `flatpickr` の標準的な利用方法が規約として追加された。
+-   `docs/design/02_CODING_STANDARDS.md` に `flatpickr` の標準的な利用方法が規約として追加された。
 -   今後の開発で日付入力が必要な場合は、原則として `flatpickr` を使用する。
 
 ---

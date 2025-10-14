@@ -3,7 +3,7 @@
 ## Unreleased
 
 ### Added
-- ミーティング内容と現行UIの突き合わせ結果を整理した `docs/specifications/2025-10-04_dashboard_requirement_alignment.md` を追加しました。
+- ミーティング内容と現行UIの突き合わせ結果を整理した `docs/requirements/specifications/2025-10-04_dashboard_requirement_alignment.md` を追加しました。
 - プロプラン利用時のみ表示する多言語設定に合わせ、アンケート作成画面の目次にプレビュー／保存ショートカットとQRコード連携ボタンを追加しました。
 - アンケート一覧からSPEEDレビューを即時に開けるアクションと、詳細モーダルからURLコピー・QRコードダウンロードを行える導線を追加しました。
 

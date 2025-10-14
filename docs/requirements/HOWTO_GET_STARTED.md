@@ -91,7 +91,7 @@ UI要素は、再利用性、一貫性、保守性を高めるためにモジュ
 - **[GEMINI.md](GEMINI.md)**: AIによる開発のための詳細な指示書。開発ワークフローの「憲法」です。
 - **[00_PROJECT_OVERVIEW.md](00_PROJECT_OVERVIEW.md)**: プロジェクトの全体像、目的、スコープ、機能要件、非機能要件。
 - **[01_ARCHITECTURE.md](01_ARCHITECTURE.md)**: システムの構造、設計原則、主要コンポーネント。
-- **[02_CODING_STANDARDS.md](02_CODING_STANDARDS.md)**: コーディング規約、HTML構造、コメントのルール。
+- **[02_CODING_STANDARDS.md](../design/02_CODING_STANDARDS.md)**: コーディング規約、HTML構造、コメントのルール。
 - **[design/00_design_guideline.md](design/00_design_guideline.md)**: カラーパレット、タイポグラフィ、コンポーネントスタイルなどのUIデザイン全般の指針。
 - **[design/01_ui_messages.md](design/01_ui_messages.md)**: UI上で使用される文言や通知メッセージの定義。
 - **`specifications/` ディレクトリ**: 各画面・機能ごとの詳細な仕様書。

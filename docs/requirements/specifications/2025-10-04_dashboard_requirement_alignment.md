@@ -82,7 +82,7 @@
 ## 5. サンクス画面設定
 - **連続回答機能の初期状態をオフに変更** — 要対応  
   現状: 既定値は `true` (`02_dashboard/src/thankYouScreenSettings.js:131-144`)。  
-  方針: 初期値を `false` にし、仕様書 (`docs/specifications/08_thank_you_screen_settings.md`) も更新する。
+  方針: 初期値を `false` にし、仕様書 (`docs/requirements/specifications/08_thank_you_screen_settings.md`) も更新する。
 
 ## 6. その他横断要件
 - **アカウント情報モーダルの「パスワードを変更する」重複を解消** — 要対応  
@@ -92,7 +92,7 @@
   現状: ナビに「アンケート新規作成」リンクが残存 (`02_dashboard/common/sidebar.html:36-38`)。  
   方針: `アンケート一覧` に集約し、作成導線は画面内CTAへ。
 - **グループ機能の戻り導線／招待挙動の明文化／権限と請求先仕様の再設計** — 追加検討  
-  現状: `docs/specifications/group_edit_requirements.md` に現行仕様はあるが、個人ビューや招待フロー、権限に紐づく請求表示の定義が不足。  
+  現状: `docs/requirements/specifications/group_edit_requirements.md` に現行仕様はあるが、個人ビューや招待フロー、権限に紐づく請求表示の定義が不足。  
   方針: 追加の業務整理が必要。
 - **言語切替の全画面適用** — 要対応  
   現状: ページ個別に `initLanguageSwitcher` を実装しているが (`02_dashboard/src/surveyCreation.js:402-420` 他)、共通ヘッダーと各モジュールで挙動が乖離。  
