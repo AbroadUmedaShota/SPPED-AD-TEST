@@ -56,9 +56,42 @@ function displayError(message) {
     surveyContainer.classList.add('hidden');
     const errorMessageElement = document.getElementById('error-message');
     if (errorMessageElement) {
-        errorMessageElement.innerHTML = `<p>${message}</p>`;
+        const paragraph = document.createElement('p');
+        paragraph.textContent = message;
+        errorMessageElement.replaceChildren(paragraph);
     }
     errorContainer.classList.remove('hidden');
+}
+
+/**
+ * 多言語テキストから表示用の文字列を取得する
+ * @param {string|object} value - 多言語テキストまたはプレーンテキスト
+ * @param {string} [defaultValue=''] - フォールバックテキスト
+ * @returns {string} 表示に利用する文字列
+ */
+function resolveLocalizedText(value, defaultValue = '') {
+    if (!value) {
+        return defaultValue;
+    }
+
+    if (typeof value === 'string') {
+        const trimmedValue = value.trim();
+        return trimmedValue || defaultValue;
+    }
+
+    if (typeof value === 'object') {
+        if (typeof value.ja === 'string' && value.ja.trim()) {
+            return value.ja.trim();
+        }
+
+        for (const localeValue of Object.values(value)) {
+            if (typeof localeValue === 'string' && localeValue.trim()) {
+                return localeValue.trim();
+            }
+        }
+    }
+
+    return defaultValue;
 }
 
 /**
@@ -66,8 +99,8 @@ function displayError(message) {
  * @param {object} surveyData - アンケートデータ
  */
 function renderSurveyHeader(surveyData) {
-    const title = surveyData.displayTitle?.ja || 'アンケート';
-    const description = surveyData.description?.ja || '';
+    const title = resolveLocalizedText(surveyData.displayTitle, 'アンケート');
+    const description = resolveLocalizedText(surveyData.description);
     const headerHTML = `
         <h1 class="text-2xl sm:text-3xl font-bold text-on-surface mb-4" id="survey-title">${title}</h1>
         <p class="text-on-surface-variant">${description}</p>
@@ -85,9 +118,10 @@ function renderQuestions(questionGroups) {
     let formHTML = '';
     (questionGroups || []).forEach((group, groupIndex) => {
         const groupHeadingId = `question-group-${group.groupId || groupIndex}`;
+        const groupTitle = resolveLocalizedText(group.title);
         formHTML += `
             <section class="mb-10" aria-labelledby="${groupHeadingId}">
-                <h2 id="${groupHeadingId}" class="text-xl font-bold text-on-surface mb-4 border-b-2 border-primary pb-2">${group.title.ja}</h2>
+                <h2 id="${groupHeadingId}" class="text-xl font-bold text-on-surface mb-4 border-b-2 border-primary pb-2">${groupTitle}</h2>
                 <div class="space-y-6">
         `;
         (group.questions || []).forEach((question, questionIndex) => {
@@ -110,7 +144,7 @@ function renderQuestions(questionGroups) {
  */
 function renderQuestion(question, groupIndex, questionIndex) {
     const questionNumber = `Q${groupIndex + 1}-${questionIndex + 1}`;
-    const questionText = question.text?.ja || question.text || '';
+    const questionText = resolveLocalizedText(question.text);
     const requirementHintId = `${question.questionId}-requirement`;
     const ariaAttributes = [];
     if (question.required) {
@@ -153,7 +187,7 @@ function renderQuestion(question, groupIndex, questionIndex) {
             {
                 const options = question.options || [];
                 options.forEach((option, optionIndex) => {
-                    const optionText = option.text?.ja || option.text || '';
+                    const optionText = resolveLocalizedText(option.text);
                     const optionId = `${controlIdBase}-${option.optionId || optionIndex}`;
                     const requiredAttribute = question.required ? 'required' : '';
                     questionHTML += `
