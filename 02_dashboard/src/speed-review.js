@@ -339,19 +339,43 @@ function setupPagination(currentData = allCombinedData) {
 
 function populateQuestionSelector(data) {
     const container = document.getElementById('question-selector-container');
-    if (!container || data.length === 0) return;
+    if (!container) return;
 
-    const allQuestions = new Set();
-    data.forEach(item => {
-        if (item.details) {
-            item.details.forEach(detail => {
-                allQuestions.add(detail.question);
-            });
+    const questions = [];
+    const pushQuestion = (label) => {
+        if (!label || questions.includes(label)) {
+            return;
         }
-    });
+        questions.push(label);
+    };
+
+    if (Array.isArray(data) && data.length > 0) {
+        data.forEach(item => {
+            if (Array.isArray(item.details)) {
+                item.details.forEach(detail => {
+                    pushQuestion(detail.question || detail.text || detail.id);
+                });
+            }
+        });
+    }
+
+    if (questions.length === 0 && currentSurvey && Array.isArray(currentSurvey.details)) {
+        currentSurvey.details.forEach(detail => {
+            pushQuestion(detail.question || detail.text || detail.id);
+        });
+    }
 
     container.innerHTML = '';
-    allQuestions.forEach(question => {
+
+    if (questions.length === 0) {
+        const fallbackMessage = document.createElement('p');
+        fallbackMessage.textContent = '設問情報が利用できません。';
+        fallbackMessage.className = 'text-sm text-on-surface-variant px-3 py-2';
+        container.appendChild(fallbackMessage);
+        return;
+    }
+
+    questions.forEach(question => {
         const button = document.createElement('button');
         button.textContent = truncateQuestion(question);
         button.title = question;
@@ -459,11 +483,14 @@ export async function initializePage() {
             throw new Error(`アンケートID「${surveyId}」の定義が見つかりません。`);
         }
         // 設問詳細情報を結合
-        if (enqueteDetails && enqueteDetails.details) {
-            currentSurvey.details = enqueteDetails.details;
-        } else {
-            currentSurvey.details = []; // 詳細情報がない場合は空の配列を設定
-        }
+        const normalizedDetails = Array.isArray(enqueteDetailsData.details)
+            ? enqueteDetailsData.details.map(detail => ({
+                ...detail,
+                text: detail.text || detail.question || '',
+                question: detail.question || detail.text || ''
+            }))
+            : [];
+        currentSurvey.details = normalizedDetails;
 
         // 3. Create a map for quick lookup of personal info
         const personalInfoArr = (Array.isArray(personalInfoData) && personalInfoData.length > 0) ? personalInfoData : personalInfo;
@@ -496,7 +523,7 @@ export async function initializePage() {
 
         // 最初の設問をデフォルトの表示設問とする
         if (currentSurvey.details && currentSurvey.details.length > 0) {
-            currentIndustryQuestion = currentSurvey.details[0].text;
+            currentIndustryQuestion = currentSurvey.details[0].question || currentSurvey.details[0].text;
         } else {
             currentIndustryQuestion = '設問情報なし'; // 設問がない場合のデフォルト
         }
