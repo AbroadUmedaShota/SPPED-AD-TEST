@@ -536,27 +536,7 @@ const ADDITIONAL_SETTINGS_MESSAGES = {
     requireBizcard: '名刺撮影依頼を有効にすると利用できます。'
 };
 
-window.addEventListener('storage', (event) => {
-    if (!currentSurveyId) {
-        return;
-    }
-    if (event && event.key === `thankYouScreenSettings_${currentSurveyId}`) {
-        updateAdditionalSettingsAvailability();
-    }
-});
 
-function loadThankYouScreenSettingsFromStorage(surveyId) {
-    if (!surveyId) {
-        return null;
-    }
-    try {
-        const raw = localStorage.getItem(`thankYouScreenSettings_${surveyId}`);
-        return raw ? JSON.parse(raw) : null;
-    } catch (error) {
-        console.warn('Failed to parse thank-you screen settings from storage:', error);
-        return null;
-    }
-}
 
 function setAdditionalSettingsButtonState(feature, disabled, message) {
     const button = additionalSettingsButtons.get(feature);
@@ -578,15 +558,14 @@ function setAdditionalSettingsButtonState(feature, disabled, message) {
 }
 
 function updateAdditionalSettingsAvailability() {
+    const bizcardEnabled = surveyData?.settings?.bizcard?.enabled ?? true;
+
     if (!currentSurveyId) {
         additionalSettingsButtons.forEach((_, feature) => {
             setAdditionalSettingsButtonState(feature, true, ADDITIONAL_SETTINGS_MESSAGES.requireSurveyId);
         });
         return;
     }
-
-    const storedSettings = loadThankYouScreenSettingsFromStorage(currentSurveyId);
-    const bizcardEnabled = storedSettings ? storedSettings.requestBusinessCardPhoto !== false : true;
 
     additionalSettingsButtons.forEach((_, feature) => {
         if (feature === 'thankYouScreen') {
@@ -1173,6 +1152,24 @@ async function initializePage() {
             setEditorLanguage(surveyData.editorLanguage);
         }
 
+        // --- bizcard setting initialization ---
+        if (!surveyData.settings) {
+            surveyData.settings = {};
+        }
+        if (!surveyData.settings.bizcard) {
+            surveyData.settings.bizcard = {};
+        }
+        if (typeof surveyData.settings.bizcard.enabled !== 'boolean') {
+            surveyData.settings.bizcard.enabled = true; // Default to true
+        }
+
+        const bizcardToggle = document.getElementById('bizcardEnabled');
+        if (bizcardToggle) {
+            bizcardToggle.checked = surveyData.settings.bizcard.enabled;
+        }
+        updateAdditionalSettingsAvailability(); // Also call here to set initial state
+        // --- end of bizcard setting initialization ---
+
         updateAndRenderAll();
         restoreAccordionState();
         const fabActions = {
@@ -1642,6 +1639,19 @@ ${summary}
             }
         });
     }
+
+    // --- bizcard setting event listener ---
+    const bizcardToggle = document.getElementById('bizcardEnabled');
+    if (bizcardToggle) {
+        bizcardToggle.addEventListener('change', () => {
+            if (surveyData.settings && surveyData.settings.bizcard) {
+                surveyData.settings.bizcard.enabled = bizcardToggle.checked;
+                setDirty(true);
+                updateAdditionalSettingsAvailability();
+            }
+        });
+    }
+    // --- end of bizcard setting event listener ---
 }
 
 // --- Data Manipulation Handlers ---

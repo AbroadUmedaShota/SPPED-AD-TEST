@@ -162,6 +162,25 @@
                 </div>
               </div>
 
+              <!-- 連携設定 -->
+              <section>
+                <h2 id="section-integration-settings" class="text-on-surface text-xl font-semibold mb-4">連携設定</h2>
+                <div class="space-y-4">
+                    <!-- 名刺画像添付機能の有効化 -->
+                    <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                        <div>
+                            <h3 class="font-medium text-text-main">名刺画像添付を有効にする</h3>
+                            <p class="text-sm text-text-sub mt-1">アンケート回答時に、名刺の撮影を依頼するステップを追加します。</p>
+                        </div>
+                        <label for="bizcardEnabled" class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="bizcardEnabled" role="switch" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-500"></div>
+                        </label>
+                    </div>
+                    <p class="text-sm text-text-sub mt-2">※この設定をオフにすると、お礼メール設定と名刺データ化設定が利用できなくなります。</p>
+                </div>
+              </section>
+
               <!-- 追加設定 -->
               <section>
                 <h2 id="section-additional-settings" class="text-on-surface text-xl font-semibold mb-4">追加設定</h2>
