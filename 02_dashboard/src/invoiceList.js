@@ -6,14 +6,29 @@ export async function initInvoiceListPage() {
 
   try {
     const invoices = await fetchInvoices();
-    if (!Array.isArray(invoices) || invoices.length === 0) {
-      showMessage('対象の請求書がありません。');
+    const safeInvoices = Array.isArray(invoices) ? invoices : [];
+
+    if (safeInvoices.length === 0) {
+      showMessage('対象の請求書がありません。', {
+        action: {
+          label: '再読み込み',
+          onClick: () => window.location.reload()
+        }
+      });
+      renderInvoices([]);
     } else {
-      renderInvoices(invoices);
+      renderInvoices(safeInvoices);
     }
   } catch (error) {
     console.error('Failed to load invoices:', error);
-    showMessage('請求データの取得に失敗しました。ページを再読み込みしてください。');
+    showMessage('請求データの取得に失敗しました。ページを再読み込みしてください。', {
+      tone: 'error',
+      action: {
+        label: '再読み込み',
+        onClick: () => window.location.reload()
+      }
+    });
+    renderInvoices([]);
   } finally {
     hideLoading();
   }

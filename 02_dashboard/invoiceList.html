@@ -7,7 +7,6 @@
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="stylesheet" href="service-top-style.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
   <link
     as="style"
@@ -27,35 +26,22 @@
         <div class="flex flex-col w-full max-w-6xl mx-auto flex-1">
           <div id="breadcrumb-container" class="mb-4"></div>
 
-          <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant">
-            <h1 class="text-on-background text-2xl sm:text-3xl font-bold leading-tight tracking-tight">請求書一覧</h1>
-            <p class="text-sm text-on-surface-variant">最新の請求データをサービスプラン別に確認できます。</p>
+          <div class="flex flex-col gap-6">
+            <div class="flex flex-col gap-2">
+              <h1 class="text-on-background text-2xl sm:text-3xl font-bold leading-tight tracking-tight">請求書一覧</h1>
+              <p class="text-sm text-on-surface-variant">直近の請求状況を確認できます。</p>
+            </div>
+
+            <div class="flex flex-col gap-4 rounded-xl border border-outline-variant bg-surface p-5 shadow-sm">
+              <div class="flex items-center justify-between text-sm text-on-surface-variant">
+                <p id="invoice-result-count">0件表示中</p>
+              </div>
+
+              <div id="invoice-status-message" role="status" aria-live="polite" class="hidden flex items-center gap-3 rounded-lg border px-4 py-3 text-sm"></div>
+
+              <ul id="invoice-card-list" class="flex flex-col gap-4" aria-label="請求書一覧"></ul>
+            </div>
           </div>
-
-          <section class="overflow-x-auto rounded-xl border border-outline-variant bg-surface relative min-h-[200px]">
-            <table class="w-full min-w-[1100px] divide-y divide-outline-variant survey-table" id="invoiceTable">
-              <thead class="bg-surface-variant">
-                <tr>
-                  <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider">請求月</th>
-                  <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider">請求書ID</th>
-                  <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider">契約プラン</th>
-                  <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider">請求金額（税込）</th>
-                  <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider">ステータス</th>
-                  <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider">詳細</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-outline-variant" id="invoice-table-body">
-              </tbody>
-            </table>
-
-            <div id="invoice-loading-overlay" class="absolute inset-0 bg-surface bg-opacity-75 flex items-center justify-center hidden">
-              <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-            </div>
-
-            <div id="invoice-message-overlay" class="absolute inset-0 bg-surface bg-opacity-75 flex items-center justify-center hidden">
-              <p class="text-on-surface-variant text-lg"></p>
-            </div>
-          </section>
         </div>
       </main>
     </div>
@@ -63,8 +49,6 @@
     <div id="footer-placeholder"></div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
   <script type="module" src="src/main.js"></script>
 </body>
 </html>

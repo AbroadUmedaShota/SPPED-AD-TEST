@@ -1,113 +1,275 @@
-const invoiceListBody = document.getElementById('invoice-table-body');
-const loadingOverlay = document.getElementById('invoice-loading-overlay');
-const messageOverlay = document.getElementById('invoice-message-overlay');
+const invoiceCardList = document.getElementById('invoice-card-list');
+const statusMessage = document.getElementById('invoice-status-message');
+const resultCount = document.getElementById('invoice-result-count');
 
-const STATUS_MAP = {
-  unpaid: { label: '未入金', classes: 'bg-amber-100 text-amber-800' },
-  paid: { label: '入金済', classes: 'bg-emerald-100 text-emerald-800' },
-  overdue: { label: '延滞', classes: 'bg-rose-100 text-rose-800' },
-  canceled: { label: '取消', classes: 'bg-neutral-200 text-neutral-700' }
+const MESSAGE_TONES = {
+  muted: ['bg-surface', 'border-outline-variant', 'text-on-surface-variant'],
+  error: ['bg-rose-50', 'border-rose-200', 'text-rose-700']
+};
+
+const ALL_TONE_CLASSES = Object.values(MESSAGE_TONES).flat();
+
+const PLAN_LABELS = {
+  STANDARD: 'スタンダード',
+  PREMIUM: 'プレミアム',
+  PREMIUM_PLUS: 'プレミアム＋'
 };
 
 function formatBillingMonth(issueDate) {
   const date = new Date(issueDate);
   if (Number.isNaN(date.getTime())) return '-';
-  return `${date.getFullYear()}年${String(date.getMonth() + 1).padStart(2, '0')}月`;
+  return `${date.getFullYear()}年${String(date.getMonth() + 1).padStart(2, '0')}月請求`;
 }
 
-function formatCurrency(amount) {
-  if (typeof amount !== 'number') return '-';
-  return `¥${amount.toLocaleString('ja-JP')}`;
+function formatBillingPeriod(period) {
+  if (!period || !period.from || !period.to) return '';
+  return `${period.from}〜${period.to}`;
 }
 
-function describePlan(invoice) {
+function resolvePlanLabel(invoice) {
   const plan = invoice?.plan;
   if (!plan) return '-';
 
-  const billingLabel = plan.billingType === 'annual' ? '年額' : '月額';
-  let text = `${plan.displayName ?? '-'}（${billingLabel}）`;
-
-  const addOns = Array.isArray(invoice?.addOns) ? invoice.addOns : [];
-  if (addOns.length > 0) {
-    const addOnSummary = addOns
-      .map(addOn => {
-        const qty = addOn.quantity != null ? `${addOn.quantity}${addOn.unit ?? ''}` : '';
-        return qty ? `${addOn.displayName} ${qty}` : addOn.displayName;
-      })
-      .join(' / ');
-    text += ` / ${addOnSummary}`;
+  if (plan.code && PLAN_LABELS[plan.code]) {
+    return PLAN_LABELS[plan.code];
   }
-  return text;
+
+  if (typeof plan.displayName === 'string' && plan.displayName.trim() !== '') {
+    return plan.displayName;
+  }
+
+  return '-';
 }
 
-function renderStatusBadge(status) {
-  const config = STATUS_MAP[status] ?? { label: '不明', classes: 'bg-neutral-200 text-neutral-700' };
-  return `<span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${config.classes}">${config.label}</span>`;
+function resolveBillingRecipient(invoice) {
+  if (invoice?.corporateName && invoice.corporateName.trim() !== '') {
+    return invoice.corporateName;
+  }
+
+  if (invoice?.accountName && invoice.accountName.trim() !== '') {
+    return invoice.accountName;
+  }
+
+  if (invoice?.accountId && invoice.accountId.trim() !== '') {
+    return invoice.accountId;
+  }
+
+  return '-';
+}
+
+function resolvePlanCode(invoice) {
+  const code = invoice?.plan?.code;
+  if (typeof code === 'string' && code.trim() !== '') {
+    return code.trim().toUpperCase();
+  }
+  return '';
+}
+
+function createPlanBadge(invoice) {
+  const label = resolvePlanLabel(invoice);
+  const badge = document.createElement('span');
+  badge.className = 'invoice-plan-badge';
+
+  const planCode = resolvePlanCode(invoice);
+  const normalizedLabel = typeof label === 'string' ? label.trim() : '';
+  const isPremiumPlan = planCode === 'PREMIUM' || planCode === 'PREMIUM_PLUS' || normalizedLabel.includes('プレミアム');
+  if (isPremiumPlan) {
+    badge.classList.add('invoice-plan-badge--premium');
+  } else {
+    badge.classList.add('invoice-plan-badge--standard');
+  }
+
+  badge.textContent = label && label !== '-' ? label : 'プラン未設定';
+  return badge;
+}
+
+function createMetadataItem(title, value) {
+  const item = document.createElement('div');
+  item.className = 'flex flex-col gap-1';
+
+  const itemTitle = document.createElement('span');
+  itemTitle.className = 'text-xs font-semibold uppercase tracking-[0.08em] text-on-surface-variant';
+  itemTitle.textContent = title;
+  item.appendChild(itemTitle);
+
+  const itemValue = document.createElement('span');
+  itemValue.className = 'text-sm font-medium text-on-background';
+  itemValue.textContent = value;
+  item.appendChild(itemValue);
+
+  return item;
+}
+
+function updateResultCount(count) {
+  if (resultCount) {
+    resultCount.textContent = `${count}件表示中`;
+  }
+}
+
+function clearStatusMessage() {
+  if (!statusMessage) return;
+  statusMessage.replaceChildren();
+  statusMessage.classList.add('hidden');
+  statusMessage.dataset.state = 'idle';
+  statusMessage.classList.remove(...ALL_TONE_CLASSES);
+}
+
+function setStatusMessage(message, { tone = 'muted', action, state } = {}) {
+  if (!statusMessage) return;
+  statusMessage.replaceChildren();
+  statusMessage.classList.remove('hidden');
+  statusMessage.dataset.state = state ?? 'message';
+
+  statusMessage.classList.remove(...ALL_TONE_CLASSES);
+  const toneClasses = MESSAGE_TONES[tone] ?? MESSAGE_TONES.muted;
+  statusMessage.classList.add(...toneClasses);
+
+  const messageSpan = document.createElement('span');
+  messageSpan.textContent = message;
+  statusMessage.appendChild(messageSpan);
+
+  if (action && typeof action.onClick === 'function' && action.label) {
+    const actionButton = document.createElement('button');
+    actionButton.type = 'button';
+    actionButton.className = 'ml-auto inline-flex items-center justify-center rounded-md border border-outline-variant px-3 py-1.5 text-sm font-semibold text-primary transition-colors hover:bg-surface-variant';
+    actionButton.textContent = action.label;
+    actionButton.addEventListener('click', action.onClick);
+    statusMessage.appendChild(actionButton);
+  }
+}
+
+function navigateToInvoiceDetail(invoiceId) {
+  if (!invoiceId) return;
+  window.location.href = `invoice-detail.html?id=${encodeURIComponent(invoiceId)}`;
+}
+
+function createInvoiceCard(invoice) {
+  const card = document.createElement('li');
+  card.className = 'invoice-card group cursor-pointer';
+  
+  if (invoice?.invoiceId) {
+    card.dataset.invoiceId = invoice.invoiceId;
+  }
+
+  card.tabIndex = 0;
+
+  const accent = document.createElement('span');
+  accent.className = 'invoice-card-accent';
+  accent.setAttribute('aria-hidden', 'true');
+  card.appendChild(accent);
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'flex flex-col gap-6';
+  card.appendChild(wrapper);
+
+  const headerRow = document.createElement('div');
+  headerRow.className = 'flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between';
+  wrapper.appendChild(headerRow);
+
+  const headingBlock = document.createElement('div');
+  headingBlock.className = 'flex flex-col gap-1';
+  headerRow.appendChild(headingBlock);
+
+  const billingMonth = document.createElement('p');
+  billingMonth.className = 'text-xl font-semibold text-on-background tracking-tight';
+  billingMonth.textContent = formatBillingMonth(invoice?.issueDate);
+  headingBlock.appendChild(billingMonth);
+
+  const periodText = formatBillingPeriod(invoice?.billingPeriod);
+  if (periodText) {
+    const period = document.createElement('p');
+    period.className = 'text-xs font-medium text-on-surface-variant';
+    period.textContent = `対象期間 ${periodText}`;
+    headingBlock.appendChild(period);
+  }
+
+  const planBadge = createPlanBadge(invoice);
+  headerRow.appendChild(planBadge);
+
+  const metadataGrid = document.createElement('div');
+  metadataGrid.className = 'grid gap-4 sm:grid-cols-2';
+  wrapper.appendChild(metadataGrid);
+
+  const invoiceLine = createMetadataItem('請求書番号', invoice?.invoiceId ?? '-');
+  metadataGrid.appendChild(invoiceLine);
+
+  const recipient = createMetadataItem('請求先', resolveBillingRecipient(invoice));
+  metadataGrid.appendChild(recipient);
+
+  const actionContainer = document.createElement('div');
+  actionContainer.className = 'flex items-center';
+  wrapper.appendChild(actionContainer);
+
+  const detailButton = document.createElement('button');
+  detailButton.type = 'button';
+  detailButton.className = 'inline-flex items-center gap-1 rounded-full bg-transparent px-0 text-sm font-semibold text-primary transition hover:underline';
+  detailButton.textContent = '詳細を見る';
+  if (invoice?.invoiceId) {
+    detailButton.dataset.invoiceId = invoice.invoiceId;
+  }
+  detailButton.addEventListener('click', (event) => {
+    event.stopPropagation();
+    navigateToInvoiceDetail(invoice?.invoiceId);
+  });
+  const chevron = document.createElement('span');
+  chevron.className = 'material-icons text-base text-primary opacity-80 transition group-hover:translate-x-0.5 group-hover:opacity-100';
+  chevron.setAttribute('aria-hidden', 'true');
+  chevron.textContent = 'chevron_right';
+  detailButton.appendChild(chevron);
+  actionContainer.appendChild(detailButton);
+
+  card.addEventListener('click', () => {
+    navigateToInvoiceDetail(invoice?.invoiceId);
+  });
+
+  card.addEventListener('keydown', (event) => {
+    if (!invoice?.invoiceId) return;
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      navigateToInvoiceDetail(invoice.invoiceId);
+    }
+  });
+
+  return card;
 }
 
 /**
- * 請求書の一覧をテーブルへ描画する。
+ * 請求書の一覧をカードリストへ描画する。
  * @param {Array<object>} invoices - 表示対象の請求書配列。
  */
 export function renderInvoices(invoices) {
-  if (!invoiceListBody) return;
-  invoiceListBody.innerHTML = '';
+  if (!invoiceCardList) return;
 
-  invoices.forEach(invoice => {
-    const row = document.createElement('tr');
-    row.classList.add('hover:bg-surface-variant');
-    row.dataset.invoiceId = invoice.invoiceId;
+  invoiceCardList.replaceChildren();
+  const safeInvoices = Array.isArray(invoices) ? invoices : [];
+  updateResultCount(safeInvoices.length);
 
-    row.innerHTML = `
-      <td class="px-4 py-3 whitespace-nowrap">${formatBillingMonth(invoice.issueDate)}</td>
-      <td class="px-4 py-3 whitespace-nowrap text-primary-600 font-medium">${invoice.invoiceId}</td>
-      <td class="px-4 py-3 whitespace-nowrap">${describePlan(invoice)}</td>
-      <td class="px-4 py-3 whitespace-nowrap text-right font-semibold">${formatCurrency(invoice.totalAmount)}</td>
-      <td class="px-4 py-3 whitespace-nowrap">${renderStatusBadge(invoice.status)}</td>
-      <td class="px-4 py-3 whitespace-nowrap">
-        <button
-          class="button-secondary inline-flex items-center px-3 py-1 text-sm font-semibold rounded-md view-detail-btn"
-          data-invoice-id="${invoice.invoiceId}"
-        >
-          詳細
-        </button>
-      </td>
-    `;
+  if (safeInvoices.length === 0) {
+    return;
+  }
 
-    invoiceListBody.appendChild(row);
+  safeInvoices.forEach(invoice => {
+    const card = createInvoiceCard(invoice);
+    invoiceCardList.appendChild(card);
   });
 
-  invoiceListBody.querySelectorAll('.view-detail-btn').forEach(button => {
-    button.addEventListener('click', (event) => {
-      event.stopPropagation();
-      const invoiceId = event.currentTarget.dataset.invoiceId;
-      window.location.href = `invoice-detail.html?id=${encodeURIComponent(invoiceId)}`;
-    });
-  });
-
-  invoiceListBody.querySelectorAll('tr').forEach(tr => {
-    tr.addEventListener('click', () => {
-      const invoiceId = tr.dataset.invoiceId;
-      if (invoiceId) {
-        window.location.href = `invoice-detail.html?id=${encodeURIComponent(invoiceId)}`;
-      }
-    });
-  });
+  clearStatusMessage();
 }
 
 export function showLoading() {
-  if (loadingOverlay) loadingOverlay.classList.remove('hidden');
-  if (messageOverlay) messageOverlay.classList.add('hidden');
+  if (invoiceCardList) {
+    invoiceCardList.replaceChildren();
+  }
+  updateResultCount(0);
+  setStatusMessage('読み込み中です…', { state: 'loading' });
 }
 
 export function hideLoading() {
-  if (loadingOverlay) loadingOverlay.classList.add('hidden');
+  if (statusMessage && statusMessage.dataset.state === 'loading') {
+    clearStatusMessage();
+  }
 }
 
-export function showMessage(msg) {
-  if (messageOverlay) {
-    messageOverlay.classList.remove('hidden');
-    const p = messageOverlay.querySelector('p');
-    if (p) p.textContent = msg;
-  }
+export function showMessage(message, options = {}) {
+  setStatusMessage(message, options);
 }
