@@ -15,6 +15,13 @@ const PLAN_LABELS = {
   PREMIUM_PLUS: 'プレミアム＋'
 };
 
+const MESSAGE_TONES = {
+  muted: ['bg-surface', 'border-outline-variant', 'text-on-surface-variant'],
+  error: ['bg-rose-50', 'border-rose-200', 'text-rose-700']
+};
+
+const ALL_TONE_CLASSES = Object.values(MESSAGE_TONES).flat();
+
 function formatBillingMonth(issueDate) {
   const date = new Date(issueDate);
   if (Number.isNaN(date.getTime())) return '-';
