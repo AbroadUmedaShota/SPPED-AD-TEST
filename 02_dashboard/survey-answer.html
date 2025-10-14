@@ -30,13 +30,50 @@
         </header>
 
         <main class="mx-auto flex max-w-3xl flex-col px-4 py-10 sm:px-6 lg:px-8" id="main-content">
+            <div id="error-container" class="hidden bg-error-container text-on-error-container p-4 rounded-lg mb-6" role="alert">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <span class="material-icons">error</span>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium" id="error-title">エラーが発生しました</h3>
+                        <div class="mt-2 text-sm" id="error-message">
+                            <p>アンケートを読み込めませんでした。URLが正しいかご確認ください。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div id="survey-container" class="bg-surface p-6 sm:p-8 rounded-xl shadow-md">
                 <div id="survey-header" class="mb-8" aria-live="polite"></div>
-                <form id="survey-form" class="space-y-6"></form>
+                <form id="survey-form" class="space-y-6">
+                    <!-- 名刺添付セクション (JSで表示/非表示を制御) -->
+                    <div id="bizcard-section" class="hidden border-t border-outline-variant pt-6 mt-6">
+                        <h3 class="text-lg font-medium text-on-surface">名刺画像のご提供</h3>
+                        <p class="text-sm text-on-surface-variant mt-1 mb-4">
+                            名刺の画像を添付してください。
+                        </p>
+                        <div class="flex items-center justify-center w-full">
+                            <label for="bizcard-upload" class="flex flex-col items-center justify-center w-full h-48 border-2 border-outline-variant border-dashed rounded-lg cursor-pointer bg-surface-container hover:bg-surface-container-high">
+                                <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                    <span class="material-icons text-4xl text-on-surface-variant">cloud_upload</span>
+                                    <p class="mb-2 text-sm text-on-surface-variant"><span class="font-semibold">クリックしてアップロード</span>またはドラッグ＆ドロップ</p>
+                                    <p class="text-xs text-on-surface-variant">PNG, JPG (最大 5MB)</p>
+                                </div>
+                                <input id="bizcard-upload" type="file" class="hidden" accept="image/png, image/jpeg" />
+                            </label>
+                        </div>
+                        <div id="bizcard-preview-container" class="hidden mt-4">
+                            <p class="text-sm font-medium text-on-surface mb-2">プレビュー:</p>
+                            <img id="bizcard-preview" src="#" alt="名刺プレビュー" class="max-w-xs rounded-lg shadow-md" />
+                            <button type="button" id="bizcard-remove" class="mt-2 text-sm text-error hover:underline">画像を削除</button>
+                        </div>
+                    </div>
+                </form>
                 <div id="completion-message" class="hidden text-center py-10" role="status" aria-live="polite">
-                    <span class="material-icons text-6xl text-primary" aria-hidden="true">check_circle</span>
-                    <h2 class="text-2xl font-bold mt-4">ご回答ありがとうございます</h2>
-                    <p class="text-on-surface-variant mt-2">ご協力に感謝いたします。</p>
+                    <div id="completion-content">
+                        <!-- この中身をJSで動的に生成する -->
+                    </div>
                 </div>
             </div>
         </main>
