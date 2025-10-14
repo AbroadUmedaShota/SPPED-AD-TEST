@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SPEED AD - ページが見つからない場合のエラーページ">
+  <meta name="keywords" content="404, エラー, SPEED AD, ページが見つかりません">
+  <title>SPEED AD - ページが見つかりません</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-primary: #7b2cbf;
+      --color-primary-hover: #5a189a;
+      --color-primary-container: #ede2ff;
+      --color-on-primary-container: #260058;
+      --color-secondary: #4cc9f0;
+      --color-secondary-hover: #0093c4;
+      --color-secondary-container: #ccf3ff;
+      --color-on-secondary-container: #001f28;
+      --gradient-accent: linear-gradient(to right, var(--color-primary), var(--color-secondary));
+      --color-surface-dim: #f9fafb;
+      --color-surface-bright: #ffffff;
+      --color-outline: #e0e0e0;
+      --color-on-surface: #111827;
+      --color-on-surface-variant: #6b7280;
+      --color-on-surface-light: #9ca3af;
+      --color-error: #d9534f;
+      --color-on-error-container: #410002;
+      --color-error-container: #ffdad6;
+      --shadow-level-0: 0 0 0 rgba(0,0,0,0);
+      --shadow-level-1: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.04);
+      --shadow-level-2: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+      --shadow-level-3: 0 10px 15px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.08);
+      --shadow-level-4: 0 20px 25px rgba(0, 0, 0, 0.2), 0 8px 10px rgba(0, 0, 0, 0.08);
+      --shadow-level-5: 0 25px 50px rgba(0, 0, 0, 0.25), 0 10px 15px rgba(0, 0, 0, 0.1);
+      --spacing-0: 0rem;
+      --spacing-1: 0.25rem;
+      --spacing-2: 0.5rem;
+      --spacing-3: 0.75rem;
+      --spacing-4: 1rem;
+      --spacing-5: 1.25rem;
+      --spacing-6: 1.5rem;
+      --spacing-7: 1.75rem;
+      --spacing-8: 2rem;
+      --spacing-10: 2.5rem;
+      --spacing-16: 4rem;
+      --border-radius-sm: 0.25rem;
+      --border-radius-md: 0.5rem;
+      --border-radius-lg: 1rem;
+    }
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Noto Sans JP', 'Inter', sans-serif;
+      background: linear-gradient(135deg, rgba(123, 44, 191, 0.85), rgba(76, 201, 240, 0.85)), url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1950&q=80') center/cover no-repeat;
+      margin: var(--spacing-0);
+      padding: var(--spacing-0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      color: var(--color-on-surface);
+    }
+    main {
+      background-color: rgba(255, 255, 255, 0.85);
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow-level-4);
+      padding: var(--spacing-16) var(--spacing-16) var(--spacing-10);
+      max-width: 640px;
+      width: calc(100% - var(--spacing-8));
+      text-align: center;
+    }
+    .status-code {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(3rem, 8vw, 6rem);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--color-primary);
+      margin-bottom: var(--spacing-6);
+      background: var(--gradient-accent);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+    h1 {
+      font-size: clamp(1.75rem, 3vw, 2.5rem);
+      margin-bottom: var(--spacing-4);
+      color: var(--color-on-surface);
+    }
+    p {
+      margin-bottom: var(--spacing-8);
+      line-height: 1.8;
+      color: var(--color-on-surface-variant);
+    }
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-4);
+    }
+    .primary-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--spacing-3) var(--spacing-8);
+      background: var(--gradient-accent);
+      color: var(--color-surface-bright);
+      border: none;
+      border-radius: var(--border-radius-md);
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      text-decoration: none;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: var(--shadow-level-2);
+    }
+    .primary-button:focus {
+      outline: 3px solid var(--color-secondary-container);
+      outline-offset: 4px;
+    }
+    .primary-button:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-level-3);
+    }
+    .contact-link {
+      color: var(--color-on-surface-variant);
+      text-decoration: underline;
+      font-weight: 500;
+    }
+    @media (max-width: 640px) {
+      main {
+        padding: var(--spacing-10) var(--spacing-8);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main role="main" aria-labelledby="page-title">
+    <div class="status-code" aria-hidden="true">404</div>
+    <h1 id="page-title">ページが見つかりませんでした</h1>
+    <p>
+      お探しのページは移動したか、削除された可能性があります。URLを再確認いただくか、以下のボタンからトップページへお戻りください。
+    </p>
+    <div class="actions">
+      <a class="primary-button" href="/index.html" aria-label="SPEED AD トップページに戻る">
+        トップページへ戻る
+      </a>
+      <a class="contact-link" href="mailto:support@speed-ad.example.com">サポートに連絡する</a>
+    </div>
+  </main>
+</body>
+</html>
