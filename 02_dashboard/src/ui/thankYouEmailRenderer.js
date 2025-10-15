@@ -99,12 +99,37 @@ export function updateUI(isEnabled, surveyData) {
     if (!dom.thankYouEmailEnabledToggle) cacheDOMElements();
     dom.thankYouEmailEnabledStatus.textContent = isEnabled ? '有効' : '無効';
 
+    // Always show the main content area
+    dom.thankYouEmailSettingsFields.classList.remove('hidden');
+
+    // Explicitly disable/enable form fields to ensure functionality
+    const elementsToDisable = [
+        ...document.querySelectorAll('input[name="sendMethod"]'), // Radios
+        dom.emailTemplateSelect,
+        dom.emailSubjectInput,
+        dom.emailBodyTextarea,
+        document.getElementById('insertVariableBtn')
+    ];
+
+    elementsToDisable.forEach(el => {
+        if (el) { // Check if element exists
+            el.disabled = !isEnabled;
+        }
+    });
+
+    // Also visually fade out the disabled fields for better UX
+    dom.thankYouEmailSettingsFields.style.transition = 'opacity 0.3s ease, filter 0.3s ease';
+    dom.thankYouEmailSettingsFields.style.opacity = isEnabled ? '1' : '0.6';
+    dom.thankYouEmailSettingsFields.style.filter = isEnabled ? 'none' : 'grayscale(80%)';
+    // Prevent clicks on the faded out area
+    dom.thankYouEmailSettingsFields.style.pointerEvents = isEnabled ? 'auto' : 'none';
+
     if (isEnabled) {
-        dom.thankYouEmailSettingsFields.classList.remove('hidden');
         updateRecipientList(surveyData);
         updateSendButtonState(surveyData);
     } else {
-        dom.thankYouEmailSettingsFields.classList.add('hidden');
+        // When disabled, ensure the external send button is also disabled
+        dom.sendEmailButton.disabled = true;
     }
 }
 

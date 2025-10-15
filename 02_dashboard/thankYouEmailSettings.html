@@ -51,100 +51,111 @@
                 </div>
 
                 <!-- お礼メール設定フォーム -->
-                <div class="bg-surface p-6 rounded-xl space-y-6 xl:max-w-4xl 2xl:mx-auto">
-                    <div class="flex items-center justify-between p-4 bg-surface-container rounded-lg shadow-sm">
-                        <label for="thankYouEmailEnabledToggle" class="text-on-surface font-semibold text-lg">お礼メール送信</label>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" value="" id="thankYouEmailEnabledToggle" class="sr-only peer">
-                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                            <span class="ml-3 text-sm font-medium text-on-surface-variant" id="thankYouEmailEnabledStatus">無効</span>
-                        </label>
-                    </div>
+                <div class="bg-surface p-6 rounded-xl xl:max-w-none 2xl:mx-0">
+                    <!-- Main 2-column grid -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 lg:gap-x-12">
+                        <!-- Left Column: Email Content -->
+                        <div class="space-y-6">
+                            <h2 class="text-xl font-semibold text-on-surface border-b border-outline-variant pb-2">メール内容設定</h2>
+                            
+                            <!-- Email Template -->
+                            <div class="input-group">
+                                <select id="emailTemplate" class="input-field"></select>
+                                <label for="emailTemplate" class="input-label">メールテンプレート選択</label>
+                            </div>
+                            <div id="templatePreview" class="p-4 bg-surface-container rounded-lg text-sm">
+                                <h4 class="font-bold mb-2 text-on-surface-variant">テンプレートプレビュー</h4>
+                                <p class="text-on-surface-variant">ここに選択したテンプレートの本文が表示されます。</p>
+                            </div>
 
-                    <div id="thankYouEmailSettingsFields" class="space-y-6 hidden">
-                        <!-- 送信方法 -->
-                        <div class="space-y-2">
-                            <label class="text-on-surface font-semibold">送信方法</label>
-                            <div class="flex flex-col sm:flex-row gap-4">
-                                <label class="flex items-center gap-2 p-3 border rounded-lg has-[:checked]:border-primary">
-                                    <input type="radio" name="sendMethod" value="auto" class="form-radio text-primary focus:ring-primary">
-                                    <div>
-                                        <span class="font-semibold text-on-surface">自動送信</span>
-                                        <p class="text-xs text-on-surface-variant">名刺データ化完了後、自動的に送信されます。</p>
+                            <!-- Email Subject -->
+                            <div class="input-group">
+                                <input type="text" id="emailSubject" placeholder=" " class="input-field">
+                                <label for="emailSubject" class="input-label">メール件名</label>
+                            </div>
+
+                            <!-- Email Body & Variables -->
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <label for="emailBody" class="input-label-static">メール本文</label>
+                                    <div class="relative">
+                                        <button id="insertVariableBtn" class="text-sm text-primary font-semibold">変数を挿入</button>
+                                        <div id="variableList" class="absolute right-0 mt-2 w-48 bg-surface rounded-md shadow-lg z-10 hidden"></div>
                                     </div>
-                                </label>
-                                <label class="flex items-center gap-2 p-3 border rounded-lg has-[:checked]:border-primary">
-                                    <input type="radio" name="sendMethod" value="manual" class="form-radio text-primary focus:ring-primary" checked>
-                                    <div>
-                                        <span class="font-semibold text-on-surface">手動送信</span>
-                                        <p class="text-xs text-on-surface-variant">名刺データ化完了後、この画面から手動で送信実行できます。</p>
-                                    </div>
-                                </label>
+                                </div>
+                                <textarea id="emailBody" rows="10" placeholder=" " class="input-field"></textarea>
+                                <div id="emailBodyRealtimePreview" class="mt-4 p-4 bg-surface-container rounded-lg text-sm">
+                                    <h4 class="font-bold mb-2 text-on-surface-variant">リアルタイムプレビュー</h4>
+                                    <p class="text-on-surface-variant">ここにメール本文のリアルタイムプレビューが表示されます。</p>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- メールテンプレート -->
-                        <div class="input-group">
-                            <select id="emailTemplate" class="input-field">
-                                <!-- Options will be dynamically loaded by JS -->
-                            </select>
-                            <label for="emailTemplate" class="input-label">メールテンプレート選択</label>
-                        </div>
-                        <div id="templatePreview" class="p-4 bg-surface-container rounded-lg text-sm">
-                            <h4 class="font-bold mb-2 text-on-surface-variant">テンプレートプレビュー</h4>
-                            <p class="text-on-surface-variant">ここに選択したテンプレートの本文が表示されます。</p>
-                        </div>
+                        <!-- Right Column: Sending Options -->
+                        <div class="space-y-6 mt-6 lg:mt-0">
+                            <h2 class="text-xl font-semibold text-on-surface border-b border-outline-variant pb-2">送信オプション</h2>
 
-                        <!-- メール件名 -->
-                        <div class="input-group">
-                            <input type="text" id="emailSubject" placeholder=" " class="input-field">
-                            <label for="emailSubject" class="input-label">メール件名</label>
-                        </div>
+                            <!-- Enable/Disable Toggle -->
+                            <div class="flex items-center justify-between p-4 bg-surface-container rounded-lg shadow-sm">
+                                <label for="thankYouEmailEnabledToggle" class="text-on-surface font-semibold text-lg">お礼メール送信</label>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" value="" id="thankYouEmailEnabledToggle" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                                    <span class="ml-3 text-sm font-medium text-on-surface-variant" id="thankYouEmailEnabledStatus">無効</span>
+                                </label>
+                            </div>
 
-                        <!-- メール本文 & 変数挿入 -->
-                        <div class="space-y-2">
-                            <div class="flex justify-between items-center">
-                                <label for="emailBody" class="input-label-static">メール本文</label>
-                                <div class="relative">
-                                    <button id="insertVariableBtn" class="text-sm text-primary font-semibold">変数を挿入</button>
-                                    <div id="variableList" class="absolute right-0 mt-2 w-48 bg-surface rounded-md shadow-lg z-10 hidden">
-                                        <!-- Variable list will be populated by JS -->
+                            <!-- All settings fields container (for enable/disable logic) -->
+                            <div id="thankYouEmailSettingsFields" class="space-y-6">
+                                <!-- Send Method -->
+                                <div class="space-y-2">
+                                    <label class="text-on-surface font-semibold">送信方法</label>
+                                    <div class="flex flex-col sm:flex-row gap-4">
+                                        <label class="flex items-center gap-2 p-3 border rounded-lg has-[:checked]:border-primary">
+                                            <input type="radio" name="sendMethod" value="auto" class="form-radio text-primary focus:ring-primary">
+                                            <div>
+                                                <span class="font-semibold text-on-surface">自動送信</span>
+                                                <p class="text-xs text-on-surface-variant">名刺データ化完了後、自動的に送信されます。</p>
+                                            </div>
+                                        </label>
+                                        <label class="flex items-center gap-2 p-3 border rounded-lg has-[:checked]:border-primary">
+                                            <input type="radio" name="sendMethod" value="manual" class="form-radio text-primary focus:ring-primary" checked>
+                                            <div>
+                                                <span class="font-semibold text-on-surface">手動送信</span>
+                                                <p class="text-xs text-on-surface-variant">この画面から手動で送信実行できます。</p>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Recipient List -->
+                                <div class="p-4 bg-surface-container rounded-lg text-sm">
+                                    <h4 class="font-bold mb-2 text-on-surface-variant">送信対象者リスト</h4>
+                                    <div id="recipientList">
+                                        <p class="text-on-surface-variant text-sm">送信対象者: <span id="recipientCount" class="font-bold">0件</span></p>
+                                        <p id="recipientConditionMessage" class="text-sm text-on-surface-variant mt-2">会期終了後、名刺データ化が完了すると対象者が表示されます。</p>
                                     </div>
                                 </div>
                             </div>
-                            <textarea id="emailBody" rows="10" placeholder=" " class="input-field"></textarea>
-                            <div id="emailBodyRealtimePreview" class="mt-4 p-4 bg-surface-container rounded-lg text-sm">
-                                <h4 class="font-bold mb-2 text-on-surface-variant">リアルタイムプレビュー</h4>
-                                <p class="text-on-surface-variant">ここにメール本文のリアルタイムプレビューが表示されます。</p>
+                             <div id="sendEmailStatus" class="mt-4 text-center text-sm text-on-surface-variant">
+                                <!-- Send status: Sending / Sent / Failed -->
                             </div>
-                        </div>
-
-                        <!-- 送信対象者リスト -->
-                        <div class="input-group">
-                            <div id="recipientList" class="input-field-static min-h-[100px]">
-                                <p class="text-on-surface-variant text-sm">送信対象者: <span id="recipientCount" class="font-bold">0件</span></p>
-                                <p id="recipientConditionMessage" class="text-sm text-on-surface-variant mt-2">会期終了後、名刺データ化が完了すると対象者が表示されます。</p>
-                            </div>
-                            <label class="input-label-static">送信対象者リスト</label>
                         </div>
                     </div>
 
-                    <div class="flex justify-end gap-4 pt-4">
+                    <!-- Action Buttons -->
+                    <div class="flex justify-end gap-4 pt-6 mt-8 border-t border-outline-variant">
                         <button id="cancelThankYouEmailSettings" class="min-w-[100px] px-6 py-2 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors">キャンセル</button>
-                        <button id="saveThankYouEmailSettingsBtn" class="min-w-[100px] px-6 py-2 rounded-full gradient-primary-bg text-on-primary font-semibold transition-colors">
+                        <button id="saveThankYouEmailSettingsBtn" class="min-w-[100px] px-6 py-2 rounded-full bg-primary text-on-primary font-semibold transition-colors shadow-md">
                             <span id="saveThankYouEmailSettingsBtnText">設定を保存する</span>
                             <span id="saveThankYouEmailSettingsBtnLoading" class="hidden material-icons animate-spin ml-2">sync</span>
                         </button>
-                        <button id="sendThankYouEmailBtn" class="min-w-[100px] px-6 py-2 rounded-full gradient-primary-bg text-on-primary font-semibold transition-colors" disabled>
+                        <button id="sendThankYouEmailBtn" class="min-w-[100px] px-6 py-2 rounded-full bg-tertiary-container text-on-tertiary-container font-semibold transition-colors" disabled>
                             <span id="sendThankYouEmailBtnText">お礼メールを送信する</span>
                             <span id="sendThankYouEmailBtnLoading" class="hidden material-icons animate-spin ml-2">sync</span>
                         </button>
                     </div>
-                    <div id="sendEmailStatus" class="mt-4 text-center text-sm text-on-surface-variant">
-                        <!-- 送信ステータス: 送信中 / 送信完了 / 送信失敗 -->
-                    </div>
                 </div>
-
             </div>
         </main>
     </div>

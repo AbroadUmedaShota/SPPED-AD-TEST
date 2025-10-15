@@ -66,6 +66,7 @@ export function initThankYouEmailSettings() {
             setupEventListeners();
             updateUI(state.emailSettings.thankYouEmailEnabled, state.surveyData);
             updateTemplatePreview(state.emailTemplates.find(t => t.id === state.emailSettings.emailTemplateId));
+            handleRealtimePreview(); // Render initial preview
 
         } catch (error) {
             console.error('初期化エラー:', error);
@@ -80,10 +81,31 @@ export function initThankYouEmailSettings() {
         thankYouEmailEnabledToggle.addEventListener('change', handleFormChange);
         sendMethodRadios.forEach(radio => radio.addEventListener('change', handleFormChange));
         emailTemplateSelect.addEventListener('change', handleTemplateChange);
+        document.getElementById('emailBody').addEventListener('input', handleRealtimePreview);
         insertVariableBtn.addEventListener('click', () => variableList.classList.toggle('hidden'));
         saveButton.addEventListener('click', handleSaveSettings);
         sendEmailButton.addEventListener('click', handleSendEmails);
         cancelButton.addEventListener('click', handleCancel);
+    }
+
+    /**
+     * Updates the real-time preview of the email body.
+     */
+    function handleRealtimePreview() {
+        const bodyText = document.getElementById('emailBody').value;
+        const previewParagraph = document.querySelector('#emailBodyRealtimePreview p');
+
+        if (previewParagraph) {
+            // To prevent XSS, escape HTML characters and then replace newlines with <br>
+            const escapedText = bodyText
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+            
+            previewParagraph.innerHTML = escapedText.replace(/\n/g, "<br>");
+        }
     }
 
     /**
@@ -135,13 +157,14 @@ export function initThankYouEmailSettings() {
     function handleTemplateChange() {
         const selectedTemplate = state.emailTemplates.find(t => t.id === emailTemplateSelect.value);
         updateTemplatePreview(selectedTemplate);
+        handleRealtimePreview(); // Also update preview when template changes
     }
 
     function handleVariableClick(variable) {
         insertTextAtCursor(emailBodyTextarea, `{${variable}}`);
         variableList.classList.add('hidden');
+        handleRealtimePreview(); // Also update preview when variable is inserted
     }
-
     async function handleSaveSettings() {
         setButtonLoading(saveButton, true);
         const settingsToSave = {

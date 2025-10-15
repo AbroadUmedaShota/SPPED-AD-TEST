@@ -51,7 +51,7 @@ export async function getInitialData(surveyId) {
         const settings = (survey && typeof survey.thankYouEmailSettings === 'object' && survey.thankYouEmailSettings !== null) 
             ? survey.thankYouEmailSettings 
             : { 
-                thankYouEmailEnabled: false, 
+                thankYouEmailEnabled: true, 
                 sendMethod: 'manual',
                 emailTemplateId: '',
                 emailSubject: '',
