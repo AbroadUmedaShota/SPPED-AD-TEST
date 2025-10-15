@@ -642,29 +642,41 @@ export function initTableManager() {
 
                 // Sorting on currentFilteredData directly
                 currentFilteredData.sort((a, b) => {
-                    let aValue = a[sortKey];
-                    let bValue = b[sortKey];
+                    const lang = window.getCurrentLanguage();
+                    let aValue, bValue;
 
-                    // Type conversion for robust numerical/date sorting
-                    if (sortKey === 'answerCount' && aValue !== undefined && bValue !== undefined) {
-                        aValue = parseInt(aValue, 10);
-                        bValue = parseInt(bValue, 10);
-                    } else if ((sortKey === 'periodStart' || sortKey === 'deadline' || sortKey === 'dataCompletionDate') && aValue !== undefined && bValue !== undefined) {
-                        aValue = new Date(aValue); // Date objects for proper comparison
-                        bValue = new Date(bValue);
-                    } else if (sortKey === 'status') {
-                        // Custom sort order for status
-                        aValue = STATUS_SORT_ORDER[getSurveyStatus(a)] || 99;
-                        bValue = STATUS_SORT_ORDER[getSurveyStatus(b)] || 99;
-                    } else if (typeof aValue === 'string' && typeof bValue === 'string') {
-                        // Default string comparison (case-insensitive)
-                        return aValue.localeCompare(bValue, 'ja', { sensitivity: 'base' });
+                    // Get values based on sortKey, handling multi-language names
+                    if (sortKey === 'name') {
+                        aValue = (a.name && typeof a.name === 'object') ? a.name[lang] || a.name.ja || '' : a.name || '';
+                        bValue = (b.name && typeof b.name === 'object') ? b.name[lang] || b.name.ja || '' : b.name || '';
+                    } else {
+                        aValue = a[sortKey];
+                        bValue = b[sortKey];
                     }
 
-                    // Comparison logic
-                    if (aValue < bValue) return (sortOrder === 'asc') ? -1 : 1;
-                    if (aValue > bValue) return (sortOrder === 'asc') ? 1 : -1;
-                    return 0;
+                    // Type-specific processing
+                    if (sortKey === 'status') {
+                        aValue = STATUS_SORT_ORDER[getSurveyStatus(a)] || 99;
+                        bValue = STATUS_SORT_ORDER[getSurveyStatus(b)] || 99;
+                    } else if (sortKey === 'answerCount') {
+                        aValue = parseInt(aValue, 10) || 0;
+                        bValue = parseInt(bValue, 10) || 0;
+                    } else if (['periodStart', 'deadline', 'dataCompletionDate'].includes(sortKey)) {
+                        // Handle invalid dates gracefully for sorting
+                        aValue = aValue ? new Date(aValue) : new Date(0);
+                        bValue = bValue ? new Date(bValue) : new Date(0);
+                    }
+
+                    // Universal comparison logic
+                    let result;
+                    if (typeof aValue === 'string' && typeof bValue === 'string') {
+                        result = aValue.localeCompare(bValue, 'ja', { sensitivity: 'base' });
+                    } else {
+                        // Handles numbers, dates, and status orders
+                        result = (aValue < bValue) ? -1 : ((aValue > bValue) ? 1 : 0);
+                    }
+
+                    return sortOrder === 'asc' ? result : -result;
                 });
 
                 updatePagination(); // Re-render table with sorted data and update pagination
