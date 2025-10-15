@@ -563,7 +563,7 @@ export function renderOutlineMap() {
   const mainContent = document.getElementById('survey-content-area');
   if (!mainContent) return;
 
-  const headings = Array.from(mainContent.querySelectorAll('h2, .group-title-input, .question-title'));
+  const headings = Array.from(mainContent.querySelectorAll('h2, .group-title-input, .question-text-input'));
   if (!headings.length) {
     outlineMapContainer.innerHTML = '';
     return;
@@ -571,7 +571,7 @@ export function renderOutlineMap() {
 
   let html = '<h3 class="text-lg font-semibold mb-4">目次</h3><ul class="space-y-2">';
   headings.forEach((h, idx) => {
-    const isQuestion = h.classList.contains('question-title');
+    const isQuestion = h.classList.contains('question-text-input');
     const isGroup = h.classList.contains('group-title-input');
     
     let targetElement;
@@ -580,8 +580,7 @@ export function renderOutlineMap() {
 
     if (isQuestion) {
         targetElement = h.closest('.question-item');
-        const input = targetElement ? targetElement.querySelector('.question-text-input') : null;
-        text = input ? input.value : (h.textContent || '');
+        text = h.value || '';
         level = 3;
     } else if (isGroup) {
         targetElement = h.closest('.question-group');
