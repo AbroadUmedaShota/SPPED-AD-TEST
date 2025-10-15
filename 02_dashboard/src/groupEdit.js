@@ -360,8 +360,16 @@ function setupEventListeners() {
     // Add member button
     elements.addMemberBtn.addEventListener('click', () => {
         const email = elements.newMemberEmail.value.trim();
+        const errorEl = document.getElementById('newMemberEmailError');
+
+        // Clear previous error before validation
+        errorEl.classList.add('hidden');
+        elements.newMemberEmail.classList.remove('input-error');
+
         if (!email || !/\S+@\S+\.\S+/.test(email)) {
-            showToast('有効なメールアドレスを入力してください。', 'error');
+            errorEl.textContent = '有効なメールアドレスを入力してください。';
+            errorEl.classList.remove('hidden');
+            elements.newMemberEmail.classList.add('input-error');
             return;
         }
         const newMember = {
