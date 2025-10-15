@@ -2020,7 +2020,7 @@ function setupSortables() {
             animation: 150,
             ghostClass: 'sortable-ghost',
             chosenClass: 'sortable-chosen',
-            dragClass: 'sortable-drag',
+            dragClass: 'dragging-item',
             forceFallback: true, // Use fallback to avoid HTML5 D&D quirks
             onEnd: (evt) => {
                 const { oldIndex, newIndex } = evt;
