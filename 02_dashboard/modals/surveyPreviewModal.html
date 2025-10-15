@@ -2,6 +2,17 @@
     <div class="modal-content-transition modal-content w-full max-w-3xl p-6 rounded-xl bg-surface shadow-lg relative">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-on-surface text-2xl font-bold">アンケートプレビュー</h2>
+
+            <!-- Preview Mode Switcher -->
+            <div id="preview-mode-switcher" class="absolute top-6 left-1/2 -translate-x-1/2 flex items-center border border-outline-variant rounded-full p-1 bg-surface-variant">
+                <button id="preview-mode-phone" title="スマートフォン表示" class="px-4 py-2 rounded-full flex items-center justify-center">
+                    <span class="material-icons text-base">smartphone</span>
+                </button>
+                <button id="preview-mode-tablet" title="タブレット表示" class="px-4 py-2 rounded-full flex items-center justify-center">
+                    <span class="material-icons text-base">tablet_mac</span>
+                </button>
+            </div>
+
             <button data-modal-close="surveyPreviewModal">
                 <span class="material-icons text-3xl">close</span>
             </button>

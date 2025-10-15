@@ -6,7 +6,7 @@ const JAPANESE_LOCALE = flatpickrInstance?.l10ns?.ja ?? flatpickrInstance?.l10ns
 /**
  * 日付ピッカーを初期化する
  */
-export function initializeDatepickers() {
+export function initializeDatepickers(isNewSurvey = false) {
     if (!flatpickrInstance) {
         console.warn('flatpickr is not loaded.');
         return;
@@ -15,17 +15,21 @@ export function initializeDatepickers() {
         flatpickrInstance.localize(JAPANESE_LOCALE);
     }
 
-    // Initialize for the new period range input
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setHours(0, 0, 0, 0);
 
-    flatpickrInstance('#periodRange', {
+    const rangeOptions = {
         mode: 'range',
         dateFormat: 'Y-m-d',
-        locale: JAPANESE_LOCALE, // Ensure locale is applied
-        minDate: tomorrow
-    });
+        locale: JAPANESE_LOCALE,
+    };
+
+    if (isNewSurvey) {
+        rangeOptions.minDate = tomorrow;
+    }
+
+    flatpickrInstance('#periodRange', rangeOptions);
 
     // Keep the deadline picker initialization
     flatpickrInstance('#deadlineWrapper', {

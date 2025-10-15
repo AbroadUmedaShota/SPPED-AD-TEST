@@ -656,6 +656,45 @@ function updateAndRenderAll() {
 
     updateOutlineActionsState();
 
+    // Post-render enhancements (linking labels, setting dynamic states)
+    document.querySelectorAll('.question-item').forEach(qItem => {
+        const groupId = qItem.closest('.question-group').dataset.groupId;
+        const questionId = qItem.dataset.questionId;
+        const question = surveyData.questionGroups.find(g => g.groupId === groupId)?.questions.find(q => q.questionId === questionId);
+        if (!question) return;
+
+        // Link 'Required' checkbox and label
+        const requiredCheckbox = qItem.querySelector('.required-checkbox');
+        const requiredLabel = qItem.querySelector('.required-label');
+        if (requiredCheckbox && requiredLabel) {
+            const uniqueId = `required-${questionId}`;
+            requiredCheckbox.id = uniqueId;
+            requiredLabel.setAttribute('for', uniqueId);
+        }
+
+        // Handle 'Display as dropdown' checkbox visibility and state
+        const dropdownContainer = qItem.querySelector('.display-as-dropdown-container');
+        if (dropdownContainer) {
+            if (question.type === 'single_answer') {
+                dropdownContainer.classList.remove('hidden');
+                dropdownContainer.classList.add('flex');
+                
+                const dropdownCheckbox = dropdownContainer.querySelector('.display-as-dropdown-checkbox');
+                const dropdownLabel = dropdownContainer.querySelector('.display-as-dropdown-label');
+                
+                if (dropdownCheckbox && dropdownLabel) {
+                    const uniqueId = `display-as-dropdown-${questionId}`;
+                    dropdownCheckbox.id = uniqueId;
+                    dropdownLabel.setAttribute('for', uniqueId);
+                    dropdownCheckbox.checked = question.meta?.displayAs === 'dropdown';
+                }
+            } else {
+                dropdownContainer.classList.add('hidden');
+                dropdownContainer.classList.remove('flex');
+            }
+        }
+    });
+
     // Ensure placeholders and outline actions are updated after rendering
     Promise.resolve().then(() => {
         updateAllPlaceholders();
@@ -851,6 +890,27 @@ function setupInputBindings() {
             if (question && question.matrix && Array.isArray(question.matrix.cols) && question.matrix.cols[index]) {
                 question.matrix.cols[index].text = normalizeLocalization(question.matrix.cols[index].text);
                 question.matrix.cols[index].text[lang] = target.value || '';
+                setDirty(true);
+                validateFormForSaveButton();
+            }
+            return;
+        }
+
+        // Explanation description
+        if (target.classList.contains('explanation-description-input')) {
+            const qItem = target.closest('.question-item');
+            const groupEl = target.closest('.question-group');
+            if (!qItem || !groupEl) return;
+            const groupId = groupEl.dataset.groupId;
+            const questionId = qItem.dataset.questionId;
+            const lang = target.dataset.lang || getEditorLanguage();
+            const group = (surveyData.questionGroups || []).find((g) => g.groupId === groupId);
+            const question = group?.questions?.find((q) => q.questionId === questionId);
+            if (question) {
+                if (typeof question.explanationText !== 'object' || question.explanationText === null) {
+                    question.explanationText = normalizeLocalization(question.explanationText);
+                }
+                question.explanationText[lang] = target.value || '';
                 setDirty(true);
                 validateFormForSaveButton();
             }
@@ -1174,33 +1234,18 @@ async function initializePage() {
         updateAndRenderAll();
         restoreAccordionState();
         const fabActions = {
-            onAddQuestion: (questionType) => handleAddNewQuestion(null, questionType),
+            onAddQuestion: (questionType) => {
+                if (questionType === 'dropdown_pseudo') {
+                    handleAddNewQuestion(null, 'single_answer', { displayAs: 'dropdown' });
+                } else {
+                    handleAddNewQuestion(null, questionType);
+                }
+            },
             onAddGroup: () => handleAddNewQuestionGroup()
         };
         initializeFab('fab-container', fabActions);
 
-        // Force update bizcard plan display at the very end
-        setTimeout(() => {
-            try {
-                const surveyId = new URLSearchParams(window.location.search).get('surveyId');
-                const bizcardPlanValue = localStorage.getItem(`bizcardPlan_${surveyId}`);
-                const planDisplayEl = document.getElementById('selectedBizcardPlan');
 
-                if (planDisplayEl && bizcardPlanValue) {
-                    const planMap = {
-                        'normal': '通常作業プラン',
-                        'express': '特急作業プラン',
-                        'super-express': '超特急プラン',
-                        'ondemand': 'オンデマンドプラン'
-                    };
-                    planDisplayEl.textContent = planMap[bizcardPlanValue] || bizcardPlanValue;
-                } else if (planDisplayEl) {
-                    planDisplayEl.textContent = '未設定';
-                }
-            } catch (e) {
-                console.error('Failed to display bizcard plan:', e);
-            }
-        }, 100);
 
         // チュートリアルの状態を確認して開始
         const tutorialStatus = localStorage.getItem('speedad-tutorial-status');
@@ -1474,6 +1519,31 @@ function setupEventListeners() {
             }
             return;
         }
+
+        // Handle display-as-dropdown checkbox change
+        const dropdownCheckbox = target.closest('.display-as-dropdown-checkbox');
+        if (dropdownCheckbox) {
+            const qItem = dropdownCheckbox.closest('.question-item');
+            const gItem = dropdownCheckbox.closest('.question-group');
+            if (qItem && gItem) {
+                const groupId = gItem.dataset.groupId;
+                const questionId = qItem.dataset.questionId;
+                const question = surveyData.questionGroups.find(g => g.groupId === groupId)?.questions.find(q => q.questionId === questionId);
+                if (question) {
+                    ensureQuestionMeta(question);
+                    if (dropdownCheckbox.checked) {
+                        question.meta.displayAs = 'dropdown';
+                    } else {
+                        delete question.meta.displayAs;
+                        if (Object.keys(question.meta).length === 0) {
+                            delete question.meta;
+                        }
+                    }
+                    setDirty(true);
+                }
+            }
+            return;
+        }
     });
 
     // --- Delegated Click-to-Action Listeners ---
@@ -1581,9 +1651,12 @@ function setupEventListeners() {
                 return;
             }
 
+            const isNewSurvey = !currentSurveyId;
             const startDateObj = toDateOnly(periodStartVal);
             const today = toDateOnly(new Date());
-            if (!startDateObj || (today && startDateObj.getTime() <= today.getTime())) {
+
+            // Only validate that the start date is in the future for NEW surveys.
+            if (isNewSurvey && (!startDateObj || (today && startDateObj.getTime() <= today.getTime()))) {
                 showToast('開始日は翌日以降の日付を選択してください。', 'error');
                 return;
             }
@@ -1658,6 +1731,22 @@ ${summary}
 // --- Data Manipulation Handlers ---
 function handleAddNewQuestionGroup() {
     if (!surveyData.questionGroups) surveyData.questionGroups = [];
+
+    const emptyGroup = surveyData.questionGroups.find(g => !g.questions || g.questions.length === 0);
+
+    if (emptyGroup) {
+        showToast('設問のない空のグループが既に存在します。先に設問を追加してください。', 'warning');
+        const emptyGroupEl = document.querySelector(`[data-group-id="${emptyGroup.groupId}"]`);
+        if (emptyGroupEl) {
+            emptyGroupEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            emptyGroupEl.classList.add('border-yellow-400', 'shadow-lg');
+            setTimeout(() => {
+                emptyGroupEl.classList.remove('border-yellow-400', 'shadow-lg');
+            }, 2000);
+        }
+        return;
+    }
+
     const newGroup = {
         groupId: `group_${Date.now()}`,
         title: normalizeLocalization({ ja: '新しい質問グループ' }),
@@ -1688,7 +1777,7 @@ function handleDuplicateQuestionGroup(groupId) {
     updateAndRenderAll();
 }
 
-function handleAddNewQuestion(groupId, questionType) {
+function handleAddNewQuestion(groupId, questionType, creationOptions = {}) {
     let targetGroup;
     if (groupId) {
         targetGroup = surveyData.questionGroups.find(g => g.groupId === groupId);
@@ -1707,9 +1796,21 @@ function handleAddNewQuestion(groupId, questionType) {
         questionId: `q_${Date.now()}`,
         type: questionType,
         text: normalizeLocalization({ ja: '新しい設問' }),
-        required: false,
-        options: (questionType === 'single_answer' || questionType === 'multi_answer') ? [] : undefined
+        required: false
     };
+
+    if (['single_answer', 'multi_answer'].includes(questionType)) {
+        newQuestion.options = [
+            { text: normalizeLocalization({ ja: '選択肢1' }) },
+            { text: normalizeLocalization({ ja: '選択肢2' }) }
+        ];
+    }
+
+    if (creationOptions.displayAs === 'dropdown') {
+        ensureQuestionMeta(newQuestion);
+        newQuestion.meta.displayAs = 'dropdown';
+    }
+
     initializeQuestionMeta(newQuestion);
     targetGroup.questions.push(newQuestion);
     setDirty(true);
@@ -1802,7 +1903,7 @@ function handleChangeQuestionType(groupId, questionId, newType) {
 
     question.type = newType;
     setDirty(true); // Change of type is a modification
-    const needsOptions = ['single_answer', 'multi_answer'].includes(newType);
+    const needsOptions = ['single_answer', 'multi_answer', 'dropdown_answer'].includes(newType);
     if (needsOptions) {
         if (!Array.isArray(question.options)) {
             question.options = [
@@ -1811,9 +1912,11 @@ function handleChangeQuestionType(groupId, questionId, newType) {
             ];
         }
         if ('matrix' in question) delete question.matrix;
+        if ('explanationText' in question) delete question.explanationText;
     } else if (newType === 'matrix_sa' || newType === 'matrix_ma') {
         // Initialize matrix rows/cols
         delete question.options;
+        if ('explanationText' in question) delete question.explanationText;
         question.matrix = question.matrix || { rows: [], cols: [] };
         if (!Array.isArray(question.matrix.rows) || question.matrix.rows.length === 0) {
             question.matrix.rows = [
@@ -1827,9 +1930,16 @@ function handleChangeQuestionType(groupId, questionId, newType) {
                 { text: normalizeLocalization({ ja: '列2' }) },
             ];
         }
+    } else if (newType === 'explanation_card') {
+        delete question.options;
+        delete question.matrix;
+        if (!question.explanationText) {
+            question.explanationText = normalizeLocalization({ ja: '' });
+        }
     } else {
         if ('options' in question) delete question.options;
         if ('matrix' in question) delete question.matrix;
+        if ('explanationText' in question) delete question.explanationText;
     }
 
     updateAndRenderAll();
@@ -1842,6 +1952,7 @@ function validateFormForSaveButton() {
     const saveButton = document.getElementById('createSurveyBtn');
     if (!saveButton) return;
 
+    const isNewSurvey = !currentSurveyId;
     const baseLang = BASE_LANGUAGE;
     const nameVal = getLocalizedValue(surveyData.name, baseLang).trim();
     const titleVal = getLocalizedValue(surveyData.displayTitle, baseLang).trim();
@@ -1864,7 +1975,7 @@ function validateFormForSaveButton() {
     if (!startMissing) {
         if (!startDateObj) {
             startDateValid = false;
-        } else if (today && startDateObj.getTime() <= today.getTime()) {
+        } else if (isNewSurvey && today && startDateObj.getTime() <= today.getTime()) {
             startDateValid = false;
         }
     }
@@ -1912,14 +2023,20 @@ function validateFormForSaveButton() {
         periodRangeInput.setAttribute('aria-invalid', hasRangeError ? 'true' : 'false');
     }
     if (rangeError) {
+        let errorMessage = '';
         if (startMissing || endMissing) {
-            rangeError.textContent = 'この入力は必須です';
-        } else if (!startDateValid) {
-            rangeError.textContent = '開始日は翌日以降に設定してください。';
+            errorMessage = 'この入力は必須です';
         } else if (!dateOrderValid) {
-            rangeError.textContent = '終了日は開始日以降に設定してください。';
+            errorMessage = '終了日は開始日以降に設定してください。';
+        } else if (!startDateValid) {
+            if (isNewSurvey) {
+                errorMessage = '開始日は翌日以降に設定してください。';
+            } else {
+                errorMessage = '開始日が無効です。';
+            }
         }
-        rangeError.classList.toggle('hidden', !hasRangeError);
+        rangeError.textContent = errorMessage;
+        rangeError.classList.toggle('hidden', !hasRangeError || !errorMessage);
     }
 
     const memoInput = document.getElementById('memo');
@@ -1972,32 +2089,121 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// プレビューのイベントを付与
+function renderPreviewInModal() {
+    const dataString = localStorage.getItem('surveyPreviewData');
+    if (!dataString) return;
+
+    const surveyData = JSON.parse(dataString);
+    const container = document.getElementById('modalSurveyPreviewContainer');
+    if (!container) return;
+
+    const getLocalizedText = (field) => {
+        if (typeof field === 'string') return field;
+        if (typeof field === 'object' && field !== null) {
+            return field.ja || Object.values(field)[0] || '';
+        }
+        return '';
+    };
+
+    let html = '<div class="survey-preview-stack">';
+
+    // Header
+    html += `
+        <div class="survey-preview-header">
+            <h3 class="survey-preview-title">${getLocalizedText(surveyData.displayTitle)}</h3>
+            <p class="survey-preview-period">期間: ${surveyData.periodStart || ''} ～ ${surveyData.periodEnd || ''}</p>
+            <p class="survey-preview-description">${getLocalizedText(surveyData.description)}</p>
+        </div>
+    `;
+
+    // Questions
+    (surveyData.questionGroups || []).forEach(group => {
+        html += '<div class="survey-preview-section">';
+        if (group.title && getLocalizedText(group.title)) {
+            html += `<h4 class="survey-preview-group-title">${getLocalizedText(group.title)}</h4>`;
+        }
+        (group.questions || []).forEach(q => {
+            html += '<div class="survey-preview-question">';
+            html += `<p class="survey-preview-question-title">${getLocalizedText(q.text)} ${q.required ? '<span class="text-error survey-preview-required">*</span>' : ''}</p>`;
+            
+            if (q.type === 'single_answer' && q.meta?.displayAs === 'dropdown') {
+                html += '<select class="input-field"><option value="">選択してください</option>';
+                (q.options || []).forEach(opt => {
+                    html += `<option value="${getLocalizedText(opt.text)}">${getLocalizedText(opt.text)}</option>`;
+                });
+                html += '</select>';
+            } else if (q.type === 'single_answer') {
+                html += '<div class="survey-preview-options">';
+                (q.options || []).forEach(opt => {
+                    html += `<div class="survey-preview-option-row"><span class="material-icons survey-preview-option-icon">radio_button_unchecked</span> <span class="survey-preview-option-text">${getLocalizedText(opt.text)}</span></div>`;
+                });
+                html += '</div>';
+            } else if (q.type === 'multi_answer') {
+                html += '<div class="survey-preview-options">';
+                (q.options || []).forEach(opt => {
+                    html += `<div class="survey-preview-option-row"><span class="material-icons survey-preview-option-icon">check_box_outline_blank</span> <span class="survey-preview-option-text">${getLocalizedText(opt.text)}</span></div>`;
+                });
+                html += '</div>';
+            } else if (q.type === 'free_answer') {
+                html += '<textarea class="input-field" rows="3" placeholder="回答を入力"></textarea>';
+            } else if (q.type === 'number_answer') {
+                html += '<input type="number" class="input-field" placeholder="数値を入力">';
+            }
+            
+            html += '</div>';
+        });
+        html += '</div>';
+    });
+
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+function setupPreviewSwitcher() {
+    // Render the content first
+    renderPreviewInModal();
+
+    const phoneBtn = document.getElementById('preview-mode-phone');
+    const tabletBtn = document.getElementById('preview-mode-tablet');
+    const device = document.querySelector('.survey-preview-device');
+
+    if (!phoneBtn || !tabletBtn || !device) return;
+
+    phoneBtn.classList.add('active');
+    device.classList.remove('is-tablet');
+
+    phoneBtn.addEventListener('click', () => {
+        device.classList.remove('is-tablet');
+        phoneBtn.classList.add('active');
+        tabletBtn.classList.remove('active');
+    });
+
+    tabletBtn.addEventListener('click', () => {
+        device.classList.add('is-tablet');
+        tabletBtn.classList.add('active');
+        phoneBtn.classList.remove('active');
+    });
+}
+
 function attachPreviewListener() {
     const previewBtn = document.getElementById('showPreviewBtn');
-    if (!previewBtn) return;
-    previewBtn.addEventListener('click', async (e) => {
-        e.preventDefault();
-        try {
-            const setupEventListeners = () => {
-                const modal = document.getElementById('surveyPreviewModal');
-                if (!modal) return;
-
-                const closeButtons = modal.querySelectorAll('[data-modal-close="surveyPreviewModal"]');
-                closeButtons.forEach(btn => {
-                    if (!btn.dataset.listenerAttached) {
-                        btn.addEventListener('click', () => closeModal('surveyPreviewModal'));
-                        btn.dataset.listenerAttached = 'true';
-                    }
-                });
-            };
-            
-            await handleOpenModal('surveyPreviewModal', 'modals/surveyPreviewModal.html', setupEventListeners);
-            renderSurveyPreview();
-        } catch (err) {
-            console.error('Failed to open preview modal:', err);
-        }
-    });
+    if (previewBtn) {
+        previewBtn.addEventListener('click', () => {
+            try {
+                localStorage.setItem('surveyPreviewData', JSON.stringify(surveyData));
+                handleOpenModal('surveyPreviewModal', 'modals/surveyPreviewModal.html', setupPreviewSwitcher);
+            } catch (e) {
+                console.error('Failed to save preview data to localStorage', e);
+                showToast('プレビューの表示に失敗しました。', 'error');
+            }
+        });
+    }
+    const outlinePreviewBtn = document.querySelector('[data-outline-action="preview"]');
+    if (outlinePreviewBtn) {
+        outlinePreviewBtn.addEventListener('click', () => {
+            document.getElementById('showPreviewBtn')?.click();
+        });
+    }
 }
 
 // --- Drag & Drop (Sortable) ---
@@ -2143,11 +2349,25 @@ function renderSurveyPreview() {
         group.questions.forEach((question, qIndex) => {
             content += `<div class="py-4">
 `;
-            content += `<p class="font-semibold">${qIndex + 1}. ${getLocalizedValue(question.text, lang)} ${question.required ? '<span class="text-red-500">*</span>' : ''}</p>`;
+            if (question.type === 'explanation_card') {
+                // Render title without number, but bold and with normal text size
+                content += `<p class="font-semibold break-words">${getLocalizedValue(question.text, lang)}</p>`;
+                // Render description below it
+                if (question.explanationText) {
+                    content += `<p class="mt-2 text-on-surface-variant break-words">${getLocalizedValue(question.explanationText, lang)}</p>`;
+                }
+            } else {
+                content += `<p class="font-semibold">${qIndex + 1}. ${getLocalizedValue(question.text, lang)} ${question.required ? '<span class="text-red-500">*</span>' : ''}</p>`;
+            }
             content += `<div class="mt-2 space-y-2">
 `;
 
             switch (question.type) {
+                case 'explanation_card':
+                    if (question.explanationText) {
+                        content += `<p class="mt-2 text-base text-on-surface-variant break-words">${getLocalizedValue(question.explanationText, lang)}</p>`;
+                    }
+                    break;
                 case 'free_answer':
                     content += `<textarea class="w-full border-gray-300 rounded-md shadow-sm" rows="3" readonly></textarea>`;
                     break;

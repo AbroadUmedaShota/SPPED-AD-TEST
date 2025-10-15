@@ -63,9 +63,14 @@
                                 <select id="emailTemplate" class="input-field"></select>
                                 <label for="emailTemplate" class="input-label">メールテンプレート選択</label>
                             </div>
-                            <div id="templatePreview" class="p-4 bg-surface-container rounded-lg text-sm">
-                                <h4 class="font-bold mb-2 text-on-surface-variant">テンプレートプレビュー</h4>
-                                <p class="text-on-surface-variant">ここに選択したテンプレートの本文が表示されます。</p>
+                            <div id="templateSelectionContainer" class="hidden">
+                                <div id="templatePreview" class="p-4 bg-surface-container rounded-lg text-sm">
+                                    <h4 class="font-bold mb-2 text-on-surface-variant">テンプレートプレビュー</h4>
+                                    <p class="text-on-surface-variant whitespace-pre-wrap">ここに選択したテンプレートの本文が表示されます。</p>
+                                </div>
+                                <div class="text-right mt-2">
+                                    <button id="insertTemplateBtn" class="text-sm text-primary font-semibold">本文に挿入する</button>
+                                </div>
                             </div>
 
                             <!-- Email Subject -->
@@ -95,39 +100,38 @@
                         <div class="space-y-6 mt-6 lg:mt-0">
                             <h2 class="text-xl font-semibold text-on-surface border-b border-outline-variant pb-2">送信オプション</h2>
 
-                            <!-- Enable/Disable Toggle -->
-                            <div class="flex items-center justify-between p-4 bg-surface-container rounded-lg shadow-sm">
-                                <label for="thankYouEmailEnabledToggle" class="text-on-surface font-semibold text-lg">お礼メール送信</label>
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" value="" id="thankYouEmailEnabledToggle" class="sr-only peer">
-                                    <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                                    <span class="ml-3 text-sm font-medium text-on-surface-variant" id="thankYouEmailEnabledStatus">無効</span>
-                                </label>
+
+
+                            <!-- Send Method -->
+                            <div class="space-y-2">
+                                <label class="text-on-surface font-semibold">送信方法</label>
+                                <div class="flex flex-col sm:flex-row gap-4">
+                                    <label class="flex items-center gap-2 p-3 border rounded-lg has-[:checked]:border-primary">
+                                        <input type="radio" name="sendMethod" value="auto" class="form-radio text-primary focus:ring-primary">
+                                        <div>
+                                            <span class="font-semibold text-on-surface">自動送信</span>
+                                            <p class="text-xs text-on-surface-variant">名刺データ化完了後、自動的に送信されます。</p>
+                                        </div>
+                                    </label>
+                                    <label class="flex items-center gap-2 p-3 border rounded-lg has-[:checked]:border-primary">
+                                        <input type="radio" name="sendMethod" value="manual" class="form-radio text-primary focus:ring-primary">
+                                        <div>
+                                            <span class="font-semibold text-on-surface">手動送信</span>
+                                            <p class="text-xs text-on-surface-variant">この画面から手動で送信実行できます。</p>
+                                        </div>
+                                    </label>
+                                    <label class="flex items-center gap-2 p-3 border rounded-lg has-[:checked]:border-primary">
+                                        <input type="radio" name="sendMethod" value="none" class="form-radio text-primary focus:ring-primary">
+                                        <div>
+                                            <span class="font-semibold text-on-surface">送信しない</span>
+                                            <p class="text-xs text-on-surface-variant">お礼メールの送信機能を利用しません。</p>
+                                        </div>
+                                    </label>
+                                </div>
                             </div>
 
                             <!-- All settings fields container (for enable/disable logic) -->
                             <div id="thankYouEmailSettingsFields" class="space-y-6">
-                                <!-- Send Method -->
-                                <div class="space-y-2">
-                                    <label class="text-on-surface font-semibold">送信方法</label>
-                                    <div class="flex flex-col sm:flex-row gap-4">
-                                        <label class="flex items-center gap-2 p-3 border rounded-lg has-[:checked]:border-primary">
-                                            <input type="radio" name="sendMethod" value="auto" class="form-radio text-primary focus:ring-primary">
-                                            <div>
-                                                <span class="font-semibold text-on-surface">自動送信</span>
-                                                <p class="text-xs text-on-surface-variant">名刺データ化完了後、自動的に送信されます。</p>
-                                            </div>
-                                        </label>
-                                        <label class="flex items-center gap-2 p-3 border rounded-lg has-[:checked]:border-primary">
-                                            <input type="radio" name="sendMethod" value="manual" class="form-radio text-primary focus:ring-primary" checked>
-                                            <div>
-                                                <span class="font-semibold text-on-surface">手動送信</span>
-                                                <p class="text-xs text-on-surface-variant">この画面から手動で送信実行できます。</p>
-                                            </div>
-                                        </label>
-                                    </div>
-                                </div>
-
                                 <!-- Recipient List -->
                                 <div class="p-4 bg-surface-container rounded-lg text-sm">
                                     <h4 class="font-bold mb-2 text-on-surface-variant">送信対象者リスト</h4>

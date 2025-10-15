@@ -13,7 +13,8 @@ const I18N = {
       matrix_sa: 'マトリクス（単一）',
       matrix_ma: 'マトリクス（複数）',
       date_time: '日付/時刻',
-      handwriting: '手書きスペース'
+      handwriting: '手書きスペース',
+      explanation_card: '説明カード'
     },
     en: {
       free_answer: 'Free Text',
@@ -23,7 +24,8 @@ const I18N = {
       matrix_sa: 'Matrix (Single)',
       matrix_ma: 'Matrix (Multiple)',
       date_time: 'Date/Time',
-      handwriting: 'Handwriting'
+      handwriting: 'Handwriting',
+      explanation_card: 'Explanation Card'
     }
   },
   labels: {
@@ -317,7 +319,6 @@ function renderQuestion(question, uiLang, index, languageOptions = {}) {
   const template = document.getElementById('questionTemplate');
   const fragment = template.content.cloneNode(true);
   const questionItem = fragment.querySelector('.question-item');
-  const questionTitle = fragment.querySelector('.question-title');
   const requiredCheckbox = fragment.querySelector('.required-checkbox');
   const matrixEditor = fragment.querySelector('.matrix-editor');
   const typeSelect = fragment.querySelector('.question-type-select');
@@ -327,12 +328,9 @@ function renderQuestion(question, uiLang, index, languageOptions = {}) {
   questionItem.dataset.questionId = question.questionId;
   if (question.type) questionItem.dataset.questionType = question.type;
 
-  const labelText = getLocalizedText(question.text, editorLanguage) || getLocalizedText(question.text, FALLBACK_LANGUAGE);
-  const typeLabel = t('questionTypes', question.type || 'unknownType', 'ja');
-  questionTitle.textContent = labelText || `Q${index + 1}: (${typeLabel})`;
 
   if (typeSelect) {
-    const supported = ['free_answer', 'single_answer', 'multi_answer', 'number_answer', 'matrix_sa', 'matrix_ma', 'date_time', 'handwriting'];
+    const supported = ['free_answer', 'single_answer', 'multi_answer', 'number_answer', 'matrix_sa', 'matrix_ma', 'date_time', 'handwriting', 'explanation_card'];
     typeSelect.value = supported.includes(question.type) ? question.type : 'free_answer';
   }
 
@@ -401,8 +399,23 @@ function renderQuestion(question, uiLang, index, languageOptions = {}) {
   applyNumberConfig(questionItem, question);
   applyDateTimeConfig(questionItem, question);
   applyHandwritingConfig(questionItem, question);
+  applyExplanationCardConfig(questionItem, question, languageOptions);
 
   return questionItem;
+}
+
+function applyExplanationCardConfig(questionItem, question, languageOptions) {
+  const section = questionItem.querySelector('[data-config-section="explanation_card"]');
+  if (!section) return;
+  if (question.type !== 'explanation_card') {
+    section.classList.add('hidden');
+    return;
+  }
+  section.classList.remove('hidden');
+  hydrateSingleLanguageField(section, question.explanationText, languageOptions, {
+    fieldKey: `explanationDescription_${question.questionId}`,
+    label: '説明文'
+  });
 }
 
 
@@ -550,7 +563,7 @@ export function renderOutlineMap() {
   const mainContent = document.getElementById('survey-content-area');
   if (!mainContent) return;
 
-  const headings = Array.from(mainContent.querySelectorAll('h2, .group-title-input, .question-title'));
+  const headings = Array.from(mainContent.querySelectorAll('h2, .group-title-input, .question-text-input'));
   if (!headings.length) {
     outlineMapContainer.innerHTML = '';
     return;
@@ -558,7 +571,7 @@ export function renderOutlineMap() {
 
   let html = '<h3 class="text-lg font-semibold mb-4">目次</h3><ul class="space-y-2">';
   headings.forEach((h, idx) => {
-    const isQuestion = h.classList.contains('question-title');
+    const isQuestion = h.classList.contains('question-text-input');
     const isGroup = h.classList.contains('group-title-input');
     
     let targetElement;
@@ -567,8 +580,7 @@ export function renderOutlineMap() {
 
     if (isQuestion) {
         targetElement = h.closest('.question-item');
-        const input = targetElement ? targetElement.querySelector('.question-text-input') : null;
-        text = input ? input.value : (h.textContent || '');
+        text = h.value || '';
         level = 3;
     } else if (isGroup) {
         targetElement = h.closest('.question-group');
