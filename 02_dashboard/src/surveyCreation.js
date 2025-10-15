@@ -1651,9 +1651,12 @@ function setupEventListeners() {
                 return;
             }
 
+            const isNewSurvey = !currentSurveyId;
             const startDateObj = toDateOnly(periodStartVal);
             const today = toDateOnly(new Date());
-            if (!startDateObj || (today && startDateObj.getTime() <= today.getTime())) {
+
+            // Only validate that the start date is in the future for NEW surveys.
+            if (isNewSurvey && (!startDateObj || (today && startDateObj.getTime() <= today.getTime()))) {
                 showToast('開始日は翌日以降の日付を選択してください。', 'error');
                 return;
             }
