@@ -65,9 +65,6 @@ export function getSurveyStatus(survey) {
         }
         
         // データ化関連のステータスをチェック
-        if (survey.status === 'データ入力中' || survey.status === 'データ精査中') {
-            return 'データ精査中';
-        }
         if (survey.status === 'データ精査完了' || (survey.dataCompletionDate && survey.dataCompletionDate !== '')) {
             return '完了';
         }
@@ -83,11 +80,10 @@ export function getSurveyStatus(survey) {
 const STATUS_SORT_ORDER = {
     '会期前': 1,
     '会期中': 2,
-    'データ精査中': 3,
-    '完了': 4,
-    '終了': 5,
-    'データ化なし': 6,
-    '削除済み': 7
+    '完了': 3,
+    '終了': 4,
+    'データ化なし': 5,
+    '削除済み': 6
 };
 
 let lastSortedHeader = null; // Tracks the last header clicked for sorting
