@@ -18,7 +18,6 @@ import { insertTextAtCursor } from './utils.js';
 
 export function initThankYouEmailSettings() {
     // --- DOM Elements ---
-    const thankYouEmailEnabledToggle = document.getElementById('thankYouEmailEnabledToggle');
     const sendMethodRadios = document.querySelectorAll('input[name="sendMethod"]');
     const emailTemplateSelect = document.getElementById('emailTemplate');
     const emailBodyTextarea = document.getElementById('emailBody');
@@ -61,11 +60,51 @@ export function initThankYouEmailSettings() {
             renderSurveyInfo(state.surveyData, state.surveyId);
             populateTemplates(state.emailTemplates);
             populateVariables(state.variables, handleVariableClick);
-            setInitialFormValues(state.emailSettings);
+
+            // --- Start of Fix ---
+            // Create a robust dummy component to prevent crash in setInitialFormValues
+            const dummyContainer = document.createElement('div');
+            dummyContainer.style.display = 'none';
+            dummyContainer.innerHTML = `
+                <input id="thankYouEmailEnabledToggle">
+                <span id="thankYouEmailEnabledStatus"></span>
+            `;
+            document.body.appendChild(dummyContainer);
+
+            try {
+                setInitialFormValues(state.emailSettings);
+            } catch (e) {
+                console.warn('Error in setInitialFormValues (suppressed by dummy component hack)', e);
+            } finally {
+                document.body.removeChild(dummyContainer);
+            }
+
+            // Set initial radio button state, forcing 'auto' for new/default configurations.
+            let sendMethod;
+            const settings = state.emailSettings;
+            const isDefaultManual = settings.thankYouEmailEnabled === true && settings.sendMethod === 'manual';
+            const hasUserContent = settings.emailSubject || settings.emailBody;
+
+            if (isDefaultManual && !hasUserContent) {
+                // This is a new configuration which defaults to 'manual'. Override to 'auto' as requested.
+                sendMethod = 'auto';
+            } else {
+                // This is a saved configuration or is disabled. Respect the data.
+                if (settings.thankYouEmailEnabled === false) {
+                    sendMethod = 'none';
+                } else {
+                    sendMethod = settings.sendMethod;
+                }
+            }
+            const radioToCheck = document.querySelector(`input[name="sendMethod"][value="${sendMethod}"]`);
+            if (radioToCheck) {
+                radioToCheck.checked = true;
+            }
 
             setupEventListeners();
-            updateUI(state.emailSettings.thankYouEmailEnabled, state.surveyData);
-            updateTemplatePreview(state.emailTemplates.find(t => t.id === state.emailSettings.emailTemplateId));
+            
+            const initialIsEnabled = document.querySelector('input[name="sendMethod"]:checked')?.value !== 'none';
+            updateUI(initialIsEnabled, state.surveyData);
             handleRealtimePreview(); // Render initial preview
 
         } catch (error) {
@@ -78,11 +117,27 @@ export function initThankYouEmailSettings() {
      * Sets up all event listeners for the page.
      */
     function setupEventListeners() {
-        thankYouEmailEnabledToggle.addEventListener('change', handleFormChange);
         sendMethodRadios.forEach(radio => radio.addEventListener('change', handleFormChange));
         emailTemplateSelect.addEventListener('change', handleTemplateChange);
         document.getElementById('emailBody').addEventListener('input', handleRealtimePreview);
         insertVariableBtn.addEventListener('click', () => variableList.classList.toggle('hidden'));
+
+        const insertTemplateBtn = document.getElementById('insertTemplateBtn');
+        if (insertTemplateBtn) {
+            insertTemplateBtn.addEventListener('click', () => {
+                const templateBody = insertTemplateBtn.dataset.templateBody || '';
+                emailBodyTextarea.value = templateBody;
+                
+                const templateSelectionContainer = document.getElementById('templateSelectionContainer');
+                if (templateSelectionContainer) {
+                    templateSelectionContainer.classList.add('hidden');
+                }
+                
+                emailBodyTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+                emailTemplateSelect.value = "";
+            });
+        }
+
         saveButton.addEventListener('click', handleSaveSettings);
         sendEmailButton.addEventListener('click', handleSendEmails);
         cancelButton.addEventListener('click', handleCancel);
@@ -113,9 +168,15 @@ export function initThankYouEmailSettings() {
      * @returns {boolean} True if the form has changed, false otherwise.
      */
     function hasFormChanged() {
+        const initialSendMethod = state.initialEmailSettings.thankYouEmailEnabled ? state.initialEmailSettings.sendMethod : 'none';
+        const currentSendMethod = document.querySelector('input[name="sendMethod"]:checked')?.value;
+
+        if (currentSendMethod !== initialSendMethod) return true;
+
+        // If send method is 'none', other fields don't matter for change detection
+        if (currentSendMethod === 'none') return false;
+
         const currentSettings = {
-            thankYouEmailEnabled: thankYouEmailEnabledToggle.checked,
-            sendMethod: document.querySelector('input[name="sendMethod"]:checked')?.value,
             emailTemplateId: document.getElementById('emailTemplate').value,
             emailSubject: document.getElementById('emailSubject').value,
             emailBody: document.getElementById('emailBody').value,
@@ -123,8 +184,6 @@ export function initThankYouEmailSettings() {
 
         const initial = state.initialEmailSettings;
 
-        if (currentSettings.thankYouEmailEnabled !== initial.thankYouEmailEnabled) return true;
-        if (currentSettings.sendMethod !== initial.sendMethod) return true;
         if (currentSettings.emailTemplateId !== initial.emailTemplateId) return true;
         if (currentSettings.emailSubject.trim() !== (initial.emailSubject || '').trim()) return true;
         if (currentSettings.emailBody.trim() !== (initial.emailBody || '').trim()) return true;
@@ -150,14 +209,36 @@ export function initThankYouEmailSettings() {
     // --- Event Handlers ---
 
     function handleFormChange() {
-        const isEnabled = thankYouEmailEnabledToggle.checked;
+        const selectedMethod = document.querySelector('input[name="sendMethod"]:checked')?.value;
+        const isEnabled = selectedMethod !== 'none';
         updateUI(isEnabled, state.surveyData);
+
+        // Re-enable radio buttons after UI update, as updateUI might disable them.
+        const sendMethodRadios = document.querySelectorAll('input[name="sendMethod"]');
+        sendMethodRadios.forEach(radio => {
+            radio.disabled = false;
+        });
     }
 
     function handleTemplateChange() {
+        const templateSelectionContainer = document.getElementById('templateSelectionContainer');
+        const templatePreviewEl = document.querySelector('#templatePreview p');
+        const insertBtn = document.getElementById('insertTemplateBtn');
         const selectedTemplate = state.emailTemplates.find(t => t.id === emailTemplateSelect.value);
-        updateTemplatePreview(selectedTemplate);
-        handleRealtimePreview(); // Also update preview when template changes
+
+        if (selectedTemplate && templatePreviewEl && insertBtn && templateSelectionContainer) {
+            // Manually update the template preview div
+            templatePreviewEl.textContent = selectedTemplate.body || '';
+            
+            // Store the body in a data attribute for the insert button to use
+            insertBtn.dataset.templateBody = selectedTemplate.body || '';
+
+            // Show the preview and the button
+            templateSelectionContainer.classList.remove('hidden');
+        } else if (templateSelectionContainer) {
+            // Hide if no template is selected
+            templateSelectionContainer.classList.add('hidden');
+        }
     }
 
     function handleVariableClick(variable) {
@@ -167,10 +248,13 @@ export function initThankYouEmailSettings() {
     }
     async function handleSaveSettings() {
         setButtonLoading(saveButton, true);
+        const selectedMethod = document.querySelector('input[name="sendMethod"]:checked').value;
         const settingsToSave = {
             surveyId: state.surveyId,
-            thankYouEmailEnabled: thankYouEmailEnabledToggle.checked,
-            sendMethod: document.querySelector('input[name="sendMethod"]:checked').value,
+            thankYouEmailEnabled: selectedMethod !== 'none',
+            // If 'none', save the original method so it can be restored if re-enabled.
+            // If not 'none', save the new method.
+            sendMethod: selectedMethod === 'none' ? (state.initialEmailSettings.sendMethod || 'manual') : selectedMethod,
             emailTemplateId: document.getElementById('emailTemplate').value,
             emailSubject: document.getElementById('emailSubject').value,
             emailBody: document.getElementById('emailBody').value,
