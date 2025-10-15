@@ -273,7 +273,7 @@ export function renderDataConversionPlans(plans, selectedPlan) {
             ].join(' ');
 
             const badgeLabel = document.createElement('span');
-            badgeLabel.className = 'inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wide';
+            badgeLabel.className = 'inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wide whitespace-nowrap';
             if (basePlan) {
                 badgeLabel.classList.add('bg-primary', 'text-on-primary');
             } else {

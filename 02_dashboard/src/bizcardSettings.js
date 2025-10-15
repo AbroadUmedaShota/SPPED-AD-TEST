@@ -493,6 +493,15 @@ export function initBizcardSettings() {
 
         // Speed plan restriction logic
         const isTrialPlan = state.settings.dataConversionPlan === 'free';
+        const speedPlanSection = document.getElementById('speed-plan-section');
+        if (speedPlanSection) {
+            if (isTrialPlan) {
+                speedPlanSection.classList.add('opacity-50', 'pointer-events-none');
+            } else {
+                speedPlanSection.classList.remove('opacity-50', 'pointer-events-none');
+            }
+        }
+
         const speedOptions = document.querySelectorAll('input[name="dataConversionSpeed"]');
         
         speedOptions.forEach(radio => {
@@ -546,7 +555,8 @@ export function initBizcardSettings() {
     }
 
     function updateCouponSectionUI() {
-        if (!couponCodeInput || !applyCouponBtn) {
+        const couponLoadingIndicator = document.getElementById('couponLoadingIndicator');
+        if (!couponCodeInput || !applyCouponBtn || !couponLoadingIndicator) {
             return;
         }
 
@@ -578,21 +588,21 @@ export function initBizcardSettings() {
             remove: '適用済みのクーポンを削除する'
         };
 
-        applyCouponBtn.textContent = labels[mode];
-        applyCouponBtn.setAttribute('aria-label', ariaLabels[mode]);
-        applyCouponBtn.setAttribute('aria-pressed', mode === 'remove' ? 'true' : 'false');
-
-        applyCouponBtn.classList.remove('coupon-action-button--apply', 'coupon-action-button--change', 'coupon-action-button--remove');
-        applyCouponBtn.classList.add(`coupon-action-button--${mode}`);
-
-        applyCouponBtn.disabled = state.isCouponProcessing;
-        applyCouponBtn.setAttribute('aria-busy', state.isCouponProcessing ? 'true' : 'false');
         couponCodeInput.disabled = state.isCouponProcessing;
-        couponCodeInput.setAttribute('aria-disabled', state.isCouponProcessing ? 'true' : 'false');
+
         if (state.isCouponProcessing) {
-            applyCouponBtn.classList.add('is-processing');
+            applyCouponBtn.classList.add('hidden');
+            couponLoadingIndicator.classList.remove('hidden');
         } else {
-            applyCouponBtn.classList.remove('is-processing');
+            applyCouponBtn.classList.remove('hidden');
+            couponLoadingIndicator.classList.add('hidden');
+
+            applyCouponBtn.textContent = labels[mode];
+            applyCouponBtn.setAttribute('aria-label', ariaLabels[mode]);
+            applyCouponBtn.setAttribute('aria-pressed', mode === 'remove' ? 'true' : 'false');
+            
+            applyCouponBtn.classList.remove('coupon-action-button--apply', 'coupon-action-button--change', 'coupon-action-button--remove');
+            applyCouponBtn.classList.add(`coupon-action-button--${mode}`);
         }
     }
 
