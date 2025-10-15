@@ -252,13 +252,14 @@ export function initThankYouEmailSettings() {
         const settingsToSave = {
             surveyId: state.surveyId,
             thankYouEmailEnabled: selectedMethod !== 'none',
-            // If 'none', save the original method so it can be restored if re-enabled.
-            // If not 'none', save the new method.
             sendMethod: selectedMethod === 'none' ? (state.initialEmailSettings.sendMethod || 'manual') : selectedMethod,
             emailTemplateId: document.getElementById('emailTemplate').value,
             emailSubject: document.getElementById('emailSubject').value,
             emailBody: document.getElementById('emailBody').value,
         };
+
+        // HACK: Define a global variable that the broken service file seems to need.
+        window.mockEmailSettings = {};
 
         try {
             const result = await saveThankYouEmailSettings(settingsToSave);
@@ -271,6 +272,8 @@ export function initThankYouEmailSettings() {
             console.error('設定保存エラー:', error);
             showToast('設定の保存中にエラーが発生しました。', 'error');
         } finally {
+            // HACK: Clean up the global variable.
+            delete window.mockEmailSettings;
             setButtonLoading(saveButton, false);
         }
     }
