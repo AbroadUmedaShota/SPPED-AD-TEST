@@ -2089,32 +2089,121 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// プレビューのイベントを付与
+function renderPreviewInModal() {
+    const dataString = localStorage.getItem('surveyPreviewData');
+    if (!dataString) return;
+
+    const surveyData = JSON.parse(dataString);
+    const container = document.getElementById('modalSurveyPreviewContainer');
+    if (!container) return;
+
+    const getLocalizedText = (field) => {
+        if (typeof field === 'string') return field;
+        if (typeof field === 'object' && field !== null) {
+            return field.ja || Object.values(field)[0] || '';
+        }
+        return '';
+    };
+
+    let html = '<div class="survey-preview-stack">';
+
+    // Header
+    html += `
+        <div class="survey-preview-header">
+            <h3 class="survey-preview-title">${getLocalizedText(surveyData.displayTitle)}</h3>
+            <p class="survey-preview-period">期間: ${surveyData.periodStart || ''} ～ ${surveyData.periodEnd || ''}</p>
+            <p class="survey-preview-description">${getLocalizedText(surveyData.description)}</p>
+        </div>
+    `;
+
+    // Questions
+    (surveyData.questionGroups || []).forEach(group => {
+        html += '<div class="survey-preview-section">';
+        if (group.title && getLocalizedText(group.title)) {
+            html += `<h4 class="survey-preview-group-title">${getLocalizedText(group.title)}</h4>`;
+        }
+        (group.questions || []).forEach(q => {
+            html += '<div class="survey-preview-question">';
+            html += `<p class="survey-preview-question-title">${getLocalizedText(q.text)} ${q.required ? '<span class="text-error survey-preview-required">*</span>' : ''}</p>`;
+            
+            if (q.type === 'single_answer' && q.meta?.displayAs === 'dropdown') {
+                html += '<select class="input-field"><option value="">選択してください</option>';
+                (q.options || []).forEach(opt => {
+                    html += `<option value="${getLocalizedText(opt.text)}">${getLocalizedText(opt.text)}</option>`;
+                });
+                html += '</select>';
+            } else if (q.type === 'single_answer') {
+                html += '<div class="survey-preview-options">';
+                (q.options || []).forEach(opt => {
+                    html += `<div class="survey-preview-option-row"><span class="material-icons survey-preview-option-icon">radio_button_unchecked</span> <span class="survey-preview-option-text">${getLocalizedText(opt.text)}</span></div>`;
+                });
+                html += '</div>';
+            } else if (q.type === 'multi_answer') {
+                html += '<div class="survey-preview-options">';
+                (q.options || []).forEach(opt => {
+                    html += `<div class="survey-preview-option-row"><span class="material-icons survey-preview-option-icon">check_box_outline_blank</span> <span class="survey-preview-option-text">${getLocalizedText(opt.text)}</span></div>`;
+                });
+                html += '</div>';
+            } else if (q.type === 'free_answer') {
+                html += '<textarea class="input-field" rows="3" placeholder="回答を入力"></textarea>';
+            } else if (q.type === 'number_answer') {
+                html += '<input type="number" class="input-field" placeholder="数値を入力">';
+            }
+            
+            html += '</div>';
+        });
+        html += '</div>';
+    });
+
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+function setupPreviewSwitcher() {
+    // Render the content first
+    renderPreviewInModal();
+
+    const phoneBtn = document.getElementById('preview-mode-phone');
+    const tabletBtn = document.getElementById('preview-mode-tablet');
+    const device = document.querySelector('.survey-preview-device');
+
+    if (!phoneBtn || !tabletBtn || !device) return;
+
+    phoneBtn.classList.add('active');
+    device.classList.remove('is-tablet');
+
+    phoneBtn.addEventListener('click', () => {
+        device.classList.remove('is-tablet');
+        phoneBtn.classList.add('active');
+        tabletBtn.classList.remove('active');
+    });
+
+    tabletBtn.addEventListener('click', () => {
+        device.classList.add('is-tablet');
+        tabletBtn.classList.add('active');
+        phoneBtn.classList.remove('active');
+    });
+}
+
 function attachPreviewListener() {
     const previewBtn = document.getElementById('showPreviewBtn');
-    if (!previewBtn) return;
-    previewBtn.addEventListener('click', async (e) => {
-        e.preventDefault();
-        try {
-            const setupEventListeners = () => {
-                const modal = document.getElementById('surveyPreviewModal');
-                if (!modal) return;
-
-                const closeButtons = modal.querySelectorAll('[data-modal-close="surveyPreviewModal"]');
-                closeButtons.forEach(btn => {
-                    if (!btn.dataset.listenerAttached) {
-                        btn.addEventListener('click', () => closeModal('surveyPreviewModal'));
-                        btn.dataset.listenerAttached = 'true';
-                    }
-                });
-            };
-            
-            await handleOpenModal('surveyPreviewModal', 'modals/surveyPreviewModal.html', setupEventListeners);
-            renderSurveyPreview();
-        } catch (err) {
-            console.error('Failed to open preview modal:', err);
-        }
-    });
+    if (previewBtn) {
+        previewBtn.addEventListener('click', () => {
+            try {
+                localStorage.setItem('surveyPreviewData', JSON.stringify(surveyData));
+                handleOpenModal('surveyPreviewModal', 'modals/surveyPreviewModal.html', setupPreviewSwitcher);
+            } catch (e) {
+                console.error('Failed to save preview data to localStorage', e);
+                showToast('プレビューの表示に失敗しました。', 'error');
+            }
+        });
+    }
+    const outlinePreviewBtn = document.querySelector('[data-outline-action="preview"]');
+    if (outlinePreviewBtn) {
+        outlinePreviewBtn.addEventListener('click', () => {
+            document.getElementById('showPreviewBtn')?.click();
+        });
+    }
 }
 
 // --- Drag & Drop (Sortable) ---

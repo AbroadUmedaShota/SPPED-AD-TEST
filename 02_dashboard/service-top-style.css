@@ -119,7 +119,7 @@ body.dark-mode {
     --color-state-on-error: #000000;
 
     --color-button-primary-bg: #BB86FC;
-    --color-on-primary-fixed-variant: #E0E0E0; /* 新規追加 */
+n    --color-on-primary-fixed-variant: #E0E0E0; /* 新規追加 */
     --color-button-primary-hover-bg: #03DAC6; /* BUTTON_HOVER_STYLE_CONSISTENCY: 新規追加 */
     --color-button-secondary-bg: #333333;
     --color-button-secondary-text: #E0E0E0;
@@ -1028,7 +1028,7 @@ button:disabled:hover,
     .modal-content-transition,
     .sidebar,
     .mobile-sidebar-overlay,
-    .main-content,
+n    .main-content,
     .main-footer {
         transition: none !important;
         animation: none !important;
@@ -1171,7 +1171,7 @@ input.input-field[readonly] {
 
 .question-item.drag-over {
     background-color: var(--color-surface-variant);
-    border-color: var(--color-secondary);
+n    border-color: var(--color-secondary);
 }
 
 /* Active sidebar link style */
@@ -1449,7 +1449,7 @@ input.input-field[readonly] {
     z-index: 3;
 }
 .help-popover::before {
-    content: ;
+    content: '';
     position: absolute;
     top: -0.35rem;
     right: 1.5rem;
@@ -1626,4 +1626,19 @@ input.input-field[readonly] {
 .selection-card-label.selected .selection-card-text {
     color: var(--color-on-secondary-container);
     font-weight: 600;
+}
+
+/* Styles for Tablet Preview Switcher */
+.survey-preview-device.is-tablet {
+    max-width: 768px;
+}
+
+#preview-mode-switcher button.active {
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+#preview-mode-switcher button.active .material-icons {
+    color: var(--color-on-primary);
 }
