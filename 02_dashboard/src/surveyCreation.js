@@ -607,6 +607,7 @@ window.dummyUserData = {
  * Re-renders the entire form based on the current state (surveyData, currentLang)
  */
 function updateAndRenderAll() {
+    destroySortables(); // Destroy old instances before re-rendering
     const allowExtraLanguages = isProPlan(surveyData.plan);
     if (!allowExtraLanguages) {
         setActiveLanguages([BASE_LANGUAGE]);
@@ -1290,8 +1291,8 @@ function initializeAccordion() {
     document.body.addEventListener('click', (event) => {
         const header = event.target.closest('.accordion-header, .group-header');
         if (header) {
-            // inputやbuttonなど、ヘッダー内のインタラクティブな要素は除外
-            if (event.target.closest('input, button, select')) {
+            // input, button, select, and drag handles are excluded from toggling the accordion
+            if (event.target.closest('input, button, select, .handle')) {
                 return;
             }
             toggle(header);
@@ -2000,123 +2001,111 @@ function attachPreviewListener() {
 }
 
 // --- Drag & Drop (Sortable) ---
-function arrayMove(arr, from, to) {
-    if (!arr || from === to || from < 0 || to < 0 || from >= arr.length || to >= arr.length) return;
-    const item = arr.splice(from, 1)[0];
-    arr.splice(to, 0, item);
-}
+let sortableInstances = [];
 
 function setupSortables() {
-    if (typeof Sortable === 'undefined') return;
+    destroySortables();
 
-    // Group sorting
-    const groupsContainer = document.getElementById('questionGroupsContainer');
-    if (groupsContainer) {
-        new Sortable(groupsContainer, {
-            animation: 150,
+    const reorder = (list, oldIndex, newIndex) => {
+        const item = list.splice(oldIndex, 1)[0];
+        list.splice(newIndex, 0, item);
+        return list;
+    };
+
+    const createSortable = (el, groupName, onEndCallback) => {
+        if (!el) return null;
+        const sortable = new Sortable(el, {
+            group: groupName,
             handle: '.handle',
-            draggable: '.question-group',
-            onStart: () => {
-                // Close all accordions when starting to drag
-                document.querySelectorAll('.question-group .accordion-content').forEach(content => {
-                    if (getComputedStyle(content).display !== 'none') {
-                        const header = content.previousElementSibling;
-                        const icon = header ? header.querySelector('.expand-icon') : null;
-                        content.style.display = 'none';
-                        if (icon) icon.textContent = 'expand_more';
-                        if (header) header.setAttribute('aria-expanded', 'false');
-                    }
-                });
-            },
+            animation: 150,
+            ghostClass: 'sortable-ghost',
+            chosenClass: 'sortable-chosen',
+            dragClass: 'sortable-drag',
+            forceFallback: true, // Use fallback to avoid HTML5 D&D quirks
             onEnd: (evt) => {
-                arrayMove(surveyData.questionGroups, evt.oldIndex, evt.newIndex);
-                setDirty(true);
-                updateAndRenderAll();
-            }
+                const { oldIndex, newIndex } = evt;
+                if (oldIndex !== newIndex) {
+                    onEndCallback(oldIndex, newIndex);
+                    setDirty(true);
+                    renderOutlineMap();
+                }
+            },
         });
-    }
+        sortableInstances.push(sortable);
+        return sortable;
+    };
 
-    // For each group: question sorting and option sorting
-    document.querySelectorAll('.question-group').forEach(groupEl => {
+    // Sort groups
+    const groupsContainer = document.getElementById('questionGroupsContainer');
+    createSortable(groupsContainer, 'groups', (oldIndex, newIndex) => {
+        reorder(surveyData.questionGroups, oldIndex, newIndex);
+    });
+
+    // Sort questions within each group
+    document.querySelectorAll('.questions-list').forEach(list => {
+        const groupEl = list.closest('.question-group');
         const groupId = groupEl.dataset.groupId;
-        const questionsList = groupEl.querySelector('.questions-list');
-        if (questionsList) {
-            new Sortable(questionsList, {
-                animation: 150,
-                handle: '.handle',
-                draggable: '.question-item',
-                onEnd: (evt) => {
-                    const group = surveyData.questionGroups.find(g => g.groupId === groupId);
-                    if (!group || !group.questions) return;
-                    arrayMove(group.questions, evt.oldIndex, evt.newIndex);
-                    setDirty(true);
-                    updateAndRenderAll();
-                }
-            });
-        }
+        const group = surveyData.questionGroups.find(g => g.groupId === groupId);
+        if (!group) return;
 
-        // Option sorting per question (if options exist)
-        groupEl.querySelectorAll('.question-item').forEach(qItem => {
-            const questionId = qItem.dataset.questionId;
-            const optionsContainer = qItem.querySelector('.options-container');
-            if (!optionsContainer) return;
-            new Sortable(optionsContainer, {
-                animation: 150,
-                draggable: '.option-item',
-                onEnd: (evt) => {
-                    const group = surveyData.questionGroups.find(g => g.groupId === groupId);
-                    const question = group?.questions?.find(q => q.questionId === questionId);
-                    if (!question || !question.options) return;
-                    arrayMove(question.options, evt.oldIndex, evt.newIndex);
-                    setDirty(true);
-                    updateAndRenderAll();
-                }
-            });
-        });
-
-        // Matrix rows/cols sorting per question (if matrix exists)
-        groupEl.querySelectorAll('.question-item').forEach(qItem => {
-            const qId = qItem.dataset.questionId;
-            const rowsList = qItem.querySelector('.matrix-rows-list');
-            const colsList = qItem.querySelector('.matrix-cols-list');
-            if (rowsList) {
-                new Sortable(rowsList, {
-                    animation: 150,
-                    handle: '.matrix-handle',
-                    draggable: '.matrix-row-item',
-                    chosenClass: 'matrix-chosen',
-                    dragClass: 'matrix-drag',
-                    ghostClass: 'matrix-ghost',
-                    onEnd: (evt) => {
-                        const group = surveyData.questionGroups.find(g => g.groupId === groupId);
-                        const question = group?.questions?.find(q => q.questionId === qId);
-                        if (!question || !question.matrix || !Array.isArray(question.matrix.rows)) return;
-                        arrayMove(question.matrix.rows, evt.oldIndex, evt.newIndex);
-                        setDirty(true);
-                        updateAndRenderAll();
-                    }
-                });
-            }
-            if (colsList) {
-                new Sortable(colsList, {
-                    animation: 150,
-                    handle: '.matrix-handle',
-                    draggable: '.matrix-col-item',
-                    chosenClass: 'matrix-chosen',
-                    dragClass: 'matrix-drag',
-                    ghostClass: 'matrix-ghost',
-                    onEnd: (evt) => {
-                        const group = surveyData.questionGroups.find(g => g.groupId === groupId);
-                        const question = group?.questions?.find(q => q.questionId === qId);
-                        if (!question || !question.matrix || !Array.isArray(question.matrix.cols)) return;
-                        arrayMove(question.matrix.cols, evt.oldIndex, evt.newIndex);
-                        setDirty(true);
-                        updateAndRenderAll();
-                    }
-                });
-            }
+        createSortable(list, `questions-${groupId}`, (oldIndex, newIndex) => {
+            reorder(group.questions, oldIndex, newIndex);
         });
     });
+
+    // Sort options within each question
+    document.querySelectorAll('.options-container').forEach(container => {
+        const questionEl = container.closest('.question-item');
+        const groupEl = container.closest('.question-group');
+        if (!questionEl || !groupEl) return;
+
+        const questionId = questionEl.dataset.questionId;
+        const groupId = groupEl.dataset.groupId;
+        const question = surveyData.questionGroups.find(g => g.groupId === groupId)?.questions.find(q => q.questionId === questionId);
+        if (!question || !Array.isArray(question.options)) return;
+
+        createSortable(container, `options-${questionId}`, (oldIndex, newIndex) => {
+            reorder(question.options, oldIndex, newIndex);
+        });
+    });
+
+    // Sort matrix rows
+    document.querySelectorAll('.matrix-rows-list').forEach(list => {
+        const questionEl = list.closest('.question-item');
+        const groupEl = list.closest('.question-group');
+        if (!questionEl || !groupEl) return;
+
+        const questionId = questionEl.dataset.questionId;
+        const groupId = groupEl.dataset.groupId;
+        const question = surveyData.questionGroups.find(g => g.groupId === groupId)?.questions.find(q => q.questionId === questionId);
+        if (!question || !question.matrix || !Array.isArray(question.matrix.rows)) return;
+
+        createSortable(list, `matrix-rows-${questionId}`, (oldIndex, newIndex) => {
+            reorder(question.matrix.rows, oldIndex, newIndex);
+        });
+    });
+
+    // Sort matrix cols
+    document.querySelectorAll('.matrix-cols-list').forEach(list => {
+        const questionEl = list.closest('.question-item');
+        const groupEl = list.closest('.question-group');
+        if (!questionEl || !groupEl) return;
+
+        const questionId = questionEl.dataset.questionId;
+        const groupId = groupEl.dataset.groupId;
+        const question = surveyData.questionGroups.find(g => g.groupId === groupId)?.questions.find(q => q.questionId === questionId);
+        if (!question || !question.matrix || !Array.isArray(question.matrix.cols)) return;
+
+        createSortable(list, `matrix-cols-${questionId}`, (oldIndex, newIndex) => {
+            reorder(question.matrix.cols, oldIndex, newIndex);
+        });
+    });
+}
+
+
+function destroySortables() {
+    sortableInstances.forEach(s => s.destroy());
+    sortableInstances = [];
 }
 
 // --- Preview Rendering ---
@@ -2132,79 +2121,86 @@ function renderSurveyPreview() {
     const container = document.getElementById('modalSurveyPreviewContainer');
     if (!container) return;
 
-    const lang = (typeof getEditorLanguage === 'function' ? getEditorLanguage() : currentLang) || 'ja';
-    const lines = [];
-    const periodHasStart = Boolean(surveyData.periodStart);
-    const periodHasEnd = Boolean(surveyData.periodEnd);
-    const periodText = (periodHasStart || periodHasEnd)
-        ? `${surveyData.periodStart || ''}${(surveyData.periodStart || surveyData.periodEnd) ? '〜' : ''}${surveyData.periodEnd || ''}`
-        : '';
+    const data = getSurveyData();
+    const lang = getEditorSurveyLanguage();
 
-    lines.push('<div class="survey-preview-stack">');
-    lines.push('<header class="survey-preview-header">');
-    lines.push(`<div class="survey-preview-title text-on-surface">${getTextLocal(surveyData.displayTitle, lang) || getTextLocal(surveyData.name, lang) || '（無題アンケート）'}</div>`);
-    if (periodText) {
-        lines.push(`<div class="survey-preview-period text-on-surface-variant">${periodText}</div>`);
+    let content = `<div class="p-4 space-y-6">
+`;
+    content += `<h1 class="text-2xl font-bold">${getLocalizedValue(data.displayTitle, lang)}</h1>`;
+    if (data.description) {
+        content += `<p class="text-base">${getLocalizedValue(data.description, lang)}</p>`;
     }
-    const description = surveyData.description ? getTextLocal(surveyData.description, lang) : '';
-    if (description) {
-        lines.push(`<p class="survey-preview-description text-on-surface-variant">${description}</p>`);
-    }
-    lines.push('</header>');
+    content += `<hr class="my-6">
+`;
 
-    (surveyData.questionGroups || []).forEach((g, gi) => {
-        const groupTitle = getTextLocal(g.title, lang) || `グループ${gi + 1}`;
-        lines.push('<section class="survey-preview-section">');
-        if (groupTitle) {
-            lines.push(`<h3 class="survey-preview-group-title text-on-surface-variant">${groupTitle}</h3>`);
+    data.questionGroups.forEach((group, groupIndex) => {
+        content += `<div class="space-y-4">
+`;
+        if (group.title) {
+            content += `<h2 class="text-xl font-semibold">${getLocalizedValue(group.title, lang)}</h2>`;
         }
-        (g.questions || []).forEach((q, qi) => {
-            const qTitle = getTextLocal(q.text, lang) || `設問${qi + 1}`;
-            const requiredTag = q.required ? '<span class="survey-preview-required text-error">(必須)</span>' : '';
-            lines.push('<div class="survey-preview-question">');
-            lines.push(`<div class="survey-preview-question-title">Q${qi + 1}. ${qTitle}${requiredTag}</div>`);
-            if (q.options && q.options.length) {
-                const optionIcon = q.type === 'multi_answer' ? 'check_box_outline_blank' : 'radio_button_unchecked';
-                lines.push('<div class="survey-preview-options">');
-                q.options.forEach((opt) => {
-                    lines.push(`<div class="survey-preview-option-row"><span class="material-icons-outlined survey-preview-option-icon">${optionIcon}</span><span class="survey-preview-option-text">${getTextLocal(opt.text, lang)}</span></div>`);
-                });
-                lines.push('</div>');
-            } else if (q.matrix && Array.isArray(q.matrix.rows) && Array.isArray(q.matrix.cols)) {
-                const cols = q.matrix.cols.map((c) => getTextLocal(c.text, lang));
-                const rows = q.matrix.rows.map((r) => getTextLocal(r.text, lang));
-                const isSA = q.type === 'matrix_sa';
-                lines.push('<div class="survey-preview-matrix">');
-                lines.push('<div class="survey-preview-matrix-scroll">');
-                lines.push('<table class="matrix-preview-table">');
-                lines.push('<thead><tr>');
-                lines.push('<th class="matrix-header">&nbsp;</th>');
-                cols.forEach((label) => {
-                    lines.push(`<th class="matrix-header">${label || '&nbsp;'}</th>`);
-                });
-                lines.push('</tr></thead>');
-                lines.push('<tbody>');
-                rows.forEach((rLabel) => {
-                    lines.push('<tr>');
-                    lines.push(`<td class="matrix-row-header">${rLabel || '&nbsp;'}</td>`);
-                    cols.forEach(() => {
-                        const icon = isSA ? 'radio_button_unchecked' : 'check_box_outline_blank';
-                        lines.push(`<td class="matrix-cell"><span class="material-icons-outlined matrix-icon">${icon}</span></td>`);
-                    });
-                    lines.push('</tr>');
-                });
-                lines.push('</tbody>');
-                lines.push('</table>');
-                lines.push('</div>');
-                lines.push('</div>');
-            }
-            lines.push('</div>');
-        });
-        lines.push('</section>');
-    });
-    lines.push('</div>');
 
-    container.innerHTML = lines.join('');
+        group.questions.forEach((question, qIndex) => {
+            content += `<div class="py-4">
+`;
+            content += `<p class="font-semibold">${qIndex + 1}. ${getLocalizedValue(question.text, lang)} ${question.required ? '<span class="text-red-500">*</span>' : ''}</p>`;
+            content += `<div class="mt-2 space-y-2">
+`;
+
+            switch (question.type) {
+                case 'free_answer':
+                    content += `<textarea class="w-full border-gray-300 rounded-md shadow-sm" rows="3" readonly></textarea>`;
+                    break;
+                case 'single_answer':
+                    question.options.forEach(option => {
+                        content += `<div class="flex items-center space-x-3">
+                            <span class="material-icons text-on-surface-variant">radio_button_unchecked</span>
+                            <span>${getLocalizedValue(option.text, lang)}</span>
+                        </div>`;
+                    });
+                    break;
+                case 'multi_answer':
+                    question.options.forEach(option => {
+                        content += `<div class="flex items-center space-x-3">
+                            <span class="material-icons text-on-surface-variant">check_box_outline_blank</span>
+                            <span>${getLocalizedValue(option.text, lang)}</span>
+                        </div>`;
+                    });
+                    break;
+                case 'number_answer':
+                    content += `<input type="number" class="w-full border-gray-300 rounded-md shadow-sm" readonly />`;
+                    break;
+                case 'matrix_sa':
+                case 'matrix_ma':
+                    content += `<div class="overflow-x-auto relative"><table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                            <tr>
+                                <th scope="col" class="py-3 px-6"></th>
+                                ${question.matrix.cols.map(c => `<th scope="col" class="py-3 px-6">${getLocalizedValue(c.text, lang)}</th>`).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${question.matrix.rows.map(r => `
+                                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                    <th scope="row" class="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white">${getLocalizedValue(r.text, lang)}</th>
+                                    ${question.matrix.cols.map(() => `
+                                        <td class="py-4 px-6 text-center">
+                                            <span class="material-icons text-on-surface-variant">${question.type === 'matrix_sa' ? 'radio_button_unchecked' : 'check_box_outline_blank'}</span>
+                                        </td>
+                                    `).join('')}
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table></div>`;
+                    break;
+            }
+            content += `</div></div>`;
+        });
+        content += `</div>`;
+    });
+
+    content += `</div>`;
+    container.innerHTML = content;
 }
 
 // Ensure input bindings are attached once

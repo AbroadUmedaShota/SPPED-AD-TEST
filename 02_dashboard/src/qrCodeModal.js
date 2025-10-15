@@ -1,4 +1,4 @@
-import { showToast, downloadFile } from './utils.js';
+import { showToast, downloadFile, copyTextToClipboard } from './utils.js';
 import { closeModal } from './modalHandler.js';
 
 /**
@@ -13,14 +13,17 @@ export function setupQrCodeModalListeners(modalElement) {
     }
 
     const downloadQrCodeBtn = modalElement.querySelector('#downloadQrCodeBtn');
+    const copyUrlBtn = modalElement.querySelector('#copyUrlBtn');
     const qrCodeImage = modalElement.querySelector('#qrCodeImage');
     const surveyUrlInput = modalElement.querySelector('#surveyUrlInput');
 
     // Remove existing listeners to prevent duplication
     if (downloadQrCodeBtn) downloadQrCodeBtn.removeEventListener('click', handleDownloadQrCode);
+    if (copyUrlBtn) copyUrlBtn.removeEventListener('click', handleCopyUrl);
 
     // Add new listeners
     if (downloadQrCodeBtn) downloadQrCodeBtn.addEventListener('click', handleDownloadQrCode);
+    if (copyUrlBtn) copyUrlBtn.addEventListener('click', handleCopyUrl);
 
     const closeBtn = modalElement.querySelector('#closeQrCodeModalBtn');
     if (closeBtn) {
@@ -46,5 +49,14 @@ function handleDownloadQrCode() {
         showToast('QRコードのダウンロードを開始しました。', 'success');
     } else {
         showToast('QRコード画像が見つかりません。', 'error');
+    }
+}
+
+function handleCopyUrl() {
+    const surveyUrlInput = document.getElementById('surveyUrlInput');
+    if (surveyUrlInput && surveyUrlInput.value) {
+        copyTextToClipboard(surveyUrlInput.value);
+    } else {
+        showToast('コピー対象のURLが見つかりません。', 'error');
     }
 }

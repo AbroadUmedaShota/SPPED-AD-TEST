@@ -125,7 +125,8 @@ function openNewSurveyModalWithSetup(afterOpen) {
         tomorrow.setHours(0, 0, 0, 0);
         tomorrow.setDate(tomorrow.getDate() + 1);
 
-        const periodRangePicker = window.flatpickr('#newSurveyPeriodRange', {
+        const periodRangePicker = window.flatpickr('#newSurveyPeriodRangeWrapper', {
+            wrap: true,
             mode: 'range',
             dateFormat: 'Y-m-d',
             locale: 'ja',
@@ -160,25 +161,21 @@ function openNewSurveyModalWithSetup(afterOpen) {
         };
 
         document.querySelectorAll('#newSurveyModal .survey-help-trigger').forEach((button) => {
-            if (!button || button.dataset.bound === 'true') {
+            if (!button || button.dataset.tippyInit === 'true') {
                 return;
             }
             const helpKey = button.dataset.helpKey;
             const message = helpMessages[helpKey];
-            if (!message) {
-                return;
+            if (message && window.tippy) { // Check if tippy is loaded
+                tippy(button, {
+                    content: message,
+                    theme: 'material',
+                    animation: 'scale-subtle',
+                    placement: 'top',
+                    maxWidth: 'none' // 改行を防ぐ
+                });
             }
-            const showHelp = () => {
-                showToast(message, 'info');
-            };
-            button.addEventListener('click', showHelp);
-            button.addEventListener('keydown', (event) => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault();
-                    showHelp();
-                }
-            });
-            button.dataset.bound = 'true';
+            button.dataset.tippyInit = 'true';
         });
 
         const hideAllErrors = () => {
