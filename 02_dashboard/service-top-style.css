@@ -646,7 +646,6 @@ body.overflow-hidden {
     will-change: width;
 }
 
-/* Sidebar language switcher state */
 .sidebar-language-control .is-active {
     background-color: var(--color-surface-container);
     color: var(--color-primary);
@@ -712,12 +711,17 @@ body.overflow-hidden {
         transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
     }
     .sidebar:hover .profile-block,
-    .sidebar:hover .sidebar-group-control,
-    .sidebar:hover .sidebar-language-control {
+    .sidebar:hover .sidebar-group-control {
         display: flex; /* Show on hover */
         flex-direction: column; /* SIDBAR LAYOUT FIX: Ensure column direction on hover */
         align-items: flex-start; /* Ensure items start at the beginning */
         gap: 8px; /* Add gap for consistency */
+        opacity: 1; /* フェードイン */
+        transform: translateX(0); /* スライドイン */
+        transition-delay: 150ms; /* Delay for smoother reveal */
+    }
+    .sidebar:hover .sidebar-language-control {
+        display: block;
         opacity: 1; /* フェードイン */
         transform: translateX(0); /* スライドイン */
         transition-delay: 150ms; /* Delay for smoother reveal */
@@ -735,11 +739,18 @@ body.overflow-hidden {
 
 /* Mobile: Ensure profile block and labels are always visible when open */
 .sidebar.is-open-mobile .profile-block,
-.sidebar.is-open-mobile .sidebar-nav-label,
-.sidebar.is-open-mobile .sidebar-group-control,
-.sidebar.is-open-mobile .sidebar-language-control { /* Include group control for mobile */
+.sidebar.is-open-mobile .sidebar-group-control {
     display: flex !important; /* Override media query display none */
-    flex-direction: column !important; /* Force column for mobile when open */
+    flex-direction: column !important;
+    opacity: 1;
+    transform: translateX(0);
+}
+.sidebar.is-open-mobile .sidebar-language-control { /* Include language control for mobile */
+    display: block !important;
+    opacity: 1;
+    transform: translateX(0);
+}
+.sidebar.is-open-mobile .sidebar-nav-label {
     opacity: 1;
     transform: translateX(0);
 }

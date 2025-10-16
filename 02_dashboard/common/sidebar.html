@@ -22,32 +22,30 @@
                 </button>
             </div>
 
-            <!-- Language Switcher -->
-            <div class="p-4 border-b border-outline-variant sidebar-language-control">
-                <div class="relative">
-                    <button id="language-switcher-button" class="w-full flex items-center justify-between gap-2 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-semibold transition-colors">
-                        <span class="flex items-center gap-2">
-                            <span class="material-icons text-lg">language</span>
-                            <span class="sidebar-nav-label whitespace-nowrap" id="current-language-text">日本語</span>
-                        </span>
-                        <span class="material-icons text-lg">arrow_drop_down</span>
-                    </button>
-                    <div id="language-switcher-dropdown" class="absolute left-0 mt-2 w-full bg-surface rounded-md shadow-lg py-1 z-50 hidden" role="listbox">
-                        <a href="#" class="block px-4 py-2 text-sm text-on-surface hover:bg-surface-container" data-lang="ja" role="option">日本語</a>
-                        <a href="#" class="block px-4 py-2 text-sm text-on-surface hover:bg-surface-container" data-lang="en" role="option">English</a>
-                    </div>
-                </div>
-            </div>
-
             <!-- ナビゲーション -->
             <nav id="sidebar-nav" class="flex-1 space-y-1 p-2">
                 <!-- Navigation links will be populated by JavaScript -->
             </nav>
             <!-- テーマ切り替えボタン (サイドバー下部) -->
             <div class="mt-auto p-2 border-t border-outline-variant">
-                <a class="flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors" href="#" aria-label="テーマを切り替える" id="sidebarThemeToggle">
-                    <span class="material-icons text-lg" id="sidebarThemeIcon">light_mode</span>
-                    <span class="sidebar-nav-label whitespace-nowrap">テーマ切替</span>
-                </a>
+                <div class="flex flex-col gap-2">
+                    <div class="relative sidebar-language-control">
+                        <button id="language-switcher-button" class="w-full flex items-center justify-between gap-2 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-semibold transition-colors">
+                            <span class="flex items-center gap-2">
+                                <span class="material-icons text-lg">language</span>
+                                <span class="sidebar-nav-label whitespace-nowrap" id="current-language-text">日本語</span>
+                            </span>
+                            <span class="material-icons text-lg">arrow_drop_down</span>
+                        </button>
+                        <div id="language-switcher-dropdown" class="absolute left-0 mt-2 w-full bg-surface rounded-md shadow-lg py-1 z-50 hidden" role="listbox">
+                            <a href="#" class="block px-4 py-2 text-sm text-on-surface hover:bg-surface-container" data-lang="ja" role="option">日本語</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-on-surface hover:bg-surface-container" data-lang="en" role="option">English</a>
+                        </div>
+                    </div>
+                    <a class="flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors" href="#" aria-label="テーマを切り替える" id="sidebarThemeToggle">
+                        <span class="material-icons text-lg" id="sidebarThemeIcon">light_mode</span>
+                        <span class="sidebar-nav-label whitespace-nowrap">テーマ切替</span>
+                    </a>
+                </div>
             </div>
         </aside>
