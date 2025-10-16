@@ -1,6 +1,7 @@
 import { showToast, copyTextToClipboard } from './utils.js';
 import { openDownloadModal } from './downloadOptionsModal.js';
-import { updateSurveyData, getSurveyStatus } from './tableManager.js'; // tableManagerからインポート
+import { updateSurveyData } from './tableManager.js'; // tableManagerからインポート
+import { deriveSurveyLifecycleMeta, USER_STATUSES } from './services/statusService.js';
 import { closeModal } from './modalHandler.js';
 
 let currentEditingSurvey = null; // 現在編集中のアンケートデータを保持する変数
@@ -278,37 +279,17 @@ export function populateSurveyDetails(survey) {
     const description = (survey.description && typeof survey.description === 'object') ? survey.description[lang] || survey.description.ja : survey.description;
 
     // Status Badge
-    const displayStatus = getSurveyStatus(survey);
-    let statusColorClass = '';
-    switch (displayStatus) {
-        case '会期中':
-            statusColorClass = 'bg-green-100 text-green-800';
-            break;
-        case '会期前':
-            statusColorClass = 'bg-yellow-100 text-yellow-800';
-            break;
-        case 'データ精査中':
-            statusColorClass = 'bg-blue-100 text-blue-800';
-            break;
-        case '完了':
-            statusColorClass = 'bg-indigo-100 text-indigo-800';
-            break;
-        case 'データ化なし':
-            statusColorClass = 'bg-gray-200 text-gray-700';
-            break;
-        case '終了':
-            statusColorClass = 'bg-emerald-100 text-emerald-800';
-            break;
-        case '削除済み':
-            statusColorClass = 'bg-red-100 text-red-800';
-            break;
-        default:
-            statusColorClass = 'bg-gray-100 text-gray-800';
-            break;
-    }
+    const lifecycleMeta = deriveSurveyLifecycleMeta(survey);
+    const displayStatus = lifecycleMeta.status;
+    const statusMeta = lifecycleMeta.statusMeta;
+    const statusColorClass = statusMeta.badgeClass;
+    const statusTooltip = statusMeta.description;
+
     surveyDetailName.textContent = surveyName;
     surveyDetailStatusBadge.className = `inline-flex items-center rounded-full text-xs px-2 py-1 ${statusColorClass}`;
     surveyDetailStatusBadge.textContent = displayStatus;
+    surveyDetailStatusBadge.title = statusTooltip;
+    surveyDetailStatusBadge.setAttribute('aria-label', statusTooltip);
 
     // Populate view fields
     detail_surveyId_view.textContent = survey.id;
@@ -322,10 +303,10 @@ export function populateSurveyDetails(survey) {
     detail_surveyPeriod_view.textContent = `${formattedPeriodStart} ~ ${formattedPeriodEnd}`;
     const realtimeAnswersDisplay = survey.realtimeAnswers > 0 ? ` (+${survey.realtimeAnswers})` : '';
     detail_answerCount_view.textContent = `${survey.answerCount}${realtimeAnswersDisplay}`;
-    detail_dataCompletionDate_view.textContent = survey.dataCompletionDate || '未定';
-    detail_deadline_view.textContent = survey.deadline || 'N/A';
+    detail_dataCompletionDate_view.textContent = lifecycleMeta.completionDateLabel || '未定';
+    detail_deadline_view.textContent = lifecycleMeta.downloadDeadlineLabel || survey.deadline || '―';
 
-    const isBillingConfirmed = displayStatus === '完了' || Boolean(survey.dataCompletionDate);
+    const isBillingConfirmed = lifecycleMeta.dataConversionCompleted;
     if (detail_billingAmount_label) {
         detail_billingAmount_label.textContent = isBillingConfirmed ? '確定請求額' : '見込み請求額';
     }
@@ -353,7 +334,7 @@ export function populateSurveyDetails(survey) {
     // 編集ボタンの表示/非表示をステータスに基づいて制御
     const editSurveyBtn = modal.querySelector('#editSurveyBtn');
     if (editSurveyBtn) {
-        if (displayStatus === '会期前') {
+        if (displayStatus === USER_STATUSES.PRE_PERIOD) {
             editSurveyBtn.classList.remove('hidden');
         } else {
             editSurveyBtn.classList.add('hidden');

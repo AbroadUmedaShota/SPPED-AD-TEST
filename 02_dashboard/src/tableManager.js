@@ -4,6 +4,12 @@ import { handleOpenModal } from './modalHandler.js';
 import { populateSurveyDetails } from './surveyDetailsModal.js';
 import { openDownloadModal } from './downloadOptionsModal.js';
 import { openDuplicateSurveyModal } from './duplicateSurveyModal.js';
+import {
+    deriveSurveyStatus,
+    deriveSurveyLifecycleMeta,
+    getStatusSortOrder,
+    USER_STATUSES
+} from './services/statusService.js';
 
 const surveyTableBody = document.getElementById('surveyTableBody');
 let allSurveyData = []; // Stores all fetched survey data
@@ -25,7 +31,7 @@ function shouldSkipInitialSurveyLoad() {
 const SURVEY_ID_PATTERN = /^sv_(\d{4})_(\d{2})(\d{3})$/;
 const SURVEY_ID_DEFAULT_USER = '0001';
 const SURVEY_ID_MAX_SEQUENCE = 999;
-const HIDDEN_USER_STATUSES = new Set(['削除済み']);
+const HIDDEN_USER_STATUSES = new Set([USER_STATUSES.DELETED]);
 
 
 /**
@@ -33,58 +39,11 @@ const HIDDEN_USER_STATUSES = new Set(['削除済み']);
  * @param {object} survey - アンケートオブジェクト
  * @returns {string} - 表示用のステータス文字列
  */
-export function getSurveyStatus(survey) {
-    const now = new Date();
-    // 時刻部分をリセットして日付のみで比較
-    now.setHours(0, 0, 0, 0); 
-    
-    const periodStart = survey.periodStart ? new Date(survey.periodStart) : null;
-    const periodEnd = survey.periodEnd ? new Date(survey.periodEnd) : null;
-
-    // '削除済み'などの特別なステータスを優先
-    if (survey.status === '削除済み') {
-        return '削除済み';
-    }
-    // 「草稿」はUI上「会期前」として扱う
-    if (survey.status === '草稿') {
-        return '会期前';
-    }
-
-    if (periodStart && now < periodStart) {
-        return '会期前';
-    }
-
-    if (periodStart && periodEnd && now >= periodStart && now <= periodEnd) {
-        return '会期中';
-    }
-
-    if (periodEnd && now > periodEnd) {
-        // bizcardEnabledがfalseの場合は、データ化作業が発生しない
-        if (survey.bizcardEnabled === false) {
-            return 'データ化なし';
-        }
-        
-        // データ化関連のステータスをチェック
-        if (survey.status === 'データ精査完了' || (survey.dataCompletionDate && survey.dataCompletionDate !== '')) {
-            return '完了';
-        }
-        
-        // 上記以外はすべて「終了」
-        return '終了';
-    }
-
-    // 不明なケースはユーザー画面では「終了」として扱う
-    return '終了';
+export function getSurveyStatus(survey, referenceDate) {
+    return deriveSurveyStatus(survey, referenceDate);
 }
 
-const STATUS_SORT_ORDER = {
-    '会期前': 1,
-    '会期中': 2,
-    '完了': 3,
-    '終了': 4,
-    'データ化なし': 5,
-    '削除済み': 6
-};
+
 
 let lastSortedHeader = null; // Tracks the last header clicked for sorting
 
@@ -142,51 +101,21 @@ function renderTableRows(surveysToRender) {
         row.dataset.id = survey.id;
         const surveyName = (survey.name && typeof survey.name === 'object') ? survey.name[lang] || survey.name.ja : survey.name;
         row.dataset.name = surveyName;
-        const displayStatus = getSurveyStatus(survey);
+        const lifecycleMeta = deriveSurveyLifecycleMeta(survey);
+        const displayStatus = lifecycleMeta.status;
+        const statusMeta = lifecycleMeta.statusMeta;
+
         row.dataset.status = displayStatus;
         row.dataset.periodStart = survey.periodStart;
         row.dataset.periodEnd = survey.periodEnd;
-        row.dataset.deadline = survey.deadline;
+        row.dataset.deadline = lifecycleMeta.downloadDeadlineLabel || survey.deadline || '';
         row.dataset.answerCount = survey.answerCount;
-        row.dataset.dataCompletionDate = survey.dataCompletionDate || '';
+        row.dataset.dataCompletionDate = lifecycleMeta.completionDateLabel || survey.dataCompletionDate || '';
+        row.dataset.downloadDeadline = lifecycleMeta.downloadDeadlineLabel || '';
+        row.dataset.downloadAvailable = lifecycleMeta.isDownloadable ? 'true' : 'false';
 
-        let statusColorClass = '';
-        let statusTitle = '';
-
-        switch (displayStatus) {
-            case '会期前':
-                statusColorClass = 'bg-yellow-100 text-yellow-800';
-                statusTitle = 'アンケートの公開準備が進行中です。';
-                break;
-            case '会期中':
-                statusColorClass = 'bg-green-100 text-green-800';
-                statusTitle = 'アンケートが公開されており、回答を受け付けています。';
-                break;
-            case 'データ精査中':
-                statusColorClass = 'bg-blue-100 text-blue-800';
-                statusTitle = '回答された名刺データの入力・照合を行っています。';
-                break;
-            case '完了':
-                statusColorClass = 'bg-indigo-100 text-indigo-800';
-                statusTitle = '名刺データが利用可能です。ダウンロードやお礼メール送信ができます。';
-                break;
-            case 'データ化なし':
-                statusColorClass = 'bg-gray-200 text-gray-700';
-                statusTitle = '名刺データ化の依頼がないアンケートです。';
-                break;
-            case '終了':
-                statusColorClass = 'bg-emerald-100 text-emerald-800';
-                statusTitle = 'アンケートの回答期間が終了しました。';
-                break;
-            case '削除済み':
-                statusColorClass = 'bg-red-100 text-red-800';
-                statusTitle = 'このアンケートは削除されました。';
-                break;
-            default:
-                statusColorClass = 'bg-gray-100 text-gray-800';
-                statusTitle = 'ステータス情報を取得できませんでした。';
-                break;
-        }
+        const statusColorClass = statusMeta.badgeClass;
+        const statusTitle = statusMeta.description;
 
         const realtimeAnswersDisplay = '';
 
@@ -204,7 +133,7 @@ function renderTableRows(surveysToRender) {
             <td data-label="アンケート名" class="px-4 py-3 text-on-surface text-sm font-medium" data-sort-value="${surveyName}">
                 ${surveyName}
             </td>
-            <td data-label="ステータス" class="px-4 py-3" data-sort-value="${survey.status}">
+            <td data-label="ステータス" class="px-4 py-3" data-sort-value="${displayStatus}">
                 <span class="inline-flex items-center rounded-full text-xs px-2 py-1 whitespace-nowrap w-auto ${statusColorClass}" title="${statusTitle}">${displayStatus}</span>
             </td>
             <td data-label="回答数" class="px-4 py-3 text-on-surface-variant text-sm" data-sort-value="${survey.answerCount}">
@@ -214,6 +143,19 @@ function renderTableRows(surveysToRender) {
                 ${survey.periodStart} ~ ${survey.periodEnd}
             </td>
         `;
+
+        const downloadButton = row.querySelector('button[title="データダウンロード"]');
+        if (downloadButton) {
+            if (lifecycleMeta.isDownloadable) {
+                downloadButton.classList.remove('opacity-50', 'pointer-events-none', 'cursor-not-allowed');
+                downloadButton.removeAttribute('aria-disabled');
+                downloadButton.title = 'データダウンロード';
+            } else {
+                downloadButton.classList.add('opacity-50', 'pointer-events-none', 'cursor-not-allowed');
+                downloadButton.setAttribute('aria-disabled', 'true');
+                downloadButton.title = statusTitle;
+            }
+        }
 
         fragment.appendChild(row);
 
@@ -230,11 +172,16 @@ function renderTableRows(surveysToRender) {
             window.location.href = `speed-review.html?surveyId=${survey.id}`;
         });
 
-        row.querySelector('button[title="データダウンロード"]').addEventListener('click', (e) => {
-            e.stopPropagation();
-            // surveyDetailsModal.js の openDownloadModal を呼び出す
-            openDownloadModal('answer', survey.periodStart, survey.periodEnd);
-        });
+        if (downloadButton) {
+            downloadButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (!lifecycleMeta.isDownloadable) {
+                    showToast('名刺データは現在ダウンロードできません。', 'info');
+                    return;
+                }
+                openDownloadModal('answer', survey.periodStart, survey.periodEnd);
+            });
+        }
 
         row.querySelector('button[title="アンケートを編集"]').addEventListener('click', (e) => {
             e.stopPropagation();
@@ -652,8 +599,8 @@ export function initTableManager() {
 
                     // Type-specific processing
                     if (sortKey === 'status') {
-                        aValue = STATUS_SORT_ORDER[getSurveyStatus(a)] || 99;
-                        bValue = STATUS_SORT_ORDER[getSurveyStatus(b)] || 99;
+                        aValue = getStatusSortOrder(getSurveyStatus(a)) || 99;
+                        bValue = getStatusSortOrder(getSurveyStatus(b)) || 99;
                     } else if (sortKey === 'answerCount') {
                         aValue = parseInt(aValue, 10) || 0;
                         bValue = parseInt(bValue, 10) || 0;
