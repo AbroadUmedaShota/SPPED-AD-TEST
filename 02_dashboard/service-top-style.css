@@ -646,6 +646,13 @@ body.overflow-hidden {
     will-change: width;
 }
 
+/* Sidebar language switcher state */
+.sidebar-language-control .is-active {
+    background-color: var(--color-surface-container);
+    color: var(--color-primary);
+    font-weight: 600;
+}
+
 /* Page-specific tweaks */
 .thank-you-screen-settings-page #main-content {
     background-color: var(--color-base-background-sub);
@@ -697,14 +704,16 @@ body.overflow-hidden {
 /* Profile block and labels visibility on hover (PC) */
 @media (min-width: 1024px) {
     .sidebar .profile-block,
-    .sidebar .sidebar-group-control {
+    .sidebar .sidebar-group-control,
+    .sidebar .sidebar-language-control {
         display: none; /* Default hidden on XL when collapsed */
         opacity: 0; /* トランジションのためにopacityも初期値として設定 */
         transform: translateX(-8px); /* トランジションのためにtransformも初期値として設定 */
         transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
     }
     .sidebar:hover .profile-block,
-    .sidebar:hover .sidebar-group-control {
+    .sidebar:hover .sidebar-group-control,
+    .sidebar:hover .sidebar-language-control {
         display: flex; /* Show on hover */
         flex-direction: column; /* SIDBAR LAYOUT FIX: Ensure column direction on hover */
         align-items: flex-start; /* Ensure items start at the beginning */
@@ -727,7 +736,8 @@ body.overflow-hidden {
 /* Mobile: Ensure profile block and labels are always visible when open */
 .sidebar.is-open-mobile .profile-block,
 .sidebar.is-open-mobile .sidebar-nav-label,
-.sidebar.is-open-mobile .sidebar-group-control { /* Include group control for mobile */
+.sidebar.is-open-mobile .sidebar-group-control,
+.sidebar.is-open-mobile .sidebar-language-control { /* Include group control for mobile */
     display: flex !important; /* Override media query display none */
     flex-direction: column !important; /* Force column for mobile when open */
     opacity: 1;
