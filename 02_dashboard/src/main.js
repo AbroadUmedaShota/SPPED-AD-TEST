@@ -91,51 +91,6 @@ function showTutorialResumeBanner() {
     }
 }
 
-// --- Language Switcher ---
-function initLanguageSwitcher() {
-    const languageSwitcherButton = document.getElementById('language-switcher-button');
-    const languageSwitcherDropdown = document.getElementById('language-switcher-dropdown');
-    const currentLanguageText = document.getElementById('current-language-text');
-
-    if (!languageSwitcherButton || !languageSwitcherDropdown || !currentLanguageText) {
-        // Elements might not be present on all pages, so we exit gracefully.
-        return;
-    }
-
-    languageSwitcherButton.setAttribute('aria-haspopup', 'listbox');
-    languageSwitcherButton.setAttribute('aria-expanded', 'false');
-
-    const updateSelectionState = (lang) => {
-        languageSwitcherDropdown.querySelectorAll('a[data-lang]').forEach((link) => {
-            const isActive = link.getAttribute('data-lang') === lang;
-            link.classList.toggle('is-active', isActive);
-            link.setAttribute('aria-checked', isActive);
-        });
-    };
-
-    const setLanguage = (lang) => {
-        localStorage.setItem('language', lang);
-        currentLanguageText.textContent = lang === 'ja' ? '日本語' : 'English';
-        document.documentElement.lang = lang; // Update the lang attribute of the <html> tag
-        
-        // Dispatch a custom event to notify other parts of the app
-        document.dispatchEvent(new CustomEvent('languagechange', { detail: { lang } }));
-        
-        updateSelectionState(lang);
-        languageSwitcherDropdown.classList.add('hidden');
-        languageSwitcherButton.setAttribute('aria-expanded', 'false');
-    };
-
-    const toggleDropdownVisibility = () => {
-        const isHidden = languageSwitcherDropdown.classList.toggle('hidden');
-        languageSwitcherButton.setAttribute('aria-expanded', isHidden ? 'false' : 'true');
-    };
-
-    languageSwitcherButton.addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggleDropdownVisibility();
-    });
-
 function openNewSurveyModalWithSetup(afterOpen) {
     handleOpenModal('newSurveyModal', 'modals/newSurveyModal.html', () => {
         // Initialize flatpickr for the new range input
@@ -270,7 +225,7 @@ function openNewSurveyModalWithSetup(afterOpen) {
             const surveyEndDate = formatDate(selectedDates[1]);
 
             if (!surveyStartDate || !surveyEndDate) {
-                showError(periodRangeInput, periodRangeError, '�񓚊��Ԃ�I�����Ă��������B');
+                showError(periodRangeInput, periodRangeError, '回答期間を選択してください。');
                 return;
             }
 
@@ -294,6 +249,51 @@ function openNewSurveyModalWithSetup(afterOpen) {
 }
 
 window.openNewSurveyModalWithSetup = openNewSurveyModalWithSetup;
+
+// --- Language Switcher ---
+function initLanguageSwitcher() {
+    const languageSwitcherButton = document.getElementById('language-switcher-button');
+    const languageSwitcherDropdown = document.getElementById('language-switcher-dropdown');
+    const currentLanguageText = document.getElementById('current-language-text');
+
+    if (!languageSwitcherButton || !languageSwitcherDropdown || !currentLanguageText) {
+        // Elements might not be present on all pages, so we exit gracefully.
+        return;
+    }
+
+    languageSwitcherButton.setAttribute('aria-haspopup', 'listbox');
+    languageSwitcherButton.setAttribute('aria-expanded', 'false');
+
+    const updateSelectionState = (lang) => {
+        languageSwitcherDropdown.querySelectorAll('a[data-lang]').forEach((link) => {
+            const isActive = link.getAttribute('data-lang') === lang;
+            link.classList.toggle('is-active', isActive);
+            link.setAttribute('aria-checked', isActive);
+        });
+    };
+
+    const setLanguage = (lang) => {
+        localStorage.setItem('language', lang);
+        currentLanguageText.textContent = lang === 'ja' ? '日本語' : 'English';
+        document.documentElement.lang = lang; // Update the lang attribute of the <html> tag
+        
+        // Dispatch a custom event to notify other parts of the app
+        document.dispatchEvent(new CustomEvent('languagechange', { detail: { lang } }));
+        
+        updateSelectionState(lang);
+        languageSwitcherDropdown.classList.add('hidden');
+        languageSwitcherButton.setAttribute('aria-expanded', 'false');
+    };
+
+    const toggleDropdownVisibility = () => {
+        const isHidden = languageSwitcherDropdown.classList.toggle('hidden');
+        languageSwitcherButton.setAttribute('aria-expanded', isHidden ? 'false' : 'true');
+    };
+
+    languageSwitcherButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleDropdownVisibility();
+    });
 
     document.addEventListener('click', () => {
         if (!languageSwitcherDropdown.classList.contains('hidden')) {

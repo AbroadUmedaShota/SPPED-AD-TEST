@@ -119,6 +119,7 @@ body.dark-mode {
     --color-state-on-error: #000000;
 
     --color-button-primary-bg: #BB86FC;
+    --gradient-primary-bg: var(--color-button-primary-bg); /*  この行を追加 */
 n    --color-on-primary-fixed-variant: #E0E0E0; /* 新規追加 */
     --color-button-primary-hover-bg: #03DAC6; /* BUTTON_HOVER_STYLE_CONSISTENCY: 新規追加 */
     --color-button-secondary-bg: #333333;
@@ -1662,4 +1663,32 @@ n    border-color: var(--color-secondary);
 
 #preview-mode-switcher button.active .material-icons {
     color: var(--color-on-primary);
+}
+
+/* Dark Mode Overrides for Status Badges */
+body.dark-mode .bg-yellow-100 { background-color: #422006; }
+body.dark-mode .text-yellow-800 { color: #FBBF24; }
+
+body.dark-mode .bg-green-100 { background-color: #064E3B; }
+body.dark-mode .text-green-800 { color: #6EE7B7; }
+
+body.dark-mode .bg-blue-100 { background-color: #1E3A8A; }
+body.dark-mode .text-blue-800 { color: #93C5FD; }
+
+body.dark-mode .bg-indigo-100 { background-color: #3730A3; }
+body.dark-mode .text-indigo-800 { color: #A5B4FC; }
+
+body.dark-mode .bg-slate-200 { background-color: #334155; }
+body.dark-mode .text-slate-700 { color: #CBD5E1; }
+
+body.dark-mode .bg-rose-100 { background-color: #881337; }
+body.dark-mode .text-rose-700 { color: #FDA4AF; }
+
+body.dark-mode .bg-red-100 { background-color: #7f1d1d; }
+body.dark-mode .text-red-800 { color: #fca5a5; }
+
+/* [Fix Attempt] Ensure the button is in a new stacking context and on top of other elements in dark mode. */
+body.dark-mode #openNewSurveyModalBtn {
+    position: relative;
+    z-index: 99999;
 }
