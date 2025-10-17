@@ -129,14 +129,44 @@ export function renderModalContent(item, isEditMode = false) {
     // --- Survey Answer Details (editable in edit mode) ---
     let answerHtml = '';
     if (isEditMode) {
-        // EDIT MODE: Render input fields for answers
+        // EDIT MODE: Render appropriate inputs based on question type
         item.details.forEach(detail => {
-            const answer = Array.isArray(detail.answer) ? detail.answer.join(', ') : detail.answer;
-            answerHtml += `
-                <div class="py-2 space-y-1">
-                    <p class="font-semibold text-on-surface">${detail.question}</p>
-                    <input type="text" class="input-field w-full mt-1" value="${answer || ''}" data-question="${detail.question}">
-                </div>`;
+            const questionDef = item.survey?.details?.find(d => d.question === detail.question);
+            const questionType = questionDef ? questionDef.type : 'free_text'; // Default to free_text if not found
+            
+            answerHtml += `<div class="py-2 space-y-1">
+                             <p class="font-semibold text-on-surface">${detail.question}</p>`;
+
+            switch (questionType) {
+                case 'single_choice':
+                    answerHtml += `<select class="w-auto max-w-full mt-1 border border-outline-variant rounded-md shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" data-question="${detail.question}">`;
+                    answerHtml += `<option value="">選択してください</option>`;
+                    (questionDef.options || []).forEach(option => {
+                        const isSelected = detail.answer === option;
+                        answerHtml += `<option value="${option}" ${isSelected ? 'selected' : ''}>${option}</option>`;
+                    });
+                    answerHtml += `</select>`;
+                    break;
+
+                case 'multi_choice':
+                    answerHtml += `<div class="mt-1 space-y-2">`;
+                    const currentAnswers = Array.isArray(detail.answer) ? detail.answer : [detail.answer];
+                    (questionDef.options || []).forEach(option => {
+                        const isChecked = currentAnswers.includes(option);
+                        answerHtml += `<label class="flex items-center">
+                                         <input type="checkbox" class="rounded border-gray-300 text-primary shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" value="${option}" data-question="${detail.question}" ${isChecked ? 'checked' : ''}>
+                                         <span class="ml-2 text-on-surface">${option}</span>
+                                       </label>`;
+                    });
+                    answerHtml += `</div>`;
+                    break;
+
+                default: // free_text, number, etc.
+                    const answer = Array.isArray(detail.answer) ? detail.answer.join(', ') : detail.answer;
+                    answerHtml += `<input type="text" class="input-field w-full mt-1" value="${answer || ''}" data-question="${detail.question}">`;
+                    break;
+            }
+            answerHtml += `</div>`;
         });
     } else {
         // VIEW MODE: Render text content for answers

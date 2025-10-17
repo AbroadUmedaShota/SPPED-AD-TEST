@@ -33,11 +33,21 @@
                         <table class="w-full divide-y divide-outline-variant review-table table-fixed" id="reviewTable">
                             <thead class="bg-surface-variant">
                                 <tr>
-                                    <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[15%]">回答ID</th>
-                                    <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[15%]">回答日時</th>
-                                    <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[20%]">氏名</th>
-                                    <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[20%]">会社名</th>
-                                    <th id="dynamic-question-header" class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[30%]">Q.02_お客様の主な業界</th>
+                                    <th class="sortable-header px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[15%] cursor-pointer" data-sort-key="answerId">
+                                        <div class="flex items-center">回答ID<span class="material-icons sort-icon opacity-40">unfold_more</span></div>
+                                    </th>
+                                    <th class="sortable-header px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[15%] cursor-pointer" data-sort-key="answeredAt">
+                                        <div class="flex items-center">回答日時<span class="material-icons sort-icon opacity-40">unfold_more</span></div>
+                                    </th>
+                                    <th class="sortable-header px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[20%] cursor-pointer" data-sort-key="fullName">
+                                        <div class="flex items-center">氏名<span class="material-icons sort-icon opacity-40">unfold_more</span></div>
+                                    </th>
+                                    <th class="sortable-header px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[20%] cursor-pointer" data-sort-key="companyName">
+                                        <div class="flex items-center">会社名<span class="material-icons sort-icon opacity-40">unfold_more</span></div>
+                                    </th>
+                                    <th id="dynamic-question-header" class="sortable-header px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[30%] cursor-pointer" data-sort-key="dynamicQuestion">
+                                        <div class="flex items-center">Q.02_お客様の主な業界<span class="material-icons sort-icon opacity-40">unfold_more</span></div>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody id="reviewTableBody"></tbody>

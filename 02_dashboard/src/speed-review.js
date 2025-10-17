@@ -18,6 +18,9 @@ let currentItemInModal = null;
 let isModalInEditMode = false;
 let currentSurvey = null;
 
+let currentSortKey = 'answeredAt';
+let currentSortOrder = 'desc';
+
 // --- Functions ---
 
 function truncateQuestion(questionText) {
@@ -147,9 +150,67 @@ function handleEditToggle() {
 }
 
 function handleSave() {
-    if (!isModalInEditMode) return;
-    console.log('Saving data for answerId:', currentItemInModal.answerId);
-    showToast('データが保存されました。（実際には保存されません）', 'success');
+    if (!isModalInEditMode || !currentItemInModal) return;
+
+    const answerContainer = document.getElementById('modal-survey-answer-details');
+    if (!answerContainer) return;
+
+    const updatedItem = JSON.parse(JSON.stringify(currentItemInModal));
+
+    let hasChanges = false;
+
+    updatedItem.details.forEach(detail => {
+        const questionText = detail.question;
+        const questionDef = updatedItem.survey?.details?.find(d => d.question === questionText);
+        const questionType = questionDef ? questionDef.type : 'free_text';
+
+        let newAnswer;
+
+        switch (questionType) {
+            case 'single_choice':
+                const select = answerContainer.querySelector(`select[data-question="${questionText}"]`);
+                if (select) {
+                    newAnswer = select.value;
+                }
+                break;
+            
+            case 'multi_choice':
+                const checkboxes = answerContainer.querySelectorAll(`input[type="checkbox"][data-question="${questionText}"]:checked`);
+                newAnswer = Array.from(checkboxes).map(cb => cb.value);
+                break;
+
+            default:
+                const input = answerContainer.querySelector(`input[type="text"][data-question="${questionText}"]`);
+                if (input) {
+                    newAnswer = input.value;
+                }
+                break;
+        }
+
+        const oldAnswer = JSON.stringify(detail.answer);
+        const newAnswerStr = JSON.stringify(newAnswer);
+
+        if (oldAnswer !== newAnswerStr) {
+            hasChanges = true;
+            detail.answer = newAnswer;
+        }
+    });
+
+    if (hasChanges) {
+        const index = allCombinedData.findIndex(item => item.answerId === updatedItem.answerId);
+        if (index !== -1) {
+            allCombinedData[index] = updatedItem;
+        }
+        
+        currentItemInModal = updatedItem;
+
+        applyFilters(); 
+
+        showToast('回答を更新しました。', 'success');
+    } else {
+        showToast('変更はありませんでした。', 'info');
+    }
+
     handleEditToggle();
 }
 
@@ -240,6 +301,7 @@ function applyFilters() {
         });
     }
 
+    sortData(filteredData);
     displayPage(1, filteredData);
 }
 
@@ -391,6 +453,8 @@ function populateQuestionSelector(data) {
 }
 
 function setupEventListeners() {
+    setupSortListeners();
+
     const searchInput = document.getElementById('searchKeyword');
     if (searchInput) {
         searchInput.addEventListener('input', handleSearch);
@@ -430,6 +494,72 @@ function setupEventListeners() {
             applyFilters();
         });
     }
+}
+
+function sortData(data) {
+    data.sort((a, b) => {
+        let aValue, bValue;
+
+        const getValue = (item, key) => {
+            if (key === 'fullName') {
+                const lastName = item.businessCard?.group2?.lastName || '';
+                const firstName = item.businessCard?.group2?.firstName || '';
+                return `${lastName} ${firstName}`.trim();
+            }
+            if (key === 'companyName') {
+                return item.businessCard?.group3?.companyName || '';
+            }
+            if (key === 'dynamicQuestion') {
+                const detail = item.details?.find(d => d.question === currentIndustryQuestion);
+                const answer = detail?.answer;
+                return Array.isArray(answer) ? answer.join(', ') : answer || '';
+            }
+            return item[key] || '';
+        };
+
+        aValue = getValue(a, currentSortKey);
+        bValue = getValue(b, currentSortKey);
+
+        if (typeof aValue === 'string' && typeof bValue === 'string') {
+            return currentSortOrder === 'asc' 
+                ? aValue.localeCompare(bValue, 'ja') 
+                : bValue.localeCompare(aValue, 'ja');
+        } else {
+            if (aValue < bValue) return currentSortOrder === 'asc' ? -1 : 1;
+            if (aValue > bValue) return currentSortOrder === 'asc' ? 1 : -1;
+            return 0;
+        }
+    });
+}
+
+function updateSortIcons() {
+    document.querySelectorAll('.sortable-header').forEach(header => {
+        const icon = header.querySelector('.sort-icon');
+        if (!icon) return;
+        if (header.dataset.sortKey === currentSortKey) {
+            icon.textContent = currentSortOrder === 'asc' ? 'arrow_upward' : 'arrow_downward';
+            icon.classList.remove('opacity-40');
+        } else {
+            icon.textContent = 'unfold_more';
+            icon.classList.add('opacity-40');
+        }
+    });
+}
+
+function setupSortListeners() {
+    document.querySelectorAll('.sortable-header').forEach(header => {
+        header.addEventListener('click', () => {
+            const sortKey = header.dataset.sortKey;
+            if (currentSortKey === sortKey) {
+                currentSortOrder = currentSortOrder === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSortKey = sortKey;
+                currentSortOrder = 'desc';
+            }
+            applyFilters();
+            updateSortIcons();
+        });
+    });
 }
 
 export async function initializePage() {
@@ -537,6 +667,7 @@ export async function initializePage() {
         updateAnswerFilterAvailability();
         displayPage(1, allCombinedData);
         setupEventListeners();
+        updateSortIcons();
 
     } catch (error) {
         console.error('SPEEDレビューページの初期化に失敗しました:', error);
