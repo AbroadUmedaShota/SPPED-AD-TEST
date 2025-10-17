@@ -10,15 +10,34 @@ const NAV_ITEMS = [
     { id: 'invoice-list', href: 'invoiceList.html', icon: 'receipt_long', label: 'ご請求内容一覧' },
     { id: 'group-management', href: 'group-edit.html', icon: 'groups', label: 'グループ管理' },
     { isDivider: true },
-    { id: 'account-info', href: '#', icon: 'account_circle', label: 'アカウント情報', onClick: () => window.openAccountInfoModal(window.dummyUserData) },
-    { id: 'logout', href: '#', icon: 'logout', label: 'ログアウト' }
+    {
+        id: 'account-info',
+        href: '#',
+        icon: 'account_circle',
+        label: 'アカウント情報',
+        onClick: () => window.openAccountInfoModal(window.dummyUserData),
+        preventAutoClose: true
+    },
+    { id: 'logout', href: '#', icon: 'logout', label: 'ログアウト', preventAutoClose: true }
 ];
 
 const MEDIA_QUERY = window.matchMedia('(min-width: 1024px)');
+const SELECTED_GROUP_STORAGE_KEY = 'dashboard.selectedGroupId';
 
 // --- DOM Elements ---
 
-let sidebar, mobileSidebarOverlay, sidebarToggleMobile, userSelect, navContainer;
+let sidebar, mobileSidebarOverlay, sidebarToggleMobile, userSelect, navContainer, currentGroupLabel;
+
+// --- State ---
+
+let groupsCache = [];
+let activeGroupId = null;
+let isMediaQueryBound = false;
+let isMobileToggleBound = false;
+let isOverlayBound = false;
+let isNavClickBound = false;
+let isUserSelectBound = false;
+let isLogoutBound = false;
 
 /**
  * Cache all necessary DOM elements for the sidebar.
@@ -29,6 +48,7 @@ function cacheDOMElements() {
     sidebarToggleMobile = document.getElementById('sidebarToggleMobile');
     userSelect = document.getElementById('user_select');
     navContainer = document.getElementById('sidebar-nav');
+    currentGroupLabel = document.getElementById('currentGroupLabel');
 }
 
 // --- UI Logic ---
@@ -118,13 +138,17 @@ function populateNav() {
             <span class="sidebar-nav-label whitespace-nowrap">${item.label}</span>
         `;
 
+        if (item.preventAutoClose) {
+            link.dataset.preventAutoClose = 'true';
+        }
+
         if (item.onClick) {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
                 item.onClick();
             });
         }
-        
+
         navContainer.appendChild(link);
     });
 }
@@ -136,23 +160,87 @@ async function populateGroupSelect() {
     if (!userSelect) return;
     userSelect.innerHTML = ''; // Clear existing options
 
-    const defaultOption = document.createElement('option');
-    defaultOption.value = 'current';
-    defaultOption.textContent = 'Current Group';
-    userSelect.appendChild(defaultOption);
-
     try {
-        const groups = await fetchGroups();
-        groups.forEach(group => {
+        groupsCache = await fetchGroups();
+
+        if (!Array.isArray(groupsCache) || groupsCache.length === 0) {
+            const placeholderOption = document.createElement('option');
+            placeholderOption.value = '';
+            placeholderOption.textContent = 'グループが登録されていません';
+            placeholderOption.disabled = true;
+            placeholderOption.selected = true;
+            userSelect.appendChild(placeholderOption);
+            updateCurrentGroupLabel('グループ未設定');
+            persistSelectedGroup(null);
+            setGroupFilter(null);
+            return;
+        }
+
+        groupsCache.forEach(group => {
             const option = document.createElement('option');
             option.value = group.id;
             option.textContent = group.name;
             userSelect.appendChild(option);
         });
+
+        const storedGroupId = getStoredGroupId();
+        const resolvedGroup = groupsCache.find(group => group.id === storedGroupId) || groupsCache[0];
+
+        if (resolvedGroup) {
+            activeGroupId = resolvedGroup.id;
+            userSelect.value = resolvedGroup.id;
+            updateCurrentGroupLabel(resolvedGroup.name);
+            setGroupFilter(resolvedGroup.id);
+            persistSelectedGroup(activeGroupId);
+        }
     } catch (error) {
         console.error('Failed to fetch groups for sidebar:', error);
         showToast('グループの読み込みに失敗しました。', 'error');
+        groupsCache = [];
+        updateCurrentGroupLabel('グループ未設定');
+        persistSelectedGroup(null);
+        setGroupFilter(null);
     }
+}
+
+function updateCurrentGroupLabel(label) {
+    if (!currentGroupLabel) return;
+    currentGroupLabel.textContent = label && label.trim() ? label : 'グループ未設定';
+}
+
+function persistSelectedGroup(groupId) {
+    try {
+        if (!groupId) {
+            localStorage.removeItem(SELECTED_GROUP_STORAGE_KEY);
+            return;
+        }
+        localStorage.setItem(SELECTED_GROUP_STORAGE_KEY, groupId);
+    } catch (storageError) {
+        console.warn('Failed to persist selected group.', storageError);
+    }
+}
+
+function getStoredGroupId() {
+    try {
+        return localStorage.getItem(SELECTED_GROUP_STORAGE_KEY);
+    } catch (storageError) {
+        console.warn('Failed to read stored group id.', storageError);
+        return null;
+    }
+}
+
+function shouldPreventMobileAutoClose(link) {
+    if (!link) return false;
+
+    if (link.dataset.preventAutoClose) {
+        return link.dataset.preventAutoClose === 'true';
+    }
+
+    if (link.hasAttribute('data-prevent-auto-close')) {
+        return link.getAttribute('data-prevent-auto-close') !== 'false';
+    }
+
+    return false;
 }
 
 // --- Event Listener Setup ---
@@ -161,21 +249,36 @@ async function populateGroupSelect() {
  * Attaches all necessary event listeners for sidebar functionality.
  */
 function attachEventListeners() {
-    if (sidebarToggleMobile) sidebarToggleMobile.addEventListener('click', toggleMobileSidebar);
-    if (mobileSidebarOverlay) mobileSidebarOverlay.addEventListener('click', toggleMobileSidebar);
+    if (sidebarToggleMobile && !isMobileToggleBound) {
+        sidebarToggleMobile.addEventListener('click', toggleMobileSidebar);
+        isMobileToggleBound = true;
+    }
+    if (mobileSidebarOverlay && !isOverlayBound) {
+        mobileSidebarOverlay.addEventListener('click', toggleMobileSidebar);
+        isOverlayBound = true;
+    }
 
     // Group selection change
-    if (userSelect) {
+    if (userSelect && !isUserSelectBound) {
         userSelect.addEventListener('change', () => {
             const selectedGroupId = userSelect.value;
-            setGroupFilter(selectedGroupId === 'current' ? null : selectedGroupId);
-            showToast(`グループを切り替えました。`, 'info');
+            activeGroupId = selectedGroupId || null;
+            const selectedGroup = groupsCache.find(group => group.id === selectedGroupId);
+            persistSelectedGroup(activeGroupId);
+            if (selectedGroup) {
+                updateCurrentGroupLabel(selectedGroup.name);
+            } else {
+                updateCurrentGroupLabel('グループ未設定');
+            }
+            setGroupFilter(activeGroupId);
+            showToast('グループを切り替えました。', 'info');
         });
+        isUserSelectBound = true;
     }
 
     // Logout button
     const logoutButton = document.getElementById('logoutButton');
-    if (logoutButton) {
+    if (logoutButton && !isLogoutBound) {
         logoutButton.addEventListener('click', (e) => {
             e.preventDefault();
             showConfirmationModal(
@@ -188,21 +291,28 @@ function attachEventListeners() {
                 'ログアウト'
             );
         });
+        isLogoutBound = true;
     }
-    
+
     // Close mobile sidebar on nav item click
-    navContainer.addEventListener('click', (event) => {
-        if (!MEDIA_QUERY.matches && event.target.closest('a')) {
-            // Don't close for modals triggered from sidebar
+    if (navContainer && !isNavClickBound) {
+        navContainer.addEventListener('click', (event) => {
+            if (MEDIA_QUERY.matches) return;
+
             const link = event.target.closest('a');
-            if (!link.onclick) {
-                 toggleMobileSidebar();
-            }
-        }
-    });
+            if (!link || shouldPreventMobileAutoClose(link)) return;
+            if (!sidebar || !sidebar.classList.contains('is-open-mobile')) return;
+
+            toggleMobileSidebar();
+        });
+        isNavClickBound = true;
+    }
 
     // Listen for screen size changes
-    MEDIA_QUERY.addEventListener('change', adjustLayout);
+    if (!isMediaQueryBound) {
+        MEDIA_QUERY.addEventListener('change', adjustLayout);
+        isMediaQueryBound = true;
+    }
 }
 
 
@@ -227,6 +337,6 @@ export function initSidebarHandler() {
 
     // Attach any page-specific guards
     if (typeof window.attachPasswordChangeNavGuard === 'function') {
-        window.attachPasswordChange_changeNavGuard();
+        window.attachPasswordChangeNavGuard();
     }
 }

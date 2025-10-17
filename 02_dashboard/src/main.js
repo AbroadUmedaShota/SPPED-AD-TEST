@@ -102,6 +102,17 @@ function initLanguageSwitcher() {
         return;
     }
 
+    languageSwitcherButton.setAttribute('aria-haspopup', 'listbox');
+    languageSwitcherButton.setAttribute('aria-expanded', 'false');
+
+    const updateSelectionState = (lang) => {
+        languageSwitcherDropdown.querySelectorAll('a[data-lang]').forEach((link) => {
+            const isActive = link.getAttribute('data-lang') === lang;
+            link.classList.toggle('is-active', isActive);
+            link.setAttribute('aria-checked', isActive);
+        });
+    };
+
     const setLanguage = (lang) => {
         localStorage.setItem('language', lang);
         currentLanguageText.textContent = lang === 'ja' ? '日本語' : 'English';
@@ -110,12 +121,19 @@ function initLanguageSwitcher() {
         // Dispatch a custom event to notify other parts of the app
         document.dispatchEvent(new CustomEvent('languagechange', { detail: { lang } }));
         
+        updateSelectionState(lang);
         languageSwitcherDropdown.classList.add('hidden');
+        languageSwitcherButton.setAttribute('aria-expanded', 'false');
+    };
+
+    const toggleDropdownVisibility = () => {
+        const isHidden = languageSwitcherDropdown.classList.toggle('hidden');
+        languageSwitcherButton.setAttribute('aria-expanded', isHidden ? 'false' : 'true');
     };
 
     languageSwitcherButton.addEventListener('click', (e) => {
         e.stopPropagation();
-        languageSwitcherDropdown.classList.toggle('hidden');
+        toggleDropdownVisibility();
     });
 
 function openNewSurveyModalWithSetup(afterOpen) {
@@ -280,6 +298,7 @@ window.openNewSurveyModalWithSetup = openNewSurveyModalWithSetup;
     document.addEventListener('click', () => {
         if (!languageSwitcherDropdown.classList.contains('hidden')) {
             languageSwitcherDropdown.classList.add('hidden');
+            languageSwitcherButton.setAttribute('aria-expanded', 'false');
         }
     });
 
