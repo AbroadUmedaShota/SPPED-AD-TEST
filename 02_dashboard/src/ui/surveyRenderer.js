@@ -330,7 +330,7 @@ function renderQuestion(question, uiLang, index, languageOptions = {}) {
 
 
   if (typeSelect) {
-    const supported = ['free_answer', 'single_answer', 'multi_answer', 'number_answer', 'matrix_sa', 'matrix_ma', 'date_time', 'handwriting', 'explanation_card'];
+    const supported = ['free_answer', 'single_answer', 'multi_answer', 'dropdown', 'number_answer', 'matrix_sa', 'matrix_ma', 'date_time', 'handwriting', 'explanation_card'];
     typeSelect.value = supported.includes(question.type) ? question.type : 'free_answer';
   }
 
@@ -359,7 +359,7 @@ function renderQuestion(question, uiLang, index, languageOptions = {}) {
   const optionsContainer = fragment.querySelector('.options-container');
   if (optionsContainer) {
     optionsContainer.innerHTML = '';
-    const supportsOptions = question.type === 'single_answer' || question.type === 'multi_answer';
+    const supportsOptions = question.type === 'single_answer' || question.type === 'multi_answer' || question.type === 'dropdown';
     if (supportsOptions) {
       const list = Array.isArray(question.options) ? question.options : [];
       list.forEach((opt, optIndex) => {

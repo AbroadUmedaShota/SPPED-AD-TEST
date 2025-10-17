@@ -69,7 +69,7 @@
       <div id="sidebar-placeholder"></div>
 
       <!-- Main Content -->
-      <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8">
+      <main class="flex flex-1 flex-col items-center py-8 px-4 sm:px-6 lg:px-8">
         <div class="w-full max-w-7xl mx-auto flex flex-col gap-6 lg:grid lg:grid-cols-1 lg:items-start">
           <div id="survey-content-area" class="flex flex-col w-full max-w-6xl mx-auto flex-1 lg:col-span-1">
             <!-- Breadcrumb -->
@@ -249,10 +249,6 @@
                 <span class="material-icons text-on-surface-variant mr-4">radio_button_checked</span>
                 <span>シングルアンサー</span>
             </button>
-            <button data-question-type="dropdown_pseudo" class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
-                <span class="material-icons text-on-surface-variant mr-4">arrow_drop_down_circle</span>
-                <span>ドロップダウン</span>
-            </button>
             <button data-question-type="multi_answer" class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
                 <span class="material-icons text-on-surface-variant mr-4">check_box</span>
                 <span>マルチアンサー</span>
@@ -261,7 +257,7 @@
                 <span class="material-icons text-on-surface-variant mr-4">pin</span>
                 <span>数値回答</span>
             </button>
-            <button data-question-type="dropdown_answer" class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
+            <button data-question-type="dropdown" class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
                 <span class="material-icons text-on-surface-variant mr-4">arrow_drop_down_circle</span>
                 <span>ドロップダウン回答</span>
             </button>
@@ -340,11 +336,11 @@
         <div class="flex items-center gap-3 flex-wrap">
           <span class="material-icons text-on-surface-variant handle cursor-move" title="ドラッグで並び替え">drag_indicator</span>
 
-          <select class="question-type-select border border-outline-variant rounded-md text-sm px-2 py-1 bg-surface text-on-surface" aria-label="設問タイプを選択">
+          <select class="question-type-select w-48 border border-outline-variant rounded-md text-sm px-2 py-1 bg-surface text-on-surface" aria-label="設問タイプを選択">
             <option value="free_answer">自由記述</option>
             <option value="single_answer">単一選択</option>
             <option value="multi_answer">複数選択</option>
-            <option value="dropdown_answer">ドロップダウン回答</option>
+            <option value="dropdown">ドロップダウン回答</option>
             <option value="number_answer">数値入力</option>
             <option value="matrix_sa">マトリクス（単一）</option>
             <option value="matrix_ma">マトリクス（複数）</option>
@@ -390,10 +386,6 @@
 
       <div class="mt-4 border-t border-outline-variant pt-4 flex items-center justify-end">
         <div class="flex items-center">
-          <div class="display-as-dropdown-container hidden items-center mr-4">
-            <input type="checkbox" class="display-as-dropdown-checkbox h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary">
-            <label class="display-as-dropdown-label ml-2 block text-sm text-on-surface-variant">ドロップダウンで回答</label>
-          </div>
           <div class="flex items-center">
             <input type="checkbox" class="required-checkbox h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary">
             <label class="required-label ml-2 block text-sm text-on-surface-variant">必須回答にする</label>

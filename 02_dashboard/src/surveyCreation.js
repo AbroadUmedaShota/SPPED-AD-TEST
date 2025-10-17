@@ -672,27 +672,7 @@ function updateAndRenderAll() {
             requiredLabel.setAttribute('for', uniqueId);
         }
 
-        // Handle 'Display as dropdown' checkbox visibility and state
-        const dropdownContainer = qItem.querySelector('.display-as-dropdown-container');
-        if (dropdownContainer) {
-            if (question.type === 'single_answer') {
-                dropdownContainer.classList.remove('hidden');
-                dropdownContainer.classList.add('flex');
-                
-                const dropdownCheckbox = dropdownContainer.querySelector('.display-as-dropdown-checkbox');
-                const dropdownLabel = dropdownContainer.querySelector('.display-as-dropdown-label');
-                
-                if (dropdownCheckbox && dropdownLabel) {
-                    const uniqueId = `display-as-dropdown-${questionId}`;
-                    dropdownCheckbox.id = uniqueId;
-                    dropdownLabel.setAttribute('for', uniqueId);
-                    dropdownCheckbox.checked = question.meta?.displayAs === 'dropdown';
-                }
-            } else {
-                dropdownContainer.classList.add('hidden');
-                dropdownContainer.classList.remove('flex');
-            }
-        }
+
     });
 
     // Ensure placeholders and outline actions are updated after rendering
@@ -1235,11 +1215,7 @@ async function initializePage() {
         restoreAccordionState();
         const fabActions = {
             onAddQuestion: (questionType) => {
-                if (questionType === 'dropdown_pseudo') {
-                    handleAddNewQuestion(null, 'single_answer', { displayAs: 'dropdown' });
-                } else {
-                    handleAddNewQuestion(null, questionType);
-                }
+                handleAddNewQuestion(null, questionType);
             },
             onAddGroup: () => handleAddNewQuestionGroup()
         };
@@ -1475,6 +1451,7 @@ function handleQuestionConfigInput(target) {
 }
 
 function setupEventListeners() {
+
     initializeAccordion();
 
     const addNewGroupBtn = document.getElementById('addNewGroupBtn');
@@ -1520,30 +1497,7 @@ function setupEventListeners() {
             return;
         }
 
-        // Handle display-as-dropdown checkbox change
-        const dropdownCheckbox = target.closest('.display-as-dropdown-checkbox');
-        if (dropdownCheckbox) {
-            const qItem = dropdownCheckbox.closest('.question-item');
-            const gItem = dropdownCheckbox.closest('.question-group');
-            if (qItem && gItem) {
-                const groupId = gItem.dataset.groupId;
-                const questionId = qItem.dataset.questionId;
-                const question = surveyData.questionGroups.find(g => g.groupId === groupId)?.questions.find(q => q.questionId === questionId);
-                if (question) {
-                    ensureQuestionMeta(question);
-                    if (dropdownCheckbox.checked) {
-                        question.meta.displayAs = 'dropdown';
-                    } else {
-                        delete question.meta.displayAs;
-                        if (Object.keys(question.meta).length === 0) {
-                            delete question.meta;
-                        }
-                    }
-                    setDirty(true);
-                }
-            }
-            return;
-        }
+
     });
 
     // --- Delegated Click-to-Action Listeners ---
@@ -1799,7 +1753,7 @@ function handleAddNewQuestion(groupId, questionType, creationOptions = {}) {
         required: false
     };
 
-    if (['single_answer', 'multi_answer'].includes(questionType)) {
+    if (['single_answer', 'multi_answer', 'dropdown'].includes(questionType)) {
         newQuestion.options = [
             { text: normalizeLocalization({ ja: '選択肢1' }) },
             { text: normalizeLocalization({ ja: '選択肢2' }) }
@@ -1903,7 +1857,7 @@ function handleChangeQuestionType(groupId, questionId, newType) {
 
     question.type = newType;
     setDirty(true); // Change of type is a modification
-    const needsOptions = ['single_answer', 'multi_answer', 'dropdown_answer'].includes(newType);
+    const needsOptions = ['single_answer', 'multi_answer', 'dropdown'].includes(newType);
     if (needsOptions) {
         if (!Array.isArray(question.options)) {
             question.options = [
@@ -2127,6 +2081,12 @@ function renderPreviewInModal() {
             html += `<p class="survey-preview-question-title">${getLocalizedText(q.text)} ${q.required ? '<span class="text-error survey-preview-required">*</span>' : ''}</p>`;
             
             if (q.type === 'single_answer' && q.meta?.displayAs === 'dropdown') {
+                html += '<select class="input-field"><option value="">選択してください</option>';
+                (q.options || []).forEach(opt => {
+                    html += `<option value="${getLocalizedText(opt.text)}">${getLocalizedText(opt.text)}</option>`;
+                });
+                html += '</select>';
+            } else if (q.type === 'dropdown') {
                 html += '<select class="input-field"><option value="">選択してください</option>';
                 (q.options || []).forEach(opt => {
                     html += `<option value="${getLocalizedText(opt.text)}">${getLocalizedText(opt.text)}</option>`;
