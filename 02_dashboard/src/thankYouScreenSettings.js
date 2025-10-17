@@ -4,7 +4,7 @@ import { showConfirmationModal } from './confirmationModal.js';
 const MAX_MESSAGE_LENGTH = 500;
 const STORAGE_KEY_PREFIX = 'thankYouScreenSettings_';
 
-// --- Services (�ȈՓI�Ȃ���) ---
+// --- Services (本来は外部ファイル) ---
 async function getSurveyById(surveyId) {
   try {
     const dataPath = resolveDashboardDataPath('surveys/surveys-with-details.json');
@@ -48,8 +48,8 @@ function renderPageTitle(survey) {
     const displayName = surveyName || 'Survey';
     titleElement.textContent = `Thank-you Screen Settings for "${displayName}"`;
   } else {
-    const displayName = surveyName || '���̖��ݒ�';
-    titleElement.textContent = `�A���P�[�g�u${displayName}�v�̃T���N�X��ʐݒ�`;
+    const displayName = surveyName || 'アンケート';
+    titleElement.textContent = `アンケート「${displayName}」のサンクス画面設定`;
   }
 }
 
@@ -64,7 +64,7 @@ function updateThankYouMessageMeta(textarea) {
   const isValid = length <= MAX_MESSAGE_LENGTH;
   if (errorEl) {
     if (!isValid) {
-      errorEl.textContent = `�T���N�X���b�Z�[�W��${MAX_MESSAGE_LENGTH}�����ȓ��œ��͂��Ă��������B`;
+      errorEl.textContent = `サンクスメッセージは${MAX_MESSAGE_LENGTH}文字以内で入力してください。`;
       errorEl.classList.remove('hidden');
     } else {
       errorEl.textContent = '';
@@ -140,10 +140,10 @@ export async function initThankYouScreenSettings() {
   const surveyId = urlParams.get('surveyId');
 
   if (!surveyId) {
-    showToast('Survey ID is missing.', 'error');
+    showToast('アンケートIDが見つかりません。', 'error');
     const titleEl = document.getElementById('pageTitle');
     if (titleEl) {
-      titleEl.textContent = 'Survey ID not provided';
+      titleEl.textContent = 'アンケートIDが指定されていません。';
     }
     disableThankYouScreenForm(interactiveControls);
     return;
@@ -155,7 +155,7 @@ export async function initThankYouScreenSettings() {
     renderPageTitle(survey);
   } catch (error) {
     console.error('Failed to initialize thank-you screen settings:', error);
-    showToast('Failed to load survey data.', 'error');
+    showToast('アンケートデータの読み込みに失敗しました。', 'error');
     disableThankYouScreenForm(interactiveControls);
     return;
   }
@@ -183,29 +183,29 @@ export async function initThankYouScreenSettings() {
   allowContinuousAnswerToggle.addEventListener('change', () => {
     showToast(
       allowContinuousAnswerToggle.checked
-        ? 'Continuous answers enabled.'
-        : 'Continuous answers disabled.',
+        ? '連続回答が有効になりました。'
+        : '連続回答が無効になりました。',
       'info'
     );
   });
 
   saveButton.addEventListener('click', () => {
     if (!updateThankYouMessageMeta(thankYouMessageInput)) {
-      showToast(`Thank-you message must be ${MAX_MESSAGE_LENGTH} characters or fewer.`, 'error');
+      showToast(`サンクスメッセージは${MAX_MESSAGE_LENGTH}文字以下で入力してください。`, 'error');
       thankYouMessageInput.focus();
       return;
     }
     const settingsToSave = collectCurrentSettings();
     saveStoredSettings(surveyId, settingsToSave);
     initialSettings = { ...settingsToSave };
-    showToast('Settings saved.', 'success');
+    showToast('設定を保存しました。', 'success');
   });
 
   cancelButton.addEventListener('click', () => {
     const currentSettings = collectCurrentSettings();
     if (hasSettingsChanged(currentSettings, initialSettings)) {
       showConfirmationModal(
-        'You have unsaved changes. Leave this page?',
+        '未保存の変更があります。このページを離れますか？',
         () => { window.location.href = 'index.html'; }
       );
     } else {
