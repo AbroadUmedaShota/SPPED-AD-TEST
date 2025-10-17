@@ -516,7 +516,7 @@ function setAdditionalSettingsButtonState(feature, disabled, message) {
 }
 
 function updateAdditionalSettingsAvailability() {
-    const bizcardEnabled = surveyData?.settings?.bizcard?.enabled ?? true;
+    const bizcardEnabled = surveyData?.settings?.bizcard?.enabled === true;
 
     if (!currentSurveyId) {
         additionalSettingsButtons.forEach((_, feature) => {
@@ -1158,9 +1158,25 @@ async function initializePage() {
         if (!surveyData.settings.bizcard) {
             surveyData.settings.bizcard = {};
         }
-        if (typeof surveyData.settings.bizcard.enabled !== 'boolean') {
-            surveyData.settings.bizcard.enabled = true; // Default to true
+
+        // Robustly coerce the 'enabled' value to a boolean, defaulting to ON for new/unspecified surveys.
+        const rawValue = surveyData.settings.bizcard.enabled;
+        let coercedValue;
+
+        if (rawValue === undefined || rawValue === null) {
+            // If the setting is missing entirely, default to ON.
+            coercedValue = true;
+        } else if (typeof rawValue === 'boolean') {
+            // If it's already a boolean, use it as is.
+            coercedValue = rawValue;
+        } else if (rawValue === 'true' || rawValue === 1 || rawValue === '1') {
+            // Coerce truthy strings/numbers to true.
+            coercedValue = true;
+        } else {
+            // Coerce all other values (e.g., "false", 0, "", etc.) to false.
+            coercedValue = false; 
         }
+        surveyData.settings.bizcard.enabled = coercedValue;
 
         const bizcardToggle = document.getElementById('bizcardEnabled');
         if (bizcardToggle) {
