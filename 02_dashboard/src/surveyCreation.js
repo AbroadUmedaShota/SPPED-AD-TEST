@@ -328,49 +328,7 @@ function initializeQuestionMeta(question) {
 
 // --- Language Switcher ---
 function initLanguageSwitcher() {
-    const languageSwitcherButton = document.getElementById('language-switcher-button');
-    const languageSwitcherDropdown = document.getElementById('language-switcher-dropdown');
-    const currentLanguageText = document.getElementById('current-language-text');
-
-    if (!languageSwitcherButton || !languageSwitcherDropdown || !currentLanguageText) {
-        return;
-    }
-
-    const setLanguage = (lang) => {
-        localStorage.setItem('language', lang);
-        document.documentElement.lang = lang;
-        currentLanguageText.textContent = lang === 'ja' ? '日本語' : 'English';
-        // update local state then notify
-        currentLang = lang;
-        document.dispatchEvent(new CustomEvent('languagechange', { detail: { lang } }));
-        languageSwitcherDropdown.classList.add('hidden');
-    };
-
-    languageSwitcherButton.addEventListener('click', (e) => {
-        e.stopPropagation();
-        languageSwitcherDropdown.classList.toggle('hidden');
-        languageSwitcherButton.setAttribute('aria-expanded', languageSwitcherDropdown.classList.contains('hidden') ? 'false' : 'true');
-    });
-
-    document.addEventListener('click', () => {
-        if (!languageSwitcherDropdown.classList.contains('hidden')) {
-            languageSwitcherDropdown.classList.add('hidden');
-            languageSwitcherButton.setAttribute('aria-expanded', 'false');
-        }
-    });
-
-    languageSwitcherDropdown.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const target = e.target.closest('a[data-lang]');
-        if (target) {
-            const lang = target.getAttribute('data-lang');
-            setLanguage(lang);
-        }
-    });
-
-    // initial
-    const initial = localStorage.getItem('language') || 'ja';
-    setLanguage(initial);
+    // This function is intentionally left blank to disable the language switcher.
 }
 
 function updateTabIndicator() {
