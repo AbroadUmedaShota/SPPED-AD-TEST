@@ -233,17 +233,42 @@ function renderCharts(chartsData) {
     // Add event listeners for download buttons
     document.querySelectorAll('.download-btn').forEach(button => {
         button.addEventListener('click', (e) => {
-            const { chartId, questionText } = e.currentTarget.dataset;
-            const chartInstance = chartInstances[chartId];
-            if (chartInstance) {
-                const dataUrl = chartInstance.toBase64Image();
-                const link = document.createElement('a');
-                link.href = dataUrl;
-                const sanitizedQuestion = questionText.replace(/[^a-z0-9_\-]/gi, '_').substring(0, 50);
-                link.download = `chart-${sanitizedQuestion}.png`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+            const buttonEl = e.currentTarget;
+            const questionText = buttonEl.dataset.questionText;
+            const chartCard = buttonEl.closest('.bg-surface'); // Find the parent card element
+
+            if (chartCard && window.html2canvas) {
+                // Temporarily hide the download button and type switchers from the capture
+                const elementsToHide = [
+                    buttonEl,
+                    chartCard.querySelector('[role="group"]'),
+                ];
+                elementsToHide.forEach(el => el.style.visibility = 'hidden');
+
+                html2canvas(chartCard, {
+                    useCORS: true,
+                    backgroundColor: '#ffffff', // Explicitly set a white background
+                    onrendered: function() {
+                        // Show the elements again after capture
+                        elementsToHide.forEach(el => el.style.visibility = 'visible');
+                    }
+                }).then(canvas => {
+                    // Show the elements again in case of promise resolution before onrendered
+                    elementsToHide.forEach(el => el.style.visibility = 'visible');
+
+                    const dataUrl = canvas.toDataURL('image/png');
+                    const link = document.createElement('a');
+                    link.href = dataUrl;
+                    const sanitizedQuestion = questionText.replace(/[<>:"/\\|?*]/g, '_');
+                    link.download = `${sanitizedQuestion}.png`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }).catch(err => {
+                    // Ensure elements are visible even if there's an error
+                    elementsToHide.forEach(el => el.style.visibility = 'visible');
+                    console.error('html2canvas failed:', err);
+                });
             }
         });
     });
