@@ -4,7 +4,7 @@ import {
     validateCoupon,
     saveBizcardSettings
 } from './services/bizcardSettingsService.js';
-import { calculateEstimate, SPEED_OPTIONS } from './services/bizcardCalculator.js';
+import { calculateEstimate } from './services/bizcardCalculator.js';
 import {
     renderSurveyInfo,
     setInitialFormValues,
@@ -14,185 +14,23 @@ import {
     validateForm,
     setSaveButtonLoading,
     renderDataConversionPlans,
-    renderDataConversionSpeeds
+    renderPremiumOptions
 } from './ui/bizcardSettingsRenderer.js';
 import { showToast } from './utils.js';
 import { showConfirmationModal } from './confirmationModal.js';
-
-const DATA_CONVERSION_FEATURES = {
-    basicFields: {
-        key: 'basic-fields',
-        text: {
-            ja: '対象項目: 氏名 / メールアドレス',
-            en: 'Fields: Name / Email'
-        }
-    },
-    monthlyLimit50: {
-        key: 'monthly-limit-50',
-        text: {
-            ja: '月間50枚まで',
-            en: 'Up to 50 cards / month'
-        }
-    },
-    turnaround6Days: {
-        key: 'turnaround-6-days',
-        text: {
-            ja: '納期目安: 6営業日',
-            en: 'Turnaround: 6 business days'
-        }
-    },
-    retention90Days: {
-        key: 'retention-90-days',
-        text: {
-            ja: 'データ保存期間: 90日間',
-            en: 'Data retention: 90 days'
-        }
-    },
-    extendedFields: {
-        key: 'extended-fields',
-        text: {
-            ja: '対象項目: 氏名 / メール / 会社名 / 部署 / 役職 / 郵便番号 / 住所 / 電話 / 携帯 / Webサイト',
-            en: 'Fields: Name / Email / Company / Department / Title / Zip / Address / Phone / Mobile / Website'
-        }
-    },
-    doubleCheck: {
-        key: 'double-check',
-        text: {
-            ja: '有人ダブルチェックで高精度',
-            en: 'High accuracy with human double-checks'
-        }
-    },
-    socialQrFields: {
-        key: 'social-qr-fields',
-        text: {
-            ja: 'SNS・QRコードなどの追加項目',
-            en: 'Includes social and QR data'
-        }
-    },
-    crmReadyData: {
-        key: 'crm-ready-data',
-        text: {
-            ja: 'CRM連携向けの整形データ',
-            en: 'CRM-ready formatted data'
-        }
-    },
-    sameDaySupport: {
-        key: 'same-day-support',
-        text: {
-            ja: '最短当日納品に対応',
-            en: 'Same-day delivery available'
-        }
-    },
-    unlimitedRetention: {
-        key: 'unlimited-retention',
-        text: {
-            ja: 'データ保存期間: 無期限',
-            en: 'Data retention: Unlimited'
-        }
-    }
-};
-
-const FREE_PLAN_BASE_FEATURES = [
-    DATA_CONVERSION_FEATURES.basicFields,
-    DATA_CONVERSION_FEATURES.monthlyLimit50
-];
-
-const FREE_PLAN_ADDITIONAL_FEATURES = [
-    DATA_CONVERSION_FEATURES.turnaround6Days,
-    DATA_CONVERSION_FEATURES.retention90Days
-];
-
-const STANDARD_PLAN_BASE_FEATURES = [
-    ...FREE_PLAN_BASE_FEATURES,
-    ...FREE_PLAN_ADDITIONAL_FEATURES
-];
-
-const STANDARD_PLAN_ADDITIONAL_FEATURES = [
-    DATA_CONVERSION_FEATURES.extendedFields,
-    DATA_CONVERSION_FEATURES.doubleCheck
-];
-
-const PREMIUM_PLAN_BASE_FEATURES = [
-    ...STANDARD_PLAN_BASE_FEATURES,
-    ...STANDARD_PLAN_ADDITIONAL_FEATURES
-];
-
-const PREMIUM_PLAN_ADDITIONAL_FEATURES = [
-    DATA_CONVERSION_FEATURES.socialQrFields,
-    DATA_CONVERSION_FEATURES.crmReadyData,
-    DATA_CONVERSION_FEATURES.sameDaySupport,
-    DATA_CONVERSION_FEATURES.unlimitedRetention
-];
-
-const DATA_CONVERSION_PLANS = [
-    {
-        value: 'free',
-        title: { ja: 'お試しプラン', en: 'Trial Plan' },
-        price: { ja: '¥50/枚', en: '¥50/card' },
-        priceNote: { ja: '2項目対応（氏名・メールアドレス）', en: 'Includes 2 fields (Name & Email)' },
-        basePlanKey: null,
-        baseFeatures: [...FREE_PLAN_BASE_FEATURES],
-        additionalFeatures: [...FREE_PLAN_ADDITIONAL_FEATURES],
-        badges: [
-            { text: { ja: '対象項目: 氏名 / メールアドレス', en: 'Fields: Name / Email' }, tone: 'info' },
-            { text: { ja: '月間50枚まで', en: 'Up to 50 cards / month' }, tone: 'limit' }
-        ],
-        description: {
-            ja: '名刺データ化をまずは試したい方向け。',
-            en: 'For those who want to try business card digitization.'
-        },
-        highlights: [
-            { ja: '納期目安: 6営業日', en: 'Turnaround: 6 business days' },
-            { ja: 'データ保存期間: 90日間', en: 'Data retention: 90 days' }
-        ]
-    },
-    {
-        value: 'standard',
-        title: { ja: 'スタンダード', en: 'Standard' },
-        price: { ja: '¥50/枚〜', en: '¥50/card〜' },
-        priceNote: { ja: '10項目データ化（通常作業 @50円）', en: 'Up to 10 fields (Normal @¥50/card)' },
-        basePlanKey: 'free',
-        baseFeatures: [...STANDARD_PLAN_BASE_FEATURES],
-        additionalFeatures: [...STANDARD_PLAN_ADDITIONAL_FEATURES],
-        badges: [
-            { text: { ja: '対象項目: 氏名 / メール / 会社名 / 部署 / 役職 / 郵便番号 / 住所 / 電話 / 携帯 / Webサイト', en: 'Fields: Name / Email / Company / Department / Title / Zip / Address / Phone / Mobile / Website' }, tone: 'info' }
-        ],
-        description: {
-            ja: 'もっとも選ばれている標準プラン。有人によるダブルチェックで高精度なデータを納品します。',
-            en: 'Most popular plan with human double-checks for high accuracy.'
-        },
-        highlights: [
-            { ja: '納期目安: 6営業日（通常作業）', en: 'Turnaround: 6 business days (Normal)' },
-            { ja: 'データ保存期間: 90日間', en: 'Data retention: 90 days' }
-        ]
-    },
-    {
-        value: 'premium',
-        title: { ja: 'プレミアム', en: 'Premium' },
-        price: { ja: '要お見積もり', en: 'Custom quote' },
-        priceNote: { ja: '月額契約（個別見積り）', en: 'Monthly contract (custom quote)' },
-        basePlanKey: 'standard',
-        baseFeatures: [...PREMIUM_PLAN_BASE_FEATURES],
-        additionalFeatures: [...PREMIUM_PLAN_ADDITIONAL_FEATURES],
-        badges: [
-            { text: { ja: '対象項目: スタンダード項目 + SNS・QR情報', en: 'Fields: Standard + Social / QR data' }, tone: 'info' }
-        ],
-        description: {
-            ja: 'イベントや展示会で大量の名刺を扱う企業向け。CRM連携用の整形データを納品します。',
-            en: 'Ideal for events with high volume, delivering CRM-ready formatted data.'
-        },
-        highlights: [
-            { ja: '納期目安: 最短当日〜6営業日', en: 'Turnaround: Same-day to 6 business days' },
-            { ja: 'データ保存期間: 無期限', en: 'Data retention: Unlimited' }
-        ]
-    }
-];
+import {
+    DATA_CONVERSION_PLANS,
+    DEFAULT_PLAN,
+    PREMIUM_OPTION_GROUPS,
+    getPlanConfig,
+    normalizePlanValue,
+    normalizePremiumOptions
+} from './services/bizcardPlans.js';
 
 export function initBizcardSettings() {
     // --- DOM Element Cache ---
     const bizcardRequestInput = document.getElementById('bizcardRequest');
     const dataConversionPlanSelection = document.getElementById('dataConversionPlanSelection');
-    const dataConversionSpeedSelection = document.getElementById('dataConversionSpeedSelection');
     const couponCodeInput = document.getElementById('couponCode');
     const applyCouponBtn = document.getElementById('applyCouponBtn');
     const saveButton = document.getElementById('saveBizcardSettingsBtn');
@@ -200,6 +38,7 @@ export function initBizcardSettings() {
     const toggleMemoSectionBtn = document.getElementById('toggleMemoSection');
     const memoSection = document.getElementById('memoSection');
     const internalMemoInput = document.getElementById('internalMemo');
+    const premiumOptionsContainer = document.getElementById('premiumOptionsContainer');
 
     // --- State Management ---
     let state = {
@@ -233,8 +72,10 @@ export function initBizcardSettings() {
 
             // Set default value for bizcardEnabled to true as the toggle is removed
             settingsData.bizcardEnabled = true;
-            settingsData.dataConversionPlan = settingsData.dataConversionPlan || 'free';
-            settingsData.dataConversionSpeed = settingsData.dataConversionSpeed || 'normal';
+            settingsData.dataConversionPlan = normalizePlanValue(settingsData.dataConversionPlan);
+            const planConfig = getPlanConfig(settingsData.dataConversionPlan);
+            settingsData.dataConversionSpeed = planConfig?.speedValue || getPlanConfig(DEFAULT_PLAN)?.speedValue || 'normal';
+            settingsData.premiumOptions = normalizePremiumOptions(settingsData.premiumOptions);
             const parsedBizcardRequest = parseInt(settingsData.bizcardRequest, 10);
             settingsData.bizcardRequest = Number.isFinite(parsedBizcardRequest) && parsedBizcardRequest > 0
                 ? parsedBizcardRequest
@@ -270,6 +111,7 @@ export function initBizcardSettings() {
             state.surveyData = surveyData; // surveyDataをstateに保存
             // Deep copy for initial state comparison
             state.initialSettings = JSON.parse(JSON.stringify(settingsData));
+            state.initialSettings.premiumOptions = normalizePremiumOptions(state.initialSettings.premiumOptions);
 
             renderSurveyInfo(surveyData, state.surveyId);
             setInitialFormValues(state.settings);
@@ -292,13 +134,16 @@ export function initBizcardSettings() {
     function setupEventListeners() {
         const formElements = [
             bizcardRequestInput,
-            dataConversionPlanSelection,
-            dataConversionSpeedSelection
+            dataConversionPlanSelection
         ];
         formElements.forEach(el => {
             if(el) el.addEventListener('change', (e) => handleFormChange(e));
         });
         if(bizcardRequestInput) bizcardRequestInput.addEventListener('input', (e) => handleFormChange(e));
+
+        if (premiumOptionsContainer) {
+            premiumOptionsContainer.addEventListener('change', handlePremiumOptionChange);
+        }
 
         if (couponCodeInput) {
             couponCodeInput.addEventListener('input', handleCouponInputChange);
@@ -323,17 +168,21 @@ export function initBizcardSettings() {
         const currentSettings = {
             bizcardRequest: Math.max(0, parseInt(bizcardRequestInput.value, 10) || 0),
             dataConversionPlan: document.querySelector('input[name="dataConversionPlan"]:checked')?.value,
-            dataConversionSpeed: document.querySelector('input[name="dataConversionSpeed"]:checked')?.value,
-            internalMemo: internalMemoInput.value || ''
+            internalMemo: internalMemoInput.value || '',
+            premiumOptions: getPremiumSelectionsFromDom()
         };
 
         const initial = state.initialSettings;
+        const initialPremium = normalizePremiumOptions(initial.premiumOptions);
+        const currentPremium = normalizePremiumOptions(currentSettings.premiumOptions);
 
         if (currentSettings.bizcardRequest != initial.bizcardRequest) return true;
         if (currentSettings.dataConversionPlan != initial.dataConversionPlan) return true;
-        if (currentSettings.dataConversionSpeed != initial.dataConversionSpeed) return true;
         if (currentSettings.internalMemo.trim() !== (initial.internalMemo || '').trim()) return true;
-        
+
+        if (currentPremium.multilingual !== initialPremium.multilingual) return true;
+        if (!areArraysEqual(currentPremium.additionalItems, initialPremium.additionalItems)) return true;
+
         if ((couponCodeInput.value || '') !== (initial.couponCode || '')) return true;
 
         return false;
@@ -366,14 +215,44 @@ export function initBizcardSettings() {
 
         switch (name) {
             case 'dataConversionPlan':
-                state.settings.dataConversionPlan = value;
-                break;
-            case 'dataConversionSpeed':
-                state.settings.dataConversionSpeed = value;
+                {
+                    const normalizedPlan = normalizePlanValue(value);
+                    state.settings.dataConversionPlan = normalizedPlan;
+                    const linkedSpeed = getPlanConfig(normalizedPlan)?.speedValue
+                        || getPlanConfig(DEFAULT_PLAN)?.speedValue
+                        || 'normal';
+                    state.settings.dataConversionSpeed = linkedSpeed;
+                }
                 break;
             case 'bizcardRequest':
                 state.settings.bizcardRequest = Math.max(0, parseInt(value, 10) || 0);
                 break;
+        }
+
+        updateFullUI();
+    }
+
+    function handlePremiumOptionChange(event) {
+        const target = event.target;
+        if (!target || !target.name) {
+            return;
+        }
+
+        state.settings.premiumOptions = normalizePremiumOptions(state.settings.premiumOptions);
+
+        if (target.name === 'premiumMultilingual') {
+            state.settings.premiumOptions.multilingual = target.checked;
+        }
+
+        if (target.name === 'premiumAdditionalItems') {
+            const value = target.value;
+            const items = new Set(state.settings.premiumOptions.additionalItems || []);
+            if (target.checked) {
+                items.add(value);
+            } else {
+                items.delete(value);
+            }
+            state.settings.premiumOptions.additionalItems = Array.from(items);
         }
 
         updateFullUI();
@@ -491,37 +370,13 @@ export function initBizcardSettings() {
             settingsFields.classList.remove('hidden');
         }
 
-        // Speed plan restriction logic
-        const isTrialPlan = state.settings.dataConversionPlan === 'free';
-        const speedPlanSection = document.getElementById('speed-plan-section');
-        if (speedPlanSection) {
-            if (isTrialPlan) {
-                speedPlanSection.classList.add('opacity-50', 'pointer-events-none');
-            } else {
-                speedPlanSection.classList.remove('opacity-50', 'pointer-events-none');
-            }
-        }
+        state.settings.dataConversionPlan = normalizePlanValue(state.settings.dataConversionPlan);
+        const selectedPlanConfig = getPlanConfig(state.settings.dataConversionPlan);
+        state.settings.dataConversionSpeed = selectedPlanConfig?.speedValue
+            || getPlanConfig(DEFAULT_PLAN)?.speedValue
+            || 'normal';
+        state.settings.premiumOptions = normalizePremiumOptions(state.settings.premiumOptions);
 
-        const speedOptions = document.querySelectorAll('input[name="dataConversionSpeed"]');
-        
-        speedOptions.forEach(radio => {
-            if (radio.value !== 'normal') {
-                radio.disabled = isTrialPlan;
-            }
-        });
-
-        if (isTrialPlan) {
-            const normalPlanRadio = document.querySelector('input[name="dataConversionSpeed"][value="normal"]');
-            if (normalPlanRadio) normalPlanRadio.checked = true;
-            state.settings.dataConversionSpeed = 'normal';
-        }
-
-        if (!state.settings.dataConversionPlan && DATA_CONVERSION_PLANS.length > 0) {
-            state.settings.dataConversionPlan = DATA_CONVERSION_PLANS[0].value;
-        }
-        if (!state.settings.dataConversionSpeed) {
-            state.settings.dataConversionSpeed = 'normal';
-        }
         const parsedBizcardRequest = parseInt(state.settings.bizcardRequest, 10);
         state.settings.bizcardRequest = Number.isFinite(parsedBizcardRequest) && parsedBizcardRequest > 0
             ? parsedBizcardRequest
@@ -532,21 +387,7 @@ export function initBizcardSettings() {
         }
 
         renderDataConversionPlans(DATA_CONVERSION_PLANS, state.settings.dataConversionPlan);
-
-        // データ化スピードプラン（@単価表記）
-        const SPEED_LABELS = {
-            normal: { ja: '通常作業プラン', en: 'Normal' },
-            express: { ja: '特急作業プラン', en: 'Express' },
-            superExpress: { ja: '超特急作業プラン', en: 'Super Express' },
-            onDemand: { ja: 'オンデマンドプラン', en: 'On-Demand' }
-        };
-        const speedList = Object.entries(SPEED_OPTIONS).map(([key, val]) => ({
-            value: key,
-            title: SPEED_LABELS[key] || { ja: key, en: key },
-            unitPrice: val.price_per_card,
-            days: val.days
-        }));
-        renderDataConversionSpeeds(speedList, state.settings.dataConversionSpeed);
+        renderPremiumOptions(PREMIUM_OPTION_GROUPS, state.settings.premiumOptions);
 
         const estimate = calculateEstimate(state.settings, state.appliedCoupon, state.surveyData?.periodEnd);
         renderEstimate(estimate);
@@ -604,6 +445,24 @@ export function initBizcardSettings() {
             applyCouponBtn.classList.remove('coupon-action-button--apply', 'coupon-action-button--change', 'coupon-action-button--remove');
             applyCouponBtn.classList.add(`coupon-action-button--${mode}`);
         }
+    }
+
+    function getPremiumSelectionsFromDom() {
+        const multilingualInput = document.querySelector('input[name="premiumMultilingual"]');
+        const additionalInputs = Array.from(document.querySelectorAll('input[name="premiumAdditionalItems"]:checked'));
+
+        return {
+            multilingual: Boolean(multilingualInput?.checked),
+            additionalItems: additionalInputs.map(input => input.value)
+        };
+    }
+
+    function areArraysEqual(a = [], b = []) {
+        if (!Array.isArray(a) || !Array.isArray(b)) return false;
+        if (a.length !== b.length) return false;
+        const sortedA = [...a].sort();
+        const sortedB = [...b].sort();
+        return sortedA.every((value, index) => value === sortedB[index]);
     }
 
     // --- Initialize Page ---

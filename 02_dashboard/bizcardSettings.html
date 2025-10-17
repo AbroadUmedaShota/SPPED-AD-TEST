@@ -30,19 +30,37 @@
         <div id="sidebar-placeholder"></div>
             
         <!-- 4. メインコンテンツ -->
-        <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
-            <div class="flex flex-col w-full flex-1 max-w-7xl mx-auto">
+        <main class="relative flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
+            <div class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-72 bg-gradient-to-br from-sky-500/20 via-blue-500/10 to-indigo-500/20 blur-3xl"></div>
+            <div class="flex flex-col w-full flex-1 max-w-7xl mx-auto gap-8">
                 <!-- パンくずリストコンテナ -->
                 <div id="breadcrumb-container" class="mb-4"></div>
 
                 <!-- タイトルエリア -->
-                <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant">
+                <div class="flex flex-wrap justify-between items-center gap-4 pb-4 border-b border-outline-variant">
                     <h1 class="text-on-background text-2xl sm:text-3xl font-bold leading-tight tracking-tight" id="pageTitle">アンケート『[アンケート名]』の名刺データ化設定</h1>
                 </div>
 
+                <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-600 via-blue-600 to-indigo-600 p-6 text-white shadow-xl">
+                    <div class="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/10 blur-3xl"></div>
+                    <div class="absolute -bottom-24 -left-10 h-56 w-56 rounded-full bg-sky-400/20 blur-3xl"></div>
+                    <div class="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                        <div class="max-w-2xl space-y-2">
+                            <p class="text-sm uppercase tracking-[0.3em] text-white/70">Bizcard Conversion</p>
+                            <h2 class="text-2xl font-bold md:text-3xl">プラン比較と見積もりを一目でチェック</h2>
+                            <p class="text-sm text-white/80 md:text-base">利用状況に合わせて名刺データ化プランを選択し、オプションの有無によって即時に見積もりを確認できます。チーム全体で共有しやすいよう、最新の料金と納期情報をまとめています。</p>
+                        </div>
+                        <div class="flex flex-col items-start gap-3 rounded-2xl bg-white/10 p-4 backdrop-blur">
+                            <span class="text-xs font-semibold uppercase tracking-widest text-white/70">リアルタイム見積もり</span>
+                            <p class="text-3xl font-bold">設定に合わせて即時更新</p>
+                            <span class="text-sm text-white/70">プラン変更やオプション選択で金額・納期が自動反映されます。</span>
+                        </div>
+                    </div>
+                </section>
+
                 <!-- アンケート基本情報表示エリア -->
-                <div class="bg-surface p-4 rounded-lg mb-6">
-                    <h2 class="text-on-surface text-xl font-bold mb-2">アンケート基本情報</h2>
+                <div class="rounded-3xl border border-outline-variant/60 bg-surface p-6 shadow-sm">
+                    <h2 class="text-on-surface text-xl font-bold mb-4">アンケート基本情報</h2>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-on-surface-variant">
                         <div><span class="font-bold text-on-surface">アンケート名:</span> <span id="surveyNameDisplay"></span></div>
                         <div><span class="font-bold text-on-surface">ID:</span> <span id="surveyIdDisplay"></span></div>
@@ -51,18 +69,24 @@
                 </div>
 
                 <div class="w-full max-w-6xl mx-auto">
-                    <div class="flex flex-col lg:flex-row gap-6">
+                    <div class="grid gap-6 xl:gap-8 lg:grid-cols-[minmax(0,1fr)_320px] xl:grid-cols-[minmax(0,1fr)_360px]">
                     <!-- 名刺データ化設定フォーム -->
-                    <div class="bg-surface p-6 rounded-xl space-y-6">
+                    <section class="order-1 bg-surface p-6 rounded-3xl border border-outline-variant/60 shadow-sm backdrop-blur-xl space-y-6">
                         <div id="bizcardSettingsFields" class="space-y-6">
 
                             <!-- データ化項目プラン -->
                             <div class="space-y-4">
-                                <h2 class="text-on-surface text-xl font-bold">データ化項目プラン</h2>
-                                <p class="text-sm text-on-surface-variant">名刺データの読み取り範囲や課金方式をプランごとに選択できます。組織のワークフローにあわせて最適なプランをお選びください。</p>
-                                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4" id="dataConversionPlanSelection">
-                                    <!-- Plan cards will be dynamically inserted here -->
+                                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                    <div>
+                                        <h2 class="text-on-surface text-xl font-bold">データ化項目プラン</h2>
+                                        <p class="text-sm text-on-surface-variant">名刺データの読み取り範囲や課金方式をプランごとに比較しながら選択できます。</p>
+                                    </div>
+                                    <span class="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-xs font-semibold text-primary">
+                                        <span class="material-icons text-sm">touch_app</span>
+                                        プランをクリックして選択
+                                    </span>
                                 </div>
+                                <div id="dataConversionPlanSelection" role="radiogroup" class="space-y-4"></div>
                                 <div class="space-y-1 text-xs leading-relaxed text-on-surface-variant" id="dataConversionPlanNotes">
                                     <p>※ 名刺データ化プランの選択と見込み枚数の入力は必須項目です。未選択の場合は依頼を完了できません。</p>
                                     <p>※ 請求は毎月末締め・翌月末払いでご案内します。表示料金は税抜金額で、別途消費税が加算されます。</p>
@@ -70,44 +94,20 @@
                                 </div>
                             </div>
 
-                            <!-- データ化スピードプラン -->
-                            <div class="space-y-2" id="speed-plan-section">
-                                <h2 class="text-on-surface text-xl font-bold mb-4">データ化スピードプラン（納期オプション）</h2>
-                                <p class="text-sm text-on-surface-variant mb-2">作業スピードに応じて@単価が変動します。ご希望の納期に合わせて選択してください。</p>
-                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="dataConversionSpeedSelection">
-                                    
-                                    <div class="relative">
-                                        <input class="sr-only peer" type="radio" id="normalPlan" name="dataConversionSpeed" value="normal" checked>
-                                        <label class="flex flex-col items-center p-4 bg-surface-container rounded-lg border border-outline cursor-pointer peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-primary peer-disabled:opacity-50 peer-disabled:cursor-not-allowed" for="normalPlan">
-                                            <span class="text-on-surface font-semibold">通常作業プラン</span>
-                                            <span class="text-on-surface-variant text-sm mt-1">納期目安: 6営業日</span>
-                                        </label>
+                            <!-- プレミアムオプション -->
+                            <div class="space-y-4">
+                                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                    <div>
+                                        <h2 class="text-on-surface text-xl font-bold">プレミアムオプション</h2>
+                                        <p class="text-sm text-on-surface-variant">標準プランに加えて、より高度なデータ化や翻訳対応を行う場合は以下のオプションをご利用ください。</p>
                                     </div>
-
-                                    <div class="relative">
-                                        <input class="sr-only peer" type="radio" id="expressPlan" name="dataConversionSpeed" value="express">
-                                        <label class="flex flex-col items-center p-4 bg-surface-container rounded-lg border border-outline cursor-pointer peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-primary peer-disabled:opacity-50 peer-disabled:cursor-not-allowed" for="expressPlan">
-                                            <span class="text-on-surface font-semibold">特急作業プラン</span>
-                                            <span class="text-on-surface-variant text-sm mt-1">納期目安: 3営業日</span>
-                                        </label>
-                                    </div>
-
-                                    <div class="relative">
-                                        <input class="sr-only peer" type="radio" id="superExpressPlan" name="dataConversionSpeed" value="superExpress">
-                                        <label class="flex flex-col items-center p-4 bg-surface-container rounded-lg border border-outline cursor-pointer peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-primary peer-disabled:opacity-50 peer-disabled:cursor-not-allowed" for="superExpressPlan">
-                                            <span class="text-on-surface font-semibold">超特急プラン</span>
-                                            <span class="text-on-surface-variant text-sm mt-1">納期目安: 1営業日</span>
-                                        </label>
-                                    </div>
-
-                                    <div class="relative">
-                                        <input class="sr-only peer" type="radio" id="ondemandPlan" name="dataConversionSpeed" value="onDemand">
-                                        <label class="flex flex-col items-center p-4 bg-surface-container rounded-lg border border-outline cursor-pointer peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-primary peer-disabled:opacity-50 peer-disabled:cursor-not-allowed" for="ondemandPlan">
-                                            <span class="text-on-surface font-semibold whitespace-nowrap">オンデマンドプラン</span>
-                                            <span class="text-on-surface-variant text-sm mt-1">納期目安: 当日中</span>
-                                        </label>
-                                    </div>
+                                    <span class="inline-flex items-center gap-2 rounded-full bg-secondary-container/30 px-4 py-2 text-xs font-semibold text-on-secondary-container">
+                                        <span class="material-icons text-sm">add_circle</span>
+                                        任意で複数選択可能
+                                    </span>
                                 </div>
+                                <div id="premiumOptionsContainer" class="grid gap-4 md:grid-cols-2"></div>
+                                <p class="text-xs text-on-surface-variant">※ プレミアムオプションは選択内容に応じてご請求見込み金額に反映されます。</p>
                             </div>
 
                             <!-- 見込み枚数 -->
@@ -148,34 +148,44 @@
                             </div>
                         </div>
 
-                        <div class="flex justify-end gap-4 pt-4">
-                            <button id="cancelBizcardSettings" class="min-w-[100px] px-6 py-2 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors">キャンセル</button>
-                            <button id="saveBizcardSettingsBtn" class="min-w-[100px] px-6 py-2 rounded-full gradient-primary-bg text-on-primary font-semibold transition-colors" disabled>
+                        <div class="flex flex-col-reverse gap-3 pt-4 sm:flex-row sm:justify-end">
+                            <button id="cancelBizcardSettings" class="min-w-[100px] rounded-full border border-outline px-6 py-3 text-sm font-semibold text-on-surface transition-colors hover:border-on-surface hover:text-on-surface">キャンセル</button>
+                            <button id="saveBizcardSettingsBtn" class="min-w-[100px] rounded-full bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-lg transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70" disabled>
                                 <span id="saveBizcardSettingsBtnText">設定を保存して依頼を確定する</span>
                                 <span id="saveBizcardSettingsBtnLoading" class="hidden material-icons animate-spin ml-2">sync</span>
                             </button>
                         </div>
-                    </div>
+                    </section>
 
-                    <!-- フローティング見積もりウィンドウ -->
-                    <div class="fixed top-24 right-6 z-40 w-72 sm:w-96 bg-surface p-5 rounded-xl shadow-2xl border border-outline/60">
-                        <h2 class="text-on-surface text-lg font-bold mb-3">名刺データ化費用見積もり</h2>
-                        <div class="space-y-4">
-                            <div class="input-group">
-                                <div id="estimatedAmount" class="input-field-static text-right text-2xl font-bold text-primary">¥0</div>
-                                <label class="input-label-static">請求見込み金額</label>
+                    <!-- 見積もりウィンドウ -->
+                    <aside class="order-2 lg:self-start">
+                        <div class="rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 p-6 text-white shadow-2xl ring-1 ring-white/10 backdrop-blur">
+                            <div class="flex items-center justify-between">
+                                <h2 class="text-lg font-bold">名刺データ化費用見積もり</h2>
+                                <span class="inline-flex items-center gap-1 rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-white/70">
+                                    <span class="material-icons text-xs">autorenew</span>
+                                    Auto Update
+                                </span>
                             </div>
-                            <div class="input-group">
-                                <div id="estimatedCompletionDate" class="input-field-static text-right text-lg font-bold">未定</div>
-                                <label class="input-label-static">データ化完了予定日</label>
+                            <div class="mt-6 space-y-5">
+                                <div class="rounded-2xl bg-white/10 p-5 shadow-inner">
+                                    <p class="text-xs uppercase tracking-widest text-white/60">請求見込み金額</p>
+                                    <div id="estimatedAmount" class="mt-2 text-right text-4xl font-black tracking-tight text-white">¥0</div>
+                                </div>
+                                <div class="grid gap-3 rounded-2xl bg-white/5 p-5">
+                                    <div class="flex items-center justify-between text-sm text-white/70">
+                                        <span class="inline-flex items-center gap-2"><span class="material-icons text-base">event_available</span>データ化完了予定日</span>
+                                        <span id="estimatedCompletionDate" class="text-base font-semibold text-white">未定</span>
+                                    </div>
+                                    <div id="estimateBreakdown" class="text-xs leading-relaxed text-white/70"></div>
+                                </div>
                             </div>
-                            <div id="estimateBreakdown" class="text-xs leading-relaxed text-on-surface-variant"></div>
                         </div>
-                    </div>
+                    </aside>
                 </div>
                 
                 <!-- 注意書き・ご請求に関する詳細・名刺データ化の詳細 -->
-                <section class="bg-surface p-6 rounded-xl space-y-4 mt-20">
+                <section class="bg-surface p-6 rounded-3xl border border-outline-variant/60 space-y-4 shadow-sm">
                     <details>
                         <summary class="cursor-pointer text-on-surface font-semibold">注意書き</summary>
                         <ul class="list-disc pl-5 text-sm text-on-surface-variant space-y-1 mt-2">
