@@ -60,7 +60,7 @@ export async function fetchBizcardSettings(surveyId) {
         return {
             bizcardEnabled: false,
             bizcardRequest: 100,
-            dataConversionPlan: 'standard',
+            dataConversionPlan: 'normal',
             dataConversionSpeed: 'normal',
             couponCode: '',
             internalMemo: ''

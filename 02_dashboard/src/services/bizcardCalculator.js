@@ -3,21 +3,13 @@
  * 名刺データ化費用の見積もり計算ロジックを扱うモジュール
  */
 
-const PLAN_PRICES = {
-  free: 0,
-  standard: 0,
-  // プレミアムは月額の個別見積りのため見積合計へは含めない
-  premium: 0,
-  enterprise: 0,
-  custom: 0 // カスタムプランは別途計算
-};
-
-export const SPEED_OPTIONS = {
-    normal: { days: 6, price_per_card: 50 },
-    express: { days: 3, price_per_card: 100 },
-    superExpress: { days: 1, price_per_card: 150 },
-    onDemand: { days: 0, price_per_card: 200 }
-};
+import {
+    DEFAULT_PLAN,
+    PREMIUM_OPTION_GROUPS,
+    getPlanConfig,
+    normalizePlanValue,
+    normalizePremiumOptions
+} from './bizcardPlans.js';
 
 /**
  * 見積もりを計算します。
@@ -30,25 +22,43 @@ export function calculateEstimate(settings, appliedCoupon = null, surveyEndDate 
         return { amount: 0, completionDate: '未定' };
     }
 
-    const selectedPlan = settings.dataConversionPlan || 'free';
-    const selectedSpeed = settings.dataConversionSpeed || 'normal';
+    const normalizedPlan = normalizePlanValue(settings.dataConversionPlan || DEFAULT_PLAN);
+    const planConfig = getPlanConfig(normalizedPlan) || getPlanConfig(DEFAULT_PLAN);
+    const unitPrice = planConfig?.unitPrice ?? 0;
+    const turnaroundDays = planConfig?.turnaroundDays ?? 0;
     const requestedCards = Math.max(0, parseInt(settings.bizcardRequest, 10) || 0);
 
     let amount = 0;
-    let completionDays = SPEED_OPTIONS.normal.days;
+    let completionDays = turnaroundDays;
 
-    // 1. プラン料金
-    amount += PLAN_PRICES[selectedPlan] || 0;
-
-    // 2. スピード料金と納期
-    const speedOption = SPEED_OPTIONS[selectedSpeed];
-    if (speedOption) {
-        completionDays = speedOption.days;
-        amount += requestedCards * speedOption.price_per_card;
+    if (normalizedPlan !== 'trial') {
+        amount += requestedCards * unitPrice;
     }
 
+    const premiumSelections = normalizePremiumOptions(settings.premiumOptions);
+    const multilingualGroup = PREMIUM_OPTION_GROUPS.find(group => group.value === 'multilingual');
+    const additionalGroup = PREMIUM_OPTION_GROUPS.find(group => group.value === 'additionalItems');
+
+    const premiumUnitAddOn = premiumSelections.multilingual
+        ? (multilingualGroup?.unitPrice ?? 0)
+        : 0;
+    const premiumTotal = requestedCards * premiumUnitAddOn;
+    amount += premiumTotal;
+
+    const selectedPremiumOptions = [];
+    if (premiumSelections.multilingual && multilingualGroup) {
+        selectedPremiumOptions.push({ value: multilingualGroup.value, title: multilingualGroup.title });
+    }
+
+    const additionalOptionsMap = new Map((additionalGroup?.options || []).map(option => [option.value, option]));
+    premiumSelections.additionalItems.forEach(itemValue => {
+        const option = additionalOptionsMap.get(itemValue);
+        if (option) {
+            selectedPremiumOptions.push({ value: option.value, title: option.title });
+        }
+    });
+
     // 3. クーポン適用
-    const unitPrice = speedOption ? speedOption.price_per_card : 0;
     const preDiscount = amount;
     let couponAmount = 0;
     if (appliedCoupon) {
@@ -79,6 +89,10 @@ export function calculateEstimate(settings, appliedCoupon = null, surveyEndDate 
         couponAmount,
         couponPercent,
         minCharge,
-        minChargeCards
+        minChargeCards,
+        premiumTotal,
+        premiumUnitAddOn,
+        selectedPremiumOptions,
+        premiumSelections
     };
 }
