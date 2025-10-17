@@ -64,6 +64,14 @@ document.addEventListener('DOMContentLoaded', () => {
             passwordError.textContent = 'パスワードを入力してください。';
             passwordInput.setAttribute('aria-invalid', 'true');
             isValid = false;
+        } else if (passwordInput.value.length < 8) {
+            passwordError.textContent = 'パスワードは8文字以上で入力してください。';
+            passwordInput.setAttribute('aria-invalid', 'true');
+            isValid = false;
+        } else if (!/[0-9]/.test(passwordInput.value)) {
+            passwordError.textContent = 'パスワードには少なくとも1つの数字を含めてください。';
+            passwordInput.setAttribute('aria-invalid', 'true');
+            isValid = false;
         }
 
         if (passwordInput.value && passwordInput.value !== passwordConfirmInput.value) {

@@ -26,6 +26,26 @@ async function changePassword(newPassword) {
     });
 }
 
+function setupPasswordVisibilityToggle() {
+    document.querySelectorAll('[data-toggle-password]').forEach(button => {
+        button.addEventListener('click', () => {
+            const targetId = button.dataset.togglePassword;
+            const targetInput = document.getElementById(targetId);
+            const icon = button.querySelector('.material-icons');
+
+            if (targetInput && icon) {
+                if (targetInput.type === 'password') {
+                    targetInput.type = 'text';
+                    icon.textContent = 'visibility_off';
+                } else {
+                    targetInput.type = 'password';
+                    icon.textContent = 'visibility';
+                }
+            }
+        });
+    });
+}
+
 export function initPasswordChange() {
     // --- DOM Element Cache ---
     const wizard = document.getElementById('passwordChangeWizard');
@@ -115,9 +135,23 @@ export function initPasswordChange() {
 
         // Clear previous errors
         newPasswordError.textContent = '';
+        newPasswordError.classList.add('hidden');
 
         if (!newPassword) {
             newPasswordError.textContent = '新しいパスワードを入力してください。';
+            newPasswordError.classList.remove('hidden');
+            return;
+        }
+
+        if (newPassword.length < 8) {
+            newPasswordError.textContent = 'パスワードは8文字以上で入力してください。';
+            newPasswordError.classList.remove('hidden');
+            return;
+        }
+
+        if (!/[0-9]/.test(newPassword)) {
+            newPasswordError.textContent = 'パスワードには少なくとも1つの数字を含めてください。';
+            newPasswordError.classList.remove('hidden');
             return;
         }
 
@@ -134,7 +168,7 @@ export function initPasswordChange() {
         const result = await changePassword(newPassword);
 
         if (result.success) {
-            navigateToStep(3);
+            window.location.href = 'password-change-complete.html';
         } else {
             showToast(result.message, 'error');
         }
@@ -153,6 +187,9 @@ export function initPasswordChange() {
     }
 
     function checkPasswordStrength(password) {
+        if (!password) {
+            return { level: -1, text: '', color: 'bg-transparent', width: '0%' };
+        }
         let score = 0;
         if (password.length >= 8) score++;
         if (password.length >= 10) score++;
@@ -166,7 +203,11 @@ export function initPasswordChange() {
     }
 
     function updatePasswordStrengthUI(strength) {
-        strengthText.textContent = `パスワード強度: ${strength.text}`;
+        if (strength.level === -1) {
+            strengthText.textContent = '';
+        } else {
+            strengthText.textContent = `パスワード強度: ${strength.text}`;
+        }
         strengthBar.className = `h-2 rounded-full transition-all ${strength.color}`;
         strengthBar.style.width = strength.width;
     }
@@ -176,15 +217,19 @@ export function initPasswordChange() {
         const confirmPassword = confirmPasswordInput.value;
         if (confirmPassword && newPassword !== confirmPassword) {
             confirmPasswordError.textContent = 'パスワードが一致しません。';
+            confirmPasswordError.classList.remove('hidden');
             return false;
         } else {
             confirmPasswordError.textContent = '';
+            confirmPasswordError.classList.add('hidden');
             return true;
         }
     }
 
     // --- Event Listeners ---
     function setupEventListeners() {
+        setupPasswordVisibilityToggle();
+
         cancelStep1Btn.addEventListener('click', handleCancel);
         nextStep1Btn.addEventListener('click', handleNextStep1);
 
@@ -192,7 +237,6 @@ export function initPasswordChange() {
         clearStep2Btn.addEventListener('click', handleClearStep2);
         nextStep2Btn.addEventListener('click', handleNextStep2);
         newPasswordInput.addEventListener('input', handlePasswordInput);
-        confirmPasswordInput.addEventListener('input', checkPasswordMatch);
 
         backToDashboardBtn.addEventListener('click', handleCancel); // Same as cancel
     }
