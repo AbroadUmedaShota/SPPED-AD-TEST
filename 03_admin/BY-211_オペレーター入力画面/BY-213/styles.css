@@ -1,12 +1,52 @@
 body {
     font-family: sans-serif;
     margin: 0;
-    overflow: hidden; /* コンテナには overflow:hidden を設定 */
+    overflow: hidden;
     background-color: #f9f9f9;
     color: #333;
     transition: background-color 0.3s, color 0.3s;
-    font-size: 1rem; /* 基本の文字サイズ */
+    font-size: 1rem;
 }
+
+/* CSS for new layout */
+.main-image-container {
+    flex-grow: 1; /* Take up available space */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; /* Prevent overflow */
+    margin-bottom: 10px; /* Space between main image and thumbnails */
+}
+
+.main-card-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* Ensure the whole image is visible */
+    transition: transform 0.3s ease; /* Smooth rotation */
+    transform-origin: center;
+}
+
+.thumbnail-container {
+    display: flex;
+    justify-content: center; /* Center thumbnails */
+    gap: 10px; /* Space between thumbnails */
+    flex-shrink: 0; /* Prevent thumbnails from shrinking */
+}
+
+.thumbnail-image {
+    width: 300px; /* Thumbnail size */
+    height: 180px;
+    object-fit: cover;
+    cursor: pointer;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    transition: border-color 0.2s ease;
+}
+
+.thumbnail-image:hover, .thumbnail-image.active {
+    border-color: #007bff; /* Highlight active/hovered thumbnail */
+}
+
 
 @media (min-width: 768px) {
     body {
@@ -28,10 +68,9 @@ body.dark-mode {
 .container {
     display: flex;
     width: 100%;
-    /*height: 100vh;削除*/
     margin-top: 40px;
     box-sizing: border-box;
-    overflow-x: hidden; /* 横スクロールを防止 */
+    overflow-x: hidden;
     flex-direction: column;
 }
 
@@ -66,107 +105,130 @@ body.dark-mode {
     overflow: hidden;
 }
 .main-panel {
-    display: flex; /* 左右のパネルを横並びにする */
+    display: flex;
     flex-direction: row;
-    height: calc(100vh - 40px); /* メインパネルの高さを設定 */
-    /*overflow-y: auto; 削除*/ /* メインパネルでスクロールを許可しない */
+    height: calc(100vh - 40px);
 }
 
 
 .left-panel {
     width: 65%;
-    padding: 20px;
+    padding: 10px; /* Reduced padding */
     border-right: 1px solid #ccc;
-    /*height: calc(100vh - 40px);削除*/
-    height: 100%; /* 高さの指定を削除 */
+    height: 100%;
     box-sizing: border-box;
     position: relative;
     display: flex;
     flex-direction: column;
+    /* justify-content: center; Removed */
+}
+
+.image-controls {
+    display: flex;
     justify-content: center;
-    /* overflow-y: auto;削除 */ /* 縦スクロールを許可 */
-}
-
-.rotate-button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: transparent;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-    color: #555;
-    transition: color 0.3s;
+    align-items: center;
+    gap: 18px;
+    padding: 10px 20px;
+    margin: 10px auto;
+    background-color: rgba(44, 44, 44, 0.8);
+    border-radius: 30px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     z-index: 100;
+    transition: background-color 0.3s;
+    width: fit-content;
 }
 
-.rotate-button:hover {
-    color: #333;
+.dark-mode .image-controls {
+    background-color: rgba(60, 60, 60, 0.9);
+}
+
+.control-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    color: #f1f1f1;
+    transition: color 0.2s, transform 0.2s;
+}
+
+.control-btn:hover {
+    color: #3498db;
+    transform: scale(1.1);
+}
+
+.zoom-control {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.zoom-control i {
+    color: #ccc;
+    font-size: 16px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.zoom-control i:hover {
+    color: #3498db;
+}
+
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 150px;
+    height: 4px;
+    background: #555;
+    border-radius: 5px;
+    outline: none;
+    transition: background 0.3s;
+}
+
+.dark-mode input[type="range"] {
+    background: #666;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    background: #3498db;
+    cursor: pointer;
+    border-radius: 50%;
+    border: 2px solid #f1f1f1;
+    transition: background 0.2s, transform 0.2s;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+    background: #5dade2;
+    transform: scale(1.1);
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: #3498db;
+    cursor: pointer;
+    border-radius: 50%;
+    border: 2px solid #f1f1f1;
 }
 
 .card-area {
     display: flex;
     flex-direction: column;
     width: 100%;
-    height: calc(100% - 40px);
+    height: 100%; /* Adjusted to take full height of left-panel */
 }
-
-.card-area.rotated {
-    flex-direction: row;
-}
-
-.card-image-wrapper {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    overflow: hidden;
-    position: relative;
-}
-
-.card-image-wrapper img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-    object-position: center top;
-}
-
-.card-image-wrapper:hover img {
-    transform: scale(1.4);
-    cursor: zoom-in;
-}
-
-.card-image-wrapper.rotated img {
-    object-fit: cover;
-    transform: rotate(90deg);
-    object-position: center;
-}
-
-.card-image-wrapper:first-child {
-      order: 1;
-}
-
-.card-image-wrapper:last-child {
-      order: 0;
-}
-
-.card-area:not(.rotated) .card-image-wrapper:first-child {
-    order: 0; /* 上が表画像 */
-}
-
-.card-area:not(.rotated) .card-image-wrapper:last-child {
-    order: 1;  /* 下が裏画像 */
-}
-
 
 .right-panel {
     width: 35%;
     flex: 1;
     padding: 20px;
-    /* height: calc(100vh - 40px);削除 */
-    height: auto; /* 高さをautoに変更 */
-    overflow-y: auto; /* 縦スクロールを許可 */
-    display: flex; /* ボタンを最下部に固定 */
-    flex-direction: column; /* ボタンを最下部に固定 */
+    height: auto;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
     justify-content: flex-start;
     align-items: stretch;
     position: relative;
@@ -213,13 +275,12 @@ body.dark-mode {
 .button-group {
     margin-top: 20px;
     text-align: right;
-    position: fixed; /* 追加 */
-    bottom: 20px; /* 追加 */
-    right: 20px; /* 追加 */
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
     width: auto;
     display: flex;
     gap: 10px;
-    /*  position: static; 削除 */
 }
 
 .button-group button {
@@ -298,23 +359,6 @@ body.dark-mode {
     display: block;
 }
 
-.rotate-button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: transparent;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-    color: #555;
-    transition: color 0.3s;
-    z-index: 100;
-}
-
-.rotate-button:hover {
-    color: #333;
-}
-
 .toggle-dark-mode {
     position: absolute;
     top: 10px;
@@ -332,7 +376,6 @@ body.dark-mode {
     color: #333;
 }
 
-/* レスポンシブデザインの強化 */
 @media (max-width: 768px) {
     .container {
         flex-direction: column;
@@ -361,7 +404,6 @@ body.dark-mode {
     }
 }
 
-/* ダークモード時のコントラスト改善 */
 .dark-mode {
     background-color: #222;
     color: #eee;
@@ -374,7 +416,6 @@ body.dark-mode {
     border-color: #555;
 }
 
-/* アイコン調整 */
 .button-group button i {
     font-size: 1.2rem;
     color: white;
