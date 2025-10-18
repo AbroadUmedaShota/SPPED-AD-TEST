@@ -26,43 +26,43 @@ const INTERNAL_STATUS_MAP = new Map([
 const STATUS_METADATA = {
   [USER_STATUSES.PRE_PERIOD]: {
     sortOrder: 1,
-    badgeClass: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+    badgeClass: 'bg-yellow-100 text-yellow-800',
     description: 'アンケートに設定された会期開始日を迎えるまでの状態です。',
     canDownload: false
   },
   [USER_STATUSES.IN_PERIOD]: {
     sortOrder: 2,
-    badgeClass: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+    badgeClass: 'bg-green-100 text-green-800',
     description: '会期中です。回答受付や来場者対応がアクティブな状態です。',
     canDownload: false
   },
   [USER_STATUSES.DATA_PROCESSING]: {
     sortOrder: 4,
-    badgeClass: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+    badgeClass: 'bg-blue-100 text-blue-800',
     description: '会期終了後に名刺データ化処理が進行中です。完了判定を待機しています。',
     canDownload: false
   },
   [USER_STATUSES.DATA_READY]: {
     sortOrder: 5,
-    badgeClass: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300',
+    badgeClass: 'bg-indigo-100 text-indigo-800',
     description: '名刺データ化が完了しました。ダウンロード期限内であれば取得できます。',
     canDownload: true
   },
   [USER_STATUSES.POST_PERIOD]: {
     sortOrder: 3,
-    badgeClass: 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300',
+    badgeClass: 'bg-slate-200 text-slate-700',
     description: 'データ化対象外、またはデータ化が不要なアンケートの会期終了後状態です。',
     canDownload: false
   },
   [USER_STATUSES.DOWNLOAD_CLOSED]: {
     sortOrder: 6,
-    badgeClass: 'bg-rose-100 text-rose-700 dark:bg-rose-900 dark:text-rose-300',
+    badgeClass: 'bg-rose-100 text-rose-700',
     description: 'ダウンロード期限を過ぎ、名刺データは取得できない状態です。',
     canDownload: false
   },
   [USER_STATUSES.DELETED]: {
     sortOrder: 99,
-    badgeClass: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
+    badgeClass: 'bg-red-100 text-red-800',
     description: 'このアンケートは削除済みです。',
     canDownload: false
   }
