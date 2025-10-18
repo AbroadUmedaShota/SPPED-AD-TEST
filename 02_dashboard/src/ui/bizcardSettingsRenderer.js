@@ -4,6 +4,8 @@
  */
 
 // DOM要素をこのモジュール内で管理
+import { DEFAULT_PLAN } from '../services/bizcardPlans.js';
+
 const dom = {};
 
 function getLocalizedText(content, lang) {
@@ -13,40 +15,6 @@ function getLocalizedText(content, lang) {
         return content[lang] || content.ja || Object.values(content)[0] || '';
     }
     return String(content);
-}
-
-function findPlanByValue(plans, value) {
-    if (!value) return null;
-    return plans.find(plan => plan.value === value) || null;
-}
-
-function dedupeFeatures(features = []) {
-    const seen = new Set();
-    return features.filter(feature => {
-        if (!feature) return false;
-        const key = feature.key || getLocalizedText(feature.text, 'ja');
-        if (seen.has(key)) return false;
-        seen.add(key);
-        return true;
-    });
-}
-
-function collectPlanFeatures(plan, plans, visited = new Set()) {
-    if (!plan || visited.has(plan.value)) return [];
-    visited.add(plan.value);
-
-    const ownFeatures = dedupeFeatures([
-        ...(Array.isArray(plan.baseFeatures) ? plan.baseFeatures : []),
-        ...(Array.isArray(plan.additionalFeatures) ? plan.additionalFeatures : [])
-    ]);
-
-    if (!plan.basePlanKey) {
-        return ownFeatures;
-    }
-
-    const basePlan = findPlanByValue(plans, plan.basePlanKey);
-    const inherited = collectPlanFeatures(basePlan, plans, visited);
-    return dedupeFeatures([...inherited, ...ownFeatures]);
 }
 
 /**
@@ -59,10 +27,10 @@ function cacheDOMElements() {
     dom.surveyPeriodDisplay = document.getElementById('surveyPeriodDisplay');
     dom.bizcardSettingsFields = document.getElementById('bizcardSettingsFields');
     dom.dataConversionPlanSelection = document.getElementById('dataConversionPlanSelection');
-    dom.dataConversionSpeedSelection = document.getElementById('dataConversionSpeedSelection');
     dom.bizcardRequestInput = document.getElementById('bizcardRequest');
     dom.couponCodeInput = document.getElementById('couponCode');
     dom.couponMessage = document.getElementById('couponMessage');
+    dom.premiumOptionsContainer = document.getElementById('premiumOptionsContainer');
     dom.estimatedAmountSpan = document.getElementById('estimatedAmount');
     dom.estimatedCompletionDateSpan = document.getElementById('estimatedCompletionDate');
     dom.estimateBreakdown = document.getElementById('estimateBreakdown');
@@ -95,8 +63,7 @@ export function setInitialFormValues(settings) {
     if (!settings) return; // settings が null や undefined なら何もしない
     if (!dom.bizcardRequestInput) cacheDOMElements();
 
-    const planValue = settings.dataConversionPlan || 'free';
-    const speedValue = settings.dataConversionSpeed || 'normal';
+    const planValue = settings.dataConversionPlan || DEFAULT_PLAN;
     const parsedRequest = parseInt(settings.bizcardRequest, 10);
     const requestCount = Number.isFinite(parsedRequest) && parsedRequest > 0 ? parsedRequest : 100;
 
@@ -106,10 +73,13 @@ export function setInitialFormValues(settings) {
 
     // ラジオボタンの選択
     const planRadio = document.querySelector(`input[name="dataConversionPlan"][value="${planValue}"]`);
-    if (planRadio) planRadio.checked = true;
+    if (planRadio) {
+        planRadio.checked = true;
+    } else {
+        const fallbackPlanRadio = document.querySelector(`input[name="dataConversionPlan"][value="${DEFAULT_PLAN}"]`);
+        if (fallbackPlanRadio) fallbackPlanRadio.checked = true;
+    }
 
-    const speedRadio = document.querySelector(`input[name="dataConversionSpeed"][value="${speedValue}"]`);
-    if (speedRadio) speedRadio.checked = true;
 }
 
 /**
@@ -129,26 +99,47 @@ export function renderEstimate(estimate) {
     dom.estimatedAmountSpan.textContent = `¥${estimate.amount.toLocaleString()}`;
     dom.estimatedCompletionDateSpan.textContent = estimate.completionDate;
     if (dom.estimateBreakdown) {
+        const lang = document.documentElement.lang || 'ja';
         const cards = estimate.requestedCards ?? 0;
         const unit = estimate.unitPrice ?? 0;
         const couponAmt = estimate.couponAmount ?? 0;
         const couponPct = estimate.couponPercent ?? 0;
+        const premiumUnit = estimate.premiumUnitAddOn ?? 0;
+        const premiumTotal = estimate.premiumTotal ?? 0;
         const minCharge = estimate.minCharge ?? 0;
         const minChargeLine = minCharge > 0
-            ? `<div class="text-xs text-on-surface-variant">＝ ※最低ご請求金額 ¥${minCharge.toLocaleString()}（＋税）</div>`
+            ? `<div class="text-xs text-white/60">※ 最低ご請求金額 ¥${minCharge.toLocaleString()}（＋税）</div>`
+            : '';
+        const baseLine = `${cards.toLocaleString()}件 × データ化単価 ${unit.toLocaleString()}円`;
+        const premiumLine = premiumTotal > 0
+            ? `＋ ${cards.toLocaleString()}件 × プレミアム加算 ${premiumUnit.toLocaleString()}円`
+            : '';
+        const couponLine = couponAmt > 0
+            ? `ー クーポンお値引き ${couponAmt.toLocaleString()}円（${couponPct}%相当）`
+            : '';
+        const breakdownLines = [baseLine, premiumLine, couponLine].filter(Boolean).join('<br>');
+        const premiumSelections = Array.isArray(estimate.selectedPremiumOptions)
+            ? estimate.selectedPremiumOptions
+            : [];
+        const premiumSummary = premiumSelections.length > 0
+            ? `<div class="text-xs text-white/60">選択オプション: ${premiumSelections
+                .map(option => getLocalizedText(option.title, lang))
+                .join('、')}</div>`
             : '';
         dom.estimateBreakdown.innerHTML = `
-            <div class="space-y-1">
-              <div class="text-xs text-on-surface-variant">ご請求見込み金額</div>
-              <div class="grid grid-cols-2 text-sm">
-                <div class="text-on-surface-variant">想定件数</div>
-                <div class="text-right text-on-surface">${cards.toLocaleString()}件</div>
+            <div class="space-y-3 text-white/70">
+              <div class="flex items-center justify-between text-sm">
+                <span class="text-white/60">想定件数</span>
+                <span class="text-base font-semibold text-white">${cards.toLocaleString()}件</span>
               </div>
-              <div class="text-xs text-on-surface-variant">内訳</div>
-              <div class="text-sm text-on-surface">
-                ${cards.toLocaleString()}件 × データ化単価 ${unit.toLocaleString()}円 ー クーポンお値引き ${couponAmt.toLocaleString()}円（${couponPct}%相当）
+              <div class="space-y-2">
+                <div class="text-xs uppercase tracking-widest text-white/50">内訳</div>
+                <div class="rounded-2xl border border-white/10 bg-white/5 p-3 text-xs leading-relaxed">
+                  ${breakdownLines || '—'}
+                </div>
               </div>
-              <div class="text-sm font-semibold text-on-surface">＝ ご請求見込み金額 ¥${estimate.amount.toLocaleString()}（＋税）</div>
+              ${premiumSummary}
+              <div class="text-sm font-semibold text-white">＝ ご請求見込み金額 ¥${estimate.amount.toLocaleString()}（＋税）</div>
               ${minChargeLine}
             </div>
         `;
@@ -174,231 +165,217 @@ export function renderEstimate(estimate) {
  * @param {string} selectedPlan - 選択中のプラン値。
  */
 export function renderDataConversionPlans(plans, selectedPlan) {
-    if (!Array.isArray(plans)) return;
-    if (!dom.dataConversionPlanSelection) cacheDOMElements();
-    const container = dom.dataConversionPlanSelection;
-    if (!container) return;
+  if (!Array.isArray(plans)) return;
+  if (!dom.dataConversionPlanSelection) cacheDOMElements();
+  const container = dom.dataConversionPlanSelection;
+  if (!container) return;
 
-    const lang = document.documentElement.lang || 'ja';
-    container.innerHTML = '';
+  const lang = document.documentElement.lang || 'ja';
+  const normalizedPlan = selectedPlan || DEFAULT_PLAN;
+  container.innerHTML = '';
 
-    plans.forEach(plan => {
-        const isSelected = plan.value === selectedPlan;
-        const wrapper = document.createElement('div');
-        wrapper.className = 'relative';
+  const tableWrapper = document.createElement('div');
+  tableWrapper.className = 'overflow-hidden rounded-xl border border-outline-variant/60 bg-surface shadow-sm';
 
-        const input = document.createElement('input');
-        input.type = 'radio';
-        input.name = 'dataConversionPlan';
-        input.value = plan.value;
-        input.id = `data-plan-${plan.value}`;
-        input.className = 'sr-only peer';
-        if (isSelected) {
-            input.checked = true;
-        }
+  const table = document.createElement('table');
+  table.className = 'min-w-full table-fixed';
+  table.setAttribute('role', 'presentation');
 
-        const label = document.createElement('label');
-        label.setAttribute('for', input.id);
-        label.className = [
-            'flex h-full flex-col gap-3 rounded-xl border p-5 transition-all focus:outline-none cursor-pointer',
-            isSelected
-                ? 'border-primary ring-2 ring-primary bg-primary-container'
-                : 'border-outline bg-surface-container hover:border-primary hover:shadow-sm'
-        ].join(' ');
+  const thead = document.createElement('thead');
+  thead.className = 'bg-surface-container text-left text-xs font-semibold uppercase tracking-widest text-on-surface-variant';
 
-        const header = document.createElement('div');
-        header.className = 'flex items-start justify-between gap-2';
+  const headerRow = document.createElement('tr');
+  const headers = [
+    { label: '', className: 'w-12 px-4 py-3 text-center sm:px-6' },
+    { label: lang === 'ja' ? 'プラン名' : 'Plan', className: 'px-4 py-3 sm:px-6' },
+    { label: lang === 'ja' ? '単価' : 'Unit price', className: 'px-4 py-3 text-right sm:px-6' },
+    { label: lang === 'ja' ? '項目数' : 'Fields', className: 'px-4 py-3 text-right sm:px-6' },
+    { label: lang === 'ja' ? '納期' : 'Turnaround', className: 'px-4 py-3 text-right sm:px-6' }
+  ];
 
-        const title = document.createElement('p');
-        title.className = 'text-lg font-semibold text-on-surface';
-        title.textContent = getLocalizedText(plan.title, lang);
+  headers.forEach(header => {
+    const th = document.createElement('th');
+    th.scope = 'col';
+    th.className = header.className;
+    th.textContent = header.label;
+    headerRow.appendChild(th);
+  });
+  thead.appendChild(headerRow);
 
-        const price = document.createElement('div');
-        price.className = 'text-right';
-        const priceValue = document.createElement('p');
-        priceValue.className = 'text-2xl font-bold text-primary';
-        priceValue.textContent = getLocalizedText(plan.price, lang);
-        const priceNote = document.createElement('p');
-        priceNote.className = 'text-xs text-on-surface-variant';
-        priceNote.textContent = getLocalizedText(plan.priceNote, lang);
-        price.append(priceValue, priceNote);
+  const tbody = document.createElement('tbody');
+  tbody.className = 'divide-y divide-outline-variant/30';
 
-        header.append(title, price);
-        label.appendChild(header);
+  plans.forEach(plan => {
+    const isSelected = plan.value === normalizedPlan;
+    const row = document.createElement('tr');
+    row.className = [
+      'cursor-pointer transition-colors',
+      isSelected ? 'bg-primary/10' : 'hover:bg-surface-container-highest'
+    ].join(' ');
 
-        const description = document.createElement('p');
-        description.className = 'text-sm text-on-surface-variant';
-        description.textContent = getLocalizedText(plan.description, lang);
-        label.appendChild(description);
+    const selectCell = document.createElement('td');
+    selectCell.className = 'px-4 py-4 text-center sm:px-6';
+    const input = document.createElement('input');
+    input.type = 'radio';
+    input.name = 'dataConversionPlan';
+    input.value = plan.value;
+    input.id = `data-plan-${plan.value}`;
+    input.className = 'h-4 w-4 border-outline text-primary focus:ring-primary';
+    input.checked = isSelected;
+    selectCell.appendChild(input);
+    row.appendChild(selectCell);
 
-        const basePlan = findPlanByValue(plans, plan.basePlanKey);
-        const planName = getLocalizedText(plan.title, lang);
-        const intro = document.createElement('p');
-        intro.className = 'text-sm font-medium text-on-surface';
-        if (basePlan) {
-            const basePlanName = getLocalizedText(basePlan.title, lang);
-            intro.textContent = lang === 'ja'
-                ? `${planName}は${basePlanName}に加えて、次の機能が利用できます。`
-                : `${planName} adds the following on top of ${basePlanName}.`;
-        } else {
-            intro.textContent = lang === 'ja' ? 'このプランで利用可能' : 'Available in this plan';
-        }
+    const planCell = document.createElement('td');
+    planCell.className = 'px-4 py-4 sm:px-6';
+    const planStack = document.createElement('div');
+    planStack.className = 'flex flex-col gap-1';
+    const title = document.createElement('p');
+    title.className = isSelected
+      ? 'text-sm font-semibold text-primary'
+      : 'text-sm font-semibold text-on-surface';
+    title.textContent = getLocalizedText(plan.title, lang);
+    planStack.appendChild(title);
 
-        const featureSection = document.createElement('div');
-        featureSection.className = 'space-y-2';
-        featureSection.appendChild(intro);
+    const description = getLocalizedText(plan.description, lang);
+    const tagline = getLocalizedText(plan.tagline, lang);
+    const helperText = description || tagline;
+    if (helperText) {
+      const note = document.createElement('p');
+      note.className = 'text-xs text-on-surface-variant';
+      note.textContent = helperText;
+      planStack.appendChild(note);
+    }
+    planCell.appendChild(planStack);
+    row.appendChild(planCell);
 
-        const featureList = document.createElement('ul');
-        featureList.className = 'flex flex-wrap gap-2';
-        featureList.setAttribute('role', 'list');
+    const priceCell = document.createElement('td');
+    priceCell.className = 'px-4 py-4 text-right text-sm font-semibold sm:px-6';
+    priceCell.textContent = getLocalizedText(plan.unitPriceLabel || plan.price, lang);
+    row.appendChild(priceCell);
 
-        const featuresToRender = basePlan
-            ? dedupeFeatures(Array.isArray(plan.additionalFeatures) ? plan.additionalFeatures : [])
-            : dedupeFeatures([
-                ...(Array.isArray(plan.baseFeatures) ? plan.baseFeatures : []),
-                ...(Array.isArray(plan.additionalFeatures) ? plan.additionalFeatures : [])
-            ]);
+    const itemCell = document.createElement('td');
+    itemCell.className = 'px-4 py-4 text-right text-sm font-semibold sm:px-6';
+    itemCell.textContent = getLocalizedText(plan.itemCountLabel, lang);
+    row.appendChild(itemCell);
 
-        featuresToRender.forEach(feature => {
-            const item = document.createElement('li');
-            item.className = 'flex';
-            item.setAttribute('role', 'listitem');
+    const turnaroundCell = document.createElement('td');
+    turnaroundCell.className = 'px-4 py-4 text-right text-sm font-semibold sm:px-6';
+    turnaroundCell.textContent = getLocalizedText(plan.turnaroundLabel, lang);
+    row.appendChild(turnaroundCell);
 
-            const pill = document.createElement('span');
-            pill.className = [
-                'inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold',
-                basePlan
-                    ? 'bg-secondary-container text-on-secondary-container'
-                    : 'bg-primary-container text-on-primary-container'
-            ].join(' ');
-
-            const badgeLabel = document.createElement('span');
-            badgeLabel.className = 'inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wide whitespace-nowrap';
-            if (basePlan) {
-                badgeLabel.classList.add('bg-primary', 'text-on-primary');
-            } else {
-                badgeLabel.classList.add('bg-secondary', 'text-on-secondary');
-            }
-            badgeLabel.textContent = basePlan ? (lang === 'ja' ? '追加' : 'New') : (lang === 'ja' ? '基本' : 'Included');
-            badgeLabel.setAttribute('aria-hidden', 'true');
-
-            const srPrefix = document.createElement('span');
-            srPrefix.className = 'sr-only';
-            srPrefix.textContent = basePlan
-                ? (lang === 'ja' ? '追加機能: ' : 'Additional feature: ')
-                : (lang === 'ja' ? '含まれる機能: ' : 'Included feature: ');
-
-            const textSpan = document.createElement('span');
-            textSpan.textContent = getLocalizedText(feature.text, lang);
-
-            pill.append(badgeLabel, srPrefix, textSpan);
-            item.appendChild(pill);
-            featureList.appendChild(item);
-        });
-
-        if (featuresToRender.length > 0) {
-            featureSection.appendChild(featureList);
-        }
-
-        if (basePlan) {
-            const inheritedFeatures = collectPlanFeatures(basePlan, plans);
-            if (inheritedFeatures.length > 0) {
-                const srInherited = document.createElement('p');
-                srInherited.className = 'sr-only';
-                const inheritedTexts = inheritedFeatures
-                    .map(feature => getLocalizedText(feature.text, lang))
-                    .filter(Boolean);
-                const basePlanName = getLocalizedText(basePlan.title, lang);
-                srInherited.textContent = lang === 'ja'
-                    ? `${basePlanName}から継承される機能: ${inheritedTexts.join('、')}。`
-                    : `Inherited from ${basePlanName}: ${inheritedTexts.join(', ')}.`;
-                featureSection.appendChild(srInherited);
-            }
-        }
-
-        label.appendChild(featureSection);
-
-        const divider = document.createElement('div');
-        divider.className = 'border-t border-outline-variant my-2';
-        label.appendChild(divider);
-
-        if (Array.isArray(plan.highlights) && plan.highlights.length > 0) {
-            const list = document.createElement('ul');
-            list.className = 'space-y-1 text-sm text-on-surface-variant';
-            plan.highlights.forEach(item => {
-                const li = document.createElement('li');
-                li.className = 'flex items-start gap-2';
-                const icon = document.createElement('span');
-                icon.className = 'material-icons text-base text-primary mt-0.5';
-                icon.textContent = 'check_circle';
-                const text = document.createElement('span');
-                text.className = 'flex-1';
-                text.textContent = getLocalizedText(item, lang);
-                li.append(icon, text);
-                list.appendChild(li);
-            });
-            label.appendChild(list);
-        }
-
-        wrapper.append(input, label);
-        container.appendChild(wrapper);
+    row.addEventListener('click', event => {
+      const target = event.target;
+      if (target instanceof HTMLInputElement) return;
+      input.checked = true;
+      input.dispatchEvent(new Event('change', { bubbles: true }));
     });
+
+    tbody.appendChild(row);
+  });
+
+  table.append(thead, tbody);
+  tableWrapper.appendChild(table);
+  container.appendChild(tableWrapper);
 }
 
-/**
- * データ化スピードプラン（@単価表示あり）を描画します。
- * @param {Array<object>} speeds - 表示するスピードオプション一覧。
- *  speeds[i]: { value, title: {ja,en}|string, unitPrice: number, days: number }
- * @param {string} selectedSpeed - 選択中のスピード値。
- */
-export function renderDataConversionSpeeds(speeds, selectedSpeed) {
-    if (!Array.isArray(speeds)) return;
-    if (!dom.dataConversionSpeedSelection) cacheDOMElements();
-    const container = dom.dataConversionSpeedSelection;
-    if (!container) return;
+export function renderPremiumOptions(optionGroups, selections) {
+  if (!dom.premiumOptionsContainer) cacheDOMElements();
+  const container = dom.premiumOptionsContainer;
+  if (!container || !Array.isArray(optionGroups)) return;
 
-    const lang = document.documentElement.lang || 'ja';
-    container.innerHTML = '';
+  const lang = document.documentElement.lang || 'ja';
+  const normalizedSelections = selections || {};
+  const additionalItems = new Set(normalizedSelections.additionalItems || []);
+  container.innerHTML = '';
 
-    speeds.forEach(speed => {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'relative';
+  optionGroups.forEach(group => {
+    const card = document.createElement('div');
+    card.className = 'rounded-xl border border-outline-variant/60 bg-surface p-4 shadow-sm';
+
+    const header = document.createElement('div');
+    header.className = 'flex items-start justify-between gap-3';
+
+    const titleBlock = document.createElement('div');
+    titleBlock.className = 'space-y-1';
+    const title = document.createElement('p');
+    title.className = 'text-sm font-semibold text-on-surface';
+    title.textContent = getLocalizedText(group.title, lang);
+    titleBlock.appendChild(title);
+
+    const description = document.createElement('p');
+    description.className = 'text-xs text-on-surface-variant';
+    description.textContent = getLocalizedText(group.description, lang);
+    titleBlock.appendChild(description);
+    header.appendChild(titleBlock);
+
+    if (group.unitPriceLabel) {
+      const badge = document.createElement('span');
+      badge.className = 'rounded-full border border-primary/40 bg-primary/5 px-3 py-1 text-[11px] font-semibold text-primary';
+      badge.textContent = getLocalizedText(group.unitPriceLabel, lang);
+      header.appendChild(badge);
+    }
+
+    card.appendChild(header);
+
+    if (group.type === 'toggle') {
+      const optionId = `premium-${group.value}`;
+      const toggleLabel = document.createElement('label');
+      toggleLabel.setAttribute('for', optionId);
+      toggleLabel.className = 'mt-3 flex items-center justify-between rounded-lg border border-outline-variant/50 bg-surface-container-highest px-3 py-2';
+
+      const textLabel = document.createElement('span');
+      textLabel.className = 'text-sm text-on-surface-variant';
+      textLabel.textContent = lang === 'ja' ? '必要に応じてチェックしてください' : 'Check to enable';
+
+      const input = document.createElement('input');
+      input.type = 'checkbox';
+      input.id = optionId;
+      input.name = 'premiumMultilingual';
+      input.className = 'h-4 w-4 rounded border-outline text-primary focus:ring-primary';
+      input.checked = Boolean(normalizedSelections[group.value]);
+
+      toggleLabel.append(textLabel, input);
+      card.appendChild(toggleLabel);
+    }
+
+    if (group.type === 'multi' && Array.isArray(group.options)) {
+      const list = document.createElement('div');
+      list.className = 'mt-3 grid gap-2';
+
+      group.options.forEach(option => {
+        const optionId = `premium-${group.value}-${option.value}`;
+        const optionLabel = document.createElement('label');
+        optionLabel.setAttribute('for', optionId);
+        optionLabel.className = 'flex items-start gap-3 rounded-lg border border-outline-variant/50 bg-surface-container-highest px-3 py-2';
 
         const input = document.createElement('input');
-        input.type = 'radio';
-        input.name = 'dataConversionSpeed';
-        input.value = speed.value;
-        input.id = `speed-${speed.value}`;
-        input.className = 'sr-only peer';
-        if (speed.value === selectedSpeed) input.checked = true;
+        input.type = 'checkbox';
+        input.id = optionId;
+        input.name = 'premiumAdditionalItems';
+        input.value = option.value;
+        input.className = 'mt-1 h-4 w-4 rounded border-outline text-primary focus:ring-primary';
+        input.checked = additionalItems.has(option.value);
 
-        const label = document.createElement('label');
-        label.setAttribute('for', input.id);
-        label.className = [
-            'flex h-full flex-col gap-2 rounded-xl border p-4 transition-all focus:outline-none',
-            speed.value === selectedSpeed
-                ? 'border-green-500 ring-2 ring-green-500 bg-surface-container-highest shadow-lg'
-                : 'border-outline bg-surface-container hover:border-green-500 hover:shadow-sm'
-        ].join(' ');
+        const textStack = document.createElement('div');
+        textStack.className = 'flex flex-col';
+        const optionTitle = document.createElement('p');
+        optionTitle.className = 'text-sm font-medium text-on-surface';
+        optionTitle.textContent = getLocalizedText(option.title, lang);
+        const optionDescription = document.createElement('p');
+        optionDescription.className = 'text-xs text-on-surface-variant';
+        optionDescription.textContent = getLocalizedText(option.description, lang);
+        textStack.append(optionTitle, optionDescription);
 
-        const title = document.createElement('p');
-        title.className = 'text-sm font-semibold text-on-surface';
-        title.textContent = getLocalizedText(speed.title, lang);
+        optionLabel.append(input, textStack);
+        list.appendChild(optionLabel);
+      });
 
-        const unit = document.createElement('p');
-        unit.className = 'text-lg font-bold text-primary';
-        unit.textContent = `@${speed.unitPrice.toLocaleString()}円/枚`;
+      card.appendChild(list);
+    }
 
-        const note = document.createElement('p');
-        note.className = 'text-xs text-on-surface-variant';
-        note.textContent = speed.days === 0 ? '納期目安: 当日中' : `納期目安: ${speed.days}営業日`;
-
-        label.append(title, unit, note);
-        wrapper.append(input, label);
-        container.appendChild(wrapper);
-    });
+    container.appendChild(card);
+  });
 }
-
 /**
  * クーポン適用の結果メッセージを表示します。
  * @param {object} couponResult - クーポン検証結果。
