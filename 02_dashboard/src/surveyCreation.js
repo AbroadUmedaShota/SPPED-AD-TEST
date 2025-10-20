@@ -57,12 +57,78 @@ function setDirty(dirty) {
     }
 }
 
-window.addEventListener('beforeunload', (event) => {
-    if (isDirty) {
-        event.preventDefault();
-        event.returnValue = ''; // For legacy browsers
-    }
-});
+/**
+ * Initializes unload confirmation logic.
+ * This function handles three scenarios for preventing data loss:
+ * 1. In-page navigation (e.g., clicking a link): Shows a custom modal.
+ * 2. Browser back button: Uses the history API (`pushState`/`popstate`) to show a custom modal.
+ * 3. Browser-level navigation (e.g., closing tab, refresh): Shows the browser's native confirmation prompt.
+ * This multi-layered approach is necessary due to browser security restrictions.
+ */
+function initUnloadConfirmation() {
+    // --- 2. Browser back button handling ---
+    // Push an initial state to the history. This allows us to intercept the first back button press.
+    history.pushState(null, '', null);
+
+    window.addEventListener('popstate', (event) => {
+        if (isDirty) {
+            // When the user clicks 'back', popstate fires. We immediately push the state back
+            // to "re-arm" the trap in case the user cancels our modal.
+            history.pushState(null, '', null);
+
+            showConfirmationModal(
+                '編集中の内容は保存されませんが、ページを離れてもよろしいですか？',
+                () => { // On Confirm (Leave)
+                    isDirty = false; // Allow navigation
+                    // Use a timeout to ensure the history operation completes after the modal closes
+                    setTimeout(() => history.back(), 0);
+                },
+                'ページを離れますか？'
+            );
+        }
+    });
+
+    // --- 1. In-page navigation handling (Link clicks) ---
+    document.body.addEventListener('click', (event) => {
+        const link = event.target.closest('a[href]');
+
+        // Ignore non-navigation links or links opening in a new tab
+        if (!link || link.getAttribute('href') === '#' || link.target === '_blank' || link.dataset.preventNavGuard || link.getAttribute('onclick')) {
+            return;
+        }
+
+        // Ignore if the URL is the same
+        const currentUrl = new URL(window.location.href);
+        const targetUrl = new URL(link.href, window.location.href);
+        if (currentUrl.href === targetUrl.href) {
+            return;
+        }
+
+        if (isDirty) {
+            event.preventDefault();
+            showConfirmationModal(
+                '編集中の内容は保存されませんが、ページを離れてもよろしいですか？',
+                () => {
+                    isDirty = false; // Allow navigation
+                    window.location.href = link.href;
+                },
+                'ページを離れますか？'
+            );
+        }
+    }, true); // Use capture phase to intercept clicks early
+
+    // --- 3. Browser-level navigation handling (Close tab, refresh, etc.) ---
+    window.addEventListener('beforeunload', (event) => {
+        if (isDirty) {
+            // This will trigger the browser's native confirmation dialog.
+            // Customizing this dialog's appearance is not possible for security reasons.
+            event.preventDefault();
+            event.returnValue = ''; // Required for legacy browsers
+        }
+    });
+}
+
+
 
 // --- Utility Functions ---
 window.getCurrentLanguage = () => currentLang;
@@ -478,12 +544,25 @@ function registerAdditionalSettingsLinks() {
         button.dataset.settingsLinkInitialized = 'true';
         button.addEventListener('click', (event) => {
             event.preventDefault();
+
             if (!currentSurveyId) {
                 showToast('アンケートIDが未設定です。先にアンケートを保存してください。', 'error');
                 return;
             }
             const url = `${path}?surveyId=${encodeURIComponent(currentSurveyId)}`;
-            window.location.href = url;
+
+            if (isDirty) {
+                showConfirmationModal(
+                    '編集中の内容は保存されませんが、ページを離れてもよろしいですか？',
+                    () => { // onConfirm
+                        isDirty = false;
+                        window.location.href = url;
+                    },
+                    'ページを離れますか？'
+                );
+            } else {
+                window.location.href = url;
+            }
         });
     });
     updateAdditionalSettingsAvailability();
@@ -1018,6 +1097,8 @@ const mapEnqueteToQuestions = (enqueteDetails) => {
     }];
 };
 
+
+
 /**
  * ページの初期化処理
  */
@@ -1207,6 +1288,7 @@ async function initializePage() {
             }
         }
 
+        initUnloadConfirmation();
         document.dispatchEvent(new CustomEvent('pageInitialized'));
 
     } catch (error) {
@@ -1605,6 +1687,9 @@ function setupEventListeners() {
                 setDirty(false);
             };
 
+            let confirmationMessage = 'アンケートを保存します。よろしいですか？';
+            let confirmationTitle = '保存の確認';
+
             if (missing.length > 0) {
                 const summary = extras.map((lang) => {
                     const meta = getLanguageMeta(lang);
@@ -1612,14 +1697,11 @@ function setupEventListeners() {
                     const count = missing.filter((item) => item.lang === lang).length;
                     return `${label}：${count}件`;
                 }).join(' / ');
-                const message = `選択された追加言語で未入力の項目があります。
-${summary}
-この状態で保存しますか？`;
-                showConfirmationModal(message, performSave, '未翻訳の確認');
-                return;
+                confirmationMessage = `選択された追加言語で未入力の項目があります。\n${summary}\nこの状態で保存しますか？`;
+                confirmationTitle = '未翻訳の確認';
             }
 
-            performSave();
+            showConfirmationModal(confirmationMessage, performSave, confirmationTitle);
         });
     }
 

@@ -108,7 +108,7 @@ export function renderEstimate(estimate) {
         const premiumTotal = estimate.premiumTotal ?? 0;
         const minCharge = estimate.minCharge ?? 0;
         const minChargeLine = minCharge > 0
-            ? `<div class="text-xs text-white/60">※ 最低ご請求金額 ¥${minCharge.toLocaleString()}（＋税）</div>`
+            ? `<div class="text-xs text-on-surface-variant">※ 最低ご請求金額 ¥${minCharge.toLocaleString()}（＋税）</div>`
             : '';
         const baseLine = `${cards.toLocaleString()}件 × データ化単価 ${unit.toLocaleString()}円`;
         const premiumLine = premiumTotal > 0
@@ -122,24 +122,24 @@ export function renderEstimate(estimate) {
             ? estimate.selectedPremiumOptions
             : [];
         const premiumSummary = premiumSelections.length > 0
-            ? `<div class="text-xs text-white/60">選択オプション: ${premiumSelections
+            ? `<div class="text-xs text-on-surface-variant">選択オプション: ${premiumSelections
                 .map(option => getLocalizedText(option.title, lang))
                 .join('、')}</div>`
             : '';
         dom.estimateBreakdown.innerHTML = `
-            <div class="space-y-3 text-white/70">
+            <div class="space-y-3 text-on-surface-variant">
               <div class="flex items-center justify-between text-sm">
-                <span class="text-white/60">想定件数</span>
-                <span class="text-base font-semibold text-white">${cards.toLocaleString()}件</span>
+                <span class="text-on-surface-variant">想定件数</span>
+                <span class="text-base font-semibold text-on-surface">${cards.toLocaleString()}件</span>
               </div>
               <div class="space-y-2">
-                <div class="text-xs uppercase tracking-widest text-white/50">内訳</div>
-                <div class="rounded-2xl border border-white/10 bg-white/5 p-3 text-xs leading-relaxed">
+                <div class="text-xs uppercase tracking-widest text-on-surface-variant">内訳</div>
+                <div class="rounded-2xl border border-outline-variant bg-surface p-3 text-xs leading-relaxed">
                   ${breakdownLines || '—'}
                 </div>
               </div>
               ${premiumSummary}
-              <div class="text-sm font-semibold text-white">＝ ご請求見込み金額 ¥${estimate.amount.toLocaleString()}（＋税）</div>
+              <div class="text-sm font-semibold text-on-surface">＝ ご請求見込み金額 ¥${estimate.amount.toLocaleString()}（＋税）</div>
               ${minChargeLine}
             </div>
         `;

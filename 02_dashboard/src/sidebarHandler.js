@@ -153,6 +153,32 @@ function populateNav() {
     });
 }
 
+function handleGroupChange(selectedId) {
+    const newGroupButton = document.getElementById('newGroupButton');
+    const groupManagementNav = document.getElementById('group-managementButton');
+
+    activeGroupId = selectedId || null;
+    persistSelectedGroup(activeGroupId);
+    setGroupFilter(activeGroupId === 'personal' ? 'personal' : activeGroupId);
+
+    if (selectedId === 'personal') {
+        if (newGroupButton) newGroupButton.style.display = 'none';
+        if (groupManagementNav) groupManagementNav.style.display = 'none';
+        if (currentGroupLabel) currentGroupLabel.style.display = 'none';
+    } else {
+        if (newGroupButton) newGroupButton.style.display = '';
+        if (groupManagementNav) groupManagementNav.style.display = '';
+        if (currentGroupLabel) currentGroupLabel.style.display = '';
+        const selectedGroup = groupsCache.find(g => g.id === selectedId);
+        if (selectedGroup) {
+            updateCurrentGroupLabel(selectedGroup.name);
+        } else {
+            // This might happen if cache is out of sync. Fallback.
+            updateCurrentGroupLabel('グループ未設定');
+        }
+    }
+}
+
 /**
  * Populates the group selection dropdown.
  */
@@ -161,45 +187,36 @@ async function populateGroupSelect() {
     userSelect.innerHTML = ''; // Clear existing options
 
     try {
+        // Add Personal Account option first
+        const personalOption = document.createElement('option');
+        personalOption.value = 'personal';
+        personalOption.textContent = '個人アカウント';
+        userSelect.appendChild(personalOption);
+
         groupsCache = await fetchGroups();
 
-        if (!Array.isArray(groupsCache) || groupsCache.length === 0) {
-            const placeholderOption = document.createElement('option');
-            placeholderOption.value = '';
-            placeholderOption.textContent = 'グループが登録されていません';
-            placeholderOption.disabled = true;
-            placeholderOption.selected = true;
-            userSelect.appendChild(placeholderOption);
-            updateCurrentGroupLabel('グループ未設定');
-            persistSelectedGroup(null);
-            setGroupFilter(null);
-            return;
+        if (Array.isArray(groupsCache) && groupsCache.length > 0) {
+            groupsCache.forEach(group => {
+                const option = document.createElement('option');
+                option.value = group.id;
+                option.textContent = group.name;
+                userSelect.appendChild(option);
+            });
         }
-
-        groupsCache.forEach(group => {
-            const option = document.createElement('option');
-            option.value = group.id;
-            option.textContent = group.name;
-            userSelect.appendChild(option);
-        });
 
         const storedGroupId = getStoredGroupId();
-        const resolvedGroup = groupsCache.find(group => group.id === storedGroupId) || groupsCache[0];
+        const initialGroupId = storedGroupId || 'personal';
+        userSelect.value = initialGroupId;
+        
+        // Run initial UI update based on the selected group
+        handleGroupChange(initialGroupId);
 
-        if (resolvedGroup) {
-            activeGroupId = resolvedGroup.id;
-            userSelect.value = resolvedGroup.id;
-            updateCurrentGroupLabel(resolvedGroup.name);
-            setGroupFilter(resolvedGroup.id);
-            persistSelectedGroup(activeGroupId);
-        }
     } catch (error) {
         console.error('Failed to fetch groups for sidebar:', error);
         showToast('グループの読み込みに失敗しました。', 'error');
-        groupsCache = [];
-        updateCurrentGroupLabel('グループ未設定');
-        persistSelectedGroup(null);
-        setGroupFilter(null);
+        groupsCache = []; // Ensure cache is empty on error
+        // Still show personal account even if group fetch fails
+        handleGroupChange('personal');
     }
 }
 
@@ -262,15 +279,7 @@ function attachEventListeners() {
     if (userSelect && !isUserSelectBound) {
         userSelect.addEventListener('change', () => {
             const selectedGroupId = userSelect.value;
-            activeGroupId = selectedGroupId || null;
-            const selectedGroup = groupsCache.find(group => group.id === selectedGroupId);
-            persistSelectedGroup(activeGroupId);
-            if (selectedGroup) {
-                updateCurrentGroupLabel(selectedGroup.name);
-            } else {
-                updateCurrentGroupLabel('グループ未設定');
-            }
-            setGroupFilter(activeGroupId);
+            handleGroupChange(selectedGroupId);
             showToast('グループを切り替えました。', 'info');
         });
         isUserSelectBound = true;

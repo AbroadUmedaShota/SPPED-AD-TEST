@@ -519,7 +519,9 @@ export function applyFiltersAndPagination() {
 
             const matchesKeyword = keyword === '' || surveyName.includes(keyword);
             const matchesStatus = status === 'all' || displayStatus === status;
-            const matchesGroup = currentGroupId === null || survey.groupId === currentGroupId; // グループIDによるフィルタリング
+            const matchesGroup = currentGroupId === 'personal'
+                ? !survey.groupId
+                : (currentGroupId === null || survey.groupId === currentGroupId); // グループIDによるフィルタリング
             
             const matchesPeriod = 
                 (!startDate || !isValidDate(startDate) || (surveyPeriodStart && surveyPeriodStart >= startDate)) &&

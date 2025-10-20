@@ -36,7 +36,7 @@ export function setupQrCodeModalListeners(modalElement) {
 
     // Populate with dummy data for now
     // In a real application, this would be populated dynamically based on the selected survey
-    surveyUrlInput.value = `https://survey.speedad.com/qr/dummy_survey_id`;
+    surveyUrlInput.textContent = `https://survey.speedad.com/qr/dummy_survey_id`;
     qrCodeImage.src = `sample_qr.png`; // Assuming sample_qr.png is in the same directory as index.html
 }
 
@@ -54,8 +54,8 @@ function handleDownloadQrCode() {
 
 function handleCopyUrl() {
     const surveyUrlInput = document.getElementById('surveyUrlInput');
-    if (surveyUrlInput && surveyUrlInput.value) {
-        copyTextToClipboard(surveyUrlInput.value);
+    if (surveyUrlInput && surveyUrlInput.textContent) {
+        copyTextToClipboard(surveyUrlInput.textContent);
     } else {
         showToast('コピー対象のURLが見つかりません。', 'error');
     }

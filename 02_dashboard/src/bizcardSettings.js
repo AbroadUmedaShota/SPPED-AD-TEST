@@ -121,6 +121,7 @@ export function initBizcardSettings() {
 
             setupEventListeners();
             updateFullUI();
+            initEstimateSidebarToggle();
 
         } catch (error) {
             console.error('初期化エラー:', error);
@@ -455,6 +456,30 @@ export function initBizcardSettings() {
             multilingual: Boolean(multilingualInput?.checked),
             additionalItems: additionalInputs.map(input => input.value)
         };
+    }
+
+    function initEstimateSidebarToggle() {
+        const sidebar = document.getElementById('estimateSidebar');
+        const toggleBtn = document.getElementById('toggleEstimateSidebarBtn');
+
+        if (!sidebar || !toggleBtn) {
+            return;
+        }
+
+        const toggleIcon = toggleBtn.querySelector('.material-icons');
+
+        toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('translate-x-full');
+            const isCollapsed = sidebar.classList.contains('translate-x-full');
+
+            if (isCollapsed) {
+                toggleIcon.textContent = 'chevron_left';
+                toggleBtn.setAttribute('aria-expanded', 'false');
+            } else {
+                toggleIcon.textContent = 'chevron_right';
+                toggleBtn.setAttribute('aria-expanded', 'true');
+            }
+        });
     }
 
     function areArraysEqual(a = [], b = []) {
