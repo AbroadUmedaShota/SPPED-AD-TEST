@@ -318,7 +318,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Zip-code auto-fill (using jQuery)
     if (window.jQuery) {
         // Apply the mask for formatting
-        $('#zip').mask('000-0000');
 
         const searchAddressByZip = () => {
             const zip = $('#zip').val();
