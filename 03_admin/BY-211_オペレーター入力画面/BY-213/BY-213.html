@@ -64,29 +64,74 @@
           
           <div class="group-section active" data-group="グループ1">
             <h5>グループ1：メールアドレス</h5>
-            <div class="input-field"><i class="material-icons prefix">email</i><input type="email" id="email" name="email"><label for="email">メールアドレス</label></div>
+            <div class="input-field with-suggestion">
+              <i class="material-icons prefix">email</i>
+              <input type="email" id="email" name="email">
+              <label for="email">メールアドレス</label>
+              <a href="#suggestions-modal" class="manage-suggestions-btn modal-trigger" data-input-id="email" data-input-label="メールアドレス">
+                <i class="material-icons">star_border</i>
+              </a>
+            </div>
           </div>
 
           <div class="group-section" data-group="グループ2">
             <h5>グループ2：氏名</h5>
-            <div class="input-field"><i class="material-icons prefix">person</i><input type="text" id="last-name" name="last-name"><label for="last-name">姓</label></div>
-            <div class="input-field"><i class="material-icons prefix">person_outline</i><input type="text" id="first-name" name="first-name"><label for="first-name">名</label></div>
+            <div class="input-field with-suggestion">
+              <i class="material-icons prefix">person</i>
+              <input type="text" id="last-name" name="last-name">
+              <label for="last-name">姓</label>
+              <a href="#suggestions-modal" class="manage-suggestions-btn modal-trigger" data-input-id="last-name" data-input-label="姓">
+                <i class="material-icons">star_border</i>
+              </a>
+            </div>
+            <div class="input-field with-suggestion">
+              <i class="material-icons prefix">person_outline</i>
+              <input type="text" id="first-name" name="first-name">
+              <label for="first-name">名</label>
+              <a href="#suggestions-modal" class="manage-suggestions-btn modal-trigger" data-input-id="first-name" data-input-label="名">
+                <i class="material-icons">star_border</i>
+              </a>
+            </div>
           </div>
 
           <div class="group-section" data-group="グループ3">
             <h5>グループ3：会社情報</h5>
-            <div class="input-field"><i class="material-icons prefix">business</i><input type="text" id="company" name="company"><label for="company">会社名</label></div>
-            <div class="input-field"><i class="material-icons prefix">group_work</i><input type="text" id="department" name="department"><label for="department">部署名</label></div>
-            <div class="input-field"><i class="material-icons prefix">work</i><input type="text" id="position" name="position"><label for="position">役職名</label></div>
+            <div class="input-field with-suggestion">
+              <i class="material-icons prefix">business</i>
+              <input type="text" id="company" name="company">
+              <label for="company">会社名</label>
+              <a href="#suggestions-modal" class="manage-suggestions-btn modal-trigger" data-input-id="company" data-input-label="会社名">
+                <i class="material-icons">star_border</i>
+              </a>
+            </div>
+            <div class="input-field with-suggestion">
+              <i class="material-icons prefix">group_work</i>
+              <input type="text" id="department" name="department">
+              <label for="department">部署名</label>
+              <a href="#suggestions-modal" class="manage-suggestions-btn modal-trigger" data-input-id="department" data-input-label="部署名">
+                <i class="material-icons">star_border</i>
+              </a>
+            </div>
+            <div class="input-field with-suggestion">
+              <i class="material-icons prefix">work</i>
+              <input type="text" id="position" name="position">
+              <label for="position">役職名</label>
+              <a href="#suggestions-modal" class="manage-suggestions-btn modal-trigger" data-input-id="position" data-input-label="役職名">
+                <i class="material-icons">star_border</i>
+              </a>
+            </div>
           </div>
           
           <div class="group-section" data-group="グループ4">
             <h5>グループ4：住所</h5>
             <div class="row" style="margin-bottom: 0;">
-                <div class="input-field col s9">
+                <div class="input-field col s9 with-suggestion">
                     <i class="material-icons prefix">markunread_mailbox</i>
                     <input type="text" id="zip" name="zip">
                     <label for="zip">郵便番号</label>
+                    <a href="#suggestions-modal" class="manage-suggestions-btn modal-trigger" data-input-id="zip" data-input-label="郵便番号">
+                      <i class="material-icons">star_border</i>
+                    </a>
                 </div>
                 <div class="input-field col s3">
                     <a href="#!" id="zip-search-btn" class="btn waves-effect waves-light tooltipped" data-position="top" data-tooltip="郵便番号から住所を検索">
@@ -94,43 +139,112 @@
                     </a>
                 </div>
             </div>
-            <div class="input-field"><i class="material-icons prefix">location_on</i><input type="text" id="address1" name="address1"><label for="address1">住所1</label></div>
-            <div class="input-field"><i class="material-icons prefix">location_city</i><input type="text" id="address2" name="address2"><label for="address2">住所2(建物名)</label></div>
+            <div class="input-field with-suggestion">
+              <i class="material-icons prefix">location_on</i>
+              <input type="text" id="address1" name="address1">
+              <label for="address1">住所1</label>
+              <a href="#suggestions-modal" class="manage-suggestions-btn modal-trigger" data-input-id="address1" data-input-label="住所1">
+                <i class="material-icons">star_border</i>
+              </a>
+            </div>
+            <div class="input-field with-suggestion">
+              <i class="material-icons prefix">location_city</i>
+              <input type="text" id="address2" name="address2">
+              <label for="address2">住所2(建物名)</label>
+              <a href="#suggestions-modal" class="manage-suggestions-btn modal-trigger" data-input-id="address2" data-input-label="住所2(建物名)">
+                <i class="material-icons">star_border</i>
+              </a>
+            </div>
           </div>
 
           <div class="group-section" data-group="グループ5">
             <h5>グループ5：電話番号</h5>
-            <div class="input-field"><i class="material-icons prefix">phone</i><input type="tel" id="tel1" name="tel1"><label for="tel1">電話番号1</label></div>
-            <div class="input-field"><i class="material-icons prefix">phone_in_talk</i><input type="tel" id="tel2" name="tel2"><label for="tel2">電話番号2</label></div>
-            <div class="input-field"><i class="material-icons prefix">phone_iphone</i><input type="tel" id="mobile" name="mobile"><label for="mobile">携帯番号</label></div>
-            <div class="input-field"><i class="material-icons prefix">print</i><input type="tel" id="fax" name="fax"><label for="fax">FAX番号</label></div>
+            <div class="input-field with-suggestion">
+              <i class="material-icons prefix">phone</i>
+              <input type="tel" id="tel1" name="tel1">
+              <label for="tel1">電話番号1</label>
+              <a href="#suggestions-modal" class="manage-suggestions-btn modal-trigger" data-input-id="tel1" data-input-label="電話番号1">
+                <i class="material-icons">star_border</i>
+              </a>
+            </div>
+            <div class="input-field with-suggestion">
+              <i class="material-icons prefix">phone_in_talk</i>
+              <input type="tel" id="tel2" name="tel2">
+              <label for="tel2">電話番号2</label>
+              <a href="#suggestions-modal" class="manage-suggestions-btn modal-trigger" data-input-id="tel2" data-input-label="電話番号2">
+                <i class="material-icons">star_border</i>
+              </a>
+            </div>
+            <div class="input-field with-suggestion">
+              <i class="material-icons prefix">phone_iphone</i>
+              <input type="tel" id="mobile" name="mobile">
+              <label for="mobile">携帯番号</label>
+              <a href="#suggestions-modal" class="manage-suggestions-btn modal-trigger" data-input-id="mobile" data-input-label="携帯番号">
+                <i class="material-icons">star_border</i>
+              </a>
+            </div>
+            <div class="input-field with-suggestion">
+              <i class="material-icons prefix">print</i>
+              <input type="tel" id="fax" name="fax">
+              <label for="fax">FAX番号</label>
+              <a href="#suggestions-modal" class="manage-suggestions-btn modal-trigger" data-input-id="fax" data-input-label="FAX番号">
+                <i class="material-icons">star_border</i>
+              </a>
+            </div>
           </div>
 
           <div class="group-section" data-group="グループ6">
             <h5>グループ6：URL</h5>
-            <div class="input-field"><i class="material-icons prefix">link</i><input type="url" id="url" name="url"><label for="url">URL</label></div>
+            <div class="input-field with-suggestion">
+              <i class="material-icons prefix">link</i>
+              <input type="url" id="url" name="url">
+              <label for="url">URL</label>
+              <a href="#suggestions-modal" class="manage-suggestions-btn modal-trigger" data-input-id="url" data-input-label="URL">
+                <i class="material-icons">star_border</i>
+              </a>
+            </div>
           </div>
 
           <div class="group-section" data-group="グループ7">
             <h5>グループ7：その他（メモ等）</h5>
-            <div class="input-field"><i class="material-icons prefix">note</i><textarea id="notes" name="notes" class="materialize-textarea"></textarea><label for="notes">その他</label></div>
+            <div class="input-field with-suggestion">
+              <i class="material-icons prefix">note</i>
+              <textarea id="notes" name="notes" class="materialize-textarea"></textarea>
+              <label for="notes">その他</label>
+              <a href="#suggestions-modal" class="manage-suggestions-btn modal-trigger" data-input-id="notes" data-input-label="その他">
+                <i class="material-icons">star_border</i>
+              </a>
+            </div>
           </div>
 
           <div class="group-section" data-group="グループ8">
             <h5>グループ8：フリー入力</h5>
-            <div class="input-field"><i class="material-icons prefix">edit</i><textarea id="free-text" name="free-text" class="materialize-textarea"></textarea><label for="free-text">フリー入力</label></div>
+            <div class="input-field with-suggestion">
+              <i class="material-icons prefix">edit</i>
+              <textarea id="free-text" name="free-text" class="materialize-textarea"></textarea>
+              <label for="free-text">フリー入力</label>
+              <a href="#suggestions-modal" class="manage-suggestions-btn modal-trigger" data-input-id="free-text" data-input-label="フリー入力">
+                <i class="material-icons">star_border</i>
+              </a>
+            </div>
           </div>
         </div>
+
+        <div id="snippet-container"></div>
 
         <!-- Action Controls (Timer and Buttons) -->
         <div class="fixed-action-controls">
             <div class="timer-container center-align">
-                <span id="elapsed-time" style="font-size: 1.2rem; font-weight: bold; background-color: rgba(0,0,0,0.1); padding: 5px 10px; border-radius: 5px;">経過時間: 00:00:00</span>
+                <span id="elapsed-time">経過時間: 00:00:00</span>
+                <span class="stats-divider">|</span>
+                <span id="card-count">処理枚数: 0</span>
+                <span class="stats-divider">|</span>
+                <span id="avg-time">平均時間: 0.0s</span>
             </div>
             <div class="button-group" style="margin-top: 10px;">
-                <a id="suspend-button" class="btn waves-effect waves-light orange darken-2 modal-trigger tooltipped" data-target="suspend-modal" data-tooltip="作業終了"><i class="material-icons">exit_to_app</i></a>
-                <a id="skip-button" class="btn waves-effect waves-light red lighten-1 modal-trigger tooltipped" data-target="skip-modal" data-tooltip="スキップ"><i class="material-icons">skip_next</i></a>
-                <a id="confirm-button" class="btn-large btn-floating waves-effect waves-light green darken-1 tooltipped" data-position="left" data-tooltip="確定 (Ctrl+Enter)"><i class="material-icons">check</i></a>
+                <a id="suspend-button" class="btn waves-effect waves-light orange darken-2 modal-trigger tooltipped" data-position="top" data-target="suspend-modal" data-tooltip="作業終了"><i class="material-icons">exit_to_app</i></a>
+                <a id="skip-button" class="btn waves-effect waves-light red lighten-1 modal-trigger tooltipped" data-position="top" data-target="skip-modal" data-tooltip="スキップ"><i class="material-icons">skip_next</i></a>
+                <a id="confirm-button" class="btn-large btn-floating waves-effect waves-light green darken-1 tooltipped" data-position="top" data-tooltip="確定 (Ctrl+Enter)"><i class="material-icons">check</i></a>
             </div>
         </div>
 
@@ -138,7 +252,29 @@
     </div>
   </div>
 
+
   <!-- Modals -->
+  <div id="suggestions-modal" class="modal">
+    <div class="modal-content">
+      <h4 id="suggestions-modal-title"></h4>
+      <div class="row">
+        <div class="input-field col s9">
+          <input type="text" id="new-suggestion-input">
+          <label for="new-suggestion-input">新しい候補を追加</label>
+        </div>
+        <div class="col s3">
+          <a href="#!" id="add-suggestion-btn" class="btn waves-effect waves-light">追加</a>
+        </div>
+      </div>
+      <ul id="suggestions-list" class="collection">
+        <!-- Suggestions will be dynamically added here -->
+      </ul>
+    </div>
+    <div class="modal-footer">
+      <a href="#!" class="modal-close waves-effect waves-green btn-flat">完了</a>
+    </div>
+  </div>
+
   <div id="skip-modal" class="modal">
     <div class="modal-header">
       <i class="material-icons">skip_next</i>
@@ -148,16 +284,26 @@
       <p>スキップする理由を選択してください。</p>
       <div class="radio-group">
         <p>
-          <label><input type="radio" name="skip-reason" value="not-card"><span>名刺ではない</span></label>
+          <label><input type="radio" name="skip-reason" value="not-card"><span class="grey-text text-darken-3">名刺ではない</span></label>
         </p>
         <p>
-          <label><input type="radio" name="skip-reason" value="other-language"><span>対応言語外</span></label>
+          <label><input type="radio" name="skip-reason" value="other-language"><span class="grey-text text-darken-3">対応言語外</span></label>
         </p>
         <p>
-          <label><input type="radio" name="skip-reason" value="other"><span>その他</span></label>
+          <label><input type="radio" name="skip-reason" value="escalation"><span class="grey-text text-darken-3">エスカレーション</span></label>
+        </p>
+        <p>
+          <label><input type="radio" name="skip-reason" value="other"><span class="grey-text text-darken-3">その他</span></label>
         </p>
       </div>
-      <div class="input-field" id="skip-reason-other-input" style="display: none;">
+      <p id="skip-reason-error" class="red-text" style="display: none; margin-top: 10px;">スキップ理由を選択してください。</p>
+      
+      <div class="input-field" id="skip-reason-escalation-input" style="display: none; margin-top: 15px;">
+        <textarea id="escalation-reason-text" class="materialize-textarea"></textarea>
+        <label for="escalation-reason-text">エスカレーション理由を具体的に入力してください</label>
+      </div>
+
+      <div class="input-field" id="skip-reason-other-input" style="display: none; margin-top: 15px;">
         <textarea id="other-reason-text" class="materialize-textarea"></textarea>
         <label for="other-reason-text">理由を具体的に入力してください</label>
       </div>
@@ -205,6 +351,7 @@ document.addEventListener('DOMContentLoaded', function () {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js" defer></script>
 <!-- Materialize JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<script src="suggestion.js" defer></script>
 <script src="script.js" defer></script>
 </body>
 </html>

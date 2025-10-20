@@ -14,12 +14,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const zoomInBtn = document.getElementById('zoom-in-btn');
     const toggleDarkModeButton = document.getElementById('toggle-dark-mode');
     const body = document.body;
+    const elapsedTimeElement = document.getElementById('elapsed-time');
+    const cardCountElement = document.getElementById('card-count');
+    const avgTimeElement = document.getElementById('avg-time');
 
     // --- State Variables ---
     const groups = ["グループ1", "グループ2", "グループ3", "グループ4", "グループ5", "グループ6", "グループ7", "グループ8"];
     let currentGroupIndex = 0;
     let userEmail;
-    let startTime;
+    let cardStartTime;
+    let cardCount = 0;
+    let sessionTotalSeconds = 0;
     let mainImageRotation = 0;
     let mainImageScale = 1;
     let isFront = true;
@@ -29,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Functions ---
 
     function showToast(message) {
-        M.toast({ html: message });
+        const toastInstance = M.toast({ html: message, classes: 'rounded' });
     }
 
     function updateTransform() {
@@ -55,41 +60,64 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         const firstInput = document.querySelector('.group-section.active input:not([type="hidden"]), .group-section.active textarea');
         if (firstInput) firstInput.focus();
+
+        // Update snippet buttons for the new group
+        if (window.updateSnippetButtonsForGroup) {
+            window.updateSnippetButtonsForGroup(groups[currentGroupIndex]);
+        }
+    }
+
+    function startNewCard() {
+        // Reset form fields
+        document.querySelectorAll('input, textarea').forEach(el => el.value = '');
+        M.updateTextFields();
+
+        currentGroupIndex = 0;
+        cardStartTime = new Date();
+        elapsedTimeElement.classList.remove('time-warning');
+        displayCurrentGroup();
     }
 
     function moveToNextCardOrGroup() {
         if (currentGroupIndex < groups.length - 1) {
             currentGroupIndex++;
+            displayCurrentGroup();
         } else {
-            showToast('全てのグループの入力を完了しました。');
-            currentGroupIndex = 0;
+            // Card finished, update stats
+            const cardElapsedTimeSeconds = (new Date() - cardStartTime) / 1000;
+            sessionTotalSeconds += cardElapsedTimeSeconds;
+            cardCount++;
+            const avgTime = sessionTotalSeconds / cardCount;
+
+            cardCountElement.textContent = `処理枚数: ${cardCount}`;
+            avgTimeElement.textContent = `平均時間: ${avgTime.toFixed(1)}s`;
+
+            showToast(`カード完了 (処理時間: ${cardElapsedTimeSeconds.toFixed(1)}s)`);
+            startNewCard();
         }
-        displayCurrentGroup();
     }
 
     function updateElapsedTime() {
-        if (!startTime) return;
+        if (!cardStartTime) return;
         const currentTime = new Date();
-        const elapsedTime = currentTime - startTime;
+        const elapsedTime = currentTime - cardStartTime;
         const totalSeconds = Math.floor(elapsedTime / 1000);
         const seconds = totalSeconds % 60;
         const minutes = Math.floor(totalSeconds / 60) % 60;
         const hours = Math.floor(totalSeconds / 3600);
         const formattedTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
         
-        const timeElement = document.getElementById('elapsed-time');
-        timeElement.textContent = `経過時間: ${formattedTime}`;
+        elapsedTimeElement.textContent = `経過時間: ${formattedTime}`;
 
         const WARNING_THRESHOLD_SECONDS = 15;
         if (totalSeconds > WARNING_THRESHOLD_SECONDS) {
-            timeElement.classList.add('time-warning');
+            elapsedTimeElement.classList.add('time-warning');
         }
     }
 
-    function resumeWork() {
+    function loadUser() {
         userEmail = localStorage.getItem('userEmail') || 'example@example.com';
         document.getElementById('user-email').textContent = `入力者: ${userEmail}`;
-        startTime = localStorage.getItem('startTime') ? new Date(localStorage.getItem('startTime')) : new Date();
     }
 
     function validateForm() {
@@ -168,14 +196,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Modal-related event listeners
     document.getElementById('confirm-skip-button').addEventListener('click', () => {
-        const selectedReason = document.querySelector('input[name="skip-reason"]:checked').value;
-        let reason = selectedReason;
-        if (reason === 'other') {
-            reason += ': ' + document.getElementById('other-reason-text').value;
+        const checkedRadio = document.querySelector('input[name="skip-reason"]:checked');
+        const errorElement = document.getElementById('skip-reason-error');
+
+        if (!checkedRadio) {
+            errorElement.style.display = 'block';
+            return;
         }
-        showToast(`スキップしました (理由: ${reason})`);
+
+        errorElement.style.display = 'none';
+        const selectedValue = checkedRadio.value;
+        let reasonText = '';
+
+        if (checkedRadio.nextElementSibling) {
+            reasonText = checkedRadio.nextElementSibling.textContent;
+        }
+
+        if (selectedValue === 'other') {
+            const otherReason = document.getElementById('other-reason-text').value;
+            if (otherReason) {
+                reasonText += `: ${otherReason}`;
+            }
+        } else if (selectedValue === 'escalation') {
+            const escalationReason = document.getElementById('escalation-reason-text').value;
+            if (escalationReason) {
+                reasonText += `: ${escalationReason}`;
+            }
+        }
+
+        showToast(`スキップしました (理由: ${reasonText})`);
         skipModalInstance.close();
-        moveToNextCardOrGroup();
+        startNewCard(); // Start a new card after skipping
     });
 
     document.getElementById('confirm-suspend-button').addEventListener('click', () => {
@@ -184,13 +235,19 @@ document.addEventListener('DOMContentLoaded', () => {
         // Optionally, redirect or clear session here
     });
 
-    document.querySelector('input[name="skip-reason"][value="other"]').addEventListener('change', function() {
-        document.getElementById('skip-reason-other-input').style.display = this.checked ? 'block' : 'none';
+    // Show/hide textareas based on skip reason
+    document.querySelectorAll('input[name="skip-reason"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const otherInput = document.getElementById('skip-reason-other-input');
+            const escalationInput = document.getElementById('skip-reason-escalation-input');
+            otherInput.style.display = (this.value === 'other' && this.checked) ? 'block' : 'none';
+            escalationInput.style.display = (this.value === 'escalation' && this.checked) ? 'block' : 'none';
+        });
     });
 
     // --- Initial Execution ---
-    displayCurrentGroup();
-    resumeWork();
+    loadUser();
+    startNewCard();
     setInterval(updateElapsedTime, 1000);
 
     // Zip-code auto-fill (using jQuery)

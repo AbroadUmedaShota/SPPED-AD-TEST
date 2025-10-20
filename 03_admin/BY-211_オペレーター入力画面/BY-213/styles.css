@@ -4,7 +4,6 @@ body {
   min-height: 100vh;
   flex-direction: column;
   background-color: #f4f4f4; /* Light grey background */
-  overflow: hidden; /* Prevent scrollbars */
 }
 
 main {
@@ -196,6 +195,65 @@ body.dark-mode .image-controls {
     align-items: flex-end;
 }
 
+.timer-container {
+    font-size: 1.2rem;
+    font-weight: bold;
+    background-color: rgba(0,0,0,0.1);
+    padding: 5px 15px;
+    border-radius: 5px;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.stats-divider {
+    color: #9e9e9e; /* Grey */
+}
+
 .button-group .btn, .button-group .btn-large, .button-group .btn-floating {
     margin-left: 10px;
+}
+
+#toast-container {
+  bottom: 10%;
+  top: auto;
+  right: auto;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Styles for suggestion management */
+.input-field.with-suggestion {
+  position: relative;
+  padding-right: 40px; /* Make space for the icon */
+}
+
+.manage-suggestions-btn {
+  position: absolute;
+  top: 50%;
+  right: 7px;
+  transform: translateY(-50%);
+  color: #9e9e9e; /* Grey */
+  transition: color 0.2s ease;
+}
+
+.manage-suggestions-btn:hover {
+  color: #fbc02d; /* Yellow darken-2 */
+}
+
+.manage-suggestions-btn i {
+  font-size: 24px;
+}
+
+#snippet-container {
+  padding: 10px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 50px; /* Reserve space to avoid layout jump */
+}
+
+#snippet-container:empty {
+    padding: 0;
+    min-height: 0;
 }
