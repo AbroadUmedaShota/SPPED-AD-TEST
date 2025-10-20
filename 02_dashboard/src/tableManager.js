@@ -24,6 +24,17 @@ function sanitizeSurveysForDisplay(surveys) {
     return surveys.filter((survey) => !HIDDEN_USER_STATUSES.has(getSurveyStatus(survey)));
 }
 
+function sortSurveysByIdDesc(surveys) {
+    if (!Array.isArray(surveys)) return [];
+    return [...surveys].sort((a, b) => {
+        const idA = a?.id ?? '';
+        const idB = b?.id ?? '';
+        if (idA < idB) return 1;
+        if (idA > idB) return -1;
+        return 0;
+    });
+}
+
 function shouldSkipInitialSurveyLoad() {
     const status = localStorage.getItem('speedad-tutorial-status');
     return ['pending', 'main-running', 'modal-running'].includes(status);
@@ -685,14 +696,9 @@ export function initTableManager() {
         applyFiltersAndPagination();
     } else {
         fetchSurveyData().then(data => {
-            allSurveyData = sanitizeSurveysForDisplay(data);
-            // 初期ソートをアンケートIDの降順に設定
-            currentFilteredData = [...allSurveyData]; // フィルタリング前の全データを対象にする
-            currentFilteredData.sort((a, b) => {
-                if (a.id < b.id) return 1;
-                if (a.id > b.id) return -1;
-                return 0;
-            });
+            const visibleSurveys = sanitizeSurveysForDisplay(data);
+            allSurveyData = sortSurveysByIdDesc(visibleSurveys);
+            currentFilteredData = [...allSurveyData];
             
             // ソートアイコンを更新
             const idHeader = document.querySelector('.sortable-header[data-sort-key="id"]');
@@ -716,7 +722,8 @@ export function initTableManager() {
 
 export async function reloadSurveyData() {
     const data = await fetchSurveyData();
-    allSurveyData = sanitizeSurveysForDisplay(data);
+    const visibleSurveys = sanitizeSurveysForDisplay(data);
+    allSurveyData = sortSurveysByIdDesc(visibleSurveys);
     applyFiltersAndPagination();
 }
 
