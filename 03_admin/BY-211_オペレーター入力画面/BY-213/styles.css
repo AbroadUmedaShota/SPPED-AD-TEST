@@ -4,6 +4,7 @@ body {
   min-height: 100vh;
   flex-direction: column;
   background-color: #f4f4f4; /* Light grey background */
+  overflow: hidden; /* スクロールを無効にする */
 }
 
 main {
@@ -220,8 +221,8 @@ body.dark-mode .image-controls {
 /* Fixed controls for timer and buttons */
 .fixed-action-controls {
     position: fixed;
-    bottom: 50px; /* Increased from 30px */
-    right: 30px;
+    bottom: 20px; /* 画面端に近づけるために変更 */
+    right: 20px; /* 画面端に近づけるために変更 */
     z-index: 998;
     display: flex;
     flex-direction: column;
@@ -289,4 +290,28 @@ body.dark-mode .image-controls {
 #snippet-container:empty {
     padding: 0;
     min-height: 0;
+}
+
+/* Dark mode adjustment for snippet buttons */
+body.dark-mode .snippet-container a.btn-small {
+    background-color: #455a64 !important; /* blue-grey darken-2 */
+    color: #ffffff !important;
+}
+
+body.dark-mode .snippet-container a.btn-small:hover {
+    background-color: #37474f !important; /* blue-grey darken-3 */
+}
+
+/* Dark mode adjustment for general buttons */
+body.dark-mode .btn,
+body.dark-mode .btn-large,
+body.dark-mode .btn-floating {
+    background-color: #424242 !important; /* Dark grey background */
+    color: #ffffff !important; /* White text */
+}
+
+body.dark-mode .btn:hover,
+body.dark-mode .btn-large:hover,
+body.dark-mode .btn-floating:hover {
+    background-color: #545454 !important; /* Slightly lighter on hover */
 }
