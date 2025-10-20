@@ -95,8 +95,8 @@ const PREMIUM_OPTION_GROUPS = [
         type: 'toggle',
         title: { ja: '多言語対応', en: 'Multilingual support' },
         description: {
-            ja: '日本語に加えて英語・中国語など複数言語の翻訳入力を追加します。',
-            en: 'Add translation entry fields so cards can be processed in multiple languages.'
+            ja: '日本語に加えて中国語（繁体字・簡体字）など複数言語の翻訳入力を追加します。',
+            en: 'Add translation entry fields so cards can be processed in Japanese, Traditional/Simplified Chinese, and other languages.'
         },
         unitPrice: 100,
         unitPriceLabel: { ja: '＋＠100円', en: '+@¥100' },
