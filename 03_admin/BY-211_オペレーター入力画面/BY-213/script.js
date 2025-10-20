@@ -1,6 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Materialize Components Initialization
-    M.AutoInit();
+    // Manually initialize Materialize components
+    const tooltips = document.querySelectorAll('.tooltipped');
+    M.Tooltip.init(tooltips);
+    const modals = document.querySelectorAll('.modal:not(#suggestions-modal)');
+    M.Modal.init(modals);
+
+    // Manually set width for the user profile modal to override Materialize default
+    const userProfileModal = document.getElementById('user-profile-modal');
+    if (userProfileModal) {
+        userProfileModal.style.width = '560px';
+    }
+
     const skipModalInstance = M.Modal.getInstance(document.getElementById('skip-modal'));
     const suspendModalInstance = M.Modal.getInstance(document.getElementById('suspend-modal'));
 
@@ -17,6 +27,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const elapsedTimeElement = document.getElementById('elapsed-time');
     const cardCountElement = document.getElementById('card-count');
     const avgTimeElement = document.getElementById('avg-time');
+    const pauseButton = document.getElementById('pause-button');
+    const pauseTimeElement = document.getElementById('pause-time');
+    const taskNameElement = document.getElementById('current-task-name');
+    const modalTaskNameElement = document.getElementById('modal-user-task');
 
     // --- State Variables ---
     const groups = ["グループ1", "グループ2", "グループ3", "グループ4", "グループ5", "グループ6", "グループ7", "グループ8"];
@@ -28,6 +42,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let mainImageRotation = 0;
     let mainImageScale = 1;
     let isFront = true;
+    let isPaused = false;
+    let pauseStartTime;
     const frontImageSrc = "../../sample/表.png";
     const backImageSrc = "../../sample/裏.png";
 
@@ -35,6 +51,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function showToast(message) {
         const toastInstance = M.toast({ html: message, classes: 'rounded' });
+    }
+
+    function formatTime(totalSeconds) {
+        const seconds = totalSeconds % 60;
+        const minutes = Math.floor(totalSeconds / 60) % 60;
+        const hours = Math.floor(totalSeconds / 3600);
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+
+    function updateTaskName() {
+        if (!taskNameElement) return;
+        const taskNumber = String(cardCount + 1).padStart(3, '0');
+        const taskName = `#${taskNumber}`;
+        taskNameElement.textContent = `タスク: ${taskName}`;
+        if (modalTaskNameElement) {
+            modalTaskNameElement.textContent = taskName;
+        }
     }
 
     function updateTransform() {
@@ -61,30 +94,31 @@ document.addEventListener('DOMContentLoaded', () => {
         const firstInput = document.querySelector('.group-section.active input:not([type="hidden"]), .group-section.active textarea');
         if (firstInput) firstInput.focus();
 
-        // Update snippet buttons for the new group
         if (window.updateSnippetButtonsForGroup) {
             window.updateSnippetButtonsForGroup(groups[currentGroupIndex]);
         }
     }
 
     function startNewCard() {
-        // Reset form fields
+        if (isPaused) togglePause(); // Unpause if paused
+
         document.querySelectorAll('input, textarea').forEach(el => el.value = '');
         M.updateTextFields();
 
         currentGroupIndex = 0;
         cardStartTime = new Date();
         elapsedTimeElement.classList.remove('time-warning');
+        updateTaskName(); // Update task name for the new card
         displayCurrentGroup();
     }
 
     function moveToNextCardOrGroup() {
+        if (isPaused) return; // Do nothing if paused
         if (currentGroupIndex < groups.length - 1) {
             currentGroupIndex++;
             displayCurrentGroup();
         } else {
-            // Card finished, update stats
-            const cardElapsedTimeSeconds = (new Date() - cardStartTime) / 1000;
+            const cardElapsedTimeSeconds = Math.floor((new Date() - cardStartTime) / 1000);
             sessionTotalSeconds += cardElapsedTimeSeconds;
             cardCount++;
             const avgTime = sessionTotalSeconds / cardCount;
@@ -98,26 +132,52 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateElapsedTime() {
+        if (isPaused) {
+            const pauseDuration = Math.floor((new Date() - pauseStartTime) / 1000);
+            pauseTimeElement.textContent = `(休憩: ${formatTime(pauseDuration)})`;
+            const PAUSE_WARNING_THRESHOLD_SECONDS = 300; // 5 minutes
+            if (pauseDuration > PAUSE_WARNING_THRESHOLD_SECONDS) {
+                pauseTimeElement.classList.add('time-warning');
+            } else {
+                pauseTimeElement.classList.remove('time-warning');
+            }
+            return;
+        }
+
         if (!cardStartTime) return;
-        const currentTime = new Date();
-        const elapsedTime = currentTime - cardStartTime;
-        const totalSeconds = Math.floor(elapsedTime / 1000);
-        const seconds = totalSeconds % 60;
-        const minutes = Math.floor(totalSeconds / 60) % 60;
-        const hours = Math.floor(totalSeconds / 3600);
-        const formattedTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-        
-        elapsedTimeElement.textContent = `経過時間: ${formattedTime}`;
+        const totalSeconds = Math.floor((new Date() - cardStartTime) / 1000);
+        elapsedTimeElement.textContent = `経過時間: ${formatTime(totalSeconds)}`;
 
         const WARNING_THRESHOLD_SECONDS = 15;
         if (totalSeconds > WARNING_THRESHOLD_SECONDS) {
             elapsedTimeElement.classList.add('time-warning');
+        } else {
+            elapsedTimeElement.classList.remove('time-warning');
+        }
+    }
+
+    function togglePause() {
+        isPaused = !isPaused;
+        const icon = pauseButton.querySelector('i');
+        if (isPaused) {
+            pauseStartTime = new Date();
+            icon.textContent = 'play_arrow';
+            pauseTimeElement.style.display = 'inline';
+            showToast('タイマーを一時停止しました');
+        } else {
+            const pauseDuration = new Date() - pauseStartTime;
+            cardStartTime.setTime(cardStartTime.getTime() + pauseDuration);
+            icon.textContent = 'pause';
+            pauseTimeElement.style.display = 'none';
+            pauseTimeElement.classList.remove('time-warning');
+            showToast('タイマーを再開しました');
         }
     }
 
     function loadUser() {
         userEmail = localStorage.getItem('userEmail') || 'example@example.com';
         document.getElementById('user-email').textContent = `入力者: ${userEmail}`;
+        document.getElementById('modal-user-email').textContent = userEmail;
     }
 
     function validateForm() {
@@ -130,11 +190,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function processCardInput() {
+        if (isPaused) {
+            showToast('一時停止中です。再開してください。');
+            return;
+        }
         if (!validateForm()) return;
         moveToNextCardOrGroup();
     }
 
     // --- Event Listeners ---
+    pauseButton.addEventListener('click', togglePause);
     thumbnailImage.addEventListener('click', swapImages);
     document.addEventListener('keydown', (e) => {
         if (e.altKey && e.key.toLowerCase() === 'q') {
