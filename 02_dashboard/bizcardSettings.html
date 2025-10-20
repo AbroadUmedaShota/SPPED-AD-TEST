@@ -41,23 +41,6 @@
                     <h1 class="text-on-background text-2xl sm:text-3xl font-bold leading-tight tracking-tight" id="pageTitle">アンケート『[アンケート名]』の名刺データ化設定</h1>
                 </div>
 
-                <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-600 via-blue-600 to-indigo-600 p-6 text-white shadow-xl">
-                    <div class="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/10 blur-3xl"></div>
-                    <div class="absolute -bottom-24 -left-10 h-56 w-56 rounded-full bg-sky-400/20 blur-3xl"></div>
-                    <div class="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                        <div class="max-w-2xl space-y-2">
-                            <p class="text-sm uppercase tracking-[0.3em] text-white/70">Bizcard Conversion</p>
-                            <h2 class="text-xl font-semibold md:text-2xl text-white">プラン比較と見積もりを一目でチェック</h2>
-                            <p class="text-sm text-white/80 md:text-base">利用状況に合わせて名刺データ化プランを選択し、オプションの有無によって即時に見積もりを確認できます。チーム全体で共有しやすいよう、最新の料金と納期情報をまとめています。</p>
-                        </div>
-                        <div class="flex flex-col items-start gap-3 rounded-2xl bg-white/10 p-4 backdrop-blur">
-                            <span class="text-sm font-semibold uppercase tracking-widest text-white/70">リアルタイム見積もり</span>
-                            <p class="text-3xl font-bold">設定に合わせて即時更新</p>
-                            <span class="text-sm text-white/70">プラン変更やオプション選択で金額・納期が自動反映されます。</span>
-                        </div>
-                    </div>
-                </section>
-
                 <!-- アンケート基本情報表示エリア -->
                 <div class="rounded-3xl border border-outline-variant/60 bg-surface p-6 shadow-sm">
                     <h2 class="text-on-surface text-xl font-bold mb-4">アンケート基本情報</h2>
@@ -68,9 +51,9 @@
                     </div>
                 </div>
 
-                <div class="flex flex-col w-full gap-10 lg:grid lg:grid-cols-[minmax(0,1fr)_22rem] xl:grid-cols-[minmax(0,1fr)_24rem] lg:items-start lg:gap-12">
+                <div class="flex flex-col w-full gap-8 sm:gap-10 xl:gap-12">
                     <!-- 名刺データ化設定フォーム -->
-                    <section class="order-1 w-full mx-auto lg:mx-0 bg-surface p-6 rounded-3xl border border-outline-variant/60 shadow-sm backdrop-blur-xl space-y-6 lg:max-w-[48rem] xl:max-w-[54rem]">
+                    <section class="w-full bg-surface p-6 rounded-3xl border border-outline-variant/60 shadow-sm backdrop-blur-xl space-y-6">
                         <div id="bizcardSettingsFields" class="space-y-6">
 
                             <!-- データ化項目プラン -->
@@ -135,16 +118,16 @@
                     </section>
 
                     <!-- 見積もりウィンドウ -->
-                    <aside class="order-2 mt-6 lg:mt-0 lg:sticky lg:top-28 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto">
-                        <div class="rounded-3xl border border-outline-variant/60 bg-surface p-6 text-on-surface shadow-sm">
+                    <aside class="w-full">
+                        <div class="rounded-3xl border border-outline-variant/60 bg-surface p-6 text-on-surface shadow-sm space-y-5">
                             <div class="flex items-center justify-between">
                                 <h2 class="text-lg font-bold text-on-surface">名刺データ化費用見積もり</h2>
-                                <span class="inline-flex items-center gap-1 rounded-full bg-surface-variant px-3 py-1 text-sm font-semibold uppercase tracking-widest text-on-surface">
+                                <span class="inline-flex items-center gap-1 rounded-full bg-surface-variant px-3 py-1 text-sm font-semibold text-on-surface">
                                     <span class="material-icons text-base text-on-surface-variant">autorenew</span>
-                                    Auto Update
+                                    自動更新
                                 </span>
                             </div>
-                            <div class="mt-6 space-y-5">
+                            <div class="space-y-5">
                                 <div class="space-y-2">
                                     <div class="input-group">
                                         <input type="number" id="bizcardRequest" min="1" placeholder=" " class="input-field pr-10" value="100">
@@ -155,7 +138,7 @@
                                     <p id="minChargeNotice" class="text-sm text-error/90 hidden" aria-live="polite"></p>
                                 </div>
                                 <div class="rounded-2xl bg-surface-bright p-5 shadow-inner border border-outline-variant">
-                                    <p class="text-sm uppercase tracking-widest text-on-surface-variant">請求見込み金額</p>
+                                    <p class="text-sm text-on-surface-variant">請求見込み金額</p>
                                     <div id="estimatedAmount" class="mt-2 text-right text-4xl font-black tracking-tight text-on-surface">¥0</div>
                                 </div>
                                 <div class="grid gap-3 rounded-2xl bg-surface-bright p-5 border border-outline-variant">
@@ -177,6 +160,16 @@
                                     </div>
                                     <p id="couponMessage" class="text-sm text-secondary"></p>
                                     <div id="couponFeedback" class="hidden mt-1 p-2 rounded-md text-sm"></div>
+                                </div>
+                                <div class="rounded-2xl bg-surface-bright p-5 border border-outline-variant space-y-2">
+                                    <p class="text-sm font-semibold text-on-surface">対応言語</p>
+                                    <ul class="text-sm text-on-surface-variant space-y-1 list-disc pl-5">
+                                        <li>日本語</li>
+                                        <li>英語</li>
+                                        <li>中国語（繁体字・簡体字）</li>
+                                        <li>韓国語</li>
+                                    </ul>
+                                    <p class="text-xs text-on-surface-variant">その他の言語追加もご希望に合わせてご相談いただけます。</p>
                                 </div>
                             </div>
                         </div>
