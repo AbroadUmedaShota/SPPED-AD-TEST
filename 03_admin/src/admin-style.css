@@ -36,3 +36,35 @@
 body.sidebar-locked {
     overflow: hidden;
 }
+
+/* Responsive table styles for mobile */
+@media screen and (max-width: 768px) {
+    .responsive-table thead {
+        display: none;
+    }
+    .responsive-table tr {
+        display: block;
+        margin-bottom: 1rem;
+        border-radius: 0.5rem;
+        border: 1px solid #E0E0E0;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .responsive-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #E0E0E0;
+        text-align: right;
+    }
+    .responsive-table td:last-child {
+        border-bottom: none;
+    }
+    .responsive-table td::before {
+        content: attr(data-label);
+        font-weight: 500;
+        text-align: left;
+        margin-right: 1rem;
+        color: #6B6B6B;
+    }
+}
