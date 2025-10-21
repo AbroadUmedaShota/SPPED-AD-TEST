@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const snippets = {
         'グループ1': {
-            'email': ['@gmail.com', '@yahoo.co.jp', '@outlook.com', '@icloud.com', '@docomo.ne.jp', '@softbank.ne.jp', '@ezweb.ne.jp', '@au.com']
+            'email': ['@gmail.com', '@yahoo.co.jp', '@outlook.com', '@icloud.com', '.co.jp', '.com']
         },
         'グループ3': {
             'company': ['株式会社', '有限会社', '合同会社', '(株)', '(有)'],
