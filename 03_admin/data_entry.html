@@ -51,20 +51,19 @@
                             </div>
                         </div>
                     </div>
-                    <div id="kpi-personal-completed-card" class="kpi-card bg-surface p-5 rounded-xl border border-outline-variant shadow-sm cursor-pointer flex items-center gap-4">
-                        <div class="bg-purple-500 p-3 rounded-full">
-                            <span class="material-icons text-white text-3xl">person</span>
-                        </div>
-                        <div>
-                            <p class="text-on-surface-variant text-sm">個人の作業完了数</p>
-                            <p id="personal-completed-count" class="text-3xl font-bold text-on-surface">0</p>
-                            <div class="flex items-center text-sm mt-1">
-                                <span id="personal-trend-icon" class="material-icons text-green-500 text-base">trending_up</span>
-                                <span id="personal-trend-text" class="text-on-surface-variant ml-1">前日比 +3%</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                                            <div id="kpi-consistency-card" class="kpi-card bg-surface p-5 rounded-xl border border-outline-variant shadow-sm cursor-pointer flex items-center gap-4">
+                                                <div class="bg-purple-500 p-3 rounded-full">
+                                                    <span class="material-icons text-white text-3xl">fact_check</span>
+                                                </div>
+                                                <div>
+                                                    <p class="text-on-surface-variant text-sm">データ入力整合性</p>
+                                                    <p id="data-consistency-rate" class="text-3xl font-bold text-on-surface">0%</p>
+                                                    <div class="flex items-center text-sm mt-1">
+                                                        <span id="consistency-trend-icon" class="material-icons text-green-500 text-base">trending_up</span>
+                                                        <span id="consistency-trend-text" class="text-on-surface-variant ml-1">前日比 +1.2%</span>
+                                                    </div>
+                                                </div>
+                                            </div>                </div>
                 <!-- Task List -->
                 <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
                     <h2 class="text-lg font-semibold text-on-surface mb-4">タスク一覧</h2>
@@ -74,7 +73,6 @@
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-on-surface-variant uppercase tracking-wider">タスク名</th>
                                     <th class="px-6 py-3 text-center text-xs font-medium text-on-surface-variant uppercase tracking-wider">進捗</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-on-surface-variant uppercase tracking-wider">担当者数</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-on-surface-variant uppercase tracking-wider">最終更新日時</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-on-surface-variant uppercase tracking-wider"></th>
                                 </tr>

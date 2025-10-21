@@ -5,15 +5,15 @@ function renderPersonalPerformance(summary) {
     // Use real data for center-wide completions
     const centerCompletedCount = summary.completedItems;
 
-    // Dummy data for personal and average time for demonstration
-    const personalCompletedCountData = Math.floor(Math.random() * 50) + 10; // 10-60
+    // Dummy data for consistency and average time for demonstration
+    const consistencyRate = (Math.random() * 5 + 95).toFixed(1); // 95.0-100.0%
     const avgTimeSeconds = Math.floor(Math.random() * 20) + 5; // 5-25 seconds
 
     const centerCompletedEl = document.getElementById('center-completed-count');
     if (centerCompletedEl) centerCompletedEl.textContent = centerCompletedCount.toLocaleString();
 
-    const personalCompletedEl = document.getElementById('personal-completed-count');
-    if (personalCompletedEl) personalCompletedEl.textContent = personalCompletedCountData.toLocaleString();
+    const consistencyEl = document.getElementById('data-consistency-rate');
+    if (consistencyEl) consistencyEl.textContent = `${consistencyRate}%`;
 
     const personalAvgTime = document.getElementById('personal-avg-time');
     if (personalAvgTime) personalAvgTime.textContent = `${avgTimeSeconds.toFixed(1)}s`;
@@ -21,8 +21,8 @@ function renderPersonalPerformance(summary) {
     // Dummy trend data
     const centerTrend = Math.random() > 0.5 ? 'up' : 'down';
     const centerTrendValue = (Math.random() * 10).toFixed(1);
-    const personalTrend = Math.random() > 0.5 ? 'up' : 'down';
-    const personalTrendValue = (Math.random() * 15).toFixed(1);
+    const consistencyTrend = Math.random() < 0.5 ? 'up' : 'down';
+    const consistencyTrendValue = (Math.random() * 2).toFixed(1);
     const avgTimeTrend = Math.random() > 0.5 ? 'up' : 'down';
     const avgTimeTrendValue = (Math.random() * 2).toFixed(1);
 
@@ -35,13 +35,13 @@ function renderPersonalPerformance(summary) {
         centerTrendText.textContent = `前日比 ${centerTrend === 'up' ? '+' : '-'}${centerTrendValue}%`;
     }
 
-    // Update Personal Trend
-    const personalTrendIcon = document.getElementById('personal-trend-icon');
-    const personalTrendText = document.getElementById('personal-trend-text');
-    if (personalTrendIcon && personalTrendText) {
-        personalTrendIcon.textContent = personalTrend === 'up' ? 'trending_up' : 'trending_down';
-        personalTrendIcon.className = `material-icons text-base ${personalTrend === 'up' ? 'text-green-500' : 'text-red-500'}`;
-        personalTrendText.textContent = `前日比 ${personalTrend === 'up' ? '+' : '-'}${personalTrendValue}%`;
+    // Update Consistency Trend
+    const consistencyTrendIcon = document.getElementById('consistency-trend-icon');
+    const consistencyTrendText = document.getElementById('consistency-trend-text');
+    if (consistencyTrendIcon && consistencyTrendText) {
+        consistencyTrendIcon.textContent = consistencyTrend === 'up' ? 'trending_up' : 'trending_down';
+        consistencyTrendIcon.className = `material-icons text-base ${consistencyTrend === 'up' ? 'text-green-500' : 'text-red-500'}`;
+        consistencyTrendText.textContent = `前日比 ${consistencyTrend === 'up' ? '+' : '-'}${consistencyTrendValue}%`;
     }
 
     // Update Avg Time Trend
@@ -67,6 +67,7 @@ function renderPerformanceChart(type) {
     let labels = [];
     let data = [];
     let title = '';
+    let borderColor = 'rgb(75, 192, 192)';
 
     // Dummy data for the last 7 days
     for (let i = 6; i >= 0; i--) {
@@ -77,9 +78,15 @@ function renderPerformanceChart(type) {
         if (type === 'completed') {
             data.push(Math.floor(Math.random() * 30) + 20); // 20-50 completed items
             title = '過去7日間の完了件数';
+            borderColor = 'rgb(75, 192, 192)';
         } else if (type === 'avgTime') {
             data.push((Math.random() * 10 + 10).toFixed(1)); // 10-20 seconds avg time
             title = '過去7日間の平均処理時間 (秒)';
+            borderColor = 'rgb(255, 99, 132)';
+        } else if (type === 'consistency') {
+            data.push((Math.random() * 5 + 95).toFixed(1)); // 95-100%
+            title = '過去7日間のデータ入力整合性 (%)';
+            borderColor = 'rgb(153, 102, 255)';
         }
     }
 
@@ -90,7 +97,7 @@ function renderPerformanceChart(type) {
             datasets: [{
                 label: title,
                 data: data,
-                borderColor: type === 'completed' ? 'rgb(75, 192, 192)' : 'rgb(255, 99, 132)',
+                borderColor: borderColor,
                 tension: 0.1,
                 fill: false
             }]
@@ -105,7 +112,7 @@ function renderPerformanceChart(type) {
             },
             scales: {
                 y: {
-                    beginAtZero: true
+                    beginAtZero: false
                 }
             }
         }
@@ -143,7 +150,7 @@ function renderTaskTable(tasks) {
     tbody.innerHTML = ''; // Clear existing rows
 
     if (tasks.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-gray-400">表示対象のタスクはありません。</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-gray-400">表示対象のタスクはありません。</td></tr>';
         return;
     }
 
@@ -163,6 +170,14 @@ function renderTaskTable(tasks) {
             }
         };
 
+        let buttonHtml = '';
+        if (task.completed < task.total || task.id === 'admin') {
+            const destination = task.id === 'admin'
+                ? 'sample/data_entry_admin_form.html'
+                : `BY-211_オペレーター入力画面/BY-213/BY-213.html?groupId=${task.id}`;
+            buttonHtml = `<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-xs" onclick="event.stopPropagation(); window.location.href = '${destination}'">作業開始</button>`;
+        }
+
         row.innerHTML = `
             <td class="px-6 py-4 whitespace-nowrap">
                 <div class="text-sm font-medium text-on-surface">${task.name}</div>
@@ -178,10 +193,9 @@ function renderTaskTable(tasks) {
                 </div>
                 <div class="text-xs text-on-surface-variant text-center">${task.completed.toLocaleString()} / ${task.total.toLocaleString()} 件</div>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-on-surface-variant">${task.operatorCount}人</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-on-surface-variant">${new Date(task.lastUpdatedAt).toLocaleString('ja-JP')}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-right">
-                ${task.completed < task.total ? `<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-xs" onclick="event.stopPropagation(); window.location.href = 'BY-211_オペレーター入力画面/BY-213/BY-213.html?groupId=${task.id}'">作業開始</button>` : ''}
+            <td class="py-4 pl-6 pr-0 whitespace-nowrap text-sm text-on-surface-variant">${new Date(task.lastUpdatedAt).toLocaleString('ja-JP')}</td>
+            <td class="py-4 pl-2 pr-6 whitespace-nowrap text-left">
+                ${buttonHtml}
             </td>
         `;
         tbody.appendChild(row);
@@ -208,10 +222,10 @@ export async function initDataEntryPage() {
         renderPerformanceChart('avgTime');
     });
 
-    document.getElementById('kpi-personal-completed-card').addEventListener('click', () => {
-        document.getElementById('graphModalTitle').textContent = '個人の作業完了数 詳細';
+    document.getElementById('kpi-consistency-card').addEventListener('click', () => {
+        document.getElementById('graphModalTitle').textContent = 'データ入力整合性 詳細';
         document.getElementById('graphModal').classList.remove('hidden');
-        renderPerformanceChart('completed');
+        renderPerformanceChart('consistency');
     });
 
     // Event listeners to close modal

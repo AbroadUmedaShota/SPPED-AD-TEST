@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const promises = surveyFiles.map(file => fetch(`../data/demo_surveys/${file}`).then(res => res.json()));
         const results = await Promise.all(promises);
         allSurveyData = results.map(survey => {
-            const statuses = ['未着手', '作業中', '完了', 'エスカレーション'];
+            const statuses = ['会期前', '会期中', '会期中オンデマンド', '会期終了（データ化無し）', '会期終了（データ化中）', '会期終了（照合待ち）', 'エスカレ有'];
             const total = Math.floor(Math.random() * 200) + 50;
             const completed = Math.floor(Math.random() * total);
             const matchCount = Math.floor(Math.random() * (completed + 1));
@@ -71,6 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 matchCount: matchCount,
                 mismatchCount: mismatchCount,
                 progress: progress,
+                option: Math.random() > 0.5 ? '有' : '無',
             };
         });
         renderTable();
@@ -88,9 +89,10 @@ document.addEventListener('DOMContentLoaded', () => {
         paginatedData.forEach(survey => {
             const row = `
                 <tr class="hover:bg-surface-variant/60">
-                    <td class="px-4 py-3 text-on-surface truncate" title="${survey.name.ja}">${truncateString(survey.name.ja, 18)}</td>
-                    <td class="px-4 py-3 text-center"><span class="inline-flex items-center justify-center gap-1 rounded-full px-2.5 py-1 text-xs ${getStatusClass(survey.status)} whitespace-nowrap">${survey.status === 'エスカレーション' ? 'エスカレ' : survey.status}</span></td>
+                    <td class="px-4 py-3 text-on-surface truncate" title="${survey.name.ja}">${truncateString(survey.name.ja, 17)}</td>
+                    <td class="px-4 py-3 text-center"><span class="inline-flex items-center justify-center gap-1 rounded-full px-2.5 py-1 text-xs ${getStatusClass(survey.status)} whitespace-nowrap">${getShortStatus(survey.status)}</span></td>
                     <td class="px-4 py-3 text-on-surface-variant font-medium whitespace-nowrap">${survey.periodEnd}</td>
+                    <td class="px-4 py-3 text-on-surface-variant whitespace-nowrap text-center">${survey.option}</td>
                     <td class="px-4 py-3 text-on-surface-variant whitespace-nowrap">${survey.totalCount}</td>
                     <td class="px-4 py-3 text-on-surface-variant whitespace-nowrap">${survey.matchCount}</td>
                     <td class="px-4 py-3 text-on-surface-variant whitespace-nowrap">${survey.mismatchCount}</td>
@@ -151,12 +153,26 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
+    const getShortStatus = (status) => {
+        switch (status) {
+            case '会期中オンデマンド': return 'ｵﾝﾃﾞﾏﾝﾄﾞ';
+            case '会期終了（データ化無し）': return 'データ化無';
+            case '会期終了（データ化中）': return 'データ化中';
+            case '会期終了（照合待ち）': return '照合待ち';
+            case 'エスカレ有': return 'エスカレ有';
+            default: return status;
+        }
+    };
+
     const getStatusClass = (status) => {
         switch (status) {
-            case '完了': return 'bg-green-100 text-green-800';
-            case '作業中': return 'bg-blue-100 text-blue-800';
-            case 'エスカレーション': return 'bg-red-100 text-red-800';
-            case '未着手':
+            case '会期前': return 'bg-gray-100 text-gray-800';
+            case '会期中': return 'bg-blue-100 text-blue-800';
+            case '会期中オンデマンド': return 'bg-purple-100 text-purple-800';
+            case '会期終了（データ化無し）': return 'bg-green-100 text-green-800';
+            case '会期終了（データ化中）': return 'bg-yellow-100 text-yellow-800';
+            case '会期終了（照合待ち）': return 'bg-indigo-100 text-indigo-800';
+            case 'エスカレ有': return 'bg-red-100 text-red-800';
             default:
                 return 'bg-gray-100 text-gray-800';
         }
@@ -243,7 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ソートロジックの適用
         if (currentSortKey) {
-            const STATUS_ORDER = ['未着手', '作業中', '完了', 'エスカレーション'];
+            const STATUS_ORDER = ['会期前', '会期中', '会期中オンデマンド', '会期終了（データ化無し）', '会期終了（データ化中）', '会期終了（照合待ち）', 'エスカレ有'];
             filteredData.sort((a, b) => {
                 let aValue, bValue;
 
