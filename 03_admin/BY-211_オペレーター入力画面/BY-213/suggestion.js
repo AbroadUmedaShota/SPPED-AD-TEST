@@ -18,32 +18,16 @@ document.addEventListener('DOMContentLoaded', () => {
     function createSnippetButton(targetInput, text, index) {
         const button = document.createElement('a');
         button.href = '#!';
-        button.className = 'btn-small waves-effect waves-light blue-grey lighten-3';
+        button.className = 'btn-small waves-effect waves-light blue-grey lighten-3 tooltipped';
+        button.setAttribute('data-position', 'bottom');
+        button.setAttribute('data-tooltip', `Alt+${index + 1} で入力`);
         button.textContent = `[${index + 1}] ${text}`;
         button.style.textTransform = 'none';
         button.style.margin = '2px';
 
         button.addEventListener('click', (e) => {
             e.preventDefault();
-            const currentValue = targetInput.value;
-
-            if (targetInput.id === 'email') {
-                const atIndex = currentValue.indexOf('@');
-                if (text.startsWith('@') && atIndex !== -1) {
-                    targetInput.value = currentValue.substring(0, atIndex) + text;
-                } else {
-                    targetInput.value = currentValue + text;
-                }
-            } else if (targetInput.id === 'company') {
-                 if (text.startsWith('(')) {
-                     targetInput.value = text + currentValue;
-                 } else {
-                     targetInput.value = currentValue + text;
-                 }
-            } 
-            else {
-                targetInput.value = currentValue + text;
-            }
+            targetInput.value = text;
 
             M.updateTextFields();
             targetInput.focus();
@@ -102,6 +86,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // Insert after the input-field container
                 targetInput.parentElement.insertAdjacentElement('afterend', container);
+
+                // 新しく追加されたツールチップを初期化
+                const newTooltips = container.querySelectorAll('.tooltipped');
+                M.Tooltip.init(newTooltips);
             }
         }
     };
