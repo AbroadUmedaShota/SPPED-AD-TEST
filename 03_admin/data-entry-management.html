@@ -165,17 +165,17 @@
 
         <!-- レコードテーブル -->
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-outline-variant text-sm">
+            <table class="w-full divide-y divide-outline-variant text-sm">
                 <thead class="bg-surface-variant text-on-surface-variant text-xs uppercase">
                     <tr>
-                        <th class="px-4 py-3 text-left sortable-header" data-sort-key="name">アンケート名<span class="sort-icon material-icons text-base ml-1">unfold_more</span></th>
-                        <th class="px-4 py-3 text-left sortable-header" data-sort-key="status">ステータス<span class="sort-icon material-icons text-base ml-1">unfold_more</span></th>
-                        <th class="px-4 py-3 text-left sortable-header" data-sort-key="periodEnd">納品期日<span class="sort-icon material-icons text-base ml-1">unfold_more</span></th>
-                        <th class="px-4 py-3 text-left">総件数</th>
-                        <th class="px-4 py-3 text-left">一致</th>
-                        <th class="px-4 py-3 text-left">不一致</th>
-                        <th class="px-4 py-3 text-left">進捗</th>
-                        <th class="px-4 py-3 text-left">操作</th>
+                        <th class="px-4 py-3 text-left sortable-header" style="width: 25%" data-sort-key="name">アンケート名<span class="sort-icon material-icons text-base ml-1">unfold_more</span></th>
+                        <th class="px-4 py-3 text-left sortable-header whitespace-nowrap" style="width: 10%" data-sort-key="status">ステータス<span class="sort-icon material-icons text-base ml-1">unfold_more</span></th>
+                        <th class="px-4 py-3 text-left sortable-header" style="width: 15%" data-sort-key="periodEnd">納品期日<span class="sort-icon material-icons text-base ml-1">unfold_more</span></th>
+                        <th class="px-4 py-3 text-left" style="width: 8%">総件数</th>
+                        <th class="px-4 py-3 text-left" style="width: 8%">一致</th>
+                        <th class="px-4 py-3 text-left" style="width: 8%">不一致</th>
+                        <th class="px-4 py-3 text-left" style="width: 16%">進捗</th>
+                        <th class="px-4 py-3 text-left" style="width: 10%">操作</th>
                     </tr>
                 </thead>
                 <tbody id="reconciliation-table-body" class="divide-y divide-outline-variant">
