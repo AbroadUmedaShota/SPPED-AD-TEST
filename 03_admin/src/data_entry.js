@@ -1,59 +1,50 @@
-let myChart = null;
 let performanceChartInstance = null; // Chart.js インスタンスを保持
-let currentTaskTimeSeconds = 0; // 現在の作業時間を追跡
-
-// Function to format time (HH:MM:SS)
-function formatTime(totalSeconds) {
-    const seconds = totalSeconds % 60;
-    const minutes = Math.floor(totalSeconds / 60) % 60;
-    const hours = Math.floor(totalSeconds / 3600);
-    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-}
-
-// Function to update only the current time display
-function updateCurrentTimeDisplay() {
-    const personalCurrentTime = document.getElementById('personal-current-time');
-    if (personalCurrentTime) {
-        personalCurrentTime.textContent = formatTime(currentTaskTimeSeconds);
-        currentTaskTimeSeconds++; // 1秒ごとに時間を増加
-    }
-}
 
 // Function to render personal performance cards
-function renderPersonalPerformance() {
-    // Dummy data for demonstration
-    const completedCount = Math.floor(Math.random() * 50) + 10; // 10-60
-    const avgTimeSeconds = Math.floor(Math.random() * 20) + 5; // 5-25 seconds
-    const currentTaskTimeSeconds = Math.floor(Math.random() * 300) + 60; // 1-6 minutes
+function renderPersonalPerformance(summary) {
+    // Use real data for center-wide completions
+    const centerCompletedCount = summary.completedItems;
 
-    const personalCompletedCount = document.getElementById('personal-completed-count');
-    if (personalCompletedCount) personalCompletedCount.textContent = completedCount.toLocaleString();
+    // Dummy data for personal and average time for demonstration
+    const personalCompletedCountData = Math.floor(Math.random() * 50) + 10; // 10-60
+    const avgTimeSeconds = Math.floor(Math.random() * 20) + 5; // 5-25 seconds
+
+    const centerCompletedEl = document.getElementById('center-completed-count');
+    if (centerCompletedEl) centerCompletedEl.textContent = centerCompletedCount.toLocaleString();
+
+    const personalCompletedEl = document.getElementById('personal-completed-count');
+    if (personalCompletedEl) personalCompletedEl.textContent = personalCompletedCountData.toLocaleString();
 
     const personalAvgTime = document.getElementById('personal-avg-time');
     if (personalAvgTime) personalAvgTime.textContent = `${avgTimeSeconds.toFixed(1)}s`;
 
-    const personalCurrentTime = document.getElementById('personal-current-time');
-    if (personalCurrentTime) {
-        personalCurrentTime.textContent = formatTime(currentTaskTimeSeconds);
-    }
-
-    // Start the timer for current working time
-    setInterval(updateCurrentTimeDisplay, 1000);
-
     // Dummy trend data
-    const completedTrend = Math.random() > 0.5 ? 'up' : 'down';
-    const completedTrendValue = (Math.random() * 10).toFixed(1);
+    const centerTrend = Math.random() > 0.5 ? 'up' : 'down';
+    const centerTrendValue = (Math.random() * 10).toFixed(1);
+    const personalTrend = Math.random() > 0.5 ? 'up' : 'down';
+    const personalTrendValue = (Math.random() * 15).toFixed(1);
     const avgTimeTrend = Math.random() > 0.5 ? 'up' : 'down';
     const avgTimeTrendValue = (Math.random() * 2).toFixed(1);
 
-    const completedTrendIcon = document.getElementById('completed-trend-icon');
-    const completedTrendText = document.getElementById('completed-trend-text');
-    if (completedTrendIcon && completedTrendText) {
-        completedTrendIcon.textContent = completedTrend === 'up' ? 'trending_up' : 'trending_down';
-        completedTrendIcon.className = `material-icons text-base ${completedTrend === 'up' ? 'text-green-500' : 'text-red-500'}`;
-        completedTrendText.textContent = `前日比 ${completedTrend === 'up' ? '+' : '-'}${completedTrendValue}%`;
+    // Update Center Trend
+    const centerTrendIcon = document.getElementById('center-trend-icon');
+    const centerTrendText = document.getElementById('center-trend-text');
+    if (centerTrendIcon && centerTrendText) {
+        centerTrendIcon.textContent = centerTrend === 'up' ? 'trending_up' : 'trending_down';
+        centerTrendIcon.className = `material-icons text-base ${centerTrend === 'up' ? 'text-green-500' : 'text-red-500'}`;
+        centerTrendText.textContent = `前日比 ${centerTrend === 'up' ? '+' : '-'}${centerTrendValue}%`;
     }
 
+    // Update Personal Trend
+    const personalTrendIcon = document.getElementById('personal-trend-icon');
+    const personalTrendText = document.getElementById('personal-trend-text');
+    if (personalTrendIcon && personalTrendText) {
+        personalTrendIcon.textContent = personalTrend === 'up' ? 'trending_up' : 'trending_down';
+        personalTrendIcon.className = `material-icons text-base ${personalTrend === 'up' ? 'text-green-500' : 'text-red-500'}`;
+        personalTrendText.textContent = `前日比 ${personalTrend === 'up' ? '+' : '-'}${personalTrendValue}%`;
+    }
+
+    // Update Avg Time Trend
     const avgTimeTrendIcon = document.getElementById('avg-time-trend-icon');
     const avgTimeTrendText = document.getElementById('avg-time-trend-text');
     if (avgTimeTrendIcon && avgTimeTrendText) {
@@ -179,19 +170,16 @@ function renderTaskTable(tasks) {
                 <div class="text-xs text-on-surface-variant">${task.description}</div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
-                <div class="flex items-center">
+                <div class="flex items-center justify-center">
                     <div class="w-24 bg-surface-variant rounded-full h-2.5 mr-3">
                         <div class="${progressBarColorClass} h-2.5 rounded-full" style="width: ${progress}%"></div>
                     </div>
                     <span class="text-sm text-on-surface-variant">${Math.round(progress)}%</span>
                 </div>
-                <div class="text-xs text-on-surface-variant">${task.completed.toLocaleString()} / ${task.total.toLocaleString()} 件</div>
+                <div class="text-xs text-on-surface-variant text-center">${task.completed.toLocaleString()} / ${task.total.toLocaleString()} 件</div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-on-surface-variant">${task.operatorCount}人</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-on-surface-variant">${new Date(task.lastUpdatedAt).toLocaleString('ja-JP')}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-right">
-                ${task.completed < task.total ? `<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-xs" onclick="event.stopPropagation(); window.location.href = 'BY-211_オペレーター入力画面/BY-213/BY-213.html?groupId=${task.id}'">作業開始</button>` : ''}
-            </td>
         `;
         tbody.appendChild(row);
     });
@@ -201,12 +189,12 @@ export async function initDataEntryPage() {
     const data = await fetchData();
     if (!data) return; // Stop if data fetch failed
 
-    renderPersonalPerformance();
+    renderPersonalPerformance(data.summary);
     renderTaskTable(data.tasks);
 
     // Event listeners for personal performance cards to open modal
-    document.getElementById('personal-completed-count').closest('.kpi-card').addEventListener('click', () => {
-        document.getElementById('graphModalTitle').textContent = '今日の完了件数 詳細';
+    document.getElementById('center-completed-count').closest('.kpi-card').addEventListener('click', () => {
+        document.getElementById('graphModalTitle').textContent = 'センター全体の完了数 詳細';
         document.getElementById('graphModal').classList.remove('hidden');
         renderPerformanceChart('completed');
     });
@@ -217,16 +205,10 @@ export async function initDataEntryPage() {
         renderPerformanceChart('avgTime');
     });
 
-    document.getElementById('kpi-current-time-card').addEventListener('click', () => {
-        document.getElementById('graphModalTitle').textContent = '現在の作業時間 詳細';
+    document.getElementById('kpi-personal-completed-card').addEventListener('click', () => {
+        document.getElementById('graphModalTitle').textContent = '個人の作業完了数 詳細';
         document.getElementById('graphModal').classList.remove('hidden');
-        // Clear the chart area if no graph is intended
-        const chartContainer = document.getElementById('myPerformanceChart').parentNode;
-        chartContainer.innerHTML = '<canvas id="myPerformanceChart"></canvas>';
-        if (performanceChartInstance) {
-            performanceChartInstance.destroy();
-            performanceChartInstance = null;
-        }
+        renderPerformanceChart('completed');
     });
 
     // Event listeners to close modal
