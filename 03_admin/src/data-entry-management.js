@@ -14,6 +14,13 @@ document.addEventListener('DOMContentLoaded', () => {
         "sv_0001_25061.json", "sv_0001_25062.json"
     ];
 
+    const truncateString = (str, maxLength) => {
+        if (str.length > maxLength) {
+            return str.substring(0, maxLength) + '...';
+        }
+        return str;
+    };
+
     const tableBody = document.getElementById('reconciliation-table-body');
     const paginationContainer = document.getElementById('reconciliation-pagination');
     const pageInfo = document.getElementById('pageInfo');
@@ -43,6 +50,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let allSurveyData = [];
     let currentPage = 1;
     let rowsPerPage = 10;
+    let currentSortKey = 'name';
+    let currentSortDirection = 'asc';
 
     const fetchData = async () => {
         const promises = surveyFiles.map(file => fetch(`../data/demo_surveys/${file}`).then(res => res.json()));
@@ -53,6 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const completed = Math.floor(Math.random() * total);
             const matchCount = Math.floor(Math.random() * (completed + 1));
             const mismatchCount = completed - matchCount;
+            const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
             return {
                 ...survey,
                 status: statuses[Math.floor(Math.random() * statuses.length)],
@@ -60,9 +70,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 completedCount: completed,
                 matchCount: matchCount,
                 mismatchCount: mismatchCount,
+                progress: progress,
             };
         });
         renderTable();
+        setupSortListeners();
     };
 
     const renderTable = () => {
@@ -74,21 +86,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const paginatedData = filteredData.slice(start, end);
 
         paginatedData.forEach(survey => {
-            const progress = survey.totalCount > 0 ? Math.round((survey.completedCount / survey.totalCount) * 100) : 0;
             const row = `
                 <tr class="hover:bg-surface-variant/60">
-                    <td class="px-4 py-3 text-on-surface">${survey.name.ja}</td>
-                    <td class="px-4 py-3"><span class="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs ${getStatusClass(survey.status)}">${survey.status}</span></td>
-                    <td class="px-4 py-3 text-on-surface-variant">${survey.totalCount}</td>
-                    <td class="px-4 py-3 text-on-surface-variant">${survey.matchCount}</td>
-                    <td class="px-4 py-3 text-on-surface-variant">${survey.mismatchCount}</td>
-                    <td class="px-4 py-3">
+                    <td class="px-4 py-3 text-on-surface truncate" title="${survey.name.ja}">${truncateString(survey.name.ja, 18)}</td>
+                    <td class="px-4 py-3"><span class="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs ${getStatusClass(survey.status)} whitespace-nowrap">${survey.status === 'エスカレーション' ? 'エスカレ' : survey.status}</span></td>
+                    <td class="px-4 py-3 text-on-surface-variant font-medium whitespace-nowrap">${survey.periodEnd}</td>
+                    <td class="px-4 py-3 text-on-surface-variant whitespace-nowrap">${survey.totalCount}</td>
+                    <td class="px-4 py-3 text-on-surface-variant whitespace-nowrap">${survey.matchCount}</td>
+                    <td class="px-4 py-3 text-on-surface-variant whitespace-nowrap">${survey.mismatchCount}</td>
+                    <td class="px-4 py-3 whitespace-nowrap">
                         <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                            <div class="bg-blue-600 h-2.5 rounded-full" style="width: ${progress}%"></div>
+                            <div class="bg-blue-600 h-2.5 rounded-full" style="width: ${survey.progress}%"></div>
                         </div>
-                        <span class="text-xs text-on-surface-variant">${progress}%</span>
+                        <span class="text-xs text-on-surface-variant">${survey.progress}%</span>
                     </td>
-                    <td class="px-4 py-3 text-left space-x-1">
+                    <td class="px-4 py-3 text-left space-x-1 whitespace-nowrap">
                         <button class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700" title="照合作業"><span class="material-icons text-base">fact_check</span></button>
                         <button class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700" title="エスカレーション"><span class="material-icons text-base">gpp_maybe</span></button>
                         <button class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700" title="データ確認"><span class="material-icons text-base">preview</span></button>
@@ -99,6 +111,45 @@ document.addEventListener('DOMContentLoaded', () => {
             tableBody.innerHTML += row;
         });
         renderPagination(totalPages, filteredData.length);
+        updateSortIcons();
+    };
+
+    const setupSortListeners = () => {
+        document.querySelectorAll('.sortable-header').forEach(header => {
+            header.addEventListener('click', (e) => {
+                const newSortKey = e.currentTarget.dataset.sortKey;
+
+                if (currentSortKey === newSortKey) {
+                    currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+                } else {
+                    currentSortKey = newSortKey;
+                    currentSortDirection = 'asc';
+                }
+
+                currentPage = 1;
+                renderTable();
+            });
+        });
+    };
+
+    const updateSortIcons = () => {
+        document.querySelectorAll('.sortable-header').forEach(header => {
+            const key = header.dataset.sortKey;
+            const iconSpan = header.querySelector('.sort-icon');
+            const icon = iconSpan.querySelector('.material-icons');
+
+            // デフォルト状態 (薄いunfold_more)
+            iconSpan.classList.add('text-on-surface-variant/50');
+            iconSpan.classList.remove('text-primary');
+            icon.textContent = 'unfold_more';
+
+            if (key === currentSortKey) {
+                // ソートされている場合 (濃い矢印)
+                iconSpan.classList.remove('text-on-surface-variant/50');
+                iconSpan.classList.add('text-primary');
+                icon.textContent = currentSortDirection === 'asc' ? 'arrow_upward' : 'arrow_downward';
+            }
+        });
     };
 
     const getStatusClass = (status) => {
@@ -184,12 +235,40 @@ document.addEventListener('DOMContentLoaded', () => {
         const startDate = startDateInput.value;
         const endDate = endDateInput.value;
 
-        return allSurveyData.filter(survey => {
+        let filteredData = allSurveyData.filter(survey => {
             const nameMatch = survey.name.ja.toLowerCase().includes(keyword);
             const statusMatch = status === 'すべて' || survey.status === status;
             const dateMatch = (!startDate || survey.periodStart >= startDate) && (!endDate || survey.periodEnd <= endDate);
             return nameMatch && statusMatch && dateMatch;
         });
+
+        // ソートロジックの適用
+        if (currentSortKey) {
+            filteredData.sort((a, b) => {
+                let aValue, bValue;
+
+                if (currentSortKey === 'name') {
+                    aValue = a.name.ja;
+                    bValue = b.name.ja;
+                } else {
+                    aValue = a[currentSortKey];
+                    bValue = b[currentSortKey];
+                }
+
+                let comparison = 0;
+                if (typeof aValue === 'number' && typeof bValue === 'number') {
+                    comparison = aValue - bValue;
+                } else if (aValue > bValue) {
+                    comparison = 1;
+                } else if (aValue < bValue) {
+                    comparison = -1;
+                }
+
+                return currentSortDirection === 'asc' ? comparison : comparison * -1;
+            });
+        }
+
+        return filteredData;
     };
 
     const handleFilterChange = () => {
