@@ -226,16 +226,16 @@ export async function initDataEntryPage() {
 
     // Event listeners to close modal
     document.getElementById('closeGraphModal').addEventListener('click', () => {
-        document.getElementById('graphModal').style.display = 'none';
+        document.getElementById('graphModal').classList.add('hidden');
     });
     document.getElementById('modalCloseBtn').addEventListener('click', () => {
-        document.getElementById('graphModal').style.display = 'none';
+        document.getElementById('graphModal').classList.add('hidden');
     });
 
     // Close modal when clicking outside of it
     document.getElementById('graphModal').addEventListener('click', (event) => {
         if (event.target.id === 'graphModal') {
-            document.getElementById('graphModal').style.display = 'none';
+            document.getElementById('graphModal').classList.add('hidden');
         }
     });
 
