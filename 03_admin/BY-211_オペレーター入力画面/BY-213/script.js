@@ -2,8 +2,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // Manually initialize Materialize components
     const tooltips = document.querySelectorAll('.tooltipped');
     M.Tooltip.init(tooltips);
-    const modals = document.querySelectorAll('.modal:not(#suggestions-modal)');
-    M.Modal.init(modals);
+    
+    // Materializeによってvalue属性が失われる問題への対処
+    document.querySelectorAll('input[name="skip-reason"]').forEach(radio => {
+        const originalValue = radio.getAttribute('value');
+        if (originalValue) {
+            radio.value = originalValue;
+        }
+    });
+
+    // skip-modal以外のモーダルを初期化
+    const otherModals = document.querySelectorAll('.modal:not(#suggestions-modal, #skip-modal)');
+    M.Modal.init(otherModals);
 
     // Manually set width for the user profile modal to override Materialize default
     const userProfileModal = document.getElementById('user-profile-modal');
@@ -11,7 +21,21 @@ document.addEventListener('DOMContentLoaded', () => {
         userProfileModal.style.width = '560px';
     }
 
-    const skipModalInstance = M.Modal.getInstance(document.getElementById('skip-modal'));
+    // skip-modalをカスタムオプションで初期化し、開くときにリセット処理を追加
+    const skipModalElement = document.getElementById('skip-modal');
+    const skipModalInstance = M.Modal.init(skipModalElement, {
+        onOpenStart: () => {
+            // モーダルが開くときにラジオボタンと入力欄をリセット
+            document.querySelectorAll('input[name="skip-reason"]').forEach(radio => {
+                radio.checked = false;
+            });
+            document.getElementById('skip-reason-escalation-input').style.display = 'none';
+            document.getElementById('skip-reason-other-input').style.display = 'none';
+            document.getElementById('escalation-reason-text').value = ''; // Clear textarea
+            document.getElementById('other-reason-text').value = ''; // Clear textarea
+            document.getElementById('skip-reason-error').style.display = 'none';
+        }
+    });
     const suspendModalInstance = M.Modal.getInstance(document.getElementById('suspend-modal'));
 
     // --- DOM Element Selection ---
@@ -72,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateTransform() {
         if (mainImage) {
-            mainImage.style.transform = `rotate(${mainImageRotation}deg) scale(${mainImageScale})`;
+            mainImage.style.transform = `rotate(${mainImageRotation}deg) scale(${mainImageScale})`
         }
     }
 
@@ -182,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function validateForm() {
         const email = document.getElementById('email').value;
-        if (email && !/^[\s\S]+@[\s\S]+\.[\s\S]+$/.test(email)) {
+        if (email && !/^[ -￿]+@[ -￿]+\.[ -￿]+$/.test(email)) {
             showToast('有効なメールアドレスを入力してください');
             return false;
         }
@@ -302,11 +326,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Show/hide textareas based on skip reason
     document.querySelectorAll('input[name="skip-reason"]').forEach(radio => {
-        radio.addEventListener('change', function() {
+        radio.addEventListener('change', function(event) {
+            console.log('Change event fired!');
+            const checkedRadio = document.querySelector('input[name="skip-reason"]:checked');
+            console.log('Checked radio button element:', checkedRadio ? checkedRadio.outerHTML : 'No radio button checked');
+            if (checkedRadio) {
+                console.log('Checked radio button .value:', checkedRadio.value);
+                console.log('Checked radio button .getAttribute("value"):', checkedRadio.getAttribute('value'));
+            } else {
+                console.log('No radio button is checked.');
+            }
+
             const otherInput = document.getElementById('skip-reason-other-input');
             const escalationInput = document.getElementById('skip-reason-escalation-input');
-            otherInput.style.display = (this.value === 'other' && this.checked) ? 'block' : 'none';
-            escalationInput.style.display = (this.value === 'escalation' && this.checked) ? 'block' : 'none';
+
+            otherInput.style.display = 'none';
+            escalationInput.style.display = 'none';
+
+            let selectedValue = null;
+            if (checkedRadio) {
+                selectedValue = checkedRadio.value; // まずは.valueを試す
+                if (!selectedValue) { // .valueが空の場合、getAttribute('value')を試す
+                    selectedValue = checkedRadio.getAttribute('value');
+                }
+            }
+
+            if (selectedValue === 'other') {
+                otherInput.style.display = 'block';
+            } else if (selectedValue === 'escalation') {
+                escalationInput.style.display = 'block';
+            }
         });
     });
 
