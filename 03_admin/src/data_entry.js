@@ -220,8 +220,13 @@ export async function initDataEntryPage() {
     document.getElementById('kpi-current-time-card').addEventListener('click', () => {
         document.getElementById('graphModalTitle').textContent = '現在の作業時間 詳細';
         document.getElementById('graphModal').classList.remove('hidden');
-        // 現在の作業時間は折れ線グラフではないので、ここではグラフは描画しないか、別の情報を表示する
-        // renderPerformanceChart('currentTime'); // 必要であれば実装
+        // Clear the chart area if no graph is intended
+        const chartContainer = document.getElementById('myPerformanceChart').parentNode;
+        chartContainer.innerHTML = '<canvas id="myPerformanceChart"></canvas>';
+        if (performanceChartInstance) {
+            performanceChartInstance.destroy();
+            performanceChartInstance = null;
+        }
     });
 
     // Event listeners to close modal
