@@ -143,7 +143,7 @@ function renderTaskTable(tasks) {
     tbody.innerHTML = ''; // Clear existing rows
 
     if (tasks.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-gray-400">表示対象のタスクはありません。</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-gray-400">表示対象のタスクはありません。</td></tr>';
         return;
     }
 
@@ -180,6 +180,9 @@ function renderTaskTable(tasks) {
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-on-surface-variant">${task.operatorCount}人</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-on-surface-variant">${new Date(task.lastUpdatedAt).toLocaleString('ja-JP')}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-right">
+                ${task.completed < task.total ? `<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-xs" onclick="event.stopPropagation(); window.location.href = 'BY-211_オペレーター入力画面/BY-213/BY-213.html?groupId=${task.id}'">作業開始</button>` : ''}
+            </td>
         `;
         tbody.appendChild(row);
     });
