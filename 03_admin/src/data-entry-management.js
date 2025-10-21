@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const row = `
                 <tr class="hover:bg-surface-variant/60">
                     <td class="px-4 py-3 text-on-surface truncate" title="${survey.name.ja}">${truncateString(survey.name.ja, 18)}</td>
-                    <td class="px-4 py-3"><span class="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs ${getStatusClass(survey.status)} whitespace-nowrap">${survey.status === 'エスカレーション' ? 'エスカレ' : survey.status}</span></td>
+                    <td class="px-4 py-3 text-center"><span class="inline-flex items-center justify-center gap-1 rounded-full px-2.5 py-1 text-xs ${getStatusClass(survey.status)} whitespace-nowrap">${survey.status === 'エスカレーション' ? 'エスカレ' : survey.status}</span></td>
                     <td class="px-4 py-3 text-on-surface-variant font-medium whitespace-nowrap">${survey.periodEnd}</td>
                     <td class="px-4 py-3 text-on-surface-variant whitespace-nowrap">${survey.totalCount}</td>
                     <td class="px-4 py-3 text-on-surface-variant whitespace-nowrap">${survey.matchCount}</td>
@@ -136,18 +136,17 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.sortable-header').forEach(header => {
             const key = header.dataset.sortKey;
             const iconSpan = header.querySelector('.sort-icon');
-            const icon = iconSpan.querySelector('.material-icons');
 
             // デフォルト状態 (薄いunfold_more)
             iconSpan.classList.add('text-on-surface-variant/50');
             iconSpan.classList.remove('text-primary');
-            icon.textContent = 'unfold_more';
+            iconSpan.textContent = 'unfold_more';
 
             if (key === currentSortKey) {
                 // ソートされている場合 (濃い矢印)
                 iconSpan.classList.remove('text-on-surface-variant/50');
                 iconSpan.classList.add('text-primary');
-                icon.textContent = currentSortDirection === 'asc' ? 'arrow_upward' : 'arrow_downward';
+                iconSpan.textContent = currentSortDirection === 'asc' ? 'arrow_upward' : 'arrow_downward';
             }
         });
     };
@@ -244,19 +243,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ソートロジックの適用
         if (currentSortKey) {
+            const STATUS_ORDER = ['未着手', '作業中', '完了', 'エスカレーション'];
             filteredData.sort((a, b) => {
                 let aValue, bValue;
 
                 if (currentSortKey === 'name') {
-                    aValue = a.name.ja;
-                    bValue = b.name.ja;
+                    aValue = (a.name && a.name.ja) ? a.name.ja : '';
+                    bValue = (b.name && b.name.ja) ? b.name.ja : '';
                 } else {
                     aValue = a[currentSortKey];
                     bValue = b[currentSortKey];
                 }
 
                 let comparison = 0;
-                if (typeof aValue === 'number' && typeof bValue === 'number') {
+                
+                if (currentSortKey === 'status') {
+                    const aIndex = STATUS_ORDER.indexOf(aValue);
+                    const bIndex = STATUS_ORDER.indexOf(bValue);
+                    comparison = aIndex - bIndex;
+                } else if (currentSortKey === 'periodEnd') {
+                    // Convert YYYY-MM-DD to YYYYMMDD for numerical comparison
+                    const aDate = parseInt(aValue ? aValue.replace(/-/g, '') : '0');
+                    const bDate = parseInt(bValue ? bValue.replace(/-/g, '') : '0');
+                    comparison = aDate - bDate;
+                } else if (typeof aValue === 'number' && typeof bValue === 'number') {
                     comparison = aValue - bValue;
                 } else if (aValue > bValue) {
                     comparison = 1;

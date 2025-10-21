@@ -12,6 +12,14 @@
     <link rel="stylesheet" href="src/admin-style.css">
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
     <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+    <style>
+        .sortable-header {
+            cursor: pointer;
+        }
+        .sortable-header .sort-icon {
+            vertical-align: middle;
+        }
+    </style>
 </head>
 <body class="bg-background text-on-background">
 <div class="relative flex min-h-screen flex-col overflow-x-hidden">
@@ -160,8 +168,9 @@
             <table class="min-w-full divide-y divide-outline-variant text-sm">
                 <thead class="bg-surface-variant text-on-surface-variant text-xs uppercase">
                     <tr>
-                        <th class="px-4 py-3 text-left">アンケート名</th>
-                        <th class="px-4 py-3 text-left">ステータス</th>
+                        <th class="px-4 py-3 text-left sortable-header" data-sort-key="name">アンケート名<span class="sort-icon material-icons text-base ml-1">unfold_more</span></th>
+                        <th class="px-4 py-3 text-left sortable-header" data-sort-key="status">ステータス<span class="sort-icon material-icons text-base ml-1">unfold_more</span></th>
+                        <th class="px-4 py-3 text-left sortable-header" data-sort-key="periodEnd">納品期日<span class="sort-icon material-icons text-base ml-1">unfold_more</span></th>
                         <th class="px-4 py-3 text-left">総件数</th>
                         <th class="px-4 py-3 text-left">一致</th>
                         <th class="px-4 py-3 text-left">不一致</th>
