@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const promises = surveyFiles.map(file => fetch(`../data/demo_surveys/${file}`).then(res => res.json()));
         const results = await Promise.all(promises);
         allSurveyData = results.map(survey => {
-            const statuses = ['会期前', '会期中', '会期中オンデマンド', '会期終了（データ化無し）', '会期終了（データ化中）', '会期終了（照合待ち）', 'エスカレ有'];
+            const statuses = ['会期前', '会期中', '会期中オンデマンド', '会期終了（データ化無し）', '会期終了（データ化中）', '会期終了（照合待ち）', 'エスカレ'];
             const total = Math.floor(Math.random() * 200) + 50;
             const completed = Math.floor(Math.random() * total);
             const matchCount = Math.floor(Math.random() * (completed + 1));
@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
             case '会期終了（データ化無し）': return 'データ化無';
             case '会期終了（データ化中）': return 'データ化中';
             case '会期終了（照合待ち）': return '照合待ち';
-            case 'エスカレ有': return 'エスカレ有';
+
             default: return status;
         }
     };
@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
             case '会期終了（データ化無し）': return 'bg-green-100 text-green-800';
             case '会期終了（データ化中）': return 'bg-yellow-100 text-yellow-800';
             case '会期終了（照合待ち）': return 'bg-indigo-100 text-indigo-800';
-            case 'エスカレ有': return 'bg-red-100 text-red-800';
+            case 'エスカレ': return 'bg-red-100 text-red-800';
             default:
                 return 'bg-gray-100 text-gray-800';
         }
@@ -259,7 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ソートロジックの適用
         if (currentSortKey) {
-            const STATUS_ORDER = ['会期前', '会期中', '会期中オンデマンド', '会期終了（データ化無し）', '会期終了（データ化中）', '会期終了（照合待ち）', 'エスカレ有'];
+            const STATUS_ORDER = ['会期前', '会期中', '会期中オンデマンド', '会期終了（データ化無し）', '会期終了（データ化中）', '会期終了（照合待ち）', 'エスカレ'];
             filteredData.sort((a, b) => {
                 let aValue, bValue;
 

@@ -21,6 +21,7 @@
         #next-action-modal .modal-footer {
             text-align: right;
         }
+
     </style>
 </head>
 <body>
@@ -263,43 +264,29 @@
         </div>
       
         <div id="skip-modal" class="modal">
-          <div class="modal-header">
-            <i class="material-icons">skip_next</i>
-            <h4>スキップ理由</h4>
-          </div>
-          <div class="modal-content">
-            <p>スキップする理由を選択してください。</p>
-            <div class="radio-group">
-              <p>
-                <label><input type="radio" name="skip-reason" value="not-card"><span class="grey-text text-darken-3">名刺ではない</span></label>
-              </p>
-              <p>
-                <label><input type="radio" name="skip-reason" value="other-language"><span class="grey-text text-darken-3">対応言語外</span></label>
-              </p>
-              <p>
-                <label><input type="radio" name="skip-reason" value="escalation"><span class="grey-text text-darken-3">エスカレーション</span></label>
-              </p>
-              <p>
-                <label><input type="radio" name="skip-reason" value="other"><span class="grey-text text-darken-3">その他</span></label>
-              </p>
-            </div>
-            <p id="skip-reason-error" class="red-text" style="display: none; margin-top: 10px;">スキップ理由を選択してください。</p>
-            
-            <div class="input-field" id="skip-reason-escalation-input" style="display: none; margin-top: 15px;">
-              <textarea id="escalation-reason-text" class="materialize-textarea"></textarea>
-              <label for="escalation-reason-text">エスカレーション理由を具体的に入力してください</label>
-            </div>
-      
-            <div class="input-field" id="skip-reason-other-input" style="display: none; margin-top: 15px;">
-              <textarea id="other-reason-text" class="materialize-textarea"></textarea>
-              <label for="other-reason-text">理由を具体的に入力してください</label>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <a href="#!" id="cancel-skip-button" class="modal-close waves-effect waves-green btn-flat">キャンセル</a>
-            <a href="#!" id="confirm-skip-button" class="waves-effect waves-light btn red lighten-1">スキップ実行</a>
-          </div>
+    <div class="modal-content">
+        <h4>スキップ理由</h4>
+        <p>スキップする理由を選択してください。</p>
+        
+        <div id="skip-reason-options">
+            <div><label><input name="skip_reason_group" type="radio" value="not_card" /><span>名刺ではない</span></label></div>
+            <div><label><input name="skip_reason_group" type="radio" value="unsupported_language" /><span>対応言語外</span></label></div>
+            <div><label><input name="skip_reason_group" type="radio" value="escalation" /><span>エスカレーション</span></label></div>
+            <div><label><input name="skip_reason_group" type="radio" value="other" /><span>その他</span></label></div>
         </div>
+
+        <!-- Shared Reason Textarea -->
+        <div class="input-field" id="shared-reason-container" style="margin-top: 20px;">
+            <textarea id="shared-reason-input" class="materialize-textarea" disabled></textarea>
+            <label for="shared-reason-input">理由</label>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <a href="#!" class="modal-close waves-effect btn-flat">キャンセル</a>
+        <a href="#!" id="confirm-skip-btn" class="waves-effect waves-light btn red">スキップ実行</a>
+    </div>
+</div>
       
         <div id="suspend-modal" class="modal">
           <div class="modal-header">
