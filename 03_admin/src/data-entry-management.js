@@ -14,12 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
         "sv_0001_25061.json", "sv_0001_25062.json"
     ];
 
-    const truncateString = (str, maxLength) => {
-        if (str.length > maxLength) {
-            return str.substring(0, maxLength) + '...';
-        }
-        return str;
-    };
 
     const tableBody = document.getElementById('reconciliation-table-body');
     const paginationContainer = document.getElementById('reconciliation-pagination');
@@ -89,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
         paginatedData.forEach(survey => {
             const row = `
                 <tr class="hover:bg-surface-variant/60">
-                    <td class="px-4 py-3 text-on-surface truncate" title="${survey.name.ja}">${truncateString(survey.name.ja, 17)}</td>
+                    <td class="px-4 py-3 text-on-surface truncate" title="${survey.name.ja}" style="width: 250px; max-width: 250px;">${survey.name.ja}</td>
                     <td class="px-4 py-3 text-center"><span class="inline-flex items-center justify-center gap-1 rounded-full px-2.5 py-1 text-xs ${getStatusClass(survey.status)} whitespace-nowrap">${getShortStatus(survey.status)}</span></td>
                     <td class="px-4 py-3 text-on-surface-variant font-medium whitespace-nowrap">${survey.periodEnd}</td>
                     <td class="px-4 py-3 text-on-surface-variant whitespace-nowrap text-center">${survey.option}</td>
@@ -302,7 +296,10 @@ document.addEventListener('DOMContentLoaded', () => {
         renderTable();
     };
 
-    rowsPerPageSelect.addEventListener('change', handleFilterChange);
+    rowsPerPageSelect.addEventListener('change', (e) => {
+        rowsPerPage = parseInt(e.target.value, 10);
+        handleFilterChange();
+    });
     keywordInput.addEventListener('input', handleFilterChange);
     statusInput.addEventListener('change', handleFilterChange);
     startDateInput.addEventListener('change', handleFilterChange);

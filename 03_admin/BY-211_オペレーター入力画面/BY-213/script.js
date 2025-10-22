@@ -228,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const handleChange = () => {
                 const selectedValue = skipModalEl.querySelector('input[name="skip_reason_group"]:checked')?.value;
                 const sharedInput = skipModalEl.querySelector('#shared-reason-input');
-                const shouldBeDisabled = !(selectedValue === 'escalation' || selectedValue === 'other');
+                const shouldBeDisabled = false; // Always enable the textarea
 
                 if (shouldBeDisabled) {
                     sharedInput.setAttribute('disabled', 'disabled');
