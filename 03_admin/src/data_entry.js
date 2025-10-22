@@ -31,7 +31,7 @@ function renderPersonalPerformance(summary) {
     const centerTrendText = document.getElementById('center-trend-text');
     if (centerTrendIcon && centerTrendText) {
         centerTrendIcon.textContent = centerTrend === 'up' ? 'trending_up' : 'trending_down';
-        centerTrendIcon.className = `material-icons text-base ${centerTrend === 'up' ? 'text-green-500' : 'text-red-500'}`;
+        centerTrendIcon.className = `material-icons text-base ${centerTrend === 'up' ? 'text-green-500 dark:text-green-400' : 'text-red-500 dark:text-red-400'}`;
         centerTrendText.textContent = `前日比 ${centerTrend === 'up' ? '+' : '-'}${centerTrendValue}%`;
     }
 
@@ -40,7 +40,7 @@ function renderPersonalPerformance(summary) {
     const consistencyTrendText = document.getElementById('consistency-trend-text');
     if (consistencyTrendIcon && consistencyTrendText) {
         consistencyTrendIcon.textContent = consistencyTrend === 'up' ? 'trending_up' : 'trending_down';
-        consistencyTrendIcon.className = `material-icons text-base ${consistencyTrend === 'up' ? 'text-green-500' : 'text-red-500'}`;
+        consistencyTrendIcon.className = `material-icons text-base ${consistencyTrend === 'up' ? 'text-green-500 dark:text-green-400' : 'text-red-500 dark:text-red-400'}`;
         consistencyTrendText.textContent = `前日比 ${consistencyTrend === 'up' ? '+' : '-'}${consistencyTrendValue}%`;
     }
 
@@ -49,7 +49,7 @@ function renderPersonalPerformance(summary) {
     const avgTimeTrendText = document.getElementById('avg-time-trend-text');
     if (avgTimeTrendIcon && avgTimeTrendText) {
         avgTimeTrendIcon.textContent = avgTimeTrend === 'up' ? 'trending_up' : 'trending_down';
-        avgTimeTrendIcon.className = `material-icons text-base ${avgTimeTrend === 'up' ? 'text-red-500' : 'text-green-500'}`;
+        avgTimeTrendIcon.className = `material-icons text-base ${avgTimeTrend === 'up' ? 'text-red-500 dark:text-red-400' : 'text-green-500 dark:text-green-400'}`;
         avgTimeTrendText.textContent = `前日比 ${avgTimeTrend === 'up' ? '+' : '-'}${avgTimeTrendValue}s`;
     }
 }
@@ -154,11 +154,21 @@ function renderTaskTable(tasks) {
         return;
     }
 
+    const statuses = [
+        { text: '未着手', color: 'text-gray-500 dark:text-gray-400' },
+        { text: '作業中', color: 'text-blue-600 dark:text-blue-400' },
+        { text: '保留', color: 'text-yellow-600 dark:text-yellow-400' },
+        { text: '完了', color: 'text-green-600 dark:text-green-400' }
+    ];
+
     tasks.forEach(task => {
         const progress = task.total > 0 ? (task.completed / task.total) * 100 : 0;
-        const progressBarColorClass = progress === 100 ? 'bg-green-500' : 'bg-blue-500';
-        const statusText = progress === 100 ? '完了' : (task.completed > 0 ? '作業中' : '未着手');
-        const statusColorClass = progress === 100 ? 'text-green-600' : (task.completed > 0 ? 'text-blue-600' : 'text-gray-500');
+        const progressBarColorClass = progress === 100 ? 'bg-green-500 dark:bg-green-600' : 'bg-blue-500 dark:bg-blue-600';
+        
+        // Select a random status for mock purposes
+        const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+        const statusText = randomStatus.text;
+        const statusColorClass = randomStatus.color;
 
         const row = document.createElement('tr');
         row.className = 'hover:bg-surface-variant cursor-pointer';
@@ -175,7 +185,7 @@ function renderTaskTable(tasks) {
             const destination = task.id === 'admin'
                 ? 'sample/data_entry_admin_form.html'
                 : `BY-211_オペレーター入力画面/BY-213/BY-213.html?groupId=${task.id}`;
-            buttonHtml = `<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-xs" onclick="event.stopPropagation(); window.location.href = '${destination}'">作業開始</button>`;
+            buttonHtml = `<button class="bg-blue-500 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-xs" onclick="event.stopPropagation(); window.location.href = '${destination}'">作業開始</button>`;
         }
 
         row.innerHTML = `

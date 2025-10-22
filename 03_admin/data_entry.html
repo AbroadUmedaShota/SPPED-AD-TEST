@@ -26,7 +26,7 @@
                 <!-- Personal Performance Cards -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
                     <div class="kpi-card bg-surface p-5 rounded-xl border border-outline-variant shadow-sm cursor-pointer flex items-center gap-4">
-                        <div class="bg-blue-500 p-3 rounded-full">
+                        <div class="bg-blue-500 dark:bg-blue-600 p-3 rounded-full">
                             <span class="material-icons text-white text-3xl">check_circle</span>
                         </div>
                         <div>
@@ -39,7 +39,7 @@
                         </div>
                     </div>
                     <div class="kpi-card bg-surface p-5 rounded-xl border border-outline-variant shadow-sm cursor-pointer flex items-center gap-4">
-                        <div class="bg-green-500 p-3 rounded-full">
+                        <div class="bg-green-500 dark:bg-green-600 p-3 rounded-full">
                             <span class="material-icons text-white text-3xl">timer</span>
                         </div>
                         <div>
@@ -52,7 +52,7 @@
                         </div>
                     </div>
                                             <div id="kpi-consistency-card" class="kpi-card bg-surface p-5 rounded-xl border border-outline-variant shadow-sm cursor-pointer flex items-center gap-4">
-                                                <div class="bg-purple-500 p-3 rounded-full">
+                                                <div class="bg-purple-500 dark:bg-purple-600 p-3 rounded-full">
                                                     <span class="material-icons text-white text-3xl">fact_check</span>
                                                 </div>
                                                 <div>
@@ -65,7 +65,7 @@
                                                 </div>
                                             </div>                </div>
                 <!-- Task List -->
-                <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+                <div class="bg-surface rounded-xl border border-outline-variant shadow-sm">
                     <h2 class="text-lg font-semibold text-on-surface mb-4">タスク一覧</h2>
                     <div class="overflow-x-auto">
                         <table class="min-w-full">
@@ -95,7 +95,7 @@
 
 <!-- Graph Modal -->
 <div id="graphModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
-    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-surface text-on-surface">
         <div class="flex justify-between items-center pb-3">
             <h3 class="text-lg font-bold text-gray-900" id="graphModalTitle">個人実績詳細</h3>
             <button class="text-gray-400 hover:text-gray-600" id="closeGraphModal">
@@ -106,7 +106,7 @@
             <canvas id="myPerformanceChart"></canvas>
         </div>
         <div class="items-center px-4 py-3">
-            <button id="modalCloseBtn" class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
+            <button id="modalCloseBtn" class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md shadow-soft hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
                 閉じる
             </button>
         </div>
