@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    function createSnippetButton(targetInput, text, index) {
+    function createSnippetButton(targetInput, text, index, allSuggestions) {
         const button = document.createElement('a');
         button.href = '#!';
         button.className = 'btn-small waves-effect waves-light blue-grey lighten-3 tooltipped';
@@ -27,7 +27,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
         button.addEventListener('click', (e) => {
             e.preventDefault();
-            targetInput.value = text;
+            
+            let currentValue = targetInput.value;
+            let replaced = false;
+
+            if (allSuggestions && allSuggestions.length > 0) {
+                for (const suggestionToFind of allSuggestions) {
+                    if (currentValue.endsWith(suggestionToFind)) {
+                        // Replace the ending suggestion with the new one
+                        const baseValue = currentValue.substring(0, currentValue.length - suggestionToFind.length);
+                        targetInput.value = baseValue + text;
+                        replaced = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!replaced) {
+                // If no existing suggestion was found at the end, append the new one
+                targetInput.value += text;
+            }
 
             M.updateTextFields();
             targetInput.focus();
@@ -57,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 container.style.padding = '10px 0';
 
                 suggestions.forEach((text, index) => {
-                    const button = createSnippetButton(targetInput, text, index);
+                    const button = createSnippetButton(targetInput, text, index, suggestions);
                     container.appendChild(button);
                 });
 
