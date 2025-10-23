@@ -65,3 +65,21 @@ body.dark-mode #graphModal #modalCloseBtn {
 body.dark-mode #graphModal #modalCloseBtn:hover {
     background-color: var(--color-button-primary-hover-bg);
 }
+
+/* Dark Mode Calendar Colors */
+.dark-mode .bg-yellow-200 {
+    background-color: #713f12; /* amber-800 */
+}
+.dark-mode .bg-blue-200 {
+    background-color: #1e3a8a; /* blue-900 */
+}
+.dark-mode .bg-red-200 {
+    background-color: #7f1d1d; /* red-900 */
+}
+
+/* Adjust text color for readability on the new dark backgrounds */
+.dark-mode .bg-yellow-200 .text-on-surface-variant,
+.dark-mode .bg-blue-200 .text-on-surface-variant,
+.dark-mode .bg-red-200 .text-on-surface-variant {
+    color: #d1d5db; /* gray-300 */
+}

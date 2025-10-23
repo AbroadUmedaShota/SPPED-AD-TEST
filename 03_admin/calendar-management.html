@@ -92,8 +92,8 @@
                         </div>
                     </div>
                     <section class="grid gap-6 md:grid-cols-2">
-                        <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm" aria-label="休業日一覧">
-                            <div class="flex justify-between items-center mb-4">
+                        <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm flex flex-col h-96" aria-label="休業日一覧">
+                            <div class="flex justify-between items-center mb-4 flex-shrink-0">
                                 <h2 class="text-title-large font-semibold text-on-surface">休業日の個別設定</h2>
                                 <div class="flex items-center gap-2">
                                     <button id="setting-prev-button" class="inline-flex items-center justify-center rounded-full border border-outline size-8" aria-label="前のページへ"><span class="material-icons text-base">chevron_left</span></button>
@@ -101,12 +101,12 @@
                                     <button id="setting-next-button" class="inline-flex items-center justify-center rounded-full border border-outline size-8" aria-label="次のページへ"><span class="material-icons text-base">chevron_right</span></button>
                                 </div>
                             </div>
-                            <ul id="manual-settings-list" class="space-y-2 text-sm text-on-surface-variant">
+                            <ul id="manual-settings-list" class="space-y-2 text-sm text-on-surface-variant flex-grow min-h-0 overflow-y-auto pr-2">
                                 <!-- Manual settings will be injected here by JavaScript -->
                             </ul>
                         </div>
-                        <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm" aria-label="操作ログ">
-                            <div class="flex justify-between items-center mb-4">
+                        <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm flex flex-col h-96" aria-label="操作ログ">
+                            <div class="flex justify-between items-center mb-4 flex-shrink-0">
                                 <h2 class="text-title-large font-semibold text-on-surface">更新ログ</h2>
                                 <div class="flex items-center gap-2">
                                     <button id="log-prev-button" class="inline-flex items-center justify-center rounded-full border border-outline size-8" aria-label="前のページへ"><span class="material-icons text-base">chevron_left</span></button>
@@ -114,7 +114,7 @@
                                     <button id="log-next-button" class="inline-flex items-center justify-center rounded-full border border-outline size-8" aria-label="次のページへ"><span class="material-icons text-base">chevron_right</span></button>
                                 </div>
                             </div>
-                            <ol id="update-log-list" class="space-y-2 text-sm text-on-surface-variant">
+                            <ol id="update-log-list" class="space-y-2 text-sm text-on-surface-variant flex-grow min-h-0 overflow-y-auto pr-2">
                                 <!-- Update logs will be injected here by JavaScript -->
                             </ol>
                         </div>
@@ -146,8 +146,11 @@
                     <button id="tab-btn-settings" class="tab-button shrink-0 border-b-2 border-primary px-1 py-3 text-sm font-medium text-primary" aria-current="page">
                         個別設定
                     </button>
-                    <button id="tab-btn-assignment" class="tab-button shrink-0 border-b-2 border-transparent px-1 py-3 text-sm font-medium text-on-surface-variant hover:border-gray-300 hover:text-on-surface">
-                        入力作業
+                    <button id="tab-btn-survey-details" class="tab-button shrink-0 border-b-2 border-transparent px-1 py-3 text-sm font-medium text-on-surface-variant hover:border-gray-300 hover:text-on-surface">
+                        アンケート詳細
+                    </button>
+                    <button id="tab-btn-reassign" class="tab-button shrink-0 border-b-2 border-transparent px-1 py-3 text-sm font-medium text-on-surface-variant hover:border-gray-300 hover:text-on-surface">
+                        アサイン
                     </button>
                 </nav>
             </div>
@@ -187,7 +190,21 @@
                     </div>
                 </form>
             </div>
-            <div id="tab-content-assignment" class="tab-content hidden py-4">
+            <div id="tab-content-survey-details" class="tab-content hidden py-4">
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h4 class="text-title-medium font-semibold text-on-surface">対象アンケート</h4>
+                        <button id="toggle-day-urgency-button" class="text-white text-xs font-bold py-1 px-2 rounded"></button>
+                    </div>
+                    <div id="assignment-surveys-list" class="space-y-3 max-h-60 overflow-y-auto pr-2">
+                        <!-- Survey items will be injected here by JavaScript -->
+                    </div>
+                </div>
+                <div class="flex justify-end gap-2 mt-6">
+                    <button type="button" id="close-assignment-tab-button" class="rounded-lg border border-outline px-4 py-2 text-sm font-semibold">閉じる</button>
+                </div>
+            </div>
+            <div id="tab-content-reassign" class="tab-content hidden py-4">
                 <form id="assignment-form">
                     <div class="space-y-4">
                         <div>
@@ -201,7 +218,7 @@
                     </div>
                     <div class="flex justify-end gap-2 mt-6">
                         <button type="button" id="cancel-assignment-button" class="rounded-lg border border-outline px-4 py-2 text-sm font-semibold">キャンセル</button>
-                        <button type="submit" id="save-assignment-button" class="rounded-lg bg-primary text-on-primary px-4 py-2 text-sm font-semibold">                        完了</button>
+                        <button type="submit" id="save-assignment-button" class="rounded-lg bg-primary text-on-primary px-4 py-2 text-sm font-semibold">完了</button>
                     </div>
                 </form>
             </div>
@@ -214,6 +231,9 @@
     <div id="confirmation-modal-container" class="relative bg-surface rounded-xl shadow-xl w-full max-w-lg m-4 p-6 text-center transform transition-all opacity-0 -translate-y-4">
         <h3 id="confirmation-modal-title" class="text-title-large font-semibold text-on-surface mb-4">完了</h3>
         <p id="confirmation-modal-message" class="text-on-surface-variant mb-6"></p>
+        <div class="mt-6">
+            <button type="button" id="close-confirmation-modal-button" class="rounded-lg bg-primary text-on-primary px-6 py-2 text-sm font-semibold">閉じる</button>
+        </div>
     </div>
 </div>
 

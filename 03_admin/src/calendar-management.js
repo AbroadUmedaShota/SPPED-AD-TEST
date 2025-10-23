@@ -11,6 +11,9 @@ export function initCalendarManagementPage() {
         logCurrentPage: 1,
         logItemsPerPage: 7,
         settingToDeleteId: null,
+        urgencyOverrides: {},
+        assignmentOverrides: {},
+        currentModalDate: null,
     };
 
     // Declare variables for DOM elements
@@ -76,22 +79,36 @@ export function initCalendarManagementPage() {
 
             let cellClasses = 'border border-outline-variant rounded-lg min-h-[120px] p-2 cursor-pointer hover:bg-surface-variant/60 relative';
             let cellTitle = '';
+            let dayInfoHTML = '';
 
-            // --- Survey Period Highlighting ---
+            // --- Survey Period Highlighting & Info ---
             const surveysForDay = getSurveysForDay(dateString);
-            if (surveysForDay.length > 0) {
-                cellClasses += ' bg-blue-100'; // Apply a light background highlight
-                const surveyTitles = surveysForDay.map(s => `${s.name} (${s.startDate} - ${s.endDate})`).join('\n');
-                cellTitle = surveyTitles;
+            const isUrgent = state.urgencyOverrides[dateString];
+            const dayAssignments = state.assignmentOverrides[dateString];
 
-                surveysForDay.forEach(survey => {
-                    if (survey.startDate === dateString) {
-                        cellClasses += ' border-l-4 border-l-primary';
+            if (isUrgent) {
+                cellClasses += ' bg-red-200'; // Red for high urgency
+            }
+
+            if (surveysForDay.length > 0) {
+                const totalCards = surveysForDay.reduce((sum, survey) => sum + (survey.expected_cards || 0), 0);
+                dayInfoHTML = `
+                <div class="mt-1 text-xs text-on-surface-variant">
+                    <p>件数: ${surveysForDay.length}</p>
+                    <p>見込枚数: ${totalCards.toLocaleString()}</p>
+                </div>
+            `;
+
+                if (!isUrgent) {
+                    if (dayAssignments && dayAssignments.surveyIds.length > 0) {
+                        cellClasses += ' bg-blue-200'; // Blue for assigned day
+                    } else {
+                        cellClasses += ' bg-yellow-200'; // Yellow for unassigned survey period
                     }
-                    if (survey.endDate === dateString) {
-                        cellClasses += ' border-r-4 border-r-primary';
-                    }
-                });
+                }
+                
+                const surveyTitles = surveysForDay.map(s => s.name).join(', ');
+                cellTitle = surveyTitles;
             }
 
             dayCell.className = cellClasses;
@@ -122,13 +139,6 @@ export function initCalendarManagementPage() {
                 ${reason ? `<p class="text-xs text-on-surface-variant mt-1 truncate">${reason}</p>` : ''}
             `;
 
-            // --- Build Surveys HTML ---
-            let surveysHTML = '<div class="mt-1 space-y-1">';
-            surveysForDay.forEach(survey => {
-                surveysHTML += `<div class="text-xs text-gray-700 truncate" title="${survey.name}">${survey.name}</div>`;
-            });
-            surveysHTML += '</div>';
-
             // --- Set Final Cell HTML ---
             let textColor = 'text-on-surface';
             if (date.getDay() === 0) textColor = 'text-error';
@@ -142,7 +152,7 @@ export function initCalendarManagementPage() {
                 <div class="mt-1">
                     ${holidayStatusHTML}
                 </div>
-                ${surveysHTML}
+                ${dayInfoHTML}
             `;
             
             calendarGrid.appendChild(dayCell);
@@ -158,10 +168,13 @@ export function initCalendarManagementPage() {
 
     function renderManualSettings() {
         manualSettingsList.innerHTML = '';
-        const totalPages = Math.ceil(state.manualSettings.length / state.manualSettingsItemsPerPage);
+        
+        const sortedSettings = state.manualSettings.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+        const totalPages = Math.ceil(sortedSettings.length / state.manualSettingsItemsPerPage);
         settingPageInfo.textContent = `${state.manualSettingsCurrentPage} / ${totalPages || 1}`;
 
-        if (state.manualSettings.length === 0) {
+        if (sortedSettings.length === 0) {
             manualSettingsList.innerHTML = '<li>個別設定はありません。</li>';
             settingPrevButton.disabled = true;
             settingNextButton.disabled = true;
@@ -170,17 +183,35 @@ export function initCalendarManagementPage() {
 
         const start = (state.manualSettingsCurrentPage - 1) * state.manualSettingsItemsPerPage;
         const end = start + state.manualSettingsItemsPerPage;
-        const pageItems = state.manualSettings.slice(start, end);
+        const pageItems = sortedSettings.slice(start, end);
 
         pageItems.forEach(setting => {
             const li = document.createElement('li');
-            li.className = 'flex items-center justify-between p-2 rounded-lg hover:bg-surface-variant/60';
+            li.className = 'flex items-center justify-between p-2 rounded-lg';
+            
+            const reasonText = `${setting.reason} (${setting.event_type === 'HOLIDAY' ? '特別休業日' : '振替営業日'})`;
+            let reasonHTML;
+            const maxLength = 40;
+
+            if (reasonText.length > maxLength) {
+                const shortText = reasonText.substring(0, maxLength) + '...';
+                reasonHTML = `
+                    <div class="expandable-text">
+                        <p class="short-text">${shortText}</p>
+                        <p class="full-text hidden">${reasonText}</p>
+                        <button class="toggle-text-button text-sm text-primary hover:underline">続きを読む</button>
+                    </div>
+                `;
+            } else {
+                reasonHTML = `<p>${reasonText}</p>`;
+            }
+
             li.innerHTML = `
-                <div>
+                <div class="flex-1">
                     <p class="text-on-surface font-medium">${setting.event_date}</p>
-                    <p>${setting.reason} (${setting.event_type === 'HOLIDAY' ? '特別休業日' : '振替営業日'})</p>
+                    ${reasonHTML}
                 </div>
-                <div class="flex gap-2">
+                <div class="flex gap-2 pl-4">
                     <button data-id="${setting.id}" class="edit-setting-button inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs">編集</button>
                     <button data-id="${setting.id}" class="delete-setting-button inline-flex items-center gap-1 rounded border border-error/50 text-error px-3 py-1 text-xs">削除</button>
                 </div>
@@ -194,10 +225,13 @@ export function initCalendarManagementPage() {
 
     function renderUpdateLog() {
         updateLogList.innerHTML = '';
-        const totalPages = Math.ceil(state.updateLog.length / state.logItemsPerPage);
+        
+        const sortedLog = state.updateLog.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+        const totalPages = Math.ceil(sortedLog.length / state.logItemsPerPage);
         logPageInfo.textContent = `${state.logCurrentPage} / ${totalPages || 1}`;
 
-        if (state.updateLog.length === 0) {
+        if (sortedLog.length === 0) {
             updateLogList.innerHTML = '<li>更新ログはありません。</li>';
             logPrevButton.disabled = true;
             logNextButton.disabled = true;
@@ -206,13 +240,31 @@ export function initCalendarManagementPage() {
 
         const start = (state.logCurrentPage - 1) * state.logItemsPerPage;
         const end = start + state.logItemsPerPage;
-        const pageItems = state.updateLog.slice(start, end);
+        const pageItems = sortedLog.slice(start, end);
 
         pageItems.forEach(log => {
             const li = document.createElement('li');
+
+            const actionText = log.action;
+            let actionHTML;
+            const maxLength = 40;
+
+            if (actionText.length > maxLength) {
+                const shortText = actionText.substring(0, maxLength) + '...';
+                actionHTML = `
+                    <div class="expandable-text">
+                        <p class="short-text">${shortText}</p>
+                        <p class="full-text hidden">${actionText}</p>
+                        <button class="toggle-text-button text-sm text-primary hover:underline">続きを読む</button>
+                    </div>
+                `;
+            } else {
+                actionHTML = `<p>${actionText}</p>`;
+            }
+
             li.innerHTML = `
                 <p class="text-on-surface font-medium">${new Date(log.timestamp).toLocaleString('ja-JP')} ${log.user}</p>
-                <p>${log.action}</p>
+                ${actionHTML}
             `;
             updateLogList.appendChild(li);
         });
@@ -245,32 +297,41 @@ export function initCalendarManagementPage() {
     }
 
     function switchTab(targetTab) {
-        const isAssignment = targetTab === 'assignment';
+        // Deactivate all buttons and hide all content
+        ['settings', 'survey-details', 'reassign'].forEach(tab => {
+            const tabBtn = document.getElementById(`tab-btn-${tab}`);
+            const tabContent = document.getElementById(`tab-content-${tab}`);
+            if (tabBtn) {
+                tabBtn.className = 'tab-button shrink-0 border-b-2 border-transparent px-1 py-3 text-sm font-medium text-on-surface-variant hover:border-gray-300 hover:text-on-surface';
+            }
+            if (tabContent) {
+                tabContent.classList.add('hidden');
+            }
+        });
 
-        // Reset both buttons to inactive state
-        tabBtnSettings.className = 'tab-button shrink-0 border-b-2 border-transparent px-1 py-3 text-sm font-medium text-on-surface-variant hover:border-gray-300 hover:text-on-surface';
-        tabBtnAssignment.className = 'tab-button shrink-0 border-b-2 border-transparent px-1 py-3 text-sm font-medium text-on-surface-variant hover:border-gray-300 hover:text-on-surface';
-
-        // Activate the target button
-        const activeBtn = isAssignment ? tabBtnAssignment : tabBtnSettings;
-        activeBtn.classList.remove('border-transparent', 'text-on-surface-variant');
-        activeBtn.classList.add('border-primary', 'text-primary');
-
-        // Toggle content visibility
-        tabContentSettings.classList.toggle('hidden', isAssignment);
-        tabContentAssignment.classList.toggle('hidden', !isAssignment);
+        // Activate the target tab
+        const activeBtn = document.getElementById(`tab-btn-${targetTab}`);
+        if (activeBtn) {
+            activeBtn.classList.remove('border-transparent', 'text-on-surface-variant');
+            activeBtn.classList.add('border-primary', 'text-primary');
+        }
+        const activeContent = document.getElementById(`tab-content-${targetTab}`);
+        if (activeContent) {
+            activeContent.classList.remove('hidden');
+        }
     }
 
     function openModal(data = {}) {
-        // Clear previous validation
-        eventDateError.textContent = '';
-        reasonError.textContent = '';
+        state.currentModalDate = data.date;
+        // Reset forms
         settingForm.reset();
-        assignmentForm.reset();
+        if (assignmentForm) assignmentForm.reset();
 
+        // Set common display
         modalDateDisplay.textContent = data.date || '';
         eventDateInput.value = data.date || '';
         
+        // Populate Holiday Settings Tab
         if (data.manualSetting) {
             settingIdInput.value = data.manualSetting.id || '';
             reasonInput.value = data.manualSetting.reason || '';
@@ -281,16 +342,44 @@ export function initCalendarManagementPage() {
             if (holidayRadio) holidayRadio.checked = true;
         }
 
-        if (data.surveys && data.surveys.length > 0) {
-            tabBtnAssignment.style.display = 'block';
-            assignmentSurveySelect.innerHTML = data.surveys.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
-            
-            const companyName = state.operators.length > 0 ? state.operators[0].company : 'N/A';
-            assignmentCompanyDisplay.textContent = companyName;
+        const surveyDetailsTab = document.getElementById('tab-btn-survey-details');
+        const reassignTab = document.getElementById('tab-btn-reassign');
+        const assignmentSurveysList = document.getElementById('assignment-surveys-list');
+        const dayUrgencyButton = document.getElementById('toggle-day-urgency-button');
 
-            switchTab('assignment');
+        // Handle Survey-related Tabs
+        if (data.surveys && data.surveys.length > 0) {
+            [surveyDetailsTab, reassignTab].forEach(tab => tab.style.display = 'block');
+
+            // --- Populate Survey Details Tab ---
+            assignmentSurveysList.innerHTML = data.surveys.map(survey => `
+                <div class="p-3 rounded-lg bg-surface-container">
+                    <p class="font-semibold text-on-surface">${survey.name}</p>
+                    <p class="text-sm text-on-surface-variant">見込枚数: ${(survey.expected_cards || 0).toLocaleString()}</p>
+                </div>
+            `).join('');
+            
+            // --- Set Day Urgency Button State ---
+            const isUrgent = state.urgencyOverrides[data.date];
+            dayUrgencyButton.textContent = isUrgent ? '緊急を解除' : '緊急に設定';
+            dayUrgencyButton.className = `toggle-day-urgency-button text-white text-xs font-bold py-1 px-2 rounded ${isUrgent ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-red-500 hover:bg-red-600'}`;
+            dayUrgencyButton.dataset.date = data.date;
+
+            // --- Populate Re-assign Tab ---
+            const assignmentSurveySelect = document.getElementById('assignment-survey');
+            const assignmentCompanyDisplay = document.getElementById('assignment-company');
+            if (assignmentSurveySelect) {
+                assignmentSurveySelect.innerHTML = data.surveys.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+            }
+            if (assignmentCompanyDisplay) {
+                const companyName = state.operators.length > 0 ? state.operators[0].company : 'N/A';
+                assignmentCompanyDisplay.textContent = companyName;
+            }
+
+            switchTab('survey-details');
         } else {
-            tabBtnAssignment.style.display = 'none';
+            [surveyDetailsTab, reassignTab].forEach(tab => tab.style.display = 'none');
+            assignmentSurveysList.innerHTML = '';
             switchTab('settings');
         }
 
@@ -417,9 +506,11 @@ export function initCalendarManagementPage() {
         cancelButton = document.getElementById('cancel-button');
         cancelAssignmentButton = document.getElementById('cancel-assignment-button');
         tabBtnSettings = document.getElementById('tab-btn-settings');
-        tabBtnAssignment = document.getElementById('tab-btn-assignment');
+        const tabBtnSurveyDetails = document.getElementById('tab-btn-survey-details');
+        const tabBtnReassign = document.getElementById('tab-btn-reassign');
         tabContentSettings = document.getElementById('tab-content-settings');
-        tabContentAssignment = document.getElementById('tab-content-assignment');
+        const tabContentSurveyDetails = document.getElementById('tab-content-survey-details');
+        const tabContentReassign = document.getElementById('tab-content-reassign');
         settingForm = document.getElementById('setting-form');
         settingIdInput = document.getElementById('setting-id');
         eventDateInput = document.getElementById('event_date');
@@ -491,6 +582,20 @@ export function initCalendarManagementPage() {
         manualSettingsList.addEventListener('click', (e) => {
             const button = e.target.closest('button');
             if (!button) return;
+
+            if (button.classList.contains('toggle-text-button')) {
+                const container = button.closest('.expandable-text');
+                if (!container) return;
+
+                const shortText = container.querySelector('.short-text');
+                const fullText = container.querySelector('.full-text');
+
+                shortText.classList.toggle('hidden');
+                fullText.classList.toggle('hidden');
+
+                button.textContent = fullText.classList.contains('hidden') ? '続きを読む' : '閉じる';
+                return;
+            }
             
             const id = parseInt(button.dataset.id, 10);
             if (button.classList.contains('edit-setting-button')) {
@@ -502,24 +607,78 @@ export function initCalendarManagementPage() {
             }
         });
 
+        updateLogList.addEventListener('click', (e) => {
+            const button = e.target.closest('.toggle-text-button');
+            if (!button) return;
+
+            const container = button.closest('.expandable-text');
+            if (!container) return;
+
+            const shortText = container.querySelector('.short-text');
+            const fullText = container.querySelector('.full-text');
+
+            shortText.classList.toggle('hidden');
+            fullText.classList.toggle('hidden');
+
+            button.textContent = fullText.classList.contains('hidden') ? '続きを読む' : '閉じる';
+        });
+
         // Modal and Tab Listeners
+        const closeAssignmentTabButton = document.getElementById('close-assignment-tab-button');
         closeModalButton.addEventListener('click', closeModal);
         cancelButton.addEventListener('click', closeModal);
-        cancelAssignmentButton.addEventListener('click', closeModal);
+        if(closeAssignmentTabButton) {
+            closeAssignmentTabButton.addEventListener('click', closeModal);
+        }
+        if(cancelAssignmentButton) {
+            cancelAssignmentButton.addEventListener('click', closeModal);
+        }
         modal.addEventListener('click', (e) => {
             if (e.target === modal) closeModal();
         });
         settingForm.addEventListener('submit', handleSave);
 
-        assignmentForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const surveyName = assignmentSurveySelect.options[assignmentSurveySelect.selectedIndex].text;
-            const companyName = assignmentCompanyDisplay.textContent;
-            const message = `${surveyName}に ${companyName} をアサインしました。`;
-            
-            closeModal(); // Close the main modal
-            showConfirmationModal(message); // Show the custom confirmation modal
-        });
+        if (assignmentForm) {
+            assignmentForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const date = state.currentModalDate;
+                if (!date) return;
+
+                const surveyId = parseInt(assignmentSurveySelect.value, 10);
+                
+                // Add surveyId to the assignments for the specific date
+                if (!state.assignmentOverrides[date]) {
+                    state.assignmentOverrides[date] = { surveyIds: [] };
+                }
+                if (!state.assignmentOverrides[date].surveyIds.includes(surveyId)) {
+                    state.assignmentOverrides[date].surveyIds.push(surveyId);
+                }
+
+                renderAll();
+
+                const surveyName = assignmentSurveySelect.options[assignmentSurveySelect.selectedIndex].text;
+                const companyName = assignmentCompanyDisplay.textContent;
+                const message = `${date}の${surveyName}に ${companyName} をアサインしました。`;
+                
+                closeModal();
+                showConfirmationModal(message);
+            });
+        }
+
+        const dayUrgencyButton = document.getElementById('toggle-day-urgency-button');
+        if (dayUrgencyButton) {
+            dayUrgencyButton.addEventListener('click', (e) => {
+                const date = e.target.dataset.date;
+                if (!date) return;
+
+                state.urgencyOverrides[date] = !state.urgencyOverrides[date];
+                renderAll();
+
+                const isUrgent = state.urgencyOverrides[date];
+                e.target.textContent = isUrgent ? '緊急を解除' : '緊急に設定';
+                e.target.className = `toggle-day-urgency-button text-white text-xs font-bold py-1 px-2 rounded ${isUrgent ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-red-500 hover:bg-red-600'}`;
+            });
+        }
 
         if (closeConfirmationModalButton) {
             closeConfirmationModalButton.addEventListener('click', closeConfirmationModal);
@@ -546,8 +705,10 @@ export function initCalendarManagementPage() {
             }
         });
 
+        // Tab listeners
         tabBtnSettings.addEventListener('click', () => switchTab('settings'));
-        tabBtnAssignment.addEventListener('click', () => switchTab('assignment'));
+        if (tabBtnSurveyDetails) tabBtnSurveyDetails.addEventListener('click', () => switchTab('survey-details'));
+        if (tabBtnReassign) tabBtnReassign.addEventListener('click', () => switchTab('reassign'));
 
         document.getElementById('export-csv-button').addEventListener('click', () => alert('CSVエクスポート機能は現在開発中です。'));
         document.getElementById('import-csv-button').addEventListener('click', () => alert('CSVインポート機能は現在開発中です。'));

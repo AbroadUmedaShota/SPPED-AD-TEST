@@ -1,21 +1,29 @@
-
 [
   {
     "id": 1,
     "name": "顧客満足度アンケート",
     "startDate": "2025-10-15",
-    "endDate": "2025-10-25"
+    "endDate": "2025-10-25",
+    "expected_cards": 500,
+    "status": "pending",
+    "urgency": "normal"
   },
   {
     "id": 2,
     "name": "新機能に関するアンケート",
     "startDate": "2025-11-05",
-    "endDate": "2025-11-15"
+    "endDate": "2025-11-15",
+    "expected_cards": 1200,
+    "status": "pending",
+    "urgency": "normal"
   },
   {
     "id": 3,
     "name": "短期アンケート",
     "startDate": "2025-10-20",
-    "endDate": "2025-10-22"
+    "endDate": "2025-10-22",
+    "expected_cards": 250,
+    "status": "assigned",
+    "urgency": "high"
   }
 ]
