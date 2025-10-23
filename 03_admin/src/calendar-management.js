@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+export function initCalendarManagementPage() {
     const state = {
         currentDate: new Date(),
         holidays: {},
@@ -10,55 +10,21 @@ document.addEventListener('DOMContentLoaded', () => {
         manualSettingsItemsPerPage: 5,
         logCurrentPage: 1,
         logItemsPerPage: 7,
+        settingToDeleteId: null,
     };
 
-    // DOM Elements
-    const calendarTitle = document.getElementById('calendar-title');
-    const calendarGrid = document.getElementById('calendar-grid');
-    const prevMonthButton = document.getElementById('prev-month-button');
-    const nextMonthButton = document.getElementById('next-month-button');
-    const manualSettingsList = document.getElementById('manual-settings-list');
-    const settingPageInfo = document.getElementById('setting-page-info');
-    const settingPrevButton = document.getElementById('setting-prev-button');
-    const settingNextButton = document.getElementById('setting-next-button');
-    const updateLogList = document.getElementById('update-log-list');
-    const logPageInfo = document.getElementById('log-page-info');
-    const logPrevButton = document.getElementById('log-prev-button');
-    const logNextButton = document.getElementById('log-next-button');
-    const kpiHolidays = document.getElementById('kpi-holidays');
-    const kpiSubstituteWorkdays = document.getElementById('kpi-substitute-workdays');
-    const kpiSlaAlerts = document.getElementById('kpi-sla-alerts');
+    // Declare variables for DOM elements
+    let calendarTitle, calendarGrid, prevMonthButton, nextMonthButton, manualSettingsList,
+        settingPageInfo, settingPrevButton, settingNextButton, updateLogList, logPageInfo,
+        logPrevButton, logNextButton, kpiHolidays, kpiSubstituteWorkdays, kpiSlaAlerts,
+        modal, modalContainer, modalDateDisplay, closeModalButton, cancelButton,
+        cancelAssignmentButton, tabBtnSettings, tabBtnAssignment, tabContentSettings,
+        tabContentAssignment, settingForm, settingIdInput, eventDateInput, reasonInput,
+        eventDateError, reasonError, assignmentForm, assignmentSurveySelect,
+        assignmentCompanyDisplay, confirmationModal, confirmationModalContainer,
+        confirmationModalMessage, closeConfirmationModalButton, deleteConfirmModal,
+        deleteConfirmModalContainer, cancelDeleteButton, confirmDeleteButton;
 
-    // Modal Elements
-    const modal = document.getElementById('setting-modal');
-    const modalContainer = document.getElementById('setting-modal-container');
-    const modalDateDisplay = document.getElementById('modal-date-display');
-    const closeModalButton = document.getElementById('close-modal-button');
-    const cancelButton = document.getElementById('cancel-button');
-    const cancelAssignmentButton = document.getElementById('cancel-assignment-button');
-    
-    // Tab Elements
-    const tabBtnSettings = document.getElementById('tab-btn-settings');
-    const tabBtnAssignment = document.getElementById('tab-btn-assignment');
-    const tabContentSettings = document.getElementById('tab-content-settings');
-    const tabContentAssignment = document.getElementById('tab-content-assignment');
-
-    // Settings Form Elements
-    const settingForm = document.getElementById('setting-form');
-    const settingIdInput = document.getElementById('setting-id');
-    const eventDateInput = document.getElementById('event_date');
-    const reasonInput = document.getElementById('reason');
-
-    // Assignment Form Elements
-    const assignmentForm = document.getElementById('assignment-form');
-    const assignmentSurveySelect = document.getElementById('assignment-survey');
-    const assignmentCompanyDisplay = document.getElementById('assignment-company');
-
-    // Confirmation Modal Elements
-    const confirmationModal = document.getElementById('confirmation-modal');
-    const confirmationModalContainer = document.getElementById('confirmation-modal-container');
-    const confirmationModalMessage = document.getElementById('confirmation-modal-message');
-    const closeConfirmationModalButton = document.getElementById('close-confirmation-modal-button');
 
     // --- Data Fetching ---
     async function fetchData() {
@@ -296,6 +262,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function openModal(data = {}) {
+        // Clear previous validation
+        eventDateError.textContent = '';
+        reasonError.textContent = '';
         settingForm.reset();
         assignmentForm.reset();
 
@@ -305,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (data.manualSetting) {
             settingIdInput.value = data.manualSetting.id || '';
             reasonInput.value = data.manualSetting.reason || '';
-            const typeRadio = settingForm.querySelector(`input[name="event_type"][value="${data.manualSetting.type}"]`);
+            const typeRadio = settingForm.querySelector(`input[name="event_type"][value="${data.manualSetting.event_type}"]`);
             if (typeRadio) typeRadio.checked = true;
         } else {
             const holidayRadio = settingForm.querySelector(`input[name="event_type"][value="HOLIDAY"]`);
@@ -340,6 +309,20 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => confirmationModal.classList.add('hidden'), 200);
     }
 
+    function showDeleteConfirmModal(settingId) {
+        state.settingToDeleteId = settingId;
+        deleteConfirmModal.classList.remove('hidden');
+        setTimeout(() => deleteConfirmModalContainer.classList.add('opacity-100', 'translate-y-0'), 10);
+    }
+
+    function closeDeleteConfirmModal() {
+        deleteConfirmModalContainer.classList.remove('opacity-100', 'translate-y-0');
+        setTimeout(() => {
+            deleteConfirmModal.classList.add('hidden');
+            state.settingToDeleteId = null;
+        }, 200);
+    }
+
     function closeModal() {
         modalContainer.classList.remove('opacity-100', 'translate-y-0');
         setTimeout(() => modal.classList.add('hidden'), 200);
@@ -352,6 +335,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleSave(e) {
         e.preventDefault();
+        // Clear previous errors
+        eventDateError.textContent = '';
+        reasonError.textContent = '';
+
+        let isValid = true;
+        if (!eventDateInput.value) {
+            eventDateError.textContent = '日付は必須です。';
+            isValid = false;
+        }
+        if (!reasonInput.value) {
+            reasonError.textContent = '理由は必須です。';
+            isValid = false;
+        }
+
+        if (!isValid) return;
+
         const id = parseInt(settingIdInput.value, 10);
         const newSetting = {
             id: id || Date.now(),
@@ -361,11 +360,6 @@ document.addEventListener('DOMContentLoaded', () => {
             created_by: '現在のユーザー',
             created_at: new Date().toISOString(),
         };
-
-        if (!newSetting.event_date || !newSetting.reason) {
-            alert('日付と理由は必須です。');
-            return;
-        }
 
         if (id) {
             const index = state.manualSettings.findIndex(s => s.id === id);
@@ -400,6 +394,50 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function init() {
+        // Assign DOM elements
+        calendarTitle = document.getElementById('calendar-title');
+        calendarGrid = document.getElementById('calendar-grid');
+        prevMonthButton = document.getElementById('prev-month-button');
+        nextMonthButton = document.getElementById('next-month-button');
+        manualSettingsList = document.getElementById('manual-settings-list');
+        settingPageInfo = document.getElementById('setting-page-info');
+        settingPrevButton = document.getElementById('setting-prev-button');
+        settingNextButton = document.getElementById('setting-next-button');
+        updateLogList = document.getElementById('update-log-list');
+        logPageInfo = document.getElementById('log-page-info');
+        logPrevButton = document.getElementById('log-prev-button');
+        logNextButton = document.getElementById('log-next-button');
+        kpiHolidays = document.getElementById('kpi-holidays');
+        kpiSubstituteWorkdays = document.getElementById('kpi-substitute-workdays');
+        kpiSlaAlerts = document.getElementById('kpi-sla-alerts');
+        modal = document.getElementById('setting-modal');
+        modalContainer = document.getElementById('setting-modal-container');
+        modalDateDisplay = document.getElementById('modal-date-display');
+        closeModalButton = document.getElementById('close-modal-button');
+        cancelButton = document.getElementById('cancel-button');
+        cancelAssignmentButton = document.getElementById('cancel-assignment-button');
+        tabBtnSettings = document.getElementById('tab-btn-settings');
+        tabBtnAssignment = document.getElementById('tab-btn-assignment');
+        tabContentSettings = document.getElementById('tab-content-settings');
+        tabContentAssignment = document.getElementById('tab-content-assignment');
+        settingForm = document.getElementById('setting-form');
+        settingIdInput = document.getElementById('setting-id');
+        eventDateInput = document.getElementById('event_date');
+        reasonInput = document.getElementById('reason');
+        eventDateError = document.getElementById('event_date-error');
+        reasonError = document.getElementById('reason-error');
+        assignmentForm = document.getElementById('assignment-form');
+        assignmentSurveySelect = document.getElementById('assignment-survey');
+        assignmentCompanyDisplay = document.getElementById('assignment-company');
+        confirmationModal = document.getElementById('confirmation-modal');
+        confirmationModalContainer = document.getElementById('confirmation-modal-container');
+        confirmationModalMessage = document.getElementById('confirmation-modal-message');
+        closeConfirmationModalButton = document.getElementById('close-confirmation-modal-button');
+        deleteConfirmModal = document.getElementById('delete-confirm-modal');
+        deleteConfirmModalContainer = document.getElementById('delete-confirm-modal-container');
+        cancelDeleteButton = document.getElementById('cancel-delete-button');
+        confirmDeleteButton = document.getElementById('confirm-delete-button');
+
         await fetchData();
         renderAll();
 
@@ -442,7 +480,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const date = dayCell.dataset.date;
                 const manualSetting = state.manualSettings.find(s => s.event_date === date);
                 const surveys = getSurveysForDay(date);
-                openModal({ 
+                openModal({
                     date: date, 
                     manualSetting: manualSetting,
                     surveys: surveys
@@ -460,11 +498,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 openModal({ date: setting.event_date, manualSetting: setting });
             }
             if (button.classList.contains('delete-setting-button')) {
-                if (confirm('この設定を削除してもよろしいですか？')) {
-                    state.manualSettings = state.manualSettings.filter(s => s.id !== id);
-                    console.log("Deleted setting:", id);
-                    renderAll();
-                }
+                showDeleteConfirmModal(id);
             }
         });
 
@@ -487,10 +521,28 @@ document.addEventListener('DOMContentLoaded', () => {
             showConfirmationModal(message); // Show the custom confirmation modal
         });
 
-        closeConfirmationModalButton.addEventListener('click', closeConfirmationModal);
+        if (closeConfirmationModalButton) {
+            closeConfirmationModalButton.addEventListener('click', closeConfirmationModal);
+        }
         confirmationModal.addEventListener('click', (e) => {
             if (e.target === confirmationModal) {
                 closeConfirmationModal();
+            }
+        });
+
+        // Delete confirmation listeners
+        deleteConfirmModal.addEventListener('click', (e) => {
+            if (e.target === deleteConfirmModal) {
+                closeDeleteConfirmModal();
+            }
+        });
+        cancelDeleteButton.addEventListener('click', closeDeleteConfirmModal);
+        confirmDeleteButton.addEventListener('click', () => {
+            if (state.settingToDeleteId) {
+                state.manualSettings = state.manualSettings.filter(s => s.id !== state.settingToDeleteId);
+                console.log("Deleted setting:", state.settingToDeleteId);
+                closeDeleteConfirmModal();
+                renderAll();
             }
         });
 
@@ -503,4 +555,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     init();
-});
+}
