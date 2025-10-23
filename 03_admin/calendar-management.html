@@ -129,42 +129,90 @@
 <!-- Setting Modal -->
 <div id="setting-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/50" aria-labelledby="modal-title" role="dialog" aria-modal="true">
     <div id="setting-modal-container" class="relative bg-surface rounded-xl shadow-xl w-full max-w-md m-4 transform transition-all opacity-0 -translate-y-4">
-        <form id="setting-form" class="p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h3 id="modal-title" class="text-title-large font-semibold text-on-surface">個別設定</h3>
+        <div class="p-6">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h3 id="modal-title" class="text-title-large font-semibold text-on-surface">日付設定</h3>
+                    <p id="modal-date-display" class="text-sm text-on-surface-variant"></p>
+                </div>
                 <button type="button" id="close-modal-button" class="rounded-full p-2 hover:bg-surface-variant" aria-label="閉じる">
                     <span class="material-icons">close</span>
                 </button>
             </div>
-            <div class="space-y-4">
-                <input type="hidden" id="setting-id">
-                <div>
-                    <label class="text-sm font-medium text-on-surface-variant">種別</label>
-                    <div class="flex gap-4 mt-2">
-                        <label class="flex items-center gap-2">
-                            <input type="radio" name="event_type" value="HOLIDAY" class="form-radio text-primary focus:ring-primary">
-                            <span>特別休業日</span>
-                        </label>
-                        <label class="flex items-center gap-2">
-                            <input type="radio" name="event_type" value="SUBSTITUTE_WORKDAY" class="form-radio text-primary focus:ring-primary">
-                            <span>振替営業日</span>
-                        </label>
+
+            <!-- Tab Navigation -->
+            <div class="border-b border-outline-variant">
+                <nav class="-mb-px flex gap-4" aria-label="Tabs">
+                    <button id="tab-btn-settings" class="tab-button shrink-0 border-b-2 border-primary px-1 py-3 text-sm font-medium text-primary" aria-current="page">
+                        個別設定
+                    </button>
+                    <button id="tab-btn-assignment" class="tab-button shrink-0 border-b-2 border-transparent px-1 py-3 text-sm font-medium text-on-surface-variant hover:border-gray-300 hover:text-on-surface">
+                        入力作業
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Tab Content -->
+            <div id="tab-content-settings" class="tab-content py-4">
+                <form id="setting-form">
+                    <div class="space-y-4">
+                        <input type="hidden" id="setting-id">
+                        <div>
+                            <label class="text-sm font-medium text-on-surface-variant">種別</label>
+                            <div class="flex gap-4 mt-2">
+                                <label class="flex items-center gap-2">
+                                    <input type="radio" name="event_type" value="HOLIDAY" class="form-radio text-primary focus:ring-primary">
+                                    <span>特別休業日</span>
+                                </label>
+                                <label class="flex items-center gap-2">
+                                    <input type="radio" name="event_type" value="SUBSTITUTE_WORKDAY" class="form-radio text-primary focus:ring-primary">
+                                    <span>振替営業日</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="event_date" class="block text-sm font-medium text-on-surface-variant">日付</label>
+                            <input type="date" id="event_date" class="mt-1 block w-full rounded-md border-outline bg-surface-container-lowest focus:border-primary focus:ring-primary" required>
+                        </div>
+                        <div>
+                            <label for="reason" class="block text-sm font-medium text-on-surface-variant">理由</label>
+                            <textarea id="reason" rows="3" class="mt-1 block w-full rounded-md border-outline bg-surface-container-lowest focus:border-primary focus:ring-primary" required></textarea>
+                        </div>
                     </div>
-                </div>
-                <div>
-                    <label for="event_date" class="block text-sm font-medium text-on-surface-variant">日付</label>
-                    <input type="date" id="event_date" class="mt-1 block w-full rounded-md border-outline bg-surface-container-lowest focus:border-primary focus:ring-primary" required>
-                </div>
-                <div>
-                    <label for="reason" class="block text-sm font-medium text-on-surface-variant">理由</label>
-                    <textarea id="reason" rows="3" class="mt-1 block w-full rounded-md border-outline bg-surface-container-lowest focus:border-primary focus:ring-primary" required></textarea>
-                </div>
+                    <div class="flex justify-end gap-2 mt-6">
+                        <button type="button" id="cancel-button" class="rounded-lg border border-outline px-4 py-2 text-sm font-semibold">キャンセル</button>
+                        <button type="submit" id="save-button" class="rounded-lg bg-primary text-on-primary px-4 py-2 text-sm font-semibold">保存</button>
+                    </div>
+                </form>
             </div>
-            <div class="flex justify-end gap-2 mt-6">
-                <button type="button" id="cancel-button" class="rounded-lg border border-outline px-4 py-2 text-sm font-semibold">キャンセル</button>
-                <button type="submit" id="save-button" class="rounded-lg bg-primary text-on-primary px-4 py-2 text-sm font-semibold">保存</button>
+            <div id="tab-content-assignment" class="tab-content hidden py-4">
+                <form id="assignment-form">
+                    <div class="space-y-4">
+                        <div>
+                            <label for="assignment-survey" class="block text-sm font-medium text-on-surface-variant">対象アンケート</label>
+                            <select id="assignment-survey" class="mt-1 block w-full rounded-md border-outline bg-surface-container-lowest focus:border-primary focus:ring-primary"></select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-on-surface-variant">担当会社</label>
+                            <p id="assignment-company" class="mt-1 text-on-surface"></p>
+                        </div>
+                    </div>
+                    <div class="flex justify-end gap-2 mt-6">
+                        <button type="button" id="cancel-assignment-button" class="rounded-lg border border-outline px-4 py-2 text-sm font-semibold">キャンセル</button>
+                        <button type="submit" id="save-assignment-button" class="rounded-lg bg-primary text-on-primary px-4 py-2 text-sm font-semibold">                        完了</button>
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div id="confirmation-modal" class="fixed inset-0 z-60 hidden flex items-center justify-center bg-black/50" aria-labelledby="confirmation-modal-title" role="dialog" aria-modal="true">
+    <div id="confirmation-modal-container" class="relative bg-surface rounded-xl shadow-xl w-full max-w-lg m-4 p-6 text-center transform transition-all opacity-0 -translate-y-4">
+        <h3 id="confirmation-modal-title" class="text-title-large font-semibold text-on-surface mb-4">完了</h3>
+        <p id="confirmation-modal-message" class="text-on-surface-variant mb-6"></p>
+        <button id="close-confirmation-modal-button" class="w-full rounded-lg bg-primary text-on-primary px-4 py-2 text-sm font-semibold">閉じる</button>
     </div>
 </div>
 

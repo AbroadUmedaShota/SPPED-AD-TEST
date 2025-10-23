@@ -4,10 +4,12 @@ document.addEventListener('DOMContentLoaded', () => {
         holidays: {},
         manualSettings: [],
         updateLog: [],
+        surveys: [],
+        operators: [],
         manualSettingsCurrentPage: 1,
         manualSettingsItemsPerPage: 5,
         logCurrentPage: 1,
-        logItemsPerPage: 5,
+        logItemsPerPage: 7,
     };
 
     // DOM Elements
@@ -30,25 +32,49 @@ document.addEventListener('DOMContentLoaded', () => {
     // Modal Elements
     const modal = document.getElementById('setting-modal');
     const modalContainer = document.getElementById('setting-modal-container');
+    const modalDateDisplay = document.getElementById('modal-date-display');
     const closeModalButton = document.getElementById('close-modal-button');
     const cancelButton = document.getElementById('cancel-button');
+    const cancelAssignmentButton = document.getElementById('cancel-assignment-button');
+    
+    // Tab Elements
+    const tabBtnSettings = document.getElementById('tab-btn-settings');
+    const tabBtnAssignment = document.getElementById('tab-btn-assignment');
+    const tabContentSettings = document.getElementById('tab-content-settings');
+    const tabContentAssignment = document.getElementById('tab-content-assignment');
+
+    // Settings Form Elements
     const settingForm = document.getElementById('setting-form');
-    const modalTitle = document.getElementById('modal-title');
     const settingIdInput = document.getElementById('setting-id');
     const eventDateInput = document.getElementById('event_date');
     const reasonInput = document.getElementById('reason');
 
+    // Assignment Form Elements
+    const assignmentForm = document.getElementById('assignment-form');
+    const assignmentSurveySelect = document.getElementById('assignment-survey');
+    const assignmentCompanyDisplay = document.getElementById('assignment-company');
+
+    // Confirmation Modal Elements
+    const confirmationModal = document.getElementById('confirmation-modal');
+    const confirmationModalContainer = document.getElementById('confirmation-modal-container');
+    const confirmationModalMessage = document.getElementById('confirmation-modal-message');
+    const closeConfirmationModalButton = document.getElementById('close-confirmation-modal-button');
+
     // --- Data Fetching ---
     async function fetchData() {
         try {
-            const [holidaysRes, manualSettingsRes, logRes] = await Promise.all([
+            const [holidaysRes, manualSettingsRes, logRes, surveysRes, operatorsRes] = await Promise.all([
                 fetch('../../data/admin/holidays.json'),
                 fetch('../../data/admin/manual_calendar_settings.json'),
                 fetch('../../data/admin/calendar_update_log.json'),
+                fetch('../../data/admin/surveys.json'),
+                fetch('../../data/admin/operators.json'),
             ]);
             state.holidays = await holidaysRes.json();
             state.manualSettings = await manualSettingsRes.json();
             state.updateLog = await logRes.json();
+            state.surveys = await surveysRes.json();
+            state.operators = await operatorsRes.json();
         } catch (error) {
             console.error("Failed to fetch initial data:", error);
         }
@@ -80,16 +106,39 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let day = 1; day <= totalDays; day++) {
             const date = new Date(year, month, day);
             const dayCell = document.createElement('div');
-            dayCell.className = 'border border-outline-variant rounded-lg min-h-[96px] p-2 cursor-pointer hover:bg-surface-variant/60';
-            dayCell.dataset.date = date.toISOString().split('T')[0];
+            const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
-            const { status, reason } = getDayStatus(date);
-            
-            let textColor = 'text-on-surface';
+            let cellClasses = 'border border-outline-variant rounded-lg min-h-[120px] p-2 cursor-pointer hover:bg-surface-variant/60 relative';
+            let cellTitle = '';
+
+            // --- Survey Period Highlighting ---
+            const surveysForDay = getSurveysForDay(dateString);
+            if (surveysForDay.length > 0) {
+                cellClasses += ' bg-blue-100'; // Apply a light background highlight
+                const surveyTitles = surveysForDay.map(s => `${s.name} (${s.startDate} - ${s.endDate})`).join('\n');
+                cellTitle = surveyTitles;
+
+                surveysForDay.forEach(survey => {
+                    if (survey.startDate === dateString) {
+                        cellClasses += ' border-l-4 border-l-primary';
+                    }
+                    if (survey.endDate === dateString) {
+                        cellClasses += ' border-r-4 border-r-primary';
+                    }
+                });
+            }
+
+            dayCell.className = cellClasses;
+            dayCell.dataset.date = dateString;
+            if (cellTitle) {
+                dayCell.title = cellTitle;
+            }
+
+            // --- Build Holiday Status HTML ---
+            const { status, reason } = getDayStatus(dateString, date.getDay());
             let statusIcon = 'event_available';
             let statusText = '営業日';
             let statusStyle = 'color: var(--color-state-success); border-color: var(--color-state-success);';
-
             if (status === 'HOLIDAY') {
                 statusIcon = 'event_busy';
                 statusText = '休業日';
@@ -99,7 +148,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 statusText = '振替営業';
                 statusStyle = 'color: var(--color-state-warning); border-color: var(--color-state-warning);';
             }
-            
+            const holidayStatusHTML = `
+                <span style="${statusStyle}" class="inline-flex items-center gap-1 text-xs border px-2 py-0.5 rounded-full">
+                    <span class="material-icons text-base !text-sm">${statusIcon}</span>
+                    ${statusText}
+                </span>
+                ${reason ? `<p class="text-xs text-on-surface-variant mt-1 truncate">${reason}</p>` : ''}
+            `;
+
+            // --- Build Surveys HTML ---
+            let surveysHTML = '<div class="mt-1 space-y-1">';
+            surveysForDay.forEach(survey => {
+                surveysHTML += `<div class="text-xs text-gray-700 truncate" title="${survey.name}">${survey.name}</div>`;
+            });
+            surveysHTML += '</div>';
+
+            // --- Set Final Cell HTML ---
+            let textColor = 'text-on-surface';
             if (date.getDay() === 0) textColor = 'text-error';
             if (date.getDay() === 6) textColor = 'text-primary';
 
@@ -109,15 +174,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="text-xs text-on-surface-variant">${['日', '月', '火', '水', '木', '金', '土'][date.getDay()]}</span>
                 </div>
                 <div class="mt-1">
-                    <span style="${statusStyle}" class="inline-flex items-center gap-1 text-xs border px-2 py-0.5 rounded-full">
-                        <span class="material-icons text-base !text-sm">${statusIcon}</span>
-                        ${statusText}
-                    </span>
-                    ${reason ? `<p class="text-xs text-on-surface-variant mt-1 truncate">${reason}</p>` : ''}
+                    ${holidayStatusHTML}
                 </div>
+                ${surveysHTML}
             `;
+            
             calendarGrid.appendChild(dayCell);
         }
+    }
+
+    function getSurveysForDay(dateString) {
+        if (!state.surveys) return [];
+        return state.surveys.filter(survey => {
+            return dateString >= survey.startDate && dateString <= survey.endDate;
+        });
     }
 
     function renderManualSettings() {
@@ -195,7 +265,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         for (let day = 1; day <= daysInMonth; day++) {
             const date = new Date(year, month, day);
-            const { status } = getDayStatus(date);
+            const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const { status } = getDayStatus(dateString, date.getDay());
             if (status === 'HOLIDAY') {
                 holidayCount++;
             } else if (status === 'SUBSTITUTE_WORKDAY') {
@@ -207,21 +278,66 @@ document.addEventListener('DOMContentLoaded', () => {
         kpiSlaAlerts.textContent = '3件';
     }
 
+    function switchTab(targetTab) {
+        const isAssignment = targetTab === 'assignment';
+
+        // Reset both buttons to inactive state
+        tabBtnSettings.className = 'tab-button shrink-0 border-b-2 border-transparent px-1 py-3 text-sm font-medium text-on-surface-variant hover:border-gray-300 hover:text-on-surface';
+        tabBtnAssignment.className = 'tab-button shrink-0 border-b-2 border-transparent px-1 py-3 text-sm font-medium text-on-surface-variant hover:border-gray-300 hover:text-on-surface';
+
+        // Activate the target button
+        const activeBtn = isAssignment ? tabBtnAssignment : tabBtnSettings;
+        activeBtn.classList.remove('border-transparent', 'text-on-surface-variant');
+        activeBtn.classList.add('border-primary', 'text-primary');
+
+        // Toggle content visibility
+        tabContentSettings.classList.toggle('hidden', isAssignment);
+        tabContentAssignment.classList.toggle('hidden', !isAssignment);
+    }
+
     function openModal(data = {}) {
         settingForm.reset();
-        settingIdInput.value = data.id || '';
+        assignmentForm.reset();
+
+        modalDateDisplay.textContent = data.date || '';
         eventDateInput.value = data.date || '';
-        reasonInput.value = data.reason || '';
         
-        if (data.type) {
-            settingForm.querySelector(`input[name="event_type"][value="${data.type}"]`).checked = true;
+        if (data.manualSetting) {
+            settingIdInput.value = data.manualSetting.id || '';
+            reasonInput.value = data.manualSetting.reason || '';
+            const typeRadio = settingForm.querySelector(`input[name="event_type"][value="${data.manualSetting.type}"]`);
+            if (typeRadio) typeRadio.checked = true;
         } else {
-             settingForm.querySelector(`input[name="event_type"][value="HOLIDAY"]`).checked = true;
+            const holidayRadio = settingForm.querySelector(`input[name="event_type"][value="HOLIDAY"]`);
+            if (holidayRadio) holidayRadio.checked = true;
         }
 
-        modalTitle.textContent = data.id ? '設定を編集' : '個別設定を追加';
+        if (data.surveys && data.surveys.length > 0) {
+            tabBtnAssignment.style.display = 'block';
+            assignmentSurveySelect.innerHTML = data.surveys.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+            
+            const companyName = state.operators.length > 0 ? state.operators[0].company : 'N/A';
+            assignmentCompanyDisplay.textContent = companyName;
+
+            switchTab('assignment');
+        } else {
+            tabBtnAssignment.style.display = 'none';
+            switchTab('settings');
+        }
+
         modal.classList.remove('hidden');
         setTimeout(() => modalContainer.classList.add('opacity-100', 'translate-y-0'), 10);
+    }
+
+    function showConfirmationModal(message) {
+        confirmationModalMessage.textContent = message;
+        confirmationModal.classList.remove('hidden');
+        setTimeout(() => confirmationModalContainer.classList.add('opacity-100', 'translate-y-0'), 10);
+    }
+
+    function closeConfirmationModal() {
+        confirmationModalContainer.classList.remove('opacity-100', 'translate-y-0');
+        setTimeout(() => confirmationModal.classList.add('hidden'), 200);
     }
 
     function closeModal() {
@@ -263,9 +379,8 @@ document.addEventListener('DOMContentLoaded', () => {
         renderAll();
     }
 
-    function getDayStatus(date) {
-        const dateString = date.toISOString().split('T')[0];
-        const year = date.getFullYear().toString();
+    function getDayStatus(dateString, dayOfWeek) {
+        const year = dateString.substring(0, 4);
 
         const manualSetting = state.manualSettings.find(s => s.event_date === dateString);
         if (manualSetting) {
@@ -274,12 +389,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const nationalHoliday = state.holidays[year]?.find(h => h.date === dateString);
         if (nationalHoliday) {
-            return { status: 'HOLIDAY', reason: nationalHoliday.name };
+            return { status: 'HOLIDAY', reason: null };
         }
 
-        const dayOfWeek = date.getDay();
         if (dayOfWeek === 0 || dayOfWeek === 6) {
-            return { status: 'HOLIDAY', reason: '週末' };
+            return { status: 'HOLIDAY', reason: null };
         }
 
         return { status: 'WORKDAY', reason: null };
@@ -320,18 +434,19 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        document.getElementById('add-setting-button').addEventListener('click', () => openModal());
+        document.getElementById('add-setting-button').addEventListener('click', () => openModal({ date: new Date().toISOString().split('T')[0] }));
         
         calendarGrid.addEventListener('click', (e) => {
             const dayCell = e.target.closest('[data-date]');
             if (dayCell) {
                 const date = dayCell.dataset.date;
-                const existingSetting = state.manualSettings.find(s => s.event_date === date);
-                if (existingSetting) {
-                     openModal({ id: existingSetting.id, date: existingSetting.event_date, reason: existingSetting.reason, type: existingSetting.event_type });
-                } else {
-                     openModal({ date });
-                }
+                const manualSetting = state.manualSettings.find(s => s.event_date === date);
+                const surveys = getSurveysForDay(date);
+                openModal({ 
+                    date: date, 
+                    manualSetting: manualSetting,
+                    surveys: surveys
+                });
             }
         });
 
@@ -342,7 +457,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const id = parseInt(button.dataset.id, 10);
             if (button.classList.contains('edit-setting-button')) {
                 const setting = state.manualSettings.find(s => s.id === id);
-                openModal({ id: setting.id, date: setting.event_date, reason: setting.reason, type: setting.event_type });
+                openModal({ date: setting.event_date, manualSetting: setting });
             }
             if (button.classList.contains('delete-setting-button')) {
                 if (confirm('この設定を削除してもよろしいですか？')) {
@@ -353,12 +468,34 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        // Modal and Tab Listeners
         closeModalButton.addEventListener('click', closeModal);
         cancelButton.addEventListener('click', closeModal);
+        cancelAssignmentButton.addEventListener('click', closeModal);
         modal.addEventListener('click', (e) => {
             if (e.target === modal) closeModal();
         });
         settingForm.addEventListener('submit', handleSave);
+
+        assignmentForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const surveyName = assignmentSurveySelect.options[assignmentSurveySelect.selectedIndex].text;
+            const companyName = assignmentCompanyDisplay.textContent;
+            const message = `${surveyName}に ${companyName} をアサインしました。`;
+            
+            closeModal(); // Close the main modal
+            showConfirmationModal(message); // Show the custom confirmation modal
+        });
+
+        closeConfirmationModalButton.addEventListener('click', closeConfirmationModal);
+        confirmationModal.addEventListener('click', (e) => {
+            if (e.target === confirmationModal) {
+                closeConfirmationModal();
+            }
+        });
+
+        tabBtnSettings.addEventListener('click', () => switchTab('settings'));
+        tabBtnAssignment.addEventListener('click', () => switchTab('assignment'));
 
         document.getElementById('export-csv-button').addEventListener('click', () => alert('CSVエクスポート機能は現在開発中です。'));
         document.getElementById('import-csv-button').addEventListener('click', () => alert('CSVインポート機能は現在開発中です。'));
