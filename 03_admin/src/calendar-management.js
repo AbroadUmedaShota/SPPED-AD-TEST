@@ -121,16 +121,44 @@ export function initCalendarManagementPage() {
             cellClasses += surveyBgClass; // Add the determined background class
 
             if (surveysForDay.length > 0) {
-                const totalCards = surveysForDay.reduce((sum, survey) => sum + (survey.expected_cards || 0), 0);
-                dayInfoHTML = `
-                <div class="mt-1 text-xs text-on-surface-variant">
-                    <p>件数: ${surveysForDay.length}</p>
-                    <p>見込枚数: ${totalCards.toLocaleString()}</p>
-                </div>
-            `;
-                if (regularSurveys.length > 0) {
-                    dayInfoHTML += `<p class="text-xs text-blue-600 font-semibold mt-1">・通常アンケートあり</p>`;
+                // Only show total counts if there are on-demand surveys
+                if (onDemandSurveys.length > 0) {
+                    const totalCards = surveysForDay.reduce((sum, survey) => sum + (survey.expected_cards || 0), 0);
+                    dayInfoHTML += `
+                        <div class="mt-1 text-xs text-on-surface-variant">
+                            <p>件数: ${surveysForDay.length}</p>
+                            <p>見込枚数: ${totalCards.toLocaleString()}</p>
+                        </div>
+                    `;
                 }
+
+                // Display On-demand surveys with a lightning icon
+                onDemandSurveys.forEach(survey => {
+                    const surveyName = survey.name.length > 8 ? survey.name.substring(0, 8) + '...' : survey.name;
+                    dayInfoHTML += `<p class="text-xs text-gray-900 mt-1 truncate" title="${survey.name}">⚡ ${surveyName}</p>`;
+                });
+
+                // Display Regular surveys with conditional checkmark
+                if (regularSurveys.length > 0) {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0); // Normalize today to the beginning of the day
+
+                    regularSurveys.forEach(survey => {
+                        const surveyDate = new Date(dateString);
+                        const diffTime = surveyDate.getTime() - today.getTime();
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                        let textColorClass = 'text-gray-900'; // Default black color
+                        if (survey.assignee == null && diffDays >= 0 && diffDays <= 3) {
+                            textColorClass = 'text-red-600 font-semibold';
+                        }
+
+                        const assignedIcon = survey.assignee != null ? '☑ ' : '';
+                        const surveyName = survey.name.length > 8 ? survey.name.substring(0, 8) + '...' : survey.name;
+                        dayInfoHTML += `<p class="text-xs ${textColorClass} mt-1 truncate" title="${survey.name}">${assignedIcon}${surveyName}</p>`;
+                    });
+                }
+
                 const surveyTitles = surveysForDay.map(s => s.name).join(', ');
                 cellTitle = surveyTitles;
             }
