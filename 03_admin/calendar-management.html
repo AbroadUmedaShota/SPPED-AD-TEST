@@ -23,140 +23,325 @@
                 <div id="breadcrumb-container" class="mb-4"></div>
                 <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant">
                     <h1 class="text-on-background text-headline-large font-bold leading-tight tracking-tight">営業日カレンダー管理</h1>
-                    <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-4 py-2 text-sm"><span class="material-icons text-base">upload_file</span>休業日CSV取込</button>
+                    <div class="flex items-center gap-2">
+                        <button id="export-csv-button" class="inline-flex items-center gap-1 rounded-lg border border-outline px-4 py-2 text-sm"><span class="material-icons text-base">download</span>カレンダーCSV出力</button>
+                        <button id="import-csv-button" class="inline-flex items-center gap-1 rounded-lg border border-outline px-4 py-2 text-sm"><span class="material-icons text-base">upload_file</span>休業日CSV取込</button>
+                    </div>
                 </div>
                 <section class="space-y-6">
-    <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
-        <div class="flex flex-wrap justify-between items-center gap-4">
-            <div>
-                <h2 class="text-title-large font-semibold text-on-surface">営業日ルール</h2>
-                <p class="text-sm text-on-surface-variant">祝日APIで取得した休日 + 個別設定の休業日を管理します。</p>
-            </div>
-            <div class="flex items-center gap-2 text-sm">
-                <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-2">
-                    <span class="material-icons text-base">cloud_sync</span>
-                    祝日API同期
-                </button>
-                <button class="inline-flex items-center gap-1 rounded-lg bg-secondary text-secondary-on px-3 py-2 font-semibold">
-                    <span class="material-icons text-base">add</span>
-                    休業日を追加
-                </button>
-            </div>
-        </div>
-        <div class="mt-6 grid gap-4 sm:grid-cols-3">
-            <div class="rounded-lg bg-surface-variant/40 p-4">
-                <p class="text-on-surface-variant text-sm">休業日数 (今月)</p>
-                <p class="text-title-large font-semibold text-on-surface">6日</p>
-            </div>
-            <div class="rounded-lg bg-surface-variant/40 p-4">
-                <p class="text-on-surface-variant text-sm">振替営業日</p>
-                <p class="text-title-large font-semibold text-on-surface">2日</p>
-            </div>
-            <div class="rounded-lg bg-surface-variant/40 p-4">
-                <p class="text-on-surface-variant text-sm">SLA影響案件</p>
-                <p class="text-title-large font-semibold text-warning">3件</p>
-            </div>
-        </div>
-    </div>
-    <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
-        <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
-            <div class="flex items-center gap-2">
-                <button class="inline-flex items-center justify-center rounded-full border border-outline size-10" aria-label="前月へ">
-                    <span class="material-icons">chevron_left</span>
-                </button>
-                <h2 class="text-title-large font-semibold text-on-surface">2025年10月</h2>
-                <button class="inline-flex items-center justify-center rounded-full border border-outline size-10" aria-label="翌月へ">
-                    <span class="material-icons">chevron_right</span>
-                </button>
-            </div>
-            <div class="flex items-center gap-2 text-sm">
-                <span class="inline-flex items-center gap-1"><span class="size-3 rounded-full bg-success"></span>営業日</span>
-                <span class="inline-flex items-center gap-1"><span class="size-3 rounded-full bg-error"></span>休業日</span>
-                <span class="inline-flex items-center gap-1"><span class="size-3 rounded-full bg-warning"></span>振替営業</span>
-            </div>
-        </div>
-        <div class="grid grid-cols-7 gap-2 text-sm text-on-surface-variant">
-            <div class="text-center font-medium">日</div>
-            <div class="text-center font-medium">月</div>
-            <div class="text-center font-medium">火</div>
-            <div class="text-center font-medium">水</div>
-            <div class="text-center font-medium">木</div>
-            <div class="text-center font-medium">金</div>
-            <div class="text-center font-medium">土</div>
-            <div class="border border-outline-variant rounded-lg min-h-[96px] p-2"><div class="flex justify-between text-on-surface font-medium">1<span class="text-xs text-on-surface-variant">火</span></div><div class="mt-4"><span class="inline-flex items-center gap-1 text-xs text-success"><span class="material-icons text-base">event_available</span>営業</span></div></div>
-            <div class="border border-outline-variant rounded-lg min-h-[96px] p-2"><div class="flex justify-between text-on-surface font-medium">2<span class="text-xs text-on-surface-variant">火</span></div><div class="mt-4"><span class="inline-flex items-center gap-1 text-xs text-success"><span class="material-icons text-base">event_available</span>営業</span></div></div>
-            <div class="border border-outline-variant rounded-lg min-h-[96px] p-2"><div class="flex justify-between text-on-surface font-medium">3<span class="text-xs text-on-surface-variant">火</span></div><div class="mt-4"><span class="inline-flex items-center gap-1 text-xs text-success"><span class="material-icons text-base">event_available</span>営業</span></div></div>
-            <div class="border border-outline-variant rounded-lg min-h-[96px] p-2"><div class="flex justify-between text-on-surface font-medium">4<span class="text-xs text-on-surface-variant">火</span></div><div class="mt-4"><span class="inline-flex items-center gap-1 text-xs text-success"><span class="material-icons text-base">event_available</span>営業</span></div></div>
-            <div class="border border-outline-variant rounded-lg min-h-[96px] p-2 bg-error/10"><div class="flex justify-between text-on-surface font-medium">5<span class="text-xs text-on-surface-variant">火</span></div><div class="mt-4"><span class="inline-flex items-center gap-1 text-xs text-error"><span class="material-icons text-base">event_busy</span>休業</span></div></div>
-            <div class="border border-outline-variant rounded-lg min-h-[96px] p-2"><div class="flex justify-between text-on-surface font-medium">6<span class="text-xs text-on-surface-variant">火</span></div><div class="mt-4"><span class="inline-flex items-center gap-1 text-xs text-success"><span class="material-icons text-base">event_available</span>営業</span></div></div>
-            <div class="border border-outline-variant rounded-lg min-h-[96px] p-2"><div class="flex justify-between text-on-surface font-medium">7<span class="text-xs text-on-surface-variant">火</span></div><div class="mt-4"><span class="inline-flex items-center gap-1 text-xs text-success"><span class="material-icons text-base">event_available</span>営業</span></div></div>
-            <div class="border border-outline-variant rounded-lg min-h-[96px] p-2"><div class="flex justify-between text-on-surface font-medium">8<span class="text-xs text-on-surface-variant">火</span></div><div class="mt-4"><span class="inline-flex items-center gap-1 text-xs text-success"><span class="material-icons text-base">event_available</span>営業</span></div></div>
-            <div class="border border-outline-variant rounded-lg min-h-[96px] p-2"><div class="flex justify-between text-on-surface font-medium">9<span class="text-xs text-on-surface-variant">火</span></div><div class="mt-4"><span class="inline-flex items-center gap-1 text-xs text-success"><span class="material-icons text-base">event_available</span>営業</span></div></div>
-            <div class="border border-outline-variant rounded-lg min-h-[96px] p-2"><div class="flex justify-between text-on-surface font-medium">10<span class="text-xs text-on-surface-variant">火</span></div><div class="mt-4"><span class="inline-flex items-center gap-1 text-xs text-success"><span class="material-icons text-base">event_available</span>営業</span></div></div>
-            <div class="border border-outline-variant rounded-lg min-h-[96px] p-2"><div class="flex justify-between text-on-surface font-medium">11<span class="text-xs text-on-surface-variant">火</span></div><div class="mt-4"><span class="inline-flex items-center gap-1 text-xs text-success"><span class="material-icons text-base">event_available</span>営業</span></div></div>
-            <div class="border border-outline-variant rounded-lg min-h-[96px] p-2 bg-error/10"><div class="flex justify-between text-on-surface font-medium">12<span class="text-xs text-on-surface-variant">火</span></div><div class="mt-4"><span class="inline-flex items-center gap-1 text-xs text-error"><span class="material-icons text-base">event_busy</span>休業</span></div></div>
-            <div class="border border-outline-variant rounded-lg min-h-[96px] p-2"><div class="flex justify-between text-on-surface font-medium">13<span class="text-xs text-on-surface-variant">火</span></div><div class="mt-4"><span class="inline-flex items-center gap-1 text-xs text-success"><span class="material-icons text-base">event_available</span>営業</span></div></div>
-            <div class="border border-outline-variant rounded-lg min-h-[96px] p-2"><div class="flex justify-between text-on-surface font-medium">14<span class="text-xs text-on-surface-variant">火</span></div><div class="mt-4"><span class="inline-flex items-center gap-1 text-xs text-success"><span class="material-icons text-base">event_available</span>営業</span></div></div>
-            <div class="border border-outline-variant rounded-lg min-h-[96px] p-2"><div class="flex justify-between text-on-surface font-medium">15<span class="text-xs text-on-surface-variant">火</span></div><div class="mt-4"><span class="inline-flex items-center gap-1 text-xs text-success"><span class="material-icons text-base">event_available</span>営業</span></div></div>
-            <div class="border border-outline-variant rounded-lg min-h-[96px] p-2"><div class="flex justify-between text-on-surface font-medium">16<span class="text-xs text-on-surface-variant">火</span></div><div class="mt-4"><span class="inline-flex items-center gap-1 text-xs text-success"><span class="material-icons text-base">event_available</span>営業</span></div></div>
-            <div class="border border-outline-variant rounded-lg min-h-[96px] p-2"><div class="flex justify-between text-on-surface font-medium">17<span class="text-xs text-on-surface-variant">火</span></div><div class="mt-4"><span class="inline-flex items-center gap-1 text-xs text-success"><span class="material-icons text-base">event_available</span>営業</span></div></div>
-            <div class="border border-outline-variant rounded-lg min-h-[96px] p-2"><div class="flex justify-between text-on-surface font-medium">18<span class="text-xs text-on-surface-variant">火</span></div><div class="mt-4"><span class="inline-flex items-center gap-1 text-xs text-success"><span class="material-icons text-base">event_available</span>営業</span></div></div>
-            <div class="border border-outline-variant rounded-lg min-h-[96px] p-2 bg-error/10"><div class="flex justify-between text-on-surface font-medium">19<span class="text-xs text-on-surface-variant">火</span></div><div class="mt-4"><span class="inline-flex items-center gap-1 text-xs text-error"><span class="material-icons text-base">event_busy</span>休業</span></div></div>
-            <div class="border border-outline-variant rounded-lg min-h-[96px] p-2"><div class="flex justify-between text-on-surface font-medium">20<span class="text-xs text-on-surface-variant">火</span></div><div class="mt-4"><span class="inline-flex items-center gap-1 text-xs text-success"><span class="material-icons text-base">event_available</span>営業</span></div></div>
-            <div class="border border-outline-variant rounded-lg min-h-[96px] p-2"><div class="flex justify-between text-on-surface font-medium">21<span class="text-xs text-on-surface-variant">火</span></div><div class="mt-4"><span class="inline-flex items-center gap-1 text-xs text-success"><span class="material-icons text-base">event_available</span>営業</span></div></div>
-            <div class="border border-outline-variant rounded-lg min-h-[96px] p-2"><div class="flex justify-between text-on-surface font-medium">22<span class="text-xs text-on-surface-variant">火</span></div><div class="mt-4"><span class="inline-flex items-center gap-1 text-xs text-success"><span class="material-icons text-base">event_available</span>営業</span></div></div>
-            <div class="border border-outline-variant rounded-lg min-h-[96px] p-2"><div class="flex justify-between text-on-surface font-medium">23<span class="text-xs text-on-surface-variant">火</span></div><div class="mt-4"><span class="inline-flex items-center gap-1 text-xs text-success"><span class="material-icons text-base">event_available</span>営業</span></div></div>
-            <div class="border border-outline-variant rounded-lg min-h-[96px] p-2"><div class="flex justify-between text-on-surface font-medium">24<span class="text-xs text-on-surface-variant">火</span></div><div class="mt-4"><span class="inline-flex items-center gap-1 text-xs text-success"><span class="material-icons text-base">event_available</span>営業</span></div></div>
-            <div class="border border-outline-variant rounded-lg min-h-[96px] p-2 bg-warning/10"><div class="flex justify-between text-on-surface font-medium">25<span class="text-xs text-on-surface-variant">火</span></div><div class="mt-4"><span class="inline-flex items-center gap-1 text-xs text-warning"><span class="material-icons text-base">event_available</span>振替</span></div></div>
-            <div class="border border-outline-variant rounded-lg min-h-[96px] p-2 bg-error/10"><div class="flex justify-between text-on-surface font-medium">26<span class="text-xs text-on-surface-variant">火</span></div><div class="mt-4"><span class="inline-flex items-center gap-1 text-xs text-error"><span class="material-icons text-base">event_busy</span>休業</span></div></div>
-            <div class="border border-outline-variant rounded-lg min-h-[96px] p-2"><div class="flex justify-between text-on-surface font-medium">27<span class="text-xs text-on-surface-variant">火</span></div><div class="mt-4"><span class="inline-flex items-center gap-1 text-xs text-success"><span class="material-icons text-base">event_available</span>営業</span></div></div>
-            <div class="border border-outline-variant rounded-lg min-h-[96px] p-2"><div class="flex justify-between text-on-surface font-medium">28<span class="text-xs text-on-surface-variant">火</span></div><div class="mt-4"><span class="inline-flex items-center gap-1 text-xs text-success"><span class="material-icons text-base">event_available</span>営業</span></div></div>
-            <div class="border border-outline-variant rounded-lg min-h-[96px] p-2"><div class="flex justify-between text-on-surface font-medium">29<span class="text-xs text-on-surface-variant">火</span></div><div class="mt-4"><span class="inline-flex items-center gap-1 text-xs text-success"><span class="material-icons text-base">event_available</span>営業</span></div></div>
-            <div class="border border-outline-variant rounded-lg min-h-[96px] p-2"><div class="flex justify-between text-on-surface font-medium">30<span class="text-xs text-on-surface-variant">火</span></div><div class="mt-4"><span class="inline-flex items-center gap-1 text-xs text-success"><span class="material-icons text-base">event_available</span>営業</span></div></div>
-            <div class="border border-outline-variant rounded-lg min-h-[96px] p-2"><div class="flex justify-between text-on-surface font-medium">31<span class="text-xs text-on-surface-variant">火</span></div><div class="mt-4"><span class="inline-flex items-center gap-1 text-xs text-success"><span class="material-icons text-base">event_available</span>営業</span></div></div>
-        </div>
-    </div>
-    <section class="grid gap-6 md:grid-cols-2">
-        <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm" aria-label="休業日一覧">
-            <h2 class="text-title-large font-semibold text-on-surface mb-4">休業日の個別設定</h2>
-            <ul class="space-y-3 text-sm text-on-surface-variant">
-                <li class="flex items-center justify-between">
-                    <div>
-                        <p class="text-on-surface font-medium">2025/10/14</p>
-                        <p>社内総会のため休業</p>
+                    <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+                        <div class="flex flex-wrap justify-between items-center gap-4">
+                            <div>
+                                <h2 class="text-title-large font-semibold text-on-surface">営業日ルール</h2>
+                                <p class="text-sm text-on-surface-variant">祝日APIで取得した休日 + 個別設定の休業日を管理します。</p>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm">
+                                <button id="sync-holidays-button" class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-2">
+                                    <span class="material-icons text-base">cloud_sync</span>
+                                    祝日API同期
+                                </button>
+                                <button id="add-setting-button" class="inline-flex items-center gap-1 rounded-lg bg-secondary text-secondary-on px-3 py-2 font-semibold">
+                                    <span class="material-icons text-base">add</span>
+                                    休業日を追加
+                                </button>
+                            </div>
+                        </div>
+                        <div id="kpi-summary-container" class="mt-6 grid gap-4 sm:grid-cols-3">
+                            <div class="rounded-lg bg-surface-container-low p-4">
+                                <p class="text-on-surface-variant text-sm">休業日数 (今月)</p>
+                                <p id="kpi-holidays" class="text-title-large font-semibold text-on-surface">-</p>
+                            </div>
+                            <div class="rounded-lg bg-surface-container-low p-4">
+                                <p class="text-on-surface-variant text-sm">振替営業日</p>
+                                <p id="kpi-substitute-workdays" class="text-title-large font-semibold text-on-surface">-</p>
+                            </div>
+                            <div class="rounded-lg bg-surface-container-low p-4">
+                                <p class="text-on-surface-variant text-sm">SLA期限間近の案件数</p>
+                                <p id="kpi-sla-alerts" class="text-title-large font-semibold text-warning">-</p>
+                            </div>
+                        </div>
                     </div>
-                    <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs">削除</button>
-                </li>
-                <li class="flex items-center justify-between">
-                    <div>
-                        <p class="text-on-surface font-medium">2025/10/25</p>
-                        <p>展示会サポート対応のため振替営業</p>
+                    <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+                        <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
+                            <div class="flex items-center gap-2">
+                                <button id="prev-month-button" class="inline-flex items-center justify-center rounded-full border border-outline size-10" aria-label="前月へ">
+                                    <span class="material-icons">chevron_left</span>
+                                </button>
+                                <h2 id="calendar-title" class="text-title-large font-semibold text-on-surface w-32 text-center">-</h2>
+                                <button id="next-month-button" class="inline-flex items-center justify-center rounded-full border border-outline size-10" aria-label="翌月へ">
+                                    <span class="material-icons">chevron_right</span>
+                                </button>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm">
+                                <span class="inline-flex items-center gap-1"><span class="size-3 rounded-full bg-success"></span>営業日</span>
+                                <span class="inline-flex items-center gap-1"><span class="size-3 rounded-full bg-error"></span>休業日</span>
+                                <span class="inline-flex items-center gap-1"><span class="size-3 rounded-full bg-warning"></span>振替営業</span>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-7 text-sm text-center font-medium text-on-surface-variant">
+                            <div class="py-2">日</div>
+                            <div class="py-2">月</div>
+                            <div class="py-2">火</div>
+                            <div class="py-2">水</div>
+                            <div class="py-2">木</div>
+                            <div class="py-2">金</div>
+                            <div class="py-2">土</div>
+                        </div>
+                        <div id="calendar-grid" class="grid grid-cols-7 gap-1 text-sm text-on-surface-variant">
+                            <!-- Calendar days will be injected here by JavaScript -->
+                        </div>
                     </div>
-                    <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs">編集</button>
-                </li>
-            </ul>
-        </div>
-        <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm" aria-label="操作ログ">
-            <h2 class="text-title-large font-semibold text-on-surface mb-4">更新ログ</h2>
-            <ol class="space-y-3 text-sm text-on-surface-variant">
-                <li>
-                    <p class="text-on-surface font-medium">2025/09/30 09:00 佐藤 花子</p>
-                    <p>祝日APIを同期し、2025年の祝日カレンダーを更新しました。</p>
-                </li>
-                <li>
-                    <p class="text-on-surface font-medium">2025/09/20 14:20 田中 太郎</p>
-                    <p>10/25を振替営業日に追加しました。</p>
-                </li>
-            </ol>
-        </div>
-    </section>
-</section>
-
+                    <section class="grid gap-6 md:grid-cols-2">
+                        <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm flex flex-col h-96" aria-label="休業日一覧">
+                            <div class="flex justify-between items-center mb-4 flex-shrink-0">
+                                <h2 class="text-title-large font-semibold text-on-surface">休業日の個別設定</h2>
+                                <div class="flex items-center gap-2">
+                                    <button id="setting-prev-button" class="inline-flex items-center justify-center rounded-full border border-outline size-8" aria-label="前のページへ"><span class="material-icons text-base">chevron_left</span></button>
+                                    <span id="setting-page-info" class="text-sm">-</span>
+                                    <button id="setting-next-button" class="inline-flex items-center justify-center rounded-full border border-outline size-8" aria-label="次のページへ"><span class="material-icons text-base">chevron_right</span></button>
+                                </div>
+                            </div>
+                            <ul id="manual-settings-list" class="space-y-2 text-sm text-on-surface-variant flex-grow min-h-0 overflow-y-auto pr-2">
+                                <!-- Manual settings will be injected here by JavaScript -->
+                            </ul>
+                        </div>
+                        <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm flex flex-col h-96" aria-label="操作ログ">
+                            <div class="flex justify-between items-center mb-4 flex-shrink-0">
+                                <h2 class="text-title-large font-semibold text-on-surface">更新ログ</h2>
+                                <div class="flex items-center gap-2">
+                                    <button id="log-prev-button" class="inline-flex items-center justify-center rounded-full border border-outline size-8" aria-label="前のページへ"><span class="material-icons text-base">chevron_left</span></button>
+                                    <span id="log-page-info" class="text-sm">-</span>
+                                    <button id="log-next-button" class="inline-flex items-center justify-center rounded-full border border-outline size-8" aria-label="次のページへ"><span class="material-icons text-base">chevron_right</span></button>
+                                </div>
+                            </div>
+                            <ol id="update-log-list" class="space-y-2 text-sm text-on-surface-variant flex-grow min-h-0 overflow-y-auto pr-2">
+                                <!-- Update logs will be injected here by JavaScript -->
+                            </ol>
+                        </div>
+                    </section>
+                </section>
             </div>
         </main>
     </div>
     <div id="footer-placeholder"></div>
 </div>
+
+<!-- Setting Modal -->
+<div id="setting-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/50" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div id="setting-modal-container" class="relative bg-surface rounded-xl shadow-xl w-full max-w-md m-4 transform transition-all opacity-0 -translate-y-4">
+        <div class="p-6">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h3 id="modal-title" class="text-title-large font-semibold text-on-surface">日付設定</h3>
+                    <p id="modal-date-display" class="text-sm text-on-surface-variant"></p>
+                </div>
+                <button type="button" id="close-modal-button" class="rounded-full p-2 hover:bg-surface-variant" aria-label="閉じる">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div class="border-b border-outline-variant">
+                <nav class="-mb-px flex gap-4" aria-label="Tabs">
+                    <button id="tab-btn-settings" class="tab-button shrink-0 border-b-2 border-primary px-1 py-3 text-sm font-medium text-primary" aria-current="page">
+                        個別設定
+                    </button>
+                    <button id="tab-btn-survey-details" class="tab-button shrink-0 border-b-2 border-transparent px-1 py-3 text-sm font-medium text-on-surface-variant hover:border-gray-300 hover:text-on-surface">
+                        アンケート詳細
+                    </button>
+                    <button id="tab-btn-reassign" class="tab-button shrink-0 border-b-2 border-transparent px-1 py-3 text-sm font-medium text-on-surface-variant hover:border-gray-300 hover:text-on-surface">
+                        アサイン
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Tab Content -->
+            <div id="tab-content-settings" class="tab-content py-4">
+                <form id="setting-form">
+                    <div class="space-y-4">
+                        <input type="hidden" id="setting-id">
+                        <div>
+                            <label class="text-sm font-medium text-on-surface-variant">種別</label>
+                            <div class="flex gap-4 mt-2">
+                                <label class="flex items-center gap-2">
+                                    <input type="radio" name="event_type" value="HOLIDAY" class="form-radio text-primary focus:ring-primary">
+                                    <span>特別休業日</span>
+                                </label>
+                                <label class="flex items-center gap-2">
+                                    <input type="radio" name="event_type" value="SUBSTITUTE_WORKDAY" class="form-radio text-primary focus:ring-primary">
+                                    <span>振替営業日</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="event_date" class="block text-sm font-medium text-on-surface-variant">日付</label>
+                            <input type="date" id="event_date" class="mt-1 block w-full rounded-md border-outline bg-surface-container-lowest focus:border-primary focus:ring-primary" required>
+                            <div id="event_date-error" class="text-sm text-error mt-1"></div>
+                        </div>
+                        <div>
+                            <label for="reason" class="block text-sm font-medium text-on-surface-variant">理由</label>
+                            <textarea id="reason" rows="3" class="mt-1 block w-full rounded-md border-outline bg-surface-container-lowest focus:border-primary focus:ring-primary" required></textarea>
+                            <div id="reason-error" class="text-sm text-error mt-1"></div>
+                        </div>
+                    </div>
+                    <div class="flex justify-end gap-2 mt-6">
+                        <button type="button" id="cancel-button" class="rounded-lg border border-outline px-4 py-2 text-sm font-semibold">キャンセル</button>
+                        <button type="submit" id="save-button" class="rounded-lg bg-primary text-on-primary px-4 py-2 text-sm font-semibold">保存</button>
+                    </div>
+                </form>
+            </div>
+            <div id="tab-content-survey-details" class="tab-content hidden py-4">
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h4 class="text-title-medium font-semibold text-on-surface">対象アンケート</h4>
+                        <button id="toggle-day-urgency-button" class="text-white text-xs font-bold py-1 px-2 rounded"></button>
+                    </div>
+                    <div id="assignment-surveys-list" class="space-y-3 max-h-60 overflow-y-auto pr-2">
+                        <!-- Survey items will be injected here by JavaScript -->
+                    </div>
+                </div>
+                <div class="flex justify-end gap-2 mt-6">
+                    <button type="button" id="close-assignment-tab-button" class="rounded-lg border border-outline px-4 py-2 text-sm font-semibold">閉じる</button>
+                </div>
+            </div>
+            <div id="tab-content-reassign" class="tab-content hidden py-4">
+                <form id="assignment-form">
+                    <div class="space-y-4">
+                        <div>
+                            <label for="assignment-survey" class="block text-sm font-medium text-on-surface-variant">対象アンケート</label>
+                            <select id="assignment-survey" class="mt-1 block w-full rounded-md border-outline bg-surface-container-lowest focus:border-primary focus:ring-primary"></select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-on-surface-variant">担当会社</label>
+                            <p id="assignment-company" class="mt-1 text-on-surface"></p>
+                        </div>
+                    </div>
+                    <div class="flex justify-end gap-2 mt-6">
+                        <button type="button" id="cancel-assignment-button" class="rounded-lg border border-outline px-4 py-2 text-sm font-semibold">キャンセル</button>
+                        <button type="submit" id="save-assignment-button" class="rounded-lg bg-primary text-on-primary px-4 py-2 text-sm font-semibold">完了</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div id="confirmation-modal" class="fixed inset-0 z-60 hidden flex items-center justify-center bg-black/50" aria-labelledby="confirmation-modal-title" role="dialog" aria-modal="true">
+    <div id="confirmation-modal-container" class="relative bg-surface rounded-xl shadow-xl w-full max-w-lg m-4 p-6 text-center transform transition-all opacity-0 -translate-y-4">
+        <h3 id="confirmation-modal-title" class="text-title-large font-semibold text-on-surface mb-4">完了</h3>
+        <p id="confirmation-modal-message" class="text-on-surface-variant mb-6"></p>
+        <div class="mt-6">
+            <button type="button" id="close-confirmation-modal-button" class="rounded-lg bg-primary text-on-primary px-6 py-2 text-sm font-semibold">閉じる</button>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="delete-confirm-modal" class="fixed inset-0 z-70 hidden flex items-center justify-center bg-black/50" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
+    <div id="delete-confirm-modal-container" class="relative bg-surface rounded-xl shadow-xl w-full max-w-sm m-4 p-6 transform transition-all opacity-0 -translate-y-4">
+        <h3 id="delete-modal-title" class="text-title-large font-semibold text-on-surface">設定を削除</h3>
+        <p class="mt-2 text-sm text-on-surface-variant">この設定を本当に削除してもよろしいですか？この操作は元に戻せません。</p>
+        <div class="mt-6 flex justify-end gap-3">
+            <button type="button" id="cancel-delete-button" class="rounded-lg border border-outline px-4 py-2 text-sm font-semibold">いいえ</button>
+            <button type="button" id="confirm-delete-button" class="rounded-lg bg-error text-white px-4 py-2 text-sm font-semibold">はい、削除します</button>
+        </div>
+    </div>
+</div>
+
+<!-- Bulk Setting Modal -->
+<div id="bulk-setting-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/50" aria-labelledby="bulk-modal-title" role="dialog" aria-modal="true">
+    <div id="bulk-setting-modal-container" class="relative bg-surface rounded-xl shadow-xl w-full max-w-md m-4 transform transition-all opacity-0 -translate-y-4">
+        <div class="p-6">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h3 id="bulk-modal-title" class="text-title-large font-semibold text-on-surface">範囲設定</h3>
+                    <p id="bulk-modal-date-range-display" class="text-sm text-on-surface-variant"></p>
+                </div>
+                <button type="button" id="bulk-close-modal-button" class="rounded-full p-2 hover:bg-surface-variant" aria-label="閉じる">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div class="border-b border-outline-variant">
+                <nav class="-mb-px flex gap-4" aria-label="Tabs">
+                    <button id="bulk-tab-btn-settings" class="tab-button shrink-0 border-b-2 border-primary px-1 py-3 text-sm font-medium text-primary" aria-current="page">
+                        個別設定
+                    </button>
+                    <button id="bulk-tab-btn-survey-details" class="tab-button shrink-0 border-b-2 border-transparent px-1 py-3 text-sm font-medium text-on-surface-variant hover:border-gray-300 hover:text-on-surface">
+                        アンケート詳細
+                    </button>
+                    <button id="bulk-tab-btn-reassign" class="tab-button shrink-0 border-b-2 border-transparent px-1 py-3 text-sm font-medium text-on-surface-variant hover:border-gray-300 hover:text-on-surface">
+                        アサイン
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Tab Content -->
+            <div id="bulk-tab-content-settings" class="tab-content py-4">
+                <form id="bulk-setting-form">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-sm font-medium text-on-surface-variant">種別</label>
+                            <div class="flex gap-4 mt-2">
+                                <label class="flex items-center gap-2">
+                                    <input type="radio" name="bulk_event_type" value="HOLIDAY" class="form-radio text-primary focus:ring-primary" checked>
+                                    <span>特別休業日</span>
+                                </label>
+                                <label class="flex items-center gap-2">
+                                    <input type="radio" name="bulk_event_type" value="SUBSTITUTE_WORKDAY" class="form-radio text-primary focus:ring-primary">
+                                    <span>振替営業日</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="bulk_reason" class="block text-sm font-medium text-on-surface-variant">理由</label>
+                            <textarea id="bulk_reason" rows="3" class="mt-1 block w-full rounded-md border-outline bg-surface-container-lowest focus:ring-primary" required></textarea>
+                            <div id="bulk_reason-error" class="text-sm text-error mt-1"></div>
+                        </div>
+                    </div>
+                    <div class="flex justify-end gap-2 mt-6">
+                        <button type="button" id="bulk-cancel-button" class="rounded-lg border border-outline px-4 py-2 text-sm font-semibold">キャンセル</button>
+                        <button type="submit" class="rounded-lg bg-primary text-on-primary px-4 py-2 text-sm font-semibold">保存</button>
+                    </div>
+                </form>
+            </div>
+            <div id="bulk-tab-content-survey-details" class="tab-content hidden py-4">
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h4 class="text-title-medium font-semibold text-on-surface">対象アンケート</h4>
+                    </div>
+                    <div id="bulk-assignment-surveys-list" class="space-y-3 max-h-60 overflow-y-auto pr-2">
+                        <!-- Survey items will be injected here by JavaScript -->
+                    </div>
+                </div>
+                <div class="flex justify-end gap-2 mt-6">
+                    <button type="button" id="bulk-close-assignment-tab-button" class="rounded-lg border border-outline px-4 py-2 text-sm font-semibold">閉じる</button>
+                </div>
+            </div>
+            <div id="bulk-tab-content-reassign" class="tab-content hidden py-4">
+                <form id="bulk-assignment-form">
+                    <div class="space-y-4">
+                        <div>
+                            <label for="bulk-assignment-survey" class="block text-sm font-medium text-on-surface-variant">対象アンケート</label>
+                            <select id="bulk-assignment-survey" class="mt-1 block w-full rounded-md border-outline bg-surface-container-lowest focus:border-primary focus:ring-primary"></select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-on-surface-variant">担当会社</label>
+                            <p id="bulk-assignment-company" class="mt-1 text-on-surface"></p>
+                        </div>
+                    </div>
+                    <div class="flex justify-end gap-2 mt-6">
+                        <button type="button" id="bulk-cancel-assignment-button" class="rounded-lg border border-outline px-4 py-2 text-sm font-semibold">キャンセル</button>
+                        <button type="submit" id="bulk-save-assignment-button" class="rounded-lg bg-primary text-on-primary px-4 py-2 text-sm font-semibold">完了</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script type="module" src="src/admin.js"></script>
 </body>
 </html>

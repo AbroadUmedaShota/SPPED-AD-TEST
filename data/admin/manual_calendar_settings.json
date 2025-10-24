@@ -1,0 +1,74 @@
+[
+  {
+    "id": 1,
+    "event_date": "2025-08-13",
+    "event_type": "HOLIDAY",
+    "reason": "夏季特別休業日",
+    "created_by": "管理者",
+    "created_at": "2025-07-01T10:00:00Z"
+  },
+  {
+    "id": 2,
+    "event_date": "2025-08-14",
+    "event_type": "HOLIDAY",
+    "reason": "夏季特別休業日",
+    "created_by": "管理者",
+    "created_at": "2025-07-01T10:00:00Z"
+  },
+  {
+    "id": 3,
+    "event_date": "2025-08-15",
+    "event_type": "HOLIDAY",
+    "reason": "夏季特別休業日",
+    "created_by": "管理者",
+    "created_at": "2025-07-01T10:00:00Z"
+  },
+  {
+    "id": 4,
+    "event_date": "2025-10-14",
+    "event_type": "SUBSTITUTE_WORKDAY",
+    "reason": "展示会サポート対応のため振替営業",
+    "created_by": "佐藤 花子",
+    "created_at": "2025-09-25T11:00:00Z"
+  },
+  {
+    "id": 5,
+    "event_date": "2025-12-29",
+    "event_type": "HOLIDAY",
+    "reason": "年末特別休業日",
+    "created_by": "管理者",
+    "created_at": "2025-09-20T15:00:00Z"
+  },
+  {
+    "id": 6,
+    "event_date": "2025-12-30",
+    "event_type": "HOLIDAY",
+    "reason": "年末特別休業日",
+    "created_by": "管理者",
+    "created_at": "2025-09-20T15:00:00Z"
+  },
+  {
+    "id": 7,
+    "event_date": "2025-12-31",
+    "event_type": "HOLIDAY",
+    "reason": "年末特別休業日",
+    "created_by": "管理者",
+    "created_at": "2025-09-20T15:00:00Z"
+  },
+  {
+    "id": 8,
+    "event_date": "2026-01-02",
+    "event_type": "HOLIDAY",
+    "reason": "年始特別休業日",
+    "created_by": "管理者",
+    "created_at": "2025-09-20T15:00:00Z"
+  },
+  {
+    "id": 9,
+    "event_date": "2026-01-03",
+    "event_type": "HOLIDAY",
+    "reason": "年始特別休業日",
+    "created_by": "管理者",
+    "created_at": "2025-09-20T15:00:00Z"
+  }
+]

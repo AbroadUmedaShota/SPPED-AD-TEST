@@ -4,61 +4,90 @@ import { handleOpenModal, closeModal } from './modalHandler.js';
  * Displays a confirmation modal and executes a callback on confirmation.
  * @param {string} message The message to display in the modal.
  * @param {function} onConfirm The callback function to execute if the user confirms.
- * @param {string} [title='確認'] The title of the modal.
+ * @param {object} [options] Optional parameters.
+ * @param {string} [options.title='確認'] The title of the modal.
+ * @param {string} [options.confirmText='実行'] The text for the confirm button.
+ * @param {string} [options.cancelText='キャンセル'] The text for the cancel button.
+ * @param {boolean} [options.defaultCancel=true] If true, the cancel button is focused by default.
  */
-export function showConfirmationModal(message, onConfirm, title = '確認') {
+export function showConfirmationModal(message, onConfirm, options = {}) {
+    const {
+        title = '確認',
+        confirmText = '実行',
+        cancelText = 'キャンセル',
+        defaultCancel = true
+    } = options;
+
     handleOpenModal('confirmationModal', 'modals/confirmationModal.html')
         .then(() => {
+            const modal = document.getElementById('confirmationModal');
             const titleEl = document.getElementById('confirmationModalTitle');
             const messageEl = document.getElementById('confirmationModalMessage');
             const confirmBtn = document.getElementById('confirmationModalConfirmBtn');
             const cancelBtn = document.getElementById('confirmationModalCancelBtn');
-            const closeBtn = document.getElementById('closeConfirmationModalBtn'); // ✕ボタンを取得
+            const closeBtn = document.getElementById('closeConfirmationModalBtn');
 
             if (titleEl) titleEl.textContent = title;
             if (messageEl) messageEl.textContent = message;
+            if (confirmBtn) confirmBtn.textContent = confirmText;
+            if (cancelBtn) cancelBtn.textContent = cancelText;
 
-            // Clone and replace the confirm button to remove old event listeners
             const newConfirmBtn = confirmBtn.cloneNode(true);
             confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+            const newCancelBtn = cancelBtn.cloneNode(true);
+            cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+
+            let observer;
+            const cleanup = () => {
+                document.removeEventListener('keydown', handleKeyDown);
+                if (observer) observer.disconnect();
+            };
 
             const confirmAndClose = () => {
                 onConfirm();
                 closeModal('confirmationModal');
+                cleanup();
+            };
+
+            const cancelAction = () => {
+                closeModal('confirmationModal');
+                cleanup();
             };
 
             newConfirmBtn.addEventListener('click', confirmAndClose);
-
-            // Add event listener for the cancel and close buttons
-            const cancelAction = () => closeModal('confirmationModal');
-            if (cancelBtn) {
-                cancelBtn.addEventListener('click', cancelAction);
-            }
-            if (closeBtn) { // ✕ボタンにイベントリスナーを追加
+            newCancelBtn.addEventListener('click', cancelAction);
+            if (closeBtn) {
                 closeBtn.addEventListener('click', cancelAction);
             }
 
-            // Also handle Enter key for confirmation
-            const handleEnter = (event) => {
-                if (event.key === 'Enter') {
+            if (defaultCancel) {
+                newCancelBtn.focus();
+            } else {
+                newConfirmBtn.focus();
+            }
+
+            const handleKeyDown = (event) => {
+                if (event.ctrlKey && event.key === 'Enter') {
+                    event.preventDefault();
                     confirmAndClose();
-                    document.removeEventListener('keydown', handleEnter);
+                } else if (event.key === 'Escape') {
+                    event.preventDefault();
+                    cancelAction();
                 }
             };
-            document.addEventListener('keydown', handleEnter);
 
-            // Ensure keydown listener is removed when modal is closed by other means
-            const modal = document.getElementById('confirmationModal');
-            const observer = new MutationObserver((mutations) => {
+            document.addEventListener('keydown', handleKeyDown);
+
+            observer = new MutationObserver((mutations) => {
                 mutations.forEach(mutation => {
                     if (mutation.attributeName === 'data-state' && modal.dataset.state === 'closed') {
-                        document.removeEventListener('keydown', handleEnter);
-                        observer.disconnect();
+                        cleanup();
                     }
                 });
             });
             observer.observe(modal, { attributes: true });
-
         })
-        .catch(error => console.error('Error opening confirmation modal:', error));
+        .catch(error => {
+            console.error('Error opening confirmation modal:', error);
+        });
 }

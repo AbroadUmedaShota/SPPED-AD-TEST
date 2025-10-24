@@ -7,7 +7,7 @@
     --color-base-background-sub: #F8F8F8;
     --color-base-card: #FFFFFF;
     --color-base-border-divider: #E0E0E0;
-    --color-base-shadow-soft: none; /* shadow_soft に名称変更 */
+    --color-base-shadow-soft: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow_soft に名称変更 */
     --color-base-shadow-strong: none; /* shadow_strong を新規追加 */
 
     /* Text Colors */
@@ -97,7 +97,7 @@ body.dark-mode {
     --color-base-background-sub: #282828;
     --color-base-card: #282828;
     --color-base-border-divider: #3A3A3A;
-    --color-base-shadow-soft: rgba(255, 255, 255, 0.08);
+    --color-base-shadow-soft: 0 1px 2px 0 rgba(255, 255, 255, 0.1);
     --color-base-shadow-strong: rgba(0, 0, 0, 0.6); /* DARK_MODE_COLOR_PALETTE_ACCURACY: ダークモードではより透過率を上げて控えめに */
 
     --color-text-main: #E0E0E0;

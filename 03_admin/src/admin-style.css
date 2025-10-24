@@ -36,3 +36,50 @@
 body.sidebar-locked {
     overflow: hidden;
 }
+
+/* Dark mode fix for floating elements */
+body.dark-mode .kpi-card,
+body.dark-mode .bg-surface.shadow-sm {
+    background-color: var(--color-base-card) !important;
+    border-color: var(--color-base-border-divider) !important;
+}
+
+body.dark-mode #graphModal > div {
+    background-color: var(--color-base-card);
+    color: var(--color-text-main);
+}
+
+body.dark-mode #graphModal #closeGraphModal {
+    color: var(--color-text-sub);
+}
+
+body.dark-mode #graphModal #closeGraphModal:hover {
+    color: var(--color-text-main);
+}
+
+body.dark-mode #graphModal #modalCloseBtn {
+    background-color: var(--color-button-primary-bg);
+    color: var(--color-button-primary-text);
+}
+
+body.dark-mode #graphModal #modalCloseBtn:hover {
+    background-color: var(--color-button-primary-hover-bg);
+}
+
+/* Dark Mode Calendar Colors */
+.dark-mode .bg-yellow-200 {
+    background-color: #713f12; /* amber-800 */
+}
+.dark-mode .bg-blue-200 {
+    background-color: #1e3a8a; /* blue-900 */
+}
+.dark-mode .bg-red-200 {
+    background-color: #7f1d1d; /* red-900 */
+}
+
+/* Adjust text color for readability on the new dark backgrounds */
+.dark-mode .bg-yellow-200 .text-on-surface-variant,
+.dark-mode .bg-blue-200 .text-on-surface-variant,
+.dark-mode .bg-red-200 .text-on-surface-variant {
+    color: #d1d5db; /* gray-300 */
+}

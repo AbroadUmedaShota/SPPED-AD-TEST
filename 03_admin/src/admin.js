@@ -196,6 +196,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             const { initDataEntryPage } = await import('./data_entry.js');
             initDataEntryPage();
             break;
+        case 'calendar-management.html':
+            const { initCalendarManagementPage } = await import('./calendar-management.js');
+            initCalendarManagementPage();
+            break;
         // Add other admin pages here
         // case 'some_other_page.html':
         //     const { initSomeOtherPage } = await import('./some_other_page.js');

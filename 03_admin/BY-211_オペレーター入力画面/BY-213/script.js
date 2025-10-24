@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Manually initialize Materialize components
     const tooltips = document.querySelectorAll('.tooltipped');
     M.Tooltip.init(tooltips);
-    const modals = document.querySelectorAll('.modal:not(#suggestions-modal)');
+    const modals = document.querySelectorAll('.modal:not(#suggestions-modal):not(#skip-modal)');
     M.Modal.init(modals);
 
     // Manually set width for the user profile modal to override Materialize default
@@ -11,8 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
         userProfileModal.style.width = '560px';
     }
 
-    const skipModalInstance = M.Modal.getInstance(document.getElementById('skip-modal'));
-    const suspendModalInstance = M.Modal.getInstance(document.getElementById('suspend-modal'));
+
 
     // --- DOM Element Selection ---
     const mainImage = document.getElementById('main-image');
@@ -27,8 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const elapsedTimeElement = document.getElementById('elapsed-time');
     const cardCountElement = document.getElementById('card-count');
     const avgTimeElement = document.getElementById('avg-time');
-    const pauseButton = document.getElementById('pause-button');
-    const pauseTimeElement = document.getElementById('pause-time');
     const taskNameElement = document.getElementById('current-task-name');
     const modalTaskNameElement = document.getElementById('modal-user-task');
 
@@ -42,8 +39,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let mainImageRotation = 0;
     let mainImageScale = 1;
     let isFront = true;
-    let isPaused = false;
-    let pauseStartTime;
     const frontImageSrc = "../../sample/表.png";
     const backImageSrc = "../../sample/裏.png";
 
@@ -100,8 +95,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function startNewCard() {
-        if (isPaused) togglePause(); // Unpause if paused
-
         document.querySelectorAll('input, textarea').forEach(el => el.value = '');
         M.updateTextFields();
 
@@ -113,7 +106,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function moveToNextCardOrGroup() {
-        if (isPaused) return; // Do nothing if paused
         if (currentGroupIndex < groups.length - 1) {
             currentGroupIndex++;
             displayCurrentGroup();
@@ -132,18 +124,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateElapsedTime() {
-        if (isPaused) {
-            const pauseDuration = Math.floor((new Date() - pauseStartTime) / 1000);
-            pauseTimeElement.textContent = `(休憩: ${formatTime(pauseDuration)})`;
-            const PAUSE_WARNING_THRESHOLD_SECONDS = 300; // 5 minutes
-            if (pauseDuration > PAUSE_WARNING_THRESHOLD_SECONDS) {
-                pauseTimeElement.classList.add('time-warning');
-            } else {
-                pauseTimeElement.classList.remove('time-warning');
-            }
-            return;
-        }
-
         if (!cardStartTime) return;
         const totalSeconds = Math.floor((new Date() - cardStartTime) / 1000);
         elapsedTimeElement.textContent = `経過時間: ${formatTime(totalSeconds)}`;
@@ -153,24 +133,6 @@ document.addEventListener('DOMContentLoaded', () => {
             elapsedTimeElement.classList.add('time-warning');
         } else {
             elapsedTimeElement.classList.remove('time-warning');
-        }
-    }
-
-    function togglePause() {
-        isPaused = !isPaused;
-        const icon = pauseButton.querySelector('i');
-        if (isPaused) {
-            pauseStartTime = new Date();
-            icon.textContent = 'play_arrow';
-            pauseTimeElement.style.display = 'inline';
-            showToast('タイマーを一時停止しました');
-        } else {
-            const pauseDuration = new Date() - pauseStartTime;
-            cardStartTime.setTime(cardStartTime.getTime() + pauseDuration);
-            icon.textContent = 'pause';
-            pauseTimeElement.style.display = 'none';
-            pauseTimeElement.classList.remove('time-warning');
-            showToast('タイマーを再開しました');
         }
     }
 
@@ -190,16 +152,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function processCardInput() {
-        if (isPaused) {
-            showToast('一時停止中です。再開してください。');
-            return;
-        }
         if (!validateForm()) return;
         moveToNextCardOrGroup();
     }
 
     // --- Event Listeners ---
-    pauseButton.addEventListener('click', togglePause);
     thumbnailImage.addEventListener('click', swapImages);
     document.addEventListener('keydown', (e) => {
         if (e.altKey && e.key.toLowerCase() === 'q') {
@@ -260,54 +217,69 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Modal-related event listeners
-    document.getElementById('confirm-skip-button').addEventListener('click', () => {
-        const checkedRadio = document.querySelector('input[name="skip-reason"]:checked');
-        const errorElement = document.getElementById('skip-reason-error');
 
+    // --- New, Robust Skip Modal Initialization ---
+    const skipModalEl = document.getElementById('skip-modal');
+    const skipModalInstance = M.Modal.init(skipModalEl, { // This defines the instance for the skip modal
+        onOpenEnd: () => {
+            const skipReasonRadios = skipModalEl.querySelectorAll('input[name="skip_reason_group"]');
+            const sharedInput = skipModalEl.querySelector('#shared-reason-input');
+
+            const handleChange = () => {
+                const selectedValue = skipModalEl.querySelector('input[name="skip_reason_group"]:checked')?.value;
+                const sharedInput = skipModalEl.querySelector('#shared-reason-input');
+                const shouldBeDisabled = false; // Always enable the textarea
+
+                if (shouldBeDisabled) {
+                    sharedInput.setAttribute('disabled', 'disabled');
+                } else {
+                    sharedInput.removeAttribute('disabled');
+                }
+                
+                // Also re-trigger materialize label handling
+                M.updateTextFields();
+
+                if (!shouldBeDisabled) {
+                    sharedInput.focus();
+                }
+            };
+
+            skipReasonRadios.forEach(radio => {
+                radio.addEventListener('change', handleChange);
+            });
+            
+            handleChange(); // Run once on open to set initial state
+        }
+    });
+
+    // Get instance for the suspend modal, which was initialized generically
+    const suspendModalInstance = M.Modal.getInstance(document.getElementById('suspend-modal'));
+
+    // New listener for the confirm button, separate from the initialization
+    document.getElementById('confirm-skip-btn').addEventListener('click', () => {
+        const checkedRadio = document.querySelector('input[name="skip_reason_group"]:checked');
         if (!checkedRadio) {
-            errorElement.style.display = 'block';
+            showToast('スキップ理由を選択してください。');
             return;
         }
-
-        errorElement.style.display = 'none';
         const selectedValue = checkedRadio.value;
-        let reasonText = '';
-
-        if (checkedRadio.nextElementSibling) {
-            reasonText = checkedRadio.nextElementSibling.textContent;
-        }
-
-        if (selectedValue === 'other') {
-            const otherReason = document.getElementById('other-reason-text').value;
-            if (otherReason) {
-                reasonText += `: ${otherReason}`;
-            }
-        } else if (selectedValue === 'escalation') {
-            const escalationReason = document.getElementById('escalation-reason-text').value;
-            if (escalationReason) {
-                reasonText += `: ${escalationReason}`;
+        let reasonText = checkedRadio.nextElementSibling.textContent;
+        if (selectedValue === 'escalation' || selectedValue === 'other') {
+            const detailReason = document.getElementById('shared-reason-input').value;
+            if (detailReason) {
+                reasonText += `: ${detailReason}`;
             }
         }
-
         showToast(`スキップしました (理由: ${reasonText})`);
-        skipModalInstance.close();
-        startNewCard(); // Start a new card after skipping
+        skipModalInstance.close(); // This uses the instance defined above
+        startNewCard();
     });
 
+    // --- Suspend Modal Logic (unchanged) ---
     document.getElementById('confirm-suspend-button').addEventListener('click', () => {
         showToast('作業を終了しました。');
-        suspendModalInstance.close();
+        suspendModalInstance.close(); // This now has its instance variable
         // Optionally, redirect or clear session here
-    });
-
-    // Show/hide textareas based on skip reason
-    document.querySelectorAll('input[name="skip-reason"]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            const otherInput = document.getElementById('skip-reason-other-input');
-            const escalationInput = document.getElementById('skip-reason-escalation-input');
-            otherInput.style.display = (this.value === 'other' && this.checked) ? 'block' : 'none';
-            escalationInput.style.display = (this.value === 'escalation' && this.checked) ? 'block' : 'none';
-        });
     });
 
     // --- Initial Execution ---

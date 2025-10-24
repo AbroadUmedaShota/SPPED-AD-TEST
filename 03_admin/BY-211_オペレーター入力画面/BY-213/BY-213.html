@@ -12,6 +12,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
           integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
           crossorigin="anonymous" referrerpolicy="no-referrer">
+    <style>
+        #next-action-modal {
+            max-width: 450px;
+            width: 80%;
+            top: 45% !important;
+        }
+        #next-action-modal .modal-footer {
+            text-align: right;
+        }
+
+    </style>
 </head>
 <body>
 
@@ -201,7 +212,6 @@
                       <span id="avg-time">平均時間: 0.0s</span>
                   </div>
                   <div class="button-group" style="margin-top: 10px;">
-                      <a id="pause-button" class="btn waves-effect waves-light blue tooltipped" data-position="top" data-tooltip="小休憩"><i class="material-icons">pause</i></a>
                       <a id="suspend-button" class="btn waves-effect waves-light orange darken-2 modal-trigger tooltipped" data-position="top" data-target="suspend-modal" data-tooltip="作業終了"><i class="material-icons">exit_to_app</i></a>
                       <a id="skip-button" class="btn waves-effect waves-light red lighten-1 modal-trigger tooltipped" data-position="top" data-target="skip-modal" data-tooltip="スキップ"><i class="material-icons">skip_next</i></a>
                       <a id="confirm-button" class="btn-large btn-floating waves-effect waves-light green darken-1 tooltipped" data-position="top" data-tooltip="確定 (Ctrl+Enter)"><i class="material-icons">check</i></a>
@@ -254,43 +264,29 @@
         </div>
       
         <div id="skip-modal" class="modal">
-          <div class="modal-header">
-            <i class="material-icons">skip_next</i>
-            <h4>スキップ理由</h4>
-          </div>
-          <div class="modal-content">
-            <p>スキップする理由を選択してください。</p>
-            <div class="radio-group">
-              <p>
-                <label><input type="radio" name="skip-reason" value="not-card"><span class="grey-text text-darken-3">名刺ではない</span></label>
-              </p>
-              <p>
-                <label><input type="radio" name="skip-reason" value="other-language"><span class="grey-text text-darken-3">対応言語外</span></label>
-              </p>
-              <p>
-                <label><input type="radio" name="skip-reason" value="escalation"><span class="grey-text text-darken-3">エスカレーション</span></label>
-              </p>
-              <p>
-                <label><input type="radio" name="skip-reason" value="other"><span class="grey-text text-darken-3">その他</span></label>
-              </p>
-            </div>
-            <p id="skip-reason-error" class="red-text" style="display: none; margin-top: 10px;">スキップ理由を選択してください。</p>
-            
-            <div class="input-field" id="skip-reason-escalation-input" style="display: none; margin-top: 15px;">
-              <textarea id="escalation-reason-text" class="materialize-textarea"></textarea>
-              <label for="escalation-reason-text">エスカレーション理由を具体的に入力してください</label>
-            </div>
-      
-            <div class="input-field" id="skip-reason-other-input" style="display: none; margin-top: 15px;">
-              <textarea id="other-reason-text" class="materialize-textarea"></textarea>
-              <label for="other-reason-text">理由を具体的に入力してください</label>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <a href="#!" id="cancel-skip-button" class="modal-close waves-effect waves-green btn-flat">キャンセル</a>
-            <a href="#!" id="confirm-skip-button" class="waves-effect waves-light btn red lighten-1">スキップ実行</a>
-          </div>
+    <div class="modal-content">
+        <h4>スキップ理由</h4>
+        <p>スキップする理由を選択してください。</p>
+        
+        <div id="skip-reason-options">
+            <div><label><input name="skip_reason_group" type="radio" value="not_card" /><span>名刺ではない</span></label></div>
+            <div><label><input name="skip_reason_group" type="radio" value="unsupported_language" /><span>対応言語外</span></label></div>
+            <div><label><input name="skip_reason_group" type="radio" value="escalation" /><span>エスカレーション</span></label></div>
+            <div><label><input name="skip_reason_group" type="radio" value="other" /><span>その他</span></label></div>
         </div>
+
+        <!-- Shared Reason Textarea -->
+        <div class="input-field" id="shared-reason-container" style="margin-top: 20px;">
+            <textarea id="shared-reason-input" class="materialize-textarea" disabled></textarea>
+            <label for="shared-reason-input">理由</label>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <a href="#!" class="modal-close waves-effect btn-flat">キャンセル</a>
+        <a href="#!" id="confirm-skip-btn" class="waves-effect waves-light btn red">スキップ実行</a>
+    </div>
+</div>
       
         <div id="suspend-modal" class="modal">
           <div class="modal-header">
@@ -307,22 +303,124 @@
         </div>
       
 
+<!-- Confirmation Modal for Next Action -->
+<div id="next-action-modal" class="modal">
+  <div class="modal-content">
+    <h4 id="next-action-modal-title">確認</h4>
+    <p id="next-action-modal-message">次のグループに進みますか？</p>
+  </div>
+  <div class="modal-footer">
+    <a href="#!" class="modal-close waves-effect waves-green btn-flat tooltipped" data-position="top" data-tooltip="閉じる (Enter)">いいえ</a>
+    <a href="#!" id="next-action-modal-confirm" class="waves-effect waves-light btn tooltipped" data-position="top" data-tooltip="次に進む (Ctrl+Enter)">はい</a>
+  </div>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // Initialize Materialize components
-    M.AutoInit();
+    // --- Initialize all tooltips on the page ---
+    M.Tooltip.init(document.querySelectorAll('.tooltipped'));
 
-    const formElements = Array.from(document.querySelectorAll('input, textarea'));
-    formElements.forEach((element, index) => {
-        element.addEventListener('keydown', function (event) {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                const nextElement = formElements[index + 1];
-                if (nextElement) {
-                    nextElement.focus();
+    // --- Modal Setup ---
+    const nextActionModalEl = document.getElementById('next-action-modal');
+    let modalKeydownHandler;
+    let elementToFocusAfterClose = null; // Variable to store the element to focus
+
+    const modalOptions = {
+        dismissible: true,
+        onOpenEnd: () => {
+            modalKeydownHandler = (event) => {
+                if (event.ctrlKey && event.key === 'Enter') {
+                    event.preventDefault();
+                    document.getElementById('next-action-modal-confirm').click();
+                } else if (event.key === 'Enter') {
+                    event.preventDefault();
+                    modalInstance.close();
+                }
+            };
+            document.addEventListener('keydown', modalKeydownHandler);
+        },
+        onCloseEnd: () => {
+            if (modalKeydownHandler) document.removeEventListener('keydown', modalKeydownHandler);
+            // Focus the element after the modal is fully closed
+            if (elementToFocusAfterClose) {
+                elementToFocusAfterClose.focus();
+                elementToFocusAfterClose = null; // Reset for the next use
+            }
+        }
+    };
+    const modalInstance = M.Modal.init(nextActionModalEl, modalOptions);
+    const modalTitle = document.getElementById('next-action-modal-title');
+    const modalMessage = document.getElementById('next-action-modal-message');
+
+    // --- Simplified Event Handling ---
+    const formGroupsContainer = document.getElementById('form-groups');
+    if (!formGroupsContainer) return;
+
+    const allFormElements = Array.from(document.querySelectorAll('input:not([type="hidden"]), textarea'));
+
+    const showModal = (title, message, onConfirm) => {
+        modalTitle.textContent = title;
+        modalMessage.textContent = message;
+        const originalConfirmBtn = document.getElementById('next-action-modal-confirm');
+        const newConfirmBtn = originalConfirmBtn.cloneNode(true);
+        originalConfirmBtn.parentNode.replaceChild(newConfirmBtn, originalConfirmBtn);
+
+        // Initialize tooltip on the new button, as cloning removes the instance
+        M.Tooltip.init(newConfirmBtn);
+
+        newConfirmBtn.addEventListener('click', () => {
+            if (onConfirm) onConfirm(); // Execute the confirm action
+            modalInstance.close();
+        }, { once: true });
+        modalInstance.open();
+    };
+
+    formGroupsContainer.addEventListener('keydown', (event) => {
+        const currentElement = event.target;
+        if ((currentElement.tagName === 'INPUT' || currentElement.tagName === 'TEXTAREA') && event.key === 'Enter' && !event.ctrlKey) {
+            event.preventDefault();
+
+            const group = currentElement.closest('.group-section');
+            if (!group) return;
+
+            const groupInputs = Array.from(group.querySelectorAll('input:not([type="hidden"]), textarea'));
+            const currentIndexInGroup = groupInputs.indexOf(currentElement);
+            const isLastInGroup = currentIndexInGroup === groupInputs.length - 1;
+
+            const overallIndex = allFormElements.indexOf(currentElement);
+            const isLastOnPage = overallIndex === allFormElements.length - 1;
+
+            if (isLastInGroup) {
+                if (isLastOnPage) {
+                    showModal('確定', '次の名刺に進みますか？', () => {
+                        document.getElementById('confirm-button').click();
+                    });
+                } else {
+                    // Set the default focus target to the current element (to return focus on cancel)
+                    elementToFocusAfterClose = currentElement;
+                    showModal('確認', '次のグループに進みますか？', () => {
+                        // On confirm, overwrite the focus target to be the next element
+                        if (overallIndex < allFormElements.length - 1) {
+                            elementToFocusAfterClose = allFormElements[overallIndex + 1];
+                        }
+                    });
+                }
+            } else {
+                if (currentIndexInGroup < groupInputs.length - 1) {
+                    groupInputs[currentIndexInGroup + 1].focus();
                 }
             }
-        });
+        }
+    });
+
+    // Global Ctrl+Enter handler
+    document.addEventListener('keydown', function(event) {
+        if (event.ctrlKey && event.key === 'Enter') {
+            if (modalInstance && !modalInstance.isOpen) {
+                event.preventDefault();
+                document.getElementById('confirm-button').click();
+            }
+        }
     });
 });
 </script>

@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const snippets = {
         'グループ1': {
-            'email': ['@gmail.com', '@yahoo.co.jp', '@outlook.com', '@icloud.com', '@docomo.ne.jp', '@softbank.ne.jp', '@ezweb.ne.jp', '@au.com']
+            'email': ['@gmail.com', '@yahoo.co.jp', '@outlook.com', '@icloud.com', '.co.jp', '.com']
         },
         'グループ3': {
             'company': ['株式会社', '有限会社', '合同会社', '(株)', '(有)'],
@@ -15,34 +15,37 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    function createSnippetButton(targetInput, text, index) {
+    function createSnippetButton(targetInput, text, index, allSuggestions) {
         const button = document.createElement('a');
         button.href = '#!';
-        button.className = 'btn-small waves-effect waves-light blue-grey lighten-3';
+        button.className = 'btn-small waves-effect waves-light blue-grey lighten-3 tooltipped';
+        button.setAttribute('data-position', 'bottom');
+        button.setAttribute('data-tooltip', `Alt+${index + 1} で入力`);
         button.textContent = `[${index + 1}] ${text}`;
         button.style.textTransform = 'none';
         button.style.margin = '2px';
 
         button.addEventListener('click', (e) => {
             e.preventDefault();
-            const currentValue = targetInput.value;
+            
+            let currentValue = targetInput.value;
+            let replaced = false;
 
-            if (targetInput.id === 'email') {
-                const atIndex = currentValue.indexOf('@');
-                if (text.startsWith('@') && atIndex !== -1) {
-                    targetInput.value = currentValue.substring(0, atIndex) + text;
-                } else {
-                    targetInput.value = currentValue + text;
+            if (allSuggestions && allSuggestions.length > 0) {
+                for (const suggestionToFind of allSuggestions) {
+                    if (currentValue.endsWith(suggestionToFind)) {
+                        // Replace the ending suggestion with the new one
+                        const baseValue = currentValue.substring(0, currentValue.length - suggestionToFind.length);
+                        targetInput.value = baseValue + text;
+                        replaced = true;
+                        break;
+                    }
                 }
-            } else if (targetInput.id === 'company') {
-                 if (text.startsWith('(')) {
-                     targetInput.value = text + currentValue;
-                 } else {
-                     targetInput.value = currentValue + text;
-                 }
-            } 
-            else {
-                targetInput.value = currentValue + text;
+            }
+
+            if (!replaced) {
+                // If no existing suggestion was found at the end, append the new one
+                targetInput.value += text;
             }
 
             M.updateTextFields();
@@ -73,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 container.style.padding = '10px 0';
 
                 suggestions.forEach((text, index) => {
-                    const button = createSnippetButton(targetInput, text, index);
+                    const button = createSnippetButton(targetInput, text, index, suggestions);
                     container.appendChild(button);
                 });
 
@@ -102,6 +105,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // Insert after the input-field container
                 targetInput.parentElement.insertAdjacentElement('afterend', container);
+
+                // 新しく追加されたツールチップを初期化
+                const newTooltips = container.querySelectorAll('.tooltipped');
+                M.Tooltip.init(newTooltips);
             }
         }
     };
