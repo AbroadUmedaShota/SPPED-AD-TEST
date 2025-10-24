@@ -14,6 +14,10 @@ export function initCalendarManagementPage() {
         urgencyOverrides: {},
         assignmentOverrides: {},
         currentModalDate: null,
+        // Additions for drag selection
+        isDragging: false,
+        dragStartDate: null,
+        dragEndDate: null,
     };
 
     // Declare variables for DOM elements
@@ -26,7 +30,12 @@ export function initCalendarManagementPage() {
         eventDateError, reasonError, assignmentForm, assignmentSurveySelect,
         assignmentCompanyDisplay, confirmationModal, confirmationModalContainer,
         confirmationModalMessage, closeConfirmationModalButton, deleteConfirmModal,
-        deleteConfirmModalContainer, cancelDeleteButton, confirmDeleteButton;
+        deleteConfirmModalContainer, cancelDeleteButton, confirmDeleteButton,
+        // Additions for bulk modal
+        bulkModal, bulkModalContainer, bulkModalDateRangeDisplay, bulkCloseModalButton,
+        bulkCancelButton, bulkSettingForm, bulkReasonInput, bulkReasonError,
+        bulkAssignmentForm, bulkSaveAssignmentButton, bulkCancelAssignmentButton,
+        bulkCloseAssignmentTabButton;
 
 
     // --- Data Fetching ---
@@ -157,6 +166,7 @@ export function initCalendarManagementPage() {
             
             calendarGrid.appendChild(dayCell);
         }
+        updateSelectionHighlight();
     }
 
     function getSurveysForDay(dateString) {
@@ -164,6 +174,22 @@ export function initCalendarManagementPage() {
         return state.surveys.filter(survey => {
             return dateString >= survey.startDate && dateString <= survey.endDate;
         });
+    }
+
+    function getSurveysForRange(startDate, endDate) {
+        if (!state.surveys) return [];
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const surveysInRange = new Map();
+
+        let currentDate = new Date(start);
+        while (currentDate <= end) {
+            const dateString = currentDate.toISOString().split('T')[0];
+            const surveysForDay = getSurveysForDay(dateString);
+            surveysForDay.forEach(survey => surveysInRange.set(survey.id, survey));
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+        return Array.from(surveysInRange.values());
     }
 
     function renderManualSettings() {
@@ -482,6 +508,246 @@ export function initCalendarManagementPage() {
         return { status: 'WORKDAY', reason: null };
     }
 
+    // --- Drag Selection Functions ---
+
+    function handleDragStart(e) {
+        const dayCell = e.target.closest('[data-date]');
+        if (dayCell) {
+            e.preventDefault();
+            state.isDragging = true;
+            state.dragStartDate = dayCell.dataset.date;
+            state.dragEndDate = dayCell.dataset.date;
+            updateSelectionHighlight();
+        }
+    }
+
+    function handleDrag(e) {
+        if (state.isDragging) {
+            const dayCell = e.target.closest('[data-date]');
+            if (dayCell && dayCell.dataset.date !== state.dragEndDate) {
+                state.dragEndDate = dayCell.dataset.date;
+                updateSelectionHighlight();
+            }
+        }
+    }
+
+    function handleDragEnd() {
+        if (!state.isDragging) return;
+
+        const wasDragging = state.dragStartDate !== state.dragEndDate;
+        state.isDragging = false;
+
+        if (wasDragging) {
+            const { start, end } = getOrderedDateRange();
+            openBulkSettingModal(start, end);
+        } else {
+            // This is a single click, handle it here
+            const date = state.dragStartDate;
+            const manualSetting = state.manualSettings.find(s => s.event_date === date);
+            const surveys = getSurveysForDay(date);
+            openModal({
+                date: date,
+                manualSetting: manualSetting,
+                surveys: surveys
+            });
+            // Reset selection visuals after a short delay
+            setTimeout(() => {
+                state.dragStartDate = null;
+                state.dragEndDate = null;
+                updateSelectionHighlight();
+            }, 100);
+        }
+    }
+
+    function getOrderedDateRange() {
+        const start = state.dragStartDate;
+        const end = state.dragEndDate;
+        if (!start || !end) return { start: null, end: null };
+        return new Date(start) > new Date(end) ? { start: end, end: start } : { start: start, end: end };
+    }
+
+    function updateSelectionHighlight() {
+        calendarGrid.querySelectorAll('.selection').forEach(cell => {
+            cell.classList.remove('selection', 'bg-blue-300');
+        });
+
+        if (!state.dragStartDate || !state.dragEndDate) return;
+
+        const { start, end } = getOrderedDateRange();
+        if (!start || !end) return;
+
+        let currentDate = new Date(start);
+        const lastDate = new Date(end);
+
+        while (currentDate <= lastDate) {
+            const dateString = currentDate.toISOString().split('T')[0];
+            const cell = calendarGrid.querySelector(`[data-date="${dateString}"]`);
+            if (cell) {
+                cell.classList.add('selection', 'bg-blue-300');
+            }
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+    }
+
+    // --- Bulk Setting Modal Functions ---
+    function switchBulkTab(targetTab) {
+        // Deactivate all buttons and hide all content
+        ['settings', 'survey-details', 'reassign'].forEach(tab => {
+            const tabBtn = document.getElementById(`bulk-tab-btn-${tab}`);
+            const tabContent = document.getElementById(`bulk-tab-content-${tab}`);
+            if (tabBtn) {
+                tabBtn.className = 'tab-button shrink-0 border-b-2 border-transparent px-1 py-3 text-sm font-medium text-on-surface-variant hover:border-gray-300 hover:text-on-surface';
+            }
+            if (tabContent) {
+                tabContent.classList.add('hidden');
+            }
+        });
+
+        // Activate the target tab
+        const activeBtn = document.getElementById(`bulk-tab-btn-${targetTab}`);
+        if (activeBtn) {
+            activeBtn.classList.remove('border-transparent', 'text-on-surface-variant');
+            activeBtn.classList.add('border-primary', 'text-primary');
+        }
+        const activeContent = document.getElementById(`bulk-tab-content-${targetTab}`);
+        if (activeContent) {
+            activeContent.classList.remove('hidden');
+        }
+    }
+
+    function openBulkSettingModal(startDate, endDate) {
+        bulkModalDateRangeDisplay.textContent = `${startDate} から ${endDate}`;
+        bulkSettingForm.reset();
+        if(bulkAssignmentForm) bulkAssignmentForm.reset();
+        bulkReasonError.textContent = '';
+
+        const surveysInRange = getSurveysForRange(startDate, endDate);
+        const surveyDetailsTab = document.getElementById('bulk-tab-btn-survey-details');
+        const reassignTab = document.getElementById('bulk-tab-btn-reassign');
+        const assignmentSurveysList = document.getElementById('bulk-assignment-surveys-list');
+
+        if (surveysInRange.length > 0) {
+            [surveyDetailsTab, reassignTab].forEach(tab => tab.style.display = 'block');
+
+            assignmentSurveysList.innerHTML = surveysInRange.map(survey => `
+                <div class="p-3 rounded-lg bg-surface-container">
+                    <p class="font-semibold text-on-surface">${survey.name}</p>
+                    <p class="text-sm text-on-surface-variant">見込枚数: ${(survey.expected_cards || 0).toLocaleString()}</p>
+                </div>
+            `).join('');
+
+            const bulkAssignmentSurveySelect = document.getElementById('bulk-assignment-survey');
+            const bulkAssignmentCompanyDisplay = document.getElementById('bulk-assignment-company');
+            if (bulkAssignmentSurveySelect) {
+                bulkAssignmentSurveySelect.innerHTML = surveysInRange.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+            }
+            if (bulkAssignmentCompanyDisplay) {
+                const companyName = state.operators.length > 0 ? state.operators[0].company : 'N/A';
+                bulkAssignmentCompanyDisplay.textContent = companyName;
+            }
+            switchBulkTab('survey-details');
+        } else {
+            [surveyDetailsTab, reassignTab].forEach(tab => tab.style.display = 'none');
+            assignmentSurveysList.innerHTML = '';
+            switchBulkTab('settings');
+        }
+
+        bulkModal.classList.remove('hidden');
+        setTimeout(() => bulkModalContainer.classList.add('opacity-100', 'translate-y-0'), 10);
+    }
+
+    function closeBulkSettingModal() {
+        bulkModalContainer.classList.remove('opacity-100', 'translate-y-0');
+        setTimeout(() => {
+            bulkModal.classList.add('hidden');
+            // Clear selection after closing modal
+            state.dragStartDate = null;
+            state.dragEndDate = null;
+            updateSelectionHighlight();
+        }, 200);
+    }
+
+    function handleBulkSave(e) {
+        e.preventDefault();
+        bulkReasonError.textContent = '';
+        const bulkReasonInput = document.getElementById('bulk_reason');
+        if (!bulkReasonInput.value) {
+            bulkReasonError.textContent = '理由は必須です。';
+            return;
+        }
+
+        const { start, end } = getOrderedDateRange();
+        if (!start || !end) return;
+
+        const eventType = bulkSettingForm.querySelector('input[name="bulk_event_type"]:checked').value;
+        const reason = bulkReasonInput.value;
+
+        let currentDate = new Date(start);
+        const lastDate = new Date(end);
+
+        while (currentDate <= lastDate) {
+            const dateString = currentDate.toISOString().split('T')[0];
+
+            const existingSettingIndex = state.manualSettings.findIndex(s => s.event_date === dateString);
+            const newSetting = {
+                id: existingSettingIndex > -1 ? state.manualSettings[existingSettingIndex].id : Date.now() + Math.random(),
+                event_date: dateString,
+                event_type: eventType,
+                reason: reason,
+                created_by: '現在のユーザー',
+                created_at: new Date().toISOString(),
+            };
+
+            if (existingSettingIndex > -1) {
+                state.manualSettings[existingSettingIndex] = newSetting;
+            } else {
+                state.manualSettings.push(newSetting);
+            }
+
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        console.log(`Bulk saving for ${start} to ${end}`);
+        closeBulkSettingModal();
+        renderAll();
+    }
+    
+    function handleBulkAssignmentSave(e) {
+        e.preventDefault();
+        const { start, end } = getOrderedDateRange();
+        if (!start || !end) return;
+
+        const bulkAssignmentSurveySelect = document.getElementById('bulk-assignment-survey');
+        const surveyId = parseInt(bulkAssignmentSurveySelect.value, 10);
+
+        let currentDate = new Date(start);
+        const lastDate = new Date(end);
+
+        while (currentDate <= lastDate) {
+            const dateString = currentDate.toISOString().split('T')[0];
+            if (!state.assignmentOverrides[dateString]) {
+                state.assignmentOverrides[dateString] = { surveyIds: [] };
+            }
+            if (!state.assignmentOverrides[dateString].surveyIds.includes(surveyId)) {
+                state.assignmentOverrides[dateString].surveyIds.push(surveyId);
+            }
+            if (state.urgencyOverrides[dateString]) {
+                state.urgencyOverrides[dateString] = false;
+            }
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        renderAll();
+
+        const surveyName = bulkAssignmentSurveySelect.options[bulkAssignmentSurveySelect.selectedIndex].text;
+        const companyName = document.getElementById('bulk-assignment-company').textContent;
+        const message = `${start}から${end}の${surveyName}に ${companyName} をアサインしました。`;
+        
+        closeBulkSettingModal();
+        showConfirmationModal(message);
+    }
+
+
     async function init() {
         // Assign DOM elements
         calendarTitle = document.getElementById('calendar-title');
@@ -529,6 +795,19 @@ export function initCalendarManagementPage() {
         cancelDeleteButton = document.getElementById('cancel-delete-button');
         confirmDeleteButton = document.getElementById('confirm-delete-button');
 
+        // Additions for bulk modal
+        bulkModal = document.getElementById('bulk-setting-modal');
+        bulkModalContainer = document.getElementById('bulk-setting-modal-container');
+        bulkModalDateRangeDisplay = document.getElementById('bulk-modal-date-range-display');
+        bulkCloseModalButton = document.getElementById('bulk-close-modal-button');
+        bulkCancelButton = document.getElementById('bulk-cancel-button');
+        bulkSettingForm = document.getElementById('bulk-setting-form');
+        bulkReasonError = document.getElementById('bulk_reason-error');
+        bulkAssignmentForm = document.getElementById('bulk-assignment-form');
+        bulkSaveAssignmentButton = document.getElementById('bulk-save-assignment-button');
+        bulkCancelAssignmentButton = document.getElementById('bulk-cancel-assignment-button');
+        bulkCloseAssignmentTabButton = document.getElementById('bulk-close-assignment-tab-button');
+
         await fetchData();
         renderAll();
 
@@ -565,19 +844,10 @@ export function initCalendarManagementPage() {
 
         document.getElementById('add-setting-button').addEventListener('click', () => openModal({ date: new Date().toISOString().split('T')[0] }));
         
-        calendarGrid.addEventListener('click', (e) => {
-            const dayCell = e.target.closest('[data-date]');
-            if (dayCell) {
-                const date = dayCell.dataset.date;
-                const manualSetting = state.manualSettings.find(s => s.event_date === date);
-                const surveys = getSurveysForDay(date);
-                openModal({
-                    date: date, 
-                    manualSetting: manualSetting,
-                    surveys: surveys
-                });
-            }
-        });
+        // Drag and drop listeners for calendar
+        calendarGrid.addEventListener('mousedown', handleDragStart);
+        calendarGrid.addEventListener('mousemove', handleDrag);
+        document.addEventListener('mouseup', handleDragEnd); // Listen on document to catch mouseup outside grid
 
         manualSettingsList.addEventListener('click', (e) => {
             const button = e.target.closest('button');
@@ -654,6 +924,11 @@ export function initCalendarManagementPage() {
                     state.assignmentOverrides[date].surveyIds.push(surveyId);
                 }
 
+                // If the day was urgent, remove the urgent status after assigning.
+                if (state.urgencyOverrides[date]) {
+                    state.urgencyOverrides[date] = false;
+                }
+
                 renderAll();
 
                 const surveyName = assignmentSurveySelect.options[assignmentSurveySelect.selectedIndex].text;
@@ -709,6 +984,20 @@ export function initCalendarManagementPage() {
         tabBtnSettings.addEventListener('click', () => switchTab('settings'));
         if (tabBtnSurveyDetails) tabBtnSurveyDetails.addEventListener('click', () => switchTab('survey-details'));
         if (tabBtnReassign) tabBtnReassign.addEventListener('click', () => switchTab('reassign'));
+
+        // Bulk modal listeners
+        bulkCloseModalButton.addEventListener('click', closeBulkSettingModal);
+        bulkCancelButton.addEventListener('click', closeBulkSettingModal);
+        bulkSettingForm.addEventListener('submit', handleBulkSave);
+        if(bulkCancelAssignmentButton) bulkCancelAssignmentButton.addEventListener('click', closeBulkSettingModal);
+        if(bulkCloseAssignmentTabButton) bulkCloseAssignmentTabButton.addEventListener('click', closeBulkSettingModal);
+        if(bulkAssignmentForm) bulkAssignmentForm.addEventListener('submit', handleBulkAssignmentSave);
+        bulkModal.addEventListener('click', (e) => {
+            if (e.target === bulkModal) closeBulkSettingModal();
+        });
+        document.getElementById('bulk-tab-btn-settings').addEventListener('click', () => switchBulkTab('settings'));
+        document.getElementById('bulk-tab-btn-survey-details').addEventListener('click', () => switchBulkTab('survey-details'));
+        document.getElementById('bulk-tab-btn-reassign').addEventListener('click', () => switchBulkTab('reassign'));
 
         document.getElementById('export-csv-button').addEventListener('click', () => alert('CSVエクスポート機能は現在開発中です。'));
         document.getElementById('import-csv-button').addEventListener('click', () => alert('CSVインポート機能は現在開発中です。'));
