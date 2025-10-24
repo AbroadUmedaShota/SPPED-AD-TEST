@@ -149,11 +149,11 @@ export function initCalendarManagementPage() {
                         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
                         let textColorClass = 'text-gray-900'; // Default black color
-                        if (survey.assignee == null && diffDays >= 0 && diffDays <= 3) {
+                        if (survey.status !== "assigned" && diffDays >= 0 && diffDays <= 3) {
                             textColorClass = 'text-red-600 font-semibold';
                         }
 
-                        const assignedIcon = survey.assignee != null ? '☑ ' : '';
+                        const assignedIcon = survey.status === "assigned" ? '☑ ' : '';
                         const surveyName = survey.name.length > 8 ? survey.name.substring(0, 8) + '...' : survey.name;
                         dayInfoHTML += `<p class="text-xs ${textColorClass} mt-1 truncate" title="${survey.name}">${assignedIcon}${surveyName}</p>`;
                     });
