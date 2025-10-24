@@ -153,7 +153,7 @@ export function initCalendarManagementPage() {
                             textColorClass = 'text-red-600 font-semibold';
                         }
 
-                        const assignedIcon = survey.status === "assigned" ? '☑ ' : '';
+                        const assignedIcon = survey.status === "assigned" ? '<span class="text-green-600">☑</span> ' : '';
                         const surveyName = survey.name.length > 8 ? survey.name.substring(0, 8) + '...' : survey.name;
                         dayInfoHTML += `<p class="text-xs ${textColorClass} mt-1 truncate" title="${survey.name}">${assignedIcon}${surveyName}</p>`;
                     });
@@ -416,6 +416,20 @@ export function initCalendarManagementPage() {
         const assignmentSurveysList = document.getElementById('assignment-surveys-list');
         const dayUrgencyButton = document.getElementById('toggle-day-urgency-button');
 
+        const assignView = document.getElementById('assign-view');
+        const cancelAssignView = document.getElementById('cancel-assign-view');
+
+        const dayAssignments = state.assignmentOverrides[data.date];
+        const isAssigned = dayAssignments && dayAssignments.surveyIds.length > 0;
+
+        if (isAssigned) {
+            assignView.classList.add('hidden');
+            cancelAssignView.classList.remove('hidden');
+        } else {
+            assignView.classList.remove('hidden');
+            cancelAssignView.classList.add('hidden');
+        }
+
         // Handle Survey-related Tabs
         if (data.surveys && data.surveys.length > 0) {
             [surveyDetailsTab, reassignTab].forEach(tab => tab.style.display = 'block');
@@ -435,10 +449,10 @@ export function initCalendarManagementPage() {
             dayUrgencyButton.dataset.date = data.date;
 
             // --- Populate Re-assign Tab ---
-            const assignmentSurveySelect = document.getElementById('assignment-survey');
             const assignmentCompanyDisplay = document.getElementById('assignment-company');
-            if (assignmentSurveySelect) {
-                assignmentSurveySelect.innerHTML = data.surveys.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+            const assignmentDateText = document.getElementById('assignment-date-text');
+            if (assignmentDateText) {
+                assignmentDateText.textContent = `${data.date}にアサインしますか？`;
             }
             if (assignmentCompanyDisplay) {
                 const companyName = state.operators.length > 0 ? state.operators[0].company : 'N/A';
@@ -669,6 +683,30 @@ export function initCalendarManagementPage() {
         const reassignTab = document.getElementById('bulk-tab-btn-reassign');
         const assignmentSurveysList = document.getElementById('bulk-assignment-surveys-list');
 
+        const bulkAssignView = document.getElementById('bulk-assign-view');
+        const bulkCancelAssignView = document.getElementById('bulk-cancel-assign-view');
+
+        let isRangeAssigned = false;
+        let currentDate = new Date(startDate);
+        const lastDate = new Date(endDate);
+        while (currentDate <= lastDate) {
+            const dateString = currentDate.toISOString().split('T')[0];
+            const dayAssignments = state.assignmentOverrides[dateString];
+            if (dayAssignments && dayAssignments.surveyIds.length > 0) {
+                isRangeAssigned = true;
+                break;
+            }
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        if (isRangeAssigned) {
+            bulkAssignView.classList.add('hidden');
+            bulkCancelAssignView.classList.remove('hidden');
+        } else {
+            bulkAssignView.classList.remove('hidden');
+            bulkCancelAssignView.classList.add('hidden');
+        }
+
         if (surveysInRange.length > 0) {
             [surveyDetailsTab, reassignTab].forEach(tab => tab.style.display = 'block');
 
@@ -679,10 +717,10 @@ export function initCalendarManagementPage() {
                 </div>
             `).join('');
 
-            const bulkAssignmentSurveySelect = document.getElementById('bulk-assignment-survey');
             const bulkAssignmentCompanyDisplay = document.getElementById('bulk-assignment-company');
-            if (bulkAssignmentSurveySelect) {
-                bulkAssignmentSurveySelect.innerHTML = surveysInRange.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+            const bulkAssignmentDateText = document.getElementById('bulk-assignment-date-text');
+            if (bulkAssignmentDateText) {
+                bulkAssignmentDateText.textContent = `${startDate}～${endDate}にアサインしますか？`;
             }
             if (bulkAssignmentCompanyDisplay) {
                 const companyName = state.operators.length > 0 ? state.operators[0].company : 'N/A';
@@ -760,20 +798,30 @@ export function initCalendarManagementPage() {
         const { start, end } = getOrderedDateRange();
         if (!start || !end) return;
 
-        const bulkAssignmentSurveySelect = document.getElementById('bulk-assignment-survey');
-        const surveyId = parseInt(bulkAssignmentSurveySelect.value, 10);
+        const surveysInRange = getSurveysForRange(start, end);
+        if (surveysInRange.length === 0) {
+            closeBulkSettingModal();
+            return;
+        }
 
         let currentDate = new Date(start);
         const lastDate = new Date(end);
 
         while (currentDate <= lastDate) {
             const dateString = currentDate.toISOString().split('T')[0];
-            if (!state.assignmentOverrides[dateString]) {
-                state.assignmentOverrides[dateString] = { surveyIds: [] };
+            const surveysForDay = getSurveysForDay(dateString);
+
+            if (surveysForDay.length > 0) {
+                if (!state.assignmentOverrides[dateString]) {
+                    state.assignmentOverrides[dateString] = { surveyIds: [] };
+                }
+                surveysForDay.forEach(survey => {
+                    if (!state.assignmentOverrides[dateString].surveyIds.includes(survey.id)) {
+                        state.assignmentOverrides[dateString].surveyIds.push(survey.id);
+                    }
+                });
             }
-            if (!state.assignmentOverrides[dateString].surveyIds.includes(surveyId)) {
-                state.assignmentOverrides[dateString].surveyIds.push(surveyId);
-            }
+
             if (state.urgencyOverrides[dateString]) {
                 state.urgencyOverrides[dateString] = false;
             }
@@ -782,9 +830,8 @@ export function initCalendarManagementPage() {
 
         renderAll();
 
-        const surveyName = bulkAssignmentSurveySelect.options[bulkAssignmentSurveySelect.selectedIndex].text;
         const companyName = document.getElementById('bulk-assignment-company').textContent;
-        const message = `${start}から${end}の${surveyName}に ${companyName} をアサインしました。`;
+        const message = `${start}から${end}に ${companyName} をアサインしました。`;
         
         closeBulkSettingModal();
         showConfirmationModal(message);
@@ -957,26 +1004,30 @@ export function initCalendarManagementPage() {
                 const date = state.currentModalDate;
                 if (!date) return;
 
-                const surveyId = parseInt(assignmentSurveySelect.value, 10);
-                
-                // Add surveyId to the assignments for the specific date
+                const surveysForDay = getSurveysForDay(date);
+                if (surveysForDay.length === 0) {
+                    closeModal();
+                    return;
+                }
+
                 if (!state.assignmentOverrides[date]) {
                     state.assignmentOverrides[date] = { surveyIds: [] };
                 }
-                if (!state.assignmentOverrides[date].surveyIds.includes(surveyId)) {
-                    state.assignmentOverrides[date].surveyIds.push(surveyId);
-                }
 
-                // If the day was urgent, remove the urgent status after assigning.
+                surveysForDay.forEach(survey => {
+                    if (!state.assignmentOverrides[date].surveyIds.includes(survey.id)) {
+                        state.assignmentOverrides[date].surveyIds.push(survey.id);
+                    }
+                });
+
                 if (state.urgencyOverrides[date]) {
                     state.urgencyOverrides[date] = false;
                 }
 
                 renderAll();
 
-                const surveyName = assignmentSurveySelect.options[assignmentSurveySelect.selectedIndex].text;
                 const companyName = assignmentCompanyDisplay.textContent;
-                const message = `${date}の${surveyName}に ${companyName} をアサインしました。`;
+                const message = `${date}に ${companyName} をアサインしました。`;
                 
                 closeModal();
                 showConfirmationModal(message);
@@ -1041,6 +1092,52 @@ export function initCalendarManagementPage() {
         document.getElementById('bulk-tab-btn-settings').addEventListener('click', () => switchBulkTab('settings'));
         document.getElementById('bulk-tab-btn-survey-details').addEventListener('click', () => switchBulkTab('survey-details'));
         document.getElementById('bulk-tab-btn-reassign').addEventListener('click', () => switchBulkTab('reassign'));
+
+        const cancelAssignmentBtn = document.getElementById('cancel-assignment-btn');
+        if (cancelAssignmentBtn) {
+            cancelAssignmentBtn.addEventListener('click', () => {
+                const date = state.currentModalDate;
+                if (date && state.assignmentOverrides[date]) {
+                    delete state.assignmentOverrides[date];
+                    renderAll();
+                    closeModal();
+                    showConfirmationModal(`${date}のアサインを解除しました。`);
+                }
+            });
+        }
+
+        const bulkCancelAssignmentBtn = document.getElementById('bulk-cancel-assignment-btn');
+        if (bulkCancelAssignmentBtn) {
+            bulkCancelAssignmentBtn.addEventListener('click', () => {
+                const { start, end } = getOrderedDateRange();
+                if (!start || !end) return;
+
+                let currentDate = new Date(start);
+                const lastDate = new Date(end);
+
+                while (currentDate <= lastDate) {
+                    const dateString = currentDate.toISOString().split('T')[0];
+                    if (state.assignmentOverrides[dateString]) {
+                        delete state.assignmentOverrides[dateString];
+                    }
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+
+                renderAll();
+                closeBulkSettingModal();
+                showConfirmationModal(`${start}から${end}のアサインを解除しました。`);
+            });
+        }
+
+        const cancelModalButton = document.getElementById('cancel-modal-button');
+        if(cancelModalButton) {
+            cancelModalButton.addEventListener('click', closeModal);
+        }
+
+        const bulkCancelModalButton = document.getElementById('bulk-cancel-modal-button');
+        if(bulkCancelModalButton) {
+            bulkCancelModalButton.addEventListener('click', closeBulkSettingModal);
+        }
 
         document.getElementById('export-csv-button').addEventListener('click', () => alert('CSVエクスポート機能は現在開発中です。'));
         document.getElementById('import-csv-button').addEventListener('click', () => alert('CSVインポート機能は現在開発中です。'));

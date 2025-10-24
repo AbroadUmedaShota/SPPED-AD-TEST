@@ -35,7 +35,7 @@
     "startDate": "2025-10-01",
     "endDate": "2025-10-10",
     "expected_cards": 800,
-    "status": "pending",
+    "status": "assigned",
     "urgency": "low",
     "type": "normal"
   }
