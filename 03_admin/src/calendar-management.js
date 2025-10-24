@@ -129,7 +129,10 @@ export function initCalendarManagementPage() {
                 </div>
             `;
                 if (regularSurveys.length > 0) {
-                    dayInfoHTML += `<p class="text-xs text-blue-600 font-semibold mt-1">・通常アンケートあり</p>`;
+                    regularSurveys.forEach(survey => {
+                        const surveyName = survey.name.length > 10 ? survey.name.substring(0, 10) + '...' : survey.name;
+                        dayInfoHTML += `<p class="text-xs text-blue-600 font-semibold mt-1 truncate" title="${survey.name}">・${surveyName}</p>`;
+                    });
                 }
                 const surveyTitles = surveysForDay.map(s => s.name).join(', ');
                 cellTitle = surveyTitles;
