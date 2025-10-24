@@ -95,6 +95,7 @@ export function initCalendarManagementPage() {
             const isUrgent = state.urgencyOverrides[dateString]; // Manual override
             const dayAssignments = state.assignmentOverrides[dateString];
             const onDemandSurveys = surveysForDay.filter(s => s.type === 'on-demand');
+            const regularSurveys = surveysForDay.filter(s => s.type === 'normal');
 
             let surveyBgClass = ''; // Initialize background class
 
@@ -127,6 +128,9 @@ export function initCalendarManagementPage() {
                     <p>見込枚数: ${totalCards.toLocaleString()}</p>
                 </div>
             `;
+                if (regularSurveys.length > 0) {
+                    dayInfoHTML += `<p class="text-xs text-blue-600 font-semibold mt-1">・通常アンケートあり</p>`;
+                }
                 const surveyTitles = surveysForDay.map(s => s.name).join(', ');
                 cellTitle = surveyTitles;
             }
