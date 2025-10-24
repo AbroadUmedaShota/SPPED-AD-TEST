@@ -6,7 +6,8 @@
     "endDate": "2025-10-25",
     "expected_cards": 500,
     "status": "pending",
-    "urgency": "normal"
+    "urgency": "normal",
+    "type": "on-demand"
   },
   {
     "id": 2,
@@ -15,7 +16,8 @@
     "endDate": "2025-11-15",
     "expected_cards": 1200,
     "status": "pending",
-    "urgency": "normal"
+    "urgency": "normal",
+    "type": "normal"
   },
   {
     "id": 3,
@@ -24,6 +26,7 @@
     "endDate": "2025-10-22",
     "expected_cards": 250,
     "status": "assigned",
-    "urgency": "high"
+    "urgency": "high",
+    "type": "on-demand"
   }
 ]

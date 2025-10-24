@@ -92,12 +92,32 @@ export function initCalendarManagementPage() {
 
             // --- Survey Period Highlighting & Info ---
             const surveysForDay = getSurveysForDay(dateString);
-            const isUrgent = state.urgencyOverrides[dateString];
+            const isUrgent = state.urgencyOverrides[dateString]; // Manual override
             const dayAssignments = state.assignmentOverrides[dateString];
+            const onDemandSurveys = surveysForDay.filter(s => s.type === 'on-demand');
 
+            let surveyBgClass = ''; // Initialize background class
+
+            // 1. Manual urgency override has the highest priority
             if (isUrgent) {
-                cellClasses += ' bg-red-200'; // Red for high urgency
+                surveyBgClass = ' bg-red-200';
+            } 
+            // 2. Logic for on-demand surveys if no manual override
+            else if (onDemandSurveys.length > 0) {
+                const isAssigned = dayAssignments && dayAssignments.surveyIds.length > 0;
+                const isToday = new Date().toISOString().split('T')[0] === dateString;
+
+                if (isAssigned) {
+                    surveyBgClass = ' bg-green-200'; // Green for assigned
+                } else if (isToday) {
+                    surveyBgClass = ' bg-red-200';   // Red for unassigned & today
+                } else {
+                    surveyBgClass = ' bg-yellow-200';// Yellow for unassigned & not today
+                }
             }
+            // Normal (non-on-demand) surveys do not get a background color.
+
+            cellClasses += surveyBgClass; // Add the determined background class
 
             if (surveysForDay.length > 0) {
                 const totalCards = surveysForDay.reduce((sum, survey) => sum + (survey.expected_cards || 0), 0);
@@ -107,15 +127,6 @@ export function initCalendarManagementPage() {
                     <p>見込枚数: ${totalCards.toLocaleString()}</p>
                 </div>
             `;
-
-                if (!isUrgent) {
-                    if (dayAssignments && dayAssignments.surveyIds.length > 0) {
-                        cellClasses += ' bg-blue-200'; // Blue for assigned day
-                    } else {
-                        cellClasses += ' bg-yellow-200'; // Yellow for unassigned survey period
-                    }
-                }
-                
                 const surveyTitles = surveysForDay.map(s => s.name).join(', ');
                 cellTitle = surveyTitles;
             }
