@@ -153,7 +153,9 @@ export function initCalendarManagementPage() {
                             textColorClass = 'text-red-600 font-semibold';
                         }
 
-                        const assignedIcon = survey.status === "assigned" ? '<span class="text-green-600">☑</span> ' : '';
+                        const dayAssignments = state.assignmentOverrides[dateString];
+                        const isAssigned = dayAssignments && dayAssignments.surveyIds.includes(survey.id);
+                        const assignedIcon = isAssigned ? '<span class="text-green-600">☑</span> ' : '';
                         const surveyName = survey.name.length > 8 ? survey.name.substring(0, 8) + '...' : survey.name;
                         dayInfoHTML += `<p class="text-xs ${textColorClass} mt-1 truncate" title="${survey.name}">${assignedIcon}${surveyName}</p>`;
                     });
@@ -447,6 +449,16 @@ export function initCalendarManagementPage() {
             dayUrgencyButton.textContent = isUrgent ? '緊急を解除' : '緊急に設定';
             dayUrgencyButton.className = `toggle-day-urgency-button text-white text-xs font-bold py-1 px-2 rounded ${isUrgent ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-red-500 hover:bg-red-600'}`;
             dayUrgencyButton.dataset.date = data.date;
+
+            if (isAssigned) {
+                dayUrgencyButton.disabled = true;
+                dayUrgencyButton.title = "アサイン済みの日は緊急設定できません";
+                dayUrgencyButton.classList.add('cursor-not-allowed', 'opacity-50');
+            } else {
+                dayUrgencyButton.disabled = false;
+                dayUrgencyButton.title = "";
+                dayUrgencyButton.classList.remove('cursor-not-allowed', 'opacity-50');
+            }
 
             // --- Populate Re-assign Tab ---
             const assignmentCompanyDisplay = document.getElementById('assignment-company');
@@ -899,6 +911,25 @@ export function initCalendarManagementPage() {
         bulkCloseAssignmentTabButton = document.getElementById('bulk-close-assignment-tab-button');
 
         await fetchData();
+
+        // Populate initial assignments from survey data
+        state.surveys.forEach(survey => {
+            if (survey.status === 'assigned') {
+                let currentDate = new Date(survey.startDate);
+                const lastDate = new Date(survey.endDate);
+                while (currentDate <= lastDate) {
+                    const dateString = currentDate.toISOString().split('T')[0];
+                    if (!state.assignmentOverrides[dateString]) {
+                        state.assignmentOverrides[dateString] = { surveyIds: [] };
+                    }
+                    if (!state.assignmentOverrides[dateString].surveyIds.includes(survey.id)) {
+                        state.assignmentOverrides[dateString].surveyIds.push(survey.id);
+                    }
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+            }
+        });
+
         renderAll();
 
         prevMonthButton.addEventListener('click', () => handleMonthChange(-1));
