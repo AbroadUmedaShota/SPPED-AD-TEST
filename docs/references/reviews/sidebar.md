@@ -14,6 +14,7 @@
 
 ## 3. 表示中グループ名が常に "Current Group" のままでローカライズされていない
 - **内容**: プロファイルブロックとグループセレクトの初期値が固定文字列 "Current Group" のままで、実際に選択されているグループ名も日本語ラベルにも置き換わりません。UI文言定義では動的差し込みを想定しています。
-- **根拠**: サイドバーHTML内のラベルおよび `populateGroupSelect` のデフォルトオプションが固定文字列になっています。【F:02_dashboard/common/sidebar.html†L9-L22】【F:02_dashboard/src/sidebarHandler.js†L135-L151】 UI文言定義でも「Current Group (※動的にグループ名が入る)」とされており、固定表示は仕様と乖離しています。【F:docs/design/01_ui_messages.md†L18-L37】
+- **根拠**: サイドバーHTML内のラベルおよび `populateGroupSelect` のデフォルトオプションが固定文字列になっています。【F:02_dashboard/common/sidebar.html†L9-L22】【F:02_dashboard/src/sidebarHandler.js†L135-L151】 UI文言定義でも「Current Group (※動的にグループ名が入る)」とされており、固定表示は仕様と乖離しています。【F:docs/product/ui/01_ui_messages.md†L18-L37】
 - **影響**: 実際にどのグループのデータを閲覧しているかが分かりにくく、特に多グループ運用時に誤操作を招く可能性があります。日本語UIに英語文言が残ることでプロダクト完成度も下がります。
 - **提案**: 初期化時に現在のグループ名を表示し、セレクト変更に合わせてプロファイルブロックのラベルを更新してください。固定英語表記は UI 文言リストに合わせて日本語へ置き換える必要があります。
+

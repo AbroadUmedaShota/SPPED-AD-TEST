@@ -56,7 +56,7 @@ SPEED AD は、展示会・セミナーにおけるリードマネジメント�
 
 UI要素は、再利用性、一貫性、保守性を高めるためにモジュール化されています。共通のヘッダー、サイドバー、フッターなどは独立したHTMLファイルとして管理され、JavaScript (`src/utils.js` の `loadCommonHtml`) によって動的にページに組み込まれます。モーダルやテーブルなどの複雑なUIも、それぞれ独立したモジュールとして開発されています。
 
-**利用方法の詳細は [`docs/design/02_UI_COMPONENT_INTEGRATION.md`](design/02_UI_COMPONENT_INTEGRATION.md) を参照してください。**
+**利用方法の詳細は [`docs/product/ui/02_UI_COMPONENT_INTEGRATION.md`](../product/ui/02_UI_COMPONENT_INTEGRATION.md) を参照してください。**
 
 ### 4.2. 関心の分離とレイヤー化
 
@@ -97,3 +97,4 @@ UI要素は、再利用性、一貫性、保守性を高めるためにモジュ
 - **`specifications/` ディレクトリ**: 各画面・機能ごとの詳細な仕様書。
 
 これらのドキュメントを読み、プロジェクトの全体像と開発プロセスを理解した上で、作業を開始してください。
+
