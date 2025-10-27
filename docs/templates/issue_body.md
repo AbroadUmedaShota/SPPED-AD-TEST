@@ -1,8 +1,1 @@
-### 概要 (Overview)
-[概要を記述]
-
-### 発生している問題 (Current Problem)
-[問題の詳細を記述]
-
-### 期待される動作 (Expected Behavior)
-[期待される動作を記述]
+The current implementation displays a generic text "通常アンケート有り" for days with normal surveys. This was implemented in #111. The user has requested to display the actual survey names for better clarity.
