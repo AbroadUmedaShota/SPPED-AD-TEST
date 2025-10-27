@@ -557,6 +557,16 @@ export function initCalendarManagementPage() {
         renderAll();
     }
 
+    function addLogEntry(action, user = 'Admin') {
+        const newLog = {
+            timestamp: new Date().toISOString(),
+            user: user,
+            action: action,
+        };
+        state.updateLog.unshift(newLog);
+        state.logCurrentPage = 1;
+    }
+
     function getDayStatus(dateString, dayOfWeek) {
         const year = dateString.substring(0, 4);
 
@@ -840,11 +850,12 @@ export function initCalendarManagementPage() {
             currentDate.setDate(currentDate.getDate() + 1);
         }
 
-        renderAll();
-
         const companyName = document.getElementById('bulk-assignment-company').textContent;
         const message = `${start}から${end}に ${companyName} をアサインしました。`;
-        
+        addLogEntry(`${start}～${end} を ${companyName} にアサインしました。`);
+
+        renderAll();
+
         closeBulkSettingModal();
         showConfirmationModal(message);
     }
@@ -1055,10 +1066,11 @@ export function initCalendarManagementPage() {
                     state.urgencyOverrides[date] = false;
                 }
 
-                renderAll();
-
                 const companyName = assignmentCompanyDisplay.textContent;
                 const message = `${date}に ${companyName} をアサインしました。`;
+                addLogEntry(`${date} を ${companyName} にアサインしました。`);
+
+                renderAll();
                 
                 closeModal();
                 showConfirmationModal(message);
@@ -1129,7 +1141,9 @@ export function initCalendarManagementPage() {
             cancelAssignmentBtn.addEventListener('click', () => {
                 const date = state.currentModalDate;
                 if (date && state.assignmentOverrides[date]) {
+                    const companyName = state.operators.length > 0 ? state.operators[0].company : 'N/A';
                     delete state.assignmentOverrides[date];
+                    addLogEntry(`${date} の ${companyName} のアサインを解除しました。`);
                     renderAll();
                     closeModal();
                     showConfirmationModal(`${date}のアサインを解除しました。`);
@@ -1154,9 +1168,13 @@ export function initCalendarManagementPage() {
                     currentDate.setDate(currentDate.getDate() + 1);
                 }
 
+                const companyName = state.operators.length > 0 ? state.operators[0].company : 'N/A';
+                const message = `${start}から${end}のアサインを解除しました。`;
+                addLogEntry(`${start}～${end} の ${companyName} のアサインを解除しました。`);
+
                 renderAll();
                 closeBulkSettingModal();
-                showConfirmationModal(`${start}から${end}のアサインを解除しました。`);
+                showConfirmationModal(message);
             });
         }
 
