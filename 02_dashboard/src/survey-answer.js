@@ -32,14 +32,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             throw new Error(`アンケート定義ファイルが見つかりません (ID: ${surveyId})`);
         }
         const surveyData = await surveyRes.json();
+        const questionGroups = normalizeSurveyQuestionGroups(surveyData);
+        if (!questionGroups.length) {
+            displayError('No questions available for this survey.');
+            return;
+        }
 
         // UIの描画
         renderSurveyHeader(surveyData);
-        renderQuestions(surveyData.questionGroups);
+        renderQuestions(questionGroups);
         renderSubmitButton();
 
         // 機能のセットアップ
-        setupBizcardFeature(surveyData.settings);
+        setupBizcardFeature(surveyData);
         setupFormSubmission(surveyId, surveyData.thankYouScreenSettings);
 
     } catch (error) {
@@ -98,6 +103,103 @@ function resolveLocalizedText(value, defaultValue = '') {
  * アンケートのヘッダーを描画する
  * @param {object} surveyData - アンケートデータ
  */
+function normalizeSurveyQuestionGroups(surveyData) {
+    const hasGroups = Array.isArray(surveyData?.questionGroups) && surveyData.questionGroups.length > 0;
+    if (hasGroups) {
+        return surveyData.questionGroups.map((group, groupIndex) => ({
+            ...group,
+            groupId: group.groupId || `group-${groupIndex + 1}`,
+            questions: (group.questions || []).map((question, questionIndex) =>
+                normalizeQuestion(question, questionIndex, group.groupId || `group-${groupIndex + 1}`)
+            )
+        }));
+    }
+
+    const hasDetails = Array.isArray(surveyData?.details) && surveyData.details.length > 0;
+    if (hasDetails) {
+        return [
+            {
+                groupId: 'default-group',
+                title: resolveLocalizedText(surveyData.displayTitle, 'Survey'),
+                questions: surveyData.details.map((question, questionIndex) =>
+                    normalizeQuestion(question, questionIndex, 'default-group')
+                )
+            }
+        ];
+    }
+
+    return [];
+}
+
+function normalizeQuestion(rawQuestion, questionIndex, groupId) {
+    const fallbackId = `${groupId || 'group'}-q${questionIndex + 1}`;
+    const questionId = rawQuestion.questionId || rawQuestion.id || fallbackId;
+    const normalizedType = normalizeQuestionType(rawQuestion.type);
+    const questionText = resolveLocalizedText(rawQuestion.text || rawQuestion.title || '');
+    const required =
+        rawQuestion.required === true ||
+        rawQuestion.isRequired === true ||
+        rawQuestion.mandatory === true;
+    const optionsSource = rawQuestion.options || rawQuestion.choices || [];
+    const options = (normalizedType === 'single_answer' || normalizedType === 'multi_choice')
+        ? normalizeOptions(optionsSource, questionId)
+        : [];
+
+    return {
+        ...rawQuestion,
+        questionId,
+        type: normalizedType,
+        text: questionText,
+        required,
+        options
+    };
+}
+
+function normalizeQuestionType(type) {
+    switch (type) {
+        case 'free_answer':
+        case 'free_text':
+        case 'text':
+            return 'free_answer';
+        case 'single_answer':
+        case 'single_choice':
+        case 'radio':
+            return 'single_answer';
+        case 'multi_choice':
+        case 'multi_answer':
+        case 'multiple_choice':
+        case 'checkbox':
+            return 'multi_choice';
+        default:
+            return 'free_answer';
+    }
+}
+
+function normalizeOptions(options, questionId) {
+    return (options || []).map((option, index) => {
+        if (typeof option === 'string') {
+            const trimmed = option.trim();
+            const fallbackId = `${questionId}-option-${index + 1}`;
+            return {
+                optionId: fallbackId,
+                value: fallbackId,
+                text: trimmed || `Option ${index + 1}`
+            };
+        }
+
+        const optionId = option.optionId || option.id || `${questionId}-option-${index + 1}`;
+        const optionText = resolveLocalizedText(option.text || option.label || option.name || '');
+        const optionValue = option.value || optionId || optionText || `${questionId}-option-${index + 1}`;
+
+        return {
+            ...option,
+            optionId,
+            value: optionValue,
+            text: optionText || `Option ${index + 1}`
+        };
+    });
+}
+
 function renderSurveyHeader(surveyData) {
     const title = resolveLocalizedText(surveyData.displayTitle, 'アンケート');
     const description = resolveLocalizedText(surveyData.description);
@@ -119,9 +221,10 @@ function renderQuestions(questionGroups) {
     (questionGroups || []).forEach((group, groupIndex) => {
         const groupHeadingId = `question-group-${group.groupId || groupIndex}`;
         const groupTitle = resolveLocalizedText(group.title);
+        const sectionTitle = groupTitle || `Section ${groupIndex + 1}`;
         formHTML += `
             <section class="mb-10" aria-labelledby="${groupHeadingId}">
-                <h2 id="${groupHeadingId}" class="text-xl font-bold text-on-surface mb-4 border-b-2 border-primary pb-2">${groupTitle}</h2>
+                <h2 id="${groupHeadingId}" class="text-xl font-bold text-on-surface mb-4 border-b-2 border-primary pb-2">${sectionTitle}</h2>
                 <div class="space-y-6">
         `;
         (group.questions || []).forEach((question, questionIndex) => {
@@ -135,28 +238,24 @@ function renderQuestions(questionGroups) {
     surveyForm.insertAdjacentHTML('afterbegin', formHTML);
 }
 
-/**
- * 個別の設問HTMLを生成する
- * @param {object} question - 設問データ
- * @param {number} groupIndex - グループのインデックス
- * @param {number} questionIndex - 質問のインデックス
- * @returns {string} 生成されたHTML文字列
- */
 function renderQuestion(question, groupIndex, questionIndex) {
     const questionNumber = `Q${groupIndex + 1}-${questionIndex + 1}`;
     const questionText = resolveLocalizedText(question.text);
     const requirementHintId = `${question.questionId}-requirement`;
     const ariaAttributes = [];
+    const dataAttributes = [`data-question-type="${question.type}"`];
     if (question.required) {
         ariaAttributes.push('aria-required="true"');
         ariaAttributes.push(`aria-describedby="${requirementHintId}"`);
+        dataAttributes.push('data-required="true"');
     }
-    const fieldsetAttributes = ariaAttributes.length ? ` ${ariaAttributes.join(' ')}` : '';
+    const fieldsetAttributesParts = [...ariaAttributes, ...dataAttributes];
+    const fieldsetAttributes = fieldsetAttributesParts.length ? ` ${fieldsetAttributesParts.join(' ')}` : '';
     const requiredBadge = question.required
-        ? '<span class="ml-2 text-sm font-medium text-error" aria-hidden="true">必須</span>'
+        ? '<span class="ml-2 text-sm font-medium text-error" aria-hidden="true">�K�{</span>'
         : '';
     const requirementHint = question.required
-        ? `<p id="${requirementHintId}" class="sr-only">${questionNumber} ${questionText}は必須の設問です。</p>`
+        ? `<p id="${requirementHintId}" class="sr-only">${questionNumber} ${questionText}�͕K�{�̐ݖ�ł��B</p>`
         : '';
 
     let questionHTML = `
@@ -166,6 +265,7 @@ function renderQuestion(question, groupIndex, questionIndex) {
                 ${requiredBadge}
             </legend>
             ${requirementHint}
+            <div class="space-y-3">
     `;
 
     const controlIdBase = `${question.questionId}`;
@@ -178,7 +278,7 @@ function renderQuestion(question, groupIndex, questionIndex) {
                     ? ` required aria-required="true" aria-describedby="${requirementHintId}"`
                     : '';
                 questionHTML += `
-                    <label for="${textareaId}" class="sr-only">${questionText}への回答</label>
+                    <label for="${textareaId}" class="sr-only">${questionText}�ւ̉�</label>
                     <textarea id="${textareaId}" name="${question.questionId}" class="input-field w-full" rows="4"${requirementAttrs}></textarea>
                 `;
             }
@@ -189,24 +289,47 @@ function renderQuestion(question, groupIndex, questionIndex) {
                 options.forEach((option, optionIndex) => {
                     const optionText = resolveLocalizedText(option.text);
                     const optionId = `${controlIdBase}-${option.optionId || optionIndex}`;
-                    const requiredAttribute = question.required ? 'required' : '';
+                    const requiredAttribute = question.required && optionIndex === 0 ? 'required' : '';
                     questionHTML += `
                         <div class="flex items-center gap-3">
-                            <input type="radio" id="${optionId}" name="${question.questionId}" value="${optionText}" class="form-radio text-primary focus:ring-primary" ${requiredAttribute}>
+                            <input type="radio" id="${optionId}" name="${question.questionId}" value="${option.value}" class="form-radio text-primary focus:ring-primary" ${requiredAttribute}>
                             <label for="${optionId}" class="text-on-surface">${optionText}</label>
                         </div>
                     `;
                 });
             }
             break;
-        // 他の質問タイプ（multiple_answerなど）のケースもここに追加可能
+        case 'multi_choice':
+            {
+                const options = question.options || [];
+                options.forEach((option, optionIndex) => {
+                    const optionText = resolveLocalizedText(option.text);
+                    const optionId = `${controlIdBase}-${option.optionId || optionIndex}`;
+                    questionHTML += `
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" id="${optionId}" name="${question.questionId}" value="${option.value}" class="form-checkbox text-primary focus:ring-primary">
+                            <label for="${optionId}" class="text-on-surface">${optionText}</label>
+                        </div>
+                    `;
+                });
+            }
+            break;
+        default:
+            {
+                const textareaId = `${controlIdBase}-input`;
+                questionHTML += `
+                    <label for="${textareaId}" class="sr-only">${questionText}�ւ̉�</label>
+                    <textarea id="${textareaId}" name="${question.questionId}" class="input-field w-full" rows="4"></textarea>
+                `;
+            }
+            break;
     }
     questionHTML += `
+            </div>
         </fieldset>
     `;
     return questionHTML;
 }
-
 
 /**
  * 送信ボタンを描画する
@@ -223,8 +346,8 @@ function renderSubmitButton() {
  * 名刺添付機能をセットアップする
  * @param {object} settings - アンケート設定
  */
-function setupBizcardFeature(settings) {
-    if (!settings?.bizcardEnabled) return;
+function setupBizcardFeature(surveyData) {
+    if (!isBizcardFeatureEnabled(surveyData)) return;
 
     bizcardSection.classList.remove('hidden');
 
@@ -247,6 +370,23 @@ function setupBizcardFeature(settings) {
     });
 }
 
+function isBizcardFeatureEnabled(surveyData) {
+    if (!surveyData) return false;
+    if (surveyData.settings?.bizcard?.enabled != null) {
+        return surveyData.settings.bizcard.enabled === true;
+    }
+    if (surveyData.settings?.bizcardEnabled != null) {
+        return surveyData.settings.bizcardEnabled === true;
+    }
+    if (surveyData.settings?.bizcard?.isEnabled != null) {
+        return surveyData.settings.bizcard.isEnabled === true;
+    }
+    if (surveyData.bizcardEnabled != null) {
+        return surveyData.bizcardEnabled === true;
+    }
+    return false;
+}
+
 /**
  * フォーム送信処理をセットアップする
  * @param {string} surveyId - アンケートID
@@ -257,16 +397,30 @@ function setupFormSubmission(surveyId, thankYouSettings) {
         event.preventDefault();
 
         const formData = new FormData(surveyForm);
-        const answers = [];
+        const answersMap = new Map();
         for (const [name, value] of formData.entries()) {
-            answers.push({ questionId: name, answer: value });
+            if (!answersMap.has(name)) {
+                answersMap.set(name, value);
+                continue;
+            }
+            const current = answersMap.get(name);
+            if (Array.isArray(current)) {
+                current.push(value);
+            } else {
+                answersMap.set(name, [current, value]);
+            }
         }
 
-        // 名刺画像をFormDataに追加
+        // ���h�摜��FormData�ɒǉ�
         const bizcardFile = bizcardUpload.files[0];
         if (bizcardFile) {
             formData.append('bizcardImage', bizcardFile);
         }
+
+        const answers = Array.from(answersMap.entries()).map(([questionId, answer]) => ({
+            questionId,
+            answer
+        }));
 
         const submission = {
             surveyId: surveyId,
@@ -275,8 +429,8 @@ function setupFormSubmission(surveyId, thankYouSettings) {
         };
 
         console.log('Submission Data:', submission);
-        // ここでAPIにデータを送信する処理を将来的に実装
-        // 例: await fetch('/api/submit', { method: 'POST', body: formData });
+        // ������API�Ƀf�[�^�𑗐M���鏈���������I�Ɏ���
+        // ��: await fetch('/api/submit', { method: 'POST', body: formData });
 
         displayCompletionMessage(thankYouSettings);
     });
