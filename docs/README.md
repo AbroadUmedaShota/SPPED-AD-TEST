@@ -1,36 +1,45 @@
 # ドキュメント案内
 
-プロジェクト構成や開発ルールに関する資料への入口です。  
-2025-10 時点で「何を実現するか（要件）」と「どう実現するか（設計）」で整理しています。
+プロジェクト文書のトップガイドです。
+2025-10 時点で「更新された内容」と「参照できる内容」が整理されています。
 
 ## カテゴリ別インデックス
 
-### サービス要件 (`docs/requirements/`)
-- `docs/requirements/00_PROJECT_OVERVIEW.md`: 画面構成と機能スコープの概要。
-- `docs/requirements/data-inventory.md`: モックデータ配置と利用モジュールの対照表。
-- `docs/requirements/04_SETUP.md` / `05_DEPLOYMENT.md` / `06_OPERATIONS_GUIDE.md` / `07_SECURITY_GUIDELINES.md`: 導入・運用・セキュリティの前提条件。
-- `docs/requirements/processes/`: 業務プロセスと運用フロー。導入は `docs/requirements/processes/README.md`、詳細は `04_operator_workflows.md` などを参照。
-- `docs/requirements/specifications/`: 画面・機能の要件仕様。例: `01_screen_flow.md`, `06_speed_review.md`, `admin/00_admin_requirements_design.md`。
-- `docs/requirements/resources/`: クライアント提供資料やフォーム雛形。例: `client-materials/service-plan-comparison.md`。
-- `docs/requirements/testing/`: テスト指針とチェックリスト。例: `03_TESTING_GUIDELINES.md`, `invoice_manual_checklist.md`。
-- `docs/requirements/��ʐ��ڐ}.md`: 画面遷移図などの補足資料。
+### 製品ドキュメント (`docs/product/`)
+- `overview/00_PROJECT_OVERVIEW.md`: 製品の背景と目的、主要ユースケース。
+- `overview/requirements-overview.md`: 仕様書の読み方と参照先の索引。
+- `overview/screen-transition-diagram.md`: 画面遷移図（Mermaid 形式）。
+- `architecture/`: 全体アーキテクチャ、データモデリング、データインベントリ。
+- `specs/`: 画面仕様・機能要件一式。`admin/` 以下に管理画面の派生要件あり。
+- `processes/`: ビジネスプロセスと KPI フロー。`README.md` から導線を確認。
+- `ui/`: デザインガイドライン、メッセージ文面、コンポーネント統合手順。
+- `standards/02_CODING_STANDARDS.md`: コーディング規約とレビュー基準。
 
-### 設計・実装 (`docs/design/`)
-- `docs/design/01_ARCHITECTURE.md`: フロントエンド構成と将来のバックエンド連携方針。
-- `docs/design/architecture/02_data_model.md`: モックデータおよび将来のデータモデル定義。
-- `docs/design/02_CODING_STANDARDS.md`: コーディング規約、レビューの観点。
-- `docs/design/00_design_guideline.md` / `02_UI_COMPONENT_INTEGRATION.md`: UI ガイドラインとコンポーネント統合手順。
-- `docs/design/01_ui_messages.md`: UI メッセージの用語統一ガイド。
+### 運用ハンドブック (`docs/handbook/`)
+- `setup/`: 初期セットアップとオンボーディング手順。
+- `deployment/`: 展開/公開フローと必要なチェックリスト。
+- `operations/06_OPERATIONS_GUIDE.md`: 運用手順と定例タスク。
+- `security/07_SECURITY_GUIDELINES.md`: セキュリティポリシーと権限管理。
+- `testing/`: 手動テストガイドラインとチェックリスト群。
 
-## 共通リソース
-- `docs/cleanup-plan.md`: リポジトリ整理の進捗と残課題。
-- `docs/templates/`: Issue/PR テンプレート。例: `docs/templates/pr_body.md`。
-- `docs/reviews/`: レビュー記録。例: `docs/reviews/bizcard-settings.md`。
-- `tools/README.md`: 各種スクリプトの利用方法。
-- `archive/temp/`: 一時退避用。常用せず必要時のみ参照。
+### 参照資料 (`docs/references/`)
+- `templates/`: Issue / PR テンプレートの正規版。
+- `reviews/`: UI/仕様レビューの記録。
+- `resources/`: クライアント提供資料や比較表などの外部リファレンス。
 
-## 開発の際に押さえておきたいポイント
-- 共通ヘッダー / サイドバー / フッターは `loadCommonHtml(placeholderId, 'common/header.html')` で読み込みます。特殊配置時のみ `window.__COMMON_BASE_PATH` を上書きしてください。
-- ダッシュボード用 JSON は `data/` に集約。`resolveDashboardDataPath` を経由して相対パスずれを防ぎます。
-- デモデータは `data/demo_surveys/`, `data/demo_answers/`, `data/demo_business-cards/` などに配置され、`speed-review.js` や `graph-page.js` が参照します。
+### 更新履歴 (`docs/changelog/`)
+- `CHANGELOG.md`: 開発履歴とマイルストーン。
+- `08_DECISION_LOG.md`: 重要な意思決定の記録。
+- `status_draft.md`: 進行中トピックや未完了タスクのメモ。
 
+### アーカイブ (`docs/archive/`)
+- `forms/legacy-submissions/`: 過去のフォーム ZIP・スナップショット（`node_modules/` を含むため現行ビルドから隔離）。
+- 今後の整理対象はこの直下に集約し、参照時のみ展開してください。
+
+### ローカライズ資料 (`docs/ja/`)
+- `user-permissions.md`: アカウント権限ドキュメント（日本語版）。エンコード調整予定のため閲覧時はエディタ設定に注意。
+
+## 運用メモ
+- 共通ヘッダーやサイドバーなどの HTML は `02_dashboard/common/` から `loadCommonHtml(...)` で読み込む仕様です。`window.__COMMON_BASE_PATH` を必ず確認してください。
+- ダッシュボード用 JSON は `data/` 配下に統一されています。新規データは `resolveDashboardDataPath` を介して参照すること。
+- 旧リポジトリから移管した添付ファイルは `docs/archive/` に退避済みです。再利用する場合は最新仕様と差異がないか確認してから復元してください。

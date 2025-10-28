@@ -84,7 +84,7 @@
 ```
 
 ### 3.2 補助マスタ
-- `plan.displayName`・`addOns.displayName` は `docs/requirements/resources/client-materials/service-plan-comparison.md` を唯一の参照元とし、表記揺れを許容しない。
+- `plan.displayName`・`addOns.displayName` は `docs/references/resources/client-materials/service-plan-comparison.md` を唯一の参照元とし、表記揺れを許容しない。
 - `status` は以下に固定：
   - `unpaid`: 未入金（一覧・詳細とも「未入金」表示、黄色バッジ）
   - `paid`: 入金済（緑バッジ）
@@ -203,7 +203,8 @@
 
 ## 10. 関連資料
 
-- `docs/requirements/resources/client-materials/service-plan-comparison.md`（サービスプラン比較表）
+- `docs/references/resources/client-materials/service-plan-comparison.md`（サービスプラン比較表）
 - `docs/architecture/02_data_model.md`（データモデル全体像）
 - `docs/03_TESTING_GUIDELINES.md`（手動テスト手順）
 - `data/core/invoices.json`（本仕様に準拠したモックデータ）
+

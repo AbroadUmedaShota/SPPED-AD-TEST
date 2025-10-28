@@ -11,8 +11,8 @@ Pull Requestを作成する前に、開発者は以下の観点に基づいて�
 
 ### 2.1. UI/UXの確認
 -   **デザイン整合性:**
-    -   [デザインガイドライン (`docs/design/00_design_guideline.md`)](design/00_design_guideline.md) に記載されたカラー、タイポグラフィ、スペーシングが適用されているか。
-    -   [UI文言・メッセージ定義書 (`docs/design/01_ui_messages.md`)](design/01_ui_messages.md) の文言が正しく使用されているか。
+    -   [デザインガイドライン (`docs/product/ui/00_design_guideline.md`)](../product/ui/00_design_guideline.md) に記載されたカラー、タイポグラフィ、スペーシングが適用されているか。
+    -   [UI文言・メッセージ定義書 (`docs/product/ui/01_ui_messages.md`)](../product/ui/01_ui_messages.md) の文言が正しく使用されているか。
 -   **レスポンシブ表示:**
     -   PC、タブレット、スマートフォンの各画面幅でレイアウト崩れが発生していないか。
     -   ブラウザの開発者ツールを使い、主要なブレークポイント（例: `1280px`, `1024px`, `768px`, `640px`）で確認する。
@@ -41,3 +41,4 @@ Pull Requestを作成する前に、開発者は以下の観点に基づいて�
 ## 4. 不具合報告
 -   テスト中に発見された不具合は、修正が困難な場合や仕様の確認が必要な場合、GitHubのIssues機能を利用して報告してください。
 -   Issueには、不具合の再現手順、期待される結果、実際の挙動（スクリーンショットを含む）を具体的に記述してください。
+

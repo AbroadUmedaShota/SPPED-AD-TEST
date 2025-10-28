@@ -425,7 +425,7 @@ documentation:
   - file: "[docs/01_ARCHITECTURE.md](docs/01_ARCHITECTURE.md)"
     purpose: "Defines the system's structure and design philosophy, and records the rationale for technical decisions. It includes an architecture overview, design principles, details of main components, data model, infrastructure, and reasons for technology selection."
     update_trigger: "When there are changes related to the system's structure, such as the addition of new components, changes in the responsibilities of existing components, or changes in the infrastructure configuration."
-  - file: "[docs/design/02_CODING_STANDARDS.md](docs/design/02_CODING_STANDARDS.md)"
+  - file: "[docs/product/standards/02_CODING_STANDARDS.md](docs/product/standards/02_CODING_STANDARDS.md)"
     purpose: "Defines the conventions for maintaining code consistency. It includes formatting conventions, naming conventions, coding style, library usage conventions, and discouraged patterns."
     update_trigger: "When new conventions are added, existing conventions are changed, or the linters used are changed."
   - file: "[docs/03_TESTING_GUIDELINES.md](docs/03_TESTING_GUIDELINES.md)"
@@ -510,3 +510,4 @@ This section defines a context-aware workflow for the AI to follow when it disco
     *   **Action:** The AI will **first complete its current assigned task** to avoid disrupting the user's workflow.
     *   **Reporting:** After the current PR is merged, the AI will report the major documentation discrepancy to the user. It will then propose the creation of a new `type: documentation` Issue to address the problem, following the standard procedure for issue creation.
     
+

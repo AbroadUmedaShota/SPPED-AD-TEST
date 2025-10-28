@@ -3,7 +3,7 @@
 
 - 作成日: 2025-09-24
 - 対象システム: SPEED AD 管理者ポータル
-- 参照元: 03_admin 配下モック & `docs/requirements/resources/client-materials/reference-docs/【00.要件定義書】2025-05-21※Backlog転記済.txt` 等
+- 参照元: 03_admin 配下モック & `docs/references/resources/client-materials/reference-docs/【00.要件定義書】2025-05-21※Backlog転記済.txt` 等
 
 ## 1. 背景と目的
 - リード管理プロセス全体を管理者が統制できることを目的に、ユーザー側UIとは独立した管理者向けモックと要件を整理する。
@@ -78,7 +78,7 @@
 ### 4.4 請求管理
 - アンケート単位と請求書単位の2軸ビュー。
 - 詳細: 金額・請求日・入金日を手動調整。【冪等性】対象。
-- 出力: 請求書プレビュー/ダウンロード (PDF) は `docs/requirements/specifications/04_invoice_screen.md`/`docs/requirements/specifications/05_invoice_document.md` を準拠。
+- 出力: 請求書プレビュー/ダウンロード (PDF) は `docs/product/specs/04_invoice_screen.md`/`docs/product/specs/05_invoice_document.md` を準拠。
 - 未決事項: 自動発行バッチとの連係/ステータス遷移ルール。
 
 ### 4.5 クーポン管理
@@ -187,6 +187,7 @@
 - `03_admin/BY-211_オペレーター入力画面/BY-213/BY-213.html`
 - `03_admin/BY-221_照合画面/BY-223/BY-223.html`
 - `03_admin/BY-231_オペレーター管理/BY-231/BY-231.html`
-- `docs/requirements/specifications/04_invoice_screen.md`, `docs/requirements/specifications/05_invoice_document.md`
-- `docs/requirements/resources/client-materials/reference-docs/【00.要件定義書】2025-05-21※Backlog転記済.txt`
+- `docs/product/specs/04_invoice_screen.md`, `docs/product/specs/05_invoice_document.md`
+- `docs/references/resources/client-materials/reference-docs/【00.要件定義書】2025-05-21※Backlog転記済.txt`
+
 

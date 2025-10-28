@@ -32,7 +32,7 @@
 
 -   `index.html` に `flatpickr` のCSSとJSがCDN経由で追加された。
 -   `src/main.js` に `flatpickr` の初期化ロジックが実装された。
--   `docs/design/02_CODING_STANDARDS.md` に `flatpickr` の標準的な利用方法が規約として追加された。
+-   `docs/product/standards/02_CODING_STANDARDS.md` に `flatpickr` の標準的な利用方法が規約として追加された。
 -   今後の開発で日付入力が必要な場合は、原則として `flatpickr` を使用する。
 
 ---
@@ -65,3 +65,4 @@
 -   テーブル内のアクションボタンのデフォルト背景色も `#E0EDFF` となった。
 -   テーブル内のアクションボタンのアイコン色が `text-secondary` から `text-on-secondary-container` に変更され、視認性が向上した。
 -   ユーザーはセカンダリボタンをより容易に識別できるようになり、操作性が向上する。
+
