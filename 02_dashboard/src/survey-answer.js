@@ -72,6 +72,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         setupLeaveConfirmation();
         setupHeaderScrollBehavior();
         disablePullToRefresh();
+        history.pushState(null, '', location.href); // <-- Add this line
     } catch (error) {
         console.error('初期化エラー:', error);
         displayError(error.message || 'アンケートの読み込みに失敗しました。');
@@ -195,10 +196,12 @@ function setupEventListeners() {
                 <div>
                     <label for="manual-phone" class="block text-sm font-medium text-on-surface-variant">電話番号</label>
                     <input type="tel" id="manual-phone" name="phone" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    <div id="manual-phone-error" class="text-red-500 text-xs mt-1 hidden"></div>
                 </div>
                 <div>
                     <label for="manual-postal-code" class="block text-sm font-medium text-on-surface-variant">郵便番号</label>
                     <input type="text" id="manual-postal-code" name="postalCode" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    <div id="manual-postal-code-error" class="text-red-500 text-xs mt-1 hidden"></div>
                 </div>
                 <div>
                     <label for="manual-address" class="block text-sm font-medium text-on-surface-variant">住所</label>
@@ -216,10 +219,40 @@ function setupEventListeners() {
                     const formData = new FormData(form);
                     const manualInfo = {};
                     formData.forEach((value, key) => manualInfo[key] = value);
+
+                    // エラーメッセージ要素をクリア
+                    document.getElementById('manual-postal-code-error').textContent = '';
+                    document.getElementById('manual-postal-code-error').classList.add('hidden');
+                    document.getElementById('manual-phone-error').textContent = '';
+                    document.getElementById('manual-phone-error').classList.add('hidden');
+
+                    let isValid = true;
+
+                    // 郵便番号バリデーション
+                    const postalCode = manualInfo.postalCode;
+                    if (postalCode && !/^\d{3}-?\d{4}$/.test(postalCode)) {
+                        isValid = false;
+                        document.getElementById('manual-postal-code-error').textContent = '郵便番号の形式が正しくありません。(例: 123-4567)';
+                        document.getElementById('manual-postal-code-error').classList.remove('hidden');
+                    }
+
+                    // 電話番号バリデーション
+                    const phone = manualInfo.phone;
+                    if (phone && !/^[\d-]+$/.test(phone)) {
+                        isValid = false;
+                        document.getElementById('manual-phone-error').textContent = '電話番号には数字とハイフンのみを使用してください。';
+                        document.getElementById('manual-phone-error').classList.remove('hidden');
+                    }
+
+                    if (!isValid) {
+                        return; // 保存せずに処理を中断
+                    }
+
                     state.answers.manualBizcardInfo = manualInfo;
                     state.hasUnsavedChanges = true;
-                    showToast('名刺情報を保存しました。');
+                    showToast('名刺情報を保存しました。'); // 成功時のトーストは残す
                     console.log('Manual bizcard info saved:', manualInfo);
+                    DOMElements.manualInputModal.style.display = 'none';
                 }
             });
         });
@@ -239,6 +272,38 @@ let bizcardImages = { front: null, back: null };
 
 function startBizcardUploadFlow() {
     let localImages = { front: null, back: null };
+    let currentSide = null; // New variable to track current side
+    
+    // Create a single hidden file input element and reuse it
+    const hiddenFileInput = document.createElement('input');
+    hiddenFileInput.type = 'file';
+    hiddenFileInput.accept = 'image/*';
+    hiddenFileInput.style.display = 'none'; // Hide it
+    document.body.appendChild(hiddenFileInput); // Add to DOM once
+
+    // Set onchange listener ONCE for hiddenFileInput
+    hiddenFileInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) {
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            localImages[currentSide] = event.target.result;
+            if (currentSide === 'front') showFrontPreview();
+            else showBackPreview();
+        };
+        reader.onerror = (error) => {
+            console.error(`FileReader error for side: ${currentSide}`, error);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const triggerFileInput = (useCamera, side) => {
+        currentSide = side; // Set currentSide before triggering click
+        hiddenFileInput.capture = useCamera ? 'environment' : ''; // Set capture attribute
+        hiddenFileInput.click(); // Trigger click on the reused input
+    };
 
     const showChoice = () => {
         const body = `
@@ -262,25 +327,6 @@ function startBizcardUploadFlow() {
 
         document.getElementById('upload-storage').addEventListener('click', () => triggerFileInput(false, 'front'));
         document.getElementById('upload-camera').addEventListener('click', () => triggerFileInput(true, 'front'));
-    };
-
-    const triggerFileInput = (useCamera, side) => {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'image/*';
-        if (useCamera) input.capture = 'environment';
-        input.onchange = (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                localImages[side] = event.target.result;
-                if (side === 'front') showFrontPreview();
-                else showBackPreview();
-            };
-            reader.readAsDataURL(file);
-        };
-        input.click();
     };
 
     const showFrontPreview = () => {
@@ -339,9 +385,17 @@ function startBizcardUploadFlow() {
                 </div>
             </div>
         `;
-        showModal(DOMElements.bizcardUploadModal, '裏面の追加', body, { cancelText: '戻る', onCancel: showFrontPreview });
-        document.getElementById('upload-storage-back').addEventListener('click', () => triggerFileInput(false, 'back'));
-        document.getElementById('upload-camera-back').addEventListener('click', () => triggerFileInput(true, 'back'));
+                showModal(DOMElements.bizcardUploadModal, '裏面の追加', body, { cancelText: '戻る', onCancel: showFrontPreview });
+        
+                const uploadStorageBack = document.getElementById('upload-storage-back');
+                const uploadCameraBack = document.getElementById('upload-camera-back');
+        
+                if (uploadStorageBack) {
+                    uploadStorageBack.addEventListener('click', () => triggerFileInput(false, 'back'));
+                }
+                if (uploadCameraBack) {
+                    uploadCameraBack.addEventListener('click', () => triggerFileInput(true, 'back'));
+                }
     };
 
     const showBackPreview = () => {
@@ -431,14 +485,12 @@ function showModal(modalElement, title, body, options = {}) {
     if (onSave) {
         modalElement.querySelector('#modal-save-button').addEventListener('click', () => {
             onSave();
-            modalElement.style.display = 'none';
         });
     }
 
     if (onCancel) {
         modalElement.querySelector('#modal-cancel-button').addEventListener('click', () => {
             onCancel();
-            modalElement.style.display = 'none';
         });
     }
 
@@ -732,6 +784,7 @@ function createQuestionElement(question) {
         state.hasUnsavedChanges = true;
         validateField(questionId); // リアルタイムバリデーションを実行
         console.log('Answers updated:', state.answers);
+        console.log('state.hasUnsavedChanges after change:', state.hasUnsavedChanges); // <-- Add this line
     });
 
     return fieldset;
@@ -824,7 +877,13 @@ function saveDraft(isManual) {
 
     const draftKey = `survey_draft_${state.surveyId}_${state.sessionId}`;
     
-    localStorage.setItem(draftKey, JSON.stringify(state.answers));
+    // Create a copy of state.answers and remove bizcardImages for localStorage
+    const answersToSave = { ...state.answers };
+    if (answersToSave.bizcardImages) {
+        delete answersToSave.bizcardImages;
+    }
+
+    localStorage.setItem(draftKey, JSON.stringify(answersToSave));
     state.hasUnsavedChanges = false;
 
     if (isManual) {
@@ -999,27 +1058,29 @@ function setupHeaderScrollBehavior() {
 }
 
 function setupLeaveConfirmation() {
-    // ブラウザ標準の離脱防止
-    window.addEventListener('beforeunload', (e) => {
-        if (state.hasUnsavedChanges) {
-            e.preventDefault();
-            e.returnValue = ''; // Chromeでダイアログを出すために必要
-        }
-    });
+
 
     // 戻るボタン対策
     window.addEventListener('popstate', (e) => {
+        console.log('popstate event fired. hasUnsavedChanges:', state.hasUnsavedChanges); // <-- Add this line
         if (state.hasUnsavedChanges) {
-            history.pushState(null, '', location.href); // デフォルトの挙動を一旦キャンセル
             showModal(DOMElements.leaveConfirmModal, 'ページを離れますか？', '変更が保存されていません。このページを離れてもよろしいですか？', {
                 saveText: '離れる',
                 cancelText: '留まる',
                 onSave: () => {
                     state.hasUnsavedChanges = false; // 離脱を許可
-                    history.back();
+                    DOMElements.leaveConfirmModal.style.display = 'none'; // <-- Add this line
+                    history.back(); // <-- 実際に前のページに戻る
                 },
-                onCancel: () => {}
+                onCancel: () => {
+                    // 留まる場合、何もしない。ユーザーは既に現在のページに留まっている。
+                    DOMElements.leaveConfirmModal.style.display = 'none'; // モーダルを閉じる
+                    history.pushState(null, '', location.href); // <-- この行を追加: 履歴ポインタを現在のページに戻す
+                }
             });
+        } else {
+            // 変更がない場合は、そのまま前のページに戻る
+            // 何もしないことで、ブラウザのデフォルトの戻る動作が実行される
         }
     });
 
