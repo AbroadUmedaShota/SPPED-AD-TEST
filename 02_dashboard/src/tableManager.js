@@ -67,11 +67,28 @@ export async function fetchSurveyData() {
     if (loadingIndicator) loadingIndicator.classList.remove('hidden');
 
     try {
-        const response = await fetch(resolveDashboardDataPath('surveys/surveys-with-details.json'));
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return await response.json();
+        // Statically define the list of surveys to load, as we cannot list directory contents.
+        const surveyIds = [
+            'sv_0001_25019', 'sv_0001_25020', 'sv_0001_25022', 'sv_0001_25023', 'sv_0001_25024',
+            'sv_0001_25025', 'sv_0001_25026', 'sv_0001_25027', 'sv_0001_25028', 'sv_0001_25031',
+            'sv_0001_25032', 'sv_0001_25035', 'sv_0001_25039', 'sv_0001_25040', 'sv_0001_25043',
+            'sv_0001_25044', 'sv_0001_25045', 'sv_0001_25047', 'sv_0001_25049', 'sv_0001_25050',
+            'sv_0001_25051', 'sv_0001_25052', 'sv_0001_25053', 'sv_0001_25054', 'sv_0001_25055',
+            'sv_0001_25056', 'sv_0001_25057', 'sv_0001_25058', 'sv_0001_25059', 'sv_0001_25060',
+            'sv_0001_25061', 'sv_0001_25062'
+        ];
+        const surveyPromises = surveyIds.map(id => 
+            fetch(resolveDashboardDataPath(`demo_surveys/${id}.json`)).then(res => {
+                if (!res.ok) {
+                    console.warn(`Could not load survey: ${id}`);
+                    return null; // Return null for failed fetches
+                }
+                return res.json();
+            })
+        );
+        const allSurveys = await Promise.all(surveyPromises);
+        return allSurveys.filter(Boolean); // Filter out any null results
+
     } catch (error) {
         console.error('Error fetching survey data:', error);
         showToast("アンケートデータの取得に失敗しました。", "error");
