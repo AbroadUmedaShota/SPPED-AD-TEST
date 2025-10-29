@@ -11,39 +11,55 @@ const state = {
     draftExists: false,
     sessionId: `session_${Date.now()}`,
     isSubmitting: false,
+    idleTimer: null,
+    isIdle: false,
     currentLanguage: 'ja',
     hasUnsavedChanges: false,
 };
 
 // --- DOM要素 ---
-const DOMElements = {
-    loadingIndicator: document.getElementById('loading-indicator'),
-    header: document.getElementById('survey-page-header'),
-    headerText: document.getElementById('survey-header-text'),
-    draftSaveButton: document.getElementById('draft-save-button'),
-    languageSelectorContainer: document.getElementById('language-selector-container'),
-    languageSelector: document.getElementById('language-selector'),
-    mainContent: document.getElementById('main-content'),
-    errorContainer: document.getElementById('error-container'),
-    surveyForm: document.getElementById('survey-form'),
-    bizcardManualButton: document.getElementById('bizcard-manual-button'),
-    bizcardCameraButton: document.getElementById('bizcard-camera-button'),
-    submitSurveyButton: document.getElementById('submit-survey-button'),
-    bizcardUploadModal: document.getElementById('bizcard-upload-modal'),
-    manualInputModal: document.getElementById('manual-input-modal'),
-    leaveConfirmModal: document.getElementById('leave-confirm-modal'),
-    draftRestoreModal: document.getElementById('draft-restore-modal'),
-    toastNotification: document.getElementById('toast-notification'),
-    toastMessage: document.getElementById('toast-message'),
-    submittingModal: document.getElementById('submitting-modal'),
-    submittingProgressBar: document.getElementById('submitting-progress-bar'),
-    submittingPercentage: document.getElementById('submitting-percentage'),
-};
+let DOMElements = {}; // DOM要素の参照を保持するオブジェクト
+
+function initializeDOMElements() {
+    DOMElements = {
+        loadingIndicator: document.getElementById('loading-indicator'),
+        header: document.getElementById('survey-page-header'),
+        headerText: document.getElementById('survey-header-text'),
+        draftSaveButton: document.getElementById('draft-save-fab'),
+        draftSaveFabContainer: document.getElementById('draft-save-fab-container'),
+        languageSwitcher: document.getElementById('language-switcher'),
+        languageSwitcherButton: document.getElementById('language-switcher-button'),
+        languageMenu: document.getElementById('language-menu'),
+        mainContent: document.getElementById('main-content'),
+        errorContainer: document.getElementById('error-container'),
+        surveyForm: document.getElementById('survey-form'),
+        bizcardManualButton: document.getElementById('bizcard-manual-button'),
+        bizcardCameraButton: document.getElementById('bizcard-camera-button'),
+        submitSurveyButton: document.getElementById('submit-survey-button'),
+        bizcardUploadModal: document.getElementById('bizcard-upload-modal'),
+        manualInputModal: document.getElementById('manual-input-modal'),
+        leaveConfirmModal: document.getElementById('leave-confirm-modal'),
+        draftRestoreModal: document.getElementById('draft-restore-modal'),
+        toastNotification: document.getElementById('toast-notification'),
+        toastMessage: document.getElementById('toast-message'),
+        submittingModal: document.getElementById('submitting-modal'),
+        submittingProgressBar: document.getElementById('submitting-progress-bar'),
+        submittingPercentage: document.getElementById('submitting-percentage'),
+
+        // --- カラーピッカーテスト機能用要素 ---
+        surveyMainWrapper: document.getElementById('survey-main-wrapper'),
+        headerColorPicker: document.getElementById('header-color-picker'),
+        footerColorPicker: document.getElementById('footer-color-picker'),
+        backgroundColorPicker: document.getElementById('background-color-picker'),
+        footer: document.querySelector('footer'),
+    };
+}
 
 // --- 初期化 ---
 document.addEventListener('DOMContentLoaded', async () => {
-    showLoading(true);
     try {
+        initializeDOMElements(); // DOMElements の初期化をここで行う
+        showLoading(true); // 初期化後にローディングを表示
         initializeParams();
         await loadSurveyData();
         setupEventListeners();
@@ -132,15 +148,89 @@ async function loadSurveyData() {
     state.surveyData.questions = rawQuestions.map((q, index) => normalizeQuestion(q, index));
 
     // プレミアム機能のチェックとUIの更新
-    if (state.surveyData.plan === 'premium') {
-        setupPremiumFeatures();
-    }
+    // NOTE: Temporarily calling this always for testing
+    setupPremiumFeatures();
 }
 
 function setupEventListeners() {
-    DOMElements.draftSaveButton.addEventListener('click', () => saveDraft(true));
-    DOMElements.submitSurveyButton.addEventListener('click', handleSubmit);
-    DOMElements.bizcardCameraButton.addEventListener('click', startBizcardUploadFlow);
+    // 一時保存ボタンのイベントリスナー設定
+    if (DOMElements.draftSaveButton) {
+        DOMElements.draftSaveButton.addEventListener('click', () => saveDraft(true));
+    } else {
+        console.error('一時保存ボタン (draft-save-fab) が見つかりません。一時保存機能は無効です。');
+    }
+    
+    // 他の必須ボタンもガード
+    if (DOMElements.submitSurveyButton) {
+        DOMElements.submitSurveyButton.addEventListener('click', handleSubmit);
+    }
+    if (DOMElements.bizcardCameraButton) {
+        DOMElements.bizcardCameraButton.addEventListener('click', startBizcardUploadFlow);
+    }
+    if (DOMElements.bizcardManualButton) {
+        DOMElements.bizcardManualButton.addEventListener('click', () => {
+            const formId = 'manual-bizcard-form';
+            const body = `
+            <form id="${formId}" class="space-y-4">
+                <div>
+                    <label for="manual-name" class="block text-sm font-medium text-on-surface-variant">氏名</label>
+                    <input type="text" id="manual-name" name="name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                </div>
+                <div>
+                    <label for="manual-email" class="block text-sm font-medium text-on-surface-variant">メールアドレス</label>
+                    <input type="email" id="manual-email" name="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                </div>
+                <div>
+                    <label for="manual-company" class="block text-sm font-medium text-on-surface-variant">会社名</label>
+                    <input type="text" id="manual-company" name="company" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                </div>
+                <div>
+                    <label for="manual-department" class="block text-sm font-medium text-on-surface-variant">部署名</label>
+                    <input type="text" id="manual-department" name="department" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                </div>
+                <div>
+                    <label for="manual-title" class="block text-sm font-medium text-on-surface-variant">役職名</label>
+                    <input type="text" id="manual-title" name="title" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                </div>
+                <div>
+                    <label for="manual-phone" class="block text-sm font-medium text-on-surface-variant">電話番号</label>
+                    <input type="tel" id="manual-phone" name="phone" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                </div>
+                <div>
+                    <label for="manual-postal-code" class="block text-sm font-medium text-on-surface-variant">郵便番号</label>
+                    <input type="text" id="manual-postal-code" name="postalCode" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                </div>
+                <div>
+                    <label for="manual-address" class="block text-sm font-medium text-on-surface-variant">住所</label>
+                    <input type="text" id="manual-address" name="address" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                </div>
+                <div>
+                    <label for="manual-building" class="block text-sm font-medium text-on-surface-variant">建物名</label>
+                    <input type="text" id="manual-building" name="building" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                </div>
+            </form>
+        `;
+            showModal(DOMElements.manualInputModal, '名刺情報を手入力', body, {
+                onSave: () => {
+                    const form = document.getElementById(formId);
+                    const formData = new FormData(form);
+                    const manualInfo = {};
+                    formData.forEach((value, key) => manualInfo[key] = value);
+                    state.answers.manualBizcardInfo = manualInfo;
+                    state.hasUnsavedChanges = true;
+                    showToast('名刺情報を保存しました。');
+                    console.log('Manual bizcard info saved:', manualInfo);
+                }
+            });
+        });
+    }
+
+    // テスト用カラーピッカー機能のセットアップ
+    setupColorPickerTestFeature();
+    
+    // アイドル検出とFAB表示ロジックのセットアップ
+    setupIdleDetection();
+}
 
 // ... (他の関数の間)
 
@@ -312,62 +402,6 @@ function startBizcardUploadFlow() {
     };
 
     showChoice();
-}
-    DOMElements.bizcardManualButton.addEventListener('click', () => {
-        const formId = 'manual-bizcard-form';
-        const body = `
-            <form id="${formId}" class="space-y-4">
-                <div>
-                    <label for="manual-name" class="block text-sm font-medium text-on-surface-variant">氏名</label>
-                    <input type="text" id="manual-name" name="name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-                </div>
-                <div>
-                    <label for="manual-email" class="block text-sm font-medium text-on-surface-variant">メールアドレス</label>
-                    <input type="email" id="manual-email" name="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-                </div>
-                <div>
-                    <label for="manual-company" class="block text-sm font-medium text-on-surface-variant">会社名</label>
-                    <input type="text" id="manual-company" name="company" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-                </div>
-                <div>
-                    <label for="manual-department" class="block text-sm font-medium text-on-surface-variant">部署名</label>
-                    <input type="text" id="manual-department" name="department" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-                </div>
-                <div>
-                    <label for="manual-title" class="block text-sm font-medium text-on-surface-variant">役職名</label>
-                    <input type="text" id="manual-title" name="title" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-                </div>
-                <div>
-                    <label for="manual-phone" class="block text-sm font-medium text-on-surface-variant">電話番号</label>
-                    <input type="tel" id="manual-phone" name="phone" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-                </div>
-                <div>
-                    <label for="manual-postal-code" class="block text-sm font-medium text-on-surface-variant">郵便番号</label>
-                    <input type="text" id="manual-postal-code" name="postalCode" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-                </div>
-                <div>
-                    <label for="manual-address" class="block text-sm font-medium text-on-surface-variant">住所</label>
-                    <input type="text" id="manual-address" name="address" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-                </div>
-                <div>
-                    <label for="manual-building" class="block text-sm font-medium text-on-surface-variant">建物名</label>
-                    <input type="text" id="manual-building" name="building" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-                </div>
-            </form>
-        `;
-        showModal(DOMElements.manualInputModal, '名刺情報を手入力', body, {
-            onSave: () => {
-                const form = document.getElementById(formId);
-                const formData = new FormData(form);
-                const manualInfo = {};
-                formData.forEach((value, key) => manualInfo[key] = value);
-                state.answers.manualBizcardInfo = manualInfo;
-                state.hasUnsavedChanges = true;
-                showToast('名刺情報を保存しました。');
-                console.log('Manual bizcard info saved:', manualInfo);
-            }
-        });
-    });
 }
 
 // ... (他の関数の間)
@@ -707,36 +741,86 @@ function createQuestionElement(question) {
 
 function setupPremiumFeatures() {
     // 多言語対応
-    if (state.surveyData.plan === 'premium' && state.surveyData.languages && state.surveyData.languages.length > 0) {
-        DOMElements.languageSelectorContainer.classList.remove('hidden');
-        
-        const languageMap = {
-            'ja': '日本語',
-            'en': 'English',
-            'zh-CN': '中文(简体)',
-            'zh-TW': '中文(繁體)',
-            'vi': 'Tiếng Việt',
-        };
+    // NOTE: Temporarily modified to always show switcher for testing.
+    let displayLanguages = state.surveyData.languages || [];
+    // Create dummy data for testing if no languages are set
+    if (displayLanguages.length === 0) {
+        displayLanguages = ['en', 'zh-CN'];
+    }
 
-        // 利用可能な言語をドロップダウンに追加
-        const availableLanguages = ['ja', ...state.surveyData.languages];
-        DOMElements.languageSelector.innerHTML = availableLanguages.map(lang => 
-            `<option value="${lang}" ${state.currentLanguage === lang ? 'selected' : ''}>${languageMap[lang] || lang}</option>`
-        ).join('');
+    DOMElements.languageSwitcher.classList.remove('hidden');
+    
+    const languageMap = {
+        'ja': '日本語',
+        'en': 'English',
+        'zh-CN': '中文(简体)',
+        'zh-TW': '中文(繁體)',
+        'vi': 'Tiếng Việt',
+    };
 
-        // 言語切り替えイベント
-        DOMElements.languageSelector.addEventListener('change', (e) => {
-            state.currentLanguage = e.target.value;
-            renderSurvey(); // UIを再描画
-            populateFormWithDraft(); // 入力済みの回答を再適用
-            showToast(`${languageMap[state.currentLanguage]}に切り替えました`);
+    const buildMenu = () => {
+        const availableLanguages = ['ja', ...displayLanguages];
+        DOMElements.languageMenu.innerHTML = ''; // Clear existing options
+
+        availableLanguages.forEach(lang => {
+            const langName = languageMap[lang] || lang;
+            const link = document.createElement('a');
+            link.href = '#';
+            link.className = 'block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100';
+            if (state.currentLanguage === lang) {
+                link.classList.add('bg-gray-100', 'font-bold');
+            }
+            link.textContent = langName;
+            link.dataset.lang = lang;
+            DOMElements.languageMenu.appendChild(link);
+        });
+    };
+
+    buildMenu(); // Initial build
+
+    // Attach listeners only once.
+    if (!DOMElements.languageSwitcher.dataset.listenerAttached) {
+        DOMElements.languageSwitcher.dataset.listenerAttached = 'true';
+
+        // Globe icon click to toggle menu
+        DOMElements.languageSwitcherButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            DOMElements.languageMenu.classList.toggle('hidden');
+        });
+
+        // Language selection click
+        DOMElements.languageMenu.addEventListener('click', (e) => {
+            e.preventDefault();
+            const target = e.target.closest('[data-lang]');
+            if (target) {
+                const lang = target.dataset.lang;
+                if (lang !== state.currentLanguage) {
+                    state.currentLanguage = lang;
+                    renderSurvey();
+                    populateFormWithDraft();
+                    showToast(`${languageMap[state.currentLanguage] || state.currentLanguage}に切り替えました`);
+                    buildMenu(); // Re-build menu to update highlight
+                }
+                DOMElements.languageMenu.classList.add('hidden');
+            }
+        });
+
+        // Click outside to close
+        window.addEventListener('click', () => {
+            if (!DOMElements.languageMenu.classList.contains('hidden')) {
+                DOMElements.languageMenu.classList.add('hidden');
+            }
         });
     }
     // TODO: 手書きスペース設問のハンドリング
 }
 
 function saveDraft(isManual) {
-    if (!state.hasUnsavedChanges && !isManual) return;
+    // 自動保存 (isManual: false) の場合のみ、未保存の変更がない場合はスキップ
+    if (!isManual && !state.hasUnsavedChanges) {
+        console.log('自動保存: 未保存の変更がないためスキップしました。');
+        return;
+    }
 
     const draftKey = `survey_draft_${state.surveyId}_${state.sessionId}`;
     
@@ -745,8 +829,12 @@ function saveDraft(isManual) {
 
     if (isManual) {
         showToast('下書きを保存しました。');
+        // 手動保存が成功したら、ボタンを非表示にする
+        hideFab();
+        console.log('手動保存: ドラフトを保存しました。', state.answers);
+    } else {
+        console.log('自動保存: ドラフトを保存しました。', state.answers);
     }
-    console.log('ドラフトを保存しました:', state.answers);
 }
 
 function validateField(questionId) {
@@ -855,6 +943,21 @@ async function simulateUpload(data) {
 
 // --- UIフィードバック関数 ---
 
+function showToast(message) {
+    if (!DOMElements.toastNotification || !DOMElements.toastMessage) {
+        console.error('Toast elements not initialized.');
+        return;
+    }
+    
+    DOMElements.toastMessage.textContent = message;
+    DOMElements.toastNotification.classList.remove('hidden');
+    
+    // 3秒後に非表示にする
+    setTimeout(() => {
+        DOMElements.toastNotification.classList.add('hidden');
+    }, 3000);
+}
+
 function showLoading(show) {
     DOMElements.loadingIndicator.style.display = show ? 'flex' : 'none';
 }
@@ -945,3 +1048,420 @@ function setupLeaveConfirmation() {
 function disablePullToRefresh() {
     document.body.style.overscrollBehaviorY = 'contain';
 }
+
+// --- テスト用カラーピッカー機能 ---
+function setupColorPickerTestFeature() {
+    if (!DOMElements.headerColorPicker || !DOMElements.footerColorPicker || !DOMElements.backgroundColorPicker) {
+        // HTMLに要素がない場合は何もしない
+        return;
+    }
+
+    // ヘッダー色の変更
+    DOMElements.headerColorPicker.addEventListener('input', (e) => {
+        if (DOMElements.header) {
+            DOMElements.header.style.backgroundColor = e.target.value;
+        }
+    });
+
+    // フッター色の変更
+    DOMElements.footerColorPicker.addEventListener('input', (e) => {
+        if (DOMElements.footer) {
+            DOMElements.footer.style.backgroundColor = e.target.value;
+        }
+    });
+
+        // 背景色の変更
+
+        DOMElements.backgroundColorPicker.addEventListener('input', (e) => {
+
+            if (DOMElements.surveyMainWrapper) {
+
+                // Tailwind CSSのクラスを上書きするためにstyle属性を直接操作
+
+                DOMElements.surveyMainWrapper.style.backgroundColor = e.target.value;
+
+            }
+
+        });
+
+    }
+
+    
+
+    
+
+        // --- FAB表示/非表示ロジック (アイドル検出) ---
+
+    
+
+        const IDLE_TIMEOUT = 2000; // 2秒
+
+    
+
+        function showFab() {
+
+    
+
+            DOMElements.draftSaveFabContainer.classList.remove('opacity-0', 'pointer-events-none');
+
+    
+
+            DOMElements.draftSaveFabContainer.classList.add('opacity-100');
+
+    
+
+        }
+
+    
+
+        
+
+    
+
+        function hideFab() {
+
+    
+
+        
+
+    
+
+            if (!DOMElements.draftSaveFabContainer) {
+
+    
+
+        
+
+    
+
+                console.error('FAB container not initialized.');
+
+    
+
+        
+
+    
+
+                return;
+
+    
+
+        
+
+    
+
+            }
+
+    
+
+        
+
+    
+
+            DOMElements.draftSaveFabContainer.classList.remove('opacity-100');
+
+    
+
+        
+
+    
+
+            DOMElements.draftSaveFabContainer.classList.add('opacity-0', 'pointer-events-none');
+
+    
+
+        
+
+    
+
+        }
+
+    
+
+        
+
+    
+
+        function resetIdleTimer() {
+
+    
+
+            // 既存のタイマーをクリア
+
+    
+
+            clearTimeout(state.idleTimer);
+
+    
+
+        
+
+    
+
+                            // 操作があったら、アイドル状態を解除し、FABを非表示にする
+
+    
+
+        
+
+    
+
+                    
+
+    
+
+        
+
+    
+
+                            if (state.isIdle) {
+
+    
+
+        
+
+    
+
+                    
+
+    
+
+        
+
+    
+
+                                state.isIdle = false;
+
+    
+
+        
+
+    
+
+                                // クリック操作を妨げないように、少し遅れて非表示にする
+
+    
+
+        
+
+    
+
+                                setTimeout(hideFab, 500);
+
+    
+
+        
+
+    
+
+                    
+
+    
+
+        
+
+    
+
+                            }
+
+    
+
+        
+
+    
+
+            // 新しいタイマーを設定
+
+    
+
+            state.idleTimer = setTimeout(() => {
+
+    
+
+                // 2秒経過したらアイドル状態
+
+    
+
+                state.isIdle = true;
+
+    
+
+                // 未保存の変更がある場合のみ表示
+
+    
+
+                if (state.hasUnsavedChanges) {
+
+    
+
+                    showFab();
+
+    
+
+                }
+
+    
+
+            }, IDLE_TIMEOUT);
+
+    
+
+        }
+
+    
+
+        
+
+    
+
+        function setupIdleDetection() {
+
+    
+
+            // 初期タイマー設定
+
+    
+
+            resetIdleTimer();
+
+    
+
+        
+
+    
+
+                // 監視するイベントの基本セット
+
+    
+
+        
+
+    
+
+                let events = ['mousedown', 'keypress', 'scroll'];
+
+    
+
+        
+
+    
+
+            
+
+    
+
+        
+
+    
+
+                // PCとモバイルでイベントを分岐
+
+    
+
+        
+
+    
+
+                const isTouchDevice = ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+
+    
+
+        
+
+    
+
+            
+
+    
+
+        
+
+    
+
+                if (isTouchDevice) {
+
+    
+
+        
+
+    
+
+                    events.push('touchstart');
+
+    
+
+        
+
+    
+
+                } else {
+
+    
+
+        
+
+    
+
+                    // PCの場合、マウスムーブでは非表示にしない。
+
+    
+
+        
+
+    
+
+                    // マウスダウン、キープレス、スクロールは操作とみなす。
+
+    
+
+        
+
+    
+
+                }
+
+    
+
+        
+
+    
+
+            
+
+    
+
+        
+
+    
+
+                events.forEach(event => {
+
+    
+
+        
+
+    
+
+                    document.addEventListener(event, resetIdleTimer, true);
+
+    
+
+        
+
+    
+
+                });
+
+    
+
+        }
+
+    
+
+        // --- /FAB表示/非表示ロジック (アイドル検出)
+
+    
+
+        
+
+    

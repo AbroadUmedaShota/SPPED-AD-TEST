@@ -11,4 +11,5 @@ document.addEventListener('DOMContentLoaded', () => {
         container.classList.remove('hidden');
         button.href = `survey-answer.html?surveyId=${surveyId}`;
     }
+
 });
