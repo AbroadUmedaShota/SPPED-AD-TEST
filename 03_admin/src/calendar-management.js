@@ -79,10 +79,16 @@ export function initCalendarManagementPage() {
     function switchView(viewName) {
         state.currentView = viewName;
 
-        // Toggle view containers
-        [monthlyView, yearlyView, verticalView].forEach(v => v.classList.add('hidden'));
+        // Toggle view containers using direct style manipulation for robustness
+        document.getElementById('monthly-view').style.display = 'none';
+        document.getElementById('yearly-view').style.display = 'none';
+        document.getElementById('vertical-view').style.display = 'none';
+
         const activeView = document.getElementById(`${viewName}-view`);
-        if (activeView) activeView.classList.remove('hidden');
+        if (activeView) {
+            // Yearly view uses display:grid, others use block.
+            activeView.style.display = viewName === 'yearly' ? 'grid' : 'block';
+        }
 
         // Toggle buttons
         [viewMonthlyButton, viewVerticalButton, viewYearlyButton].forEach(b => b.classList.remove('active'));
@@ -93,6 +99,8 @@ export function initCalendarManagementPage() {
     }
 
     function renderYearlyCalendar() {
+        document.getElementById('monthly-view').style.display = 'none';
+        document.getElementById('vertical-view').style.display = 'none';
         const year = state.currentDate.getFullYear();
         yearlyView.innerHTML = '';
         calendarTitle.textContent = `${year}年`;
@@ -126,11 +134,12 @@ export function initCalendarManagementPage() {
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             for (let day = 1; day <= daysInMonth; day++) {
                 const date = new Date(year, month, day);
-                const dateString = date.toISOString().split('T')[0];
+                const dateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
                 const dayCell = document.createElement('div');
                 dayCell.textContent = day;
                 dayCell.dataset.date = dateString;
                 dayCell.className = 'year-day-cell';
+                dayCell.style.pointerEvents = 'auto';
 
                 const surveysForDay = getSurveysForDay(dateString);
                 if (isDayAssigned(dateString)) {
@@ -140,16 +149,16 @@ export function initCalendarManagementPage() {
                 }
 
                 const dayOfWeek = date.getDay();
-                const { status } = getDayStatus(dateString, dayOfWeek);
+                let { status: dayStatus } = getDayStatus(dateString, dayOfWeek);
+                const hasOnDemand = surveysForDay.some(s => s.type === 'on-demand');
+
+                if (hasOnDemand && dayStatus === 'HOLIDAY') {
+                    dayStatus = 'WORKDAY'; // Override status to prevent holiday styling
+                }
+
                 if (dayOfWeek === 0) dayCell.classList.add('sunday');
                 if (dayOfWeek === 6) dayCell.classList.add('saturday');
-                if (status === 'HOLIDAY' && dayOfWeek !== 0) dayCell.classList.add('holiday');
-
-                dayCell.addEventListener('click', () => {
-                    state.currentDate = date;
-                    switchView('monthly');
-                    openFocusArea(dateString);
-                });
+                if (dayStatus === 'HOLIDAY' && dayOfWeek !== 0) dayCell.classList.add('holiday');
 
                 dayGrid.appendChild(dayCell);
             }
@@ -160,6 +169,8 @@ export function initCalendarManagementPage() {
     }
 
     function renderVerticalCalendar() {
+        document.getElementById('monthly-view').style.display = 'none';
+        document.getElementById('yearly-view').style.display = 'none';
         verticalView.innerHTML = '';
         const year = state.currentDate.getFullYear();
         const month = state.currentDate.getMonth();
@@ -169,16 +180,12 @@ export function initCalendarManagementPage() {
 
         for (let day = 1; day <= daysInMonth; day++) {
             const date = new Date(year, month, day);
-            const dateString = date.toISOString().split('T')[0];
+            const dateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
             const row = document.createElement('div');
             row.className = 'vertical-day-row';
             row.style.cursor = 'pointer';
-            row.addEventListener('click', () => {
-                state.currentDate = date;
-                switchView('monthly');
-                openFocusArea(dateString);
-            });
+            row.dataset.date = dateString;
 
             const dateEl = document.createElement('div');
             dateEl.className = 'vertical-day-date';
@@ -188,15 +195,27 @@ export function initCalendarManagementPage() {
             const contentEl = document.createElement('div');
             contentEl.className = 'vertical-day-content';
 
-            const { status: dayStatus } = getDayStatus(dateString, date.getDay());
+            let { status: dayStatus } = getDayStatus(dateString, date.getDay());
             const surveysForDay = getSurveysForDay(dateString);
             const isAssigned = isDayAssigned(dateString);
+            const hasOnDemand = surveysForDay.some(s => s.type === 'on-demand');
 
             let statusHTML = '';
-            if (dayStatus === 'HOLIDAY') statusHTML = `<span class="text-xs font-semibold text-error">休業日</span>`;
-            else if (dayStatus === 'SUBSTITUTE_WORKDAY') statusHTML = `<span class="text-xs font-semibold text-primary">振替営業日</span>`;
+            if (hasOnDemand && dayStatus === 'HOLIDAY') {
+                statusHTML = `<span class="text-xs font-semibold text-error">営業日</span>`;
+            } else if (dayStatus === 'HOLIDAY') {
+                statusHTML = `<span class="text-xs font-semibold text-error">休業日</span>`;
+            } else if (dayStatus === 'SUBSTITUTE_WORKDAY') {
+                statusHTML = `<span class="text-xs font-semibold text-primary">振替営業日</span>`;
+            }
 
-            let surveyHTML = surveysForDay.map(s => `<div class="text-xs">${s.name}</div>`).join('');
+            const normalIndicator = `<span class="text-xs border rounded px-1 py-0.5 ${isAssigned ? 'bg-green-100 border-green-300 text-green-800' : 'bg-pink-100 border-pink-300 text-pink-800'}">⭐通常</span>`;
+            const onDemandIndicator = `<span class="text-xs border rounded border-error text-error px-1 py-0.5">⚡オンデマンド</span>`;
+
+            let surveyHTML = surveysForDay.map(s => {
+                const indicator = s.type === 'on-demand' ? onDemandIndicator : normalIndicator;
+                return `<div class="flex items-center gap-2 text-xs py-0.5"><span>${s.name}</span>${indicator}</div>`;
+            }).join('');
 
             contentEl.innerHTML = `${statusHTML}${surveyHTML}`;
             row.appendChild(contentEl);
@@ -206,6 +225,8 @@ export function initCalendarManagementPage() {
     }
 
     function renderCalendar() {
+        document.getElementById('yearly-view').style.display = 'none';
+        document.getElementById('vertical-view').style.display = 'none';
         calendarGrid.innerHTML = '';
         const year = state.currentDate.getFullYear();
         const month = state.currentDate.getMonth();
@@ -225,12 +246,18 @@ export function initCalendarManagementPage() {
             const dayCell = document.createElement('div');
             const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
-            const { status: dayStatus } = getDayStatus(dateString, date.getDay());
+            let { status: dayStatus } = getDayStatus(dateString, date.getDay());
             const surveysForDay = getSurveysForDay(dateString);
             const memoForDay = state.memos && state.memos[dateString];
             const isAssigned = isDayAssigned(dateString);
             const hasOnDemand = surveysForDay.some(s => s.type === 'on-demand');
             const hasNormal = surveysForDay.some(s => s.type === 'normal');
+
+            let isSpecialOnDemandWorkday = false;
+            if (hasOnDemand && dayStatus === 'HOLIDAY') {
+                dayStatus = 'WORKDAY'; // Override status for logic below
+                isSpecialOnDemandWorkday = true;
+            }
 
             let cellClasses = 'border rounded-lg min-h-[120px] p-2 cursor-pointer hover:bg-surface-variant/60 relative';
             if (hasOnDemand) {
@@ -240,7 +267,9 @@ export function initCalendarManagementPage() {
             }
 
             let dayTypeIndicatorHTML = '';
-            if (dayStatus === 'HOLIDAY') {
+            if (isSpecialOnDemandWorkday) {
+                dayTypeIndicatorHTML = `<span class="text-xs font-semibold text-error">営業日</span>`;
+            } else if (dayStatus === 'HOLIDAY') {
                 dayTypeIndicatorHTML = `<span class="text-xs font-semibold text-error">休業日</span>`;
             } else if (dayStatus === 'SUBSTITUTE_WORKDAY') {
                 dayTypeIndicatorHTML = `<span class="text-xs font-semibold text-primary">振替営業日</span>`;
@@ -436,6 +465,11 @@ export function initCalendarManagementPage() {
         state.currentFocusStartDate = startDate;
         state.currentFocusEndDate = endDate;
 
+        // Update selection on calendar
+        state.dragStartDate = startDate;
+        state.dragEndDate = endDate || startDate;
+        updateSelectionHighlight();
+
         document.getElementById('focus-area-title').textContent = endDate ? "期間設定" : "詳細";
         document.getElementById('focus-area-date').textContent = endDate ? `${startDate} から ${endDate}` : startDate;
 
@@ -470,8 +504,9 @@ export function initCalendarManagementPage() {
             assignButtonsHTML = `<button id="save-assignment-button" class="mt-4 w-full rounded-lg bg-primary text-on-primary px-4 py-2 text-sm font-semibold" ${surveysInRange.length === 0 ? 'disabled' : ''}>${assignButtonText}</button>`;
         }
         assignContent.innerHTML = `
-            <p class="text-sm text-on-surface-variant mb-2">担当会社:</p>
-            <p class="font-semibold text-on-surface">${companyName}</p>
+            <div>
+                <span class="text-sm text-on-surface-variant">担当会社：</span><span class="font-semibold text-on-surface">${companyName}</span>
+            </div>
             ${assignButtonsHTML}
         `;
 
@@ -571,15 +606,10 @@ export function initCalendarManagementPage() {
 
     function getSurveysForRange(startDate, endDate) {
         if (!state.surveys) return [];
-        const start = new Date(startDate);
-        const end = new Date(endDate);
         const surveysInRange = new Map();
-        let currentDate = new Date(start);
-        while (currentDate <= end) {
-            const dateString = currentDate.toISOString().split('T')[0];
+        forEachDateInRange(startDate, endDate, (dateString) => {
             getSurveysForDay(dateString).forEach(survey => surveysInRange.set(survey.id, survey));
-            currentDate.setDate(currentDate.getDate() + 1);
-        }
+        });
         return Array.from(surveysInRange.values());
     }
 
@@ -589,17 +619,19 @@ export function initCalendarManagementPage() {
     }
 
     function isRangeAssigned(startDate, endDate) {
-        let current = new Date(startDate);
-        const last = new Date(endDate);
-        while (current <= last) {
-            const dateString = current.toISOString().split('T')[0];
-            const dayAssignments = state.assignmentOverrides[dateString];
-            if (dayAssignments && dayAssignments.surveyIds.length > 0) {
-                return true;
-            }
-            current.setDate(current.getDate() + 1);
+        let assigned = false;
+        // This is a bit of a workaround to allow breaking the loop
+        try {
+            forEachDateInRange(startDate, endDate, (dateString) => {
+                if (isDayAssigned(dateString)) {
+                    assigned = true;
+                    throw new Error("Found"); // Break the loop
+                }
+            });
+        } catch (e) {
+            if (e.message !== "Found") throw e;
         }
-        return false;
+        return assigned;
     }
 
     // --- Drag Selection ---
@@ -616,7 +648,10 @@ export function initCalendarManagementPage() {
 
     function handleDrag(e) {
         if (state.isDragging) {
-            const dayCell = e.target.closest('[data-date]');
+            const elementUnderMouse = document.elementFromPoint(e.clientX, e.clientY);
+            if (!elementUnderMouse) return;
+
+            const dayCell = elementUnderMouse.closest('[data-date]');
             if (dayCell && dayCell.dataset.date !== state.dragEndDate) {
                 state.dragEndDate = dayCell.dataset.date;
                 updateSelectionHighlight();
@@ -624,13 +659,38 @@ export function initCalendarManagementPage() {
         }
     }
 
-    function handleDragEnd() {
+    function handleDragEnd(e) {
         if (!state.isDragging) return;
+
+        // Final update of dragEndDate based on the mouseup position
+        const elementUnderMouse = document.elementFromPoint(e.clientX, e.clientY);
+        if (elementUnderMouse) {
+            const dayCell = elementUnderMouse.closest('[data-date]');
+            if (dayCell) {
+                state.dragEndDate = dayCell.dataset.date;
+            }
+        }
+
         const wasDragging = state.dragStartDate !== state.dragEndDate;
         state.isDragging = false;
         const { start, end } = getOrderedDateRange();
-        if (wasDragging) openFocusArea(start, end);
-        else openFocusArea(state.dragStartDate);
+        if (!start) return; // Guard
+
+        // Open the focus area first
+        if (wasDragging) {
+            openFocusArea(start, end);
+        } else { // Single click
+            openFocusArea(start);
+        }
+
+        // If the action occurred on a non-monthly view, switch to monthly to show the selection
+        if (state.currentView !== 'monthly') {
+            state.currentDate = new Date(start);
+            // Use a timeout to allow the focus area animation to start before re-rendering the calendar
+            setTimeout(() => {
+                switchView('monthly');
+            }, 50); // A small delay
+        }
     }
 
     function getOrderedDateRange() {
@@ -639,20 +699,49 @@ export function initCalendarManagementPage() {
         return new Date(start) > new Date(end) ? { start: end, end: start } : { start, end };
     }
 
+    function forEachDateInRange(startDate, endDate, callback) {
+        // Add T00:00:00Z to treat date strings as UTC, avoiding timezone shifts.
+        let currentDate = new Date(startDate + 'T00:00:00Z');
+        const lastDate = new Date(endDate + 'T00:00:00Z');
+
+        while (currentDate <= lastDate) {
+            const dateString = currentDate.toISOString().split('T')[0];
+            callback(dateString);
+            // Increment the date in UTC.
+            currentDate.setUTCDate(currentDate.getUTCDate() + 1);
+        }
+    }
+
     function updateSelectionHighlight() {
-        calendarGrid.querySelectorAll('.selection').forEach(cell => cell.classList.remove('selection', 'bg-blue-300'));
+        // Clear previous selection from all views
+        calendarGrid.querySelectorAll('.selection').forEach(cell => cell.classList.remove('selection', 'border-2', 'border-blue-500'));
+        yearlyView.querySelectorAll('.selection').forEach(cell => cell.classList.remove('selection', 'bg-blue-300', 'text-white'));
+        verticalView.querySelectorAll('.selection').forEach(cell => cell.classList.remove('selection', 'bg-blue-100'));
+
         if (!state.dragStartDate || !state.dragEndDate) return;
         const { start, end } = getOrderedDateRange();
         if (!start || !end) return;
-        let currentDate = new Date(start);
-        const lastDate = new Date(end);
-        while (currentDate <= lastDate) {
-            const dateString = currentDate.toISOString().split('T')[0];
-            const cell = calendarGrid.querySelector(`[data-date="${dateString}"]`);
-            if (cell) cell.classList.add('selection', 'bg-blue-300');
-            currentDate.setDate(currentDate.getDate() + 1);
-        }
+
+        forEachDateInRange(start, end, (dateString) => {
+            let cell;
+            switch (state.currentView) {
+                case 'monthly':
+                    cell = calendarGrid.querySelector(`[data-date="${dateString}"]`);
+                    if (cell) cell.classList.add('selection', 'border-2', 'border-blue-500');
+                    break;
+                case 'yearly':
+                    cell = yearlyView.querySelector(`[data-date="${dateString}"]`);
+                    if (cell) cell.classList.add('selection', 'bg-blue-300', 'text-white');
+                    break;
+                case 'vertical':
+                    cell = verticalView.querySelector(`[data-date="${dateString}"]`);
+                    if (cell) cell.classList.add('selection', 'bg-blue-100');
+                    break;
+            }
+        });
     }
+
+
 
     async function init() {
         // Assign DOM elements
@@ -743,6 +832,10 @@ export function initCalendarManagementPage() {
 
         calendarGrid.addEventListener('mousedown', handleDragStart);
         calendarGrid.addEventListener('mousemove', handleDrag);
+        yearlyView.addEventListener('mousedown', handleDragStart);
+        yearlyView.addEventListener('mousemove', handleDrag);
+        verticalView.addEventListener('mousedown', handleDragStart);
+        verticalView.addEventListener('mousemove', handleDrag);
         document.addEventListener('mouseup', handleDragEnd);
 
         let tooltipTimer = null;
@@ -809,6 +902,10 @@ export function initCalendarManagementPage() {
 
 
         document.getElementById('focus-area-close-tab').addEventListener('click', closeFocusArea);
+        const closeButton = document.getElementById('focus-area-close-button');
+        if (closeButton) {
+            closeButton.addEventListener('click', closeFocusArea);
+        }
         
         document.querySelectorAll('.tab-button').forEach(button => {
             button.addEventListener('click', () => setActiveTab(button.dataset.tab));
@@ -819,12 +916,9 @@ export function initCalendarManagementPage() {
             if (!startDate) return;
 
             const dateRange = [];
-            let current = new Date(startDate);
-            const last = new Date(endDate || startDate);
-            while (current <= last) {
-                dateRange.push(current.toISOString().split('T')[0]);
-                current.setDate(current.getDate() + 1);
-            }
+            forEachDateInRange(startDate, endDate || startDate, (dateString) => {
+                dateRange.push(dateString);
+            });
             const rangeString = endDate ? `${startDate}～${endDate}` : startDate;
 
             if (e.target.id === 'save-memo-button') {
@@ -942,8 +1036,35 @@ export function initCalendarManagementPage() {
 
         document.getElementById('export-csv-button').addEventListener('click', () => alert('CSVエクスポート機能は現在開発中です。'));
         document.getElementById('import-csv-button').addEventListener('click', () => alert('CSVインポート機能は現在開発中です。'));
-        document.getElementById('sync-holidays-button').addEventListener('click', () => alert('祝日API同期を実行しました（シミュレーション）。'));
-    }
+                document.getElementById('sync-holidays-button').addEventListener('click', () => alert('祝日API同期を実行しました（シミュレーション）。'));
+        
+                window.addEventListener('wheel', (e) => {
+                    const verticalView = document.getElementById('vertical-view');
+                    // Only apply this logic if the vertical view is visible
+                    if (!verticalView || verticalView.style.display === 'none') {
+                        return;
+                    }
+        
+                    // And if the event started inside the vertical view
+                    if (!verticalView.contains(e.target)) {
+                        return;
+                    }
+        
+                    const { scrollTop, scrollHeight, clientHeight } = verticalView;
+                    const atTop = scrollTop === 0;
+                    const atBottom = scrollTop + clientHeight >= scrollHeight - 1;
+        
+                    // If at a boundary and scrolling "out", let the default window scroll happen.
+                    if ((atTop && e.deltaY < 0) || (atBottom && e.deltaY > 0)) {
+                        return;
+                    }
+        
+                    // Otherwise, we are scrolling "inside" the div.
+                    // Prevent the default window scroll, and manually scroll the div.
+                    e.preventDefault();
+                    verticalView.scrollTop += e.deltaY;
+                }, { passive: false });
+            }
 
     init();
 }

@@ -156,6 +156,9 @@ body.dark-mode #graphModal #modalCloseBtn:hover {
 #vertical-view {
     max-height: 800px; /* or other appropriate height */
     overflow-y: auto;
+    /* Ensure scroll chaining is enabled, allowing the main page to scroll
+       when the user reaches the top or bottom of this scrollable area. */
+    overscroll-behavior-y: auto;
 }
 .vertical-day-row {
     display: flex;
