@@ -7,7 +7,7 @@ export function initCalendarManagementPage() {
         surveys: [],
         operators: [],
         manualSettingsCurrentPage: 1,
-        manualSettingsItemsPerPage: 5,
+        manualSettingsItemsPerPage: 9,
         logCurrentPage: 1,
         logItemsPerPage: 7,
         settingToDeleteId: null,
