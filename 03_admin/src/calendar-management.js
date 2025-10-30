@@ -25,8 +25,8 @@ export function initCalendarManagementPage() {
     };
 
     // Declare variables for DOM elements
-    let calendarTitle, calendarGrid, prevMonthButton, nextMonthButton, manualSettingsList,
-        settingPageInfo, settingPrevButton, settingNextButton, updateLogList, logPageInfo,
+    let calendarTitle, calendarGrid, prevMonthButton, nextMonthButton, manualSettingsTableBody,
+        settingPageInfo, settingPrevButton, settingNextButton, updateLogTableBody, logPageInfo,
         logPrevButton, logNextButton, kpiHolidays, kpiSubstituteWorkdays, kpiSlaAlerts,
         // Modals to keep
         confirmationModal, confirmationModalContainer,
@@ -337,13 +337,13 @@ export function initCalendarManagementPage() {
     }
 
     function renderManualSettings() {
-        manualSettingsList.innerHTML = '';
+        manualSettingsTableBody.innerHTML = '';
         const sortedSettings = state.manualSettings.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
         const totalPages = Math.ceil(sortedSettings.length / state.manualSettingsItemsPerPage);
         settingPageInfo.textContent = `${state.manualSettingsCurrentPage} / ${totalPages || 1}`;
 
         if (sortedSettings.length === 0) {
-            manualSettingsList.innerHTML = '<li>個別設定はありません。</li>';
+            manualSettingsTableBody.innerHTML = '<tr><td colspan="4" class="px-4 py-3 text-center">個別設定はありません。</td></tr>';
             settingPrevButton.disabled = true;
             settingNextButton.disabled = true;
             return;
@@ -354,32 +354,20 @@ export function initCalendarManagementPage() {
         const pageItems = sortedSettings.slice(start, end);
 
         pageItems.forEach(setting => {
-            const li = document.createElement('li');
-            li.className = 'flex items-center justify-between p-2 rounded-lg';
-            const reasonText = `${setting.reason} (${setting.event_type === 'HOLIDAY' ? '特別休業日' : '振替営業日'})`;
-            let reasonHTML = `<p>${reasonText}</p>`;
-            const maxLength = 40;
-            if (reasonText.length > maxLength) {
-                const shortText = reasonText.substring(0, maxLength) + '...';
-                reasonHTML = `
-                    <div class="expandable-text">
-                        <p class="short-text">${shortText}</p>
-                        <p class="full-text hidden">${reasonText}</p>
-                        <button class="toggle-text-button text-sm text-primary hover:underline">続きを読む</button>
-                    </div>
-                `;
-            }
-            li.innerHTML = `
-                <div class="flex-1">
-                    <p class="text-on-surface font-medium">${setting.event_date}</p>
-                    ${reasonHTML}
-                </div>
-                <div class="flex gap-2 pl-4">
-                    <button data-id="${setting.id}" class="edit-setting-button inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs">編集</button>
-                    <button data-id="${setting.id}" class="delete-setting-button inline-flex items-center gap-1 rounded border border-error/50 text-error px-3 py-1 text-xs">削除</button>
-                </div>
+            const tr = document.createElement('tr');
+            const typeText = setting.event_type === 'HOLIDAY' ? '特別休業日' : '振替営業日';
+            const typeClass = setting.event_type === 'HOLIDAY' ? 'text-error' : 'text-primary';
+
+            tr.innerHTML = `
+                <td class="px-4 py-3 whitespace-nowrap font-medium">${setting.event_date}</td>
+                <td class="px-4 py-3 whitespace-nowrap ${typeClass}">${typeText}</td>
+                <td class="px-4 py-3">${setting.reason || '-'}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-right">
+                    <button data-id="${setting.id}" class="edit-setting-button inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs hover:bg-surface-variant">編集</button>
+                    <button data-id="${setting.id}" class="delete-setting-button inline-flex items-center gap-1 rounded border border-error/50 text-error px-3 py-1 text-xs hover:bg-error-container">削除</button>
+                </td>
             `;
-            manualSettingsList.appendChild(li);
+            manualSettingsTableBody.appendChild(tr);
         });
 
         settingPrevButton.disabled = state.manualSettingsCurrentPage === 1;
@@ -387,13 +375,13 @@ export function initCalendarManagementPage() {
     }
 
     function renderUpdateLog() {
-        updateLogList.innerHTML = '';
+        updateLogTableBody.innerHTML = '';
         const sortedLog = state.updateLog.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
         const totalPages = Math.ceil(sortedLog.length / state.logItemsPerPage);
         logPageInfo.textContent = `${state.logCurrentPage} / ${totalPages || 1}`;
 
         if (sortedLog.length === 0) {
-            updateLogList.innerHTML = '<li>更新ログはありません。</li>';
+            updateLogTableBody.innerHTML = '<tr><td colspan="3" class="px-4 py-3 text-center">更新ログはありません。</td></tr>';
             logPrevButton.disabled = true;
             logNextButton.disabled = true;
             return;
@@ -404,25 +392,15 @@ export function initCalendarManagementPage() {
         const pageItems = sortedLog.slice(start, end);
 
         pageItems.forEach(log => {
-            const li = document.createElement('li');
-            const actionText = log.action;
-            let actionHTML = `<p>${actionText}</p>`;
-            const maxLength = 40;
-            if (actionText.length > maxLength) {
-                const shortText = actionText.substring(0, maxLength) + '...';
-                actionHTML = `
-                    <div class="expandable-text">
-                        <p class="short-text">${shortText}</p>
-                        <p class="full-text hidden">${actionText}</p>
-                        <button class="toggle-text-button text-sm text-primary hover:underline">続きを読む</button>
-                    </div>
-                `;
-            }
-            li.innerHTML = `
-                <p class="text-on-surface font-medium">${new Date(log.timestamp).toLocaleString('ja-JP')} ${log.user}</p>
-                ${actionHTML}
+            const tr = document.createElement('tr');
+            const timestamp = new Date(log.timestamp).toLocaleString('ja-JP');
+            
+            tr.innerHTML = `
+                <td class="px-4 py-3 whitespace-nowrap">${timestamp}</td>
+                <td class="px-4 py-3 whitespace-nowrap">${log.user}</td>
+                <td class="px-4 py-3">${log.action}</td>
             `;
-            updateLogList.appendChild(li);
+            updateLogTableBody.appendChild(tr);
         });
 
         logPrevButton.disabled = state.logCurrentPage === 1;
@@ -751,11 +729,11 @@ export function initCalendarManagementPage() {
         calendarGrid = document.getElementById('calendar-grid');
         prevMonthButton = document.getElementById('prev-month-button');
         nextMonthButton = document.getElementById('next-month-button');
-        manualSettingsList = document.getElementById('manual-settings-list');
+        manualSettingsTableBody = document.getElementById('manual-settings-table-body');
         settingPageInfo = document.getElementById('setting-page-info');
         settingPrevButton = document.getElementById('setting-prev-button');
         settingNextButton = document.getElementById('setting-next-button');
-        updateLogList = document.getElementById('update-log-list');
+        updateLogTableBody = document.getElementById('update-log-table-body');
         logPageInfo = document.getElementById('log-page-info');
         logPrevButton = document.getElementById('log-prev-button');
         logNextButton = document.getElementById('log-next-button');
@@ -991,18 +969,10 @@ export function initCalendarManagementPage() {
             }
         });
 
-        manualSettingsList.addEventListener('click', (e) => {
+        manualSettingsTableBody.addEventListener('click', (e) => {
             const button = e.target.closest('button');
             if (!button) return;
-            if (button.classList.contains('toggle-text-button')) {
-                const container = button.closest('.expandable-text');
-                const shortText = container.querySelector('.short-text');
-                const fullText = container.querySelector('.full-text');
-                shortText.classList.toggle('hidden');
-                fullText.classList.toggle('hidden');
-                button.textContent = fullText.classList.contains('hidden') ? '続きを読む' : '閉じる';
-                return;
-            }
+            
             const id = parseInt(button.dataset.id, 10);
             if (button.classList.contains('edit-setting-button')) {
                 const setting = state.manualSettings.find(s => s.id === id);
@@ -1011,17 +981,6 @@ export function initCalendarManagementPage() {
             if (button.classList.contains('delete-setting-button')) {
                 showDeleteConfirmModal(id);
             }
-        });
-
-        updateLogList.addEventListener('click', (e) => {
-            const button = e.target.closest('.toggle-text-button');
-            if (!button) return;
-            const container = button.closest('.expandable-text');
-            const shortText = container.querySelector('.short-text');
-            const fullText = container.querySelector('.full-text');
-            shortText.classList.toggle('hidden');
-            fullText.classList.toggle('hidden');
-            button.textContent = fullText.classList.contains('hidden') ? '続きを読む' : '閉じる';
         });
 
         deleteConfirmModal.addEventListener('click', (e) => {

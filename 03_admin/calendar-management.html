@@ -120,31 +120,54 @@
                         </div>
                     </div>
                     <section class="grid gap-6 md:grid-cols-2">
-                        <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm flex flex-col h-96" aria-label="休業日一覧">
+                        <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm flex flex-col" aria-label="休業日一覧">
                             <div class="flex justify-between items-center mb-4 flex-shrink-0">
                                 <h2 class="text-title-large font-semibold text-on-surface">休業日の個別設定</h2>
-                                <div class="flex items-center gap-2">
-                                    <button id="setting-prev-button" class="inline-flex items-center justify-center rounded-full border border-outline size-8" aria-label="前のページへ"><span class="material-icons text-base">chevron_left</span></button>
-                                    <span id="setting-page-info" class="text-sm">-</span>
-                                    <button id="setting-next-button" class="inline-flex items-center justify-center rounded-full border border-outline size-8" aria-label="次のページへ"><span class="material-icons text-base">chevron_right</span></button>
-                                </div>
                             </div>
-                            <ul id="manual-settings-list" class="space-y-2 text-sm text-on-surface-variant flex-grow min-h-0 overflow-y-auto pr-2">
-                                <!-- Manual settings will be injected here by JavaScript -->
-                            </ul>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-outline-variant">
+                                    <thead class="bg-surface-container-low">
+                                        <tr>
+                                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-on-surface-variant uppercase tracking-wider">日付</th>
+                                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-on-surface-variant uppercase tracking-wider">種別</th>
+                                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-on-surface-variant uppercase tracking-wider">理由</th>
+                                            <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-on-surface-variant uppercase tracking-wider">操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="manual-settings-table-body" class="divide-y divide-outline-variant text-sm text-on-surface-variant">
+                                        <!-- Manual settings will be injected here by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="flex justify-end items-center gap-2 mt-4">
+                                <button id="setting-prev-button" class="inline-flex items-center justify-center rounded-full border border-outline size-8" aria-label="前のページへ"><span class="material-icons text-base">chevron_left</span></button>
+                                <span id="setting-page-info" class="text-sm">-</span>
+                                <button id="setting-next-button" class="inline-flex items-center justify-center rounded-full border border-outline size-8" aria-label="次のページへ"><span class="material-icons text-base">chevron_right</span></button>
+                            </div>
                         </div>
-                        <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm flex flex-col h-96" aria-label="操作ログ">
+                        <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm flex flex-col" aria-label="操作ログ">
                             <div class="flex justify-between items-center mb-4 flex-shrink-0">
                                 <h2 class="text-title-large font-semibold text-on-surface">更新ログ</h2>
-                                <div class="flex items-center gap-2">
-                                    <button id="log-prev-button" class="inline-flex items-center justify-center rounded-full border border-outline size-8" aria-label="前のページへ"><span class="material-icons text-base">chevron_left</span></button>
-                                    <span id="log-page-info" class="text-sm">-</span>
-                                    <button id="log-next-button" class="inline-flex items-center justify-center rounded-full border border-outline size-8" aria-label="次のページへ"><span class="material-icons text-base">chevron_right</span></button>
-                                </div>
                             </div>
-                            <ol id="update-log-list" class="space-y-2 text-sm text-on-surface-variant flex-grow min-h-0 overflow-y-auto pr-2">
-                                <!-- Update logs will be injected here by JavaScript -->
-                            </ol>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-outline-variant">
+                                    <thead class="bg-surface-container-low">
+                                        <tr>
+                                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-on-surface-variant uppercase tracking-wider">日時</th>
+                                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-on-surface-variant uppercase tracking-wider">ユーザー</th>
+                                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-on-surface-variant uppercase tracking-wider">操作内容</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="update-log-table-body" class="divide-y divide-outline-variant text-sm text-on-surface-variant">
+                                        <!-- Update logs will be injected here by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="flex justify-end items-center gap-2 mt-4">
+                                <button id="log-prev-button" class="inline-flex items-center justify-center rounded-full border border-outline size-8" aria-label="前のページへ"><span class="material-icons text-base">chevron_left</span></button>
+                                <span id="log-page-info" class="text-sm">-</span>
+                                <button id="log-next-button" class="inline-flex items-center justify-center rounded-full border border-outline size-8" aria-label="次のページへ"><span class="material-icons text-base">chevron_right</span></button>
+                            </div>
                         </div>
                     </section>
                 </section>
