@@ -18,24 +18,24 @@ export function initCalendarManagementPage() {
         isDragging: false,
         dragStartDate: null,
         dragEndDate: null,
+        memos: {},
+        currentFocusStartDate: null,
+        currentFocusEndDate: null,
+        currentView: 'monthly',
     };
 
     // Declare variables for DOM elements
     let calendarTitle, calendarGrid, prevMonthButton, nextMonthButton, manualSettingsList,
         settingPageInfo, settingPrevButton, settingNextButton, updateLogList, logPageInfo,
         logPrevButton, logNextButton, kpiHolidays, kpiSubstituteWorkdays, kpiSlaAlerts,
-        modal, modalContainer, modalDateDisplay, closeModalButton, cancelButton,
-        cancelAssignmentButton, tabBtnSettings, tabBtnAssignment, tabContentSettings,
-        tabContentAssignment, settingForm, settingIdInput, eventDateInput, reasonInput,
-        eventDateError, reasonError, assignmentForm, assignmentSurveySelect,
-        assignmentCompanyDisplay, confirmationModal, confirmationModalContainer,
+        // Modals to keep
+        confirmationModal, confirmationModalContainer,
         confirmationModalMessage, closeConfirmationModalButton, deleteConfirmModal,
         deleteConfirmModalContainer, cancelDeleteButton, confirmDeleteButton,
-        // Additions for bulk modal
-        bulkModal, bulkModalContainer, bulkModalDateRangeDisplay, bulkCloseModalButton,
-        bulkCancelButton, bulkSettingForm, bulkReasonInput, bulkReasonError,
-        bulkAssignmentForm, bulkSaveAssignmentButton, bulkCancelAssignmentButton,
-        bulkCloseAssignmentTabButton;
+        calendarTooltip,
+        // View containers and buttons
+        monthlyView, yearlyView, verticalView,
+        viewMonthlyButton, viewVerticalButton, viewYearlyButton;
 
 
     // --- Data Fetching ---
@@ -58,12 +58,151 @@ export function initCalendarManagementPage() {
         }
     }
 
-    // --- Rendering ---
+    // --- Rendering & UI ---
     function renderAll() {
-        renderCalendar();
+        switch (state.currentView) {
+            case 'monthly':
+                renderCalendar();
+                break;
+            case 'yearly':
+                renderYearlyCalendar();
+                break;
+            case 'vertical':
+                renderVerticalCalendar();
+                break;
+        }
         renderManualSettings();
         renderUpdateLog();
         updateKPIs();
+    }
+
+    function switchView(viewName) {
+        state.currentView = viewName;
+
+        // Toggle view containers
+        [monthlyView, yearlyView, verticalView].forEach(v => v.classList.add('hidden'));
+        const activeView = document.getElementById(`${viewName}-view`);
+        if (activeView) activeView.classList.remove('hidden');
+
+        // Toggle buttons
+        [viewMonthlyButton, viewVerticalButton, viewYearlyButton].forEach(b => b.classList.remove('active'));
+        const activeButton = document.getElementById(`view-${viewName}-button`);
+        if (activeButton) activeButton.classList.add('active');
+
+        renderAll();
+    }
+
+    function renderYearlyCalendar() {
+        const year = state.currentDate.getFullYear();
+        yearlyView.innerHTML = '';
+        calendarTitle.textContent = `${year}年`;
+
+        for (let month = 0; month < 12; month++) {
+            const monthContainer = document.createElement('div');
+            monthContainer.className = 'year-month-container';
+
+            const monthHeader = document.createElement('h3');
+            monthHeader.className = 'year-month-header';
+            monthHeader.textContent = `${month + 1}月`;
+            monthContainer.appendChild(monthHeader);
+
+            const dayGrid = document.createElement('div');
+            dayGrid.className = 'year-day-grid';
+
+            ['日', '月', '火', '水', '木', '金', '土'].forEach(day => {
+                const dayEl = document.createElement('div');
+                dayEl.className = 'text-xs font-bold text-center text-on-surface-variant';
+                dayEl.textContent = day;
+                dayGrid.appendChild(dayEl);
+            });
+
+            const firstDay = new Date(year, month, 1);
+            const startingDay = firstDay.getDay();
+
+            for (let i = 0; i < startingDay; i++) {
+                dayGrid.appendChild(document.createElement('div'));
+            }
+
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(year, month, day);
+                const dateString = date.toISOString().split('T')[0];
+                const dayCell = document.createElement('div');
+                dayCell.textContent = day;
+                dayCell.dataset.date = dateString;
+                dayCell.className = 'year-day-cell';
+
+                const surveysForDay = getSurveysForDay(dateString);
+                if (isDayAssigned(dateString)) {
+                    dayCell.classList.add('is-assigned');
+                } else if (surveysForDay.length > 0) {
+                    dayCell.classList.add('has-survey');
+                }
+
+                const dayOfWeek = date.getDay();
+                const { status } = getDayStatus(dateString, dayOfWeek);
+                if (dayOfWeek === 0) dayCell.classList.add('sunday');
+                if (dayOfWeek === 6) dayCell.classList.add('saturday');
+                if (status === 'HOLIDAY' && dayOfWeek !== 0) dayCell.classList.add('holiday');
+
+                dayCell.addEventListener('click', () => {
+                    state.currentDate = date;
+                    switchView('monthly');
+                    openFocusArea(dateString);
+                });
+
+                dayGrid.appendChild(dayCell);
+            }
+
+            monthContainer.appendChild(dayGrid);
+            yearlyView.appendChild(monthContainer);
+        }
+    }
+
+    function renderVerticalCalendar() {
+        verticalView.innerHTML = '';
+        const year = state.currentDate.getFullYear();
+        const month = state.currentDate.getMonth();
+        calendarTitle.textContent = `${year}年${month + 1}月`;
+
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const date = new Date(year, month, day);
+            const dateString = date.toISOString().split('T')[0];
+
+            const row = document.createElement('div');
+            row.className = 'vertical-day-row';
+            row.style.cursor = 'pointer';
+            row.addEventListener('click', () => {
+                state.currentDate = date;
+                switchView('monthly');
+                openFocusArea(dateString);
+            });
+
+            const dateEl = document.createElement('div');
+            dateEl.className = 'vertical-day-date';
+            dateEl.textContent = `${month + 1}/${day}`;
+            row.appendChild(dateEl);
+
+            const contentEl = document.createElement('div');
+            contentEl.className = 'vertical-day-content';
+
+            const { status: dayStatus } = getDayStatus(dateString, date.getDay());
+            const surveysForDay = getSurveysForDay(dateString);
+            const isAssigned = isDayAssigned(dateString);
+
+            let statusHTML = '';
+            if (dayStatus === 'HOLIDAY') statusHTML = `<span class="text-xs font-semibold text-error">休業日</span>`;
+            else if (dayStatus === 'SUBSTITUTE_WORKDAY') statusHTML = `<span class="text-xs font-semibold text-primary">振替営業日</span>`;
+
+            let surveyHTML = surveysForDay.map(s => `<div class="text-xs">${s.name}</div>`).join('');
+
+            contentEl.innerHTML = `${statusHTML}${surveyHTML}`;
+            row.appendChild(contentEl);
+
+            verticalView.appendChild(row);
+        }
     }
 
     function renderCalendar() {
@@ -86,127 +225,79 @@ export function initCalendarManagementPage() {
             const dayCell = document.createElement('div');
             const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
-            let cellClasses = 'border border-outline-variant rounded-lg min-h-[120px] p-2 cursor-pointer hover:bg-surface-variant/60 relative';
-            let cellTitle = '';
-            let dayInfoHTML = '';
-
-            // --- Survey Period Highlighting & Info ---
+            const { status: dayStatus } = getDayStatus(dateString, date.getDay());
             const surveysForDay = getSurveysForDay(dateString);
-            const isUrgent = state.urgencyOverrides[dateString]; // Manual override
-            const dayAssignments = state.assignmentOverrides[dateString];
-            const onDemandSurveys = surveysForDay.filter(s => s.type === 'on-demand');
-            const regularSurveys = surveysForDay.filter(s => s.type === 'normal');
+            const memoForDay = state.memos && state.memos[dateString];
+            const isAssigned = isDayAssigned(dateString);
+            const hasOnDemand = surveysForDay.some(s => s.type === 'on-demand');
+            const hasNormal = surveysForDay.some(s => s.type === 'normal');
 
-            let surveyBgClass = ''; // Initialize background class
-
-            // 1. Manual urgency override has the highest priority
-            if (isUrgent) {
-                surveyBgClass = ' bg-red-200';
-            } 
-            // 2. Logic for on-demand surveys if no manual override
-            else if (onDemandSurveys.length > 0) {
-                const isAssigned = dayAssignments && dayAssignments.surveyIds.length > 0;
-                const isToday = new Date().toISOString().split('T')[0] === dateString;
-
-                if (isAssigned) {
-                    surveyBgClass = ' bg-green-200'; // Green for assigned
-                } else if (isToday) {
-                    surveyBgClass = ' bg-red-200';   // Red for unassigned & today
-                } else {
-                    surveyBgClass = ' bg-yellow-200';// Yellow for unassigned & not today
-                }
+            let cellClasses = 'border rounded-lg min-h-[120px] p-2 cursor-pointer hover:bg-surface-variant/60 relative';
+            if (hasOnDemand) {
+                cellClasses += isAssigned ? ' bg-green-50' : ' bg-pink-50';
+            } else if (dayStatus === 'HOLIDAY') {
+                cellClasses += ' bg-surface-container-lowest';
             }
-            // Normal (non-on-demand) surveys do not get a background color.
 
-            cellClasses += surveyBgClass; // Add the determined background class
+            let dayTypeIndicatorHTML = '';
+            if (dayStatus === 'HOLIDAY') {
+                dayTypeIndicatorHTML = `<span class="text-xs font-semibold text-error">休業日</span>`;
+            } else if (dayStatus === 'SUBSTITUTE_WORKDAY') {
+                dayTypeIndicatorHTML = `<span class="text-xs font-semibold text-primary">振替営業日</span>`;
+            } else {
+                dayTypeIndicatorHTML = `<span class="text-xs font-semibold text-green-600">営業日</span>`;
+            }
 
+            let surveyTypeIndicatorHTML = '';
+            const normalIndicator = `<span class="text-xs border rounded px-1 py-0.5 ${isAssigned ? 'bg-green-100 border-green-300 text-green-800' : 'bg-pink-100 border-pink-300 text-pink-800'}">⭐通常</span>`;
+            const onDemandIndicator = `<span class="text-xs border rounded border-error text-error px-1 py-0.5">⚡オンデマンド</span>`;
+
+            if (hasNormal && hasOnDemand) {
+                surveyTypeIndicatorHTML = `
+                    <div class="flex flex-col items-end space-y-1">
+                        ${normalIndicator}
+                        ${onDemandIndicator}
+                    </div>
+                `;
+            } else if (hasNormal) {
+                surveyTypeIndicatorHTML = normalIndicator;
+            } else if (hasOnDemand) {
+                surveyTypeIndicatorHTML = onDemandIndicator;
+            }
+
+            let surveyItemsHTML = '';
             if (surveysForDay.length > 0) {
-                // Only show total counts if there are on-demand surveys
-                if (onDemandSurveys.length > 0) {
-                    const totalCards = surveysForDay.reduce((sum, survey) => sum + (survey.expected_cards || 0), 0);
-                    dayInfoHTML += `
-                        <div class="mt-1 text-xs text-on-surface-variant">
-                            <p>件数: ${surveysForDay.length}</p>
-                            <p>見込枚数: ${totalCards.toLocaleString()}</p>
-                        </div>
-                    `;
-                }
-
-                // Display On-demand surveys with a lightning icon
-                onDemandSurveys.forEach(survey => {
-                    const surveyName = survey.name.length > 8 ? survey.name.substring(0, 8) + '...' : survey.name;
-                    dayInfoHTML += `<p class="text-xs text-gray-900 mt-1 truncate" title="${survey.name}">⚡ ${surveyName}</p>`;
+                surveyItemsHTML = '<ul class="mt-1 space-y-1">';
+                surveysForDay.slice(0, 2).forEach(survey => {
+                    const surveyName = survey.name.length > 12 ? survey.name.substring(0, 12) + '...' : survey.name;
+                    surveyItemsHTML += `<li class="text-xs text-on-surface-variant truncate" title="${survey.name}">${surveyName}</li>`;
                 });
-
-                // Display Regular surveys with conditional checkmark
-                if (regularSurveys.length > 0) {
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0); // Normalize today to the beginning of the day
-
-                    regularSurveys.forEach(survey => {
-                        const surveyDate = new Date(dateString);
-                        const diffTime = surveyDate.getTime() - today.getTime();
-                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-                        let textColorClass = 'text-gray-900'; // Default black color
-                        if (survey.status !== "assigned" && diffDays >= 0 && diffDays <= 3) {
-                            textColorClass = 'text-red-600 font-semibold';
-                        }
-
-                        const dayAssignments = state.assignmentOverrides[dateString];
-                        const isAssigned = dayAssignments && dayAssignments.surveyIds.includes(survey.id);
-                        const assignedIcon = isAssigned ? '<span class="text-green-600">☑</span> ' : '';
-                        const surveyName = survey.name.length > 8 ? survey.name.substring(0, 8) + '...' : survey.name;
-                        dayInfoHTML += `<p class="text-xs ${textColorClass} mt-1 truncate" title="${survey.name}">${assignedIcon}${surveyName}</p>`;
-                    });
+                if (surveysForDay.length > 2) {
+                    surveyItemsHTML += `<li class="text-xs text-on-surface-variant">他${surveysForDay.length - 2}件...</li>`;
                 }
-
-                const surveyTitles = surveysForDay.map(s => s.name).join(', ');
-                cellTitle = surveyTitles;
+                surveyItemsHTML += '</ul>';
             }
+
+            let dayColor = 'text-on-surface';
+            if (date.getDay() === 0) dayColor = 'text-error';
+            if (date.getDay() === 6) dayColor = 'text-primary';
+
+            const memoIconHTML = memoForDay ? '<span class="material-icons text-sm text-on-surface-variant">📌</span>' : '';
 
             dayCell.className = cellClasses;
             dayCell.dataset.date = dateString;
-            if (cellTitle) {
-                dayCell.title = cellTitle;
-            }
-
-            // --- Build Holiday Status HTML ---
-            const { status, reason } = getDayStatus(dateString, date.getDay());
-            let statusIcon = 'event_available';
-            let statusText = '営業日';
-            let statusStyle = 'color: var(--color-state-success); border-color: var(--color-state-success);';
-            if (status === 'HOLIDAY') {
-                statusIcon = 'event_busy';
-                statusText = '休業日';
-                statusStyle = 'color: var(--color-state-error); border-color: var(--color-state-error);';
-            } else if (status === 'SUBSTITUTE_WORKDAY') {
-                statusIcon = 'event_available';
-                statusText = '振替営業';
-                statusStyle = 'color: var(--color-state-warning); border-color: var(--color-state-warning);';
-            }
-            const holidayStatusHTML = `
-                <span style="${statusStyle}" class="inline-flex items-center gap-1 text-xs border px-2 py-0.5 rounded-full">
-                    <span class="material-icons text-base !text-sm">${statusIcon}</span>
-                    ${statusText}
-                </span>
-                ${reason ? `<p class="text-xs text-on-surface-variant mt-1 truncate">${reason}</p>` : ''}
-            `;
-
-            // --- Set Final Cell HTML ---
-            let textColor = 'text-on-surface';
-            if (date.getDay() === 0) textColor = 'text-error';
-            if (date.getDay() === 6) textColor = 'text-primary';
-
             dayCell.innerHTML = `
-                <div class="flex justify-between ${textColor} font-medium">
-                    ${day}
-                    <span class="text-xs text-on-surface-variant">${['日', '月', '火', '水', '木', '金', '土'][date.getDay()]}</span>
+                <div class="flex justify-between items-start ${dayColor} font-medium">
+                    <div class="flex items-center gap-1">
+                        <span>${day}</span>
+                    </div>
+                    <div class="text-xs">${dayTypeIndicatorHTML}</div>
                 </div>
-                <div class="mt-1">
-                    ${holidayStatusHTML}
+                ${surveyItemsHTML}
+                <div class="absolute bottom-2 right-2 flex items-end gap-1">
+                    ${memoIconHTML}
+                    ${surveyTypeIndicatorHTML}
                 </div>
-                ${dayInfoHTML}
             `;
             
             calendarGrid.appendChild(dayCell);
@@ -214,34 +305,9 @@ export function initCalendarManagementPage() {
         updateSelectionHighlight();
     }
 
-    function getSurveysForDay(dateString) {
-        if (!state.surveys) return [];
-        return state.surveys.filter(survey => {
-            return dateString >= survey.startDate && dateString <= survey.endDate;
-        });
-    }
-
-    function getSurveysForRange(startDate, endDate) {
-        if (!state.surveys) return [];
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-        const surveysInRange = new Map();
-
-        let currentDate = new Date(start);
-        while (currentDate <= end) {
-            const dateString = currentDate.toISOString().split('T')[0];
-            const surveysForDay = getSurveysForDay(dateString);
-            surveysForDay.forEach(survey => surveysInRange.set(survey.id, survey));
-            currentDate.setDate(currentDate.getDate() + 1);
-        }
-        return Array.from(surveysInRange.values());
-    }
-
     function renderManualSettings() {
         manualSettingsList.innerHTML = '';
-        
         const sortedSettings = state.manualSettings.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
         const totalPages = Math.ceil(sortedSettings.length / state.manualSettingsItemsPerPage);
         settingPageInfo.textContent = `${state.manualSettingsCurrentPage} / ${totalPages || 1}`;
 
@@ -259,11 +325,9 @@ export function initCalendarManagementPage() {
         pageItems.forEach(setting => {
             const li = document.createElement('li');
             li.className = 'flex items-center justify-between p-2 rounded-lg';
-            
             const reasonText = `${setting.reason} (${setting.event_type === 'HOLIDAY' ? '特別休業日' : '振替営業日'})`;
-            let reasonHTML;
+            let reasonHTML = `<p>${reasonText}</p>`;
             const maxLength = 40;
-
             if (reasonText.length > maxLength) {
                 const shortText = reasonText.substring(0, maxLength) + '...';
                 reasonHTML = `
@@ -273,10 +337,7 @@ export function initCalendarManagementPage() {
                         <button class="toggle-text-button text-sm text-primary hover:underline">続きを読む</button>
                     </div>
                 `;
-            } else {
-                reasonHTML = `<p>${reasonText}</p>`;
             }
-
             li.innerHTML = `
                 <div class="flex-1">
                     <p class="text-on-surface font-medium">${setting.event_date}</p>
@@ -296,9 +357,7 @@ export function initCalendarManagementPage() {
 
     function renderUpdateLog() {
         updateLogList.innerHTML = '';
-        
         const sortedLog = state.updateLog.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-
         const totalPages = Math.ceil(sortedLog.length / state.logItemsPerPage);
         logPageInfo.textContent = `${state.logCurrentPage} / ${totalPages || 1}`;
 
@@ -315,11 +374,9 @@ export function initCalendarManagementPage() {
 
         pageItems.forEach(log => {
             const li = document.createElement('li');
-
             const actionText = log.action;
-            let actionHTML;
+            let actionHTML = `<p>${actionText}</p>`;
             const maxLength = 40;
-
             if (actionText.length > maxLength) {
                 const shortText = actionText.substring(0, maxLength) + '...';
                 actionHTML = `
@@ -329,10 +386,7 @@ export function initCalendarManagementPage() {
                         <button class="toggle-text-button text-sm text-primary hover:underline">続きを読む</button>
                     </div>
                 `;
-            } else {
-                actionHTML = `<p>${actionText}</p>`;
             }
-
             li.innerHTML = `
                 <p class="text-on-surface font-medium">${new Date(log.timestamp).toLocaleString('ja-JP')} ${log.user}</p>
                 ${actionHTML}
@@ -347,150 +401,123 @@ export function initCalendarManagementPage() {
     function updateKPIs() {
         const year = state.currentDate.getFullYear();
         const month = state.currentDate.getMonth();
-        
-        let holidayCount = 0;
-        let substituteCount = 0;
-
+        let holidayCount = 0, substituteCount = 0;
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         for (let day = 1; day <= daysInMonth; day++) {
             const date = new Date(year, month, day);
             const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             const { status } = getDayStatus(dateString, date.getDay());
-            if (status === 'HOLIDAY') {
-                holidayCount++;
-            } else if (status === 'SUBSTITUTE_WORKDAY') {
-                substituteCount++;
-            }
+            if (status === 'HOLIDAY') holidayCount++;
+            else if (status === 'SUBSTITUTE_WORKDAY') substituteCount++;
         }
         kpiHolidays.textContent = `${holidayCount}日`;
         kpiSubstituteWorkdays.textContent = `${substituteCount}日`;
         kpiSlaAlerts.textContent = '3件';
     }
 
-    function switchTab(targetTab) {
-        // Deactivate all buttons and hide all content
-        ['settings', 'survey-details', 'reassign'].forEach(tab => {
-            const tabBtn = document.getElementById(`tab-btn-${tab}`);
-            const tabContent = document.getElementById(`tab-content-${tab}`);
-            if (tabBtn) {
-                tabBtn.className = 'tab-button shrink-0 border-b-2 border-transparent px-1 py-3 text-sm font-medium text-on-surface-variant hover:border-gray-300 hover:text-on-surface';
-            }
-            if (tabContent) {
-                tabContent.classList.add('hidden');
-            }
+    function setActiveTab(tabName) {
+        const focusArea = document.getElementById('focus-area');
+        focusArea.querySelectorAll('.tab-button').forEach(button => {
+            const isSelected = button.dataset.tab === tabName;
+            button.classList.toggle('border-primary', isSelected);
+            button.classList.toggle('text-primary', isSelected);
+            button.classList.toggle('border-transparent', !isSelected);
+            button.classList.toggle('text-on-surface-variant', !isSelected);
         });
-
-        // Activate the target tab
-        const activeBtn = document.getElementById(`tab-btn-${targetTab}`);
-        if (activeBtn) {
-            activeBtn.classList.remove('border-transparent', 'text-on-surface-variant');
-            activeBtn.classList.add('border-primary', 'text-primary');
-        }
-        const activeContent = document.getElementById(`tab-content-${targetTab}`);
-        if (activeContent) {
-            activeContent.classList.remove('hidden');
-        }
+        focusArea.querySelectorAll('.tab-panel').forEach(panel => {
+            panel.classList.toggle('hidden', panel.id !== `tab-panel-${tabName}`);
+        });
     }
 
-    function openModal(data = {}) {
-        state.currentModalDate = data.date;
-        // Reset forms
-        settingForm.reset();
-        if (assignmentForm) assignmentForm.reset();
+    function openFocusArea(startDate, endDate = null) {
+        const focusArea = document.getElementById('focus-area');
+        if (!focusArea) return;
 
-        // Set common display
-        modalDateDisplay.textContent = data.date || '';
-        eventDateInput.value = data.date || '';
-        
-        // Populate Holiday Settings Tab
-        if (data.manualSetting) {
-            settingIdInput.value = data.manualSetting.id || '';
-            reasonInput.value = data.manualSetting.reason || '';
-            const typeRadio = settingForm.querySelector(`input[name="event_type"][value="${data.manualSetting.event_type}"]`);
-            if (typeRadio) typeRadio.checked = true;
-        } else {
-            const holidayRadio = settingForm.querySelector(`input[name="event_type"][value="HOLIDAY"]`);
-            if (holidayRadio) holidayRadio.checked = true;
-        }
+        state.currentFocusStartDate = startDate;
+        state.currentFocusEndDate = endDate;
 
-        const surveyDetailsTab = document.getElementById('tab-btn-survey-details');
-        const reassignTab = document.getElementById('tab-btn-reassign');
-        const assignmentSurveysList = document.getElementById('assignment-surveys-list');
-        const dayUrgencyButton = document.getElementById('toggle-day-urgency-button');
+        document.getElementById('focus-area-title').textContent = endDate ? "期間設定" : "詳細";
+        document.getElementById('focus-area-date').textContent = endDate ? `${startDate} から ${endDate}` : startDate;
 
-        const assignView = document.getElementById('assign-view');
-        const cancelAssignView = document.getElementById('cancel-assign-view');
-
-        const dayAssignments = state.assignmentOverrides[data.date];
-        const isAssigned = dayAssignments && dayAssignments.surveyIds.length > 0;
-
-        if (isAssigned) {
-            assignView.classList.add('hidden');
-            cancelAssignView.classList.remove('hidden');
-        } else {
-            assignView.classList.remove('hidden');
-            cancelAssignView.classList.add('hidden');
-        }
-
-        // Handle Survey-related Tabs
-        if (data.surveys && data.surveys.length > 0) {
-            [surveyDetailsTab, reassignTab].forEach(tab => tab.style.display = 'block');
-
-            // --- Populate Survey Details Tab ---
-            assignmentSurveysList.innerHTML = data.surveys.map(survey => `
+        const surveysInRange = getSurveysForRange(startDate, endDate || startDate);
+        const detailsContent = document.getElementById('focus-details-content');
+        if (surveysInRange.length > 0) {
+            detailsContent.innerHTML = surveysInRange.map(survey => `
                 <div class="p-3 rounded-lg bg-surface-container">
-                    <p class="font-semibold text-on-surface">${survey.name}</p>
-                    <p class="text-sm text-on-surface-variant">見込枚数: ${(survey.expected_cards || 0).toLocaleString()}</p>
+                    <div class="flex justify-between items-center">
+                        <p class="font-semibold text-on-surface">${survey.name}</p>
+                        <span class="text-xs font-medium ${survey.type === 'on-demand' ? 'text-error' : 'text-on-surface-variant'}">${survey.type === 'on-demand' ? 'オンデマンド' : '通常'}</span>
+                    </div>
+                    <p class="text-sm text-on-surface-variant mt-1">期間: ${survey.startDate} ~ ${survey.endDate}</p>
+                    <p class="text-sm text-on-surface-variant mt-1">見込枚数: ${(survey.expected_cards || 0).toLocaleString()}</p>
                 </div>
             `).join('');
-            
-            // --- Set Day Urgency Button State ---
-            const isUrgent = state.urgencyOverrides[data.date];
-            dayUrgencyButton.textContent = isUrgent ? '緊急を解除' : '緊急に設定';
-            dayUrgencyButton.className = `toggle-day-urgency-button text-white text-xs font-bold py-1 px-2 rounded ${isUrgent ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-red-500 hover:bg-red-600'}`;
-            dayUrgencyButton.dataset.date = data.date;
-
-            if (isAssigned) {
-                dayUrgencyButton.disabled = true;
-                dayUrgencyButton.title = "アサイン済みの日は緊急設定できません";
-                dayUrgencyButton.classList.add('cursor-not-allowed', 'opacity-50');
-            } else {
-                dayUrgencyButton.disabled = false;
-                dayUrgencyButton.title = "";
-                dayUrgencyButton.classList.remove('cursor-not-allowed', 'opacity-50');
-            }
-
-            // --- Populate Re-assign Tab ---
-            const assignmentCompanyDisplay = document.getElementById('assignment-company');
-            const assignmentDateText = document.getElementById('assignment-date-text');
-            if (assignmentDateText) {
-                assignmentDateText.textContent = `${data.date}にアサインしますか？`;
-            }
-            if (assignmentCompanyDisplay) {
-                const companyName = state.operators.length > 0 ? state.operators[0].company : 'N/A';
-                assignmentCompanyDisplay.textContent = companyName;
-            }
-
-            switchTab('survey-details');
         } else {
-            [surveyDetailsTab, reassignTab].forEach(tab => tab.style.display = 'none');
-            assignmentSurveysList.innerHTML = '';
-            switchTab('settings');
+            detailsContent.innerHTML = `<p class="text-sm text-on-surface-variant">${endDate ? 'この期間に' : 'この日に'}アンケートはありません。</p>`;
         }
 
-        modal.classList.remove('hidden');
-        setTimeout(() => modalContainer.classList.add('opacity-100', 'translate-y-0'), 10);
+        const assignContent = document.getElementById('focus-assign-content');
+        const companyName = state.operators.length > 0 ? state.operators[0].company : 'N/A';
+        const isAssigned = isRangeAssigned(startDate, endDate || startDate);
+        
+        let assignButtonsHTML = '';
+        const assignButtonText = endDate ? 'この期間にまとめてアサイン' : 'この日にアサイン';
+        const unassignButtonText = endDate ? 'この期間のアサインをまとめて解除' : 'アサインを解除';
+
+        if (isAssigned) {
+            assignButtonsHTML = `<button id="cancel-assignment-button" class="mt-4 w-full rounded-lg bg-error text-white px-4 py-2 text-sm font-semibold">${unassignButtonText}</button>`;
+        } else {
+            assignButtonsHTML = `<button id="save-assignment-button" class="mt-4 w-full rounded-lg bg-primary text-on-primary px-4 py-2 text-sm font-semibold" ${surveysInRange.length === 0 ? 'disabled' : ''}>${assignButtonText}</button>`;
+        }
+        assignContent.innerHTML = `
+            <p class="text-sm text-on-surface-variant mb-2">担当会社:</p>
+            <p class="font-semibold text-on-surface">${companyName}</p>
+            ${assignButtonsHTML}
+        `;
+
+        const memoTextarea = document.getElementById('memo-textarea');
+        if (endDate) {
+            memoTextarea.value = '';
+            memoTextarea.placeholder = '選択した期間のすべての日付に同じメモが保存されます。';
+        } else {
+            memoTextarea.value = state.memos[startDate] || '';
+            memoTextarea.placeholder = 'メモを入力';
+        }
+
+        const reasonTextarea = document.getElementById('focus-reason');
+        reasonTextarea.value = '';
+        if (endDate) {
+            document.querySelector(`input[name="focus_event_type"][value="WORKDAY"]`).checked = true;
+        } else {
+            const manualSetting = state.manualSettings.find(s => s.event_date === startDate);
+            let eventType = 'WORKDAY';
+            if (manualSetting) {
+                eventType = manualSetting.event_type;
+                reasonTextarea.value = manualSetting.reason || '';
+            }
+            const typeRadio = document.querySelector(`input[name="focus_event_type"][value="${eventType}"]`);
+            if (typeRadio) typeRadio.checked = true;
+            else document.querySelector(`input[name="focus_event_type"][value="WORKDAY"]`).checked = true;
+        }
+
+        if (surveysInRange.length > 0) {
+            setActiveTab('assign');
+        } else {
+            setActiveTab('settings');
+        }
+
+        document.getElementById('focus-area-close-tab').classList.remove('hidden');
+        focusArea.classList.remove('translate-x-full');
     }
 
-    function showConfirmationModal(message) {
-        confirmationModalMessage.textContent = message;
-        confirmationModal.classList.remove('hidden');
-        setTimeout(() => confirmationModalContainer.classList.add('opacity-100', 'translate-y-0'), 10);
-    }
-
-    function closeConfirmationModal() {
-        confirmationModalContainer.classList.remove('opacity-100', 'translate-y-0');
-        setTimeout(() => confirmationModal.classList.add('hidden'), 200);
+    function closeFocusArea() {
+        const focusArea = document.getElementById('focus-area');
+        if (!focusArea) return;
+        document.getElementById('focus-area-close-tab').classList.add('hidden');
+        focusArea.classList.add('translate-x-full');
+        state.dragStartDate = null;
+        state.dragEndDate = null;
+        updateSelectionHighlight();
     }
 
     function showDeleteConfirmModal(settingId) {
@@ -507,88 +534,75 @@ export function initCalendarManagementPage() {
         }, 200);
     }
 
-    function closeModal() {
-        modalContainer.classList.remove('opacity-100', 'translate-y-0');
-        setTimeout(() => modal.classList.add('hidden'), 200);
-    }
-
     function handleMonthChange(offset) {
-        state.currentDate.setMonth(state.currentDate.getMonth() + offset);
-        renderAll();
-    }
-
-    function handleSave(e) {
-        e.preventDefault();
-        // Clear previous errors
-        eventDateError.textContent = '';
-        reasonError.textContent = '';
-
-        let isValid = true;
-        if (!eventDateInput.value) {
-            eventDateError.textContent = '日付は必須です。';
-            isValid = false;
-        }
-        if (!reasonInput.value) {
-            reasonError.textContent = '理由は必須です。';
-            isValid = false;
-        }
-
-        if (!isValid) return;
-
-        const id = parseInt(settingIdInput.value, 10);
-        const newSetting = {
-            id: id || Date.now(),
-            event_date: eventDateInput.value,
-            event_type: settingForm.querySelector('input[name="event_type"]:checked').value,
-            reason: reasonInput.value,
-            created_by: '現在のユーザー',
-            created_at: new Date().toISOString(),
-        };
-
-        if (id) {
-            const index = state.manualSettings.findIndex(s => s.id === id);
-            state.manualSettings[index] = newSetting;
+        if (state.currentView === 'yearly') {
+            state.currentDate.setFullYear(state.currentDate.getFullYear() + offset);
         } else {
-            state.manualSettings.push(newSetting);
+            state.currentDate.setMonth(state.currentDate.getMonth() + offset);
         }
-        
-        console.log("Saving setting:", newSetting);
-        closeModal();
         renderAll();
     }
 
     function addLogEntry(action, user = 'Admin') {
-        const newLog = {
+        state.updateLog.unshift({
             timestamp: new Date().toISOString(),
             user: user,
             action: action,
-        };
-        state.updateLog.unshift(newLog);
+        });
         state.logCurrentPage = 1;
     }
 
+    // --- Data & State Helpers ---
     function getDayStatus(dateString, dayOfWeek) {
-        const year = dateString.substring(0, 4);
-
         const manualSetting = state.manualSettings.find(s => s.event_date === dateString);
-        if (manualSetting) {
-            return { status: manualSetting.event_type, reason: manualSetting.reason };
-        }
+        if (manualSetting) return { status: manualSetting.event_type, reason: manualSetting.reason };
 
-        const nationalHoliday = state.holidays[year]?.find(h => h.date === dateString);
-        if (nationalHoliday) {
-            return { status: 'HOLIDAY', reason: null };
-        }
+        const nationalHoliday = state.holidays[dateString.substring(0, 4)]?.find(h => h.date === dateString);
+        if (nationalHoliday) return { status: 'HOLIDAY', reason: null };
 
-        if (dayOfWeek === 0 || dayOfWeek === 6) {
-            return { status: 'HOLIDAY', reason: null };
-        }
-
+        if (dayOfWeek === 0 || dayOfWeek === 6) return { status: 'HOLIDAY', reason: null };
         return { status: 'WORKDAY', reason: null };
     }
 
-    // --- Drag Selection Functions ---
+    function getSurveysForDay(dateString) {
+        if (!state.surveys) return [];
+        return state.surveys.filter(survey => dateString >= survey.startDate && dateString <= survey.endDate);
+    }
 
+    function getSurveysForRange(startDate, endDate) {
+        if (!state.surveys) return [];
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const surveysInRange = new Map();
+        let currentDate = new Date(start);
+        while (currentDate <= end) {
+            const dateString = currentDate.toISOString().split('T')[0];
+            getSurveysForDay(dateString).forEach(survey => surveysInRange.set(survey.id, survey));
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+        return Array.from(surveysInRange.values());
+    }
+
+    function isDayAssigned(dateString) {
+        const dayAssignments = state.assignmentOverrides[dateString];
+        return dayAssignments && dayAssignments.surveyIds.length > 0;
+    }
+
+    function isRangeAssigned(startDate, endDate) {
+        let current = new Date(startDate);
+        const last = new Date(endDate);
+        while (current <= last) {
+            const dateString = current.toISOString().split('T')[0];
+            const dayAssignments = state.assignmentOverrides[dateString];
+            if (dayAssignments && dayAssignments.surveyIds.length > 0) {
+                return true;
+            }
+            current.setDate(current.getDate() + 1);
+        }
+        return false;
+    }
+
+    // --- Drag Selection ---
     function handleDragStart(e) {
         const dayCell = e.target.closest('[data-date]');
         if (dayCell) {
@@ -612,254 +626,33 @@ export function initCalendarManagementPage() {
 
     function handleDragEnd() {
         if (!state.isDragging) return;
-
         const wasDragging = state.dragStartDate !== state.dragEndDate;
         state.isDragging = false;
-
-        if (wasDragging) {
-            const { start, end } = getOrderedDateRange();
-            openBulkSettingModal(start, end);
-        } else {
-            // This is a single click, handle it here
-            const date = state.dragStartDate;
-            const manualSetting = state.manualSettings.find(s => s.event_date === date);
-            const surveys = getSurveysForDay(date);
-            openModal({
-                date: date,
-                manualSetting: manualSetting,
-                surveys: surveys
-            });
-            // Reset selection visuals after a short delay
-            setTimeout(() => {
-                state.dragStartDate = null;
-                state.dragEndDate = null;
-                updateSelectionHighlight();
-            }, 100);
-        }
+        const { start, end } = getOrderedDateRange();
+        if (wasDragging) openFocusArea(start, end);
+        else openFocusArea(state.dragStartDate);
     }
 
     function getOrderedDateRange() {
-        const start = state.dragStartDate;
-        const end = state.dragEndDate;
+        const { start, end } = { start: state.dragStartDate, end: state.dragEndDate };
         if (!start || !end) return { start: null, end: null };
-        return new Date(start) > new Date(end) ? { start: end, end: start } : { start: start, end: end };
+        return new Date(start) > new Date(end) ? { start: end, end: start } : { start, end };
     }
 
     function updateSelectionHighlight() {
-        calendarGrid.querySelectorAll('.selection').forEach(cell => {
-            cell.classList.remove('selection', 'bg-blue-300');
-        });
-
+        calendarGrid.querySelectorAll('.selection').forEach(cell => cell.classList.remove('selection', 'bg-blue-300'));
         if (!state.dragStartDate || !state.dragEndDate) return;
-
         const { start, end } = getOrderedDateRange();
         if (!start || !end) return;
-
         let currentDate = new Date(start);
         const lastDate = new Date(end);
-
         while (currentDate <= lastDate) {
             const dateString = currentDate.toISOString().split('T')[0];
             const cell = calendarGrid.querySelector(`[data-date="${dateString}"]`);
-            if (cell) {
-                cell.classList.add('selection', 'bg-blue-300');
-            }
+            if (cell) cell.classList.add('selection', 'bg-blue-300');
             currentDate.setDate(currentDate.getDate() + 1);
         }
     }
-
-    // --- Bulk Setting Modal Functions ---
-    function switchBulkTab(targetTab) {
-        // Deactivate all buttons and hide all content
-        ['settings', 'survey-details', 'reassign'].forEach(tab => {
-            const tabBtn = document.getElementById(`bulk-tab-btn-${tab}`);
-            const tabContent = document.getElementById(`bulk-tab-content-${tab}`);
-            if (tabBtn) {
-                tabBtn.className = 'tab-button shrink-0 border-b-2 border-transparent px-1 py-3 text-sm font-medium text-on-surface-variant hover:border-gray-300 hover:text-on-surface';
-            }
-            if (tabContent) {
-                tabContent.classList.add('hidden');
-            }
-        });
-
-        // Activate the target tab
-        const activeBtn = document.getElementById(`bulk-tab-btn-${targetTab}`);
-        if (activeBtn) {
-            activeBtn.classList.remove('border-transparent', 'text-on-surface-variant');
-            activeBtn.classList.add('border-primary', 'text-primary');
-        }
-        const activeContent = document.getElementById(`bulk-tab-content-${targetTab}`);
-        if (activeContent) {
-            activeContent.classList.remove('hidden');
-        }
-    }
-
-    function openBulkSettingModal(startDate, endDate) {
-        bulkModalDateRangeDisplay.textContent = `${startDate} から ${endDate}`;
-        bulkSettingForm.reset();
-        if(bulkAssignmentForm) bulkAssignmentForm.reset();
-        bulkReasonError.textContent = '';
-
-        const surveysInRange = getSurveysForRange(startDate, endDate);
-        const surveyDetailsTab = document.getElementById('bulk-tab-btn-survey-details');
-        const reassignTab = document.getElementById('bulk-tab-btn-reassign');
-        const assignmentSurveysList = document.getElementById('bulk-assignment-surveys-list');
-
-        const bulkAssignView = document.getElementById('bulk-assign-view');
-        const bulkCancelAssignView = document.getElementById('bulk-cancel-assign-view');
-
-        let isRangeAssigned = false;
-        let currentDate = new Date(startDate);
-        const lastDate = new Date(endDate);
-        while (currentDate <= lastDate) {
-            const dateString = currentDate.toISOString().split('T')[0];
-            const dayAssignments = state.assignmentOverrides[dateString];
-            if (dayAssignments && dayAssignments.surveyIds.length > 0) {
-                isRangeAssigned = true;
-                break;
-            }
-            currentDate.setDate(currentDate.getDate() + 1);
-        }
-
-        if (isRangeAssigned) {
-            bulkAssignView.classList.add('hidden');
-            bulkCancelAssignView.classList.remove('hidden');
-        } else {
-            bulkAssignView.classList.remove('hidden');
-            bulkCancelAssignView.classList.add('hidden');
-        }
-
-        if (surveysInRange.length > 0) {
-            [surveyDetailsTab, reassignTab].forEach(tab => tab.style.display = 'block');
-
-            assignmentSurveysList.innerHTML = surveysInRange.map(survey => `
-                <div class="p-3 rounded-lg bg-surface-container">
-                    <p class="font-semibold text-on-surface">${survey.name}</p>
-                    <p class="text-sm text-on-surface-variant">見込枚数: ${(survey.expected_cards || 0).toLocaleString()}</p>
-                </div>
-            `).join('');
-
-            const bulkAssignmentCompanyDisplay = document.getElementById('bulk-assignment-company');
-            const bulkAssignmentDateText = document.getElementById('bulk-assignment-date-text');
-            if (bulkAssignmentDateText) {
-                bulkAssignmentDateText.textContent = `${startDate}～${endDate}にアサインしますか？`;
-            }
-            if (bulkAssignmentCompanyDisplay) {
-                const companyName = state.operators.length > 0 ? state.operators[0].company : 'N/A';
-                bulkAssignmentCompanyDisplay.textContent = companyName;
-            }
-            switchBulkTab('survey-details');
-        } else {
-            [surveyDetailsTab, reassignTab].forEach(tab => tab.style.display = 'none');
-            assignmentSurveysList.innerHTML = '';
-            switchBulkTab('settings');
-        }
-
-        bulkModal.classList.remove('hidden');
-        setTimeout(() => bulkModalContainer.classList.add('opacity-100', 'translate-y-0'), 10);
-    }
-
-    function closeBulkSettingModal() {
-        bulkModalContainer.classList.remove('opacity-100', 'translate-y-0');
-        setTimeout(() => {
-            bulkModal.classList.add('hidden');
-            // Clear selection after closing modal
-            state.dragStartDate = null;
-            state.dragEndDate = null;
-            updateSelectionHighlight();
-        }, 200);
-    }
-
-    function handleBulkSave(e) {
-        e.preventDefault();
-        bulkReasonError.textContent = '';
-        const bulkReasonInput = document.getElementById('bulk_reason');
-        if (!bulkReasonInput.value) {
-            bulkReasonError.textContent = '理由は必須です。';
-            return;
-        }
-
-        const { start, end } = getOrderedDateRange();
-        if (!start || !end) return;
-
-        const eventType = bulkSettingForm.querySelector('input[name="bulk_event_type"]:checked').value;
-        const reason = bulkReasonInput.value;
-
-        let currentDate = new Date(start);
-        const lastDate = new Date(end);
-
-        while (currentDate <= lastDate) {
-            const dateString = currentDate.toISOString().split('T')[0];
-
-            const existingSettingIndex = state.manualSettings.findIndex(s => s.event_date === dateString);
-            const newSetting = {
-                id: existingSettingIndex > -1 ? state.manualSettings[existingSettingIndex].id : Date.now() + Math.random(),
-                event_date: dateString,
-                event_type: eventType,
-                reason: reason,
-                created_by: '現在のユーザー',
-                created_at: new Date().toISOString(),
-            };
-
-            if (existingSettingIndex > -1) {
-                state.manualSettings[existingSettingIndex] = newSetting;
-            } else {
-                state.manualSettings.push(newSetting);
-            }
-
-            currentDate.setDate(currentDate.getDate() + 1);
-        }
-
-        console.log(`Bulk saving for ${start} to ${end}`);
-        closeBulkSettingModal();
-        renderAll();
-    }
-    
-    function handleBulkAssignmentSave(e) {
-        e.preventDefault();
-        const { start, end } = getOrderedDateRange();
-        if (!start || !end) return;
-
-        const surveysInRange = getSurveysForRange(start, end);
-        if (surveysInRange.length === 0) {
-            closeBulkSettingModal();
-            return;
-        }
-
-        let currentDate = new Date(start);
-        const lastDate = new Date(end);
-
-        while (currentDate <= lastDate) {
-            const dateString = currentDate.toISOString().split('T')[0];
-            const surveysForDay = getSurveysForDay(dateString);
-
-            if (surveysForDay.length > 0) {
-                if (!state.assignmentOverrides[dateString]) {
-                    state.assignmentOverrides[dateString] = { surveyIds: [] };
-                }
-                surveysForDay.forEach(survey => {
-                    if (!state.assignmentOverrides[dateString].surveyIds.includes(survey.id)) {
-                        state.assignmentOverrides[dateString].surveyIds.push(survey.id);
-                    }
-                });
-            }
-
-            if (state.urgencyOverrides[dateString]) {
-                state.urgencyOverrides[dateString] = false;
-            }
-            currentDate.setDate(currentDate.getDate() + 1);
-        }
-
-        const companyName = document.getElementById('bulk-assignment-company').textContent;
-        const message = `${start}から${end}に ${companyName} をアサインしました。`;
-        addLogEntry(`${start}～${end} を ${companyName} にアサインしました。`);
-
-        renderAll();
-
-        closeBulkSettingModal();
-        showConfirmationModal(message);
-    }
-
 
     async function init() {
         // Assign DOM elements
@@ -878,52 +671,21 @@ export function initCalendarManagementPage() {
         kpiHolidays = document.getElementById('kpi-holidays');
         kpiSubstituteWorkdays = document.getElementById('kpi-substitute-workdays');
         kpiSlaAlerts = document.getElementById('kpi-sla-alerts');
-        modal = document.getElementById('setting-modal');
-        modalContainer = document.getElementById('setting-modal-container');
-        modalDateDisplay = document.getElementById('modal-date-display');
-        closeModalButton = document.getElementById('close-modal-button');
-        cancelButton = document.getElementById('cancel-button');
-        cancelAssignmentButton = document.getElementById('cancel-assignment-button');
-        tabBtnSettings = document.getElementById('tab-btn-settings');
-        const tabBtnSurveyDetails = document.getElementById('tab-btn-survey-details');
-        const tabBtnReassign = document.getElementById('tab-btn-reassign');
-        tabContentSettings = document.getElementById('tab-content-settings');
-        const tabContentSurveyDetails = document.getElementById('tab-content-survey-details');
-        const tabContentReassign = document.getElementById('tab-content-reassign');
-        settingForm = document.getElementById('setting-form');
-        settingIdInput = document.getElementById('setting-id');
-        eventDateInput = document.getElementById('event_date');
-        reasonInput = document.getElementById('reason');
-        eventDateError = document.getElementById('event_date-error');
-        reasonError = document.getElementById('reason-error');
-        assignmentForm = document.getElementById('assignment-form');
-        assignmentSurveySelect = document.getElementById('assignment-survey');
-        assignmentCompanyDisplay = document.getElementById('assignment-company');
-        confirmationModal = document.getElementById('confirmation-modal');
-        confirmationModalContainer = document.getElementById('confirmation-modal-container');
-        confirmationModalMessage = document.getElementById('confirmation-modal-message');
-        closeConfirmationModalButton = document.getElementById('close-confirmation-modal-button');
         deleteConfirmModal = document.getElementById('delete-confirm-modal');
         deleteConfirmModalContainer = document.getElementById('delete-confirm-modal-container');
         cancelDeleteButton = document.getElementById('cancel-delete-button');
         confirmDeleteButton = document.getElementById('confirm-delete-button');
+        calendarTooltip = document.getElementById('calendar-tooltip');
+        monthlyView = document.getElementById('monthly-view');
+        yearlyView = document.getElementById('yearly-view');
+        verticalView = document.getElementById('vertical-view');
+        viewMonthlyButton = document.getElementById('view-monthly-button');
+        viewVerticalButton = document.getElementById('view-vertical-button');
+        viewYearlyButton = document.getElementById('view-yearly-button');
 
-        // Additions for bulk modal
-        bulkModal = document.getElementById('bulk-setting-modal');
-        bulkModalContainer = document.getElementById('bulk-setting-modal-container');
-        bulkModalDateRangeDisplay = document.getElementById('bulk-modal-date-range-display');
-        bulkCloseModalButton = document.getElementById('bulk-close-modal-button');
-        bulkCancelButton = document.getElementById('bulk-cancel-button');
-        bulkSettingForm = document.getElementById('bulk-setting-form');
-        bulkReasonError = document.getElementById('bulk_reason-error');
-        bulkAssignmentForm = document.getElementById('bulk-assignment-form');
-        bulkSaveAssignmentButton = document.getElementById('bulk-save-assignment-button');
-        bulkCancelAssignmentButton = document.getElementById('bulk-cancel-assignment-button');
-        bulkCloseAssignmentTabButton = document.getElementById('bulk-close-assignment-tab-button');
 
         await fetchData();
 
-        // Populate initial assignments from survey data
         state.surveys.forEach(survey => {
             if (survey.status === 'assigned') {
                 let currentDate = new Date(survey.startDate);
@@ -942,6 +704,11 @@ export function initCalendarManagementPage() {
         });
 
         renderAll();
+
+        // --- Event Listeners ---
+        viewMonthlyButton.addEventListener('click', () => switchView('monthly'));
+        viewVerticalButton.addEventListener('click', () => switchView('vertical'));
+        viewYearlyButton.addEventListener('click', () => switchView('yearly'));
 
         prevMonthButton.addEventListener('click', () => handleMonthChange(-1));
         nextMonthButton.addEventListener('click', () => handleMonthChange(1));
@@ -974,35 +741,176 @@ export function initCalendarManagementPage() {
             }
         });
 
-        document.getElementById('add-setting-button').addEventListener('click', () => openModal({ date: new Date().toISOString().split('T')[0] }));
-        
-        // Drag and drop listeners for calendar
         calendarGrid.addEventListener('mousedown', handleDragStart);
         calendarGrid.addEventListener('mousemove', handleDrag);
-        document.addEventListener('mouseup', handleDragEnd); // Listen on document to catch mouseup outside grid
+        document.addEventListener('mouseup', handleDragEnd);
+
+        let tooltipTimer = null;
+
+        calendarGrid.addEventListener('mouseover', (e) => {
+            if (state.isDragging) return;
+            const cell = e.target.closest('[data-date]');
+
+            if (!cell) {
+                clearTimeout(tooltipTimer);
+                calendarTooltip.style.display = 'none';
+                return;
+            }
+
+            const isTooltipVisible = calendarTooltip.style.display === 'block';
+
+            clearTimeout(tooltipTimer);
+
+            const showTooltip = () => {
+                const dateString = cell.dataset.date;
+                const { status: dayStatus, reason: dayStatusReason } = getDayStatus(dateString, new Date(dateString).getDay());
+                const surveysForDay = getSurveysForDay(dateString);
+                const isAssigned = isDayAssigned(dateString);
+
+                let tooltipHTML = `<div class="font-bold text-white mb-2">${dateString}</div>`;
+                tooltipHTML += `<div><span class="font-semibold">ステータス:</span> ${dayStatus}${dayStatusReason ? ` (${dayStatusReason})` : ''}</div>`;
+                tooltipHTML += `<div><span class="font-semibold">アンケート数:</span> ${surveysForDay.length}</div>`;
+                if (isAssigned) {
+                    tooltipHTML += `<div><span class="font-semibold">アサイン:</span> はい</div>`;
+                }
+                if (surveysForDay.length > 0) {
+                    tooltipHTML += '<div class="mt-2 pt-2 border-t border-gray-500 font-semibold">アンケート:</div>';
+                    tooltipHTML += '<ul class="list-disc pl-4">';
+                    surveysForDay.forEach(s => {
+                        tooltipHTML += `<li>${s.name} (${s.type})</li>`;
+                    });
+                    tooltipHTML += '</ul>';
+                }
+
+                calendarTooltip.innerHTML = tooltipHTML;
+                calendarTooltip.style.display = 'block';
+                calendarTooltip.style.left = `${e.pageX + 15}px`;
+                calendarTooltip.style.top = `${e.pageY + 15}px`;
+            };
+
+            if (isTooltipVisible) {
+                showTooltip();
+            } else {
+                tooltipTimer = setTimeout(showTooltip, 1000);
+            }
+        });
+
+        calendarGrid.addEventListener('mousemove', (e) => {
+            if (calendarTooltip.style.display === 'block') {
+                calendarTooltip.style.left = `${e.pageX + 15}px`;
+                calendarTooltip.style.top = `${e.pageY + 15}px`;
+            }
+        });
+
+        calendarGrid.addEventListener('mouseleave', () => {
+            clearTimeout(tooltipTimer);
+            calendarTooltip.style.display = 'none';
+        });
+
+
+        document.getElementById('focus-area-close-tab').addEventListener('click', closeFocusArea);
+        
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => setActiveTab(button.dataset.tab));
+        });
+
+        document.getElementById('focus-area').addEventListener('click', (e) => {
+            const { currentFocusStartDate: startDate, currentFocusEndDate: endDate } = state;
+            if (!startDate) return;
+
+            const dateRange = [];
+            let current = new Date(startDate);
+            const last = new Date(endDate || startDate);
+            while (current <= last) {
+                dateRange.push(current.toISOString().split('T')[0]);
+                current.setDate(current.getDate() + 1);
+            }
+            const rangeString = endDate ? `${startDate}～${endDate}` : startDate;
+
+            if (e.target.id === 'save-memo-button') {
+                const memoText = document.getElementById('memo-textarea').value.trim();
+                if (memoText) {
+                    dateRange.forEach(date => { state.memos[date] = memoText; });
+                    addLogEntry(`メモを更新しました: ${rangeString}`);
+                } else if (!endDate) {
+                    delete state.memos[startDate];
+                    addLogEntry(`メモを削除しました: ${rangeString}`);
+                }
+                renderAll();
+                closeFocusArea();
+            }
+
+            if (e.target.id === 'save-assignment-button') {
+                const surveysInRange = getSurveysForRange(startDate, endDate || startDate);
+                if (surveysInRange.length === 0) return;
+                dateRange.forEach(date => {
+                    const surveysForDay = getSurveysForDay(date);
+                    if (surveysForDay.length > 0) {
+                        if (!state.assignmentOverrides[date]) state.assignmentOverrides[date] = { surveyIds: [] };
+                        surveysForDay.forEach(survey => {
+                            if (!state.assignmentOverrides[date].surveyIds.includes(survey.id)) {
+                                state.assignmentOverrides[date].surveyIds.push(survey.id);
+                            }
+                        });
+                    }
+                });
+                const companyName = state.operators.length > 0 ? state.operators[0].company : 'N/A';
+                addLogEntry(`${rangeString} を ${companyName} にアサインしました。`);
+                renderAll();
+                closeFocusArea();
+            }
+
+            if (e.target.id === 'cancel-assignment-button') {
+                dateRange.forEach(date => { delete state.assignmentOverrides[date]; });
+                const companyName = state.operators.length > 0 ? state.operators[0].company : 'N/A';
+                addLogEntry(`${rangeString} の ${companyName} のアサインを解除しました。`);
+                renderAll();
+                closeFocusArea();
+            }
+
+            if (e.target.id === 'save-day-setting-button') {
+                const eventType = document.querySelector('input[name="focus_event_type"]:checked').value;
+                const reason = document.getElementById('focus-reason').value;
+                if ((eventType === 'HOLIDAY' || eventType === 'SUBSTITUTE_WORKDAY') && !reason) {
+                    alert('理由を入力してください。');
+                    return;
+                }
+                dateRange.forEach(date => {
+                    state.manualSettings = state.manualSettings.filter(s => s.event_date !== date);
+                    if (eventType !== 'WORKDAY') {
+                        state.manualSettings.push({
+                            id: Date.now() + Math.random(),
+                            event_date: date,
+                            event_type: eventType,
+                            reason: reason,
+                            created_by: '現在のユーザー',
+                            created_at: new Date().toISOString(),
+                        });
+                    }
+                });
+                if (eventType !== 'WORKDAY') addLogEntry(`${rangeString}を${eventType === 'HOLIDAY' ? '特別休業日' : '振替営業日'}に設定しました。`);
+                else addLogEntry(`${rangeString}の個別設定を解除しました。`);
+                renderAll();
+                closeFocusArea();
+            }
+        });
 
         manualSettingsList.addEventListener('click', (e) => {
             const button = e.target.closest('button');
             if (!button) return;
-
             if (button.classList.contains('toggle-text-button')) {
                 const container = button.closest('.expandable-text');
-                if (!container) return;
-
                 const shortText = container.querySelector('.short-text');
                 const fullText = container.querySelector('.full-text');
-
                 shortText.classList.toggle('hidden');
                 fullText.classList.toggle('hidden');
-
                 button.textContent = fullText.classList.contains('hidden') ? '続きを読む' : '閉じる';
                 return;
             }
-            
             const id = parseInt(button.dataset.id, 10);
             if (button.classList.contains('edit-setting-button')) {
                 const setting = state.manualSettings.find(s => s.id === id);
-                openModal({ date: setting.event_date, manualSetting: setting });
+                if(setting) openFocusArea(setting.event_date);
             }
             if (button.classList.contains('delete-setting-button')) {
                 showDeleteConfirmModal(id);
@@ -1012,181 +920,25 @@ export function initCalendarManagementPage() {
         updateLogList.addEventListener('click', (e) => {
             const button = e.target.closest('.toggle-text-button');
             if (!button) return;
-
             const container = button.closest('.expandable-text');
-            if (!container) return;
-
             const shortText = container.querySelector('.short-text');
             const fullText = container.querySelector('.full-text');
-
             shortText.classList.toggle('hidden');
             fullText.classList.toggle('hidden');
-
             button.textContent = fullText.classList.contains('hidden') ? '続きを読む' : '閉じる';
         });
 
-        // Modal and Tab Listeners
-        const closeAssignmentTabButton = document.getElementById('close-assignment-tab-button');
-        closeModalButton.addEventListener('click', closeModal);
-        cancelButton.addEventListener('click', closeModal);
-        if(closeAssignmentTabButton) {
-            closeAssignmentTabButton.addEventListener('click', closeModal);
-        }
-        if(cancelAssignmentButton) {
-            cancelAssignmentButton.addEventListener('click', closeModal);
-        }
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeModal();
-        });
-        settingForm.addEventListener('submit', handleSave);
-
-        if (assignmentForm) {
-            assignmentForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const date = state.currentModalDate;
-                if (!date) return;
-
-                const surveysForDay = getSurveysForDay(date);
-                if (surveysForDay.length === 0) {
-                    closeModal();
-                    return;
-                }
-
-                if (!state.assignmentOverrides[date]) {
-                    state.assignmentOverrides[date] = { surveyIds: [] };
-                }
-
-                surveysForDay.forEach(survey => {
-                    if (!state.assignmentOverrides[date].surveyIds.includes(survey.id)) {
-                        state.assignmentOverrides[date].surveyIds.push(survey.id);
-                    }
-                });
-
-                if (state.urgencyOverrides[date]) {
-                    state.urgencyOverrides[date] = false;
-                }
-
-                const companyName = assignmentCompanyDisplay.textContent;
-                const message = `${date}に ${companyName} をアサインしました。`;
-                addLogEntry(`${date} を ${companyName} にアサインしました。`);
-
-                renderAll();
-                
-                closeModal();
-                showConfirmationModal(message);
-            });
-        }
-
-        const dayUrgencyButton = document.getElementById('toggle-day-urgency-button');
-        if (dayUrgencyButton) {
-            dayUrgencyButton.addEventListener('click', (e) => {
-                const date = e.target.dataset.date;
-                if (!date) return;
-
-                state.urgencyOverrides[date] = !state.urgencyOverrides[date];
-                renderAll();
-
-                const isUrgent = state.urgencyOverrides[date];
-                e.target.textContent = isUrgent ? '緊急を解除' : '緊急に設定';
-                e.target.className = `toggle-day-urgency-button text-white text-xs font-bold py-1 px-2 rounded ${isUrgent ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-red-500 hover:bg-red-600'}`;
-            });
-        }
-
-        if (closeConfirmationModalButton) {
-            closeConfirmationModalButton.addEventListener('click', closeConfirmationModal);
-        }
-        confirmationModal.addEventListener('click', (e) => {
-            if (e.target === confirmationModal) {
-                closeConfirmationModal();
-            }
-        });
-
-        // Delete confirmation listeners
         deleteConfirmModal.addEventListener('click', (e) => {
-            if (e.target === deleteConfirmModal) {
-                closeDeleteConfirmModal();
-            }
+            if (e.target === deleteConfirmModal) closeDeleteConfirmModal();
         });
         cancelDeleteButton.addEventListener('click', closeDeleteConfirmModal);
         confirmDeleteButton.addEventListener('click', () => {
             if (state.settingToDeleteId) {
                 state.manualSettings = state.manualSettings.filter(s => s.id !== state.settingToDeleteId);
-                console.log("Deleted setting:", state.settingToDeleteId);
                 closeDeleteConfirmModal();
                 renderAll();
             }
         });
-
-        // Tab listeners
-        tabBtnSettings.addEventListener('click', () => switchTab('settings'));
-        if (tabBtnSurveyDetails) tabBtnSurveyDetails.addEventListener('click', () => switchTab('survey-details'));
-        if (tabBtnReassign) tabBtnReassign.addEventListener('click', () => switchTab('reassign'));
-
-        // Bulk modal listeners
-        bulkCloseModalButton.addEventListener('click', closeBulkSettingModal);
-        bulkCancelButton.addEventListener('click', closeBulkSettingModal);
-        bulkSettingForm.addEventListener('submit', handleBulkSave);
-        if(bulkCancelAssignmentButton) bulkCancelAssignmentButton.addEventListener('click', closeBulkSettingModal);
-        if(bulkCloseAssignmentTabButton) bulkCloseAssignmentTabButton.addEventListener('click', closeBulkSettingModal);
-        if(bulkAssignmentForm) bulkAssignmentForm.addEventListener('submit', handleBulkAssignmentSave);
-        bulkModal.addEventListener('click', (e) => {
-            if (e.target === bulkModal) closeBulkSettingModal();
-        });
-        document.getElementById('bulk-tab-btn-settings').addEventListener('click', () => switchBulkTab('settings'));
-        document.getElementById('bulk-tab-btn-survey-details').addEventListener('click', () => switchBulkTab('survey-details'));
-        document.getElementById('bulk-tab-btn-reassign').addEventListener('click', () => switchBulkTab('reassign'));
-
-        const cancelAssignmentBtn = document.getElementById('cancel-assignment-btn');
-        if (cancelAssignmentBtn) {
-            cancelAssignmentBtn.addEventListener('click', () => {
-                const date = state.currentModalDate;
-                if (date && state.assignmentOverrides[date]) {
-                    const companyName = state.operators.length > 0 ? state.operators[0].company : 'N/A';
-                    delete state.assignmentOverrides[date];
-                    addLogEntry(`${date} の ${companyName} のアサインを解除しました。`);
-                    renderAll();
-                    closeModal();
-                    showConfirmationModal(`${date}のアサインを解除しました。`);
-                }
-            });
-        }
-
-        const bulkCancelAssignmentBtn = document.getElementById('bulk-cancel-assignment-btn');
-        if (bulkCancelAssignmentBtn) {
-            bulkCancelAssignmentBtn.addEventListener('click', () => {
-                const { start, end } = getOrderedDateRange();
-                if (!start || !end) return;
-
-                let currentDate = new Date(start);
-                const lastDate = new Date(end);
-
-                while (currentDate <= lastDate) {
-                    const dateString = currentDate.toISOString().split('T')[0];
-                    if (state.assignmentOverrides[dateString]) {
-                        delete state.assignmentOverrides[dateString];
-                    }
-                    currentDate.setDate(currentDate.getDate() + 1);
-                }
-
-                const companyName = state.operators.length > 0 ? state.operators[0].company : 'N/A';
-                const message = `${start}から${end}のアサインを解除しました。`;
-                addLogEntry(`${start}～${end} の ${companyName} のアサインを解除しました。`);
-
-                renderAll();
-                closeBulkSettingModal();
-                showConfirmationModal(message);
-            });
-        }
-
-        const cancelModalButton = document.getElementById('cancel-modal-button');
-        if(cancelModalButton) {
-            cancelModalButton.addEventListener('click', closeModal);
-        }
-
-        const bulkCancelModalButton = document.getElementById('bulk-cancel-modal-button');
-        if(bulkCancelModalButton) {
-            bulkCancelModalButton.addEventListener('click', closeBulkSettingModal);
-        }
 
         document.getElementById('export-csv-button').addEventListener('click', () => alert('CSVエクスポート機能は現在開発中です。'));
         document.getElementById('import-csv-button').addEventListener('click', () => alert('CSVインポート機能は現在開発中です。'));

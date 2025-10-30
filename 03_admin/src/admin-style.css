@@ -83,3 +83,89 @@ body.dark-mode #graphModal #modalCloseBtn:hover {
 .dark-mode .bg-red-200 .text-on-surface-variant {
     color: #d1d5db; /* gray-300 */
 }
+
+#calendar-tooltip {
+    position: absolute;
+    display: none;
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 1000;
+    pointer-events: none; /* So it doesn't interfere with other mouse events */
+    white-space: pre-wrap; /* To respect newlines in the tooltip */
+    max-width: 300px;
+}
+
+/* Calendar View Switcher */
+.calendar-view-button.active {
+    background-color: var(--color-primary, #006878);
+    color: var(--color-on-primary, #ffffff);
+}
+
+/* Yearly View */
+#yearly-view {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+.year-month-container {
+    padding: 1rem;
+    border: 1px solid var(--color-outline-variant, #ccc);
+    border-radius: 0.5rem;
+}
+.year-month-header {
+    font-size: 1.125rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+.year-day-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    text-align: center;
+}
+.year-day-cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 2rem;
+    width: 2rem;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 0.875rem;
+}
+.year-day-cell:hover {
+    background-color: var(--color-surface-variant, #eee);
+}
+.year-day-cell.has-survey {
+    background-color: #fce7f3; /* pink-100 */
+}
+.year-day-cell.is-assigned {
+    background-color: #dcfce7; /* green-100 */
+}
+.year-day-cell.saturday {
+    color: #2563eb; /* blue-600 */
+}
+.year-day-cell.sunday, .year-day-cell.holiday {
+    color: #dc2626; /* red-600 */
+}
+
+/* Vertical View */
+#vertical-view {
+    max-height: 800px; /* or other appropriate height */
+    overflow-y: auto;
+}
+.vertical-day-row {
+    display: flex;
+    border-bottom: 1px solid var(--color-outline-variant, #ccc);
+    padding: 1rem 0.5rem;
+}
+.vertical-day-date {
+    flex: 0 0 100px;
+    font-weight: 500;
+}
+.vertical-day-content {
+    flex: 1;
+}

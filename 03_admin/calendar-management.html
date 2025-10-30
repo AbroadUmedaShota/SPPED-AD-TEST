@@ -72,25 +72,46 @@
                                     <span class="material-icons">chevron_right</span>
                                 </button>
                             </div>
-                                                            <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-                                                            <div class="flex items-center gap-2">
-                                                                <span class="inline-flex items-center gap-1"><span class="size-3 rounded-full bg-green-200"></span>アサイン済</span>
-                                                                <span class="inline-flex items-center gap-1"><span class="size-3 rounded-full bg-yellow-200"></span>未アサイン</span>
-                                                                <span class="inline-flex items-center gap-1"><span class="size-3 rounded-full bg-red-200"></span>緊急</span>
-                                                            </div>
-                            
-                                                        </div>
-                                                    </div>                        <div class="grid grid-cols-7 text-sm text-center font-medium text-on-surface-variant">
-                            <div class="py-2">日</div>
-                            <div class="py-2">月</div>
-                            <div class="py-2">火</div>
-                            <div class="py-2">水</div>
-                            <div class="py-2">木</div>
-                            <div class="py-2">金</div>
-                            <div class="py-2">土</div>
+                                                            <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-on-surface-variant">
+                                <span class="inline-flex items-center gap-1">⚡: オンデマンド</span>
+                                <span class="inline-flex items-center gap-1">⭐: 通常</span>
+                                <span class="inline-flex items-center gap-1">📌: メモあり</span>
+                            </div>
                         </div>
-                        <div id="calendar-grid" class="grid grid-cols-7 gap-1 text-sm text-on-surface-variant">
-                            <!-- Calendar days will be injected here by JavaScript -->
+                        <div class="flex items-center justify-end gap-2 mb-4">
+                            <button id="view-monthly-button" class="calendar-view-button p-2 rounded-full bg-primary-container text-on-primary-container" aria-label="月表示">
+                                <span class="material-icons">calendar_month</span>
+                            </button>
+                            <button id="view-vertical-button" class="calendar-view-button p-2 rounded-full hover:bg-surface-container" aria-label="縦表示">
+                                <span class="material-icons">view_day</span>
+                            </button>
+                            <button id="view-yearly-button" class="calendar-view-button p-2 rounded-full hover:bg-surface-container" aria-label="年表示">
+                                <span class="material-icons">calendar_today</span>
+                            </button>
+                        </div>
+                        <div id="monthly-view">
+                            <div class="grid grid-cols-7 text-sm text-center font-medium text-on-surface-variant">
+                                <div class="py-2">日</div>
+                                <div class="py-2">月</div>
+                                <div class="py-2">火</div>
+                                <div class="py-2">水</div>
+                                <div class="py-2">木</div>
+                                <div class="py-2">金</div>
+                                <div class="py-2">土</div>
+                            </div>
+                            <div id="calendar-grid" class="grid grid-cols-7 gap-1 text-sm text-on-surface-variant">
+                                <!-- Calendar days will be injected here by JavaScript -->
+                            </div>
+                        </div>
+
+                        <!-- Yearly View -->
+                        <div id="yearly-view" class="hidden">
+                            <!-- Yearly calendar will be injected here -->
+                        </div>
+
+                        <!-- Vertical View -->
+                        <div id="vertical-view" class="hidden">
+                            <!-- Vertical calendar will be injected here -->
                         </div>
                     </div>
                     <section class="grid gap-6 md:grid-cols-2">
@@ -124,238 +145,136 @@
                 </section>
             </div>
         </main>
+
+        <!-- Focus Area -->
+        <aside id="focus-area" class="fixed top-0 right-0 z-50 h-screen w-full max-w-md transform translate-x-full transition-transform duration-300 ease-in-out bg-surface border-l border-outline-variant shadow-2xl flex flex-col" aria-labelledby="focus-area-title">
+            <!-- Close Tab Button -->
+            <button id="focus-area-close-tab" class="absolute -left-12 top-5 bg-surface border border-r-0 border-outline-variant rounded-l-lg p-2 shadow-lg hover:bg-surface-variant focus:outline-none ring-2 ring-primary focus:ring-offset-2 hidden">
+                <span class="material-icons">chevron_right</span>
+            </button>
+
+            <!-- Focus Area Header -->
+            <div class="flex items-center justify-between p-4 border-b border-outline-variant flex-shrink-0">
+                <div id="focus-area-header">
+                    <h2 id="focus-area-title" class="text-title-large font-semibold text-on-surface">詳細</h2>
+                    <p id="focus-area-date" class="text-sm text-on-surface-variant"></p>
+                </div>
+            </div>
+
+            <!-- Focus Area Content -->
+            <div class="flex-grow flex flex-col">
+                <!-- Tab Headers -->
+                <div class="border-b border-outline-variant flex-shrink-0">
+                    <nav class="-mb-px flex space-x-4 px-6" aria-label="Tabs">
+                        <button data-tab="details" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-primary text-primary">
+                            アンケート詳細
+                        </button>
+                        <button data-tab="assign" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-on-surface-variant hover:text-on-surface hover:border-outline">
+                            アサイン
+                        </button>
+                        <button data-tab="settings" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-on-surface-variant hover:text-on-surface hover:border-outline">
+                            個別設定
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Tab Panels -->
+                <div class="flex-grow overflow-y-auto">
+                    <!-- Details & Memo Panel -->
+                    <div id="tab-panel-details" class="tab-panel p-6 space-y-6">
+                        <section aria-labelledby="focus-details-title">
+                            <h3 id="focus-details-title" class="text-title-medium font-semibold text-on-surface mb-3">アンケート詳細</h3>
+                            <div id="focus-details-content" class="space-y-2">
+                                <!-- Survey details will be injected here -->
+                            </div>
+                        </section>
+                        <section aria-labelledby="focus-memo-title">
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="material-icons text-on-surface-variant">edit_note</span>
+                                <h3 id="focus-memo-title" class="text-title-medium font-semibold text-on-surface">メモ</h3>
+                            </div>
+                            <div id="focus-memo-content">
+                                <textarea id="memo-textarea" rows="4" class="w-full rounded-md border-outline bg-surface-container-lowest focus:border-primary focus:ring-primary" placeholder="この日のメモを入力..."></textarea>
+                                <div class="text-right mt-2">
+                                    <button id="save-memo-button" class="rounded-lg bg-primary text-on-primary px-4 py-2 text-sm font-semibold">メモを保存</button>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- Assign Panel -->
+                    <div id="tab-panel-assign" class="tab-panel p-6 hidden">
+                        <section aria-labelledby="focus-assign-title">
+                            <h3 id="focus-assign-title" class="text-title-medium font-semibold text-on-surface mb-3">アサイン</h3>
+                            <div id="focus-assign-content" class="space-y-2">
+                                <!-- Assignment content will be injected here -->
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- Settings Panel -->
+                    <div id="tab-panel-settings" class="tab-panel p-6 hidden">
+                        <section aria-labelledby="focus-settings-title">
+                            <h3 id="focus-settings-title" class="text-title-medium font-semibold text-on-surface mb-3">個別設定</h3>
+                            <div id="focus-settings-content" class="space-y-4">
+                                <div>
+                                    <label class="text-sm font-medium text-on-surface-variant">種別</label>
+                                    <div class="flex gap-4 mt-2">
+                                        <label class="flex items-center gap-2">
+                                            <input type="radio" name="focus_event_type" value="HOLIDAY" class="form-radio text-primary focus:ring-primary">
+                                            <span>特別休業日</span>
+                                        </label>
+                                        <label class="flex items-center gap-2">
+                                            <input type="radio" name="focus_event_type" value="SUBSTITUTE_WORKDAY" class="form-radio text-primary focus:ring-primary">
+                                            <span>振替営業日</span>
+                                        </label>
+                                        <label class="flex items-center gap-2">
+                                            <input type="radio" name="focus_event_type" value="WORKDAY" class="form-radio text-primary focus:ring-primary">
+                                            <span>設定解除</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="focus-reason" class="block text-sm font-medium text-on-surface-variant">理由</label>
+                                    <textarea id="focus-reason" rows="3" class="mt-1 block w-full rounded-md border-outline bg-surface-container-lowest focus:border-primary focus:ring-primary" placeholder="理由を入力 (例: 社内研修)"></textarea>
+                                </div>
+                                <div class="text-right mt-2">
+                                    <button id="save-day-setting-button" class="rounded-lg bg-primary text-on-primary px-4 py-2 text-sm font-semibold">この日の設定を保存</button>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </aside>
     </div>
     <div id="footer-placeholder"></div>
-</div>
-
-<!-- Setting Modal -->
-<div id="setting-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/50" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-    <div id="setting-modal-container" class="relative bg-surface rounded-xl shadow-xl w-full max-w-md m-4 transform transition-all opacity-0 -translate-y-4">
-        <div class="p-6">
-            <div class="flex justify-between items-start mb-4">
-                <div>
-                    <h3 id="modal-title" class="text-title-large font-semibold text-on-surface">日付設定</h3>
-                    <p id="modal-date-display" class="text-sm text-on-surface-variant"></p>
-                </div>
-                <button type="button" id="close-modal-button" class="rounded-full p-2 hover:bg-surface-variant" aria-label="閉じる">
-                    <span class="material-icons">close</span>
-                </button>
-            </div>
-
-            <!-- Tab Navigation -->
-            <div class="border-b border-outline-variant">
-                <nav class="-mb-px flex gap-4" aria-label="Tabs">
-                    <button id="tab-btn-settings" class="tab-button shrink-0 border-b-2 border-primary px-1 py-3 text-sm font-medium text-primary" aria-current="page">
-                        個別設定
-                    </button>
-                    <button id="tab-btn-survey-details" class="tab-button shrink-0 border-b-2 border-transparent px-1 py-3 text-sm font-medium text-on-surface-variant hover:border-gray-300 hover:text-on-surface">
-                        アンケート詳細
-                    </button>
-                    <button id="tab-btn-reassign" class="tab-button shrink-0 border-b-2 border-transparent px-1 py-3 text-sm font-medium text-on-surface-variant hover:border-gray-300 hover:text-on-surface">
-                        アサイン
-                    </button>
-                </nav>
-            </div>
-
-            <!-- Tab Content -->
-            <div id="tab-content-settings" class="tab-content py-4">
-                <form id="setting-form">
-                    <div class="space-y-4">
-                        <input type="hidden" id="setting-id">
-                        <div>
-                            <label class="text-sm font-medium text-on-surface-variant">種別</label>
-                            <div class="flex gap-4 mt-2">
-                                <label class="flex items-center gap-2">
-                                    <input type="radio" name="event_type" value="HOLIDAY" class="form-radio text-primary focus:ring-primary">
-                                    <span>特別休業日</span>
-                                </label>
-                                <label class="flex items-center gap-2">
-                                    <input type="radio" name="event_type" value="SUBSTITUTE_WORKDAY" class="form-radio text-primary focus:ring-primary">
-                                    <span>振替営業日</span>
-                                </label>
-                            </div>
-                        </div>
-                        <div>
-                            <label for="event_date" class="block text-sm font-medium text-on-surface-variant">日付</label>
-                            <input type="date" id="event_date" class="mt-1 block w-full rounded-md border-outline bg-surface-container-lowest focus:border-primary focus:ring-primary" required>
-                            <div id="event_date-error" class="text-sm text-error mt-1"></div>
-                        </div>
-                        <div>
-                            <label for="reason" class="block text-sm font-medium text-on-surface-variant">理由</label>
-                            <textarea id="reason" rows="3" class="mt-1 block w-full rounded-md border-outline bg-surface-container-lowest focus:border-primary focus:ring-primary" required></textarea>
-                            <div id="reason-error" class="text-sm text-error mt-1"></div>
-                        </div>
-                    </div>
-                    <div class="flex justify-end gap-2 mt-6">
-                        <button type="button" id="cancel-button" class="rounded-lg border border-outline px-4 py-2 text-sm font-semibold">キャンセル</button>
-                        <button type="submit" id="save-button" class="rounded-lg bg-primary text-on-primary px-4 py-2 text-sm font-semibold">保存</button>
-                    </div>
-                </form>
-            </div>
-            <div id="tab-content-survey-details" class="tab-content hidden py-4">
-                <div class="space-y-4">
-                    <div class="flex justify-between items-center">
-                        <h4 class="text-title-medium font-semibold text-on-surface">対象アンケート</h4>
-                        <button id="toggle-day-urgency-button" class="text-white text-xs font-bold py-1 px-2 rounded"></button>
-                    </div>
-                    <div id="assignment-surveys-list" class="space-y-3 max-h-60 overflow-y-auto pr-2">
-                        <!-- Survey items will be injected here by JavaScript -->
-                    </div>
-                </div>
-                <div class="flex justify-end gap-2 mt-6">
-                    <button type="button" id="close-assignment-tab-button" class="rounded-lg border border-outline px-4 py-2 text-sm font-semibold">閉じる</button>
-                </div>
-            </div>
-            <div id="tab-content-reassign" class="tab-content hidden py-4">
-                <div id="assign-view">
-                    <form id="assignment-form">
-                        <div class="space-y-4">
-                            <div>
-                                <p id="assignment-date-text" class="block text-sm font-medium text-on-surface-variant mb-2"></p>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-on-surface-variant">担当会社</label>
-                                <p id="assignment-company" class="mt-1 text-on-surface"></p>
-                            </div>
-                        </div>
-                        <div class="flex justify-end gap-2 mt-6">
-                            <button type="button" id="cancel-assignment-button" class="rounded-lg border border-outline px-4 py-2 text-sm font-semibold">キャンセル</button>
-                            <button type="submit" id="save-assignment-button" class="rounded-lg bg-primary text-on-primary px-4 py-2 text-sm font-semibold">完了</button>
-                        </div>
-                    </form>
-                </div>
-                <div id="cancel-assign-view" class="hidden">
-                    <p class="text-on-surface-variant mb-4">この日はアサイン済みです。</p>
-                    <div class="flex justify-end gap-2 mt-6">
-                        <button type="button" id="cancel-modal-button" class="rounded-lg border border-outline px-4 py-2 text-sm font-semibold">キャンセル</button>
-                        <button type="button" id="cancel-assignment-btn" class="rounded-lg bg-error text-white px-4 py-2 text-sm font-semibold">アサインを解除</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Confirmation Modal -->
-<div id="confirmation-modal" class="fixed inset-0 z-60 hidden flex items-center justify-center bg-black/50" aria-labelledby="confirmation-modal-title" role="dialog" aria-modal="true">
-    <div id="confirmation-modal-container" class="relative bg-surface rounded-xl shadow-xl w-full max-w-lg m-4 p-6 text-center transform transition-all opacity-0 -translate-y-4">
-        <h3 id="confirmation-modal-title" class="text-title-large font-semibold text-on-surface mb-4">完了</h3>
-        <p id="confirmation-modal-message" class="text-on-surface-variant mb-6"></p>
-        <div class="mt-6">
-            <button type="button" id="close-confirmation-modal-button" class="rounded-lg bg-primary text-on-primary px-6 py-2 text-sm font-semibold">閉じる</button>
-        </div>
-    </div>
+    <div id="calendar-tooltip" class="hidden"></div>
 </div>
 
 <!-- Delete Confirmation Modal -->
-<div id="delete-confirm-modal" class="fixed inset-0 z-70 hidden flex items-center justify-center bg-black/50" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
-    <div id="delete-confirm-modal-container" class="relative bg-surface rounded-xl shadow-xl w-full max-w-sm m-4 p-6 transform transition-all opacity-0 -translate-y-4">
-        <h3 id="delete-modal-title" class="text-title-large font-semibold text-on-surface">設定を削除</h3>
-        <p class="mt-2 text-sm text-on-surface-variant">この設定を本当に削除してもよろしいですか？この操作は元に戻せません。</p>
-        <div class="mt-6 flex justify-end gap-3">
-            <button type="button" id="cancel-delete-button" class="rounded-lg border border-outline px-4 py-2 text-sm font-semibold">いいえ</button>
-            <button type="button" id="confirm-delete-button" class="rounded-lg bg-error text-white px-4 py-2 text-sm font-semibold">はい、削除します</button>
+<div id="delete-confirm-modal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div id="delete-confirm-modal-container" class="transform opacity-0 translate-y-4 transition-all sm:max-w-lg sm:w-full bg-surface rounded-xl shadow-xl">
+        <div class="bg-surface px-4 pt-5 pb-4 sm:p-6 sm:pb-4 rounded-t-xl">
+            <div class="sm:flex sm:items-start">
+                <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-error-container sm:mx-0 sm:h-10 sm:w-10">
+                    <span class="material-icons text-error">warning</span>
+                </div>
+                <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                    <h3 class="text-lg leading-6 font-medium text-on-surface" id="modal-title">設定を削除</h3>
+                    <div class="mt-2">
+                        <p class="text-sm text-on-surface-variant">この設定を本当に削除しますか？この操作は元に戻せません。</p>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-</div>
-
-<!-- Bulk Setting Modal -->
-<div id="bulk-setting-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/50" aria-labelledby="bulk-modal-title" role="dialog" aria-modal="true">
-    <div id="bulk-setting-modal-container" class="relative bg-surface rounded-xl shadow-xl w-full max-w-md m-4 transform transition-all opacity-0 -translate-y-4">
-        <div class="p-6">
-            <div class="flex justify-between items-start mb-4">
-                <div>
-                    <h3 id="bulk-modal-title" class="text-title-large font-semibold text-on-surface">範囲設定</h3>
-                    <p id="bulk-modal-date-range-display" class="text-sm text-on-surface-variant"></p>
-                </div>
-                <button type="button" id="bulk-close-modal-button" class="rounded-full p-2 hover:bg-surface-variant" aria-label="閉じる">
-                    <span class="material-icons">close</span>
-                </button>
-            </div>
-
-            <!-- Tab Navigation -->
-            <div class="border-b border-outline-variant">
-                <nav class="-mb-px flex gap-4" aria-label="Tabs">
-                    <button id="bulk-tab-btn-settings" class="tab-button shrink-0 border-b-2 border-primary px-1 py-3 text-sm font-medium text-primary" aria-current="page">
-                        個別設定
-                    </button>
-                    <button id="bulk-tab-btn-survey-details" class="tab-button shrink-0 border-b-2 border-transparent px-1 py-3 text-sm font-medium text-on-surface-variant hover:border-gray-300 hover:text-on-surface">
-                        アンケート詳細
-                    </button>
-                    <button id="bulk-tab-btn-reassign" class="tab-button shrink-0 border-b-2 border-transparent px-1 py-3 text-sm font-medium text-on-surface-variant hover:border-gray-300 hover:text-on-surface">
-                        アサイン
-                    </button>
-                </nav>
-            </div>
-
-            <!-- Tab Content -->
-            <div id="bulk-tab-content-settings" class="tab-content py-4">
-                <form id="bulk-setting-form">
-                    <div class="space-y-4">
-                        <div>
-                            <label class="text-sm font-medium text-on-surface-variant">種別</label>
-                            <div class="flex gap-4 mt-2">
-                                <label class="flex items-center gap-2">
-                                    <input type="radio" name="bulk_event_type" value="HOLIDAY" class="form-radio text-primary focus:ring-primary" checked>
-                                    <span>特別休業日</span>
-                                </label>
-                                <label class="flex items-center gap-2">
-                                    <input type="radio" name="bulk_event_type" value="SUBSTITUTE_WORKDAY" class="form-radio text-primary focus:ring-primary">
-                                    <span>振替営業日</span>
-                                </label>
-                            </div>
-                        </div>
-                        <div>
-                            <label for="bulk_reason" class="block text-sm font-medium text-on-surface-variant">理由</label>
-                            <textarea id="bulk_reason" rows="3" class="mt-1 block w-full rounded-md border-outline bg-surface-container-lowest focus:ring-primary" required></textarea>
-                            <div id="bulk_reason-error" class="text-sm text-error mt-1"></div>
-                        </div>
-                    </div>
-                    <div class="flex justify-end gap-2 mt-6">
-                        <button type="button" id="bulk-cancel-button" class="rounded-lg border border-outline px-4 py-2 text-sm font-semibold">キャンセル</button>
-                        <button type="submit" class="rounded-lg bg-primary text-on-primary px-4 py-2 text-sm font-semibold">保存</button>
-                    </div>
-                </form>
-            </div>
-            <div id="bulk-tab-content-survey-details" class="tab-content hidden py-4">
-                <div class="space-y-4">
-                    <div class="flex justify-between items-center">
-                        <h4 class="text-title-medium font-semibold text-on-surface">対象アンケート</h4>
-                    </div>
-                    <div id="bulk-assignment-surveys-list" class="space-y-3 max-h-60 overflow-y-auto pr-2">
-                        <!-- Survey items will be injected here by JavaScript -->
-                    </div>
-                </div>
-                <div class="flex justify-end gap-2 mt-6">
-                    <button type="button" id="bulk-close-assignment-tab-button" class="rounded-lg border border-outline px-4 py-2 text-sm font-semibold">閉じる</button>
-                </div>
-            </div>
-            <div id="bulk-tab-content-reassign" class="tab-content hidden py-4">
-                <div id="bulk-assign-view">
-                    <form id="bulk-assignment-form">
-                        <div class="space-y-4">
-                            <div>
-                                <p id="bulk-assignment-date-text" class="block text-sm font-medium text-on-surface-variant mb-2"></p>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-on-surface-variant">担当会社</label>
-                                <p id="bulk-assignment-company" class="mt-1 text-on-surface"></p>
-                            </div>
-                        </div>
-                        <div class="flex justify-end gap-2 mt-6">
-                            <button type="button" id="bulk-cancel-assignment-button" class="rounded-lg border border-outline px-4 py-2 text-sm font-semibold">キャンセル</button>
-                            <button type="submit" id="bulk-save-assignment-button" class="rounded-lg bg-primary text-on-primary px-4 py-2 text-sm font-semibold">完了</button>
-                        </div>
-                    </form>
-                </div>
-                <div id="bulk-cancel-assign-view" class="hidden">
-                    <p class="text-on-surface-variant mb-4">この期間は一部またはすべてアサイン済みです。</p>
-                    <div class="flex justify-end gap-2 mt-6">
-                        <button type="button" id="bulk-cancel-modal-button" class="rounded-lg border border-outline px-4 py-2 text-sm font-semibold">キャンセル</button>
-                        <button type="button" id="bulk-cancel-assignment-btn" class="rounded-lg bg-error text-white px-4 py-2 text-sm font-semibold">すべてのアサインを解除</button>
-                    </div>
-                </div>
-            </div>
+        <div class="bg-surface-container-lowest px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse rounded-b-xl">
+            <button id="confirm-delete-button" type="button" class="w-full inline-flex justify-center rounded-full border border-transparent shadow-sm px-4 py-2 bg-error text-on-error text-base font-medium hover:bg-error/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-error sm:ml-3 sm:w-auto sm:text-sm">
+                削除
+            </button>
+            <button id="cancel-delete-button" type="button" class="mt-3 w-full inline-flex justify-center rounded-full border border-outline shadow-sm px-4 py-2 bg-surface text-on-surface text-base font-medium hover:bg-surface-variant focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:mt-0 sm:w-auto sm:text-sm">
+                キャンセル
+            </button>
         </div>
     </div>
 </div>
