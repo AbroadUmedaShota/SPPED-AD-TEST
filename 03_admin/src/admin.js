@@ -209,6 +209,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             const { initCalendarManagementPage } = await import('./calendar-management.js');
             initCalendarManagementPage();
             break;
+        case 'operator-management.html':
+            const { initOperatorManagementPage } = await import('./operator-management.js');
+            initOperatorManagementPage();
+            break;
         // Add other admin pages here
         // case 'some_other_page.html':
         //     const { initSomeOtherPage } = await import('./some_other_page.js');

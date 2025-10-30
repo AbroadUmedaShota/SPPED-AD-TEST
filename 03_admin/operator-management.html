@@ -7,6 +7,7 @@
     <link rel="icon" href="../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="../02_dashboard/service-top-style.css">
     <link rel="stylesheet" href="src/admin-style.css">
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
@@ -19,135 +20,199 @@
     <div class="flex flex-1 pt-16 bg-background">
         <div id="sidebar-placeholder"></div>
         <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
-            <div class="flex flex-col w-full max-w-6xl mx-auto flex-1">
+            <div class="flex flex-col w-full max-w-7xl mx-auto flex-1">
                 <div id="breadcrumb-container" class="mb-4"></div>
                 <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant">
                     <h1 class="text-on-background text-headline-large font-bold leading-tight tracking-tight">オペレーター管理</h1>
-                    <button class="inline-flex items-center gap-1 rounded-lg bg-secondary text-secondary-on px-4 py-2 text-sm font-semibold"><span class="material-icons text-base">person_add_alt</span>オペレーター招待</button>
+                    <button id="open-invite-modal-btn" class="inline-flex items-center gap-2 justify-center rounded-md bg-blue-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        <span class="material-icons text-base">person_add_alt</span>
+                        オペレーター招待
+                    </button>
                 </div>
-                <section class="space-y-6">
-    <div class="grid gap-4 md:grid-cols-4">
-        <div class="rounded-xl border border-outline-variant bg-surface p-5 shadow-sm">
-            <p class="text-sm text-on-surface-variant">稼働中</p>
-            <p class="text-display-small font-bold text-success">48</p>
-        </div>
-        <div class="rounded-xl border border-outline-variant bg-surface p-5 shadow-sm">
-            <p class="text-sm text-on-surface-variant">待機中</p>
-            <p class="text-display-small font-bold text-warning">12</p>
-        </div>
-        <div class="rounded-xl border border-outline-variant bg-surface p-5 shadow-sm">
-            <p class="text-sm text-on-surface-variant">平均処理件数/日</p>
-            <p class="text-display-small font-bold text-on-surface">36.4</p>
-        </div>
-        <div class="rounded-xl border border-outline-variant bg-surface p-5 shadow-sm">
-            <p class="text-sm text-on-surface-variant">精度 (一致率)</p>
-            <p class="text-display-small font-bold text-primary">97.3%</p>
-        </div>
-    </div>
-    <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
-        <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
-            <h2 class="text-title-large font-semibold text-on-surface">オペレーター一覧</h2>
-            <div class="flex items-center gap-2 text-sm">
-                <input type="search" class="form-input" placeholder="氏名・メールで検索" aria-label="オペレーター検索" />
-                <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-2">
-                    <span class="material-icons text-base">filter_list</span>
-                    フィルタ
-                </button>
-            </div>
-        </div>
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-outline-variant text-sm" aria-label="オペレーター一覧テーブル">
-                <thead class="bg-surface-variant text-on-surface-variant text-xs uppercase">
-                    <tr>
-                        <th class="px-4 py-3 text-left">氏名</th>
-                        <th class="px-4 py-3 text-left">メール</th>
-                        <th class="px-4 py-3 text-left">権限</th>
-                        <th class="px-4 py-3 text-left">現在タスク</th>
-                        <th class="px-4 py-3 text-left">本日完了</th>
-                        <th class="px-4 py-3 text-left">精度</th>
-                        <th class="px-4 py-3 text-left">状態</th>
-                        <th class="px-4 py-3 text-right">操作</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-outline-variant">
-                    <tr class="hover:bg-surface-variant/60">
-                        <td class="px-4 py-3 font-medium text-on-surface">山田 向日葵</td>
-                        <td class="px-4 py-3 text-on-surface-variant">h.yamada@example.com</td>
-                        <td class="px-4 py-3 text-on-surface-variant">照合兼任</td>
-                        <td class="px-4 py-3 text-on-surface-variant">展示会2025春 #1241</td>
-                        <td class="px-4 py-3 text-on-surface-variant">18件</td>
-                        <td class="px-4 py-3 text-on-surface-variant">98.4%</td>
-                        <td class="px-4 py-3"><span class="inline-flex items-center gap-1 rounded-full bg-success/20 text-success px-2.5 py-1 text-xs">稼働中</span></td>
-                        <td class="px-4 py-3 text-right space-x-2">
-                            <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs">詳細</button>
-                            <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs">稼働停止</button>
-                        </td>
-                    </tr>
-                    <tr class="hover:bg-surface-variant/60">
-                        <td class="px-4 py-3 font-medium text-on-surface">鈴木 蒼</td>
-                        <td class="px-4 py-3 text-on-surface-variant">a.suzuki@example.com</td>
-                        <td class="px-4 py-3 text-on-surface-variant">入力専任</td>
-                        <td class="px-4 py-3 text-on-surface-variant">未割当</td>
-                        <td class="px-4 py-3 text-on-surface-variant">12件</td>
-                        <td class="px-4 py-3 text-on-surface-variant">96.2%</td>
-                        <td class="px-4 py-3"><span class="inline-flex items-center gap-1 rounded-full bg-warning/20 text-warning px-2.5 py-1 text-xs">待機中</span></td>
-                        <td class="px-4 py-3 text-right space-x-2">
-                            <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs">割当</button>
-                            <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs">削除</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <section class="grid gap-6 md:grid-cols-2">
-        <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
-            <h2 class="text-title-large font-semibold text-on-surface mb-4">新規招待</h2>
-            <form class="space-y-3" aria-label="オペレーター招待フォーム">
-                <label class="flex flex-col gap-1 text-sm text-on-surface-variant">
-                    <span>メールアドレス</span>
-                    <input type="email" class="form-input" placeholder="operator@example.com" />
-                </label>
-                <label class="flex flex-col gap-1 text-sm text-on-surface-variant">
-                    <span>権限</span>
-                    <select class="form-select">
-                        <option>入力専任</option>
-                        <option>照合兼任</option>
-                        <option>管理者候補</option>
-                    </select>
-                </label>
-                <label class="flex flex-col gap-1 text-sm text-on-surface-variant">
-                    <span>グループ</span>
-                    <select class="form-select">
-                        <option>展示会2025春</option>
-                        <option>セミナーB</option>
-                        <option>キャンペーンC</option>
-                    </select>
-                </label>
-                <button class="inline-flex items-center gap-1 rounded-lg bg-primary text-primary-on px-4 py-2 text-sm">招待メール送信</button>
-            </form>
-        </div>
-        <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
-            <h2 class="text-title-large font-semibold text-on-surface mb-4">最近の操作履歴</h2>
-            <ul class="space-y-3 text-sm text-on-surface-variant">
-                <li>
-                    <p class="text-on-surface font-medium">2025/09/30 09:15</p>
-                    <p>田中 太郎が山田 向日葵の権限を照合兼任に変更しました。</p>
-                </li>
-                <li>
-                    <p class="text-on-surface font-medium">2025/09/29 17:40</p>
-                    <p>佐藤 花子が新規オペレーターを招待しました (a.suzuki@example.com)。</p>
-                </li>
-            </ul>
-        </div>
-    </section>
-</section>
-
+                <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <div class="rounded-xl border border-outline-variant bg-surface p-5 shadow-sm">
+                        <p class="text-sm text-on-surface-variant">稼働中</p>
+                        <p id="kpi-active" class="text-display-small font-bold text-green-600">0</p>
+                    </div>
+                    <div class="rounded-xl border border-outline-variant bg-surface p-5 shadow-sm">
+                        <p class="text-sm text-on-surface-variant">待機中</p>
+                        <p id="kpi-idle" class="text-display-small font-bold text-yellow-600">0</p>
+                    </div>
+                    <div class="rounded-xl border border-outline-variant bg-surface p-5 shadow-sm">
+                        <p class="text-sm text-on-surface-variant">平均処理件数/日</p>
+                        <p id="kpi-avg-per-day" class="text-display-small font-bold text-on-surface">0.0</p>
+                    </div>
+                    <div class="rounded-xl border border-outline-variant bg-surface p-5 shadow-sm">
+                        <p class="text-sm text-on-surface-variant">精度 (一致率)</p>
+                        <p id="kpi-accuracy" class="text-display-small font-bold text-blue-600">0.0%</p>
+                    </div>
+                </section>
+                <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+                    <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
+                        <h2 class="text-title-large font-semibold text-on-surface">オペレーター一覧</h2>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-outline-variant text-sm table-fixed" aria-label="オペレーター一覧テーブル">
+                            <thead class="bg-surface-variant text-on-surface-variant text-xs uppercase">
+                                <tr>
+                                    <th class="w-12 px-4 py-3 text-center"><input type="checkbox" id="select-all-checkbox" class="form-checkbox"></th>
+                                    <th class="w-40 px-4 py-3 text-left"><button class="sort-btn" data-sort-key="name">氏名<span class="material-icons text-base">unfold_more</span></button></th>
+                                    <th class="px-4 py-3 text-left"><button class="sort-btn" data-sort-key="email">メール<span class="material-icons text-base">unfold_more</span></button></th>
+                                    <th class="w-24 px-4 py-3 text-left"><button class="sort-btn" data-sort-key="role">権限<span class="material-icons text-base">unfold_more</span></button></th>
+                                    <th class="w-40 px-4 py-3 text-left"><button class="sort-btn" data-sort-key="currentTaskName">現在タスク<span class="material-icons text-base">unfold_more</span></button></th>
+                                    <th class="w-24 px-4 py-3 text-right"><button class="sort-btn w-full justify-end" data-sort-key="todayCompleted">本日完了<span class="material-icons text-base">unfold_more</span></button></th>
+                                    <th class="w-20 px-4 py-3 text-right"><button class="sort-btn w-full justify-end" data-sort-key="accuracy">精度<span class="material-icons text-base">unfold_more</span></button></th>
+                                    <th class="w-24 px-4 py-3 text-left"><button class="sort-btn" data-sort-key="status">状態<span class="material-icons text-base">unfold_more</span></button></th>
+                                    <th class="w-40 px-4 py-3 text-center">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="operator-table-body"></tbody>
+                        </table>
+                    </div>
+                    <div class="grid grid-cols-3 items-center gap-4 mt-4 text-sm">
+                        <div class="flex items-center gap-2">
+                            <label for="rows-per-page" class="text-on-surface-variant">表示件数:</label>
+                            <select id="rows-per-page" class="form-select !text-xs !py-1">
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                                <option value="200">200</option>
+                            </select>
+                        </div>
+                        <nav aria-label="ページネーション" class="justify-self-center">
+                            <ul class="inline-flex items-center -space-x-px"></ul>
+                        </nav>
+                        <div></div>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
     <div id="footer-placeholder"></div>
 </div>
+
+<div id="panel-triggers" class="fixed top-1/2 -translate-y-1/2 right-0 z-70 flex flex-col gap-2">
+    <button id="open-filter-panel-btn" class="flex items-center justify-start gap-1 text-sm font-semibold text-gray-600 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 py-2 pl-3 pr-2 rounded-l-lg border-y border-l border-gray-200 shadow-md transition-all w-28">
+        <span id="filter-arrow-icon" class="material-icons text-lg">chevron_left</span>
+        フィルタ
+    </button>
+    <button id="open-history-panel-btn" class="flex items-center justify-start gap-1 text-sm font-semibold text-gray-600 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 py-2 pl-3 pr-2 rounded-l-lg border-y border-l border-gray-200 shadow-md transition-all w-28">
+        <span id="history-arrow-icon" class="material-icons text-lg">chevron_left</span>
+        更新ログ
+    </button>
+</div>
+
+<div id="filter-container" class="fixed top-0 right-0 h-screen z-60 transition-transform translate-x-full">
+    <div id="filter-panel" class="h-full p-6 overflow-y-auto bg-surface w-[28rem] shadow-2xl" tabindex="-1">
+        <h5 class="text-title-large font-semibold text-on-surface mb-6">フィルターと検索</h5>
+        <form id="filter-form" class="space-y-4">
+            <div class="space-y-2">
+                <label for="operator-id" class="form-label">オペレーターID</label>
+                <input type="text" id="operator-id" name="operator-id" class="form-input w-full" placeholder="op-001">
+            </div>
+            <div class="space-y-2">
+                <label for="search-input" class="form-label">氏名・メール</label>
+                <input type="search" id="search-input" name="search-input" class="form-input w-full" placeholder="キーワードを入力">
+            </div>
+            <div class="border-t border-outline-variant pt-4 space-y-4">
+                <h4 class="text-title-medium font-medium text-on-surface-variant">分類</h4>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="font-medium text-sm mb-1">権限</p>
+                        <div class="flex flex-col gap-1">
+                            <label class="form-check-label"><input type="checkbox" class="form-checkbox" name="role" value="入力専任"> 入力専任</label>
+                            <label class="form-check-label"><input type="checkbox" class="form-checkbox" name="role" value="照合兼任"> 照合兼任</label>
+                            <label class="form-check-label"><input type="checkbox" class="form-checkbox" name="role" value="管理者"> 管理者</label>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="font-medium text-sm mb-1">状態</p>
+                        <div class="flex flex-col gap-1">
+                            <label class="form-check-label"><input type="checkbox" class="form-checkbox" name="status" value="active"> 稼働中</label>
+                            <label class="form-check-label"><input type="checkbox" class="form-checkbox" name="status" value="idle"> 待機中</label>
+                            <label class="form-check-label"><input type="checkbox" class="form-checkbox" name="status" value="suspended"> 停止中</label>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="font-medium text-sm mb-1">グループ</p>
+                        <div class="flex flex-col gap-1">
+                            <label class="form-check-label"><input type="checkbox" class="form-checkbox" name="group" value="A"> グループA</label>
+                            <label class="form-check-label"><input type="checkbox" class="form-checkbox" name="group" value="B"> グループB</label>
+                            <label class="form-check-label"><input type="checkbox" class="form-checkbox" name="group" value="C"> グループC</label>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="font-medium text-sm mb-1">タスク有無</p>
+                        <div class="flex flex-col gap-1">
+                            <label class="form-check-label"><input type="radio" class="form-radio" name="hasTask" value="yes"> あり</label>
+                            <label class="form-check-label"><input type="radio" class="form-radio" name="hasTask" value="no"> なし</label>
+                            <label class="form-check-label"><input type="radio" class="form-radio" name="hasTask" value="" checked> 指定なし</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-outline-variant pt-4 space-y-4">
+                <h4 class="text-title-medium font-medium text-on-surface-variant">パフォーマンス</h4>
+                <div class="space-y-2">
+                    <label class="form-label text-sm">本日完了件数</label>
+                    <div class="flex items-center gap-2">
+                        <input type="number" name="todayCompleted_min" class="form-input w-full" placeholder="最小">
+                        <span>-</span>
+                        <input type="number" name="todayCompleted_max" class="form-input w-full" placeholder="最大">
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="form-label text-sm">総完了件数</label>
+                    <div class="flex items-center gap-2">
+                        <input type="number" name="totalCompleted_min" class="form-input w-full" placeholder="最小">
+                        <span>-</span>
+                        <input type="number" name="totalCompleted_max" class="form-input w-full" placeholder="最大">
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="form-label text-sm">精度 (%)</label>
+                    <div class="flex items-center gap-2">
+                        <input type="number" name="accuracy_min" class="form-input w-full" placeholder="最小" min="0" max="100">
+                        <span>-</span>
+                        <input type="number" name="accuracy_max" class="form-input w-full" placeholder="最大" min="0" max="100">
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="form-label text-sm">平均処理時間 (秒)</label>
+                    <div class="flex items-center gap-2">
+                        <input type="number" name="avgProcessingTime_min" class="form-input w-full" placeholder="最小">
+                        <span>-</span>
+                        <input type="number" name="avgProcessingTime_max" class="form-input w-full" placeholder="最大">
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-outline-variant pt-4 space-y-4">
+                <h4 class="text-title-medium font-medium text-on-surface-variant">日付</h4>
+                <div class="space-y-2">
+                    <label for="registrationDate-range" class="form-label">登録日</label>
+                    <input type="text" id="registrationDate-range" name="registrationDate-range" class="form-input w-full" placeholder="期間を選択">
+                </div>
+                <div class="space-y-2">
+                    <label for="lastLoginDate-range" class="form-label">最終ログイン日</label>
+                    <input type="text" id="lastLoginDate-range" name="lastLoginDate-range" class="form-input w-full" placeholder="期間を選択">
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 mt-6 border-t border-outline-variant pt-4">
+                <button type="button" id="reset-filter-btn" class="rounded-md bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">リセット</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="history-container" class="fixed top-0 right-0 h-screen z-50 transition-transform translate-x-full">
+    <div id="history-panel" class="h-full p-6 overflow-y-auto bg-surface w-[28rem] shadow-2xl" tabindex="-1">
+        <h5 class="text-title-large font-semibold text-on-surface mb-4">最近の操作履歴</h5>
+        <div id="history-panel-content" class="space-y-4 text-sm"></div>
+    </div>
+</div>
+
+<div id="invite-operator-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50"></div>
+<div id="confirmation-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50"></div>
+
 <script type="module" src="src/admin.js"></script>
 </body>
 </html>
