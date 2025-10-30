@@ -174,6 +174,15 @@ function initAdminSidebarHandler() {
                 }
             });
         });
+
+        const logoutButton = document.getElementById('logoutButton');
+        if (logoutButton) {
+            logoutButton.addEventListener('click', (e) => {
+                e.preventDefault(); // Prevent default link behavior
+                // In a real application, this would involve clearing session/token and redirecting to login
+                window.location.href = '../../index.html'; // Redirect to the main index.html (e.g., login page)
+            });
+        }
     }
 
     handleResizeForSidebar();
