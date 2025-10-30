@@ -207,6 +207,8 @@ export function initCalendarManagementPage() {
                 statusHTML = `<span class="text-xs font-semibold text-error">休業日</span>`;
             } else if (dayStatus === 'SUBSTITUTE_WORKDAY') {
                 statusHTML = `<span class="text-xs font-semibold text-primary">振替営業日</span>`;
+            } else if (dayStatus === 'WORKDAY') {
+                statusHTML = `<span class="text-xs font-semibold text-green-600">営業日</span>`;
             }
 
             const normalIndicator = `<span class="text-xs border rounded px-1 py-0.5 ${isAssigned ? 'bg-green-100 border-green-300 text-green-800' : 'bg-pink-100 border-pink-300 text-pink-800'}">⭐通常</span>`;
