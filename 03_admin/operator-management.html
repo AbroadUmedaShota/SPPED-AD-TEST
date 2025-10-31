@@ -92,18 +92,20 @@
     <div id="footer-placeholder"></div>
 </div>
 
-<div id="panel-triggers" class="fixed top-1/2 -translate-y-1/2 right-0 z-70 flex flex-col gap-2">
+<div id="filter-trigger" class="fixed top-24 right-0 z-70 transition-transform duration-300 ease-in-out">
     <button id="open-filter-panel-btn" class="flex items-center justify-start gap-1 text-sm font-semibold text-gray-600 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 py-2 pl-3 pr-2 rounded-l-lg border-y border-l border-gray-200 shadow-md transition-all w-28">
         <span id="filter-arrow-icon" class="material-icons text-lg">chevron_left</span>
         フィルタ
     </button>
+</div>
+<div id="history-trigger" class="fixed top-36 right-0 z-70 transition-transform duration-300 ease-in-out">
     <button id="open-history-panel-btn" class="flex items-center justify-start gap-1 text-sm font-semibold text-gray-600 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 py-2 pl-3 pr-2 rounded-l-lg border-y border-l border-gray-200 shadow-md transition-all w-28">
         <span id="history-arrow-icon" class="material-icons text-lg">chevron_left</span>
         更新ログ
     </button>
 </div>
 
-<div id="filter-container" class="fixed top-0 right-0 h-screen z-60 transition-transform translate-x-full">
+<div id="filter-container" class="fixed top-24 right-0 bottom-0 z-60 transition-transform translate-x-full">
     <div id="filter-panel" class="h-full p-6 overflow-y-auto bg-surface w-[28rem] shadow-2xl" tabindex="-1">
         <h5 class="text-title-large font-semibold text-on-surface mb-6">フィルターと検索</h5>
         <form id="filter-form" class="space-y-4">
@@ -205,7 +207,7 @@
     </div>
 </div>
 
-<div id="history-container" class="fixed top-0 right-0 h-screen z-50 transition-transform translate-x-full">
+<div id="history-container" class="fixed top-24 right-0 bottom-0 z-50 transition-transform translate-x-full">
     <div id="history-panel" class="h-full p-6 overflow-y-auto bg-surface w-[28rem] shadow-2xl" tabindex="-1">
         <h5 class="text-title-large font-semibold text-on-surface mb-4">最近の操作履歴</h5>
         <div id="history-panel-content" class="space-y-4 text-sm"></div>

@@ -196,48 +196,77 @@ export function initOperatorManagementPage() {
     const historyArrowIcon = document.getElementById('history-arrow-icon');
     const filterContainer = document.getElementById('filter-container');
     const filterArrowIcon = document.getElementById('filter-arrow-icon');
+    const filterTrigger = document.getElementById('filter-trigger');
+    const historyTrigger = document.getElementById('history-trigger');
     const filterForm = document.getElementById('filter-form');
 
-    document.getElementById('open-filter-panel-btn')?.addEventListener('click', () => {
+    const openPanel = (panelToShow) => {
+        if (panelToShow === 'filter') {
+            filterContainer.classList.remove('translate-x-full');
+            historyContainer.classList.add('translate-x-full');
+            filterArrowIcon.textContent = 'chevron_right';
+            historyArrowIcon.textContent = 'chevron_left';
+            filterTrigger.style.transform = 'translateX(-28rem)';
+            historyTrigger.classList.add('hidden');
+            filterTrigger.classList.remove('hidden');
+        } else if (panelToShow === 'history') {
+            historyContainer.classList.remove('translate-x-full');
+            filterContainer.classList.add('translate-x-full');
+            historyArrowIcon.textContent = 'chevron_right';
+            filterArrowIcon.textContent = 'chevron_left';
+            historyTrigger.style.transform = 'translateX(-28rem)';
+            filterTrigger.classList.add('hidden');
+            historyTrigger.classList.remove('hidden');
+        }
+    };
+
+    const closeAllPanels = () => {
+        filterContainer.classList.add('translate-x-full');
+        historyContainer.classList.add('translate-x-full');
+        filterArrowIcon.textContent = 'chevron_left';
+        historyArrowIcon.textContent = 'chevron_left';
+        filterTrigger.style.transform = 'translateX(0)';
+        historyTrigger.style.transform = 'translateX(0)';
+        filterTrigger.classList.remove('hidden');
+        historyTrigger.classList.remove('hidden');
+    };
+
+    document.getElementById('open-filter-panel-btn')?.addEventListener('click', (e) => {
+        e.stopPropagation();
         const isClosed = filterContainer.classList.contains('translate-x-full');
         if (isClosed) {
-            historyContainer.classList.add('translate-x-full');
-            historyArrowIcon.textContent = 'chevron_left';
-            filterContainer.classList.remove('translate-x-full');
-            filterArrowIcon.textContent = 'chevron_right';
-            filterContainer.style.zIndex = '60';
-            historyContainer.style.zIndex = '50';
+            openPanel('filter');
         } else {
-            filterContainer.classList.add('translate-x-full');
-            filterArrowIcon.textContent = 'chevron_left';
+            closeAllPanels();
         }
     });
 
-    document.getElementById('open-history-panel-btn')?.addEventListener('click', () => {
+    document.getElementById('open-history-panel-btn')?.addEventListener('click', (e) => {
+        e.stopPropagation();
         const isClosed = historyContainer.classList.contains('translate-x-full');
         if (isClosed) {
-            filterContainer.classList.add('translate-x-full');
-            filterArrowIcon.textContent = 'chevron_left';
-            historyContainer.classList.remove('translate-x-full');
-            historyArrowIcon.textContent = 'chevron_right';
-            historyContainer.style.zIndex = '60';
-            filterContainer.style.zIndex = '50';
+            openPanel('history');
         } else {
-            historyContainer.classList.add('translate-x-full');
-            historyArrowIcon.textContent = 'chevron_left';
+            closeAllPanels();
         }
     });
 
     document.addEventListener('click', (e) => {
-        const openFilterBtn = document.getElementById('open-filter-panel-btn');
-        const openHistoryBtn = document.getElementById('open-history-panel-btn');
-        if (!filterContainer.classList.contains('translate-x-full') && !filterContainer.contains(e.target) && !openFilterBtn.contains(e.target)) {
-            filterContainer.classList.add('translate-x-full');
-            filterArrowIcon.textContent = 'chevron_left';
-        }
-        if (!historyContainer.classList.contains('translate-x-full') && !historyContainer.contains(e.target) && !openHistoryBtn.contains(e.target)) {
-            historyContainer.classList.add('translate-x-full');
-            historyArrowIcon.textContent = 'chevron_left';
+        const isFilterOpen = !filterContainer.classList.contains('translate-x-full');
+        const isHistoryOpen = !historyContainer.classList.contains('translate-x-full');
+
+        if (!isFilterOpen && !isHistoryOpen) return;
+
+        const filterTriggerBtn = document.getElementById('open-filter-panel-btn');
+        const historyTriggerBtn = document.getElementById('open-history-panel-btn');
+
+        const clickedOnFilterTrigger = filterTriggerBtn.contains(e.target);
+        const clickedOnHistoryTrigger = historyTriggerBtn.contains(e.target);
+        const clickedInFilterPanel = filterContainer.contains(e.target);
+        const clickedInHistoryPanel = historyContainer.contains(e.target);
+
+        if (!clickedOnFilterTrigger && !clickedOnHistoryTrigger && !clickedInFilterPanel && !clickedInHistoryPanel) {
+            closeAllPanels();
         }
     });
 
