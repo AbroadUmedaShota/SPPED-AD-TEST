@@ -172,3 +172,25 @@ body.dark-mode #graphModal #modalCloseBtn:hover {
 .vertical-day-content {
     flex: 1;
 }
+
+.toolbox-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 2px solid transparent;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-on-surface-variant);
+    transition: all 0.2s ease-in-out;
+}
+
+.toolbox-tab:hover {
+    color: var(--color-on-surface);
+    background-color: var(--color-surface-container-hover);
+}
+
+.toolbox-tab.active {
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+}
