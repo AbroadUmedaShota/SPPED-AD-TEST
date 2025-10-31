@@ -636,7 +636,7 @@ function initCollapsibleToolbox() {
         if (isToolboxOpen) {
             // OPEN STATE
             toolboxAside.classList.remove('translate-x-full');
-            toggleBtn.style.right = '36rem';
+            toggleBtn.style.right = '34.2rem';
             btnIcon.textContent = 'chevron_left';
         } else {
             // CLOSED STATE
