@@ -15,57 +15,40 @@
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
     <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
 </head>
-<body class="bg-background text-on-background">
+<body class="bg-background text-on-background font-sans">
 <div class="relative flex min-h-screen flex-col overflow-x-hidden">
     <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
     <div id="header-placeholder"></div>
+
     <div class="flex flex-1 pt-16 bg-background">
         <div id="sidebar-placeholder"></div>
-        <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
-            <div class="flex flex-col w-full max-w-7xl mx-auto flex-1">
+
+        <!-- Main content area -->
+        <main id="main-content" class="flex-1 transition-all duration-300 ease-in-out">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div id="breadcrumb-container" class="mb-4"></div>
                 <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant">
                     <h1 class="text-on-background text-headline-large font-bold leading-tight tracking-tight">オペレーター管理</h1>
-                    <button id="open-invite-modal-btn" class="inline-flex items-center gap-2 justify-center rounded-md bg-blue-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                    <button id="open-invite-modal-btn" class="flex items-center justify-center gap-2 min-w-[84px] max-w-[480px] cursor-pointer overflow-hidden rounded-full h-10 px-5 button-primary text-on-primary text-sm font-semibold leading-normal " aria-label="オペレーター招待">
                         <span class="material-icons text-base">person_add_alt</span>
-                        オペレーター招待
+                        <span class="truncate">オペレーター招待</span>
                     </button>
                 </div>
-                <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                    <div class="rounded-xl border border-outline-variant bg-surface p-5 shadow-sm">
-                        <p class="text-sm text-on-surface-variant">稼働中</p>
-                        <p id="kpi-active" class="text-display-small font-bold text-green-600">0</p>
-                    </div>
-                    <div class="rounded-xl border border-outline-variant bg-surface p-5 shadow-sm">
-                        <p class="text-sm text-on-surface-variant">待機中</p>
-                        <p id="kpi-idle" class="text-display-small font-bold text-yellow-600">0</p>
-                    </div>
-                    <div class="rounded-xl border border-outline-variant bg-surface p-5 shadow-sm">
-                        <p class="text-sm text-on-surface-variant">平均処理件数/日</p>
-                        <p id="kpi-avg-per-day" class="text-display-small font-bold text-on-surface">0.0</p>
-                    </div>
-                    <div class="rounded-xl border border-outline-variant bg-surface p-5 shadow-sm">
-                        <p class="text-sm text-on-surface-variant">精度 (一致率)</p>
-                        <p id="kpi-accuracy" class="text-display-small font-bold text-blue-600">0.0%</p>
-                    </div>
-                </section>
                 <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
                     <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
                         <h2 class="text-title-large font-semibold text-on-surface">オペレーター一覧</h2>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-outline-variant text-sm table-fixed" aria-label="オペレーター一覧テーブル">
+                        <table class="min-w-full divide-y divide-outline-variant text-sm" aria-label="オペレーター一覧テーブル">
                             <thead class="bg-surface-variant text-on-surface-variant text-xs uppercase">
                                 <tr>
                                     <th class="w-12 px-4 py-3 text-center"><input type="checkbox" id="select-all-checkbox" class="form-checkbox"></th>
-                                    <th class="w-32 px-4 py-3 text-left"><button class="sort-btn" data-sort-key="name">氏名<span class="material-icons text-base">unfold_more</span></button></th>
+                                    <th class="px-4 py-3 text-left"><button class="sort-btn" data-sort-key="name">氏名<span class="material-icons text-base">unfold_more</span></button></th>
                                     <th class="px-4 py-3 text-left"><button class="sort-btn" data-sort-key="email">メール<span class="material-icons text-base">unfold_more</span></button></th>
-                                    <th class="w-24 px-4 py-3 text-left"><button class="sort-btn" data-sort-key="role">権限<span class="material-icons text-base">unfold_more</span></button></th>
-                                    <th class="w-32 px-4 py-3 text-left"><button class="sort-btn" data-sort-key="currentTaskName">現在タスク<span class="material-icons text-base">unfold_more</span></button></th>
-                                    <th class="w-24 px-4 py-3 text-right"><button class="sort-btn w-full justify-end flex-nowrap" data-sort-key="todayCompleted">本日完了<span class="material-icons text-base">unfold_more</span></button></th>
-                                    <th class="w-20 px-4 py-3 text-right"><button class="sort-btn w-full justify-end flex-nowrap" data-sort-key="accuracy">精度<span class="material-icons text-base">unfold_more</span></button></th>
-                                    <th class="w-24 px-4 py-3 text-left"><button class="sort-btn" data-sort-key="status">状態<span class="material-icons text-base">unfold_more</span></button></th>
-                                    <th class="w-80 px-4 py-3 text-center">操作</th>
+                                    <th class="w-48 px-4 py-3 text-left whitespace-nowrap"><button class="sort-btn" data-sort-key="role">権限<span class="material-icons text-base">unfold_more</span></button></th>
+                                    <th class="w-32 px-4 py-3 text-right"><button class="sort-btn w-full justify-end flex-nowrap" data-sort-key="totalCompleted">総処理数<span class="material-icons text-base">unfold_more</span></button></th>
+                                    <th class="w-32 px-4 py-3 text-left"><button class="sort-btn" data-sort-key="status">状態<span class="material-icons text-base">unfold_more</span></button></th>
+                                    <th class="w-40 px-4 py-3 text-center">操作</th>
                                 </tr>
                             </thead>
                             <tbody id="operator-table-body"></tbody>
@@ -75,9 +58,9 @@
                         <div class="flex items-center gap-2">
                             <label for="rows-per-page" class="text-on-surface-variant">表示件数:</label>
                             <select id="rows-per-page" class="form-select !text-xs !py-1">
+                                <option value="25" selected>25</option>
                                 <option value="50">50</option>
                                 <option value="100">100</option>
-                                <option value="200">200</option>
                             </select>
                         </div>
                         <nav aria-label="ページネーション" class="justify-self-center">
@@ -88,133 +71,74 @@
                 </div>
             </div>
         </main>
+
+        <!-- Collapsible Toolbox -->
+        <aside id="toolbox-aside" class="fixed top-16 right-0 h-[calc(100vh-4rem)] w-[36rem] bg-surface border-l border-outline-variant shadow-lg transform transition-transform duration-300 ease-in-out z-30">
+            <div class="h-full flex flex-col">
+                <div class="p-6 space-y-8">
+                    <h3 class="text-title-large font-semibold text-on-surface">ツールボックス</h3>
+                    <section>
+                        <h4 class="text-title-medium font-medium text-on-surface-variant mb-2">フィルター</h4>
+                        <form id="filter-form" class="space-y-4">
+                            <div class="space-y-2">
+                                <label for="search-input" class="form-label">検索</label>
+                                <input type="search" id="search-input" name="search-input" class="form-input w-full" placeholder="氏名, メール, IDで検索">
+                            </div>
+                            <div class="border-t border-outline-variant pt-4 space-y-4">
+                                <h5 class="text-title-small font-medium text-on-surface-variant">分類</h5>
+                                <div>
+                                    <p class="font-medium text-sm mb-2">権限</p>
+                                    <div id="filter-roles-container" class="flex flex-col gap-1"></div>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-sm mb-2">状態</p>
+                                    <div class="flex flex-col gap-1">
+                                        <label class="form-check-label"><input type="checkbox" class="form-checkbox" name="status" value="active"> 稼働中</label>
+                                        <label class="form-check-label"><input type="checkbox" class="form-checkbox" name="status" value="suspended"> 停止中</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="border-t border-outline-variant pt-4 space-y-4">
+                                <h5 class="text-title-small font-medium text-on-surface-variant">パフォーマンス</h5>
+                                <div class="space-y-2">
+                                    <label class="form-label text-sm">総完了件数</label>
+                                    <div class="flex items-center gap-2">
+                                        <input type="number" name="totalCompleted_min" class="form-input w-full" placeholder="最小">
+                                        <span>-</span>
+                                        <input type="number" name="totalCompleted_max" class="form-input w-full" placeholder="最大">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex justify-end gap-3 mt-6 border-t border-outline-variant pt-4">
+                                <button type="button" id="reset-filter-btn" class="border border-outline-variant bg-surface text-on-surface-variant px-3 py-1.5 rounded-md text-sm">リセット</button>
+                            </div>
+                        </form>
+                    </section>
+                </div>
+                <div class="flex-1 flex flex-col p-6 pt-0">
+                    <section>
+                        <h3 class="text-title-large font-semibold text-on-surface mb-4 border-t border-outline-variant pt-8">更新ログ</h3>
+                        <div id="history-panel-content" class="space-y-4 text-sm overflow-y-auto border p-4 rounded-md"></div>
+                    </section>
+                </div>
+            </div>
+        </aside>
+        <button id="toolbox-toggle-btn" class="fixed top-[20%] -translate-y-1/2 right-[36rem] w-8 h-16 bg-surface hover:bg-surface-container-high rounded-l-lg shadow-lg flex items-center justify-center border-y border-l border-outline-variant transition-all duration-300 ease-in-out z-40 focus:outline-none focus:ring-2 focus:ring-primary">
+            <span class="material-icons transition-transform duration-300">chevron_left</span>
+        </button>
     </div>
     <div id="footer-placeholder"></div>
 </div>
 
-<div id="filter-trigger" class="fixed top-24 right-0 z-70 transition-transform duration-300 ease-in-out">
-    <button id="open-filter-panel-btn" class="flex items-center justify-start gap-1 text-sm font-semibold text-gray-600 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 py-2 pl-3 pr-2 rounded-l-lg border-y border-l border-gray-200 shadow-md transition-all w-28">
-        <span id="filter-arrow-icon" class="material-icons text-lg">chevron_left</span>
-        フィルタ
-    </button>
-</div>
-<div id="history-trigger" class="fixed top-36 right-0 z-70 transition-transform duration-300 ease-in-out">
-    <button id="open-history-panel-btn" class="flex items-center justify-start gap-1 text-sm font-semibold text-gray-600 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 py-2 pl-3 pr-2 rounded-l-lg border-y border-l border-gray-200 shadow-md transition-all w-28">
-        <span id="history-arrow-icon" class="material-icons text-lg">chevron_left</span>
-        更新ログ
-    </button>
-</div>
+<div id="invite-operator-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50"></div>
+<div id="edit-operator-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50"></div>
+<div id="confirmation-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50"></div>
 
-<div id="filter-container" class="fixed top-24 right-0 bottom-0 z-60 transition-transform translate-x-full">
-    <div id="filter-panel" class="h-full p-6 overflow-y-auto bg-surface w-[28rem] shadow-2xl" tabindex="-1">
-        <h5 class="text-title-large font-semibold text-on-surface mb-6">フィルターと検索</h5>
-        <form id="filter-form" class="space-y-4">
-            <div class="space-y-2">
-                <label for="operator-id" class="form-label">オペレーターID</label>
-                <input type="text" id="operator-id" name="operator-id" class="form-input w-full" placeholder="op-001">
-            </div>
-            <div class="space-y-2">
-                <label for="search-input" class="form-label">氏名・メール</label>
-                <input type="search" id="search-input" name="search-input" class="form-input w-full" placeholder="キーワードを入力">
-            </div>
-            <div class="border-t border-outline-variant pt-4 space-y-4">
-                <h4 class="text-title-medium font-medium text-on-surface-variant">分類</h4>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <p class="font-medium text-sm mb-1">権限</p>
-                        <div class="flex flex-col gap-1">
-                            <label class="form-check-label"><input type="checkbox" class="form-checkbox" name="role" value="入力専任"> 入力専任</label>
-                            <label class="form-check-label"><input type="checkbox" class="form-checkbox" name="role" value="照合兼任"> 照合兼任</label>
-                            <label class="form-check-label"><input type="checkbox" class="form-checkbox" name="role" value="管理者"> 管理者</label>
-                        </div>
-                    </div>
-                    <div>
-                        <p class="font-medium text-sm mb-1">状態</p>
-                        <div class="flex flex-col gap-1">
-                            <label class="form-check-label"><input type="checkbox" class="form-checkbox" name="status" value="active"> 稼働中</label>
-                            <label class="form-check-label"><input type="checkbox" class="form-checkbox" name="status" value="idle"> 待機中</label>
-                            <label class="form-check-label"><input type="checkbox" class="form-checkbox" name="status" value="suspended"> 停止中</label>
-                        </div>
-                    </div>
-                    <div>
-                        <p class="font-medium text-sm mb-1">グループ</p>
-                        <div class="flex flex-col gap-1">
-                            <label class="form-check-label"><input type="checkbox" class="form-checkbox" name="group" value="A"> グループA</label>
-                            <label class="form-check-label"><input type="checkbox" class="form-checkbox" name="group" value="B"> グループB</label>
-                            <label class="form-check-label"><input type="checkbox" class="form-checkbox" name="group" value="C"> グループC</label>
-                        </div>
-                    </div>
-                    <div>
-                        <p class="font-medium text-sm mb-1">タスク有無</p>
-                        <div class="flex flex-col gap-1">
-                            <label class="form-check-label"><input type="radio" class="form-radio" name="hasTask" value="yes"> あり</label>
-                            <label class="form-check-label"><input type="radio" class="form-radio" name="hasTask" value="no"> なし</label>
-                            <label class="form-check-label"><input type="radio" class="form-radio" name="hasTask" value="" checked> 指定なし</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="border-t border-outline-variant pt-4 space-y-4">
-                <h4 class="text-title-medium font-medium text-on-surface-variant">パフォーマンス</h4>
-                <div class="space-y-2">
-                    <label class="form-label text-sm">本日完了件数</label>
-                    <div class="flex items-center gap-2">
-                        <input type="number" name="todayCompleted_min" class="form-input w-full" placeholder="最小">
-                        <span>-</span>
-                        <input type="number" name="todayCompleted_max" class="form-input w-full" placeholder="最大">
-                    </div>
-                </div>
-                <div class="space-y-2">
-                    <label class="form-label text-sm">総完了件数</label>
-                    <div class="flex items-center gap-2">
-                        <input type="number" name="totalCompleted_min" class="form-input w-full" placeholder="最小">
-                        <span>-</span>
-                        <input type="number" name="totalCompleted_max" class="form-input w-full" placeholder="最大">
-                    </div>
-                </div>
-                <div class="space-y-2">
-                    <label class="form-label text-sm">精度 (%)</label>
-                    <div class="flex items-center gap-2">
-                        <input type="number" name="accuracy_min" class="form-input w-full" placeholder="最小" min="0" max="100">
-                        <span>-</span>
-                        <input type="number" name="accuracy_max" class="form-input w-full" placeholder="最大" min="0" max="100">
-                    </div>
-                </div>
-                <div class="space-y-2">
-                    <label class="form-label text-sm">平均処理時間 (秒)</label>
-                    <div class="flex items-center gap-2">
-                        <input type="number" name="avgProcessingTime_min" class="form-input w-full" placeholder="最小">
-                        <span>-</span>
-                        <input type="number" name="avgProcessingTime_max" class="form-input w-full" placeholder="最大">
-                    </div>
-                </div>
-            </div>
-            <div class="border-t border-outline-variant pt-4 space-y-4">
-                <h4 class="text-title-medium font-medium text-on-surface-variant">日付</h4>
-                <div class="space-y-2">
-                    <label for="registrationDate-range" class="form-label">登録日</label>
-                    <input type="text" id="registrationDate-range" name="registrationDate-range" class="form-input w-full" placeholder="期間を選択">
-                </div>
-                <div class="space-y-2">
-                    <label for="lastLoginDate-range" class="form-label">最終ログイン日</label>
-                    <input type="text" id="lastLoginDate-range" name="lastLoginDate-range" class="form-input w-full" placeholder="期間を選択">
-                </div>
-            </div>
-            <div class="flex justify-end gap-3 mt-6 border-t border-outline-variant pt-4">
-                <button type="button" id="reset-filter-btn" class="rounded-md bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">リセット</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<div id="history-container" class="fixed top-24 right-0 bottom-0 z-50 transition-transform translate-x-full">
-    <div id="history-panel" class="h-full p-6 overflow-y-auto bg-surface w-[28rem] shadow-2xl" tabindex="-1">
-        <h5 class="text-title-large font-semibold text-on-surface mb-4">最近の操作履歴</h5>
-        <div id="history-panel-content" class="space-y-4 text-sm"></div>
-    </div>
-</div>
+<script type="module" src="src/admin.js"></script>
+</body>
 
 <div id="invite-operator-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50"></div>
+<div id="edit-operator-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50"></div>
 <div id="confirmation-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50"></div>
 
 <script type="module" src="src/admin.js"></script>

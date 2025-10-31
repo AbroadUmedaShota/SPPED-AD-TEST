@@ -15,7 +15,8 @@ export function showConfirmationModal(message, onConfirm, options = {}) {
         title = '確認',
         confirmText = '実行',
         cancelText = 'キャンセル',
-        defaultCancel = true
+        defaultCancel = true,
+        prompt = null // New option for input field
     } = options;
 
     handleOpenModal('confirmationModal', 'modals/confirmationModal.html')
@@ -23,6 +24,7 @@ export function showConfirmationModal(message, onConfirm, options = {}) {
             const modal = document.getElementById('confirmationModal');
             const titleEl = document.getElementById('confirmationModalTitle');
             const messageEl = document.getElementById('confirmationModalMessage');
+            const inputContainer = document.getElementById('confirmationModalInputContainer');
             const confirmBtn = document.getElementById('confirmationModalConfirmBtn');
             const cancelBtn = document.getElementById('confirmationModalCancelBtn');
             const closeBtn = document.getElementById('closeConfirmationModalBtn');
@@ -31,6 +33,22 @@ export function showConfirmationModal(message, onConfirm, options = {}) {
             if (messageEl) messageEl.textContent = message;
             if (confirmBtn) confirmBtn.textContent = confirmText;
             if (cancelBtn) cancelBtn.textContent = cancelText;
+
+            // --- Prompt/Input Field Logic ---
+            let inputEl = null;
+            if (inputContainer) {
+                inputContainer.innerHTML = ''; // Clear previous content
+                if (prompt) {
+                    inputContainer.innerHTML = `
+                        <div class="input-group">
+                            <input type="${prompt.type || 'text'}" id="confirmationModalInput" class="input-field" placeholder=" " required>
+                            <label class="input-label" for="confirmationModalInput">${prompt.label || ''}</label>
+                        </div>
+                    `;
+                    inputEl = document.getElementById('confirmationModalInput');
+                }
+            }
+            // --- End Prompt Logic ---
 
             const newConfirmBtn = confirmBtn.cloneNode(true);
             confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
@@ -44,7 +62,8 @@ export function showConfirmationModal(message, onConfirm, options = {}) {
             };
 
             const confirmAndClose = () => {
-                onConfirm();
+                const inputValue = inputEl ? inputEl.value : null;
+                onConfirm(inputValue); // Pass input value to callback
                 closeModal('confirmationModal');
                 cleanup();
             };
@@ -60,14 +79,16 @@ export function showConfirmationModal(message, onConfirm, options = {}) {
                 closeBtn.addEventListener('click', cancelAction);
             }
 
-            if (defaultCancel) {
+            if (inputEl) {
+                inputEl.focus();
+            } else if (defaultCancel) {
                 newCancelBtn.focus();
             } else {
                 newConfirmBtn.focus();
             }
 
             const handleKeyDown = (event) => {
-                if (event.ctrlKey && event.key === 'Enter') {
+                if (event.key === 'Enter' && (inputEl === document.activeElement || newConfirmBtn === document.activeElement)) {
                     event.preventDefault();
                     confirmAndClose();
                 } else if (event.key === 'Escape') {

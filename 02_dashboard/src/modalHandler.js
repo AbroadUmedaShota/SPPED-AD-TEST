@@ -114,8 +114,14 @@ export async function handleOpenModal(modalId, filePath, callback) {
         }
     };
 
+    // Adjust path for calls from the admin directory
+    let finalPath = filePath;
+    if (window.location.pathname.includes('/03_admin/')) {
+        finalPath = `../02_dashboard/${filePath}`;
+    }
+
     try {
-        await loadModalFromFile(modalId, filePath);
+        await loadModalFromFile(modalId, finalPath);
         openAndCallback();
     } catch (error) {
         // Error is handled in loadModalFromFile
