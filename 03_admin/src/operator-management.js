@@ -3,8 +3,6 @@
  * Operator management page specific javascript
  */
 import { debounce } from '../../02_dashboard/src/utils.js';
-import flatpickr from 'https://cdn.jsdelivr.net/npm/flatpickr';
-import { Japanese } from 'https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js';
 
 // --- DUMMY DATA ---
 const firstNames = ['太郎', '花子', '次郎', '三郎', '陽葵', '凛', '蒼', '蓮', '湊', '結衣'];
@@ -13,7 +11,6 @@ const roles = ['入力専任', '照合兼任', '管理者'];
 const statuses = ['active', 'idle', 'suspended'];
 const groups = ['A', 'B', 'C'];
 
-// Helper function to generate a random date
 const randomDate = (start, end) => new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 
 const dummyOperators = [];
@@ -27,7 +24,7 @@ for (let i = 1; i <= 200; i++) {
     const accuracy = (Math.random() * 10 + 90).toFixed(1);
     const todayCompleted = Math.floor(Math.random() * 50);
     const totalCompleted = Math.floor(Math.random() * 1000) + 50;
-    const avgProcessingTime = Math.floor(Math.random() * 120) + 30; // 30-150 seconds
+    const avgProcessingTime = Math.floor(Math.random() * 120) + 30;
     const registrationDate = randomDate(new Date(2023, 0, 1), new Date());
     const lastLoginDate = randomDate(registrationDate, new Date());
 
@@ -41,8 +38,8 @@ for (let i = 1; i <= 200; i++) {
         todayCompleted: status === 'suspended' ? 0 : todayCompleted,
         accuracy: status === 'suspended' ? 0 : parseFloat(accuracy),
         status: status,
-        registrationDate: registrationDate.toISOString().split('T')[0], // YYYY-MM-DD
-        lastLoginDate: lastLoginDate.toISOString().split('T')[0], // YYYY-MM-DD
+        registrationDate: registrationDate.toISOString().split('T')[0],
+        lastLoginDate: lastLoginDate.toISOString().split('T')[0],
         totalCompleted: totalCompleted,
         avgProcessingTime: avgProcessingTime,
     });
@@ -63,13 +60,10 @@ const dummyHistory = [
     { type: '新規招待', actor: '佐藤 花子', message: '新規オペレーター (a.suzuki@example.com) を招待しました。', timestamp: '2025/10/29 17:40', color: 'purple-500' },
 ];
 
-// --- STATE MANAGEMENT ---
 let currentPage = 1;
 let rowsPerPage = 50;
 let filteredOperators = [...dummyOperators];
-let sortState = { key: null, direction: 'none' }; // none, asc, desc
-
-// --- UI ELEMENT RENDERING ---
+let sortState = { key: null, direction: 'none' };
 
 function displayTablePage() {
     const start = (currentPage - 1) * rowsPerPage;
@@ -101,37 +95,31 @@ function renderKpi(data) {
 
 function getStatusBadge(status) {
     switch (status) {
-        case 'active':
-            return '<span class="status-badge bg-green-100 text-green-800">稼働中</span>';
-        case 'idle':
-            return '<span class="status-badge bg-yellow-100 text-yellow-800">待機中</span>';
-        case 'suspended':
-            return '<span class="status-badge bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200">停止中</span>';
-        default:
-            return '';
+        case 'active': return '<span class="status-badge bg-green-100 text-green-800">稼働中</span>';
+        case 'idle': return '<span class="status-badge bg-yellow-100 text-yellow-800">待機中</span>';
+        case 'suspended': return '<span class="status-badge bg-gray-200 text-gray-700">停止中</span>';
+        default: return '';
     }
 }
 
 function renderOperatorTable(operators) {
     const tableBody = document.getElementById('operator-table-body');
     if (!tableBody) return;
-
     if (operators.length === 0) {
         tableBody.innerHTML = `<tr><td colspan="10" class="text-center py-12 text-on-surface-variant">該当するオペレーターが見つかりません。</td></tr>`;
         return;
     }
-
     tableBody.innerHTML = operators.map(op => `
         <tr class="hover:bg-surface-variant/60" data-operator-id="${op.id}">
             <td class="w-12 px-4 py-3 text-center"><input type="checkbox" class="row-checkbox form-checkbox" data-operator-id="${op.id}"></td>
-            <td class="w-40 px-4 py-3 font-medium text-on-surface">${op.name}</td>
+            <td class="w-32 px-4 py-3 font-medium text-on-surface">${op.name}</td>
             <td class="px-4 py-3 text-on-surface-variant">${op.email}</td>
             <td class="w-24 px-4 py-3 text-on-surface-variant">${op.role}</td>
-            <td class="w-40 px-4 py-3 text-on-surface-variant">${op.currentTaskName || '-'}</td>
+            <td class="w-32 px-4 py-3 text-on-surface-variant">${op.currentTaskName || '-'}</td>
             <td class="w-24 px-4 py-3 text-on-surface-variant text-right">${op.todayCompleted}</td>
             <td class="w-20 px-4 py-3 text-on-surface-variant text-right">${op.accuracy}%</td>
             <td class="w-24 px-4 py-3 text-on-surface-variant">${getStatusBadge(op.status)}</td>
-            <td class="w-40 px-4 py-3 text-center space-x-1">
+            <td class="w-80 px-4 py-3 text-center space-x-1">
                 <button class="action-btn detail-btn">詳細</button>
                 <button class="action-btn suspend-btn">稼働停止</button>
                 <button class="action-btn assign-btn">割当</button>
@@ -146,13 +134,7 @@ function updateSortIcons() {
         const icon = btn.querySelector('.material-icons');
         const key = btn.dataset.sortKey;
         if (key === sortState.key) {
-            if (sortState.direction === 'asc') {
-                icon.textContent = 'arrow_upward';
-            } else if (sortState.direction === 'desc') {
-                icon.textContent = 'arrow_downward';
-            } else {
-                icon.textContent = 'unfold_more';
-            }
+            icon.textContent = sortState.direction === 'asc' ? 'arrow_upward' : 'arrow_downward';
         } else {
             icon.textContent = 'unfold_more';
         }
@@ -162,75 +144,47 @@ function updateSortIcons() {
 function updatePaginationUI() {
     const paginationContainer = document.querySelector('nav[aria-label="ページネーション"] ul');
     if (!paginationContainer) return;
-
     const totalPages = Math.ceil(filteredOperators.length / rowsPerPage);
     paginationContainer.innerHTML = '';
-
     if (totalPages <= 1) return;
-
-    // Previous button
-    const prevLi = document.createElement('li');
-    const prevA = document.createElement('a');
-    prevA.href = '#';
-    prevA.textContent = '前へ';
-    prevA.className = 'flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700';
-    if (currentPage === 1) {
-        prevA.classList.add('opacity-50', 'cursor-not-allowed');
-    } else {
-        prevA.dataset.page = currentPage - 1;
-    }
-    prevLi.appendChild(prevA);
-    paginationContainer.appendChild(prevLi);
-
-    // Page numbers
-    for (let i = 1; i <= totalPages; i++) {
-        const pageLi = document.createElement('li');
-        const pageA = document.createElement('a');
-        pageA.href = '#';
-        pageA.textContent = i;
-        pageA.dataset.page = i;
-        if (i === currentPage) {
-            pageA.className = 'flex items-center justify-center px-3 h-8 text-blue-600 border border-gray-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700';
-            pageA.setAttribute('aria-current', 'page');
+    // Simplified pagination logic
+    const createPageLink = (page, text = page, isActive = false, isDisabled = false) => {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = '#';
+        a.textContent = text;
+        a.dataset.page = page;
+        a.className = `flex items-center justify-center px-3 h-8 leading-tight `;
+        if (isActive) {
+            a.className += 'text-blue-600 border border-gray-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700';
+            a.setAttribute('aria-current', 'page');
         } else {
-            pageA.className = 'flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700';
+            a.className += 'text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700';
         }
-        pageLi.appendChild(pageA);
-        paginationContainer.appendChild(pageLi);
+        if (isDisabled) {
+            a.classList.add('opacity-50', 'cursor-not-allowed');
+            a.removeAttribute('data-page');
+        }
+        li.appendChild(a);
+        return li;
+    };
+    paginationContainer.appendChild(createPageLink(currentPage - 1, '前へ', false, currentPage === 1));
+    for (let i = 1; i <= totalPages; i++) {
+        paginationContainer.appendChild(createPageLink(i, i, i === currentPage));
     }
-
-    // Next button
-    const nextLi = document.createElement('li');
-    const nextA = document.createElement('a');
-    nextA.href = '#';
-    nextA.textContent = '次へ';
-    nextA.className = 'flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700';
-    if (currentPage === totalPages || totalPages === 0) {
-        nextA.classList.add('opacity-50', 'cursor-not-allowed');
-    } else {
-        nextA.dataset.page = currentPage + 1;
-    }
-    nextLi.appendChild(nextA);
-    paginationContainer.appendChild(nextLi);
+    paginationContainer.appendChild(createPageLink(currentPage + 1, '次へ', false, currentPage === totalPages));
 }
 
 function toggleModal(modalId, show) {
     const modal = document.getElementById(modalId);
     if (modal) {
-        if (show) {
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        } else {
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        }
+        modal.classList.toggle('hidden', !show);
+        modal.classList.toggle('flex', show);
     }
 }
 
-// --- MAIN INITIALIZATION ---
-
 export function initOperatorManagementPage() {
-    flatpickr.localize(Japanese);
+    flatpickr.localize(flatpickr.l10ns.ja);
     flatpickr("#registrationDate-range", { mode: "range", dateFormat: "Y-m-d" });
     flatpickr("#lastLoginDate-range", { mode: "range", dateFormat: "Y-m-d" });
 
@@ -256,8 +210,6 @@ export function initOperatorManagementPage() {
         } else {
             filterContainer.classList.add('translate-x-full');
             filterArrowIcon.textContent = 'chevron_left';
-            filterContainer.style.zIndex = '60';
-            historyContainer.style.zIndex = '50';
         }
     });
 
@@ -273,15 +225,12 @@ export function initOperatorManagementPage() {
         } else {
             historyContainer.classList.add('translate-x-full');
             historyArrowIcon.textContent = 'chevron_left';
-            filterContainer.style.zIndex = '60';
-            historyContainer.style.zIndex = '50';
         }
     });
 
     document.addEventListener('click', (e) => {
         const openFilterBtn = document.getElementById('open-filter-panel-btn');
         const openHistoryBtn = document.getElementById('open-history-panel-btn');
-
         if (!filterContainer.classList.contains('translate-x-full') && !filterContainer.contains(e.target) && !openFilterBtn.contains(e.target)) {
             filterContainer.classList.add('translate-x-full');
             filterArrowIcon.textContent = 'chevron_left';
@@ -296,15 +245,12 @@ export function initOperatorManagementPage() {
         const formData = new FormData(filterForm);
         const searchTerm = formData.get('search-input')?.toLowerCase() || '';
         const operatorId = formData.get('operator-id')?.toLowerCase() || '';
-        
         const roles = formData.getAll('role');
         const statuses = formData.getAll('status');
         const groups = formData.getAll('group');
         const hasTask = formData.get('hasTask');
-
         const [regDateStart, regDateEnd] = (formData.get('registrationDate-range') || '').split(' to ');
         const [loginDateStart, loginDateEnd] = (formData.get('lastLoginDate-range') || '').split(' to ');
-
         const completedMin = formData.get('todayCompleted_min');
         const completedMax = formData.get('todayCompleted_max');
         const totalCompletedMin = formData.get('totalCompleted_min');
@@ -321,10 +267,8 @@ export function initOperatorManagementPage() {
             const statusMatch = statuses.length === 0 || statuses.includes(op.status);
             const groupMatch = groups.length === 0 || groups.includes(op.group);
             const hasTaskMatch = !hasTask || (hasTask === 'yes' && op.currentTaskName) || (hasTask === 'no' && !op.currentTaskName);
-            
             const regDateMatch = (!regDateStart || op.registrationDate >= regDateStart) && (!regDateEnd || op.registrationDate <= regDateEnd);
             const loginDateMatch = (!loginDateStart || op.lastLoginDate >= loginDateStart) && (!loginDateEnd || op.lastLoginDate <= loginDateEnd);
-
             const completedMinMatch = completedMin === '' || op.todayCompleted >= parseInt(completedMin);
             const completedMaxMatch = completedMax === '' || op.todayCompleted <= parseInt(completedMax);
             const totalCompletedMinMatch = totalCompletedMin === '' || op.totalCompleted >= parseInt(totalCompletedMin);
@@ -333,12 +277,8 @@ export function initOperatorManagementPage() {
             const accuracyMaxMatch = accuracyMax === '' || op.accuracy <= parseInt(accuracyMax);
             const avgTimeMinMatch = avgTimeMin === '' || op.avgProcessingTime >= parseInt(avgTimeMin);
             const avgTimeMaxMatch = avgTimeMax === '' || op.avgProcessingTime <= parseInt(avgTimeMax);
-            
-            return searchMatch && idMatch && roleMatch && statusMatch && groupMatch && hasTaskMatch && regDateMatch && loginDateMatch &&
-                   completedMinMatch && completedMaxMatch && totalCompletedMinMatch && totalCompletedMaxMatch && 
-                   accuracyMinMatch && accuracyMaxMatch && avgTimeMinMatch && avgTimeMaxMatch;
+            return searchMatch && idMatch && roleMatch && statusMatch && groupMatch && hasTaskMatch && regDateMatch && loginDateMatch && completedMinMatch && completedMaxMatch && totalCompletedMinMatch && totalCompletedMaxMatch && accuracyMinMatch && accuracyMaxMatch && avgTimeMinMatch && avgTimeMaxMatch;
         });
-
         currentPage = 1;
         sortState = { key: null, direction: 'none' };
         displayTablePage();
@@ -357,24 +297,19 @@ export function initOperatorManagementPage() {
         btn.addEventListener('click', () => {
             const key = btn.dataset.sortKey;
             let direction = 'asc';
-
             if (sortState.key === key) {
                 if (sortState.direction === 'asc') direction = 'desc';
                 else if (sortState.direction === 'desc') direction = 'none';
             }
-
             sortState = { key: direction === 'none' ? null : key, direction };
-
             if (direction === 'none') {
                 applyFiltersAndSearch();
             } else {
                 filteredOperators.sort((a, b) => {
                     const valA = a[key];
                     const valB = b[key];
-
                     if (valA === null) return 1;
                     if (valB === null) return -1;
-
                     if (typeof valA === 'string') {
                         return direction === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
                     } else if (typeof valA === 'number') {
@@ -383,7 +318,6 @@ export function initOperatorManagementPage() {
                     return 0;
                 });
             }
-            
             currentPage = 1;
             displayTablePage();
         });

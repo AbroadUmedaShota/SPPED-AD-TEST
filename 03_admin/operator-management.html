@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
     <link rel="stylesheet" href="../02_dashboard/service-top-style.css">
     <link rel="stylesheet" href="src/admin-style.css">
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
@@ -56,14 +58,14 @@
                             <thead class="bg-surface-variant text-on-surface-variant text-xs uppercase">
                                 <tr>
                                     <th class="w-12 px-4 py-3 text-center"><input type="checkbox" id="select-all-checkbox" class="form-checkbox"></th>
-                                    <th class="w-40 px-4 py-3 text-left"><button class="sort-btn" data-sort-key="name">氏名<span class="material-icons text-base">unfold_more</span></button></th>
+                                    <th class="w-32 px-4 py-3 text-left"><button class="sort-btn" data-sort-key="name">氏名<span class="material-icons text-base">unfold_more</span></button></th>
                                     <th class="px-4 py-3 text-left"><button class="sort-btn" data-sort-key="email">メール<span class="material-icons text-base">unfold_more</span></button></th>
                                     <th class="w-24 px-4 py-3 text-left"><button class="sort-btn" data-sort-key="role">権限<span class="material-icons text-base">unfold_more</span></button></th>
-                                    <th class="w-40 px-4 py-3 text-left"><button class="sort-btn" data-sort-key="currentTaskName">現在タスク<span class="material-icons text-base">unfold_more</span></button></th>
-                                    <th class="w-24 px-4 py-3 text-right"><button class="sort-btn w-full justify-end" data-sort-key="todayCompleted">本日完了<span class="material-icons text-base">unfold_more</span></button></th>
-                                    <th class="w-20 px-4 py-3 text-right"><button class="sort-btn w-full justify-end" data-sort-key="accuracy">精度<span class="material-icons text-base">unfold_more</span></button></th>
+                                    <th class="w-32 px-4 py-3 text-left"><button class="sort-btn" data-sort-key="currentTaskName">現在タスク<span class="material-icons text-base">unfold_more</span></button></th>
+                                    <th class="w-24 px-4 py-3 text-right"><button class="sort-btn w-full justify-end flex-nowrap" data-sort-key="todayCompleted">本日完了<span class="material-icons text-base">unfold_more</span></button></th>
+                                    <th class="w-20 px-4 py-3 text-right"><button class="sort-btn w-full justify-end flex-nowrap" data-sort-key="accuracy">精度<span class="material-icons text-base">unfold_more</span></button></th>
                                     <th class="w-24 px-4 py-3 text-left"><button class="sort-btn" data-sort-key="status">状態<span class="material-icons text-base">unfold_more</span></button></th>
-                                    <th class="w-40 px-4 py-3 text-center">操作</th>
+                                    <th class="w-80 px-4 py-3 text-center">操作</th>
                                 </tr>
                             </thead>
                             <tbody id="operator-table-body"></tbody>
