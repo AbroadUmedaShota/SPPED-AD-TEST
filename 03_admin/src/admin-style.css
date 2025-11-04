@@ -194,3 +194,12 @@ body.dark-mode #graphModal #modalCloseBtn:hover {
     color: var(--color-primary);
     border-color: var(--color-primary);
 }
+
+.button-danger {
+    background-color: var(--color-button-danger-bg);
+    color: var(--color-button-danger-text);
+}
+
+.button-danger:hover {
+    background-color: var(--color-button-danger-hover-bg);
+}

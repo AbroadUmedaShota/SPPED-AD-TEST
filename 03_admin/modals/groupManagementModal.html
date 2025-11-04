@@ -1,0 +1,56 @@
+<div class="modal-content-transition max-w-3xl w-full bg-surface rounded-2xl shadow-lg overflow-hidden">
+    <div class="p-6 border-b border-outline-variant">
+        <div class="flex justify-between items-center">
+            <h2 class="text-headline-small font-semibold text-on-surface">グループ管理</h2>
+            <button id="close-group-modal-btn" class="text-on-surface-variant hover:text-on-surface">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Create New Group Section -->
+            <div class="space-y-4">
+                <h3 class="text-title-medium font-semibold text-on-surface">新しいグループを作成</h3>
+                <div class="form-group">
+                    <label for="new-group-name" class="form-label">グループ名</label>
+                    <input type="text" id="new-group-name" class="form-input w-full" placeholder="例：東京営業部">
+                </div>
+                <button id="create-group-btn" class="button-primary w-full">
+                    <span class="material-icons">add</span>
+                    <span>作成</span>
+                </button>
+            </div>
+
+            <!-- Edit Existing Group Section -->
+            <div class="space-y-4">
+                <h3 class="text-title-medium font-semibold text-on-surface">既存のグループを編集</h3>
+                <div class="form-group">
+                    <label for="select-group" class="form-label">グループを選択</label>
+                    <select id="select-group" class="form-select w-full">
+                        <option value="">グループを選択してください</option>
+                        <!-- Group options will be populated by JavaScript -->
+                    </select>
+                </div>
+
+                <div id="group-members-section" class="hidden space-y-3">
+                    <h4 class="text-title-small font-medium text-on-surface-variant">所属メンバー</h4>
+                    <div id="group-members-list" class="max-h-48 overflow-y-auto border border-outline-variant rounded-md p-3 space-y-2">
+                        <!-- Member list will be populated by JavaScript -->
+                    </div>
+                    <div class="flex justify-end gap-2">
+                         <button id="delete-group-btn" class="button-danger">
+                            <span class="material-icons">delete</span>
+                            <span>グループ削除</span>
+                        </button>
+                        <button id="update-group-btn" class="button-primary">
+                            <span class="material-icons">save</span>
+                            <span>更新</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

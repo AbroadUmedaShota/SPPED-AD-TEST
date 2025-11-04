@@ -20,41 +20,15 @@ export function initCouponManagementPage() {
 
     function setupEventListeners() {
         document.getElementById('newCouponButton').addEventListener('click', () => {
-            handleOpenModal('newCouponModal', '03_admin/modals/newCouponModal.html', setupNewCouponModal);
+            handleOpenModal('newCouponModal', '/03_admin/modals/newCouponModal.html', setupNewCouponModal);
         });
 
-        searchForm.addEventListener('submit', e => {
-            e.preventDefault();
-            applyFiltersAndRender();
-        });
-
-        document.getElementById('resetButton').addEventListener('click', () => {
-            searchForm.reset();
-            applyFiltersAndRender();
-        });
-
-        tableHeader.addEventListener('click', e => {
-            const th = e.target.closest('th[data-sort-key]');
-            if (th) {
-                const key = th.dataset.sortKey;
-                sortKey = key;
-                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
-                renderAll();
-            }
-        });
-
-        tableBody.addEventListener('click', e => {
-            const button = e.target.closest('button');
-            if (!button) return;
-
-            const couponId = button.dataset.couponId;
-            const coupon = allCouponsData.find(c => c.id === couponId);
-            if (!coupon) return;
+        // ... (other event listeners)
 
             if (button.classList.contains('detail-btn')) {
-                handleOpenModal('couponDetailModal', '03_admin/modals/couponDetailModal.html', () => setupCouponDetailModal(coupon));
+                handleOpenModal('couponDetailModal', '/03_admin/modals/couponDetailModal.html', () => setupCouponDetailModal(coupon));
             } else if (button.classList.contains('edit-btn')) {
-                handleOpenModal('editCouponModal', '03_admin/modals/editCouponModal.html', () => setupCouponEditModal(coupon));
+                handleOpenModal('editCouponModal', '/03_admin/modals/editCouponModal.html', () => setupCouponEditModal(coupon));
             }
         });
 

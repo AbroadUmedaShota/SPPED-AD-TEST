@@ -540,6 +540,103 @@ export function initOperatorManagementPage() {
     initCollapsibleToolbox(); // Keep the sliding panel logic
     adjustPagePaddingForFooter(); // Add padding for footer
 
+    // --- Bulk Action and Checkbox Logic ---
+    const selectAllCheckbox = document.getElementById('select-all-checkbox');
+    const tableBody = document.getElementById('operator-table-body');
+
+    function updateBulkActionUI() {
+        const bulkActionSection = document.getElementById('bulk-action-section');
+        if (!bulkActionSection) return;
+
+        const selectedCheckboxes = document.querySelectorAll('.row-checkbox:checked');
+        const hasSelection = selectedCheckboxes.length > 0;
+
+        bulkActionSection.classList.toggle('hidden', !hasSelection);
+
+        const bulkDeleteBtn = document.getElementById('bulk-delete-btn');
+        const bulkChangeRoleBtn = document.getElementById('bulk-change-role-btn');
+        const bulkChangeAffiliationBtn = document.getElementById('bulk-change-affiliation-btn');
+
+        if (bulkDeleteBtn) bulkDeleteBtn.disabled = !hasSelection;
+        if (bulkChangeRoleBtn) bulkChangeRoleBtn.disabled = !hasSelection;
+        if (bulkChangeAffiliationBtn) bulkChangeAffiliationBtn.disabled = !hasSelection;
+
+        // Update select-all checkbox state
+        if (selectAllCheckbox) {
+            const totalCheckboxes = document.querySelectorAll('.row-checkbox').length;
+            if (totalCheckboxes > 0) {
+                selectAllCheckbox.checked = hasSelection && selectedCheckboxes.length === totalCheckboxes;
+                selectAllCheckbox.indeterminate = hasSelection && selectedCheckboxes.length < totalCheckboxes;
+            }
+        }
+    }
+
+    selectAllCheckbox?.addEventListener('change', (e) => {
+        document.querySelectorAll('.row-checkbox').forEach(checkbox => {
+            checkbox.checked = e.target.checked;
+        });
+        updateBulkActionUI();
+    });
+
+    tableBody?.addEventListener('change', (e) => {
+        if (e.target.classList.contains('row-checkbox')) {
+            updateBulkActionUI();
+        }
+    });
+
+    document.getElementById('bulk-delete-btn')?.addEventListener('click', () => {
+        const selectedIds = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.dataset.operatorId);
+        if (selectedIds.length === 0) return;
+
+        showConfirmationModal(`選択した ${selectedIds.length} 人のオペレーターを削除します。この操作は元に戻せません。よろしいですか？`, () => {
+            dummyOperators = dummyOperators.filter(op => !selectedIds.includes(op.id));
+            applyFiltersAndSearch();
+            showToast(`${selectedIds.length} 人のオペレーターを削除しました。`, 'success');
+        }, { title: '一括削除の確認', confirmText: '削除' });
+    });
+
+    document.getElementById('bulk-change-role-btn')?.addEventListener('click', () => {
+        const selectedIds = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.dataset.operatorId);
+        if (selectedIds.length === 0) return;
+
+        const roleOptions = roles.map(r => `<option value="${r}">${r}</option>`).join('');
+        showConfirmationModal(`選択した ${selectedIds.length} 人の権限を新しい権限に変更します。`, (newRole) => {
+            if (newRole) {
+                dummyOperators.forEach(op => {
+                    if (selectedIds.includes(op.id)) op.role = newRole;
+                });
+                applyFiltersAndSearch();
+                showToast(`${selectedIds.length} 人の権限を「${newRole}」に変更しました。`, 'success');
+            }
+        }, { 
+            title: '一括権限変更',
+            confirmText: '変更を適用',
+            prompt: { type: 'select', label: '新しい権限', options: roleOptions }
+        });
+    });
+
+    document.getElementById('bulk-change-affiliation-btn')?.addEventListener('click', () => {
+        const selectedIds = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.dataset.operatorId);
+        if (selectedIds.length === 0) return;
+
+        const affiliationOptions = affiliations.map(a => `<option value="${a}">${a}</option>`).join('');
+        showConfirmationModal(`選択した ${selectedIds.length} 人の所属を新しい所属に変更します。`, (newAffiliation) => {
+            if (newAffiliation) {
+                dummyOperators.forEach(op => {
+                    if (selectedIds.includes(op.id)) op.affiliation = newAffiliation;
+                });
+                applyFiltersAndSearch();
+                showToast(`${selectedIds.length} 人の所属を「${newAffiliation}」に変更しました。`, 'success');
+            }
+        }, { 
+            title: '一括所属変更',
+            confirmText: '変更を適用',
+            prompt: { type: 'select', label: '新しい所属', options: affiliationOptions }
+        });
+    });
+
+
+
     filterForm?.addEventListener('input', debounce(applyFiltersAndSearch, 300));
 
     document.getElementById('reset-filter-btn')?.addEventListener('click', () => {
@@ -634,25 +731,10 @@ export function initOperatorManagementPage() {
         }
     });
     
-    const selectAllCheckbox = document.getElementById('select-all-checkbox');
-    selectAllCheckbox?.addEventListener('change', (e) => {
-        const isChecked = e.target.checked;
-        document.querySelectorAll('.row-checkbox').forEach(checkbox => {
-            checkbox.checked = isChecked;
-        });
-    });
 
-    document.getElementById('operator-table-body')?.addEventListener('change', (e) => {
-        if (e.target.classList.contains('row-checkbox')) {
-            if (!e.target.checked) {
-                selectAllCheckbox.checked = false;
-            } else {
-                const allChecked = Array.from(document.querySelectorAll('.row-checkbox')).every(checkbox => checkbox.checked);
-                selectAllCheckbox.checked = allChecked;
-            }
-        }
-    });
 }
+
+
 
 /**
  * Initializes the collapsible toolbox functionality.

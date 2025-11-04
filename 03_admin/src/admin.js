@@ -212,6 +212,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         case 'operator-management.html':
             const { initOperatorManagementPage } = await import('./operator-management.js');
             initOperatorManagementPage();
+            const { initGroupManagement } = await import('./groupManagement.js');
+            initGroupManagement();
             break;
         case 'coupon-management.html':
             const { initCouponManagementPage } = await import('./coupon-management.js');

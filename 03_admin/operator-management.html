@@ -29,15 +29,41 @@
                 <div id="breadcrumb-container" class="mb-4"></div>
                 <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant">
                     <h1 class="text-on-background text-headline-large font-bold leading-tight tracking-tight">オペレーター管理</h1>
-                    <button id="open-invite-modal-btn" class="flex items-center justify-center gap-2 min-w-[84px] max-w-[480px] cursor-pointer overflow-hidden rounded-full h-10 px-5 button-primary text-on-primary text-sm font-semibold leading-normal " aria-label="オペレーター招待">
-                        <span class="material-icons text-base">person_add_alt</span>
-                        <span class="truncate">オペレーター招待</span>
-                    </button>
+                    <div class="flex items-center gap-4">
+                        <button id="open-group-modal-btn" class="flex items-center justify-center gap-2 min-w-[84px] max-w-[480px] cursor-pointer overflow-hidden rounded-full h-10 px-5 button-secondary text-on-secondary-container text-sm font-semibold leading-normal" aria-label="グループ作成">
+                            <span class="material-icons text-base">group_add</span>
+                            <span class="truncate">グループ管理</span>
+                        </button>
+                        <button id="open-invite-modal-btn" class="flex items-center justify-center gap-2 min-w-[84px] max-w-[480px] cursor-pointer overflow-hidden rounded-full h-10 px-5 button-primary text-on-primary text-sm font-semibold leading-normal " aria-label="オペレーター招待">
+                            <span class="material-icons text-base">person_add_alt</span>
+                            <span class="truncate">オペレーター招待</span>
+                        </button>
+                    </div>
                 </div>
                 <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
                     <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
                         <h2 class="text-title-large font-semibold text-on-surface">オペレーター一覧</h2>
                     </div>
+
+                    <!-- 一括操作セクション -->
+                    <div id="bulk-action-section" class="mb-4 p-4 border border-outline-variant rounded-lg bg-surface-variant/40 hidden">
+                        <h3 class="text-title-medium font-semibold text-on-surface mb-3">選択中のオペレーターを一括操作</h3>
+                        <div class="flex flex-wrap gap-3">
+                            <button id="bulk-delete-btn" class="button-danger text-on-error-container px-4 py-2 text-sm font-semibold" disabled>
+                                <span class="material-icons text-base">delete</span>
+                                一括削除
+                            </button>
+                            <button id="bulk-change-role-btn" class="button-secondary text-on-secondary-container px-4 py-2 text-sm font-semibold" disabled>
+                                <span class="material-icons text-base">manage_accounts</span>
+                                一括権限変更
+                            </button>
+                            <button id="bulk-change-affiliation-btn" class="button-secondary text-on-secondary-container px-4 py-2 text-sm font-semibold" disabled>
+                                <span class="material-icons text-base">apartment</span>
+                                一括所属変更
+                            </button>
+                        </div>
+                    </div>
+
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-outline-variant text-sm" aria-label="オペレーター一覧テーブル">
                             <thead class="bg-surface-variant text-on-surface-variant text-xs uppercase">
@@ -133,13 +159,7 @@
 <div id="invite-operator-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50"></div>
 <div id="edit-operator-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50"></div>
 <div id="confirmation-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50"></div>
-
-<script type="module" src="src/admin.js"></script>
-</body>
-
-<div id="invite-operator-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50"></div>
-<div id="edit-operator-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50"></div>
-<div id="confirmation-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50"></div>
+<div id="group-management-modal" class="modal-overlay" data-state="closed"></div>
 
 <script type="module" src="src/admin.js"></script>
 </body>
