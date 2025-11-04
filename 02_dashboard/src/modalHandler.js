@@ -51,6 +51,36 @@ async function loadModalFromFile(modalId, filePath) {
                     cancelBtn.addEventListener('click', () => closeModal(modalId));
                 }
             }
+            if (modalId === 'newCouponModal') {
+                const closeBtn = modalElement.querySelector('#closeNewCouponModalBtn');
+                const cancelBtn = modalElement.querySelector('#cancelNewCouponModalBtn');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => closeModal(modalId));
+                }
+                if (cancelBtn) {
+                    cancelBtn.addEventListener('click', () => closeModal(modalId));
+                }
+            }
+            if (modalId === 'couponDetailModal') {
+                const closeBtn = modalElement.querySelector('#closeCouponDetailModalBtn');
+                const cancelBtn = modalElement.querySelector('#closeDetailModalBtn');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => closeModal(modalId));
+                }
+                if (cancelBtn) {
+                    cancelBtn.addEventListener('click', () => closeModal(modalId));
+                }
+            }
+            if (modalId === 'editCouponModal') {
+                const closeBtn = modalElement.querySelector('#closeEditCouponModalBtn');
+                const cancelBtn = modalElement.querySelector('#cancelEditCouponModalBtn');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => closeModal(modalId));
+                }
+                if (cancelBtn) {
+                    cancelBtn.addEventListener('click', () => closeModal(modalId));
+                }
+            }
             if (modalId === 'reviewDetailModalOverlay') {
                 const closeBtn = modalElement.querySelector('#closeDetailModalBtn');
                 if (closeBtn) {
@@ -114,14 +144,8 @@ export async function handleOpenModal(modalId, filePath, callback) {
         }
     };
 
-    // Adjust path for calls from the admin directory
-    let finalPath = filePath;
-    if (window.location.pathname.includes('/03_admin/')) {
-        finalPath = `../02_dashboard/${filePath}`;
-    }
-
     try {
-        await loadModalFromFile(modalId, finalPath);
+        await loadModalFromFile(modalId, filePath);
         openAndCallback();
     } catch (error) {
         // Error is handled in loadModalFromFile
