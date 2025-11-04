@@ -16,19 +16,19 @@
                     <!-- クーポンコード (編集不可) -->
                     <label class="flex flex-col gap-1 text-on-surface-variant text-sm md:col-span-2">
                         <span>クーポンコード</span>
-                        <input type="text" id="editCouponCode" name="code" class="form-input bg-surface-container" readonly>
+                        <input type="text" id="editCouponCode" name="code" class="form-input bg-surface-container text-on-surface" readonly>
                     </label>
 
                     <!-- クーポン名称 -->
                     <label class="flex flex-col gap-1 text-on-surface-variant text-sm md:col-span-2">
                         <span>クーポン名称</span>
-                        <input type="text" id="editCouponName" name="name" class="form-input" required maxlength="100">
+                        <input type="text" id="editCouponName" name="name" class="form-input text-on-surface placeholder:text-on-surface-variant" required maxlength="100">
                     </label>
 
                     <!-- 対象メールアドレス -->
                     <label class="flex flex-col gap-1 text-on-surface-variant text-sm md:col-span-2">
                         <span>対象メールアドレス (任意)</span>
-                        <input type="email" id="editCouponTargetEmail" name="targetUserEmail" class="form-input">
+                        <input type="email" id="editCouponTargetEmail" name="targetUserEmail" class="form-input text-on-surface placeholder:text-on-surface-variant">
                     </label>
                 </div>
 
@@ -36,13 +36,13 @@
                     <!-- 有効期限（開始） -->
                     <label class="flex flex-col gap-1 text-on-surface-variant text-sm">
                         <span>有効期限 (開始)</span>
-                        <input type="date" id="editCouponValidFrom" name="validFrom" class="form-input" required>
+                        <input type="date" id="editCouponValidFrom" name="validFrom" class="form-input text-on-surface placeholder:text-on-surface-variant" required>
                     </label>
 
                     <!-- 有効期限（終了） -->
                     <label class="flex flex-col gap-1 text-on-surface-variant text-sm">
                         <span>有効期限 (終了)</span>
-                        <input type="date" id="editCouponValidTo" name="validTo" class="form-input" required>
+                        <input type="date" id="editCouponValidTo" name="validTo" class="form-input text-on-surface placeholder:text-on-surface-variant" required>
                     </label>
                 </div>
 
@@ -50,13 +50,13 @@
                     <!-- 割引率 (編集不可) -->
                     <label class="flex flex-col gap-1 text-on-surface-variant text-sm">
                         <span>割引率 (%)</span>
-                        <input type="number" id="editCouponDiscountRate" name="discountRate" class="form-input bg-surface-container" readonly>
+                        <input type="number" id="editCouponDiscountRate" name="discountRate" class="form-input bg-surface-container text-on-surface" readonly>
                     </label>
 
                     <!-- 利用回数上限 -->
                     <div class="flex flex-col gap-1 text-on-surface-variant text-sm">
                         <span>利用回数上限</span>
-                        <input type="number" id="editCouponUsageLimit" name="usageLimit" class="form-input" required min="1">
+                        <input type="number" id="editCouponUsageLimit" name="usageLimit" class="form-input text-on-surface placeholder:text-on-surface-variant" required min="1">
                         <label class="flex items-center gap-2 mt-2 text-sm">
                             <input type="checkbox" id="editUnlimitedUsage" class="form-checkbox">
                             <span>無制限にする</span>
@@ -67,7 +67,7 @@
                 <!-- メモ -->
                 <label class="flex flex-col gap-1 text-on-surface-variant text-sm">
                     <span>メモ (任意)</span>
-                    <textarea id="editCouponMemo" name="memo" class="form-textarea" rows="3" maxlength="500"></textarea>
+                    <textarea id="editCouponMemo" name="memo" class="form-textarea text-on-surface placeholder:text-on-surface-variant" rows="3" maxlength="500"></textarea>
                 </label>
             </form>
         </div>

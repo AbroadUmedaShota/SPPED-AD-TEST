@@ -17,7 +17,7 @@
                     <label class="flex flex-col gap-1 text-on-surface-variant text-sm md:col-span-2">
                         <span>クーポンコード</span>
                         <div class="flex items-center gap-2">
-                            <input type="text" id="newCouponCode" name="code" class="form-input flex-grow" placeholder="例: SPRING25" required maxlength="50">
+                            <input type="text" id="newCouponCode" name="code" class="form-input flex-grow text-on-surface placeholder:text-on-surface-variant" placeholder="例: SPRING25" required maxlength="50">
                             <button type="button" id="generateCouponCode" class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-2 text-sm font-semibold text-on-surface">
                                 <span class="material-icons text-base">autorenew</span>
                                 自動生成
@@ -29,13 +29,13 @@
                     <!-- クーポン名称 -->
                     <label class="flex flex-col gap-1 text-on-surface-variant text-sm md:col-span-2">
                         <span>クーポン名称</span>
-                        <input type="text" id="newCouponName" name="name" class="form-input" placeholder="例: 2025年春のプロモーション" required maxlength="100">
+                        <input type="text" id="newCouponName" name="name" class="form-input text-on-surface placeholder:text-on-surface-variant" placeholder="例: 2025年春のプロモーション" required maxlength="100">
                     </label>
 
                     <!-- 対象メールアドレス -->
                     <label class="flex flex-col gap-1 text-on-surface-variant text-sm md:col-span-2">
                         <span>対象メールアドレス (任意)</span>
-                        <input type="email" id="newCouponTargetEmail" name="targetUserEmail" class="form-input" placeholder="例: user@example.com">
+                        <input type="email" id="newCouponTargetEmail" name="targetUserEmail" class="form-input text-on-surface placeholder:text-on-surface-variant" placeholder="例: user@example.com">
                         <p class="text-xs text-on-surface-variant mt-1">クーポンを送付する対象の記録用です。このメールアドレスのみに利用が制限されるわけではありません。</p>
                     </label>
                 </div>
@@ -44,13 +44,13 @@
                     <!-- 有効期限（開始） -->
                     <label class="flex flex-col gap-1 text-on-surface-variant text-sm">
                         <span>有効期限 (開始)</span>
-                        <input type="date" id="newCouponValidFrom" name="validFrom" class="form-input" required>
+                        <input type="date" id="newCouponValidFrom" name="validFrom" class="form-input text-on-surface placeholder:text-on-surface-variant" required>
                     </label>
 
                     <!-- 有効期限（終了） -->
                     <label class="flex flex-col gap-1 text-on-surface-variant text-sm">
                         <span>有効期限 (終了)</span>
-                        <input type="date" id="newCouponValidTo" name="validTo" class="form-input" required>
+                        <input type="date" id="newCouponValidTo" name="validTo" class="form-input text-on-surface placeholder:text-on-surface-variant" required>
                     </label>
                 </div>
 
@@ -58,13 +58,13 @@
                     <!-- 割引率 -->
                     <label class="flex flex-col gap-1 text-on-surface-variant text-sm">
                         <span>割引率 (%)</span>
-                        <input type="number" id="newCouponDiscountRate" name="discountRate" class="form-input" placeholder="1〜50の整数" required min="1" max="50">
+                        <input type="number" id="newCouponDiscountRate" name="discountRate" class="form-input text-on-surface placeholder:text-on-surface-variant" placeholder="1〜50の整数" required min="1" max="50">
                     </label>
 
                     <!-- 利用回数上限 -->
                     <div class="flex flex-col gap-1 text-on-surface-variant text-sm">
                         <span>利用回数上限</span>
-                        <input type="number" id="newCouponUsageLimit" name="usageLimit" class="form-input" placeholder="1以上の整数" required min="1">
+                        <input type="number" id="newCouponUsageLimit" name="usageLimit" class="form-input text-on-surface placeholder:text-on-surface-variant" placeholder="1以上の整数" required min="1">
                         <label class="flex items-center gap-2 mt-2 text-sm">
                             <input type="checkbox" id="unlimitedUsage" class="form-checkbox">
                             <span>無制限にする</span>
@@ -75,7 +75,7 @@
                 <!-- メモ -->
                 <label class="flex flex-col gap-1 text-on-surface-variant text-sm">
                     <span>メモ (任意)</span>
-                    <textarea id="newCouponMemo" name="memo" class="form-textarea" rows="3" placeholder="管理用の内部メモ" maxlength="500"></textarea>
+                    <textarea id="newCouponMemo" name="memo" class="form-textarea text-on-surface placeholder:text-on-surface-variant" rows="3" placeholder="管理用の内部メモ" maxlength="500"></textarea>
                 </label>
             </form>
         </div>

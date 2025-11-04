@@ -19,16 +19,16 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <label class="flex flex-col gap-1 text-on-surface-variant text-sm">
                             <span>作成件数</span>
-                            <input type="number" name="quantity" class="form-input" placeholder="1以上の整数" required min="1" value="10">
+                            <input type="number" name="quantity" class="form-input text-on-surface placeholder:text-on-surface-variant" placeholder="1以上の整数" required min="1" value="10">
                         </label>
                         <label class="flex flex-col gap-1 text-on-surface-variant text-sm">
                             <span>割引率 (%)</span>
-                            <input type="number" name="discountRate" class="form-input" placeholder="1〜50の整数" required min="1" max="50">
+                            <input type="number" name="discountRate" class="form-input text-on-surface placeholder:text-on-surface-variant" placeholder="1〜50の整数" required min="1" max="50">
                         </label>
                         <div class="flex flex-col gap-1 text-on-surface-variant text-sm">
                             <span>利用回数上限</span>
                             <div class="flex items-center gap-4">
-                                <input type="number" id="bulkCouponUsageLimit" name="usageLimit" class="form-input" placeholder="1以上の整数" required min="1" value="1">
+                                <input type="number" id="bulkCouponUsageLimit" name="usageLimit" class="form-input text-on-surface placeholder:text-on-surface-variant" placeholder="1以上の整数" required min="1" value="1">
                                 <label class="flex items-center gap-2 flex-shrink-0">
                                     <input type="checkbox" id="bulkUnlimitedUsage" name="unlimited" class="form-checkbox">
                                     <span class="whitespace-nowrap">無制限</span>
@@ -38,15 +38,15 @@
                         <div class="flex flex-col gap-1 text-on-surface-variant text-sm md:col-span-2">
                             <span>有効期限</span>
                             <div class="flex items-center gap-2">
-                                <input type="date" name="validFrom" class="form-input w-full" required>
+                                <input type="date" name="validFrom" class="form-input w-full text-on-surface placeholder:text-on-surface-variant" required>
                                 <span class="text-on-surface-variant">〜</span>
-                                <input type="date" name="validTo" class="form-input w-full" required>
+                                <input type="date" name="validTo" class="form-input w-full text-on-surface placeholder:text-on-surface-variant" required>
                             </div>
                         </div>
                     </div>
                      <label class="flex flex-col gap-1 text-on-surface-variant text-sm">
                         <span>メモ (任意)</span>
-                        <textarea name="memo" class="form-textarea" rows="2" placeholder="管理用の内部メモ" maxlength="500"></textarea>
+                        <textarea name="memo" class="form-textarea text-on-surface placeholder:text-on-surface-variant" rows="2" placeholder="管理用の内部メモ" maxlength="500"></textarea>
                     </label>
                 </form>
             </div>

@@ -179,11 +179,17 @@ function setupEventListeners() {
         } else if (button.classList.contains('edit-btn')) {
             handleOpenModal('editCouponModal', 'modals/editCouponModal.html', (close) => setupEditCouponModal(coupon, close));
         } else if (button.classList.contains('delete-btn')) {
-            if (confirm(`本当にクーポン「${coupon.name}」を削除しますか？`)) {
-                allCoupons = allCoupons.filter(item => item.id !== couponId);
-                updateAndRender();
-                showToast('クーポンを削除しました。');
-            }
+            const modalOptions = {
+                title: 'クーポン削除',
+                message: `本当にクーポン「${coupon.name}」を削除しますか？この操作は元に戻せません。`,
+                confirmText: '削除',
+                onConfirm: () => {
+                    allCoupons = allCoupons.filter(item => item.id !== couponId);
+                    updateAndRender();
+                    showToast('クーポンを削除しました。');
+                }
+            };
+            handleOpenModal('confirmationModal', 'modals/confirmationModal.html', (close) => setupConfirmationModal(modalOptions, close));
         }
     });
 }
@@ -229,7 +235,7 @@ function renderTable(coupons) {
             <td class="px-4 py-3 text-left whitespace-nowrap">
                 <button class="detail-btn border border-outline hover:bg-surface-container text-on-surface text-xs font-semibold px-3 py-1 rounded-full" data-coupon-id="${c.id}">詳細</button>
                 <button class="edit-btn border border-outline hover:bg-surface-container text-on-surface text-xs font-semibold px-3 py-1 rounded-full ml-2" data-coupon-id="${c.id}">編集</button>
-                <button class="delete-btn bg-error text-on-error text-xs font-semibold px-3 py-1 rounded-full ml-2" data-coupon-id="${c.id}">削除</button>
+                <button class="delete-btn bg-red-600 text-white text-xs font-semibold px-3 py-1 rounded-full ml-2" data-coupon-id="${c.id}">削除</button>
             </td>`;
         tableBody.appendChild(row);
     });
@@ -238,29 +244,79 @@ function renderTable(coupons) {
 function renderPagination(total, pages, start, end) {
     paginationInfo.textContent = `${total}件中 ${total > 0 ? start + 1 : 0}〜${Math.min(end, total)}件を表示`;
     paginationControls.innerHTML = '';
-    if (pages <= 1) return;
 
-    const prev = document.createElement('button');
-    prev.innerHTML = `<span class="material-icons text-base">chevron_left</span>`;
-    prev.disabled = state.currentPage === 1;
-    prev.className = 'p-1 rounded-full disabled:opacity-50';
-    prev.addEventListener('click', () => { state.currentPage--; updateAndRender(); });
-    paginationControls.appendChild(prev);
+    // ページが1以下の場合は、ページネーションコントロールを非表示にしない
+    // ただし、ページ番号ボタンは生成されないため、実質的に矢印ボタンのみが表示される
+    // または、何も表示しない（ユーザーの意図による）
+    // 今回は、ページ番号ボタンが生成されないため、矢印ボタンのみが表示される状態にする
 
-    for (let i = 1; i <= pages; i++) {
+    const createButton = (content, page, disabled = false, active = false) => {
         const btn = document.createElement('button');
-        btn.textContent = i;
-        btn.className = `px-3 py-1 rounded-lg text-sm ${i === state.currentPage ? 'bg-primary text-primary-on' : ''}`;
-        btn.addEventListener('click', () => { state.currentPage = i; updateAndRender(); });
-        paginationControls.appendChild(btn);
-    }
+        btn.innerHTML = content;
+        btn.disabled = disabled;
+        let classes = 'p-1 rounded-full disabled:opacity-50';
+        if (typeof content === 'number') {
+            classes = `w-8 h-8 flex items-center justify-center rounded-lg text-sm ${active ? 'bg-primary text-primary-on' : 'hover:bg-surface-container'}`;
+        }
+        btn.className = classes;
+        if (page) {
+            btn.addEventListener('click', () => { state.currentPage = page; updateAndRender(); });
+        }
+        return btn;
+    };
+    
+    const createEllipsis = () => {
+        const span = document.createElement('span');
+        span.textContent = '...';
+        span.className = 'w-8 h-8 flex items-center justify-center text-sm';
+        return span;
+    };
 
-    const next = document.createElement('button');
-    next.innerHTML = `<span class="material-icons text-base">chevron_right</span>`;
-    next.disabled = state.currentPage === pages;
-    next.className = 'p-1 rounded-full disabled:opacity-50';
-    next.addEventListener('click', () => { state.currentPage++; updateAndRender(); });
-    paginationControls.appendChild(next);
+    paginationControls.appendChild(createButton('<span class="material-icons text-base">chevron_left</span>', state.currentPage - 1, state.currentPage === 1));
+
+    const getPageNumbers = () => {
+        const totalNumbers = 5; // 表示するページ番号の最大数 (奇数を推奨)
+        const totalBlocks = totalNumbers + 2; // ページ番号 + 省略記号
+
+        if (pages <= totalBlocks) {
+            return Array.from({ length: pages }, (_, i) => i + 1);
+        }
+
+        const result = new Set();
+        const currentPage = state.currentPage;
+
+        result.add(1);
+
+        if (currentPage > 3) {
+            result.add('...');
+        }
+
+        const wingSize = Math.floor(totalNumbers / 2);
+        for (let i = -wingSize; i <= wingSize; i++) {
+            const page = currentPage + i;
+            if (page > 1 && page < pages) {
+                result.add(page);
+            }
+        }
+        
+        if (currentPage < pages - 2) {
+            result.add('...');
+        }
+
+        result.add(pages);
+        return Array.from(result);
+    };
+
+    getPageNumbers().forEach(pageNumber => {
+        if (typeof pageNumber === 'string') {
+            paginationControls.appendChild(createEllipsis());
+        } else {
+            paginationControls.appendChild(createButton(pageNumber, pageNumber, false, pageNumber === state.currentPage));
+        }
+    });
+
+
+    paginationControls.appendChild(createButton('<span class="material-icons text-base">chevron_right</span>', state.currentPage + 1, state.currentPage === pages));
 }
 
 async function handleOpenModal(modalId, url, callback) {
@@ -457,7 +513,7 @@ function setupBulkCreateCouponModal(closeModal) {
                 });
             }
 
-            getElement('bulk-preview-body').innerHTML = bulkData.individuals.map((d, i) => `<tr><td class="p-2"><input class="form-input" data-index="${i}" name="code" value="${d.code}"></td><td class="p-2"><input class="form-input" data-index="${i}" name="name" value="${d.name}"></td></tr>`).join('');
+            getElement('bulk-preview-body').innerHTML = bulkData.individuals.map((d, i) => `<tr><td class="p-2"><input class="form-input text-on-surface placeholder:text-on-surface-variant" data-index="${i}" name="code" value="${d.code}"></td><td class="p-2"><input class="form-input text-on-surface placeholder:text-on-surface-variant" data-index="${i}" name="name" value="${d.name}"></td></tr>`).join('');
             goToStep(2);
         }
     });
@@ -528,7 +584,6 @@ function showToast(message, type = 'success') {
 
 function setupSendEmailModal(closeModal) {
     const form = getElement('sendEmailForm');
-    const couponSelect = getElement('emailTargetCoupon');
     const recipientsContainer = getElement('emailRecipientsContainer');
     const addRecipientButton = getElement('addRecipientButton');
     const templateSelect = getElement('emailTemplateSelect');
@@ -538,14 +593,64 @@ function setupSendEmailModal(closeModal) {
     const insertCouponCode = getElement('insertCouponCode');
     const saveAsTemplateButton = getElement('saveAsTemplateButton');
 
-    // 1. クーポン選択プルダウンの初期化
-    couponSelect.innerHTML = '<option value="">クーポンを選択してください</option>';
-    allCoupons.forEach(coupon => {
-        const option = document.createElement('option');
-        option.value = coupon.id;
-        option.textContent = `${coupon.code} - ${coupon.name}`;
-        couponSelect.appendChild(option);
+    // --- カスタムクーポン選択プルダウンのロジック ---
+    const customDropdown = getElement('customCouponDropdown');
+    const dropdownButton = getElement('customDropdownButton');
+    const selectedCouponText = getElement('selectedCouponText');
+    const dropdownOptions = getElement('customDropdownOptions');
+    const emailCouponSearch = getElement('emailCouponSearch');
+    const couponOptionsList = getElement('couponOptionsList');
+    const hiddenInput = getElement('emailTargetCoupon');
+
+    // オプションリストのレンダリング
+    const renderCouponOptions = (coupons) => {
+        couponOptionsList.innerHTML = '';
+        coupons.forEach(coupon => {
+            const li = document.createElement('li');
+            li.className = 'px-4 py-2 text-sm text-on-surface hover:bg-surface-container cursor-pointer';
+            li.textContent = `${coupon.code} - ${coupon.name}`;
+            li.dataset.id = coupon.id;
+            li.dataset.text = `${coupon.code} - ${coupon.name}`;
+            couponOptionsList.appendChild(li);
+        });
+    };
+
+    renderCouponOptions(allCoupons); // 初期表示
+
+    // プルダウンの開閉
+    dropdownButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdownOptions.classList.toggle('hidden');
     });
+
+    // 外側クリックで閉じる
+    document.addEventListener('click', (e) => {
+        if (!customDropdown.contains(e.target)) {
+            dropdownOptions.classList.add('hidden');
+        }
+    });
+
+    // 検索機能
+    emailCouponSearch.addEventListener('input', () => {
+        const searchTerm = emailCouponSearch.value.toLowerCase();
+        const allOptions = couponOptionsList.querySelectorAll('li');
+        allOptions.forEach(option => {
+            const text = option.textContent.toLowerCase();
+            option.style.display = text.includes(searchTerm) ? '' : 'none';
+        });
+    });
+
+    // オプション選択
+    couponOptionsList.addEventListener('click', (e) => {
+        if (e.target.tagName === 'LI') {
+            selectedCouponText.textContent = e.target.dataset.text;
+            hiddenInput.value = e.target.dataset.id;
+            dropdownOptions.classList.add('hidden');
+            dropdownButton.classList.remove('placeholder:text-on-surface-variant');
+        }
+    });
+
+    // --- ここまでカスタムプルダウンのロジック ---
 
     // 2. 送付先追加機能
     addRecipientButton.addEventListener('click', () => {
@@ -623,8 +728,31 @@ function setupSendEmailModal(closeModal) {
     // 6. フォーム送信処理
     form.addEventListener('submit', e => {
         e.preventDefault();
+        if (!hiddenInput.value) {
+            showToast('対象クーポンを選択してください。', 'error');
+            return;
+        }
         // ここで実際のメール送信APIを呼び出す
         showToast('メールを送信しました。');
+        closeModal();
+    });
+}
+
+function setupConfirmationModal(options, closeModal) {
+    const { title, message, confirmText, onConfirm } = options;
+
+    getElement('confirmationModalTitle').textContent = title;
+    getElement('confirmationModalMessage').textContent = message;
+    
+    const confirmButton = getElement('confirmActionButton');
+    confirmButton.textContent = confirmText;
+
+    // 既存のイベントリスナーを削除して、多重実行を防ぐ
+    const newConfirmButton = confirmButton.cloneNode(true);
+    confirmButton.parentNode.replaceChild(newConfirmButton, confirmButton);
+
+    newConfirmButton.addEventListener('click', () => {
+        onConfirm();
         closeModal();
     });
 }

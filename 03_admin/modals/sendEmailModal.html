@@ -9,13 +9,28 @@
         </div>
 
         <form id="sendEmailForm" class="mt-6 space-y-6">
-            <!-- 対象クーポン -->
+            <!-- 対象クーポン (カスタムプルダウン) -->
             <div>
-                <label for="emailTargetCoupon" class="block text-sm font-medium text-on-surface-variant mb-1">対象クーポン</label>
-                <select id="emailTargetCoupon" name="targetCoupon" class="form-select w-full" required>
-                    <option value="">クーポンを選択してください</option>
-                    <!-- クーポンデータがここに挿入されます -->
-                </select>
+                <label class="block text-sm font-medium text-on-surface-variant mb-1">対象クーポン</label>
+                <div id="customCouponDropdown" class="relative">
+                    <!-- 選択中の項目を表示するボタン -->
+                    <button type="button" id="customDropdownButton" class="form-input w-full text-left flex justify-between items-center text-on-surface placeholder:text-on-surface-variant">
+                        <span id="selectedCouponText">クーポンを選択してください</span>
+                        <span class="material-icons text-on-surface-variant">arrow_drop_down</span>
+                    </button>
+                    <!-- オプションリスト -->
+                    <div id="customDropdownOptions" class="absolute z-10 w-full mt-1 bg-surface border border-outline-variant rounded-md shadow-lg hidden max-h-60 overflow-y-auto">
+                        <!-- 検索欄 -->
+                        <div class="p-2 border-b border-outline-variant">
+                            <input type="text" id="emailCouponSearch" class="form-input w-full text-sm text-on-surface placeholder:text-on-surface-variant" placeholder="クーポンコードまたは名称で検索">
+                        </div>
+                        <!-- オプションリスト本体 -->
+                        <ul id="couponOptionsList" class="py-1">
+                            <!-- li要素がここに挿入されます -->
+                        </ul>
+                    </div>
+                </div>
+                <input type="hidden" id="emailTargetCoupon" name="targetCoupon" required>
             </div>
 
             <!-- 送付先 -->
