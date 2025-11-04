@@ -1,0 +1,71 @@
+<!-- メール送付モーダル -->
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300 ease-in-out opacity-0 pointer-events-none" id="sendEmailModal">
+    <div class="relative w-full max-w-3xl transform rounded-xl bg-surface p-6 shadow-xl transition-all duration-300 ease-in-out scale-95">
+        <div class="flex items-center justify-between pb-4 border-b border-outline-variant">
+            <h2 class="text-title-large font-semibold text-on-surface">メール送付</h2>
+            <button type="button" data-action="close" class="p-2 rounded-full hover:bg-surface-container-highest">
+                <span class="material-icons text-on-surface-variant">close</span>
+            </button>
+        </div>
+
+        <form id="sendEmailForm" class="mt-6 space-y-6">
+            <!-- 対象クーポン -->
+            <div>
+                <label for="emailTargetCoupon" class="block text-sm font-medium text-on-surface-variant mb-1">対象クーポン</label>
+                <select id="emailTargetCoupon" name="targetCoupon" class="form-select w-full" required>
+                    <option value="">クーポンを選択してください</option>
+                    <!-- クーポンデータがここに挿入されます -->
+                </select>
+            </div>
+
+            <!-- 送付先 -->
+            <div>
+                <label class="block text-sm font-medium text-on-surface-variant mb-1">送付先</label>
+                <div id="emailRecipientsContainer" class="space-y-2">
+                    <div class="flex items-center gap-2">
+                        <input type="email" name="recipients[]" class="form-input flex-grow" placeholder="recipient@example.com" required>
+                        <button type="button" id="addRecipientButton" class="w-8 h-8 flex items-center justify-center rounded-full bg-secondary-container text-on-secondary-container hover:opacity-90">
+                            <span class="material-icons text-base">add</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 件名 -->
+            <div>
+                <label for="emailSubject" class="block text-sm font-medium text-on-surface-variant mb-1">件名</label>
+                <input type="text" id="emailSubject" name="subject" class="form-input w-full" placeholder="お得なクーポンのご案内" required>
+            </div>
+
+            <!-- 本文 -->
+            <div>
+                <div class="flex justify-between items-center mb-1">
+                    <label for="emailBody" class="block text-sm font-medium text-on-surface-variant">本文</label>
+                    <div class="flex items-center gap-2">
+                        <select id="emailTemplateSelect" class="form-select text-sm py-1">
+                            <option value="">テンプレートを選択</option>
+                            <option value="template1">再利用促進テンプレート</option>
+                            <option value="template2">新規顧客向けテンプレート</option>
+                            <option value="template3">特別オファーテンプレート</option>
+                        </select>
+                        <button type="button" id="insertCompanyName" class="text-xs border border-outline px-2 py-1 rounded-md hover:bg-surface-container">会社名</button>
+                        <button type="button" id="insertCouponCode" class="text-xs border border-outline px-2 py-1 rounded-md hover:bg-surface-container">クーポンコード</button>
+                    </div>
+                </div>
+                <textarea id="emailBody" name="body" rows="10" class="form-textarea w-full" placeholder="メール本文を入力してください..." required></textarea>
+            </div>
+
+            <!-- 送信ボタン -->
+            <div class="flex justify-between items-center pt-6 border-t border-outline-variant">
+                <button type="button" id="saveAsTemplateButton" class="inline-flex items-center gap-1 rounded-lg border border-outline px-4 py-2 text-sm font-semibold text-on-surface">
+                    <span class="material-icons text-base">save</span>
+                    テンプレートとして登録
+                </button>
+                <div class="flex gap-4">
+                    <button type="button" data-action="close" class="rounded-lg border border-outline px-4 py-2 text-sm font-semibold text-on-surface">キャンセル</button>
+                    <button type="submit" class="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-on">送信</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

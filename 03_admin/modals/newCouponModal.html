@@ -1,116 +1,89 @@
-<div id="newCouponModal" class="fixed inset-0 flex items-center justify-center p-4 modal-overlay hidden z-[60]" data-state="closed">
-    <div class="bg-surface rounded-lg shadow-xl p-6 w-full max-w-2xl modal-content-transition" data-state="closed">
-        <div class="flex justify-between items-center mb-6">
-            <h3 class="text-on-surface text-xl font-semibold">クーポン新規作成</h3>
-            <button class="text-on-surface-variant hover:text-on-surface" id="closeNewCouponModalBtn" aria-label="モーダルを閉じる">
-                <span class="material-icons">close</span>
+<!-- 新規クーポン作成モーダル -->
+<div id="new-coupon-modal" class="fixed inset-0 z-40 bg-black bg-opacity-50 flex items-center justify-center p-4 transition-opacity duration-300 opacity-0 pointer-events-none" data-state="closed">
+    <div class="bg-surface rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col transition-transform duration-300 scale-95">
+        <!-- モーダルヘッダー -->
+        <header class="flex items-center justify-between p-4 border-b border-outline-variant">
+            <h2 class="text-title-large font-semibold text-on-surface">新規クーポン作成</h2>
+            <button data-action="close" class="p-2 rounded-full hover:bg-surface-container-highest">
+                <span class="material-icons text-on-surface-variant">close</span>
             </button>
+        </header>
+
+        <!-- モーダルボディ -->
+        <div class="p-6 overflow-y-auto">
+            <form id="newCouponForm" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- クーポンコード -->
+                    <label class="flex flex-col gap-1 text-on-surface-variant text-sm md:col-span-2">
+                        <span>クーポンコード</span>
+                        <div class="flex items-center gap-2">
+                            <input type="text" id="newCouponCode" name="code" class="form-input flex-grow" placeholder="例: SPRING25" required maxlength="50">
+                            <button type="button" id="generateCouponCode" class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-2 text-sm font-semibold text-on-surface">
+                                <span class="material-icons text-base">autorenew</span>
+                                自動生成
+                            </button>
+                        </div>
+                        <p class="text-xs text-on-surface-variant mt-1">半角英数字とハイフン(-)のみ使用可能</p>
+                    </label>
+
+                    <!-- クーポン名称 -->
+                    <label class="flex flex-col gap-1 text-on-surface-variant text-sm md:col-span-2">
+                        <span>クーポン名称</span>
+                        <input type="text" id="newCouponName" name="name" class="form-input" placeholder="例: 2025年春のプロモーション" required maxlength="100">
+                    </label>
+
+                    <!-- 対象メールアドレス -->
+                    <label class="flex flex-col gap-1 text-on-surface-variant text-sm md:col-span-2">
+                        <span>対象メールアドレス (任意)</span>
+                        <input type="email" id="newCouponTargetEmail" name="targetUserEmail" class="form-input" placeholder="例: user@example.com">
+                        <p class="text-xs text-on-surface-variant mt-1">クーポンを送付する対象の記録用です。このメールアドレスのみに利用が制限されるわけではありません。</p>
+                    </label>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- 有効期限（開始） -->
+                    <label class="flex flex-col gap-1 text-on-surface-variant text-sm">
+                        <span>有効期限 (開始)</span>
+                        <input type="date" id="newCouponValidFrom" name="validFrom" class="form-input" required>
+                    </label>
+
+                    <!-- 有効期限（終了） -->
+                    <label class="flex flex-col gap-1 text-on-surface-variant text-sm">
+                        <span>有効期限 (終了)</span>
+                        <input type="date" id="newCouponValidTo" name="validTo" class="form-input" required>
+                    </label>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- 割引率 -->
+                    <label class="flex flex-col gap-1 text-on-surface-variant text-sm">
+                        <span>割引率 (%)</span>
+                        <input type="number" id="newCouponDiscountRate" name="discountRate" class="form-input" placeholder="1〜50の整数" required min="1" max="50">
+                    </label>
+
+                    <!-- 利用回数上限 -->
+                    <div class="flex flex-col gap-1 text-on-surface-variant text-sm">
+                        <span>利用回数上限</span>
+                        <input type="number" id="newCouponUsageLimit" name="usageLimit" class="form-input" placeholder="1以上の整数" required min="1">
+                        <label class="flex items-center gap-2 mt-2 text-sm">
+                            <input type="checkbox" id="unlimitedUsage" class="form-checkbox">
+                            <span>無制限にする</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- メモ -->
+                <label class="flex flex-col gap-1 text-on-surface-variant text-sm">
+                    <span>メモ (任意)</span>
+                    <textarea id="newCouponMemo" name="memo" class="form-textarea" rows="3" placeholder="管理用の内部メモ" maxlength="500"></textarea>
+                </label>
+            </form>
         </div>
-        <form id="newCouponForm" class="space-y-4">
-            <!-- クーポン種別 -->
-            <div class="input-group">
-                <label class="input-label">クーポン種別</label>
-                <div class="flex gap-4 pt-2">
-                    <label class="flex items-center gap-2">
-                        <input type="radio" name="couponType" value="normal" class="form-radio" checked>
-                        <span>通常クーポン</span>
-                    </label>
-                    <label class="flex items-center gap-2">
-                        <input type="radio" name="couponType" value="private" class="form-radio">
-                        <span>プライベートクーポン</span>
-                    </label>
-                </div>
-            </div>
 
-            <!-- クーポンコード -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="input-group">
-                    <input class="input-field" id="couponCode" name="couponCode" placeholder=" " type="text" required>
-                    <label class="input-label" for="couponCode">クーポンコード</label>
-                    <p class="error-message hidden" id="couponCode-error"></p>
-                </div>
-                <div class="flex items-end">
-                    <button type="button" id="generateCouponCodeBtn" class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-2 text-sm text-on-surface">
-                        <span class="material-icons text-base">autorenew</span>
-                        自動生成
-                    </button>
-                </div>
-            </div>
-
-            <!-- クーポン名称 -->
-            <div class="input-group">
-                <input class="input-field" id="couponName" name="couponName" placeholder=" " type="text" required>
-                <label class="input-label" for="couponName">クーポン名称</label>
-                <p class="error-message hidden" id="couponName-error"></p>
-            </div>
-
-            <!-- 対象者 (通常クーポン用) -->
-            <div id="normalCouponFields">
-                <div class="input-group">
-                    <label class="input-label">クーポン対象者</label>
-                    <div class="flex flex-wrap gap-4 pt-2">
-                        <label class="flex items-center gap-2"><input type="checkbox" name="targetUser" value="all" class="form-checkbox"> すべてのユーザー</label>
-                        <label class="flex items-center gap-2"><input type="checkbox" name="targetUser" value="new" class="form-checkbox"> 新規</label>
-                        <label class="flex items-center gap-2"><input type="checkbox" name="targetUser" value="existing" class="form-checkbox"> 既存</label>
-                    </div>
-                </div>
-                <div class="input-group mt-4">
-                    <label class="input-label">対象プラン</label>
-                     <div class="flex flex-wrap gap-4 pt-2">
-                        <label class="flex items-center gap-2"><input type="checkbox" name="targetPlan" value="standard" class="form-checkbox"> Standard</label>
-                        <label class="flex items-center gap-2"><input type="checkbox" name="targetPlan" value="premium" class="form-checkbox"> Premium</label>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 対象メールアドレス (プライベートクーポン用) -->
-            <div id="privateCouponFields" class="hidden">
-                <div class="input-group">
-                    <input class="input-field" id="targetUserEmail" name="targetUserEmail" placeholder=" " type="email">
-                    <label class="input-label" for="targetUserEmail">対象メールアドレス</label>
-                    <p class="error-message hidden" id="targetUserEmail-error"></p>
-                </div>
-            </div>
-
-            <!-- 有効期限 -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="input-group">
-                    <input class="input-field" id="validFrom" name="validFrom" placeholder=" " type="date" required>
-                    <label class="input-label" for="validFrom">有効期間（開始）</label>
-                </div>
-                <div class="input-group">
-                    <input class="input-field" id="validTo" name="validTo" placeholder=" " type="date" required>
-                    <label class="input-label" for="validTo">有効期間（終了）</label>
-                </div>
-            </div>
-
-            <!-- 割引率と利用回数上限 -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="input-group">
-                    <input class="input-field" id="discountRate" name="discountRate" placeholder=" " type="number" min="1" max="100" required>
-                    <label class="input-label" for="discountRate">割引率 (%)</label>
-                </div>
-                <div class="input-group">
-                    <input class="input-field" id="usageLimit" name="usageLimit" placeholder=" " type="number" min="1" required>
-                    <label class="input-label" for="usageLimit">利用回数上限</label>
-                    <label class="flex items-center gap-2 mt-1 text-sm">
-                        <input type="checkbox" id="unlimitedUsage" class="form-checkbox">
-                        <span>無制限</span>
-                    </label>
-                </div>
-            </div>
-
-            <!-- メモ -->
-            <div class="input-group">
-                <textarea class="input-field" id="couponMemo" name="couponMemo" placeholder=" " rows="3"></textarea>
-                <label class="input-label" for="couponMemo">メモ（任意）</label>
-            </div>
-
-            <!-- ボタン -->
-            <div class="flex justify-end gap-3 pt-4">
-                <button id="cancelNewCouponModalBtn" class="bg-secondary-container text-on-secondary-container py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal tracking-wide transition-colors" type="button" aria-label="キャンセル">キャンセル</button>
-                <button id="createCouponFromModalBtn" class="button-primary text-on-primary py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal transition-colors" type="submit" aria-label="クーポンを作成">作成する</button>
-            </div>
-        </form>
+        <!-- モーダルフッター -->
+        <footer class="flex items-center justify-end gap-3 p-4 border-t border-outline-variant">
+            <button type="button" data-action="close" class="rounded-lg border border-outline px-4 py-2 text-sm font-semibold text-on-surface">キャンセル</button>
+            <button type="submit" form="newCouponForm" class="rounded-lg bg-primary text-primary-on px-4 py-2 text-sm font-semibold">作成する</button>
+        </footer>
     </div>
 </div>

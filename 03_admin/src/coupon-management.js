@@ -1,242 +1,630 @@
-import { showToast } from '../../02_dashboard/src/utils.js';
-import { handleOpenModal, closeModal } from '../../02_dashboard/src/modalHandler.js';
+/**
+ * クーポン管理ページの初期化とイベントハンドリング
+ */
 
-export function initCouponManagementPage() {
-    let allCouponsData = [];
-    let displayedCoupons = [];
+// ダミーデータ（APIからの取得を想定）
+const dummyCoupons = [
+    {
+        id: 'c_001',
+        code: 'SPRING25',
+        name: '春の特別割引キャンペーン',
+        discountRate: 10,
+        validFrom: '2025-04-01T00:00:00Z',
+        validTo: '2025-04-30T23:59:59Z',
+        usageLimit: 100,
+        usageCount: 25,
+        targetUserEmail: null,
+        status: 'ACTIVE',
+        memo: '新規顧客獲得用のプロモーションコード',
+        createdBy: 'admin_01',
+        createdAt: '2025-03-20T10:00:00Z',
+        updatedAt: '2025-03-20T10:00:00Z',
+        usageLogs: Array.from({ length: 25 }, (_, j) => ({
+            usedAt: new Date(Date.now() - (Math.random() * 30 * 24 * 60 * 60 * 1000)).toISOString(),
+            userId: `user_${Math.floor(Math.random() * 1000)}`,
+            orderId: `order_${Math.random().toString(36).substr(2, 9)}`
+        })),
+    },
+    {
+        id: 'c_002',
+        code: 'PRIVATE_USER_A',
+        name: '特定ユーザーA様向けクーポン',
+        discountRate: 20,
+        validFrom: '2025-04-10T00:00:00Z',
+        validTo: '2025-05-10T23:59:59Z',
+        usageLimit: 1,
+        usageCount: 1,
+        targetUserEmail: 'user.a@example.com',
+        status: 'LIMIT_REACHED',
+        memo: 'ロイヤルカスタマー向け',
+        createdBy: 'admin_02',
+        createdAt: '2025-04-09T15:30:00Z',
+        updatedAt: '2025-04-15T11:00:00Z',
+        usageLogs: [{
+            usedAt: '2025-04-15T11:00:00Z',
+            userId: 'user_123',
+            orderId: 'order_abc'
+        }],
+    },
+];
 
-    let currentPage = 1;
-    let itemsPerPage = 10;
-    let sortKey = 'createdAt';
-    let sortDirection = 'desc';
-
-    const tableBody = document.getElementById('coupon-list-body');
-    const searchForm = document.getElementById('couponSearchForm');
-    const itemsPerPageSelect = document.getElementById('itemsPerPageSelect');
-    const tableHeader = document.querySelector('#coupon-list-body').previousElementSibling;
-
-    loadCoupons();
-    setupEventListeners();
-
-    function setupEventListeners() {
-        document.getElementById('newCouponButton').addEventListener('click', () => {
-            handleOpenModal('newCouponModal', '/03_admin/modals/newCouponModal.html', setupNewCouponModal);
+// Generate more dummy data to reach 100 coupons
+for (let i = 3; i <= 100; i++) {
+    const status_options = ['ACTIVE', 'LIMIT_REACHED', 'INACTIVE', 'EXPIRED'];
+    const status = status_options[i % status_options.length];
+    const usageLimit = (i % 10 === 0) ? -1 : 100;
+    const usageCount = Math.floor(Math.random() * 100);
+    const usageLogs = [];
+    for (let j = 0; j < usageCount; j++) {
+        usageLogs.push({
+            usedAt: new Date(Date.now() - (Math.random() * 30 * 24 * 60 * 60 * 1000)).toISOString(),
+            userId: `user_${Math.floor(Math.random() * 1000)}`,
+            orderId: `order_${Math.random().toString(36).substr(2, 9)}`
         });
-
-        // ... (other event listeners)
-
-            if (button.classList.contains('detail-btn')) {
-                handleOpenModal('couponDetailModal', '/03_admin/modals/couponDetailModal.html', () => setupCouponDetailModal(coupon));
-            } else if (button.classList.contains('edit-btn')) {
-                handleOpenModal('editCouponModal', '/03_admin/modals/editCouponModal.html', () => setupCouponEditModal(coupon));
-            }
-        });
-
-        if (itemsPerPageSelect) {
-            itemsPerPageSelect.addEventListener('change', e => {
-                itemsPerPage = parseInt(e.target.value, 10);
-                currentPage = 1;
-                renderAll();
-            });
-        }
-
-        const csvExportButton = document.getElementById('csvExportButton');
-        if (csvExportButton) {
-            csvExportButton.addEventListener('click', () => {
-                exportToCsv('coupons.csv', displayedCoupons);
-            });
-        }
     }
 
-    function exportToCsv(filename, data) {
-        const headers = ['id', 'code', 'name', 'discountRate', 'validFrom', 'validTo', 'usageLimit', 'usageCount', 'targetType', 'targetUserEmail', 'status', 'memo', 'createdBy', 'createdAt', 'updatedAt'];
-        const csvRows = [headers.join(',')];
-        for (const row of data) {
-            const values = headers.map(header => {
-                let value = row[header];
-                if (value === null || value === undefined) value = '';
-                else if (typeof value === 'string') value = `"${value.replace(/"/g, '""')}"`;
-                return value;
-            });
-            csvRows.push(values.join(','));
+    dummyCoupons.push({
+        id: `c_${String(i).padStart(3, '0')}`,
+        code: `DUMMYCODE-${i}`,
+        name: `ダミーキャンペーン ${i}`,
+        discountRate: (i % 50) + 1,
+        validFrom: `2025-01-01T00:00:00Z`,
+        validTo: `2025-12-31T23:59:59Z`,
+        usageLimit: usageLimit,
+        usageCount: usageCount,
+        targetUserEmail: (i % 5 === 0) ? `user${i}@example.com` : null,
+        status: status,
+        memo: `ダミーデータ ${i}`,
+        createdBy: `admin_${i % 3 + 1}`,
+        createdAt: new Date(Date.now() - (100-i) * 24 * 60 * 60 * 1000).toISOString(),
+        updatedAt: new Date().toISOString(),
+        usageLogs: usageLogs,
+    });
+}
+
+
+let allCoupons = [];
+let displayedCoupons = [];
+let lastNewCouponData = null;
+
+// 状態管理
+const state = {
+    currentPage: 1,
+    itemsPerPage: 50, // Default to 50
+    sortKey: 'createdAt',
+    sortDirection: 'desc',
+    filters: { keyword: '', status: '', dateStart: '', dateEnd: '' },
+};
+
+// --- DOM要素 ---
+const getElement = (id) => document.getElementById(id);
+const tableBody = getElement('coupon-list-body');
+const searchForm = getElement('couponSearchForm');
+const itemsPerPageSelect = getElement('itemsPerPageSelect');
+const paginationInfo = getElement('pagination-info');
+const paginationControls = getElement('pagination-controls');
+const newCouponButton = getElement('newCouponButton');
+const bulkCreateCouponButton = getElement('bulkCreateCouponButton');
+
+/**
+ *メインの初期化関数
+ */
+export function initCouponManagementPage() {
+    allCoupons = [...dummyCoupons];
+    setupEventListeners();
+    updateAndRender();
+}
+
+/**
+ * イベントリスナーを設定
+ */
+function setupEventListeners() {
+    getElement('searchAccordionHeader').addEventListener('click', () => {
+        const content = getElement('searchAccordionContent');
+        const icon = getElement('searchAccordionIcon');
+        const isHidden = content.classList.toggle('hidden');
+        icon.textContent = isHidden ? 'expand_more' : 'expand_less';
+    });
+
+    searchForm.addEventListener('submit', e => {
+        e.preventDefault();
+        state.filters.keyword = getElement('searchKeyword').value;
+        state.filters.status = getElement('searchStatus').value;
+        state.filters.dateStart = getElement('searchDateStart').value;
+        state.filters.dateEnd = getElement('searchDateEnd').value;
+        state.currentPage = 1;
+        updateAndRender();
+    });
+
+    searchForm.addEventListener('reset', () => {
+        setTimeout(() => { 
+            Object.keys(state.filters).forEach(key => state.filters[key] = ''); 
+            state.currentPage = 1; 
+            updateAndRender(); 
+        }, 0);
+    });
+
+    itemsPerPageSelect.addEventListener('change', e => {
+        state.itemsPerPage = parseInt(e.target.value, 10);
+        state.currentPage = 1;
+        updateAndRender();
+    });
+
+    document.querySelector('#coupon-list-body').previousElementSibling.addEventListener('click', e => {
+        const th = e.target.closest('th');
+        if (!th || !th.dataset.sortKey) return;
+        const key = th.dataset.sortKey;
+        if (state.sortKey === key) {
+            state.sortDirection = state.sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            state.sortKey = key;
+            state.sortDirection = 'desc';
         }
-        const blob = new Blob(["\uFEFF" + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        updateAndRender();
+    });
+
+    getElement('sendEmailButton').addEventListener('click', () => handleOpenModal('sendEmailModal', 'modals/sendEmailModal.html', setupSendEmailModal));
+    newCouponButton.addEventListener('click', () => handleOpenModal('newCouponModal', 'modals/newCouponModal.html', setupNewCouponModal));
+    bulkCreateCouponButton.addEventListener('click', () => handleOpenModal('bulkCreateCouponModal', 'modals/bulkCreateCouponModal.html', setupBulkCreateCouponModal));
+
+    tableBody.addEventListener('click', e => {
+        const button = e.target.closest('button');
+        if (!button) return;
+        const couponId = button.dataset.couponId;
+        const coupon = allCoupons.find(c => c.id === couponId);
+        if (!coupon) return;
+
+        if (button.classList.contains('detail-btn')) {
+            handleOpenModal('couponDetailModal', 'modals/couponDetailModal.html', (close) => setupCouponDetailModal(coupon, close));
+        } else if (button.classList.contains('edit-btn')) {
+            handleOpenModal('editCouponModal', 'modals/editCouponModal.html', (close) => setupEditCouponModal(coupon, close));
+        } else if (button.classList.contains('delete-btn')) {
+            if (confirm(`本当にクーポン「${coupon.name}」を削除しますか？`)) {
+                allCoupons = allCoupons.filter(item => item.id !== couponId);
+                updateAndRender();
+                showToast('クーポンを削除しました。');
+            }
+        }
+    });
+}
+
+function updateAndRender() {
+    let filtered = allCoupons.filter(c => {
+        const keyword = state.filters.keyword.toLowerCase();
+        return (!keyword || c.code.toLowerCase().includes(keyword) || c.name.toLowerCase().includes(keyword) || (c.targetUserEmail && c.targetUserEmail.toLowerCase().includes(keyword))) &&
+               (!state.filters.status || c.status === state.filters.status) &&
+               (!state.filters.dateStart || c.validTo >= state.filters.dateStart) && 
+               (!state.filters.dateEnd || c.validFrom <= state.filters.dateEnd);
+    });
+
+    filtered.sort((a, b) => (a[state.sortKey] > b[state.sortKey] ? 1 : -1) * (state.sortDirection === 'asc' ? 1 : -1));
+    
+    displayedCoupons = filtered;
+    const total = displayedCoupons.length;
+    const pages = Math.ceil(total / state.itemsPerPage);
+    state.currentPage = Math.max(1, Math.min(state.currentPage, pages));
+    const start = (state.currentPage - 1) * state.itemsPerPage;
+    const end = start + state.itemsPerPage;
+    
+    renderTable(displayedCoupons.slice(start, end));
+    renderPagination(total, pages, start, end);
+}
+
+function renderTable(coupons) {
+    tableBody.innerHTML = '';
+    if (coupons.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-on-surface-variant">該当なし</td></tr>`;
+        return;
+    }
+    coupons.forEach(c => {
+        const row = document.createElement('tr');
+        row.className = 'hover:bg-surface-container-highest';
+        row.innerHTML = `
+            <td class="px-4 py-3 whitespace-nowrap">${escapeHTML(c.code)}</td>
+            <td class="px-4 py-3 whitespace-nowrap">${escapeHTML(c.name)}</td>
+            <td class="px-4 py-3 text-right whitespace-nowrap">${c.discountRate}%</td>
+            <td class="px-4 py-3 whitespace-nowrap text-right">${new Date(c.validTo).toLocaleDateString()}</td>
+            <td class="px-4 py-3 text-right whitespace-nowrap">${c.usageCount} / ${c.usageLimit === -1 ? '∞' : c.usageLimit}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-left"><span class="status-badge status-${c.status.toLowerCase()}">${getStatusText(c.status)}</span></td>
+            <td class="px-4 py-3 text-left whitespace-nowrap">
+                <button class="detail-btn border border-outline hover:bg-surface-container text-on-surface text-xs font-semibold px-3 py-1 rounded-full" data-coupon-id="${c.id}">詳細</button>
+                <button class="edit-btn border border-outline hover:bg-surface-container text-on-surface text-xs font-semibold px-3 py-1 rounded-full ml-2" data-coupon-id="${c.id}">編集</button>
+                <button class="delete-btn bg-error text-on-error text-xs font-semibold px-3 py-1 rounded-full ml-2" data-coupon-id="${c.id}">削除</button>
+            </td>`;
+        tableBody.appendChild(row);
+    });
+}
+
+function renderPagination(total, pages, start, end) {
+    paginationInfo.textContent = `${total}件中 ${total > 0 ? start + 1 : 0}〜${Math.min(end, total)}件を表示`;
+    paginationControls.innerHTML = '';
+    if (pages <= 1) return;
+
+    const prev = document.createElement('button');
+    prev.innerHTML = `<span class="material-icons text-base">chevron_left</span>`;
+    prev.disabled = state.currentPage === 1;
+    prev.className = 'p-1 rounded-full disabled:opacity-50';
+    prev.addEventListener('click', () => { state.currentPage--; updateAndRender(); });
+    paginationControls.appendChild(prev);
+
+    for (let i = 1; i <= pages; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = i;
+        btn.className = `px-3 py-1 rounded-lg text-sm ${i === state.currentPage ? 'bg-primary text-primary-on' : ''}`;
+        btn.addEventListener('click', () => { state.currentPage = i; updateAndRender(); });
+        paginationControls.appendChild(btn);
+    }
+
+    const next = document.createElement('button');
+    next.innerHTML = `<span class="material-icons text-base">chevron_right</span>`;
+    next.disabled = state.currentPage === pages;
+    next.className = 'p-1 rounded-full disabled:opacity-50';
+    next.addEventListener('click', () => { state.currentPage++; updateAndRender(); });
+    paginationControls.appendChild(next);
+}
+
+async function handleOpenModal(modalId, url, callback) {
+    const placeholder = getElement(`${modalId}Placeholder`);
+    if (!placeholder) return;
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Modal load failed');
+        placeholder.innerHTML = await response.text();
+        const modal = placeholder.querySelector('.fixed');
+        modal.classList.remove('opacity-0', 'pointer-events-none');
+        modal.children[0].classList.remove('scale-95');
+        const close = () => {
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modal.children[0].classList.add('scale-95');
+            setTimeout(() => { placeholder.innerHTML = '' }, 300);
+        };
+        modal.querySelectorAll('[data-action="close"]').forEach(b => b.addEventListener('click', close));
+        modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
+        if (callback) callback(close);
+    } catch (err) {
+        showToast('モーダル読込失敗', 'error');
+    }
+}
+
+function setupNewCouponModal(closeModal) {
+    const form = getElement('newCouponForm');
+    const today = new Date().toISOString().split('T')[0];
+
+    if (lastNewCouponData) {
+        Object.keys(lastNewCouponData).forEach(key => {
+            const input = form.elements[key];
+            if (input && key !== 'code') {
+                if (input.type === 'checkbox') {
+                    input.checked = lastNewCouponData[key];
+                } else {
+                    input.value = lastNewCouponData[key];
+                }
+            }
+        });
+    } else {
+        form.elements.validFrom.value = today;
+        form.elements.validTo.value = today;
+    }
+
+    const unlimited = getElement('unlimitedUsage');
+    const usageLimit = getElement('newCouponUsageLimit');
+    unlimited.addEventListener('change', () => { usageLimit.disabled = unlimited.checked; if (unlimited.checked) usageLimit.value = ''; });
+    if(form.elements['unlimitedUsage'].checked) usageLimit.disabled = true;
+
+    getElement('generateCouponCode').addEventListener('click', () => { getElement('newCouponCode').value = `CPN-${Date.now().toString(36).toUpperCase()}`; });
+    
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+        if (new Date(data.validTo) < new Date(data.validFrom)) return showToast('終了日は開始日より後に設定してください', 'error');
+        if (allCoupons.some(c => c.code === data.code)) return showToast('そのクーポンコードは既に使用されています', 'error');
+        
+        lastNewCouponData = data; // Save form data
+
+        const newCoupon = { 
+            ...data, 
+            id: `c_${Date.now()}`,
+            usageLimit: unlimited.checked ? -1 : parseInt(data.usageLimit, 10),
+            usageCount: 0,
+            status: 'ACTIVE', 
+            createdAt: new Date().toISOString(), 
+            updatedAt: new Date().toISOString()
+        };
+        allCoupons.unshift(newCoupon);
+        updateAndRender();
+        showToast('クーポンが正常に作成されました。');
+        closeModal();
+    });
+}
+
+function setupCouponDetailModal(coupon, closeModal) {
+    Object.keys(coupon).forEach(key => {
+        const el = getElement(`detail-${key}`);
+        if (el) {
+            if (key === 'validFrom' || key === 'validTo') {
+                el.textContent = new Date(coupon[key]).toLocaleDateString();
+            } else {
+                el.textContent = coupon[key] || '-';
+            }
+        }
+    });
+
+    getElement('detail-usage').textContent = `${coupon.usageCount} / ${coupon.usageLimit === -1 ? '∞' : coupon.usageLimit}`;
+    getElement('detail-status').innerHTML = `<span class="status-badge status-${coupon.status.toLowerCase()}">${getStatusText(coupon.status)}</span>`;
+
+    const logBody = getElement('detail-log-body');
+    logBody.innerHTML = '';
+    if (coupon.usageLogs && coupon.usageLogs.length > 0) {
+        coupon.usageLogs.forEach(log => {
+            const row = logBody.insertRow();
+            row.innerHTML = `
+                <td class="px-4 py-2">${new Date(log.usedAt).toLocaleString()}</td>
+                <td class="px-4 py-2">${escapeHTML(log.userId)}</td>
+                <td class="px-4 py-2">${escapeHTML(log.orderId)}</td>
+            `;
+        });
+    } else {
+        logBody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-on-surface-variant">利用ログはありません</td></tr>';
+    }
+
+    getElement('deactivateCouponButton').addEventListener('click', () => {
+        if (confirm('本当にこのクーポンを停止しますか？')) { 
+            coupon.status = 'INACTIVE'; 
+            updateAndRender(); 
+            showToast('クーポンを停止しました。'); 
+            closeModal(); 
+        }
+    });
+}
+
+function setupEditCouponModal(coupon, closeModal) {
+    const form = getElement('editCouponForm');
+    Object.keys(coupon).forEach(key => {
+        const input = form.elements[key];
+        if (input) {
+            if (input.type === 'date') {
+                input.value = new Date(coupon[key]).toISOString().split('T')[0];
+            } else {
+                input.value = coupon[key];
+            }
+        }
+    });
+    const unlimited = getElement('editUnlimitedUsage');
+    unlimited.checked = coupon.usageLimit === -1;
+    getElement('editCouponUsageLimit').disabled = unlimited.checked;
+    unlimited.addEventListener('change', () => { getElement('editCouponUsageLimit').disabled = unlimited.checked; });
+
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+        const data = Object.fromEntries(new FormData(form).entries());
+        if (new Date(data.validTo) < new Date(data.validFrom)) return showToast('終了日は開始日より後に設定してください', 'error');
+        
+        Object.assign(coupon, { 
+            ...data, 
+            usageLimit: unlimited.checked ? -1 : parseInt(data.usageLimit, 10), 
+            updatedAt: new Date().toISOString() 
+        });
+        updateAndRender();
+        showToast('クーポンが正常に更新されました。');
+        closeModal();
+    });
+}
+
+function setupBulkCreateCouponModal(closeModal) {
+    let step = 1;
+    let bulkData = { common: {}, individuals: [] };
+    const form = getElement('bulkCreateForm-step1');
+    const today = new Date().toISOString().split('T')[0];
+    form.elements.validFrom.value = today;
+    form.elements.validTo.value = today;
+
+    const unlimited = getElement('bulkUnlimitedUsage');
+    const usageLimit = getElement('bulkCouponUsageLimit');
+    unlimited.addEventListener('change', () => { 
+        usageLimit.disabled = unlimited.checked; 
+        if (unlimited.checked) usageLimit.value = '';
+        usageLimit.required = !unlimited.checked;
+    });
+
+    const goToStep = (s) => {
+        step = s;
+        [1, 2, 3].forEach(i => getElement(`bulk-step-${i}`).classList.toggle('hidden', i !== step));
+        getElement('bulk-prev-btn').classList.toggle('hidden', step === 1 || step === 3);
+        getElement('bulk-next-btn').classList.toggle('hidden', step !== 1);
+        getElement('bulk-create-btn').classList.toggle('hidden', step !== 2);
+        if (step === 3) {
+            getElement('bulk-create-btn').parentElement.previousElementSibling.querySelector('button').classList.add('hidden');
+            getElement('bulk-next-btn').classList.add('hidden');
+        }
+    };
+
+    const nextBtn = getElement('bulk-next-btn');
+    const createBtn = getElement('bulk-create-btn');
+
+    nextBtn.addEventListener('click', () => {
+        if (step === 1) {
+            if (!form.checkValidity()) return form.reportValidity();
+            bulkData.common = Object.fromEntries(new FormData(form).entries());
+            const quantity = parseInt(bulkData.common.quantity, 10);
+            if (isNaN(quantity) || quantity <= 0) return showToast('作成件数は1以上で入力してください', 'error');
+            
+            bulkData.individuals = [];
+            for(let i = 0; i < quantity; i++) {
+                bulkData.individuals.push({ 
+                    code: `CPN-${Date.now().toString(36).toUpperCase()}-${i}`,
+                    name: 'プロモーションクーポン' 
+                });
+            }
+
+            getElement('bulk-preview-body').innerHTML = bulkData.individuals.map((d, i) => `<tr><td class="p-2"><input class="form-input" data-index="${i}" name="code" value="${d.code}"></td><td class="p-2"><input class="form-input" data-index="${i}" name="name" value="${d.name}"></td></tr>`).join('');
+            goToStep(2);
+        }
+    });
+
+    createBtn.addEventListener('click', () => {
+        getElement('bulk-preview-body').querySelectorAll('input').forEach(input => {
+            const index = parseInt(input.dataset.index, 10);
+            bulkData.individuals[index][input.name] = input.value;
+        });
+
+        const unlimited = getElement('bulkUnlimitedUsage').checked;
+        const newCoupons = bulkData.individuals.map(ind => ({
+            ...bulkData.common,
+            ...ind,
+            id: `c_${Date.now()}_${Math.random()}`,
+            usageLimit: unlimited ? -1 : parseInt(bulkData.common.usageLimit, 10),
+            usageCount: 0,
+            status: 'ACTIVE',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+        }));
+        allCoupons.unshift(...newCoupons);
+        getElement('bulk-success-count').textContent = newCoupons.length;
+        updateAndRender();
+        goToStep(3);
+    });
+
+    getElement('bulk-csv-download').addEventListener('click', () => {
+        const csvHeader = ["code", "name"].join(',');
+        const csvRows = bulkData.individuals.map(i => [i.code, i.name].join(','));
+        const csvContent = [csvHeader, ...csvRows].join('');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.setAttribute('download', filename);
-        document.body.appendChild(link);
+        link.download = 'coupons.csv';
         link.click();
-        document.body.removeChild(link);
-        showToast('CSVファイルをエクスポートしました。', 'success');
-    }
+    });
 
-    async function loadCoupons() {
-        try {
-            const response = await fetch('../../data/admin/coupons.json');
-            allCouponsData = await response.json();
-            applyFiltersAndRender();
-        } catch (error) {
-            console.error('Failed to load coupons:', error);
-            tableBody.innerHTML = `<tr><td colspan="8" class="text-center py-4">読込失敗</td></tr>`;
+    getElement('bulk-prev-btn').addEventListener('click', () => goToStep(step - 1));
+}
+
+// --- ユーティリティ関数 ---
+function getStatusText(status) {
+    const map = { ACTIVE: '有効', LIMIT_REACHED: '利用上限到達', INACTIVE: '利用停止', EXPIRED: '期限切れ' };
+    return map[status] || status;
+}
+
+function escapeHTML(str) {
+    if (typeof str !== 'string') return str;
+    return str.replace(/[&<>' "]/g, tag => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        "'": '&#39;',
+        '"': '&quot;'
+    }[tag] || tag));
+}
+
+function showToast(message, type = 'success') {
+    const container = getElement('toast-container');
+    if (!container) return;
+    const toast = document.createElement('div');
+    toast.className = `text-white px-4 py-3 rounded-lg shadow-lg transition-all duration-300 ${type === 'success' ? 'bg-green-600' : 'bg-red-600'}`;
+    toast.innerHTML = `<span class="font-semibold">${type === 'success' ? '成功' : 'エラー'}:</span> ${escapeHTML(message)}`;
+    container.appendChild(toast);
+    setTimeout(() => { toast.style.opacity = '0'; toast.addEventListener('transitionend', () => toast.remove()); }, 3000);
+}
+
+function setupSendEmailModal(closeModal) {
+    const form = getElement('sendEmailForm');
+    const couponSelect = getElement('emailTargetCoupon');
+    const recipientsContainer = getElement('emailRecipientsContainer');
+    const addRecipientButton = getElement('addRecipientButton');
+    const templateSelect = getElement('emailTemplateSelect');
+    const emailBody = getElement('emailBody');
+    const emailSubject = getElement('emailSubject');
+    const insertCompanyName = getElement('insertCompanyName');
+    const insertCouponCode = getElement('insertCouponCode');
+    const saveAsTemplateButton = getElement('saveAsTemplateButton');
+
+    // 1. クーポン選択プルダウンの初期化
+    couponSelect.innerHTML = '<option value="">クーポンを選択してください</option>';
+    allCoupons.forEach(coupon => {
+        const option = document.createElement('option');
+        option.value = coupon.id;
+        option.textContent = `${coupon.code} - ${coupon.name}`;
+        couponSelect.appendChild(option);
+    });
+
+    // 2. 送付先追加機能
+    addRecipientButton.addEventListener('click', () => {
+        const newRecipient = document.createElement('div');
+        newRecipient.className = 'flex items-center gap-2';
+        newRecipient.innerHTML = `
+            <input type="email" name="recipients[]" class="form-input flex-grow" placeholder="recipient@example.com" required>
+            <button type="button" class="remove-recipient-btn w-8 h-8 flex items-center justify-center rounded-full bg-error-container text-on-error-container hover:opacity-90">
+                <span class="material-icons text-base">remove</span>
+            </button>
+        `;
+        recipientsContainer.appendChild(newRecipient);
+    });
+
+    recipientsContainer.addEventListener('click', e => {
+        if (e.target.closest('.remove-recipient-btn')) {
+            e.target.closest('.flex').remove();
         }
-    }
+    });
 
-    function applyFiltersAndRender() {
-        const keyword = document.getElementById('searchKeyword').value.toLowerCase();
-        const status = document.getElementById('searchStatus').value;
-        const startDate = document.getElementById('searchDateStart').value;
-        const endDate = document.getElementById('searchDateEnd').value;
-        displayedCoupons = allCouponsData.filter(c => {
-            const keywordMatch = !keyword || [c.code, c.name, c.targetUserEmail].some(s => s && s.toLowerCase().includes(keyword));
-            const statusMatch = !status || c.status === status;
-            const dateMatch = (!startDate || c.validTo >= startDate) && (!endDate || c.validFrom <= endDate);
-            return keywordMatch && statusMatch && dateMatch;
-        });
-        currentPage = 1;
-        renderAll();
-    }
+    // 3. テンプレート適用機能
+    let templates = {
+        template1: "{{company_name}}様\n\nいつもご利用いただきありがとうございます。\n感謝の気持ちを込めて、特別なクーポンをご用意しました。\nクーポンコード: {{coupon_code}}\n\nぜひこの機会にご利用ください。",
+        template2: "{{company_name}}様\n\nはじめまして！\n新規登録ありがとうございます。初回限定でご利用いただけるクーポンをお届けします。\nクーポンコード: {{coupon_code}}\n\n皆様のご利用を心よりお待ちしております。",
+        template3: "{{company_name}}様\n\n【特別オファー】\n今だけの特別なご案内です。\nこちらのクーポンをご利用いただくと、特別な割引が適用されます。\nクーポンコード: {{coupon_code}}\n\n有効期限が迫っておりますので、お早めにご利用ください。"
+    };
 
-    function renderAll() {
-        const sortedData = [...displayedCoupons].sort((a, b) => {
-            let valA = a[sortKey];
-            let valB = b[sortKey];
-            if (valA === null || valA === undefined) valA = '';
-            if (valB === null || valB === undefined) valB = '';
-            if (sortDirection === 'asc') return valA > valB ? 1 : -1;
-            return valA < valB ? 1 : -1;
-        });
-        renderCoupons(sortedData);
-        renderPagination(sortedData.length);
-    }
+    templateSelect.addEventListener('change', () => {
+        const selectedTemplate = templates[templateSelect.value];
+        if (selectedTemplate) {
+            emailBody.value = selectedTemplate;
+        }
+    });
 
-    function renderCoupons(dataToRender) {
-        const start = (currentPage - 1) * itemsPerPage;
-        const end = start + itemsPerPage;
-        const paginatedData = dataToRender.slice(start, end);
-        tableBody.innerHTML = paginatedData.map(coupon => `
-            <tr class="hover:bg-surface-variant/60 transition-colors">
-                 <td class="px-4 py-3 font-mono text-on-surface">${coupon.code}</td>
-                 <td class="px-4 py-3 text-on-surface-variant">${coupon.name}</td>
-                 <td class="px-4 py-3 text-on-surface-variant flex items-center">${coupon.targetType === 'SPECIFIC_EMAIL' ? '<span class="material-icons text-base mr-1">person</span>' : ''}${coupon.targetUserEmail || '-'}</td>
-                 <td class="px-4 py-3 text-on-surface-variant text-right">${coupon.discountRate}%</td>
-                 <td class="px-4 py-3 text-on-surface-variant">${new Date(coupon.validFrom).toLocaleDateString()} 〜 ${new Date(coupon.validTo).toLocaleDateString()}</td>
-                 <td class="px-4 py-3 text-on-surface-variant">${coupon.usageCount} / ${coupon.usageLimit === -1 ? '∞' : coupon.usageLimit}</td>
-                 <td class="px-4 py-3"><span class="inline-flex items-center rounded-full ${getStatusClass(coupon.status)} px-2.5 py-1 text-xs">${getStatusText(coupon.status)}</span></td>
-                 <td class="px-4 py-3 text-right space-x-2">
-                    <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs detail-btn" data-coupon-id="${coupon.id}">詳細</button>
-                    <button class="inline-flex items-center gap-1 rounded border border-outline px-3 py-1 text-xs edit-btn" data-coupon-id="${coupon.id}">編集</button>
-                </td>
-            </tr>
-        `).join('');
-    }
+    // 4. 変数挿入機能
+    const insertVariable = (variable) => {
+        const start = emailBody.selectionStart;
+        const end = emailBody.selectionEnd;
+        const text = emailBody.value;
+        emailBody.value = text.substring(0, start) + `{{${variable}}}` + text.substring(end);
+        emailBody.focus();
+        emailBody.selectionEnd = start + `{{${variable}}}`.length;
+    };
 
-    function renderPagination(totalItems) {
-        const totalPages = Math.ceil(totalItems / itemsPerPage);
-        const infoEl = document.getElementById('pagination-info');
-        const controlsEl = document.getElementById('pagination-controls');
-        if (totalItems === 0) {
-            infoEl.textContent = '0件中 0〜0件を表示';
-            controlsEl.innerHTML = '';
+    insertCompanyName.addEventListener('click', () => insertVariable('company_name'));
+    insertCouponCode.addEventListener('click', () => insertVariable('coupon_code'));
+
+    // 5. テンプレートとして登録機能
+    saveAsTemplateButton.addEventListener('click', () => {
+        const subject = emailSubject.value.trim();
+        const body = emailBody.value.trim();
+
+        if (!subject) {
+            showToast('テンプレート名として使用するため、件名を入力してください。', 'error');
             return;
         }
-        const startItem = (currentPage - 1) * itemsPerPage + 1;
-        const endItem = Math.min(currentPage * itemsPerPage, totalItems);
-        infoEl.textContent = `${totalItems}件中 ${startItem}〜${endItem}件を表示`;
-        let buttons = `<button class="px-3 py-1 rounded border border-outline" ${currentPage === 1 ? 'disabled' : ''} data-page="${currentPage - 1}">前へ</button>`;
-        for (let i = 1; i <= totalPages; i++) {
-            buttons += `<button class="px-3 py-1 rounded ${i === currentPage ? 'bg-primary text-primary-on' : 'border border-outline'}" data-page="${i}">${i}</button>`;
+        if (!body) {
+            showToast('テンプレートとして登録する本文を入力してください。', 'error');
+            return;
         }
-        buttons += `<button class="px-3 py-1 rounded border border-outline" ${currentPage === totalPages ? 'disabled' : ''} data-page="${currentPage + 1}">次へ</button>`;
-        controlsEl.innerHTML = buttons;
-        controlsEl.querySelectorAll('button').forEach(button => {
-            button.addEventListener('click', e => {
-                const page = parseInt(e.target.dataset.page, 10);
-                if (page) {
-                    currentPage = page;
-                    renderAll();
-                }
-            });
-        });
-    }
 
-    function getStatusText(status) {
-        const map = { ACTIVE: '有効', LIMIT_REACHED: '利用上限到達', INACTIVE: '利用停止', EXPIRED: '期限切れ' };
-        return map[status] || '不明';
-    }
+        const newTemplateId = `custom_template_${Date.now()}`;
+        templates[newTemplateId] = body;
+        
+        const newOption = document.createElement('option');
+        newOption.value = newTemplateId;
+        newOption.textContent = subject;
+        templateSelect.appendChild(newOption);
 
-    function getStatusClass(status) {
-        const map = { ACTIVE: 'bg-success/20 text-success', LIMIT_REACHED: 'bg-warning/20 text-warning', INACTIVE: 'bg-outline/20 text-on-surface-variant', EXPIRED: 'bg-error/20 text-error' };
-        return map[status] || 'bg-outline/20 text-on-surface-variant';
-    }
+        newOption.selected = true;
 
-    function setupNewCouponModal() {
-        const form = document.getElementById('newCouponForm');
-        if (!form) return;
-        form.onsubmit = e => {
-            e.preventDefault();
-            const newCoupon = { id: `c_${Date.now()}`, code: form.couponCode.value, name: form.couponName.value, discountRate: parseInt(form.discountRate.value), validFrom: new Date(form.validFrom.value).toISOString(), validTo: new Date(form.validTo.value).toISOString(), usageLimit: form.unlimitedUsage.checked ? -1 : parseInt(form.usageLimit.value), usageCount: 0, targetType: form.couponType.value === 'private' ? 'SPECIFIC_EMAIL' : 'ALL', targetUserEmail: form.couponType.value === 'private' ? form.targetUserEmail.value : null, targetPlan: [], status: 'ACTIVE', memo: form.couponMemo.value, createdBy: 'admin', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
-            allCouponsData.unshift(newCoupon);
-            applyFiltersAndRender();
-            closeModal('newCouponModal');
-            showToast('クーポンを正常に作成しました。', 'success');
-        };
-    }
+        showToast(`テンプレート「${subject}」を登録しました。`);
+    });
 
-    function setupCouponEditModal(coupon) {
-        const form = document.getElementById('editCouponForm');
-        if (!form) return;
-        form.id.value = coupon.id;
-        document.getElementById('edit-couponType').textContent = coupon.targetType === 'SPECIFIC_EMAIL' ? 'プライベートクーポン' : '通常クーポン';
-        document.getElementById('edit-couponCode').textContent = coupon.code;
-        document.getElementById('edit-discountRate').textContent = `${coupon.discountRate}%`;
-        form.couponName.value = coupon.name;
-        form.validFrom.value = new Date(coupon.validFrom).toISOString().split('T')[0];
-        form.validTo.value = new Date(form.validTo.value).toISOString().split('T')[0];
-        form.couponMemo.value = coupon.memo || '';
-        const usageLimitInput = document.getElementById('edit-usageLimit');
-        const unlimitedUsageCheckbox = document.getElementById('edit-unlimitedUsage');
-        if (coupon.usageLimit === -1) {
-            unlimitedUsageCheckbox.checked = true;
-            usageLimitInput.disabled = true;
-        } else {
-            unlimitedUsageCheckbox.checked = false;
-            usageLimitInput.value = coupon.usageLimit;
-        }
-        unlimitedUsageCheckbox.onchange = e => { usageLimitInput.disabled = e.target.checked; if (e.target.checked) usageLimitInput.value = ''; };
-        form.onsubmit = e => {
-            e.preventDefault();
-            const couponIndex = allCouponsData.findIndex(c => c.id === coupon.id);
-            if (couponIndex > -1) {
-                const updatedCoupon = { ...allCouponsData[couponIndex], name: form.couponName.value, validFrom: new Date(form.validFrom.value).toISOString(), validTo: new Date(form.validTo.value).toISOString(), usageLimit: form.unlimitedUsage.checked ? -1 : parseInt(form.usageLimit.value, 10), memo: form.couponMemo.value, updatedAt: new Date().toISOString() };
-                allCouponsData[couponIndex] = updatedCoupon;
-                applyFiltersAndRender();
-                closeModal('editCouponModal');
-                showToast('クーポン情報を更新しました。', 'success');
-            }
-        };
-    }
-
-    function setupCouponDetailModal() {
-        document.getElementById('detail-code').textContent = coupon.code;
-        document.getElementById('detail-name').textContent = coupon.name;
-        document.getElementById('detail-status').innerHTML = `<span class="inline-flex items-center rounded-full ${getStatusClass(coupon.status)} px-2.5 py-1 text-xs">${getStatusText(coupon.status)}</span>`;
-        document.getElementById('detail-discountRate').textContent = `${coupon.discountRate}%`;
-        document.getElementById('detail-usage').textContent = `${coupon.usageCount} / ${coupon.usageLimit === -1 ? '∞' : coupon.usageLimit}`;
-        document.getElementById('detail-validPeriod').textContent = `${new Date(coupon.validFrom).toLocaleDateString()} 〜 ${new Date(coupon.validTo).toLocaleDateString()}`;
-        document.getElementById('detail-target').textContent = coupon.targetUserEmail || '全てのユーザー';
-        document.getElementById('detail-memo').textContent = coupon.memo || '-';
-        document.getElementById('detail-createdBy').textContent = coupon.createdBy;
-        document.getElementById('detail-createdAt').textContent = new Date(coupon.createdAt).toLocaleString();
-        document.getElementById('detail-updatedAt').textContent = new Date(coupon.updatedAt).toLocaleString();
-        document.getElementById('detail-log-body').innerHTML = `<tr><td colspan="4" class="text-center py-4">ログはありません</td></tr>`;
-        const deactivateBtn = document.getElementById('deactivateCouponBtn');
-        deactivateBtn.onclick = () => {
-            if (confirm('このクーポンを停止します。よろしいですか？')) {
-                coupon.status = 'INACTIVE';
-                applyFiltersAndRender();
-                closeModal('couponDetailModal');
-                showToast('クーポンを停止しました。', 'info');
-            }
-        };
-    }
+    // 6. フォーム送信処理
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+        // ここで実際のメール送信APIを呼び出す
+        showToast('メールを送信しました。');
+        closeModal();
+    });
 }
