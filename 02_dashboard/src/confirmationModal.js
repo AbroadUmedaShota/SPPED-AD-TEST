@@ -19,7 +19,7 @@ export function showConfirmationModal(message, onConfirm, options = {}) {
         prompt = null // New option for input field
     } = options;
 
-    handleOpenModal('confirmationModal', 'modals/confirmationModal.html')
+    handleOpenModal('confirmationModal', '/02_dashboard/modals/confirmationModal.html')
         .then(() => {
             const modal = document.getElementById('confirmationModal');
             const titleEl = document.getElementById('confirmationModalTitle');
@@ -39,12 +39,23 @@ export function showConfirmationModal(message, onConfirm, options = {}) {
             if (inputContainer) {
                 inputContainer.innerHTML = ''; // Clear previous content
                 if (prompt) {
-                    inputContainer.innerHTML = `
-                        <div class="input-group">
-                            <input type="${prompt.type || 'text'}" id="confirmationModalInput" class="input-field" placeholder=" " required>
-                            <label class="input-label" for="confirmationModalInput">${prompt.label || ''}</label>
-                        </div>
-                    `;
+                    if (prompt.type === 'select') {
+                        inputContainer.innerHTML = `
+                            <div class="input-group">
+                                <select id="confirmationModalInput" class="input-field">
+                                    ${prompt.options || ''}
+                                </select>
+                                <label class="input-label" for="confirmationModalInput">${prompt.label || ''}</label>
+                            </div>
+                        `;
+                    } else {
+                        inputContainer.innerHTML = `
+                            <div class="input-group">
+                                <input type="${prompt.type || 'text'}" id="confirmationModalInput" class="input-field" placeholder=" " required>
+                                <label class="input-label" for="confirmationModalInput">${prompt.label || ''}</label>
+                            </div>
+                        `;
+                    }
                     inputEl = document.getElementById('confirmationModalInput');
                 }
             }

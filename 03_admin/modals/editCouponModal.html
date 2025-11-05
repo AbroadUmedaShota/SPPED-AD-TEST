@@ -1,0 +1,81 @@
+<!-- クーポン編集モーダル -->
+<div id="edit-coupon-modal" role="dialog" aria-modal="true" aria-labelledby="edit-coupon-title" class="fixed inset-0 z-40 bg-black bg-opacity-50 flex items-center justify-center p-4 transition-opacity duration-300 opacity-0 pointer-events-none" data-state="closed">
+    <div class="bg-surface rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col transition-transform duration-300 scale-95">
+        <!-- モーダルヘッダー -->
+        <header class="flex items-center justify-between p-4 border-b border-outline-variant">
+            <h2 id="edit-coupon-title" class="text-title-large font-semibold text-on-surface">クーポン編集</h2>
+            <button data-action="close" class="p-2 rounded-full hover:bg-surface-container-highest">
+                <span class="material-icons text-on-surface-variant">close</span>
+            </button>
+        </header>
+
+        <!-- モーダルボディ -->
+        <div class="p-6 overflow-y-auto">
+            <form id="editCouponForm" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- クーポンコード (編集不可) -->
+                    <label class="flex flex-col gap-1 text-on-surface-variant text-sm md:col-span-2">
+                        <span>クーポンコード</span>
+                        <input type="text" id="editCouponCode" name="code" class="form-input bg-surface-container text-on-surface" readonly>
+                    </label>
+
+                    <!-- クーポン名称 -->
+                    <label class="flex flex-col gap-1 text-on-surface-variant text-sm md:col-span-2">
+                        <span>クーポン名称</span>
+                        <input type="text" id="editCouponName" name="name" class="form-input text-on-surface placeholder:text-on-surface-variant" required maxlength="100">
+                    </label>
+
+                    <!-- 対象メールアドレス -->
+                    <label class="flex flex-col gap-1 text-on-surface-variant text-sm md:col-span-2">
+                        <span>対象メールアドレス (任意)</span>
+                        <input type="email" id="editCouponTargetEmail" name="targetUserEmail" class="form-input text-on-surface placeholder:text-on-surface-variant">
+                    </label>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- 有効期限（開始） -->
+                    <label class="flex flex-col gap-1 text-on-surface-variant text-sm">
+                        <span>有効期限 (開始)</span>
+                        <input type="date" id="editCouponValidFrom" name="validFrom" class="form-input text-on-surface placeholder:text-on-surface-variant" required>
+                    </label>
+
+                    <!-- 有効期限（終了） -->
+                    <label class="flex flex-col gap-1 text-on-surface-variant text-sm">
+                        <span>有効期限 (終了)</span>
+                        <input type="date" id="editCouponValidTo" name="validTo" class="form-input text-on-surface placeholder:text-on-surface-variant" required>
+                    </label>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- 割引率 (編集不可) -->
+                    <label class="flex flex-col gap-1 text-on-surface-variant text-sm">
+                        <span>割引率 (%)</span>
+                        <input type="number" id="editCouponDiscountRate" name="discountRate" class="form-input bg-surface-container text-on-surface" readonly>
+                    </label>
+
+                    <!-- 利用回数上限 -->
+                    <div class="flex flex-col gap-1 text-on-surface-variant text-sm">
+                        <span>利用回数上限</span>
+                        <input type="number" id="editCouponUsageLimit" name="usageLimit" class="form-input text-on-surface placeholder:text-on-surface-variant" required min="1">
+                        <label class="flex items-center gap-2 mt-2 text-sm">
+                            <input type="checkbox" id="editUnlimitedUsage" class="form-checkbox">
+                            <span>無制限にする</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- メモ -->
+                <label class="flex flex-col gap-1 text-on-surface-variant text-sm">
+                    <span>メモ (任意)</span>
+                    <textarea id="editCouponMemo" name="memo" class="form-textarea text-on-surface placeholder:text-on-surface-variant" rows="3" maxlength="500"></textarea>
+                </label>
+            </form>
+        </div>
+
+        <!-- モーダルフッター -->
+        <footer class="flex items-center justify-end gap-3 p-4 border-t border-outline-variant">
+            <button type="button" data-action="close" class="rounded-lg border border-outline px-4 py-2 text-sm font-semibold text-on-surface">キャンセル</button>
+            <button type="submit" form="editCouponForm" class="rounded-lg bg-primary text-primary-on px-4 py-2 text-sm font-semibold">保存する</button>
+        </footer>
+    </div>
+</div>

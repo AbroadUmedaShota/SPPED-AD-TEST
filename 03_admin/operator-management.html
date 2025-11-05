@@ -29,26 +29,52 @@
                 <div id="breadcrumb-container" class="mb-4"></div>
                 <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant">
                     <h1 class="text-on-background text-headline-large font-bold leading-tight tracking-tight">オペレーター管理</h1>
-                    <button id="open-invite-modal-btn" class="flex items-center justify-center gap-2 min-w-[84px] max-w-[480px] cursor-pointer overflow-hidden rounded-full h-10 px-5 button-primary text-on-primary text-sm font-semibold leading-normal " aria-label="オペレーター招待">
-                        <span class="material-icons text-base">person_add_alt</span>
-                        <span class="truncate">オペレーター招待</span>
-                    </button>
+                    <div class="flex items-center gap-4">
+                        <button id="open-group-modal-btn" class="flex items-center justify-center gap-2 min-w-[84px] max-w-[480px] cursor-pointer overflow-hidden rounded-full h-10 px-5 button-secondary text-on-secondary-container text-sm font-semibold leading-normal" aria-label="グループ作成">
+                            <span class="material-icons text-base">group_add</span>
+                            <span class="truncate">グループ管理</span>
+                        </button>
+                        <button id="open-invite-modal-btn" class="flex items-center justify-center gap-2 min-w-[84px] max-w-[480px] cursor-pointer overflow-hidden rounded-full h-10 px-5 button-primary text-on-primary text-sm font-semibold leading-normal " aria-label="オペレーター招待">
+                            <span class="material-icons text-base">person_add_alt</span>
+                            <span class="truncate">オペレーター招待</span>
+                        </button>
+                    </div>
                 </div>
                 <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
                     <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
                         <h2 class="text-title-large font-semibold text-on-surface">オペレーター一覧</h2>
                     </div>
+
+                    <!-- 一括操作セクション -->
+                    <div id="bulk-action-section" class="mb-4 p-4 border border-outline-variant rounded-lg bg-surface-variant/40 hidden">
+                        <h3 class="text-title-medium font-semibold text-on-surface mb-3">選択中のオペレーターを一括操作</h3>
+                        <div class="flex flex-wrap gap-3">
+                            <button id="bulk-delete-btn" class="button-danger text-on-error-container px-4 py-2 text-sm font-semibold" disabled>
+                                <span class="material-icons text-base">delete</span>
+                                一括削除
+                            </button>
+                            <button id="bulk-change-role-btn" class="button-secondary text-on-secondary-container px-4 py-2 text-sm font-semibold" disabled>
+                                <span class="material-icons text-base">manage_accounts</span>
+                                一括権限変更
+                            </button>
+                            <button id="bulk-change-affiliation-btn" class="button-secondary text-on-secondary-container px-4 py-2 text-sm font-semibold" disabled>
+                                <span class="material-icons text-base">apartment</span>
+                                一括所属変更
+                            </button>
+                        </div>
+                    </div>
+
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-outline-variant text-sm" aria-label="オペレーター一覧テーブル">
                             <thead class="bg-surface-variant text-on-surface-variant text-xs uppercase">
                                 <tr>
                                     <th class="w-12 px-4 py-3 text-center"><input type="checkbox" id="select-all-checkbox" class="form-checkbox"></th>
-                                    <th class="px-4 py-3 text-left"><button class="sort-btn" data-sort-key="name">氏名<span class="material-icons text-base">unfold_more</span></button></th>
-                                    <th class="px-4 py-3 text-left"><button class="sort-btn" data-sort-key="email">メール<span class="material-icons text-base">unfold_more</span></button></th>
-                                    <th class="w-48 px-4 py-3 text-left whitespace-nowrap"><button class="sort-btn" data-sort-key="role">権限<span class="material-icons text-base">unfold_more</span></button></th>
-                                    <th class="w-32 px-4 py-3 text-right"><button class="sort-btn w-full justify-end flex-nowrap" data-sort-key="totalCompleted">総処理数<span class="material-icons text-base">unfold_more</span></button></th>
-                                    <th class="w-32 px-4 py-3 text-left"><button class="sort-btn" data-sort-key="status">状態<span class="material-icons text-base">unfold_more</span></button></th>
-                                    <th class="w-40 px-4 py-3 text-center">操作</th>
+                                    <th class="px-4 py-3 text-left"><button class="sort-btn inline-flex items-center" data-sort-key="name">氏名<span class="material-icons text-base">unfold_more</span></button></th>
+                                    <th class="px-4 py-3 text-left"><button class="sort-btn inline-flex items-center" data-sort-key="email">メール<span class="material-icons text-base">unfold_more</span></button></th>
+                                    <th class="w-48 px-4 py-3 text-left whitespace-nowrap"><button class="sort-btn inline-flex items-center" data-sort-key="role">権限<span class="material-icons text-base">unfold_more</span></button></th>
+                                    <th class="w-32 px-4 py-3 text-left"><button class="sort-btn w-full justify-start inline-flex items-center flex-nowrap" data-sort-key="totalCompleted">総処理数<span class="material-icons text-base">unfold_more</span></button></th>
+                                    <th class="w-32 px-4 py-3 text-left"><button class="sort-btn inline-flex items-center" data-sort-key="status">状態<span class="material-icons text-base">unfold_more</span></button></th>
+                                    <th class="w-40 px-4 py-3 text-left">操作</th>
                                 </tr>
                             </thead>
                             <tbody id="operator-table-body"></tbody>
@@ -73,7 +99,7 @@
         </main>
 
         <!-- Collapsible Toolbox -->
-        <aside id="toolbox-aside" class="fixed top-16 right-0 h-[calc(100vh-4rem)] w-[36rem] bg-surface border-l border-outline-variant shadow-lg transform transition-transform duration-300 ease-in-out z-30">
+        <aside id="toolbox-aside" class="fixed top-16 right-0 h-[calc(100vh-4rem)] w-[34.2rem] bg-surface border-l border-outline-variant shadow-lg transform transition-transform duration-300 ease-in-out z-30">
             <div class="h-full flex flex-col">
                 <div class="p-6 space-y-8">
                     <h3 class="text-title-large font-semibold text-on-surface">ツールボックス</h3>
@@ -123,7 +149,7 @@
                 </div>
             </div>
         </aside>
-        <button id="toolbox-toggle-btn" class="fixed top-[20%] -translate-y-1/2 right-[36rem] w-8 h-16 bg-surface hover:bg-surface-container-high rounded-l-lg shadow-lg flex items-center justify-center border-y border-l border-outline-variant transition-all duration-300 ease-in-out z-40 focus:outline-none focus:ring-2 focus:ring-primary">
+        <button id="toolbox-toggle-btn" class="fixed top-[20%] -translate-y-1/2 right-[34.2rem] w-8 h-16 bg-surface hover:bg-surface-container-high rounded-l-lg shadow-lg flex items-center justify-center border-y border-l border-outline-variant transition-all duration-300 ease-in-out z-40 focus:outline-none focus:ring-2 focus:ring-primary">
             <span class="material-icons transition-transform duration-300">chevron_left</span>
         </button>
     </div>
@@ -133,13 +159,7 @@
 <div id="invite-operator-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50"></div>
 <div id="edit-operator-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50"></div>
 <div id="confirmation-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50"></div>
-
-<script type="module" src="src/admin.js"></script>
-</body>
-
-<div id="invite-operator-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50"></div>
-<div id="edit-operator-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50"></div>
-<div id="confirmation-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50"></div>
+<div id="group-management-modal" class="modal-overlay" data-state="closed"></div>
 
 <script type="module" src="src/admin.js"></script>
 </body>

@@ -120,7 +120,7 @@ function renderOperatorTable(operators) {
             <td class="px-4 py-3 font-medium text-on-surface">${op.name}</td>
             <td class="px-4 py-3 text-on-surface-variant">${op.email}</td>
             <td class="w-48 px-4 py-3 text-on-surface-variant">${op.role}</td>
-            <td class="w-32 px-4 py-3 text-on-surface-variant text-right">${op.totalCompleted}</td>
+            <td class="w-32 px-4 py-3 text-on-surface-variant text-left">${op.totalCompleted}</td>
             <td class="w-32 px-4 py-3 text-on-surface-variant">${getStatusBadge(op.status)}</td>
             <td class="w-40 px-4 py-3 text-center space-x-1">
                 <button class="action-btn detail-btn border border-outline-variant bg-surface text-on-surface-variant px-3 py-1.5 rounded-md text-sm">詳細</button>
@@ -218,6 +218,10 @@ function initInviteOperatorModal() {
             <form id="invite-operator-form">
                 <div class="space-y-4">
                     <div class="space-y-1">
+                        <label for="assigned-id" class="form-label">割り振られるID</label>
+                        <input type="text" id="assigned-id" name="assignedId" class="form-input w-full bg-gray-100 text-gray-500 cursor-not-allowed" readonly>
+                    </div>
+                    <div class="space-y-1">
                         <label for="affiliation" class="form-label">所属</label>
                         <select id="affiliation" name="affiliation" class="form-select w-full">
                             ${affiliations.map(a => `<option value="${a}">${a}</option>`).join('')}
@@ -246,6 +250,22 @@ function initInviteOperatorModal() {
         </div>
     `;
     modalContainer.innerHTML = modalHTML;
+
+    // Add logic to update assigned ID
+    const roleSelect = document.getElementById('role');
+    const assignedIdInput = document.getElementById('assigned-id');
+
+    const updateAssignedId = () => {
+        const selectedRole = roleSelect.value;
+        if (selectedRole === 'Abroadスタッフ(Lv3)' || selectedRole === 'Abroadマネージャー(Lv4)') {
+            assignedIdInput.value = 'ab-000';
+        } else {
+            assignedIdInput.value = 'op-000';
+        }
+    };
+
+    roleSelect?.addEventListener('change', updateAssignedId);
+    updateAssignedId(); // Call once to set initial value
 
     document.getElementById('open-invite-modal-btn')?.addEventListener('click', () => toggleModal('invite-operator-modal', true));
     document.getElementById('close-invite-modal-btn')?.addEventListener('click', () => toggleModal('invite-operator-modal', false));
@@ -292,9 +312,16 @@ function initInviteOperatorModal() {
 
         applyFiltersAndSearch();
         
-        alert(`新規オペレーター「${newOperator.name}」を招待しました。(ID: ${newOperator.id})`);
+        showToast(`新規オペレーター「${newOperator.name}」を招待しました。(ID: ${newOperator.id})`, 'success');
         toggleModal('invite-operator-modal', false);
         e.target.reset();
+    });
+
+    // Add listener to close modal on overlay click
+    document.getElementById('invite-operator-modal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'invite-operator-modal') {
+            toggleModal('invite-operator-modal', false);
+        }
     });
 }
 
@@ -309,6 +336,10 @@ function initEditOperatorModal() {
             <form id="edit-operator-form">
                 <input type="hidden" name="id">
                 <div class="grid grid-cols-1 gap-6">
+                    <div class="space-y-1">
+                        <label for="edit-id" class="form-label">オペレーターID</label>
+                        <input type="text" id="edit-id" name="displayId" class="form-input w-full bg-gray-100 text-gray-500 cursor-not-allowed" readonly>
+                    </div>
                     <div class="space-y-1">
                         <label for="edit-name" class="form-label">オペレーター名</label>
                         <input type="text" id="edit-name" name="name" class="form-input w-full">
@@ -420,6 +451,13 @@ function initEditOperatorModal() {
         toggleModal('edit-operator-modal', false);
         showToast('オペレーター情報が更新されました。', 'success');
     });
+
+    // Add listener to close modal on overlay click
+    document.getElementById('edit-operator-modal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'edit-operator-modal') {
+            toggleModal('edit-operator-modal', false);
+        }
+    });
 }
 
 function openEditModal(operator) {
@@ -427,6 +465,7 @@ function openEditModal(operator) {
     if (!form) return;
 
     form.elements.id.value = operator.id;
+    document.getElementById('edit-id').value = operator.id; // Populate the display ID field
     form.elements.name.value = operator.name;
     form.elements.email.value = operator.email;
     form.elements.affiliation.value = operator.affiliation;
@@ -500,6 +539,103 @@ export function initOperatorManagementPage() {
     initEditOperatorModal();
     initCollapsibleToolbox(); // Keep the sliding panel logic
     adjustPagePaddingForFooter(); // Add padding for footer
+
+    // --- Bulk Action and Checkbox Logic ---
+    const selectAllCheckbox = document.getElementById('select-all-checkbox');
+    const tableBody = document.getElementById('operator-table-body');
+
+    function updateBulkActionUI() {
+        const bulkActionSection = document.getElementById('bulk-action-section');
+        if (!bulkActionSection) return;
+
+        const selectedCheckboxes = document.querySelectorAll('.row-checkbox:checked');
+        const hasSelection = selectedCheckboxes.length > 0;
+
+        bulkActionSection.classList.toggle('hidden', !hasSelection);
+
+        const bulkDeleteBtn = document.getElementById('bulk-delete-btn');
+        const bulkChangeRoleBtn = document.getElementById('bulk-change-role-btn');
+        const bulkChangeAffiliationBtn = document.getElementById('bulk-change-affiliation-btn');
+
+        if (bulkDeleteBtn) bulkDeleteBtn.disabled = !hasSelection;
+        if (bulkChangeRoleBtn) bulkChangeRoleBtn.disabled = !hasSelection;
+        if (bulkChangeAffiliationBtn) bulkChangeAffiliationBtn.disabled = !hasSelection;
+
+        // Update select-all checkbox state
+        if (selectAllCheckbox) {
+            const totalCheckboxes = document.querySelectorAll('.row-checkbox').length;
+            if (totalCheckboxes > 0) {
+                selectAllCheckbox.checked = hasSelection && selectedCheckboxes.length === totalCheckboxes;
+                selectAllCheckbox.indeterminate = hasSelection && selectedCheckboxes.length < totalCheckboxes;
+            }
+        }
+    }
+
+    selectAllCheckbox?.addEventListener('change', (e) => {
+        document.querySelectorAll('.row-checkbox').forEach(checkbox => {
+            checkbox.checked = e.target.checked;
+        });
+        updateBulkActionUI();
+    });
+
+    tableBody?.addEventListener('change', (e) => {
+        if (e.target.classList.contains('row-checkbox')) {
+            updateBulkActionUI();
+        }
+    });
+
+    document.getElementById('bulk-delete-btn')?.addEventListener('click', () => {
+        const selectedIds = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.dataset.operatorId);
+        if (selectedIds.length === 0) return;
+
+        showConfirmationModal(`選択した ${selectedIds.length} 人のオペレーターを削除します。この操作は元に戻せません。よろしいですか？`, () => {
+            dummyOperators = dummyOperators.filter(op => !selectedIds.includes(op.id));
+            applyFiltersAndSearch();
+            showToast(`${selectedIds.length} 人のオペレーターを削除しました。`, 'success');
+        }, { title: '一括削除の確認', confirmText: '削除' });
+    });
+
+    document.getElementById('bulk-change-role-btn')?.addEventListener('click', () => {
+        const selectedIds = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.dataset.operatorId);
+        if (selectedIds.length === 0) return;
+
+        const roleOptions = roles.map(r => `<option value="${r}">${r}</option>`).join('');
+        showConfirmationModal(`選択した ${selectedIds.length} 人の権限を新しい権限に変更します。`, (newRole) => {
+            if (newRole) {
+                dummyOperators.forEach(op => {
+                    if (selectedIds.includes(op.id)) op.role = newRole;
+                });
+                applyFiltersAndSearch();
+                showToast(`${selectedIds.length} 人の権限を「${newRole}」に変更しました。`, 'success');
+            }
+        }, { 
+            title: '一括権限変更',
+            confirmText: '変更を適用',
+            prompt: { type: 'select', label: '新しい権限', options: roleOptions }
+        });
+    });
+
+    document.getElementById('bulk-change-affiliation-btn')?.addEventListener('click', () => {
+        const selectedIds = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.dataset.operatorId);
+        if (selectedIds.length === 0) return;
+
+        const affiliationOptions = affiliations.map(a => `<option value="${a}">${a}</option>`).join('');
+        showConfirmationModal(`選択した ${selectedIds.length} 人の所属を新しい所属に変更します。`, (newAffiliation) => {
+            if (newAffiliation) {
+                dummyOperators.forEach(op => {
+                    if (selectedIds.includes(op.id)) op.affiliation = newAffiliation;
+                });
+                applyFiltersAndSearch();
+                showToast(`${selectedIds.length} 人の所属を「${newAffiliation}」に変更しました。`, 'success');
+            }
+        }, { 
+            title: '一括所属変更',
+            confirmText: '変更を適用',
+            prompt: { type: 'select', label: '新しい所属', options: affiliationOptions }
+        });
+    });
+
+
 
     filterForm?.addEventListener('input', debounce(applyFiltersAndSearch, 300));
 
@@ -595,25 +731,10 @@ export function initOperatorManagementPage() {
         }
     });
     
-    const selectAllCheckbox = document.getElementById('select-all-checkbox');
-    selectAllCheckbox?.addEventListener('change', (e) => {
-        const isChecked = e.target.checked;
-        document.querySelectorAll('.row-checkbox').forEach(checkbox => {
-            checkbox.checked = isChecked;
-        });
-    });
 
-    document.getElementById('operator-table-body')?.addEventListener('change', (e) => {
-        if (e.target.classList.contains('row-checkbox')) {
-            if (!e.target.checked) {
-                selectAllCheckbox.checked = false;
-            } else {
-                const allChecked = Array.from(document.querySelectorAll('.row-checkbox')).every(checkbox => checkbox.checked);
-                selectAllCheckbox.checked = allChecked;
-            }
-        }
-    });
 }
+
+
 
 /**
  * Initializes the collapsible toolbox functionality.
@@ -629,14 +750,17 @@ function initCollapsibleToolbox() {
         return;
     }
 
-    // Default state is open
-    let isToolboxOpen = true;
+    // Check initial width to set default state
+    const toolboxWidth = toolboxAside.offsetWidth;
+    const screenWidth = window.innerWidth;
+    // Default to closed if toolbox takes more than 25% of the screen
+    let isToolboxOpen = (toolboxWidth <= screenWidth * 0.25);
 
     const updateToolboxState = () => {
         if (isToolboxOpen) {
             // OPEN STATE
             toolboxAside.classList.remove('translate-x-full');
-            toggleBtn.style.right = '36rem';
+            toggleBtn.style.right = '34.2rem';
             btnIcon.textContent = 'chevron_left';
         } else {
             // CLOSED STATE

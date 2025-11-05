@@ -1,0 +1,98 @@
+<!-- クーポン一括作成モーダル -->
+<div id="bulk-create-coupon-modal" role="dialog" aria-modal="true" aria-labelledby="bulk-create-coupon-title" class="fixed inset-0 z-40 bg-black bg-opacity-50 flex items-center justify-center p-4 transition-opacity duration-300 opacity-0 pointer-events-none" data-state="closed">
+    <div class="bg-surface rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col transition-transform duration-300 scale-95">
+        <!-- モーダルヘッダー -->
+        <header class="flex items-center justify-between p-4 border-b border-outline-variant">
+            <h2 id="bulk-create-coupon-title" class="text-title-large font-semibold text-on-surface">クーポン一括作成</h2>
+            <button data-action="close" class="p-2 rounded-full hover:bg-surface-container-highest">
+                <span class="material-icons text-on-surface-variant">close</span>
+            </button>
+        </header>
+
+        <!-- モーダルボディ -->
+        <div class="p-6 overflow-y-auto space-y-6">
+
+            <!-- Step 1: Common Settings -->
+            <div id="bulk-step-1">
+                <h3 class="text-title-medium font-medium text-on-surface mb-4">ステップ1: 共通設定と作成件数</h3>
+                <form id="bulkCreateForm-step1" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <label class="flex flex-col gap-1 text-on-surface-variant text-sm">
+                            <span>作成件数</span>
+                            <input type="number" name="quantity" class="form-input text-on-surface placeholder:text-on-surface-variant" placeholder="1以上の整数" required min="1" value="10">
+                        </label>
+                        <label class="flex flex-col gap-1 text-on-surface-variant text-sm">
+                            <span>割引率 (%)</span>
+                            <input type="number" name="discountRate" class="form-input text-on-surface placeholder:text-on-surface-variant" placeholder="1〜50の整数" required min="1" max="50">
+                        </label>
+                        <div class="flex flex-col gap-1 text-on-surface-variant text-sm">
+                            <span>利用回数上限</span>
+                            <div class="flex items-center gap-4">
+                                <input type="number" id="bulkCouponUsageLimit" name="usageLimit" class="form-input text-on-surface placeholder:text-on-surface-variant" placeholder="1以上の整数" required min="1" value="1">
+                                <label class="flex items-center gap-2 flex-shrink-0">
+                                    <input type="checkbox" id="bulkUnlimitedUsage" name="unlimited" class="form-checkbox">
+                                    <span class="whitespace-nowrap">無制限</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-1 text-on-surface-variant text-sm md:col-span-2">
+                            <span>有効期限</span>
+                            <div class="flex items-center gap-2">
+                                <input type="date" name="validFrom" class="form-input w-full text-on-surface placeholder:text-on-surface-variant" required>
+                                <span class="text-on-surface-variant">〜</span>
+                                <input type="date" name="validTo" class="form-input w-full text-on-surface placeholder:text-on-surface-variant" required>
+                            </div>
+                        </div>
+                    </div>
+                     <label class="flex flex-col gap-1 text-on-surface-variant text-sm">
+                        <span>メモ (任意)</span>
+                        <textarea name="memo" class="form-textarea text-on-surface placeholder:text-on-surface-variant" rows="2" placeholder="管理用の内部メモ" maxlength="500"></textarea>
+                    </label>
+                </form>
+            </div>
+
+            <!-- Step 2: Individual Settings & Creation -->
+            <div id="bulk-step-2" class="hidden">
+                <h3 class="text-title-medium font-medium text-on-surface mb-4">ステップ2: コードの確認と作成</h3>
+                <p class="text-sm text-on-surface-variant mb-4">ユニークなクーポンコードが自動生成されました。必要に応じて編集し、作成を実行してください。</p>
+                <div class="max-h-96 overflow-y-auto border border-outline-variant rounded-lg">
+                    <table class="min-w-full text-sm">
+                        <thead class="bg-surface sticky top-0">
+                            <tr>
+                                <th class="px-4 py-2 text-left font-semibold text-on-surface-variant">クーポンコード</th>
+                                <th class="px-4 py-2 text-left font-semibold text-on-surface-variant">クーポン名称</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bulk-preview-body" class="divide-y divide-outline-variant"></tbody>
+                    </table>
+                </div>
+            </div>
+
+             <!-- Step 3: Success -->
+            <div id="bulk-step-3" class="hidden text-center py-8">
+                <span class="material-icons text-6xl text-green-500">check_circle</span>
+                <h3 class="text-title-large font-semibold text-on-surface mt-4">作成完了</h3>
+                <p class="text-on-surface-variant mt-2"><strong id="bulk-success-count"></strong>件のクーポンを作成しました。</p>
+                <div class="mt-6">
+                    <button id="bulk-csv-download" class="inline-flex items-center gap-2 rounded-lg bg-primary text-primary-on px-6 py-3 text-base font-semibold">
+                        <span class="material-icons">file_download</span>
+                        CSVをダウンロード
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- モーダルフッター -->
+        <footer class="flex items-center justify-between gap-3 p-4 border-t border-outline-variant">
+            <div>
+                <button type="button" id="bulk-prev-btn" class="rounded-lg border border-outline px-4 py-2 text-sm font-semibold text-on-surface hidden">戻る</button>
+            </div>
+            <div class="flex items-center gap-3">
+                <button type="button" data-action="close" class="rounded-lg border border-outline px-4 py-2 text-sm font-semibold text-on-surface">キャンセル</button>
+                <button type="button" id="bulk-next-btn" class="rounded-lg bg-primary text-primary-on px-4 py-2 text-sm font-semibold">次へ</button>
+                <button type="button" id="bulk-create-btn" class="rounded-lg bg-primary text-primary-on px-4 py-2 text-sm font-semibold hidden">作成実行</button>
+            </div>
+        </footer>
+    </div>
+</div>

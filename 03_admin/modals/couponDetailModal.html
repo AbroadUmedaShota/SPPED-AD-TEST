@@ -1,0 +1,83 @@
+<!-- クーポン詳細モーダル -->
+<div id="coupon-detail-modal" role="dialog" aria-modal="true" aria-labelledby="coupon-detail-title" class="fixed inset-0 z-40 bg-black bg-opacity-50 flex items-center justify-center p-4 transition-opacity duration-300 opacity-0 pointer-events-none" data-state="closed">
+    <div class="bg-surface rounded-2xl shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col transition-transform duration-300 scale-95">
+        <!-- モーダルヘッダー -->
+        <header class="flex items-center justify-between p-4 border-b border-outline-variant">
+            <h2 id="coupon-detail-title" class="text-title-large font-semibold text-on-surface">クーポン詳細</h2>
+            <button data-action="close" class="p-2 rounded-full hover:bg-surface-container-highest">
+                <span class="material-icons text-on-surface-variant">close</span>
+            </button>
+        </header>
+
+        <!-- モーダルボディ -->
+        <div class="p-6 space-y-6 overflow-y-auto">
+            <!-- 基本情報 -->
+            <section>
+                <h3 class="text-title-medium font-medium text-on-surface mb-3">基本情報</h3>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-3 text-sm">
+                    <div class="flex flex-col">
+                        <span class="text-xs text-on-surface-variant">クーポンコード</span>
+                        <strong id="detail-code" class="text-on-surface">-</strong>
+                    </div>
+                    <div class="flex flex-col col-span-2">
+                        <span class="text-xs text-on-surface-variant">クーポン名称</span>
+                        <strong id="detail-name" class="text-on-surface">-</strong>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-xs text-on-surface-variant">割引率</span>
+                        <strong id="detail-discountRate" class="text-on-surface">-</strong>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-xs text-on-surface-variant">ステータス</span>
+                        <strong id="detail-status" class="text-on-surface">-</strong>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-xs text-on-surface-variant">利用回数</span>
+                        <strong id="detail-usage" class="text-on-surface">-</strong>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-xs text-on-surface-variant">有効期間 (開始)</span>
+                        <strong id="detail-validFrom" class="text-on-surface">-</strong>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-xs text-on-surface-variant">有効期間 (終了)</span>
+                        <strong id="detail-validTo" class="text-on-surface">-</strong>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-xs text-on-surface-variant">対象メールアドレス</span>
+                        <strong id="detail-targetUserEmail" class="text-on-surface">-</strong>
+                    </div>
+                     <div class="flex flex-col col-span-full">
+                        <span class="text-xs text-on-surface-variant">メモ</span>
+                        <p id="detail-memo" class="text-on-surface whitespace-pre-wrap"></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 利用ログ -->
+            <section>
+                <h3 class="text-title-medium font-medium text-on-surface mb-3">利用ログ</h3>
+                <div id="detail-log-container" class="border border-outline-variant rounded-lg max-h-60 overflow-y-auto">
+                    <table class="min-w-full text-sm">
+                        <thead class="bg-surface sticky top-0">
+                            <tr>
+                                <th class="px-4 py-2 text-left font-semibold text-on-surface-variant">利用日時</th>
+                                <th class="px-4 py-2 text-left font-semibold text-on-surface-variant">利用者ID</th>
+                                <th class="px-4 py-2 text-left font-semibold text-on-surface-variant">注文ID</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detail-log-body" class="divide-y divide-outline-variant">
+                            <!-- ログデータがここに挿入されます -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- モーダルフッター -->
+        <footer class="flex items-center justify-between gap-3 p-4 border-t border-outline-variant">
+            <button type="button" id="deactivateCouponButton" class="rounded-lg bg-error text-error-on px-4 py-2 text-sm font-semibold">クーポンを停止する</button>
+            <button type="button" data-action="close" class="rounded-lg border border-outline px-4 py-2 text-sm font-semibold text-on-surface">閉じる</button>
+        </footer>
+    </div>
+</div>

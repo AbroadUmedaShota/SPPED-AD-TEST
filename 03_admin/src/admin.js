@@ -212,6 +212,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         case 'operator-management.html':
             const { initOperatorManagementPage } = await import('./operator-management.js');
             initOperatorManagementPage();
+            const { initGroupManagement } = await import('./groupManagement.js');
+            initGroupManagement();
+            break;
+        case 'coupon-management.html':
+            const { initCouponManagementPage } = await import('./coupon-management.js');
+            initCouponManagementPage();
+            const { initCouponBulkCreate } = await import('./couponBulkCreate.js');
+            initCouponBulkCreate();
             break;
         // Add other admin pages here
         // case 'some_other_page.html':
