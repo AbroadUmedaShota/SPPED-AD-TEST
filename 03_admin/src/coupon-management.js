@@ -256,7 +256,7 @@ function renderPagination(total, pages, start, end) {
         btn.disabled = disabled;
         let classes = 'p-1 rounded-full disabled:opacity-50';
         if (typeof content === 'number') {
-            classes = `w-8 h-8 flex items-center justify-center rounded-lg text-sm ${active ? 'bg-primary text-primary-on' : 'hover:bg-surface-container'}`;
+            classes = `w-8 h-8 flex items-center justify-center rounded-lg text-sm ${active ? 'bg-primary text-white' : 'hover:bg-surface-container'}`;
         }
         btn.className = classes;
         if (page) {
