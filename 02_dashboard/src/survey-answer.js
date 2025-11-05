@@ -13,7 +13,7 @@ const state = {
     isSubmitting: false,
     idleTimer: null,
     isIdle: false,
-    currentLanguage: 'ja',
+    currentLanguage: '',
     hasUnsavedChanges: false,
 };
 
@@ -25,11 +25,7 @@ function initializeDOMElements() {
         loadingIndicator: document.getElementById('loading-indicator'),
         header: document.getElementById('survey-page-header'),
         headerText: document.getElementById('survey-header-text'),
-        draftSaveButton: document.getElementById('draft-save-fab'),
-        draftSaveFabContainer: document.getElementById('draft-save-fab-container'),
-        languageSwitcher: document.getElementById('language-switcher'),
-        languageSwitcherButton: document.getElementById('language-switcher-button'),
-        languageMenu: document.getElementById('language-menu'),
+        languageSelect: document.getElementById('language-select'),
         mainContent: document.getElementById('main-content'),
         errorContainer: document.getElementById('error-container'),
         surveyForm: document.getElementById('survey-form'),
@@ -48,9 +44,6 @@ function initializeDOMElements() {
 
         // --- カラーピッカーテスト機能用要素 ---
         surveyMainWrapper: document.getElementById('survey-main-wrapper'),
-        headerColorPicker: document.getElementById('header-color-picker'),
-        footerColorPicker: document.getElementById('footer-color-picker'),
-        backgroundColorPicker: document.getElementById('background-color-picker'),
         footer: document.querySelector('footer'),
     };
 }
@@ -70,9 +63,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         startAutoSaveTimer();
         setupLeaveConfirmation();
-        setupHeaderScrollBehavior();
+        // setupHeaderScrollBehavior();
         disablePullToRefresh();
         history.pushState(null, '', location.href); // <-- Add this line
+
+        // テキストエリアの自動リサイズ
+        DOMElements.surveyForm.addEventListener('input', (e) => {
+            if (e.target.tagName.toLowerCase() === 'textarea') {
+                autoResizeTextarea(e.target);
+            }
+        });
     } catch (error) {
         console.error('初期化エラー:', error);
         displayError(error.message || 'アンケートの読み込みに失敗しました。');
@@ -154,13 +154,6 @@ async function loadSurveyData() {
 }
 
 function setupEventListeners() {
-    // 一時保存ボタンのイベントリスナー設定
-    if (DOMElements.draftSaveButton) {
-        DOMElements.draftSaveButton.addEventListener('click', () => saveDraft(true));
-    } else {
-        console.error('一時保存ボタン (draft-save-fab) が見つかりません。一時保存機能は無効です。');
-    }
-    
     // 他の必須ボタンもガード
     if (DOMElements.submitSurveyButton) {
         DOMElements.submitSurveyButton.addEventListener('click', handleSubmit);
@@ -255,17 +248,48 @@ function setupEventListeners() {
                     DOMElements.manualInputModal.style.display = 'none';
                 }
             });
+
+            // --- リアルタイムバリデーションの追加 ---
+            const postalInput = document.getElementById('manual-postal-code');
+            const phoneInput = document.getElementById('manual-phone');
+            const postalError = document.getElementById('manual-postal-code-error');
+            const phoneError = document.getElementById('manual-phone-error');
+
+            postalInput.addEventListener('input', (e) => {
+                const value = e.target.value;
+                if (value && !/^\d{3}-?\d{4}$/.test(value)) {
+                    postalError.textContent = '郵便番号の形式が正しくありません。(例: 123-4567)';
+                    postalError.classList.remove('hidden');
+                } else {
+                    postalError.textContent = '';
+                    postalError.classList.add('hidden');
+                }
+            });
+
+            phoneInput.addEventListener('input', (e) => {
+                const value = e.target.value;
+                if (value && !/^[\d-]+$/.test(value)) {
+                    phoneError.textContent = '電話番号には数字とハイフンのみを使用してください。';
+                    phoneError.classList.remove('hidden');
+                } else {
+                    phoneError.textContent = '';
+                    phoneError.classList.add('hidden');
+                }
+            });
         });
     }
-
-    // テスト用カラーピッカー機能のセットアップ
-    setupColorPickerTestFeature();
-    
-    // アイドル検出とFAB表示ロジックのセットアップ
-    setupIdleDetection();
 }
 
 // ... (他の関数の間)
+
+/**
+ * テキストエリアの高さを内容に応じて自動調整する
+ * @param {HTMLTextAreaElement} element - 対象のテキストエリア
+ */
+function autoResizeTextarea(element) {
+    element.style.height = 'auto';
+    element.style.height = `${element.scrollHeight}px`;
+}
 
 // --- 名刺アップロードフロー ---
 let bizcardImages = { front: null, back: null };
@@ -579,23 +603,35 @@ function populateFormWithDraft() {
 }
 
 function startAutoSaveTimer() {
-    setInterval(() => saveDraft(false), 30000); // 30秒ごとに自動保存
+    setInterval(saveDraft, 30000); // 30秒ごとに自動保存
 }
 
 // --- 描画関数 ---
 
 function renderSurvey() {
     renderHeader();
+    renderSurveyTitle();
     renderQuestions();
+    updateDynamicColors('#FFFFFF'); // スタイルを再適用
 }
 
 function renderHeader() {
-    const { displayTitle, description } = state.surveyData;
-    DOMElements.headerText.innerHTML = `
-        <h1 class="text-2xl sm:text-3xl font-bold text-on-surface">${resolveLocalizedText(displayTitle) || 'アンケート'}</h1>
-        <p class="text-on-surface-variant mt-2">${resolveLocalizedText(description) || ''}</p>
-    `;
+    const { displayTitle } = state.surveyData;
+    // DOMElements.headerText.innerHTML = ''; // コンテンツを削除
     document.title = `SpeedAd - ${resolveLocalizedText(displayTitle) || 'アンケート回答'}`;
+}
+
+function renderSurveyTitle() {
+    const { displayTitle, description } = state.surveyData;
+    const titleContainer = document.getElementById('survey-title-container');
+    if (titleContainer) {
+        titleContainer.innerHTML = `
+            <div class="bg-white border-2 border-gray-200 rounded-lg shadow-md p-6">
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">${resolveLocalizedText(displayTitle) || 'アンケート'}</h1>
+                <p class="text-gray-600 mt-2">${resolveLocalizedText(description) || ''}</p>
+            </div>
+        `;
+    }
 }
 
 function renderQuestions() {
@@ -607,13 +643,13 @@ function renderQuestions() {
         return;
     }
 
-    state.surveyData.questions.forEach(question => {
-        const questionElement = createQuestionElement(question);
+    state.surveyData.questions.forEach((question, index) => {
+        const questionElement = createQuestionElement(question, index);
         form.appendChild(questionElement);
     });
 }
 
-function createQuestionElement(question) {
+function createQuestionElement(question, index) {
     const fieldset = document.createElement('fieldset');
     fieldset.className = 'survey-question-card';
     if (question.required) {
@@ -621,15 +657,18 @@ function createQuestionElement(question) {
     }
     fieldset.dataset.questionId = question.id;
 
-    const requiredBadge = question.required ? `<span class="text-red-600 font-bold ml-1">*</span>` : '';
+    const questionNumber = `Q.${String(index + 1).padStart(2, '0')}`;
+    const requiredText = question.required ? `<span class="text-red-600 font-bold text-xs">必須</span>` : '';
     
     const contentDiv = document.createElement('div');
     contentDiv.className = 'question-content';
 
     contentDiv.innerHTML = `
-        <div class="flex items-center mb-4">
-            <p class="text-base font-semibold text-on-surface-variant">${resolveLocalizedText(question.text)}</p>
-            ${requiredBadge}
+        <div class="mb-4">
+            <div class="flex items-center">
+                <span class="text-lg font-bold text-gray-500 mr-3">${questionNumber}</span>${requiredText}
+            </div>
+            <p class="text-base font-semibold text-on-surface-variant mt-2">${resolveLocalizedText(question.text)}</p>
         </div>
         <div class="control-area space-y-3"></div>
     `;
@@ -794,15 +833,17 @@ function createQuestionElement(question) {
 
 function setupPremiumFeatures() {
     // 多言語対応
-    // NOTE: Temporarily modified to always show switcher for testing.
-    let displayLanguages = state.surveyData.languages || [];
-    // Create dummy data for testing if no languages are set
-    if (displayLanguages.length === 0) {
-        displayLanguages = ['en', 'zh-CN'];
+    const { languageSelect } = DOMElements;
+    if (!languageSelect) {
+        console.error('Language select element not found.');
+        return;
     }
 
-    DOMElements.languageSwitcher.classList.remove('hidden');
-    
+    let displayLanguages = state.surveyData.languages || [];
+    if (displayLanguages.length === 0) {
+        displayLanguages = ['en', 'zh-CN']; // テスト用のダミーデータ
+    }
+
     const languageMap = {
         'ja': '日本語',
         'en': 'English',
@@ -811,67 +852,52 @@ function setupPremiumFeatures() {
         'vi': 'Tiếng Việt',
     };
 
-    const buildMenu = () => {
-        const availableLanguages = ['ja', ...displayLanguages];
-        DOMElements.languageMenu.innerHTML = ''; // Clear existing options
+    const availableLanguages = ['ja', ...displayLanguages];
 
-        availableLanguages.forEach(lang => {
-            const langName = languageMap[lang] || lang;
-            const link = document.createElement('a');
-            link.href = '#';
-            link.className = 'block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100';
-            if (state.currentLanguage === lang) {
-                link.classList.add('bg-gray-100', 'font-bold');
-            }
-            link.textContent = langName;
-            link.dataset.lang = lang;
-            DOMElements.languageMenu.appendChild(link);
-        });
-    };
+    languageSelect.innerHTML = ''; // 既存のオプションをクリア
 
-    buildMenu(); // Initial build
+    // デフォルトの「Language」オプションを追加
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'Language';
+    defaultOption.disabled = true;
+    languageSelect.appendChild(defaultOption);
 
-    // Attach listeners only once.
-    if (!DOMElements.languageSwitcher.dataset.listenerAttached) {
-        DOMElements.languageSwitcher.dataset.listenerAttached = 'true';
+    availableLanguages.forEach(lang => {
+        const langName = languageMap[lang] || lang;
+        const option = document.createElement('option');
+        option.value = lang;
+        option.textContent = langName;
+        languageSelect.appendChild(option);
+    });
 
-        // Globe icon click to toggle menu
-        DOMElements.languageSwitcherButton.addEventListener('click', (e) => {
-            e.stopPropagation();
-            DOMElements.languageMenu.classList.toggle('hidden');
-        });
+    // 現在の言語に基づいて選択状態を設定
+    languageSelect.value = state.currentLanguage || '';
 
-        // Language selection click
-        DOMElements.languageMenu.addEventListener('click', (e) => {
-            e.preventDefault();
-            const target = e.target.closest('[data-lang]');
-            if (target) {
-                const lang = target.dataset.lang;
-                if (lang !== state.currentLanguage) {
-                    state.currentLanguage = lang;
-                    renderSurvey();
-                    populateFormWithDraft();
-                    showToast(`${languageMap[state.currentLanguage] || state.currentLanguage}に切り替えました`);
-                    buildMenu(); // Re-build menu to update highlight
-                }
-                DOMElements.languageMenu.classList.add('hidden');
-            }
-        });
+    // コンテナを表示
+    const container = document.getElementById('language-switcher-container');
+    if (container) {
+        container.classList.remove('hidden');
+    }
 
-        // Click outside to close
-        window.addEventListener('click', () => {
-            if (!DOMElements.languageMenu.classList.contains('hidden')) {
-                DOMElements.languageMenu.classList.add('hidden');
+    // イベントリスナーを設定 (一度だけ)
+    if (!languageSelect.dataset.listenerAttached) {
+        languageSelect.dataset.listenerAttached = 'true';
+        languageSelect.addEventListener('change', (e) => {
+            const newLang = e.target.value;
+            if (newLang !== state.currentLanguage) {
+                state.currentLanguage = newLang;
+                renderSurvey();
+                populateFormWithDraft();
+                showToast(`${languageMap[newLang] || newLang}に切り替えました`);
             }
         });
     }
-    // TODO: 手書きスペース設問のハンドリング
 }
 
-function saveDraft(isManual) {
-    // 自動保存 (isManual: false) の場合のみ、未保存の変更がない場合はスキップ
-    if (!isManual && !state.hasUnsavedChanges) {
-        console.log('自動保存: 未保存の変更がないためスキップしました。');
+function saveDraft() {
+    // 未保存の変更がない場合はスキップ
+    if (!state.hasUnsavedChanges) {
         return;
     }
 
@@ -886,14 +912,7 @@ function saveDraft(isManual) {
     localStorage.setItem(draftKey, JSON.stringify(answersToSave));
     state.hasUnsavedChanges = false;
 
-    if (isManual) {
-        showToast('下書きを保存しました。');
-        // 手動保存が成功したら、ボタンを非表示にする
-        hideFab();
-        console.log('手動保存: ドラフトを保存しました。', state.answers);
-    } else {
-        console.log('自動保存: ドラフトを保存しました。', state.answers);
-    }
+    console.log('自動保存: ドラフトを保存しました。', state.answers);
 }
 
 function validateField(questionId) {
@@ -1044,17 +1063,7 @@ function resolveLocalizedText(value) {
 // --- その他のユーティリティ ---
 
 function setupHeaderScrollBehavior() {
-    let lastScrollY = window.scrollY;
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > lastScrollY && window.scrollY > DOMElements.header.offsetHeight) {
-            // Downscroll
-            DOMElements.header.classList.add('header-unpinned');
-        } else {
-            // Upscroll
-            DOMElements.header.classList.remove('header-unpinned');
-        }
-        lastScrollY = window.scrollY;
-    });
+    // Header has been removed.
 }
 
 function setupLeaveConfirmation() {
@@ -1110,419 +1119,60 @@ function disablePullToRefresh() {
     document.body.style.overscrollBehaviorY = 'contain';
 }
 
-// --- テスト用カラーピッカー機能 ---
-function setupColorPickerTestFeature() {
-    if (!DOMElements.headerColorPicker || !DOMElements.footerColorPicker || !DOMElements.backgroundColorPicker) {
-        // HTMLに要素がない場合は何もしない
-        return;
-    }
+function adjustColor(color, amount) {
+    // Handles hex, rgb, and rgba colors
+    let r, g, b;
 
-    // ヘッダー色の変更
-    DOMElements.headerColorPicker.addEventListener('input', (e) => {
-        if (DOMElements.header) {
-            DOMElements.header.style.backgroundColor = e.target.value;
+    if (color.startsWith('#')) {
+        color = color.slice(1);
+        if (color.length === 3) {
+            color = color.split('').map(c => c + c).join('');
         }
+        r = parseInt(color.substring(0, 2), 16);
+        g = parseInt(color.substring(2, 4), 16);
+        b = parseInt(color.substring(4, 6), 16);
+    } else if (color.startsWith('rgb')) {
+        const parts = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+        r = parseInt(parts[1], 10);
+        g = parseInt(parts[2], 10);
+        b = parseInt(parts[3], 10);
+    } else {
+        // Return a default if color format is unknown
+        return { hex: '#4285F4', rgb: { r: 66, g: 133, b: 244 } };
+    }
+    
+    r = Math.max(0, Math.min(255, r - amount));
+    g = Math.max(0, Math.min(255, g - amount));
+    b = Math.max(0, Math.min(255, b - amount));
+
+    const hex = `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+    return { hex, rgb: { r, g, b } };
+}
+
+function updateDynamicColors(backgroundColor) {
+    const darkerColor = adjustColor(backgroundColor, 40);
+
+    // Update left border for required questions
+    const requiredElements = document.querySelectorAll('.is-required');
+    requiredElements.forEach(el => {
+        el.style.borderLeftColor = darkerColor.hex;
     });
 
-    // フッター色の変更
-    DOMElements.footerColorPicker.addEventListener('input', (e) => {
-        if (DOMElements.footer) {
-            DOMElements.footer.style.backgroundColor = e.target.value;
-        }
-    });
-
-        // 背景色の変更
-
-        DOMElements.backgroundColorPicker.addEventListener('input', (e) => {
-
-            if (DOMElements.surveyMainWrapper) {
-
-                // Tailwind CSSのクラスを上書きするためにstyle属性を直接操作
-
-                DOMElements.surveyMainWrapper.style.backgroundColor = e.target.value;
-
-            }
-
-        });
-
+    // Create/update style tag for focus-within styles
+    let styleTag = document.getElementById('dynamic-styles');
+    if (!styleTag) {
+        styleTag = document.createElement('style');
+        styleTag.id = 'dynamic-styles';
+        document.head.appendChild(styleTag);
     }
-
     
+    const { r, g, b } = darkerColor.rgb;
 
-    
-
-        // --- FAB表示/非表示ロジック (アイドル検出) ---
-
-    
-
-        const IDLE_TIMEOUT = 2000; // 2秒
-
-    
-
-        function showFab() {
-
-    
-
-            DOMElements.draftSaveFabContainer.classList.remove('opacity-0', 'pointer-events-none');
-
-    
-
-            DOMElements.draftSaveFabContainer.classList.add('opacity-100');
-
-    
-
+    styleTag.innerHTML = `
+        .survey-question-card:focus-within {
+            border-color: ${darkerColor.hex};
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px 0 rgba(${r}, ${g}, ${b}, 0.25);
         }
-
-    
-
-        
-
-    
-
-        function hideFab() {
-
-    
-
-        
-
-    
-
-            if (!DOMElements.draftSaveFabContainer) {
-
-    
-
-        
-
-    
-
-                console.error('FAB container not initialized.');
-
-    
-
-        
-
-    
-
-                return;
-
-    
-
-        
-
-    
-
-            }
-
-    
-
-        
-
-    
-
-            DOMElements.draftSaveFabContainer.classList.remove('opacity-100');
-
-    
-
-        
-
-    
-
-            DOMElements.draftSaveFabContainer.classList.add('opacity-0', 'pointer-events-none');
-
-    
-
-        
-
-    
-
-        }
-
-    
-
-        
-
-    
-
-        function resetIdleTimer() {
-
-    
-
-            // 既存のタイマーをクリア
-
-    
-
-            clearTimeout(state.idleTimer);
-
-    
-
-        
-
-    
-
-                            // 操作があったら、アイドル状態を解除し、FABを非表示にする
-
-    
-
-        
-
-    
-
-                    
-
-    
-
-        
-
-    
-
-                            if (state.isIdle) {
-
-    
-
-        
-
-    
-
-                    
-
-    
-
-        
-
-    
-
-                                state.isIdle = false;
-
-    
-
-        
-
-    
-
-                                // クリック操作を妨げないように、少し遅れて非表示にする
-
-    
-
-        
-
-    
-
-                                setTimeout(hideFab, 500);
-
-    
-
-        
-
-    
-
-                    
-
-    
-
-        
-
-    
-
-                            }
-
-    
-
-        
-
-    
-
-            // 新しいタイマーを設定
-
-    
-
-            state.idleTimer = setTimeout(() => {
-
-    
-
-                // 2秒経過したらアイドル状態
-
-    
-
-                state.isIdle = true;
-
-    
-
-                // 未保存の変更がある場合のみ表示
-
-    
-
-                if (state.hasUnsavedChanges) {
-
-    
-
-                    showFab();
-
-    
-
-                }
-
-    
-
-            }, IDLE_TIMEOUT);
-
-    
-
-        }
-
-    
-
-        
-
-    
-
-        function setupIdleDetection() {
-
-    
-
-            // 初期タイマー設定
-
-    
-
-            resetIdleTimer();
-
-    
-
-        
-
-    
-
-                // 監視するイベントの基本セット
-
-    
-
-        
-
-    
-
-                let events = ['mousedown', 'keypress', 'scroll'];
-
-    
-
-        
-
-    
-
-            
-
-    
-
-        
-
-    
-
-                // PCとモバイルでイベントを分岐
-
-    
-
-        
-
-    
-
-                const isTouchDevice = ('ontouchstart' in window || navigator.maxTouchPoints > 0);
-
-    
-
-        
-
-    
-
-            
-
-    
-
-        
-
-    
-
-                if (isTouchDevice) {
-
-    
-
-        
-
-    
-
-                    events.push('touchstart');
-
-    
-
-        
-
-    
-
-                } else {
-
-    
-
-        
-
-    
-
-                    // PCの場合、マウスムーブでは非表示にしない。
-
-    
-
-        
-
-    
-
-                    // マウスダウン、キープレス、スクロールは操作とみなす。
-
-    
-
-        
-
-    
-
-                }
-
-    
-
-        
-
-    
-
-            
-
-    
-
-        
-
-    
-
-                events.forEach(event => {
-
-    
-
-        
-
-    
-
-                    document.addEventListener(event, resetIdleTimer, true);
-
-    
-
-        
-
-    
-
-                });
-
-    
-
-        }
-
-    
-
-        // --- /FAB表示/非表示ロジック (アイドル検出)
-
-    
-
-        
-
-    
+    `;
+}

@@ -31,14 +31,11 @@
             border-radius: 8px;
             box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
             margin-bottom: 1.5rem;
-            transition: box-shadow 0.2s ease;
+            transition: all 0.2s ease-in-out;
         }
-        .survey-question-card:focus-within {
-            border-color: #4285F4;
-            box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.2);
-        }
+
         .survey-question-card.is-required {
-            border-left: 4px solid #4285F4;
+            border-left: 4px solid transparent;
         }
         .survey-question-card .question-content {
             padding: 1.5rem;
@@ -53,37 +50,25 @@
 </head>
 <body class="bg-gray-50">
 
-    <div id="survey-main-wrapper" style="background-color: #FDF8F8;" class="text-gray-800 min-h-screen">
+    <div id="survey-main-wrapper" style="background-color: #E0F2F7;" class="text-gray-800 min-h-screen">
         <!-- ローディングインジケーター -->
         <div id="loading-indicator" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div class="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
         </div>
 
-        <!-- ヘッダー -->
-        <header id="survey-page-header" class="sticky top-0 bg-white shadow-md border-b border-gray-200 transition-transform duration-300 ease-in-out z-40">
-            <div class="survey-content-wrapper py-4">
-                <div class="relative flex justify-center items-center">
-                    <div id="survey-header-text" class="text-center">
-                        <!-- アンケートタイトルと説明がJSでここに挿入される -->
-                    </div>
-                </div>
-            </div>
-        </header>
+
+
 
         <!-- メインコンテンツ -->
         <main id="main-content" class="py-2">
             <div class="survey-content-wrapper">
-                <!-- Language Switcher -->
-                        <div id="language-switcher" class="relative flex justify-end mb-2 hidden">
-                            <!-- Globe Icon Button -->
-                            <button id="language-switcher-button" type="button" class="p-2 rounded-full hover:bg-gray-100">
-                                <span class="material-icons">language</span>
-                            </button>
-                            <!-- Language Popover Menu -->
-                            <div id="language-menu" class="absolute right-0 mt-12 w-48 bg-white rounded-md shadow-lg py-1 z-50 hidden">
-                                <!-- Language options will be dynamically inserted here by JS -->
-                            </div>
-                        </div>                <div id="error-container" class="hidden bg-red-100 text-red-700 p-4 rounded-lg mb-6" role="alert">
+                        <!-- Language Switcher -->
+                <div id="language-switcher-container" class="relative flex justify-end items-center mb-4">
+                    <select id="language-select" class="w-40 block pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-100 focus:border-indigo-500 sm:text-sm rounded-md">
+                        <!-- Language options will be dynamically inserted here by JS -->
+                    </select>
+                </div>                <div id="survey-title-container" class="mb-6"></div>
+                <div id="error-container" class="hidden bg-red-100 text-red-700 p-4 rounded-lg mb-6" role="alert">
                     <!-- エラーメッセージ表示領域 -->
                 </div>
                 <form id="survey-form" class="space-y-6"></form>
@@ -127,32 +112,9 @@
         <p id="toast-message" class="whitespace-nowrap overflow-hidden text-ellipsis"></p>
     </div>
 
-    <!-- フローティング一時保存ボタン (FAB) -->
-    <div id="draft-save-fab-container" class="fixed bottom-4 right-4 z-30 transition-opacity duration-300 opacity-0 pointer-events-none">
-        <button id="draft-save-fab" type="button" class="w-14 h-14 rounded-full bg-blue-600 text-white shadow-xl hover:bg-blue-700 flex items-center justify-center">
-            <span class="material-icons text-2xl">save</span>
-        </button>
-    </div>
 
-    <!-- カラーピッカーテスト機能 (UIの邪魔にならないように画面右上に固定配置) -->
-    <div id="color-picker-test-container" class="fixed top-4 left-4 z-50 p-4 bg-white shadow-lg rounded-lg border border-gray-200 opacity-0 transition-opacity duration-300 hover:opacity-100">
-        <h3 class="text-sm font-bold mb-2 text-gray-700">テスト用カラー設定</h3>
-        <div class="space-y-2">
-            <div class="flex items-center justify-between">
-                <label for="header-color-picker" class="text-xs text-gray-600">ヘッダー色:</label>
-                <input type="color" id="header-color-picker" value="#ffffff" class="w-8 h-8 p-0 border-none cursor-pointer">
-            </div>
-            <div class="flex items-center justify-between">
-                <label for="footer-color-picker" class="text-xs text-gray-600">フッター色:</label>
-                <input type="color" id="footer-color-picker" value="#ffffff" class="w-8 h-8 p-0 border-none cursor-pointer">
-            </div>
-            <div class="flex items-center justify-between">
-                <label for="background-color-picker" class="text-xs text-gray-600">背景色:</label>
-                <input type="color" id="background-color-picker" value="#FDF8F8" class="w-8 h-8 p-0 border-none cursor-pointer">
-            </div>
-        </div>
-        <p class="text-xs text-gray-400 mt-2">※マウスオーバーで表示</p>
-    </div>
+
+
 
     <script type="module" src="src/survey-answer.js"></script>
 </body>
