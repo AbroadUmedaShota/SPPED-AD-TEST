@@ -138,7 +138,7 @@ function normalizeOptions(options, questionId) {
 }
 
 async function loadSurveyData() {
-    const response = await fetch(`/data/demo_surveys/${state.surveyId}.json`);
+    const response = await fetch(`/data/surveys/${state.surveyId}.json`);
     if (!response.ok) {
         throw new Error(`アンケート定義ファイルが見つかりません (ID: ${state.surveyId})`);
     }
@@ -568,11 +568,16 @@ function populateFormWithDraft() {
         if (!question) return;
 
         const elements = document.getElementsByName(questionId);
-        if (elements.length === 0 && question.type !== 'handwriting_space') return;
-
+        
         const type = question.type;
 
-        if (type === 'handwriting_space') {
+        if (type === 'date_time') {
+            const [datePart, timePart] = (answer || '').split('T');
+            const dateInput = document.querySelector(`input[name=\"${questionId}_date\"]`);
+            const timeInput = document.querySelector(`input[name=\"${questionId}_time\"]`);
+            if (dateInput) dateInput.value = datePart || '';
+            if (timeInput) timeInput.value = timePart || '';
+        } else if (type === 'handwriting_space') {
             const canvas = document.getElementById(`${questionId}-canvas`);
             if (canvas && answer) {
                 const ctx = canvas.getContext('2d');
@@ -582,21 +587,23 @@ function populateFormWithDraft() {
                 };
                 img.src = answer;
             }
-        } else if (elements[0].type === 'radio') {
-            elements.forEach(el => {
-                if (el.value === answer) {
-                    el.checked = true;
-                }
-            });
-        } else if (type === 'checkbox') {
-            const answerArray = Array.isArray(answer) ? answer : [answer];
-            elements.forEach(el => {
-                if (answerArray.includes(el.value)) {
-                    el.checked = true;
-                }
-            });
-        } else { // textarea, select-one, number, datetime-local etc.
-            elements[0].value = answer;
+        } else if (elements.length > 0) { // elements を使う他のタイプ
+            if (elements[0].type === 'radio') {
+                elements.forEach(el => {
+                    if (el.value === answer) {
+                        el.checked = true;
+                    }
+                });
+            } else if (elements[0].type === 'checkbox') {
+                const answerArray = Array.isArray(answer) ? answer : [answer];
+                elements.forEach(el => {
+                    if (answerArray.includes(el.value)) {
+                        el.checked = true;
+                    }
+                });
+            } else { // textarea, select-one, number, etc.
+                elements[0].value = answer;
+            }
         }
     });
     console.log('フォームにドラフトを反映しました。');
@@ -703,7 +710,12 @@ function createQuestionElement(question, index) {
             controlArea.innerHTML = `<input type="number" name="${question.id}" class="w-full rounded-md border-gray-300 shadow-sm" min="${question.min}" max="${question.max}" step="${question.step || 1}">`;
             break;
         case 'date_time':
-            controlArea.innerHTML = `<input type="datetime-local" name="${question.id}" class="w-full rounded-md border-gray-300 shadow-sm">`;
+            controlArea.innerHTML = `
+              <div class="flex flex-col sm:flex-row gap-2">
+                <input type="date" name="${question.id}_date" class="w-full rounded-md border-gray-300 shadow-sm p-2" aria-label="Date" max="9999-12-31">
+                <input type="time" name="${question.id}_time" class="w-full rounded-md border-gray-300 shadow-sm p-2" aria-label="Time">
+              </div>
+            `;
             break;
         case 'dropdown':
             let optionsHTML = '';
@@ -738,15 +750,13 @@ function createQuestionElement(question, index) {
         case 'explanation_card':
             controlArea.innerHTML = `<p class="text-on-surface-variant">${resolveLocalizedText(question.text)}</p>`;
             // 説明カードには凡例や枠線が不要な場合があるため、スタイルを調整
-            fieldset.className = 'p-4'; // 余白のみ
-            fieldset.querySelector('legend').style.display = 'none';
             break;
         case 'handwriting_space':
             const canvasId = `${question.id}-canvas`;
             const clearButtonId = `${question.id}-clear`;
             controlArea.innerHTML = `
                 <canvas id="${canvasId}" class="border border-gray-400 rounded-md w-full" height="200"></canvas>
-                <button type="button" id="${clearButtonId}" class="text-sm text-primary hover:underline mt-2">クリア</button>
+                <button type="button" id="${clearButtonId}" class="px-4 py-2 text-sm font-medium rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 mt-2">クリア</button>
             `;
 
             setTimeout(() => {
@@ -807,23 +817,34 @@ function createQuestionElement(question, index) {
             controlArea.innerHTML = `<p class="text-sm text-error">未対応の設問タイプです: ${question.type}</p>`;
     }
     
-    // 回答をstateに反映するイベントリスナー
     fieldset.addEventListener('change', (e) => {
         const questionId = fieldset.dataset.questionId;
-        const formData = new FormData(DOMElements.surveyForm);
-        const entries = formData.getAll(questionId);
-        
-        if (entries.length > 1) {
-            state.answers[questionId] = entries; // チェックボックスやマトリックスMAなど
-        } else if (entries.length === 1) {
-            state.answers[questionId] = entries[0]; // ラジオボタンやテキスト入力など
+        const question = state.surveyData.questions.find(q => q.id === questionId);
+
+        if (question.type === 'date_time') {
+            const dateValue = fieldset.querySelector(`input[name=\"${questionId}_date\"]`).value;
+            const timeValue = fieldset.querySelector(`input[name=\"${questionId}_time\"]`).value;
+
+            if (dateValue) { // 時刻は任意でも良い場合を考慮
+                state.answers[questionId] = `${dateValue}${timeValue ? 'T' + timeValue : ''}`;
+            } else {
+                delete state.answers[questionId];
+            }
         } else {
-            delete state.answers[questionId]; // 未選択状態
+            const formData = new FormData(DOMElements.surveyForm);
+            const entries = formData.getAll(questionId);
+            
+            if (entries.length > 1) {
+                state.answers[questionId] = entries; // チェックボックスやマトリックスMAなど
+            } else if (entries.length === 1) {
+                state.answers[questionId] = entries[0]; // ラジオボタンやテキスト入力など
+            } else {
+                delete state.answers[questionId]; // 未選択状態
+            }
         }
         state.hasUnsavedChanges = true;
         validateField(questionId); // リアルタイムバリデーションを実行
         console.log('Answers updated:', state.answers);
-        console.log('state.hasUnsavedChanges after change:', state.hasUnsavedChanges); // <-- Add this line
     });
 
     return fieldset;
