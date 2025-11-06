@@ -1,5 +1,5 @@
-<div class="modal-content-transition max-w-3xl w-full bg-surface rounded-2xl shadow-lg overflow-hidden">
-    <div class="p-6 border-b border-outline-variant">
+<div class="modal-content-transition max-w-3xl w-full bg-surface rounded-2xl shadow-lg overflow-hidden flex flex-col" style="max-height: 90vh;">
+    <div class="p-6 border-b border-outline-variant flex-shrink-0">
         <div class="flex justify-between items-center">
             <h2 class="text-headline-small font-semibold text-on-surface">グループ管理</h2>
             <button id="close-group-modal-btn" class="text-on-surface-variant hover:text-on-surface">
@@ -8,47 +8,66 @@
         </div>
     </div>
 
-    <div class="p-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- Create New Group Section -->
-            <div class="space-y-4">
-                <h3 class="text-title-medium font-semibold text-on-surface">新しいグループを作成</h3>
+    <!-- Tab Headers -->
+    <div class="px-6 flex-shrink-0">
+        <div class="tab-nav-container">
+            <button id="tab-create-group" class="tab-btn active" aria-current="page">
+                <span class="material-icons text-base">add</span>
+                <span>グループ作成</span>
+            </button>
+            <button id="tab-edit-group" class="tab-btn">
+                <span class="material-icons text-base">edit</span>
+                <span>グループ編集</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Tab Panels -->
+    <div class="p-6 overflow-y-auto flex-grow tab-panel-content">
+        <!-- Create Group Panel -->
+        <div id="panel-create-group" class="tab-panel space-y-6">
+            <div>
+                <h3 class="text-title-medium font-semibold text-on-surface mb-4">新しいグループを作成</h3>
                 <div class="form-group">
                     <label for="new-group-name" class="form-label">グループ名</label>
-                    <input type="text" id="new-group-name" class="form-input w-full" placeholder="例：東京営業部">
+                    <input type="text" id="new-group-name" class="form-input w-full max-w-sm" placeholder="例：東京営業部">
+                    <p id="create-group-error" class="text-sm text-error mt-1 hidden"></p>
                 </div>
-                <button id="create-group-btn" class="button-primary w-full">
+            </div>
+            <div class="flex justify-start">
+                <button id="create-group-btn" class="button-primary flex items-center gap-2 rounded-full h-10 px-5 text-sm font-semibold">
                     <span class="material-icons">add</span>
                     <span>作成</span>
                 </button>
             </div>
+        </div>
 
-            <!-- Edit Existing Group Section -->
-            <div class="space-y-4">
-                <h3 class="text-title-medium font-semibold text-on-surface">既存のグループを編集</h3>
-                <div class="form-group">
-                    <label for="select-group" class="form-label">グループを選択</label>
-                    <select id="select-group" class="form-select w-full">
-                        <option value="">グループを選択してください</option>
-                        <!-- Group options will be populated by JavaScript -->
-                    </select>
+        <!-- Edit Group Panel (hidden by default) -->
+        <div id="panel-edit-group" class="tab-panel hidden space-y-4">
+            <div>
+                <label for="select-group-to-edit" class="form-label">編集するグループを選択</label>
+                <select id="select-group-to-edit" class="form-select w-full"></select>
+            </div>
+
+            <div id="group-edit-container" class="hidden space-y-4 pt-4 border-t border-outline-variant">
+                <h4 class="text-title-medium font-semibold text-on-surface-variant">所属メンバー</h4>
+                <div id="group-members-list" class="max-h-60 overflow-y-auto border border-outline-variant rounded-md p-3 space-y-2 bg-surface-variant/40">
+                    <!-- Member list will be populated by JavaScript -->
                 </div>
 
-                <div id="group-members-section" class="hidden space-y-3">
-                    <h4 class="text-title-small font-medium text-on-surface-variant">所属メンバー</h4>
-                    <div id="group-members-list" class="max-h-48 overflow-y-auto border border-outline-variant rounded-md p-3 space-y-2">
-                        <!-- Member list will be populated by JavaScript -->
-                    </div>
-                    <div class="flex justify-end gap-2">
-                         <button id="delete-group-btn" class="button-danger">
-                            <span class="material-icons">delete</span>
-                            <span>グループ削除</span>
-                        </button>
-                        <button id="update-group-btn" class="button-primary">
-                            <span class="material-icons">save</span>
-                            <span>更新</span>
-                        </button>
-                    </div>
+                <h4 class="text-title-medium font-semibold text-on-surface-variant pt-4 border-t border-outline-variant">メンバーを追加</h4>
+                <div class="add-member-controls flex gap-2">
+                    <select class="add-member-select form-select flex-grow">
+                        <!-- Unassigned operators will be populated here -->
+                    </select>
+                    <button class="add-member-btn button-secondary px-4 py-2 text-sm font-semibold rounded-md">追加</button>
+                </div>
+
+                <div class="mt-6 pt-6 flex justify-end border-t border-outline-variant">
+                    <button class="delete-group-btn button-danger flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-md">
+                        <span class="material-icons">delete_forever</span>
+                        <span>グループを削除</span>
+                    </button>
                 </div>
             </div>
         </div>

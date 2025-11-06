@@ -149,31 +149,61 @@ function updatePaginationUI() {
     paginationContainer.innerHTML = '';
     if (totalPages <= 1) return;
     
-    const createPageLink = (page, text = page, isActive = false, isDisabled = false) => {
-        const li = document.createElement('li');
-        const a = document.createElement('a');
-        a.href = '#';
-        a.textContent = text;
-        a.dataset.page = page;
-        a.className = `flex items-center justify-center px-3 h-8 leading-tight `;
-        if (isActive) {
-            a.className += 'text-blue-600 border border-gray-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700';
-            a.setAttribute('aria-current', 'page');
-        } else {
-            a.className += 'text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700';
+        const createPageLink = (page, text = page, isActive = false, isDisabled = false, isNav = false) => {
+    
+            const li = document.createElement('li');
+    
+            if (isNav) {
+    
+                li.classList.add('flex-shrink-0');
+    
+            }
+    
+            const a = document.createElement('a');
+    
+            a.href = '#';
+    
+            a.textContent = text;
+    
+            a.dataset.page = page;
+    
+            a.className = `flex items-center justify-center px-3 h-8 leading-tight whitespace-nowrap`;
+    
+            if (isActive) {
+    
+                a.className += ' text-blue-600 border border-gray-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700';
+    
+                a.setAttribute('aria-current', 'page');
+    
+            } else {
+    
+                a.className += ' text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700';
+    
+            }
+    
+            if (isDisabled) {
+    
+                a.classList.add('opacity-50', 'cursor-not-allowed');
+    
+                a.removeAttribute('data-page');
+    
+            }
+    
+            li.appendChild(a);
+    
+            return li;
+    
+        };
+    
+        paginationContainer.appendChild(createPageLink(currentPage - 1, '前へ', false, currentPage === 1, true));
+    
+        for (let i = 1; i <= totalPages; i++) {
+    
+            paginationContainer.appendChild(createPageLink(i, i, i === currentPage));
+    
         }
-        if (isDisabled) {
-            a.classList.add('opacity-50', 'cursor-not-allowed');
-            a.removeAttribute('data-page');
-        }
-        li.appendChild(a);
-        return li;
-    };
-    paginationContainer.appendChild(createPageLink(currentPage - 1, '前へ', false, currentPage === 1));
-    for (let i = 1; i <= totalPages; i++) {
-        paginationContainer.appendChild(createPageLink(i, i, i === currentPage));
-    }
-    paginationContainer.appendChild(createPageLink(currentPage + 1, '次へ', false, currentPage === totalPages));
+    
+        paginationContainer.appendChild(createPageLink(currentPage + 1, '次へ', false, currentPage === totalPages, true));
 }
 
 function toggleModal(modalId, show) {
@@ -539,6 +569,7 @@ export function initOperatorManagementPage() {
     initEditOperatorModal();
     initCollapsibleToolbox(); // Keep the sliding panel logic
     adjustPagePaddingForFooter(); // Add padding for footer
+    initGroupManagement(); // Initialize the group management modal logic
 
     // --- Bulk Action and Checkbox Logic ---
     const selectAllCheckbox = document.getElementById('select-all-checkbox');
@@ -800,4 +831,310 @@ function adjustPagePaddingForFooter() {
 
     // Adjust on window resize.
     window.addEventListener('resize', debounce(adjustPadding, 150));
+}
+
+
+// --- GROUP MANAGEMENT LOGIC ---
+
+// Mock data - replace with actual API calls
+let MOCK_GROUPS = [
+    { id: 1, name: '東京営業部' },
+    { id: 2, name: '大阪支社' },
+    { id: 3, name: '開発チーム' },
+    { id: 4, name: 'マーケティング部' },
+    { id: 5, name: 'サポート' },
+];
+
+let MOCK_OPERATORS_GROUP = [
+    { id: 101, name: '田中 太郎', groupId: 1 },
+    { id: 102, name: '鈴木 一郎', groupId: 1 },
+    { id: 103, name: '佐藤 花子', groupId: 2 },
+    { id: 104, name: '高橋 次郎', groupId: 3 },
+    { id: 105, name: '伊藤 三郎', groupId: 1 },
+    { id: 106, name: '渡辺 直美', groupId: 4 },
+    { id: 107, name: '山本 健太', groupId: null }, // Unassigned
+    { id: 108, name: '中村 さくら', groupId: 2 },
+    { id: 109, name: '小林 翼', groupId: null }, // Unassigned
+    { id: 201, name: '加藤 純一', groupId: 1 },
+    { id: 202, name: '吉田 光', groupId: 1 },
+    { id: 203, name: '山田 健', groupId: 1 },
+    { id: 204, name: '佐々木 恵', groupId: 1 },
+    { id: 205, name: '山口 翔太', groupId: 1 },
+    { id: 206, name: '松本 優', groupId: 1 },
+    { id: 207, name: '井上 碧', groupId: 1 },
+    { id: 208, name: '木村 大輝', groupId: 1 },
+    { id: 209, name: '林 誠', groupId: 1 },
+    { id: 210, name: '斎藤 拓海', groupId: 1 },
+    { id: 211, name: '清水 奈々', groupId: 1 },
+    { id: 212, name: '森 竜也', groupId: 1 },
+    { id: 213, name: '阿部 浩', groupId: 1 },
+    { id: 214, name: '池田 亮', groupId: 1 },
+    { id: 215, name: '橋本 遥', groupId: 1 },
+];
+
+let nextGroupId = 6;
+
+function initGroupManagement() {
+    const openModalBtn = document.getElementById('open-group-modal-btn');
+    const modal = document.getElementById('group-management-modal');
+
+    if (!openModalBtn || !modal) {
+        console.error('Group management modal elements not found');
+        return;
+    }
+
+    openModalBtn.addEventListener('click', async () => {
+        try {
+            const modalUrl = new URL('../modals/groupManagementModal.html', import.meta.url);
+            const response = await fetch(`${modalUrl}?v=${new Date().getTime()}`);
+            if (!response.ok) throw new Error('Failed to load modal content');
+            modal.innerHTML = await response.text();
+
+            // Inject styles directly to bypass caching issues
+            const styleId = 'group-modal-styles';
+            if (!document.getElementById(styleId)) {
+                const style = document.createElement('style');
+                style.id = styleId;
+                style.innerHTML = `
+                    .tab-nav-container {
+                        display: flex;
+                        border-bottom: 1px solid var(--color-base-border-divider);
+                    }
+                    .tab-btn {
+                        background: none;
+                        border: 1px solid var(--color-base-border-divider);
+                        border-bottom: none;
+                        padding: 0.75rem 1.25rem;
+                        cursor: pointer;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        color: var(--color-text-sub);
+                        font-weight: 500;
+                        border-top-left-radius: 0.5rem;
+                        border-top-right-radius: 0.5rem;
+                        position: relative;
+                        margin-bottom: -1px;
+                    }
+                    .tab-btn:hover {
+                        color: var(--color-text-main);
+                        background-color: var(--color-base-background-sub);
+                    }
+                    .tab-btn.active {
+                        background-color: var(--color-base-card);
+                        color: var(--color-primary);
+                        font-weight: 600;
+                        border-bottom-color: var(--color-base-card);
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+
+            modal.dataset.state = 'open';
+            setupGroupModalEventListeners();
+        } catch (error) {
+            console.error('Error loading group management modal:', error);
+            modal.innerHTML = '<p class="text-red-500">モーダルの読み込みに失敗しました。</p>';
+        }
+    });
+}
+
+function setupGroupModalEventListeners() {
+    const modal = document.getElementById('group-management-modal');
+    const closeModalBtn = document.getElementById('close-group-modal-btn');
+    const createGroupBtn = document.getElementById('create-group-btn');
+    const groupSelect = document.getElementById('select-group-to-edit');
+
+    const tabCreate = document.getElementById('tab-create-group');
+    const tabEdit = document.getElementById('tab-edit-group');
+
+    modal.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            modal.dataset.state = 'closed';
+        }
+    });
+    closeModalBtn.addEventListener('click', () => {
+        modal.dataset.state = 'closed';
+    });
+
+    tabCreate.addEventListener('click', () => switchGroupTab('create'));
+    tabEdit.addEventListener('click', () => switchGroupTab('edit'));
+
+    createGroupBtn.addEventListener('click', createGroup);
+    groupSelect.addEventListener('change', (e) => renderSelectedGroupDetails(e.target.value));
+}
+
+function switchGroupTab(tabName) {
+    const tabCreateBtn = document.getElementById('tab-create-group');
+    const tabEditBtn = document.getElementById('tab-edit-group');
+    const panelCreate = document.getElementById('panel-create-group');
+    const panelEdit = document.getElementById('panel-edit-group');
+    const groupEditContainer = document.getElementById('group-edit-container');
+
+    if (tabName === 'create') {
+        tabCreateBtn.classList.add('active');
+        tabEditBtn.classList.remove('active');
+        panelCreate.classList.remove('hidden');
+        panelEdit.classList.add('hidden');
+    } else {
+        tabCreateBtn.classList.remove('active');
+        tabEditBtn.classList.add('active');
+        panelCreate.classList.add('hidden');
+        panelEdit.classList.remove('hidden');
+        groupEditContainer.classList.add('hidden');
+        populateGroupDropdown();
+    }
+}
+
+async function populateGroupDropdown() {
+    const selectEl = document.getElementById('select-group-to-edit');
+    if (!selectEl) return;
+
+    const groups = await new Promise(resolve => setTimeout(() => resolve(MOCK_GROUPS), 100));
+    selectEl.innerHTML = '<option value="">編集するグループを選択してください</option>';
+    groups.forEach(group => {
+        const option = document.createElement('option');
+        option.value = group.id;
+        option.textContent = group.name;
+        selectEl.appendChild(option);
+    });
+}
+
+async function renderSelectedGroupDetails(groupId) {
+    const container = document.getElementById('group-edit-container');
+    if (!container) return;
+
+    if (!groupId) {
+        container.classList.add('hidden');
+        return;
+    }
+
+    const numericGroupId = parseInt(groupId, 10);
+    const operators = await new Promise(resolve => setTimeout(() => resolve(MOCK_OPERATORS_GROUP), 100));
+    const groupMembers = operators.filter(op => op.groupId === numericGroupId);
+    const unassignedOperators = operators.filter(op => op.groupId === null);
+
+    const membersListEl = container.querySelector('#group-members-list');
+    const addMemberSelectEl = container.querySelector('.add-member-select');
+    const addMemberBtn = container.querySelector('.add-member-btn');
+    const deleteGroupBtn = container.querySelector('.delete-group-btn');
+
+    membersListEl.innerHTML = '';
+    if (groupMembers.length > 0) {
+        groupMembers.forEach(member => {
+            const memberEl = document.createElement('div');
+            memberEl.className = 'flex items-center justify-between bg-surface-variant/60 p-2 rounded-md';
+            memberEl.innerHTML = `
+                <span>${member.name}</span>
+                <button class="remove-member-btn" data-member-id="${member.id}" aria-label="${member.name}を削除">
+                    <span class="material-icons text-on-surface-variant hover:text-error">delete</span>
+                </button>
+            `;
+            memberEl.querySelector('.remove-member-btn').addEventListener('click', removeMember);
+            membersListEl.appendChild(memberEl);
+        });
+    } else {
+        membersListEl.innerHTML = '<p class="text-sm text-on-surface-variant">メンバーがいません。</p>';
+    }
+
+    addMemberSelectEl.innerHTML = '<option value="">未所属のオペレーターを選択</option>';
+    unassignedOperators.forEach(op => {
+        addMemberSelectEl.innerHTML += `<option value="${op.id}">${op.name}</option>`;
+    });
+    addMemberSelectEl.disabled = unassignedOperators.length === 0;
+    addMemberBtn.disabled = unassignedOperators.length === 0;
+
+    addMemberBtn.dataset.groupId = numericGroupId;
+    deleteGroupBtn.dataset.groupId = numericGroupId;
+
+    const newAddBtn = addMemberBtn.cloneNode(true);
+    addMemberBtn.parentNode.replaceChild(newAddBtn, addMemberBtn);
+    newAddBtn.addEventListener('click', addMember);
+
+    const newDeleteBtn = deleteGroupBtn.cloneNode(true);
+    deleteGroupBtn.parentNode.replaceChild(newDeleteBtn, deleteGroupBtn);
+    newDeleteBtn.addEventListener('click', deleteGroup);
+
+    container.classList.remove('hidden');
+}
+
+function createGroup() {
+    const groupNameInput = document.getElementById('new-group-name');
+    const errorEl = document.getElementById('create-group-error');
+    const groupName = groupNameInput.value.trim();
+
+    if (!groupName) {
+        errorEl.textContent = 'グループ名を入力してください。';
+        errorEl.classList.remove('hidden');
+        groupNameInput.classList.add('input-error');
+        return;
+    }
+    if (MOCK_GROUPS.some(g => g.name.toLowerCase() === groupName.toLowerCase())) {
+        errorEl.textContent = '同じ名前のグループが既に存在します。';
+        errorEl.classList.remove('hidden');
+        groupNameInput.classList.add('input-error');
+        return;
+    }
+
+    errorEl.classList.add('hidden');
+    groupNameInput.classList.remove('input-error');
+
+    const newGroup = { id: nextGroupId++, name: groupName };
+    MOCK_GROUPS.push(newGroup);
+
+    console.log('Creating group:', newGroup);
+    alert(`グループ「${groupName}」を作成しました。（モックデータ）`);
+    groupNameInput.value = '';
+    switchGroupTab('edit');
+}
+
+function deleteGroup(event) {
+    const groupId = parseInt(event.currentTarget.dataset.groupId, 10);
+    const group = MOCK_GROUPS.find(g => g.id === groupId);
+    if (!group) return;
+
+    if (confirm(`本当にグループ「${group.name}」を削除しますか？\n所属するメンバーは「未所属」になります。`)) {
+        MOCK_GROUPS = MOCK_GROUPS.filter(g => g.id !== groupId);
+        MOCK_OPERATORS_GROUP.forEach(op => {
+            if (op.groupId === groupId) {
+                op.groupId = null;
+            }
+        });
+
+        console.log('Deleting group:', groupId);
+        alert(`グループ「${group.name}」を削除しました。（モックデータ）`);
+        renderEditGroupTab();
+    }
+}
+
+function removeMember(event) {
+    const memberId = parseInt(event.currentTarget.dataset.memberId, 10);
+    const operator = MOCK_OPERATORS_GROUP.find(op => op.id === memberId);
+    if (!operator) return;
+
+    if (confirm(`${operator.name}をグループから削除しますか？`)) {
+        operator.groupId = null;
+        console.log('Removing member:', memberId);
+        alert(`${operator.name}をグループから削除しました。（モックデータ）`);
+        renderEditGroupTab(document.getElementById('search-group-input').value);
+    }
+}
+
+function addMember(event) {
+    const groupId = parseInt(event.currentTarget.dataset.groupId, 10);
+    const selectEl = event.currentTarget.previousElementSibling;
+    const memberId = parseInt(selectEl.value, 10);
+
+    if (!memberId) {
+        alert('追加するオペレーターを選択してください。');
+        return;
+    }
+
+    const operator = MOCK_OPERATORS_GROUP.find(op => op.id === memberId);
+    if (operator) {
+        operator.groupId = groupId;
+        console.log(`Adding member ${memberId} to group ${groupId}`);
+        alert(`${operator.name}をグループに追加しました。（モックデータ）`);
+        renderEditGroupTab(document.getElementById('search-group-input').value);
+    }
 }
