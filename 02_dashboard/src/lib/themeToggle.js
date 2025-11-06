@@ -16,10 +16,14 @@ export function initThemeToggle() {
     const themeIcons = [document.getElementById('themeIcon'), document.getElementById('sidebarThemeIcon')];
 
     const savedTheme = localStorage.getItem('theme');
+
+    // Apply dark mode only if it's explicitly saved as 'dark'
     if (savedTheme === 'dark') {
         document.body.classList.add('dark-mode');
         themeIcons.forEach(icon => { if(icon) icon.textContent = 'dark_mode'; });
     } else {
+        // Default to light mode for any other case ('light', null, etc.)
+        document.body.classList.remove('dark-mode');
         themeIcons.forEach(icon => { if(icon) icon.textContent = 'light_mode'; });
     }
 

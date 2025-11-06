@@ -7,11 +7,14 @@ const STORAGE_KEY_PREFIX = 'thankYouScreenSettings_';
 // --- Services (本来は外部ファイル) ---
 async function getSurveyById(surveyId) {
   try {
-    const dataPath = resolveDashboardDataPath('surveys/surveys-with-details.json');
+    const dataPath = resolveDashboardDataPath('demo_answers/surveys-with-details.json');
     const response = await fetch(dataPath);
     if (!response.ok) throw new Error('Survey data not found');
-    const surveys = await response.json();
-    const survey = surveys.find(s => s.id === surveyId);
+    const surveysOrSurvey = await response.json();
+    // データが配列か単一オブジェクトかを判断して処理を分岐
+    const survey = Array.isArray(surveysOrSurvey)
+      ? surveysOrSurvey.find(s => s.id === surveyId)
+      : (surveysOrSurvey && surveysOrSurvey.id === surveyId ? surveysOrSurvey : null);
     if (!survey) throw new Error(`Survey with id ${surveyId} not found`);
     return survey;
   } catch (error) {
