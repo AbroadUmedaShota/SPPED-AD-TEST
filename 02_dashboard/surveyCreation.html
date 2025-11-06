@@ -25,37 +25,7 @@
       box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     }
   </style>
-  <style>
-    #custom-tutorial-svg-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 10000;
-        pointer-events: none; /* オーバーレイ全体を透過させ、下の要素をクリック可能にする */
-    }
-    .custom-tutorial-highlight {
-        position: relative; /* ポップアップの位置基準のため */
-        box-shadow: 0 0 0 2px white, 0 0 0 4px var(--md-sys-color-primary, #6750A4);
-        border-radius: 8px;
-        transition: box-shadow 0.3s ease-in-out;
-    }
-    .custom-tutorial-highlight-light-bg {
-        position: relative;
-        box-shadow: 0 0 12px 3px rgba(255, 255, 255, 0.9); /* 白いグロー効果 */
-        border-radius: 8px;
-        transition: box-shadow 0.3s ease-in-out;
-    }
-    #custom-tutorial-popover {
-        z-index: 10002;
-    }
 
-    .outline-map-container.collapsed {
-      transform: translateX(100%);
-    }
-
-  </style>
 </head>
 <body class="bg-background text-on-background">
 
@@ -303,7 +273,8 @@
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
   <!-- Tutorial Scripts -->
-  <script src="./src/surveyCreationTutorial.js"></script>
+  <link rel="stylesheet" href="./src/app-tutorial.css">
+  <script src="./src/app-tutorial.js"></script>
 
   <!-- Page JS -->
   <script type="module" src="src/surveyCreation.js"></script>
