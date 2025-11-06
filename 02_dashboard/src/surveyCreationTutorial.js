@@ -13,13 +13,22 @@ function startSurveyCreationTutorial() {
             { selector: '#surveyName_ja', title: 'アンケート名の入力', description: 'まず、管理用のアンケート名を入力します。この名前は回答者には表示されません。', position: 'bottom', showButtons: true },
             { selector: '#displayTitle_ja', title: '表示タイトルの入力', description: '次に、回答者に表示されるアンケートのタイトルを入力します。', position: 'bottom', showButtons: true },
             { selector: '#periodRange', title: '回答期間の設定', description: 'アンケートの回答期間を設定します。本日から3日間の日程を自動で設定します。', position: 'bottom', showButtons: true },
-            { selector: '#addNewGroupBtn', title: '設問グループ作成', description: 'こちらは設問を編集する画面です。まず、関連する質問をまとめる『グループ』を作成します。内容を確認後、「次へ」ボタンをクリックしてください。', position: 'bottom', showButtons: true, advanceOnClick: false },
-            { selector: '#fab-main-button', title: '設問の追加', description: 'グループが作成されました。次に、画面右下の『+』ボタンをクリックして、最初の質問を追加してください。', position: 'left', advanceOnClick: true },
-            { selector: 'button[data-question-type="free_answer"]', title: '設問形式の選択', description: '追加する設問の形式を選択します。まず、自由に文章で回答してもらう「フリーアンサー」を追加してみましょう。', position: 'left', advanceOnClick: true },
+            { selector: '#addNewGroupBtn', title: '設問グループ作成', description: 'こちらは設問を編集する画面です。まず、関連する質問をまとめる『グループ』を作成します。内容を確認後、「次へ」ボタンをクリックしてください。', position: 'bottom', showButtons: true },
+            { selector: '#fab-main-button', title: '設問の追加', description: 'グループが作成されました。次に、画面右下の『+』ボタンをクリックして、最初の質問を追加してください。', position: 'left', showButtons: true },
+            { selector: 'button[data-question-type="free_answer"]', title: '設問形式の選択', description: '追加する設問の形式を選択します。まず、自由に文章で回答してもらう「フリーアンサー」を追加してみましょう。', position: 'left', showButtons: true },
             { selector: '.question-item:last-child .question-text-input[data-lang="ja"]', title: '設問の作成（記述式）', description: '質問が追加されました。こちらに質問文をご入力ください。この『記述式』は、回答者が文章で自由に回答する形式の設問です。（例：弊社サービスを何でお知りになりましたか？）', position: 'bottom', showButtons: true },
-            { selector: '.question-item:last-child .question-type-select', title: '設問の作成（単一選択）', description: '次にもう一つ、別の形式の質問を追加します。複数の選択肢から一つを選んでいただく『単一選択』です。質問文と、いくつかの選択肢をご入力ください。', position: 'bottom', showButtons: true },
-            { selector: '#showPreviewBtn', title: 'プレビュー機能の確認', description: '設問が作成できました。回答者からどのように見えるかは、いつでも『プレビュー』機能でご確認いただけます。こちらをクリックしてご確認ください。', position: 'bottom', advanceOnClick: true },
-            { selector: '#createSurveyBtn', title: 'トレーニング完了', description: '以上で、アンケート作成の一連の流れは完了となります。『アンケートを保存』をクリックして、このトレーニングを終了してください。', position: 'bottom', advanceOnClick: true }
+            { selector: '.question-item:last-child .question-type-select', title: '設問形式の変更', description: '次に、設問形式を「単一選択」に変更します。ドロップダウンをクリックして「単一選択」を選んでください。', position: 'bottom', showButtons: true },
+            { selector: '.question-item:last-child .question-type-select', title: '設問形式の自動変更', description: '設問形式を「単一選択」に自動で変更します。', position: 'bottom', showButtons: true },
+            { selector: '.question-item:last-child .question-text-input[data-lang="ja"]', title: '設問の作成（単一選択）', description: '設問形式が「単一選択」になりました。こちらに質問文をご入力ください。（例：最も満足している点をお選びください）', position: 'bottom', showButtons: true },
+            { selector: '.question-item:last-child .option-item:nth-child(1) .option-text-input[data-lang="ja"]', title: '選択肢の入力', description: '最初の選択肢を入力します。（例：価格）', position: 'bottom', showButtons: true },
+            { selector: '.question-item:last-child .option-item:nth-child(2) .option-text-input[data-lang="ja"]', title: '選択肢の入力', description: '二番目の選択肢を入力します。（例：機能）', position: 'bottom', showButtons: true },
+            { selector: '#fab-main-button', title: '設問の追加（マルチアンサー）', description: '次に、複数の選択肢から複数を選んでいただく『マルチアンサー』形式の設問を追加します。画面右下の『+』ボタンをクリックしてください。', position: 'left', showButtons: true },
+            { selector: 'button[data-question-type="multi_answer"]', title: '設問形式の選択（マルチアンサー）', description: '「マルチアンサー」を選択してください。', position: 'left', showButtons: true },
+            { selector: '.question-item:last-child .question-text-input[data-lang="ja"]', title: '設問の作成（マルチアンサー）', description: '設問形式が「マルチアンサー」になりました。こちらに質問文をご入力ください。（例：改善してほしい点をお選びください）', position: 'bottom', showButtons: true },
+            { selector: '.question-item:last-child .option-item:nth-child(1) .option-text-input[data-lang="ja"]', title: '選択肢の入力', description: '最初の選択肢を入力します。（例：UIデザイン）', position: 'bottom', showButtons: true },
+            { selector: '.question-item:last-child .option-item:nth-child(2) .option-text-input[data-lang="ja"]', title: '選択肢の入力', description: '二番目の選択肢を入力します。（例：機能の豊富さ）', position: 'bottom', showButtons: true },
+            { selector: '#showPreviewBtn', title: 'プレビュー機能の確認', description: '設問が作成できました。回答者からどのように見えるかは、いつでも『プレビュー』機能でご確認いただけます。こちらをクリックしてご確認ください。', position: 'bottom', showButtons: true },
+            { selector: '#createSurveyBtn', title: 'トレーニング完了', description: '以上で、アンケート作成の一連の流れは完了となります。『アンケートを保存』をクリックして、このトレーニングを終了してください。', position: 'bottom', showButtons: true }
         ];
 
         function createTutorialUI() {
@@ -235,30 +244,12 @@ function startSurveyCreationTutorial() {
                 popover.style.left = `${left}px`;
                 
                 const footer = popover.querySelector('.tutorial-footer');
-                if (footer) {
-                    footer.style.display = step.showButtons === false ? 'none' : 'flex';
-                }
-
-                if (step.advanceOnClick) {
-                    const advanceHandler = () => { // e.preventDefault/stopPropagationを削除
-                        showNextStep();
-                    };
-                    element.addEventListener('click', advanceHandler, { once: true });
-                    if (index === steps.length - 1) {
-                        nextButton.style.display = 'none';
-                        element.addEventListener('click', () => {
-                            tutorialCompleted = true;
-                            destroyTutorial();
-                        }, { once: true });
-                    }
-                }
-
                 if (index === steps.length - 1) {
                     nextButton.textContent = '完了';
                 }
 
                 isTransitioning = false;
-            }, 300); // FABメニューのアニメーション完了を待つための遅延
+            }, 600); // FABメニューのアニメーション完了を待つための遅延
         }
 
         // --- Initialization ---

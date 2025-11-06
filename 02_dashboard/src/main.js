@@ -103,7 +103,8 @@ function openNewSurveyModalWithSetup(afterOpen) {
             mode: 'range',
             dateFormat: 'Y-m-d',
             locale: 'ja',
-            minDate: tomorrow
+            minDate: tomorrow,
+            allowInput: true // Allow manual input
         });
 
         const createSurveyBtn = document.getElementById('createSurveyFromModalBtn');
@@ -358,22 +359,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const currentPage = window.location.pathname.split('/').pop() || '';
     const isIndexPage = currentPage === '' || currentPage === 'index.html';
 
-    // Check for tutorial status AFTER common elements are loaded
-    let tutorialStatus = localStorage.getItem('speedad-tutorial-status');
-
-    if (tutorialStatus === 'main-running' || tutorialStatus === 'modal-running') {
-        localStorage.setItem('speedad-tutorial-status', 'pending');
-        tutorialStatus = 'pending';
-    }
-
-    if (tutorialStatus === 'pending' && isIndexPage) {
-        if (typeof startTutorial === 'function') {
-            startTutorial();
-        }
-    } else if (tutorialStatus === 'survey-creation-started' && isIndexPage) {
-        showTutorialResumeBanner();
-    }
-
     // --- Global Escape Key Listener for Modals & Sidebar ---
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape') {
@@ -438,7 +423,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const openNewSurveyModalBtn = document.getElementById('openNewSurveyModalBtn');
     if (openNewSurveyModalBtn) {
-        openNewSurveyModalBtn.addEventListener('click', openNewSurveyModalWithSetup);
+        openNewSurveyModalBtn.addEventListener('click', () => openNewSurveyModalWithSetup(window.advanceTutorialStep));
     }
 
     // Initial layout adjustment on load
@@ -447,4 +432,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Adjust on window resize
     window.addEventListener('resize', adjustLayout);
 
+    // --- Tutorial Initialization ---
+    // All other initializations should be complete before starting the tutorial.
+    if (isIndexPage) { // Only run tutorial logic on the index page.
+        let tutorialStatus = localStorage.getItem('speedad-tutorial-status');
+
+        // Legacy status handling.
+        if (tutorialStatus === 'main-running' || tutorialStatus === 'modal-running') {
+            localStorage.setItem('speedad-tutorial-status', 'pending');
+            tutorialStatus = 'pending';
+        }
+
+        if (tutorialStatus === 'pending' && typeof window.startAppTutorial === 'function') {
+            // A brief delay to ensure all rendering is complete after JS initializations.
+            setTimeout(() => {
+                window.startAppTutorial();
+            }, 300); // 300ms delay as a safeguard.
+        } else if (tutorialStatus === 'survey-creation-started') {
+            showTutorialResumeBanner();
+        }
+    }
 });

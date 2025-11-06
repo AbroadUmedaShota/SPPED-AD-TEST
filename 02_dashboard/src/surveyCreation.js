@@ -22,6 +22,7 @@ let surveyData = {};
 let currentLang = 'ja';
 let currentSurveyId = null;
 let isDirty = false; // To track unsaved changes
+window.isTutorialActive = false; // Global flag for tutorial state
 const ADDITIONAL_SETTINGS_CONFIG = [
     { id: 'openBizcardSettingsBtn', path: 'bizcardSettings.html', feature: 'bizcard' },
     { id: 'openThankYouEmailSettingsBtn', path: 'thankYouEmailSettings.html', feature: 'thankYouEmail' },
@@ -1103,6 +1104,15 @@ const mapEnqueteToQuestions = (enqueteDetails) => {
  * ページの初期化処理
  */
 async function initializePage() {
+    // --- Tutorial Restart Logic ---
+    if (localStorage.getItem('speedad-tutorial-status') === 'pending') {
+        if (typeof window.startAppTutorial === 'function') {
+            // A brief delay to ensure the page elements are ready
+            setTimeout(() => window.startAppTutorial(), 300);
+        }
+    }
+    // --- End Tutorial Logic ---
+
     try {
         await Promise.all([
             loadCommonHtml('header-placeholder', 'common/header.html'),
@@ -1290,6 +1300,10 @@ async function initializePage() {
 
         initUnloadConfirmation();
         document.dispatchEvent(new CustomEvent('pageInitialized'));
+
+        // Expose functions to global scope for tutorial
+        window.handleAddNewQuestion = handleAddNewQuestion;
+        window.updateAndRenderAll = updateAndRenderAll;
 
     } catch (error) {
         console.error('Failed to initialize page:', error);
@@ -2202,6 +2216,12 @@ function setupPreviewSwitcher() {
         tabletBtn.classList.add('active');
         phoneBtn.classList.remove('active');
     });
+
+    // Set focus to the modal title for accessibility
+    const modalTitle = document.getElementById('modalTitle');
+    if (modalTitle) {
+        modalTitle.focus();
+    }
 }
 
 function attachPreviewListener() {
