@@ -1083,7 +1083,7 @@ function createGroup() {
     MOCK_GROUPS.push(newGroup);
 
     console.log('Creating group:', newGroup);
-    alert(`グループ「${groupName}」を作成しました。（モックデータ）`);
+    // alert(`グループ「${groupName}」を作成しました。（モックデータ）`);
     groupNameInput.value = '';
     switchGroupTab('edit');
 }
@@ -1093,7 +1093,7 @@ function deleteGroup(event) {
     const group = MOCK_GROUPS.find(g => g.id === groupId);
     if (!group) return;
 
-    if (confirm(`本当にグループ「${group.name}」を削除しますか？\n所属するメンバーは「未所属」になります。`)) {
+    // if (confirm(`本当にグループ「${group.name}」を削除しますか？\n所属するメンバーは「未所属」になります。`)) {
         MOCK_GROUPS = MOCK_GROUPS.filter(g => g.id !== groupId);
         MOCK_OPERATORS_GROUP.forEach(op => {
             if (op.groupId === groupId) {
@@ -1102,9 +1102,9 @@ function deleteGroup(event) {
         });
 
         console.log('Deleting group:', groupId);
-        alert(`グループ「${group.name}」を削除しました。（モックデータ）`);
-        renderEditGroupTab();
-    }
+        // alert(`グループ「${group.name}」を削除しました。（モックデータ）`);
+        switchGroupTab('edit');
+    // }
 }
 
 function removeMember(event) {
@@ -1112,12 +1112,12 @@ function removeMember(event) {
     const operator = MOCK_OPERATORS_GROUP.find(op => op.id === memberId);
     if (!operator) return;
 
-    if (confirm(`${operator.name}をグループから削除しますか？`)) {
+    // if (confirm(`${operator.name}をグループから削除しますか？`)) {
         operator.groupId = null;
         console.log('Removing member:', memberId);
-        alert(`${operator.name}をグループから削除しました。（モックデータ）`);
-        renderEditGroupTab(document.getElementById('search-group-input').value);
-    }
+        // alert(`${operator.name}をグループから削除しました。（モックデータ）`);
+        renderSelectedGroupDetails(document.getElementById('select-group-to-edit').value);
+    // }
 }
 
 function addMember(event) {
@@ -1126,7 +1126,7 @@ function addMember(event) {
     const memberId = parseInt(selectEl.value, 10);
 
     if (!memberId) {
-        alert('追加するオペレーターを選択してください。');
+        // alert('追加するオペレーターを選択してください。');
         return;
     }
 
@@ -1134,7 +1134,7 @@ function addMember(event) {
     if (operator) {
         operator.groupId = groupId;
         console.log(`Adding member ${memberId} to group ${groupId}`);
-        alert(`${operator.name}をグループに追加しました。（モックデータ）`);
-        renderEditGroupTab(document.getElementById('search-group-input').value);
+        // alert(`${operator.name}をグループに追加しました。（モックデータ）`);
+        renderSelectedGroupDetails(document.getElementById('select-group-to-edit').value);
     }
 }

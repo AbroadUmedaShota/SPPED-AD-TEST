@@ -1509,6 +1509,7 @@ function handleQuestionConfigInput(target) {
 function setupEventListeners() {
 
     initializeAccordion();
+    initOutlineMapToggle();
 
     const addNewGroupBtn = document.getElementById('addNewGroupBtn');
     if (addNewGroupBtn) {
@@ -2079,6 +2080,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initializePage();
     
     setupEventListeners();
+
+    initOutlineMapToggle();
     
     attachPreviewListener();
     // Re-render on language change
@@ -2451,3 +2454,38 @@ try {
         window.__surveyInputBound = true;
     }
 } catch (_) { /* noop */ }
+
+function initOutlineMapToggle() {
+    const toggleBtn = document.getElementById('outline-map-toggle-btn');
+    const outlineContainer = document.getElementById('outline-map-container');
+    const btnIcon = toggleBtn.querySelector('.material-icons');
+
+    if (!toggleBtn || !outlineContainer || !btnIcon) {
+        return;
+    }
+
+    // Default state is open
+    let isOutlineOpen = true;
+
+    const updateOutlineState = () => {
+        if (isOutlineOpen) {
+            // OPEN STATE
+            outlineContainer.classList.remove('translate-x-full');
+            toggleBtn.style.right = '18rem'; // w-72 = 18rem
+            btnIcon.textContent = 'chevron_left';
+        } else {
+            // CLOSED STATE
+            outlineContainer.classList.add('translate-x-full');
+            toggleBtn.style.right = '0';
+            btnIcon.textContent = 'chevron_right';
+        }
+    };
+
+    toggleBtn.addEventListener('click', () => {
+        isOutlineOpen = !isOutlineOpen;
+        updateOutlineState();
+    });
+
+    // Initial setup
+    updateOutlineState();
+}

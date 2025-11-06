@@ -376,15 +376,43 @@ function startBizcardUploadFlow() {
             onCancel: showChoice
         });
 
-        // 「裏面をスキップ」ボタンをフッターに別途追加
-        const footer = DOMElements.bizcardUploadModal.querySelector('.flex.justify-end');
+        // フッターのボタンレイアウトを調整
+        const footer = DOMElements.bizcardUploadModal.querySelector('.rounded-b-lg');
         if (footer) {
+            // 1. フッターを完全にクリアして重複を防止
+            footer.innerHTML = ''; 
+            
+            // 2. 正しいレイアウトを設定
+            footer.classList.remove('justify-end');
+            footer.classList.add('justify-between', 'w-full', 'items-center');
+
+            // 3. 「撮り直す」ボタンを作成して追加 (左側)
+            const retakeButton = document.createElement('button');
+            retakeButton.className = 'px-4 py-2 text-sm font-medium rounded-md hover:bg-surface-container-high';
+            retakeButton.textContent = '撮り直す';
+            retakeButton.onclick = showChoice;
+            footer.appendChild(retakeButton);
+
+            // 4. 右側のボタン用コンテナを作成
+            const rightContainer = document.createElement('div');
+            rightContainer.className = 'flex items-center gap-4';
+
+            // 5. 「裏面をスキップ」ボタンを作成して追加
             const skipButton = document.createElement('button');
-            skipButton.id = 'skip-back-button';
-            skipButton.className = 'text-sm font-medium text-primary hover:underline mr-auto';
+            skipButton.className = 'text-sm font-medium text-primary hover:underline';
             skipButton.textContent = '裏面をスキップ';
             skipButton.onclick = showFinalConfirmation;
-            footer.insertBefore(skipButton, footer.firstChild);
+            rightContainer.appendChild(skipButton);
+
+            // 6. 「裏面を追加する」ボタンを作成して追加
+            const addBackButton = document.createElement('button');
+            addBackButton.className = 'px-4 py-2 text-sm font-bold text-on-primary bg-primary rounded-md hover:bg-primary-dark';
+            addBackButton.textContent = '裏面を追加する';
+            addBackButton.onclick = showBackChoice;
+            rightContainer.appendChild(addBackButton);
+
+            // 7. 右側コンテナをフッターに追加
+            footer.appendChild(rightContainer);
         }
     };
 
@@ -445,7 +473,8 @@ function startBizcardUploadFlow() {
     };
 
     const showFinalConfirmation = () => {
-        const backImageHTML = localImages.back ? `<img src="${localImages.back}" alt="名刺 裏面" class="w-full rounded-md shadow-sm">` : '<div class="h-full flex items-center justify-center bg-gray-100 rounded-md"><p class="text-sm text-gray-500">裏面なし</p></div>';
+        const frontImageHTML = `<img src="${localImages.front}" alt="名刺 表面" class="w-full rounded-md shadow-sm cursor-pointer bizcard-confirm-image">`;
+        const backImageHTML = localImages.back ? `<img src="${localImages.back}" alt="名刺 裏面" class="w-full rounded-md shadow-sm cursor-pointer bizcard-confirm-image">` : '<div class="h-full flex items-center justify-center bg-gray-100 rounded-md"><p class="text-sm text-gray-500">裏面なし</p></div>';
         const body = `
             <div class="flex items-center justify-center mb-4">
                 <span class="w-8 h-8 rounded-full border-2 border-primary flex items-center justify-center"><span class="material-icons text-primary">check</span></span>
@@ -458,7 +487,7 @@ function startBizcardUploadFlow() {
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <p class="font-bold text-center mb-2">表面</p>
-                    <img src="${localImages.front}" alt="名刺 表面" class="w-full rounded-md shadow-sm">
+                    ${frontImageHTML}
                 </div>
                 <div>
                     <p class="font-bold text-center mb-2">裏面</p>
@@ -476,6 +505,13 @@ function startBizcardUploadFlow() {
                 DOMElements.bizcardUploadModal.style.display = 'none';
             },
             onCancel: () => localImages.back ? showBackPreview() : showFrontPreview()
+        });
+
+        // Add click listeners for magnification
+        DOMElements.bizcardUploadModal.querySelectorAll('.bizcard-confirm-image').forEach(img => {
+            img.addEventListener('click', (e) => {
+                openMagnifyModal(e.target.src);
+            });
         });
     };
 
@@ -531,6 +567,41 @@ function showModal(modalElement, title, body, options = {}) {
             if (onCancel) onCancel();
             modalElement.style.display = 'none';
         }
+    });
+}
+
+function openMagnifyModal(src) {
+    const modal = document.getElementById('image-magnify-modal');
+    if (!modal) return;
+
+    modal.innerHTML = `
+        <button class="magnify-close-button absolute top-4 right-4 text-white text-5xl z-10 leading-none">&times;</button>
+        <div class="magnify-image-container p-4">
+            <img src="${src}" class="max-w-[90vw] max-h-[90vh] object-contain">
+        </div>
+    `;
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+
+    const closeModal = () => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        modal.innerHTML = '';
+        // イベントリスナーはモーダルがクリアされると自動的に削除される
+    };
+
+    // 背景クリックで閉じる
+    modal.addEventListener('click', closeModal);
+
+    // Xボタンクリックで閉じる
+    modal.querySelector('.magnify-close-button').addEventListener('click', (e) => {
+        e.stopPropagation(); // 背景のクリックイベントを発火させない
+        closeModal();
+    });
+
+    // 画像自体のクリックでは閉じないようにする
+    modal.querySelector('.magnify-image-container').addEventListener('click', (e) => {
+        e.stopPropagation();
     });
 }
 
