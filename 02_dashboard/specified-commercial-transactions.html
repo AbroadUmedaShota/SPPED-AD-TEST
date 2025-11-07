@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpeedAd - 特定商取引法に基づく表示</title>
+
+    <link rel="icon" href="assets/svg/speedad_logo.svg" type="image/svg+xml">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Material Icons CDN -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="service-top-style.css">
+    <!-- Custom Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+    <style>
+        .sct-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .sct-table th, .sct-table td {
+            border: 1px solid #e5e7eb; /* border-gray-200 */
+            padding: 1rem; /* p-4 */
+            text-align: left;
+        }
+        .sct-table th {
+            background-color: #f9fafb; /* bg-gray-50 */
+            font-weight: 600;
+            width: 30%;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background" data-page-id="sct">
+
+<!-- 1. アプリケーション全体構造 -->
+<div class="relative flex min-h-screen flex-col overflow-x-hidden">
+
+    <!-- サイドバー用オーバーレイ -->
+    <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
+
+    <!-- 2. ヘッダー -->
+    <div id="header-placeholder"></div>
+
+    <div class="flex flex-1 pt-16 bg-background">
+        <!-- 3. サイドバー -->
+        <div id="sidebar-placeholder"></div>
+
+        <!-- 4. メインコンテンツ -->
+        <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
+            <div class="flex flex-col w-full max-w-6xl mx-auto flex-1">
+                <!-- パンくずリストコンテナ -->
+                <div id="breadcrumb-container" class="mb-4"></div>
+
+                <!-- タイトルエリア -->
+                <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant">
+                    <h1 class="text-on-background text-headline-large font-bold leading-tight tracking-tight">特定商取引法に基づく表示</h1>
+                </div>
+
+                <!-- コンテンツ -->
+                <div class="bg-surface p-6 sm:p-8 rounded-xl shadow-sm">
+                    <div class="overflow-x-auto">
+                        <table class="sct-table">
+                            <tr>
+                              <th style="vertical-align: middle;white-space: nowrap;padding-right: 10px;">事業者名</th>
+                              <td>アブロードアウトソーシング株式会社</td>
+                            </tr>
+                            <tr>
+                              <th style="vertical-align: middle;white-space: nowrap;">代表者名</th>
+                              <td class="no-pb">林　剛之</td>
+                            </tr>
+                            <tr>
+                              <th style="vertical-align: middle;white-space: nowrap;">住所</th>
+                              <td class="no-pb">東京都千代田区東神田2-1-8　秋葉原クロスサイド4階  </td>
+                            </tr>
+                            <tr>
+                              <th style="vertical-align: middle;white-space: nowrap;">電話</th>
+                              <td class="no-pb">03-5835-0250</td>
+                            </tr>
+                            <tr>
+                              <th style="vertical-align: middle;white-space: nowrap;">メール</th>
+                              <td class="no-pb">customer@speed-ad.com</td>
+                            </tr>
+                            <tr>
+                              <th style="vertical-align: middle;white-space: nowrap;">販売価格</th>
+                              <td class="no-pb">サービスごとに該当ページで表示</td>
+                            </tr>
+                            <tr>
+                              <th style="vertical-align: middle;white-space: nowrap;">支払時期および方法</th>
+                              <td class="no-pb">サービスごとに該当ページで表示</td>
+                            </tr>
+                            <tr>
+                              <th style="vertical-align: middle;white-space: nowrap;">引き渡し時期</th>
+                              <td class="no-pb">サービスごとに該当ページで表示</td>
+                            </tr>
+                            <tr>
+                              <th style="vertical-align: middle;white-space: nowrap;padding-right: 10px;">商品代金以外に必要な費用</th>
+                              <td class="no-pb">消費税等</td>
+                            </tr>
+                            <tr>
+                              <th style="vertical-align: middle;white-space: nowrap;">返品の取扱条件／返品期限</th>
+                              <td class="no-pb">作成されたWEBアンケートの運用開始の前日までキャンセル可能。WEBアンケートの運用開始以降は基本的に返品・キャンセルの取扱いはしていません。</td>
+                            </tr>
+                          </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 5. フッター -->
+    <div id="footer-placeholder"></div>
+
+</div>
+
+<!-- JSファイル -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
