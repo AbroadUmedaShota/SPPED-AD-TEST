@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>よくある質問 | SPEED AD</title>
+
+    <link rel="icon" href="assets/svg/speedad_logo.svg" type="image/svg+xml">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Material Icons CDN -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="service-top-style.css">
+    <!-- FAQページ専用CSS -->
+    <link rel="stylesheet" href="assets/css/faq.css">
+    <!-- Custom Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+</head>
+<body class="bg-background text-on-background" data-page-id="faq">
+
+<div class="relative flex min-h-screen flex-col overflow-x-hidden">
+
+    <!-- サイドバー用オーバーレイ -->
+    <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
+
+    <!-- ヘッダー -->
+    <div id="header-placeholder"></div>
+
+    <div class="flex flex-1 pt-16 bg-background">
+        <!-- サイドバー -->
+        <div id="sidebar-placeholder"></div>
+
+        <!-- メインコンテンツ -->
+        <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
+            <div class="flex flex-col w-full max-w-4xl mx-auto flex-1">
+                <!-- パンくずリストコンテナ -->
+                <div id="breadcrumb-container" class="mb-4"></div>
+
+                <!-- タイトルエリア -->
+                <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant">
+                    <h1 class="text-on-background text-headline-large font-bold leading-tight tracking-tight">よくある質問</h1>
+                </div>
+
+                <!-- ローディングインジケーター -->
+                <div id="loading-indicator" class="text-center py-10 hidden">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
+                    <p class="mt-4 text-on-surface-variant">読み込み中...</p>
+                </div>
+
+                <!-- エラーメッセージ -->
+                <div id="error-message" class="text-center py-10 hidden">
+                    <!-- JSでメッセージを挿入 -->
+                </div>
+
+                <!-- FAQコンテンツ -->
+                <div id="faq-container" class="hidden">
+                    <!-- 検索ボックス -->
+                    <div id="search-container" class="mb-8">
+                        <div class="relative">
+                            <input type="text" id="search-box" placeholder="キーワードで検索" class="input-field pl-10 w-full">
+                            <span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+                            <button id="clear-search-btn" class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hidden">&times;</button>
+                        </div>
+                    </div>
+
+                    <!-- 注目の質問 -->
+                    <section id="featured-questions" class="mb-12">
+                        <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                            <span class="material-icons text-primary">star</span>
+                            注目の質問
+                        </h2>
+                        <div id="featured-questions-list" class="space-y-4">
+                            <!-- JSで動的に生成 -->
+                        </div>
+                    </section>
+
+                    <!-- カテゴリ別Q&Aリスト -->
+                    <div id="faq-list" class="space-y-10">
+                        <!-- JSで動的に生成 -->
+                    </div>
+                     <div id="no-results-message" class="text-center py-10 hidden">
+                        <p class="font-bold">ご指定のキーワードに一致する質問は見つかりませんでした。</p>
+                        <p class="text-sm text-on-surface-variant">単語を変えてお試しください。</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- フッター -->
+    <div id="footer-placeholder"></div>
+
+</div>
+
+<!-- 既存のmain.jsと、FAQページ専用のJSを読み込む -->
+<script type="module" src="src/main.js"></script>
+<script type="module" src="src/faq.js"></script>
+
+</body>
+</html>
