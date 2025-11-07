@@ -1,5 +1,5 @@
 
-import { resolveDemoDataPath, resolveDashboardDataPath, showToast } from './utils.js';
+import { resolveDemoDataPath, resolveDashboardDataPath, resolveDashboardAssetPath, showToast } from './utils.js';
 import { speedReviewService } from './services/speedReviewService.js';
 import { populateTable, renderModalContent } from './ui/speedReviewRenderer.js';
 import { handleOpenModal } from './modalHandler.js';
@@ -119,7 +119,7 @@ function handleDetailClick(answerId) {
     if (item) {
         currentItemInModal = item;
         isModalInEditMode = false;
-        handleOpenModal('reviewDetailModalOverlay', 'modals/reviewDetailModal.html', () => {
+        handleOpenModal('reviewDetailModalOverlay', resolveDashboardAssetPath('modals/reviewDetailModal.html'), () => {
             renderModalContent(item, false);
             setupModalEventListeners();
         });

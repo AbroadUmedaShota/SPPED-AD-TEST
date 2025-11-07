@@ -1,5 +1,5 @@
 import { handleOpenModal, closeModal } from './modalHandler.js';
-import { showToast } from './utils.js';
+import { showToast, resolveDashboardAssetPath } from './utils.js';
 
 // --- DOM Elements ---
 let modal;
@@ -124,7 +124,7 @@ const setupEventListeners = () => {
  * @param {object} survey The survey object to be duplicated.
  */
 export async function openDuplicateSurveyModal(survey) {
-    await handleOpenModal('duplicateSurveyModal', 'modals/duplicateSurveyModal.html');
+    await handleOpenModal('duplicateSurveyModal', resolveDashboardAssetPath('modals/duplicateSurveyModal.html'));
     
     initElements();
 
