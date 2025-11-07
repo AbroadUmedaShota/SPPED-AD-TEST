@@ -441,6 +441,8 @@ function setupEditCouponModal(coupon, closeModal) {
         if (input) {
             if (input.type === 'date') {
                 input.value = new Date(coupon[key]).toISOString().split('T')[0];
+            } else if (key === 'usageLimit' && coupon[key] === -1) {
+                input.value = ''; // Set to empty string if unlimited
             } else {
                 input.value = coupon[key];
             }
@@ -449,7 +451,13 @@ function setupEditCouponModal(coupon, closeModal) {
     const unlimited = getElement('editUnlimitedUsage');
     unlimited.checked = coupon.usageLimit === -1;
     getElement('editCouponUsageLimit').disabled = unlimited.checked;
-    unlimited.addEventListener('change', () => { getElement('editCouponUsageLimit').disabled = unlimited.checked; });
+    unlimited.addEventListener('change', () => {
+        const usageLimitInput = getElement('editCouponUsageLimit');
+        usageLimitInput.disabled = unlimited.checked;
+        if (unlimited.checked) {
+            usageLimitInput.value = '';
+        }
+    });
 
     form.addEventListener('submit', e => {
         e.preventDefault();
