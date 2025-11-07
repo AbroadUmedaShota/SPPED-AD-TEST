@@ -1,5 +1,5 @@
 import { handleOpenModal, closeModal } from './modalHandler.js';
-import { showToast } from './utils.js';
+import { showToast, resolveDashboardAssetPath } from './utils.js';
 
 // ダミーユーザーデータ (本来はAPIから取得)
 // windowオブジェクトにアタッチすることで、HTMLのonclickから参照可能にする
@@ -30,7 +30,7 @@ window.dummyUserData = {
  * @param {object} userData 表示するユーザーデータ
  */
 export async function openAccountInfoModal(userData) {
-    await handleOpenModal('accountInfoModal', 'modals/accountInfoModal.html');
+    await handleOpenModal('accountInfoModal', resolveDashboardAssetPath('modals/accountInfoModal.html'));
     // モーダルがDOMにロードされた後、専用の初期化処理とデータ投入を行う
     initializeAccountInfoModalFunctionality(document.getElementById('accountInfoModal')); // モーダル要素を渡す
     populateAccountInfoModal(userData); // データ投入

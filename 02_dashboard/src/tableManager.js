@@ -1,5 +1,5 @@
 import { showConfirmationModal } from './confirmationModal.js';
-import { showToast, copyTextToClipboard, resolveDashboardDataPath, debounce } from './utils.js';
+import { showToast, copyTextToClipboard, resolveDashboardDataPath, resolveDashboardAssetPath, debounce } from './utils.js';
 import { handleOpenModal } from './modalHandler.js';
 import { populateSurveyDetails } from './surveyDetailsModal.js';
 import { openDownloadModal } from './downloadOptionsModal.js';
@@ -219,14 +219,14 @@ function renderTableRows(surveysToRender) {
 
         row.querySelector('button[title="QRコードを表示"]').addEventListener('click', (e) => {
             e.stopPropagation();
-            handleOpenModal('qrCodeModal', 'modals/qrCodeModal.html');
+            handleOpenModal('qrCodeModal', resolveDashboardAssetPath('modals/qrCodeModal.html'));
         });
         
         row.addEventListener('click', (e) => {
             if (e.target.closest('button')) {
                 return;
             }
-            handleOpenModal('surveyDetailsModal', 'modals/surveyDetailsModal.html')
+            handleOpenModal('surveyDetailsModal', resolveDashboardAssetPath('modals/surveyDetailsModal.html'))
                 .then(() => {
                     populateSurveyDetails(survey);
                 })

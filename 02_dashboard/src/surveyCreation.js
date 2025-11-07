@@ -14,7 +14,7 @@ import {
 } from './ui/surveyRenderer.js';
 import { initializeFab } from './ui/fab.js';
 import { initializeDatepickers } from './ui/datepicker.js';
-import { loadCommonHtml, showToast, resolveDashboardDataPath, resolveDemoDataPath } from './utils.js';
+import { loadCommonHtml, showToast, resolveDashboardDataPath, resolveDemoDataPath, resolveDashboardAssetPath } from './utils.js';
 import { showConfirmationModal } from './confirmationModal.js';
 
 // --- Global State ---
@@ -686,7 +686,7 @@ function updateAndRenderAll() {
         if (!qrButton.dataset.qrModalListenerAttached) {
             qrButton.addEventListener('click', () => {
                 if (qrButton.disabled) return;
-                handleOpenModal('qrCodeModal', 'modals/qrCodeModal.html', setupQrCodeModalListeners);
+                handleOpenModal('qrCodeModal', resolveDashboardAssetPath('modals/qrCodeModal.html'), setupQrCodeModalListeners);
             });
             qrButton.dataset.qrModalListenerAttached = 'true';
         }
@@ -1119,7 +1119,7 @@ async function initializePage() {
             loadCommonHtml('sidebar-placeholder', 'common/sidebar.html', initSidebarHandler),
             loadCommonHtml('footer-placeholder', 'common/footer.html', () => {
                 const btn = document.getElementById('openContactModalBtn');
-                if (btn) btn.addEventListener('click', () => handleOpenModal('contactModal', 'modals/contactModal.html'));
+                if (btn) btn.addEventListener('click', () => handleOpenModal('contactModal', resolveDashboardAssetPath('modals/contactModal.html')));
             })
         ]);
 
@@ -2230,7 +2230,7 @@ function attachPreviewListener() {
         previewBtn.addEventListener('click', () => {
             try {
                 localStorage.setItem('surveyPreviewData', JSON.stringify(surveyData));
-                handleOpenModal('surveyPreviewModal', 'modals/surveyPreviewModal.html', setupPreviewSwitcher);
+                handleOpenModal('surveyPreviewModal', resolveDashboardAssetPath('modals/surveyPreviewModal.html'), setupPreviewSwitcher);
             } catch (e) {
                 console.error('Failed to save preview data to localStorage', e);
                 showToast('プレビューの表示に失敗しました。', 'error');

@@ -2,6 +2,7 @@
 let scrollPosition = 0; // Stores scroll position for `lockScroll`/`unlockScroll`
 let activeUIsCount = 0; // Tracks number of active UI overlays (modals, mobile sidebar)
 
+const DEFAULT_DASHBOARD_ROOT = '/02_dashboard';
 const DEFAULT_DATA_ROOT = '/data';
 function removeTrailingSlash(urlString) {
     return urlString.replace(/\/$/, '');
@@ -54,6 +55,15 @@ function resolveRepoBasePath() {
     return pathname.slice(0, markerIndex);
 }
 
+function getDashboardRoot() {
+    const basePath = resolveRepoBasePath();
+    if (!basePath) {
+        return DEFAULT_DASHBOARD_ROOT;
+    }
+
+    return `${basePath}${DEFAULT_DASHBOARD_ROOT}`;
+}
+
 function getDashboardDataRoot() {
     if (DASHBOARD_DATA_ROOT) {
         return DASHBOARD_DATA_ROOT;
@@ -77,6 +87,12 @@ function sanitizeRelativePath(relativePath) {
 export function resolveDashboardDataPath(relativePath) {
     const sanitized = sanitizeRelativePath(relativePath);
     const root = getDashboardDataRoot();
+    return sanitized ? `${root}/${sanitized}` : root;
+}
+
+export function resolveDashboardAssetPath(relativePath) {
+    const sanitized = sanitizeRelativePath(relativePath);
+    const root = getDashboardRoot();
     return sanitized ? `${root}/${sanitized}` : root;
 }
 

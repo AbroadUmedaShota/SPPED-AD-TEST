@@ -1,4 +1,5 @@
 import { handleOpenModal, closeModal } from './modalHandler.js';
+import { resolveDashboardAssetPath } from './utils.js';
 
 const DEFAULT_START_TIME = '00:00';
 const DEFAULT_END_TIME = '24:00';
@@ -134,7 +135,7 @@ function initializeDatepickers() {
  * @param {string} periodEnd End date for the survey period (YYYY-MM-DD).
  */
 export async function openDownloadModal(initialSelection, periodStart = '', periodEnd = '') {
-    await handleOpenModal('downloadOptionsModal', 'modals/downloadOptionsModal.html');
+    await handleOpenModal('downloadOptionsModal', resolveDashboardAssetPath('modals/downloadOptionsModal.html'));
 
     // Set checked states before initializing
     const periodAllRadio = document.getElementById('period_all');

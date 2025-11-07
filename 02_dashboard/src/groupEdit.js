@@ -1,4 +1,4 @@
-import { showToast } from './utils.js';
+import { showToast, resolveDashboardAssetPath } from './utils.js';
 import { showConfirmationModal } from './confirmationModal.js';
 import { handleOpenModal, closeModal } from './modalHandler.js';
 
@@ -351,7 +351,7 @@ function setupEventListeners() {
                 showToast('メンバーを削除しました。', 'success');
             });
         } else if (!target.closest('select, button, a')) {
-            handleOpenModal('memberDetailModal', 'modals/memberDetailModal.html').then(() => {
+            handleOpenModal('memberDetailModal', resolveDashboardAssetPath('modals/memberDetailModal.html')).then(() => {
                 if (member) populateMemberDetailModal(member);
             });
         }

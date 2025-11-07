@@ -33,7 +33,7 @@ import { initializePage as initSpeedReviewPage } from './speed-review.js'; // Im
 import { initGroupEditPage } from './groupEdit.js';
 import { initPasswordChange } from './password_change.js';
 
-import { showToast, copyTextToClipboard, loadCommonHtml } from './utils.js';
+import { showToast, copyTextToClipboard, loadCommonHtml, resolveDashboardAssetPath } from './utils.js';
 
 function showTutorialResumeBanner() {
     if (document.getElementById('tutorialResumeBanner')) {
@@ -92,7 +92,7 @@ function showTutorialResumeBanner() {
 }
 
 function openNewSurveyModalWithSetup(afterOpen) {
-    handleOpenModal('newSurveyModal', 'modals/newSurveyModal.html', () => {
+    handleOpenModal('newSurveyModal', resolveDashboardAssetPath('modals/newSurveyModal.html'), () => {
         // Initialize flatpickr for the new range input
         const tomorrow = new Date();
         tomorrow.setHours(0, 0, 0, 0);
