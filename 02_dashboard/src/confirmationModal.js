@@ -1,4 +1,5 @@
 import { handleOpenModal, closeModal } from './modalHandler.js';
+import { resolveDashboardAssetPath } from './utils.js';
 
 /**
  * Displays a confirmation modal and executes a callback on confirmation.
@@ -19,7 +20,7 @@ export function showConfirmationModal(message, onConfirm, options = {}) {
         prompt = null // New option for input field
     } = options;
 
-    handleOpenModal('confirmationModal', '/02_dashboard/modals/confirmationModal.html')
+    handleOpenModal('confirmationModal', resolveDashboardAssetPath('modals/confirmationModal.html'))
         .then(() => {
             const modal = document.getElementById('confirmationModal');
             const titleEl = document.getElementById('confirmationModalTitle');
