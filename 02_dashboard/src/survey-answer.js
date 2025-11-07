@@ -3,6 +3,8 @@
  * アンケート回答画面のフロントエンドロジック
  */
 
+import { resolveDashboardDataPath } from './utils.js';
+
 // --- 状態管理 ---
 const state = {
     surveyId: null,
@@ -138,7 +140,7 @@ function normalizeOptions(options, questionId) {
 }
 
 async function loadSurveyData() {
-    const response = await fetch(`/data/demo_surveys/${state.surveyId}.json`);
+    const response = await fetch(resolveDashboardDataPath(`demo_surveys/${state.surveyId}.json`));
     if (!response.ok) {
         throw new Error(`アンケート定義ファイルが見つかりません (ID: ${state.surveyId})`);
     }
