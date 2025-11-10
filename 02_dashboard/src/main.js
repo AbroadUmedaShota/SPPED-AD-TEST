@@ -32,6 +32,7 @@ import { initIndexPage } from './indexPage.js';
 import { initializePage as initSpeedReviewPage } from './speed-review.js'; // Import initializePage from speed-review.js
 import { initGroupEditPage } from './groupEdit.js';
 import { initPasswordChange } from './password_change.js';
+import { initBugReportPage } from './bug-report.js';
 
 import { showToast, copyTextToClipboard, loadCommonHtml, resolveDashboardAssetPath } from './utils.js';
 
@@ -414,6 +415,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             break;
         case 'password_change.html':
             initPasswordChange();
+            break;
+        case 'bug-report.html':
+            initBugReportPage();
             break;
         
     }
