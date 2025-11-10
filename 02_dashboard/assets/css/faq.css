@@ -1,6 +1,6 @@
 /* アコーディオン */
 .faq-item {
-    border: 1px solid #e5e7eb; /* Tailwind gray-200 */
+    border: 1px solid var(--color-outline); /* Tailwind gray-200 */
     border-radius: 0.5rem; /* 8px */
     overflow: hidden;
     transition: box-shadow 0.2s ease-in-out;
@@ -17,18 +17,18 @@
     width: 100%;
     padding: 1rem; /* 16px */
     cursor: pointer;
-    background-color: #f9fafb; /* Tailwind gray-50 */
+    background-color: var(--color-surface-variant); /* Tailwind gray-50 */
     font-weight: 600; /* semibold */
     text-align: left;
 }
 
 .faq-question:hover {
-    background-color: #f3f4f6; /* Tailwind gray-100 */
+    background-color: var(--color-base-border-divider); /* Tailwind gray-100 */
 }
 
 .faq-icon {
     transition: transform 0.3s ease-in-out;
-    color: #6b7280; /* Tailwind gray-500 */
+    color: var(--color-on-surface-variant); /* Tailwind gray-500 */
 }
 
 .faq-answer {
@@ -41,7 +41,7 @@
 .faq-item.is-open .faq-answer {
     max-height: 1000px; /* 十分な高さを確保 */
     padding: 1.5rem 1rem; /* 24px 16px */
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid var(--color-outline);
     line-height: 1.6;
 }
 
@@ -53,23 +53,23 @@
 .feedback-section {
     margin-top: 1.5rem; /* 24px */
     padding-top: 1rem; /* 16px */
-    border-top: 1px dashed #d1d5db; /* Tailwind gray-300 */
+    border-top: 1px dashed var(--color-outline); /* Tailwind gray-300 */
     text-align: center;
     font-size: 0.875rem; /* 14px */
-    color: #4b5563; /* Tailwind gray-600 */
+    color: var(--color-on-surface-variant); /* Tailwind gray-600 */
 }
 
 .feedback-buttons button {
     margin: 0 0.5rem; /* 8px */
     padding: 0.25rem 0.75rem; /* 4px 12px */
     border-radius: 9999px; /* rounded-full */
-    border: 1px solid #d1d5db; /* Tailwind gray-300 */
+    border: 1px solid var(--color-outline); /* Tailwind gray-300 */
     cursor: pointer;
     transition: background-color 0.2s;
 }
 
 .feedback-buttons button:hover {
-    background-color: #f3f4f6; /* Tailwind gray-100 */
+    background-color: var(--color-surface-variant); /* Tailwind gray-100 */
 }
 
 .feedback-buttons button:disabled {

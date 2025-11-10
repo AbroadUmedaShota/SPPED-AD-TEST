@@ -101,7 +101,7 @@ body.dark-mode {
     --color-base-shadow-strong: rgba(0, 0, 0, 0.6); /* DARK_MODE_COLOR_PALETTE_ACCURACY: ダークモードではより透過率を上げて控えめに */
 
     --color-text-main: #E0E0E0;
-    --color-text-sub: #BBBBBB;
+    --color-text-sub: #E0E0E0;
     --color-text-link: #90CAF9;
     --color-text-disabled: #616161;
 

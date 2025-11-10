@@ -207,7 +207,7 @@ function createRadioGroup(groupId, name, options, selectedValue) {
         div.className = 'flex items-center';
         div.innerHTML = `
             <input id="${name}-${opt.value}" name="${name}" type="radio" value="${opt.value}" ${isChecked ? 'checked' : ''} class="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500">
-            <label for="${name}-${opt.value}" class="ml-3 block text-sm font-medium text-slate-700">${opt.label}</label>
+            <label for="${name}-${opt.value}" class="ml-3 block text-sm font-medium text-on-surface-variant">${opt.label}</label>
         `;
         group.appendChild(div);
     });
