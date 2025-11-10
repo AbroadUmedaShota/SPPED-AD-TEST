@@ -162,15 +162,15 @@ document.addEventListener('DOMContentLoaded', () => {
         renderFeaturedCarousel() {
             if (!this.elements.featuredCarouselWrapper) return;
 
-            const featuredCategoryIds = ['survey', 'account', 'analytics', 'getting-started', 'troubleshooting'];
+            const featuredCategoryIds = ['getting-started', 'how-to-use', 'account', 'troubleshooting', 'faq'];
             const duplicatedCategoryIds = [...featuredCategoryIds, ...featuredCategoryIds]; // ループ再生のためにスライドを複製
 
             const categoryIcons = {
-                survey: 'poll',
-                account: 'account_circle',
-                analytics: 'analytics',
                 'getting-started': 'flag',
-                troubleshooting: 'support_agent'
+                'how-to-use': 'build',
+                account: 'account_circle',
+                troubleshooting: 'support_agent',
+                faq: 'help_outline'
             };
 
             const slidesHtml = duplicatedCategoryIds.map(id => {
