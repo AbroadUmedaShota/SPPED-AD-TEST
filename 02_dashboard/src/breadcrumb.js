@@ -41,6 +41,10 @@ const breadcrumbPaths = {
         { name: '請求書一覧', link: 'invoiceList.html' },
         { name: '請求書詳細' },
     ],
+    'help-center.html': [
+        { name: 'アンケート一覧', link: 'index.html' },
+        { name: 'ヘルプセンター' },
+    ],
 };
 
 function generateBreadcrumbs(currentPage, surveyId = null) {
@@ -81,6 +85,11 @@ export function initBreadcrumbs() {
     if (!container) return;
 
     const currentPage = window.location.pathname.split('/').pop();
+    // help-content.html は独自のパンくずリスト処理を持つため、共通処理をスキップ
+    if (currentPage === 'help-content.html') {
+        return;
+    }
+
     const urlParams = new URLSearchParams(window.location.search);
     const surveyId = urlParams.get('surveyId');
 

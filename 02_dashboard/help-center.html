@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpeedAd - ヘルプセンター</title>
+
+    <link rel="icon" href="assets/svg/speedad_logo.svg" type="image/svg+xml">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Material Icons CDN -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="service-top-style.css">
+    <!-- Help Center CSS -->
+    <link rel="stylesheet" href="src/help-center.css">
+    <!-- Swiper.js CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
+    <!-- Custom Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+</head>
+<body class="bg-background text-on-background" data-page-id="help-center">
+
+<!-- 1. アプリケーション全体構造 -->
+<div class="relative flex min-h-screen flex-col overflow-x-hidden">
+
+    <!-- サイドバー用オーバーレイ -->
+    <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
+
+    <!-- 2. ヘッダー -->
+    <div id="header-placeholder"></div>
+
+    <div class="flex flex-1 pt-16 bg-background">
+        <!-- 3. サイドバー -->
+        <div id="sidebar-placeholder"></div>
+
+        <!-- 4. メインコンテンツ -->
+        <main class="flex flex-1 flex-col" id="main-content">
+            
+            <!-- ヒーローセクション (フル幅) -->
+            <section class="relative help-center-hero px-4 sm:px-6 lg:px-8 py-16 text-center">
+                <!-- 背景画像コンテナ -->
+                <div class="max-w-6xl mx-auto h-full absolute inset-0">
+                    <div class="absolute inset-0 bg-cover bg-center opacity-10" style="background-image: url('assets/img/dummy-bg.jpg');"></div>
+                </div>
+                <div class="relative max-w-2xl mx-auto">
+                    <h1 class="text-4xl font-bold tracking-tight text-white text-shadow-sm mb-4">どんなことでお困りですか？</h1>
+                    <p class="text-lg text-gray-200 text-shadow-sm mb-8">キーワードを入力して、関連記事を検索できます。</p>
+                    <form action="#" method="GET" class="relative">
+                        <span class="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-white text-2xl pointer-events-none">search</span>
+                        <input type="search" name="query" placeholder="例：アンケートの作り方" class="w-full h-16 pl-14 pr-6 py-2 text-lg bg-surface border-2 border-outline rounded-full focus:ring-primary focus:border-primary transition text-gray-900 placeholder-gray-400">
+                    </form>
+                </div>
+            </section>
+
+            <!-- メインコンテンツコンテナ (パンくずリスト以降の全コンテンツ) -->
+            <div class="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+
+                <!-- パンくずリストコンテナ -->
+                <!-- <div id="breadcrumb-container" class="py-6"></div> -->
+
+                <!-- 2. よく読まれているカテゴリ -->
+                <section class="pt-16 pb-8">
+                    <h2 class="text-2xl font-bold text-on-background text-center mb-10">よく読まれているカテゴリ</h2>
+                    <div class="swiper-container relative" id="featured-carousel">
+                        <div class="swiper-wrapper" id="featured-carousel-wrapper">
+                            <!-- JSでカテゴリのスライドが動的に挿入されます -->
+                        </div>
+                        <!-- Add Pagination -->
+                        <div class="swiper-pagination"></div>
+                        <!-- Add Navigation -->
+                        <div class="swiper-button-prev"></div>
+                        <div class="swiper-button-next"></div>
+                    </div>
+                </section>
+
+                <!-- 3. すべてのカテゴリから探す -->
+                <section class="pt-8 pb-16 border-t border-outline-variant">
+                    <div class="max-w-6xl mx-auto">
+                        <h2 class="text-2xl font-bold text-on-background text-center mb-10">すべてのカテゴリから探す</h2>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <a href="help-content.html?category=getting-started" class="category-card group block bg-surface rounded-xl p-6 text-center shadow-sm hover:shadow-lg transition-shadow duration-300">
+                                <div class="inline-block p-4 bg-primary-container rounded-full mb-4"><span class="material-icons text-4xl text-on-primary-container">flag</span></div>
+                                <h3 class="text-lg font-semibold text-on-surface mb-1">はじめに</h3>
+                                <p class="text-sm text-on-surface-variant">初期設定や画面の見方など</p>
+                            </a>
+                            <a href="help-content.html?category=account" class="category-card group block bg-surface rounded-xl p-6 text-center shadow-sm hover:shadow-lg transition-shadow duration-300">
+                                <div class="inline-block p-4 bg-primary-container rounded-full mb-4"><span class="material-icons text-4xl text-on-primary-container">account_circle</span></div>
+                                <h3 class="text-lg font-semibold text-on-surface mb-1">アカウント設定</h3>
+                                <p class="text-sm text-on-surface-variant">パスワードや登録情報の変更など</p>
+                            </a>
+                            <a href="help-content.html?category=survey" class="category-card group block bg-surface rounded-xl p-6 text-center shadow-sm hover:shadow-lg transition-shadow duration-300">
+                                <div class="inline-block p-4 bg-primary-container rounded-full mb-4"><span class="material-icons text-4xl text-on-primary-container">poll</span></div>
+                                <h3 class="text-lg font-semibold text-on-surface mb-1">アンケート機能</h3>
+                                <p class="text-sm text-on-surface-variant">作成、編集、QRコード発行など</p>
+                            </a>
+                            <a href="help-content.html?category=analytics" class="category-card group block bg-surface rounded-xl p-6 text-center shadow-sm hover:shadow-lg transition-shadow duration-300">
+                                <div class="inline-block p-4 bg-primary-container rounded-full mb-4"><span class="material-icons text-4xl text-on-primary-container">analytics</span></div>
+                                <h3 class="text-lg font-semibold text-on-surface mb-1">分析・レポート機能</h3>
+                                <p class="text-sm text-on-surface-variant">回答データのグラフ分析やDLなど</p>
+                            </a>
+                            <a href="help-content.html?category=group" class="category-card group block bg-surface rounded-xl p-6 text-center shadow-sm hover:shadow-lg transition-shadow duration-300">
+                                <div class="inline-block p-4 bg-primary-container rounded-full mb-4"><span class="material-icons text-4xl text-on-primary-container">group</span></div>
+                                <h3 class="text-lg font-semibold text-on-surface mb-1">グループ管理</h3>
+                                <p class="text-sm text-on-surface-variant">メンバーの追加や権限設定など</p>
+                            </a>
+                            <a href="help-content.html?category=billing" class="category-card group block bg-surface rounded-xl p-6 text-center shadow-sm hover:shadow-lg transition-shadow duration-300">
+                                <div class="inline-block p-4 bg-primary-container rounded-full mb-4"><span class="material-icons text-4xl text-on-primary-container">receipt_long</span></div>
+                                <h3 class="text-lg font-semibold text-on-surface mb-1">ご請求・お支払い</h3>
+                                <p class="text-sm text-on-surface-variant">請求書の確認や支払い方法など</p>
+                            </a>
+                            <a href="faq.html" class="category-card group block bg-surface rounded-xl p-6 text-center shadow-sm hover:shadow-lg transition-shadow duration-300">
+                                <div class="inline-block p-4 bg-primary-container rounded-full mb-4"><span class="material-icons text-4xl text-on-primary-container">help_outline</span></div>
+                                <h3 class="text-lg font-semibold text-on-surface mb-1">よくある質問</h3>
+                                <p class="text-sm text-on-surface-variant">サービス全般に関するご質問</p>
+                            </a>
+                            <a href="help-content.html?category=glossary" class="category-card group block bg-surface rounded-xl p-6 text-center shadow-sm hover:shadow-lg transition-shadow duration-300">
+                                <div class="inline-block p-4 bg-primary-container rounded-full mb-4"><span class="material-icons text-4xl text-on-primary-container">book</span></div>
+                                <h3 class="text-lg font-semibold text-on-surface mb-1">用語集</h3>
+                                <p class="text-sm text-on-surface-variant">SPEED ADで使われる用語を解説</p>
+                            </a>
+                            <a href="help-content.html?category=troubleshooting" class="category-card group block bg-surface rounded-xl p-6 text-center shadow-sm hover:shadow-lg transition-shadow duration-300">
+                                <div class="inline-block p-4 bg-primary-container rounded-full mb-4"><span class="material-icons text-4xl text-on-primary-container">support_agent</span></div>
+                                <h3 class="text-lg font-semibold text-on-surface mb-1">困ったときは</h3>
+                                <p class="text-sm text-on-surface-variant">ログインや表示の問題など</p>
+                            </a>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. お知らせ -->
+                <section class="pt-8 pb-16 border-t border-outline-variant">
+                    <div class="max-w-6xl mx-auto">
+                        <h2 class="text-2xl font-bold text-on-background text-center mb-10">お知らせ</h2>
+                        <div id="notifications-list" class="space-y-4">
+                            <!-- JSによりお知らせアイテムが動的に挿入されます -->
+                        </div>
+                        <nav id="notifications-pagination" class="flex justify-center items-center gap-4 mt-10">
+                            <!-- JSによりページネーションが動的に挿入されます -->
+                        </nav>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- 5. フッター -->
+    <div id="footer-placeholder"></div>
+
+</div>
+
+<!-- JSファイル -->
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<script type="module" src="src/main.js"></script>
+<script type="module" src="src/help-center.js"></script>
+</body>
+</html>

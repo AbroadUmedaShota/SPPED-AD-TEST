@@ -1,0 +1,284 @@
+/* SpeedAd Help Center Custom Styles */
+
+/* ファーストビューのセクション */
+.help-center-hero {
+    position: relative; /* 疑似要素の基準点とする */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 320px;
+    background-image: url('https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=1950&q=80');
+    background-position: center 25%; /* 画像の上部が表示されるように調整 */
+    background-size: cover;
+    color: white; /* テキストを白に */
+}
+
+/* 背景画像の上に重ねる暗いオーバーレイ */
+.help-center-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: brightness(0.6); /* 背景を少し暗くする */
+}
+
+/* ヒーローセクション内のコンテンツはオーバーレイより手前に表示 */
+.help-center-hero > .relative {
+    position: relative;
+    z-index: 1;
+}
+
+/* カテゴリカードのインタラクション */
+.category-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    border: 1px solid var(--color-base-border-divider);
+}
+
+.category-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.07);
+    border-color: var(--color-primary);
+}
+
+.category-card .material-icons {
+    transition: transform 0.3s ease;
+}
+
+.category-card:hover .material-icons {
+    transform: scale(1.1);
+}
+
+/* 強調表示カードのスタイル */
+.highlight-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.highlight-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+/* 記事一覧アイテムのスタイル */
+.article-list-item {
+    transition: background-color 0.2s ease;
+    text-decoration: none !important; /* aタグのデフォルト下線を無効化 */
+}
+
+.article-list-item:hover {
+    background-color: var(--color-surface-variant);
+}
+
+/* 記事本文のスタイル (Tailwindのproseのような基本的なスタイル) */
+.prose {
+    line-height: 1.7;
+}
+.prose h1, .prose h2, .prose h3 {
+    font-weight: 700;
+    margin-bottom: 1em;
+}
+.prose p {
+    margin-bottom: 1em;
+}
+.prose a {
+    color: var(--color-primary);
+    text-decoration: underline;
+}
+.prose ul, .prose ol {
+    padding-left: 1.5em;
+    margin-bottom: 1em;
+}
+.prose li {
+    margin-bottom: 0.5em;
+}
+
+/* フィードバックセクションのスタイル */
+.feedback-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--color-outline);
+    border-radius: 9999px;
+    background-color: var(--color-surface);
+    color: var(--color-on-surface-variant);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.feedback-btn:hover {
+    background-color: var(--color-surface-variant);
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+/* 関連記事セクションのスタイル */
+.related-article-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    border: 1px solid var(--color-outline);
+    border-radius: 0.5rem;
+    background-color: var(--color-surface);
+    color: var(--color-on-surface);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.related-article-link:hover {
+    background-color: var(--color-surface-variant);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+/* 検索結果のハイライトスタイル */
+mark {
+    background-color: var(--color-state-warning);
+    color: var(--color-state-on-warning);
+    padding: 0.1em 0.2em;
+    border-radius: 0.2em;
+}
+
+/* Swiper.js カスタムスタイル */
+#featured-carousel {
+    max-width: 72rem; /* 1152px, max-w-6xl と同じ */
+    margin: 0 auto;
+    position: relative; /* ナビゲーションボタンの基準点 */
+    overflow: hidden; /* はみ出したスライドを隠す */
+}
+
+.swiper-container {
+    padding-bottom: 50px; /* ページネーションのスペースを確保 */
+}
+
+.swiper-slide {
+    height: auto; /* スライドの高さをコンテンツに合わせる */
+}
+
+.swiper-button-prev,
+.swiper-button-next {
+    position: absolute;
+    color: var(--color-primary);
+    width: 44px;
+    height: 44px;
+    background-color: var(--color-surface);
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* ホバーエフェクトのための初期設定 */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+#featured-carousel:hover .swiper-button-prev,
+#featured-carousel:hover .swiper-button-next {
+    opacity: 1;
+    visibility: visible;
+}
+
+.swiper-button-prev {
+    left: 10px;
+}
+.swiper-button-next {
+    right: 10px;
+}
+
+.swiper-button-prev:hover,
+.swiper-button-next:hover {
+    background-color: var(--color-surface-variant);
+}
+
+.swiper-button-prev::after,
+.swiper-button-next::after {
+    font-size: 1.5rem;
+    font-weight: 900;
+}
+
+.swiper-pagination {
+    bottom: 10px !important; /* ページネーションの位置を調整 */
+}
+
+.swiper-pagination-bullet {
+    background-color: var(--color-outline);
+    opacity: 0.8;
+}
+
+.swiper-pagination-bullet-active {
+    background-color: var(--color-primary);
+    opacity: 1;
+}
+
+/* カルーセル内のカードの高さを揃える */
+.highlight-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.highlight-card ul {
+    flex-grow: 1;
+}
+
+/* お知らせアコーディオンのスタイル */
+.notification-item {
+    border: 1px solid var(--color-base-border-divider);
+    background-color: var(--color-base-card);
+}
+
+.notification-toggle {
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 1rem;
+    width: 100%;
+    text-align: left;
+    transition: background-color 0.2s ease;
+}
+
+.notification-toggle:hover {
+    background-color: var(--color-surface-variant);
+}
+
+#notifications-list .notification-content {
+    max-height: 0;
+    overflow: hidden;
+    padding-top: 0;
+    padding-bottom: 0;
+    transition: max-height 0.3s ease-out, padding-top 0.3s ease-out, padding-bottom 0.3s ease-out;
+}
+
+#notifications-list .notification-item.is-open .notification-content {
+    max-height: 1000px; /* 十分な高さを確保 */
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+/* ページネーションのスタイル */
+#notifications-pagination button {
+    background-color: var(--color-base-card);
+    border: 1px solid var(--color-base-border-divider);
+    color: var(--color-text-main);
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+#notifications-pagination button:hover:not(:disabled) {
+    background-color: var(--color-surface-variant);
+}
+
+#notifications-pagination button.bg-primary {
+    border-color: var(--color-primary);
+}
+
+#notifications-pagination button:disabled {
+    cursor: not-allowed;
+}
