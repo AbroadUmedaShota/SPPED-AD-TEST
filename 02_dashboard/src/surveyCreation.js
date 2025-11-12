@@ -336,6 +336,20 @@ function ensureNumericMeta(question) {
     return meta.validation.numeric;
 }
 
+function ensureTextValidationMeta(question) {
+    const meta = ensureQuestionMeta(question);
+    if (!meta.validation || typeof meta.validation !== 'object') {
+        meta.validation = {};
+    }
+    if (!meta.validation.text || typeof meta.validation.text !== 'object') {
+        meta.validation.text = {
+            minLength: '',
+            maxLength: '',
+        };
+    }
+    return meta.validation.text;
+}
+
 function ensureDateTimeMeta(question) {
     const meta = ensureQuestionMeta(question);
     if (!meta.dateTimeConfig || typeof meta.dateTimeConfig !== 'object') {
@@ -369,9 +383,12 @@ function pruneQuestionMeta(question, type) {
     if (!question || !question.meta || typeof question.meta !== 'object') return;
     if (type !== 'number_answer' && question.meta.validation) {
         delete question.meta.validation.numeric;
-        if (Object.keys(question.meta.validation).length === 0) {
-            delete question.meta.validation;
-        }
+    }
+    if (type !== 'free_answer' && question.meta.validation) {
+        delete question.meta.validation.text;
+    }
+    if (Object.keys(question.meta.validation || {}).length === 0) {
+        delete question.meta.validation;
     }
     if (type !== 'date_time') {
         delete question.meta.dateTimeConfig;
@@ -390,6 +407,8 @@ function initializeQuestionMeta(question) {
         ensureDateTimeMeta(question);
     } else if (question.type === 'handwriting') {
         ensureHandwritingMeta(question);
+    } else if (question.type === 'free_answer') {
+        ensureTextValidationMeta(question);
     }
 }
 
@@ -1423,7 +1442,13 @@ function handleQuestionConfigInput(target) {
 
     let requiresRerender = false;
 
-    if (configType === 'number') {
+    if (configType === 'text') {
+        const textValidation = ensureTextValidationMeta(question);
+        if (field === 'minLength' || field === 'maxLength') {
+            const value = parseInt(target.value, 10);
+            textValidation[field] = !Number.isNaN(value) && value >= 0 ? value : '';
+        }
+    } else if (configType === 'number') {
         const numeric = ensureNumericMeta(question);
         switch (field) {
             case 'mode':
@@ -2178,7 +2203,14 @@ function renderPreviewInModal() {
                 });
                 html += '</div>';
             } else if (q.type === 'free_answer') {
-                html += '<textarea class="input-field" rows="3" placeholder="回答を入力"></textarea>';
+                const validation = q.meta?.validation?.text;
+                const min = validation?.minLength > 0 ? validation.minLength : '';
+                const max = validation?.maxLength > 0 ? validation.maxLength : '';
+                const textareaId = `preview-textarea-${q.questionId}`;
+                const warningId = `preview-warning-${q.questionId}`;
+
+                html += `<textarea id="${textareaId}" class="input-field" rows="3" placeholder="回答を入力" data-min="${min}" data-max="${max}"></textarea>`;
+                html += `<div id="${warningId}" class="text-error text-sm mt-1" style="display: none;"></div>`;
             } else if (q.type === 'number_answer') {
                 html += '<input type="number" class="input-field" placeholder="数値を入力">';
             }
@@ -2222,6 +2254,46 @@ function setupPreviewSwitcher() {
     if (modalTitle) {
         modalTitle.focus();
     }
+
+    // --- Add validation for free_answer textareas in preview ---
+    const dataString = localStorage.getItem('surveyPreviewData');
+    if (!dataString) return;
+
+    const surveyData = JSON.parse(dataString);
+    if (surveyData && surveyData.questionGroups) {
+        surveyData.questionGroups.forEach(group => {
+            (group.questions || []).forEach(q => {
+                if (q.type === 'free_answer') {
+                    const textarea = document.getElementById(`preview-textarea-${q.questionId}`);
+                    const warningDiv = document.getElementById(`preview-warning-${q.questionId}`);
+                    
+                    if (textarea && warningDiv) {
+                        const min = parseInt(textarea.dataset.min, 10);
+                        const max = parseInt(textarea.dataset.max, 10);
+
+                        textarea.addEventListener('input', () => {
+                            const len = textarea.value.length;
+                            let message = '';
+
+                            if (max > 0 && len > max) {
+                                message = `${len - max}文字超過しています。`;
+                            } else if (min > 0 && len < min) {
+                                message = `あと${min - len}文字必要です。`;
+                            }
+
+                            if (message) {
+                                warningDiv.textContent = message;
+                                warningDiv.style.display = 'block';
+                            } else {
+                                warningDiv.style.display = 'none';
+                            }
+                        });
+                    }
+                }
+            });
+        });
+    }
+    // --- End validation for free_answer textareas in preview ---
 }
 
 function attachPreviewListener() {
@@ -2407,9 +2479,45 @@ function renderSurveyPreview() {
                         content += `<p class="mt-2 text-base text-on-surface-variant break-words">${getLocalizedValue(question.explanationText, lang)}</p>`;
                     }
                     break;
-                case 'free_answer':
-                    content += `<textarea class="w-full border-gray-300 rounded-md shadow-sm" rows="3" readonly></textarea>`;
-                    break;
+        case 'free_answer':
+            console.log('Rendering preview for free_answer. Question data:', JSON.stringify(question, null, 2)); // Debug log
+            const validation = question.meta?.validation?.text;
+            const minLength = validation?.minLength;
+            const maxLength = validation?.maxLength;
+
+            const textarea = document.createElement('textarea');
+            textarea.name = `preview_${question.questionId}`;
+            textarea.className = 'input-field w-full';
+            textarea.rows = 4;
+            textarea.placeholder = '回答を入力';
+
+            const warningDiv = document.createElement('div');
+            warningDiv.className = 'text-error text-sm mt-1';
+            warningDiv.style.display = 'none';
+
+            controlArea.appendChild(textarea);
+            controlArea.appendChild(warningDiv);
+
+            textarea.addEventListener('input', () => {
+                const len = textarea.value.length;
+                let message = '';
+
+                if (maxLength > 0 && len > maxLength) {
+                    message = `${len - maxLength}文字超過しています。`;
+                } else if (minLength > 0 && len < minLength) {
+                    message = `あと${minLength - len}文字必要です。`;
+                }
+                
+                console.log(`Input length: ${len}, min: ${minLength}, max: ${maxLength}, message: "${message}"`); // Debug log
+
+                if (message) {
+                    warningDiv.textContent = message;
+                    warningDiv.style.display = 'block';
+                } else {
+                    warningDiv.style.display = 'none';
+                }
+            });
+            break;
                 case 'single_answer':
                     question.options.forEach(option => {
                         content += `<div class="flex items-center space-x-3">

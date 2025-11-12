@@ -760,7 +760,40 @@ function createQuestionElement(question, index) {
     // 設問タイプに応じて入力コントロールを生成
     switch (question.type) {
         case 'free_answer':
-            controlArea.innerHTML = `<textarea name="${question.id}" class="w-full rounded-md border-gray-300 shadow-sm" rows="4"></textarea>`;
+            const validation = question.meta?.validation?.text;
+            const min = validation?.minLength;
+            const max = validation?.maxLength;
+
+            const textarea = document.createElement('textarea');
+            textarea.name = question.id;
+            textarea.className = 'w-full rounded-md border-gray-300 shadow-sm';
+            textarea.rows = 4;
+            if (min > 0) textarea.minLength = min;
+
+            const warningDiv = document.createElement('div');
+            warningDiv.className = 'text-error text-sm mt-1';
+            warningDiv.style.display = 'none';
+
+            controlArea.appendChild(textarea);
+            controlArea.appendChild(warningDiv);
+
+            textarea.addEventListener('input', () => {
+                const len = textarea.value.length;
+                let message = '';
+
+                if (max > 0 && len > max) {
+                    message = `${len - max}文字超過しています。`;
+                } else if (min > 0 && len < min) {
+                    message = `あと${min - len}文字必要です。`;
+                }
+
+                if (message) {
+                    warningDiv.textContent = message;
+                    warningDiv.style.display = 'block';
+                } else {
+                    warningDiv.style.display = 'none';
+                }
+            });
             break;
         case 'single_answer':
             question.options.forEach(opt => {

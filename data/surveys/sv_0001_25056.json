@@ -36,7 +36,15 @@
     {
       "id": "Q2",
       "text": "どのようなキャリア開発支援を希望しますか？",
-      "type": "text"
+      "type": "text",
+      "meta": {
+        "validation": {
+          "text": {
+            "minLength": 10,
+            "maxLength": 15
+          }
+        }
+      }
     },
     {
       "id": "Q3",

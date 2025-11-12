@@ -399,6 +399,7 @@ function renderQuestion(question, uiLang, index, languageOptions = {}) {
   applyNumberConfig(questionItem, question);
   applyDateTimeConfig(questionItem, question);
   applyHandwritingConfig(questionItem, question);
+  applyTextValidationConfig(questionItem, question);
   applyExplanationCardConfig(questionItem, question, languageOptions);
 
   return questionItem;
@@ -499,6 +500,29 @@ function applyHandwritingConfig(questionItem, question) {
   if (penWidthInput) penWidthInput.value = config.penWidth ?? DEFAULT_HANDWRITING_META.penWidth;
   const bgSelect = section.querySelector('[data-config-field="backgroundPattern"]');
   if (bgSelect) bgSelect.value = config.backgroundPattern || DEFAULT_HANDWRITING_META.backgroundPattern;
+}
+
+function applyTextValidationConfig(questionItem, question) {
+    const section = questionItem.querySelector('[data-config-section="free_answer"]');
+    if (!section) return;
+
+    if (question.type !== 'free_answer') {
+        section.classList.add('hidden');
+        return;
+    }
+    section.classList.remove('hidden');
+
+    const validation = question.meta?.validation?.text || { minLength: '', maxLength: '' };
+
+    const minLengthInput = section.querySelector('[data-config-field="minLength"]');
+    if (minLengthInput) {
+        minLengthInput.value = validation.minLength ?? '';
+    }
+
+    const maxLengthInput = section.querySelector('[data-config-field="maxLength"]');
+    if (maxLengthInput) {
+        maxLengthInput.value = validation.maxLength ?? '';
+    }
 }
 
 
