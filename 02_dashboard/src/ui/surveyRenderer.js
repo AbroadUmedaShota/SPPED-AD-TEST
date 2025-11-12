@@ -459,27 +459,17 @@ function applyDateTimeConfig(questionItem, question) {
   }
   section.classList.remove('hidden');
   const config = question.meta?.dateTimeConfig || DEFAULT_DATETIME_META;
-  const mode = config.inputMode || DEFAULT_DATETIME_META.inputMode;
-  const modeSelect = section.querySelector('[data-config-field="inputMode"]');
-  if (modeSelect) modeSelect.value = mode;
-  const timezoneSelect = section.querySelector('[data-config-field="timezone"]');
-  if (timezoneSelect) timezoneSelect.value = config.timezone || DEFAULT_DATETIME_META.timezone;
-  const minInput = section.querySelector('[data-config-field="minDateTime"]');
-  const maxInput = section.querySelector('[data-config-field="maxDateTime"]');
-  const typeMap = { date: 'date', time: 'time', datetime: 'datetime-local' };
-  const inputType = typeMap[mode] || 'datetime-local';
-  if (minInput) {
-    minInput.type = inputType;
-    minInput.value = config.minDateTime || '';
+  const mode = config.inputMode || 'datetime'; // Default to datetime if not set
+
+  const showDateCheckbox = section.querySelector('[data-config-field="showDate"]');
+  const showTimeCheckbox = section.querySelector('[data-config-field="showTime"]');
+
+  if (showDateCheckbox) {
+    showDateCheckbox.checked = (mode === 'date' || mode === 'datetime');
   }
-  if (maxInput) {
-    maxInput.type = inputType;
-    maxInput.value = config.maxDateTime || '';
+  if (showTimeCheckbox) {
+    showTimeCheckbox.checked = (mode === 'time' || mode === 'datetime');
   }
-  const allowPast = section.querySelector('[data-config-field="allowPast"]');
-  if (allowPast) allowPast.checked = config.allowPast !== false;
-  const allowFuture = section.querySelector('[data-config-field="allowFuture"]');
-  if (allowFuture) allowFuture.checked = config.allowFuture !== false;
 }
 
 function applyHandwritingConfig(questionItem, question) {

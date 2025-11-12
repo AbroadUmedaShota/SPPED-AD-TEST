@@ -354,7 +354,7 @@ function ensureDateTimeMeta(question) {
     const meta = ensureQuestionMeta(question);
     if (!meta.dateTimeConfig || typeof meta.dateTimeConfig !== 'object') {
         meta.dateTimeConfig = {
-            inputMode: 'date',
+            inputMode: 'datetime', // Default to show both date and time
             timezone: 'Asia/Tokyo',
             minDateTime: '',
             maxDateTime: '',
@@ -1496,20 +1496,23 @@ function handleQuestionConfigInput(target) {
     } else if (configType === 'date_time') {
         const config = ensureDateTimeMeta(question);
         switch (field) {
-            case 'inputMode':
-                config.inputMode = target.value || 'date';
-                requiresRerender = true;
-                break;
-            case 'timezone':
-                config.timezone = target.value || 'Asia/Tokyo';
-                break;
-            case 'minDateTime':
-            case 'maxDateTime':
-                config[field] = target.value || '';
-                break;
-            case 'allowPast':
-            case 'allowFuture':
-                config[field] = !!target.checked;
+            case 'showDate':
+            case 'showTime':
+                const showDate = qItem.querySelector('[data-config-field="showDate"]').checked;
+                const showTime = qItem.querySelector('[data-config-field="showTime"]').checked;
+                if (showDate && showTime) {
+                    config.inputMode = 'datetime';
+                } else if (showDate) {
+                    config.inputMode = 'date';
+                } else if (showTime) {
+                    config.inputMode = 'time';
+                } else {
+                    // If neither is checked, default to datetime or handle as an error/warning
+                    // For now, let's default to datetime if both are unchecked to ensure a valid state
+                    config.inputMode = 'datetime';
+                    // Optionally, you could force one to be checked or show a warning
+                    // For this implementation, we'll ensure at least one is selected in the UI rendering
+                }
                 break;
             default:
                 break;

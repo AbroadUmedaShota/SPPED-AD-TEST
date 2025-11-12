@@ -842,10 +842,23 @@ function createQuestionElement(question, index) {
             controlArea.innerHTML = `<input type="number" name="${question.id}" class="w-full rounded-md border-gray-300 shadow-sm" min="${question.min}" max="${question.max}" step="${question.step || 1}">`;
             break;
         case 'date_time':
+            const config = question.meta?.dateTimeConfig || { inputMode: 'datetime' };
+            const mode = config.inputMode || 'datetime';
+
+            let dateInputHTML = '';
+            if (mode === 'date' || mode === 'datetime') {
+                dateInputHTML = `<input type="date" name="${question.id}_date" class="w-full rounded-md border-gray-300 shadow-sm p-2" aria-label="Date" max="9999-12-31">`;
+            }
+
+            let timeInputHTML = '';
+            if (mode === 'time' || mode === 'datetime') {
+                timeInputHTML = `<input type="time" name="${question.id}_time" class="w-full rounded-md border-gray-300 shadow-sm p-2" aria-label="Time">`;
+            }
+
             controlArea.innerHTML = `
               <div class="flex flex-col sm:flex-row gap-2">
-                <input type="date" name="${question.id}_date" class="w-full rounded-md border-gray-300 shadow-sm p-2" aria-label="Date" max="9999-12-31">
-                <input type="time" name="${question.id}_time" class="w-full rounded-md border-gray-300 shadow-sm p-2" aria-label="Time">
+                ${dateInputHTML}
+                ${timeInputHTML}
               </div>
             `;
             break;
