@@ -396,6 +396,9 @@ function pruneQuestionMeta(question, type) {
     if (type !== 'handwriting') {
         delete question.meta.handwritingConfig;
     }
+    if (type !== 'multi_answer') {
+        delete question.meta.maxSelections;
+    }
 }
 
 function initializeQuestionMeta(question) {
@@ -409,6 +412,11 @@ function initializeQuestionMeta(question) {
         ensureHandwritingMeta(question);
     } else if (question.type === 'free_answer') {
         ensureTextValidationMeta(question);
+    } else if (question.type === 'multi_answer') {
+        const meta = ensureQuestionMeta(question);
+        if (meta.maxSelections === undefined) {
+            meta.maxSelections = question.options?.length || 1;
+        }
     }
 }
 
@@ -1535,6 +1543,12 @@ function handleQuestionConfigInput(target) {
             default:
                 break;
         }
+    } else if (configType === 'multi_answer') {
+        const meta = ensureQuestionMeta(question);
+        if (field === 'maxSelections') {
+            const value = parseInt(target.value, 10);
+            meta.maxSelections = !Number.isNaN(value) && value >= 1 ? value : 1;
+        }
     } else {
         return;
     }
@@ -1895,6 +1909,13 @@ function handleAddOption(groupId, questionId) {
     const question = surveyData.questionGroups.find(g => g.groupId === groupId)?.questions.find(q => q.questionId === questionId);
     if (question && question.options) {
         question.options.push({ text: normalizeLocalization({ ja: '新しい選択肢' }) });
+        
+        // Also update maxSelections to match the new number of options
+        if (question.type === 'multi_answer') {
+            const meta = ensureQuestionMeta(question);
+            meta.maxSelections = question.options.length;
+        }
+
         setDirty(true);
         updateAndRenderAll();
     }
@@ -1960,6 +1981,10 @@ function handleChangeQuestionType(groupId, questionId, newType) {
                 { text: normalizeLocalization({ ja: '選択肢1' }) },
                 { text: normalizeLocalization({ ja: '選択肢2' }) }
             ];
+        }
+        if (newType === 'multi_answer') {
+            const meta = ensureQuestionMeta(question);
+            meta.maxSelections = question.options.length;
         }
         if ('matrix' in question) delete question.matrix;
         if ('explanationText' in question) delete question.explanationText;

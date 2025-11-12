@@ -401,6 +401,7 @@ function renderQuestion(question, uiLang, index, languageOptions = {}) {
   applyHandwritingConfig(questionItem, question);
   applyTextValidationConfig(questionItem, question);
   applyExplanationCardConfig(questionItem, question, languageOptions);
+  applyMultiAnswerConfig(questionItem, question);
 
   return questionItem;
 }
@@ -522,6 +523,25 @@ function applyTextValidationConfig(questionItem, question) {
     const maxLengthInput = section.querySelector('[data-config-field="maxLength"]');
     if (maxLengthInput) {
         maxLengthInput.value = validation.maxLength ?? '';
+    }
+}
+
+function applyMultiAnswerConfig(questionItem, question) {
+    const section = questionItem.querySelector('[data-config-section="multi_answer"]');
+    if (!section) return;
+
+    if (question.type !== 'multi_answer') {
+        section.classList.add('hidden');
+        return;
+    }
+    section.classList.remove('hidden');
+
+    const maxSelectionsInput = section.querySelector('[data-config-field="maxSelections"]');
+    if (maxSelectionsInput) {
+        const meta = question.meta || {};
+        const numOptions = Array.isArray(question.options) ? question.options.length : 1;
+        maxSelectionsInput.value = meta.maxSelections ?? numOptions;
+        maxSelectionsInput.max = numOptions;
     }
 }
 

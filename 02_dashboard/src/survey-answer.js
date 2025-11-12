@@ -805,13 +805,38 @@ function createQuestionElement(question, index) {
             });
             break;
         case 'multi_answer':
-             question.options.forEach(opt => {
-                controlArea.innerHTML += `
-                    <div class="flex items-center gap-3">
-                        <input type="checkbox" id="${question.id}-${opt.value}" name="${question.id}" value="${opt.value}" class="form-checkbox text-primary">
-                        <label for="${question.id}-${opt.value}">${resolveLocalizedText(opt.text)}</label>
-                    </div>`;
+            const maxSelections = question.meta?.maxSelections;
+            question.options.forEach(opt => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center gap-3';
+                const input = document.createElement('input');
+                input.type = 'checkbox';
+                input.id = `${question.id}-${opt.value}`;
+                input.name = question.id;
+                input.value = opt.value;
+                input.className = 'form-checkbox text-primary';
+                const label = document.createElement('label');
+                label.htmlFor = input.id;
+                label.textContent = resolveLocalizedText(opt.text);
+                div.appendChild(input);
+                div.appendChild(label);
+                controlArea.appendChild(div);
             });
+
+            if (maxSelections > 0) {
+                controlArea.addEventListener('change', (e) => {
+                    if (e.target.type === 'checkbox') {
+                        const checkedCheckboxes = controlArea.querySelectorAll('input[type="checkbox"]:checked');
+                        const uncheckedCheckboxes = controlArea.querySelectorAll('input[type="checkbox"]:not(:checked)');
+                        
+                        if (checkedCheckboxes.length >= maxSelections) {
+                            uncheckedCheckboxes.forEach(cb => cb.disabled = true);
+                        } else {
+                            uncheckedCheckboxes.forEach(cb => cb.disabled = false);
+                        }
+                    }
+                });
+            }
             break;
         case 'number_answer':
             controlArea.innerHTML = `<input type="number" name="${question.id}" class="w-full rounded-md border-gray-300 shadow-sm" min="${question.min}" max="${question.max}" step="${question.step || 1}">`;
