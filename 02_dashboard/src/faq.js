@@ -1,3 +1,5 @@
+import { resolveDashboardDataPath } from './utils.js';
+
 document.addEventListener('DOMContentLoaded', () => {
     const faqApp = {
         elements: {
@@ -24,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.state.isLoading = true;
             this.renderUI();
             try {
-                const response = await fetch('../data/faq.json');
+                const response = await fetch(resolveDashboardDataPath('faq.json'));
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 this.state.allData = await response.json();
             } catch (e) {
