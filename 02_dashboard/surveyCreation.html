@@ -392,7 +392,37 @@
             </div>
         </div>
       </div>
-      <div data-config-section="number" class="hidden mt-4 pt-4 border-t border-outline-variant space-y-3"></div>
+      <div data-config-section="number" class="hidden mt-4 pt-4 border-t border-outline-variant space-y-3">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="input-group">
+                <input type="number" data-config-type="number" data-config-field="min" class="input-field" placeholder="指定なし">
+                <label class="input-label">最小値</label>
+            </div>
+            <div class="input-group">
+                <input type="number" data-config-type="number" data-config-field="max" class="input-field" placeholder="指定なし">
+                <label class="input-label">最大値</label>
+            </div>
+            <div class="input-group">
+                <select data-config-type="number" data-config-field="mode" class="input-field">
+                    <option value="integer">整数</option>
+                    <option value="decimal">小数</option>
+                </select>
+                <label class="input-label">数値形式</label>
+            </div>
+            <div class="input-group">
+                <input type="text" data-config-type="number" data-config-field="unitLabel" class="input-field" placeholder="例: 歳, 円, cm">
+                <label class="input-label">単位</label>
+            </div>
+            <div class="input-group">
+                <input type="number" data-config-type="number" data-config-field="precision" min="0" class="input-field" placeholder="指定なし">
+                <label class="input-label">小数点以下の桁数</label>
+            </div>
+             <div class="input-group">
+                <input type="number" data-config-type="number" data-config-field="step" min="0" class="input-field" placeholder="1">
+                <label class="input-label">ステップ（矢印での増減量）</label>
+            </div>
+        </div>
+      </div>
       <div data-config-section="date_time" class="hidden mt-4 pt-4 border-t border-outline-variant space-y-3"></div>
       <div data-config-section="handwriting" class="hidden mt-4 pt-4 border-t border-outline-variant space-y-3"></div>
     </div>
