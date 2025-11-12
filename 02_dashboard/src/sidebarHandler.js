@@ -295,7 +295,8 @@ function attachEventListeners() {
                 () => {
                     localStorage.clear();
                     sessionStorage.clear();
-                    window.location.href = '/index.html';
+                    const logoutRedirectUrl = new URL('../index.html', window.location.href);
+                    window.location.href = logoutRedirectUrl.toString();
                 },
                 'ログアウト'
             );
