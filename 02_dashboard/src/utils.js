@@ -2,10 +2,44 @@
 let scrollPosition = 0; // Stores scroll position for `lockScroll`/`unlockScroll`
 let activeUIsCount = 0; // Tracks number of active UI overlays (modals, mobile sidebar)
 
-const DEFAULT_DASHBOARD_ROOT = '/02_dashboard';
-const DEFAULT_DATA_ROOT = '/data';
-function removeTrailingSlash(urlString) {
-    return urlString.replace(/\/$/, '');
+const DEFAULT_DASHBOARD_ROOT = './';
+const DEFAULT_DATA_ROOT = './data';
+
+function resolveRelativeBaseFromUrl(url) {
+    const marker = '/02_dashboard/';
+    const pathname = url.pathname || '';
+    const markerIndex = pathname.lastIndexOf(marker);
+    if (markerIndex === -1) {
+        return null;
+    }
+
+    const subPath = pathname.slice(markerIndex + marker.length);
+    const segments = subPath.split('/').filter(Boolean);
+    if (segments.length <= 1) {
+        return './';
+    }
+
+    const depth = segments.length - 1;
+    return '../'.repeat(depth);
+}
+
+function joinRelativePath(base, relativePath) {
+    const cleanedBase = base ? base.replace(/\/+$/, '') : '';
+    const cleanedRelative = relativePath ? relativePath.replace(/^\/+/, '') : '';
+
+    if (!cleanedBase && !cleanedRelative) {
+        return './';
+    }
+
+    if (!cleanedBase) {
+        return `./${cleanedRelative}`;
+    }
+
+    if (!cleanedRelative) {
+        return cleanedBase === '.' ? './' : cleanedBase;
+    }
+
+    return `${cleanedBase}/${cleanedRelative}`;
 }
 
 function resolveDataRootFromImportMeta() {
@@ -20,18 +54,16 @@ function resolveDataRootFromImportMeta() {
             const proxiedTarget = moduleUrl.search.slice(1);
             if (proxiedTarget) {
                 const targetUrl = new URL(proxiedTarget);
-                const dataUrl = new URL('../../data/', targetUrl);
-                return removeTrailingSlash(dataUrl.href);
+                const basePath = resolveRelativeBaseFromUrl(targetUrl);
+                if (basePath) {
+                    return joinRelativePath(basePath, 'data');
+                }
             }
         }
-
-        const dataUrl = new URL('../../data/', moduleUrl);
-
-        if (moduleUrl.protocol === 'file:') {
-            return removeTrailingSlash(dataUrl.pathname);
+        const basePath = resolveRelativeBaseFromUrl(moduleUrl);
+        if (basePath) {
+            return joinRelativePath(basePath, 'data');
         }
-
-        return removeTrailingSlash(dataUrl.href);
     } catch (error) {
         // Fall back to window-based detection when parsing fails (older browsers or CSP constraints)
         return null;
@@ -40,41 +72,24 @@ function resolveDataRootFromImportMeta() {
 
 const DASHBOARD_DATA_ROOT = resolveDataRootFromImportMeta();
 
-function resolveRepoBasePath() {
-    if (typeof window === 'undefined' || !window.location) {
-        return '';
-    }
-
-    const marker = '/02_dashboard/';
-    const { pathname } = window.location;
-    const markerIndex = pathname.indexOf(marker);
-    if (markerIndex === -1) {
-        return '';
-    }
-
-    return pathname.slice(0, markerIndex);
-}
-
 function getDashboardRoot() {
-    const basePath = resolveRepoBasePath();
-    if (!basePath) {
+    if (typeof window === 'undefined' || !window.location) {
         return DEFAULT_DASHBOARD_ROOT;
     }
-
-    return `${basePath}${DEFAULT_DASHBOARD_ROOT}`;
+    const basePath = resolveCommonBasePath();
+    return basePath || './';
 }
 
 function getDashboardDataRoot() {
+    if (typeof window !== 'undefined' && window.location) {
+        const basePath = resolveCommonBasePath();
+        const relativeBase = basePath || './';
+        return joinRelativePath(relativeBase, 'data');
+    }
     if (DASHBOARD_DATA_ROOT) {
         return DASHBOARD_DATA_ROOT;
     }
-
-    const basePath = resolveRepoBasePath();
-    if (!basePath) {
-        return DEFAULT_DATA_ROOT;
-    }
-
-    return `${basePath}${DEFAULT_DATA_ROOT}`;
+    return DEFAULT_DATA_ROOT;
 }
 
 function sanitizeRelativePath(relativePath) {
@@ -87,13 +102,13 @@ function sanitizeRelativePath(relativePath) {
 export function resolveDashboardDataPath(relativePath) {
     const sanitized = sanitizeRelativePath(relativePath);
     const root = getDashboardDataRoot();
-    return sanitized ? `${root}/${sanitized}` : root;
+    return joinRelativePath(root, sanitized);
 }
 
 export function resolveDashboardAssetPath(relativePath) {
     const sanitized = sanitizeRelativePath(relativePath);
     const root = getDashboardRoot();
-    return sanitized ? `${root}/${sanitized}` : root;
+    return joinRelativePath(root, sanitized);
 }
 
 export function resolveDemoDataPath(relativePath) {
@@ -108,7 +123,7 @@ export function resolveDemoDataPath(relativePath) {
     }
     const newPath = parts.join('/');
     const root = getDashboardDataRoot();
-    return newPath ? `${root}/${newPath}` : root;
+    return joinRelativePath(root, newPath);
 }
 
 /**

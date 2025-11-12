@@ -41,5 +41,5 @@
 
 ## 運用メモ
 - 共通ヘッダーやサイドバーなどの HTML は `02_dashboard/common/` から `loadCommonHtml(...)` で読み込む仕様です。`window.__COMMON_BASE_PATH` を必ず確認してください。
-- ダッシュボード用 JSON は `data/` 配下に統一されています。新規データは `resolveDashboardDataPath` を介して参照すること。
+- ダッシュボード用 JSON は リポジトリ直下の `data/` 配下に統一されています。新規データは `resolveDashboardDataPath` （`./` 起点の相対パスを返却）を介して参照すること。
 - 旧リポジトリから移管した添付ファイルは `docs/archive/` に退避済みです。再利用する場合は最新仕様と差異がないか確認してから復元してください。

@@ -1,3 +1,5 @@
+import { resolveDashboardDataPath } from './utils.js';
+
 document.addEventListener('DOMContentLoaded', () => {
     const helpCenterApp = {
         elements: {
@@ -44,8 +46,8 @@ document.addEventListener('DOMContentLoaded', () => {
         async loadData() {
             try {
                 const [notificationsRes, articlesRes] = await Promise.all([
-                    fetch('../data/notifications.json'),
-                    fetch('../data/help_articles.json')
+                    fetch(resolveDashboardDataPath('notifications.json')),
+                    fetch(resolveDashboardDataPath('help_articles.json'))
                 ]);
                 if (!notificationsRes.ok) throw new Error('お知らせデータの読み込みに失敗しました。');
                 if (!articlesRes.ok) throw new Error('記事データの読み込みに失敗しました。');
