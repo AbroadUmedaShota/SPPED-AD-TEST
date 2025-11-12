@@ -898,30 +898,130 @@ function createQuestionElement(question, index) {
             break;
         case 'handwriting_space':
             const canvasId = `${question.id}-canvas`;
-            const clearButtonId = `${question.id}-clear`;
+            const handwritingConfig = question.meta?.handwritingConfig || { canvasHeight: 200 };
+            const canvasHeight = handwritingConfig.canvasHeight || 200;
+
+            // ツールボックスのHTMLを定義
             controlArea.innerHTML = `
-                <canvas id="${canvasId}" class="border border-gray-400 rounded-md w-full" height="200"></canvas>
-                <button type="button" id="${clearButtonId}" class="px-4 py-2 text-sm font-medium rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 mt-2">クリア</button>
+                <div class="handwriting-container">
+                    <div class="toolbox">
+                        <div class="tool-group">
+                            <button type="button" id="${question.id}-pen-tool" class="tool-button active" title="ペン">
+                                <span class="material-icons">edit</span>
+                            </button>
+                            <button type="button" id="${question.id}-eraser-tool" class="tool-button" title="消しゴム">
+                                <span class="material-icons">layers_clear</span>
+                            </button>
+                        </div>
+                        <div class="tool-group">
+                            <input type="color" id="${question.id}-color-picker" class="color-palette" title="カラーパレット" value="#000000">
+                            <input type="range" id="${question.id}-thickness-slider" class="thickness-slider" min="1" max="20" value="5" title="ペンの太さ">
+                        </div>
+                        <div class="tool-group">
+                            <button type="button" id="${question.id}-undo-btn" class="tool-button" title="戻る">
+                                <span class="material-icons">undo</span>
+                            </button>
+                            <button type="button" id="${question.id}-redo-btn" class="tool-button" title="進む">
+                                <span class="material-icons">redo</span>
+                            </button>
+                        </div>
+                         <div class="tool-group">
+                            <button type="button" id="${question.id}-clear-btn" class="tool-button" title="リセット">
+                                <span class="material-icons">delete</span>
+                            </button>
+                        </div>
+                    </div>
+                    <canvas id="${canvasId}" class="border border-gray-400 rounded-md w-full" style="touch-action: none;" height="${canvasHeight}"></canvas>
+                </div>
             `;
 
+            // setTimeoutを使用して、DOMがレンダリングされた後にCanvasの初期化を行う
             setTimeout(() => {
                 const canvas = document.getElementById(canvasId);
+                if (!canvas) return;
                 const ctx = canvas.getContext('2d');
+
+                // DPIスケーリングで高解像度ディスプレイに対応
+                const dpr = window.devicePixelRatio || 1;
+                const rect = canvas.getBoundingClientRect();
+                canvas.width = rect.width * dpr;
+                canvas.height = rect.height * dpr;
+                ctx.scale(dpr, dpr);
+
+                // 描画状態
                 let drawing = false;
+                let tool = 'pen'; // 'pen' or 'eraser'
+                
+                // 履歴管理
+                let history = [ctx.getImageData(0, 0, canvas.width, canvas.height)];
+                let historyIndex = 0;
+
+                // ツールボタン
+                const penTool = document.getElementById(`${question.id}-pen-tool`);
+                const eraserTool = document.getElementById(`${question.id}-eraser-tool`);
+                const colorPicker = document.getElementById(`${question.id}-color-picker`);
+                const thicknessSlider = document.getElementById(`${question.id}-thickness-slider`);
+                const undoBtn = document.getElementById(`${question.id}-undo-btn`);
+                const redoBtn = document.getElementById(`${question.id}-redo-btn`);
+                const clearBtn = document.getElementById(`${question.id}-clear-btn`);
+
+                // 初期設定
+                ctx.strokeStyle = colorPicker.value;
+                ctx.lineWidth = thicknessSlider.value;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                updateHistoryButtons();
+
+
+                // --- 関数定義 ---
+
+                function updateToolButtons() {
+                    penTool.classList.toggle('active', tool === 'pen');
+                    eraserTool.classList.toggle('active', tool === 'eraser');
+                }
+
+                function updateHistoryButtons() {
+                    undoBtn.disabled = historyIndex <= 0;
+                    redoBtn.disabled = historyIndex >= history.length - 1;
+                }
+                
+                function saveState() {
+                    // Redoの履歴を削除
+                    if (historyIndex < history.length - 1) {
+                        history = history.slice(0, historyIndex + 1);
+                    }
+                    history.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+                    historyIndex++;
+                    updateHistoryButtons();
+                    
+                    // stateを更新して自動保存をトリガー
+                    state.answers[question.id] = canvas.toDataURL();
+                    state.hasUnsavedChanges = true;
+                }
+
+                function restoreState(index) {
+                    if (index < 0 || index >= history.length) return;
+                    ctx.putImageData(history[index], 0, 0);
+                    historyIndex = index;
+                    updateHistoryButtons();
+                    
+                    // stateを更新
+                    state.answers[question.id] = canvas.toDataURL();
+                    state.hasUnsavedChanges = true;
+                }
 
                 const getPos = (e) => {
                     const rect = canvas.getBoundingClientRect();
-                    const scaleX = canvas.width / rect.width;
-                    const scaleY = canvas.height / rect.height;
                     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
                     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
                     return {
-                        x: (clientX - rect.left) * scaleX,
-                        y: (clientY - rect.top) * scaleY
+                        x: (clientX - rect.left),
+                        y: (clientY - rect.top)
                     };
                 };
 
                 const startDrawing = (e) => {
+                    e.preventDefault();
                     drawing = true;
                     const pos = getPos(e);
                     ctx.beginPath();
@@ -939,23 +1039,66 @@ function createQuestionElement(question, index) {
                 const stopDrawing = () => {
                     if (!drawing) return;
                     drawing = false;
-                    state.answers[question.id] = canvas.toDataURL();
-                    state.hasUnsavedChanges = true;
+                    ctx.closePath();
+                    saveState();
                 };
 
+                // --- イベントリスナー設定 ---
+
+                // ツール選択
+                penTool.addEventListener('click', () => {
+                    tool = 'pen';
+                    ctx.globalCompositeOperation = 'source-over';
+                    ctx.strokeStyle = colorPicker.value;
+                    updateToolButtons();
+                });
+
+                eraserTool.addEventListener('click', () => {
+                    tool = 'eraser';
+                    ctx.globalCompositeOperation = 'destination-out';
+                    updateToolButtons();
+                });
+
+                // プロパティ変更
+                colorPicker.addEventListener('input', (e) => {
+                    ctx.strokeStyle = e.target.value;
+                    // ペンモードに戻す
+                    tool = 'pen';
+                    ctx.globalCompositeOperation = 'source-over';
+                    updateToolButtons();
+                });
+
+                thicknessSlider.addEventListener('input', (e) => {
+                    ctx.lineWidth = e.target.value;
+                });
+
+                // 履歴操作
+                undoBtn.addEventListener('click', () => {
+                    if (historyIndex > 0) {
+                        restoreState(historyIndex - 1);
+                    }
+                });
+
+                redoBtn.addEventListener('click', () => {
+                    if (historyIndex < history.length - 1) {
+                        restoreState(historyIndex + 1);
+                    }
+                });
+                
+                clearBtn.addEventListener('click', () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    saveState(); // クリアした状態を保存
+                });
+
+                // 描画イベント
                 canvas.addEventListener('mousedown', startDrawing);
                 canvas.addEventListener('mousemove', draw);
                 canvas.addEventListener('mouseup', stopDrawing);
                 canvas.addEventListener('mouseleave', stopDrawing);
-                canvas.addEventListener('touchstart', startDrawing);
-                canvas.addEventListener('touchmove', draw);
+                canvas.addEventListener('touchstart', startDrawing, { passive: false });
+                canvas.addEventListener('touchmove', draw, { passive: false });
                 canvas.addEventListener('touchend', stopDrawing);
 
-                document.getElementById(clearButtonId).addEventListener('click', () => {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    delete state.answers[question.id];
-                    state.hasUnsavedChanges = true;
-                });
             }, 0);
             break;
         default:

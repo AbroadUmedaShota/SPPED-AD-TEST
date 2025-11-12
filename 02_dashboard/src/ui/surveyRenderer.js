@@ -481,16 +481,24 @@ function applyHandwritingConfig(questionItem, question) {
   }
   section.classList.remove('hidden');
   const config = question.meta?.handwritingConfig || DEFAULT_HANDWRITING_META;
-  const widthInput = section.querySelector('[data-config-field="canvasWidth"]');
-  if (widthInput) widthInput.value = config.canvasWidth ?? DEFAULT_HANDWRITING_META.canvasWidth;
-  const heightInput = section.querySelector('[data-config-field="canvasHeight"]');
-  if (heightInput) heightInput.value = config.canvasHeight ?? DEFAULT_HANDWRITING_META.canvasHeight;
-  const colorInput = section.querySelector('[data-config-field="penColor"]');
-  if (colorInput) colorInput.value = config.penColor || DEFAULT_HANDWRITING_META.penColor;
-  const penWidthInput = section.querySelector('[data-config-field="penWidth"]');
-  if (penWidthInput) penWidthInput.value = config.penWidth ?? DEFAULT_HANDWRITING_META.penWidth;
-  const bgSelect = section.querySelector('[data-config-field="backgroundPattern"]');
-  if (bgSelect) bgSelect.value = config.backgroundPattern || DEFAULT_HANDWRITING_META.backgroundPattern;
+  
+  const presetSelect = section.querySelector('[data-config-field="canvasHeightPreset"]');
+  const customHeightGroup = section.querySelector('[data-handwriting-sub-config="customHeight"]');
+  const customHeightInput = section.querySelector('[data-config-field="canvasHeight"]');
+
+  if (presetSelect && customHeightGroup && customHeightInput) {
+    const height = config.canvasHeight ?? 200;
+    const presetValues = ['100', '200', '300', '500'];
+    
+    if (presetValues.includes(String(height))) {
+      presetSelect.value = String(height);
+      customHeightGroup.classList.add('hidden');
+    } else {
+      presetSelect.value = 'custom';
+      customHeightGroup.classList.remove('hidden');
+      customHeightInput.value = height;
+    }
+  }
 }
 
 function applyTextValidationConfig(questionItem, question) {

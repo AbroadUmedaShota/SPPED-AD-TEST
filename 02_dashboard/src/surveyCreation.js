@@ -1519,32 +1519,21 @@ function handleQuestionConfigInput(target) {
         }
     } else if (configType === 'handwriting') {
         const config = ensureHandwritingMeta(question);
-        switch (field) {
-            case 'canvasWidth':
-            case 'canvasHeight':
-                if (target.value === '') {
-                    config[field] = '';
-                } else {
-                    const sizeValue = parseInt(target.value, 10);
-                    config[field] = Number.isNaN(sizeValue) ? '' : Math.max(1, sizeValue);
-                }
-                break;
-            case 'penColor':
-                config.penColor = target.value || '#000000';
-                break;
-            case 'penWidth':
-                if (target.value === '') {
-                    config.penWidth = '';
-                } else {
-                    const widthValue = parseInt(target.value, 10);
-                    config.penWidth = Number.isNaN(widthValue) ? '' : Math.max(1, widthValue);
-                }
-                break;
-            case 'backgroundPattern':
-                config.backgroundPattern = target.value || 'plain';
-                break;
-            default:
-                break;
+        const customHeightGroup = qItem.querySelector('[data-handwriting-sub-config="customHeight"]');
+
+        if (field === 'canvasHeightPreset') {
+            const presetValue = target.value;
+            if (presetValue === 'custom') {
+                customHeightGroup.classList.remove('hidden');
+            } else {
+                customHeightGroup.classList.add('hidden');
+                config.canvasHeight = parseInt(presetValue, 10);
+            }
+        } else if (field === 'canvasHeight') {
+             const sizeValue = parseInt(target.value, 10);
+             config.canvasHeight = Number.isNaN(sizeValue) ? 200 : Math.max(50, sizeValue); // Default 200, min 50
+        } else {
+            // Handle other handwriting settings if any
         }
     } else if (configType === 'multi_answer') {
         const meta = ensureQuestionMeta(question);
