@@ -77,15 +77,36 @@ export async function fetchSurveyData() {
             'sv_0001_25056', 'sv_0001_25057', 'sv_0001_25058', 'sv_0001_25059', 'sv_0001_25060',
             'sv_0001_25061', 'sv_0001_25062'
         ];
-        const surveyPromises = surveyIds.map(id => 
-            fetch(resolveDashboardDataPath(`demo_surveys/${id}.json`)).then(res => {
-                if (!res.ok) {
-                    console.warn(`Could not load survey: ${id}`);
-                    return null; // Return null for failed fetches
+        const surveyPromises = surveyIds.map(async id => {
+            const primaryUrl = resolveDashboardDataPath(`demo_surveys/${id}.json`);
+            const fallbackUrls = [
+                `https://raw.githubusercontent.com/abroadumedashota/SPPED-AD-TEST/main/data/demo_surveys/${id}.json`,
+                `https://rawcdn.githack.com/abroadumedashota/SPPED-AD-TEST/main/data/demo_surveys/${id}.json`
+            ];
+
+            const urlsToTry = [primaryUrl, ...fallbackUrls];
+
+            for (const url of urlsToTry) {
+                try {
+                    const res = await fetch(url);
+                    if (!res.ok) {
+                        console.warn(`Could not load survey from ${url}: ${res.status} ${res.statusText}`);
+                        continue;
+                    }
+
+                    if (url !== primaryUrl) {
+                        console.info(`Loaded survey ${id} from fallback URL: ${url}`);
+                    }
+
+                    return await res.json();
+                } catch (error) {
+                    console.warn(`Error loading survey from ${url}:`, error);
                 }
-                return res.json();
-            })
-        );
+            }
+
+            console.warn(`Could not load survey after trying all sources: ${id}`);
+            return null;
+        });
         const allSurveys = await Promise.all(surveyPromises);
         return allSurveys.filter(Boolean); // Filter out any null results
 
