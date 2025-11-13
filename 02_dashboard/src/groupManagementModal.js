@@ -57,7 +57,7 @@ export async function initGroupManagementModal(modalElement, groupId = null) {
         if (groupToEdit) {
             populateGroupForm(groupToEdit);
         } else {
-            showToast('指定されたグループが見つかりません。新規作成モードで開きます。 ', 'error');
+            showToast('指定されたグループが見つかりません。新規作成モードで開きます。', 'error');
             currentGroupId = null; // 見つからない場合は新規作成モードに切り替える
             modalTitle.textContent = 'グループ新規作成';
             submitButton.textContent = '作成する';
@@ -69,7 +69,9 @@ export async function initGroupManagementModal(modalElement, groupId = null) {
         submitButton.textContent = '作成する';
         deleteGroupSection.classList.add('hidden');
         // フォームをクリア
-        groupForm.reset();
+        if (groupForm) {
+            groupForm.reset();
+        }
     }
     renderMemberList();
 }
@@ -95,7 +97,7 @@ async function handleGroupFormSubmit(event) {
     };
 
     if (!groupData.name) {
-        showToast('グループ名は必須です。 ', 'error');
+        showToast('グループ名は必須です。', 'error');
         return;
     }
 
@@ -103,17 +105,17 @@ async function handleGroupFormSubmit(event) {
         if (currentGroupId) {
             // 更新
             await updateGroup(currentGroupId, groupData);
-            showToast('グループ情報が更新されました！ ', 'success');
+            showToast('グループ情報が更新されました！', 'success');
         } else {
             // 新規作成
             await createGroup(groupData);
-            showToast('グループが新規作成されました！ ', 'success');
+            showToast('グループが新規作成されました！', 'success');
         }
         closeModal('newGroupModal');
         // TODO: グループ一覧を再読み込みする処理を呼び出す
     } catch (error) {
         console.error('Error saving group:', error);
-        showToast('グループの保存に失敗しました。 ', 'error');
+        showToast('グループの保存に失敗しました。', 'error');
     }
 }
 
@@ -124,19 +126,25 @@ function handleAddMember() {
     const memberEmailInput = document.getElementById('memberEmail');
     const memberRoleSelect = document.getElementById('memberRole');
 
+    if (!memberEmailInput || !memberRoleSelect) {
+        console.error('Group management modal inputs are missing.');
+        showToast('メンバー追加に必要な入力欄が見つかりません。', 'error');
+        return;
+    }
+
     const email = memberEmailInput.value.trim();
     const role = memberRoleSelect.value;
 
     if (!email) {
-        showToast('メールアドレスを入力してください。 ', 'error');
+        showToast('メールアドレスを入力してください。', 'error');
         return;
     }
     if (!isValidEmail(email)) {
-        showToast('有効なメールアドレスを入力してください。 ', 'error');
+        showToast('有効なメールアドレスを入力してください。', 'error');
         return;
     }
     if (currentMembers.some(member => member.email === email)) {
-        showToast('このメンバーは既に追加されています。 ', 'error');
+        showToast('このメンバーは既に追加されています。', 'error');
         return;
     }
 
@@ -158,10 +166,15 @@ function renderMemberList() {
     memberListContainer.innerHTML = ''; // Clear existing list
 
     if (currentMembers.length === 0) {
-        memberListContainer.appendChild(noMembersMessage);
-        noMembersMessage.classList.remove('hidden');
+        if (noMembersMessage) {
+            memberListContainer.appendChild(noMembersMessage);
+            noMembersMessage.classList.remove('hidden');
+        }
+        return;
     } else {
-        noMembersMessage.classList.add('hidden');
+        if (noMembersMessage) {
+            noMembersMessage.classList.add('hidden');
+        }
         currentMembers.forEach((member, index) => {
             const memberDiv = document.createElement('div');
             memberDiv.className = 'flex items-center justify-between p-2 border-b border-outline-variant last:border-b-0';
@@ -183,7 +196,18 @@ function renderMemberList() {
  */
 function handleRemoveMember(event) {
     const indexToRemove = parseInt(event.currentTarget.dataset.index, 10);
-    const removedMember = currentMembers.splice(indexToRemove, 1)[0];
+    if (Number.isNaN(indexToRemove)) {
+        console.error('Invalid member index for removal:', event.currentTarget.dataset.index);
+        showToast('指定したメンバーが見つかりません。', 'error');
+        return;
+    }
+
+    const [removedMember] = currentMembers.splice(indexToRemove, 1);
+    if (!removedMember) {
+        console.error('No member found for removal at index:', indexToRemove);
+        showToast('指定したメンバーが見つかりません。', 'error');
+        return;
+    }
     renderMemberList();
     showToast(`${removedMember.email} を削除しました。`, 'success');
 }
@@ -193,19 +217,19 @@ function handleRemoveMember(event) {
  */
 async function handleDeleteGroup() {
     if (!currentGroupId) {
-        showToast('削除するグループが指定されていません。 ', 'error');
+        showToast('削除するグループが指定されていません。', 'error');
         return;
     }
 
-    if (confirm('本当にこのグループを削除しますか？この操作は元に戻せません。 ')) {
+    if (confirm('本当にこのグループを削除しますか？この操作は元に戻せません。')) {
         try {
             await deleteGroup(currentGroupId);
-            showToast('グループが削除されました！ ', 'success');
+            showToast('グループが削除されました！', 'success');
             closeModal('newGroupModal');
             // TODO: グループ一覧を再読み込みする処理を呼び出す
         } catch (error) {
             console.error('Error deleting group:', error);
-            showToast('グループの削除に失敗しました。 ', 'error');
+            showToast('グループの削除に失敗しました。', 'error');
         }
     }
 }
