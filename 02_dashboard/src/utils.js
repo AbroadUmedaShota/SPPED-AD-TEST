@@ -83,8 +83,9 @@ function getDashboardRoot() {
 function getDashboardDataRoot() {
     if (typeof window !== 'undefined' && window.location) {
         const basePath = resolveCommonBasePath();
-        const relativeBase = basePath || './';
-        return joinRelativePath(relativeBase, 'data');
+        const depth = (basePath.match(/\.{2}\//g) || []).length;
+        const repoRootBase = '../'.repeat(depth + 1);
+        return joinRelativePath(repoRootBase, 'data');
     }
     if (DASHBOARD_DATA_ROOT) {
         return DASHBOARD_DATA_ROOT;
