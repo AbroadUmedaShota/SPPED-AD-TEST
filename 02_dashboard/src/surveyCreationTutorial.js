@@ -1,10 +1,11 @@
 function startSurveyCreationTutorial() {
     const initTutorial = () => {
         // --- DOM Elements ---
-        let svgOverlay, maskRect; // maskRectはくり抜き用の矩形
+        let highlightBox;
         let popover, popoverTitle, popoverDescription, nextButton, closeButton;
         let currentHighlightedElement = null;
         let isTransitioning = false;
+        let dynamicStyle;
 
         // --- State ---
         let currentStepIndex = 0;
@@ -27,57 +28,100 @@ function startSurveyCreationTutorial() {
             { selector: '.question-item:last-child .question-text-input[data-lang="ja"]', title: '設問の作成（マルチアンサー）', description: '設問形式が「マルチアンサー」になりました。こちらに質問文をご入力ください。（例：改善してほしい点をお選びください）', position: 'bottom', showButtons: true },
             { selector: '.question-item:last-child .option-item:nth-child(1) .option-text-input[data-lang="ja"]', title: '選択肢の入力', description: '最初の選択肢を入力します。（例：UIデザイン）', position: 'bottom', showButtons: true },
             { selector: '.question-item:last-child .option-item:nth-child(2) .option-text-input[data-lang="ja"]', title: '選択肢の入力', description: '二番目の選択肢を入力します。（例：機能の豊富さ）', position: 'bottom', showButtons: true },
-            { selector: '#showPreviewBtn', title: 'プレビュー機能の確認', description: '設問が作成できました。回答者からどのように見えるかは、いつでも『プレビュー』機能でご確認いただけます。こちらをクリックしてご確認ください。', position: 'bottom', showButtons: true },
+            { 
+                selector: '#showPreviewBtn', 
+                title: 'プレビュー機能の確認', 
+                description: '設問が作成できました。回答者からどのように見えるかは、いつでも『プレビュー』機能でご確認いただけます。こちらをクリックしてご確認ください。', 
+                position: 'bottom', 
+                showButtons: false,
+                awaitClick: true
+            },
+            { 
+                selector: '.modal-content', 
+                title: 'プレビュー画面', 
+                description: 'こちらが回答者に表示されるプレビュー画面です。右上の「×」ボタンでプレビューを閉じてから、トレーニングを完了してください。', 
+                position: 'top', 
+                showButtons: true 
+            },
             { selector: '#createSurveyBtn', title: 'トレーニング完了', description: '以上で、アンケート作成の一連の流れは完了となります。『アンケートを保存』をクリックして、このトレーニングを終了してください。', position: 'bottom', showButtons: true }
         ];
 
         function createTutorialUI() {
-            // --- SVG Overlay ---
-            svgOverlay = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-            svgOverlay.id = 'custom-tutorial-svg-overlay';
-            svgOverlay.setAttribute('width', '100%');
-            svgOverlay.setAttribute('height', '100%');
-            
-            const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
-            const mask = document.createElementNS("http://www.w3.org/2000/svg", "mask");
-            mask.id = 'tutorial-mask';
+            // --- Highlight Box ---
+            highlightBox = document.createElement('div');
+            highlightBox.id = 'custom-tutorial-highlight-box';
+            document.body.appendChild(highlightBox);
 
-            const maskBg = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-            maskBg.setAttribute('x', '0');
-            maskBg.setAttribute('y', '0');
-            maskBg.setAttribute('width', '100%');
-            maskBg.setAttribute('height', '100%');
-            maskBg.setAttribute('fill', 'white'); // マスクの背景は白で、全体を覆う
-
-            maskRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-            maskRect.setAttribute('fill', 'black'); // くり抜き部分は黒
-            maskRect.setAttribute('rx', '8'); // 角丸
-            maskRect.setAttribute('ry', '8'); // 角丸
-            maskRect.style.transition = 'all 0.3s ease-in-out';
-
-            mask.appendChild(maskBg);
-            mask.appendChild(maskRect);
-            defs.appendChild(mask);
-            svgOverlay.appendChild(defs);
-
-            const overlayRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-            overlayRect.setAttribute('x', '0');
-            overlayRect.setAttribute('y', '0');
-            overlayRect.setAttribute('width', '100%');
-            overlayRect.setAttribute('height', '100%');
-            overlayRect.setAttribute('fill', 'rgba(0, 0, 0, 0.7)'); // オーバーレイの色
-            overlayRect.setAttribute('mask', 'url(#tutorial-mask)'); // マスクを適用
-            overlayRect.classList.add('overlay-rect'); // クリックイベント用
-            svgOverlay.appendChild(overlayRect);
-            
-            document.body.appendChild(svgOverlay);
+            // --- Dynamic Styles ---
+            dynamicStyle = document.createElement('style');
+            dynamicStyle.textContent = `
+                #custom-tutorial-highlight-box {
+                    position: fixed;
+                    border-radius: 8px;
+                    box-shadow: 0 0 0 5000px rgba(0, 0, 0, 0.7);
+                    z-index: 10001;
+                    pointer-events: none;
+                    transition: top 0.3s ease-in-out, left 0.3s ease-in-out, width 0.3s ease-in-out, height 0.3s ease-in-out;
+                }
+                .custom-tutorial-highlight-target {
+                    position: relative;
+                    z-index: 10001;
+                    pointer-events: auto;
+                }
+                /* Popover base styles */
+                #custom-tutorial-popover {
+                    position: fixed;
+                    background-color: #fff;
+                    color: #333;
+                    border-radius: 8px;
+                    padding: 15px 20px;
+                    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+                    max-width: 350px;
+                    z-index: 10002;
+                    transition: opacity 0.3s ease;
+                    opacity: 1;
+                }
+                #custom-tutorial-popover h3 {
+                    margin-top: 0;
+                    font-size: 1.2em;
+                    margin-bottom: 10px;
+                    font-weight: bold;
+                }
+                #custom-tutorial-popover p {
+                    margin-bottom: 15px;
+                    line-height: 1.6;
+                    font-size: 0.95em;
+                }
+                .tutorial-footer {
+                    display: flex;
+                    justify-content: flex-end;
+                    align-items: center;
+                    gap: 8px;
+                    margin-top: 10px;
+                }
+                #custom-tutorial-next-btn {
+                    background-color: #1a73e8;
+                    color: white;
+                    border: none;
+                    border-radius: 5px;
+                    padding: 8px 15px;
+                    cursor: pointer;
+                    font-size: 0.9em;
+                }
+                .tutorial-close-btn {
+                    background-color: transparent;
+                    color: #5f6368;
+                    border: none;
+                    padding: 8px 15px;
+                    cursor: pointer;
+                }
+            `;
+            document.head.appendChild(dynamicStyle);
 
             // --- Popover ---
             popover = document.createElement('div');
             popover.id = 'custom-tutorial-popover';
-            popover.style.zIndex = '10002'; // SVGオーバーレイより手前
             popover.innerHTML = `
-                <div id="custom-tutorial-arrow"></div>
                 <h3 id="custom-tutorial-title"></h3>
                 <p id="custom-tutorial-description"></p>
                 <div class="tutorial-footer">
@@ -98,10 +142,12 @@ function startSurveyCreationTutorial() {
 
         function destroyTutorial() {
             if (currentHighlightedElement) {
-                currentHighlightedElement.classList.remove('custom-tutorial-highlight', 'custom-tutorial-highlight-light-bg');
+                currentHighlightedElement.classList.remove('custom-tutorial-highlight-target');
             }
-            if (svgOverlay) svgOverlay.remove();
+            if (highlightBox) highlightBox.remove();
             if (popover) popover.remove();
+            if (dynamicStyle) dynamicStyle.remove();
+
             const nextStatus = tutorialCompleted ? 'completed' : 'pending';
             localStorage.setItem('speedad-tutorial-status', nextStatus);
             if (tutorialCompleted) {
@@ -125,15 +171,14 @@ function startSurveyCreationTutorial() {
             if (isTransitioning) return;
             isTransitioning = true;
 
-            // --- 前のステップのクリーンアップ ---
+            // --- Previous step cleanup ---
             if (currentHighlightedElement) {
-                currentHighlightedElement.classList.remove('custom-tutorial-highlight', 'custom-tutorial-highlight-light-bg');
+                currentHighlightedElement.classList.remove('custom-tutorial-highlight-target');
             }
-            // マスクをリセットして、次の描画に備える
-            maskRect.setAttribute('x', '0');
-            maskRect.setAttribute('y', '0');
-            maskRect.setAttribute('width', '0');
-            maskRect.setAttribute('height', '0');
+            highlightBox.style.width = '0px';
+            highlightBox.style.height = '0px';
+            highlightBox.style.top = '50%';
+            highlightBox.style.left = '50%';
 
 
             const fabButton = document.getElementById('fab-main-button');
@@ -151,55 +196,44 @@ function startSurveyCreationTutorial() {
                 return;
             }
             
-            // スクロールを実行
-            element.scrollIntoView({ behavior: 'auto', block: 'center' }); // 即時スクロール
+            element.scrollIntoView({ behavior: 'auto', block: 'center' });
 
-            // DOMの再描画を待ってからハイライトとポップアップ表示
-                    setTimeout(() => {
-                        // Tutorial actions tied to visual focus
-                        if (step.selector === '#surveyName_ja') {
-                            element.focus();
-                            element.value = '（自動入力）新製品満足度調査';
-                            element.dispatchEvent(new Event('input', { bubbles: true }));
-                        }
-                        if (step.selector === '#displayTitle_ja') {
-                            element.focus();
-                            element.value = '（自動入力）新製品に関する満足度アンケート';
-                            element.dispatchEvent(new Event('input', { bubbles: true }));
-                        }
-                        if (step.selector === '#periodRange') {
-                            if (element._flatpickr) {
-                                element.focus();
-                                const tomorrow = new Date();
-                                tomorrow.setDate(tomorrow.getDate() + 1);
-                                const threeDaysAfterTomorrow = new Date();
-                                threeDaysAfterTomorrow.setDate(tomorrow.getDate() + 3);
-                                element._flatpickr.setDate([tomorrow, threeDaysAfterTomorrow], true);
-                                // Give a brief moment for setDate to process before opening
-                                setTimeout(() => {
-                                    element._flatpickr.open();
-                                }, 100);
-                            }
-                        }
-            
-                        currentHighlightedElement = element;                
-                // ハイライトクラス適用（枠線やグローのため）
-                if (step.selector === 'button[data-question-type="free_answer"]') {
-                    element.classList.add('custom-tutorial-highlight-light-bg');
-                } else {
-                    element.classList.add('custom-tutorial-highlight');
+            setTimeout(() => {
+                // Tutorial actions
+                if (step.selector === '#surveyName_ja') {
+                    element.focus();
+                    element.value = '（自動入力）新製品満足度調査';
+                    element.dispatchEvent(new Event('input', { bubbles: true }));
                 }
-
-                // SVGマスクの矩形を更新
+                if (step.selector === '#displayTitle_ja') {
+                    element.focus();
+                    element.value = '（自動入力）新製品に関する満足度アンケート';
+                    element.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+                if (step.selector === '#periodRange') {
+                    if (element._flatpickr) {
+                        element.focus();
+                        const tomorrow = new Date();
+                        tomorrow.setDate(tomorrow.getDate() + 1);
+                        const threeDaysAfterTomorrow = new Date();
+                        threeDaysAfterTomorrow.setDate(tomorrow.getDate() + 3);
+                        element._flatpickr.setDate([tomorrow, threeDaysAfterTomorrow], true);
+                        setTimeout(() => element._flatpickr.open(), 100);
+                    }
+                }
+    
+                currentHighlightedElement = element;
+                
+                // --- Highlight with box-shadow ---
+                element.classList.add('custom-tutorial-highlight-target');
                 const rect = element.getBoundingClientRect();
-                const padding = 8; // くり抜く領域の余白 (角丸に合わせて調整)
-                maskRect.setAttribute('x', rect.left - padding);
-                maskRect.setAttribute('y', rect.top - padding);
-                maskRect.setAttribute('width', rect.width + (padding * 2));
-                maskRect.setAttribute('height', rect.height + (padding * 2));
+                const padding = 4;
+                highlightBox.style.top = `${rect.top - padding}px`;
+                highlightBox.style.left = `${rect.left - padding}px`;
+                highlightBox.style.width = `${rect.width + (padding * 2)}px`;
+                highlightBox.style.height = `${rect.height + (padding * 2)}px`;
 
-
-                // ポップアップ表示
+                // --- Position Popover ---
                 popoverTitle.textContent = step.title;
                 popoverDescription.textContent = step.description;
                 
@@ -244,12 +278,49 @@ function startSurveyCreationTutorial() {
                 popover.style.left = `${left}px`;
                 
                 const footer = popover.querySelector('.tutorial-footer');
+                footer.style.display = step.showButtons === false ? 'none' : 'flex';
+
                 if (index === steps.length - 1) {
                     nextButton.textContent = '完了';
+                } else {
+                    nextButton.textContent = '次へ';
+                }
+
+                if (step.awaitClick) {
+                    const clickHandler = (e) => {
+                        if (e.target.closest('#custom-tutorial-popover')) return;
+                        element.removeEventListener('click', clickHandler, true);
+
+                        const nextStepSelector = steps[index + 1]?.selector;
+                        if (!nextStepSelector) {
+                            showNextStep();
+                            return;
+                        }
+
+                        const interval = 100;
+                        const timeout = 5000;
+                        let elapsedTime = 0;
+
+                        const pollForElement = setInterval(() => {
+                            const nextElement = document.querySelector(nextStepSelector);
+                            if (nextElement && nextElement.getBoundingClientRect().width > 0) {
+                                clearInterval(pollForElement);
+                                showNextStep();
+                            }
+
+                            elapsedTime += interval;
+                            if (elapsedTime >= timeout) {
+                                clearInterval(pollForElement);
+                                console.warn(`Tutorial timed out waiting for element: ${nextStepSelector}`);
+                                showNextStep();
+                            }
+                        }, interval);
+                    };
+                    element.addEventListener('click', clickHandler, { once: true, capture: true });
                 }
 
                 isTransitioning = false;
-            }, 600); // FABメニューのアニメーション完了を待つための遅延
+            }, 300);
         }
 
         // --- Initialization ---
@@ -259,7 +330,6 @@ function startSurveyCreationTutorial() {
 
     // メインスクリプトの初期化完了を待ってからチュートリアルを開始
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
-        // 既にページが読み込み済みの場合、少し遅延させて実行
         setTimeout(initTutorial, 100);
     } else {
         document.addEventListener('pageInitialized', initTutorial, { once: true });

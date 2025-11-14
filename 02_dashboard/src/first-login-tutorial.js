@@ -272,12 +272,11 @@
                 on: 'click',
             },
             {
-                element: '#surveyPreviewModal',
+                element: '#surveyPreviewModal .modal-content',
                 title: 'プレビュー画面',
                 content: 'プレビューを確認したら、「次へ」ボタンを押してアンケートの保存に進みましょう。',
                 placement: 'top',
                 on: 'manual',
-                highlight: false,
             },
             {
                 element: '#createSurveyBtn',
@@ -450,8 +449,8 @@
             return;
         }
 
-        if (step.element === '#surveyPreviewModal') {
-            const closeButtons = document.querySelectorAll('#surveyPreviewModal button[data-modal-close="surveyPreviewModal"]');
+        if (step.element === '#surveyPreviewModal .modal-content') {
+            const closeButtons = document.querySelectorAll('#surveyPreviewModal [data-modal-close="surveyPreviewModal"]');
             closeButtons.forEach(btn => {
                 btn.style.pointerEvents = 'none';
                 disabledButtons.push(btn);
@@ -599,9 +598,12 @@
             console.log('Adding "click" listener to "Next" button.');
             nextButton.addEventListener('click', () => {
                 // Special handling for the preview modal step
-                if (step.element === '#surveyPreviewModal') {
-                    const closeButton = document.querySelector('#surveyPreviewModal button[data-modal-close="surveyPreviewModal"]');
+                if (step.element === '#surveyPreviewModal .modal-content') {
+                    const closeButton = document.querySelector('#surveyPreviewModal [data-modal-close="surveyPreviewModal"]');
                     if (closeButton) {
+                        // Re-enable pointer events to click it, then proceed.
+                        // The full re-enabling is handled in cleanUp.
+                        closeButton.style.pointerEvents = 'auto';
                         closeButton.click();
                     }
                 }
