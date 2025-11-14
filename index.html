@@ -840,9 +840,16 @@
       function showModal() {
         modalOverlay.classList.remove('modal--is-hidden');
         document.body.classList.add('is-modal-open');
-        if (signupNameInput) {
-          signupNameInput.focus();
-        }
+        // モーダルが表示されるアニメーションを考慮し、少し遅延させてからフォーカスを試みる
+        setTimeout(() => {
+          if (signupNameInput) {
+            signupNameInput.focus();
+            // フォーカスが当たったか確認し、当たっていなければログを出す
+            if (document.activeElement !== signupNameInput) {
+                console.warn('Focus did not land on signupNameInput as expected.');
+            }
+          }
+        }, 100); // 100msの遅延
       }
       function hideModal() {
         modalOverlay.classList.add('modal--is-hidden');
@@ -919,6 +926,8 @@
         signupButtonMain.addEventListener('click', (event) => {
           event.preventDefault();
           showModal();
+          // モーダルが表示されたらボタンからフォーカスを外す
+          event.currentTarget.blur();
         });
       }
       if (modalOverlay) {

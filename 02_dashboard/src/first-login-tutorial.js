@@ -485,6 +485,9 @@
                     e.stopImmediatePropagation();
                 }
 
+                // クリックされた要素からフォーカスを外す
+                targetElement.blur();
+
                 // For navigation, proceed immediately. For others, wait for the action to complete.
                 if (step.isNavigation) {
                     proceedToNextStep(step);
