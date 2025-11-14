@@ -1,0 +1,82 @@
+.tutorial-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 9999;
+    pointer-events: none;
+    transition: clip-path 0.3s ease-in-out;
+}
+
+.tutorial-tooltip {
+    position: fixed;
+    background-color: #fff;
+    color: #333;
+    border-radius: 8px;
+    padding: 15px 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    max-width: 300px;
+    z-index: 10000;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: auto;
+}
+
+.tutorial-tooltip.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.tutorial-tooltip h3 {
+    margin-top: 0;
+    color: #4CAF50;
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+.tutorial-tooltip p {
+    margin-bottom: 15px;
+    line-height: 1.6;
+    font-size: 0.95em;
+}
+
+.tutorial-tooltip-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.tutorial-step-counter {
+    font-size: 0.85em;
+    color: #666;
+}
+
+.tutorial-tooltip-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 15px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.2s ease;
+}
+
+.tutorial-tooltip-button:hover {
+    background-color: #45a049;
+}
+
+/* モーダル内の要素がハイライトされる際の調整 */
+.modal-overlay.tutorial-active {
+    z-index: 10001 !important;
+}
+.modal-overlay.tutorial-active .tutorial-highlighter {
+    z-index: 10002 !important;
+}
+.modal-overlay.tutorial-active .tutorial-tooltip {
+    z-index: 10003 !important;
+}
