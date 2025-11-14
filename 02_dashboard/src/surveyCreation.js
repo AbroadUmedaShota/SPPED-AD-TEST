@@ -66,6 +66,15 @@ function setDirty(dirty) {
  * 3. Browser-level navigation (e.g., closing tab, refresh): Shows the browser's native confirmation prompt.
  * This multi-layered approach is necessary due to browser security restrictions.
  */
+const handleBeforeUnload = (event) => {
+    if (isDirty) {
+        // This will trigger the browser's native confirmation dialog.
+        // Customizing this dialog's appearance is not possible for security reasons.
+        event.preventDefault();
+        event.returnValue = ''; // Required for legacy browsers
+    }
+};
+
 function initUnloadConfirmation() {
     // --- 2. Browser back button handling ---
     // Push an initial state to the history. This allows us to intercept the first back button press.
@@ -119,15 +128,16 @@ function initUnloadConfirmation() {
     }, true); // Use capture phase to intercept clicks early
 
     // --- 3. Browser-level navigation handling (Close tab, refresh, etc.) ---
-    window.addEventListener('beforeunload', (event) => {
-        if (isDirty) {
-            // This will trigger the browser's native confirmation dialog.
-            // Customizing this dialog's appearance is not possible for security reasons.
-            event.preventDefault();
-            event.returnValue = ''; // Required for legacy browsers
-        }
-    });
+    window.addEventListener('beforeunload', handleBeforeUnload);
 }
+
+window.disableUnloadConfirmation = () => {
+    window.removeEventListener('beforeunload', handleBeforeUnload);
+};
+
+window.enableUnloadConfirmation = () => {
+    window.addEventListener('beforeunload', handleBeforeUnload);
+};
 
 
 
