@@ -137,66 +137,78 @@ export function initializeFloatingLabelsForModal(containerElement) {
  * @param {string} filePath The path to the modal's HTML file.
  */
 export async function handleOpenModal(modalId, filePath, callback) {
-    const openAndCallback = () => {
-        openModal(modalId);
+    const openAndCallback = async () => {
+        await openModal(modalId); // Wait for the modal to be fully ready
         if (callback && typeof callback === 'function') {
-            callback();
+            callback(); // This is now called at the correct time
         }
     };
 
     try {
-        await loadModalFromFile(modalId, filePath);
-        openAndCallback();
+        // Check if modal already exists to prevent duplicates
+        if (!document.getElementById(modalId)) {
+            await loadModalFromFile(modalId, filePath);
+        }
+        await openAndCallback();
     } catch (error) {
         // Error is handled in loadModalFromFile
     }
 }
 
 /**
- * Opens a modal window.
+ * Opens a modal window and returns a promise that resolves when it's ready.
  * @param {string} modalId The ID of the modal element to open.
+ * @returns {Promise<void>}
  */
 export function openModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.classList.remove('hidden');
-        requestAnimationFrame(() => {
-            modal.dataset.state = 'open';
-        });
-        lockScroll();
+    return new Promise((resolve) => {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                modal.dataset.state = 'open';
+                // Resolve the promise AFTER the state is set
+                resolve();
+            });
+            lockScroll();
 
-        // Ensure mobile sidebar overlay is hidden when a modal opens
-        const mobileSidebarOverlay = document.getElementById('mobileSidebarOverlay');
-        if (mobileSidebarOverlay) {
-            mobileSidebarOverlay.classList.remove('is-visible');
-        }
-
-        // Specific handler for newSurveyModal to set default dates
-        if (modalId === 'newSurveyModal') {
-            const today = new Date();
-            const tomorrow = new Date(today);
-            tomorrow.setDate(today.getDate() + 1);
-
-            const surveyStartDateInput = document.getElementById('surveyStartDate');
-            const surveyEndDateInput = document.getElementById('surveyEndDate');
-
-            const getFormattedDate = (date) => {
-                const year = date.getFullYear();
-                const month = (date.getMonth() + 1).toString().padStart(2, '0');
-                const day = date.getDate().toString().padStart(2, '0');
-                return `${year}-${month}-${day}`;
-            };
-
-            if (surveyStartDateInput) {
-                surveyStartDateInput.value = getFormattedDate(tomorrow);
+            // Ensure mobile sidebar overlay is hidden when a modal opens
+            const mobileSidebarOverlay = document.getElementById('mobileSidebarOverlay');
+            if (mobileSidebarOverlay) {
+                mobileSidebarOverlay.classList.remove('is-visible');
             }
-            if (surveyEndDateInput) {
-                const oneWeekLater = new Date(tomorrow);
-                oneWeekLater.setDate(tomorrow.getDate() + 7);
-                surveyEndDateInput.value = getFormattedDate(oneWeekLater);
+
+            // Specific handler for newSurveyModal to set default dates
+            if (modalId === 'newSurveyModal') {
+                const today = new Date();
+                const tomorrow = new Date(today);
+                tomorrow.setDate(today.getDate() + 1);
+
+                const surveyStartDateInput = document.getElementById('surveyStartDate');
+                const surveyEndDateInput = document.getElementById('surveyEndDate');
+
+                const getFormattedDate = (date) => {
+                    const year = date.getFullYear();
+                    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                    const day = date.getDate().toString().padStart(2, '0');
+                    return `${year}-${month}-${day}`;
+                };
+
+                if (surveyStartDateInput) {
+                    surveyStartDateInput.value = getFormattedDate(tomorrow);
+                }
+                if (surveyEndDateInput) {
+                    const oneWeekLater = new Date(tomorrow);
+                    oneWeekLater.setDate(tomorrow.getDate() + 7);
+                    surveyEndDateInput.value = getFormattedDate(oneWeekLater);
+                }
             }
+        } else {
+            // If modal doesn't exist, resolve immediately to not hang forever
+            console.error(`Modal with ID ${modalId} not found.`);
+            resolve();
         }
-    }
+    });
 }
 
 /**

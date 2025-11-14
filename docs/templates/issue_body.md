@@ -1,44 +1,17 @@
-# 概要
-ユーザーからの問い合わせを削減し、自己解決を促進するため、「よくある質問（FAQ）」ページを新規に作成する。
+### Description
 
-# 事前調査の概要
-- 既存のコードベースに類似のFAQ機能は存在しないことを確認済み。
-- ヘッダー、フッター、サイドバーは `index.html` および `02_dashboard` ディレクトリ内の各HTMLファイルで利用されている共通コンポーネントを流用する。
+This issue addresses two problems in the tutorial on the `surveyCreation.html` page.
 
-# 機能要件
-- **Q&A表示:**
-    - 質問と回答はアコーディオン形式で表示する。
-    - デフォルトでは、すべてのアコーディオンが閉じている状態とする。
-    - いずれかのアコーディオンを開くと、他に開いているアコーディオンは自動的に閉じる。
-- **検索機能:**
-    - ページ内にキーワード検索ボックスを設置し、質問文を対象にインクリメンタルサーチ（入力中のリアルタイム検索）を実装する。
-- **カテゴリ分類:**
-    - 質問をカテゴリごとにグループ化して表示する。
-    - カテゴリ案：
-        - アカウント関連（新規登録、ログイン、設定変更など）
-        - アンケート機能関連（作成、編集、設問タイプ、お礼メール/サンクス画面設定など）
-        - 料金プラン関連
-        - その他
-- **注目コンテンツ表示:**
-    - 問い合わせが多い、または閲覧数の多い質問を「注目の質問」としてページ上部に別途表示する。
-    - （将来的な展望）このリストは動的に更新されることが望ましい。
+1.  **Preview screen not highlighted:** During the tutorial, the preview screen is not highlighted (dimmed) as an overlay, which makes it difficult for users to focus on the target element.
+2.  **Browser modal on exit:** After completing the tutorial, clicking the "Return to Dashboard" button triggers an unnecessary browser confirmation modal ("Are you sure you want to leave?"). This should be suppressed to allow for direct navigation.
 
-# 画面構成案
-1.  **ヘッダー:** 既存の共通ヘッダーを流用
-2.  **サイドバー:** 既存の共通サイドバーを流用
-3.  **メインコンテンツエリア:**
-    - **注目の質問セクション:** 閲覧数の多いQ&Aへのリンクまたはアコーディオンを数件表示
-    - **検索ボックス:** キーワード検索用の入力欄
-    - **カテゴリ別Q&Aリスト:**
-        - カテゴリA
-            - 質問1（アコーディオン）
-            - 質問2（アコーディオン）
-            - ...
-        - カテゴリB
-            - 質問1（アコーディオン）
-            - ...
-4.  **フッター:** 既存の共通フッターを流用
+### Pre-investigation Summary
 
-# 検討事項
-- Q&Aコンテンツの管理方法（HTMLに直接記述するか、JSONファイルなどで外部管理するか）
-- 「注目の質問」をどのように決定し、表示するか（初期は手動指定、将来的にはアクセス解析などと連携）
+- The target file is `02_dashboard/surveyCreation.html`.
+- The related JavaScript file is likely `02_dashboard/src/surveyCreationTutorial.js` or a similar file that controls the tutorial's behavior.
+- The browser confirmation modal is probably caused by a `beforeunload` event listener, which should be conditionally disabled during or after the tutorial.
+
+### Acceptance Criteria
+
+- The preview screen is correctly highlighted with an overlay during the relevant tutorial step.
+- Clicking "Return to Dashboard" after the tutorial navigates the user directly to the dashboard without any confirmation modal.

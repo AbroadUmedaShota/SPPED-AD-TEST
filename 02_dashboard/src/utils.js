@@ -133,11 +133,7 @@ export function resolveDemoDataPath(relativePath) {
  */
 export function lockScroll() {
     if (activeUIsCount === 0) { // Lock scroll only when the first UI element opens
-        scrollPosition = window.scrollY;
         document.body.style.overflow = 'hidden';
-        document.body.style.position = 'fixed';
-        document.body.style.top = `-${scrollPosition}px`;
-        document.body.style.width = '100%';
     }
     activeUIsCount++;
 }
@@ -150,10 +146,6 @@ export function unlockScroll() {
     activeUIsCount--;
     if (activeUIsCount <= 0) { // Unlock scroll only when all UI elements are closed
         document.body.style.removeProperty('overflow');
-        document.body.style.removeProperty('position');
-        document.body.style.removeProperty('top');
-        document.body.style.removeProperty('width');
-        window.scrollTo(0, scrollPosition);
         activeUIsCount = 0; // Reset to 0 to prevent negative values
     }
 }

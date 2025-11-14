@@ -425,9 +425,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
 
+    // A generic click handler for the survey modal button for non-tutorial use.
+    // The tutorial will add its own specific listener.
     const openNewSurveyModalBtn = document.getElementById('openNewSurveyModalBtn');
     if (openNewSurveyModalBtn) {
-        openNewSurveyModalBtn.addEventListener('click', () => openNewSurveyModalWithSetup(window.advanceTutorialStep));
+        openNewSurveyModalBtn.addEventListener('click', () => {
+            // This check prevents the generic listener from firing if the tutorial is active
+            if (!document.getElementById('tutorial-svg-overlay')) {
+                handleOpenModal('newSurveyModal', resolveDashboardAssetPath('modals/newSurveyModal.html'));
+            }
+        });
     }
 
     // Initial layout adjustment on load
@@ -437,23 +444,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.addEventListener('resize', adjustLayout);
 
     // --- Tutorial Initialization ---
-    // All other initializations should be complete before starting the tutorial.
-    if (isIndexPage) { // Only run tutorial logic on the index page.
-        let tutorialStatus = localStorage.getItem('speedad-tutorial-status');
-
-        // Legacy status handling.
-        if (tutorialStatus === 'main-running' || tutorialStatus === 'modal-running') {
-            localStorage.setItem('speedad-tutorial-status', 'pending');
-            tutorialStatus = 'pending';
-        }
-
-        if (tutorialStatus === 'pending' && typeof window.startAppTutorial === 'function') {
-            // A brief delay to ensure all rendering is complete after JS initializations.
+    // This is called last, after all other page elements are loaded and initialized.
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('start_tutorial') === 'true') {
+        if (typeof window.startSpeedAdTutorial === 'function') {
+            // A brief delay for good measure, to ensure rendering is 100% complete.
             setTimeout(() => {
-                window.startAppTutorial();
-            }, 300); // 300ms delay as a safeguard.
-        } else if (tutorialStatus === 'survey-creation-started') {
-            showTutorialResumeBanner();
+                window.startSpeedAdTutorial();
+                // Clean the URL
+                history.replaceState(null, '', window.location.pathname);
+            }, 100);
+        } else {
+            console.error("Tutorial function not found. Was tutorial.js loaded correctly?");
         }
     }
 });

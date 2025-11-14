@@ -2276,10 +2276,12 @@ function setupPreviewSwitcher() {
         phoneBtn.classList.remove('active');
     });
 
-    // Set focus to the modal title for accessibility
-    const modalTitle = document.getElementById('modalTitle');
-    if (modalTitle) {
-        modalTitle.focus();
+    // Set focus to the modal title for accessibility, ONLY if tutorial is not active
+    if (!window.isTutorialActive) {
+        const modalTitle = document.getElementById('modalTitle');
+        if (modalTitle) {
+            modalTitle.focus();
+        }
     }
 
     // --- Add validation for free_answer textareas in preview ---
