@@ -209,9 +209,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.addEventListener('keydown', (e) => {
-        // Do not trigger shortcuts if focus is on an input/textarea
-        if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
-
         if (e.altKey) {
             switch (e.key.toLowerCase()) {
                 case 'q':
