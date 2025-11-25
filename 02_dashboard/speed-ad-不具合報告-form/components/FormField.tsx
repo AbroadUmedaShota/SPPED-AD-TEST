@@ -51,11 +51,6 @@ const FormField: React.FC<FormFieldProps> = ({
           <textarea
             {...commonProps}
             rows={rows}
-            onInput={(e: React.FormEvent<HTMLTextAreaElement>) => {
-              const target = e.currentTarget;
-              target.style.height = 'auto';
-              target.style.height = `${target.scrollHeight}px`;
-            }}
           />
         );
       case 'select':

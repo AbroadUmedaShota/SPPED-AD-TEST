@@ -137,20 +137,20 @@ const App: React.FC = () => {
 
     // Common validations
     if (!formData.bugCategory) newErrors.bugCategory = '不具合の種別は必須です。';
-    if (!formData.bugSummary) newErrors.bugSummary = '不具合の概要は必須です。';
-    if (!formData.reproductionSteps) newErrors.reproductionSteps = '再現手順は必須です。';
-    if (!formData.actualBehavior) newErrors.actualBehavior = '実際の動作は必須です。';
+    if (!formData.bugSummary.trim()) newErrors.bugSummary = '不具合の概要は必須です。';
+    if (!formData.reproductionSteps.trim()) newErrors.reproductionSteps = '再現手順は必須です。';
+    if (!formData.actualBehavior.trim()) newErrors.actualBehavior = '実際の動作は必須です。';
     
     // Detailed report validations
     if (formData.reportType === ReportType.Detailed) {
-        if (!formData.expectedBehavior) newErrors.expectedBehavior = '期待される動作は必須です。';
-        if (formData.hasErrorMessage && !formData.errorMessage) newErrors.errorMessage = 'エラーメッセージの内容を記載してください。';
+        if (!formData.expectedBehavior.trim()) newErrors.expectedBehavior = '期待される動作は必須です。';
+        if (formData.hasErrorMessage && !formData.errorMessage.trim()) newErrors.errorMessage = 'エラーメッセージの内容を記載してください。';
 
-        if (formData.device === 'other' && !formData.deviceOther) newErrors.deviceOther = '利用デバイスを具体的に入力してください。';
-        if (formData.os === 'other' && !formData.osOther) newErrors.osOther = 'OSを具体的に入力してください。';
-        if (formData.browser === 'other' && !formData.browserOther) newErrors.browserOther = 'ブラウザ名を具体的に入力してください。';
-        if (formData.speedAdEnvironment === 'other' && !formData.speedAdEnvironmentOther) newErrors.speedAdEnvironmentOther = '利用画面を具体的に入力してください。';
-        if (formData.affectedModule === 'other' && !formData.affectedModuleOther) newErrors.affectedModuleOther = '影響を受けるモジュール/機能を具体的に入力してください。';
+        if (formData.device === 'other' && !formData.deviceOther.trim()) newErrors.deviceOther = '利用デバイスを具体的に入力してください。';
+        if (formData.os === 'other' && !formData.osOther.trim()) newErrors.osOther = 'OSを具体的に入力してください。';
+        if (formData.browser === 'other' && !formData.browserOther.trim()) newErrors.browserOther = 'ブラウザ名を具体的に入力してください。';
+        if (formData.speedAdEnvironment === 'other' && !formData.speedAdEnvironmentOther.trim()) newErrors.speedAdEnvironmentOther = '利用画面を具体的に入力してください。';
+        if (formData.affectedModule === 'other' && !formData.affectedModuleOther.trim()) newErrors.affectedModuleOther = '影響を受けるモジュール/機能を具体的に入力してください。';
     }
     
     setErrors(newErrors);

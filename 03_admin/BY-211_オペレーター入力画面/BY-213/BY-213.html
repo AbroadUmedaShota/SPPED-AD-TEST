@@ -16,10 +16,20 @@
         #next-action-modal {
             max-width: 450px;
             width: 80%;
-            top: 45% !important;
+        }
+        #skip-modal,
+        #suspend-modal {
+            max-width: 450px;
+            width: 80%;
         }
         #next-action-modal .modal-footer {
             text-align: right;
+        }
+        #skip-modal label span {
+            color: #000;
+        }
+        body.dark-mode #skip-modal label span {
+            color: #fff;
         }
 
     </style>
@@ -264,29 +274,42 @@
         </div>
       
         <div id="skip-modal" class="modal">
-    <div class="modal-content">
-        <h4>スキップ理由</h4>
-        <p>スキップする理由を選択してください。</p>
-        
-        <div id="skip-reason-options">
-            <div><label><input name="skip_reason_group" type="radio" value="not_card" /><span>名刺ではない</span></label></div>
-            <div><label><input name="skip_reason_group" type="radio" value="unsupported_language" /><span>対応言語外</span></label></div>
-            <div><label><input name="skip_reason_group" type="radio" value="escalation" /><span>エスカレーション</span></label></div>
-            <div><label><input name="skip_reason_group" type="radio" value="other" /><span>その他</span></label></div>
-        </div>
+            <div class="modal-content">
+                <!-- View 1: Reason Selection -->
+                <div id="skip-reason-view">
+                    <h4>スキップ理由</h4>
+                    <p>スキップする理由を選択してください。</p>
+                    <div id="skip-reason-options">
+                        <div><label><input name="skip_reason_group" type="radio" value="not_card" /><span>名刺ではない</span></label></div>
+                        <div><label><input name="skip_reason_group" type="radio" value="unsupported_language" /><span>対応言語外</span></label></div>
+                        <div><label><input name="skip_reason_group" type="radio" value="escalation" /><span>エスカレーション（理由入力へ）</span></label></div>
+                        <div><label><input name="skip_reason_group" type="radio" value="other" /><span>その他（理由入力へ）</span></label></div>
+                    </div>
+                </div>
 
-        <!-- Shared Reason Textarea -->
-        <div class="input-field" id="shared-reason-container" style="margin-top: 20px;">
-            <textarea id="shared-reason-input" class="materialize-textarea" disabled></textarea>
-            <label for="shared-reason-input">理由</label>
-        </div>
+                <!-- View 2: Reason Detail Input -->
+                <div id="skip-detail-view" style="display: none;">
+                    <h4>詳細な理由</h4>
+                    <p>スキップする詳細な理由を入力してください。</p>
+                    <div class="input-field" style="margin-top: 20px;">
+                        <textarea id="skip-reason-detail-input" class="materialize-textarea"></textarea>
+                        <label for="skip-reason-detail-input">理由 (必須)</label>
+                    </div>
+                </div>
+            </div>
 
-    </div>
-    <div class="modal-footer">
-        <a href="#!" class="modal-close waves-effect btn-flat">キャンセル</a>
-        <a href="#!" id="confirm-skip-btn" class="waves-effect waves-light btn red">スキップ実行</a>
-    </div>
-</div>
+            <!-- Footer for View 1 -->
+            <div class="modal-footer" id="skip-reason-footer">
+                <a href="#!" class="modal-close waves-effect btn-flat">キャンセル</a>
+                <a href="#!" id="skip-next-btn" class="waves-effect waves-light btn">スキップ / 次へ</a>
+            </div>
+
+            <!-- Footer for View 2 -->
+            <div class="modal-footer" id="skip-detail-footer" style="display: none;">
+                <a href="#!" id="skip-back-btn" class="waves-effect btn-flat">戻る</a>
+                <a href="#!" id="confirm-skip-with-reason-btn" class="waves-effect waves-light btn red">スキップ確定</a>
+            </div>
+        </div>
       
         <div id="suspend-modal" class="modal">
           <div class="modal-header">
@@ -377,7 +400,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
     formGroupsContainer.addEventListener('keydown', (event) => {
         const currentElement = event.target;
-        if ((currentElement.tagName === 'INPUT' || currentElement.tagName === 'TEXTAREA') && event.key === 'Enter' && !event.ctrlKey) {
+
+        // Handle Alt+Enter to go backwards
+        if (event.altKey && event.key === 'Enter') {
+            event.preventDefault();
+            const activeGroup = currentElement.closest('.group-section.active');
+            if (activeGroup) {
+                const groupInputs = Array.from(activeGroup.querySelectorAll('input:not([type="hidden"]), textarea'));
+                const currentIndex = groupInputs.indexOf(currentElement);
+                if (currentIndex > 0) {
+                    groupInputs[currentIndex - 1].focus();
+                }
+            }
+            return; // Stop processing
+        }
+
+        // Handle Enter (but not with Alt) to go forwards
+        if ((currentElement.tagName === 'INPUT' || currentElement.tagName === 'TEXTAREA') && event.key === 'Enter' && !event.ctrlKey && !event.altKey) {
             event.preventDefault();
 
             const group = currentElement.closest('.group-section');

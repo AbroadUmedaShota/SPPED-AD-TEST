@@ -158,7 +158,39 @@ document.addEventListener('DOMContentLoaded', () => {
         moveToNextCardOrGroup();
     }
 
+    function refocusCurrentInput() {
+        const activeGroupInputs = document.querySelectorAll('.group-section.active input:not([type="hidden"]), .group-section.active textarea');
+        let focused = false;
+
+        // Try to find the first empty input and focus it
+        for (const input of activeGroupInputs) {
+            if (input.value.trim() === '') {
+                input.focus();
+                focused = true;
+                break;
+            }
+        }
+
+        // If all inputs are filled, focus on the first input of the group
+        if (!focused && activeGroupInputs.length > 0) {
+            activeGroupInputs[0].focus();
+        }
+    }
+
     // --- Event Listeners ---
+    document.addEventListener('click', (e) => {
+        // List of tags that can legitimately hold focus or are interactive
+        const interactiveTags = ['INPUT', 'TEXTAREA', 'A', 'BUTTON', 'I', 'SPAN'];
+        
+        // If the click is on an interactive element, or inside a component that should be interactive (like a modal or tooltip), do nothing.
+        if (interactiveTags.includes(e.target.tagName) || e.target.closest('.modal, .tooltipped, .btn, .btn-floating, a')) {
+            return;
+        }
+        
+        // Otherwise, refocus on the current input field
+        refocusCurrentInput();
+    });
+
     thumbnailImage.addEventListener('click', swapImages);
 
     mainImageArea.addEventListener('mousemove', (e) => {
@@ -256,61 +288,93 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Modal-related event listeners
 
-    // --- New, Robust Skip Modal Initialization ---
-    const skipModalEl = document.getElementById('skip-modal');
-    const skipModalInstance = M.Modal.init(skipModalEl, { // This defines the instance for the skip modal
-        onOpenEnd: () => {
-            const skipReasonRadios = skipModalEl.querySelectorAll('input[name="skip_reason_group"]');
-            const sharedInput = skipModalEl.querySelector('#shared-reason-input');
+    // --- Skip Modal Logic (View Switching Version) ---
+    $(document).ready(function() {
+        const $skipModal = $('#skip-modal');
+        if (!$skipModal.length) return;
 
-            const handleChange = () => {
-                const selectedValue = skipModalEl.querySelector('input[name="skip_reason_group"]:checked')?.value;
-                const sharedInput = skipModalEl.querySelector('#shared-reason-input');
-                const shouldBeDisabled = false; // Always enable the textarea
+        // Views and Footers
+        const $reasonView = $('#skip-reason-view');
+        const $detailView = $('#skip-detail-view');
+        const $reasonFooter = $('#skip-reason-footer');
+        const $detailFooter = $('#skip-detail-footer');
 
-                if (shouldBeDisabled) {
-                    sharedInput.setAttribute('disabled', 'disabled');
-                } else {
-                    sharedInput.removeAttribute('disabled');
-                }
-                
-                // Also re-trigger materialize label handling
+        // Controls
+        const $reasonRadios = $skipModal.find('input[name="skip_reason_group"]');
+        const $detailTextarea = $('#skip-reason-detail-input');
+
+        const skipModalInstance = M.Modal.init($skipModal[0], {
+            onOpenStart: function() {
+                // Reset to the first view every time
+                $reasonView.css('display', 'block');
+                $reasonFooter.css('display', 'block');
+                $detailView.css('display', 'none');
+                $detailFooter.css('display', 'none');
+
+                // Reset form elements
+                $reasonRadios.prop('checked', false);
+                $detailTextarea.val('');
+                $detailTextarea.removeClass('invalid');
                 M.updateTextFields();
+            }
+        });
 
-                if (!shouldBeDisabled) {
-                    sharedInput.focus();
-                }
-            };
-
-            skipReasonRadios.forEach(radio => {
-                radio.addEventListener('change', handleChange);
-            });
-            
-            handleChange(); // Run once on open to set initial state
-        }
-    });
-
-    // Get instance for the suspend modal, which was initialized generically
-    const suspendModalInstance = M.Modal.getInstance(document.getElementById('suspend-modal'));
-
-    // New listener for the confirm button, separate from the initialization
-    document.getElementById('confirm-skip-btn').addEventListener('click', () => {
-        const checkedRadio = document.querySelector('input[name="skip_reason_group"]:checked');
-        if (!checkedRadio) {
-            showToast('スキップ理由を選択してください。');
-            return;
-        }
-        const selectedValue = checkedRadio.value;
-        let reasonText = checkedRadio.nextElementSibling.textContent;
-        if (selectedValue === 'escalation' || selectedValue === 'other') {
-            const detailReason = document.getElementById('shared-reason-input').value;
-            if (detailReason) {
-                reasonText += `: ${detailReason}`;
+        // Function to perform the actual skip action
+        function performSkip(reason, detail = '') {
+            let fullReason = reason;
+            if (detail) {
+                fullReason += `: ${detail}`;
+            }
+            M.toast({ html: `スキップしました (理由: ${fullReason})` });
+            skipModalInstance.close();
+            if (typeof startNewCard === 'function') {
+                startNewCard();
             }
         }
-        showToast(`スキップしました (理由: ${reasonText})`);
-        skipModalInstance.close(); // This uses the instance defined above
-        startNewCard();
+
+        // Use event delegation for robust handling
+        $skipModal.on('click', '#skip-next-btn', function() {
+            const $checkedRadio = $reasonRadios.filter(':checked');
+            if (!$checkedRadio.length) {
+                M.toast({ html: 'スキップ理由を選択してください。' });
+                return;
+            }
+
+            const selectedValue = $checkedRadio.val();
+            
+            if (selectedValue === 'escalation' || selectedValue === 'other') {
+                // Switch to detail view
+                $reasonView.css('display', 'none');
+                $reasonFooter.css('display', 'none');
+                $detailView.css('display', 'block');
+                $detailFooter.css('display', 'block');
+                $detailTextarea.focus();
+            } else {
+                // Skip directly
+                const reasonText = $checkedRadio.parent().find('span').text();
+                performSkip(reasonText);
+            }
+        });
+
+        $skipModal.on('click', '#skip-back-btn', function() {
+            $detailView.css('display', 'none');
+            $detailFooter.css('display', 'none');
+            $reasonView.css('display', 'block');
+            $reasonFooter.css('display', 'block');
+        });
+
+        $skipModal.on('click', '#confirm-skip-with-reason-btn', function() {
+            const reasonDetail = $detailTextarea.val().trim();
+            if (reasonDetail === '') {
+                M.toast({ html: '詳細な理由を入力してください。' });
+                $detailTextarea.addClass('invalid').focus();
+                return;
+            }
+
+            const $checkedRadio = $reasonRadios.filter(':checked');
+            const reasonText = $checkedRadio.length ? $checkedRadio.parent().find('span').text() : '不明';
+            performSkip(reasonText, reasonDetail);
+        });
     });
 
     // --- Suspend Modal Logic (unchanged) ---
