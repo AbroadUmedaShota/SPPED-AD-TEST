@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const elapsedTimeElement = document.getElementById('elapsed-time');
     const cardCountElement = document.getElementById('card-count');
     const avgTimeElement = document.getElementById('avg-time');
+    const mainImageArea = document.getElementById('main-image-area');
     const taskNameElement = document.getElementById('current-task-name');
     const modalTaskNameElement = document.getElementById('modal-user-task');
 
@@ -67,7 +68,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateTransform() {
         if (mainImage) {
-            mainImage.style.transform = `rotate(${mainImageRotation}deg) scale(${mainImageScale})`;
+            mainImage.style.setProperty('--rotation', `${mainImageRotation}deg`);
+            mainImage.style.setProperty('--scale', mainImageScale);
         }
     }
 
@@ -158,11 +160,47 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Event Listeners ---
     thumbnailImage.addEventListener('click', swapImages);
+
+    mainImageArea.addEventListener('mousemove', (e) => {
+        const rect = mainImage.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const xPercent = (x / rect.width) * 100;
+        const yPercent = (y / rect.height) * 100;
+        mainImage.style.setProperty('--x-origin', `${xPercent}%`);
+        mainImage.style.setProperty('--y-origin', `${yPercent}%`);
+    });
+
+    mainImageArea.addEventListener('mouseleave', () => {
+        mainImage.style.setProperty('--x-origin', '50%');
+        mainImage.style.setProperty('--y-origin', '50%');
+    });
+
     document.addEventListener('keydown', (e) => {
-        if (e.altKey && e.key.toLowerCase() === 'q') {
-            if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
-            e.preventDefault();
-            swapImages();
+        // Do not trigger shortcuts if focus is on an input/textarea
+        if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
+
+        if (e.altKey) {
+            switch (e.key.toLowerCase()) {
+                case 'q':
+                    e.preventDefault();
+                    swapImages();
+                    break;
+                case 'r':
+                    e.preventDefault();
+                    resetBtn.click();
+                    break;
+                case 'arrowright':
+                    e.preventDefault();
+                    mainImageRotation += 90;
+                    updateTransform();
+                    break;
+                case 'arrowleft':
+                    e.preventDefault();
+                    mainImageRotation -= 90;
+                    updateTransform();
+                    break;
+            }
         }
     });
 
@@ -291,6 +329,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.jQuery) {
         // Apply the mask for formatting
 
+        const toHalfWidth = (str) => {
+            if (!str) return '';
+            return str.replace(/[！-～]/g, (s) => {
+                return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
+            });
+        };
+
         const searchAddressByZip = () => {
             const zip = $('#zip').val();
             if (!zip) {
@@ -307,9 +352,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (data.status === 200 && data.results) {
                         const res = data.results[0];
                         const fullAddress = (res.address1 || '') + (res.address2 || '') + (res.address3 || '');
-                        $('#address1').val(fullAddress);
+                        const address1Input = document.getElementById('address1');
+                        
+                        address1Input.value = toHalfWidth(fullAddress);
                         M.updateTextFields(); // Update labels
                         showToast('住所を自動入力しました');
+                        address1Input.focus(); // Focus the input for immediate editing
                     } else {
                         showToast(`住所が見つかりませんでした (エラー: ${data.message})`);
                     }
