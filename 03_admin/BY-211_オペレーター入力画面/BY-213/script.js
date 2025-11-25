@@ -288,94 +288,187 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Modal-related event listeners
 
-    // --- Skip Modal Logic (View Switching Version) ---
-    $(document).ready(function() {
-        const $skipModal = $('#skip-modal');
-        if (!$skipModal.length) return;
+        // --- Skip Modal Logic (Consistent Self-Managed State) ---
 
-        // Views and Footers
-        const $reasonView = $('#skip-reason-view');
-        const $detailView = $('#skip-detail-view');
-        const $reasonFooter = $('#skip-reason-footer');
-        const $detailFooter = $('#skip-detail-footer');
+        const skipModalEl = document.getElementById('skip-modal');
 
-        // Controls
-        const $reasonRadios = $skipModal.find('input[name="skip_reason_group"]');
-        const $detailTextarea = $('#skip-reason-detail-input');
+        if (skipModalEl) {
 
-        const skipModalInstance = M.Modal.init($skipModal[0], {
-            onOpenStart: function() {
-                // Reset to the first view every time
-                $reasonView.css('display', 'block');
-                $reasonFooter.css('display', 'block');
-                $detailView.css('display', 'none');
-                $detailFooter.css('display', 'none');
+            let selectedSkipInfo = null; // Holds the information of the selected radio button
 
-                // Reset form elements
-                $reasonRadios.prop('checked', false);
-                $detailTextarea.val('');
-                $detailTextarea.removeClass('invalid');
-                M.updateTextFields();
+    
+
+            const reasonOptionsContainer = document.getElementById('skip-reason-options');
+
+            const otherDetailTextarea = document.getElementById('skip-reason-other-detail');
+
+            const confirmSkipBtn = document.getElementById('confirm-skip-btn');
+
+    
+
+            const skipModalInstance = M.Modal.init(skipModalEl, {
+
+                onOpenStart: function() {
+
+                    // Reset state and form on open
+
+                    selectedSkipInfo = null;
+
+                    if (reasonOptionsContainer) {
+
+                        reasonOptionsContainer.classList.remove('other-enabled');
+
+                    }
+
+                    const reasonRadios = skipModalEl.querySelectorAll('input[name="skip_reason_group"]');
+
+                    reasonRadios.forEach(radio => radio.checked = false);
+
+                    if (otherDetailTextarea) {
+
+                        otherDetailTextarea.value = '';
+
+                        otherDetailTextarea.style.color = ''; // Reset inline style
+
+                    }
+
+                    M.updateTextFields();
+
+                }
+
+            });
+
+    
+
+            // When a radio button is clicked, save its info to our state variable
+
+            if (reasonOptionsContainer) {
+
+                reasonOptionsContainer.addEventListener('click', function(event) {
+
+                    const radio = event.target.closest('input[type="radio"]');
+
+                    if (radio) {
+
+                        // Save the selected info
+
+                        selectedSkipInfo = {
+
+                            value: radio.value,
+
+                            text: radio.parentElement.querySelector('span').textContent
+
+                        };
+
+    
+
+                        // Update UI
+
+                        const isDarkMode = document.body.classList.contains('dark-mode');
+
+                        if (radio.value === 'other') {
+
+                            reasonOptionsContainer.classList.add('other-enabled');
+
+                            otherDetailTextarea.style.color = isDarkMode ? '#fff' : '#000';
+
+                            setTimeout(() => otherDetailTextarea.focus(), 0);
+
+                        } else {
+
+                            reasonOptionsContainer.classList.remove('other-enabled');
+
+                            otherDetailTextarea.value = '';
+
+                            otherDetailTextarea.style.color = '';
+
+                        }
+
+                    }
+
+                });
+
             }
-        });
 
-        // Function to perform the actual skip action
-        function performSkip(reason, detail = '') {
-            let fullReason = reason;
-            if (detail) {
-                fullReason += `: ${detail}`;
+    
+
+            function performSkip(reason, detail = '') {
+
+                let fullReason = reason;
+
+                if (detail) {
+
+                    fullReason += `: ${detail}`;
+
+                }
+
+                M.toast({ html: `スキップしました (理由: ${fullReason})` });
+
+                skipModalInstance.close();
+
+                if (typeof startNewCard === 'function') {
+
+                    startNewCard();
+
+                }
+
             }
-            M.toast({ html: `スキップしました (理由: ${fullReason})` });
-            skipModalInstance.close();
-            if (typeof startNewCard === 'function') {
-                startNewCard();
+
+    
+
+            // When confirm is clicked, check our state variable, not the DOM
+
+            if (confirmSkipBtn) {
+
+                confirmSkipBtn.addEventListener('click', function() {
+
+                    // Check our reliable state variable
+
+                    if (!selectedSkipInfo) {
+
+                        M.toast({ html: 'スキップ理由を選択してください。' });
+
+                        return;
+
+                    }
+
+    
+
+                                    if (selectedSkipInfo.value === 'other') {
+
+    
+
+                                        const reasonDetail = otherDetailTextarea.value.trim();
+
+    
+
+                                        otherDetailTextarea.classList.remove('invalid'); // 入力があればinvalidを解除
+
+    
+
+                                        performSkip(selectedSkipInfo.text, reasonDetail);
+
+    
+
+                                    } else {
+
+    
+
+                                        otherDetailTextarea.classList.remove('invalid'); // 他の選択肢の場合も念のため解除
+
+    
+
+                                        performSkip(selectedSkipInfo.text);
+
+    
+
+                                    }
+
+                });
+
             }
+
         }
-
-        // Use event delegation for robust handling
-        $skipModal.on('click', '#skip-next-btn', function() {
-            const $checkedRadio = $reasonRadios.filter(':checked');
-            if (!$checkedRadio.length) {
-                M.toast({ html: 'スキップ理由を選択してください。' });
-                return;
-            }
-
-            const selectedValue = $checkedRadio.val();
-            
-            if (selectedValue === 'escalation' || selectedValue === 'other') {
-                // Switch to detail view
-                $reasonView.css('display', 'none');
-                $reasonFooter.css('display', 'none');
-                $detailView.css('display', 'block');
-                $detailFooter.css('display', 'block');
-                $detailTextarea.focus();
-            } else {
-                // Skip directly
-                const reasonText = $checkedRadio.parent().find('span').text();
-                performSkip(reasonText);
-            }
-        });
-
-        $skipModal.on('click', '#skip-back-btn', function() {
-            $detailView.css('display', 'none');
-            $detailFooter.css('display', 'none');
-            $reasonView.css('display', 'block');
-            $reasonFooter.css('display', 'block');
-        });
-
-        $skipModal.on('click', '#confirm-skip-with-reason-btn', function() {
-            const reasonDetail = $detailTextarea.val().trim();
-            if (reasonDetail === '') {
-                M.toast({ html: '詳細な理由を入力してください。' });
-                $detailTextarea.addClass('invalid').focus();
-                return;
-            }
-
-            const $checkedRadio = $reasonRadios.filter(':checked');
-            const reasonText = $checkedRadio.length ? $checkedRadio.parent().find('span').text() : '不明';
-            performSkip(reasonText, reasonDetail);
-        });
-    });
 
     // --- Suspend Modal Logic (unchanged) ---
     document.getElementById('confirm-suspend-button').addEventListener('click', () => {

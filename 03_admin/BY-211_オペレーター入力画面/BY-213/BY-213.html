@@ -31,6 +31,45 @@
         body.dark-mode #skip-modal label span {
             color: #fff;
         }
+        .other-reason-section {
+            margin-top: 15px;
+        }
+        .other-reason-section .other-textarea-field {
+            /* Indent the textarea slightly to show it belongs to "Other" */
+            margin-top: 5px;
+            margin-left: 35px; 
+        }
+
+        #skip-reason-options .other-textarea-field .materialize-textarea {
+            /* Default: disabled-like appearance */
+            background-color: #f2f2f2 !important;
+            border-bottom-color: #ccc !important;
+            pointer-events: none;
+            color: #9e9e9e;
+        }
+
+        #skip-reason-options.other-enabled .other-textarea-field .materialize-textarea {
+            /* Enabled appearance */
+            background-color: transparent !important;
+            border-bottom-color: #9e9e9e;
+            pointer-events: auto;
+        }
+
+        /* Set text color for light mode */
+        #skip-reason-options.other-enabled .other-textarea-field textarea#skip-reason-other-detail.materialize-textarea {
+            color: #000 !important;
+        }
+
+        /* Set text color for dark mode */
+        body.dark-mode #skip-reason-options.other-enabled .other-textarea-field textarea#skip-reason-other-detail.materialize-textarea {
+            color: #fff !important;
+        }
+
+        /* When focused while enabled */
+        #skip-reason-options.other-enabled .other-textarea-field .materialize-textarea:focus {
+            border-bottom: 1px solid #26a69a; /* Materialize focus color */
+            box-shadow: 0 1px 0 0 #26a69a;
+        }
 
     </style>
 </head>
@@ -275,39 +314,29 @@
       
         <div id="skip-modal" class="modal">
             <div class="modal-content">
-                <!-- View 1: Reason Selection -->
-                <div id="skip-reason-view">
-                    <h4>スキップ理由</h4>
-                    <p>スキップする理由を選択してください。</p>
-                    <div id="skip-reason-options">
-                        <div><label><input name="skip_reason_group" type="radio" value="not_card" /><span>名刺ではない</span></label></div>
-                        <div><label><input name="skip_reason_group" type="radio" value="unsupported_language" /><span>対応言語外</span></label></div>
-                        <div><label><input name="skip_reason_group" type="radio" value="escalation" /><span>エスカレーション（理由入力へ）</span></label></div>
-                        <div><label><input name="skip_reason_group" type="radio" value="other" /><span>その他（理由入力へ）</span></label></div>
-                    </div>
-                </div>
-
-                <!-- View 2: Reason Detail Input -->
-                <div id="skip-detail-view" style="display: none;">
-                    <h4>詳細な理由</h4>
-                    <p>スキップする詳細な理由を入力してください。</p>
-                    <div class="input-field" style="margin-top: 20px;">
-                        <textarea id="skip-reason-detail-input" class="materialize-textarea"></textarea>
-                        <label for="skip-reason-detail-input">理由 (必須)</label>
+                <h4>スキップ理由</h4>
+                <p>スキップする理由を選択、または入力してください。</p>
+                <div id="skip-reason-options">
+                    <div><label><input name="skip_reason_group" type="radio" value="not_card" /><span>名刺ではない</span></label></div>
+                    <div><label><input name="skip_reason_group" type="radio" value="unsupported_language" /><span>対応言語外</span></label></div>
+                    <div><label><input name="skip_reason_group" type="radio" value="escalation" /><span>エスカレーション</span></label></div>
+                    
+                    <!-- "Other" section now as a block -->
+                    <div class="other-reason-section">
+                        <label>
+                            <input name="skip_reason_group" type="radio" value="other" />
+                            <span>その他</span>
+                        </label>
+                        <div class="input-field other-textarea-field">
+                            <textarea id="skip-reason-other-detail" class="materialize-textarea"></textarea>
+                            <label for="skip-reason-other-detail">詳細な理由を入力</label>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Footer for View 1 -->
-            <div class="modal-footer" id="skip-reason-footer">
+            <div class="modal-footer">
                 <a href="#!" class="modal-close waves-effect btn-flat">キャンセル</a>
-                <a href="#!" id="skip-next-btn" class="waves-effect waves-light btn">スキップ / 次へ</a>
-            </div>
-
-            <!-- Footer for View 2 -->
-            <div class="modal-footer" id="skip-detail-footer" style="display: none;">
-                <a href="#!" id="skip-back-btn" class="waves-effect btn-flat">戻る</a>
-                <a href="#!" id="confirm-skip-with-reason-btn" class="waves-effect waves-light btn red">スキップ確定</a>
+                <a href="#!" id="confirm-skip-btn" class="waves-effect waves-light btn red">スキップ確定</a>
             </div>
         </div>
       

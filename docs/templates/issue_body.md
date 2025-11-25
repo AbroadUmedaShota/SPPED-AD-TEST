@@ -1,17 +1,26 @@
-### Description
+#### 概要
+オペレーター入力画面 (BY-213) で、スキップボタンを押した際に表示されるモーダルに不具合があります。
+スキップ理由として「エスカレーション」または「その他」を選択して「スキップ / 次へ」ボタンを押しても、詳細な理由を入力するためのビューに切り替わりません。
 
-This issue addresses two problems in the tutorial on the `surveyCreation.html` page.
+#### 再現手順
+1. `03_admin/BY-211_オペレーター入力画面/BY-213/BY-213.html` を開く。
+2. 右下の「スキップ」ボタンをクリックする。
+3. 表示されたモーダルで、「エスカレーション（理由入力へ）」または「その他（理由入力へ）」のラジオボタンを選択する。
+4. 「スキップ / 次へ」ボタンをクリックする。
 
-1.  **Preview screen not highlighted:** During the tutorial, the preview screen is not highlighted (dimmed) as an overlay, which makes it difficult for users to focus on the target element.
-2.  **Browser modal on exit:** After completing the tutorial, clicking the "Return to Dashboard" button triggers an unnecessary browser confirmation modal ("Are you sure you want to leave?"). This should be suppressed to allow for direct navigation.
+#### 期待される動作
+詳細な理由を入力するためのテキストエリアがあるビューに切り替わること。
 
-### Pre-investigation Summary
+#### 実際の動作
+ビューが切り替わらず、モーダルが閉じてしまうか、何も起こらない。
 
-- The target file is `02_dashboard/surveyCreation.html`.
-- The related JavaScript file is likely `02_dashboard/src/surveyCreationTutorial.js` or a similar file that controls the tutorial's behavior.
-- The browser confirmation modal is probably caused by a `beforeunload` event listener, which should be conditionally disabled during or after the tutorial.
+#### 調査結果
+`script.js`内のスキップモーダルに関するロジックを調査しました。
+`#skip-next-btn` のクリックイベントハンドラは存在し、選択されたラジオボタンの値をチェックしてビューを切り替える処理も記述されています。
 
-### Acceptance Criteria
+しかし、このロジックはjQueryの `$(document).ready()` の中に記述されており、ファイルの他の大部分が使用している `DOMContentLoaded` とは別のイベントリスナー内で実行されています。この二重の初期化構造が、競合や意図しない動作を引き起こしている可能性があります。
 
-- The preview screen is correctly highlighted with an overlay during the relevant tutorial step.
-- Clicking "Return to Dashboard" after the tutorial navigates the user directly to the dashboard without any confirmation modal.
+#### 修正案
+1. `script.js` から `$(document).ready()` ラッパーを削除します。
+2. スキップモーダルのロジックを、既存の `DOMContentLoaded` イベントリスナー内に移動させ、初期化処理を統合します。
+3. スキップモーダル部分のjQueryのコードを、他のコードスタイルに合わせてVanilla JS（標準のJavaScript）に書き換えます。これにより、コードの一貫性を高め、潜在的な問題を解決します。
