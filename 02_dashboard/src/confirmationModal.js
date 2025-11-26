@@ -23,12 +23,28 @@ export function showConfirmationModal(message, onConfirm, options = {}) {
     handleOpenModal('confirmationModal', resolveDashboardAssetPath('modals/confirmationModal.html'))
         .then(() => {
             const modal = document.getElementById('confirmationModal');
-            const titleEl = document.getElementById('confirmationModalTitle');
-            const messageEl = document.getElementById('confirmationModalMessage');
-            const inputContainer = document.getElementById('confirmationModalInputContainer');
-            const confirmBtn = document.getElementById('confirmationModalConfirmBtn');
-            const cancelBtn = document.getElementById('confirmationModalCancelBtn');
-            const closeBtn = document.getElementById('closeConfirmationModalBtn');
+            console.log('ConfirmationModal: Entering then block after modal opened.');
+            console.log('ConfirmationModal: Modal element retrieved:', modal);
+            if (modal) {
+                console.log('ConfirmationModal: Modal innerHTML:', modal.innerHTML);
+            }
+            if (!modal) {
+                throw new Error('Confirmation modal element not found in DOM after handleOpenModal resolved.');
+            }
+            // 変数宣言を一度にまとめる
+            const titleEl = modal.querySelector('#confirmationModalTitle');
+            const messageEl = modal.querySelector('#confirmationModalMessage');
+            const inputContainer = modal.querySelector('#confirmationModalInputContainer');
+            const confirmBtn = modal.querySelector('#confirmActionButton');
+            const cancelBtn = modal.querySelector('[data-action="close"]');
+            const closeBtn = modal.querySelector('#closeConfirmationModalBtn');
+
+            console.log('ConfirmationModal: inputContainer element:', inputContainer);
+            console.log('ConfirmationModal: prompt option received:', options.prompt);
+
+            if (!confirmBtn || !cancelBtn) {
+                throw new Error('Confirmation modal confirm or cancel buttons not found within the modal element.');
+            }
 
             if (titleEl) titleEl.textContent = title;
             if (messageEl) messageEl.textContent = message;
@@ -40,6 +56,7 @@ export function showConfirmationModal(message, onConfirm, options = {}) {
             if (inputContainer) {
                 inputContainer.innerHTML = ''; // Clear previous content
                 if (prompt) {
+                    console.log(`[confirmationModal] Prompt type detected: ${prompt.type}`);
                     if (prompt.type === 'select') {
                         inputContainer.innerHTML = `
                             <div class="input-group">
@@ -57,7 +74,9 @@ export function showConfirmationModal(message, onConfirm, options = {}) {
                             </div>
                         `;
                     }
+                    console.log(`[confirmationModal] inputContainer innerHTML after prompt generation:`, inputContainer.innerHTML);
                     inputEl = document.getElementById('confirmationModalInput');
+                    console.log(`[confirmationModal] inputEl (confirmationModalInput) after getElementById:`, inputEl);
                 }
             }
             // --- End Prompt Logic ---
@@ -74,6 +93,7 @@ export function showConfirmationModal(message, onConfirm, options = {}) {
             };
 
             const confirmAndClose = () => {
+                console.log('Confirmation confirmed and closing modal.'); // デバッグ用ログ
                 const inputValue = inputEl ? inputEl.value : null;
                 onConfirm(inputValue); // Pass input value to callback
                 closeModal('confirmationModal');
@@ -81,6 +101,7 @@ export function showConfirmationModal(message, onConfirm, options = {}) {
             };
 
             const cancelAction = () => {
+                console.log('Confirmation cancelled and closing modal.'); // デバッグ用ログ
                 closeModal('confirmationModal');
                 cleanup();
             };
