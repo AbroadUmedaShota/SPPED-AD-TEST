@@ -1,0 +1,14 @@
+■注意事項など
+確認ファイル: 利用者向けダッシュボードは 02_dashboard/index.html、ログイン画面は 01_login/login-top.html。参考資料は docs/README.md, docs/design/02_CODING_STANDARDS.md, docs/03_TESTING_GUIDELINES.md。
+モックデータ: data/*.json にはモック専用の仮データです。本番データとは概念が違うので注意。
+
+■フォルダの役割
+01_login/: 初回ログインや通常ログイン画面のモック。login-top.html などを基準に動作イメージを確認。
+02_dashboard/: 利用者（エンドユーザー）向けダッシュボード画面。src/services/ と src/ui/ を分離して構成。
+03_admin/: 管理者画面の草案モック。機能追加時は仕様確定前提で再確認。
+04_first-login/: 初回ログイン時の操作フローを再現した参考モック。オンボーディング動作イメージ把握用。
+02_dashboard/src/services/ / src/services/: データ取得や整形など業務ロジックを集約。UI から独立させる。
+02_dashboard/src/ui/ / src/ui/: DOM 操作や描画ヘルパーを配置し、画面表示の責務を明確化。
+src/utils.js: 各画面で共通利用するユーティリティ関数の置き場所。
+data/: モック用 JSON データ置き場。開発時の仮データとしてのみ利用。
+docs/: アーキテクチャ、コーディング規約、テスト手順などのドキュメント。実装前に必読。
