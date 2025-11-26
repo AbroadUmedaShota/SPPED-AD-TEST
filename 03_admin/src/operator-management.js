@@ -126,7 +126,7 @@ function renderOperatorTable(operators) {
     const tableBody = document.getElementById('operator-table-body');
     if (!tableBody) return;
     if (operators.length === 0) {
-        tableBody.innerHTML = `<tr><td colspan="7" class="text-center py-12 text-on-surface-variant">該当するオペレーターが見つかりません。</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="8" class="text-center py-12 text-on-surface-variant">該当するオペレーターが見つかりません。</td></tr>`;
         return;
     }
     tableBody.innerHTML = operators.map(op => `
@@ -135,6 +135,7 @@ function renderOperatorTable(operators) {
             <td class="px-4 py-3 font-medium text-on-surface">${op.name}</td>
             <td class="px-4 py-3 text-on-surface-variant">${op.email}</td>
             <td class="w-48 px-4 py-3 text-on-surface-variant">${op.role}</td>
+            <td class="px-4 py-3 text-on-surface-variant">${op.affiliation}</td> <!-- 所属グループを追加 -->
             <td class="w-32 px-4 py-3 text-on-surface-variant text-left">${op.totalCompleted}</td>
             <td class="w-32 px-4 py-3 text-on-surface-variant">${getStatusBadge(op.status)}</td>
             <td class="w-40 px-4 py-3 text-center space-x-1">
@@ -428,20 +429,35 @@ function initEditOperatorModal() {
     document.getElementById('cancel-edit-btn')?.addEventListener('click', () => toggleModal('edit-operator-modal', false));
 
     document.getElementById('password-change-btn')?.addEventListener('click', () => {
-        showConfirmationModal('新しいパスワードを入力してください。', (newPassword) => {
-            if (newPassword) { // Check if user entered a password
-                // In a real app, you would send this to the server.
-                console.log(`New password for operator: ${newPassword}`); // For demonstration
-                showToast('パスワードが変更されました。', 'success');
+        showConfirmationModal('新しいパスワードを入力してください。確認のため2回入力してください。', (inputValues) => {
+            console.log('[operator-management] onConfirm callback called.');
+            console.log('[operator-management] Input values received:', inputValues);
+            const newPassword = inputValues.newPassword;
+            const confirmNewPassword = inputValues.confirmNewPassword;
+
+            if (!newPassword || !confirmNewPassword) {
+                console.log('[operator-management] Validation failed: Passwords not fully entered.');
+                showToast('パスワードをすべて入力してください。', 'error');
+                return;
             }
+
+            if (newPassword !== confirmNewPassword) {
+                console.log('[operator-management] Validation failed: Passwords do not match.');
+                showToast('パスワードが一致しません。', 'error');
+                return;
+            }
+
+            // In a real app, you would send this to the server.
+            console.log(`[operator-management] Passwords matched. New password for operator: ${newPassword}`); // For demonstration
+            showToast('パスワードが変更されました。', 'success');
         }, {
             title: 'パスワード変更',
             confirmText: '保存',
             cancelText: 'キャンセル',
-            prompt: {
-                type: 'password',
-                label: '新しいパスワード'
-            }
+            prompt: [
+                { type: 'password', label: '新しいパスワード', id: 'newPassword', required: true },
+                { type: 'password', label: '新しいパスワード（確認用）', id: 'confirmNewPassword', required: true }
+            ]
         });
     });
 
