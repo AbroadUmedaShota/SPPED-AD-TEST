@@ -663,19 +663,34 @@ function setupSendEmailModal(closeModal) {
     // 2. 送付先追加機能
     addRecipientButton.addEventListener('click', () => {
         const newRecipient = document.createElement('div');
+        const recipientId = `recipient-${Date.now()}-${Math.floor(Math.random() * 1000)}`; // ユニークIDを生成
         newRecipient.className = 'flex items-center gap-2';
+        newRecipient.dataset.recipientId = recipientId; // data属性を追加
         newRecipient.innerHTML = `
             <input type="email" name="recipients[]" class="form-input flex-grow" placeholder="recipient@example.com" required>
-            <button type="button" class="remove-recipient-btn w-8 h-8 flex items-center justify-center rounded-full bg-error-container text-on-error-container hover:opacity-90">
+            <button type="button" class="remove-recipient-btn w-8 h-8 flex items-center justify-center rounded-full bg-error-container text-on-error-container hover:opacity-90" data-recipient-target="${recipientId}">
                 <span class="material-icons text-base">remove</span>
             </button>
         `;
         recipientsContainer.appendChild(newRecipient);
+        console.log('[setupSendEmailModal] Recipient added. Current recipients container HTML:', recipientsContainer.innerHTML);
     });
 
+    console.log('[setupSendEmailModal] Attaching click listener to recipientsContainer for removal.');
     recipientsContainer.addEventListener('click', e => {
-        if (e.target.closest('.remove-recipient-btn')) {
-            e.target.closest('.flex').remove();
+        console.log('[setupSendEmailModal] recipientsContainer click event fired. Target:', e.target);
+        const removeButton = e.target.closest('.remove-recipient-btn');
+        if (removeButton) {
+            console.log('[setupSendEmailModal] remove-recipient-btn clicked:', removeButton);
+            const targetRecipientId = removeButton.dataset.recipientTarget; // data属性からIDを取得
+            const recipientElement = recipientsContainer.querySelector(`[data-recipient-id="${targetRecipientId}"]`); // そのIDを持つ要素を探す
+            if (recipientElement) {
+                console.log('[setupSendEmailModal] Recipient element to remove:', recipientElement);
+                recipientElement.remove();
+                console.log('[setupSendEmailModal] Recipient removed. Updated recipients container HTML:', recipientsContainer.innerHTML);
+            } else {
+                console.warn('[setupSendEmailModal] Could not find recipient element with ID to remove.');
+            }
         }
     });
 
