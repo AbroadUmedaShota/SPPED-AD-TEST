@@ -6,12 +6,27 @@ import { debounce, showToast } from '../../02_dashboard/src/utils.js';
 import { showConfirmationModal } from '../../02_dashboard/src/confirmationModal.js';
 
 // --- DUMMY DATA & CONFIG ---
-const affiliations = ['社内', 'Abroad'];
+// const affiliations = ['社内', 'Abroad']; // MOCK_GROUPSを使用するため削除
 const roles = ['オペレーター(Lv1)', 'オペレーター管理者(Lv2)', 'Abroadスタッフ(Lv3)', 'Abroadマネージャー(Lv4)'];
 const statuses = ['active', 'suspended'];
 const firstNames = ['太郎', '花子', '次郎', '三郎', '陽葵', '凛', '蒼', '蓮', '湊', '結衣'];
 const lastNames = ['佐藤', '鈴木', '高橋', '田中', '伊藤', '渡辺', '山本', '中村', '小林', '加藤'];
-const groups = ['A', 'B', 'C'];
+const groups = ['A', 'B', 'C']; // これはダミーグループで、MOCK_GROUPSとは別なので残しておく
+
+let MOCK_GROUPS = [ // MOCK_GROUPS の定義を移動
+    { id: 1, name: '東京営業部' },
+    { id: 2, name: '大阪支社' },
+    { id: 3, name: '開発チーム' },
+    { id: 4, name: 'マーケティング部' },
+    { id: 5, name: 'サポート' },
+];
+
+// ヘルパー関数: MOCK_GROUPSから<option>タグのHTMLを生成
+function getGroupOptionsHtml(selectedGroupName = null) {
+    return MOCK_GROUPS.map(group => `
+        <option value="${group.name}" ${selectedGroupName === group.name ? 'selected' : ''}>${group.name}</option>
+    `).join('');
+}
 
 const randomDate = (start, end) => new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 
@@ -20,9 +35,9 @@ let opCounter = 0;
 let abCounter = 0;
 
 for (let i = 1; i <= 200; i++) {
-    const affiliation = affiliations[Math.floor(Math.random() * affiliations.length)];
+    const affiliation = MOCK_GROUPS[Math.floor(Math.random() * MOCK_GROUPS.length)].name; // affiliation を MOCK_GROUPS から取得
     let id;
-    if (affiliation === 'Abroad') {
+    if (affiliation.includes('Abroad')) { // Abroadを含むグループ名で判定
         abCounter++;
         id = `ab-${String(abCounter).padStart(3, '0')}`;
     } else {
@@ -34,14 +49,14 @@ for (let i = 1; i <= 200; i++) {
     const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
     
     let role;
-    if (affiliation === 'Abroad') {
+    if (affiliation.includes('Abroad')) {
         role = roles[Math.floor(Math.random() * 2) + 2];
     } else {
         role = roles[Math.floor(Math.random() * 2)];
     }
 
     const status = statuses[Math.floor(Math.random() * statuses.length)];
-    const group = groups[Math.floor(Math.random() * groups.length)];
+    const group = groups[Math.floor(Math.random() * groups.length)]; // このgroupはダミーグループなのでそのまま
     const totalCompleted = Math.floor(Math.random() * 1000) + 50;
 
     dummyOperators.push({
@@ -254,7 +269,7 @@ function initInviteOperatorModal() {
                     <div class="space-y-1">
                         <label for="affiliation" class="form-label">所属</label>
                         <select id="affiliation" name="affiliation" class="form-select w-full">
-                            ${affiliations.map(a => `<option value="${a}">${a}</option>`).join('')}
+                            ${getGroupOptionsHtml()}
                         </select>
                     </div>
                     <div class="space-y-1">
@@ -381,7 +396,7 @@ function initEditOperatorModal() {
                     <div class="space-y-1">
                         <label for="edit-affiliation" class="form-label">所属</label>
                         <select id="edit-affiliation" name="affiliation" class="form-select w-full">
-                            ${affiliations.map(a => `<option value="${a}">${a}</option>`).join('')}
+                            ${getGroupOptionsHtml()}
                         </select>
                     </div>
                     <div class="space-y-1">
@@ -631,7 +646,7 @@ export function initOperatorManagementPage() {
         if (selectedIds.length === 0) return;
 
         const roleOptions = roles.map(r => `<option value="${r}">${r}</option>`).join('');
-        showConfirmationModal(`選択した ${selectedIds.length} 人の権限を新しい権限に変更します。`, (newRole) => {
+        showConfirmationModal(`選択した ${selectedIds.length} 人のオペレーターの権限を、以下の選択肢から新しい権限に変更します。変更する権限を選択し、よろしければ「変更を適用」をクリックしてください。`, (newRole) => {
             if (newRole) {
                 dummyOperators.forEach(op => {
                     if (selectedIds.includes(op.id)) op.role = newRole;
@@ -650,8 +665,8 @@ export function initOperatorManagementPage() {
         const selectedIds = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.dataset.operatorId);
         if (selectedIds.length === 0) return;
 
-        const affiliationOptions = affiliations.map(a => `<option value="${a}">${a}</option>`).join('');
-        showConfirmationModal(`選択した ${selectedIds.length} 人の所属を新しい所属に変更します。`, (newAffiliation) => {
+        const affiliationOptions = getGroupOptionsHtml();
+        showConfirmationModal(`選択した ${selectedIds.length} 人のオペレーターの所属を、以下の選択肢から新しい所属に変更します。変更する所属を選択し、よろしければ「変更を適用」をクリックしてください。`, (newAffiliation) => {
             if (newAffiliation) {
                 dummyOperators.forEach(op => {
                     if (selectedIds.includes(op.id)) op.affiliation = newAffiliation;
@@ -836,14 +851,7 @@ function adjustPagePaddingForFooter() {
 
 // --- GROUP MANAGEMENT LOGIC ---
 
-// Mock data - replace with actual API calls
-let MOCK_GROUPS = [
-    { id: 1, name: '東京営業部' },
-    { id: 2, name: '大阪支社' },
-    { id: 3, name: '開発チーム' },
-    { id: 4, name: 'マーケティング部' },
-    { id: 5, name: 'サポート' },
-];
+
 
 let MOCK_OPERATORS_GROUP = [
     { id: 101, name: '田中 太郎', groupId: 1 },
