@@ -157,6 +157,31 @@ async function loadSurveyData() {
 }
 
 function setupEventListeners() {
+    DOMElements.surveyForm.addEventListener('click', (e) => {
+        const header = e.target.closest('.accordion-header');
+        if (!header) return;
+
+        const fieldset = header.closest('.survey-question-card');
+        if (!fieldset) return;
+
+        const body = fieldset.querySelector('.accordion-body');
+        const icon = header.querySelector('.accordion-icon');
+
+        if (!body || !icon) return;
+
+        const currentState = header.dataset.state;
+
+        if (currentState === 'open') {
+            body.classList.add('hidden');
+            icon.textContent = 'expand_more';
+            header.dataset.state = 'closed';
+        } else {
+            body.classList.remove('hidden');
+            icon.textContent = 'expand_less';
+            header.dataset.state = 'open';
+        }
+    });
+
     // 他の必須ボタンもガード
     if (DOMElements.submitSurveyButton) {
         DOMElements.submitSurveyButton.addEventListener('click', handleSubmit);
@@ -745,13 +770,16 @@ function createQuestionElement(question, index) {
     contentDiv.className = 'question-content';
 
     contentDiv.innerHTML = `
-        <div class="mb-4">
-            <div class="flex items-center">
-                <span class="text-lg font-bold text-gray-500 mr-3">${questionNumber}</span>${requiredText}
+        <div class="accordion-header flex justify-between items-start cursor-pointer mb-4" data-state="open">
+            <div class="flex-grow">
+                <div class="flex items-center">
+                    <span class="text-lg font-bold text-gray-500 mr-3">${questionNumber}</span>${requiredText}
+                </div>
+                <p class="text-base font-semibold text-on-surface-variant mt-2">${resolveLocalizedText(question.text)}</p>
             </div>
-            <p class="text-base font-semibold text-on-surface-variant mt-2">${resolveLocalizedText(question.text)}</p>
+            <span class="material-icons accordion-icon text-on-surface-variant ml-4">expand_less</span>
         </div>
-        <div class="control-area space-y-3"></div>
+        <div class="control-area space-y-3 accordion-body"></div>
     `;
     
     fieldset.appendChild(contentDiv);
