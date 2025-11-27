@@ -116,8 +116,8 @@ function renderHistory(history) {
 
 function getStatusBadge(status) {
     switch (status) {
-        case 'active': return '<span class="status-badge bg-green-100 text-green-800">稼働中</span>';
-        case 'suspended': return '<span class="status-badge bg-gray-200 text-gray-700">停止中</span>';
+        case 'active': return '<span class="status-badge bg-green-100 text-green-800">有効</span>';
+        case 'suspended': return '<span class="status-badge bg-gray-200 text-gray-700">無効</span>';
         default: return '';
     }
 }
@@ -406,6 +406,13 @@ function initEditOperatorModal() {
                             ${roles.map(r => `<option value="${r}">${r}</option>`).join('')}
                         </select>
                     </div>
+                    <div class="space-y-1">
+                        <label for="edit-status" class="form-label">ステータス</label>
+                        <select id="edit-status" name="status" class="form-select w-full">
+                            <option value="active">有効</option>
+                            <option value="suspended">無効</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="mt-6 pt-6 border-t border-outline-variant">
@@ -486,6 +493,7 @@ function initEditOperatorModal() {
             email: formData.get('email'),
             affiliation: formData.get('affiliation'),
             role: formData.get('role'),
+            status: formData.get('status'),
         };
 
         dummyOperators[operatorIndex] = { ...dummyOperators[operatorIndex], ...updatedFields };
@@ -496,6 +504,7 @@ function initEditOperatorModal() {
         if (originalOperator.email !== updatedFields.email) changes.push(`メールを「${updatedFields.email}」に変更`);
         if (originalOperator.affiliation !== updatedFields.affiliation) changes.push(`所属を「${updatedFields.affiliation}」に変更`);
         if (originalOperator.role !== updatedFields.role) changes.push(`権限を「${updatedFields.role}」に変更`);
+        if (originalOperator.status !== updatedFields.status) changes.push(`ステータスを「${updatedFields.status === 'active' ? '有効' : '無効'}」に変更`);
 
         if (changes.length > 0) {
             dummyHistory.push({
@@ -531,6 +540,7 @@ function openEditModal(operator) {
     form.elements.email.value = operator.email;
     form.elements.affiliation.value = operator.affiliation;
     form.elements.role.value = operator.role;
+    form.elements.status.value = operator.status;
 
     toggleModal('edit-operator-modal', true);
 }
@@ -618,10 +628,12 @@ export function initOperatorManagementPage() {
         const bulkDeleteBtn = document.getElementById('bulk-delete-btn');
         const bulkChangeRoleBtn = document.getElementById('bulk-change-role-btn');
         const bulkChangeAffiliationBtn = document.getElementById('bulk-change-affiliation-btn');
+        const bulkChangeStatusBtn = document.getElementById('bulk-change-status-btn');
 
         if (bulkDeleteBtn) bulkDeleteBtn.disabled = !hasSelection;
         if (bulkChangeRoleBtn) bulkChangeRoleBtn.disabled = !hasSelection;
         if (bulkChangeAffiliationBtn) bulkChangeAffiliationBtn.disabled = !hasSelection;
+        if (bulkChangeStatusBtn) bulkChangeStatusBtn.disabled = !hasSelection;
 
         // Update select-all checkbox state
         if (selectAllCheckbox) {
@@ -694,6 +706,31 @@ export function initOperatorManagementPage() {
             title: '一括所属変更',
             confirmText: '変更を適用',
             prompt: { type: 'select', label: '新しい所属', options: affiliationOptions }
+        });
+    });
+
+    document.getElementById('bulk-change-status-btn')?.addEventListener('click', () => {
+        const selectedIds = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.dataset.operatorId);
+        if (selectedIds.length === 0) return;
+
+        const statusOptions = `
+            <option value="active">有効</option>
+            <option value="suspended">無効</option>
+        `;
+
+        showConfirmationModal(`選択した ${selectedIds.length} 人のオペレーターのステータスを変更します。`, (newStatus) => {
+            if (newStatus) {
+                dummyOperators.forEach(op => {
+                    if (selectedIds.includes(op.id)) op.status = newStatus;
+                });
+                applyFiltersAndSearch();
+                const statusLabel = newStatus === 'active' ? '有効' : '無効';
+                showToast(`${selectedIds.length} 人のステータスを「${statusLabel}」に変更しました。`, 'success');
+            }
+        }, {
+            title: '一括ステータス変更',
+            confirmText: '変更を適用',
+            prompt: { type: 'select', label: '新しいステータス', options: statusOptions }
         });
     });
 

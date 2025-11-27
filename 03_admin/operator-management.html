@@ -62,6 +62,10 @@
                                 <span class="material-icons text-base">apartment</span>
                                 一括所属変更
                             </button>
+                            <button id="bulk-change-status-btn" class="button-secondary text-on-secondary-container px-4 py-2 text-sm font-semibold" disabled>
+                                <span class="material-icons text-base">toggle_on</span>
+                                一括ステータス変更
+                            </button>
                         </div>
                     </div>
 
@@ -75,7 +79,7 @@
                                     <th class="w-48 px-4 py-3 text-left whitespace-nowrap"><button class="sort-btn inline-flex items-center" data-sort-key="role">権限<span class="material-icons text-base">unfold_more</span></button></th>
                                     <th class="px-4 py-3 text-left whitespace-nowrap"><button class="sort-btn inline-flex items-center" data-sort-key="affiliation">所属グループ<span class="material-icons text-base">unfold_more</span></button></th>
                                     <th class="w-32 px-4 py-3 text-left"><button class="sort-btn w-full justify-start inline-flex items-center flex-nowrap" data-sort-key="totalCompleted">総処理数<span class="material-icons text-base">unfold_more</span></button></th>
-                                    <th class="w-32 px-4 py-3 text-left"><button class="sort-btn inline-flex items-center" data-sort-key="status">状態<span class="material-icons text-base">unfold_more</span></button></th>
+                                    <th class="w-32 px-4 py-3 text-left"><button class="sort-btn inline-flex items-center" data-sort-key="status">ステータス<span class="material-icons text-base">unfold_more</span></button></th>
                                     <th class="w-40 px-4 py-3 text-left">操作</th>
                                 </tr>
                             </thead>
@@ -119,10 +123,10 @@
                                     <div id="filter-roles-container" class="flex flex-col gap-1"></div>
                                 </div>
                                 <div>
-                                    <p class="font-medium text-sm mb-2">状態</p>
+                                    <p class="font-medium text-sm mb-2">ステータス</p>
                                     <div class="flex flex-col gap-1">
-                                        <label class="form-check-label"><input type="checkbox" class="form-checkbox" name="status" value="active"> 稼働中</label>
-                                        <label class="form-check-label"><input type="checkbox" class="form-checkbox" name="status" value="suspended"> 停止中</label>
+                                        <label class="form-check-label"><input type="checkbox" class="form-checkbox" name="status" value="active"> 有効</label>
+                                        <label class="form-check-label"><input type="checkbox" class="form-checkbox" name="status" value="suspended"> 無効</label>
                                     </div>
                                 </div>
                             </div>
