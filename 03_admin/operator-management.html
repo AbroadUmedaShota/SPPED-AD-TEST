@@ -123,6 +123,20 @@
                                     <div id="filter-roles-container" class="flex flex-col gap-1"></div>
                                 </div>
                                 <div>
+                                    <p class="font-medium text-sm mb-2">所属グループ</p>
+                                    <select id="filter-group" name="group" class="form-select w-full">
+                                        <option value="">すべてのグループ</option>
+                                        <!-- Options will be populated by JS -->
+                                    </select>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-sm mb-2">対応可能言語</p>
+                                    <select id="filter-language" name="language" class="form-select w-full">
+                                        <option value="">すべての言語</option>
+                                        <!-- Options will be populated by JS -->
+                                    </select>
+                                </div>
+                                <div>
                                     <p class="font-medium text-sm mb-2">ステータス</p>
                                     <div class="flex flex-col gap-1">
                                         <label class="form-check-label"><input type="checkbox" class="form-checkbox" name="status" value="active"> 有効</label>

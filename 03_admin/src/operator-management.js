@@ -12,6 +12,7 @@ const statuses = ['active', 'suspended'];
 const firstNames = ['太郎', '花子', '次郎', '三郎', '陽葵', '凛', '蒼', '蓮', '湊', '結衣'];
 const lastNames = ['佐藤', '鈴木', '高橋', '田中', '伊藤', '渡辺', '山本', '中村', '小林', '加藤'];
 const groups = ['A', 'B', 'C']; // これはダミーグループで、MOCK_GROUPSとは別なので残しておく
+const languages = ['日本語', '英語', '中国語', 'ベトナム語'];
 
 let MOCK_GROUPS = [ // MOCK_GROUPS の定義を移動
     { id: 1, name: '東京営業部' },
@@ -59,6 +60,13 @@ for (let i = 1; i <= 200; i++) {
     const group = groups[Math.floor(Math.random() * groups.length)]; // このgroupはダミーグループなのでそのまま
     const totalCompleted = Math.floor(Math.random() * 1000) + 50;
 
+    const operatorLanguages = [];
+    const numLanguages = Math.floor(Math.random() * 2) + 1;
+    const shuffledLanguages = [...languages].sort(() => 0.5 - Math.random());
+    for (let j = 0; j < numLanguages; j++) {
+        operatorLanguages.push(shuffledLanguages[j]);
+    }
+
     dummyOperators.push({
         id: id,
         name: `${lastName} ${firstName}`,
@@ -70,6 +78,7 @@ for (let i = 1; i <= 200; i++) {
         registrationDate: randomDate(new Date(2023, 0, 1), new Date()).toISOString().split('T')[0],
         lastLoginDate: randomDate(new Date(2023, 0, 1), new Date()).toISOString().split('T')[0],
         totalCompleted: totalCompleted,
+        languages: operatorLanguages,
     });
 }
 
@@ -253,6 +262,24 @@ function populateFilterRoles() {
     `).join('');
 }
 
+function populateFilterGroups() {
+    const selectEl = document.getElementById('filter-group');
+    if (!selectEl) return;
+    const groupOptions = MOCK_GROUPS.map(group => `
+        <option value="${group.name}">${group.name}</option>
+    `).join('');
+    selectEl.innerHTML += groupOptions;
+}
+
+function populateFilterLanguages() {
+    const selectEl = document.getElementById('filter-language');
+    if (!selectEl) return;
+    const languageOptions = languages.map(lang => `
+        <option value="${lang}">${lang}</option>
+    `).join('');
+    selectEl.innerHTML += languageOptions;
+}
+
 function initInviteOperatorModal() {
     const modalContainer = document.getElementById('invite-operator-modal');
     if (!modalContainer) return;
@@ -413,6 +440,12 @@ function initEditOperatorModal() {
                             <option value="suspended">無効</option>
                         </select>
                     </div>
+                    <div class="space-y-1">
+                        <label class="form-label">対応可能言語</label>
+                        <div id="edit-languages-container" class="grid grid-cols-2 gap-2">
+                            <!-- JSでチェックボックスを生成 -->
+                        </div>
+                    </div>
                 </div>
 
                 <div class="mt-6 pt-6 border-t border-outline-variant">
@@ -431,6 +464,15 @@ function initEditOperatorModal() {
         </div>
     `;
     modalContainer.innerHTML = modalHTML;
+
+    const languagesContainer = document.getElementById('edit-languages-container');
+    if (languagesContainer) {
+        languagesContainer.innerHTML = languages.map(lang => `
+            <label class="form-check-label">
+                <input type="checkbox" class="form-checkbox" name="languages" value="${lang}"> ${lang}
+            </label>
+        `).join('');
+    }
 
     document.getElementById('close-edit-modal-btn')?.addEventListener('click', () => toggleModal('edit-operator-modal', false));
     document.getElementById('cancel-edit-btn')?.addEventListener('click', () => toggleModal('edit-operator-modal', false));
@@ -488,12 +530,14 @@ function initEditOperatorModal() {
 
         const originalOperator = { ...dummyOperators[operatorIndex] };
 
+        const selectedLanguages = formData.getAll('languages');
         const updatedFields = {
             name: formData.get('name'),
             email: formData.get('email'),
             affiliation: formData.get('affiliation'),
             role: formData.get('role'),
             status: formData.get('status'),
+            languages: selectedLanguages,
         };
 
         dummyOperators[operatorIndex] = { ...dummyOperators[operatorIndex], ...updatedFields };
@@ -505,6 +549,10 @@ function initEditOperatorModal() {
         if (originalOperator.affiliation !== updatedFields.affiliation) changes.push(`所属を「${updatedFields.affiliation}」に変更`);
         if (originalOperator.role !== updatedFields.role) changes.push(`権限を「${updatedFields.role}」に変更`);
         if (originalOperator.status !== updatedFields.status) changes.push(`ステータスを「${updatedFields.status === 'active' ? '有効' : '無効'}」に変更`);
+        // Compare sorted arrays to ignore order differences
+        if (JSON.stringify((originalOperator.languages || []).sort()) !== JSON.stringify(updatedFields.languages.sort())) {
+            changes.push(`対応可能言語を「${updatedFields.languages.join(', ') || 'なし'}」に変更`);
+        }
 
         if (changes.length > 0) {
             dummyHistory.push({
@@ -542,6 +590,10 @@ function openEditModal(operator) {
     form.elements.role.value = operator.role;
     form.elements.status.value = operator.status;
 
+    document.querySelectorAll('#edit-languages-container input[name="languages"]').forEach(checkbox => {
+        checkbox.checked = operator.languages && operator.languages.includes(checkbox.value);
+    });
+
     toggleModal('edit-operator-modal', true);
 }
 
@@ -577,7 +629,8 @@ export function initOperatorManagementPage() {
         const searchTerm = formData.get('search-input')?.toLowerCase() || '';
         const roles = formData.getAll('role');
         const statuses = formData.getAll('status');
-        const groups = formData.getAll('group');
+        const selectedGroup = formData.get('group') || '';
+        const selectedLanguage = formData.get('language') || '';
         const [regDateStart, regDateEnd] = (formData.get('registrationDate-range') || '').split(' to ');
         const totalCompletedMin = formData.get('totalCompleted_min');
         const totalCompletedMax = formData.get('totalCompleted_max');
@@ -589,12 +642,13 @@ export function initOperatorManagementPage() {
                 op.id.toLowerCase().includes(searchTerm);
             const roleMatch = roles.length === 0 || roles.includes(op.role);
             const statusMatch = statuses.length === 0 || statuses.includes(op.status);
-            const groupMatch = groups.length === 0 || groups.includes(op.group);
+            const groupMatch = !selectedGroup || op.affiliation === selectedGroup;
+            const languageMatch = !selectedLanguage || (op.languages && op.languages.includes(selectedLanguage));
             const regDateMatch = (!regDateStart || op.registrationDate >= regDateStart) && (!regDateEnd || op.registrationDate <= regDateEnd);
             const totalCompletedMinMatch = totalCompletedMin === '' || op.totalCompleted >= parseInt(totalCompletedMin);
             const totalCompletedMaxMatch = totalCompletedMax === '' || op.totalCompleted <= parseInt(totalCompletedMax);
             
-            return searchMatch && roleMatch && statusMatch && groupMatch && regDateMatch && totalCompletedMinMatch && totalCompletedMaxMatch;
+            return searchMatch && roleMatch && statusMatch && groupMatch && languageMatch && regDateMatch && totalCompletedMinMatch && totalCompletedMaxMatch;
         });
         currentPage = 1;
         sortState = { key: null, direction: 'none' };
@@ -606,6 +660,8 @@ export function initOperatorManagementPage() {
     
     initToolboxTabs();
     populateFilterRoles();
+    populateFilterGroups();
+    populateFilterLanguages();
     initInviteOperatorModal();
     initEditOperatorModal();
     initCollapsibleToolbox(); // Keep the sliding panel logic

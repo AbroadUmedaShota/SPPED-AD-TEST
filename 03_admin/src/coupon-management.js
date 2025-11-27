@@ -13,7 +13,6 @@ const dummyCoupons = [
         validTo: '2025-04-30T23:59:59Z',
         usageLimit: 100,
         usageCount: 25,
-        targetUserEmail: null,
         status: 'ACTIVE',
         memo: '新規顧客獲得用のプロモーションコード',
         createdBy: 'admin_01',
@@ -34,7 +33,6 @@ const dummyCoupons = [
         validTo: '2025-05-10T23:59:59Z',
         usageLimit: 1,
         usageCount: 1,
-        targetUserEmail: 'user.a@example.com',
         status: 'LIMIT_REACHED',
         memo: 'ロイヤルカスタマー向け',
         createdBy: 'admin_02',
@@ -72,7 +70,6 @@ for (let i = 3; i <= 100; i++) {
         validTo: `2025-12-31T23:59:59Z`,
         usageLimit: usageLimit,
         usageCount: usageCount,
-        targetUserEmail: (i % 5 === 0) ? `user${i}@example.com` : null,
         status: status,
         memo: `ダミーデータ ${i}`,
         createdBy: `admin_${i % 3 + 1}`,
@@ -197,7 +194,7 @@ function setupEventListeners() {
 function updateAndRender() {
     let filtered = allCoupons.filter(c => {
         const keyword = state.filters.keyword.toLowerCase();
-        return (!keyword || c.code.toLowerCase().includes(keyword) || c.name.toLowerCase().includes(keyword) || (c.targetUserEmail && c.targetUserEmail.toLowerCase().includes(keyword))) &&
+        return (!keyword || c.code.toLowerCase().includes(keyword) || c.name.toLowerCase().includes(keyword)) &&
                (!state.filters.status || c.status === state.filters.status) &&
                (!state.filters.dateStart || c.validTo >= state.filters.dateStart) && 
                (!state.filters.dateEnd || c.validFrom <= state.filters.dateEnd);
