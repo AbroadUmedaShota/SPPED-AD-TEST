@@ -1,57 +1,145 @@
 let performanceChartInstance = null; // Chart.js インスタンスを保持
 
-// Function to render personal performance cards
-function renderPersonalPerformance(summary) {
-    // Use real data for center-wide completions
-    const centerCompletedCount = summary.completedItems;
+// Chart.js インスタンスを保持するためのオブジェクト
+let miniChartInstances = {};
 
-    // Dummy data for consistency and average time for demonstration
-    const consistencyRate = (Math.random() * 5 + 95).toFixed(1); // 95.0-100.0%
-    const avgTimeSeconds = Math.floor(Math.random() * 20) + 5; // 5-25 seconds
+// Function to draw a mini chart in the background of a KPI card
+function drawMiniChart(canvasId, data, borderColor, chartLabel) {
+    const ctx = document.getElementById(canvasId);
+    if (!ctx) return;
 
-    const centerCompletedEl = document.getElementById('center-completed-count');
-    if (centerCompletedEl) centerCompletedEl.textContent = centerCompletedCount.toLocaleString();
-
-    const consistencyEl = document.getElementById('data-consistency-rate');
-    if (consistencyEl) consistencyEl.textContent = `${consistencyRate}%`;
-
-    const personalAvgTime = document.getElementById('personal-avg-time');
-    if (personalAvgTime) personalAvgTime.textContent = `${avgTimeSeconds.toFixed(1)}s`;
-
-    // Dummy trend data
-    const centerTrend = Math.random() > 0.5 ? 'up' : 'down';
-    const centerTrendValue = (Math.random() * 10).toFixed(1);
-    const consistencyTrend = Math.random() < 0.5 ? 'up' : 'down';
-    const consistencyTrendValue = (Math.random() * 2).toFixed(1);
-    const avgTimeTrend = Math.random() > 0.5 ? 'up' : 'down';
-    const avgTimeTrendValue = (Math.random() * 2).toFixed(1);
-
-    // Update Center Trend
-    const centerTrendIcon = document.getElementById('center-trend-icon');
-    const centerTrendText = document.getElementById('center-trend-text');
-    if (centerTrendIcon && centerTrendText) {
-        centerTrendIcon.textContent = centerTrend === 'up' ? 'trending_up' : 'trending_down';
-        centerTrendIcon.className = `material-icons text-base ${centerTrend === 'up' ? 'text-green-500 dark:text-green-400' : 'text-red-500 dark:text-red-400'}`;
-        centerTrendText.textContent = `前日比 ${centerTrend === 'up' ? '+' : '-'}${centerTrendValue}%`;
+    // 既存のチャートインスタンスがあれば破棄
+    if (miniChartInstances[canvasId]) {
+        miniChartInstances[canvasId].destroy();
     }
 
-    // Update Consistency Trend
-    const consistencyTrendIcon = document.getElementById('consistency-trend-icon');
-    const consistencyTrendText = document.getElementById('consistency-trend-text');
-    if (consistencyTrendIcon && consistencyTrendText) {
-        consistencyTrendIcon.textContent = consistencyTrend === 'up' ? 'trending_up' : 'trending_down';
-        consistencyTrendIcon.className = `material-icons text-base ${consistencyTrend === 'up' ? 'text-green-500 dark:text-green-400' : 'text-red-500 dark:text-red-400'}`;
-        consistencyTrendText.textContent = `前日比 ${consistencyTrend === 'up' ? '+' : '-'}${consistencyTrendValue}%`;
-    }
+    miniChartInstances[canvasId] = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: Array.from({ length: data.length }, (_, i) => `Day ${i + 1}`), // Dummy labels
+            datasets: [{
+                label: chartLabel,
+                data: data,
+                borderColor: borderColor,
+                backgroundColor: (context) => {
+                    const chart = context.chart;
+                    const { ctx, chartArea } = chart;
+                    if (!chartArea) {
+                        return null;
+                    }
+                    const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+                    // borderColor が "rgb(R, G, B)" 形式であることを想定し、rgba に変換
+                    const rgbaColor0 = borderColor.replace('rgb', 'rgba').replace(')', ', 0)');   // rgba(R, G, B, 0)
+                    const rgbaColor1 = borderColor.replace('rgb', 'rgba').replace(')', ', 0.5)'); // rgba(R, G, B, 0.5)
+                    gradient.addColorStop(0, rgbaColor0);
+                    gradient.addColorStop(1, rgbaColor1);
+                    return gradient;
+                },
+                fill: true,
+                tension: 0.4,
+                pointRadius: 0, // ポイントを非表示
+                borderWidth: 2,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: false
+                },
+                tooltip: {
+                    enabled: false // ツールチップを非表示
+                }
+            },
+            scales: {
+                x: {
+                    display: false, // X軸を非表示
+                    grid: {
+                        display: false
+                    },
+                    border: {
+                        display: false
+                    }
+                },
+                y: {
+                    display: false, // Y軸を非表示
+                    grid: {
+                        display: false
+                    },
+                    border: {
+                        display: false
+                    }
+                }
+            },
+            elements: {
+                line: {
+                    borderJoinStyle: 'round'
+                }
+            },
+            layout: {
+                padding: {
+                    left: 0,
+                    right: 0,
+                    top: 0,
+                    bottom: 0
+                }
+            },
+            animation: {
+                duration: 0 // アニメーションを無効化
+            }
+        }
+    });
+}
 
-    // Update Avg Time Trend
-    const avgTimeTrendIcon = document.getElementById('avg-time-trend-icon');
-    const avgTimeTrendText = document.getElementById('avg-time-trend-text');
-    if (avgTimeTrendIcon && avgTimeTrendText) {
-        avgTimeTrendIcon.textContent = avgTimeTrend === 'up' ? 'trending_up' : 'trending_down';
-        avgTimeTrendIcon.className = `material-icons text-base ${avgTimeTrend === 'up' ? 'text-red-500 dark:text-red-400' : 'text-green-500 dark:text-green-400'}`;
-        avgTimeTrendText.textContent = `前日比 ${avgTimeTrend === 'up' ? '+' : '-'}${avgTimeTrendValue}s`;
-    }
+// Function to update KPI cards
+function updateKPIs(summary) {
+    const totalItems = summary.totalItems || 0;
+    const completedItems = summary.completedItems || 0;
+
+    // 総未完了数 = 総アイテム数 - 完了したアイテム数
+    const totalUncompletedCount = totalItems - completedItems;
+    // センター全体の完了数 = 完了したアイテム数
+    const centerTotalCompletedCount = completedItems;
+    // センター全体の整合率 = (完了したアイテム数 / 総アイテム数) * 100
+    const centerConsistencyRate = totalItems > 0 ? ((completedItems / totalItems) * 100).toFixed(1) : 0;
+
+    // 各カードに値を設定
+    const totalUncompletedCountEl = document.getElementById('total-uncompleted-count');
+    if (totalUncompletedCountEl) totalUncompletedCountEl.textContent = totalUncompletedCount.toLocaleString();
+
+    const centerTotalCompletedCountEl = document.getElementById('center-total-completed-count');
+    if (centerTotalCompletedCountEl) centerTotalCompletedCountEl.textContent = centerTotalCompletedCount.toLocaleString();
+
+    const centerConsistencyRateEl = document.getElementById('center-consistency-rate');
+    if (centerConsistencyRateEl) centerConsistencyRateEl.textContent = `${centerConsistencyRate}%`;
+
+    // --- ミニグラフの描画 ---
+    // ダミーのトレンドデータを生成 (過去7日間のデータ)
+    const generateDummyTrendData = (baseValue, variance, isPercentage = false) => {
+        const data = [];
+        for (let i = 6; i >= 0; i--) { // 過去7日間
+            let value = baseValue + (Math.random() - 0.5) * variance;
+            if (isPercentage) value = Math.max(0, Math.min(100, value)); // 0-100%の範囲に制限
+            data.push(isPercentage ? parseFloat(value.toFixed(1)) : Math.round(value));
+        }
+        return data.reverse(); // 最新が右に来るように反転
+    };
+
+    // 総未完了数のトレンド (減少傾向)
+    const totalUncompletedTrend = generateDummyTrendData(totalUncompletedCount / 2, totalUncompletedCount / 4);
+    drawMiniChart('total-uncompleted-chart', totalUncompletedTrend, 'rgb(239, 68, 68)', '総未完了数トレンド'); // Red
+
+    // センター全体の完了数のトレンド (増加傾向)
+    const centerCompletedTrend = generateDummyTrendData(centerTotalCompletedCount / 2, centerTotalCompletedCount / 4);
+    drawMiniChart('center-total-completed-chart', centerCompletedTrend, 'rgb(59, 130, 246)', 'センター完了数トレンド'); // Blue
+
+    // センター全体の整合率のトレンド (安定傾向)
+    const centerConsistencyTrend = generateDummyTrendData(parseFloat(centerConsistencyRate), 5, true);
+    drawMiniChart('center-consistency-chart', centerConsistencyTrend, 'rgb(168, 85, 247)', '整合率トレンド'); // Purple
 }
 
 // Function to render chart in modal
@@ -67,28 +155,40 @@ function renderPerformanceChart(type) {
     let labels = [];
     let data = [];
     let title = '';
-    let borderColor = 'rgb(75, 192, 192)';
+    let borderColor = '';
+
+    // Summary data from the most recent fetch (assuming it's stored or accessible)
+    // For this dummy, let's use fixed base values for calculation, or pass them from updateKPIs if available
+    const baseTotalItems = 6520; // from data_entry_status.json
+    const baseCompletedItems = 3580; // from data_entry_status.json
 
     // Dummy data for the last 7 days
-    for (let i = 6; i >= 0; i--) {
+    for (let i = 6; i >= 0; i--) { // 過去7日間を逆順に
         const d = new Date();
         d.setDate(d.getDate() - i);
         labels.push(`${d.getMonth() + 1}/${d.getDate()}`);
 
-        if (type === 'completed') {
-            data.push(Math.floor(Math.random() * 30) + 20); // 20-50 completed items
-            title = '過去7日間の完了件数';
-            borderColor = 'rgb(75, 192, 192)';
-        } else if (type === 'avgTime') {
-            data.push((Math.random() * 10 + 10).toFixed(1)); // 10-20 seconds avg time
-            title = '過去7日間の平均処理時間 (秒)';
-            borderColor = 'rgb(255, 99, 132)';
+        // Base value for today (i=0) and then extrapolate backward
+        if (type === 'uncompleted') {
+            // 未完了数が徐々に減少するトレンド
+            const uncompletedToday = baseTotalItems - baseCompletedItems;
+            data.push(Math.max(0, uncompletedToday + (i * 50) + Math.floor(Math.random() * 20 - 10)));
+            title = '過去7日間の総未完了数';
+            borderColor = 'rgb(239, 68, 68)'; // Red
+        } else if (type === 'completed') {
+            // 完了数が徐々に増加するトレンド
+            const completedToday = baseCompletedItems;
+            data.push(Math.max(0, completedToday - (i * 100) + Math.floor(Math.random() * 50 - 25)));
+            title = '過去7日間のセンター全体の完了数';
+            borderColor = 'rgb(59, 130, 246)'; // Blue
         } else if (type === 'consistency') {
-            data.push((Math.random() * 5 + 95).toFixed(1)); // 95-100%
-            title = '過去7日間のデータ入力整合性 (%)';
-            borderColor = 'rgb(153, 102, 255)';
+            // 整合率が高水準で推移するトレンド (90-100%)
+            data.push(Math.max(90, Math.min(100, 95 + (Math.random() * 5 - 2.5))).toFixed(1)); // 90-100%
+            title = '過去7日間のセンター全体の整合率';
+            borderColor = 'rgb(168, 85, 247)'; // Purple
         }
     }
+    data.reverse(); // 日付順に並べ替え
 
     performanceChartInstance = new Chart(ctx, {
         type: 'line',
@@ -98,8 +198,10 @@ function renderPerformanceChart(type) {
                 label: title,
                 data: data,
                 borderColor: borderColor,
-                tension: 0.1,
-                fill: false
+                tension: 0.3, // 少しカーブさせる
+                fill: false,
+                pointRadius: 3, // ポイントを表示
+                borderWidth: 2
             }]
         },
         options: {
@@ -216,24 +318,24 @@ export async function initDataEntryPage() {
     const data = await fetchData();
     if (!data) return; // Stop if data fetch failed
 
-    renderPersonalPerformance(data.summary);
+    updateKPIs(data.summary);
     renderTaskTable(data.tasks);
 
     // Event listeners for personal performance cards to open modal
-    document.getElementById('center-completed-count').closest('.kpi-card').addEventListener('click', () => {
+    document.getElementById('total-uncompleted-count').closest('.kpi-card').addEventListener('click', () => {
+        document.getElementById('graphModalTitle').textContent = '総未完了数 詳細';
+        document.getElementById('graphModal').classList.remove('hidden');
+        renderPerformanceChart('uncompleted'); // 新しいチャートタイプ
+    });
+
+    document.getElementById('center-total-completed-count').closest('.kpi-card').addEventListener('click', () => {
         document.getElementById('graphModalTitle').textContent = 'センター全体の完了数 詳細';
         document.getElementById('graphModal').classList.remove('hidden');
         renderPerformanceChart('completed');
     });
 
-    document.getElementById('personal-avg-time').closest('.kpi-card').addEventListener('click', () => {
-        document.getElementById('graphModalTitle').textContent = '平均処理時間 詳細';
-        document.getElementById('graphModal').classList.remove('hidden');
-        renderPerformanceChart('avgTime');
-    });
-
     document.getElementById('kpi-consistency-card').addEventListener('click', () => {
-        document.getElementById('graphModalTitle').textContent = 'データ入力整合性 詳細';
+        document.getElementById('graphModalTitle').textContent = 'センター全体の整合率 詳細';
         document.getElementById('graphModal').classList.remove('hidden');
         renderPerformanceChart('consistency');
     });
