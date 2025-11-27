@@ -37,29 +37,29 @@
                 <section class="space-y-6">
     <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <div class="rounded-xl border border-outline-variant bg-surface p-5 shadow-sm">
-            <p class="text-sm text-on-surface-variant">総件数</p>
-            <p class="text-display-small font-bold text-on-surface">1,240</p>
-            <p class="text-xs text-on-surface-variant mt-2">前日比 +3%</p>
+            <p class="text-sm text-on-surface-variant">進行中のアンケート数</p>
+            <p id="in-progress-surveys" class="text-display-small font-bold text-on-surface">0</p>
+            <p class="text-xs text-on-surface-variant mt-2">現在アクティブなアンケート</p>
+        </div>
+        <div class="rounded-xl border border-outline-variant bg-surface p-5 shadow-sm">
+            <p class="text-sm text-on-surface-variant">総名刺数</p>
+            <p id="total-items" class="text-display-small font-bold text-on-surface">0</p>
+            <p class="text-xs text-on-surface-variant mt-2">データ入力が必要な総名刺数</p>
         </div>
         <div class="rounded-xl border border-outline-variant bg-surface p-5 shadow-sm">
             <p class="text-sm text-on-surface-variant">エスカレーション</p>
-            <p class="text-display-small font-bold text-error">18</p>
+            <p id="escalation-items" class="text-display-small font-bold text-error">0</p>
             <p class="text-xs text-on-surface-variant mt-2">要管理者対応</p>
         </div>
         <div class="rounded-xl border border-outline-variant bg-surface p-5 shadow-sm">
             <p class="text-sm text-on-surface-variant">ロック中</p>
-            <p class="text-display-small font-bold text-warning">12</p>
+            <p id="locked-items" class="text-display-small font-bold text-warning">0</p>
             <p class="text-xs text-on-surface-variant mt-2">タイムアウト監視中</p>
-        </div>
-        <div class="rounded-xl border border-outline-variant bg-surface p-5 shadow-sm">
-            <p class="text-sm text-on-surface-variant">当日完了</p>
-            <p class="text-display-small font-bold text-success">84</p>
-            <p class="text-xs text-on-surface-variant mt-2">前年比 +12%</p>
         </div>
     </div>
     <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
         <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
-            <h2 class="text-title-large font-semibold text-on-surface">優先度別キュー</h2>
+            <h2 class="text-title-large font-semibold text-on-surface">進捗サマリー</h2>
             <div class="flex items-center gap-2 text-sm">
                 <button class="inline-flex items-center gap-1 rounded-lg border border-outline px-3 py-2">
                     <span class="material-icons text-base">refresh</span>
@@ -72,42 +72,16 @@
             </div>
         </div>
         <div class="grid gap-4 md:grid-cols-2">
-            <section class="rounded-lg border border-outline-variant/60 bg-surface-variant/30 p-4" aria-label="優先度リスト">
-                <h3 class="text-title-medium font-semibold text-on-surface mb-3">優先度キュー</h3>
-                <ul class="space-y-3 text-sm text-on-surface-variant">
-                    <li class="flex items-center justify-between">
-                        <span class="inline-flex items-center gap-2"><span class="size-2 rounded-full bg-error"></span>オンデマンド</span>
-                        <span class="text-on-surface font-semibold">24件</span>
-                    </li>
-                    <li class="flex items-center justify-between">
-                        <span class="inline-flex items-center gap-2"><span class="size-2 rounded-full bg-warning"></span>超特急</span>
-                        <span class="text-on-surface font-semibold">38件</span>
-                    </li>
-                    <li class="flex items-center justify-between">
-                        <span class="inline-flex items-center gap-2"><span class="size-2 rounded-full bg-secondary"></span>特急</span>
-                        <span class="text-on-surface font-semibold">66件</span>
-                    </li>
-                    <li class="flex items-center justify-between">
-                        <span class="inline-flex items-center gap-2"><span class="size-2 rounded-full bg-success"></span>通常</span>
-                        <span class="text-on-surface font-semibold">144件</span>
-                    </li>
+            <section class="rounded-lg border border-outline-variant/60 bg-surface-variant/30 p-4 max-h-80 overflow-y-auto" aria-label="言語別進捗リスト">
+                <h3 class="text-title-medium font-semibold text-on-surface mb-3">言語別進捗</h3>
+                <ul id="language-progress-list" class="space-y-4 text-sm text-on-surface-variant">
+                    <!-- JSで動的に挿入 -->
                 </ul>
             </section>
-            <section class="rounded-lg border border-outline-variant/60 bg-surface-variant/30 p-4" aria-label="グループ残タスク">
-                <h3 class="text-title-medium font-semibold text-on-surface mb-3">グループ別残タスク</h3>
-                <ul class="space-y-3 text-sm text-on-surface-variant">
-                    <li class="flex items-center justify-between">
-                        <span>展示会A (OCR併用)</span>
-                        <span class="text-on-surface font-semibold">32件</span>
-                    </li>
-                    <li class="flex items-center justify-between">
-                        <span>セミナーB (手入力優先)</span>
-                        <span class="text-on-surface font-semibold">21件</span>
-                    </li>
-                    <li class="flex items-center justify-between">
-                        <span>キャンペーンC</span>
-                        <span class="text-on-surface font-semibold">48件</span>
-                    </li>
+            <section class="rounded-lg border border-outline-variant/60 bg-surface-variant/30 p-4 max-h-80 overflow-y-auto" aria-label="グループ別進捗リスト">
+                <h3 class="text-title-medium font-semibold text-on-surface mb-3">グループ別進捗</h3>
+                <ul id="group-progress-list" class="space-y-4 text-sm text-on-surface-variant">
+                    <!-- JSで動的に挿入 -->
                 </ul>
             </section>
         </div>
@@ -120,7 +94,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-end">
                 <!-- キーワード検索 -->
                 <div class="input-group lg:col-span-1 relative">
-                    <input type="search" id="keyword-search" placeholder=" " class="input-field pl-10 pr-4 w-full">
+                    <input type="search" id="keyword-search" placeholder="アンケート名, ID, 会社名" class="input-field pl-10 pr-4 w-full">
                     <label for="keyword-search" class="input-label">キーワードで検索</label>
                     <span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl pointer-events-none">search</span>
                 </div>

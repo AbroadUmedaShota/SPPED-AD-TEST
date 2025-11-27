@@ -57,8 +57,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const matchCount = Math.floor(Math.random() * (completed + 1));
             const mismatchCount = completed - matchCount;
             const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
+            const companyNames = ['株式会社A', '合同会社B', '株式会社C', '有限会社D'];
+            const languages = ['日本語', '英語', '中国語（簡体字）', '中国語（繁体字）', 'ベトナム語'];
+            const groupIds = Object.keys(groupNameMapping);
             return {
                 ...survey,
+                groupId: groupIds[Math.floor(Math.random() * groupIds.length)],
+                language: languages[Math.floor(Math.random() * languages.length)],
+                companyName: companyNames[Math.floor(Math.random() * companyNames.length)],
                 status: statuses[Math.floor(Math.random() * statuses.length)],
                 totalCount: total,
                 completedCount: completed,
@@ -69,7 +75,28 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         });
         renderTable();
+        renderLanguageProgress();
+        renderGroupProgress();
+        renderKpiCards();
         setupSortListeners();
+    };
+
+    const renderKpiCards = () => {
+        if (!allSurveyData || allSurveyData.length === 0) return;
+
+        // 進行中のアンケート数
+        const inProgressSurveys = allSurveyData.filter(s => s.status === '会期中' || s.status === '会期中オンデマンド').length;
+        document.getElementById('in-progress-surveys').textContent = inProgressSurveys.toLocaleString();
+
+            // 総名刺数
+            const totalItems = allSurveyData.reduce((sum, s) => sum + (s.bizcardRequest || 0), 0);
+            document.getElementById('total-items').textContent = totalItems.toLocaleString();
+        // エスカレーション
+        const escalationItems = allSurveyData.filter(s => s.status === 'エスカレ').length;
+        document.getElementById('escalation-items').textContent = escalationItems.toLocaleString();
+
+        // ロック中 (ダミー)
+        document.getElementById('locked-items').textContent = '12';
     };
 
     const renderTable = () => {
@@ -238,6 +265,100 @@ document.addEventListener('DOMContentLoaded', () => {
         paginationContainer.appendChild(nextPageBtn);
     };
 
+    const renderLanguageProgress = () => {
+        const listElement = document.getElementById('language-progress-list');
+        if (!listElement) return;
+
+        const languages = ['日本語', '英語', '中国語（簡体字）', '中国語（繁体字）', 'ベトナム語'];
+        const progressData = {};
+
+        // 言語ごとにデータを初期化
+        languages.forEach(lang => {
+            progressData[lang] = { total: 0, completed: 0 };
+        });
+
+        // 全調査データを集計
+        allSurveyData.forEach(survey => {
+            if (progressData[survey.language]) {
+                progressData[survey.language].total += survey.totalCount;
+                progressData[survey.language].completed += survey.completedCount;
+            }
+        });
+
+        // HTMLを生成
+        listElement.innerHTML = languages.map(lang => {
+            const data = progressData[lang];
+            const percentage = data.total > 0 ? Math.round((data.completed / data.total) * 100) : 0;
+            const colors = {
+                '日本語': 'bg-blue-600',
+                '英語': 'bg-green-600',
+                '中国語（簡体字）': 'bg-red-600',
+                '中国語（繁体字）': 'bg-orange-500',
+                'ベトナム語': 'bg-purple-600'
+            };
+            const colorClass = colors[lang] || 'bg-gray-500';
+
+            return `
+                <li>
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="font-medium">${lang}</span>
+                        <span class="text-xs">${percentage}% (${data.completed.toLocaleString()}/${data.total.toLocaleString()}件)</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="${colorClass} h-2 rounded-full" style="width: ${percentage}%"></div>
+                    </div>
+                </li>
+            `;
+        }).join('');
+    }
+
+    const groupNameMapping = {
+        "GROUP001": "展示会A (OCR併用)",
+        "GROUP002": "セミナーB (手入力優先)",
+        "GROUP003": "キャンペーンC",
+        "GROUP004": "Webinar D",
+        "GROUP005": "パートナーE",
+        "GROUP006": "新規リード",
+        "GROUP007": "既存顧客フォロー"
+    };
+
+    const renderGroupProgress = () => {
+        const listElement = document.getElementById('group-progress-list');
+        if (!listElement) return;
+
+        const progressData = {};
+
+        // グループごとにデータを集計
+        allSurveyData.forEach(survey => {
+            const groupName = groupNameMapping[survey.groupId] || survey.groupId || '不明なグループ';
+            if (!progressData[groupName]) {
+                progressData[groupName] = { total: 0, completed: 0 };
+            }
+            progressData[groupName].total += survey.totalCount;
+            progressData[groupName].completed += survey.completedCount;
+        });
+
+        // HTMLを生成
+        listElement.innerHTML = Object.keys(progressData).map((groupName, index) => {
+            const data = progressData[groupName];
+            const percentage = data.total > 0 ? Math.round((data.completed / data.total) * 100) : 0;
+            const colors = ['bg-teal-500', 'bg-cyan-500', 'bg-sky-500', 'bg-indigo-500', 'bg-fuchsia-500'];
+            const colorClass = colors[index % colors.length];
+
+            return `
+                <li>
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="font-medium">${groupName}</span>
+                        <span class="text-xs">${percentage}% (${data.completed.toLocaleString()}/${data.total.toLocaleString()}件)</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="${colorClass} h-2 rounded-full" style="width: ${percentage}%"></div>
+                    </div>
+                </li>
+            `;
+        }).join('');
+    }
+
     const applyFilters = () => {
         const keyword = keywordInput.value.toLowerCase();
         const status = statusInput.value;
@@ -245,10 +366,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const endDate = endDateInput.value;
 
         let filteredData = allSurveyData.filter(survey => {
-            const nameMatch = survey.name.ja.toLowerCase().includes(keyword);
+            const keywordMatch = !keyword ||
+                (survey.name.ja && survey.name.ja.toLowerCase().includes(keyword)) ||
+                (survey.id && survey.id.toLowerCase().includes(keyword)) ||
+                (survey.companyName && survey.companyName.toLowerCase().includes(keyword));
             const statusMatch = status === 'すべて' || survey.status === status;
             const dateMatch = (!startDate || survey.periodStart >= startDate) && (!endDate || survey.periodEnd <= endDate);
-            return nameMatch && statusMatch && dateMatch;
+            return keywordMatch && statusMatch && dateMatch;
         });
 
         // ソートロジックの適用
