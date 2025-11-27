@@ -64,8 +64,3 @@ graph TD
     D -- 請求書クリック --> E
 
     %% スタイル定義
-    classDef page fill:#e8f0fe,stroke:#3367d6,stroke-width:2px;
-    classDef modal fill:#fce8e6,stroke:#d93025,stroke-width:2px;
-    class A,B,C,D,E,F,G,H,I,J page;
-    class M1,M2,M3,M4,M5 modal;
-    class Sidebar fill:#e6f4ea,stroke:#1e8e3e,stroke-width:2px;

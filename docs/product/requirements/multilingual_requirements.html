@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>multilingual_requirements.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h3 id="speed-ad-%E8%A6%81%E4%BB%B6%E5%AE%9A%E7%BE%A9%E6%9B%B8%E5%A4%9A%E8%A8%80%E8%AA%9E%E5%AF%BE%E5%BF%9C%E7%89%88">SPEED AD 要件定義書（多言語対応版）</h3>
+<p>文書バージョン: 2.4<br>
+作成日: 2025年11月26日 (最終改訂)</p>
+<h4 id="%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB">はじめに</h4>
+<p>本書は、SPEED ADの多言語対応に関する要件を定義します。日本企業が海外のリード情報を扱う際の課題解決を主眼に置いています。</p>
+<h4 id="1-%E8%A6%81%E4%BB%B6%E3%81%AE%E5%84%AA%E5%85%88%E9%A0%86%E4%BD%8D%E3%81%A8%E3%82%B9%E3%82%B3%E3%83%BC%E3%83%97">1. 要件の優先順位とスコープ</h4>
+<h5 id="11-%E3%83%95%E3%82%A7%E3%83%BC%E3%82%BA1%E3%83%87%E3%83%BC%E3%82%BF%E5%A4%9A%E8%A8%80%E8%AA%9E%E5%AF%BE%E5%BF%9C%E3%80%9C2025%E5%B9%B412%E6%9C%88%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9">1.1. フェーズ1：データ多言語対応（〜2025年12月リリース）</h5>
+<p>本要件定義書が対象とするスコープは、「アンケートデータと名刺データの多言語対応」に限定する。主な目的は、多言語でのリード獲得からデータ化、仕分けまでのプロセスを確立することである。
+対象言語（3言語/4種）: 日本語、英語、中国語（簡体字）、中国語（繁体字）。
+対象機能: 本書3章、4章に記載の機能。</p>
+<h5 id="12-%E3%83%95%E3%82%A7%E3%83%BC%E3%82%BA2%E5%A4%9A%E8%A8%80%E8%AA%9E%E5%AF%BE%E5%BF%9C%E3%81%AE%E6%8B%A1%E5%BC%B52026%E5%B9%B4%E3%80%9C">1.2. フェーズ2：多言語対応の拡張（2026年〜）</h5>
+<p>以下の項目は本要件定義書のスコープ外とし、フェーズ2で別途要件を定義する。
+管理画面全体の表示言語切り替え（UIの国際化）。
+韓国語、東南アジア言語、欧州言語（ドイツ語、フランス語等）への対応拡大。
+ユーザーの基本言語設定機能。</p>
+<h5 id="13-%E5%89%8D%E6%8F%90%E3%83%BB%E7%94%A8%E8%AA%9E%E3%81%AE%E6%98%8E%E7%A2%BA%E5%8C%96">1.3. 前提・用語の明確化</h5>
+<pre><code>対応言語コード: BCP47準拠のロケールコードを使用する。フェーズ1は `ja`, `en`, `zh-CN`, `zh-TW` の3言語/4種に限定する。
+中国語バリアント: zh-TW/zh-HK 等の扱い・マッピングは開発実装方針に委ねるが、上限（3言語/4種）の制約のみ適用する。
+第一言語: `supported_locales`（後述）の先頭要素を第一言語とし、未設定の場合は日本語（`ja`）を適用する。
+デフォルト言語: ユーザーの言語設定に基づき決定する。（未設定の場合は日本語を適用）
+言語選択の優先順位: ユーザーの言語設定 &gt; ブラウザ言語 &gt; 第一言語（アンケート設定）の順で初期選択を提示する。
+非対応言語の名刺データ: サポート外言語が検出された場合、管理者等に通知する（通知経路はダッシュボードとメールを検討）。
+</code></pre>
+<hr>
+<h3 id="%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E8%A6%81%E4%BB%B6">（サービス要件）</h3>
+<h4 id="2-%E6%A5%AD%E5%8B%99%E4%B8%8A%E3%81%AE%E5%BD%B1%E9%9F%BF%E7%AF%84%E5%9B%B2">2. 業務上の影響範囲</h4>
+<p>本改修は、既存の業務フローに以下の影響を与える。</p>
+<p>2.1. ユーザー（サービス利用ユーザー）
+アンケート作成: 多言語対応アンケートを作成する場合、言語ごとの質問文や選択肢を登録する新しい手順が発生する。本機能はプレミアムプランの契約ユーザーに提供される。
+データ活用: ダウンロードするCSVに「回答言語」「国」の列が追加されるため、社内でのデータ仕分けや、国内外の担当者へのデータ連携プロセスを見直す必要が生じる場合がある。（「国」列の定義/取得元は要検討とし、開発・運用設計と協議して決定）</p>
+<p>2.2. オペレーター
+タスク受注フローの変更: タスクが自身の言語スキルに応じて自動で割り振られるため、手動でタスクを選択する業務は無くなる。システムから提示されたタスクを順次処理するフローに変更となる。
+業務知識の追加: 対応言語（特に中国語）特有の氏名・住所表記に関するマニュアルの習得と、語学スキルが求められる。</p>
+<p>2.3. 管理者（オペレーター管理者含む）
+オペレーター管理業務の重要性の増大: オペレーターごとに「対応可能言語」を設定・管理する業務が発生する。特に、高度な語学スキルを持つ照合担当者の採用・教育・評価体制の構築が、サービス品質を担保する上で極めて重要になる。
+進捗管理業務の変更: 多言語データ化の進捗状況を言語別にモニタリングする必要が生じる。特定言語のタスクに遅延が発生した場合の原因究明や、オペレーターへの指示が求められる。</p>
+<h4 id="24-%E4%B8%BB%E8%A6%81%E6%A5%AD%E5%8B%99%E3%83%95%E3%83%AD%E3%83%BC">2.4. 主要業務フロー</h4>
+<h5 id="241-%E3%82%A2%E3%83%B3%E3%82%B1%E3%83%BC%E3%83%88%E5%9B%9E%E7%AD%94%E3%83%95%E3%83%AD%E3%83%BC">2.4.1. アンケート回答フロー</h5>
+<pre><code class="language-mermaid"><div class="mermaid">graph TD
+    A[回答者がQRコードをスキャン] --> B[アンケートフォームを表示];
+    B --> C{言語を選択<br/>（初期表示は設定順）};
+    C --> D[選択された言語でアンケートフォームを再表示];
+    D --> E[回答を入力・送信];
+    E --> F((回答データを保存));
+</div></code></pre>
+<p>（補足）フォームを開いた後に言語を選択するパターンを前提とし、初期選択はアンケートの言語設定順（ユーザー言語設定 &gt; ブラウザ言語 &gt; 第一言語の優先順位）で提示する。</p>
+<h5 id="242-%E3%83%87%E3%83%BC%E3%82%BF%E5%8C%96%E3%83%AF%E3%83%BC%E3%82%AF%E3%83%95%E3%83%AD%E3%83%BC%E3%82%B9%E3%82%AD%E3%83%AB%E3%83%99%E3%83%BC%E3%82%B9%E3%83%BB%E3%83%AB%E3%83%BC%E3%83%86%E3%82%A3%E3%83%B3%E3%82%B0">2.4.2. データ化ワークフロー（スキルベース・ルーティング）</h5>
+<pre><code class="language-mermaid"><div class="mermaid">graph TD;
+    A["データ受信<br/>名刺画像+回答言語ヒント"] --> B["名刺画像のOCR判定<br/>スコア算出"];
+    B --> C{"対応言語かつ閾値以上？"};
+    C -->|"はい"| D["対応言語の未入力キューへ自動割当"];
+    C -->|"いいえ"| E["言語判定キューへ隔離<br/>アンケート言語参照"];
+
+    D --> F["オペレーターが受領"];
+    F --> G["入力／再入力（最大3回）"];
+    G --> H{"入力結果は一致？"};
+    H -->|"はい"| I["入力完了"];
+    H -->|"いいえ（3回未満）"| G;
+    H -->|"いいえ（3回超）"| J["不一致として照合へ"];
+    E --> K["スキップ／差戻しで言語判定キューへ"];
+
+    I --> L((データ化完了));
+    J --> M((照合画面で最終判断入力));
+</div></code></pre>
+<pre><code>基本的にはアンケートの言語情報を必ず付与しているため、OCRでの言語判定を軸にアンケートの言語情報を補助的に参照するようなイメージ。
+それに基づいて、各名刺データは各言語の未入力キューへタスクを自動割当する。
+
+オペレーターは入力作業を始める際に、自身の対応言語情報から未入力キューより名刺データを受け取り各タスクの処理を開始する。
+名刺データはデータの一致が行われるまで再入力処理が行われ、オペレーターによる入力が3回を超えたものについては、不一致データとして照合作業の処理へと進む。
+※オペレーター入力画面で対応言語外のデータが表示された場合、スキップ機能を利用し、対象外言語であれば言語判定キューに差し戻しなどを行う想定。
+
+照合作業では名刺画像との一致済みの項目の照らし合わせや、不一致項目の最終判断入力を照合画面上から行う。
+</code></pre>
+<h5 id="243-%E4%BE%8B%E5%A4%96%E5%AF%BE%E5%BF%9C%E3%83%95%E3%83%AD%E3%83%BCocr%E8%A8%80%E8%AA%9E%E5%88%A4%E5%AE%9A%E5%A4%B1%E6%95%97">2.4.3. 例外対応フロー（OCR/言語判定失敗）</h5>
+<pre><code class="language-mermaid"><div class="mermaid">graph TD
+    A[データ受信] --> B{言語判定成功?};
+    B -- Yes --> C[通常ルーティングへ];
+    B -- No --> D[手動判定キューに登録];
+    D --> E[オペレーターが言語を手動判定];
+    E --> F{対応言語か?};
+    F -- Yes --> G[スキルに合致するオペレーターへ再割当];
+    F -- No --> H[非対応言語として管理者へ通知];
+    H --> I[翻訳/対応可否の判断と指示];
+</div></code></pre>
+<hr>
+<h3 id="%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E8%A6%81%E4%BB%B6">（システム要件）</h3>
+<h4 id="3-%E6%A9%9F%E8%83%BD%E8%A6%81%E4%BB%B6">3. 機能要件</h4>
+<h5 id="31-%E3%83%A6%E3%83%BC%E3%82%B6%E3%83%BC%E5%90%91%E3%81%91%E6%A9%9F%E8%83%BD">3.1. ユーザー向け機能</h5>
+<p>3.1.1. アンケート作成・管理（変更）
+多言語対応設定: アンケート(またはユーザー)ごとに「多言語対応」を有効化（ON/OFF）する機能を追加する。（プレミアムプラン限定機能）
+対応言語リスト: アンケートごとに <code>supported_locales</code> 配列で対応言語を登録する（最大3言語/4種）。第一言語は配列の先頭に設定する。中国語バリアントの細かい扱いは開発実装に委ねるが、上限判定ルールのみ遵守する。
+設問の多言語入力: 多言語対応がONの場合、1つの設問に対し、タブ切り替え等のUIで対象言語（日本語、英語、中国語簡体字・繁体字）の質問文や選択肢を登録・編集できる機能を追加する。</p>
+<p>3.1.2. アンケート回答（変更・新規）
+【新規】言語選択機能: 回答者がQRコード読み取り後、使用する言語（アンケートに設定された言語から）を選択する画面を設ける。ブラウザの言語設定を元に、最適な言語を自動で推奨表示する。
+回答インターフェースの地域化: 選択された言語に基づき、設問、ボタン、エラーメッセージ等、回答プロセスに関わる全てのUIテキストをその言語で表示する。
+（内部処理）回答時に選択された言語コードを、回答データに記録する。
+未翻訳言語の表示: 翻訳未入力の言語が選択された場合は、アンケート内容を第一言語（日本語）で表示する。
+言語切替時の入力保持: 回答途中で言語を切り替えた場合でも、既に入力済みの回答値は変更・破棄しない。
+非対応/未設定言語の選択: UIでは <code>supported_locales</code> 外の選択肢を提示しない。URLパラメータ等で対応外が指定された場合は第一言語で表示・保存し、警告文言と監査ログを残す。</p>
+<p>3.1.3. データエクスポート（変更）
+CSVへの列追加: アンケート回答データおよび名刺データのCSVダウンロード時に「回答言語」の列を追加する。</p>
+<h6 id="314-%E3%82%A2%E3%83%B3%E3%82%B1%E3%83%BC%E3%83%88%E4%BD%9C%E6%88%90%E3%83%95%E3%83%AD%E3%83%BC%E5%A4%9A%E8%A8%80%E8%AA%9E%E5%AF%BE%E5%BF%9C-on-%E6%99%82">3.1.4. アンケート作成フロー（多言語対応 ON 時）</h6>
+<pre><code class="language-mermaid"><div class="mermaid">graph TD
+    A[新規アンケート作成<br/>多言語対応をON] --> B[第一言語で設問入力];
+    B --> C{言語タブ切替};
+    C --> D[各言語タブで質問文/選択肢を入力<br/>（未入力は第一言語でフォールバック）];
+    D --> E[各言語でプレビュー確認<br/>未入力・未翻訳をチェック];
+    E --> F[ドラフト保存];
+    F --> G[公開設定・確認<br/>言語選択画面の挙動を確認];
+    G --> H[公開・配布<br/>QR/URLを共有];
+</div></code></pre>
+<h5 id="32-%E7%AE%A1%E7%90%86%E8%80%85%E3%83%BB%E3%82%AA%E3%83%9A%E3%83%AC%E3%83%BC%E3%82%BF%E3%83%BC%E5%90%91%E3%81%91%E6%A9%9F%E8%83%BD">3.2. 管理者・オペレーター向け機能</h5>
+<p>3.2.1. アンケート管理（変更）
+回答データ管理: アンケートに紐づく回答一覧画面で、回答者が選択した言語によるフィルタリング（絞り込み）機能を追加する。一覧表示には、回答言語を示す視覚的なラベル（例: 国旗アイコンや言語タグ）を表示する。具体的な表現方法は開発実装に委ねる。</p>
+<p>3.2.2. データ入力・照合管理（変更）
+ワークフロー変更（スキルベース・ルーティング）: システムは、回答者がアンケートで選択した言語、または名刺画像のOCRによる言語判定結果に基づき、対応可能な言語スキルを持つオペレーターにタスクを自動で割り当てる。
+ルーティング優先度: OCRの言語判定を主とし、回答画面の選択言語は補助ヒントとして閾値未満/判定不能時に参照する。
+閾値設定: OCR判定の信頼度閾値はシステム設定値とし、閾値未満は回答言語ヒントを参照し、それでも確定できない場合は不一致キューに送る。閾値の初期値は開発側で設定し、運用設計で変更手順を定義する。
+【UX改善】優先言語の表示: データ入力画面において、システムが判断した入力すべき言語の優先順位（例：1.日本語, 2.英語）を明示し、オペレーターの作業効率と正確性を向上させる。
+OCR処理の最適化:
+利用API: Google Cloud Vision API を継続して利用する。
+精度向上ロジック: アンケートで回答言語が選択されている場合、その言語コード（例: 回答者が'en'を選択）を Cloud Vision API の <code>language_hints</code> パラメータとして連携し、当該言語のOCR精度を向上させる。言語情報がない場合は、APIの自動言語判定に委ねる。</p>
+<p>3.2.3. オペレーター管理（変更）
+スキル設定機能: 管理者が、オペレーターごとに「対応可能言語」（対象言語から複数選択可）を設定できる機能を追加する。中国語については簡体字と繁体字を区別して設定できることを求めるが、具体的なバリアントの扱い方やUIは開発実装に委ねる。</p>
+<h5 id="33-%E7%BF%BB%E8%A8%B3%E9%81%8B%E7%94%A8%E3%83%95%E3%83%AD%E3%83%BC">3.3. 翻訳運用フロー</h5>
+<pre><code>タブ切替入力: アンケート作成時に言語タブを切り替え、タブ内の項目・内容をユーザーが入力することで各言語の表示内容を決定する。（英語タブに日本語を入力するなど、言語と入力内容の不一致も許容）
+未入力項目の扱い: ある言語タブで未入力の場合、第一言語として入力された内容をデフォルト表示とする。
+    未翻訳公開時の挙動: 未翻訳の状態で公開された場合、回答時には第一言語（日本語）でアンケート内容を表示する。
+対応言語の整合性: 設定した `supported_locales` と入力用タブを同期し、言語の追加・削除時に対応タブを自動で生成/非表示にする。
+翻訳責任: 翻訳内容の正確性・適法性はサービス利用者側に帰属し、サービス側では保証しない。
+保存前チェック: 保存時に未入力の言語がある場合は簡易通知（警告）を表示し、未入力言語の一覧を示した上で公開は継続可能とする。
+機械翻訳の扱い: 自動翻訳の活用を検討するが、翻訳精度はサービス内で保証しない。
+</code></pre>
+<h4 id="4-%E3%83%87%E3%83%BC%E3%82%BF%E3%83%A2%E3%83%87%E3%83%AB%E3%81%AE%E5%A4%89%E6%9B%B4">4. データモデルの変更</h4>
+<p><code>surveys</code>テーブル（アンケート情報）:
+<code>is_multilingual_enabled</code> (Boolean): 多言語対応フラグを追加。
+<code>supported_locales</code> (JSON/Text): 対応言語の配列を保存する（例: <code>[&quot;ja&quot;, &quot;en&quot;, &quot;zh-CN&quot;, &quot;zh-TW&quot;]</code>）。フェーズ1の上限は3言語/4種。保存形式の詳細は実装に委ねる。
+<code>default_answer_locale</code> (String): 第一言語を保存する。未設定の場合は <code>ja</code> を保存する。保存形式の詳細は実装に委ねる。
+<code>survey_details</code>テーブル（アンケート設問情報）:
+質問文、選択肢等のカラムを、複数言語のテキストを格納できる形式（例: JSON）に変更。（例: <code>question_text</code> → <code>{&quot;ja&quot;: &quot;質問文&quot;, &quot;en&quot;: &quot;Question&quot;, &quot;zh-CN&quot;: &quot;问题&quot;}</code>）。格納形式の詳細は実装に委ねる。
+バリデーション: 保存時に必須言語キーの欠落やJSON形式の不整合を検知し、エラー（必須キー欠落）/警告（任意言語欠落）を返す。
+<code>answers</code>テーブル（回答データ）:
+<code>language_code</code> (String): 回答者が選択した言語コードを記録するカラムを追加。（例: 'ja', 'en', 'zh-CN' ...）
+値は <code>surveys.supported_locales</code> に含まれるものを原則とし、含まれない場合は <code>default_answer_locale</code> にフォールバックした上で監査ログに記録する。
+CSV出力仕様: 言語列はBCP47の言語コードを出力し、文字コードはUTF-8（必要に応じBOM付与）とする。未翻訳フォールバック時も元の言語コードを保持する。
+<code>admin_users</code>テーブル（オペレーター情報）:
+<code>skill_languages</code> (JSON/Text): 対応可能言語を配列で保存するカラムを追加。（例: <code>[&quot;ja&quot;, &quot;en&quot;, &quot;zh-Hant&quot;]</code>）。保存形式の詳細は実装に委ねる。
+BCP47準拠のコードを保存し、<code>surveys.supported_locales</code> との照合に利用する。</p>
+<h4 id="5-%E5%B0%86%E6%9D%A5%E7%9A%84%E3%81%AA%E6%8B%A1%E5%BC%B5%E8%A8%88%E7%94%BB%E3%83%95%E3%82%A7%E3%83%BC%E3%82%BA2%E4%BB%A5%E9%99%8D">5. 将来的な拡張計画（フェーズ2以降）</h4>
+<p>UIの完全な国際化: 管理画面全体をユーザーの基本言語設定に応じて表示変更する機能。
+対応言語の拡大: 韓国語、東南アジア言語（ベトナム語、タイ語等）、欧州言語（ドイツ語、フランス語等）への対応。
+ユーザーの基本言語設定機能: ユーザー情報に「基本言語」を追加し、管理画面表示や各種通知の言語に反映させる機能。</p>
+<hr>
+<h5 id="6-%E9%9D%9E%E6%A9%9F%E8%83%BD%E8%A6%81%E4%BB%B6">6. 非機能要件</h5>
+<p>6.1. パフォーマンス
+データ化速度: 多言語対応後も、既存の日本語データ化と同等のSLA（サービス品質保証）を維持する。特に、スキルベース・ルーティングによるタスク割り当て処理がボトルネックにならないこと。
+応答時間: アンケートの言語選択画面や回答画面の表示速度は、3秒以内を目標とする。</p>
+<p>6.2. セキュリティ
+アクセス制御: オペレーターは、自身のスキルセットに合致しない言語のデータにはアクセスできないようにする。
+データ保護: 個人情報を含むデータは、従来通り暗号化し、厳格なアクセス管理を行う。
+未対応言語アラート: 対応可能なオペレーターが不在の場合は、同グループのオペレーター管理者、およびそれ以上の権限者へ通知（ダッシュボードとメール通知を想定）。通知手段・詳細は運用設計で決定する。
+監査ログ: 言語スキル設定の変更、最終言語（finalLocale）の補正、再割当操作を監査ログに記録し、追跡可能にする。ログ項目の詳細・保持期間は運用設計で決定する。</p>
+<p>6.3. 可用性
+システム稼働率: 99.9%以上を維持する。</p>
+<p>6.4. 運用・保守
+モニタリング: 言語ごとのデータ処理量や処理時間を監視し、特定言語のタスク遅延を早期に検知できる仕組みを構築する。
+設定変更の容易性: 将来的な対応言語の追加・変更が、大規模なシステム改修を伴わずに、設定ファイルの変更等で柔軟に対応できる設計とする。
+<strong>UIフォント:</strong> 多言語（特に中国語の簡体字・繁体字）を正しく表示するためのWebフォントについては、現在最適なものを検討中。
+<strong>エラーハンドリング:</strong> 対応可能なオペレーターが存在しない場合や、OCRの言語判定が失敗した場合のリカバリーフローなど、詳細なエラーハンドリング方針については現在検討中。</p>
+<p>6.5. テスト戦略（暫定）
+E2E: 言語切替→回答→CSV出力で言語コードが保持されることを主要言語（ja/en/zh-CN/zh-TW）で検証。
+非対応言語入力: <code>supported_locales</code> 外のロケール指定で第一言語へフォールバックし、警告表示・監査ログ出力されることを確認。
+OCR連携: 言語選択あり/なし両ケースで <code>language_hints</code> の付与とOCR結果の整合性を確認。
+UIレイアウト: 各言語での文字量増による崩れを簡易ビジュアルチェックで確認。
+権限/通知: 非対応言語タスクでのアラート通知（ダッシュボード・メール）を確認。</p>
+<hr>
+<p>以上</p>
+
+</body>
+</html>
