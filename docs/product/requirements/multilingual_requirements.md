@@ -70,7 +70,6 @@ graph TD
     F -- Yes --> G[スキルに合致するオペレーターへ再割当];
     F -- No --> H[非対応言語として管理者へ通知];
     H --> I[翻訳/対応可否の判断と指示];
-    style I fill:#111,stroke:#333,stroke-width:2px
 ```
 
 ---
