@@ -299,7 +299,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const colorClass = colors[lang] || 'bg-gray-500';
 
             return `
-                <li>
+                <li class="cursor-pointer p-2 rounded-md hover:bg-surface-container" data-lang-name="${lang}">
                     <div class="flex items-center justify-between mb-1">
                         <span class="font-medium">${lang}</span>
                         <span class="text-xs">${percentage}% (${data.completed.toLocaleString()}/${data.total.toLocaleString()}件)</span>
@@ -316,7 +316,7 @@ document.addEventListener('DOMContentLoaded', () => {
         "GROUP001": "展示会A (OCR併用)",
         "GROUP002": "セミナーB (手入力優先)",
         "GROUP003": "キャンペーンC",
-        "GROUP004": "Webinar D",
+        "GROUP004": "WebinarD",
         "GROUP005": "パートナーE",
         "GROUP006": "新規リード",
         "GROUP007": "既存顧客フォロー"
@@ -346,7 +346,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const colorClass = colors[index % colors.length];
 
             return `
-                <li>
+                <li class="cursor-pointer p-2 rounded-md hover:bg-surface-container" data-group-name="${groupName}">
                     <div class="flex items-center justify-between mb-1">
                         <span class="font-medium">${groupName}</span>
                         <span class="text-xs">${percentage}% (${data.completed.toLocaleString()}/${data.total.toLocaleString()}件)</span>
@@ -437,5 +437,111 @@ document.addEventListener('DOMContentLoaded', () => {
         handleFilterChange();
     });
 
+    const languageList = document.getElementById('language-progress-list');
+    const groupList = document.getElementById('group-progress-list');
+
+    languageList?.addEventListener('click', (e) => {
+        const listItem = e.target.closest('li[data-lang-name]');
+        if (!listItem) return;
+        const languageName = listItem.dataset.langName;
+        handleLanguageClick(languageName);
+    });
+
+    groupList?.addEventListener('click', (e) => {
+        const listItem = e.target.closest('li[data-group-name]');
+        if (!listItem) return;
+        const groupName = listItem.dataset.groupName;
+        handleGroupClick(groupName);
+    });
+
     fetchData();
+
+    function showDetailModal(title, content) {
+        const placeholder = document.getElementById('detail-modal-placeholder');
+        if (!placeholder) return;
+    
+        const modalHTML = `
+            <div id="detail-modal" class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+                <div class="bg-surface rounded-2xl shadow-xl w-full max-w-lg max-h-[80vh] flex flex-col">
+                    <header class="flex items-center justify-between p-4 border-b border-outline-variant">
+                        <h2 class="text-title-large font-semibold text-on-surface">${title}</h2>
+                        <button id="close-detail-modal" class="p-2 rounded-full hover:bg-surface-container-highest">
+                            <span class="material-icons text-on-surface-variant">close</span>
+                        </button>
+                    </header>
+                    <div class="p-6 overflow-y-auto">
+                        ${content}
+                    </div>
+                </div>
+            </div>
+        `;
+        placeholder.innerHTML = modalHTML;
+    
+        const closeModal = () => placeholder.innerHTML = '';
+        placeholder.querySelector('#close-detail-modal').addEventListener('click', closeModal);
+        placeholder.querySelector('#detail-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'detail-modal') {
+                closeModal();
+            }
+        });
+    }
+    
+    function handleLanguageClick(languageName) {
+        const surveysInLanguage = allSurveyData.filter(s => s.language === languageName);
+        let content = '<ul class="space-y-2">';
+        surveysInLanguage.forEach(s => {
+            const remaining = s.totalCount - s.completedCount;
+            content += `<li class="flex justify-between items-center text-sm"><span>${s.name.ja}</span><span class="font-medium">${remaining.toLocaleString()}件残</span></li>`;
+        });
+        content += '</ul>';
+    
+        showDetailModal(`${languageName} のアンケート別残件数`, content);
+    }
+    
+    function handleGroupClick(groupName) {
+        // マッピングから正しいgroupIdを見つける
+        const groupId = Object.keys(groupNameMapping).find(key => groupNameMapping[key] === groupName);
+        const surveysInGroup = allSurveyData.filter(s => s.groupId === groupId);
+    
+        const progressData = {};
+        const languages = ['日本語', '英語', '中国語（簡体字）', '中国語（繁体字）', 'ベトナム語'];
+        languages.forEach(lang => {
+            progressData[lang] = { total: 0, completed: 0 };
+        });
+    
+        surveysInGroup.forEach(survey => {
+            if (progressData[survey.language]) {
+                progressData[survey.language].total += survey.totalCount;
+                progressData[survey.language].completed += survey.completedCount;
+            }
+        });
+    
+        let content = '<ul class="space-y-4">';
+        Object.keys(progressData).forEach(lang => {
+            const data = progressData[lang];
+            if (data.total === 0) return; // 該当言語のタスクがなければ表示しない
+    
+            const percentage = Math.round((data.completed / data.total) * 100);
+            const colors = {
+                '日本語': 'bg-blue-600', '英語': 'bg-green-600', '中国語（簡体字）': 'bg-red-600',
+                '中国語（繁体字）': 'bg-orange-500', 'ベトナム語': 'bg-purple-600'
+            };
+            const colorClass = colors[lang] || 'bg-gray-500';
+    
+            content += `
+                <li>
+                    <div class="flex items-center justify-between mb-1 text-sm">
+                        <span class="font-medium">${lang}</span>
+                        <span class="text-xs">${percentage}% (${data.completed.toLocaleString()}/${data.total.toLocaleString()}件)</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="${colorClass} h-2 rounded-full" style="width: ${percentage}%"></div>
+                    </div>
+                </li>
+            `;
+        });
+        content += '</ul>';
+    
+        showDetailModal(`${groupName} の言語別進捗`, content);
+    }
 });
