@@ -75,7 +75,7 @@ export async function fetchSurveyData() {
             'sv_0001_25044', 'sv_0001_25045', 'sv_0001_25047', 'sv_0001_25049', 'sv_0001_25050',
             'sv_0001_25051', 'sv_0001_25052', 'sv_0001_25053', 'sv_0001_25054', 'sv_0001_25055',
             'sv_0001_25056', 'sv_0001_25057', 'sv_0001_25058', 'sv_0001_25059', 'sv_0001_25060',
-            'sv_0001_25061', 'sv_0001_25062'
+            'sv_0001_25061', 'sv_0001_25062', 'sv_0001_25063', 'sv_0001_25064', 'sv_0001_25065'
         ];
         const surveyPromises = surveyIds.map(async id => {
             const primaryUrl = resolveDashboardDataPath(`demo_surveys/${id}.json`);

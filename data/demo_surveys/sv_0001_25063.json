@@ -1,0 +1,89 @@
+{
+    "id": "sv_0001_25063",
+    "name": {
+        "ja": "製品満足度調査",
+        "en": "Product Satisfaction Survey"
+    },
+    "displayTitle": {
+        "ja": "製品のご利用満足度に関するアンケート",
+        "en": "Survey on Product Satisfaction"
+    },
+    "description": {
+        "ja": "弊社製品をご利用いただきありがとうございます。今後の品質向上のため、満足度調査にご協力ください。",
+        "en": "Thank you for using our product. Please cooperate with our satisfaction survey to improve quality in the future."
+    },
+    "memo": "個人ユーザー向け。Q3の結果を重点的に分析。",
+    "status": "会期中",
+    "answerCount": 152,
+    "realtimeAnswers": 5,
+    "periodStart": "2025-11-20",
+    "periodEnd": "2025-12-10",
+    "dataCompletionDate": null,
+    "plan": "Free",
+    "deadline": null,
+    "estimatedBillingAmount": 0,
+    "bizcardEnabled": false,
+    "bizcardRequest": 0,
+    "bizcardCompletionCount": 0,
+    "thankYouEmailSettings": "自動",
+    "createdAt": "2025-11-15T10:00:00+09:00",
+    "details": [
+        {
+            "type": "single_choice",
+            "text": "総合的な満足度を5段階で評価してください。",
+            "required": true,
+            "options": ["非常に満足", "満足", "普通", "不満", "非常に不満"]
+        },
+        {
+            "type": "matrix_single",
+            "text": "各機能の満足度をお聞かせください。",
+            "required": true,
+            "rows": ["機能A: デザイン", "機能B: 使いやすさ", "機能C: パフォーマンス"],
+            "columns": ["満足", "普通", "不満"]
+        },
+        {
+            "type": "number",
+            "text": "この製品を友人に勧める可能性を0〜10点で評価してください（10点が最も高い）。",
+            "required": true
+        },
+        {
+            "type": "free_text",
+            "text": "製品の最も気に入っている点を教えてください。",
+            "required": false
+        },
+        {
+            "type": "free_text",
+            "text": "製品について改善してほしい点を具体的に教えてください。",
+            "required": true
+        },
+        {
+            "type": "single_choice",
+            "text": "製品の利用頻度はどのくらいですか？",
+            "required": true,
+            "options": ["毎日", "週に数回", "週に1回", "月に数回", "それ以下"]
+        },
+        {
+            "type": "multi_choice",
+            "text": "製品を知ったきっかけは何ですか？（複数選択可）",
+            "required": false,
+            "options": ["インターネット広告", "SNS", "友人・知人の紹介", "雑誌・メディア", "その他"]
+        },
+        {
+            "type": "single_choice",
+            "text": "価格設定についてどう思いますか？",
+            "required": true,
+            "options": ["高い", "妥当", "安い"]
+        },
+        {
+            "type": "free_text",
+            "text": "他にどのような機能があれば良いと思いますか？",
+            "required": false
+        },
+        {
+            "type": "single_choice",
+            "text": "今後もこの製品を使い続けたいと思いますか？",
+            "required": true,
+            "options": ["はい", "いいえ", "わからない"]
+        }
+    ]
+}

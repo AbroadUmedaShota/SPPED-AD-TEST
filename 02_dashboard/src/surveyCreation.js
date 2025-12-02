@@ -1219,7 +1219,7 @@ async function initializePage() {
                 const surveyInfo = surveysList?.find(s => s.id === currentSurveyId) || null;
                 let enqueteDetails = null;
 
-                enqueteDetails = await fetchJson(resolveDemoDataPath(`surveys/${currentSurveyId}.json`));
+                enqueteDetails = await fetchJson(resolveDashboardDataPath(`demo_surveys/${currentSurveyId}.json`));
 
                 if (enqueteDetails) {
                     const questionGroups = mapEnqueteToQuestions(enqueteDetails);
