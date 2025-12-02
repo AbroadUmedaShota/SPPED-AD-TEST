@@ -12,6 +12,10 @@ import {
 } from './services/statusService.js';
 
 const surveyTableBody = document.getElementById('surveyTableBody');
+const surveyFetchErrorOverlay = document.getElementById('survey-fetch-error');
+const surveyFetchErrorDetail = document.getElementById('surveyFetchErrorDetail');
+const retryFetchButton = document.getElementById('retryFetchButton');
+const reloadPageButton = document.getElementById('reloadPageButton');
 let allSurveyData = []; // Stores all fetched survey data
 let currentGroupId = null; // Stores the currently selected group ID
 let currentFilteredData = []; // Data array: holds filtered and sorted data
@@ -44,6 +48,35 @@ const SURVEY_ID_DEFAULT_USER = '0001';
 const SURVEY_ID_MAX_SEQUENCE = 999;
 const HIDDEN_USER_STATUSES = new Set([USER_STATUSES.DELETED]);
 
+function showSurveyFetchError(fetchStats) {
+    if (surveyFetchErrorOverlay) {
+        if (surveyFetchErrorDetail && fetchStats) {
+            surveyFetchErrorDetail.textContent = `取得件数: 成功${fetchStats.successCount}件 / 失敗${fetchStats.failureCount}件。JSONへのアクセス設定をご確認ください。`;
+        }
+        surveyFetchErrorOverlay.classList.remove('hidden');
+    }
+}
+
+function hideSurveyFetchError() {
+    if (surveyFetchErrorOverlay) {
+        surveyFetchErrorOverlay.classList.add('hidden');
+    }
+}
+
+function setDefaultSortHeader() {
+    if (lastSortedHeader) return;
+    const idHeader = document.querySelector('.sortable-header[data-sort-key="id"]');
+    if (idHeader) {
+        idHeader.dataset.sortOrder = 'desc';
+        const icon = idHeader.querySelector('.sort-icon');
+        if (icon) {
+            icon.textContent = 'arrow_downward';
+            icon.classList.remove('opacity-40');
+            icon.classList.add('opacity-100');
+        }
+        lastSortedHeader = idHeader;
+    }
+}
 
 /**
  * 仕様に基づいてアンケートの表示ステータスを決定します。
@@ -59,12 +92,14 @@ export function getSurveyStatus(survey, referenceDate) {
 let lastSortedHeader = null; // Tracks the last header clicked for sorting
 
 /**
- * Fetches survey data from a JSON file.
- * @returns {Promise<Array>} A promise that resolves with an array of survey objects.
+ * Fetches survey data from JSON files with aggregated success/failure counts.
+ * @returns {Promise<{surveys: Array, fetchStats: { successCount: number, failureCount: number, totalCount: number }}>} A promise that resolves with survey objects and fetch stats.
  */
 export async function fetchSurveyData() {
     const loadingIndicator = document.getElementById('loading-indicator');
     if (loadingIndicator) loadingIndicator.classList.remove('hidden');
+
+    const fetchStats = { successCount: 0, failureCount: 0, totalCount: 0 };
 
     try {
         // Statically define the list of surveys to load, as we cannot list directory contents.
@@ -77,6 +112,7 @@ export async function fetchSurveyData() {
             'sv_0001_25056', 'sv_0001_25057', 'sv_0001_25058', 'sv_0001_25059', 'sv_0001_25060',
             'sv_0001_25061', 'sv_0001_25062'
         ];
+        fetchStats.totalCount = surveyIds.length;
         const surveyPromises = surveyIds.map(async id => {
             const primaryUrl = resolveDashboardDataPath(`demo_surveys/${id}.json`);
             const fallbackUrls = [
@@ -98,25 +134,56 @@ export async function fetchSurveyData() {
                         console.info(`Loaded survey ${id} from fallback URL: ${url}`);
                     }
 
-                    return await res.json();
+                    const survey = await res.json();
+                    fetchStats.successCount += 1;
+                    return survey;
                 } catch (error) {
                     console.warn(`Error loading survey from ${url}:`, error);
                 }
             }
 
             console.warn(`Could not load survey after trying all sources: ${id}`);
+            fetchStats.failureCount += 1;
             return null;
         });
         const allSurveys = await Promise.all(surveyPromises);
-        return allSurveys.filter(Boolean); // Filter out any null results
+        return { surveys: allSurveys.filter(Boolean), fetchStats }; // Filter out any null results
 
     } catch (error) {
         console.error('Error fetching survey data:', error);
-        showToast("アンケートデータの取得に失敗しました。", "error");
-        return [];
+        fetchStats.failureCount = fetchStats.totalCount || 0;
+        return { surveys: [], fetchStats };
     } finally {
         if (loadingIndicator) loadingIndicator.classList.add('hidden');
     }
+}
+
+async function loadAndRenderSurveyData({ suppressToastOnError = false } = {}) {
+    const { surveys, fetchStats } = await fetchSurveyData();
+
+    if (fetchStats.successCount === 0) {
+        showSurveyFetchError(fetchStats);
+        if (!suppressToastOnError) {
+            showToast('データ取得に失敗しました（JSONへのアクセスを確認してください）', 'error', 5000);
+        }
+        allSurveyData = [];
+        currentFilteredData = [];
+        applyFiltersAndPagination();
+        return { surveys, fetchStats };
+    }
+
+    hideSurveyFetchError();
+    const visibleSurveys = sanitizeSurveysForDisplay(surveys);
+    allSurveyData = sortSurveysByIdDesc(visibleSurveys);
+    currentFilteredData = [...allSurveyData];
+    setDefaultSortHeader();
+    applyFiltersAndPagination();
+
+    if (fetchStats.failureCount > 0) {
+        console.warn(`Survey fetch completed with partial failures. Success: ${fetchStats.successCount}, Failure: ${fetchStats.failureCount}`);
+    }
+
+    return { surveys, fetchStats };
 }
 
 /**
@@ -603,6 +670,17 @@ export function initTableManager() {
     const nextPageBtn = document.getElementById('nextPageBtn');
     const resetFiltersButton = document.getElementById('resetFiltersButton');
 
+    if (retryFetchButton) {
+        retryFetchButton.addEventListener('click', () => {
+            loadAndRenderSurveyData();
+        });
+    }
+    if (reloadPageButton) {
+        reloadPageButton.addEventListener('click', () => {
+            window.location.reload();
+        });
+    }
+
     // Table Sort Logic
     document.querySelectorAll('.sortable-header').forEach(header => {
         header.addEventListener('click', () => {
@@ -733,36 +811,14 @@ export function initTableManager() {
         allSurveyData = [];
         applyFiltersAndPagination();
     } else {
-        fetchSurveyData().then(data => {
-            const visibleSurveys = sanitizeSurveysForDisplay(data);
-            allSurveyData = sortSurveysByIdDesc(visibleSurveys);
-            currentFilteredData = [...allSurveyData];
-            
-            // ソートアイコンを更新
-            const idHeader = document.querySelector('.sortable-header[data-sort-key="id"]');
-            if (idHeader) {
-                idHeader.dataset.sortOrder = 'desc';
-                const icon = idHeader.querySelector('.sort-icon');
-                if (icon) {
-                    icon.textContent = 'arrow_downward';
-                    icon.classList.remove('opacity-40');
-                    icon.classList.add('opacity-100');
-                }
-                lastSortedHeader = idHeader;
-            }
-
-            applyFiltersAndPagination();
-        }).catch(error => {
-            console.error("DEBUG: Error during initial data fetch or rendering:", error);
+        loadAndRenderSurveyData().catch(error => {
+            console.error('DEBUG: Error during initial data fetch or rendering:', error);
         });
     }
 }
 
 export async function reloadSurveyData() {
-    const data = await fetchSurveyData();
-    const visibleSurveys = sanitizeSurveysForDisplay(data);
-    allSurveyData = sortSurveysByIdDesc(visibleSurveys);
-    applyFiltersAndPagination();
+    await loadAndRenderSurveyData();
 }
 
 export function updateSurveyData(updatedSurvey) {
