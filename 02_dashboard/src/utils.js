@@ -5,126 +5,120 @@ let activeUIsCount = 0; // Tracks number of active UI overlays (modals, mobile s
 const DEFAULT_DASHBOARD_ROOT = './';
 const DEFAULT_DATA_ROOT = './data';
 
-function resolveRelativeBaseFromUrl(url) {
-    const marker = '/02_dashboard/';
-    const pathname = url.pathname || '';
-    const markerIndex = pathname.lastIndexOf(marker);
-    if (markerIndex === -1) {
-        return null;
-    }
-
-    const subPath = pathname.slice(markerIndex + marker.length);
-    const segments = subPath.split('/').filter(Boolean);
-    if (segments.length <= 1) {
-        return './';
-    }
-
-    const depth = segments.length - 1;
-    return '../'.repeat(depth);
-}
-
 function joinRelativePath(base, relativePath) {
-    const cleanedBase = base ? base.replace(/\/+$/, '') : '';
-    const cleanedRelative = relativePath ? relativePath.replace(/^\/+/, '') : '';
+  const cleanedBase = base ? base.replace(/\/+$/, '') : '';
+  const cleanedRelative = relativePath ? relativePath.replace(/^\/+/, '') : '';
 
-    if (!cleanedBase && !cleanedRelative) {
-        return './';
-    }
+  if (!cleanedBase && !cleanedRelative) {
+    return './';
+  }
 
-    if (!cleanedBase) {
-        return `./${cleanedRelative}`;
-    }
+  if (!cleanedBase) {
+    return `./${cleanedRelative}`;
+  }
 
-    if (!cleanedRelative) {
-        return cleanedBase === '.' ? './' : cleanedBase;
-    }
+  if (!cleanedRelative) {
+    return cleanedBase === '.' ? './' : cleanedBase;
+  }
 
-    return `${cleanedBase}/${cleanedRelative}`;
+  return `${cleanedBase}/${cleanedRelative}`;
 }
 
-function resolveDataRootFromImportMeta() {
-    if (typeof import.meta === 'undefined' || !import.meta.url) {
-        return null;
+function resolveDashboardBasePathFromUrl(url) {
+  try {
+    const targetUrl = url.hostname === 'htmlpreview.github.io' && url.search
+      ? new URL(url.search.slice(1))
+      : url;
+
+    const pathname = targetUrl.pathname || '';
+    const marker = '/02_dashboard/';
+    const markerIndex = pathname.lastIndexOf(marker);
+    const basePath = markerIndex === -1 ? '' : pathname.slice(0, markerIndex);
+    const normalized = basePath.replace(/\/+$/, '');
+
+    if (!normalized && !pathname) {
+      return null;
     }
 
+    return normalized;
+  } catch (error) {
+    return null;
+  }
+}
+
+function resolveDashboardBasePath() {
+  if (typeof window !== 'undefined' && window.location) {
+    const basePath = resolveDashboardBasePathFromUrl(window.location);
+    if (basePath !== null) {
+      return basePath;
+    }
+  }
+
+  if (typeof import.meta !== 'undefined' && import.meta.url) {
     try {
-        const moduleUrl = new URL(import.meta.url);
-
-        if (moduleUrl.hostname === 'htmlpreview.github.io' && moduleUrl.search) {
-            const proxiedTarget = moduleUrl.search.slice(1);
-            if (proxiedTarget) {
-                const targetUrl = new URL(proxiedTarget);
-                const basePath = resolveRelativeBaseFromUrl(targetUrl);
-                if (basePath) {
-                    return joinRelativePath(basePath, 'data');
-                }
-            }
-        }
-        const basePath = resolveRelativeBaseFromUrl(moduleUrl);
-        if (basePath) {
-            return joinRelativePath(basePath, 'data');
-        }
+      const moduleUrl = new URL(import.meta.url);
+      const basePath = resolveDashboardBasePathFromUrl(moduleUrl);
+      if (basePath !== null) {
+        return basePath;
+      }
     } catch (error) {
-        // Fall back to window-based detection when parsing fails (older browsers or CSP constraints)
-        return null;
+      return null;
     }
+  }
+
+  return null;
 }
 
-const DASHBOARD_DATA_ROOT = resolveDataRootFromImportMeta();
+const DASHBOARD_BASE_PATH = resolveDashboardBasePath();
+const DASHBOARD_DATA_ROOT = DASHBOARD_BASE_PATH !== null ? `${DASHBOARD_BASE_PATH}/data` : null;
 
 function getDashboardRoot() {
-    if (typeof window === 'undefined' || !window.location) {
-        return DEFAULT_DASHBOARD_ROOT;
-    }
-    const basePath = resolveCommonBasePath();
-    return basePath || './';
+  if (typeof window === 'undefined' || !window.location) {
+    return DEFAULT_DASHBOARD_ROOT;
+  }
+  const basePath = resolveCommonBasePath();
+  return basePath || './';
 }
 
 function getDashboardDataRoot() {
-    if (typeof window !== 'undefined' && window.location) {
-        const basePath = resolveCommonBasePath();
-        const depth = (basePath.match(/\.{2}\//g) || []).length;
-        const repoRootBase = '../'.repeat(depth + 1);
-        return joinRelativePath(repoRootBase, 'data');
-    }
-    if (DASHBOARD_DATA_ROOT) {
-        return DASHBOARD_DATA_ROOT;
-    }
-    return DEFAULT_DATA_ROOT;
+  if (DASHBOARD_DATA_ROOT !== null) {
+    return DASHBOARD_DATA_ROOT;
+  }
+  return DEFAULT_DATA_ROOT;
 }
 
 function sanitizeRelativePath(relativePath) {
-    if (!relativePath) {
-        return '';
-    }
-    return relativePath.replace(/^\/+/, '');
+  if (!relativePath) {
+    return '';
+  }
+  return relativePath.replace(/^\/+/, '');
 }
 
 export function resolveDashboardDataPath(relativePath) {
-    const sanitized = sanitizeRelativePath(relativePath);
-    const root = getDashboardDataRoot();
-    return joinRelativePath(root, sanitized);
+  const sanitized = sanitizeRelativePath(relativePath);
+  const root = getDashboardDataRoot();
+  return joinRelativePath(root, sanitized);
 }
 
 export function resolveDashboardAssetPath(relativePath) {
-    const sanitized = sanitizeRelativePath(relativePath);
-    const root = getDashboardRoot();
-    return joinRelativePath(root, sanitized);
+  const sanitized = sanitizeRelativePath(relativePath);
+  const root = getDashboardRoot();
+  return joinRelativePath(root, sanitized);
 }
 
 export function resolveDemoDataPath(relativePath) {
-    const sanitized = sanitizeRelativePath(relativePath);
-    if (!sanitized) {
-        return getDashboardDataRoot();
-    }
+  const sanitized = sanitizeRelativePath(relativePath);
+  if (!sanitized) {
+    return getDashboardDataRoot();
+  }
 
-    const parts = sanitized.split('/');
-    if (parts.length > 0 && parts[0]) {
-        parts[0] = `demo_${parts[0]}`;
-    }
-    const newPath = parts.join('/');
-    const root = getDashboardDataRoot();
-    return joinRelativePath(root, newPath);
+  const parts = sanitized.split('/');
+  if (parts.length > 0 && parts[0]) {
+    parts[0] = `demo_${parts[0]}`;
+  }
+  const newPath = parts.join('/');
+  const root = getDashboardDataRoot();
+  return joinRelativePath(root, newPath);
 }
 
 /**
