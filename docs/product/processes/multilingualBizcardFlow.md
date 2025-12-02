@@ -67,7 +67,7 @@ flowchart TD
 
 4. **納品・ダウンロード**  
    - ステータスサービスが名刺データ化の進行度を多言語説明付きで表示（`02_dashboard/src/services/statusService.js:42-60`）。  
-   - Premium+ のみ多言語 CSV/Excel エクスポートと SLA 通知を有効化（`docs/product/specs/11_plan_feature_restrictions.md:11-134`）。  
+   - Premium+ のみ多言語 CSV/Excel エクスポートと SLA 通知を有効化し、出力列は「アンケートの回答言語」「名刺の入力言語」に統一（`docs/product/specs/11_plan_feature_restrictions.md:11-134`）。  
 
 ## 4. データモデルとバリデーション
 - **アンケート設定 (`survey.settings`)**: `bizcardEnabled`, `bizcardRequest`, `supportedLocales` などを保持。`supportedLocales` は回答 GUI の言語タブと名刺 OCR の判定基準になる（`docs/product/specs/02_survey_creation.md:64`）。  
@@ -117,7 +117,7 @@ flowchart TD
   - 対応方針: 待機リストに入ったデータに対して、管理者が手動で言語を再設定したり、入力対象から除外したりできる専用の管理画面を用意する。
 - **データ出力（CSV）への言語情報追加**  
   - 背景: 納品されるデータがどの言語で入力されたものかが不明だと、後工程でのデータ集計や分析が困難になる。  
-  - 対応方針: 最終的に出力されるアンケートの回答結果と名刺データの両方のCSVファイルに、それぞれのデータが「どの言語で入力されたか」を示す列を追加する。
+  - 対応方針: 最終的に出力されるアンケート回答CSV/名刺CSVの双方に「アンケートの回答言語」「名刺の入力言語」列を設け、回答言語はアンケート作成時の優先回答言語で初期化した値を保持する。
 
 ### 8.2 将来的に導入を検討すべき事項
 サービスの付加価値向上と運用コスト削減を目指し、中長期的に実装を検討する先進的な機能群。
@@ -142,7 +142,7 @@ flowchart TD
    - 回答 UI で利用するデフォルト回答言語 (`defaultAnswerLocale`) と、名刺アップロードモジュールが提示する推奨名刺言語 (`defaultBizcardLocale`) を保持する。
 2. **回答フェーズ**  
    - 回答画面のヘッダーで回答者が `answerLocale` を選択し、回答データに紐づけて保存する。  
-   - 名刺アップロード UI では、ユーザーが `bizcardLocaleSelection` を指定できる状態を維持し、選択値を名刺メタデータとして送信する。
+   - 名刺アップロード UI では、アンケート作成時の優先回答言語 (`defaultAnswerLocale`) を初期値として `bizcardLocaleSelection` をセットし、ユーザーが必要に応じて変更できる状態を維持する。選択値を名刺メタデータとして送信する。
 3. **OCR・言語判定フェーズ**  
    - 画像アップロード後に OCR サービスが `detectedLocale` と `confidence` を返却し、名刺メタデータへ書き込む。  
    - システムは `detectedLocale` と `survey.bizcard.supportedLocales` を突合し、閾値以上かつ対応言語であれば自動処理フローへ進める。  
@@ -181,7 +181,7 @@ flowchart TD
 - `survey_answers` : `answerLocale`, `responseId`, `submissionTimestamp`（既存）に加え、多言語設問のバインド情報。  
 - `bizcards` : `detectedLocale`, `finalBizcardLocale`, `confidence`, `ocrVersion`, `aiClassificationVersion`, `sourceAnswerId`。  
 - `manualReviewQueue` : `bizcardId`, `status`, `reason`, `assignedTo`, `lastActionAt`。  
-- `export_snapshots` : 回答・名刺データ双方の言語列 (`answer_locale`, `bizcard_locale`) と処理経路 (`processed_by`／`review_status`)。
+- `export_snapshots` : 回答・名刺データ双方の言語列（CSVの表示名は「アンケートの回答言語」「名刺の入力言語」）と処理経路 (`processed_by`／`review_status`)。
 
 ### 9.4 将来拡張の挿入ポイント
 - **AI入力支援**: 正規化フェーズの「AI項目分類」コンポーネントとして導入し、分類結果を `aiClassificationVersion` と紐づけてロールバック可能にする。  
