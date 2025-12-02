@@ -112,6 +112,24 @@
                             <p class="mt-4 text-on-surface-variant">読み込み中...</p>
                         </div>
                     </div>
+                    <div id="survey-fetch-error" class="absolute inset-0 bg-surface bg-opacity-95 flex items-center justify-center z-10 hidden">
+                        <div class="flex flex-col items-center text-center gap-4 max-w-md px-4">
+                            <div>
+                                <p class="text-lg font-semibold text-on-surface">アンケートデータの取得に失敗しました</p>
+                                <p id="surveyFetchErrorDetail" class="text-sm text-on-surface-variant mt-1">JSONへのアクセス設定を確認し、再読み込みを行ってください。</p>
+                            </div>
+                            <div class="flex flex-wrap gap-2 justify-center">
+                                <button id="retryFetchButton" class="flex items-center justify-center gap-2 rounded-full h-10 px-5 button-primary text-on-primary text-sm font-semibold leading-normal">
+                                    <span class="material-icons text-xl">refresh</span>
+                                    <span>データの再取得</span>
+                                </button>
+                                <button id="reloadPageButton" class="flex items-center justify-center gap-2 rounded-full h-10 px-5 bg-secondary-container text-on-secondary-container text-sm font-semibold leading-normal">
+                                    <span class="material-icons text-xl">restart_alt</span>
+                                    <span>ページをリロード</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                     <table class="w-full min-w-[900px] divide-y divide-outline-variant survey-table" id="surveyTable">
                         <thead class="bg-surface-variant">
                             <tr>
