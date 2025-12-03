@@ -33,6 +33,7 @@ import { initializePage as initSpeedReviewPage } from './speed-review.js'; // Im
 import { initGroupEditPage } from './groupEdit.js';
 import { initPasswordChange } from './password_change.js';
 import { initBugReportPage } from './bug-report.js';
+import { showConfirmationModal } from './confirmationModal.js';
 
 import { showToast, copyTextToClipboard, loadCommonHtml, resolveDashboardAssetPath } from './utils.js';
 
@@ -353,6 +354,48 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadCommonHtml('header-placeholder', 'common/header.html');
     await loadCommonHtml('sidebar-placeholder', 'common/sidebar.html', initSidebarHandler);
     await loadCommonHtml('footer-placeholder', 'common/footer.html');
+
+    // --- External Link Confirmation ---
+    // This runs after all common HTML is loaded, ensuring footer links are included.
+    const links = document.querySelectorAll('a');
+    const currentHost = window.location.hostname;
+
+    links.forEach(link => {
+        // Check if the link has an href, a hostname, and the hostname is different from the current host.
+        // Also checks that hostname is not empty, to avoid issues with file:/// protocol.
+        if (link.href && link.hostname && link.hostname !== currentHost) {
+            link.classList.add('external-link');
+            
+            // Ensure it opens in a new tab and is secure.
+            link.setAttribute('target', '_blank');
+            link.setAttribute('rel', 'noopener noreferrer');
+
+            // To prevent adding multiple listeners if this script were to run again, add a flag.
+            if (link.dataset.externalLinkChecked) {
+                return;
+            }
+            link.dataset.externalLinkChecked = 'true';
+
+            link.addEventListener('click', (event) => {
+                // Prevent the default link navigation
+                event.preventDefault();
+
+                // Show custom confirmation modal instead
+                showConfirmationModal(
+                    '外部サイトへ移動します。<br>よろしければ"進む"をクリックしてください<br>', // message
+                    () => { // onConfirm
+                        window.open(link.href, '_blank', 'noopener,noreferrer');
+                    },
+                    { // options
+                        title: '外部リンクの確認',
+                        confirmText: '進む',
+                        cancelText: 'キャンセル',
+                        url: link.href
+                    }
+                );
+            });
+        }
+    });
 
     // Initialize the language switcher after the header is loaded
     initLanguageSwitcher();

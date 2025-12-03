@@ -10,6 +10,7 @@ import { resolveDashboardAssetPath } from './utils.js';
  * @param {string} [options.confirmText='実行'] The text for the confirm button.
  * @param {string} [options.cancelText='キャンセル'] The text for the cancel button.
  * @param {boolean} [options.defaultCancel=true] If true, the cancel button is focused by default.
+ * @param {string|null} [options.url=null] An optional URL to display below the message.
  */
 export function showConfirmationModal(message, onConfirm, options = {}) {
     const {
@@ -17,7 +18,8 @@ export function showConfirmationModal(message, onConfirm, options = {}) {
         confirmText = '実行',
         cancelText = 'キャンセル',
         defaultCancel = true,
-        prompt = null // New option for input field
+        prompt = null, // New option for input field
+        url = null
     } = options;
 
     handleOpenModal('confirmationModal', resolveDashboardAssetPath('modals/confirmationModal.html'))
@@ -34,6 +36,7 @@ export function showConfirmationModal(message, onConfirm, options = {}) {
             // 変数宣言を一度にまとめる
             const titleEl = modal.querySelector('#confirmationModalTitle');
             const messageEl = modal.querySelector('#confirmationModalMessage');
+            const urlEl = modal.querySelector('#confirmationModalUrl');
             const inputContainer = modal.querySelector('#confirmationModalInputContainer');
             const confirmBtn = modal.querySelector('#confirmActionButton');
             const cancelBtn = modal.querySelector('[data-action="close"]');
@@ -47,7 +50,20 @@ export function showConfirmationModal(message, onConfirm, options = {}) {
             }
 
             if (titleEl) titleEl.textContent = title;
-            if (messageEl) messageEl.textContent = message;
+            if (messageEl) messageEl.innerHTML = message;
+            
+            // --- URL Display Logic ---
+            if (urlEl) {
+                if (url) {
+                    urlEl.textContent = url;
+                    urlEl.parentNode.style.display = ''; // Show the container
+                } else {
+                    urlEl.textContent = '';
+                    urlEl.parentNode.style.display = 'none'; // Hide the container
+                }
+            }
+            // --- End URL Display Logic ---
+
             if (confirmBtn) confirmBtn.textContent = confirmText;
             if (cancelBtn) cancelBtn.textContent = cancelText;
 
