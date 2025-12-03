@@ -39,6 +39,7 @@ flowchart TD
 ## データ保持（例）
 - `input_business_cards`: `detected_locale`, `detected_confidence`, `answer_language_hint`, `final_locale`, `routing_reason`, `source_answer_id`, `photo_1/2`.
 - `survey.settings`: `supportedLocales`, `defaultAnswerLocale`, `bizcard.supportedLocales`, `defaultBizcardLocale`.
+- エクスポート列: 回答CSV/名刺CSVともに「アンケートの回答言語」「名刺の入力言語」を持ち、`answer_language_hint` は後者の初期値（優先回答言語）として扱う。
 - 監査ログ: 誰がいつ `finalLocale` を補正したか（管理画面の再割当時に記録）。
 
 ## 運用・画面
