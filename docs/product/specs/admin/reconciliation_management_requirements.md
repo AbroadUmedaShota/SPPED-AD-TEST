@@ -15,7 +15,7 @@
 ## 1. 概要
 
 ### 1.1 目的
-本書は名刺データ照合タスクを管理する「照合管理」画面 (`03_admin/data-entry-management.html`) のレイアウト・機能要件を定義する。優先キューの把握、フィルタリング、タスク一覧のソート、ページネーションなどを明文化する。
+本書は名刺データ照合タスクを管理する「照合管理」画面 (`03_admin/reconciliation/index.html`) のレイアウト・機能要件を定義する。優先キューの把握、フィルタリング、タスク一覧のソート、ページネーションなどを明文化する。
 
 ### 1.2 背景
 照合業務では進捗や優先度別の残タスクを即時確認する必要があり、モックで実装されたUIを元に正式な要件を整理する。
@@ -30,25 +30,25 @@
 ## 2. 画面構成
 
 ### 2.1 ヘッダー
-- タイトル「照合管理」と右側に「一致判定ルール」ボタン、最終更新タイムスタンプを表示する。【F:03_admin/data-entry-management.html†L28-L35】
+- タイトル「照合管理」と右側に「一致判定ルール」ボタン、最終更新タイムスタンプを表示する。【F:03_admin/reconciliation/index.html†L28-L35】
 
 ### 2.2 KPIサマリ
-- 総件数、エスカレーション、ロック中、当日完了の4カードを表示し、`text-display-small` と色付きの数値で強調する。【F:03_admin/data-entry-management.html†L37-L60】
+- 総件数、エスカレーション、ロック中、当日完了の4カードを表示し、`text-display-small` と色付きの数値で強調する。【F:03_admin/reconciliation/index.html†L37-L60】
 
 ### 2.3 優先度別キュー
-- 「優先度キュー」と「グループ別残タスク」を2カラムで表示し、各リストは `bg-surface-variant/30` のカードとして構成する。オンデマンド〜通常の件数を表示する。【F:03_admin/data-entry-management.html†L61-L108】
+- 「優先度キュー」と「グループ別残タスク」を2カラムで表示し、各リストは `bg-surface-variant/30` のカードとして構成する。オンデマンド〜通常の件数を表示する。【F:03_admin/reconciliation/index.html†L61-L108】
 
 ### 2.4 フィルタフォーム
-- 「アンケート一覧」セクション上部に検索・ステータス・期間フィルタを提供する。期間フィルタは Flatpickr を利用した日付選択UIとし、開始・終了を並列配置する。【F:03_admin/data-entry-management.html†L109-L160】
-- フィルターリセットボタンを右下に配置する。【F:03_admin/data-entry-management.html†L137-L160】
+- 「アンケート一覧」セクション上部に検索・ステータス・期間フィルタを提供する。期間フィルタは Flatpickr を利用した日付選択UIとし、開始・終了を並列配置する。【F:03_admin/reconciliation/index.html†L109-L160】
+- フィルターリセットボタンを右下に配置する。【F:03_admin/reconciliation/index.html†L137-L160】
 
 ### 2.5 一覧テーブル
-- テーブル列: アンケート名、ステータス、納品期日、オプション、総件数、一致、不一致、進捗、操作。【F:03_admin/data-entry-management.html†L161-L203】
-- 各列ヘッダーに `sortable-header` クラスと `data-sort-key` 属性を付与し、昇降順切替アイコンを表示する。【F:03_admin/data-entry-management.html†L165-L178】
+- テーブル列: アンケート名、ステータス、納品期日、オプション、総件数、一致、不一致、進捗、操作。【F:03_admin/reconciliation/index.html†L161-L203】
+- 各列ヘッダーに `sortable-header` クラスと `data-sort-key` 属性を付与し、昇降順切替アイコンを表示する。【F:03_admin/reconciliation/index.html†L165-L178】
 - テーブル本体は `tbody#reconciliation-table-body` をJSで描画する。
 
 ### 2.6 ページネーション
-- 下部に表示件数セレクトとページ切替ボタン群を配置し、1ページあたり10/25/50件を選択可能とする。【F:03_admin/data-entry-management.html†L204-L230】
+- 下部に表示件数セレクトとページ切替ボタン群を配置し、1ページあたり10/25/50件を選択可能とする。【F:03_admin/reconciliation/index.html†L204-L230】
 
 ---
 
@@ -129,3 +129,4 @@
 - WebSocket によるリアルタイム残件更新。
 - 優先度キューのドラッグ＆ドロップによる再配列機能。
 - エスカレーション連携のアラート表示と Slack 通知統合。
+
