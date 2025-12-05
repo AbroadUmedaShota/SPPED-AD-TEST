@@ -224,7 +224,8 @@ function renderPerformanceChart(type) {
 // Function to fetch data
 async function fetchData() {
     try {
-        const response = await fetch('../../data/admin/data_entry_status.json');
+        const basePath = window.location.pathname.includes('/SPPED-AD-TEST/') ? '/SPPED-AD-TEST' : '';
+        const response = await fetch(`${basePath}/data/admin/data_entry_status.json`);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
