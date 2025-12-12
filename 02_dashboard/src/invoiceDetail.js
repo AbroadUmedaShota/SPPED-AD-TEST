@@ -124,9 +124,7 @@ function renderInvoiceDetail(invoice) {
   setText('corporate-name', `${invoice.corporateName ?? '-'} 御中`);
   setText('contact-person', `${invoice.contactPerson ?? '-'} 様`);
 
-  updateStatusBadge(invoice.status);
   toggleNotes(invoice.notes);
-  togglePrintAvailability(invoice.status);
 }
 
 function renderInvoiceSheet(invoice) {
@@ -327,13 +325,6 @@ function describeAddOns(addOns) {
   }).join(' / ');
 }
 
-function updateStatusBadge(status) {
-  const badgeContainer = document.getElementById('invoice-status-badge');
-  if (!badgeContainer) return;
-  const config = STATUS_CONFIG[status] ?? { label: '不明', classes: 'bg-neutral-200 text-neutral-700' };
-  badgeContainer.innerHTML = `<span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${config.classes}">${config.label}</span>`;
-}
-
 function toggleNotes(notes) {
   const section = document.getElementById('invoice-notes-section');
   const paragraph = document.getElementById('invoice-notes');
@@ -348,21 +339,5 @@ function toggleNotes(notes) {
   }
 }
 
-// NOTE: togglePrintAvailability removed or merged? Original code had it.
-// Re-adding it to be safe, though not explicitly in replacement chunk above.
-// Wait, I am replacing `renderInvoiceDetail` and below.
-// I should make sure I include all helper functions if I am replacing the end of the file.
-// The `replacementContent` starts from `renderInvoiceDetail` call in `loadInvoiceDetail`.
 
-function togglePrintAvailability(status) {
-  const printButton = document.getElementById('printInvoiceBtn');
-  if (!printButton) return;
-  if (status === 'canceled') {
-    printButton.setAttribute('disabled', 'true');
-    printButton.classList.add('opacity-60', 'cursor-not-allowed');
-  } else {
-    printButton.removeAttribute('disabled');
-    printButton.classList.remove('opacity-60', 'cursor-not-allowed');
-  }
-}
 

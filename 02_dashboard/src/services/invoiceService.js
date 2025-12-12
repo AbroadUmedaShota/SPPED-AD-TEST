@@ -48,9 +48,25 @@ export async function fetchInvoiceById(id) {
 
       // Merge logic
       const base = filtered[0];
+
+      // Generate formatted ID: YY-UID(5)-SEQ(3)
+      // Example: 25-00002-001
+      const d = new Date(base.issueDate);
+      const yy = d.getFullYear().toString().slice(-2);
+      const accNum = base.accountId ? base.accountId.replace(/\D/g, '') : '0';
+      const uid = accNum.padStart(5, '0');
+
+      // Attempt to extract sequence from original ID (INV-YYYY-MM-SEQ)
+      const idParts = base.invoiceId.split('-');
+      const seq = idParts.length > 0 && !isNaN(idParts[idParts.length - 1])
+        ? idParts[idParts.length - 1]
+        : '001';
+
+      const formattedId = `${yy}-${uid}-${seq}`;
+
       const merged = {
         ...base,
-        invoiceId: filtered[0].invoiceId,
+        invoiceId: formattedId,
         items: [],
         totalAmount: 0,
         subtotalTaxable: 0,
@@ -101,6 +117,19 @@ export async function fetchInvoiceById(id) {
   if (invoice) {
     const totals = calculateInvoiceTotals(invoice.items);
     Object.assign(invoice, totals);
+
+    // Format ID for display: YY-UID(5)-SEQ(3)
+    const d = new Date(invoice.issueDate);
+    const yy = d.getFullYear().toString().slice(-2);
+    const accNum = invoice.accountId ? invoice.accountId.replace(/\D/g, '') : '0';
+    const uid = accNum.padStart(5, '0');
+    const idParts = invoice.invoiceId.split('-');
+    const seq = idParts.length > 0 && !isNaN(idParts[idParts.length - 1])
+      ? idParts[idParts.length - 1]
+      : '001';
+
+    invoice.invoiceId = `${yy}-${uid}-${seq}`;
+
     return invoice;
   }
   return null;

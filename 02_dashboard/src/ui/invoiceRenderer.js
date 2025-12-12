@@ -158,117 +158,81 @@ function createInvoiceCard(invoice) {
   accent.setAttribute('aria-hidden', 'true');
   card.appendChild(accent);
 
+  /* Wrapper with compressed vertical spacing */
   const wrapper = document.createElement('div');
-  wrapper.className = 'flex flex-col gap-6';
+  wrapper.className = 'flex flex-col gap-3 py-2'; // Reduced gap
   card.appendChild(wrapper);
 
+  /* --- HEADER ROW: Date & ID/Type --- */
   const headerRow = document.createElement('div');
-  headerRow.className = 'flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between';
+  headerRow.className = 'flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between';
   wrapper.appendChild(headerRow);
 
-  const headingBlock = document.createElement('div');
-  headingBlock.className = 'flex flex-col gap-1';
-  headerRow.appendChild(headingBlock);
+  /* Left: Billing Month & Period */
+  const dateBlock = document.createElement('div');
+  headerRow.appendChild(dateBlock);
 
   const billingMonth = document.createElement('p');
-  billingMonth.className = 'text-xl font-semibold text-on-background tracking-tight';
+  billingMonth.className = 'text-lg font-bold text-on-background tracking-tight leading-snug';
   billingMonth.textContent = formatBillingMonth(invoice?.issueDate);
-  headingBlock.appendChild(billingMonth);
+  dateBlock.appendChild(billingMonth);
 
   const periodText = formatBillingPeriod(invoice?.billingPeriod);
   if (periodText) {
     const period = document.createElement('p');
-    period.className = 'text-xs font-medium text-on-surface-variant';
-    period.textContent = `対象期間 ${periodText}`;
-    headingBlock.appendChild(period);
+    period.className = 'text-xs text-on-surface-variant mt-0.5';
+    period.textContent = periodText;
+    dateBlock.appendChild(period);
   }
 
-  /* Create Badges Container */
-  const badgesContainer = document.createElement('div');
-  badgesContainer.className = 'flex items-center gap-2';
-  headerRow.appendChild(badgesContainer);
+  /* Right: Invoice ID & Type Badge */
+  const metaBlock = document.createElement('div');
+  metaBlock.className = 'flex items-center gap-3 mt-1 sm:mt-0';
+  headerRow.appendChild(metaBlock);
 
-  /* Plan Badge (Standard/Premium) */
-  const planBadge = document.createElement('span');
-  planBadge.className = 'invoice-plan-badge';
+  // Invoice Number
+  const invoiceNum = document.createElement('span');
+  invoiceNum.className = 'text-xs font-mono text-on-surface-variant tracking-wide';
+  invoiceNum.textContent = invoice?.displayId ?? invoice?.invoiceId ?? '-';
+  metaBlock.appendChild(invoiceNum);
+
+  // Type Badge (Group/Personal) - Logic simplified as per request
   const planCode = resolvePlanCode(invoice);
-
-  // Determine Plan Text/Style
-  let planText = 'スタンダード';
-  let isPremium = false;
+  let typeText = '個人';
+  let typeClasses = ['bg-sky-50', 'text-sky-700', 'border-sky-100']; // Lighter/Subtle
 
   if (planCode === 'GROUP' || planCode === 'PREMIUM' || planCode === 'PREMIUM_PLUS') {
-    planText = 'プレミアム';
-    isPremium = true;
-  }
-
-  if (isPremium) {
-    planBadge.classList.add('invoice-plan-badge--premium');
-  } else {
-    planBadge.classList.add('invoice-plan-badge--standard');
-  }
-  planBadge.textContent = planText;
-  badgesContainer.appendChild(planBadge);
-
-  /* Type Badge (Personal/Group) */
-  const typeBadge = document.createElement('span');
-  typeBadge.className = 'invoice-plan-badge border';
-
-  let typeText = '個人';
-  let typeClasses = ['bg-sky-100', 'text-sky-800', 'border-sky-200'];
-
-  if (planCode === 'GROUP') {
     typeText = 'グループ';
-    typeClasses = ['bg-indigo-100', 'text-indigo-800', 'border-indigo-200'];
-  } else if (planCode === 'PERSONAL') {
-    typeText = '個人'; // Default
-    typeClasses = ['bg-sky-100', 'text-sky-800', 'border-sky-200'];
-  } else {
-    // Logic for non-aggregated fallback
-    if (isPremium) {
-      typeText = 'グループ';
-      typeClasses = ['bg-indigo-100', 'text-indigo-800', 'border-indigo-200'];
-    } else {
-      typeText = '個人';
-      typeClasses = ['bg-sky-100', 'text-sky-800', 'border-sky-200'];
-    }
+    typeClasses = ['bg-indigo-50', 'text-indigo-700', 'border-indigo-100'];
   }
 
+  const typeBadge = document.createElement('span');
+  typeBadge.className = 'inline-flex items-center rounded border px-2 py-0.5 text-xs font-medium';
   typeBadge.classList.add(...typeClasses);
   typeBadge.textContent = typeText;
-  badgesContainer.appendChild(typeBadge);
+  metaBlock.appendChild(typeBadge);
 
-  const metadataGrid = document.createElement('div');
-  metadataGrid.className = 'grid gap-4 sm:grid-cols-2';
-  wrapper.appendChild(metadataGrid);
 
-  const invoiceLine = createMetadataItem('請求書番号', invoice?.displayId ?? invoice?.invoiceId ?? '-');
-  metadataGrid.appendChild(invoiceLine);
+  /* --- BODY ROW: Amount Only --- */
+  const bodyRow = document.createElement('div');
+  bodyRow.className = 'flex items-end justify-end mt-2 pt-2 border-t border-dashed border-outline-variant/50';
+  wrapper.appendChild(bodyRow);
 
-  const recipient = createMetadataItem('請求先', resolveBillingRecipient(invoice));
-  metadataGrid.appendChild(recipient);
+  // Amount
+  const amountDiv = document.createElement('div');
+  amountDiv.className = 'text-right';
+  bodyRow.appendChild(amountDiv);
 
-  const actionContainer = document.createElement('div');
-  actionContainer.className = 'flex items-center';
-  wrapper.appendChild(actionContainer);
+  const amountLabel = document.createElement('span');
+  amountLabel.className = 'text-[10px] text-on-surface-variant mr-1';
+  amountLabel.textContent = '請求額(税込)';
+  amountDiv.appendChild(amountLabel);
 
-  const detailButton = document.createElement('button');
-  detailButton.type = 'button';
-  detailButton.className = 'inline-flex items-center gap-1 rounded-full bg-transparent px-0 text-sm font-semibold text-primary transition hover:underline';
-  detailButton.textContent = '詳細を見る';
-  if (invoice?.invoiceId) {
-    detailButton.dataset.invoiceId = invoice.invoiceId;
-  }
-  detailButton.addEventListener('click', (event) => {
-    event.stopPropagation();
-    navigateToInvoiceDetail(invoice?.invoiceId);
-  });
-  const chevron = document.createElement('span');
-  chevron.className = 'material-icons text-base text-primary opacity-80 transition group-hover:translate-x-0.5 group-hover:opacity-100';
-  chevron.setAttribute('aria-hidden', 'true');
-  chevron.textContent = 'chevron_right';
-  detailButton.appendChild(chevron);
-  actionContainer.appendChild(detailButton);
+  const amountVal = document.createElement('span');
+  amountVal.className = 'text-xl font-bold text-on-background tracking-tight';
+  amountVal.textContent = `¥ ${(invoice?.totalAmount || 0).toLocaleString()}`;
+  amountDiv.appendChild(amountVal);
+
 
   card.addEventListener('click', () => {
     navigateToInvoiceDetail(invoice?.invoiceId);

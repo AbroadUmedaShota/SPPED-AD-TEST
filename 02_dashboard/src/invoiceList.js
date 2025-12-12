@@ -114,7 +114,18 @@ function aggregateInvoices(invoices) {
     group.originalInvoices.push(inv);
 
     if (group.originalInvoices.length > 0) {
-      group.displayId = group.originalInvoices[0].invoiceId;
+      const base = group.originalInvoices[0];
+      const d = new Date(base.issueDate);
+      const yy = d.getFullYear().toString().slice(-2);
+      const accNum = base.accountId ? base.accountId.replace(/\D/g, '') : '0';
+      const uid = accNum.padStart(5, '0');
+
+      const idParts = base.invoiceId.split('-');
+      const seq = idParts.length > 0 && !isNaN(idParts[idParts.length - 1])
+        ? idParts[idParts.length - 1]
+        : '001';
+
+      group.displayId = `${yy}-${uid}-${seq}`;
     }
 
     // Status logic: If any invoice in the group is 'overdue', group is overdue.
