@@ -20,11 +20,13 @@
     "totalAmount": 11000,
     "status": "unpaid",
     "bankInfo": {
-      "bankName": "三都銀行",
-      "branchName": "渋谷支店",
+      "bankName": "三井住友銀行",
+      "bankCode": "0009",
+      "branchName": "小岩支店",
+      "branchCode": "643",
       "accountType": "普通",
-      "accountNumber": "1234567",
-      "accountHolder": "カニスピード株式会社"
+      "accountNumber": "7128447",
+      "accountHolder": "アブロードアウトソーシング株式会社"
     },
     "notes": null,
     "items": [
@@ -69,11 +71,13 @@
     "totalAmount": 55000,
     "status": "paid",
     "bankInfo": {
-      "bankName": "央海UFJ銀行",
-      "branchName": "品川支店",
+      "bankName": "三井住友銀行",
+      "bankCode": "0009",
+      "branchName": "小岩支店",
+      "branchCode": "643",
       "accountType": "普通",
-      "accountNumber": "7654321",
-      "accountHolder": "カニスピード株式会社"
+      "accountNumber": "7128447",
+      "accountHolder": "アブロードアウトソーシング株式会社"
     },
     "notes": "2025-09-15 入金済み",
     "items": [
@@ -108,6 +112,178 @@
         "unit": "ユーザー",
         "unitPrice": 3333,
         "amount": 10000,
+        "taxable": true
+      },
+      {
+        "itemName": "追加ストレージ (100GB)",
+        "description": "データ保存容量追加",
+        "quantity": 1,
+        "unit": "OP",
+        "unitPrice": 5000,
+        "amount": 5000
+      },
+      {
+        "itemName": "API連携オプション",
+        "description": "外部システム連携機能",
+        "quantity": 1,
+        "unit": "OP",
+        "unitPrice": 15000,
+        "amount": 15000
+      },
+      {
+        "itemName": "SMS送信パック",
+        "description": "500通パック",
+        "quantity": 1,
+        "unit": "PK",
+        "unitPrice": 7500,
+        "amount": 7500
+      },
+      {
+        "itemName": "メール配信オプション",
+        "description": "Proプラン",
+        "quantity": 1,
+        "unit": "OP",
+        "unitPrice": 8000,
+        "amount": 8000
+      },
+      {
+        "itemName": "IPアドレス制限機能",
+        "description": "セキュリティ強化",
+        "quantity": 1,
+        "unit": "OP",
+        "unitPrice": 2000,
+        "amount": 2000
+      },
+      {
+        "itemName": "月次レポート作成代行",
+        "description": "8月度分析レポート",
+        "quantity": 1,
+        "unit": "式",
+        "unitPrice": 20000,
+        "amount": 20000
+      },
+      {
+        "itemName": "スポットコンサルティング",
+        "description": "運用改善MTG (1H)",
+        "quantity": 2,
+        "unit": "H",
+        "unitPrice": 15000,
+        "amount": 30000
+      },
+      {
+        "itemName": "LP制作費 (秋キャンペーン)",
+        "description": "デザイン・コーディング",
+        "quantity": 1,
+        "unit": "式",
+        "unitPrice": 150000,
+        "amount": 150000
+      },
+      {
+        "itemName": "バナー制作費",
+        "description": "リサイズ展開 (3サイズ)",
+        "quantity": 3,
+        "unit": "点",
+        "unitPrice": 5000,
+        "amount": 15000
+      },
+      {
+        "itemName": "ドメイン維持管理費",
+        "description": "年次更新",
+        "quantity": 1,
+        "unit": "年",
+        "unitPrice": 12000,
+        "amount": 12000
+      },
+      {
+        "itemName": "SSL証明書オプション",
+        "description": "企業認証SSL",
+        "quantity": 1,
+        "unit": "月",
+        "unitPrice": 3000,
+        "amount": 3000
+      },
+      {
+        "itemName": "バックアップオプション",
+        "description": "日次・7世代保存",
+        "quantity": 1,
+        "unit": "月",
+        "unitPrice": 4000,
+        "amount": 4000
+      },
+      {
+        "itemName": "SSO連携機能",
+        "description": "SAML認証連携",
+        "quantity": 1,
+        "unit": "月",
+        "unitPrice": 5000,
+        "amount": 5000
+      },
+      {
+        "itemName": "監査ログ出力オプション",
+        "description": "ログ保存期間延長",
+        "quantity": 1,
+        "unit": "月",
+        "unitPrice": 2000,
+        "amount": 2000
+      },
+      {
+        "itemName": "優先サポートオプション",
+        "description": "営業時間外緊急対応",
+        "quantity": 1,
+        "unit": "月",
+        "unitPrice": 30000,
+        "amount": 30000
+      },
+      {
+        "itemName": "データクレンジング作業",
+        "description": "名寄せ処理",
+        "quantity": 1,
+        "unit": "式",
+        "unitPrice": 50000,
+        "amount": 50000
+      },
+      {
+        "itemName": "アカウント設定変更代行",
+        "description": "一括登録作業",
+        "quantity": 1,
+        "unit": "式",
+        "unitPrice": 10000,
+        "amount": 10000
+      },
+      {
+        "itemName": "専用サーバー利用料",
+        "description": "ハイパフォーマンス構成",
+        "quantity": 1,
+        "unit": "月",
+        "unitPrice": 80000,
+        "amount": 80000,
+        "taxable": true
+      },
+      {
+        "itemName": "ロードバランサー利用料",
+        "description": "負荷分散装置",
+        "quantity": 1,
+        "unit": "月",
+        "unitPrice": 5000,
+        "amount": 5000,
+        "taxable": true
+      },
+      {
+        "itemName": "WAF利用料",
+        "description": "Webアプリケーションファイアウォール",
+        "quantity": 1,
+        "unit": "月",
+        "unitPrice": 10000,
+        "amount": 10000,
+        "taxable": true
+      },
+      {
+        "itemName": "CDN配信料",
+        "description": "転送量 500GB",
+        "quantity": 1,
+        "unit": "式",
+        "unitPrice": 8000,
+        "amount": 8000,
         "taxable": true
       }
     ]
@@ -146,11 +322,13 @@
     "totalAmount": 105600,
     "status": "overdue",
     "bankInfo": {
-      "bankName": "東都信用金庫",
-      "branchName": "神田支店",
+      "bankName": "三井住友銀行",
+      "bankCode": "0009",
+      "branchName": "小岩支店",
+      "branchCode": "643",
       "accountType": "普通",
-      "accountNumber": "5544332",
-      "accountHolder": "カニスピード株式会社"
+      "accountNumber": "7128447",
+      "accountHolder": "アブロードアウトソーシング株式会社"
     },
     "notes": "9月30日時点で入金未確認。営業チームによるフォロー予定。",
     "items": [
@@ -221,11 +399,13 @@
     "totalAmount": 11000,
     "status": "paid",
     "bankInfo": {
-      "bankName": "三都銀行",
-      "branchName": "渋谷支店",
+      "bankName": "三井住友銀行",
+      "bankCode": "0009",
+      "branchName": "小岩支店",
+      "branchCode": "643",
       "accountType": "普通",
-      "accountNumber": "1234567",
-      "accountHolder": "カニスピード株式会社"
+      "accountNumber": "7128447",
+      "accountHolder": "アブロードアウトソーシング株式会社"
     },
     "notes": null,
     "items": [
@@ -270,11 +450,13 @@
     "totalAmount": 409200,
     "status": "unpaid",
     "bankInfo": {
-      "bankName": "央海UFJ銀行",
-      "branchName": "品川支店",
-      "accountType": "当座",
-      "accountNumber": "9988776",
-      "accountHolder": "カニスピード株式会社"
+      "bankName": "三井住友銀行",
+      "bankCode": "0009",
+      "branchName": "小岩支店",
+      "branchCode": "643",
+      "accountType": "普通",
+      "accountNumber": "7128447",
+      "accountHolder": "アブロードアウトソーシング株式会社"
     },
     "notes": "年額一括請求。12 ヶ月分を前倒し計上。",
     "items": [
@@ -330,11 +512,13 @@
     "totalAmount": 57200,
     "status": "canceled",
     "bankInfo": {
-      "bankName": "東都信用金庫",
-      "branchName": "神田支店",
+      "bankName": "三井住友銀行",
+      "bankCode": "0009",
+      "branchName": "小岩支店",
+      "branchCode": "643",
       "accountType": "普通",
-      "accountNumber": "5544332",
-      "accountHolder": "カニスピード株式会社"
+      "accountNumber": "7128447",
+      "accountHolder": "アブロードアウトソーシング株式会社"
     },
     "notes": "契約解約に伴い請求取消（2025-10-20）",
     "items": [

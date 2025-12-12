@@ -72,7 +72,7 @@ function createPlanBadge(invoice) {
 
   const planCode = resolvePlanCode(invoice);
   const normalizedLabel = typeof label === 'string' ? label.trim() : '';
-  const isPremiumPlan = planCode === 'PREMIUM' || planCode === 'PREMIUM_PLUS' || normalizedLabel.includes('プレミアム');
+  const isPremiumPlan = planCode === 'PREMIUM' || planCode === 'PREMIUM_PLUS' || planCode === 'GROUP' || normalizedLabel.includes('プレミアム');
   if (isPremiumPlan) {
     badge.classList.add('invoice-plan-badge--premium');
   } else {
@@ -146,7 +146,7 @@ function navigateToInvoiceDetail(invoiceId) {
 function createInvoiceCard(invoice) {
   const card = document.createElement('li');
   card.className = 'invoice-card group cursor-pointer';
-  
+
   if (invoice?.invoiceId) {
     card.dataset.invoiceId = invoice.invoiceId;
   }
@@ -183,14 +183,66 @@ function createInvoiceCard(invoice) {
     headingBlock.appendChild(period);
   }
 
-  const planBadge = createPlanBadge(invoice);
-  headerRow.appendChild(planBadge);
+  /* Create Badges Container */
+  const badgesContainer = document.createElement('div');
+  badgesContainer.className = 'flex items-center gap-2';
+  headerRow.appendChild(badgesContainer);
+
+  /* Plan Badge (Standard/Premium) */
+  const planBadge = document.createElement('span');
+  planBadge.className = 'invoice-plan-badge';
+  const planCode = resolvePlanCode(invoice);
+
+  // Determine Plan Text/Style
+  let planText = 'スタンダード';
+  let isPremium = false;
+
+  if (planCode === 'GROUP' || planCode === 'PREMIUM' || planCode === 'PREMIUM_PLUS') {
+    planText = 'プレミアム';
+    isPremium = true;
+  }
+
+  if (isPremium) {
+    planBadge.classList.add('invoice-plan-badge--premium');
+  } else {
+    planBadge.classList.add('invoice-plan-badge--standard');
+  }
+  planBadge.textContent = planText;
+  badgesContainer.appendChild(planBadge);
+
+  /* Type Badge (Personal/Group) */
+  const typeBadge = document.createElement('span');
+  typeBadge.className = 'invoice-plan-badge border';
+
+  let typeText = '個人';
+  let typeClasses = ['bg-sky-100', 'text-sky-800', 'border-sky-200'];
+
+  if (planCode === 'GROUP') {
+    typeText = 'グループ';
+    typeClasses = ['bg-indigo-100', 'text-indigo-800', 'border-indigo-200'];
+  } else if (planCode === 'PERSONAL') {
+    typeText = '個人'; // Default
+    typeClasses = ['bg-sky-100', 'text-sky-800', 'border-sky-200'];
+  } else {
+    // Logic for non-aggregated fallback
+    if (isPremium) {
+      typeText = 'グループ';
+      typeClasses = ['bg-indigo-100', 'text-indigo-800', 'border-indigo-200'];
+    } else {
+      typeText = '個人';
+      typeClasses = ['bg-sky-100', 'text-sky-800', 'border-sky-200'];
+    }
+  }
+
+  typeBadge.classList.add(...typeClasses);
+  typeBadge.textContent = typeText;
+  badgesContainer.appendChild(typeBadge);
 
   const metadataGrid = document.createElement('div');
   metadataGrid.className = 'grid gap-4 sm:grid-cols-2';
   wrapper.appendChild(metadataGrid);
 
-  const invoiceLine = createMetadataItem('請求書番号', invoice?.invoiceId ?? '-');
+  const invoiceLine = createMetadataItem('請求書番号', invoice?.displayId ?? invoice?.invoiceId ?? '-');
   metadataGrid.appendChild(invoiceLine);
 
   const recipient = createMetadataItem('請求先', resolveBillingRecipient(invoice));

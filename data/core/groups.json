@@ -1,14 +1,30 @@
 [
   {
     "id": "GROUP001",
-    "name": "営業部"
+    "accountId": "ACC-003",
+    "name": "営業部",
+    "billing": {
+      "type": "creator",
+      "creatorId": "user3@example.com"
+    }
   },
   {
     "id": "GROUP002",
-    "name": "マーケティング部"
+    "accountId": "ACC-004",
+    "name": "マーケティング部",
+    "billing": {
+      "type": "group",
+      "corporateName": "マーケティング部 請求先",
+      "contactPerson": "鈴木 三郎 様"
+    }
   },
   {
     "id": "GROUP003",
-    "name": "BPO部"
+    "accountId": "ACC-008",
+    "name": "BPO部",
+    "billing": {
+      "type": "creator",
+      "creatorId": "user5@example.com"
+    }
   }
 ]
