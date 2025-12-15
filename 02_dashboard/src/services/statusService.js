@@ -181,6 +181,7 @@ export function deriveSurveyStatus(survey, referenceDate = new Date()) {
   if (!survey) return USER_STATUSES.POST_PERIOD;
 
   const now = normalizeDate(referenceDate) || normalizeDate(new Date());
+  const bypassDownloadDeadline = coerceBoolean(survey?.bypassDownloadDeadline);
 
   if (survey.status === '削除済み') {
     return USER_STATUSES.DELETED;
@@ -213,7 +214,7 @@ export function deriveSurveyStatus(survey, referenceDate = new Date()) {
   }
 
   const downloadDeadline = computeDownloadDeadline(periodEnd, survey.downloadDeadline || survey.deadline);
-  if (downloadDeadline && now.getTime() > downloadDeadline.getTime()) {
+  if (!bypassDownloadDeadline && downloadDeadline && now.getTime() > downloadDeadline.getTime()) {
     return USER_STATUSES.DOWNLOAD_CLOSED;
   }
 
@@ -234,6 +235,7 @@ export function deriveSurveyLifecycleMeta(survey, referenceDate = new Date()) {
   const periodStart = parseISODate(survey?.periodStart);
   const periodEnd = parseISODate(survey?.periodEnd);
   const downloadDeadlineDate = computeDownloadDeadline(periodEnd, survey?.downloadDeadline || survey?.deadline);
+  const bypassDownloadDeadline = coerceBoolean(survey?.bypassDownloadDeadline);
 
   const status = deriveSurveyStatus(survey, now || undefined);
   const statusMeta = getStatusMetadata(status);
@@ -251,7 +253,9 @@ export function deriveSurveyLifecycleMeta(survey, referenceDate = new Date()) {
     completionDate,
     completionDateLabel: formatDate(completionDate),
     requiresDataConversion: dataConversionTarget,
-    isDownloadable: Boolean(statusMeta.canDownload) && (!downloadDeadlineDate || !now || now.getTime() <= downloadDeadlineDate.getTime()),
+    isDownloadable: Boolean(statusMeta.canDownload) && (
+      bypassDownloadDeadline || !downloadDeadlineDate || !now || now.getTime() <= downloadDeadlineDate.getTime()
+    ),
     dataConversionCompleted
   };
 }

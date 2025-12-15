@@ -110,7 +110,8 @@ export async function fetchSurveyData() {
             'sv_0001_25044', 'sv_0001_25045', 'sv_0001_25047', 'sv_0001_25049', 'sv_0001_25050',
             'sv_0001_25051', 'sv_0001_25052', 'sv_0001_25053', 'sv_0001_25054', 'sv_0001_25055',
             'sv_0001_25056', 'sv_0001_25057', 'sv_0001_25058', 'sv_0001_25059', 'sv_0001_25060',
-            'sv_0001_25061', 'sv_0001_25062', 'sv_0001_25063', 'sv_0001_25064', 'sv_0001_25065'
+            'sv_0001_25061', 'sv_0001_25062', 'sv_0001_25063', 'sv_0001_25064', 'sv_0001_25065',
+            'sv_0001_99099'
         ];
         fetchStats.totalCount = surveyIds.length;
         const surveyPromises = surveyIds.map(async id => {
@@ -263,11 +264,11 @@ function renderTableRows(surveysToRender) {
         const downloadButton = row.querySelector('button[title="データダウンロード"]');
         if (downloadButton) {
             if (lifecycleMeta.isDownloadable) {
-                downloadButton.classList.remove('opacity-50', 'pointer-events-none', 'cursor-not-allowed');
+                downloadButton.classList.remove('opacity-50', 'cursor-not-allowed');
                 downloadButton.removeAttribute('aria-disabled');
                 downloadButton.title = 'データダウンロード';
             } else {
-                downloadButton.classList.add('opacity-50', 'pointer-events-none', 'cursor-not-allowed');
+                downloadButton.classList.add('opacity-50', 'cursor-not-allowed');
                 downloadButton.setAttribute('aria-disabled', 'true');
                 downloadButton.title = statusTitle;
             }
@@ -292,6 +293,13 @@ function renderTableRows(surveysToRender) {
             downloadButton.addEventListener('click', (e) => {
                 e.stopPropagation();
                 if (!lifecycleMeta.isDownloadable) {
+                    if (lifecycleMeta.status === USER_STATUSES.DOWNLOAD_CLOSED) {
+                        handleOpenModal(
+                            'downloadExpiredModal',
+                            resolveDashboardAssetPath('modals/downloadExpiredModal.html')
+                        );
+                        return;
+                    }
                     showToast('名刺データは現在ダウンロードできません。', 'info');
                     return;
                 }
