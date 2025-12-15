@@ -1,0 +1,49 @@
+{
+    "id": "sv_0001_99099",
+    "groupId": "GROUP-DEMO",
+    "name": {
+        "ja": "機能確認用アンケート",
+        "en": "Feature Verification Survey"
+    },
+    "displayTitle": {
+        "ja": "機能確認用アンケート",
+        "en": "Feature Verification Survey"
+    },
+    "description": {
+        "ja": "ダウンロード期限の動作確認に用いる特別なアンケートです。",
+        "en": "A special survey for validating download expiry behavior."
+    },
+    "memo": "ダウンロード期限を無視する特例設定付き。",
+    "status": "データ精査完了",
+    "answerCount": 12,
+    "realtimeAnswers": 0,
+    "periodStart": "2024-01-01",
+    "periodEnd": "2024-01-31",
+    "dataCompletionDate": "2024-02-05",
+    "plan": "Standard",
+    "deadline": "2024-03-31",
+    "bypassDownloadDeadline": true,
+    "bizcardEnabled": true,
+    "bizcardRequest": 15,
+    "bizcardCompletionCount": 15,
+    "thankYouEmailSettings": "自動送信",
+    "details": [
+        {
+            "id": "q1",
+            "text": "Q.01_確認担当者名",
+            "type": "free_text"
+        },
+        {
+            "id": "q2",
+            "text": "Q.02_確認目的",
+            "type": "single_choice",
+            "options": ["リリース確認", "デモ", "QA検証", "その他"]
+        },
+        {
+            "id": "q3",
+            "text": "Q.03_備考",
+            "type": "free_text"
+        }
+    ],
+    "createdAt": "2024-01-01T00:00:00+09:00"
+}
