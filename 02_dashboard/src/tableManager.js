@@ -302,18 +302,7 @@ function renderTableRows(surveysToRender) {
         if (downloadButton) {
             downloadButton.addEventListener('click', (e) => {
                 e.stopPropagation();
-                if (!lifecycleMeta.isDownloadable) {
-                    if (lifecycleMeta.status === USER_STATUSES.DOWNLOAD_CLOSED) {
-                        handleOpenModal(
-                            'downloadExpiredModal',
-                            resolveDashboardAssetPath('modals/downloadExpiredModal.html')
-                        );
-                        return;
-                    }
-                    showToast('名刺データは現在ダウンロードできません。', 'info');
-                    return;
-                }
-                openDownloadModal('answer', survey.periodStart, survey.periodEnd);
+                openDownloadModal(survey);
             });
         }
 
@@ -853,7 +842,6 @@ export function updateSurveyData(updatedSurvey) {
     }
     applyFiltersAndPagination(); // Re-apply filters and pagination to update table
 }
-
 
 
 
