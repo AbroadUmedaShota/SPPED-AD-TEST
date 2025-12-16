@@ -132,15 +132,6 @@ function openNewSurveyModalWithSetup(afterOpen) {
             { input: periodRangeInput, error: periodRangeError }
         ];
 
-        // ... other imports ...
-
-        // ...
-
-        const helpMessages = {
-            surveyName: '社内向けの管理名称です。回答者には表示されません。',
-            displayTitle: '回答者に表示されるタイトルです。イベント名等、外部向けの名称を設定してください。'
-        };
-
         // Initialize help popovers (Unified method)
         /*
          * Note: The popover content is now defined directly in the HTML (newSurveyModal.html).
@@ -472,7 +463,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         openNewSurveyModalBtn.addEventListener('click', () => {
             // This check prevents the generic listener from firing if the tutorial is active
             if (!document.getElementById('tutorial-svg-overlay')) {
-                handleOpenModal('newSurveyModal', resolveDashboardAssetPath('modals/newSurveyModal.html'));
+                openNewSurveyModalWithSetup();
             }
         });
     }
