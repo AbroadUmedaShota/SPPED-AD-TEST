@@ -91,6 +91,31 @@ export function getSurveyStatus(survey, referenceDate) {
 
 let lastSortedHeader = null; // Tracks the last header clicked for sorting
 
+async function fetchSurveyIds() {
+    const surveyListUrl = resolveDashboardDataPath('data/surveys/survey_list.json');
+    try {
+        const response = await fetch(surveyListUrl);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const surveyList = await response.json();
+        return surveyList.survey_ids;
+    } catch (error) {
+        console.warn('Could not fetch remote survey list, falling back to static list.', error);
+        // Static fallback list
+        return [
+            'sv_0001_25019', 'sv_0001_25020', 'sv_0001_25022', 'sv_0001_25023', 'sv_0001_25024',
+            'sv_0001_25025', 'sv_0001_25026', 'sv_0001_25027', 'sv_0001_25028', 'sv_0001_25031',
+            'sv_0001_25032', 'sv_0001_25035', 'sv_0001_25039', 'sv_0001_25040', 'sv_0001_25043',
+            'sv_0001_25044', 'sv_0001_25045', 'sv_0001_25047', 'sv_0001_25049', 'sv_0001_25050',
+            'sv_0001_25051', 'sv_0001_25052', 'sv_0001_25053', 'sv_0001_25054', 'sv_0001_25055',
+            'sv_0001_25056', 'sv_0001_25057', 'sv_0001_25058', 'sv_0001_25059', 'sv_0001_25060',
+            'sv_0001_25061', 'sv_0001_25062', 'sv_0001_25063', 'sv_0001_25064', 'sv_0001_25065',
+            'sv_0001_99099'
+        ];
+    }
+}
+
 /**
  * Fetches survey data from JSON files with aggregated success/failure counts.
  * @returns {Promise<{surveys: Array, fetchStats: { successCount: number, failureCount: number, totalCount: number }}>} A promise that resolves with survey objects and fetch stats.
@@ -102,17 +127,9 @@ export async function fetchSurveyData() {
     const fetchStats = { successCount: 0, failureCount: 0, totalCount: 0 };
 
     try {
-        // Statically define the list of surveys to load, as we cannot list directory contents.
-        const surveyIds = [
-            'sv_0001_25019', 'sv_0001_25020', 'sv_0001_25022', 'sv_0001_25023', 'sv_0001_25024',
-            'sv_0001_25025', 'sv_0001_25026', 'sv_0001_25027', 'sv_0001_25028', 'sv_0001_25031',
-            'sv_0001_25032', 'sv_0001_25035', 'sv_0001_25039', 'sv_0001_25040', 'sv_0001_25043',
-            'sv_0001_25044', 'sv_0001_25045', 'sv_0001_25047', 'sv_0001_25049', 'sv_0001_25050',
-            'sv_0001_25051', 'sv_0001_25052', 'sv_0001_25053', 'sv_0001_25054', 'sv_0001_25055',
-            'sv_0001_25056', 'sv_0001_25057', 'sv_0001_25058', 'sv_0001_25059', 'sv_0001_25060',
-            'sv_0001_25061', 'sv_0001_25062', 'sv_0001_25063', 'sv_0001_25064', 'sv_0001_25065'
-        ];
+        const surveyIds = await fetchSurveyIds();
         fetchStats.totalCount = surveyIds.length;
+        
         const surveyPromises = surveyIds.map(async id => {
             const primaryUrl = resolveDashboardDataPath(`demo_surveys/${id}.json`);
             const fallbackUrls = [
@@ -262,9 +279,15 @@ function renderTableRows(surveysToRender) {
 
         const downloadButton = row.querySelector('button[title="データダウンロード"]');
         if (downloadButton) {
-            downloadButton.classList.remove('opacity-50', 'pointer-events-none', 'cursor-not-allowed');
-            downloadButton.removeAttribute('aria-disabled');
-            downloadButton.title = 'データダウンロード';
+            if (lifecycleMeta.isDownloadable) {
+                downloadButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                downloadButton.removeAttribute('aria-disabled');
+                downloadButton.title = 'データダウンロード';
+            } else {
+                downloadButton.classList.add('opacity-50', 'cursor-not-allowed');
+                downloadButton.setAttribute('aria-disabled', 'true');
+                downloadButton.title = statusTitle;
+            }
         }
 
         fragment.appendChild(row);
@@ -285,7 +308,18 @@ function renderTableRows(surveysToRender) {
         if (downloadButton) {
             downloadButton.addEventListener('click', (e) => {
                 e.stopPropagation();
-                openDownloadModal(survey);
+                if (!lifecycleMeta.isDownloadable) {
+                    if (lifecycleMeta.status === USER_STATUSES.DOWNLOAD_CLOSED) {
+                        handleOpenModal(
+                            'downloadExpiredModal',
+                            resolveDashboardAssetPath('modals/downloadExpiredModal.html')
+                        );
+                        return;
+                    }
+                    showToast('名刺データは現在ダウンロードできません。', 'info');
+                    return;
+                }
+                openDownloadModal('answer', survey.periodStart, survey.periodEnd);
             });
         }
 
@@ -825,6 +859,7 @@ export function updateSurveyData(updatedSurvey) {
     }
     applyFiltersAndPagination(); // Re-apply filters and pagination to update table
 }
+
 
 
 

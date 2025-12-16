@@ -20,5 +20,140 @@ export async function fetchInvoices() {
  */
 export async function fetchInvoiceById(id) {
   const invoices = await fetchInvoices();
-  return invoices.find(invoice => invoice.invoiceId === id) ?? null;
+
+  // Check for Aggregated ID
+  if (id.startsWith('AGG-')) {
+    const parts = id.split('-');
+    // AGG-YYYYMM-TYPE (TYPE might be GROUP or PERSONAL)
+    // Actually parts length might be 3: ['AGG', '202509', 'GROUP']
+    if (parts.length === 3) {
+      const targetMonth = parts[1]; // YYYYMM
+      const targetType = parts[2]; // GROUP or PERSONAL
+
+      const filtered = invoices.filter(inv => {
+        if (!inv.issueDate) return false;
+        const d = new Date(inv.issueDate);
+        if (isNaN(d.getTime())) return false;
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const mKey = `${yyyy}${mm}`;
+
+        const isGroup = inv.plan?.code !== 'STANDARD';
+        const tKey = isGroup ? 'GROUP' : 'PERSONAL';
+
+        return mKey === targetMonth && tKey === targetType;
+      });
+
+      if (filtered.length === 0) return null;
+
+      // Merge logic
+      const base = filtered[0];
+
+      // Generate formatted ID: YY-UID(5)-SEQ(3)
+      // Example: 25-00002-001
+      const d = new Date(base.issueDate);
+      const yy = d.getFullYear().toString().slice(-2);
+      const accNum = base.accountId ? base.accountId.replace(/\D/g, '') : '0';
+      const uid = accNum.padStart(5, '0');
+
+      // Attempt to extract sequence from original ID (INV-YYYY-MM-SEQ)
+      const idParts = base.invoiceId.split('-');
+      const seq = idParts.length > 0 && !isNaN(idParts[idParts.length - 1])
+        ? idParts[idParts.length - 1]
+        : '001';
+
+      const formattedId = `${yy}-${uid}-${seq}`;
+
+      const merged = {
+        ...base,
+        invoiceId: formattedId,
+        items: [],
+        totalAmount: 0,
+        subtotalTaxable: 0,
+        subtotalNonTaxable: 0,
+        tax: 0,
+        plan: {
+          code: targetType === 'GROUP' ? 'GROUP' : 'PERSONAL',
+          displayName: targetType === 'GROUP' ? 'Group' : 'Personal'
+        }
+      };
+
+      filtered.forEach((inv, index) => {
+        // Recalculate totals for this individual invoice first
+        const totals = calculateInvoiceTotals(inv.items);
+        Object.assign(inv, totals);
+
+        merged.items = merged.items.concat(inv.items || []);
+
+        // Add Subtotal row
+        merged.items.push({
+          isSubtotal: true,
+          itemName: '',
+          description: '小計',
+          quantity: null,
+          unitPrice: null,
+          amount: inv.totalAmount
+        });
+
+        merged.totalAmount += (inv.totalAmount || 0);
+        merged.subtotalTaxable += (inv.subtotalTaxable || 0);
+        merged.subtotalNonTaxable += (inv.subtotalNonTaxable || 0);
+        merged.tax += (inv.tax || 0);
+      });
+
+      // Re-calculate status if mixed? keeping simple: use base status or override if needed.
+      // invoiceList logic prioritized overdue. Let's replicate simple check.
+      const statuses = filtered.map(i => i.status);
+      if (statuses.includes('overdue')) merged.status = 'overdue';
+      else if (statuses.includes('unpaid')) merged.status = 'unpaid';
+      else if (statuses.every(s => s === 'canceled')) merged.status = 'canceled';
+      else merged.status = 'paid';
+
+      return merged;
+    }
+  }
+
+  const invoice = invoices.find(invoice => invoice.invoiceId === id);
+  if (invoice) {
+    const totals = calculateInvoiceTotals(invoice.items);
+    Object.assign(invoice, totals);
+
+    // Format ID for display: YY-UID(5)-SEQ(3)
+    const d = new Date(invoice.issueDate);
+    const yy = d.getFullYear().toString().slice(-2);
+    const accNum = invoice.accountId ? invoice.accountId.replace(/\D/g, '') : '0';
+    const uid = accNum.padStart(5, '0');
+    const idParts = invoice.invoiceId.split('-');
+    const seq = idParts.length > 0 && !isNaN(idParts[idParts.length - 1])
+      ? idParts[idParts.length - 1]
+      : '001';
+
+    invoice.invoiceId = `${yy}-${uid}-${seq}`;
+
+    return invoice;
+  }
+  return null;
+}
+
+function calculateInvoiceTotals(items) {
+  let subtotalTaxable = 0;
+  let subtotalNonTaxable = 0;
+
+  (items || []).forEach(item => {
+    if (item.isSpacer || item.isSubtotal) return;
+
+    // Use item.amount if available, otherwise calculate
+    const amount = item.amount ?? ((item.unitPrice || 0) * (item.quantity || 0));
+
+    if (item.taxable) {
+      subtotalTaxable += amount;
+    } else {
+      subtotalNonTaxable += amount;
+    }
+  });
+
+  const tax = Math.floor(subtotalTaxable * 0.1);
+  const totalAmount = subtotalTaxable + subtotalNonTaxable + tax;
+
+  return { subtotalTaxable, subtotalNonTaxable, tax, totalAmount };
 }

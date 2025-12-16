@@ -1,5 +1,6 @@
 [
   {
+    "accountId": "ACC-001",
     "email": "user1@example.com",
     "companyName": "株式会社A",
     "departmentName": "営業部",
@@ -21,6 +22,7 @@
     "billingBuildingFloor": ""
   },
   {
+    "accountId": "ACC-002",
     "email": "user2@example.com",
     "companyName": "合同会社B",
     "departmentName": "開発部",
@@ -34,14 +36,15 @@
     "billingAddressType": "different",
     "billingCompanyName": "請求先会社B",
     "billingDepartmentName": "経理部",
-    "billingLastName": "請求",
-    "billingFirstName": "担当",
+    "billingLastName": "佐藤",
+    "billingFirstName": "次郎",
     "billingPhoneNumber": "03-9999-0011",
     "billingPostalCode": "101-0001",
     "billingAddress": "東京都千代田区神田",
     "billingBuildingFloor": "請求ビル 5F"
   },
   {
+    "accountId": "ACC-006",
     "email": "user3@example.com",
     "companyName": "株式会社C",
     "departmentName": "マーケティング部",
@@ -63,6 +66,7 @@
     "billingBuildingFloor": ""
   },
   {
+    "accountId": "ACC-005",
     "email": "user4@example.com",
     "companyName": "有限会社D",
     "departmentName": "人事部",
@@ -76,14 +80,15 @@
     "billingAddressType": "different",
     "billingCompanyName": "請求先会社D",
     "billingDepartmentName": "経理部",
-    "billingLastName": "請求",
-    "billingFirstName": "担当",
+    "billingLastName": "田中",
+    "billingFirstName": "一郎",
     "billingPhoneNumber": "03-9999-0022",
     "billingPostalCode": "101-0002",
     "billingAddress": "東京都千代田区神田駿河台",
     "billingBuildingFloor": "請求ビル 8F"
   },
   {
+    "accountId": "ACC-007",
     "email": "user5@example.com",
     "companyName": "株式会社E",
     "departmentName": "総務部",

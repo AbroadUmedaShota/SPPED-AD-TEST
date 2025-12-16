@@ -137,12 +137,19 @@ function handleResizeForSidebar() {
  * Sets the active state for the current page in the sidebar navigation.
  */
 function setActiveSidebarLink() {
-    const currentPage = window.location.pathname.split('/').pop();
+    const normalizedCurrentPath = window.location.pathname.replace(/\/index\.html$/, '/');
     const sidebarLinks = document.querySelectorAll('.admin-sidebar .nav-link');
-    
+
     sidebarLinks.forEach(link => {
-        const linkPage = link.getAttribute('href').split('/').pop();
-        if (linkPage === currentPage) {
+        link.classList.remove('active');
+
+        const href = link.getAttribute('href');
+        if (!href) {
+            return;
+        }
+
+        const linkPath = new URL(href, window.location.href).pathname.replace(/\/index\.html$/, '/');
+        if (linkPath === normalizedCurrentPath) {
             link.classList.add('active');
         }
     });
