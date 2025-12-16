@@ -279,15 +279,9 @@ function renderTableRows(surveysToRender) {
 
         const downloadButton = row.querySelector('button[title="データダウンロード"]');
         if (downloadButton) {
-            if (lifecycleMeta.isDownloadable) {
-                downloadButton.classList.remove('opacity-50', 'cursor-not-allowed');
-                downloadButton.removeAttribute('aria-disabled');
-                downloadButton.title = 'データダウンロード';
-            } else {
-                downloadButton.classList.add('opacity-50', 'cursor-not-allowed');
-                downloadButton.setAttribute('aria-disabled', 'true');
-                downloadButton.title = statusTitle;
-            }
+            downloadButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            downloadButton.removeAttribute('aria-disabled');
+            downloadButton.title = 'データダウンロード';
         }
 
         fragment.appendChild(row);
@@ -859,7 +853,6 @@ export function updateSurveyData(updatedSurvey) {
     }
     applyFiltersAndPagination(); // Re-apply filters and pagination to update table
 }
-
 
 
 
