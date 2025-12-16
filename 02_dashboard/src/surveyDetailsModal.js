@@ -227,7 +227,7 @@ function handleSaveSurvey() {
 
 function handleDetailDownload() {
     if (currentEditingSurvey) {
-        openDownloadModal('answer', currentEditingSurvey.periodStart, currentEditingSurvey.periodEnd);
+        openDownloadModal(currentEditingSurvey);
     } else {
         showToast('ダウンロードするアンケート情報がありません。', 'error');
     }

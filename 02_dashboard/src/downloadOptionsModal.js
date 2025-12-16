@@ -1,8 +1,12 @@
 import { handleOpenModal, closeModal } from './modalHandler.js';
-import { resolveDashboardAssetPath } from './utils.js';
+import { resolveDashboardAssetPath, showToast } from './utils.js';
+import { deriveSurveyLifecycleMeta, USER_STATUSES } from './services/statusService.js';
 
 const DEFAULT_START_TIME = '00:00';
 const DEFAULT_END_TIME = '24:00';
+
+let currentSurvey = null;
+let currentOptionStates = null;
 
 let currentSurveyPeriod = {
     startDate: '',
@@ -10,6 +14,184 @@ let currentSurveyPeriod = {
     startDefaultDate: '',
     endDefaultDate: ''
 }; // Stores survey specific period for date picker limits
+
+function safeNumber(value) {
+    if (typeof value === 'number') {
+        return Number.isFinite(value) ? value : 0;
+    }
+    if (typeof value === 'string' && value.trim() !== '') {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : 0;
+    }
+    return 0;
+}
+
+function summarizeDownloadState(optionStates) {
+    const availability = Object.values(optionStates).map(option => Boolean(option.isAvailable));
+    const allUnavailable = availability.every(isAvailable => !isAvailable);
+    const anyUnavailable = availability.some(isAvailable => !isAvailable);
+
+    if (allUnavailable) {
+        return '現在ダウンロードできるデータがありません。';
+    }
+    if (anyUnavailable) {
+        return 'ダウンロードできないデータがあります。理由をご確認ください。';
+    }
+    return 'ダウンロードするデータを選択してください。';
+}
+
+function computeOptionStates(survey) {
+    const lifecycleMeta = deriveSurveyLifecycleMeta(survey);
+
+    const answerCount = safeNumber(survey?.answerCount);
+    const realtimeAnswers = safeNumber(survey?.realtimeAnswers);
+    const totalAnswers = answerCount + realtimeAnswers;
+
+    const bizcardEnabled = Boolean(survey?.bizcardEnabled);
+    const bizcardRequested = safeNumber(survey?.bizcardRequest);
+    const bizcardCompleted = safeNumber(survey?.bizcardCompletionCount);
+
+    const isDownloadClosed = lifecycleMeta.status === USER_STATUSES.DOWNLOAD_CLOSED;
+
+    const answer = {
+        isAvailable: totalAnswers > 0,
+        reason: totalAnswers > 0 ? '' : '回答がないためダウンロードできません。',
+        meta: `回答数: ${answerCount}${realtimeAnswers > 0 ? ` (+${realtimeAnswers})` : ''}件`
+    };
+
+    let imageReason = '';
+    if (!bizcardEnabled) {
+        imageReason = '名刺機能を利用していないためダウンロードできません。';
+    } else if (bizcardRequested <= 0) {
+        imageReason = '名刺画像が登録されていないためダウンロードできません。';
+    } else if (isDownloadClosed) {
+        imageReason = 'ダウンロード期限を過ぎたためダウンロードできません。';
+    }
+    const image = {
+        isAvailable: bizcardEnabled && bizcardRequested > 0 && !isDownloadClosed,
+        reason: imageReason,
+        meta: bizcardEnabled ? `名刺登録: ${bizcardRequested}件` : '名刺機能: 利用しない'
+    };
+
+    let businessCardReason = '';
+    if (!bizcardEnabled) {
+        businessCardReason = '名刺機能を利用していないためダウンロードできません。';
+    } else if (bizcardRequested <= 0) {
+        businessCardReason = '名刺が登録されていないためダウンロードできません。';
+    } else if (isDownloadClosed) {
+        businessCardReason = 'ダウンロード期限を過ぎたためダウンロードできません。';
+    } else if (lifecycleMeta.status === USER_STATUSES.DATA_PROCESSING) {
+        businessCardReason = '名刺データがまだ準備できていません。しばらくしてから再度お試しください。';
+    } else if (lifecycleMeta.status === USER_STATUSES.PRE_PERIOD || lifecycleMeta.status === USER_STATUSES.IN_PERIOD) {
+        businessCardReason = '会期終了後に名刺データが準備されます。';
+    } else if (lifecycleMeta.status === USER_STATUSES.POST_PERIOD) {
+        businessCardReason = '名刺データ化対象外のためダウンロードできません。';
+    } else if (bizcardCompleted <= 0) {
+        businessCardReason = '名刺データが存在しないためダウンロードできません。';
+    } else if (!lifecycleMeta.isDownloadable) {
+        businessCardReason = '名刺データがまだ準備できていません。しばらくしてから再度お試しください。';
+    }
+
+    const businessCard = {
+        isAvailable: bizcardEnabled && bizcardRequested > 0 && bizcardCompleted > 0 && lifecycleMeta.isDownloadable,
+        reason: businessCardReason,
+        meta: bizcardEnabled
+            ? `名刺データ化完了: ${bizcardCompleted}件 / 名刺登録: ${bizcardRequested}件`
+            : '名刺機能: 利用しない'
+    };
+
+    return {
+        lifecycleMeta,
+        optionStates: {
+            answer,
+            business_card: businessCard,
+            image
+        }
+    };
+}
+
+function applyStatusBadge(modal, optionKey, optionState) {
+    const badge = modal.querySelector(`[data-download-status="${optionKey}"]`);
+    if (!badge) return;
+
+    badge.textContent = optionState.isAvailable ? '利用可能' : '利用不可';
+    badge.className = `text-xs mt-2 px-2 py-0.5 rounded-full ${optionState.isAvailable ? 'bg-green-100 text-green-800' : 'bg-rose-100 text-rose-700'}`;
+    if (!optionState.isAvailable && optionState.reason) {
+        badge.setAttribute('title', optionState.reason);
+    } else {
+        badge.removeAttribute('title');
+    }
+}
+
+function getSelectedDownloadType() {
+    const selected = document.querySelector('input[name="download_type"]:checked');
+    return selected?.value || '';
+}
+
+function updateDownloadButtonState(modal) {
+    const downloadBtn = modal.querySelector('#downloadSubmitBtn');
+    if (!downloadBtn) return;
+
+    const selectedType = getSelectedDownloadType();
+    const selectedState = selectedType && currentOptionStates ? currentOptionStates[selectedType] : null;
+    const canDownload = Boolean(selectedState?.isAvailable);
+
+    downloadBtn.disabled = !canDownload;
+    downloadBtn.setAttribute('aria-disabled', canDownload ? 'false' : 'true');
+    downloadBtn.classList.toggle('opacity-50', !canDownload);
+    downloadBtn.classList.toggle('cursor-not-allowed', !canDownload);
+
+    const typeMessageEl = modal.querySelector('#downloadOptionsTypeMessage');
+    if (typeMessageEl) {
+        const message = selectedState && !selectedState.isAvailable ? selectedState.reason : '';
+        typeMessageEl.textContent = message || '';
+        typeMessageEl.classList.toggle('hidden', !message);
+    }
+}
+
+function renderDownloadOptionsModal() {
+    const modal = document.getElementById('downloadOptionsModal');
+    if (!modal) return;
+
+    const summaryMessageEl = modal.querySelector('#downloadOptionsSummaryMessage');
+    const deadlineMessageEl = modal.querySelector('#downloadOptionsDeadlineMessage');
+
+    if (!currentSurvey) {
+        if (summaryMessageEl) summaryMessageEl.textContent = 'ダウンロードするアンケート情報がありません。';
+        if (deadlineMessageEl) deadlineMessageEl.classList.add('hidden');
+
+        const unavailableState = { isAvailable: false, reason: 'ダウンロードするアンケート情報がありません。', meta: '' };
+        applyStatusBadge(modal, 'answer', unavailableState);
+        applyStatusBadge(modal, 'business_card', unavailableState);
+        applyStatusBadge(modal, 'image', unavailableState);
+        currentOptionStates = { answer: unavailableState, business_card: unavailableState, image: unavailableState };
+        updateDownloadButtonState(modal);
+        return;
+    }
+
+    const { lifecycleMeta, optionStates } = computeOptionStates(currentSurvey);
+    currentOptionStates = optionStates;
+
+    if (summaryMessageEl) {
+        summaryMessageEl.textContent = summarizeDownloadState(optionStates);
+    }
+
+    if (deadlineMessageEl) {
+        const deadlineLabel = lifecycleMeta.downloadDeadlineLabel;
+        if (deadlineLabel && Boolean(currentSurvey.bizcardEnabled)) {
+            deadlineMessageEl.textContent = `名刺データのダウンロード期限: ${deadlineLabel}`;
+            deadlineMessageEl.classList.remove('hidden');
+        } else {
+            deadlineMessageEl.classList.add('hidden');
+        }
+    }
+
+    applyStatusBadge(modal, 'answer', optionStates.answer);
+    applyStatusBadge(modal, 'business_card', optionStates.business_card);
+    applyStatusBadge(modal, 'image', optionStates.image);
+
+    updateDownloadButtonState(modal);
+}
 
 /**
  * Updates the visual state of selection cards within a group.
@@ -38,10 +220,29 @@ function initializeDownloadOptionsModal() {
         console.warn('Download Options Modal not found for initialization.');
         return;
     }
+    const alreadyBound = modal.dataset.bound === 'true';
 
     const downloadForm = modal.querySelector('form');
-    if (downloadForm) {
-        downloadForm.addEventListener('change', handleDownloadFormChange);
+    if (downloadForm && !alreadyBound) {
+        downloadForm.addEventListener('change', (event) => {
+            handleDownloadFormChange(event);
+            renderDownloadOptionsModal();
+        });
+        downloadForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const selectedType = getSelectedDownloadType();
+            const optionState = selectedType && currentOptionStates ? currentOptionStates[selectedType] : null;
+            if (!selectedType) {
+                showToast('ダウンロードするデータを選択してください。', 'error');
+                return;
+            }
+            if (!optionState?.isAvailable) {
+                showToast(optionState?.reason || '現在ダウンロードできません。', 'info');
+                renderDownloadOptionsModal();
+                return;
+            }
+            showToast('データダウンロード機能は未実装です。', 'info');
+        });
     }
 
     // Setup selection cards
@@ -49,18 +250,22 @@ function initializeDownloadOptionsModal() {
     selectionGroups.forEach(group => {
         // Set initial state
         updateSelectionCards(group);
-        // Add event listener for changes
-        group.addEventListener('change', () => updateSelectionCards(group));
+        // Add event listener for changes (bind once)
+        if (!alreadyBound) {
+            group.addEventListener('change', () => updateSelectionCards(group));
+        }
     });
 
     const closeBtn = modal.querySelector('#closeDownloadOptionsModalBtn');
-    if (closeBtn) {
+    if (closeBtn && !alreadyBound) {
         closeBtn.addEventListener('click', () => closeModal('downloadOptionsModal'));
     }
     const cancelBtn = modal.querySelector('#cancelDownloadBtn');
-    if (cancelBtn) {
+    if (cancelBtn && !alreadyBound) {
         cancelBtn.addEventListener('click', () => closeModal('downloadOptionsModal'));
     }
+
+    modal.dataset.bound = 'true';
 }
 
 function handleDownloadFormChange(event) {
@@ -129,25 +334,20 @@ function initializeDatepickers() {
 }
 
 /**
- * Opens the download options modal, pre-selects a download type, and sets date limits.
- * @param {string} initialSelection Initial radio button to select ('answer', 'image', 'business_card', 'both').
- * @param {string} periodStart Start date for the survey period (YYYY-MM-DD).
- * @param {string} periodEnd End date for the survey period (YYYY-MM-DD).
+ * Opens the download options modal and renders availability/reasons based on survey data.
+ * @param {object | null} survey Survey object.
  */
-export async function openDownloadModal(initialSelection, periodStart = '', periodEnd = '') {
+export async function openDownloadModal(survey) {
     await handleOpenModal('downloadOptionsModal', resolveDashboardAssetPath('modals/downloadOptionsModal.html'));
+
+    currentSurvey = survey || null;
 
     // Set checked states before initializing
     const periodAllRadio = document.getElementById('period_all');
     if (periodAllRadio) periodAllRadio.checked = true;
 
-    const initialRadio = document.getElementById(`download_${initialSelection}`);
-    if (initialRadio) {
-        initialRadio.checked = true;
-    } else {
-        const defaultAnswerRadio = document.getElementById('download_answer');
-        if (defaultAnswerRadio) defaultAnswerRadio.checked = true;
-    }
+    const defaultAnswerRadio = document.getElementById('download_answer');
+    if (defaultAnswerRadio) defaultAnswerRadio.checked = true;
 
     // Hide custom period inputs initially
     const customPeriodInputsEl = document.getElementById('customPeriodInputs');
@@ -155,12 +355,13 @@ export async function openDownloadModal(initialSelection, periodStart = '', peri
 
     // Store survey period for date pickers
     currentSurveyPeriod = {
-        startDate: periodStart,
-        endDate: periodEnd,
-        startDefaultDate: periodStart || '',
-        endDefaultDate: periodEnd || periodStart || ''
+        startDate: currentSurvey?.periodStart || '',
+        endDate: currentSurvey?.periodEnd || '',
+        startDefaultDate: currentSurvey?.periodStart || '',
+        endDefaultDate: currentSurvey?.periodEnd || currentSurvey?.periodStart || ''
     };
 
     // Initialize all modal components, including selection cards and datepickers
     initializeDownloadOptionsModal();
+    renderDownloadOptionsModal();
 }

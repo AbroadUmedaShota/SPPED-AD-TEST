@@ -6,6 +6,11 @@
                 <span class="material-icons">close</span>
             </button>
         </div>
+
+        <div class="mb-6">
+            <p id="downloadOptionsSummaryMessage" class="text-sm text-on-surface-variant"></p>
+            <p id="downloadOptionsDeadlineMessage" class="text-xs text-on-surface-variant mt-1 hidden"></p>
+        </div>
         <form>
             <div class="grid md:grid-cols-2 md:gap-x-8 space-y-8 md:space-y-0">
 
@@ -17,23 +22,22 @@
                             <input type="radio" id="download_answer" name="download_type" value="answer" class="hidden" required>
                             <span class="material-icons">description</span>
                             <span class="selection-card-text">回答データ</span>
+                            <span class="text-xs mt-2 px-2 py-0.5 rounded-full bg-slate-100 text-slate-700" data-download-status="answer"></span>
                         </label>
                         <label for="download_business_card" class="selection-card-label">
                             <input type="radio" id="download_business_card" name="download_type" value="business_card" class="hidden">
                             <span class="material-icons">contacts</span>
                             <span class="selection-card-text">名刺入力データ</span>
-                        </label>
-                        <label for="download_both" class="selection-card-label">
-                            <input type="radio" id="download_both" name="download_type" value="both" class="hidden">
-                            <span class="material-icons">library_add</span>
-                            <span class="selection-card-text">名刺入力データ<br>＋回答データ</span>
+                            <span class="text-xs mt-2 px-2 py-0.5 rounded-full bg-slate-100 text-slate-700" data-download-status="business_card"></span>
                         </label>
                         <label for="download_image" class="selection-card-label">
                             <input type="radio" id="download_image" name="download_type" value="image" class="hidden">
                             <span class="material-icons">image</span>
                             <span class="selection-card-text">名刺画像</span>
+                            <span class="text-xs mt-2 px-2 py-0.5 rounded-full bg-slate-100 text-slate-700" data-download-status="image"></span>
                         </label>
                     </div>
+                    <p id="downloadOptionsTypeMessage" class="text-xs text-rose-700 mt-3 hidden"></p>
                     <p class="error-message hidden mt-2" id="download_type-error"></p>
                 </div>
 
@@ -87,7 +91,7 @@
             <!-- Buttons -->
             <div class="flex justify-end gap-3 mt-8">
                 <button id="cancelDownloadBtn" class="bg-secondary-container text-on-secondary-container py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal tracking-wide transition-colors" type="button" aria-label="キャンセル">キャンセル</button>
-                <button class="gradient-primary-bg text-on-primary py-2 px-4 rounded-md text-sm font-semibold leading-normal transition-colors" type="submit" aria-label="ダウンロード" onclick="showToast('データダウンロード機能は未実装です。', 'info'); return false;">
+                <button id="downloadSubmitBtn" class="gradient-primary-bg text-on-primary py-2 px-4 rounded-md text-sm font-semibold leading-normal transition-colors" type="submit" aria-label="ダウンロード">
                     ダウンロード
                 </button>
             </div>
