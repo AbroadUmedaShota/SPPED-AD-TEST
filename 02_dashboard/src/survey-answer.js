@@ -206,37 +206,37 @@ function setupEventListeners() {
                 </div>
                 <div>
                     <label for="manual-email" class="block text-sm font-medium text-on-surface-variant">メールアドレス</label>
-                    <input type="email" id="manual-email" name="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    <input type="email" id="manual-email" name="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" placeholder="taro.yamada@example.com">
                 </div>
                 <div>
                     <label for="manual-company" class="block text-sm font-medium text-on-surface-variant">会社名</label>
-                    <input type="text" id="manual-company" name="company" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    <input type="text" id="manual-company" name="company" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" placeholder="株式会社SpeedAd">
                 </div>
                 <div>
                     <label for="manual-department" class="block text-sm font-medium text-on-surface-variant">部署名</label>
-                    <input type="text" id="manual-department" name="department" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    <input type="text" id="manual-department" name="department" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" placeholder="営業部">
                 </div>
                 <div>
                     <label for="manual-title" class="block text-sm font-medium text-on-surface-variant">役職名</label>
-                    <input type="text" id="manual-title" name="title" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    <input type="text" id="manual-title" name="title" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" placeholder="部長">
                 </div>
                 <div>
                     <label for="manual-phone" class="block text-sm font-medium text-on-surface-variant">電話番号</label>
-                    <input type="tel" id="manual-phone" name="phone" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    <input type="tel" id="manual-phone" name="phone" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" placeholder="03-1234-5678">
                     <div id="manual-phone-error" class="text-red-500 text-xs mt-1 hidden"></div>
                 </div>
                 <div>
                     <label for="manual-postal-code" class="block text-sm font-medium text-on-surface-variant">郵便番号</label>
-                    <input type="text" id="manual-postal-code" name="postalCode" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    <input type="text" id="manual-postal-code" name="postalCode" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" placeholder="100-0001">
                     <div id="manual-postal-code-error" class="text-red-500 text-xs mt-1 hidden"></div>
                 </div>
                 <div>
                     <label for="manual-address" class="block text-sm font-medium text-on-surface-variant">住所</label>
-                    <input type="text" id="manual-address" name="address" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    <input type="text" id="manual-address" name="address" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" placeholder="東京都千代田区千代田1-1">
                 </div>
                 <div>
                     <label for="manual-building" class="block text-sm font-medium text-on-surface-variant">建物名</label>
-                    <input type="text" id="manual-building" name="building" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    <input type="text" id="manual-building" name="building" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" placeholder="SpeedAdビル 4F">
                 </div>
             </form>
         `;
