@@ -1,5 +1,6 @@
 import { handleOpenModal, closeModal } from './modalHandler.js';
 import { showToast, resolveDashboardAssetPath } from './utils.js';
+import { initHelpPopovers } from './helpPopover.js';
 
 // --- DOM Elements ---
 let modal;
@@ -93,7 +94,7 @@ const handleConfirm = (event) => {
     console.log('Duplicating survey with data:', newSurveyData);
     showToast('アンケートの複製処理は未実装です。', 'info');
     // TODO: Implement actual duplication logic (e.g., API call)
-    
+
     // On success:
     // closeModal('duplicateSurveyModal');
 };
@@ -125,7 +126,7 @@ const setupEventListeners = () => {
  */
 export async function openDuplicateSurveyModal(survey) {
     await handleOpenModal('duplicateSurveyModal', resolveDashboardAssetPath('modals/duplicateSurveyModal.html'));
-    
+
     initElements();
 
     try {
@@ -135,8 +136,19 @@ export async function openDuplicateSurveyModal(survey) {
         showToast('アンケート情報の表示に失敗しました。', 'error');
         return;
     }
-    
+
     initDatepicker();
+
+    // ... other imports ...
+
+    // ...
+
+    // Tooltip initialization
+    /*
+     * Unified help popover initialization.
+     * Content is defined in duplicateSurveyModal.html.
+     */
+    initHelpPopovers(modal);
 
     setupEventListeners();
 }

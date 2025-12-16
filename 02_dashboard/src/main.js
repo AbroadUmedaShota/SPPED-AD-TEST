@@ -34,6 +34,7 @@ import { initGroupEditPage } from './groupEdit.js';
 import { initPasswordChange } from './password_change.js';
 import { initBugReportPage } from './bug-report.js';
 import { showConfirmationModal } from './confirmationModal.js';
+import { initHelpPopovers } from './helpPopover.js';
 
 import { showToast, copyTextToClipboard, loadCommonHtml, resolveDashboardAssetPath } from './utils.js';
 
@@ -131,28 +132,24 @@ function openNewSurveyModalWithSetup(afterOpen) {
             { input: periodRangeInput, error: periodRangeError }
         ];
 
+        // ... other imports ...
+
+        // ...
+
         const helpMessages = {
-            surveyName: 'アンケート名は管理画面でのみ表示される内部向け名称です。',
-            displayTitle: '表示タイトルは回答者に表示されるアンケートの見出しです。'
+            surveyName: '社内向けの管理名称です。回答者には表示されません。',
+            displayTitle: '回答者に表示されるタイトルです。イベント名等、外部向けの名称を設定してください。'
         };
 
-        document.querySelectorAll('#newSurveyModal .survey-help-trigger').forEach((button) => {
-            if (!button || button.dataset.tippyInit === 'true') {
-                return;
-            }
-            const helpKey = button.dataset.helpKey;
-            const message = helpMessages[helpKey];
-            if (message && window.tippy) { // Check if tippy is loaded
-                tippy(button, {
-                    content: message,
-                    theme: 'material',
-                    animation: 'scale-subtle',
-                    placement: 'top',
-                    maxWidth: 'none' // 改行を防ぐ
-                });
-            }
-            button.dataset.tippyInit = 'true';
-        });
+        // Initialize help popovers (Unified method)
+        /*
+         * Note: The popover content is now defined directly in the HTML (newSurveyModal.html).
+         * helpMessages object above is kept for reference/future use but not needed for HTML-based popovers.
+         */
+        const modalElement = document.getElementById('newSurveyModal');
+        if (modalElement) {
+            initHelpPopovers(modalElement);
+        }
 
         const hideAllErrors = () => {
             inputs.forEach(({ input, error }) => {
@@ -279,10 +276,10 @@ function initLanguageSwitcher() {
         localStorage.setItem('language', lang);
         currentLanguageText.textContent = lang === 'ja' ? '日本語' : 'English';
         document.documentElement.lang = lang; // Update the lang attribute of the <html> tag
-        
+
         // Dispatch a custom event to notify other parts of the app
         document.dispatchEvent(new CustomEvent('languagechange', { detail: { lang } }));
-        
+
         updateSelectionState(lang);
         languageSwitcherDropdown.classList.add('hidden');
         languageSwitcherButton.setAttribute('aria-expanded', 'false');
@@ -337,7 +334,7 @@ window.openDuplicateSurveyModal = openDuplicateSurveyModal;
 window.showToast = showToast;
 window.closeModal = closeModal;
 window.openModal = openModal;
-window.copyUrl = async function(inputElement) {
+window.copyUrl = async function (inputElement) {
     if (inputElement && inputElement.value) {
         await copyTextToClipboard(inputElement.value);
     }
@@ -365,7 +362,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Also checks that hostname is not empty, to avoid issues with file:/// protocol.
         if (link.href && link.hostname && link.hostname !== currentHost) {
             link.classList.add('external-link');
-            
+
             // Ensure it opens in a new tab and is secure.
             link.setAttribute('target', '_blank');
             link.setAttribute('rel', 'noopener noreferrer');
@@ -462,7 +459,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         case 'bug-report.html':
             initBugReportPage();
             break;
-        
+
     }
 
 

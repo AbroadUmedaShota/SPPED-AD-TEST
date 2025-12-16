@@ -1,31 +1,33 @@
-<div id="newSurveyModal" class="fixed inset-0 flex items-center justify-center p-4 modal-overlay hidden z-[60]" data-state="closed">
+<div id="newSurveyModal" class="fixed inset-0 flex items-center justify-center p-4 modal-overlay hidden z-[60]"
+    data-state="closed">
     <div class="bg-surface rounded-lg shadow-xl p-6 w-full max-w-xl modal-content-transition" data-state="closed">
         <div class="flex justify-between items-center mb-6">
             <h3 class="text-on-surface text-xl font-semibold">アンケート新規作成</h3>
-            <button class="text-on-surface-variant hover:text-on-surface" id="closeNewSurveyModalBtn" aria-label="モーダルを閉じる">
+            <button class="text-on-surface-variant hover:text-on-surface" id="closeNewSurveyModalBtn"
+                aria-label="モーダルを閉じる">
                 <span class="material-icons">close</span>
             </button>
         </div>
         <form class="space-y-4">
             <div class="input-group">
-                <input class="input-field" id="surveyName" name="surveyName" placeholder=" " type="text" required/>
+                <input class="input-field" id="surveyName" name="surveyName" placeholder=" " type="text" required />
                 <label class="input-label" for="surveyName">アンケート名</label>
                 <p class="error-message hidden" id="surveyName-error"></p>
-                <button type="button" class="mt-1 flex items-center gap-1 text-xs text-on-surface-variant hover:text-primary transition-colors survey-help-trigger" data-help-key="surveyName" aria-describedby="surveyNameHelpText">
-                    <span class="material-icons text-sm">help_outline</span>
-                    <span>アンケート名と表示タイトルの違いとは？</span>
-                </button>
-                <span id="surveyNameHelpText" class="sr-only">アンケート名は管理画面のみで表示される内部用の名称です。</span>
+                <button type="button" class="help-icon-button material-icons" data-tooltip-id="new-survey-name-tooltip"
+                    aria-label="ヒントを表示">help_outline</button>
+                <div id="new-survey-name-tooltip" class="help-popover hidden" role="tooltip">
+                    <p class="text-xs leading-snug text-on-surface-variant">社内向けの管理名称です。回答者には表示されません。</p>
+                </div>
             </div>
             <div class="input-group">
-                <input class="input-field" id="displayTitle" name="displayTitle" placeholder=" " type="text" required/>
+                <input class="input-field" id="displayTitle" name="displayTitle" placeholder=" " type="text" required />
                 <label class="input-label" for="displayTitle">表示タイトル</label>
                 <p class="error-message hidden" id="displayTitle-error"></p>
-                <button type="button" class="mt-1 flex items-center gap-1 text-xs text-on-surface-variant hover:text-primary transition-colors survey-help-trigger" data-help-key="displayTitle" aria-describedby="displayTitleHelpText">
-                    <span class="material-icons text-sm">help_outline</span>
-                    <span>表示タイトルに何が表示されますか？</span>
-                </button>
-                <span id="displayTitleHelpText" class="sr-only">表示タイトルは回答者に表示されるアンケートの見出しです。</span>
+                <button type="button" class="help-icon-button material-icons"
+                    data-tooltip-id="new-display-title-tooltip" aria-label="ヒントを表示">help_outline</button>
+                <div id="new-display-title-tooltip" class="help-popover hidden" role="tooltip">
+                    <p class="text-xs leading-snug text-on-surface-variant">回答者に表示されるタイトルです。イベント名等、外部向けの名称を設定してください。</p>
+                </div>
             </div>
             <div class="input-group">
                 <textarea class="input-field" id="surveyMemo" name="surveyMemo" placeholder=" " rows="3"></textarea>
@@ -34,15 +36,24 @@
             </div>
             <div class="input-group" id="newSurveyPeriodRangeWrapper">
                 <div class="relative">
-                    <input type="text" id="newSurveyPeriodRange" name="newSurveyPeriodRange" placeholder=" " class="input-field pr-10" required data-input data-toggle>
+                    <input type="text" id="newSurveyPeriodRange" name="newSurveyPeriodRange" placeholder=" "
+                        class="input-field pr-10" required data-input data-toggle>
                     <label class="input-label" for="newSurveyPeriodRange" data-toggle>回答期間</label>
-                    <span class="material-icons absolute top-1/2 right-3 -translate-y-1/2 text-on-surface-variant cursor-pointer" data-toggle>calendar_today</span>
+                    <span
+                        class="material-icons absolute top-1/2 right-3 -translate-y-1/2 text-on-surface-variant cursor-pointer"
+                        data-toggle>calendar_today</span>
                 </div>
                 <p class="error-message hidden" id="newSurveyPeriodRange-error"></p>
             </div>
             <div class="flex justify-end gap-3 pt-4">
-                <button class="bg-secondary-container text-on-secondary-container py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal tracking-wide transition-colors" id="cancelNewSurveyModalBtn" class="bg-secondary-container text-on-secondary-container py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal tracking-wide transition-colors" type="button" aria-label="キャンセル">キャンセル</button>
-                <button id="createSurveyFromModalBtn" class="button-primary text-on-primary py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal transition-colors" type="submit" aria-label="アンケートを作成">
+                <button
+                    class="bg-secondary-container text-on-secondary-container py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal tracking-wide transition-colors"
+                    id="cancelNewSurveyModalBtn"
+                    class="bg-secondary-container text-on-secondary-container py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal tracking-wide transition-colors"
+                    type="button" aria-label="キャンセル">キャンセル</button>
+                <button id="createSurveyFromModalBtn"
+                    class="button-primary text-on-primary py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal transition-colors"
+                    type="submit" aria-label="アンケートを作成">
                     作成する
                 </button>
             </div>
