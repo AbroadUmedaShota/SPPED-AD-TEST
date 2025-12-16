@@ -1,5 +1,6 @@
 import { handleOpenModal, closeModal } from './modalHandler.js';
 import { showToast, resolveDashboardAssetPath } from './utils.js';
+import { initHelpPopovers } from './helpPopover.js';
 
 // --- DOM Elements ---
 let modal;
@@ -138,29 +139,16 @@ export async function openDuplicateSurveyModal(survey) {
 
     initDatepicker();
 
-    // Tooltip initialization
-    const helpMessages = {
-        surveyName: '社内向けの管理名称です。回答者には表示されません。',
-        displayTitle: '回答者に表示されるタイトルです。イベント名等、外部向けの名称を設定してください。'
-    };
+    // ... other imports ...
 
-    modal.querySelectorAll('.survey-help-trigger').forEach((button) => {
-        if (!button || button.dataset.tippyInit === 'true') {
-            return;
-        }
-        const helpKey = button.dataset.helpKey;
-        const message = helpMessages[helpKey];
-        if (message && window.tippy) {
-            tippy(button, {
-                content: message,
-                theme: 'material',
-                animation: 'scale-subtle',
-                placement: 'top',
-                maxWidth: 'none'
-            });
-        }
-        button.dataset.tippyInit = 'true';
-    });
+    // ...
+
+    // Tooltip initialization
+    /*
+     * Unified help popover initialization.
+     * Content is defined in duplicateSurveyModal.html.
+     */
+    initHelpPopovers(modal);
 
     setupEventListeners();
 }

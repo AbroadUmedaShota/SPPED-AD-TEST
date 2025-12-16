@@ -34,6 +34,7 @@ import { initGroupEditPage } from './groupEdit.js';
 import { initPasswordChange } from './password_change.js';
 import { initBugReportPage } from './bug-report.js';
 import { showConfirmationModal } from './confirmationModal.js';
+import { initHelpPopovers } from './helpPopover.js';
 
 import { showToast, copyTextToClipboard, loadCommonHtml, resolveDashboardAssetPath } from './utils.js';
 
@@ -131,28 +132,24 @@ function openNewSurveyModalWithSetup(afterOpen) {
             { input: periodRangeInput, error: periodRangeError }
         ];
 
+        // ... other imports ...
+
+        // ...
+
         const helpMessages = {
             surveyName: '社内向けの管理名称です。回答者には表示されません。',
             displayTitle: '回答者に表示されるタイトルです。イベント名等、外部向けの名称を設定してください。'
         };
 
-        document.querySelectorAll('#newSurveyModal .survey-help-trigger').forEach((button) => {
-            if (!button || button.dataset.tippyInit === 'true') {
-                return;
-            }
-            const helpKey = button.dataset.helpKey;
-            const message = helpMessages[helpKey];
-            if (message && window.tippy) { // Check if tippy is loaded
-                tippy(button, {
-                    content: message,
-                    theme: 'material',
-                    animation: 'scale-subtle',
-                    placement: 'top',
-                    maxWidth: 'none' // 改行を防ぐ
-                });
-            }
-            button.dataset.tippyInit = 'true';
-        });
+        // Initialize help popovers (Unified method)
+        /*
+         * Note: The popover content is now defined directly in the HTML (newSurveyModal.html).
+         * helpMessages object above is kept for reference/future use but not needed for HTML-based popovers.
+         */
+        const modalElement = document.getElementById('newSurveyModal');
+        if (modalElement) {
+            initHelpPopovers(modalElement);
+        }
 
         const hideAllErrors = () => {
             inputs.forEach(({ input, error }) => {
