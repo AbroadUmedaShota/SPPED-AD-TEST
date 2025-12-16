@@ -95,7 +95,7 @@ function initializeParams() {
 
 function normalizeQuestion(rawQuestion, index) {
     const type = normalizeQuestionType(rawQuestion.type);
-    const options = (type === 'single_answer' || type === 'multi_answer' || type === 'dropdown') 
+    const options = (type === 'single_answer' || type === 'multi_answer' || type === 'dropdown')
         ? normalizeOptions(rawQuestion.options || rawQuestion.choices, rawQuestion.id || `q${index}`)
         : [];
 
@@ -194,9 +194,15 @@ function setupEventListeners() {
             const formId = 'manual-bizcard-form';
             const body = `
             <form id="${formId}" class="space-y-4">
-                <div>
-                    <label for="manual-name" class="block text-sm font-medium text-on-surface-variant">氏名</label>
-                    <input type="text" id="manual-name" name="name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="manual-last-name" class="block text-sm font-medium text-on-surface-variant">姓</label>
+                        <input type="text" id="manual-last-name" name="lastName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" placeholder="山田">
+                    </div>
+                    <div>
+                        <label for="manual-first-name" class="block text-sm font-medium text-on-surface-variant">名</label>
+                        <input type="text" id="manual-first-name" name="firstName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" placeholder="太郎">
+                    </div>
                 </div>
                 <div>
                     <label for="manual-email" class="block text-sm font-medium text-on-surface-variant">メールアドレス</label>
@@ -325,7 +331,7 @@ let bizcardImages = { front: null, back: null };
 function startBizcardUploadFlow() {
     let localImages = { front: null, back: null };
     let currentSide = null; // New variable to track current side
-    
+
     // Create a single hidden file input element and reuse it
     const hiddenFileInput = document.createElement('input');
     hiddenFileInput.type = 'file';
@@ -408,8 +414,8 @@ function startBizcardUploadFlow() {
         const footer = DOMElements.bizcardUploadModal.querySelector('.rounded-b-lg');
         if (footer) {
             // 1. フッターを完全にクリアして重複を防止
-            footer.innerHTML = ''; 
-            
+            footer.innerHTML = '';
+
             // 2. 正しいレイアウトを設定
             footer.classList.remove('justify-end');
             footer.classList.add('justify-between', 'w-full', 'items-center');
@@ -465,17 +471,17 @@ function startBizcardUploadFlow() {
                 </div>
             </div>
         `;
-                showModal(DOMElements.bizcardUploadModal, '裏面の追加', body, { cancelText: '戻る', onCancel: showFrontPreview });
-        
-                const uploadStorageBack = document.getElementById('upload-storage-back');
-                const uploadCameraBack = document.getElementById('upload-camera-back');
-        
-                if (uploadStorageBack) {
-                    uploadStorageBack.addEventListener('click', () => triggerFileInput(false, 'back'));
-                }
-                if (uploadCameraBack) {
-                    uploadCameraBack.addEventListener('click', () => triggerFileInput(true, 'back'));
-                }
+        showModal(DOMElements.bizcardUploadModal, '裏面の追加', body, { cancelText: '戻る', onCancel: showFrontPreview });
+
+        const uploadStorageBack = document.getElementById('upload-storage-back');
+        const uploadCameraBack = document.getElementById('upload-camera-back');
+
+        if (uploadStorageBack) {
+            uploadStorageBack.addEventListener('click', () => triggerFileInput(false, 'back'));
+        }
+        if (uploadCameraBack) {
+            uploadCameraBack.addEventListener('click', () => triggerFileInput(true, 'back'));
+        }
     };
 
     const showBackPreview = () => {
@@ -667,7 +673,7 @@ function populateFormWithDraft() {
         if (!question) return;
 
         const elements = document.getElementsByName(questionId);
-        
+
         const type = question.type;
 
         if (type === 'date_time') {
@@ -765,7 +771,7 @@ function createQuestionElement(question, index) {
 
     const questionNumber = `Q.${String(index + 1).padStart(2, '0')}`;
     const requiredText = question.required ? `<span class="text-red-600 font-bold text-xs">必須</span>` : '';
-    
+
     const contentDiv = document.createElement('div');
     contentDiv.className = 'question-content';
 
@@ -781,7 +787,7 @@ function createQuestionElement(question, index) {
         </div>
         <div class="control-area space-y-3 accordion-body"></div>
     `;
-    
+
     fieldset.appendChild(contentDiv);
     const controlArea = fieldset.querySelector('.control-area');
 
@@ -856,7 +862,7 @@ function createQuestionElement(question, index) {
                     if (e.target.type === 'checkbox') {
                         const checkedCheckboxes = controlArea.querySelectorAll('input[type="checkbox"]:checked');
                         const uncheckedCheckboxes = controlArea.querySelectorAll('input[type="checkbox"]:not(:checked)');
-                        
+
                         if (checkedCheckboxes.length >= maxSelections) {
                             uncheckedCheckboxes.forEach(cb => cb.disabled = true);
                         } else {
@@ -979,7 +985,7 @@ function createQuestionElement(question, index) {
                 // 描画状態
                 let drawing = false;
                 let tool = 'pen'; // 'pen' or 'eraser'
-                
+
                 // 履歴管理
                 let history = [ctx.getImageData(0, 0, canvas.width, canvas.height)];
                 let historyIndex = 0;
@@ -1012,7 +1018,7 @@ function createQuestionElement(question, index) {
                     undoBtn.disabled = historyIndex <= 0;
                     redoBtn.disabled = historyIndex >= history.length - 1;
                 }
-                
+
                 function saveState() {
                     // Redoの履歴を削除
                     if (historyIndex < history.length - 1) {
@@ -1021,7 +1027,7 @@ function createQuestionElement(question, index) {
                     history.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
                     historyIndex++;
                     updateHistoryButtons();
-                    
+
                     // stateを更新して自動保存をトリガー
                     state.answers[question.id] = canvas.toDataURL();
                     state.hasUnsavedChanges = true;
@@ -1032,7 +1038,7 @@ function createQuestionElement(question, index) {
                     ctx.putImageData(history[index], 0, 0);
                     historyIndex = index;
                     updateHistoryButtons();
-                    
+
                     // stateを更新
                     state.answers[question.id] = canvas.toDataURL();
                     state.hasUnsavedChanges = true;
@@ -1112,7 +1118,7 @@ function createQuestionElement(question, index) {
                         restoreState(historyIndex + 1);
                     }
                 });
-                
+
                 clearBtn.addEventListener('click', () => {
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
                     saveState(); // クリアした状態を保存
@@ -1132,7 +1138,7 @@ function createQuestionElement(question, index) {
         default:
             controlArea.innerHTML = `<p class="text-sm text-error">未対応の設問タイプです: ${question.type}</p>`;
     }
-    
+
     fieldset.addEventListener('change', (e) => {
         const questionId = fieldset.dataset.questionId;
         const question = state.surveyData.questions.find(q => q.id === questionId);
@@ -1149,7 +1155,7 @@ function createQuestionElement(question, index) {
         } else {
             const formData = new FormData(DOMElements.surveyForm);
             const entries = formData.getAll(questionId);
-            
+
             if (entries.length > 1) {
                 state.answers[questionId] = entries; // チェックボックスやマトリックスMAなど
             } else if (entries.length === 1) {
@@ -1239,7 +1245,7 @@ function saveDraft() {
     }
 
     const draftKey = `survey_draft_${state.surveyId}_${state.sessionId}`;
-    
+
     // Create a copy of state.answers and remove bizcardImages for localStorage
     const answersToSave = { ...state.answers };
     if (answersToSave.bizcardImages) {
@@ -1343,7 +1349,7 @@ async function simulateUpload(data) {
         const interval = setInterval(() => {
             progress += Math.random() * 20;
             if (progress > 100) progress = 100;
-            
+
             DOMElements.submittingProgressBar.style.width = `${progress}%`;
             DOMElements.submittingPercentage.textContent = `${Math.round(progress)}%`;
 
@@ -1363,10 +1369,10 @@ function showToast(message) {
         console.error('Toast elements not initialized.');
         return;
     }
-    
+
     DOMElements.toastMessage.textContent = message;
     DOMElements.toastNotification.classList.remove('hidden');
-    
+
     // 3秒後に非表示にする
     setTimeout(() => {
         DOMElements.toastNotification.classList.add('hidden');
@@ -1437,15 +1443,15 @@ function setupLeaveConfirmation() {
         const anchor = e.target.closest('a');
         if (anchor && anchor.href && anchor.target !== '_blank') {
             if (location.origin !== anchor.origin || !anchor.hash) {
-                 e.preventDefault();
-                 showModal(DOMElements.leaveConfirmModal, 'ページを離れますか？', '変更が保存されていません。このページを離れてもよろしいですか？', {
+                e.preventDefault();
+                showModal(DOMElements.leaveConfirmModal, 'ページを離れますか？', '変更が保存されていません。このページを離れてもよろしいですか？', {
                     saveText: '離れる',
                     cancelText: '留まる',
                     onSave: () => {
                         state.hasUnsavedChanges = false; // 離脱を許可
                         window.location.href = anchor.href;
                     },
-                    onCancel: () => {}
+                    onCancel: () => { }
                 });
             }
         }
@@ -1477,7 +1483,7 @@ function adjustColor(color, amount) {
         // Return a default if color format is unknown
         return { hex: '#4285F4', rgb: { r: 66, g: 133, b: 244 } };
     }
-    
+
     r = Math.max(0, Math.min(255, r - amount));
     g = Math.max(0, Math.min(255, g - amount));
     b = Math.max(0, Math.min(255, b - amount));
@@ -1502,7 +1508,7 @@ function updateDynamicColors(backgroundColor) {
         styleTag.id = 'dynamic-styles';
         document.head.appendChild(styleTag);
     }
-    
+
     const { r, g, b } = darkerColor.rgb;
 
     styleTag.innerHTML = `
