@@ -93,7 +93,7 @@ const handleConfirm = (event) => {
     console.log('Duplicating survey with data:', newSurveyData);
     showToast('アンケートの複製処理は未実装です。', 'info');
     // TODO: Implement actual duplication logic (e.g., API call)
-    
+
     // On success:
     // closeModal('duplicateSurveyModal');
 };
@@ -125,7 +125,7 @@ const setupEventListeners = () => {
  */
 export async function openDuplicateSurveyModal(survey) {
     await handleOpenModal('duplicateSurveyModal', resolveDashboardAssetPath('modals/duplicateSurveyModal.html'));
-    
+
     initElements();
 
     try {
@@ -135,8 +135,32 @@ export async function openDuplicateSurveyModal(survey) {
         showToast('アンケート情報の表示に失敗しました。', 'error');
         return;
     }
-    
+
     initDatepicker();
+
+    // Tooltip initialization
+    const helpMessages = {
+        surveyName: '社内向けの管理名称です。回答者には表示されません。',
+        displayTitle: '回答者に表示されるタイトルです。イベント名等、外部向けの名称を設定してください。'
+    };
+
+    modal.querySelectorAll('.survey-help-trigger').forEach((button) => {
+        if (!button || button.dataset.tippyInit === 'true') {
+            return;
+        }
+        const helpKey = button.dataset.helpKey;
+        const message = helpMessages[helpKey];
+        if (message && window.tippy) {
+            tippy(button, {
+                content: message,
+                theme: 'material',
+                animation: 'scale-subtle',
+                placement: 'top',
+                maxWidth: 'none'
+            });
+        }
+        button.dataset.tippyInit = 'true';
+    });
 
     setupEventListeners();
 }

@@ -132,8 +132,8 @@ function openNewSurveyModalWithSetup(afterOpen) {
         ];
 
         const helpMessages = {
-            surveyName: 'アンケート名は管理画面でのみ表示される内部向け名称です。',
-            displayTitle: '表示タイトルは回答者に表示されるアンケートの見出しです。'
+            surveyName: '社内向けの管理名称です。回答者には表示されません。',
+            displayTitle: '回答者に表示されるタイトルです。イベント名等、外部向けの名称を設定してください。'
         };
 
         document.querySelectorAll('#newSurveyModal .survey-help-trigger').forEach((button) => {
@@ -279,10 +279,10 @@ function initLanguageSwitcher() {
         localStorage.setItem('language', lang);
         currentLanguageText.textContent = lang === 'ja' ? '日本語' : 'English';
         document.documentElement.lang = lang; // Update the lang attribute of the <html> tag
-        
+
         // Dispatch a custom event to notify other parts of the app
         document.dispatchEvent(new CustomEvent('languagechange', { detail: { lang } }));
-        
+
         updateSelectionState(lang);
         languageSwitcherDropdown.classList.add('hidden');
         languageSwitcherButton.setAttribute('aria-expanded', 'false');
@@ -337,7 +337,7 @@ window.openDuplicateSurveyModal = openDuplicateSurveyModal;
 window.showToast = showToast;
 window.closeModal = closeModal;
 window.openModal = openModal;
-window.copyUrl = async function(inputElement) {
+window.copyUrl = async function (inputElement) {
     if (inputElement && inputElement.value) {
         await copyTextToClipboard(inputElement.value);
     }
@@ -365,7 +365,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Also checks that hostname is not empty, to avoid issues with file:/// protocol.
         if (link.href && link.hostname && link.hostname !== currentHost) {
             link.classList.add('external-link');
-            
+
             // Ensure it opens in a new tab and is secure.
             link.setAttribute('target', '_blank');
             link.setAttribute('rel', 'noopener noreferrer');
@@ -462,7 +462,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         case 'bug-report.html':
             initBugReportPage();
             break;
-        
+
     }
 
 
