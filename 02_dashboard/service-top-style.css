@@ -1650,6 +1650,24 @@ n    border-color: var(--color-secondary);
     font-weight: 600;
 }
 
+/* --- Download Options Modal: square cards --- */
+#downloadOptionsModal [data-selection-group="download_type"] .selection-card-label,
+#downloadOptionsModal [data-selection-group="download_period"] .selection-card-label {
+    aspect-ratio: 1 / 1;
+    min-height: auto;
+    position: relative;
+    width: 100%;
+}
+
+#downloadOptionsModal .selection-card-label [data-download-status] {
+    position: absolute;
+    bottom: 0.75rem;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 0;
+    white-space: nowrap;
+}
+
 /* Styles for Tablet Preview Switcher */
 .survey-preview-device.is-tablet {
     max-width: 768px;
