@@ -52,6 +52,8 @@ export async function initInvoiceDetailPage() {
           padding: sheet.style.padding,
           position: sheet.style.position,
           pageBreakAfter: sheet.style.pageBreakAfter,
+          overflow: sheet.style.overflow,
+          maxHeight: sheet.style.maxHeight,
           pageNumEl: pageNumEl,
           originalPageNumStyle: originalPageNumStyle
         });
@@ -66,20 +68,29 @@ export async function initInvoiceDetailPage() {
         // @ts-ignore
         sheet.style.height = 'auto';
 
+        // FORCE overflow hidden to clip any invisible "white" content leaking out
+        // @ts-ignore
+        sheet.style.overflow = 'hidden';
+
+        // FORCE massive safety buffer by capping max-height well below A4 (297mm)
+        // 270mm should be perfectly safe even with margins
+        // @ts-ignore
+        sheet.style.maxHeight = '275mm';
+
         // Use relative positioning for the sheet to anchor absolute children
         // @ts-ignore
         sheet.style.position = 'relative';
 
-        // Set padding: Top 5mm, Sides 15mm, Bottom 20mm (space for footer)
+        // Set padding: Top 5mm, Sides 15mm, Bottom 5mm (Reduced bottom padding to prevent push)
         // @ts-ignore
-        sheet.style.padding = '5mm 15mm 20mm 15mm';
+        sheet.style.padding = '5mm 15mm 5mm 15mm';
 
         // Absoutely position the page number to ensure it doesn't push flow or get caught in overflow
         if (pageNumEl) {
           // @ts-ignore
           pageNumEl.style.position = 'absolute';
           // @ts-ignore
-          pageNumEl.style.bottom = '10mm'; // Higher up as requested
+          pageNumEl.style.bottom = '15mm'; // Adjusted for visibility
           // @ts-ignore
           pageNumEl.style.right = '15mm';
           // @ts-ignore
@@ -141,6 +152,10 @@ export async function initInvoiceDetailPage() {
           sheet.style.position = originalInfo[i].position;
           // @ts-ignore
           sheet.style.pageBreakAfter = originalInfo[i].pageBreakAfter;
+          // @ts-ignore
+          sheet.style.overflow = originalInfo[i].overflow;
+          // @ts-ignore
+          sheet.style.maxHeight = originalInfo[i].maxHeight;
 
           if (originalInfo[i].pageNumEl) {
             // @ts-ignore
@@ -179,6 +194,10 @@ export async function initInvoiceDetailPage() {
           sheet.style.position = originalInfo[i].position;
           // @ts-ignore
           sheet.style.pageBreakAfter = originalInfo[i].pageBreakAfter;
+          // @ts-ignore
+          sheet.style.overflow = originalInfo[i].overflow;
+          // @ts-ignore
+          sheet.style.maxHeight = originalInfo[i].maxHeight;
 
           if (originalInfo[i].pageNumEl) {
             // @ts-ignore
