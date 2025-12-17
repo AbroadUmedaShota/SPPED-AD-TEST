@@ -273,7 +273,7 @@ function setupEventListeners() {
 
                     // 確認モーダルを表示
                     showModal(DOMElements.leaveConfirmModal, '入力内容の確認', confirmationBody, {
-                        saveText: 'はい、保存します',
+                        saveText: '保存', // 「はい、保存します」から「保存」へ変更
                         cancelText: '修正する',
                         onSave: () => {
                             // 元の保存処理
@@ -540,7 +540,7 @@ function showModal(modalElement, title, body, options = {}) {
     const { onSave, onCancel, saveText = '保存', cancelText = 'キャンセル' } = options;
 
     const saveButtonHTML = onSave ? `<button id="modal-save-button" class="px-4 py-2 text-sm font-bold text-on-primary bg-primary rounded-md hover:bg-primary-dark">${saveText}</button>` : '';
-    const cancelButtonHTML = onCancel ? `<button id="modal-cancel-button" class="px-4 py-2 text-sm font-medium rounded-md hover:bg-surface-container-high">${cancelText}</button>` : '';
+    const cancelButtonHTML = onCancel ? `<button id="modal-cancel-button" class="px-4 py-2 text-sm font-medium rounded-md border border-outline-variant hover:bg-surface-container-high">${cancelText}</button>` : '';
 
     modalElement.innerHTML = `
         <div class="bg-surface rounded-lg shadow-xl max-w-lg w-full m-4">
