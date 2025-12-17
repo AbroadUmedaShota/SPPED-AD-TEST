@@ -15,6 +15,10 @@ let currentSurveyPeriod = {
     endDefaultDate: ''
 }; // Stores survey specific period for date picker limits
 
+function combineReasons(...reasons) {
+    return reasons.filter(Boolean).join(' / ');
+}
+
 function safeNumber(value) {
     if (typeof value === 'number') {
         return Number.isFinite(value) ? value : 0;
@@ -100,10 +104,20 @@ function computeOptionStates(survey) {
             : '名刺機能: 利用しない'
     };
 
+    const businessCardAnswer = {
+        isAvailable: answer.isAvailable && businessCard.isAvailable,
+        reason: combineReasons(
+            answer.isAvailable ? '' : answer.reason,
+            businessCard.isAvailable ? '' : businessCard.reason
+        ),
+        meta: `${answer.meta} | ${businessCard.meta}`
+    };
+
     return {
         lifecycleMeta,
         optionStates: {
             answer,
+            business_card_answer: businessCardAnswer,
             business_card: businessCard,
             image
         }
@@ -162,9 +176,15 @@ function renderDownloadOptionsModal() {
 
         const unavailableState = { isAvailable: false, reason: 'ダウンロードするアンケート情報がありません。', meta: '' };
         applyStatusBadge(modal, 'answer', unavailableState);
+        applyStatusBadge(modal, 'business_card_answer', unavailableState);
         applyStatusBadge(modal, 'business_card', unavailableState);
         applyStatusBadge(modal, 'image', unavailableState);
-        currentOptionStates = { answer: unavailableState, business_card: unavailableState, image: unavailableState };
+        currentOptionStates = {
+            answer: unavailableState,
+            business_card_answer: unavailableState,
+            business_card: unavailableState,
+            image: unavailableState
+        };
         updateDownloadButtonState(modal);
         return;
     }
@@ -187,6 +207,7 @@ function renderDownloadOptionsModal() {
     }
 
     applyStatusBadge(modal, 'answer', optionStates.answer);
+    applyStatusBadge(modal, 'business_card_answer', optionStates.business_card_answer);
     applyStatusBadge(modal, 'business_card', optionStates.business_card);
     applyStatusBadge(modal, 'image', optionStates.image);
 
