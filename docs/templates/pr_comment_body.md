@@ -6,15 +6,15 @@ I have conducted a self-review and confirmed that the implementation aligns with
 
 ### Quality Gate Assessment
 
-- **Computational Complexity:** O(N) where N is the number of invoice sheets (usually 1-2). Negligible performance impact.
-- **Security:** No security implications.
-- **Scalability:** Handles multiple pages gracefully.
+- **Computational Complexity:** Low.
+- **Security:** N/A.
+- **Scalability:** N/A.
 
 ---
 
 ### Design Trade-offs
 
-- **Direct DOM Manipulation:** Temporarily modifying styles directly (`sheet.style.marginBottom`) is necessary because `html2pdf` captures the live DOM. This is a standard workaround for library limitations regarding page breaks and margins.
+- **Aggressive Margins:** Choosing stability over accurate screen-to-pdf fidelity in terms of whitespace. The priority is preventing content loss.
 
 ---
 Please review and approve the merge.

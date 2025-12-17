@@ -32,7 +32,7 @@ export async function initInvoiceDetailPage() {
 
       // Save and modify Container width
       const originalContainerWidth = element.style.width;
-      element.style.width = '210mm'; // Force exactly A4 width prevents scaling artifacts
+      element.style.width = '210mm'; // Force exactly A4 width
 
       sheets.forEach(sheet => {
         // @ts-ignore
@@ -40,6 +40,7 @@ export async function initInvoiceDetailPage() {
           marginBottom: sheet.style.marginBottom,
           boxShadow: sheet.style.boxShadow,
           minHeight: sheet.style.minHeight,
+          height: sheet.style.height,
           padding: sheet.style.padding
         });
         // @ts-ignore
@@ -47,16 +48,28 @@ export async function initInvoiceDetailPage() {
         // @ts-ignore
         sheet.style.boxShadow = 'none';
 
-        // Aggressively reduce min-height and padding to ensure it fits safely within A4
-        // The original 297mm often triggers page breaks due to slight rendering differences
+        // REMOVE min-height entirely to let content dictate size.
         // @ts-ignore
-        sheet.style.minHeight = '275mm';
+        sheet.style.minHeight = 'auto';
         // @ts-ignore
-        sheet.style.padding = '10mm 15mm'; // Reduce vertical padding
+        sheet.style.height = 'auto';
+        // @ts-ignore
+        sheet.style.padding = '10mm 15mm';
+
+        // Explicitly compress row height on Page 1 to ensure 20 rows fit easily
+        if (sheet.classList.contains('page-1')) {
+          const rows = sheet.querySelectorAll('td');
+          rows.forEach(td => {
+            // @ts-ignore
+            td.dataset.originalHeight = td.style.height;
+            // @ts-ignore
+            td.style.height = '20px'; // Force compressed height (default was 24px)
+          });
+        }
       });
 
       const opt = {
-        margin: 0, // No margin, handled by CSS padding
+        margin: 0,
         filename: `invoice-${invoiceId}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
@@ -76,7 +89,23 @@ export async function initInvoiceDetailPage() {
           // @ts-ignore
           sheet.style.minHeight = originalInfo[i].minHeight;
           // @ts-ignore
+          sheet.style.height = originalInfo[i].height;
+          // @ts-ignore
           sheet.style.padding = originalInfo[i].padding;
+
+          if (sheet.classList.contains('page-1')) {
+            const rows = sheet.querySelectorAll('td');
+            rows.forEach(td => {
+              // @ts-ignore
+              if (td.dataset.originalHeight) {
+                // @ts-ignore
+                td.style.height = td.dataset.originalHeight;
+              } else {
+                // @ts-ignore
+                td.style.height = '';
+              }
+            });
+          }
         });
       }).catch(err => {
         console.error('PDF generation failed:', err);
@@ -90,7 +119,23 @@ export async function initInvoiceDetailPage() {
           // @ts-ignore
           sheet.style.minHeight = originalInfo[i].minHeight;
           // @ts-ignore
+          sheet.style.height = originalInfo[i].height;
+          // @ts-ignore
           sheet.style.padding = originalInfo[i].padding;
+
+          if (sheet.classList.contains('page-1')) {
+            const rows = sheet.querySelectorAll('td');
+            rows.forEach(td => {
+              // @ts-ignore
+              if (td.dataset.originalHeight) {
+                // @ts-ignore
+                td.style.height = td.dataset.originalHeight;
+              } else {
+                // @ts-ignore
+                td.style.height = '';
+              }
+            });
+          }
         });
       });
     });
