@@ -32,17 +32,22 @@ export async function initInvoiceDetailPage() {
       const clone = originalElement.cloneNode(true);
 
       // 2. SETUP HIDDEN STAGING AREA
-      // Position fixed off-screen so html2pdf can render it, but user can't see it.
+      // Position fixed at top-left so it renders correctly, but hidden behind main content.
+      // We avoid 'right: -10000px' as that causes blank pages in html2canvas.
       // @ts-ignore
       clone.style.position = 'fixed';
       // @ts-ignore
-      clone.style.left = '-10000px';
+      clone.style.left = '0';
       // @ts-ignore
       clone.style.top = '0';
       // @ts-ignore
       clone.style.width = '210mm'; // Force A4 width on the clone
       // @ts-ignore
-      clone.style.zIndex = '-9999';
+      clone.style.zIndex = '-9999'; // Hide behind everything
+      // @ts-ignore
+      clone.style.visibility = 'visible'; // Must be visible for html2canvas to capture it
+      // @ts-ignore
+      clone.style.backgroundColor = '#ffffff'; // Ensure white background so alpha doesn't make it weird
 
       // Append to body to make it renderable
       document.body.appendChild(clone);
