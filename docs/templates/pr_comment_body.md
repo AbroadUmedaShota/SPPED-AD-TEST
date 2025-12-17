@@ -14,7 +14,7 @@ I have conducted a self-review and confirmed that the implementation aligns with
 
 ### Design Trade-offs
 
-- **Strict Page Breaks:** Removing reliance on auto-flow page breaks means we trust our manual pagination logic in `invoiceDetail.js`. This is safer for structured documents like invoices.
+- **Clipping Content:** Using `overflow: hidden` means that if content *truly* exceeds the page length, it will be cut off rather than wrapping. This is a computed risk: we prefer cut-off content over blank pages in this invoice context, as the content *should* fit given our other compression constraints.
 
 ---
 Please review and approve the merge.

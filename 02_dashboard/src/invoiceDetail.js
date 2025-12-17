@@ -54,43 +54,50 @@ export async function initInvoiceDetailPage() {
           pageBreakAfter: sheet.style.pageBreakAfter,
           overflow: sheet.style.overflow,
           maxHeight: sheet.style.maxHeight,
+          boxSizing: sheet.style.boxSizing,
           pageNumEl: pageNumEl,
           originalPageNumStyle: originalPageNumStyle
         });
+
         // @ts-ignore
         sheet.style.marginBottom = '0';
         // @ts-ignore
         sheet.style.boxShadow = 'none';
 
-        // Remove min-height / height constraints
+        // Use FIXED HEIGHT of 296mm (1mm safety buffer from 297mm A4)
+        // This forces the "sheet" to be the full size of the page,
+        // ensuring absolute positioned footers sit at the bottom of the PAGE, not content.
         // @ts-ignore
-        sheet.style.minHeight = 'auto';
+        sheet.style.minHeight = '296mm';
         // @ts-ignore
-        sheet.style.height = 'auto';
+        sheet.style.height = '296mm';
+        // @ts-ignore
+        sheet.style.maxHeight = 'none'; // Allow full height
 
-        // FORCE overflow hidden to clip any invisible "white" content leaking out
+        // Box sizing border-box ensures padding doesn't expand dimensions
+        // @ts-ignore
+        sheet.style.boxSizing = 'border-box';
+
+        // Overflow hidden to prevent blank pages from invisible leaks,
+        // but height is now sufficient (296mm) so content shouldn't be cut off unless massive.
         // @ts-ignore
         sheet.style.overflow = 'hidden';
-
-        // FORCE massive safety buffer by capping max-height well below A4 (297mm)
-        // 270mm should be perfectly safe even with margins
-        // @ts-ignore
-        sheet.style.maxHeight = '275mm';
 
         // Use relative positioning for the sheet to anchor absolute children
         // @ts-ignore
         sheet.style.position = 'relative';
 
-        // Set padding: Top 5mm, Sides 15mm, Bottom 5mm (Reduced bottom padding to prevent push)
+        // Set padding: Top 10mm, Sides 10mm, Bottom 0mm
+        // Footer is handled by absolute positioning, so we just need side margins for content.
         // @ts-ignore
-        sheet.style.padding = '5mm 15mm 5mm 15mm';
+        sheet.style.padding = '10mm 15mm 10mm 15mm';
 
-        // Absoutely position the page number to ensure it doesn't push flow or get caught in overflow
+        // Absoutely position the page number
         if (pageNumEl) {
           // @ts-ignore
           pageNumEl.style.position = 'absolute';
           // @ts-ignore
-          pageNumEl.style.bottom = '15mm'; // Adjusted for visibility
+          pageNumEl.style.bottom = '12mm'; // Nice position at bottom
           // @ts-ignore
           pageNumEl.style.right = '15mm';
           // @ts-ignore
@@ -110,8 +117,8 @@ export async function initInvoiceDetailPage() {
           sheet.style.pageBreakAfter = 'auto';
         }
 
-        // GLOBAL ROW COMPRESSION (All pages)
-        // Compressing to 18px ensures valid fit even with font updates or rendering shifts.
+        // GLOBAL ROW COMPRESSION (All pages) - Moderate at 20mm
+        // 18mm might be too aggressive visually, 20mm is standard tight.
         const rows = sheet.querySelectorAll('td');
         rows.forEach(td => {
           // @ts-ignore
@@ -120,7 +127,7 @@ export async function initInvoiceDetailPage() {
             td.dataset.originalHeight = td.style.height || '';
           }
           // @ts-ignore
-          td.style.height = '18px';
+          td.style.height = '20px';
         });
       });
 
@@ -156,6 +163,8 @@ export async function initInvoiceDetailPage() {
           sheet.style.overflow = originalInfo[i].overflow;
           // @ts-ignore
           sheet.style.maxHeight = originalInfo[i].maxHeight;
+          // @ts-ignore
+          sheet.style.boxSizing = originalInfo[i].boxSizing;
 
           if (originalInfo[i].pageNumEl) {
             // @ts-ignore
@@ -198,6 +207,8 @@ export async function initInvoiceDetailPage() {
           sheet.style.overflow = originalInfo[i].overflow;
           // @ts-ignore
           sheet.style.maxHeight = originalInfo[i].maxHeight;
+          // @ts-ignore
+          sheet.style.boxSizing = originalInfo[i].boxSizing;
 
           if (originalInfo[i].pageNumEl) {
             // @ts-ignore
