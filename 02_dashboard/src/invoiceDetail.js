@@ -24,81 +24,71 @@ export async function initInvoiceDetailPage() {
   const downloadButton = document.getElementById('downloadPdfBtn');
   if (downloadButton) {
     downloadButton.addEventListener('click', () => {
-      const element = document.getElementById('invoice-sheet-container');
+      const originalElement = document.getElementById('invoice-sheet-container');
 
-      // Temporarily remove styles that interfere with PDF generation
-      const sheets = element.querySelectorAll('.invoice-sheet');
-      const originalInfo = [];
+      // 1. CLONE THE ELEMENT
+      // We use a clone to avoid any visual jank/shifting on the user's screen during generation.
+      // @ts-ignore
+      const clone = originalElement.cloneNode(true);
 
-      // Save and modify Container width
-      const originalContainerWidth = element.style.width;
-      element.style.width = '210mm'; // Force exactly A4 width
+      // 2. SETUP HIDDEN STAGING AREA
+      // Position fixed off-screen so html2pdf can render it, but user can't see it.
+      // @ts-ignore
+      clone.style.position = 'fixed';
+      // @ts-ignore
+      clone.style.left = '-10000px';
+      // @ts-ignore
+      clone.style.top = '0';
+      // @ts-ignore
+      clone.style.width = '210mm'; // Force A4 width on the clone
+      // @ts-ignore
+      clone.style.zIndex = '-9999';
+
+      // Append to body to make it renderable
+      document.body.appendChild(clone);
+
+      // 3. APPLY PDF-SPECIFIC STYLING TO THE CLONE
+      // We can be aggressive here because it doesn't affect the main UI.
+      const sheets = clone.querySelectorAll('.invoice-sheet');
 
       sheets.forEach((sheet, index) => {
-        // Find Page Number element
-        const pageNumEl = sheet.querySelector('.page-number');
-        let originalPageNumStyle = '';
-        if (pageNumEl) {
-          // @ts-ignore
-          originalPageNumStyle = pageNumEl.getAttribute('style') || '';
-        }
-
-        // @ts-ignore
-        originalInfo.push({
-          marginBottom: sheet.style.marginBottom,
-          boxShadow: sheet.style.boxShadow,
-          minHeight: sheet.style.minHeight,
-          height: sheet.style.height,
-          padding: sheet.style.padding,
-          position: sheet.style.position,
-          pageBreakAfter: sheet.style.pageBreakAfter,
-          overflow: sheet.style.overflow,
-          maxHeight: sheet.style.maxHeight,
-          boxSizing: sheet.style.boxSizing,
-          pageNumEl: pageNumEl,
-          originalPageNumStyle: originalPageNumStyle
-        });
-
         // @ts-ignore
         sheet.style.marginBottom = '0';
         // @ts-ignore
         sheet.style.boxShadow = 'none';
 
-        // Use FIXED HEIGHT of 296mm (1mm safety buffer from 297mm A4)
-        // This forces the "sheet" to be the full size of the page,
-        // ensuring absolute positioned footers sit at the bottom of the PAGE, not content.
+        // FIXED HEIGHT of 296mm (1mm safety buffer)
         // @ts-ignore
         sheet.style.minHeight = '296mm';
         // @ts-ignore
         sheet.style.height = '296mm';
         // @ts-ignore
-        sheet.style.maxHeight = 'none'; // Allow full height
+        sheet.style.maxHeight = 'none';
 
-        // Box sizing border-box ensures padding doesn't expand dimensions
-        // @ts-ignore
-        sheet.style.boxSizing = 'border-box';
-
-        // Overflow hidden to prevent blank pages from invisible leaks,
-        // but height is now sufficient (296mm) so content shouldn't be cut off unless massive.
+        // Overflow hidden to prevent white pages
         // @ts-ignore
         sheet.style.overflow = 'hidden';
 
-        // Use relative positioning for the sheet to anchor absolute children
+        // Relative positioning for absolute children
         // @ts-ignore
         sheet.style.position = 'relative';
 
-        // Set padding: Top 10mm, Sides 15mm, Bottom 25mm
-        // Increased bottom padding to 25mm to create a "No Fly Zone" for the table content,
-        // ensuring it absolutely cannot overlap with the footer.
+        // PADDING ADJUSTMENT
+        // Top: 10mm
+        // Side: 15mm
+        // Bottom: 35mm (Massive buffer to prevent overlap on Page 2+)
         // @ts-ignore
-        sheet.style.padding = '10mm 15mm 25mm 15mm';
+        sheet.style.padding = '10mm 15mm 35mm 15mm';
+        // @ts-ignore
+        sheet.style.boxSizing = 'border-box';
 
-        // Absoutely position the page number
+        // ABSOLUTE FOOTER POSITIONING
+        const pageNumEl = sheet.querySelector('.page-number');
         if (pageNumEl) {
           // @ts-ignore
           pageNumEl.style.position = 'absolute';
           // @ts-ignore
-          pageNumEl.style.bottom = '5mm'; // Lowered significantly (was 12mm) to sit at the page edge
+          pageNumEl.style.bottom = '4mm'; // Very low, near the edge as requested
           // @ts-ignore
           pageNumEl.style.right = '15mm';
           // @ts-ignore
@@ -109,7 +99,7 @@ export async function initInvoiceDetailPage() {
           pageNumEl.style.paddingTop = '0';
         }
 
-        // STRICT PAGE BREAK MANAGEMENT
+        // STRICT PAGE BREAKS
         if (index < sheets.length - 1) {
           // @ts-ignore
           sheet.style.pageBreakAfter = 'always';
@@ -118,15 +108,9 @@ export async function initInvoiceDetailPage() {
           sheet.style.pageBreakAfter = 'auto';
         }
 
-        // GLOBAL ROW COMPRESSION (All pages) - Moderate at 20mm
-        // 18mm might be too aggressive visually, 20mm is standard tight.
+        // ROW COMPRESSION (20px)
         const rows = sheet.querySelectorAll('td');
         rows.forEach(td => {
-          // @ts-ignore
-          if (!td.dataset.originalHeight) {
-            // @ts-ignore
-            td.dataset.originalHeight = td.style.height || '';
-          }
           // @ts-ignore
           td.style.height = '20px';
         });
@@ -141,94 +125,15 @@ export async function initInvoiceDetailPage() {
         pagebreak: { mode: ['css', 'legacy'] }
       };
 
+      // 4. GENERATE PDF FROM CLONE
       // @ts-ignore
-      html2pdf().set(opt).from(element).save().then(() => {
-        // Restore original styles
-        element.style.width = originalContainerWidth;
-        sheets.forEach((sheet, i) => {
-          // @ts-ignore
-          sheet.style.marginBottom = originalInfo[i].marginBottom;
-          // @ts-ignore
-          sheet.style.boxShadow = originalInfo[i].boxShadow;
-          // @ts-ignore
-          sheet.style.minHeight = originalInfo[i].minHeight;
-          // @ts-ignore
-          sheet.style.height = originalInfo[i].height;
-          // @ts-ignore
-          sheet.style.padding = originalInfo[i].padding;
-          // @ts-ignore
-          sheet.style.position = originalInfo[i].position;
-          // @ts-ignore
-          sheet.style.pageBreakAfter = originalInfo[i].pageBreakAfter;
-          // @ts-ignore
-          sheet.style.overflow = originalInfo[i].overflow;
-          // @ts-ignore
-          sheet.style.maxHeight = originalInfo[i].maxHeight;
-          // @ts-ignore
-          sheet.style.boxSizing = originalInfo[i].boxSizing;
-
-          if (originalInfo[i].pageNumEl) {
-            // @ts-ignore
-            originalInfo[i].pageNumEl.setAttribute('style', originalInfo[i].originalPageNumStyle);
-          }
-
-          // Restore row heights
-          const rows = sheet.querySelectorAll('td');
-          rows.forEach(td => {
-            // @ts-ignore
-            if (td.dataset.originalHeight !== undefined) {
-              // @ts-ignore
-              td.style.height = td.dataset.originalHeight;
-            } else {
-              // @ts-ignore
-              td.style.height = '';
-            }
-          });
-        });
+      html2pdf().set(opt).from(clone).save().then(() => {
+        // Cleanup: Remove the clone after success
+        document.body.removeChild(clone);
       }).catch(err => {
         console.error('PDF generation failed:', err);
-        // Restore styles even if it fails
-        element.style.width = originalContainerWidth;
-        sheets.forEach((sheet, i) => {
-          // @ts-ignore
-          sheet.style.marginBottom = originalInfo[i].marginBottom;
-          // @ts-ignore
-          sheet.style.boxShadow = originalInfo[i].boxShadow;
-          // @ts-ignore
-          sheet.style.minHeight = originalInfo[i].minHeight;
-          // @ts-ignore
-          sheet.style.height = originalInfo[i].height;
-          // @ts-ignore
-          sheet.style.padding = originalInfo[i].padding;
-          // @ts-ignore
-          sheet.style.position = originalInfo[i].position;
-          // @ts-ignore
-          sheet.style.pageBreakAfter = originalInfo[i].pageBreakAfter;
-          // @ts-ignore
-          sheet.style.overflow = originalInfo[i].overflow;
-          // @ts-ignore
-          sheet.style.maxHeight = originalInfo[i].maxHeight;
-          // @ts-ignore
-          sheet.style.boxSizing = originalInfo[i].boxSizing;
-
-          if (originalInfo[i].pageNumEl) {
-            // @ts-ignore
-            originalInfo[i].pageNumEl.setAttribute('style', originalInfo[i].originalPageNumStyle);
-          }
-
-          // Restore row heights
-          const rows = sheet.querySelectorAll('td');
-          rows.forEach(td => {
-            // @ts-ignore
-            if (td.dataset.originalHeight !== undefined) {
-              // @ts-ignore
-              td.style.height = td.dataset.originalHeight;
-            } else {
-              // @ts-ignore
-              td.style.height = '';
-            }
-          });
-        });
+        // Cleanup: Remove the clone even if it fails
+        document.body.removeChild(clone);
       });
     });
   }
