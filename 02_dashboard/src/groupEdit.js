@@ -89,7 +89,6 @@ function createMemberCardHTML(member) {
     }
     return `
         <div class="member-card flex items-center gap-4 p-3 bg-surface-bright rounded-lg border border-outline-variant hover:bg-surface-container-low transition-colors cursor-pointer" data-member-id="${member.email}">
-            <span class="material-icons drag-handle text-on-surface-variant">drag_indicator</span>
             <img src="${member.avatarUrl}" alt="アバター" class="w-10 h-10 rounded-full">
             <div class="flex-grow">
                 <p class="font-semibold text-on-surface">${member.name}</p>
@@ -110,17 +109,6 @@ function createMemberCardHTML(member) {
 function renderMemberList(members) {
     if (!elements.memberList) return;
     elements.memberList.innerHTML = members.map(createMemberCardHTML).join('');
-    new Sortable(elements.memberList, {
-        animation: 150,
-        handle: '.drag-handle',
-        ghostClass: 'sortable-ghost',
-        dragClass: 'sortable-drag',
-        onEnd: () => {
-            state.currentSort.key = null; // Reset sort on manual drag
-            updateSortIndicators();
-            setDirty(true);
-        },
-    });
 }
 
 function renderBillingInfo() {
@@ -389,8 +377,41 @@ function setupEventListeners() {
     // Main action buttons
     elements.saveBtn.addEventListener('click', () => {
         if (!state.isDirty) return;
-        console.log('Saving data:', state.allGroupsData[state.currentGroupId]);
+
+        const currentGroup = state.allGroupsData[state.currentGroupId];
+        
+        // 現在のメンバーリストからemailとroleを取得
+        const memberElements = elements.memberList.querySelectorAll('.member-card');
+        const updatedMembers = Array.from(memberElements).map(card => {
+            const email = card.dataset.memberId;
+            const role = card.querySelector('select').value;
+            const originalMember = currentGroup.members.find(m => m.email === email);
+            return {
+                ...originalMember, // email, name, status などの元の情報を維持
+                role: role, // 権限だけ更新
+            };
+        });
+
+        const dataToSave = {
+            groupInfo: {
+                name: elements.groupName.value,
+                description: elements.groupDescription.value,
+            },
+            members: updatedMembers.map(member => ({
+                email: member.email,
+                role: member.role,
+            })),
+        };
+
+        console.log('Saving data:', dataToSave);
         showToast('グループ情報を保存しました。', 'success');
+        
+        // データを"保存"したことにするため、現在の状態をオリジナルとして更新
+        currentGroup.name = elements.groupName.value;
+        currentGroup.description = elements.groupDescription.value;
+        currentGroup.members = updatedMembers;
+        currentGroup.originalMembers = [...updatedMembers];
+
         setDirty(false);
     });
     elements.cancelBtn.addEventListener('click', () => {
@@ -412,6 +433,33 @@ function setupEventListeners() {
         updateSortIndicators();
         setDirty(true);
     });
+
+    // 画面離脱確認
+    window.addEventListener('beforeunload', (e) => {
+        if (state.isDirty) {
+            e.preventDefault();
+            e.returnValue = ''; // 古いブラウザ用の設定
+        }
+    });
+
+    document.body.addEventListener('click', (e) => {
+        if (!state.isDirty) return;
+
+        const anchor = e.target.closest('a');
+        if (anchor && anchor.href && anchor.target !== '_blank' && !anchor.href.startsWith('javascript:')) {
+            // 現在のページへのリンクやハッシュリンクは無視
+            if (new URL(anchor.href, window.location.origin).pathname === window.location.pathname) return;
+
+            e.preventDefault();
+            showConfirmationModal(
+                '編集内容が保存されていません。ページを離れてもよろしいですか？',
+                () => {
+                    setDirty(false); // isDirtyフラグをリセットして無限ループを防ぐ
+                    window.location.href = anchor.href;
+                }
+            );
+        }
+    }, true);
 }
 
 const generateDummyMembers = (count, startIndex = 1) => {
@@ -478,6 +526,26 @@ export async function initGroupEditPage() {
             members: generateDummyMembers(20, 41)
         }
     };
+
+    const loggedInUser = {
+        email: 'user0@example.com',
+        role: '管理者',
+        name: state.creatorBillingInfo.name,
+        status: 'グループ加入済',
+        avatarUrl: `https://i.pravatar.cc/40?u=user0@example.com`,
+        companyName: '株式会社A',
+        departmentName: state.creatorBillingInfo.department,
+        positionName: '部長',
+        phoneNumber: state.creatorBillingInfo.phone,
+        address: state.creatorBillingInfo.address
+    };
+
+    for (const groupId in state.allGroupsData) {
+        const group = state.allGroupsData[groupId];
+        if (!group.members.some(member => member.email === loggedInUser.email)) {
+            group.members.unshift(loggedInUser);
+        }
+    }
 
     // Store original order for resetting
     for (const groupId in state.allGroupsData) {
