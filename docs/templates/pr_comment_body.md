@@ -14,7 +14,8 @@ I have conducted a self-review and confirmed that the implementation aligns with
 
 ### Design Trade-offs
 
-- **Smaller Content Area:** By reserving 25mm at the bottom, we slightly reduce the amount of content per page. This is a necessary trade-off to guarantee readability and prevent overlap.
+- **Cloning DOM:** Cloning the DOM can be slightly expensive for massive tables, but for a 5-page invoice (approx 100 rows), it's negligible. The benefit (no UI flickering) far outweighs this cost.
+- **35mm Padding:** This is a very large padding, but given the user's persistent issue with overlap, this "nuclear option" is justified to guarantee layout safety.
 
 ---
 Please review and approve the merge.
