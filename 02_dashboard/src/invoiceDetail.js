@@ -35,6 +35,14 @@ export async function initInvoiceDetailPage() {
       element.style.width = '210mm'; // Force exactly A4 width
 
       sheets.forEach((sheet, index) => {
+        // Find Page Number element
+        const pageNumEl = sheet.querySelector('.page-number');
+        let originalPageNumStyle = '';
+        if (pageNumEl) {
+          // @ts-ignore
+          originalPageNumStyle = pageNumEl.getAttribute('style') || '';
+        }
+
         // @ts-ignore
         originalInfo.push({
           marginBottom: sheet.style.marginBottom,
@@ -42,7 +50,10 @@ export async function initInvoiceDetailPage() {
           minHeight: sheet.style.minHeight,
           height: sheet.style.height,
           padding: sheet.style.padding,
-          pageBreakAfter: sheet.style.pageBreakAfter
+          position: sheet.style.position,
+          pageBreakAfter: sheet.style.pageBreakAfter,
+          pageNumEl: pageNumEl,
+          originalPageNumStyle: originalPageNumStyle
         });
         // @ts-ignore
         sheet.style.marginBottom = '0';
@@ -54,8 +65,30 @@ export async function initInvoiceDetailPage() {
         sheet.style.minHeight = 'auto';
         // @ts-ignore
         sheet.style.height = 'auto';
+
+        // Use relative positioning for the sheet to anchor absolute children
         // @ts-ignore
-        sheet.style.padding = '10mm 15mm';
+        sheet.style.position = 'relative';
+
+        // Set padding: Top 5mm, Sides 15mm, Bottom 20mm (space for footer)
+        // @ts-ignore
+        sheet.style.padding = '5mm 15mm 20mm 15mm';
+
+        // Absoutely position the page number to ensure it doesn't push flow or get caught in overflow
+        if (pageNumEl) {
+          // @ts-ignore
+          pageNumEl.style.position = 'absolute';
+          // @ts-ignore
+          pageNumEl.style.bottom = '10mm'; // Higher up as requested
+          // @ts-ignore
+          pageNumEl.style.right = '15mm';
+          // @ts-ignore
+          pageNumEl.style.width = 'auto';
+          // @ts-ignore
+          pageNumEl.style.marginTop = '0';
+          // @ts-ignore
+          pageNumEl.style.paddingTop = '0';
+        }
 
         // STRICT PAGE BREAK MANAGEMENT
         if (index < sheets.length - 1) {
@@ -105,7 +138,14 @@ export async function initInvoiceDetailPage() {
           // @ts-ignore
           sheet.style.padding = originalInfo[i].padding;
           // @ts-ignore
+          sheet.style.position = originalInfo[i].position;
+          // @ts-ignore
           sheet.style.pageBreakAfter = originalInfo[i].pageBreakAfter;
+
+          if (originalInfo[i].pageNumEl) {
+            // @ts-ignore
+            originalInfo[i].pageNumEl.setAttribute('style', originalInfo[i].originalPageNumStyle);
+          }
 
           // Restore row heights
           const rows = sheet.querySelectorAll('td');
@@ -136,7 +176,14 @@ export async function initInvoiceDetailPage() {
           // @ts-ignore
           sheet.style.padding = originalInfo[i].padding;
           // @ts-ignore
+          sheet.style.position = originalInfo[i].position;
+          // @ts-ignore
           sheet.style.pageBreakAfter = originalInfo[i].pageBreakAfter;
+
+          if (originalInfo[i].pageNumEl) {
+            // @ts-ignore
+            originalInfo[i].pageNumEl.setAttribute('style', originalInfo[i].originalPageNumStyle);
+          }
 
           // Restore row heights
           const rows = sheet.querySelectorAll('td');
