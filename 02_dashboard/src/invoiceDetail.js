@@ -28,24 +28,33 @@ export async function initInvoiceDetailPage() {
 
       // Temporarily remove styles that interfere with PDF generation
       const sheets = element.querySelectorAll('.invoice-sheet');
-      const originalStyles = [];
+      const originalInfo = [];
+
+      // Save and modify Container width
+      const originalContainerWidth = element.style.width;
+      element.style.width = '210mm'; // Force exactly A4 width prevents scaling artifacts
+
       sheets.forEach(sheet => {
         // @ts-ignore
-        originalStyles.push({
+        originalInfo.push({
           marginBottom: sheet.style.marginBottom,
-          boxShadow: sheet.style.boxShadow
+          boxShadow: sheet.style.boxShadow,
+          minHeight: sheet.style.minHeight
         });
         // @ts-ignore
         sheet.style.marginBottom = '0';
         // @ts-ignore
         sheet.style.boxShadow = 'none';
+        // Reduce min-height slightly to ensure it fits safely within 297mm without triggering overflow
+        // @ts-ignore
+        sheet.style.minHeight = '295mm';
       });
 
       const opt = {
         margin: 0, // No margin, handled by CSS padding
         filename: `invoice-${invoiceId}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
+        html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
         pagebreak: { mode: ['css', 'legacy'] }
       };
@@ -53,20 +62,26 @@ export async function initInvoiceDetailPage() {
       // @ts-ignore
       html2pdf().set(opt).from(element).save().then(() => {
         // Restore original styles
+        element.style.width = originalContainerWidth;
         sheets.forEach((sheet, i) => {
           // @ts-ignore
-          sheet.style.marginBottom = originalStyles[i].marginBottom;
+          sheet.style.marginBottom = originalInfo[i].marginBottom;
           // @ts-ignore
-          sheet.style.boxShadow = originalStyles[i].boxShadow;
+          sheet.style.boxShadow = originalInfo[i].boxShadow;
+          // @ts-ignore
+          sheet.style.minHeight = originalInfo[i].minHeight;
         });
       }).catch(err => {
         console.error('PDF generation failed:', err);
         // Restore styles even if it fails
+        element.style.width = originalContainerWidth;
         sheets.forEach((sheet, i) => {
           // @ts-ignore
-          sheet.style.marginBottom = originalStyles[i].marginBottom;
+          sheet.style.marginBottom = originalInfo[i].marginBottom;
           // @ts-ignore
-          sheet.style.boxShadow = originalStyles[i].boxShadow;
+          sheet.style.boxShadow = originalInfo[i].boxShadow;
+          // @ts-ignore
+          sheet.style.minHeight = originalInfo[i].minHeight;
         });
       });
     });
