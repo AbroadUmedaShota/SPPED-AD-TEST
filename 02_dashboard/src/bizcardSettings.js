@@ -348,6 +348,8 @@ export function initBizcardSettings() {
             const result = await saveBizcardSettings(finalSettings);
             if (result.success) {
 
+                // Store updated settings in sessionStorage to be picked up by the list page
+                sessionStorage.setItem(`updatedSurvey_${finalSettings.surveyId}`, JSON.stringify(finalSettings));
 
                 showToast('名刺データ化設定を保存し、依頼を確定しました！', 'success');
                 setTimeout(() => window.location.href = 'index.html', 1000);

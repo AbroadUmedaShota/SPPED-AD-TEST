@@ -152,6 +152,12 @@ export async function fetchSurveyData() {
                     }
 
                     const survey = await res.json();
+
+                    // bizcardSettingsからトップレベルにdataConversionPlanをコピー
+                    if (survey.bizcardSettings && survey.bizcardSettings.dataConversionPlan) {
+                        survey.dataConversionPlan = survey.bizcardSettings.dataConversionPlan;
+                    }
+
                     // thankYouEmailSettings が存在しない場合、ランダムな値を割り当てる
                     if (!survey.thankYouEmailSettings) {
                         const options = ['自動送信', '手動送信', '送信しない'];
@@ -183,6 +189,34 @@ export async function fetchSurveyData() {
 
 async function loadAndRenderSurveyData({ suppressToastOnError = false } = {}) {
     const { surveys, fetchStats } = await fetchSurveyData();
+
+    // Check sessionStorage for any updated survey data
+    for (let i = 0; i < sessionStorage.length; i++) {
+        const key = sessionStorage.key(i);
+        if (key.startsWith('updatedSurvey_')) {
+            try {
+                const updatedSettings = JSON.parse(sessionStorage.getItem(key));
+                const surveyId = key.substring('updatedSurvey_'.length);
+                const surveyIndex = surveys.findIndex(s => s.id === surveyId);
+
+                if (surveyIndex !== -1) {
+                    // Update the survey object with the new settings
+                    surveys[surveyIndex].dataConversionPlan = updatedSettings.dataConversionPlan;
+
+                    // Also update the bizcardSettings if it exists or create it
+                    if (!surveys[surveyIndex].bizcardSettings) {
+                        surveys[surveyIndex].bizcardSettings = {};
+                    }
+                    Object.assign(surveys[surveyIndex].bizcardSettings, updatedSettings);
+                }
+                // Clean up the sessionStorage item
+                sessionStorage.removeItem(key);
+            } catch (e) {
+                console.error("Error parsing updated survey data from sessionStorage", e);
+                sessionStorage.removeItem(key); // Remove malformed item
+            }
+        }
+    }
 
     if (fetchStats.successCount === 0) {
         showSurveyFetchError(fetchStats);
