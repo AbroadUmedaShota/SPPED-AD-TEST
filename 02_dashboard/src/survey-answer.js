@@ -194,9 +194,15 @@ function setupEventListeners() {
             const formId = 'manual-bizcard-form';
             const body = `
             <form id="${formId}" class="space-y-4">
-                <div>
-                    <label for="manual-name" class="block text-sm font-medium text-on-surface-variant">氏名</label>
-                    <input type="text" id="manual-name" name="name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="manual-last-name" class="block text-sm font-medium text-on-surface-variant">姓</label>
+                        <input type="text" id="manual-last-name" name="lastName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    </div>
+                    <div>
+                        <label for="manual-first-name" class="block text-sm font-medium text-on-surface-variant">名</label>
+                        <input type="text" id="manual-first-name" name="firstName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    </div>
                 </div>
                 <div>
                     <label for="manual-email" class="block text-sm font-medium text-on-surface-variant">メールアドレス</label>
@@ -240,6 +246,11 @@ function setupEventListeners() {
                     const formData = new FormData(form);
                     const manualInfo = {};
                     formData.forEach((value, key) => manualInfo[key] = value);
+
+                    // 姓と名を結合してnameフィールドを作成
+                    if (manualInfo.lastName || manualInfo.firstName) {
+                        manualInfo.name = `${manualInfo.lastName || ''} ${manualInfo.firstName || ''}`.trim();
+                    }
 
                     // エラーメッセージ要素をクリア
                     document.getElementById('manual-postal-code-error').textContent = '';

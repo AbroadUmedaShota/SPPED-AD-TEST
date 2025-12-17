@@ -1,30 +1,22 @@
 ### Pre-investigation Summary
-The user pointed out that the Survey Duplication Modal (`duplicateSurveyModal`) still uses the old text-based help buttons, and that the New Survey Modal might not be updated either (likely due to viewing cached/unmerged state, but will verify).
-The previous fix only addressed `newSurveyModal`. This task is to apply the same UI/UX updates to `duplicateSurveyModal`.
+The user reported that the help tooltips in the "New Survey Modal" are not working, although the "Duplicate Survey Modal" ones are.
+Investigation revealed that the "New Survey" button in `main.js` calls `handleOpenModal` directly, bypassing `openNewSurveyModalWithSetup` which contains the logic for initializing the help popovers (and the date picker).
 
 **Files to be changed:**
-- `02_dashboard/modals/duplicateSurveyModal.html`: Replace text buttons with icon buttons and add popover HTML.
-- `02_dashboard/src/duplicateSurveyModal.js`: Add logic to toggle the popovers.
+- `02_dashboard/src/main.js`: Update the event listener for `#openNewSurveyModalBtn` to call `openNewSurveyModalWithSetup()` instead of `handleOpenModal(...)`.
 
 ### Contribution to Project Goals
-Consistent UI/UX across all modals (New, Detail, Duplicate).
+Ensures the New Survey Modal is fully initialized with all required functionality (help tooltips, date pickers, validation).
 
 ### Overview of Changes
-1.  **HTML**: Replace "What is the difference?" text buttons with `help_outline` icons and add hidden popover divs in `duplicateSurveyModal.html`.
-2.  **JS**: Implement popover toggle logic in `duplicateSurveyModal.js` similar to `surveyDetailsModal.js` and `main.js`.
+- Change the click handler for `#openNewSurveyModalBtn` in `main.js` to invoke the setup function.
 
 ### Specific Work Content for Each File
-- `02_dashboard/modals/duplicateSurveyModal.html`:
-    - Replace `.survey-help-trigger` buttons with `.help-icon-button`.
-    - Add `.help-popover` divs with unique IDs (e.g., `duplicate-survey-name-tooltip`).
-- `02_dashboard/src/duplicateSurveyModal.js`:
-    - Add `activeDuplicateSurveyPopover` state variable.
-    - Add `closeDuplicateSurveyPopover` function.
-    - In `setupEventListeners` (or `openDuplicateSurveyModal`), add click listeners to the new help icons.
-    - Add global click/keydown listeners to close the popover (scoped/managed carefully to avoid conflicts).
+- `02_dashboard/src/main.js`:
+    - Locate the event listener for `openNewSurveyModalBtn`.
+    - Change the callback to call `openNewSurveyModalWithSetup()`.
 
 ### Definition of Done
-- [ ] Duplicate Survey Modal displays "?" icons.
-- [ ] Clicking the icon toggles the popover with correct text.
-- [ ] Clicking outside closes the popover.
-- [ ] (Re-verify) New Survey Modal works as expected.
+- [ ] Clicking "Create New Survey" opens the modal.
+- [ ] value help icons work (popovers appear).
+- [ ] Date picker works (as it was also in that setup function).

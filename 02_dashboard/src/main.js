@@ -504,7 +504,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         openNewSurveyModalBtn.addEventListener('click', () => {
             // This check prevents the generic listener from firing if the tutorial is active
             if (!document.getElementById('tutorial-svg-overlay')) {
-                handleOpenModal('newSurveyModal', resolveDashboardAssetPath('modals/newSurveyModal.html'));
+                openNewSurveyModalWithSetup();
             }
         });
     }
