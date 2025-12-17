@@ -222,7 +222,7 @@ function handleSaveSurvey() {
     updateSurveyData(newSurveyData);
 
     showToast('アンケート情報を保存しました！', 'success');
-    
+
 }
 
 function handleDetailDownload() {
@@ -252,7 +252,7 @@ export function populateSurveyDetails(survey) {
     // --- Get All View and Edit Elements ---
     const surveyDetailName = document.getElementById('surveyDetailName');
     const surveyDetailStatusBadge = document.getElementById('surveyDetailStatusBadge');
-    
+
     // View mode elements
     const detail_surveyId_view = document.getElementById('detail_surveyId');
     const detail_plan_view = document.getElementById('detail_plan_view');
@@ -320,7 +320,7 @@ export function populateSurveyDetails(survey) {
         ? `¥${billingAmountValue.toLocaleString()}`
         : '―';
     detail_bizcardEnabled_view.textContent = survey.bizcardEnabled ? '利用する' : '利用しない';
-    detail_bizcardCompletionCount_view.textContent = survey.bizcardEnabled ? `${survey.bizcardCompletionCount || 0}件` : 'N/A';
+    detail_bizcardCompletionCount_view.textContent = survey.bizcardEnabled ? `${survey.bizcardRequest || 0}件` : 'N/A';
     detail_thankYouEmailSettings_view.textContent = survey.thankYouEmailSettings || '設定なし';
 
     // Non-editable fields
@@ -329,7 +329,7 @@ export function populateSurveyDetails(survey) {
     detail_qrCodeImage.src = `sample_qr.png`; // survey.id を使って動的に生成
 
     // --- Reset to View Mode --- 
-    
+
 
     // 編集ボタンの表示/非表示をステータスに基づいて制御
     const editSurveyBtn = modal.querySelector('#editSurveyBtn');
