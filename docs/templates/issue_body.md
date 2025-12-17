@@ -1,26 +1,31 @@
-#### 概要
-オペレーター入力画面 (BY-213) で、スキップボタンを押した際に表示されるモーダルに不具合があります。
-スキップ理由として「エスカレーション」または「その他」を選択して「スキップ / 次へ」ボタンを押しても、詳細な理由を入力するためのビューに切り替わりません。
+### Pre-investigation Summary
+The user requested to update the help text and behavior for "Questionnaire Name" and "Display Title" in the New Survey Modal to match the Survey Details Modal.
+Currently, the New Survey Modal uses a text button ("What is the difference?") and Tippy.js tooltips. The Survey Details Modal uses a "?" icon and a custom popover with specific text.
 
-#### 再現手順
-1. `03_admin/BY-211_オペレーター入力画面/BY-213/BY-213.html` を開く。
-2. 右下の「スキップ」ボタンをクリックする。
-3. 表示されたモーダルで、「エスカレーション（理由入力へ）」または「その他（理由入力へ）」のラジオボタンを選択する。
-4. 「スキップ / 次へ」ボタンをクリックする。
+**Files to be changed:**
+- `02_dashboard/modals/newSurveyModal.html`: Update the HTML structure of the help buttons to matching the icon-only style and add the popover elements.
+- `02_dashboard/src/main.js`: Update the `openNewSurveyModalWithSetup` function to implement the popover logic (toggle visibility) instead of initializing Tippy.js, and remove the old text strings.
 
-#### 期待される動作
-詳細な理由を入力するためのテキストエリアがあるビューに切り替わること。
+### Contribution to Project Goals
+Consistency in UI/UX across modals improves usability and reduces cognitive load for the user.
 
-#### 実際の動作
-ビューが切り替わらず、モーダルが閉じてしまうか、何も起こらない。
+### Overview of Changes
+1.  **HTML**: Replace the text-based help buttons with `help_outline` icon buttons. Add hidden popover `div`s with the requested text.
+2.  **JS**: Implement the click/hover logic to show/hide the popovers in `main.js`, replicating the behavior from `surveyDetailsModal.js`.
 
-#### 調査結果
-`script.js`内のスキップモーダルに関するロジックを調査しました。
-`#skip-next-btn` のクリックイベントハンドラは存在し、選択されたラジオボタンの値をチェックしてビューを切り替える処理も記述されています。
+### Specific Work Content for Each File
+- `02_dashboard/modals/newSurveyModal.html`:
+    - Replace `<button ...>...<span>Text</span>...</button>` with `<button class="help-icon-button ...">help_outline</button>`.
+    - Add `<div id="..." class="help-popover ...">...</div>` for both fields.
+- `02_dashboard/src/main.js`:
+    - Remove the `tippy` initialization in `openNewSurveyModalWithSetup`.
+    - Add event listeners for the new `.help-icon-button` elements to toggle the corresponding popovers.
+    - Implement `closeActiveHelpPopover` logic similar to `surveyDetailsModal.js` to handle closing when clicking outside.
 
-しかし、このロジックはjQueryの `$(document).ready()` の中に記述されており、ファイルの他の大部分が使用している `DOMContentLoaded` とは別のイベントリスナー内で実行されています。この二重の初期化構造が、競合や意図しない動作を引き起こしている可能性があります。
-
-#### 修正案
-1. `script.js` から `$(document).ready()` ラッパーを削除します。
-2. スキップモーダルのロジックを、既存の `DOMContentLoaded` イベントリスナー内に移動させ、初期化処理を統合します。
-3. スキップモーダル部分のjQueryのコードを、他のコードスタイルに合わせてVanilla JS（標準のJavaScript）に書き換えます。これにより、コードの一貫性を高め、潜在的な問題を解決します。
+### Definition of Done
+- [ ] The New Survey Modal displays "?" icons instead of "What is the difference?" text buttons.
+- [ ] Clicking/Hovering the "?" icon shows a popover with the correct text.
+    - Survey Name: "社内向けの管理名称です。回答者には表示されません。"
+    - Display Title: "回答者に表示されるタイトルです。イベント名等、外部向けの名称を設定してください。"
+- [ ] The popover style matches the Survey Details Modal.
+- [ ] Clicking outside closes the popover.
