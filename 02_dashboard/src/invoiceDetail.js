@@ -25,15 +25,50 @@ export async function initInvoiceDetailPage() {
   if (downloadButton) {
     downloadButton.addEventListener('click', () => {
       const element = document.getElementById('invoice-sheet-container');
+
+      // Temporarily remove styles that interfere with PDF generation
+      const sheets = element.querySelectorAll('.invoice-sheet');
+      const originalStyles = [];
+      sheets.forEach(sheet => {
+        // @ts-ignore
+        originalStyles.push({
+          marginBottom: sheet.style.marginBottom,
+          boxShadow: sheet.style.boxShadow
+        });
+        // @ts-ignore
+        sheet.style.marginBottom = '0';
+        // @ts-ignore
+        sheet.style.boxShadow = 'none';
+      });
+
       const opt = {
         margin: 0, // No margin, handled by CSS padding
         filename: `invoice-${invoiceId}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['css', 'legacy'] }
       };
+
       // @ts-ignore
-      html2pdf().set(opt).from(element).save();
+      html2pdf().set(opt).from(element).save().then(() => {
+        // Restore original styles
+        sheets.forEach((sheet, i) => {
+          // @ts-ignore
+          sheet.style.marginBottom = originalStyles[i].marginBottom;
+          // @ts-ignore
+          sheet.style.boxShadow = originalStyles[i].boxShadow;
+        });
+      }).catch(err => {
+        console.error('PDF generation failed:', err);
+        // Restore styles even if it fails
+        sheets.forEach((sheet, i) => {
+          // @ts-ignore
+          sheet.style.marginBottom = originalStyles[i].marginBottom;
+          // @ts-ignore
+          sheet.style.boxShadow = originalStyles[i].boxShadow;
+        });
+      });
     });
   }
 
