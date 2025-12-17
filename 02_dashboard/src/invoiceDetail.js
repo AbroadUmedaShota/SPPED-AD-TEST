@@ -39,15 +39,20 @@ export async function initInvoiceDetailPage() {
         originalInfo.push({
           marginBottom: sheet.style.marginBottom,
           boxShadow: sheet.style.boxShadow,
-          minHeight: sheet.style.minHeight
+          minHeight: sheet.style.minHeight,
+          padding: sheet.style.padding
         });
         // @ts-ignore
         sheet.style.marginBottom = '0';
         // @ts-ignore
         sheet.style.boxShadow = 'none';
-        // Reduce min-height slightly to ensure it fits safely within 297mm without triggering overflow
+
+        // Aggressively reduce min-height and padding to ensure it fits safely within A4
+        // The original 297mm often triggers page breaks due to slight rendering differences
         // @ts-ignore
-        sheet.style.minHeight = '295mm';
+        sheet.style.minHeight = '275mm';
+        // @ts-ignore
+        sheet.style.padding = '10mm 15mm'; // Reduce vertical padding
       });
 
       const opt = {
@@ -70,6 +75,8 @@ export async function initInvoiceDetailPage() {
           sheet.style.boxShadow = originalInfo[i].boxShadow;
           // @ts-ignore
           sheet.style.minHeight = originalInfo[i].minHeight;
+          // @ts-ignore
+          sheet.style.padding = originalInfo[i].padding;
         });
       }).catch(err => {
         console.error('PDF generation failed:', err);
@@ -82,6 +89,8 @@ export async function initInvoiceDetailPage() {
           sheet.style.boxShadow = originalInfo[i].boxShadow;
           // @ts-ignore
           sheet.style.minHeight = originalInfo[i].minHeight;
+          // @ts-ignore
+          sheet.style.padding = originalInfo[i].padding;
         });
       });
     });
