@@ -223,12 +223,10 @@ function setupEventListeners() {
                 <div>
                     <label for="manual-phone" class="block text-sm font-medium text-on-surface-variant">電話番号</label>
                     <input type="tel" id="manual-phone" name="phone" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-                    <div id="manual-phone-error" class="text-red-500 text-xs mt-1 hidden"></div>
                 </div>
                 <div>
                     <label for="manual-postal-code" class="block text-sm font-medium text-on-surface-variant">郵便番号</label>
                     <input type="text" id="manual-postal-code" name="postalCode" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-                    <div id="manual-postal-code-error" class="text-red-500 text-xs mt-1 hidden"></div>
                 </div>
                 <div>
                     <label for="manual-address" class="block text-sm font-medium text-on-surface-variant">住所</label>
@@ -252,67 +250,45 @@ function setupEventListeners() {
                         manualInfo.name = `${manualInfo.lastName || ''} ${manualInfo.firstName || ''}`.trim();
                     }
 
-                    // エラーメッセージ要素をクリア
-                    document.getElementById('manual-postal-code-error').textContent = '';
-                    document.getElementById('manual-postal-code-error').classList.add('hidden');
-                    document.getElementById('manual-phone-error').textContent = '';
-                    document.getElementById('manual-phone-error').classList.add('hidden');
+                    // 確認用のHTMLを生成
+                    const confirmationBody = `
+                        <div class="space-y-2 text-sm text-on-surface-variant">
+                            ${Object.entries({
+                                '氏名': manualInfo.name,
+                                'メールアドレス': manualInfo.email,
+                                '会社名': manualInfo.company,
+                                '部署名': manualInfo.department,
+                                '役職名': manualInfo.title,
+                                '電話番号': manualInfo.phone,
+                                '郵便番号': manualInfo.postalCode,
+                                '住所': manualInfo.address,
+                                '建物名': manualInfo.building
+                            }).map(([label, value]) => `<p><span class="font-semibold text-on-surface">${label}:</span> ${value || ''}</p>`).join('')}
+                        </div>
+                        <p class="mt-6 text-on-surface">この内容で保存しますか？</p>
+                    `;
 
-                    let isValid = true;
-
-                    // 郵便番号バリデーション
-                    const postalCode = manualInfo.postalCode;
-                    if (postalCode && !/^\d{3}-?\d{4}$/.test(postalCode)) {
-                        isValid = false;
-                        document.getElementById('manual-postal-code-error').textContent = '郵便番号の形式が正しくありません。(例: 123-4567)';
-                        document.getElementById('manual-postal-code-error').classList.remove('hidden');
-                    }
-
-                    // 電話番号バリデーション
-                    const phone = manualInfo.phone;
-                    if (phone && !/^[\d-]+$/.test(phone)) {
-                        isValid = false;
-                        document.getElementById('manual-phone-error').textContent = '電話番号には数字とハイフンのみを使用してください。';
-                        document.getElementById('manual-phone-error').classList.remove('hidden');
-                    }
-
-                    if (!isValid) {
-                        return; // 保存せずに処理を中断
-                    }
-
-                    state.answers.manualBizcardInfo = manualInfo;
-                    state.hasUnsavedChanges = true;
-                    showToast('名刺情報を保存しました。'); // 成功時のトーストは残す
-                    console.log('Manual bizcard info saved:', manualInfo);
+                    // 既存の手入力モーダルを一旦隠す
                     DOMElements.manualInputModal.style.display = 'none';
-                }
-            });
 
-            // --- リアルタイムバリデーションの追加 ---
-            const postalInput = document.getElementById('manual-postal-code');
-            const phoneInput = document.getElementById('manual-phone');
-            const postalError = document.getElementById('manual-postal-code-error');
-            const phoneError = document.getElementById('manual-phone-error');
-
-            postalInput.addEventListener('input', (e) => {
-                const value = e.target.value;
-                if (value && !/^\d{3}-?\d{4}$/.test(value)) {
-                    postalError.textContent = '郵便番号の形式が正しくありません。(例: 123-4567)';
-                    postalError.classList.remove('hidden');
-                } else {
-                    postalError.textContent = '';
-                    postalError.classList.add('hidden');
-                }
-            });
-
-            phoneInput.addEventListener('input', (e) => {
-                const value = e.target.value;
-                if (value && !/^[\d-]+$/.test(value)) {
-                    phoneError.textContent = '電話番号には数字とハイフンのみを使用してください。';
-                    phoneError.classList.remove('hidden');
-                } else {
-                    phoneError.textContent = '';
-                    phoneError.classList.add('hidden');
+                    // 確認モーダルを表示
+                    showModal(DOMElements.leaveConfirmModal, '入力内容の確認', confirmationBody, {
+                        saveText: 'はい、保存します',
+                        cancelText: '修正する',
+                        onSave: () => {
+                            // 元の保存処理
+                            state.answers.manualBizcardInfo = manualInfo;
+                            state.hasUnsavedChanges = true;
+                            showToast('名刺情報を保存しました。');
+                            console.log('Manual bizcard info saved:', manualInfo);
+                            DOMElements.leaveConfirmModal.style.display = 'none';
+                        },
+                        onCancel: () => {
+                            // 手入力モーダルを再表示
+                            DOMElements.leaveConfirmModal.style.display = 'none';
+                            DOMElements.manualInputModal.style.display = 'flex';
+                        }
+                    });
                 }
             });
         });
