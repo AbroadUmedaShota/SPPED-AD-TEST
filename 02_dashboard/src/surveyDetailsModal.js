@@ -320,7 +320,7 @@ export function populateSurveyDetails(survey) {
         ? `¥${billingAmountValue.toLocaleString()}`
         : '―';
     detail_bizcardEnabled_view.textContent = survey.bizcardEnabled ? '利用する' : '利用しない';
-    detail_bizcardCompletionCount_view.textContent = survey.bizcardEnabled ? `${survey.bizcardRequest || 0}件` : 'N/A';
+    detail_bizcardCompletionCount_view.textContent = `${survey.bizcardRequest || 0}件`;
     detail_thankYouEmailSettings_view.textContent = survey.thankYouEmailSettings || '設定なし';
 
     // Non-editable fields

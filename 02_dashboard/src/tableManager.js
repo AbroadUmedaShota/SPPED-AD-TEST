@@ -92,7 +92,7 @@ export function getSurveyStatus(survey, referenceDate) {
 let lastSortedHeader = null; // Tracks the last header clicked for sorting
 
 async function fetchSurveyIds() {
-    const surveyListUrl = resolveDashboardDataPath('data/surveys/survey_list.json');
+    const surveyListUrl = '../data/surveys/survey_list.json';
     try {
         const response = await fetch(surveyListUrl);
         if (!response.ok) {
@@ -131,7 +131,7 @@ export async function fetchSurveyData() {
         fetchStats.totalCount = surveyIds.length;
 
         const surveyPromises = surveyIds.map(async id => {
-            const primaryUrl = resolveDashboardDataPath(`demo_surveys/${id}.json`);
+            const primaryUrl = `../data/demo_surveys/${id}.json`;
             const fallbackUrls = [
                 `https://raw.githubusercontent.com/abroadumedashota/SPPED-AD-TEST/main/data/demo_surveys/${id}.json`,
                 `https://rawcdn.githack.com/abroadumedashota/SPPED-AD-TEST/main/data/demo_surveys/${id}.json`
