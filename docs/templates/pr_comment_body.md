@@ -14,7 +14,7 @@ I have conducted a self-review and confirmed that the implementation aligns with
 
 ### Design Trade-offs
 
-- **Aggressive Margins:** Choosing stability over accurate screen-to-pdf fidelity in terms of whitespace. The priority is preventing content loss.
+- **Strict Page Breaks:** Removing reliance on auto-flow page breaks means we trust our manual pagination logic in `invoiceDetail.js`. This is safer for structured documents like invoices.
 
 ---
 Please review and approve the merge.
