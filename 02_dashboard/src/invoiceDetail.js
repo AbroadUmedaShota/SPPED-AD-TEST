@@ -87,17 +87,18 @@ export async function initInvoiceDetailPage() {
         // @ts-ignore
         sheet.style.position = 'relative';
 
-        // Set padding: Top 10mm, Sides 10mm, Bottom 0mm
-        // Footer is handled by absolute positioning, so we just need side margins for content.
+        // Set padding: Top 10mm, Sides 15mm, Bottom 25mm
+        // Increased bottom padding to 25mm to create a "No Fly Zone" for the table content,
+        // ensuring it absolutely cannot overlap with the footer.
         // @ts-ignore
-        sheet.style.padding = '10mm 15mm 10mm 15mm';
+        sheet.style.padding = '10mm 15mm 25mm 15mm';
 
         // Absoutely position the page number
         if (pageNumEl) {
           // @ts-ignore
           pageNumEl.style.position = 'absolute';
           // @ts-ignore
-          pageNumEl.style.bottom = '12mm'; // Nice position at bottom
+          pageNumEl.style.bottom = '5mm'; // Lowered significantly (was 12mm) to sit at the page edge
           // @ts-ignore
           pageNumEl.style.right = '15mm';
           // @ts-ignore
