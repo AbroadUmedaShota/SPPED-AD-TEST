@@ -1,7 +1,7 @@
 # Data Inventory (2025-09-17)
 IDフォーマット: アンケートIDは `sv_YYYYMMDD_###` 形式（JSTの作成日＋連番）で統一し、関連データのキーとして利用します。
 ## Module Consumers
-- `tableManager.js`: fetches `data/surveys/surveys-with-details.json` for listing dashboards.
+- `tableManager.js`: fetches `data/core/surveys.json` for listing dashboards (demoフォールバック廃止、core一本化)。
 - `surveyCreation.js`: loads `data/surveys/surveys.json` and per-survey detail files in `data/surveys/enquete/` (fallbacks to `data/core/surveys.json`).
 - `survey-answer.js`: relies on `data/core/surveys.json` and `data/surveys/sample_survey.json` for respondent previews.
 - `speed-review.js`: combines `data/core/surveys.json`, `data/responses/answers/<surveyId>.json`, `data/responses/business-cards/<surveyId>.json`, and demo payloads in `data/demo_surveys/<surveyId>.json`.

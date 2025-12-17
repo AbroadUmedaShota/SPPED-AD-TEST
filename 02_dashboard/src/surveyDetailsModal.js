@@ -1,4 +1,4 @@
-import { DATA_CONVERSION_PLANS, getPlanConfig } from './services/bizcardPlans.js';
+import { DATA_CONVERSION_PLANS, DEFAULT_PLAN, getPlanConfig, normalizePlanValue } from './services/bizcardPlans.js';
 import { openDownloadModal } from './downloadOptionsModal.js';
 import { updateSurveyData } from './tableManager.js'; // tableManagerからインポート
 import { deriveSurveyLifecycleMeta, USER_STATUSES } from './services/statusService.js';
@@ -319,8 +319,9 @@ export function populateSurveyDetails(survey) {
     detail_estimatedBillingAmount_view.textContent = billingAmountValue !== null
         ? `¥${billingAmountValue.toLocaleString()}`
         : '―';
-    const normalizedPlan = survey.dataConversionPlan ? survey.dataConversionPlan : 'not_set';
-    const planConfig = getPlanConfig(normalizedPlan);
+    const rawPlan = survey.dataConversionPlan || survey.bizcardSettings?.dataConversionPlan;
+    const normalizedPlan = normalizePlanValue(rawPlan || DEFAULT_PLAN);
+    const planConfig = getPlanConfig(normalizedPlan) || getPlanConfig(DEFAULT_PLAN);
     if (detail_dataConversionPlan_view) {
         detail_dataConversionPlan_view.textContent = planConfig ? planConfig.title.ja : 'データ化項目プランは設定されていません';
     }

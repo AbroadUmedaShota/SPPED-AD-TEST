@@ -91,31 +91,6 @@ export function getSurveyStatus(survey, referenceDate) {
 
 let lastSortedHeader = null; // Tracks the last header clicked for sorting
 
-async function fetchSurveyIds() {
-    const surveyListUrl = '../data/surveys/survey_list.json';
-    try {
-        const response = await fetch(surveyListUrl);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const surveyList = await response.json();
-        return surveyList.survey_ids;
-    } catch (error) {
-        console.warn('Could not fetch remote survey list, falling back to static list.', error);
-        // Static fallback list
-        return [
-            'sv_0001_25019', 'sv_0001_25020', 'sv_0001_25022', 'sv_0001_25023', 'sv_0001_25024',
-            'sv_0001_25025', 'sv_0001_25026', 'sv_0001_25027', 'sv_0001_25028', 'sv_0001_25031',
-            'sv_0001_25032', 'sv_0001_25035', 'sv_0001_25039', 'sv_0001_25040', 'sv_0001_25043',
-            'sv_0001_25044', 'sv_0001_25045', 'sv_0001_25047', 'sv_0001_25049', 'sv_0001_25050',
-            'sv_0001_25051', 'sv_0001_25052', 'sv_0001_25053', 'sv_0001_25054', 'sv_0001_25055',
-            'sv_0001_25056', 'sv_0001_25057', 'sv_0001_25058', 'sv_0001_25059', 'sv_0001_25060',
-            'sv_0001_25061', 'sv_0001_25062', 'sv_0001_25063', 'sv_0001_25064', 'sv_0001_25065',
-            'sv_0001_99099'
-        ];
-    }
-}
-
 /**
  * Fetches survey data from JSON files with aggregated success/failure counts.
  * @returns {Promise<{surveys: Array, fetchStats: { successCount: number, failureCount: number, totalCount: number }}>} A promise that resolves with survey objects and fetch stats.
@@ -127,56 +102,45 @@ export async function fetchSurveyData() {
     const fetchStats = { successCount: 0, failureCount: 0, totalCount: 0 };
 
     try {
-        const surveyIds = await fetchSurveyIds();
-        fetchStats.totalCount = surveyIds.length;
+        const coreUrl = '../data/core/surveys.json';
+        const response = await fetch(coreUrl);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const coreSurveys = await response.json();
+        fetchStats.totalCount = Array.isArray(coreSurveys) ? coreSurveys.length : 0;
 
-        const surveyPromises = surveyIds.map(async id => {
-            const primaryUrl = `../data/demo_surveys/${id}.json`;
-            const fallbackUrls = [
-                `https://raw.githubusercontent.com/abroadumedashota/SPPED-AD-TEST/main/data/demo_surveys/${id}.json`,
-                `https://rawcdn.githack.com/abroadumedashota/SPPED-AD-TEST/main/data/demo_surveys/${id}.json`
-            ];
-
-            const urlsToTry = [primaryUrl, ...fallbackUrls];
-
-            for (const url of urlsToTry) {
-                try {
-                    const res = await fetch(url);
-                    if (!res.ok) {
-                        console.warn(`Could not load survey from ${url}: ${res.status} ${res.statusText}`);
-                        continue;
+        const normalizedSurveys = Array.isArray(coreSurveys)
+            ? coreSurveys.map((survey) => {
+                const normalized = { ...survey };
+                // bizcardSettings からの値をトップレベルへ補完
+                if (normalized.bizcardSettings) {
+                    if (normalized.bizcardSettings.dataConversionPlan && !normalized.dataConversionPlan) {
+                        normalized.dataConversionPlan = normalized.bizcardSettings.dataConversionPlan;
                     }
-
-                    if (url !== primaryUrl) {
-                        console.info(`Loaded survey ${id} from fallback URL: ${url}`);
+                    if (normalized.bizcardSettings.bizcardEnabled !== undefined && normalized.bizcardEnabled === undefined) {
+                        normalized.bizcardEnabled = normalized.bizcardSettings.bizcardEnabled;
                     }
-
-                    const survey = await res.json();
-
-                    // bizcardSettingsからトップレベルにdataConversionPlanをコピー
-                    if (survey.bizcardSettings && survey.bizcardSettings.dataConversionPlan) {
-                        survey.dataConversionPlan = survey.bizcardSettings.dataConversionPlan;
+                    if (normalized.bizcardSettings.bizcardRequest !== undefined && normalized.bizcardRequest === undefined) {
+                        normalized.bizcardRequest = normalized.bizcardSettings.bizcardRequest;
                     }
-
-                    // thankYouEmailSettings が存在しない場合、ランダムな値を割り当てる
-                    if (!survey.thankYouEmailSettings) {
-                        const options = ['自動送信', '手動送信', '送信しない'];
-                        const randomIndex = Math.floor(Math.random() * options.length);
-                        survey.thankYouEmailSettings = options[randomIndex];
+                    if (normalized.bizcardSettings.internalMemo && !normalized.internalMemo) {
+                        normalized.internalMemo = normalized.bizcardSettings.internalMemo;
                     }
-                    fetchStats.successCount += 1;
-                    return survey;
-                } catch (error) {
-                    console.warn(`Error loading survey from ${url}:`, error);
                 }
-            }
 
-            console.warn(`Could not load survey after trying all sources: ${id}`);
-            fetchStats.failureCount += 1;
-            return null;
-        });
-        const allSurveys = await Promise.all(surveyPromises);
-        return { surveys: allSurveys.filter(Boolean), fetchStats }; // Filter out any null results
+                // thankYouEmailSettings が存在しない場合、ランダムな値を割り当てる（既存動作踏襲）
+                if (!normalized.thankYouEmailSettings) {
+                    const options = ['自動送信', '手動送信', '送信しない'];
+                    const randomIndex = Math.floor(Math.random() * options.length);
+                    normalized.thankYouEmailSettings = options[randomIndex];
+                }
+                return normalized;
+            })
+            : [];
+
+        fetchStats.successCount = normalizedSurveys.length;
+        return { surveys: normalizedSurveys, fetchStats };
 
     } catch (error) {
         console.error('Error fetching survey data:', error);
@@ -864,6 +828,4 @@ export function updateSurveyData(updatedSurvey) {
     }
     applyFiltersAndPagination(); // Re-apply filters and pagination to update table
 }
-
-
 

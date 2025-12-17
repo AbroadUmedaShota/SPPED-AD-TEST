@@ -91,7 +91,7 @@
             },
             {
                 element: '#openBizcardSettingsBtn',
-                title: '名刺データ設定',
+                title: '名刺データ化設定',
                 content: 'ここでは名刺の情報をどのようにデータ化するかなど、詳細な設定ができます。',
                 placement: 'top',
             },

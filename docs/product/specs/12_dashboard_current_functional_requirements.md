@@ -7,7 +7,7 @@
 
 ## Data Sources and Path Resolution
 - `02_dashboard/src/utils.js` exposes `resolveDashboardDataPath` and `resolveDemoDataPath` to translate relative requests into `./data/...` および `./data/demo_...`（必要に応じて `../` を積み上げる相対パス）。返却値はいずれも `.` で始まり、HTML 配信元に依存せず同階層・下位階層からデータが解決できる。
-- Primary datasets include `data/surveys/surveys-with-details.json` (table view and survey modal), `data/core/surveys.json` (per-survey settings), `data/core/invoices.json` (billing), and `data/core/groups.json` (sidebar context).
+- Primary datasets include `data/core/surveys.json` (table view、詳細モーダル、作成画面の初期化を含む単一ソース), `data/core/invoices.json` (billing), and `data/core/groups.json` (sidebar context). デモ用 `demo_surveys` のフォールバックは撤廃。
 - Sample responses and business-card payloads live under `data/demo_answers`, `data/demo_business-cards`, and `data/responses`; CSV paths are also supported by `speedReviewService`.
 - Write operations update in-memory arrays or `localStorage`; no server persistence is wired up in this codebase.
 
@@ -18,7 +18,7 @@
 - `sidebarHandler.js` fetches groups, persists the selected group (`dashboard.selectedGroupId`), toggles the mobile drawer with scroll locking, and binds navigation items (including the account modal and logout placeholder).
 
 ## Survey List (`index.html`, `tableManager.js`)
-- Fetches surveys from `data/surveys/surveys-with-details.json`, filters out entries mapped to `USER_STATUSES.DELETED`, and caches the result for reuse.
+- Fetches surveys from `data/core/surveys.json`（bizcardSettingsのdataConversionPlan/bizcardRequestなどをトップレベルへ補完）、filters out entries mapped to `USER_STATUSES.DELETED`, and caches the result for reuse.
 - Provides keyword search, status dropdown (derived in `statusService.js`), date range filters (flatpickr), items-per-page selection, and group scoping from the sidebar; language changes trigger re-evaluation.
 - Table headers support ascending/descending sort with icon feedback, while pagination renders ellipsis buttons and keeps the current page within bounds.
 - Row actions include duplication (generates a new ID based on user and fiscal year), opening Speed Review, conditional downloads (disabled until lifecycle permits), launching the survey editor, copying the survey URL, and opening the detail modal.

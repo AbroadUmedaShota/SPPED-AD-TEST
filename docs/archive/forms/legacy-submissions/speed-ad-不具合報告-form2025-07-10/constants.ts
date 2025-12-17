@@ -55,7 +55,7 @@ export const AFFECTED_SCREEN_OPTIONS = [
   { value: 'thanks', label: 'サンクス画面' },
   { value: 'questionnaire_preview', label: 'アンケートプレビュー画面' },
   { value: 'questionnaire_copy', label: 'アンケートコピー画面' },
-  { value: 'bizcard', label: '名刺データ設定画面' },
+  { value: 'bizcard', label: '名刺データ化設定画面' },
   { value: 'thanks_mail', label: 'お礼メール設定画面' },
   { value: 'group_create', label: 'グループ作成画面' },
   { value: 'group_setting_done', label: 'グループ設定画面_申し込み完了画面' },
