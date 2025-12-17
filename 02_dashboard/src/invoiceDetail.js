@@ -34,21 +34,22 @@ export async function initInvoiceDetailPage() {
       const originalContainerWidth = element.style.width;
       element.style.width = '210mm'; // Force exactly A4 width
 
-      sheets.forEach(sheet => {
+      sheets.forEach((sheet, index) => {
         // @ts-ignore
         originalInfo.push({
           marginBottom: sheet.style.marginBottom,
           boxShadow: sheet.style.boxShadow,
           minHeight: sheet.style.minHeight,
           height: sheet.style.height,
-          padding: sheet.style.padding
+          padding: sheet.style.padding,
+          pageBreakAfter: sheet.style.pageBreakAfter
         });
         // @ts-ignore
         sheet.style.marginBottom = '0';
         // @ts-ignore
         sheet.style.boxShadow = 'none';
 
-        // REMOVE min-height entirely to let content dictate size.
+        // Remove min-height / height constraints
         // @ts-ignore
         sheet.style.minHeight = 'auto';
         // @ts-ignore
@@ -56,16 +57,27 @@ export async function initInvoiceDetailPage() {
         // @ts-ignore
         sheet.style.padding = '10mm 15mm';
 
-        // Explicitly compress row height on Page 1 to ensure 20 rows fit easily
-        if (sheet.classList.contains('page-1')) {
-          const rows = sheet.querySelectorAll('td');
-          rows.forEach(td => {
-            // @ts-ignore
-            td.dataset.originalHeight = td.style.height;
-            // @ts-ignore
-            td.style.height = '20px'; // Force compressed height (default was 24px)
-          });
+        // STRICT PAGE BREAK MANAGEMENT
+        if (index < sheets.length - 1) {
+          // @ts-ignore
+          sheet.style.pageBreakAfter = 'always';
+        } else {
+          // @ts-ignore
+          sheet.style.pageBreakAfter = 'auto';
         }
+
+        // GLOBAL ROW COMPRESSION (All pages)
+        // Compressing to 18px ensures valid fit even with font updates or rendering shifts.
+        const rows = sheet.querySelectorAll('td');
+        rows.forEach(td => {
+          // @ts-ignore
+          if (!td.dataset.originalHeight) {
+            // @ts-ignore
+            td.dataset.originalHeight = td.style.height || '';
+          }
+          // @ts-ignore
+          td.style.height = '18px';
+        });
       });
 
       const opt = {
@@ -92,20 +104,21 @@ export async function initInvoiceDetailPage() {
           sheet.style.height = originalInfo[i].height;
           // @ts-ignore
           sheet.style.padding = originalInfo[i].padding;
+          // @ts-ignore
+          sheet.style.pageBreakAfter = originalInfo[i].pageBreakAfter;
 
-          if (sheet.classList.contains('page-1')) {
-            const rows = sheet.querySelectorAll('td');
-            rows.forEach(td => {
+          // Restore row heights
+          const rows = sheet.querySelectorAll('td');
+          rows.forEach(td => {
+            // @ts-ignore
+            if (td.dataset.originalHeight !== undefined) {
               // @ts-ignore
-              if (td.dataset.originalHeight) {
-                // @ts-ignore
-                td.style.height = td.dataset.originalHeight;
-              } else {
-                // @ts-ignore
-                td.style.height = '';
-              }
-            });
-          }
+              td.style.height = td.dataset.originalHeight;
+            } else {
+              // @ts-ignore
+              td.style.height = '';
+            }
+          });
         });
       }).catch(err => {
         console.error('PDF generation failed:', err);
@@ -122,20 +135,21 @@ export async function initInvoiceDetailPage() {
           sheet.style.height = originalInfo[i].height;
           // @ts-ignore
           sheet.style.padding = originalInfo[i].padding;
+          // @ts-ignore
+          sheet.style.pageBreakAfter = originalInfo[i].pageBreakAfter;
 
-          if (sheet.classList.contains('page-1')) {
-            const rows = sheet.querySelectorAll('td');
-            rows.forEach(td => {
+          // Restore row heights
+          const rows = sheet.querySelectorAll('td');
+          rows.forEach(td => {
+            // @ts-ignore
+            if (td.dataset.originalHeight !== undefined) {
               // @ts-ignore
-              if (td.dataset.originalHeight) {
-                // @ts-ignore
-                td.style.height = td.dataset.originalHeight;
-              } else {
-                // @ts-ignore
-                td.style.height = '';
-              }
-            });
-          }
+              td.style.height = td.dataset.originalHeight;
+            } else {
+              // @ts-ignore
+              td.style.height = '';
+            }
+          });
         });
       });
     });
