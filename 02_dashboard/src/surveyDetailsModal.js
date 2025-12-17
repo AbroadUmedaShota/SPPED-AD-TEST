@@ -321,7 +321,22 @@ export function populateSurveyDetails(survey) {
         : '―';
     detail_bizcardEnabled_view.textContent = survey.bizcardEnabled ? '利用する' : '利用しない';
     detail_bizcardCompletionCount_view.textContent = survey.bizcardEnabled ? `${survey.bizcardCompletionCount || 0}件` : 'N/A';
-    detail_thankYouEmailSettings_view.textContent = survey.thankYouEmailSettings || '設定なし';
+    let thankYouEmailSettingsText;
+    switch (survey.thankYouEmailSettings) {
+        case 'auto':
+            thankYouEmailSettingsText = '自動送信';
+            break;
+        case 'manual':
+            thankYouEmailSettingsText = '手動送信';
+            break;
+        case 'none':
+            thankYouEmailSettingsText = '送信しない';
+            break;
+        default:
+            thankYouEmailSettingsText = '設定なし';
+            break;
+    }
+    detail_thankYouEmailSettings_view.textContent = thankYouEmailSettingsText;
 
     // Non-editable fields
     const qrUrl = `https://survey.speedad.com/qr/${survey.id}`;
