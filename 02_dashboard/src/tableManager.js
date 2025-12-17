@@ -129,7 +129,7 @@ export async function fetchSurveyData() {
     try {
         const surveyIds = await fetchSurveyIds();
         fetchStats.totalCount = surveyIds.length;
-        
+
         const surveyPromises = surveyIds.map(async id => {
             const primaryUrl = resolveDashboardDataPath(`demo_surveys/${id}.json`);
             const fallbackUrls = [
@@ -316,7 +316,7 @@ function renderTableRows(surveysToRender) {
             e.stopPropagation();
             handleOpenModal('qrCodeModal', resolveDashboardAssetPath('modals/qrCodeModal.html'));
         });
-        
+
         row.addEventListener('click', (e) => {
             if (e.target.closest('button')) {
                 return;
@@ -412,7 +412,7 @@ function extractSurveySequenceParts(surveyId) {
     if (typeof surveyId !== 'string') {
         return null;
     }
-   
+
     const match = SURVEY_ID_PATTERN.exec(surveyId);
     if (!match) {
         return null;
@@ -564,41 +564,23 @@ function updatePagination() {
         return button;
     };
 
-    if (totalPages <= 7) { // Show all pages if 7 or less
-        for (let i = 1; i <= totalPages; i++) {
-            fragment.appendChild(createPageButton(i, i === currentPage));
-        }
-    } else {
-        // Always show first page
-        fragment.appendChild(createPageButton(1, 1 === currentPage));
+    const maxVisiblePages = 5;
+    let startPage = 1;
+    let endPage = totalPages;
 
-        // Logic for ellipses
-        if (currentPage > 4) {
-            fragment.appendChild(createPageButton(0, false, true, '...'));
-        }
+    if (totalPages > maxVisiblePages) {
+        const half = Math.floor(maxVisiblePages / 2);
+        startPage = Math.max(1, currentPage - half);
+        endPage = startPage + maxVisiblePages - 1;
 
-        let startPage = Math.max(2, currentPage - 2);
-        let endPage = Math.min(totalPages - 1, currentPage + 2);
-
-        if (currentPage <= 4) {
-            startPage = 2;
-            endPage = 5;
+        if (endPage > totalPages) {
+            endPage = totalPages;
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
         }
-        if (currentPage >= totalPages - 3) {
-            startPage = totalPages - 4;
-            endPage = totalPages - 1;
-        }
+    }
 
-        for (let i = startPage; i <= endPage; i++) {
-            fragment.appendChild(createPageButton(i, i === currentPage));
-        }
-
-        if (currentPage < totalPages - 3) {
-            fragment.appendChild(createPageButton(0, false, true, '...'));
-        }
-
-        // Always show last page
-        fragment.appendChild(createPageButton(totalPages, totalPages === currentPage));
+    for (let i = startPage; i <= endPage; i++) {
+        fragment.appendChild(createPageButton(i, i === currentPage));
     }
 
     paginationNumbersContainer.appendChild(fragment);
@@ -629,10 +611,10 @@ export function applyFiltersAndPagination() {
         const lang = window.getCurrentLanguage();
 
         currentFilteredData = allSurveyData.filter(survey => {
-            const surveyName = (survey.name && typeof survey.name === 'object') 
-                ? (survey.name[lang] || survey.name.ja || '').toLowerCase() 
+            const surveyName = (survey.name && typeof survey.name === 'object')
+                ? (survey.name[lang] || survey.name.ja || '').toLowerCase()
                 : (survey.name || '').toLowerCase();
-            
+
             const displayStatus = getSurveyStatus(survey);
             if (HIDDEN_USER_STATUSES.has(displayStatus)) {
                 return false;
@@ -645,11 +627,11 @@ export function applyFiltersAndPagination() {
             const matchesGroup = currentGroupId === 'personal'
                 ? !survey.groupId
                 : (currentGroupId === null || survey.groupId === currentGroupId); // グループIDによるフィルタリング
-            
-            const matchesPeriod = 
+
+            const matchesPeriod =
                 (!startDate || !isValidDate(startDate) || (surveyPeriodStart && surveyPeriodStart >= startDate)) &&
                 (!endDate || !isValidDate(endDate) || (surveyPeriodEnd && surveyPeriodEnd <= endDate));
-            
+
             return matchesKeyword && matchesStatus && matchesPeriod && matchesGroup;
         });
 
