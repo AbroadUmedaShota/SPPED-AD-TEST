@@ -23,17 +23,189 @@ export async function initInvoiceDetailPage() {
 
   const downloadButton = document.getElementById('downloadPdfBtn');
   if (downloadButton) {
-    downloadButton.addEventListener('click', () => {
-      const element = document.getElementById('invoice-sheet-container');
-      const opt = {
-        margin: 0, // No margin, handled by CSS padding
-        filename: `invoice-${invoiceId}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-      // @ts-ignore
-      html2pdf().set(opt).from(element).save();
+    downloadButton.addEventListener('click', async () => {
+      // ローディング表示
+      showLoading('invoice-detail-loading-overlay');
+
+      try {
+        const element = document.getElementById('invoice-sheet-container');
+        if (!element) {
+          throw new Error('請求書要素が見つかりません');
+        }
+
+        // 一時的にスタイルを保存して変更
+        const sheets = element.querySelectorAll('.invoice-sheet');
+        const originalStyles = [];
+
+        sheets.forEach((sheet, index) => {
+          // 元のスタイルを保存
+          // @ts-ignore
+          const original = {
+            marginBottom: sheet.style.marginBottom,
+            boxShadow: sheet.style.boxShadow,
+            minHeight: sheet.style.minHeight,
+            height: sheet.style.height,
+            maxHeight: sheet.style.maxHeight,
+            overflow: sheet.style.overflow,
+            position: sheet.style.position,
+            padding: sheet.style.padding,
+            boxSizing: sheet.style.boxSizing,
+            pageBreakAfter: sheet.style.pageBreakAfter
+          };
+
+          const pageNumEl = sheet.querySelector('.page-number');
+          if (pageNumEl) {
+            // @ts-ignore
+            original.pageNumber = {
+              // @ts-ignore
+              position: pageNumEl.style.position,
+              // @ts-ignore
+              bottom: pageNumEl.style.bottom,
+              // @ts-ignore
+              right: pageNumEl.style.right,
+              // @ts-ignore
+              width: pageNumEl.style.width,
+              // @ts-ignore
+              marginTop: pageNumEl.style.marginTop,
+              // @ts-ignore
+              paddingTop: pageNumEl.style.paddingTop
+            };
+          }
+
+          originalStyles.push(original);
+
+          // PDF用スタイルを適用
+          // @ts-ignore
+          sheet.style.marginBottom = '0';
+          // @ts-ignore
+          sheet.style.boxShadow = 'none';
+          // @ts-ignore
+          sheet.style.minHeight = '296mm';
+          // @ts-ignore
+          sheet.style.height = '296mm';
+          // @ts-ignore
+          sheet.style.maxHeight = 'none';
+          // @ts-ignore
+          sheet.style.overflow = 'hidden';
+          // @ts-ignore
+          sheet.style.position = 'relative';
+          // @ts-ignore
+          sheet.style.padding = '10mm 15mm 30mm 15mm'; // 下部パディング30mm
+          // @ts-ignore
+          sheet.style.boxSizing = 'border-box';
+
+          // ページ番号の位置調整
+          if (pageNumEl) {
+            // @ts-ignore
+            pageNumEl.style.position = 'absolute';
+            // 2ページ目以降はもっと下げる
+            // @ts-ignore
+            pageNumEl.style.bottom = index === 0 ? '5mm' : '3mm';
+            // @ts-ignore
+            pageNumEl.style.right = '15mm';
+            // @ts-ignore
+            pageNumEl.style.width = 'auto';
+            // @ts-ignore
+            pageNumEl.style.marginTop = '0';
+            // @ts-ignore
+            pageNumEl.style.paddingTop = '0';
+          }
+
+          // ページブレイク設定
+          if (index < sheets.length - 1) {
+            // @ts-ignore
+            sheet.style.pageBreakAfter = 'always';
+          } else {
+            // @ts-ignore
+            sheet.style.pageBreakAfter = 'auto';
+          }
+
+          // 行の高さ調整
+          const rows = sheet.querySelectorAll('td');
+          rows.forEach(td => {
+            // @ts-ignore
+            if (!td.dataset.originalHeight) {
+              // @ts-ignore
+              td.dataset.originalHeight = td.style.height || '';
+            }
+            // @ts-ignore
+            td.style.height = '20px';
+          });
+        });
+
+        // PDF生成オプション
+        const opt = {
+          margin: 0,
+          filename: `invoice-${invoiceId}.pdf`,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, scrollY: 0, scrollX: 0 },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+          pagebreak: { mode: ['css', 'legacy'] }
+        };
+
+        // PDF生成
+        // @ts-ignore
+        await html2pdf().set(opt).from(element).save();
+
+        // 元のスタイルに戻す
+        sheets.forEach((sheet, index) => {
+          const original = originalStyles[index];
+          // @ts-ignore
+          sheet.style.marginBottom = original.marginBottom;
+          // @ts-ignore
+          sheet.style.boxShadow = original.boxShadow;
+          // @ts-ignore
+          sheet.style.minHeight = original.minHeight;
+          // @ts-ignore
+          sheet.style.height = original.height;
+          // @ts-ignore
+          sheet.style.maxHeight = original.maxHeight;
+          // @ts-ignore
+          sheet.style.overflow = original.overflow;
+          // @ts-ignore
+          sheet.style.position = original.position;
+          // @ts-ignore
+          sheet.style.padding = original.padding;
+          // @ts-ignore
+          sheet.style.boxSizing = original.boxSizing;
+          // @ts-ignore
+          sheet.style.pageBreakAfter = original.pageBreakAfter;
+
+          const pageNumEl = sheet.querySelector('.page-number');
+          if (pageNumEl && original.pageNumber) {
+            // @ts-ignore
+            pageNumEl.style.position = original.pageNumber.position;
+            // @ts-ignore
+            pageNumEl.style.bottom = original.pageNumber.bottom;
+            // @ts-ignore
+            pageNumEl.style.right = original.pageNumber.right;
+            // @ts-ignore
+            pageNumEl.style.width = original.pageNumber.width;
+            // @ts-ignore
+            pageNumEl.style.marginTop = original.pageNumber.marginTop;
+            // @ts-ignore
+            pageNumEl.style.paddingTop = original.pageNumber.paddingTop;
+          }
+
+          // 行の高さを戻す
+          const rows = sheet.querySelectorAll('td');
+          rows.forEach(td => {
+            // @ts-ignore
+            if (td.dataset.originalHeight !== undefined) {
+              // @ts-ignore
+              td.style.height = td.dataset.originalHeight;
+              // @ts-ignore
+              delete td.dataset.originalHeight;
+            }
+          });
+        });
+
+      } catch (error) {
+        console.error('PDF生成エラー:', error);
+        alert('PDFの生成に失敗しました。');
+      } finally {
+        hideLoading('invoice-detail-loading-overlay');
+      }
     });
   }
 

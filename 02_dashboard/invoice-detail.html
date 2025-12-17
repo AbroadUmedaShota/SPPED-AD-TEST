@@ -75,9 +75,10 @@
       padding: 15mm 15mm;
       box-sizing: border-box;
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-      position: relative;
       color: #333;
       /* Default text color override for sheet stuff */
+      display: flex;
+      flex-direction: column;
     }
 
     /* --- 共通テーブル設定 --- */
@@ -405,12 +406,11 @@
     /* I'll just remove top/bottom borders. */
 
     /* ページ番号 */
-    /* ページ番号 */
     .invoice-sheet .page-number {
-      position: absolute;
-      bottom: 5mm;
-      right: 15mm;
       font-size: 9pt;
+      text-align: right;
+      margin-top: auto; /* Pushes to the bottom */
+      padding-top: 1em; /* Add some space from the table above */
     }
 
     /* --- 印刷設定 --- */
