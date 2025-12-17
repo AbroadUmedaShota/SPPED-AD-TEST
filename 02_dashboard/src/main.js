@@ -93,6 +93,33 @@ function showTutorialResumeBanner() {
     }
 }
 
+
+// --- New Survey Modal Help Popover Logic ---
+let activeNewSurveyPopover = null;
+
+function closeNewSurveyPopover() {
+    if (!activeNewSurveyPopover) return;
+    const { button, popover } = activeNewSurveyPopover;
+    if (popover) popover.classList.add('hidden');
+    if (button) button.setAttribute('aria-expanded', 'false');
+    activeNewSurveyPopover = null;
+}
+
+document.addEventListener('click', (event) => {
+    if (!activeNewSurveyPopover) return;
+    const { button, popover } = activeNewSurveyPopover;
+    if ((button && button.contains(event.target)) || (popover && popover.contains(event.target))) {
+        return;
+    }
+    closeNewSurveyPopover();
+});
+
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+        closeNewSurveyPopover();
+    }
+});
+
 function openNewSurveyModalWithSetup(afterOpen) {
     handleOpenModal('newSurveyModal', resolveDashboardAssetPath('modals/newSurveyModal.html'), () => {
         // Initialize flatpickr for the new range input
@@ -131,27 +158,29 @@ function openNewSurveyModalWithSetup(afterOpen) {
             { input: periodRangeInput, error: periodRangeError }
         ];
 
-        const helpMessages = {
-            surveyName: 'アンケート名は管理画面でのみ表示される内部向け名称です。',
-            displayTitle: '表示タイトルは回答者に表示されるアンケートの見出しです。'
-        };
+        // Initialize Help Popovers
+        const helpButtons = document.querySelectorAll('#newSurveyModal .help-icon-button');
+        helpButtons.forEach((button) => {
+            if (button.dataset.bound === 'true') return;
 
-        document.querySelectorAll('#newSurveyModal .survey-help-trigger').forEach((button) => {
-            if (!button || button.dataset.tippyInit === 'true') {
-                return;
-            }
-            const helpKey = button.dataset.helpKey;
-            const message = helpMessages[helpKey];
-            if (message && window.tippy) { // Check if tippy is loaded
-                tippy(button, {
-                    content: message,
-                    theme: 'material',
-                    animation: 'scale-subtle',
-                    placement: 'top',
-                    maxWidth: 'none' // 改行を防ぐ
-                });
-            }
-            button.dataset.tippyInit = 'true';
+            button.addEventListener('click', (e) => {
+                e.stopPropagation();
+                e.preventDefault();
+
+                const tooltipId = button.dataset.tooltipId;
+                const popover = document.getElementById(tooltipId);
+                if (!popover) return;
+
+                if (activeNewSurveyPopover && activeNewSurveyPopover.popover === popover) {
+                    closeNewSurveyPopover();
+                } else {
+                    closeNewSurveyPopover();
+                    popover.classList.remove('hidden');
+                    button.setAttribute('aria-expanded', 'true');
+                    activeNewSurveyPopover = { button, popover };
+                }
+            });
+            button.dataset.bound = 'true';
         });
 
         const hideAllErrors = () => {
@@ -279,10 +308,10 @@ function initLanguageSwitcher() {
         localStorage.setItem('language', lang);
         currentLanguageText.textContent = lang === 'ja' ? '日本語' : 'English';
         document.documentElement.lang = lang; // Update the lang attribute of the <html> tag
-        
+
         // Dispatch a custom event to notify other parts of the app
         document.dispatchEvent(new CustomEvent('languagechange', { detail: { lang } }));
-        
+
         updateSelectionState(lang);
         languageSwitcherDropdown.classList.add('hidden');
         languageSwitcherButton.setAttribute('aria-expanded', 'false');
@@ -337,7 +366,7 @@ window.openDuplicateSurveyModal = openDuplicateSurveyModal;
 window.showToast = showToast;
 window.closeModal = closeModal;
 window.openModal = openModal;
-window.copyUrl = async function(inputElement) {
+window.copyUrl = async function (inputElement) {
     if (inputElement && inputElement.value) {
         await copyTextToClipboard(inputElement.value);
     }
@@ -365,7 +394,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Also checks that hostname is not empty, to avoid issues with file:/// protocol.
         if (link.href && link.hostname && link.hostname !== currentHost) {
             link.classList.add('external-link');
-            
+
             // Ensure it opens in a new tab and is secure.
             link.setAttribute('target', '_blank');
             link.setAttribute('rel', 'noopener noreferrer');
@@ -462,7 +491,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         case 'bug-report.html':
             initBugReportPage();
             break;
-        
+
     }
 
 
