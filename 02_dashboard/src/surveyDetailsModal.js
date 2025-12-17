@@ -1,4 +1,4 @@
-import { showToast, copyTextToClipboard } from './utils.js';
+import { DATA_CONVERSION_PLANS, getPlanConfig } from './services/bizcardPlans.js';
 import { openDownloadModal } from './downloadOptionsModal.js';
 import { updateSurveyData } from './tableManager.js'; // tableManagerからインポート
 import { deriveSurveyLifecycleMeta, USER_STATUSES } from './services/statusService.js';
@@ -265,9 +265,9 @@ export function populateSurveyDetails(survey) {
     const detail_deadline_view = document.getElementById('detail_deadline_view');
     const detail_estimatedBillingAmount_view = document.getElementById('detail_estimatedBillingAmount_view');
     const detail_billingAmount_label = document.getElementById('detail_billingAmount_label');
-    const detail_bizcardEnabled_view = document.getElementById('detail_bizcardEnabled_view');
     const detail_bizcardCompletionCount_view = document.getElementById('detail_bizcardCompletionCount');
     const detail_thankYouEmailSettings_view = document.getElementById('detail_thankYouEmailSettings_view');
+    const detail_dataConversionPlan_view = document.getElementById('detail_dataConversionPlan_view');
 
     // Non-editable fields
     const detail_surveyUrl = document.getElementById('detail_surveyUrl');
@@ -319,7 +319,11 @@ export function populateSurveyDetails(survey) {
     detail_estimatedBillingAmount_view.textContent = billingAmountValue !== null
         ? `¥${billingAmountValue.toLocaleString()}`
         : '―';
-    detail_bizcardEnabled_view.textContent = survey.bizcardEnabled ? '利用する' : '利用しない';
+    const normalizedPlan = survey.dataConversionPlan ? survey.dataConversionPlan : 'not_set';
+    const planConfig = getPlanConfig(normalizedPlan);
+    if (detail_dataConversionPlan_view) {
+        detail_dataConversionPlan_view.textContent = planConfig ? planConfig.title.ja : 'データ化項目プランは設定されていません';
+    }
     detail_bizcardCompletionCount_view.textContent = `${survey.bizcardRequest || 0}件`;
     detail_thankYouEmailSettings_view.textContent = survey.thankYouEmailSettings || '設定なし';
 
