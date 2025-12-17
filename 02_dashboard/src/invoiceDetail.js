@@ -23,123 +23,189 @@ export async function initInvoiceDetailPage() {
 
   const downloadButton = document.getElementById('downloadPdfBtn');
   if (downloadButton) {
-    downloadButton.addEventListener('click', () => {
-      const originalElement = document.getElementById('invoice-sheet-container');
+    downloadButton.addEventListener('click', async () => {
+      // ローディング表示
+      showLoading('invoice-detail-loading-overlay');
 
-      // 1. CLONE THE ELEMENT
-      // We use a clone to avoid any visual jank/shifting on the user's screen during generation.
-      // @ts-ignore
-      const clone = originalElement.cloneNode(true);
-
-      // 2. SETUP HIDDEN STAGING AREA
-      // Position fixed at top-left so it renders correctly, but hidden behind main content.
-      // We avoid 'right: -10000px' as that causes blank pages in html2canvas.
-      // @ts-ignore
-      clone.style.position = 'fixed';
-      // @ts-ignore
-      clone.style.left = '0';
-      // @ts-ignore
-      clone.style.top = '0';
-      // @ts-ignore
-      clone.style.width = '210mm'; // Force A4 width on the clone
-      // @ts-ignore
-      clone.style.zIndex = '-9999'; // Hide behind everything
-      // @ts-ignore
-      clone.style.visibility = 'visible'; // Must be visible for html2canvas to capture it
-      // @ts-ignore
-      clone.style.backgroundColor = '#ffffff'; // Ensure white background so alpha doesn't make it weird
-
-      // Append to body to make it renderable
-      document.body.appendChild(clone);
-
-      // 3. APPLY PDF-SPECIFIC STYLING TO THE CLONE
-      // We can be aggressive here because it doesn't affect the main UI.
-      const sheets = clone.querySelectorAll('.invoice-sheet');
-
-      sheets.forEach((sheet, index) => {
-        // @ts-ignore
-        sheet.style.marginBottom = '0';
-        // @ts-ignore
-        sheet.style.boxShadow = 'none';
-
-        // FIXED HEIGHT of 296mm (1mm safety buffer)
-        // @ts-ignore
-        sheet.style.minHeight = '296mm';
-        // @ts-ignore
-        sheet.style.height = '296mm';
-        // @ts-ignore
-        sheet.style.maxHeight = 'none';
-
-        // Overflow hidden to prevent white pages
-        // @ts-ignore
-        sheet.style.overflow = 'hidden';
-
-        // Relative positioning for absolute children
-        // @ts-ignore
-        sheet.style.position = 'relative';
-
-        // PADDING ADJUSTMENT
-        // Top: 10mm
-        // Side: 15mm
-        // Bottom: 35mm (Massive buffer to prevent overlap on Page 2+)
-        // @ts-ignore
-        sheet.style.padding = '10mm 15mm 35mm 15mm';
-        // @ts-ignore
-        sheet.style.boxSizing = 'border-box';
-
-        // ABSOLUTE FOOTER POSITIONING
-        const pageNumEl = sheet.querySelector('.page-number');
-        if (pageNumEl) {
-          // @ts-ignore
-          pageNumEl.style.position = 'absolute';
-          // @ts-ignore
-          pageNumEl.style.bottom = '4mm'; // Very low, near the edge as requested
-          // @ts-ignore
-          pageNumEl.style.right = '15mm';
-          // @ts-ignore
-          pageNumEl.style.width = 'auto';
-          // @ts-ignore
-          pageNumEl.style.marginTop = '0';
-          // @ts-ignore
-          pageNumEl.style.paddingTop = '0';
+      try {
+        const element = document.getElementById('invoice-sheet-container');
+        if (!element) {
+          throw new Error('請求書要素が見つかりません');
         }
 
-        // STRICT PAGE BREAKS
-        if (index < sheets.length - 1) {
-          // @ts-ignore
-          sheet.style.pageBreakAfter = 'always';
-        } else {
-          // @ts-ignore
-          sheet.style.pageBreakAfter = 'auto';
-        }
+        // 一時的にスタイルを保存して変更
+        const sheets = element.querySelectorAll('.invoice-sheet');
+        const originalStyles = [];
 
-        // ROW COMPRESSION (20px)
-        const rows = sheet.querySelectorAll('td');
-        rows.forEach(td => {
+        sheets.forEach((sheet, index) => {
+          // 元のスタイルを保存
           // @ts-ignore
-          td.style.height = '20px';
+          const original = {
+            marginBottom: sheet.style.marginBottom,
+            boxShadow: sheet.style.boxShadow,
+            minHeight: sheet.style.minHeight,
+            height: sheet.style.height,
+            maxHeight: sheet.style.maxHeight,
+            overflow: sheet.style.overflow,
+            position: sheet.style.position,
+            padding: sheet.style.padding,
+            boxSizing: sheet.style.boxSizing,
+            pageBreakAfter: sheet.style.pageBreakAfter
+          };
+
+          const pageNumEl = sheet.querySelector('.page-number');
+          if (pageNumEl) {
+            // @ts-ignore
+            original.pageNumber = {
+              // @ts-ignore
+              position: pageNumEl.style.position,
+              // @ts-ignore
+              bottom: pageNumEl.style.bottom,
+              // @ts-ignore
+              right: pageNumEl.style.right,
+              // @ts-ignore
+              width: pageNumEl.style.width,
+              // @ts-ignore
+              marginTop: pageNumEl.style.marginTop,
+              // @ts-ignore
+              paddingTop: pageNumEl.style.paddingTop
+            };
+          }
+
+          originalStyles.push(original);
+
+          // PDF用スタイルを適用
+          // @ts-ignore
+          sheet.style.marginBottom = '0';
+          // @ts-ignore
+          sheet.style.boxShadow = 'none';
+          // @ts-ignore
+          sheet.style.minHeight = '296mm';
+          // @ts-ignore
+          sheet.style.height = '296mm';
+          // @ts-ignore
+          sheet.style.maxHeight = 'none';
+          // @ts-ignore
+          sheet.style.overflow = 'hidden';
+          // @ts-ignore
+          sheet.style.position = 'relative';
+          // @ts-ignore
+          sheet.style.padding = '10mm 15mm 30mm 15mm'; // 下部パディング30mm
+          // @ts-ignore
+          sheet.style.boxSizing = 'border-box';
+
+          // ページ番号の位置調整
+          if (pageNumEl) {
+            // @ts-ignore
+            pageNumEl.style.position = 'absolute';
+            // 2ページ目以降はもっと下げる
+            // @ts-ignore
+            pageNumEl.style.bottom = index === 0 ? '5mm' : '3mm';
+            // @ts-ignore
+            pageNumEl.style.right = '15mm';
+            // @ts-ignore
+            pageNumEl.style.width = 'auto';
+            // @ts-ignore
+            pageNumEl.style.marginTop = '0';
+            // @ts-ignore
+            pageNumEl.style.paddingTop = '0';
+          }
+
+          // ページブレイク設定
+          if (index < sheets.length - 1) {
+            // @ts-ignore
+            sheet.style.pageBreakAfter = 'always';
+          } else {
+            // @ts-ignore
+            sheet.style.pageBreakAfter = 'auto';
+          }
+
+          // 行の高さ調整
+          const rows = sheet.querySelectorAll('td');
+          rows.forEach(td => {
+            // @ts-ignore
+            if (!td.dataset.originalHeight) {
+              // @ts-ignore
+              td.dataset.originalHeight = td.style.height || '';
+            }
+            // @ts-ignore
+            td.style.height = '20px';
+          });
         });
-      });
 
-      const opt = {
-        margin: 0,
-        filename: `invoice-${invoiceId}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: ['css', 'legacy'] }
-      };
+        // PDF生成オプション
+        const opt = {
+          margin: 0,
+          filename: `invoice-${invoiceId}.pdf`,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, scrollY: 0, scrollX: 0 },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+          pagebreak: { mode: ['css', 'legacy'] }
+        };
 
-      // 4. GENERATE PDF FROM CLONE
-      // @ts-ignore
-      html2pdf().set(opt).from(clone).save().then(() => {
-        // Cleanup: Remove the clone after success
-        document.body.removeChild(clone);
-      }).catch(err => {
-        console.error('PDF generation failed:', err);
-        // Cleanup: Remove the clone even if it fails
-        document.body.removeChild(clone);
-      });
+        // PDF生成
+        // @ts-ignore
+        await html2pdf().set(opt).from(element).save();
+
+        // 元のスタイルに戻す
+        sheets.forEach((sheet, index) => {
+          const original = originalStyles[index];
+          // @ts-ignore
+          sheet.style.marginBottom = original.marginBottom;
+          // @ts-ignore
+          sheet.style.boxShadow = original.boxShadow;
+          // @ts-ignore
+          sheet.style.minHeight = original.minHeight;
+          // @ts-ignore
+          sheet.style.height = original.height;
+          // @ts-ignore
+          sheet.style.maxHeight = original.maxHeight;
+          // @ts-ignore
+          sheet.style.overflow = original.overflow;
+          // @ts-ignore
+          sheet.style.position = original.position;
+          // @ts-ignore
+          sheet.style.padding = original.padding;
+          // @ts-ignore
+          sheet.style.boxSizing = original.boxSizing;
+          // @ts-ignore
+          sheet.style.pageBreakAfter = original.pageBreakAfter;
+
+          const pageNumEl = sheet.querySelector('.page-number');
+          if (pageNumEl && original.pageNumber) {
+            // @ts-ignore
+            pageNumEl.style.position = original.pageNumber.position;
+            // @ts-ignore
+            pageNumEl.style.bottom = original.pageNumber.bottom;
+            // @ts-ignore
+            pageNumEl.style.right = original.pageNumber.right;
+            // @ts-ignore
+            pageNumEl.style.width = original.pageNumber.width;
+            // @ts-ignore
+            pageNumEl.style.marginTop = original.pageNumber.marginTop;
+            // @ts-ignore
+            pageNumEl.style.paddingTop = original.pageNumber.paddingTop;
+          }
+
+          // 行の高さを戻す
+          const rows = sheet.querySelectorAll('td');
+          rows.forEach(td => {
+            // @ts-ignore
+            if (td.dataset.originalHeight !== undefined) {
+              // @ts-ignore
+              td.style.height = td.dataset.originalHeight;
+              // @ts-ignore
+              delete td.dataset.originalHeight;
+            }
+          });
+        });
+
+      } catch (error) {
+        console.error('PDF生成エラー:', error);
+        alert('PDFの生成に失敗しました。');
+      } finally {
+        hideLoading('invoice-detail-loading-overlay');
+      }
     });
   }
 
