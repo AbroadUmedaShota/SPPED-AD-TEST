@@ -152,6 +152,12 @@ export async function fetchSurveyData() {
                     }
 
                     const survey = await res.json();
+                    // thankYouEmailSettings が存在しない場合、ランダムな値を割り当てる
+                    if (!survey.thankYouEmailSettings) {
+                        const options = ['自動送信', '手動送信', '送信しない'];
+                        const randomIndex = Math.floor(Math.random() * options.length);
+                        survey.thankYouEmailSettings = options[randomIndex];
+                    }
                     fetchStats.successCount += 1;
                     return survey;
                 } catch (error) {
