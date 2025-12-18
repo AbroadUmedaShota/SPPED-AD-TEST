@@ -4,6 +4,7 @@ let activeUIsCount = 0; // Tracks number of active UI overlays (modals, mobile s
 
 const DEFAULT_DASHBOARD_ROOT = './';
 const DEFAULT_DATA_ROOT = './data';
+const DEFAULT_DEMO_ROOT = './docs/examples';
 
 function joinRelativePath(base, relativePath) {
   const cleanedBase = base ? base.replace(/\/+$/, '') : '';
@@ -87,6 +88,13 @@ function getDashboardDataRoot() {
   return DEFAULT_DATA_ROOT;
 }
 
+function getDemoDataRoot() {
+  if (DASHBOARD_BASE_PATH !== null) {
+    return `${DASHBOARD_BASE_PATH}/docs/examples`;
+  }
+  return DEFAULT_DEMO_ROOT;
+}
+
 function sanitizeRelativePath(relativePath) {
   if (!relativePath) {
     return '';
@@ -108,8 +116,9 @@ export function resolveDashboardAssetPath(relativePath) {
 
 export function resolveDemoDataPath(relativePath) {
   const sanitized = sanitizeRelativePath(relativePath);
+  const root = getDemoDataRoot();
   if (!sanitized) {
-    return getDashboardDataRoot();
+    return root;
   }
 
   const parts = sanitized.split('/');
@@ -117,7 +126,6 @@ export function resolveDemoDataPath(relativePath) {
     parts[0] = `demo_${parts[0]}`;
   }
   const newPath = parts.join('/');
-  const root = getDashboardDataRoot();
   return joinRelativePath(root, newPath);
 }
 
@@ -384,5 +392,4 @@ export function debounce(func, wait) {
         timeout = setTimeout(later, wait);
     };
 }
-
 

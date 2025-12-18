@@ -1,0 +1,62 @@
+[
+  {
+    "answerId": "ANS_sv_0001_25024_001",
+    "businessCard": {
+      "group1": {
+        "email": "yoshida.naoki@example.com"
+      },
+      "group2": {
+        "lastName": "吉田",
+        "firstName": "直樹"
+      },
+      "group3": {
+        "companyName": "イベント企画株式会社",
+        "department": "企画部",
+        "position": "プランナー"
+      },
+      "group4": {
+        "postalCode": "220-0012",
+        "address1": "神奈川県横浜市西区みなとみらい2-2-1",
+        "address2": "ランドマークタワー20F"
+      },
+      "group5": {
+        "mobile": "070-1111-2222",
+        "tel1": "045-111-2222",
+        "fax": "045-111-2223"
+      },
+      "group6": {
+        "url": "https://event-planning.example.com"
+      }
+    }
+  },
+  {
+    "answerId": "ANS_sv_0001_25024_002",
+    "businessCard": {
+      "group1": {
+        "email": "yamada.keiko@example.com"
+      },
+      "group2": {
+        "lastName": "山田",
+        "firstName": "恵子"
+      },
+      "group3": {
+        "companyName": "イベントプロデュースLLC",
+        "department": "プロデュース部",
+        "position": "プロデューサー"
+      },
+      "group4": {
+        "postalCode": "604-8152",
+        "address1": "京都府京都市中京区烏丸通蛸薬師下る手洗水町678",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "070-3333-4444",
+        "tel1": "075-333-4444",
+        "fax": "075-333-4445"
+      },
+      "group6": {
+        "url": "https://event-produce.example.com"
+      }
+    }
+  }
+]

@@ -5,7 +5,7 @@
 本書は既存仕様やデータモデルを横断し、**名刺画像を起点とするサービスフローのどこで多言語情報が発生し、どのように伝搬・検証されるか**を整理する。
 
 ## 2. 関係レイヤー概要
-- **データソース層**: `data/demo_business-cards/*.json` や `data/core/surveys.json` など、モック JSON が一次ソース。多言語フィールドは `{ ja: '', en: '' }` 形式で格納する。  
+- **データソース層**: `docs/examples/demo_business-cards/*.json` や `data/core/surveys.json` など、モック JSON が一次ソース。多言語フィールドは `{ ja: '', en: '' }` 形式で格納する。  
 - **サービス層**: `02_dashboard/src/services/` 配下のモジュールがフェッチと整形を担当。`bizcardSettingsService.js` はアンケート設定と名刺依頼数の読込／保存を担い、`bizcardPlans.js` が多言語表示に対応した料金表を提供。  
 - **UI層**: `02_dashboard/src/ui/` および `survey-answer.js` が、名刺アップロードと多言語切替 UI を制御。  
 - **管理・レビュー**: 03_admin 配下の画面で名刺画像／入力キューを扱い、言語別オペレーター割当や完了 CSV アップロードを想定している。  

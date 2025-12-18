@@ -1,4 +1,4 @@
-import { showToast, resolveDashboardDataPath } from './utils.js';
+import { showToast, resolveDemoDataPath } from './utils.js';
 import { showConfirmationModal } from './confirmationModal.js';
 
 const MAX_MESSAGE_LENGTH = 500;
@@ -7,7 +7,7 @@ const STORAGE_KEY_PREFIX = 'thankYouScreenSettings_';
 // --- Services (本来は外部ファイル) ---
 async function getSurveyById(surveyId) {
   try {
-    const dataPath = resolveDashboardDataPath('demo_answers/surveys-with-details.json');
+    const dataPath = resolveDemoDataPath('answers/surveys-with-details.json');
     const response = await fetch(dataPath);
     if (!response.ok) throw new Error('Survey data not found');
     const surveysOrSurvey = await response.json();

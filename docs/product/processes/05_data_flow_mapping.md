@@ -8,7 +8,7 @@
 flowchart TD
     subgraph データ層 (JSON Mocks)
         A1[surveys/*.json]
-        A2[demo_answers/*.json]
+        A2[docs/examples/demo_answers/*.json]
         A3[core/invoices.json]
     end
 
@@ -44,8 +44,8 @@ end
 
 ## 2. 回答・スピードレビュー関連
 - **データソース**:
-  - 回答: `data/demo_answers/*.json`, `data/responses/*.json`
-  - 名刺: `data/demo_business-cards/*.json`
+  - 回答: `docs/examples/demo_answers/*.json`, `data/responses/*.json`
+  - 名刺: `docs/examples/demo_business-cards/*.json`
 - **サービス層**: `02_dashboard/src/services/speedReviewService.js`
 - **UI層**: `02_dashboard/src/ui/speedReviewRenderer.js`
 - **主なフィールド**:
@@ -72,4 +72,3 @@ end
 ## 前提・想定（Assumptions）
 - **本番環境への置換**: 本マッピングはモック環境を前提としています。本番環境では、データソースはREST/GraphQLなどのAPIエンドポイントに置き換えられます。その際のデータスキーマは、別途API仕様書に準拠します。
 - **エクスポート仕様**: CSV/Excelなど外部へのエクスポート機能は、出力先のシステム要件に応じて、別途専用のデータマッピングや変換処理を定義する必要があります。
-

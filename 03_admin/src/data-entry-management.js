@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const fetchData = async () => {
         // data files live under project root /data; adjust for pages under /03_admin/reconciliation/
-        const promises = surveyFiles.map(file => fetch(`../../data/demo_surveys/${file}`).then(res => res.json()));
+        const promises = surveyFiles.map(file => fetch(`../../docs/examples/demo_surveys/${file}`).then(res => res.json()));
         const results = await Promise.all(promises);
         allSurveyData = results.map(survey => {
             const statuses = ['会期前', '会期中', '会期中オンデマンド', '会期終了（データ化無し）', '会期終了（データ化中）', '会期終了（照合待ち）', 'エスカレ'];

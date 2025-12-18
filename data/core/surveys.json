@@ -39,7 +39,8 @@
       "emailSubject": "ご来場ありがとうございました",
       "emailBody": "本日はご来場いただき、誠にありがとうございました。\n\n株式会社〇〇\n{会社名} {氏名}様"
     },
-    "createdAt": "2025-07-01T00:00:00+09:00"
+    "createdAt": "2025-07-01T00:00:00+09:00",
+    "dataConversionPlan": "normal"
   },
   {
     "id": "sv_0001_25023",
@@ -69,7 +70,8 @@
     "bizcardRequest": 150,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-07-05T00:00:00+09:00"
+    "createdAt": "2025-07-05T00:00:00+09:00",
+    "dataConversionPlan": "superExpress"
   },
   {
     "id": "sv_0001_25024",
@@ -99,7 +101,8 @@
     "bizcardRequest": 220,
     "bizcardCompletionCount": 205,
     "thankYouEmailSettings": "設定済み",
-    "createdAt": "2025-07-10T00:00:00+09:00"
+    "createdAt": "2025-07-10T00:00:00+09:00",
+    "dataConversionPlan": "normal"
   },
   {
     "id": "sv_0001_25025",
@@ -129,7 +132,8 @@
     "bizcardRequest": 0,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-07-15T00:00:00+09:00"
+    "createdAt": "2025-07-15T00:00:00+09:00",
+    "dataConversionPlan": "normal"
   },
   {
     "id": "sv_0001_25026",
@@ -159,7 +163,8 @@
     "bizcardRequest": 0,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-07-20T00:00:00+09:00"
+    "createdAt": "2025-07-20T00:00:00+09:00",
+    "dataConversionPlan": "trial"
   },
   {
     "id": "sv_0001_25027",
@@ -189,7 +194,8 @@
     "bizcardRequest": 100,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-07-25T00:00:00+09:00"
+    "createdAt": "2025-07-25T00:00:00+09:00",
+    "dataConversionPlan": "normal"
   },
   {
     "id": "sv_0001_25028",
@@ -219,7 +225,8 @@
     "bizcardRequest": 0,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "設定済み",
-    "createdAt": "2025-08-01T00:00:00+09:00"
+    "createdAt": "2025-08-01T00:00:00+09:00",
+    "dataConversionPlan": "superExpress"
   },
   {
     "id": "sv_0001_25031",
@@ -249,7 +256,8 @@
     "bizcardRequest": 0,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "設定済み",
-    "createdAt": "2025-08-05T00:00:00+09:00"
+    "createdAt": "2025-08-05T00:00:00+09:00",
+    "dataConversionPlan": "normal"
   },
   {
     "id": "sv_0001_25032",
@@ -279,7 +287,8 @@
     "bizcardRequest": 178,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "設定済み",
-    "createdAt": "2025-08-10T00:00:00+09:00"
+    "createdAt": "2025-08-10T00:00:00+09:00",
+    "dataConversionPlan": "normal"
   },
   {
     "id": "sv_0001_25035",
@@ -309,7 +318,8 @@
     "bizcardRequest": 158,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-08-15T00:00:00+09:00"
+    "createdAt": "2025-08-15T00:00:00+09:00",
+    "dataConversionPlan": "superExpress"
   },
   {
     "id": "sv_0001_25039",
@@ -339,7 +349,8 @@
     "bizcardRequest": 108,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "送信完了",
-    "createdAt": "2025-08-20T00:00:00+09:00"
+    "createdAt": "2025-08-20T00:00:00+09:00",
+    "dataConversionPlan": "normal"
   },
   {
     "id": "sv_0001_25040",
@@ -369,7 +380,8 @@
     "bizcardRequest": 133,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "設定済み",
-    "createdAt": "2025-08-25T00:00:00+09:00"
+    "createdAt": "2025-08-25T00:00:00+09:00",
+    "dataConversionPlan": "trial"
   },
   {
     "id": "sv_0001_25043",
@@ -399,7 +411,8 @@
     "bizcardRequest": 392,
     "bizcardCompletionCount": 321,
     "thankYouEmailSettings": "設定済み",
-    "createdAt": "2025-09-01T00:00:00+09:00"
+    "createdAt": "2025-09-01T00:00:00+09:00",
+    "dataConversionPlan": "normal"
   },
   {
     "id": "sv_0001_25044",
@@ -429,7 +442,8 @@
     "bizcardRequest": 221,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "設定済み",
-    "createdAt": "2025-09-05T00:00:00+09:00"
+    "createdAt": "2025-09-05T00:00:00+09:00",
+    "dataConversionPlan": "superExpress"
   },
   {
     "id": "sv_0001_25045",
@@ -459,7 +473,8 @@
     "bizcardRequest": 350,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "設定済み",
-    "createdAt": "2025-09-10T00:00:00+09:00"
+    "createdAt": "2025-09-10T00:00:00+09:00",
+    "dataConversionPlan": "normal"
   },
   {
     "id": "sv_0001_25047",
@@ -489,7 +504,8 @@
     "bizcardRequest": 101,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "送信完了",
-    "createdAt": "2025-09-15T00:00:00+09:00"
+    "createdAt": "2025-09-15T00:00:00+09:00",
+    "dataConversionPlan": "normal"
   },
   {
     "id": "sv_0001_25049",
@@ -519,7 +535,8 @@
     "bizcardRequest": 0,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "設定済み",
-    "createdAt": "2025-09-20T00:00:00+09:00"
+    "createdAt": "2025-09-20T00:00:00+09:00",
+    "dataConversionPlan": "trial"
   },
   {
     "id": "sv_0001_25050",
@@ -549,7 +566,8 @@
     "bizcardRequest": 399,
     "bizcardCompletionCount": 323,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-09-25T00:00:00+09:00"
+    "createdAt": "2025-09-25T00:00:00+09:00",
+    "dataConversionPlan": "superExpress"
   },
   {
     "id": "sv_0001_25051",
@@ -579,7 +597,8 @@
     "bizcardRequest": 305,
     "bizcardCompletionCount": 250,
     "thankYouEmailSettings": "設定済み",
-    "createdAt": "2025-10-01T00:00:00+09:00"
+    "createdAt": "2025-10-01T00:00:00+09:00",
+    "dataConversionPlan": "superExpress"
   },
   {
     "id": "sv_0001_25052",
@@ -609,7 +628,8 @@
     "bizcardRequest": 0,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "送信完了",
-    "createdAt": "2025-10-05T00:00:00+09:00"
+    "createdAt": "2025-10-05T00:00:00+09:00",
+    "dataConversionPlan": "trial"
   },
   {
     "id": "sv_0001_25053",
@@ -639,7 +659,8 @@
     "bizcardRequest": 203,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-10-10T00:00:00+09:00"
+    "createdAt": "2025-10-10T00:00:00+09:00",
+    "dataConversionPlan": "normal"
   },
   {
     "id": "sv_0001_25054",
@@ -669,7 +690,8 @@
     "bizcardRequest": 0,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-10-15T00:00:00+09:00"
+    "createdAt": "2025-10-15T00:00:00+09:00",
+    "dataConversionPlan": "superExpress"
   },
   {
     "id": "sv_0001_25055",
@@ -699,7 +721,8 @@
     "bizcardRequest": 212,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "設定済み",
-    "createdAt": "2025-10-20T00:00:00+09:00"
+    "createdAt": "2025-10-20T00:00:00+09:00",
+    "dataConversionPlan": "normal"
   },
   {
     "id": "sv_0001_25056",
@@ -729,7 +752,8 @@
     "bizcardRequest": 163,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "設定済み",
-    "createdAt": "2025-10-25T00:00:00+09:00"
+    "createdAt": "2025-10-25T00:00:00+09:00",
+    "dataConversionPlan": "normal"
   },
   {
     "id": "sv_0001_25057",
@@ -759,7 +783,8 @@
     "bizcardRequest": 213,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "設定済み",
-    "createdAt": "2025-10-30T00:00:00+09:00"
+    "createdAt": "2025-10-30T00:00:00+09:00",
+    "dataConversionPlan": "superExpress"
   },
   {
     "id": "sv_0001_25058",
@@ -789,7 +814,8 @@
     "bizcardRequest": 0,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-11-05T00:00:00+09:00"
+    "createdAt": "2025-11-05T00:00:00+09:00",
+    "dataConversionPlan": "normal"
   },
   {
     "id": "sv_0001_25059",
@@ -819,7 +845,8 @@
     "bizcardRequest": 588,
     "bizcardCompletionCount": 524,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-11-10T00:00:00+09:00"
+    "createdAt": "2025-11-10T00:00:00+09:00",
+    "dataConversionPlan": "normal"
   },
   {
     "id": "sv_0001_25060",
@@ -849,7 +876,8 @@
     "bizcardRequest": 221,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-11-15T00:00:00+09:00"
+    "createdAt": "2025-11-15T00:00:00+09:00",
+    "dataConversionPlan": "superExpress"
   },
   {
     "id": "sv_0001_25061",
@@ -879,7 +907,8 @@
     "bizcardRequest": 88,
     "bizcardCompletionCount": 71,
     "thankYouEmailSettings": "設定済み",
-    "createdAt": "2025-11-20T00:00:00+09:00"
+    "createdAt": "2025-11-20T00:00:00+09:00",
+    "dataConversionPlan": "normal"
   },
   {
     "id": "sv_0001_25062",
@@ -909,7 +938,8 @@
     "bizcardRequest": 0,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-11-25T00:00:00+09:00"
+    "createdAt": "2025-11-25T00:00:00+09:00",
+    "dataConversionPlan": "trial"
   },
   {
     "id": "sv_0001_25018",
@@ -939,7 +969,8 @@
     "bizcardRequest": 281,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "送信完了",
-    "createdAt": "2025-04-10T00:00:00+09:00"
+    "createdAt": "2025-04-10T00:00:00+09:00",
+    "dataConversionPlan": "trial"
   },
   {
     "id": "sv_0001_25013",
@@ -969,7 +1000,8 @@
     "bizcardRequest": 0,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-03-03T00:00:00+09:00"
+    "createdAt": "2025-03-03T00:00:00+09:00",
+    "dataConversionPlan": "trial"
   },
   {
     "id": "sv_0001_25033",
@@ -999,7 +1031,8 @@
     "bizcardRequest": 211,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-08-13T00:00:00+09:00"
+    "createdAt": "2025-08-13T00:00:00+09:00",
+    "dataConversionPlan": "normal"
   },
   {
     "id": "sv_0001_25003",
@@ -1029,7 +1062,8 @@
     "bizcardRequest": 191,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-01-11T00:00:00+09:00"
+    "createdAt": "2025-01-11T00:00:00+09:00",
+    "dataConversionPlan": "trial"
   },
   {
     "id": "sv_0001_25014",
@@ -1059,7 +1093,8 @@
     "bizcardRequest": 211,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-03-13T00:00:00+09:00"
+    "createdAt": "2025-03-13T00:00:00+09:00",
+    "dataConversionPlan": "trial"
   },
   {
     "id": "sv_0001_25046",
@@ -1089,7 +1124,8 @@
     "bizcardRequest": 600,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-09-13T00:00:00+09:00"
+    "createdAt": "2025-09-13T00:00:00+09:00",
+    "dataConversionPlan": "superExpress"
   },
   {
     "id": "sv_0001_25008",
@@ -1119,7 +1155,8 @@
     "bizcardRequest": 882,
     "bizcardCompletionCount": 714,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-01-14T00:00:00+09:00"
+    "createdAt": "2025-01-14T00:00:00+09:00",
+    "dataConversionPlan": "superExpress"
   },
   {
     "id": "sv_0001_25017",
@@ -1149,7 +1186,8 @@
     "bizcardRequest": 502,
     "bizcardCompletionCount": 411,
     "thankYouEmailSettings": "送信完了",
-    "createdAt": "2025-03-18T00:00:00+09:00"
+    "createdAt": "2025-03-18T00:00:00+09:00",
+    "dataConversionPlan": "superExpress"
   },
   {
     "id": "sv_0001_25029",
@@ -1179,7 +1217,8 @@
     "bizcardRequest": 599,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-08-01T00:00:00+09:00"
+    "createdAt": "2025-08-01T00:00:00+09:00",
+    "dataConversionPlan": "superExpress"
   },
   {
     "id": "sv_0001_25038",
@@ -1209,7 +1248,8 @@
     "bizcardRequest": 61,
     "bizcardCompletionCount": 51,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-08-19T00:00:00+09:00"
+    "createdAt": "2025-08-19T00:00:00+09:00",
+    "dataConversionPlan": "trial"
   },
   {
     "id": "sv_0001_25011",
@@ -1239,7 +1279,8 @@
     "bizcardRequest": 420,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "設定済み",
-    "createdAt": "2025-01-25T00:00:00+09:00"
+    "createdAt": "2025-01-25T00:00:00+09:00",
+    "dataConversionPlan": "superExpress"
   },
   {
     "id": "sv_0001_25015",
@@ -1269,7 +1310,8 @@
     "bizcardRequest": 228,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "設定済み",
-    "createdAt": "2025-03-13T00:00:00+09:00"
+    "createdAt": "2025-03-13T00:00:00+09:00",
+    "dataConversionPlan": "normal"
   },
   {
     "id": "sv_0001_25004",
@@ -1299,7 +1341,8 @@
     "bizcardRequest": 164,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-01-11T00:00:00+09:00"
+    "createdAt": "2025-01-11T00:00:00+09:00",
+    "dataConversionPlan": "normal"
   },
   {
     "id": "sv_0001_25021",
@@ -1341,7 +1384,8 @@
       "emailSubject": "",
       "emailBody": ""
     },
-    "createdAt": "2025-05-21T00:00:00+09:00"
+    "createdAt": "2025-05-21T00:00:00+09:00",
+    "dataConversionPlan": "trial"
   },
   {
     "id": "sv_0001_25034",
@@ -1371,7 +1415,8 @@
     "bizcardRequest": 264,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-08-13T00:00:00+09:00"
+    "createdAt": "2025-08-13T00:00:00+09:00",
+    "dataConversionPlan": "normal"
   },
   {
     "id": "sv_0001_25016",
@@ -1401,7 +1446,8 @@
     "bizcardRequest": 220,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-03-13T00:00:00+09:00"
+    "createdAt": "2025-03-13T00:00:00+09:00",
+    "dataConversionPlan": "superExpress"
   },
   {
     "id": "sv_0001_25007",
@@ -1431,7 +1477,8 @@
     "bizcardRequest": 160,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-01-13T00:00:00+09:00"
+    "createdAt": "2025-01-13T00:00:00+09:00",
+    "dataConversionPlan": "trial"
   },
   {
     "id": "sv_0001_25048",
@@ -1461,7 +1508,8 @@
     "bizcardRequest": 211,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-09-19T00:00:00+09:00"
+    "createdAt": "2025-09-19T00:00:00+09:00",
+    "dataConversionPlan": "normal"
   },
   {
     "id": "sv_0001_25012",
@@ -1491,7 +1539,8 @@
     "bizcardRequest": 151,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-01-28T00:00:00+09:00"
+    "createdAt": "2025-01-28T00:00:00+09:00",
+    "dataConversionPlan": "trial"
   },
   {
     "id": "sv_0001_25001",
@@ -1521,7 +1570,8 @@
     "bizcardRequest": 211,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-01-10T00:00:00+09:00"
+    "createdAt": "2025-01-10T00:00:00+09:00",
+    "dataConversionPlan": "normal"
   },
   {
     "id": "sv_0001_25037",
@@ -1551,7 +1601,8 @@
     "bizcardRequest": 161,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-08-18T00:00:00+09:00"
+    "createdAt": "2025-08-18T00:00:00+09:00",
+    "dataConversionPlan": "normal"
   },
   {
     "id": "sv_0001_25002",
@@ -1581,7 +1632,8 @@
     "bizcardRequest": 299,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-01-10T00:00:00+09:00"
+    "createdAt": "2025-01-10T00:00:00+09:00",
+    "dataConversionPlan": "normal"
   },
   {
     "id": "sv_0001_25030",
@@ -1611,7 +1663,8 @@
     "bizcardRequest": 222,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-08-04T00:00:00+09:00"
+    "createdAt": "2025-08-04T00:00:00+09:00",
+    "dataConversionPlan": "normal"
   },
   {
     "id": "sv_0001_25009",
@@ -1641,7 +1694,8 @@
     "bizcardRequest": 183,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-01-14T00:00:00+09:00"
+    "createdAt": "2025-01-14T00:00:00+09:00",
+    "dataConversionPlan": "normal"
   },
   {
     "id": "sv_0001_25041",
@@ -1671,7 +1725,8 @@
     "bizcardRequest": 178,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-08-26T00:00:00+09:00"
+    "createdAt": "2025-08-26T00:00:00+09:00",
+    "dataConversionPlan": "normal"
   },
   {
     "id": "sv_0001_25005",
@@ -1701,7 +1756,8 @@
     "bizcardRequest": 207,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-01-11T00:00:00+09:00"
+    "createdAt": "2025-01-11T00:00:00+09:00",
+    "dataConversionPlan": "normal"
   },
   {
     "id": "sv_0001_25036",
@@ -1731,7 +1787,8 @@
     "bizcardRequest": 175,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-08-15T00:00:00+09:00"
+    "createdAt": "2025-08-15T00:00:00+09:00",
+    "dataConversionPlan": "normal"
   },
   {
     "id": "sv_0001_25010",
@@ -1761,7 +1818,8 @@
     "bizcardRequest": 198,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-01-18T00:00:00+09:00"
+    "createdAt": "2025-01-18T00:00:00+09:00",
+    "dataConversionPlan": "normal"
   },
   {
     "id": "sv_0001_25042",
@@ -1791,7 +1849,8 @@
     "bizcardRequest": 188,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-08-28T00:00:00+09:00"
+    "createdAt": "2025-08-28T00:00:00+09:00",
+    "dataConversionPlan": "normal"
   },
   {
     "id": "sv_0001_25006",
@@ -1821,7 +1880,8 @@
     "bizcardRequest": 207,
     "bizcardCompletionCount": 0,
     "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-01-11T00:00:00+09:00"
+    "createdAt": "2025-01-11T00:00:00+09:00",
+    "dataConversionPlan": "normal"
   },
   {
     "id": "sv_0001_25019",
@@ -1863,7 +1923,8 @@
       "emailSubject": "【特別オファー】ご来場ありがとうございます",
       "emailBody": "先日はご来場いただき、誠にありがとうございました。"
     },
-    "createdAt": "2025-07-20T00:00:00+09:00"
+    "createdAt": "2025-07-20T00:00:00+09:00",
+    "dataConversionPlan": "superExpress"
   },
   {
     "id": "sv_0001_25020",
@@ -1905,6 +1966,7 @@
       "emailSubject": "",
       "emailBody": ""
     },
-    "createdAt": "2025-07-21T00:00:00+09:00"
+    "createdAt": "2025-07-21T00:00:00+09:00",
+    "dataConversionPlan": "trial"
   }
 ]

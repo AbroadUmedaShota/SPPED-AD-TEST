@@ -1,0 +1,62 @@
+[
+  {
+    "answerId": "ANS_sv_0001_25057_001",
+    "businessCard": {
+      "group1": {
+        "email": "takahashi.kenta@example.com"
+      },
+      "group2": {
+        "lastName": "高橋",
+        "firstName": "健太"
+      },
+      "group3": {
+        "companyName": "製品企画株式会社",
+        "department": "製品企画部",
+        "position": "プロダクトストラテジスト"
+      },
+      "group4": {
+        "postalCode": "100-0005",
+        "address1": "東京都千代田区丸の内1-5-1",
+        "address2": "新丸の内ビルディング 10F"
+      },
+      "group5": {
+        "mobile": "030-2345-6789",
+        "tel1": "03-4567-8901",
+        "fax": "03-4567-8902"
+      },
+      "group6": {
+        "url": "https://product-strategy.example.com"
+      }
+    }
+  },
+  {
+    "answerId": "ANS_sv_0001_25057_002",
+    "businessCard": {
+      "group1": {
+        "email": "kobayashi.aya@example.com"
+      },
+      "group2": {
+        "lastName": "小林",
+        "firstName": "彩"
+      },
+      "group3": {
+        "companyName": "マーケティング株式会社",
+        "department": "マーケティング部",
+        "position": "ブランドマネージャー"
+      },
+      "group4": {
+        "postalCode": "150-0002",
+        "address1": "東京都渋谷区渋谷1-23-21",
+        "address2": "渋谷キャスト 13F"
+      },
+      "group5": {
+        "mobile": "030-9876-5432",
+        "tel1": "03-5678-9012",
+        "fax": "03-5678-9013"
+      },
+      "group6": {
+        "url": "https://marketing-corp-inc.example.com"
+      }
+    }
+  }
+]

@@ -2,8 +2,8 @@ import json
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parents[1]
-ANSWERS_DIR = BASE_DIR / 'data/demo_answers'
-SURVEYS_DIR = BASE_DIR / 'data/demo_surveys'
+ANSWERS_DIR = BASE_DIR / 'docs/examples/demo_answers'
+SURVEYS_DIR = BASE_DIR / 'docs/examples/demo_surveys'
 ENQUETE_DIR = BASE_DIR / 'data/surveys/enquete'
 
 

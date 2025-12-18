@@ -1,0 +1,62 @@
+[
+  {
+    "answerId": "ANS_sv_0001_25060_001",
+    "businessCard": {
+      "group1": {
+        "email": "yamada.naoki@example.com"
+      },
+      "group2": {
+        "lastName": "山田",
+        "firstName": "直樹"
+      },
+      "group3": {
+        "companyName": "製品利用分析株式会社",
+        "department": "製品利用分析部",
+        "position": "データサイエンティスト"
+      },
+      "group4": {
+        "postalCode": "100-0006",
+        "address1": "東京都千代田区有楽町2-7-1",
+        "address2": "有楽町イトシア 12F"
+      },
+      "group5": {
+        "mobile": "090-3456-7890",
+        "tel1": "03-0123-4567",
+        "fax": "03-0123-4568"
+      },
+      "group6": {
+        "url": "https://product-analytics.example.com"
+      }
+    }
+  },
+  {
+    "answerId": "ANS_sv_0001_25060_002",
+    "businessCard": {
+      "group1": {
+        "email": "sasaki.mika@example.com"
+      },
+      "group2": {
+        "lastName": "佐々木",
+        "firstName": "美香"
+      },
+      "group3": {
+        "companyName": "データ分析株式会社",
+        "department": "データ分析部",
+        "position": "データアナリスト"
+      },
+      "group4": {
+        "postalCode": "150-6090",
+        "address1": "東京都渋谷区恵比寿4-20-3",
+        "address2": "恵比寿ガーデンプレイスタワー 27F"
+      },
+      "group5": {
+        "mobile": "090-0987-6543",
+        "tel1": "03-1234-5678",
+        "fax": "03-1234-5679"
+      },
+      "group6": {
+        "url": "https://data-analytics.example.com"
+      }
+    }
+  }
+]

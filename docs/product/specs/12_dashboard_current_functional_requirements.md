@@ -6,9 +6,9 @@
 - Login, admin, and other entry points are out of scope unless reused by the dashboard shell.
 
 ## Data Sources and Path Resolution
-- `02_dashboard/src/utils.js` exposes `resolveDashboardDataPath` and `resolveDemoDataPath` to translate relative requests into `./data/...` および `./data/demo_...`（必要に応じて `../` を積み上げる相対パス）。返却値はいずれも `.` で始まり、HTML 配信元に依存せず同階層・下位階層からデータが解決できる。
-- Primary datasets include `data/core/surveys.json` (table view、詳細モーダル、作成画面の初期化を含む単一ソース), `data/core/invoices.json` (billing), and `data/core/groups.json` (sidebar context). デモ用 `demo_surveys` のフォールバックは撤廃。
-- Sample responses and business-card payloads live under `data/demo_answers`, `data/demo_business-cards`, and `data/responses`; CSV paths are also supported by `speedReviewService`.
+- `02_dashboard/src/utils.js` exposes `resolveDashboardDataPath` and `resolveDemoDataPath` to translate relative requests into `./data/...` および `./docs/examples/demo_...`（必要に応じて `../` を積み上げる相対パス）。返却値はいずれも `.` で始まり、HTML 配信元に依存せず同階層・下位階層からデータが解決できる。
+- Primary datasets include `data/core/surveys.json` (table view、詳細モーダル、作成画面の初期化を含む単一ソース), `data/core/invoices.json` (billing), and `data/core/groups.json` (sidebar context). デモ用データは `docs/examples/demo_*` に移設し、フォールバックを撤廃。
+- Sample responses and business-card payloads live under `docs/examples/demo_answers`, `docs/examples/demo_business-cards`, and `data/responses`; CSV paths are also supported by `speedReviewService`.
 - Write operations update in-memory arrays or `localStorage`; no server persistence is wired up in this codebase.
 
 ## Shell Navigation and Common UI
@@ -40,7 +40,7 @@
 - Detail modal supports view/edit modes, adapting controls for single-choice, multi-choice, and free-text questions; edits are applied to in-memory state and persisted only for the session.
 
 ### Graph Page (`graph-page.html`, `graph-page.js`)
-- Loads survey definitions and answers from paths resolved via `resolveDashboardDataPath`（例: `./data/demo_surveys`, `./data/demo_answers`）。
+- Loads survey definitions and answers from paths resolved via `resolveDashboardDataPath`（例: `./docs/examples/demo_surveys`, `./docs/examples/demo_answers`）。
 - Optional date range filtering limits the dataset before aggregation.
 - Produces chart-ready data for single and multi-choice questions while ensuring that predefined options with zero responses still appear in the output.
 

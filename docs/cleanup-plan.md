@@ -78,5 +78,4 @@ Track progress by converting the phases into issues or tasks, closing each once 
 
 ## Next Steps
 - [2025-09-17] Run smoke tests on key dashboard pages to confirm new `/data/` fetch paths resolve (survey creation, speed review, graph page, invoice detail).
-- [2025-09-17] Decide final home for demo datasets (`data/demo_surveys/`, `data/demo_answers/`, `data/demo_business-cards/`) and document expected usage.
-
+- [2025-09-17] Demo datasets moved to `docs/examples/demo_*` (surveys/answers/business-cards); document usage and adjust remaining references.
