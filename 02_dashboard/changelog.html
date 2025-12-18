@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpeedAd - 変更履歴</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="service-top-style.css">
+    <style>
+        .changelog-section {
+            border: 1px solid #e2e8f0; /* 枠線の色 */
+            border-radius: 0.75rem;      /* 角丸 */
+            padding: 1.5rem;             /* 内側の余白 */
+            margin-bottom: 1.5rem;       /* 各セクション間の下の余白 */
+            background-color: #ffffff;
+        }
+        .dark .changelog-section {
+            border-color: #374151;
+            background-color: #1f2937;
+        }
+        #changelog-content h1, #changelog-content h2 {
+           margin-top: 0;
+           padding-top: 0;
+        }
+        #changelog-content ul li {
+            margin-bottom: 0.5em; /* リストアイテム間のスペースを調整 */
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background">
+
+    <div class="relative flex min-h-screen flex-col">
+        <!-- サイドバー用オーバーレイ (モバイル用) -->
+        <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
+
+        <!-- ヘッダーのプレースホルダー -->
+        <div id="header-placeholder"></div>
+
+        <div class="flex flex-1 pt-16 bg-background">
+            <!-- サイドバーのプレースホルダー -->
+            <div id="sidebar-placeholder"></div>
+
+            <!-- メインコンテンツ -->
+            <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8">
+                <div class="w-full max-w-4xl mx-auto">
+                    <div id="breadcrumb-container" class="mb-4"></div>
+                    <h1 id="pageMainTitle" class="text-2xl font-bold text-text-main mb-6">変更履歴</h1>
+
+                    <div id="changelog-content" class="prose dark:prose-invert max-w-none">
+                        <!-- ここにMarkdownの内容が挿入されます -->
+                        <p>読み込み中...</p>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- フッターのプレースホルダー -->
+        <div id="footer-placeholder"></div>
+    </div>
+
+    <!-- marked.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- main.js は共通部品の読み込みに必要 -->
+    <script type="module" src="src/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // main.jsが共通部品を読み込むのを少し待つ
+            setTimeout(() => {
+                const contentEl = document.getElementById('changelog-content');
+                if (contentEl) {
+                    fetch('../WEEKLY_CHANGELOG.md')
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.text();
+                        })
+                        .then(text => {
+                                                        const tempDiv = document.createElement('div');
+                                                        tempDiv.innerHTML = marked.parse(text, { breaks: true });
+                            
+                                                        // 変換されたHTMLから h1 を探し、ページのタイトルを更新
+                                                        const firstH1 = tempDiv.querySelector('h1');
+                                                        if (firstH1) {
+                                                            const pageTitleElement = document.getElementById('pageMainTitle');
+                                                            if (pageTitleElement) {
+                                                                pageTitleElement.textContent = firstH1.textContent;
+                                                            }
+                                                            firstH1.remove(); // ページのタイトルとして使ったh1はコンテンツからは削除
+                                                        }
+                                                        
+                                                        const finalContainer = document.createDocumentFragment();
+                                                        let currentSection = null;
+                            
+                                                        Array.from(tempDiv.children).forEach(node => {
+                                                            if (node.tagName === 'H2') {
+                                                                // 新しいセクションの開始
+                                                                currentSection = document.createElement('div');
+                                                                currentSection.className = 'changelog-section';
+                                                                finalContainer.appendChild(currentSection);
+                                                            }
+                                                            
+                                                            if (currentSection) {
+                                                                currentSection.appendChild(node.cloneNode(true));
+                                                            } else {
+                                                                // 最初のh2より前の要素があれば、そのまま追加
+                                                                finalContainer.appendChild(node.cloneNode(true));
+                                                            }
+                                                        });
+                            
+                                                        contentEl.innerHTML = ''; // コンテナをクリア
+                                                        contentEl.appendChild(finalContainer);                        })
+                        .catch(error => {
+                            contentEl.innerHTML = '<p class="text-error">変更履歴ファイルの読み込みに失敗しました。</p>';
+                            console.error('Error fetching changelog:', error);
+                        });
+                }
+            }, 500); // 500ms待つ (もっと良い方法があれば修正)
+        });
+    </script>
+</body>
+</html>
