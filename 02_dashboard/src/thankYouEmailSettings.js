@@ -44,15 +44,37 @@ export function initThankYouEmailSettings() {
         const urlParams = new URLSearchParams(window.location.search);
         state.surveyId = urlParams.get('surveyId');
 
-        if (!state.surveyId) {
-            document.getElementById('pageTitle').textContent = 'アンケートIDが見つかりません';
-            showToast('有効なアンケートIDが指定されていません。', 'error');
-            return;
-        }
-
         try {
-            const initialData = await getInitialData(state.surveyId);
-            state = { ...state, ...initialData };
+            if (state.surveyId) {
+                // --- Existing Survey Mode ---
+                const initialData = await getInitialData(state.surveyId);
+                state = { ...state, ...initialData };
+            } else {
+                // --- New Survey (Temp) Mode ---
+                const tempDataString = localStorage.getItem('tempSurveyData');
+                if (!tempDataString) {
+                    showToast('一時的なアンケートデータが見つかりません。作成画面からやり直してください。', 'error');
+                    setTimeout(() => { window.location.href = 'surveyCreation.html'; }, 2000);
+                    return;
+                }
+                const tempData = JSON.parse(tempDataString);
+
+                state.surveyData = {
+                    id: null,
+                    name: tempData.name,
+                    displayTitle: tempData.displayTitle,
+                    recipientCount: 0 // No real recipients yet
+                };
+                state.emailSettings = tempData.settings?.thankYouEmail || {};
+                // For new surveys, templates and variables might be empty or come from a default source
+                state.emailTemplates = []; 
+                state.variables = [
+                    { name: '会社名', value: 'company_name' },
+                    { name: '氏名', value: 'full_name' },
+                    { name: '部署名', value: 'department' },
+                    { name: '役職', value: 'title' }
+                ];
+            }
 
             // Deep copy for initial state comparison
             state.initialEmailSettings = JSON.parse(JSON.stringify(state.emailSettings));
@@ -79,23 +101,16 @@ export function initThankYouEmailSettings() {
                 document.body.removeChild(dummyContainer);
             }
 
-            // Set initial radio button state, forcing 'auto' for new/default configurations.
-            let sendMethod;
-            const settings = state.emailSettings;
-            const isDefaultManual = settings.thankYouEmailEnabled === true && settings.sendMethod === 'manual';
-            const hasUserContent = settings.emailSubject || settings.emailBody;
-
-            if (isDefaultManual && !hasUserContent) {
-                // This is a new configuration which defaults to 'manual'. Override to 'auto' as requested.
-                sendMethod = 'auto';
-            } else {
-                // This is a saved configuration or is disabled. Respect the data.
-                if (settings.thankYouEmailEnabled === false) {
-                    sendMethod = 'none';
-                } else {
-                    sendMethod = settings.sendMethod;
-                }
+            // Set initial radio button state
+            let sendMethod = 'none';
+            if (state.emailSettings.thankYouEmailEnabled) {
+                 sendMethod = state.emailSettings.sendMethod || 'manual';
             }
+             // For new surveys, default to 'auto' if no specific method is set
+            if (!state.surveyId && !state.emailSettings.sendMethod) {
+                sendMethod = 'auto';
+            }
+
             const radioToCheck = document.querySelector(`input[name="sendMethod"][value="${sendMethod}"]`);
             if (radioToCheck) {
                 radioToCheck.checked = true;
@@ -195,14 +210,15 @@ export function initThankYouEmailSettings() {
      * Handles the cancel button click.
      */
     function handleCancel() {
+        const returnUrl = state.surveyId ? 'index.html' : 'surveyCreation.html';
         if (hasFormChanged()) {
             showConfirmationModal(
-                '変更が保存されていません。破棄してアンケート一覧に戻りますか？',
-                () => { window.location.href = 'index.html'; },
+                `変更が保存されていません。破棄して前の画面に戻りますか？`,
+                () => { window.location.href = returnUrl; },
                 '変更を破棄'
             );
         } else {
-            window.location.href = 'index.html';
+            window.location.href = returnUrl;
         }
     }
 
@@ -248,16 +264,40 @@ export function initThankYouEmailSettings() {
     }
     async function handleSaveSettings() {
         setButtonLoading(saveButton, true);
+
         const selectedMethod = document.querySelector('input[name="sendMethod"]:checked').value;
         const settingsToSave = {
-            surveyId: state.surveyId,
             thankYouEmailEnabled: selectedMethod !== 'none',
             sendMethod: selectedMethod === 'none' ? (state.initialEmailSettings.sendMethod || 'manual') : selectedMethod,
             emailTemplateId: document.getElementById('emailTemplate').value,
             emailSubject: document.getElementById('emailSubject').value,
             emailBody: document.getElementById('emailBody').value,
         };
+        
+        // --- New Survey (Temp) Mode ---
+        if (!state.surveyId) {
+            try {
+                const tempDataString = localStorage.getItem('tempSurveyData');
+                const surveyDataForUpdate = tempDataString ? JSON.parse(tempDataString) : {};
 
+                if (!surveyDataForUpdate.settings) surveyDataForUpdate.settings = {};
+                surveyDataForUpdate.settings.thankYouEmail = settingsToSave;
+                
+                localStorage.setItem('tempSurveyData', JSON.stringify(surveyDataForUpdate));
+
+                showToast('設定を一時保存しました。', 'success');
+                setTimeout(() => { window.location.href = 'surveyCreation.html'; }, 1000);
+            } catch (error) {
+                console.error('一時データへの保存エラー:', error);
+                showToast('設定の一時保存に失敗しました。', 'error');
+            } finally {
+                setButtonLoading(saveButton, false);
+            }
+            return;
+        }
+
+        // --- Existing Survey Mode ---
+        settingsToSave.surveyId = state.surveyId;
         // HACK: Define a global variable that the broken service file seems to need.
         window.mockEmailSettings = {};
 

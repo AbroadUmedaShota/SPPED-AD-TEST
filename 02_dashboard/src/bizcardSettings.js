@@ -58,19 +58,42 @@ export function initBizcardSettings() {
         const urlParams = new URLSearchParams(window.location.search);
         state.surveyId = urlParams.get('surveyId');
 
-        if (!state.surveyId) {
-            document.getElementById('pageTitle').textContent = 'アンケートIDが見つかりません';
-            showToast('有効なアンケートIDが指定されていません。', 'error');
-            return;
-        }
+        let surveyData;
+        let settingsData;
 
         try {
-            const [surveyData, settingsData] = await Promise.all([
-                fetchSurveyData(state.surveyId),
-                fetchBizcardSettings(state.surveyId)
-            ]);
+            if (state.surveyId) {
+                // --- Existing Survey Mode ---
+                [surveyData, settingsData] = await Promise.all([
+                    fetchSurveyData(state.surveyId),
+                    fetchBizcardSettings(state.surveyId)
+                ]);
+            } else {
+                // --- New Survey (Temp) Mode ---
+                const tempDataString = localStorage.getItem('tempSurveyData');
+                if (!tempDataString) {
+                    showToast('一時的なアンケートデータが見つかりません。作成画面からやり直してください。', 'error');
+                    setTimeout(() => { window.location.href = 'surveyCreation.html'; }, 2000);
+                    return;
+                }
+                const tempData = JSON.parse(tempDataString);
+                
+                surveyData = {
+                    id: null,
+                    name: tempData.name,
+                    displayTitle: tempData.displayTitle,
+                    periodStart: tempData.periodStart,
+                    periodEnd: tempData.periodEnd,
+                };
+                
+                settingsData = tempData.settings?.bizcard || {};
+                // Ensure default values are set for new survey settings
+                if (!settingsData.dataConversionPlan) {
+                    settingsData.dataConversionPlan = DEFAULT_PLAN;
+                }
+            }
 
-            // Set default value for bizcardEnabled to true as the toggle is removed
+            // --- Common Initialization Logic ---
             settingsData.bizcardEnabled = true;
             settingsData.dataConversionPlan = normalizePlanValue(settingsData.dataConversionPlan);
             const planConfig = getPlanConfig(settingsData.dataConversionPlan);
@@ -108,8 +131,7 @@ export function initBizcardSettings() {
             }
 
             state.settings = settingsData;
-            state.surveyData = surveyData; // surveyDataをstateに保存
-            // Deep copy for initial state comparison
+            state.surveyData = surveyData;
             state.initialSettings = JSON.parse(JSON.stringify(settingsData));
             state.initialSettings.premiumOptions = normalizePremiumOptions(state.initialSettings.premiumOptions);
 
@@ -193,14 +215,15 @@ export function initBizcardSettings() {
      * Handles the cancel button click.
      */
     function handleCancel() {
+        const returnUrl = state.surveyId ? 'index.html' : 'surveyCreation.html';
         if (hasFormChanged()) {
             showConfirmationModal(
-                '変更が保存されていません。破棄してアンケート一覧に戻りますか？',
-                () => { window.location.href = 'index.html'; },
+                `変更が保存されていません。破棄して前の画面に戻りますか？`,
+                () => { window.location.href = returnUrl; },
                 '変更を破棄'
             );
         } else {
-            window.location.href = 'index.html';
+            window.location.href = returnUrl;
         }
     }
 
@@ -336,7 +359,32 @@ export function initBizcardSettings() {
 
         setSaveButtonLoading(true);
 
-        // Collect final settings from state and form
+        // --- New Survey (Temp) Mode ---
+        if (!state.surveyId) {
+            try {
+                const tempDataString = localStorage.getItem('tempSurveyData');
+                const surveyDataForUpdate = tempDataString ? JSON.parse(tempDataString) : {};
+
+                if (!surveyDataForUpdate.settings) surveyDataForUpdate.settings = {};
+                surveyDataForUpdate.settings.bizcard = {
+                    ...state.settings,
+                    couponCode: state.appliedCoupon ? state.appliedCoupon.code : null,
+                    internalMemo: internalMemoInput.value
+                };
+                
+                localStorage.setItem('tempSurveyData', JSON.stringify(surveyDataForUpdate));
+
+                showToast('設定を一時保存しました。', 'success');
+                setTimeout(() => { window.location.href = 'surveyCreation.html'; }, 1000);
+            } catch (error) {
+                console.error('一時データへの保存エラー:', error);
+                showToast('設定の一時保存に失敗しました。', 'error');
+                setSaveButtonLoading(false);
+            }
+            return; 
+        }
+        
+        // --- Existing Survey Mode ---
         const finalSettings = {
             ...state.settings,
             surveyId: state.surveyId,
@@ -347,10 +395,7 @@ export function initBizcardSettings() {
         try {
             const result = await saveBizcardSettings(finalSettings);
             if (result.success) {
-
-                // Store updated settings in sessionStorage to be picked up by the list page
                 sessionStorage.setItem(`updatedSurvey_${finalSettings.surveyId}`, JSON.stringify(finalSettings));
-
                 showToast('名刺データ化設定を保存し、依頼を確定しました！', 'success');
                 setTimeout(() => window.location.href = 'index.html', 1000);
             } else {

@@ -595,12 +595,23 @@ function registerAdditionalSettingsLinks() {
         button.addEventListener('click', (event) => {
             event.preventDefault();
 
+            const url = `${path}?surveyId=${encodeURIComponent(currentSurveyId || '')}`;
+
             if (!currentSurveyId) {
-                showToast('アンケートIDが未設定です。先にアンケートを保存してください。', 'error');
+                // For new surveys, save the current state to localStorage and navigate.
+                try {
+                    localStorage.setItem('tempSurveyData', JSON.stringify(surveyData));
+                } catch (e) {
+                    console.error('Failed to save temporary survey data to localStorage:', e);
+                    showToast('一時的なデータの保存に失敗しました。', 'error');
+                    return;
+                }
+                // Navigate without the surveyId parameter
+                window.location.href = path;
                 return;
             }
-            const url = `${path}?surveyId=${encodeURIComponent(currentSurveyId)}`;
 
+            // For existing surveys with unsaved changes, show confirmation.
             if (isDirty) {
                 showConfirmationModal(
                     '編集中の内容は保存されませんが、ページを離れてもよろしいですか？',
@@ -646,13 +657,6 @@ function setAdditionalSettingsButtonState(feature, disabled, message) {
 
 function updateAdditionalSettingsAvailability() {
     const bizcardEnabled = surveyData?.settings?.bizcard?.enabled === true;
-
-    if (!currentSurveyId) {
-        additionalSettingsButtons.forEach((_, feature) => {
-            setAdditionalSettingsButtonState(feature, true, ADDITIONAL_SETTINGS_MESSAGES.requireSurveyId);
-        });
-        return;
-    }
 
     additionalSettingsButtons.forEach((_, feature) => {
         if (feature === 'thankYouScreen') {
@@ -728,13 +732,16 @@ function updateAndRenderAll() {
     const qrButton = document.getElementById('openQrModalBtn');
     if (qrButton) {
         const canOpenQr = Boolean(surveyData.id);
-        qrButton.disabled = !canOpenQr;
+        // qrButton.disabled = !canOpenQr; // Keep button enabled
         qrButton.setAttribute('aria-disabled', !canOpenQr ? 'true' : 'false');
-        qrButton.classList.toggle('opacity-50', !canOpenQr);
+        qrButton.classList.toggle('opacity-50', !canOpenQr); // Still visually indicate if not usable
 
         if (!qrButton.dataset.qrModalListenerAttached) {
             qrButton.addEventListener('click', () => {
-                if (qrButton.disabled) return;
+                if (!surveyData.id) {
+                    showToast('アンケートを保存した後にQRコードが発行されます。', 'info');
+                    return;
+                }
                 handleOpenModal('qrCodeModal', resolveDashboardAssetPath('modals/qrCodeModal.html'), setupQrCodeModalListeners);
             });
             qrButton.dataset.qrModalListenerAttached = 'true';
