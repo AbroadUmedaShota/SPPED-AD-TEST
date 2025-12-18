@@ -80,7 +80,7 @@ function initUnloadConfirmation() {
     // Push an initial state to the history. This allows us to intercept the first back button press.
     history.pushState(null, '', null);
 
-    window.addEventListener('popstate', (event) => {
+    const popstateHandler = (event) => {
         if (isDirty) {
             // When the user clicks 'back', popstate fires. We immediately push the state back
             // to "re-arm" the trap in case the user cancels our modal.
@@ -96,25 +96,39 @@ function initUnloadConfirmation() {
                 'ページを離れますか？'
             );
         }
-    });
+    };
+    window.addEventListener('popstate', popstateHandler);
+
 
     // --- 1. In-page navigation handling (Link clicks) ---
     document.body.addEventListener('click', (event) => {
         const link = event.target.closest('a[href]');
+        if (!link) return;
 
-        // Ignore non-navigation links or links opening in a new tab
-        if (!link || link.getAttribute('href') === '#' || link.target === '_blank' || link.dataset.preventNavGuard || link.getAttribute('onclick')) {
+        // If it's an in-page anchor link, temporarily disable the popstate handler
+        // to prevent it from firing incorrectly, then let the default action proceed.
+        if (link.getAttribute('href').startsWith('#')) {
+            window.removeEventListener('popstate', popstateHandler);
+            setTimeout(() => {
+                window.addEventListener('popstate', popstateHandler);
+            }, 0);
             return;
         }
 
-        // Ignore if the URL is the same
-        const currentUrl = new URL(window.location.href);
-        const targetUrl = new URL(link.href, window.location.href);
-        if (currentUrl.href === targetUrl.href) {
-            return;
-        }
-
+        // For all other links, if the form is dirty, show the confirmation modal.
         if (isDirty) {
+            // Ignore links that open in a new tab or have specific guards that bypass this check.
+            if (link.target === '_blank' || link.dataset.preventNavGuard || link.getAttribute('onclick')) {
+                return;
+            }
+
+            // Also ignore if the URL isn't actually changing.
+            const currentUrl = new URL(window.location.href);
+            const targetUrl = new URL(link.href, window.location.href);
+            if (currentUrl.href === targetUrl.href) {
+                return;
+            }
+
             event.preventDefault();
             showConfirmationModal(
                 '編集中の内容は保存されませんが、ページを離れてもよろしいですか？',
@@ -334,10 +348,8 @@ function ensureNumericMeta(question) {
     }
     if (!meta.validation.numeric || typeof meta.validation.numeric !== 'object') {
         meta.validation.numeric = {
-            mode: 'integer',
             min: '',
             max: '',
-            precision: 0,
             step: 1,
             unitLabel: '',
             unitSystem: 'metric'
@@ -1469,18 +1481,6 @@ function handleQuestionConfigInput(target) {
     } else if (configType === 'number') {
         const numeric = ensureNumericMeta(question);
         switch (field) {
-            case 'mode':
-                numeric.mode = target.value || 'integer';
-                if (numeric.mode !== 'decimal') {
-                    numeric.precision = 0;
-                    if (numeric.step === '' || Number.isNaN(Number(numeric.step))) {
-                        numeric.step = 1;
-                    }
-                } else if (numeric.step === '' || Number.isNaN(Number(numeric.step))) {
-                    numeric.step = 0.1;
-                }
-                requiresRerender = true;
-                break;
             case 'min':
             case 'max':
             case 'step':
@@ -1490,9 +1490,6 @@ function handleQuestionConfigInput(target) {
                     const numericValue = Number(target.value);
                     numeric[field] = Number.isNaN(numericValue) ? '' : numericValue;
                 }
-                break;
-            case 'precision':
-                numeric.precision = target.value === '' ? '' : Math.max(0, parseInt(target.value, 10) || 0);
                 break;
             case 'unitLabel':
                 numeric.unitLabel = target.value || '';

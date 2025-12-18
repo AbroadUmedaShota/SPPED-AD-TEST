@@ -626,7 +626,7 @@ export function applyFiltersAndPagination() {
             const surveyPeriodStart = survey.periodStart ? new Date(survey.periodStart) : null;
             const surveyPeriodEnd = survey.periodEnd ? new Date(survey.periodEnd) : null;
 
-            const matchesKeyword = keyword === '' || surveyName.includes(keyword);
+            const matchesKeyword = keyword === '' || surveyName.includes(keyword) || survey.id.toLowerCase().includes(keyword);
             const matchesStatus = status === 'all' || displayStatus === status;
             const matchesGroup = currentGroupId === 'personal'
                 ? !survey.groupId

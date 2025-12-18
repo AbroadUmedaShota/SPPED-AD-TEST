@@ -46,7 +46,7 @@ const I18N = {
 
 const FALLBACK_LANGUAGE = 'ja';
 
-const DEFAULT_NUMERIC_META = { mode: 'integer', min: '', max: '', precision: 0, step: 1, unitLabel: '', unitSystem: 'metric' };
+const DEFAULT_NUMERIC_META = { min: '', max: '', step: 1, unitLabel: '', unitSystem: 'metric' };
 const DEFAULT_DATETIME_META = { inputMode: 'date', timezone: 'Asia/Tokyo', minDateTime: '', maxDateTime: '', allowPast: true, allowFuture: true };
 const DEFAULT_HANDWRITING_META = { canvasWidth: 600, canvasHeight: 200, penColor: '#000000', penWidth: 2, backgroundPattern: 'plain' };
 
@@ -430,24 +430,14 @@ function applyNumberConfig(questionItem, question) {
   }
   section.classList.remove('hidden');
   const numeric = (question.meta && question.meta.validation && question.meta.validation.numeric) || DEFAULT_NUMERIC_META;
-  const mode = numeric.mode || DEFAULT_NUMERIC_META.mode;
-  const modeSelect = section.querySelector('[data-config-field="mode"]');
-  if (modeSelect) modeSelect.value = mode;
   const minInput = section.querySelector('[data-config-field="min"]');
   if (minInput) minInput.value = numeric.min ?? '';
   const maxInput = section.querySelector('[data-config-field="max"]');
   if (maxInput) maxInput.value = numeric.max ?? '';
-  const precisionInput = section.querySelector('[data-config-field="precision"]');
-  if (precisionInput) {
-    precisionInput.value = numeric.precision ?? '';
-    precisionInput.disabled = mode !== 'decimal';
-  }
   const stepInput = section.querySelector('[data-config-field="step"]');
-  if (stepInput) stepInput.value = numeric.step ?? (mode === 'decimal' ? 0.1 : 1);
+  if (stepInput) stepInput.value = numeric.step ?? 1;
   const unitLabelInput = section.querySelector('[data-config-field="unitLabel"]');
   if (unitLabelInput) unitLabelInput.value = numeric.unitLabel || '';
-  const unitSystemSelect = section.querySelector('[data-config-field="unitSystem"]');
-  if (unitSystemSelect) unitSystemSelect.value = numeric.unitSystem || DEFAULT_NUMERIC_META.unitSystem;
 }
 
 function applyDateTimeConfig(questionItem, question) {
