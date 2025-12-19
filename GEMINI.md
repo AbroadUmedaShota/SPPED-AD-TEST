@@ -102,12 +102,12 @@ The following is the series of processes from when an Issue is created until it 
 #### **Principle: Use of Standardized Files for GitHub Interactions**
 When performing operations that send multi-line text on GitHub (e.g., creating issues or pull requests), the AI **must** use a dedicated, standardized file for each action. This prevents errors and ensures consistency. The filenames are defined as follows:
 
-| Action | Filename to Use |
-| :--- | :--- |
-| Issue Creation | `docs/templates/issue_body.md` |
-| Issue Comment | `docs/templates/issue_comment_body.md` |
-| Pull Request Creation | `docs/templates/pr_body.md` |
-| Pull Request Comment | `docs/templates/pr_comment_body.md` |
+| Action                | Filename to Use                        |
+| :-------------------- | :------------------------------------- |
+| Issue Creation        | `docs/templates/issue_body.md`         |
+| Issue Comment         | `docs/templates/issue_comment_body.md` |
+| Pull Request Creation | `docs/templates/pr_body.md`            |
+| Pull Request Comment  | `docs/templates/pr_comment_body.md`    |
 
 The AI will write the body content to the appropriate file and then use the `--body-file` option to pass it to the `gh` command. This avoids unexpected errors with command-line arguments and enforces a predictable workflow.
 
@@ -169,6 +169,7 @@ Issues are created in concrete, clear task units that can be completed in a sing
         - [ ] New tests have been added to cover the changes.
         - [ ] All existing and new tests pass.
         - [ ] The documentation has been updated to reflect the changes.
+        - [ ] `WEEKLY_CHANGELOG.md` has been updated with the changes.
         - [ ] The implementation has been manually verified.
 
         ---
@@ -446,6 +447,9 @@ documentation:
   - file: "[docs/08_DECISION_LOG.md](docs/08_DECISION_LOG.md)"
     purpose: "Serves as an Architecture Decision Record (ADR). Logs important architectural and design decisions, their context, and the rationale behind them to ensure transparency in the decision-making process."
     update_trigger: "Whenever a significant architectural or technical design decision is made."
+  - file: "[WEEKLY_CHANGELOG.md](WEEKLY_CHANGELOG.md)"
+    purpose: "Records all changes made to the project, grouped by date. Includes detailed descriptions of fixes, features, and modifications."
+    update_trigger: "AUTOMATICALLY updated on EVERY code change or significant configuration change."
 ```
 
 

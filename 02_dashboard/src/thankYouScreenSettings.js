@@ -1,21 +1,39 @@
-import { showToast, resolveDemoDataPath } from './utils.js';
+import { showToast, resolveDashboardDataPath } from './utils.js';
 import { showConfirmationModal } from './confirmationModal.js';
 
 const MAX_MESSAGE_LENGTH = 500;
 const STORAGE_KEY_PREFIX = 'thankYouScreenSettings_';
+const PREMIUM_PLAN_KEYWORDS = ['premium', 'professional', 'pro'];
+
+function isPremiumPlan(plan) {
+    if (!plan) return false;
+    const normalized = String(plan).toLowerCase();
+    return PREMIUM_PLAN_KEYWORDS.some((keyword) => normalized.includes(keyword));
+}
+
 
 // --- Services (本来は外部ファイル) ---
 async function getSurveyById(surveyId) {
   try {
-    const dataPath = resolveDemoDataPath('answers/surveys-with-details.json');
+    const dataPath = resolveDashboardDataPath('core/surveys.json');
     const response = await fetch(dataPath);
     if (!response.ok) throw new Error('Survey data not found');
-    const surveysOrSurvey = await response.json();
-    // データが配列か単一オブジェクトかを判断して処理を分岐
-    const survey = Array.isArray(surveysOrSurvey)
-      ? surveysOrSurvey.find(s => s.id === surveyId)
-      : (surveysOrSurvey && surveysOrSurvey.id === surveyId ? surveysOrSurvey : null);
-    if (!survey) throw new Error(`Survey with id ${surveyId} not found`);
+    const surveys = await response.json();
+    const survey = surveys.find(s => s.id === surveyId);
+
+    if (!survey) {
+        // もし core/surveys.json になければ、古いデータ形式も試す
+        const oldDataPath = resolveDashboardDataPath('demo_answers/surveys-with-details.json');
+        const oldResponse = await fetch(oldDataPath);
+        if (!oldResponse.ok) throw new Error(`Survey with id ${surveyId} not found in both new and old data sources.`);
+        const oldSurveysOrSurvey = await oldResponse.json();
+        const foundSurvey = Array.isArray(oldSurveysOrSurvey)
+          ? oldSurveysOrSurvey.find(s => s.id === surveyId)
+          : (oldSurveysOrSurvey && oldSurveysOrSurvey.id === surveyId ? oldSurveysOrSurvey : null);
+        
+        if (!foundSurvey) throw new Error(`Survey with id ${surveyId} not found`);
+        return foundSurvey;
+    }
     return survey;
   } catch (error) {
     console.error('Failed to get survey by id:', error);
@@ -115,12 +133,44 @@ function hasSettingsChanged(current, baseline) {
     || current.allowContinuousAnswer !== baseline.allowContinuousAnswer;
 }
 
-function disableThankYouScreenForm(controls) {
-  controls.forEach(control => {
-    if (control) {
-      control.disabled = true;
+function disableThankYouScreenForm(controls, message) {
+    const mainContent = document.getElementById('main-content');
+    
+    // Disable interactive controls
+    controls.forEach(control => {
+        if (control) {
+            control.disabled = true;
+        }
+    });
+
+    // Visually disable the sections
+    const messageSection = document.querySelector('#thankYouMessage')?.closest('section');
+    const continuousAnswerSection = document.querySelector('#allowContinuousAnswer')?.closest('section');
+    
+    [messageSection, continuousAnswerSection].forEach(section => {
+        if (section) {
+            section.classList.add('opacity-50');
+            const sectionControls = section.querySelectorAll('input, textarea, button');
+            sectionControls.forEach(sc => sc.tabIndex = -1);
+        }
+    });
+
+    if (message && mainContent) {
+        const noticeContainer = document.createElement('div');
+        noticeContainer.className = 'max-w-4xl mx-auto -mt-4 mb-6';
+        noticeContainer.innerHTML = `
+            <div class="p-4 bg-blue-50 border border-blue-200 text-blue-800 rounded-lg shadow">
+                <div class="flex items-start">
+                    <span class="material-icons mr-3 text-blue-600">info</span>
+                    <div>
+                        <p class="font-semibold">プレミアム機能のご案内</p>
+                        <p class="text-sm">${message}</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        mainContent.insertBefore(noticeContainer, mainContent.children[2]);
     }
-  });
 }
 
 export async function initThankYouScreenSettings() {
@@ -140,35 +190,135 @@ export async function initThankYouScreenSettings() {
   ];
 
   const urlParams = new URLSearchParams(window.location.search);
-  const surveyId = urlParams.get('surveyId');
-
-  if (!surveyId) {
-    showToast('アンケートIDが見つかりません。', 'error');
-    const titleEl = document.getElementById('pageTitle');
-    if (titleEl) {
-      titleEl.textContent = 'アンケートIDが指定されていません。';
-    }
-    disableThankYouScreenForm(interactiveControls);
-    return;
-  }
-
+  let surveyId = urlParams.get('surveyId');
   let survey = null;
+  let mergedSettings;
+  let initialSettings;
+
   try {
-    survey = await getSurveyById(surveyId);
-    renderPageTitle(survey);
+    if (surveyId) {
+      // --- Existing Survey Mode ---
+      survey = await getSurveyById(surveyId);
+      renderPageTitle(survey);
+      const defaultSettings = deriveDefaultSettings(survey);
+      const storedSettings = loadStoredSettings(surveyId);
+      mergedSettings = { ...defaultSettings, ...storedSettings };
+
+    } else {
+      // --- New Survey (Temp) Mode ---
+      const tempDataString = localStorage.getItem('tempSurveyData');
+      if (!tempDataString) {
+        showToast('一時的なアンケートデータが見つかりません。作成画面からやり直してください。', 'error');
+        setTimeout(() => { window.location.href = 'surveyCreation.html'; }, 2000);
+        disableThankYouScreenForm(interactiveControls, '一時的なアンケートデータが見つかりません。');
+        return;
+      }
+      const tempData = JSON.parse(tempDataString);
+      survey = {
+          id: null,
+          name: tempData.name,
+          plan: tempData.plan || 'Standard' // Assume a plan for feature gating
+      };
+      renderPageTitle(survey);
+      // In temp mode, settings come directly from the temp data
+      mergedSettings = tempData.settings?.thankYouScreen || deriveDefaultSettings({});
+    }
   } catch (error) {
     console.error('Failed to initialize thank-you screen settings:', error);
     showToast('アンケートデータの読み込みに失敗しました。', 'error');
-    disableThankYouScreenForm(interactiveControls);
+    disableThankYouScreenForm(interactiveControls, 'アンケートデータの読み込みに失敗しました。');
     return;
   }
-
-  const defaultSettings = deriveDefaultSettings(survey);
-  const storedSettings = loadStoredSettings(surveyId);
-  const mergedSettings = { ...defaultSettings, ...storedSettings };
-  let initialSettings = { ...mergedSettings };
-
-  const applySettingsToForm = (settings) => {
+  
+    initialSettings = { ...mergedSettings };
+  
+  
+  
+    // --- Plan-based Feature Gate ---
+  
+    if (!isPremiumPlan(survey.plan)) {
+  
+      const message = 'サンクスメッセージのカスタマイズはプレミアムプラン（今後実装予定）でご利用いただけます。';
+  
+      
+  
+      // Disable only the message input
+  
+      if (thankYouMessageInput) {
+  
+          thankYouMessageInput.disabled = true;
+  
+          const messageSection = thankYouMessageInput.closest('section');
+  
+          if (messageSection) {
+  
+              messageSection.classList.add('opacity-50');
+  
+              const sectionControls = messageSection.querySelectorAll('textarea, button');
+  
+              sectionControls.forEach(sc => sc.tabIndex = -1);
+  
+          }
+  
+      }
+  
+      
+  
+      // Show the premium plan notice
+  
+      const mainContent = document.getElementById('main-content');
+  
+      if (mainContent) {
+  
+          const noticeContainer = document.createElement('div');
+  
+          noticeContainer.className = 'max-w-4xl mx-auto -mt-4 mb-6';
+  
+          noticeContainer.innerHTML = `
+  
+              <div class="p-4 bg-blue-50 border border-blue-200 text-blue-800 rounded-lg shadow">
+  
+                  <div class="flex items-start">
+  
+                      <span class="material-icons mr-3 text-blue-600">info</span>
+  
+                      <div>
+  
+                          <p class="font-semibold">プレミアム機能のご案内</p>
+  
+                          <p class="text-sm">${message}</p>
+  
+                      </div>
+  
+                  </div>
+  
+              </div>
+  
+          `;
+  
+          const formContainer = document.querySelector('.bg-surface.rounded-xl');
+  
+          if(formContainer){
+  
+               mainContent.insertBefore(noticeContainer, formContainer);
+  
+          } else if (mainContent.children.length > 2) {
+  
+               mainContent.insertBefore(noticeContainer, mainContent.children[2]);
+  
+          } else {
+  
+              mainContent.appendChild(noticeContainer);
+  
+          }
+  
+      }
+  
+    }
+  
+  
+  
+    const applySettingsToForm = (settings) => {
     thankYouMessageInput.value = settings.thankYouMessage || '';
     allowContinuousAnswerToggle.checked = Boolean(settings.allowContinuousAnswer);
     updateThankYouMessageMeta(thankYouMessageInput);
@@ -199,20 +349,39 @@ export async function initThankYouScreenSettings() {
       return;
     }
     const settingsToSave = collectCurrentSettings();
-    saveStoredSettings(surveyId, settingsToSave);
+
+    if (surveyId) {
+        saveStoredSettings(surveyId, settingsToSave);
+    } else {
+        try {
+            const tempDataString = localStorage.getItem('tempSurveyData');
+            const surveyDataForUpdate = tempDataString ? JSON.parse(tempDataString) : {};
+            if (!surveyDataForUpdate.settings) surveyDataForUpdate.settings = {};
+            surveyDataForUpdate.settings.thankYouScreen = settingsToSave;
+            localStorage.setItem('tempSurveyData', JSON.stringify(surveyDataForUpdate));
+        } catch(e) {
+            console.error("Failed to save temp data", e);
+            showToast('設定の一時保存に失敗しました。', 'error');
+            return;
+        }
+    }
     initialSettings = { ...settingsToSave };
     showToast('設定を保存しました。', 'success');
+    if (!surveyId) {
+      setTimeout(() => { window.location.href = 'surveyCreation.html'; }, 1000);
+    }
   });
 
   cancelButton.addEventListener('click', () => {
+    const returnUrl = surveyId ? 'index.html' : 'surveyCreation.html';
     const currentSettings = collectCurrentSettings();
     if (hasSettingsChanged(currentSettings, initialSettings)) {
       showConfirmationModal(
         '未保存の変更があります。このページを離れますか？',
-        () => { window.location.href = 'index.html'; }
+        () => { window.location.href = returnUrl; }
       );
     } else {
-      window.location.href = 'index.html';
+      window.location.href = returnUrl;
     }
   });
 
