@@ -1,4 +1,4 @@
-# 月次変更履歴 (2025-11-18 〜 2025-12-18)
+# 月次変更履歴 (2025-07-22 〜 2025-12-18)
 
 ## 2025-12-18 (木)
 
@@ -75,3 +75,229 @@
 
 - `docs/product/overview/action_tasks_2025-10.md`
     - **タスクリストの整理**: 10月〜11月のアクションプランと残タスクを整理し、ドキュメント化しました。
+## 2025-11-14 (金)
+
+- `02_dashboard/index.html` / `02_dashboard/src/first-login-tutorial.js` / `02_dashboard/src/surveyCreationTutorial.js`
+    - **初回ログイン/作成チュートリアルの整備**: チュートリアル画面の導線と表示を追加・調整しました。
+
+## 2025-11-12 (水)
+
+- `02_dashboard/surveyCreation.html` / `02_dashboard/survey-answer.html` / `02_dashboard/src/ui/surveyRenderer.js`
+    - **設問作成・回答UIの強化**: 日付/時間、数値入力、マルチアンサー上限、フリーアンサー検証、ツールボックス/手書きスペースなどを追加しました。
+- `02_dashboard/bug-report.html`
+    - **不具合報告画面の調整**: 入力フォームの表示を改善しました。
+
+## 2025-11-10 (月)
+
+- `02_dashboard/help-center.html` / `02_dashboard/help-content.html`
+    - **ヘルプセンターの新設**: ヘルプセンター画面を追加し、カテゴリ表示を整理しました。
+- `02_dashboard/bug-report.html`
+    - **不具合報告ページの追加**: フォーム画面と導線を追加しました。
+- `02_dashboard/service-top-style.css`
+    - **ダークモード調整**: ヘルプ/報告ページの配色を調整しました。
+
+## 2025-11-07 (金)
+
+- `02_dashboard/faq.html` / `02_dashboard/src/faq.js`
+    - **FAQ画面の追加**: FAQページを追加しました。
+- `02_dashboard/common/footer.html` / `02_dashboard/terms-of-service.html`
+    - **フッターリンク拡充**: 規約/特商法ページへの導線を追加しました。
+- `02_dashboard/modals/newSurveyModal.html` / `02_dashboard/modals/duplicateSurveyModal.html`
+    - **モーダルテンプレートの統一**: 画面間でモーダルの表示体裁を揃えました。
+
+## 2025-11-06 (木)
+
+- `02_dashboard/src/surveyCreationTutorial.js` / `02_dashboard/src/tutorial.js`
+    - **初回ログインチュートリアルの実装**: 画面内ガイドを追加しました。
+- `02_dashboard/survey-answer.html` / `02_dashboard/src/survey-answer.js`
+    - **回答画面の調整**: 表示や挙動を修正しました。
+- `03_admin/operator-management.html` / `03_admin/coupon-management.html`
+    - **管理画面UIの調整**: オペレーター/クーポン管理画面のレイアウトを修正しました。
+
+## 2025-11-05 (水)
+
+- `02_dashboard/thankYouScreen.html`
+    - **サンクス画面の新規作成**: 回答後画面を追加しました。
+- `02_dashboard/survey-answer.html`
+    - **回答画面のUI調整**: 表示調整とダミーデータ対応を進めました。
+- `03_admin/coupon-management.html`
+    - **クーポン管理画面の改修**: モーダルやレイアウトを調整しました。
+
+## 2025-11-04 (火)
+
+- `03_admin/coupon-management.html`
+    - **クーポン管理画面の拡充**: 詳細/編集/一括作成モーダルなどを追加しました。
+- `03_admin/operator-management.html`
+    - **ユーザー/オペレーター管理画面の調整**: 表示と操作性を改善しました。
+
+## 2025-10-31 (金)
+
+- `03_admin/operator-management.html`
+    - **オペレーター管理画面の調整**: レイアウトとフィルターを改善しました。
+
+## 2025-10-30 (木)
+
+- `03_admin/operator-management.html`
+    - **オペレーター管理画面の作成**: 管理画面にオペレーター管理UIを追加しました。
+- `03_admin/calendar-management.html`
+    - **営業日カレンダーの拡張**: 年間/縦ビューと更新ログ表示を追加しました。
+
+## 2025-10-24 (金)
+
+- `03_admin/calendar-management.html`
+    - **営業日カレンダーのUI改善**: 色分け、表示対象、操作感を調整しました。
+
+## 2025-10-22 (水)
+
+- `03_admin/data_entry.html` / `03_admin/src/data_entry.js`
+    - **データ入力画面の調整**: レイアウト修正とナイトモード対応を行いました。
+- `02_dashboard/service-top-style.css`
+    - **ダークモードの配色調整**: 管理画面とダッシュボードの色味を揃えました。
+
+## 2025-10-20 (月)
+
+- `02_dashboard/bizcardSettings.html` / `02_dashboard/src/bizcardSettings.js`
+    - **名刺データ化設定のUI改善**: 見積もりサイドバーの固定表示やプラン表示を整理しました。
+- `02_dashboard/src/surveyCreation.js` / `02_dashboard/modals/qrCodeModal.html`
+    - **アンケート作成の離脱警告/QR表示調整**: 意図しない離脱防止とQRモーダルの表示を改善しました。
+- `03_admin/data-entry-management.html`
+    - **オペレーター入力関連UIの改善**: 入力画面や照合画面の表示を調整しました。
+
+## 2025-10-17 (金)
+
+- `02_dashboard/surveyCreation.html`
+    - **アンケート作成画面のUI強化**: 目次/ドロップダウン回答などの表示を調整しました。
+- `02_dashboard/password_change.html` / `02_dashboard/reset-password.html`
+    - **パスワード変更フローの整備**: 変更完了画面と遷移を追加しました。
+- `02_dashboard/graph-page.html` / `02_dashboard/speed-review.html`
+    - **グラフ/レビュー画面の改善**: 編集制御と表示を調整しました。
+
+## 2025-10-14 (火)
+
+- `02_dashboard/invoiceList.html`
+    - **請求書一覧のレイアウト整理**: 一覧UIを簡素化し、バッジ色を調整しました。
+- `02_dashboard/survey-answer.html`
+    - **回答画面の安定化**: 表示フローとエラーハンドリングを改善しました。
+- `02_dashboard/surveyCreation.html` / `02_dashboard/thankYouScreenSettings.html`
+    - **添付/サンクス設定の調整**: 添付UIとサンクス画面設定を修正しました。
+
+## 2025-10-08 (水)
+
+- `02_dashboard/common/sidebar.html` / `02_dashboard/src/sidebarHandler.js`
+    - **サイドバーUIのリファクタリング**: 構造と動作を整理しました。
+- `02_dashboard/bizcardSettings.html`
+    - **名刺データ化設定の構成整理**: 画面構成とデフォルト値を見直しました。
+- `02_dashboard/surveyCreation.html` / `02_dashboard/thankYouEmailSettings.html`
+    - **コンテンツ幅の最適化**: 画面幅と余白を調整しました。
+
+## 2025-10-06 (月)
+
+- `03_admin/data_entry.html` / `03_admin/data-entry-management.html`
+    - **照合管理/データ入力画面の追加**: 管理画面の入力関連UIを追加しました。
+- `02_dashboard/modals/downloadOptionsModal.html` / `02_dashboard/modals/duplicateSurveyModal.html`
+    - **モーダルUI調整**: ダウンロード/複製モーダルの表示を改善しました。
+- `02_dashboard/modals/surveyPreviewModal.html`
+    - **プレビュー表示の調整**: ビューポートの見た目を改善しました。
+
+## 2025-10-04 (土)
+
+- `02_dashboard/index.html` / `02_dashboard/modals/surveyDetailsModal.html`
+    - **ダッシュボード仕様変更**: 一覧表示と詳細モーダルのUIを更新しました。
+
+## 2025-10-01 (水)
+
+- `03_admin/user-management.html` / `03_admin/calendar-management.html`
+    - **管理画面の主要ページを追加**: ユーザー/カレンダーなどの画面を追加しました。
+
+## 2025-09-12 (金)
+
+- `02_dashboard/speed-review.html` / `02_dashboard/src/ui/speedReviewRenderer.js`
+    - **SPEEDレビューのグラフ強化**: 新しいデータ形式に対応し、グラフ表示を追加しました。
+
+## 2025-09-11 (木)
+
+- `02_dashboard/speed-review.html`
+    - **レビュー画面のレイアウト改善**: ツールボックスの配置を整理しました。
+- `02_dashboard/modals/reviewDetailModal.html`
+    - **CSV取り込み/回答表示の拡充**: 詳細モーダルの表示を拡張しました。
+
+## 2025-09-10 (水)
+
+- `02_dashboard/surveyCreation.html`
+    - **アンケート作成UI改善/国際化対応**: 作成画面のUIを整理し、多言語対応を追加しました。
+
+## 2025-09-09 (火)
+
+- `02_dashboard/index.html` / `02_dashboard/service-top-style.css`
+    - **デザインガイドライン準拠**: ダッシュボードの見た目を調整しました。
+
+## 2025-09-04 (木)
+
+- `02_dashboard/surveyCreation.html`
+    - **アンケート作成画面の機能強化**: UI構成と設定項目を整理しました。
+
+## 2025-08-18 (月)
+
+- `02_dashboard/survey-answer.html`
+    - **アンケート回答画面の実装**: 新規回答UIを追加しました。
+- `02_dashboard/src/main.js` / `02_dashboard/src/modalHandler.js`
+    - **作成導線の改善**: 新規作成モーダルから作成画面への引き継ぎを追加しました。
+
+## 2025-08-05 (火)
+
+- `02_dashboard/common/header.html` / `02_dashboard/src/indexPage.js`
+    - **多言語対応の追加**: アンケート一覧/作成画面で言語切り替えを追加しました。
+
+## 2025-07-30 (水)
+
+- `02_dashboard/invoice-detail.html` / `02_dashboard/invoice-print.html`
+    - **請求書詳細/印刷画面のリニューアル**: PDF表示とレイアウトを改善しました。
+- `02_dashboard/components/fab.html`
+    - **アンケート作成のFAB追加**: 画面内の追加アクションを追加しました。
+
+## 2025-07-29 (火)
+
+- `02_dashboard/surveyCreation.html` / `02_dashboard/src/ui/accordion.js`
+    - **アンケート作成UIのモジュール化**: UI部品の分離と整理を行いました。
+- `02_dashboard/src/invoiceList.js`
+    - **請求書一覧のリファクタリング**: 表示ロジックを整理しました。
+- `02_dashboard/index.html`
+    - **アンケートステータス表記の改善**: 一覧表示の文言を調整しました。
+- `02_dashboard/src/qrCodeModal.js`
+    - **QRコードモーダル修正**: 表示の不具合を修正しました。
+
+## 2025-07-28 (月)
+
+- `02_dashboard/common/header.html` / `02_dashboard/common/footer.html`
+    - **共通ヘッダー/フッターの動的読み込み導入**: 共通パーツを動的読み込みに変更しました。
+- `02_dashboard/invoiceList.html` / `02_dashboard/invoice-detail.html`
+    - **請求書一覧/詳細ページの追加**: 請求書画面を追加しました。
+
+## 2025-07-27 (日)
+
+- `02_dashboard/common/sidebar.html` / `02_dashboard/index.html`
+    - **共通コンポーネントの動的読み込み**: サイドバー/ヘッダー/フッターの共通化を行いました。
+- `02_dashboard/src/surveyCreation.js`
+    - **作成データの一時保存**: ローカル保存の導線を追加しました。
+
+## 2025-07-25 (金)
+
+- `02_dashboard/src/invoiceList.js`
+    - **請求書一覧画面のUI改善**: 一覧表示のレイアウトを調整しました。
+
+## 2025-07-24 (木)
+
+- `02_dashboard/invoice-detail.html` / `02_dashboard/service-top-style.css`
+    - **請求書画面ドラフト/レイアウト調整**: 請求書画面の初期デザインを整えました。
+
+## 2025-07-23 (水)
+
+- `02_dashboard/surveyCreation.html`
+    - **アンケート作成のアウトラインUI追加**: 目次/アウトラインの導線を追加しました。
+
+## 2025-07-22 (火)
+
+- `02_dashboard/bizcardSettings.html` / `02_dashboard/thankYouEmailSettings.html`
+    - **名刺データ化/お礼メール設定画面のUI改善**: 設定画面の構成を整えました。
+- `01_login/login-top.html`
+    - **ログイン画面の初期UI同期**: ログイン画面の初期UIを整えました。
