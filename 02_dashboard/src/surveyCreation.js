@@ -1796,6 +1796,14 @@ function setupEventListeners() {
         });
     }
     // --- end of bizcard setting event listener ---
+
+    // --- QR Code Modal ---
+    const openQrModalBtn = document.getElementById('openQrModalBtn');
+    if (openQrModalBtn) {
+        openQrModalBtn.addEventListener('click', () => {
+            handleOpenModal('qrCodeModal', resolveDashboardAssetPath('modals/qrCodeModal.html'));
+        });
+    }
 }
 
 // --- Data Manipulation Handlers ---
