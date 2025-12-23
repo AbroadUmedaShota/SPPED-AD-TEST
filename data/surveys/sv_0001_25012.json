@@ -1,0 +1,31 @@
+{
+    "id": "sv_0001_25012",
+    "groupId": "GROUP001",
+    "name": {
+        "ja": "既存顧客サービス利用状況調査",
+        "en": "Existing Customer Service Usage Survey"
+    },
+    "displayTitle": {
+        "ja": "サービスご利用に関するアンケート",
+        "en": "Survey on Service Usage"
+    },
+    "description": {
+        "ja": "既存顧客のサービス利用状況を把握するための調査です。",
+        "en": "This survey is to understand the service usage of existing customers."
+    },
+    "memo": "CSチーム依頼。リピーター中心。",
+    "status": "実施中",
+    "answerCount": 210,
+    "realtimeAnswers": 3,
+    "periodStart": "2025-04-10",
+    "periodEnd": "2025-04-20",
+    "dataCompletionDate": "2025-04-30",
+    "plan": "Premium",
+    "deadline": "2025-05-15",
+    "estimatedBillingAmount": 75000,
+    "bizcardEnabled": true,
+    "bizcardRequest": 210,
+    "bizcardCompletionCount": 205,
+    "thankYouEmailSettings": "手動",
+    "createdAt": "2025-04-10T00:00:00+09:00"
+}
