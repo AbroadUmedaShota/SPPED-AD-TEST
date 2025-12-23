@@ -731,17 +731,14 @@ function updateAndRenderAll() {
 
     const qrButton = document.getElementById('openQrModalBtn');
     if (qrButton) {
-        const canOpenQr = Boolean(surveyData.id);
-        // qrButton.disabled = !canOpenQr; // Keep button enabled
-        qrButton.setAttribute('aria-disabled', !canOpenQr ? 'true' : 'false');
-        qrButton.classList.toggle('opacity-50', !canOpenQr); // Still visually indicate if not usable
+        // Always enabled for mock purposes
+        qrButton.setAttribute('aria-disabled', 'false');
+        qrButton.classList.remove('opacity-50');
 
         if (!qrButton.dataset.qrModalListenerAttached) {
-            qrButton.addEventListener('click', () => {
-                if (!surveyData.id) {
-                    showToast('アンケートを保存した後にQRコードが発行されます。', 'info');
-                    return;
-                }
+            qrButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 handleOpenModal('qrCodeModal', resolveDashboardAssetPath('modals/qrCodeModal.html'), setupQrCodeModalListeners);
             });
             qrButton.dataset.qrModalListenerAttached = 'true';
@@ -1797,15 +1794,7 @@ function setupEventListeners() {
     }
     // --- end of bizcard setting event listener ---
 
-    // --- QR Code Modal ---
-    const openQrModalBtn = document.getElementById('openQrModalBtn');
-    if (openQrModalBtn) {
-        openQrModalBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            handleOpenModal('qrCodeModal', resolveDashboardAssetPath('modals/qrCodeModal.html'));
-        });
-    }
+    // --- end of bizcard setting event listener ---
 }
 
 // --- Data Manipulation Handlers ---
