@@ -468,13 +468,13 @@ function renderLanguageSettings({ activeLanguages, editorLanguage, languageMap }
     if (panel) {
         panel.innerHTML = '';
         const selectable = SUPPORTED_LANGUAGES.filter((lang) => lang.code !== 'ja');
-        
+
         selectable.forEach((lang) => {
             const isSelected = activeLanguages.includes(lang.code);
             const button = document.createElement('button');
             button.type = 'button';
             button.dataset.lang = lang.code;
-            
+
             if (isSelected) {
                 button.setAttribute('aria-label', `${lang.label}を削除`);
                 button.className = 'flex items-center gap-1.5 pl-3 pr-2 py-1.5 rounded-full border border-transparent bg-secondary-container text-on-secondary-container shadow-sm text-sm';
@@ -731,17 +731,14 @@ function updateAndRenderAll() {
 
     const qrButton = document.getElementById('openQrModalBtn');
     if (qrButton) {
-        const canOpenQr = Boolean(surveyData.id);
-        // qrButton.disabled = !canOpenQr; // Keep button enabled
-        qrButton.setAttribute('aria-disabled', !canOpenQr ? 'true' : 'false');
-        qrButton.classList.toggle('opacity-50', !canOpenQr); // Still visually indicate if not usable
+        // Always enabled for mock purposes
+        qrButton.setAttribute('aria-disabled', 'false');
+        qrButton.classList.remove('opacity-50');
 
         if (!qrButton.dataset.qrModalListenerAttached) {
-            qrButton.addEventListener('click', () => {
-                if (!surveyData.id) {
-                    showToast('アンケートを保存した後にQRコードが発行されます。', 'info');
-                    return;
-                }
+            qrButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 handleOpenModal('qrCodeModal', resolveDashboardAssetPath('modals/qrCodeModal.html'), setupQrCodeModalListeners);
             });
             qrButton.dataset.qrModalListenerAttached = 'true';
@@ -815,7 +812,7 @@ function setupInputBindings() {
         el.addEventListener('change', handler);
     };
 
-        const basicInfoContainer = document.getElementById('basicInfoContent');
+    const basicInfoContainer = document.getElementById('basicInfoContent');
     if (basicInfoContainer) {
         const handleBasicInput = (event) => {
             const target = event.target;
@@ -1069,7 +1066,7 @@ function loadQuestionsFromCsv(csvString) {
                     })) : [],
                 };
             }
-            
+
             initializeQuestionMeta(question);
             return question;
 
@@ -1205,7 +1202,7 @@ async function initializePage() {
                     setDirty(true);
                 });
             }
-        } catch (_) {}
+        } catch (_) { }
 
         const params = new URLSearchParams(window.location.search);
         currentSurveyId = params.get('surveyId');
@@ -1321,7 +1318,7 @@ async function initializePage() {
             coercedValue = true;
         } else {
             // Coerce all other values (e.g., "false", 0, "", etc.) to false.
-            coercedValue = false; 
+            coercedValue = false;
         }
         surveyData.settings.bizcard.enabled = coercedValue;
 
@@ -1393,7 +1390,7 @@ function restoreAccordionState() {
 
         if (content) {
             const isStoredOpen = localStorage.getItem(`accordionState_${contentId || item.dataset.groupId}`) !== 'false';
-            
+
             content.classList.toggle('hidden', !isStoredOpen);
             if (icon) {
                 icon.textContent = isStoredOpen ? 'expand_less' : 'expand_more';
@@ -1411,15 +1408,15 @@ function initializeAccordion() {
         if (!header) return;
         const contentId = header.getAttribute('data-accordion-target');
         // 動的に生成されるグループヘッダーの場合、contentIdがないことがあるので、親要素からコンテンツを探す
-        const content = contentId 
-            ? document.getElementById(contentId) 
+        const content = contentId
+            ? document.getElementById(contentId)
             : header.closest('.question-group')?.querySelector('.accordion-content');
 
         const icon = header.querySelector('.expand-icon');
         if (!content) return;
 
         const isOpen = !content.classList.contains('hidden');
-        
+
         content.classList.toggle('hidden');
         const isNowOpen = !content.classList.contains('hidden');
 
@@ -1427,7 +1424,7 @@ function initializeAccordion() {
             icon.textContent = isNowOpen ? 'expand_less' : 'expand_more';
         }
         header.setAttribute('aria-expanded', isNowOpen ? 'true' : 'false');
-        
+
         // 動的グループの場合はgroupIdを、静的な場合はcontentIdをキーにする
         const storageKey = contentId || header.closest('.question-group')?.dataset.groupId;
         if (storageKey) {
@@ -1544,8 +1541,8 @@ function handleQuestionConfigInput(target) {
                 config.canvasHeight = parseInt(presetValue, 10);
             }
         } else if (field === 'canvasHeight') {
-             const sizeValue = parseInt(target.value, 10);
-             config.canvasHeight = Number.isNaN(sizeValue) ? 200 : Math.max(50, sizeValue); // Default 200, min 50
+            const sizeValue = parseInt(target.value, 10);
+            config.canvasHeight = Number.isNaN(sizeValue) ? 200 : Math.max(50, sizeValue); // Default 200, min 50
         } else {
             // Handle other handwriting settings if any
         }
@@ -1797,13 +1794,7 @@ function setupEventListeners() {
     }
     // --- end of bizcard setting event listener ---
 
-    // --- QR Code Modal ---
-    const openQrModalBtn = document.getElementById('openQrModalBtn');
-    if (openQrModalBtn) {
-        openQrModalBtn.addEventListener('click', () => {
-            handleOpenModal('qrCodeModal', resolveDashboardAssetPath('modals/qrCodeModal.html'));
-        });
-    }
+    // --- end of bizcard setting event listener ---
 }
 
 // --- Data Manipulation Handlers ---
@@ -1923,7 +1914,7 @@ function handleAddOption(groupId, questionId) {
     const question = surveyData.questionGroups.find(g => g.groupId === groupId)?.questions.find(q => q.questionId === questionId);
     if (question && question.options) {
         question.options.push({ text: normalizeLocalization({ ja: '新しい選択肢' }) });
-        
+
         // Also update maxSelections to match the new number of options
         if (question.type === 'multi_answer') {
             const meta = ensureQuestionMeta(question);
@@ -2154,13 +2145,13 @@ function enhanceAccordionA11y() {
 
 // DOMの読み込みが完了したら処理を開始
 document.addEventListener('DOMContentLoaded', () => {
-    
+
     initializePage();
-    
+
     setupEventListeners();
 
     initOutlineMapToggle();
-    
+
     attachPreviewListener();
     // Re-render on language change
     document.addEventListener('languagechange', (e) => {
@@ -2216,7 +2207,7 @@ function renderPreviewInModal() {
         (group.questions || []).forEach(q => {
             html += '<div class="survey-preview-question">';
             html += `<p class="survey-preview-question-title">${getLocalizedText(q.text)} ${q.required ? '<span class="text-error survey-preview-required">*</span>' : ''}</p>`;
-            
+
             if (q.type === 'single_answer' && q.meta?.displayAs === 'dropdown') {
                 html += '<select class="input-field"><option value="">選択してください</option>';
                 (q.options || []).forEach(opt => {
@@ -2253,7 +2244,7 @@ function renderPreviewInModal() {
             } else if (q.type === 'number_answer') {
                 html += '<input type="number" class="input-field" placeholder="数値を入力">';
             }
-            
+
             html += '</div>';
         });
         html += '</div>';
@@ -2307,7 +2298,7 @@ function setupPreviewSwitcher() {
                 if (q.type === 'free_answer') {
                     const textarea = document.getElementById(`preview-textarea-${q.questionId}`);
                     const warningDiv = document.getElementById(`preview-warning-${q.questionId}`);
-                    
+
                     if (textarea && warningDiv) {
                         const min = parseInt(textarea.dataset.min, 10);
                         const max = parseInt(textarea.dataset.max, 10);
@@ -2520,45 +2511,45 @@ function renderSurveyPreview() {
                         content += `<p class="mt-2 text-base text-on-surface-variant break-words">${getLocalizedValue(question.explanationText, lang)}</p>`;
                     }
                     break;
-        case 'free_answer':
-            console.log('Rendering preview for free_answer. Question data:', JSON.stringify(question, null, 2)); // Debug log
-            const validation = question.meta?.validation?.text;
-            const minLength = validation?.minLength;
-            const maxLength = validation?.maxLength;
+                case 'free_answer':
+                    console.log('Rendering preview for free_answer. Question data:', JSON.stringify(question, null, 2)); // Debug log
+                    const validation = question.meta?.validation?.text;
+                    const minLength = validation?.minLength;
+                    const maxLength = validation?.maxLength;
 
-            const textarea = document.createElement('textarea');
-            textarea.name = `preview_${question.questionId}`;
-            textarea.className = 'input-field w-full';
-            textarea.rows = 4;
-            textarea.placeholder = '回答を入力';
+                    const textarea = document.createElement('textarea');
+                    textarea.name = `preview_${question.questionId}`;
+                    textarea.className = 'input-field w-full';
+                    textarea.rows = 4;
+                    textarea.placeholder = '回答を入力';
 
-            const warningDiv = document.createElement('div');
-            warningDiv.className = 'text-error text-sm mt-1';
-            warningDiv.style.display = 'none';
-
-            controlArea.appendChild(textarea);
-            controlArea.appendChild(warningDiv);
-
-            textarea.addEventListener('input', () => {
-                const len = textarea.value.length;
-                let message = '';
-
-                if (maxLength > 0 && len > maxLength) {
-                    message = `${len - maxLength}文字超過しています。`;
-                } else if (minLength > 0 && len < minLength) {
-                    message = `あと${minLength - len}文字必要です。`;
-                }
-                
-                console.log(`Input length: ${len}, min: ${minLength}, max: ${maxLength}, message: "${message}"`); // Debug log
-
-                if (message) {
-                    warningDiv.textContent = message;
-                    warningDiv.style.display = 'block';
-                } else {
+                    const warningDiv = document.createElement('div');
+                    warningDiv.className = 'text-error text-sm mt-1';
                     warningDiv.style.display = 'none';
-                }
-            });
-            break;
+
+                    controlArea.appendChild(textarea);
+                    controlArea.appendChild(warningDiv);
+
+                    textarea.addEventListener('input', () => {
+                        const len = textarea.value.length;
+                        let message = '';
+
+                        if (maxLength > 0 && len > maxLength) {
+                            message = `${len - maxLength}文字超過しています。`;
+                        } else if (minLength > 0 && len < minLength) {
+                            message = `あと${minLength - len}文字必要です。`;
+                        }
+
+                        console.log(`Input length: ${len}, min: ${minLength}, max: ${maxLength}, message: "${message}"`); // Debug log
+
+                        if (message) {
+                            warningDiv.textContent = message;
+                            warningDiv.style.display = 'block';
+                        } else {
+                            warningDiv.style.display = 'none';
+                        }
+                    });
+                    break;
                 case 'single_answer':
                     question.options.forEach(option => {
                         content += `<div class="flex items-center space-x-3">
@@ -2614,7 +2605,7 @@ function renderSurveyPreview() {
 // Ensure input bindings are attached once
 try {
     if (!window.__surveyInputBound) {
-        const bindNow = () => { try { setupInputBindings(); } catch(_) {} };
+        const bindNow = () => { try { setupInputBindings(); } catch (_) { } };
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', bindNow, { once: true });
         } else {
