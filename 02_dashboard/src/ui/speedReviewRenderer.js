@@ -228,35 +228,32 @@ export function openCardZoom(imageUrl) {
 
         // Modal content container
         overlay.innerHTML = `
-            <div style="position: absolute; top: 1rem; right: 1rem; z-index: 100000;">
-                <button id="zoom-close-btn" class="text-white hover:text-gray-300 bg-black/50 rounded-full p-2 transition-colors">
-                    <span class="material-icons text-3xl">close</span>
-                </button>
+            <img src="${imageUrl}" style="max-width: 95vw; max-height: 90vh; object-fit: contain; transform: scale(0.95); transition: transform 0.3s ease; cursor: pointer;" class="shadow-2xl" id="zoom-image-content">
+            <div style="position: absolute; bottom: 1.5rem; color: white; font-size: 0.875rem; background: rgba(0,0,0,0.5); padding: 0.5rem 1rem; border-radius: 9999px; pointer-events: none;">
+                クリックまたは枠外をタップで閉じる
             </div>
-            <img src="${imageUrl}" style="max-width: 95vw; max-height: 90vh; object-fit: contain; transform: scale(0.95); transition: transform 0.3s ease;" class="shadow-2xl">
         `;
 
         const close = () => {
             overlay.style.opacity = '0';
-            const img = overlay.querySelector('img');
+            const img = overlay.querySelector('#zoom-image-content');
             if (img) img.style.transform = 'scale(0.95)';
             setTimeout(() => {
                 if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
             }, 300);
         };
 
-        const closeBtn = overlay.querySelector('#zoom-close-btn');
-        if (closeBtn) {
-            closeBtn.onclick = (e) => {
+        // Close when clicking the image as well, for convenience
+        const imgContent = overlay.querySelector('#zoom-image-content');
+        if (imgContent) {
+            imgContent.onclick = (e) => {
                 e.stopPropagation();
                 close();
             };
         }
 
         overlay.onclick = (e) => {
-            if (e.target === overlay) {
-                close();
-            }
+            close();
         };
 
         document.body.appendChild(overlay);

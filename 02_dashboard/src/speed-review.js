@@ -121,7 +121,7 @@ function handleDetailClick(answerId) {
         isModalInEditMode = false;
         handleOpenModal('reviewDetailModalOverlay', resolveDashboardAssetPath('modals/reviewDetailModal.html'), () => {
             renderModalContent(item, false);
-            // setupCardZoomListeners() is removed in favor of event delegation in setupModalEventListeners
+            updateModalFooter(); // Initialize footer with correct buttons
             setupModalEventListeners();
         });
     } else {
@@ -133,13 +133,6 @@ function setupModalEventListeners() {
     const modal = document.getElementById('reviewDetailModalOverlay');
     if (!modal) return;
 
-    // Remove existing listener to avoid duplicates if any (though typically this runs once per open or we can be safe)
-    // For simplicity, we just add it. The modal is re-created or re-opened. 
-    // If handleOpenModal reloads from file, it's fresh. If not, we might stack listeners.
-    // Assuming handleOpenModal manages DOM freshness or we should use a flag.
-    // Given the current implementation re-renders content, let's attach to the static container part if possible, 
-    // or just attach to the overlay which is the root.
-    
     // Check if listener is already attached to avoid duplicates (using a custom property)
     if (!modal.hasAttribute('data-zoom-listener-attached')) {
         modal.addEventListener('click', handleModalImageClick);
@@ -149,13 +142,46 @@ function setupModalEventListeners() {
     const footer = document.querySelector('#reviewDetailModal .p-4.border-t');
     if (!footer) return;
 
-    footer.addEventListener('click', (e) => {
-        if (e.target.id === 'editDetailBtn') {
-            handleEditToggle();
-        } else if (e.target.id === 'saveDetailBtn') {
-            handleSave();
-        } else if (e.target.id === 'cancelEditBtn') {
-            handleEditToggle();
+    // Use event delegation for footer buttons to handle dynamic updates
+    if (!footer.hasAttribute('data-footer-listeners-attached')) {
+        footer.addEventListener('click', (e) => {
+            if (e.target.id === 'editDetailBtn') {
+                handleEditToggle();
+            } else if (e.target.id === 'saveDetailBtn') {
+                handleSave();
+            } else if (e.target.id === 'cancelEditBtn') {
+                handleEditToggle();
+            } else if (e.target.id === 'showCardImagesBtn') {
+                showCardImagesModal(currentItemInModal);
+            }
+        });
+        footer.setAttribute('data-footer-listeners-attached', 'true');
+    }
+}
+
+function showCardImagesModal(item) {
+    if (!item) return;
+    
+    handleOpenModal('cardImagesModalOverlay', resolveDashboardAssetPath('modals/cardImagesModal.html'), () => {
+        const modal = document.getElementById('cardImagesModalOverlay');
+        const frontContainer = modal.querySelector('#card-image-front-container');
+        const backContainer = modal.querySelector('#card-image-back-container');
+        
+        const frontUrl = item.businessCard?.imageUrl?.front || '../media/表面.png';
+        const backUrl = item.businessCard?.imageUrl?.back || '../media/裏面.png';
+
+        const setupImage = (container, url) => {
+            container.innerHTML = `<img src="${url}" class="max-w-full max-h-full object-contain" alt="名刺画像">`;
+            container.setAttribute('data-zoom-src', url);
+        };
+
+        if (frontContainer) setupImage(frontContainer, frontUrl);
+        if (backContainer) setupImage(backContainer, backUrl);
+
+        // Attach zoom listener to the new modal
+        if (!modal.hasAttribute('data-zoom-listener-attached')) {
+            modal.addEventListener('click', handleModalImageClick);
+            modal.setAttribute('data-zoom-listener-attached', 'true');
         }
     });
 }
@@ -238,12 +264,22 @@ function updateModalFooter() {
 
     if (isModalInEditMode) {
         footer.innerHTML = `
-            <button id="cancelEditBtn" class="button-secondary py-2 px-4 rounded-md font-semibold mr-2">キャンセル</button>
-            <button id="saveDetailBtn" class="button-primary py-2 px-4 rounded-md font-semibold">保存する</button>
+            <div class="flex justify-end items-center gap-2 w-full">
+                <button id="showCardImagesBtn" class="button-secondary py-2 px-4 rounded-md font-semibold flex items-center gap-2">
+                    <span class="material-icons text-base">image</span> 名刺画像
+                </button>
+                <button id="cancelEditBtn" class="button-secondary py-2 px-4 rounded-md font-semibold">キャンセル</button>
+                <button id="saveDetailBtn" class="button-primary py-2 px-4 rounded-md font-semibold">保存する</button>
+            </div>
         `;
     } else {
         footer.innerHTML = `
-            <button id="editDetailBtn" class="button-secondary py-2 px-4 rounded-md font-semibold">編集する</button>
+            <div class="flex justify-end items-center gap-2 w-full">
+                <button id="showCardImagesBtn" class="button-secondary py-2 px-4 rounded-md font-semibold flex items-center gap-2">
+                    <span class="material-icons text-base">image</span> 名刺画像
+                </button>
+                <button id="editDetailBtn" class="button-secondary py-2 px-4 rounded-md font-semibold">編集する</button>
+            </div>
         `;
     }
 }
