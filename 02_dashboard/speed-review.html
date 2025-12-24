@@ -13,7 +13,7 @@
 </head>
 <body class="bg-background text-on-background h-full">
 
-<div class="relative flex min-h-screen flex-col overflow-x-hidden">
+<div class="relative flex min-h-screen flex-col">
 
     <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
     <div id="header-placeholder"></div>
@@ -27,7 +27,7 @@
                 <p id="review-survey-name" class="text-sm text-on-surface-variant">アンケート名: (ここにアンケート名が入ります)</p>
             </div>
 
-            <div class="flex flex-col lg:flex-row lg:items-start lg:gap-x-8">
+            <div class="flex flex-col lg:flex-row lg:gap-x-8">
                 <div class="flex-1 min-w-0">
                     <div class="rounded-xl border border-outline-variant bg-surface relative min-h-[300px]">
                         <table class="w-full divide-y divide-outline-variant review-table table-fixed" id="reviewTable">
@@ -73,7 +73,7 @@
                 </div>
 
                 <aside class="w-full lg:w-80 lg:flex-shrink-0 mt-8 lg:mt-0">
-                    <div class="space-y-6 sticky top-24">
+                    <div class="space-y-6 sticky top-24 h-[calc(100vh-6rem)] overflow-y-auto z-10 custom-scrollbar">
                          <div class="toolbox-card">
                             <h3>ツール</h3>
                             <div class="input-group">

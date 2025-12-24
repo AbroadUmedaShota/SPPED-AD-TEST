@@ -10,8 +10,18 @@
         <div class="p-6 overflow-y-auto" style="max-height: 80vh;">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center justify-center">
                 <!-- 表面 -->
-                <div class="flex flex-col items-center">
-                    <p class="text-sm font-bold text-on-surface-variant mb-2">表面</p>
+                <div class="flex flex-col items-center w-full max-w-sm">
+                    <div class="flex justify-between items-center w-full mb-2">
+                        <p class="text-sm font-bold text-on-surface-variant">表面</p>
+                        <div class="flex gap-2">
+                             <button class="rotate-btn p-1 rounded hover:bg-surface-variant text-on-surface-variant transition-colors" data-target="front" data-dir="-90" title="左回転">
+                                <span class="material-icons text-lg">rotate_left</span>
+                             </button>
+                             <button class="rotate-btn p-1 rounded hover:bg-surface-variant text-on-surface-variant transition-colors" data-target="front" data-dir="90" title="右回転">
+                                <span class="material-icons text-lg">rotate_right</span>
+                             </button>
+                        </div>
+                    </div>
                     <div class="w-full aspect-[1.6/1] bg-surface-variant rounded-lg border border-outline-variant overflow-hidden flex items-center justify-center relative group cursor-zoom-in hover:shadow-lg transition-shadow" id="card-image-front-container">
                         <!-- 画像はJSで挿入されます -->
                         <span class="text-on-surface-variant text-sm">画像なし</span>
@@ -19,8 +29,18 @@
                 </div>
 
                 <!-- 裏面 -->
-                <div class="flex flex-col items-center">
-                    <p class="text-sm font-bold text-on-surface-variant mb-2">裏面</p>
+                <div class="flex flex-col items-center w-full max-w-sm">
+                    <div class="flex justify-between items-center w-full mb-2">
+                        <p class="text-sm font-bold text-on-surface-variant">裏面</p>
+                        <div class="flex gap-2">
+                             <button class="rotate-btn p-1 rounded hover:bg-surface-variant text-on-surface-variant transition-colors" data-target="back" data-dir="-90" title="左回転">
+                                <span class="material-icons text-lg">rotate_left</span>
+                             </button>
+                             <button class="rotate-btn p-1 rounded hover:bg-surface-variant text-on-surface-variant transition-colors" data-target="back" data-dir="90" title="右回転">
+                                <span class="material-icons text-lg">rotate_right</span>
+                             </button>
+                        </div>
+                    </div>
                     <div class="w-full aspect-[1.6/1] bg-surface-variant rounded-lg border border-outline-variant overflow-hidden flex items-center justify-center relative group cursor-zoom-in hover:shadow-lg transition-shadow" id="card-image-back-container">
                         <!-- 画像はJSで挿入されます -->
                         <span class="text-on-surface-variant text-sm">画像なし</span>
