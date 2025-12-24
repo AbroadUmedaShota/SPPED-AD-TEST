@@ -10,18 +10,28 @@
  */
 export function populateTable(data, onDetailClick, selectedIndustryQuestion) {
     const tableBody = document.getElementById('reviewTableBody');
+    const tableHead = document.querySelector('#reviewTable thead tr');
+    
     if (!tableBody) return;
+
+    // ヘッダーに展開用の列を追加（一度だけ）
+    if (tableHead && !tableHead.querySelector('.expand-col-header')) {
+        const th = document.createElement('th');
+        th.className = 'px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[40px] expand-col-header';
+        tableHead.insertBefore(th, tableHead.firstChild);
+    }
 
     tableBody.innerHTML = ''; // テーブルをクリア
 
     if (data.length === 0) {
-        tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-on-surface-variant">該当する回答データがありません。</td></tr>`;
+        // colspanを調整（展開列分+1）
+        tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-on-surface-variant">該当する回答データがありません。</td></tr>`;
         return;
     }
 
     data.forEach(item => {
         const row = document.createElement('tr');
-        row.className = 'transition-colors cursor-pointer'; // Add cursor-pointer for UX
+        row.className = 'transition-colors cursor-pointer border-b border-outline-variant hover:bg-surface-variant/10'; // Add cursor-pointer for UX
         row.dataset.answerId = item.answerId; // Add data-answer-id to the row
 
         const formatCell = (value) => (value === null || value === undefined || value === '') ? '-' : value;
@@ -38,7 +48,12 @@ export function populateTable(data, onDetailClick, selectedIndustryQuestion) {
             return answer === '' ? '-' : answer; // 回答が空文字列の場合も「-」を返す
         };
 
-                row.innerHTML = `
+        row.innerHTML = `
+            <td class="px-2 py-3 whitespace-nowrap text-sm text-on-surface w-[40px]">
+                <button class="toggle-inline-btn p-1 rounded hover:bg-surface-variant text-on-surface-variant transition-colors" title="詳細を展開">
+                    <span class="material-icons toggle-icon text-xl">keyboard_arrow_right</span>
+                </button>
+            </td>
             <td class="px-4 py-3 whitespace-nowrap text-sm text-on-surface overflow-hidden text-ellipsis">${formatCell(item.answerId)}</td>
             <td class="px-4 py-3 whitespace-nowrap text-sm text-on-surface overflow-hidden text-ellipsis">${formatCell(item.answeredAt)}</td>
             <td class="px-4 py-3 whitespace-nowrap text-sm text-on-surface overflow-hidden text-ellipsis">${formatCell(fullName)}</td>
@@ -53,8 +68,115 @@ export function populateTable(data, onDetailClick, selectedIndustryQuestion) {
 
     // 各行にイベントリスナーを設定
     tableBody.querySelectorAll('tr').forEach(row => {
-        row.addEventListener('click', () => onDetailClick(row.dataset.answerId));
+        // 行全体クリックで詳細モーダル（ただしボタンクリックは除外されるように呼び出し元で制御）
+        row.addEventListener('click', (e) => {
+            if (!e.target.closest('button')) {
+                onDetailClick(row.dataset.answerId);
+            }
+        });
     });
+}
+
+/**
+ * インライン展開用の行（詳細情報）を生成して返します。
+ * @param {object} item - 表示するデータ項目。
+ * @param {number} colSpan - テーブルの列数。
+ * @returns {HTMLElement} 生成されたtr要素。
+ */
+export function renderInlineRow(item, colSpan) {
+    const row = document.createElement('tr');
+    row.className = 'inline-detail-row bg-surface-variant/30 border-b border-outline-variant';
+    
+    // 画像パス（固定）
+    const frontImageUrl = '../media/縦表 .png';
+    const backImageUrl = '../media/縦裏.png';
+
+    const card = item.businessCard || {};
+    const fullName = `${card.group2?.lastName || ''} ${card.group2?.firstName || ''}`.trim();
+    const company = card.group3?.companyName || '';
+    const dept = card.group3?.department || '';
+    const pos = card.group3?.position || '';
+    const email = card.group1?.email || '';
+    const tel = card.group5?.mobile || card.group5?.tel1 || '';
+
+    row.innerHTML = `
+        <td colspan="${colSpan}" class="p-0">
+            <div class="flex flex-col md:flex-row gap-6 p-6 animate-fade-in-down">
+                <!-- 名刺画像エリア（タブ切り替え式） -->
+                <div class="flex flex-col gap-3 min-w-[320px]">
+                    <!-- タブヘッダー（中央配置） -->
+                    <div class="flex p-1 bg-surface-variant rounded-lg self-center mb-1">
+                        <button class="card-tab-btn px-6 py-1.5 text-xs font-bold rounded-md transition-all active bg-surface text-primary shadow-sm" data-tab="front">表面</button>
+                        <button class="card-tab-btn px-6 py-1.5 text-xs font-bold rounded-md transition-all text-on-surface-variant hover:text-on-surface" data-tab="back">裏面</button>
+                    </div>
+
+                    <!-- 画像表示本体 -->
+                    <div class="inline-card-display-area relative">
+                        <!-- 表面コンテナ -->
+                        <div class="inline-card-wrapper w-full max-w-sm flex flex-col gap-2" id="inline-front-view">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-on-surface-variant font-bold">名刺（表面）</span>
+                                <div class="flex gap-1">
+                                    <button class="rotate-btn p-1 rounded hover:bg-surface-variant text-on-surface-variant transition-colors" data-target="inline" data-dir="-90" title="左回転">
+                                        <span class="material-icons text-base">rotate_left</span>
+                                    </button>
+                                    <button class="rotate-btn p-1 rounded hover:bg-surface-variant text-on-surface-variant transition-colors" data-target="inline" data-dir="90" title="右回転">
+                                        <span class="material-icons text-base">rotate_right</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="aspect-[1.6/1] bg-surface rounded-lg border border-outline-variant overflow-hidden cursor-zoom-in relative group shadow-sm" data-zoom-src="${frontImageUrl}">
+                                 <img src="${frontImageUrl}" class="max-w-full max-h-full object-contain transition-transform duration-200 group-hover:scale-105 mx-auto" alt="表面" data-scale="1" data-rotation="0">
+                            </div>
+                        </div>
+
+                        <!-- 裏面コンテナ (初期非表示) -->
+                        <div class="inline-card-wrapper w-full max-w-sm flex flex-col gap-2 hidden" id="inline-back-view">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-on-surface-variant font-bold">名刺（裏面）</span>
+                                <div class="flex gap-1">
+                                    <button class="rotate-btn p-1 rounded hover:bg-surface-variant text-on-surface-variant transition-colors" data-target="inline" data-dir="-90" title="左回転">
+                                        <span class="material-icons text-base">rotate_left</span>
+                                    </button>
+                                    <button class="rotate-btn p-1 rounded hover:bg-surface-variant text-on-surface-variant transition-colors" data-target="inline" data-dir="90" title="右回転">
+                                        <span class="material-icons text-base">rotate_right</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="aspect-[1.6/1] bg-surface rounded-lg border border-outline-variant overflow-hidden cursor-zoom-in relative group shadow-sm" data-zoom-src="${backImageUrl}">
+                                 <img src="${backImageUrl}" class="max-w-full max-h-full object-contain transition-transform duration-200 group-hover:scale-105 mx-auto" alt="裏面" data-scale="1" data-rotation="0">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 簡易情報エリア（1行1項目） -->
+                <div class="flex-1 text-sm text-on-surface space-y-4 border-l border-outline-variant pl-8 py-2">
+                    <div>
+                        <p class="text-xs text-on-surface-variant mb-1">会社名</p>
+                        <p class="font-bold text-lg text-on-surface leading-tight">${company || '-'}</p>
+                    </div>
+                    <div class="border-t border-outline-variant pt-2">
+                        <p class="text-xs text-on-surface-variant mb-1">氏名</p>
+                        <p class="font-bold text-lg leading-tight">${fullName || '-'}</p>
+                    </div>
+                    <div class="border-t border-outline-variant pt-2">
+                        <p class="text-xs text-on-surface-variant mb-1">部署・役職</p>
+                        <p class="font-medium text-on-surface leading-tight">${dept || '-'} ${pos || ''}</p>
+                    </div>
+                    <div class="border-t border-outline-variant pt-2">
+                        <p class="text-xs text-on-surface-variant mb-1">Email</p>
+                        <p class="font-medium text-on-surface break-all">${email || '-'}</p>
+                    </div>
+                    <div class="border-t border-outline-variant pt-2">
+                        <p class="text-xs text-on-surface-variant mb-1">電話番号</p>
+                        <p class="font-medium text-on-surface">${tel || '-'}</p>
+                    </div>
+                </div>
+            </div>
+        </td>
+    `;
+    return row;
 }
 
 /**
@@ -78,6 +200,50 @@ export function renderModalContent(item, isEditMode = false) {
 
     // --- Business Card Details (always in view mode) ---
     let cardHtml = '';
+
+    // --- Business Card Images Section ---
+    const frontImageUrl = item.businessCard?.imageUrl?.front || '../media/表面.png';
+    const backImageUrl = item.businessCard?.imageUrl?.back || '../media/裏面.png';
+
+    cardHtml += `
+        <div class="flex gap-4 mb-6 select-none">
+            <div class="w-1/2">
+                <div class="flex justify-between items-center mb-1">
+                    <p class="text-xs text-on-surface-variant">名刺（表面）</p>
+                    <div class="flex gap-1">
+                         <button class="rotate-btn p-1 rounded hover:bg-surface-variant text-on-surface-variant transition-colors" data-target="detail-front" data-dir="-90" title="左回転">
+                            <span class="material-icons text-base">rotate_left</span>
+                         </button>
+                         <button class="rotate-btn p-1 rounded hover:bg-surface-variant text-on-surface-variant transition-colors" data-target="detail-front" data-dir="90" title="右回転">
+                            <span class="material-icons text-base">rotate_right</span>
+                         </button>
+                    </div>
+                </div>
+                <div class="aspect-[1.6/1] w-full border border-outline-variant rounded-md overflow-hidden bg-surface-variant flex items-center justify-center relative group cursor-zoom-in" data-zoom-src="${frontImageUrl}">
+                    <img id="detail-front-image" src="${frontImageUrl}" class="max-w-full max-h-full object-contain transition-transform duration-200 group-hover:scale-105" alt="名刺（表面）" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                    <div class="hidden absolute inset-0 flex items-center justify-center text-on-surface-variant text-sm">画像なし</div>
+                </div>
+            </div>
+            <div class="w-1/2">
+                <div class="flex justify-between items-center mb-1">
+                    <p class="text-xs text-on-surface-variant">名刺（裏面）</p>
+                    <div class="flex gap-1">
+                         <button class="rotate-btn p-1 rounded hover:bg-surface-variant text-on-surface-variant transition-colors" data-target="detail-back" data-dir="-90" title="左回転">
+                            <span class="material-icons text-base">rotate_left</span>
+                         </button>
+                         <button class="rotate-btn p-1 rounded hover:bg-surface-variant text-on-surface-variant transition-colors" data-target="detail-back" data-dir="90" title="右回転">
+                            <span class="material-icons text-base">rotate_right</span>
+                         </button>
+                    </div>
+                </div>
+                <div class="aspect-[1.6/1] w-full border border-outline-variant rounded-md overflow-hidden bg-surface-variant flex items-center justify-center relative group cursor-zoom-in" data-zoom-src="${backImageUrl}">
+                    <img id="detail-back-image" src="${backImageUrl}" class="max-w-full max-h-full object-contain transition-transform duration-200 group-hover:scale-105" alt="名刺（裏面）" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                    <div class="hidden absolute inset-0 flex items-center justify-center text-on-surface-variant text-sm">画像なし</div>
+                </div>
+            </div>
+        </div>
+    `;
+
     if (item.businessCard) {
         const card = item.businessCard;
         const fields = {
@@ -114,7 +280,7 @@ export function renderModalContent(item, isEditMode = false) {
             phoneHtml += '</div></div>';
             cardHtml += phoneHtml;
         }
-        
+
         const url = card.group6?.url;
         if (url && url.trim() !== '') {
             cardHtml += `
@@ -133,7 +299,7 @@ export function renderModalContent(item, isEditMode = false) {
         item.details.forEach(detail => {
             const questionDef = item.survey?.details?.find(d => d.question === detail.question);
             const questionType = questionDef ? questionDef.type : 'free_text'; // Default to free_text if not found
-            
+
             answerHtml += `<div class="py-2 space-y-1">
                              <p class="font-semibold text-on-surface">${detail.question}</p>`;
 
@@ -180,4 +346,94 @@ export function renderModalContent(item, isEditMode = false) {
         });
     }
     answerDetailsContainer.innerHTML = answerHtml;
+}
+
+// Zoom function implementation
+export function openCardZoom(imageUrl, rotation = 0) {
+    try {
+        // Prevent multiple overlays
+        if (document.getElementById('image-zoom-overlay')) return;
+
+        const overlay = document.createElement('div');
+        overlay.id = 'image-zoom-overlay';
+        // Use extremely high z-index and explicit flex styles
+        overlay.style.position = 'fixed';
+        overlay.style.inset = '0';
+        overlay.style.zIndex = '99999';
+        overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+        overlay.style.display = 'flex';
+        overlay.style.flexDirection = 'column';
+        overlay.style.alignItems = 'center';
+        overlay.style.justifyContent = 'center';
+        overlay.style.opacity = '0'; // Start invisible for fade-in
+        overlay.style.transition = 'opacity 0.3s ease';
+
+        // Modal content container
+        overlay.innerHTML = `
+            <img src="${imageUrl}" style="max-width: 95vw; max-height: 90vh; object-fit: contain; transform: scale(0.95) rotate(${rotation}deg); transition: transform 0.3s ease; cursor: pointer;" class="shadow-2xl" id="zoom-image-content">
+            <div style="position: absolute; bottom: 1.5rem; color: white; font-size: 0.875rem; background: rgba(0,0,0,0.5); padding: 0.5rem 1rem; border-radius: 9999px; pointer-events: none;">
+                クリックまたは枠外をタップで閉じる
+            </div>
+        `;
+
+        const close = () => {
+            overlay.style.opacity = '0';
+            const img = overlay.querySelector('#zoom-image-content');
+            if (img) img.style.transform = `scale(0.95) rotate(${rotation}deg)`;
+            setTimeout(() => {
+                if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+            }, 300);
+        };
+
+        // Close when clicking the image as well, for convenience
+        const imgContent = overlay.querySelector('#zoom-image-content');
+        if (imgContent) {
+            imgContent.onclick = (e) => {
+                e.stopPropagation();
+                close();
+            };
+        }
+
+        overlay.onclick = (e) => {
+            close();
+        };
+
+        document.body.appendChild(overlay);
+
+        // Trigger fade-in
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                overlay.style.opacity = '1';
+                const img = overlay.querySelector('img');
+                if (img) img.style.transform = `scale(1) rotate(${rotation}deg)`;
+            });
+        });
+    } catch (e) {
+        console.error('Zoom error:', e);
+    }
+}
+
+/**
+ * Handles click events within the modal to detect business card image clicks (Event Delegation).
+ * Pass this function to the modal container's click event listener.
+ * @param {Event} e - The click event object.
+ */
+export function handleModalImageClick(e) {
+    // Traverse up from the clicked element to find a zoomable container or image
+    const zoomTarget = e.target.closest('[data-zoom-src]');
+    
+    if (zoomTarget) {
+        e.preventDefault(); // Prevent default behavior
+        e.stopPropagation(); // Stop propagation to prevent bubbling issues
+        
+        const src = zoomTarget.getAttribute('data-zoom-src');
+        if (src) {
+            // Get rotation from the image element inside the target
+            const img = zoomTarget.querySelector('img');
+            const rotation = img ? (parseInt(img.dataset.rotation) || 0) : 0;
+            
+            console.log('[speedReviewRenderer] Zooming image:', src, 'rotation:', rotation);
+            openCardZoom(src, rotation);
+        }
+    }
 }

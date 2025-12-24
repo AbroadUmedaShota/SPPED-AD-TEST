@@ -1,7 +1,7 @@
 
 import { resolveDemoDataPath, resolveDashboardDataPath, resolveDashboardAssetPath, showToast } from './utils.js';
 import { speedReviewService } from './services/speedReviewService.js';
-import { populateTable, renderModalContent } from './ui/speedReviewRenderer.js';
+import { populateTable, renderModalContent, handleModalImageClick } from './ui/speedReviewRenderer.js';
 import { handleOpenModal } from './modalHandler.js';
 import { initBreadcrumbs } from './breadcrumb.js';
 
@@ -114,6 +114,179 @@ function handleQuestionSelectClick(newQuestion) {
     applyFilters();
 }
 
+function handleWheelZoom(e) {
+    e.preventDefault();
+    const container = e.currentTarget;
+    const img = container.querySelector('img');
+    if (!img) return;
+
+    let scale = parseFloat(img.dataset.scale || '1');
+    const rotation = parseInt(img.dataset.rotation || '0');
+    
+    // ホイールの移動量に応じてスケール変更
+    // deltaYの符号で方向判定
+    const delta = e.deltaY > 0 ? -0.1 : 0.1;
+    scale += delta;
+
+    // 範囲制限 (0.5倍 〜 5.0倍)
+    scale = Math.min(Math.max(scale, 0.5), 5.0);
+
+    img.dataset.scale = scale.toFixed(2); // 精度を保つため文字列化して保存
+    img.style.transform = `rotate(${rotation}deg) scale(${scale})`;
+}
+
+function setupWheelZoomListeners(modalContext) {
+    if (!modalContext) return;
+    const zoomContainers = modalContext.querySelectorAll('[data-zoom-src]');
+    zoomContainers.forEach(container => {
+        // 重複登録を避けるために一度削除
+        container.removeEventListener('wheel', handleWheelZoom);
+        container.addEventListener('wheel', handleWheelZoom, { passive: false });
+    });
+}
+
+function handleRotateClick(e) {
+    const btn = e.currentTarget;
+    const targetKey = btn.dataset.target; // 'front', 'back', 'detail-front', 'detail-back', 'inline'
+    const dir = parseInt(btn.dataset.dir);
+
+    // ターゲット画像要素を特定
+    let imgElement;
+    
+    if (targetKey === 'inline') {
+        // インライン展開の場合、DOM構造から相対的に探索
+        const wrapper = btn.closest('.inline-card-wrapper');
+        if (wrapper) {
+            imgElement = wrapper.querySelector('img');
+        }
+    } else {
+        // 安全のためボタンの親モーダルから探索することを推奨したいが、
+        // IDが一意であることを前提に既存ロジックを踏襲
+        if (targetKey === 'front') {
+            imgElement = document.querySelector('#card-image-front-container img');
+        } else if (targetKey === 'back') {
+            imgElement = document.querySelector('#card-image-back-container img');
+        } else if (targetKey === 'detail-front') {
+            imgElement = document.getElementById('detail-front-image');
+        } else if (targetKey === 'detail-back') {
+            imgElement = document.getElementById('detail-back-image');
+        }
+    }
+
+    if (!imgElement) return;
+
+    // 現在の角度を取得
+    let currentRotation = parseInt(imgElement.dataset.rotation || '0');
+    let newRotation = currentRotation + dir;
+    
+    // 現在のスケールを取得（追加）
+    let currentScale = parseFloat(imgElement.dataset.scale || '1');
+    
+    imgElement.style.transform = `rotate(${newRotation}deg) scale(${currentScale})`;
+    imgElement.dataset.rotation = newRotation;
+}
+
+function setupTableEventListeners() {
+    const table = document.getElementById('reviewTable');
+    if (!table) return;
+
+    // 既にリスナーが登録されていたら何もしない（二重登録防止）
+    if (table.hasAttribute('data-listeners-attached')) return;
+    table.setAttribute('data-listeners-attached', 'true');
+
+    table.addEventListener('click', (e) => {
+        // 0. タブ切り替えボタン
+        const tabBtn = e.target.closest('.card-tab-btn');
+        if (tabBtn) {
+            e.stopPropagation();
+            const tabType = tabBtn.dataset.tab; // 'front' or 'back'
+            const detailRow = tabBtn.closest('.inline-detail-row');
+            if (detailRow) {
+                const frontView = detailRow.querySelector('#inline-front-view');
+                const backView = detailRow.querySelector('#inline-back-view');
+                const buttons = detailRow.querySelectorAll('.card-tab-btn');
+
+                // ボタンのスタイル更新
+                buttons.forEach(btn => {
+                    if (btn === tabBtn) {
+                        btn.classList.add('bg-surface', 'text-primary', 'shadow-sm', 'active');
+                        btn.classList.remove('text-on-surface-variant', 'hover:text-on-surface');
+                    } else {
+                        btn.classList.remove('bg-surface', 'text-primary', 'shadow-sm', 'active');
+                        btn.classList.add('text-on-surface-variant', 'hover:text-on-surface');
+                    }
+                });
+
+                // 表示切り替え
+                if (tabType === 'front') {
+                    frontView.classList.remove('hidden');
+                    backView.classList.add('hidden');
+                } else {
+                    frontView.classList.add('hidden');
+                    backView.classList.remove('hidden');
+                }
+            }
+            return;
+        }
+
+        // 1. インライン展開ボタン
+        const toggleBtn = e.target.closest('.toggle-inline-btn');
+        if (toggleBtn) {
+            e.stopPropagation(); // 行クリック（詳細モーダル）への伝播を止める
+            const row = toggleBtn.closest('tr');
+            const answerId = row.dataset.answerId;
+            toggleInlineRow(row, answerId);
+            return;
+        }
+
+        // 2. 回転ボタン（インライン用）
+        const rotateBtn = e.target.closest('.rotate-btn');
+        if (rotateBtn) {
+            e.stopPropagation();
+            handleRotateClick({ currentTarget: rotateBtn });
+            return;
+        }
+
+        // 3. 画像クリック（ズーム）（インライン用）
+        const zoomTarget = e.target.closest('[data-zoom-src]');
+        if (zoomTarget) {
+            // handleModalImageClick はイベントオブジェクトを受け取って処理する設計なのでそのまま呼ぶ
+            // ただし、handleModalImageClick は e.target を使うので、ここでの e を渡せばOK
+            // デリゲーションの中でさらに条件分岐している形
+            handleModalImageClick(e);
+            return;
+        }
+    });
+}
+
+import { renderInlineRow } from './ui/speedReviewRenderer.js';
+
+function toggleInlineRow(parentRow, answerId) {
+    const nextRow = parentRow.nextElementSibling;
+    const isExpanded = parentRow.dataset.expanded === 'true';
+
+    if (isExpanded && nextRow && nextRow.classList.contains('inline-detail-row')) {
+        // 折りたたみ
+        nextRow.remove();
+        parentRow.dataset.expanded = 'false';
+        const icon = parentRow.querySelector('.toggle-icon');
+        if (icon) icon.textContent = 'keyboard_arrow_right';
+    } else {
+        // 展開
+        const item = allCombinedData.find(d => d.answerId === answerId);
+        if (!item) return;
+
+        const detailRow = renderInlineRow(item, 6); // colspanは適宜調整
+        parentRow.after(detailRow);
+        parentRow.dataset.expanded = 'true';
+        const icon = parentRow.querySelector('.toggle-icon');
+        if (icon) icon.textContent = 'keyboard_arrow_down';
+
+        // ホイールズームの適用
+        setupWheelZoomListeners(detailRow);
+    }
+}
+
 function handleDetailClick(answerId) {
     const item = allCombinedData.find(data => data.answerId === answerId);
     if (item) {
@@ -121,7 +294,11 @@ function handleDetailClick(answerId) {
         isModalInEditMode = false;
         handleOpenModal('reviewDetailModalOverlay', resolveDashboardAssetPath('modals/reviewDetailModal.html'), () => {
             renderModalContent(item, false);
+            updateModalFooter(); // Initialize footer with correct buttons
             setupModalEventListeners();
+            
+            // ホイールズームリスナーを設定（DOM再描画のたびに必要）
+            setupWheelZoomListeners(document.getElementById('reviewDetailModalOverlay'));
         });
     } else {
         console.warn('Item not found for answerId:', answerId);
@@ -129,23 +306,98 @@ function handleDetailClick(answerId) {
 }
 
 function setupModalEventListeners() {
+    const modal = document.getElementById('reviewDetailModalOverlay');
+    if (!modal) return;
+
+    // Check if listener is already attached to avoid duplicates (using a custom property)
+    if (!modal.hasAttribute('data-zoom-listener-attached')) {
+        modal.addEventListener('click', handleModalImageClick);
+        modal.setAttribute('data-zoom-listener-attached', 'true');
+    }
+    
+    // Rotate button listener (Delegation)
+    if (!modal.hasAttribute('data-rotate-listener-attached')) {
+        modal.addEventListener('click', (e) => {
+            const btn = e.target.closest('.rotate-btn');
+            if (btn) {
+                e.stopPropagation();
+                handleRotateClick({ currentTarget: btn });
+            }
+        });
+        modal.setAttribute('data-rotate-listener-attached', 'true');
+    }
+
     const footer = document.querySelector('#reviewDetailModal .p-4.border-t');
     if (!footer) return;
 
-    footer.addEventListener('click', (e) => {
-        if (e.target.id === 'editDetailBtn') {
-            handleEditToggle();
-        } else if (e.target.id === 'saveDetailBtn') {
-            handleSave();
-        } else if (e.target.id === 'cancelEditBtn') {
-            handleEditToggle();
+    // Use event delegation for footer buttons to handle dynamic updates
+    if (!footer.hasAttribute('data-footer-listeners-attached')) {
+        footer.addEventListener('click', (e) => {
+            if (e.target.id === 'editDetailBtn') {
+                handleEditToggle();
+            } else if (e.target.id === 'saveDetailBtn') {
+                handleSave();
+            } else if (e.target.id === 'cancelEditBtn') {
+                handleEditToggle();
+            } else if (e.target.id === 'showCardImagesBtn') {
+                showCardImagesModal(currentItemInModal);
+            }
+        });
+        footer.setAttribute('data-footer-listeners-attached', 'true');
+    }
+}
+
+function showCardImagesModal(item) {
+    if (!item) return;
+    
+    handleOpenModal('cardImagesModalOverlay', resolveDashboardAssetPath('modals/cardImagesModal.html'), () => {
+        const modal = document.getElementById('cardImagesModalOverlay');
+        const frontContainer = modal.querySelector('#card-image-front-container');
+        const backContainer = modal.querySelector('#card-image-back-container');
+        
+        const frontUrl = '../media/縦表 .png';
+        const backUrl = '../media/縦裏.png';
+
+        const setupImage = (container, url) => {
+            container.innerHTML = `<img src="${url}" class="max-w-full max-h-full object-contain transition-transform duration-200" alt="名刺画像">`;
+            const img = container.querySelector('img');
+            if(img) {
+                img.dataset.rotation = '0'; // Reset rotation
+                img.dataset.scale = '1';    // Reset scale
+            }
+            container.setAttribute('data-zoom-src', url);
+        };
+
+        if (frontContainer) setupImage(frontContainer, frontUrl);
+        if (backContainer) setupImage(backContainer, backUrl);
+
+        // Attach zoom listener to the new modal
+        if (!modal.hasAttribute('data-zoom-listener-attached')) {
+            modal.addEventListener('click', handleModalImageClick);
+            modal.setAttribute('data-zoom-listener-attached', 'true');
         }
+
+        // Rotate button listener (Delegation)
+        if (!modal.hasAttribute('data-rotate-listener-attached')) {
+            modal.addEventListener('click', (e) => {
+                const btn = e.target.closest('.rotate-btn');
+                if (btn) {
+                    e.stopPropagation();
+                    handleRotateClick({ currentTarget: btn });
+                }
+            });
+            modal.setAttribute('data-rotate-listener-attached', 'true');
+        }
+        
+        // ホイールズームリスナーを設定
+        setupWheelZoomListeners(modal);
     });
 }
 
 function handleEditToggle() {
     isModalInEditMode = !isModalInEditMode;
     renderModalContent(currentItemInModal, isModalInEditMode);
+    // setupCardZoomListeners() removed; Event delegation handles this automatically
     updateModalFooter();
 }
 
@@ -220,12 +472,22 @@ function updateModalFooter() {
 
     if (isModalInEditMode) {
         footer.innerHTML = `
-            <button id="cancelEditBtn" class="button-secondary py-2 px-4 rounded-md font-semibold mr-2">キャンセル</button>
-            <button id="saveDetailBtn" class="button-primary py-2 px-4 rounded-md font-semibold">保存する</button>
+            <div class="flex justify-end items-center gap-2 w-full">
+                <button id="showCardImagesBtn" class="button-secondary py-2 px-4 rounded-md font-semibold flex items-center gap-2">
+                    <span class="material-icons text-base">image</span> 名刺画像
+                </button>
+                <button id="cancelEditBtn" class="button-secondary py-2 px-4 rounded-md font-semibold">キャンセル</button>
+                <button id="saveDetailBtn" class="button-primary py-2 px-4 rounded-md font-semibold">保存する</button>
+            </div>
         `;
     } else {
         footer.innerHTML = `
-            <button id="editDetailBtn" class="button-secondary py-2 px-4 rounded-md font-semibold">編集する</button>
+            <div class="flex justify-end items-center gap-2 w-full">
+                <button id="showCardImagesBtn" class="button-secondary py-2 px-4 rounded-md font-semibold flex items-center gap-2">
+                    <span class="material-icons text-base">image</span> 名刺画像
+                </button>
+                <button id="editDetailBtn" class="button-secondary py-2 px-4 rounded-md font-semibold">編集する</button>
+            </div>
         `;
     }
 }
@@ -663,6 +925,7 @@ export async function initializePage() {
             dynamicHeader.textContent = truncateQuestion(currentIndustryQuestion);
         }
 
+        setupTableEventListeners();
         populateQuestionSelector(allCombinedData);
         updateAnswerFilterAvailability();
         displayPage(1, allCombinedData);
