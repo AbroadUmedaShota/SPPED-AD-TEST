@@ -1,7 +1,7 @@
 
 import { resolveDemoDataPath, resolveDashboardDataPath, resolveDashboardAssetPath, showToast } from './utils.js';
 import { speedReviewService } from './services/speedReviewService.js';
-import { populateTable, renderModalContent } from './ui/speedReviewRenderer.js';
+import { populateTable, renderModalContent, handleModalImageClick } from './ui/speedReviewRenderer.js';
 import { handleOpenModal } from './modalHandler.js';
 import { initBreadcrumbs } from './breadcrumb.js';
 
@@ -121,6 +121,7 @@ function handleDetailClick(answerId) {
         isModalInEditMode = false;
         handleOpenModal('reviewDetailModalOverlay', resolveDashboardAssetPath('modals/reviewDetailModal.html'), () => {
             renderModalContent(item, false);
+            // setupCardZoomListeners() is removed in favor of event delegation in setupModalEventListeners
             setupModalEventListeners();
         });
     } else {
@@ -129,6 +130,22 @@ function handleDetailClick(answerId) {
 }
 
 function setupModalEventListeners() {
+    const modal = document.getElementById('reviewDetailModalOverlay');
+    if (!modal) return;
+
+    // Remove existing listener to avoid duplicates if any (though typically this runs once per open or we can be safe)
+    // For simplicity, we just add it. The modal is re-created or re-opened. 
+    // If handleOpenModal reloads from file, it's fresh. If not, we might stack listeners.
+    // Assuming handleOpenModal manages DOM freshness or we should use a flag.
+    // Given the current implementation re-renders content, let's attach to the static container part if possible, 
+    // or just attach to the overlay which is the root.
+    
+    // Check if listener is already attached to avoid duplicates (using a custom property)
+    if (!modal.hasAttribute('data-zoom-listener-attached')) {
+        modal.addEventListener('click', handleModalImageClick);
+        modal.setAttribute('data-zoom-listener-attached', 'true');
+    }
+
     const footer = document.querySelector('#reviewDetailModal .p-4.border-t');
     if (!footer) return;
 
@@ -146,6 +163,7 @@ function setupModalEventListeners() {
 function handleEditToggle() {
     isModalInEditMode = !isModalInEditMode;
     renderModalContent(currentItemInModal, isModalInEditMode);
+    // setupCardZoomListeners() removed; Event delegation handles this automatically
     updateModalFooter();
 }
 

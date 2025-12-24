@@ -1,22 +1,15 @@
-Closes #177
+### Pull Request Description
+This PR addresses the issue where clicking the business card image in the Speed Review modal causes the application to freeze.
 
-## 概要 (Overview)
-「PDFが白紙になる」という致命的な問題を修正しました。原因は、PDF生成用クローンを画面外（-10000px）に配置したことで、html2canvasの描画範囲外になってしまったためでした。
+**Changes:**
+- Refactored `02_dashboard/src/ui/speedReviewRenderer.js` to remove inline `onclick` attributes from the HTML string generation.
+- Implemented `setupCardZoomListeners` to attach event listeners to business card images after they are rendered in the DOM.
+- Refactored `openCardZoom` to be a local exported function instead of a global `window` property.
+- Updated `02_dashboard/src/speed-review.js` to call `setupCardZoomListeners` after rendering the modal content.
 
-## 修正内容 (Changes)
-1.  **クローンの配置位置修正**
-    - `left: -10000px` を廃止し、**`left: 0; top: 0;`** に変更しました。これにより、html2canvasが正しく内容をキャプチャできるようになります。
-    - ユーザーから見えないようにするため、**`z-index: -9999`** でメインコンテンツの裏側に隠しました。
-2.  **その他の保護**
-    - `visibility: visible` を明示（html2canvasが無視しないように）。
-    - `background-color: #ffffff` を指定（透過して変な色が混ざらないように）。
+**Testing:**
+- Verified that clicking the business card image opens the zoom overlay without freezing.
+- Verified that the zoom overlay can be closed.
+- Confirmed that toggling edit mode in the modal works correctly and re-attaches zoom listeners.
 
-## 期待される動作 (Expected Behavior)
-- PDFが正常に（内容ありで）生成されます。
-- ダウンロード中も画面上のUIはズレたりちらついたりしません（クローンは裏側にいます）。
-- コンテンツ被り防止（35mmパディング）とフッター固定（4mm）も維持されているため、レイアウトも安全です。
-
-## チェックリスト (Checklist)
-- [x] クローンを画面内に戻しつつ隠蔽
-- [x] 白紙回避の検証済み設定への変更
-- [x] ワークフロー遵守
+**Related Issue:** #186
