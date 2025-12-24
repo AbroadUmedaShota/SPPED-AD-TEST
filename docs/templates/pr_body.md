@@ -1,15 +1,16 @@
 ### Pull Request Description
-This PR addresses the issue where clicking the business card image in the Speed Review modal causes the application to freeze.
+SPEEDレビュー画面のUI/UXを大幅に改善し、名刺画像の確認効率を向上させました。
 
-**Changes:**
-- Refactored `02_dashboard/src/ui/speedReviewRenderer.js` to remove inline `onclick` attributes from the HTML string generation.
-- Implemented `setupCardZoomListeners` to attach event listeners to business card images after they are rendered in the DOM.
-- Refactored `openCardZoom` to be a local exported function instead of a global `window` property.
-- Updated `02_dashboard/src/speed-review.js` to call `setupCardZoomListeners` after rendering the modal content.
+**主な変更点:**
+- **インライン展開機能の実装**: 一覧テーブルの各行に「展開ボタン」を追加し、モーダルを開かずにその場で名刺画像（表・裏切り替えタブ付き）と主要情報を確認できるようにしました。
+- **名刺画像確認モーダルの追加**: 詳細モーダルからも、名刺の表・裏を並べて大きく確認できる専用モーダルを開けるようにしました。
+- **画像操作機能の強化**: 名刺画像に対して、90度ごとの回転ボタンと、マウスホイールによる拡大縮小（ズーム）機能を実装しました。回転状態を維持したままのズームや全画面表示も可能です。
+- **サイドバーのスクロール追従**: 画面左側のツールボックスが、画面下端までピッタリと追従するようにスタイルを修正しました。
+- **パフォーマンス改善**: イベントハンドリングを最適化（Event Delegation採用）し、フリーズやメモリリークのリスクを低減しました。
 
-**Testing:**
-- Verified that clicking the business card image opens the zoom overlay without freezing.
-- Verified that the zoom overlay can be closed.
-- Confirmed that toggling edit mode in the modal works correctly and re-attaches zoom listeners.
+**検証:**
+- 一覧画面での行展開・折りたたみがスムーズに行えること。
+- インライン表示、詳細モーダル、名刺画像モーダルのすべてで、画像の回転・ズーム・全画面表示が正しく動作すること。
+- サイドバーがスクロール時に正しく追従し、画面下端まで表示されること。
 
 **Related Issue:** #186
