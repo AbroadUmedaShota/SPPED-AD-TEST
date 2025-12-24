@@ -1,5 +1,13 @@
 # 月次変更履歴 (2025-07-22 〜 2025-12-23)
 
+## 2025-12-24 (水)
+
+- `02_dashboard/src/ui/speedReviewRenderer.js` / `02_dashboard/src/speed-review.js`
+    - **SPEEDレビュー画面のフリーズ修正 (Issue #186)**:
+        - 名刺画像クリック時にアプリケーションがフリーズする問題を修正しました。
+        - インラインの `onclick` 属性を廃止し、イベント委譲（Event Delegation）を用いた実装に変更することで、メモリリークやイベントの競合を解消しました。
+        - 画像ズーム表示（ライトボックス）のスタイルをインラインCSSに変更し、z-indexの競合を防ぐとともに、`requestAnimationFrame` を用いてスムーズなアニメーションを実現しました。
+
 ## 2025-12-23 (火)
 
 - `02_dashboard/src/surveyCreation.js`

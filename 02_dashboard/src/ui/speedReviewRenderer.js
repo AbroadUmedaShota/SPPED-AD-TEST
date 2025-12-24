@@ -214,22 +214,32 @@ export function openCardZoom(imageUrl) {
 
         const overlay = document.createElement('div');
         overlay.id = 'image-zoom-overlay';
-        overlay.className = 'fixed inset-0 z-[10000] bg-black/90 flex flex-col items-center justify-center opacity-0 transition-opacity duration-300';
+        // Use extremely high z-index and explicit flex styles
+        overlay.style.position = 'fixed';
+        overlay.style.inset = '0';
+        overlay.style.zIndex = '99999';
+        overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+        overlay.style.display = 'flex';
+        overlay.style.flexDirection = 'column';
+        overlay.style.alignItems = 'center';
+        overlay.style.justifyContent = 'center';
+        overlay.style.opacity = '0'; // Start invisible for fade-in
+        overlay.style.transition = 'opacity 0.3s ease';
 
         // Modal content container
         overlay.innerHTML = `
-            <div class="absolute top-4 right-4 z-[10001]">
+            <div style="position: absolute; top: 1rem; right: 1rem; z-index: 100000;">
                 <button id="zoom-close-btn" class="text-white hover:text-gray-300 bg-black/50 rounded-full p-2 transition-colors">
                     <span class="material-icons text-3xl">close</span>
                 </button>
             </div>
-            <img src="${imageUrl}" class="w-[95vw] h-[90vh] object-contain shadow-2xl scale-95 transition-transform duration-300">
+            <img src="${imageUrl}" style="max-width: 95vw; max-height: 90vh; object-fit: contain; transform: scale(0.95); transition: transform 0.3s ease;" class="shadow-2xl">
         `;
 
         const close = () => {
-            overlay.classList.remove('opacity-100');
+            overlay.style.opacity = '0';
             const img = overlay.querySelector('img');
-            if (img) img.classList.remove('scale-100');
+            if (img) img.style.transform = 'scale(0.95)';
             setTimeout(() => {
                 if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
             }, 300);
@@ -251,12 +261,14 @@ export function openCardZoom(imageUrl) {
 
         document.body.appendChild(overlay);
 
-        // Use setTimeout instead of requestAnimationFrame for safety
-        setTimeout(() => {
-            overlay.classList.add('opacity-100');
-            const img = overlay.querySelector('img');
-            if (img) img.classList.add('scale-100');
-        }, 10);
+        // Trigger fade-in
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                overlay.style.opacity = '1';
+                const img = overlay.querySelector('img');
+                if (img) img.style.transform = 'scale(1)';
+            });
+        });
     } catch (e) {
         console.error('Zoom error:', e);
     }
