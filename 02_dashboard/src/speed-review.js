@@ -339,8 +339,6 @@ function setupModalEventListeners() {
                 handleSave();
             } else if (e.target.id === 'cancelEditBtn') {
                 handleEditToggle();
-            } else if (e.target.id === 'showCardImagesBtn') {
-                showCardImagesModal(currentItemInModal);
             }
         });
         footer.setAttribute('data-footer-listeners-attached', 'true');
@@ -473,9 +471,6 @@ function updateModalFooter() {
     if (isModalInEditMode) {
         footer.innerHTML = `
             <div class="flex justify-end items-center gap-2 w-full">
-                <button id="showCardImagesBtn" class="button-secondary py-2 px-4 rounded-md font-semibold flex items-center gap-2">
-                    <span class="material-icons text-base">image</span> 名刺画像
-                </button>
                 <button id="cancelEditBtn" class="button-secondary py-2 px-4 rounded-md font-semibold">キャンセル</button>
                 <button id="saveDetailBtn" class="button-primary py-2 px-4 rounded-md font-semibold">保存する</button>
             </div>
@@ -483,9 +478,6 @@ function updateModalFooter() {
     } else {
         footer.innerHTML = `
             <div class="flex justify-end items-center gap-2 w-full">
-                <button id="showCardImagesBtn" class="button-secondary py-2 px-4 rounded-md font-semibold flex items-center gap-2">
-                    <span class="material-icons text-base">image</span> 名刺画像
-                </button>
                 <button id="editDetailBtn" class="button-secondary py-2 px-4 rounded-md font-semibold">編集する</button>
             </div>
         `;
