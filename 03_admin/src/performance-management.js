@@ -679,7 +679,7 @@ function showGroupDetail(id) {
     const opList = document.getElementById('group-op-list');
     opList.innerHTML = group.operators.map(gOp => {
         const fullOp = performanceData.operators.find(o => o.name === gOp.name) || {};
-        return `<tr class="text-xs hover:bg-surface-variant/30"><td class="px-3 py-2 font-medium">${gOp.name}</td><td class="px-3 py-2 text-right">${(fullOp.processed || 0).toLocaleString()}</td><td class="px-3 py-2 text-right">${gOp.avgTime}s</td><td class="px-3 py-2 text-right ${gOp.accuracy < CONFIG.THRESHOLD_ACCURACY ? 'text-error font-bold' : ''}">${gOp.accuracy}%</td><td class="px-3 py-2 text-right">¥${(fullOp.estPayment || 0).toLocaleString()}</td></tr>`;
+        return `<tr class="text-xs hover:bg-surface-variant/30"><td class="px-3 py-2 font-medium">${gOp.name}</td><td class="px-3 py-2 text-center">${(fullOp.processed || 0).toLocaleString()}</td><td class="px-3 py-2 text-center">${gOp.avgTime}s</td><td class="px-3 py-2 text-center ${gOp.accuracy < CONFIG.THRESHOLD_ACCURACY ? 'text-error font-bold' : ''}">${gOp.accuracy}%</td><td class="px-3 py-2 text-center">¥${(fullOp.estPayment || 0).toLocaleString()}</td></tr>`;
     }).join('');
     modal.classList.remove('hidden');
     modal.classList.add('flex');
