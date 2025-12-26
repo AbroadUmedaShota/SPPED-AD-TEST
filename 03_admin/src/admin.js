@@ -226,6 +226,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             const { initCouponBulkCreate } = await import('./couponBulkCreate.js');
             initCouponBulkCreate();
             break;
+        case 'performance-management.html':
+            const { initPerformanceManagementPage } = await import('./performance-management.js');
+            initPerformanceManagementPage();
+            break;
         // Add other admin pages here
         // case 'some_other_page.html':
         //     const { initSomeOtherPage } = await import('./some_other_page.js');

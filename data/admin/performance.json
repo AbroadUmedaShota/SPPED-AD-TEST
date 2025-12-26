@@ -1,0 +1,2248 @@
+{
+  "summary": {
+    "totalPayment": 1250000,
+    "lastMonthComparison": 5.2,
+    "activeUsers": 42,
+    "totalUsers": 50,
+    "totalProcessed": 15600,
+    "errorRate": 1.2,
+    "avgTime": 245,
+    "maxCapacity": 18000,
+    "costPerformance": 0.85,
+    "onTimeRate": 98.5
+  },
+  "parameters": {
+    "targetProcessed": 400,
+    "targetErrorRate": 1.5,
+    "targetAvgTime": 250,
+    "unitPrice": 100,
+    "correctionCost": 50
+  },
+  "operators": [
+    {
+      "id": "OP001",
+      "name": "鈴木 蒼",
+      "group": "展示会Aチーム",
+      "processed": 372,
+      "errors": 12,
+      "valid": 360,
+      "workTime": "21:11:00",
+      "avgTime": 205,
+      "estPayment": 36000,
+      "status": "未達",
+      "onTimeRate": 94.8,
+      "errorTypes": {
+        "name": 0.4,
+        "company": 0.7,
+        "address": 0.1,
+        "phone": 1.6,
+        "email": 1.3
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 41,
+          "errorRate": 4.0
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 42,
+          "errorRate": 3.4
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 42,
+          "errorRate": 2.9
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 39,
+          "errorRate": 3.7
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 30,
+          "errorRate": 3.6
+        }
+      ]
+    },
+    {
+      "id": "OP002",
+      "name": "佐藤 健太",
+      "group": "セミナーBチーム",
+      "processed": 412,
+      "errors": 1,
+      "valid": 411,
+      "workTime": "33:45:40",
+      "avgTime": 295,
+      "estPayment": 41100,
+      "status": "達成",
+      "onTimeRate": 96.1,
+      "errorTypes": {
+        "name": 0.3,
+        "company": 1.9,
+        "address": 1.7,
+        "phone": 0.6,
+        "email": 1.4
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 47,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 44,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 37,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 45,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 35,
+          "errorRate": 0.4
+        }
+      ]
+    },
+    {
+      "id": "OP003",
+      "name": "山田 向日葵",
+      "group": "展示会Aチーム",
+      "processed": 437,
+      "errors": 2,
+      "valid": 435,
+      "workTime": "36:17:43",
+      "avgTime": 299,
+      "estPayment": 43500,
+      "status": "達成",
+      "onTimeRate": 94.0,
+      "errorTypes": {
+        "name": 0.3,
+        "company": 1.1,
+        "address": 1.7,
+        "phone": 0.6,
+        "email": 1.9
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 46,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 47,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 44,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 41,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 46,
+          "errorRate": 0.7
+        }
+      ]
+    },
+    {
+      "id": "OP004",
+      "name": "長谷川 太郎",
+      "group": "その他案件Cチーム",
+      "processed": 376,
+      "errors": 7,
+      "valid": 369,
+      "workTime": "30:23:36",
+      "avgTime": 291,
+      "estPayment": 36900,
+      "status": "未達",
+      "onTimeRate": 95.6,
+      "errorTypes": {
+        "name": 0.7,
+        "company": 0.8,
+        "address": 1.8,
+        "phone": 0.7,
+        "email": 1.2
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 38,
+          "errorRate": 2.1
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 33,
+          "errorRate": 2.3
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 44,
+          "errorRate": 1.9
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 37,
+          "errorRate": 2.1
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 40,
+          "errorRate": 2.4
+        }
+      ]
+    },
+    {
+      "id": "OP005",
+      "name": "後藤 一郎",
+      "group": "その他案件Cチーム",
+      "processed": 437,
+      "errors": 1,
+      "valid": 436,
+      "workTime": "31:11:49",
+      "avgTime": 257,
+      "estPayment": 43600,
+      "status": "達成",
+      "onTimeRate": 91.2,
+      "errorTypes": {
+        "name": 1.7,
+        "company": 0.3,
+        "address": 0.9,
+        "phone": 0.8,
+        "email": 0.4
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 38,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 47,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 35,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 40,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 40,
+          "errorRate": 0.3
+        }
+      ]
+    },
+    {
+      "id": "OP006",
+      "name": "前田 哲也",
+      "group": "セミナーBチーム",
+      "processed": 390,
+      "errors": 6,
+      "valid": 384,
+      "workTime": "28:36:00",
+      "avgTime": 264,
+      "estPayment": 38400,
+      "status": "達成",
+      "onTimeRate": 98.2,
+      "errorTypes": {
+        "name": 1.5,
+        "company": 1.8,
+        "address": 0.0,
+        "phone": 1.1,
+        "email": 1.6
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 41,
+          "errorRate": 1.9
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 44,
+          "errorRate": 1.9
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 44,
+          "errorRate": 1.9
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 40,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 44,
+          "errorRate": 1.7
+        }
+      ]
+    },
+    {
+      "id": "OP007",
+      "name": "渡辺 翔太",
+      "group": "その他案件Cチーム",
+      "processed": 337,
+      "errors": 8,
+      "valid": 329,
+      "workTime": "19:28:16",
+      "avgTime": 208,
+      "estPayment": 32900,
+      "status": "未達",
+      "onTimeRate": 95.9,
+      "errorTypes": {
+        "name": 0.9,
+        "company": 1.5,
+        "address": 0.0,
+        "phone": 0.5,
+        "email": 1.0
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 33,
+          "errorRate": 2.7
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 30,
+          "errorRate": 2.9
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 36,
+          "errorRate": 2.5
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 36,
+          "errorRate": 2.1
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 33,
+          "errorRate": 2.6
+        }
+      ]
+    },
+    {
+      "id": "OP008",
+      "name": "山下 香織",
+      "group": "その他案件Cチーム",
+      "processed": 549,
+      "errors": 3,
+      "valid": 546,
+      "workTime": "41:37:57",
+      "avgTime": 273,
+      "estPayment": 54600,
+      "status": "達成",
+      "onTimeRate": 96.7,
+      "errorTypes": {
+        "name": 0.0,
+        "company": 1.7,
+        "address": 1.0,
+        "phone": 1.7,
+        "email": 1.1
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 65,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 61,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 59,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 59,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 59,
+          "errorRate": 0.5
+        }
+      ]
+    },
+    {
+      "id": "OP009",
+      "name": "山下 大輔",
+      "group": "セミナーBチーム",
+      "processed": 479,
+      "errors": 6,
+      "valid": 473,
+      "workTime": "38:19:12",
+      "avgTime": 288,
+      "estPayment": 47300,
+      "status": "達成",
+      "onTimeRate": 99.1,
+      "errorTypes": {
+        "name": 1.9,
+        "company": 1.1,
+        "address": 0.6,
+        "phone": 0.3,
+        "email": 1.5
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 40,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 47,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 54,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 38,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 47,
+          "errorRate": 1.5
+        }
+      ]
+    },
+    {
+      "id": "OP010",
+      "name": "山崎 恵",
+      "group": "セミナーBチーム",
+      "processed": 281,
+      "errors": 7,
+      "valid": 274,
+      "workTime": "22:42:51",
+      "avgTime": 291,
+      "estPayment": 27400,
+      "status": "未達",
+      "onTimeRate": 98.7,
+      "errorTypes": {
+        "name": 0.9,
+        "company": 1.3,
+        "address": 0.8,
+        "phone": 1.4,
+        "email": 0.3
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 30,
+          "errorRate": 2.7
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 27,
+          "errorRate": 2.2
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 27,
+          "errorRate": 2.9
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 22,
+          "errorRate": 2.3
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 32,
+          "errorRate": 3.2
+        }
+      ]
+    },
+    {
+      "id": "OP011",
+      "name": "清水 恵",
+      "group": "セミナーBチーム",
+      "processed": 491,
+      "errors": 1,
+      "valid": 490,
+      "workTime": "29:11:14",
+      "avgTime": 214,
+      "estPayment": 49000,
+      "status": "達成",
+      "onTimeRate": 96.3,
+      "errorTypes": {
+        "name": 1.5,
+        "company": 0.9,
+        "address": 1.1,
+        "phone": 0.7,
+        "email": 1.2
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 48,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 50,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 51,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 46,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 57,
+          "errorRate": 0.4
+        }
+      ]
+    },
+    {
+      "id": "OP012",
+      "name": "池田 直人",
+      "group": "展示会Aチーム",
+      "processed": 358,
+      "errors": 3,
+      "valid": 355,
+      "workTime": "28:14:32",
+      "avgTime": 284,
+      "estPayment": 35500,
+      "status": "達成",
+      "onTimeRate": 96.8,
+      "errorTypes": {
+        "name": 0.3,
+        "company": 0.2,
+        "address": 1.8,
+        "phone": 0.0,
+        "email": 1.7
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 35,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 36,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 33,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 41,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 41,
+          "errorRate": 1.1
+        }
+      ]
+    },
+    {
+      "id": "OP013",
+      "name": "林 香織",
+      "group": "展示会Aチーム",
+      "processed": 326,
+      "errors": 6,
+      "valid": 320,
+      "workTime": "23:48:58",
+      "avgTime": 263,
+      "estPayment": 32000,
+      "status": "未達",
+      "onTimeRate": 95.8,
+      "errorTypes": {
+        "name": 0.7,
+        "company": 1.0,
+        "address": 1.6,
+        "phone": 0.8,
+        "email": 1.1
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 35,
+          "errorRate": 2.5
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 26,
+          "errorRate": 2.0
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 38,
+          "errorRate": 2.2
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 31,
+          "errorRate": 1.8
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 33,
+          "errorRate": 1.9
+        }
+      ]
+    },
+    {
+      "id": "OP014",
+      "name": "山口 拓哉",
+      "group": "セミナーBチーム",
+      "processed": 585,
+      "errors": 2,
+      "valid": 583,
+      "workTime": "36:53:15",
+      "avgTime": 227,
+      "estPayment": 58300,
+      "status": "達成",
+      "onTimeRate": 95.5,
+      "errorTypes": {
+        "name": 1.6,
+        "company": 1.3,
+        "address": 1.8,
+        "phone": 0.2,
+        "email": 0.8
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 60,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 69,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 46,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 48,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 53,
+          "errorRate": 0.4
+        }
+      ]
+    },
+    {
+      "id": "OP015",
+      "name": "石川 直人",
+      "group": "展示会Aチーム",
+      "processed": 447,
+      "errors": 4,
+      "valid": 443,
+      "workTime": "33:53:51",
+      "avgTime": 273,
+      "estPayment": 44300,
+      "status": "達成",
+      "onTimeRate": 99.9,
+      "errorTypes": {
+        "name": 0.4,
+        "company": 0.5,
+        "address": 0.4,
+        "phone": 0.6,
+        "email": 1.8
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 52,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 41,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 36,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 36,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 46,
+          "errorRate": 1.1
+        }
+      ]
+    },
+    {
+      "id": "OP016",
+      "name": "石井 優子",
+      "group": "その他案件Cチーム",
+      "processed": 312,
+      "errors": 14,
+      "valid": 298,
+      "workTime": "19:35:12",
+      "avgTime": 226,
+      "estPayment": 29800,
+      "status": "未達",
+      "onTimeRate": 92.7,
+      "errorTypes": {
+        "name": 1.2,
+        "company": 0.6,
+        "address": 1.5,
+        "phone": 0.8,
+        "email": 1.9
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 27,
+          "errorRate": 5.4
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 34,
+          "errorRate": 5.2
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 36,
+          "errorRate": 5.6
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 32,
+          "errorRate": 4.4
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 30,
+          "errorRate": 4.9
+        }
+      ]
+    },
+    {
+      "id": "OP017",
+      "name": "林 翔太",
+      "group": "展示会Aチーム",
+      "processed": 452,
+      "errors": 3,
+      "valid": 449,
+      "workTime": "26:14:28",
+      "avgTime": 209,
+      "estPayment": 44900,
+      "status": "達成",
+      "onTimeRate": 99.4,
+      "errorTypes": {
+        "name": 1.0,
+        "company": 1.9,
+        "address": 1.0,
+        "phone": 1.3,
+        "email": 1.0
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 46,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 41,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 41,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 45,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 50,
+          "errorRate": 0.6
+        }
+      ]
+    },
+    {
+      "id": "OP018",
+      "name": "山口 亮",
+      "group": "セミナーBチーム",
+      "processed": 489,
+      "errors": 3,
+      "valid": 486,
+      "workTime": "38:42:45",
+      "avgTime": 285,
+      "estPayment": 48600,
+      "status": "達成",
+      "onTimeRate": 97.8,
+      "errorTypes": {
+        "name": 0.2,
+        "company": 1.9,
+        "address": 1.9,
+        "phone": 1.2,
+        "email": 1.3
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 49,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 57,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 52,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 41,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 42,
+          "errorRate": 0.6
+        }
+      ]
+    },
+    {
+      "id": "OP019",
+      "name": "小林 陽菜",
+      "group": "その他案件Cチーム",
+      "processed": 355,
+      "errors": 18,
+      "valid": 337,
+      "workTime": "25:50:10",
+      "avgTime": 262,
+      "estPayment": 33700,
+      "status": "未達",
+      "onTimeRate": 94.3,
+      "errorTypes": {
+        "name": 1.7,
+        "company": 1.3,
+        "address": 1.9,
+        "phone": 1.1,
+        "email": 1.5
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 38,
+          "errorRate": 4.9
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 35,
+          "errorRate": 6.0
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 38,
+          "errorRate": 6.0
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 40,
+          "errorRate": 4.5
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 34,
+          "errorRate": 5.5
+        }
+      ]
+    },
+    {
+      "id": "OP020",
+      "name": "斎藤 遥",
+      "group": "展示会Aチーム",
+      "processed": 573,
+      "errors": 4,
+      "valid": 569,
+      "workTime": "44:43:33",
+      "avgTime": 281,
+      "estPayment": 56900,
+      "status": "達成",
+      "onTimeRate": 97.1,
+      "errorTypes": {
+        "name": 0.1,
+        "company": 0.3,
+        "address": 0.3,
+        "phone": 1.0,
+        "email": 0.8
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 59,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 61,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 50,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 62,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 46,
+          "errorRate": 0.7
+        }
+      ]
+    },
+    {
+      "id": "OP021",
+      "name": "山崎 彩",
+      "group": "展示会Aチーム",
+      "processed": 495,
+      "errors": 3,
+      "valid": 492,
+      "workTime": "31:54:00",
+      "avgTime": 232,
+      "estPayment": 49200,
+      "status": "達成",
+      "onTimeRate": 98.2,
+      "errorTypes": {
+        "name": 0.5,
+        "company": 1.4,
+        "address": 1.3,
+        "phone": 1.6,
+        "email": 1.5
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 43,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 46,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 57,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 56,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 49,
+          "errorRate": 0.7
+        }
+      ]
+    },
+    {
+      "id": "OP022",
+      "name": "中島 亮",
+      "group": "展示会Aチーム",
+      "processed": 355,
+      "errors": 18,
+      "valid": 337,
+      "workTime": "28:18:05",
+      "avgTime": 287,
+      "estPayment": 33700,
+      "status": "未達",
+      "onTimeRate": 94.1,
+      "errorTypes": {
+        "name": 1.3,
+        "company": 1.6,
+        "address": 1.2,
+        "phone": 0.5,
+        "email": 1.4
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 35,
+          "errorRate": 4.4
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 34,
+          "errorRate": 4.3
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 35,
+          "errorRate": 4.2
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 32,
+          "errorRate": 4.6
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 36,
+          "errorRate": 4.3
+        }
+      ]
+    },
+    {
+      "id": "OP023",
+      "name": "斎藤 美穂",
+      "group": "その他案件Cチーム",
+      "processed": 519,
+      "errors": 2,
+      "valid": 517,
+      "workTime": "39:04:09",
+      "avgTime": 271,
+      "estPayment": 51700,
+      "status": "達成",
+      "onTimeRate": 94.4,
+      "errorTypes": {
+        "name": 1.3,
+        "company": 1.9,
+        "address": 1.9,
+        "phone": 1.4,
+        "email": 0.6
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 47,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 51,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 51,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 61,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 54,
+          "errorRate": 0.5
+        }
+      ]
+    },
+    {
+      "id": "OP024",
+      "name": "加藤 秀樹",
+      "group": "展示会Aチーム",
+      "processed": 429,
+      "errors": 5,
+      "valid": 424,
+      "workTime": "25:22:57",
+      "avgTime": 213,
+      "estPayment": 42400,
+      "status": "達成",
+      "onTimeRate": 90.5,
+      "errorTypes": {
+        "name": 0.7,
+        "company": 0.6,
+        "address": 1.5,
+        "phone": 1.8,
+        "email": 1.4
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 37,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 44,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 36,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 47,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 41,
+          "errorRate": 1.4
+        }
+      ]
+    },
+    {
+      "id": "OP025",
+      "name": "村上 哲也",
+      "group": "その他案件Cチーム",
+      "processed": 377,
+      "errors": 20,
+      "valid": 357,
+      "workTime": "27:01:06",
+      "avgTime": 258,
+      "estPayment": 35700,
+      "status": "未達",
+      "onTimeRate": 99.7,
+      "errorTypes": {
+        "name": 1.6,
+        "company": 1.0,
+        "address": 0.6,
+        "phone": 0.7,
+        "email": 0.9
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 38,
+          "errorRate": 6.2
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 41,
+          "errorRate": 5.2
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 44,
+          "errorRate": 6.4
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 44,
+          "errorRate": 4.9
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 37,
+          "errorRate": 5.0
+        }
+      ]
+    },
+    {
+      "id": "OP026",
+      "name": "後藤 亮",
+      "group": "展示会Aチーム",
+      "processed": 559,
+      "errors": 2,
+      "valid": 557,
+      "workTime": "34:46:56",
+      "avgTime": 224,
+      "estPayment": 55700,
+      "status": "達成",
+      "onTimeRate": 99.1,
+      "errorTypes": {
+        "name": 1.2,
+        "company": 0.7,
+        "address": 1.0,
+        "phone": 1.8,
+        "email": 0.3
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 51,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 56,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 65,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 55,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 45,
+          "errorRate": 0.4
+        }
+      ]
+    },
+    {
+      "id": "OP027",
+      "name": "山下 陽菜",
+      "group": "セミナーBチーム",
+      "processed": 406,
+      "errors": 3,
+      "valid": 403,
+      "workTime": "22:46:52",
+      "avgTime": 202,
+      "estPayment": 40300,
+      "status": "達成",
+      "onTimeRate": 99.9,
+      "errorTypes": {
+        "name": 0.2,
+        "company": 0.8,
+        "address": 0.3,
+        "phone": 0.8,
+        "email": 0.4
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 42,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 44,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 44,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 36,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 44,
+          "errorRate": 0.7
+        }
+      ]
+    },
+    {
+      "id": "OP028",
+      "name": "渡辺 七海",
+      "group": "その他案件Cチーム",
+      "processed": 262,
+      "errors": 14,
+      "valid": 248,
+      "workTime": "17:58:34",
+      "avgTime": 247,
+      "estPayment": 24800,
+      "status": "未達",
+      "onTimeRate": 98.5,
+      "errorTypes": {
+        "name": 1.1,
+        "company": 1.8,
+        "address": 0.5,
+        "phone": 0.3,
+        "email": 1.0
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 25,
+          "errorRate": 5.0
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 22,
+          "errorRate": 6.4
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 26,
+          "errorRate": 6.1
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 24,
+          "errorRate": 4.5
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 21,
+          "errorRate": 5.0
+        }
+      ]
+    },
+    {
+      "id": "OP029",
+      "name": "井上 陽菜",
+      "group": "その他案件Cチーム",
+      "processed": 432,
+      "errors": 3,
+      "valid": 429,
+      "workTime": "27:28:48",
+      "avgTime": 229,
+      "estPayment": 42900,
+      "status": "達成",
+      "onTimeRate": 96.3,
+      "errorTypes": {
+        "name": 1.0,
+        "company": 0.5,
+        "address": 1.9,
+        "phone": 0.4,
+        "email": 1.8
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 50,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 36,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 35,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 50,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 42,
+          "errorRate": 0.8
+        }
+      ]
+    },
+    {
+      "id": "OP030",
+      "name": "山田 愛",
+      "group": "その他案件Cチーム",
+      "processed": 428,
+      "errors": 7,
+      "valid": 421,
+      "workTime": "28:53:24",
+      "avgTime": 243,
+      "estPayment": 42100,
+      "status": "達成",
+      "onTimeRate": 98.1,
+      "errorTypes": {
+        "name": 1.0,
+        "company": 0.9,
+        "address": 0.8,
+        "phone": 1.7,
+        "email": 1.4
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 39,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 37,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 35,
+          "errorRate": 1.9
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 43,
+          "errorRate": 1.6
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 41,
+          "errorRate": 1.8
+        }
+      ]
+    },
+    {
+      "id": "OP031",
+      "name": "村上 健一",
+      "group": "その他案件Cチーム",
+      "processed": 291,
+      "errors": 9,
+      "valid": 282,
+      "workTime": "23:07:06",
+      "avgTime": 286,
+      "estPayment": 28200,
+      "status": "未達",
+      "onTimeRate": 95.0,
+      "errorTypes": {
+        "name": 0.2,
+        "company": 1.1,
+        "address": 1.0,
+        "phone": 1.4,
+        "email": 1.3
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 23,
+          "errorRate": 3.7
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 24,
+          "errorRate": 3.6
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 34,
+          "errorRate": 3.8
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 27,
+          "errorRate": 3.4
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 27,
+          "errorRate": 3.1
+        }
+      ]
+    },
+    {
+      "id": "OP032",
+      "name": "藤田 直樹",
+      "group": "セミナーBチーム",
+      "processed": 538,
+      "errors": 4,
+      "valid": 534,
+      "workTime": "39:54:06",
+      "avgTime": 267,
+      "estPayment": 53400,
+      "status": "達成",
+      "onTimeRate": 92.9,
+      "errorTypes": {
+        "name": 1.3,
+        "company": 1.5,
+        "address": 0.9,
+        "phone": 1.4,
+        "email": 0.7
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 55,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 47,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 59,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 45,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 62,
+          "errorRate": 1.0
+        }
+      ]
+    },
+    {
+      "id": "OP033",
+      "name": "森 恵",
+      "group": "その他案件Cチーム",
+      "processed": 430,
+      "errors": 6,
+      "valid": 424,
+      "workTime": "29:44:30",
+      "avgTime": 249,
+      "estPayment": 42400,
+      "status": "達成",
+      "onTimeRate": 90.3,
+      "errorTypes": {
+        "name": 0.1,
+        "company": 0.4,
+        "address": 0.0,
+        "phone": 0.5,
+        "email": 1.0
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 36,
+          "errorRate": 1.8
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 44,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 47,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 46,
+          "errorRate": 1.7
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 41,
+          "errorRate": 1.8
+        }
+      ]
+    },
+    {
+      "id": "OP034",
+      "name": "長谷川 健一",
+      "group": "その他案件Cチーム",
+      "processed": 337,
+      "errors": 15,
+      "valid": 322,
+      "workTime": "20:07:35",
+      "avgTime": 215,
+      "estPayment": 32200,
+      "status": "未達",
+      "onTimeRate": 92.1,
+      "errorTypes": {
+        "name": 1.6,
+        "company": 1.3,
+        "address": 2.0,
+        "phone": 0.2,
+        "email": 1.3
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 38,
+          "errorRate": 5.1
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 28,
+          "errorRate": 4.7
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 36,
+          "errorRate": 4.8
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 38,
+          "errorRate": 5.0
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 34,
+          "errorRate": 4.3
+        }
+      ]
+    },
+    {
+      "id": "OP035",
+      "name": "加藤 次郎",
+      "group": "展示会Aチーム",
+      "processed": 555,
+      "errors": 3,
+      "valid": 552,
+      "workTime": "31:45:30",
+      "avgTime": 206,
+      "estPayment": 55200,
+      "status": "達成",
+      "onTimeRate": 96.1,
+      "errorTypes": {
+        "name": 0.7,
+        "company": 0.3,
+        "address": 0.7,
+        "phone": 0.9,
+        "email": 0.2
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 60,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 50,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 58,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 61,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 62,
+          "errorRate": 0.6
+        }
+      ]
+    },
+    {
+      "id": "OP036",
+      "name": "斎藤 美月",
+      "group": "その他案件Cチーム",
+      "processed": 369,
+      "errors": 5,
+      "valid": 364,
+      "workTime": "23:03:45",
+      "avgTime": 225,
+      "estPayment": 36400,
+      "status": "達成",
+      "onTimeRate": 92.1,
+      "errorTypes": {
+        "name": 0.6,
+        "company": 0.1,
+        "address": 1.6,
+        "phone": 1.7,
+        "email": 1.3
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 44,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 33,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 32,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 34,
+          "errorRate": 1.6
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 35,
+          "errorRate": 1.5
+        }
+      ]
+    },
+    {
+      "id": "OP037",
+      "name": "近藤 恵",
+      "group": "その他案件Cチーム",
+      "processed": 355,
+      "errors": 8,
+      "valid": 347,
+      "workTime": "25:56:05",
+      "avgTime": 263,
+      "estPayment": 34700,
+      "status": "未達",
+      "onTimeRate": 94.9,
+      "errorTypes": {
+        "name": 1.9,
+        "company": 1.3,
+        "address": 0.3,
+        "phone": 0.3,
+        "email": 0.3
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 35,
+          "errorRate": 2.0
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 34,
+          "errorRate": 2.7
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 32,
+          "errorRate": 2.5
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 42,
+          "errorRate": 2.7
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 35,
+          "errorRate": 2.3
+        }
+      ]
+    },
+    {
+      "id": "OP038",
+      "name": "佐々木 達也",
+      "group": "その他案件Cチーム",
+      "processed": 506,
+      "errors": 1,
+      "valid": 505,
+      "workTime": "33:18:42",
+      "avgTime": 237,
+      "estPayment": 50500,
+      "status": "達成",
+      "onTimeRate": 96.1,
+      "errorTypes": {
+        "name": 0.1,
+        "company": 0.5,
+        "address": 1.0,
+        "phone": 1.2,
+        "email": 0.5
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 44,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 55,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 40,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 42,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 43,
+          "errorRate": 0.4
+        }
+      ]
+    },
+    {
+      "id": "OP039",
+      "name": "山崎 健",
+      "group": "展示会Aチーム",
+      "processed": 469,
+      "errors": 3,
+      "valid": 466,
+      "workTime": "27:52:46",
+      "avgTime": 214,
+      "estPayment": 46600,
+      "status": "達成",
+      "onTimeRate": 98.8,
+      "errorTypes": {
+        "name": 1.8,
+        "company": 0.2,
+        "address": 1.2,
+        "phone": 1.4,
+        "email": 1.1
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 55,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 46,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 41,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 41,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 39,
+          "errorRate": 0.9
+        }
+      ]
+    },
+    {
+      "id": "OP040",
+      "name": "小川 香織",
+      "group": "展示会Aチーム",
+      "processed": 272,
+      "errors": 13,
+      "valid": 259,
+      "workTime": "20:51:12",
+      "avgTime": 276,
+      "estPayment": 25900,
+      "status": "未達",
+      "onTimeRate": 96.4,
+      "errorTypes": {
+        "name": 0.4,
+        "company": 0.3,
+        "address": 0.2,
+        "phone": 1.2,
+        "email": 1.6
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 30,
+          "errorRate": 4.2
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 25,
+          "errorRate": 5.0
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 22,
+          "errorRate": 5.7
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 32,
+          "errorRate": 5.8
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 30,
+          "errorRate": 4.4
+        }
+      ]
+    },
+    {
+      "id": "OP041",
+      "name": "中島 大輔",
+      "group": "セミナーBチーム",
+      "processed": 496,
+      "errors": 1,
+      "valid": 495,
+      "workTime": "34:51:28",
+      "avgTime": 253,
+      "estPayment": 49500,
+      "status": "達成",
+      "onTimeRate": 97.1,
+      "errorTypes": {
+        "name": 1.2,
+        "company": 0.1,
+        "address": 0.3,
+        "phone": 0.1,
+        "email": 0.1
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 47,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 42,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 42,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 45,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 46,
+          "errorRate": 0.4
+        }
+      ]
+    },
+    {
+      "id": "OP042",
+      "name": "伊藤 智子",
+      "group": "その他案件Cチーム",
+      "processed": 361,
+      "errors": 5,
+      "valid": 356,
+      "workTime": "20:57:29",
+      "avgTime": 209,
+      "estPayment": 35600,
+      "status": "達成",
+      "onTimeRate": 98.3,
+      "errorTypes": {
+        "name": 0.1,
+        "company": 1.6,
+        "address": 0.6,
+        "phone": 1.7,
+        "email": 0.6
+      },
+      "history": [
+        {
+          "date": "2025-09-01",
+          "processed": 35,
+          "errorRate": 1.8
+        },
+        {
+          "date": "2025-09-02",
+          "processed": 38,
+          "errorRate": 1.8
+        },
+        {
+          "date": "2025-09-03",
+          "processed": 37,
+          "errorRate": 1.8
+        },
+        {
+          "date": "2025-09-04",
+          "processed": 34,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2025-09-05",
+          "processed": 36,
+          "errorRate": 1.4
+        }
+      ]
+    }
+  ],
+  "groups": [
+    {
+      "id": "GR001",
+      "name": "展示会Aチーム",
+      "activeUsers": 14,
+      "totalUsers": 16,
+      "maxCapacity": 6300,
+      "avgTime": 247,
+      "qualityVariance": 0.5,
+      "costPerformance": 0.89,
+      "onTimeRate": 95.6,
+      "operators": [
+        {
+          "name": "鈴木 蒼",
+          "avgTime": 205,
+          "accuracy": 96.8
+        },
+        {
+          "name": "山田 向日葵",
+          "avgTime": 299,
+          "accuracy": 99.5
+        },
+        {
+          "name": "池田 直人",
+          "avgTime": 284,
+          "accuracy": 99.2
+        },
+        {
+          "name": "林 香織",
+          "avgTime": 263,
+          "accuracy": 98.2
+        },
+        {
+          "name": "石川 直人",
+          "avgTime": 273,
+          "accuracy": 99.1
+        },
+        {
+          "name": "林 翔太",
+          "avgTime": 209,
+          "accuracy": 99.3
+        },
+        {
+          "name": "斎藤 遥",
+          "avgTime": 281,
+          "accuracy": 99.3
+        },
+        {
+          "name": "山崎 彩",
+          "avgTime": 232,
+          "accuracy": 99.4
+        },
+        {
+          "name": "中島 亮",
+          "avgTime": 287,
+          "accuracy": 94.9
+        },
+        {
+          "name": "加藤 秀樹",
+          "avgTime": 213,
+          "accuracy": 98.8
+        },
+        {
+          "name": "後藤 亮",
+          "avgTime": 224,
+          "accuracy": 99.6
+        },
+        {
+          "name": "加藤 次郎",
+          "avgTime": 206,
+          "accuracy": 99.5
+        },
+        {
+          "name": "山崎 健",
+          "avgTime": 214,
+          "accuracy": 99.4
+        },
+        {
+          "name": "小川 香織",
+          "avgTime": 276,
+          "accuracy": 95.2
+        }
+      ]
+    },
+    {
+      "id": "GR002",
+      "name": "セミナーBチーム",
+      "activeUsers": 10,
+      "totalUsers": 12,
+      "maxCapacity": 4500,
+      "avgTime": 258,
+      "qualityVariance": 1.5,
+      "costPerformance": 1.06,
+      "onTimeRate": 95.9,
+      "operators": [
+        {
+          "name": "佐藤 健太",
+          "avgTime": 295,
+          "accuracy": 99.8
+        },
+        {
+          "name": "前田 哲也",
+          "avgTime": 264,
+          "accuracy": 98.5
+        },
+        {
+          "name": "山下 大輔",
+          "avgTime": 288,
+          "accuracy": 98.7
+        },
+        {
+          "name": "山崎 恵",
+          "avgTime": 291,
+          "accuracy": 97.5
+        },
+        {
+          "name": "清水 恵",
+          "avgTime": 214,
+          "accuracy": 99.8
+        },
+        {
+          "name": "山口 拓哉",
+          "avgTime": 227,
+          "accuracy": 99.7
+        },
+        {
+          "name": "山口 亮",
+          "avgTime": 285,
+          "accuracy": 99.4
+        },
+        {
+          "name": "山下 陽菜",
+          "avgTime": 202,
+          "accuracy": 99.3
+        },
+        {
+          "name": "藤田 直樹",
+          "avgTime": 267,
+          "accuracy": 99.3
+        },
+        {
+          "name": "中島 大輔",
+          "avgTime": 253,
+          "accuracy": 99.8
+        }
+      ]
+    },
+    {
+      "id": "GR003",
+      "name": "その他案件Cチーム",
+      "activeUsers": 18,
+      "totalUsers": 21,
+      "maxCapacity": 8100,
+      "avgTime": 247,
+      "qualityVariance": 0.9,
+      "costPerformance": 0.85,
+      "onTimeRate": 97.4,
+      "operators": [
+        {
+          "name": "長谷川 太郎",
+          "avgTime": 291,
+          "accuracy": 98.1
+        },
+        {
+          "name": "後藤 一郎",
+          "avgTime": 257,
+          "accuracy": 99.8
+        },
+        {
+          "name": "渡辺 翔太",
+          "avgTime": 208,
+          "accuracy": 97.6
+        },
+        {
+          "name": "山下 香織",
+          "avgTime": 273,
+          "accuracy": 99.5
+        },
+        {
+          "name": "石井 優子",
+          "avgTime": 226,
+          "accuracy": 95.5
+        },
+        {
+          "name": "小林 陽菜",
+          "avgTime": 262,
+          "accuracy": 94.9
+        },
+        {
+          "name": "斎藤 美穂",
+          "avgTime": 271,
+          "accuracy": 99.6
+        },
+        {
+          "name": "村上 哲也",
+          "avgTime": 258,
+          "accuracy": 94.7
+        },
+        {
+          "name": "渡辺 七海",
+          "avgTime": 247,
+          "accuracy": 94.7
+        },
+        {
+          "name": "井上 陽菜",
+          "avgTime": 229,
+          "accuracy": 99.3
+        },
+        {
+          "name": "山田 愛",
+          "avgTime": 243,
+          "accuracy": 98.4
+        },
+        {
+          "name": "村上 健一",
+          "avgTime": 286,
+          "accuracy": 96.9
+        },
+        {
+          "name": "森 恵",
+          "avgTime": 249,
+          "accuracy": 98.6
+        },
+        {
+          "name": "長谷川 健一",
+          "avgTime": 215,
+          "accuracy": 95.5
+        },
+        {
+          "name": "斎藤 美月",
+          "avgTime": 225,
+          "accuracy": 98.6
+        },
+        {
+          "name": "近藤 恵",
+          "avgTime": 263,
+          "accuracy": 97.7
+        },
+        {
+          "name": "佐々木 達也",
+          "avgTime": 237,
+          "accuracy": 99.8
+        },
+        {
+          "name": "伊藤 智子",
+          "avgTime": 209,
+          "accuracy": 98.6
+        }
+      ]
+    }
+  ]
+}
