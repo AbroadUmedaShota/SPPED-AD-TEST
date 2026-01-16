@@ -1,5 +1,5 @@
 ■注意事項など
-確認ファイル: 利用者向けダッシュボードは 02_dashboard/index.html、ログイン画面は 01_login/login-top.html。参考資料は docs/README.md, docs/design/02_CODING_STANDARDS.md, docs/03_TESTING_GUIDELINES.md。
+確認ファイル: 利用者向けダッシュボードは 02_dashboard/index.html、ログイン画面は 01_login/login-top.html。参考資料は docs/README.md, docs/product/standards/02_CODING_STANDARDS.md, docs/handbook/testing/03_TESTING_GUIDELINES.md。
 モックデータ: data/*.json にはモック専用の仮データです。本番データとは概念が違うので注意。
 
 ■フォルダの役割

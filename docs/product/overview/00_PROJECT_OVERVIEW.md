@@ -127,7 +127,7 @@
 
 ### 6. データモデル（フロントエンド用）
 
-本フェーズでは、`docs/architecture/02_data_model.md` に定義されたデータ構造に基づき、`data/` ディレクトリ内に配置された静的なJSONファイル（例: `surveys.json`, `invoices.json`）をデータソースとして使用します。
+本フェーズでは、`docs/product/architecture/02_data_model.md` に定義されたデータ構造に基づき、`data/` ディレクトリ内に配置された静的なJSONファイル（例: `surveys.json`, `invoices.json`）をデータソースとして使用します。
 
 ### 7. 制約事項
 
