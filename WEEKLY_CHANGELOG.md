@@ -1,4 +1,21 @@
-# 月次変更履歴 (2025-07-22 〜 2025-12-26)
+# 月次変更履歴 (2025-07-22 〜 2026-01-15)
+
+## 2026-01-15 (木)
+
+- `docs/product/specs/04_invoice_screen.md` / `docs/product/specs/04_invoice_detail_requirements.md` / `docs/product/specs/05_invoice_document.md`
+    - **請求書機能の要件定義・仕様書の刷新**:
+        - INV-001（一覧）、INV-002（詳細/PDF）、INV-003（印刷）の各画面における要件定義を最新の実装に合わせて全面的に刷新しました。
+        - データの取得元、集計ID（AGG-...）の扱い、表示用IDの生成ルールなどの仕様を明文化し、実装との整合性を高めました。
+- `docs/handbook/testing/invoice_manual_checklist.md`
+    - **請求書機能の手動確認チェックリストの拡充**:
+        - ユーザー画面における請求書一覧・詳細・印刷の各機能に対するテスト項目を、より詳細かつ網羅的な内容に整理・拡充しました。
+- `docs/product/overview/00_PROJECT_OVERVIEW.md` / `docs/archive/front-share-2025-10/2025-10-21_front-share-notes.txt`
+    - **プロジェクトドキュメントのパス調整**: 整理・移動されたドキュメントの新しいパスを反映し、リンク切れを修正しました。
+
+## 2026-01-06 (火)
+
+- `docs/`
+    - **ドキュメントのテーブルフォーマット調整**: 請求・入金関連ドキュメント内のテーブル形式を整理し、可読性を向上させました。
 
 ## 2025-12-26 (金)
 

@@ -1,203 +1,206 @@
-# 請求関連画面仕様書（サービスプラン反映版）
+# 請求書機能 画面・機能要件定義書（ユーザー画面）
 
-最終更新日: 2025-10-12
-
----
-
-## 1. 概要
-
-- SPEED AD の請求情報（一覧・詳細・印刷ビュー）を統一仕様で提供する。
-- 現行サービスプラン（Standard / Premium / Premium+従量課金）と各種オプションを画面上で正しく提示し、料金算出の根拠を透明化する。
-- データは `data/core/invoices.json` の静的モックを使用し、将来的な API 連携に備えて構造を固定化する。
+最終更新日: 2026-01-15
 
 ---
 
-## 2. 対象画面
+## 1. 対象範囲
+
+### 1.1 対象画面（ユーザー画面）
 
 | 画面ID | パス | 役割 |
 | :--- | :--- | :--- |
-| INV-001 | `02_dashboard/invoiceList.html` | 請求書の検索・一覧表示・詳細遷移 |
-| INV-002 | `02_dashboard/invoice-detail.html` | 個別請求書の明細確認・ダウンロード・印刷遷移 |
-| INV-003 | `02_dashboard/invoice-print.html` | 印刷用簡易レイアウト |
+| INV-001 | `02_dashboard/invoiceList.html` | 請求書一覧（月次サマリー） |
+| INV-002 | `02_dashboard/invoice-detail.html` | 請求書詳細（Invoice Sheet 表示 + PDF出力） |
+| INV-003 | `02_dashboard/invoice-print.html` | 印刷用ページ（ブラウザ印刷） |
 
-### 共通要件
-- ヘッダー／サイドバー／フッターは `src/utils.js` の `loadCommonHtml` で読み込む。
-- 画面識別用 `data-page-id` を `invoice-list` / `invoice-detail` とする。
-- 表示通貨はデフォルトで「円」。数値は税抜・税込を明示し、桁区切りは `toLocaleString('ja-JP')` を使用。
+### 1.2 スコープ外
 
----
-
-## 3. データモデル
-
-### 3.1 請求書オブジェクト
-
-```js
-{
-  invoiceId: string,              // 例: "INV-2025-09-001"
-  accountId: string,              // 例: "ACC-001"
-  plan: {
-    code: "STANDARD" | "PREMIUM" | "PREMIUM_PLUS",
-    displayName: string,          // 画面表示用 (例: "Premium")
-    billingType: "monthly" | "annual"
-  },
-  addOns: [                       // 任意。サマリー表示にも利用
-    {
-      code: string,               // 例: "BIZCARD"
-      displayName: string,        // 例: "名刺データ化パック"
-      quantity: number,           // 例: 200
-      unit: string                // 例: "件"
-    }
-  ],
-  issueDate: string,              // YYYY-MM-DD
-  dueDate: string,                // YYYY-MM-DD
-  billingPeriod: {
-    from: string,                 // YYYY-MM-DD
-    to: string                    // YYYY-MM-DD
-  },
-  subtotalTaxable: number,
-  subtotalNonTaxable: number,
-  tax: number,
-  totalAmount: number,
-  status: "unpaid" | "paid" | "overdue" | "canceled",
-  bankInfo: {
-    bankName: string,
-    branchName: string,
-    accountType: string,
-    accountNumber: string,
-    accountHolder: string
-  },
-  notes: string | null,
-  items: [
-    {
-      lineId: string,
-      category: "BASE" | "ADD_ON" | "ONE_TIME" | "CREDIT",
-      itemName: string,
-      description: string | null,
-      quantity: number | null,
-      unit: string | null,
-      unitPrice: number | null,
-      amount: number,
-      taxable: boolean
-    }
-  ]
-}
-```
-
-### 3.2 補助マスタ
-- `plan.displayName`・`addOns.displayName` は `docs/references/resources/client-materials/service-plan-comparison.md` を唯一の参照元とし、表記揺れを許容しない。
-- `status` は以下に固定：
-  - `unpaid`: 未入金（一覧・詳細とも「未入金」表示、黄色バッジ）
-  - `paid`: 入金済（緑バッジ）
-  - `overdue`: 延滞（赤バッジ。期限超過日数を詳細画面で表示）
-  - `canceled`: 請求取消（灰バッジ。印刷不可）
+- 決済（カード/口座振替/請求代行）の実行、入金消込
+- 送付（メール送信）・督促・再発行の業務フロー
+- 管理画面での請求データ作成/編集
 
 ---
 
-## 4. 一覧画面仕様（INV-001）
+## 2. 参照（実装・データ）
 
-請求書一覧は個別の請求書を直接表示するのではなく、**請求月**と**契約種別（個人／グループ）**で集計された月次サマリーをカード形式で表示する。
+### 2.1 実装（モック画面の正）
 
-### 4.1 レイアウト
-- **カードレイアウト**: 一覧はテーブルではなく、月次サマリーごとのカードリストとして表示する。
-- **カード内表示項目**:
-  1. 請求月（例: `2025年09月請求`）
-  2. 請求期間（例: `2025-08-01〜2025-08-31`）
-  3. 表示用ID（ロジックに基づき生成されたID）
-  4. 契約種別バッジ（`個人` / `グループ`）
-  5. 合計請求額（その月の種別ごとの合計、税込）
+- 一覧: `02_dashboard/src/invoiceList.js`
+- 詳細: `02_dashboard/src/invoiceDetail.js`
+- データ取得: `02_dashboard/src/services/invoiceService.js`
+- 一覧UI描画: `02_dashboard/src/ui/invoiceRenderer.js`
 
-### 4.2 フィルタ
-- フィルタ：
-  - ステータス（`すべて` / `未入金` / `入金済` / `延滞` / `取消`）
-- フィルタ結果が 0 件の際は `invoiceRenderer.showMessage('対象の請求書がありません')` を表示。
+### 2.2 モックデータ
 
-### 4.3 状態表示
-- ローディング：`invoiceRenderer.showLoading()` により「読み込み中です…」メッセージを表示。
-- エラー：サービス層が throw した場合「請求データの取得に失敗しました。ページを再読み込みしてください。」をエラーメッセージとして表示。
+- 請求書: `data/core/invoices.json`
+- ユーザー: `data/core/users.json`
+- グループ: `data/core/groups.json`
 
 ---
 
-## 5. 詳細画面仕様（INV-002）
+## 3. 用語・IDの定義
 
-### 5.1 ヘッダー
-- タイトル：`請求書詳細`
-- アクションボタン：
-  - `帳票ダウンロード` (`PDFダウンロード`): `html2pdf.js` ライブラリを使用し、画面に表示されている請求書レイアウトから動的に `invoice-{invoiceId}.pdf` というファイル名のPDFを生成してダウンロードする。
-  - `印刷` → `invoice-print.html?id={invoiceId}` を新規タブで開く。
-  - ステータスバッジを請求書の発行日（issueDate）と併記。
+### 3.1 表示用ID（請求書番号）
 
-### 5.2 情報ブロック
-1. **請求情報**
-   - `請求書番号`, `発行日`, `支払期限`, `対象期間`
-   - `契約プラン`: `plan.displayName` + 課金タイプ（例: `Premium（定額/月次）`）
-   - `追加オプション`: `addOns` を `/` 区切りで表示。
-2. **請求先情報**
-   - `accountId`に基づき、個人アカウントまたはグループの請求先情報を動的に解決して表示 (`corporateName` 御中, `contactPerson` 様)。
-3. **明細テーブル**
-   - 列：No., 品名１, 品名２, 数量, 単価, 金額
-   - `items` 配列の各要素を一行としてテーブルに描画する。カテゴリごとの小計は表示しない。
-   - 金額列は `12,345` 形式。
-4. **集計**
-   - 小計(課税対象)、小計(非課税)、消費税等、合計ご請求金額（税込）
-5. **振込先情報**
-   - 登録口座を表示。
-6. **備考**
-   - `notes` が存在する場合のみ表示。
+- 画面上の請求書番号は `YY-ユーザーID5桁-連番3桁` 形式で表示する（例: `25-00001-001`）。
+- 生成ルール（現行モック実装）:
+  - `YY`: `issueDate` の西暦下2桁
+  - `ユーザーID5桁`: `accountId` の数字部分を抽出し、0埋めで5桁
+  - `連番3桁`: 元 `invoiceId`（例: `INV-2025-09-001`）の末尾要素
 
-### 5.3 異常系
-- 対象 ID が存在しない：`invoice-detail-message-overlay` に「対象の請求書が見つかりませんでした」を表示。
-- データ取得エラー：一覧と同じ文言でオーバーレイ表示し、アクションボタンは `disabled`。
-- ステータス `canceled`: 印刷ボタンを非活性化する。
+### 3.2 遷移ID（URLパラメータ `id`）
+
+一覧→詳細/印刷で利用する `id` は以下のいずれか。
+
+- 元請求書 ID: `INV-YYYY-MM-SEQ`（例: `INV-2025-09-001`）
+- 集計 ID: `AGG-YYYYMM-{GROUP|PERSONAL}`（例: `AGG-202509-GROUP`）
+
+一覧画面（INV-001）は **月次サマリー** を表示するため、詳細遷移には原則として集計 ID を用いる。
+
+補足（集計 ID の解決）:
+- 集計 ID を指定した場合、詳細/印刷側では該当月・該当種別に属する複数請求書をまとめて1件として扱う。
+- 明細は請求書ごとに連結し、各請求書の末尾に「小計」行（`isSubtotal: true`）を挿入する（現行モック実装）。
+
+### 3.3 契約種別（個人/グループ）
+
+現行モック実装の判定:
+- `plan.code === 'STANDARD'` → `個人`
+- 上記以外 → `グループ`
 
 ---
 
-## 6. 印刷画面仕様（INV-003）
+## 4. データ契約（画面が期待する `Invoice`）
 
-- `invoice-detail.html` と同じデータソースを使用し、`items` の順序・小計構成を一致させる。
-- Web フォントを限定し、白黒印刷でも可読性を確保する（太字・下線中心）。
-- ステータス表示はページ右上（`未入金`, `入金済`, `延滞`, `取消`）。`取消` の場合は朱色で「控」で透かしを入れる。
+本要件は API 連携を想定したデータ契約でもあります（現状は `data/core/invoices.json` を参照）。
+
+### 4.1 `Invoice`（請求書）
+
+| 項目 | 型 | 必須 | 説明 |
+| :--- | :--- | :---: | :--- |
+| `invoiceId` | string | ◯ | 元請求書ID（画面では表示用に整形される） |
+| `accountId` | string | ◯ | 請求先アカウントID |
+| `plan.code` | string | ◯ | `STANDARD/PREMIUM/PREMIUM_PLUS` 等 |
+| `plan.displayName` | string | ◯ | 画面表示名 |
+| `plan.billingType` | string | ◯ | `monthly/annual` |
+| `addOns[]` | array |  | 追加オプション（要約表示に使用） |
+| `issueDate` | string | ◯ | `YYYY-MM-DD` |
+| `dueDate` | string | ◯ | `YYYY-MM-DD` |
+| `billingPeriod.from` | string | ◯ | `YYYY-MM-DD` |
+| `billingPeriod.to` | string | ◯ | `YYYY-MM-DD` |
+| `status` | string | ◯ | `unpaid/paid/overdue/canceled` |
+| `bankInfo` | object | ◯ | 振込先情報 |
+| `notes` | string/null |  | 備考 |
+| `items[]` | array | ◯ | 明細（計算・表示の正） |
+
+### 4.2 `InvoiceItem`（明細）
+
+| 項目 | 型 | 必須 | 説明 |
+| :--- | :--- | :---: | :--- |
+| `category` | string | ◯ | `BASE/ADD_ON/ONE_TIME/CREDIT`（印刷画面の出力条件） |
+| `itemName` | string | ◯ | 項目名 |
+| `description` | string/null |  | 内訳 |
+| `quantity` | number/null |  | 数量 |
+| `unit` | string/null |  | 単位 |
+| `unitPrice` | number/null |  | 単価 |
+| `amount` | number | ◯ | 金額（未設定時は `unitPrice * quantity` 相当を推奨） |
+| `taxable` | boolean | ◯ | 課税対象フラグ（合計計算に使用） |
+
+### 4.3 金額計算（現行モック実装）
+
+画面/帳票は `items[]` を正として金額を再計算する。
+
+- 課税小計: `sum(item.amount)`（ただし `item.taxable === true` のみ）
+- 非課税小計: `sum(item.amount)`（上記以外）
+- 消費税: `floor(課税小計 * 0.1)`
+- 合計: `課税小計 + 非課税小計 + 消費税`
 
 ---
 
-## 7. 操作フロー
+## 5. 画面要件
 
-1. ユーザーがダッシュボードにログインし、左ナビから「請求書」メニューを選択。
-2. INV-001 が表示され、直近3か月分の請求書がロードされる。
-3. フィルタ／ソートで対象を絞り込み、任意の請求書行の「詳細」ボタンを押下。
-4. INV-002 が開き、`invoiceId` に応じたデータが表示される。
-5. `PDFダウンロード` または `印刷` を実行。
-6. ブラウザの戻る操作または「一覧に戻る」リンクで INV-001 へ戻る。
+### 5.1 INV-001 請求書一覧（月次サマリー）
+
+#### 5.1.1 表示要件
+
+- 一覧は請求書単位ではなく **請求月 + 契約種別（個人/グループ）** で集計した月次サマリーをカード表示する。
+- 表示順は新しい請求月（`issueDate`）が先（降順）。
+- カードには最低限以下を表示する。
+  - 請求月（例: `2025年09月請求`）
+  - 対象期間（例: `2025-08-01 ? 2025-08-31`）
+  - 表示用ID（表示用に整形した請求書番号）
+  - 契約種別バッジ（`個人` / `グループ`）
+  - 合計請求額（税込、3桁区切り）
+
+#### 5.1.2 操作要件
+
+- カード押下で INV-002 に遷移する（`invoice-detail.html?id={AGG...}`）。
+- キーボード操作で `Enter` / `Space` でも遷移できる。
+
+#### 5.1.3 状態（ロード/空/エラー）
+
+- ロード中は「読み込み中です…」を表示する。
+- 0件の場合:
+  - 「対象の請求書がありません。」を表示し、`再読み込み` アクションを提供する。
+- 取得失敗の場合:
+  - 「請求データの取得に失敗しました。ページを再読み込みしてください。」を表示し、`再読み込み` アクションを提供する。
+
+#### 5.1.4 フィルタ
+
+- 現行モック画面ではフィルタ UI は提供しない（将来拡張余地として内部ロジックは存在）。
 
 ---
 
-## 8. テスト観点（手動）
+### 5.2 INV-002 請求書詳細（Invoice Sheet + PDF出力）
 
-| 観点 | 詳細 |
-| :--- | :--- |
-| ロード | 一覧・詳細ともに初回ロードでコンソールエラーが無いこと |
-| フィルタ | 期間・プラン・ステータスで組み合わせ検索し、結果が一致すること |
-| 明細表示 | `BASE` / `ADD_ON` / `ONE_TIME` / `CREDIT` の各カテゴリが小計されること |
-| 金額 | 税抜・税込・消費税が仕様通り計算表示されること |
-| ステータス | 各ステータスでバッジ色と文言が一致すること |
-| ダウンロード | ダウンロードリンクが存在するファイルに遷移すること（暫定で XLSX を使用） |
-| 印刷 | `invoice-print.html` で同一データが反映され、A4 縦で崩れないこと |
-| エラー | 404 ID や fetch 失敗時に適切なメッセージが表示されること |
+#### 5.2.1 表示要件
+
+- 詳細は、A4の「請求書レイアウト（Invoice Sheet）」を画面内に表示する（カード分割しない）。
+- 明細が多い場合はページを自動追加する。
+  - 1ページ目: 20行
+  - 2ページ目以降: 42行
+- 請求先（宛名）は `accountId` から解決した `corporateName` / `contactPerson` を表示する。
+
+#### 5.2.2 操作要件（帳票ダウンロード）
+
+- `帳票ダウンロード` ボタンで PDF を生成しダウンロードする。
+- PDF生成対象は `#invoice-sheet-container` とする。
+- ファイル名は `invoice-{id}.pdf`（`id` は URL の `id` 値）とする。
+
+#### 5.2.3 状態（ロード/エラー）
+
+- ロード中はローディングオーバーレイを表示する。
+- `id` 未指定: 「請求書IDが指定されていません。」
+- データ未存在: 「対象の請求書が見つかりませんでした。」
+- その他: 例外メッセージ（または「請求データの取得に失敗しました。」）
 
 ---
 
-## 9. 今後の課題
+### 5.3 INV-003 印刷用ページ（ブラウザ印刷）
 
-- PDF 出力の正式対応（テンプレート整備・動的生成）
--.MongoDB 等の永続層との連携に向けた API 契約定義
-- 英語／多言語対応時の表示文言マッピング
-- 支払実績データとの突合表示（入金日・入金額）
+#### 5.3.1 表示要件
+
+- `invoice-print.html` は `id` に該当する請求書を取得し、印刷用のHTMLを生成して表示する。
+- 明細は `category` でグルーピングし、カテゴリごとに小計行を出力する。
+- `category` が未設定、または定義外の明細は印刷画面に表示されない（現行モック実装の制約）。
+
+#### 5.3.2 操作要件
+
+- 画面表示後、印刷ダイアログを自動で開く（`window.print()`）。
 
 ---
 
-## 10. 関連資料
+## 6. 受け入れ基準（抜粋）
 
-- `docs/references/resources/client-materials/service-plan-comparison.md`（サービスプラン比較表）
-- `docs/architecture/02_data_model.md`（データモデル全体像）
-- `docs/03_TESTING_GUIDELINES.md`（手動テスト手順）
-- `data/core/invoices.json`（本仕様に準拠したモックデータ）
+- INV-001: 月次サマリーが降順で表示され、カード押下で詳細に遷移できる。
+- INV-002: `id` に応じた請求書が表示され、PDFが生成できる。
+- INV-003: `id` に応じた内容が表示され、カテゴリ小計を含めて印刷プレビューで崩れない。
 
+詳細チェックは `docs/handbook/testing/invoice_manual_checklist.md` を参照。
+
+---
+
+## 7. 既知の留意点（引き継ぎ向け）
+
+- 一覧カードの金額表示の通貨記号は実装上の表示差分が出やすい（提供時に `¥` 表示へ統一すること）。
+- `items[].category` と `items[].taxable` は帳票整合のため必須項目として扱うこと（モックデータ側も揃えること）。

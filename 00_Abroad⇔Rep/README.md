@@ -1,0 +1,22 @@
+# Abroad⇔Rep（共有・やり取り資料置き場）
+
+本フォルダは、モック実装（`02_dashboard/` や `docs/`）とは別に、開発チーム（Rep）へ共有するための資料を集約するための置き場です。
+
+## 目的
+
+- Rep への提出物（仕様共有資料、確認依頼、質問票、合意事項）を1か所にまとめる
+- 「モック実装の最新版」と「Rep提出物（その時点の共有物）」を分離して管理する
+
+## 使い方（推奨）
+
+- 提出物はこのフォルダ直下に配置する（例: `請求書関連ページ_仕様共有資料.md`）
+- 日付を付ける場合は `YYYY-MM-DD_` プレフィックスを付与する（例: `2026-01-15_請求書関連ページ_仕様共有資料.md`）
+
+## 正本（社内の仕様書）
+
+このフォルダ内の資料は「共有用コピー」です。詳細仕様の正本は以下を参照します。
+
+- `docs/product/specs/04_invoice_screen.md`
+- `docs/product/specs/04_invoice_detail_requirements.md`
+- `docs/product/specs/05_invoice_document.md`
+- `docs/handbook/testing/invoice_manual_checklist.md`
