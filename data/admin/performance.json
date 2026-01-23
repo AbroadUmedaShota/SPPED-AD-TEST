@@ -63,6 +63,161 @@
           "date": "2025-09-05",
           "processed": 30,
           "errorRate": 3.6
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 36,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 24,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 52,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 26,
+          "errorRate": 3.8
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 20,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 53,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 65,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 65,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 51,
+          "errorRate": 2.0
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 27,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 54,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 27,
+          "errorRate": 2.4
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 58,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 64,
+          "errorRate": 2.7
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 51,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 40,
+          "errorRate": 4.3
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 58,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 21,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 53,
+          "errorRate": 5.0
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 48,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 51,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 55,
+          "errorRate": 3.1
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 23,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 42,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 70,
+          "errorRate": 1.7
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 25,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 65,
+          "errorRate": 0.4
         }
       ]
     },
@@ -110,6 +265,161 @@
           "date": "2025-09-05",
           "processed": 35,
           "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 31,
+          "errorRate": 2.1
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 69,
+          "errorRate": 2.5
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 45,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 52,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 32,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 65,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 67,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 27,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 46,
+          "errorRate": 2.9
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 65,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 69,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 62,
+          "errorRate": 5.0
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 52,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 34,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 65,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 62,
+          "errorRate": 4.5
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 44,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 48,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 54,
+          "errorRate": 3.5
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 62,
+          "errorRate": 2.9
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 35,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 48,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 23,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 59,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 70,
+          "errorRate": 4.8
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 56,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 24,
+          "errorRate": 4.5
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 58,
+          "errorRate": 4.7
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 39,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 63,
+          "errorRate": 0.3
         }
       ]
     },
@@ -157,6 +467,161 @@
           "date": "2025-09-05",
           "processed": 46,
           "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 21,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 23,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 20,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 45,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 57,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 41,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 49,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 49,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 28,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 52,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 65,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 30,
+          "errorRate": 2.6
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 35,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 49,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 60,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 62,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 37,
+          "errorRate": 1.6
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 70,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 33,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 56,
+          "errorRate": 2.1
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 23,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 37,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 27,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 35,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 66,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 0,
+          "errorRate": 0.0
         }
       ]
     },
@@ -204,6 +669,161 @@
           "date": "2025-09-05",
           "processed": 40,
           "errorRate": 2.4
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 61,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 48,
+          "errorRate": 4.1
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 61,
+          "errorRate": 3.5
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 21,
+          "errorRate": 2.1
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 70,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 55,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 62,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 61,
+          "errorRate": 3.9
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 52,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 23,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 64,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 28,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 33,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 29,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 69,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 68,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 60,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 60,
+          "errorRate": 1.8
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 63,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 27,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 24,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 40,
+          "errorRate": 4.2
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 49,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 66,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 60,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 41,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 20,
+          "errorRate": 3.6
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 0,
+          "errorRate": 0.0
         }
       ]
     },
@@ -251,6 +871,161 @@
           "date": "2025-09-05",
           "processed": 40,
           "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 22,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 60,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 21,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 58,
+          "errorRate": 2.0
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 37,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 47,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 63,
+          "errorRate": 2.5
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 51,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 41,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 39,
+          "errorRate": 2.9
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 44,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 25,
+          "errorRate": 4.8
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 35,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 69,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 31,
+          "errorRate": 2.9
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 30,
+          "errorRate": 1.7
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 66,
+          "errorRate": 2.5
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 20,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 35,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 23,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 59,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 30,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 58,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 67,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 64,
+          "errorRate": 2.2
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 20,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 22,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 42,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 40,
+          "errorRate": 2.3
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 46,
+          "errorRate": 0.7
         }
       ]
     },
@@ -298,6 +1073,161 @@
           "date": "2025-09-05",
           "processed": 44,
           "errorRate": 1.7
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 60,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 60,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 41,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 37,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 54,
+          "errorRate": 4.2
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 48,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 69,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 44,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 34,
+          "errorRate": 4.4
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 37,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 49,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 45,
+          "errorRate": 2.9
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 63,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 50,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 38,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 48,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 48,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 49,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 49,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 22,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 23,
+          "errorRate": 5.0
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 46,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 50,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 36,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 27,
+          "errorRate": 4.0
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 68,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 55,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 68,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 28,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 50,
+          "errorRate": 0.8
         }
       ]
     },
@@ -345,6 +1275,161 @@
           "date": "2025-09-05",
           "processed": 33,
           "errorRate": 2.6
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 61,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 45,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 35,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 36,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 47,
+          "errorRate": 3.5
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 28,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 49,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 23,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 35,
+          "errorRate": 1.7
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 27,
+          "errorRate": 2.5
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 29,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 69,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 39,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 23,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 57,
+          "errorRate": 3.7
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 57,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 69,
+          "errorRate": 3.1
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 62,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 51,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 46,
+          "errorRate": 4.8
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 59,
+          "errorRate": 4.3
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 26,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 21,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 48,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 21,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 67,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 26,
+          "errorRate": 4.0
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 34,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 66,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 20,
+          "errorRate": 0.9
         }
       ]
     },
@@ -392,6 +1477,161 @@
           "date": "2025-09-05",
           "processed": 59,
           "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 38,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 22,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 59,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 55,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 44,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 59,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 49,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 68,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 26,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 50,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 28,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 35,
+          "errorRate": 4.6
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 33,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 28,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 63,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 70,
+          "errorRate": 3.4
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 20,
+          "errorRate": 4.7
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 25,
+          "errorRate": 1.7
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 53,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 51,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 37,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 66,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 59,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 59,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 25,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 28,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 49,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 24,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 65,
+          "errorRate": 1.3
         }
       ]
     },
@@ -439,6 +1679,161 @@
           "date": "2025-09-05",
           "processed": 47,
           "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 26,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 68,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 70,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 67,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 38,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 62,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 57,
+          "errorRate": 4.3
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 62,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 66,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 67,
+          "errorRate": 2.3
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 33,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 28,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 42,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 48,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 69,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 48,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 54,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 39,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 29,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 34,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 48,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 20,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 69,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 31,
+          "errorRate": 2.3
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 30,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 21,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 53,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 36,
+          "errorRate": 0.9
         }
       ]
     },
@@ -486,6 +1881,161 @@
           "date": "2025-09-05",
           "processed": 32,
           "errorRate": 3.2
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 32,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 26,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 27,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 51,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 64,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 47,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 31,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 37,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 46,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 29,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 55,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 39,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 37,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 36,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 41,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 64,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 69,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 52,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 65,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 58,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 31,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 68,
+          "errorRate": 3.7
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 69,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 30,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 59,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 34,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 62,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 22,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 65,
+          "errorRate": 0.9
         }
       ]
     },
@@ -533,6 +2083,161 @@
           "date": "2025-09-05",
           "processed": 57,
           "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 61,
+          "errorRate": 2.6
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 64,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 41,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 66,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 41,
+          "errorRate": 3.6
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 42,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 54,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 36,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 66,
+          "errorRate": 3.4
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 45,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 27,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 42,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 57,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 68,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 31,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 20,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 64,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 70,
+          "errorRate": 4.7
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 44,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 37,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 29,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 36,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 24,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 56,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 48,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 36,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 57,
+          "errorRate": 3.5
         }
       ]
     },
@@ -580,6 +2285,161 @@
           "date": "2025-09-05",
           "processed": 41,
           "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 40,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 36,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 65,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 50,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 22,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 70,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 62,
+          "errorRate": 3.7
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 68,
+          "errorRate": 2.7
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 55,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 24,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 22,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 60,
+          "errorRate": 3.0
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 64,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 24,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 40,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 25,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 47,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 59,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 50,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 33,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 53,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 28,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 27,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 54,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 60,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 29,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 41,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 65,
+          "errorRate": 1.6
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 68,
+          "errorRate": 1.0
         }
       ]
     },
@@ -627,6 +2487,161 @@
           "date": "2025-09-05",
           "processed": 33,
           "errorRate": 1.9
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 47,
+          "errorRate": 1.7
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 50,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 55,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 70,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 26,
+          "errorRate": 4.8
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 41,
+          "errorRate": 2.7
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 66,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 41,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 69,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 33,
+          "errorRate": 4.9
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 56,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 38,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 54,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 33,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 68,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 38,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 24,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 24,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 67,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 23,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 45,
+          "errorRate": 2.1
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 36,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 24,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 70,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 58,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 20,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 40,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 31,
+          "errorRate": 0.3
         }
       ]
     },
@@ -674,6 +2689,161 @@
           "date": "2025-09-05",
           "processed": 53,
           "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 50,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 64,
+          "errorRate": 3.3
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 57,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 26,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 20,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 67,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 44,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 57,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 57,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 55,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 32,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 48,
+          "errorRate": 2.0
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 35,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 47,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 44,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 60,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 26,
+          "errorRate": 4.9
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 48,
+          "errorRate": 4.0
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 68,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 22,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 56,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 50,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 24,
+          "errorRate": 2.0
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 36,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 64,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 33,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 43,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 27,
+          "errorRate": 0.2
         }
       ]
     },
@@ -721,6 +2891,161 @@
           "date": "2025-09-05",
           "processed": 46,
           "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 24,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 38,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 68,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 36,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 64,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 66,
+          "errorRate": 2.1
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 22,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 51,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 39,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 38,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 42,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 66,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 20,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 40,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 67,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 28,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 25,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 57,
+          "errorRate": 4.3
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 44,
+          "errorRate": 3.7
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 21,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 51,
+          "errorRate": 3.6
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 38,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 54,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 34,
+          "errorRate": 2.6
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 67,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 59,
+          "errorRate": 4.2
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 29,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 48,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 49,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 64,
+          "errorRate": 1.5
         }
       ]
     },
@@ -768,6 +3093,161 @@
           "date": "2025-09-05",
           "processed": 30,
           "errorRate": 4.9
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 54,
+          "errorRate": 4.1
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 60,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 31,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 27,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 34,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 50,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 56,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 33,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 44,
+          "errorRate": 2.9
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 29,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 70,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 20,
+          "errorRate": 2.3
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 55,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 54,
+          "errorRate": 3.5
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 65,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 34,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 30,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 23,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 39,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 60,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 44,
+          "errorRate": 1.6
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 66,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 56,
+          "errorRate": 2.5
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 30,
+          "errorRate": 1.0
         }
       ]
     },
@@ -815,6 +3295,161 @@
           "date": "2025-09-05",
           "processed": 50,
           "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 41,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 30,
+          "errorRate": 4.1
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 65,
+          "errorRate": 1.8
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 55,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 38,
+          "errorRate": 3.8
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 23,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 34,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 67,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 50,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 69,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 48,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 25,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 26,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 38,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 24,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 54,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 30,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 57,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 50,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 57,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 50,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 38,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 49,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 66,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 44,
+          "errorRate": 2.9
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 28,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 49,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 23,
+          "errorRate": 0.0
         }
       ]
     },
@@ -862,6 +3497,161 @@
           "date": "2025-09-05",
           "processed": 42,
           "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 53,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 43,
+          "errorRate": 4.2
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 44,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 29,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 59,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 64,
+          "errorRate": 2.1
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 52,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 69,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 54,
+          "errorRate": 3.6
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 38,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 31,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 58,
+          "errorRate": 2.3
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 20,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 45,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 29,
+          "errorRate": 2.5
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 38,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 21,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 43,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 22,
+          "errorRate": 3.5
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 27,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 70,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 65,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 66,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 25,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 62,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 59,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 20,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 31,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 47,
+          "errorRate": 0.9
         }
       ]
     },
@@ -909,6 +3699,161 @@
           "date": "2025-09-05",
           "processed": 34,
           "errorRate": 5.5
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 46,
+          "errorRate": 2.0
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 39,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 21,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 39,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 32,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 55,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 50,
+          "errorRate": 4.9
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 52,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 48,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 26,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 36,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 53,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 61,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 22,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 44,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 55,
+          "errorRate": 4.5
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 26,
+          "errorRate": 2.8
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 55,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 21,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 38,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 56,
+          "errorRate": 4.4
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 21,
+          "errorRate": 3.2
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 33,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 48,
+          "errorRate": 3.1
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 47,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 66,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 26,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 53,
+          "errorRate": 4.5
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 26,
+          "errorRate": 4.2
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 40,
+          "errorRate": 4.2
         }
       ]
     },
@@ -956,6 +3901,161 @@
           "date": "2025-09-05",
           "processed": 46,
           "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 70,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 55,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 63,
+          "errorRate": 2.7
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 28,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 63,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 24,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 53,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 67,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 46,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 61,
+          "errorRate": 3.5
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 55,
+          "errorRate": 2.7
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 39,
+          "errorRate": 1.7
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 67,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 70,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 34,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 56,
+          "errorRate": 3.6
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 50,
+          "errorRate": 2.7
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 39,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 31,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 61,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 67,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 42,
+          "errorRate": 2.6
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 50,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 41,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 38,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 56,
+          "errorRate": 4.8
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 65,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 21,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 24,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 40,
+          "errorRate": 1.4
         }
       ]
     },
@@ -1003,6 +4103,161 @@
           "date": "2025-09-05",
           "processed": 49,
           "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 68,
+          "errorRate": 3.5
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 46,
+          "errorRate": 3.0
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 54,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 46,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 45,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 23,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 22,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 36,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 65,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 66,
+          "errorRate": 3.4
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 48,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 56,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 39,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 52,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 59,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 48,
+          "errorRate": 4.9
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 25,
+          "errorRate": 3.2
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 60,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 28,
+          "errorRate": 2.6
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 67,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 61,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 56,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 44,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 45,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 44,
+          "errorRate": 0.8
         }
       ]
     },
@@ -1050,6 +4305,161 @@
           "date": "2025-09-05",
           "processed": 36,
           "errorRate": 4.3
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 39,
+          "errorRate": 3.6
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 62,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 35,
+          "errorRate": 3.0
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 41,
+          "errorRate": 1.8
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 53,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 39,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 62,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 35,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 61,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 34,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 59,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 44,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 48,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 47,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 20,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 59,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 64,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 46,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 52,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 39,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 60,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 23,
+          "errorRate": 1.7
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 26,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 57,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 52,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 40,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 61,
+          "errorRate": 1.0
         }
       ]
     },
@@ -1097,6 +4507,161 @@
           "date": "2025-09-05",
           "processed": 54,
           "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 60,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 66,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 46,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 70,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 44,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 34,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 59,
+          "errorRate": 2.8
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 31,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 58,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 22,
+          "errorRate": 1.9
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 54,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 38,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 39,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 43,
+          "errorRate": 4.4
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 35,
+          "errorRate": 3.0
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 47,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 45,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 33,
+          "errorRate": 3.9
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 57,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 64,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 47,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 42,
+          "errorRate": 3.4
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 28,
+          "errorRate": 5.0
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 23,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 53,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 25,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 67,
+          "errorRate": 1.1
         }
       ]
     },
@@ -1144,6 +4709,161 @@
           "date": "2025-09-05",
           "processed": 41,
           "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 64,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 25,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 23,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 39,
+          "errorRate": 3.7
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 35,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 24,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 32,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 23,
+          "errorRate": 2.3
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 37,
+          "errorRate": 3.6
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 68,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 20,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 24,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 27,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 63,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 25,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 54,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 47,
+          "errorRate": 4.9
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 64,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 29,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 44,
+          "errorRate": 3.0
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 41,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 51,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 41,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 25,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 41,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 42,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 59,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 23,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 20,
+          "errorRate": 0.3
         }
       ]
     },
@@ -1191,6 +4911,161 @@
           "date": "2025-09-05",
           "processed": 37,
           "errorRate": 5.0
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 52,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 53,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 25,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 23,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 45,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 47,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 56,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 30,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 55,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 43,
+          "errorRate": 4.1
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 68,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 53,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 22,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 31,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 28,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 28,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 42,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 20,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 40,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 39,
+          "errorRate": 2.8
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 48,
+          "errorRate": 3.4
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 47,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 58,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 62,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 51,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 24,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 23,
+          "errorRate": 0.3
         }
       ]
     },
@@ -1238,6 +5113,161 @@
           "date": "2025-09-05",
           "processed": 45,
           "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 24,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 38,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 69,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 39,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 36,
+          "errorRate": 4.1
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 61,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 31,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 48,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 40,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 59,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 35,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 51,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 69,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 63,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 36,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 54,
+          "errorRate": 1.8
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 38,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 33,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 22,
+          "errorRate": 2.0
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 45,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 53,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 50,
+          "errorRate": 2.3
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 33,
+          "errorRate": 3.7
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 52,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 25,
+          "errorRate": 3.6
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 22,
+          "errorRate": 1.3
         }
       ]
     },
@@ -1285,6 +5315,161 @@
           "date": "2025-09-05",
           "processed": 44,
           "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 22,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 55,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 38,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 55,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 48,
+          "errorRate": 4.5
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 57,
+          "errorRate": 2.7
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 32,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 38,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 27,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 67,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 36,
+          "errorRate": 3.9
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 51,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 35,
+          "errorRate": 2.2
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 50,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 66,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 23,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 66,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 28,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 31,
+          "errorRate": 2.5
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 47,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 29,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 51,
+          "errorRate": 3.5
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 48,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 55,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 51,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 27,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 20,
+          "errorRate": 2.2
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 49,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 31,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 22,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 34,
+          "errorRate": 0.1
         }
       ]
     },
@@ -1332,6 +5517,161 @@
           "date": "2025-09-05",
           "processed": 21,
           "errorRate": 5.0
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 68,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 30,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 47,
+          "errorRate": 3.3
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 27,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 66,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 29,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 62,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 20,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 49,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 33,
+          "errorRate": 4.0
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 39,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 28,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 69,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 28,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 27,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 53,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 20,
+          "errorRate": 4.3
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 36,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 52,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 69,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 45,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 26,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 65,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 47,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 45,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 48,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 53,
+          "errorRate": 1.8
         }
       ]
     },
@@ -1379,6 +5719,161 @@
           "date": "2025-09-05",
           "processed": 42,
           "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 33,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 51,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 50,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 60,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 68,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 42,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 65,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 28,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 51,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 47,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 68,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 52,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 70,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 48,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 52,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 62,
+          "errorRate": 2.9
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 48,
+          "errorRate": 3.7
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 69,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 53,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 55,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 53,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 35,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 39,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 63,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 22,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 56,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 34,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 31,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 29,
+          "errorRate": 4.8
         }
       ]
     },
@@ -1426,6 +5921,161 @@
           "date": "2025-09-05",
           "processed": 41,
           "errorRate": 1.8
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 21,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 23,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 58,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 61,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 53,
+          "errorRate": 2.6
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 59,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 56,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 53,
+          "errorRate": 2.1
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 20,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 41,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 70,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 59,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 43,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 52,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 31,
+          "errorRate": 1.8
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 62,
+          "errorRate": 4.3
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 52,
+          "errorRate": 3.3
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 53,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 28,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 42,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 28,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 66,
+          "errorRate": 5.0
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 35,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 32,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 50,
+          "errorRate": 4.0
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 59,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 62,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 55,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 39,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 63,
+          "errorRate": 0.7
         }
       ]
     },
@@ -1473,6 +6123,161 @@
           "date": "2025-09-05",
           "processed": 27,
           "errorRate": 3.1
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 61,
+          "errorRate": 4.3
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 55,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 27,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 30,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 31,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 42,
+          "errorRate": 3.1
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 22,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 65,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 36,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 46,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 65,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 42,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 60,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 44,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 41,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 42,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 53,
+          "errorRate": 4.0
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 67,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 62,
+          "errorRate": 4.1
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 34,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 45,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 48,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 46,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 34,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 25,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 51,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 25,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 29,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 53,
+          "errorRate": 3.3
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 52,
+          "errorRate": 0.3
         }
       ]
     },
@@ -1520,6 +6325,161 @@
           "date": "2025-09-05",
           "processed": 62,
           "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 55,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 22,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 54,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 25,
+          "errorRate": 1.8
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 34,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 24,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 29,
+          "errorRate": 4.7
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 25,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 45,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 69,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 28,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 66,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 57,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 35,
+          "errorRate": 2.1
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 60,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 35,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 30,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 25,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 57,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 69,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 44,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 40,
+          "errorRate": 4.0
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 57,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 44,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 42,
+          "errorRate": 2.1
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 33,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 60,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 43,
+          "errorRate": 2.0
         }
       ]
     },
@@ -1566,6 +6526,161 @@
         {
           "date": "2025-09-05",
           "processed": 41,
+          "errorRate": 1.8
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 27,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 29,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 61,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 35,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 44,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 55,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 26,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 20,
+          "errorRate": 4.8
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 20,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 30,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 22,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 53,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 60,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 68,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 34,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 53,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 34,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 35,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 24,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 34,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 66,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 54,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 64,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 20,
+          "errorRate": 1.7
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 48,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 54,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 55,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 44,
           "errorRate": 1.8
         }
       ]
@@ -1614,6 +6729,161 @@
           "date": "2025-09-05",
           "processed": 34,
           "errorRate": 4.3
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 66,
+          "errorRate": 3.5
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 29,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 43,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 33,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 55,
+          "errorRate": 2.3
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 66,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 32,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 65,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 59,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 51,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 51,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 55,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 32,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 45,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 33,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 32,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 21,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 70,
+          "errorRate": 2.2
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 49,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 27,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 40,
+          "errorRate": 4.7
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 20,
+          "errorRate": 2.7
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 61,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 20,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 41,
+          "errorRate": 0.7
         }
       ]
     },
@@ -1661,6 +6931,161 @@
           "date": "2025-09-05",
           "processed": 62,
           "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 32,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 55,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 36,
+          "errorRate": 3.6
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 63,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 42,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 53,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 46,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 58,
+          "errorRate": 2.8
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 67,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 58,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 52,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 26,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 63,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 58,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 28,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 63,
+          "errorRate": 4.5
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 30,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 23,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 66,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 29,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 33,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 49,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 26,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 42,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 66,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 43,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 20,
+          "errorRate": 1.1
         }
       ]
     },
@@ -1708,6 +7133,161 @@
           "date": "2025-09-05",
           "processed": 35,
           "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 69,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 66,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 53,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 28,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 37,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 40,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 39,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 66,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 52,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 64,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 23,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 61,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 60,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 48,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 26,
+          "errorRate": 3.4
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 42,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 58,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 69,
+          "errorRate": 3.6
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 30,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 24,
+          "errorRate": 4.1
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 21,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 56,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 35,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 31,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 52,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 29,
+          "errorRate": 2.7
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 29,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 40,
+          "errorRate": 4.9
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 67,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 35,
+          "errorRate": 1.4
         }
       ]
     },
@@ -1755,6 +7335,161 @@
           "date": "2025-09-05",
           "processed": 35,
           "errorRate": 2.3
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 25,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 20,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 53,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 53,
+          "errorRate": 2.5
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 51,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 53,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 25,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 53,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 69,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 69,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 22,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 70,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 31,
+          "errorRate": 3.5
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 39,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 47,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 30,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 60,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 41,
+          "errorRate": 2.6
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 53,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 25,
+          "errorRate": 1.8
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 36,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 40,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 28,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 39,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 66,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 27,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 64,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 52,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 29,
+          "errorRate": 0.9
         }
       ]
     },
@@ -1802,6 +7537,161 @@
           "date": "2025-09-05",
           "processed": 43,
           "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 42,
+          "errorRate": 2.8
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 51,
+          "errorRate": 4.9
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 65,
+          "errorRate": 1.9
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 63,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 27,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 46,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 58,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 70,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 58,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 50,
+          "errorRate": 2.3
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 26,
+          "errorRate": 2.2
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 64,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 38,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 32,
+          "errorRate": 5.0
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 27,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 58,
+          "errorRate": 2.8
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 23,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 43,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 61,
+          "errorRate": 3.1
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 45,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 44,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 67,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 27,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 49,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 28,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 26,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 22,
+          "errorRate": 2.8
         }
       ]
     },
@@ -1849,6 +7739,161 @@
           "date": "2025-09-05",
           "processed": 39,
           "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 62,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 55,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 47,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 46,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 37,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 66,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 25,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 52,
+          "errorRate": 1.7
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 45,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 41,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 51,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 65,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 47,
+          "errorRate": 3.7
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 34,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 20,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 56,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 57,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 30,
+          "errorRate": 4.2
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 46,
+          "errorRate": 2.5
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 61,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 38,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 32,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 56,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 39,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 24,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 21,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 55,
+          "errorRate": 0.7
         }
       ]
     },
@@ -1896,6 +7941,161 @@
           "date": "2025-09-05",
           "processed": 30,
           "errorRate": 4.4
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 55,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 32,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 27,
+          "errorRate": 2.9
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 69,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 52,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 28,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 29,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 54,
+          "errorRate": 3.8
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 24,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 21,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 21,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 66,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 46,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 33,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 21,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 47,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 48,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 33,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 23,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 66,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 50,
+          "errorRate": 3.4
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 51,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 63,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 25,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 42,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 56,
+          "errorRate": 1.1
         }
       ]
     },
@@ -1943,6 +8143,161 @@
           "date": "2025-09-05",
           "processed": 46,
           "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 51,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 43,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 34,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 44,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 24,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 50,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 33,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 30,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 35,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 67,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 69,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 27,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 56,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 38,
+          "errorRate": 1.8
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 35,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 56,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 62,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 27,
+          "errorRate": 1.0
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 39,
+          "errorRate": 4.0
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 53,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 25,
+          "errorRate": 2.9
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 34,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 21,
+          "errorRate": 0.2
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 57,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 55,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 0,
+          "errorRate": 0.0
         }
       ]
     },
@@ -1990,6 +8345,161 @@
           "date": "2025-09-05",
           "processed": 36,
           "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-01",
+          "processed": 29,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-02",
+          "processed": 63,
+          "errorRate": 1.3
+        },
+        {
+          "date": "2026-01-03",
+          "processed": 44,
+          "errorRate": 4.6
+        },
+        {
+          "date": "2026-01-04",
+          "processed": 66,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-05",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-06",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-07",
+          "processed": 58,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-08",
+          "processed": 31,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-09",
+          "processed": 56,
+          "errorRate": 0.7
+        },
+        {
+          "date": "2026-01-10",
+          "processed": 39,
+          "errorRate": 0.3
+        },
+        {
+          "date": "2026-01-11",
+          "processed": 20,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-12",
+          "processed": 0,
+          "errorRate": 0.0
+        },
+        {
+          "date": "2026-01-13",
+          "processed": 60,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-14",
+          "processed": 40,
+          "errorRate": 1.5
+        },
+        {
+          "date": "2026-01-15",
+          "processed": 23,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-16",
+          "processed": 53,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-17",
+          "processed": 60,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-18",
+          "processed": 22,
+          "errorRate": 0.8
+        },
+        {
+          "date": "2026-01-19",
+          "processed": 69,
+          "errorRate": 1.6
+        },
+        {
+          "date": "2026-01-20",
+          "processed": 41,
+          "errorRate": 0.5
+        },
+        {
+          "date": "2026-01-21",
+          "processed": 61,
+          "errorRate": 4.3
+        },
+        {
+          "date": "2026-01-22",
+          "processed": 68,
+          "errorRate": 4.3
+        },
+        {
+          "date": "2026-01-23",
+          "processed": 22,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-24",
+          "processed": 66,
+          "errorRate": 0.6
+        },
+        {
+          "date": "2026-01-25",
+          "processed": 50,
+          "errorRate": 0.9
+        },
+        {
+          "date": "2026-01-26",
+          "processed": 55,
+          "errorRate": 1.1
+        },
+        {
+          "date": "2026-01-27",
+          "processed": 38,
+          "errorRate": 0.4
+        },
+        {
+          "date": "2026-01-28",
+          "processed": 69,
+          "errorRate": 1.4
+        },
+        {
+          "date": "2026-01-29",
+          "processed": 41,
+          "errorRate": 1.2
+        },
+        {
+          "date": "2026-01-30",
+          "processed": 61,
+          "errorRate": 0.1
+        },
+        {
+          "date": "2026-01-31",
+          "processed": 46,
+          "errorRate": 3.1
         }
       ]
     }
