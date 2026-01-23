@@ -15,6 +15,9 @@
 - `ui/`: デザインガイドライン、メッセージ文面、コンポーネント統合手順。
 - `standards/02_CODING_STANDARDS.md`: コーディング規約とレビュー基準。
 
+### サービス検討（`docs/service-consideration/`）
+- `service-consideration/2026-01-23_premium-plan_feature-list.md`: プレミアムプラン検討用の機能一覧（ドラフト）
+
 ### 運用ハンドブック (`docs/handbook/`)
 - `setup/`: 初期セットアップとオンボーディング手順。
 - `deployment/`: 展開/公開フローと必要なチェックリスト。
