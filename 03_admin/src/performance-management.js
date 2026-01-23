@@ -35,11 +35,17 @@ let groupTrendChart = null;
  */
 export async function initPerformanceManagementPage() {
     exposeGlobals(); 
+    renderBreadcrumb();
+    initDatePicker();
+    
+    showLoadingState();
     await loadPerformanceData();
+    // No explicit hideLoadingState needed as render functions overwrite the content,
+    // but good practice to have logic ready if needed.
+
     renderSummary();
     renderTables();
     initEventListeners();
-    initDatePicker();
 }
 
 /**
@@ -61,6 +67,66 @@ function exposeGlobals() {
 }
 
 /**
+ * Helper: HTML Escape for XSS prevention
+ */
+function escapeHtml(unsafe) {
+    if (unsafe == null) return '';
+    return String(unsafe)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+/**
+ * Breadcrumb Rendering
+ */
+function renderBreadcrumb() {
+    const container = document.getElementById('breadcrumb-container');
+    if (!container) return;
+    
+    container.innerHTML = `
+        <nav aria-label="Breadcrumb">
+            <ol class="flex items-center space-x-1 text-xs text-on-surface-variant">
+                <li><a href="index.html" class="hover:text-primary hover:underline">ホーム</a></li>
+                <li><span class="material-icons text-[14px]">chevron_right</span></li>
+                <li><span class="font-bold text-on-surface">実績管理</span></li>
+            </ol>
+        </nav>
+    `;
+}
+
+/**
+ * Loading State
+ */
+function showLoadingState() {
+    const summaryContainer = document.getElementById('summary-container');
+    const tableBody = document.getElementById('performance-table-body');
+    
+    if (summaryContainer) {
+        summaryContainer.innerHTML = `
+             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                ${[...Array(4)].map(() => `<div class="animate-pulse bg-surface-variant/30 h-24 rounded-xl border border-outline-variant"></div>`).join('')}
+             </div>
+        `;
+    }
+    
+    if (tableBody) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="10" class="py-12 text-center text-on-surface-variant">
+                    <div class="flex flex-col items-center gap-2">
+                        <span class="material-icons animate-spin text-4xl text-primary">autorenew</span>
+                        <span class="text-sm">データを読み込み中...</span>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }
+}
+
+/**
  * Filter Reset
  */
 function resetFilters() {
@@ -73,11 +139,8 @@ function resetFilters() {
         if (el) el.value = el.tagName === 'SELECT' ? 'all' : '';
     });
 
-    const indPicker = document.querySelector('#date-range-filter-ind')._flatpickr;
-    const grpPicker = document.querySelector('#date-range-filter-grp')._flatpickr;
-    const defaultDate = ["2025/09/01", "2025/09/30"];
-    if (indPicker) indPicker.setDate(defaultDate, false);
-    if (grpPicker) grpPicker.setDate(defaultDate, false);
+    // Reset date pickers to current month
+    initDatePicker();
 
     currentPage = 1;
     renderTables();
@@ -102,10 +165,17 @@ function getAvatarStyle(name) {
  */
 function initDatePicker() {
     if (window.flatpickr) {
+        // Dynamic date range: 1st of current month to last day of current month
+        const now = new Date();
+        const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+        const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        const formatDate = (d) => `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
+        const defaultDate = [formatDate(firstDay), formatDate(lastDay)];
+
         const config = {
             mode: "range",
             dateFormat: "Y/m/d",
-            defaultDate: ["2025/09/01", "2025/09/30"],
+            defaultDate: defaultDate,
             locale: "ja",
             onChange: function() {
                 currentPage = 1;
@@ -113,8 +183,12 @@ function initDatePicker() {
                 renderSummary();
             }
         };
-        window.flatpickr("#date-range-filter-ind", config);
-        window.flatpickr("#date-range-filter-grp", config);
+        
+        const indPicker = document.getElementById("date-range-filter-ind");
+        const grpPicker = document.getElementById("date-range-filter-grp");
+        
+        if (indPicker) window.flatpickr(indPicker, config);
+        if (grpPicker) window.flatpickr(grpPicker, config);
     }
 }
 
@@ -123,10 +197,25 @@ function initDatePicker() {
  */
 async function loadPerformanceData() {
     try {
+        // Simulate network delay for loading demonstration
+        // await new Promise(resolve => setTimeout(resolve, 500)); 
         const response = await fetch('../data/admin/performance.json');
         performanceData = await response.json();
     } catch (error) {
         console.error('Error loading performance data:', error);
+        const tableBody = document.getElementById('performance-table-body');
+        if (tableBody) {
+             tableBody.innerHTML = `
+                <tr>
+                    <td colspan="10" class="py-12 text-center text-error">
+                        <div class="flex flex-col items-center gap-2">
+                            <span class="material-icons text-4xl">error_outline</span>
+                            <span class="text-sm">データの読み込みに失敗しました。</span>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
     }
 }
 
@@ -135,47 +224,111 @@ async function loadPerformanceData() {
  */
 function renderSummary() {
     if (!performanceData) return;
-    const s = performanceData.summary;
     const summaryContainer = document.getElementById('summary-container');
     if (!summaryContainer) return;
 
     const filteredData = getFilteredData();
+
+    // 1. Calculate Total Payment
     let currentTotalPayment = 0;
     if (currentTab === 'individual') {
-        currentTotalPayment = filteredData.reduce((sum, op) => sum + op.estPayment, 0);
+        currentTotalPayment = filteredData.reduce((sum, op) => sum + (op.estPayment || 0), 0);
     } else {
-        currentTotalPayment = s.totalPayment;
+        // For groups, calculate based on operators within the filtered groups
+        currentTotalPayment = filteredData.reduce((sum, grp) => {
+             let grpPayment = 0;
+             if (grp.operators) {
+                 grp.operators.forEach(gOp => {
+                     const fullOp = performanceData.operators.find(o => o.name === gOp.name);
+                     if (fullOp) grpPayment += fullOp.estPayment;
+                 });
+             }
+             return sum + grpPayment;
+        }, 0);
     }
-    const estimatedLanding = Math.round(currentTotalPayment * 1.2); 
+    const estimatedLanding = Math.round(currentTotalPayment * 1.2);
+
+    // 2. Calculate Active Users / Total Users
+    let activeUsers = 0;
+    let totalUsers = 0;
+    if (currentTab === 'individual') {
+        totalUsers = filteredData.length;
+        activeUsers = filteredData.filter(op => op.processed > 0).length;
+    } else {
+        totalUsers = filteredData.reduce((sum, grp) => sum + (grp.totalUsers || 0), 0);
+        activeUsers = filteredData.reduce((sum, grp) => sum + (grp.activeUsers || 0), 0);
+    }
+
+    // 3. Calculate Average Error Rate
+    let totalProcessed = 0;
+    let totalErrors = 0;
+    if (currentTab === 'individual') {
+        filteredData.forEach(op => {
+            totalProcessed += op.processed;
+            totalErrors += op.errors;
+        });
+    } else {
+         filteredData.forEach(grp => {
+             if (grp.operators) {
+                 grp.operators.forEach(gOp => {
+                     const fullOp = performanceData.operators.find(o => o.name === gOp.name);
+                     if (fullOp) {
+                         totalProcessed += fullOp.processed;
+                         totalErrors += fullOp.errors;
+                     }
+                 });
+             }
+         });
+    }
+    const avgErrorRate = totalProcessed > 0 ? ((totalErrors / totalProcessed) * 100).toFixed(2) : "0.00";
+
+    // 4. Calculate Max Capacity
+    let totalCapacity = 0;
+    if (currentTab === 'individual') {
+        // Estimate: (8 hours in seconds / avgTime) for each operator
+        const SECONDS_IN_DAY = 8 * 3600; 
+        filteredData.forEach(op => {
+             if (op.avgTime > 0) {
+                 totalCapacity += Math.floor(SECONDS_IN_DAY / op.avgTime);
+             }
+        });
+    } else {
+        totalCapacity = filteredData.reduce((sum, grp) => sum + (grp.maxCapacity || 0), 0);
+    }
+
+    // Last month comparison (Fixed value from JSON as historical data comparison logic is complex)
+    const lastMonthComparison = performanceData.summary.lastMonthComparison;
 
     summaryContainer.innerHTML = `
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <div class="bg-surface p-4 rounded-xl border border-outline-variant shadow-sm text-center lg:text-left">
-                <div class="text-sm text-on-surface-variant mb-1">今月の支払い確定額 (全体)</div>
+                <div class="text-sm text-on-surface-variant mb-1">期間内の支払い確定額</div>
                 <div class="flex items-baseline justify-center lg:justify-start gap-2">
-                    <span class="text-2xl font-bold text-primary">¥${s.totalPayment.toLocaleString()}</span>
-                    <span class="text-xs ${s.lastMonthComparison >= 0 ? 'text-success' : 'text-error'} font-medium">
-                        ${s.lastMonthComparison >= 0 ? '↑' : '↓'} ${Math.abs(s.lastMonthComparison)}%
+                    <span class="text-2xl font-bold text-primary">¥${currentTotalPayment.toLocaleString()}</span>
+                    <span class="text-xs ${lastMonthComparison >= 0 ? 'text-success' : 'text-error'} font-medium" title="前月比 (固定値)">
+                        ${lastMonthComparison >= 0 ? '↑' : '↓'} ${Math.abs(lastMonthComparison)}%
                     </span>
                 </div>
                 <div class="text-[10px] text-on-surface-variant mt-1">着地見込: ¥${estimatedLanding.toLocaleString()}</div>
             </div>
             <div class="bg-surface p-4 rounded-xl border border-outline-variant shadow-sm text-center lg:text-left">
-                <div class="text-sm text-on-surface-variant mb-1">稼働人数 / 登録人数</div>
-                <div class="text-2xl font-bold">${s.activeUsers} / ${s.totalUsers} <span class="text-sm font-normal text-on-surface-variant ml-1">人</span></div>
+                <div class="text-sm text-on-surface-variant mb-1">稼働人数 / 表示対象</div>
+                <div class="text-2xl font-bold">${activeUsers.toLocaleString()} / ${totalUsers.toLocaleString()} <span class="text-sm font-normal text-on-surface-variant ml-1">人</span></div>
                 <div class="w-full bg-outline-variant h-1.5 rounded-full mt-2 overflow-hidden">
-                    <div class="bg-primary h-full transition-all duration-500" style="width: ${(s.activeUsers / s.totalUsers) * 100}%"></div>
+                    <div class="bg-primary h-full transition-all duration-500" style="width: ${totalUsers > 0 ? (activeUsers / totalUsers) * 100 : 0}%"></div>
                 </div>
             </div>
             <div class="bg-surface p-4 rounded-xl border border-outline-variant shadow-sm text-center lg:text-left">
-                <div class="text-sm text-on-surface-variant mb-1">グループ全体の品質レベル</div>
-                <div class="text-2xl font-bold text-success">${s.errorRate}% <span class="text-sm font-normal text-on-surface-variant ml-1 text-on-surface">Avg Error</span></div>
+                <div class="text-sm text-on-surface-variant mb-1">期間内の平均エラー率</div>
+                <div class="text-2xl font-bold ${parseFloat(avgErrorRate) > performanceData.parameters.targetErrorRate ? 'text-error' : 'text-success'}">
+                    ${avgErrorRate}% <span class="text-sm font-normal text-on-surface-variant ml-1 text-on-surface">Avg Error</span>
+                </div>
                 <div class="text-xs text-on-surface-variant mt-1">目標: ${performanceData.parameters.targetErrorRate}%以下</div>
             </div>
             <div class="bg-surface p-4 rounded-xl border border-outline-variant shadow-sm text-center lg:text-left">
-                <div class="text-sm text-on-surface-variant mb-1">最大処理能力 (全体)</div>
-                <div class="text-2xl font-bold">${s.maxCapacity.toLocaleString()} <span class="text-sm font-normal text-on-surface-variant ml-1 text-on-surface">枚/日</span></div>
-                <div class="text-xs text-on-surface-variant mt-1">稼働中の推定限界値</div>
+                <div class="text-sm text-on-surface-variant mb-1">推定最大処理能力</div>
+                <div class="text-2xl font-bold">${totalCapacity.toLocaleString()} <span class="text-sm font-normal text-on-surface-variant ml-1 text-on-surface">枚/日</span></div>
+                <div class="text-xs text-on-surface-variant mt-1">表示メンバーの合計値(8h換算)</div>
             </div>
         </div>
     `;
@@ -213,7 +366,7 @@ function createSortableHeader(label, column, align = 'center') {
     return `
         <th class="px-4 py-3 text-${align} cursor-pointer hover:bg-surface-variant/50 transition-colors select-none group" onclick="window.sortTable('${column}')">
             <div class="flex items-center justify-${align === 'left' ? 'start' : (align === 'right' ? 'end' : 'center')} gap-1">
-                ${label}
+                ${escapeHtml(label)}
                 ${getSortIcon(column)}
             </div>
         </th>
@@ -261,35 +414,35 @@ function renderIndividualTable() {
     const displayData = filteredData.slice(startIndex, endIndex);
 
     tableBody.innerHTML = displayData.map(op => `
-        <tr class="group hover:bg-primary/5 cursor-pointer transition-colors ${op.processed === 0 ? 'opacity-50' : ''}" onclick="window.showOperatorDetail('${op.id}')">
+        <tr class="group hover:bg-primary/5 cursor-pointer transition-colors ${op.processed === 0 ? 'opacity-50' : ''}" onclick="window.showOperatorDetail('${escapeHtml(op.id)}')">
             <td class="px-4 py-4 text-left">
                 <div class="flex items-center gap-3">
                     <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm shadow-sm transition-transform group-hover:scale-110" style="${getAvatarStyle(op.name)}">
-                        ${op.name.charAt(0)}
+                        ${escapeHtml(op.name.charAt(0))}
                     </div>
                     <div>
-                        <div class="font-bold text-on-surface group-hover:text-primary transition-colors">${op.name}</div>
+                        <div class="font-bold text-on-surface group-hover:text-primary transition-colors">${escapeHtml(op.name)}</div>
                         <div class="text-[11px] text-on-surface-variant flex items-center gap-1">
-                            <span class="material-icons text-[12px]">badge</span> ${op.id}
+                            <span class="material-icons text-[12px]">badge</span> ${escapeHtml(op.id)}
                             <span class="mx-1">/</span>
-                            <span class="material-icons text-[12px]">group</span> ${op.group}
+                            <span class="material-icons text-[12px]">group</span> ${escapeHtml(op.group)}
                         </div>
                     </div>
                 </div>
             </td>
-            <td class="px-4 py-4 text-center">${op.processed.toLocaleString()}</td>
-            <td class="px-4 py-4 text-center text-error">${op.errors}</td>
-            <td class="px-4 py-4 text-center font-bold text-primary">${op.valid.toLocaleString()}</td>
+            <td class="px-4 py-4 text-center">${Number(op.processed).toLocaleString()}</td>
+            <td class="px-4 py-4 text-center text-error">${Number(op.errors).toLocaleString()}</td>
+            <td class="px-4 py-4 text-center font-bold text-primary">${Number(op.valid).toLocaleString()}</td>
             <td class="px-4 py-4 text-center">
-                <div class="text-sm font-medium text-on-surface">${op.workTime}</div>
-                <div class="text-[10px] text-on-surface-variant uppercase">Avg: ${op.avgTime}s</div>
+                <div class="text-sm font-medium text-on-surface">${escapeHtml(op.workTime)}</div>
+                <div class="text-[10px] text-on-surface-variant uppercase">Avg: ${escapeHtml(op.avgTime)}s</div>
             </td>
-            <td class="px-4 py-4 text-center font-bold text-on-surface">¥${op.estPayment.toLocaleString()}</td>
+            <td class="px-4 py-4 text-center font-bold text-on-surface">¥${Number(op.estPayment).toLocaleString()}</td>
             <td class="px-4 py-4 text-center font-bold ${op.accuracy < 95 ? 'text-error' : (op.accuracy >= 99 ? 'text-success' : 'text-on-surface')}">${op.accuracy}%</td>
             <td class="px-4 py-4 text-center">
                 <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold ${op.status === '達成' ? 'bg-success/10 text-success' : 'bg-error/10 text-error'}">
                     <span class="material-icons text-[12px]">${op.status === '達成' ? 'check_circle' : 'warning'}</span>
-                    ${op.status}
+                    ${escapeHtml(op.status)}
                 </span>
             </td>
             <td class="px-4 py-4 text-right">
@@ -335,31 +488,31 @@ function renderGroupTable() {
     const displayData = filteredData.slice(startIndex, endIndex);
 
     tableBody.innerHTML = displayData.map(group => `
-        <tr class="hover:bg-primary/5 cursor-pointer transition-colors" onclick="window.showGroupDetail('${group.id}')">
-            <td class="px-4 py-4 font-bold text-on-surface text-left">${group.name}</td>
+        <tr class="hover:bg-primary/5 cursor-pointer transition-colors" onclick="window.showGroupDetail('${escapeHtml(group.id)}')">
+            <td class="px-4 py-4 font-bold text-on-surface text-left">${escapeHtml(group.name)}</td>
             <td class="px-4 py-4 text-center">
                 <div class="flex flex-col">
-                    <span class="font-bold text-on-surface">${group.activeUsers} <span class="font-normal text-[10px] text-on-surface-variant">/ ${group.totalUsers}人</span></span>
+                    <span class="font-bold text-on-surface">${Number(group.activeUsers).toLocaleString()} <span class="font-normal text-[10px] text-on-surface-variant">/ ${Number(group.totalUsers).toLocaleString()}人</span></span>
                     <div class="w-12 h-1 bg-outline-variant rounded-full mx-auto mt-1">
                         <div class="bg-primary h-full rounded-full" style="width: ${(group.activeUsers/group.totalUsers)*100}%"></div>
                     </div>
                 </div>
             </td>
             <td class="px-4 py-4 text-center">
-                <span class="font-medium text-on-surface">${group.maxCapacity.toLocaleString()}</span>
+                <span class="font-medium text-on-surface">${Number(group.maxCapacity).toLocaleString()}</span>
                 <span class="text-[10px] text-on-surface-variant block uppercase">枚/日</span>
             </td>
             <td class="px-4 py-4 text-center">
-                <div class="text-sm font-medium text-on-surface">${group.avgTime}s <span class="font-normal text-[10px] text-on-surface-variant">/ 枚</span></div>
-                <div class="text-[10px] text-on-surface-variant">ばらつき: ${group.qualityVariance}</div>
+                <div class="text-sm font-medium text-on-surface">${escapeHtml(group.avgTime)}s <span class="font-normal text-[10px] text-on-surface-variant">/ 枚</span></div>
+                <div class="text-[10px] text-on-surface-variant">ばらつき: ${escapeHtml(group.qualityVariance)}</div>
             </td>
-            <td class="px-4 py-4 text-center font-bold text-primary">${group.costPerformance} <span class="text-[10px] text-on-surface-variant font-normal">枚/円</span></td>
+            <td class="px-4 py-4 text-center font-bold text-primary">${escapeHtml(group.costPerformance)} <span class="text-[10px] text-on-surface-variant font-normal">枚/円</span></td>
             <td class="px-4 py-4 text-center">
                 <div class="flex items-center justify-center gap-2">
                     <div class="w-16 bg-outline-variant h-1.5 rounded-full overflow-hidden">
                         <div class="bg-success h-full" style="width: ${group.onTimeRate}%"></div>
                     </div>
-                    <span class="text-xs font-bold text-on-surface">${group.onTimeRate}%</span>
+                    <span class="text-xs font-bold text-on-surface">${escapeHtml(group.onTimeRate)}%</span>
                 </div>
             </td>
             <td class="px-4 py-4 text-right">
