@@ -16,7 +16,8 @@
 - `standards/02_CODING_STANDARDS.md`: コーディング規約とレビュー基準。
 
 ### サービス検討（`docs/service-consideration/`）
-- `service-consideration/2026-01-23_premium-plan_feature-list.md`: プレミアムプラン検討用の機能一覧（ドラフト）
+- `service-consideration/2026-01-23_service-feature-inventory.md`: サービス機能の全体棚卸し（表・ドラフト）
+- `service-consideration/2026-01-23_premium-plan_feature-list.md`: プレミアム選別（標準/オプション/対象外/要決定・ドラフト）
 
 ### 運用ハンドブック (`docs/handbook/`)
 - `setup/`: 初期セットアップとオンボーディング手順。
