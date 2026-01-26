@@ -21,6 +21,9 @@ let currentSurvey = null;
 let currentSortKey = 'answeredAt';
 let currentSortOrder = 'desc';
 
+let timeSeriesChart = null; // Dashboard Chart Instance
+let attributeChart = null;  // Dashboard Chart Instance
+
 // --- Functions ---
 
 function truncateQuestion(questionText) {
@@ -557,6 +560,7 @@ function applyFilters() {
 
     sortData(filteredData);
     displayPage(1, filteredData);
+    renderDashboard(filteredData);
 }
 
 function displayPage(page, data = allCombinedData) {
@@ -814,7 +818,174 @@ function setupSortListeners() {
             updateSortIcons();
         });
     });
+    });
 }
+
+function renderDashboard(data) {
+    const dashboardContainer = document.getElementById('analytics-dashboard');
+    if (!dashboardContainer) return;
+    dashboardContainer.classList.remove('hidden');
+
+    // 1. KPIs
+    const totalElement = document.getElementById('kpi-total-answers');
+    if (totalElement) totalElement.textContent = data.length.toLocaleString() + '件';
+
+    const latestElement = document.getElementById('kpi-latest-activity');
+    if (latestElement) {
+        if (data.length === 0) {
+            latestElement.textContent = '-';
+        } else {
+            // Find latest date logic
+            const timestamps = data.map(d => new Date(d.answeredAt).getTime()).filter(t => !isNaN(t));
+            if (timestamps.length > 0) {
+                const latest = Math.max(...timestamps);
+                const diffMs = Date.now() - latest;
+                const diffMins = Math.floor(diffMs / 60000); // Minutes
+                
+                if (diffMins < 0) {
+                     latestElement.textContent = 'ついさっき'; 
+                } else if (diffMins < 60) {
+                    latestElement.textContent = `${diffMins}分前`;
+                } else if (diffMins < 1440) { // 24 hours
+                    const hours = Math.floor(diffMins / 60);
+                    latestElement.textContent = `${hours}時間前`;
+                } else {
+                    const days = Math.floor(diffMins / 1440);
+                    latestElement.textContent = `${days}日前`;
+                }
+            } else {
+                latestElement.textContent = '-';
+            }
+        }
+    }
+    
+    // Update Question Title
+    const questionTitleEl = document.getElementById('dashboard-current-question');
+    if (questionTitleEl) {
+        questionTitleEl.textContent = truncateQuestion(currentIndustryQuestion) || '未選択';
+    }
+    const attributeTitleEl = document.getElementById('attribute-chart-title');
+    if (attributeTitleEl) {
+        attributeTitleEl.textContent = truncateQuestion(currentIndustryQuestion) || '未選択';
+    }
+
+    // 2. Time Series Chart
+    renderTimeSeriesChart(data);
+
+    // 3. Attribute Chart
+    renderAttributeChart(data);
+}
+
+function renderTimeSeriesChart(data) {
+    const ctx = document.getElementById('timeSeriesChart');
+    if (!ctx) return;
+
+    // Aggregate by hour (0-23)
+    const hours = Array(24).fill(0);
+    
+    data.forEach(item => {
+        if (!item.answeredAt) return;
+        const d = new Date(item.answeredAt);
+        if (isNaN(d.getTime())) return;
+        const h = d.getHours();
+        hours[h]++;
+    });
+
+    if (timeSeriesChart) {
+        timeSeriesChart.destroy();
+    }
+
+    timeSeriesChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: Array.from({length: 24}, (_, i) => `${i}:00`),
+            datasets: [{
+                label: '回答数',
+                data: hours,
+                backgroundColor: '#1a73e8',
+                borderRadius: 4,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { precision: 0 }
+                },
+                x: {
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+}
+
+function renderAttributeChart(data) {
+    const ctx = document.getElementById('attributeChart');
+    if (!ctx) return;
+
+    // Aggregate by currentIndustryQuestion
+    const counts = {};
+    data.forEach(item => {
+        const detail = item.details?.find(d => d.question === currentIndustryQuestion);
+        let answer = detail?.answer;
+        
+        if (Array.isArray(answer)) {
+            answer.forEach(a => {
+                const label = a || '未回答';
+                counts[label] = (counts[label] || 0) + 1;
+            });
+        } else {
+            const label = answer || '未回答';
+            counts[label] = (counts[label] || 0) + 1;
+        }
+    });
+
+    // Sort by count desc
+    const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    const labels = sorted.map(s => s[0]);
+    const values = sorted.map(s => s[1]);
+
+    if (attributeChart) {
+        attributeChart.destroy();
+    }
+    
+    // Colors
+    const palette = ['#1a73e8', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800', '#ff5722', '#795548', '#9e9e9e', '#607d8b'];
+
+    attributeChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: values,
+                backgroundColor: palette.slice(0, labels.length),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '60%',
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: { boxWidth: 12, font: { size: 11 } }
+                }
+            }
+        }
+    });
+}
+
 
 export async function initializePage() {
     try {
@@ -921,6 +1092,7 @@ export async function initializePage() {
         populateQuestionSelector(allCombinedData);
         updateAnswerFilterAvailability();
         displayPage(1, allCombinedData);
+        renderDashboard(allCombinedData);
         setupEventListeners();
         updateSortIcons();
 
