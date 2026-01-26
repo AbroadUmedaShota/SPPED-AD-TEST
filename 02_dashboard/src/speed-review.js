@@ -61,7 +61,7 @@ function populateAnswerFilterDropdown() {
     allCombinedData.forEach(item => {
         const detail = item.details?.find(d => d.question === currentIndustryQuestion);
         const answer = detail?.answer;
-        
+
         if (Array.isArray(answer)) {
             answer.forEach(a => {
                 if (a !== '') answers.add(a);
@@ -125,7 +125,7 @@ function handleWheelZoom(e) {
 
     let scale = parseFloat(img.dataset.scale || '1');
     const rotation = parseInt(img.dataset.rotation || '0');
-    
+
     // ホイールの移動量に応じてスケール変更
     // deltaYの符号で方向判定
     const delta = e.deltaY > 0 ? -0.1 : 0.1;
@@ -155,7 +155,7 @@ function handleRotateClick(e) {
 
     // ターゲット画像要素を特定
     let imgElement;
-    
+
     if (targetKey === 'inline') {
         // インライン展開の場合、DOM構造から相対的に探索
         const wrapper = btn.closest('.inline-card-wrapper');
@@ -181,10 +181,10 @@ function handleRotateClick(e) {
     // 現在の角度を取得
     let currentRotation = parseInt(imgElement.dataset.rotation || '0');
     let newRotation = currentRotation + dir;
-    
+
     // 現在のスケールを取得（追加）
     let currentScale = parseFloat(imgElement.dataset.scale || '1');
-    
+
     imgElement.style.transform = `rotate(${newRotation}deg) scale(${currentScale})`;
     imgElement.dataset.rotation = newRotation;
 }
@@ -299,7 +299,7 @@ function handleDetailClick(answerId) {
             renderModalContent(item, false);
             updateModalFooter(); // Initialize footer with correct buttons
             setupModalEventListeners();
-            
+
             // ホイールズームリスナーを設定（DOM再描画のたびに必要）
             setupWheelZoomListeners(document.getElementById('reviewDetailModalOverlay'));
         });
@@ -317,7 +317,7 @@ function setupModalEventListeners() {
         modal.addEventListener('click', handleModalImageClick);
         modal.setAttribute('data-zoom-listener-attached', 'true');
     }
-    
+
     // Rotate button listener (Delegation)
     if (!modal.hasAttribute('data-rotate-listener-attached')) {
         modal.addEventListener('click', (e) => {
@@ -350,19 +350,19 @@ function setupModalEventListeners() {
 
 function showCardImagesModal(item) {
     if (!item) return;
-    
+
     handleOpenModal('cardImagesModalOverlay', resolveDashboardAssetPath('modals/cardImagesModal.html'), () => {
         const modal = document.getElementById('cardImagesModalOverlay');
         const frontContainer = modal.querySelector('#card-image-front-container');
         const backContainer = modal.querySelector('#card-image-back-container');
-        
+
         const frontUrl = '../media/縦表 .png';
         const backUrl = '../media/縦裏.png';
 
         const setupImage = (container, url) => {
             container.innerHTML = `<img src="${url}" class="max-w-full max-h-full object-contain transition-transform duration-200" alt="名刺画像">`;
             const img = container.querySelector('img');
-            if(img) {
+            if (img) {
                 img.dataset.rotation = '0'; // Reset rotation
                 img.dataset.scale = '1';    // Reset scale
             }
@@ -389,7 +389,7 @@ function showCardImagesModal(item) {
             });
             modal.setAttribute('data-rotate-listener-attached', 'true');
         }
-        
+
         // ホイールズームリスナーを設定
         setupWheelZoomListeners(modal);
     });
@@ -426,7 +426,7 @@ function handleSave() {
                     newAnswer = select.value;
                 }
                 break;
-            
+
             case 'multi_choice':
                 const checkboxes = answerContainer.querySelectorAll(`input[type="checkbox"][data-question="${questionText}"]:checked`);
                 newAnswer = Array.from(checkboxes).map(cb => cb.value);
@@ -454,10 +454,10 @@ function handleSave() {
         if (index !== -1) {
             allCombinedData[index] = updatedItem;
         }
-        
+
         currentItemInModal = updatedItem;
 
-        applyFilters(); 
+        applyFilters();
 
         showToast('回答を更新しました。', 'success');
     } else {
@@ -524,9 +524,9 @@ function applyFilters() {
                     selectedQuestionAnswer = Array.isArray(detail.answer) ? detail.answer.join(', ').toLowerCase() : String(detail.answer).toLowerCase();
                 }
             }
-            return fullName.includes(searchTermLower) || 
-                   companyName.includes(searchTermLower) ||
-                   selectedQuestionAnswer.includes(searchTermLower);
+            return fullName.includes(searchTermLower) ||
+                companyName.includes(searchTermLower) ||
+                selectedQuestionAnswer.includes(searchTermLower);
         });
     }
 
@@ -536,8 +536,8 @@ function applyFilters() {
             if (!item.answeredAt) return false;
             const itemDate = new Date(item.answeredAt);
             return itemDate.getFullYear() === filterDate.getFullYear() &&
-                   itemDate.getMonth() === filterDate.getMonth() &&
-                   itemDate.getDate() === filterDate.getDate();
+                itemDate.getMonth() === filterDate.getMonth() &&
+                itemDate.getDate() === filterDate.getDate();
         });
     }
 
@@ -549,7 +549,7 @@ function applyFilters() {
             if (currentAnswerFilter === 'unanswered') {
                 return answer === '' || answer == null || answer === '-' || (Array.isArray(answer) && answer.length === 0);
             }
-            
+
             if (Array.isArray(answer)) {
                 return answer.includes(currentAnswerFilter);
             } else {
@@ -722,7 +722,7 @@ function setupEventListeners() {
         datePickerInstance = flatpickr(dateFilterInput, {
             dateFormat: "Y-m-d",
             locale: "ja",
-            onChange: function(selectedDates, dateStr, instance) {
+            onChange: function (selectedDates, dateStr, instance) {
                 currentDateFilter = dateStr;
                 applyFilters();
             }
@@ -779,8 +779,8 @@ function sortData(data) {
         bValue = getValue(b, currentSortKey);
 
         if (typeof aValue === 'string' && typeof bValue === 'string') {
-            return currentSortOrder === 'asc' 
-                ? aValue.localeCompare(bValue, 'ja') 
+            return currentSortOrder === 'asc'
+                ? aValue.localeCompare(bValue, 'ja')
                 : bValue.localeCompare(aValue, 'ja');
         } else {
             if (aValue < bValue) return currentSortOrder === 'asc' ? -1 : 1;
@@ -818,7 +818,6 @@ function setupSortListeners() {
             updateSortIcons();
         });
     });
-    });
 }
 
 function renderDashboard(data) {
@@ -841,9 +840,9 @@ function renderDashboard(data) {
                 const latest = Math.max(...timestamps);
                 const diffMs = Date.now() - latest;
                 const diffMins = Math.floor(diffMs / 60000); // Minutes
-                
+
                 if (diffMins < 0) {
-                     latestElement.textContent = 'ついさっき'; 
+                    latestElement.textContent = 'ついさっき';
                 } else if (diffMins < 60) {
                     latestElement.textContent = `${diffMins}分前`;
                 } else if (diffMins < 1440) { // 24 hours
@@ -858,7 +857,7 @@ function renderDashboard(data) {
             }
         }
     }
-    
+
     // Update Question Title
     const questionTitleEl = document.getElementById('dashboard-current-question');
     if (questionTitleEl) {
@@ -882,7 +881,7 @@ function renderTimeSeriesChart(data) {
 
     // Aggregate by hour (0-23)
     const hours = Array(24).fill(0);
-    
+
     data.forEach(item => {
         if (!item.answeredAt) return;
         const d = new Date(item.answeredAt);
@@ -898,7 +897,7 @@ function renderTimeSeriesChart(data) {
     timeSeriesChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: Array.from({length: 24}, (_, i) => `${i}:00`),
+            labels: Array.from({ length: 24 }, (_, i) => `${i}:00`),
             datasets: [{
                 label: '回答数',
                 data: hours,
@@ -938,7 +937,7 @@ function renderAttributeChart(data) {
     data.forEach(item => {
         const detail = item.details?.find(d => d.question === currentIndustryQuestion);
         let answer = detail?.answer;
-        
+
         if (Array.isArray(answer)) {
             answer.forEach(a => {
                 const label = a || '未回答';
@@ -958,7 +957,7 @@ function renderAttributeChart(data) {
     if (attributeChart) {
         attributeChart.destroy();
     }
-    
+
     // Colors
     const palette = ['#1a73e8', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800', '#ff5722', '#795548', '#9e9e9e', '#607d8b'];
 
@@ -1064,9 +1063,9 @@ export async function initializePage() {
                 businessCard: businessCard
             };
         });
-        
+
         if (answersArr.length === 0) {
-             console.warn(`アンケートID「${surveyId}」に対する回答データが見つかりませんでした。`);
+            console.warn(`アンケートID「${surveyId}」に対する回答データが見つかりませんでした。`);
         }
 
 
