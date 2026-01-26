@@ -21,6 +21,9 @@ let currentSurvey = null;
 let currentSortKey = 'answeredAt';
 let currentSortOrder = 'desc';
 
+let timeSeriesChart = null; // Dashboard Chart Instance
+let attributeChart = null;  // Dashboard Chart Instance
+
 // --- Functions ---
 
 function truncateQuestion(questionText) {
@@ -28,8 +31,8 @@ function truncateQuestion(questionText) {
         return '';
     }
     let truncatedText = questionText.replace(/（.*?）/g, '').replace(/\(.*?\)/g, '');
-    if (truncatedText.length > 17) {
-        truncatedText = truncatedText.substring(0, 17) + '...';
+    if (truncatedText.length > 25) {
+        truncatedText = truncatedText.substring(0, 25) + '...';
     }
     return truncatedText;
 }
@@ -58,7 +61,7 @@ function populateAnswerFilterDropdown() {
     allCombinedData.forEach(item => {
         const detail = item.details?.find(d => d.question === currentIndustryQuestion);
         const answer = detail?.answer;
-        
+
         if (Array.isArray(answer)) {
             answer.forEach(a => {
                 if (a !== '') answers.add(a);
@@ -122,7 +125,7 @@ function handleWheelZoom(e) {
 
     let scale = parseFloat(img.dataset.scale || '1');
     const rotation = parseInt(img.dataset.rotation || '0');
-    
+
     // ホイールの移動量に応じてスケール変更
     // deltaYの符号で方向判定
     const delta = e.deltaY > 0 ? -0.1 : 0.1;
@@ -152,7 +155,7 @@ function handleRotateClick(e) {
 
     // ターゲット画像要素を特定
     let imgElement;
-    
+
     if (targetKey === 'inline') {
         // インライン展開の場合、DOM構造から相対的に探索
         const wrapper = btn.closest('.inline-card-wrapper');
@@ -178,10 +181,10 @@ function handleRotateClick(e) {
     // 現在の角度を取得
     let currentRotation = parseInt(imgElement.dataset.rotation || '0');
     let newRotation = currentRotation + dir;
-    
+
     // 現在のスケールを取得（追加）
     let currentScale = parseFloat(imgElement.dataset.scale || '1');
-    
+
     imgElement.style.transform = `rotate(${newRotation}deg) scale(${currentScale})`;
     imgElement.dataset.rotation = newRotation;
 }
@@ -296,7 +299,7 @@ function handleDetailClick(answerId) {
             renderModalContent(item, false);
             updateModalFooter(); // Initialize footer with correct buttons
             setupModalEventListeners();
-            
+
             // ホイールズームリスナーを設定（DOM再描画のたびに必要）
             setupWheelZoomListeners(document.getElementById('reviewDetailModalOverlay'));
         });
@@ -314,7 +317,7 @@ function setupModalEventListeners() {
         modal.addEventListener('click', handleModalImageClick);
         modal.setAttribute('data-zoom-listener-attached', 'true');
     }
-    
+
     // Rotate button listener (Delegation)
     if (!modal.hasAttribute('data-rotate-listener-attached')) {
         modal.addEventListener('click', (e) => {
@@ -347,19 +350,19 @@ function setupModalEventListeners() {
 
 function showCardImagesModal(item) {
     if (!item) return;
-    
+
     handleOpenModal('cardImagesModalOverlay', resolveDashboardAssetPath('modals/cardImagesModal.html'), () => {
         const modal = document.getElementById('cardImagesModalOverlay');
         const frontContainer = modal.querySelector('#card-image-front-container');
         const backContainer = modal.querySelector('#card-image-back-container');
-        
+
         const frontUrl = '../media/縦表 .png';
         const backUrl = '../media/縦裏.png';
 
         const setupImage = (container, url) => {
             container.innerHTML = `<img src="${url}" class="max-w-full max-h-full object-contain transition-transform duration-200" alt="名刺画像">`;
             const img = container.querySelector('img');
-            if(img) {
+            if (img) {
                 img.dataset.rotation = '0'; // Reset rotation
                 img.dataset.scale = '1';    // Reset scale
             }
@@ -386,7 +389,7 @@ function showCardImagesModal(item) {
             });
             modal.setAttribute('data-rotate-listener-attached', 'true');
         }
-        
+
         // ホイールズームリスナーを設定
         setupWheelZoomListeners(modal);
     });
@@ -423,7 +426,7 @@ function handleSave() {
                     newAnswer = select.value;
                 }
                 break;
-            
+
             case 'multi_choice':
                 const checkboxes = answerContainer.querySelectorAll(`input[type="checkbox"][data-question="${questionText}"]:checked`);
                 newAnswer = Array.from(checkboxes).map(cb => cb.value);
@@ -451,10 +454,10 @@ function handleSave() {
         if (index !== -1) {
             allCombinedData[index] = updatedItem;
         }
-        
+
         currentItemInModal = updatedItem;
 
-        applyFilters(); 
+        applyFilters();
 
         showToast('回答を更新しました。', 'success');
     } else {
@@ -521,9 +524,9 @@ function applyFilters() {
                     selectedQuestionAnswer = Array.isArray(detail.answer) ? detail.answer.join(', ').toLowerCase() : String(detail.answer).toLowerCase();
                 }
             }
-            return fullName.includes(searchTermLower) || 
-                   companyName.includes(searchTermLower) ||
-                   selectedQuestionAnswer.includes(searchTermLower);
+            return fullName.includes(searchTermLower) ||
+                companyName.includes(searchTermLower) ||
+                selectedQuestionAnswer.includes(searchTermLower);
         });
     }
 
@@ -533,8 +536,8 @@ function applyFilters() {
             if (!item.answeredAt) return false;
             const itemDate = new Date(item.answeredAt);
             return itemDate.getFullYear() === filterDate.getFullYear() &&
-                   itemDate.getMonth() === filterDate.getMonth() &&
-                   itemDate.getDate() === filterDate.getDate();
+                itemDate.getMonth() === filterDate.getMonth() &&
+                itemDate.getDate() === filterDate.getDate();
         });
     }
 
@@ -546,7 +549,7 @@ function applyFilters() {
             if (currentAnswerFilter === 'unanswered') {
                 return answer === '' || answer == null || answer === '-' || (Array.isArray(answer) && answer.length === 0);
             }
-            
+
             if (Array.isArray(answer)) {
                 return answer.includes(currentAnswerFilter);
             } else {
@@ -557,6 +560,7 @@ function applyFilters() {
 
     sortData(filteredData);
     displayPage(1, filteredData);
+    renderDashboard(filteredData);
 }
 
 function displayPage(page, data = allCombinedData) {
@@ -588,6 +592,28 @@ function displayPage(page, data = allCombinedData) {
     const startItem = totalItems === 0 ? 0 : startIndex + 1;
     const endItem = Math.min(endIndex, totalItems);
     pageInfo.textContent = `${startItem} - ${endItem} / 全 ${totalItems}件`;
+}
+
+function renderTableSkeleton() {
+    const tableBody = document.getElementById('reviewTableBody');
+    const pageInfo = document.getElementById('pageInfo');
+    if (!tableBody) return;
+
+    // Reset info
+    if (pageInfo) pageInfo.textContent = '読み込み中...';
+
+    // Create 5 skeleton rows
+    const skeletonRow = `
+        <tr class="animate-pulse border-b border-outline-variant/50">
+            <td class="px-4 py-4"><div class="h-4 bg-outline-variant/20 rounded w-16"></div></td>
+            <td class="px-4 py-4"><div class="h-4 bg-outline-variant/20 rounded w-32"></div></td>
+            <td class="px-4 py-4"><div class="h-4 bg-outline-variant/20 rounded w-24"></div></td>
+            <td class="px-4 py-4"><div class="h-4 bg-outline-variant/20 rounded w-40"></div></td>
+            <td class="px-4 py-4"><div class="h-4 bg-outline-variant/20 rounded w-full"></div></td>
+        </tr>
+    `;
+
+    tableBody.innerHTML = skeletonRow.repeat(5);
 }
 
 function setupPagination(currentData = allCombinedData) {
@@ -718,7 +744,7 @@ function setupEventListeners() {
         datePickerInstance = flatpickr(dateFilterInput, {
             dateFormat: "Y-m-d",
             locale: "ja",
-            onChange: function(selectedDates, dateStr, instance) {
+            onChange: function (selectedDates, dateStr, instance) {
                 currentDateFilter = dateStr;
                 applyFilters();
             }
@@ -775,8 +801,8 @@ function sortData(data) {
         bValue = getValue(b, currentSortKey);
 
         if (typeof aValue === 'string' && typeof bValue === 'string') {
-            return currentSortOrder === 'asc' 
-                ? aValue.localeCompare(bValue, 'ja') 
+            return currentSortOrder === 'asc'
+                ? aValue.localeCompare(bValue, 'ja')
                 : bValue.localeCompare(aValue, 'ja');
         } else {
             if (aValue < bValue) return currentSortOrder === 'asc' ? -1 : 1;
@@ -816,7 +842,222 @@ function setupSortListeners() {
     });
 }
 
+function renderDashboard(data) {
+    const dashboardContainer = document.getElementById('analytics-dashboard');
+    if (!dashboardContainer) return;
+    dashboardContainer.classList.remove('hidden');
+
+    // 1. KPIs
+    const totalElement = document.getElementById('kpi-total-answers');
+    if (totalElement) totalElement.textContent = data.length.toLocaleString() + '件';
+
+    const latestElement = document.getElementById('kpi-latest-activity');
+    if (latestElement) {
+        if (data.length === 0) {
+            latestElement.textContent = '-';
+        } else {
+            // Find latest date logic
+            const timestamps = data.map(d => new Date(d.answeredAt).getTime()).filter(t => !isNaN(t));
+            if (timestamps.length > 0) {
+                const latest = Math.max(...timestamps);
+                const diffMs = Date.now() - latest;
+                const diffMins = Math.floor(diffMs / 60000); // Minutes
+
+                if (diffMins < 0) {
+                    latestElement.textContent = 'ついさっき';
+                } else if (diffMins < 60) {
+                    latestElement.textContent = `${diffMins}分前`;
+                } else if (diffMins < 1440) { // 24 hours
+                    const hours = Math.floor(diffMins / 60);
+                    latestElement.textContent = `${hours}時間前`;
+                } else {
+                    const days = Math.floor(diffMins / 1440);
+                    latestElement.textContent = `${days}日前`;
+                }
+            } else {
+                latestElement.textContent = '-';
+            }
+        }
+    }
+
+    // Update Question Title
+    const questionTitleEl = document.getElementById('dashboard-current-question');
+    if (questionTitleEl) {
+        questionTitleEl.textContent = truncateQuestion(currentIndustryQuestion) || '未選択';
+    }
+    const attributeTitleEl = document.getElementById('attribute-chart-title');
+    if (attributeTitleEl) {
+        attributeTitleEl.textContent = truncateQuestion(currentIndustryQuestion) || '未選択';
+    }
+
+    // 2. Time Series Chart
+    renderTimeSeriesChart(data);
+
+    // 3. Attribute Chart
+    renderAttributeChart(data);
+}
+
+function renderTimeSeriesChart(data) {
+    const ctx = document.getElementById('timeSeriesChart');
+    if (!ctx) return;
+
+    // Aggregate by hour (0-23)
+    const hours = Array(24).fill(0);
+
+    data.forEach(item => {
+        if (!item.answeredAt) return;
+        const d = new Date(item.answeredAt);
+        if (isNaN(d.getTime())) return;
+        const h = d.getHours();
+        hours[h]++;
+    });
+
+    if (timeSeriesChart) {
+        timeSeriesChart.destroy();
+    }
+
+    timeSeriesChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: Array.from({ length: 24 }, (_, i) => `${i}:00`),
+            datasets: [{
+                label: '回答数',
+                data: hours,
+                backgroundColor: '#1a73e8', // Primary Blue
+                borderRadius: 4,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { precision: 0 }
+                },
+                x: {
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+}
+
+function renderAttributeChart(data) {
+    const ctx = document.getElementById('attributeChart');
+    if (!ctx) return;
+
+    // Aggregate by currentIndustryQuestion
+    const counts = {};
+    data.forEach(item => {
+        const detail = item.details?.find(d => d.question === currentIndustryQuestion);
+        let answer = detail?.answer;
+
+        if (Array.isArray(answer)) {
+            answer.forEach(a => {
+                const label = a || '未回答';
+                counts[label] = (counts[label] || 0) + 1;
+            });
+        } else {
+            const label = answer || '未回答';
+            counts[label] = (counts[label] || 0) + 1;
+        }
+    });
+
+    // Sort by count desc
+    const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    const labels = sorted.map(s => s[0]);
+    const values = sorted.map(s => s[1]);
+
+    if (attributeChart) {
+        attributeChart.destroy();
+    }
+
+    // Colors
+    const palette = ['#1a73e8', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800', '#ff5722', '#795548', '#9e9e9e', '#607d8b'];
+
+    attributeChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: values,
+                backgroundColor: palette.slice(0, labels.length),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '60%',
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: { boxWidth: 12, font: { size: 11 } }
+                }
+            }
+        }
+    });
+}
+
+
+function setupSidebarToggle() {
+    const sidebar = document.getElementById('right-sidebar');
+    const toggleBtn = document.getElementById('right-sidebar-toggle-btn');
+    const icon = toggleBtn?.querySelector('.material-icons');
+    const mainContentWrapper = document.getElementById('main-content-wrapper');
+
+    if (!sidebar || !toggleBtn || !icon || !mainContentWrapper) return;
+
+    toggleBtn.addEventListener('click', () => {
+        // We check if it's currently hidden by translate-x-full
+        const isHidden = sidebar.classList.contains('translate-x-full');
+
+        if (isHidden) {
+            // OPEN
+            sidebar.classList.remove('translate-x-full', 'shadow-none');
+            sidebar.classList.add('translate-x-0');
+            // Add shadow if you like, or rely on border
+
+            // Push content
+            mainContentWrapper.classList.add('lg:mr-80');
+
+            // Icon
+            icon.textContent = 'chevron_right';
+        } else {
+            // CLOSE
+            sidebar.classList.remove('translate-x-0');
+            sidebar.classList.add('translate-x-full', 'shadow-none');
+
+            // Remove margin from content (expand)
+            mainContentWrapper.classList.remove('lg:mr-80');
+
+            // Icon
+            icon.textContent = 'chevron_left';
+        }
+    });
+
+    // Responsive Check: Auto-collapse if screen is too narrow
+    // If window width < 1280px, assume sidebar might cover content, so collapse by default.
+    // Default in HTML is OPEN (translate-x-0, lg:mr-80).
+    if (window.innerWidth < 1280) {
+        // CLOSE
+        sidebar.classList.remove('translate-x-0');
+        sidebar.classList.add('translate-x-full', 'shadow-none');
+        mainContentWrapper.classList.remove('lg:mr-80');
+        icon.textContent = 'chevron_left';
+    }
+}
+
 export async function initializePage() {
+    renderTableSkeleton(); // Show skeleton immediately
     try {
         initBreadcrumbs();
         const urlParams = new URLSearchParams(window.location.search);
@@ -893,9 +1134,9 @@ export async function initializePage() {
                 businessCard: businessCard
             };
         });
-        
+
         if (answersArr.length === 0) {
-             console.warn(`アンケートID「${surveyId}」に対する回答データが見つかりませんでした。`);
+            console.warn(`アンケートID「${surveyId}」に対する回答データが見つかりませんでした。`);
         }
 
 
@@ -921,7 +1162,9 @@ export async function initializePage() {
         populateQuestionSelector(allCombinedData);
         updateAnswerFilterAvailability();
         displayPage(1, allCombinedData);
+        renderDashboard(allCombinedData);
         setupEventListeners();
+        setupSidebarToggle();
         updateSortIcons();
 
     } catch (error) {
