@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speed Ad プレミアムプランのご案内</title>
+
+    <link rel="icon" href="assets/svg/speedad_logo.svg" type="image/svg+xml">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Material Icons CDN -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="service-top-style.css">
+    <!-- First Login Tutorial CSS -->
+    <link rel="stylesheet" href="./src/first-login-tutorial.css">
+    <!-- First Login Tutorial Script -->
+    <!-- flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <!-- Tippy.js CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css" />
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/themes/material.css">
+    <!-- Custom Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link as="style"
+        href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900"
+        onload="this.rel='stylesheet'" rel="stylesheet">
+
+    <!-- このページ専用のスタイルシート (必ず最後に読み込む) -->
+    <link rel="stylesheet" href="premium_signup.css">
+</head>
+
+<body class="bg-background text-on-background">
+
+    <!-- 1. アプリケーション全体構造 -->
+    <div class="relative flex min-h-screen flex-col overflow-x-hidden">
+
+
+
+        <!-- 2. ヘッダー (main.jsによって読み込まれる) -->
+        <div id="header-placeholder"></div>
+
+        <div class="flex flex-1 pt-16 bg-background">
+
+
+            <!-- 4. メインコンテンツ -->
+            <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
+                <div class="flex flex-col w-full max-w-6xl mx-auto flex-1">
+
+                    <!-- ファーストビュー・セクション -->
+                    <header class="hero-section rounded-xl mb-8 text-center relative overflow-hidden">
+                        <!-- Aurora Background Blobs -->
+                        <div class="hero-bg-blob blob-1"></div>
+                        <div class="hero-bg-blob blob-2"></div>
+                        <div class="hero-bg-blob blob-3"></div>
+
+                        <!-- Glass Content Panel -->
+                        <div class="hero-glass-panel relative z-10 mx-auto max-w-4xl">
+                            <h1
+                                class="text-white text-3xl md:text-4xl font-bold leading-tight tracking-tight drop-shadow-md">
+                                展示会リードを、その日のうちに商談へ。</h1>
+                            <p class="text-white text-lg md:text-xl mt-4 max-w-3xl mx-auto drop-shadow-sm opacity-90">
+                                名刺情報のデータ化からお礼メール配信まで、最速当日完了。<br>もう、「入力待ち」でお客様を待たせません。</p>
+                            <div class="mt-8">
+                                <a href="#" class="cta-button shadow-lg">今すぐプレミアムプランを始める</a>
+                            </div>
+                        </div>
+                    </header>
+
+                    <!-- サービスご利用の流れ紹介セクション -->
+                    <section class="bg-surface rounded-xl shadow-soft p-8 md:p-12 mb-8">
+                        <h2 class="text-on-surface">ご利用の流れ</h2>
+                        <div class="flow-steps-container">
+                            <!-- Step 1 -->
+                            <div class="flow-step-card">
+                                <div class="step-number">Step 1</div>
+                                <div class="step-icon-wrapper">
+                                    <span class="material-icons">qr_code_2</span>
+                                </div>
+                                <h3>アンケート作成</h3>
+                                <p>「名刺アップロード機能」付きのアンケートを作成。イベント会場などでQRコードを提示するだけ。</p>
+                            </div>
+
+                            <!-- Step 2 -->
+                            <div class="flow-step-card">
+                                <div class="step-number">Step 2</div>
+                                <div class="step-icon-wrapper">
+                                    <span class="material-icons">add_a_photo</span>
+                                </div>
+                                <h3>名刺画像を収集</h3>
+                                <p>お客様がアンケート回答の流れで名刺を撮影・アップロード。自動で名刺画像が集まります。</p>
+                            </div>
+
+                            <!-- Step 3 -->
+                            <div class="flow-step-card">
+                                <div class="step-number">Step 3</div>
+                                <div class="step-icon-wrapper">
+                                    <span class="material-icons">keyboard</span>
+                                </div>
+                                <h3>プロがデータ化</h3>
+                                <p>アップロードされた画像を、弊社オペレーターが正確にテキストデータ化。最短当日中に納品します。</p>
+                            </div>
+
+                            <!-- Step 4 -->
+                            <div class="flow-step-card">
+                                <div class="step-number">Step 4</div>
+                                <div class="step-icon-wrapper">
+                                    <span class="material-icons">insights</span>
+                                </div>
+                                <h3>すぐに活用</h3>
+                                <p>アンケート回答と紐付いた顧客情報がダッシュボードに蓄積。いつでも活用可能です。</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- プラン比較セクション -->
+                    <section id="plan-comparison" class="bg-transparent p-0 border-none shadow-none mb-8">
+                        <h2 class="text-on-surface">貴社の課題を解決するプランはどちらですか？</h2>
+                        <div class="plan-comparison-cards">
+                            <!-- Standard Plan Card -->
+                            <div class="plan-card">
+                                <div class="plan-header">
+                                    <h3>Standard</h3>
+                                    <p class="plan-price">Free</p>
+                                    <p class="plan-description">まずは基本的な機能をお試し</p>
+                                </div>
+                                <ul class="plan-features">
+                                    <li><span class="material-icons">done</span>基本項目のデータ化</li>
+                                    <li><span class="material-icons">done</span>データ保存期間 (30日間)</li>
+                                    <li><span class="material-icons">done</span>メールサポート</li>
+                                    <li class="dimmed"><span class="material-icons">close</span>ロゴ非表示</li>
+                                    <li class="dimmed"><span class="material-icons">close</span>専任担当者サポート</li>
+                                    <li class="dimmed"><span class="material-icons">close</span>オンデマンド納期</li>
+                                    <li class="dimmed"><span class="material-icons">close</span>手書きメモのデータ化</li>
+                                </ul>
+                                <a href="#" class="cta-button secondary" style="margin-top: auto;">現在のプラン</a>
+                            </div>
+                            <!-- Premium Plan Card (Recommended) -->
+                            <div class="plan-card recommended">
+                                <div class="plan-badge">おすすめ</div>
+                                <div class="plan-header">
+                                    <h3>Premium</h3>
+                                    <p class="plan-price">お問い合わせ</p>
+                                    <p class="plan-description">ビジネスを加速させる全ての機能</p>
+                                </div>
+                                <ul class="plan-features">
+                                    <li><span class="material-icons">done</span><strong>名刺の全項目</strong>をデータ化</li>
+                                    <li><span class="material-icons">done</span><strong>無期限</strong>のデータ保存</li>
+                                    <li><span class="material-icons">done</span><strong>専任担当者</strong>による手厚いサポート</li>
+                                    <li><span class="material-icons">done</span>ロゴ非表示 / 自社ロゴ設定</li>
+                                    <li><span class="material-icons">done</span>オンデマンド納期 (オプション)</li>
+                                    <li><span class="material-icons">done</span>手書きメモのデータ化 (オプション)</li>
+                                    <li><span class="material-icons">done</span>分析グラフのダウンロード</li>
+                                    <li><span class="material-icons">done</span>外部連携 (SFA, CRM)</li>
+                                </ul>
+                                <a href="#" class="cta-button">プランをアップグレード</a>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- (他のセクションも同様に更新) -->
+                    <section id="pricing" class="bg-surface rounded-xl shadow-soft p-8 md:p-12 mb-8">
+                        <h2 class="text-on-surface">料金プラン</h2>
+                        <div class="pricing-card">
+                            <h3>Premiumプラン</h3>
+                            <div class="pricing-card__price">プレミアム料金：<a href="#"
+                                    onclick="handleOpenModal('contactModal', 'modals/contactModal.html'); return false;"
+                                    class="text-primary hover:underline">お問い合わせください</a></div>
+                            <p class="text-on-surface-variant">貴社の規模やご利用状況に合わせた最適なプランをご提案します。</p>
+                        </div>
+                    </section>
+                    <section id="testimonials" class="bg-surface rounded-xl shadow-soft p-8 md:p-12 mb-8">
+                        <h2 class="text-on-surface text-center mb-8">導入企業様の声</h2>
+                        <!-- 横スクロール可能なカードコンテナ -->
+                        <div class="testimonial-scroll-container">
+                            <!-- Review Card 1 -->
+                            <div
+                                class="testimonial-card bg-background-variant p-6 rounded-lg border border-outline-variant">
+                                <div class="flex items-center mb-4">
+                                    <span class="material-icons text-primary mr-2">business</span>
+                                    <h3 class="font-bold text-on-surface">株式会社〇〇 様</h3>
+                                </div>
+                                <div class="space-y-2 text-sm">
+                                    <p><span class="font-bold text-on-surface-variant">課題:</span> イベント後の名刺入力に2週間かかっていた
+                                    </p>
+                                    <p><span class="font-bold text-primary">成果:</span> <span
+                                            class="text-primary font-bold text-lg">リード獲得数が2倍</span>、翌日にはお礼メール配信が可能に。</p>
+                                </div>
+                                <div class="mt-4 pt-4 border-t border-outline-variant">
+                                    <p class="text-on-surface-variant italic text-sm">「後日の入力作業がゼロになったのが革命的です。」</p>
+                                    <p class="text-right text-xs text-on-surface-variant mt-1">- マーケティング部長</p>
+                                </div>
+                            </div>
+
+                            <!-- Review Card 2 -->
+                            <div
+                                class="testimonial-card bg-background-variant p-6 rounded-lg border border-outline-variant">
+                                <div class="flex items-center mb-4">
+                                    <span class="material-icons text-primary mr-2">business</span>
+                                    <h3 class="font-bold text-on-surface">△△コンサルティング合同会社 様</h3>
+                                </div>
+                                <div class="space-y-2 text-sm">
+                                    <p><span class="font-bold text-on-surface-variant">課題:</span> 即日フォローができず機会損失が発生</p>
+                                    <p><span class="font-bold text-primary">成果:</span> 当日納品で<span
+                                            class="text-primary font-bold text-lg">商談化率が15%向上</span>。</p>
+                                </div>
+                                <div class="mt-4 pt-4 border-t border-outline-variant">
+                                    <p class="text-on-surface-variant italic text-sm">「お客様からの反応も明らかに速くなりましたね。」</p>
+                                    <p class="text-right text-xs text-on-surface-variant mt-1">- 営業企画担当</p>
+                                </div>
+                            </div>
+
+                            <!-- Review Card 3 (新規追加) -->
+                            <div
+                                class="testimonial-card bg-background-variant p-6 rounded-lg border border-outline-variant">
+                                <div class="flex items-center mb-4">
+                                    <span class="material-icons text-primary mr-2">school</span>
+                                    <h3 class="font-bold text-on-surface">国立◯◯大学 様</h3>
+                                </div>
+                                <div class="space-y-2 text-sm">
+                                    <p><span class="font-bold text-on-surface-variant">課題:</span>
+                                        オープンキャンパスでの来場者アンケート集計に時間がかかっていた</p>
+                                    <p><span class="font-bold text-primary">成果:</span> <span
+                                            class="text-primary font-bold text-lg">アンケート回収率が80%超え</span>、即座にデータ分析が可能に。
+                                    </p>
+                                </div>
+                                <div class="mt-4 pt-4 border-outline-variant">
+                                    <p class="text-on-surface-variant italic text-sm">
+                                        「直感的なアンケート作成機能で、学生スタッフでもすぐに使いこなせました。リアルタイムでの集計機能が特に素晴らしいです。」</p>
+                                    <p class="text-right text-xs text-on-surface-variant mt-1">- 広報担当</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Company Link Area -->
+                        <div class="mt-8 text-center border-t border-outline-variant pt-6">
+                            <p class="text-sm text-on-surface-variant mb-4">より詳細な導入事例や、弊社の企業情報は公式HPをご覧ください。</p>
+                            <a href="#"
+                                class="inline-flex items-center justify-center px-6 py-2 border border-outline text-on-surface bg-transparent hover:bg-surface-variant rounded-full transition-colors duration-200">
+                                公式ホームページへ
+                                <span class="material-icons text-sm ml-2">open_in_new</span>
+                            </a>
+                        </div>
+                    </section>
+                    <section id="faq" class="faq-section bg-surface rounded-xl shadow-soft p-8 md:p-12 mb-8">
+                        <h2 class="text-on-surface">よくある質問</h2>
+                        <details>
+                            <summary>Q. 来場者は専用アプリのインストールなど必要ですか？</summary>
+                            <p>いいえ、一切不要です。来場者はご自身のスマートフォンのブラウザだけで、アンケート回答から名刺の撮影・アップロードまで全て完結できます。</p>
+                        </details>
+                        <details>
+                            <summary>Q. 撮影された名刺の画像の精度が低い場合、どうなりますか？</summary>
+                            <p>撮影時にプレビュー画面で画像の鮮明さをご確認いただけます。不鮮明な場合は撮り直しが可能です。送信後は、オペレーターが目視で確認しながらデータ化を行いますので、多少の不鮮明さがあっても正確にデータ化いたします。万が一判別が出来ない場合には〓(ゲタ)に置き換える可能性もございます。
+                            </p>
+                        </details>
+                        <details>
+                            <summary>Q. 納期はどのくらいですか？</summary>
+                            <p>通常プランでは、最大6営業日以内にデータ化を行っております。オプション料金をご利用いただくことで、当日中の納品も可能です。</p>
+                        </details>
+                        <details>
+                            <summary>Q. セキュリティ体制について教えてください。</summary>
+                            <p>弊社はプライバシーマークを取得しており、お客様からお預かりした情報は最高水準のセキュリティ環境で厳重に管理しております。</p>
+                        </details>
+                        <p class="text-center mt-8 text-sm text-on-surface-variant">その他のご質問は<a href="faq.html"
+                                target="_blank" class="text-primary hover:underline">こちら</a>をご覧ください。</p>
+                    </section>
+                    <footer id="cta" class="bg-surface rounded-xl shadow-soft p-8 md:p-12 text-center">
+                        <h2 class="text-on-surface text-2xl md:text-3xl font-bold">名刺管理に使っていた時間を、<br>未来の戦略を練る時間に。</h2>
+                        <div class="mt-8">
+                            <a href="#" class="cta-button">プレミアムプランに申し込む</a>
+                        </div>
+                    </footer>
+                </div>
+            </main>
+        </div>
+
+        <!-- 5. フッター (main.jsによって読み込まれる) -->
+        <div id="footer-placeholder"></div>
+
+    </div>
+
+    <!-- ログイン/新規登録モーダル -->
+    <div id="auth-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close-button">&times;</button>
+            <div class="tab-navigation">
+                <button class="tab-button active" data-tab="login">ログイン</button>
+                <button class="tab-button" data-tab="register">新規登録</button>
+            </div>
+            <div id="login-form-tab" class="tab-content active">
+                <h2>ログイン</h2>
+                <form>
+                    <div class="form-group">
+                        <label for="login-email">メールアドレス</label>
+                        <input type="email" id="login-email" class="input-field" placeholder="your@example.com"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">パスワード</label>
+                        <input type="password" id="login-password" class="input-field" placeholder="パスワード" required>
+                    </div>
+                    <button type="submit" class="cta-button">ログイン</button>
+                    <a href="#" class="forgot-password">パスワードをお忘れですか？</a>
+                </form>
+            </div>
+            <div id="register-form-tab" class="tab-content">
+                <h2>新規登録</h2>
+                <form>
+                    <div class="form-group">
+                        <label for="register-name">会社名（任意）</label>
+                        <input type="text" id="register-name" class="input-field" placeholder="株式会社〇〇">
+                    </div>
+                    <div class="form-group">
+                        <label for="register-email">メールアドレス</label>
+                        <input type="email" id="register-email" class="input-field" placeholder="your@example.com"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">パスワード</label>
+                        <input type="password" id="register-password" class="input-field" placeholder="パスワード (8文字以上)"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password-confirm">パスワード確認</label>
+                        <input type="password" id="register-password-confirm" class="input-field"
+                            placeholder="パスワードを再入力" required>
+                    </div>
+                    <button type="submit" class="cta-button">新規登録</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- JSファイル -->
+    <script type="module" src="src/main.js"></script>
+    <script src="premium_signup.js"></script>
+
+</body>
+
+</html>

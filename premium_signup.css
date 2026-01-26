@@ -1,0 +1,283 @@
+/*
+ * premium_signup.css
+ * Modern, clean, and conversion-focused stylesheet.
+ * Inspired by leading SaaS pricing pages.
+ */
+
+/* --- Base & Typography --- */
+body {
+    font-family: "Noto Sans JP", "Inter", sans-serif;
+    line-height: 1.7;
+    background-color: var(--color-base-background-sub); /* Slightly off-white background for a softer look */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+    max-width: 1024px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+header, section, footer {
+    background-color: var(--color-base-card);
+    margin-bottom: 2.5rem;
+    padding: 3rem;
+    border-radius: 16px; /* Larger radius for a modern feel */
+    border: 1px solid var(--color-base-border-divider);
+    box-shadow: none; /* Reset shadow, will apply card-specific shadows */
+    transition: all 0.3s ease;
+}
+
+h1 {
+    font-size: clamp(2.5rem, 5vw, 3.5rem); /* Responsive font size */
+    font-weight: 800;
+    color: var(--color-text-main);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+}
+
+h2 {
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-weight: 700;
+    color: var(--color-text-main);
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--color-base-border-divider);
+}
+
+.subtitle {
+    font-size: 1.25rem;
+    color: var(--color-text-sub);
+    margin-top: 1rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* --- CTA Button --- */
+.cta-button {
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    background-color: var(--color-button-primary-bg);
+    color: var(--color-button-primary-text);
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 4px 15px rgba(var(--color-input-border-focus-rgb, 66, 133, 244), 0.2);
+}
+.cta-button:hover {
+    background-color: var(--color-button-primary-hover-bg);
+    transform: translateY(-3px);
+    box-shadow: 0 7px 20px rgba(var(--color-input-border-focus-rgb, 66, 133, 244), 0.3);
+}
+
+/* --- Flow Steps --- */
+.flow-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+}
+.flow-step {
+    text-align: center;
+}
+.flow-step h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin-bottom: 0.75rem;
+}
+.flow-step p {
+    font-size: 0.9rem;
+    color: var(--color-text-sub);
+}
+
+/* --- Plan Comparison Table --- */
+.plan-table-wrapper {
+    overflow-x: auto;
+    padding-bottom: 1rem;
+}
+.plan-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 2rem;
+    border: 1px solid var(--color-base-border-divider);
+    border-radius: 12px;
+    overflow: hidden;
+    font-size: 0.95rem;
+}
+.plan-table th, .plan-table td {
+    padding: 1.25rem;
+    text-align: left;
+    border-bottom: 1px solid var(--color-base-border-divider);
+}
+.plan-table th {
+    background-color: var(--color-base-background-sub);
+    font-weight: 600;
+    color: var(--color-text-sub);
+}
+.plan-table td {
+    color: var(--color-text-main);
+}
+.plan-table tbody tr:last-child td {
+    border-bottom: none;
+}
+.plan-table .premium-col {
+    background-color: #F8FBFF; /* A very light blue tint */
+}
+body.dark-mode .plan-table .premium-col {
+    background-color: rgba(var(--color-input-border-focus-rgb), 0.05);
+}
+.check-mark {
+    color: var(--color-state-success);
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+/* --- Pricing Plan --- */
+.pricing-plan {
+    border: 1px solid var(--color-base-border-divider);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+}
+.pricing-plan .price {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: var(--color-primary);
+    margin: 0.5rem 0;
+}
+.simulator-box {
+    background-color: var(--color-base-background-sub);
+    padding: 2rem;
+    margin-top: 2rem;
+    border-radius: 8px;
+}
+.simulator-box input {
+    padding: 0.75rem 1rem;
+    width: 80%;
+    max-width: 300px;
+    margin-bottom: 1rem;
+    border: 1px solid var(--color-input-border-default);
+    border-radius: 8px;
+    font-size: 1rem;
+}
+.simulator-box input:focus {
+    border-color: var(--color-input-border-focus);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(var(--color-input-border-focus-rgb), 0.2);
+}
+
+/* --- Testimonial --- */
+.testimonial {
+    background-color: transparent;
+    border-left: 4px solid var(--color-primary);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    font-style: italic;
+    color: var(--color-text-sub);
+}
+.testimonial .author {
+    font-style: normal;
+    font-weight: 600;
+    margin-top: 1rem;
+    text-align: right;
+    color: var(--color-text-main);
+}
+
+/* --- FAQ --- */
+details {
+    border: none;
+    border-bottom: 1px solid var(--color-base-border-divider);
+    padding: 1.5rem 0;
+    margin-bottom: 0;
+}
+details:last-of-type {
+    border-bottom: none;
+}
+summary {
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none; /* Remove default marker */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--color-text-main);
+}
+summary::after {
+    content: 'add';
+    font-family: 'Material Icons';
+    font-size: 1.5rem;
+    transition: transform 0.3s ease;
+}
+details[open] summary::after {
+    content: 'remove';
+    transform: rotate(180deg);
+}
+details p {
+    margin-top: 1rem;
+    color: var(--color-text-sub);
+}
+
+/* --- Modal Styles --- */
+.modal-overlay {
+    background-color: var(--color-scrim);
+}
+.modal-content {
+    background-color: var(--color-base-card);
+    padding: 2.5rem;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    position: relative;
+    max-width: 480px;
+    width: 90%;
+    text-align: center;
+}
+.modal-close-button {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.8rem;
+    color: var(--color-text-disabled);
+    background: none;
+    border: none;
+    cursor: pointer;
+    line-height: 1;
+}
+.tab-navigation {
+    border-bottom: 1px solid var(--color-base-border-divider);
+    margin-bottom: 1.5rem;
+}
+.tab-button.active {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
+}
+.form-group label {
+    color: var(--color-text-sub);
+    font-weight: 500;
+}
+.form-group input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--color-input-border-default);
+    border-radius: 8px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+.form-group input:focus {
+    border-color: var(--color-input-border-focus);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(var(--color-input-border-focus-rgb), 0.2);
+}
+.tab-content .cta-button {
+    width: 100%;
+    margin-top: 1.5rem;
+}
+.forgot-password {
+    color: var(--color-primary);
+}

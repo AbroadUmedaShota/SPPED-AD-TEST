@@ -79,6 +79,7 @@ export function toggleMobileSidebar() {
  * @param {boolean} isPcScreen - True if the screen matches the PC media query.
  */
 function handlePcSidebarBehavior(isPcScreen) {
+    if (!sidebar) return;
     if (isPcScreen) {
         sidebar.onmouseenter = () => document.body.classList.add('sidebar-hovered');
         sidebar.onmouseleave = () => document.body.classList.remove('sidebar-hovered');
@@ -94,6 +95,7 @@ function handlePcSidebarBehavior(isPcScreen) {
  * Now exported and callable without an event.
  */
 export function adjustLayout() {
+    if (!sidebar) return;
     const isPcScreen = MEDIA_QUERY.matches;
     handlePcSidebarBehavior(isPcScreen);
 
