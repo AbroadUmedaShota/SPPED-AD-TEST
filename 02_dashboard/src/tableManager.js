@@ -234,7 +234,15 @@ function renderTableRows(surveysToRender) {
 
     surveysToRender.forEach(survey => {
         const row = document.createElement('tr');
-        row.className = 'cursor-pointer hover:bg-surface-variant transition-colors';
+        let premiumClass = '';
+        let premiumBadge = '';
+
+        if (survey.plan === 'Premium') {
+            premiumClass = 'bg-amber-50 hover:bg-amber-100';
+            premiumBadge = `<span class="mr-2 material-icons text-amber-500" title="プレミアムプラン">workspace_premium</span>`;
+        }
+
+        row.className = `cursor-pointer transition-colors ${premiumClass ? premiumClass : 'hover:bg-surface-variant'}`;
         row.dataset.id = survey.id;
         const surveyName = (survey.name && typeof survey.name === 'object') ? survey.name[lang] || survey.name.ja : survey.name;
         row.dataset.name = surveyName;
@@ -268,7 +276,7 @@ function renderTableRows(surveysToRender) {
                 ${survey.id}
             </td>
             <td data-label="アンケート名" class="px-4 py-3 text-on-surface text-sm font-medium" data-sort-value="${surveyName}">
-                ${surveyName}
+                <div class="flex items-center">${premiumBadge}${surveyName}</div>
             </td>
             <td data-label="ステータス" class="px-4 py-3" data-sort-value="${displayStatus}">
                 <span class="inline-flex items-center rounded-full text-xs px-2 py-1 whitespace-nowrap w-auto ${statusColorClass}" title="${statusTitle}">${displayStatus}</span>
