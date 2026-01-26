@@ -21,12 +21,14 @@ const NAV_ITEMS = [
     { id: 'logout', href: '#', icon: 'logout', label: 'ログアウト', preventAutoClose: true }
 ];
 
+const SUPPORT_ITEM = { id: 'support', href: 'help-center.html', icon: 'help_outline', label: 'サポート' };
+
 const MEDIA_QUERY = window.matchMedia('(min-width: 1024px)');
 const SELECTED_GROUP_STORAGE_KEY = 'dashboard.selectedGroupId';
 
 // --- DOM Elements ---
 
-let sidebar, mobileSidebarOverlay, sidebarToggleMobile, userSelect, navContainer, currentGroupLabel;
+let sidebar, mobileSidebarOverlay, sidebarToggleMobile, userSelect, navContainer, supportContainer, currentGroupLabel;
 
 // --- State ---
 
@@ -48,6 +50,7 @@ function cacheDOMElements() {
     sidebarToggleMobile = document.getElementById('sidebarToggleMobile');
     userSelect = document.getElementById('user_select');
     navContainer = document.getElementById('sidebar-nav');
+    supportContainer = document.getElementById('sidebar-support');
     currentGroupLabel = document.getElementById('currentGroupLabel');
 }
 
@@ -151,6 +154,24 @@ function populateNav() {
 
         navContainer.appendChild(link);
     });
+}
+
+function populateSupportLink() {
+    if (!supportContainer) return;
+    supportContainer.innerHTML = '';
+
+    const link = document.createElement('a');
+    link.href = SUPPORT_ITEM.href;
+    link.className = 'flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors';
+    link.setAttribute('aria-label', SUPPORT_ITEM.label);
+    link.id = `${SUPPORT_ITEM.id}Button`;
+
+    link.innerHTML = `
+        <span class="material-icons text-xl">${SUPPORT_ITEM.icon}</span>
+        <span class="sidebar-nav-label whitespace-nowrap">${SUPPORT_ITEM.label}</span>
+    `;
+
+    supportContainer.appendChild(link);
 }
 
 function handleGroupChange(selectedId) {
@@ -339,6 +360,7 @@ export function initSidebarHandler() {
     }
 
     populateNav();
+    populateSupportLink();
     populateGroupSelect();
     attachEventListeners();
     
