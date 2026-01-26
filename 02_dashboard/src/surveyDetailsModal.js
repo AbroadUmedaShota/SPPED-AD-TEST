@@ -293,7 +293,15 @@ export function populateSurveyDetails(survey) {
 
     // Populate view fields
     detail_surveyId_view.textContent = survey.id;
-    detail_plan_view.textContent = survey.plan || 'N/A';
+    if (survey.plan === 'Premium') {
+        detail_plan_view.className = 'text-on-surface text-base view-mode flex items-center gap-2 font-semibold text-amber-700';
+        detail_plan_view.innerHTML = `
+            <span class="material-icons text-xl">workspace_premium</span>
+            <span>Premium</span>`;
+    } else {
+        detail_plan_view.className = 'text-on-surface text-base view-mode'; // Reset to default if not premium
+        detail_plan_view.textContent = survey.plan || 'N/A';
+    }
     detail_surveyNameInternal_view.textContent = surveyName;
     detail_displayTitle_view.textContent = displayTitle || 'なし';
     detail_surveyMemo_view.textContent = survey.memo || description || 'なし';
