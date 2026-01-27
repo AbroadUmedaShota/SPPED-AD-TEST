@@ -901,15 +901,47 @@ function renderTimeSeriesChart(data) {
     const ctx = document.getElementById('timeSeriesChart');
     if (!ctx) return;
 
-    // Aggregate by hour (0-23)
-    const hours = Array(24).fill(0);
+    if (!data || data.length === 0) {
+        if (timeSeriesChart) {
+            timeSeriesChart.destroy();
+            timeSeriesChart = null;
+        }
+        return;
+    }
 
-    data.forEach(item => {
-        if (!item.answeredAt) return;
+    // 1. Find min and max hours from data
+    const hourIndices = data.map(item => {
+        if (!item.answeredAt) return null;
         const d = new Date(item.answeredAt);
-        if (isNaN(d.getTime())) return;
-        const h = d.getHours();
-        hours[h]++;
+        if (isNaN(d.getTime())) return null;
+        return d.getHours();
+    }).filter(h => h !== null);
+
+    if (hourIndices.length === 0) {
+        if (timeSeriesChart) {
+            timeSeriesChart.destroy();
+            timeSeriesChart = null;
+        }
+        return;
+    }
+
+    const minHour = Math.min(...hourIndices);
+    const maxHour = Math.max(...hourIndices);
+
+    // Range: from minHour to maxHour + 1
+    const startHour = minHour;
+    const endHour = maxHour + 1; // +1 to include the end interval visually or as user requested
+    const length = endHour - startHour + 1;
+
+    // 2. Aggregate counts for the dynamic range
+    const counts = Array(length).fill(0);
+    const labels = Array.from({ length: length }, (_, i) => `${startHour + i}:00`);
+
+    hourIndices.forEach(h => {
+        const index = h - startHour;
+        if (index >= 0 && index < length) {
+            counts[index]++;
+        }
     });
 
     if (timeSeriesChart) {
@@ -917,14 +949,18 @@ function renderTimeSeriesChart(data) {
     }
 
     timeSeriesChart = new Chart(ctx, {
-        type: 'bar',
+        type: 'line', // Changed to Line Chart
         data: {
-            labels: Array.from({ length: 24 }, (_, i) => `${i}:00`),
+            labels: labels,
             datasets: [{
                 label: '回答数',
-                data: hours,
-                backgroundColor: '#1a73e8', // Primary Blue
-                borderRadius: 4,
+                data: counts,
+                borderColor: '#1a73e8', // Primary Blue Line
+                backgroundColor: 'rgba(26, 115, 232, 0.1)', // Light blue fill
+                fill: true, // Fill area under the line
+                tension: 0.4, // Smooth curves
+                pointRadius: 4,
+                pointHoverRadius: 6
             }]
         },
         options: {
@@ -940,7 +976,8 @@ function renderTimeSeriesChart(data) {
             scales: {
                 y: {
                     beginAtZero: true,
-                    ticks: { precision: 0 }
+                    ticks: { precision: 0 },
+                    grid: { borderDash: [2, 4] }
                 },
                 x: {
                     grid: { display: false }

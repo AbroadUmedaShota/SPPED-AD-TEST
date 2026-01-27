@@ -5,7 +5,7 @@ import os
 
 # Configuration
 TARGET_FILE = os.path.join("docs", "examples", "demo_answers", "sv_0001_25060.json")
-TARGET_COUNT = 100
+TARGET_COUNT = 500
 SURVEY_ID = "sv_0001_25060"
 START_DATE = datetime.datetime(2025, 11, 1, 9, 0, 0)
 END_DATE = datetime.datetime(2025, 11, 30, 18, 0, 0)
