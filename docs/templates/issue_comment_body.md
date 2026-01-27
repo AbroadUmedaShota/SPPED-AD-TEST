@@ -1,32 +1,38 @@
 ### Implementation Proposal
 
-To resolve this Issue, I will proceed with the implementation according to the following plan.
+本Issueを解決するため、以下の計画で実装を進めます。
 
-#### 1. **Pre-investigation Summary**
-`speed-review.html` の回答詳細モーダルにおいて、フッター部分に「名刺画像」ボタンが表示されています。
-調査の結果、`02_dashboard/src/speed-review.js` 内の `updateModalFooter` 関数でこのボタンが動的に追加されており、同ファイル内のイベントリスナーでクリック処理が行われていることが分かりました。
+#### 1. **事前調査のまとめ**
+- 現在、`docs/examples/demo_answers/sv_0001_25060.json` には2件の回答データしかありません。
+- SPEED Review画面の「時間帯別推移」などのグラフ機能を検証するためには、より多くのデータと分散された回答日時が必要です。
+- 手動での作成は非効率であるため、Pythonスクリプトを使用してデータを生成します。
 
-**Files to be changed:**
-- `02_dashboard/src/speed-review.js`
+**変更対象ファイル:**
+- `docs/examples/demo_answers/sv_0001_25060.json`
+- (新規作成) `tools/generate_dummy_answers.py` (データ生成用スクリプト)
 
-#### 2. **Contribution to Project Goals**
-不要なボタンを削除することでUIをシンプルにし、ユーザーが主要なアクション（編集・保存）に集中できるように改善します。
+#### 2. **プロジェクト目標への貢献**
+- SPEED Review画面（分析機能）の検証精度を向上させ、開発およびテストの効率を高めます。
+- バグの早期発見（大量データ時の表示崩れやパフォーマンス問題など）に寄与します。
 
-#### 3. **Overview of Changes**
-回答詳細モーダルのフッターから「名刺画像」ボタンを完全に削除し、関連するコードをクリーンアップします。
+#### 3. **変更の概要**
+- Pythonスクリプトを作成し、指定されたアンケートID (`sv_0001_25060`) 向けに100件の回答データを生成します。
+- 生成時は、2025年11月1日から11月30日の間でランダムな日時 (`answeredAt`) を設定します。
+- 回答内容は、既存の選択肢からランダムに、または特定のパターンを維持しつつ生成します。
 
-#### 4. **Specific Work Content for Each File**
-- `02_dashboard/src/speed-review.js`:
-    - `updateModalFooter` 関数内の `footer.innerHTML` 代入箇所から `showCardImagesBtn` ボタンのHTML記述を削除します（通常時および編集時の両方）。
-    - モーダル初期化処理内の `footer.addEventListener` 内にある `showCardImagesBtn` のクリック処理（`else if` ブロック）を削除します。
+#### 4. **各ファイルの具体的な作業内容**
+- `tools/generate_dummy_answers.py`:
+    - 既存のJSONファイルを読み込み、設問構造を解析。
+    - ランダムな日時と回答内容を持つオブジェクトを100件生成。
+    - 生成したデータを `docs/examples/demo_answers/sv_0001_25060.json` に上書き保存するロジックを実装。
+- `docs/examples/demo_answers/sv_0001_25060.json`:
+    - スクリプト実行により、データが100件に増加。
 
-#### 5. **Definition of Done**
-- [x] All necessary code changes have been implemented.
-- [ ] New tests have been added to cover the changes. (N/A for this UI change)
-- [ ] All existing and new tests pass.
-- [ ] The documentation has been updated to reflect the changes.
-- [ ] `WEEKLY_CHANGELOG.md` has been updated with the changes.
-- [ ] The implementation has been manually verified.
+#### 5. **完了の定義 (Definition of Done)**
+- [ ] `sv_0001_25060.json` に100件の回答データが存在する。
+- [ ] 各回答の `answeredAt` が分散されている。
+- [ ] 生成されたJSONファイルが有効なフォーマットである。
+- [ ] `WEEKLY_CHANGELOG.md` に変更を記録する。
 
 ---
-If you approve, please reply to this comment with "Approve".
+承認いただける場合は、本コメントに "Approve" と返信するか、CLIで承認の旨をお伝えください。

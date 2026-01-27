@@ -9,6 +9,9 @@
     - **変更対象ファイル**:
         - `02_dashboard/src/tableManager.js`
         - `02_dashboard/src/surveyDetailsModal.js`
+- **SPEED Review画面用ダミー回答データの増量 (sv_0001_25060)**:
+    - **テストデータの拡充**: SPEEDレビュー画面のグラフ表示検証のため、ID `sv_0001_25060` の回答データを2件から100件に増量し、回答日時を分散させました。
+    - **変更対象ファイル**: `docs/examples/demo_answers/sv_0001_25060.json`
 
 ## 2026-01-26 (月)
 
