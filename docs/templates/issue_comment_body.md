@@ -1,32 +1,28 @@
 ### Implementation Proposal
 
-To resolve this Issue, I will proceed with the implementation according to the following plan.
+本Issueを解決するため、以下の計画で実装を進めます。
 
-#### 1. **Pre-investigation Summary**
-`speed-review.html` の回答詳細モーダルにおいて、フッター部分に「名刺画像」ボタンが表示されています。
-調査の結果、`02_dashboard/src/speed-review.js` 内の `updateModalFooter` 関数でこのボタンが動的に追加されており、同ファイル内のイベントリスナーでクリック処理が行われていることが分かりました。
+#### 1. **事前調査のまとめ**
+- `tools/generate_dummy_answers.py` 内に `TARGET_COUNT = 100` という定数があります。
+- これを `500` に変更し、スクリプトを実行することで目的を達成できます。
 
-**Files to be changed:**
-- `02_dashboard/src/speed-review.js`
+**変更対象ファイル:**
+- `tools/generate_dummy_answers.py`
 
-#### 2. **Contribution to Project Goals**
-不要なボタンを削除することでUIをシンプルにし、ユーザーが主要なアクション（編集・保存）に集中できるように改善します。
+#### 2. **プロジェクト目標への貢献**
+- 開発およびテスト用のデータセットを拡充し、品質向上に寄与します。
 
-#### 3. **Overview of Changes**
-回答詳細モーダルのフッターから「名刺画像」ボタンを完全に削除し、関連するコードをクリーンアップします。
+#### 3. **変更の概要**
+- `TARGET_COUNT` を 500 に変更。
+- スクリプト実行により `docs/examples/demo_answers/sv_0001_25060.json` を更新。
 
-#### 4. **Specific Work Content for Each File**
-- `02_dashboard/src/speed-review.js`:
-    - `updateModalFooter` 関数内の `footer.innerHTML` 代入箇所から `showCardImagesBtn` ボタンのHTML記述を削除します（通常時および編集時の両方）。
-    - モーダル初期化処理内の `footer.addEventListener` 内にある `showCardImagesBtn` のクリック処理（`else if` ブロック）を削除します。
+#### 4. **各ファイルの具体的な作業内容**
+- `tools/generate_dummy_answers.py`:
+    - `TARGET_COUNT = 100` -> `TARGET_COUNT = 500`
 
-#### 5. **Definition of Done**
-- [x] All necessary code changes have been implemented.
-- [ ] New tests have been added to cover the changes. (N/A for this UI change)
-- [ ] All existing and new tests pass.
-- [ ] The documentation has been updated to reflect the changes.
-- [ ] `WEEKLY_CHANGELOG.md` has been updated with the changes.
-- [ ] The implementation has been manually verified.
+#### 5. **完了の定義 (Definition of Done)**
+- [ ] `docs/examples/demo_answers/sv_0001_25060.json` に500件のデータが含まれていること。
+- [ ] `WEEKLY_CHANGELOG.md` に変更を記録する。
 
 ---
-If you approve, please reply to this comment with "Approve".
+承認いただける場合は、本コメントに "Approve" と返信するか、CLIで承認の旨をお伝えください。

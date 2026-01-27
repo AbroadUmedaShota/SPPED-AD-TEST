@@ -99,7 +99,7 @@ const PREMIUM_OPTION_GROUPS = [
             en: 'Add translation entry fields so cards can be processed in Japanese, Traditional/Simplified Chinese, and other languages.'
         },
         unitPrice: 100,
-        unitPriceLabel: { ja: '＋＠100円', en: '+@¥100' },
+
         icon: 'language'
     },
     {
