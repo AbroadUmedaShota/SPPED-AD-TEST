@@ -1124,10 +1124,20 @@ export async function initializePage() {
 
         // 4. Combine answers with personal info and survey definition
         allCombinedData = answersArr.map(answer => {
-            const businessCard = personalInfoMap.get(answer.answerId) || {
-                group2: { lastName: '(情報なし)' },
-                group3: { companyName: '(情報なし)' }
-            };
+            // Priority: 1. Separate file (map), 2. Embedded in answer, 3. Fallback
+            let businessCard = personalInfoMap.get(answer.answerId);
+
+            if (!businessCard && answer.businessCard) {
+                businessCard = answer.businessCard;
+            }
+
+            if (!businessCard) {
+                businessCard = {
+                    group2: { lastName: '(情報なし)' },
+                    group3: { companyName: '(情報なし)' }
+                };
+            }
+
             return {
                 ...answer,
                 survey: currentSurvey,
