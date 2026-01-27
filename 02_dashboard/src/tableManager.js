@@ -239,7 +239,7 @@ function renderTableRows(surveysToRender) {
 
         if (survey.plan === 'Premium') {
             premiumClass = 'bg-amber-50 hover:bg-amber-100';
-            premiumBadge = `<span class="mr-2 material-icons text-amber-500" title="プレミアムプラン">workspace_premium</span>`;
+            premiumBadge = '';
         }
 
         row.className = `cursor-pointer transition-colors ${premiumClass ? premiumClass : 'hover:bg-surface-variant'}`;

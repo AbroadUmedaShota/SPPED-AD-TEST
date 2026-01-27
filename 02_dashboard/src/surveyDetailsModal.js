@@ -296,7 +296,6 @@ export function populateSurveyDetails(survey) {
     if (survey.plan === 'Premium') {
         detail_plan_view.className = 'text-on-surface text-base view-mode flex items-center gap-2 font-semibold text-amber-700';
         detail_plan_view.innerHTML = `
-            <span class="material-icons text-xl">workspace_premium</span>
             <span>Premium</span>`;
     } else {
         detail_plan_view.className = 'text-on-surface text-base view-mode'; // Reset to default if not premium
