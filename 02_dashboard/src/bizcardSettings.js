@@ -100,7 +100,7 @@ export function initBizcardSettings() {
             settingsData.dataConversionSpeed = planConfig?.speedValue || getPlanConfig(DEFAULT_PLAN)?.speedValue || 'normal';
             settingsData.premiumOptions = normalizePremiumOptions(settingsData.premiumOptions);
             const parsedBizcardRequest = parseInt(settingsData.bizcardRequest, 10);
-            settingsData.bizcardRequest = Number.isFinite(parsedBizcardRequest) && parsedBizcardRequest > 0
+            settingsData.bizcardRequest = Number.isFinite(parsedBizcardRequest) && parsedBizcardRequest >= 0
                 ? parsedBizcardRequest
                 : 100;
 
@@ -426,7 +426,7 @@ export function initBizcardSettings() {
         state.settings.premiumOptions = normalizePremiumOptions(state.settings.premiumOptions);
 
         const parsedBizcardRequest = parseInt(state.settings.bizcardRequest, 10);
-        state.settings.bizcardRequest = Number.isFinite(parsedBizcardRequest) && parsedBizcardRequest > 0
+        state.settings.bizcardRequest = Number.isFinite(parsedBizcardRequest) && parsedBizcardRequest >= 0
             ? parsedBizcardRequest
             : 100;
 
@@ -508,25 +508,48 @@ export function initBizcardSettings() {
     function initEstimateSidebarToggle() {
         const sidebar = document.getElementById('estimateSidebar');
         const toggleBtn = document.getElementById('toggleEstimateSidebarBtn');
+        const overlay = document.getElementById('estimateSidebarOverlay');
 
         if (!sidebar || !toggleBtn) {
             return;
         }
 
         const toggleIcon = toggleBtn.querySelector('.material-icons');
+        let hasUserInteracted = false;
 
-        toggleBtn.addEventListener('click', () => {
-            sidebar.classList.toggle('translate-x-full');
-            const isCollapsed = sidebar.classList.contains('translate-x-full');
-
+        const applySidebarState = (isCollapsed) => {
+            if (!toggleIcon) return;
             if (isCollapsed) {
+                sidebar.classList.add('translate-x-full');
                 toggleIcon.textContent = 'chevron_left';
                 toggleBtn.setAttribute('aria-expanded', 'false');
+                if (overlay) overlay.classList.remove('is-visible');
             } else {
+                sidebar.classList.remove('translate-x-full');
                 toggleIcon.textContent = 'chevron_right';
                 toggleBtn.setAttribute('aria-expanded', 'true');
+                if (overlay) overlay.classList.add('is-visible');
             }
+        };
+
+        toggleBtn.addEventListener('click', () => {
+            hasUserInteracted = true;
+            const isCollapsed = sidebar.classList.contains('translate-x-full');
+            applySidebarState(!isCollapsed);
         });
+
+        if (overlay) {
+            overlay.addEventListener('click', () => {
+                hasUserInteracted = true;
+                applySidebarState(true);
+            });
+        }
+
+        applySidebarState(sidebar.classList.contains('translate-x-full'));
+        setTimeout(() => {
+            if (hasUserInteracted) return;
+            applySidebarState(true);
+        }, 800);
     }
 
     function areArraysEqual(a = [], b = []) {

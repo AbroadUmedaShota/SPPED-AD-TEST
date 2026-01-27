@@ -65,7 +65,7 @@ export function setInitialFormValues(settings) {
 
     const planValue = settings.dataConversionPlan || DEFAULT_PLAN;
     const parsedRequest = parseInt(settings.bizcardRequest, 10);
-    const requestCount = Number.isFinite(parsedRequest) && parsedRequest > 0 ? parsedRequest : 100;
+    const requestCount = Number.isFinite(parsedRequest) && parsedRequest >= 0 ? parsedRequest : 100;
 
     dom.bizcardRequestInput.value = requestCount;
     dom.couponCodeInput.value = settings.couponCode || '';
