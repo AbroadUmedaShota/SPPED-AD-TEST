@@ -4,6 +4,7 @@ import { handleOpenModal } from './modalHandler.js';
 import { populateSurveyDetails } from './surveyDetailsModal.js';
 import { openDownloadModal } from './downloadOptionsModal.js';
 import { openDuplicateSurveyModal } from './duplicateSurveyModal.js';
+import { populateQrCodeModal } from './qrCodeModal.js';
 import {
     deriveSurveyStatus,
     deriveSurveyLifecycleMeta,
@@ -326,7 +327,11 @@ function renderTableRows(surveysToRender) {
 
         row.querySelector('button[title="QRコードを表示"]').addEventListener('click', (e) => {
             e.stopPropagation();
-            handleOpenModal('qrCodeModal', resolveDashboardAssetPath('modals/qrCodeModal.html'));
+            handleOpenModal(
+                'qrCodeModal',
+                resolveDashboardAssetPath('modals/qrCodeModal.html'),
+                () => populateQrCodeModal({ surveyId: survey.id })
+            );
         });
 
         row.addEventListener('click', (e) => {
@@ -836,4 +841,3 @@ export function updateSurveyData(updatedSurvey) {
     }
     applyFiltersAndPagination(); // Re-apply filters and pagination to update table
 }
-

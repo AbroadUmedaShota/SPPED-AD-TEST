@@ -105,7 +105,8 @@ sequenceDiagram
 
 1.  **トリガー**: ユーザーがアンケート一覧テーブルのアクション列にある「QRコード」アイコンをクリックする。
 2.  **アクション**: **QRコードモーダル** (`#qrCodeModal`) が表示される。
-3.  モーダルには、該当アンケートの回答ページURL (`https://example.com/survey?id={surveyId}`) と、そのURLから生成されたQRコード画像が表示される。
+3.  モーダルには、該当アンケートの回答ページURL (`https://example.com/survey?surveyId={surveyId}`) と、そのURLから生成されたQRコード画像が表示される。
+    - **モック画面専用**: 現行のモック実装では相対パスの `survey-answer.html?surveyId={surveyId}` を表示し、QRコード画像はプレースホルダーを使用する。
 4.  ユーザーは「URLコピー」ボタンでURLをクリップボードにコピーしたり、「QRコードをダウンロード」ボタンで画像ファイル（`qr_{surveyId}.png`）を保存したりできる。
 
 ### 3.5. グループの切り替え

@@ -1,6 +1,8 @@
 import { showToast, downloadFile, copyTextToClipboard } from './utils.js';
 import { closeModal } from './modalHandler.js';
 
+const DEFAULT_QR_IMAGE_SRC = 'sample_qr.png';
+
 /**
  * Initializes elements specific to the QR Code Modal.
  * This is called after the modal's HTML is loaded into the DOM.
@@ -34,17 +36,45 @@ export function setupQrCodeModalListeners(modalElement) {
         footerCloseBtn.addEventListener('click', () => closeModal('qrCodeModal'));
     }
 
-    // Populate with dummy data for now
-    // In a real application, this would be populated dynamically based on the selected survey
-    surveyUrlInput.textContent = `https://survey.speedad.com/qr/dummy_survey_id`;
-    qrCodeImage.src = `sample_qr.png`; // Assuming sample_qr.png is in the same directory as index.html
+    if (qrCodeImage && !qrCodeImage.src) {
+        qrCodeImage.src = DEFAULT_QR_IMAGE_SRC;
+    }
+}
+
+function buildSurveyQrUrl(surveyId) {
+    if (!surveyId) return '';
+    return `survey-answer.html?surveyId=${surveyId}`;
+}
+
+export function populateQrCodeModal({ surveyId, surveyUrl, qrImageSrc } = {}) {
+    if (!surveyId && !surveyUrl && !qrImageSrc) return;
+
+    const modalElement = document.getElementById('qrCodeModal');
+    if (!modalElement) return;
+
+    const qrCodeImage = modalElement.querySelector('#qrCodeImage');
+    const surveyUrlInput = modalElement.querySelector('#surveyUrlInput');
+    const resolvedUrl = surveyUrl || buildSurveyQrUrl(surveyId);
+
+    if (surveyUrlInput && resolvedUrl) {
+        surveyUrlInput.textContent = resolvedUrl;
+        surveyUrlInput.dataset.surveyId = surveyId || '';
+    }
+
+    if (qrCodeImage) {
+        qrCodeImage.src = qrImageSrc || qrCodeImage.src || DEFAULT_QR_IMAGE_SRC;
+        qrCodeImage.dataset.surveyId = surveyId || '';
+    }
 }
 
 function handleDownloadQrCode() {
     const qrCodeImage = document.getElementById('qrCodeImage');
     if (qrCodeImage && qrCodeImage.src) {
         const imageUrl = qrCodeImage.src;
-        const filename = `qr_code_${new Date().getTime()}.png`; // ユニークなファイル名を生成
+        const surveyId = qrCodeImage.dataset.surveyId;
+        const filename = surveyId
+            ? `qr_${surveyId}.png`
+            : `qr_code_${new Date().getTime()}.png`;
         downloadFile(imageUrl, filename);
         showToast('QRコードのダウンロードを開始しました。', 'success');
     } else {

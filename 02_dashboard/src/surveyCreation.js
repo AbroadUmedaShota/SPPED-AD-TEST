@@ -2,7 +2,7 @@ import { handleOpenModal, closeModal } from './modalHandler.js';
 import { openAccountInfoModal } from './accountInfoModal.js';
 import { initSidebarHandler } from './sidebarHandler.js';
 import { initBreadcrumbs } from './breadcrumb.js';
-import { setupQrCodeModalListeners } from './qrCodeModal.js';
+import { populateQrCodeModal } from './qrCodeModal.js';
 import { initThemeToggle } from './lib/themeToggle.js';
 import { fetchSurveyData, saveSurveyDataToLocalStorage, loadSurveyDataFromLocalStorage } from './services/surveyService.js';
 import {
@@ -16,6 +16,11 @@ import { initializeFab } from './ui/fab.js';
 import { initializeDatepickers } from './ui/datepicker.js';
 import { loadCommonHtml, showToast, resolveDashboardDataPath, resolveDemoDataPath, resolveDashboardAssetPath } from './utils.js';
 import { showConfirmationModal } from './confirmationModal.js';
+import {
+    loadPlanCapabilities,
+    normalizePlanTier,
+    getCapabilitiesForTier
+} from './services/planCapabilityService.js';
 
 // --- Global State ---
 let surveyData = {};
@@ -23,6 +28,11 @@ let currentLang = 'ja';
 let currentSurveyId = null;
 let isDirty = false; // To track unsaved changes
 window.isTutorialActive = false; // Global flag for tutorial state
+let planFeatureState = {
+    allowMultilingual: false,
+    allowBranching: false,
+    maxQuestions: null
+};
 const ADDITIONAL_SETTINGS_CONFIG = [
     { id: 'openBizcardSettingsBtn', path: 'bizcardSettings.html', feature: 'bizcard' },
     { id: 'openThankYouEmailSettingsBtn', path: 'thankYouEmailSettings.html', feature: 'thankYouEmail' },
@@ -401,6 +411,14 @@ function ensureHandwritingMeta(question) {
     return meta.handwritingConfig;
 }
 
+function ensureJumpMeta(question) {
+    const meta = ensureQuestionMeta(question);
+    if (!meta.jump || typeof meta.jump !== 'object') {
+        meta.jump = { targetQuestionId: '' };
+    }
+    return meta.jump;
+}
+
 function pruneQuestionMeta(question, type) {
     if (!question || !question.meta || typeof question.meta !== 'object') return;
     if (type !== 'number_answer' && question.meta.validation) {
@@ -440,6 +458,7 @@ function initializeQuestionMeta(question) {
             meta.maxSelections = question.options?.length || 1;
         }
     }
+    ensureJumpMeta(question);
 }
 
 // --- Language Switcher ---
@@ -699,7 +718,7 @@ window.dummyUserData = {
  */
 function updateAndRenderAll() {
     destroySortables(); // Destroy old instances before re-rendering
-    const allowExtraLanguages = isProPlan(surveyData.plan);
+    const allowExtraLanguages = planFeatureState.allowMultilingual || isProPlan(surveyData.plan);
     if (!allowExtraLanguages) {
         setActiveLanguages([BASE_LANGUAGE]);
         setEditorLanguage(BASE_LANGUAGE);
@@ -711,7 +730,9 @@ function updateAndRenderAll() {
         activeLanguages: getActiveLanguages(),
         editorLanguage: getEditorLanguage(),
         languageMap: LANGUAGE_MAP,
-        allowMultilingual: allowExtraLanguages
+        allowMultilingual: allowExtraLanguages,
+        allowBranching: planFeatureState.allowBranching,
+        jumpTargets: buildJumpTargets(surveyData.questionGroups, currentLang)
     };
 
     const languageSection = document.getElementById('language-settings-section');
@@ -739,7 +760,11 @@ function updateAndRenderAll() {
             qrButton.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                handleOpenModal('qrCodeModal', resolveDashboardAssetPath('modals/qrCodeModal.html'), setupQrCodeModalListeners);
+                handleOpenModal(
+                    'qrCodeModal',
+                    resolveDashboardAssetPath('modals/qrCodeModal.html'),
+                    () => populateQrCodeModal({ surveyId: currentSurveyId })
+                );
             });
             qrButton.dataset.qrModalListenerAttached = 'true';
         }
@@ -771,6 +796,27 @@ function updateAndRenderAll() {
         updateAllPlaceholders();
         updateOutlineActionsState();
     });
+}
+
+function buildJumpTargets(groups = [], lang) {
+    const targets = [];
+    let counter = 1;
+    (groups || []).forEach((group) => {
+        (group.questions || []).forEach((question) => {
+            const labelText = getLocalizedValue(question.text, lang) || `設問${counter}`;
+            targets.push({ id: question.questionId, label: labelText });
+            counter += 1;
+        });
+    });
+    return targets;
+}
+
+function getPlanTier() {
+    return normalizePlanTier(surveyData.plan);
+}
+
+function getQuestionCount() {
+    return (surveyData.questionGroups || []).reduce((sum, group) => sum + (group.questions?.length || 0), 0);
 }
 
 // --- Input Bindings ---
@@ -1329,6 +1375,14 @@ async function initializePage() {
         updateAdditionalSettingsAvailability(); // Also call here to set initial state
         // --- end of bizcard setting initialization ---
 
+        const capabilities = await loadPlanCapabilities();
+        const planCaps = getCapabilitiesForTier(getPlanTier(), capabilities);
+        planFeatureState = {
+            allowMultilingual: planCaps.features?.multilingual?.enabled === true,
+            allowBranching: planCaps.features?.conditionalBranching === true,
+            maxQuestions: typeof planCaps.maxQuestions === 'number' ? planCaps.maxQuestions : null
+        };
+
         updateAndRenderAll();
         restoreAccordionState();
         const fabActions = {
@@ -1551,6 +1605,11 @@ function handleQuestionConfigInput(target) {
         if (field === 'maxSelections') {
             const value = parseInt(target.value, 10);
             meta.maxSelections = !Number.isNaN(value) && value >= 1 ? value : 1;
+        }
+    } else if (configType === 'jump') {
+        const jumpMeta = ensureJumpMeta(question);
+        if (field === 'targetQuestionId') {
+            jumpMeta.targetQuestionId = target.value || '';
         }
     } else {
         return;
@@ -1847,6 +1906,13 @@ function handleDuplicateQuestionGroup(groupId) {
 }
 
 function handleAddNewQuestion(groupId, questionType, creationOptions = {}) {
+    if (planFeatureState.maxQuestions !== null) {
+        const nextCount = getQuestionCount() + 1;
+        if (nextCount > planFeatureState.maxQuestions) {
+            showToast('プランの設問上限に達しています。', 'warning');
+            return;
+        }
+    }
     let targetGroup;
     if (groupId) {
         targetGroup = surveyData.questionGroups.find(g => g.groupId === groupId);
