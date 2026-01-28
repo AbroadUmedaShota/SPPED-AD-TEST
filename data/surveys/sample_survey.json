@@ -5,7 +5,6 @@
   "description": "これはサンプルアンケートの説明です。",
   "periodStart": "2025-08-01",
   "periodEnd": "2025-08-31",
-  "plan": "Standard",
   "deadline": "2025-09-15",
   "memo": "これは日本語用のメモです。",
   "questionGroups": [

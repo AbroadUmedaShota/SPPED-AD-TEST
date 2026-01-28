@@ -15,3 +15,4 @@
 - 既存のプラン比較（クライアント提供資料ドラフト相当）：`docs/references/resources/client-materials/service-plan-comparison.md`
 - 会議メモ（プレミアム機能候補の出所）：`docs/notes/meetings/`
 - 会議メモ（今回）：`docs/notes/meetings/2026-01-24_premium-plan_scope-and-apr-release.txt`
+- 会議メモ（改修方針）：`docs/notes/meetings/2026-01-27_speed-ad_rework_policy_meeting.txt`

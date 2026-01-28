@@ -23,6 +23,7 @@ window.dummyUserData = {
     billingPostalCode: "",
     billingAddress: "",
     billingBuildingFloor: "",
+    plan: "Premium",
 };
 
 /**
