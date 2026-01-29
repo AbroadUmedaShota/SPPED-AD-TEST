@@ -1,4 +1,9 @@
 import { resolveDashboardDataPath } from '../utils.js';
+import {
+    loadPlanCapabilities,
+    normalizePlanTier,
+    getCapabilitiesForTier
+} from './planCapabilityService.js';
 /**
  * アンケートデータをサーバーやファイルから取得します。
  * @returns {Promise<object>} アンケートデータのJSONオブジェクト
@@ -32,7 +37,6 @@ export function collectSurveyDataFromDOM() {
     surveyData.description = document.getElementById('description').value;
     surveyData.periodStart = document.getElementById('periodStart').value;
     surveyData.periodEnd = document.getElementById('periodEnd').value;
-    surveyData.plan = document.getElementById('plan').value;
     surveyData.deadline = document.getElementById('deadline').value;
     surveyData.memo = document.getElementById('memo').value;
 
@@ -106,4 +110,28 @@ export function loadSurveyDataFromLocalStorage() {
         console.error('Error loading survey data from localStorage:', e);
         return null;
     }
+}
+
+/**
+ * プラン制限に対してアンケートの設問数を検証します。
+ * @param {object} surveyData
+ * @param {string} planTier
+ * @returns {Promise<{ok: boolean, limit?: number, count?: number}>}
+ */
+export async function validateSurveyPlanLimits(surveyData, planTier) {
+    const capabilities = await loadPlanCapabilities();
+    const tier = normalizePlanTier(planTier);
+    const planCaps = getCapabilitiesForTier(tier, capabilities);
+    const maxQuestions = planCaps?.maxQuestions;
+
+    if (typeof maxQuestions !== 'number') {
+        return { ok: true };
+    }
+
+    const count = (surveyData?.questionGroups || []).reduce((sum, group) => sum + (group.questions?.length || 0), 0);
+    if (count > maxQuestions) {
+        return { ok: false, limit: maxQuestions, count };
+    }
+
+    return { ok: true, limit: maxQuestions, count };
 }
