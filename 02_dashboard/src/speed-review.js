@@ -10,9 +10,7 @@ let allCombinedData = [];
 let currentPage = 1;
 let rowsPerPage = 25;
 let currentIndustryQuestion = '';
-let currentSearchTerm = '';
 let currentDateFilter = '';
-let currentAnswerFilter = '';
 let datePickerInstance = null;
 let currentItemInModal = null;
 let isModalInEditMode = false;
@@ -37,68 +35,6 @@ function truncateQuestion(questionText) {
     return truncatedText;
 }
 
-function updateAnswerFilterAvailability() {
-    const answerFilterSelect = document.getElementById('answerFilter');
-    if (!answerFilterSelect) return;
-
-    const questionDef = currentSurvey?.details?.find(d => d.text === currentIndustryQuestion);
-    const filterableTypes = ['single_choice', 'multi_choice', 'matrix_single', 'matrix_multi'];
-
-    if (questionDef && filterableTypes.includes(questionDef.type)) {
-        answerFilterSelect.disabled = false;
-        populateAnswerFilterDropdown();
-    } else {
-        answerFilterSelect.innerHTML = '<option value="">(対象外の設問)</option>';
-        answerFilterSelect.disabled = true;
-    }
-}
-
-function populateAnswerFilterDropdown() {
-    const answerFilterSelect = document.getElementById('answerFilter');
-    if (!answerFilterSelect) return;
-
-    const answers = new Set();
-    allCombinedData.forEach(item => {
-        const detail = item.details?.find(d => d.question === currentIndustryQuestion);
-        const answer = detail?.answer;
-
-        if (Array.isArray(answer)) {
-            answer.forEach(a => {
-                if (a !== '') answers.add(a);
-            });
-        } else {
-            answers.add(answer);
-        }
-    });
-
-    const uniqueAnswers = Array.from(answers);
-    answerFilterSelect.innerHTML = '<option value="">全ての回答</option>';
-
-    let hasUnansweredOption = false;
-    uniqueAnswers.forEach(answer => {
-        const option = document.createElement('option');
-        if (answer === '' || answer == null || answer === '-') {
-            if (!hasUnansweredOption) {
-                option.value = 'unanswered';
-                option.textContent = '未回答';
-                answerFilterSelect.appendChild(option);
-                hasUnansweredOption = true;
-            }
-        } else {
-            option.value = answer;
-            option.textContent = answer;
-            answerFilterSelect.appendChild(option);
-        }
-    });
-
-    answerFilterSelect.value = currentAnswerFilter;
-}
-
-function handleSearch(e) {
-    currentSearchTerm = e.target.value;
-    applyFilters();
-}
-
 function handleQuestionSelectClick(newQuestion) {
     currentIndustryQuestion = newQuestion;
     const dynamicHeader = document.getElementById('dynamic-question-header');
@@ -112,8 +48,6 @@ function handleQuestionSelectClick(newQuestion) {
             button.classList.toggle('active', button.title === newQuestion);
         });
     }
-    currentAnswerFilter = '';
-    updateAnswerFilterAvailability();
     applyFilters();
 }
 
@@ -488,20 +422,10 @@ function updateModalFooter() {
 }
 
 function handleResetFilters() {
-    currentSearchTerm = '';
     currentDateFilter = '';
-    currentAnswerFilter = '';
 
-    const searchInput = document.getElementById('searchKeyword');
-    if (searchInput) {
-        searchInput.value = '';
-    }
     if (datePickerInstance) {
         datePickerInstance.clear();
-    }
-    const answerFilterSelect = document.getElementById('answerFilter');
-    if (answerFilterSelect) {
-        answerFilterSelect.value = '';
     }
 
     applyFilters();
@@ -509,26 +433,6 @@ function handleResetFilters() {
 
 function applyFilters() {
     let filteredData = allCombinedData;
-
-    if (currentSearchTerm) {
-        const searchTermLower = currentSearchTerm.toLowerCase();
-        filteredData = filteredData.filter(item => {
-            const lastName = item.businessCard?.group2?.lastName || '';
-            const firstName = item.businessCard?.group2?.firstName || '';
-            const fullName = `${lastName} ${firstName}`.toLowerCase();
-            const companyName = (item.businessCard?.group3?.companyName || '').trim().toLowerCase();
-            let selectedQuestionAnswer = '';
-            if (item.details) {
-                const detail = item.details.find(d => d.question === currentIndustryQuestion);
-                if (detail && detail.answer) {
-                    selectedQuestionAnswer = Array.isArray(detail.answer) ? detail.answer.join(', ').toLowerCase() : String(detail.answer).toLowerCase();
-                }
-            }
-            return fullName.includes(searchTermLower) ||
-                companyName.includes(searchTermLower) ||
-                selectedQuestionAnswer.includes(searchTermLower);
-        });
-    }
 
     if (currentDateFilter) {
         const filterDate = new Date(currentDateFilter);
@@ -538,23 +442,6 @@ function applyFilters() {
             return itemDate.getFullYear() === filterDate.getFullYear() &&
                 itemDate.getMonth() === filterDate.getMonth() &&
                 itemDate.getDate() === filterDate.getDate();
-        });
-    }
-
-    if (currentAnswerFilter) {
-        filteredData = filteredData.filter(item => {
-            const detail = item.details?.find(d => d.question === currentIndustryQuestion);
-            const answer = detail?.answer;
-
-            if (currentAnswerFilter === 'unanswered') {
-                return answer === '' || answer == null || answer === '-' || (Array.isArray(answer) && answer.length === 0);
-            }
-
-            if (Array.isArray(answer)) {
-                return answer.includes(currentAnswerFilter);
-            } else {
-                return answer === currentAnswerFilter;
-            }
         });
     }
 
@@ -735,10 +622,6 @@ function populateQuestionSelector(data) {
 function setupEventListeners() {
     setupSortListeners();
 
-    const searchInput = document.getElementById('searchKeyword');
-    if (searchInput) {
-        searchInput.addEventListener('input', handleSearch);
-    }
     const dateFilterInput = document.getElementById('dateFilterInput');
     if (dateFilterInput) {
         datePickerInstance = flatpickr(dateFilterInput, {
@@ -764,14 +647,6 @@ function setupEventListeners() {
                 surveyId = 'sv_0001_24001'; // Fallback to default
             }
             window.location.href = `graph-page.html?surveyId=${surveyId}`;
-        });
-    }
-
-    const answerFilterSelect = document.getElementById('answerFilter');
-    if (answerFilterSelect) {
-        answerFilterSelect.addEventListener('change', (e) => {
-            currentAnswerFilter = e.target.value;
-            applyFilters();
         });
     }
 }
@@ -850,35 +725,6 @@ function renderDashboard(data) {
     // 1. KPIs
     const totalElement = document.getElementById('kpi-total-answers');
     if (totalElement) totalElement.textContent = data.length.toLocaleString() + '件';
-
-    const latestElement = document.getElementById('kpi-latest-activity');
-    if (latestElement) {
-        if (data.length === 0) {
-            latestElement.textContent = '-';
-        } else {
-            // Find latest date logic
-            const timestamps = data.map(d => new Date(d.answeredAt).getTime()).filter(t => !isNaN(t));
-            if (timestamps.length > 0) {
-                const latest = Math.max(...timestamps);
-                const diffMs = Date.now() - latest;
-                const diffMins = Math.floor(diffMs / 60000); // Minutes
-
-                if (diffMins < 0) {
-                    latestElement.textContent = 'ついさっき';
-                } else if (diffMins < 60) {
-                    latestElement.textContent = `${diffMins}分前`;
-                } else if (diffMins < 1440) { // 24 hours
-                    const hours = Math.floor(diffMins / 60);
-                    latestElement.textContent = `${hours}時間前`;
-                } else {
-                    const days = Math.floor(diffMins / 1440);
-                    latestElement.textContent = `${days}日前`;
-                }
-            } else {
-                latestElement.textContent = '-';
-            }
-        }
-    }
 
     // Update Question Title
     const questionTitleEl = document.getElementById('dashboard-current-question');
@@ -1217,7 +1063,6 @@ export async function initializePage() {
 
         setupTableEventListeners();
         populateQuestionSelector(allCombinedData);
-        updateAnswerFilterAvailability();
         displayPage(1, allCombinedData);
         renderDashboard(allCombinedData);
         setupEventListeners();
