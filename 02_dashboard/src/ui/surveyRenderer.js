@@ -402,6 +402,7 @@ function renderQuestion(question, uiLang, index, languageOptions = {}) {
   applyTextValidationConfig(questionItem, question);
   applyExplanationCardConfig(questionItem, question, languageOptions);
   applyMultiAnswerConfig(questionItem, question);
+  applyJumpConfig(questionItem, question, languageOptions);
 
   return questionItem;
 }
@@ -531,6 +532,40 @@ function applyMultiAnswerConfig(questionItem, question) {
         maxSelectionsInput.value = meta.maxSelections ?? numOptions;
         maxSelectionsInput.max = numOptions;
     }
+}
+
+function applyJumpConfig(questionItem, question, languageOptions) {
+  const section = questionItem.querySelector('[data-config-section="jump"]');
+  if (!section) return;
+
+  const allowBranching = languageOptions.allowBranching === true;
+  const isExplanation = question.type === 'explanation_card';
+  section.classList.toggle('hidden', isExplanation);
+  if (isExplanation) return;
+
+  const select = section.querySelector('.jump-target-select');
+  const lockedMessage = section.querySelector('[data-jump-locked-message]');
+  if (!select) return;
+
+  const targets = Array.isArray(languageOptions.jumpTargets) ? languageOptions.jumpTargets : [];
+  const availableTargets = targets.filter(target => target.id !== question.questionId);
+
+  select.innerHTML = '<option value="">次の設問へ</option>';
+  availableTargets.forEach(target => {
+    const option = document.createElement('option');
+    option.value = target.id;
+    option.textContent = target.label || target.id;
+    select.appendChild(option);
+  });
+
+  const targetValue = question.meta?.jump?.targetQuestionId || '';
+  select.value = targetValue;
+  select.disabled = !allowBranching;
+  select.setAttribute('aria-disabled', allowBranching ? 'false' : 'true');
+
+  if (lockedMessage) {
+    lockedMessage.classList.toggle('hidden', allowBranching);
+  }
 }
 
 

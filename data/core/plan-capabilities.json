@@ -1,0 +1,112 @@
+{
+  "free": {
+    "maxQuestions": 20,
+    "bizcard": {
+      "allowedFields": ["fullName", "email"],
+      "speedPlans": ["normal"],
+      "maxCustomFields": 0,
+      "maxAdditionalFields": 0
+    },
+    "integrations": [],
+    "features": {
+      "thankYouEmail": { "mode": "templateOnly", "sendQuota": 100, "domain": "speed-ad" },
+      "analytics": { "crossTab": false, "realtime": false },
+      "multilingual": { "enabled": false, "maxLocales": 0 },
+      "conditionalBranching": false
+    },
+    "limits": { "activeSurveys": 1 }
+  },
+  "standard": {
+    "maxQuestions": 200,
+    "bizcard": {
+      "allowedFields": [
+        "fullName",
+        "company",
+        "department",
+        "title",
+        "email",
+        "phone",
+        "mobile",
+        "address",
+        "website",
+        "memo",
+        "secondPhone",
+        "secondAddress",
+        "handwrittenMemo"
+      ],
+      "speedPlans": ["normal", "express"],
+      "maxCustomFields": 0,
+      "maxAdditionalFields": 3
+    },
+    "integrations": ["slack"],
+    "features": {
+      "thankYouEmail": { "mode": "customBody", "sendQuota": 500, "domain": "restricted" },
+      "analytics": { "crossTab": false, "realtime": false },
+      "multilingual": { "enabled": false, "maxLocales": 0 },
+      "conditionalBranching": false
+    },
+    "limits": { "activeSurveys": 10 }
+  },
+  "premium": {
+    "maxQuestions": 500,
+    "bizcard": {
+      "allowedFields": [
+        "fullName",
+        "company",
+        "department",
+        "title",
+        "email",
+        "phone",
+        "mobile",
+        "address",
+        "website",
+        "memo",
+        "secondPhone",
+        "secondAddress",
+        "handwrittenMemo"
+      ],
+      "speedPlans": ["normal", "express", "superExpress"],
+      "maxCustomFields": 10,
+      "maxAdditionalFields": 3
+    },
+    "integrations": ["slack", "crm"],
+    "features": {
+      "thankYouEmail": { "mode": "customDomain", "sendQuota": null, "domain": "custom" },
+      "analytics": { "crossTab": true, "realtime": false },
+      "multilingual": { "enabled": true, "maxLocales": 3 },
+      "conditionalBranching": true
+    },
+    "limits": { "activeSurveys": 50 }
+  },
+  "premiumPlus": {
+    "maxQuestions": 1000,
+    "bizcard": {
+      "allowedFields": [
+        "fullName",
+        "company",
+        "department",
+        "title",
+        "email",
+        "phone",
+        "mobile",
+        "address",
+        "website",
+        "memo",
+        "secondPhone",
+        "secondAddress",
+        "handwrittenMemo"
+      ],
+      "speedPlans": ["normal", "express", "superExpress", "onDemand"],
+      "maxCustomFields": null,
+      "maxAdditionalFields": null
+    },
+    "integrations": ["slack", "crm", "webhook", "sso"],
+    "features": {
+      "thankYouEmail": { "mode": "automation", "sendQuota": null, "domain": "custom" },
+      "analytics": { "crossTab": true, "realtime": true },
+      "multilingual": { "enabled": true, "maxLocales": 5 },
+      "conditionalBranching": true
+    },
+    "limits": { "activeSurveys": 100 }
+  }
+}

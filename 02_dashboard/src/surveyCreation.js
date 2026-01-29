@@ -2,7 +2,7 @@ import { handleOpenModal, closeModal } from './modalHandler.js';
 import { openAccountInfoModal } from './accountInfoModal.js';
 import { initSidebarHandler } from './sidebarHandler.js';
 import { initBreadcrumbs } from './breadcrumb.js';
-import { setupQrCodeModalListeners } from './qrCodeModal.js';
+import { populateQrCodeModal } from './qrCodeModal.js';
 import { initThemeToggle } from './lib/themeToggle.js';
 import { fetchSurveyData, saveSurveyDataToLocalStorage, loadSurveyDataFromLocalStorage } from './services/surveyService.js';
 import {
@@ -16,6 +16,11 @@ import { initializeFab } from './ui/fab.js';
 import { initializeDatepickers } from './ui/datepicker.js';
 import { loadCommonHtml, showToast, resolveDashboardDataPath, resolveDemoDataPath, resolveDashboardAssetPath } from './utils.js';
 import { showConfirmationModal } from './confirmationModal.js';
+import {
+    loadPlanCapabilities,
+    normalizePlanTier,
+    getCapabilitiesForTier
+} from './services/planCapabilityService.js';
 
 // --- Global State ---
 let surveyData = {};
@@ -23,6 +28,11 @@ let currentLang = 'ja';
 let currentSurveyId = null;
 let isDirty = false; // To track unsaved changes
 window.isTutorialActive = false; // Global flag for tutorial state
+let planFeatureState = {
+    allowMultilingual: false,
+    allowBranching: false,
+    maxQuestions: null
+};
 const ADDITIONAL_SETTINGS_CONFIG = [
     { id: 'openBizcardSettingsBtn', path: 'bizcardSettings.html', feature: 'bizcard' },
     { id: 'openThankYouEmailSettingsBtn', path: 'thankYouEmailSettings.html', feature: 'thankYouEmail' },
@@ -37,7 +47,6 @@ const SUPPORTED_LANGUAGES = [
 ];
 const LANGUAGE_MAP = new Map(SUPPORTED_LANGUAGES.map((lang) => [lang.code, lang]));
 const BASE_LANGUAGE = 'ja';
-const PRO_PLAN_KEYWORDS = ['premium', 'professional', 'pro'];
 
 let activeLanguages = [BASE_LANGUAGE];
 let editorLanguage = BASE_LANGUAGE;
@@ -179,12 +188,6 @@ function normalizeActiveLanguages(langs = []) {
     return normalized;
 }
 
-function isProPlan(plan) {
-    if (!plan) return false;
-    const normalized = String(plan).toLowerCase();
-    return PRO_PLAN_KEYWORDS.some((keyword) => normalized.includes(keyword));
-}
-
 function getActiveLanguages() {
     activeLanguages = normalizeActiveLanguages(activeLanguages);
     return [...activeLanguages];
@@ -216,6 +219,23 @@ function setEditorLanguage(lang) {
     editorLanguage = lang;
     surveyData.editorLanguage = editorLanguage;
     return true;
+}
+
+function canUseMultilingual() {
+    return planFeatureState.allowMultilingual === true;
+}
+
+function isMultilingualEnabled() {
+    return canUseMultilingual() && surveyData?.settings?.multilingualEnabled === true;
+}
+
+function getEnabledLanguages() {
+    return isMultilingualEnabled() ? getActiveLanguages() : [BASE_LANGUAGE];
+}
+
+function getEnabledExtraLanguages() {
+    if (!isMultilingualEnabled()) return [];
+    return getActiveLanguages().filter((lang) => lang !== BASE_LANGUAGE);
 }
 
 function getLocalizedValue(value, lang) {
@@ -284,6 +304,38 @@ function collectMissingTranslations(langs) {
     });
 
     return missing;
+}
+
+function hasTranslatedContent(langs) {
+    if (!Array.isArray(langs) || !langs.length) return false;
+    const hasValue = (value) => langs.some((lang) => getLocalizedValue(value, lang).trim());
+
+    if (hasValue(surveyData.name) || hasValue(surveyData.displayTitle) || hasValue(surveyData.description)) {
+        return true;
+    }
+
+    for (const group of (surveyData.questionGroups || [])) {
+        if (hasValue(group.title)) return true;
+        for (const question of (group.questions || [])) {
+            if (hasValue(question.text)) return true;
+            if (question.explanationText && hasValue(question.explanationText)) return true;
+            if (Array.isArray(question.options)) {
+                for (const option of question.options) {
+                    if (hasValue(option.text)) return true;
+                }
+            }
+            if (question.matrix) {
+                for (const row of (question.matrix.rows || [])) {
+                    if (hasValue(row.text)) return true;
+                }
+                for (const col of (question.matrix.cols || [])) {
+                    if (hasValue(col.text)) return true;
+                }
+            }
+        }
+    }
+
+    return false;
 }
 
 function syncSurveyLocalization() {
@@ -401,6 +453,14 @@ function ensureHandwritingMeta(question) {
     return meta.handwritingConfig;
 }
 
+function ensureJumpMeta(question) {
+    const meta = ensureQuestionMeta(question);
+    if (!meta.jump || typeof meta.jump !== 'object') {
+        meta.jump = { targetQuestionId: '' };
+    }
+    return meta.jump;
+}
+
 function pruneQuestionMeta(question, type) {
     if (!question || !question.meta || typeof question.meta !== 'object') return;
     if (type !== 'number_answer' && question.meta.validation) {
@@ -440,6 +500,7 @@ function initializeQuestionMeta(question) {
             meta.maxSelections = question.options?.length || 1;
         }
     }
+    ensureJumpMeta(question);
 }
 
 // --- Language Switcher ---
@@ -692,6 +753,7 @@ window.dummyUserData = {
     billingPostalCode: "",
     billingAddress: "",
     billingBuildingFloor: "",
+    plan: "Premium",
 };
 
 /**
@@ -699,26 +761,35 @@ window.dummyUserData = {
  */
 function updateAndRenderAll() {
     destroySortables(); // Destroy old instances before re-rendering
-    const allowExtraLanguages = isProPlan(surveyData.plan);
-    if (!allowExtraLanguages) {
-        setActiveLanguages([BASE_LANGUAGE]);
+    const multilingualAllowed = canUseMultilingual();
+    if (!multilingualAllowed && surveyData.settings) {
+        surveyData.settings.multilingualEnabled = false;
+    }
+    const multilingualEnabled = isMultilingualEnabled();
+    const effectiveLanguages = getEnabledLanguages();
+
+    if (!multilingualEnabled) {
         setEditorLanguage(BASE_LANGUAGE);
     }
 
     syncSurveyLocalization();
 
     const languageOptions = {
-        activeLanguages: getActiveLanguages(),
-        editorLanguage: getEditorLanguage(),
+        activeLanguages: effectiveLanguages,
+        editorLanguage: multilingualEnabled ? getEditorLanguage() : BASE_LANGUAGE,
         languageMap: LANGUAGE_MAP,
-        allowMultilingual: allowExtraLanguages
+        allowMultilingual: multilingualEnabled,
+        allowBranching: planFeatureState.allowBranching,
+        jumpTargets: buildJumpTargets(surveyData.questionGroups, currentLang)
     };
 
     const languageSection = document.getElementById('language-settings-section');
     if (languageSection) {
-        languageSection.classList.toggle('hidden', !allowExtraLanguages);
-        languageSection.setAttribute('aria-hidden', !allowExtraLanguages ? 'true' : 'false');
+        languageSection.classList.remove('hidden');
+        languageSection.setAttribute('aria-hidden', 'false');
     }
+
+    updateMultilingualToggleUI(multilingualAllowed, multilingualEnabled);
 
     renderLanguageSettings(languageOptions);
     populateBasicInfo(surveyData, languageOptions);
@@ -739,7 +810,11 @@ function updateAndRenderAll() {
             qrButton.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                handleOpenModal('qrCodeModal', resolveDashboardAssetPath('modals/qrCodeModal.html'), setupQrCodeModalListeners);
+                handleOpenModal(
+                    'qrCodeModal',
+                    resolveDashboardAssetPath('modals/qrCodeModal.html'),
+                    () => populateQrCodeModal({ surveyId: currentSurveyId })
+                );
             });
             qrButton.dataset.qrModalListenerAttached = 'true';
         }
@@ -771,6 +846,103 @@ function updateAndRenderAll() {
         updateAllPlaceholders();
         updateOutlineActionsState();
     });
+}
+
+function updateMultilingualToggleUI(multilingualAllowed, multilingualEnabled) {
+    const toggle = document.getElementById('multilingualEnabledToggle');
+    const controls = document.getElementById('multilingual-controls');
+    const lockedMessage = document.querySelector('[data-multilingual-locked-message]');
+    const offMessage = document.querySelector('[data-multilingual-off-message]');
+
+    if (!toggle) return;
+
+    toggle.checked = !!multilingualEnabled;
+    toggle.disabled = !multilingualAllowed;
+    toggle.setAttribute('aria-disabled', multilingualAllowed ? 'false' : 'true');
+
+    const toggleLabel = toggle.closest('label');
+    if (toggleLabel) {
+        toggleLabel.classList.toggle('opacity-50', !multilingualAllowed);
+        toggleLabel.classList.toggle('cursor-not-allowed', !multilingualAllowed);
+    }
+
+    if (lockedMessage) {
+        lockedMessage.classList.toggle('hidden', multilingualAllowed);
+    }
+    if (offMessage) {
+        offMessage.classList.toggle('hidden', !multilingualAllowed || multilingualEnabled);
+    }
+    if (controls) {
+        controls.classList.toggle('hidden', !multilingualEnabled);
+        controls.setAttribute('aria-hidden', multilingualEnabled ? 'false' : 'true');
+    }
+
+    if (toggle.dataset.bound !== 'true') {
+        toggle.dataset.bound = 'true';
+        toggle.addEventListener('change', (event) => {
+            if (!surveyData.settings) {
+                surveyData.settings = {};
+            }
+            if (!canUseMultilingual()) {
+                event.target.checked = false;
+                surveyData.settings.multilingualEnabled = false;
+                updateAndRenderAll();
+                return;
+            }
+
+            if (!event.target.checked) {
+                const extras = getActiveLanguages().filter((lang) => lang !== BASE_LANGUAGE);
+                const hasTranslations = hasTranslatedContent(extras);
+                const finalizeDisable = () => {
+                    surveyData.settings.multilingualEnabled = false;
+                    setDirty(true);
+                    updateAndRenderAll();
+                };
+
+                if (hasTranslations) {
+                    event.target.checked = true;
+                    showConfirmationModal(
+                        '翻訳データは保持されますが、多言語入力は非表示になります。オフにしますか？',
+                        finalizeDisable,
+                        {
+                            title: '多言語機能をオフにしますか？',
+                            confirmText: 'オフにする',
+                            cancelText: 'キャンセル',
+                            defaultCancel: true
+                        }
+                    );
+                } else {
+                    finalizeDisable();
+                }
+                return;
+            }
+
+            surveyData.settings.multilingualEnabled = true;
+            setDirty(true);
+            updateAndRenderAll();
+        });
+    }
+}
+
+function buildJumpTargets(groups = [], lang) {
+    const targets = [];
+    let counter = 1;
+    (groups || []).forEach((group) => {
+        (group.questions || []).forEach((question) => {
+            const labelText = getLocalizedValue(question.text, lang) || `設問${counter}`;
+            targets.push({ id: question.questionId, label: labelText });
+            counter += 1;
+        });
+    });
+    return targets;
+}
+
+function getPlanTier() {
+    return normalizePlanTier(window?.dummyUserData?.plan);
+}
+
+function getQuestionCount() {
+    return (surveyData.questionGroups || []).reduce((sum, group) => sum + (group.questions?.length || 0), 0);
 }
 
 // --- Input Bindings ---
@@ -1240,17 +1412,17 @@ async function initializePage() {
                 if (enqueteDetails) {
                     const questionGroups = mapEnqueteToQuestions(enqueteDetails);
                     if (questionGroups) {
-                        surveyData = {
-                            id: currentSurveyId,
-                            name: enqueteDetails.name || surveyInfo?.name || { ja: currentSurveyId, en: '' },
-                            displayTitle: enqueteDetails.displayTitle || surveyInfo?.displayTitle || enqueteDetails.name,
-                            description: enqueteDetails.description || surveyInfo?.description || { ja: '', en: '' },
-                            memo: enqueteDetails.memo || surveyInfo?.memo || '',
-                            periodStart: enqueteDetails.periodStart || surveyInfo?.periodStart || '',
-                            periodEnd: enqueteDetails.periodEnd || '',
-                            plan: enqueteDetails.plan || surveyInfo?.plan || 'Standard',
-                            questionGroups: questionGroups,
-                        };
+                          surveyData = {
+                              id: currentSurveyId,
+                              name: enqueteDetails.name || surveyInfo?.name || { ja: currentSurveyId, en: '' },
+                              displayTitle: enqueteDetails.displayTitle || surveyInfo?.displayTitle || enqueteDetails.name,
+                              description: enqueteDetails.description || surveyInfo?.description || { ja: '', en: '' },
+                              memo: enqueteDetails.memo || surveyInfo?.memo || '',
+                              periodStart: enqueteDetails.periodStart || surveyInfo?.periodStart || '',
+                              periodEnd: enqueteDetails.periodEnd || '',
+                              questionGroups: questionGroups,
+                              settings: enqueteDetails.settings || surveyInfo?.settings || {}
+                          };
                     }
                 } else {
                     console.warn(`Survey with id "${currentSurveyId}" not found.`);
@@ -1270,10 +1442,12 @@ async function initializePage() {
                 memo: '',
                 periodStart: '',
                 periodEnd: '',
-                plan: 'Standard',
                 questionGroups: [],
                 activeLanguages: ['ja'],
-                editorLanguage: 'ja'
+                editorLanguage: 'ja',
+                settings: {
+                    multilingualEnabled: false
+                }
             };
 
             // Apply any URL parameters for pre-filling
@@ -1295,9 +1469,24 @@ async function initializePage() {
             setEditorLanguage(surveyData.editorLanguage);
         }
 
+        if ('plan' in surveyData) {
+            delete surveyData.plan;
+        }
+
         // --- bizcard setting initialization ---
         if (!surveyData.settings) {
             surveyData.settings = {};
+        }
+        const rawMultilingual = surveyData.settings.multilingualEnabled;
+        if (rawMultilingual === undefined || rawMultilingual === null) {
+            const hasExtraLanguages = Array.isArray(surveyData.activeLanguages)
+                && surveyData.activeLanguages.some((lang) => lang && lang !== BASE_LANGUAGE);
+            surveyData.settings.multilingualEnabled = hasExtraLanguages;
+        } else if (typeof rawMultilingual !== 'boolean') {
+            surveyData.settings.multilingualEnabled = rawMultilingual === true
+                || rawMultilingual === 'true'
+                || rawMultilingual === 1
+                || rawMultilingual === '1';
         }
         if (!surveyData.settings.bizcard) {
             surveyData.settings.bizcard = {};
@@ -1328,6 +1517,14 @@ async function initializePage() {
         }
         updateAdditionalSettingsAvailability(); // Also call here to set initial state
         // --- end of bizcard setting initialization ---
+
+        const capabilities = await loadPlanCapabilities();
+        const planCaps = getCapabilitiesForTier(getPlanTier(), capabilities);
+        planFeatureState = {
+            allowMultilingual: planCaps.features?.multilingual?.enabled === true,
+            allowBranching: planCaps.features?.conditionalBranching === true,
+            maxQuestions: typeof planCaps.maxQuestions === 'number' ? planCaps.maxQuestions : null
+        };
 
         updateAndRenderAll();
         restoreAccordionState();
@@ -1552,6 +1749,11 @@ function handleQuestionConfigInput(target) {
             const value = parseInt(target.value, 10);
             meta.maxSelections = !Number.isNaN(value) && value >= 1 ? value : 1;
         }
+    } else if (configType === 'jump') {
+        const jumpMeta = ensureJumpMeta(question);
+        if (field === 'targetQuestionId') {
+            jumpMeta.targetQuestionId = target.value || '';
+        }
     } else {
         return;
     }
@@ -1728,7 +1930,7 @@ function setupEventListeners() {
                 return;
             }
 
-            const extras = getActiveLanguages().filter((lang) => lang !== 'ja');
+            const extras = getEnabledExtraLanguages();
             const missing = collectMissingTranslations(extras);
 
             const performSave = () => {
@@ -1847,6 +2049,13 @@ function handleDuplicateQuestionGroup(groupId) {
 }
 
 function handleAddNewQuestion(groupId, questionType, creationOptions = {}) {
+    if (planFeatureState.maxQuestions !== null) {
+        const nextCount = getQuestionCount() + 1;
+        if (nextCount > planFeatureState.maxQuestions) {
+            showToast('プランの設問上限に達しています。', 'warning');
+            return;
+        }
+    }
     let targetGroup;
     if (groupId) {
         targetGroup = surveyData.questionGroups.find(g => g.groupId === groupId);

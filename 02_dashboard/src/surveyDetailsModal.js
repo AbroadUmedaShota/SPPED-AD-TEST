@@ -336,7 +336,7 @@ export function populateSurveyDetails(survey) {
     detail_thankYouEmailSettings_view.textContent = survey.thankYouEmailSettings || '設定なし';
 
     // Non-editable fields
-    const qrUrl = `https://survey.speedad.com/qr/${survey.id}`;
+    const qrUrl = `survey-answer.html?surveyId=${survey.id}`;
     detail_surveyUrl.value = qrUrl;
     detail_qrCodeImage.src = `sample_qr.png`; // survey.id を使って動的に生成
 

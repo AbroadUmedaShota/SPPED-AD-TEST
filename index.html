@@ -673,6 +673,15 @@
           <input type="password" id="password" name="password" class="form-group__input" required aria-required="true" autocomplete="current-password" aria-describedby="password-error">
           <div id="password-error" class="form-group__error-message" role="alert"></div>
         </div>
+        <div class="form-group">
+          <label class="form-options__checkbox-label" style="justify-content: flex-start; margin-bottom: 0;">
+            <input type="checkbox" id="login-terms-agree" name="login-terms-agree" class="form-options__checkbox-input" required aria-required="true">
+            <span style="font-weight: normal; font-size: 0.9rem;">
+              <a href="http://127.0.0.1:5500/02_dashboard/terms-of-service.html" target="_blank" rel="noopener noreferrer" class="form-options__link">利用規約</a>と<a href="https://www.abroad-o.com/rule.html" target="_blank" rel="noopener noreferrer" class="form-options__link">プライバシーポリシー</a>に同意する
+            </span>
+          </label>
+          <div id="login-terms-agree-error" class="form-group__error-message" role="alert"></div>
+        </div>
         <div class="form-options">
           <label class="form-options__checkbox-label">
             <input type="checkbox" name="remember" class="form-options__checkbox-input" aria-label="ログイン状態を保持する"> ログイン状態を保持する
@@ -716,7 +725,7 @@
       </button>
       <button class="button button--tonal" type="button">新規アカウント作成</button>
       <div class="sub-links">
-        <a href="http://127.0.0.1:5500/02_dashboard/terms-of-service.html" class="sub-links__item">利用規約</a>｜<a href="https://www.abroad-o.com/rule.html" class="sub-links__item">プライバシー</a>｜<a href="02_dashboard/help-center.html" class="sub-links__item">サポート</a>
+        <a href="http://127.0.0.1:5500/02_dashboard/terms-of-service.html" class="sub-links__item">利用規約</a>｜<a href="https://www.abroad-o.com/rule.html" class="sub-links__item" target="_blank" rel="noopener noreferrer">プライバシー</a>｜<a href="02_dashboard/help-center.html" class="sub-links__item">サポート</a>
       </div>
       <div class="mt-4 text-center text-xs text-on-surface-light">
           【開発者向け】 <a href="02_dashboard/changelog.html" class="hover:underline">変更履歴</a>
@@ -785,6 +794,8 @@
       const passwordInput = document.getElementById('password');
       const emailError = document.getElementById('email-error');
       const passwordError = document.getElementById('password-error');
+      const loginTermsAgreeCheckbox = document.getElementById('login-terms-agree');
+      const loginTermsAgreeError = document.getElementById('login-terms-agree-error');
       const loginButton = loginForm.querySelector('.button--filled');
       const googleButtonMain = document.querySelector('.form-container > .button--google');
       const signupButtonMain = document.querySelector('.button--tonal');
@@ -878,6 +889,9 @@
       function clearLoginFormErrors() {
           clearError(emailInput, emailError);
           clearError(passwordInput, passwordError);
+          if (loginTermsAgreeCheckbox) {
+              clearError(loginTermsAgreeCheckbox, loginTermsAgreeError);
+          }
       }
       function clearSignupFormErrors() {
           clearError(signupNameInput, signupNameError);
@@ -1039,6 +1053,10 @@
             isValid = false;
           }
         }
+        if (loginTermsAgreeCheckbox && !loginTermsAgreeCheckbox.checked) {
+          displayError(loginTermsAgreeCheckbox, loginTermsAgreeError, "利用規約とプライバシーポリシーへの同意が必要です。");
+          isValid = false;
+        }
         return isValid;
       }
       if (signupForm) {
@@ -1100,7 +1118,7 @@
       }
       // --- 入力時のエラークリア ---
       const inputsToClear = [
-        emailInput, passwordInput,
+        emailInput, passwordInput, loginTermsAgreeCheckbox,
         signupNameInput, signupEmailInput, signupPasswordInput, signupPasswordConfirmInput,
         termsAgreeCheckbox
       ];
@@ -1110,6 +1128,7 @@
                 let errorElement;
                 if (input === emailInput) errorElement = emailError;
                 else if (input === passwordInput) errorElement = passwordError;
+                else if (input === loginTermsAgreeCheckbox) errorElement = loginTermsAgreeError;
                 else if (input === signupNameInput) errorElement = signupNameError;
                 else if (input === signupEmailInput) errorElement = signupEmailError;
                 else if (input === signupPasswordInput) errorElement = signupPasswordError;
@@ -1132,7 +1151,8 @@
             if (input.type === 'checkbox') {
                 input.addEventListener('change', () => {
                     if (input.checked && input.getAttribute('aria-invalid') === 'true') {
-                        clearError(input, termsAgreeError);
+                        const errorElement = input === loginTermsAgreeCheckbox ? loginTermsAgreeError : termsAgreeError;
+                        clearError(input, errorElement);
                     }
                 });
             }
@@ -1151,7 +1171,3 @@
 <!-- BEM OK: クラス名が Block__Element--Modifier の規則に従って定義されていることを確認 -->
 <!-- 浮動ラベル削除 OK: 浮動ラベルのHTML構造とCSSルールを削除し、標準的なラベル配置に戻っていることを確認 -->
 <!-- BEM OK: クラス名が Block__Element--Modifier の規則に従って定義されていることを確認 -->
-
-
-
-

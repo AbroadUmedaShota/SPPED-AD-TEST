@@ -18,7 +18,7 @@
 | :--- | :--- | :--- |
 | 1 | ログイン画面の「シナリオテスト用アカウント」から `user` を選択し、自動入力された状態で「ログイン」を押す。 | 疑似ログイン完了後、`02_dashboard/index.html` が開き、アンケート一覧テーブルが即時に描画される。`sv_0001_25022` などのサンプル行が表示される。 |
 | 2 | 一覧から任意のアンケート行（例: `sv_0001_25022`）をクリックし、詳細モーダルの「アンケートURL」をコピーする。 | モーダルにアンケートの概要が表示され、URL 欄に `https://survey.speedad.com/qr/sv_0001_25022` 形式の値がセットされている。コピー操作でクリップボードへ保持される。 |
-| 3 | コピーした URL のドメインを `http://localhost:8000` へ差し替え、`http://localhost:8000/02_dashboard/survey-answer.html?id=sv_0001_25022` を新規タブで開く。 | 回答画面が読み込まれ、タイトル・設問が `data/surveys/enquete/sv_0001_25022.json` の内容と一致する。名刺添付セクションは JSON の `settings.attachCard` に従い表示が切り替わる。 |
+| 3 | コピーした URL のドメインを `http://localhost:8000` へ差し替え、`http://localhost:8000/02_dashboard/survey-answer.html?surveyId=sv_0001_25022` を新規タブで開く。 | 回答画面が読み込まれ、タイトル・設問が `data/surveys/enquete/sv_0001_25022.json` の内容と一致する。名刺添付セクションは JSON の `settings.attachCard` に従い表示が切り替わる。 |
 | 4 | 必須設問（`required: true`）をすべて入力し、「送信」を押す。 | 送信完了メッセージが同画面に表示され、`role="status"` の領域で完了を通知する。フォームはロックされ、再送信できない。 |
 | 5 | ブラウザの開発者ツールでネットワークタブとコンソールを確認する。 | エラーが発生していない。`survey-answer.js` が `resolveDashboardDataPath()` から JSON を正常取得していることが確認できる。 |
 
