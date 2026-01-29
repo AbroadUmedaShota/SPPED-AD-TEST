@@ -33,8 +33,6 @@
 - **ツールボックス:**
     - **目的**: データ探索と操作のための機能を一箇所に集約し、効率的な作業を支援する。
     - **コンポーネント**:
-        - **キーワード検索**: 氏名、会社名、および現在表示中の設問の回答を対象とした部分一致検索。
-        - **回答で絞り込み**: 選択中の設問の回答内容を元にした絞り込みフィルター。
         - **日時で絞り込み**: 回答日時による期間フィルター。
         - **フィルターリセット**: 全てのフィルター条件を初期状態に戻す。
         - **グラフ化**: 現在のアンケートデータをグラフ分析ページで表示するために画面遷移する。
@@ -62,7 +60,7 @@
 - `allCombinedData`: 現在のアンケートに関する全回答データを保持する配列。
 - `currentSurvey`: 現在のアンケートの定義情報（質問リスト、タイプ等）を保持するオブジェクト。
 - `currentIndustryQuestion`: 「表示設問」で選択されている設問の完全なテキスト。
-- `currentSearchTerm`, `currentDateFilter`, `currentAnswerFilter`: 各フィルターの現在の選択値を保持する。
+- `currentDateFilter`: 日付フィルターの現在の選択値を保持する。
 - `currentPage`: ページネーションの現在のページ番号。
 
 ### 3.2. 主要ワークフロー
@@ -71,16 +69,13 @@
 1.  URLから `surveyId` を取得する。
 2.  `surveyId` を元に `displaySurveyName` を実行し、アンケート名を表示。
 3.  `surveyId` に応じて、JSONまたはCSVのデータソースから全回答データを非同期で取得し、`allCombinedData` と `currentSurvey` を設定する。
-4.  `updateAnswerFilterAvailability` を実行し、「回答で絞り込み」プルダウンの初期状態を設定する。
-5.  `displayPage` を初回実行し、テーブルの初期表示を行う。
-6.  `setupEventListeners` を実行し、各種操作要素にイベントリスナーを設定する。
+4.  `displayPage` を初回実行し、テーブルの初期表示を行う。
+5.  `setupEventListeners` を実行し、各種操作要素にイベントリスナーを設定する。
 
 #### 3.2.2. フィルター適用 (`applyFilters`)
 1.  `allCombinedData` をベースのデータとする。
-2.  `currentSearchTerm` が設定されていれば、キーワードによる絞り込みを実行。
-3.  `currentDateFilter` が設定されていれば、日付による絞り込みを実行。
-4.  `currentAnswerFilter` が設定されていれば、回答内容による絞り込みを実行。
-5.  絞り込まれた最終的なデータセットを引数として `displayPage(1, filteredData)` を呼び出し、テーブルを更新する。
+2.  `currentDateFilter` が設定されていれば、日付による絞り込みを実行。
+3.  絞り込まれた最終的なデータセットを引数として `displayPage(1, filteredData)` を呼び出し、テーブルを更新する。
 
 #### 3.2.3. テーブル描画 (`displayPage`)
 1.  引数として渡されたデータセット（フィルター後のデータ）を受け取る。
@@ -94,17 +89,7 @@
 #### 3.2.4. 表示設問の変更 (`handleQuestionSelectClick`)
 1.  クリックされたボタンから、新しい設問名を取得し `currentIndustryQuestion` を更新する。
 2.  テーブルヘッダーの設問名を更新する。
-3.  `currentAnswerFilter` の値をリセットする。
-4.  `updateAnswerFilterAvailability` を呼び出し、新しい設問のタイプに応じて「回答で絞り込み」プルダウンを有効化または無効化する。
-5.  `applyFilters` を呼び出してテーブル表示を更新する。
-
-### 3.3. 「回答で絞り込み」の有効化/無効化ロジック
-- **目的**: 自由記述など、絞り込みに適さない設問タイプではフィルター機能を表示しないことで、ユーザーの混乱を防ぐ。
-- **ロジック (`updateAnswerFilterAvailability`):**
-    1.  `currentSurvey` の定義情報から、`currentIndustryQuestion` に一致する設問の `type` を特定する。
-    2.  `type` が `single_choice`, `multi_choice`, `matrix_single`, `matrix_multi` のいずれかであるか判定する。
-    3.  **有効な場合**: プルダウンを有効化し、`populateAnswerFilterDropdown` を呼び出して回答の選択肢を生成する。
-    4.  **無効な場合**: プルダウンを無効化し、選択肢を「(対象外の設問)」のみにする。
+3.  `applyFilters` を呼び出してテーブル表示を更新する。
 
 ---
 
