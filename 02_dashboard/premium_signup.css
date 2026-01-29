@@ -53,6 +53,12 @@ h2 {
     margin-bottom: 3rem;
 }
 
+/* 「ご利用の流れ」専用の文字サイズ調整 */
+.text-sm-h2 {
+    font-size: 1.5rem !important; /* 既存のh2スタイルより優先 */
+    margin-bottom: 2rem; /* h2デフォルトのmargin-bottomより少し小さく */
+}
+
 /* 料金プランとFAQセクションのh2は確実に大きく */
 #pricing h2,
 #faq h2,
