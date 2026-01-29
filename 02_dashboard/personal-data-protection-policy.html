@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>個人情報保護方針 - SPEED AD</title>
+
+    <link rel="icon" href="assets/svg/speedad_logo.svg" type="image/svg+xml">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Material Icons CDN -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="service-top-style.css">
+    <!-- Custom Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+    <style>
+        /* Add some basic styling for the terms content */
+        .terms-content h3 {
+            font-size: 1.5rem; /* text-2xl */
+            font-weight: 600;
+            margin-top: 2rem; /* mt-8 */
+            margin-bottom: 1rem; /* mb-4 */
+            padding-bottom: 0.5rem; /* pb-2 */
+            border-bottom: 1px solid #e5e7eb; /* border-gray-200 */
+        }
+        .terms-content p, .terms-content ul, .terms-content ol {
+            margin-bottom: 1rem; /* mb-4 */
+            line-height: 1.75; /* leading-relaxed */
+        }
+        .terms-content ul, .terms-content ol {
+            padding-left: 1.5rem; /* pl-6 */
+        }
+        .terms-content ul {
+            list-style-type: disc;
+        }
+        .terms-content ol {
+            list-style-type: decimal;
+        }
+        .terms-content li {
+            margin-bottom: 0.5rem; /* mb-2 */
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background" data-page-id="personal-data-protection-policy">
+
+<!-- 1. アプリケーション全体構造 -->
+<div class="relative flex min-h-screen flex-col overflow-x-hidden">
+
+    <!-- サイドバー用オーバーレイ -->
+    <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
+
+    <!-- 2. ヘッダー -->
+    <div id="header-placeholder"></div>
+
+    <div class="flex flex-1 pt-16 bg-background">
+        <!-- 3. サイドバー -->
+        <div id="sidebar-placeholder"></div>
+
+        <!-- 4. メインコンテンツ -->
+        <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
+            <div class="flex flex-col w-full max-w-6xl mx-auto flex-1">
+                <!-- パンくずリストコンテナ -->
+                <div id="breadcrumb-container" class="mb-4"></div>
+
+                <!-- タイトルエリア -->
+                <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant">
+                    <h1 class="text-on-background text-headline-large font-bold leading-tight tracking-tight">個人情報保護方針</h1>
+                </div>
+
+                <!-- コンテンツ -->
+                <div class="bg-surface p-6 sm:p-8 rounded-xl shadow-sm">
+                    <div class="prose prose-lg max-w-none terms-content">
+        <p>SPEED AD（以下、「当サービス」といいます。）は、お客様の個人情報の重要性を認識し、その保護に努めます。当サービスは、個人情報の取扱いに関し、「個人情報の保護に関する法律」および関連する法令、ガイドライン等を遵守します。</p>
+
+        <h2>1. 個人情報の取得</h2>
+        <p>当サービスは、適法かつ公正な手段によって、お客様の個人情報を取得します。主には、会員登録、お問い合わせ、サービスの利用時に、氏名、メールアドレス、会社名などの情報を提供いただきます。</p>
+
+        <h2>2. 個人情報の利用目的</h2>
+        <p>当サービスが取得した個人情報は、以下の目的で利用します。</p>
+        <ul>
+            <li>当サービスの提供、運営、改善のため</li>
+            <li>お客様からのお問い合わせに対応するため</li>
+            <li>当サービスの新しい機能、更新情報、キャンペーン等の案内メールを送付するため</li>
+            <li>メンテナンス、重要なお知らせなど必要に応じたご連絡のため</li>
+            <li>利用規約に違反したユーザーや、不正・不当な目的でサービスを利用しようとするユーザーの特定をし、ご利用をお断りするため</li>
+        </ul>
+
+        <h2>3. 個人情報の第三者提供</h2>
+        <p>当サービスは、以下の場合を除き、あらかじめお客様の同意を得ることなく、第三者に個人情報を提供することはありません。</p>
+        <ul>
+            <li>法令に基づく場合</li>
+            <li>人の生命、身体または財産の保護のために必要がある場合であって、本人の同意を得ることが困難であるとき</li>
+            <li>公衆衛生の向上または児童の健全な育成の推進のために特に必要がある場合であって、本人の同意を得ることが困難であるとき</li>
+            <li>国の機関もしくは地方公共団体またはその委託を受けた者が法令の定める事務を遂行することに対して協力する必要がある場合であって、本人の同意を得ることにより当該事務の遂行に支支障を及ぼすおそれがあるとき</li>
+        </ul>
+
+        <h2>4. 個人情報の管理</h2>
+        <p>当サービスは、個人情報の紛失、破壊、改ざん及び漏えいなどを防止するため、不正アクセス、コンピュータウイルス等に対する適正な情報セキュリティ対策を講じます。</p>
+
+        <h2>5. 個人情報の開示・訂正・削除</h2>
+        <p>お客様は、当サービスが保有する自己の個人情報が誤った情報である場合には、当サービスが定める手続きにより、個人情報の訂正、追加または削除を請求することができます。当サービスは、お客様からこれらの請求を受けた場合、遅滞なく必要な調査を行い、その結果に基づき、個人情報の内容の訂訂正等を行い、これをお客様に通知します。</p>
+
+        <h2>6. 個人情報保護方針の変更</h2>
+        <p>当サービスは、必要に応じて、本個人情報保護方針を変更することがあります。変更後の個人情報保護方針は、当サービスが別途定める場合を除き、当ウェブサイトに掲載したときから効力を生じるものとします。</p>
+
+        <h2>7. お問い合わせ窓口</h2>
+        <p>本個人情報保護方針に関するお問い合わせは、下記の窓口までお願いいたします。</p>
+        <p>社名: SPEED AD 運営事務局<br>
+        Eメールアドレス: support@speed-ad.jp</p>
+
+        <p>以上</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 5. フッター -->
+    <div id="footer-placeholder"></div>
+
+</div>
+
+<!-- JSファイル -->
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
