@@ -139,4 +139,20 @@ document.addEventListener('DOMContentLoaded', () => {
         // 初回開始
         startAutoScroll();
     }
+
+    // --- 料金プランへのスクロール制御 (画面中央に配置) ---
+    const pricingScrollButtons = document.querySelectorAll('.js-scroll-to-pricing');
+    const pricingSection = document.getElementById('pricing');
+
+    if (pricingScrollButtons.length > 0 && pricingSection) {
+        pricingScrollButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                pricingSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            });
+        });
+    }
 });
