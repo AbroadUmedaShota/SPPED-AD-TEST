@@ -841,41 +841,52 @@ function renderGraphDataTable(processedData) {
     const container = document.getElementById('graph-data-table-container');
     if (!container) return;
 
-    const dataForCurrentQuestion = processedData.find(d => d.questionText === currentIndustryQuestion);
-
-    if (!dataForCurrentQuestion || dataForCurrentQuestion.labels.length === 0) {
-        container.innerHTML = '<p class="text-sm text-on-surface-variant p-4 text-center">この設問の集計データはありません。</p>';
+    if (!processedData || processedData.length === 0) {
+        container.innerHTML = '<p class="text-sm text-on-surface-variant p-4 text-center">集計可能なデータはありません。</p>';
         return;
     }
 
-    const { labels, data, totalVotes } = dataForCurrentQuestion;
+    const allTablesHtml = processedData.map(questionData => {
+        if (!questionData || questionData.labels.length === 0) {
+            return ''; // Skip if no data for this question
+        }
 
-    const tableRows = labels.map((label, index) => {
-        const count = data[index];
-        const percentage = totalVotes > 0 ? ((count / totalVotes) * 100).toFixed(1) : 0;
+        const { questionText, labels, data, totalVotes } = questionData;
+
+        const tableRows = labels.map((label, index) => {
+            const count = data[index];
+            const percentage = totalVotes > 0 ? ((count / totalVotes) * 100).toFixed(1) : 0;
+            return `
+                <tr class="border-b border-outline-variant/30 last:border-b-0">
+                    <td class="px-3 py-2 text-sm text-on-surface truncate" title="${label}">${label}</td>
+                    <td class="px-3 py-2 text-sm text-on-surface text-right">${count}</td>
+                    <td class="px-3 py-2 text-sm text-on-surface-variant text-right">${percentage}%</td>
+                </tr>
+            `;
+        }).join('');
+
         return `
-            <tr class="border-b border-outline-variant/30 last:border-b-0">
-                <td class="px-3 py-2 text-sm text-on-surface truncate" title="${label}">${label}</td>
-                <td class="px-3 py-2 text-sm text-on-surface text-right">${count}</td>
-                <td class="px-3 py-2 text-sm text-on-surface-variant text-right">${percentage}%</td>
-            </tr>
+            <div class="mb-6">
+                <h4 class="text-base font-bold text-on-surface mb-2 px-1 truncate" title="${questionText}">${truncateQuestion(questionText)}</h4>
+                <div class="rounded-lg border border-outline-variant/50">
+                    <table class="w-full text-left table-fixed">
+                        <thead class="bg-surface-variant/30">
+                            <tr class="border-b border-outline-variant/50">
+                                <th class="px-3 py-2 text-xs font-semibold text-on-surface-variant w-1/2">選択肢</th>
+                                <th class="px-3 py-2 text-xs font-semibold text-on-surface-variant text-right">回答数</th>
+                                <th class="px-3 py-2 text-xs font-semibold text-on-surface-variant text-right">割合</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-outline-variant/30">
+                            ${tableRows}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         `;
     }).join('');
 
-    container.innerHTML = `
-        <table class="w-full text-left table-fixed">
-            <thead class="sticky top-0 bg-surface">
-                <tr class="border-b border-outline-variant">
-                    <th class="px-3 py-2 text-xs font-semibold text-on-surface-variant w-1/2">選択肢</th>
-                    <th class="px-3 py-2 text-xs font-semibold text-on-surface-variant text-right">回答数</th>
-                    <th class="px-3 py-2 text-xs font-semibold text-on-surface-variant text-right">割合</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-outline-variant/30">
-                ${tableRows}
-            </tbody>
-        </table>
-    `;
+    container.innerHTML = allTablesHtml || '<p class="text-sm text-on-surface-variant p-4 text-center">集計可能なデータはありません。</p>';
 }
 
 function renderDashboard(data) {
