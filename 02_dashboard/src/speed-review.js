@@ -866,15 +866,15 @@ function renderGraphDataTable(processedData) {
         }).join('');
 
         return `
-            <div class="mb-6">
-                <h4 class="text-base font-bold text-on-surface mb-2 px-1 truncate" title="${questionText}">${truncateQuestion(questionText)}</h4>
-                <div class="rounded-lg border border-outline-variant/50">
-                    <table class="w-full text-left table-fixed">
+            <div class="mb-6 border border-outline-variant/50 rounded-lg overflow-hidden">
+                <h4 class="text-base font-bold text-on-surface py-2 px-3 bg-surface-variant/30 truncate" title="${questionText}">${truncateQuestion(questionText)}</h4>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left table-auto">
                         <thead class="bg-surface-variant/30">
                             <tr class="border-b border-outline-variant/50">
-                                <th class="px-3 py-2 text-xs font-semibold text-on-surface-variant w-1/2">選択肢</th>
-                                <th class="px-3 py-2 text-xs font-semibold text-on-surface-variant text-right">回答数</th>
-                                <th class="px-3 py-2 text-xs font-semibold text-on-surface-variant text-right">割合</th>
+                                <th class="py-2 px-3 text-xs font-semibold text-on-surface-variant w-1/2">選択肢</th>
+                                <th class="py-2 px-3 text-xs font-semibold text-on-surface-variant text-right">回答数</th>
+                                <th class="py-2 px-3 text-xs font-semibold text-on-surface-variant text-right">割合</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-outline-variant/30">
