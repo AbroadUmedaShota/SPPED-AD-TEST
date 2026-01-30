@@ -483,6 +483,8 @@
       transform: translateY(var(--spacing-0)); /* 初期位置 */
       transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1); /* Motion duration & easing */
       box-sizing: border-box;
+      max-height: calc(100vh - 4rem); /* 画面の高さから上下4remのマージンを引いた高さを最大値とする */
+      overflow-y: auto; /* コンテンツがはみ出す場合は縦スクロールを表示 */
     }
     .modal--is-hidden .modal__content { /* 非表示時のアニメーション */
        transform: translateY(-20px); /* fade-slide-up */
