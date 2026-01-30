@@ -69,10 +69,10 @@ function randomElement(array) {
 
 // ランダムな日時を生成（2026年1月1日～1月30日、9:00～17:00）
 function randomDate() {
-    // ランダムな日付を生成
+    // ランダムな日付を生成（1月4日～1月17日）
     const year = 2026;
     const month = 0; // 1月（0-indexed）
-    const day = Math.floor(Math.random() * 30) + 1; // 1-30日
+    const day = Math.floor(Math.random() * 14) + 4; // 4日～17日
 
     // 9時～17時のランダムな時刻
     const hour = Math.floor(Math.random() * 9) + 9; // 9-17時
@@ -90,12 +90,10 @@ function randomDate() {
     return `${year}-${monthStr}-${dayStr} ${hours}:${minutes}:${seconds}`;
 }
 
-// ステータスを決定（1:1:1の割合でblank, processing, completed）
+// ステータスを決定する関数（ランダム）
 function determineStatus(index) {
-    const remainder = index % 3;
-    if (remainder === 0) return 'blank';
-    if (remainder === 1) return 'processing';
-    return 'completed';
+    // ランダムにprocessingかcompletedを返す (50%の確率)
+    return Math.random() < 0.5 ? 'processing' : 'completed';
 }
 
 // 回答データを生成
@@ -174,11 +172,7 @@ function generateBusinessCards(count) {
         const answerId = `sv25060-${String(i).padStart(5, '0')}`;
         const status = determineStatus(i);
 
-        // blank の場合は名刺データを生成しない
-        if (status === 'blank') {
-            continue;
-        }
-
+        // processingとcompletedの両方で名刺データを生成
         const lastName = randomElement(lastNames);
         const firstName = randomElement(firstNames);
         const companyName = `${randomElement(companyPrefixes)}${randomElement(companyNames)}`;
@@ -259,9 +253,8 @@ function main() {
     console.log(`   - 総回答データ: ${answers.length}件`);
     console.log(`   - 総名刺データ: ${businessCards.length}件`);
     console.log(`📋 ステータス別:`);
-    console.log(`   - 未データ化（blank）: ${answers.filter(a => !a.cardStatus && !a.businessCard).length}件`);
     console.log(`   - データ化進行中（processing）: ${answers.filter(a => a.cardStatus === 'processing').length}件`);
-    console.log(`   - データ化完了（completed）: ${businessCards.length}件`);
+    console.log(`   - データ化完了（completed）: ${answers.filter(a => !a.cardStatus).length}件`);
     console.log(`📁 保存先:`);
     console.log(`   - ${answersPath}`);
     console.log(`   - ${businessCardsPath}`);

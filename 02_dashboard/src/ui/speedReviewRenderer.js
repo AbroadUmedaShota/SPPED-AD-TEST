@@ -36,8 +36,8 @@ export function populateTable(data, onDetailClick, selectedIndustryQuestion) {
 
         const formatCell = (value) => (value === null || value === undefined || value === '') ? '-' : value;
 
-        // ステータスを判定（優先順位: 1. cardStatus, 2. businessCardの有無）
-        const cardStatus = item.cardStatus || (item.businessCard ? 'completed' : 'blank');
+        // ステータスを判定（processingまたはcompleted）
+        const cardStatus = item.cardStatus === 'processing' || !item.businessCard ? 'processing' : 'completed';
 
         let fullName = '';
         let companyName = '';
@@ -46,10 +46,6 @@ export function populateTable(data, onDetailClick, selectedIndustryQuestion) {
             // データ化進行中: グレー文字でアニメーション付き
             fullName = '<span class="processing-text">データ化進行中</span>';
             companyName = '<span class="processing-text">データ化進行中</span>';
-        } else if (cardStatus === 'blank') {
-            // 未データ化: 空白（ブランク）を表示
-            fullName = '';
-            companyName = '';
         } else {
             // 完了: 通常通りデータを表示
             const lastName = item.businessCard?.group2?.lastName || '';
@@ -104,22 +100,17 @@ export function renderInlineRow(item, colSpan) {
     const row = document.createElement('tr');
     row.className = 'inline-detail-row bg-surface-variant/30 border-b border-outline-variant';
 
-    // ステータスを判定
-    const cardStatus = item.cardStatus || (item.businessCard ? 'completed' : 'blank');
+    // ステータスを判定（processingまたはcompleted）
+    const cardStatus = item.cardStatus === 'processing' || !item.businessCard ? 'processing' : 'completed';
 
     // 名刺画像のURL（全てのステータスで共通）
     const frontImageUrl = item.businessCard?.imageUrl?.front || '../media/縦表 .png';
     const backImageUrl = item.businessCard?.imageUrl?.back || '../media/縦裏.png';
 
-    // データ化進行中または未データ化の場合
-    if (cardStatus === 'processing' || cardStatus === 'blank') {
-        const statusMessage = cardStatus === 'processing'
-            ? '<span class="processing-text text-2xl font-bold">データ化進行中</span>'
-            : '<span class="text-2xl font-bold text-on-surface-variant">データ化をお待ちください</span>';
-
-        const statusDescription = cardStatus === 'processing'
-            ? '名刺画像をデータ化しています。しばらくお待ちください。'
-            : '名刺のデータ化が完了次第、こちらに表示されます。';
+    // データ化進行中の場合
+    if (cardStatus === 'processing') {
+        const statusMessage = '<span class="processing-text text-2xl font-bold">データ化進行中</span>';
+        const statusDescription = '名刺画像をデータ化しています。しばらくお待ちください。';
 
         row.innerHTML = `
             <td colspan="${colSpan}" class="p-0">
@@ -136,9 +127,7 @@ export function renderInlineRow(item, colSpan) {
                         <div class="inline-card-display-area relative">
                             <!-- 表面コンテナ -->
                             <div class="inline-card-wrapper w-full max-w-sm flex flex-col gap-2" id="inline-front-view">
-                                <div class="flex justify-between items-center">
-                                    <span class="text-xs text-on-surface-variant font-bold">名刺（表面）</span>
-                                </div>
+
                                 <div class="aspect-[1.6/1] bg-surface rounded-lg border border-outline-variant overflow-hidden relative shadow-sm">
                                     <img src="${frontImageUrl}" class="w-full h-full object-contain" alt="名刺（表面）" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
                                     <div class="hidden absolute inset-0 flex items-center justify-center text-on-surface-variant text-sm bg-surface-variant/50">画像なし</div>
@@ -146,9 +135,7 @@ export function renderInlineRow(item, colSpan) {
                             </div>
                             <!-- 裏面コンテナ -->
                             <div class="inline-card-wrapper w-full max-w-sm flex-col gap-2 hidden" id="inline-back-view">
-                                <div class="flex justify-between items-center">
-                                    <span class="text-xs text-on-surface-variant font-bold">名刺（裏面）</span>
-                                </div>
+
                                 <div class="aspect-[1.6/1] bg-surface rounded-lg border border-outline-variant overflow-hidden relative shadow-sm">
                                     <img src="${backImageUrl}" class="w-full h-full object-contain" alt="名刺（裏面）" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
                                     <div class="hidden absolute inset-0 flex items-center justify-center text-on-surface-variant text-sm bg-surface-variant/50">画像なし</div>
@@ -159,10 +146,10 @@ export function renderInlineRow(item, colSpan) {
                     
                     <!-- 右側：ステータスメッセージ -->
                     <div class="flex-1 flex items-center justify-center">
-                        <div class="text-center space-y-4 p-8 border border-outline-variant rounded-lg bg-surface-variant/50 max-w-md">
+                        <div class="text-center space-y-4 p-8 max-w-md">
                             <div class="flex items-center justify-center mb-4">
-                                <span class="material-icons text-6xl ${cardStatus === 'processing' ? 'text-on-surface-variant animate-spin' : 'text-on-surface-variant'}">
-                                    ${cardStatus === 'processing' ? 'sync' : 'schedule'}
+                                <span class="material-icons text-6xl text-on-surface-variant animate-spin">
+                                    sync
                                 </span>
                             </div>
                             <div>${statusMessage}</div>
@@ -200,8 +187,7 @@ export function renderInlineRow(item, colSpan) {
                     <div class="inline-card-display-area relative">
                         <!-- 表面コンテナ -->
                         <div class="inline-card-wrapper w-full max-w-sm flex flex-col gap-2" id="inline-front-view">
-                            <div class="flex justify-between items-center">
-                                <span class="text-xs text-on-surface-variant font-bold">名刺（表面）</span>
+                            <div class="flex justify-end items-center mb-1">
                                 <div class="flex gap-1">
                                     <button class="rotate-btn p-1 rounded hover:bg-surface-variant text-on-surface-variant transition-colors" data-target="inline" data-dir="-90" title="左回転">
                                         <span class="material-icons text-base">rotate_left</span>
@@ -218,8 +204,7 @@ export function renderInlineRow(item, colSpan) {
 
                         <!-- 裏面コンテナ (初期非表示) -->
                         <div class="inline-card-wrapper w-full max-w-sm flex flex-col gap-2 hidden" id="inline-back-view">
-                            <div class="flex justify-between items-center">
-                                <span class="text-xs text-on-surface-variant font-bold">名刺（裏面）</span>
+                            <div class="flex justify-end items-center mb-1">
                                 <div class="flex gap-1">
                                     <button class="rotate-btn p-1 rounded hover:bg-surface-variant text-on-surface-variant transition-colors" data-target="inline" data-dir="-90" title="左回転">
                                         <span class="material-icons text-base">rotate_left</span>
@@ -284,8 +269,8 @@ export function renderModalContent(item, isEditMode = false) {
 
     if (!cardDetailsContainer || !answerDetailsContainer) return;
 
-    // ステータスを判定
-    const cardStatus = item.cardStatus || (item.businessCard ? 'completed' : 'blank');
+    // ステータスを判定（processingまたはcompleted）
+    const cardStatus = item.cardStatus === 'processing' || !item.businessCard ? 'processing' : 'completed';
 
     // --- Business Card Details (always in view mode) ---
     let cardHtml = '';
@@ -333,22 +318,17 @@ export function renderModalContent(item, isEditMode = false) {
         </div>
     `;
 
-    // 2. ステータスメッセージ（データ化進行中または未データ化の場合のみ）
-    if (cardStatus === 'processing' || cardStatus === 'blank') {
-        const statusMessage = cardStatus === 'processing'
-            ? '<span class="processing-text text-2xl font-bold">データ化進行中</span>'
-            : '<span class="text-2xl font-bold text-on-surface-variant">データ化をお待ちください</span>';
-
-        const statusDescription = cardStatus === 'processing'
-            ? '名刺画像をデータ化しています。しばらくお待ちください。'
-            : '名刺のデータ化が完了次第、こちらに表示されます。';
+    // 2. ステータスメッセージ（データ化進行中の場合のみ）
+    if (cardStatus === 'processing') {
+        const statusMessage = '<span class="processing-text text-2xl font-bold">データ化進行中</span>';
+        const statusDescription = '名刺画像をデータ化しています。しばらくお待ちください。';
 
         cardHtml += `
             <div class="flex items-center justify-center p-6 mb-6 border border-outline-variant rounded-lg bg-surface-variant/30">
                 <div class="text-center space-y-2">
                     <div class="flex items-center justify-center mb-2">
-                        <span class="material-icons text-4xl ${cardStatus === 'processing' ? 'text-on-surface-variant animate-spin' : 'text-on-surface-variant'}">
-                            ${cardStatus === 'processing' ? 'sync' : 'schedule'}
+                        <span class="material-icons text-4xl text-on-surface-variant animate-spin">
+                            sync
                         </span>
                     </div>
                     <div>${statusMessage}</div>

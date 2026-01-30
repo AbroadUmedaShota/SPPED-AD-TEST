@@ -505,7 +505,7 @@ function applyFilters() {
     // ステータスフィルター
     if (currentStatusFilter !== 'all') {
         filteredData = filteredData.filter(item => {
-            const cardStatus = item.cardStatus || (item.businessCard ? 'completed' : 'blank');
+            const cardStatus = item.cardStatus === 'processing' || !item.businessCard ? 'processing' : 'completed';
             return cardStatus === currentStatusFilter;
         });
     }
@@ -695,6 +695,17 @@ function setupEventListeners() {
             onChange: function (selectedDates, dateStr, instance) {
                 currentDateFilter = dateStr;
                 applyFilters();
+            },
+            onDayCreate: function (dObj, dStr, fp, dayElem) {
+                // 会期: 2026-01-04 ~ 2026-01-17 (month is 0-indexed)
+                const date = dayElem.dateObj;
+                const start = new Date(2026, 0, 4);
+                const end = new Date(2026, 0, 17);
+                // 時間部分をクリアして比較
+                date.setHours(0, 0, 0, 0);
+                if (date >= start && date <= end) {
+                    dayElem.classList.add('event-duration-highlight');
+                }
             }
         });
     }
@@ -947,7 +958,9 @@ function renderDashboard(data) {
 
     // 4. Data Table (New!)
     const processedData = processDataForTable(currentSurvey, data);
-    renderGraphDataTable(processedData);
+    // Filter to show only the currently selected question
+    const currentQuestionData = processedData.filter(d => d.questionText === currentIndustryQuestion);
+    renderGraphDataTable(currentQuestionData);
 }
 
 function renderTimeSeriesChart(data) {
@@ -1024,6 +1037,14 @@ function renderTimeSeriesChart(data) {
                 tooltip: {
                     mode: 'index',
                     intersect: false,
+                }
+            },
+            layout: {
+                padding: {
+                    left: 0,
+                    right: 0,
+                    top: 0,
+                    bottom: 0
                 }
             },
             scales: {
