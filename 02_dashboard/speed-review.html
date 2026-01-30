@@ -57,18 +57,25 @@
                     <!-- Charts Row -->
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                         <!-- Time Series Chart -->
-                        <div class="bg-surface border border-outline-variant rounded-xl p-4 shadow-sm lg:col-span-2">
-                            <h3 class="text-sm font-medium mb-4 text-on-surface-variant">時間帯別回答数 (0:00 - 23:59)</h3>
+                        <div class="bg-surface border border-outline-variant rounded-xl p-4 shadow-sm">
+                            <h3 class="text-sm font-medium mb-4 text-on-surface-variant">時間帯別回答数</h3>
                             <div class="relative h-64 w-full">
                                 <canvas id="timeSeriesChart"></canvas>
                             </div>
                         </div>
                         <!-- Attribute Chart -->
                         <div class="bg-surface border border-outline-variant rounded-xl p-4 shadow-sm">
-                            <h3 class="text-sm font-medium mb-4 text-on-surface-variant">属性内訳 (<span
-                                    id="attribute-chart-title">...</span>)</h3>
+                            <h3 class="text-sm font-medium mb-4 text-on-surface-variant">属性内訳 (<span id="attribute-chart-title">...</span>)</h3>
                             <div class="relative h-64 w-full flex justify-center">
                                 <canvas id="attributeChart"></canvas>
+                            </div>
+                        </div>
+                        <!-- Data Table -->
+                        <div class="bg-surface border border-outline-variant rounded-xl p-4 shadow-sm">
+                            <h3 class="text-sm font-medium mb-4 text-on-surface-variant">データ集計</h3>
+                            <div id="graph-data-table-container" class="relative h-64 w-full overflow-y-auto custom-scrollbar">
+                                <!-- Table will be inserted here by JavaScript -->
+                                <p class="text-sm text-on-surface-variant">設問を選択すると、集計データが表示されます。</p>
                             </div>
                         </div>
                     </div>

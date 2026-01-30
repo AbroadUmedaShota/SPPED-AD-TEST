@@ -772,6 +772,112 @@ function setupSortListeners() {
     });
 }
 
+/**
+ * Processes raw survey data into a format suitable for a data table.
+ * This is adapted from graph-page.js's processDataForCharts.
+ * @param {object} survey The survey definition object.
+ * @param {Array} answers The array of answer objects to process.
+ * @returns {Array} An array of objects, each representing a question's aggregated data.
+ */
+function processDataForTable(survey, answers) {
+    if (!survey?.details) return [];
+
+    const graphableQuestions = survey.details.filter(q => q.type === 'single_choice' || q.type === 'multi_choice');
+
+    return graphableQuestions.map(question => {
+        const counts = {};
+        let answeredCount = 0;
+
+        answers.forEach(answer => {
+            const answerDetail = answer.details.find(d => d.question === question.text);
+            
+            if (answerDetail && answerDetail.answer && answerDetail.answer !== '') {
+                answeredCount++;
+                const answerValue = answerDetail.answer;
+                if (Array.isArray(answerValue)) { // Multi-choice
+                    answerValue.forEach(ans => {
+                        if (ans) {
+                           counts[ans] = (counts[ans] || 0) + 1;
+                        }
+                    });
+                } else { // Single-choice
+                    if (answerValue) {
+                        counts[answerValue] = (counts[answerValue] || 0) + 1;
+                    }
+                }
+            }
+        });
+
+        // Ensure all predefined options are present, even with 0 count
+        if (question.options) {
+            question.options.forEach(opt => {
+                if (!counts.hasOwnProperty(opt)) {
+                    counts[opt] = 0;
+                }
+            });
+        }
+        
+        // Add 'Unanswered' if it makes sense, but let's stick to the original logic for now
+        // which only counts answered questions.
+
+        const sortedLabels = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+
+        return {
+            questionId: question.id,
+            questionText: question.text,
+            labels: sortedLabels,
+            data: sortedLabels.map(label => counts[label]),
+            totalAnswers: answeredCount,
+            totalVotes: sortedLabels.reduce((sum, label) => sum + counts[label], 0)
+        };
+    });
+}
+
+/**
+ * Renders the aggregated data into an HTML table.
+ * @param {Array} processedData The data processed by processDataForTable.
+ */
+function renderGraphDataTable(processedData) {
+    const container = document.getElementById('graph-data-table-container');
+    if (!container) return;
+
+    const dataForCurrentQuestion = processedData.find(d => d.questionText === currentIndustryQuestion);
+
+    if (!dataForCurrentQuestion || dataForCurrentQuestion.labels.length === 0) {
+        container.innerHTML = '<p class="text-sm text-on-surface-variant p-4 text-center">この設問の集計データはありません。</p>';
+        return;
+    }
+
+    const { labels, data, totalVotes } = dataForCurrentQuestion;
+
+    const tableRows = labels.map((label, index) => {
+        const count = data[index];
+        const percentage = totalVotes > 0 ? ((count / totalVotes) * 100).toFixed(1) : 0;
+        return `
+            <tr class="border-b border-outline-variant/30 last:border-b-0">
+                <td class="px-3 py-2 text-sm text-on-surface truncate" title="${label}">${label}</td>
+                <td class="px-3 py-2 text-sm text-on-surface text-right">${count}</td>
+                <td class="px-3 py-2 text-sm text-on-surface-variant text-right">${percentage}%</td>
+            </tr>
+        `;
+    }).join('');
+
+    container.innerHTML = `
+        <table class="w-full text-left table-fixed">
+            <thead class="sticky top-0 bg-surface">
+                <tr class="border-b border-outline-variant">
+                    <th class="px-3 py-2 text-xs font-semibold text-on-surface-variant w-1/2">選択肢</th>
+                    <th class="px-3 py-2 text-xs font-semibold text-on-surface-variant text-right">回答数</th>
+                    <th class="px-3 py-2 text-xs font-semibold text-on-surface-variant text-right">割合</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-outline-variant/30">
+                ${tableRows}
+            </tbody>
+        </table>
+    `;
+}
+
 function renderDashboard(data) {
     const dashboardContainer = document.getElementById('analytics-dashboard');
     if (!dashboardContainer) return;
@@ -796,6 +902,10 @@ function renderDashboard(data) {
 
     // 3. Attribute Chart
     renderAttributeChart(data);
+
+    // 4. Data Table (New!)
+    const processedData = processDataForTable(currentSurvey, data);
+    renderGraphDataTable(processedData);
 }
 
 function renderTimeSeriesChart(data) {
