@@ -43,9 +43,12 @@
                             <div class="text-sm text-on-surface-variant font-medium">回答総数</div>
                             <div id="kpi-total-answers" class="text-3xl font-bold text-primary mt-1">-</div>
                         </div>
-                        <div
-                            class="bg-surface border border-outline-variant rounded-xl p-4 shadow-sm md:col-span-2 flex flex-col justify-center">
-                            <div class="text-sm text-on-surface-variant font-medium">現在選択中の設問</div>
+                        <div id="kpi-current-question-card"
+                            class="bg-surface border border-outline-variant rounded-xl p-4 shadow-sm md:col-span-2 flex flex-col justify-center cursor-pointer hover:bg-surface-variant/50 transition-colors group">
+                            <div class="flex justify-between items-center">
+                                <div class="text-sm text-on-surface-variant font-medium">現在選択中の設問</div>
+                                <span class="material-icons text-on-surface-variant group-hover:text-primary transition-colors">expand_more</span>
+                            </div>
                             <div id="dashboard-current-question"
                                 class="text-base font-bold text-on-surface mt-1 truncate">...</div>
                         </div>

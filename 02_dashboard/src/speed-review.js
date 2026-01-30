@@ -431,6 +431,56 @@ function handleResetFilters() {
     applyFilters();
 }
 
+function showQuestionSelectModal() {
+    handleOpenModal('questionSelectModalOverlay', resolveDashboardAssetPath('modals/questionSelectModal.html'), () => {
+        const container = document.getElementById('modal-question-list');
+        if (!container) return;
+
+        const questions = [];
+        const pushQuestion = (label) => {
+            if (!label || questions.includes(label)) return;
+            questions.push(label);
+        };
+
+        // Get questions from combined data or survey definition
+        if (allCombinedData.length > 0) {
+            allCombinedData.forEach(item => {
+                item.details?.forEach(detail => pushQuestion(detail.question || detail.text || detail.id));
+            });
+        }
+        if (questions.length === 0 && currentSurvey?.details) {
+            currentSurvey.details.forEach(detail => pushQuestion(detail.question || detail.text || detail.id));
+        }
+
+        container.innerHTML = '';
+        if (questions.length === 0) {
+            container.innerHTML = '<p class="p-4 text-center text-on-surface-variant">設問情報がありません。</p>';
+            return;
+        }
+
+        questions.forEach(question => {
+            const button = document.createElement('button');
+            const isActive = question === currentIndustryQuestion;
+            button.className = `w-full text-left px-4 py-3 rounded-xl transition-all flex items-center justify-between group ${
+                isActive ? 'bg-primary/10 text-primary font-bold' : 'hover:bg-surface-variant text-on-surface'
+            }`;
+            
+            button.innerHTML = `
+                <span class="truncate pr-4">${question}</span>
+                ${isActive ? '<span class="material-icons text-sm">check_circle</span>' : '<span class="material-icons text-sm opacity-0 group-hover:opacity-40 transition-opacity">chevron_right</span>'}
+            `;
+
+            button.onclick = () => {
+                handleQuestionSelectClick(question);
+                // Close modal
+                const overlay = document.getElementById('questionSelectModalOverlay');
+                if (overlay) overlay.click(); // Standard way to close in this project
+            };
+            container.appendChild(button);
+        });
+    });
+}
+
 function applyFilters() {
     let filteredData = allCombinedData;
 
@@ -636,6 +686,11 @@ function setupEventListeners() {
     const resetBtn = document.getElementById('resetFiltersButton');
     if (resetBtn) {
         resetBtn.addEventListener('click', handleResetFilters);
+    }
+
+    const questionCard = document.getElementById('kpi-current-question-card');
+    if (questionCard) {
+        questionCard.addEventListener('click', showQuestionSelectModal);
     }
 
     const graphBtn = document.getElementById('graphButton');
