@@ -1050,47 +1050,57 @@ function setupSidebarToggle() {
     const toggleBtn = document.getElementById('right-sidebar-toggle-btn');
     const icon = toggleBtn?.querySelector('.material-icons');
     const mainContentWrapper = document.getElementById('main-content-wrapper');
+    const overlay = document.getElementById('right-sidebar-overlay');
 
     if (!sidebar || !toggleBtn || !icon || !mainContentWrapper) return;
 
-    toggleBtn.addEventListener('click', () => {
-        // We check if it's currently hidden by translate-x-full
-        const isHidden = sidebar.classList.contains('translate-x-full');
+    let hasUserInteracted = false;
 
-        if (isHidden) {
-            // OPEN
-            sidebar.classList.remove('translate-x-full', 'shadow-none');
-            sidebar.classList.add('translate-x-0');
-            // Add shadow if you like, or rely on border
-
-            // Push content
-            mainContentWrapper.classList.add('lg:mr-80');
-
-            // Icon
-            icon.textContent = 'chevron_right';
-        } else {
+    const applySidebarState = (isCollapsed) => {
+        if (isCollapsed) {
             // CLOSE
             sidebar.classList.remove('translate-x-0');
-            sidebar.classList.add('translate-x-full', 'shadow-none');
-
-            // Remove margin from content (expand)
+            sidebar.classList.add('translate-x-full');
             mainContentWrapper.classList.remove('lg:mr-80');
-
-            // Icon
             icon.textContent = 'chevron_left';
+            toggleBtn.setAttribute('aria-expanded', 'false');
+            if (overlay) overlay.classList.remove('is-visible');
+        } else {
+            // OPEN
+            sidebar.classList.remove('translate-x-full');
+            sidebar.classList.add('translate-x-0');
+            mainContentWrapper.classList.add('lg:mr-80');
+            icon.textContent = 'chevron_right';
+            toggleBtn.setAttribute('aria-expanded', 'true');
+            if (overlay) overlay.classList.add('is-visible');
         }
+    };
+
+    toggleBtn.addEventListener('click', () => {
+        hasUserInteracted = true;
+        const isCollapsed = !sidebar.classList.contains('translate-x-full');
+        applySidebarState(isCollapsed);
     });
 
-    // Responsive Check: Auto-collapse if screen is too narrow
-    // If window width < 1280px, assume sidebar might cover content, so collapse by default.
-    // Default in HTML is OPEN (translate-x-0, lg:mr-80).
-    if (window.innerWidth < 1280) {
-        // CLOSE
-        sidebar.classList.remove('translate-x-0');
-        sidebar.classList.add('translate-x-full', 'shadow-none');
-        mainContentWrapper.classList.remove('lg:mr-80');
-        icon.textContent = 'chevron_left';
+    if (overlay) {
+        overlay.addEventListener('click', () => {
+            hasUserInteracted = true;
+            applySidebarState(true);
+        });
     }
+
+    // Initial state check
+    const isInitiallyCollapsed = window.innerWidth < 1280;
+    applySidebarState(isInitiallyCollapsed);
+
+    // Auto-hide logic
+    setTimeout(() => {
+        if (hasUserInteracted) return;
+        // Only auto-hide if it wasn't collapsed initially due to screen size
+        if (!isInitiallyCollapsed) {
+            applySidebarState(true);
+        }
+    }, 800);
 }
 
 export async function initializePage() {
