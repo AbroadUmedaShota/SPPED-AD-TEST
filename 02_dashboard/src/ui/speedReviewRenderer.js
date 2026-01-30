@@ -324,7 +324,7 @@ export function renderModalContent(item, isEditMode = false) {
         const statusDescription = '名刺画像をデータ化しています。しばらくお待ちください。';
 
         cardHtml += `
-            <div class="flex items-center justify-center p-6 mb-6 border border-outline-variant rounded-lg bg-surface-variant/30">
+            <div class="flex items-center justify-center p-6 mb-6">
                 <div class="text-center space-y-2">
                     <div class="flex items-center justify-center mb-2">
                         <span class="material-icons text-4xl text-on-surface-variant animate-spin">
