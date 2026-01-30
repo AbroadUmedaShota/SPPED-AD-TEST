@@ -11,6 +11,7 @@ let currentPage = 1;
 let rowsPerPage = 25;
 let currentIndustryQuestion = '';
 let currentDateFilter = '';
+let currentStatusFilter = 'all'; // ステータスフィルター
 let datePickerInstance = null;
 let currentItemInModal = null;
 let isModalInEditMode = false;
@@ -423,9 +424,15 @@ function updateModalFooter() {
 
 function handleResetFilters() {
     currentDateFilter = '';
+    currentStatusFilter = 'all';
 
     if (datePickerInstance) {
         datePickerInstance.clear();
+    }
+
+    const statusFilterSelect = document.getElementById('statusFilterSelect');
+    if (statusFilterSelect) {
+        statusFilterSelect.value = 'all';
     }
 
     applyFilters();
@@ -461,10 +468,9 @@ function showQuestionSelectModal() {
         questions.forEach(question => {
             const button = document.createElement('button');
             const isActive = question === currentIndustryQuestion;
-            button.className = `w-full text-left px-4 py-3 rounded-xl transition-all flex items-center justify-between group ${
-                isActive ? 'bg-primary/10 text-primary font-bold' : 'hover:bg-surface-variant text-on-surface'
-            }`;
-            
+            button.className = `w-full text-left px-4 py-3 rounded-xl transition-all flex items-center justify-between group ${isActive ? 'bg-primary/10 text-primary font-bold' : 'hover:bg-surface-variant text-on-surface'
+                }`;
+
             button.innerHTML = `
                 <span class="truncate pr-4">${question}</span>
                 ${isActive ? '<span class="material-icons text-sm">check_circle</span>' : '<span class="material-icons text-sm opacity-0 group-hover:opacity-40 transition-opacity">chevron_right</span>'}
@@ -484,6 +490,7 @@ function showQuestionSelectModal() {
 function applyFilters() {
     let filteredData = allCombinedData;
 
+    // 日付フィルター
     if (currentDateFilter) {
         const filterDate = new Date(currentDateFilter);
         filteredData = filteredData.filter(item => {
@@ -492,6 +499,14 @@ function applyFilters() {
             return itemDate.getFullYear() === filterDate.getFullYear() &&
                 itemDate.getMonth() === filterDate.getMonth() &&
                 itemDate.getDate() === filterDate.getDate();
+        });
+    }
+
+    // ステータスフィルター
+    if (currentStatusFilter !== 'all') {
+        filteredData = filteredData.filter(item => {
+            const cardStatus = item.cardStatus || (item.businessCard ? 'completed' : 'blank');
+            return cardStatus === currentStatusFilter;
         });
     }
 
@@ -683,6 +698,16 @@ function setupEventListeners() {
             }
         });
     }
+
+    // ステータスフィルターのイベントリスナー
+    const statusFilterSelect = document.getElementById('statusFilterSelect');
+    if (statusFilterSelect) {
+        statusFilterSelect.addEventListener('change', (e) => {
+            currentStatusFilter = e.target.value;
+            applyFilters();
+        });
+    }
+
     const resetBtn = document.getElementById('resetFiltersButton');
     if (resetBtn) {
         resetBtn.addEventListener('click', handleResetFilters);
@@ -691,6 +716,12 @@ function setupEventListeners() {
     const questionCard = document.getElementById('kpi-current-question-card');
     if (questionCard) {
         questionCard.addEventListener('click', showQuestionSelectModal);
+    }
+
+    // 「表示設問の変更」ボタンのイベントリスナー
+    const changeQuestionBtn = document.getElementById('change-display-question-btn');
+    if (changeQuestionBtn) {
+        changeQuestionBtn.addEventListener('click', showQuestionSelectModal);
     }
 
     const graphBtn = document.getElementById('graphButton');
@@ -790,14 +821,14 @@ function processDataForTable(survey, answers) {
 
         answers.forEach(answer => {
             const answerDetail = answer.details.find(d => d.question === question.text);
-            
+
             if (answerDetail && answerDetail.answer && answerDetail.answer !== '') {
                 answeredCount++;
                 const answerValue = answerDetail.answer;
                 if (Array.isArray(answerValue)) { // Multi-choice
                     answerValue.forEach(ans => {
                         if (ans) {
-                           counts[ans] = (counts[ans] || 0) + 1;
+                            counts[ans] = (counts[ans] || 0) + 1;
                         }
                     });
                 } else { // Single-choice
@@ -816,7 +847,7 @@ function processDataForTable(survey, answers) {
                 }
             });
         }
-        
+
         // Add 'Unanswered' if it makes sense, but let's stick to the original logic for now
         // which only counts answered questions.
 
@@ -1159,12 +1190,18 @@ export async function initializePage() {
         let enqueteDetailsData = enqueteDetails;
 
         if (!Array.isArray(answersData) || answersData.length === 0) {
-            const r1 = await fetch(resolveDashboardDataPath(`responses/answers/${surveyId}.json`));
+            const url = resolveDashboardDataPath(`responses/answers/${surveyId}.json`);
+            console.log('Fetching answers from:', url); // ★デバッグ用ログ
+            const r1 = await fetch(url);
             answersData = r1.ok ? await r1.json() : [];
+            console.log('Fetched answersData:', answersData); // ★デバッグ用ログ
         }
         if (!Array.isArray(personalInfoData) || personalInfoData.length === 0) {
-            const r2 = await fetch(resolveDashboardDataPath(`responses/business-cards/${surveyId}.json`));
+            const url = resolveDashboardDataPath(`responses/business-cards/${surveyId}.json`);
+            console.log('Fetching personal info from:', url); // ★デバッグ用ログ
+            const r2 = await fetch(url);
             personalInfoData = r2.ok ? await r2.json() : [];
+            console.log('Fetched personalInfoData:', personalInfoData); // ★デバッグ用ログ
         }
         if (!enqueteDetailsData || !enqueteDetailsData.details) {
             const r3 = await fetch(resolveDashboardDataPath(`surveys/enquete/${surveyId}.json`));
@@ -1193,19 +1230,15 @@ export async function initializePage() {
 
         // 4. Combine answers with personal info and survey definition
         allCombinedData = answersArr.map(answer => {
-            // Priority: 1. Separate file (map), 2. Embedded in answer, 3. Fallback
+            // Priority: 1. Separate file (map), 2. Embedded in answer, 3. null for blank status
             let businessCard = personalInfoMap.get(answer.answerId);
 
             if (!businessCard && answer.businessCard) {
                 businessCard = answer.businessCard;
             }
 
-            if (!businessCard) {
-                businessCard = {
-                    group2: { lastName: '(情報なし)' },
-                    group3: { companyName: '(情報なし)' }
-                };
-            }
+            // 未データ化の場合はbusinessCardをnullのままにする（フォールバックしない）
+            // これによりレンダラーがcardStatus='blank'と正しく判定できる
 
             return {
                 ...answer,

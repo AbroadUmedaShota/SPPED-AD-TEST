@@ -11,7 +11,7 @@
 export function populateTable(data, onDetailClick, selectedIndustryQuestion) {
     const tableBody = document.getElementById('reviewTableBody');
     const tableHead = document.querySelector('#reviewTable thead tr');
-    
+
     if (!tableBody) return;
 
     // ヘッダーに展開用の列を追加（一度だけ）
@@ -36,10 +36,27 @@ export function populateTable(data, onDetailClick, selectedIndustryQuestion) {
 
         const formatCell = (value) => (value === null || value === undefined || value === '') ? '-' : value;
 
-        const lastName = item.businessCard?.group2?.lastName || '';
-        const firstName = item.businessCard?.group2?.firstName || '';
-        const fullName = `${lastName} ${firstName}`.trim();
-        const companyName = item.businessCard?.group3?.companyName || '';
+        // ステータスを判定（優先順位: 1. cardStatus, 2. businessCardの有無）
+        const cardStatus = item.cardStatus || (item.businessCard ? 'completed' : 'blank');
+
+        let fullName = '';
+        let companyName = '';
+
+        if (cardStatus === 'processing') {
+            // データ化進行中: グレー文字でアニメーション付き
+            fullName = '<span class="processing-text">データ化進行中</span>';
+            companyName = '<span class="processing-text">データ化進行中</span>';
+        } else if (cardStatus === 'blank') {
+            // 未データ化: 空白（ブランク）を表示
+            fullName = '';
+            companyName = '';
+        } else {
+            // 完了: 通常通りデータを表示
+            const lastName = item.businessCard?.group2?.lastName || '';
+            const firstName = item.businessCard?.group2?.firstName || '';
+            fullName = `${lastName} ${firstName}`.trim() || '-';
+            companyName = item.businessCard?.group3?.companyName || '-';
+        }
 
         const getAnswer = (questionText) => {
             const detail = item.details.find(d => d.question === questionText);
@@ -56,8 +73,8 @@ export function populateTable(data, onDetailClick, selectedIndustryQuestion) {
             </td>
             <td class="px-4 py-3 whitespace-nowrap text-sm text-on-surface overflow-hidden text-ellipsis">${formatCell(item.answerId)}</td>
             <td class="px-4 py-3 whitespace-nowrap text-sm text-on-surface overflow-hidden text-ellipsis">${formatCell(item.answeredAt)}</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-on-surface overflow-hidden text-ellipsis">${formatCell(fullName)}</td>
-            <td class="px-4 py-3 text-sm text-on-surface truncate max-w-[200px]" title="${formatCell(companyName)}">${formatCell(companyName)}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-sm overflow-hidden text-ellipsis">${fullName}</td>
+            <td class="px-4 py-3 text-sm truncate max-w-[200px]" title="${cardStatus === 'completed' ? companyName : ''}">${companyName}</td>
             <td class="px-4 py-3 whitespace-nowrap text-sm text-on-surface overflow-hidden text-ellipsis">${(() => {
                 const answer = getAnswer(selectedIndustryQuestion);
                 return answer.length > 22 ? answer.substring(0, 22) + '...' : answer;
@@ -86,10 +103,79 @@ export function populateTable(data, onDetailClick, selectedIndustryQuestion) {
 export function renderInlineRow(item, colSpan) {
     const row = document.createElement('tr');
     row.className = 'inline-detail-row bg-surface-variant/30 border-b border-outline-variant';
-    
-    // 画像パス（固定）
-    const frontImageUrl = '../media/縦表 .png';
-    const backImageUrl = '../media/縦裏.png';
+
+    // ステータスを判定
+    const cardStatus = item.cardStatus || (item.businessCard ? 'completed' : 'blank');
+
+    // 名刺画像のURL（全てのステータスで共通）
+    const frontImageUrl = item.businessCard?.imageUrl?.front || '../media/縦表 .png';
+    const backImageUrl = item.businessCard?.imageUrl?.back || '../media/縦裏.png';
+
+    // データ化進行中または未データ化の場合
+    if (cardStatus === 'processing' || cardStatus === 'blank') {
+        const statusMessage = cardStatus === 'processing'
+            ? '<span class="processing-text text-2xl font-bold">データ化進行中</span>'
+            : '<span class="text-2xl font-bold text-on-surface-variant">データ化をお待ちください</span>';
+
+        const statusDescription = cardStatus === 'processing'
+            ? '名刺画像をデータ化しています。しばらくお待ちください。'
+            : '名刺のデータ化が完了次第、こちらに表示されます。';
+
+        row.innerHTML = `
+            <td colspan="${colSpan}" class="p-0">
+                <div class="flex flex-col md:flex-row gap-6 p-6 animate-fade-in-down">
+                    <!-- 名刺画像エリア（タブ切り替え式） -->
+                    <div class="flex flex-col gap-3 min-w-[320px]">
+                        <!-- タブヘッダー（中央配置） -->
+                        <div class="flex p-1 bg-surface-variant rounded-lg self-center mb-1">
+                            <button class="card-tab-btn px-6 py-1.5 text-xs font-bold rounded-md transition-all active bg-surface text-primary shadow-sm" data-tab="front">表面</button>
+                            <button class="card-tab-btn px-6 py-1.5 text-xs font-bold rounded-md transition-all text-on-surface-variant hover:text-on-surface" data-tab="back">裏面</button>
+                        </div>
+
+                        <!-- 画像表示本体 -->
+                        <div class="inline-card-display-area relative">
+                            <!-- 表面コンテナ -->
+                            <div class="inline-card-wrapper w-full max-w-sm flex flex-col gap-2" id="inline-front-view">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs text-on-surface-variant font-bold">名刺（表面）</span>
+                                </div>
+                                <div class="aspect-[1.6/1] bg-surface rounded-lg border border-outline-variant overflow-hidden relative shadow-sm">
+                                    <img src="${frontImageUrl}" class="w-full h-full object-contain" alt="名刺（表面）" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                                    <div class="hidden absolute inset-0 flex items-center justify-center text-on-surface-variant text-sm bg-surface-variant/50">画像なし</div>
+                                </div>
+                            </div>
+                            <!-- 裏面コンテナ -->
+                            <div class="inline-card-wrapper w-full max-w-sm flex-col gap-2 hidden" id="inline-back-view">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs text-on-surface-variant font-bold">名刺（裏面）</span>
+                                </div>
+                                <div class="aspect-[1.6/1] bg-surface rounded-lg border border-outline-variant overflow-hidden relative shadow-sm">
+                                    <img src="${backImageUrl}" class="w-full h-full object-contain" alt="名刺（裏面）" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                                    <div class="hidden absolute inset-0 flex items-center justify-center text-on-surface-variant text-sm bg-surface-variant/50">画像なし</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 右側：ステータスメッセージ -->
+                    <div class="flex-1 flex items-center justify-center">
+                        <div class="text-center space-y-4 p-8 border border-outline-variant rounded-lg bg-surface-variant/50 max-w-md">
+                            <div class="flex items-center justify-center mb-4">
+                                <span class="material-icons text-6xl ${cardStatus === 'processing' ? 'text-on-surface-variant animate-spin' : 'text-on-surface-variant'}">
+                                    ${cardStatus === 'processing' ? 'sync' : 'schedule'}
+                                </span>
+                            </div>
+                            <div>${statusMessage}</div>
+                            <p class="text-sm text-on-surface-variant">${statusDescription}</p>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        `;
+        return row;
+    }
+
+    // 完了の場合: 通常通り名刺データを表示
 
     const card = item.businessCard || {};
     const fullName = `${card.group2?.lastName || ''} ${card.group2?.firstName || ''}`.trim();
@@ -198,10 +284,13 @@ export function renderModalContent(item, isEditMode = false) {
 
     if (!cardDetailsContainer || !answerDetailsContainer) return;
 
+    // ステータスを判定
+    const cardStatus = item.cardStatus || (item.businessCard ? 'completed' : 'blank');
+
     // --- Business Card Details (always in view mode) ---
     let cardHtml = '';
 
-    // --- Business Card Images Section ---
+    // 1. まず名刺画像を表示（全てのステータスで共通）
     const frontImageUrl = item.businessCard?.imageUrl?.front || '../media/表面.png';
     const backImageUrl = item.businessCard?.imageUrl?.back || '../media/裏面.png';
 
@@ -244,7 +333,33 @@ export function renderModalContent(item, isEditMode = false) {
         </div>
     `;
 
-    if (item.businessCard) {
+    // 2. ステータスメッセージ（データ化進行中または未データ化の場合のみ）
+    if (cardStatus === 'processing' || cardStatus === 'blank') {
+        const statusMessage = cardStatus === 'processing'
+            ? '<span class="processing-text text-2xl font-bold">データ化進行中</span>'
+            : '<span class="text-2xl font-bold text-on-surface-variant">データ化をお待ちください</span>';
+
+        const statusDescription = cardStatus === 'processing'
+            ? '名刺画像をデータ化しています。しばらくお待ちください。'
+            : '名刺のデータ化が完了次第、こちらに表示されます。';
+
+        cardHtml += `
+            <div class="flex items-center justify-center p-6 mb-6 border border-outline-variant rounded-lg bg-surface-variant/30">
+                <div class="text-center space-y-2">
+                    <div class="flex items-center justify-center mb-2">
+                        <span class="material-icons text-4xl ${cardStatus === 'processing' ? 'text-on-surface-variant animate-spin' : 'text-on-surface-variant'}">
+                            ${cardStatus === 'processing' ? 'sync' : 'schedule'}
+                        </span>
+                    </div>
+                    <div>${statusMessage}</div>
+                    <p class="text-sm text-on-surface-variant">${statusDescription}</p>
+                </div>
+            </div>
+        `;
+    }
+
+    // 3. 名刺の詳細情報（データ化完了の場合のみ）
+    if (cardStatus === 'completed' && item.businessCard) {
         const card = item.businessCard;
         const fields = {
             '会社名': { value: card.group3?.companyName, key: 'companyName' },
@@ -421,17 +536,17 @@ export function openCardZoom(imageUrl, rotation = 0) {
 export function handleModalImageClick(e) {
     // Traverse up from the clicked element to find a zoomable container or image
     const zoomTarget = e.target.closest('[data-zoom-src]');
-    
+
     if (zoomTarget) {
         e.preventDefault(); // Prevent default behavior
         e.stopPropagation(); // Stop propagation to prevent bubbling issues
-        
+
         const src = zoomTarget.getAttribute('data-zoom-src');
         if (src) {
             // Get rotation from the image element inside the target
             const img = zoomTarget.querySelector('img');
             const rotation = img ? (parseInt(img.dataset.rotation) || 0) : 0;
-            
+
             console.log('[speedReviewRenderer] Zooming image:', src, 'rotation:', rotation);
             openCardZoom(src, rotation);
         }

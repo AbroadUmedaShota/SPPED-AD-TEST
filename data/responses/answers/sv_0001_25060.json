@@ -1,0 +1,8098 @@
+[
+  {
+    "answerId": "sv25060-00001",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-18 07:01:54",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3601"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "農林水産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00002",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-13 12:04:37",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6170"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "製造業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00003",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-26 17:58:35",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S7689"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00004",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-23 01:27:46",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0935"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "IT・情報通信業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00005",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-30 11:22:13",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3643"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "建設業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00006",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-27 14:32:05",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1576"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00007",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-27 17:32:45",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8562"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "金融・保険業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00008",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-09 11:41:19",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6315"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "IT・情報通信業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00009",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-19 06:03:38",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3738"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "農林水産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00010",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-11 14:43:14",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6624"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "建設業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00011",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-21 04:53:22",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3552"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "小売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00012",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-13 02:51:50",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0380"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "その他"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00013",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-17 19:38:08",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2001"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00014",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-22 05:00:03",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0277"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "製造業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00015",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-23 20:11:12",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6453"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "医療・福祉"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00016",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-18 06:54:45",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3895"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "小売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00017",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-05 16:52:24",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0587"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "医療・福祉"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00018",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-20 22:28:06",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0167"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00019",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-28 16:34:17",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1957"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "医療・福祉"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00020",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-13 12:37:51",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S7286"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "医療・福祉"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00021",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-03 15:45:14",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5480"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "IT・情報通信業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00022",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-27 10:53:14",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0943"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00023",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-27 20:00:25",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S7671"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00024",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-18 01:01:30",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2906"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "小売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00025",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-28 21:56:24",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4329"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00026",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-04 12:48:44",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0120"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "小売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00027",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-11 01:38:25",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9764"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "電気・ガス業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00028",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-09 08:22:24",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0539"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "電気・ガス業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00029",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-18 03:23:40",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S7871"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "電気・ガス業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00030",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-21 09:42:28",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S7918"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "IT・情報通信業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00031",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-22 23:00:18",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9381"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "医療・福祉"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00032",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-06 14:07:47",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9901"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00033",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-09 03:22:44",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S7821"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "建設業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00034",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-02 16:03:50",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2801"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "小売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00035",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-18 10:25:51",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8280"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "金融・保険業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00036",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-17 22:55:19",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5309"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "小売業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00037",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-12 22:21:12",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9547"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "建設業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00038",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-23 07:42:16",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9907"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00039",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-10 17:19:59",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1767"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00040",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-12 06:32:51",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5495"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "運輸業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00041",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-28 09:34:00",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6994"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00042",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-21 19:26:07",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4232"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00043",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-18 14:43:21",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1849"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00044",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-03 14:41:28",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3289"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00045",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-26 05:18:12",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2020"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00046",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-30 08:47:37",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0759"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00047",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-26 20:24:05",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S7476"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00048",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-19 22:11:23",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3867"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "農林水産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00049",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-18 04:16:33",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0005"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00050",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-14 12:07:18",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0889"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "電気・ガス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00051",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-12 16:15:34",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9618"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "その他"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00052",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-23 17:45:58",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2225"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "小売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00053",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-13 11:38:06",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2959"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00054",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-29 01:19:15",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1088"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "金融・保険業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00055",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-20 07:44:04",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3346"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00056",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-10 04:40:07",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0410"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "小売業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00057",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-28 07:51:55",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3479"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00058",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-28 06:49:52",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8557"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "小売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00059",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-09 02:11:58",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9053"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00060",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-08 12:44:07",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9545"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "電気・ガス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00061",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-09 16:37:06",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4086"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "IT・情報通信業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00062",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-16 22:24:16",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5723"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "製造業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00063",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-20 04:24:43",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5049"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00064",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-14 23:12:32",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5033"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "IT・情報通信業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00065",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-26 13:03:10",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5982"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "医療・福祉"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00066",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-25 05:40:54",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4789"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00067",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-24 16:48:11",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5487"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "建設業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00068",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-08 09:20:46",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9764"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "その他"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00069",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-04 10:55:11",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2758"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "農林水産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00070",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-22 08:02:01",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5646"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "農林水産業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00071",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-23 18:58:10",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9088"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "電気・ガス業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00072",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-26 14:14:59",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4824"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "小売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00073",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-15 11:31:38",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0220"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00074",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-03 14:03:51",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9101"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "小売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00075",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-22 01:06:59",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5949"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00076",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-20 13:58:07",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4554"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "その他"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00077",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-03 19:24:41",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4545"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "金融・保険業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00078",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-06 22:21:44",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5802"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00079",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-26 12:20:10",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1385"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00080",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-27 04:38:54",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3494"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "小売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00081",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-26 02:35:43",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9951"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "農林水産業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00082",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-15 01:17:55",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5927"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00083",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-12 21:46:23",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4287"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00084",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-14 03:09:14",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3001"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "小売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00085",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-15 12:26:48",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8163"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00086",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-17 11:17:19",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1249"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "小売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00087",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-14 11:51:24",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S7992"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "農林水産業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00088",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-20 11:25:31",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5228"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "製造業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00089",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-22 22:24:30",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6474"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00090",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-08 13:02:02",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8512"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00091",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-14 00:27:21",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0664"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "建設業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00092",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-02 22:23:13",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S7715"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "その他"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00093",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-16 20:19:02",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8633"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "製造業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00094",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-13 17:19:30",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8817"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00095",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-03 22:24:37",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4382"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00096",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-07 20:58:57",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0050"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "電気・ガス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00097",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-17 03:40:06",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5002"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "建設業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00098",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-05 19:55:41",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8223"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00099",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-05 18:11:27",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1268"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "運輸業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00100",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-17 14:40:07",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1964"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "IT・情報通信業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00101",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-21 21:23:55",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6878"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00102",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-22 04:49:23",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4464"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "電気・ガス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00103",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-10 21:48:26",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2872"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "金融・保険業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00104",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-08 15:57:30",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0893"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00105",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-03 16:05:12",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3569"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "製造業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00106",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-05 00:48:01",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6862"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "電気・ガス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00107",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-24 13:22:07",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0867"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "医療・福祉"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00108",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-29 10:11:01",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8197"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "小売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00109",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-05 17:50:06",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5800"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00110",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-16 09:29:21",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6906"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00111",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-12 16:59:38",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8299"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "製造業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00112",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-30 02:39:41",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4961"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "IT・情報通信業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00113",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-04 01:33:09",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9826"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "その他"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00114",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-01 12:05:16",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9601"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "金融・保険業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00115",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-21 00:39:17",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9071"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "IT・情報通信業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00116",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-12 21:24:53",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4509"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "小売業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00117",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-26 20:32:52",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9238"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "金融・保険業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00118",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-26 12:30:49",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0461"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00119",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-14 09:19:23",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0618"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "医療・福祉"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00120",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-28 01:37:45",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2006"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00121",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-27 10:33:59",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3489"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "製造業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00122",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-05 23:16:39",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S7310"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00123",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-21 09:09:28",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8442"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "運輸業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00124",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-13 00:44:49",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4555"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00125",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-29 01:45:57",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5792"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "その他"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00126",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-10 01:12:20",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4150"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "建設業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00127",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-23 20:32:58",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5194"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00128",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-07 01:22:50",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8525"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00129",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-09 09:36:18",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9509"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "運輸業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00130",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-04 20:59:11",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2945"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00131",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-22 08:17:33",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4999"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00132",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-15 20:54:44",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2495"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "運輸業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00133",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-21 01:09:11",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2744"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "その他"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00134",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-15 07:12:37",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6211"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "IT・情報通信業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00135",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-04 23:52:32",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6465"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "製造業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00136",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-25 17:09:45",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5269"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00137",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-29 20:32:18",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2608"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00138",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-21 17:43:14",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6238"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00139",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-01 09:56:32",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2095"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "その他"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00140",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-18 23:52:48",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9454"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "製造業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00141",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-21 14:19:21",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2108"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00142",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-23 15:08:39",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5196"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "電気・ガス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00143",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-25 04:52:25",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S7158"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "農林水産業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00144",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-14 05:28:11",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1129"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "その他"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00145",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-30 05:12:00",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9870"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00146",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-09 04:03:44",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3971"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "IT・情報通信業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00147",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-05 19:20:27",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6108"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00148",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-15 01:11:41",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0563"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "IT・情報通信業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00149",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-09 13:47:28",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5479"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "建設業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00150",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-12 10:57:04",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5486"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "製造業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00151",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-14 19:50:32",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1230"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00152",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-27 20:37:35",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0220"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "建設業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00153",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-11 08:06:04",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5058"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "その他"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00154",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-13 00:54:30",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8608"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "IT・情報通信業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00155",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-22 12:38:08",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1294"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "農林水産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00156",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-21 00:03:21",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4761"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "農林水産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00157",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-19 05:05:12",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2018"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00158",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-08 21:06:01",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9517"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00159",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-30 17:11:30",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9950"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "その他"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00160",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-08 19:16:17",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3939"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "医療・福祉"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00161",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-28 17:53:07",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1448"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "小売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00162",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-15 18:01:53",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9572"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00163",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-25 11:05:54",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6022"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00164",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-01 11:37:28",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3665"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00165",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-03 00:37:47",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8758"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "電気・ガス業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00166",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-02 04:32:18",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4456"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "製造業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00167",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-06 07:24:57",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2162"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00168",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-26 04:15:43",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3696"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00169",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-06 13:04:49",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8095"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "製造業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00170",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-25 13:59:59",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5505"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00171",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-21 04:26:35",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6267"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "製造業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00172",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-21 02:42:11",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3225"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "運輸業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00173",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-03 13:46:10",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3954"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "医療・福祉"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00174",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-08 01:15:08",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9368"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "医療・福祉"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00175",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-18 13:04:57",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2116"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "金融・保険業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00176",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-16 07:56:06",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6423"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "運輸業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00177",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-11 13:13:45",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1566"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "建設業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00178",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-16 15:34:42",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2785"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00179",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-15 02:33:28",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5038"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "建設業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00180",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-28 09:06:03",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5370"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "IT・情報通信業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00181",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-16 13:47:38",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5781"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "小売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00182",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-12 04:25:49",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3189"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00183",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-21 00:33:59",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8983"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "小売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00184",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-12 12:21:33",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9012"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00185",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-22 16:01:19",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S7618"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00186",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-14 12:25:43",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9484"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00187",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-04 23:29:13",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5897"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00188",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-12 00:44:34",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S7876"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "建設業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00189",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-30 07:40:03",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4394"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00190",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-30 16:59:35",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S7536"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "電気・ガス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00191",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-24 18:50:14",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8007"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "製造業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00192",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-07 04:49:22",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3146"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "金融・保険業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00193",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-17 03:12:02",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1889"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "その他"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00194",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-02 12:53:02",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4757"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "小売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00195",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-12 03:04:17",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8538"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00196",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-22 16:12:07",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2127"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00197",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-21 23:25:43",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2798"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "建設業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00198",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-09 05:15:49",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3355"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00199",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-15 18:07:22",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4784"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00200",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-08 21:36:20",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2809"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00201",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-08 11:20:01",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S7902"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "建設業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00202",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-08 04:24:29",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6799"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "運輸業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00203",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-01 09:21:32",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8814"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "その他"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00204",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-29 23:17:14",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1081"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "農林水産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00205",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-08 01:57:38",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0012"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "医療・福祉"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00206",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-22 20:31:36",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2928"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00207",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-15 14:55:31",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9134"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "IT・情報通信業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00208",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-23 00:22:12",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1151"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00209",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-16 10:30:45",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1890"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "農林水産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00210",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-20 20:23:54",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2160"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00211",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-15 15:05:41",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0245"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "製造業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00212",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-04 08:04:56",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8414"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00213",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-05 01:39:47",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0487"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "金融・保険業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00214",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-25 08:24:27",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5653"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "電気・ガス業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00215",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-18 20:28:24",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3189"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "小売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00216",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-29 21:46:49",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8898"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00217",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-05 20:29:05",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0620"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "IT・情報通信業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00218",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-14 02:36:38",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9911"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "その他"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00219",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-23 23:41:48",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1152"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00220",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-11 17:06:01",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3095"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "小売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00221",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-15 17:38:35",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0083"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "その他"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00222",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-16 12:07:42",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4995"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00223",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-20 11:19:03",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8815"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "小売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00224",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-02 01:35:13",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4296"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00225",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-02 11:47:58",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8773"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "運輸業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00226",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-14 02:29:33",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8342"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00227",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-13 03:50:25",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6635"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00228",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-08 08:09:44",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3865"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00229",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-19 03:18:33",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3826"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "医療・福祉"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00230",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-04 04:22:07",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6328"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "電気・ガス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00231",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-23 01:18:41",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8410"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "医療・福祉"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00232",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-22 16:10:18",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9541"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00233",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-17 14:32:53",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5929"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "建設業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00234",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-18 10:27:11",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5302"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "電気・ガス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00235",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-23 17:38:35",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0759"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00236",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-25 18:02:53",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S7021"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "農林水産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00237",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-05 10:45:53",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4330"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00238",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-10 06:03:50",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0485"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00239",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-16 11:04:31",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S7760"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "農林水産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00240",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-13 06:07:14",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2069"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00241",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-19 00:28:05",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S7240"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "製造業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00242",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-30 02:14:18",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6869"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "医療・福祉"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00243",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-22 18:01:34",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9758"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00244",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-12 00:08:16",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3029"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00245",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-12 07:44:59",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S7097"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00246",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-08 12:14:39",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9930"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "小売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00247",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-27 11:10:07",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8445"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "IT・情報通信業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00248",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-29 14:32:04",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3640"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00249",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-05 15:43:07",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6575"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "農林水産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00250",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-18 08:44:09",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0657"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "電気・ガス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00251",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-21 03:18:23",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8120"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "その他"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00252",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-03 00:23:57",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4001"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "金融・保険業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00253",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-09 14:04:06",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2917"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00254",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-27 21:16:19",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8779"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "運輸業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00255",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-16 05:13:00",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5132"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00256",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-01 11:27:28",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0863"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00257",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-19 12:37:42",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3602"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00258",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-03 00:05:30",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S7808"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00259",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-06 00:53:16",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1557"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00260",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-29 06:27:22",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1702"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "製造業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00261",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-04 06:50:10",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S7535"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "その他"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00262",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-25 13:43:04",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6988"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "小売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00263",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-27 09:21:11",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6777"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00264",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-25 04:31:45",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3093"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00265",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-08 15:30:22",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4506"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "IT・情報通信業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00266",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-16 01:01:18",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0561"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "その他"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00267",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-05 23:52:04",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5226"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "製造業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00268",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-07 22:37:50",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9663"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00269",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-04 18:22:28",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8204"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00270",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-06 20:04:30",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5550"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "農林水産業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00271",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-04 15:17:00",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9201"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "製造業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00272",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-28 16:09:14",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9456"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "その他"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00273",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-03 05:00:41",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5617"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "その他"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00274",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-30 03:06:19",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2280"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "その他"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00275",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-29 08:02:03",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1380"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "電気・ガス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00276",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-05 04:24:18",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4119"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00277",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-10 14:41:59",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8428"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00278",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-28 10:33:03",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0298"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "金融・保険業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00279",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-30 15:51:43",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8110"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "その他"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00280",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-05 13:56:26",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1453"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "金融・保険業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00281",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-13 13:05:03",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6084"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "建設業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00282",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-20 20:33:34",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S7748"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "電気・ガス業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00283",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-09 17:42:44",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4076"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00284",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-08 10:29:45",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2039"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "建設業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00285",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-23 05:41:33",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1695"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "建設業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00286",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-18 23:45:08",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0735"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "農林水産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00287",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-05 03:54:19",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3453"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "建設業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00288",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-10 15:59:53",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9629"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "運輸業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00289",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-10 09:50:45",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0079"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "医療・福祉"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00290",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-27 21:32:49",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3649"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00291",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-16 11:20:34",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4792"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "建設業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00292",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-09 00:06:39",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0619"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "農林水産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00293",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-20 06:24:17",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5165"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00294",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-25 02:40:02",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S7951"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "医療・福祉"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00295",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-24 23:29:52",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0354"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00296",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-26 01:20:11",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9211"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00297",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-29 22:00:49",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6196"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00298",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-16 18:50:33",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2239"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "その他"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00299",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-19 18:38:04",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5855"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00300",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-04 06:56:02",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3397"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "農林水産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00301",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-29 11:13:24",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4763"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00302",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-26 05:32:16",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6211"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "農林水産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00303",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-24 06:54:47",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S7491"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00304",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-19 17:28:07",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8627"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "電気・ガス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00305",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-19 00:40:33",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0983"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00306",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-02 09:33:38",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3928"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "金融・保険業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00307",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-15 05:46:18",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9894"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00308",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-09 06:56:38",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1454"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "その他"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00309",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-26 03:34:11",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3641"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "農林水産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00310",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-04 03:42:25",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4879"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00311",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-06 23:09:05",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8826"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "IT・情報通信業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00312",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-29 15:36:01",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9086"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00313",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-24 05:31:06",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5300"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "建設業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00314",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-19 14:47:23",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9595"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00315",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-02 03:03:32",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6734"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00316",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-22 02:25:44",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8925"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00317",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-29 09:31:21",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6211"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00318",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-15 03:58:15",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6399"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00319",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-18 13:41:16",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9031"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "農林水産業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00320",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-02 20:30:28",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1946"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "農林水産業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00321",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-14 22:40:50",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3748"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "IT・情報通信業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00322",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-02 05:08:33",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2413"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "その他"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00323",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-23 22:14:18",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8225"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "金融・保険業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00324",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-12 02:06:43",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3119"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "電気・ガス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00325",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-15 14:07:47",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9350"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00326",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-25 09:32:45",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9067"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00327",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-29 21:23:53",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1371"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "電気・ガス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00328",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-10 07:42:08",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1197"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "医療・福祉"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00329",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-25 02:27:54",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9683"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00330",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-26 22:48:41",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8615"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "IT・情報通信業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00331",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-20 13:24:44",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0695"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "金融・保険業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00332",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-15 22:55:08",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3538"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "製造業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00333",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-08 19:30:43",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5074"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00334",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-23 05:10:25",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4894"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00335",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-12 23:18:17",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3196"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00336",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-07 06:33:40",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0571"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "電気・ガス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00337",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-22 16:06:47",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1872"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00338",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-04 02:30:31",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4056"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "農林水産業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00339",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-27 12:35:15",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2108"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00340",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-29 13:18:28",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9916"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00341",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-23 15:13:47",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2130"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00342",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-18 07:04:23",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4773"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "IT・情報通信業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00343",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-21 01:39:22",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S7572"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "小売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00344",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-29 14:48:05",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6693"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00345",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-21 02:57:34",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0231"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "電気・ガス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00346",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-08 17:41:44",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5997"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "製造業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00347",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-09 11:02:24",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0568"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "農林水産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00348",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-09 00:02:15",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5319"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00349",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-30 07:00:24",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3448"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00350",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-16 01:27:23",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5324"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00351",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-11 09:09:16",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1565"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "小売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00352",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-05 19:36:07",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5919"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00353",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-16 07:20:04",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8821"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00354",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-13 07:48:19",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8294"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "金融・保険業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00355",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-23 01:19:25",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6746"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00356",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-24 12:31:07",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1962"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "医療・福祉"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00357",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-16 07:00:30",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4545"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "建設業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00358",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-05 04:24:09",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1860"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "電気・ガス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00359",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-15 11:49:43",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9978"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "その他"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00360",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-18 02:11:41",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6199"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00361",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-12 20:25:25",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9572"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00362",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-12 02:43:59",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9724"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "金融・保険業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00363",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-06 05:44:39",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0626"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "金融・保険業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00364",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-14 01:43:45",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6537"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00365",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-29 09:22:26",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0158"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "その他"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00366",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-08 17:33:58",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0836"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "医療・福祉"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00367",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-02 12:36:23",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2997"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "医療・福祉"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00368",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-02 03:49:58",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3283"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00369",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-11 15:20:06",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0989"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "医療・福祉"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00370",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-03 11:13:05",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4257"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "小売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00371",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-08 11:11:45",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4306"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "IT・情報通信業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00372",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-23 05:41:34",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S7851"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "建設業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00373",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-30 03:13:58",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8381"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00374",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-11 14:36:07",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6876"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00375",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-26 05:55:45",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4342"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "農林水産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00376",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-16 22:04:31",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6508"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "その他"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00377",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-19 05:49:36",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9648"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "小売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00378",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-06 22:25:23",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5859"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "医療・福祉"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00379",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-14 13:09:33",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S7475"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "金融・保険業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00380",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-21 09:24:31",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0653"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "運輸業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00381",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-27 00:17:33",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S7917"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "IT・情報通信業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00382",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-09 10:32:16",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8345"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00383",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-15 09:58:53",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S7625"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "農林水産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00384",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-29 08:49:04",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0794"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "製造業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00385",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-13 09:31:52",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3515"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "IT・情報通信業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00386",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-23 06:41:07",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5927"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "小売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00387",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-24 06:14:13",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3062"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00388",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-01 11:17:05",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6463"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00389",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-10 12:55:34",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1953"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00390",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-21 06:21:08",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4815"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00391",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-14 02:31:52",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2079"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00392",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-27 06:09:01",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9721"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00393",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-05 01:14:38",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9668"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "小売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00394",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-03 10:47:36",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0695"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "その他"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00395",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-23 08:13:40",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9341"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "運輸業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00396",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-08 14:02:45",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2304"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00397",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-03 13:23:22",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4177"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "金融・保険業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00398",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-08 00:06:52",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6520"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "製造業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00399",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-03 22:28:44",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6270"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "建設業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00400",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-25 03:49:11",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5839"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00401",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-23 06:13:07",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2021"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00402",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-11 15:34:01",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3654"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00403",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-25 07:35:51",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9269"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "IT・情報通信業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00404",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-11 20:47:16",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4066"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00405",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-07 19:13:20",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9713"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "電気・ガス業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00406",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-21 03:55:25",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8080"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00407",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-26 21:24:26",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6081"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00408",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-18 23:35:08",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6984"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00409",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-09 13:47:39",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4155"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "運輸業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00410",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-11 00:02:14",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3596"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "医療・福祉"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00411",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-24 14:19:07",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4020"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00412",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-21 15:40:18",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1716"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "運輸業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00413",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-01 23:15:52",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6143"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00414",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-22 06:20:05",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0321"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "運輸業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00415",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-18 07:06:49",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5110"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00416",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-24 05:23:22",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5316"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00417",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-11 22:59:26",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S7497"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "製造業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00418",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-04 23:11:59",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0620"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00419",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-13 00:05:01",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0219"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "小売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00420",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-18 22:37:04",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S7245"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "その他"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00421",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-24 07:54:02",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6057"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00422",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-29 17:59:11",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9633"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "建設業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00423",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-14 11:53:41",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8099"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "金融・保険業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00424",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-10 08:57:59",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6373"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00425",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-07 13:17:50",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6563"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "運輸業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00426",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-07 03:37:48",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8524"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00427",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-19 13:00:15",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2616"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "建設業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00428",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-30 13:46:23",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5027"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00429",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-18 00:48:32",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4588"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "電気・ガス業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00430",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-27 14:17:39",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9184"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00431",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-17 02:34:34",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0713"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00432",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-30 13:59:51",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4454"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "農林水産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00433",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-14 03:42:55",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4107"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "建設業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00434",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-08 02:11:25",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5197"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00435",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-19 16:29:26",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8104"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "金融・保険業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00436",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-03 17:31:57",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3808"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "IT・情報通信業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00437",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-13 01:38:54",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5265"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "運輸業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00438",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-23 05:55:32",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1231"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "IT・情報通信業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00439",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-04 21:26:31",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8416"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "建設業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00440",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-18 21:36:53",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4853"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00441",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-14 21:08:21",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3620"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "農林水産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00442",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-06 05:00:54",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8251"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "IT・情報通信業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00443",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-19 02:17:00",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9661"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00444",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-11 17:26:19",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1966"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00445",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-05 10:28:05",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4224"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "その他"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00446",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-19 19:28:48",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5065"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00447",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-24 02:50:39",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0053"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00448",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-08 22:28:30",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8529"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00449",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-19 03:11:22",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2708"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "農林水産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00450",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-06 04:33:12",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2238"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00451",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-07 23:16:50",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5784"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "金融・保険業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00452",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-05 00:02:26",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0124"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00453",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-16 17:22:18",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8720"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "農林水産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00454",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-15 14:21:16",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3419"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "製造業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00455",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-12 09:13:07",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3011"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "建設業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00456",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-29 16:03:48",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S7781"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "小売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00457",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-19 05:03:25",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6973"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "運輸業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00458",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-17 03:46:59",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S7160"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "医療・福祉"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00459",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-23 19:16:46",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1135"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "金融・保険業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00460",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-23 20:58:13",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9317"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00461",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-10 02:50:33",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9214"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00462",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-13 09:47:51",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5133"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "製造業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00463",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-19 22:40:18",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4047"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "卸売業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00464",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-06 03:31:47",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4626"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00465",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-20 09:23:51",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0349"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "農林水産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00466",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-10 23:48:41",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3768"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "金融・保険業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00467",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-16 22:25:07",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9871"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "建設業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00468",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-25 18:12:48",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0635"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "IT・情報通信業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00469",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-12 09:25:24",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S3076"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00470",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-18 19:16:35",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5422"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "農林水産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00471",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-18 00:34:11",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8941"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "教育・学習支援業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00472",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-18 20:17:29",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5953"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "金融・保険業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00473",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-17 13:54:20",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S7792"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "金融・保険業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00474",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-16 16:09:42",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1700"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00475",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-05 14:32:50",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1129"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00476",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-09 01:14:29",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9797"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "金融・保険業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00477",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-03 08:59:33",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1604"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "電気・ガス業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00478",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-25 16:44:31",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S0968"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "その他"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00479",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-14 04:10:30",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6407"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "製造業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00480",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-10 10:12:04",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9753"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "医療・福祉"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00481",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-15 18:30:15",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1062"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "運輸業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00482",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-25 04:50:51",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1412"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "IT・情報通信業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00483",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-22 21:40:27",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S7731"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "医療・福祉"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00484",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-25 11:33:05",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6128"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "運輸業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00485",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-08 02:19:44",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4563"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "その他"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00486",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-14 04:12:20",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2834"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "農林水産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00487",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-10 00:33:41",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5652"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "サービス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00488",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-03 02:20:46",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S6190"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "製造業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00489",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-27 02:18:44",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1473"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "農林水産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00490",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-05 22:58:10",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1539"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "金融・保険業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00491",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-23 18:21:05",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S8541"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00492",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-03 15:49:59",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S1879"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00493",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-03 16:19:49",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9370"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00494",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-05 17:44:49",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4429"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "金融・保険業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00495",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-18 06:41:34",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S9255"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "不動産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00496",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-28 01:43:10",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S5315"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "建設業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00497",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-03 05:18:50",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2884"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ],
+    "cardStatus": "processing"
+  },
+  {
+    "answerId": "sv25060-00498",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-17 08:07:02",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2159"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "農林水産業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00499",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-13 18:45:22",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S4924"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "電気・ガス業"
+      }
+    ]
+  },
+  {
+    "answerId": "sv25060-00500",
+    "surveyId": "sv_0001_25060",
+    "answeredAt": "2026-01-27 00:43:08",
+    "isTest": false,
+    "details": [
+      {
+        "question": "Q.01_社員CD（8桁）",
+        "answer": "S2766"
+      },
+      {
+        "question": "Q.02_お客様の主な業界",
+        "answer": "宿泊・飲食業"
+      }
+    ],
+    "cardStatus": "processing"
+  }
+]

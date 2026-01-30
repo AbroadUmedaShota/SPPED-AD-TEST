@@ -14,6 +14,49 @@
     <link as="style"
         href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900"
         onload="this.rel='stylesheet'" rel="stylesheet">
+    <style>
+        .processing-text {
+            color: #9CA3AF;
+            /* Tailwind gray-400 */
+            font-weight: 500;
+        }
+
+        .processing-text::after {
+            content: '.';
+            animation: dots 1.5s steps(3, end) infinite;
+        }
+
+        @keyframes dots {
+
+            0%,
+            20% {
+                color: rgba(0, 0, 0, 0);
+                text-shadow:
+                    .2em 0 0 rgba(0, 0, 0, 0),
+                    .4em 0 0 rgba(0, 0, 0, 0);
+            }
+
+            40% {
+                color: #9CA3AF;
+                text-shadow:
+                    .2em 0 0 rgba(0, 0, 0, 0),
+                    .4em 0 0 rgba(0, 0, 0, 0);
+            }
+
+            60% {
+                text-shadow:
+                    .2em 0 0 #9CA3AF,
+                    .4em 0 0 rgba(0, 0, 0, 0);
+            }
+
+            80%,
+            100% {
+                text-shadow:
+                    .2em 0 0 #9CA3AF,
+                    .4em 0 0 #9CA3AF;
+            }
+        }
+    </style>
 </head>
 
 <body class="bg-background text-on-background h-full">
@@ -44,13 +87,19 @@
                             <div id="kpi-total-answers" class="text-3xl font-bold text-primary mt-1">-</div>
                         </div>
                         <div id="kpi-current-question-card"
-                            class="bg-surface border border-outline-variant rounded-xl p-4 shadow-sm md:col-span-2 flex flex-col justify-center cursor-pointer hover:bg-surface-variant/50 transition-colors group">
+                            class="bg-surface border border-outline-variant rounded-xl p-4 shadow-sm md:col-span-2 flex flex-col justify-center transition-colors">
                             <div class="flex justify-between items-center">
                                 <div class="text-sm text-on-surface-variant font-medium">現在選択中の設問</div>
-                                <span class="material-icons text-on-surface-variant group-hover:text-primary transition-colors">expand_more</span>
                             </div>
                             <div id="dashboard-current-question"
                                 class="text-base font-bold text-on-surface mt-1 truncate">...</div>
+                            <div class="mt-2 flex justify-end">
+                                <button id="change-display-question-btn"
+                                    class="justify-center button-secondary py-2 px-4 rounded-md font-semibold flex items-center gap-2">
+                                    <span class="material-icons text-base">edit</span>
+                                    <span>表示設問の変更</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -65,7 +114,8 @@
                         </div>
                         <!-- Attribute Chart -->
                         <div class="bg-surface border border-outline-variant rounded-xl p-4 shadow-sm">
-                            <h3 class="text-sm font-medium mb-4 text-on-surface-variant">属性内訳 (<span id="attribute-chart-title">...</span>)</h3>
+                            <h3 class="text-sm font-medium mb-4 text-on-surface-variant">属性内訳 (<span
+                                    id="attribute-chart-title">...</span>)</h3>
                             <div class="relative h-64 w-full flex justify-center">
                                 <canvas id="attributeChart"></canvas>
                             </div>
@@ -73,7 +123,8 @@
                         <!-- Data Table -->
                         <div class="bg-surface border border-outline-variant rounded-xl p-4 shadow-sm">
                             <h3 class="text-sm font-medium mb-4 text-on-surface-variant">データ集計</h3>
-                            <div id="graph-data-table-container" class="relative h-64 w-full overflow-y-auto custom-scrollbar">
+                            <div id="graph-data-table-container"
+                                class="relative h-64 w-full overflow-y-auto custom-scrollbar">
                                 <!-- Table will be inserted here by JavaScript -->
                                 <p class="text-sm text-on-surface-variant">設問を選択すると、集計データが表示されます。</p>
                             </div>
@@ -151,7 +202,7 @@
                 <div id="right-sidebar-overlay" class="estimate-sidebar-overlay"></div>
                 <!-- Sidebar (Floating Style like bizcardSettings.html) -->
                 <aside id="right-sidebar"
-                    class="fixed top-24 right-8 w-80 h-[calc(100vh-30rem)] transition-transform duration-300 ease-in-out z-30 translate-x-0">
+                    class="fixed top-24 right-8 w-80 transition-transform duration-300 ease-in-out z-30 translate-x-0">
                     <!-- Toggle Button -->
                     <button id="right-sidebar-toggle-btn"
                         class="absolute -left-10 top-8 bg-surface p-2 rounded-l-full shadow-lg hover:bg-surface-variant focus:outline-none focus:ring-2 ring-offset-2 ring-primary transition-colors flex items-center justify-center lg:flex"
@@ -161,7 +212,7 @@
 
                     <!-- Inner Card Content -->
                     <div
-                        class="h-full overflow-y-auto rounded-3xl border border-outline-variant/60 bg-surface p-6 text-on-surface shadow-sm space-y-6 custom-scrollbar">
+                        class="overflow-y-auto rounded-3xl border border-outline-variant/60 bg-surface p-6 text-on-surface shadow-sm space-y-6 custom-scrollbar">
                         <div class="toolbox-card">
                             <h3>ツール</h3>
                             <div class="input-group">
@@ -169,6 +220,17 @@
                                 <label for="dateFilterInput" class="input-label">日時で絞り込み</label>
                                 <span
                                     class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl pointer-events-none">event</span>
+                            </div>
+                            <div class="input-group mt-4">
+                                <select id="statusFilterSelect" class="input-field pl-10 pr-3">
+                                    <option value="all">全て表示</option>
+                                    <option value="completed">データ化完了</option>
+                                    <option value="processing">データ化進行中</option>
+                                    <option value="blank">未データ化</option>
+                                </select>
+                                <label for="statusFilterSelect" class="input-label">ステータスで絞り込み</label>
+                                <span
+                                    class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl pointer-events-none">filter_list</span>
                             </div>
                             <div class="space-y-4 pt-2">
                                 <button id="resetFiltersButton"
@@ -183,10 +245,7 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="toolbox-card">
-                            <h3>表示設問</h3>
-                            <div id="question-selector-container" class="space-y-2"></div>
-                        </div>
+
                     </div>
                 </aside>
             </div>
