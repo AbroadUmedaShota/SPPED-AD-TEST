@@ -365,6 +365,7 @@ body.dark-mode .invoice-plan-badge--premium {
 
 .estimate-sidebar-overlay.is-visible {
     opacity: 1;
+    pointer-events: auto;
 }
 
 @media (max-width: 1279.98px) {

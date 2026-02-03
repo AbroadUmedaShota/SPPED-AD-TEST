@@ -11,6 +11,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
     <!-- flatpickr CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <!-- Custom CSS -->
@@ -36,26 +37,90 @@
                 <!-- Header -->
                 <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant">
                     <h1 id="survey-title" class="text-on-background text-headline-large font-bold leading-tight tracking-tight">グラフ分析</h1>
+                    <button id="excel-export-all" type="button" class="button-primary px-4 py-2 rounded-md">
+                        Excel一括出力
+                    </button>
                 </div>
 
                 <!-- Filters -->
-                <div class="bg-surface p-4 rounded-xl mb-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-end">
-                        <div class="flex items-end gap-2 lg:col-span-1">
-                            <div id="startDatePickerWrapper" class="input-group flex-1 relative">
-                                <input type="text" id="filterStartDate" class="input-field pr-10" placeholder=" " readonly data-input>
-                                <label for="filterStartDate" class="input-label">開始日</label>
-                                <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors" data-toggle>
-                                    <span class="material-icons text-xl">calendar_today</span>
-                                </button>
+                <div class="bg-surface p-6 rounded-xl mb-8 border border-outline-variant shadow-sm">
+                    <div class="flex flex-col md:flex-row md:items-start gap-6">
+                        <!-- Tabs -->
+                        <div class="w-full md:w-48 shrink-0">
+                            <div class="flex flex-row md:flex-col p-1 bg-surface-variant rounded-lg">
+                                <button id="simple-search-tab" class="flex-1 py-2 text-xs font-bold rounded-md transition-all bg-surface text-primary shadow-sm" data-tab="simple">簡易検索</button>
+                                <button id="detailed-search-tab" class="flex-1 py-2 text-xs font-bold rounded-md transition-all text-on-surface-variant hover:text-on-surface" data-tab="detailed">詳細検索</button>
                             </div>
-                            <span class="pb-2 text-on-surface-variant">～</span>
-                            <div id="endDatePickerWrapper" class="input-group flex-1 relative">
-                                <input type="text" id="filterEndDate" class="input-field pr-10" placeholder=" " readonly data-input>
-                                <label for="filterEndDate" class="input-label">終了日</label>
-                                <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors" data-toggle>
-                                    <span class="material-icons text-xl">calendar_today</span>
-                                </button>
+                        </div>
+
+                        <!-- Filter Contents -->
+                        <div class="flex-1">
+                            <!-- Simple Search Content -->
+                            <div id="simple-search-content" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div class="input-group">
+                                    <select id="dayFilterSelect" class="input-field pl-10 pr-3">
+                                        <option value="all">会期全体 (1/4 - 1/17)</option>
+                                        <option value="2026-01-04">1日目 (1/4)</option>
+                                        <option value="2026-01-05">2日目 (1/5)</option>
+                                        <option value="2026-01-06">3日目 (1/6)</option>
+                                        <option value="2026-01-07">4日目 (1/7)</option>
+                                        <option value="2026-01-08">5日目 (1/8)</option>
+                                        <option value="2026-01-09">6日目 (1/9)</option>
+                                        <option value="2026-01-10">7日目 (1/10)</option>
+                                        <option value="2026-01-11">8日目 (1/11)</option>
+                                        <option value="2026-01-12">9日目 (1/12)</option>
+                                        <option value="2026-01-13">10日目 (1/13)</option>
+                                        <option value="2026-01-14">11日目 (1/14)</option>
+                                        <option value="2026-01-15">12日目 (1/15)</option>
+                                        <option value="2026-01-16">13日目 (1/16)</option>
+                                        <option value="2026-01-17">14日目 (1/17)</option>
+                                        <option value="custom">カスタム範囲</option>
+                                    </select>
+                                    <label for="dayFilterSelect" class="input-label">表示対象日</label>
+                                    <span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl pointer-events-none">calendar_today</span>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <button id="resetFiltersButton" class="px-6 py-2 rounded-md font-semibold transition-colors shadow-sm button-secondary whitespace-nowrap">
+                                        条件をリセット
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Detailed Search Content -->
+                            <div id="detailed-search-content" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div class="input-group">
+                                    <input type="text" id="startDateInput" placeholder=" " class="input-field pl-10">
+                                    <label for="startDateInput" class="input-label">開始日時</label>
+                                    <span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl pointer-events-none">schedule</span>
+                                </div>
+                                <div class="input-group">
+                                    <input type="text" id="endDateInput" placeholder=" " class="input-field pl-10">
+                                    <label for="endDateInput" class="input-label">終了日時</label>
+                                    <span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl pointer-events-none">schedule</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Display Options (New) -->
+                        <div class="w-full md:w-64 border-t md:border-t-0 md:border-l border-outline-variant pt-6 md:pt-0 md:pl-6">
+                            <h4 class="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-4">表示設定</h4>
+                            <div class="space-y-3">
+                                <label class="flex items-center justify-between cursor-pointer group">
+                                    <span class="text-sm text-on-surface group-hover:text-primary transition-colors">サマリーを表示</span>
+                                    <input type="checkbox" id="opt-show-summary" class="form-checkbox h-4 w-4 text-primary rounded border-outline-variant focus:ring-primary" checked>
+                                </label>
+                                <label class="flex items-center justify-between cursor-pointer group">
+                                    <span class="text-sm text-on-surface group-hover:text-primary transition-colors">グラフ上の数値を表示</span>
+                                    <input type="checkbox" id="opt-show-datalabels" class="form-checkbox h-4 w-4 text-primary rounded border-outline-variant focus:ring-primary" checked>
+                                </label>
+                                <label class="flex items-center justify-between cursor-pointer group">
+                                    <span class="text-sm text-on-surface group-hover:text-primary transition-colors">中央に合計を表示</span>
+                                    <input type="checkbox" id="opt-show-center-text" class="form-checkbox h-4 w-4 text-primary rounded border-outline-variant focus:ring-primary" checked>
+                                </label>
+                                <label class="flex items-center justify-between cursor-pointer group">
+                                    <span class="text-sm text-on-surface group-hover:text-primary transition-colors">グリッド線を表示</span>
+                                    <input type="checkbox" id="opt-show-grid" class="form-checkbox h-4 w-4 text-primary rounded border-outline-variant focus:ring-primary">
+                                </label>
                             </div>
                         </div>
                     </div>
@@ -73,7 +138,7 @@
                 </div>
 
                 <!-- Charts Container -->
-                <div id="charts-container" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div id="charts-container" class="grid grid-cols-1 gap-6">
                     <!-- Charts will be dynamically inserted here -->
                 </div>
             </div>
@@ -87,6 +152,7 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
 <!-- App Scripts -->
 <script type="module" src="src/main.js"></script>
 <script type="module" src="src/graph-page.js"></script>
