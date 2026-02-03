@@ -1,34 +1,33 @@
-### Issue Proposal
+### 概要
+SPEEDレビュー画面および詳細分析画面において、ユーザーの利便性と分析の質を向上させるためのUI/UX改善、フィルタリング機能の強化、およびExcelエクスポート機能の高度化を実施します。
 
-プレミアムプランのロードマップを更新し、外部連携以外の全機能を「6月末スコープ」に集約しました。
+### 実施内容
 
-#### 1. **Pre-investigation Summary**
-- プレミアムプランの提供スピードを速めるため、これまで「それ以降」としていた機能（データ保存無期限化、自社ドメイン送信、グラフDL等）の目標を「6月末スコープ」に前倒しする方針を反映。
-- 外部連携（Slack/CRM連携等）のみを「それ以降」の対象として残し、リリースの優先順位を明確化。
+#### 1. SPEEDレビュー画面の改善
+- 設問選択UIをドロップダウン形式に集約し、操作性を向上。
+- 設問選択モーダルに、特性（集計可能か等）を示すアイコンを追加。
+- サイドバー展開時のオーバーレイクリックによる閉鎖機能を実装。
+- 「グラフ化」ボタンを「詳細分析ページへ」に文言変更。
 
-**Files to be changed:**
-- `docs/service-consideration/2026-01-23_プレミアムプラン_機能選別一覧.md`
-- `docs/service-consideration/2026-01-23_サービス機能_全体棚卸し表.md`
-- `docs/service-consideration/2026-01-24_プレミアム機能_詳細分解一覧.md`
-- `docs/notes/meetings/2026-01-24_premium-plan_scope-and-apr-release.txt`
-- `docs/notes/meetings/2026-01-27_speed-ad_rework_policy_meeting.txt`
+#### 2. 詳細分析画面（graph-page.html）の改善
+- フィルタUIをSPEEDレビュー画面と統一（簡易・詳細検索タブ）。
+- 集計カードのレイアウトを「左側に表、右側にグラフ」に変更。
+- 円グラフ（ドーナツ形式）と横棒グラフの採用、および相互切り替え機能の復元。
+- グラフ上に数値ラベルを直接表示。
+- 表示設定パネル（サマリー、数値、合計値、グリッド線の表示/非表示）の実装。
 
-#### 2. **Contribution to Project Goals**
-- 開発目標の明確化と、主要機能の早期リリース計画の文書化。
-- チーム内の優先順位に関する認識の不一致を防止。
+#### 3. フィルタリング・時間軸の強化
+- 日時・時間の範囲選択（Range + Time Picker）の実装。
+- 会期（1/4〜1/17）外の日付をグレーアウト。
+- 時間帯別グラフの軸モード切替（自動/固定 9:00-19:00）の実装。
 
-#### 3. **Overview of Changes**
-- 外部連携以外の全プレミアム機能の目標時期を「6月末スコープ」に更新。
-- 外部連携機能の目標時期を「それ以降」に設定。
+#### 4. エクスポート機能の高度化
+- ExcelJSを使用した「分析レポート形式」のエクスポート。
+- Excelの正式なテーブル機能と、高解像度グラフ画像の埋め込みを両立。
 
-#### 4. **Specific Work Content for Each File**
-- `2026-01-24_プレミアム機能_詳細分解一覧.md`: 表内の「目標」列を一括更新。
-- 各ドキュメント: ロードマップやまとめセクションの時期記述を修正。
-
-#### 5. **Definition of Done**
-- [x] All relevant delivery targets have been updated.
-- [x] External integration is the only feature marked as "それ以降".
-- [x] The documentation has been verified for consistency.
-
----
-If you approve, please reply to this comment with "Approve".
+### 完了条件
+- [x] SPEEDレビュー画面のUI改善が完了していること。
+- [x] 詳細分析画面のUI/UXおよび機能改善が完了していること。
+- [x] 日時範囲フィルタが正常に動作し、会期外が制限されていること。
+- [x] Excelエクスポートで画像とテーブルが正しく出力されること。
+- [x] 関連ドキュメント（要件定義書、仕様書）が更新されていること。

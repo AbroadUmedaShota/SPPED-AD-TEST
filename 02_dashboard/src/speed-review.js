@@ -10,9 +10,11 @@ let allCombinedData = [];
 let currentPage = 1;
 let rowsPerPage = 25;
 let currentIndustryQuestion = '';
-let currentDateFilter = '';
+let currentDateFilter = null;
 let currentStatusFilter = 'all'; // ステータスフィルター
-let datePickerInstance = null;
+let startDatePicker = null;
+let endDatePicker = null;
+let timeSeriesAxisMode = 'auto'; // 'auto' or 'fixed'
 let currentItemInModal = null;
 let isModalInEditMode = false;
 let currentSurvey = null;
@@ -22,6 +24,25 @@ let currentSortOrder = 'desc';
 
 let timeSeriesChart = null; // Dashboard Chart Instance
 let attributeChart = null;  // Dashboard Chart Instance
+
+const SINGLE_CHOICE_TYPES = new Set(['single_choice', 'dropdown']);
+const MULTI_CHOICE_TYPES = new Set(['multi_choice']);
+const BLANK_TYPES = new Set([
+    'text',
+    'free_text',
+    'number',
+    'date',
+    'datetime',
+    'datetime_local',
+    'time',
+    'handwriting',
+    'explanation',
+    'matrix_sa',
+    'matrix_single',
+    'matrix_ma',
+    'matrix_multi',
+    'matrix_multiple'
+]);
 
 // --- Functions ---
 
@@ -34,6 +55,130 @@ function truncateQuestion(questionText) {
         truncatedText = truncatedText.substring(0, 25) + '...';
     }
     return truncatedText;
+}
+
+function escapeHtml(value) {
+    if (value === undefined || value === null) return '';
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function getBlankReason(type) {
+    switch (type) {
+        case 'text':
+        case 'free_text':
+            return '自由記述のため';
+        case 'number':
+            return '数値入力のため';
+        case 'date':
+        case 'datetime':
+        case 'datetime_local':
+        case 'time':
+            return '日付・時刻入力のため';
+        case 'handwriting':
+            return '手書き入力のため';
+        case 'explanation':
+            return '説明カードのため';
+        case 'matrix_sa':
+        case 'matrix_single':
+        case 'matrix_ma':
+        case 'matrix_multi':
+        case 'matrix_multiple':
+            return 'マトリクス設問のため';
+        default:
+            return '未対応の設問タイプ';
+    }
+}
+
+function normalizeQuestionText(text) {
+    if (!text) return '';
+    return String(text)
+        .toLowerCase()
+        .replace(/^[\s　]*q[0-9０-９]+[._、:：\s-]*/i, '')
+        .replace(/\s+/g, '');
+}
+
+function findAnswerDetail(answer, question) {
+    if (!answer || !answer.details) return null;
+    const normalizedTarget = normalizeQuestionText(question.text);
+    return answer.details.find(detail => {
+        if (!detail || !detail.question) return false;
+        if (detail.question === question.text) return true;
+        return normalizeQuestionText(detail.question) === normalizedTarget;
+    }) || null;
+}
+
+function normalizeChoiceOptions(options = []) {
+    const labels = [];
+    const map = new Map();
+
+    options.forEach((opt, index) => {
+        if (opt && typeof opt === 'object') {
+            const value = opt.value ?? opt.id ?? opt.text ?? `option_${index + 1}`;
+            const text = opt.text ?? opt.label ?? opt.value ?? opt.id ?? String(value);
+            labels.push(text);
+            map.set(String(value), text);
+            map.set(String(text), text);
+        } else if (opt !== undefined && opt !== null) {
+            const text = String(opt);
+            labels.push(text);
+            map.set(text, text);
+        }
+    });
+
+    return { labels, map };
+}
+
+function resolveOptionLabel(value, optionsInfo) {
+    if (value === undefined || value === null || value === '') return null;
+    if (typeof value === 'object') {
+        const raw = value.value ?? value.text ?? value.label ?? value.id;
+        if (raw !== undefined && raw !== null) {
+            return optionsInfo.map.get(String(raw)) || String(raw);
+        }
+        return null;
+    }
+    return optionsInfo.map.get(String(value)) || String(value);
+}
+
+function buildChoiceSummary(question, answers) {
+    const counts = {};
+    let answeredCount = 0;
+    const optionsInfo = normalizeChoiceOptions(question.options || []);
+
+    answers.forEach(answer => {
+        const detail = findAnswerDetail(answer, question);
+        if (!detail || detail.answer === undefined || detail.answer === null || detail.answer === '') return;
+
+        const answerValue = detail.answer;
+        const selections = Array.isArray(answerValue) ? answerValue : [answerValue];
+        if (selections.length === 0) return;
+
+        answeredCount += 1;
+        selections.forEach(selection => {
+            const label = resolveOptionLabel(selection, optionsInfo);
+            if (!label) return;
+            counts[label] = (counts[label] || 0) + 1;
+        });
+    });
+
+    const labels = optionsInfo.labels.length > 0
+        ? optionsInfo.labels
+        : Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+
+    const data = labels.map(label => counts[label] || 0);
+    const totalVotes = data.reduce((sum, current) => sum + current, 0);
+
+    return {
+        labels,
+        data,
+        totalAnswers: answeredCount,
+        totalVotes
+    };
 }
 
 function handleQuestionSelectClick(newQuestion) {
@@ -423,12 +568,14 @@ function updateModalFooter() {
 }
 
 function handleResetFilters() {
-    currentDateFilter = '';
+    currentDateFilter = null;
     currentStatusFilter = 'all';
 
-    if (datePickerInstance) {
-        datePickerInstance.clear();
-    }
+    if (startDatePicker) startDatePicker.clear();
+    if (endDatePicker) endDatePicker.clear();
+
+    const daySelect = document.getElementById('dayFilterSelect');
+    if (daySelect) daySelect.value = 'all';
 
     const statusFilterSelect = document.getElementById('statusFilterSelect');
     if (statusFilterSelect) {
@@ -468,11 +615,21 @@ function showQuestionSelectModal() {
         questions.forEach(question => {
             const button = document.createElement('button');
             const isActive = question === currentIndustryQuestion;
+            
+            // 設問タイプを確認してグラフ化可能か判定
+            const questionDef = currentSurvey?.details?.find(d => (d.question || d.text) === question);
+            const isGraphable = questionDef && (questionDef.type === 'single_choice' || questionDef.type === 'multi_choice');
+
             button.className = `w-full text-left px-4 py-3 rounded-xl transition-all flex items-center justify-between group ${isActive ? 'bg-primary/10 text-primary font-bold' : 'hover:bg-surface-variant text-on-surface'
                 }`;
 
             button.innerHTML = `
-                <span class="truncate pr-4">${question}</span>
+                <div class="flex items-center gap-3 truncate">
+                    <span class="material-icons text-sm ${isGraphable ? 'text-primary' : 'text-on-surface-variant/60'}">
+                        ${isGraphable ? 'analytics' : 'subject'}
+                    </span>
+                    <span class="truncate pr-4">${question}</span>
+                </div>
                 ${isActive ? '<span class="material-icons text-sm">check_circle</span>' : '<span class="material-icons text-sm opacity-0 group-hover:opacity-40 transition-opacity">chevron_right</span>'}
             `;
 
@@ -487,18 +644,27 @@ function showQuestionSelectModal() {
     });
 }
 
-function applyFilters() {
+function getFilteredData() {
     let filteredData = allCombinedData;
 
-    // 日付フィルター
-    if (currentDateFilter) {
-        const filterDate = new Date(currentDateFilter);
+    // 日付・時間範囲フィルター
+    if (currentDateFilter && currentDateFilter.length === 2) {
+        const [startDate, endDate] = currentDateFilter;
         filteredData = filteredData.filter(item => {
             if (!item.answeredAt) return false;
             const itemDate = new Date(item.answeredAt);
-            return itemDate.getFullYear() === filterDate.getFullYear() &&
-                itemDate.getMonth() === filterDate.getMonth() &&
-                itemDate.getDate() === filterDate.getDate();
+            return itemDate >= startDate && itemDate <= endDate;
+        });
+    } else if (currentDateFilter && currentDateFilter.length === 1) {
+        // 片方のみ選択されている場合はその日全体
+        const startDate = new Date(currentDateFilter[0]);
+        startDate.setHours(0, 0, 0, 0);
+        const endDate = new Date(currentDateFilter[0]);
+        endDate.setHours(23, 59, 59, 999);
+        filteredData = filteredData.filter(item => {
+            if (!item.answeredAt) return false;
+            const itemDate = new Date(item.answeredAt);
+            return itemDate >= startDate && itemDate <= endDate;
         });
     }
 
@@ -510,6 +676,11 @@ function applyFilters() {
         });
     }
 
+    return filteredData;
+}
+
+function applyFilters() {
+    const filteredData = getFilteredData();
     sortData(filteredData);
     displayPage(1, filteredData);
     renderDashboard(filteredData);
@@ -687,26 +858,76 @@ function populateQuestionSelector(data) {
 function setupEventListeners() {
     setupSortListeners();
 
-    const dateFilterInput = document.getElementById('dateFilterInput');
-    if (dateFilterInput) {
-        datePickerInstance = flatpickr(dateFilterInput, {
-            dateFormat: "Y-m-d",
-            locale: "ja",
-            onChange: function (selectedDates, dateStr, instance) {
-                currentDateFilter = dateStr;
-                applyFilters();
-            },
-            onDayCreate: function (dObj, dStr, fp, dayElem) {
-                // 会期: 2026-01-04 ~ 2026-01-17 (month is 0-indexed)
-                const date = dayElem.dateObj;
-                const start = new Date(2026, 0, 4);
-                const end = new Date(2026, 0, 17);
-                // 時間部分をクリアして比較
-                date.setHours(0, 0, 0, 0);
-                if (date >= start && date <= end) {
-                    dayElem.classList.add('event-duration-highlight');
+    const startEl = document.getElementById('startDateInput');
+    const endEl = document.getElementById('endDateInput');
+    const daySelect = document.getElementById('dayFilterSelect');
+
+    const fpConfig = {
+        enableTime: true,
+        dateFormat: "Y-m-d H:i",
+        minDate: "2026-01-04",
+        maxDate: "2026-01-17",
+        locale: "ja",
+        onDayCreate: function (dObj, dStr, fp, dayElem) {
+            const date = dayElem.dateObj;
+            const start = new Date(2026, 0, 4);
+            const end = new Date(2026, 0, 17);
+            const compareDate = new Date(date.getTime());
+            compareDate.setHours(0, 0, 0, 0);
+            if (compareDate >= start && compareDate <= end) {
+                dayElem.classList.add('event-duration-highlight');
+            }
+        },
+        onChange: function () {
+            if (startDatePicker && endDatePicker) {
+                const start = startDatePicker.selectedDates[0];
+                const end = endDatePicker.selectedDates[0];
+                if (start && end) {
+                    currentDateFilter = [start, end];
+                    // 手動変更時はセレクターを「カスタム」に
+                    if (daySelect && daySelect.value !== 'custom') {
+                        const startStr = startDatePicker.formatDate(start, "Y-m-d");
+                        const endStr = endDatePicker.formatDate(end, "Y-m-d");
+                        // 開始と終了が同じ日の00:00と23:59なら、その日の選択状態を維持してもよいが
+                        // 簡略化のため、手動変更はカスタム扱いとする
+                        if (valFromSelectChange !== true) {
+                            daySelect.value = 'custom';
+                        }
+                    }
+                    applyFilters();
                 }
             }
+        }
+    };
+
+    let valFromSelectChange = false;
+
+    if (startEl && endEl) {
+        startDatePicker = flatpickr(startEl, fpConfig);
+        endDatePicker = flatpickr(endEl, fpConfig);
+    }
+
+    if (daySelect) {
+        daySelect.addEventListener('change', (e) => {
+            const val = e.target.value;
+            valFromSelectChange = true;
+            if (val === 'all') {
+                startDatePicker.setDate("2026-01-04 00:00");
+                endDatePicker.setDate("2026-01-17 23:59");
+                currentDateFilter = [new Date(2026, 0, 4, 0, 0), new Date(2026, 0, 17, 23, 59)];
+            } else if (val === 'custom') {
+                // カスタム選択時は何もしない（ユーザーの入力を待つ）
+                valFromSelectChange = false;
+                return;
+            } else {
+                // val は "2026-01-04" 形式
+                startDatePicker.setDate(`${val} 00:00`);
+                endDatePicker.setDate(`${val} 23:59`);
+                const d = val.split('-');
+                currentDateFilter = [new Date(d[0], d[1] - 1, d[2], 0, 0), new Date(d[0], d[1] - 1, d[2], 23, 59)];
+            }
+            applyFilters();
+            valFromSelectChange = false;
         });
     }
 
@@ -729,12 +950,6 @@ function setupEventListeners() {
         questionCard.addEventListener('click', showQuestionSelectModal);
     }
 
-    // 「表示設問の変更」ボタンのイベントリスナー
-    const changeQuestionBtn = document.getElementById('change-display-question-btn');
-    if (changeQuestionBtn) {
-        changeQuestionBtn.addEventListener('click', showQuestionSelectModal);
-    }
-
     const graphBtn = document.getElementById('graphButton');
     if (graphBtn) {
         graphBtn.addEventListener('click', () => {
@@ -744,6 +959,38 @@ function setupEventListeners() {
                 surveyId = 'sv_0001_24001'; // Fallback to default
             }
             window.location.href = `graph-page.html?surveyId=${surveyId}`;
+        });
+    }
+
+    // 時間帯別グラフの軸モード切り替え
+    const tsAutoBtn = document.getElementById('ts-axis-auto-btn');
+    const tsFixedBtn = document.getElementById('ts-axis-fixed-btn');
+
+    if (tsAutoBtn && tsFixedBtn) {
+        const updateTSButtons = (mode) => {
+            if (mode === 'auto') {
+                tsAutoBtn.classList.add('bg-surface', 'text-primary', 'shadow-sm');
+                tsAutoBtn.classList.remove('text-on-surface-variant', 'hover:text-on-surface');
+                tsFixedBtn.classList.remove('bg-surface', 'text-primary', 'shadow-sm');
+                tsFixedBtn.classList.add('text-on-surface-variant', 'hover:text-on-surface');
+            } else {
+                tsFixedBtn.classList.add('bg-surface', 'text-primary', 'shadow-sm');
+                tsFixedBtn.classList.remove('text-on-surface-variant', 'hover:text-on-surface');
+                tsAutoBtn.classList.remove('bg-surface', 'text-primary', 'shadow-sm');
+                tsAutoBtn.classList.add('text-on-surface-variant', 'hover:text-on-surface');
+            }
+        };
+
+        tsAutoBtn.addEventListener('click', () => {
+            timeSeriesAxisMode = 'auto';
+            updateTSButtons('auto');
+            renderTimeSeriesChart(getFilteredData());
+        });
+
+        tsFixedBtn.addEventListener('click', () => {
+            timeSeriesAxisMode = 'fixed';
+            updateTSButtons('fixed');
+            renderTimeSeriesChart(getFilteredData());
         });
     }
 }
@@ -824,53 +1071,36 @@ function setupSortListeners() {
 function processDataForTable(survey, answers) {
     if (!survey?.details) return [];
 
-    const graphableQuestions = survey.details.filter(q => q.type === 'single_choice' || q.type === 'multi_choice');
+    return survey.details.map((question, index) => {
+        const questionId = question.id || `q${index + 1}`;
 
-    return graphableQuestions.map(question => {
-        const counts = {};
-        let answeredCount = 0;
-
-        answers.forEach(answer => {
-            const answerDetail = answer.details.find(d => d.question === question.text);
-
-            if (answerDetail && answerDetail.answer && answerDetail.answer !== '') {
-                answeredCount++;
-                const answerValue = answerDetail.answer;
-                if (Array.isArray(answerValue)) { // Multi-choice
-                    answerValue.forEach(ans => {
-                        if (ans) {
-                            counts[ans] = (counts[ans] || 0) + 1;
-                        }
-                    });
-                } else { // Single-choice
-                    if (answerValue) {
-                        counts[answerValue] = (counts[answerValue] || 0) + 1;
-                    }
-                }
-            }
-        });
-
-        // Ensure all predefined options are present, even with 0 count
-        if (question.options) {
-            question.options.forEach(opt => {
-                if (!counts.hasOwnProperty(opt)) {
-                    counts[opt] = 0;
-                }
-            });
+        if (SINGLE_CHOICE_TYPES.has(question.type) || MULTI_CHOICE_TYPES.has(question.type)) {
+            const summary = buildChoiceSummary(question, answers);
+            return {
+                questionId,
+                questionText: question.text,
+                labels: summary.labels,
+                data: summary.data,
+                totalAnswers: summary.totalAnswers,
+                totalVotes: summary.totalVotes,
+                includeTotalRow: SINGLE_CHOICE_TYPES.has(question.type),
+                blankReason: ''
+            };
         }
 
-        // Add 'Unanswered' if it makes sense, but let's stick to the original logic for now
-        // which only counts answered questions.
-
-        const sortedLabels = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+        const reason = BLANK_TYPES.has(question.type)
+            ? getBlankReason(question.type)
+            : '未対応の設問タイプ';
 
         return {
-            questionId: question.id,
+            questionId,
             questionText: question.text,
-            labels: sortedLabels,
-            data: sortedLabels.map(label => counts[label]),
-            totalAnswers: answeredCount,
-            totalVotes: sortedLabels.reduce((sum, label) => sum + counts[label], 0)
+            labels: [],
+            data: [],
+            totalAnswers: 0,
+            totalVotes: 0,
+            includeTotalRow: false,
+            blankReason: reason
         };
     });
 }
@@ -889,27 +1119,61 @@ function renderGraphDataTable(processedData) {
     }
 
     const allTablesHtml = processedData.map(questionData => {
-        if (!questionData || questionData.labels.length === 0) {
-            return ''; // Skip if no data for this question
+        if (!questionData) {
+            return '';
         }
 
-        const { questionText, labels, data, totalVotes } = questionData;
+        const questionTitle = escapeHtml(truncateQuestion(questionData.questionText));
+        const questionTooltip = escapeHtml(questionData.questionText);
+
+        if (questionData.blankReason) {
+            const reason = escapeHtml(questionData.blankReason);
+            return `
+                <div class="mb-6">
+                    <h4 class="text-base font-bold text-on-surface mb-2 px-1 truncate" title="${questionTooltip}">${questionTitle}</h4>
+                    <div class="p-4 rounded-lg bg-surface-variant text-on-surface-variant text-sm">
+                        この設問は現在グラフ対象外です。理由: ${reason}
+                    </div>
+                </div>
+            `;
+        }
+
+        if (!questionData.labels || questionData.labels.length === 0) {
+            return `
+                <div class="mb-6">
+                    <h4 class="text-base font-bold text-on-surface mb-2 px-1 truncate" title="${questionTooltip}">${questionTitle}</h4>
+                    <p class="text-sm text-on-surface-variant p-4 text-center">集計可能なデータはありません。</p>
+                </div>
+            `;
+        }
+
+        const { labels, data, totalVotes, includeTotalRow } = questionData;
 
         const tableRows = labels.map((label, index) => {
             const count = data[index];
-            const percentage = totalVotes > 0 ? ((count / totalVotes) * 100).toFixed(1) : 0;
+            const percentage = totalVotes > 0 ? ((count / totalVotes) * 100).toFixed(1) : '0.0';
             return `
                 <tr class="border-b border-outline-variant/30 last:border-b-0">
-                    <td class="px-3 py-2 text-sm text-on-surface truncate" title="${label}">${label}</td>
+                    <td class="px-3 py-2 text-sm text-on-surface truncate" title="${escapeHtml(label)}">${escapeHtml(label)}</td>
                     <td class="px-3 py-2 text-sm text-on-surface text-right">${count}</td>
                     <td class="px-3 py-2 text-sm text-on-surface-variant text-right">${percentage}%</td>
                 </tr>
             `;
         }).join('');
 
+        const totalRow = includeTotalRow
+            ? `
+                <tr class="border-b border-outline-variant/30 font-semibold">
+                    <td class="px-3 py-2 text-sm text-on-surface">合計</td>
+                    <td class="px-3 py-2 text-sm text-on-surface text-right">${questionData.totalAnswers}</td>
+                    <td class="px-3 py-2 text-sm text-on-surface-variant text-right">${questionData.totalAnswers > 0 ? '100.0' : '0.0'}%</td>
+                </tr>
+            `
+            : '';
+
         return `
             <div class="mb-6">
-                <h4 class="text-base font-bold text-on-surface mb-2 px-1 truncate" title="${questionText}">${truncateQuestion(questionText)}</h4>
+                <h4 class="text-base font-bold text-on-surface mb-2 px-1 truncate" title="${questionTooltip}">${questionTitle}</h4>
                 <div class="rounded-lg border border-outline-variant/50">
                     <table class="w-full text-left table-fixed">
                         <thead class="bg-surface-variant/30">
@@ -921,6 +1185,7 @@ function renderGraphDataTable(processedData) {
                         </thead>
                         <tbody class="divide-y divide-outline-variant/30">
                             ${tableRows}
+                            ${totalRow}
                         </tbody>
                     </table>
                 </div>
@@ -975,7 +1240,9 @@ function renderTimeSeriesChart(data) {
         return;
     }
 
-    // 1. Find min and max hours from data
+    // 1. Determine bounds
+    let startHour, endHour;
+    
     const hourIndices = data.map(item => {
         if (!item.answeredAt) return null;
         const d = new Date(item.answeredAt);
@@ -983,7 +1250,7 @@ function renderTimeSeriesChart(data) {
         return d.getHours();
     }).filter(h => h !== null);
 
-    if (hourIndices.length === 0) {
+    if (hourIndices.length === 0 && timeSeriesAxisMode === 'auto') {
         if (timeSeriesChart) {
             timeSeriesChart.destroy();
             timeSeriesChart = null;
@@ -991,15 +1258,19 @@ function renderTimeSeriesChart(data) {
         return;
     }
 
-    const minHour = Math.min(...hourIndices);
-    const maxHour = Math.max(...hourIndices);
+    if (timeSeriesAxisMode === 'fixed') {
+        startHour = 9;
+        endHour = 19; // 19:00 included
+    } else {
+        const minHour = Math.min(...hourIndices);
+        const maxHour = Math.max(...hourIndices);
+        startHour = minHour;
+        endHour = maxHour + 1;
+    }
 
-    // Range: from minHour to maxHour + 1
-    const startHour = minHour;
-    const endHour = maxHour + 1; // +1 to include the end interval visually or as user requested
     const length = endHour - startHour + 1;
 
-    // 2. Aggregate counts for the dynamic range
+    // 2. Aggregate counts
     const counts = Array(length).fill(0);
     const labels = Array.from({ length: length }, (_, i) => `${startHour + i}:00`);
 
@@ -1067,8 +1338,17 @@ function renderAttributeChart(data) {
 
     // Aggregate by currentIndustryQuestion
     const counts = {};
+    const questionDef = currentSurvey?.details?.find(detail => detail.question === currentIndustryQuestion || detail.text === currentIndustryQuestion);
+    if (!questionDef || (!SINGLE_CHOICE_TYPES.has(questionDef.type) && !MULTI_CHOICE_TYPES.has(questionDef.type))) {
+        if (attributeChart) {
+            attributeChart.destroy();
+            attributeChart = null;
+        }
+        return;
+    }
+
     data.forEach(item => {
-        const detail = item.details?.find(d => d.question === currentIndustryQuestion);
+        const detail = findAnswerDetail(item, questionDef);
         let answer = detail?.answer;
 
         if (Array.isArray(answer)) {
@@ -1129,6 +1409,35 @@ function setupSidebarToggle() {
     if (!sidebar || !toggleBtn || !icon || !mainContentWrapper) return;
 
     let hasUserInteracted = false;
+
+    // --- Search Tab Logic ---
+    const simpleTab = document.getElementById('simple-search-tab');
+    const detailedTab = document.getElementById('detailed-search-tab');
+    const simpleContent = document.getElementById('simple-search-content');
+    const detailedContent = document.getElementById('detailed-search-content');
+
+    if (simpleTab && detailedTab && simpleContent && detailedContent) {
+        const switchTab = (mode) => {
+            if (mode === 'simple') {
+                simpleTab.classList.add('bg-surface', 'text-primary', 'shadow-sm');
+                simpleTab.classList.remove('text-on-surface-variant', 'hover:text-on-surface');
+                detailedTab.classList.remove('bg-surface', 'text-primary', 'shadow-sm');
+                detailedTab.classList.add('text-on-surface-variant', 'hover:text-on-surface');
+                simpleContent.classList.remove('hidden');
+                detailedContent.classList.add('hidden');
+            } else {
+                detailedTab.classList.add('bg-surface', 'text-primary', 'shadow-sm');
+                detailedTab.classList.remove('text-on-surface-variant', 'hover:text-on-surface');
+                simpleTab.classList.remove('bg-surface', 'text-primary', 'shadow-sm');
+                simpleTab.classList.add('text-on-surface-variant', 'hover:text-on-surface');
+                detailedContent.classList.remove('hidden');
+                simpleContent.classList.add('hidden');
+            }
+        };
+
+        simpleTab.addEventListener('click', () => switchTab('simple'));
+        detailedTab.addEventListener('click', () => switchTab('detailed'));
+    }
 
     const applySidebarState = (isCollapsed) => {
         if (isCollapsed) {
@@ -1307,4 +1616,3 @@ export async function initializePage() {
         }
     }
 }
-
