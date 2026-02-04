@@ -14,6 +14,7 @@ let startDatePicker = null;
 let endDatePicker = null;
 let currentDateFilter = null;
 let chartSequence = 0;
+let isExporting = false; // 書き出し中フラグ
 
 // 表示オプションの状態管理
 const displayOptions = {
@@ -47,6 +48,14 @@ async function initGraphPage() {
     initBreadcrumbs();
     const urlParams = new URLSearchParams(window.location.search);
     const surveyId = urlParams.get('surveyId') || 'sv_0001_24001';
+
+    // 離脱防止イベント
+    window.addEventListener('beforeunload', (event) => {
+        if (isExporting) {
+            event.preventDefault();
+            event.returnValue = ''; // ブラウザ標準の警告を表示
+        }
+    });
 
     setupFilterEventListeners();
     await loadAndRenderCharts(surveyId);
@@ -90,10 +99,8 @@ function setupFilterEventListeners() {
         daySelect.addEventListener('change', (e) => {
             const val = e.target.value;
             
-            // カスタム範囲の表示制御
             if (val === 'custom') {
                 detailedContent.classList.remove('hidden');
-                // 前回のカスタム値を維持するか、空にするかは要件次第だが、ここでは入力を促す
                 return;
             } else {
                 detailedContent.classList.add('hidden');
@@ -183,7 +190,6 @@ async function loadAndRenderCharts(surveyId) {
             throw new Error("アンケートIDが指定されていません。");
         }
 
-        // 1. Fetch survey definition and answer data in parallel
         const [surveyDefinition, answers] = await Promise.all([
             fetch(resolveDemoDataPath(`surveys/${surveyId}.json`)).then(res => {
                 if (!res.ok) throw new Error(`アンケート定義ファイルが見つかりません: ${surveyId}.json`);
@@ -195,7 +201,6 @@ async function loadAndRenderCharts(surveyId) {
             })
         ]);
 
-        // 2. Set the current survey definition
         currentSurvey = surveyDefinition;
         if (!currentSurvey) {
             throw new Error(`アンケートID「${surveyId}」の定義が見つかりません。`);
@@ -203,11 +208,6 @@ async function loadAndRenderCharts(surveyId) {
         
         originalAnswers = answers;
 
-        if (originalAnswers.length === 0) {
-             console.warn(`アンケートID「${surveyId}」に対する回答データが見つかりませんでした。`);
-        }
-
-        // 3. Set survey name and render charts
         document.getElementById('survey-title').textContent = `グラフ分析: ${currentSurvey.name.ja}`;
         
         const chartData = processDataForCharts(currentSurvey, originalAnswers);
@@ -296,7 +296,9 @@ function renderCharts(chartsData) {
     chartDataStore.clear();
 
     Object.keys(chartInstances).forEach(key => {
-        chartInstances[key].destroy();
+        if (chartInstances[key] && typeof chartInstances[key].destroy === 'function') {
+            chartInstances[key].destroy();
+        }
         delete chartInstances[key];
     });
 
@@ -314,12 +316,10 @@ function renderCharts(chartsData) {
         const chartArea = buildChartArea(chartData, chartId);
         const questionTitle = escapeHtml(chartData.questionText);
         
-        // アイコン判定
         const isBlank = chartData.chartType === 'blank';
         const iconName = isBlank ? 'subject' : 'analytics';
         const iconColor = isBlank ? 'text-on-surface-variant/60' : 'text-primary';
 
-        // クイックインサイト（Top回答）
         let insightHtml = '';
         if (displayOptions.showSummary && !isBlank && chartData.labels.length > 0) {
             const maxIdx = chartData.data.indexOf(Math.max(...chartData.data));
@@ -341,7 +341,6 @@ function renderCharts(chartsData) {
             : '';
 
         card.innerHTML = `
-            <!-- Card Header -->
             <div class="p-5 border-b border-outline-variant/50 bg-surface-variant/10">
                 <div class="flex justify-between items-start gap-4">
                     <div class="flex items-center gap-3">
@@ -360,19 +359,15 @@ function renderCharts(chartsData) {
                 </div>
             </div>
 
-            <!-- Card Body -->
             <div class="p-5 flex-1 flex flex-col gap-6">
-                <!-- Controls -->
                 <div class="flex justify-start">
                     ${buildChartTypeButtons(chartData, chartId)}
                 </div>
 
-                <!-- Visual Section -->
                 <div class="w-full">
                     ${chartArea}
                 </div>
 
-                <!-- Data Section (Table) -->
                 ${(summaryArea && displayOptions.showTable) ? `
                 <div class="mt-2 pt-6 border-t border-outline-variant/30">
                     <div class="flex items-center gap-2 mb-4 text-on-surface-variant">
@@ -396,8 +391,6 @@ function renderCharts(chartsData) {
         }
     });
 
-    // ... (以下イベントリスナー部分は変更なし) ...
-    // Add event listeners for chart type buttons
     document.querySelectorAll('.chart-type-btn').forEach(button => {
         button.addEventListener('click', (e) => {
             const { chartId, chartType } = e.currentTarget.dataset;
@@ -416,40 +409,35 @@ function renderCharts(chartsData) {
         });
     });
 
-    // Add event listeners for download buttons
     document.querySelectorAll('.download-btn').forEach(button => {
-        button.addEventListener('click', (e) => {
+        button.addEventListener('click', async (e) => {
             const buttonEl = e.currentTarget;
             const chartId = buttonEl.dataset.chartId;
-            const chartData = chartDataStore.get(chartId);
-            if (!chartData) return;
-            const questionText = chartData.questionText;
-            const chartCard = buttonEl.closest('.bg-surface');
+            const chartInstance = chartInstances[chartId];
+            
+            if (chartInstance) {
+                try {
+                    buttonEl.disabled = true;
+                    buttonEl.style.opacity = '0.5';
 
-            if (chartCard && window.html2canvas) {
-                const elementsToHide = [buttonEl];
-                const groupEl = chartCard.querySelector('[role="group"]');
-                if (groupEl) elementsToHide.push(groupEl);
-                elementsToHide.forEach(el => el && (el.style.visibility = 'hidden'));
+                    await chartInstance.dataURI().then(({ imgURI }) => {
+                        const link = document.createElement('a');
+                        link.href = imgURI;
+                        const sanitizedQuestion = chartDataStore.get(chartId).questionText.replace(/[<>:"/\\|?*]/g, '_').substring(0, 50);
+                        link.download = `${sanitizedQuestion}.png`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    });
 
-                html2canvas(chartCard, {
-                    useCORS: true,
-                    backgroundColor: '#ffffff',
-                    scale: 2
-                }).then(canvas => {
-                    elementsToHide.forEach(el => el && (el.style.visibility = 'visible'));
-                    const dataUrl = canvas.toDataURL('image/png');
-                    const link = document.createElement('a');
-                    link.href = dataUrl;
-                    const sanitizedQuestion = questionText.replace(/[<>:"/\\|?*]/g, '_');
-                    link.download = `${sanitizedQuestion}.png`;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                }).catch(err => {
-                    elementsToHide.forEach(el => el && (el.style.visibility = 'visible'));
-                    console.error('html2canvas failed:', err);
-                });
+                    showToast('画像を保存しました。', 'success');
+                } catch (err) {
+                    console.error('保存失敗:', err);
+                    showToast('画像の保存に失敗しました。', 'error');
+                } finally {
+                    buttonEl.disabled = false;
+                    buttonEl.style.opacity = '1';
+                }
             }
         });
     });
@@ -461,164 +449,101 @@ function renderCharts(chartsData) {
 }
 
 /**
- * Creates or updates a Chart.js instance.
- * @param {string} chartId The ID of the canvas element.
- * @param {object} chartData The data for the chart.
- * @param {string} type The type of chart ('bar' or 'pie'/'doughnut').
+ * Creates or updates an ApexCharts instance.
  */
 function createChart(chartId, chartData, type) {
-    const ctx = document.getElementById(chartId).getContext('2d');
+    const container = document.getElementById(chartId);
+    if (!container) return;
+
     if (chartInstances[chartId]) {
         chartInstances[chartId].destroy();
     }
 
     const colors = ['#4285F4', '#34A853', '#FBBC05', '#EA4335', '#AB47BC', '#00ACC1', '#FF7043', '#9E9D24'];
+    const isDoughnut = type === 'pie';
 
-    const whiteBgPlugin = {
-        id: 'whiteBg',
-        beforeDraw: (chart) => {
-            const {ctx} = chart;
-            ctx.save();
-            ctx.globalCompositeOperation = 'destination-over';
-            ctx.fillStyle = 'white';
-            ctx.fillRect(0, 0, chart.width, chart.height);
-            ctx.restore();
-        }
-    };
-
-    // ドーナツグラフの中央に合計値を表示するプラグイン
-    const centerTextPlugin = {
-        id: 'centerText',
-        beforeDraw: (chart) => {
-            if (displayOptions.showCenterText && chart.config.type === 'doughnut') {
-                const { ctx, width, height } = chart;
-                ctx.restore();
-                const fontSize = (height / 160).toFixed(2);
-                ctx.font = `bold ${fontSize}em sans-serif`;
-                ctx.textBaseline = "middle";
-                ctx.fillStyle = "#1A1A1A";
-
-                const text = chartData.totalAnswers.toLocaleString();
-                const textX = Math.round((width - ctx.measureText(text).width) / 2);
-                const textY = height / 2;
-
-                ctx.fillText(text, textX, textY);
-
-                ctx.font = `500 ${(height / 400).toFixed(2)}em sans-serif`;
-                ctx.fillStyle = "#6B6B6B";
-                const subText = "Total";
-                const subTextX = Math.round((width - ctx.measureText(subText).width) / 2);
-                const subTextY = textY + 25;
-                ctx.fillText(subText, subTextX, subTextY);
-                ctx.save();
-            }
-        }
-    };
-
-    let chartConfigType = type === 'pie' ? 'doughnut' : 'bar';
-    let chartConfigData;
-    let chartOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-        indexAxis: type === 'bar' ? 'y' : 'x', // 横棒グラフに
-        plugins: {
-            legend: {
-                position: chartConfigType === 'doughnut' ? 'right' : 'top',
-                display: chartConfigType === 'doughnut',
-                labels: {
-                    boxWidth: 12,
-                    padding: 15,
-                    font: { size: 11 }
-                }
-            },
-            datalabels: {
-                display: displayOptions.showDataLabels,
-                color: (context) => {
-                    return chartConfigType === 'doughnut' ? '#fff' : '#1A1A1A';
-                },
-                anchor: (context) => {
-                    return chartConfigType === 'doughnut' ? 'center' : 'end';
-                },
-                align: (context) => {
-                    return chartConfigType === 'doughnut' ? 'center' : 'right';
-                },
-                offset: 8,
-                font: {
-                    weight: 'bold',
-                    size: 11
-                },
-                formatter: (value, context) => {
-                    if (chartConfigType === 'doughnut') {
-                        const total = context.dataset.data.reduce((acc, curr) => acc + curr, 0);
-                        const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
-                        return percentage > 8 ? `${percentage}%` : '';
+    const options = {
+        series: isDoughnut ? chartData.data : [{ name: '件数', data: chartData.data }],
+        chart: {
+            type: isDoughnut ? 'donut' : 'bar',
+            height: 350,
+            width: '100%',
+            fontFamily: "'Noto Sans JP', sans-serif",
+            toolbar: { show: false },
+            animations: { enabled: true, easing: 'easeinout', speed: 800 },
+            padding: { top: 10, right: 10, bottom: 10, left: 10 }
+        },
+        colors: colors,
+        labels: chartData.labels,
+        plotOptions: {
+            pie: {
+                donut: {
+                    size: '72%',
+                    labels: {
+                        show: displayOptions.showCenterText,
+                        total: {
+                            show: true,
+                            label: 'Total',
+                            fontSize: '14px',
+                            fontWeight: 600,
+                            color: '#6B6B6B',
+                            formatter: () => chartData.totalAnswers.toLocaleString()
+                        },
+                        value: {
+                            fontSize: '32px',
+                            fontWeight: 800,
+                            color: '#1A1A1A',
+                            offsetY: 5
+                        }
                     }
-                    return value > 0 ? `${value}件` : '';
                 }
             },
-            tooltip: {
-                backgroundColor: 'rgba(26, 26, 26, 0.9)',
-                padding: 12,
-                titleFont: { size: 13 },
-                bodyFont: { size: 13 },
-                cornerRadius: 8
+            bar: {
+                horizontal: true,
+                borderRadius: 8,
+                barHeight: '75%',
+                dataLabels: { position: 'top' }
             }
         },
-        scales: {
-            x: {
-                display: chartConfigType === 'bar',
-                grid: { display: displayOptions.showGrid },
-                ticks: { font: { size: 10 } }
+        dataLabels: {
+            enabled: displayOptions.showDataLabels,
+            formatter: (val) => isDoughnut ? Math.round(val) + "%" : val + "件",
+            style: {
+                fontSize: '13px',
+                fontWeight: 700,
+                colors: isDoughnut ? ['#fff'] : ['#1A1A1A']
             },
-            y: {
-                display: chartConfigType === 'bar',
-                grid: { 
-                    display: displayOptions.showGrid,
-                    borderDash: [2, 2], 
-                    color: '#E0E0E0' 
-                },
-                ticks: { font: { size: 11 } }
-            }
-        }
+            offsetX: isDoughnut ? 0 : 40
+        },
+        legend: {
+            show: isDoughnut,
+            position: 'bottom',
+            fontSize: '13px',
+            fontFamily: "'Noto Sans JP', sans-serif",
+            markers: { radius: 12, width: 12, height: 12 },
+            itemMargin: { horizontal: 15, vertical: 8 }
+        },
+        grid: {
+            show: displayOptions.showGrid,
+            borderColor: '#F1F1F1',
+            padding: { left: 20, right: 40 }
+        },
+        xaxis: {
+            categories: chartData.labels,
+            labels: { show: !isDoughnut, style: { fontSize: '12px', fontWeight: 500 } }
+        },
+        yaxis: {
+            labels: { show: !isDoughnut, maxWidth: 200, style: { fontSize: '13px', fontWeight: 600 } }
+        },
+        stroke: { show: true, width: isDoughnut ? 3 : 0, colors: ['#fff'] }
     };
 
-    if (chartConfigType === 'doughnut') {
-        chartConfigData = {
-            labels: chartData.labels,
-            datasets: [{
-                data: chartData.data,
-                backgroundColor: chartData.labels.map((_, index) => colors[index % colors.length]),
-                borderWidth: 0,
-                hoverOffset: 10
-            }]
-        };
-        chartOptions.cutout = '70%';
-    } else {
-        chartConfigData = {
-            labels: chartData.labels,
-            datasets: [{
-                label: '件数',
-                data: chartData.data,
-                backgroundColor: colors[0],
-                borderRadius: 6,
-                barThickness: 24
-            }]
-        };
-        chartOptions.plugins.legend.display = false; // 横棒グラフ時は凡例不要（軸でわかるため）
-    }
-
-    chartInstances[chartId] = new Chart(ctx, {
-        type: chartConfigType,
-        data: chartConfigData,
-        options: chartOptions,
-        plugins: [whiteBgPlugin, centerTextPlugin, ChartDataLabels]
-    });
+    chartInstances[chartId] = new ApexCharts(container, options);
+    chartInstances[chartId].render();
 }
 
 /**
  * Renders the summary table for a chart.
- * @param {string} summaryId The ID of the summary container element.
- * @param {object} chartData The data for the chart.
  */
 function renderChartSummaryTable(summaryId, chartData) {
     const container = document.getElementById(summaryId);
@@ -670,6 +595,171 @@ function renderChartSummaryTable(summaryId, chartData) {
     container.innerHTML = html;
 }
 
+async function exportAllChartsToExcel(chartsData) {
+    const ExcelJSInstance = window.ExcelJS || (typeof ExcelJS !== 'undefined' ? ExcelJS : null);
+    if (!ExcelJSInstance || typeof ExcelJSInstance.Workbook !== 'function') {
+        alert('Excelエクスポート用のライブラリ(ExcelJS)が読み込めませんでした。');
+        return;
+    }
+
+    const exportBtn = document.getElementById('excel-export-all');
+    const originalBtnHtml = exportBtn.innerHTML;
+    const overlay = document.getElementById('export-progress-overlay');
+    const progressText = document.getElementById('export-progress-text');
+    const progressBar = document.getElementById('export-progress-bar');
+    const progressPercent = document.getElementById('export-progress-percent');
+
+    // スレッド解放用のヘルパー
+    const yieldToMain = () => new Promise(resolve => setTimeout(resolve, 50));
+
+    try {
+        isExporting = true; // 書き出し開始
+        if (exportBtn) {
+            exportBtn.disabled = true;
+            exportBtn.style.opacity = '0.7';
+            exportBtn.innerHTML = `
+                <span class="material-icons animate-spin text-sm mr-2">sync</span>
+                <span>出力タスク実行中</span>
+            `;
+        }
+        if (overlay) overlay.classList.remove('hidden');
+
+        const workbook = new ExcelJSInstance.Workbook();
+        const usedNames = new Map();
+        const blankQuestions = [];
+        const totalCharts = chartsData.length;
+        let processedCount = 0;
+
+        for (const chartData of chartsData) {
+            processedCount++;
+            const percent = Math.round((processedCount / totalCharts) * 100);
+            if (progressText) progressText.textContent = `${totalCharts}件中 ${processedCount}件目を処理中...`;
+            if (progressBar) progressBar.style.width = `${percent}%`;
+            if (progressPercent) progressPercent.textContent = `${percent}%`;
+
+            // ブラウザに操作権限を一度戻す（バックグラウンド感の演出とフリーズ防止）
+            await yieldToMain();
+
+            if (chartData.chartType === 'blank') {
+                blankQuestions.push([chartData.questionId, chartData.questionText, chartData.blankReason || '現在グラフ対象外']);
+                continue;
+            }
+
+            const baseName = sanitizeSheetName(chartData.questionText);
+            const sheetName = ensureUniqueSheetName(baseName, usedNames);
+            const sheet = workbook.addWorksheet(sheetName, { views: [{ showGridLines: false }] });
+
+            const titleRow = sheet.addRow([chartData.questionText]);
+            titleRow.font = { bold: true, size: 16 };
+            sheet.addRow([]);
+
+            const totalAnswers = chartData.totalAnswers || 0;
+            const rows = chartData.labels.map((label, index) => {
+                const count = chartData.data[index] || 0;
+                const percentage = totalAnswers > 0 ? (count / totalAnswers) : 0;
+                return [label, count, percentage];
+            });
+
+            sheet.addTable({
+                name: `Table_${chartData.chartId.replace(/[^a-zA-Z0-9]/g, '_')}`,
+                ref: 'A3',
+                headerRow: true,
+                totalsRow: chartData.includeTotalRow,
+                style: { theme: 'TableStyleMedium2', showRowStripes: true },
+                columns: [
+                    { name: '項目', filterButton: true, totalsRowLabel: '合計' },
+                    { name: '回答数', filterButton: false, totalsRowFunction: 'sum' },
+                    { name: '割合', filterButton: false, totalsRowFunction: 'none' }
+                ],
+                rows: rows
+            });
+
+            sheet.getColumn(1).width = 40;
+            sheet.getColumn(2).width = 15;
+            sheet.getColumn(3).width = 15;
+            sheet.getColumn(2).numFmt = '#,##0"件"';
+            sheet.getColumn(3).numFmt = '0.0%';
+            sheet.getColumn(3).alignment = { horizontal: 'right' };
+
+            try {
+                const chartElement = document.getElementById(`chart-${chartData.chartId}`);
+                if (chartElement) {
+                    const canvas = await html2canvas(chartElement, { useCORS: true, backgroundColor: '#ffffff', scale: 3 });
+                    
+                    // アスペクト比の維持
+                    const imgWidth = canvas.width;
+                    const imgHeight = canvas.height;
+                    const ratio = imgHeight / imgWidth;
+                    
+                    // Excel上での表示サイズ（基準幅500pxに対し比率を適用）
+                    const displayWidth = 500;
+                    const displayHeight = displayWidth * ratio;
+
+                    const base64Image = canvas.toDataURL('image/png');
+                    const imageId = workbook.addImage({
+                        base64: base64Image,
+                        extension: 'png',
+                    });
+
+                    sheet.addImage(imageId, {
+                        tl: { col: 4.5, row: 2 },
+                        ext: { width: displayWidth, height: displayHeight }
+                    });
+                }
+            } catch (err) { console.error(`画像キャプチャ失敗:`, err); }
+
+            if (chartData.includeTotalRow) {
+                const totalRowNumber = 3 + rows.length + 1;
+                sheet.getCell(`B${totalRowNumber}`).value = totalAnswers;
+                sheet.getCell(`C${totalRowNumber}`).value = 1;
+            }
+        }
+
+        if (progressText) progressText.textContent = `レポートを保存中...`;
+        await yieldToMain();
+
+        if (blankQuestions.length > 0) {
+            const sheet = workbook.addWorksheet('対象外', { views: [{ showGridLines: false }] });
+            sheet.addRow(['グラフ化対象外の設問一覧']).font = { bold: true, size: 14 };
+            sheet.addRow([]);
+            sheet.addTable({
+                name: 'Table_Exclusions',
+                ref: 'A3',
+                headerRow: true,
+                columns: [{ name: '設問ID' }, { name: '設問文' }, { name: '理由' }],
+                rows: blankQuestions
+            });
+            sheet.getColumn(1).width = 20;
+            sheet.getColumn(2).width = 60;
+            sheet.getColumn(3).width = 30;
+        }
+
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const url = window.URL.createObjectURL(blob);
+        const anchor = document.createElement('a');
+        const filename = `${sanitizeFilename(currentSurvey?.name?.ja || 'survey')}_分析レポート.xlsx`;
+        anchor.href = url;
+        anchor.download = filename;
+        anchor.style.display = 'none';
+        document.body.appendChild(anchor);
+        anchor.click();
+        setTimeout(() => { document.body.removeChild(anchor); window.URL.revokeObjectURL(url); }, 100);
+        showToast('分析レポートの出力が完了しました！', 'success');
+    } catch (error) {
+        console.error('Excel出力エラー:', error);
+        showToast('Excelの生成中にエラーが発生しました。', 'error');
+    } finally {
+        isExporting = false; // 書き出し終了
+        if (exportBtn) {
+            exportBtn.disabled = false;
+            exportBtn.style.opacity = '1';
+            exportBtn.innerHTML = originalBtnHtml;
+        }
+        if (overlay) overlay.classList.add('hidden');
+    }
+}
+
 // --- Utility Functions ---
 function showLoading(isLoading) {
     document.getElementById('loading-indicator').style.display = isLoading ? 'block' : 'none';
@@ -692,41 +782,23 @@ function showError(message, show = true) {
 
 function escapeHtml(value) {
     if (value === undefined || value === null) return '';
-    return String(value)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/\"/g, '&quot;')
-        .replace(/'/g, '&#39;');
+    return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
 function getBlankReason(type) {
     switch (type) {
-        case 'text':
-        case 'free_text':
-            return '自由記述のため';
-        case 'number':
-            return '数値入力のため';
-        case 'date':
-        case 'datetime':
-        case 'datetime_local':
-        case 'time':
-            return '日付・時刻入力のため';
-        case 'handwriting':
-            return '手書き入力のため';
-        case 'explanation':
-            return '説明カードのため';
-        default:
-            return '未対応の設問タイプ';
+        case 'text': case 'free_text': return '自由記述のため';
+        case 'number': return '数値入力のため';
+        case 'date': case 'datetime': case 'datetime_local': case 'time': return '日付・時刻入力のため';
+        case 'handwriting': return '手書き入力のため';
+        case 'explanation': return '説明カードのため';
+        default: return '未対応の設問タイプ';
     }
 }
 
 function normalizeQuestionText(text) {
     if (!text) return '';
-    return String(text)
-        .toLowerCase()
-        .replace(/^[\s　]*q[0-9０-９]+[._、:：\s-]*/i, '')
-        .replace(/\s+/g, '');
+    return String(text).toLowerCase().replace(/^[\\s　]*q[0-9０-９]+[._、:：\\s-]*/i, '').replace(/\\s+/g, '');
 }
 
 function findAnswerDetail(answer, question) {
@@ -742,7 +814,6 @@ function findAnswerDetail(answer, question) {
 function normalizeChoiceOptions(options = []) {
     const labels = [];
     const map = new Map();
-
     options.forEach((opt, index) => {
         if (opt && typeof opt === 'object') {
             const value = opt.value ?? opt.id ?? opt.text ?? `option_${index + 1}`;
@@ -756,7 +827,6 @@ function normalizeChoiceOptions(options = []) {
             map.set(text, text);
         }
     });
-
     return { labels, map };
 }
 
@@ -776,15 +846,12 @@ function buildChoiceSummary(question, answers, isMulti) {
     const counts = {};
     let answeredCount = 0;
     const optionsInfo = normalizeChoiceOptions(question.options || []);
-
     answers.forEach(answer => {
         const detail = findAnswerDetail(answer, question);
         if (!detail || detail.answer === undefined || detail.answer === null || detail.answer === '') return;
-
         const answerValue = detail.answer;
         const selections = Array.isArray(answerValue) ? answerValue : [answerValue];
         if (selections.length === 0) return;
-
         answeredCount += 1;
         selections.forEach(selection => {
             const label = resolveOptionLabel(selection, optionsInfo);
@@ -792,18 +859,9 @@ function buildChoiceSummary(question, answers, isMulti) {
             counts[label] = (counts[label] || 0) + 1;
         });
     });
-
-    const labels = optionsInfo.labels.length > 0
-        ? optionsInfo.labels
-        : Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
-
+    const labels = optionsInfo.labels.length > 0 ? optionsInfo.labels : Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
     const data = labels.map(label => counts[label] || 0);
-
-    return {
-        labels,
-        data,
-        totalAnswers: answeredCount
-    };
+    return { labels, data, totalAnswers: answeredCount };
 }
 
 function normalizeMatrixRows(rows = []) {
@@ -832,9 +890,7 @@ function normalizeMatrixColumns(columns = []) {
 
 function extractMatrixRowResponses(answerValue, row) {
     if (!answerValue) return [];
-
     const rowKeys = [row.id, row.text].filter(Boolean);
-
     if (Array.isArray(answerValue)) {
         const matched = answerValue.filter(item => {
             if (!item || typeof item !== 'object') return false;
@@ -842,28 +898,20 @@ function extractMatrixRowResponses(answerValue, row) {
             const rowText = item.rowText ?? item.label ?? item.text;
             return rowKeys.includes(String(rowId)) || rowKeys.includes(String(rowText));
         });
-
         if (matched.length === 0) return [];
-
         return matched.flatMap(item => normalizeMatrixValue(item.value ?? item.column ?? item.answer ?? item.selection));
     }
-
     if (typeof answerValue === 'object') {
         for (const key of rowKeys) {
-            if (Object.prototype.hasOwnProperty.call(answerValue, key)) {
-                return normalizeMatrixValue(answerValue[key]);
-            }
+            if (Object.prototype.hasOwnProperty.call(answerValue, key)) { return normalizeMatrixValue(answerValue[key]); }
         }
     }
-
     return [];
 }
 
 function normalizeMatrixValue(value) {
     if (value === undefined || value === null || value === '') return [];
-    if (Array.isArray(value)) {
-        return value.filter(item => item !== undefined && item !== null && item !== '');
-    }
+    if (Array.isArray(value)) return value.filter(item => item !== undefined && item !== null && item !== '');
     return [value];
 }
 
@@ -871,9 +919,7 @@ function resolveMatrixColumnLabel(value, columns) {
     if (value === undefined || value === null || value === '') return null;
     if (typeof value === 'object') {
         const raw = value.value ?? value.text ?? value.label ?? value.id;
-        if (raw !== undefined && raw !== null) {
-            return resolveMatrixColumnLabel(raw, columns);
-        }
+        if (raw !== undefined && raw !== null) return resolveMatrixColumnLabel(raw, columns);
         return null;
     }
     const valueStr = String(value);
@@ -884,40 +930,26 @@ function resolveMatrixColumnLabel(value, columns) {
 function buildMatrixCharts(question, questionId, answers, isMulti) {
     const rows = normalizeMatrixRows(question.rows || []);
     const columns = normalizeMatrixColumns(question.columns || []);
-
-    if (rows.length === 0 || columns.length === 0) {
-        return [buildBlankChart(questionId, question.text)];
-    }
-
+    if (rows.length === 0 || columns.length === 0) return [buildBlankChart(questionId, question.text)];
     return rows.map((row, rowIndex) => {
         const counts = {};
-        columns.forEach(col => {
-            counts[col.text] = 0;
-        });
-
+        columns.forEach(col => { counts[col.text] = 0; });
         let answeredCount = 0;
-
         answers.forEach(answer => {
             const detail = findAnswerDetail(answer, question);
             if (!detail || detail.answer === undefined || detail.answer === null || detail.answer === '') return;
-
             const responses = extractMatrixRowResponses(detail.answer, row);
             if (responses.length === 0) return;
-
             answeredCount += 1;
             responses.forEach(response => {
                 const label = resolveMatrixColumnLabel(response, columns);
                 if (!label) return;
-                if (!Object.prototype.hasOwnProperty.call(counts, label)) {
-                    counts[label] = 0;
-                }
+                if (!Object.prototype.hasOwnProperty.call(counts, label)) { counts[label] = 0; }
                 counts[label] += 1;
             });
         });
-
         const labels = columns.map(col => col.text);
         const data = labels.map(label => counts[label] || 0);
-
         return buildChartData({
             questionId: `${questionId}_${rowIndex + 1}`,
             questionText: `${question.text} - ${row.text}`,
@@ -925,9 +957,7 @@ function buildMatrixCharts(question, questionId, answers, isMulti) {
             summaryType: isMulti ? 'none' : 'table',
             includeTotalRow: !isMulti,
             allowToggle: false,
-            labels,
-            data,
-            totalAnswers: answeredCount
+            labels, data, totalAnswers: answeredCount
         });
     });
 }
@@ -962,10 +992,7 @@ function buildBlankChart(questionId, questionText, reason) {
 }
 
 function buildActionButtons(chartData, chartId) {
-    if (chartData.chartType === 'blank') {
-        return '';
-    }
-
+    if (chartData.chartType === 'blank') return '';
     return `
         <div class="flex items-center gap-2">
             <button type="button" data-chart-id="${chartId}" class="download-btn button-secondary p-2 rounded-md" title="グラフをダウンロード">
@@ -976,13 +1003,9 @@ function buildActionButtons(chartData, chartId) {
 }
 
 function buildChartTypeButtons(chartData, chartId) {
-    if (!chartData.allowToggle) {
-        return '';
-    }
-
+    if (!chartData.allowToggle) return '';
     const isBar = chartData.chartType === 'bar';
     const isPie = chartData.chartType === 'pie';
-
     return `
         <div class="mb-4">
             <div class="inline-flex rounded-md shadow-sm" role="group">
@@ -1001,199 +1024,21 @@ function buildChartTypeButtons(chartData, chartId) {
 
 function buildChartArea(chartData, chartId) {
     if (chartData.chartType === 'blank') {
-        return `
-            <div class="p-6 rounded-xl bg-surface-variant/50 text-on-surface-variant text-sm border border-outline-variant/30 italic">
-                ${escapeHtml(chartData.blankMessage)}
-            </div>
-        `;
+        return `<div class="p-6 rounded-xl bg-surface-variant/50 text-on-surface-variant text-sm border border-outline-variant/30 italic">${escapeHtml(chartData.blankMessage)}</div>`;
     }
-
-    return `
-        <div class="chart-wrapper h-72 w-full">
-            <canvas id="${chartId}"></canvas>
-        </div>
-    `;
+    return `<div class="w-full min-h-[350px]"><div id="${chartId}" class="w-full h-full"></div></div>`;
 }
 
-async function exportAllChartsToExcel(chartsData) {
-    const ExcelJSInstance = window.ExcelJS || (typeof ExcelJS !== 'undefined' ? ExcelJS : null);
-    
-    if (!ExcelJSInstance || typeof ExcelJSInstance.Workbook !== 'function') {
-        alert('Excelエクスポート用のライブラリ(ExcelJS)が読み込めませんでした。');
-        return;
-    }
-
-    showToast('分析レポート(Excel)を生成しています...', 'info');
-
-    const workbook = new ExcelJSInstance.Workbook();
-    const usedNames = new Map();
-    const blankQuestions = [];
-
-    for (const chartData of chartsData) {
-        if (chartData.chartType === 'blank') {
-            blankQuestions.push([chartData.questionId, chartData.questionText, chartData.blankReason || '現在グラフ対象外']);
-            continue;
-        }
-
-        const baseName = sanitizeSheetName(chartData.questionText);
-        const sheetName = ensureUniqueSheetName(baseName, usedNames);
-        const sheet = workbook.addWorksheet(sheetName, {
-            views: [{ showGridLines: false }]
-        });
-
-        // タイトル
-        const titleRow = sheet.addRow([chartData.questionText]);
-        titleRow.font = { bold: true, size: 16 };
-        sheet.addRow([]); // 空行
-
-        const totalAnswers = chartData.totalAnswers || 0;
-        const rows = chartData.labels.map((label, index) => {
-            const count = chartData.data[index] || 0;
-            const percentage = totalAnswers > 0 ? (count / totalAnswers) : 0;
-            return [label, count, percentage];
-        });
-
-        // --- 1. Excelテーブルの追加 ---
-        sheet.addTable({
-            name: `Table_${chartData.chartId.replace(/[^a-zA-Z0-9]/g, '_')}`,
-            ref: 'A3',
-            headerRow: true,
-            totalsRow: chartData.includeTotalRow,
-            style: {
-                theme: 'TableStyleMedium2',
-                showRowStripes: true,
-            },
-            columns: [
-                { name: '項目', filterButton: true, totalsRowLabel: '合計' },
-                { name: '回答数', filterButton: false, totalsRowFunction: 'sum' },
-                { name: '割合', filterButton: false, totalsRowFunction: 'none' }
-            ],
-            rows: rows
-        });
-
-        // 列幅と書式の設定
-        sheet.getColumn(1).width = 40; // 項目
-        sheet.getColumn(2).width = 15; // 回答数
-        sheet.getColumn(3).width = 15; // 割合
-
-        sheet.getColumn(2).numFmt = '#,##0"件"';
-        sheet.getColumn(3).numFmt = '0.0%';
-        sheet.getColumn(3).alignment = { horizontal: 'right' };
-
-        // --- 2. 高画質グラフ画像のキャプチャと埋め込み ---
-        try {
-            const chartCanvas = document.getElementById(`chart-${chartData.chartId}`);
-
-            if (chartCanvas) {
-                // グラフ（Canvas）部分のみをピンポイントでキャプチャ
-                const canvas = await html2canvas(chartCanvas, {
-                    useCORS: true,
-                    backgroundColor: '#ffffff',
-                    scale: 3 // 超高解像度（擬似SVG品質）
-                });
-
-                const base64Image = canvas.toDataURL('image/png');
-                const imageId = workbook.addImage({
-                    base64: base64Image,
-                    extension: 'png',
-                });
-
-                // テーブルの右側に配置
-                sheet.addImage(imageId, {
-                    tl: { col: 4.5, row: 2 },
-                    ext: { width: 500, height: 350 }
-                });
-            }
-        } catch (err) {
-            console.error(`画像キャプチャ失敗 (${chartData.questionText}):`, err);
-        }
-
-        if (chartData.includeTotalRow) {
-            const totalRowNumber = 3 + rows.length + 1;
-            sheet.getCell(`B${totalRowNumber}`).value = totalAnswers;
-            sheet.getCell(`C${totalRowNumber}`).value = 1;
-        }
-    }
-
-    // 対象外シート
-    if (blankQuestions.length > 0) {
-        const sheet = workbook.addWorksheet('対象外', {
-            views: [{ showGridLines: false }]
-        });
-        sheet.addRow(['グラフ化対象外の設問一覧']).font = { bold: true, size: 14 };
-        sheet.addRow([]);
-        sheet.addTable({
-            name: 'Table_Exclusions',
-            ref: 'A3',
-            headerRow: true,
-            columns: [{ name: '設問ID' }, { name: '設問文' }, { name: '理由' }],
-            rows: blankQuestions
-        });
-        sheet.getColumn(1).width = 20;
-        sheet.getColumn(2).width = 60;
-        sheet.getColumn(3).width = 30;
-    }
-
-    if (workbook.worksheets.length === 0) {
-        alert('出力対象の設問がありません。');
-        return;
-    }
-
-    // --- 3. ファイルの書き出し ---
-    try {
-        const buffer = await workbook.xlsx.writeBuffer();
-        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        const url = window.URL.createObjectURL(blob);
-        const anchor = document.createElement('a');
-        const filename = `${sanitizeFilename(currentSurvey?.name?.ja || 'survey')}_分析レポート.xlsx`;
-        
-        anchor.href = url;
-        anchor.download = filename;
-        anchor.style.display = 'none';
-        document.body.appendChild(anchor);
-        anchor.click();
-        
-        setTimeout(() => {
-            document.body.removeChild(anchor);
-            window.URL.revokeObjectURL(url);
-        }, 100);
-
-        showToast('分析レポート(Excel)を出力しました。', 'success');
-    } catch (writeError) {
-        console.error('Excelファイルの書き出しに失敗しました:', writeError);
-        alert('Excelファイルの生成中にエラーが発生しました。');
-        showToast('Excelファイルの生成に失敗しました。', 'error');
-    }
-}
-
-function buildExcelRows(chartData) {
-    const rows = [['項目', '件数', '割合(%)', '設問ID', '設問文']];
-    const totalAnswers = chartData.totalAnswers || 0;
-
-    chartData.labels.forEach((label, index) => {
-        const count = chartData.data[index] || 0;
-        const percentage = totalAnswers > 0 ? ((count / totalAnswers) * 100).toFixed(1) : '0.0';
-        rows.push([label, count, percentage, chartData.questionId, chartData.questionText]);
-    });
-
-    if (chartData.includeTotalRow) {
-        const totalPercentage = totalAnswers > 0 ? '100.0' : '0.0';
-        rows.push(['合計', totalAnswers, totalPercentage, chartData.questionId, chartData.questionText]);
-    }
-
-    return rows;
+function buildChartAreaStatic(chartData, chartId) {
+    // This was duplicated, merged into buildChartArea
 }
 
 function sanitizeFilename(name) {
-    return String(name || 'chart')
-        .replace(/[<>:"/\\|?*]/g, '_')
-        .slice(0, 80);
+    return String(name || 'chart').replace(/[<>:"/\\|?*]/g, '_').slice(0, 80);
 }
 
 function sanitizeSheetName(name) {
-    const sanitized = String(name || 'Sheet1')
-        .replace(/[\[\]\*\/\\\?\:]/g, '_')
-        .slice(0, 31);
+    const sanitized = String(name || 'Sheet1').replace(/[\[\]\*\/\\?\:]/g, '_').slice(0, 31);
     return sanitized || 'Sheet1';
 }
 
@@ -1206,4 +1051,3 @@ function ensureUniqueSheetName(baseName, usedNames) {
     const trimmedBase = base.slice(0, 31 - suffix.length);
     return `${trimmedBase}${suffix}`;
 }
-
