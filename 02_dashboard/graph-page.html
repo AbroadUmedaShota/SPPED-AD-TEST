@@ -9,9 +9,8 @@
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <!-- Material Icons CDN -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <!-- Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+    <!-- ApexCharts CDN (SVG Based) -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.45.2"></script>
     <!-- flatpickr CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <!-- Custom CSS -->
@@ -135,7 +134,7 @@
                         
                         <label class="flex items-center gap-2 cursor-pointer group">
                             <input type="checkbox" id="opt-show-grid" class="form-checkbox h-3.5 w-3.4 text-primary rounded border-outline-variant focus:ring-primary">
-                            <span class="text-xs text-on-surface-variant group-hover:text-primary transition-colors">グリッド線</span>
+                            <span class="text-xs text-on-surface-variant group-hover:text-primary transition-colors">グリッド線（棒グラフのみ）</span>
                         </label>
                     </div>
                 </div>
@@ -157,6 +156,32 @@
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- Excel Export Floating Progress (Non-blocking) -->
+    <div id="export-progress-overlay" class="fixed bottom-8 right-8 z-[100] hidden animate-fade-in-up">
+        <div class="bg-surface p-5 rounded-2xl shadow-2xl border border-primary/20 w-72 backdrop-blur-md">
+            <div class="flex items-center gap-4">
+                <div class="relative shrink-0">
+                    <span class="material-icons text-primary animate-spin">sync</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h3 class="text-sm font-bold text-on-surface truncate">Excelレポートを作成中...</h3>
+                    <p id="export-progress-text" class="text-[10px] text-on-surface-variant mt-0.5 truncate">データを集計しています</p>
+                </div>
+            </div>
+            
+            <!-- Mini Progress Bar -->
+            <div class="mt-4">
+                <div class="flex justify-between items-end mb-1.5">
+                    <span id="export-progress-percent" class="text-[10px] font-black text-primary uppercase">0%</span>
+                    <span class="text-[9px] text-on-surface-variant font-medium">Please wait</span>
+                </div>
+                <div class="w-full bg-surface-variant/50 rounded-full h-1.5 overflow-hidden">
+                    <div id="export-progress-bar" class="bg-primary h-full transition-all duration-500 ease-out" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div id="footer-placeholder"></div>
