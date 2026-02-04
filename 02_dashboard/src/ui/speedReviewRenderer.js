@@ -46,6 +46,7 @@ export function populateTable(data, onDetailClick, selectedIndustryQuestion) {
             // データ化進行中: グレー文字でアニメーション付き
             fullName = '<span class="processing-text">データ化進行中</span>';
             companyName = '<span class="processing-text">データ化進行中</span>';
+            row.classList.add('review-row-processing');
         } else {
             // 完了: 通常通りデータを表示
             const lastName = item.businessCard?.group2?.lastName || '';
@@ -68,8 +69,8 @@ export function populateTable(data, onDetailClick, selectedIndustryQuestion) {
                 </button>
             </td>
             <td class="px-4 py-3 whitespace-nowrap text-sm text-on-surface overflow-hidden text-ellipsis">${formatCell(item.answerId)}</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm text-on-surface overflow-hidden text-ellipsis">${formatCell(item.answeredAt)}</td>
-            <td class="px-4 py-3 whitespace-nowrap text-sm overflow-hidden text-ellipsis">${fullName}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-sm text-on-surface overflow-hidden text-ellipsis min-w-[160px]">${formatCell(item.answeredAt)}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-sm overflow-hidden text-ellipsis min-w-[140px]">${fullName}</td>
             <td class="px-4 py-3 text-sm truncate max-w-[200px]" title="${cardStatus === 'completed' ? companyName : ''}">${companyName}</td>
             <td class="px-4 py-3 whitespace-nowrap text-sm text-on-surface overflow-hidden text-ellipsis">${(() => {
                 const answer = getAnswer(selectedIndustryQuestion);
