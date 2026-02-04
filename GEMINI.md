@@ -212,7 +212,7 @@ If a minor, localized ambiguity arises during the implementation phase (`Step 3`
             4.  **Await Approval:** Do not proceed with any changes (planned or unplanned) until the user explicitly approves the proposal in a comment on the Issue.
     *   **Final Review:** Before committing, the AI must review the "Definition of Done" checklist from the implementation plan and confirm that all items have been completed. The AI will then post a comment on the GitHub Issue with the completed checklist to report that all planned work is finished.
     *   **Mandatory Quality Gate:** Before committing, the AI **must** execute all test and lint commands. This is a non-negotiable gate.
-        *   The AI must first check for the existence of `docs/03_TESTING_GUIDELINES.md`.
+        *   The AI must first check for the existence of `docs/handbook/testing/03_TESTING_GUIDELINES.md`.
         *   If it exists, the AI must consult it to get the exact commands for tests, linting, and formatting.
         *   **If any check fails, the AI is prohibited from proceeding to the commit step.** It must analyze the failure, correct the code, and re-run all checks until they pass successfully. Only after all checks pass may the AI proceed.
     *   Once the work is complete, commit the changes. The commit message will follow the convention defined in `4.5. Commit Message Convention`.
@@ -291,7 +291,7 @@ This step defines the workflow when the user requests modifications during a Pul
 I will proceed with these changes."
     *   **Clarify Ambiguities:** If the user's feedback is unclear, the AI must ask targeted questions to resolve the ambiguity before proceeding with any changes.
     *   **Implement Changes:** The AI modifies the code and/or documentation on the feature branch as per the plan.
-    *   **Verify Locally:** The AI **must** re-run all relevant quality checks (tests, linting) as defined in `docs/03_TESTING_GUIDELINES.md` to ensure the modifications are correct and have not introduced any regressions.
+    *   **Verify Locally:** The AI **must** re-run all relevant quality checks (tests, linting) as defined in `docs/handbook/testing/03_TESTING_GUIDELINES.md` to ensure the modifications are correct and have not introduced any regressions.
     *   **Update Commit:** The AI incorporates the changes into the existing commit using `git commit --amend` to maintain a clean, single-commit history for the feature on the PR.
     *   **Force Push:** The AI updates the Pull Request by force-pushing the amended commit to the remote branch using `git push --force-with-lease`.
     *   **Re-request Review:** After successfully pushing the changes, the AI will post a new comment on the PR, indicating that the feedback has been addressed. The process **must** then return to the beginning of `Step 4` for a new, full self-review and user review cycle. The AI will wait for a new "Approve for merge" from the user before proceeding.
@@ -330,9 +330,9 @@ I will proceed with these changes."
     *   **Static Analysis (Linting):** Code must be free of linting errors. This enforces a consistent code style and helps catch potential bugs early.
     *   **Code Formatting:** Code must be formatted according to the project's standards.
 *   **Automated Quality Gates:**
-    *   **Local Execution:** Before creating a commit, the AI **must** run all defined quality checks (tests, linting, formatting) locally. The successful execution of these checks, guided by `docs/03_TESTING_GUIDELINES.md` (if it exists), is a mandatory prerequisite for creating a Pull Request.
+    *   **Local Execution:** Before creating a commit, the AI **must** run all defined quality checks (tests, linting, formatting) locally. The successful execution of these checks, guided by `docs/handbook/testing/03_TESTING_GUIDELINES.md` (if it exists), is a mandatory prerequisite for creating a Pull Request.
 *   **Project-Specific Guidelines:**
-    *   The specific commands, tools, and configurations for testing and linting for this project should be defined in `docs/03_TESTING_GUIDELINES.md`. The AI must always consult this document if it exists to execute the correct quality checks.
+    *   The specific commands, tools, and configurations for testing and linting for this project should be defined in `docs/handbook/testing/03_TESTING_GUIDELINES.md`. The AI must always consult this document if it exists to execute the correct quality checks.
 
 ### 4.4. Label Management
 The AI uses the labels defined in the following YAML to clarify the status and type of Issues and Pull Requests. This YAML block is the **single source of truth** for the issue workflow. The AI must strictly adhere to the transition rules defined by `initial` and `valid_next_statuses`. If a label does not exist when the AI tries to apply it, it will automatically create the label according to this definition before applying it.
@@ -414,37 +414,37 @@ documentation:
   - file: "[README.md](README.md)"
     purpose: "Provides the information that new participants and external viewers will see first, as the face of the project. It includes the project overview, main features, technologies used, setup, basic usage, license, and contribution guidelines."
     update_trigger: "When there are major changes to the project's basic information, technology stack, or setup method."
-  - file: "[CONTRIBUTING.md](CONTRIBUTING.md)"
+  - file: "[CONTRIBUTING.md](docs/CONTRIBUTING.md)"
     purpose: "Defines the process for contributing to the project, including how to create Issues and Pull Requests, and the code review process. Aims to lower the barrier for external and internal contributors."
     update_trigger: "When the contribution workflow or review process changes."
-  - file: "[CHANGELOG.md](CHANGELOG.md)"
+  - file: "[CHANGELOG.md](docs/changelog/CHANGELOG.md)"
     purpose: "Records a chronological list of notable changes for each version of the project. Helps users and contributors understand the evolution of the project at a glance."
     update_trigger: "On every new release (version update)."
-  - file: "[docs/00_PROJECT_OVERVIEW.md](docs/00_PROJECT_OVERVIEW.md)"
+  - file: "[docs/product/overview/00_PROJECT_OVERVIEW.md](docs/product/overview/00_PROJECT_OVERVIEW.md)"
     purpose: "Defines the overall picture of the project and forms a common understanding among stakeholders. It includes the background, problems to solve, goals, target users, scope, and a list of main features."
     update_trigger: "When there are changes to the core specifications, such as the project's purpose, scope, or main features."
-  - file: "[docs/01_ARCHITECTURE.md](docs/01_ARCHITECTURE.md)"
+  - file: "[docs/product/architecture/01_ARCHITECTURE.md](docs/product/architecture/01_ARCHITECTURE.md)"
     purpose: "Defines the system's structure and design philosophy, and records the rationale for technical decisions. It includes an architecture overview, design principles, details of main components, data model, infrastructure, and reasons for technology selection."
     update_trigger: "When there are changes related to the system's structure, such as the addition of new components, changes in the responsibilities of existing components, or changes in the infrastructure configuration."
   - file: "[docs/product/standards/02_CODING_STANDARDS.md](docs/product/standards/02_CODING_STANDARDS.md)"
     purpose: "Defines the conventions for maintaining code consistency. It includes formatting conventions, naming conventions, coding style, library usage conventions, and discouraged patterns."
     update_trigger: "When new conventions are added, existing conventions are changed, or the linters used are changed."
-  - file: "[docs/03_TESTING_GUIDELINES.md](docs/03_TESTING_GUIDELINES.md)"
+  - file: "[docs/handbook/testing/03_TESTING_GUIDELINES.md](docs/handbook/testing/03_TESTING_GUIDELINES.md)"
     purpose: "Defines the testing policies and procedures for ensuring quality. It includes the test strategy, how to write tests, test scope, how to run tests, and the policy for using mocks/stubs."
     update_trigger: "When the test strategy is changed, a new test framework is introduced, or the method of running tests is changed."
-  - file: "[docs/04_SETUP.md](docs/04_SETUP.md)" 
+  - file: "[docs/handbook/setup/04_SETUP.md](docs/handbook/setup/04_SETUP.md)" 
     purpose: "Defines the development environment setup procedure in detail. It includes prerequisites, installation procedure, environment variable settings, how to start the application, and troubleshooting."
     update_trigger: "When there are changes to the development environment setup procedure, the necessary tools, or environment variables."
-  - file: "[docs/05_DEPLOYMENT.md](docs/05_DEPLOYMENT.md)"
+  - file: "[docs/handbook/deployment/05_DEPLOYMENT.md](docs/handbook/deployment/05_DEPLOYMENT.md)"
     purpose: "Provides detailed procedures for deploying the application to production and other environments. Includes environment-specific settings and rollback procedures."
     update_trigger: "When the deployment process, infrastructure, or required environment variables change."
-  - file: "[docs/06_OPERATIONS_GUIDE.md](docs/06_OPERATIONS_GUIDE.md)"
+  - file: "[docs/handbook/operations/06_OPERATIONS_GUIDE.md](docs/handbook/operations/06_OPERATIONS_GUIDE.md)"
     purpose: "A runbook for operators, defining standard operating procedures (SOPs) for system operations, such as monitoring, backup, incident response, and regular maintenance tasks."
     update_trigger: "When operational procedures, monitoring metrics, or the incident response plan are updated."
-  - file: "[docs/07_SECURITY_GUIDELINES.md](docs/07_SECURITY_GUIDELINES.md)"
+  - file: "[docs/handbook/security/07_SECURITY_GUIDELINES.md](docs/handbook/security/07_SECURITY_GUIDELINES.md)"
     purpose: "Documents the project's security design, threat model, and policies. Includes guidelines for handling vulnerabilities, data privacy considerations, and access control policies."
     update_trigger: "When there are changes to the security architecture, a new vulnerability is identified, or the security policy is revised."
-  - file: "[docs/08_DECISION_LOG.md](docs/08_DECISION_LOG.md)"
+  - file: "[docs/changelog/08_DECISION_LOG.md](docs/changelog/08_DECISION_LOG.md)"
     purpose: "Serves as an Architecture Decision Record (ADR). Logs important architectural and design decisions, their context, and the rationale behind them to ensure transparency in the decision-making process."
     update_trigger: "Whenever a significant architectural or technical design decision is made."
   - file: "[WEEKLY_CHANGELOG.md](WEEKLY_CHANGELOG.md)"
@@ -472,7 +472,7 @@ If the AI determines that the specifications or design that are prerequisites fo
     *   The AI starts this workflow when, during Issue response, it determines that essential design information for starting implementation (e.g., concrete specifications for a new feature, the flow of complex business logic, API endpoint details, etc.) is not specified in the existing documentation.
 
 2.  **Step 1: Proposal for Documentation**
-    *   The AI temporarily suspends the implementation work and proposes to the user the benefits of documenting, for example, by saying, "Before we start implementing the 〇〇 feature, why don't we document its specifications and design in `docs/01_ARCHITECTURE.md`? This will prevent rework and improve future development efficiency."
+    *   The AI temporarily suspends the implementation work and proposes to the user the benefits of documenting, for example, by saying, "Before we start implementing the 〇〇 feature, why don't we document its specifications and design in `docs/product/architecture/01_ARCHITECTURE.md`? This will prevent rework and improve future development efficiency."
 
 3.  **Step 2: Hearing of Functional Requirements**
     *   If the user agrees, the AI will ask the user about the functional requirements, constraints, expected behavior, etc., necessary for implementation.
@@ -497,9 +497,9 @@ To maintain the readability and maintainability of documents as they grow in siz
     *   **Complexity:** The document contains three or more independent major topics (corresponding to H2 level headings).
 
 *   **Splitting Method:**
-    1.  **Create a Subdirectory:** Create a subdirectory corresponding to the original file name (e.g., `docs/01_ARCHITECTURE.md` -> `docs/architecture/`).
+    1.  **Create a Subdirectory:** Create a subdirectory corresponding to the original file name (e.g., `docs/product/architecture/01_ARCHITECTURE.md` -> `docs/architecture/`).
     2.  **Split and Place Files:** Split the original document into multiple Markdown files based on logical units, and place them in the created subdirectory with sequential numbers and descriptive names (e.g., `01_overview.md`, `02_components.md`, `03_data_flow.md`).
-    3.  **Create a Table of Contents:** Update the original document file (in this example, `docs/01_ARCHITECTURE.md`) to function as a **Table of Contents**, containing links to each of the split files.
+    3.  **Create a Table of Contents:** Update the original document file (in this example, `docs/product/architecture/01_ARCHITECTURE.md`) to function as a **Table of Contents**, containing links to each of the split files.
 
 ### 5.5. Handling Outdated Documentation
 This section defines a context-aware workflow for the AI to follow when it discovers outdated documentation, ensuring that fixes are handled efficiently without disrupting the primary development flow.
