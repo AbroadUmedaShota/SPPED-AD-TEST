@@ -20,6 +20,7 @@ const displayOptions = {
     showSummary: true,
     showDataLabels: true,
     showCenterText: true,
+    showTable: true,
     showGrid: false
 };
 
@@ -60,34 +61,8 @@ function setupFilterEventListeners() {
     const startEl = document.getElementById('startDateInput');
     const endEl = document.getElementById('endDateInput');
     const daySelect = document.getElementById('dayFilterSelect');
-    const simpleTab = document.getElementById('simple-search-tab');
-    const detailedTab = document.getElementById('detailed-search-tab');
-    const simpleContent = document.getElementById('simple-search-content');
     const detailedContent = document.getElementById('detailed-search-content');
     const resetBtn = document.getElementById('resetFiltersButton');
-
-    // --- Search Tab Logic ---
-    if (simpleTab && detailedTab && simpleContent && detailedContent) {
-        const switchTab = (mode) => {
-            if (mode === 'simple') {
-                simpleTab.classList.add('bg-surface', 'text-primary', 'shadow-sm');
-                simpleTab.classList.remove('text-on-surface-variant', 'hover:text-on-surface');
-                detailedTab.classList.remove('bg-surface', 'text-primary', 'shadow-sm');
-                detailedTab.classList.add('text-on-surface-variant', 'hover:text-on-surface');
-                simpleContent.classList.remove('hidden');
-                detailedContent.classList.add('hidden');
-            } else {
-                detailedTab.classList.add('bg-surface', 'text-primary', 'shadow-sm');
-                detailedTab.classList.remove('text-on-surface-variant', 'hover:text-on-surface');
-                simpleTab.classList.remove('bg-surface', 'text-primary', 'shadow-sm');
-                simpleTab.classList.add('text-on-surface-variant', 'hover:text-on-surface');
-                detailedContent.classList.remove('hidden');
-                simpleContent.classList.add('hidden');
-            }
-        };
-        simpleTab.addEventListener('click', () => switchTab('simple'));
-        detailedTab.addEventListener('click', () => switchTab('detailed'));
-    }
 
     const fpConfig = {
         enableTime: true,
@@ -100,16 +75,11 @@ function setupFilterEventListeners() {
                 const end = endDatePicker.selectedDates[0];
                 if (start && end) {
                     currentDateFilter = [start, end];
-                    if (daySelect && daySelect.value !== 'custom' && valFromSelectChange !== true) {
-                        daySelect.value = 'custom';
-                    }
                     triggerChartUpdate();
                 }
             }
         }
     };
-
-    let valFromSelectChange = false;
 
     if (startEl && endEl) {
         startDatePicker = flatpickr(startEl, fpConfig);
@@ -119,24 +89,27 @@ function setupFilterEventListeners() {
     if (daySelect) {
         daySelect.addEventListener('change', (e) => {
             const val = e.target.value;
-            valFromSelectChange = true;
-            if (val === 'all') {
-                startDatePicker.setDate("2026-01-04 00:00");
-                endDatePicker.setDate("2026-01-17 23:59");
-                currentDateFilter = [new Date(2026, 0, 3, 15, 0), new Date(2026, 0, 17, 23, 59)]; // Note: Timezone consideration if necessary, but following speed-review logic
-                // Using exact dates for filter
-                currentDateFilter = [new Date(2026, 0, 4, 0, 0), new Date(2026, 0, 17, 23, 59)];
-            } else if (val === 'custom') {
-                valFromSelectChange = false;
+            
+            // カスタム範囲の表示制御
+            if (val === 'custom') {
+                detailedContent.classList.remove('hidden');
+                // 前回のカスタム値を維持するか、空にするかは要件次第だが、ここでは入力を促す
                 return;
             } else {
-                startDatePicker.setDate(`${val} 00:00`);
-                endDatePicker.setDate(`${val} 23:59`);
+                detailedContent.classList.add('hidden');
+            }
+
+            if (val === 'all') {
+                if (startDatePicker) startDatePicker.setDate("2026-01-04 00:00");
+                if (endDatePicker) endDatePicker.setDate("2026-01-17 23:59");
+                currentDateFilter = [new Date(2026, 0, 4, 0, 0), new Date(2026, 0, 17, 23, 59)];
+            } else {
+                if (startDatePicker) startDatePicker.setDate(`${val} 00:00`);
+                if (endDatePicker) endDatePicker.setDate(`${val} 23:59`);
                 const d = val.split('-');
                 currentDateFilter = [new Date(d[0], d[1] - 1, d[2], 0, 0), new Date(d[0], d[1] - 1, d[2], 23, 59)];
             }
             triggerChartUpdate();
-            valFromSelectChange = false;
         });
     }
 
@@ -149,6 +122,7 @@ function setupFilterEventListeners() {
         'opt-show-summary': 'showSummary',
         'opt-show-datalabels': 'showDataLabels',
         'opt-show-center-text': 'showCenterText',
+        'opt-show-table': 'showTable',
         'opt-show-grid': 'showGrid'
     };
 
@@ -172,6 +146,10 @@ function handleResetFilters() {
     if (endDatePicker) endDatePicker.clear();
     const daySelect = document.getElementById('dayFilterSelect');
     if (daySelect) daySelect.value = 'all';
+    
+    const detailedContent = document.getElementById('detailed-search-content');
+    if (detailedContent) detailedContent.classList.add('hidden');
+    
     triggerChartUpdate();
 }
 
@@ -330,7 +308,7 @@ function renderCharts(chartsData) {
     chartsData.forEach(chartData => {
         const chartId = `chart-${chartData.chartId}`;
         const card = document.createElement('div');
-        card.className = 'bg-surface p-6 rounded-2xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow';
+        card.className = 'bg-surface rounded-2xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col';
 
         const actionButtons = buildActionButtons(chartData, chartId);
         const chartArea = buildChartArea(chartData, chartId);
@@ -341,7 +319,7 @@ function renderCharts(chartsData) {
         const iconName = isBlank ? 'subject' : 'analytics';
         const iconColor = isBlank ? 'text-on-surface-variant/60' : 'text-primary';
 
-        // クイックインサイト（Top回答）の算出
+        // クイックインサイト（Top回答）
         let insightHtml = '';
         if (displayOptions.showSummary && !isBlank && chartData.labels.length > 0) {
             const maxIdx = chartData.data.indexOf(Math.max(...chartData.data));
@@ -350,10 +328,10 @@ function renderCharts(chartsData) {
             const topPercent = chartData.totalAnswers > 0 ? Math.round((topVal / chartData.totalAnswers) * 100) : 0;
             
             insightHtml = `
-                <div class="flex items-center gap-2 bg-primary/5 border border-primary/10 px-3 py-1.5 rounded-full">
-                    <span class="text-[10px] font-bold text-primary uppercase tracking-wider">Top Result</span>
-                    <span class="text-sm font-bold text-on-surface">${escapeHtml(topLabel)}</span>
-                    <span class="text-xs font-medium text-primary">${topPercent}%</span>
+                <div class="flex items-center gap-2 bg-primary/5 border border-primary/10 px-3 py-1 rounded-full">
+                    <span class="text-[10px] font-bold text-primary uppercase tracking-wider">Top</span>
+                    <span class="text-xs font-bold text-on-surface truncate max-w-[100px]">${escapeHtml(topLabel)}</span>
+                    <span class="text-xs font-black text-primary">${topPercent}%</span>
                 </div>
             `;
         }
@@ -361,40 +339,49 @@ function renderCharts(chartsData) {
         const summaryArea = chartData.summaryType === 'table'
             ? `<div id="summary-${chartId}" class="text-sm"></div>`
             : '';
-        const contentArea = chartData.summaryType === 'table'
-            ? `
-                <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
-                    <div class="lg:col-span-2">${summaryArea}</div>
-                    <div class="lg:col-span-3">${chartArea}</div>
-                </div>
-            `
-            : `
-                <div class="space-y-4">
-                    ${summaryArea}
-                    ${chartArea}
-                </div>
-            `;
 
         card.innerHTML = `
-            <div class="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center shrink-0">
-                        <span class="material-icons ${iconColor}">${iconName}</span>
+            <!-- Card Header -->
+            <div class="p-5 border-b border-outline-variant/50 bg-surface-variant/10">
+                <div class="flex justify-between items-start gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-white shadow-sm border border-outline-variant flex items-center justify-center shrink-0">
+                            <span class="material-icons text-lg ${iconColor}">${iconName}</span>
+                        </div>
+                        <h3 class="text-base font-bold text-on-surface leading-tight line-clamp-2" title="${questionTitle}">${questionTitle}</h3>
                     </div>
-                    <div>
-                        <h3 class="text-lg font-bold text-on-surface leading-tight">${questionTitle}</h3>
-                        <p class="text-xs text-on-surface-variant mt-1">有効回答数: ${chartData.totalAnswers}件</p>
+                    <div class="flex items-center gap-2 shrink-0">
+                        ${actionButtons}
                     </div>
                 </div>
-                <div class="flex items-center gap-3 self-end sm:self-start">
+                <div class="flex items-center justify-between mt-4">
+                    <p class="text-[11px] font-medium text-on-surface-variant uppercase tracking-widest">有効回答: ${chartData.totalAnswers}件</p>
                     ${insightHtml}
-                    ${actionButtons}
                 </div>
             </div>
-            <div class="flex justify-between items-center mb-4">
-                ${buildChartTypeButtons(chartData, chartId)}
+
+            <!-- Card Body -->
+            <div class="p-5 flex-1 flex flex-col gap-6">
+                <!-- Controls -->
+                <div class="flex justify-start">
+                    ${buildChartTypeButtons(chartData, chartId)}
+                </div>
+
+                <!-- Visual Section -->
+                <div class="w-full">
+                    ${chartArea}
+                </div>
+
+                <!-- Data Section (Table) -->
+                ${(summaryArea && displayOptions.showTable) ? `
+                <div class="mt-2 pt-6 border-t border-outline-variant/30">
+                    <div class="flex items-center gap-2 mb-4 text-on-surface-variant">
+                        <span class="material-icons text-sm">list_alt</span>
+                        <span class="text-xs font-bold uppercase tracking-wider">詳細データ</span>
+                    </div>
+                    ${summaryArea}
+                </div>` : ''}
             </div>
-            ${contentArea}
         `;
 
         container.appendChild(card);
@@ -1015,14 +1002,14 @@ function buildChartTypeButtons(chartData, chartId) {
 function buildChartArea(chartData, chartId) {
     if (chartData.chartType === 'blank') {
         return `
-            <div class="p-6 rounded-lg bg-surface-variant text-on-surface-variant text-sm">
+            <div class="p-6 rounded-xl bg-surface-variant/50 text-on-surface-variant text-sm border border-outline-variant/30 italic">
                 ${escapeHtml(chartData.blankMessage)}
             </div>
         `;
     }
 
     return `
-        <div class="chart-wrapper h-64">
+        <div class="chart-wrapper h-72 w-full">
             <canvas id="${chartId}"></canvas>
         </div>
     `;

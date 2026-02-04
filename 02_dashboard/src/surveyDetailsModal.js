@@ -1,5 +1,6 @@
 import { DATA_CONVERSION_PLANS, DEFAULT_PLAN, getPlanConfig, normalizePlanValue } from './services/bizcardPlans.js';
 import { openDownloadModal } from './downloadOptionsModal.js';
+import { openDuplicateSurveyModal } from './duplicateSurveyModal.js';
 import { updateSurveyData } from './tableManager.js'; // tableManagerからインポート
 import { deriveSurveyLifecycleMeta, USER_STATUSES } from './services/statusService.js';
 import { closeModal } from './modalHandler.js';
@@ -73,6 +74,7 @@ export function setupSurveyDetailsModalListeners(modalElement) {
     closeActiveHelpPopover();
 
     const editSurveyBtn = modalElement.querySelector('#editSurveyBtn');
+    const duplicateSurveyBtn = modalElement.querySelector('#duplicateSurveyBtn');
     const cancelEditBtn = modalElement.querySelector('#cancelEditBtn');
     const saveSurveyBtn = modalElement.querySelector('#saveSurveyBtn');
     const detailDownloadBtn = modalElement.querySelector('#detailDownloadBtn');
@@ -84,6 +86,7 @@ export function setupSurveyDetailsModalListeners(modalElement) {
     // Remove existing listeners to prevent duplication
     if (detailDownloadBtn) detailDownloadBtn.removeEventListener('click', handleDetailDownload);
     if (deleteSurveyBtn) deleteSurveyBtn.removeEventListener('click', handleDeleteSurvey);
+    if (duplicateSurveyBtn) duplicateSurveyBtn.removeEventListener('click', handleDuplicateSurvey);
     if (goToBizcardSettingsBtn) goToBizcardSettingsBtn.removeEventListener('click', handleGoToBizcardSettings);
     if (goToThankYouEmailSettingsBtn) goToThankYouEmailSettingsBtn.removeEventListener('click', handleGoToThankYouEmailSettings);
     if (goToSpeedReviewBtn) goToSpeedReviewBtn.removeEventListener('click', handleGoToSpeedReview);
@@ -142,6 +145,7 @@ export function setupSurveyDetailsModalListeners(modalElement) {
     if (saveSurveyBtn) saveSurveyBtn.addEventListener('click', handleSaveSurvey);
     if (detailDownloadBtn) detailDownloadBtn.addEventListener('click', handleDetailDownload);
     if (deleteSurveyBtn) deleteSurveyBtn.addEventListener('click', handleDeleteSurvey);
+    if (duplicateSurveyBtn) duplicateSurveyBtn.addEventListener('click', handleDuplicateSurvey);
     if (goToBizcardSettingsBtn) goToBizcardSettingsBtn.addEventListener('click', handleGoToBizcardSettings);
     if (goToThankYouEmailSettingsBtn) goToThankYouEmailSettingsBtn.addEventListener('click', handleGoToThankYouEmailSettings);
     if (goToSpeedReviewBtn) goToSpeedReviewBtn.addEventListener('click', handleGoToSpeedReview);
@@ -177,6 +181,14 @@ function handleGoToSpeedReview() {
         window.location.href = `speed-review.html?surveyId=${currentEditingSurvey.id}`;
     } else {
         showToast('アンケート情報がありません。', 'error');
+    }
+}
+
+function handleDuplicateSurvey() {
+    if (currentEditingSurvey) {
+        openDuplicateSurveyModal(currentEditingSurvey);
+    } else {
+        showToast('複製するアンケート情報がありません。', 'error');
     }
 }
 

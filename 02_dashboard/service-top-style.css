@@ -958,16 +958,57 @@ body.dark-mode select.appearance-none {
 }
 
 
+/* プレースホルダーのCLS対策 */
+#header-placeholder {
+    min-height: 64px;
+}
+@media (min-width: 1024px) {
+    #sidebar-placeholder {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 4rem;
+        z-index: 40;
+    }
+}
+
 .input-label {
     position: absolute;
-    top: -0.75rem; /* 最初から上に配置 */
-    left: 0.5rem;  /* 少し内側に配置 */
-    font-size: 0.75rem; /* 小さいフォントサイズ */
-    color: var(--color-text-sub); /* 通常時の色 */
-    background-color: var(--color-base-card); /* 背景色を指定して下の枠線を隠す */
-    padding: 0 0.25rem; /* 背景色のための左右パディング */
+    top: 0.75rem; /* 最初は中側に配置 */
+    left: 0.75rem;
+    font-size: 0.875rem;
+    color: var(--color-text-sub);
+    background-color: transparent;
+    padding: 0;
     pointer-events: none;
-    transition: color 0.2s ease-out;
+    transition: all 0.2s ease-out;
+    z-index: 1;
+}
+
+/* 入力があるか、フォーカスされている時に上に浮かせる */
+.input-field:focus ~ .input-label,
+.input-field:not(:placeholder-shown) ~ .input-label {
+    top: -0.75rem;
+    left: 0.5rem;
+    font-size: 0.75rem;
+    background-color: var(--color-base-card);
+    padding: 0 0.25rem;
+    color: var(--color-input-border-focus);
+}
+
+/* ダークモード時のラベル背景色調整 */
+body.dark-mode .input-field:focus ~ .input-label,
+body.dark-mode .input-field:not(:placeholder-shown) ~ .input-label {
+    background-color: var(--color-base-card);
+}
+
+/* 日付選択等のアイコンがある場合のパディング調整（必要に応じて） */
+.input-field.pl-10 ~ .input-label {
+    left: 2.5rem;
+}
+.input-field.pl-10:focus ~ .input-label,
+.input-field.pl-10:not(:placeholder-shown) ~ .input-label {
+    left: 0.5rem;
 }
 
 /* Readonly fields in input-group style (e.g., URL in QR modal) */
