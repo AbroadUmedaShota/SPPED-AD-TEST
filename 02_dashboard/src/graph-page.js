@@ -315,6 +315,7 @@ function renderCharts(chartsData) {
         const actionButtons = buildActionButtons(chartData, chartId);
         const chartArea = buildChartArea(chartData, chartId);
         const questionTitle = escapeHtml(chartData.questionText);
+        const questionChip = formatQuestionChip(chartData.questionId);
         
         const isBlank = chartData.chartType === 'blank';
         const iconName = isBlank ? 'subject' : 'analytics';
@@ -343,11 +344,14 @@ function renderCharts(chartsData) {
         card.innerHTML = `
             <div class="p-5 border-b border-outline-variant/50 bg-surface-variant/10">
                 <div class="flex justify-between items-start gap-4">
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-3 min-w-0">
                         <div class="w-8 h-8 rounded-lg bg-white shadow-sm border border-outline-variant flex items-center justify-center shrink-0">
                             <span class="material-icons text-lg ${iconColor}">${iconName}</span>
                         </div>
-                        <h3 class="text-base font-bold text-on-surface leading-tight line-clamp-2" title="${questionTitle}">${questionTitle}</h3>
+                        <div class="min-w-0">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-surface-variant text-on-surface-variant border border-outline-variant mb-1">${questionChip}</span>
+                            <h3 class="text-base font-bold text-on-surface leading-tight line-clamp-2" title="${questionTitle}">${questionTitle}</h3>
+                        </div>
                     </div>
                     <div class="flex items-center gap-2 shrink-0">
                         ${actionButtons}
@@ -461,12 +465,14 @@ function createChart(chartId, chartData, type) {
 
     const colors = ['#4285F4', '#34A853', '#FBBC05', '#EA4335', '#AB47BC', '#00ACC1', '#FF7043', '#9E9D24'];
     const isDoughnut = type === 'pie';
+    const legendConfig = getLegendConfig(chartData.labels);
+    const chartHeight = isDoughnut ? legendConfig.chartHeight : 350;
 
     const options = {
         series: isDoughnut ? chartData.data : [{ name: '件数', data: chartData.data }],
         chart: {
             type: isDoughnut ? 'donut' : 'bar',
-            height: 350,
+            height: chartHeight,
             width: '100%',
             fontFamily: "'Noto Sans JP', sans-serif",
             toolbar: { show: false },
@@ -517,11 +523,12 @@ function createChart(chartId, chartData, type) {
         },
         legend: {
             show: isDoughnut,
-            position: 'bottom',
+            position: legendConfig.position,
+            height: legendConfig.height,
             fontSize: '13px',
             fontFamily: "'Noto Sans JP', sans-serif",
             markers: { radius: 12, width: 12, height: 12 },
-            itemMargin: { horizontal: 15, vertical: 8 }
+            itemMargin: legendConfig.itemMargin
         },
         grid: {
             show: displayOptions.showGrid,
@@ -554,11 +561,11 @@ function renderChartSummaryTable(summaryId, chartData) {
     let html = `
         <div class="overflow-x-auto">
             <table class="min-w-full text-left text-sm border border-outline-variant">
-                <thead class="bg-surface-variant text-on-surface-variant">
+                <thead class="bg-surface-variant-soft text-on-surface-variant">
                     <tr>
                         <th class="px-3 py-2 border-b border-outline-variant">項目</th>
-                        <th class="px-3 py-2 border-b border-outline-variant text-right">件数</th>
-                        <th class="px-3 py-2 border-b border-outline-variant text-right">割合</th>
+                        <th class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums">件数</th>
+                        <th class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums">割合</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -570,8 +577,8 @@ function renderChartSummaryTable(summaryId, chartData) {
         html += `
             <tr>
                 <td class="px-3 py-2 border-b border-outline-variant">${escapeHtml(label)}</td>
-                <td class="px-3 py-2 border-b border-outline-variant text-right">${count}件</td>
-                <td class="px-3 py-2 border-b border-outline-variant text-right">${percentage}%</td>
+                <td class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums">${count}件</td>
+                <td class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums">${percentage}%</td>
             </tr>
         `;
     });
@@ -581,8 +588,8 @@ function renderChartSummaryTable(summaryId, chartData) {
         html += `
             <tr class="font-semibold">
                 <td class="px-3 py-2">合計</td>
-                <td class="px-3 py-2 text-right">${totalVotes}件</td>
-                <td class="px-3 py-2 text-right">${totalPercentage}</td>
+                <td class="px-3 py-2 text-right font-mono tabular-nums">${totalVotes}件</td>
+                <td class="px-3 py-2 text-right font-mono tabular-nums">${totalPercentage}</td>
             </tr>
         `;
     }
@@ -608,6 +615,9 @@ async function exportAllChartsToExcel(chartsData) {
     const progressText = document.getElementById('export-progress-text');
     const progressBar = document.getElementById('export-progress-bar');
     const progressPercent = document.getElementById('export-progress-percent');
+    const progressIcon = document.getElementById('export-progress-icon');
+    const successIconClass = 'text-success';
+    let exportSucceeded = false;
 
     // スレッド解放用のヘルパー
     const yieldToMain = () => new Promise(resolve => setTimeout(resolve, 50));
@@ -622,7 +632,16 @@ async function exportAllChartsToExcel(chartsData) {
                 <span>出力タスク実行中</span>
             `;
         }
-        if (overlay) overlay.classList.remove('hidden');
+        if (overlay) {
+            overlay.classList.remove('hidden', 'opacity-0');
+            overlay.classList.add('opacity-100');
+        }
+        if (progressIcon) {
+            progressIcon.textContent = 'sync';
+            progressIcon.classList.add('animate-spin', 'text-primary');
+            progressIcon.classList.remove(successIconClass);
+        }
+        if (progressPercent) progressPercent.textContent = '0%';
 
         const workbook = new ExcelJSInstance.Workbook();
         const usedNames = new Map();
@@ -746,6 +765,7 @@ async function exportAllChartsToExcel(chartsData) {
         anchor.click();
         setTimeout(() => { document.body.removeChild(anchor); window.URL.revokeObjectURL(url); }, 100);
         showToast('分析レポートの出力が完了しました！', 'success');
+        exportSucceeded = true;
     } catch (error) {
         console.error('Excel出力エラー:', error);
         showToast('Excelの生成中にエラーが発生しました。', 'error');
@@ -756,7 +776,14 @@ async function exportAllChartsToExcel(chartsData) {
             exportBtn.style.opacity = '1';
             exportBtn.innerHTML = originalBtnHtml;
         }
-        if (overlay) overlay.classList.add('hidden');
+        if (overlay) {
+            if (exportSucceeded) {
+                showExportCompletion(overlay, progressIcon, progressText, progressPercent);
+            } else {
+                overlay.classList.add('hidden');
+                overlay.classList.remove('opacity-0', 'opacity-100');
+            }
+        }
     }
 }
 
@@ -778,6 +805,58 @@ function showError(message, show = true) {
     } else {
         container.classList.add('hidden');
     }
+}
+
+function toHalfWidthDigits(value) {
+    return String(value).replace(/[０-９]/g, char => String.fromCharCode(char.charCodeAt(0) - 0xFEE0));
+}
+
+function formatQuestionChip(questionId) {
+    if (!questionId) return 'Q';
+    const raw = String(questionId);
+    const match = raw.match(/q\s*([0-9０-９]+)/i);
+    if (match) {
+        return `Q${toHalfWidthDigits(match[1])}`;
+    }
+    return raw.toUpperCase();
+}
+
+function getLegendConfig(labels = []) {
+    const labelStrings = labels.map(label => String(label ?? ''));
+    const totalLength = labelStrings.reduce((sum, label) => sum + label.length, 0);
+    const maxLength = Math.max(0, ...labelStrings.map(label => label.length));
+    const shouldPlaceRight = labelStrings.length > 6 || maxLength >= 12 || totalLength >= 60;
+    return {
+        position: shouldPlaceRight ? 'right' : 'bottom',
+        height: shouldPlaceRight ? 220 : undefined,
+        itemMargin: shouldPlaceRight ? { horizontal: 8, vertical: 6 } : { horizontal: 15, vertical: 8 },
+        chartHeight: shouldPlaceRight ? 380 : 350
+    };
+}
+
+function showExportCompletion(overlay, progressIcon, progressText, progressPercent) {
+    if (!overlay) return;
+    if (progressIcon) {
+        progressIcon.textContent = 'check_circle';
+        progressIcon.classList.remove('animate-spin');
+        progressIcon.classList.add('text-success');
+        progressIcon.classList.remove('text-primary');
+    }
+    if (progressText) progressText.textContent = '完了しました';
+    if (progressPercent) progressPercent.textContent = '100%';
+
+    overlay.classList.remove('hidden');
+    overlay.classList.remove('opacity-0');
+    overlay.classList.add('opacity-100');
+
+    setTimeout(() => {
+        overlay.classList.add('opacity-0');
+        setTimeout(() => {
+            overlay.classList.add('hidden');
+            overlay.classList.remove('opacity-0');
+            overlay.classList.remove('opacity-100');
+        }, 700);
+    }, 2500);
 }
 
 function escapeHtml(value) {

@@ -9,9 +9,8 @@
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <!-- Material Icons CDN -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <!-- Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+    <!-- ApexCharts CDN (SVG Based) -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.45.2"></script>
     <!-- flatpickr CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <!-- Custom CSS -->
@@ -37,8 +36,9 @@
                 <!-- Header -->
                 <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant">
                     <h1 id="survey-title" class="text-on-background text-headline-large font-bold leading-tight tracking-tight">グラフ分析</h1>
-                    <button id="excel-export-all" type="button" class="button-primary px-4 py-2 rounded-md">
-                        Excel一括出力
+                    <button id="excel-export-all" type="button" class="button-primary px-4 py-2 rounded-md inline-flex items-center">
+                        <span class="material-icons text-base mr-2">file_download</span>
+                        <span>Excel一括出力</span>
                     </button>
                 </div>
 
@@ -50,7 +50,7 @@
                             <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                                 <span class="material-icons text-lg">filter_alt</span>
                             </div>
-                            <h2 class="text-sm font-bold text-on-surface uppercase tracking-wider">分析フィルター</h2>
+                            <h2 class="text-xs font-semibold text-on-surface-variant uppercase tracking-[0.24em]">分析フィルター</h2>
                         </div>
 
                         <!-- Period Selector -->
@@ -113,42 +113,48 @@
                             <span class="text-[10px] font-black uppercase tracking-widest">表示設定:</span>
                         </div>
                         
-                        <label class="flex items-center gap-2 cursor-pointer group">
+                        <label class="filter-option flex items-center gap-2 cursor-pointer group">
                             <input type="checkbox" id="opt-show-summary" class="form-checkbox h-3.5 w-3.4 text-primary rounded border-outline-variant focus:ring-primary" checked>
                             <span class="text-xs text-on-surface-variant group-hover:text-primary transition-colors">サマリー</span>
                         </label>
                         
-                        <label class="flex items-center gap-2 cursor-pointer group">
+                        <label class="filter-option flex items-center gap-2 cursor-pointer group">
                             <input type="checkbox" id="opt-show-datalabels" class="form-checkbox h-3.5 w-3.4 text-primary rounded border-outline-variant focus:ring-primary" checked>
                             <span class="text-xs text-on-surface-variant group-hover:text-primary transition-colors">数値ラベル</span>
                         </label>
                         
-                        <label class="flex items-center gap-2 cursor-pointer group">
+                        <label class="filter-option flex items-center gap-2 cursor-pointer group">
                             <input type="checkbox" id="opt-show-center-text" class="form-checkbox h-3.5 w-3.4 text-primary rounded border-outline-variant focus:ring-primary" checked>
                             <span class="text-xs text-on-surface-variant group-hover:text-primary transition-colors">中央合計</span>
                         </label>
                         
-                        <label class="flex items-center gap-2 cursor-pointer group">
+                        <label class="filter-option flex items-center gap-2 cursor-pointer group">
                             <input type="checkbox" id="opt-show-table" class="form-checkbox h-3.5 w-3.4 text-primary rounded border-outline-variant focus:ring-primary" checked>
                             <span class="text-xs text-on-surface-variant group-hover:text-primary transition-colors">詳細表</span>
                         </label>
                         
-                        <label class="flex items-center gap-2 cursor-pointer group">
+                        <label class="filter-option flex items-center gap-2 cursor-pointer group">
                             <input type="checkbox" id="opt-show-grid" class="form-checkbox h-3.5 w-3.4 text-primary rounded border-outline-variant focus:ring-primary">
-                            <span class="text-xs text-on-surface-variant group-hover:text-primary transition-colors">グリッド線</span>
+                            <span class="text-xs text-on-surface-variant group-hover:text-primary transition-colors">グリッド線（棒グラフのみ）</span>
                         </label>
                     </div>
                 </div>
 
                 <!-- Loading Indicator -->
                 <div id="loading-indicator" class="text-center py-16">
-                    <div class="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent mx-auto"></div>
+                    <div class="soft-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent mx-auto"></div>
                     <p class="mt-4 text-on-surface-variant">グラフを生成しています...</p>
                 </div>
 
                 <!-- Error Display -->
-                <div id="error-display" class="hidden bg-error-container text-on-error-container p-4 rounded-md">
-                    <p id="error-message"></p>
+                <div id="error-display" class="hidden bg-error-container text-on-error-container p-4 rounded-xl border border-outline-variant shadow-sm">
+                    <div class="flex items-start gap-3">
+                        <span class="material-icons text-lg">error_outline</span>
+                        <div>
+                            <p class="text-sm font-bold mb-1">エラーが発生しました</p>
+                            <p id="error-message" class="text-sm"></p>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Charts Container -->
@@ -157,6 +163,32 @@
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- Excel Export Floating Progress (Non-blocking) -->
+    <div id="export-progress-overlay" class="fixed bottom-8 right-8 z-[100] hidden animate-fade-in-up opacity-100 transition-opacity duration-700">
+        <div class="bg-surface-glass p-5 rounded-2xl shadow-2xl border border-outline-variant w-72 backdrop-blur-md">
+            <div class="flex items-center gap-4">
+                <div class="relative shrink-0">
+                    <span id="export-progress-icon" class="material-icons text-primary animate-spin">sync</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h3 class="text-sm font-bold text-on-surface truncate">Excelレポートを作成中...</h3>
+                    <p id="export-progress-text" class="text-[10px] text-on-surface-variant mt-0.5 truncate">データを集計しています</p>
+                </div>
+            </div>
+            
+            <!-- Mini Progress Bar -->
+            <div class="mt-4">
+                <div class="flex justify-between items-end mb-1.5">
+                    <span id="export-progress-percent" class="text-[10px] font-black text-primary uppercase">0%</span>
+                    <span class="text-[9px] text-on-surface-variant font-medium">Please wait</span>
+                </div>
+                <div class="w-full bg-surface-variant/50 rounded-full h-1.5 overflow-hidden">
+                    <div id="export-progress-bar" class="bg-primary h-full transition-all duration-500 ease-out" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div id="footer-placeholder"></div>

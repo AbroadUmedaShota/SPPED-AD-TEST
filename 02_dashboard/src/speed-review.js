@@ -1421,15 +1421,19 @@ function setupSidebarToggle() {
             if (mode === 'simple') {
                 simpleTab.classList.add('bg-surface', 'text-primary', 'shadow-sm');
                 simpleTab.classList.remove('text-on-surface-variant', 'hover:text-on-surface');
+                simpleTab.classList.add('is-active');
                 detailedTab.classList.remove('bg-surface', 'text-primary', 'shadow-sm');
                 detailedTab.classList.add('text-on-surface-variant', 'hover:text-on-surface');
+                detailedTab.classList.remove('is-active');
                 simpleContent.classList.remove('hidden');
                 detailedContent.classList.add('hidden');
             } else {
                 detailedTab.classList.add('bg-surface', 'text-primary', 'shadow-sm');
                 detailedTab.classList.remove('text-on-surface-variant', 'hover:text-on-surface');
+                detailedTab.classList.add('is-active');
                 simpleTab.classList.remove('bg-surface', 'text-primary', 'shadow-sm');
                 simpleTab.classList.add('text-on-surface-variant', 'hover:text-on-surface');
+                simpleTab.classList.remove('is-active');
                 detailedContent.classList.remove('hidden');
                 simpleContent.classList.add('hidden');
             }

@@ -88,9 +88,16 @@
                     <!-- KPI Row -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div
-                            class="bg-surface border border-outline-variant rounded-xl p-6 shadow-sm flex flex-col justify-center items-center text-center h-full">
-                            <div class="text-lg text-on-surface-variant font-bold mb-2">回答総数</div>
-                            <div id="kpi-total-answers" class="text-5xl font-extrabold text-primary leading-none">-
+                            class="bg-surface border border-outline-variant rounded-xl p-6 shadow-sm flex flex-col justify-between items-start h-full">
+                            <div class="flex items-center gap-3">
+                                <div class="kpi-icon-badge" aria-hidden="true">
+                                    <span class="material-icons text-xl">poll</span>
+                                </div>
+                                <div class="text-lg text-on-surface-variant font-bold">回答総数</div>
+                            </div>
+                            <div class="flex items-end gap-3 mt-4">
+                                <div id="kpi-total-answers" class="text-5xl font-extrabold text-primary leading-none">-
+                                </div>
                             </div>
                         </div>
                         <div id="kpi-current-question-card"
@@ -105,7 +112,7 @@
                     </div>
 
                     <!-- Charts Row -->
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <!-- Left Column: Time Series Chart (1/3 width) -->
                         <div
                             class="bg-surface border border-outline-variant rounded-xl p-4 shadow-sm col-span-1 h-full flex flex-col">
@@ -144,7 +151,7 @@
                                         <p class="text-sm text-on-surface-variant">設問を選択すると、集計データが表示されます。</p>
                                     </div>
                                     <button id="graphButton"
-                                        class="absolute bottom-0 right-0 justify-center button-secondary py-2 px-4 rounded-md font-semibold flex items-center gap-2 shadow-sm bg-surface border border-outline-variant">
+                                        class="absolute bottom-0 right-0 justify-center button-primary py-2 px-4 rounded-md font-semibold flex items-center gap-2 shadow-sm transition-transform duration-150 hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40">
                                         <span class="material-icons text-base">analytics</span>
                                         <span>詳細分析ページへ</span>
                                     </button>
@@ -156,8 +163,8 @@
 
                 <div class="relative">
                     <div id="main-content-wrapper" class="w-full transition-all duration-300 lg:mr-80">
-                        <div class="rounded-xl border border-outline-variant bg-surface relative min-h-[300px]">
-                            <table class="w-full divide-y divide-outline-variant review-table table-fixed"
+                        <div class="rounded-xl border border-outline-variant bg-surface relative min-h-[300px] overflow-x-auto">
+                            <table class="w-full divide-y divide-outline-variant review-table table-fixed min-w-[960px]"
                                 id="reviewTable">
                                 <thead class="bg-surface-variant">
                                     <tr>
@@ -166,12 +173,12 @@
                                             <div class="flex items-center">回答ID<span
                                                     class="material-icons sort-icon opacity-40">unfold_more</span></div>
                                         </th>
-                                        <th class="sortable-header px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[15%] cursor-pointer"
+                                        <th class="sortable-header px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[18%] min-w-[160px] cursor-pointer"
                                             data-sort-key="answeredAt">
                                             <div class="flex items-center">回答日時<span
                                                     class="material-icons sort-icon opacity-40">unfold_more</span></div>
                                         </th>
-                                        <th class="sortable-header px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[20%] cursor-pointer"
+                                        <th class="sortable-header px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[18%] min-w-[140px] cursor-pointer"
                                             data-sort-key="fullName">
                                             <div class="flex items-center">氏名<span
                                                     class="material-icons sort-icon opacity-40">unfold_more</span></div>
@@ -182,9 +189,9 @@
                                                     class="material-icons sort-icon opacity-40">unfold_more</span></div>
                                         </th>
                                         <th id="dynamic-question-header"
-                                            class="sortable-header px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[30%] cursor-pointer"
+                                            class="sortable-header px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[29%] min-w-[180px] cursor-pointer"
                                             data-sort-key="dynamicQuestion">
-                                            <div class="flex items-center">Q.02_お客様の主な業界<span
+                                            <div class="flex items-center">設問回答<span
                                                     class="material-icons sort-icon opacity-40">unfold_more</span></div>
                                         </th>
                                     </tr>
@@ -195,6 +202,7 @@
                         <div
                             class="flex flex-wrap items-center justify-between gap-4 py-4 px-2 text-on-surface-variant text-sm">
                             <div class="flex items-center gap-2">
+                                <label for="itemsPerPage" class="sr-only">表示件数</label>
                                 <span>表示件数:</span>
                                 <select id="itemsPerPage"
                                     class="py-1 px-2 rounded-md border border-outline-variant bg-surface-bright text-on-surface-variant appearance-none"
@@ -207,12 +215,12 @@
                             </div>
                             <div class="flex items-center gap-2">
                                 <button
-                                    class="p-1 rounded-full hover:bg-surface-variant transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    class="w-9 h-9 p-2 rounded-full hover:bg-surface-variant transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     title="前へ" id="prevPageBtn" aria-label="前のページへ"><span
                                         class="material-icons text-lg">chevron_left</span></button>
                                 <div id="pagination-numbers" class="flex items-center gap-1"></div>
                                 <button
-                                    class="p-1 rounded-full hover:bg-surface-variant transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    class="w-9 h-9 p-2 rounded-full hover:bg-surface-variant transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     title="次へ" id="nextPageBtn" aria-label="次のページへ"><span
                                         class="material-icons text-lg">chevron_right</span></button>
                             </div>
@@ -240,8 +248,8 @@
                             
                             <!-- Search Tabs -->
                             <div class="flex p-1 bg-surface-variant rounded-lg mb-6">
-                                <button id="simple-search-tab" class="flex-1 py-1.5 text-xs font-bold rounded-md transition-all bg-surface text-primary shadow-sm" data-tab="simple">簡易検索</button>
-                                <button id="detailed-search-tab" class="flex-1 py-1.5 text-xs font-bold rounded-md transition-all text-on-surface-variant hover:text-on-surface" data-tab="detailed">詳細検索</button>
+                                <button id="simple-search-tab" class="search-tab-btn is-active flex-1 py-1.5 text-xs font-bold rounded-md transition-all bg-surface text-primary shadow-sm" data-tab="simple">簡易検索</button>
+                                <button id="detailed-search-tab" class="search-tab-btn flex-1 py-1.5 text-xs font-bold rounded-md transition-all text-on-surface-variant hover:text-on-surface" data-tab="detailed">詳細検索</button>
                             </div>
 
                             <!-- Simple Search Content -->
@@ -267,7 +275,7 @@
                                     </select>
                                     <label for="dayFilterSelect" class="input-label">表示対象日</label>
                                     <span
-                                        class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl pointer-events-none">calendar_today</span>
+                                        class="calendar-icon material-icons absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl pointer-events-none">calendar_today</span>
                                 </div>
                                 <div class="input-group">
                                     <select id="statusFilterSelect" class="input-field pl-10 pr-3">
