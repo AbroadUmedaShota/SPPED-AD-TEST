@@ -25,8 +25,8 @@ const displayOptions = {
     showGrid: false
 };
 
-const SINGLE_CHOICE_TYPES = new Set(['single_choice', 'dropdown']);
-const MULTI_CHOICE_TYPES = new Set(['multi_choice']);
+const SINGLE_CHOICE_TYPES = new Set(['single_choice', 'dropdown', 'rating']);
+const MULTI_CHOICE_TYPES = new Set(['multi_choice', 'ranking']);
 const MATRIX_SINGLE_TYPES = new Set(['matrix_sa', 'matrix_single']);
 const MATRIX_MULTI_TYPES = new Set(['matrix_ma', 'matrix_multi', 'matrix_multiple']);
 const BLANK_TYPES = new Set([
@@ -255,7 +255,7 @@ function processDataForCharts(survey, answers) {
                 chartType: 'pie',
                 summaryType: 'table',
                 includeTotalRow: true,
-                allowToggle: true,
+                allowToggle: false,
                 ...summary
             }));
             return;
@@ -269,18 +269,18 @@ function processDataForCharts(survey, answers) {
                 chartType: 'bar',
                 summaryType: 'table',
                 includeTotalRow: false,
-                allowToggle: true,
+                allowToggle: false,
                 ...summary
             }));
             return;
         }
 
         if (BLANK_TYPES.has(question.type)) {
-            charts.push(buildBlankChart(questionId, question.text, getBlankReason(question.type)));
+            charts.push(buildListChart(question, questionId, answers));
             return;
         }
 
-        charts.push(buildBlankChart(questionId, question.text, '未対応の設問タイプ'));
+        charts.push(buildListChart(question, questionId, answers, '未対応の設問タイプ'));
     });
 
     return charts;
@@ -318,11 +318,12 @@ function renderCharts(chartsData) {
         const questionChip = formatQuestionChip(chartData.questionId);
         
         const isBlank = chartData.chartType === 'blank';
+        const isList = chartData.chartType === 'list';
         const iconName = isBlank ? 'subject' : 'analytics';
         const iconColor = isBlank ? 'text-on-surface-variant/60' : 'text-primary';
 
         let insightHtml = '';
-        if (displayOptions.showSummary && !isBlank && chartData.labels.length > 0) {
+        if (displayOptions.showSummary && !isBlank && !isList && chartData.labels.length > 0) {
             const maxIdx = chartData.data.indexOf(Math.max(...chartData.data));
             const topLabel = chartData.labels[maxIdx];
             const topVal = chartData.data[maxIdx];
@@ -386,7 +387,7 @@ function renderCharts(chartsData) {
         container.appendChild(card);
         chartDataStore.set(chartId, chartData);
 
-        if (chartData.chartType !== 'blank') {
+        if (chartData.chartType !== 'blank' && chartData.chartType !== 'list') {
             createChart(chartId, chartData, chartData.chartType);
         }
 
@@ -489,7 +490,7 @@ function createChart(chartId, chartData, type) {
                         show: displayOptions.showCenterText,
                         total: {
                             show: true,
-                            label: 'Total',
+                            label: '有効回答数',
                             fontSize: '14px',
                             fontWeight: 600,
                             color: '#6B6B6B',
@@ -555,6 +556,39 @@ function createChart(chartId, chartData, type) {
 function renderChartSummaryTable(summaryId, chartData) {
     const container = document.getElementById(summaryId);
     if (!container) return;
+
+    if (chartData.chartType === 'list') {
+        const rows = chartData.listAll || [];
+        const itemsHtml = rows.length > 0
+            ? rows.map(item => `
+                <tr>
+                    <td class="px-3 py-2 border-b border-outline-variant">${escapeHtml(item.value)}</td>
+                    <td class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums">${escapeHtml(item.answeredAtLabel)}</td>
+                </tr>
+            `).join('')
+            : `
+                <tr>
+                    <td class="px-3 py-3 text-on-surface-variant" colspan="2">回答がありません。</td>
+                </tr>
+            `;
+
+        container.innerHTML = `
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-left text-sm border border-outline-variant">
+                    <thead class="bg-surface-variant-soft text-on-surface-variant">
+                        <tr>
+                            <th class="px-3 py-2 border-b border-outline-variant">回答</th>
+                            <th class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums">回答日時</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${itemsHtml}
+                    </tbody>
+                </table>
+            </div>
+        `;
+        return;
+    }
 
     const totalVotes = chartData.totalAnswers || 0;
 
@@ -671,6 +705,29 @@ async function exportAllChartsToExcel(chartsData) {
             const titleRow = sheet.addRow([chartData.questionText]);
             titleRow.font = { bold: true, size: 16 };
             sheet.addRow([]);
+
+            if (chartData.chartType === 'list') {
+                const listRows = (chartData.listAll || []).map(item => [item.value, item.answeredAtLabel]);
+                const tableRows = listRows.length > 0 ? listRows : [['回答がありません。', '']];
+
+                sheet.addTable({
+                    name: `Table_${chartData.chartId.replace(/[^a-zA-Z0-9]/g, '_')}`,
+                    ref: 'A3',
+                    headerRow: true,
+                    totalsRow: false,
+                    style: { theme: 'TableStyleMedium2', showRowStripes: true },
+                    columns: [
+                        { name: '回答', filterButton: true },
+                        { name: '回答日時', filterButton: true }
+                    ],
+                    rows: tableRows
+                });
+
+                sheet.getColumn(1).width = 60;
+                sheet.getColumn(2).width = 24;
+                sheet.getColumn(2).alignment = { horizontal: 'right' };
+                continue;
+            }
 
             const totalAnswers = chartData.totalAnswers || 0;
             const rows = chartData.labels.map((label, index) => {
@@ -890,22 +947,39 @@ function findAnswerDetail(answer, question) {
     }) || null;
 }
 
-function normalizeChoiceOptions(options = []) {
+function normalizeChoiceOptions(options = [], type = '') {
+    const isRating = type === 'rating';
+    const numericValues = [];
     const labels = [];
     const map = new Map();
     options.forEach((opt, index) => {
         if (opt && typeof opt === 'object') {
             const value = opt.value ?? opt.id ?? opt.text ?? `option_${index + 1}`;
             const text = opt.text ?? opt.label ?? opt.value ?? opt.id ?? String(value);
-            labels.push(text);
-            map.set(String(value), text);
-            map.set(String(text), text);
+            const label = isRating ? formatRatingLabel(value, options.length) : text;
+            if (isRating && !Number.isNaN(Number(value))) numericValues.push(Number(value));
+            labels.push(label);
+            map.set(String(value), label);
+            map.set(String(text), label);
         } else if (opt !== undefined && opt !== null) {
             const text = String(opt);
-            labels.push(text);
-            map.set(text, text);
+            const label = isRating ? formatRatingLabel(opt, options.length) : text;
+            if (isRating && !Number.isNaN(Number(opt))) numericValues.push(Number(opt));
+            labels.push(label);
+            map.set(text, label);
         }
     });
+    if (isRating && numericValues.length > 0) {
+        const maxStars = Math.max(...numericValues);
+        labels.forEach((label, index) => {
+            const raw = options[index];
+            if (raw === undefined || raw === null) return;
+            const rawValue = typeof raw === 'object' ? (raw.value ?? raw.id ?? raw.text) : raw;
+            const rebuilt = formatRatingLabel(rawValue, maxStars);
+            labels[index] = rebuilt;
+            map.set(String(rawValue), rebuilt);
+        });
+    }
     return { labels, map };
 }
 
@@ -924,7 +998,7 @@ function resolveOptionLabel(value, optionsInfo) {
 function buildChoiceSummary(question, answers, isMulti) {
     const counts = {};
     let answeredCount = 0;
-    const optionsInfo = normalizeChoiceOptions(question.options || []);
+    const optionsInfo = normalizeChoiceOptions(question.options || [], question.type);
     answers.forEach(answer => {
         const detail = findAnswerDetail(answer, question);
         if (!detail || detail.answer === undefined || detail.answer === null || detail.answer === '') return;
@@ -938,9 +1012,20 @@ function buildChoiceSummary(question, answers, isMulti) {
             counts[label] = (counts[label] || 0) + 1;
         });
     });
-    const labels = optionsInfo.labels.length > 0 ? optionsInfo.labels : Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
-    const data = labels.map(label => counts[label] || 0);
-    return { labels, data, totalAnswers: answeredCount };
+    const labels = optionsInfo.labels.length > 0 ? optionsInfo.labels : Object.keys(counts);
+    const entries = labels.map((label, index) => ({
+        label,
+        count: counts[label] || 0,
+        index
+    }));
+    if (isMulti) {
+        entries.sort((a, b) => (b.count - a.count) || (a.index - b.index));
+    }
+    return {
+        labels: entries.map(entry => entry.label),
+        data: entries.map(entry => entry.count),
+        totalAnswers: answeredCount
+    };
 }
 
 function normalizeMatrixRows(rows = []) {
@@ -1029,6 +1114,18 @@ function buildMatrixCharts(question, questionId, answers, isMulti) {
         });
         const labels = columns.map(col => col.text);
         const data = labels.map(label => counts[label] || 0);
+        let sortedLabels = labels;
+        let sortedData = data;
+        if (isMulti) {
+            const entries = labels.map((label, index) => ({
+                label,
+                count: data[index] || 0,
+                index
+            }));
+            entries.sort((a, b) => (b.count - a.count) || (a.index - b.index));
+            sortedLabels = entries.map(entry => entry.label);
+            sortedData = entries.map(entry => entry.count);
+        }
         return buildChartData({
             questionId: `${questionId}_${rowIndex + 1}`,
             questionText: `${question.text} - ${row.text}`,
@@ -1036,7 +1133,9 @@ function buildMatrixCharts(question, questionId, answers, isMulti) {
             summaryType: isMulti ? 'none' : 'table',
             includeTotalRow: !isMulti,
             allowToggle: false,
-            labels, data, totalAnswers: answeredCount
+            labels: sortedLabels,
+            data: sortedData,
+            totalAnswers: answeredCount
         });
     });
 }
@@ -1055,7 +1154,9 @@ function buildChartData(data) {
         includeTotalRow: Boolean(data.includeTotalRow),
         allowToggle: Boolean(data.allowToggle),
         blankMessage: data.blankMessage || '',
-        blankReason: data.blankReason || ''
+        blankReason: data.blankReason || '',
+        listItems: data.listItems || [],
+        listAll: data.listAll || []
     };
 }
 
@@ -1070,8 +1171,27 @@ function buildBlankChart(questionId, questionText, reason) {
     });
 }
 
+function buildListChart(question, questionId, answers, fallbackReason = '') {
+    const listEntries = collectListEntries(question, answers);
+    const listAll = listEntries.map(entry => ({
+        value: entry.value,
+        answeredAtLabel: entry.answeredAtLabel
+    }));
+    return buildChartData({
+        questionId,
+        questionText: question.text,
+        chartType: 'list',
+        summaryType: 'table',
+        includeTotalRow: false,
+        allowToggle: false,
+        listItems: listAll.slice(0, 3),
+        listAll,
+        blankReason: fallbackReason
+    });
+}
+
 function buildActionButtons(chartData, chartId) {
-    if (chartData.chartType === 'blank') return '';
+    if (chartData.chartType === 'blank' || chartData.chartType === 'list') return '';
     return `
         <div class="flex items-center gap-2">
             <button type="button" data-chart-id="${chartId}" class="download-btn button-secondary p-2 rounded-md" title="グラフをダウンロード">
@@ -1105,6 +1225,24 @@ function buildChartArea(chartData, chartId) {
     if (chartData.chartType === 'blank') {
         return `<div class="p-6 rounded-xl bg-surface-variant/50 text-on-surface-variant text-sm border border-outline-variant/30 italic">${escapeHtml(chartData.blankMessage)}</div>`;
     }
+    if (chartData.chartType === 'list') {
+        const items = chartData.listItems || [];
+        if (items.length === 0) {
+            return `<div class="p-6 rounded-xl bg-surface-variant/50 text-on-surface-variant text-sm border border-outline-variant/30">まだ回答がありません。</div>`;
+        }
+        const listHtml = items.map(item => `
+            <li class="flex flex-col gap-1 p-3 rounded-lg bg-surface-variant/30 border border-outline-variant/30">
+                <span class="text-sm font-medium text-on-surface break-words">${escapeHtml(item.value)}</span>
+                <span class="text-[11px] text-on-surface-variant font-mono tabular-nums">${escapeHtml(item.answeredAtLabel)}</span>
+            </li>
+        `).join('');
+        return `
+            <ul class="grid gap-3">
+                ${listHtml}
+            </ul>
+            <p class="mt-3 text-xs text-on-surface-variant/70">全件は詳細表で確認できます。</p>
+        `;
+    }
     return `<div class="w-full min-h-[350px]"><div id="${chartId}" class="w-full h-full"></div></div>`;
 }
 
@@ -1129,4 +1267,58 @@ function ensureUniqueSheetName(baseName, usedNames) {
     const suffix = `_${count + 1}`;
     const trimmedBase = base.slice(0, 31 - suffix.length);
     return `${trimmedBase}${suffix}`;
+}
+
+function collectListEntries(question, answers) {
+    const entries = [];
+    answers.forEach(answer => {
+        const detail = findAnswerDetail(answer, question);
+        if (!detail || detail.answer === undefined || detail.answer === null || detail.answer === '') return;
+        const value = formatListValue(detail.answer);
+        if (!value) return;
+        const answeredAt = answer.answeredAt ? new Date(answer.answeredAt) : null;
+        entries.push({
+            value,
+            answeredAt,
+            answeredAtLabel: formatAnsweredAt(answeredAt)
+        });
+    });
+    entries.sort((a, b) => {
+        const aTime = a.answeredAt ? a.answeredAt.getTime() : 0;
+        const bTime = b.answeredAt ? b.answeredAt.getTime() : 0;
+        return bTime - aTime;
+    });
+    return entries;
+}
+
+function formatListValue(value) {
+    if (Array.isArray(value)) {
+        const items = value.map(item => formatListValue(item)).filter(Boolean);
+        return items.length > 0 ? items.join('、') : null;
+    }
+    if (typeof value === 'object') {
+        try {
+            return JSON.stringify(value);
+        } catch (err) {
+            return String(value);
+        }
+    }
+    const text = String(value).trim();
+    return text === '' ? null : text;
+}
+
+function formatAnsweredAt(dateValue) {
+    if (!dateValue || Number.isNaN(dateValue.getTime())) return '—';
+    const month = String(dateValue.getMonth() + 1).padStart(2, '0');
+    const day = String(dateValue.getDate()).padStart(2, '0');
+    const hour = String(dateValue.getHours()).padStart(2, '0');
+    const minute = String(dateValue.getMinutes()).padStart(2, '0');
+    return `${month}/${day} ${hour}:${minute}`;
+}
+
+function formatRatingLabel(value, maxStars = 5) {
+    const num = Number(value);
+    if (Number.isNaN(num)) return String(value);
+    const stars = '★'.repeat(Math.max(0, Math.min(num, maxStars)));
+    return `${num} (${stars})`;
 }
