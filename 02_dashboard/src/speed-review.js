@@ -27,6 +27,7 @@ let attributeChart = null;  // Dashboard Chart Instance
 
 const SINGLE_CHOICE_TYPES = new Set(['single_choice', 'dropdown']);
 const MULTI_CHOICE_TYPES = new Set(['multi_choice']);
+const MATRIX_SINGLE_TYPES = new Set(['matrix_sa', 'matrix_single']);
 const BLANK_TYPES = new Set([
     'text',
     'free_text',
@@ -37,8 +38,6 @@ const BLANK_TYPES = new Set([
     'time',
     'handwriting',
     'explanation',
-    'matrix_sa',
-    'matrix_single',
     'matrix_ma',
     'matrix_multi',
     'matrix_multiple'
@@ -145,6 +144,72 @@ function resolveOptionLabel(value, optionsInfo) {
     return optionsInfo.map.get(String(value)) || String(value);
 }
 
+function normalizeMatrixRows(rows = []) {
+    return rows.map((row, index) => {
+        if (row && typeof row === 'object') {
+            const id = row.id ?? row.value ?? row.text ?? `row_${index + 1}`;
+            const text = row.text ?? row.label ?? row.value ?? row.id ?? String(id);
+            return { id: String(id), text };
+        }
+        const id = row ?? `row_${index + 1}`;
+        const text = row ?? `行${index + 1}`;
+        return { id: String(id), text: String(text) };
+    });
+}
+
+function normalizeMatrixColumns(columns = []) {
+    return columns.map((column, index) => {
+        if (column && typeof column === 'object') {
+            const value = column.value ?? column.id ?? column.text ?? `col_${index + 1}`;
+            const text = column.text ?? column.label ?? column.value ?? column.id ?? String(value);
+            return { value: String(value), text };
+        }
+        const value = column ?? `col_${index + 1}`;
+        const text = column ?? `選択肢${index + 1}`;
+        return { value: String(value), text: String(text) };
+    });
+}
+
+function normalizeMatrixValue(value) {
+    if (value === undefined || value === null || value === '') return [];
+    if (Array.isArray(value)) return value.filter(item => item !== undefined && item !== null && item !== '');
+    return [value];
+}
+
+function extractMatrixRowResponses(answerValue, row) {
+    if (!answerValue) return [];
+    const rowKeys = [row.id, row.text].filter(Boolean);
+    if (Array.isArray(answerValue)) {
+        const matched = answerValue.filter(item => {
+            if (!item) return false;
+            const key = item.row ?? item.key ?? item.id ?? item.label ?? item.text;
+            return rowKeys.includes(String(key));
+        });
+        if (matched.length === 0) return [];
+        return matched.flatMap(item => normalizeMatrixValue(item.value ?? item.column ?? item.answer ?? item.selection));
+    }
+    if (typeof answerValue === 'object') {
+        for (const key of rowKeys) {
+            if (Object.prototype.hasOwnProperty.call(answerValue, key)) {
+                return normalizeMatrixValue(answerValue[key]);
+            }
+        }
+    }
+    return [];
+}
+
+function resolveMatrixColumnLabel(value, columns) {
+    if (value === undefined || value === null || value === '') return null;
+    if (typeof value === 'object') {
+        const raw = value.value ?? value.text ?? value.label ?? value.id;
+        if (raw !== undefined && raw !== null) return resolveMatrixColumnLabel(raw, columns);
+        return null;
+    }
+    const valueStr = String(value);
+    const column = columns.find(col => col.value === valueStr || col.text === valueStr);
+    return column ? column.text : valueStr;
+}
+
 function buildChoiceSummary(question, answers) {
     const counts = {};
     let answeredCount = 0;
@@ -178,6 +243,47 @@ function buildChoiceSummary(question, answers) {
         data,
         totalAnswers: answeredCount,
         totalVotes
+    };
+}
+
+function buildMatrixSummary(question, answers) {
+    const rows = normalizeMatrixRows(question.rows || []);
+    const columns = normalizeMatrixColumns(question.columns || question.options || []);
+    const counts = rows.map(() => {
+        const rowCounts = {};
+        columns.forEach(col => {
+            rowCounts[col.text] = 0;
+        });
+        return rowCounts;
+    });
+    const rowAnswered = rows.map(() => 0);
+
+    answers.forEach(answer => {
+        const detail = findAnswerDetail(answer, question);
+        if (!detail || detail.answer === undefined || detail.answer === null || detail.answer === '') return;
+        rows.forEach((row, rowIndex) => {
+            const responses = extractMatrixRowResponses(detail.answer, row);
+            if (responses.length === 0) return;
+            rowAnswered[rowIndex] += 1;
+            responses.forEach(response => {
+                const label = resolveMatrixColumnLabel(response, columns);
+                if (!label) return;
+                if (!Object.prototype.hasOwnProperty.call(counts[rowIndex], label)) {
+                    counts[rowIndex][label] = 0;
+                }
+                counts[rowIndex][label] += 1;
+            });
+        });
+    });
+
+    const rowTotals = counts.map(rowCounts => Object.values(rowCounts).reduce((sum, value) => sum + value, 0));
+
+    return {
+        rows,
+        columns,
+        counts,
+        rowTotals,
+        rowAnswered
     };
 }
 
@@ -1110,6 +1216,35 @@ function processDataForTable(survey, answers) {
             };
         }
 
+        if (MATRIX_SINGLE_TYPES.has(question.type)) {
+            const summary = buildMatrixSummary(question, answers);
+            if (summary.rows.length === 0 || summary.columns.length === 0) {
+                return {
+                    questionId,
+                    questionText: question.text,
+                    labels: [],
+                    data: [],
+                    totalAnswers: 0,
+                    totalVotes: 0,
+                    includeTotalRow: false,
+                    blankReason: 'マトリクスの行または選択肢が未設定です。'
+                };
+            }
+
+            return {
+                questionId,
+                questionText: question.text,
+                isMatrix: true,
+                matrixRows: summary.rows,
+                matrixColumns: summary.columns,
+                matrixCounts: summary.counts,
+                matrixRowTotals: summary.rowTotals,
+                matrixRowAnswered: summary.rowAnswered,
+                includeTotalRow: true,
+                blankReason: ''
+            };
+        }
+
         const reason = BLANK_TYPES.has(question.type)
             ? getBlankReason(question.type)
             : '未対応の設問タイプ';
@@ -1159,6 +1294,70 @@ function renderGraphDataTable(processedData) {
             `;
         }
 
+        const renderTableBlock = (labels, data, totalVotes, includeTotalRow, totalAnswers) => {
+            const tableRows = labels.map((label, index) => {
+                const count = data[index] ?? 0;
+                const percentage = totalVotes > 0 ? ((count / totalVotes) * 100).toFixed(1) : '0.0';
+                return `
+                    <tr class="border-b border-outline-variant/30 last:border-b-0">
+                        <td class="px-3 py-2 text-sm text-on-surface graph-data-table__label" title="${escapeHtml(label)}">${escapeHtml(label)}</td>
+                        <td class="px-3 py-2 text-sm text-on-surface text-right">${count}</td>
+                        <td class="px-3 py-2 text-sm text-on-surface-variant text-right">${percentage}%</td>
+                    </tr>
+                `;
+            }).join('');
+
+            const totalRow = includeTotalRow
+                ? `
+                    <tr class="border-b border-outline-variant/30 font-semibold graph-table-total-row">
+                        <td class="px-3 py-2 text-sm text-on-surface">合計</td>
+                        <td class="px-3 py-2 text-sm text-on-surface text-right">${totalAnswers}</td>
+                        <td class="px-3 py-2 text-sm text-on-surface-variant text-right">${totalAnswers > 0 ? '100.0' : '0.0'}%</td>
+                    </tr>
+                `
+                : '';
+
+            return `
+                <div class="rounded-lg border border-outline-variant/50">
+                    <table class="graph-data-table w-full text-left table-fixed">
+                        <thead class="bg-surface-variant/30">
+                            <tr class="border-b border-outline-variant/50">
+                                <th class="px-3 py-2 text-xs font-semibold text-on-surface-variant w-1/2">選択肢</th>
+                                <th class="px-3 py-2 text-xs font-semibold text-on-surface-variant text-right">回答数</th>
+                                <th class="px-3 py-2 text-xs font-semibold text-on-surface-variant text-right">割合</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-outline-variant/30">
+                            ${tableRows}
+                            ${totalRow}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        };
+
+        if (questionData.isMatrix) {
+            const rows = questionData.matrixRows || [];
+            const columns = questionData.matrixColumns || [];
+            const counts = questionData.matrixCounts || [];
+            const totals = questionData.matrixRowTotals || [];
+            const answered = questionData.matrixRowAnswered || [];
+
+            return rows.map((row, rowIndex) => {
+                const labels = columns.map(col => col.text);
+                const rowCounts = counts[rowIndex] || {};
+                const data = labels.map(label => rowCounts[label] || 0);
+                const totalVotes = totals[rowIndex] || 0;
+                const totalAnswers = answered[rowIndex] || 0;
+                return `
+                    <div class="space-y-2">
+                        <div class="text-xs font-semibold text-on-surface-variant">${escapeHtml(row.text)}</div>
+                        ${renderTableBlock(labels, data, totalVotes, questionData.includeTotalRow, totalAnswers)}
+                    </div>
+                `;
+            }).join('');
+        }
+
         if (!questionData.labels || questionData.labels.length === 0) {
             return `
                 <div class="flex flex-col items-center justify-center text-center gap-2 py-6">
@@ -1169,46 +1368,7 @@ function renderGraphDataTable(processedData) {
         }
 
         const { labels, data, totalVotes, includeTotalRow } = questionData;
-
-        const tableRows = labels.map((label, index) => {
-            const count = data[index];
-            const percentage = totalVotes > 0 ? ((count / totalVotes) * 100).toFixed(1) : '0.0';
-            return `
-                <tr class="border-b border-outline-variant/30 last:border-b-0">
-                    <td class="px-3 py-2 text-sm text-on-surface truncate" title="${escapeHtml(label)}">${escapeHtml(label)}</td>
-                    <td class="px-3 py-2 text-sm text-on-surface text-right">${count}</td>
-                    <td class="px-3 py-2 text-sm text-on-surface-variant text-right">${percentage}%</td>
-                </tr>
-            `;
-        }).join('');
-
-        const totalRow = includeTotalRow
-            ? `
-                <tr class="border-b border-outline-variant/30 font-semibold">
-                    <td class="px-3 py-2 text-sm text-on-surface">合計</td>
-                    <td class="px-3 py-2 text-sm text-on-surface text-right">${questionData.totalAnswers}</td>
-                    <td class="px-3 py-2 text-sm text-on-surface-variant text-right">${questionData.totalAnswers > 0 ? '100.0' : '0.0'}%</td>
-                </tr>
-            `
-            : '';
-
-        return `
-            <div class="rounded-lg border border-outline-variant/50">
-                <table class="w-full text-left table-fixed">
-                    <thead class="bg-surface-variant/30">
-                        <tr class="border-b border-outline-variant/50">
-                            <th class="px-3 py-2 text-xs font-semibold text-on-surface-variant w-1/2">選択肢</th>
-                            <th class="px-3 py-2 text-xs font-semibold text-on-surface-variant text-right">回答数</th>
-                            <th class="px-3 py-2 text-xs font-semibold text-on-surface-variant text-right">割合</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-outline-variant/30">
-                        ${tableRows}
-                        ${totalRow}
-                    </tbody>
-                </table>
-            </div>
-        `;
+        return renderTableBlock(labels, data, totalVotes, includeTotalRow, questionData.totalAnswers);
     }).join('');
 
     container.innerHTML = allTablesHtml || '<p class="text-sm text-on-surface-variant p-4 text-center">集計可能なデータはありません。</p>';
@@ -1382,8 +1542,100 @@ function renderAttributeChart(data) {
     // Aggregate by currentIndustryQuestion
     const counts = {};
     const questionDef = currentSurvey?.details?.find(detail => detail.question === currentIndustryQuestion || detail.text === currentIndustryQuestion);
-    if (!questionDef || (!SINGLE_CHOICE_TYPES.has(questionDef.type) && !MULTI_CHOICE_TYPES.has(questionDef.type))) {
+    if (!questionDef || (!SINGLE_CHOICE_TYPES.has(questionDef.type) && !MULTI_CHOICE_TYPES.has(questionDef.type) && !MATRIX_SINGLE_TYPES.has(questionDef.type))) {
         renderEmptyState('設問を選択するとここに内訳が表示されます。', 'bar_chart');
+        return;
+    }
+
+    if (MATRIX_SINGLE_TYPES.has(questionDef.type)) {
+        const summary = buildMatrixSummary(questionDef, data || []);
+        if (summary.rows.length === 0 || summary.columns.length === 0) {
+            renderEmptyState('回答を待っています...', 'hourglass_empty');
+            return;
+        }
+
+        const rowLabels = summary.rows.map(row => row.text);
+        const columnLabels = summary.columns.map(col => col.text);
+        const rowTotals = summary.rowTotals;
+        const datasets = columnLabels.map((label, columnIndex) => {
+            const countsByRow = summary.counts.map(rowCounts => rowCounts[label] || 0);
+            const percentByRow = countsByRow.map((count, rowIndex) => {
+                const total = rowTotals[rowIndex] || 0;
+                return total > 0 ? (count / total) * 100 : 0;
+            });
+            return {
+                label,
+                data: percentByRow,
+                _rawCounts: countsByRow,
+                _rowTotals: rowTotals
+            };
+        });
+
+        if (datasets.every(dataset => dataset.data.every(value => value === 0))) {
+            renderEmptyState('回答を待っています...', 'hourglass_empty');
+            return;
+        }
+
+        clearEmptyState();
+        if (attributeChart) {
+            attributeChart.destroy();
+        }
+
+        const palette = ['#1a73e8', '#2a9d8f', '#e9c46a', '#f4a261', '#e76f51', '#8ab4f8', '#f28b82', '#fbbc04'];
+        const chartDatasets = datasets.map((dataset, index) => ({
+            label: dataset.label,
+            data: dataset.data,
+            backgroundColor: palette[index % palette.length],
+            borderWidth: 1,
+            _rawCounts: dataset._rawCounts,
+            _rowTotals: dataset._rowTotals
+        }));
+
+        attributeChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: rowLabels,
+                datasets: chartDatasets
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                scales: {
+                    x: {
+                        stacked: true,
+                        max: 100,
+                        ticks: {
+                            callback: value => `${value}%`
+                        }
+                    },
+                    y: {
+                        stacked: true
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: { boxWidth: 12, font: { size: 11 } }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: () => '',
+                            label: context => {
+                                const rowLabel = context.label || '';
+                                const optionLabel = context.dataset.label || '';
+                                const countsByRow = context.dataset._rawCounts || [];
+                                const totals = context.dataset._rowTotals || [];
+                                const count = countsByRow[context.dataIndex] || 0;
+                                const total = totals[context.dataIndex] || 0;
+                                const percent = total > 0 ? ((count / total) * 100).toFixed(1) : '0.0';
+                                return `${rowLabel} > ${optionLabel}: ${count}件 (${percent}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
         return;
     }
 

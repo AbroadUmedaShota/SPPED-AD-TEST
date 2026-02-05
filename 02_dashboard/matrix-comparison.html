@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>マトリクス設問 グラフ化比較 - SPEED AD</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Sans+JP:wght@400;700&display=swap');
+        body { font-family: 'Inter', 'Noto Sans JP', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 p-8">
+
+    <div class="max-w-6xl mx-auto">
+        <header class="mb-12">
+            <h1 class="text-3xl font-bold text-slate-900 mb-2">マトリクス設問（SA）グラフ化設計案</h1>
+            <p class="text-slate-600">マトリクス形式の回答データをどのように可視化すべきかの比較用プロトタイプです。</p>
+        </header>
+
+        <!-- 設問概要 -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-8">
+            <h2 class="text-sm font-bold text-blue-600 uppercase tracking-widest mb-4">対象の設問例</h2>
+            <p class="text-lg font-bold text-slate-800">Q. 各項目についてのご評価をお聞かせください（単一選択）</p>
+            <div class="mt-4 grid grid-cols-2 gap-4 text-sm text-slate-600">
+                <div><span class="font-bold text-slate-800">行項目:</span> 機能性、デザイン、価格、サポート</div>
+                <div><span class="font-bold text-slate-800">選択肢:</span> 非常に良い、良い、普通、悪い、非常に悪い</div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-12">
+            
+            <!-- パターンA: 個別円グラフ -->
+            <section>
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">A</div>
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-800">個別円グラフ案 (Separate Donut Charts)</h3>
+                        <p class="text-sm text-slate-500">行項目ごとにグラフを独立させて表示</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <h4 class="text-center font-bold text-slate-700 mb-2">機能性</h4>
+                        <div id="donut-kinou"></div>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <h4 class="text-center font-bold text-slate-700 mb-2">デザイン</h4>
+                        <div id="donut-design"></div>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <h4 class="text-center font-bold text-slate-700 mb-2">価格</h4>
+                        <div id="donut-kakaku"></div>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <h4 class="text-center font-bold text-slate-700 mb-2">サポート</h4>
+                        <div id="donut-support"></div>
+                    </div>
+                </div>
+                <div class="mt-4 flex gap-6 text-sm">
+                    <div class="flex-1 bg-green-50 p-4 rounded-lg text-green-800">
+                        <span class="font-bold">メリット:</span> 特定の項目（例：価格だけ）に対する満足度の内訳が直感的にわかります。
+                    </div>
+                    <div class="flex-1 bg-amber-50 p-4 rounded-lg text-amber-800">
+                        <span class="font-bold">デメリット:</span> 行項目が増えると画面を占有し、全体の傾向（どこが悪くてどこが良いか）の比較が難しくなります。
+                    </div>
+                </div>
+            </section>
+
+            <hr class="border-slate-200">
+
+            <!-- パターンB: 積み上げ棒グラフ -->
+            <section>
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">B</div>
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-800">100% 積み上げ棒グラフ案 (Stacked Bar Chart)</h3>
+                        <p class="text-sm text-slate-500">全項目を1つのグラフに集約して比較</p>
+                    </div>
+                </div>
+                <div class="bg-white p-8 rounded-xl border border-slate-200 shadow-sm">
+                    <div id="stacked-bar"></div>
+                </div>
+                <div class="mt-4 flex gap-6 text-sm">
+                    <div class="flex-1 bg-green-50 p-4 rounded-lg text-green-800">
+                        <span class="font-bold">メリット:</span> 各項目の評価バランスを横並びで比較できます。「価格は悪いが多いが、デザインは良いが多い」といった洞察が容易です。
+                    </div>
+                    <div class="flex-1 bg-amber-50 p-4 rounded-lg text-amber-800">
+                        <span class="font-bold">デメリット:</span> 個別の正確なパーセンテージを読み取るには少し慣れが必要です。
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+        <footer class="mt-16 pt-8 border-t border-slate-200 text-center text-slate-400 text-sm">
+            &copy; 2026 SPEED AD Project. This is a design comparison prototype.
+        </footer>
+    </div>
+
+    <script>
+        const categories = ['非常に良い', '良い', '普通', '悪い', '非常に悪い'];
+        const colors = ['#1a73e8', '#34a853', '#fbbc04', '#ea4335', '#757575'];
+
+        // Donut Chart Helper
+        function renderDonut(id, data) {
+            new ApexCharts(document.querySelector("#" + id), {
+                series: data,
+                chart: { type: 'donut', height: 220 },
+                labels: categories,
+                colors: colors,
+                legend: { show: false },
+                dataLabels: { enabled: false },
+                plotOptions: { pie: { donut: { size: '65%' } } }
+            }).render();
+        }
+
+        // Render Pattern A
+        renderDonut('donut-kinou', [40, 30, 20, 5, 5]);
+        renderDonut('donut-design', [20, 50, 25, 3, 2]);
+        renderDonut('donut-kakaku', [10, 20, 40, 20, 10]);
+        renderDonut('donut-support', [30, 40, 20, 8, 2]);
+
+        // Render Pattern B
+        new ApexCharts(document.querySelector("#stacked-bar"), {
+            series: [
+                { name: '非常に良い', data: [40, 20, 10, 30] },
+                { name: '良い', data: [30, 50, 20, 40] },
+                { name: '普通', data: [20, 25, 40, 20] },
+                { name: '悪い', data: [5, 3, 20, 8] },
+                { name: '非常に悪い', data: [5, 2, 10, 2] }
+            ],
+            chart: {
+                type: 'bar',
+                height: 350,
+                stacked: true,
+                stackType: '100%'
+            },
+            plotOptions: {
+                bar: { horizontal: true, barHeight: '60%' }
+            },
+            colors: colors,
+            xaxis: {
+                categories: ['機能性', 'デザイン', '価格', 'サポート'],
+            },
+            tooltip: { y: { formatter: val => val + "%" } },
+            fill: { opacity: 1 },
+            legend: { position: 'top', horizontalAlign: 'left' }
+        }).render();
+    </script>
+</body>
+</html>
