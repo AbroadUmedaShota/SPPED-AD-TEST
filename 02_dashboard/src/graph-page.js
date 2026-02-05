@@ -1099,7 +1099,7 @@ function resolveMatrixColumnLabel(value, columns) {
 
 function buildMatrixCharts(question, questionId, answers, isMulti) {
     const rows = normalizeMatrixRows(question.rows || []);
-    const columns = normalizeMatrixColumns(question.columns || []);
+    const columns = normalizeMatrixColumns(question.columns || question.options || []);
     if (rows.length === 0 || columns.length === 0) return [buildBlankChart(questionId, question.text)];
     const matrixTotal = rows.length;
     return rows.map((row, rowIndex) => {

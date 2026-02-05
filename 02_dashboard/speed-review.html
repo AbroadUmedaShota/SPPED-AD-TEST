@@ -62,6 +62,47 @@
             background-color: rgba(26, 115, 232, 0.1) !important;
             border-bottom: 2px solid #1a73e8 !important;
         }
+
+        .graph-data-table-container {
+            height: 180px;
+            max-height: 180px;
+            overflow-y: auto;
+            scrollbar-gutter: stable;
+        }
+
+        .graph-data-table {
+            width: 100%;
+            table-layout: fixed;
+        }
+
+        .graph-data-table thead th {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background-color: var(--color-surface, #ffffff);
+            box-shadow: inset 0 -1px 0 var(--color-outline-variant, #e5e7eb);
+        }
+
+        .graph-data-table__label {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .graph-table-total-row {
+            position: sticky;
+            bottom: 0;
+            background-color: var(--color-surface, #ffffff);
+            box-shadow: inset 0 1px 0 var(--color-outline-variant, #e5e7eb);
+        }
+
+        @media (max-width: 767px) {
+            .graph-data-table-container {
+                height: auto;
+                max-height: none;
+                overflow: visible;
+            }
+        }
     </style>
 </head>
 
@@ -167,7 +208,7 @@
                                     class="flex-1 w-full md:w-1/2 flex flex-col border-t md:border-t-0 md:border-l border-outline-variant/50 pt-4 md:pt-0 md:pl-4 relative">
                                     <h3 class="text-sm font-medium mb-4 text-on-surface-variant">集計データ</h3>
                                     <div id="graph-data-table-container"
-                                        class="relative h-40 w-full overflow-y-auto custom-scrollbar flex-1">
+                                        class="relative w-full custom-scrollbar flex-1 graph-data-table-container">
                                         <!-- Table will be inserted here by JavaScript -->
                                         <p class="text-sm text-on-surface-variant">設問を選択すると、集計データが表示されます。</p>
                                     </div>
