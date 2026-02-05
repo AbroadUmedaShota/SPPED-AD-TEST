@@ -64,23 +64,28 @@
         }
 
         .graph-data-table-container {
-            height: 180px;
-            max-height: 180px;
+            height: auto;
+            min-height: 120px;
+            max-height: 320px;
             overflow-y: auto;
             scrollbar-gutter: stable;
+            padding-right: 4px;
+            transition: max-height 0.3s ease;
         }
 
         .graph-data-table {
             width: 100%;
             table-layout: fixed;
+            border-collapse: separate;
+            border-spacing: 0;
         }
 
         .graph-data-table thead th {
             position: sticky;
             top: 0;
-            z-index: 10;
-            background-color: var(--color-surface, #ffffff);
-            box-shadow: inset 0 -1px 0 var(--color-outline-variant, #e5e7eb);
+            z-index: 20;
+            background-color: #ffffff;
+            box-shadow: inset 0 -1px 0 #e5e7eb;
         }
 
         .graph-data-table__label {
@@ -92,8 +97,10 @@
         .graph-table-total-row {
             position: sticky;
             bottom: 0;
-            background-color: var(--color-surface, #ffffff);
-            box-shadow: inset 0 1px 0 var(--color-outline-variant, #e5e7eb);
+            z-index: 10;
+            background-color: #f9fafb;
+            font-weight: 700;
+            box-shadow: inset 0 1px 0 #e5e7eb;
         }
 
         @media (max-width: 767px) {
