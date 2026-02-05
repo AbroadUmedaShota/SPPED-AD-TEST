@@ -310,12 +310,19 @@ function renderCharts(chartsData) {
     chartsData.forEach(chartData => {
         const chartId = `chart-${chartData.chartId}`;
         const card = document.createElement('div');
-        card.className = 'bg-surface rounded-2xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col';
+        const isMatrix = Boolean(chartData.isMatrix);
+        const matrixBorder = isMatrix ? '<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary/40"></div>' : '';
+        card.className = `${isMatrix ? 'relative ' : ''}bg-surface rounded-2xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col`;
 
         const actionButtons = buildActionButtons(chartData, chartId);
         const chartArea = buildChartArea(chartData, chartId);
         const questionTitle = escapeHtml(chartData.questionText);
-        const questionChip = formatQuestionChip(chartData.questionId);
+        const parentTitle = escapeHtml(chartData.matrixParentText || chartData.questionText);
+        const rowTitle = escapeHtml(chartData.matrixRowText || '');
+        const baseChip = formatQuestionChip(chartData.questionBaseId || chartData.questionId);
+        const questionChip = isMatrix
+            ? `${baseChip} [${chartData.matrixIndex}/${chartData.matrixTotal}]`
+            : baseChip;
         
         const isBlank = chartData.chartType === 'blank';
         const isList = chartData.chartType === 'list';
@@ -342,7 +349,12 @@ function renderCharts(chartsData) {
             ? `<div id="summary-${chartId}" class="text-sm"></div>`
             : '';
 
+        const titleHtml = isMatrix
+            ? `<span class="font-bold text-on-surface block mb-1">${parentTitle}</span><span class="font-normal text-on-surface">${rowTitle}</span>`
+            : questionTitle;
+
         card.innerHTML = `
+            ${matrixBorder}
             <div class="p-5 border-b border-outline-variant/50 bg-surface-variant/10">
                 <div class="flex justify-between items-start gap-4">
                     <div class="flex items-center gap-3 min-w-0">
@@ -351,7 +363,7 @@ function renderCharts(chartsData) {
                         </div>
                         <div class="min-w-0">
                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-surface-variant text-on-surface-variant border border-outline-variant mb-1">${questionChip}</span>
-                            <h3 class="text-base font-bold text-on-surface leading-tight line-clamp-2" title="${questionTitle}">${questionTitle}</h3>
+                            <h3 class="text-base ${isMatrix ? '' : 'font-bold '}text-on-surface leading-tight line-clamp-2" title="${questionTitle}">${titleHtml}</h3>
                         </div>
                     </div>
                     <div class="flex items-center gap-2 shrink-0">
@@ -411,39 +423,6 @@ function renderCharts(chartsData) {
             
             e.currentTarget.classList.add('active', 'bg-primary', 'text-on-primary');
             e.currentTarget.classList.remove('bg-surface', 'text-primary');
-        });
-    });
-
-    document.querySelectorAll('.download-btn').forEach(button => {
-        button.addEventListener('click', async (e) => {
-            const buttonEl = e.currentTarget;
-            const chartId = buttonEl.dataset.chartId;
-            const chartInstance = chartInstances[chartId];
-            
-            if (chartInstance) {
-                try {
-                    buttonEl.disabled = true;
-                    buttonEl.style.opacity = '0.5';
-
-                    await chartInstance.dataURI().then(({ imgURI }) => {
-                        const link = document.createElement('a');
-                        link.href = imgURI;
-                        const sanitizedQuestion = chartDataStore.get(chartId).questionText.replace(/[<>:"/\\|?*]/g, '_').substring(0, 50);
-                        link.download = `${sanitizedQuestion}.png`;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                    });
-
-                    showToast('画像を保存しました。', 'success');
-                } catch (err) {
-                    console.error('保存失敗:', err);
-                    showToast('画像の保存に失敗しました。', 'error');
-                } finally {
-                    buttonEl.disabled = false;
-                    buttonEl.style.opacity = '1';
-                }
-            }
         });
     });
 
@@ -562,8 +541,10 @@ function renderChartSummaryTable(summaryId, chartData) {
         const itemsHtml = rows.length > 0
             ? rows.map(item => `
                 <tr>
-                    <td class="px-3 py-2 border-b border-outline-variant">${escapeHtml(item.value)}</td>
-                    <td class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums">${escapeHtml(item.answeredAtLabel)}</td>
+                    <td class="px-3 py-2 border-b border-outline-variant align-top">
+                        <div class="cell-truncate-container" title="${escapeHtml(item.value)}">${escapeHtml(item.value)}</div>
+                    </td>
+                    <td class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums align-top whitespace-nowrap text-on-surface-variant text-[11px]">${escapeHtml(item.answeredAtLabel)}</td>
                 </tr>
             `).join('')
             : `
@@ -573,12 +554,12 @@ function renderChartSummaryTable(summaryId, chartData) {
             `;
 
         container.innerHTML = `
-            <div class="overflow-x-auto">
-                <table class="min-w-full text-left text-sm border border-outline-variant">
-                    <thead class="bg-surface-variant-soft text-on-surface-variant">
+            <div class="chart-summary-scroll-area border border-outline-variant rounded-lg">
+                <table class="table-layout-fixed text-left text-sm">
+                    <thead class="bg-surface-variant-soft text-on-surface-variant sticky top-0 z-10 shadow-[0_1px_0_0_rgba(0,0,0,0.05)]">
                         <tr>
-                            <th class="px-3 py-2 border-b border-outline-variant">回答</th>
-                            <th class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums">回答日時</th>
+                            <th class="px-3 py-2 border-b border-outline-variant w-full">回答</th>
+                            <th class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums w-[100px]">回答日時</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -593,13 +574,13 @@ function renderChartSummaryTable(summaryId, chartData) {
     const totalVotes = chartData.totalAnswers || 0;
 
     let html = `
-        <div class="overflow-x-auto">
-            <table class="min-w-full text-left text-sm border border-outline-variant">
-                <thead class="bg-surface-variant-soft text-on-surface-variant">
+        <div class="chart-summary-scroll-area border border-outline-variant rounded-lg">
+            <table class="table-layout-fixed text-left text-sm">
+                <thead class="bg-surface-variant-soft text-on-surface-variant sticky top-0 z-10 shadow-[0_1px_0_0_rgba(0,0,0,0.05)]">
                     <tr>
-                        <th class="px-3 py-2 border-b border-outline-variant">項目</th>
-                        <th class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums">件数</th>
-                        <th class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums">割合</th>
+                        <th class="px-3 py-2 border-b border-outline-variant w-full">項目</th>
+                        <th class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums w-[80px]">件数</th>
+                        <th class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums w-[80px]">割合</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -610,9 +591,11 @@ function renderChartSummaryTable(summaryId, chartData) {
         const percentage = totalVotes > 0 ? ((count / totalVotes) * 100).toFixed(1) : '0.0';
         html += `
             <tr>
-                <td class="px-3 py-2 border-b border-outline-variant">${escapeHtml(label)}</td>
-                <td class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums">${count}件</td>
-                <td class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums">${percentage}%</td>
+                <td class="px-3 py-2 border-b border-outline-variant align-top">
+                    <div class="cell-truncate-container" title="${escapeHtml(label)}">${escapeHtml(label)}</div>
+                </td>
+                <td class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums align-top">${count}件</td>
+                <td class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums align-top">${percentage}%</td>
             </tr>
         `;
     });
@@ -620,7 +603,7 @@ function renderChartSummaryTable(summaryId, chartData) {
     if (chartData.includeTotalRow) {
         const totalPercentage = totalVotes > 0 ? '100.0%' : '0.0%';
         html += `
-            <tr class="font-semibold">
+            <tr class="font-semibold bg-surface-variant/5">
                 <td class="px-3 py-2">合計</td>
                 <td class="px-3 py-2 text-right font-mono tabular-nums">${totalVotes}件</td>
                 <td class="px-3 py-2 text-right font-mono tabular-nums">${totalPercentage}</td>
@@ -848,7 +831,30 @@ async function exportAllChartsToExcel(chartsData) {
 function showLoading(isLoading) {
     document.getElementById('loading-indicator').style.display = isLoading ? 'block' : 'none';
     if (isLoading) {
-        document.getElementById('charts-container').innerHTML = '';
+        const container = document.getElementById('charts-container');
+        const skeletonCard = `
+            <div class="bg-surface rounded-2xl border border-outline-variant shadow-sm overflow-hidden flex flex-col animate-pulse">
+                <div class="p-5 border-b border-outline-variant/50 bg-surface-variant/5">
+                    <div class="flex justify-between items-start gap-4">
+                        <div class="flex items-center gap-3 w-full">
+                            <div class="w-8 h-8 rounded-lg bg-surface-variant/50 shrink-0"></div>
+                            <div class="flex-1">
+                                <div class="h-2 w-12 bg-surface-variant/50 rounded-full mb-2"></div>
+                                <div class="h-4 w-3/4 bg-surface-variant/50 rounded-full"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-5 flex-1 flex flex-col gap-6">
+                    <div class="w-full h-48 bg-surface-variant/30 rounded-xl"></div>
+                    <div class="space-y-3">
+                        <div class="h-3 w-full bg-surface-variant/20 rounded-full"></div>
+                        <div class="h-3 w-5/6 bg-surface-variant/20 rounded-full"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+        container.innerHTML = skeletonCard.repeat(4);
         showError('', false);
     }
 }
@@ -1095,6 +1101,7 @@ function buildMatrixCharts(question, questionId, answers, isMulti) {
     const rows = normalizeMatrixRows(question.rows || []);
     const columns = normalizeMatrixColumns(question.columns || []);
     if (rows.length === 0 || columns.length === 0) return [buildBlankChart(questionId, question.text)];
+    const matrixTotal = rows.length;
     return rows.map((row, rowIndex) => {
         const counts = {};
         columns.forEach(col => { counts[col.text] = 0; });
@@ -1129,6 +1136,12 @@ function buildMatrixCharts(question, questionId, answers, isMulti) {
         return buildChartData({
             questionId: `${questionId}_${rowIndex + 1}`,
             questionText: `${question.text} - ${row.text}`,
+            questionBaseId: questionId,
+            isMatrix: true,
+            matrixIndex: rowIndex + 1,
+            matrixTotal,
+            matrixParentText: question.text,
+            matrixRowText: row.text,
             chartType: isMulti ? 'bar' : 'pie',
             summaryType: isMulti ? 'none' : 'table',
             includeTotalRow: !isMulti,
@@ -1145,7 +1158,13 @@ function buildChartData(data) {
     return {
         chartId: `${data.questionId}_${chartSequence}`,
         questionId: data.questionId,
+        questionBaseId: data.questionBaseId || '',
         questionText: data.questionText,
+        isMatrix: Boolean(data.isMatrix),
+        matrixIndex: data.matrixIndex || 0,
+        matrixTotal: data.matrixTotal || 0,
+        matrixParentText: data.matrixParentText || '',
+        matrixRowText: data.matrixRowText || '',
         labels: data.labels || [],
         data: data.data || [],
         totalAnswers: data.totalAnswers || 0,
@@ -1191,14 +1210,7 @@ function buildListChart(question, questionId, answers, fallbackReason = '') {
 }
 
 function buildActionButtons(chartData, chartId) {
-    if (chartData.chartType === 'blank' || chartData.chartType === 'list') return '';
-    return `
-        <div class="flex items-center gap-2">
-            <button type="button" data-chart-id="${chartId}" class="download-btn button-secondary p-2 rounded-md" title="グラフをダウンロード">
-                <span class="material-icons">download</span>
-            </button>
-        </div>
-    `;
+    return '';
 }
 
 function buildChartTypeButtons(chartData, chartId) {
@@ -1232,14 +1244,16 @@ function buildChartArea(chartData, chartId) {
         }
         const listHtml = items.map(item => `
             <li class="flex flex-col gap-1 p-3 rounded-lg bg-surface-variant/30 border border-outline-variant/30">
-                <span class="text-sm font-medium text-on-surface break-words">${escapeHtml(item.value)}</span>
+                <span class="text-sm font-medium text-on-surface break-words line-clamp-3" title="${escapeHtml(item.value)}">${escapeHtml(item.value)}</span>
                 <span class="text-[11px] text-on-surface-variant font-mono tabular-nums">${escapeHtml(item.answeredAtLabel)}</span>
             </li>
         `).join('');
         return `
-            <ul class="grid gap-3">
-                ${listHtml}
-            </ul>
+            <div class="chart-list-scroll-area">
+                <ul class="grid gap-3">
+                    ${listHtml}
+                </ul>
+            </div>
             <p class="mt-3 text-xs text-on-surface-variant/70">全件は詳細表で確認できます。</p>
         `;
     }

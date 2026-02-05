@@ -10,14 +10,17 @@
     <!-- Material Icons CDN -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- ApexCharts CDN (SVG Based) -->
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.45.2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.45.2" defer></script>
     <!-- flatpickr CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="../02_dashboard/service-top-style.css">
     <!-- Custom Fonts -->
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
-    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900">
+    </noscript>
 </head>
 <body class="bg-background text-on-background">
 
@@ -43,7 +46,7 @@
                 </div>
 
                 <!-- Analysis Controls -->
-                <div class="bg-surface border border-outline-variant rounded-2xl shadow-sm mb-8 overflow-hidden">
+                <div class="bg-surface-glass border border-outline-variant rounded-2xl shadow-md mb-8 overflow-hidden sticky top-16 z-30 backdrop-blur-md">
                     <!-- Main Toolbar -->
                     <div class="p-4 flex flex-wrap items-center gap-6 bg-surface-variant/10">
                         <div class="flex items-center gap-2">
@@ -82,7 +85,7 @@
                         </div>
 
                         <div class="flex items-center gap-3 ml-auto">
-                            <button id="resetFiltersButton" class="button-secondary px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all">
+                            <button id="resetFiltersButton" class="bg-secondary/10 text-secondary hover:bg-secondary/20 border-none px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all shadow-sm">
                                 <span class="material-icons text-sm">restart_alt</span>
                                 <span>リセット</span>
                             </button>
@@ -107,47 +110,52 @@
                     </div>
 
                     <!-- Display Settings Bar -->
-                    <div class="px-6 py-3 border-t border-outline-variant/50 flex flex-wrap items-center gap-x-8 gap-y-2">
+                    <div class="px-6 py-3 border-t border-outline-variant/50 flex flex-wrap items-center gap-x-4 gap-y-2">
                         <div class="flex items-center gap-2 text-on-surface-variant mr-2">
                             <span class="material-icons text-sm">settings</span>
                             <span class="text-[10px] font-black uppercase tracking-widest">表示設定:</span>
                         </div>
-                        
-                        <label class="filter-option flex items-center gap-2 cursor-pointer group">
-                            <input type="checkbox" id="opt-show-summary" class="form-checkbox h-3.5 w-3.4 text-primary rounded border-outline-variant focus:ring-primary" checked>
-                            <span class="text-xs text-on-surface-variant group-hover:text-primary transition-colors">サマリー</span>
+
+                        <input type="checkbox" id="opt-show-summary" class="filter-chip-input" checked>
+                        <label for="opt-show-summary" class="filter-chip-label">
+                            <span class="material-icons filter-chip-icon">check</span>
+                            <span>サマリー</span>
                         </label>
-                        
-                        <label class="filter-option flex items-center gap-2 cursor-pointer group">
-                            <input type="checkbox" id="opt-show-datalabels" class="form-checkbox h-3.5 w-3.4 text-primary rounded border-outline-variant focus:ring-primary" checked>
-                            <span class="text-xs text-on-surface-variant group-hover:text-primary transition-colors">数値ラベル</span>
+
+                        <input type="checkbox" id="opt-show-datalabels" class="filter-chip-input" checked>
+                        <label for="opt-show-datalabels" class="filter-chip-label">
+                            <span class="material-icons filter-chip-icon">check</span>
+                            <span>数値ラベル</span>
                         </label>
-                        
-                        <label class="filter-option flex items-center gap-2 cursor-pointer group">
-                            <input type="checkbox" id="opt-show-center-text" class="form-checkbox h-3.5 w-3.4 text-primary rounded border-outline-variant focus:ring-primary" checked>
-                            <span class="text-xs text-on-surface-variant group-hover:text-primary transition-colors">中央合計</span>
+
+                        <input type="checkbox" id="opt-show-center-text" class="filter-chip-input" checked>
+                        <label for="opt-show-center-text" class="filter-chip-label">
+                            <span class="material-icons filter-chip-icon">check</span>
+                            <span>中央合計</span>
                         </label>
-                        
-                        <label class="filter-option flex items-center gap-2 cursor-pointer group">
-                            <input type="checkbox" id="opt-show-table" class="form-checkbox h-3.5 w-3.4 text-primary rounded border-outline-variant focus:ring-primary" checked>
-                            <span class="text-xs text-on-surface-variant group-hover:text-primary transition-colors">詳細表</span>
+
+                        <input type="checkbox" id="opt-show-table" class="filter-chip-input" checked>
+                        <label for="opt-show-table" class="filter-chip-label">
+                            <span class="material-icons filter-chip-icon">check</span>
+                            <span>詳細表</span>
                         </label>
-                        
-                        <label class="filter-option flex items-center gap-2 cursor-pointer group">
-                            <input type="checkbox" id="opt-show-grid" class="form-checkbox h-3.5 w-3.4 text-primary rounded border-outline-variant focus:ring-primary">
-                            <span class="text-xs text-on-surface-variant group-hover:text-primary transition-colors">グリッド線（棒グラフのみ）</span>
+
+                        <input type="checkbox" id="opt-show-grid" class="filter-chip-input">
+                        <label for="opt-show-grid" class="filter-chip-label">
+                            <span class="material-icons filter-chip-icon">check</span>
+                            <span>グリッド線（棒グラフのみ）</span>
                         </label>
                     </div>
                 </div>
 
                 <!-- Loading Indicator -->
-                <div id="loading-indicator" class="text-center py-16">
+                <div id="loading-indicator" class="text-center py-16" role="status" aria-live="polite">
                     <div class="soft-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent mx-auto"></div>
                     <p class="mt-4 text-on-surface-variant">グラフを生成しています...</p>
                 </div>
 
                 <!-- Error Display -->
-                <div id="error-display" class="hidden bg-error-container text-on-error-container p-4 rounded-xl border border-outline-variant shadow-sm">
+                <div id="error-display" class="hidden bg-error-container text-on-error-container p-4 rounded-xl border border-outline-variant shadow-sm" role="alert">
                     <div class="flex items-start gap-3">
                         <span class="material-icons text-lg">error_outline</span>
                         <div>

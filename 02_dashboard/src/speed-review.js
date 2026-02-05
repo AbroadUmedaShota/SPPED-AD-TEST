@@ -581,6 +581,10 @@ function handleResetFilters() {
     if (statusFilterSelect) {
         statusFilterSelect.value = 'all';
     }
+    const statusFilterSelectDetailed = document.getElementById('statusFilterSelectDetailed');
+    if (statusFilterSelectDetailed) {
+        statusFilterSelectDetailed.value = 'all';
+    }
 
     applyFilters();
 }
@@ -933,12 +937,29 @@ function setupEventListeners() {
 
     // ステータスフィルターのイベントリスナー
     const statusFilterSelect = document.getElementById('statusFilterSelect');
+    const statusFilterSelectDetailed = document.getElementById('statusFilterSelectDetailed');
+    const syncStatusFilter = (value) => {
+        currentStatusFilter = value;
+        if (statusFilterSelect && statusFilterSelect.value !== value) {
+            statusFilterSelect.value = value;
+        }
+        if (statusFilterSelectDetailed && statusFilterSelectDetailed.value !== value) {
+            statusFilterSelectDetailed.value = value;
+        }
+        applyFilters();
+    };
     if (statusFilterSelect) {
         statusFilterSelect.addEventListener('change', (e) => {
-            currentStatusFilter = e.target.value;
-            applyFilters();
+            syncStatusFilter(e.target.value);
         });
     }
+    if (statusFilterSelectDetailed) {
+        statusFilterSelectDetailed.addEventListener('change', (e) => {
+            syncStatusFilter(e.target.value);
+        });
+    }
+    if (statusFilterSelect) statusFilterSelect.value = currentStatusFilter;
+    if (statusFilterSelectDetailed) statusFilterSelectDetailed.value = currentStatusFilter;
 
     const resetBtn = document.getElementById('resetFiltersButton');
     if (resetBtn) {
@@ -952,7 +973,8 @@ function setupEventListeners() {
 
     const graphBtn = document.getElementById('graphButton');
     if (graphBtn) {
-        graphBtn.addEventListener('click', () => {
+        graphBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
             const urlParams = new URLSearchParams(window.location.search);
             let surveyId = urlParams.get('surveyId');
             if (!surveyId) {
@@ -1114,7 +1136,12 @@ function renderGraphDataTable(processedData) {
     if (!container) return;
 
     if (!processedData || processedData.length === 0) {
-        container.innerHTML = '<p class="text-sm text-on-surface-variant p-4 text-center">集計可能なデータはありません。</p>';
+        container.innerHTML = `
+            <div class="flex flex-col items-center justify-center text-center gap-2 py-8 h-full">
+                <span class="material-icons text-5xl text-on-surface-variant/20">bar_chart</span>
+                <p class="text-sm text-on-surface-variant">設問を選択するとここに内訳が表示されます。</p>
+            </div>
+        `;
         return;
     }
 
@@ -1123,26 +1150,20 @@ function renderGraphDataTable(processedData) {
             return '';
         }
 
-        const questionTitle = escapeHtml(truncateQuestion(questionData.questionText));
-        const questionTooltip = escapeHtml(questionData.questionText);
-
         if (questionData.blankReason) {
             const reason = escapeHtml(questionData.blankReason);
             return `
-                <div class="mb-6">
-                    <h4 class="text-base font-bold text-on-surface mb-2 px-1 truncate" title="${questionTooltip}">${questionTitle}</h4>
-                    <div class="p-4 rounded-lg bg-surface-variant text-on-surface-variant text-sm">
-                        この設問は現在グラフ対象外です。理由: ${reason}
-                    </div>
+                <div class="p-4 rounded-lg bg-surface-variant text-on-surface-variant text-sm">
+                    この設問は現在グラフ対象外です。理由: ${reason}
                 </div>
             `;
         }
 
         if (!questionData.labels || questionData.labels.length === 0) {
             return `
-                <div class="mb-6">
-                    <h4 class="text-base font-bold text-on-surface mb-2 px-1 truncate" title="${questionTooltip}">${questionTitle}</h4>
-                    <p class="text-sm text-on-surface-variant p-4 text-center">集計可能なデータはありません。</p>
+                <div class="flex flex-col items-center justify-center text-center gap-2 py-6">
+                    <span class="material-icons text-4xl text-on-surface-variant/20">hourglass_empty</span>
+                    <p class="text-sm text-on-surface-variant">回答を待っています...</p>
                 </div>
             `;
         }
@@ -1172,23 +1193,20 @@ function renderGraphDataTable(processedData) {
             : '';
 
         return `
-            <div class="mb-6">
-                <h4 class="text-base font-bold text-on-surface mb-2 px-1 truncate" title="${questionTooltip}">${questionTitle}</h4>
-                <div class="rounded-lg border border-outline-variant/50">
-                    <table class="w-full text-left table-fixed">
-                        <thead class="bg-surface-variant/30">
-                            <tr class="border-b border-outline-variant/50">
-                                <th class="px-3 py-2 text-xs font-semibold text-on-surface-variant w-1/2">選択肢</th>
-                                <th class="px-3 py-2 text-xs font-semibold text-on-surface-variant text-right">回答数</th>
-                                <th class="px-3 py-2 text-xs font-semibold text-on-surface-variant text-right">割合</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-outline-variant/30">
-                            ${tableRows}
-                            ${totalRow}
-                        </tbody>
-                    </table>
-                </div>
+            <div class="rounded-lg border border-outline-variant/50">
+                <table class="w-full text-left table-fixed">
+                    <thead class="bg-surface-variant/30">
+                        <tr class="border-b border-outline-variant/50">
+                            <th class="px-3 py-2 text-xs font-semibold text-on-surface-variant w-1/2">選択肢</th>
+                            <th class="px-3 py-2 text-xs font-semibold text-on-surface-variant text-right">回答数</th>
+                            <th class="px-3 py-2 text-xs font-semibold text-on-surface-variant text-right">割合</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-outline-variant/30">
+                        ${tableRows}
+                        ${totalRow}
+                    </tbody>
+                </table>
             </div>
         `;
     }).join('');
@@ -1209,10 +1227,6 @@ function renderDashboard(data) {
     const questionTitleEl = document.getElementById('dashboard-current-question');
     if (questionTitleEl) {
         questionTitleEl.textContent = truncateQuestion(currentIndustryQuestion) || '未選択';
-    }
-    const attributeTitleEl = document.getElementById('attribute-chart-title');
-    if (attributeTitleEl) {
-        attributeTitleEl.textContent = truncateQuestion(currentIndustryQuestion) || '未選択';
     }
 
     // 2. Time Series Chart
@@ -1264,8 +1278,8 @@ function renderTimeSeriesChart(data) {
     } else {
         const minHour = Math.min(...hourIndices);
         const maxHour = Math.max(...hourIndices);
-        startHour = minHour;
-        endHour = maxHour + 1;
+        startHour = Math.max(0, minHour - 1);
+        endHour = Math.min(23, maxHour + 1);
     }
 
     const length = endHour - startHour + 1;
@@ -1335,19 +1349,45 @@ function renderTimeSeriesChart(data) {
 function renderAttributeChart(data) {
     const ctx = document.getElementById('attributeChart');
     if (!ctx) return;
+    const container = ctx.parentElement;
+
+    const renderEmptyState = (message, icon) => {
+        if (attributeChart) {
+            attributeChart.destroy();
+            attributeChart = null;
+        }
+        if (container) {
+            let empty = container.querySelector('.attribute-empty-state');
+            if (!empty) {
+                empty = document.createElement('div');
+                empty.className = 'attribute-empty-state flex flex-col items-center justify-center text-center gap-2 py-6 h-full w-full';
+                empty.innerHTML = `
+                    <span class="material-icons text-5xl text-on-surface-variant/20">${icon}</span>
+                    <p class="text-sm text-on-surface-variant"></p>
+                `;
+                container.appendChild(empty);
+            }
+            const messageEl = empty.querySelector('p');
+            if (messageEl) messageEl.textContent = message;
+        }
+        ctx.classList.add('hidden');
+    };
+
+    const clearEmptyState = () => {
+        if (!container) return;
+        container.querySelector('.attribute-empty-state')?.remove();
+        ctx.classList.remove('hidden');
+    };
 
     // Aggregate by currentIndustryQuestion
     const counts = {};
     const questionDef = currentSurvey?.details?.find(detail => detail.question === currentIndustryQuestion || detail.text === currentIndustryQuestion);
     if (!questionDef || (!SINGLE_CHOICE_TYPES.has(questionDef.type) && !MULTI_CHOICE_TYPES.has(questionDef.type))) {
-        if (attributeChart) {
-            attributeChart.destroy();
-            attributeChart = null;
-        }
+        renderEmptyState('設問を選択するとここに内訳が表示されます。', 'bar_chart');
         return;
     }
 
-    data.forEach(item => {
+    (data || []).forEach(item => {
         const detail = findAnswerDetail(item, questionDef);
         let answer = detail?.answer;
 
@@ -1364,6 +1404,12 @@ function renderAttributeChart(data) {
 
     // Sort by count desc
     const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    if (sorted.length === 0) {
+        renderEmptyState('回答を待っています...', 'hourglass_empty');
+        return;
+    }
+
+    clearEmptyState();
     const labels = sorted.map(s => s[0]);
     const values = sorted.map(s => s[1]);
 

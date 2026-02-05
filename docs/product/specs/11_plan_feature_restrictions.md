@@ -6,30 +6,29 @@
 - プラン追加・改訂に対する柔軟性、アップセル導線の明確化、監査ログの一元化を実現するため、**共通の能力定義を基に UI・サービス・API で一貫した制御**を行う設計を策定する。
 
 ## 2. 対象プランと識別キー
-| プラン表示名 | システムキー (`planTier`) | 想定契約単位 | 主な特徴 | 備考 |
+| プラン表示名 | システムキー (`planTier`) | 価格（税別） | 主な特徴 | 備考 |
 | :-- | :-- | :-- | :-- | :-- |
-| Free | `free` | 月次 | 基本アンケート、無料範囲内での名刺データ化(2項目)。御礼メールはSPEED ADドメイン限定。 | クロス集計・外部連携は非対応。 |
-| Standard | `standard` | 月次/従量 | 名刺データ化10項目＋追加3項目、通常〜特急スピード対応、御礼メール送信上限500件。 | 追加料金で従量課金に移行可能。 |
-| Premium | `premium` | 月次/年次 | 全有料機能利用可、カスタム項目拡張、特急以上のスピード保証、クロス集計提供。 | 御礼メール自社ドメイン、保存期間無制限。 |
-| Premium+ (Enterprise) | `premiumPlus` | 年次/従量 | Premiumに加えてオンデマンド納期、SLA/多言語/高度分析、SSO対応。 | 旧称「Pro」「Enterprise」を統合。 |
+| Free (無料) | `free` | 0円 | 基本アンケート、回答テキストのみDL、無料範囲内での名刺データ化。 | 期間30日、ロゴ表示あり。 |
+| Premium (月額) | `premium` | 10,000円 | 画像/名刺結合データDL、Excelレポート、自社ドメイン、保存期間無期限。 | 2026-05-18 展開予定。 |
+| Enterprise | `enterprise` | 個別見積 | Premium＋SSO対応、SLA、高度な外部連携（Slack/CRM等）。 | 2026-07 以降（見直し対象）。 |
 
 - `planTier` は UI/サービス/保存API で共通利用する判定キー。請求情報の `plan.displayName` とは別に保持する。
-- 将来的なプラン追加に備えて `account.planTier` と `surveys.plan` の両方で同じキーを採用し、マスタ管理を一元化する。
+- `Premium` プランは 2026-05-18 のサービス展開に向けた主力プラン。
 
 ## 3. 機能カテゴリ別の制限マトリクス
-| 機能カテゴリ | Free | Standard | Premium | Premium+ | UI制御方針 | 保存/API制御方針 |
-| :-- | :-- | :-- | :-- | :-- | :-- | :-- |
-| アンケート設問数 | 20問まで | 200問まで | 500問まで | 1000問まで | 上限超過時に警告→追加ボタン無効化。 | 保存APIで `plan_limits.maxQuestions` を検証。 |
-| 名刺データ化項目 | 固定2項目 | 既定10項目＋追加3 | 既定＋カスタム10 | 制限なし | 選択肢生成時に `allowedFields` でフィルタ。 | 依頼送信時に `allowedFields` を検証。 |
-| 名刺データ化スピード | 通常のみ | 通常/特急 | 通常/特急/超特急 | 全種 (オンデマンド含む) | 非対象プランはカード自体を非表示。 | 申込APIで `speedPlans` 妥当性チェック。 |
-| 多言語アンケート | 利用不可 | 利用不可 | 設問翻訳3言語まで | 5言語＋自動提案オプション | セクション非表示、サイドナビでアップセル。 | `plan_limits.multilingual.maxLocales` を検証。 |
-| 御礼メール | テンプレ固定/100件まで | カスタム本文/500件まで | 自社ドメイン/無制限 | シナリオ自動化/行動トリガー | 設定UIの項目表示をプラン別テンプレで切替。 | 送信ジョブ作成時に `sendQuota` と `domainRestrictions` を評価。 |
-| 集計機能 | 単純ダッシュボードのみ | 基本集計＋CSV | 基本＋クロス集計 | クロス＋リアルタイム指標 | ナビゲーション項目を制御、非対応はグレーダウト。 | 集計APIは `featureFlags.analytics` を確認し非対応時は 403。 |
-| アンケート公開数 | 1件 | 10件 | 50件 | 100件 | 新規作成ボタン活性判定に利用。 | 公開処理時に `limits.activeSurveys` を検証。 |
-| 外部連携 | なし | Slack通知のみ | Slack + CRMエクスポート | Slack/CRM + Webhook + SSO | 設定タブの表示制御。 | 連携API登録時に `integrations` 許可リストを参照。 |
+| 機能カテゴリ | Free | Premium | UI制御方針 (Abroad) | 保存/API制御方針 (Rep) |
+| :-- | :-- | :-- | :-- | :-- |
+| ダウンロード | **回答テキストのみ** | **全データ**（画像・名刺結合含む） | 非対象の選択肢をロック、加入LPへ誘導。 | `downloadOptions` の認可チェック。 |
+| グラフ分析出力 | 閲覧のみ | **Excel一括出力** 可能 | 出力ボタンに鍵アイコン＋ポップアップ。 | エクスポートAPIの権限検証。 |
+| 設問タイプ | 基本12種 | + **手書き / 画像添付** | プレミアム専用設問を「新規」タグで強調。 | 設問定義保存時のプラン検証。 |
+| 名刺データ化 | 通常スピード | **オンデマンド納期** 等 | 納期選択肢を制限。 | 完了予定日計算ロジックの切替。 |
+| 御礼メール | テンプレ/ADドメイン | **自社ドメイン** / 条件付き | 設定画面で認証ステータスを表示。 | DNS認証済みドメインのみ送信許可。 |
+| ロゴ表示 | SPEED ADロゴ表示 | ロゴ非表示設定が可能 | ヘッダー等のロゴ表示切り替え。 | アカウント設定の反映。 |
+| 保存期間 | 30日間 | **無期限** | 期限切れ間近の警告、アーカイブ案内。 | クリーンアップバッチの対象外設定。 |
+| 外部連携 | なし | 順次追加（Slack等） | 連携設定タブを限定表示。 | 外部Webhook/APIの有効化。 |
 
-- UI制御は「非表示＞非活性＋アップセルCTA＞説明付き活性」の順に適用し、期待する誘導を明示する。
-- 保存/API層は `planCapabilityService.hasFeature(accountId, featureKey)` で判定し、UIの制御と同一ロジックを共有する。
+- UI制御（Abroad担当）は「非表示＞非活性＋アップセルCTA＞説明付き活性」の順に適用し、期待する誘導を明示する。
+- 保存/API層（Rep担当）は `planCapabilityService.hasFeature(accountId, featureKey)` で判定し、UIの制御と同一ロジックを共有する。
 
 ## 4. 実装構成
 ### 4.1 データソース構成
@@ -40,20 +39,28 @@
     "maxQuestions": 20,
     "bizcard": {
       "allowedFields": ["email", "fullName"],
-      "speedPlans": ["normal"],
-      "maxCustomFields": 0
+      "speedPlans": ["normal"]
     },
-    "integrations": [],
     "features": {
-      "thankYouEmail": { "mode": "templateOnly", "sendQuota": 100, "domain": "spped-ad" },
-      "analytics": { "crossTab": false, "realtime": false },
-      "multilingual": { "enabled": false, "maxLocales": 0 }
+      "download": { "allowImages": false, "allowCombined": false },
+      "excelExport": false,
+      "logoHidden": false
     },
-    "limits": { "activeSurveys": 1 }
+    "limits": { "activeSurveys": 1, "retentionDays": 30 }
   },
-  "standard": { "maxQuestions": 200, "bizcard": { ... } },
-  "premium": { ... },
-  "premiumPlus": { ... }
+  "premium": {
+    "maxQuestions": 500,
+    "bizcard": {
+      "allowedFields": ["all"],
+      "speedPlans": ["normal", "rush", "express", "on-demand"]
+    },
+    "features": {
+      "download": { "allowImages": true, "allowCombined": true },
+      "excelExport": true,
+      "logoHidden": true
+    },
+    "limits": { "activeSurveys": 50, "retentionDays": -1 }
+  }
 }
 ```
 - JSONでプラン毎の数値・配列・ブール値を管理し、フロントとバックエンドで共用する。
