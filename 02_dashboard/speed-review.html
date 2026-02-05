@@ -101,13 +101,35 @@
                             </div>
                         </div>
                         <div id="kpi-current-question-card"
-                            class="bg-surface border border-outline-variant rounded-xl p-4 shadow-sm md:col-span-2 flex flex-col justify-center transition-colors cursor-pointer hover:bg-surface-variant/50 group">
-                            <div class="flex justify-between items-center mb-1">
-                                <div class="text-sm text-on-surface-variant font-medium">現在選択中の設問</div>
-                                <span class="material-icons text-on-surface-variant group-hover:text-primary transition-colors">arrow_drop_down</span>
+                            class="bg-surface border border-outline-variant rounded-2xl shadow-sm md:col-span-2 flex flex-col justify-center transition-all cursor-pointer hover:ring-2 ring-primary/20 group">
+                            <div class="flex items-stretch h-full">
+                                <!-- 左側：設問選択エリア（クリック領域のメイン） -->
+                                <div class="flex-1 p-5 min-w-0 flex flex-col justify-center">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Active Question</span>
+                                        <div class="h-px flex-1 bg-outline-variant/30"></div>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <!-- 設問アイコン -->
+                                        <div class="w-8 h-8 rounded-lg bg-primary/5 flex items-center justify-center shrink-0">
+                                            <span class="material-icons text-primary text-lg">quiz</span>
+                                        </div>
+                                        <!-- 設問名 -->
+                                        <div class="flex-1 min-w-0 flex items-center gap-2">
+                                            <div id="dashboard-current-question" class="text-lg font-bold text-on-surface truncate">...</div>
+                                            <span class="material-icons text-on-surface-variant group-hover:text-primary transition-colors shrink-0">expand_more</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- 右側：ナビゲーションエリア（セパレーター付き） -->
+                                <div class="shrink-0 flex items-center px-6 border-l border-outline-variant/50 bg-surface-variant/5 rounded-r-2xl">
+                                    <button id="graphButton"
+                                        class="bg-primary text-white hover:bg-primary/90 shadow-md hover:shadow-lg text-xs font-bold py-2.5 px-5 rounded-xl flex items-center gap-2 transition-all hover:scale-105 active:scale-95 border-none">
+                                        <span class="material-icons text-sm">analytics</span>
+                                        <span class="whitespace-nowrap">詳細分析</span>
+                                    </button>
+                                </div>
                             </div>
-                            <div id="dashboard-current-question"
-                                class="text-lg font-bold text-on-surface truncate">...</div>
                         </div>
                     </div>
 
@@ -124,7 +146,7 @@
                                     <button id="ts-axis-fixed-btn" class="px-2 py-0.5 text-[10px] font-bold rounded-sm transition-all text-on-surface-variant hover:text-on-surface" title="9:00-19:00で固定表示">固定</button>
                                 </div>
                             </div>
-                            <div class="relative flex-1 w-full min-h-[160px] h-full">
+                            <div class="relative flex-1 w-full min-h-[180px] h-full">
                                 <canvas id="timeSeriesChart"></canvas>
                             </div>
                         </div>
@@ -135,26 +157,20 @@
                             <div class="flex flex-col md:flex-row gap-4 h-full">
                                 <!-- Attribute Chart -->
                                 <div class="flex-1 w-full md:w-1/2 flex flex-col">
-                                    <h3 class="text-sm font-medium mb-4 text-on-surface-variant">属性内訳 (<span
-                                            id="attribute-chart-title">...</span>)</h3>
-                                    <div class="relative h-40 w-full flex justify-center flex-1">
+                                    <h3 class="text-sm font-medium mb-4 text-on-surface-variant">回答内容の内訳</h3>
+                                    <div class="relative min-h-[180px] w-full flex justify-center flex-1">
                                         <canvas id="attributeChart"></canvas>
                                     </div>
                                 </div>
                                 <!-- Data Table -->
                                 <div
                                     class="flex-1 w-full md:w-1/2 flex flex-col border-t md:border-t-0 md:border-l border-outline-variant/50 pt-4 md:pt-0 md:pl-4 relative">
-                                    <h3 class="text-sm font-medium mb-4 text-on-surface-variant">データ集計</h3>
+                                    <h3 class="text-sm font-medium mb-4 text-on-surface-variant">集計データ</h3>
                                     <div id="graph-data-table-container"
-                                        class="relative h-40 w-full overflow-y-auto custom-scrollbar flex-1 pb-8">
+                                        class="relative h-40 w-full overflow-y-auto custom-scrollbar flex-1">
                                         <!-- Table will be inserted here by JavaScript -->
                                         <p class="text-sm text-on-surface-variant">設問を選択すると、集計データが表示されます。</p>
                                     </div>
-                                    <button id="graphButton"
-                                        class="absolute bottom-0 right-0 justify-center button-primary py-2 px-4 rounded-md font-semibold flex items-center gap-2 shadow-sm transition-transform duration-150 hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40">
-                                        <span class="material-icons text-base">analytics</span>
-                                        <span>詳細分析ページへ</span>
-                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -242,9 +258,12 @@
 
                     <!-- Inner Card Content -->
                     <div
-                        class="overflow-y-auto rounded-3xl border border-outline-variant/60 bg-surface p-6 text-on-surface shadow-sm space-y-6 custom-scrollbar">
+                        class="overflow-y-auto rounded-3xl border border-outline-variant/60 bg-surface/95 p-6 text-on-surface shadow-2xl shadow-primary/5 backdrop-blur-xl space-y-6 custom-scrollbar">
                         <div class="toolbox-card">
-                            <h3>絞り込み</h3>
+                            <div class="flex items-center gap-2 mb-4">
+                                <span class="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Filter Options</span>
+                                <div class="h-px flex-1 bg-outline-variant/30"></div>
+                            </div>
                             
                             <!-- Search Tabs -->
                             <div class="flex p-1 bg-surface-variant rounded-lg mb-6">
@@ -303,11 +322,21 @@
                                     <span
                                         class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl pointer-events-none">schedule</span>
                                 </div>
+                                <div class="input-group">
+                                    <select id="statusFilterSelectDetailed" class="input-field pl-10 pr-3">
+                                        <option value="all">全て表示</option>
+                                        <option value="completed">データ化完了</option>
+                                        <option value="processing">データ化進行中</option>
+                                    </select>
+                                    <label for="statusFilterSelectDetailed" class="input-label">ステータス</label>
+                                    <span
+                                        class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl pointer-events-none">filter_list</span>
+                                </div>
                             </div>
 
                             <div class="space-y-4 pt-6 border-t border-outline-variant/30 mt-6">
                                 <button id="resetFiltersButton"
-                                    class="w-full px-4 py-2 rounded-md font-semibold transition-colors shadow-sm button-secondary"
+                                    class="w-full px-4 py-2 rounded-md font-semibold transition-colors shadow-sm bg-secondary/10 text-secondary hover:bg-secondary/20 border-none"
                                     aria-label="フィルターをリセット">
                                     フィルターをリセット
                                 </button>
