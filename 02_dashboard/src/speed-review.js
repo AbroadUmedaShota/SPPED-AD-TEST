@@ -1904,35 +1904,8 @@ export async function initializePage() {
 
         setupTableEventListeners();
         populateQuestionSelector(allCombinedData);
-
-        // --- Visual Insight 連携: URLパラメータによる初期フィルタリング ---
-        const insightQuestion = urlParams.get('insightQuestion');
-        const insightAnswer = urlParams.get('insightAnswer');
-        if (insightQuestion && insightAnswer) {
-            // 表示設問を切り替え
-            const targetQuestion = currentSurvey.details.find(d => (d.question || d.text) === insightQuestion);
-            if (targetQuestion) {
-                currentIndustryQuestion = targetQuestion.question || targetQuestion.text;
-                if (dynamicHeader) {
-                    dynamicHeader.textContent = truncateQuestion(currentIndustryQuestion);
-                }
-            }
-            // 簡易検索タブを詳細検索（またはキーワード検索の代わり）として利用、あるいはデータセット自体を絞り込む
-            // 今回はシンプルに allCombinedData 自体をこのセグメントで絞り込んで初期表示する
-            const filteredByInsight = allCombinedData.filter(item => {
-                const detail = item.details?.find(d => d.question === insightQuestion);
-                const val = detail?.answer;
-                if (Array.isArray(val)) return val.includes(insightAnswer);
-                return val === insightAnswer;
-            });
-            displayPage(1, filteredByInsight);
-            renderDashboard(filteredByInsight);
-            showToast(`「${insightAnswer}」の回答で絞り込みました`, 'info');
-        } else {
-            displayPage(1, allCombinedData);
-            renderDashboard(allCombinedData);
-        }
-
+        displayPage(1, allCombinedData);
+        renderDashboard(allCombinedData);
         setupEventListeners();
         setupSidebarToggle();
         updateSortIcons();
