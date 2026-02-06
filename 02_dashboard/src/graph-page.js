@@ -1,5 +1,5 @@
 import { initBreadcrumbs } from './breadcrumb.js';
-import { resolveDemoDataPath, showToast } from './utils.js';
+import { resolveDashboardAssetPath, resolveDemoDataPath, showToast } from './utils.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     initGraphPage();
@@ -8,13 +8,15 @@ document.addEventListener('DOMContentLoaded', () => {
 // --- Global State ---
 const chartInstances = {};
 const chartDataStore = new Map();
-let originalAnswers = [];
+let allAnswers = [];
 let currentSurvey = null;
 let startDatePicker = null;
 let endDatePicker = null;
 let currentDateFilter = null;
 let chartSequence = 0;
 let isExporting = false; // 書き出し中フラグ
+let activeVisualInsightSelection = null;
+let visualInsightItems = [];
 
 // 表示オプションの状態管理
 const displayOptions = {
@@ -40,6 +42,7 @@ const BLANK_TYPES = new Set([
     'handwriting',
     'explanation'
 ]);
+const IMAGE_DETAIL_TYPES = new Set(['image', 'handwriting']);
 
 /**
  * Initializes the graph page.
@@ -58,6 +61,7 @@ async function initGraphPage() {
     });
 
     setupFilterEventListeners();
+    setupVisualInsightEventListeners();
     await loadAndRenderCharts(surveyId);
 }
 
@@ -164,17 +168,18 @@ function handleResetFilters() {
  * Triggers a chart update based on the current date filter.
  */
 function triggerChartUpdate() {
-    let answersToProcess = originalAnswers;
+    let answersToProcess = allAnswers;
 
     if (currentDateFilter && currentDateFilter.length === 2) {
         const [startDate, endDate] = currentDateFilter;
-        answersToProcess = originalAnswers.filter(answer => {
+        answersToProcess = allAnswers.filter(answer => {
             if (!answer.answeredAt) return false;
             const itemDate = new Date(answer.answeredAt);
             return itemDate >= startDate && itemDate <= endDate;
         });
     }
-    
+
+    closeVisualInsightDrawer();
     const chartData = processDataForCharts(currentSurvey, answersToProcess);
     renderCharts(chartData);
 }
@@ -190,12 +195,16 @@ async function loadAndRenderCharts(surveyId) {
             throw new Error("アンケートIDが指定されていません。");
         }
 
-        const [surveyDefinition, answers] = await Promise.all([
+        const [surveyDefinition, answers, personalInfo] = await Promise.all([
             fetch(resolveDemoDataPath(`surveys/${surveyId}.json`)).then(res => {
                 if (!res.ok) throw new Error(`アンケート定義ファイルが見つかりません: ${surveyId}.json`);
                 return res.json();
             }),
             fetch(resolveDemoDataPath(`answers/${surveyId}.json`)).then(res => {
+                if (!res.ok) return [];
+                return res.json();
+            }),
+            fetch(resolveDemoDataPath(`business-cards/${surveyId}.json`)).then(res => {
                 if (!res.ok) return [];
                 return res.json();
             })
@@ -206,11 +215,18 @@ async function loadAndRenderCharts(surveyId) {
             throw new Error(`アンケートID「${surveyId}」の定義が見つかりません。`);
         }
         
-        originalAnswers = answers;
+        const personalInfoMap = new Map(
+            (Array.isArray(personalInfo) ? personalInfo : []).map(info => [info.answerId, info.businessCard])
+        );
+        allAnswers = (Array.isArray(answers) ? answers : []).map(answer => ({
+            ...answer,
+            businessCard: personalInfoMap.get(answer.answerId) || answer.businessCard || null
+        }));
 
         document.getElementById('survey-title').textContent = `グラフ分析: ${currentSurvey.name.ja}`;
-        
-        const chartData = processDataForCharts(currentSurvey, originalAnswers);
+
+        closeVisualInsightDrawer();
+        const chartData = processDataForCharts(currentSurvey, allAnswers);
         renderCharts(chartData);
 
     } catch (error) {
@@ -252,6 +268,9 @@ function processDataForCharts(survey, answers) {
             charts.push(buildChartData({
                 questionId,
                 questionText: question.text,
+                sourceQuestionText: question.text,
+                sourceQuestionType: question.type,
+                sourceQuestionId: questionId,
                 chartType: 'pie',
                 summaryType: 'table',
                 includeTotalRow: true,
@@ -266,6 +285,9 @@ function processDataForCharts(survey, answers) {
             charts.push(buildChartData({
                 questionId,
                 questionText: question.text,
+                sourceQuestionText: question.text,
+                sourceQuestionType: question.type,
+                sourceQuestionId: questionId,
                 chartType: 'bar',
                 summaryType: 'table',
                 includeTotalRow: false,
@@ -457,7 +479,12 @@ function createChart(chartId, chartData, type) {
             fontFamily: "'Noto Sans JP', sans-serif",
             toolbar: { show: false },
             animations: { enabled: true, easing: 'easeinout', speed: 800 },
-            padding: { top: 10, right: 10, bottom: 10, left: 10 }
+            padding: { top: 10, right: 10, bottom: 10, left: 10 },
+            events: {
+                dataPointSelection: (event, chartContext, config) => {
+                    handleChartDataPointSelection(chartId, chartData, config);
+                }
+            }
         },
         colors: colors,
         labels: chartData.labels,
@@ -940,7 +967,7 @@ function getBlankReason(type) {
 
 function normalizeQuestionText(text) {
     if (!text) return '';
-    return String(text).toLowerCase().replace(/^[\\s　]*q[0-9０-９]+[._、:：\\s-]*/i, '').replace(/\\s+/g, '');
+    return String(text).toLowerCase().replace(/^[\s　]*q[0-9０-９]+[._、:：\s-]*/i, '').replace(/\s+/g, '');
 }
 
 function findAnswerDetail(answer, question) {
@@ -958,6 +985,16 @@ function normalizeChoiceOptions(options = [], type = '') {
     const numericValues = [];
     const labels = [];
     const map = new Map();
+    const labelLookup = new Map();
+    const registerLookup = (label, rawValue) => {
+        if (!label || rawValue === undefined || rawValue === null || rawValue === '') return;
+        const key = String(label);
+        const raw = String(rawValue);
+        if (!labelLookup.has(key)) {
+            labelLookup.set(key, new Set());
+        }
+        labelLookup.get(key).add(raw);
+    };
     options.forEach((opt, index) => {
         if (opt && typeof opt === 'object') {
             const value = opt.value ?? opt.id ?? opt.text ?? `option_${index + 1}`;
@@ -967,12 +1004,15 @@ function normalizeChoiceOptions(options = [], type = '') {
             labels.push(label);
             map.set(String(value), label);
             map.set(String(text), label);
+            registerLookup(label, value);
+            registerLookup(label, text);
         } else if (opt !== undefined && opt !== null) {
             const text = String(opt);
             const label = isRating ? formatRatingLabel(opt, options.length) : text;
             if (isRating && !Number.isNaN(Number(opt))) numericValues.push(Number(opt));
             labels.push(label);
             map.set(text, label);
+            registerLookup(label, text);
         }
     });
     if (isRating && numericValues.length > 0) {
@@ -984,9 +1024,10 @@ function normalizeChoiceOptions(options = [], type = '') {
             const rebuilt = formatRatingLabel(rawValue, maxStars);
             labels[index] = rebuilt;
             map.set(String(rawValue), rebuilt);
+            registerLookup(rebuilt, rawValue);
         });
     }
-    return { labels, map };
+    return { labels, map, labelLookup };
 }
 
 function resolveOptionLabel(value, optionsInfo) {
@@ -1030,7 +1071,10 @@ function buildChoiceSummary(question, answers, isMulti) {
     return {
         labels: entries.map(entry => entry.label),
         data: entries.map(entry => entry.count),
-        totalAnswers: answeredCount
+        totalAnswers: answeredCount,
+        segmentLookup: Object.fromEntries(
+            entries.map(entry => [entry.label, Array.from(optionsInfo.labelLookup.get(entry.label) || [entry.label])])
+        )
     };
 }
 
@@ -1120,6 +1164,7 @@ function buildMatrixCharts(question, questionId, answers, isMulti) {
             });
         });
         const labels = columns.map(col => col.text);
+        const segmentLookup = Object.fromEntries(columns.map(col => [col.text, [col.text, col.value]]));
         const data = labels.map(label => counts[label] || 0);
         let sortedLabels = labels;
         let sortedData = data;
@@ -1148,7 +1193,13 @@ function buildMatrixCharts(question, questionId, answers, isMulti) {
             allowToggle: false,
             labels: sortedLabels,
             data: sortedData,
-            totalAnswers: answeredCount
+            totalAnswers: answeredCount,
+            segmentLookup,
+            sourceQuestionText: question.text,
+            sourceQuestionType: question.type,
+            sourceQuestionId: questionId,
+            matrixRowId: row.id,
+            matrixRowText: row.text
         });
     });
 }
@@ -1165,6 +1216,7 @@ function buildChartData(data) {
         matrixTotal: data.matrixTotal || 0,
         matrixParentText: data.matrixParentText || '',
         matrixRowText: data.matrixRowText || '',
+        matrixRowId: data.matrixRowId || '',
         labels: data.labels || [],
         data: data.data || [],
         totalAnswers: data.totalAnswers || 0,
@@ -1175,7 +1227,11 @@ function buildChartData(data) {
         blankMessage: data.blankMessage || '',
         blankReason: data.blankReason || '',
         listItems: data.listItems || [],
-        listAll: data.listAll || []
+        listAll: data.listAll || [],
+        segmentLookup: data.segmentLookup || {},
+        sourceQuestionText: data.sourceQuestionText || data.questionText || '',
+        sourceQuestionType: data.sourceQuestionType || '',
+        sourceQuestionId: data.sourceQuestionId || data.questionId || ''
     };
 }
 
@@ -1199,6 +1255,9 @@ function buildListChart(question, questionId, answers, fallbackReason = '') {
     return buildChartData({
         questionId,
         questionText: question.text,
+        sourceQuestionText: question.text,
+        sourceQuestionType: question.type,
+        sourceQuestionId: questionId,
         chartType: 'list',
         summaryType: 'table',
         includeTotalRow: false,
@@ -1328,6 +1387,293 @@ function formatAnsweredAt(dateValue) {
     const hour = String(dateValue.getHours()).padStart(2, '0');
     const minute = String(dateValue.getMinutes()).padStart(2, '0');
     return `${month}/${day} ${hour}:${minute}`;
+}
+
+function setupVisualInsightEventListeners() {
+    const overlay = document.getElementById('visual-insight-overlay');
+    const drawerClose = document.getElementById('visual-insight-close');
+    const list = document.getElementById('visual-insight-list');
+    const preview = document.getElementById('visual-insight-image-preview');
+    const previewClose = document.getElementById('visual-insight-image-preview-close');
+    const upsell = document.getElementById('visual-insight-upsell');
+    const upsellClose = document.getElementById('visual-insight-upsell-close');
+    const openReviewButton = document.getElementById('open-speed-review-by-condition');
+
+    if (overlay) {
+        overlay.addEventListener('click', () => closeVisualInsightDrawer());
+    }
+    if (drawerClose) {
+        drawerClose.addEventListener('click', () => closeVisualInsightDrawer());
+    }
+    if (list) {
+        list.addEventListener('click', (event) => {
+            const thumbButton = event.target.closest('[data-visual-src]');
+            if (!thumbButton) return;
+            const src = thumbButton.getAttribute('data-visual-src');
+            if (!src) return;
+            openVisualInsightImagePreview(src);
+        });
+    }
+    if (previewClose) {
+        previewClose.addEventListener('click', closeVisualInsightImagePreview);
+    }
+    if (preview) {
+        preview.addEventListener('click', (event) => {
+            if (event.target === preview) {
+                closeVisualInsightImagePreview();
+            }
+        });
+    }
+    if (upsellClose) {
+        upsellClose.addEventListener('click', closeVisualInsightUpsell);
+    }
+    if (upsell) {
+        upsell.addEventListener('click', (event) => {
+            if (event.target === upsell) {
+                closeVisualInsightUpsell();
+            }
+        });
+    }
+    if (openReviewButton) {
+        openReviewButton.addEventListener('click', () => {
+            if (!activeVisualInsightSelection) return;
+            const url = new URL(resolveDashboardAssetPath('speed-review.html'), window.location.href);
+            if (currentSurvey?.id) {
+                url.searchParams.set('surveyId', currentSurvey.id);
+            }
+            url.searchParams.set('insightQuestion', activeVisualInsightSelection.questionText);
+            url.searchParams.set('insightAnswer', activeVisualInsightSelection.label);
+            window.location.href = url.toString();
+        });
+    }
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape') return;
+        closeVisualInsightImagePreview();
+        closeVisualInsightUpsell();
+        closeVisualInsightDrawer();
+    });
+}
+
+function handleChartDataPointSelection(chartId, chartData, config) {
+    const index = Number(config?.dataPointIndex);
+    if (Number.isNaN(index) || index < 0) return;
+
+    const label = chartData.labels[index];
+    if (!label) return;
+
+    if (!isVisualInsightAvailable()) {
+        showVisualInsightUpsell();
+        return;
+    }
+
+    if (
+        activeVisualInsightSelection &&
+        activeVisualInsightSelection.chartId === chartId &&
+        activeVisualInsightSelection.dataPointIndex === index
+    ) {
+        closeVisualInsightDrawer();
+        return;
+    }
+
+    const items = extractVisualInsightItems(chartData, label);
+    activeVisualInsightSelection = {
+        chartId,
+        dataPointIndex: index,
+        label,
+        questionText: chartData.sourceQuestionText || chartData.questionText
+    };
+    visualInsightItems = items;
+    renderVisualInsightDrawer(chartData, label, items);
+    openVisualInsightDrawer();
+}
+
+function isVisualInsightAvailable() {
+    return String(currentSurvey?.plan || '').toLowerCase() === 'premium';
+}
+
+function showVisualInsightUpsell() {
+    const upsell = document.getElementById('visual-insight-upsell');
+    if (!upsell) {
+        showToast('画像閲覧はプレミアム機能です。', 'info');
+        return;
+    }
+    upsell.classList.add('is-open');
+    upsell.setAttribute('aria-hidden', 'false');
+}
+
+function closeVisualInsightUpsell() {
+    const upsell = document.getElementById('visual-insight-upsell');
+    if (!upsell) return;
+    upsell.classList.remove('is-open');
+    upsell.setAttribute('aria-hidden', 'true');
+}
+
+function openVisualInsightDrawer() {
+    const overlay = document.getElementById('visual-insight-overlay');
+    const drawer = document.getElementById('visual-insight-drawer');
+    if (!overlay || !drawer) return;
+    overlay.classList.add('is-open');
+    drawer.classList.add('is-open');
+    overlay.setAttribute('aria-hidden', 'false');
+    drawer.setAttribute('aria-hidden', 'false');
+}
+
+function closeVisualInsightDrawer() {
+    const overlay = document.getElementById('visual-insight-overlay');
+    const drawer = document.getElementById('visual-insight-drawer');
+    if (overlay) {
+        overlay.classList.remove('is-open');
+        overlay.setAttribute('aria-hidden', 'true');
+    }
+    if (drawer) {
+        drawer.classList.remove('is-open');
+        drawer.setAttribute('aria-hidden', 'true');
+    }
+    activeVisualInsightSelection = null;
+    visualInsightItems = [];
+}
+
+function renderVisualInsightDrawer(chartData, label, items) {
+    const condition = document.getElementById('visual-insight-condition');
+    const count = document.getElementById('visual-insight-count');
+    const list = document.getElementById('visual-insight-list');
+    const empty = document.getElementById('visual-insight-empty');
+    if (!condition || !count || !list || !empty) return;
+
+    const questionLabel = chartData.sourceQuestionText || chartData.questionText;
+    condition.textContent = `${questionLabel}：${label}`;
+    count.textContent = `${items.length}件`;
+
+    if (items.length === 0) {
+        list.innerHTML = '';
+        empty.classList.remove('hidden');
+        return;
+    }
+
+    empty.classList.add('hidden');
+    list.innerHTML = items.map(item => `
+        <article class="visual-insight-card">
+            <button type="button" class="visual-insight-thumb" data-visual-src="${escapeHtml(item.src)}">
+                <img src="${escapeHtml(item.src)}" alt="${escapeHtml(item.typeLabel)}">
+            </button>
+            <div class="visual-insight-card-meta">
+                <p class="visual-insight-card-type">${escapeHtml(item.typeLabel)}</p>
+                <p class="visual-insight-card-info">回答日時: ${escapeHtml(item.answeredAtLabel)}</p>
+                <p class="visual-insight-card-info">会社名: ${escapeHtml(item.companyName)}</p>
+            </div>
+        </article>
+    `).join('');
+}
+
+function extractVisualInsightItems(chartData, label) {
+    const question = findSurveyQuestionByText(chartData.sourceQuestionText || chartData.questionText);
+    if (!question) return [];
+
+    const filteredAnswers = getCurrentScopedAnswers();
+    const items = [];
+
+    filteredAnswers.forEach(answer => {
+        const targetDetail = findAnswerDetail(answer, question);
+        if (!targetDetail) return;
+        if (!doesAnswerMatchSegment(targetDetail.answer, label, chartData)) return;
+
+        const companyName = answer.businessCard?.group3?.companyName || '未登録';
+        const answeredAtDate = answer.answeredAt ? new Date(answer.answeredAt) : null;
+        const answeredAtLabel = formatAnsweredAt(answeredAtDate);
+
+        (answer.details || []).forEach(detail => {
+            if (!detail || !IMAGE_DETAIL_TYPES.has(detail.type)) return;
+            const src = typeof detail.answer === 'string' ? detail.answer.trim() : '';
+            if (!src) return;
+            items.push({
+                src,
+                typeLabel: detail.type === 'handwriting' ? '手書き署名' : '画像',
+                companyName,
+                answeredAtLabel,
+                answeredAt: answeredAtDate
+            });
+        });
+    });
+
+    items.sort((a, b) => {
+        const aTime = a.answeredAt && !Number.isNaN(a.answeredAt.getTime()) ? a.answeredAt.getTime() : 0;
+        const bTime = b.answeredAt && !Number.isNaN(b.answeredAt.getTime()) ? b.answeredAt.getTime() : 0;
+        return bTime - aTime;
+    });
+    return items;
+}
+
+function getCurrentScopedAnswers() {
+    if (!currentDateFilter || currentDateFilter.length !== 2) {
+        return allAnswers;
+    }
+    const [startDate, endDate] = currentDateFilter;
+    return allAnswers.filter(answer => {
+        if (!answer.answeredAt) return false;
+        const itemDate = new Date(answer.answeredAt);
+        return itemDate >= startDate && itemDate <= endDate;
+    });
+}
+
+function findSurveyQuestionByText(questionText) {
+    if (!currentSurvey || !Array.isArray(currentSurvey.details)) return null;
+    const normalizedTarget = normalizeQuestionText(questionText);
+    return currentSurvey.details.find(question => {
+        const text = question?.text || question?.question || '';
+        if (text === questionText) return true;
+        return normalizeQuestionText(text) === normalizedTarget;
+    }) || null;
+}
+
+function doesAnswerMatchSegment(answerValue, label, chartData) {
+    const allowedRawValues = new Set((chartData.segmentLookup?.[label] || [label]).map(value => String(value)));
+
+    if (chartData.isMatrix) {
+        const row = {
+            id: chartData.matrixRowId || chartData.matrixRowText,
+            text: chartData.matrixRowText
+        };
+        const rowSelections = extractMatrixRowResponses(answerValue, row);
+        return rowSelections.some(selection => {
+            const normalized = normalizeAnswerSelection(selection);
+            return normalized !== null && allowedRawValues.has(normalized);
+        });
+    }
+
+    const selections = Array.isArray(answerValue) ? answerValue : [answerValue];
+    return selections.some(selection => {
+        const normalized = normalizeAnswerSelection(selection);
+        return normalized !== null && allowedRawValues.has(normalized);
+    });
+}
+
+function normalizeAnswerSelection(selection) {
+    if (selection === undefined || selection === null || selection === '') return null;
+    if (typeof selection === 'object') {
+        const raw = selection.value ?? selection.id ?? selection.label ?? selection.text;
+        if (raw === undefined || raw === null || raw === '') return null;
+        return String(raw);
+    }
+    return String(selection);
+}
+
+function openVisualInsightImagePreview(src) {
+    const preview = document.getElementById('visual-insight-image-preview');
+    const previewImage = document.getElementById('visual-insight-image-preview-img');
+    if (!preview || !previewImage) return;
+    previewImage.src = src;
+    preview.classList.add('is-open');
+    preview.setAttribute('aria-hidden', 'false');
+}
+
+function closeVisualInsightImagePreview() {
+    const preview = document.getElementById('visual-insight-image-preview');
+    const previewImage = document.getElementById('visual-insight-image-preview-img');
+    if (!preview || !previewImage) return;
+    preview.classList.remove('is-open');
+    preview.setAttribute('aria-hidden', 'true');
+    previewImage.src = '';
 }
 
 function formatRatingLabel(value, maxStars = 5) {
