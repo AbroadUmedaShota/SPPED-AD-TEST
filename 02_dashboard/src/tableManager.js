@@ -632,7 +632,7 @@ export function applyFiltersAndPagination() {
             const matchesKeyword = keyword === '' || surveyName.includes(keyword) || survey.id.toLowerCase().includes(keyword);
             const matchesStatus = status === 'all' || displayStatus === status;
             const matchesGroup = currentGroupId === 'personal'
-                ? !survey.groupId
+                ? (!survey.groupId || survey.groupId === 'personal')
                 : (currentGroupId === null || survey.groupId === currentGroupId); // グループIDによるフィルタリング
 
             const matchesPeriod =

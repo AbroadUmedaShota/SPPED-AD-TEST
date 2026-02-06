@@ -211,12 +211,6 @@ async function populateGroupSelect() {
     userSelect.innerHTML = ''; // Clear existing options
 
     try {
-        // Add Personal Account option first
-        const personalOption = document.createElement('option');
-        personalOption.value = 'personal';
-        personalOption.textContent = '個人アカウント';
-        userSelect.appendChild(personalOption);
-
         groupsCache = await fetchGroups();
 
         if (Array.isArray(groupsCache) && groupsCache.length > 0) {
@@ -229,11 +223,13 @@ async function populateGroupSelect() {
         }
 
         const storedGroupId = getStoredGroupId();
-        const initialGroupId = storedGroupId || 'personal';
-        userSelect.value = initialGroupId;
+        // If no stored ID, default to the first group in the list (which should be personal)
+        const initialGroupId = storedGroupId || (groupsCache.length > 0 ? groupsCache[0].id : null);
         
-        // Run initial UI update based on the selected group
-        handleGroupChange(initialGroupId);
+        if (initialGroupId) {
+            userSelect.value = initialGroupId;
+            handleGroupChange(initialGroupId);
+        }
 
     } catch (error) {
         console.error('Failed to fetch groups for sidebar:', error);
@@ -304,7 +300,14 @@ function attachEventListeners() {
         userSelect.addEventListener('change', () => {
             const selectedGroupId = userSelect.value;
             handleGroupChange(selectedGroupId);
-            showToast('グループを切り替えました。', 'info');
+            
+            // Redirect to index.html if not already there
+            const currentPageId = document.body.dataset.pageId;
+            if (currentPageId !== 'survey-list') {
+                window.location.href = 'index.html';
+            } else {
+                showToast('グループを切り替えました。', 'info');
+            }
         });
         isUserSelectBound = true;
     }

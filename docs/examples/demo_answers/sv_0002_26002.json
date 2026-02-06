@@ -1,0 +1,602 @@
+[
+  {
+    "answerId": "ans-sv_0002_26002-0001",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-05 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "製造",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0002",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-16 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "製造",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0003",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-05 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "製造",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0004",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-08 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "製造",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0005",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-14 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "IT",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0006",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-17 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "IT",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0007",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-10 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "IT",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0008",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-15 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "IT",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0009",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-11 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "IT",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0010",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-13 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "IT",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0011",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-09 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "製造",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0012",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-05 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "IT",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0013",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-10 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "製造",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0014",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-14 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "IT",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0015",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-12 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "製造",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0016",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-12 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "製造",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0017",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-14 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "製造",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0018",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-07 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "製造",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0019",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-08 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "製造",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0020",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-06 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "製造",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0021",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-17 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "IT",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0022",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-04 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "IT",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0023",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-17 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "IT",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0024",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-09 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "IT",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0025",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-11 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "IT",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0026",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-14 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "製造",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0027",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-09 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "IT",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0028",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-15 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "製造",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0029",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-08 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "製造",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0030",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-11 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "製造",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0031",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-05 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "IT",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0032",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-07 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "製造",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0033",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-04 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "IT",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0034",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-12 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "IT",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0035",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-05 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "製造",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0036",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-11 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "IT",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0037",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-15 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "製造",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0038",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-17 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "IT",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0039",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-05 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "製造",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0040",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-16 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "IT",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0041",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-13 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "製造",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0042",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-06 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "製造",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0043",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-17 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "IT",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0044",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-15 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "IT",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0045",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-09 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "製造",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0046",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-15 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "製造",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0047",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-08 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "製造",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0048",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-10 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "IT",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0049",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-09 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "製造",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0002_26002-0050",
+    "surveyId": "sv_0002_26002",
+    "answeredAt": "2026-01-16 12:00:00",
+    "details": [
+      {
+        "question": "業種",
+        "answer": "製造",
+        "type": "single_choice"
+      }
+    ]
+  }
+]

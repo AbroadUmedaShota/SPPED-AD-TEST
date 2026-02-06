@@ -1,0 +1,25 @@
+{
+  "id": "sv_my_industry",
+  "groupId": "personal",
+  "name": {
+    "ja": "医療向け undefined",
+    "en": "INDUSTRY Survey"
+  },
+  "status": "会期中",
+  "answerCount": 60,
+  "periodStart": "2026-01-04",
+  "periodEnd": "2026-01-17",
+  "plan": "Free",
+  "details": [
+    {
+      "id": "Q1",
+      "text": "来院目的",
+      "type": "single_choice",
+      "options": [
+        "検査",
+        "薬のみ",
+        "相談"
+      ]
+    }
+  ]
+}

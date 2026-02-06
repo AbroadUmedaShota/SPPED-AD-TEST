@@ -1,0 +1,37 @@
+{
+  "id": "sv_my_csat",
+  "groupId": "personal",
+  "name": {
+    "ja": "製品満足度調査 undefined",
+    "en": "CSAT Survey"
+  },
+  "status": "会期中",
+  "answerCount": 50,
+  "periodStart": "2026-01-04",
+  "periodEnd": "2026-01-17",
+  "plan": "Free",
+  "details": [
+    {
+      "id": "Q1",
+      "text": "満足度",
+      "type": "matrix_sa",
+      "rows": [
+        "機能性",
+        "デザイン",
+        "価格",
+        "サポート"
+      ],
+      "options": [
+        "非常に良い",
+        "良い",
+        "普通",
+        "悪い"
+      ]
+    },
+    {
+      "id": "Q2",
+      "text": "改善要望",
+      "type": "free_text"
+    }
+  ]
+}

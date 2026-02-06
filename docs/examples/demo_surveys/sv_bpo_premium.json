@@ -1,0 +1,25 @@
+{
+  "id": "sv_bpo_premium",
+  "groupId": "group_bpo",
+  "name": {
+    "ja": "現場点検ログ undefined",
+    "en": "PREMIUM Survey"
+  },
+  "status": "会期中",
+  "answerCount": 50,
+  "periodStart": "2026-01-04",
+  "periodEnd": "2026-01-17",
+  "plan": "Premium",
+  "details": [
+    {
+      "id": "Q1",
+      "text": "現場写真",
+      "type": "image"
+    },
+    {
+      "id": "Q2",
+      "text": "作業者サイン",
+      "type": "handwriting"
+    }
+  ]
+}

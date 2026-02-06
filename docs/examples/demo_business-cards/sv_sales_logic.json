@@ -1,0 +1,482 @@
+[
+  {
+    "answerId": "ans-sv_sales_logic-0001",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト1"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0002",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト2"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0003",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト3"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0004",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト4"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0005",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト5"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0006",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト6"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0007",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト7"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0008",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト8"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0009",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト9"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0010",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト10"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0011",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト11"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0012",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト12"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0013",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト13"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0014",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト14"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0015",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト15"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0016",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト16"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0017",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト17"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0018",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト18"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0019",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト19"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0020",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト20"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0021",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト21"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0022",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト22"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0023",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト23"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0024",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト24"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0025",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト25"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0026",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト26"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0027",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト27"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0028",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト28"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0029",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト29"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0030",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト30"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0031",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト31"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0032",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト32"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0033",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト33"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0034",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト34"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0035",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト35"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0036",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト36"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0037",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト37"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0038",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト38"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0039",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト39"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_sales_logic-0040",
+    "businessCard": {
+      "group2": {
+        "lastName": "営業部",
+        "firstName": "テスト40"
+      },
+      "group3": {
+        "companyName": "営業ターゲット(株)"
+      }
+    }
+  }
+]

@@ -1,30 +1,26 @@
 [
   {
-    "id": "GROUP001",
+    "id": "personal",
+    "accountId": "ACC-001",
+    "name": "個人アカウント",
+    "billing": { "type": "creator", "creatorId": "user1@example.com" }
+  },
+  {
+    "id": "group_sales",
+    "accountId": "ACC-002",
+    "name": "営業部 (組織)",
+    "billing": { "type": "group", "corporateName": "株式会社SPEED 営業部" }
+  },
+  {
+    "id": "group_marketing",
     "accountId": "ACC-003",
-    "name": "営業部",
-    "billing": {
-      "type": "creator",
-      "creatorId": "user3@example.com"
-    }
+    "name": "マーケティング部 (組織)",
+    "billing": { "type": "group", "corporateName": "株式会社SPEED マーケティング部" }
   },
   {
-    "id": "GROUP002",
+    "id": "group_bpo",
     "accountId": "ACC-004",
-    "name": "マーケティング部",
-    "billing": {
-      "type": "group",
-      "corporateName": "マーケティング部 請求先",
-      "contactPerson": "鈴木 三郎 様"
-    }
-  },
-  {
-    "id": "GROUP003",
-    "accountId": "ACC-008",
-    "name": "BPO部",
-    "billing": {
-      "type": "creator",
-      "creatorId": "user5@example.com"
-    }
+    "name": "BPO部 (組織)",
+    "billing": { "type": "group", "corporateName": "株式会社SPEED BPO部" }
   }
 ]

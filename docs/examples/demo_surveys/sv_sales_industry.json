@@ -1,0 +1,25 @@
+{
+  "id": "sv_sales_industry",
+  "groupId": "group_sales",
+  "name": {
+    "ja": "飲食向け undefined",
+    "en": "INDUSTRY Survey"
+  },
+  "status": "会期中",
+  "answerCount": 60,
+  "periodStart": "2026-01-04",
+  "periodEnd": "2026-01-17",
+  "plan": "Free",
+  "details": [
+    {
+      "id": "Q1",
+      "text": "注文内容",
+      "type": "single_choice",
+      "options": [
+        "ランチ",
+        "ディナー",
+        "テイクアウト"
+      ]
+    }
+  ]
+}

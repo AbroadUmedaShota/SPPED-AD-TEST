@@ -1,0 +1,20 @@
+{
+  "id": "sv_sales_global",
+  "groupId": "group_sales",
+  "name": {
+    "ja": "グローバル意識調査 undefined",
+    "en": "GLOBAL Survey"
+  },
+  "status": "会期中",
+  "answerCount": 50,
+  "periodStart": "2026-01-04",
+  "periodEnd": "2026-01-17",
+  "plan": "Free",
+  "details": [
+    {
+      "id": "Q1",
+      "text": "基本質問",
+      "type": "text"
+    }
+  ]
+}
