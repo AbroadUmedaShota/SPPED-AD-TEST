@@ -1,0 +1,20 @@
+{
+  "id": "sv_0002_26007",
+  "groupId": "group_sales",
+  "name": {
+    "ja": "大量データ負荷検証 (営業部)",
+    "en": "大量データ負荷検証 - group_sales"
+  },
+  "status": "会期中",
+  "answerCount": 1200,
+  "periodStart": "2026-01-04",
+  "periodEnd": "2026-01-17",
+  "plan": "Free",
+  "details": [
+    {
+      "id": "Q1",
+      "text": "質問1",
+      "type": "text"
+    }
+  ]
+}

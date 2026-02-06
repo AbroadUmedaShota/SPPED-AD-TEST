@@ -1,0 +1,722 @@
+[
+  {
+    "answerId": "ans-sv_marketing_industry-0001",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-04 17:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "普通",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0002",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-06 14:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "不満",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0003",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-03 15:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "普通",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0004",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-02 13:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "不満",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0005",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-06 14:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "普通",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0006",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-01-29 12:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "普通",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0007",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-06 17:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "不満",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0008",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-06 15:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "不満",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0009",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-03 14:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "満足",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0010",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-01-29 15:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "不満",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0011",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-01-31 11:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "満足",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0012",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-01-28 15:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "普通",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0013",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-02 15:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "不満",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0014",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-01-31 16:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "不満",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0015",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-06 09:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "満足",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0016",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-05 15:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "不満",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0017",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-01-31 14:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "普通",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0018",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-04 13:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "普通",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0019",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-01 13:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "不満",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0020",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-01-28 14:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "満足",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0021",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-01-30 10:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "満足",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0022",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-04 17:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "不満",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0023",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-04 11:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "満足",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0024",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-01 11:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "普通",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0025",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-01-29 09:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "満足",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0026",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-01-29 13:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "不満",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0027",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-01-31 11:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "不満",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0028",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-01 09:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "普通",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0029",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-03 12:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "満足",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0030",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-04 10:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "満足",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0031",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-01-28 15:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "普通",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0032",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-01 13:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "不満",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0033",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-01-28 16:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "普通",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0034",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-01 10:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "不満",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0035",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-01-28 15:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "普通",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0036",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-01-31 10:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "普通",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0037",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-04 13:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "不満",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0038",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-01-31 10:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "満足",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0039",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-03 13:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "不満",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0040",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-03 09:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "満足",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0041",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-03 17:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "不満",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0042",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-04 12:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "普通",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0043",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-01 17:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "不満",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0044",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-06 10:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "満足",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0045",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-04 09:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "不満",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0046",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-03 12:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "普通",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0047",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-03 13:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "不満",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0048",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-01-31 12:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "普通",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0049",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-02 14:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "普通",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0050",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-01-30 13:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "普通",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0051",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-03 12:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "普通",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0052",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-06 09:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "不満",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0053",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-01-30 17:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "普通",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0054",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-01-29 17:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "普通",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0055",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-01-31 12:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "満足",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0056",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-03 10:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "普通",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0057",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-02 09:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "普通",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0058",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-05 17:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "満足",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0059",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-02-01 14:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "普通",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_marketing_industry-0060",
+    "surveyId": "sv_marketing_industry",
+    "answeredAt": "2026-01-30 14:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": "満足",
+        "type": "single_choice"
+      }
+    ]
+  }
+]

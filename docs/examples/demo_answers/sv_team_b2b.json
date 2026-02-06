@@ -1,0 +1,1002 @@
+[
+  {
+    "answerId": "ans-sv_team_b2b-001",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-06 12:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "IT",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品A",
+          "製品B"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-002",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-09 13:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "サービス",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品A",
+          "製品B"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-003",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-11 15:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "小売",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品A",
+          "製品B"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-004",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-05 14:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "金融",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品A",
+          "製品B"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-005",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-14 12:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "小売",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品C",
+          "製品A"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-006",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-17 14:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "小売",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品C",
+          "製品B"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-007",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-06 16:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "製造業",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品B",
+          "製品A"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-008",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-06 10:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "製造業",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品B",
+          "製品A"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-009",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-11 14:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "金融",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品B",
+          "製品C"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-010",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-08 14:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "製造業",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品A",
+          "製品B"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-011",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-09 11:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "小売",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品C",
+          "製品B"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-012",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-05 17:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "IT",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品A",
+          "製品C"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-013",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-16 10:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "金融",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品C",
+          "製品B"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-014",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-16 11:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "小売",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品B",
+          "製品A"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-015",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-05 10:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "サービス",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品A",
+          "製品B"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-016",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-11 10:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "IT",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品A",
+          "製品B"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-017",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-04 14:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "製造業",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品C",
+          "製品B"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-018",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-10 13:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "小売",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品B",
+          "製品A"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-019",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-10 14:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "IT",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品C",
+          "製品B"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-020",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-05 13:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "金融",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品B",
+          "製品A"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-021",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-10 15:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "金融",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品C",
+          "製品B"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-022",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-16 15:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "サービス",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品B",
+          "製品A"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-023",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-13 10:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "小売",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品A",
+          "製品B"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-024",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-17 09:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "IT",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品C",
+          "製品B"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-025",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-13 09:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "小売",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品C",
+          "製品B"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-026",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-07 14:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "サービス",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品C",
+          "製品A"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-027",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-14 15:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "製造業",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品A",
+          "製品B"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-028",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-09 10:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "サービス",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品C",
+          "製品A"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-029",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-05 10:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "IT",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品C",
+          "製品B"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-030",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-16 17:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "IT",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品C",
+          "製品B"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-031",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-10 16:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "小売",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品B",
+          "製品A"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-032",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-17 15:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "IT",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品C",
+          "製品B"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-033",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-11 12:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "製造業",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品A",
+          "製品B"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-034",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-12 09:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "IT",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品A",
+          "製品C"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-035",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-15 09:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "IT",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品A",
+          "製品C"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-036",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-05 10:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "IT",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品C",
+          "製品B"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-037",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-15 10:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "サービス",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品C",
+          "製品B"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-038",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-13 13:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "製造業",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品A",
+          "製品C"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-039",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-05 11:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "製造業",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品A",
+          "製品B"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-040",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-16 15:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "サービス",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品A",
+          "製品B"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-041",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-15 10:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "サービス",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品A",
+          "製品B"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-042",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-08 17:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "製造業",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品A",
+          "製品C"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-043",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-06 10:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "IT",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品A",
+          "製品B"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-044",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-13 16:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "金融",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品B",
+          "製品C"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-045",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-17 17:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "金融",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品C",
+          "製品B"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-046",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-06 11:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "金融",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品C",
+          "製品B"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-047",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-04 16:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "サービス",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品C",
+          "製品B"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-048",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-16 09:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "小売",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品C",
+          "製品B"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-049",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-04 09:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "製造業",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品A",
+          "製品B"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_b2b-050",
+    "surveyId": "sv_team_b2b",
+    "answeredAt": "2026-01-06 15:00:00",
+    "details": [
+      {
+        "question": "Q1. 業種",
+        "answer": "製造業",
+        "type": "single_choice"
+      },
+      {
+        "question": "Q2. 興味のある製品",
+        "answer": [
+          "製品B",
+          "製品C"
+        ],
+        "type": "multi_choice"
+      }
+    ]
+  }
+]

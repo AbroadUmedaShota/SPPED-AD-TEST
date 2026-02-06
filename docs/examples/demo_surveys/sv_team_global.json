@@ -1,0 +1,26 @@
+{
+  "id": "sv_team_global",
+  "groupId": "group_team_rep",
+  "name": {
+    "ja": "グローバル意識調査 (チーム)",
+    "en": "GLOBAL Survey group_team_rep"
+  },
+  "status": "会期中",
+  "answerCount": 50,
+  "periodStart": "2026-01-04",
+  "periodEnd": "2026-01-17",
+  "plan": "Premium",
+  "details": [
+    {
+      "id": "Q1",
+      "text": "Q1. 居住国",
+      "type": "single_choice",
+      "options": [
+        "日本",
+        "米国",
+        "中国",
+        "その他"
+      ]
+    }
+  ]
+}

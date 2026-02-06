@@ -1,0 +1,852 @@
+[
+  {
+    "answerId": "ans-sv_bpo_premium-0001",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-01-28 14:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_1.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_1.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0002",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-02-04 17:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_2.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_2.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0003",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-01-31 13:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_3.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_3.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0004",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-02-03 15:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_4.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_4.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0005",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-01-30 10:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_5.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_5.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0006",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-02-05 09:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_6.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_6.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0007",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-01-29 12:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_7.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_7.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0008",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-02-05 11:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_8.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_8.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0009",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-02-03 14:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_9.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_9.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0010",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-01-30 11:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_10.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_10.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0011",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-02-06 13:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_11.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_11.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0012",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-02-03 17:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_12.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_12.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0013",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-01-31 16:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_13.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_13.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0014",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-01-29 17:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_14.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_14.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0015",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-01-31 09:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_15.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_15.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0016",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-02-06 15:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_16.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_16.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0017",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-01-30 11:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_17.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_17.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0018",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-02-03 16:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_18.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_18.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0019",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-02-04 10:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_19.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_19.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0020",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-01-29 10:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_20.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_20.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0021",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-01-30 15:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_21.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_21.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0022",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-02-02 13:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_22.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_22.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0023",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-02-01 14:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_23.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_23.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0024",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-02-06 10:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_24.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_24.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0025",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-01-28 15:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_25.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_25.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0026",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-02-03 11:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_26.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_26.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0027",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-02-02 13:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_27.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_27.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0028",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-01-30 09:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_28.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_28.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0029",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-01-30 12:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_29.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_29.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0030",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-01-31 12:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_30.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_30.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0031",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-01-29 10:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_31.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_31.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0032",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-02-06 11:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_32.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_32.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0033",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-02-01 17:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_33.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_33.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0034",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-02-02 16:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_34.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_34.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0035",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-02-05 14:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_35.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_35.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0036",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-02-05 09:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_36.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_36.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0037",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-01-30 09:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_37.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_37.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0038",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-02-03 14:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_38.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_38.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0039",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-01-28 09:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_39.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_39.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0040",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-01-29 17:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_40.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_40.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0041",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-02-02 15:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_41.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_41.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0042",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-01-31 13:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_42.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_42.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0043",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-01-28 10:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_43.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_43.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0044",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-01-31 16:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_44.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_44.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0045",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-01-30 10:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_45.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_45.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0046",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-01-29 13:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_46.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_46.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0047",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-02-01 11:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_47.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_47.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0048",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-02-06 17:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_48.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_48.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0049",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-01-28 13:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_49.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_49.png",
+        "type": "handwriting"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_bpo_premium-0050",
+    "surveyId": "sv_bpo_premium",
+    "answeredAt": "2026-02-01 15:00:00",
+    "details": [
+      {
+        "question": "現場写真",
+        "answer": "img_50.jpg",
+        "type": "image"
+      },
+      {
+        "question": "作業者サイン",
+        "answer": "sign_50.png",
+        "type": "handwriting"
+      }
+    ]
+  }
+]

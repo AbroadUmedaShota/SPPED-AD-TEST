@@ -1,0 +1,25 @@
+{
+  "id": "sv_team_premium",
+  "groupId": "group_team_rep",
+  "name": {
+    "ja": "現場点検ログ (チーム)",
+    "en": "PREMIUM Survey group_team_rep"
+  },
+  "status": "会期中",
+  "answerCount": 50,
+  "periodStart": "2026-01-04",
+  "periodEnd": "2026-01-17",
+  "plan": "Premium",
+  "details": [
+    {
+      "id": "Q1",
+      "text": "Q1. 現場写真",
+      "type": "image"
+    },
+    {
+      "id": "Q2",
+      "text": "Q2. 作業者サイン",
+      "type": "handwriting"
+    }
+  ]
+}

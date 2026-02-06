@@ -1,0 +1,34 @@
+{
+  "id": "sv_sales_logic",
+  "groupId": "group_sales",
+  "name": {
+    "ja": "条件分岐ロジック検証 undefined",
+    "en": "LOGIC Survey"
+  },
+  "status": "会期中",
+  "answerCount": 40,
+  "periodStart": "2026-01-04",
+  "periodEnd": "2026-01-17",
+  "plan": "Free",
+  "details": [
+    {
+      "id": "Q1",
+      "text": "詳細回答しますか？",
+      "type": "single_choice",
+      "options": [
+        "はい",
+        "いいえ"
+      ]
+    },
+    {
+      "id": "Q2",
+      "text": "詳細その1",
+      "type": "text"
+    },
+    {
+      "id": "Q3",
+      "text": "詳細その2",
+      "type": "text"
+    }
+  ]
+}

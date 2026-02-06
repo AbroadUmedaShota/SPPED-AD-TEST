@@ -1,0 +1,98 @@
+{
+  "id": "sv_sales_all_types",
+  "groupId": "group_sales",
+  "name": {
+    "ja": "全形式網羅テスト undefined",
+    "en": "ALL_TYPES Survey"
+  },
+  "status": "会期中",
+  "answerCount": 30,
+  "periodStart": "2026-01-04",
+  "periodEnd": "2026-01-17",
+  "plan": "Free",
+  "details": [
+    {
+      "id": "Q1",
+      "text": "単一選択",
+      "type": "single_choice",
+      "options": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "id": "Q2",
+      "text": "複数選択",
+      "type": "multi_choice",
+      "options": [
+        "X",
+        "Y",
+        "Z"
+      ]
+    },
+    {
+      "id": "Q3",
+      "text": "一行テキスト",
+      "type": "text"
+    },
+    {
+      "id": "Q4",
+      "text": "複数行テキスト",
+      "type": "free_text"
+    },
+    {
+      "id": "Q5",
+      "text": "数値",
+      "type": "number"
+    },
+    {
+      "id": "Q6",
+      "text": "日付",
+      "type": "date"
+    },
+    {
+      "id": "Q7",
+      "text": "時刻",
+      "type": "time"
+    },
+    {
+      "id": "Q8",
+      "text": "マトリクスSA",
+      "type": "matrix_sa",
+      "rows": [
+        "行1"
+      ],
+      "options": [
+        "列1",
+        "列2"
+      ]
+    },
+    {
+      "id": "Q9",
+      "text": "マトリクスMA",
+      "type": "matrix_ma",
+      "rows": [
+        "行1"
+      ],
+      "options": [
+        "列1",
+        "列2"
+      ]
+    },
+    {
+      "id": "Q10",
+      "text": "手書き",
+      "type": "handwriting"
+    },
+    {
+      "id": "Q11",
+      "text": "画像",
+      "type": "image"
+    },
+    {
+      "id": "Q12",
+      "text": "説明",
+      "type": "explanation"
+    }
+  ]
+}

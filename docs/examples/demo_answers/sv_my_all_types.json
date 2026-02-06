@@ -1,0 +1,2282 @@
+[
+  {
+    "answerId": "ans-sv_my_all_types-0001",
+    "surveyId": "sv_my_all_types",
+    "answeredAt": "2026-02-03 11:00:00",
+    "details": [
+      {
+        "question": "単一選択",
+        "answer": "A",
+        "type": "single_choice"
+      },
+      {
+        "question": "複数選択",
+        "answer": [
+          "X",
+          "Y"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "一行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "text"
+      },
+      {
+        "question": "複数行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      },
+      {
+        "question": "数値",
+        "answer": 14,
+        "type": "number"
+      },
+      {
+        "question": "日付",
+        "answer": "サンプルテキスト回答",
+        "type": "date"
+      },
+      {
+        "question": "時刻",
+        "answer": "サンプルテキスト回答",
+        "type": "time"
+      },
+      {
+        "question": "マトリクスSA",
+        "answer": {
+          "行1": "列1"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "マトリクスMA",
+        "answer": {
+          "行1": [
+            "列1"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "手書き",
+        "answer": "sign_1.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "画像",
+        "answer": "img_1.jpg",
+        "type": "image"
+      },
+      {
+        "question": "説明",
+        "answer": null,
+        "type": "explanation"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_my_all_types-0002",
+    "surveyId": "sv_my_all_types",
+    "answeredAt": "2026-01-29 17:00:00",
+    "details": [
+      {
+        "question": "単一選択",
+        "answer": "B",
+        "type": "single_choice"
+      },
+      {
+        "question": "複数選択",
+        "answer": [
+          "X",
+          "Y"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "一行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "text"
+      },
+      {
+        "question": "複数行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      },
+      {
+        "question": "数値",
+        "answer": 54,
+        "type": "number"
+      },
+      {
+        "question": "日付",
+        "answer": "サンプルテキスト回答",
+        "type": "date"
+      },
+      {
+        "question": "時刻",
+        "answer": "サンプルテキスト回答",
+        "type": "time"
+      },
+      {
+        "question": "マトリクスSA",
+        "answer": {
+          "行1": "列1"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "マトリクスMA",
+        "answer": {
+          "行1": [
+            "列2"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "手書き",
+        "answer": "sign_2.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "画像",
+        "answer": "img_2.jpg",
+        "type": "image"
+      },
+      {
+        "question": "説明",
+        "answer": null,
+        "type": "explanation"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_my_all_types-0003",
+    "surveyId": "sv_my_all_types",
+    "answeredAt": "2026-01-31 13:00:00",
+    "details": [
+      {
+        "question": "単一選択",
+        "answer": "A",
+        "type": "single_choice"
+      },
+      {
+        "question": "複数選択",
+        "answer": [
+          "Z",
+          "Y"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "一行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "text"
+      },
+      {
+        "question": "複数行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      },
+      {
+        "question": "数値",
+        "answer": 83,
+        "type": "number"
+      },
+      {
+        "question": "日付",
+        "answer": "サンプルテキスト回答",
+        "type": "date"
+      },
+      {
+        "question": "時刻",
+        "answer": "サンプルテキスト回答",
+        "type": "time"
+      },
+      {
+        "question": "マトリクスSA",
+        "answer": {
+          "行1": "列2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "マトリクスMA",
+        "answer": {
+          "行1": [
+            "列2"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "手書き",
+        "answer": "sign_3.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "画像",
+        "answer": "img_3.jpg",
+        "type": "image"
+      },
+      {
+        "question": "説明",
+        "answer": null,
+        "type": "explanation"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_my_all_types-0004",
+    "surveyId": "sv_my_all_types",
+    "answeredAt": "2026-01-30 09:00:00",
+    "details": [
+      {
+        "question": "単一選択",
+        "answer": "B",
+        "type": "single_choice"
+      },
+      {
+        "question": "複数選択",
+        "answer": [
+          "Y",
+          "X"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "一行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "text"
+      },
+      {
+        "question": "複数行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      },
+      {
+        "question": "数値",
+        "answer": 87,
+        "type": "number"
+      },
+      {
+        "question": "日付",
+        "answer": "サンプルテキスト回答",
+        "type": "date"
+      },
+      {
+        "question": "時刻",
+        "answer": "サンプルテキスト回答",
+        "type": "time"
+      },
+      {
+        "question": "マトリクスSA",
+        "answer": {
+          "行1": "列2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "マトリクスMA",
+        "answer": {
+          "行1": [
+            "列1"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "手書き",
+        "answer": "sign_4.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "画像",
+        "answer": "img_4.jpg",
+        "type": "image"
+      },
+      {
+        "question": "説明",
+        "answer": null,
+        "type": "explanation"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_my_all_types-0005",
+    "surveyId": "sv_my_all_types",
+    "answeredAt": "2026-01-28 17:00:00",
+    "details": [
+      {
+        "question": "単一選択",
+        "answer": "B",
+        "type": "single_choice"
+      },
+      {
+        "question": "複数選択",
+        "answer": [
+          "Y",
+          "X"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "一行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "text"
+      },
+      {
+        "question": "複数行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      },
+      {
+        "question": "数値",
+        "answer": 62,
+        "type": "number"
+      },
+      {
+        "question": "日付",
+        "answer": "サンプルテキスト回答",
+        "type": "date"
+      },
+      {
+        "question": "時刻",
+        "answer": "サンプルテキスト回答",
+        "type": "time"
+      },
+      {
+        "question": "マトリクスSA",
+        "answer": {
+          "行1": "列2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "マトリクスMA",
+        "answer": {
+          "行1": [
+            "列2"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "手書き",
+        "answer": "sign_5.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "画像",
+        "answer": "img_5.jpg",
+        "type": "image"
+      },
+      {
+        "question": "説明",
+        "answer": null,
+        "type": "explanation"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_my_all_types-0006",
+    "surveyId": "sv_my_all_types",
+    "answeredAt": "2026-02-02 15:00:00",
+    "details": [
+      {
+        "question": "単一選択",
+        "answer": "A",
+        "type": "single_choice"
+      },
+      {
+        "question": "複数選択",
+        "answer": [
+          "X",
+          "Y"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "一行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "text"
+      },
+      {
+        "question": "複数行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      },
+      {
+        "question": "数値",
+        "answer": 66,
+        "type": "number"
+      },
+      {
+        "question": "日付",
+        "answer": "サンプルテキスト回答",
+        "type": "date"
+      },
+      {
+        "question": "時刻",
+        "answer": "サンプルテキスト回答",
+        "type": "time"
+      },
+      {
+        "question": "マトリクスSA",
+        "answer": {
+          "行1": "列1"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "マトリクスMA",
+        "answer": {
+          "行1": [
+            "列1"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "手書き",
+        "answer": "sign_6.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "画像",
+        "answer": "img_6.jpg",
+        "type": "image"
+      },
+      {
+        "question": "説明",
+        "answer": null,
+        "type": "explanation"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_my_all_types-0007",
+    "surveyId": "sv_my_all_types",
+    "answeredAt": "2026-01-29 15:00:00",
+    "details": [
+      {
+        "question": "単一選択",
+        "answer": "B",
+        "type": "single_choice"
+      },
+      {
+        "question": "複数選択",
+        "answer": [
+          "X",
+          "Y"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "一行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "text"
+      },
+      {
+        "question": "複数行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      },
+      {
+        "question": "数値",
+        "answer": 9,
+        "type": "number"
+      },
+      {
+        "question": "日付",
+        "answer": "サンプルテキスト回答",
+        "type": "date"
+      },
+      {
+        "question": "時刻",
+        "answer": "サンプルテキスト回答",
+        "type": "time"
+      },
+      {
+        "question": "マトリクスSA",
+        "answer": {
+          "行1": "列2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "マトリクスMA",
+        "answer": {
+          "行1": [
+            "列2"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "手書き",
+        "answer": "sign_7.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "画像",
+        "answer": "img_7.jpg",
+        "type": "image"
+      },
+      {
+        "question": "説明",
+        "answer": null,
+        "type": "explanation"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_my_all_types-0008",
+    "surveyId": "sv_my_all_types",
+    "answeredAt": "2026-02-03 16:00:00",
+    "details": [
+      {
+        "question": "単一選択",
+        "answer": "B",
+        "type": "single_choice"
+      },
+      {
+        "question": "複数選択",
+        "answer": [
+          "Y",
+          "X"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "一行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "text"
+      },
+      {
+        "question": "複数行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      },
+      {
+        "question": "数値",
+        "answer": 75,
+        "type": "number"
+      },
+      {
+        "question": "日付",
+        "answer": "サンプルテキスト回答",
+        "type": "date"
+      },
+      {
+        "question": "時刻",
+        "answer": "サンプルテキスト回答",
+        "type": "time"
+      },
+      {
+        "question": "マトリクスSA",
+        "answer": {
+          "行1": "列2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "マトリクスMA",
+        "answer": {
+          "行1": [
+            "列1"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "手書き",
+        "answer": "sign_8.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "画像",
+        "answer": "img_8.jpg",
+        "type": "image"
+      },
+      {
+        "question": "説明",
+        "answer": null,
+        "type": "explanation"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_my_all_types-0009",
+    "surveyId": "sv_my_all_types",
+    "answeredAt": "2026-01-28 14:00:00",
+    "details": [
+      {
+        "question": "単一選択",
+        "answer": "B",
+        "type": "single_choice"
+      },
+      {
+        "question": "複数選択",
+        "answer": [
+          "Z",
+          "Y"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "一行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "text"
+      },
+      {
+        "question": "複数行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      },
+      {
+        "question": "数値",
+        "answer": 59,
+        "type": "number"
+      },
+      {
+        "question": "日付",
+        "answer": "サンプルテキスト回答",
+        "type": "date"
+      },
+      {
+        "question": "時刻",
+        "answer": "サンプルテキスト回答",
+        "type": "time"
+      },
+      {
+        "question": "マトリクスSA",
+        "answer": {
+          "行1": "列1"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "マトリクスMA",
+        "answer": {
+          "行1": [
+            "列1"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "手書き",
+        "answer": "sign_9.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "画像",
+        "answer": "img_9.jpg",
+        "type": "image"
+      },
+      {
+        "question": "説明",
+        "answer": null,
+        "type": "explanation"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_my_all_types-0010",
+    "surveyId": "sv_my_all_types",
+    "answeredAt": "2026-02-06 13:00:00",
+    "details": [
+      {
+        "question": "単一選択",
+        "answer": "A",
+        "type": "single_choice"
+      },
+      {
+        "question": "複数選択",
+        "answer": [
+          "X",
+          "Y"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "一行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "text"
+      },
+      {
+        "question": "複数行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      },
+      {
+        "question": "数値",
+        "answer": 80,
+        "type": "number"
+      },
+      {
+        "question": "日付",
+        "answer": "サンプルテキスト回答",
+        "type": "date"
+      },
+      {
+        "question": "時刻",
+        "answer": "サンプルテキスト回答",
+        "type": "time"
+      },
+      {
+        "question": "マトリクスSA",
+        "answer": {
+          "行1": "列2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "マトリクスMA",
+        "answer": {
+          "行1": [
+            "列2"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "手書き",
+        "answer": "sign_10.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "画像",
+        "answer": "img_10.jpg",
+        "type": "image"
+      },
+      {
+        "question": "説明",
+        "answer": null,
+        "type": "explanation"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_my_all_types-0011",
+    "surveyId": "sv_my_all_types",
+    "answeredAt": "2026-02-06 10:00:00",
+    "details": [
+      {
+        "question": "単一選択",
+        "answer": "B",
+        "type": "single_choice"
+      },
+      {
+        "question": "複数選択",
+        "answer": [
+          "Y",
+          "Z"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "一行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "text"
+      },
+      {
+        "question": "複数行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      },
+      {
+        "question": "数値",
+        "answer": 45,
+        "type": "number"
+      },
+      {
+        "question": "日付",
+        "answer": "サンプルテキスト回答",
+        "type": "date"
+      },
+      {
+        "question": "時刻",
+        "answer": "サンプルテキスト回答",
+        "type": "time"
+      },
+      {
+        "question": "マトリクスSA",
+        "answer": {
+          "行1": "列2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "マトリクスMA",
+        "answer": {
+          "行1": [
+            "列2"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "手書き",
+        "answer": "sign_11.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "画像",
+        "answer": "img_11.jpg",
+        "type": "image"
+      },
+      {
+        "question": "説明",
+        "answer": null,
+        "type": "explanation"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_my_all_types-0012",
+    "surveyId": "sv_my_all_types",
+    "answeredAt": "2026-01-31 10:00:00",
+    "details": [
+      {
+        "question": "単一選択",
+        "answer": "B",
+        "type": "single_choice"
+      },
+      {
+        "question": "複数選択",
+        "answer": [
+          "X",
+          "Y"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "一行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "text"
+      },
+      {
+        "question": "複数行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      },
+      {
+        "question": "数値",
+        "answer": 49,
+        "type": "number"
+      },
+      {
+        "question": "日付",
+        "answer": "サンプルテキスト回答",
+        "type": "date"
+      },
+      {
+        "question": "時刻",
+        "answer": "サンプルテキスト回答",
+        "type": "time"
+      },
+      {
+        "question": "マトリクスSA",
+        "answer": {
+          "行1": "列2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "マトリクスMA",
+        "answer": {
+          "行1": [
+            "列1"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "手書き",
+        "answer": "sign_12.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "画像",
+        "answer": "img_12.jpg",
+        "type": "image"
+      },
+      {
+        "question": "説明",
+        "answer": null,
+        "type": "explanation"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_my_all_types-0013",
+    "surveyId": "sv_my_all_types",
+    "answeredAt": "2026-02-04 13:00:00",
+    "details": [
+      {
+        "question": "単一選択",
+        "answer": "A",
+        "type": "single_choice"
+      },
+      {
+        "question": "複数選択",
+        "answer": [
+          "Z",
+          "Y"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "一行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "text"
+      },
+      {
+        "question": "複数行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      },
+      {
+        "question": "数値",
+        "answer": 54,
+        "type": "number"
+      },
+      {
+        "question": "日付",
+        "answer": "サンプルテキスト回答",
+        "type": "date"
+      },
+      {
+        "question": "時刻",
+        "answer": "サンプルテキスト回答",
+        "type": "time"
+      },
+      {
+        "question": "マトリクスSA",
+        "answer": {
+          "行1": "列1"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "マトリクスMA",
+        "answer": {
+          "行1": [
+            "列2"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "手書き",
+        "answer": "sign_13.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "画像",
+        "answer": "img_13.jpg",
+        "type": "image"
+      },
+      {
+        "question": "説明",
+        "answer": null,
+        "type": "explanation"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_my_all_types-0014",
+    "surveyId": "sv_my_all_types",
+    "answeredAt": "2026-02-06 09:00:00",
+    "details": [
+      {
+        "question": "単一選択",
+        "answer": "B",
+        "type": "single_choice"
+      },
+      {
+        "question": "複数選択",
+        "answer": [
+          "Z",
+          "Y"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "一行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "text"
+      },
+      {
+        "question": "複数行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      },
+      {
+        "question": "数値",
+        "answer": 85,
+        "type": "number"
+      },
+      {
+        "question": "日付",
+        "answer": "サンプルテキスト回答",
+        "type": "date"
+      },
+      {
+        "question": "時刻",
+        "answer": "サンプルテキスト回答",
+        "type": "time"
+      },
+      {
+        "question": "マトリクスSA",
+        "answer": {
+          "行1": "列2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "マトリクスMA",
+        "answer": {
+          "行1": [
+            "列1"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "手書き",
+        "answer": "sign_14.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "画像",
+        "answer": "img_14.jpg",
+        "type": "image"
+      },
+      {
+        "question": "説明",
+        "answer": null,
+        "type": "explanation"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_my_all_types-0015",
+    "surveyId": "sv_my_all_types",
+    "answeredAt": "2026-02-06 09:00:00",
+    "details": [
+      {
+        "question": "単一選択",
+        "answer": "B",
+        "type": "single_choice"
+      },
+      {
+        "question": "複数選択",
+        "answer": [
+          "X",
+          "Y"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "一行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "text"
+      },
+      {
+        "question": "複数行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      },
+      {
+        "question": "数値",
+        "answer": 85,
+        "type": "number"
+      },
+      {
+        "question": "日付",
+        "answer": "サンプルテキスト回答",
+        "type": "date"
+      },
+      {
+        "question": "時刻",
+        "answer": "サンプルテキスト回答",
+        "type": "time"
+      },
+      {
+        "question": "マトリクスSA",
+        "answer": {
+          "行1": "列2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "マトリクスMA",
+        "answer": {
+          "行1": [
+            "列1"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "手書き",
+        "answer": "sign_15.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "画像",
+        "answer": "img_15.jpg",
+        "type": "image"
+      },
+      {
+        "question": "説明",
+        "answer": null,
+        "type": "explanation"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_my_all_types-0016",
+    "surveyId": "sv_my_all_types",
+    "answeredAt": "2026-01-29 09:00:00",
+    "details": [
+      {
+        "question": "単一選択",
+        "answer": "A",
+        "type": "single_choice"
+      },
+      {
+        "question": "複数選択",
+        "answer": [
+          "Z",
+          "Y"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "一行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "text"
+      },
+      {
+        "question": "複数行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      },
+      {
+        "question": "数値",
+        "answer": 34,
+        "type": "number"
+      },
+      {
+        "question": "日付",
+        "answer": "サンプルテキスト回答",
+        "type": "date"
+      },
+      {
+        "question": "時刻",
+        "answer": "サンプルテキスト回答",
+        "type": "time"
+      },
+      {
+        "question": "マトリクスSA",
+        "answer": {
+          "行1": "列1"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "マトリクスMA",
+        "answer": {
+          "行1": [
+            "列1"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "手書き",
+        "answer": "sign_16.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "画像",
+        "answer": "img_16.jpg",
+        "type": "image"
+      },
+      {
+        "question": "説明",
+        "answer": null,
+        "type": "explanation"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_my_all_types-0017",
+    "surveyId": "sv_my_all_types",
+    "answeredAt": "2026-01-29 13:00:00",
+    "details": [
+      {
+        "question": "単一選択",
+        "answer": "B",
+        "type": "single_choice"
+      },
+      {
+        "question": "複数選択",
+        "answer": [
+          "X",
+          "Y"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "一行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "text"
+      },
+      {
+        "question": "複数行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      },
+      {
+        "question": "数値",
+        "answer": 22,
+        "type": "number"
+      },
+      {
+        "question": "日付",
+        "answer": "サンプルテキスト回答",
+        "type": "date"
+      },
+      {
+        "question": "時刻",
+        "answer": "サンプルテキスト回答",
+        "type": "time"
+      },
+      {
+        "question": "マトリクスSA",
+        "answer": {
+          "行1": "列2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "マトリクスMA",
+        "answer": {
+          "行1": [
+            "列1"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "手書き",
+        "answer": "sign_17.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "画像",
+        "answer": "img_17.jpg",
+        "type": "image"
+      },
+      {
+        "question": "説明",
+        "answer": null,
+        "type": "explanation"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_my_all_types-0018",
+    "surveyId": "sv_my_all_types",
+    "answeredAt": "2026-01-28 12:00:00",
+    "details": [
+      {
+        "question": "単一選択",
+        "answer": "A",
+        "type": "single_choice"
+      },
+      {
+        "question": "複数選択",
+        "answer": [
+          "X",
+          "Y"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "一行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "text"
+      },
+      {
+        "question": "複数行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      },
+      {
+        "question": "数値",
+        "answer": 43,
+        "type": "number"
+      },
+      {
+        "question": "日付",
+        "answer": "サンプルテキスト回答",
+        "type": "date"
+      },
+      {
+        "question": "時刻",
+        "answer": "サンプルテキスト回答",
+        "type": "time"
+      },
+      {
+        "question": "マトリクスSA",
+        "answer": {
+          "行1": "列2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "マトリクスMA",
+        "answer": {
+          "行1": [
+            "列2"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "手書き",
+        "answer": "sign_18.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "画像",
+        "answer": "img_18.jpg",
+        "type": "image"
+      },
+      {
+        "question": "説明",
+        "answer": null,
+        "type": "explanation"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_my_all_types-0019",
+    "surveyId": "sv_my_all_types",
+    "answeredAt": "2026-01-31 16:00:00",
+    "details": [
+      {
+        "question": "単一選択",
+        "answer": "A",
+        "type": "single_choice"
+      },
+      {
+        "question": "複数選択",
+        "answer": [
+          "X",
+          "Y"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "一行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "text"
+      },
+      {
+        "question": "複数行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      },
+      {
+        "question": "数値",
+        "answer": 13,
+        "type": "number"
+      },
+      {
+        "question": "日付",
+        "answer": "サンプルテキスト回答",
+        "type": "date"
+      },
+      {
+        "question": "時刻",
+        "answer": "サンプルテキスト回答",
+        "type": "time"
+      },
+      {
+        "question": "マトリクスSA",
+        "answer": {
+          "行1": "列2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "マトリクスMA",
+        "answer": {
+          "行1": [
+            "列2"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "手書き",
+        "answer": "sign_19.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "画像",
+        "answer": "img_19.jpg",
+        "type": "image"
+      },
+      {
+        "question": "説明",
+        "answer": null,
+        "type": "explanation"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_my_all_types-0020",
+    "surveyId": "sv_my_all_types",
+    "answeredAt": "2026-01-28 11:00:00",
+    "details": [
+      {
+        "question": "単一選択",
+        "answer": "A",
+        "type": "single_choice"
+      },
+      {
+        "question": "複数選択",
+        "answer": [
+          "X",
+          "Y"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "一行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "text"
+      },
+      {
+        "question": "複数行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      },
+      {
+        "question": "数値",
+        "answer": 56,
+        "type": "number"
+      },
+      {
+        "question": "日付",
+        "answer": "サンプルテキスト回答",
+        "type": "date"
+      },
+      {
+        "question": "時刻",
+        "answer": "サンプルテキスト回答",
+        "type": "time"
+      },
+      {
+        "question": "マトリクスSA",
+        "answer": {
+          "行1": "列2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "マトリクスMA",
+        "answer": {
+          "行1": [
+            "列1"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "手書き",
+        "answer": "sign_20.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "画像",
+        "answer": "img_20.jpg",
+        "type": "image"
+      },
+      {
+        "question": "説明",
+        "answer": null,
+        "type": "explanation"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_my_all_types-0021",
+    "surveyId": "sv_my_all_types",
+    "answeredAt": "2026-02-01 16:00:00",
+    "details": [
+      {
+        "question": "単一選択",
+        "answer": "A",
+        "type": "single_choice"
+      },
+      {
+        "question": "複数選択",
+        "answer": [
+          "X",
+          "Y"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "一行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "text"
+      },
+      {
+        "question": "複数行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      },
+      {
+        "question": "数値",
+        "answer": 60,
+        "type": "number"
+      },
+      {
+        "question": "日付",
+        "answer": "サンプルテキスト回答",
+        "type": "date"
+      },
+      {
+        "question": "時刻",
+        "answer": "サンプルテキスト回答",
+        "type": "time"
+      },
+      {
+        "question": "マトリクスSA",
+        "answer": {
+          "行1": "列2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "マトリクスMA",
+        "answer": {
+          "行1": [
+            "列1"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "手書き",
+        "answer": "sign_21.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "画像",
+        "answer": "img_21.jpg",
+        "type": "image"
+      },
+      {
+        "question": "説明",
+        "answer": null,
+        "type": "explanation"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_my_all_types-0022",
+    "surveyId": "sv_my_all_types",
+    "answeredAt": "2026-02-03 10:00:00",
+    "details": [
+      {
+        "question": "単一選択",
+        "answer": "A",
+        "type": "single_choice"
+      },
+      {
+        "question": "複数選択",
+        "answer": [
+          "Z",
+          "Y"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "一行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "text"
+      },
+      {
+        "question": "複数行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      },
+      {
+        "question": "数値",
+        "answer": 97,
+        "type": "number"
+      },
+      {
+        "question": "日付",
+        "answer": "サンプルテキスト回答",
+        "type": "date"
+      },
+      {
+        "question": "時刻",
+        "answer": "サンプルテキスト回答",
+        "type": "time"
+      },
+      {
+        "question": "マトリクスSA",
+        "answer": {
+          "行1": "列2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "マトリクスMA",
+        "answer": {
+          "行1": [
+            "列2"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "手書き",
+        "answer": "sign_22.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "画像",
+        "answer": "img_22.jpg",
+        "type": "image"
+      },
+      {
+        "question": "説明",
+        "answer": null,
+        "type": "explanation"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_my_all_types-0023",
+    "surveyId": "sv_my_all_types",
+    "answeredAt": "2026-02-06 16:00:00",
+    "details": [
+      {
+        "question": "単一選択",
+        "answer": "A",
+        "type": "single_choice"
+      },
+      {
+        "question": "複数選択",
+        "answer": [
+          "Y",
+          "X"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "一行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "text"
+      },
+      {
+        "question": "複数行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      },
+      {
+        "question": "数値",
+        "answer": 27,
+        "type": "number"
+      },
+      {
+        "question": "日付",
+        "answer": "サンプルテキスト回答",
+        "type": "date"
+      },
+      {
+        "question": "時刻",
+        "answer": "サンプルテキスト回答",
+        "type": "time"
+      },
+      {
+        "question": "マトリクスSA",
+        "answer": {
+          "行1": "列1"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "マトリクスMA",
+        "answer": {
+          "行1": [
+            "列2"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "手書き",
+        "answer": "sign_23.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "画像",
+        "answer": "img_23.jpg",
+        "type": "image"
+      },
+      {
+        "question": "説明",
+        "answer": null,
+        "type": "explanation"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_my_all_types-0024",
+    "surveyId": "sv_my_all_types",
+    "answeredAt": "2026-01-28 16:00:00",
+    "details": [
+      {
+        "question": "単一選択",
+        "answer": "A",
+        "type": "single_choice"
+      },
+      {
+        "question": "複数選択",
+        "answer": [
+          "X",
+          "Y"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "一行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "text"
+      },
+      {
+        "question": "複数行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      },
+      {
+        "question": "数値",
+        "answer": 86,
+        "type": "number"
+      },
+      {
+        "question": "日付",
+        "answer": "サンプルテキスト回答",
+        "type": "date"
+      },
+      {
+        "question": "時刻",
+        "answer": "サンプルテキスト回答",
+        "type": "time"
+      },
+      {
+        "question": "マトリクスSA",
+        "answer": {
+          "行1": "列1"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "マトリクスMA",
+        "answer": {
+          "行1": [
+            "列2"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "手書き",
+        "answer": "sign_24.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "画像",
+        "answer": "img_24.jpg",
+        "type": "image"
+      },
+      {
+        "question": "説明",
+        "answer": null,
+        "type": "explanation"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_my_all_types-0025",
+    "surveyId": "sv_my_all_types",
+    "answeredAt": "2026-01-31 09:00:00",
+    "details": [
+      {
+        "question": "単一選択",
+        "answer": "B",
+        "type": "single_choice"
+      },
+      {
+        "question": "複数選択",
+        "answer": [
+          "Y",
+          "X"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "一行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "text"
+      },
+      {
+        "question": "複数行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      },
+      {
+        "question": "数値",
+        "answer": 50,
+        "type": "number"
+      },
+      {
+        "question": "日付",
+        "answer": "サンプルテキスト回答",
+        "type": "date"
+      },
+      {
+        "question": "時刻",
+        "answer": "サンプルテキスト回答",
+        "type": "time"
+      },
+      {
+        "question": "マトリクスSA",
+        "answer": {
+          "行1": "列2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "マトリクスMA",
+        "answer": {
+          "行1": [
+            "列2"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "手書き",
+        "answer": "sign_25.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "画像",
+        "answer": "img_25.jpg",
+        "type": "image"
+      },
+      {
+        "question": "説明",
+        "answer": null,
+        "type": "explanation"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_my_all_types-0026",
+    "surveyId": "sv_my_all_types",
+    "answeredAt": "2026-02-02 15:00:00",
+    "details": [
+      {
+        "question": "単一選択",
+        "answer": "B",
+        "type": "single_choice"
+      },
+      {
+        "question": "複数選択",
+        "answer": [
+          "X",
+          "Z"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "一行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "text"
+      },
+      {
+        "question": "複数行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      },
+      {
+        "question": "数値",
+        "answer": 27,
+        "type": "number"
+      },
+      {
+        "question": "日付",
+        "answer": "サンプルテキスト回答",
+        "type": "date"
+      },
+      {
+        "question": "時刻",
+        "answer": "サンプルテキスト回答",
+        "type": "time"
+      },
+      {
+        "question": "マトリクスSA",
+        "answer": {
+          "行1": "列1"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "マトリクスMA",
+        "answer": {
+          "行1": [
+            "列2"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "手書き",
+        "answer": "sign_26.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "画像",
+        "answer": "img_26.jpg",
+        "type": "image"
+      },
+      {
+        "question": "説明",
+        "answer": null,
+        "type": "explanation"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_my_all_types-0027",
+    "surveyId": "sv_my_all_types",
+    "answeredAt": "2026-02-05 11:00:00",
+    "details": [
+      {
+        "question": "単一選択",
+        "answer": "A",
+        "type": "single_choice"
+      },
+      {
+        "question": "複数選択",
+        "answer": [
+          "X",
+          "Y"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "一行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "text"
+      },
+      {
+        "question": "複数行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      },
+      {
+        "question": "数値",
+        "answer": 44,
+        "type": "number"
+      },
+      {
+        "question": "日付",
+        "answer": "サンプルテキスト回答",
+        "type": "date"
+      },
+      {
+        "question": "時刻",
+        "answer": "サンプルテキスト回答",
+        "type": "time"
+      },
+      {
+        "question": "マトリクスSA",
+        "answer": {
+          "行1": "列1"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "マトリクスMA",
+        "answer": {
+          "行1": [
+            "列1"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "手書き",
+        "answer": "sign_27.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "画像",
+        "answer": "img_27.jpg",
+        "type": "image"
+      },
+      {
+        "question": "説明",
+        "answer": null,
+        "type": "explanation"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_my_all_types-0028",
+    "surveyId": "sv_my_all_types",
+    "answeredAt": "2026-01-28 11:00:00",
+    "details": [
+      {
+        "question": "単一選択",
+        "answer": "B",
+        "type": "single_choice"
+      },
+      {
+        "question": "複数選択",
+        "answer": [
+          "Z",
+          "X"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "一行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "text"
+      },
+      {
+        "question": "複数行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      },
+      {
+        "question": "数値",
+        "answer": 96,
+        "type": "number"
+      },
+      {
+        "question": "日付",
+        "answer": "サンプルテキスト回答",
+        "type": "date"
+      },
+      {
+        "question": "時刻",
+        "answer": "サンプルテキスト回答",
+        "type": "time"
+      },
+      {
+        "question": "マトリクスSA",
+        "answer": {
+          "行1": "列2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "マトリクスMA",
+        "answer": {
+          "行1": [
+            "列1"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "手書き",
+        "answer": "sign_28.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "画像",
+        "answer": "img_28.jpg",
+        "type": "image"
+      },
+      {
+        "question": "説明",
+        "answer": null,
+        "type": "explanation"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_my_all_types-0029",
+    "surveyId": "sv_my_all_types",
+    "answeredAt": "2026-02-01 12:00:00",
+    "details": [
+      {
+        "question": "単一選択",
+        "answer": "A",
+        "type": "single_choice"
+      },
+      {
+        "question": "複数選択",
+        "answer": [
+          "X",
+          "Y"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "一行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "text"
+      },
+      {
+        "question": "複数行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      },
+      {
+        "question": "数値",
+        "answer": 31,
+        "type": "number"
+      },
+      {
+        "question": "日付",
+        "answer": "サンプルテキスト回答",
+        "type": "date"
+      },
+      {
+        "question": "時刻",
+        "answer": "サンプルテキスト回答",
+        "type": "time"
+      },
+      {
+        "question": "マトリクスSA",
+        "answer": {
+          "行1": "列2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "マトリクスMA",
+        "answer": {
+          "行1": [
+            "列2"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "手書き",
+        "answer": "sign_29.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "画像",
+        "answer": "img_29.jpg",
+        "type": "image"
+      },
+      {
+        "question": "説明",
+        "answer": null,
+        "type": "explanation"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_my_all_types-0030",
+    "surveyId": "sv_my_all_types",
+    "answeredAt": "2026-02-06 15:00:00",
+    "details": [
+      {
+        "question": "単一選択",
+        "answer": "A",
+        "type": "single_choice"
+      },
+      {
+        "question": "複数選択",
+        "answer": [
+          "X",
+          "Y"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "一行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "text"
+      },
+      {
+        "question": "複数行テキスト",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      },
+      {
+        "question": "数値",
+        "answer": 30,
+        "type": "number"
+      },
+      {
+        "question": "日付",
+        "answer": "サンプルテキスト回答",
+        "type": "date"
+      },
+      {
+        "question": "時刻",
+        "answer": "サンプルテキスト回答",
+        "type": "time"
+      },
+      {
+        "question": "マトリクスSA",
+        "answer": {
+          "行1": "列1"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "マトリクスMA",
+        "answer": {
+          "行1": [
+            "列1"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "手書き",
+        "answer": "sign_30.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "画像",
+        "answer": "img_30.jpg",
+        "type": "image"
+      },
+      {
+        "question": "説明",
+        "answer": null,
+        "type": "explanation"
+      }
+    ]
+  }
+]

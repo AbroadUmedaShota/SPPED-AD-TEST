@@ -1,1972 +1,1042 @@
 [
   {
-    "id": "sv_0001_25022",
-    "groupId": "GROUP001",
+    "id": "sv_0001_26001",
+    "groupId": "personal",
     "name": {
-      "ja": "サンプルアンケート 1",
-      "en": "Sample Survey 1"
+      "ja": "全形式網羅・分析検証テスト (個人アカウント)",
+      "en": "全形式網羅・分析検証テスト - personal"
     },
-    "displayTitle": {
-      "ja": "顧客満足度調査 1",
-      "en": "Customer Satisfaction 1"
-    },
-    "description": {
-      "ja": "顧客満足度を把握するための調査です。",
-      "en": "A survey to gauge customer satisfaction."
-    },
-    "status": "実施中",
-    "answerCount": 125,
-    "realtimeAnswers": 12,
-    "periodStart": "2025-07-01",
-    "periodEnd": "2025-07-31",
-    "dataCompletionDate": "2025-08-05",
-    "plan": "Standard",
-    "deadline": "2025-08-31",
-    "estimatedBillingAmount": 50000,
-    "bizcardCompletionCount": 110,
-    "bizcardSettings": {
-      "bizcardEnabled": true,
-      "bizcardRequest": 120,
-      "dataConversionPlan": "standard",
-      "dataConversionSpeed": "normal",
-      "couponCode": "",
-      "internalMemo": "これは社内用のメモです。"
-    },
-    "thankYouEmailSettings": {
-      "thankYouEmailEnabled": true,
-      "sendMethod": "manual",
-      "emailTemplateId": "default",
-      "emailSubject": "ご来場ありがとうございました",
-      "emailBody": "本日はご来場いただき、誠にありがとうございました。\n\n株式会社〇〇\n{会社名} {氏名}様"
-    },
-    "createdAt": "2025-07-01T00:00:00+09:00",
-    "dataConversionPlan": "normal"
+    "status": "会期中",
+    "answerCount": 300,
+    "periodStart": "2026-01-04",
+    "periodEnd": "2026-01-17",
+    "plan": "Free",
+    "details": [
+      {
+        "id": "Q1",
+        "text": "業界 (SA)",
+        "type": "single_choice",
+        "options": [
+          "製造",
+          "IT",
+          "金融",
+          "小売"
+        ]
+      },
+      {
+        "id": "Q2",
+        "text": "興味のある分野 (MA)",
+        "type": "multi_choice",
+        "options": [
+          "製品A",
+          "製品B",
+          "製品C"
+        ]
+      },
+      {
+        "id": "Q3",
+        "text": "氏名 (Text)",
+        "type": "text"
+      },
+      {
+        "id": "Q4",
+        "text": "ご意見 (FreeText)",
+        "type": "free_text"
+      },
+      {
+        "id": "Q5",
+        "text": "来場人数 (Number)",
+        "type": "number"
+      },
+      {
+        "id": "Q6",
+        "text": "希望日 (Date)",
+        "type": "date"
+      },
+      {
+        "id": "Q7",
+        "text": "時間 (Time)",
+        "type": "time"
+      },
+      {
+        "id": "Q8",
+        "text": "製品評価 (Matrix SA)",
+        "type": "matrix_sa",
+        "rows": [
+          {
+            "id": "row1",
+            "text": "デザイン"
+          },
+          {
+            "id": "row2",
+            "text": "機能性"
+          },
+          {
+            "id": "row3",
+            "text": "価格"
+          },
+          {
+            "id": "row4",
+            "text": "サポート"
+          }
+        ],
+        "columns": [
+          {
+            "value": "5",
+            "text": "非常に良い"
+          },
+          {
+            "value": "4",
+            "text": "良い"
+          },
+          {
+            "value": "3",
+            "text": "普通"
+          },
+          {
+            "value": "2",
+            "text": "悪い"
+          },
+          {
+            "value": "1",
+            "text": "非常に悪い"
+          }
+        ]
+      },
+      {
+        "id": "Q9",
+        "text": "署名 (Handwriting)",
+        "type": "handwriting"
+      },
+      {
+        "id": "Q10",
+        "text": "現場写真 (Image)",
+        "type": "image"
+      }
+    ]
   },
   {
-    "id": "sv_0001_25023",
-    "groupId": "GROUP001",
+    "id": "sv_0001_26002",
+    "groupId": "personal",
     "name": {
-      "ja": "新製品アンケート",
-      "en": "New Product Survey"
+      "ja": "展示会リード獲得 (個人アカウント)",
+      "en": "展示会リード獲得 - personal"
     },
-    "displayTitle": {
-      "ja": "新製品に関する意識調査",
-      "en": "Awareness about new product"
-    },
-    "description": {
-      "ja": "新製品の評価および改善点を把握します。",
-      "en": "Collect feedback on a new product and improvements."
-    },
-    "status": "準備中",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-07-05",
-    "periodEnd": "2025-08-20",
-    "dataCompletionDate": "",
-    "plan": "Premium",
-    "deadline": "2025-09-10",
-    "estimatedBillingAmount": 75000,
-    "bizcardEnabled": true,
-    "bizcardRequest": 150,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-07-05T00:00:00+09:00",
-    "dataConversionPlan": "superExpress"
+    "status": "会期中",
+    "answerCount": 50,
+    "periodStart": "2026-01-04",
+    "periodEnd": "2026-01-17",
+    "plan": "Free",
+    "details": [
+      {
+        "id": "Q1",
+        "text": "業種",
+        "type": "single_choice",
+        "options": [
+          "製造",
+          "IT"
+        ]
+      }
+    ]
   },
   {
-    "id": "sv_0001_25024",
-    "groupId": "GROUP002",
+    "id": "sv_0001_26003",
+    "groupId": "personal",
     "name": {
-      "ja": "ブランド認知調査",
-      "en": "Brand Awareness Survey"
+      "ja": "製品満足度調査 (個人アカウント)",
+      "en": "製品満足度調査 - personal"
     },
-    "displayTitle": {
-      "ja": "ブランド認知と印象",
-      "en": "Brand awareness and impressions"
-    },
-    "description": {
-      "ja": "ブランドの認知度・好感度を把握します。",
-      "en": "Measure brand awareness and favorability."
-    },
-    "status": "データ入力中",
-    "answerCount": 210,
-    "realtimeAnswers": 5,
-    "periodStart": "2025-07-10",
-    "periodEnd": "2025-06-15",
-    "dataCompletionDate": "2025-06-30",
-    "plan": "Standard",
-    "deadline": "2025-07-15",
-    "estimatedBillingAmount": 68000,
-    "bizcardEnabled": true,
-    "bizcardRequest": 220,
-    "bizcardCompletionCount": 205,
-    "thankYouEmailSettings": "設定済み",
-    "createdAt": "2025-07-10T00:00:00+09:00",
-    "dataConversionPlan": "normal"
+    "status": "会期中",
+    "answerCount": 50,
+    "periodStart": "2026-01-04",
+    "periodEnd": "2026-01-17",
+    "plan": "Free",
+    "details": [
+      {
+        "id": "Q1",
+        "text": "質問1",
+        "type": "text"
+      }
+    ]
   },
   {
-    "id": "sv_0001_25025",
-    "groupId": "GROUP002",
+    "id": "sv_0001_26004",
+    "groupId": "personal",
     "name": {
-      "ja": "イベント来場者アンケート",
-      "en": "Event Attendee Survey"
+      "ja": "現場点検ログ (個人アカウント)",
+      "en": "現場点検ログ - personal"
     },
-    "displayTitle": {
-      "ja": "イベント満足度調査",
-      "en": "Event satisfaction survey"
-    },
-    "description": {
-      "ja": "来場者の満足度や改善要望を収集します。",
-      "en": "Collect attendee satisfaction and requests."
-    },
-    "status": "終了",
-    "answerCount": 95,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-07-15",
-    "periodEnd": "2025-05-20",
-    "dataCompletionDate": "2025-05-27",
-    "plan": "Standard",
-    "deadline": "2025-06-10",
-    "estimatedBillingAmount": 42000,
-    "bizcardEnabled": false,
-    "bizcardRequest": 0,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-07-15T00:00:00+09:00",
-    "dataConversionPlan": "normal"
+    "status": "会期中",
+    "answerCount": 50,
+    "periodStart": "2026-01-04",
+    "periodEnd": "2026-01-17",
+    "plan": "Free",
+    "details": [
+      {
+        "id": "Q1",
+        "text": "質問1",
+        "type": "text"
+      }
+    ]
   },
   {
-    "id": "sv_0001_25026",
-    "groupId": "GROUP001",
+    "id": "sv_0001_26005",
+    "groupId": "personal",
     "name": {
-      "ja": "キャンペーン効果測定",
-      "en": "Campaign Effectiveness"
+      "ja": "グローバル意識調査 (個人アカウント)",
+      "en": "グローバル意識調査 - personal"
     },
-    "displayTitle": {
-      "ja": "広告キャンペーンの効果測定",
-      "en": "Ad campaign effectiveness"
+    "status": "会期中",
+    "answerCount": 50,
+    "periodStart": "2026-01-04",
+    "periodEnd": "2026-01-17",
+    "plan": "Free",
+    "details": [
+      {
+        "id": "Q1",
+        "text": "質問1",
+        "type": "text"
+      }
+    ]
+  },
+  {
+    "id": "sv_0001_26006",
+    "groupId": "personal",
+    "name": {
+      "ja": "条件分岐ロジック検証 (個人アカウント)",
+      "en": "条件分岐ロジック検証 - personal"
     },
-    "description": {
-      "ja": "広告キャンペーンの成果を評価します。",
-      "en": "Evaluate the outcomes of an ad campaign."
+    "status": "会期中",
+    "answerCount": 40,
+    "periodStart": "2026-01-04",
+    "periodEnd": "2026-01-17",
+    "plan": "Free",
+    "details": [
+      {
+        "id": "Q1",
+        "text": "質問1",
+        "type": "text"
+      }
+    ]
+  },
+  {
+    "id": "sv_0001_26007",
+    "groupId": "personal",
+    "name": {
+      "ja": "大量データ負荷検証 (個人アカウント)",
+      "en": "大量データ負荷検証 - personal"
     },
-    "status": "データ入力",
+    "status": "会期中",
+    "answerCount": 1200,
+    "periodStart": "2026-01-04",
+    "periodEnd": "2026-01-17",
+    "plan": "Free",
+    "details": [
+      {
+        "id": "Q1",
+        "text": "質問1",
+        "type": "text"
+      }
+    ]
+  },
+  {
+    "id": "sv_0001_26008",
+    "groupId": "personal",
+    "name": {
+      "ja": "業種別実用テンプレート (個人アカウント)",
+      "en": "業種別実用テンプレート - personal"
+    },
+    "status": "会期中",
     "answerCount": 60,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-07-20",
-    "periodEnd": "2025-04-15",
-    "dataCompletionDate": "",
+    "periodStart": "2026-01-04",
+    "periodEnd": "2026-01-17",
     "plan": "Free",
-    "deadline": "2025-05-01",
-    "estimatedBillingAmount": 0,
-    "bizcardEnabled": false,
-    "bizcardRequest": 0,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-07-20T00:00:00+09:00",
-    "dataConversionPlan": "trial"
+    "details": [
+      {
+        "id": "Q1",
+        "text": "質問1",
+        "type": "text"
+      }
+    ]
   },
   {
-    "id": "sv_0001_25027",
-    "groupId": "GROUP002",
+    "id": "sv_0002_26001",
+    "groupId": "group_sales",
     "name": {
-      "ja": "従業員満足度",
-      "en": "Employee Satisfaction"
+      "ja": "全形式網羅・分析検証テスト (営業部)",
+      "en": "全形式網羅・分析検証テスト - group_sales"
     },
-    "displayTitle": {
-      "ja": "社内満足度アンケート",
-      "en": "Internal satisfaction survey"
-    },
-    "description": {
-      "ja": "社内施策の満足度を調査します。",
-      "en": "Survey on internal initiatives satisfaction."
-    },
-    "status": "草稿",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-07-25",
-    "periodEnd": "2025-09-30",
-    "dataCompletionDate": "",
-    "plan": "Standard",
-    "deadline": "2025-10-15",
-    "estimatedBillingAmount": 30000,
-    "bizcardEnabled": true,
-    "bizcardRequest": 100,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-07-25T00:00:00+09:00",
-    "dataConversionPlan": "normal"
-  },
-  {
-    "id": "sv_0001_25028",
-    "groupId": "GROUP003",
-    "name": {
-      "ja": "Webサイト利用満足度",
-      "en": "Survey Name 7"
-    },
-    "displayTitle": {
-      "ja": "Webサイト利用満足度",
-      "en": "Survey Title 7"
-    },
-    "description": {
-      "ja": "Webサイト利用満足度についての詳細な調査です。",
-      "en": "Detailed survey about Webサイト利用満足度."
-    },
-    "status": "終了",
-    "answerCount": 389,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-08-01",
-    "periodEnd": "2025-08-02",
-    "dataCompletionDate": "2025-08-12",
-    "plan": "Premium",
-    "deadline": "2025-09-19",
-    "estimatedBillingAmount": 88500,
-    "bizcardEnabled": false,
-    "bizcardRequest": 0,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "設定済み",
-    "createdAt": "2025-08-01T00:00:00+09:00",
-    "dataConversionPlan": "superExpress"
-  },
-  {
-    "id": "sv_0001_25031",
-    "groupId": "GROUP005",
-    "name": {
-      "ja": "四半期製品フィードバック",
-      "en": "Survey Name 8"
-    },
-    "displayTitle": {
-      "ja": "四半期製品フィードバック",
-      "en": "Survey Title 8"
-    },
-    "description": {
-      "ja": "四半期製品フィードバックについての詳細な調査です。",
-      "en": "Detailed survey about 四半期製品フィードバック."
-    },
-    "status": "準備中",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-08-05",
-    "periodEnd": "2025-03-25",
-    "dataCompletionDate": "",
-    "plan": "Standard",
-    "deadline": "2025-04-25",
-    "estimatedBillingAmount": 39500,
-    "bizcardEnabled": false,
-    "bizcardRequest": 0,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "設定済み",
-    "createdAt": "2025-08-05T00:00:00+09:00",
-    "dataConversionPlan": "normal"
-  },
-  {
-    "id": "sv_0001_25032",
-    "groupId": "GROUP001",
-    "name": {
-      "ja": "カスタマーサポート評価",
-      "en": "Survey Name 9"
-    },
-    "displayTitle": {
-      "ja": "カスタマーサポート評価",
-      "en": "Survey Title 9"
-    },
-    "description": {
-      "ja": "カスタマーサポート評価についての詳細な調査です。",
-      "en": "Detailed survey about カスタマーサポート評価."
-    },
-    "status": "草稿",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-08-10",
-    "periodEnd": "2025-02-15",
-    "dataCompletionDate": "",
-    "plan": "Standard",
-    "deadline": "2025-03-20",
-    "estimatedBillingAmount": 87300,
-    "bizcardEnabled": true,
-    "bizcardRequest": 178,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "設定済み",
-    "createdAt": "2025-08-10T00:00:00+09:00",
-    "dataConversionPlan": "normal"
-  },
-  {
-    "id": "sv_0001_25035",
-    "groupId": "GROUP001",
-    "name": {
-      "ja": "新機能Aに関する調査",
-      "en": "Survey Name 10"
-    },
-    "displayTitle": {
-      "ja": "新機能Aに関する調査",
-      "en": "Survey Title 10"
-    },
-    "description": {
-      "ja": "新機能Aに関する調査についての詳細な調査です。",
-      "en": "Detailed survey about 新機能Aに関する調査."
-    },
-    "status": "草稿",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-08-15",
-    "periodEnd": "2025-10-01",
-    "dataCompletionDate": "",
-    "plan": "Premium",
-    "deadline": "2025-11-02",
-    "estimatedBillingAmount": 93100,
-    "bizcardEnabled": true,
-    "bizcardRequest": 158,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-08-15T00:00:00+09:00",
-    "dataConversionPlan": "superExpress"
-  },
-  {
-    "id": "sv_0001_25039",
-    "groupId": "GROUP004",
-    "name": {
-      "ja": "マーケティングイベント事後調査",
-      "en": "Survey Name 11"
-    },
-    "displayTitle": {
-      "ja": "マーケティングイベント事後調査",
-      "en": "Survey Title 11"
-    },
-    "description": {
-      "ja": "マーケティングイベント事後調査についての詳細な調査です。",
-      "en": "Detailed survey about マーケティングイベント事後調査."
-    },
-    "status": "準備中",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-08-20",
-    "periodEnd": "2025-04-15",
-    "dataCompletionDate": "",
-    "plan": "Standard",
-    "deadline": "2025-05-20",
-    "estimatedBillingAmount": 64600,
-    "bizcardEnabled": true,
-    "bizcardRequest": 108,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "送信完了",
-    "createdAt": "2025-08-20T00:00:00+09:00",
-    "dataConversionPlan": "normal"
-  },
-  {
-    "id": "sv_0001_25040",
-    "groupId": "GROUP003",
-    "name": {
-      "ja": "採用プロセスフィードバック",
-      "en": "Survey Name 12"
-    },
-    "displayTitle": {
-      "ja": "採用プロセスフィードバック",
-      "en": "Survey Title 12"
-    },
-    "description": {
-      "ja": "採用プロセスフィードバックについての詳細な調査です。",
-      "en": "Detailed survey about 採用プロセスフィードバック."
-    },
-    "status": "準備中",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-08-25",
-    "periodEnd": "2025-07-20",
-    "dataCompletionDate": "",
+    "status": "会期中",
+    "answerCount": 300,
+    "periodStart": "2026-01-04",
+    "periodEnd": "2026-01-17",
     "plan": "Free",
-    "deadline": "2025-08-21",
-    "estimatedBillingAmount": 68600,
-    "bizcardEnabled": true,
-    "bizcardRequest": 133,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "設定済み",
-    "createdAt": "2025-08-25T00:00:00+09:00",
-    "dataConversionPlan": "trial"
+    "details": [
+      {
+        "id": "Q1",
+        "text": "業界 (SA)",
+        "type": "single_choice",
+        "options": [
+          "製造",
+          "IT",
+          "金融",
+          "小売"
+        ]
+      },
+      {
+        "id": "Q2",
+        "text": "興味のある分野 (MA)",
+        "type": "multi_choice",
+        "options": [
+          "製品A",
+          "製品B",
+          "製品C"
+        ]
+      },
+      {
+        "id": "Q3",
+        "text": "氏名 (Text)",
+        "type": "text"
+      },
+      {
+        "id": "Q4",
+        "text": "ご意見 (FreeText)",
+        "type": "free_text"
+      },
+      {
+        "id": "Q5",
+        "text": "来場人数 (Number)",
+        "type": "number"
+      },
+      {
+        "id": "Q6",
+        "text": "希望日 (Date)",
+        "type": "date"
+      },
+      {
+        "id": "Q7",
+        "text": "時間 (Time)",
+        "type": "time"
+      },
+      {
+        "id": "Q8",
+        "text": "製品評価 (Matrix SA)",
+        "type": "matrix_sa",
+        "rows": [
+          {
+            "id": "row1",
+            "text": "デザイン"
+          },
+          {
+            "id": "row2",
+            "text": "機能性"
+          },
+          {
+            "id": "row3",
+            "text": "価格"
+          },
+          {
+            "id": "row4",
+            "text": "サポート"
+          }
+        ],
+        "columns": [
+          {
+            "value": "5",
+            "text": "非常に良い"
+          },
+          {
+            "value": "4",
+            "text": "良い"
+          },
+          {
+            "value": "3",
+            "text": "普通"
+          },
+          {
+            "value": "2",
+            "text": "悪い"
+          },
+          {
+            "value": "1",
+            "text": "非常に悪い"
+          }
+        ]
+      },
+      {
+        "id": "Q9",
+        "text": "署名 (Handwriting)",
+        "type": "handwriting"
+      },
+      {
+        "id": "Q10",
+        "text": "現場写真 (Image)",
+        "type": "image"
+      }
+    ]
   },
   {
-    "id": "sv_0001_25043",
-    "groupId": "GROUP004",
+    "id": "sv_0002_26002",
+    "groupId": "group_sales",
     "name": {
-      "ja": "社内コミュニケーション改善",
-      "en": "Survey Name 13"
+      "ja": "展示会リード獲得 (営業部)",
+      "en": "展示会リード獲得 - group_sales"
     },
-    "displayTitle": {
-      "ja": "社内コミュニケーション改善",
-      "en": "Survey Title 13"
-    },
-    "description": {
-      "ja": "社内コミュニケーション改善についての詳細な調査です。",
-      "en": "Detailed survey about 社内コミュニケーション改善."
-    },
-    "status": "データ入力中",
-    "answerCount": 488,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-09-01",
-    "periodEnd": "2025-01-11",
-    "dataCompletionDate": "2025-01-18",
-    "plan": "Standard",
-    "deadline": "2025-02-25",
-    "estimatedBillingAmount": 57100,
-    "bizcardEnabled": true,
-    "bizcardRequest": 392,
-    "bizcardCompletionCount": 321,
-    "thankYouEmailSettings": "設定済み",
-    "createdAt": "2025-09-01T00:00:00+09:00",
-    "dataConversionPlan": "normal"
-  },
-  {
-    "id": "sv_0001_25044",
-    "groupId": "GROUP003",
-    "name": {
-      "ja": "ITインフラ満足度",
-      "en": "Survey Name 14"
-    },
-    "displayTitle": {
-      "ja": "ITインフラ満足度",
-      "en": "Survey Title 14"
-    },
-    "description": {
-      "ja": "ITインフラ満足度についての詳細な調査です。",
-      "en": "Detailed survey about ITインフラ満足度."
-    },
-    "status": "実施中",
-    "answerCount": 269,
-    "realtimeAnswers": 1,
-    "periodStart": "2025-09-05",
-    "periodEnd": "2025-02-04",
-    "dataCompletionDate": "",
-    "plan": "Premium",
-    "deadline": "2025-03-19",
-    "estimatedBillingAmount": 96100,
-    "bizcardEnabled": true,
-    "bizcardRequest": 221,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "設定済み",
-    "createdAt": "2025-09-05T00:00:00+09:00",
-    "dataConversionPlan": "superExpress"
-  },
-  {
-    "id": "sv_0001_25045",
-    "groupId": "GROUP004",
-    "name": {
-      "ja": "福利厚生に関するアンケート",
-      "en": "Survey Name 15"
-    },
-    "displayTitle": {
-      "ja": "福利厚生に関するアンケート",
-      "en": "Survey Title 15"
-    },
-    "description": {
-      "ja": "福利厚生に関するアンケートについての詳細な調査です。",
-      "en": "Detailed survey about 福利厚生に関するアンケート."
-    },
-    "status": "実施中",
-    "answerCount": 494,
-    "realtimeAnswers": 1,
-    "periodStart": "2025-09-10",
-    "periodEnd": "2025-09-08",
-    "dataCompletionDate": "",
-    "plan": "Standard",
-    "deadline": "2025-10-15",
-    "estimatedBillingAmount": 69100,
-    "bizcardEnabled": true,
-    "bizcardRequest": 350,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "設定済み",
-    "createdAt": "2025-09-10T00:00:00+09:00",
-    "dataConversionPlan": "normal"
-  },
-  {
-    "id": "sv_0001_25047",
-    "groupId": "GROUP003",
-    "name": {
-      "ja": "競合製品比較調査",
-      "en": "Survey Name 16"
-    },
-    "displayTitle": {
-      "ja": "競合製品比較調査",
-      "en": "Survey Title 16"
-    },
-    "description": {
-      "ja": "競合製品比較調査についての詳細な調査です。",
-      "en": "Detailed survey about 競合製品比較調査."
-    },
-    "status": "準備中",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-09-15",
-    "periodEnd": "2025-02-18",
-    "dataCompletionDate": "",
-    "plan": "Standard",
-    "deadline": "2025-03-10",
-    "estimatedBillingAmount": 98700,
-    "bizcardEnabled": true,
-    "bizcardRequest": 101,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "送信完了",
-    "createdAt": "2025-09-15T00:00:00+09:00",
-    "dataConversionPlan": "normal"
-  },
-  {
-    "id": "sv_0001_25049",
-    "groupId": "GROUP004",
-    "name": {
-      "ja": "価格戦略に関する調査",
-      "en": "Survey Name 17"
-    },
-    "displayTitle": {
-      "ja": "価格戦略に関する調査",
-      "en": "Survey Title 17"
-    },
-    "description": {
-      "ja": "価格戦略に関する調査についての詳細な調査です。",
-      "en": "Detailed survey about 価格戦略に関する調査."
-    },
-    "status": "草稿",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-09-20",
-    "periodEnd": "2025-04-08",
-    "dataCompletionDate": "",
+    "status": "会期中",
+    "answerCount": 50,
+    "periodStart": "2026-01-04",
+    "periodEnd": "2026-01-17",
     "plan": "Free",
-    "deadline": "2025-05-23",
-    "estimatedBillingAmount": 59700,
-    "bizcardEnabled": false,
-    "bizcardRequest": 0,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "設定済み",
-    "createdAt": "2025-09-20T00:00:00+09:00",
-    "dataConversionPlan": "trial"
+    "details": [
+      {
+        "id": "Q1",
+        "text": "業種",
+        "type": "single_choice",
+        "options": [
+          "製造",
+          "IT"
+        ]
+      }
+    ]
   },
   {
-    "id": "sv_0001_25050",
-    "groupId": "GROUP001",
+    "id": "sv_0002_26003",
+    "groupId": "group_sales",
     "name": {
-      "ja": "パートナープログラム満足度",
-      "en": "Survey Name 18"
+      "ja": "製品満足度調査 (営業部)",
+      "en": "製品満足度調査 - group_sales"
     },
-    "displayTitle": {
-      "ja": "パートナープログラム満足度",
-      "en": "Survey Title 18"
-    },
-    "description": {
-      "ja": "パートナープログラム満足度についての詳細な調査です。",
-      "en": "Detailed survey about パートナーシップ満足度."
-    },
-    "status": "終了",
-    "answerCount": 403,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-09-25",
-    "periodEnd": "2025-04-21",
-    "dataCompletionDate": "2025-04-27",
-    "plan": "Premium",
-    "deadline": "2025-05-23",
-    "estimatedBillingAmount": 28400,
-    "bizcardEnabled": true,
-    "bizcardRequest": 399,
-    "bizcardCompletionCount": 323,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-09-25T00:00:00+09:00",
-    "dataConversionPlan": "superExpress"
-  },
-  {
-    "id": "sv_0001_25051",
-    "groupId": "GROUP001",
-    "name": {
-      "ja": "オンラインセミナー評価",
-      "en": "Survey Name 19"
-    },
-    "displayTitle": {
-      "ja": "オンラインセミナー評価",
-      "en": "Survey Title 19"
-    },
-    "description": {
-      "ja": "オンラインセミナー評価についての詳細な調査です。",
-      "en": "Detailed survey about オンラインセミナー評価."
-    },
-    "status": "データ入力中",
-    "answerCount": 403,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-10-01",
-    "periodEnd": "2025-01-29",
-    "dataCompletionDate": "2025-02-05",
-    "plan": "Premium",
-    "deadline": "2025-03-19",
-    "estimatedBillingAmount": 83200,
-    "bizcardEnabled": true,
-    "bizcardRequest": 305,
-    "bizcardCompletionCount": 250,
-    "thankYouEmailSettings": "設定済み",
-    "createdAt": "2025-10-01T00:00:00+09:00",
-    "dataConversionPlan": "superExpress"
-  },
-  {
-    "id": "sv_0001_25052",
-    "groupId": "GROUP003",
-    "name": {
-      "ja": "技術ドキュメント改善",
-      "en": "Survey Name 20"
-    },
-    "displayTitle": {
-      "ja": "技術ドキュメント改善",
-      "en": "Survey Title 20"
-    },
-    "description": {
-      "ja": "技術ドキュメント改善についての詳細な調査です。",
-      "en": "Detailed survey about 技術ドキュメント改善."
-    },
-    "status": "終了",
-    "answerCount": 493,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-10-05",
-    "periodEnd": "2025-03-20",
-    "dataCompletionDate": "2025-03-25",
+    "status": "会期中",
+    "answerCount": 50,
+    "periodStart": "2026-01-04",
+    "periodEnd": "2026-01-17",
     "plan": "Free",
-    "deadline": "2025-04-29",
-    "estimatedBillingAmount": 98500,
-    "bizcardEnabled": false,
-    "bizcardRequest": 0,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "送信完了",
-    "createdAt": "2025-10-05T00:00:00+09:00",
-    "dataConversionPlan": "trial"
+    "details": [
+      {
+        "id": "Q1",
+        "text": "質問1",
+        "type": "text"
+      }
+    ]
   },
   {
-    "id": "sv_0001_25053",
-    "groupId": "GROUP001",
+    "id": "sv_0002_26004",
+    "groupId": "group_sales",
     "name": {
-      "ja": "製品フィードバック #21",
-      "en": "Survey Name 21"
+      "ja": "現場点検ログ (営業部)",
+      "en": "現場点検ログ - group_sales"
     },
-    "displayTitle": {
-      "ja": "製品フィードバック #21",
-      "en": "Survey Title 21"
-    },
-    "description": {
-      "ja": "製品フィードバック #21についての詳細な調査です。",
-      "en": "Detailed survey about 製品フィードバック #21."
-    },
-    "status": "草稿",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-10-10",
-    "periodEnd": "2025-08-21",
-    "dataCompletionDate": "",
-    "plan": "Standard",
-    "deadline": "2025-09-22",
-    "estimatedBillingAmount": 133800,
-    "bizcardEnabled": true,
-    "bizcardRequest": 203,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-10-10T00:00:00+09:00",
-    "dataConversionPlan": "normal"
-  },
-  {
-    "id": "sv_0001_25054",
-    "groupId": "GROUP003",
-    "name": {
-      "ja": "従業員エンゲージメント調査 #22",
-      "en": "Survey Name 22"
-    },
-    "displayTitle": {
-      "ja": "従業員エンゲージメント調査 #22",
-      "en": "Survey Title 22"
-    },
-    "description": {
-      "ja": "従業員エンゲージメント調査 #22についての詳細な調査です。",
-      "en": "Detailed survey about 従業員エンゲージメント調査 #22."
-    },
-    "status": "草稿",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-10-15",
-    "periodEnd": "2025-02-09",
-    "dataCompletionDate": "",
-    "plan": "Premium",
-    "deadline": "2025-03-24",
-    "estimatedBillingAmount": 199900,
-    "bizcardEnabled": false,
-    "bizcardRequest": 0,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-10-15T00:00:00+09:00",
-    "dataConversionPlan": "superExpress"
-  },
-  {
-    "id": "sv_0001_25055",
-    "groupId": "GROUP004",
-    "name": {
-      "ja": "パートナーシップ満足度 #23",
-      "en": "Survey Name 23"
-    },
-    "displayTitle": {
-      "ja": "パートナーシップ満足度 #23",
-      "en": "Survey Title 23"
-    },
-    "description": {
-      "ja": "パートナーシップ満足度 #23についての詳細な調査です。",
-      "en": "Detailed survey about パートナーシップ満足度 #23."
-    },
-    "status": "草稿",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-10-20",
-    "periodEnd": "2025-08-18",
-    "dataCompletionDate": "",
-    "plan": "Standard",
-    "deadline": "2025-09-20",
-    "estimatedBillingAmount": 188700,
-    "bizcardEnabled": true,
-    "bizcardRequest": 212,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "設定済み",
-    "createdAt": "2025-10-20T00:00:00+09:00",
-    "dataConversionPlan": "normal"
-  },
-  {
-    "id": "sv_0001_25056",
-    "groupId": "GROUP001",
-    "name": {
-      "ja": "ブランドイメージ調査 #24",
-      "en": "Survey Name 24"
-    },
-    "displayTitle": {
-      "ja": "ブランドイメージ調査 #24",
-      "en": "Survey Title 24"
-    },
-    "description": {
-      "ja": "ブランドイメージ調査 #24についての詳細な調査です。",
-      "en": "Detailed survey about ブランドイメージ調査 #24."
-    },
-    "status": "草稿",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-10-25",
-    "periodEnd": "2025-10-01",
-    "dataCompletionDate": "",
-    "plan": "Standard",
-    "deadline": "2025-11-15",
-    "estimatedBillingAmount": 163100,
-    "bizcardEnabled": true,
-    "bizcardRequest": 163,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "設定済み",
-    "createdAt": "2025-10-25T00:00:00+09:00",
-    "dataConversionPlan": "normal"
-  },
-  {
-    "id": "sv_0001_25057",
-    "groupId": "GROUP001",
-    "name": {
-      "ja": "新規事業アイデア募集 #25",
-      "en": "Survey Name 25"
-    },
-    "displayTitle": {
-      "ja": "新規事業アイデア募集 #25",
-      "en": "Survey Title 25"
-    },
-    "description": {
-      "ja": "新規事業アイデア募集 #25についての詳細な調査です。",
-      "en": "Detailed survey about 新規事業アイデア募集 #25."
-    },
-    "status": "準備中",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-10-30",
-    "periodEnd": "2025-03-13",
-    "dataCompletionDate": "",
-    "plan": "Premium",
-    "deadline": "2025-04-16",
-    "estimatedBillingAmount": 112500,
-    "bizcardEnabled": true,
-    "bizcardRequest": 213,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "設定済み",
-    "createdAt": "2025-10-30T00:00:00+09:00",
-    "dataConversionPlan": "superExpress"
-  },
-  {
-    "id": "sv_0001_25058",
-    "groupId": "GROUP005",
-    "name": {
-      "ja": "製品フィードバック #26",
-      "en": "Survey Name 26"
-    },
-    "displayTitle": {
-      "ja": "製品フィードバック #26",
-      "en": "Survey Title 26"
-    },
-    "description": {
-      "ja": "製品フィードバック #26についての詳細な調査です。",
-      "en": "Detailed survey about 製品フィードバック #26."
-    },
-    "status": "準備中",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-11-05",
-    "periodEnd": "2025-09-19",
-    "dataCompletionDate": "",
-    "plan": "Standard",
-    "deadline": "2025-10-23",
-    "estimatedBillingAmount": 114200,
-    "bizcardEnabled": false,
-    "bizcardRequest": 0,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-11-05T00:00:00+09:00",
-    "dataConversionPlan": "normal"
-  },
-  {
-    "id": "sv_0001_25059",
-    "groupId": "GROUP001",
-    "name": {
-      "ja": "サービス改善アンケート #27",
-      "en": "Survey Name 27"
-    },
-    "displayTitle": {
-      "ja": "サービス改善アンケート #27",
-      "en": "Survey Title 27"
-    },
-    "description": {
-      "ja": "サービス改善アンケート #27についての詳細な調査です。",
-      "en": "Detailed survey about サービス改善アンケート #27."
-    },
-    "status": "終了",
-    "answerCount": 968,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-11-10",
-    "periodEnd": "2025-02-12",
-    "dataCompletionDate": "2025-02-22",
-    "plan": "Standard",
-    "deadline": "2025-03-26",
-    "estimatedBillingAmount": 194800,
-    "bizcardEnabled": true,
-    "bizcardRequest": 588,
-    "bizcardCompletionCount": 524,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-11-10T00:00:00+09:00",
-    "dataConversionPlan": "normal"
-  },
-  {
-    "id": "sv_0001_25060",
-    "groupId": "GROUP001",
-    "name": {
-      "ja": "ウェブサイトUX調査 #28",
-      "en": "Survey Name 28"
-    },
-    "displayTitle": {
-      "ja": "ウェブサイトUX調査 #28",
-      "en": "Survey Title 28"
-    },
-    "description": {
-      "ja": "ウェブサイトUX調査 #28についての詳細な調査です。",
-      "en": "Detailed survey about ウェブサイトUX調査 #28."
-    },
-    "status": "草稿",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-11-15",
-    "periodEnd": "2025-08-09",
-    "dataCompletionDate": "",
-    "plan": "Premium",
-    "deadline": "2025-09-18",
-    "estimatedBillingAmount": 187300,
-    "bizcardEnabled": true,
-    "bizcardRequest": 221,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-11-15T00:00:00+09:00",
-    "dataConversionPlan": "superExpress"
-  },
-  {
-    "id": "sv_0001_25061",
-    "groupId": "GROUP001",
-    "name": {
-      "ja": "パートナーシップ満足度 #29",
-      "en": "Survey Name 29"
-    },
-    "displayTitle": {
-      "ja": "パートナーシップ満足度 #29",
-      "en": "Survey Title 29"
-    },
-    "description": {
-      "ja": "パートナーシップ満足度 #29についての詳細な調査です。",
-      "en": "Detailed survey about パートナーシップ満足度 #29."
-    },
-    "status": "データ入力中",
-    "answerCount": 89,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-11-20",
-    "periodEnd": "2025-08-25",
-    "dataCompletionDate": "2025-09-01",
-    "plan": "Standard",
-    "deadline": "2025-09-25",
-    "estimatedBillingAmount": 117100,
-    "bizcardEnabled": true,
-    "bizcardRequest": 88,
-    "bizcardCompletionCount": 71,
-    "thankYouEmailSettings": "設定済み",
-    "createdAt": "2025-11-20T00:00:00+09:00",
-    "dataConversionPlan": "normal"
-  },
-  {
-    "id": "sv_0001_25062",
-    "groupId": "GROUP005",
-    "name": {
-      "ja": "従業員エンゲージメント調査 #30",
-      "en": "Survey Name 30"
-    },
-    "displayTitle": {
-      "ja": "従業員エンゲージメント調査 #30",
-      "en": "Survey Title 30"
-    },
-    "description": {
-      "ja": "従業員エンゲージメント調査 #30についての詳細な調査です。",
-      "en": "Detailed survey about 従業員エンゲージメント調査 #30."
-    },
-    "status": "草稿",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-11-25",
-    "periodEnd": "2025-04-02",
-    "dataCompletionDate": "",
+    "status": "会期中",
+    "answerCount": 50,
+    "periodStart": "2026-01-04",
+    "periodEnd": "2026-01-17",
     "plan": "Free",
-    "deadline": "2025-05-07",
-    "estimatedBillingAmount": 185300,
-    "bizcardEnabled": false,
-    "bizcardRequest": 0,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-11-25T00:00:00+09:00",
-    "dataConversionPlan": "trial"
+    "details": [
+      {
+        "id": "Q1",
+        "text": "質問1",
+        "type": "text"
+      }
+    ]
   },
   {
-    "id": "sv_0001_25018",
-    "groupId": "GROUP005",
+    "id": "sv_0002_26005",
+    "groupId": "group_sales",
     "name": {
-      "ja": "製品フィードバック #31",
-      "en": "Survey Name 31"
+      "ja": "グローバル意識調査 (営業部)",
+      "en": "グローバル意識調査 - group_sales"
     },
-    "displayTitle": {
-      "ja": "製品フィードバック #31",
-      "en": "Survey Title 31"
-    },
-    "description": {
-      "ja": "製品フィードバック #31についての詳細な調査です。",
-      "en": "Detailed survey about 製品フィードバック #31."
-    },
-    "status": "草稿",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-04-10",
-    "periodEnd": "2025-05-08",
-    "dataCompletionDate": "",
+    "status": "会期中",
+    "answerCount": 50,
+    "periodStart": "2026-01-04",
+    "periodEnd": "2026-01-17",
     "plan": "Free",
-    "deadline": "2025-06-11",
-    "estimatedBillingAmount": 173800,
-    "bizcardEnabled": true,
-    "bizcardRequest": 281,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "送信完了",
-    "createdAt": "2025-04-10T00:00:00+09:00",
-    "dataConversionPlan": "trial"
+    "details": [
+      {
+        "id": "Q1",
+        "text": "質問1",
+        "type": "text"
+      }
+    ]
   },
   {
-    "id": "sv_0001_25013",
-    "groupId": "GROUP001",
+    "id": "sv_0002_26006",
+    "groupId": "group_sales",
     "name": {
-      "ja": "ブランドイメージ調査 #32",
-      "en": "Survey Name 32"
+      "ja": "条件分岐ロジック検証 (営業部)",
+      "en": "条件分岐ロジック検証 - group_sales"
     },
-    "displayTitle": {
-      "ja": "ブランドイメージ調査 #32",
-      "en": "Survey Title 32"
-    },
-    "description": {
-      "ja": "ブランドイメージ調査 #32についての詳細な調査です。",
-      "en": "Detailed survey about ブランドイメージ調査 #32."
-    },
-    "status": "実施中",
-    "answerCount": 82,
-    "realtimeAnswers": 4,
-    "periodStart": "2025-03-03",
-    "periodEnd": "2025-03-14",
-    "dataCompletionDate": "",
+    "status": "会期中",
+    "answerCount": 40,
+    "periodStart": "2026-01-04",
+    "periodEnd": "2026-01-17",
     "plan": "Free",
-    "deadline": "2025-04-22",
-    "estimatedBillingAmount": 108500,
-    "bizcardEnabled": false,
-    "bizcardRequest": 0,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-03-03T00:00:00+09:00",
-    "dataConversionPlan": "trial"
+    "details": [
+      {
+        "id": "Q1",
+        "text": "質問1",
+        "type": "text"
+      }
+    ]
   },
   {
-    "id": "sv_0001_25033",
-    "groupId": "GROUP004",
+    "id": "sv_0002_26007",
+    "groupId": "group_sales",
     "name": {
-      "ja": "サービス改善アンケート #33",
-      "en": "Survey Name 33"
+      "ja": "大量データ負荷検証 (営業部)",
+      "en": "大量データ負荷検証 - group_sales"
     },
-    "displayTitle": {
-      "ja": "サービス改善アンケート #33",
-      "en": "Survey Title 33"
-    },
-    "description": {
-      "ja": "サービス改善アンケート #33についての詳細な調査です。",
-      "en": "Detailed survey about サービス改善アンケート #33."
-    },
-    "status": "草稿",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-08-13",
-    "periodEnd": "2025-09-09",
-    "dataCompletionDate": "",
-    "plan": "Standard",
-    "deadline": "2025-10-15",
-    "estimatedBillingAmount": 199300,
-    "bizcardEnabled": true,
-    "bizcardRequest": 211,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-08-13T00:00:00+09:00",
-    "dataConversionPlan": "normal"
-  },
-  {
-    "id": "sv_0001_25003",
-    "groupId": "GROUP004",
-    "name": {
-      "ja": "顧客満足度調査 #34",
-      "en": "Survey Name 34"
-    },
-    "displayTitle": {
-      "ja": "顧客満足度調査 #34",
-      "en": "Survey Title 34"
-    },
-    "description": {
-      "ja": "顧客満足度調査 #34についての詳細な調査です。",
-      "en": "Detailed survey about 顧客満足度調査 #34."
-    },
-    "status": "準備中",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-01-11",
-    "periodEnd": "2025-01-20",
-    "dataCompletionDate": "",
+    "status": "会期中",
+    "answerCount": 1200,
+    "periodStart": "2026-01-04",
+    "periodEnd": "2026-01-17",
     "plan": "Free",
-    "deadline": "2025-02-20",
-    "estimatedBillingAmount": 183300,
-    "bizcardEnabled": true,
-    "bizcardRequest": 191,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-01-11T00:00:00+09:00",
-    "dataConversionPlan": "trial"
+    "details": [
+      {
+        "id": "Q1",
+        "text": "質問1",
+        "type": "text"
+      }
+    ]
   },
   {
-    "id": "sv_0001_25014",
-    "groupId": "GROUP002",
+    "id": "sv_0002_26008",
+    "groupId": "group_sales",
     "name": {
-      "ja": "新規事業アイデア募集 #35",
-      "en": "Survey Name 35"
+      "ja": "業種別実用テンプレート (営業部)",
+      "en": "業種別実用テンプレート - group_sales"
     },
-    "displayTitle": {
-      "ja": "新規事業アイデア募集 #35",
-      "en": "Survey Title 35"
-    },
-    "description": {
-      "ja": "新規事業アイデア募集 #35についての詳細な調査です。",
-      "en": "Detailed survey about 新規事業アイデア募集 #35."
-    },
-    "status": "準備中",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-03-13",
-    "periodEnd": "2025-04-09",
-    "dataCompletionDate": "",
+    "status": "会期中",
+    "answerCount": 60,
+    "periodStart": "2026-01-04",
+    "periodEnd": "2026-01-17",
     "plan": "Free",
-    "deadline": "2025-05-16",
-    "estimatedBillingAmount": 167000,
-    "bizcardEnabled": true,
-    "bizcardRequest": 211,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-03-13T00:00:00+09:00",
-    "dataConversionPlan": "trial"
+    "details": [
+      {
+        "id": "Q1",
+        "text": "質問1",
+        "type": "text"
+      }
+    ]
   },
   {
-    "id": "sv_0001_25046",
-    "groupId": "GROUP004",
+    "id": "sv_0003_26001",
+    "groupId": "group_marketing",
     "name": {
-      "ja": "ウェブサイトUX調査 #36",
-      "en": "Survey Name 36"
+      "ja": "全形式網羅・分析検証テスト (マーケティング部)",
+      "en": "全形式網羅・分析検証テスト - group_marketing"
     },
-    "displayTitle": {
-      "ja": "ウェブサイトUX調査 #36",
-      "en": "Survey Title 36"
-    },
-    "description": {
-      "ja": "ウェブサイトUX調査 #36についての詳細な調査です。",
-      "en": "Detailed survey about ウェブサイトUX調査 #36."
-    },
-    "status": "実施中",
-    "answerCount": 993,
-    "realtimeAnswers": 4,
-    "periodStart": "2025-09-13",
-    "periodEnd": "2025-09-22",
-    "dataCompletionDate": "",
+    "status": "会期中",
+    "answerCount": 300,
+    "periodStart": "2026-01-04",
+    "periodEnd": "2026-01-17",
     "plan": "Premium",
-    "deadline": "2025-10-27",
-    "estimatedBillingAmount": 119300,
-    "bizcardEnabled": true,
-    "bizcardRequest": 600,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-09-13T00:00:00+09:00",
-    "dataConversionPlan": "superExpress"
+    "details": [
+      {
+        "id": "Q1",
+        "text": "業界 (SA)",
+        "type": "single_choice",
+        "options": [
+          "製造",
+          "IT",
+          "金融",
+          "小売"
+        ]
+      },
+      {
+        "id": "Q2",
+        "text": "興味のある分野 (MA)",
+        "type": "multi_choice",
+        "options": [
+          "製品A",
+          "製品B",
+          "製品C"
+        ]
+      },
+      {
+        "id": "Q3",
+        "text": "氏名 (Text)",
+        "type": "text"
+      },
+      {
+        "id": "Q4",
+        "text": "ご意見 (FreeText)",
+        "type": "free_text"
+      },
+      {
+        "id": "Q5",
+        "text": "来場人数 (Number)",
+        "type": "number"
+      },
+      {
+        "id": "Q6",
+        "text": "希望日 (Date)",
+        "type": "date"
+      },
+      {
+        "id": "Q7",
+        "text": "時間 (Time)",
+        "type": "time"
+      },
+      {
+        "id": "Q8",
+        "text": "製品評価 (Matrix SA)",
+        "type": "matrix_sa",
+        "rows": [
+          {
+            "id": "row1",
+            "text": "デザイン"
+          },
+          {
+            "id": "row2",
+            "text": "機能性"
+          },
+          {
+            "id": "row3",
+            "text": "価格"
+          },
+          {
+            "id": "row4",
+            "text": "サポート"
+          }
+        ],
+        "columns": [
+          {
+            "value": "5",
+            "text": "非常に良い"
+          },
+          {
+            "value": "4",
+            "text": "良い"
+          },
+          {
+            "value": "3",
+            "text": "普通"
+          },
+          {
+            "value": "2",
+            "text": "悪い"
+          },
+          {
+            "value": "1",
+            "text": "非常に悪い"
+          }
+        ]
+      },
+      {
+        "id": "Q9",
+        "text": "署名 (Handwriting)",
+        "type": "handwriting"
+      },
+      {
+        "id": "Q10",
+        "text": "現場写真 (Image)",
+        "type": "image"
+      }
+    ]
   },
   {
-    "id": "sv_0001_25008",
-    "groupId": "GROUP002",
+    "id": "sv_0003_26002",
+    "groupId": "group_marketing",
     "name": {
-      "ja": "市場調査 #37",
-      "en": "Survey Name 37"
+      "ja": "展示会リード獲得 (マーケティング部)",
+      "en": "展示会リード獲得 - group_marketing"
     },
-    "displayTitle": {
-      "ja": "市場調査 #37",
-      "en": "Survey Title 37"
-    },
-    "description": {
-      "ja": "市場調査 #37についての詳細な調査です。",
-      "en": "Detailed survey about 市場調査 #37."
-    },
-    "status": "データ入力中",
-    "answerCount": 981,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-01-14",
-    "periodEnd": "2025-01-23",
-    "dataCompletionDate": "2025-01-28",
+    "status": "会期中",
+    "answerCount": 50,
+    "periodStart": "2026-01-04",
+    "periodEnd": "2026-01-17",
     "plan": "Premium",
-    "deadline": "2025-03-03",
-    "estimatedBillingAmount": 195300,
-    "bizcardEnabled": true,
-    "bizcardRequest": 882,
-    "bizcardCompletionCount": 714,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-01-14T00:00:00+09:00",
-    "dataConversionPlan": "superExpress"
+    "details": [
+      {
+        "id": "Q1",
+        "text": "業種",
+        "type": "single_choice",
+        "options": [
+          "製造",
+          "IT"
+        ]
+      }
+    ]
   },
   {
-    "id": "sv_0001_25017",
-    "groupId": "GROUP002",
+    "id": "sv_0003_26003",
+    "groupId": "group_marketing",
     "name": {
-      "ja": "イベント参加後アンケート #38",
-      "en": "Survey Name 38"
+      "ja": "製品満足度調査 (マーケティング部)",
+      "en": "製品満足度調査 - group_marketing"
     },
-    "displayTitle": {
-      "ja": "イベント参加後アンケート #38",
-      "en": "Survey Title 38"
-    },
-    "description": {
-      "ja": "イベント参加後アンケート #38についての詳細な調査です。",
-      "en": "Detailed survey about イベント参加後アンケート #38."
-    },
-    "status": "データ入力中",
-    "answerCount": 898,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-03-18",
-    "periodEnd": "2025-04-10",
-    "dataCompletionDate": "2025-04-15",
+    "status": "会期中",
+    "answerCount": 50,
+    "periodStart": "2026-01-04",
+    "periodEnd": "2026-01-17",
     "plan": "Premium",
-    "deadline": "2025-05-21",
-    "estimatedBillingAmount": 196800,
-    "bizcardEnabled": true,
-    "bizcardRequest": 502,
-    "bizcardCompletionCount": 411,
-    "thankYouEmailSettings": "送信完了",
-    "createdAt": "2025-03-18T00:00:00+09:00",
-    "dataConversionPlan": "superExpress"
+    "details": [
+      {
+        "id": "Q1",
+        "text": "質問1",
+        "type": "text"
+      }
+    ]
   },
   {
-    "id": "sv_0001_25029",
-    "groupId": "GROUP004",
+    "id": "sv_0003_26004",
+    "groupId": "group_marketing",
     "name": {
-      "ja": "製品フィードバック #39",
-      "en": "Survey Name 39"
+      "ja": "現場点検ログ (マーケティング部)",
+      "en": "現場点検ログ - group_marketing"
     },
-    "displayTitle": {
-      "ja": "製品フィードバック #39",
-      "en": "Survey Title 39"
-    },
-    "description": {
-      "ja": "製品フィードバック #39についての詳細な調査です。",
-      "en": "Detailed survey about 製品フィードバック #39."
-    },
-    "status": "実施中",
-    "answerCount": 983,
-    "realtimeAnswers": 2,
-    "periodStart": "2025-08-01",
-    "periodEnd": "2025-08-29",
-    "dataCompletionDate": "",
+    "status": "会期中",
+    "answerCount": 50,
+    "periodStart": "2026-01-04",
+    "periodEnd": "2026-01-17",
     "plan": "Premium",
-    "deadline": "2025-10-03",
-    "estimatedBillingAmount": 166400,
-    "bizcardEnabled": true,
-    "bizcardRequest": 599,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-08-01T00:00:00+09:00",
-    "dataConversionPlan": "superExpress"
+    "details": [
+      {
+        "id": "Q1",
+        "text": "質問1",
+        "type": "text"
+      }
+    ]
   },
   {
-    "id": "sv_0001_25038",
-    "groupId": "GROUP005",
+    "id": "sv_0003_26005",
+    "groupId": "group_marketing",
     "name": {
-      "ja": "従業員エンゲージメント調査 #40",
-      "en": "Survey Name 40"
+      "ja": "グローバル意識調査 (マーケティング部)",
+      "en": "グローバル意識調査 - group_marketing"
     },
-    "displayTitle": {
-      "ja": "従業員エンゲージメント調査 #40",
-      "en": "Survey Title 40"
+    "status": "会期中",
+    "answerCount": 50,
+    "periodStart": "2026-01-04",
+    "periodEnd": "2026-01-17",
+    "plan": "Premium",
+    "details": [
+      {
+        "id": "Q1",
+        "text": "質問1",
+        "type": "text"
+      }
+    ]
+  },
+  {
+    "id": "sv_0003_26006",
+    "groupId": "group_marketing",
+    "name": {
+      "ja": "条件分岐ロジック検証 (マーケティング部)",
+      "en": "条件分岐ロジック検証 - group_marketing"
     },
-    "description": {
-      "ja": "従業員エンゲージメント調査 #40についての詳細な調査です。",
-      "en": "Detailed survey about 従業員エンゲージメント調査 #40."
+    "status": "会期中",
+    "answerCount": 40,
+    "periodStart": "2026-01-04",
+    "periodEnd": "2026-01-17",
+    "plan": "Premium",
+    "details": [
+      {
+        "id": "Q1",
+        "text": "質問1",
+        "type": "text"
+      }
+    ]
+  },
+  {
+    "id": "sv_0003_26007",
+    "groupId": "group_marketing",
+    "name": {
+      "ja": "大量データ負荷検証 (マーケティング部)",
+      "en": "大量データ負荷検証 - group_marketing"
     },
-    "status": "終了",
-    "answerCount": 65,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-08-19",
-    "periodEnd": "2025-09-01",
-    "dataCompletionDate": "2025-09-06",
+    "status": "会期中",
+    "answerCount": 1200,
+    "periodStart": "2026-01-04",
+    "periodEnd": "2026-01-17",
+    "plan": "Premium",
+    "details": [
+      {
+        "id": "Q1",
+        "text": "質問1",
+        "type": "text"
+      }
+    ]
+  },
+  {
+    "id": "sv_0003_26008",
+    "groupId": "group_marketing",
+    "name": {
+      "ja": "業種別実用テンプレート (マーケティング部)",
+      "en": "業種別実用テンプレート - group_marketing"
+    },
+    "status": "会期中",
+    "answerCount": 60,
+    "periodStart": "2026-01-04",
+    "periodEnd": "2026-01-17",
+    "plan": "Premium",
+    "details": [
+      {
+        "id": "Q1",
+        "text": "質問1",
+        "type": "text"
+      }
+    ]
+  },
+  {
+    "id": "sv_0004_26001",
+    "groupId": "group_bpo",
+    "name": {
+      "ja": "全形式網羅・分析検証テスト (BPO部)",
+      "en": "全形式網羅・分析検証テスト - group_bpo"
+    },
+    "status": "会期中",
+    "answerCount": 300,
+    "periodStart": "2026-01-04",
+    "periodEnd": "2026-01-17",
+    "plan": "Premium",
+    "details": [
+      {
+        "id": "Q1",
+        "text": "業界 (SA)",
+        "type": "single_choice",
+        "options": [
+          "製造",
+          "IT",
+          "金融",
+          "小売"
+        ]
+      },
+      {
+        "id": "Q2",
+        "text": "興味のある分野 (MA)",
+        "type": "multi_choice",
+        "options": [
+          "製品A",
+          "製品B",
+          "製品C"
+        ]
+      },
+      {
+        "id": "Q3",
+        "text": "氏名 (Text)",
+        "type": "text"
+      },
+      {
+        "id": "Q4",
+        "text": "ご意見 (FreeText)",
+        "type": "free_text"
+      },
+      {
+        "id": "Q5",
+        "text": "来場人数 (Number)",
+        "type": "number"
+      },
+      {
+        "id": "Q6",
+        "text": "希望日 (Date)",
+        "type": "date"
+      },
+      {
+        "id": "Q7",
+        "text": "時間 (Time)",
+        "type": "time"
+      },
+      {
+        "id": "Q8",
+        "text": "製品評価 (Matrix SA)",
+        "type": "matrix_sa",
+        "rows": [
+          {
+            "id": "row1",
+            "text": "デザイン"
+          },
+          {
+            "id": "row2",
+            "text": "機能性"
+          },
+          {
+            "id": "row3",
+            "text": "価格"
+          },
+          {
+            "id": "row4",
+            "text": "サポート"
+          }
+        ],
+        "columns": [
+          {
+            "value": "5",
+            "text": "非常に良い"
+          },
+          {
+            "value": "4",
+            "text": "良い"
+          },
+          {
+            "value": "3",
+            "text": "普通"
+          },
+          {
+            "value": "2",
+            "text": "悪い"
+          },
+          {
+            "value": "1",
+            "text": "非常に悪い"
+          }
+        ]
+      },
+      {
+        "id": "Q9",
+        "text": "署名 (Handwriting)",
+        "type": "handwriting"
+      },
+      {
+        "id": "Q10",
+        "text": "現場写真 (Image)",
+        "type": "image"
+      }
+    ]
+  },
+  {
+    "id": "sv_0004_26002",
+    "groupId": "group_bpo",
+    "name": {
+      "ja": "展示会リード獲得 (BPO部)",
+      "en": "展示会リード獲得 - group_bpo"
+    },
+    "status": "会期中",
+    "answerCount": 50,
+    "periodStart": "2026-01-04",
+    "periodEnd": "2026-01-17",
+    "plan": "Premium",
+    "details": [
+      {
+        "id": "Q1",
+        "text": "業種",
+        "type": "single_choice",
+        "options": [
+          "製造",
+          "IT"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "sv_0004_26003",
+    "groupId": "group_bpo",
+    "name": {
+      "ja": "製品満足度調査 (BPO部)",
+      "en": "製品満足度調査 - group_bpo"
+    },
+    "status": "会期中",
+    "answerCount": 50,
+    "periodStart": "2026-01-04",
+    "periodEnd": "2026-01-17",
+    "plan": "Premium",
+    "details": [
+      {
+        "id": "Q1",
+        "text": "質問1",
+        "type": "text"
+      }
+    ]
+  },
+  {
+    "id": "sv_0004_26004",
+    "groupId": "group_bpo",
+    "name": {
+      "ja": "現場点検ログ (BPO部)",
+      "en": "現場点検ログ - group_bpo"
+    },
+    "status": "会期中",
+    "answerCount": 50,
+    "periodStart": "2026-01-04",
+    "periodEnd": "2026-01-17",
+    "plan": "Premium",
+    "details": [
+      {
+        "id": "Q1",
+        "text": "質問1",
+        "type": "text"
+      }
+    ]
+  },
+  {
+    "id": "sv_0004_26005",
+    "groupId": "group_bpo",
+    "name": {
+      "ja": "グローバル意識調査 (BPO部)",
+      "en": "グローバル意識調査 - group_bpo"
+    },
+    "status": "会期中",
+    "answerCount": 50,
+    "periodStart": "2026-01-04",
+    "periodEnd": "2026-01-17",
     "plan": "Free",
-    "deadline": "2025-10-14",
-    "estimatedBillingAmount": 180000,
-    "bizcardEnabled": true,
-    "bizcardRequest": 61,
-    "bizcardCompletionCount": 51,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-08-19T00:00:00+09:00",
-    "dataConversionPlan": "trial"
+    "details": [
+      {
+        "id": "Q1",
+        "text": "質問1",
+        "type": "text"
+      }
+    ]
   },
   {
-    "id": "sv_0001_25011",
-    "groupId": "GROUP003",
+    "id": "sv_0004_26006",
+    "groupId": "group_bpo",
     "name": {
-      "ja": "パートナーシップ満足度 #41",
-      "en": "Survey Name 41"
+      "ja": "条件分岐ロジック検証 (BPO部)",
+      "en": "条件分岐ロジック検証 - group_bpo"
     },
-    "displayTitle": {
-      "ja": "パートナーシップ満足度 #41",
-      "en": "Survey Title 41"
-    },
-    "description": {
-      "ja": "パートナーシップ満足度 #41についての詳細な調査です。",
-      "en": "Detailed survey about パートナーシップ満足度 #41."
-    },
-    "status": "実施中",
-    "answerCount": 833,
-    "realtimeAnswers": 45,
-    "periodStart": "2025-01-25",
-    "periodEnd": "2025-02-01",
-    "dataCompletionDate": "",
-    "plan": "Premium",
-    "deadline": "2025-03-26",
-    "estimatedBillingAmount": 188900,
-    "bizcardEnabled": true,
-    "bizcardRequest": 420,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "設定済み",
-    "createdAt": "2025-01-25T00:00:00+09:00",
-    "dataConversionPlan": "superExpress"
-  },
-  {
-    "id": "sv_0001_25015",
-    "groupId": "GROUP003",
-    "name": {
-      "ja": "製品フィードバック #42",
-      "en": "Survey Name 42"
-    },
-    "displayTitle": {
-      "ja": "製品フィードバック #42",
-      "en": "Survey Title 42"
-    },
-    "description": {
-      "ja": "製品フィードバック #42についての詳細な調査です。",
-      "en": "Detailed survey about 製品フィードバック #42."
-    },
-    "status": "準備中",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-03-13",
-    "periodEnd": "2025-04-05",
-    "dataCompletionDate": "",
-    "plan": "Standard",
-    "deadline": "2025-05-15",
-    "estimatedBillingAmount": 184100,
-    "bizcardEnabled": true,
-    "bizcardRequest": 228,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "設定済み",
-    "createdAt": "2025-03-13T00:00:00+09:00",
-    "dataConversionPlan": "normal"
-  },
-  {
-    "id": "sv_0001_25004",
-    "groupId": "GROUP004",
-    "name": {
-      "ja": "サービス改善アンケート #43",
-      "en": "Survey Name 43"
-    },
-    "displayTitle": {
-      "ja": "サービス改善アンケート #43",
-      "en": "Survey Title 43"
-    },
-    "description": {
-      "ja": "サービス改善アンケート #43についての詳細な調査です。",
-      "en": "Detailed survey about サービス改善アンケート #43."
-    },
-    "status": "草稿",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-01-11",
-    "periodEnd": "2025-02-08",
-    "dataCompletionDate": "",
-    "plan": "Standard",
-    "deadline": "2025-03-18",
-    "estimatedBillingAmount": 108900,
-    "bizcardEnabled": true,
-    "bizcardRequest": 164,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-01-11T00:00:00+09:00",
-    "dataConversionPlan": "normal"
-  },
-  {
-    "id": "sv_0001_25021",
-    "groupId": "GROUP003",
-    "name": {
-      "ja": "従業員エンゲージメント調査 #44",
-      "en": "Survey Name 44"
-    },
-    "displayTitle": {
-      "ja": "従業員エンゲージメント調査 #44",
-      "en": "Survey Title 44"
-    },
-    "description": {
-      "ja": "従業員エンゲージメント調査 #44についての詳細な調査です。",
-      "en": "Detailed survey about 従業員エンゲージメント調査 #44."
-    },
-    "status": "草稿",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-05-21",
-    "periodEnd": "2025-06-02",
-    "dataCompletionDate": "",
+    "status": "会期中",
+    "answerCount": 40,
+    "periodStart": "2026-01-04",
+    "periodEnd": "2026-01-17",
     "plan": "Free",
-    "deadline": "2025-07-03",
-    "estimatedBillingAmount": 161500,
-    "bizcardCompletionCount": 0,
-    "bizcardSettings": {
-      "bizcardEnabled": false,
-      "bizcardRequest": 0,
-      "dataConversionPlan": "standard",
-      "dataConversionSpeed": "normal",
-      "couponCode": "",
-      "internalMemo": ""
-    },
-    "thankYouEmailSettings": {
-      "thankYouEmailEnabled": false,
-      "sendMethod": "manual",
-      "emailTemplateId": "default",
-      "emailSubject": "",
-      "emailBody": ""
-    },
-    "createdAt": "2025-05-21T00:00:00+09:00",
-    "dataConversionPlan": "trial"
+    "details": [
+      {
+        "id": "Q1",
+        "text": "質問1",
+        "type": "text"
+      }
+    ]
   },
   {
-    "id": "sv_0001_25034",
-    "groupId": "GROUP003",
+    "id": "sv_0004_26007",
+    "groupId": "group_bpo",
     "name": {
-      "ja": "ウェブサイトUX調査 #45",
-      "en": "Survey Name 45"
+      "ja": "大量データ負荷検証 (BPO部)",
+      "en": "大量データ負荷検証 - group_bpo"
     },
-    "displayTitle": {
-      "ja": "ウェブサイトUX調査 #45",
-      "en": "Survey Title 45"
-    },
-    "description": {
-      "ja": "ウェブサイトUX調査 #45についての詳細な調査です。",
-      "en": "Detailed survey about ウェブサイトUX調査 #45."
-    },
-    "status": "草稿",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-08-13",
-    "periodEnd": "2025-09-01",
-    "dataCompletionDate": "",
-    "plan": "Standard",
-    "deadline": "2025-10-06",
-    "estimatedBillingAmount": 178300,
-    "bizcardEnabled": true,
-    "bizcardRequest": 264,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-08-13T00:00:00+09:00",
-    "dataConversionPlan": "normal"
-  },
-  {
-    "id": "sv_0001_25016",
-    "groupId": "GROUP003",
-    "name": {
-      "ja": "ブランドイメージ調査 #46",
-      "en": "Survey Name 46"
-    },
-    "displayTitle": {
-      "ja": "ブランドイメージ調査 #46",
-      "en": "Survey Title 46"
-    },
-    "description": {
-      "ja": "ブランドイメージ調査 #46についての詳細な調査です。",
-      "en": "Detailed survey about ブランドイメージ調査 #46."
-    },
-    "status": "草稿",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-03-13",
-    "periodEnd": "2025-04-09",
-    "dataCompletionDate": "",
-    "plan": "Premium",
-    "deadline": "2025-05-15",
-    "estimatedBillingAmount": 112100,
-    "bizcardEnabled": true,
-    "bizcardRequest": 220,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-03-13T00:00:00+09:00",
-    "dataConversionPlan": "superExpress"
-  },
-  {
-    "id": "sv_0001_25007",
-    "groupId": "GROUP001",
-    "name": {
-      "ja": "新規事業アイデア募集 #47",
-      "en": "Survey Name 47"
-    },
-    "displayTitle": {
-      "ja": "新規事業アイデア募集 #47",
-      "en": "Survey Title 47"
-    },
-    "description": {
-      "ja": "新規事業アイデア募集 #47についての詳細な調査です。",
-      "en": "Detailed survey about 新規事業アイデア募集 #47."
-    },
-    "status": "草稿",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-01-13",
-    "periodEnd": "2025-01-23",
-    "dataCompletionDate": "",
+    "status": "会期中",
+    "answerCount": 1200,
+    "periodStart": "2026-01-04",
+    "periodEnd": "2026-01-17",
     "plan": "Free",
-    "deadline": "2025-02-25",
-    "estimatedBillingAmount": 186700,
-    "bizcardEnabled": true,
-    "bizcardRequest": 160,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-01-13T00:00:00+09:00",
-    "dataConversionPlan": "trial"
+    "details": [
+      {
+        "id": "Q1",
+        "text": "質問1",
+        "type": "text"
+      }
+    ]
   },
   {
-    "id": "sv_0001_25048",
-    "groupId": "GROUP001",
+    "id": "sv_0004_26008",
+    "groupId": "group_bpo",
     "name": {
-      "ja": "市場調査 #48",
-      "en": "Survey Name 48"
+      "ja": "業種別実用テンプレート (BPO部)",
+      "en": "業種別実用テンプレート - group_bpo"
     },
-    "displayTitle": {
-      "ja": "市場調査 #48",
-      "en": "Survey Title 48"
-    },
-    "description": {
-      "ja": "市場調査 #48についての詳細な調査です。",
-      "en": "Detailed survey about 市場調査 #48."
-    },
-    "status": "準備中",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-09-19",
-    "periodEnd": "2025-10-13",
-    "dataCompletionDate": "",
-    "plan": "Standard",
-    "deadline": "2025-11-14",
-    "estimatedBillingAmount": 194100,
-    "bizcardEnabled": true,
-    "bizcardRequest": 211,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-09-19T00:00:00+09:00",
-    "dataConversionPlan": "normal"
-  },
-  {
-    "id": "sv_0001_25012",
-    "groupId": "GROUP004",
-    "name": {
-      "ja": "製品フィードバック #49",
-      "en": "Survey Name 49"
-    },
-    "displayTitle": {
-      "ja": "製品フィードバック #49",
-      "en": "Survey Title 49"
-    },
-    "description": {
-      "ja": "製品フィードバック #49についての詳細な調査です。",
-      "en": "Detailed survey about 製品フィードバック #49."
-    },
-    "status": "準備中",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-01-28",
-    "periodEnd": "2025-02-20",
-    "dataCompletionDate": "",
+    "status": "会期中",
+    "answerCount": 60,
+    "periodStart": "2026-01-04",
+    "periodEnd": "2026-01-17",
     "plan": "Free",
-    "deadline": "2025-03-25",
-    "estimatedBillingAmount": 163300,
-    "bizcardEnabled": true,
-    "bizcardRequest": 151,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-01-28T00:00:00+09:00",
-    "dataConversionPlan": "trial"
-  },
-  {
-    "id": "sv_0001_25001",
-    "groupId": "GROUP004",
-    "name": {
-      "ja": "顧客満足度調査 #50",
-      "en": "Survey Name 50"
-    },
-    "displayTitle": {
-      "ja": "顧客満足度調査 #50",
-      "en": "Survey Title 50"
-    },
-    "description": {
-      "ja": "顧客満足度調査 #50についての詳細な調査です。",
-      "en": "Detailed survey about 顧客満足度調査 #50."
-    },
-    "status": "準備中",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-01-10",
-    "periodEnd": "2025-01-25",
-    "dataCompletionDate": "",
-    "plan": "Standard",
-    "deadline": "2025-02-25",
-    "estimatedBillingAmount": 133100,
-    "bizcardEnabled": true,
-    "bizcardRequest": 211,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-01-10T00:00:00+09:00",
-    "dataConversionPlan": "normal"
-  },
-  {
-    "id": "sv_0001_25037",
-    "groupId": "GROUP001",
-    "name": {
-      "ja": "イベント参加後アンケート #51",
-      "en": "Survey Name 51"
-    },
-    "displayTitle": {
-      "ja": "イベント参加後アンケート #51",
-      "en": "Survey Title 51"
-    },
-    "description": {
-      "ja": "イベント参加後アンケート #51についての詳細な調査です。",
-      "en": "Detailed survey about イベント参加後アンケート #51."
-    },
-    "status": "準備中",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-08-18",
-    "periodEnd": "2025-09-10",
-    "dataCompletionDate": "",
-    "plan": "Standard",
-    "deadline": "2025-10-13",
-    "estimatedBillingAmount": 104100,
-    "bizcardEnabled": true,
-    "bizcardRequest": 161,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-08-18T00:00:00+09:00",
-    "dataConversionPlan": "normal"
-  },
-  {
-    "id": "sv_0001_25002",
-    "groupId": "GROUP001",
-    "name": {
-      "ja": "ウェブサイトUX調査 #52",
-      "en": "Survey Name 52"
-    },
-    "displayTitle": {
-      "ja": "ウェブサイトUX調査 #52",
-      "en": "Survey Title 52"
-    },
-    "description": {
-      "ja": "ウェブサイトUX調査 #52についての詳細な調査です。",
-      "en": "Detailed survey about ウェブサイトUX調査 #52."
-    },
-    "status": "準備中",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-01-10",
-    "periodEnd": "2025-02-06",
-    "dataCompletionDate": "",
-    "plan": "Standard",
-    "deadline": "2025-03-11",
-    "estimatedBillingAmount": 189900,
-    "bizcardEnabled": true,
-    "bizcardRequest": 299,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-01-10T00:00:00+09:00",
-    "dataConversionPlan": "normal"
-  },
-  {
-    "id": "sv_0001_25030",
-    "groupId": "GROUP001",
-    "name": {
-      "ja": "従業員エンゲージメント調査 #53",
-      "en": "Survey Name 53"
-    },
-    "displayTitle": {
-      "ja": "従業員エンゲージメント調査 #53",
-      "en": "Survey Title 53"
-    },
-    "description": {
-      "ja": "従業員エンゲージメント調査 #53についての詳細な調査です。",
-      "en": "Detailed survey about 従業員エンゲージメント調査 #53."
-    },
-    "status": "準備中",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-08-04",
-    "periodEnd": "2025-08-18",
-    "dataCompletionDate": "",
-    "plan": "Standard",
-    "deadline": "2025-09-29",
-    "estimatedBillingAmount": 133200,
-    "bizcardEnabled": true,
-    "bizcardRequest": 222,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-08-04T00:00:00+09:00",
-    "dataConversionPlan": "normal"
-  },
-  {
-    "id": "sv_0001_25009",
-    "groupId": "GROUP001",
-    "name": {
-      "ja": "パートナーシップ満足度 #54",
-      "en": "Survey Name 54"
-    },
-    "displayTitle": {
-      "ja": "パートナーシップ満足度 #54",
-      "en": "Survey Title 54"
-    },
-    "description": {
-      "ja": "パートナーシップ満足度 #54についての詳細な調査です。",
-      "en": "Detailed survey about パートナーシップ満足度 #54."
-    },
-    "status": "準備中",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-01-14",
-    "periodEnd": "2025-02-09",
-    "dataCompletionDate": "",
-    "plan": "Standard",
-    "deadline": "2025-03-13",
-    "estimatedBillingAmount": 115300,
-    "bizcardEnabled": true,
-    "bizcardRequest": 183,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-01-14T00:00:00+09:00",
-    "dataConversionPlan": "normal"
-  },
-  {
-    "id": "sv_0001_25041",
-    "groupId": "GROUP001",
-    "name": {
-      "ja": "サービス改善アンケート #55",
-      "en": "Survey Name 55"
-    },
-    "displayTitle": {
-      "ja": "サービス改善アンケート #55",
-      "en": "Survey Title 55"
-    },
-    "description": {
-      "ja": "サービス改善アンケート #55についての詳細な調査です。",
-      "en": "Detailed survey about サービス改善アンケート #55."
-    },
-    "status": "準備中",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-08-26",
-    "periodEnd": "2025-09-18",
-    "dataCompletionDate": "",
-    "plan": "Standard",
-    "deadline": "2025-10-20",
-    "estimatedBillingAmount": 105800,
-    "bizcardEnabled": true,
-    "bizcardRequest": 178,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-08-26T00:00:00+09:00",
-    "dataConversionPlan": "normal"
-  },
-  {
-    "id": "sv_0001_25005",
-    "groupId": "GROUP001",
-    "name": {
-      "ja": "ブランドイメージ調査 #56",
-      "en": "Survey Name 56"
-    },
-    "displayTitle": {
-      "ja": "ブランドイメージ調査 #56",
-      "en": "Survey Title 56"
-    },
-    "description": {
-      "ja": "ブランドイメージ調査 #56についての詳細な調査です。",
-      "en": "Detailed survey about ブランドイメージ調査 #56."
-    },
-    "status": "準備中",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-01-11",
-    "periodEnd": "2025-02-08",
-    "dataCompletionDate": "",
-    "plan": "Standard",
-    "deadline": "2025-03-15",
-    "estimatedBillingAmount": 130700,
-    "bizcardEnabled": true,
-    "bizcardRequest": 207,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-01-11T00:00:00+09:00",
-    "dataConversionPlan": "normal"
-  },
-  {
-    "id": "sv_0001_25036",
-    "groupId": "GROUP001",
-    "name": {
-      "ja": "新規事業アイデア募集 #57",
-      "en": "Survey Name 57"
-    },
-    "displayTitle": {
-      "ja": "新規事業アイデア募集 #57",
-      "en": "Survey Title 57"
-    },
-    "description": {
-      "ja": "新規事業アイデア募集 #57についての詳細な調査です。",
-      "en": "Detailed survey about 新規事業アイデア募集 #57."
-    },
-    "status": "準備中",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-08-15",
-    "periodEnd": "2025-09-11",
-    "dataCompletionDate": "",
-    "plan": "Standard",
-    "deadline": "2025-10-13",
-    "estimatedBillingAmount": 110500,
-    "bizcardEnabled": true,
-    "bizcardRequest": 175,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-08-15T00:00:00+09:00",
-    "dataConversionPlan": "normal"
-  },
-  {
-    "id": "sv_0001_25010",
-    "groupId": "GROUP001",
-    "name": {
-      "ja": "市場調査 #58",
-      "en": "Survey Name 58"
-    },
-    "displayTitle": {
-      "ja": "市場調査 #58",
-      "en": "Survey Title 58"
-    },
-    "description": {
-      "ja": "市場調査 #58についての詳細な調査です。",
-      "en": "Detailed survey about 市場調査 #58."
-    },
-    "status": "準備中",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-01-18",
-    "periodEnd": "2025-02-10",
-    "dataCompletionDate": "",
-    "plan": "Standard",
-    "deadline": "2025-03-13",
-    "estimatedBillingAmount": 123800,
-    "bizcardEnabled": true,
-    "bizcardRequest": 198,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-01-18T00:00:00+09:00",
-    "dataConversionPlan": "normal"
-  },
-  {
-    "id": "sv_0001_25042",
-    "groupId": "GROUP001",
-    "name": {
-      "ja": "顧客満足度調査 #59",
-      "en": "Survey Name 59"
-    },
-    "displayTitle": {
-      "ja": "顧客満足度調査 #59",
-      "en": "Survey Title 59"
-    },
-    "description": {
-      "ja": "顧客満足度調査 #59についての詳細な調査です。",
-      "en": "Detailed survey about 顧客満足度調査 #59."
-    },
-    "status": "準備中",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-08-28",
-    "periodEnd": "2025-09-18",
-    "dataCompletionDate": "",
-    "plan": "Standard",
-    "deadline": "2025-10-20",
-    "estimatedBillingAmount": 115800,
-    "bizcardEnabled": true,
-    "bizcardRequest": 188,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-08-28T00:00:00+09:00",
-    "dataConversionPlan": "normal"
-  },
-  {
-    "id": "sv_0001_25006",
-    "groupId": "GROUP001",
-    "name": {
-      "ja": "イベント参加後アンケート #60",
-      "en": "Survey Name 60"
-    },
-    "displayTitle": {
-      "ja": "イベント参加後アンケート #60",
-      "en": "Survey Title 60"
-    },
-    "description": {
-      "ja": "イベント参加後アンケート #60についての詳細な調査です。",
-      "en": "Detailed survey about イベント参加後アンケート #60."
-    },
-    "status": "準備中",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-01-11",
-    "periodEnd": "2025-02-08",
-    "dataCompletionDate": "",
-    "plan": "Standard",
-    "deadline": "2025-03-15",
-    "estimatedBillingAmount": 130700,
-    "bizcardEnabled": true,
-    "bizcardRequest": 207,
-    "bizcardCompletionCount": 0,
-    "thankYouEmailSettings": "未設定",
-    "createdAt": "2025-01-11T00:00:00+09:00",
-    "dataConversionPlan": "normal"
-  },
-  {
-    "id": "sv_0001_25019",
-    "groupId": "GROUP002",
-    "name": {
-      "ja": "追加アンケートA",
-      "en": "Additional Survey A"
-    },
-    "displayTitle": {
-      "ja": "追加アンケートA",
-      "en": "Additional Survey A"
-    },
-    "description": {
-      "ja": "データ追加テスト用のアンケートです。",
-      "en": "Survey for data addition test."
-    },
-    "status": "準備中",
-    "answerCount": 10,
-    "realtimeAnswers": 2,
-    "periodStart": "2025-08-01",
-    "periodEnd": "2025-08-31",
-    "dataCompletionDate": "",
-    "plan": "Premium",
-    "deadline": "2025-09-15",
-    "estimatedBillingAmount": 25000,
-    "bizcardCompletionCount": 0,
-    "bizcardSettings": {
-      "bizcardEnabled": true,
-      "bizcardRequest": 150,
-      "dataConversionPlan": "premium",
-      "dataConversionSpeed": "fast",
-      "couponCode": "SAVE10",
-      "internalMemo": "要優先対応"
-    },
-    "thankYouEmailSettings": {
-      "thankYouEmailEnabled": true,
-      "sendMethod": "auto",
-      "emailTemplateId": "special",
-      "emailSubject": "【特別オファー】ご来場ありがとうございます",
-      "emailBody": "先日はご来場いただき、誠にありがとうございました。"
-    },
-    "createdAt": "2025-07-20T00:00:00+09:00",
-    "dataConversionPlan": "superExpress"
-  },
-  {
-    "id": "sv_0001_25020",
-    "groupId": "GROUP002",
-    "name": {
-      "ja": "追加アンケートB",
-      "en": "Additional Survey B"
-    },
-    "displayTitle": {
-      "ja": "追加アンケートB",
-      "en": "Additional Survey B"
-    },
-    "description": {
-      "ja": "データ追加テスト用のアンケートその2です。",
-      "en": "Survey for data addition test 2."
-    },
-    "status": "草稿",
-    "answerCount": 0,
-    "realtimeAnswers": 0,
-    "periodStart": "2025-09-01",
-    "periodEnd": "2025-09-30",
-    "dataCompletionDate": "",
-    "plan": "Free",
-    "deadline": "2025-10-15",
-    "estimatedBillingAmount": 0,
-    "bizcardCompletionCount": 0,
-    "bizcardSettings": {
-      "bizcardEnabled": false,
-      "bizcardRequest": 0,
-      "dataConversionPlan": "standard",
-      "dataConversionSpeed": "normal",
-      "couponCode": "",
-      "internalMemo": ""
-    },
-    "thankYouEmailSettings": {
-      "thankYouEmailEnabled": false,
-      "sendMethod": "manual",
-      "emailTemplateId": "default",
-      "emailSubject": "",
-      "emailBody": ""
-    },
-    "createdAt": "2025-07-21T00:00:00+09:00",
-    "dataConversionPlan": "trial"
+    "details": [
+      {
+        "id": "Q1",
+        "text": "質問1",
+        "type": "text"
+      }
+    ]
   }
 ]

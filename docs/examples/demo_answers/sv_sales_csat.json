@@ -1,0 +1,952 @@
+[
+  {
+    "answerId": "ans-sv_sales_csat-0001",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-01-29 11:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "良い"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0002",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-02-01 16:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "良い"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0003",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-01-30 10:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "普通"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0004",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-01-31 11:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "悪い"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0005",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-02-05 17:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "非常に良い"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0006",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-02-01 14:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "非常に良い"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0007",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-02-04 16:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "普通"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0008",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-02-05 13:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "良い"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0009",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-02-06 15:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "悪い"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0010",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-01-28 14:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "悪い"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0011",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-02-03 09:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "悪い"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0012",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-02-02 17:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "非常に良い"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0013",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-02-05 11:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "普通"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0014",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-01-30 16:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "悪い"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0015",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-01-31 14:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "普通"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0016",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-01-30 16:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "悪い"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0017",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-02-01 16:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "良い"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0018",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-02-04 13:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "非常に良い"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0019",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-01-31 12:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "普通"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0020",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-01-30 17:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "良い"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0021",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-02-06 09:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "悪い"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0022",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-02-06 12:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "良い"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0023",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-01-31 11:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "普通"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0024",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-01-28 14:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "普通"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0025",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-02-02 09:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "非常に良い"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0026",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-02-03 15:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "悪い"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0027",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-01-30 10:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "非常に良い"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0028",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-01-29 17:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "普通"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0029",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-02-02 14:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "非常に良い"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0030",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-02-03 16:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "普通"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0031",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-01-28 09:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "悪い"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0032",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-01-31 15:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "良い"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0033",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-02-01 13:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "普通"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0034",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-02-06 12:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "普通"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0035",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-02-01 15:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "非常に良い"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0036",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-02-01 12:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "非常に良い"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0037",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-02-06 16:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "良い"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0038",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-02-03 14:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "良い"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0039",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-02-06 11:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "非常に良い"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0040",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-01-28 11:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "普通"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0041",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-02-03 17:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "良い"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0042",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-02-03 09:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "非常に良い"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0043",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-01-31 13:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "悪い"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0044",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-01-30 10:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "非常に良い"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0045",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-01-31 17:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "悪い"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0046",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-01-29 11:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "良い"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0047",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-01-28 14:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "普通"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0048",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-01-28 14:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "良い"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0049",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-02-05 15:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "普通"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_sales_csat-0050",
+    "surveyId": "sv_sales_csat",
+    "answeredAt": "2026-01-29 17:00:00",
+    "details": [
+      {
+        "question": "満足度",
+        "answer": {
+          "機能性": "悪い"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "改善要望",
+        "answer": "サンプルテキスト回答",
+        "type": "free_text"
+      }
+    ]
+  }
+]

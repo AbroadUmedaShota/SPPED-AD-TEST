@@ -1,0 +1,602 @@
+[
+  {
+    "answerId": "ans-sv_team_global-001",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-06 14:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "米国",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-002",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-15 13:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "日本",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-003",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-10 17:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "その他",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-004",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-13 10:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "中国",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-005",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-06 13:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "米国",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-006",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-17 09:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "米国",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-007",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-09 14:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "その他",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-008",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-05 15:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "その他",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-009",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-13 10:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "米国",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-010",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-06 16:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "その他",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-011",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-13 15:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "米国",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-012",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-08 13:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "その他",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-013",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-04 10:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "中国",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-014",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-09 15:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "米国",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-015",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-11 09:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "中国",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-016",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-14 09:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "中国",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-017",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-16 16:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "中国",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-018",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-11 13:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "中国",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-019",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-05 15:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "米国",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-020",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-14 11:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "米国",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-021",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-11 10:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "その他",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-022",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-07 12:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "中国",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-023",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-07 13:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "その他",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-024",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-14 14:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "日本",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-025",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-12 10:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "その他",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-026",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-05 16:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "その他",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-027",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-13 09:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "日本",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-028",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-17 13:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "中国",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-029",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-06 10:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "米国",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-030",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-11 11:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "米国",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-031",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-10 17:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "中国",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-032",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-17 10:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "その他",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-033",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-10 17:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "日本",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-034",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-14 14:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "その他",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-035",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-08 09:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "日本",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-036",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-09 12:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "米国",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-037",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-08 14:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "その他",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-038",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-05 10:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "米国",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-039",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-10 12:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "日本",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-040",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-09 09:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "中国",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-041",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-16 13:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "米国",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-042",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-04 17:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "米国",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-043",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-11 09:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "その他",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-044",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-08 11:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "その他",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-045",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-17 14:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "米国",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-046",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-07 14:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "米国",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-047",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-11 13:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "日本",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-048",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-07 11:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "米国",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-049",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-10 16:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "その他",
+        "type": "single_choice"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_team_global-050",
+    "surveyId": "sv_team_global",
+    "answeredAt": "2026-01-08 10:00:00",
+    "details": [
+      {
+        "question": "Q1. 居住国",
+        "answer": "日本",
+        "type": "single_choice"
+      }
+    ]
+  }
+]

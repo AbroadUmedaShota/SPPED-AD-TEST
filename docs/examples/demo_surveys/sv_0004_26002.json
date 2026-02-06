@@ -1,0 +1,24 @@
+{
+  "id": "sv_0004_26002",
+  "groupId": "group_bpo",
+  "name": {
+    "ja": "展示会リード獲得 (BPO部)",
+    "en": "展示会リード獲得 - group_bpo"
+  },
+  "status": "会期中",
+  "answerCount": 50,
+  "periodStart": "2026-01-04",
+  "periodEnd": "2026-01-17",
+  "plan": "Premium",
+  "details": [
+    {
+      "id": "Q1",
+      "text": "業種",
+      "type": "single_choice",
+      "options": [
+        "製造",
+        "IT"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "id": "sv_bpo_industry",
+  "groupId": "group_bpo",
+  "name": {
+    "ja": "製造向け undefined",
+    "en": "INDUSTRY Survey"
+  },
+  "status": "会期中",
+  "answerCount": 60,
+  "periodStart": "2026-01-04",
+  "periodEnd": "2026-01-17",
+  "plan": "Free",
+  "details": [
+    {
+      "id": "Q1",
+      "text": "ライン",
+      "type": "single_choice",
+      "options": [
+        "Aライン",
+        "Bライン"
+      ]
+    }
+  ]
+}
