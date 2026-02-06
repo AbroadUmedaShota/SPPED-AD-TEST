@@ -199,6 +199,55 @@
         </div>
     </div>
 
+    <!-- Visual Insight Drawer -->
+    <div id="visual-insight-overlay" class="visual-insight-overlay" aria-hidden="true"></div>
+    <aside id="visual-insight-drawer" class="visual-insight-drawer" aria-hidden="true" aria-label="Visual Insight">
+        <div class="visual-insight-header">
+            <div class="flex-1 min-w-0">
+                <p class="text-[11px] font-black uppercase tracking-widest text-primary">Visual Insight</p>
+                <h2 class="text-base font-bold text-on-surface mt-1">画像ドリルダウン</h2>
+                <p id="visual-insight-condition" class="text-xs text-on-surface-variant mt-2 truncate">条件未選択</p>
+            </div>
+            <button id="visual-insight-close" type="button" class="visual-insight-close-btn" aria-label="閉じる">
+                <span class="material-icons text-base">close</span>
+            </button>
+        </div>
+        <div class="visual-insight-meta">
+            <span id="visual-insight-count">0件</span>
+        </div>
+        <div id="visual-insight-empty" class="visual-insight-empty hidden">該当する画像はありません。</div>
+        <div id="visual-insight-list" class="visual-insight-grid"></div>
+        <div class="visual-insight-footer">
+            <button id="open-speed-review-by-condition" type="button" class="button-primary visual-insight-review-btn">
+                この条件でSPEEDレビューを開く
+            </button>
+        </div>
+    </aside>
+
+    <!-- Visual Insight Image Preview -->
+    <div id="visual-insight-image-preview" class="visual-insight-image-preview" aria-hidden="true">
+        <button id="visual-insight-image-preview-close" type="button" class="visual-insight-image-preview-close" aria-label="閉じる">
+            <span class="material-icons text-xl">close</span>
+        </button>
+        <img id="visual-insight-image-preview-img" src="" alt="Visual Insight Preview">
+    </div>
+
+    <!-- Visual Insight Upsell -->
+    <div id="visual-insight-upsell" class="visual-insight-upsell" aria-hidden="true">
+        <div class="visual-insight-upsell-card">
+            <h3 class="text-lg font-bold text-on-surface">プレミアム機能</h3>
+            <p class="text-sm text-on-surface-variant mt-2">画像閲覧はプレミアム機能です。</p>
+            <div class="flex gap-2 mt-5">
+                <button id="visual-insight-upsell-close" type="button" class="px-4 py-2 rounded-lg border border-outline-variant text-sm font-semibold">
+                    閉じる
+                </button>
+                <a href="./premium_signup.html" class="button-primary px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center">
+                    プランを見る
+                </a>
+            </div>
+        </div>
+    </div>
+
     <div id="footer-placeholder"></div>
 </div>
 
