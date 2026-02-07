@@ -47,18 +47,11 @@
     "invoiceId": "INV-2025-09-002",
     "accountId": "ACC-002",
     "plan": {
-      "code": "PREMIUM",
-      "displayName": "Premium",
+      "code": "STANDARD",
+      "displayName": "Standard",
       "billingType": "monthly"
     },
-    "addOns": [
-      {
-        "code": "BIZCARD",
-        "displayName": "名刺データ化パック",
-        "quantity": 200,
-        "unit": "件"
-      }
-    ],
+    "addOns": [],
     "issueDate": "2025-09-05",
     "dueDate": "2025-10-05",
     "billingPeriod": {

@@ -65,16 +65,16 @@ function computeOptionStates(survey) {
 
     let imageReason = '';
     if (!bizcardEnabled) {
-        imageReason = '名刺機能を利用していないためダウンロードできません。';
+        imageReason = '画像データの登録対象がないためダウンロードできません。';
     } else if (bizcardRequested <= 0) {
-        imageReason = '名刺画像が登録されていないためダウンロードできません。';
+        imageReason = '画像データが登録されていないためダウンロードできません。';
     } else if (isDownloadClosed) {
-        imageReason = 'ダウンロード期限を過ぎたためダウンロードできません。';
+        imageReason = '画像データのダウンロード期限を過ぎたためダウンロードできません。';
     }
     const image = {
         isAvailable: bizcardEnabled && bizcardRequested > 0 && !isDownloadClosed,
         reason: imageReason,
-        meta: bizcardEnabled ? `名刺登録: ${bizcardRequested}件` : '名刺機能: 利用しない'
+        meta: bizcardEnabled ? `画像登録: ${bizcardRequested}件` : '画像機能: 利用しない'
     };
 
     let businessCardReason = '';
@@ -199,7 +199,7 @@ function renderDownloadOptionsModal() {
     if (deadlineMessageEl) {
         const deadlineLabel = lifecycleMeta.downloadDeadlineLabel;
         if (deadlineLabel && Boolean(currentSurvey.bizcardEnabled)) {
-            deadlineMessageEl.textContent = `名刺データのダウンロード期限: ${deadlineLabel}`;
+            deadlineMessageEl.textContent = `画像データのダウンロード期限: ${deadlineLabel}`;
             deadlineMessageEl.classList.remove('hidden');
         } else {
             deadlineMessageEl.classList.add('hidden');

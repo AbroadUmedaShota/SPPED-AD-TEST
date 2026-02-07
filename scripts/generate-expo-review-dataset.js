@@ -9,7 +9,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const SURVEY_ID = 'sv_0001_26009';
+const SURVEY_ID = 'sv_0003_26009';
 const DAY_COUNTS = [285, 300, 315]; // 合計900件（1日300件想定、±10%以内）
 const PERIOD_START = '2026-01-10';
 const PERIOD_END = '2026-01-12';
@@ -133,8 +133,8 @@ function buildAnswerDetail(index) {
   const nextDates = ['2026-01-15', '2026-01-20', '2026-01-24', '2026-01-28', '2026-02-03'];
   const timeSlots = ['10:00', '11:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
 
-  const handwritingFile = `handwriting_${pad(index, 4)}.png`;
-  const attachmentFile = `attachment_${pad(index, 4)}.jpg`;
+  const handwritingFile = `${SURVEY_ID}_${pad(index, 4)}_handwriting.png`;
+  const attachmentFile = `${SURVEY_ID}_${pad(index, 4)}_attachment.jpg`;
 
   return QUESTION_DEFS.map((q) => {
     let answer;
@@ -210,8 +210,8 @@ function buildBusinessCard(answerId, index, cardStatusProcessing) {
   if (cardStatusProcessing) {
     return { answerId, businessCard: null };
   }
-  const frontFile = `card_front_${pad(index, 4)}.jpg`;
-  const backFile = `card_back_${pad(index, 4)}.jpg`;
+  const frontFile = `${SURVEY_ID}_${pad(index, 4)}_1.jpg`;
+  const backFile = `${SURVEY_ID}_${pad(index, 4)}_2.jpg`;
   return {
     answerId,
     businessCard: {
@@ -261,7 +261,7 @@ function main() {
 
   const survey = {
     id: SURVEY_ID,
-    groupId: 'personal',
+    groupId: 'group_marketing',
     name: {
       ja: '展示会レビュー検証（3日・900件）',
       en: 'Expo Review Validation (3 days / 900 answers)'
@@ -288,10 +288,10 @@ function main() {
       const processing = (serial % 8 === 0); // 約12.5%を進行中扱い
 
       // 画像は3種で分離して全件分を作成
-      ensureFile(path.join(HANDWRITING_MEDIA_DIR, `handwriting_${pad(serial, 4)}.png`), PNG_1X1);
-      ensureFile(path.join(ATTACHMENT_MEDIA_DIR, `attachment_${pad(serial, 4)}.jpg`), JPG_TEMPLATE);
-      ensureFile(path.join(BIZCARD_MEDIA_DIR, `card_front_${pad(serial, 4)}.jpg`), JPG_TEMPLATE);
-      ensureFile(path.join(BIZCARD_MEDIA_DIR, `card_back_${pad(serial, 4)}.jpg`), JPG_TEMPLATE);
+      ensureFile(path.join(HANDWRITING_MEDIA_DIR, `${SURVEY_ID}_${pad(serial, 4)}_handwriting.png`), PNG_1X1);
+      ensureFile(path.join(ATTACHMENT_MEDIA_DIR, `${SURVEY_ID}_${pad(serial, 4)}_attachment.jpg`), JPG_TEMPLATE);
+      ensureFile(path.join(BIZCARD_MEDIA_DIR, `${SURVEY_ID}_${pad(serial, 4)}_1.jpg`), JPG_TEMPLATE);
+      ensureFile(path.join(BIZCARD_MEDIA_DIR, `${SURVEY_ID}_${pad(serial, 4)}_2.jpg`), JPG_TEMPLATE);
 
       answers.push({
         answerId,

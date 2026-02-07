@@ -192,7 +192,7 @@ def create_attachment(path, filename):
     draw.text((70, 120), f"Ref: {filename}", font=font, fill=(100, 100, 100))
     image.save(os.path.join(path, filename))
 
-survey_id = "sv_0001_26009"
+survey_id = "sv_0003_26009"
 base_dir = r'C:\SharedFolder\WorkSpace\00.NewTopics\01_SPEED_AD_Project\00_dev_speed_ad_user\media\generated'
 target_dir = os.path.join(base_dir, survey_id)
 bizcard_dir = os.path.join(target_dir, 'bizcard')

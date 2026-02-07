@@ -3,14 +3,14 @@
 To resolve this Issue, I will proceed with the implementation according to the following plan.
 
 #### 1. **Pre-investigation Summary**
-- `media/generated/sv_0001_26009` フォルダ内のサンプル画像が同一画像の複製となっており、テストデータとしての有用性が低い。
+- `media/generated/sv_0003_26009` フォルダ内のサンプル画像が同一画像の複製となっており、テストデータとしての有用性が低い。
 - 命名規則が「アンケートID_連番_判別コード」の形式になっておらず、システム連携のテストに適していない。
 - `Pillow` ライブラリを使用して、日本語フォントを含む動的な画像生成が可能であることを確認済み。
 
 **Files to be changed:**
-- `media/generated/sv_0001_26009/bizcard/*` (再生成)
-- `media/generated/sv_0001_26009/handwriting/*` (再生成)
-- `media/generated/sv_0001_26009/attachment/*` (再生成)
+- `media/generated/sv_0003_26009/bizcard/*` (再生成)
+- `media/generated/sv_0003_26009/handwriting/*` (再生成)
+- `media/generated/sv_0003_26009/attachment/*` (再生成)
 - `tools/generate_realistic_images.py` (新規追加)
 
 #### 2. **Contribution to Project Goals**
@@ -18,12 +18,12 @@ To resolve this Issue, I will proceed with the implementation according to the f
 
 #### 3. **Overview of Changes**
 - `Pillow` を使用した画像生成スクリプト `tools/generate_realistic_images.py` を作成。
-- 命名規則を `アンケートID_連番_判別コード`（例: `sv_0001_26009_0001_1.jpg`）に変更。
+- 命名規則を `アンケートID_連番_判別コード`（例: `sv_0003_26009_0001_1.jpg`）に変更。
 - 900セット（計3,600枚）の多様な画像を生成。
 
 #### 4. **Specific Work Content for Each File**
 - `tools/generate_realistic_images.py`: 日本語フォント（MSゴシック等）を使用し、ランダムな会社名、氏名、メモ、図面風の描画を行うロジックを実装。
-- `media/generated/sv_0001_26009/*`: スクリプトを実行し、既存のダミー画像を新しい命名規則のリアルな画像で置き換える。
+- `media/generated/sv_0003_26009/*`: スクリプトを実行し、既存のダミー画像を新しい命名規則のリアルな画像で置き換える。
 
 #### 5. **Definition of Done**
 - [x] 画像生成スクリプトが実装されている。
@@ -33,3 +33,4 @@ To resolve this Issue, I will proceed with the implementation according to the f
 
 ---
 User approval confirmed on the CLI.
+
