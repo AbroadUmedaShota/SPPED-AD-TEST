@@ -11,9 +11,13 @@
     <link rel="stylesheet" href="service-top-style.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
-    <link as="style"
+    <link rel="preload" as="style"
         href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900"
-        onload="this.rel='stylesheet'" rel="stylesheet">
+        onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900">
+    </noscript>
     <style>
         .processing-text {
             color: #9CA3AF;
@@ -233,27 +237,32 @@
                                 <thead class="bg-surface-variant">
                                     <tr>
                                         <th class="sortable-header px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[15%] cursor-pointer"
+                                            tabindex="0" role="button" aria-sort="none"
                                             data-sort-key="answerId">
                                             <div class="flex items-center">回答ID<span
                                                     class="material-icons sort-icon opacity-40">unfold_more</span></div>
                                         </th>
                                         <th class="sortable-header px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[18%] min-w-[160px] cursor-pointer"
+                                            tabindex="0" role="button" aria-sort="none"
                                             data-sort-key="answeredAt">
                                             <div class="flex items-center">回答日時<span
                                                     class="material-icons sort-icon opacity-40">unfold_more</span></div>
                                         </th>
                                         <th class="sortable-header px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[18%] min-w-[140px] cursor-pointer"
+                                            tabindex="0" role="button" aria-sort="none"
                                             data-sort-key="fullName">
                                             <div class="flex items-center">氏名<span
                                                     class="material-icons sort-icon opacity-40">unfold_more</span></div>
                                         </th>
                                         <th class="sortable-header px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[20%] cursor-pointer"
+                                            tabindex="0" role="button" aria-sort="none"
                                             data-sort-key="companyName">
                                             <div class="flex items-center">会社名<span
                                                     class="material-icons sort-icon opacity-40">unfold_more</span></div>
                                         </th>
                                         <th id="dynamic-question-header"
                                             class="sortable-header px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[29%] min-w-[180px] cursor-pointer"
+                                            tabindex="0" role="button" aria-sort="none"
                                             data-sort-key="dynamicQuestion">
                                             <div class="flex items-center">設問回答<span
                                                     class="material-icons sort-icon opacity-40">unfold_more</span></div>
@@ -323,21 +332,7 @@
                             <div id="simple-search-content" class="space-y-4">
                                 <div class="input-group">
                                     <select id="dayFilterSelect" class="input-field pl-10 pr-3">
-                                        <option value="all">会期全体 (1/4 - 1/17)</option>
-                                        <option value="2026-01-04">1日目 (1/4)</option>
-                                        <option value="2026-01-05">2日目 (1/5)</option>
-                                        <option value="2026-01-06">3日目 (1/6)</option>
-                                        <option value="2026-01-07">4日目 (1/7)</option>
-                                        <option value="2026-01-08">5日目 (1/8)</option>
-                                        <option value="2026-01-09">6日目 (1/9)</option>
-                                        <option value="2026-01-10">7日目 (1/10)</option>
-                                        <option value="2026-01-11">8日目 (1/11)</option>
-                                        <option value="2026-01-12">9日目 (1/12)</option>
-                                        <option value="2026-01-13">10日目 (1/13)</option>
-                                        <option value="2026-01-14">11日目 (1/14)</option>
-                                        <option value="2026-01-15">12日目 (1/15)</option>
-                                        <option value="2026-01-16">13日目 (1/16)</option>
-                                        <option value="2026-01-17">14日目 (1/17)</option>
+                                        <option value="all">会期全体</option>
                                         <option value="custom">カスタム範囲</option>
                                     </select>
                                     <label for="dayFilterSelect" class="input-label">表示対象日</label>

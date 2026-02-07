@@ -3,18 +3,150 @@
   "groupId": "group_marketing",
   "name": {
     "ja": "製品満足度調査 (マーケティング部)",
-    "en": "製品満足度調査 - group_marketing"
+    "en": "CSAT Survey"
   },
   "status": "会期中",
-  "answerCount": 50,
+  "answerCount": 100,
   "periodStart": "2026-01-04",
   "periodEnd": "2026-01-17",
   "plan": "Premium",
   "details": [
     {
       "id": "Q1",
-      "text": "質問1",
+      "text": "ご所属の業界",
+      "type": "single_choice",
+      "options": [
+        "製造業",
+        "IT・情報通信",
+        "金融・保険",
+        "小売・流通",
+        "その他"
+      ]
+    },
+    {
+      "id": "Q2",
+      "text": "興味のあるソリューション (複数回答)",
+      "type": "multi_choice",
+      "options": [
+        "クラウド移行",
+        "AI活用",
+        "セキュリティ強化",
+        "コスト削減",
+        "DX推進"
+      ]
+    },
+    {
+      "id": "Q3",
+      "text": "担当者名",
       "type": "text"
+    },
+    {
+      "id": "Q4",
+      "text": "具体的なお悩み・ご要望",
+      "type": "free_text"
+    },
+    {
+      "id": "Q5",
+      "text": "来場人数",
+      "type": "number",
+      "min": 1,
+      "max": 10,
+      "unit": "名"
+    },
+    {
+      "id": "Q6",
+      "text": "次回商談希望日",
+      "type": "date"
+    },
+    {
+      "id": "Q7",
+      "text": "連絡希望時間帯",
+      "type": "time"
+    },
+    {
+      "id": "Q8",
+      "text": "製品満足度詳細",
+      "type": "matrix_sa",
+      "rows": [
+        {
+          "id": "r1",
+          "text": "UI/UX"
+        },
+        {
+          "id": "r2",
+          "text": "機能"
+        },
+        {
+          "id": "r3",
+          "text": "価格"
+        },
+        {
+          "id": "r4",
+          "text": "サポート"
+        }
+      ],
+      "options": [
+        {
+          "value": "5",
+          "text": "非常に良い"
+        },
+        {
+          "value": "4",
+          "text": "良い"
+        },
+        {
+          "value": "3",
+          "text": "普通"
+        },
+        {
+          "value": "2",
+          "text": "悪い"
+        },
+        {
+          "value": "1",
+          "text": "非常に悪い"
+        }
+      ]
+    },
+    {
+      "id": "Q9",
+      "text": "承諾の署名",
+      "type": "handwriting"
+    },
+    {
+      "id": "Q10",
+      "text": "現場の状況写真",
+      "type": "image"
+    },
+    {
+      "id": "Q11",
+      "text": "評価マトリクス(MA)",
+      "type": "matrix_ma",
+      "rows": [
+        {
+          "id": "r1",
+          "text": "注力分野"
+        }
+      ],
+      "options": [
+        {
+          "value": "a",
+          "text": "技術"
+        },
+        {
+          "value": "b",
+          "text": "営業"
+        },
+        {
+          "value": "c",
+          "text": "企画"
+        }
+      ]
+    },
+    {
+      "id": "Q12",
+      "text": "※入力完了後、送信ボタンを押してください",
+      "type": "explanation"
     }
   ]
 }

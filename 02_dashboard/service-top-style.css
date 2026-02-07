@@ -1988,6 +1988,15 @@ body.dark-mode .outline-highlight {
     scrollbar-color: #cbd5e1 transparent;
 }
 
+.chart-summary-scroll-area--expanded {
+    max-height: none;
+    height: 100%;
+}
+
+.chart-summary-scroll-area--list-15 {
+    max-height: 640px;
+}
+
 .chart-summary-scroll-area::-webkit-scrollbar {
     width: 5px;
 }

@@ -1,6 +1,7 @@
 
 import { resolveDemoDataPath, resolveDashboardDataPath, resolveDashboardAssetPath, showToast } from './utils.js';
 import { speedReviewService } from './services/speedReviewService.js';
+import { getSurveyPeriodRange, buildDateFilterOptions, applyDateFilterOptions, resolveDateRangeFromValue, formatDateYmd } from './services/dateFilterService.js';
 import { populateTable, renderModalContent, handleModalImageClick } from './ui/speedReviewRenderer.js';
 import { handleOpenModal } from './modalHandler.js';
 import { initBreadcrumbs } from './breadcrumb.js';
@@ -18,12 +19,36 @@ let timeSeriesAxisMode = 'auto'; // 'auto' or 'fixed'
 let currentItemInModal = null;
 let isModalInEditMode = false;
 let currentSurvey = null;
+let availableDateRange = null;
 
 let currentSortKey = 'answeredAt';
 let currentSortOrder = 'desc';
 
 let timeSeriesChart = null; // Dashboard Chart Instance
 let attributeChart = null;  // Dashboard Chart Instance
+const REVIEW_CHART_PRIMARY = '#1a73e8';
+const REVIEW_CHART_FILL = 'rgba(26, 115, 232, 0.1)';
+const REVIEW_CHART_DONUT_PALETTE = [
+    '#1a73e8',
+    '#e91e63',
+    '#9c27b0',
+    '#673ab7',
+    '#3f51b5',
+    '#2196f3',
+    '#03a9f4',
+    '#00bcd4',
+    '#009688',
+    '#4caf50',
+    '#8bc34a',
+    '#cddc39',
+    '#ffeb3b',
+    '#ffc107',
+    '#ff9800',
+    '#ff5722',
+    '#795548',
+    '#9e9e9e',
+    '#607d8b'
+];
 
 const SINGLE_CHOICE_TYPES = new Set(['single_choice', 'dropdown']);
 const MULTI_CHOICE_TYPES = new Set(['multi_choice']);
@@ -677,11 +702,18 @@ function handleResetFilters() {
     currentDateFilter = null;
     currentStatusFilter = 'all';
 
-    if (startDatePicker) startDatePicker.clear();
-    if (endDatePicker) endDatePicker.clear();
-
     const daySelect = document.getElementById('dayFilterSelect');
     if (daySelect) daySelect.value = 'all';
+
+    const allRange = resolveDateRangeFromValue('all', availableDateRange);
+    if (allRange) {
+        currentDateFilter = allRange;
+        if (startDatePicker) startDatePicker.setDate(allRange[0], false);
+        if (endDatePicker) endDatePicker.setDate(allRange[1], false);
+    } else {
+        if (startDatePicker) startDatePicker.clear();
+        if (endDatePicker) endDatePicker.clear();
+    }
 
     const statusFilterSelect = document.getElementById('statusFilterSelect');
     if (statusFilterSelect) {
@@ -971,20 +1003,26 @@ function setupEventListeners() {
     const startEl = document.getElementById('startDateInput');
     const endEl = document.getElementById('endDateInput');
     const daySelect = document.getElementById('dayFilterSelect');
+    const detailedContent = document.getElementById('detailed-search-content');
+
+    availableDateRange = getSurveyPeriodRange(currentSurvey, allCombinedData);
+    if (daySelect) {
+        const options = buildDateFilterOptions(availableDateRange);
+        applyDateFilterOptions(daySelect, options);
+    }
 
     const fpConfig = {
         enableTime: true,
-        dateFormat: "Y-m-d H:i",
-        minDate: "2026-01-04",
-        maxDate: "2026-01-17",
+        dateFormat: 'Y-m-d H:i',
+        minDate: availableDateRange?.start || null,
+        maxDate: availableDateRange?.end || null,
         locale: "ja",
         onDayCreate: function (dObj, dStr, fp, dayElem) {
+            if (!availableDateRange) return;
             const date = dayElem.dateObj;
-            const start = new Date(2026, 0, 4);
-            const end = new Date(2026, 0, 17);
             const compareDate = new Date(date.getTime());
             compareDate.setHours(0, 0, 0, 0);
-            if (compareDate >= start && compareDate <= end) {
+            if (compareDate >= availableDateRange.start && compareDate <= availableDateRange.end) {
                 dayElem.classList.add('event-duration-highlight');
             }
         },
@@ -996,12 +1034,20 @@ function setupEventListeners() {
                     currentDateFilter = [start, end];
                     // 手動変更時はセレクターを「カスタム」に
                     if (daySelect && daySelect.value !== 'custom') {
-                        const startStr = startDatePicker.formatDate(start, "Y-m-d");
-                        const endStr = endDatePicker.formatDate(end, "Y-m-d");
-                        // 開始と終了が同じ日の00:00と23:59なら、その日の選択状態を維持してもよいが
-                        // 簡略化のため、手動変更はカスタム扱いとする
                         if (valFromSelectChange !== true) {
-                            daySelect.value = 'custom';
+                            const selectedStart = formatDateYmd(start);
+                            const selectedEnd = formatDateYmd(end);
+                            if (
+                                availableDateRange &&
+                                selectedStart === formatDateYmd(availableDateRange.start) &&
+                                selectedEnd === formatDateYmd(availableDateRange.end)
+                            ) {
+                                daySelect.value = 'all';
+                            } else if (selectedStart === selectedEnd && daySelect.querySelector(`option[value="${selectedStart}"]`)) {
+                                daySelect.value = selectedStart;
+                            } else {
+                                daySelect.value = 'custom';
+                            }
                         }
                     }
                     applyFilters();
@@ -1021,24 +1067,35 @@ function setupEventListeners() {
         daySelect.addEventListener('change', (e) => {
             const val = e.target.value;
             valFromSelectChange = true;
-            if (val === 'all') {
-                startDatePicker.setDate("2026-01-04 00:00");
-                endDatePicker.setDate("2026-01-17 23:59");
-                currentDateFilter = [new Date(2026, 0, 4, 0, 0), new Date(2026, 0, 17, 23, 59)];
-            } else if (val === 'custom') {
+            if (val === 'custom') {
+                if (detailedContent) detailedContent.classList.remove('hidden');
                 // カスタム選択時は何もしない（ユーザーの入力を待つ）
                 valFromSelectChange = false;
                 return;
             } else {
-                // val は "2026-01-04" 形式
-                startDatePicker.setDate(`${val} 00:00`);
-                endDatePicker.setDate(`${val} 23:59`);
-                const d = val.split('-');
-                currentDateFilter = [new Date(d[0], d[1] - 1, d[2], 0, 0), new Date(d[0], d[1] - 1, d[2], 23, 59)];
+                if (detailedContent) detailedContent.classList.add('hidden');
+                const range = resolveDateRangeFromValue(val, availableDateRange);
+                currentDateFilter = range;
+                if (range && startDatePicker && endDatePicker) {
+                    startDatePicker.setDate(range[0], false);
+                    endDatePicker.setDate(range[1], false);
+                }
             }
             applyFilters();
             valFromSelectChange = false;
         });
+    }
+
+    const initialRange = resolveDateRangeFromValue('all', availableDateRange);
+    if (daySelect && daySelect.querySelector('option[value="all"]')) {
+        daySelect.value = 'all';
+    }
+    if (initialRange) {
+        currentDateFilter = initialRange;
+        if (startDatePicker && endDatePicker) {
+            startDatePicker.setDate(initialRange[0], false);
+            endDatePicker.setDate(initialRange[1], false);
+        }
     }
 
     // ステータスフィルターのイベントリスナー
@@ -1166,25 +1223,35 @@ function updateSortIcons() {
         if (header.dataset.sortKey === currentSortKey) {
             icon.textContent = currentSortOrder === 'asc' ? 'arrow_upward' : 'arrow_downward';
             icon.classList.remove('opacity-40');
+            header.setAttribute('aria-sort', currentSortOrder === 'asc' ? 'ascending' : 'descending');
         } else {
             icon.textContent = 'unfold_more';
             icon.classList.add('opacity-40');
+            header.setAttribute('aria-sort', 'none');
         }
     });
 }
 
 function setupSortListeners() {
+    const onSortHeaderActivate = (header) => {
+        const sortKey = header.dataset.sortKey;
+        if (currentSortKey === sortKey) {
+            currentSortOrder = currentSortOrder === 'asc' ? 'desc' : 'asc';
+        } else {
+            currentSortKey = sortKey;
+            currentSortOrder = 'desc';
+        }
+        applyFilters();
+        updateSortIcons();
+    };
+
     document.querySelectorAll('.sortable-header').forEach(header => {
-        header.addEventListener('click', () => {
-            const sortKey = header.dataset.sortKey;
-            if (currentSortKey === sortKey) {
-                currentSortOrder = currentSortOrder === 'asc' ? 'desc' : 'asc';
-            } else {
-                currentSortKey = sortKey;
-                currentSortOrder = 'desc';
+        header.addEventListener('click', () => onSortHeaderActivate(header));
+        header.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                onSortHeaderActivate(header);
             }
-            applyFilters();
-            updateSortIcons();
         });
     });
 }
@@ -1466,8 +1533,8 @@ function renderTimeSeriesChart(data) {
             datasets: [{
                 label: '回答数',
                 data: counts,
-                borderColor: '#1a73e8', // Primary Blue Line
-                backgroundColor: 'rgba(26, 115, 232, 0.1)', // Light blue fill
+                borderColor: REVIEW_CHART_PRIMARY,
+                backgroundColor: REVIEW_CHART_FILL,
                 fill: true, // Fill area under the line
                 tension: 0.4, // Smooth curves
                 pointRadius: 4,
@@ -1581,11 +1648,10 @@ function renderAttributeChart(data) {
             attributeChart.destroy();
         }
 
-        const palette = ['#1a73e8', '#2a9d8f', '#e9c46a', '#f4a261', '#e76f51', '#8ab4f8', '#f28b82', '#fbbc04'];
         const chartDatasets = datasets.map((dataset, index) => ({
             label: dataset.label,
             data: dataset.data,
-            backgroundColor: palette[index % palette.length],
+            backgroundColor: REVIEW_CHART_DONUT_PALETTE[index % REVIEW_CHART_DONUT_PALETTE.length],
             borderWidth: 1,
             _rawCounts: dataset._rawCounts,
             _rowTotals: dataset._rowTotals
@@ -1669,16 +1735,13 @@ function renderAttributeChart(data) {
         attributeChart.destroy();
     }
 
-    // Colors
-    const palette = ['#1a73e8', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800', '#ff5722', '#795548', '#9e9e9e', '#607d8b'];
-
     attributeChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
             labels: labels,
             datasets: [{
                 data: values,
-                backgroundColor: palette.slice(0, labels.length),
+                backgroundColor: REVIEW_CHART_DONUT_PALETTE.slice(0, labels.length),
                 borderWidth: 1
             }]
         },

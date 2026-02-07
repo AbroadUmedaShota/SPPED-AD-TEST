@@ -3,7 +3,7 @@
   "groupId": "group_bpo",
   "name": {
     "ja": "全形式網羅・分析検証テスト (BPO部)",
-    "en": "全形式網羅・分析検証テスト - group_bpo"
+    "en": "ALL_TYPES Survey"
   },
   "status": "会期中",
   "answerCount": 300,
@@ -13,73 +13,79 @@
   "details": [
     {
       "id": "Q1",
-      "text": "業界 (SA)",
+      "text": "ご所属の業界",
       "type": "single_choice",
       "options": [
-        "製造",
-        "IT",
-        "金融",
-        "小売"
+        "製造業",
+        "IT・情報通信",
+        "金融・保険",
+        "小売・流通",
+        "その他"
       ]
     },
     {
       "id": "Q2",
-      "text": "興味のある分野 (MA)",
+      "text": "興味のあるソリューション (複数回答)",
       "type": "multi_choice",
       "options": [
-        "製品A",
-        "製品B",
-        "製品C"
+        "クラウド移行",
+        "AI活用",
+        "セキュリティ強化",
+        "コスト削減",
+        "DX推進"
       ]
     },
     {
       "id": "Q3",
-      "text": "氏名 (Text)",
+      "text": "担当者名",
       "type": "text"
     },
     {
       "id": "Q4",
-      "text": "ご意見 (FreeText)",
+      "text": "具体的なお悩み・ご要望",
       "type": "free_text"
     },
     {
       "id": "Q5",
-      "text": "来場人数 (Number)",
-      "type": "number"
+      "text": "来場人数",
+      "type": "number",
+      "min": 1,
+      "max": 10,
+      "unit": "名"
     },
     {
       "id": "Q6",
-      "text": "希望日 (Date)",
+      "text": "次回商談希望日",
       "type": "date"
     },
     {
       "id": "Q7",
-      "text": "時間 (Time)",
+      "text": "連絡希望時間帯",
       "type": "time"
     },
     {
       "id": "Q8",
-      "text": "製品評価 (Matrix SA)",
+      "text": "製品満足度詳細",
       "type": "matrix_sa",
       "rows": [
         {
-          "id": "row1",
-          "text": "デザイン"
+          "id": "r1",
+          "text": "UI/UX"
         },
         {
-          "id": "row2",
-          "text": "機能性"
+          "id": "r2",
+          "text": "機能"
         },
         {
-          "id": "row3",
+          "id": "r3",
           "text": "価格"
         },
         {
-          "id": "row4",
+          "id": "r4",
           "text": "サポート"
         }
       ],
-      "columns": [
+      "options": [
         {
           "value": "5",
           "text": "非常に良い"
@@ -104,13 +110,43 @@
     },
     {
       "id": "Q9",
-      "text": "署名 (Handwriting)",
+      "text": "承諾の署名",
       "type": "handwriting"
     },
     {
       "id": "Q10",
-      "text": "現場写真 (Image)",
+      "text": "現場の状況写真",
       "type": "image"
+    },
+    {
+      "id": "Q11",
+      "text": "評価マトリクス(MA)",
+      "type": "matrix_ma",
+      "rows": [
+        {
+          "id": "r1",
+          "text": "注力分野"
+        }
+      ],
+      "options": [
+        {
+          "value": "a",
+          "text": "技術"
+        },
+        {
+          "value": "b",
+          "text": "営業"
+        },
+        {
+          "value": "c",
+          "text": "企画"
+        }
+      ]
+    },
+    {
+      "id": "Q12",
+      "text": "※入力完了後、送信ボタンを押してください",
+      "type": "explanation"
     }
   ]
 }
