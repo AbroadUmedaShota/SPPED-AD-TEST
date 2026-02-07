@@ -2,600 +2,3950 @@
   {
     "answerId": "ans-sv_0003_26004-0001",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-04 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "製造業",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "コスト削減",
+          "セキュリティ強化"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者1",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "既存ツールとの競合が心配です。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 5,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "3",
+          "r2": "1",
+          "r3": "3",
+          "r4": "1"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "c"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0002",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-15 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "金融・保険",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "クラウド移行",
+          "コスト削減"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者2",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "概ね満足です。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 2,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "2",
+          "r2": "4",
+          "r3": "4",
+          "r4": "2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "c"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0003",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-09 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "製造業",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "セキュリティ強化",
+          "コスト削減"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者3",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "既存ツールとの競合が心配です。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 4,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "3",
+          "r2": "2",
+          "r3": "2",
+          "r4": "3"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "a"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0004",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-09 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "IT・情報通信",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "コスト削減",
+          "セキュリティ強化"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者4",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "初期費用がネックです。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 3,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "1",
+          "r2": "1",
+          "r3": "2",
+          "r4": "3"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "c"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0005",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-13 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "製造業",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "クラウド移行",
+          "コスト削減"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者5",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "操作に慣れが必要です。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 4,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "1",
+          "r2": "1",
+          "r3": "1",
+          "r4": "1"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "b"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0006",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-09 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "金融・保険",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "クラウド移行",
+          "AI活用"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者6",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "資料を確認します。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 5,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "4",
+          "r2": "3",
+          "r3": "4",
+          "r4": "3"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "a"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0007",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-12 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "その他",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "DX推進",
+          "コスト削減"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者7",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "初期費用がネックです。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 2,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "2",
+          "r2": "2",
+          "r3": "1",
+          "r4": "1"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "b"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0008",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-11 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "金融・保険",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "コスト削減",
+          "クラウド移行"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者8",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "操作が非常にスムーズです。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 1,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "4",
+          "r2": "5",
+          "r3": "5",
+          "r4": "4"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "c"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0009",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-15 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "金融・保険",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "コスト削減",
+          "クラウド移行"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者9",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "既存ツールとの競合が心配です。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 1,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "2",
+          "r2": "1",
+          "r3": "1",
+          "r4": "2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "b"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0010",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-17 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "製造業",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "クラウド移行",
+          "AI活用"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者10",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "既存ツールとの競合が心配です。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 1,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "1",
+          "r2": "1",
+          "r3": "2",
+          "r4": "1"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "c"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0011",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-17 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "製造業",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "クラウド移行",
+          "DX推進"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者11",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "導入メリットが明確です。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 5,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "4",
+          "r2": "5",
+          "r3": "4",
+          "r4": "4"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "c"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0012",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-11 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "小売・流通",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "セキュリティ強化",
+          "AI活用"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者12",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "導入メリットが明確です。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 5,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "4",
+          "r2": "4",
+          "r3": "5",
+          "r4": "5"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "b"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0013",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-15 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "製造業",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "DX推進",
+          "クラウド移行"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者13",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "初期費用がネックです。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 1,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "1",
+          "r2": "1",
+          "r3": "1",
+          "r4": "1"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "c"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0014",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-08 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "製造業",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "AI活用",
+          "DX推進"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者14",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "継続して検討します。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 4,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "3",
+          "r2": "2",
+          "r3": "4",
+          "r4": "2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "c"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0015",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-16 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "IT・情報通信",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "AI活用",
+          "クラウド移行"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者15",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "導入メリットが明確です。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 1,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "4",
+          "r2": "5",
+          "r3": "3",
+          "r4": "4"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "c"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0016",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-04 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "IT・情報通信",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "DX推進",
+          "セキュリティ強化"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者16",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "UIが洗練されています。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 3,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "4",
+          "r2": "4",
+          "r3": "4",
+          "r4": "5"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "c"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0017",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-10 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "小売・流通",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "AI活用",
+          "コスト削減"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者17",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "資料を確認します。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 3,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "4",
+          "r2": "2",
+          "r3": "2",
+          "r4": "4"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "a"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0018",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-16 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "金融・保険",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "AI活用",
+          "クラウド移行"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者18",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "操作が非常にスムーズです。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 1,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "4",
+          "r2": "5",
+          "r3": "3",
+          "r4": "3"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "a"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0019",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-08 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "製造業",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "セキュリティ強化",
+          "コスト削減"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者19",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "既存ツールとの競合が心配です。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 3,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "2",
+          "r2": "3",
+          "r3": "1",
+          "r4": "2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "b"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0020",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-07 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "製造業",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "コスト削減",
+          "セキュリティ強化"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者20",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "UIが洗練されています。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 5,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "3",
+          "r2": "3",
+          "r3": "4",
+          "r4": "4"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "c"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0021",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-09 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "金融・保険",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "クラウド移行",
+          "AI活用"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者21",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "UIが洗練されています。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 2,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "5",
+          "r2": "5",
+          "r3": "5",
+          "r4": "5"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "c"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0022",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-14 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "金融・保険",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "AI活用",
+          "コスト削減"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者22",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "導入メリットが明確です。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 1,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "4",
+          "r2": "5",
+          "r3": "4",
+          "r4": "5"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "a"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0023",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-07 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "製造業",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "AI活用",
+          "DX推進"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者23",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "操作が非常にスムーズです。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 3,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "4",
+          "r2": "5",
+          "r3": "4",
+          "r4": "5"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "c"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0024",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-10 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "IT・情報通信",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "DX推進",
+          "クラウド移行"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者24",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "継続して検討します。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 4,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "4",
+          "r2": "2",
+          "r3": "3",
+          "r4": "3"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "c"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0025",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-06 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "その他",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "クラウド移行",
+          "AI活用"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者25",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "UIが洗練されています。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 5,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "4",
+          "r2": "5",
+          "r3": "5",
+          "r4": "5"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "c"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0026",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-17 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "IT・情報通信",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "DX推進",
+          "AI活用"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者26",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "UIが洗練されています。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 4,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "3",
+          "r2": "4",
+          "r3": "5",
+          "r4": "5"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "a"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0027",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-17 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "金融・保険",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "クラウド移行",
+          "AI活用"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者27",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "資料を確認します。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 5,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "2",
+          "r2": "2",
+          "r3": "2",
+          "r4": "4"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "c"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0028",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-08 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "金融・保険",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "クラウド移行",
+          "AI活用"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者28",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "操作に慣れが必要です。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 1,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "1",
+          "r2": "1",
+          "r3": "2",
+          "r4": "1"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "a"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0029",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-08 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "金融・保険",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "DX推進",
+          "コスト削減"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者29",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "既存ツールとの競合が心配です。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 4,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "2",
+          "r2": "3",
+          "r3": "1",
+          "r4": "2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "c"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0030",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-17 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "その他",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "DX推進",
+          "セキュリティ強化"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者30",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "UIが洗練されています。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 2,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "3",
+          "r2": "4",
+          "r3": "4",
+          "r4": "3"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "b"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0031",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-16 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "小売・流通",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "DX推進",
+          "コスト削減"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者31",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "操作に慣れが必要です。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 1,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "3",
+          "r2": "2",
+          "r3": "1",
+          "r4": "3"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "c"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0032",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-14 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "金融・保険",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "AI活用",
+          "クラウド移行"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者32",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "既存ツールとの競合が心配です。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 1,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "1",
+          "r2": "2",
+          "r3": "1",
+          "r4": "2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "c"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0033",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-13 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "製造業",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "コスト削減",
+          "セキュリティ強化"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者33",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "初期費用がネックです。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 1,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "2",
+          "r2": "3",
+          "r3": "3",
+          "r4": "2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "c"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0034",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-15 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "小売・流通",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "セキュリティ強化",
+          "AI活用"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者34",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "概ね満足です。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 5,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "3",
+          "r2": "4",
+          "r3": "4",
+          "r4": "2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "c"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0035",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-10 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "小売・流通",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "コスト削減",
+          "AI活用"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者35",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "操作が非常にスムーズです。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 5,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "4",
+          "r2": "5",
+          "r3": "5",
+          "r4": "5"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "a"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0036",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-06 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "IT・情報通信",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "クラウド移行",
+          "AI活用"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者36",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "操作に慣れが必要です。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 5,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "2",
+          "r2": "3",
+          "r3": "2",
+          "r4": "1"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "c"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0037",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-10 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "金融・保険",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "セキュリティ強化",
+          "クラウド移行"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者37",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "概ね満足です。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 4,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "2",
+          "r2": "3",
+          "r3": "3",
+          "r4": "2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "a"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0038",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-14 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "金融・保険",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "セキュリティ強化",
+          "コスト削減"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者38",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "概ね満足です。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 3,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "4",
+          "r2": "2",
+          "r3": "3",
+          "r4": "4"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "a"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0039",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-08 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "小売・流通",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "セキュリティ強化",
+          "クラウド移行"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者39",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "既存ツールとの競合が心配です。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 2,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "1",
+          "r2": "2",
+          "r3": "3",
+          "r4": "1"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "b"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0040",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-09 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "小売・流通",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "セキュリティ強化",
+          "AI活用"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者40",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "操作に慣れが必要です。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 2,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "3",
+          "r2": "2",
+          "r3": "1",
+          "r4": "3"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "a"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0041",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-07 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "金融・保険",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "クラウド移行",
+          "AI活用"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者41",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "操作に慣れが必要です。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 2,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "1",
+          "r2": "1",
+          "r3": "2",
+          "r4": "1"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "c"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0042",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-11 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "小売・流通",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "AI活用",
+          "DX推進"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者42",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "操作に慣れが必要です。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 1,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "2",
+          "r2": "1",
+          "r3": "1",
+          "r4": "2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "b"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0043",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-10 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "IT・情報通信",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "クラウド移行",
+          "AI活用"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者43",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "操作に慣れが必要です。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 2,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "2",
+          "r2": "3",
+          "r3": "1",
+          "r4": "1"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "b"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0044",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-04 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "小売・流通",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "セキュリティ強化",
+          "AI活用"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者44",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "初期費用がネックです。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 4,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "3",
+          "r2": "1",
+          "r3": "1",
+          "r4": "2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "c"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0045",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-13 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "その他",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "DX推進",
+          "クラウド移行"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者45",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "概ね満足です。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 1,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "3",
+          "r2": "3",
+          "r3": "2",
+          "r4": "2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "c"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0046",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-16 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "その他",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "コスト削減",
+          "クラウド移行"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者46",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "導入メリットが明確です。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 1,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "4",
+          "r2": "3",
+          "r3": "5",
+          "r4": "4"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "c"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0047",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-16 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "製造業",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "クラウド移行",
+          "AI活用"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者47",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "操作が非常にスムーズです。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 1,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "5",
+          "r2": "5",
+          "r3": "4",
+          "r4": "4"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "a"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0048",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-08 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "その他",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "セキュリティ強化",
+          "AI活用"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者48",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "導入メリットが明確です。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 5,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "4",
+          "r2": "5",
+          "r3": "4",
+          "r4": "4"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "a"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0049",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-16 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "小売・流通",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "コスト削減",
+          "クラウド移行"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者49",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "UIが洗練されています。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 1,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "5",
+          "r2": "4",
+          "r3": "4",
+          "r4": "4"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "c"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   },
   {
     "answerId": "ans-sv_0003_26004-0050",
     "surveyId": "sv_0003_26004",
-    "answeredAt": "2026-01-14 12:00:00",
+    "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
-        "question": "質問1",
-        "answer": "サンプル回答",
+        "question": "ご所属の業界",
+        "answer": "IT・情報通信",
+        "type": "single_choice"
+      },
+      {
+        "question": "興味のあるソリューション (複数回答)",
+        "answer": [
+          "クラウド移行",
+          "セキュリティ強化"
+        ],
+        "type": "multi_choice"
+      },
+      {
+        "question": "担当者名",
+        "answer": "テスト 利用者50",
         "type": "text"
+      },
+      {
+        "question": "具体的なお悩み・ご要望",
+        "answer": "操作が非常にスムーズです。",
+        "type": "free_text"
+      },
+      {
+        "question": "来場人数",
+        "answer": 2,
+        "type": "number"
+      },
+      {
+        "question": "次回商談希望日",
+        "answer": "2026-02-15",
+        "type": "date"
+      },
+      {
+        "question": "連絡希望時間帯",
+        "answer": "14:00",
+        "type": "time"
+      },
+      {
+        "question": "製品満足度詳細",
+        "answer": {
+          "r1": "4",
+          "r2": "4",
+          "r3": "5",
+          "r4": "5"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "question": "承諾の署名",
+        "answer": "../media/hanko.png",
+        "type": "handwriting"
+      },
+      {
+        "question": "現場の状況写真",
+        "answer": "../media/縦表 .png",
+        "type": "image"
+      },
+      {
+        "question": "評価マトリクス(MA)",
+        "answer": {
+          "r1": [
+            "a"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "question": "※入力完了後、送信ボタンを押してください",
+        "answer": null,
+        "type": "explanation"
       }
     ]
   }
