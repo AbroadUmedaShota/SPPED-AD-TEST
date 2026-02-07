@@ -29,26 +29,31 @@ let attributeChart = null;  // Dashboard Chart Instance
 const REVIEW_CHART_PRIMARY = '#1a73e8';
 const REVIEW_CHART_FILL = 'rgba(26, 115, 232, 0.1)';
 const REVIEW_CHART_DONUT_PALETTE = [
-    '#1a73e8',
-    '#e91e63',
-    '#9c27b0',
-    '#673ab7',
-    '#3f51b5',
-    '#2196f3',
-    '#03a9f4',
-    '#00bcd4',
-    '#009688',
-    '#4caf50',
-    '#8bc34a',
-    '#cddc39',
-    '#ffeb3b',
-    '#ffc107',
-    '#ff9800',
-    '#ff5722',
-    '#795548',
-    '#9e9e9e',
-    '#607d8b'
+    '#005AFF',
+    '#FF4B00',
+    '#03AF7A',
+    '#4C1BB3',
+    '#F6AA00',
+    '#FFF100',
+    '#99FFFF',
+    '#804000'
 ];
+const REVIEW_CHART_PATTERN_TYPES = [
+    'diagonal',
+    'dot',
+    'cross',
+    'dash',
+    'grid',
+    'zigzag',
+    'diagonalReverse',
+    'wave'
+];
+const chartPatternCache = new Map();
+
+const chartDataLabels = window.ChartDataLabels;
+if (chartDataLabels && window.Chart) {
+    Chart.register(chartDataLabels);
+}
 
 const SINGLE_CHOICE_TYPES = new Set(['single_choice', 'dropdown']);
 const MULTI_CHOICE_TYPES = new Set(['multi_choice']);
@@ -69,6 +74,155 @@ const BLANK_TYPES = new Set([
 ]);
 
 // --- Functions ---
+function hexToRgba(hex, alpha = 1) {
+    const normalized = hex.replace('#', '');
+    const bigint = parseInt(normalized.length === 3
+        ? normalized.split('').map(char => char + char).join('')
+        : normalized, 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function getOverlayColor(hex) {
+    const normalized = hex.replace('#', '');
+    const bigint = parseInt(normalized.length === 3
+        ? normalized.split('').map(char => char + char).join('')
+        : normalized, 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    const luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+    return luminance < 0.55 ? 'rgba(255, 255, 255, 0.65)' : 'rgba(0, 0, 0, 0.25)';
+}
+
+function createChartPattern(baseColor, patternType, alpha = 1) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 14;
+    canvas.height = 14;
+    const ctx = canvas.getContext('2d');
+
+    if (!ctx) return baseColor;
+
+    ctx.fillStyle = hexToRgba(baseColor, alpha);
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.strokeStyle = getOverlayColor(baseColor);
+    ctx.lineWidth = 2;
+    ctx.fillStyle = getOverlayColor(baseColor);
+
+    switch (patternType) {
+        case 'diagonal':
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height);
+            ctx.lineTo(canvas.width, 0);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(-4, canvas.height);
+            ctx.lineTo(canvas.width, -4);
+            ctx.stroke();
+            break;
+        case 'diagonalReverse':
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(canvas.width, canvas.height);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(-4, 4);
+            ctx.lineTo(canvas.width - 4, canvas.height + 4);
+            ctx.stroke();
+            break;
+        case 'dot':
+            ctx.beginPath();
+            ctx.arc(4, 4, 2, 0, Math.PI * 2);
+            ctx.arc(10, 10, 2, 0, Math.PI * 2);
+            ctx.fill();
+            break;
+        case 'cross':
+            ctx.beginPath();
+            ctx.moveTo(7, 2);
+            ctx.lineTo(7, 12);
+            ctx.moveTo(2, 7);
+            ctx.lineTo(12, 7);
+            ctx.stroke();
+            break;
+        case 'dash':
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.moveTo(0, 7);
+            ctx.lineTo(canvas.width, 7);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            break;
+        case 'grid':
+            ctx.beginPath();
+            ctx.moveTo(7, 0);
+            ctx.lineTo(7, canvas.height);
+            ctx.moveTo(0, 7);
+            ctx.lineTo(canvas.width, 7);
+            ctx.stroke();
+            break;
+        case 'zigzag':
+            ctx.beginPath();
+            ctx.moveTo(0, 10);
+            ctx.lineTo(4, 6);
+            ctx.lineTo(8, 10);
+            ctx.lineTo(12, 6);
+            ctx.stroke();
+            break;
+        case 'wave':
+            ctx.beginPath();
+            ctx.moveTo(0, 8);
+            ctx.quadraticCurveTo(3.5, 4, 7, 8);
+            ctx.quadraticCurveTo(10.5, 12, 14, 8);
+            ctx.stroke();
+            break;
+        default:
+            break;
+    }
+
+    return ctx.createPattern(canvas, 'repeat');
+}
+
+function getPatternFill(index, alpha = 1) {
+    const paletteIndex = index % REVIEW_CHART_DONUT_PALETTE.length;
+    const typeIndex = index % REVIEW_CHART_PATTERN_TYPES.length;
+    const cacheKey = `${paletteIndex}-${typeIndex}-${alpha}`;
+    if (chartPatternCache.has(cacheKey)) {
+        return chartPatternCache.get(cacheKey);
+    }
+    const pattern = createChartPattern(
+        REVIEW_CHART_DONUT_PALETTE[paletteIndex],
+        REVIEW_CHART_PATTERN_TYPES[typeIndex],
+        alpha
+    );
+    chartPatternCache.set(cacheKey, pattern);
+    return pattern;
+}
+
+function updateLegendFade(chart, hoveredIndex, mode) {
+    if (!chart || !chart.data) return;
+
+    if (mode === 'segment') {
+        const dataset = chart.data.datasets?.[0];
+        if (!dataset) return;
+        dataset.backgroundColor = chart.data.labels.map((_, index) => {
+            const alpha = hoveredIndex === null ? 1 : (index === hoveredIndex ? 1 : 0.2);
+            return getPatternFill(index, alpha);
+        });
+    }
+
+    if (mode === 'dataset') {
+        chart.data.datasets.forEach((dataset, index) => {
+            const alpha = hoveredIndex === null ? 1 : (index === hoveredIndex ? 1 : 0.2);
+            const patternIndex = dataset._patternIndex ?? index;
+            dataset.backgroundColor = getPatternFill(patternIndex, alpha);
+        });
+    }
+
+    chart.update();
+}
 
 function truncateQuestion(questionText) {
     if (!questionText) {
@@ -1549,6 +1703,9 @@ function renderTimeSeriesChart(data) {
                 tooltip: {
                     mode: 'index',
                     intersect: false,
+                },
+                datalabels: {
+                    display: false
                 }
             },
             layout: {
@@ -1651,8 +1808,10 @@ function renderAttributeChart(data) {
         const chartDatasets = datasets.map((dataset, index) => ({
             label: dataset.label,
             data: dataset.data,
-            backgroundColor: REVIEW_CHART_DONUT_PALETTE[index % REVIEW_CHART_DONUT_PALETTE.length],
-            borderWidth: 1,
+            backgroundColor: getPatternFill(index),
+            borderColor: '#ffffff',
+            borderWidth: 2,
+            _patternIndex: index,
             _rawCounts: dataset._rawCounts,
             _rowTotals: dataset._rowTotals
         }));
@@ -1682,7 +1841,22 @@ function renderAttributeChart(data) {
                 plugins: {
                     legend: {
                         position: 'top',
-                        labels: { boxWidth: 12, font: { size: 11 } }
+                        labels: { boxWidth: 12, font: { size: 11 }, usePointStyle: true },
+                        onHover: (event, legendItem, legend) => {
+                            updateLegendFade(legend.chart, legendItem.datasetIndex, 'dataset');
+                        },
+                        onLeave: (event, legendItem, legend) => {
+                            updateLegendFade(legend.chart, null, 'dataset');
+                        }
+                    },
+                    datalabels: {
+                        color: '#111827',
+                        font: { weight: 'bold', size: 10 },
+                        anchor: 'end',
+                        align: 'right',
+                        formatter: value => (value > 0 ? `${value.toFixed(1)}%` : ''),
+                        textStrokeColor: '#ffffff',
+                        textStrokeWidth: 3
                     },
                     tooltip: {
                         callbacks: {
@@ -1741,8 +1915,9 @@ function renderAttributeChart(data) {
             labels: labels,
             datasets: [{
                 data: values,
-                backgroundColor: REVIEW_CHART_DONUT_PALETTE.slice(0, labels.length),
-                borderWidth: 1
+                backgroundColor: labels.map((label, index) => getPatternFill(index)),
+                borderColor: '#ffffff',
+                borderWidth: 2
             }]
         },
         options: {
@@ -1752,7 +1927,22 @@ function renderAttributeChart(data) {
             plugins: {
                 legend: {
                     position: 'right',
-                    labels: { boxWidth: 12, font: { size: 11 } }
+                    labels: { boxWidth: 12, font: { size: 11 }, usePointStyle: true },
+                    onHover: (event, legendItem, legend) => {
+                        updateLegendFade(legend.chart, legendItem.index, 'segment');
+                    },
+                    onLeave: (event, legendItem, legend) => {
+                        updateLegendFade(legend.chart, null, 'segment');
+                    }
+                },
+                datalabels: {
+                    color: '#111827',
+                    font: { weight: 'bold', size: 10 },
+                    anchor: 'center',
+                    align: 'center',
+                    formatter: value => (value > 0 ? value : ''),
+                    textStrokeColor: '#ffffff',
+                    textStrokeWidth: 3
                 }
             }
         }
