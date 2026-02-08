@@ -119,6 +119,7 @@ class SpeedReviewService {
         const surveyDefinition = allSurveys.find(s => s.id === surveyId);
 
         return csvData.map(row => {
+            const splitName = this.resolveNameParts(row);
             const details = [];
             for (const key in row) {
                 if (key.startsWith('Q.')) {
@@ -140,8 +141,8 @@ class SpeedReviewService {
                     email: row['メールアドレス'] || ''
                 },
                 group2: {
-                    lastName: row['氏名（姓）'] || '',
-                    firstName: '' // No first name in the new CSV structure
+                    lastName: splitName.lastName,
+                    firstName: splitName.firstName
                 },
                 group3: {
                     companyName: row['会社名'] || '',
@@ -219,6 +220,7 @@ class SpeedReviewService {
         const surveyDefinition = allSurveys.find(s => s.id === surveyId);
 
         return jsonData.map(row => {
+            const splitName = this.resolveNameParts(row);
             const details = [];
             for (const key in row) {
                 if (key.startsWith('Q.')) {
@@ -240,8 +242,8 @@ class SpeedReviewService {
                     email: row['メールアドレス'] || ''
                 },
                 group2: {
-                    lastName: row['氏名（姓）'] || '',
-                    firstName: '' // No first name in the new JSON structure
+                    lastName: splitName.lastName,
+                    firstName: splitName.firstName
                 },
                 group3: {
                     companyName: row['会社名'] || '',
@@ -321,6 +323,32 @@ class SpeedReviewService {
                 businessCard: businessCardMap.get(answer.answerId) || null,
                 survey: targetSurvey
             }));
+    }
+
+    resolveNameParts(row = {}) {
+        const explicitLastName = (row['氏名（姓）'] || row['姓'] || '').trim();
+        const explicitFirstName = (row['氏名（名）'] || row['名'] || '').trim();
+        if (explicitLastName || explicitFirstName) {
+            return { lastName: explicitLastName, firstName: explicitFirstName };
+        }
+
+        const fullNameRaw = [row['氏名'], row['お名前'], row['名前']]
+            .find(value => typeof value === 'string' && value.trim() !== '') || '';
+        const fullName = fullNameRaw.trim().replace(/\s+/g, ' ');
+
+        if (!fullName) {
+            return { lastName: '', firstName: '' };
+        }
+
+        const parts = fullName.split(' ');
+        if (parts.length === 1) {
+            return { lastName: parts[0], firstName: '' };
+        }
+
+        return {
+            lastName: parts[0],
+            firstName: parts.slice(1).join(' ')
+        };
     }
 }
 
