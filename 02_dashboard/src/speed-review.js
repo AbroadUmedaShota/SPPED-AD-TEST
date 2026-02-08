@@ -73,24 +73,58 @@ function getChartColor(index, alpha = 1) {
 
 function updateLegendFade(chart, hoveredIndex, mode) {
     if (!chart || !chart.data) return;
+    const focusIndex = chart._legendFocusIndex ?? null;
+    const activeIndex = focusIndex !== null ? focusIndex : hoveredIndex;
 
     if (mode === 'segment') {
         const dataset = chart.data.datasets?.[0];
         if (!dataset) return;
         dataset.backgroundColor = chart.data.labels.map((_, index) => {
-            const alpha = hoveredIndex === null ? 1 : (index === hoveredIndex ? 1 : 0.2);
+            const alpha = activeIndex === null ? 1 : (index === activeIndex ? 1 : 0.2);
             return getChartColor(index, alpha);
         });
     }
 
     if (mode === 'dataset') {
         chart.data.datasets.forEach((dataset, index) => {
-            const alpha = hoveredIndex === null ? 1 : (index === hoveredIndex ? 1 : 0.2);
+            const alpha = activeIndex === null ? 1 : (index === activeIndex ? 1 : 0.2);
             dataset.backgroundColor = getChartColor(index, alpha);
         });
     }
 
     chart.update();
+}
+
+function applyLegendFocus(chart, targetIndex, mode) {
+    if (!chart) return;
+    chart._legendFocusIndex = targetIndex;
+    updateLegendFade(chart, null, mode);
+}
+
+function normalizeDataKey(value) {
+    if (value === undefined || value === null) return '';
+    const normalized = String(value).trim().toLowerCase();
+    return encodeURIComponent(normalized);
+}
+
+function clearMatrixTableHighlight() {
+    const container = document.getElementById('graph-data-table-container');
+    if (!container) return;
+    container.querySelectorAll('.graph-data-table__row.is-highlighted')
+        .forEach(row => row.classList.remove('is-highlighted'));
+}
+
+function highlightMatrixTableRow(rowLabel, columnLabel) {
+    const container = document.getElementById('graph-data-table-container');
+    if (!container) return;
+    clearMatrixTableHighlight();
+    const rowKey = normalizeDataKey(rowLabel);
+    const columnKey = normalizeDataKey(columnLabel);
+    const selector = `.graph-data-table__row[data-matrix-row="${rowKey}"][data-matrix-column="${columnKey}"]`;
+    const targetRow = container.querySelector(selector);
+    if (targetRow) {
+        targetRow.classList.add('is-highlighted');
+    }
 }
 
 function truncateQuestion(questionText) {
@@ -1156,6 +1190,13 @@ function setupEventListeners() {
     if (questionCard) {
         questionCard.addEventListener('click', showQuestionSelectModal);
     }
+    const questionChangeLink = document.getElementById('question-change-link');
+    if (questionChangeLink) {
+        questionChangeLink.addEventListener('click', (event) => {
+            event.stopPropagation();
+            showQuestionSelectModal();
+        });
+    }
 
     const graphBtn = document.getElementById('graphButton');
     if (graphBtn) {
@@ -1359,6 +1400,7 @@ function processDataForTable(survey, answers) {
 function renderGraphDataTable(processedData) {
     const container = document.getElementById('graph-data-table-container');
     if (!container) return;
+    clearMatrixTableHighlight();
 
     if (!processedData || processedData.length === 0) {
         container.innerHTML = `
@@ -1384,12 +1426,16 @@ function renderGraphDataTable(processedData) {
             `;
         }
 
-        const renderTableBlock = (labels, data, totalVotes, includeTotalRow, totalAnswers) => {
+        const renderTableBlock = (labels, data, totalVotes, includeTotalRow, totalAnswers, rowKey = null) => {
             const tableRows = labels.map((label, index) => {
                 const count = data[index] ?? 0;
                 const percentage = totalVotes > 0 ? ((count / totalVotes) * 100).toFixed(1) : '0.0';
+                const columnKey = normalizeDataKey(label);
+                const dataAttrs = rowKey
+                    ? ` data-matrix-row="${rowKey}" data-matrix-column="${columnKey}"`
+                    : '';
                 return `
-                    <tr class="border-b border-outline-variant/30 last:border-b-0">
+                    <tr class="border-b border-outline-variant/30 last:border-b-0 graph-data-table__row"${dataAttrs}>
                         <td class="px-3 py-2 text-sm text-on-surface graph-data-table__label" title="${escapeHtml(label)}">${escapeHtml(label)}</td>
                         <td class="px-3 py-2 text-sm text-on-surface text-right">${count}</td>
                         <td class="px-3 py-2 text-sm text-on-surface-variant text-right">${percentage}%</td>
@@ -1439,10 +1485,11 @@ function renderGraphDataTable(processedData) {
                 const data = labels.map(label => rowCounts[label] || 0);
                 const totalVotes = totals[rowIndex] || 0;
                 const totalAnswers = answered[rowIndex] || 0;
+                const rowKey = normalizeDataKey(row.text);
                 return `
-                    <div class="space-y-2">
+                    <div class="space-y-2" data-matrix-row="${rowKey}">
                         <div class="text-xs font-semibold text-on-surface-variant">${escapeHtml(row.text)}</div>
-                        ${renderTableBlock(labels, data, totalVotes, questionData.includeTotalRow, totalAnswers)}
+                        ${renderTableBlock(labels, data, totalVotes, questionData.includeTotalRow, totalAnswers, rowKey)}
                     </div>
                 `;
             }).join('');
@@ -1617,11 +1664,22 @@ function renderAttributeChart(data) {
                 empty.innerHTML = `
                     <span class="material-icons text-5xl text-on-surface-variant/20">${icon}</span>
                     <p class="text-sm text-on-surface-variant"></p>
+                    <button type="button" class="mt-2 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-xs font-semibold text-primary hover:bg-primary/10">
+                        <span class="material-icons text-sm">tune</span>
+                        設問を選択する
+                    </button>
                 `;
                 container.appendChild(empty);
             }
             const messageEl = empty.querySelector('p');
             if (messageEl) messageEl.textContent = message;
+            const actionBtn = empty.querySelector('button');
+            if (actionBtn && !actionBtn.hasAttribute('data-bound')) {
+                actionBtn.setAttribute('data-bound', 'true');
+                actionBtn.addEventListener('click', () => {
+                    showQuestionSelectModal();
+                });
+            }
         }
         ctx.classList.add('hidden');
     };
@@ -1710,6 +1768,11 @@ function renderAttributeChart(data) {
                     legend: {
                         position: 'top',
                         labels: { boxWidth: 12, font: { size: 11 }, usePointStyle: true },
+                        onClick: (event, legendItem, legend) => {
+                            const chart = legend.chart;
+                            const nextIndex = chart._legendFocusIndex === legendItem.datasetIndex ? null : legendItem.datasetIndex;
+                            applyLegendFocus(chart, nextIndex, 'dataset');
+                        },
                         onHover: (event, legendItem, legend) => {
                             updateLegendFade(legend.chart, legendItem.datasetIndex, 'dataset');
                         },
@@ -1740,6 +1803,16 @@ function renderAttributeChart(data) {
                                 return `${rowLabel} > ${optionLabel}: ${count}件 (${percent}%)`;
                             }
                         }
+                    }
+                },
+                onHover: (event, elements, chart) => {
+                    if (elements && elements.length > 0) {
+                        const { datasetIndex, index } = elements[0];
+                        const rowLabel = chart.data.labels?.[index];
+                        const columnLabel = chart.data.datasets?.[datasetIndex]?.label;
+                        highlightMatrixTableRow(rowLabel, columnLabel);
+                    } else {
+                        clearMatrixTableHighlight();
                     }
                 }
             }
@@ -1796,6 +1869,11 @@ function renderAttributeChart(data) {
                 legend: {
                     position: 'right',
                     labels: { boxWidth: 12, font: { size: 11 }, usePointStyle: true },
+                    onClick: (event, legendItem, legend) => {
+                        const chart = legend.chart;
+                        const nextIndex = chart._legendFocusIndex === legendItem.index ? null : legendItem.index;
+                        applyLegendFocus(chart, nextIndex, 'segment');
+                    },
                     onHover: (event, legendItem, legend) => {
                         updateLegendFade(legend.chart, legendItem.index, 'segment');
                     },
@@ -1824,10 +1902,9 @@ function setupSidebarToggle() {
     const icon = toggleBtn?.querySelector('.material-icons');
     const mainContentWrapper = document.getElementById('main-content-wrapper');
     const overlay = document.getElementById('right-sidebar-overlay');
+    const storageKey = 'speedReviewSidebarCollapsed';
 
     if (!sidebar || !toggleBtn || !icon || !mainContentWrapper) return;
-
-    let hasUserInteracted = false;
 
     // --- Search Tab Logic ---
     const simpleTab = document.getElementById('simple-search-tab');
@@ -1883,30 +1960,53 @@ function setupSidebarToggle() {
     };
 
     toggleBtn.addEventListener('click', () => {
-        hasUserInteracted = true;
         const isCollapsed = !sidebar.classList.contains('translate-x-full');
         applySidebarState(isCollapsed);
+        localStorage.setItem(storageKey, String(isCollapsed));
     });
 
     if (overlay) {
         overlay.addEventListener('click', () => {
-            hasUserInteracted = true;
             applySidebarState(true);
+            localStorage.setItem(storageKey, 'true');
         });
     }
 
     // Initial state check
-    const isInitiallyCollapsed = window.innerWidth < 1280;
+    const storedState = localStorage.getItem(storageKey);
+    const isInitiallyCollapsed = storedState === null
+        ? window.innerWidth < 1280
+        : storedState === 'true';
     applySidebarState(isInitiallyCollapsed);
 
-    // Auto-hide logic
-    setTimeout(() => {
-        if (hasUserInteracted) return;
-        // Only auto-hide if it wasn't collapsed initially due to screen size
-        if (!isInitiallyCollapsed) {
-            applySidebarState(true);
+    if (storedState === null) {
+        setTimeout(() => {
+            if (!isInitiallyCollapsed) {
+                applySidebarState(true);
+                localStorage.setItem(storageKey, 'true');
+            }
+        }, 700);
+    }
+}
+
+function setupTableScrollIndicator() {
+    const container = document.getElementById('review-table-scroll-container');
+    const shadow = document.getElementById('review-table-scroll-shadow');
+    if (!container || !shadow) return;
+
+    const updateShadow = () => {
+        const canScroll = container.scrollWidth - container.clientWidth > 2;
+        const isAtEnd = container.scrollLeft + container.clientWidth >= container.scrollWidth - 2;
+        if (canScroll && !isAtEnd) {
+            shadow.classList.add('is-visible');
+        } else {
+            shadow.classList.remove('is-visible');
         }
-    }, 800);
+    };
+
+    updateShadow();
+    container.addEventListener('scroll', updateShadow);
+    window.addEventListener('resize', updateShadow);
 }
 
 export async function initializePage() {
@@ -2029,6 +2129,7 @@ export async function initializePage() {
         renderDashboard(allCombinedData);
         setupEventListeners();
         setupSidebarToggle();
+        setupTableScrollIndicator();
         updateSortIcons();
 
     } catch (error) {
