@@ -1,6 +1,7 @@
 import { initBreadcrumbs } from './breadcrumb.js';
 import { resolveDemoDataPath, showToast } from './utils.js';
 import { getSurveyPeriodRange, buildDateFilterOptions, applyDateFilterOptions, resolveDateRangeFromValue } from './services/dateFilterService.js';
+import { COMMON_CHART_DONUT_PALETTE } from './constants/chartPalette.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     initGraphPage();
@@ -26,27 +27,7 @@ const displayOptions = {
     showTable: true,
     showGrid: false
 };
-const GRAPH_CHART_DONUT_PALETTE = [
-    '#1a73e8',
-    '#e91e63',
-    '#9c27b0',
-    '#673ab7',
-    '#3f51b5',
-    '#2196f3',
-    '#03a9f4',
-    '#00bcd4',
-    '#009688',
-    '#4caf50',
-    '#8bc34a',
-    '#cddc39',
-    '#ffeb3b',
-    '#ffc107',
-    '#ff9800',
-    '#ff5722',
-    '#795548',
-    '#9e9e9e',
-    '#607d8b'
-];
+const GRAPH_CHART_DONUT_PALETTE = COMMON_CHART_DONUT_PALETTE;
 const GRAPH_CHART_MUTED_TEXT = '#6B6B6B';
 const GRAPH_CHART_TEXT = '#1A1A1A';
 const GRAPH_CHART_GRID = '#F1F1F1';
