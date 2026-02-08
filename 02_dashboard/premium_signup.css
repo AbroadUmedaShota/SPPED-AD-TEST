@@ -696,12 +696,13 @@ footer#cta a:not(.cta-button):hover {
 }
 
 .cta-button {
-    display: inline-block;
+    display: inline-flex; /* スピナーとテキストを横並びにするため */
+    align-items: center; /* 垂直方向中央揃え */
+    justify-content: center; /* 水平方向中央揃え */
+    gap: 0.5rem; /* テキストとスピナーの間隔 */
     padding: 1rem 2.5rem;
     background-color: #007bff;
-    /* 以前の青色に戻す */
     color: #fff;
-    /* 白文字 */
     text-decoration: none;
     font-size: 1.1rem;
     font-weight: 700;
@@ -710,15 +711,12 @@ footer#cta a:not(.cta-button):hover {
     cursor: pointer;
     border: none;
     box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2);
-    /* 青色に合わせた影 */
 }
 
 .cta-button:hover {
     background-color: #0056b3;
-    /* 以前のホバー色に戻す */
     transform: translateY(-3px);
     box-shadow: 0 7px 20px rgba(0, 123, 255, 0.3);
-    /* 青色に合わせた影 */
 }
 
 /* --- Premium Registration Form Specific Styles --- */
@@ -770,4 +768,22 @@ textarea.is-invalid {
     background-repeat: no-repeat;
     background-position: right calc(0.375em + 0.1875rem) center;
     background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+/* スピナーの基本スタイルとアニメーション */
+.spinner-border {
+    display: none;
+    width: 1.5rem;
+    height: 1.5rem;
+    vertical-align: text-bottom;
+    border: .25em solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spinner-border .75s linear infinite;
+}
+
+@keyframes spinner-border {
+    to {
+        transform: rotate(360deg);
+    }
 }

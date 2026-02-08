@@ -27,18 +27,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ローディング表示/非表示を切り替えるヘルパー関数
     function toggleLoading(button, isLoading) {
+        const buttonText = button.querySelector('.button-text');
+        const spinner = button.querySelector('.spinner-border');
+
         if (isLoading) {
             button.disabled = true;
             button.classList.add('opacity-50', 'cursor-not-allowed');
-            // スピナーを追加（必要に応じてHTML側にスピナー要素を追加）
-            // 例: button.innerHTML = '<span class="spinner"></span> Loading...';
-            // console.log('Loading started for:', button.id); // デバッグ用
+            if (buttonText) buttonText.style.display = 'none';
+            if (spinner) spinner.style.display = 'inline-block';
         } else {
             button.disabled = false;
             button.classList.remove('opacity-50', 'cursor-not-allowed');
-            // スピナーを削除
-            // 例: button.innerHTML = 'Original Text';
-            // console.log('Loading finished for:', button.id); // デバッグ用
+            if (buttonText) buttonText.style.display = 'inline-block';
+            if (spinner) spinner.style.display = 'none';
         }
     }
 
@@ -96,6 +97,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const passwordInput = document.getElementById('password');
     const passwordConfirmInput = document.getElementById('passwordConfirm');
     const nextToStep2Button = document.getElementById('nextToStep2');
+    const togglePasswordVisibilityButton = document.getElementById('togglePasswordVisibility'); // 新しく追加
+
+    // パスワード表示/非表示切り替え機能
+    if (togglePasswordVisibilityButton) {
+        togglePasswordVisibilityButton.addEventListener('click', () => {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            const icon = togglePasswordVisibilityButton.querySelector('.material-icons');
+            if (icon) {
+                icon.textContent = type === 'password' ? 'visibility_off' : 'visibility';
+            }
+        });
+    }
 
     function validateStep1() {
         let isValid = true;
