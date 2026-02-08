@@ -720,3 +720,54 @@ footer#cta a:not(.cta-button):hover {
     box-shadow: 0 7px 20px rgba(0, 123, 255, 0.3);
     /* 青色に合わせた影 */
 }
+
+/* --- Premium Registration Form Specific Styles --- */
+
+/* ステップ表示 (パンくずリスト) */
+nav[aria-label="Progress"] ol li a {
+    transition: all 0.3s ease;
+}
+
+nav[aria-label="Progress"] ol li a[aria-current="step"] {
+    border-color: var(--color-primary);
+}
+
+nav[aria-label="Progress"] ol li a[aria-current="step"] span {
+    color: var(--color-primary);
+    font-weight: 600; /* 現在のステップを強調 */
+}
+
+/* 完了したステップ */
+nav[aria-label="Progress"] ol li a.completed {
+    border-color: var(--color-state-success); /* 完了したステップは緑など */
+}
+nav[aria-label="Progress"] ol li a.completed span {
+    color: var(--color-state-success);
+}
+
+/* 未完了のステップ */
+nav[aria-label="Progress"] ol li a:not([aria-current="step"]):not(.completed) {
+    border-color: var(--color-outline-variant);
+}
+nav[aria-label="Progress"] ol li a:not([aria-current="step"]):not(.completed) span {
+    color: var(--color-on-surface-variant);
+}
+
+/* フォームフィールドのエラー表示 */
+.form-field-error {
+    color: var(--color-error);
+    font-size: 0.875rem; /* text-sm */
+    margin-top: 0.25rem; /* mt-1 */
+}
+
+/* 入力欄にエラーがある場合のスタイル */
+input.is-invalid,
+select.is-invalid,
+textarea.is-invalid {
+    border-color: var(--color-error) !important;
+    padding-right: 2.25rem; /* エラーアイコン分のスペース */
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccpath stroke-linejoin='round' d='M6 8.4v.1h.01v-.1z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}

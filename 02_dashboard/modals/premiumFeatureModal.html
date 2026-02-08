@@ -1,0 +1,23 @@
+<!-- Premium Feature Modal -->
+<div id="premiumFeatureModalOverlay" class="modal-overlay" data-state="closed">
+    <div class="modal-content-transition w-full max-w-md p-6 bg-surface rounded-xl">
+        <div class="flex justify-between items-center pb-4 border-b border-outline-variant">
+            <h2 class="text-lg font-semibold text-on-surface">プレミアム機能のお知らせ</h2>
+            <button class="text-on-surface-variant hover:text-primary" id="closePremiumFeatureModalBtn" aria-label="閉じる" data-modal-close="premiumFeatureModalOverlay">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+        <div class="py-6 text-center">
+            <p class="text-on-surface-variant mb-4">この機能はプレミアムプランのお客様のみご利用いただけます。</p>
+            <p class="text-on-surface-variant">プレミアムプランに加入して、すべての機能をご利用ください！</p>
+        </div>
+        <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+            <button type="button" id="premium-signup-button" class="inline-flex w-full justify-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm sm:ml-3 sm:w-auto">
+                プレミアムプランに加入する
+            </button>
+            <button type="button" data-action="close" data-modal-close="premiumFeatureModalOverlay" class="mt-3 inline-flex w-full justify-center rounded-lg border border-outline px-4 py-2 text-sm font-semibold text-on-surface shadow-sm sm:mt-0 sm:w-auto">
+                閉じる
+            </button>
+        </div>
+    </div>
+</div>

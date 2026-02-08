@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ja" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speed Ad プレミアム登録完了</title>
+
+    <link rel="icon" href="assets/svg/speedad_logo.svg" type="image/svg+xml">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Material Icons CDN -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Custom Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link as="style"
+        href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900"
+        onload="this.rel='stylesheet'" rel="stylesheet">
+
+    <!-- 共通スタイルシート -->
+    <link rel="stylesheet" href="service-top-style.css">
+    <!-- プレミアム登録フォーム専用スタイルシート (一部流用) -->
+    <link rel="stylesheet" href="premium_signup.css">
+</head>
+
+<body class="bg-background text-on-background">
+
+    <!-- 1. アプリケーション全体構造 -->
+    <div class="relative flex min-h-screen flex-col overflow-x-hidden">
+
+        <!-- 2. ヘッダー (main.jsによって読み込まれる) -->
+        <div id="header-placeholder"></div>
+
+        <div class="flex flex-1 pt-16 bg-background">
+            <!-- 4. メインコンテンツ -->
+            <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
+                <div class="flex flex-col w-full max-w-6xl mx-auto flex-1 items-center justify-center text-center">
+                    <h1 class="text-on-surface text-3xl md:text-4xl font-bold mb-6">プレミアム登録が完了しました！</h1>
+                    <p class="text-on-surface-variant text-lg mb-8">
+                        ご登録ありがとうございます。<br>
+                        後ほど、ご登録のメールアドレスに請求書に関するご案内をお送りいたします。
+                    </p>
+                    <p class="text-on-surface-variant text-base mb-10">
+                        ご入金確認後、プレミアム機能が有効になります。<br>
+                        ダッシュボードにて請求書をご確認いただけます。
+                    </p>
+                    <a href="index.html" class="cta-button">ダッシュボードへ戻る</a>
+                </div>
+            </main>
+        </div>
+
+        <!-- 5. フッター (main.jsによって読み込まれる) -->
+        <div id="footer-placeholder"></div>
+
+    </div>
+
+    <!-- JSファイル -->
+    <script type="module" src="src/main.js"></script>
+
+</body>
+
+</html>

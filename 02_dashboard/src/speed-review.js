@@ -1,4 +1,3 @@
-
 import { resolveDemoDataPath, resolveDashboardDataPath, resolveDashboardAssetPath, showToast } from './utils.js';
 import { speedReviewService } from './services/speedReviewService.js';
 import { getSurveyPeriodRange, buildDateFilterOptions, applyDateFilterOptions, resolveDateRangeFromValue, formatDateYmd } from './services/dateFilterService.js';
@@ -23,6 +22,9 @@ let availableDateRange = null;
 
 let currentSortKey = 'answeredAt';
 let currentSortOrder = 'desc';
+
+// ダミーフラグ (後で実際の判定ロジックに置き換える)
+let isFreeAccountUser; // 初期値は後で設定
 
 let timeSeriesChart = null; // Dashboard Chart Instance
 let attributeChart = null;  // Dashboard Chart Instance
@@ -160,7 +162,7 @@ function createChartPattern(baseColor, patternType, alpha = 1) {
             ctx.moveTo(7, 0);
             ctx.lineTo(7, canvas.height);
             ctx.moveTo(0, 7);
-            ctx.lineTo(canvas.width, 7);
+            ctx.lineTo(7, canvas.width);
             ctx.stroke();
             break;
         case 'zigzag':
@@ -1292,12 +1294,16 @@ function setupEventListeners() {
     if (graphBtn) {
         graphBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            const urlParams = new URLSearchParams(window.location.search);
-            let surveyId = urlParams.get('surveyId');
-            if (!surveyId) {
-                surveyId = 'sv_0001_24001'; // Fallback to default
+            if (!isFreeAccountUser) { // プレミアムアカウントの場合 (isFreeAccountUserがfalse)
+                const urlParams = new URLSearchParams(window.location.search);
+                let surveyId = urlParams.get('surveyId');
+                if (!surveyId) {
+                    surveyId = 'sv_0001_24001'; // Fallback to default
+                }
+                window.location.href = `graph-page.html?surveyId=${surveyId}`;
+            } else { // フリーアカウントの場合 (isFreeAccountUserがtrue)
+                openPremiumFeatureModal(); // プレミアム機能案内モーダルを表示
             }
-            window.location.href = `graph-page.html?surveyId=${surveyId}`;
         });
     }
 
@@ -1957,9 +1963,64 @@ function setupSidebarToggle() {
     const mainContentWrapper = document.getElementById('main-content-wrapper');
     const overlay = document.getElementById('right-sidebar-overlay');
 
-    if (!sidebar || !toggleBtn || !icon || !mainContentWrapper) return;
+    if (!sidebar || !toggleBtn || !icon || !mainContentWrapper || !overlay) return;
 
-    let hasUserInteracted = false;
+    // 初期状態は開いている
+    let isSidebarOpen = true; // サイドバーの現在の状態を管理
+    let autoCloseTimer;
+    const AUTO_CLOSE_DELAY = 2500; // 2.5秒後に自動的に閉じる (調整可能)
+
+    // サイドバーの開閉状態を更新する関数
+    const updateSidebarState = () => {
+        if (isSidebarOpen) {
+            // 開いている状態
+            sidebar.classList.remove('translate-x-full');
+            sidebar.classList.add('translate-x-0');
+            mainContentWrapper.classList.remove('lg:mr-0'); // 閉じた状態でのマージンを解除
+            mainContentWrapper.classList.add('lg:mr-80'); // 開いた状態でのマージン
+            icon.textContent = 'chevron_right'; // 開いている時のアイコン (内側を向く矢印)
+            overlay.classList.add('active'); // オーバーレイ表示
+        } else {
+            // 閉じている状態
+            sidebar.classList.remove('translate-x-0');
+            sidebar.classList.add('translate-x-full');
+            mainContentWrapper.classList.remove('lg:mr-80'); // 開いた状態でのマージンを解除
+            mainContentWrapper.classList.add('lg:mr-0'); // 閉じた状態でのマージン
+            icon.textContent = 'chevron_left'; // 閉じている時のアイコン (外側を向く矢印)
+            overlay.classList.remove('active'); // オーバーレイ非表示
+        }
+    };
+
+    // 自動クローズタイマーをセット
+    const setAutoCloseTimer = () => {
+        clearTimeout(autoCloseTimer); // 既存のタイマーをクリア
+        autoCloseTimer = setTimeout(() => {
+            if (isSidebarOpen) { // 開いている場合のみ閉じる
+                isSidebarOpen = false;
+                updateSidebarState();
+            }
+        }, AUTO_CLOSE_DELAY);
+    };
+
+    // 初期表示処理
+    updateSidebarState(); // 最初は開いている状態を反映
+    setAutoCloseTimer(); // 自動クローズタイマーをセット
+
+    // トグルボタンのイベントリスナー
+    toggleBtn.addEventListener('click', () => {
+        isSidebarOpen = !isSidebarOpen;
+        updateSidebarState();
+        clearTimeout(autoCloseTimer); // 手動操作があった場合は自動クローズをキャンセル
+    });
+
+    // オーバーレイのイベントリスナー（開いている場合のみ閉じる）
+    overlay.addEventListener('click', () => {
+        if (isSidebarOpen) {
+            isSidebarOpen = false;
+            updateSidebarState();
+            clearTimeout(autoCloseTimer); // 手動操作があった場合は自動クローズをキャンセル
+        }
+    });
 
     // --- Search Tab Logic ---
     const simpleTab = document.getElementById('simple-search-tab');
@@ -1970,75 +2031,42 @@ function setupSidebarToggle() {
     if (simpleTab && detailedTab && simpleContent && detailedContent) {
         const switchTab = (mode) => {
             if (mode === 'simple') {
-                simpleTab.classList.add('bg-surface', 'text-primary', 'shadow-sm');
+                simpleTab.classList.add('bg-surface', 'text-primary', 'shadow-sm', 'is-active');
                 simpleTab.classList.remove('text-on-surface-variant', 'hover:text-on-surface');
-                simpleTab.classList.add('is-active');
-                detailedTab.classList.remove('bg-surface', 'text-primary', 'shadow-sm');
+                detailedTab.classList.remove('bg-surface', 'text-primary', 'shadow-sm', 'is-active');
                 detailedTab.classList.add('text-on-surface-variant', 'hover:text-on-surface');
-                detailedTab.classList.remove('is-active');
                 simpleContent.classList.remove('hidden');
                 detailedContent.classList.add('hidden');
             } else {
-                detailedTab.classList.add('bg-surface', 'text-primary', 'shadow-sm');
+                detailedTab.classList.add('bg-surface', 'text-primary', 'shadow-sm', 'is-active');
                 detailedTab.classList.remove('text-on-surface-variant', 'hover:text-on-surface');
-                detailedTab.classList.add('is-active');
-                simpleTab.classList.remove('bg-surface', 'text-primary', 'shadow-sm');
+                simpleTab.classList.remove('bg-surface', 'text-primary', 'shadow-sm', 'is-active');
                 simpleTab.classList.add('text-on-surface-variant', 'hover:text-on-surface');
-                simpleTab.classList.remove('is-active');
                 detailedContent.classList.remove('hidden');
                 simpleContent.classList.add('hidden');
             }
         };
 
-        simpleTab.addEventListener('click', () => switchTab('simple'));
-        detailedTab.addEventListener('click', () => switchTab('detailed'));
-    }
-
-    const applySidebarState = (isCollapsed) => {
-        if (isCollapsed) {
-            // CLOSE
-            sidebar.classList.remove('translate-x-0');
-            sidebar.classList.add('translate-x-full');
-            mainContentWrapper.classList.remove('lg:mr-80');
-            icon.textContent = 'chevron_left';
-            toggleBtn.setAttribute('aria-expanded', 'false');
-            if (overlay) overlay.classList.remove('is-visible');
-        } else {
-            // OPEN
-            sidebar.classList.remove('translate-x-full');
-            sidebar.classList.add('translate-x-0');
-            mainContentWrapper.classList.add('lg:mr-80');
-            icon.textContent = 'chevron_right';
-            toggleBtn.setAttribute('aria-expanded', 'true');
-            if (overlay) overlay.classList.add('is-visible');
-        }
-    };
-
-    toggleBtn.addEventListener('click', () => {
-        hasUserInteracted = true;
-        const isCollapsed = !sidebar.classList.contains('translate-x-full');
-        applySidebarState(isCollapsed);
-    });
-
-    if (overlay) {
-        overlay.addEventListener('click', () => {
-            hasUserInteracted = true;
-            applySidebarState(true);
+        simpleTab.addEventListener('click', () => {
+            switchTab('simple');
+            clearTimeout(autoCloseTimer); // タブ操作があった場合も自動クローズをキャンセル
+        });
+        detailedTab.addEventListener('click', () => {
+            switchTab('detailed');
+            clearTimeout(autoCloseTimer); // タブ操作があった場合も自動クローズをキャンセル
         });
     }
+}
 
-    // Initial state check
-    const isInitiallyCollapsed = window.innerWidth < 1280;
-    applySidebarState(isInitiallyCollapsed);
-
-    // Auto-hide logic
-    setTimeout(() => {
-        if (hasUserInteracted) return;
-        // Only auto-hide if it wasn't collapsed initially due to screen size
-        if (!isInitiallyCollapsed) {
-            applySidebarState(true);
+function openPremiumFeatureModal() {
+    handleOpenModal('premiumFeatureModalOverlay', resolveDashboardAssetPath('modals/premiumFeatureModal.html'), () => {
+        const signupButton = document.getElementById('premium-signup-button');
+        if (signupButton) {
+            signupButton.addEventListener('click', () => {
+                window.location.href = 'premium_registration_form.html';
+            });
         }
-    }, 800);
+    });
 }
 
 export async function initializePage() {
@@ -2050,6 +2078,23 @@ export async function initializePage() {
 
         if (!surveyId) {
             throw new Error("アンケートIDが指定されていません。");
+        }
+
+        // 特定のアンケートIDに対してisFreeAccountUserをtrueに設定するロジック
+        const targetSurveyIds = [
+            'sv_0002_26001',
+            'sv_0002_26002',
+            'sv_0002_26003',
+            'sv_0002_26004',
+            'sv_0002_26005',
+            'sv_0002_26006',
+            'sv_0002_26007',
+            'sv_0002_26008'
+        ];
+        if (surveyId && targetSurveyIds.includes(surveyId)) {
+            isFreeAccountUser = true; // 指定されたアンケートIDの場合、フリーアカウントと見なす
+        } else {
+            isFreeAccountUser = false; // それ以外の場合、プレミアムアカウントと見なす
         }
 
         // 1. Fetch all data sources in parallel

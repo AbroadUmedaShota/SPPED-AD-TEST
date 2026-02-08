@@ -9,6 +9,9 @@
     - **ApexChartsへの完全移行**: Chart.jsからSVGベースのApexChartsへ変更し、操作性と解像度を向上。
     - **Excelレポート出力**: `ExcelJS` を使用し、グラフと集計データをセットにしたExcel出力機能を実装。
 
+## 2026-02-08 (日)
+- **プレミアム登録画面 要件定義書の作成**: 新規プレミアム登録画面の要件定義書（`docs/requirements/premium_registration_requirements.md`）を作成したぺこ。
+
 ## 2026-02-06 (金)
 - **Visual Insight（画像ドリルダウン）機能の実装 (#236)**:
     - グラフのセグメントクリックで、根拠となる現場写真等を即座に閲覧可能に。
