@@ -497,7 +497,7 @@ function renderCharts(chartsData) {
 
     const exportAllButton = document.getElementById('excel-export-all');
     if (exportAllButton) {
-        exportAllButton.onclick = () => exportAllChartsToExcel(chartsData);
+        exportAllButton.onclick = () => showExportOptionsModal(chartsData);
     }
 }
 
@@ -843,7 +843,45 @@ function renderChartSummaryTable(summaryId, chartData) {
     container.innerHTML = html;
 }
 
-async function exportAllChartsToExcel(chartsData) {
+async function showExportOptionsModal(chartsData) {
+    const container = document.getElementById('export-options-modal-container');
+    if (!container.innerHTML) {
+        const response = await fetch('modals/exportOptionsModal.html');
+        container.innerHTML = await response.text();
+    }
+
+    const modal = document.getElementById('exportOptionsModal');
+    const confirmBtn = document.getElementById('confirm-export-btn');
+    const cancelBtn = document.getElementById('cancel-export-btn');
+    const closeBtn = modal.querySelector('.close-modal-btn');
+
+    const openModal = () => {
+        modal.setAttribute('data-state', 'open');
+        document.body.classList.add('overflow-hidden');
+    };
+
+    const closeModal = () => {
+        modal.setAttribute('data-state', 'closed');
+        document.body.classList.remove('overflow-hidden');
+    };
+
+    confirmBtn.onclick = () => {
+        const options = {
+            includeTOC: document.getElementById('export-opt-toc').checked,
+            includeCharts: document.getElementById('export-opt-charts').checked,
+            includeMatrixFull: document.getElementById('export-opt-matrix-all').checked,
+            includeExclusions: document.getElementById('export-opt-exclusions').checked
+        };
+        closeModal();
+        executeExcelExport(chartsData, options);
+    };
+
+    cancelBtn.onclick = closeModal;
+    closeBtn.onclick = closeModal;
+    openModal();
+}
+
+async function executeExcelExport(chartsData, options) {
     const ExcelJSInstance = window.ExcelJS || (typeof ExcelJS !== 'undefined' ? ExcelJS : null);
     if (!ExcelJSInstance || typeof ExcelJSInstance.Workbook !== 'function') {
         alert('Excelエクスポート用のライブラリ(ExcelJS)が読み込めませんでした。');
@@ -860,11 +898,10 @@ async function exportAllChartsToExcel(chartsData) {
     const successIconClass = 'text-success';
     let exportSucceeded = false;
 
-    // スレッド解放用のヘルパー
     const yieldToMain = () => new Promise(resolve => setTimeout(resolve, 50));
 
     try {
-        isExporting = true; // 書き出し開始
+        isExporting = true;
         if (exportBtn) {
             exportBtn.disabled = true;
             exportBtn.style.opacity = '0.7';
@@ -885,179 +922,170 @@ async function exportAllChartsToExcel(chartsData) {
         if (progressPercent) progressPercent.textContent = '0%';
 
         const workbook = new ExcelJSInstance.Workbook();
-        const usedNames = new Map();
-        const blankQuestions = [];
         const totalCharts = chartsData.length;
         let processedCount = 0;
 
-        for (const chartData of chartsData) {
+        // 目次シートの準備
+        let tocSheet = null;
+        if (options.includeTOC) {
+            tocSheet = workbook.addWorksheet('目次', { views: [{ showGridLines: false }] });
+            tocSheet.addRow(['分析レポート 目次']).font = { bold: true, size: 18 };
+            tocSheet.addRow([`アンケート: ${currentSurvey?.name?.ja || ''}`]);
+            tocSheet.addRow([`出力日時: ${new Date().toLocaleString('ja-JP')}`]);
+            tocSheet.addRow([]);
+            tocSheet.addRow(['No.', '設問内容', 'シート']);
+            tocSheet.getRow(5).font = { bold: true };
+            tocSheet.getRow(5).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE0EDFF' } };
+            tocSheet.getColumn(1).width = 6;
+            tocSheet.getColumn(2).width = 60;
+            tocSheet.getColumn(3).width = 15;
+        }
+
+        for (let i = 0; i < chartsData.length; i++) {
+            const chartData = chartsData[i];
             processedCount++;
             const percent = Math.round((processedCount / totalCharts) * 100);
             if (progressText) progressText.textContent = `${totalCharts}件中 ${processedCount}件目を処理中...`;
             if (progressBar) progressBar.style.width = `${percent}%`;
             if (progressPercent) progressPercent.textContent = `${percent}%`;
 
-            // ブラウザに操作権限を一度戻す（バックグラウンド感の演出とフリーズ防止）
             await yieldToMain();
 
-            if (chartData.chartType === 'blank') {
-                blankQuestions.push([chartData.questionId, chartData.questionText, chartData.blankReason || '現在グラフ対象外']);
-                continue;
-            }
+            const questionNo = `Q${processedCount}`;
+            const isBlank = chartData.chartType === 'blank';
+            
+            if (isBlank && !options.includeExclusions) continue;
 
-            const baseName = sanitizeSheetName(chartData.questionText);
-            const sheetName = ensureUniqueSheetName(baseName, usedNames);
+            const sheetName = isBlank ? `Ex_${processedCount}` : questionNo;
             const sheet = workbook.addWorksheet(sheetName, { views: [{ showGridLines: false }] });
 
-            const titleRow = sheet.addRow([chartData.questionText]);
+            if (options.includeTOC) {
+                const row = tocSheet.addRow([processedCount, chartData.questionText, sheetName]);
+                row.getCell(3).value = { text: sheetName, hyperlink: `#'${sheetName}'!A1` };
+                row.getCell(3).font = { color: { argb: 'FF0000FF' }, underline: true };
+            }
+
+            const titleRow = sheet.addRow([`${questionNo}: ${chartData.questionText}`]);
             titleRow.font = { bold: true, size: 16 };
             sheet.addRow([]);
 
             if (chartData.summaryType === 'matrix_table') {
                 const rows = chartData.matrixRows || [];
                 const columns = chartData.matrixColumns || [];
-                const series = chartData.matrixSeries || [];
-                const countByColumn = new Map(series.map(item => [item.name, item.data || []]));
-
-                if (rows.length > 0 && columns.length > 0) {
-                    const tableRows = rows.map((row, rowIndex) => {
-                        const rowCounts = columns.map(col => {
-                            const values = countByColumn.get(col.text) || [];
-                            return Number(values[rowIndex] || 0);
-                        });
-                        const total = rowCounts.reduce((sum, count) => sum + count, 0);
-                        return [row.text, ...rowCounts, total];
+                const rowDetails = chartData.matrixRowDetails || [];
+                
+                const header = ['行項目', ...columns.map(c => c.text), '合計'];
+                const tableRows = rows.map((row, rIdx) => {
+                    const detail = rowDetails[rIdx];
+                    const counts = columns.map(col => {
+                        const labelIdx = detail.labels.indexOf(col.text);
+                        return labelIdx !== -1 ? detail.data[labelIdx] : 0;
                     });
-
-                    sheet.addTable({
-                        name: `Table_${chartData.chartId.replace(/[^a-zA-Z0-9]/g, '_')}`,
-                        ref: 'A3',
-                        headerRow: true,
-                        totalsRow: false,
-                        style: { theme: 'TableStyleMedium2', showRowStripes: true },
-                        columns: [
-                            { name: '行項目', filterButton: true },
-                            ...columns.map(col => ({ name: col.text, filterButton: false })),
-                            { name: '合計', filterButton: false }
-                        ],
-                        rows: tableRows
-                    });
-
-                    sheet.getColumn(1).width = 30;
-                    for (let colIdx = 0; colIdx < columns.length; colIdx += 1) {
-                        sheet.getColumn(2 + colIdx).width = 12;
-                        sheet.getColumn(2 + colIdx).numFmt = '#,##0"件"';
-                    }
-                    const totalColumnIndex = 2 + columns.length;
-                    sheet.getColumn(totalColumnIndex).width = 12;
-                    sheet.getColumn(totalColumnIndex).numFmt = '#,##0"件"';
-                } else {
-                    sheet.addRow(['集計データがありません。']);
-                }
-            } else if (chartData.chartType === 'list') {
-                const listRows = (chartData.listAll || []).map(item => [item.value, item.answeredAtLabel]);
-                const tableRows = listRows.length > 0 ? listRows : [['回答がありません。', '']];
+                    const rowTotal = counts.reduce((a, b) => a + b, 0);
+                    return [row.text, ...counts, rowTotal];
+                });
 
                 sheet.addTable({
-                    name: `Table_${chartData.chartId.replace(/[^a-zA-Z0-9]/g, '_')}`,
+                    name: `Table_${questionNo}`,
                     ref: 'A3',
                     headerRow: true,
-                    totalsRow: false,
                     style: { theme: 'TableStyleMedium2', showRowStripes: true },
-                    columns: [
-                        { name: '回答', filterButton: true },
-                        { name: '回答日時', filterButton: true }
-                    ],
+                    columns: header.map(name => ({ name, filterButton: false })),
                     rows: tableRows
                 });
 
+                sheet.getColumn(1).width = 30;
+                columns.forEach((_, cIdx) => {
+                    sheet.getColumn(2 + cIdx).width = 12;
+                    sheet.getColumn(2 + cIdx).numFmt = '#,##0"件"';
+                });
+                sheet.getColumn(2 + columns.length).width = 12;
+                sheet.getColumn(2 + columns.length).numFmt = '#,##0"件"';
+
+                if (options.includeCharts && !isBlank) {
+                    let currentRow = 5 + rows.length;
+                    for (let rIdx = 0; rIdx < rows.length; rIdx++) {
+                        applyMatrixRowSelection(`chart-${chartData.chartId}`, rIdx);
+                        await new Promise(r => setTimeout(r, 400)); // 描画待ちを少し長めに
+
+                        const chartElement = document.getElementById(`chart-${chartData.chartId}`);
+                        if (chartElement) {
+                            const canvas = await html2canvas(chartElement, { useCORS: true, backgroundColor: '#ffffff', scale: 2 });
+                            const base64Image = canvas.toDataURL('image/png');
+                            const imageId = workbook.addImage({ base64: base64Image, extension: 'png' });
+                            
+                            const ratio = canvas.height / canvas.width;
+                            const displayWidth = 450;
+                            const displayHeight = displayWidth * ratio;
+
+                            sheet.addImage(imageId, {
+                                tl: { col: 0, row: currentRow },
+                                ext: { width: displayWidth, height: displayHeight }
+                            });
+                            currentRow += Math.ceil(displayHeight / 20) + 2;
+                        }
+                        if (!options.includeMatrixFull) break;
+                    }
+                }
+            } else if (chartData.chartType === 'list') {
+                const listRows = (chartData.listAll || []).map(item => [item.value, item.answeredAtLabel]);
+                sheet.addTable({
+                    name: `Table_${questionNo}`,
+                    ref: 'A3',
+                    headerRow: true,
+                    columns: [{ name: '回答' }, { name: '回答日時' }],
+                    rows: listRows.length > 0 ? listRows : [['回答なし', '']]
+                });
                 sheet.getColumn(1).width = 60;
-                sheet.getColumn(2).width = 24;
-                sheet.getColumn(2).alignment = { horizontal: 'right' };
+                sheet.getColumn(2).width = 20;
             } else {
-                const totalAnswers = chartData.totalAnswers || 0;
                 const rows = chartData.labels.map((label, index) => {
                     const count = chartData.data[index] || 0;
-                    const percentage = totalAnswers > 0 ? (count / totalAnswers) : 0;
-                    return [label, count, percentage];
+                    const total = chartData.totalAnswers || 1;
+                    return [label, count, count / total];
                 });
 
                 sheet.addTable({
-                    name: `Table_${chartData.chartId.replace(/[^a-zA-Z0-9]/g, '_')}`,
+                    name: `Table_${questionNo}`,
                     ref: 'A3',
                     headerRow: true,
                     totalsRow: chartData.includeTotalRow,
                     style: { theme: 'TableStyleMedium2', showRowStripes: true },
                     columns: [
-                        { name: '項目', filterButton: true, totalsRowLabel: '合計' },
-                        { name: '回答数', filterButton: false, totalsRowFunction: 'sum' },
-                        { name: '割合', filterButton: false, totalsRowFunction: 'none' }
+                        { name: '項目', totalsRowLabel: '合計' },
+                        { name: '回答数', totalsRowFunction: 'sum' },
+                        { name: '割合' }
                     ],
                     rows: rows
                 });
 
                 sheet.getColumn(1).width = 40;
-                sheet.getColumn(2).width = 15;
-                sheet.getColumn(3).width = 15;
+                sheet.getColumn(2).width = 12;
+                sheet.getColumn(3).width = 12;
                 sheet.getColumn(2).numFmt = '#,##0"件"';
                 sheet.getColumn(3).numFmt = '0.0%';
-                sheet.getColumn(3).alignment = { horizontal: 'right' };
 
-                if (chartData.includeTotalRow) {
-                    const totalRowNumber = 3 + rows.length + 1;
-                    sheet.getCell(`B${totalRowNumber}`).value = totalAnswers;
-                    sheet.getCell(`C${totalRowNumber}`).value = 1;
+                if (options.includeCharts && !isBlank) {
+                    const chartElement = document.getElementById(`chart-${chartData.chartId}`);
+                    if (chartElement) {
+                        const canvas = await html2canvas(chartElement, { useCORS: true, backgroundColor: '#ffffff', scale: 2 });
+                        const base64Image = canvas.toDataURL('image/png');
+                        const imageId = workbook.addImage({ base64: base64Image, extension: 'png' });
+                        
+                        const ratio = canvas.height / canvas.width;
+                        const displayWidth = 480;
+                        const displayHeight = displayWidth * ratio;
+
+                        sheet.addImage(imageId, {
+                            tl: { col: 4, row: 2 },
+                            ext: { width: displayWidth, height: displayHeight }
+                        });
+                    }
                 }
             }
-
-            try {
-                const chartElement = document.getElementById(`chart-${chartData.chartId}`);
-                if (chartElement) {
-                    const canvas = await html2canvas(chartElement, { useCORS: true, backgroundColor: '#ffffff', scale: 3 });
-                    
-                    // アスペクト比の維持
-                    const imgWidth = canvas.width;
-                    const imgHeight = canvas.height;
-                    const ratio = imgHeight / imgWidth;
-                    
-                    // Excel上での表示サイズ（基準幅500pxに対し比率を適用）
-                    const displayWidth = 500;
-                    const displayHeight = displayWidth * ratio;
-
-                    const base64Image = canvas.toDataURL('image/png');
-                    const imageId = workbook.addImage({
-                        base64: base64Image,
-                        extension: 'png',
-                    });
-
-                    sheet.addImage(imageId, {
-                        tl: { col: 4.5, row: 2 },
-                        ext: { width: displayWidth, height: displayHeight }
-                    });
-                }
-            } catch (err) { console.error(`画像キャプチャ失敗:`, err); }
-
         }
 
-        if (progressText) progressText.textContent = `レポートを保存中...`;
-        await yieldToMain();
-
-        if (blankQuestions.length > 0) {
-            const sheet = workbook.addWorksheet('対象外', { views: [{ showGridLines: false }] });
-            sheet.addRow(['グラフ化対象外の設問一覧']).font = { bold: true, size: 14 };
-            sheet.addRow([]);
-            sheet.addTable({
-                name: 'Table_Exclusions',
-                ref: 'A3',
-                headerRow: true,
-                columns: [{ name: '設問ID' }, { name: '設問文' }, { name: '理由' }],
-                rows: blankQuestions
-            });
-            sheet.getColumn(1).width = 20;
-            sheet.getColumn(2).width = 60;
-            sheet.getColumn(3).width = 30;
-        }
-
+        if (progressText) progressText.textContent = `ファイルを保存しています...`;
         const buffer = await workbook.xlsx.writeBuffer();
         const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         const url = window.URL.createObjectURL(blob);
@@ -1065,17 +1093,16 @@ async function exportAllChartsToExcel(chartsData) {
         const filename = `${sanitizeFilename(currentSurvey?.name?.ja || 'survey')}_分析レポート.xlsx`;
         anchor.href = url;
         anchor.download = filename;
-        anchor.style.display = 'none';
-        document.body.appendChild(anchor);
         anchor.click();
-        setTimeout(() => { document.body.removeChild(anchor); window.URL.revokeObjectURL(url); }, 100);
+        window.URL.revokeObjectURL(url);
+        
         showToast('分析レポートの出力が完了しました！', 'success');
         exportSucceeded = true;
     } catch (error) {
         console.error('Excel出力エラー:', error);
         showToast('Excelの生成中にエラーが発生しました。', 'error');
     } finally {
-        isExporting = false; // 書き出し終了
+        isExporting = false;
         if (exportBtn) {
             exportBtn.disabled = false;
             exportBtn.style.opacity = '1';
@@ -1086,7 +1113,6 @@ async function exportAllChartsToExcel(chartsData) {
                 showExportCompletion(overlay, progressIcon, progressText, progressPercent);
             } else {
                 overlay.classList.add('hidden');
-                overlay.classList.remove('opacity-0', 'opacity-100');
             }
         }
     }

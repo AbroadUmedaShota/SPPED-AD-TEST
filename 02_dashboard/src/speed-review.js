@@ -20,6 +20,7 @@ let currentItemInModal = null;
 let isModalInEditMode = false;
 let currentSurvey = null;
 let availableDateRange = null;
+const imageUrlResolutionCache = new Map();
 
 let currentSortKey = 'answeredAt';
 let currentSortOrder = 'desc';
@@ -41,6 +42,7 @@ if (chartDataLabels && window.Chart) {
 const SINGLE_CHOICE_TYPES = new Set(['single_choice', 'dropdown']);
 const MULTI_CHOICE_TYPES = new Set(['multi_choice']);
 const MATRIX_SINGLE_TYPES = new Set(['matrix_sa', 'matrix_single']);
+const MATRIX_MULTI_TYPES = new Set(['matrix_ma', 'matrix_multi', 'matrix_multiple']);
 const BLANK_TYPES = new Set([
     'text',
     'free_text',
@@ -51,10 +53,12 @@ const BLANK_TYPES = new Set([
     'time',
     'handwriting',
     'explanation',
-    'matrix_ma',
-    'matrix_multi',
-    'matrix_multiple'
+    ...MATRIX_MULTI_TYPES
 ]);
+const DEFAULT_CARD_IMAGE_VIEW_STATE = {
+    front: { rotation: 0, scale: 1 },
+    back: { rotation: 0, scale: 1 }
+};
 
 // --- Functions ---
 function hexToRgba(hex, alpha = 1) {
@@ -109,6 +113,229 @@ function normalizeDataKey(value) {
     if (value === undefined || value === null) return '';
     const normalized = String(value).trim().toLowerCase();
     return encodeURIComponent(normalized);
+}
+
+function getNumberOrFallback(value, fallback) {
+    const num = Number(value);
+    return Number.isFinite(num) ? num : fallback;
+}
+
+function ensureCardImageViewState(item) {
+    if (!item || typeof item !== 'object') return DEFAULT_CARD_IMAGE_VIEW_STATE;
+    const front = item.cardImageViewState?.front || {};
+    const back = item.cardImageViewState?.back || {};
+    const state = {
+        front: {
+            rotation: Math.trunc(getNumberOrFallback(front.rotation, 0)),
+            scale: Math.min(Math.max(getNumberOrFallback(front.scale, 1), 0.5), 5)
+        },
+        back: {
+            rotation: Math.trunc(getNumberOrFallback(back.rotation, 0)),
+            scale: Math.min(Math.max(getNumberOrFallback(back.scale, 1), 0.5), 5)
+        }
+    };
+    item.cardImageViewState = state;
+    return state;
+}
+
+function findItemByAnswerId(answerId) {
+    if (!answerId) return null;
+    return allCombinedData.find(data => data.answerId === answerId) || null;
+}
+
+function resolveItemFromImageElement(imgElement) {
+    if (!imgElement) return null;
+    if (imgElement.closest('#reviewDetailModalOverlay')) {
+        return currentItemInModal || null;
+    }
+    const inlineRow = imgElement.closest('.inline-detail-row');
+    if (inlineRow) {
+        const answerId = inlineRow.dataset.answerId || inlineRow.previousElementSibling?.dataset.answerId;
+        return findItemByAnswerId(answerId);
+    }
+    return null;
+}
+
+function syncImageStateFromElement(imgElement, explicitItem = null) {
+    if (!imgElement) return;
+    const side = imgElement.dataset.imageSide;
+    if (!side) return;
+    const item = explicitItem || resolveItemFromImageElement(imgElement);
+    if (!item) return;
+    const state = ensureCardImageViewState(item);
+    if (!state[side]) return;
+    state[side].rotation = Math.trunc(getNumberOrFallback(imgElement.dataset.rotation, 0));
+    state[side].scale = Math.min(Math.max(getNumberOrFallback(imgElement.dataset.scale, 1), 0.5), 5);
+    applyImageStateToVisibleElements(item, side, imgElement);
+}
+
+function normalizeImagePath(rawPath) {
+    if (!rawPath) return '';
+    return String(rawPath).trim().replace(/\\/g, '/');
+}
+
+function isAbsoluteImagePath(path) {
+    return /^(https?:)?\/\//.test(path) || path.startsWith('data:') || path.startsWith('blob:');
+}
+
+function buildImageUrlCandidates(rawPath, surveyId) {
+    const normalized = normalizeImagePath(rawPath);
+    if (!normalized) return [];
+    if (isAbsoluteImagePath(normalized) || normalized.startsWith('/') || normalized.startsWith('./') || normalized.startsWith('../')) {
+        return [normalized];
+    }
+
+    const basename = normalized.split('/').pop();
+    const candidates = [
+        `../${normalized}`,
+        `../media/${normalized}`,
+        `../data/${normalized}`
+    ];
+
+    if (normalized.startsWith('images/')) {
+        candidates.push(`../data/responses/${normalized}`);
+    }
+
+    if (surveyId && basename) {
+        candidates.push(`../media/generated/${surveyId}/bizcard/${basename}`);
+    }
+
+    if (basename) {
+        candidates.push(`../media/${basename}`);
+    }
+
+    return [...new Set(candidates)];
+}
+
+function extractAnswerSequence(answerId) {
+    if (!answerId) return '';
+    const normalized = String(answerId).trim();
+    const seqMatch = normalized.match(/(\d{3,})$/);
+    return seqMatch ? seqMatch[1] : '';
+}
+
+function buildMissingImageCandidates(answerId, surveyId, side) {
+    if (!surveyId || !answerId) return [];
+    const suffix = side === 'back' ? '2' : '1';
+    const sequence = extractAnswerSequence(answerId);
+    const normalizedAnswerId = String(answerId).trim().replace(/^ans-/, '').replace(/-/g, '_');
+    const exts = ['jpg', 'jpeg', 'png', 'webp'];
+    const baseDir = `../media/generated/${surveyId}/bizcard`;
+    const names = [];
+
+    if (sequence) {
+        names.push(`${surveyId}_${sequence}_${suffix}`);
+    }
+    names.push(`${normalizedAnswerId}_${suffix}`);
+    names.push(`${String(answerId).trim()}_${suffix}`);
+
+    const candidates = [];
+    names.forEach(name => {
+        exts.forEach(ext => {
+            candidates.push(`${baseDir}/${name}.${ext}`);
+        });
+    });
+
+    return [...new Set(candidates)];
+}
+
+async function canFetchAsset(url) {
+    try {
+        const head = await fetch(url, { method: 'HEAD' });
+        if (head.ok) return true;
+        if (head.status !== 405) return false;
+        const get = await fetch(url, { method: 'GET' });
+        return get.ok;
+    } catch (error) {
+        return false;
+    }
+}
+
+async function resolveImageUrl(rawPath, surveyId) {
+    const normalized = normalizeImagePath(rawPath);
+    if (!normalized) return '';
+    if (isAbsoluteImagePath(normalized) || normalized.startsWith('/') || normalized.startsWith('./') || normalized.startsWith('../')) {
+        return normalized;
+    }
+
+    const cacheKey = `${surveyId || ''}::${normalized}`;
+    if (imageUrlResolutionCache.has(cacheKey)) {
+        return imageUrlResolutionCache.get(cacheKey);
+    }
+
+    const candidates = buildImageUrlCandidates(normalized, surveyId);
+    for (const candidate of candidates) {
+        if (await canFetchAsset(candidate)) {
+            imageUrlResolutionCache.set(cacheKey, candidate);
+            return candidate;
+        }
+    }
+
+    // 最後まで見つからない場合は最も有力な候補を返し、onerrorにフォールバックさせる
+    const fallback = candidates[0] || normalized;
+    imageUrlResolutionCache.set(cacheKey, fallback);
+    return fallback;
+}
+
+async function resolveMissingImageUrl(answerId, surveyId, side) {
+    const cacheKey = `${surveyId || ''}::${answerId || ''}::${side || ''}::missing`;
+    if (imageUrlResolutionCache.has(cacheKey)) {
+        return imageUrlResolutionCache.get(cacheKey);
+    }
+
+    const candidates = buildMissingImageCandidates(answerId, surveyId, side);
+    for (const candidate of candidates) {
+        if (await canFetchAsset(candidate)) {
+            imageUrlResolutionCache.set(cacheKey, candidate);
+            return candidate;
+        }
+    }
+
+    imageUrlResolutionCache.set(cacheKey, '');
+    return '';
+}
+
+async function normalizeBusinessCardImageUrls(item, surveyId) {
+    if (!item?.businessCard) return item;
+    const imageUrl = item.businessCard.imageUrl || {};
+    const frontRaw = normalizeImagePath(imageUrl.front || '');
+    const backRaw = normalizeImagePath(imageUrl.back || '');
+
+    const [front, back] = await Promise.all([
+        frontRaw ? resolveImageUrl(frontRaw, surveyId) : resolveMissingImageUrl(item.answerId, surveyId, 'front'),
+        backRaw ? resolveImageUrl(backRaw, surveyId) : resolveMissingImageUrl(item.answerId, surveyId, 'back')
+    ]);
+
+    item.businessCard.imageUrl = {
+        ...imageUrl,
+        front,
+        back
+    };
+    return item;
+}
+
+function applyImageStateToVisibleElements(item, side, sourceElement = null) {
+    if (!item || !side) return;
+    const state = ensureCardImageViewState(item)[side];
+    if (!state) return;
+
+    const applyTo = (img) => {
+        if (!img || img === sourceElement) return;
+        img.dataset.rotation = String(state.rotation);
+        img.dataset.scale = String(state.scale);
+        img.style.transform = `rotate(${state.rotation}deg) scale(${state.scale})`;
+    };
+
+    const inlineTargets = document.querySelectorAll(`.inline-detail-row[data-answer-id="${item.answerId}"] img[data-image-side="${side}"]`);
+    inlineTargets.forEach(applyTo);
+
+    if (currentItemInModal?.answerId === item.answerId) {
+        const modalImg = document.querySelector(`#reviewDetailModalOverlay img[data-image-side="${side}"]`);
+        applyTo(modalImg);
+    }
+
+    const cardImagesModalImg = document.querySelector(`#cardImagesModalOverlay img[data-image-side="${side}"]`);
+    applyTo(cardImagesModalImg);
 }
 
 function clearMatrixTableHighlight() {
@@ -408,6 +635,7 @@ function handleWheelZoom(e) {
 
     img.dataset.scale = scale.toFixed(2); // 精度を保つため文字列化して保存
     img.style.transform = `rotate(${rotation}deg) scale(${scale})`;
+    syncImageStateFromElement(img);
 }
 
 function setupWheelZoomListeners(modalContext) {
@@ -459,6 +687,7 @@ function handleRotateClick(e) {
 
     imgElement.style.transform = `rotate(${newRotation}deg) scale(${currentScale})`;
     imgElement.dataset.rotation = newRotation;
+    syncImageStateFromElement(imgElement);
 }
 
 function setupTableEventListeners() {
@@ -627,22 +856,23 @@ function showCardImagesModal(item) {
         const modal = document.getElementById('cardImagesModalOverlay');
         const frontContainer = modal.querySelector('#card-image-front-container');
         const backContainer = modal.querySelector('#card-image-back-container');
+        const viewState = ensureCardImageViewState(item);
 
-        const frontUrl = '../media/縦表 .png';
-        const backUrl = '../media/縦裏.png';
+        const frontUrl = item.businessCard?.imageUrl?.front || '../media/縦表 .png';
+        const backUrl = item.businessCard?.imageUrl?.back || '../media/縦裏.png';
 
-        const setupImage = (container, url) => {
-            container.innerHTML = `<img src="${url}" class="max-w-full max-h-full object-contain transition-transform duration-200" alt="名刺画像">`;
+        const setupImage = (container, url, side) => {
+            const state = viewState[side] || { rotation: 0, scale: 1 };
+            container.innerHTML = `<img src="${url}" class="max-w-full max-h-full object-contain transition-transform duration-200" alt="名刺画像" data-image-side="${side}" data-rotation="${state.rotation}" data-scale="${state.scale}" style="transform: rotate(${state.rotation}deg) scale(${state.scale})">`;
             const img = container.querySelector('img');
             if (img) {
-                img.dataset.rotation = '0'; // Reset rotation
-                img.dataset.scale = '1';    // Reset scale
+                syncImageStateFromElement(img, item);
             }
             container.setAttribute('data-zoom-src', url);
         };
 
-        if (frontContainer) setupImage(frontContainer, frontUrl);
-        if (backContainer) setupImage(backContainer, backUrl);
+        if (frontContainer) setupImage(frontContainer, frontUrl, 'front');
+        if (backContainer) setupImage(backContainer, backUrl, 'back');
 
         // Attach zoom listener to the new modal
         if (!modal.hasAttribute('data-zoom-listener-attached')) {
@@ -670,6 +900,7 @@ function showCardImagesModal(item) {
 function handleEditToggle() {
     isModalInEditMode = !isModalInEditMode;
     renderModalContent(currentItemInModal, isModalInEditMode);
+    setupWheelZoomListeners(document.getElementById('reviewDetailModalOverlay'));
     // setupCardZoomListeners() removed; Event delegation handles this automatically
     updateModalFooter();
 }
@@ -684,28 +915,57 @@ function handleSave() {
 
     let hasChanges = false;
 
-    updatedItem.details.forEach(detail => {
-        const questionText = detail.question;
-        const questionDef = updatedItem.survey?.details?.find(d => d.question === questionText);
+    updatedItem.details.forEach((detail, detailIndex) => {
+        const questionDef = updatedItem.survey?.details?.find(d => d.question === detail.question);
         const questionType = questionDef ? questionDef.type : 'free_text';
 
         let newAnswer;
 
         switch (questionType) {
             case 'single_choice':
-                const select = answerContainer.querySelector(`select[data-question="${questionText}"]`);
+                const select = answerContainer.querySelector(`select[data-detail-index="${detailIndex}"]`);
                 if (select) {
                     newAnswer = select.value;
                 }
                 break;
 
             case 'multi_choice':
-                const checkboxes = answerContainer.querySelectorAll(`input[type="checkbox"][data-question="${questionText}"]:checked`);
+                const checkboxes = answerContainer.querySelectorAll(`input[type="checkbox"][data-detail-index="${detailIndex}"]:checked`);
                 newAnswer = Array.from(checkboxes).map(cb => cb.value);
                 break;
 
+            case 'matrix_sa':
+            case 'matrix_single': {
+                const rows = normalizeMatrixRows(questionDef?.rows || []);
+                const matrixAnswer = {};
+                rows.forEach((row, rowIndex) => {
+                    const checked = answerContainer.querySelector(`input[type="radio"][data-detail-index="${detailIndex}"][data-matrix-row-index="${rowIndex}"]:checked`);
+                    if (checked) {
+                        matrixAnswer[row.id] = checked.value;
+                    }
+                });
+                newAnswer = Object.keys(matrixAnswer).length > 0 ? matrixAnswer : '';
+                break;
+            }
+
+            case 'matrix_ma':
+            case 'matrix_multi':
+            case 'matrix_multiple': {
+                const rows = normalizeMatrixRows(questionDef?.rows || []);
+                const matrixAnswer = {};
+                rows.forEach((row, rowIndex) => {
+                    const checked = answerContainer.querySelectorAll(`input[type="checkbox"][data-detail-index="${detailIndex}"][data-matrix-row-index="${rowIndex}"]:checked`);
+                    const values = Array.from(checked).map(input => input.value);
+                    if (values.length > 0) {
+                        matrixAnswer[row.id] = values;
+                    }
+                });
+                newAnswer = Object.keys(matrixAnswer).length > 0 ? matrixAnswer : '';
+                break;
+            }
+
             default:
-                const input = answerContainer.querySelector(`input[type="text"][data-question="${questionText}"]`);
+                const input = answerContainer.querySelector(`input[type="text"][data-detail-index="${detailIndex}"]`);
                 if (input) {
                     newAnswer = input.value;
                 }
@@ -2128,9 +2388,12 @@ export async function initializePage() {
             return {
                 ...answer,
                 survey: currentSurvey,
-                businessCard: businessCard
+                businessCard: businessCard,
+                cardImageViewState: JSON.parse(JSON.stringify(DEFAULT_CARD_IMAGE_VIEW_STATE))
             };
         });
+        await Promise.all(allCombinedData.map(item => normalizeBusinessCardImageUrls(item, surveyId)));
+        allCombinedData.forEach(item => ensureCardImageViewState(item));
 
         if (answersArr.length === 0) {
             console.warn(`アンケートID「${surveyId}」に対する回答データが見つかりませんでした。`);

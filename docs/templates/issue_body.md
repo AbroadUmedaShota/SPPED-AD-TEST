@@ -3,34 +3,43 @@
 To resolve this Issue, I will proceed with the implementation according to the following plan.
 
 #### 1. **Pre-investigation Summary**
-- `media/generated/sv_0003_26009` フォルダ内のサンプル画像が同一画像の複製となっており、テストデータとしての有用性が低い。
-- 命名規則が「アンケートID_連番_判別コード」の形式になっておらず、システム連携のテストに適していない。
-- `Pillow` ライブラリを使用して、日本語フォントを含む動的な画像生成が可能であることを確認済み。
+- グラフ分析画面のExcelエクスポート機能において、ユーザーから出力内容の選択（目次、画像、マトリックス全項目、対象外リスト）を行いたいという要望があった。
+- 現状のエクスポート機能は、画面の表示状態に依存しており、マトリックス設問の全行出力などが困難であった。
 
 **Files to be changed:**
-- `media/generated/sv_0003_26009/bizcard/*` (再生成)
-- `media/generated/sv_0003_26009/handwriting/*` (再生成)
-- `media/generated/sv_0003_26009/attachment/*` (再生成)
-- `tools/generate_realistic_images.py` (新規追加)
+- `02_dashboard/graph-page.html`
+- `02_dashboard/src/graph-page.js`
+- `02_dashboard/modals/exportOptionsModal.html` (New file)
+- `02_dashboard/src/services/speedReviewService.js`
+- `02_dashboard/src/speed-review.js`
+- `02_dashboard/src/ui/speedReviewRenderer.js`
+- `WEEKLY_CHANGELOG.md`
 
 #### 2. **Contribution to Project Goals**
-- よりリアリスティックなサンプルデータを提供することで、開発中のダッシュボードや管理画面の機能検証（画像表示、OCR連携等）の精度を向上させる。
+- ユーザーが印刷用や報告用に適した、より詳細でカスタマイズ可能なExcelレポートを作成できるようにすることで、ツールの利便性を大幅に向上させる。
 
 #### 3. **Overview of Changes**
-- `Pillow` を使用した画像生成スクリプト `tools/generate_realistic_images.py` を作成。
-- 命名規則を `アンケートID_連番_判別コード`（例: `sv_0003_26009_0001_1.jpg`）に変更。
-- 900セット（計3,600枚）の多様な画像を生成。
+- エクスポート設定モーダルの導入。
+- 目次シートの自動生成機能。
+- マトリックス設問の全行一括出力機能の実装。
+- パフォーマンスとメモリ管理の最適化。
 
 #### 4. **Specific Work Content for Each File**
-- `tools/generate_realistic_images.py`: 日本語フォント（MSゴシック等）を使用し、ランダムな会社名、氏名、メモ、図面風の描画を行うロジックを実装。
-- `media/generated/sv_0003_26009/*`: スクリプトを実行し、既存のダミー画像を新しい命名規則のリアルな画像で置き換える。
+- `02_dashboard/graph-page.html`: モーダルコンテナの追加とスタイル調整。
+- `02_dashboard/src/graph-page.js`: モーダル表示ロジックとExcelエクスポートロジックの強化（目次生成、マトリックス全出力対応）。
+- `02_dashboard/modals/exportOptionsModal.html`: 出力オプション選択UIの実装。
+- `02_dashboard/src/services/speedReviewService.js`: 名前分割ロジック（姓・名）の改善。
+- `02_dashboard/src/speed-review.js`: 画像パス解決ロジックの強化と表示状態管理の改善。
+- `02_dashboard/src/ui/speedReviewRenderer.js`: マトリックス設問の表示ロジックと回答フォーマットの改善。
+- `WEEKLY_CHANGELOG.md`: 変更内容の記録。
 
 #### 5. **Definition of Done**
-- [x] 画像生成スクリプトが実装されている。
-- [x] 3,600枚の画像が新しい命名規則で正しく生成されている。
-- [x] 各画像が同一ではなく、ランダムな内容（テキストや図形）を含んでいる。
-- [x] 日本語が正しく描画されている。
+- [x] 全ての必要なコード変更が実装された。
+- [x] エクスポートオプションモーダルが正しく表示され、選択内容がエクスポートに反映される。
+- [x] 目次シートが生成され、各シートへのリンクが機能する。
+- [x] マトリックス設問の全行が正しくExcelに出力される。
+- [x] ドキュメント（WEEKLY_CHANGELOG.md）が更新された。
+- [x] 実装が手動で検証された。
 
 ---
-User approval confirmed on the CLI.
-
+If you approve, please reply to this comment with "Approve".
