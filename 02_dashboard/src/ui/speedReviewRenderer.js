@@ -2,6 +2,138 @@
  * @file speedReviewRenderer.js
  * SPEEDレビュー画面のUI描画と更新を扱うモジュール
  */
+const MATRIX_SINGLE_TYPES = new Set(['matrix_sa', 'matrix_single']);
+const MATRIX_MULTI_TYPES = new Set(['matrix_ma', 'matrix_multi', 'matrix_multiple']);
+const FRONT_PLACEHOLDER_SRC = '../media/image1.png';
+const BACK_PLACEHOLDER_SRC = '../media/image2.png';
+const MEDIA_ANSWER_TYPES = new Set(['handwriting', 'image', 'attachment', 'photo', 'file']);
+
+function getImageViewState(item, side) {
+    const raw = item?.cardImageViewState?.[side] || {};
+    const rotation = Number.isFinite(Number(raw.rotation)) ? Number(raw.rotation) : 0;
+    const scaleNum = Number(raw.scale);
+    const scale = Number.isFinite(scaleNum) ? Math.min(Math.max(scaleNum, 0.5), 5) : 1;
+    return { rotation, scale };
+}
+
+function normalizeMatrixRows(rows = []) {
+    return rows.map((row, index) => {
+        if (row && typeof row === 'object') {
+            const id = row.id ?? row.value ?? row.text ?? `row_${index + 1}`;
+            const text = row.text ?? row.label ?? row.value ?? row.id ?? String(id);
+            return { id: String(id), text: String(text) };
+        }
+        const id = row ?? `row_${index + 1}`;
+        return { id: String(id), text: String(row ?? `行${index + 1}`) };
+    });
+}
+
+function normalizeMatrixColumns(columns = []) {
+    return columns.map((column, index) => {
+        if (column && typeof column === 'object') {
+            const value = column.value ?? column.id ?? column.text ?? `col_${index + 1}`;
+            const text = column.text ?? column.label ?? column.value ?? column.id ?? String(value);
+            return { value: String(value), text: String(text) };
+        }
+        const value = column ?? `col_${index + 1}`;
+        return { value: String(value), text: String(column ?? `選択肢${index + 1}`) };
+    });
+}
+
+function normalizeMatrixValue(value) {
+    if (value === undefined || value === null || value === '') return [];
+    if (Array.isArray(value)) return value.filter(item => item !== undefined && item !== null && item !== '');
+    return [value];
+}
+
+function resolveMatrixSelections(answerValue, rows) {
+    const byRowIndex = new Map(rows.map((_, index) => [index, []]));
+    if (!answerValue) return byRowIndex;
+
+    if (Array.isArray(answerValue)) {
+        answerValue.forEach(item => {
+            if (!item) return;
+            const rowKey = item.row ?? item.key ?? item.id ?? item.label ?? item.text;
+            const rowIndex = rows.findIndex(row => row.id === String(rowKey) || row.text === String(rowKey));
+            if (rowIndex < 0) return;
+            const values = normalizeMatrixValue(item.value ?? item.column ?? item.answer ?? item.selection).map(String);
+            byRowIndex.set(rowIndex, values);
+        });
+        return byRowIndex;
+    }
+
+    if (typeof answerValue === 'object') {
+        rows.forEach((row, rowIndex) => {
+            if (Object.prototype.hasOwnProperty.call(answerValue, row.id)) {
+                byRowIndex.set(rowIndex, normalizeMatrixValue(answerValue[row.id]).map(String));
+                return;
+            }
+            if (Object.prototype.hasOwnProperty.call(answerValue, row.text)) {
+                byRowIndex.set(rowIndex, normalizeMatrixValue(answerValue[row.text]).map(String));
+            }
+        });
+    }
+
+    return byRowIndex;
+}
+
+function resolveMatrixColumnText(columns, value) {
+    const valueStr = String(value);
+    const column = columns.find(col => String(col.value) === valueStr || String(col.text) === valueStr);
+    return column ? column.text : valueStr;
+}
+
+function formatAnswerValueForDisplay(answer, questionDef) {
+    if (answer === null || answer === undefined || answer === '') {
+        return '';
+    }
+
+    const questionType = questionDef?.type;
+    const isMatrixType = MATRIX_SINGLE_TYPES.has(questionType) || MATRIX_MULTI_TYPES.has(questionType);
+    if (isMatrixType) {
+        const rows = normalizeMatrixRows(questionDef?.rows || []);
+        const columns = normalizeMatrixColumns(questionDef?.columns || questionDef?.options || []);
+        if (rows.length === 0 || columns.length === 0) {
+            return '';
+        }
+        const selectionsByRow = resolveMatrixSelections(answer, rows);
+        const lines = rows.map((row, rowIndex) => {
+            const selected = selectionsByRow.get(rowIndex) || [];
+            if (selected.length === 0) {
+                return '';
+            }
+            const labels = selected.map(value => resolveMatrixColumnText(columns, value)).join(', ');
+            return `${row.text}: ${labels}`;
+        }).filter(Boolean);
+        return lines.join(' / ');
+    }
+
+    if (Array.isArray(answer)) {
+        return answer.map(v => String(v)).join(', ');
+    }
+
+    if (typeof answer === 'object') {
+        return JSON.stringify(answer);
+    }
+
+    return String(answer);
+}
+
+function renderMediaAnswerHtml(answerValue) {
+    const src = typeof answerValue === 'string' ? answerValue.trim() : '';
+    if (!src) {
+        return '<p class="mt-1 p-3 bg-surface-bright rounded-md text-on-surface">（無回答）</p>';
+    }
+    return `
+        <div class="mt-1 p-3 bg-surface-bright rounded-md">
+            <div class="aspect-[1.6/1] w-full border border-outline-variant rounded-md overflow-hidden bg-surface-variant flex items-center justify-center relative group cursor-zoom-in" data-zoom-src="${src}">
+                <img src="${src}" class="max-w-full max-h-full object-contain transition-transform duration-200 group-hover:scale-105" alt="回答画像" onerror="if(!this.dataset.fallbackApplied){this.dataset.fallbackApplied='1';this.src='${BACK_PLACEHOLDER_SRC}';return;}this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                <div class="hidden absolute inset-0 flex items-center justify-center text-on-surface-variant text-sm">画像なし</div>
+            </div>
+            <p class="mt-2 text-xs text-on-surface-variant break-all">${src}</p>
+        </div>
+    `;
+}
 
 /**
  * 回答データをテーブルに描画します。
@@ -58,7 +190,8 @@ export function populateTable(data, onDetailClick, selectedIndustryQuestion) {
         const getAnswer = (questionText) => {
             const detail = item.details.find(d => d.question === questionText);
             if (!detail) return '-'; // 回答が見つからない場合は「-」を返す
-            const answer = Array.isArray(detail.answer) ? detail.answer.join(', ') : detail.answer;
+            const questionDef = item.survey?.details?.find(d => d.question === detail.question || d.text === detail.question);
+            const answer = formatAnswerValueForDisplay(detail.answer, questionDef);
             return answer === '' ? '-' : answer; // 回答が空文字列の場合も「-」を返す
         };
 
@@ -100,13 +233,16 @@ export function populateTable(data, onDetailClick, selectedIndustryQuestion) {
 export function renderInlineRow(item, colSpan) {
     const row = document.createElement('tr');
     row.className = 'inline-detail-row bg-surface-variant/30 border-b border-outline-variant';
+    row.dataset.answerId = item.answerId || '';
 
     // ステータスを判定（processingまたはcompleted）
     const cardStatus = item.cardStatus === 'processing' || !item.businessCard ? 'processing' : 'completed';
 
     // 名刺画像のURL（全てのステータスで共通）
-    const frontImageUrl = item.businessCard?.imageUrl?.front || '../media/縦表 .png';
-    const backImageUrl = item.businessCard?.imageUrl?.back || '../media/縦裏.png';
+    const frontImageUrl = item.businessCard?.imageUrl?.front || FRONT_PLACEHOLDER_SRC;
+    const backImageUrl = item.businessCard?.imageUrl?.back || BACK_PLACEHOLDER_SRC;
+    const frontViewState = getImageViewState(item, 'front');
+    const backViewState = getImageViewState(item, 'back');
 
     // データ化進行中の場合
     if (cardStatus === 'processing') {
@@ -130,7 +266,7 @@ export function renderInlineRow(item, colSpan) {
                             <div class="inline-card-wrapper w-full max-w-sm flex flex-col gap-2" id="inline-front-view">
 
                                 <div class="aspect-[1.6/1] bg-surface rounded-lg border border-outline-variant overflow-hidden relative shadow-sm">
-                                    <img src="${frontImageUrl}" class="w-full h-full object-contain" alt="名刺（表面）" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                                    <img src="${frontImageUrl}" class="w-full h-full object-contain" alt="名刺（表面）" onerror="if(!this.dataset.fallbackApplied){this.dataset.fallbackApplied='1';this.src='${FRONT_PLACEHOLDER_SRC}';return;}this.style.display='none'; this.nextElementSibling.style.display='flex'">
                                     <div class="hidden absolute inset-0 flex items-center justify-center text-on-surface-variant text-sm bg-surface-variant/50">画像なし</div>
                                 </div>
                             </div>
@@ -138,7 +274,7 @@ export function renderInlineRow(item, colSpan) {
                             <div class="inline-card-wrapper w-full max-w-sm flex-col gap-2 hidden" id="inline-back-view">
 
                                 <div class="aspect-[1.6/1] bg-surface rounded-lg border border-outline-variant overflow-hidden relative shadow-sm">
-                                    <img src="${backImageUrl}" class="w-full h-full object-contain" alt="名刺（裏面）" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                                    <img src="${backImageUrl}" class="w-full h-full object-contain" alt="名刺（裏面）" onerror="if(!this.dataset.fallbackApplied){this.dataset.fallbackApplied='1';this.src='${BACK_PLACEHOLDER_SRC}';return;}this.style.display='none'; this.nextElementSibling.style.display='flex'">
                                     <div class="hidden absolute inset-0 flex items-center justify-center text-on-surface-variant text-sm bg-surface-variant/50">画像なし</div>
                                 </div>
                             </div>
@@ -199,7 +335,7 @@ export function renderInlineRow(item, colSpan) {
                                 </div>
                             </div>
                             <div class="aspect-[1.6/1] bg-surface rounded-lg border border-outline-variant overflow-hidden cursor-zoom-in relative group shadow-sm" data-zoom-src="${frontImageUrl}">
-                                 <img src="${frontImageUrl}" class="max-w-full max-h-full object-contain transition-transform duration-200 group-hover:scale-105 mx-auto" alt="表面" data-scale="1" data-rotation="0">
+                                 <img src="${frontImageUrl}" class="max-w-full max-h-full object-contain transition-transform duration-200 group-hover:scale-105 mx-auto" alt="表面" data-image-side="front" data-scale="${frontViewState.scale}" data-rotation="${frontViewState.rotation}" style="transform: rotate(${frontViewState.rotation}deg) scale(${frontViewState.scale})" onerror="if(!this.dataset.fallbackApplied){this.dataset.fallbackApplied='1';this.src='${FRONT_PLACEHOLDER_SRC}';return;}">
                             </div>
                         </div>
 
@@ -216,7 +352,7 @@ export function renderInlineRow(item, colSpan) {
                                 </div>
                             </div>
                             <div class="aspect-[1.6/1] bg-surface rounded-lg border border-outline-variant overflow-hidden cursor-zoom-in relative group shadow-sm" data-zoom-src="${backImageUrl}">
-                                 <img src="${backImageUrl}" class="max-w-full max-h-full object-contain transition-transform duration-200 group-hover:scale-105 mx-auto" alt="裏面" data-scale="1" data-rotation="0">
+                                 <img src="${backImageUrl}" class="max-w-full max-h-full object-contain transition-transform duration-200 group-hover:scale-105 mx-auto" alt="裏面" data-image-side="back" data-scale="${backViewState.scale}" data-rotation="${backViewState.rotation}" style="transform: rotate(${backViewState.rotation}deg) scale(${backViewState.scale})" onerror="if(!this.dataset.fallbackApplied){this.dataset.fallbackApplied='1';this.src='${BACK_PLACEHOLDER_SRC}';return;}">
                             </div>
                         </div>
                     </div>
@@ -277,8 +413,10 @@ export function renderModalContent(item, isEditMode = false) {
     let cardHtml = '';
 
     // 1. まず名刺画像を表示（全てのステータスで共通）
-    const frontImageUrl = item.businessCard?.imageUrl?.front || '../media/表面.png';
-    const backImageUrl = item.businessCard?.imageUrl?.back || '../media/裏面.png';
+    const frontImageUrl = item.businessCard?.imageUrl?.front || FRONT_PLACEHOLDER_SRC;
+    const backImageUrl = item.businessCard?.imageUrl?.back || BACK_PLACEHOLDER_SRC;
+    const frontViewState = getImageViewState(item, 'front');
+    const backViewState = getImageViewState(item, 'back');
 
     cardHtml += `
         <div class="flex gap-4 mb-6 select-none">
@@ -295,7 +433,7 @@ export function renderModalContent(item, isEditMode = false) {
                     </div>
                 </div>
                 <div class="aspect-[1.6/1] w-full border border-outline-variant rounded-md overflow-hidden bg-surface-variant flex items-center justify-center relative group cursor-zoom-in" data-zoom-src="${frontImageUrl}">
-                    <img id="detail-front-image" src="${frontImageUrl}" class="max-w-full max-h-full object-contain transition-transform duration-200 group-hover:scale-105" alt="名刺（表面）" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                    <img id="detail-front-image" src="${frontImageUrl}" class="max-w-full max-h-full object-contain transition-transform duration-200 group-hover:scale-105" alt="名刺（表面）" data-image-side="front" data-scale="${frontViewState.scale}" data-rotation="${frontViewState.rotation}" style="transform: rotate(${frontViewState.rotation}deg) scale(${frontViewState.scale})" onerror="if(!this.dataset.fallbackApplied){this.dataset.fallbackApplied='1';this.src='${FRONT_PLACEHOLDER_SRC}';return;}this.style.display='none'; this.nextElementSibling.style.display='flex'">
                     <div class="hidden absolute inset-0 flex items-center justify-center text-on-surface-variant text-sm">画像なし</div>
                 </div>
             </div>
@@ -312,7 +450,7 @@ export function renderModalContent(item, isEditMode = false) {
                     </div>
                 </div>
                 <div class="aspect-[1.6/1] w-full border border-outline-variant rounded-md overflow-hidden bg-surface-variant flex items-center justify-center relative group cursor-zoom-in" data-zoom-src="${backImageUrl}">
-                    <img id="detail-back-image" src="${backImageUrl}" class="max-w-full max-h-full object-contain transition-transform duration-200 group-hover:scale-105" alt="名刺（裏面）" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                    <img id="detail-back-image" src="${backImageUrl}" class="max-w-full max-h-full object-contain transition-transform duration-200 group-hover:scale-105" alt="名刺（裏面）" data-image-side="back" data-scale="${backViewState.scale}" data-rotation="${backViewState.rotation}" style="transform: rotate(${backViewState.rotation}deg) scale(${backViewState.scale})" onerror="if(!this.dataset.fallbackApplied){this.dataset.fallbackApplied='1';this.src='${BACK_PLACEHOLDER_SRC}';return;}this.style.display='none'; this.nextElementSibling.style.display='flex'">
                     <div class="hidden absolute inset-0 flex items-center justify-center text-on-surface-variant text-sm">画像なし</div>
                 </div>
             </div>
@@ -392,16 +530,16 @@ export function renderModalContent(item, isEditMode = false) {
     let answerHtml = '';
     if (isEditMode) {
         // EDIT MODE: Render appropriate inputs based on question type
-        item.details.forEach(detail => {
+        item.details.forEach((detail, detailIndex) => {
             const questionDef = item.survey?.details?.find(d => d.question === detail.question);
             const questionType = questionDef ? questionDef.type : 'free_text'; // Default to free_text if not found
 
-            answerHtml += `<div class="py-2 space-y-1">
+            answerHtml += `<div class="py-2 space-y-1" data-detail-index="${detailIndex}">
                              <p class="font-semibold text-on-surface">${detail.question}</p>`;
 
             switch (questionType) {
                 case 'single_choice':
-                    answerHtml += `<select class="w-auto max-w-full mt-1 border border-outline-variant rounded-md shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" data-question="${detail.question}">`;
+                    answerHtml += `<select class="w-auto max-w-full mt-1 border border-outline-variant rounded-md shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" data-detail-index="${detailIndex}">`;
                     answerHtml += `<option value="">選択してください</option>`;
                     (questionDef.options || []).forEach(option => {
                         const isSelected = detail.answer === option;
@@ -416,16 +554,71 @@ export function renderModalContent(item, isEditMode = false) {
                     (questionDef.options || []).forEach(option => {
                         const isChecked = currentAnswers.includes(option);
                         answerHtml += `<label class="flex items-center">
-                                         <input type="checkbox" class="rounded border-gray-300 text-primary shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" value="${option}" data-question="${detail.question}" ${isChecked ? 'checked' : ''}>
+                                         <input type="checkbox" class="rounded border-gray-300 text-primary shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" value="${option}" data-detail-index="${detailIndex}" ${isChecked ? 'checked' : ''}>
                                          <span class="ml-2 text-on-surface">${option}</span>
                                        </label>`;
                     });
                     answerHtml += `</div>`;
                     break;
 
+                case 'matrix_sa':
+                case 'matrix_single':
+                case 'matrix_ma':
+                case 'matrix_multi':
+                case 'matrix_multiple': {
+                    const rows = normalizeMatrixRows(questionDef?.rows || []);
+                    const columns = normalizeMatrixColumns(questionDef?.columns || questionDef?.options || []);
+                    if (rows.length === 0 || columns.length === 0) {
+                        answerHtml += `<p class="mt-1 text-sm text-on-surface-variant">行または選択肢が未設定です。</p>`;
+                        break;
+                    }
+                    const selectionsByRow = resolveMatrixSelections(detail.answer, rows);
+                    const inputType = MATRIX_SINGLE_TYPES.has(questionType) ? 'radio' : 'checkbox';
+
+                    answerHtml += `
+                        <div class="mt-2 overflow-x-auto border border-outline-variant rounded-lg">
+                            <table class="w-full text-sm table-fixed min-w-[520px]">
+                                <thead class="bg-surface-variant/30">
+                                    <tr>
+                                        <th class="px-2 py-2 text-left text-on-surface-variant font-semibold w-1/3">行</th>
+                                        ${columns.map(col => `<th class="px-2 py-2 text-center text-on-surface-variant font-semibold">${col.text}</th>`).join('')}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${rows.map((row, rowIndex) => {
+                        const selected = selectionsByRow.get(rowIndex) || [];
+                        return `
+                                            <tr class="border-t border-outline-variant/30">
+                                                <td class="px-2 py-2 font-medium text-on-surface">${row.text}</td>
+                                                ${columns.map(col => {
+                            const checked = selected.includes(String(col.value)) || selected.includes(String(col.text));
+                            return `
+                                                        <td class="px-2 py-2 text-center">
+                                                            <input
+                                                                type="${inputType}"
+                                                                class="rounded border-gray-300 text-primary shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+                                                                name="${inputType === 'radio' ? `matrix_${detailIndex}_${rowIndex}` : ''}"
+                                                                value="${col.value}"
+                                                                data-detail-index="${detailIndex}"
+                                                                data-matrix-row-index="${rowIndex}"
+                                                                ${checked ? 'checked' : ''}
+                                                            >
+                                                        </td>
+                                                    `;
+                        }).join('')}
+                                            </tr>
+                                        `;
+                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    break;
+                }
+
                 default: // free_text, number, etc.
-                    const answer = Array.isArray(detail.answer) ? detail.answer.join(', ') : detail.answer;
-                    answerHtml += `<input type="text" class="input-field w-full mt-1" value="${answer || ''}" data-question="${detail.question}">`;
+                    const answer = formatAnswerValueForDisplay(detail.answer, questionDef);
+                    answerHtml += `<input type="text" class="input-field w-full mt-1" value="${answer || ''}" data-detail-index="${detailIndex}">`;
                     break;
             }
             answerHtml += `</div>`;
@@ -433,11 +626,16 @@ export function renderModalContent(item, isEditMode = false) {
     } else {
         // VIEW MODE: Render text content for answers
         item.details.forEach(detail => {
-            const answer = Array.isArray(detail.answer) ? detail.answer.join(', ') : detail.answer;
+            const questionDef = item.survey?.details?.find(d => d.question === detail.question || d.text === detail.question);
+            const questionType = questionDef?.type;
+            const answer = formatAnswerValueForDisplay(detail.answer, questionDef);
+            const answerBlock = MEDIA_ANSWER_TYPES.has(questionType)
+                ? renderMediaAnswerHtml(detail.answer)
+                : `<p class="mt-1 p-3 bg-surface-bright rounded-md text-on-surface">${answer || '（無回答）'}</p>`;
             answerHtml += `
                 <div>
                     <p class="font-semibold text-on-surface">${detail.question}</p>
-                    <p class="mt-1 p-3 bg-surface-bright rounded-md text-on-surface">${answer || '（無回答）'}</p>
+                    ${answerBlock}
                 </div>`;
         });
     }
