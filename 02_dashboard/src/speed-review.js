@@ -2,9 +2,10 @@ import { resolveDemoDataPath, resolveDashboardDataPath, resolveDashboardAssetPat
 import { speedReviewService } from './services/speedReviewService.js';
 import { getSurveyPeriodRange, buildDateFilterOptions, applyDateFilterOptions, resolveDateRangeFromValue, formatDateYmd } from './services/dateFilterService.js';
 import { populateTable, renderModalContent, handleModalImageClick } from './ui/speedReviewRenderer.js';
-import { handleOpenModal } from './modalHandler.js';
+import { handleOpenModal, openModal } from './modalHandler.js'; // openModal をインポート
 import { initBreadcrumbs } from './breadcrumb.js';
 import { COMMON_CHART_DONUT_PALETTE } from './constants/chartPalette.js'; // リモートの変更を取り込む
+import { getCurrentGroupAccountType } from './sidebarHandler.js'; // 新しくインポート
 
 // --- State ---
 let allCombinedData = [];
@@ -25,7 +26,7 @@ let currentSortKey = 'answeredAt';
 let currentSortOrder = 'desc';
 
 // ダミーフラグ (後で実際の判定ロジックに置き換える)
-let isFreeAccountUser; // 初期値は後で設定
+let isFreeAccountUser = (getCurrentGroupAccountType() === 'free'); // 初期値を設定
 
 let timeSeriesChart = null; // Dashboard Chart Instance
 let attributeChart = null;  // Dashboard Chart Instance
@@ -55,6 +56,11 @@ const BLANK_TYPES = new Set([
     'matrix_multi',
     'matrix_multiple'
 ]);
+
+// プレミアム機能案内モーダルを開く関数
+function openPremiumFeatureModal() {
+    handleOpenModal('premiumFeatureModalOverlay', resolveDashboardAssetPath('modals/premiumFeatureModal.html'));
+}
 
 // --- Functions ---
 function hexToRgba(hex, alpha = 1) {
@@ -2013,16 +2019,7 @@ function setupSidebarToggle() {
     }
 }
 
-function openPremiumFeatureModal() {
-    handleOpenModal('premiumFeatureModalOverlay', resolveDashboardAssetPath('modals/premiumFeatureModal.html'), () => {
-        const signupButton = document.getElementById('premium-signup-button');
-        if (signupButton) {
-            signupButton.addEventListener('click', () => {
-                window.location.href = 'premium_registration_form.html';
-            });
-        }
-    });
-}
+
 
 export async function initializePage() {
     renderTableSkeleton(); // Show skeleton immediately

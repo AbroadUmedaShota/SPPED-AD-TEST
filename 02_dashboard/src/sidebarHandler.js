@@ -127,6 +127,14 @@ function populateNav() {
             return;
         }
 
+        // プレミアムプラン登録の表示制御
+        if (item.id === 'premium-plan') {
+            const currentAccountType = getCurrentGroupAccountType();
+            if (currentAccountType === 'premium') { // プレミアムアカウントの場合は非表示
+                return;
+            }
+        }
+
         const link = document.createElement('a');
         link.href = item.href;
         link.className = 'flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors';
@@ -185,6 +193,16 @@ function handleGroupChange(selectedId) {
     persistSelectedGroup(activeGroupId);
     setGroupFilter(activeGroupId === 'personal' ? 'personal' : activeGroupId);
 
+    const selectedGroup = groupsCache.find(g => g.id === selectedId);
+    const accountType = selectedGroup ? selectedGroup.accountType : null;
+
+    // グローバルにアカウントタイプを保存
+    window.__currentAccountType = accountType;
+    console.log(`[sidebarHandler] Account type set to: ${accountType}`);
+
+    // Dispatch custom event with the new account type
+    document.dispatchEvent(new CustomEvent('accountTypeChanged', { detail: { accountType } }));
+
     if (selectedId === 'personal') {
         if (newGroupButton) newGroupButton.style.display = 'none';
         if (groupManagementNav) groupManagementNav.style.display = 'none';
@@ -193,7 +211,6 @@ function handleGroupChange(selectedId) {
         if (newGroupButton) newGroupButton.style.display = '';
         if (groupManagementNav) groupManagementNav.style.display = '';
         if (currentGroupLabel) currentGroupLabel.style.display = '';
-        const selectedGroup = groupsCache.find(g => g.id === selectedId);
         if (selectedGroup) {
             updateCurrentGroupLabel(selectedGroup.name);
         } else {
@@ -280,6 +297,15 @@ function shouldPreventMobileAutoClose(link) {
     return false;
 }
 
+/**
+ * 現在選択されているグループのaccountTypeを取得する。
+ * @returns {string|null} 'premium', 'free', またはnull
+ */
+export function getCurrentGroupAccountType() {
+    const selectedGroup = groupsCache.find(group => group.id === activeGroupId);
+    return selectedGroup ? selectedGroup.accountType : null;
+}
+
 // --- Event Listener Setup ---
 
 /**
@@ -358,7 +384,7 @@ function attachEventListeners() {
 /**
  * Initializes the entire sidebar component.
  */
-export function initSidebarHandler() {
+export async function initSidebarHandler() {
     cacheDOMElements();
     if (!sidebar) {
         console.error("Sidebar element not found. Initialization aborted.");
@@ -367,7 +393,7 @@ export function initSidebarHandler() {
 
     populateNav();
     populateSupportLink();
-    populateGroupSelect();
+    await populateGroupSelect();
     attachEventListeners();
     
     // Initial layout setup

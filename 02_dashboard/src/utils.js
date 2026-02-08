@@ -309,7 +309,7 @@ export async function loadCommonHtml(placeholderId, filePath, callback = null) {
             placeholder.innerHTML = doc.body.innerHTML;
 
             if (callback && typeof callback === 'function') {
-                callback();
+                await callback();
             }
         }
     } catch (error) {

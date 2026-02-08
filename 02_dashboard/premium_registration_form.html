@@ -1,283 +1,304 @@
 <!DOCTYPE html>
-<html lang="ja" class="scroll-smooth">
+<html lang="ja">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Speed Ad プレミアムプラン登録</title>
-
-    <link rel="icon" href="assets/svg/speedad_logo.svg" type="image/svg+xml">
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <!-- Material Icons CDN -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <!-- Custom Fonts -->
-    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
-    <link as="style"
-        href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900"
-        onload="this.rel='stylesheet'" rel="stylesheet">
-
-    <!-- 共通スタイルシート -->
-    <link rel="stylesheet" href="service-top-style.css">
-    <!-- プレミアム登録フォーム専用スタイルシート -->
-    <link rel="stylesheet" href="premium_signup.css"> <!-- 既存のCSSを流用 -->
+    <title>プレミアムプラン登録 - Speed Ad</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="service-top-style.css"> <!-- 共通スタイルシートを追加 -->
+    <link rel="stylesheet" href="premium_registration_form.css">
 </head>
 
-<body class="bg-background text-on-background">
+<body class="bg-gray-50 font-sans">
+<header class="fixed top-0 left-0 right-0 z-50 flex h-16 items-center justify-between px-6  gradient-primary-bg">
+        <div class="flex items-center gap-3">
+            <!-- モバイル用サイドバートグル -->
+            <button class="lg:hidden text-on-primary hover:text-primary-container" id="sidebarToggleMobile" aria-label="モバイルメニューを開く">
+                <span class="material-icons text-3xl">menu</span>
+            </button>
+            <!-- ブランドロゴ -->
+            <div class="flex items-center gap-2">
+                <div class="h-8 w-8 text-on-primary" role="img" aria-label="SpeedAdロゴ">
+                    <img src="assets/svg/speedad_logo.svg" alt="SpeedAdロゴ" class="h-full w-full">
+                </div>
+                <span class="text-on-primary text-xl font-bold leading-tight tracking-tight">SPEED-AD</span>
+            </div>
+        </div>
+        <div class="flex items-center gap-x-3 sm:gap-x-4">
+            <!-- ユーザー情報 -->
+            <a href="#" class="text-on-primary font-bold transition-opacity" aria-label="現在のユーザー情報" onclick="window.openAccountInfoModal(window.dummyUserData);">user@example.comさん</a>
+        </div>
+    </header>
 
-    <!-- 1. アプリケーション全体構造 -->
-    <div class="relative flex min-h-screen flex-col overflow-x-hidden">
+    <main class="container mx-auto px-4 py-16">
+        <div class="max-w-3xl mx-auto">
+            <!-- タイトルエリア -->
+            <div class="title-area-decorated mb-12">
+                <h1 class="text-headline-large font-bold leading-tight tracking-tight">プレミアムサービスへアップグレード</h1>
+                <p class="mt-2 text-body-large text-on-surface-variant">最高の機能で、あなたのビジネスを加速させましょう。</p>
+            </div>
 
-        <!-- 2. ヘッダー (main.jsによって読み込まれる) -->
-        <div id="header-placeholder"></div>
+            <!-- ステップインジケーター -->
+            <div class="stepper-wrapper mb-12">
+                <div class="stepper-item completed">
+                    <div class="step-counter">1</div>
+                    <div class="step-name">アカウント情報</div>
+                </div>
+                <div class="stepper-item">
+                    <div class="step-counter">2</div>
+                    <div class="step-name">お支払い</div>
+                </div>
+                <div class="stepper-item">
+                    <div class="step-counter">3</div>
+                    <div class="step-name">確認</div>
+                </div>
+            </div>
 
-        <div class="flex flex-1 pt-16 bg-background">
-            <!-- 4. メインコンテンツ -->
-            <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
-                <div class="flex flex-col w-full max-w-6xl mx-auto flex-1">
-                    <h1 class="text-on-surface text-2xl md:text-3xl font-bold mb-8 text-center">プレミアムプラン登録</h1>
+            <form id="premium-form" class="bg-white p-8 md:p-12 rounded-2xl shadow-lg">
 
-                    <!-- ステップ表示 (パンくずリスト形式) -->
-                    <nav class="flex justify-center mb-8" aria-label="Progress">
-                        <ol role="list" class="space-y-4 sm:flex sm:space-x-8 sm:space-y-0">
-                            <li class="flex-1">
-                                <a href="#" class="group flex flex-col border-l-4 border-primary py-2 pl-4 md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4" aria-current="step">
-                                    <span class="text-sm font-medium text-primary">ステップ 1</span>
-                                    <span class="text-sm font-medium">アカウント情報</span>
-                                </a>
-                            </li>
-                            <li class="flex-1">
-                                <a href="#" class="group flex flex-col border-l-4 border-outline-variant py-2 pl-4 hover:border-outline md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4">
-                                    <span class="text-sm font-medium text-on-surface-variant">ステップ 2</span>
-                                    <span class="text-sm font-medium text-on-surface-variant">ユーザー・住所情報</span>
-                                </a>
-                            </li>
-                            <li class="flex-1">
-                                <a href="#" class="group flex flex-col border-l-4 border-outline-variant py-2 pl-4 hover:border-outline md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4">
-                                    <span class="text-sm font-medium text-on-surface-variant">ステップ 3</span>
-                                    <span class="text-sm font-medium text-on-surface-variant">同意・確認</span>
-                                </a>
-                            </li>
-                        </ol>
-                    </nav>
-
-                    <!-- フォーム本体 -->
-                    <div class="bg-surface rounded-xl shadow-soft p-8 md:p-12 mb-8">
-                        <p class="text-sm text-on-surface-variant mb-6 text-right"><span class="text-error">*</span>は必須項目です</p>
-                        <form id="premiumRegistrationForm" action="#" method="POST">
-                            <!-- アカウント情報 -->
-                            <section id="step1-account-info">
-                                <h2 class="text-on-surface text-xl font-semibold mb-6">ステップ 1: アカウント情報</h2>
-                                <div class="space-y-6">
-                                    <div>
-                                        <label for="email" class="block text-sm font-medium text-on-surface">メールアドレス <span class="text-error">*</span></label>
-                                        <input type="email" id="email" name="email" class="mt-1 block w-full rounded-md border-outline-variant shadow-sm focus:border-primary focus:ring-primary sm:text-sm" value="user@example.com" readonly>
-                                        <p class="mt-2 text-sm text-on-surface-variant">ログイン中のメールアドレスが表示されます。変更はできません。</p>
-                                    </div>
-                                    <div>
-                                        <label for="password" class="block text-sm font-medium text-on-surface">パスワード <span class="text-error">*</span></label>
-                                        <div class="relative">
-                                            <input type="password" id="password" name="password" class="mt-1 block w-full rounded-md border-outline-variant shadow-sm focus:border-primary focus:ring-primary sm:text-sm pr-10" required>
-                                            <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5" id="togglePasswordVisibility">
-                                                <span class="material-icons text-on-surface-variant text-lg">visibility_off</span>
-                                            </button>
-                                        </div>
-                                        <p class="mt-2 text-sm text-on-surface-variant">8文字以上の半角英数字と記号を組み合わせてください。</p>
-                                    </div>
-                                    <div>
-                                        <label for="passwordConfirm" class="block text-sm font-medium text-on-surface">パスワード (確認) <span class="text-error">*</span></label>
-                                        <input type="password" id="passwordConfirm" name="passwordConfirm" class="mt-1 block w-full rounded-md border-outline-variant shadow-sm focus:border-primary focus:ring-primary sm:text-sm" required>
-                                    </div>
-                                </div>
-                                <div class="mt-8 flex justify-end">
-                                    <button type="button" id="nextToStep2" class="cta-button">
-                                        <span class="button-text">次へ</span>
-                                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                    </button>
-                                </div>
-                            </section>
-
-                            <!-- ユーザー・住所情報 -->
-                            <section id="step2-user-address" class="hidden">
-                                <h2 class="text-on-surface text-xl font-semibold mb-6">ステップ 2: ユーザー・住所情報</h2>
-                                <div class="space-y-6">
-                                    <!-- ユーザー基本情報 -->
-                                    <fieldset>
-                                        <legend class="text-base font-medium text-on-surface mb-4">ユーザー基本情報</legend>
-                                        <div class="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-8">
-                                            <div>
-                                                <label for="lastName" class="block text-sm font-medium text-on-surface">氏名 (姓) <span class="text-error">*</span></label>
-                                                <input type="text" id="lastName" name="lastName" class="mt-1 block w-full rounded-md border-outline-variant shadow-sm focus:border-primary focus:ring-primary sm:text-sm" required>
-                                            </div>
-                                            <div>
-                                                <label for="firstName" class="block text-sm font-medium text-on-surface">氏名 (名) <span class="text-error">*</span></label>
-                                                <input type="text" id="firstName" name="firstName" class="mt-1 block w-full rounded-md border-outline-variant shadow-sm focus:border-primary focus:ring-primary sm:text-sm" required>
-                                            </div>
-                                            <div class="sm:col-span-2">
-                                                <label for="companyName" class="block text-sm font-medium text-on-surface">会社名 <span class="text-error">*</span></label>
-                                                <input type="text" id="companyName" name="companyName" class="mt-1 block w-full rounded-md border-outline-variant shadow-sm focus:border-primary focus:ring-primary sm:text-sm" required>
-                                            </div>
-                                            <div class="sm:col-span-2">
-                                                <label for="phoneNumber" class="block text-sm font-medium text-on-surface">電話番号 <span class="text-error">*</span></label>
-                                                <input type="tel" id="phoneNumber" name="phoneNumber" class="mt-1 block w-full rounded-md border-outline-variant shadow-sm focus:border-primary focus:ring-primary sm:text-sm" placeholder="03-1234-5678" required>
-                                            </div>
-                                            <div class="sm:col-span-2">
-                                                <label for="departmentName" class="block text-sm font-medium text-on-surface">部署名 (任意)</label>
-                                                <input type="text" id="departmentName" name="departmentName" class="mt-1 block w-full rounded-md border-outline-variant shadow-sm focus:border-primary focus:ring-primary sm:text-sm">
-                                            </div>
-                                            <div class="sm:col-span-2">
-                                                <label for="positionName" class="block text-sm font-medium text-on-surface">役職名 (任意)</label>
-                                                <input type="text" id="positionName" name="positionName" class="mt-1 block w-full rounded-md border-outline-variant shadow-sm focus:border-primary focus:ring-primary sm:text-sm">
-                                            </div>
-                                        </div>
-                                    </fieldset>
-
-                                    <!-- 住所情報 -->
-                                    <fieldset>
-                                        <legend class="text-base font-medium text-on-surface mb-4">住所情報</legend>
-                                        <div class="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-8">
-                                            <div class="sm:col-span-2">
-                                                <label for="postalCode" class="block text-sm font-medium text-on-surface">郵便番号 <span class="text-error">*</span></label>
-                                                <input type="text" id="postalCode" name="postalCode" class="mt-1 block w-full rounded-md border-outline-variant shadow-sm focus:border-primary focus:ring-primary sm:text-sm" placeholder="例: 100-0001" required>
-                                                <button type="button" id="lookupAddress" class="mt-2 inline-flex items-center px-3 py-1.5 border border-outline shadow-sm text-sm font-medium rounded-md text-on-surface bg-surface-variant hover:bg-outline focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                                                    <span class="button-text">郵便番号から住所を自動入力</span>
-                                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                                </button>
-                                            </div>
-                                            <div class="sm:col-span-2">
-                                                <label for="address" class="block text-sm font-medium text-on-surface">住所 (都道府県・市区町村・番地) <span class="text-error">*</span></label>
-                                                <input type="text" id="address" name="address" class="mt-1 block w-full rounded-md border-outline-variant shadow-sm focus:border-primary focus:ring-primary sm:text-sm" required>
-                                            </div>
-                                            <div class="sm:col-span-2">
-                                                <label for="buildingFloor" class="block text-sm font-medium text-on-surface">建物名・部屋番号 (任意)</label>
-                                                <input type="text" id="buildingFloor" name="buildingFloor" class="mt-1 block w-full rounded-md border-outline-variant shadow-sm focus:border-primary focus:ring-primary sm:text-sm">
-                                            </div>
-                                        </div>
-                                    </fieldset>
-
-                                    <!-- 請求先情報 -->
-                                    <fieldset>
-                                        <legend class="text-base font-medium text-on-surface mb-4">請求先情報</legend>
-                                        <div class="space-y-4">
-                                            <div class="flex items-center">
-                                                <input id="billingAddressSame" name="billingAddressType" type="radio" class="focus:ring-primary h-4 w-4 text-primary border-outline-variant" value="same" checked>
-                                                <label for="billingAddressSame" class="ml-3 block text-sm font-medium text-on-surface">ユーザーの住所と同じ</label>
-                                            </div>
-                                            <div class="flex items-center">
-                                                <input id="billingAddressDifferent" name="billingAddressType" type="radio" class="focus:ring-primary h-4 w-4 text-primary border-outline-variant" value="different">
-                                                <label for="billingAddressDifferent" class="ml-3 block text-sm font-medium text-on-surface">別の請求先を入力する</label>
-                                            </div>
-                                            <div id="billingAddressFields" class="space-y-6 hidden mt-4 p-4 border border-outline-variant rounded-md bg-background-variant">
-                                                <!-- 別の請求先住所入力欄 (住所情報と同様のフィールドを配置) -->
-                                                <div>
-                                                    <label for="billingPostalCode" class="block text-sm font-medium text-on-surface">郵便番号 <span class="text-error">*</span></label>
-                                                    <input type="text" id="billingPostalCode" name="billingPostalCode" class="mt-1 block w-full rounded-md border-outline-variant shadow-sm focus:border-primary focus:ring-primary sm:text-sm" placeholder="例: 100-0001">
-                                                    <button type="button" id="lookupBillingAddress" class="mt-2 inline-flex items-center px-3 py-1.5 border border-outline shadow-sm text-sm font-medium rounded-md text-on-surface bg-surface-variant hover:bg-outline focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                                                        <span class="button-text">郵便番号から住所を自動入力</span>
-                                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                                    </button>
-                                                </div>
-                                                <div>
-                                                    <label for="billingAddress" class="block text-sm font-medium text-on-surface">住所 (都道府県・市区町村・番地) <span class="text-error">*</span></label>
-                                                    <input type="text" id="billingAddress" name="billingAddress" class="mt-1 block w-full rounded-md border-outline-variant shadow-sm focus:border-primary focus:ring-primary sm:text-sm">
-                                                </div>
-                                                <div>
-                                                    <label for="billingBuildingFloor" class="block text-sm font-medium text-on-surface">建物名・部屋番号 (任意)</label>
-                                                    <input type="text" id="billingBuildingFloor" name="billingBuildingFloor" class="mt-1 block w-full rounded-md border-outline-variant shadow-sm focus:border-primary focus:ring-primary sm:text-sm">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </fieldset>
-                                </div>
-                                <div class="mt-8 flex justify-between">
-                                    <button type="button" id="prevToStep1" class="cta-button secondary">
-                                        <span class="button-text">戻る</span>
-                                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                    </button>
-                                    <button type="button" id="nextToStep3" class="cta-button">
-                                        <span class="button-text">次へ</span>
-                                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                    </button>
-                                </div>
-                            </section>
-
-                            <!-- 同意・確認 -->
-                            <section id="step3-confirmation" class="hidden">
-                                <h2 class="text-on-surface text-xl font-semibold mb-6">ステップ 3: 同意・確認</h2>
-                                <div class="space-y-6">
-                                    <fieldset>
-                                        <legend class="text-base font-medium text-on-surface mb-4">同意事項</legend>
-                                        <div class="space-y-4">
-                                            <div class="flex items-start">
-                                                <div class="flex items-center h-5">
-                                                    <input id="agreeTerms" name="agreeTerms" type="checkbox" class="focus:ring-primary h-4 w-4 text-primary border-outline-variant rounded" required>
-                                                </div>
-                                                <div class="ml-3 text-sm">
-                                                    <label for="agreeTerms" class="font-medium text-on-surface">
-                                                        <a href="terms-of-service.html" class="text-primary hover:underline" target="_blank" rel="noopener noreferrer">利用規約</a>に同意する <span class="text-error">*</span>
-                                                    </label>
-                                                </div>
-                                            </div>
-                                            <div class="flex items-start">
-                                                <div class="flex items-center h-5">
-                                                    <input id="agreePrivacy" name="agreePrivacy" type="checkbox" class="focus:ring-primary h-4 w-4 text-primary border-outline-variant rounded" required>
-                                                </div>
-                                                <div class="ml-3 text-sm">
-                                                    <label for="agreePrivacy" class="font-medium text-on-surface">
-                                                        <a href="personal-data-protection-policy.html" class="text-primary hover:underline" target="_blank" rel="noopener noreferrer">プライバシーポリシー</a>に同意する <span class="text-error">*</span>
-                                                    </label>
-                                                </div>
-                                            </div>
-                                            <div class="flex items-start">
-                                                <div class="flex items-center h-5">
-                                                    <input id="agreePersonalData" name="agreePersonalData" type="checkbox" class="focus:ring-primary h-4 w-4 text-primary border-outline-variant rounded" required>
-                                                </div>
-                                                <div class="ml-3 text-sm">
-                                                    <label for="agreePersonalData" class="font-medium text-on-surface">
-                                                        <a href="personal-data-protection-policy.html" class="text-primary hover:underline" target="_blank" rel="noopener noreferrer">個人情報の取り扱い</a>に同意する <span class="text-error">*</span>
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </fieldset>
-
-                                    <!-- 支払い・請求関連情報の表示 -->
-                                    <section class="mt-8 p-6 bg-background-variant rounded-md">
-                                        <h3 class="text-on-surface text-lg font-semibold mb-4">お支払いについて</h3>
-                                        <p class="text-on-surface-variant mb-2">プレミアムプランの料金は月額 <span class="font-bold">10,000円 (税別)</span> です。</p>
-                                        <p class="text-on-surface-variant mb-2">お支払い方法は <span class="font-bold">銀行振込のみ</span> となります。</p>
-                                        <p class="text-on-surface-variant">登録完了後、お客様のダッシュボードに請求書が発行されます。請求書に記載された期日までに指定の銀行口座へお振込みをお願いいたします。</p>
-                                        <p class="text-on-surface-variant mt-4 text-sm">※ プレミアム機能の有効化タイミングについては、別途ご案内させていただきます。</p>
-                                    </section>
-                                </div>
-                                <div class="mt-8 flex justify-between">
-                                    <button type="button" id="prevToStep2" class="cta-button secondary">
-                                        <span class="button-text">戻る</span>
-                                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display:none;"></span>
-                                    </button>
-                                    <button type="submit" id="submitRegistration" class="cta-button">
-                                        <span class="button-text">プレミアム登録を完了する</span>
-                                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display:none;"></span>
-                                    </button>
-                                </div>
-                            </section>
-
-                        </form>
+                <!-- ===== ステップ1: アカウント情報 ===== -->
+                <section id="step-1" class="form-step active">
+                    <h2 class="form-step-title">アカウント情報</h2>
+                    
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">基本情報</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div class="form-group">
+                            <label for="last_name">姓</label>
+                            <input type="text" id="last_name" name="last_name" placeholder="山田" required>
+                            <p class="error-message"></p>
+                        </div>
+                        <div class="form-group">
+                            <label for="first_name">名</label>
+                            <input type="text" id="first_name" name="first_name" placeholder="太郎" required>
+                            <p class="error-message"></p>
+                        </div>
+                        <div class="form-group md:col-span-2">
+                            <label for="phone_number">電話番号</label>
+                            <input type="tel" id="phone_number" name="phone_number" placeholder="090-1234-5678" required>
+                            <p class="error-message"></p>
+                        </div>
+                        <div class="form-group">
+                            <label for="department">部署名</label>
+                            <input type="text" id="department" name="department" placeholder="営業部">
+                            <p class="error-message"></p>
+                        </div>
+                        <div class="form-group">
+                            <label for="position">役職名</label>
+                            <input type="text" id="position" name="position" placeholder="マネージャー">
+                            <p class="error-message"></p>
+                        </div>
                     </div>
 
-                </div>
-            </main>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">会社情報・住所</h3>
+                    <div class="grid grid-cols-1 gap-6 mb-8">
+                         <div class="form-group">
+                            <label for="company_name">会社名</label>
+                            <input type="text" id="company_name" name="company_name" placeholder="株式会社Speed Ad" required>
+                            <p class="error-message"></p>
+                        </div>
+                        <div class="form-group">
+                            <label for="postal_code">郵便番号</label>
+                            <div class="flex space-x-2">
+                                <input type="text" id="postal_code" name="postal_code" placeholder="1000001" required class="flex-grow">
+                                <button type="button" id="lookup_address_btn" class="btn btn-secondary flex-shrink-0">自動入力</button>
+                            </div>
+                            <p class="error-message"></p>
+                        </div>
+                         <div class="form-group">
+                            <label for="address">住所</label>
+                            <input type="text" id="address" name="address" placeholder="東京都千代田区千代田1-1" required>
+                            <p class="error-message"></p>
+                        </div>
+                        <div class="form-group">
+                            <label for="building">建物名・部屋番号</label>
+                            <input type="text" id="building" name="building" placeholder="パレスビル 101">
+                            <p class="error-message"></p>
+                        </div>
+
+                        <!-- 請求先情報セクションの追加 -->
+                        <div class="mt-8 p-6 bg-gray-50 rounded-lg border border-gray-200">
+                            <h3 class="text-lg font-bold text-gray-800 mb-4">請求先情報</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-center">
+                                    <input type="radio" id="billing_same_address" name="billing_address_option" value="same" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300" checked>
+                                    <label for="billing_same_address" class="ml-3 text-gray-700">ユーザーの住所と同じ</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" id="billing_different_address" name="billing_address_option" value="different" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300">
+                                    <label for="billing_different_address" class="ml-3 text-gray-700">別の請求先を入力する</label>
+                                </div>
+                            </div>
+
+                            <!-- 別の請求先入力フォーム (デフォルトは非表示) -->
+                            <div id="billing_address_form" class="mt-6 space-y-6 hidden">
+                                <div class="form-group">
+                                    <label for="billing_company_name">会社名</label>
+                                    <input type="text" id="billing_company_name" name="billing_company_name" placeholder="株式会社Speed Ad" required>
+                                    <p class="error-message"></p>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div class="form-group">
+                                        <label for="billing_last_name">姓</label>
+                                        <input type="text" id="billing_last_name" name="billing_last_name" placeholder="山田" required>
+                                        <p class="error-message"></p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="billing_first_name">名</label>
+                                        <input type="text" id="billing_first_name" name="billing_first_name" placeholder="太郎" required>
+                                        <p class="error-message"></p>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="billing_phone_number">電話番号</label>
+                                    <input type="tel" id="billing_phone_number" name="billing_phone_number" placeholder="090-1234-5678" required>
+                                    <p class="error-message"></p>
+                                </div>
+                                <div class="form-group">
+                                    <label for="billing_postal_code">郵便番号</label>
+                                    <div class="flex space-x-2">
+                                        <input type="text" id="billing_postal_code" name="billing_postal_code" placeholder="1000001" class="flex-grow">
+                                        <button type="button" id="lookup_billing_address_btn" class="btn btn-secondary flex-shrink-0">自動入力</button>
+                                    </div>
+                                    <p class="error-message"></p>
+                                </div>
+                                <div class="form-group">
+                                    <label for="billing_address">住所</label>
+                                    <input type="text" id="billing_address" name="billing_address" placeholder="東京都千代田区千代田1-1">
+                                    <p class="error-message"></p>
+                                </div>
+                                <div class="form-group">
+                                    <label for="billing_building">建物名・部屋番号</label>
+                                    <input type="text" id="billing_building" name="billing_building" placeholder="丸の内ビル 2F">
+                                    <p class="error-message"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-navigation flex justify-end">
+                        <button type="button" class="btn btn-primary btn-next">次へ</button>
+                    </div>
+                </section>
+
+                <!-- ===== ステップ2: お支払い・同意 ===== -->
+                <section id="step-2" class="form-step">
+                    <h2 class="form-step-title">お支払い情報・同意</h2>
+                    <div class="space-y-8 mb-8">
+                        <div class="payment-info-box">
+                            <h3 class="text-lg font-semibold text-gray-700 mb-2">お支払いについて</h3>
+                            <p class="text-gray-600">料金は<strong
+                                    class="text-indigo-600">月末締め、後払い</strong>となります。請求書は登録月の翌月月初に発行されます。</p>
+                            <p class="text-gray-600 mt-2">請求書発行後、<strong
+                                    class="text-indigo-600">◯◯日以内</strong>にお支払いください。</p>
+                        </div>
+                        <div class="border-t border-gray-200 pt-8">
+                            <label class="flex items-start cursor-pointer">
+                                <div class="flex items-center h-5">
+                                    <input type="checkbox" id="terms_agree" name="terms_agree"
+                                        class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                                        required>
+                                </div>
+                                <div class="ml-3 text-sm">
+                                    <span class="text-gray-700">
+                                        <a href="#" class="text-indigo-600 hover:underline">有料コンテンツ利用規約</a> および <a href="specified-commercial-transactions.html"
+                                            class="text-indigo-600 hover:underline" target="_blank" rel="noopener noreferrer">特定商取引法に基づく表記</a> に同意します
+                                    </span>
+                                    <p class="error-message"></p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-navigation">
+                        <button type="button" class="btn btn-secondary btn-prev">戻る</button>
+                        <button type="button" class="btn btn-primary btn-next">確認画面へ</button>
+                    </div>
+                </section>
+
+                <!-- ===== ステップ3: 確認画面 ===== -->
+                <section id="step-3" class="form-step">
+                    <h2 class="form-step-title">入力内容の確認</h2>
+                    <div id="summary-container" class="space-y-6 mb-8"></div>
+                    <div class="form-navigation">
+                        <button type="button" class="btn btn-secondary btn-prev" id="btn-edit-step1">修正する</button>
+                        <button type="submit" class="btn btn-primary">この内容で登録する</button>
+                    </div>
+                </section>
+
+                <!-- ===== ステップ4: 完了画面 ===== -->
+                <section id="step-4" class="form-step text-center">
+                    <div class="mb-8">
+                        <div class="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-green-100 mb-4">
+                            <span class="material-icons-outlined text-4xl text-green-600">check_circle</span>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-800 mb-2">お申し込みありがとうございます！</h2>
+                        <p class="text-gray-600">プレミアムプランへのお申し込みを受け付けました。<br>確認メールをお送りしましたのでご確認ください。</p>
+                    </div>
+                    <div class="mt-8 p-6 bg-gray-50 rounded-lg max-w-lg mx-auto text-left">
+                        <h3 class="font-bold text-gray-700 mb-2">今後の流れ</h3>
+                        <ol class="list-decimal list-inside space-y-2 text-gray-600 text-sm">
+                            <li>ご登録いただいたメールアドレスに確認メールが届きます</li>
+                            <li>審査完了後（通常1営業日以内）、ご利用開始の案内メールをお送りします</li>
+                            <li>案内メールのURLからログインして、プレミアム機能をご利用いただけます</li>
+                        </ol>
+                    </div>
+                    <div class="mt-10">
+                        <a href="index.html" class="btn btn-primary">ダッシュボードへ戻る</a>
+                    </div>
+                </section>
+
+            </form>
         </div>
+    </main>
 
-        <!-- 5. フッター (main.jsによって読み込まれる) -->
-        <div id="footer-placeholder"></div>
-
+    <footer class="border-t border-outline-variant bg-surface-variant" id="main-footer">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-12">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+            <div class="col-span-1 md:col-span-2 lg:col-span-2">
+                <div class="flex items-center gap-2 text-on-surface mb-4">
+                    <div class="h-7 w-7 text-primary" role="img" aria-label="SpeedAdロゴ">
+                        <img src="assets/svg/speedad_logo.svg" alt="SpeedAdロゴ" class="h-full w-full">
+                    </div>
+                    <h2 class="text-on-surface text-lg font-bold leading-tight tracking-tight">SPEED-AD</h2>
+                </div>
+                <p class="text-on-surface-variant text-sm leading-relaxed">アンケート作成から分析まで、<br/>オールインワンで提供します。</p>
+            </div>
+            <div class="text-left lg:col-span-1">
+                <h3 class="text-on-surface text-sm font-semibold mb-4">サポート</h3>
+                <ul class="space-y-2">
+                    <li><a class="text-on-surface-variant hover:text-primary text-sm transition-colors" href="help-center.html" target="_blank" rel="noopener noreferrer">ヘルプセンター</a></li>
+                    <li><a class="text-on-surface-variant hover:text-primary text-sm transition-colors" href="./faq.html" target="_blank" rel="noopener noreferrer">よくある質問</a></li>
+                    <li><a class="text-on-surface-variant hover:text-primary text-sm transition-colors" href="./bug-report.html" target="_blank" rel="noopener noreferrer">お問い合わせ</a></li>
+                </ul>
+            </div>
+            <div class="text-left lg:col-span-1">
+                <h3 class="text-on-surface text-sm font-semibold mb-4">会社情報</h3>
+                <ul class="space-y-2">
+                    <li><a class="text-on-surface-variant hover:text-primary text-sm transition-colors" href="https://www.abroad-o.com/about.html" target="_blank" rel="noopener noreferrer">会社概要</a></li>
+                    <li><a class="text-on-surface-variant hover:text-primary text-sm transition-colors" href="https://www.abroad-o.com/news.html" target="_blank" rel="noopener noreferrer">プレスリリース</a></li>
+                </ul>
+            </div>
+            <div class="text-left lg:col-span-1">
+                <h3 class="text-on-surface text-sm font-semibold mb-4">規約等</h3>
+                <ul class="space-y-2">
+                    <li><a class="text-on-surface-variant hover:text-primary text-sm transition-colors" href="terms-of-service.html" target="_blank" rel="noopener noreferrer">利用規約</a></li>
+                    <li><a class="text-on-surface-variant hover:text-primary text-sm transition-colors" href="https://www.abroad-o.com/rule.html" target="_blank" rel="noopener noreferrer">プライバシーポリシー</a></li>
+                    <li><a class="text-on-surface-variant hover:text-primary text-sm transition-colors" href="specified-commercial-transactions.html" target="_blank" rel="noopener noreferrer">特定商取引法に基づく表示</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="mt-8 pt-8 border-t border-outline-variant text-center">
+            <p class="text-on-surface-variant text-sm">© 2025 Abroad Outsourcing Co.,Inc. All rights reserved.</p>
+        </div>
     </div>
+</footer>
 
-    <!-- JSファイル -->
-    <script type="module" src="src/main.js"></script>
-    <script src="premium_registration_form.js"></script> <!-- フォーム専用のロジックを読み込む -->
 
+    <script type="module" src="src/accountInfoModal.js"></script>
+    <script src="premium_registration_form.js"></script>
 </body>
 
 </html>

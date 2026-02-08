@@ -386,7 +386,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // --- External Link Confirmation ---
     // This runs after all common HTML is loaded, ensuring footer links are included.
-    const links = document.querySelectorAll('a');
+    // フッター内のリンクは外部リンク処理の対象外とする
+    const links = document.querySelectorAll('main a');
     const currentHost = window.location.hostname;
 
     links.forEach(link => {

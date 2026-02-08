@@ -9,15 +9,24 @@ let groups = []; // メモリ上のグループデータ
  */
 export async function fetchGroups() {
     const isSamplePage = window.location.pathname.includes('/sample/');
-    const dataFile = isSamplePage ? 'core/groups.sample.json' : 'core/groups.json';
-    const dataPath = resolveDashboardDataPath(dataFile);
+    const dataFile = isSamplePage ? '../../data/core/groups.sample.json' : '../../data/core/groups.json';
 
     try {
-        const response = await fetch(dataPath);
+        const response = await fetch(dataFile);
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(`HTTP error! status: ${response.status} from ${dataFile}`);
         }
         groups = await response.json();
+        // モック画面用にaccountTypeを追加
+        groups = groups.map(group => {
+            if (group.id === 'personal') {
+                return { ...group, accountType: 'premium' };
+            } else if (group.id === 'group_sales') {
+                return { ...group, accountType: 'free' };
+            }
+            // その他のグループはデフォルトでプレミアムとする
+            return { ...group, accountType: group.accountType || 'premium' };
+        });
         return groups;
     } catch (error) {
         console.error('Error fetching groups data:', error);

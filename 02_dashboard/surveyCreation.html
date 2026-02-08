@@ -73,7 +73,7 @@
                 <div id="basicInfoContent" class="accordion-content p-4 space-y-6">
                   <section id="language-settings-section" class="space-y-4" data-pro-only="true">
                     <div class="flex flex-col gap-3 rounded-lg border border-outline-variant bg-surface-container-lowest p-4">
-                      <div class="flex flex-wrap items-center justify-between gap-4">
+                      <div class="relative flex flex-wrap items-center justify-between gap-4" id="multilingual-toggle-wrapper">
                         <div>
                           <h3 class="text-on-surface text-lg font-semibold">アンケート多言語機能の有効化</h3>
                           <p class="text-sm text-on-surface-variant">アンケートごとに多言語入力を切り替えます。</p>
@@ -84,6 +84,10 @@
                             class="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-500">
                           </div>
                         </label>
+                        <!-- ここにオーバーレイを追加 -->
+                        <div id="multilingual-premium-overlay" class="absolute inset-0 bg-surface/50 rounded-lg flex items-center justify-center hidden cursor-pointer z-10" title="プレミアムプラン限定">
+                            <span class="text-primary font-bold text-sm bg-surface px-3 py-1 rounded-full shadow-md">プレミアムプラン限定</span>
+                        </div>
                       </div>
                       <p class="text-xs text-on-surface-variant hidden" data-multilingual-off-message>ONにすると追加言語と翻訳入力欄が表示されます。</p>
                       <p class="text-xs text-amber-700 hidden" data-multilingual-locked-message>プレミアムプランで利用できます。</p>

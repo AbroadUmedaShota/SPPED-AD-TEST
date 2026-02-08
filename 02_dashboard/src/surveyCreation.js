@@ -1,4 +1,4 @@
-import { handleOpenModal, closeModal } from './modalHandler.js';
+import { handleOpenModal, closeModal, openModal } from './modalHandler.js';
 import { openAccountInfoModal } from './accountInfoModal.js';
 import { initSidebarHandler } from './sidebarHandler.js';
 import { initBreadcrumbs } from './breadcrumb.js';
@@ -58,6 +58,11 @@ function toDateOnly(value) {
     const source = value instanceof Date ? value : new Date(value);
     if (Number.isNaN(source.getTime())) return null;
     return new Date(source.getFullYear(), source.getMonth(), source.getDate());
+}
+
+// プレミアム機能案内モーダルを開く関数
+function openPremiumFeatureModal() {
+    handleOpenModal('premiumFeatureModalOverlay', resolveDashboardAssetPath('modals/premiumFeatureModal.html'));
 }
 
 // --- Dirty State Management ---
@@ -853,22 +858,69 @@ function updateMultilingualToggleUI(multilingualAllowed, multilingualEnabled) {
     const controls = document.getElementById('multilingual-controls');
     const lockedMessage = document.querySelector('[data-multilingual-locked-message]');
     const offMessage = document.querySelector('[data-multilingual-off-message]');
+    const multilingualPremiumOverlay = document.getElementById('multilingual-premium-overlay');
+    const multilingualToggleWrapper = document.getElementById('multilingual-toggle-wrapper');
+    const toggleLabel = toggle.closest('label'); // label要素を取得
 
     if (!toggle) return;
+
+    const currentAccountType = window.__currentAccountType;
+    console.log(`[surveyCreation] updateMultilingualToggleUI: currentAccountType is '${currentAccountType}'`);
+    const isFreeAccount = currentAccountType === 'free';
+
+    // フリーアカウントの場合の処理
+    if (isFreeAccount) {
+        toggle.checked = false; // 強制的にオフ
+        toggle.disabled = true; // 無効化
+        toggle.setAttribute('aria-disabled', 'true');
+        if (toggleLabel) {
+            toggleLabel.classList.add('pointer-events-none'); // クリックイベントを無効化
+        }
+
+        if (multilingualToggleWrapper) {
+            multilingualToggleWrapper.classList.add('relative'); // オーバーレイの基準
+        }
+        if (multilingualPremiumOverlay) {
+            multilingualPremiumOverlay.classList.remove('hidden'); // オーバーレイを表示
+            // クリックイベントを追加 (重複登録防止)
+            if (!multilingualPremiumOverlay.dataset.listenerAttached) {
+                multilingualPremiumOverlay.addEventListener('click', openPremiumFeatureModal);
+                multilingualPremiumOverlay.dataset.listenerAttached = 'true';
+            }
+        }
+        if (lockedMessage) {
+            lockedMessage.classList.remove('hidden'); // ロックメッセージを表示
+        }
+        if (offMessage) {
+            offMessage.classList.add('hidden'); // 通常のオフメッセージは非表示
+        }
+        if (controls) {
+            controls.classList.add('hidden'); // 多言語コントロールは非表示
+            controls.setAttribute('aria-hidden', 'true');
+        }
+        return; // 以降の処理はスキップ
+    }
+
+    // プレミアムアカウントの場合の通常の処理
+    if (toggleLabel) {
+        toggleLabel.classList.remove('pointer-events-none'); // クリックイベントを有効化
+    }
+    if (multilingualPremiumOverlay) {
+        multilingualPremiumOverlay.classList.add('hidden'); // オーバーレイを非表示
+    }
+    if (lockedMessage) {
+        lockedMessage.classList.add('hidden'); // ロックメッセージを非表示
+    }
 
     toggle.checked = !!multilingualEnabled;
     toggle.disabled = !multilingualAllowed;
     toggle.setAttribute('aria-disabled', multilingualAllowed ? 'false' : 'true');
 
-    const toggleLabel = toggle.closest('label');
     if (toggleLabel) {
         toggleLabel.classList.toggle('opacity-50', !multilingualAllowed);
         toggleLabel.classList.toggle('cursor-not-allowed', !multilingualAllowed);
     }
 
-    if (lockedMessage) {
-        lockedMessage.classList.toggle('hidden', multilingualAllowed);
-    }
     if (offMessage) {
         offMessage.classList.toggle('hidden', !multilingualAllowed || multilingualEnabled);
     }
@@ -880,6 +932,9 @@ function updateMultilingualToggleUI(multilingualAllowed, multilingualEnabled) {
     if (toggle.dataset.bound !== 'true') {
         toggle.dataset.bound = 'true';
         toggle.addEventListener('change', (event) => {
+            if (event.target.disabled) { // 追加: 無効化されている場合は何もしない
+                return;
+            }
             if (!surveyData.settings) {
                 surveyData.settings = {};
             }
@@ -1348,9 +1403,21 @@ async function initializePage() {
             })
         ]);
 
+        // Listen for account type changes
+        document.addEventListener('accountTypeChanged', () => {
+            console.log("accountTypeChanged event received in surveyCreation.js");
+            updateAndRenderAll();
+        });
+
         initThemeToggle();
         initBreadcrumbs();
         initLanguageSwitcher();
+        
+        // 初回ロード時に明示的にUIを更新
+        // ここで updateAndRenderAll() を呼ぶことで、最新のaccountTypeとplanFeatureStateが反映される
+        console.log("surveyCreation.js: Initial UI render after all data is loaded.");
+        updateAndRenderAll(); // ★ ここで初回呼び出し
+        
         // Initialize date pickers for period/deadline fields
         try {
             initializeDatepickers();
