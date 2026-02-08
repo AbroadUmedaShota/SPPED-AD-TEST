@@ -4,6 +4,7 @@ import { getSurveyPeriodRange, buildDateFilterOptions, applyDateFilterOptions, r
 import { populateTable, renderModalContent, handleModalImageClick } from './ui/speedReviewRenderer.js';
 import { handleOpenModal } from './modalHandler.js';
 import { initBreadcrumbs } from './breadcrumb.js';
+import { COMMON_CHART_DONUT_PALETTE } from './constants/chartPalette.js'; // リモートの変更を取り込む
 
 // --- State ---
 let allCombinedData = [];
@@ -30,27 +31,7 @@ let timeSeriesChart = null; // Dashboard Chart Instance
 let attributeChart = null;  // Dashboard Chart Instance
 const REVIEW_CHART_PRIMARY = '#1a73e8';
 const REVIEW_CHART_FILL = 'rgba(26, 115, 232, 0.1)';
-const REVIEW_CHART_DONUT_PALETTE = [
-    '#005AFF',
-    '#FF4B00',
-    '#03AF7A',
-    '#4C1BB3',
-    '#F6AA00',
-    '#FFF100',
-    '#99FFFF',
-    '#804000'
-];
-const REVIEW_CHART_PATTERN_TYPES = [
-    'diagonal',
-    'dot',
-    'cross',
-    'dash',
-    'grid',
-    'zigzag',
-    'diagonalReverse',
-    'wave'
-];
-const chartPatternCache = new Map();
+const REVIEW_CHART_DONUT_PALETTE = COMMON_CHART_DONUT_PALETTE; // リモートの変更を取り込む
 
 const chartDataLabels = window.ChartDataLabels;
 if (chartDataLabels && window.Chart) {
@@ -87,143 +68,67 @@ function hexToRgba(hex, alpha = 1) {
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-function getOverlayColor(hex) {
-    const normalized = hex.replace('#', '');
-    const bigint = parseInt(normalized.length === 3
-        ? normalized.split('').map(char => char + char).join('')
-        : normalized, 16);
-    const r = (bigint >> 16) & 255;
-    const g = (bigint >> 8) & 255;
-    const b = bigint & 255;
-    const luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
-    return luminance < 0.55 ? 'rgba(255, 255, 255, 0.65)' : 'rgba(0, 0, 0, 0.25)';
-}
-
-function createChartPattern(baseColor, patternType, alpha = 1) {
-    const canvas = document.createElement('canvas');
-    canvas.width = 14;
-    canvas.height = 14;
-    const ctx = canvas.getContext('2d');
-
-    if (!ctx) return baseColor;
-
-    ctx.fillStyle = hexToRgba(baseColor, alpha);
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    ctx.strokeStyle = getOverlayColor(baseColor);
-    ctx.lineWidth = 2;
-    ctx.fillStyle = getOverlayColor(baseColor);
-
-    switch (patternType) {
-        case 'diagonal':
-            ctx.beginPath();
-            ctx.moveTo(0, canvas.height);
-            ctx.lineTo(canvas.width, 0);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(-4, canvas.height);
-            ctx.lineTo(canvas.width, -4);
-            ctx.stroke();
-            break;
-        case 'diagonalReverse':
-            ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.lineTo(canvas.width, canvas.height);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(-4, 4);
-            ctx.lineTo(canvas.width - 4, canvas.height + 4);
-            ctx.stroke();
-            break;
-        case 'dot':
-            ctx.beginPath();
-            ctx.arc(4, 4, 2, 0, Math.PI * 2);
-            ctx.arc(10, 10, 2, 0, Math.PI * 2);
-            ctx.fill();
-            break;
-        case 'cross':
-            ctx.beginPath();
-            ctx.moveTo(7, 2);
-            ctx.lineTo(7, 12);
-            ctx.moveTo(2, 7);
-            ctx.lineTo(12, 7);
-            ctx.stroke();
-            break;
-        case 'dash':
-            ctx.setLineDash([4, 4]);
-            ctx.beginPath();
-            ctx.moveTo(0, 7);
-            ctx.lineTo(canvas.width, 7);
-            ctx.stroke();
-            ctx.setLineDash([]);
-            break;
-        case 'grid':
-            ctx.beginPath();
-            ctx.moveTo(7, 0);
-            ctx.lineTo(7, canvas.height);
-            ctx.moveTo(0, 7);
-            ctx.lineTo(7, canvas.width);
-            ctx.stroke();
-            break;
-        case 'zigzag':
-            ctx.beginPath();
-            ctx.moveTo(0, 10);
-            ctx.lineTo(4, 6);
-            ctx.lineTo(8, 10);
-            ctx.lineTo(12, 6);
-            ctx.stroke();
-            break;
-        case 'wave':
-            ctx.beginPath();
-            ctx.moveTo(0, 8);
-            ctx.quadraticCurveTo(3.5, 4, 7, 8);
-            ctx.quadraticCurveTo(10.5, 12, 14, 8);
-            ctx.stroke();
-            break;
-        default:
-            break;
-    }
-
-    return ctx.createPattern(canvas, 'repeat');
-}
-
-function getPatternFill(index, alpha = 1) {
+// リモートの変更を採用し、getChartColorに統一
+function getChartColor(index, alpha = 1) {
     const paletteIndex = index % REVIEW_CHART_DONUT_PALETTE.length;
-    const typeIndex = index % REVIEW_CHART_PATTERN_TYPES.length;
-    const cacheKey = `${paletteIndex}-${typeIndex}-${alpha}`;
-    if (chartPatternCache.has(cacheKey)) {
-        return chartPatternCache.get(cacheKey);
-    }
-    const pattern = createChartPattern(
-        REVIEW_CHART_DONUT_PALETTE[paletteIndex],
-        REVIEW_CHART_PATTERN_TYPES[typeIndex],
-        alpha
-    );
-    chartPatternCache.set(cacheKey, pattern);
-    return pattern;
+    return hexToRgba(REVIEW_CHART_DONUT_PALETTE[paletteIndex], alpha);
 }
 
 function updateLegendFade(chart, hoveredIndex, mode) {
     if (!chart || !chart.data) return;
+    const focusIndex = chart._legendFocusIndex ?? null;
+    const activeIndex = focusIndex !== null ? focusIndex : hoveredIndex;
 
     if (mode === 'segment') {
         const dataset = chart.data.datasets?.[0];
         if (!dataset) return;
         dataset.backgroundColor = chart.data.labels.map((_, index) => {
-            const alpha = hoveredIndex === null ? 1 : (index === hoveredIndex ? 1 : 0.2);
-            return getPatternFill(index, alpha);
+            const alpha = activeIndex === null ? 1 : (index === activeIndex ? 1 : 0.2);
+            return getChartColor(index, alpha); // getPatternFill から getChartColor に変更
         });
     }
 
     if (mode === 'dataset') {
         chart.data.datasets.forEach((dataset, index) => {
-            const alpha = hoveredIndex === null ? 1 : (index === hoveredIndex ? 1 : 0.2);
-            const patternIndex = dataset._patternIndex ?? index;
-            dataset.backgroundColor = getPatternFill(patternIndex, alpha);
+            const alpha = activeIndex === null ? 1 : (index === activeIndex ? 1 : 0.2);
+            // const patternIndex = dataset._patternIndex ?? index; // 不要な行を削除
+            dataset.backgroundColor = getChartColor(index, alpha); // getPatternFill から getChartColor に変更
         });
     }
 
     chart.update();
+}
+
+function applyLegendFocus(chart, targetIndex, mode) {
+    if (!chart) return;
+    chart._legendFocusIndex = targetIndex;
+    updateLegendFade(chart, null, mode);
+}
+
+function normalizeDataKey(value) {
+    if (value === undefined || value === null) return '';
+    const normalized = String(value).trim().toLowerCase();
+    return encodeURIComponent(normalized);
+}
+
+function clearMatrixTableHighlight() {
+    const container = document.getElementById('graph-data-table-container');
+    if (!container) return;
+    container.querySelectorAll('.graph-data-table__row.is-highlighted')
+        .forEach(row => row.classList.remove('is-highlighted'));
+}
+
+function highlightMatrixTableRow(rowLabel, columnLabel) {
+    const container = document.getElementById('graph-data-table-container');
+    if (!container) return;
+    clearMatrixTableHighlight();
+    const rowKey = normalizeDataKey(rowLabel);
+    const columnKey = normalizeDataKey(columnLabel);
+    const selector = `.graph-data-table__row[data-matrix-row="${rowKey}"][data-matrix-column="${columnKey}"]`;
+    const targetRow = container.querySelector(selector);
+    if (targetRow) {
+        targetRow.classList.add('is-highlighted');
+    }
 }
 
 function truncateQuestion(questionText) {
@@ -903,7 +808,6 @@ function showQuestionSelectModal() {
         if (questions.length === 0 && currentSurvey?.details) {
             currentSurvey.details.forEach(detail => pushQuestion(detail.question || detail.text || detail.id));
         }
-
         container.innerHTML = '';
         if (questions.length === 0) {
             container.innerHTML = '<p class="p-4 text-center text-on-surface-variant">設問情報がありません。</p>';
@@ -1122,33 +1026,42 @@ function populateQuestionSelector(data) {
         });
     }
 
-    if (questions.length === 0 && currentSurvey && Array.isArray(currentSurvey.details)) {
-        currentSurvey.details.forEach(detail => {
-            pushQuestion(detail.question || detail.text || detail.id);
-        });
+    if (questions.length === 0 && currentSurvey?.details) {
+        currentSurvey.details.forEach(detail => pushQuestion(detail.question || detail.text || detail.id));
     }
-
     container.innerHTML = '';
-
     if (questions.length === 0) {
-        const fallbackMessage = document.createElement('p');
-        fallbackMessage.textContent = '設問情報が利用できません。';
-        fallbackMessage.className = 'text-sm text-on-surface-variant px-3 py-2';
-        container.appendChild(fallbackMessage);
+        container.innerHTML = '<p class="p-4 text-center text-on-surface-variant">設問情報がありません。</p>';
         return;
     }
 
     questions.forEach(question => {
         const button = document.createElement('button');
-        button.textContent = truncateQuestion(question);
-        button.title = question;
-        button.className = 'w-full text-left px-3 py-2 text-sm rounded-md transition-colors';
-        if (question === currentIndustryQuestion) {
-            button.classList.add('active');
-        } else {
-            button.classList.add('text-on-surface-variant', 'hover:bg-surface-variant');
-        }
-        button.addEventListener('click', () => handleQuestionSelectClick(question));
+        const isActive = question === currentIndustryQuestion;
+        
+        // 設問タイプを確認してグラフ化可能か判定
+        const questionDef = currentSurvey?.details?.find(d => (d.question || d.text) === question);
+        const isGraphable = questionDef && (questionDef.type === 'single_choice' || questionDef.type === 'multi_choice');
+
+        button.className = `w-full text-left px-4 py-3 rounded-xl transition-all flex items-center justify-between group ${isActive ? 'bg-primary/10 text-primary font-bold' : 'hover:bg-surface-variant text-on-surface'
+            }`;
+
+        button.innerHTML = `
+            <div class="flex items-center gap-3 truncate">
+                <span class="material-icons text-sm ${isGraphable ? 'text-primary' : 'text-on-surface-variant/60'}">
+                    ${isGraphable ? 'analytics' : 'subject'}
+                </span>
+                <span class="truncate pr-4">${question}</span>
+            </div>
+            ${isActive ? '<span class="material-icons text-sm">check_circle</span>' : '<span class="material-icons text-sm opacity-0 group-hover:opacity-40 transition-opacity">chevron_right</span>'}
+        `;
+
+        button.onclick = () => {
+            handleQuestionSelectClick(question);
+            // Close modal
+            const overlay = document.getElementById('questionSelectModalOverlay');
+            if (overlay) overlay.click(); // Standard way to close in this project
+        };
         container.appendChild(button);
     });
 }
@@ -1200,7 +1113,7 @@ function setupEventListeners() {
                             ) {
                                 daySelect.value = 'all';
                             } else if (selectedStart === selectedEnd && daySelect.querySelector(`option[value="${selectedStart}"]`)) {
-                                daySelect.value = selectedStart;
+                                daySelect.value = 'custom';
                             } else {
                                 daySelect.value = 'custom';
                             }
@@ -1288,6 +1201,13 @@ function setupEventListeners() {
     const questionCard = document.getElementById('kpi-current-question-card');
     if (questionCard) {
         questionCard.addEventListener('click', showQuestionSelectModal);
+    }
+    const questionChangeLink = document.getElementById('question-change-link');
+    if (questionChangeLink) {
+        questionChangeLink.addEventListener('click', (event) => {
+            event.stopPropagation();
+            showQuestionSelectModal();
+        });
     }
 
     const graphBtn = document.getElementById('graphButton');
@@ -1496,6 +1416,7 @@ function processDataForTable(survey, answers) {
 function renderGraphDataTable(processedData) {
     const container = document.getElementById('graph-data-table-container');
     if (!container) return;
+    clearMatrixTableHighlight();
 
     if (!processedData || processedData.length === 0) {
         container.innerHTML = `
@@ -1521,12 +1442,16 @@ function renderGraphDataTable(processedData) {
             `;
         }
 
-        const renderTableBlock = (labels, data, totalVotes, includeTotalRow, totalAnswers) => {
+        const renderTableBlock = (labels, data, totalVotes, includeTotalRow, totalAnswers, rowKey = null) => {
             const tableRows = labels.map((label, index) => {
                 const count = data[index] ?? 0;
                 const percentage = totalVotes > 0 ? ((count / totalVotes) * 100).toFixed(1) : '0.0';
+                const columnKey = normalizeDataKey(label);
+                const dataAttrs = rowKey
+                    ? ` data-matrix-row="${rowKey}" data-matrix-column="${columnKey}"`
+                    : '';
                 return `
-                    <tr class="border-b border-outline-variant/30 last:border-b-0">
+                    <tr class="border-b border-outline-variant/30 last:border-b-0 graph-data-table__row"${dataAttrs}>
                         <td class="px-3 py-2 text-sm text-on-surface graph-data-table__label" title="${escapeHtml(label)}">${escapeHtml(label)}</td>
                         <td class="px-3 py-2 text-sm text-on-surface text-right">${count}</td>
                         <td class="px-3 py-2 text-sm text-on-surface-variant text-right">${percentage}%</td>
@@ -1576,10 +1501,11 @@ function renderGraphDataTable(processedData) {
                 const data = labels.map(label => rowCounts[label] || 0);
                 const totalVotes = totals[rowIndex] || 0;
                 const totalAnswers = answered[rowIndex] || 0;
+                const rowKey = normalizeDataKey(row.text);
                 return `
-                    <div class="space-y-2">
+                    <div class="space-y-2" data-matrix-row="${rowKey}">
                         <div class="text-xs font-semibold text-on-surface-variant">${escapeHtml(row.text)}</div>
-                        ${renderTableBlock(labels, data, totalVotes, questionData.includeTotalRow, totalAnswers)}
+                        ${renderTableBlock(labels, data, totalVotes, questionData.includeTotalRow, totalAnswers, rowKey)}
                     </div>
                 `;
             }).join('');
@@ -1754,11 +1680,22 @@ function renderAttributeChart(data) {
                 empty.innerHTML = `
                     <span class="material-icons text-5xl text-on-surface-variant/20">${icon}</span>
                     <p class="text-sm text-on-surface-variant"></p>
+                    <button type="button" class="mt-2 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-xs font-semibold text-primary hover:bg-primary/10">
+                        <span class="material-icons text-sm">tune</span>
+                        設問を選択する
+                    </button>
                 `;
                 container.appendChild(empty);
             }
             const messageEl = empty.querySelector('p');
             if (messageEl) messageEl.textContent = message;
+            const actionBtn = empty.querySelector('button');
+            if (actionBtn && !actionBtn.hasAttribute('data-bound')) {
+                actionBtn.setAttribute('data-bound', 'true');
+                actionBtn.addEventListener('click', () => {
+                    showQuestionSelectModal();
+                });
+            }
         }
         ctx.classList.add('hidden');
     };
@@ -1814,10 +1751,9 @@ function renderAttributeChart(data) {
         const chartDatasets = datasets.map((dataset, index) => ({
             label: dataset.label,
             data: dataset.data,
-            backgroundColor: getPatternFill(index),
+            backgroundColor: getChartColor(index),
             borderColor: '#ffffff',
             borderWidth: 2,
-            _patternIndex: index,
             _rawCounts: dataset._rawCounts,
             _rowTotals: dataset._rowTotals
         }));
@@ -1848,6 +1784,11 @@ function renderAttributeChart(data) {
                     legend: {
                         position: 'top',
                         labels: { boxWidth: 12, font: { size: 11 }, usePointStyle: true },
+                        onClick: (event, legendItem, legend) => {
+                            const chart = legend.chart;
+                            const nextIndex = chart._legendFocusIndex === legendItem.datasetIndex ? null : legendItem.datasetIndex;
+                            applyLegendFocus(chart, nextIndex, 'dataset');
+                        },
                         onHover: (event, legendItem, legend) => {
                             updateLegendFade(legend.chart, legendItem.datasetIndex, 'dataset');
                         },
@@ -1878,6 +1819,16 @@ function renderAttributeChart(data) {
                                 return `${rowLabel} > ${optionLabel}: ${count}件 (${percent}%)`;
                             }
                         }
+                    }
+                },
+                onHover: (event, elements, chart) => {
+                    if (elements && elements.length > 0) {
+                        const { datasetIndex, index } = elements[0];
+                        const rowLabel = chart.data.labels?.[index];
+                        const columnLabel = chart.data.datasets?.[datasetIndex]?.label;
+                        highlightMatrixTableRow(rowLabel, columnLabel);
+                    } else {
+                        clearMatrixTableHighlight();
                     }
                 }
             }
@@ -1921,7 +1872,7 @@ function renderAttributeChart(data) {
             labels: labels,
             datasets: [{
                 data: values,
-                backgroundColor: labels.map((label, index) => getPatternFill(index)),
+                backgroundColor: labels.map((label, index) => getChartColor(index)),
                 borderColor: '#ffffff',
                 borderWidth: 2
             }]
@@ -1934,6 +1885,11 @@ function renderAttributeChart(data) {
                 legend: {
                     position: 'right',
                     labels: { boxWidth: 12, font: { size: 11 }, usePointStyle: true },
+                    onClick: (event, legendItem, legend) => {
+                        const chart = legend.chart;
+                        const nextIndex = chart._legendFocusIndex === legendItem.index ? null : legendItem.index;
+                        applyLegendFocus(chart, nextIndex, 'segment');
+                    },
                     onHover: (event, legendItem, legend) => {
                         updateLegendFade(legend.chart, legendItem.index, 'segment');
                     },
@@ -1965,8 +1921,7 @@ function setupSidebarToggle() {
 
     if (!sidebar || !toggleBtn || !icon || !mainContentWrapper || !overlay) return;
 
-    // 初期状態は開いている
-    let isSidebarOpen = true; // サイドバーの現在の状態を管理
+    let isSidebarOpen = true; // 初期状態は開いている
     let autoCloseTimer;
     const AUTO_CLOSE_DELAY = 2500; // 2.5秒後に自動的に閉じる (調整可能)
 
