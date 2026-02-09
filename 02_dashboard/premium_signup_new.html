@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>プレミアムプラン申し込み - Speed Ad</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="premium_signup_new.css">
+</head>
+<body class="bg-gray-100">
+
+    <header class="gradient-primary-bg text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Speed Ad</h1>
+            <nav>
+                <a href="#" class="text-on-primary hover:text-gray-200">ダッシュボードに戻る</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+        
+        <!-- Screen: Description -->
+        <div id="screen-description" class="screen-container text-center">
+            <div class="bg-white p-8 rounded-lg shadow-xl max-w-4xl mx-auto">
+                <h2 class="text-3xl font-extrabold text-gray-900 mb-4">Speed Ad プレミアムプラン</h2>
+                <p class="text-lg text-gray-600 mb-8">ビジネスを加速させるための最上位機能。今すぐアップグレードして、競合に差をつけましょう。</p>
+                
+                <!-- Premium Plan Card -->
+                <div class="border-4 border-primary rounded-2xl p-8 bg-white shadow-2xl relative overflow-hidden">
+                    <span class="absolute top-0 right-0 bg-primary text-white text-xs font-bold px-4 py-1 rounded-bl-lg">おすすめ</span>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">Premium プラン</h3>
+                    <p class="text-5xl font-extrabold text-gray-900 mb-4">¥10,000<span class="text-lg font-medium text-gray-500">/月</span></p>
+                    
+                    <ul class="text-left space-y-4 text-gray-700 mb-8">
+                        <li class="flex items-start"><span class="material-icons text-primary mt-1 mr-2">cloud_download</span> 全データダウンロード（画像・名刺情報含む）</li>
+                        <li class="flex items-start"><span class="material-icons text-primary mt-1 mr-2">assessment</span> Excel形式でのレポート一括出力</li>
+                        <li class="flex items-start"><span class="material-icons text-primary mt-1 mr-2">domain</span> ロゴ非表示機能</li>
+                        <li class="flex items-start"><span class="material-icons text-primary mt-1 mr-2">all_inclusive</span> 独自ドメインでのメール送信</li>
+                        <li class="flex items-start"><span class="material-icons text-primary mt-1 mr-2">edit_note</span> アンケート設問の自由記述（最大5問）</li>
+                        <li class="flex items-start"><span class="material-icons text-primary mt-1 mr-2">contact_mail</span> 回答者への御礼メール自動送信</li>
+                        <li class="flex items-start"><span class="material-icons text-primary mt-1 mr-2">visibility_off</span> 回答完了後の自社PR画面非表示</li>
+                        <li class="flex items-start"><span class="material-icons text-primary mt-1 mr-2">hub</span> 回答後の外部サンクスページへのリダイレクト</li>
+                    </ul>
+
+                    <button id="btn-goto-input-premium" class="w-full py-3 px-6 bg-primary text-white font-semibold rounded-lg shadow-md hover:bg-primary-dark transition duration-300 transform hover:scale-105" style="background-color: #4F46E5;">プレミアムプランを申し込む</button>
+                </div>
+
+                <!-- Feature Details -->
+                <div class="mt-12 text-center">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-8">主な機能で実現できること</h3>
+                    <div class="flex flex-col space-y-8 text-left max-w-3xl mx-auto">
+                        <div class="bg-gray-50 p-6 rounded-lg shadow-sm">
+                            <h3 class="font-semibold text-xl text-gray-800 mb-3 flex items-center"><span class="material-icons text-primary mr-2">analytics</span> 高度なデータ活用と分析</h3>
+                            <p class="text-gray-600">回答者の画像データや名刺情報を結合した全データのダウンロード、Excel形式でのレポート一括出力により、深い洞察と迅速な意思決定を支援します。</p>
+                        </div>
+                        <div class="bg-gray-50 p-6 rounded-lg shadow-sm">
+                            <h3 class="font-semibold text-xl text-gray-800 mb-3 flex items-center"><span class="material-icons text-primary mr-2">branding_watermark</span> 強固なブランディングとカスタマイズ</h3>
+                            <p class="text-gray-600">アンケートに貴社のロゴを非表示にしたり、御礼メールを自社ドメインから送信したりすることで、一貫したブランドイメージを構築できます。</p>
+                        </div>
+                    </div>
+                    <div class="mt-8">
+                        <button id="btn-goto-input-premium-faq" class="w-full py-3 px-6 bg-primary text-white font-semibold rounded-lg shadow-md hover:bg-primary-dark transition duration-300 mb-8" style="background-color: #4F46E5;">プレミアムプランを申し込む</button>
+                        <h3 class="text-xl font-bold text-primary mb-4">よくあるご質問</h3>
+                        <div class="max-w-3xl mx-auto text-left space-y-2">
+                            <details class="bg-white p-4 rounded-lg shadow-sm cursor-pointer">
+                                <summary class="font-semibold text-gray-800 flex justify-between items-center">
+                                    <span>支払い方法は何がありますか？</span>
+                                    <span class="material-icons accordion-icon">expand_more</span>
+                                </summary>
+                                <p class="text-gray-600 mt-2">請求書払いに対応しております。お申し込み後に請求書を発行いたしますので、期日までにお支払いください。</p>
+                            </details>
+                            <details class="bg-white p-4 rounded-lg shadow-sm cursor-pointer">
+                                <summary class="font-semibold text-gray-800 flex justify-between items-center">
+                                    <span>最低契約期間はありますか？</span>
+                                    <span class="material-icons accordion-icon">expand_more</span>
+                                </summary>
+                                <p class="text-gray-600 mt-2">最低契約期間は1ヶ月です。いつでも解約可能ですが、月の途中で解約された場合でも1ヶ月分の料金が発生します。</p>
+                            </details>
+                             <details class="bg-white p-4 rounded-lg shadow-sm cursor-pointer">
+                                <summary class="font-semibold text-gray-800 flex justify-between items-center">
+                                    <span>無料プランとの違いは何ですか？</span>
+                                    <span class="material-icons accordion-icon">expand_more</span>
+                                </summary>
+                                <p class="text-gray-600 mt-2">プレミアムプランでは、ロゴの非表示、独自ドメインでのメール送信、全データダウンロードなど、より高度な機能をご利用いただけます。</p>
+                            </details>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Screen: Input -->
+        <div id="screen-input" class="screen-container hidden">
+            <div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-xl">
+                
+                <div class="step-indicator">
+                    <div class="step-item active" data-step="input">
+                        <div class="step-number">1</div>
+                        <div class="step-label">情報入力</div>
+                    </div>
+                    <div class="step-item" data-step="confirm">
+                        <div class="step-number">2</div>
+                        <div class="step-label">確認</div>
+                    </div>
+                    <div class="step-item" data-step="complete">
+                        <div class="step-number">3</div>
+                        <div class="step-label">完了</div>
+                    </div>
+                </div>
+
+                <h2 class="text-2xl font-bold text-center text-gray-800 mb-8">請求先情報の入力</h2>
+                <form id="billing-form" class="space-y-6">
+                    <div>
+                        <label for="company-name" class="block text-sm font-medium text-gray-700">会社名</label>
+                        <input type="text" name="company-name" id="company-name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="full-name" class="block text-sm font-medium text-gray-700">氏名(姓名)</label>
+                        <input type="text" name="full-name" id="full-name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                    </div>
+                     <div>
+                        <label for="tel-number" class="block text-sm font-medium text-gray-700">電話番号</label>
+                        <input type="tel" name="tel-number" id="tel-number" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm" placeholder="例: 09012345678">
+                    </div>
+                    <div>
+                        <label for="postal-code" class="block text-sm font-medium text-gray-700">郵便番号</label>
+                        <div class="flex items-center space-x-2 mt-1">
+                            <input type="text" name="postal-code" id="postal-code" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm" placeholder="例: 1000001">
+                            <button type="button" id="btn-auto-address" class="px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-gray-50 hover:bg-gray-100 transition">住所自動入力</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="address" class="block text-sm font-medium text-gray-700">住所</label>
+                        <input type="text" name="address" id="address" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                    </div>
+                     <div>
+                        <label for="building-name" class="block text-sm font-medium text-gray-700">建物名 (任意)</label>
+                        <input type="text" name="building-name" id="building-name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="department-name" class="block text-sm font-medium text-gray-700">部署名 (任意)</label>
+                            <input type="text" name="department-name" id="department-name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="position-name" class="block text-sm font-medium text-gray-700">役職名 (任意)</label>
+                            <input type="text" name="position-name" id="position-name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                        </div>
+                    </div>
+                    <div class="pt-4">
+                        <button id="btn-goto-confirm" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary" style="background-color: #4F46E5;">入力内容の確認へ</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Screen: Confirm -->
+        <div id="screen-confirm" class="screen-container hidden">
+            <div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-xl">
+                 <div class="step-indicator">
+                    <div class="step-item active" data-step="input">
+                        <div class="step-number">1</div>
+                        <div class="step-label">情報入力</div>
+                    </div>
+                    <div class="step-item active" data-step="confirm">
+                        <div class="step-number">2</div>
+                        <div class="step-label">確認</div>
+                    </div>
+                    <div class="step-item" data-step="complete">
+                        <div class="step-number">3</div>
+                        <div class="step-label">完了</div>
+                    </div>
+                </div>
+
+                <h2 class="text-2xl font-bold text-center text-gray-800 mb-8">入力内容の確認</h2>
+                <div id="confirm-details" class="space-y-3 bg-gray-50 p-6 rounded-md">
+                    <!-- Confirmation details will be populated here by JS -->
+                </div>
+                 <div class="mt-6 flex justify-between space-x-4">
+                    <button id="btn-edit-input" class="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">修正する</button>
+                    <button id="btn-complete-registration" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary" style="background-color: #4F46E5;">この内容で申し込む</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Screen: Complete -->
+        <div id="screen-complete" class="screen-container hidden">
+            <div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-xl text-center">
+                 <div class="step-indicator">
+                    <div class="step-item active" data-step="input">
+                        <div class="step-number">1</div>
+                        <div class="step-label">情報入力</div>
+                    </div>
+                    <div class="step-item active" data-step="confirm">
+                        <div class="step-number">2</div>
+                        <div class="step-label">確認</div>
+                    </div>
+                    <div class="step-item active" data-step="complete">
+                        <div class="step-number">3</div>
+                        <div class="step-label">完了</div>
+                    </div>
+                </div>
+
+                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-5">
+                    <span class="material-icons text-4xl text-green-600">check_circle</span>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">お申し込みありがとうございます</h2>
+                <p class="text-gray-600 mb-6">プレミアムプランへのお申し込みを受け付けました。<br>ご登録いただいたメールアドレスに確認のメールを送信しましたので、ご確認ください。</p>
+                <div class="mt-8">
+                     <button id="btn-goto-dashboard" class="py-2 px-6 bg-primary text-white font-semibold rounded-lg shadow-md hover:bg-primary-dark transition duration-300" style="background-color: #4F46E5;">ダッシュボードへ戻る</button>
+                </div>
+            </div>
+        </div>
+        
+    </main>
+    
+    <script src="premium_signup_new.js"></script>
+</body>
+</html>

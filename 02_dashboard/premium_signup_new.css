@@ -1,0 +1,200 @@
+/* --- Confirm Screen Styles --- */
+.confirm-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e0e0e0; /* light gray */
+    padding-bottom: 0.5rem;
+    padding-top: 0.5rem;
+}
+.confirm-item:last-child {
+    border-bottom: none;
+}
+
+/* --- Step Indicator Styles --- */
+.step-indicator {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    position: relative;
+    padding: 0 1rem;
+}
+
+.step-indicator::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 40px;
+    right: 40px;
+    height: 2px;
+    background-color: #e0e0e0;
+    z-index: 5;
+}
+
+.step-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    flex: 1;
+    position: relative;
+    z-index: 10;
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #e0e0e0;
+    color: #757575;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease-in-out;
+}
+
+.step-label {
+    font-size: 0.875rem; /* text-sm */
+    color: #757575;
+    transition: all 0.3s ease-in-out;
+    white-space: nowrap; /* Prevent label from wrapping */
+}
+
+.step-item.active .step-number {
+    background-color: #4F46E5; /* primary-500 */
+    color: white;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.4);
+}
+
+.step-item.active .step-label {
+    color: #4F46E5; /* primary-500 */
+    font-weight: bold;
+}
+
+/* Custom CSS for Premium Signup Page */
+
+/* Base styles for the entire page (Tailwind CSS provides most of this) */
+body {
+    font-family: 'Noto Sans JP', sans-serif; /* Example font */
+}
+
+/* --- Screen Container Styles --- */
+.screen-container {
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out; /* For fade animations */
+}
+
+.screen-container.hidden {
+    display: none;
+    opacity: 0;
+}
+
+/* --- Modal Styles --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Ensure modal is on top */
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.modal-overlay.show {
+    opacity: 1;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 90%;
+    width: 400px; /* Example fixed width */
+    transform: translateY(-20px); /* Initial state for animation */
+    transition: transform 0.3s ease-in-out;
+}
+
+.modal-overlay.show .modal-content {
+    transform: translateY(0); /* Final state for animation */
+}
+
+/* --- Button Styles (Tailwind provides most, custom for brand colors if needed) --- */
+.bg-primary {
+    background-color: #4F46E5; 
+}
+.hover\:bg-primary-dark:hover {
+    background-color: #4338CA; 
+}
+
+/* --- Form Element Styles (Tailwind provides most, custom for focus/error if needed) --- */
+.focus\:ring-primary:focus {
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.4); 
+    border-color: #4F46E5;
+}
+
+/* Custom error message style (Tailwind red-500 is often used) */
+.error-message { /* Changed from .text-red-500 to .error-message for more specific styling */
+    color: #EF4444;
+}
+
+/* --- Animations (for screen transitions) --- */
+/* These will be controlled by JavaScript adding/removing classes */
+.fade-out {
+    opacity: 0;
+}
+
+.fade-in {
+    opacity: 1;
+}
+
+/* --- Header/Footer Custom Colors --- */
+.gradient-primary-bg {
+    /* Example gradient, adjust as per design */
+    background: linear-gradient(to right, #4F46E5, #6366F1); /* From primary to indigo */
+}
+
+.bg-surface-variant {
+    /* Example color, adjust as per design */
+    background-color: #F3F4F6; /* Light gray */
+}
+
+/* --- Text Colors --- */
+/* Assuming 'primary' is a blueish tone and 'on-primary' is text color on primary background */
+.text-on-primary {
+    color: white; /* Text on primary background should be white */
+}
+
+.text-primary {
+    color: #4F46E5; /* Primary text color (blue) */
+}
+
+/* --- Highlight for Auto-Address Button --- */
+#btn-auto-address.highlight {
+    background-color: #4F46E5; /* primary color */
+    color: white;
+    transform: scale(1.05);
+    transition: all 0.3s ease-in-out;
+}
+
+/* --- Accordion Styles --- */
+details > summary {
+    list-style: none; /* Remove default marker */
+}
+details > summary::-webkit-details-marker {
+    display: none; /* Remove default marker for Chrome/Safari */
+}
+details summary .accordion-icon {
+    transition: transform 0.3s ease-in-out;
+}
+details[open] summary .accordion-icon {
+    transform: rotate(180deg);
+}
