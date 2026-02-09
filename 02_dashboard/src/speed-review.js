@@ -21,7 +21,10 @@ let currentItemInModal = null;
 let isModalInEditMode = false;
 let currentSurvey = null;
 let availableDateRange = null;
+let currentSurveyId = '';
+let restoredUiState = null;
 const imageUrlResolutionCache = new Map();
+const STORAGE_NAMESPACE = 'speedReview';
 
 let currentSortKey = 'answeredAt';
 let currentSortOrder = 'desc';
@@ -64,6 +67,57 @@ const DEFAULT_CARD_IMAGE_VIEW_STATE = {
 // プレミアム機能案内モーダルを開く関数
 function openPremiumFeatureModal() {
     handleOpenModal('premiumFeatureModalOverlay', resolveDashboardAssetPath('modals/premiumFeatureModal.html'));
+}
+
+function getScopedStorageKey(suffix) {
+    const scope = currentSurveyId || currentSurvey?.id || 'unknown';
+    return `${STORAGE_NAMESPACE}:${scope}:${suffix}`;
+}
+
+function loadJsonFromStorage(key) {
+    try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return null;
+        return JSON.parse(raw);
+    } catch (error) {
+        return null;
+    }
+}
+
+function saveJsonToStorage(key, value) {
+    try {
+        localStorage.setItem(key, JSON.stringify(value));
+    } catch (error) {
+        // noop
+    }
+}
+
+function saveUiState() {
+    const payload = {
+        currentPage,
+        rowsPerPage,
+        currentSortKey,
+        currentSortOrder,
+        currentStatusFilter,
+        currentIndustryQuestion,
+        currentDateFilter: Array.isArray(currentDateFilter)
+            ? currentDateFilter.map(value => value instanceof Date ? value.toISOString() : null)
+            : null
+    };
+    saveJsonToStorage(getScopedStorageKey('uiState'), payload);
+}
+
+function loadUiState() {
+    return loadJsonFromStorage(getScopedStorageKey('uiState'));
+}
+
+function parseStoredDateFilter(value) {
+    if (!Array.isArray(value)) return null;
+    const parsed = value
+        .map(v => v ? new Date(v) : null)
+        .filter(v => v instanceof Date && !isNaN(v.getTime()));
+    if (parsed.length === 0) return null;
+    return parsed.slice(0, 2);
 }
 
 // --- Functions ---
@@ -1152,6 +1206,7 @@ function applyFilters() {
     sortData(filteredData);
     displayPage(1, filteredData);
     renderDashboard(filteredData);
+    saveUiState();
 }
 
 function displayPage(page, data = allCombinedData) {
@@ -1183,6 +1238,7 @@ function displayPage(page, data = allCombinedData) {
     const startItem = totalItems === 0 ? 0 : startIndex + 1;
     const endItem = Math.min(endIndex, totalItems);
     pageInfo.textContent = `${startItem} - ${endItem} / 全 ${totalItems}件`;
+    saveUiState();
 }
 
 function renderTableSkeleton() {
@@ -1421,7 +1477,8 @@ function setupEventListeners() {
         });
     }
 
-    const initialRange = resolveDateRangeFromValue('all', availableDateRange);
+    const storedRange = parseStoredDateFilter(restoredUiState?.currentDateFilter);
+    const initialRange = storedRange || resolveDateRangeFromValue('all', availableDateRange);
     if (daySelect && daySelect.querySelector('option[value="all"]')) {
         daySelect.value = 'all';
     }
@@ -1430,6 +1487,18 @@ function setupEventListeners() {
         if (startDatePicker && endDatePicker) {
             startDatePicker.setDate(initialRange[0], false);
             endDatePicker.setDate(initialRange[1], false);
+        }
+        if (storedRange && daySelect) {
+            const isAllRange = availableDateRange
+                && formatDateYmd(initialRange[0]) === formatDateYmd(availableDateRange.start)
+                && formatDateYmd(initialRange[1]) === formatDateYmd(availableDateRange.end);
+            if (isAllRange && daySelect.querySelector('option[value="all"]')) {
+                daySelect.value = 'all';
+                if (detailedContent) detailedContent.classList.add('hidden');
+            } else {
+                daySelect.value = 'custom';
+                if (detailedContent) detailedContent.classList.remove('hidden');
+            }
         }
     }
 
@@ -2291,6 +2360,8 @@ export async function initializePage() {
         if (!surveyId) {
             throw new Error("アンケートIDが指定されていません。");
         }
+        currentSurveyId = surveyId;
+        restoredUiState = loadUiState();
 
         // 特定のアンケートIDに対してisFreeAccountUserをtrueに設定するロジック
         const targetSurveyIds = [
@@ -2364,6 +2435,20 @@ export async function initializePage() {
             }))
             : [];
         currentSurvey.details = normalizedDetails;
+        const allowedRows = new Set([25, 50, 100, 200]);
+        const allowedSortKeys = new Set(['answerId', 'answeredAt', 'fullName', 'companyName', 'dynamicQuestion']);
+        if (restoredUiState && allowedRows.has(Number(restoredUiState.rowsPerPage))) {
+            rowsPerPage = Number(restoredUiState.rowsPerPage);
+        }
+        if (restoredUiState && allowedSortKeys.has(restoredUiState.currentSortKey)) {
+            currentSortKey = restoredUiState.currentSortKey;
+        }
+        if (restoredUiState && (restoredUiState.currentSortOrder === 'asc' || restoredUiState.currentSortOrder === 'desc')) {
+            currentSortOrder = restoredUiState.currentSortOrder;
+        }
+        if (restoredUiState && ['all', 'completed', 'processing'].includes(restoredUiState.currentStatusFilter)) {
+            currentStatusFilter = restoredUiState.currentStatusFilter;
+        }
 
         // 3. Create a map for quick lookup of personal info
         const personalInfoArr = (Array.isArray(personalInfoData) && personalInfoData.length > 0) ? personalInfoData : personalInfo;
@@ -2409,6 +2494,14 @@ export async function initializePage() {
         } else {
             currentIndustryQuestion = '設問情報なし'; // 設問がない場合のデフォルト
         }
+        if (restoredUiState?.currentIndustryQuestion) {
+            const hasQuestion = currentSurvey.details?.some(detail =>
+                (detail.question || detail.text) === restoredUiState.currentIndustryQuestion
+            );
+            if (hasQuestion) {
+                currentIndustryQuestion = restoredUiState.currentIndustryQuestion;
+            }
+        }
 
         const dynamicHeader = document.getElementById('dynamic-question-header');
         if (dynamicHeader) {
@@ -2417,11 +2510,10 @@ export async function initializePage() {
 
         setupTableEventListeners();
         populateQuestionSelector(allCombinedData);
-        displayPage(1, allCombinedData);
-        renderDashboard(allCombinedData);
         setupEventListeners();
         setupSidebarToggle();
         updateSortIcons();
+        applyFilters();
 
     } catch (error) {
         console.error('SPEEDレビューページの初期化に失敗しました:', error);

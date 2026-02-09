@@ -135,6 +135,16 @@ function renderMediaAnswerHtml(answerValue) {
     `;
 }
 
+function resolveImageStatus(cardStatus, src) {
+    if (cardStatus === 'processing') {
+        return { label: 'Processing', className: 'bg-amber-50 text-amber-700 border-amber-200' };
+    }
+    if (src && String(src).trim() !== '') {
+        return { label: 'Ready', className: 'bg-emerald-50 text-emerald-700 border-emerald-200' };
+    }
+    return { label: 'Missing', className: 'bg-slate-100 text-slate-600 border-slate-200' };
+}
+
 /**
  * 回答データをテーブルに描画します。
  * @param {Array} data - 描画する回答データの配列。
@@ -417,6 +427,8 @@ export function renderModalContent(item, isEditMode = false) {
     const backImageUrl = item.businessCard?.imageUrl?.back || BACK_PLACEHOLDER_SRC;
     const frontViewState = getImageViewState(item, 'front');
     const backViewState = getImageViewState(item, 'back');
+    const frontStatus = resolveImageStatus(cardStatus, item.businessCard?.imageUrl?.front);
+    const backStatus = resolveImageStatus(cardStatus, item.businessCard?.imageUrl?.back);
 
     cardHtml += `
         <div class="flex gap-4 mb-6 select-none">
@@ -454,6 +466,15 @@ export function renderModalContent(item, isEditMode = false) {
                     <div class="hidden absolute inset-0 flex items-center justify-center text-on-surface-variant text-sm">画像なし</div>
                 </div>
             </div>
+        </div>
+        <div class="flex items-center gap-2 mb-4">
+            <span class="text-xs font-semibold text-on-surface-variant">画像状態:</span>
+            <span class="inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold ${frontStatus.className}">
+                表面 ${frontStatus.label}
+            </span>
+            <span class="inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold ${backStatus.className}">
+                裏面 ${backStatus.label}
+            </span>
         </div>
     `;
 
