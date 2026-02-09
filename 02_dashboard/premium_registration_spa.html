@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="ja" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>プレミアムプラン登録 - Speed Ad</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Inter:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Global CSS -->
+    <link href="service-top-style.css" rel="stylesheet">
+    <style>
+        :root {
+            --color-primary: #1e3a8a;
+            --color-accent: #d97706;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+        }
+
+        /* Step Progress */
+        .step-connector {
+            flex-grow: 1;
+            height: 2px;
+            background-color: #e5e7eb;
+            margin: 0 1rem;
+        }
+
+        .step-connector.active {
+            background-color: #1e3a8a;
+        }
+
+        .step-circle {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            background-color: #f3f4f6;
+            color: #6b7280;
+            border: 2px solid #e5e7eb;
+            z-index: 10;
+        }
+
+        .step-circle.active {
+            background-color: #1e3a8a;
+            color: white;
+            border-color: #1e3a8a;
+        }
+
+        .step-circle.completed {
+            background-color: #1e3a8a;
+            color: white;
+            border-color: #1e3a8a;
+        }
+
+        .input-error {
+            border-color: #ef4444 !important;
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="relative flex min-h-screen flex-col overflow-x-hidden">
+        <!-- Header (Dynamic) -->
+        <div id="header-placeholder"></div>
+
+        <div class="flex flex-1 pt-16 bg-background justify-center">
+            <main class="flex-1 max-w-3xl w-full px-4 py-8 md:py-12">
+
+                <!-- Page Title -->
+                <h1 class="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-8">
+                    プレミアムプラン登録設定
+                </h1>
+
+                <!-- Progress Steps -->
+                <div class="flex items-center justify-between mb-12 max-w-xl mx-auto">
+                    <!-- Step 1 -->
+                    <div class="flex flex-col items-center relative">
+                        <div class="step-circle active" id="step-circle-1">1</div>
+                        <span class="text-xs md:text-sm font-semibold mt-2 text-blue-900">入力</span>
+                    </div>
+                    <div class="step-connector" id="connector-1"></div>
+                    <!-- Step 2 -->
+                    <div class="flex flex-col items-center relative">
+                        <div class="step-circle" id="step-circle-2">2</div>
+                        <span class="text-xs md:text-sm font-semibold mt-2 text-gray-500">確認</span>
+                    </div>
+                    <div class="step-connector" id="connector-2"></div>
+                    <!-- Step 3 -->
+                    <div class="flex flex-col items-center relative">
+                        <div class="step-circle" id="step-circle-3">3</div>
+                        <span class="text-xs md:text-sm font-semibold mt-2 text-gray-500">完了</span>
+                    </div>
+                </div>
+
+                <!-- Step 1: Input Form -->
+                <section id="step-input" class="bg-white p-6 md:p-10 rounded-xl shadow-lg animate-fade-in">
+                    <h2 class="text-xl font-bold text-gray-800 mb-6 border-b pb-4">請求情報の入力</h2>
+                    <form id="billing-form" novalidate>
+                        <!-- 氏名 -->
+                        <div class="mb-6">
+                            <label for="name" class="block text-sm font-bold text-gray-700 mb-2">
+                                氏名 <span class="bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded ml-2">必須</span>
+                            </label>
+                            <input type="text" id="name" name="name"
+                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-100 outline-none transition"
+                                placeholder="例：山田 太郎">
+                            <p class="error-message" id="error-name">氏名を入力してください。</p>
+                        </div>
+
+                        <!-- 会社名・部署名 -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label for="company" class="block text-sm font-bold text-gray-700 mb-2">
+                                    会社名 <span class="bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded ml-2">必須</span>
+                                </label>
+                                <input type="text" id="company" name="company"
+                                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-100 outline-none transition"
+                                    placeholder="例：株式会社SpeedAd">
+                                <p class="error-message" id="error-company">会社名を入力してください。</p>
+                            </div>
+                            <div>
+                                <label for="department" class="block text-sm font-bold text-gray-700 mb-2">
+                                    部署名
+                                </label>
+                                <input type="text" id="department" name="department"
+                                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-100 outline-none transition"
+                                    placeholder="例：営業部">
+                            </div>
+                        </div>
+
+                        <!-- 役職 -->
+                        <div class="mb-6">
+                            <label for="title" class="block text-sm font-bold text-gray-700 mb-2">
+                                役職名
+                            </label>
+                            <input type="text" id="title" name="title"
+                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-100 outline-none transition"
+                                placeholder="例：部長">
+                        </div>
+
+                        <!-- 電話番号 -->
+                        <div class="mb-6">
+                            <label for="phone" class="block text-sm font-bold text-gray-700 mb-2">
+                                電話番号 <span class="bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded ml-2">必須</span>
+                            </label>
+                            <input type="tel" id="phone" name="phone"
+                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-100 outline-none transition"
+                                placeholder="例：0312345678（ハイフンなし）">
+                            <p class="error-message" id="error-phone">電話番号を正しく入力してください。</p>
+                        </div>
+
+                        <!-- 郵便番号 -->
+                        <div class="mb-6">
+                            <label for="zip" class="block text-sm font-bold text-gray-700 mb-2">
+                                郵便番号 <span class="bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded ml-2">必須</span>
+                            </label>
+                            <input type="text" id="zip" name="zip" maxlength="7"
+                                class="w-full md:w-40 px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-100 outline-none transition"
+                                placeholder="1234567">
+                            <p class="error-message" id="error-zip">郵便番号を7桁で入力してください。</p>
+                        </div>
+
+                        <!-- 住所 -->
+                        <div class="mb-6">
+                            <label for="address" class="block text-sm font-bold text-gray-700 mb-2">
+                                住所 <span class="bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded ml-2">必須</span>
+                            </label>
+                            <input type="text" id="address" name="address"
+                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-100 outline-none transition"
+                                placeholder="例：東京都港区六本木1-2-3">
+                            <p class="error-message" id="error-address">住所を入力してください。</p>
+                        </div>
+
+                        <!-- 建物名 -->
+                        <div class="mb-8">
+                            <label for="building" class="block text-sm font-bold text-gray-700 mb-2">
+                                建物名
+                            </label>
+                            <input type="text" id="building" name="building"
+                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-100 outline-none transition"
+                                placeholder="例：六本木ヒルズ XX階">
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="flex justify-center mt-10">
+                            <button type="button" id="btn-to-confirm"
+                                class="bg-blue-900 hover:bg-blue-800 text-white font-bold py-4 px-12 rounded-full shadow-md transition duration-200 transform hover:-translate-y-1 w-full md:w-auto">
+                                確認画面へ進む
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+                <!-- Step 2: Confirmation -->
+                <section id="step-confirm" class="bg-white p-6 md:p-10 rounded-xl shadow-lg hidden">
+                    <h2 class="text-xl font-bold text-gray-800 mb-6 border-b pb-4">入力内容の確認</h2>
+                    <p class="text-gray-600 mb-8 text-sm">
+                        以下の内容で登録します。よろしければ「登録を完了する」ボタンを押してください。<br>
+                        修正する場合は「修正する」ボタンで戻ってください。
+                    </p>
+
+                    <dl class="space-y-4 text-sm md:text-base">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 border-b border-gray-100 pb-3">
+                            <dt class="font-bold text-gray-600">氏名</dt>
+                            <dd class="md:col-span-2 text-gray-900 font-medium" id="confirm-name">-</dd>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 border-b border-gray-100 pb-3">
+                            <dt class="font-bold text-gray-600">会社名</dt>
+                            <dd class="md:col-span-2 text-gray-900 font-medium" id="confirm-company">-</dd>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 border-b border-gray-100 pb-3">
+                            <dt class="font-bold text-gray-600">部署名</dt>
+                            <dd class="md:col-span-2 text-gray-900" id="confirm-department">-</dd>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 border-b border-gray-100 pb-3">
+                            <dt class="font-bold text-gray-600">役職名</dt>
+                            <dd class="md:col-span-2 text-gray-900" id="confirm-title">-</dd>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 border-b border-gray-100 pb-3">
+                            <dt class="font-bold text-gray-600">電話番号</dt>
+                            <dd class="md:col-span-2 text-gray-900 font-medium" id="confirm-phone">-</dd>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 border-b border-gray-100 pb-3">
+                            <dt class="font-bold text-gray-600">郵便番号</dt>
+                            <dd class="md:col-span-2 text-gray-900" id="confirm-zip">-</dd>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 border-b border-gray-100 pb-3">
+                            <dt class="font-bold text-gray-600">住所</dt>
+                            <dd class="md:col-span-2 text-gray-900" id="confirm-address">-</dd>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 pb-3">
+                            <dt class="font-bold text-gray-600">建物名</dt>
+                            <dd class="md:col-span-2 text-gray-900" id="confirm-building">-</dd>
+                        </div>
+                    </dl>
+
+                    <div class="bg-blue-50 p-4 rounded-lg mt-8 text-sm text-blue-800">
+                        <p class="font-bold mb-1">【料金のお支払いについて】</p>
+                        <p>月額 10,000円（税別）のご請求となります。</p>
+                        <p>月末締めで計算し、翌月第1営業日に管理画面の「ご請求内容一覧」よりダウンロードいただけます。</p>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex flex-col-reverse md:flex-row justify-center gap-4 mt-10">
+                        <button type="button" id="btn-back-to-input"
+                            class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-bold py-3 px-8 rounded-full shadow-sm transition w-full md:w-auto">
+                            修正する
+                        </button>
+                        <button type="button" id="btn-submit"
+                            class="bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 px-12 rounded-full shadow-md transition duration-200 w-full md:w-auto">
+                            この内容で登録する
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Step 3: Completion -->
+                <section id="step-complete" class="text-center py-12 hidden">
+                    <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <span class="material-icons text-green-600 text-5xl">check</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900 mb-4">プレミアム登録が完了しました！</h2>
+                    <p class="text-lg text-gray-600 mb-10">
+                        プレミアムプランへのお申し込み、誠にありがとうございます。<br>
+                        本日より全てのプレミアム機能をご利用いただけます。
+                    </p>
+                    <div class="space-y-4">
+                        <a href="index.html"
+                            class="inline-block bg-blue-900 hover:bg-blue-800 text-white font-bold py-4 px-12 rounded-full shadow-lg transition duration-200">
+                            ダッシュボードへ戻る
+                        </a>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+
+        <!-- Footer (Dynamic) -->
+        <div id="footer-placeholder"></div>
+    </div>
+
+    <!-- Account Info Check Modal -->
+    <div id="account-check-modal"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4 transform scale-95 transition-transform duration-300"
+            id="account-check-content">
+            <h3 class="text-xl font-bold text-gray-900 mb-4">登録情報の確認</h3>
+            <p class="text-gray-600 mb-6">
+                アカウントに登録されている以下の情報を使用して、プレミアムプランへの登録を行いますか？
+            </p>
+
+            <div class="bg-gray-50 p-4 rounded-lg mb-6 text-sm">
+                <dl class="space-y-2">
+                    <div class="flex">
+                        <dt class="w-20 font-bold text-gray-500">氏名</dt>
+                        <dd class="text-gray-900" id="modal-name">-</dd>
+                    </div>
+                    <div class="flex">
+                        <dt class="w-20 font-bold text-gray-500">会社名</dt>
+                        <dd class="text-gray-900" id="modal-company">-</dd>
+                    </div>
+                    <div class="flex">
+                        <dt class="w-20 font-bold text-gray-500">メール</dt>
+                        <dd class="text-gray-900" id="modal-email">-</dd>
+                    </div>
+                </dl>
+            </div>
+
+            <div class="flex flex-col gap-3">
+                <button type="button" id="btn-use-account-info"
+                    class="w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 rounded-lg shadow transition duration-200">
+                    はい、この情報を使って登録へ進む
+                </button>
+                <button type="button" id="btn-input-manually"
+                    class="w-full bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-bold py-3 rounded-lg shadow-sm transition duration-200">
+                    いいえ、情報を入力する
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="src/main.js"></script>
+    <script>
+        // Simulation Data (Assume this comes from an API or global state)
+        window.dummyUserData = {
+            email: 'user@example.com',
+            company: '株式会社サンプル',
+            name: '山田 太郎',
+            phone: '09012345678',
+            zip: '1060032',
+            address: '東京都港区六本木1-2-3',
+            building: '六本木ヒルズ 33F',
+            department: '開発部',
+            title: 'マネージャー'
+        };
+
+        // SPA Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const stepInput = document.getElementById('step-input');
+            const stepConfirm = document.getElementById('step-confirm');
+            const stepComplete = document.getElementById('step-complete');
+
+            // Modal Elements
+            const modal = document.getElementById('account-check-modal');
+            const modalContent = document.getElementById('account-check-content');
+            const modalName = document.getElementById('modal-name');
+            const modalCompany = document.getElementById('modal-company');
+            const modalEmail = document.getElementById('modal-email');
+            const btnUseInfo = document.getElementById('btn-use-account-info');
+            const btnInputManual = document.getElementById('btn-input-manually');
+
+            const steps = {
+                1: { title: '入力', circle: 'step-circle-1', conn: 'connector-1', el: stepInput },
+                2: { title: '確認', circle: 'step-circle-2', conn: 'connector-2', el: stepConfirm },
+                3: { title: '完了', circle: 'step-circle-3', conn: null, el: stepComplete }
+            };
+
+            // Elements
+            const inputs = {
+                name: document.getElementById('name'),
+                phone: document.getElementById('phone'),
+                zip: document.getElementById('zip'),
+                address: document.getElementById('address'),
+                building: document.getElementById('building'),
+                company: document.getElementById('company'),
+                department: document.getElementById('department'),
+                title: document.getElementById('title')
+            };
+
+            const confirms = {
+                name: document.getElementById('confirm-name'),
+                company: document.getElementById('confirm-company'),
+                department: document.getElementById('confirm-department'),
+                title: document.getElementById('confirm-title'),
+                phone: document.getElementById('confirm-phone'),
+                zip: document.getElementById('confirm-zip'),
+                address: document.getElementById('confirm-address'),
+                building: document.getElementById('confirm-building')
+            };
+
+            const btnToConfirm = document.getElementById('btn-to-confirm');
+            const btnBackToInput = document.getElementById('btn-back-to-input');
+            const btnSubmit = document.getElementById('btn-submit');
+
+            // --- Helper: Update Progress UI ---
+            function setProcessStep(stepNum) {
+                // Reset all
+                document.querySelectorAll('.step-circle').forEach(el => {
+                    el.classList.remove('active', 'completed');
+                });
+                document.querySelectorAll('.step-connector').forEach(el => {
+                    el.classList.remove('active');
+                });
+
+                // Set logic
+                for (let i = 1; i <= 3; i++) {
+                    const circle = document.getElementById(`step-circle-${i}`);
+                    if (i < stepNum) {
+                        circle.classList.add('completed');
+                        circle.innerHTML = '<span class="material-icons text-sm">check</span>';
+                        if (document.getElementById(`connector-${i}`)) {
+                            document.getElementById(`connector-${i}`).classList.add('active');
+                        }
+                    } else if (i === stepNum) {
+                        circle.classList.add('active');
+                        circle.innerText = i; // revert icon if going back
+                    } else {
+                        circle.innerText = i;
+                    }
+                }
+
+                // Show/Hide Sections with simple transition
+                Object.values(steps).forEach(s => s.el.classList.add('hidden'));
+                steps[stepNum].el.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+
+            // --- Helper: Validation ---
+            function validate() {
+                let isValid = true;
+
+                // Clear errors
+                document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
+                document.querySelectorAll('input').forEach(el => el.classList.remove('input-error'));
+
+                // Name
+                if (!inputs.name.value.trim()) {
+                    showError('name', 'error-name');
+                    isValid = false;
+                }
+                // Company
+                if (!inputs.company.value.trim()) {
+                    showError('company', 'error-company');
+                    isValid = false;
+                }
+                // Phone (Simple digit check)
+                if (!/^\d{10,11}$/.test(inputs.phone.value.trim())) {
+                    showError('phone', 'error-phone');
+                    isValid = false;
+                }
+                // Zip (7 digits)
+                if (!/^\d{7}$/.test(inputs.zip.value.trim())) {
+                    showError('zip', 'error-zip');
+                    isValid = false;
+                }
+                // Address
+                if (!inputs.address.value.trim()) {
+                    showError('address', 'error-address');
+                    isValid = false;
+                }
+
+                return isValid;
+            }
+
+            function showError(inputId, errorId) {
+                document.getElementById(inputId).classList.add('input-error');
+                document.getElementById(errorId).style.display = 'block';
+            }
+
+            // --- Helper: Populate Confirm Screen ---
+            function populateConfirm() {
+                confirms.name.textContent = inputs.name.value;
+                confirms.company.textContent = inputs.company.value;
+                confirms.department.textContent = inputs.department.value || '-';
+                confirms.title.textContent = inputs.title.value || '-';
+                confirms.phone.textContent = inputs.phone.value;
+                confirms.zip.textContent = `〒${inputs.zip.value.slice(0, 3)}-${inputs.zip.value.slice(3)}`;
+                confirms.address.textContent = inputs.address.value;
+                confirms.building.textContent = inputs.building.value || '-';
+            }
+
+            // --- Modal Logic ---
+            function checkAccountInfo() {
+                console.log('checkAccountInfo started');
+                const userData = window.dummyUserData;
+                console.log('userData:', userData);
+
+                const modal = document.getElementById('account-check-modal');
+                const modalContent = document.getElementById('account-check-content');
+                const modalName = document.getElementById('modal-name');
+                const modalCompany = document.getElementById('modal-company');
+                const modalEmail = document.getElementById('modal-email');
+
+                console.log('modal element:', modal);
+
+                // Check if we have enough info to prompt
+                if (userData && userData.name && userData.company) {
+                    console.log('Condition met, showing modal');
+                    // Populate modal
+                    if (modalName) modalName.textContent = userData.name;
+                    if (modalCompany) modalCompany.textContent = userData.company;
+                    if (modalEmail) modalEmail.textContent = userData.email || '-';
+
+                    // Show Modal
+                    if (modal) {
+                        modal.classList.remove('hidden');
+                        // Small delay for transition
+                        setTimeout(() => {
+                            modal.classList.remove('opacity-0');
+                            modalContent.classList.remove('scale-95');
+                        }, 50);
+                    } else {
+                        console.error('Modal element not found!');
+                    }
+                } else {
+                    console.log('Condition NOT met, skipping modal');
+                    // Not enough info, just go to input
+                    setProcessStep(1);
+                }
+            }
+
+            // Expose checkAccountInfo to window for manual testing validation
+            window.debugCheckAccountInfo = checkAccountInfo;
+
+            // Handle "Use Info"
+            if (btnUseInfo) {
+                btnUseInfo.addEventListener('click', () => {
+                    const userData = window.dummyUserData;
+
+                    // Auto-fill inputs
+                    if (inputs.name) inputs.name.value = userData.name || '';
+                    if (inputs.company) inputs.company.value = userData.company || '';
+                    // Handle other inputs safely...
+                    if (inputs.phone) inputs.phone.value = userData.phone || '';
+                    if (inputs.zip) inputs.zip.value = userData.zip || '';
+                    if (inputs.address) inputs.address.value = userData.address || '';
+                    if (inputs.building) inputs.building.value = userData.building || '';
+                    if (inputs.department) inputs.department.value = userData.department || '';
+                    if (inputs.title) inputs.title.value = userData.title || '';
+
+                    // Hide Modal
+                    modal.classList.add('opacity-0');
+                    setTimeout(() => modal.classList.add('hidden'), 300);
+
+                    // Check if we have ALL required fields to skip to confirmation
+                    if (validate()) {
+                        // Populate confirm screen immediately
+                        populateConfirm();
+                        setProcessStep(2);
+                    } else {
+                        // Missing some required fields, go to input (but filled)
+                        setProcessStep(1);
+                    }
+                });
+            }
+
+            // Handle "Input Manually"
+            if (btnInputManual) {
+                btnInputManual.addEventListener('click', () => {
+                    // Hide Modal
+                    modal.classList.add('opacity-0');
+                    setTimeout(() => modal.classList.add('hidden'), 300);
+                    setProcessStep(1);
+                });
+            }
+
+            // --- Event Listeners ---
+
+            // Go to Confirm
+            if (btnToConfirm) {
+                btnToConfirm.addEventListener('click', () => {
+                    if (validate()) {
+                        populateConfirm();
+                        setProcessStep(2);
+                    }
+                });
+            }
+
+            // Back to Input
+            if (btnBackToInput) {
+                btnBackToInput.addEventListener('click', () => {
+                    setProcessStep(1);
+                });
+            }
+
+            // Submit (Complete)
+            if (btnSubmit) {
+                btnSubmit.addEventListener('click', () => {
+                    // Simulate API call delay
+                    const originalText = btnSubmit.textContent;
+                    btnSubmit.disabled = true;
+                    btnSubmit.textContent = '登録処理中...';
+
+                    setTimeout(() => {
+                        // Success!
+                        setProcessStep(3);
+                    }, 1500);
+                });
+            }
+
+            // Run check on load
+            console.log('Running checkAccountInfo from DOMContentLoaded');
+            checkAccountInfo();
+
+        });
+    </script>
+</body>
+
+</html>
