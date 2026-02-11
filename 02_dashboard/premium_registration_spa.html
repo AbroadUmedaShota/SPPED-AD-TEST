@@ -515,9 +515,15 @@
 
                     // Show Modal
                     if (modal) {
+                        console.log('Removing hidden class from modal');
                         modal.classList.remove('hidden');
+
+                        // Force reflow to ensure transition works
+                        void modal.offsetWidth;
+
                         // Small delay for transition
                         setTimeout(() => {
+                            console.log('Animating modal opacity');
                             modal.classList.remove('opacity-0');
                             modalContent.classList.remove('scale-95');
                         }, 50);
@@ -612,7 +618,7 @@
 
             // Run check on load
             console.log('Running checkAccountInfo from DOMContentLoaded');
-            checkAccountInfo();
+            setTimeout(checkAccountInfo, 100);
 
         });
     </script>
