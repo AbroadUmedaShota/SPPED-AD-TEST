@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ja" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>プレミアムプラン解約手続き - Speed Ad</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Inter:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Global CSS -->
+    <link href="service-top-style.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="relative flex min-h-screen flex-col overflow-x-hidden">
+        <!-- Header (Dynamic) -->
+        <div id="header-placeholder"></div>
+
+        <div class="flex flex-1 pt-16 bg-background justify-center">
+            <main class="flex-1 max-w-3xl w-full px-4 py-8 md:py-12">
+                <!-- Page Title -->
+                <h1 class="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-8">
+                    プレミアムプラン解約手続き
+                </h1>
+
+                <div class="bg-white p-6 md:p-10 rounded-xl shadow-lg">
+                    <p class="text-gray-700 mb-6">
+                        プレミアムプランの解約手続きを行います。<br>
+                        月額料金の日割りはございませんので、月末付近での解約をおすすめいたします。<br>
+                        解約されますと、すべてのプレミアム機能がご利用いただけなくなります。
+                    </p>
+
+                    <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">解約理由（任意）</h2>
+                    <form id="cancel-form">
+                        <div class="mb-6">
+                            <label for="cancelReason" class="block text-sm font-bold text-gray-700 mb-2">
+                                解約理由をお聞かせください
+                            </label>
+                            <textarea id="cancelReason" name="cancelReason" rows="5"
+                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-100 outline-none transition"
+                                placeholder="例：利用頻度が少なくなったため"></textarea>
+                        </div>
+
+                        <div class="flex justify-center mt-8">
+                            <button type="button" id="cancel-button"
+                                class="bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-12 rounded-full shadow-md transition duration-200 transform hover:-translate-y-1 w-full md:w-auto">
+                                解約する
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </main>
+        </div>
+
+        <!-- Footer (Dynamic) -->
+        <div id="footer-placeholder"></div>
+    </div>
+
+    <!-- Cancel Confirmation Modal -->
+    <div id="cancelConfirmationModal"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-xl shadow-2xl p-8 max-w-sm w-full mx-4 transform scale-95 transition-transform duration-300"
+            id="cancel-confirmation-content">
+            <h3 class="text-xl font-bold text-gray-900 mb-4">プレミアムプラン解約の確認</h3>
+            <p class="text-gray-600 mb-6">
+                本当にプレミアムプランを解約してよろしいですか？<br>
+                解約されますと、すべてのプレミアム機能がご利用いただけなくなります。
+                また、月額料金の日割りはございませんので、月末付近での解約をおすすめいたします。
+            </p>
+            <div class="flex flex-col gap-3">
+                <button type="button" id="confirm-cancel-btn"
+                    class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg shadow transition duration-200">
+                    はい、解約する
+                </button>
+                <button type="button" id="cancel-cancel-btn"
+                    class="w-full bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-bold py-3 rounded-lg shadow-sm transition duration-200">
+                    いいえ、キャンセル
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="src/main.js"></script>
+    <script src="premium_cancel.js"></script>
+</body>
+
+</html>

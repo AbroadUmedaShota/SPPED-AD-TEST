@@ -84,11 +84,17 @@
         <!-- Header (Dynamic) -->
         <div id="header-placeholder"></div>
 
-        <div class="flex flex-1 pt-16 bg-background justify-center">
-            <main class="flex-1 max-w-3xl w-full px-4 py-8 md:py-12">
+                <div class="flex flex-1 pt-16 bg-background justify-center">
 
-                <!-- Page Title -->
-                <h1 class="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-8">
+                    
+
+        
+
+                    <main class="flex-1 max-w-3xl w-full px-4 py-8 md:py-12">
+
+                        <!-- Page Title -->
+
+                        <h1 class="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-8">
                     プレミアムプラン登録設定
                 </h1>
 
@@ -117,15 +123,28 @@
                 <section id="step-input" class="bg-white p-6 md:p-10 rounded-xl shadow-lg animate-fade-in">
                     <h2 class="text-xl font-bold text-gray-800 mb-6 border-b pb-4">請求情報の入力</h2>
                     <form id="billing-form" novalidate>
-                        <!-- 氏名 -->
-                        <div class="mb-6">
-                            <label for="name" class="block text-sm font-bold text-gray-700 mb-2">
-                                氏名 <span class="bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded ml-2">必須</span>
-                            </label>
-                            <input type="text" id="name" name="name"
-                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-100 outline-none transition"
-                                placeholder="例：山田 太郎">
-                            <p class="error-message" id="error-name">氏名を入力してください。</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <!-- 氏名(姓) -->
+                            <div>
+                                <label for="lastName" class="block text-sm font-bold text-gray-700 mb-2">
+                                    氏名（姓） <span class="bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded ml-2">必須</span>
+                                </label>
+                                <input type="text" id="lastName" name="lastName"
+                                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-100 outline-none transition"
+                                    placeholder="例：山田">
+                                <p class="error-message" id="error-lastName">氏名（姓）を入力してください。</p>
+                            </div>
+
+                            <!-- 氏名(名) -->
+                            <div>
+                                <label for="firstName" class="block text-sm font-bold text-gray-700 mb-2">
+                                    氏名（名） <span class="bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded ml-2">必須</span>
+                                </label>
+                                <input type="text" id="firstName" name="firstName"
+                                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-100 outline-none transition"
+                                    placeholder="例：太郎">
+                                <p class="error-message" id="error-firstName">氏名（名）を入力してください。</p>
+                            </div>
                         </div>
 
                         <!-- 会社名・部署名 -->
@@ -259,6 +278,9 @@
                         <p class="font-bold mb-1">【料金のお支払いについて】</p>
                         <p>月額 10,000円（税別）のご請求となります。</p>
                         <p>月末締めで計算し、翌月第1営業日に管理画面の「ご請求内容一覧」よりダウンロードいただけます。</p>
+                        <div id="billing-start-date-info" class="mt-4">
+                            <!-- ここに課金開始日に関する情報がJavaScriptによって挿入されます -->
+                        </div>
                     </div>
 
                     <!-- Actions -->
@@ -292,6 +314,8 @@
                     </div>
                 </section>
 
+
+
             </main>
         </div>
 
@@ -320,6 +344,30 @@
                         <dd class="text-gray-900" id="modal-company">-</dd>
                     </div>
                     <div class="flex">
+                        <dt class="w-20 font-bold text-gray-500">部署名</dt>
+                        <dd class="text-gray-900" id="modal-department">-</dd>
+                    </div>
+                    <div class="flex">
+                        <dt class="w-20 font-bold text-gray-500">役職名</dt>
+                        <dd class="text-gray-900" id="modal-title">-</dd>
+                    </div>
+                    <div class="flex">
+                        <dt class="w-20 font-bold text-gray-500">電話番号</dt>
+                        <dd class="text-gray-900" id="modal-phone">-</dd>
+                    </div>
+                    <div class="flex">
+                        <dt class="w-20 font-bold text-gray-500">郵便番号</dt>
+                        <dd class="text-gray-900" id="modal-zip">-</dd>
+                    </div>
+                    <div class="flex">
+                        <dt class="w-20 font-bold text-gray-500">住所</dt>
+                        <dd class="text-gray-900" id="modal-address">-</dd>
+                    </div>
+                    <div class="flex">
+                        <dt class="w-20 font-bold text-gray-500">建物名</dt>
+                        <dd class="text-gray-900" id="modal-building">-</dd>
+                    </div>
+                    <div class="flex">
                         <dt class="w-20 font-bold text-gray-500">メール</dt>
                         <dd class="text-gray-900" id="modal-email">-</dd>
                     </div>
@@ -339,289 +387,34 @@
         </div>
     </div>
 
+    <!-- Leave Prevention Modal -->
+    <div id="prevent-leave-modal"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-xl shadow-2xl p-8 max-w-sm w-full mx-4 transform scale-95 transition-transform duration-300"
+            id="prevent-leave-content">
+            <h3 class="text-xl font-bold text-gray-900 mb-4">入力中の情報があります</h3>
+            <p class="text-gray-600 mb-6">
+                このページを離れると、入力中の情報が失われますがよろしいですか？
+            </p>
+            <div class="flex flex-col gap-3">
+                <button type="button" id="prevent-leave-confirm-btn"
+                    class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg shadow transition duration-200">
+                    はい、ページを離れる
+                </button>
+                <button type="button" id="prevent-leave-cancel-btn"
+                    class="w-full bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-bold py-3 rounded-lg shadow-sm transition duration-200">
+                    いいえ、このページに留まる
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script type="module" src="src/main.js"></script>
+    <script src="premium_registration_spa.js"></script>
+
     <script>
-        // Simulation Data (Assume this comes from an API or global state)
-        window.dummyUserData = {
-            email: 'user@example.com',
-            company: '株式会社サンプル',
-            name: '山田 太郎',
-            phone: '09012345678',
-            zip: '1060032',
-            address: '東京都港区六本木1-2-3',
-            building: '六本木ヒルズ 33F',
-            department: '開発部',
-            title: 'マネージャー'
-        };
 
-        // SPA Logic
-        document.addEventListener('DOMContentLoaded', () => {
-            const stepInput = document.getElementById('step-input');
-            const stepConfirm = document.getElementById('step-confirm');
-            const stepComplete = document.getElementById('step-complete');
-
-            // Modal Elements
-            const modal = document.getElementById('account-check-modal');
-            const modalContent = document.getElementById('account-check-content');
-            const modalName = document.getElementById('modal-name');
-            const modalCompany = document.getElementById('modal-company');
-            const modalEmail = document.getElementById('modal-email');
-            const btnUseInfo = document.getElementById('btn-use-account-info');
-            const btnInputManual = document.getElementById('btn-input-manually');
-
-            const steps = {
-                1: { title: '入力', circle: 'step-circle-1', conn: 'connector-1', el: stepInput },
-                2: { title: '確認', circle: 'step-circle-2', conn: 'connector-2', el: stepConfirm },
-                3: { title: '完了', circle: 'step-circle-3', conn: null, el: stepComplete }
-            };
-
-            // Elements
-            const inputs = {
-                name: document.getElementById('name'),
-                phone: document.getElementById('phone'),
-                zip: document.getElementById('zip'),
-                address: document.getElementById('address'),
-                building: document.getElementById('building'),
-                company: document.getElementById('company'),
-                department: document.getElementById('department'),
-                title: document.getElementById('title')
-            };
-
-            const confirms = {
-                name: document.getElementById('confirm-name'),
-                company: document.getElementById('confirm-company'),
-                department: document.getElementById('confirm-department'),
-                title: document.getElementById('confirm-title'),
-                phone: document.getElementById('confirm-phone'),
-                zip: document.getElementById('confirm-zip'),
-                address: document.getElementById('confirm-address'),
-                building: document.getElementById('confirm-building')
-            };
-
-            const btnToConfirm = document.getElementById('btn-to-confirm');
-            const btnBackToInput = document.getElementById('btn-back-to-input');
-            const btnSubmit = document.getElementById('btn-submit');
-
-            // --- Helper: Update Progress UI ---
-            function setProcessStep(stepNum) {
-                // Reset all
-                document.querySelectorAll('.step-circle').forEach(el => {
-                    el.classList.remove('active', 'completed');
-                });
-                document.querySelectorAll('.step-connector').forEach(el => {
-                    el.classList.remove('active');
-                });
-
-                // Set logic
-                for (let i = 1; i <= 3; i++) {
-                    const circle = document.getElementById(`step-circle-${i}`);
-                    if (i < stepNum) {
-                        circle.classList.add('completed');
-                        circle.innerHTML = '<span class="material-icons text-sm">check</span>';
-                        if (document.getElementById(`connector-${i}`)) {
-                            document.getElementById(`connector-${i}`).classList.add('active');
-                        }
-                    } else if (i === stepNum) {
-                        circle.classList.add('active');
-                        circle.innerText = i; // revert icon if going back
-                    } else {
-                        circle.innerText = i;
-                    }
-                }
-
-                // Show/Hide Sections with simple transition
-                Object.values(steps).forEach(s => s.el.classList.add('hidden'));
-                steps[stepNum].el.classList.remove('hidden');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-
-
-            // --- Helper: Validation ---
-            function validate() {
-                let isValid = true;
-
-                // Clear errors
-                document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
-                document.querySelectorAll('input').forEach(el => el.classList.remove('input-error'));
-
-                // Name
-                if (!inputs.name.value.trim()) {
-                    showError('name', 'error-name');
-                    isValid = false;
-                }
-                // Company
-                if (!inputs.company.value.trim()) {
-                    showError('company', 'error-company');
-                    isValid = false;
-                }
-                // Phone (Simple digit check)
-                if (!/^\d{10,11}$/.test(inputs.phone.value.trim())) {
-                    showError('phone', 'error-phone');
-                    isValid = false;
-                }
-                // Zip (7 digits)
-                if (!/^\d{7}$/.test(inputs.zip.value.trim())) {
-                    showError('zip', 'error-zip');
-                    isValid = false;
-                }
-                // Address
-                if (!inputs.address.value.trim()) {
-                    showError('address', 'error-address');
-                    isValid = false;
-                }
-
-                return isValid;
-            }
-
-            function showError(inputId, errorId) {
-                document.getElementById(inputId).classList.add('input-error');
-                document.getElementById(errorId).style.display = 'block';
-            }
-
-            // --- Helper: Populate Confirm Screen ---
-            function populateConfirm() {
-                confirms.name.textContent = inputs.name.value;
-                confirms.company.textContent = inputs.company.value;
-                confirms.department.textContent = inputs.department.value || '-';
-                confirms.title.textContent = inputs.title.value || '-';
-                confirms.phone.textContent = inputs.phone.value;
-                confirms.zip.textContent = `〒${inputs.zip.value.slice(0, 3)}-${inputs.zip.value.slice(3)}`;
-                confirms.address.textContent = inputs.address.value;
-                confirms.building.textContent = inputs.building.value || '-';
-            }
-
-            // --- Modal Logic ---
-            function checkAccountInfo() {
-                console.log('checkAccountInfo started');
-                const userData = window.dummyUserData;
-                console.log('userData:', userData);
-
-                const modal = document.getElementById('account-check-modal');
-                const modalContent = document.getElementById('account-check-content');
-                const modalName = document.getElementById('modal-name');
-                const modalCompany = document.getElementById('modal-company');
-                const modalEmail = document.getElementById('modal-email');
-
-                console.log('modal element:', modal);
-
-                // Check if we have enough info to prompt
-                if (userData && userData.name && userData.company) {
-                    console.log('Condition met, showing modal');
-                    // Populate modal
-                    if (modalName) modalName.textContent = userData.name;
-                    if (modalCompany) modalCompany.textContent = userData.company;
-                    if (modalEmail) modalEmail.textContent = userData.email || '-';
-
-                    // Show Modal
-                    if (modal) {
-                        console.log('Removing hidden class from modal');
-                        modal.classList.remove('hidden');
-
-                        // Force reflow to ensure transition works
-                        void modal.offsetWidth;
-
-                        // Small delay for transition
-                        setTimeout(() => {
-                            console.log('Animating modal opacity');
-                            modal.classList.remove('opacity-0');
-                            modalContent.classList.remove('scale-95');
-                        }, 50);
-                    } else {
-                        console.error('Modal element not found!');
-                    }
-                } else {
-                    console.log('Condition NOT met, skipping modal');
-                    // Not enough info, just go to input
-                    setProcessStep(1);
-                }
-            }
-
-            // Expose checkAccountInfo to window for manual testing validation
-            window.debugCheckAccountInfo = checkAccountInfo;
-
-            // Handle "Use Info"
-            if (btnUseInfo) {
-                btnUseInfo.addEventListener('click', () => {
-                    const userData = window.dummyUserData;
-
-                    // Auto-fill inputs
-                    if (inputs.name) inputs.name.value = userData.name || '';
-                    if (inputs.company) inputs.company.value = userData.company || '';
-                    // Handle other inputs safely...
-                    if (inputs.phone) inputs.phone.value = userData.phone || '';
-                    if (inputs.zip) inputs.zip.value = userData.zip || '';
-                    if (inputs.address) inputs.address.value = userData.address || '';
-                    if (inputs.building) inputs.building.value = userData.building || '';
-                    if (inputs.department) inputs.department.value = userData.department || '';
-                    if (inputs.title) inputs.title.value = userData.title || '';
-
-                    // Hide Modal
-                    modal.classList.add('opacity-0');
-                    setTimeout(() => modal.classList.add('hidden'), 300);
-
-                    // Check if we have ALL required fields to skip to confirmation
-                    if (validate()) {
-                        // Populate confirm screen immediately
-                        populateConfirm();
-                        setProcessStep(2);
-                    } else {
-                        // Missing some required fields, go to input (but filled)
-                        setProcessStep(1);
-                    }
-                });
-            }
-
-            // Handle "Input Manually"
-            if (btnInputManual) {
-                btnInputManual.addEventListener('click', () => {
-                    // Hide Modal
-                    modal.classList.add('opacity-0');
-                    setTimeout(() => modal.classList.add('hidden'), 300);
-                    setProcessStep(1);
-                });
-            }
-
-            // --- Event Listeners ---
-
-            // Go to Confirm
-            if (btnToConfirm) {
-                btnToConfirm.addEventListener('click', () => {
-                    if (validate()) {
-                        populateConfirm();
-                        setProcessStep(2);
-                    }
-                });
-            }
-
-            // Back to Input
-            if (btnBackToInput) {
-                btnBackToInput.addEventListener('click', () => {
-                    setProcessStep(1);
-                });
-            }
-
-            // Submit (Complete)
-            if (btnSubmit) {
-                btnSubmit.addEventListener('click', () => {
-                    // Simulate API call delay
-                    const originalText = btnSubmit.textContent;
-                    btnSubmit.disabled = true;
-                    btnSubmit.textContent = '登録処理中...';
-
-                    setTimeout(() => {
-                        // Success!
-                        setProcessStep(3);
-                    }, 1500);
-                });
-            }
-
-            // Run check on load
-            console.log('Running checkAccountInfo from DOMContentLoaded');
-            setTimeout(checkAccountInfo, 100);
-
-        });
-    </script>
 </body>
 
 </html>

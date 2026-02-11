@@ -9,7 +9,7 @@ const NAV_ITEMS = [
     { id: 'survey-list', href: 'index.html', icon: 'list_alt', label: 'アンケート一覧' },
     { id: 'invoice-list', href: 'invoiceList.html', icon: 'receipt_long', label: 'ご請求内容一覧' },
     { id: 'group-management', href: 'group-edit.html', icon: 'groups', label: 'グループ管理' },
-    { id: 'premium-plan', href: 'premium_registration_form.html', icon: 'stars', label: 'プレミアムプラン登録' },
+    { id: 'premium-plan', href: 'premium_signup_new.html', icon: 'stars', label: 'プレミアムプラン登録' },
     { isDivider: true },
     {
         id: 'account-info',
