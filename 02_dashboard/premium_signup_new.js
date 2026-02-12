@@ -259,7 +259,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 closeContactModal();
             }
         });
-    } else {
+    }
 
+    // Sticky CTA Scroll Logic
+    const stickyCta = document.getElementById('sticky-cta');
+    const heroSection = document.querySelector('.hero-section');
+
+    if (stickyCta && heroSection) {
+        window.addEventListener('scroll', () => {
+            const heroBottom = heroSection.getBoundingClientRect().bottom;
+            // Show sticky CTA when Hero section is scrolled out of view
+            if (heroBottom < 0) {
+                stickyCta.classList.remove('translate-y-full');
+            } else {
+                stickyCta.classList.add('translate-y-full');
+            }
+        });
     }
 });
