@@ -278,31 +278,37 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Functional: First Month Free Campaign Logic ---
-    const heroCampaignMsg = document.getElementById('hero-campaign-msg');
     const campaignInfoSection = document.getElementById('campaign-info-section');
 
-    // Simulate User Status (Change this to true/false to test)
-    const isEligibleForFreeCampaign = true; // 仮：対象ユーザー
+    // Check user status from localStorage (test scenario)
+    const storedUserData = localStorage.getItem('simulationUserData');
+    let isEligibleForFreeCampaign = true; // デフォルトは新規ユーザー
 
-    if (heroCampaignMsg && campaignInfoSection) {
+    if (storedUserData) {
+        try {
+            const userData = JSON.parse(storedUserData);
+            // 再加入ユーザーまたは既存プレミアム会員の場合はキャンペーン対象外
+            isEligibleForFreeCampaign = !userData.is_rejoining_user && !userData.is_premium_member;
+        } catch (e) {
+            console.error('Failed to parse user data:', e);
+        }
+    }
+
+    if (campaignInfoSection && isEligibleForFreeCampaign) {
         const today = new Date();
         const currentYear = today.getFullYear();
         const currentMonth = today.getMonth() + 1;
         const lastDayOfMonth = new Date(currentYear, currentMonth, 0).getDate();
 
-        if (isEligibleForFreeCampaign) {
-            // Eligible Message
-            const messageHero = `<span class="material-icons text-sm align-text-bottom mr-1">event_available</span> 今なら <span class="font-bold text-amber-300 text-lg mx-1">${currentMonth}月${lastDayOfMonth}日</span> まで無料！`;
+        // Next Month Calculation
+        let nextMonth = currentMonth + 1;
+        let nextYear = currentYear;
+        if (nextMonth > 12) {
+            nextMonth = 1;
+            nextYear = nextYear + 1;
+        }
 
-            // Next Month Calculation
-            let nextMonth = currentMonth + 1;
-            let nextYear = currentYear;
-            if (nextMonth > 12) {
-                nextMonth = 1;
-                nextYear = nextYear + 1;
-            }
-
-            const messageCampaign = `
+        const messageCampaign = `
                 <div class="bg-white border-2 border-amber-400 rounded-xl p-6 md:p-8 shadow-sm">
                     <div class="text-center mb-8">
                         <span class="inline-block bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full mb-2">キャンペーン</span>
@@ -345,7 +351,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                             <div class="bg-gray-50 border-x border-b border-gray-200 p-6 flex-1 flex items-center justify-center text-center rounded-b-lg md:rounded-br-lg">
                                 <div>
-                                    <div class="text-gray-700 font-bold text-xl mb-1">¥50,000</div>
+                                    <div class="text-gray-700 font-bold text-xl mb-1">¥10,000</div>
                                     <div class="text-xs text-gray-500">通常料金</div>
                                     <div class="text-[10px] text-gray-400 mt-1">
                                         (1日 〜 末日)
@@ -364,25 +370,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
 
-            heroCampaignMsg.innerHTML = messageHero;
-            heroCampaignMsg.classList.remove('hidden');
-
-            campaignInfoSection.innerHTML = messageCampaign;
-            campaignInfoSection.classList.remove('hidden');
-
-        } else {
-            // Not Eligible Message - Simple Info
-            const messageCampaign = `
-                <div class="bg-gray-50 border border-gray-200 rounded-xl p-6 text-center shadow-sm">
-                   <h2 class="text-lg font-bold text-gray-700 mb-2">通常プランのご案内</h2>
-                   <p class="text-sm text-gray-600">
-                        お客様は過去に無料体験を利用されているため、<br>
-                        登録完了日より月額料金が発生いたします。
-                   </p>
-                </div>
-            `;
-            campaignInfoSection.innerHTML = messageCampaign;
-            campaignInfoSection.classList.remove('hidden');
-        }
+        campaignInfoSection.innerHTML = messageCampaign;
+        campaignInfoSection.classList.remove('hidden');
     }
+    // 再加入ユーザー（isEligibleForFreeCampaign = false）の場合は何も表示しない
 });
