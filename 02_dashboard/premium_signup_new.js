@@ -276,4 +276,113 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // --- Functional: First Month Free Campaign Logic ---
+    const heroCampaignMsg = document.getElementById('hero-campaign-msg');
+    const campaignInfoSection = document.getElementById('campaign-info-section');
+
+    // Simulate User Status (Change this to true/false to test)
+    const isEligibleForFreeCampaign = true; // 仮：対象ユーザー
+
+    if (heroCampaignMsg && campaignInfoSection) {
+        const today = new Date();
+        const currentYear = today.getFullYear();
+        const currentMonth = today.getMonth() + 1;
+        const lastDayOfMonth = new Date(currentYear, currentMonth, 0).getDate();
+
+        if (isEligibleForFreeCampaign) {
+            // Eligible Message
+            const messageHero = `<span class="material-icons text-sm align-text-bottom mr-1">event_available</span> 今なら <span class="font-bold text-amber-300 text-lg mx-1">${currentMonth}月${lastDayOfMonth}日</span> まで無料！`;
+
+            // Next Month Calculation
+            let nextMonth = currentMonth + 1;
+            let nextYear = currentYear;
+            if (nextMonth > 12) {
+                nextMonth = 1;
+                nextYear = nextYear + 1;
+            }
+
+            const messageCampaign = `
+                <div class="bg-white border-2 border-amber-400 rounded-xl p-6 md:p-8 shadow-sm">
+                    <div class="text-center mb-8">
+                        <span class="inline-block bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full mb-2">キャンペーン</span>
+                        <h2 class="text-xl md:text-2xl font-bold text-gray-800">
+                            登録した月の利用料が<span class="text-amber-500 mx-1">無料</span>になります
+                        </h2>
+                        <p class="text-gray-500 text-sm mt-2">
+                            月初めでも、月末でも、その月の末日まで料金はかかりません。
+                        </p>
+                    </div>
+
+                    <!-- Visual Timeline -->
+                    <div class="flex flex-col md:flex-row items-stretch justify-center max-w-2xl mx-auto space-y-2 md:space-y-0 md:space-x-1">
+                        <!-- Month 1 (Free) -->
+                        <div class="flex-1 flex flex-col">
+                            <div class="bg-amber-400 text-white text-center py-2 font-bold rounded-t-lg md:rounded-tr-none md:rounded-l-lg relative overflow-hidden">
+                                <span class="relative z-10">${currentMonth}月 (登録月)</span>
+                                <div class="absolute inset-0 bg-white/20 transform -skew-x-12 translate-x-1/2"></div>
+                            </div>
+                            <div class="bg-amber-50 border-x border-b border-amber-200 p-6 flex-1 flex items-center justify-center text-center rounded-b-lg md:rounded-bl-none md:rounded-br-none md:rounded-bl-lg">
+                                <div>
+                                    <div class="text-amber-600 font-bold text-xl mb-1">¥0</div>
+                                    <div class="text-xs text-amber-700 font-bold bg-amber-200/50 px-2 py-1 rounded">無料期間</div>
+                                    <div class="text-[10px] text-amber-600 mt-1">
+                                        (登録日 〜 ${currentMonth}/${lastDayOfMonth})
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Arrow (Desktop only) -->
+                        <div class="hidden md:flex items-center justify-center text-gray-300 z-10 -mx-3">
+                            <span class="material-icons text-4xl">arrow_forward</span>
+                        </div>
+
+                        <!-- Month 2 (Paid) -->
+                        <div class="flex-1 flex flex-col">
+                            <div class="bg-gray-600 text-white text-center py-2 font-bold rounded-t-lg md:rounded-tl-none md:rounded-r-lg">
+                                ${nextMonth}月 (翌月)
+                            </div>
+                            <div class="bg-gray-50 border-x border-b border-gray-200 p-6 flex-1 flex items-center justify-center text-center rounded-b-lg md:rounded-br-lg">
+                                <div>
+                                    <div class="text-gray-700 font-bold text-xl mb-1">¥50,000</div>
+                                    <div class="text-xs text-gray-500">通常料金</div>
+                                    <div class="text-[10px] text-gray-400 mt-1">
+                                        (1日 〜 末日)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 text-center bg-gray-50 p-4 rounded-lg border border-gray-100">
+                        <p class="text-sm font-medium text-gray-700">
+                            現在のご登録なら、<span class="font-bold text-amber-600 text-lg">${currentMonth}月${lastDayOfMonth}日</span>まで無料で全機能をお試しいただけます。<br>
+                            <span class="text-xs text-gray-500 font-normal">※ 無料期間中に解約すれば、料金は一切かかりません。</span>
+                        </p>
+                    </div>
+                </div>
+            `;
+
+            heroCampaignMsg.innerHTML = messageHero;
+            heroCampaignMsg.classList.remove('hidden');
+
+            campaignInfoSection.innerHTML = messageCampaign;
+            campaignInfoSection.classList.remove('hidden');
+
+        } else {
+            // Not Eligible Message - Simple Info
+            const messageCampaign = `
+                <div class="bg-gray-50 border border-gray-200 rounded-xl p-6 text-center shadow-sm">
+                   <h2 class="text-lg font-bold text-gray-700 mb-2">通常プランのご案内</h2>
+                   <p class="text-sm text-gray-600">
+                        お客様は過去に無料体験を利用されているため、<br>
+                        登録完了日より月額料金が発生いたします。
+                   </p>
+                </div>
+            `;
+            campaignInfoSection.innerHTML = messageCampaign;
+            campaignInfoSection.classList.remove('hidden');
+        }
+    }
 });
