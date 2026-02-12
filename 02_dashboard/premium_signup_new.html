@@ -18,69 +18,7 @@
     <!-- Global CSS -->
     <link href="service-top-style.css" rel="stylesheet">
     <!-- Custom CSS -->
-    <style>
-        :root {
-            --color-primary: #1e3a8a;
-            /* Deep Navy */
-            --color-accent: #d97706;
-            /* Amber 600 (Goldish) */
-            --color-surface-premium: #f8fafc;
-        }
-
-        body {
-            font-family: 'Inter', 'Noto Sans JP', sans-serif;
-        }
-
-        .hero-bg {
-            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero-bg::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-        }
-
-        .premium-card {
-            border: 2px solid #fbbf24;
-            /* Amber 400 */
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            position: relative;
-        }
-
-        .premium-badge {
-            background: linear-gradient(90deg, #f59e0b, #fbbf24);
-            color: white;
-            padding: 0.5rem 1.5rem;
-            border-radius: 9999px;
-            font-weight: bold;
-            position: absolute;
-            top: -1rem;
-            left: 50%;
-            transform: translateX(-50%);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-
-        .check-icon {
-            color: #16a34a;
-            /* Green 600 */
-        }
-
-        .benefit-icon {
-            background-color: #eff6ff;
-            color: #1d4ed8;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1rem;
-            display: inline-block;
-        }
-    </style>
+    <link href="premium_signup_new.css" rel="stylesheet">
 </head>
 
 <body class="bg-gray-50 text-gray-800">
@@ -91,214 +29,245 @@
         <!-- 2. ヘッダー (main.jsによって読み込まれる) -->
         <div id="header-placeholder"></div>
 
-                <div class="flex flex-1 pt-16 bg-background">
+        <div class="flex flex-1 pt-16 bg-background">
 
-                    <!-- 3. サイドバー -->
+            <!-- 3. サイドバー -->
 
-                    <div id="sidebar-placeholder"></div>
+            <div id="sidebar-placeholder"></div>
 
-        
 
-                    <!-- 4. メインコンテンツ -->
 
-                            <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
-                                <div class="flex flex-col w-full max-w-6xl mx-auto flex-1">
-                                    <!-- パンくずリストコンテナ -->
-                                    <div id="breadcrumb-container" class="mb-4">
-                                        <nav class="text-sm" aria-label="Breadcrumb">
-                                            <ol class="list-none p-0 inline-flex">
-                                                <li class="flex items-center">
-                                                    <a href="index.html" class="text-on-surface-variant hover:text-primary">ホーム</a>
-                                                    <span class="material-icons text-on-surface-variant text-base mx-2">chevron_right</span>
-                                                </li>
-                                                <li class="flex items-center">
-                                                    <a href="premium_signup_new.html" class="text-on-surface-variant hover:text-primary" aria-current="page">プレミアムプラン</a>
-                                                </li>
-                                            </ol>
-                                        </nav>
+            <!-- 4. メインコンテンツ -->
+
+            <main class="flex flex-1 flex-col pt-0 pb-8 px-4 sm:px-6 lg:px-8" id="main-content">
+                <div class="flex flex-col w-full max-w-6xl mx-auto flex-1">
+                    <!-- パンくずリストコンテナ -->
+                    <!-- パンくずリストコンテナ -->
+                    <div id="breadcrumb-container" class="breadcrumb-offset"></div>
+
+                    <!-- Page Header -->
+                    <div class="bg-gradient-to-r from-blue-900 to-indigo-800 text-white shadow-lg hero-bg">
+                        <div class="max-w-4xl mx-auto px-6 py-12 md:py-16 text-center">
+                            <span
+                                class="inline-block py-1 px-3 rounded-full bg-blue-700 bg-opacity-50 border border-blue-400 text-xs font-semibold tracking-wider mb-4">
+                                PREMIUM PLAN
+                            </span>
+                            <h1 class="text-3xl md:text-4xl font-bold mb-4">
+                                プレミアムプランのご案内
+                            </h1>
+                            <p class="text-gray-200 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+                                全機能を開放し、データ活用を最大化。<br>
+                                あなたのビジネスを加速させる、最適な環境を提供します。
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="max-w-5xl mx-auto py-8 px-4 -mt-8">
+                        <!-- Page Card -->
+                        <div class="bg-white shadow-xl rounded-lg border border-gray-100 premium-card">
+                            <div class="premium-badge">おすすめ</div>
+
+                            <div class="p-6 md:p-10 space-y-12">
+
+                                <!-- 料金セクション -->
+                                <section>
+                                    <div class="flex items-center justify-center mb-6">
+                                        <h2 class="text-2xl font-bold text-gray-800 flex items-center">
+                                            プラン料金
+                                        </h2>
                                     </div>
-                    
-                                    <!-- Page Header -->
-                                    <div class="bg-gradient-to-r from-blue-900 to-indigo-800 text-white shadow-lg">
-                                        <div class="max-w-4xl mx-auto px-6 py-12 md:py-16 text-center">
-                                            <span
-                                                class="inline-block py-1 px-3 rounded-full bg-blue-700 bg-opacity-50 border border-blue-400 text-xs font-semibold tracking-wider mb-4">
-                                                PREMIUM PLAN
-                                            </span>
-                                            <h1 class="text-3xl md:text-4xl font-bold mb-4">
-                                                プレミアムプランのご案内
-                                            </h1>
-                                            <p class="text-gray-200 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
-                                                全機能を開放し、データ活用を最大化。<br>
-                                                あなたのビジネスを加速させる、最適な環境を提供します。
-                                            </p>
-                                        </div>
-                                    </div>
-                    
-                                    <div class="max-w-5xl mx-auto py-8 px-4 -mt-8">
-                                        <!-- Page Card -->
-                                        <div class="bg-white shadow-xl rounded-lg overflow-hidden border border-gray-100">
-                    
-                                            <div class="p-6 md:p-10 space-y-12">
-                    
-                                                <!-- 料金セクション -->
-                                                <section>
-                                                    <div class="flex items-center justify-center mb-6">
-                                                        <h2 class="text-2xl font-bold text-gray-800 flex items-center">
-                                                            プラン料金
-                                                        </h2>
-                                                    </div>
-                                                    <div class="bg-blue-50 border border-blue-100 rounded-xl p-8 max-w-3xl mx-auto">
-                                                        <div class="flex flex-col md:flex-row items-center justify-between gap-6">
-                                                            <div class="flex-1 text-center md:text-left">
-                                                                <div class="text-sm text-blue-800 font-bold mb-1">月額利用料</div>
-                                                                <div class="flex items-baseline justify-center md:justify-start">
-                                                                                                                    <span class="text-4xl font-extrabold text-blue-900">¥10,000</span>
-                                                                                                                        <span class="text-gray-600 ml-2 font-medium">（税別）</span>
-                                                                                                                    </div>
-                                                                                                                                                                    <p class="text-lg font-bold text-green-600 mt-2" id="first-month-free-message">
-                                                                                                                                                                        今なら初月無料！
-                                                                                                                                                                    </p>                                                                                                <p class="text-sm text-gray-500 mt-2">                                                <span class="inline-flex items-center"><span
-                                                                            class="material-icons text-green-500 text-sm mr-1">check</span>初期費用
-                                                                        0円</span>
-                                                                    <span class="inline-flex items-center ml-3"><span
-                                                                            class="material-icons text-green-500 text-sm mr-1">check</span>請求書払い（月末締め翌月末払い）</span>
-                                                                </p>
-                                                            </div>
-                                                            <div class="flex-shrink-0 w-full md:w-auto">
-                                                                <a href="premium_registration_spa.html"
-                                                                    class="block w-full md:inline-block text-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-lg shadow-md transition duration-200 transform hover:-translate-y-0.5">
-                                                                    今すぐ申し込む
-                                                                    <span class="block text-xs font-normal opacity-80 mt-1">最短1分で登録完了</span>
-                                                                </a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </section>
-                    
-                                                <!-- 機能比較セクション -->
-                                                <section>
-                                                    <div class="flex items-center justify-center mb-6">
-                                                        <h2 class="text-2xl font-bold text-gray-800 flex items-center">
-                                                            プラン比較
-                                                        </h2>
-                                                    </div>
-                                                    <div class="overflow-x-auto border border-gray-200 rounded-lg">
-                                                        <table class="min-w-full divide-y divide-gray-200">
-                                                            <thead class="bg-gray-50">
-                                                                <tr>
-                                                                    <th scope="col"
-                                                                        class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider w-1/3">
-                                                                        機能</th>
-                                                                    <th scope="col"
-                                                                        class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider w-1/3">
-                                                                        Standard (無料)</th>
-                                                                    <th scope="col"
-                                                                        class="px-6 py-3 text-center text-xs font-bold text-blue-900 uppercase tracking-wider w-1/3 bg-blue-50">
-                                                                        Premium</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody class="bg-white divide-y divide-gray-200 text-sm">
-                                                                <tr>
-                                                                    <td class="px-6 py-4 font-medium text-gray-900">アンケート設問数</td>
-                                                                    <td class="px-6 py-4 text-center text-gray-500">最大 20問</td>
-                                                                    <td class="px-6 py-4 text-center font-bold text-blue-900 bg-blue-50/30">
-                                                                        最大 500問</td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td class="px-6 py-4 font-medium text-gray-900">設問分岐 (ロジック)</td>
-                                                                    <td class="px-6 py-4 text-center text-gray-500">-</td>
-                                                                    <td class="px-6 py-4 text-center font-bold text-blue-900 bg-blue-50/30">
-                                                                        利用可能</td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td class="px-6 py-4 font-medium text-gray-900">多言語対応</td>
-                                                                    <td class="px-6 py-4 text-center text-gray-500">-</td>
-                                                                    <td class="px-6 py-4 text-center font-bold text-blue-900 bg-blue-50/30">
-                                                                        作成・回答表示</td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td class="px-6 py-4 font-medium text-gray-900">お礼メール</td>
-                                                                    <td class="px-6 py-4 text-center text-gray-500">制限あり</td>
-                                                                    <td class="px-6 py-4 text-center font-bold text-blue-900 bg-blue-50/30">
-                                                                        自動配信・独自ドメイン・条件分岐</td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td class="px-6 py-4 font-medium text-gray-900">データ化スピード</td>
-                                                                    <td class="px-6 py-4 text-center text-gray-500">通常</td>
-                                                                    <td class="px-6 py-4 text-center font-bold text-blue-900 bg-blue-50/30">
-                                                                        優先・オンデマンド対応</td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td class="px-6 py-4 font-medium text-gray-900">分析・レポート</td>
-                                                                    <td class="px-6 py-4 text-center text-gray-500">SPEEDレビュー（閲覧のみ）</td>
-                                                                    <td class="px-6 py-4 text-center font-bold text-blue-900 bg-blue-50/30">
-                                                                        SPEEDレビュー + Excel/CSV出力</td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td class="px-6 py-4 font-medium text-gray-900">データ保存期間</td>
-                                                                    <td class="px-6 py-4 text-center text-gray-500">30日</td>
-                                                                    <td class="px-6 py-4 text-center font-bold text-blue-900 bg-blue-50/30">
-                                                                        無期限</td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td class="px-6 py-4 font-medium text-gray-900">外部連携</td>
-                                                                    <td class="px-6 py-4 text-center text-gray-500">Slack</td>
-                                                                    <td class="px-6 py-4 text-center font-bold text-blue-900 bg-blue-50/30">
-                                                                        Slack, SFA/CRM</td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td class="px-6 py-4 font-medium text-gray-900">画像アップロード設問</td>
-                                                                    <td class="px-6 py-4 text-center text-gray-500">-</td>
-                                                                    <td class="px-6 py-4 text-center font-bold text-blue-900 bg-blue-50/30">
-                                                                        利用可能</td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </section>
-                    
-                                                <!-- FAQセクション -->
-                                                <section>
-                                                    <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
-                                                        <span class="material-icons-outlined text-blue-900 mr-2">help_outline</span>
-                                                        よくある質問
-                                                    </h2>
-                                                    <div class="grid gap-6 md:grid-cols-2">
-                                                        <div class="bg-gray-50 p-4 rounded-lg">
-                                                            <h3 class="font-bold text-gray-800 text-sm mb-2">Q. 請求書はいつ発行されますか？</h3>
-                                                            <p class="text-sm text-gray-600">
-                                                                月末締めで計算し、翌月第1営業日に管理画面の「ご請求内容一覧」よりダウンロードいただけます。
-                                                            </p>
-                                                        </div>
-                                                        <div class="bg-gray-50 p-4 rounded-lg">
-                                                            <h3 class="font-bold text-gray-800 text-sm mb-2">Q. 最低利用期間はありますか？</h3>
-                                                            <p class="text-sm text-gray-600">いいえ、最低利用期間は設けておりません。月単位での解約が可能です。</p>
-                                                        </div>
-                                                        <div class="bg-gray-50 p-4 rounded-lg">
-                                                            <h3 class="font-bold text-gray-800 text-sm mb-2">Q. データは引き継げますか？</h3>
-                                                            <p class="text-sm text-gray-600">はい、現在のアカウント情報をそのまま引き継いでご利用いただけます。</p>
-                                                        </div>
-                                                        <div class="bg-gray-50 p-4 rounded-lg">
-                                                            <h3 class="font-bold text-gray-800 text-sm mb-2">Q. 支払方法は何がありますか？</h3>
-                                                            <p class="text-sm text-gray-600">現在は銀行振込（請求書払い）のみ対応しております。</p>
-                                                        </div>
-                                                    </div>
-                                                </section>
-                    
-                                                <!-- お問い合わせ -->
-                                                <div class="border-t border-gray-200 pt-6 text-center">
-                                                    <p class="text-sm text-gray-500 mb-4">
-                                                        ご不明な点がございましたら、<a href="bug-report.html" id="open-support-modal" class="text-blue-600 hover:text-blue-800 underline">サポート</a>までお問い合わせください。
-                                                    </p>
+                                    <div class="bg-blue-50 border border-blue-100 rounded-xl p-8 max-w-3xl mx-auto">
+                                        <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                                            <div class="flex-1 text-center md:text-left">
+                                                <div class="text-sm text-blue-800 font-bold mb-1">月額利用料</div>
+                                                <div class="flex items-baseline justify-center md:justify-start">
+                                                    <span class="text-4xl font-extrabold text-blue-900">¥10,000</span>
+                                                    <span class="text-gray-600 ml-2 font-medium">（税別）</span>
                                                 </div>
-                    
+                                                <p class="badge-free-month mt-2" id="first-month-free-message">
+                                                    今なら初月無料！
+                                                </p>
+                                                <div class="flex flex-col gap-2 mt-3 text-sm text-gray-500">
+                                                    <div class="flex items-center justify-center md:justify-start">
+                                                        <span class="material-icons text-green-500 text-sm mr-2"
+                                                            aria-hidden="true">check</span>
+                                                        初期費用 0円
+                                                    </div>
+                                                    <div class="flex items-center justify-center md:justify-start">
+                                                        <span class="material-icons text-green-500 text-sm mr-2"
+                                                            aria-hidden="true">check</span>
+                                                        請求書払い（月末締め翌月末払い）
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="flex-shrink-0 w-full md:w-auto text-center">
+                                                <a href="premium_registration_spa.html"
+                                                    class="block w-full md:inline-block text-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-lg shadow-md transition duration-200 transform hover:-translate-y-0.5 animate-pulse-subtle">
+                                                    今すぐ申し込む
+                                                    <span
+                                                        class="block text-xs font-normal opacity-80 mt-1">最短1分で登録完了</span>
+                                                </a>
+                                                <!-- Trust Badges -->
+                                                <div class="trust-badges">
+                                                    <div class="trust-badge">
+                                                        <span class="material-icons-outlined"
+                                                            aria-hidden="true">verified_user</span>
+                                                        セキュリティ万全
+                                                    </div>
+                                                    <div class="trust-badge">
+                                                        <span class="material-icons-outlined"
+                                                            aria-hidden="true">event_available</span>
+                                                        いつでも解約可能
+                                                    </div>
+                                                    <div class="trust-badge">
+                                                        <span class="material-icons-outlined"
+                                                            aria-hidden="true">receipt_long</span>
+                                                        インボイス対応
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                    
+                                </section>
+
+                                <!-- 機能比較セクション -->
+                                <section>
+                                    <div class="flex items-center justify-center mb-6">
+                                        <h2 class="text-2xl font-bold text-gray-800 flex items-center">
+                                            プラン比較
+                                        </h2>
+                                    </div>
+                                    <div
+                                        class="overflow-x-auto border border-gray-200 rounded-lg table-scroll-container">
+                                        <table class="min-w-full divide-y divide-gray-200">
+                                            <thead class="bg-gray-50">
+                                                <tr>
+                                                    <th scope="col"
+                                                        class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider w-1/3">
+                                                        機能</th>
+                                                    <th scope="col"
+                                                        class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider w-1/3">
+                                                        Standard (無料)</th>
+                                                    <th scope="col"
+                                                        class="px-6 py-3 text-center text-xs font-bold text-blue-900 uppercase tracking-wider w-1/3 bg-blue-50">
+                                                        Premium</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="bg-white divide-y divide-gray-200 text-sm">
+                                                <tr>
+                                                    <td class="px-6 py-4 font-medium text-gray-900">アンケート設問数</td>
+                                                    <td class="px-6 py-4 text-center text-gray-500">最大 20問</td>
+                                                    <td
+                                                        class="px-6 py-4 text-center font-bold text-blue-900 bg-blue-50/30">
+                                                        最大 500問</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="px-6 py-4 font-medium text-gray-900">設問分岐 (ロジック)</td>
+                                                    <td class="px-6 py-4 text-center text-gray-500">-</td>
+                                                    <td
+                                                        class="px-6 py-4 text-center font-bold text-blue-900 bg-blue-50/30">
+                                                        利用可能</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="px-6 py-4 font-medium text-gray-900">多言語対応</td>
+                                                    <td class="px-6 py-4 text-center text-gray-500">-</td>
+                                                    <td
+                                                        class="px-6 py-4 text-center font-bold text-blue-900 bg-blue-50/30">
+                                                        作成・回答表示</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="px-6 py-4 font-medium text-gray-900">お礼メール</td>
+                                                    <td class="px-6 py-4 text-center text-gray-500">制限あり</td>
+                                                    <td
+                                                        class="px-6 py-4 text-center font-bold text-blue-900 bg-blue-50/30">
+                                                        自動配信・独自ドメイン・条件分岐</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="px-6 py-4 font-medium text-gray-900">データ化スピード</td>
+                                                    <td class="px-6 py-4 text-center text-gray-500">通常</td>
+                                                    <td
+                                                        class="px-6 py-4 text-center font-bold text-blue-900 bg-blue-50/30">
+                                                        特急/オンデマンド対応<br><span
+                                                            class="text-xs font-normal text-gray-500">※追加料金でご利用いただけます</span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="px-6 py-4 font-medium text-gray-900">分析・レポート</td>
+                                                    <td class="px-6 py-4 text-center text-gray-500">SPEEDレビュー（閲覧のみ）</td>
+                                                    <td
+                                                        class="px-6 py-4 text-center font-bold text-blue-900 bg-blue-50/30">
+                                                        SPEEDレビュー + Excel/CSV出力</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="px-6 py-4 font-medium text-gray-900">データ保存期間</td>
+                                                    <td class="px-6 py-4 text-center text-gray-500">30日</td>
+                                                    <td
+                                                        class="px-6 py-4 text-center font-bold text-blue-900 bg-blue-50/30">
+                                                        無期限</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="px-6 py-4 font-medium text-gray-900">外部連携</td>
+                                                    <td class="px-6 py-4 text-center text-gray-500">Slack</td>
+                                                    <td
+                                                        class="px-6 py-4 text-center font-bold text-blue-900 bg-blue-50/30">
+                                                        Slack, SFA/CRM</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="px-6 py-4 font-medium text-gray-900">画像アップロード設問</td>
+                                                    <td class="px-6 py-4 text-center text-gray-500">-</td>
+                                                    <td
+                                                        class="px-6 py-4 text-center font-bold text-blue-900 bg-blue-50/30">
+                                                        利用可能</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <p class="table-scroll-hint">横にスクロールできます →</p>
+                                    </div>
+                                </section>
+
+                                <!-- FAQセクション -->
+                                <section>
+                                    <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                                        <span class="material-icons-outlined text-blue-900 mr-2">help_outline</span>
+                                        よくある質問
+                                    </h2>
+                                    <div class="grid gap-6 md:grid-cols-2">
+                                        <div class="bg-gray-50 p-4 rounded-lg">
+                                            <h3 class="font-bold text-gray-800 text-sm mb-2">Q. 請求書はいつ発行されますか？</h3>
+                                            <p class="text-sm text-gray-600">
+                                                月末締めで計算し、翌月第1営業日に管理画面の「ご請求内容一覧」よりダウンロードいただけます。
+                                            </p>
+                                        </div>
+                                        <div class="bg-gray-50 p-4 rounded-lg">
+                                            <h3 class="font-bold text-gray-800 text-sm mb-2">Q. 最低利用期間はありますか？</h3>
+                                            <p class="text-sm text-gray-600">いいえ、最低利用期間は設けておりません。月単位での解約が可能です。</p>
+                                        </div>
+                                        <div class="bg-gray-50 p-4 rounded-lg">
+                                            <h3 class="font-bold text-gray-800 text-sm mb-2">Q. データは引き継げますか？</h3>
+                                            <p class="text-sm text-gray-600">はい、現在のアカウント情報をそのまま引き継いでご利用いただけます。</p>
+                                        </div>
+                                        <div class="bg-gray-50 p-4 rounded-lg">
+                                            <h3 class="font-bold text-gray-800 text-sm mb-2">Q. 支払方法は何がありますか？</h3>
+                                            <p class="text-sm text-gray-600">現在は銀行振込（請求書払い）のみ対応しております。</p>
+                                        </div>
+                                    </div>
+                                </section>
+
+                                <!-- お問い合わせ -->
+                                <div class="border-t border-gray-200 pt-6 text-center">
+                                    <p class="text-sm text-gray-500 mb-4">
+                                        ご不明な点がございましたら、<a href="bug-report.html" id="open-support-modal"
+                                            class="text-blue-600 hover:text-blue-800 underline">サポート</a>までお問い合わせください。
+                                    </p>
                                 </div>
-                            </main>        </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+        </div>
 
         <!-- 5. フッター (main.jsによって読み込まれる) -->
         <div id="footer-placeholder"></div>
@@ -307,14 +276,6 @@
 
     <!-- JSファイル -->
     <script type="module" src="src/main.js"></script>
-    <script>
-        // ダミーユーザーデータ（header.html内のレンダリングで必要になる場合があるため）
-        window.dummyUserData = {
-            email: 'user@example.com',
-            company: '株式会社サンプル',
-            name: '山田 太郎'
-        };
-    </script>
     <script src="premium_signup_new.js"></script>
 
     <!-- Simulation Scenario Switcher -->
@@ -324,60 +285,76 @@
             <span class="material-icons-outlined">settings</span>
         </button>
 
-        <div id="scenario-switcher-menu" class="hidden absolute bottom-full left-0 mb-2 w-64 bg-white rounded-lg shadow-xl p-4 space-y-2">
+        <div id="scenario-switcher-menu"
+            class="hidden absolute bottom-full left-0 mb-2 w-64 bg-white rounded-lg shadow-xl p-4 space-y-2">
             <h3 class="font-bold text-gray-800 border-b pb-2 mb-2">シミュレーションシナリオ</h3>
-            <button class="scenario-button w-full text-left p-2 rounded-md hover:bg-gray-100" data-scenario="new-full-info">
+            <button class="scenario-button w-full text-left p-2 rounded-md hover:bg-gray-100"
+                data-scenario="new-full-info">
                 完全新規 - 全情報あり
             </button>
-            <button class="scenario-button w-full text-left p-2 rounded-md hover:bg-gray-100" data-scenario="new-partial-info">
+            <button class="scenario-button w-full text-left p-2 rounded-md hover:bg-gray-100"
+                data-scenario="new-partial-info">
                 完全新規 - 一部情報あり
             </button>
-            <button class="scenario-button w-full text-left p-2 rounded-md hover:bg-gray-100" data-scenario="rejoin-user">
+            <button class="scenario-button w-full text-left p-2 rounded-md hover:bg-gray-100"
+                data-scenario="rejoin-user">
                 再加入ユーザー
             </button>
-            <button class="scenario-button w-full text-left p-2 rounded-md hover:bg-gray-100" data-scenario="premium-member">
+            <button class="scenario-button w-full text-left p-2 rounded-md hover:bg-gray-100"
+                data-scenario="premium-member">
                 既存プレミアム会員
             </button>
         </div>
     </div>
-<div id="contactModal" class="fixed inset-0 flex items-center justify-center p-4 modal-overlay hidden opacity-0 z-[60]" data-state="closed">
-    <div class="bg-surface rounded-lg shadow-xl p-6 w-full max-w-xl modal-content-transition" data-state="closed">
-        <div class="flex justify-between items-center mb-6">
-            <h3 class="text-on-surface text-xl font-semibold">お問い合わせ</h3>
-            <button class="text-on-surface-variant hover:text-on-surface" id="closeContactModalBtn" aria-label="モーダルを閉じる">
-                <span class="material-icons">close</span>
-            </button>
-        </div>
-        <form class="space-y-4">
-            <div class="input-group">
-                <input class="input-field" id="contactName" name="contactName" placeholder=" " type="text" required/>
-                <label class="input-label" for="contactName">お名前</label>
-                <p class="error-message hidden" id="contactName-error"></p>
-            </div>
-            <div class="input-group">
-                <input class="input-field" id="contactEmail" name="contactEmail" placeholder=" " type="email" required/>
-                <label class="input-label" for="contactEmail">メールアドレス</label>
-                <p class="error-message hidden" id="contactEmail-error"></p>
-            </div>
-            <div class="input-group">
-                <input class="input-field" id="contactSubject" name="contactSubject" placeholder=" " type="text" required/>
-                <label class="input-label" for="contactSubject">件名</label>
-                <p class="error-message hidden" id="contactSubject-error"></p>
-            </div>
-            <div class="input-group">
-                <textarea class="input-field" id="contactMessage" name="contactMessage" placeholder=" " rows="4" required></textarea>
-                <label class="input-label" for="contactMessage">お問い合わせ内容</label>
-                <p class="error-message hidden" id="contactMessage-error"></p>
-            </div>
-            <div class="flex justify-end gap-3 pt-4">
-                <button class="bg-secondary-container text-on-secondary-container py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal tracking-wide transition-colors" onclick="closeModal('contactModal')" type="button" aria-label="キャンセル">キャンセル</button>
-                <button class="gradient-primary-bg text-on-primary py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal transition-colors" id="sendContactFormBtn" type="submit" aria-label="送信する">
-                    送信する
+    <div id="contactModal"
+        class="fixed inset-0 flex items-center justify-center p-4 modal-overlay hidden opacity-0 z-[60]"
+        data-state="closed">
+        <div class="bg-surface rounded-lg shadow-xl p-6 w-full max-w-xl modal-content-transition" data-state="closed">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-on-surface text-xl font-semibold">お問い合わせ</h3>
+                <button class="text-on-surface-variant hover:text-on-surface" id="closeContactModalBtn"
+                    aria-label="モーダルを閉じる">
+                    <span class="material-icons">close</span>
                 </button>
             </div>
-        </form>
+            <form class="space-y-4">
+                <div class="input-group">
+                    <input class="input-field" id="contactName" name="contactName" placeholder=" " type="text"
+                        required />
+                    <label class="input-label" for="contactName">お名前</label>
+                    <p class="error-message hidden" id="contactName-error"></p>
+                </div>
+                <div class="input-group">
+                    <input class="input-field" id="contactEmail" name="contactEmail" placeholder=" " type="email"
+                        required />
+                    <label class="input-label" for="contactEmail">メールアドレス</label>
+                    <p class="error-message hidden" id="contactEmail-error"></p>
+                </div>
+                <div class="input-group">
+                    <input class="input-field" id="contactSubject" name="contactSubject" placeholder=" " type="text"
+                        required />
+                    <label class="input-label" for="contactSubject">件名</label>
+                    <p class="error-message hidden" id="contactSubject-error"></p>
+                </div>
+                <div class="input-group">
+                    <textarea class="input-field" id="contactMessage" name="contactMessage" placeholder=" " rows="4"
+                        required></textarea>
+                    <label class="input-label" for="contactMessage">お問い合わせ内容</label>
+                    <p class="error-message hidden" id="contactMessage-error"></p>
+                </div>
+                <div class="flex justify-end gap-3 pt-4">
+                    <button
+                        class="bg-secondary-container text-on-secondary-container py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal tracking-wide transition-colors"
+                        id="cancelContactModalBtn" type="button" aria-label="キャンセル">キャンセル</button>
+                    <button
+                        class="gradient-primary-bg text-on-primary py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal transition-colors"
+                        id="sendContactFormBtn" type="submit" aria-label="送信する">
+                        送信する
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 </body>
 
 </html>

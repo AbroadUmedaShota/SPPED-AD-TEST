@@ -1,3 +1,10 @@
+// ダミーユーザーデータ（header.html内のレンダリングで必要になる場合があるため）
+window.dummyUserData = {
+    email: 'user@example.com',
+    company: '株式会社サンプル',
+    name: '山田 太郎'
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     // --- Simulation Scenario Switcher UI Toggle Logic ---
     const scenarioSwitcherButton = document.getElementById('scenario-switcher-button');
@@ -19,7 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Simulation Scenario Switcher Logic ---
     const scenarioButtons = document.querySelectorAll('.scenario-button');
-    const applyButton = document.getElementById('apply-scenario-button'); // Applyボタンを追加するなら
 
     // Define base dummy user data
     // premium_signup_new.htmlのwindow.dummyUserDataはheader用なので、シミュレーション用は別で管理
@@ -75,12 +81,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const signupButtonContainer = document.querySelector('.bg-blue-50 .flex-shrink-0');
         const signupButton = signupButtonContainer ? signupButtonContainer.querySelector('a') : null;
         const pageHeader = document.querySelector('.hero-bg'); // ページ上部のヘッダー全体
-        const mainContentArea = document.querySelector('.max-w-5xl.mx-auto.py-8.px-4.-mt-8'); // 主要コンテンツエリア
+        const mainContentArea = document.querySelector('.premium-card .p-6'); // 主要コンテンツエリア (Updated selector)
+        const premiumBadge = document.querySelector('.premium-badge'); // Badge selector
 
         // 「今すぐ申し込む」ボタンの表示制御
         if (signupButton) {
             if (currentScenarioConfig.is_premium_member) {
                 // 既存プレミアム会員の場合
+                if (premiumBadge) premiumBadge.style.display = 'none'; // Hide badge
+
                 signupButton.href = 'index.html'; // ダッシュボードへのリンクに変更
                 signupButton.innerHTML = `
                     ダッシュボードへ戻る
@@ -103,9 +112,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     `;
                 }
+
+                // Main content update for premium member
+                // Note: The structure changed slightly with re-factoring, targeting the inner container
                 if (mainContentArea) {
                     mainContentArea.innerHTML = `
-                        <div class="bg-white shadow-xl rounded-lg overflow-hidden border border-gray-100 p-10 text-center">
+                        <div class="text-center py-10">
                             <p class="text-lg text-gray-800 mb-6">
                                 お客様は既にプレミアムプランにご登録済みです。<br>
                                 ダッシュボードより引き続きサービスをご利用ください。
@@ -121,9 +133,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     `;
                 }
 
-
             } else {
                 // その他のシナリオ (新規、再加入)
+                if (premiumBadge) premiumBadge.style.display = ''; // Show badge (restore default)
+
                 signupButton.href = 'premium_registration_spa.html'; // 通常の登録SPAページへのリンク
                 signupButton.innerHTML = `
                     今すぐ申し込む
@@ -153,11 +166,11 @@ document.addEventListener('DOMContentLoaded', () => {
             currentScenarioConfig = scenarioConfigs['new-full-info'];
             localStorage.setItem('currentScenario', 'new-full-info'); // Store default
         }
-        
+
         // updateUiForScenarioに window.dummyUserData の情報を渡す (premium_registration_spa.html用)
         // premium_signup_new.html の window.dummyUserData (ヘッダー用) を更新
         // window.dummyUserData は premium_signup_new.html の header.html で利用されるため、ここで更新
-        window.dummyUserData = { 
+        window.dummyUserData = {
             ...window.dummyUserData, // 既存のheader用dummyUserDataを維持しつつ
             ...currentScenarioConfig // シミュレーション情報を追加
         };
@@ -166,16 +179,13 @@ document.addEventListener('DOMContentLoaded', () => {
         updateUiForScenario(currentScenarioConfig);
     };
 
-
-
-
     // Handle scenario button clicks
     scenarioButtons.forEach(button => {
         button.addEventListener('click', () => {
             const scenarioKey = button.dataset.scenario;
             applyScenario(scenarioKey);
             // シナリオ適用後、premium_signup_new.htmlのUIを更新するためリロード
-            location.reload(); 
+            location.reload();
         });
     });
 
@@ -183,39 +193,25 @@ document.addEventListener('DOMContentLoaded', () => {
     handleInitialScenario();
 
     // --- Contact Modal Logic ---
-    // Note: The "サポート" link now directly navigates to bug-report.html.
-    // The following JavaScript code for opening the contact modal is no longer needed
-    // for the "サポート" link, but the modal itself and its closing logic might still be used
-    // if other parts of the application open it.
-    // For now, we will comment out the code that opens the modal via the "サポート" link.
-    const openSupportModalLink = document.getElementById('open-support-modal'); // Still get the element in case it's used elsewhere
     const contactModal = document.getElementById('contactModal');
     const closeContactModalBtn = document.getElementById('closeContactModalBtn');
-
-    console.log('openSupportModalLink:', openSupportModalLink);
-    console.log('contactModal:', contactModal);
-    console.log('closeContactModalBtn:', closeContactModalBtn);
+    const cancelContactModalBtn = document.getElementById('cancelContactModalBtn'); // New button ID
 
     function openContactModal() {
-        console.log('openContactModal called');
         if (contactModal) {
-            console.log('contactModal is not null. Current classList before removing hidden/opacity-0:', contactModal.classList);
             contactModal.classList.remove('hidden');
-            void contactModal.offsetWidth; // Force reflow
-            contactModal.classList.remove('opacity-0');
-            console.log('contactModal after class changes:', contactModal.className);
-            // 必要に応じて、モーダルコンテンツのトランジションクラスも操作
-            const modalContent = contactModal.querySelector('.modal-content-transition');
-            if (modalContent) {
-                modalContent.classList.remove('scale-95');
-            }
-        } else {
-            console.error('contactModal is null in openContactModal!');
+            // Small delay to allow display:block to apply before opacity transition
+            requestAnimationFrame(() => {
+                contactModal.classList.remove('opacity-0');
+                const modalContent = contactModal.querySelector('.modal-content-transition');
+                if (modalContent) {
+                    modalContent.classList.remove('scale-95');
+                }
+            });
         }
     }
 
     function closeContactModal() {
-        console.log('closeContactModal called');
         if (contactModal) {
             contactModal.classList.add('opacity-0');
             const modalContent = contactModal.querySelector('.modal-content-transition');
@@ -228,26 +224,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // if (openSupportModalLink) { // このブロックをコメントアウト
-    //     console.log('Adding click listener to openSupportModalLink');
-    //     openSupportModalLink.addEventListener('click', (event) => {
-    //         event.preventDefault(); // デフォルトのリンク動作を防ぐ
-    //         openContactModal();
-    //     });
-    // } else {
-    //     console.log('openSupportModalLink not found');
-    // }
-
     if (closeContactModalBtn) {
-        console.log('Adding click listener to closeContactModalBtn');
         closeContactModalBtn.addEventListener('click', closeContactModal);
-    } else {
-        console.log('closeContactModalBtn not found');
     }
-    
-    // グローバル関数として closeModal を定義（contactModal.htmlのonclick属性用）
+
+    if (cancelContactModalBtn) {
+        cancelContactModalBtn.addEventListener('click', closeContactModal);
+    }
+
+    // グローバル関数として closeModal を定義（後方互換性のため）
     window.closeModal = (modalId) => {
-        console.log('closeModal global function called for:', modalId);
         if (modalId === 'contactModal') {
             closeContactModal();
         }
@@ -255,13 +241,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // モーダル外クリックで閉じる処理
     if (contactModal) {
-        console.log('Adding click listener to contactModal for outside close');
         contactModal.addEventListener('click', (event) => {
             if (event.target === contactModal) { // オーバーレイ部分をクリックした場合のみ
                 closeContactModal();
             }
         });
-    } else {
-        console.log('contactModal element not found for outside close listener');
     }
 });

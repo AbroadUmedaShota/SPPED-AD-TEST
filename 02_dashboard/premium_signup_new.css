@@ -1,990 +1,167 @@
-/* --- Confirm Screen Styles --- */
-.confirm-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #e0e0e0; /* light gray */
-    padding-bottom: 0.5rem;
-    padding-top: 0.5rem;
-}
-.confirm-item:last-child {
-    border-bottom: none;
-}
-
-/* --- Step Indicator Styles --- */
-.step-indicator {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-    position: relative;
-    padding: 0 1rem;
-}
-
-.step-indicator::before {
-    content: '';
-    position: absolute;
-    top: 20px;
-    left: 40px;
-    right: 40px;
-    height: 2px;
-    background-color: #e0e0e0;
-    z-index: 5;
-}
-
-.step-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    flex: 1;
-    position: relative;
-    z-index: 10;
-}
-
-.step-number {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: #e0e0e0;
-    color: #757575;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-    transition: all 0.3s ease-in-out;
-}
-
-.step-label {
-    font-size: 0.875rem; /* text-sm */
-    color: #757575;
-    transition: all 0.3s ease-in-out;
-    white-space: nowrap; /* Prevent label from wrapping */
-}
-
-.step-item.active .step-number {
-    background-color: #4F46E5; /* primary-500 */
-    color: white;
-    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.4);
-}
-
-.step-item.active .step-label {
-    color: #4F46E5; /* primary-500 */
-    font-weight: bold;
-}
-
-/* Custom CSS for Premium Signup Page */
-
-/* Base styles for the entire page (Tailwind CSS provides most of this) */
-body {
-    font-family: 'Noto Sans JP', sans-serif; /* Example font */
-}
-
-/* --- Screen Container Styles --- */
-.screen-container {
-    opacity: 1;
-    transition: opacity 0.3s ease-in-out; /* For fade animations */
-}
-
-.screen-container.hidden {
-    display: none;
-    opacity: 0;
-}
-
-/* --- Modal Styles --- */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000; /* Ensure modal is on top */
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out;
-}
-
-.modal-overlay.show {
-    opacity: 1;
-}
-
-.modal-content {
-    background-color: white;
-    padding: 2rem;
-    border-radius: 0.5rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    max-width: 90%;
-    width: 400px; /* Example fixed width */
-    transform: translateY(-20px); /* Initial state for animation */
-    transition: transform 0.3s ease-in-out;
-}
-
-.modal-overlay.show .modal-content {
-    transform: translateY(0); /* Final state for animation */
-}
-
-/* --- Button Styles (Tailwind provides most, custom for brand colors if needed) --- */
-.bg-primary {
-    background-color: #4F46E5; 
-}
-.hover\:bg-primary-dark:hover {
-    background-color: #4338CA; 
-}
-
-/* --- Form Element Styles (Tailwind provides most, custom for focus/error if needed) --- */
-.focus\:ring-primary:focus {
-    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.4); 
-    border-color: #4F46E5;
-}
-
-/* Custom error message style (Tailwind red-500 is often used) */
-.error-message { /* Changed from .text-red-500 to .error-message for more specific styling */
-    color: #EF4444;
-}
-
-/* --- Animations (for screen transitions) --- */
-/* These will be controlled by JavaScript adding/removing classes */
-.fade-out {
-    opacity: 0;
-}
-
-.fade-in {
-    opacity: 1;
-}
-
-/* --- Header/Footer Custom Colors --- */
-.gradient-primary-bg {
-    /* Example gradient, adjust as per design */
-    background: linear-gradient(to right, #4F46E5, #6366F1); /* From primary to indigo */
-}
-
-.bg-surface-variant {
-    /* Example color, adjust as per design */
-    background-color: #F3F4F6; /* Light gray */
-}
-
-/* --- Text Colors --- */
-/* Assuming 'primary' is a blueish tone and 'on-primary' is text color on primary background */
-.text-on-primary {
-    color: white; /* Text on primary background should be white */
-}
-
-.text-primary {
-    color: #4F46E5; /* Primary text color (blue) */
-}
-
-/* --- Highlight for Auto-Address Button --- */
-#btn-auto-address.highlight {
-    background-color: #4F46E5; /* primary color */
-    color: white;
-    transform: scale(1.05);
-    transition: all 0.3s ease-in-out;
-}
-
-/* --- Accordion Styles --- */
-details > summary {
-    list-style: none; /* Remove default marker */
-}
-details > summary::-webkit-details-marker {
-    display: none; /* Remove default marker for Chrome/Safari */
-}
-details summary .accordion-icon {
-    transition: transform 0.3s ease-in-out;
-}
-details[open] summary .accordion-icon {
-    transform: rotate(180deg);
-}
-
-/*
- * premium_signup.css
- * A complete redesign for a modern, conversion-focused pricing page.
- */
-
-/* --- Base & Typography --- */
-html {
-    overflow-y: scroll;
-    /* Fallback: 確実にスクロールバー領域を確保（全ブラウザ対応） */
-    scrollbar-gutter: stable;
-    /* Modern: スクロールバー領域を確保（モダンブラウザ用） */
+:root {
+    --color-primary: #1e3a8a;
+    /* Deep Navy */
+    --color-accent: #d97706;
+    /* Amber 600 (Goldish) */
+    --color-surface-premium: #f8fafc;
 }
 
 body {
-    /* Inherits from service-top-style.css */
-    background-color: var(--color-base-background-sub);
+    font-family: 'Inter', 'Noto Sans JP', sans-serif;
 }
 
-.container {
-    max-width: 1100px;
-    /* Wider for a more spacious layout */
-}
-
-/* Override default section padding for more control */
-section,
-footer {
-    padding: 4rem 2rem;
-    margin-bottom: 0;
-    border: none;
-    box-shadow: none;
-    border-radius: 0;
-    background-color: transparent;
-}
-
-
-
-h1 {
-    font-size: clamp(2.8rem, 6vw, 4rem);
-    font-weight: 800;
-    letter-spacing: -0.025em;
-    line-height: 1.1;
-}
-
-h2 {
-    text-align: center;
-    /* 中央揃えのみこのファイルで指定 */
-    /* 他のスタイルは service-top-style.css と Tailwind に任せる */
-    font-size: clamp(2.5rem, 6vw, 4rem);
-    /* デザイン統一のため、サイズ指定は維持。ユーザー要望により大きく */
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    border-bottom: none;
-    margin-bottom: 3rem;
-}
-
-/* 「ご利用の流れ」専用の文字サイズ調整 */
-.text-sm-h2 {
-    font-size: 1.5rem !important; /* 既存のh2スタイルより優先 */
-    margin-bottom: 2rem; /* h2デフォルトのmargin-bottomより少し小さく */
-}
-
-/* 料金プランとFAQセクションのh2は確実に大きく */
-#pricing h2,
-#faq h2,
-.pricing-section h2,
-.faq-section h2 {
-    font-size: clamp(2.5rem, 5vw, 3.5rem) !important;
-    font-weight: 800 !important;
-}
-
-#plan-comparison h2 {
-    font-size: clamp(1.8rem, 5vw, 3.2rem);
-    /* この見出しだけ文字数が多いので、改行対策で少し小さくする */
-}
-
-.subtitle {
-    font-size: 1.25rem;
-    max-width: 650px;
-}
-
-/* --- Hero Background Gradient --- */
-
-
-
-
-/* --- Hero Background (Enterprise Grid) --- */
-/* --- Hero Background (Enterprise Grid) --- */
-header.hero-section {
+.hero-bg {
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
     position: relative;
-    /* Brand Primary Blue Base */
-    background-color: #4285f4;
-    /* Subtle Grid Pattern */
-    background-image:
-        linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
-    background-size: 40px 40px;
-    /* Grid Cell Size */
-    border-radius: 0.75rem;
-    color: white;
-    padding: 2rem 1.5rem;
-    /* Reduced padding from 3rem */
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Vignette Effect for Depth (Optional but recommended) */
-header.hero-section::after {
+.hero-bg::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle, transparent 40%, rgba(0, 0, 0, 0.2) 100%);
-    pointer-events: none;
-    /* Click-through */
-    z-index: 1;
+    right: 0;
+    bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
 
-/* Ensure content is above the background effects */
-header.hero-section>* {
-    position: relative;
-    z-index: 2;
-}
-
-/* Remove blobs */
-.hero-bg-blob,
-.blob-1,
-.blob-2,
-.blob-3 {
-    display: none;
-}
-
-/* Glass panel is removed in this design to be cleaner, 
-   but we keep the class for layout if HTML still has it, 
-   just making it transparent. */
-.hero-glass-panel {
-    position: relative;
-    z-index: 10;
-    padding: 1rem 1rem;
-    background: transparent;
-    box-shadow: none;
-    border: none;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-}
-
-header.hero-section h1 {
-    /* テキストシャドウで可読性強化 */
-    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    color: #ffffff !important;
-    /* 強制的に白 */
-}
-
-header.hero-section p {
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    color: rgba(255, 255, 255, 0.95) !important;
-}
-
-header.hero-section .cta-button {
-    background-color: white;
-    /* 白背景ボタンで目立たせる */
-    color: var(--color-primary);
-    /* 文字色をブランドカラーに */
-    font-weight: 800;
-}
-
-header.hero-section .cta-button:hover {
-    background-color: #f0f9ff;
-    transform: translateY(-2px);
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
-}
-
-
-
-/* --- Plan Comparison Cards --- */
-.plan-comparison-cards {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 2rem;
-    align-items: stretch;
-}
-
-@media (min-width: 768px) {
-    .plan-comparison-cards {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-.plan-card {
-    background-color: var(--color-base-card);
-    border: 1px solid var(--color-base-border-divider);
-    border-radius: 16px;
-    padding: 2.5rem;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    transition: all 0.3s ease;
-}
-
-.plan-card.recommended {
-    border: 2px solid var(--color-primary);
-    transform: scale(1.05);
-    box-shadow: 0 20px 40px -15px rgba(var(--color-input-border-focus-rgb), 0.2);
-}
-
-.plan-header {
-    text-align: center;
-    border-bottom: 1px solid var(--color-base-border-divider);
-    padding-bottom: 1.5rem;
-    margin-bottom: 1.5rem;
-}
-
-.plan-card h3 {
-    font-size: 1.5rem;
-    font-weight: 700;
-}
-
-.plan-price {
-    font-size: 2.5rem;
-    font-weight: 800;
-    margin: 0.5rem 0;
-    color: var(--color-text-main);
-}
-
-.plan-description {
-    color: var(--color-text-sub);
-    font-size: 0.9rem;
-}
-
-.plan-badge {
-    display: inline-block;
-    background-color: var(--color-primary);
-    color: var(--color-on-primary);
-    padding: 0.25rem 0.75rem;
-    border-radius: 50px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-}
-
-.plan-features {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 1.5rem 0;
-    flex-grow: 1;
-}
-
-.plan-features li {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-    font-size: 0.95rem;
-}
-
-.plan-features .material-icons {
-    color: var(--color-state-success);
-    font-size: 1.5rem;
-}
-
-.plan-features li.dimmed {
-    color: var(--color-text-disabled);
-    text-decoration: line-through;
-}
-
-.plan-features li.dimmed .material-icons {
-    color: var(--color-text-disabled);
-}
-
-
-/* --- Testimonials (Horizontal Scroll) --- */
-.testimonial-scroll-container {
-    display: flex;
-    gap: 1.5rem;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    padding-bottom: 1rem;
-    -webkit-overflow-scrolling: touch;
-    /* スムーズスクロール for iOS */
-}
-
-.testimonial-scroll-container::-webkit-scrollbar {
-    height: 8px;
-}
-
-.testimonial-scroll-container::-webkit-scrollbar-track {
-    background: var(--color-base-border-divider);
-    border-radius: 4px;
-}
-
-.testimonial-scroll-container::-webkit-scrollbar-thumb {
-    background: var(--color-primary);
-    border-radius: 4px;
-}
-
-.testimonial-card {
-    min-width: 320px;
-    max-width: 400px;
-    flex-shrink: 0;
-    scroll-snap-align: start;
-}
-
-@media (min-width: 768px) {
-    .testimonial-card {
-        min-width: 380px;
-    }
-}
-
-/* --- Flow Steps --- */
-/* --- Flow Steps (Redesigned) --- */
-.flow-steps-container {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 2rem;
-    margin-top: 3rem;
+.premium-card {
+    border: 2px solid #fbbf24;
+    /* Amber 400 */
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     position: relative;
 }
 
-@media (min-width: 768px) {
-    .flow-steps-container {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 1.5rem;
-    }
-}
-
-.flow-step-card {
-    background: var(--color-base-background-sub);
-    padding: 2rem 1.5rem;
-    border-radius: 16px;
-    border: 1px solid var(--color-base-border-divider);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    position: relative;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    z-index: 1;
-    /* 線より手前に表示 */
-}
-
-.flow-step-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-    border-color: var(--color-primary);
-}
-
-.step-number {
+.premium-badge {
+    background: linear-gradient(90deg, #f59e0b, #fbbf24);
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 9999px;
+    font-weight: bold;
     position: absolute;
     top: -1rem;
     left: 50%;
     transform: translateX(-50%);
-    background: var(--color-primary);
-    color: var(--color-on-primary);
-    font-size: 0.9rem;
-    font-weight: 800;
-    padding: 0.25rem 1rem;
-    border-radius: 50px;
-    box-shadow: 0 4px 6px rgba(var(--color-input-border-focus-rgb), 0.3);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-.step-icon-wrapper {
-    width: 4rem;
-    height: 4rem;
-    background: var(--color-button-secondary-bg);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 1.5rem;
-    color: var(--color-primary);
-    margin-top: 0.5rem;
-    /* 番号との距離 */
+.check-icon {
+    color: #16a34a;
+    /* Green 600 */
 }
 
-.step-icon-wrapper .material-icons {
-    font-size: 2rem;
-}
-
-.flow-step-card h3 {
-    font-size: 1.3rem;
-    /* 1.1rem から増やす */
-    font-weight: 700;
-    margin-bottom: 0.75rem;
-    color: var(--color-text-main);
-}
-
-.flow-step-card p {
-    font-size: 1.05rem;
-    /* 0.9rem から増やす */
-    color: var(--color-text-sub);
-    line-height: 1.6;
-}
-
-/* 矢印（デスクトップのみ） */
-@media (min-width: 768px) {
-    .flow-step-card:not(:last-child)::after {
-        content: 'arrow_forward';
-        font-family: 'Material Icons';
-        position: absolute;
-        right: -1.25rem;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--color-base-border-divider);
-        font-size: 1.5rem;
-        z-index: 0;
-    }
-}
-
-
-/* --- FAQ --- */
-details {
-    padding: 1.5rem;
-    border: 1px solid var(--color-base-border-divider);
-    border-radius: 12px;
-}
-
-summary::after {
-    color: var(--color-primary);
-}
-
-/* --- Final CTA Footer --- */
-/* --- Final CTA Footer (Premium Black) --- */
-footer#cta {
-    background-color: #0f172a;
-    /* Deep Navy / Premium Black */
-    background-image:
-        radial-gradient(circle at 100% 0%, rgba(66, 133, 244, 0.15) 0%, transparent 25%),
-        radial-gradient(circle at 0% 100%, rgba(66, 133, 244, 0.1) 0%, transparent 25%);
-    /* Brand Blue Accents */
-    text-align: center;
-    border-radius: 16px;
-    color: white;
-    /* Default text white */
-    padding: 4rem 2rem;
-    /* Ensure generous padding */
-    box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.3);
-}
-
-footer#cta h2 {
-    color: white;
-    /* Explicitly white */
-    border: none;
-    margin-bottom: 2rem;
-}
-
-/* フッター内のCTAボタン：白背景で目立たせる */
-footer#cta .cta-button {
-    background-color: white;
-    color: var(--color-primary);
-    font-weight: 800;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    /* Reset previous overrides */
-    transform: none;
-}
-
-footer#cta .cta-button:hover {
-    background-color: #f8fafc;
-    /* Slightly off-white */
-    transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-}
-
-footer#cta a:not(.cta-button) {
-    color: rgba(255, 255, 255, 0.7);
-    text-decoration: underline;
-}
-
-footer#cta a:not(.cta-button):hover {
-    color: white;
-}
-
-/* --- Modal --- */
-.modal-content {
-    border-radius: 16px;
-}
-
-/* --- Pricing Plan Card --- */
-.pricing-card {
-    background-color: var(--color-base-card);
-    border: 1px solid var(--color-base-border-divider);
-    border-radius: 16px;
-    padding: 2.5rem;
-    display: flex;
-    flex-direction: column;
-    text-align: center;
-    /* 中央揃えに */
-    transition: all 0.3s ease;
-    box-shadow: var(--color-base-shadow-soft);
-}
-
-.pricing-card h3 {
-    font-size: 1.5rem;
-    font-weight: 700;
+.benefit-icon {
+    background-color: #eff6ff;
+    color: #1d4ed8;
+    padding: 1rem;
+    border-radius: 0.5rem;
     margin-bottom: 1rem;
-    color: var(--color-text-main);
+    display: inline-block;
 }
 
-.pricing-card__price {
-    font-size: 2.25rem;
-    /* 以前より大きく */
-    font-weight: 800;
-    margin: 1.5rem 0;
-    /* マージン調整 */
-    color: var(--color-text-main);
-}
+/* --- New Styles for UX Improvements --- */
 
-.pricing-card p {
-    color: var(--color-text-sub);
-    line-height: 1.6;
-}
-
-/* --- FAQ (Clean List / Minimalist) --- */
-.faq-section {
-    max-width: 800px;
-    /* Limit width for readability */
-    margin: 0 auto;
-    /* Center aligned */
-    display: block;
-    /* Reset grid */
-}
-
-.faq-section details {
-    background-color: transparent;
-    border: none;
-    border-bottom: 1px solid var(--color-base-border-divider);
-    border-radius: 0;
-    margin-bottom: 0;
-    box-shadow: none;
-    padding: 0;
-    /* Remove internal padding of details */
-    transition: all 0.2s ease;
-    height: auto;
-    /* Reset height */
-}
-
-.faq-section details:last-child {
-    border-bottom: none;
-}
-
-.faq-section details:hover {
-    box-shadow: none;
-    background-color: rgba(0, 0, 0, 0.02);
-    /* Very subtle hover */
-    border-color: var(--color-base-border-divider);
-    /* Reset hover border color */
-}
-
-.faq-section summary {
+/* Trust Badges */
+.trust-badges {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.25rem 1rem;
-    /* 横幅のパディングを統一して安定させる */
-    font-weight: 600;
-    font-size: 1.1rem;
-    color: var(--color-text-main);
-    cursor: pointer;
-    background-color: transparent;
-    transition: color 0.2s ease;
-    outline: none;
-    list-style: none;
-    /* マーカー削除 */
-}
-
-.faq-section summary::-webkit-details-marker {
-    display: none;
-    /* Chrome/Safari用マーカー削除 */
-}
-
-.faq-section summary:hover {
-    background-color: transparent;
-    color: var(--color-primary);
-}
-
-.faq-section summary::before {
-    display: none;
-}
-
-.faq-section summary::after {
-    content: '+';
-    font-size: 1.5rem;
-    font-weight: 400;
-    color: var(--color-text-sub);
-    transform: rotate(0deg);
-    transition: color 0.2s ease;
-    /* Remove transform transition */
-    margin-left: 1rem;
-    width: 2rem;
-    /* 幅を広めに固定 */
-    height: 2rem;
-    /* 高さも固定 */
-    display: flex;
-    /* Flexで中央揃え */
-    align-items: center;
     justify-content: center;
-    text-align: center;
-    flex-shrink: 0;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
 }
 
-/* アイコンを回転ではなく文字置換で切り替える (回転による微妙なズレを排除) */
-.faq-section details[open] summary::after {
-    content: '-';
-    /* + から - へ変更 */
-    transform: none;
-    /* 回転させない */
-    color: var(--color-primary);
-    font-size: 1.8rem;
-    /* - なので少し大きく調整 */
-    line-height: 1;
-    margin-top: -0.2rem;
-    /* 微調整 */
+.trust-badge {
+    display: flex;
+    align-items: center;
+    font-size: 0.7rem;
+    color: #4b5563;
+    /* gray-600 */
+    background-color: #ffffff;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #e5e7eb;
+    /* gray-200 */
+    white-space: nowrap;
 }
 
-/* FAQ回答のふわっとしたフェードイン効果 */
-.faq-section details[open]>p {
-    padding: 0 1rem 1.5rem 1rem;
-    /* summaryと左右パディングを完全に一致 */
-    margin-top: -0.5rem;
-    line-height: 1.6;
-    color: var(--color-text-sub);
-    font-size: 0.95rem;
-    border-top: none;
-    /* アニメーション設定 */
-    animation: fadeInDown 0.5s ease-out;
-    opacity: 1;
+.trust-badge .material-icons,
+.trust-badge .material-icons-outlined {
+    font-size: 0.9rem;
+    margin-right: 0.25rem;
+    color: #059669;
+    /* emerald-600 */
 }
 
-/* ふわっと表示するアニメーション */
-@keyframes fadeInDown {
-    0% {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
+/* Mobile Table Scroll Hint */
+.table-scroll-container {
+    position: relative;
 }
 
-/* Mobile check */
-@media (max-width: 768px) {
-    .faq-section summary {
-        font-size: 1rem;
-        padding: 1rem 0;
-    }
-}
-
-.faq-section details[open] summary::after {
-    content: '-';
-    /* 開いた時のアイコン */
-    transform: rotate(180deg);
-    /* 下矢印のように回転 */
-}
-
-.faq-section details>p {
-    max-height: 0;
-    overflow: hidden;
-    padding: 0 1.5rem;
-    /* 左右のパディングは維持 */
-    transition: max-height 0.4s ease-in-out, padding 0.4s ease-in-out;
-    font-size: 1rem;
-    /* 16px */
-    line-height: 1.7;
-    color: var(--color-text-sub);
-}
-
-.faq-section details[open]>p {
-    max-height: 500px;
-    /* 十分な高さを確保 (コンテンツに合わせて調整) */
-    padding: 1.5rem;
-    /* 開いた時の上下左右パディング */
-    border-top: 1px solid var(--color-base-border-divider);
-    /* 回答と質問の間に線 */
-}
-
-@media (max-width: 768px) {
-    .faq-section summary {
-        font-size: 1rem;
-        /* スマホで調整 */
-        padding: 1rem;
-    }
-
-    .faq-section details[open]>p {
-        padding: 1rem;
-    }
-
-    .pricing-card {
-        padding: 1.5rem;
-    }
-
-    .pricing-card__price {
-        font-size: 1.8rem;
-    }
-}
-
-.cta-button {
-    display: inline-flex; /* スピナーとテキストを横並びにするため */
-    align-items: center; /* 垂直方向中央揃え */
-    justify-content: center; /* 水平方向中央揃え */
-    gap: 0.5rem; /* テキストとスピナーの間隔 */
-    padding: 1rem 2.5rem;
-    background-color: #007bff;
-    color: #fff;
-    text-decoration: none;
-    font-size: 1.1rem;
-    font-weight: 700;
-    border-radius: 50px;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    border: none;
-    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2);
-}
-
-.cta-button:hover {
-    background-color: #0056b3;
-    transform: translateY(-3px);
-    box-shadow: 0 7px 20px rgba(0, 123, 255, 0.3);
-}
-
-/* --- Premium Registration Form Specific Styles --- */
-
-/* ステップ表示 (パンくずリスト) */
-nav[aria-label="Progress"] ol li a {
-    transition: all 0.3s ease;
-}
-
-nav[aria-label="Progress"] ol li a[aria-current="step"] {
-    border-color: var(--color-primary);
-}
-
-nav[aria-label="Progress"] ol li a[aria-current="step"] span {
-    color: var(--color-primary);
-    font-weight: 600; /* 現在のステップを強調 */
-}
-
-/* 完了したステップ */
-nav[aria-label="Progress"] ol li a.completed {
-    border-color: var(--color-state-success); /* 完了したステップは緑など */
-}
-nav[aria-label="Progress"] ol li a.completed span {
-    color: var(--color-state-success);
-}
-
-/* 未完了のステップ */
-nav[aria-label="Progress"] ol li a:not([aria-current="step"]):not(.completed) {
-    border-color: var(--color-outline-variant);
-}
-nav[aria-label="Progress"] ol li a:not([aria-current="step"]):not(.completed) span {
-    color: var(--color-on-surface-variant);
-}
-
-/* フォームフィールドのエラー表示 */
-.form-field-error {
-    color: var(--color-error);
-    font-size: 0.875rem; /* text-sm */
-    margin-top: 0.25rem; /* mt-1 */
-}
-
-/* 入力欄にエラーがある場合のスタイル */
-input.is-invalid,
-select.is-invalid,
-textarea.is-invalid {
-    border-color: var(--color-error) !important;
-    padding-right: 2.25rem; /* エラーアイコン分のスペース */
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccpath stroke-linejoin='round' d='M6 8.4v.1h.01v-.1z'/%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right calc(0.375em + 0.1875rem) center;
-    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
-}
-
-/* スピナーの基本スタイルとアニメーション */
-.spinner-border {
+.table-scroll-hint {
     display: none;
-    width: 1.5rem;
-    height: 1.5rem;
-    vertical-align: text-bottom;
-    border: .25em solid currentColor;
-    border-right-color: transparent;
-    border-radius: 50%;
-    animation: spinner-border .75s linear infinite;
+    text-align: right;
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 0.5rem;
 }
 
-@keyframes spinner-border {
-    to {
-        transform: rotate(360deg);
+@media (max-width: 640px) {
+    .table-scroll-hint {
+        display: block;
     }
+}
+
+/* --- Additional UX Improvements --- */
+
+/* 1. First Month Free Badge */
+.badge-free-month {
+    display: inline-block;
+    background-color: #dcfce7;
+    /* green-100 */
+    color: #166534;
+    /* green-800 */
+    font-weight: bold;
+    font-size: 0.875rem;
+    /* text-sm */
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    /* rounded-full */
+    border: 1px solid #86efac;
+    /* green-300 */
+    margin-top: 0.5rem;
+}
+
+/* 2. Button Pulse Animation */
+@keyframes pulse-subtle {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.03);
+    }
+}
+
+.animate-pulse-subtle {
+    animation: pulse-subtle 2s infinite ease-in-out;
+}
+
+.animate-pulse-subtle:hover {
+    animation: none;
+    /* Stop animation on hover */
+    transform: translateY(-2px);
+    /* Maintain hover effect */
+}
+
+/* 3. Aggressive Breadcrumb Offset */
+.breadcrumb-offset {
+    margin-top: -40px;
+    margin-bottom: 1rem;
+    /* mb-4 equivalent */
+    position: relative;
+    z-index: 10;
+    /* Ensure it stays clickable if overlapping heavily */
 }

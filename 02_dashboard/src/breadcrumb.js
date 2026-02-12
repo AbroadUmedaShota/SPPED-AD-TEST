@@ -45,6 +45,10 @@ const breadcrumbPaths = {
         { name: 'アンケート一覧', link: 'index.html' },
         { name: 'ヘルプセンター' },
     ],
+    'premium_signup_new.html': [
+        { name: 'ホーム', link: 'index.html' },
+        { name: 'プレミアムプラン' },
+    ],
 };
 
 function generateBreadcrumbs(currentPage, surveyId = null) {
