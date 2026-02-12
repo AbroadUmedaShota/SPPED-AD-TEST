@@ -3,6 +3,19 @@ html {
     overflow-y: scroll;
 }
 
+/* FAQ Answer text wrapping */
+.faq-answer p {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+}
+
+.faq-item {
+    max-width: 100%;
+    overflow: hidden;
+}
+
+
 /* --- Confirm Screen Styles --- */
 .confirm-item {
     display: flex;
