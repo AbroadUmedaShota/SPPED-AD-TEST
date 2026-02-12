@@ -1352,3 +1352,24 @@ textarea.is-invalid {
         transform: translate(0, 0) rotate(0deg);
     }
 }
+
+/* --- Header Opacity Fix --- */
+#header-placeholder header,
+header,
+.header {
+    background-color: #ffffff !important;
+    z-index: 1000 !important;
+    /* Ensure header stays on top */
+    position: fixed !important;
+    /* Enforce fixed positioning if needed */
+    top: 0;
+    width: 100%;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    /* Improve visibility separation */
+}
+
+/* Ensure breadcrumbs don't accidentally go over header */
+#breadcrumb-container {
+    position: relative;
+    z-index: 1;
+}
