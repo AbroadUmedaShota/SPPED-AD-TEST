@@ -374,4 +374,29 @@ document.addEventListener('DOMContentLoaded', () => {
         campaignInfoSection.classList.remove('hidden');
     }
     // 再加入ユーザー（isEligibleForFreeCampaign = false）の場合は何も表示しない
+
+    // --- FAQ Accordion Logic (2-column grid) ---
+    const faqCards = document.querySelectorAll('.faq-card');
+
+    faqCards.forEach(card => {
+        const question = card.querySelector('.faq-question');
+        const answer = card.querySelector('.faq-answer');
+        const icon = card.querySelector('.faq-icon');
+
+        question.addEventListener('click', () => {
+            const isOpen = question.getAttribute('aria-expanded') === 'true';
+
+            if (isOpen) {
+                // Close
+                answer.classList.add('hidden');
+                icon.textContent = 'expand_more';
+                question.setAttribute('aria-expanded', 'false');
+            } else {
+                // Open
+                answer.classList.remove('hidden');
+                icon.textContent = 'expand_less';
+                question.setAttribute('aria-expanded', 'true');
+            }
+        });
+    });
 });
