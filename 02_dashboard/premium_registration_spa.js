@@ -226,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return isValid;
     };
-    
+
     const validateForm = () => {
         let isFormValid = true;
         // inputs オブジェクトの各フィールドをループしてバリデーション
@@ -239,7 +239,63 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         return isFormValid;
+        return isFormValid;
     };
+
+    // --- Zip Code Search Logic ---
+    const btnZipSearch = document.getElementById('btn-zip-search');
+    const apiErrorZip = document.getElementById('api-error-zip');
+
+    if (btnZipSearch) {
+        btnZipSearch.addEventListener('click', () => {
+            const zipCode = inputs.zip.value.replace(/[^\d]/g, ''); // Remove non-digits
+
+            if (zipCode.length !== 7) {
+                displayError(inputs.zip, '郵便番号を7桁で入力してください。');
+                return;
+            }
+
+            // Clear previous errors
+            clearError(inputs.zip);
+            if (apiErrorZip) apiErrorZip.classList.add('hidden');
+
+            // Loading state
+            const originalBtnText = btnZipSearch.textContent;
+            btnZipSearch.textContent = '検索中...';
+            btnZipSearch.disabled = true;
+
+            fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${zipCode}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 200 && data.results) {
+                        const result = data.results[0];
+                        const fullAddress = `${result.address1}${result.address2}${result.address3}`;
+
+                        if (inputs.address) {
+                            inputs.address.value = fullAddress;
+                            // Trigger validation/clearing error for address
+                            validateField(inputs.address);
+                        }
+                    } else {
+                        if (apiErrorZip) {
+                            apiErrorZip.textContent = '該当する住所が見つかりませんでした。';
+                            apiErrorZip.classList.remove('hidden');
+                        }
+                    }
+                })
+                .catch(err => {
+                    console.error('Zip code fetch error:', err);
+                    if (apiErrorZip) {
+                        apiErrorZip.textContent = '住所の取得に失敗しました。';
+                        apiErrorZip.classList.remove('hidden');
+                    }
+                })
+                .finally(() => {
+                    btnZipSearch.textContent = originalBtnText;
+                    btnZipSearch.disabled = false;
+                });
+        });
+    }
 
 
     // --- Helper: Populate Confirm Screen ---

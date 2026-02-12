@@ -1132,3 +1132,141 @@ textarea.is-invalid {
     position: relative;
     z-index: 50;
 }
+
+/* --- Visual Polish: Scroll Reveal Animation --- */
+.reveal-on-scroll {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+}
+
+.reveal-on-scroll.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Staggered delays for children if needed */
+.reveal-delay-100 {
+    transition-delay: 0.1s;
+}
+
+.reveal-delay-200 {
+    transition-delay: 0.2s;
+}
+
+.reveal-delay-300 {
+    transition-delay: 0.3s;
+}
+
+/* --- Visual Polish: Enhanced Interactions --- */
+
+/* Card Lift & Depth Effect */
+.hover-card-premium {
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.hover-card-premium:hover {
+    transform: translateY(-8px) !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Button Shine Effect keyframes */
+@keyframes shine-anim {
+    0% {
+        left: -100%;
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+
+    100% {
+        left: 150%;
+        opacity: 0;
+    }
+}
+
+.btn-premium-shine {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-premium-shine::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(to right,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0.4) 50%,
+            rgba(255, 255, 255, 0) 100%);
+    transform: skewX(-25deg);
+    transition: none;
+    pointer-events: none;
+}
+
+.btn-premium-shine:hover::after {
+    animation: shine-anim 0.75s ease-in-out;
+}
+
+/* --- Visual Polish: Premium Animated Background --- */
+.premium-bg-animated {
+    background-color: #f8fafc;
+    /* slate-50 base */
+    position: relative;
+    overflow: hidden;
+}
+
+.premium-bg-animated::before,
+.premium-bg-animated::after {
+    content: '';
+    position: absolute;
+    width: 140%;
+    /* Oversize to allow movement */
+    height: 140%;
+    top: -20%;
+    left: -20%;
+    z-index: -1;
+    /* Behind content */
+    filter: blur(80px);
+    /* Soften the blobs */
+    opacity: 0.6;
+    animation: bg-move 20s infinite alternate ease-in-out;
+}
+
+.premium-bg-animated::before {
+    background: radial-gradient(circle at 80% 20%, rgba(219, 234, 254, 0.8), transparent 50%),
+        /* blue-100 */
+        radial-gradient(circle at 20% 80%, rgba(230, 240, 255, 0.8), transparent 50%);
+    animation-duration: 25s;
+}
+
+.premium-bg-animated::after {
+    background: radial-gradient(circle at 20% 20%, rgba(254, 243, 199, 0.6), transparent 40%),
+        /* amber-100/yellowish */
+        radial-gradient(circle at 80% 80%, rgba(240, 249, 255, 0.8), transparent 40%);
+    animation-direction: alternate-reverse;
+    animation-duration: 30s;
+}
+
+@keyframes bg-move {
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+
+    33% {
+        transform: translate(30px, -50px) rotate(2deg);
+    }
+
+    66% {
+        transform: translate(-20px, 40px) rotate(-1deg);
+    }
+
+    100% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+}
