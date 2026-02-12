@@ -3,10 +3,12 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #e0e0e0; /* light gray */
+    border-bottom: 1px solid #e0e0e0;
+    /* light gray */
     padding-bottom: 0.5rem;
     padding-top: 0.5rem;
 }
+
 .confirm-item:last-child {
     border-bottom: none;
 }
@@ -57,20 +59,24 @@
 }
 
 .step-label {
-    font-size: 0.875rem; /* text-sm */
+    font-size: 0.875rem;
+    /* text-sm */
     color: #757575;
     transition: all 0.3s ease-in-out;
-    white-space: nowrap; /* Prevent label from wrapping */
+    white-space: nowrap;
+    /* Prevent label from wrapping */
 }
 
 .step-item.active .step-number {
-    background-color: #4F46E5; /* primary-500 */
+    background-color: #4F46E5;
+    /* primary-500 */
     color: white;
     box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.4);
 }
 
 .step-item.active .step-label {
-    color: #4F46E5; /* primary-500 */
+    color: #4F46E5;
+    /* primary-500 */
     font-weight: bold;
 }
 
@@ -78,13 +84,15 @@
 
 /* Base styles for the entire page (Tailwind CSS provides most of this) */
 body {
-    font-family: 'Noto Sans JP', sans-serif; /* Example font */
+    font-family: 'Noto Sans JP', sans-serif;
+    /* Example font */
 }
 
 /* --- Screen Container Styles --- */
 .screen-container {
     opacity: 1;
-    transition: opacity 0.3s ease-in-out; /* For fade animations */
+    transition: opacity 0.3s ease-in-out;
+    /* For fade animations */
 }
 
 .screen-container.hidden {
@@ -99,11 +107,13 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Semi-transparent background */
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000; /* Ensure modal is on top */
+    z-index: 1000;
+    /* Ensure modal is on top */
     opacity: 0;
     transition: opacity 0.3s ease-in-out;
 }
@@ -118,31 +128,36 @@ body {
     border-radius: 0.5rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     max-width: 90%;
-    width: 400px; /* Example fixed width */
-    transform: translateY(-20px); /* Initial state for animation */
+    width: 400px;
+    /* Example fixed width */
+    transform: translateY(-20px);
+    /* Initial state for animation */
     transition: transform 0.3s ease-in-out;
 }
 
 .modal-overlay.show .modal-content {
-    transform: translateY(0); /* Final state for animation */
+    transform: translateY(0);
+    /* Final state for animation */
 }
 
 /* --- Button Styles (Tailwind provides most, custom for brand colors if needed) --- */
 .bg-primary {
-    background-color: #4F46E5; 
+    background-color: #4F46E5;
 }
+
 .hover\:bg-primary-dark:hover {
-    background-color: #4338CA; 
+    background-color: #4338CA;
 }
 
 /* --- Form Element Styles (Tailwind provides most, custom for focus/error if needed) --- */
 .focus\:ring-primary:focus {
-    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.4); 
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.4);
     border-color: #4F46E5;
 }
 
 /* Custom error message style (Tailwind red-500 is often used) */
-.error-message { /* Changed from .text-red-500 to .error-message for more specific styling */
+.error-message {
+    /* Changed from .text-red-500 to .error-message for more specific styling */
     color: #EF4444;
 }
 
@@ -159,42 +174,52 @@ body {
 /* --- Header/Footer Custom Colors --- */
 .gradient-primary-bg {
     /* Example gradient, adjust as per design */
-    background: linear-gradient(to right, #4F46E5, #6366F1); /* From primary to indigo */
+    background: linear-gradient(to right, #4F46E5, #6366F1);
+    /* From primary to indigo */
 }
 
 .bg-surface-variant {
     /* Example color, adjust as per design */
-    background-color: #F3F4F6; /* Light gray */
+    background-color: #F3F4F6;
+    /* Light gray */
 }
 
 /* --- Text Colors --- */
 /* Assuming 'primary' is a blueish tone and 'on-primary' is text color on primary background */
 .text-on-primary {
-    color: white; /* Text on primary background should be white */
+    color: white;
+    /* Text on primary background should be white */
 }
 
 .text-primary {
-    color: #4F46E5; /* Primary text color (blue) */
+    color: #4F46E5;
+    /* Primary text color (blue) */
 }
 
 /* --- Highlight for Auto-Address Button --- */
 #btn-auto-address.highlight {
-    background-color: #4F46E5; /* primary color */
+    background-color: #4F46E5;
+    /* primary color */
     color: white;
     transform: scale(1.05);
     transition: all 0.3s ease-in-out;
 }
 
 /* --- Accordion Styles --- */
-details > summary {
-    list-style: none; /* Remove default marker */
+details>summary {
+    list-style: none;
+    /* Remove default marker */
 }
-details > summary::-webkit-details-marker {
-    display: none; /* Remove default marker for Chrome/Safari */
+
+details>summary::-webkit-details-marker {
+    display: none;
+    /* Remove default marker for Chrome/Safari */
 }
+
 details summary .accordion-icon {
     transition: transform 0.3s ease-in-out;
 }
+
 details[open] summary .accordion-icon {
     transform: rotate(180deg);
 }
@@ -256,8 +281,10 @@ h2 {
 
 /* 「ご利用の流れ」専用の文字サイズ調整 */
 .text-sm-h2 {
-    font-size: 1.5rem !important; /* 既存のh2スタイルより優先 */
-    margin-bottom: 2rem; /* h2デフォルトのmargin-bottomより少し小さく */
+    font-size: 1.5rem !important;
+    /* 既存のh2スタイルより優先 */
+    margin-bottom: 2rem;
+    /* h2デフォルトのmargin-bottomより少し小さく */
 }
 
 /* 料金プランとFAQセクションのh2は確実に大きく */
@@ -897,10 +924,14 @@ footer#cta a:not(.cta-button):hover {
 }
 
 .cta-button {
-    display: inline-flex; /* スピナーとテキストを横並びにするため */
-    align-items: center; /* 垂直方向中央揃え */
-    justify-content: center; /* 水平方向中央揃え */
-    gap: 0.5rem; /* テキストとスピナーの間隔 */
+    display: inline-flex;
+    /* スピナーとテキストを横並びにするため */
+    align-items: center;
+    /* 垂直方向中央揃え */
+    justify-content: center;
+    /* 水平方向中央揃え */
+    gap: 0.5rem;
+    /* テキストとスピナーの間隔 */
     padding: 1rem 2.5rem;
     background-color: #007bff;
     color: #fff;
@@ -933,13 +964,16 @@ nav[aria-label="Progress"] ol li a[aria-current="step"] {
 
 nav[aria-label="Progress"] ol li a[aria-current="step"] span {
     color: var(--color-primary);
-    font-weight: 600; /* 現在のステップを強調 */
+    font-weight: 600;
+    /* 現在のステップを強調 */
 }
 
 /* 完了したステップ */
 nav[aria-label="Progress"] ol li a.completed {
-    border-color: var(--color-state-success); /* 完了したステップは緑など */
+    border-color: var(--color-state-success);
+    /* 完了したステップは緑など */
 }
+
 nav[aria-label="Progress"] ol li a.completed span {
     color: var(--color-state-success);
 }
@@ -948,6 +982,7 @@ nav[aria-label="Progress"] ol li a.completed span {
 nav[aria-label="Progress"] ol li a:not([aria-current="step"]):not(.completed) {
     border-color: var(--color-outline-variant);
 }
+
 nav[aria-label="Progress"] ol li a:not([aria-current="step"]):not(.completed) span {
     color: var(--color-on-surface-variant);
 }
@@ -955,8 +990,10 @@ nav[aria-label="Progress"] ol li a:not([aria-current="step"]):not(.completed) sp
 /* フォームフィールドのエラー表示 */
 .form-field-error {
     color: var(--color-error);
-    font-size: 0.875rem; /* text-sm */
-    margin-top: 0.25rem; /* mt-1 */
+    font-size: 0.875rem;
+    /* text-sm */
+    margin-top: 0.25rem;
+    /* mt-1 */
 }
 
 /* 入力欄にエラーがある場合のスタイル */
@@ -964,7 +1001,8 @@ input.is-invalid,
 select.is-invalid,
 textarea.is-invalid {
     border-color: var(--color-error) !important;
-    padding-right: 2.25rem; /* エラーアイコン分のスペース */
+    padding-right: 2.25rem;
+    /* エラーアイコン分のスペース */
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccpath stroke-linejoin='round' d='M6 8.4v.1h.01v-.1z'/%3e%3c/svg%3e");
     background-repeat: no-repeat;
     background-position: right calc(0.375em + 0.1875rem) center;
@@ -987,4 +1025,110 @@ textarea.is-invalid {
     to {
         transform: rotate(360deg);
     }
+}
+
+/* --- Restored UX Improvements --- */
+
+/* 1. Breadcrumb Offset (Aggressive Spacing) */
+.breadcrumb-offset {
+    margin-top: -40px;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 10;
+}
+
+/* 2. First Month Free Badge */
+.badge-free-month {
+    display: inline-block;
+    background-color: #dcfce7;
+    /* green-100 */
+    color: #166534;
+    /* green-800 */
+    font-weight: 700;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    /* text-sm */
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* 3. Pulse Animation for CTA */
+@keyframes pulse-subtle {
+
+    0%,
+    100% {
+        transform: scale(1);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    50% {
+        transform: scale(1.02);
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+    }
+}
+
+.animate-pulse-subtle {
+    animation: pulse-subtle 2s infinite ease-in-out;
+}
+
+.animate-pulse-subtle:hover {
+    animation: none;
+    transform: translateY(-2px);
+}
+
+/* 4. Mobile Table Scroll Hint */
+.table-scroll-hint {
+    display: none;
+    text-align: right;
+    font-size: 0.75rem;
+    color: #6b7280;
+    /* gray-500 */
+    margin-bottom: 0.5rem;
+}
+
+.table-scroll-hint::before {
+    content: '← ';
+}
+
+.table-scroll-hint::after {
+    content: ' →';
+}
+
+@media (max-width: 640px) {
+    .table-scroll-hint {
+        display: block;
+    }
+}
+
+/* 5. Trust Badges Wrapper */
+.trust-badges {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    font-size: 0.7rem;
+    /* slightly larger */
+    color: #4b5563;
+    /* gray-600 */
+    flex-wrap: wrap;
+}
+
+.trust-badge-item {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.trust-badge-item .material-icons {
+    font-size: 1rem;
+    color: #059669;
+    /* emerald-600 */
+}
+
+/* 1. Breadcrumb Offset (Aggressive Spacing) */
+.breadcrumb-offset {
+    margin-top: -20px;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 50;
 }
