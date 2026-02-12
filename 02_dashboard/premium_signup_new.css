@@ -1127,8 +1127,8 @@ textarea.is-invalid {
 
 /* 1. Breadcrumb Offset (Aggressive Spacing) */
 .breadcrumb-offset {
-    margin-top: -20px;
-    margin-bottom: 1rem;
+    margin-top: -56px;
+    margin-bottom: 4px;
     position: relative;
     z-index: 50;
 }
