@@ -1,6 +1,7 @@
 /* Prevent layout shift when scrollbar appears */
 html {
     overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* FAQ Accordion Animation */
