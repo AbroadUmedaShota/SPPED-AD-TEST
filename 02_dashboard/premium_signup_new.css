@@ -1,3 +1,8 @@
+/* Prevent layout shift when scrollbar appears */
+html {
+    overflow-y: scroll;
+}
+
 /* --- Confirm Screen Styles --- */
 .confirm-item {
     display: flex;
@@ -1297,20 +1302,15 @@ textarea.is-invalid {
         transform: translate(0, 0);
     }
 
-    100% {
-        transform: translate(20px, -20px);
+    33% {
+        transform: translate(30px, -50px) rotate(2deg);
     }
-}
 
-33% {
-    transform: translate(30px, -50px) rotate(2deg);
-}
+    66% {
+        transform: translate(-20px, 40px) rotate(-1deg);
+    }
 
-66% {
-    transform: translate(-20px, 40px) rotate(-1deg);
-}
-
-100% {
-    transform: translate(0, 0) rotate(0deg);
-}
+    100% {
+        transform: translate(0, 0) rotate(0deg);
+    }
 }
