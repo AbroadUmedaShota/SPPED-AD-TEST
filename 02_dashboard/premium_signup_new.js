@@ -375,26 +375,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     // 再加入ユーザー（isEligibleForFreeCampaign = false）の場合は何も表示しない
 
-    // --- FAQ Accordion Logic (2-column grid) ---
+    // --- FAQ Accordion Logic (2-column grid with animation) ---
     const faqCards = document.querySelectorAll('.faq-card');
 
     faqCards.forEach(card => {
         const question = card.querySelector('.faq-question');
         const answer = card.querySelector('.faq-answer');
-        const icon = card.querySelector('.faq-icon');
 
         question.addEventListener('click', () => {
             const isOpen = question.getAttribute('aria-expanded') === 'true';
 
             if (isOpen) {
                 // Close
-                answer.classList.add('hidden');
-                icon.textContent = 'expand_more';
+                answer.classList.remove('open');
                 question.setAttribute('aria-expanded', 'false');
             } else {
                 // Open
-                answer.classList.remove('hidden');
-                icon.textContent = 'expand_less';
+                answer.classList.add('open');
                 question.setAttribute('aria-expanded', 'true');
             }
         });

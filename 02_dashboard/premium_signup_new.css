@@ -3,18 +3,41 @@ html {
     overflow-y: scroll;
 }
 
-/* FAQ Answer text wrapping */
+/* FAQ Accordion Animation */
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, opacity 0.3s ease-out, padding 0.3s ease-out;
+    opacity: 0;
+}
+
+.faq-answer.open {
+    max-height: 500px;
+    /* Adjust based on content */
+    opacity: 1;
+    padding-top: 0;
+    padding-bottom: 1rem;
+}
+
 .faq-answer p {
     word-wrap: break-word;
     overflow-wrap: break-word;
     max-width: 100%;
 }
 
-.faq-item {
+.faq-card {
     max-width: 100%;
     overflow: hidden;
 }
 
+/* Icon rotation animation */
+.faq-icon {
+    transition: transform 0.3s ease;
+}
+
+.faq-question[aria-expanded="true"] .faq-icon {
+    transform: rotate(180deg);
+}
 
 /* --- Confirm Screen Styles --- */
 .confirm-item {
