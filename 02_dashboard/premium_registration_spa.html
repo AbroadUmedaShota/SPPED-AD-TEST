@@ -10,6 +10,7 @@
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -17,6 +18,7 @@
         rel="stylesheet">
     <!-- Global CSS -->
     <link href="service-top-style.css" rel="stylesheet">
+    <link href="premium_registration_spa.css" rel="stylesheet">
     <style>
         :root {
             --color-primary: #1e3a8a;
@@ -306,20 +308,35 @@
                 </section>
 
                 <!-- Step 3: Completion -->
-                <section id="step-complete" class="text-center py-12 hidden">
-                    <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <span class="material-icons text-green-600 text-5xl">check</span>
+                <section id="step-complete" class="hidden">
+                    <div class="premium-bg-effect">
+                        <div class="particle"></div>
+                        <div class="particle"></div>
+                        <div class="particle"></div>
+                        <div class="particle"></div>
                     </div>
-                    <h2 class="text-3xl font-bold text-gray-900 mb-4">プレミアム登録が完了しました！</h2>
-                    <p class="text-lg text-gray-600 mb-10">
-                        プレミアムプランへのお申し込み、誠にありがとうございます。<br>
-                        本日より全てのプレミアム機能をご利用いただけます。
-                    </p>
-                    <div class="space-y-4">
-                        <a href="index.html"
-                            class="inline-block bg-blue-900 hover:bg-blue-800 text-white font-bold py-4 px-12 rounded-full shadow-lg transition duration-200">
-                            ダッシュボードへ戻る
-                        </a>
+
+                    <div class="premium-content">
+                        <div class="premium-badge-container">
+                            <div class="premium-badge-glow"></div>
+                            <div class="premium-badge-icon">
+                                <span class="material-icons">workspace_premium</span>
+                            </div>
+                        </div>
+
+                        <h2 class="premium-title">Welcome to Premium</h2>
+
+                        <p class="premium-subtitle">
+                            プレミアムプランへの登録が完了しました。<br>
+                            あなただけの特別な体験が、今ここから始まります。
+                        </p>
+
+                        <div>
+                            <a href="index.html" class="btn-premium">
+                                <span>ダッシュボードへ戻る</span>
+                                <span class="material-icons">arrow_forward</span>
+                            </a>
+                        </div>
                     </div>
                 </section>
 

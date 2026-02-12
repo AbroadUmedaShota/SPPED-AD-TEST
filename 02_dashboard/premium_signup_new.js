@@ -127,7 +127,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 signupButton.href = 'premium_registration_spa.html'; // 通常の登録SPAページへのリンク
                 signupButton.innerHTML = `
                     今すぐ申し込む
-                    <span class="block text-xs font-normal opacity-80 mt-1">最短1分で登録完了</span>
+                    <span class="block text-xs font-normal opacity-80 mt-1">
+                        クレカ登録不要・請求書払い
+                        <span class="mx-1">|</span>
+                        最短1分で完了
+                    </span>
                 `;
                 const firstMonthFreeMessage = document.getElementById('first-month-free-message');
                 if (firstMonthFreeMessage) {
