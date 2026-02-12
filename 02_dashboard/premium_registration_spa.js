@@ -265,7 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (simulationUserData.is_rejoining_user) {
             billingMessage = `
                 <p class="font-bold text-red-600 mt-2">※本日から課金が開始されます。</p>
-                <p>ご入金確認後、プレミアム機能が利用可能になります。</p>
+                <p>プレミアム機能はすぐにご利用いただけます。お支払いは後日発行される請求書にてお願いいたします。</p>
             `;
         } else {
             // 新規ユーザー (初月無料)
