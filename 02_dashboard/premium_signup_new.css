@@ -80,19 +80,38 @@
     font-weight: bold;
 }
 
-/* Custom CSS for Premium Signup Page */
+/* Custom CSS for Premium Signup Page (SaaS Style Refinement) */
 
-/* Base styles for the entire page (Tailwind CSS provides most of this) */
+/* 1. Typography & Hierarchy */
 body {
-    font-family: 'Noto Sans JP', sans-serif;
-    /* Example font */
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    color: #1f2937;
+    /* gray-800: Softer than pure black */
+    -webkit-font-smoothing: antialiased;
 }
 
-/* --- Screen Container Styles --- */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: 'Inter', sans-serif;
+    letter-spacing: -0.025em;
+    /* Tighter headings */
+    color: #111827;
+    /* gray-900 */
+}
+
+/* 2. Layout & Whitespace */
 .screen-container {
+    max-width: 1100px;
+    /* Constrain width for better readability */
+    margin: 0 auto;
+    padding: 0 1.5rem;
     opacity: 1;
     transition: opacity 0.3s ease-in-out;
-    /* For fade animations */
 }
 
 .screen-container.hidden {
@@ -107,15 +126,16 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    /* Semi-transparent background */
+    background-color: rgba(0, 0, 0, 0.4);
+    /* Slightly lighter overlay */
+    backdrop-filter: blur(2px);
+    /* Blur behind modal */
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
-    /* Ensure modal is on top */
     opacity: 0;
-    transition: opacity 0.3s ease-in-out;
+    transition: opacity 0.2s ease-in-out;
 }
 
 .modal-overlay.show {
@@ -125,19 +145,20 @@ body {
 .modal-content {
     background-color: white;
     padding: 2rem;
-    border-radius: 0.5rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    /* Standardize radius */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    /* Clean shadow */
+    border: 1px solid #e5e7eb;
+    /* Subtle border */
     max-width: 90%;
     width: 400px;
-    /* Example fixed width */
-    transform: translateY(-20px);
-    /* Initial state for animation */
-    transition: transform 0.3s ease-in-out;
+    transform: translateY(-10px);
+    transition: transform 0.2s ease-out;
 }
 
 .modal-overlay.show .modal-content {
     transform: translateY(0);
-    /* Final state for animation */
 }
 
 /* --- Button Styles (Tailwind provides most, custom for brand colors if needed) --- */
@@ -156,9 +177,28 @@ body {
 }
 
 /* Custom error message style (Tailwind red-500 is often used) */
+/* Custom error message style */
 .error-message {
-    /* Changed from .text-red-500 to .error-message for more specific styling */
-    color: #EF4444;
+    color: #dc2626;
+    /* red-600: Standard semantic error */
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* 4. Utilities */
+.text-subtle {
+    color: #6b7280;
+    /* gray-500 */
+    font-size: 0.875rem;
+}
+
+.border-subtle {
+    border-color: #e5e7eb;
+}
+
+.bg-surface-variant {
+    background-color: #f9fafb;
+    /* gray-50 */
 }
 
 /* --- Animations (for screen transitions) --- */
@@ -1213,60 +1253,64 @@ textarea.is-invalid {
     animation: shine-anim 0.75s ease-in-out;
 }
 
-/* --- Visual Polish: Premium Animated Background --- */
+/* --- Dashboard Quality: Ambient Background (Subtle) --- */
 .premium-bg-animated {
     background-color: #f8fafc;
-    /* slate-50 base */
+    /* slate-50 */
     position: relative;
     overflow: hidden;
+    z-index: 0;
 }
 
 .premium-bg-animated::before,
 .premium-bg-animated::after {
     content: '';
     position: absolute;
-    width: 140%;
-    /* Oversize to allow movement */
-    height: 140%;
-    top: -20%;
-    left: -20%;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
     z-index: -1;
-    /* Behind content */
-    filter: blur(80px);
-    /* Soften the blobs */
-    opacity: 0.6;
-    animation: bg-move 20s infinite alternate ease-in-out;
+    filter: blur(120px);
+    /* Heavy blur for soft ambient light */
+    opacity: 0.25;
+    /* Very subtle */
+    animation: bg-move 30s infinite alternate ease-in-out;
+    pointer-events: none;
 }
 
 .premium-bg-animated::before {
-    background: radial-gradient(circle at 80% 20%, rgba(219, 234, 254, 0.8), transparent 50%),
-        /* blue-100 */
-        radial-gradient(circle at 20% 80%, rgba(230, 240, 255, 0.8), transparent 50%);
-    animation-duration: 25s;
+    background: radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.4), transparent 50%),
+        /* blue-500 */
+        radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.4), transparent 50%);
+    /* indigo-500 */
 }
 
 .premium-bg-animated::after {
-    background: radial-gradient(circle at 20% 20%, rgba(254, 243, 199, 0.6), transparent 40%),
-        /* amber-100/yellowish */
-        radial-gradient(circle at 80% 80%, rgba(240, 249, 255, 0.8), transparent 40%);
+    background: radial-gradient(circle at 20% 20%, rgba(200, 200, 200, 0.2), transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(240, 240, 240, 0.2), transparent 40%);
     animation-direction: alternate-reverse;
-    animation-duration: 30s;
 }
 
 @keyframes bg-move {
     0% {
-        transform: translate(0, 0) rotate(0deg);
-    }
-
-    33% {
-        transform: translate(30px, -50px) rotate(2deg);
-    }
-
-    66% {
-        transform: translate(-20px, 40px) rotate(-1deg);
+        transform: translate(0, 0);
     }
 
     100% {
-        transform: translate(0, 0) rotate(0deg);
+        transform: translate(20px, -20px);
     }
+}
+
+33% {
+    transform: translate(30px, -50px) rotate(2deg);
+}
+
+66% {
+    transform: translate(-20px, 40px) rotate(-1deg);
+}
+
+100% {
+    transform: translate(0, 0) rotate(0deg);
+}
 }
