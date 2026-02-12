@@ -153,11 +153,11 @@ document.addEventListener('DOMContentLoaded', () => {
             currentScenarioConfig = scenarioConfigs['new-full-info'];
             localStorage.setItem('currentScenario', 'new-full-info'); // Store default
         }
-        
+
         // updateUiForScenarioに window.dummyUserData の情報を渡す (premium_registration_spa.html用)
         // premium_signup_new.html の window.dummyUserData (ヘッダー用) を更新
         // window.dummyUserData は premium_signup_new.html の header.html で利用されるため、ここで更新
-        window.dummyUserData = { 
+        window.dummyUserData = {
             ...window.dummyUserData, // 既存のheader用dummyUserDataを維持しつつ
             ...currentScenarioConfig // シミュレーション情報を追加
         };
@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const scenarioKey = button.dataset.scenario;
             applyScenario(scenarioKey);
             // シナリオ適用後、premium_signup_new.htmlのUIを更新するためリロード
-            location.reload(); 
+            location.reload();
         });
     });
 
@@ -192,30 +192,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const contactModal = document.getElementById('contactModal');
     const closeContactModalBtn = document.getElementById('closeContactModalBtn');
 
-    console.log('openSupportModalLink:', openSupportModalLink);
-    console.log('contactModal:', contactModal);
-    console.log('closeContactModalBtn:', closeContactModalBtn);
+
 
     function openContactModal() {
-        console.log('openContactModal called');
+
         if (contactModal) {
-            console.log('contactModal is not null. Current classList before removing hidden/opacity-0:', contactModal.classList);
+
             contactModal.classList.remove('hidden');
             void contactModal.offsetWidth; // Force reflow
             contactModal.classList.remove('opacity-0');
-            console.log('contactModal after class changes:', contactModal.className);
+
             // 必要に応じて、モーダルコンテンツのトランジションクラスも操作
             const modalContent = contactModal.querySelector('.modal-content-transition');
             if (modalContent) {
                 modalContent.classList.remove('scale-95');
             }
         } else {
-            console.error('contactModal is null in openContactModal!');
+
         }
     }
 
     function closeContactModal() {
-        console.log('closeContactModal called');
+
         if (contactModal) {
             contactModal.classList.add('opacity-0');
             const modalContent = contactModal.querySelector('.modal-content-transition');
@@ -239,15 +237,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // }
 
     if (closeContactModalBtn) {
-        console.log('Adding click listener to closeContactModalBtn');
+
         closeContactModalBtn.addEventListener('click', closeContactModal);
     } else {
-        console.log('closeContactModalBtn not found');
+
     }
-    
+
     // グローバル関数として closeModal を定義（contactModal.htmlのonclick属性用）
     window.closeModal = (modalId) => {
-        console.log('closeModal global function called for:', modalId);
+
         if (modalId === 'contactModal') {
             closeContactModal();
         }
@@ -255,13 +253,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // モーダル外クリックで閉じる処理
     if (contactModal) {
-        console.log('Adding click listener to contactModal for outside close');
+
         contactModal.addEventListener('click', (event) => {
             if (event.target === contactModal) { // オーバーレイ部分をクリックした場合のみ
                 closeContactModal();
             }
         });
     } else {
-        console.log('contactModal element not found for outside close listener');
+
     }
 });
