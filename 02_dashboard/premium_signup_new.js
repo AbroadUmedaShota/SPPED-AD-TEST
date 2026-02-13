@@ -441,7 +441,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     signupButton.innerHTML = `
                         再加入する
                         <span class="block text-xs font-normal opacity-80 mt-1">
-                            以前のアカウント情報を引き継げます
+                            登録済みの情報を利用できます
                             <span class="mx-1">|</span>
                             最短1分で完了
                         </span>
@@ -510,7 +510,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <span class="material-icons">arrow_forward</span>
                             </span>
                             <span class="block text-xs font-normal text-blue-500 mt-1">
-                                以前のアカウント情報を引き継げます
+                                登録済みの情報を利用できます
                                 <span class="mx-1">|</span>
                                 最短1分で完了
                             </span>
