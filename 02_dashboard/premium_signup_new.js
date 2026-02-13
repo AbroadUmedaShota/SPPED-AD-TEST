@@ -58,6 +58,11 @@ document.addEventListener('DOMContentLoaded', () => {
             ...simulationBaseUserData,
             is_premium_member: true,
             // 既にプレミアム会員なので、登録済みであることを示す
+        },
+        'premium-free-trial': {
+            ...simulationBaseUserData,
+            is_premium_member: false, // システム的にはまだ課金会員ではない扱い（あるいはフラグ管理による）
+            is_free_trial: true,      // 表示制御用フラグ
         }
     };
 
@@ -74,55 +79,246 @@ document.addEventListener('DOMContentLoaded', () => {
     const updateUiForScenario = (currentScenarioConfig) => {
         const signupButtonContainer = document.querySelector('.bg-blue-50 .flex-shrink-0');
         const signupButton = signupButtonContainer ? signupButtonContainer.querySelector('a') : null;
-        const pageHeader = document.querySelector('.hero-bg'); // ページ上部のヘッダー全体
-        const mainContentArea = document.querySelector('.max-w-5xl.mx-auto.py-8.px-4.-mt-8'); // 主要コンテンツエリア
 
-        // 「今すぐ申し込む」ボタンの表示制御
-        if (signupButton) {
-            if (currentScenarioConfig.is_premium_member) {
-                // 既存プレミアム会員の場合
-                signupButton.href = 'index.html'; // ダッシュボードへのリンクに変更
-                signupButton.innerHTML = `
-                    ダッシュボードへ戻る
-                    <span class="block text-xs font-normal opacity-80 mt-1">契約内容を確認</span>
+        // --- 1. Hero Section & Main Content Replacement (For Premium & Free Trial) ---
+        if (currentScenarioConfig.is_premium_member) {
+            // Existing Premium Member
+            const fileHeroSection = document.getElementById('premium-hero-section');
+            if (fileHeroSection) {
+                // Calculate Dynamic Next Renewal Date (End of Current Month)
+                const today = new Date();
+                const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                const renewalDateStr = `${endOfMonth.getFullYear()}年${endOfMonth.getMonth() + 1}月${endOfMonth.getDate()}日`;
+
+                fileHeroSection.classList.remove('overflow-hidden');
+                fileHeroSection.innerHTML = `
+                    <div class="relative z-10 max-w-4xl mx-auto px-6 py-12 md:py-16 text-center">
+                         <!-- Status Badge -->
+                        <div class="inline-flex items-center gap-2 py-2 px-5 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 text-white text-sm font-bold tracking-wider mb-6">
+                            <span class="material-icons text-emerald-400 text-lg">check_circle</span>
+                            Status: Active (利用中)
+                        </div>
+
+                        <h1 class="text-3xl md:text-5xl font-bold mb-6 leading-tight text-white drop-shadow-md">
+                            こんにちは、${currentScenarioConfig.lastName} ${currentScenarioConfig.firstName} 様
+                        </h1>
+                        
+                        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20 max-w-3xl mx-auto shadow-2xl">
+                            <div class="flex flex-col md:flex-row items-center justify-center gap-12 md:gap-16">
+                                <div class="text-left">
+                                    <p class="text-blue-200 text-sm font-bold uppercase tracking-wider mb-1">CURRENT PLAN</p>
+                                    <div class="flex items-center gap-3">
+                                        <span class="material-icons text-amber-400 text-4xl">workspace_premium</span>
+                                        <div>
+                                            <div class="text-2xl font-bold text-white">Premium Plan</div>
+                                            <div class="text-sm text-blue-100">すべての機能が有効です</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="w-px h-16 bg-white/20 hidden md:block"></div>
+                                
+                                <div class="text-left">
+                                    <p class="text-blue-200 text-sm font-bold uppercase tracking-wider mb-1">NEXT RENEWAL</p>
+                                    <div class="flex items-center gap-3">
+                                        <span class="material-icons text-blue-300 text-3xl">event_repeat</span>
+                                        <div>
+                                            <div class="text-2xl font-bold text-white">${renewalDateStr}</div>
+                                            <div class="text-sm text-blue-100">次回更新予定日</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-8 pt-6 border-t border-white/10 grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+                                <div class="flex items-center gap-2 text-white/90 text-sm">
+                                    <span class="material-icons text-emerald-400 text-sm">check</span>
+                                    データ保存期間： <span class="font-bold text-white">無期限</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-white/90 text-sm">
+                                    <span class="material-icons text-emerald-400 text-sm">check</span>
+                                    画像・名刺データDL： <span class="font-bold text-white">可能</span>
+                                </div>
+                                    <div class="flex items-center gap-2 text-white/90 text-sm">
+                                    <span class="material-icons text-emerald-400 text-sm">check</span>
+                                    Excelレポート出力： <span class="font-bold text-white">可能</span>
+                                </div>
+                                    <div class="flex items-center gap-2 text-white/90 text-sm">
+                                    <span class="material-icons text-emerald-400 text-sm">check</span>
+                                    SPEEDレビュー： <span class="font-bold text-white">利用可能</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 `;
-                // 「既にプレミアム会員です」というメッセージを表示し、料金セクションなどを非表示にする
-                if (pageHeader) {
-                    pageHeader.innerHTML = `
-                        <div class="max-w-4xl mx-auto px-6 py-12 md:py-16 text-center">
-                            <span class="inline-block py-1 px-3 rounded-full bg-blue-700 bg-opacity-50 border border-blue-400 text-xs font-semibold tracking-wider mb-4">
-                                PREMIUM PLAN
-                            </span>
-                            <h1 class="text-3xl md:text-4xl font-bold mb-4">
-                                プレミアムプランにご登録済みです
-                            </h1>
-                            <p class="text-gray-200 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
-                                いつもご利用ありがとうございます。<br>
-                                現在プレミアムプランをご契約中です。
-                            </p>
-                        </div>
-                    `;
-                }
-                if (mainContentArea) {
-                    mainContentArea.innerHTML = `
-                        <div class="bg-white shadow-xl rounded-lg overflow-hidden border border-gray-100 p-10 text-center">
-                            <p class="text-lg text-gray-800 mb-6">
-                                お客様は既にプレミアムプランにご登録済みです。<br>
-                                ダッシュボードより引き続きサービスをご利用ください。
-                            </p>
-                            <a href="index.html" class="inline-block bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition duration-200">
-                                ダッシュボードへ
-                            </a>
-                            <p class="text-sm text-gray-600 mt-6">
-                                解約をお考えの方はこちら 
-                                <a href="premium_cancel.html" class="text-blue-600 hover:text-blue-800 underline">解約手続きへ</a>
-                            </p>
-                        </div>
-                    `;
-                }
+            }
 
+            // Main Content Replacement for Premium Member
+            const fileMainContent = document.getElementById('premium-main-content');
+            if (fileMainContent) {
+                fileMainContent.classList.remove('-mt-8');
+                fileMainContent.classList.add('mt-8');
+                fileMainContent.innerHTML = `
+                    <!-- Quick Actions -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+                        <!-- Invoice Action -->
+                        <a href="invoiceList.html" class="group bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 flex items-center gap-4">
+                            <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+                                <span class="material-icons text-blue-600 text-2xl">receipt_long</span>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-800 group-hover:text-blue-700 transition-colors">請求書を確認する</h3>
+                                <p class="text-xs text-gray-500 mt-1">過去の請求書をダウンロード</p>
+                            </div>
+                            <span class="material-icons text-gray-300 ml-auto group-hover:translate-x-1 transition-transform">chevron_right</span>
+                        </a>
 
-            } else {
+                        <!-- Cancel Action -->
+                        <a href="premium_cancel.html" class="group bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 flex items-center gap-4">
+                            <div class="w-12 h-12 bg-gray-50 rounded-lg flex items-center justify-center group-hover:bg-red-50 transition-colors">
+                                <span class="material-icons text-gray-600 text-2xl group-hover:text-red-500 transition-colors">cancel</span>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-800 group-hover:text-red-600 transition-colors">プランを解約する</h3>
+                                <p class="text-xs text-gray-500 mt-1">解約のお手続きはこちら</p>
+                            </div>
+                            <span class="material-icons text-gray-300 ml-auto group-hover:translate-x-1 transition-transform">chevron_right</span>
+                        </a>
+                    </div>
+                    
+                    <!-- Support Section -->
+                    <div class="bg-gray-50 rounded-xl p-8 border border-gray-100 text-center">
+                        <h3 class="font-bold text-gray-700 mb-2">お困りですか？</h3>
+                        <p class="text-sm text-gray-500 mb-6">ご不明な点や不具合がございましたら、サポートチームまでお問い合わせください。</p>
+                        <a href="bug-report.html" class="inline-flex items-center gap-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-bold py-3 px-6 rounded-lg shadow-sm transition duration-200">
+                            <span class="material-icons text-gray-500 text-sm">support_agent</span>
+                            サポートへ問い合わせ
+                        </a>
+                    </div>
+                `;
+            }
+
+        } else if (currentScenarioConfig.is_free_trial) {
+            // Free Trial User
+            const fileHeroSection = document.getElementById('premium-hero-section');
+            if (fileHeroSection) {
+                // Calculate Free Trial End Date (End of current month)
+                const today = new Date();
+                const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                const trialEndDateStr = `${endOfMonth.getFullYear()}年${endOfMonth.getMonth() + 1}月${endOfMonth.getDate()} 日`;
+
+                // Calculate First Billing Date (1st of next month)
+                const nextMonthFirst = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+                const billingStartDateStr = `${nextMonthFirst.getFullYear()}年${nextMonthFirst.getMonth() + 1}月${nextMonthFirst.getDate()} 日`;
+
+                fileHeroSection.classList.remove('overflow-hidden');
+                fileHeroSection.innerHTML = `
+                    <div class="relative z-10 max-w-4xl mx-auto px-6 py-12 md:py-16 text-center">
+                            <!-- Status Badge (Free Trial) -->
+                        <div class="inline-flex items-center gap-2 py-2 px-5 rounded-full bg-amber-500/20 backdrop-blur-sm border border-amber-400/50 text-amber-300 text-sm font-bold tracking-wider mb-6 animate-pulse-subtle">
+                            <span class="material-icons text-amber-300 text-lg">hourglass_top</span>
+                            Status: Free Trial (無料期間中)
+                        </div>
+
+                        <h1 class="text-3xl md:text-5xl font-bold mb-6 leading-tight text-white drop-shadow-md">
+                            こんにちは、${currentScenarioConfig.lastName} ${currentScenarioConfig.firstName} 様
+                        </h1>
+                        
+                        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-amber-400/30 max-w-3xl mx-auto shadow-2xl relative overflow-hidden">
+                            <!-- Ribbon -->
+                            <div class="absolute top-0 right-0 -mt-2 -mr-2 w-24 h-24 overflow-hidden">
+                                <div class="absolute top-0 right-0 bg-amber-500 text-white text-xs font-bold px-8 py-1 transform rotate-45 translate-x-4 translate-y-6 shadow-md">
+                                    FREE
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col md:flex-row items-center justify-center gap-12 md:gap-16">
+                                <div class="text-left">
+                                    <p class="text-amber-200 text-sm font-bold uppercase tracking-wider mb-1">CURRENT PLAN</p>
+                                    <div class="flex items-center gap-3">
+                                        <span class="material-icons text-white text-4xl">workspace_premium</span>
+                                        <div>
+                                            <div class="text-2xl font-bold text-white">Premium Plan</div>
+                                            <div class="text-sm text-amber-100">お試し期間中</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="w-px h-16 bg-white/20 hidden md:block"></div>
+                                
+                                <div class="text-left">
+                                    <p class="text-amber-200 text-sm font-bold uppercase tracking-wider mb-1">BILLING STARTS</p>
+                                    <div class="flex items-center gap-3">
+                                        <span class="material-icons text-amber-300 text-3xl">event_upcoming</span>
+                                        <div>
+                                            <div class="text-2xl font-bold text-white">${billingStartDateStr}</div>
+                                            <div class="text-sm text-amber-100">初回ご請求予定日</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-8 bg-amber-500/20 rounded-lg p-4 border border-amber-400/30">
+                                <p class="text-white text-sm">
+                                    <span class="font-bold text-amber-300">${trialEndDateStr}</span> まで無料でご利用いただけます。<br>
+                                    期間中に解約すれば料金は一切かかりません。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Main Content Replacement for Free Trial
+            const fileMainContent = document.getElementById('premium-main-content');
+            if (fileMainContent) {
+                fileMainContent.classList.remove('-mt-8');
+                fileMainContent.classList.add('mt-8');
+                fileMainContent.innerHTML = `
+                    <!-- Quick Actions -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+                        <!-- Invoice Action (Likely empty for trial but keeps layout consistent) -->
+                        <a href="invoiceList.html" class="group bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 flex items-center gap-4">
+                            <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+                                <span class="material-icons text-blue-600 text-2xl">receipt_long</span>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-800 group-hover:text-blue-700 transition-colors">請求書を確認する</h3>
+                                <p class="text-xs text-gray-500 mt-1">現在は請求書はありません</p>
+                            </div>
+                            <span class="material-icons text-gray-300 ml-auto group-hover:translate-x-1 transition-transform">chevron_right</span>
+                        </a>
+
+                        <!-- Cancel Action -->
+                        <a href="premium_cancel.html" class="group bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 flex items-center gap-4">
+                            <div class="w-12 h-12 bg-gray-50 rounded-lg flex items-center justify-center group-hover:bg-red-50 transition-colors">
+                                <span class="material-icons text-gray-600 text-2xl group-hover:text-red-500 transition-colors">cancel</span>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-800 group-hover:text-red-600 transition-colors">無料トライアルを終了する</h3>
+                                <p class="text-xs text-gray-500 mt-1">解約のお手続きはこちら</p>
+                            </div>
+                            <span class="material-icons text-gray-300 ml-auto group-hover:translate-x-1 transition-transform">chevron_right</span>
+                        </a>
+                    </div>
+                    
+                    <!-- Support Section -->
+                    <div class="bg-gray-50 rounded-xl p-8 border border-gray-100 text-center">
+                        <h3 class="font-bold text-gray-700 mb-2">お困りですか？</h3>
+                        <p class="text-sm text-gray-500 mb-6">ご不明な点や不具合がございましたら、サポートチームまでお問い合わせください。</p>
+                        <a href="bug-report.html" class="inline-flex items-center gap-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-bold py-3 px-6 rounded-lg shadow-sm transition duration-200">
+                            <span class="material-icons text-gray-500 text-sm">support_agent</span>
+                            サポートへ問い合わせ
+                        </a>
+                    </div>
+                `;
+            }
+
+        } else {
+            // --- 2. Button & Campaign Logic (For New / Rejoin Users) ---
+            // Only run this if we are NOT in a premium/trial scenario (i.e. we are in default mode)
+
+            if (signupButton) {
                 // その他のシナリオ (新規、再加入)
                 signupButton.href = 'premium_registration_spa.html'; // 通常の登録SPAページへのリンク
                 signupButton.innerHTML = `
@@ -133,13 +329,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         最短1分で完了
                     </span>
                 `;
-                const firstMonthFreeMessage = document.getElementById('first-month-free-message');
-                if (firstMonthFreeMessage) {
-                    if (currentScenarioConfig.is_rejoining_user) {
-                        firstMonthFreeMessage.classList.add('hidden');
-                    } else {
-                        firstMonthFreeMessage.classList.remove('hidden');
-                    }
+            }
+
+            const firstMonthFreeMessage = document.getElementById('first-month-free-message');
+            if (firstMonthFreeMessage) {
+                if (currentScenarioConfig.is_rejoining_user) {
+                    firstMonthFreeMessage.classList.add('hidden');
+                } else {
+                    firstMonthFreeMessage.classList.remove('hidden');
                 }
             }
         }
@@ -313,7 +510,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const messageCampaign = `
-                <div class="bg-white border-2 border-amber-400 rounded-xl p-6 md:p-8 shadow-sm">
+        <div class="bg-white border-2 border-amber-400 rounded-xl p-6 md:p-8 shadow-sm">
                     <div class="text-center mb-8">
                         <span class="inline-block bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full mb-2">キャンペーン</span>
                         <h2 class="text-xl md:text-2xl font-bold text-gray-800">
@@ -372,7 +569,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </p>
                     </div>
                 </div>
-            `;
+        `;
 
         campaignInfoSection.innerHTML = messageCampaign;
         campaignInfoSection.classList.remove('hidden');

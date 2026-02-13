@@ -109,6 +109,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (document.getElementById(`connector-${i}`)) {
                     document.getElementById(`connector-${i}`).classList.add('active');
                 }
+                // Make completed steps clickable
+                circle.style.cursor = 'pointer';
+                circle.onclick = () => {
+                    // Allow going back to input from confirm
+                    if (currentScreen === 'confirm' && i === 1) {
+                        setProcessStep(1);
+                    }
+                };
             } else if (i === stepNum) {
                 circle.classList.add('active');
                 circle.innerText = i; // revert icon if going back
@@ -239,7 +247,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         return isFormValid;
-        return isFormValid;
     };
 
     // --- Zip Code Search Logic ---
@@ -319,9 +326,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let billingMessage = '';
         if (simulationUserData.is_rejoining_user) {
+            // 現在の日時と月末を計算
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1;
+            const date = now.getDate();
+            const endOfMonth = new Date(year, month, 0); // Last day of current month
+            const endOfMonthFormatted = `${endOfMonth.getFullYear()}年${endOfMonth.getMonth() + 1}月${endOfMonth.getDate()}日`;
+            const todayFormatted = `${year}年${month}月${date}日`;
+
             billingMessage = `
-                <p class="font-bold text-red-600 mt-2">※本日から課金が開始されます。</p>
-                <p>プレミアム機能はすぐにご利用いただけます。お支払いは後日発行される請求書にてお願いいたします。</p>
+                <p class="font-bold text-red-600 mt-2">※本日から契約開始となり、当月分の料金（満額）が発生します。</p>
+                <p class="text-xs mt-1 text-gray-600">契約期間: ${todayFormatted} 〜 ${endOfMonthFormatted}</p>
+                <p class="mt-2">プレミアム機能はすぐにご利用いただけます。<br>お支払いは後日発行される請求書にてお願いいたします。</p>
             `;
         } else {
             // 新規ユーザー (初月無料)
@@ -457,7 +474,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Go to Confirm
     if (btnToConfirm) {
         btnToConfirm.addEventListener('click', () => {
-            if (validate()) {
+            if (validateForm()) {
                 populateConfirm();
                 setProcessStep(2);
             }
