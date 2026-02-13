@@ -618,4 +618,125 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Before checkAccountInfo window.dummyUserData:', window.dummyUserData);
     setTimeout(checkAccountInfo, 100);
 
+    // --- Loading State Management ---
+    function setSubmitButtonLoading(isLoading) {
+        const spinner = document.getElementById('btn-submit-spinner');
+        const text = document.getElementById('btn-submit-text');
+
+        if (isLoading) {
+            // Show spinner, hide text, disable button
+            if (spinner) spinner.classList.remove('hidden');
+            if (text) text.textContent = '処理中...';
+            if (btnSubmit) btnSubmit.disabled = true;
+        } else {
+            // Hide spinner, show text, enable button
+            if (spinner) spinner.classList.add('hidden');
+            if (text) text.textContent = 'この内容で登録する';
+            if (btnSubmit) btnSubmit.disabled = false;
+        }
+    }
+
+    // --- Error Modal Management ---
+    const errorModal = document.getElementById('error-modal');
+    const errorModalContent = document.getElementById('error-modal-content');
+    const errorModalMessage = document.getElementById('error-modal-message');
+    const errorModalCloseBtn = document.getElementById('error-modal-close-btn');
+
+    function showErrorModal(message = '登録処理中にエラーが発生しました。<br>もう一度お試しください。') {
+        if (errorModal && errorModalContent) {
+            // Set error message
+            if (errorModalMessage) {
+                errorModalMessage.innerHTML = message;
+            }
+
+            // Show modal
+            errorModal.classList.remove('hidden');
+            setTimeout(() => {
+                errorModal.classList.remove('opacity-0');
+                errorModalContent.classList.remove('scale-95');
+                errorModalContent.classList.add('scale-100');
+            }, 10);
+        }
+    }
+
+    function hideErrorModal() {
+        if (errorModal && errorModalContent) {
+            errorModal.classList.add('opacity-0');
+            errorModalContent.classList.remove('scale-100');
+            errorModalContent.classList.add('scale-95');
+            setTimeout(() => {
+                errorModal.classList.add('hidden');
+            }, 300);
+        }
+    }
+
+    // Error modal close button
+    if (errorModalCloseBtn) {
+        errorModalCloseBtn.addEventListener('click', () => {
+            hideErrorModal();
+        });
+    }
+
+    // Close error modal when clicking outside
+    if (errorModal) {
+        errorModal.addEventListener('click', (e) => {
+            if (e.target === errorModal) {
+                hideErrorModal();
+            }
+        });
+    }
+
+    // --- Submit Button Event Listener ---
+    if (btnSubmit) {
+        btnSubmit.addEventListener('click', () => {
+            console.log('Submit button clicked');
+
+            // Set loading state
+            setSubmitButtonLoading(true);
+
+            // Simulate API call (replace with actual API call)
+            // Randomly simulate success or error for demonstration
+            const simulateError = Math.random() < 0.3; // 30% chance of error
+
+            setTimeout(() => {
+                if (simulateError) {
+                    // Error: Show error modal
+                    setSubmitButtonLoading(false);
+                    showErrorModal('ネットワークエラーが発生しました。<br>インターネット接続を確認して、もう一度お試しください。');
+                } else {
+                    // Success: Navigate to completion screen
+                    setProcessStep(3);
+                    setSubmitButtonLoading(false);
+                }
+            }, 2000);
+
+            // TODO: Add actual API call here
+            // fetch('/api/premium/register', {
+            //     method: 'POST',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify(formData)
+            // })
+            // .then(response => response.json())
+            // .then(data => {
+            //     setSubmitButtonLoading(false);
+            //     setProcessStep(3);
+            // })
+            // .catch(error => {
+            //     setSubmitButtonLoading(false);
+            //     // Show error modal (to be implemented in next step)
+            // });
+        });
+    }
+
+    // --- Real-time Validation ---
+    // Add blur event listeners to all input fields for real-time validation
+    Object.keys(inputs).forEach(fieldName => {
+        const inputElement = inputs[fieldName];
+        if (inputElement) {
+            inputElement.addEventListener('blur', () => {
+                validateField(inputElement);
+            });
+        }
+    });
+
 });

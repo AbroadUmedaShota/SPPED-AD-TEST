@@ -273,97 +273,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 `;
 
-                // --- Resume Subscription Logic (Simplified) ---
-                const resumeButton = document.getElementById('resume-subscription-button');
-                const resumeModal = document.getElementById('resumeModal');
-                const resumeModalContent = document.getElementById('resumeModalContent');
-                const cancelResumeBtn = document.getElementById('cancelResumeBtn');
-                const confirmResumeBtn = document.getElementById('confirmResumeBtn');
-
-                // Simple modal open/close functions using inline styles
-                const openResumeModal = () => {
-                    console.log('[MODAL] Opening Resume Modal');
-                    if (resumeModal) {
-                        // Show modal with inline style
-                        resumeModal.style.display = 'flex';
-                        resumeModal.style.opacity = '0';
-
-                        // Trigger reflow to enable transition
-                        void resumeModal.offsetWidth;
-
-                        // Fade in
-                        resumeModal.style.opacity = '1';
-
-                        console.log('[MODAL] Modal should now be visible');
-                    } else {
-                        console.error('[MODAL] Resume modal element not found!');
-                    }
-                };
-
-                const closeResumeModal = () => {
-                    console.log('[MODAL] Closing Resume Modal');
-                    if (resumeModal) {
-                        // Fade out
-                        resumeModal.style.opacity = '0';
-
-                        // Hide after transition
-                        setTimeout(() => {
-                            resumeModal.style.display = 'none';
-                        }, 300);
-                    }
-                };
-
-                // Attach event listeners
-                if (resumeButton) {
-                    console.log('[MODAL] Resume button found, attaching listener');
-                    resumeButton.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        openResumeModal();
-                    });
-                } else {
-                    if (currentScenarioConfig.is_cancelled) {
-                        console.error('[MODAL] Resume button not found despite cancelled state');
-                    }
-                }
-
-                if (cancelResumeBtn) {
-                    cancelResumeBtn.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        closeResumeModal();
-                    });
-                }
-
-                // Close on outside click
-                if (resumeModal) {
-                    resumeModal.addEventListener('click', (e) => {
-                        if (e.target === resumeModal) {
-                            closeResumeModal();
-                        }
-                    });
-                }
-
-                if (confirmResumeBtn) {
-                    confirmResumeBtn.addEventListener('click', () => {
-                        console.log('[MODAL] Resume confirmed by user');
-
-                        // Update localStorage
-                        localStorage.setItem('currentScenario', 'premium-member');
-                        const newUserData = {
-                            ...currentScenarioConfig,
-                            is_premium_member: true,
-                            is_cancelled: false
-                        };
-                        localStorage.setItem('simulationUserData', JSON.stringify(newUserData));
-
-                        closeResumeModal();
-
-                        setTimeout(() => {
-                            location.reload();
-                        }, 300);
-                    });
-                } else {
-                    console.error('[MODAL] Confirm button not found');
-                }
             }
 
         } else if (currentScenarioConfig.is_free_trial) {
@@ -869,4 +778,150 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    // --- Resume Subscription Modal Logic ---
+    const resumeSubscriptionButton = document.getElementById('resume-subscription-button');
+    const resumeModal = document.getElementById('resumeModal');
+    const resumeModalContent = document.getElementById('resumeModalContent');
+    const cancelResumeBtn = document.getElementById('cancelResumeBtn');
+    const confirmResumeBtn = document.getElementById('confirmResumeBtn');
+
+    const resumeSuccessModal = document.getElementById('resumeSuccessModal');
+    const resumeSuccessModalContent = document.getElementById('resumeSuccessModalContent');
+    const closeSuccessModalBtn = document.getElementById('closeSuccessModalBtn');
+    const nextRenewalDateSpan = document.getElementById('nextRenewalDate');
+
+    // Open confirmation modal using event delegation (since button is dynamically generated)
+    document.addEventListener('click', (e) => {
+        if (e.target.closest('#resume-subscription-button')) {
+            e.preventDefault();
+            openResumeModal();
+        }
+    });
+
+    function openResumeModal() {
+        if (resumeModal) {
+            resumeModal.style.display = 'flex';
+            setTimeout(() => {
+                resumeModal.style.opacity = '1';
+                resumeModalContent.style.transform = 'scale(1)';
+            }, 10);
+        }
+    }
+
+    function closeResumeModal() {
+        if (resumeModal) {
+            resumeModal.style.opacity = '0';
+            resumeModalContent.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                resumeModal.style.display = 'none';
+            }, 300);
+        }
+    }
+
+    function openResumeSuccessModal() {
+        console.log('openResumeSuccessModal called!'); // Debug log
+        console.log('resumeSuccessModal:', resumeSuccessModal); // Debug log
+        console.log('resumeSuccessModalContent:', resumeSuccessModalContent); // Debug log
+        console.log('nextRenewalDateSpan:', nextRenewalDateSpan); // Debug log
+
+        // Calculate next renewal date (end of current month)
+        const today = new Date();
+        const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        const dateStr = `${endOfMonth.getFullYear()}年${endOfMonth.getMonth() + 1}月${endOfMonth.getDate()}日`;
+
+        if (nextRenewalDateSpan) {
+            nextRenewalDateSpan.textContent = dateStr;
+            console.log('Set next renewal date to:', dateStr); // Debug log
+        } else {
+            console.error('nextRenewalDateSpan not found!'); // Debug log
+        }
+
+        if (resumeSuccessModal) {
+            console.log('Setting display to flex...'); // Debug log
+            resumeSuccessModal.style.display = 'flex';
+            setTimeout(() => {
+                console.log('Setting opacity to 1...'); // Debug log
+                resumeSuccessModal.style.opacity = '1';
+                resumeSuccessModalContent.style.transform = 'scale(1)';
+            }, 10);
+        } else {
+            console.error('resumeSuccessModal not found!'); // Debug log
+        }
+    }
+
+    function closeResumeSuccessModal() {
+        if (resumeSuccessModal) {
+            resumeSuccessModal.style.opacity = '0';
+            resumeSuccessModalContent.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                resumeSuccessModal.style.display = 'none';
+
+                // Update localStorage to remove cancellation status
+                const currentScenario = localStorage.getItem('currentScenario');
+                const currentUserData = JSON.parse(localStorage.getItem('simulationUserData') || '{}');
+
+                // Update to active premium member (remove cancellation)
+                localStorage.setItem('currentScenario', 'premium-member');
+                const newUserData = {
+                    ...currentUserData,
+                    is_premium_member: true,
+                    is_cancelled: false
+                };
+                localStorage.setItem('simulationUserData', JSON.stringify(newUserData));
+
+                // Reload page to update UI
+                location.reload();
+            }, 300);
+        }
+    }
+
+    // Cancel button - close confirmation modal (using event delegation)
+    document.addEventListener('click', (e) => {
+        if (e.target.closest('#cancelResumeBtn')) {
+            closeResumeModal();
+        }
+    });
+
+    // Confirm button - close confirmation modal and show success modal (using event delegation)
+    document.addEventListener('click', (e) => {
+        if (e.target.closest('#confirmResumeBtn')) {
+            console.log('Confirm button clicked!'); // Debug log
+            // Here you would normally make an API call to resume the subscription
+            // For now, we'll just simulate success
+
+            // Close confirmation modal
+            closeResumeModal();
+
+            // Wait a bit, then show success modal
+            setTimeout(() => {
+                console.log('Opening success modal...'); // Debug log
+                openResumeSuccessModal();
+            }, 400);
+        }
+    });
+
+    // Close success modal button (using event delegation)
+    document.addEventListener('click', (e) => {
+        if (e.target.closest('#closeSuccessModalBtn')) {
+            closeResumeSuccessModal();
+        }
+    });
+
+    // Close modals when clicking outside
+    if (resumeModal) {
+        resumeModal.addEventListener('click', (e) => {
+            if (e.target === resumeModal) {
+                closeResumeModal();
+            }
+        });
+    }
+
+    if (resumeSuccessModal) {
+        resumeSuccessModal.addEventListener('click', (e) => {
+            if (e.target === resumeSuccessModal) {
+                closeResumeSuccessModal();
+            }
+        });
+    }
 });

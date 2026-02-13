@@ -805,6 +805,36 @@
             </div>
         </div>
     </div>
+
+    <!-- Resume Success Modal -->
+    <div id="resumeSuccessModal"
+        class="fixed inset-0 flex items-center justify-center p-4 bg-black/50 z-[60] transition-opacity duration-300"
+        style="display: none; opacity: 0;">
+        <div id="resumeSuccessModalContent"
+            class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md transform transition-all duration-300"
+            style="transform: scale(0.95);">
+            <div class="text-center">
+                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+                    <span class="material-icons text-green-600 text-4xl">check_circle</span>
+                </div>
+                <h3 class="text-xl leading-6 font-bold text-gray-900 mb-2">自動更新を再開しました</h3>
+                <p class="text-sm text-gray-600 mb-4 leading-relaxed">
+                    プレミアムプランの自動更新が再開されました。<br>
+                    解約予約がキャンセルされ、プランが継続されます。
+                </p>
+                <div class="bg-blue-50 p-4 rounded-lg mb-6 text-left">
+                    <p class="text-sm text-gray-700">
+                        <span class="font-bold text-blue-900">次回更新日:</span>
+                        <span id="nextRenewalDate" class="ml-2">-</span>
+                    </p>
+                </div>
+                <button id="closeSuccessModalBtn"
+                    class="w-full bg-blue-600 border border-transparent text-white hover:bg-blue-700 py-3 px-6 rounded-lg shadow-sm text-sm font-bold focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                    ダッシュボードに戻る
+                </button>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

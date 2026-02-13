@@ -21,6 +21,66 @@
     <link rel="stylesheet" href="service-top-style.css">
     <!-- プレミアム登録フォーム専用スタイルシート (一部流用) -->
     <link rel="stylesheet" href="premium_signup.css">
+    <style>
+        /* Animated Check Icon */
+        .check-icon-container {
+            animation: scale-in 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .check-icon-circle {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+        }
+
+        .check-icon {
+            font-size: 60px;
+            color: white;
+        }
+
+        @keyframes scale-in {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Fade in up animation */
+        .fade-in-up {
+            animation: fade-in-up 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .delay-1 {
+            animation-delay: 0.2s;
+        }
+
+        .delay-2 {
+            animation-delay: 0.4s;
+        }
+
+        .delay-3 {
+            animation-delay: 0.6s;
+        }
+
+        @keyframes fade-in-up {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
 </head>
 
 <body class="bg-background text-on-background">
@@ -35,16 +95,23 @@
             <!-- 4. メインコンテンツ -->
             <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
                 <div class="flex flex-col w-full max-w-6xl mx-auto flex-1 items-center justify-center text-center">
-                    <h1 class="text-on-surface text-3xl md:text-4xl font-bold mb-6">プレミアム登録が完了しました！</h1>
-                    <p class="text-on-surface-variant text-lg mb-8">
+                    <!-- Animated Check Icon -->
+                    <div class="check-icon-container mb-6">
+                        <div class="check-icon-circle">
+                            <span class="material-icons check-icon">check_circle</span>
+                        </div>
+                    </div>
+
+                    <h1 class="text-on-surface text-3xl md:text-4xl font-bold mb-6 fade-in-up">プレミアム登録が完了しました!</h1>
+                    <p class="text-on-surface-variant text-lg mb-8 fade-in-up delay-1">
                         ご登録ありがとうございます。<br>
                         後ほど、ご登録のメールアドレスに請求書に関するご案内をお送りいたします。
                     </p>
-                    <p class="text-on-surface-variant text-base mb-10">
+                    <p class="text-on-surface-variant text-base mb-10 fade-in-up delay-2">
                         ご入金確認後、プレミアム機能が有効になります。<br>
                         ダッシュボードにて請求書をご確認いただけます。
                     </p>
-                    <a href="index.html" class="cta-button">ダッシュボードへ戻る</a>
+                    <a href="index.html" class="cta-button fade-in-up delay-3">ダッシュボードへ戻る</a>
                 </div>
             </main>
         </div>

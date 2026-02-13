@@ -255,3 +255,28 @@
         left: 200%;
     }
 }
+
+/* Mobile Optimization: Tap Target Size */
+button,
+a.cta-button,
+.btn-premium,
+input[type="button"],
+input[type="submit"] {
+    min-height: 44px;
+    min-width: 44px;
+}
+
+/* Ensure links have adequate tap area */
+a {
+    padding: 0.25rem 0.5rem;
+    margin: -0.25rem -0.5rem;
+}
+
+/* Breadcrumb links */
+nav[aria-label="breadcrumb"] a {
+    padding: 0.5rem;
+    margin: -0.5rem;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+}
