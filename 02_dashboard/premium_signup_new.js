@@ -49,6 +49,20 @@ document.addEventListener('DOMContentLoaded', () => {
             zip: '',   // 必須だが欠けている
             address: '', // 必須だが欠けている
         },
+        'new-no-info': {
+            email: 'user@example.com',
+            companyName: '',
+            lastName: '',
+            firstName: '',
+            phone: '',
+            zip: '',
+            address: '',
+            building: '',
+            departmentName: '',
+            positionName: '',
+            is_premium_member: false,
+            is_rejoining_user: false
+        },
         'rejoin-user': {
             ...simulationBaseUserData,
             is_rejoining_user: true,

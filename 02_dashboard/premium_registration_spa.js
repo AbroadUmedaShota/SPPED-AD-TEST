@@ -694,20 +694,10 @@ document.addEventListener('DOMContentLoaded', () => {
             // Set loading state
             setSubmitButtonLoading(true);
 
-            // Simulate API call (replace with actual API call)
-            // Randomly simulate success or error for demonstration
-            const simulateError = Math.random() < 0.3; // 30% chance of error
-
             setTimeout(() => {
-                if (simulateError) {
-                    // Error: Show error modal
-                    setSubmitButtonLoading(false);
-                    showErrorModal('ネットワークエラーが発生しました。<br>インターネット接続を確認して、もう一度お試しください。');
-                } else {
-                    // Success: Navigate to completion screen
-                    setProcessStep(3);
-                    setSubmitButtonLoading(false);
-                }
+                // Success: Navigate to completion screen
+                setProcessStep(3);
+                setSubmitButtonLoading(false);
             }, 2000);
 
             // TODO: Add actual API call here
