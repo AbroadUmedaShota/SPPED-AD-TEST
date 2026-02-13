@@ -282,6 +282,11 @@ document.addEventListener('DOMContentLoaded', () => {
                             inputs.address.value = fullAddress;
                             // Trigger validation/clearing error for address
                             validateField(inputs.address);
+
+                            // Move focus to building name for better UX
+                            if (inputs.building) {
+                                inputs.building.focus();
+                            }
                         }
                     } else {
                         if (apiErrorZip) {
