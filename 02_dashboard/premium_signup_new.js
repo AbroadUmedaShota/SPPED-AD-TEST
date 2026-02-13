@@ -63,6 +63,11 @@ document.addEventListener('DOMContentLoaded', () => {
             ...simulationBaseUserData,
             is_premium_member: false, // システム的にはまだ課金会員ではない扱い（あるいはフラグ管理による）
             is_free_trial: true,      // 表示制御用フラグ
+        },
+        'premium-cancelled': {
+            ...simulationBaseUserData,
+            is_premium_member: true,
+            is_cancelled: true,       // 解約予約中フラグ
         }
     };
 
@@ -82,28 +87,62 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // --- 1. Hero Section & Main Content Replacement (For Premium & Free Trial) ---
         if (currentScenarioConfig.is_premium_member) {
-            // Existing Premium Member
+            // Existing Premium Member (Active or Cancelled)
             const fileHeroSection = document.getElementById('premium-hero-section');
             if (fileHeroSection) {
-                // Calculate Dynamic Next Renewal Date (End of Current Month)
+                // Calculate Dynamic Date (End of Current Month)
                 const today = new Date();
                 const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-                const renewalDateStr = `${endOfMonth.getFullYear()}年${endOfMonth.getMonth() + 1}月${endOfMonth.getDate()}日`;
+                const dateStr = `${endOfMonth.getFullYear()}年${endOfMonth.getMonth() + 1}月${endOfMonth.getDate()}日`;
+
+                // Status configuration based on cancellation state
+                let statusBadgeHtml = '';
+                let renewalLabel = '次回更新予定日';
+                let alertHtml = ''; // For cancelled state
+                let heroBgClass = 'border-white/20'; // Default border
+
+                if (currentScenarioConfig.is_cancelled) {
+                    // Cancelled State
+                    statusBadgeHtml = `
+                        <div class="inline-flex items-center gap-2 py-2 px-5 rounded-full bg-gray-600/50 backdrop-blur-sm border border-gray-400 text-gray-200 text-sm font-bold tracking-wider mb-6">
+                            <span class="material-icons text-gray-300 text-lg">event_busy</span>
+                            Status: Auto-Renewal Off (自動更新停止中)
+                        </div>
+                    `;
+                    renewalLabel = '利用期限 (自動更新停止中)';
+                    heroBgClass = 'border-gray-500/50';
+                    alertHtml = `
+                        <div class="mt-8 bg-gray-800/50 rounded-lg p-4 border border-gray-600 text-left">
+                            <p class="text-gray-200 text-sm flex items-start gap-2">
+                                <span class="material-icons text-amber-400 text-lg mt-0.5">warning</span>
+                                <span>
+                                    現在、解約手続きが完了しています。<br>
+                                    <span class="font-bold text-white">${dateStr}</span> までは全機能をご利用いただけますが、翌日以降フリープランへ自動移行されます。
+                                </span>
+                            </p>
+                        </div>
+                    `;
+                } else {
+                    // Active State
+                    statusBadgeHtml = `
+                        <div class="inline-flex items-center gap-2 py-2 px-5 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 text-white text-sm font-bold tracking-wider mb-6">
+                            <span class="material-icons text-emerald-400 text-lg">check_circle</span>
+                            Status: Active (利用中)
+                        </div>
+                    `;
+                }
 
                 fileHeroSection.classList.remove('overflow-hidden');
                 fileHeroSection.innerHTML = `
                     <div class="relative z-10 max-w-4xl mx-auto px-6 py-12 md:py-16 text-center">
                          <!-- Status Badge -->
-                        <div class="inline-flex items-center gap-2 py-2 px-5 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 text-white text-sm font-bold tracking-wider mb-6">
-                            <span class="material-icons text-emerald-400 text-lg">check_circle</span>
-                            Status: Active (利用中)
-                        </div>
+                        ${statusBadgeHtml}
 
                         <h1 class="text-3xl md:text-5xl font-bold mb-6 leading-tight text-white drop-shadow-md">
                             こんにちは、${currentScenarioConfig.lastName} ${currentScenarioConfig.firstName} 様
                         </h1>
                         
-                        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20 max-w-3xl mx-auto shadow-2xl">
+                        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-8 border ${heroBgClass} max-w-3xl mx-auto shadow-2xl">
                             <div class="flex flex-col md:flex-row items-center justify-center gap-12 md:gap-16">
                                 <div class="text-left">
                                     <p class="text-blue-200 text-sm font-bold uppercase tracking-wider mb-1">CURRENT PLAN</p>
@@ -119,12 +158,12 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <div class="w-px h-16 bg-white/20 hidden md:block"></div>
                                 
                                 <div class="text-left">
-                                    <p class="text-blue-200 text-sm font-bold uppercase tracking-wider mb-1">NEXT RENEWAL</p>
+                                    <p class="text-blue-200 text-sm font-bold uppercase tracking-wider mb-1">VALID UNTIL</p>
                                     <div class="flex items-center gap-3">
                                         <span class="material-icons text-blue-300 text-3xl">event_repeat</span>
                                         <div>
-                                            <div class="text-2xl font-bold text-white">${renewalDateStr}</div>
-                                            <div class="text-sm text-blue-100">次回更新予定日</div>
+                                            <div class="text-2xl font-bold text-white">${dateStr}</div>
+                                            <div class="text-sm text-blue-100">${renewalLabel}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -148,6 +187,8 @@ document.addEventListener('DOMContentLoaded', () => {
                                     SPEEDレビュー： <span class="font-bold text-white">利用可能</span>
                                 </div>
                             </div>
+
+                            ${alertHtml}
                         </div>
                     </div>
                 `;
@@ -156,11 +197,37 @@ document.addEventListener('DOMContentLoaded', () => {
             // Main Content Replacement for Premium Member
             const fileMainContent = document.getElementById('premium-main-content');
             if (fileMainContent) {
-                fileMainContent.classList.remove('-mt-8');
-                fileMainContent.classList.add('mt-8');
-                fileMainContent.innerHTML = `
-                    <!-- Quick Actions -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+                // Determine Main Actions based on cancellation state
+                let mainActionsHtml = '';
+
+                if (currentScenarioConfig.is_cancelled) {
+                    mainActionsHtml = `
+                        <!-- Invoice Action -->
+                        <a href="invoiceList.html" class="group bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 flex items-center gap-4">
+                            <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+                                <span class="material-icons text-blue-600 text-2xl">receipt_long</span>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-800 group-hover:text-blue-700 transition-colors">請求書を確認する</h3>
+                                <p class="text-xs text-gray-500 mt-1">過去の請求書をダウンロード</p>
+                            </div>
+                            <span class="material-icons text-gray-300 ml-auto group-hover:translate-x-1 transition-transform">chevron_right</span>
+                        </a>
+
+                        <!-- Resume Subscription Action (Highlight) -->
+                         <a href="#" id="resume-subscription-button" class="group bg-blue-50 p-6 rounded-xl shadow-sm border border-blue-200 hover:bg-blue-100 transition-all duration-300 flex items-center gap-4 relative overflow-hidden">
+                            <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform shadow-md">
+                                <span class="material-icons text-white text-2xl">autorenew</span>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-blue-900 group-hover:text-blue-800 transition-colors">自動更新を再開する</h3>
+                                <p class="text-xs text-blue-700 mt-1">解約をキャンセルし、プランを継続</p>
+                            </div>
+                            <span class="material-icons text-blue-400 ml-auto group-hover:translate-x-1 transition-transform">chevron_right</span>
+                        </a>
+                    `;
+                } else {
+                    mainActionsHtml = `
                         <!-- Invoice Action -->
                         <a href="invoiceList.html" class="group bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 flex items-center gap-4">
                             <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center group-hover:bg-blue-100 transition-colors">
@@ -184,6 +251,15 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                             <span class="material-icons text-gray-300 ml-auto group-hover:translate-x-1 transition-transform">chevron_right</span>
                         </a>
+                    `;
+                }
+
+                fileMainContent.classList.remove('-mt-8');
+                fileMainContent.classList.add('mt-8');
+                fileMainContent.innerHTML = `
+                    <!-- Quick Actions -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+                        ${mainActionsHtml}
                     </div>
                     
                     <!-- Support Section -->
@@ -196,6 +272,98 @@ document.addEventListener('DOMContentLoaded', () => {
                         </a>
                     </div>
                 `;
+
+                // --- Resume Subscription Logic (Simplified) ---
+                const resumeButton = document.getElementById('resume-subscription-button');
+                const resumeModal = document.getElementById('resumeModal');
+                const resumeModalContent = document.getElementById('resumeModalContent');
+                const cancelResumeBtn = document.getElementById('cancelResumeBtn');
+                const confirmResumeBtn = document.getElementById('confirmResumeBtn');
+
+                // Simple modal open/close functions using inline styles
+                const openResumeModal = () => {
+                    console.log('[MODAL] Opening Resume Modal');
+                    if (resumeModal) {
+                        // Show modal with inline style
+                        resumeModal.style.display = 'flex';
+                        resumeModal.style.opacity = '0';
+
+                        // Trigger reflow to enable transition
+                        void resumeModal.offsetWidth;
+
+                        // Fade in
+                        resumeModal.style.opacity = '1';
+
+                        console.log('[MODAL] Modal should now be visible');
+                    } else {
+                        console.error('[MODAL] Resume modal element not found!');
+                    }
+                };
+
+                const closeResumeModal = () => {
+                    console.log('[MODAL] Closing Resume Modal');
+                    if (resumeModal) {
+                        // Fade out
+                        resumeModal.style.opacity = '0';
+
+                        // Hide after transition
+                        setTimeout(() => {
+                            resumeModal.style.display = 'none';
+                        }, 300);
+                    }
+                };
+
+                // Attach event listeners
+                if (resumeButton) {
+                    console.log('[MODAL] Resume button found, attaching listener');
+                    resumeButton.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        openResumeModal();
+                    });
+                } else {
+                    if (currentScenarioConfig.is_cancelled) {
+                        console.error('[MODAL] Resume button not found despite cancelled state');
+                    }
+                }
+
+                if (cancelResumeBtn) {
+                    cancelResumeBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        closeResumeModal();
+                    });
+                }
+
+                // Close on outside click
+                if (resumeModal) {
+                    resumeModal.addEventListener('click', (e) => {
+                        if (e.target === resumeModal) {
+                            closeResumeModal();
+                        }
+                    });
+                }
+
+                if (confirmResumeBtn) {
+                    confirmResumeBtn.addEventListener('click', () => {
+                        console.log('[MODAL] Resume confirmed by user');
+
+                        // Update localStorage
+                        localStorage.setItem('currentScenario', 'premium-member');
+                        const newUserData = {
+                            ...currentScenarioConfig,
+                            is_premium_member: true,
+                            is_cancelled: false
+                        };
+                        localStorage.setItem('simulationUserData', JSON.stringify(newUserData));
+
+                        closeResumeModal();
+
+                        setTimeout(() => {
+                            location.reload();
+                        }, 300);
+                    });
+                } else {
+                    console.error('[MODAL] Confirm button not found');
+                }
             }
 
         } else if (currentScenarioConfig.is_free_trial) {
@@ -359,7 +527,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // premium_signup_new.html の window.dummyUserData (ヘッダー用) を更新
         // window.dummyUserData は premium_signup_new.html の header.html で利用されるため、ここで更新
         window.dummyUserData = {
-            ...window.dummyUserData, // 既存のheader用dummyUserDataを維持しつつ
+            ...(window.dummyUserData || {}), // Check before access
             ...currentScenarioConfig // シミュレーション情報を追加
         };
 
@@ -384,11 +552,6 @@ document.addEventListener('DOMContentLoaded', () => {
     handleInitialScenario();
 
     // --- Contact Modal Logic ---
-    // Note: The "サポート" link now directly navigates to bug-report.html.
-    // The following JavaScript code for opening the contact modal is no longer needed
-    // for the "サポート" link, but the modal itself and its closing logic might still be used
-    // if other parts of the application open it.
-    // For now, we will comment out the code that opens the modal via the "サポート" link.
     const openSupportModalLink = document.getElementById('open-support-modal'); // Still get the element in case it's used elsewhere
     const contactModal = document.getElementById('contactModal');
     const closeContactModalBtn = document.getElementById('closeContactModalBtn');
@@ -426,16 +589,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 300); // Transition duration
         }
     }
-
-    // if (openSupportModalLink) { // このブロックをコメントアウト
-    //     console.log('Adding click listener to openSupportModalLink');
-    //     openSupportModalLink.addEventListener('click', (event) => {
-    //         event.preventDefault(); // デフォルトのリンク動作を防ぐ
-    //         openContactModal();
-    //     });
-    // } else {
-    //     console.log('openSupportModalLink not found');
-    // }
 
     if (closeContactModalBtn) {
 
