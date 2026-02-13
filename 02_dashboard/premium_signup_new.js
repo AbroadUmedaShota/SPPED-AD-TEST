@@ -486,19 +486,138 @@ document.addEventListener('DOMContentLoaded', () => {
             // --- 2. Button & Campaign Logic (For New / Rejoin Users) ---
             // Only run this if we are NOT in a premium/trial scenario (i.e. we are in default mode)
 
-            if (signupButton) {
-                // その他のシナリオ (新規、再加入)
-                signupButton.href = 'premium_registration_spa.html'; // 通常の登録SPAページへのリンク
-                signupButton.innerHTML = `
-                    今すぐ申し込む
-                    <span class="block text-xs font-normal opacity-80 mt-1">
-                        クレカ登録不要・請求書払い
-                        <span class="mx-1">|</span>
-                        最短1分で完了
-                    </span>
-                `;
+            // 再加入者向けUI変更
+            if (currentScenarioConfig.is_rejoining_user) {
+                // ヒーローセクションの変更
+                const heroTitle = document.querySelector('#premium-hero-section h1');
+                if (heroTitle) {
+                    heroTitle.innerHTML = 'おかえりなさい!<br class="hidden sm:inline">再びご利用ありがとうございます!';
+                }
+
+                const heroBadge = document.querySelector('#premium-hero-section .inline-flex');
+                if (heroBadge) {
+                    heroBadge.innerHTML = `
+                        <span class="material-icons text-white text-xl animate-pulse">favorite</span>
+                        WELCOME BACK
+                    `;
+                }
+
+                // サブメッセージの追加
+                const heroContent = document.querySelector('#premium-hero-section .relative.z-10');
+                if (heroContent && !document.getElementById('rejoin-message')) {
+                    const rejoinMessage = document.createElement('p');
+                    rejoinMessage.id = 'rejoin-message';
+                    rejoinMessage.className = 'text-blue-50 text-lg mb-8 max-w-2xl mx-auto text-center';
+                    rejoinMessage.textContent = '引き続き、すべてのプレミアム機能をご利用いただけます。';
+                    heroTitle.after(rejoinMessage);
+                }
+
+                // CTAボタンの変更
+                if (signupButton) {
+                    signupButton.href = 'premium_registration_spa.html';
+                    signupButton.innerHTML = `
+                        再加入する
+                        <span class="block text-xs font-normal opacity-80 mt-1">
+                            以前のアカウント情報を引き継げます
+                            <span class="mx-1">|</span>
+                            最短1分で完了
+                        </span>
+                    `;
+                }
+
+                // 料金セクションに再加入者向けメッセージを追加
+                const pricingSection = document.querySelector('.bg-blue-50.border.border-blue-100');
+                if (pricingSection && !document.getElementById('rejoin-billing-notice')) {
+                    const billingNotice = document.createElement('div');
+                    billingNotice.id = 'rejoin-billing-notice';
+                    billingNotice.className = 'mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg';
+
+                    const today = new Date();
+                    const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                    const todayStr = `${today.getFullYear()}年${today.getMonth() + 1}月${today.getDate()}日`;
+                    const endOfMonthStr = `${endOfMonth.getFullYear()}年${endOfMonth.getMonth() + 1}月${endOfMonth.getDate()}日`;
+
+                    billingNotice.innerHTML = `
+                        <p class="text-sm text-amber-800 font-bold mb-2 flex items-center gap-2">
+                            <span class="material-icons text-amber-600 text-base">info</span>
+                            再加入の課金について
+                        </p>
+                        <p class="text-xs text-amber-700 leading-relaxed">
+                            本日から契約開始となり、<span class="font-bold">当月分の料金(¥10,000)が発生</span>します。<br>
+                            契約期間: ${todayStr} 〜 ${endOfMonthStr}
+                        </p>
+                    `;
+                    pricingSection.appendChild(billingNotice);
+                }
+
+            } else {
+                // 新規ユーザー向けUI (デフォルト)
+                if (signupButton) {
+                    signupButton.href = 'premium_registration_spa.html';
+                    signupButton.innerHTML = `
+                        今すぐ申し込む
+                        <span class="block text-xs font-normal opacity-80 mt-1">
+                            クレカ登録不要・請求書払い
+                            <span class="mx-1">|</span>
+                            最短1分で完了
+                        </span>
+                    `;
+                }
             }
 
+            // ページ下部のCTAセクションも変更
+            const bottomCtaSection = document.querySelector('.bg-gradient-to-br.from-blue-600.via-blue-500.to-indigo-600');
+            if (bottomCtaSection) {
+                const bottomCtaTitle = bottomCtaSection.querySelector('h2');
+                const bottomCtaButton = bottomCtaSection.querySelector('a[href="premium_registration_spa.html"]');
+                const bottomCtaDescription = bottomCtaSection.querySelector('p.text-blue-50');
+
+                if (currentScenarioConfig.is_rejoining_user) {
+                    // 再加入者向けに変更
+                    if (bottomCtaTitle) {
+                        bottomCtaTitle.innerHTML = 'もう一度、一緒に<br class="hidden sm:inline">業務を効率化しませんか？';
+                    }
+                    if (bottomCtaDescription) {
+                        bottomCtaDescription.textContent = 'プレミアム機能で、再び生産性を最大化しましょう。';
+                    }
+                    if (bottomCtaButton) {
+                        bottomCtaButton.innerHTML = `
+                            <span class="flex items-center justify-center gap-2">
+                                <span class="text-lg">再加入する</span>
+                                <span class="material-icons">arrow_forward</span>
+                            </span>
+                            <span class="block text-xs font-normal text-blue-500 mt-1">
+                                以前のアカウント情報を引き継げます
+                                <span class="mx-1">|</span>
+                                最短1分で完了
+                            </span>
+                        `;
+                    }
+                } else {
+                    // 新規ユーザー向け(デフォルト)
+                    if (bottomCtaTitle) {
+                        bottomCtaTitle.innerHTML = '今すぐプレミアムプランを<br class="hidden sm:inline">始めませんか？';
+                    }
+                    if (bottomCtaDescription) {
+                        bottomCtaDescription.textContent = '業務効率が劇的に向上します。最短1分で登録完了。';
+                    }
+                    if (bottomCtaButton) {
+                        bottomCtaButton.innerHTML = `
+                            <span class="flex items-center justify-center gap-2">
+                                <span class="text-lg">今すぐ申し込む</span>
+                                <span class="material-icons">arrow_forward</span>
+                            </span>
+                            <span class="block text-xs font-normal text-blue-500 mt-1">
+                                クレカ登録不要・請求書払い
+                                <span class="mx-1">|</span>
+                                最短1分で完了
+                            </span>
+                        `;
+                    }
+                }
+            }
+
+            // 「初月無料」メッセージの表示制御 (既存ロジック維持)
             const firstMonthFreeMessage = document.getElementById('first-month-free-message');
             if (firstMonthFreeMessage) {
                 if (currentScenarioConfig.is_rejoining_user) {
