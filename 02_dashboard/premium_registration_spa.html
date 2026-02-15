@@ -86,332 +86,341 @@
         <!-- Header (Dynamic) -->
         <div id="header-placeholder"></div>
 
-        <div class="flex flex-1 pt-16 bg-background justify-center">
+        <div class="flex flex-1 pt-16 bg-background">
+            <!-- Sidebar -->
+            <div id="sidebar-placeholder"></div>
 
-            <main class="flex-1 max-w-3xl w-full px-4 py-8 md:py-12">
+            <main class="flex-1 w-full ml-0 md:ml-64 px-4 py-8 md:py-12 flex justify-center">
+                <div class="max-w-3xl w-full">
 
-                <!-- Breadcrumb -->
-                <nav aria-label="breadcrumb" class="mb-6">
-                    <ol class="flex items-center space-x-2 text-sm text-gray-500">
-                        <li>
-                            <a href="index.html"
-                                class="hover:text-blue-600 hover:underline flex items-center transition-colors">
-                                <span class="material-icons text-sm mr-1">home</span>
-                                ダッシュボード
-                            </a>
-                        </li>
-                        <li class="flex items-center">
-                            <span class="material-icons text-xs">chevron_right</span>
-                        </li>
-                        <li>
-                            <a href="premium_signup_new.html"
-                                class="hover:text-blue-600 hover:underline transition-colors">
-                                プレミアムプラン
-                            </a>
-                        </li>
-                        <li class="flex items-center">
-                            <span class="material-icons text-xs">chevron_right</span>
-                        </li>
-                        <li class="font-medium text-gray-900" aria-current="page">
-                            登録設定
-                        </li>
-                    </ol>
-                </nav>
+                    <!-- Breadcrumb -->
+                    <nav aria-label="breadcrumb" class="mb-6">
+                        <ol class="flex items-center space-x-2 text-sm text-gray-500">
+                            <li>
+                                <a href="index.html"
+                                    class="hover:text-blue-600 hover:underline flex items-center transition-colors">
+                                    <span class="material-icons text-sm mr-1">home</span>
+                                    ダッシュボード
+                                </a>
+                            </li>
+                            <li class="flex items-center">
+                                <span class="material-icons text-xs">chevron_right</span>
+                            </li>
+                            <li>
+                                <a href="premium_signup_new.html"
+                                    class="hover:text-blue-600 hover:underline transition-colors">
+                                    プレミアムプラン
+                                </a>
+                            </li>
+                            <li class="flex items-center">
+                                <span class="material-icons text-xs">chevron_right</span>
+                            </li>
+                            <li class="font-medium text-gray-900" aria-current="page">
+                                登録設定
+                            </li>
+                        </ol>
+                    </nav>
 
-                <!-- Page Title -->
-                <h1 class="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-8">
-                    プレミアムプラン登録設定
-                </h1>
+                    <!-- Page Title -->
+                    <h1 class="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-8">
+                        プレミアムプラン登録設定
+                    </h1>
 
-                <!-- Progress Steps -->
-                <div class="flex items-center justify-between mb-12 max-w-xl mx-auto">
-                    <!-- Step 1 -->
-                    <div class="flex flex-col items-center relative">
-                        <div class="step-circle active" id="step-circle-1">1</div>
-                        <span class="text-xs md:text-sm font-semibold mt-2 text-blue-900">入力</span>
+                    <!-- Progress Steps -->
+                    <div class="flex items-center justify-between mb-12 max-w-xl mx-auto">
+                        <!-- Step 1 -->
+                        <div class="flex flex-col items-center relative">
+                            <div class="step-circle active" id="step-circle-1">1</div>
+                            <span class="text-xs md:text-sm font-semibold mt-2 text-blue-900">入力</span>
+                        </div>
+                        <div class="step-connector" id="connector-1"></div>
+                        <!-- Step 2 -->
+                        <div class="flex flex-col items-center relative">
+                            <div class="step-circle" id="step-circle-2">2</div>
+                            <span class="text-xs md:text-sm font-semibold mt-2 text-gray-500">確認</span>
+                        </div>
+                        <div class="step-connector" id="connector-2"></div>
+                        <!-- Step 3 -->
+                        <div class="flex flex-col items-center relative">
+                            <div class="step-circle" id="step-circle-3">3</div>
+                            <span class="text-xs md:text-sm font-semibold mt-2 text-gray-500">完了</span>
+                        </div>
                     </div>
-                    <div class="step-connector" id="connector-1"></div>
-                    <!-- Step 2 -->
-                    <div class="flex flex-col items-center relative">
-                        <div class="step-circle" id="step-circle-2">2</div>
-                        <span class="text-xs md:text-sm font-semibold mt-2 text-gray-500">確認</span>
-                    </div>
-                    <div class="step-connector" id="connector-2"></div>
-                    <!-- Step 3 -->
-                    <div class="flex flex-col items-center relative">
-                        <div class="step-circle" id="step-circle-3">3</div>
-                        <span class="text-xs md:text-sm font-semibold mt-2 text-gray-500">完了</span>
-                    </div>
-                </div>
 
-                <!-- Step 1: Input Form -->
-                <!-- Sticky "Use Account Info" Button (Visible only on Input Step) -->
-                <div id="sticky-btn-container"
-                    class="fixed top-24 right-4 z-40 hidden md:block transition-opacity duration-300 opacity-0 pointer-events-none">
-                    <button type="button" id="btn-use-account-info-sticky"
-                        class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded-full shadow-lg flex items-center gap-2 transition-all transform hover:scale-105">
-                        <span class="material-icons text-base">account_circle</span>
-                        会員情報を引用
-                    </button>
-                </div>
+                    <!-- Step 1: Input Form -->
 
-                <section id="step-input" class="bg-white p-6 md:p-10 rounded-xl shadow-lg animate-fade-in">
-                    <h2 class="text-xl font-bold text-gray-800 mb-6 border-b pb-4">請求情報の入力</h2>
-                    <form id="billing-form" novalidate>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                            <!-- 氏名(姓) -->
-                            <div>
-                                <label for="lastName" class="block text-sm font-bold text-gray-700 mb-2">
-                                    氏名（姓） <span
+
+                    <section id="step-input" class="bg-white p-6 md:p-10 rounded-xl shadow-lg animate-fade-in relative">
+                        <!-- Sticky "Use Account Info" Button (Visible only on Input Step) -->
+                        <div id="sticky-btn-container"
+                            class="absolute top-6 right-6 z-10 hidden md:block transition-opacity duration-300 opacity-0 pointer-events-none">
+                            <button type="button" id="btn-use-account-info-sticky"
+                                class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded-full shadow-lg flex items-center gap-2 transition-all transform hover:scale-105">
+                                <span class="material-icons text-base">account_circle</span>
+                                会員情報を引用
+                            </button>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-800 mb-6 border-b pb-4">請求情報の入力</h2>
+                        <form id="billing-form" novalidate>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <!-- 氏名(姓) -->
+                                <div>
+                                    <label for="lastName" class="block text-sm font-bold text-gray-700 mb-2">
+                                        氏名（姓） <span
+                                            class="bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded ml-2">必須</span>
+                                    </label>
+                                    <input type="text" id="lastName" name="lastName"
+                                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-100 outline-none transition"
+                                        placeholder="例：山田">
+                                    <p class="error-message" id="error-lastName">氏名（姓）を入力してください。</p>
+                                </div>
+
+                                <!-- 氏名(名) -->
+                                <div>
+                                    <label for="firstName" class="block text-sm font-bold text-gray-700 mb-2">
+                                        氏名（名） <span
+                                            class="bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded ml-2">必須</span>
+                                    </label>
+                                    <input type="text" id="firstName" name="firstName"
+                                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-100 outline-none transition"
+                                        placeholder="例：太郎">
+                                    <p class="error-message" id="error-firstName">氏名（名）を入力してください。</p>
+                                </div>
+                            </div>
+
+                            <!-- 会社名・部署名 -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <div>
+                                    <label for="company" class="block text-sm font-bold text-gray-700 mb-2">
+                                        会社名 <span
+                                            class="bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded ml-2">必須</span>
+                                    </label>
+                                    <input type="text" id="company" name="company"
+                                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-100 outline-none transition"
+                                        placeholder="例：株式会社SpeedAd">
+                                    <p class="error-message" id="error-company">会社名を入力してください。</p>
+                                </div>
+                                <div>
+                                    <label for="department" class="block text-sm font-bold text-gray-700 mb-2">
+                                        部署名
+                                    </label>
+                                    <input type="text" id="department" name="department"
+                                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-100 outline-none transition"
+                                        placeholder="例：営業部">
+                                </div>
+                            </div>
+
+                            <!-- 役職 -->
+                            <div class="mb-6">
+                                <label for="title" class="block text-sm font-bold text-gray-700 mb-2">
+                                    役職名
+                                </label>
+                                <input type="text" id="title" name="title"
+                                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-100 outline-none transition"
+                                    placeholder="例：部長">
+                            </div>
+
+                            <!-- 電話番号 -->
+                            <div class="mb-6">
+                                <label for="phone" class="block text-sm font-bold text-gray-700 mb-2">
+                                    電話番号 <span
                                         class="bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded ml-2">必須</span>
                                 </label>
-                                <input type="text" id="lastName" name="lastName"
+                                <input type="tel" id="phone" name="phone"
                                     class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-100 outline-none transition"
-                                    placeholder="例：山田">
-                                <p class="error-message" id="error-lastName">氏名（姓）を入力してください。</p>
+                                    placeholder="例：0312345678（ハイフンなし）">
+                                <p class="error-message" id="error-phone">電話番号を正しく入力してください。</p>
                             </div>
 
-                            <!-- 氏名(名) -->
-                            <div>
-                                <label for="firstName" class="block text-sm font-bold text-gray-700 mb-2">
-                                    氏名（名） <span
+                            <!-- 郵便番号 -->
+                            <div class="mb-6">
+                                <label for="zip" class="block text-sm font-bold text-gray-700 mb-2">
+                                    郵便番号 <span
                                         class="bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded ml-2">必須</span>
                                 </label>
-                                <input type="text" id="firstName" name="firstName"
-                                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-100 outline-none transition"
-                                    placeholder="例：太郎">
-                                <p class="error-message" id="error-firstName">氏名（名）を入力してください。</p>
+                                <div class="flex items-center gap-2">
+                                    <input type="text" id="zip" name="zip" maxlength="7"
+                                        class="w-full md:w-40 px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-100 outline-none transition"
+                                        placeholder="1234567">
+                                    <button type="button" id="btn-zip-search"
+                                        class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-3 px-4 rounded-lg transition duration-200 text-sm whitespace-nowrap">
+                                        住所検索
+                                    </button>
+                                </div>
+                                <p class="error-message" id="error-zip">郵便番号を7桁で入力してください。</p>
+                                <p class="text-xs text-red-500 mt-1 hidden" id="api-error-zip"></p>
                             </div>
-                        </div>
 
-                        <!-- 会社名・部署名 -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                            <div>
-                                <label for="company" class="block text-sm font-bold text-gray-700 mb-2">
-                                    会社名 <span class="bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded ml-2">必須</span>
+                            <!-- 住所 -->
+                            <div class="mb-6">
+                                <label for="address" class="block text-sm font-bold text-gray-700 mb-2">
+                                    住所 <span class="bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded ml-2">必須</span>
                                 </label>
-                                <input type="text" id="company" name="company"
+                                <input type="text" id="address" name="address"
                                     class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-100 outline-none transition"
-                                    placeholder="例：株式会社SpeedAd">
-                                <p class="error-message" id="error-company">会社名を入力してください。</p>
+                                    placeholder="例：東京都港区六本木1-2-3">
+                                <p class="error-message" id="error-address">住所を入力してください。</p>
                             </div>
-                            <div>
-                                <label for="department" class="block text-sm font-bold text-gray-700 mb-2">
-                                    部署名
+
+                            <!-- 建物名 -->
+                            <div class="mb-8">
+                                <label for="building" class="block text-sm font-bold text-gray-700 mb-2">
+                                    建物名
                                 </label>
-                                <input type="text" id="department" name="department"
+                                <input type="text" id="building" name="building"
                                     class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-100 outline-none transition"
-                                    placeholder="例：営業部">
+                                    placeholder="例：六本木ヒルズ XX階">
                             </div>
-                        </div>
 
-                        <!-- 役職 -->
-                        <div class="mb-6">
-                            <label for="title" class="block text-sm font-bold text-gray-700 mb-2">
-                                役職名
-                            </label>
-                            <input type="text" id="title" name="title"
-                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-100 outline-none transition"
-                                placeholder="例：部長">
-                        </div>
-
-                        <!-- 電話番号 -->
-                        <div class="mb-6">
-                            <label for="phone" class="block text-sm font-bold text-gray-700 mb-2">
-                                電話番号 <span class="bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded ml-2">必須</span>
-                            </label>
-                            <input type="tel" id="phone" name="phone"
-                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-100 outline-none transition"
-                                placeholder="例：0312345678（ハイフンなし）">
-                            <p class="error-message" id="error-phone">電話番号を正しく入力してください。</p>
-                        </div>
-
-                        <!-- 郵便番号 -->
-                        <div class="mb-6">
-                            <label for="zip" class="block text-sm font-bold text-gray-700 mb-2">
-                                郵便番号 <span class="bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded ml-2">必須</span>
-                            </label>
-                            <div class="flex items-center gap-2">
-                                <input type="text" id="zip" name="zip" maxlength="7"
-                                    class="w-full md:w-40 px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-100 outline-none transition"
-                                    placeholder="1234567">
-                                <button type="button" id="btn-zip-search"
-                                    class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-3 px-4 rounded-lg transition duration-200 text-sm whitespace-nowrap">
-                                    住所検索
+                            <!-- Actions -->
+                            <div class="flex justify-center mt-10">
+                                <button type="button" id="btn-to-confirm"
+                                    class="bg-blue-900 hover:bg-blue-800 text-white font-bold py-4 px-12 rounded-full shadow-md transition duration-200 transform hover:-translate-y-1 w-full md:w-auto">
+                                    確認画面へ進む
                                 </button>
                             </div>
-                            <p class="error-message" id="error-zip">郵便番号を7桁で入力してください。</p>
-                            <p class="text-xs text-red-500 mt-1 hidden" id="api-error-zip"></p>
+                        </form>
+                    </section>
+
+                    <!-- Step 2: Confirmation -->
+                    <section id="step-confirm" class="bg-white p-6 md:p-10 rounded-xl shadow-lg hidden">
+                        <h2 class="text-xl font-bold text-gray-800 mb-6 border-b pb-4">入力内容の確認</h2>
+                        <p class="text-gray-600 mb-8 text-sm">
+                            以下の内容で登録します。よろしければ「登録を完了する」ボタンを押してください。<br>
+                            修正する場合は「修正する」ボタンで戻ってください。
+                        </p>
+
+                        <dl class="space-y-4 text-sm md:text-base">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-2 border-b border-gray-100 pb-3">
+                                <dt class="font-bold text-gray-600">氏名</dt>
+                                <dd class="md:col-span-2 text-gray-900 font-medium" id="confirm-name">-</dd>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-2 border-b border-gray-100 pb-3">
+                                <dt class="font-bold text-gray-600">会社名</dt>
+                                <dd class="md:col-span-2 text-gray-900 font-medium" id="confirm-company">-</dd>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-2 border-b border-gray-100 pb-3">
+                                <dt class="font-bold text-gray-600">部署名</dt>
+                                <dd class="md:col-span-2 text-gray-900" id="confirm-department">-</dd>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-2 border-b border-gray-100 pb-3">
+                                <dt class="font-bold text-gray-600">役職名</dt>
+                                <dd class="md:col-span-2 text-gray-900" id="confirm-title">-</dd>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-2 border-b border-gray-100 pb-3">
+                                <dt class="font-bold text-gray-600">電話番号</dt>
+                                <dd class="md:col-span-2 text-gray-900 font-medium" id="confirm-phone">-</dd>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-2 border-b border-gray-100 pb-3">
+                                <dt class="font-bold text-gray-600">郵便番号</dt>
+                                <dd class="md:col-span-2 text-gray-900" id="confirm-zip">-</dd>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-2 border-b border-gray-100 pb-3">
+                                <dt class="font-bold text-gray-600">住所</dt>
+                                <dd class="md:col-span-2 text-gray-900" id="confirm-address">-</dd>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-2 pb-3">
+                                <dt class="font-bold text-gray-600">建物名</dt>
+                                <dd class="md:col-span-2 text-gray-900" id="confirm-building">-</dd>
+                            </div>
+                        </dl>
+
+                        <div class="bg-blue-50 p-4 rounded-lg mt-8 text-sm text-blue-800">
+                            <p class="font-bold mb-1">【料金のお支払いについて】</p>
+                            <p>月額 10,000円（税別）のご請求となります。</p>
+                            <p>月末締めで計算し、翌月第1営業日に管理画面の「ご請求内容一覧」よりダウンロードいただけます。</p>
+                            <div id="billing-start-date-info" class="mt-4">
+                                <!-- ここに課金開始日に関する情報がJavaScriptによって挿入されます -->
+                            </div>
                         </div>
 
-                        <!-- 住所 -->
-                        <div class="mb-6">
-                            <label for="address" class="block text-sm font-bold text-gray-700 mb-2">
-                                住所 <span class="bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded ml-2">必須</span>
+                        <!-- Consent Text -->
+                        <!-- Consent Checkbox -->
+                        <div class="mt-8 mb-6 flex justify-center">
+                            <label class="flex items-start gap-3 cursor-pointer group">
+                                <div class="relative flex items-center pt-0.5">
+                                    <input type="checkbox" id="consent-checkbox"
+                                        class="peer h-5 w-5 cursor-pointer appearance-none rounded border border-gray-300 shadow-sm transition-all hover:border-blue-500 checked:bg-blue-600 checked:border-blue-600 focus:ring-2 focus:ring-blue-200">
+                                    <span
+                                        class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100 material-icons text-sm pointer-events-none select-none">
+                                        check
+                                    </span>
+                                </div>
+                                <div
+                                    class="text-sm text-gray-600 leading-relaxed select-none group-hover:text-gray-900 transition-colors">
+                                    <a href="terms-of-service.html"
+                                        class="underline hover:text-blue-600 font-medium text-blue-900" target="_blank"
+                                        rel="noopener noreferrer">利用規約</a> および
+                                    <a href="https://www.abroad-o.com/rule.html" target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="underline hover:text-blue-600 font-medium text-blue-900">プライバシーポリシー</a>
+                                    に同意して登録します。
+                                </div>
                             </label>
-                            <input type="text" id="address" name="address"
-                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-100 outline-none transition"
-                                placeholder="例：東京都港区六本木1-2-3">
-                            <p class="error-message" id="error-address">住所を入力してください。</p>
-                        </div>
-
-                        <!-- 建物名 -->
-                        <div class="mb-8">
-                            <label for="building" class="block text-sm font-bold text-gray-700 mb-2">
-                                建物名
-                            </label>
-                            <input type="text" id="building" name="building"
-                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-100 outline-none transition"
-                                placeholder="例：六本木ヒルズ XX階">
                         </div>
 
                         <!-- Actions -->
-                        <div class="flex justify-center mt-10">
-                            <button type="button" id="btn-to-confirm"
-                                class="bg-blue-900 hover:bg-blue-800 text-white font-bold py-4 px-12 rounded-full shadow-md transition duration-200 transform hover:-translate-y-1 w-full md:w-auto">
-                                確認画面へ進む
+                        <div class="flex flex-col-reverse md:flex-row justify-center gap-4">
+                            <button type="button" id="btn-back-to-input"
+                                class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-bold py-3 px-8 rounded-full shadow-sm transition w-full md:w-auto">
+                                修正する
+                            </button>
+                            <button type="button" id="btn-submit"
+                                class="bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 px-12 rounded-full shadow-md transition duration-200 w-full md:w-auto disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                                <span id="btn-submit-spinner" class="hidden">
+                                    <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg"
+                                        fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                            stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                        </path>
+                                    </svg>
+                                </span>
+                                <span id="btn-submit-text">この内容で登録する</span>
                             </button>
                         </div>
-                    </form>
-                </section>
+                    </section>
 
-                <!-- Step 2: Confirmation -->
-                <section id="step-confirm" class="bg-white p-6 md:p-10 rounded-xl shadow-lg hidden">
-                    <h2 class="text-xl font-bold text-gray-800 mb-6 border-b pb-4">入力内容の確認</h2>
-                    <p class="text-gray-600 mb-8 text-sm">
-                        以下の内容で登録します。よろしければ「登録を完了する」ボタンを押してください。<br>
-                        修正する場合は「修正する」ボタンで戻ってください。
-                    </p>
+                    <!-- Step 3: Completion -->
+                    <section id="step-complete" class="hidden">
+                        <div class="premium-bg-effect">
+                            <div class="particle"></div>
+                            <div class="particle"></div>
+                            <div class="particle"></div>
+                            <div class="particle"></div>
+                        </div>
 
-                    <dl class="space-y-4 text-sm md:text-base">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 border-b border-gray-100 pb-3">
-                            <dt class="font-bold text-gray-600">氏名</dt>
-                            <dd class="md:col-span-2 text-gray-900 font-medium" id="confirm-name">-</dd>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 border-b border-gray-100 pb-3">
-                            <dt class="font-bold text-gray-600">会社名</dt>
-                            <dd class="md:col-span-2 text-gray-900 font-medium" id="confirm-company">-</dd>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 border-b border-gray-100 pb-3">
-                            <dt class="font-bold text-gray-600">部署名</dt>
-                            <dd class="md:col-span-2 text-gray-900" id="confirm-department">-</dd>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 border-b border-gray-100 pb-3">
-                            <dt class="font-bold text-gray-600">役職名</dt>
-                            <dd class="md:col-span-2 text-gray-900" id="confirm-title">-</dd>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 border-b border-gray-100 pb-3">
-                            <dt class="font-bold text-gray-600">電話番号</dt>
-                            <dd class="md:col-span-2 text-gray-900 font-medium" id="confirm-phone">-</dd>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 border-b border-gray-100 pb-3">
-                            <dt class="font-bold text-gray-600">郵便番号</dt>
-                            <dd class="md:col-span-2 text-gray-900" id="confirm-zip">-</dd>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 border-b border-gray-100 pb-3">
-                            <dt class="font-bold text-gray-600">住所</dt>
-                            <dd class="md:col-span-2 text-gray-900" id="confirm-address">-</dd>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 pb-3">
-                            <dt class="font-bold text-gray-600">建物名</dt>
-                            <dd class="md:col-span-2 text-gray-900" id="confirm-building">-</dd>
-                        </div>
-                    </dl>
-
-                    <div class="bg-blue-50 p-4 rounded-lg mt-8 text-sm text-blue-800">
-                        <p class="font-bold mb-1">【料金のお支払いについて】</p>
-                        <p>月額 10,000円（税別）のご請求となります。</p>
-                        <p>月末締めで計算し、翌月第1営業日に管理画面の「ご請求内容一覧」よりダウンロードいただけます。</p>
-                        <div id="billing-start-date-info" class="mt-4">
-                            <!-- ここに課金開始日に関する情報がJavaScriptによって挿入されます -->
-                        </div>
-                    </div>
-
-                    <!-- Consent Text -->
-                    <!-- Consent Checkbox -->
-                    <div class="mt-8 mb-6 flex justify-center">
-                        <label class="flex items-start gap-3 cursor-pointer group">
-                            <div class="relative flex items-center pt-0.5">
-                                <input type="checkbox" id="consent-checkbox"
-                                    class="peer h-5 w-5 cursor-pointer appearance-none rounded border border-gray-300 shadow-sm transition-all hover:border-blue-500 checked:bg-blue-600 checked:border-blue-600 focus:ring-2 focus:ring-blue-200">
-                                <span
-                                    class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100 material-icons text-sm pointer-events-none select-none">
-                                    check
-                                </span>
+                        <div class="premium-content">
+                            <div class="premium-badge-container">
+                                <div class="premium-badge-glow"></div>
+                                <div class="premium-badge-icon">
+                                    <span class="material-icons">workspace_premium</span>
+                                </div>
                             </div>
-                            <div
-                                class="text-sm text-gray-600 leading-relaxed select-none group-hover:text-gray-900 transition-colors">
-                                <a href="terms-of-service.html"
-                                    class="underline hover:text-blue-600 font-medium text-blue-900" target="_blank"
-                                    rel="noopener noreferrer">利用規約</a> および
-                                <a href="https://www.abroad-o.com/rule.html" target="_blank" rel="noopener noreferrer"
-                                    class="underline hover:text-blue-600 font-medium text-blue-900">プライバシーポリシー</a>
-                                に同意して登録します。
-                            </div>
-                        </label>
-                    </div>
 
-                    <!-- Actions -->
-                    <div class="flex flex-col-reverse md:flex-row justify-center gap-4">
-                        <button type="button" id="btn-back-to-input"
-                            class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-bold py-3 px-8 rounded-full shadow-sm transition w-full md:w-auto">
-                            修正する
-                        </button>
-                        <button type="button" id="btn-submit"
-                            class="bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 px-12 rounded-full shadow-md transition duration-200 w-full md:w-auto disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-                            <span id="btn-submit-spinner" class="hidden">
-                                <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg"
-                                    fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                                        stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor"
-                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                                    </path>
-                                </svg>
-                            </span>
-                            <span id="btn-submit-text">この内容で登録する</span>
-                        </button>
-                    </div>
-                </section>
+                            <h2 class="premium-title">Welcome to Premium</h2>
 
-                <!-- Step 3: Completion -->
-                <section id="step-complete" class="hidden">
-                    <div class="premium-bg-effect">
-                        <div class="particle"></div>
-                        <div class="particle"></div>
-                        <div class="particle"></div>
-                        <div class="particle"></div>
-                    </div>
+                            <p class="premium-subtitle">
+                                プレミアムプランへの登録が完了しました。<br>
+                                あなただけの特別な体験が、今ここから始まります。
+                            </p>
 
-                    <div class="premium-content">
-                        <div class="premium-badge-container">
-                            <div class="premium-badge-glow"></div>
-                            <div class="premium-badge-icon">
-                                <span class="material-icons">workspace_premium</span>
+                            <div>
+                                <a href="index.html" class="btn-premium">
+                                    <span>ダッシュボードへ戻る</span>
+                                    <span class="material-icons">arrow_forward</span>
+                                </a>
                             </div>
                         </div>
+                    </section>
 
-                        <h2 class="premium-title">Welcome to Premium</h2>
-
-                        <p class="premium-subtitle">
-                            プレミアムプランへの登録が完了しました。<br>
-                            あなただけの特別な体験が、今ここから始まります。
-                        </p>
-
-                        <div>
-                            <a href="index.html" class="btn-premium">
-                                <span>ダッシュボードへ戻る</span>
-                                <span class="material-icons">arrow_forward</span>
-                            </a>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Legal Links (Specific for this page) -->
-                <!-- Removed: Redundant as it is in the common footer -->
+                    <!-- Legal Links (Specific for this page) -->
+                    <!-- Removed: Redundant as it is in the common footer -->
 
 
 
+                </div>
             </main>
         </div>
 

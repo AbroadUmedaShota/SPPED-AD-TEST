@@ -89,6 +89,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnBackToInput = document.getElementById('btn-back-to-input');
     const btnSubmit = document.getElementById('btn-submit');
 
+    // --- Helper: Check Valid User Data ---
+    function hasValidUserData(data) {
+        return data && data.lastName && data.firstName && data.companyName;
+    }
+
     // --- Helper: Update Progress UI ---
     function setProcessStep(stepNum) {
         // Reset all
@@ -135,8 +140,9 @@ document.addEventListener('DOMContentLoaded', () => {
             hasUnsavedChanges = true; // Assume changes are made if back to input
 
             // Show Sticky Button (delayed to allow fade in)
+            // Only show if we have valid user data to quote
             const stickyBtn = document.getElementById('sticky-btn-container');
-            if (stickyBtn) {
+            if (stickyBtn && hasValidUserData(window.dummyUserData)) {
                 stickyBtn.classList.remove('hidden');
                 setTimeout(() => {
                     stickyBtn.classList.remove('opacity-0', 'pointer-events-none');
@@ -467,7 +473,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 上記条件に合致しない場合は、通常通り確認モーダルを表示
         // Check if we have enough info to prompt (Account Check Modal)
-        if (userData && userData.lastName && userData.firstName && userData.companyName) {
+        if (hasValidUserData(userData)) {
             // Populate modal
             if (modalName) modalName.textContent = `${userData.lastName} ${userData.firstName}`; // 姓名を結合
             if (modalCompany) modalCompany.textContent = userData.companyName;
