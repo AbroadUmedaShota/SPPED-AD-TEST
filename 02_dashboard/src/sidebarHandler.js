@@ -9,7 +9,7 @@ const NAV_ITEMS = [
     { id: 'survey-list', href: 'index.html', icon: 'list_alt', label: 'アンケート一覧' },
     { id: 'invoice-list', href: 'invoiceList.html', icon: 'receipt_long', label: 'ご請求内容一覧' },
     { id: 'group-management', href: 'group-edit.html', icon: 'groups', label: 'グループ管理' },
-    { id: 'premium-plan', href: 'premium_signup_new.html', icon: 'stars', label: 'プレミアムプラン登録' },
+    { id: 'premium-plan', href: 'premium_signup_new.html', icon: 'stars', label: 'プレミアムプラン' },
     { isDivider: true },
     {
         id: 'account-info',
@@ -103,7 +103,7 @@ export function adjustLayout() {
     if (isPcScreen && sidebar.classList.contains('is-open-mobile')) {
         toggleMobileSidebar(); // Close mobile sidebar if switching to PC view
     }
-    
+
     const isModalOpen = document.querySelector('.modal-overlay[data-state="open"]');
     if (!isModalOpen) {
         unlockScroll();
@@ -125,14 +125,6 @@ function populateNav() {
         if (item.isDivider) {
             navContainer.innerHTML += '<div class="border-t border-outline-variant my-2"></div>';
             return;
-        }
-
-        // プレミアムプラン登録の表示制御
-        if (item.id === 'premium-plan') {
-            const currentAccountType = getCurrentGroupAccountType();
-            if (currentAccountType === 'premium') { // プレミアムアカウントの場合は非表示
-                return;
-            }
         }
 
         const link = document.createElement('a');
@@ -242,7 +234,7 @@ async function populateGroupSelect() {
         const storedGroupId = getStoredGroupId();
         // If no stored ID, default to the first group in the list (which should be personal)
         const initialGroupId = storedGroupId || (groupsCache.length > 0 ? groupsCache[0].id : null);
-        
+
         if (initialGroupId) {
             userSelect.value = initialGroupId;
             handleGroupChange(initialGroupId);
@@ -326,7 +318,7 @@ function attachEventListeners() {
         userSelect.addEventListener('change', () => {
             const selectedGroupId = userSelect.value;
             handleGroupChange(selectedGroupId);
-            
+
             // Redirect to index.html if not already there
             const currentPageId = document.body.dataset.pageId;
             if (currentPageId !== 'survey-list') {
@@ -395,7 +387,7 @@ export async function initSidebarHandler() {
     populateSupportLink();
     await populateGroupSelect();
     attachEventListeners();
-    
+
     // Initial layout setup
     adjustLayout();
 

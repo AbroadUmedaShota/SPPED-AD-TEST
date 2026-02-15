@@ -440,11 +440,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     signupButton.href = 'premium_registration_spa.html';
                     signupButton.innerHTML = `
                         再加入する
-                        <span class="block text-xs font-normal opacity-80 mt-1">
-                            登録済みの情報を利用できます
-                            <span class="mx-1">|</span>
-                            最短1分で完了
-                        </span>
                     `;
                 }
 
@@ -479,11 +474,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     signupButton.href = 'premium_registration_spa.html';
                     signupButton.innerHTML = `
                         今すぐ申し込む
-                        <span class="block text-xs font-normal opacity-80 mt-1">
-                            クレカ登録不要・請求書払い
-                            <span class="mx-1">|</span>
-                            最短1分で完了
-                        </span>
                     `;
                 }
             }
@@ -509,11 +499,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <span class="text-lg">再加入する</span>
                                 <span class="material-icons">arrow_forward</span>
                             </span>
-                            <span class="block text-xs font-normal text-blue-500 mt-1">
-                                登録済みの情報を利用できます
-                                <span class="mx-1">|</span>
-                                最短1分で完了
-                            </span>
                         `;
                     }
                 } else {
@@ -529,11 +514,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             <span class="flex items-center justify-center gap-2">
                                 <span class="text-lg">今すぐ申し込む</span>
                                 <span class="material-icons">arrow_forward</span>
-                            </span>
-                            <span class="block text-xs font-normal text-blue-500 mt-1">
-                                クレカ登録不要・請求書払い
-                                <span class="mx-1">|</span>
-                                最短1分で完了
                             </span>
                         `;
                     }
