@@ -145,6 +145,16 @@
                 </div>
 
                 <!-- Step 1: Input Form -->
+                <!-- Sticky "Use Account Info" Button (Visible only on Input Step) -->
+                <div id="sticky-btn-container"
+                    class="fixed top-24 right-4 z-40 hidden md:block transition-opacity duration-300 opacity-0 pointer-events-none">
+                    <button type="button" id="btn-use-account-info-sticky"
+                        class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded-full shadow-lg flex items-center gap-2 transition-all transform hover:scale-105">
+                        <span class="material-icons text-base">account_circle</span>
+                        会員情報を引用
+                    </button>
+                </div>
+
                 <section id="step-input" class="bg-white p-6 md:p-10 rounded-xl shadow-lg animate-fade-in">
                     <h2 class="text-xl font-bold text-gray-800 mb-6 border-b pb-4">請求情報の入力</h2>
                     <form id="billing-form" novalidate>
@@ -318,12 +328,28 @@
                     </div>
 
                     <!-- Consent Text -->
-                    <p class="text-xs text-gray-500 text-center mt-8 mb-4">
-                        ※「この内容で登録する」ボタンを押すことで、<a href="terms-of-service.html"
-                            class="underline hover:text-blue-600">利用規約</a> および <a
-                            href="https://www.abroad-o.com/rule.html" target="_blank" rel="noopener noreferrer"
-                            class="underline hover:text-blue-600">プライバシーポリシー</a>に同意したものとみなされます。
-                    </p>
+                    <!-- Consent Checkbox -->
+                    <div class="mt-8 mb-6 flex justify-center">
+                        <label class="flex items-start gap-3 cursor-pointer group">
+                            <div class="relative flex items-center pt-0.5">
+                                <input type="checkbox" id="consent-checkbox"
+                                    class="peer h-5 w-5 cursor-pointer appearance-none rounded border border-gray-300 shadow-sm transition-all hover:border-blue-500 checked:bg-blue-600 checked:border-blue-600 focus:ring-2 focus:ring-blue-200">
+                                <span
+                                    class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100 material-icons text-sm pointer-events-none select-none">
+                                    check
+                                </span>
+                            </div>
+                            <div
+                                class="text-sm text-gray-600 leading-relaxed select-none group-hover:text-gray-900 transition-colors">
+                                <a href="terms-of-service.html"
+                                    class="underline hover:text-blue-600 font-medium text-blue-900" target="_blank"
+                                    rel="noopener noreferrer">利用規約</a> および
+                                <a href="https://www.abroad-o.com/rule.html" target="_blank" rel="noopener noreferrer"
+                                    class="underline hover:text-blue-600 font-medium text-blue-900">プライバシーポリシー</a>
+                                に同意して登録します。
+                            </div>
+                        </label>
+                    </div>
 
                     <!-- Actions -->
                     <div class="flex flex-col-reverse md:flex-row justify-center gap-4">

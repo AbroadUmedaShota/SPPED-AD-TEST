@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Default dummy data if not loaded from localStorage
-    // This should match simulationBaseUserData in premium_signup_new.js (from premium_signup_new.js)
     if (!loadedUserData) {
         loadedUserData = {
             email: 'user@example.com',
@@ -24,17 +23,16 @@ document.addEventListener('DOMContentLoaded', () => {
             is_rejoining_user: false
         };
     }
-    window.dummyUserData = loadedUserData; // window.dummyUserDataとして設定
-    console.log('DOMContentLoaded loaded window.dummyUserData:', window.dummyUserData);
+    window.dummyUserData = loadedUserData;
 
     const stepInput = document.getElementById('step-input');
     const stepConfirm = document.getElementById('step-confirm');
     const stepComplete = document.getElementById('step-complete');
 
     // Modal Elements
-    const accountCheckModal = document.getElementById('account-check-modal'); // accountCheckModalにリネーム
+    const accountCheckModal = document.getElementById('account-check-modal');
     const accountCheckModalContent = document.getElementById('account-check-content');
-    const modalName = document.getElementById('modal-name'); // 氏名全体を表示
+    const modalName = document.getElementById('modal-name');
     const modalCompany = document.getElementById('modal-company');
     const modalEmail = document.getElementById('modal-email');
     const modalDepartment = document.getElementById('modal-department');
@@ -45,6 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalBuilding = document.getElementById('modal-building');
 
     const btnUseInfo = document.getElementById('btn-use-account-info');
+    const btnUseInfoSticky = document.getElementById('btn-use-account-info-sticky'); // Sticky button
     const btnInputManual = document.getElementById('btn-input-manually');
 
     // Leave Prevention Modal Elements
@@ -53,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const preventLeaveCancelBtn = document.getElementById('prevent-leave-cancel-btn');
 
 
-    let currentScreen = 'input'; // 初期画面をinputに設定
+    let currentScreen = 'input'; // Initial screen
 
     const steps = {
         1: { title: '入力', circle: 'step-circle-1', conn: 'connector-1', el: stepInput },
@@ -61,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
         3: { title: '完了', circle: 'step-circle-3', conn: null, el: stepComplete }
     };
 
-    // Elements (IDに合わせて修正)
+    // Form Inputs
     const inputs = {
         lastName: document.getElementById('lastName'),
         firstName: document.getElementById('firstName'),
@@ -74,9 +73,9 @@ document.addEventListener('DOMContentLoaded', () => {
         title: document.getElementById('title')
     };
 
-    // Confirm画面の表示要素 (IDに合わせて修正)
+    // Confirm Screen Elements
     const confirms = {
-        name: document.getElementById('confirm-name'), // 氏名全体を表示
+        name: document.getElementById('confirm-name'),
         company: document.getElementById('confirm-company'),
         department: document.getElementById('confirm-department'),
         title: document.getElementById('confirm-title'),
@@ -134,12 +133,44 @@ document.addEventListener('DOMContentLoaded', () => {
         if (stepNum === 1) { // On input screen
             currentScreen = 'input';
             hasUnsavedChanges = true; // Assume changes are made if back to input
+
+            // Show Sticky Button (delayed to allow fade in)
+            const stickyBtn = document.getElementById('sticky-btn-container');
+            if (stickyBtn) {
+                stickyBtn.classList.remove('hidden');
+                setTimeout(() => {
+                    stickyBtn.classList.remove('opacity-0', 'pointer-events-none');
+                }, 100);
+            }
+
         } else if (stepNum === 2) { // On confirm screen
             currentScreen = 'confirm';
             hasUnsavedChanges = false; // Confirmation screen means data is 'saved' for the moment
+
+            // Reset Consent Checkbox
+            const consentCheckbox = document.getElementById('consent-checkbox');
+            if (consentCheckbox) consentCheckbox.checked = false;
+            // Disable submit button again
+            if (btnSubmit) btnSubmit.disabled = true;
+
+            // Hide Sticky Button
+            const stickyBtn = document.getElementById('sticky-btn-container');
+            if (stickyBtn) {
+                stickyBtn.classList.add('opacity-0', 'pointer-events-none');
+                setTimeout(() => {
+                    stickyBtn.classList.add('hidden');
+                }, 300);
+            }
+
         } else if (stepNum === 3) { // On complete screen
             currentScreen = 'complete';
             hasUnsavedChanges = false;
+
+            // Hide Sticky Button
+            const stickyBtn = document.getElementById('sticky-btn-container');
+            if (stickyBtn) {
+                stickyBtn.classList.add('hidden');
+            }
         }
     }
 
@@ -216,30 +247,52 @@ document.addEventListener('DOMContentLoaded', () => {
         let isValid = true;
         let errorMessage = '';
 
-        if (rule.required && !value.trim()) { // .trim() を追加
-            isValid = false;
-            errorMessage = rule.message; // required時のメッセージもrule.messageを使用
-        } else if (value.trim() && rule.validate && !rule.validate(value)) { // value.trim() を追加
+        if (rule.required && !value.trim()) {
             isValid = false;
             errorMessage = rule.message;
-        } else if (value.trim() && rule.maxLength && value.length > rule.maxLength.value) { // value.trim() を追加
+        } else if (value.trim() && rule.validate && !rule.validate(value)) {
+            isValid = false;
+            errorMessage = rule.message;
+        } else if (value.trim() && rule.maxLength && value.length > rule.maxLength.value) {
             isValid = false;
             errorMessage = rule.maxLength.message;
         }
 
+        // Visual Feedback (Green Check)
+        const parent = inputElement.parentElement; // relative container
+        let iconCheck = parent.querySelector('.valid-icon');
+
         if (!isValid) {
             displayError(inputElement, errorMessage);
+            if (iconCheck) iconCheck.style.display = 'none';
         } else {
             clearError(inputElement);
+            // Show Green Check if valid and not empty
+            if (value.trim() !== '') {
+                if (!iconCheck) {
+                    iconCheck = document.createElement('span');
+                    iconCheck.className = 'valid-icon material-icons text-green-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none';
+                    iconCheck.textContent = 'check_circle';
+                    // Ensure parent is relative for absolute positioning
+                    if (getComputedStyle(parent).position === 'static') {
+                        parent.style.position = 'relative';
+                    }
+                    parent.appendChild(iconCheck);
+                }
+                iconCheck.style.display = 'block';
+                inputElement.classList.add('border-green-500', 'bg-green-50');
+            } else {
+                if (iconCheck) iconCheck.style.display = 'none';
+                inputElement.classList.remove('border-green-500', 'bg-green-50');
+            }
         }
         return isValid;
     };
 
     const validateForm = () => {
         let isFormValid = true;
-        // inputs オブジェクトの各フィールドをループしてバリデーション
         Object.values(inputs).forEach(input => {
-            if (input) { // input要素が存在するか確認
+            if (input) {
                 const isFieldValid = validateField(input);
                 if (!isFieldValid) {
                     isFormValid = false;
@@ -255,18 +308,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnZipSearch) {
         btnZipSearch.addEventListener('click', () => {
-            const zipCode = inputs.zip.value.replace(/[^\d]/g, ''); // Remove non-digits
+            const zipCode = inputs.zip.value.replace(/[^\d]/g, '');
 
             if (zipCode.length !== 7) {
                 displayError(inputs.zip, '郵便番号を7桁で入力してください。');
                 return;
             }
 
-            // Clear previous errors
             clearError(inputs.zip);
             if (apiErrorZip) apiErrorZip.classList.add('hidden');
 
-            // Loading state
             const originalBtnText = btnZipSearch.textContent;
             btnZipSearch.textContent = '検索中...';
             btnZipSearch.disabled = true;
@@ -277,16 +328,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (data.status === 200 && data.results) {
                         const result = data.results[0];
                         const fullAddress = `${result.address1}${result.address2}${result.address3}`;
-
                         if (inputs.address) {
                             inputs.address.value = fullAddress;
-                            // Trigger validation/clearing error for address
                             validateField(inputs.address);
-
-                            // Move focus to building name for better UX
-                            if (inputs.building) {
-                                inputs.building.focus();
-                            }
+                            if (inputs.building) inputs.building.focus();
                         }
                     } else {
                         if (apiErrorZip) {
@@ -312,7 +357,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Helper: Populate Confirm Screen ---
     function populateConfirm() {
-        confirms.name.textContent = `${inputs.lastName.value} ${inputs.firstName.value}`; // 氏名を結合して表示
+        confirms.name.textContent = `${inputs.lastName.value} ${inputs.firstName.value}`;
         confirms.company.textContent = inputs.company.value;
         confirms.department.textContent = inputs.department.value || '-';
         confirms.title.textContent = inputs.title.value || '-';
@@ -331,12 +376,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let billingMessage = '';
         if (simulationUserData.is_rejoining_user) {
-            // 現在の日時と月末を計算
             const now = new Date();
             const year = now.getFullYear();
             const month = now.getMonth() + 1;
             const date = now.getDate();
-            const endOfMonth = new Date(year, month, 0); // Last day of current month
+            const endOfMonth = new Date(year, month, 0);
             const endOfMonthFormatted = `${endOfMonth.getFullYear()}年${endOfMonth.getMonth() + 1}月${endOfMonth.getDate()}日`;
             const todayFormatted = `${year}年${month}月${date}日`;
 
@@ -346,8 +390,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p class="mt-2">プレミアム機能はすぐにご利用いただけます。<br>お支払いは後日発行される請求書にてお願いいたします。</p>
             `;
         } else {
-            // 新規ユーザー (初月無料)
-            // 現在の月の翌月1日を計算
             const now = new Date();
             const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
             const nextMonthFormatted = `${nextMonth.getFullYear()}年${nextMonth.getMonth() + 1}月1日`;
@@ -364,9 +406,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+
     // --- Modal Logic ---
-    // Handle "Use Info" logic
-    function handleUseInfo(userData, skipModal = false) {
+    function handleUseInfo(userData, skipModal = false, autoAdvance = false) {
         // Auto-fill inputs
         if (inputs.lastName) inputs.lastName.value = userData.lastName || '';
         if (inputs.firstName) inputs.firstName.value = userData.firstName || '';
@@ -384,43 +426,38 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => accountCheckModal.classList.add('hidden'), 300);
         }
 
-        // Check if we have ALL required fields to skip to confirmation
-        if (validateForm()) { // validate() ではなく validateForm() を使用
-            hasUnsavedChanges = true; // 変更があったことを示す
+        // Validate and Decide Logic
+        const isValid = validateForm();
+
+        if (isValid && autoAdvance) {
+            // Case 1: Valid & Auto-advance requested (from Modal) -> Go to Confirm
+            hasUnsavedChanges = true;
             populateConfirm();
             setProcessStep(2);
         } else {
-            // Missing some required fields, go to input (but filled)
-            hasUnsavedChanges = true; // 変更があったことを示す
+            // Case 2: Not valid OR No Auto-advance requested (from Sticky) -> Stay on Input
+            hasUnsavedChanges = true;
             setProcessStep(1);
         }
     }
 
-    // Expose checkAccountInfo to window for manual testing validation
-    window.debugCheckAccountInfo = checkAccountInfo;
-
-    // Handle "Use Info" button click
+    // Handle "Use Info" button click (From Modal -> Auto Advance)
     if (btnUseInfo) {
         btnUseInfo.addEventListener('click', () => {
-            handleUseInfo(window.dummyUserData);
+            handleUseInfo(window.dummyUserData, false, true); // skipModal=false, autoAdvance=true
+        });
+    }
+
+    // Handle Sticky "Use Info" button click (From Input Screen -> Stay on Input)
+    if (btnUseInfoSticky) {
+        btnUseInfoSticky.addEventListener('click', () => {
+            // Only if we have data to use.
+            handleUseInfo(window.dummyUserData, true, false); // skipModal=true, autoAdvance=false
         });
     }
 
     function checkAccountInfo() {
-        console.log('checkAccountInfo started');
         const userData = window.dummyUserData;
-
-        // Modal Elements (ここにも定義が必要)
-        const modalName = document.getElementById('modal-name'); // 氏名全体を表示
-        const modalCompany = document.getElementById('modal-company');
-        const modalEmail = document.getElementById('modal-email');
-        const modalDepartment = document.getElementById('modal-department');
-        const modalTitle = document.getElementById('modal-title');
-        const modalPhone = document.getElementById('modal-phone');
-        const modalZip = document.getElementById('modal-zip');
-        const modalAddress = document.getElementById('modal-address');
-        const modalBuilding = document.getElementById('modal-building');
-
 
         // すでにプレミアム会員の場合は完了画面へ
         if (userData.is_premium_member) {
@@ -428,49 +465,43 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-
-
         // 上記条件に合致しない場合は、通常通り確認モーダルを表示
         // Check if we have enough info to prompt (Account Check Modal)
         if (userData && userData.lastName && userData.firstName && userData.companyName) {
-            console.log('Condition met, showing modal');
             // Populate modal
             if (modalName) modalName.textContent = `${userData.lastName} ${userData.firstName}`; // 姓名を結合
             if (modalCompany) modalCompany.textContent = userData.companyName;
             if (modalEmail) modalEmail.textContent = userData.email || '-';
             if (modalDepartment) modalDepartment.textContent = userData.departmentName || '-';
-            if (modalTitle) modalTitle.textContent = userData.positionName || '-'; // 修正: .title.value -> .textContent
-            if (modalPhone) modalPhone.textContent = userData.phone || '-'; // 修正: .phone.value -> .textContent
+            if (modalTitle) modalTitle.textContent = userData.positionName || '-';
+            if (modalPhone) modalPhone.textContent = userData.phone || '-';
             if (modalZip) modalZip.textContent = `〒${userData.zip.slice(0, 3)}-${userData.zip.slice(3)}` || '-';
             if (modalAddress) modalAddress.textContent = userData.address || '-';
             if (modalBuilding) modalBuilding.textContent = userData.building || '-';
 
             // Show Modal
             if (accountCheckModal) {
-                console.log('Removing hidden class from modal');
                 accountCheckModal.classList.remove('hidden');
                 void accountCheckModal.offsetWidth;
                 setTimeout(() => {
                     accountCheckModal.classList.remove('opacity-0');
                     accountCheckModalContent.classList.remove('scale-95');
                 }, 50);
-            } else {
-                console.error('Modal element not found!');
             }
         } else {
-            console.log('Condition NOT met, skipping modal');
-            // Not enough info, just go to input
+            // Condition NOT met, skipping modal
             setProcessStep(1);
         }
     }
+
     // Handle "Input Manually"
     if (btnInputManual) {
         btnInputManual.addEventListener('click', () => {
             // Hide Modal
-            accountCheckModal.classList.add('opacity-0'); // modal -> accountCheckModal
-            setTimeout(() => accountCheckModal.classList.add('hidden'), 300); // modal -> accountCheckModal
+            accountCheckModal.classList.add('opacity-0');
+            setTimeout(() => accountCheckModal.classList.add('hidden'), 300);
             setProcessStep(1);
-            hasUnsavedChanges = true; // ここを追加
+            hasUnsavedChanges = true;
         });
     }
 
@@ -495,36 +526,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Submit (Complete)
     if (btnSubmit) {
+        // --- Consent Checkbox Logic ---
+        const consentCheckbox = document.getElementById('consent-checkbox');
+
+        // Initial state: Disable submit button
+        btnSubmit.disabled = true;
+
+        if (consentCheckbox) {
+            consentCheckbox.addEventListener('change', () => {
+                btnSubmit.disabled = !consentCheckbox.checked;
+            });
+        }
+
         btnSubmit.addEventListener('click', () => {
+            if (consentCheckbox && !consentCheckbox.checked) return; // Guard clause
+
             // Simulate API call delay
-            const originalText = btnSubmit.textContent;
-            btnSubmit.disabled = true;
-            btnSubmit.textContent = '登録処理中...';
+            // [DEV NOTE] Replace this with actual API call
+            // e.g. fetch('/api/premium/register', { method: 'POST', body: JSON.stringify(data) })
+            setSubmitButtonLoading(true);
 
             setTimeout(() => {
                 // Success!
+                setSubmitButtonLoading(false);
                 setProcessStep(3);
+                // [DEV NOTE] Handle error cases here:
+                // showErrorModal('エラーメッセージ');
             }, 1500);
         });
     }
 
     // --- Leave Prevention Logic ---
     let hasUnsavedChanges = false;
-    let isNavigatingAway = false; // ユーザーが明示的にページを離れることを選択したかどうか
-    let isPreventingBack = false; // history.forward() による popstate イベントの連鎖を防ぐためのフラグ
+    let isNavigatingAway = false;
+    let isPreventingBack = false;
 
     // フォームの入力変更を監視
     document.getElementById('billing-form').addEventListener('input', () => {
         hasUnsavedChanges = true;
     });
 
-    // ページ離脱を検知 (ブラウザの閉じるボタン、URL直接入力など)
-    // beforeunloadイベントはブラウザ標準の警告しか出せないため、カスタムモーダルと共存させるのは難しい。
-    // そのため、ここでは何もしないか、あるいは最小限の警告にとどめる。
-    // カスタムモーダルは、リンククリックやフォームサブミットのインターセプトで表示する。
     window.addEventListener('beforeunload', (event) => {
         if (hasUnsavedChanges && (currentScreen === 'input' || currentScreen === 'confirm') && !isNavigatingAway) {
-            // ブラウザ標準の警告を出す。カスタムモーダルはここでは表示しない。
             event.preventDefault();
             event.returnValue = '';
         }
@@ -532,13 +575,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ページ内の全てのリンクをクリックした際に離脱警告を行う
     document.querySelectorAll('a').forEach(link => {
-        // javascript: を含むリンクは除外 (例: スクロールto Topなど)
         if (link.href && !link.href.startsWith('javascript:')) {
             link.addEventListener('click', (event) => {
                 if (hasUnsavedChanges && (currentScreen === 'input' || currentScreen === 'confirm') && !isNavigatingAway) {
-                    event.preventDefault(); // リンク遷移を一時的に停止
+                    event.preventDefault();
                     showPreventLeaveModal();
-                    preventLeaveConfirmBtn.dataset.targetUrl = link.href; // 遷移先のURLを保存
+                    preventLeaveConfirmBtn.dataset.targetUrl = link.href;
                 }
             });
         }
@@ -546,19 +588,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ブラウザの戻る/進むボタンに対する処理
     window.addEventListener('popstate', (event) => {
-        // isPreventingBack が true の場合は、このイベントは history.forward() によるものなので処理しない
         if (isPreventingBack) {
             isPreventingBack = false;
             return;
         }
 
         if (hasUnsavedChanges && (currentScreen === 'input' || currentScreen === 'confirm') && !isNavigatingAway) {
-            // ユーザーが「戻る」ボタンを押した
             showPreventLeaveModal();
-            // history.forward() を呼ぶために、popstateイベントリスナーの実行後すぐにhistory.forward()を呼び出す
-            // これは非同期で行う必要がある場合があるため、モーダル内のボタンで制御する。
         } else {
-            // 変更がない、または離脱が許可されている場合は通常通り遷移
             isNavigatingAway = true;
         }
     });
@@ -568,7 +605,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function showPreventLeaveModal() {
         if (preventLeaveModal) {
             preventLeaveModal.classList.remove('hidden');
-            void preventLeaveModal.offsetWidth; // Force reflow
+            void preventLeaveModal.offsetWidth;
             preventLeaveModal.classList.remove('opacity-0');
             preventLeaveModal.classList.add('opacity-100');
         }
@@ -581,7 +618,7 @@ document.addEventListener('DOMContentLoaded', () => {
             preventLeaveModal.classList.remove('opacity-100');
             setTimeout(() => {
                 preventLeaveModal.classList.add('hidden');
-                delete preventLeaveConfirmBtn.dataset.targetUrl; // URLをクリア
+                delete preventLeaveConfirmBtn.dataset.targetUrl;
             }, 300);
         }
     }
@@ -590,12 +627,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (preventLeaveConfirmBtn) {
         preventLeaveConfirmBtn.addEventListener('click', () => {
             hasUnsavedChanges = false;
-            isNavigatingAway = true; // 明示的に離脱を許可
-            isPreventingBack = false; // popstate イベントで戻された場合、ここでフラグをリセット
+            isNavigatingAway = true;
+            isPreventingBack = false;
 
             hidePreventLeaveModal();
 
-            // 保存されたURLがあればそこに遷移
             if (preventLeaveConfirmBtn.dataset.targetUrl) {
                 window.location.href = preventLeaveConfirmBtn.dataset.targetUrl;
             }
@@ -606,13 +642,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (preventLeaveCancelBtn) {
         preventLeaveCancelBtn.addEventListener('click', () => {
             hidePreventLeaveModal();
-            isNavigatingAway = false; // 離脱をキャンセル
+            isNavigatingAway = false;
 
-            // ブラウザの「戻る」ボタンでモーダルが表示された場合、
-            // ここで history.forward() を呼び出して元のページに戻す。
-            // これにより、ユーザーは入力画面に留まることができる。
             if (hasUnsavedChanges && (currentScreen === 'input' || currentScreen === 'confirm')) {
-                isPreventingBack = true; // history.forward() による popstate イベントを処理しないようにする
+                isPreventingBack = true;
                 history.forward();
             }
         });
@@ -620,7 +653,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // Run check on load
-    console.log('Before checkAccountInfo window.dummyUserData:', window.dummyUserData);
     setTimeout(checkAccountInfo, 100);
 
     // --- Loading State Management ---
@@ -649,12 +681,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function showErrorModal(message = '登録処理中にエラーが発生しました。<br>もう一度お試しください。') {
         if (errorModal && errorModalContent) {
-            // Set error message
             if (errorModalMessage) {
                 errorModalMessage.innerHTML = message;
             }
 
-            // Show modal
             errorModal.classList.remove('hidden');
             setTimeout(() => {
                 errorModal.classList.remove('opacity-0');
@@ -675,51 +705,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Error modal close button
     if (errorModalCloseBtn) {
         errorModalCloseBtn.addEventListener('click', () => {
             hideErrorModal();
         });
     }
 
-    // Close error modal when clicking outside
     if (errorModal) {
         errorModal.addEventListener('click', (e) => {
             if (e.target === errorModal) {
                 hideErrorModal();
             }
-        });
-    }
-
-    // --- Submit Button Event Listener ---
-    if (btnSubmit) {
-        btnSubmit.addEventListener('click', () => {
-            console.log('Submit button clicked');
-
-            // Set loading state
-            setSubmitButtonLoading(true);
-
-            setTimeout(() => {
-                // Success: Navigate to completion screen
-                setProcessStep(3);
-                setSubmitButtonLoading(false);
-            }, 2000);
-
-            // TODO: Add actual API call here
-            // fetch('/api/premium/register', {
-            //     method: 'POST',
-            //     headers: { 'Content-Type': 'application/json' },
-            //     body: JSON.stringify(formData)
-            // })
-            // .then(response => response.json())
-            // .then(data => {
-            //     setSubmitButtonLoading(false);
-            //     setProcessStep(3);
-            // })
-            // .catch(error => {
-            //     setSubmitButtonLoading(false);
-            //     // Show error modal (to be implemented in next step)
-            // });
         });
     }
 
