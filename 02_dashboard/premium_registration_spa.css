@@ -174,9 +174,10 @@
     background-clip: text;
     -webkit-text-fill-color: transparent;
     background-size: 200% auto;
-    animation: shine-text 5s linear infinite, fade-in-up 0.8s ease-out 0.3s forwards;
-    opacity: 0;
-    transform: translateY(20px);
+    animation: shine-text 5s linear infinite;
+    /* Animation handled by JS class */
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .premium-subtitle {
@@ -184,9 +185,33 @@
     color: rgba(255, 255, 255, 0.9);
     margin-bottom: 3rem;
     line-height: 1.6;
-    animation: fade-in-up 0.8s ease-out 0.5s forwards;
+}
+
+/* Animation Utilities */
+.animate-fade-in-up {
+    animation: fade-in-up 0.8s ease-out forwards;
     opacity: 0;
     transform: translateY(20px);
+}
+
+.delay-100 {
+    animation-delay: 0.1s;
+}
+
+.delay-200 {
+    animation-delay: 0.2s;
+}
+
+.delay-300 {
+    animation-delay: 0.3s;
+}
+
+.delay-500 {
+    animation-delay: 0.5s;
+}
+
+.delay-700 {
+    animation-delay: 0.7s;
 }
 
 @keyframes fade-in-up {
@@ -218,9 +243,6 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.8);
     transition: all 0.3s ease;
     overflow: hidden;
-    animation: fade-in-up 0.8s ease-out 0.7s forwards;
-    opacity: 0;
-    transform: translateY(20px);
     text-decoration: none;
 }
 
@@ -279,4 +301,39 @@ nav[aria-label="breadcrumb"] a {
     min-height: 44px;
     display: inline-flex;
     align-items: center;
+}
+
+/* Form Improvements */
+.validation-icon {
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+input:focus {
+    box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.2);
+    /* premium-blue-deep with opacity */
+    border-color: var(--premium-blue-deep);
+}
+
+/* Success State for Inputs */
+input.valid {
+    border-color: #10B981;
+    /* green-500 */
+    background-color: #F0FDF4;
+    /* green-50 */
+}
+
+input.valid:focus {
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+    border-color: #10B981;
+}
+
+/* Sticky Quote Button Adjustment */
+#btn-use-account-info-sticky {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+#btn-use-account-info-sticky:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }

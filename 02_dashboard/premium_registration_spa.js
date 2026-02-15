@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
     window.dummyUserData = loadedUserData; // window.dummyUserDataとして設定
-    console.log('DOMContentLoaded loaded window.dummyUserData:', window.dummyUserData);
+    window.dummyUserData = loadedUserData; // window.dummyUserDataとして設定
 
     const stepInput = document.getElementById('step-input');
     const stepConfirm = document.getElementById('step-confirm');
@@ -45,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalBuilding = document.getElementById('modal-building');
 
     const btnUseInfo = document.getElementById('btn-use-account-info');
+    const btnUseInfoSticky = document.getElementById('btn-use-account-info-sticky'); // New sticky button
     const btnInputManual = document.getElementById('btn-input-manually');
 
     // Leave Prevention Modal Elements
@@ -52,6 +53,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const preventLeaveConfirmBtn = document.getElementById('prevent-leave-confirm-btn');
     const preventLeaveCancelBtn = document.getElementById('prevent-leave-cancel-btn');
 
+
+    // --- Initial Sidebar State (Always Visible) ---
+    // No hiding logic needed as we want it valid from start
+    // Just ensure layout is correct if needed, but HTML now deals with it.
 
     let currentScreen = 'input'; // 初期画面をinputに設定
 
@@ -137,9 +142,68 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (stepNum === 2) { // On confirm screen
             currentScreen = 'confirm';
             hasUnsavedChanges = false; // Confirmation screen means data is 'saved' for the moment
+
+            // Reset Consent Checkbox
+            const consentCheckbox = document.getElementById('consent-checkbox');
+            const btnSubmit = document.getElementById('btn-submit');
+            if (consentCheckbox) consentCheckbox.checked = false;
+            if (btnSubmit) btnSubmit.disabled = true;
+
         } else if (stepNum === 3) { // On complete screen
             currentScreen = 'complete';
             hasUnsavedChanges = false;
+
+            // --- Sidebar & Layout Logic ---
+            const sidebar = document.getElementById('sidebar-placeholder');
+            const layoutWrapper = document.getElementById('layout-wrapper');
+            const mainContent = document.getElementById('main-content');
+
+            if (sidebar) sidebar.classList.remove('hidden');
+            if (layoutWrapper) layoutWrapper.classList.remove('justify-center');
+            // Optional: Adjust main content max-width if needed when sidebar is present
+            // keeping max-w-3xl is fine, but maybe we want it left aligned or centered in remaining space?
+            // Usually dashboard main content is 'flex-1'. 'justify-center' removal makes it start from left (next to sidebar).
+            // But we have 'mx-auto' on inner containers? No, main has 'max-w-3xl w-full'. 
+            // If we remove justify-center, it will be left aligned next to sidebar.
+            // Let's add 'mx-auto' to main content to center it in the remaining space if we want.
+            if (mainContent) mainContent.classList.add('mx-auto');
+
+
+            // --- Animation Logic (Fix) ---
+            // Trigger Animations manually to ensure they play every time
+            const animatedElements = [
+                { sel: '.premium-title', delay: 'delay-300' },
+                { sel: '.premium-subtitle', delay: 'delay-500' },
+                { sel: '.btn-premium', delay: 'delay-700' }
+            ];
+
+            animatedElements.forEach(item => {
+                const el = document.querySelector(item.sel);
+                if (el) {
+                    // Reset animation
+                    el.classList.remove('animate-fade-in-up', 'delay-300', 'delay-500', 'delay-700');
+                    el.style.opacity = '0'; // Ensure hidden before animation starts
+
+                    // Trigger reflow
+                    void el.offsetWidth;
+
+                    // Add animation classes
+                    el.classList.add('animate-fade-in-up', item.delay);
+                }
+            });
+        }
+
+        // --- Sidebar Reset for Step 1 & 2 ---
+        // --- Sidebar Reset for Step 1 & 2 ---
+        // Logic removed to keep sidebar visible at all times.
+
+        // Hide sticky button on non-input steps
+        if (btnUseInfoSticky) {
+            if (stepNum === 1) {
+                btnUseInfoSticky.classList.remove('hidden');
+            } else {
+                btnUseInfoSticky.classList.add('hidden');
+            }
         }
     }
 
@@ -229,8 +293,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!isValid) {
             displayError(inputElement, errorMessage);
+            inputElement.classList.remove('valid'); // Remove valid class
+            // Hide success icon
+            const icon = inputElement.parentElement.querySelector('.validation-icon');
+            if (icon) icon.classList.add('hidden');
         } else {
             clearError(inputElement);
+            inputElement.classList.add('valid'); // Add valid class
+            // Show success icon
+            const icon = inputElement.parentElement.querySelector('.validation-icon');
+            if (icon) icon.classList.remove('hidden');
         }
         return isValid;
     };
@@ -250,63 +322,93 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- Zip Code Search Logic ---
-    const btnZipSearch = document.getElementById('btn-zip-search');
+    const btnZipSearch = document.getElementById('btn-zip-search'); // May be null now
     const apiErrorZip = document.getElementById('api-error-zip');
 
-    if (btnZipSearch) {
-        btnZipSearch.addEventListener('click', () => {
-            const zipCode = inputs.zip.value.replace(/[^\d]/g, ''); // Remove non-digits
+    const executeZipSearch = (zipCode) => {
+        if (zipCode.length !== 7) return;
 
-            if (zipCode.length !== 7) {
-                displayError(inputs.zip, '郵便番号を7桁で入力してください。');
-                return;
-            }
+        if (apiErrorZip) apiErrorZip.classList.add('hidden');
 
-            // Clear previous errors
-            clearError(inputs.zip);
-            if (apiErrorZip) apiErrorZip.classList.add('hidden');
-
-            // Loading state
-            const originalBtnText = btnZipSearch.textContent;
+        // Show loading state if button exists (optional fallback)
+        if (btnZipSearch) {
             btnZipSearch.textContent = '検索中...';
             btnZipSearch.disabled = true;
+        }
 
-            fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${zipCode}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 200 && data.results) {
-                        const result = data.results[0];
-                        const fullAddress = `${result.address1}${result.address2}${result.address3}`;
+        fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${zipCode}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 200 && data.results) {
+                    const result = data.results[0];
+                    const fullAddress = `${result.address1}${result.address2}${result.address3}`;
 
-                        if (inputs.address) {
-                            inputs.address.value = fullAddress;
-                            // Trigger validation/clearing error for address
-                            validateField(inputs.address);
+                    if (inputs.address) {
+                        inputs.address.value = fullAddress;
+                        // Trigger validation/clearing error for address
+                        validateField(inputs.address);
 
-                            // Move focus to building name for better UX
-                            if (inputs.building) {
-                                inputs.building.focus();
-                            }
+                        // Add valid class to zip as well since it worked
+                        if (inputs.zip) {
+                            inputs.zip.classList.add('valid');
+                            const icon = inputs.zip.parentElement.querySelector('.validation-icon');
+                            if (icon) icon.classList.remove('hidden');
                         }
-                    } else {
-                        if (apiErrorZip) {
-                            apiErrorZip.textContent = '該当する住所が見つかりませんでした。';
-                            apiErrorZip.classList.remove('hidden');
+
+                        // Move focus to building name for better UX
+                        if (inputs.building) {
+                            inputs.building.focus();
                         }
                     }
-                })
-                .catch(err => {
-                    console.error('Zip code fetch error:', err);
+                } else {
                     if (apiErrorZip) {
-                        apiErrorZip.textContent = '住所の取得に失敗しました。';
+                        apiErrorZip.textContent = '該当する住所が見つかりませんでした。';
                         apiErrorZip.classList.remove('hidden');
                     }
-                })
-                .finally(() => {
-                    btnZipSearch.textContent = originalBtnText;
+                }
+            })
+            .catch(err => {
+                console.error('Zip code fetch error:', err);
+                if (apiErrorZip) {
+                    apiErrorZip.textContent = '住所の取得に失敗しました。';
+                    apiErrorZip.classList.remove('hidden');
+                }
+            })
+            .finally(() => {
+                if (btnZipSearch) {
+                    btnZipSearch.textContent = '住所検索';
                     btnZipSearch.disabled = false;
-                });
+                }
+            });
+    };
+
+    if (inputs.zip) {
+        const normalizeZip = (val) => {
+            // Convert full-width to half-width
+            let normalized = val.replace(/[０-９]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 0xFEE0));
+            // Remove non-digits
+            return normalized.replace(/[^\d]/g, '');
+        };
+
+        // Zip code auto-search on input
+        inputs.zip.addEventListener('input', (e) => {
+            const normalizedValue = normalizeZip(e.target.value);
+            if (normalizedValue.length === 7) {
+                executeZipSearch(normalizedValue);
+            }
         });
+
+        // Keep button listener if it exists (fallback)
+        if (btnZipSearch) {
+            btnZipSearch.addEventListener('click', () => {
+                const zipCode = normalizeZip(inputs.zip.value);
+                if (zipCode.length !== 7) {
+                    displayError(inputs.zip, '郵便番号を7桁で入力してください。');
+                    return;
+                }
+                executeZipSearch(zipCode);
+            });
+        }
     }
 
 
@@ -366,7 +468,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Modal Logic ---
     // Handle "Use Info" logic
-    function handleUseInfo(userData, skipModal = false) {
+    // --- Modal Logic ---
+    // Handle "Use Info" logic
+    function handleUseInfo(userData, skipModal = false, autoAdvance = false) {
         // Auto-fill inputs
         if (inputs.lastName) inputs.lastName.value = userData.lastName || '';
         if (inputs.firstName) inputs.firstName.value = userData.firstName || '';
@@ -384,14 +488,17 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => accountCheckModal.classList.add('hidden'), 300);
         }
 
-        // Check if we have ALL required fields to skip to confirmation
-        if (validateForm()) { // validate() ではなく validateForm() を使用
-            hasUnsavedChanges = true; // 変更があったことを示す
+        // Validate and Decide Logic
+        const isValid = validateForm(); // Show green checks/errors
+
+        if (isValid && autoAdvance) {
+            // Case 1: Valid & Auto-advance requested (from Modal) -> Go to Confirm
+            hasUnsavedChanges = true;
             populateConfirm();
             setProcessStep(2);
         } else {
-            // Missing some required fields, go to input (but filled)
-            hasUnsavedChanges = true; // 変更があったことを示す
+            // Case 2: Not valid OR No Auto-advance requested (from Sticky) -> Stay on Input
+            hasUnsavedChanges = true;
             setProcessStep(1);
         }
     }
@@ -399,15 +506,22 @@ document.addEventListener('DOMContentLoaded', () => {
     // Expose checkAccountInfo to window for manual testing validation
     window.debugCheckAccountInfo = checkAccountInfo;
 
-    // Handle "Use Info" button click
+    // Handle "Use Info" button click (From Modal -> Auto Advance)
     if (btnUseInfo) {
         btnUseInfo.addEventListener('click', () => {
-            handleUseInfo(window.dummyUserData);
+            handleUseInfo(window.dummyUserData, false, true); // skipModal=false, autoAdvance=true
+        });
+    }
+
+    // Handle Sticky "Use Info" button click (From Input Screen -> Stay on Input)
+    if (btnUseInfoSticky) {
+        btnUseInfoSticky.addEventListener('click', () => {
+            // Only if we have data to use.
+            handleUseInfo(window.dummyUserData, true, false); // skipModal=true, autoAdvance=false
         });
     }
 
     function checkAccountInfo() {
-        console.log('checkAccountInfo started');
         const userData = window.dummyUserData;
 
         // Modal Elements (ここにも定義が必要)
@@ -433,7 +547,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // 上記条件に合致しない場合は、通常通り確認モーダルを表示
         // Check if we have enough info to prompt (Account Check Modal)
         if (userData && userData.lastName && userData.firstName && userData.companyName) {
-            console.log('Condition met, showing modal');
             // Populate modal
             if (modalName) modalName.textContent = `${userData.lastName} ${userData.firstName}`; // 姓名を結合
             if (modalCompany) modalCompany.textContent = userData.companyName;
@@ -447,7 +560,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Show Modal
             if (accountCheckModal) {
-                console.log('Removing hidden class from modal');
                 accountCheckModal.classList.remove('hidden');
                 void accountCheckModal.offsetWidth;
                 setTimeout(() => {
@@ -455,10 +567,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     accountCheckModalContent.classList.remove('scale-95');
                 }, 50);
             } else {
-                console.error('Modal element not found!');
+                // Modal element not found
             }
         } else {
-            console.log('Condition NOT met, skipping modal');
+            // Condition NOT met, skipping modal
             // Not enough info, just go to input
             setProcessStep(1);
         }
@@ -495,15 +607,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Submit (Complete)
     if (btnSubmit) {
+        // --- Consent Checkbox Logic ---
+        const consentCheckbox = document.getElementById('consent-checkbox');
+
+        // Initial state: Disable submit button
+        btnSubmit.disabled = true;
+
+        if (consentCheckbox) {
+            consentCheckbox.addEventListener('change', () => {
+                btnSubmit.disabled = !consentCheckbox.checked;
+            });
+        }
+
         btnSubmit.addEventListener('click', () => {
+            if (consentCheckbox && !consentCheckbox.checked) return; // Guard clause
+
             // Simulate API call delay
-            const originalText = btnSubmit.textContent;
-            btnSubmit.disabled = true;
-            btnSubmit.textContent = '登録処理中...';
+            // [DEV NOTE] Replace this with actual API call
+            // e.g. fetch('/api/premium/register', { method: 'POST', body: JSON.stringify(data) })
+            setSubmitButtonLoading(true);
 
             setTimeout(() => {
                 // Success!
+                setSubmitButtonLoading(false);
                 setProcessStep(3);
+                // [DEV NOTE] Handle error cases here:
+                // showErrorModal('エラーメッセージ');
             }, 1500);
         });
     }
@@ -530,17 +659,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // ページ内の全てのリンクをクリックした際に離脱警告を行う
-    document.querySelectorAll('a').forEach(link => {
-        // javascript: を含むリンクは除外 (例: スクロールto Topなど)
-        if (link.href && !link.href.startsWith('javascript:')) {
-            link.addEventListener('click', (event) => {
-                if (hasUnsavedChanges && (currentScreen === 'input' || currentScreen === 'confirm') && !isNavigatingAway) {
-                    event.preventDefault(); // リンク遷移を一時的に停止
-                    showPreventLeaveModal();
-                    preventLeaveConfirmBtn.dataset.targetUrl = link.href; // 遷移先のURLを保存
-                }
-            });
+    // ページ内の全てのリンクをクリックした際に離脱警告を行う (Event Delegation for dynamic content)
+    document.body.addEventListener('click', (event) => {
+        const link = event.target.closest('a');
+        if (link && link.href && !link.href.startsWith('javascript:')) {
+            // Check if we should prevent leave
+            if (hasUnsavedChanges && (currentScreen === 'input' || currentScreen === 'confirm') && !isNavigatingAway) {
+                event.preventDefault(); // リンク遷移を一時的に停止
+                event.stopPropagation(); // Stop other handlers
+                showPreventLeaveModal();
+                preventLeaveConfirmBtn.dataset.targetUrl = link.href; // 遷移先のURLを保存
+            }
         }
     });
 
@@ -620,7 +749,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // Run check on load
-    console.log('Before checkAccountInfo window.dummyUserData:', window.dummyUserData);
+    // Run check on load
     setTimeout(checkAccountInfo, 100);
 
     // --- Loading State Management ---
@@ -723,13 +852,62 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Real-time Validation ---
+    // --- Real-time Validation and EFO ---
     // Add blur event listeners to all input fields for real-time validation
+    // And input event for cleaning errors if valid
     Object.keys(inputs).forEach(fieldName => {
         const inputElement = inputs[fieldName];
         if (inputElement) {
-            inputElement.addEventListener('blur', () => {
-                validateField(inputElement);
+            // EFO: Full-width to Half-width conversion for numeric fields
+            if (['phone', 'zip'].includes(fieldName)) {
+                inputElement.addEventListener('blur', (e) => {
+                    let val = e.target.value;
+                    // Convert full-width numbers to half-width
+                    val = val.replace(/[０-９]/g, (s) => {
+                        return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
+                    });
+
+                    // For phone, allow hyphens but maybe clean them up if strictly numeric required by backend?
+                    // Validation rule says 10-11 digits. If user types 03-1234-5678, we should probably strip hyphens for validation/storage.
+                    // Or adjust validation rule. Let's strip hyphens for validation consistency.
+                    if (fieldName === 'phone') {
+                        val = val.replace(/-/g, '');
+                    }
+                    if (fieldName === 'zip') {
+                        val = val.replace(/-/g, '');
+                    }
+
+                    if (val !== e.target.value) {
+                        e.target.value = val;
+                        // Retrigger validation after auto-correction
+                        validateField(inputElement);
+                    } else {
+                        validateField(inputElement);
+                    }
+                });
+            } else {
+                inputElement.addEventListener('blur', () => {
+                    validateField(inputElement);
+                });
+            }
+
+
+            // Real-time error clearing
+            inputElement.addEventListener('input', () => {
+                // If element has error, check if it's fixed now
+                if (inputElement.classList.contains('border-red-500')) {
+                    // We validate silently to see if we should clear error
+                    const rule = validationRules[fieldName];
+                    let isValid = true;
+                    const value = inputElement.value;
+                    // We repeat logic briefly or refactor validateField to return status without side effects?
+                    // Side effects are displayError/clearError.
+                    // To be safe, we can just run validateField. If it's valid, it clears error.
+                    // If invalid, it keeps error (updates message).
+                    // But we don't want to show aggressive errors while typing from start.
+                    // Only if error ALREADY exists.
+                    validateField(inputElement);
+                }
             });
         }
     });
