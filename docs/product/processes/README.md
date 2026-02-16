@@ -15,7 +15,7 @@
 5. **[05_data_flow_mapping.md](./05_data_flow_mapping.md)**  
    `data/*.json` からサービス層 (`surveyService.js` など) を経てUIに至るデータ連携をマッピングします。主要データセットとフィールド一覧、共通ユーティリティとの関係を開発者向けに整理しています。
 6. **[06_kpis_and_reporting.md](./06_kpis_and_reporting.md)**  
-   サーベイ／サポート／請求の各領域で追跡するKPIとレポーティング運用を定義します。計測サイクルをMermaid図で示し、アラート発火時の対応先として [03_support_escalation.md](./03_support_escalation.md) を参照しています。
+   アンケート／サポート／請求の各領域で追跡するKPIとレポーティング運用を定義します。計測サイクルをMermaid図で示し、アラート発火時の対応先として [03_support_escalation.md](./03_support_escalation.md) を参照しています。
 7. **[07_user_persona_flows.md](./07_user_persona_flows.md)**  
    主要ロール（管理者・オペレーター・顧客など）の視点で業務シナリオをMermaidフローに落とし込み、関連画面／サービスを横断的に確認できるカタログです。Order-to-Cashやサポート運用との整合性を図ります。
 8. **[99_glossary.md](./99_glossary.md)**  

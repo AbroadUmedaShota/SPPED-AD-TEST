@@ -203,7 +203,7 @@
 
 ### 6.5 データモデルへの反映
 - 各設問は `question.meta` をルートに追加し、`validation`, `dateTimeConfig`, `handwritingConfig`, `localizationPolicy` などの拡張設定を格納する。既存JSONとの互換性を保つため、フィールドはすべて任意（存在しない場合は従来挙動）とする。
-- サーベイ全体のタイムゾーン既定値は `survey.defaultTimezone` を `Asia/Tokyo` で初期化し、`date_time` 設問が個別設定を持たない場合はこの値を参照する。海外展開時はテナント単位で初期値を切り替えられるようにする。
+- アンケート全体のタイムゾーン既定値は `survey.defaultTimezone` を `Asia/Tokyo` で初期化し、`date_time` 設問が個別設定を持たない場合はこの値を参照する。海外展開時はテナント単位で初期値を切り替えられるようにする。
 - API/保存形式はISO8601およびUTF-8で統一し、サーバー側もUTC正規化・単位系メタデータ・画像サイズ検証を行う。
 
 ```mermaid

@@ -34,7 +34,7 @@ end
 
 ---
 
-## 1. サーベイ関連
+## 1. アンケート関連
 - **データソース**: `data/surveys/*.json`, `data/surveys/surveys-with-details.json`
 - **サービス層**: `02_dashboard/src/services/surveyService.js`
 - **UI層**: `02_dashboard/src/ui/surveyRenderer.js`
