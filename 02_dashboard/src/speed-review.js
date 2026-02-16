@@ -299,14 +299,28 @@ function buildMissingImageCandidates(answerId, surveyId, side) {
     return [...new Set(candidates)];
 }
 
+const FAILED_IMAGE_FETCH_THRESHOLD = 5;
+let failedImageFetchCount = 0;
+
 async function canFetchAsset(url) {
+    // エラーが多すぎる場合はチェックをスキップしてfalseを返す（サーバー負荷軽減）
+    if (failedImageFetchCount > FAILED_IMAGE_FETCH_THRESHOLD) {
+        return false;
+    }
     try {
         const head = await fetch(url, { method: 'HEAD' });
         if (head.ok) return true;
+
+        failedImageFetchCount++; // 失敗カウント増やす
         if (head.status !== 405) return false;
+
         const get = await fetch(url, { method: 'GET' });
-        return get.ok;
+        if (get.ok) return true;
+
+        failedImageFetchCount++;
+        return false;
     } catch (error) {
+        failedImageFetchCount++;
         return false;
     }
 }
@@ -323,6 +337,13 @@ async function resolveImageUrl(rawPath, surveyId) {
         return imageUrlResolutionCache.get(cacheKey);
     }
 
+    // 失敗カウントが閾値を超えていたら、チェックせずにデフォルト候補を返す
+    if (failedImageFetchCount > FAILED_IMAGE_FETCH_THRESHOLD) {
+        const fallback = `../media/${normalized}`; // 最も標準的なパスを仮定
+        imageUrlResolutionCache.set(cacheKey, fallback);
+        return fallback;
+    }
+
     const candidates = buildImageUrlCandidates(normalized, surveyId);
     for (const candidate of candidates) {
         if (await canFetchAsset(candidate)) {
@@ -331,7 +352,6 @@ async function resolveImageUrl(rawPath, surveyId) {
         }
     }
 
-    // 最後まで見つからない場合は最も有力な候補を返し、onerrorにフォールバックさせる
     const fallback = candidates[0] || normalized;
     imageUrlResolutionCache.set(cacheKey, fallback);
     return fallback;
@@ -341,6 +361,12 @@ async function resolveMissingImageUrl(answerId, surveyId, side) {
     const cacheKey = `${surveyId || ''}::${answerId || ''}::${side || ''}::missing`;
     if (imageUrlResolutionCache.has(cacheKey)) {
         return imageUrlResolutionCache.get(cacheKey);
+    }
+
+    // 失敗カウントが閾値を超えていたら、チェックせずに空文字を返す（どうせ見つからない）
+    if (failedImageFetchCount > FAILED_IMAGE_FETCH_THRESHOLD) {
+        imageUrlResolutionCache.set(cacheKey, '');
+        return '';
     }
 
     const candidates = buildMissingImageCandidates(answerId, surveyId, side);
@@ -1136,56 +1162,16 @@ function showQuestionSelectModal() {
         const container = document.getElementById('modal-question-list');
         if (!container) return;
 
-        const questions = [];
-        const pushQuestion = (label) => {
-            if (!label || questions.includes(label)) return;
-            questions.push(label);
-        };
-
-        // Get questions from combined data or survey definition
-        if (allCombinedData.length > 0) {
-            allCombinedData.forEach(item => {
-                item.details?.forEach(detail => pushQuestion(detail.question || detail.text || detail.id));
-            });
-        }
-        if (questions.length === 0 && currentSurvey?.details) {
-            currentSurvey.details.forEach(detail => pushQuestion(detail.question || detail.text || detail.id));
-        }
-        container.innerHTML = '';
-        if (questions.length === 0) {
-            container.innerHTML = '<p class="p-4 text-center text-on-surface-variant">設問情報がありません。</p>';
-            return;
-        }
-
-        questions.forEach(question => {
-            const button = document.createElement('button');
-            const isActive = question === currentIndustryQuestion;
-
-            // 設問タイプを確認してグラフ化可能か判定
-            const questionDef = currentSurvey?.details?.find(d => (d.question || d.text) === question);
-            const isGraphable = questionDef && (questionDef.type === 'single_choice' || questionDef.type === 'multi_choice');
-
-            button.className = `w-full text-left px-4 py-3 rounded-xl transition-all flex items-center justify-between group ${isActive ? 'bg-primary/10 text-primary font-bold' : 'hover:bg-surface-variant text-on-surface'
-                }`;
-
-            button.innerHTML = `
-                <div class="flex items-center gap-3 truncate">
-                    <span class="material-icons text-sm ${isGraphable ? 'text-primary' : 'text-on-surface-variant/60'}">
-                        ${isGraphable ? 'analytics' : 'subject'}
-                    </span>
-                    <span class="truncate pr-4">${question}</span>
-                </div>
-                ${isActive ? '<span class="material-icons text-sm">check_circle</span>' : '<span class="material-icons text-sm opacity-0 group-hover:opacity-40 transition-opacity">chevron_right</span>'}
-            `;
-
-            button.onclick = () => {
-                handleQuestionSelectClick(question);
-                // Close modal
-                const overlay = document.getElementById('questionSelectModalOverlay');
-                if (overlay) overlay.click(); // Standard way to close in this project
+        // モーダルコンテンツ部分のクリックがオーバーレイに伝播しないようにする（勝手に閉じるのを防ぐ）
+        const modalContent = document.getElementById('questionSelectModal');
+        if (modalContent) {
+            modalContent.onclick = (e) => {
+                e.stopPropagation();
             };
-            container.appendChild(button);
-        });
+        }
+
+        // 共通の描画ロジックを使用する (ターゲットコンテナを渡す)
+        populateQuestionSelector(allCombinedData, container);
     });
 }
 
@@ -1349,8 +1335,8 @@ function setupPagination(currentData = allCombinedData) {
     itemsPerPageSelect.value = rowsPerPage;
 }
 
-function populateQuestionSelector(data) {
-    const container = document.getElementById('question-selector-container');
+function populateQuestionSelector(data, targetContainer = null) {
+    const container = targetContainer || document.getElementById('question-selector-container');
     if (!container) return;
 
     const questions = [];
@@ -1386,7 +1372,15 @@ function populateQuestionSelector(data) {
 
         // 設問タイプを確認してグラフ化可能か判定
         const questionDef = currentSurvey?.details?.find(d => (d.question || d.text) === question);
-        const isGraphable = questionDef && (questionDef.type === 'single_choice' || questionDef.type === 'multi_choice');
+
+        // グラフ描画（集計）可能なタイプのみを厳密に判定
+        // SINGLE_CHOICE, MULTI_CHOICE, MATRIX_SINGLE のみがグラフ対応
+        // number(Q5), matrix_ma(Q11) などはグラフ非対応なので除外
+        const isGraphable = questionDef && (
+            SINGLE_CHOICE_TYPES.has(questionDef.type) ||
+            MULTI_CHOICE_TYPES.has(questionDef.type) ||
+            MATRIX_SINGLE_TYPES.has(questionDef.type)
+        );
 
         // デフォルト: グラフ化可能（青色・グラフアイコン）
         let iconName = 'analytics';
@@ -1397,25 +1391,21 @@ function populateQuestionSelector(data) {
             // ユーザー要望「アイコンで明らかに区別できるように」
             // グラフ(analytics) vs 文書/テキスト(description) という対比にする
             iconClass = 'text-on-surface-variant/60';
-
-            const type = questionDef?.type;
-            if (['date', 'datetime', 'datetime_local', 'time'].includes(type)) {
-                iconName = 'event'; // カレンダー
-            } else if (type === 'number') {
-                iconName = '123'; // 数字
-            } else if (type && type.startsWith('matrix_')) {
-                iconName = 'grid_on'; // 表
-            } else {
-                // テキスト、自由記述、その他は「文書」として統一
-                iconName = 'description';
-            }
+            // アイコンを統一 (description)
+            iconName = 'description';
         }
 
-        button.className = `w-full text-left px-4 py-3 rounded-xl transition-all flex items-center justify-between group ${isActive ? 'bg-primary/10 text-primary font-bold' : 'hover:bg-surface-variant text-on-surface'
-            }`;
+        // 選択中のスタイルを変更: 青文字(text-primary)を避け、背景色と太字、border等で区別する
+        // これにより「青＝グラフ化可能」という意味と混同させない
+        const activeClass = isActive
+            ? 'bg-primary/5 text-on-surface font-bold border-l-4 border-primary pl-3'
+            : 'hover:bg-surface-variant text-on-surface pl-4';
+
+        button.className = `w-full text-left py-3 rounded-r-xl transition-all flex items-center justify-between group ${activeClass}`;
 
         // 設問番号を追加 (Q1. 設問文)
         const displayQuestion = `Q${index + 1}. ${question}`;
+        console.log(`[populateQuestionSelector] Rendering: ${displayQuestion}`);
 
         button.innerHTML = `
             <div class="flex items-center gap-3 truncate">
@@ -1424,7 +1414,7 @@ function populateQuestionSelector(data) {
                 </span>
                 <span class="truncate pr-4">${displayQuestion}</span>
             </div>
-            ${isActive ? '<span class="material-icons text-sm">check_circle</span>' : '<span class="material-icons text-sm opacity-0 group-hover:opacity-40 transition-opacity">chevron_right</span>'}
+            ${isActive ? '<span class="material-icons text-sm text-primary">check_circle</span>' : '<span class="material-icons text-sm opacity-0 group-hover:opacity-40 transition-opacity">chevron_right</span>'}
         `;
 
         button.onclick = () => {
@@ -1921,9 +1911,29 @@ function renderDashboard(data) {
     if (totalElement) totalElement.textContent = data.length.toLocaleString() + '件';
 
     // Update Question Title
+    // Update Question Title
     const questionTitleEl = document.getElementById('dashboard-current-question');
     if (questionTitleEl) {
-        questionTitleEl.textContent = truncateQuestion(currentIndustryQuestion) || '未選択';
+        // 設問番号を特定するロジック
+        let questionIndex = -1;
+        const questions = [];
+        const pushQuestion = (label) => {
+            if (!label || questions.includes(label)) return;
+            questions.push(label);
+        };
+        // Get questions from combined data or survey definition
+        if (allCombinedData.length > 0) {
+            allCombinedData.forEach(item => {
+                item.details?.forEach(detail => pushQuestion(detail.question || detail.text || detail.id));
+            });
+        }
+        if (questions.length === 0 && currentSurvey?.details) {
+            currentSurvey.details.forEach(detail => pushQuestion(detail.question || detail.text || detail.id));
+        }
+        questionIndex = questions.indexOf(currentIndustryQuestion);
+        const prefix = questionIndex >= 0 ? `Q${questionIndex + 1}. ` : '';
+
+        questionTitleEl.textContent = prefix + truncateQuestion(currentIndustryQuestion) || '未選択';
     }
 
     // 2. Time Series Chart
@@ -2523,7 +2533,28 @@ export async function initializePage() {
                 cardImageViewState: JSON.parse(JSON.stringify(DEFAULT_CARD_IMAGE_VIEW_STATE))
             };
         });
-        await Promise.all(allCombinedData.map(item => normalizeBusinessCardImageUrls(item, surveyId)));
+        // 非同期で画像URLを解決するが、描画をブロックしないようにawaitを外す
+        // 非同期で画像URLを解決するが、描画をブロックしないようにawaitを外す
+        // かつ、並列実行による404エラー多発（サーバー負荷・ブラウザ制限）を防ぐため、
+        // チャンク（塊）ごとに直列処理を行い、エラーが頻発したら停止する
+        (async () => {
+            const BATCH_SIZE = 10;
+            const items = allCombinedData;
+            for (let i = 0; i < items.length; i += BATCH_SIZE) {
+                // エラー閾値を超えていたらループを抜けて終了
+                if (failedImageFetchCount > FAILED_IMAGE_FETCH_THRESHOLD) {
+                    console.warn('[initializePage] Too many image fetch errors. Stopping further resolution.');
+                    break;
+                }
+                const batch = items.slice(i, i + BATCH_SIZE);
+                // バッチ内は並列実行
+                await Promise.all(batch.map(item => normalizeBusinessCardImageUrls(item, surveyId)));
+                // バッチ間に少しwaitを入れる（任意：UIのレスポンス改善のため）
+                await new Promise(r => setTimeout(r, 10));
+            }
+            console.log('画像のURL解決処理が終了しました (Completed or Stopped)');
+        })();
+
         allCombinedData.forEach(item => ensureCardImageViewState(item));
 
         if (answersArr.length === 0) {

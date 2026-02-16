@@ -144,7 +144,81 @@
       ]
     },
     {
-      "id": "Q12",
+      "id": "Q13",
+      "text": "担当者の対応評価",
+      "type": "matrix_sa",
+      "rows": [
+        {
+          "id": "r1",
+          "text": "言葉遣い"
+        },
+        {
+          "id": "r2",
+          "text": "提案力"
+        },
+        {
+          "id": "r3",
+          "text": "スピード"
+        },
+        {
+          "id": "r4",
+          "text": "専門知識"
+        }
+      ],
+      "options": [
+        {
+          "value": "3",
+          "text": "満足"
+        },
+        {
+          "value": "2",
+          "text": "普通"
+        },
+        {
+          "value": "1",
+          "text": "不満"
+        }
+      ]
+    },
+    {
+      "id": "Q14",
+      "text": "導入検討における課題 (複数回答)",
+      "type": "matrix_ma",
+      "rows": [
+        {
+          "id": "r1",
+          "text": "本社"
+        },
+        {
+          "id": "r2",
+          "text": "支社A"
+        },
+        {
+          "id": "r3",
+          "text": "支社B"
+        }
+      ],
+      "options": [
+        {
+          "value": "budget",
+          "text": "予算"
+        },
+        {
+          "value": "human_resource",
+          "text": "人材"
+        },
+        {
+          "value": "time",
+          "text": "時間"
+        },
+        {
+          "value": "none",
+          "text": "特になし"
+        }
+      ]
+    },
+    {
+      "id": "Q15",
       "text": "※入力完了後、送信ボタンを押してください",
       "type": "explanation"
     }

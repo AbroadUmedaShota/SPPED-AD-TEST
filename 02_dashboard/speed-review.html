@@ -184,18 +184,23 @@
                                 <!-- 左側：設問選択エリア（クリック領域のメイン） -->
                                 <div class="flex-1 p-5 min-w-0 flex flex-col justify-center">
                                     <div class="flex items-center gap-2 mb-2">
-                                        <span class="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Active Question</span>
+                                        <span
+                                            class="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Active
+                                            Question</span>
                                         <div class="h-px flex-1 bg-outline-variant/30"></div>
                                     </div>
                                     <div class="flex items-center gap-3">
                                         <!-- 設問アイコン -->
-                                        <div class="w-8 h-8 rounded-lg bg-primary/5 flex items-center justify-center shrink-0">
+                                        <div
+                                            class="w-8 h-8 rounded-lg bg-primary/5 flex items-center justify-center shrink-0">
                                             <span class="material-icons text-primary text-lg">quiz</span>
                                         </div>
                                         <!-- 設問名 -->
                                         <div class="flex-1 min-w-0 flex items-center gap-2">
-                                            <div id="dashboard-current-question" class="text-lg font-bold text-on-surface truncate">...</div>
-                                            <span class="material-icons text-on-surface-variant group-hover:text-primary transition-colors shrink-0">expand_more</span>
+                                            <div id="dashboard-current-question"
+                                                class="text-lg font-bold text-on-surface truncate">...</div>
+                                            <span
+                                                class="material-icons text-on-surface-variant group-hover:text-primary transition-colors shrink-0">expand_more</span>
                                         </div>
                                     </div>
                                     <button id="question-change-link" type="button"
@@ -205,7 +210,8 @@
                                     </button>
                                 </div>
                                 <!-- 右側：ナビゲーションエリア（セパレーター付き） -->
-                                <div class="shrink-0 flex items-center px-6 border-l border-outline-variant/50 bg-surface-variant/5 rounded-r-2xl">
+                                <div
+                                    class="shrink-0 flex items-center px-6 border-l border-outline-variant/50 bg-surface-variant/5 rounded-r-2xl">
                                     <button id="graphButton"
                                         class="bg-primary text-white hover:bg-primary/90 shadow-md hover:shadow-lg text-xs font-bold py-2.5 px-5 rounded-xl flex items-center gap-2 transition-all hover:scale-105 active:scale-95 border-none">
                                         <span class="material-icons text-sm">analytics</span>
@@ -225,8 +231,12 @@
                                 <h3 class="text-sm font-medium text-on-surface-variant">時間帯別回答数</h3>
                                 <!-- Axis Mode Switch -->
                                 <div class="flex p-0.5 bg-surface-variant rounded-md">
-                                    <button id="ts-axis-auto-btn" class="px-2 py-0.5 text-[10px] font-bold rounded-sm transition-all bg-surface text-primary shadow-sm" title="投稿がある範囲のみ表示">自動</button>
-                                    <button id="ts-axis-fixed-btn" class="px-2 py-0.5 text-[10px] font-bold rounded-sm transition-all text-on-surface-variant hover:text-on-surface" title="9:00-19:00で固定表示">固定</button>
+                                    <button id="ts-axis-auto-btn"
+                                        class="px-2 py-0.5 text-[10px] font-bold rounded-sm transition-all bg-surface text-primary shadow-sm"
+                                        title="投稿がある範囲のみ表示">自動</button>
+                                    <button id="ts-axis-fixed-btn"
+                                        class="px-2 py-0.5 text-[10px] font-bold rounded-sm transition-all text-on-surface-variant hover:text-on-surface"
+                                        title="9:00-19:00で固定表示">固定</button>
                                 </div>
                             </div>
                             <div class="relative flex-1 w-full min-h-[180px] h-full">
@@ -264,39 +274,35 @@
                     <div id="main-content-wrapper" class="w-full transition-all duration-300 lg:mr-80">
                         <div id="review-table-scroll-container"
                             class="rounded-xl border border-outline-variant bg-surface relative min-h-[300px] overflow-x-auto">
-                            <div id="review-table-scroll-shadow" class="table-scroll-shadow sm:hidden" aria-hidden="true"></div>
+                            <div id="review-table-scroll-shadow" class="table-scroll-shadow sm:hidden"
+                                aria-hidden="true"></div>
                             <table class="w-full divide-y divide-outline-variant review-table table-fixed min-w-[960px]"
                                 id="reviewTable">
                                 <thead class="bg-surface-variant">
                                     <tr>
                                         <th class="sortable-header px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[15%] cursor-pointer"
-                                            tabindex="0" role="button" aria-sort="none"
-                                            data-sort-key="answerId">
+                                            tabindex="0" role="button" aria-sort="none" data-sort-key="answerId">
                                             <div class="flex items-center">回答ID<span
                                                     class="material-icons sort-icon opacity-40">unfold_more</span></div>
                                         </th>
                                         <th class="sortable-header px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[18%] min-w-[160px] cursor-pointer"
-                                            tabindex="0" role="button" aria-sort="none"
-                                            data-sort-key="answeredAt">
+                                            tabindex="0" role="button" aria-sort="none" data-sort-key="answeredAt">
                                             <div class="flex items-center">回答日時<span
                                                     class="material-icons sort-icon opacity-40">unfold_more</span></div>
                                         </th>
                                         <th class="sortable-header px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[18%] min-w-[140px] cursor-pointer"
-                                            tabindex="0" role="button" aria-sort="none"
-                                            data-sort-key="fullName">
+                                            tabindex="0" role="button" aria-sort="none" data-sort-key="fullName">
                                             <div class="flex items-center">氏名<span
                                                     class="material-icons sort-icon opacity-40">unfold_more</span></div>
                                         </th>
                                         <th class="sortable-header px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[20%] cursor-pointer"
-                                            tabindex="0" role="button" aria-sort="none"
-                                            data-sort-key="companyName">
+                                            tabindex="0" role="button" aria-sort="none" data-sort-key="companyName">
                                             <div class="flex items-center">会社名<span
                                                     class="material-icons sort-icon opacity-40">unfold_more</span></div>
                                         </th>
                                         <th id="dynamic-question-header"
                                             class="sortable-header px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[29%] min-w-[180px] cursor-pointer"
-                                            tabindex="0" role="button" aria-sort="none"
-                                            data-sort-key="dynamicQuestion">
+                                            tabindex="0" role="button" aria-sort="none" data-sort-key="dynamicQuestion">
                                             <div class="flex items-center">設問回答<span
                                                     class="material-icons sort-icon opacity-40">unfold_more</span></div>
                                         </th>
@@ -351,14 +357,19 @@
                         class="overflow-y-auto rounded-3xl border border-outline-variant/60 bg-surface/95 p-6 text-on-surface shadow-2xl shadow-primary/5 backdrop-blur-xl space-y-6 custom-scrollbar">
                         <div class="toolbox-card">
                             <div class="flex items-center gap-2 mb-4">
-                                <span class="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Filter Options</span>
+                                <span class="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Filter
+                                    Options</span>
                                 <div class="h-px flex-1 bg-outline-variant/30"></div>
                             </div>
-                            
+
                             <!-- Search Tabs -->
                             <div class="flex p-1 bg-surface-variant rounded-lg mb-6">
-                                <button id="simple-search-tab" class="search-tab-btn is-active flex-1 py-1.5 text-xs font-bold rounded-md transition-all bg-surface text-primary shadow-sm" data-tab="simple">簡易検索</button>
-                                <button id="detailed-search-tab" class="search-tab-btn flex-1 py-1.5 text-xs font-bold rounded-md transition-all text-on-surface-variant hover:text-on-surface" data-tab="detailed">詳細検索</button>
+                                <button id="simple-search-tab"
+                                    class="search-tab-btn is-active flex-1 py-1.5 text-xs font-bold rounded-md transition-all bg-surface text-primary shadow-sm"
+                                    data-tab="simple">簡易検索</button>
+                                <button id="detailed-search-tab"
+                                    class="search-tab-btn flex-1 py-1.5 text-xs font-bold rounded-md transition-all text-on-surface-variant hover:text-on-surface"
+                                    data-tab="detailed">詳細検索</button>
                             </div>
 
                             <!-- Simple Search Content -->
@@ -434,7 +445,7 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
     <script type="module" src="src/main.js"></script>
-    <script type="module" src="src/speed-review.js?v=2"></script>
+    <script type="module" src="src/speed-review.js?v=3"></script>
     <script type="module" src="src/testScenarioOverlay.js"></script>
 </body>
 
