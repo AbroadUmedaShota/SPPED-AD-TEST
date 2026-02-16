@@ -402,7 +402,6 @@ function renderCharts(chartsData) {
                     <div class="flex justify-start">
                         ${buildChartTypeButtons(chartData, chartId)}
                     </div>
-                    ${matrixSelectorHtml}
                 </div>
             `;
         const chartAreaBlock = chartArea
@@ -493,7 +492,7 @@ function renderCharts(chartsData) {
             e.currentTarget.classList.remove('bg-surface', 'text-primary');
         });
     });
-    bindMatrixRowSelectorEvents();
+    // Removed bindMatrixRowSelectorEvents();
 
     const exportAllButton = document.getElementById('excel-export-all');
     if (exportAllButton) {
@@ -581,21 +580,57 @@ function createChart(chartId, chartData, type) {
         chartInstances[chartId].destroy();
     }
 
-    const isMatrixStacked = type === 'matrix_stacked';
+    const isMatrixStacked = type === 'matrix_stacked' || type === 'matrix_stacked_100';
+    const isStacked100 = type === 'matrix_stacked_100';
     const isDoughnut = type === 'pie';
+
+    // For Matrix Stacked, Categories are the Rows
     const categoryLabels = isMatrixStacked
         ? (chartData.matrixRows || []).map(row => row.text)
         : chartData.labels;
-    const legendConfig = getLegendConfig(categoryLabels);
-    const chartHeight = isDoughnut ? legendConfig.chartHeight : (isMatrixStacked ? 420 : 350);
+
+    // Determine Legend Configuration
+    // For Stacked, series names are used in legend
+    const legendSource = isMatrixStacked
+        ? (chartData.matrixSeries || []).map(s => s.name)
+        : categoryLabels;
+
+    const legendConfig = getLegendConfig(legendSource);
+
+    // Dynamic Height Calculation for Matrix
+    // Base height + (row count * row height estimate)
+    const baseHeight = 100; // Title, padding, etc.
+    const rowHeight = 40;   // Height per bar
+    const calculatedHeight = isMatrixStacked
+        ? Math.max(350, baseHeight + (categoryLabels.length * rowHeight) + (legendConfig.height || 50))
+        : (isDoughnut ? legendConfig.chartHeight : 350);
+
     const matrixRowTotals = chartData.matrixRowTotals || [];
+
     const tooltipForStacked = ({ series, seriesIndex, dataPointIndex, w }) => {
         const rowLabel = w.globals.labels?.[dataPointIndex] || '';
         const seriesLabel = w.globals.seriesNames?.[seriesIndex] || '';
         const count = Number(series?.[seriesIndex]?.[dataPointIndex] || 0);
         const total = Number(matrixRowTotals[dataPointIndex] || 0);
+
+        // If 100% stacked, ApexCharts shows percentage in tooltip automatically? 
+        // No, custom tooltip replaces it. We want to show Count AND Percentage relative to Row Total.
         const ratio = total > 0 ? ((count / total) * 100).toFixed(1) : '0.0';
-        return `<div class="apexcharts-tooltip-series-group apexcharts-active"><span>${escapeHtml(rowLabel)} &gt; ${escapeHtml(seriesLabel)}: ${count}件 (${ratio}%)</span></div>`;
+
+        return `
+            <div class="apexcharts-tooltip-series-group apexcharts-active" style="order: 1; display: flex;">
+                <span class="apexcharts-tooltip-marker" style="background-color: ${w.globals.colors[seriesIndex]};"></span>
+                <div class="apexcharts-tooltip-text" style="font-family: Helvetica, Arial, sans-serif; font-size: 12px; margin-left: 5px;">
+                    <div class="apexcharts-tooltip-y-group">
+                        <span class="apexcharts-tooltip-text-y-label">${escapeHtml(seriesLabel)}: </span>
+                        <span class="apexcharts-tooltip-text-y-value">${count}件 (${ratio}%)</span>
+                    </div>
+                </div>
+            </div>
+            <div style="padding: 4px 8px; font-size: 11px; color: #666; border-top: 1px solid #eee; margin-top: 4px;">
+                ${escapeHtml(rowLabel)} (全体: ${total}件)
+            </div>
+        `;
     };
 
     const options = {
@@ -604,16 +639,16 @@ function createChart(chartId, chartData, type) {
             : (isDoughnut ? chartData.data : [{ name: '件数', data: chartData.data }]),
         chart: {
             type: isDoughnut ? 'donut' : 'bar',
-            height: chartHeight,
+            height: calculatedHeight,
             width: '100%',
             fontFamily: "'Noto Sans JP', sans-serif",
             toolbar: { show: false },
             animations: { enabled: true, easing: 'easeinout', speed: 800 },
             padding: { top: 10, right: 10, bottom: 10, left: 10 },
             stacked: isMatrixStacked,
-            stackType: isMatrixStacked ? '100%' : undefined
+            stackType: isStacked100 ? '100%' : undefined
         },
-        colors: GRAPH_CHART_DONUT_PALETTE,
+        colors: isMatrixStacked ? COMMON_CHART_DONUT_PALETTE : GRAPH_CHART_DONUT_PALETTE,
         labels: categoryLabels,
         plotOptions: {
             pie: {
@@ -641,29 +676,34 @@ function createChart(chartId, chartData, type) {
             bar: {
                 horizontal: true,
                 distributed: !isDoughnut && !isMatrixStacked,
-                borderRadius: 8,
-                barHeight: '75%',
+                borderRadius: 4, // Slightly smaller radius for stacked
+                barHeight: '60%', // Thinner bars for better spacing
                 dataLabels: { position: 'top' }
             }
         },
         dataLabels: {
-            enabled: isMatrixStacked ? false : displayOptions.showDataLabels,
-            formatter: (val) => isDoughnut ? Math.round(val) + "%" : val + "件",
-            style: {
-                fontSize: '13px',
-                fontWeight: 700,
-                colors: isDoughnut ? ['#fff'] : [GRAPH_CHART_TEXT]
+            enabled: isMatrixStacked ? true : displayOptions.showDataLabels,
+            formatter: (val, opts) => {
+                if (isDoughnut) return Math.round(val) + "%";
+                if (isStacked100) return Math.round(val) + "%"; // Show % on bar for 100% stacked
+                return val > 0 ? val : ""; // Hide 0 counts to reduce clutter
             },
-            offsetX: isDoughnut ? 0 : 40
+            style: {
+                fontSize: '11px',
+                fontWeight: 700,
+                colors: isDoughnut ? ['#fff'] : (isMatrixStacked ? ['#fff'] : [GRAPH_CHART_TEXT])
+            },
+            offsetX: isDoughnut ? 0 : (isMatrixStacked ? 0 : 40),
+            dropShadow: { enabled: isMatrixStacked } // Better visibility on colored bars
         },
         legend: {
             show: isDoughnut || isMatrixStacked,
-            position: isMatrixStacked ? 'top' : legendConfig.position,
-            height: legendConfig.height,
+            position: isMatrixStacked ? 'bottom' : legendConfig.position, // Matrix legend at bottom usually better
+            height: undefined, // Let it flow
             fontSize: '13px',
             fontFamily: "'Noto Sans JP', sans-serif",
             markers: { radius: 12, width: 12, height: 12 },
-            itemMargin: legendConfig.itemMargin
+            itemMargin: { horizontal: 8, vertical: 4 }
         },
         grid: {
             show: displayOptions.showGrid,
@@ -672,14 +712,33 @@ function createChart(chartId, chartData, type) {
         },
         xaxis: {
             categories: categoryLabels,
-            labels: { show: !isDoughnut, style: { fontSize: '12px', fontWeight: 500 } }
+            labels: {
+                show: !isDoughnut,
+                style: { fontSize: '12px', fontWeight: 500 },
+                formatter: (val) => {
+                    if (isStacked100) return val + "%"; // X-axis is %
+                    return val;
+                }
+            },
+            max: isStacked100 ? 100 : undefined
         },
         yaxis: {
-            labels: { show: !isDoughnut, maxWidth: 200, style: { fontSize: '13px', fontWeight: 600 } }
+            labels: {
+                show: !isDoughnut,
+                maxWidth: 200,
+                style: { fontSize: '13px', fontWeight: 600 },
+                formatter: (value) => {
+                    // Truncate long row labels
+                    if (typeof value === 'string' && value.length > 15) {
+                        return value.substring(0, 15) + '...';
+                    }
+                    return value;
+                }
+            }
         },
-        stroke: { show: true, width: isDoughnut ? 3 : 0, colors: ['#fff'] },
+        stroke: { show: true, width: 1, colors: ['#fff'] },
         tooltip: isMatrixStacked
-            ? { shared: false, intersect: true, custom: tooltipForStacked }
+            ? { shared: true, intersect: false, custom: tooltipForStacked }
             : { shared: false, intersect: true }
     };
 
@@ -980,18 +1039,30 @@ async function executeExcelExport(chartsData, options) {
             sheet.addRow([]);
 
             if (chartData.summaryType === 'matrix_table') {
+                // For Matrix, we now just take the single stacked chart image
                 const rows = chartData.matrixRows || [];
                 const columns = chartData.matrixColumns || [];
-                const rowDetails = chartData.matrixRowDetails || [];
+                const rowDetails = chartData.matrixRowDetails || []; // We removed this from chartData potentially, wait. 
+                // In new buildMatrixCharts, we return 'data' in rowDetails. Wait.
+                // Re-checking buildMatrixCharts...
+                // I removed matrixRowDetails from the return object in buildMatrixCharts!
+                // Ah, chartData.matrixSeries has the data now. 
+                // But simplified summary table logic in 'renderChartSummaryTable' (which I didn't edit) might break?
+                // renderChartSummaryTable uses chartData.matrixRows, matrixColumns, matrixSeries, matrixRowTotals.
+                // It iterates matrixRows and fills cells.
+
+                // Let's implement Excel table building specifically for new structure
 
                 const header = ['行項目', ...columns.map(c => c.text), '合計'];
+
+                // Reconstruct row data from Series to rows
+                // Series k -> data[rowIndex] is count for column k at row rowIndex
                 const tableRows = rows.map((row, rIdx) => {
-                    const detail = rowDetails[rIdx];
-                    const counts = columns.map(col => {
-                        const labelIdx = detail.labels.indexOf(col.text);
-                        return labelIdx !== -1 ? detail.data[labelIdx] : 0;
+                    const counts = columns.map((col, cIdx) => {
+                        const series = chartData.matrixSeries[cIdx];
+                        return series.data[rIdx] || 0;
                     });
-                    const rowTotal = counts.reduce((a, b) => a + b, 0);
+                    const rowTotal = chartData.matrixRowTotals[rIdx] || 0;
                     return [row.text, ...counts, rowTotal];
                 });
 
@@ -1013,28 +1084,25 @@ async function executeExcelExport(chartsData, options) {
                 sheet.getColumn(2 + columns.length).numFmt = '#,##0"件"';
 
                 if (options.includeCharts && !isBlank) {
-                    let currentRow = 5 + rows.length;
-                    for (let rIdx = 0; rIdx < rows.length; rIdx++) {
-                        applyMatrixRowSelection(`chart-${chartData.chartId}`, rIdx);
-                        await new Promise(r => setTimeout(r, 400)); // 描画待ちを少し長めに
+                    await yieldToMain();
+                    // Capture the single stacked chart
+                    const chartElement = document.getElementById(`chart-${chartData.chartId}`);
+                    if (chartElement) {
+                        const canvas = await html2canvas(chartElement, { useCORS: true, backgroundColor: '#ffffff', scale: 2 });
+                        const base64Image = canvas.toDataURL('image/png');
+                        const imageId = workbook.addImage({ base64: base64Image, extension: 'png' });
 
-                        const chartElement = document.getElementById(`chart-${chartData.chartId}`);
-                        if (chartElement) {
-                            const canvas = await html2canvas(chartElement, { useCORS: true, backgroundColor: '#ffffff', scale: 2 });
-                            const base64Image = canvas.toDataURL('image/png');
-                            const imageId = workbook.addImage({ base64: base64Image, extension: 'png' });
+                        const ratio = canvas.height / canvas.width;
+                        const displayWidth = 550; // Slightly wider for matrix
+                        const displayHeight = displayWidth * ratio;
 
-                            const ratio = canvas.height / canvas.width;
-                            const displayWidth = 450;
-                            const displayHeight = displayWidth * ratio;
+                        // Place below table
+                        const startRow = 5 + rows.length + 2;
 
-                            sheet.addImage(imageId, {
-                                tl: { col: 0, row: currentRow },
-                                ext: { width: displayWidth, height: displayHeight }
-                            });
-                            currentRow += Math.ceil(displayHeight / 20) + 2;
-                        }
-                        if (!options.includeMatrixFull) break;
+                        sheet.addImage(imageId, {
+                            tl: { col: 0, row: startRow },
+                            ext: { width: displayWidth, height: displayHeight }
+                        });
                     }
                 }
             } else if (chartData.chartType === 'list') {
@@ -1462,21 +1530,30 @@ function resolveMatrixColumnLabel(value, columns) {
     return column ? column.text : valueStr;
 }
 
+// --- Refactored Matrix Logic for Stacked Bars ---
+
 function buildMatrixCharts(question, questionId, answers, isMulti) {
     const rows = normalizeMatrixRows(question.rows || []);
     const columns = normalizeMatrixColumns(question.columns || question.options || []);
-    if (rows.length === 0 || columns.length === 0) return [buildBlankChart(questionId, question.text)];
-    const matrixTotal = rows.length;
+
+    if (rows.length === 0 || columns.length === 0) {
+        return [buildBlankChart(questionId, question.text)];
+    }
+
     const rowDetails = rows.map((row, rowIndex) => {
         const counts = {};
         columns.forEach(col => { counts[col.text] = 0; });
         let answeredCount = 0;
+
         answers.forEach(answer => {
             const detail = findAnswerDetail(answer, question);
             if (!detail || detail.answer === undefined || detail.answer === null || detail.answer === '') return;
             const responses = extractMatrixRowResponses(detail.answer, row);
             if (responses.length === 0) return;
+
+            // Check if this row was actually answered (count as 1 respondent)
             answeredCount += 1;
+
             responses.forEach(response => {
                 const label = resolveMatrixColumnLabel(response, columns);
                 if (!label) return;
@@ -1485,53 +1562,46 @@ function buildMatrixCharts(question, questionId, answers, isMulti) {
             });
         });
 
-        const labels = columns.map(col => col.text);
-        const data = labels.map(label => counts[label] || 0);
-        let sortedLabels = labels;
-        let sortedData = data;
-        if (isMulti) {
-            const entries = labels.map((label, index) => ({
-                label,
-                count: data[index] || 0,
-                index
-            }));
-            entries.sort((a, b) => (b.count - a.count) || (a.index - b.index));
-            sortedLabels = entries.map(entry => entry.label);
-            sortedData = entries.map(entry => entry.count);
-        }
+        // Ensure order matches columns definition
+        const data = columns.map(col => counts[col.text] || 0);
+
         return {
             rowIndex,
             rowId: row.id,
             rowText: row.text,
-            labels: sortedLabels,
-            data: sortedData,
+            data: data, // Array matching columns order
             totalAnswers: answeredCount
         };
     });
 
-    const initialIndex = 0;
-    const initial = rowDetails[initialIndex];
-    if (!initial) return [buildBlankChart(questionId, question.text)];
+    // Build Series for Stacked Bar (Series = Columns)
+    // Transpose data: Series 1 (Column 1) -> [Row1-Val, Row2-Val, ...]
+    const matrixSeries = columns.map((col, colIndex) => {
+        return {
+            name: col.text,
+            data: rowDetails.map(detail => detail.data[colIndex])
+        };
+    });
+
+    const matrixRowTotals = rowDetails.map(d => d.totalAnswers);
+    const totalAll = matrixRowTotals.reduce((a, b) => a + b, 0);
 
     return [buildChartData({
         questionId,
         questionText: question.text,
         questionBaseId: questionId,
         isMatrix: true,
-        matrixIndex: initialIndex + 1,
-        matrixTotal,
-        matrixParentText: question.text,
-        matrixRowText: initial.rowText,
-        matrixSelectedIndex: initialIndex,
         matrixRows: rows,
-        matrixRowDetails: rowDetails,
-        chartType: isMulti ? 'bar' : 'pie',
-        summaryType: 'table',
-        includeTotalRow: !isMulti,
+        matrixColumns: columns,
+        matrixSeries: matrixSeries,
+        matrixRowTotals: matrixRowTotals,
+        // For SA (Single Answer), use 100% stacked to show ratio distribution
+        // For MA (Multiple Answer), use normal stacked to show counts
+        chartType: isMulti ? 'matrix_stacked' : 'matrix_stacked_100',
+        summaryType: 'matrix_table',
+        includeTotalRow: true,
         allowToggle: false,
-        labels: initial.labels,
-        data: initial.data,
-        totalAnswers: initial.totalAnswers
+        totalAnswers: totalAll // Grand total of respondent-rows (or responses)
     })];
 }
 
