@@ -48,6 +48,24 @@ const SURVEY_ID_DEFAULT_USER = '0001';
 const SURVEY_ID_MAX_SEQUENCE = 999;
 const HIDDEN_USER_STATUSES = new Set([USER_STATUSES.DELETED]);
 
+function setHeaderAriaSort(header, sortOrder = 'none') {
+    if (!header) return;
+    let ariaSort = 'none';
+    if (sortOrder === 'asc') {
+        ariaSort = 'ascending';
+    } else if (sortOrder === 'desc') {
+        ariaSort = 'descending';
+    }
+    header.setAttribute('aria-sort', ariaSort);
+}
+
+function resetSortableHeaderAriaSort(excludeHeader = null) {
+    document.querySelectorAll('.sortable-header').forEach((header) => {
+        if (excludeHeader && header === excludeHeader) return;
+        setHeaderAriaSort(header, 'none');
+    });
+}
+
 function showSurveyFetchError(fetchStats) {
     if (surveyFetchErrorOverlay) {
         if (surveyFetchErrorDetail && fetchStats) {
@@ -67,6 +85,7 @@ function setDefaultSortHeader() {
     if (lastSortedHeader) return;
     const idHeader = document.querySelector('.sortable-header[data-sort-key="id"]');
     if (idHeader) {
+        resetSortableHeaderAriaSort(idHeader);
         idHeader.dataset.sortOrder = 'desc';
         const icon = idHeader.querySelector('.sort-icon');
         if (icon) {
@@ -74,6 +93,7 @@ function setDefaultSortHeader() {
             icon.classList.remove('opacity-40');
             icon.classList.add('opacity-100');
         }
+        setHeaderAriaSort(idHeader, 'desc');
         lastSortedHeader = idHeader;
     }
 }
@@ -90,6 +110,87 @@ export function getSurveyStatus(survey, referenceDate) {
 
 
 let lastSortedHeader = null; // Tracks the last header clicked for sorting
+
+function sortByHeader(header) {
+    if (!header) return;
+
+    const loadingIndicator = document.getElementById('loading-indicator');
+    if (loadingIndicator) loadingIndicator.classList.remove('hidden');
+
+    try {
+        const sortKey = header.dataset.sortKey;
+        let sortOrder = header.dataset.sortOrder; // 'asc' or 'desc'
+
+        // Toggle sort order
+        sortOrder = (sortOrder === 'asc') ? 'desc' : 'asc';
+        header.dataset.sortOrder = sortOrder;
+
+        // Update sort icons (reset previous, set current)
+        if (lastSortedHeader && lastSortedHeader !== header) {
+            const prevIcon = lastSortedHeader.querySelector('.sort-icon');
+            if (prevIcon) {
+                prevIcon.textContent = 'unfold_more';
+                prevIcon.classList.remove('opacity-100');
+                prevIcon.classList.add('opacity-40');
+            }
+        }
+        const currentSortIcon = header.querySelector('.sort-icon');
+        if (currentSortIcon) {
+            currentSortIcon.textContent = (sortOrder === 'asc') ? 'arrow_upward' : 'arrow_downward';
+            currentSortIcon.classList.remove('opacity-40');
+            currentSortIcon.classList.add('opacity-100');
+        }
+
+        resetSortableHeaderAriaSort(header);
+        setHeaderAriaSort(header, sortOrder);
+        lastSortedHeader = header;
+
+        // Sorting on currentFilteredData directly
+        currentFilteredData.sort((a, b) => {
+            const lang = window.getCurrentLanguage();
+            let aValue, bValue;
+
+            // Get values based on sortKey, handling multi-language names
+            if (sortKey === 'name') {
+                aValue = (a.name && typeof a.name === 'object') ? a.name[lang] || a.name.ja || '' : a.name || '';
+                bValue = (b.name && typeof b.name === 'object') ? b.name[lang] || b.name.ja || '' : b.name || '';
+            } else {
+                aValue = a[sortKey];
+                bValue = b[sortKey];
+            }
+
+            // Type-specific processing
+            if (sortKey === 'status') {
+                aValue = getStatusSortOrder(getSurveyStatus(a)) || 99;
+                bValue = getStatusSortOrder(getSurveyStatus(b)) || 99;
+            } else if (sortKey === 'answerCount') {
+                aValue = parseInt(aValue, 10) || 0;
+                bValue = parseInt(bValue, 10) || 0;
+            } else if (['periodStart', 'deadline', 'dataCompletionDate'].includes(sortKey)) {
+                // Handle invalid dates gracefully for sorting
+                aValue = aValue ? new Date(aValue) : new Date(0);
+                bValue = bValue ? new Date(bValue) : new Date(0);
+            }
+
+            // Universal comparison logic
+            let result;
+            if (typeof aValue === 'string' && typeof bValue === 'string') {
+                result = aValue.localeCompare(bValue, 'ja', { sensitivity: 'base' });
+            } else {
+                // Handles numbers, dates, and status orders
+                result = (aValue < bValue) ? -1 : ((aValue > bValue) ? 1 : 0);
+            }
+
+            return sortOrder === 'asc' ? result : -result;
+        });
+
+        updatePagination(); // Re-render table with sorted data and update pagination
+    } finally {
+        if (loadingIndicator) {
+            setTimeout(() => loadingIndicator.classList.add('hidden'), 100);
+        }
+    }
+}
 
 /**
  * Fetches survey data from JSON files with aggregated success/failure counts.
@@ -680,78 +781,12 @@ export function initTableManager() {
     // Table Sort Logic
     document.querySelectorAll('.sortable-header').forEach(header => {
         header.addEventListener('click', () => {
-            const loadingIndicator = document.getElementById('loading-indicator');
-            if (loadingIndicator) loadingIndicator.classList.remove('hidden');
-
-            try {
-                const sortKey = header.dataset.sortKey;
-                let sortOrder = header.dataset.sortOrder; // 'asc' or 'desc'
-
-                // Toggle sort order
-                sortOrder = (sortOrder === 'asc') ? 'desc' : 'asc';
-                header.dataset.sortOrder = sortOrder;
-
-                // Update sort icons (reset previous, set current)
-                if (lastSortedHeader && lastSortedHeader !== header) {
-                    const prevIcon = lastSortedHeader.querySelector('.sort-icon');
-                    if (prevIcon) {
-                        prevIcon.textContent = 'unfold_more';
-                        prevIcon.classList.remove('opacity-100');
-                        prevIcon.classList.add('opacity-40');
-                    }
-                }
-                const currentSortIcon = header.querySelector('.sort-icon');
-                if (currentSortIcon) {
-                    currentSortIcon.textContent = (sortOrder === 'asc') ? 'arrow_upward' : 'arrow_downward';
-                    currentSortIcon.classList.remove('opacity-40');
-                    currentSortIcon.classList.add('opacity-100');
-                }
-                lastSortedHeader = header;
-
-                // Sorting on currentFilteredData directly
-                currentFilteredData.sort((a, b) => {
-                    const lang = window.getCurrentLanguage();
-                    let aValue, bValue;
-
-                    // Get values based on sortKey, handling multi-language names
-                    if (sortKey === 'name') {
-                        aValue = (a.name && typeof a.name === 'object') ? a.name[lang] || a.name.ja || '' : a.name || '';
-                        bValue = (b.name && typeof b.name === 'object') ? b.name[lang] || b.name.ja || '' : b.name || '';
-                    } else {
-                        aValue = a[sortKey];
-                        bValue = b[sortKey];
-                    }
-
-                    // Type-specific processing
-                    if (sortKey === 'status') {
-                        aValue = getStatusSortOrder(getSurveyStatus(a)) || 99;
-                        bValue = getStatusSortOrder(getSurveyStatus(b)) || 99;
-                    } else if (sortKey === 'answerCount') {
-                        aValue = parseInt(aValue, 10) || 0;
-                        bValue = parseInt(bValue, 10) || 0;
-                    } else if (['periodStart', 'deadline', 'dataCompletionDate'].includes(sortKey)) {
-                        // Handle invalid dates gracefully for sorting
-                        aValue = aValue ? new Date(aValue) : new Date(0);
-                        bValue = bValue ? new Date(bValue) : new Date(0);
-                    }
-
-                    // Universal comparison logic
-                    let result;
-                    if (typeof aValue === 'string' && typeof bValue === 'string') {
-                        result = aValue.localeCompare(bValue, 'ja', { sensitivity: 'base' });
-                    } else {
-                        // Handles numbers, dates, and status orders
-                        result = (aValue < bValue) ? -1 : ((aValue > bValue) ? 1 : 0);
-                    }
-
-                    return sortOrder === 'asc' ? result : -result;
-                });
-
-                updatePagination(); // Re-render table with sorted data and update pagination
-            } finally {
-                if (loadingIndicator) {
-                    setTimeout(() => loadingIndicator.classList.add('hidden'), 100);
-                }
+            sortByHeader(header);
+        });
+        header.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ' || event.key === 'Spacebar') {
+                event.preventDefault();
+                sortByHeader(header);
             }
         });
     });

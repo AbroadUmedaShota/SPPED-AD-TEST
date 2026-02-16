@@ -7,7 +7,7 @@
 
     <link rel="icon" href="assets/svg/speedad_logo.svg" type="image/svg+xml">
     <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdn.tailwindcss.com/3.4.17?plugins=forms,container-queries" integrity="sha384-1DcZPGeODWbGGjS/i/n4ULX/pEc0DPcKK2WhyuWEmBXRfzOwoVTDQBN9C3C5jJHK" crossorigin="anonymous"></script>
     <!-- Material Icons CDN -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- Custom CSS -->
@@ -16,10 +16,10 @@
     <link rel="stylesheet" href="./src/first-login-tutorial.css">
     <!-- First Login Tutorial Script -->
     <!-- flatpickr CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css" integrity="sha384-RkASv+6KfBMW9eknReJIJ6b3UnjKOKC5bOUaNgIY778NFbQ8MtWq9Lr/khUgqtTt" crossorigin="anonymous">
     <!-- Tippy.js CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css"/>
-    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/themes/material.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tippy.js@6.3.7/dist/tippy.css" integrity="sha384-IBgYl+I5X6ZDZXI5zv1vsSE3VopDomz4BxSu/GlxaPHfFtcrJ3uj70z1w6srO9zU" crossorigin="anonymous"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tippy.js@6.3.7/themes/material.css" integrity="sha384-2z1sLAcQL0xprgvXH+F79FSWg0oB7dkL0/RlihqLIpNnpnjNN4dIGjuuvnnwsC+b" crossorigin="anonymous">
     <!-- Custom Fonts -->
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
     <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
@@ -134,23 +134,23 @@
                         <thead class="bg-surface-variant">
                             <tr>
                                 <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-32">アクション</th>
-                                <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-24 sortable-header cursor-pointer" data-sort-key="id" data-sort-order="asc" aria-label="アンケートIDで並べ替え">
+                                <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-24 sortable-header cursor-pointer" data-sort-key="id" data-sort-order="asc" aria-label="アンケートIDで並べ替え" aria-sort="none" tabindex="0">
                                     アンケートID
                                     <span class="material-icons text-xs align-middle opacity-40 sort-icon">unfold_more</span>
                                 </th>
-                                <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider sortable-header cursor-pointer" data-sort-key="name" data-sort-order="asc" title="アンケート名（社内管理用）">
+                                <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider sortable-header cursor-pointer" data-sort-key="name" data-sort-order="asc" title="アンケート名（社内管理用）" aria-label="アンケート名で並べ替え" aria-sort="none" tabindex="0">
                                     アンケート名
                                     <span class="material-icons text-xs align-middle opacity-40 sort-icon">unfold_more</span>
                                 </th>
-                                <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-28 sortable-header cursor-pointer" data-sort-key="status" data-sort-order="asc" aria-label="ステータスで並べ替え">
+                                <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-28 sortable-header cursor-pointer" data-sort-key="status" data-sort-order="asc" aria-label="ステータスで並べ替え" aria-sort="none" tabindex="0">
                                     ステータス
                                     <span class="material-icons text-xs align-middle opacity-40 sort-icon">unfold_more</span>
                                 </th>
-                                <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-24 sortable-header cursor-pointer" data-sort-key="answerCount" data-sort-order="asc" aria-label="回答数で並べ替え">
+                                <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-24 sortable-header cursor-pointer" data-sort-key="answerCount" data-sort-order="asc" aria-label="回答数で並べ替え" aria-sort="none" tabindex="0">
                                     回答数
                                     <span class="material-icons text-xs align-middle opacity-40 sort-icon">unfold_more</span>
                                 </th>
-                                <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-48 sortable-header cursor-pointer" data-sort-key="periodStart" data-sort-order="asc" title="回答受付期間" aria-label="展示会会期で並べ替え">
+                                <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-48 sortable-header cursor-pointer" data-sort-key="periodStart" data-sort-order="asc" title="回答受付期間" aria-label="展示会会期で並べ替え" aria-sort="none" tabindex="0">
                                     展示会会期
                                     <span class="material-icons text-xs align-middle opacity-40 sort-icon">unfold_more</span>
                                 </th>
@@ -190,14 +190,14 @@
 </div>
 
 <!-- JSファイル -->
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js" integrity="sha384-5JqMv4L/Xa0hfvtF06qboNdhvuYXUku9ZrhZh3bSk8VXF0A/RuSLHpLsSV9Zqhl6" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/ja.js" integrity="sha384-mKor8U8jwukUkfxaFPCsxKF9S62PXq4gG7zcZ5yQ2x3KL1msprJZeFlKFEDeeb5V" crossorigin="anonymous"></script>
 <!-- First Login Tutorial Script -->
 <script src="./src/first-login-tutorial.js" defer></script>
 
 <!-- Tippy.js and Popper.js for tooltips -->
-<script src="https://unpkg.com/@popperjs/core@2"></script>
-<script src="https://unpkg.com/tippy.js@6"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/tippy.js@6.3.7/dist/tippy.umd.min.js" integrity="sha384-pjtv4LzKGI/lGxchW/wd/upB/HsGOP/Q2iPYyDU8qo2bp4JLbN34hQkdAArvidZX" crossorigin="anonymous"></script>
 
 <script type="module" src="src/main.js"></script>
 <script type="module" src="src/testScenarioOverlay.js"></script>
