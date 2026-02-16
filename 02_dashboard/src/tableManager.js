@@ -102,7 +102,7 @@ export async function fetchSurveyData() {
     const fetchStats = { successCount: 0, failureCount: 0, totalCount: 0 };
 
     try {
-        const coreUrl = '../data/core/surveys.json';
+        const coreUrl = resolveDashboardDataPath('core/surveys.json');
         const response = await fetch(coreUrl);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);

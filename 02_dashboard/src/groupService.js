@@ -9,7 +9,9 @@ let groups = []; // メモリ上のグループデータ
  */
 export async function fetchGroups() {
     const isSamplePage = window.location.pathname.includes('/sample/');
-    const dataFile = isSamplePage ? '../../data/core/groups.sample.json' : '../../data/core/groups.json';
+    const dataFile = isSamplePage
+        ? resolveDashboardDataPath('core/groups.sample.json')
+        : resolveDashboardDataPath('core/groups.json');
 
     try {
         const response = await fetch(dataFile);
