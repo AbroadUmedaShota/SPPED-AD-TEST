@@ -116,7 +116,7 @@ function setupFilterEventListeners() {
     if (daySelect) {
         daySelect.addEventListener('change', (e) => {
             const val = e.target.value;
-            
+
             if (val === 'custom') {
                 if (detailedContent) detailedContent.classList.remove('hidden');
                 return;
@@ -186,10 +186,10 @@ function handleResetFilters() {
     }
     const daySelect = document.getElementById('dayFilterSelect');
     if (daySelect) daySelect.value = 'all';
-    
+
     const detailedContent = document.getElementById('detailed-search-content');
     if (detailedContent) detailedContent.classList.add('hidden');
-    
+
     triggerChartUpdate();
 }
 
@@ -207,7 +207,7 @@ function triggerChartUpdate() {
             return itemDate >= startDate && itemDate <= endDate;
         });
     }
-    
+
     const chartData = processDataForCharts(currentSurvey, answersToProcess);
     renderCharts(chartData);
 }
@@ -238,12 +238,12 @@ async function loadAndRenderCharts(surveyId) {
         if (!currentSurvey) {
             throw new Error(`アンケートID「${surveyId}」の定義が見つかりません。`);
         }
-        
+
         originalAnswers = answers;
         availableDateRange = getSurveyPeriodRange(currentSurvey, originalAnswers);
 
         document.getElementById('survey-title').textContent = `グラフ分析: ${currentSurvey.name.ja}`;
-        
+
         const chartData = processDataForCharts(currentSurvey, originalAnswers);
         renderCharts(chartData);
 
@@ -310,11 +310,11 @@ function processDataForCharts(survey, answers) {
         }
 
         if (BLANK_TYPES.has(question.type)) {
-            charts.push(buildListChart(question, questionId, answers));
+            charts.push(buildListChart(question, questionId, answers, '', question.type));
             return;
         }
 
-        charts.push(buildListChart(question, questionId, answers, '未対応の設問タイプ'));
+        charts.push(buildListChart(question, questionId, answers, '未対応の設問タイプ', question.type));
     });
 
     return charts;
@@ -358,7 +358,7 @@ function renderCharts(chartsData) {
         const questionChip = isMatrix
             ? `${baseChip} [${chartData.matrixIndex}/${chartData.matrixTotal}]`
             : baseChip;
-        
+
         const isBlank = chartData.chartType === 'blank';
         const isList = chartData.chartType === 'list';
         const iconName = isBlank ? 'subject' : 'analytics';
@@ -370,7 +370,7 @@ function renderCharts(chartsData) {
             const topLabel = chartData.labels[maxIdx];
             const topVal = chartData.data[maxIdx];
             const topPercent = chartData.totalAnswers > 0 ? Math.round((topVal / chartData.totalAnswers) * 100) : 0;
-            
+
             insightHtml = `
                 <div class="flex items-center gap-2 bg-primary/5 border border-primary/10 px-3 py-1 rounded-full">
                     <span class="text-[10px] font-bold text-primary uppercase tracking-wider">Top</span>
@@ -482,13 +482,13 @@ function renderCharts(chartsData) {
             const data = chartDataStore.get(chartId);
             if (!data) return;
             createChart(chartId, data, chartType);
-            
+
             const buttons = e.currentTarget.parentElement.querySelectorAll('.chart-type-btn');
             buttons.forEach(btn => {
                 btn.classList.remove('active', 'bg-primary', 'text-on-primary');
                 btn.classList.add('bg-surface', 'text-primary');
             });
-            
+
             e.currentTarget.classList.add('active', 'bg-primary', 'text-on-primary');
             e.currentTarget.classList.remove('bg-surface', 'text-primary');
         });
@@ -760,14 +760,24 @@ function renderChartSummaryTable(summaryId, chartData) {
     if (chartData.chartType === 'list') {
         const rows = chartData.listAll || [];
         const itemsHtml = rows.length > 0
-            ? rows.map(item => `
+            ? rows.map(item => {
+                const isMedia = ['image', 'photo', 'handwriting', 'file', 'file_upload', 'upload'].includes(chartData.questionType);
+                let valueHtml = escapeHtml(item.value);
+                if (isMedia && item.value && (item.value.startsWith('http') || item.value.startsWith('.') || item.value.startsWith('/'))) {
+                    valueHtml = `<button type="button" onclick="window.previewImage('${escapeHtml(item.value)}')" class="text-primary hover:underline inline-flex items-center gap-1 group transition-colors text-left">
+                        <span class="material-icons text-sm group-hover:text-primary-dark transition-colors">image</span>
+                        <span class="truncate border-b border-transparent group-hover:border-primary-dark transition-all">${escapeHtml(item.value)}</span>
+                    </button>`;
+                }
+                return `
                 <tr>
                     <td class="px-3 py-2 border-b border-outline-variant align-top">
-                        <div class="cell-truncate-container" title="${escapeHtml(item.value)}">${escapeHtml(item.value)}</div>
+                        <div class="cell-truncate-container" title="${escapeHtml(item.value)}">${valueHtml}</div>
                     </td>
                     <td class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums align-top whitespace-nowrap text-on-surface-variant text-[11px]">${escapeHtml(item.answeredAtLabel)}</td>
                 </tr>
-            `).join('')
+            `;
+            }).join('')
             : `
                 <tr>
                     <td class="px-3 py-3 text-on-surface-variant" colspan="2">回答がありません。</td>
@@ -953,7 +963,7 @@ async function executeExcelExport(chartsData, options) {
 
             const questionNo = `Q${processedCount}`;
             const isBlank = chartData.chartType === 'blank';
-            
+
             if (isBlank && !options.includeExclusions) continue;
 
             const sheetName = isBlank ? `Ex_${processedCount}` : questionNo;
@@ -973,7 +983,7 @@ async function executeExcelExport(chartsData, options) {
                 const rows = chartData.matrixRows || [];
                 const columns = chartData.matrixColumns || [];
                 const rowDetails = chartData.matrixRowDetails || [];
-                
+
                 const header = ['行項目', ...columns.map(c => c.text), '合計'];
                 const tableRows = rows.map((row, rIdx) => {
                     const detail = rowDetails[rIdx];
@@ -1013,7 +1023,7 @@ async function executeExcelExport(chartsData, options) {
                             const canvas = await html2canvas(chartElement, { useCORS: true, backgroundColor: '#ffffff', scale: 2 });
                             const base64Image = canvas.toDataURL('image/png');
                             const imageId = workbook.addImage({ base64: base64Image, extension: 'png' });
-                            
+
                             const ratio = canvas.height / canvas.width;
                             const displayWidth = 450;
                             const displayHeight = displayWidth * ratio;
@@ -1071,7 +1081,7 @@ async function executeExcelExport(chartsData, options) {
                         const canvas = await html2canvas(chartElement, { useCORS: true, backgroundColor: '#ffffff', scale: 2 });
                         const base64Image = canvas.toDataURL('image/png');
                         const imageId = workbook.addImage({ base64: base64Image, extension: 'png' });
-                        
+
                         const ratio = canvas.height / canvas.width;
                         const displayWidth = 480;
                         const displayHeight = displayWidth * ratio;
@@ -1095,7 +1105,7 @@ async function executeExcelExport(chartsData, options) {
         anchor.download = filename;
         anchor.click();
         window.URL.revokeObjectURL(url);
-        
+
         showToast('分析レポートの出力が完了しました！', 'success');
         exportSucceeded = true;
     } catch (error) {
@@ -1553,7 +1563,8 @@ function buildChartData(data) {
         matrixSeries: data.matrixSeries || [],
         matrixRowTotals: data.matrixRowTotals || [],
         matrixSelectedIndex: Number.isFinite(data.matrixSelectedIndex) ? data.matrixSelectedIndex : 0,
-        matrixRowDetails: data.matrixRowDetails || []
+        matrixRowDetails: data.matrixRowDetails || [],
+        questionType: data.questionType || ''
     };
 }
 
@@ -1568,7 +1579,7 @@ function buildBlankChart(questionId, questionText, reason) {
     });
 }
 
-function buildListChart(question, questionId, answers, fallbackReason = '') {
+function buildListChart(question, questionId, answers, fallbackReason = '', questionType = '') {
     const listEntries = collectListEntries(question, answers);
     const listAll = listEntries.map(entry => ({
         value: entry.value,
@@ -1583,7 +1594,8 @@ function buildListChart(question, questionId, answers, fallbackReason = '') {
         allowToggle: false,
         listItems: listAll.slice(0, 3),
         listAll,
-        blankReason: fallbackReason
+        blankReason: fallbackReason,
+        questionType: questionType || question.type
     });
 }
 
@@ -1714,3 +1726,86 @@ function formatRatingLabel(value, maxStars = 5) {
     const stars = '★'.repeat(Math.max(0, Math.min(num, maxStars)));
     return `${num} (${stars})`;
 }
+
+// --- Image Preview Modal Logic ---
+window.previewImage = function (startUrl) {
+    let modal = document.getElementById('image-preview-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'image-preview-modal';
+        modal.className = 'fixed inset-0 z-[200] hidden items-center justify-center p-4';
+        modal.innerHTML = `
+            <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onclick="window.closePreviewImage()"></div>
+            <div class="relative bg-surface rounded-2xl shadow-2xl max-w-5xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-fade-in-up">
+                <div class="p-4 border-b border-outline-variant flex justify-between items-center bg-surface-variant/30">
+                    <h3 class="font-bold text-on-surface flex items-center gap-2">
+                        <span class="material-icons text-primary">image</span>
+                        <span>画像プレビュー</span>
+                    </h3>
+                    <button onclick="window.closePreviewImage()" class="p-2 rounded-full hover:bg-on-surface/10 text-on-surface-variant transition-colors flex items-center justify-center">
+                        <span class="material-icons">close</span>
+                    </button>
+                </div>
+                <div class="flex-1 overflow-auto bg-surface-variant/5 border-b border-outline-variant/50 p-6 flex items-center justify-center relative min-h-[300px]">
+                     <img id="preview-image-element" src="" alt="Preview" class="max-w-full max-h-[70vh] object-contain rounded-lg shadow-sm transition-all duration-300 opacity-0">
+                     <div id="preview-loading" class="absolute inset-0 flex items-center justify-center text-primary">
+                        <div class="animate-spin rounded-full h-10 w-10 border-4 border-primary border-t-transparent"></div>
+                     </div>
+                     <div id="preview-error" class="hidden absolute inset-0 flex flex-col items-center justify-center text-error animate-fade-in">
+                        <span class="material-icons text-4xl mb-2">broken_image</span>
+                        <p class="font-bold">画像を読み込めませんでした</p>
+                     </div>
+                </div>
+                <div class="p-4 bg-surface flex justify-end gap-2">
+                    <a id="preview-download-link" href="#" target="_blank" class="button-secondary text-sm px-4 py-2 rounded-lg flex items-center gap-2">
+                        <span class="material-icons text-sm">open_in_new</span>
+                        <span>新しいタブで開く</span>
+                    </a>
+                    <button onclick="window.closePreviewImage()" class="button-primary text-sm px-6 py-2 rounded-lg">閉じる</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    const img = document.getElementById('preview-image-element');
+    const loading = document.getElementById('preview-loading');
+    const error = document.getElementById('preview-error');
+    const dlLink = document.getElementById('preview-download-link');
+
+    // Reset state
+    img.style.opacity = '0';
+    img.src = '';
+    loading.classList.remove('hidden');
+    error.classList.add('hidden');
+
+    // Set new source
+    img.onload = () => {
+        loading.classList.add('hidden');
+        img.style.opacity = '1';
+    };
+    img.onerror = () => {
+        loading.classList.add('hidden');
+        error.classList.remove('hidden');
+    };
+
+    img.src = startUrl;
+    dlLink.href = startUrl;
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    document.body.classList.add('overflow-hidden');
+};
+
+window.closePreviewImage = function () {
+    const modal = document.getElementById('image-preview-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        document.body.classList.remove('overflow-hidden');
+        const img = document.getElementById('preview-image-element');
+        if (img) {
+            img.src = ''; // Clear src to stop loading if pending
+        }
+    }
+};

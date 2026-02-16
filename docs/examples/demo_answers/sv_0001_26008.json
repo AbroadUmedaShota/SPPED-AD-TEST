@@ -72,6 +72,36 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "3",
+          "r2": "2",
+          "r3": "1",
+          "r4": "2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "budget",
+            "none"
+          ],
+          "r2": [
+            "none",
+            "time"
+          ],
+          "r3": [
+            "none"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -151,6 +181,36 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "1",
+          "r2": "2",
+          "r3": "3",
+          "r4": "1"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "none"
+          ],
+          "r2": [
+            "budget",
+            "time"
+          ],
+          "r3": [
+            "human_resource",
+            "none"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -230,6 +290,36 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "3",
+          "r2": "2",
+          "r3": "3",
+          "r4": "3"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "time",
+            "human_resource"
+          ],
+          "r2": [
+            "time",
+            "human_resource"
+          ],
+          "r3": [
+            "none"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -309,6 +399,35 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "1",
+          "r2": "3",
+          "r3": "1",
+          "r4": "3"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "time"
+          ],
+          "r2": [
+            "human_resource",
+            "none"
+          ],
+          "r3": [
+            "budget"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -388,6 +507,36 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "3",
+          "r2": "2",
+          "r3": "1",
+          "r4": "2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "human_resource"
+          ],
+          "r2": [
+            "human_resource",
+            "budget"
+          ],
+          "r3": [
+            "none",
+            "time"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -467,6 +616,35 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "3",
+          "r2": "2",
+          "r3": "1",
+          "r4": "2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "time"
+          ],
+          "r2": [
+            "budget"
+          ],
+          "r3": [
+            "time",
+            "human_resource"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -546,6 +724,35 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "1",
+          "r2": "2",
+          "r3": "3",
+          "r4": "3"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "budget"
+          ],
+          "r2": [
+            "budget",
+            "time"
+          ],
+          "r3": [
+            "none"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -625,6 +832,37 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "2",
+          "r2": "3",
+          "r3": "3",
+          "r4": "2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "none",
+            "time"
+          ],
+          "r2": [
+            "none",
+            "time"
+          ],
+          "r3": [
+            "human_resource",
+            "none"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -704,6 +942,36 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "3",
+          "r2": "2",
+          "r3": "3",
+          "r4": "1"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "human_resource",
+            "none"
+          ],
+          "r2": [
+            "human_resource",
+            "none"
+          ],
+          "r3": [
+            "human_resource"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -783,6 +1051,37 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "3",
+          "r2": "3",
+          "r3": "1",
+          "r4": "1"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "time",
+            "none"
+          ],
+          "r2": [
+            "none",
+            "budget"
+          ],
+          "r3": [
+            "none",
+            "budget"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -862,6 +1161,34 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "2",
+          "r2": "3",
+          "r3": "1",
+          "r4": "3"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "time"
+          ],
+          "r2": [
+            "human_resource"
+          ],
+          "r3": [
+            "time"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -941,6 +1268,35 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "1",
+          "r2": "3",
+          "r3": "2",
+          "r4": "3"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "time"
+          ],
+          "r2": [
+            "human_resource"
+          ],
+          "r3": [
+            "human_resource",
+            "time"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -1020,6 +1376,35 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "1",
+          "r2": "1",
+          "r3": "1",
+          "r4": "2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "human_resource"
+          ],
+          "r2": [
+            "time",
+            "human_resource"
+          ],
+          "r3": [
+            "time"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -1099,6 +1484,34 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "1",
+          "r2": "3",
+          "r3": "1",
+          "r4": "3"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "budget"
+          ],
+          "r2": [
+            "time"
+          ],
+          "r3": [
+            "none"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -1178,6 +1591,35 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "2",
+          "r2": "2",
+          "r3": "1",
+          "r4": "1"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "none"
+          ],
+          "r2": [
+            "none",
+            "time"
+          ],
+          "r3": [
+            "budget"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -1257,6 +1699,36 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "2",
+          "r2": "3",
+          "r3": "2",
+          "r4": "2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "budget",
+            "human_resource"
+          ],
+          "r2": [
+            "budget",
+            "none"
+          ],
+          "r3": [
+            "none"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -1336,6 +1808,35 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "1",
+          "r2": "3",
+          "r3": "3",
+          "r4": "3"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "time"
+          ],
+          "r2": [
+            "none",
+            "human_resource"
+          ],
+          "r3": [
+            "none"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -1415,6 +1916,34 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "1",
+          "r2": "1",
+          "r3": "3",
+          "r4": "2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "none"
+          ],
+          "r2": [
+            "none"
+          ],
+          "r3": [
+            "human_resource"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -1494,6 +2023,35 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "3",
+          "r2": "1",
+          "r3": "2",
+          "r4": "1"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "none",
+            "budget"
+          ],
+          "r2": [
+            "budget"
+          ],
+          "r3": [
+            "time"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -1573,6 +2131,35 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "3",
+          "r2": "1",
+          "r3": "2",
+          "r4": "2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "time"
+          ],
+          "r2": [
+            "time",
+            "none"
+          ],
+          "r3": [
+            "human_resource"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -1652,6 +2239,36 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "1",
+          "r2": "1",
+          "r3": "2",
+          "r4": "2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "human_resource",
+            "time"
+          ],
+          "r2": [
+            "human_resource",
+            "time"
+          ],
+          "r3": [
+            "none"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -1731,6 +2348,36 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "3",
+          "r2": "2",
+          "r3": "3",
+          "r4": "1"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "budget",
+            "human_resource"
+          ],
+          "r2": [
+            "budget"
+          ],
+          "r3": [
+            "human_resource",
+            "budget"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -1810,6 +2457,36 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "1",
+          "r2": "2",
+          "r3": "3",
+          "r4": "2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "time",
+            "human_resource"
+          ],
+          "r2": [
+            "budget"
+          ],
+          "r3": [
+            "budget",
+            "human_resource"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -1889,6 +2566,36 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "3",
+          "r2": "1",
+          "r3": "3",
+          "r4": "2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "budget",
+            "human_resource"
+          ],
+          "r2": [
+            "none"
+          ],
+          "r3": [
+            "none",
+            "human_resource"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -1968,6 +2675,35 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "2",
+          "r2": "1",
+          "r3": "1",
+          "r4": "3"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "human_resource",
+            "none"
+          ],
+          "r2": [
+            "human_resource"
+          ],
+          "r3": [
+            "time"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -2047,6 +2783,35 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "2",
+          "r2": "3",
+          "r3": "2",
+          "r4": "3"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "human_resource",
+            "budget"
+          ],
+          "r2": [
+            "human_resource"
+          ],
+          "r3": [
+            "human_resource"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -2126,6 +2891,35 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "1",
+          "r2": "2",
+          "r3": "2",
+          "r4": "2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "time"
+          ],
+          "r2": [
+            "none"
+          ],
+          "r3": [
+            "human_resource",
+            "time"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -2205,6 +2999,36 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "1",
+          "r2": "2",
+          "r3": "1",
+          "r4": "2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "budget"
+          ],
+          "r2": [
+            "budget",
+            "human_resource"
+          ],
+          "r3": [
+            "time",
+            "human_resource"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -2284,6 +3108,35 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "1",
+          "r2": "1",
+          "r3": "3",
+          "r4": "2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "time"
+          ],
+          "r2": [
+            "budget",
+            "none"
+          ],
+          "r3": [
+            "time"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -2363,6 +3216,35 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "2",
+          "r2": "2",
+          "r3": "3",
+          "r4": "3"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "human_resource",
+            "none"
+          ],
+          "r2": [
+            "budget"
+          ],
+          "r3": [
+            "time"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -2442,6 +3324,35 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "1",
+          "r2": "1",
+          "r3": "3",
+          "r4": "1"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "none"
+          ],
+          "r2": [
+            "budget",
+            "human_resource"
+          ],
+          "r3": [
+            "time"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -2521,6 +3432,34 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "2",
+          "r2": "1",
+          "r3": "3",
+          "r4": "3"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "human_resource"
+          ],
+          "r2": [
+            "time"
+          ],
+          "r3": [
+            "none"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -2600,6 +3539,35 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "2",
+          "r2": "1",
+          "r3": "1",
+          "r4": "1"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "time",
+            "none"
+          ],
+          "r2": [
+            "human_resource"
+          ],
+          "r3": [
+            "time"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -2679,6 +3647,35 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "2",
+          "r2": "1",
+          "r3": "3",
+          "r4": "1"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "human_resource",
+            "none"
+          ],
+          "r2": [
+            "time"
+          ],
+          "r3": [
+            "time"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -2758,6 +3755,35 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "1",
+          "r2": "2",
+          "r3": "3",
+          "r4": "2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "time"
+          ],
+          "r2": [
+            "time",
+            "budget"
+          ],
+          "r3": [
+            "time"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -2837,6 +3863,35 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "3",
+          "r2": "3",
+          "r3": "1",
+          "r4": "2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "human_resource",
+            "time"
+          ],
+          "r2": [
+            "human_resource"
+          ],
+          "r3": [
+            "human_resource"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -2916,6 +3971,37 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "1",
+          "r2": "2",
+          "r3": "3",
+          "r4": "2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "budget",
+            "none"
+          ],
+          "r2": [
+            "budget",
+            "none"
+          ],
+          "r3": [
+            "budget",
+            "human_resource"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -2995,6 +4081,35 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "3",
+          "r2": "2",
+          "r3": "1",
+          "r4": "1"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "none"
+          ],
+          "r2": [
+            "none"
+          ],
+          "r3": [
+            "budget",
+            "none"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -3074,6 +4189,36 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "3",
+          "r2": "2",
+          "r3": "1",
+          "r4": "3"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "none"
+          ],
+          "r2": [
+            "none",
+            "budget"
+          ],
+          "r3": [
+            "time",
+            "budget"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -3153,6 +4298,36 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "3",
+          "r2": "1",
+          "r3": "1",
+          "r4": "3"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "time"
+          ],
+          "r2": [
+            "human_resource",
+            "time"
+          ],
+          "r3": [
+            "budget",
+            "none"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -3232,6 +4407,35 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "1",
+          "r2": "3",
+          "r3": "1",
+          "r4": "3"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "human_resource"
+          ],
+          "r2": [
+            "human_resource",
+            "time"
+          ],
+          "r3": [
+            "time"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -3311,6 +4515,35 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "2",
+          "r2": "3",
+          "r3": "1",
+          "r4": "1"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "none"
+          ],
+          "r2": [
+            "human_resource"
+          ],
+          "r3": [
+            "budget",
+            "none"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -3390,6 +4623,36 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "1",
+          "r2": "2",
+          "r3": "2",
+          "r4": "3"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "budget",
+            "none"
+          ],
+          "r2": [
+            "time"
+          ],
+          "r3": [
+            "human_resource",
+            "none"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -3469,6 +4732,35 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "3",
+          "r2": "2",
+          "r3": "1",
+          "r4": "1"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "none"
+          ],
+          "r2": [
+            "none"
+          ],
+          "r3": [
+            "human_resource",
+            "time"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -3548,6 +4840,36 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "3",
+          "r2": "1",
+          "r3": "3",
+          "r4": "2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "none",
+            "budget"
+          ],
+          "r2": [
+            "budget",
+            "none"
+          ],
+          "r3": [
+            "time"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -3627,6 +4949,35 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "1",
+          "r2": "3",
+          "r3": "3",
+          "r4": "2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "budget"
+          ],
+          "r2": [
+            "budget",
+            "time"
+          ],
+          "r3": [
+            "human_resource"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -3706,6 +5057,36 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "2",
+          "r2": "2",
+          "r3": "2",
+          "r4": "3"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "budget",
+            "time"
+          ],
+          "r2": [
+            "human_resource",
+            "none"
+          ],
+          "r3": [
+            "human_resource"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -3785,6 +5166,35 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "2",
+          "r2": "2",
+          "r3": "3",
+          "r4": "3"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "human_resource"
+          ],
+          "r2": [
+            "budget"
+          ],
+          "r3": [
+            "none",
+            "budget"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -3864,6 +5274,35 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "3",
+          "r2": "3",
+          "r3": "3",
+          "r4": "2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "none",
+            "time"
+          ],
+          "r2": [
+            "none"
+          ],
+          "r3": [
+            "none"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -3943,6 +5382,35 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "2",
+          "r2": "1",
+          "r3": "1",
+          "r4": "3"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "budget",
+            "none"
+          ],
+          "r2": [
+            "budget"
+          ],
+          "r3": [
+            "budget"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -4022,6 +5490,37 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "2",
+          "r2": "1",
+          "r3": "1",
+          "r4": "1"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "time",
+            "human_resource"
+          ],
+          "r2": [
+            "time",
+            "human_resource"
+          ],
+          "r3": [
+            "time",
+            "human_resource"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -4101,6 +5600,36 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "3",
+          "r2": "3",
+          "r3": "1",
+          "r4": "3"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "time"
+          ],
+          "r2": [
+            "none",
+            "budget"
+          ],
+          "r3": [
+            "none",
+            "human_resource"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -4180,6 +5709,34 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "1",
+          "r2": "1",
+          "r3": "1",
+          "r4": "1"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "none"
+          ],
+          "r2": [
+            "none"
+          ],
+          "r3": [
+            "budget"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -4259,6 +5816,36 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "1",
+          "r2": "3",
+          "r3": "3",
+          "r4": "3"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "time",
+            "budget"
+          ],
+          "r2": [
+            "time",
+            "budget"
+          ],
+          "r3": [
+            "none"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -4338,6 +5925,35 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "2",
+          "r2": "3",
+          "r3": "1",
+          "r4": "3"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "none"
+          ],
+          "r2": [
+            "none",
+            "human_resource"
+          ],
+          "r3": [
+            "budget"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -4417,6 +6033,37 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "2",
+          "r2": "1",
+          "r3": "3",
+          "r4": "3"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "budget",
+            "time"
+          ],
+          "r2": [
+            "none",
+            "budget"
+          ],
+          "r3": [
+            "none",
+            "budget"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -4496,6 +6143,36 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "3",
+          "r2": "3",
+          "r3": "3",
+          "r4": "3"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "human_resource",
+            "time"
+          ],
+          "r2": [
+            "time",
+            "none"
+          ],
+          "r3": [
+            "none"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -4575,6 +6252,36 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "1",
+          "r2": "1",
+          "r3": "2",
+          "r4": "2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "time"
+          ],
+          "r2": [
+            "budget",
+            "human_resource"
+          ],
+          "r3": [
+            "none",
+            "budget"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -4654,6 +6361,36 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "2",
+          "r2": "3",
+          "r3": "3",
+          "r4": "2"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "none",
+            "budget"
+          ],
+          "r2": [
+            "none",
+            "budget"
+          ],
+          "r3": [
+            "human_resource"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
@@ -4733,6 +6470,36 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q13",
+        "question": "担当者の対応評価",
+        "answer": {
+          "r1": "3",
+          "r2": "3",
+          "r3": "1",
+          "r4": "3"
+        },
+        "type": "matrix_sa"
+      },
+      {
+        "id": "Q14",
+        "question": "導入検討における課題 (複数回答)",
+        "answer": {
+          "r1": [
+            "human_resource",
+            "time"
+          ],
+          "r2": [
+            "budget",
+            "none"
+          ],
+          "r3": [
+            "budget"
+          ]
+        },
+        "type": "matrix_ma"
+      },
+      {
+        "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
         "type": "explanation"
