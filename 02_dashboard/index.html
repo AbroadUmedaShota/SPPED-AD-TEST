@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +8,7 @@
 
     <link rel="icon" href="assets/svg/speedad_logo.svg" type="image/svg+xml">
     <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com/3.4.17?plugins=forms,container-queries" integrity="sha384-1DcZPGeODWbGGjS/i/n4ULX/pEc0DPcKK2WhyuWEmBXRfzOwoVTDQBN9C3C5jJHK" crossorigin="anonymous"></script>
+    <script src="https://cdn.tailwindcss.com/3.4.17?plugins=forms,container-queries"></script>
     <!-- Material Icons CDN -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- Custom CSS -->
@@ -16,190 +17,253 @@
     <link rel="stylesheet" href="./src/first-login-tutorial.css">
     <!-- First Login Tutorial Script -->
     <!-- flatpickr CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css" integrity="sha384-RkASv+6KfBMW9eknReJIJ6b3UnjKOKC5bOUaNgIY778NFbQ8MtWq9Lr/khUgqtTt" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css"
+        integrity="sha384-RkASv+6KfBMW9eknReJIJ6b3UnjKOKC5bOUaNgIY778NFbQ8MtWq9Lr/khUgqtTt" crossorigin="anonymous">
     <!-- Tippy.js CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tippy.js@6.3.7/dist/tippy.css" integrity="sha384-IBgYl+I5X6ZDZXI5zv1vsSE3VopDomz4BxSu/GlxaPHfFtcrJ3uj70z1w6srO9zU" crossorigin="anonymous"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tippy.js@6.3.7/themes/material.css" integrity="sha384-2z1sLAcQL0xprgvXH+F79FSWg0oB7dkL0/RlihqLIpNnpnjNN4dIGjuuvnnwsC+b" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tippy.js@6.3.7/dist/tippy.css"
+        integrity="sha384-IBgYl+I5X6ZDZXI5zv1vsSE3VopDomz4BxSu/GlxaPHfFtcrJ3uj70z1w6srO9zU" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tippy.js@6.3.7/themes/material.css"
+        integrity="sha384-2z1sLAcQL0xprgvXH+F79FSWg0oB7dkL0/RlihqLIpNnpnjNN4dIGjuuvnnwsC+b" crossorigin="anonymous">
     <!-- Custom Fonts -->
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
-    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+    <link as="style"
+        href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900"
+        onload="this.rel='stylesheet'" rel="stylesheet">
 </head>
+
 <body class="bg-background text-on-background" data-page-id="survey-list">
 
-<!-- 1. アプリケーション全体構造 -->
-<div class="relative flex min-h-screen flex-col overflow-x-hidden">
+    <!-- 1. アプリケーション全体構造 -->
+    <div class="relative flex min-h-screen flex-col overflow-x-hidden">
 
-    <!-- サイドバー用オーバーレイ -->
-    <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
+        <!-- サイドバー用オーバーレイ -->
+        <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
 
-    <!-- 2. ヘッダー -->
-    <div id="header-placeholder"></div>
+        <!-- 2. ヘッダー -->
+        <div id="header-placeholder"></div>
 
-    <div class="flex flex-1 pt-16 bg-background">
-        <!-- 3. サイドバー -->
-        <div id="sidebar-placeholder"></div>
+        <div class="flex flex-1 pt-16 bg-background">
+            <!-- 3. サイドバー -->
+            <div id="sidebar-placeholder"></div>
 
-        <!-- 4. メインコンテンツ -->
-        <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
-            <div class="flex flex-col w-full max-w-6xl mx-auto flex-1">
-                <!-- パンくずリストコンテナ -->
-                <div id="breadcrumb-container" class="mb-4"></div>
+            <!-- 4. メインコンテンツ -->
+            <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
+                <div class="flex flex-col w-full max-w-6xl mx-auto flex-1">
+                    <!-- パンくずリストコンテナ -->
+                    <div id="breadcrumb-container" class="mb-4"></div>
 
-                <!-- タイトルエリア -->
-                <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant">
-                    <h1 class="text-on-background text-headline-large font-bold leading-tight tracking-tight">アンケート一覧</h1>
-                    <button id="openNewSurveyModalBtn" class="flex items-center justify-center gap-2 min-w-[84px] max-w-[480px] cursor-pointer overflow-hidden rounded-full h-10 px-5 button-primary text-on-primary text-sm font-semibold leading-normal " aria-label="新しいアンケートを作成">
-                        <span class="material-icons text-xl">add</span>
-                        <span class="truncate">アンケート新規作成</span>
-                    </button>
-                </div>
-
-                <!-- フィルター・検索エリア -->
-                <div class="bg-surface p-4 rounded-xl mb-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-end">
-                        <!-- キーワード検索 -->
-                        <div class="input-group lg:col-span-1 relative">
-                            <input type="text" id="searchKeyword" placeholder=" " class="input-field pl-10 pr-4">
-                            <label for="searchKeyword" class="input-label">キーワード/アンケートIDで検索</label>
-                            <span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl pointer-events-none">search</span>
-                        </div>
-
-                        <!-- ステータスフィルター -->
-                        <div class="input-group lg:col-span-1">
-                            <select id="filterStatus" class="input-field">
-                                <option value="all">全てのステータス</option>
-                                <option value="会期前">会期前</option>
-                                <option value="会期中">会期中</option>
-                                <option value="会期終了">会期終了</option>
-                                <option value="会期終了（データ化中）">会期終了（データ化中）</option>
-                                <option value="会期終了（データ化完了）">会期終了（データ化完了）</option>
-                                <option value="会期終了（DL期限終了）">会期終了（DL期限終了）</option>
-                            </select>
-                            <label for="filterStatus" class="input-label">ステータス</label>
-                        </div>
-
-                        <!-- 期間フィルター -->
-                        <div class="flex items-center gap-2 lg:col-span-1">
-                            <div id="startDatePickerWrapper" class="input-group flex-1 relative">
-                                <input type="text" id="filterStartDate" class="input-field pr-10" placeholder=" " readonly data-input>
-                                <label for="filterStartDate" class="input-label">開始日</label>
-                                <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors" data-toggle>
-                                    <span class="material-icons text-xl">calendar_today</span>
-                                </button>
-                            </div>
-                            <span class="text-on-surface-variant">～</span>
-                            <div id="endDatePickerWrapper" class="input-group flex-1 relative">
-                                <input type="text" id="filterEndDate" class="input-field pr-10" placeholder=" " readonly data-input>
-                                <label for="filterEndDate" class="input-label">終了日</label>
-                                <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors" data-toggle>
-                                    <span class="material-icons text-xl">calendar_today</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex justify-end mt-4">
-                        <button id="resetFiltersButton" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-normal text-on-surface-variant transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40" aria-label="フィルターをリセット">
-                            フィルターをリセット
+                    <!-- タイトルエリア -->
+                    <div
+                        class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant">
+                        <h1 class="text-on-background text-headline-large font-bold leading-tight tracking-tight">
+                            アンケート一覧</h1>
+                        <button id="openNewSurveyModalBtn"
+                            class="flex items-center justify-center gap-2 min-w-[84px] max-w-[480px] cursor-pointer overflow-hidden rounded-full h-10 px-5 button-primary text-on-primary text-sm font-semibold leading-normal "
+                            aria-label="新しいアンケートを作成">
+                            <span class="material-icons text-xl">add</span>
+                            <span class="truncate">アンケート新規作成</span>
                         </button>
                     </div>
-                </div>
 
-                <!-- アンケートテーブル -->
-                <div class="overflow-x-auto rounded-xl border border-outline-variant bg-surface relative min-h-[200px]">
-                    <div id="loading-indicator" class="absolute inset-0 bg-surface bg-opacity-75 flex items-center justify-center z-10 hidden">
-                        <div class="flex flex-col items-center">
-                            <div class="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
-                            <p class="mt-4 text-on-surface-variant">読み込み中...</p>
+                    <!-- フィルター・検索エリア -->
+                    <div class="bg-surface p-4 rounded-xl mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-end">
+                            <!-- キーワード検索 -->
+                            <div class="input-group lg:col-span-1 relative">
+                                <input type="text" id="searchKeyword" placeholder=" " class="input-field pl-10 pr-4">
+                                <label for="searchKeyword" class="input-label">キーワード/アンケートIDで検索</label>
+                                <span
+                                    class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl pointer-events-none">search</span>
+                            </div>
+
+                            <!-- ステータスフィルター -->
+                            <div class="input-group lg:col-span-1">
+                                <select id="filterStatus" class="input-field">
+                                    <option value="all">全てのステータス</option>
+                                    <option value="会期前">会期前</option>
+                                    <option value="会期中">会期中</option>
+                                    <option value="会期終了">会期終了</option>
+                                    <option value="会期終了（データ化中）">会期終了（データ化中）</option>
+                                    <option value="会期終了（データ化完了）">会期終了（データ化完了）</option>
+                                    <option value="会期終了（DL期限終了）">会期終了（DL期限終了）</option>
+                                </select>
+                                <label for="filterStatus" class="input-label">ステータス</label>
+                            </div>
+
+                            <!-- 期間フィルター -->
+                            <div class="flex items-center gap-2 lg:col-span-1">
+                                <div id="startDatePickerWrapper" class="input-group flex-1 relative">
+                                    <input type="text" id="filterStartDate" class="input-field pr-10" placeholder=" "
+                                        readonly data-input>
+                                    <label for="filterStartDate" class="input-label">開始日</label>
+                                    <button type="button"
+                                        class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors"
+                                        data-toggle>
+                                        <span class="material-icons text-xl">calendar_today</span>
+                                    </button>
+                                </div>
+                                <span class="text-on-surface-variant">～</span>
+                                <div id="endDatePickerWrapper" class="input-group flex-1 relative">
+                                    <input type="text" id="filterEndDate" class="input-field pr-10" placeholder=" "
+                                        readonly data-input>
+                                    <label for="filterEndDate" class="input-label">終了日</label>
+                                    <button type="button"
+                                        class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors"
+                                        data-toggle>
+                                        <span class="material-icons text-xl">calendar_today</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex justify-end mt-4">
+                            <button id="resetFiltersButton"
+                                class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-normal text-on-surface-variant transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                                aria-label="フィルターをリセット">
+                                フィルターをリセット
+                            </button>
                         </div>
                     </div>
-                    <div id="survey-fetch-error" class="absolute inset-0 bg-surface bg-opacity-95 flex items-center justify-center z-10 hidden">
-                        <div class="flex flex-col items-center text-center gap-4 max-w-md px-4">
-                            <div>
-                                <p class="text-lg font-semibold text-on-surface">アンケートデータの取得に失敗しました</p>
-                                <p id="surveyFetchErrorDetail" class="text-sm text-on-surface-variant mt-1">JSONへのアクセス設定を確認し、再読み込みを行ってください。</p>
-                            </div>
-                            <div class="flex flex-wrap gap-2 justify-center">
-                                <button id="retryFetchButton" class="flex items-center justify-center gap-2 rounded-full h-10 px-5 button-primary text-on-primary text-sm font-semibold leading-normal">
-                                    <span class="material-icons text-xl">refresh</span>
-                                    <span>データの再取得</span>
-                                </button>
-                                <button id="reloadPageButton" class="flex items-center justify-center gap-2 rounded-full h-10 px-5 bg-secondary-container text-on-secondary-container text-sm font-semibold leading-normal">
-                                    <span class="material-icons text-xl">restart_alt</span>
-                                    <span>ページをリロード</span>
-                                </button>
+
+                    <!-- アンケートテーブル -->
+                    <div
+                        class="overflow-x-auto rounded-xl border border-outline-variant bg-surface relative min-h-[200px]">
+                        <div id="loading-indicator"
+                            class="absolute inset-0 bg-surface bg-opacity-75 flex items-center justify-center z-10 hidden">
+                            <div class="flex flex-col items-center">
+                                <div
+                                    class="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent">
+                                </div>
+                                <p class="mt-4 text-on-surface-variant">読み込み中...</p>
                             </div>
                         </div>
+                        <div id="survey-fetch-error"
+                            class="absolute inset-0 bg-surface bg-opacity-95 flex items-center justify-center z-10 hidden">
+                            <div class="flex flex-col items-center text-center gap-4 max-w-md px-4">
+                                <div>
+                                    <p class="text-lg font-semibold text-on-surface">アンケートデータの取得に失敗しました</p>
+                                    <p id="surveyFetchErrorDetail" class="text-sm text-on-surface-variant mt-1">
+                                        JSONへのアクセス設定を確認し、再読み込みを行ってください。</p>
+                                </div>
+                                <div class="flex flex-wrap gap-2 justify-center">
+                                    <button id="retryFetchButton"
+                                        class="flex items-center justify-center gap-2 rounded-full h-10 px-5 button-primary text-on-primary text-sm font-semibold leading-normal">
+                                        <span class="material-icons text-xl">refresh</span>
+                                        <span>データの再取得</span>
+                                    </button>
+                                    <button id="reloadPageButton"
+                                        class="flex items-center justify-center gap-2 rounded-full h-10 px-5 bg-secondary-container text-on-secondary-container text-sm font-semibold leading-normal">
+                                        <span class="material-icons text-xl">restart_alt</span>
+                                        <span>ページをリロード</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <table class="w-full min-w-[900px] divide-y divide-outline-variant survey-table"
+                            id="surveyTable">
+                            <thead class="bg-surface-variant">
+                                <tr>
+                                    <th
+                                        class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-32">
+                                        アクション</th>
+                                    <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-24 sortable-header cursor-pointer"
+                                        data-sort-key="id" data-sort-order="asc" aria-label="アンケートIDで並べ替え"
+                                        aria-sort="none" tabindex="0">
+                                        アンケートID
+                                        <span
+                                            class="material-icons text-xs align-middle opacity-40 sort-icon">unfold_more</span>
+                                    </th>
+                                    <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider sortable-header cursor-pointer"
+                                        data-sort-key="name" data-sort-order="asc" title="アンケート名（社内管理用）"
+                                        aria-label="アンケート名で並べ替え" aria-sort="none" tabindex="0">
+                                        アンケート名
+                                        <span
+                                            class="material-icons text-xs align-middle opacity-40 sort-icon">unfold_more</span>
+                                    </th>
+                                    <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-28 sortable-header cursor-pointer"
+                                        data-sort-key="status" data-sort-order="asc" aria-label="ステータスで並べ替え"
+                                        aria-sort="none" tabindex="0">
+                                        ステータス
+                                        <span
+                                            class="material-icons text-xs align-middle opacity-40 sort-icon">unfold_more</span>
+                                    </th>
+                                    <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-24 sortable-header cursor-pointer"
+                                        data-sort-key="answerCount" data-sort-order="asc" aria-label="回答数で並べ替え"
+                                        aria-sort="none" tabindex="0">
+                                        回答数
+                                        <span
+                                            class="material-icons text-xs align-middle opacity-40 sort-icon">unfold_more</span>
+                                    </th>
+                                    <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-48 sortable-header cursor-pointer"
+                                        data-sort-key="periodStart" data-sort-order="asc" title="回答受付期間"
+                                        aria-label="展示会会期で並べ替え" aria-sort="none" tabindex="0">
+                                        展示会会期
+                                        <span
+                                            class="material-icons text-xs align-middle opacity-40 sort-icon">unfold_more</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-outline-variant" id="surveyTableBody">
+                                <!-- JSにより動的に行が挿入されます -->
+                            </tbody>
+                        </table>
                     </div>
-                    <table class="w-full min-w-[900px] divide-y divide-outline-variant survey-table" id="surveyTable">
-                        <thead class="bg-surface-variant">
-                            <tr>
-                                <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-32">アクション</th>
-                                <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-24 sortable-header cursor-pointer" data-sort-key="id" data-sort-order="asc" aria-label="アンケートIDで並べ替え" aria-sort="none" tabindex="0">
-                                    アンケートID
-                                    <span class="material-icons text-xs align-middle opacity-40 sort-icon">unfold_more</span>
-                                </th>
-                                <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider sortable-header cursor-pointer" data-sort-key="name" data-sort-order="asc" title="アンケート名（社内管理用）" aria-label="アンケート名で並べ替え" aria-sort="none" tabindex="0">
-                                    アンケート名
-                                    <span class="material-icons text-xs align-middle opacity-40 sort-icon">unfold_more</span>
-                                </th>
-                                <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-28 sortable-header cursor-pointer" data-sort-key="status" data-sort-order="asc" aria-label="ステータスで並べ替え" aria-sort="none" tabindex="0">
-                                    ステータス
-                                    <span class="material-icons text-xs align-middle opacity-40 sort-icon">unfold_more</span>
-                                </th>
-                                <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-24 sortable-header cursor-pointer" data-sort-key="answerCount" data-sort-order="asc" aria-label="回答数で並べ替え" aria-sort="none" tabindex="0">
-                                    回答数
-                                    <span class="material-icons text-xs align-middle opacity-40 sort-icon">unfold_more</span>
-                                </th>
-                                <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-48 sortable-header cursor-pointer" data-sort-key="periodStart" data-sort-order="asc" title="回答受付期間" aria-label="展示会会期で並べ替え" aria-sort="none" tabindex="0">
-                                    展示会会期
-                                    <span class="material-icons text-xs align-middle opacity-40 sort-icon">unfold_more</span>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-outline-variant" id="surveyTableBody">
-                            <!-- JSにより動的に行が挿入されます -->
-                        </tbody>
-                    </table>
-                </div>
 
-                <!-- ページネーション -->
-                <div class="flex flex-wrap items-center justify-between gap-4 py-4 px-2 text-on-surface-variant text-sm">
-                    <div class="flex items-center gap-2">
-                        <span>表示件数:</span>
-                        <select id="itemsPerPage" class="py-1 px-2 rounded-md border border-outline-variant bg-surface-bright text-on-surface-variant appearance-none" aria-label="1ページあたりの表示件数">
-                            <option value="10">10</option>
-                            <option value="25">25</option>
-                            <option value="50">50</option>
-                        </select>
+                    <!-- ページネーション -->
+                    <div
+                        class="flex flex-wrap items-center justify-between gap-4 py-4 px-2 text-on-surface-variant text-sm">
+                        <div class="flex items-center gap-2">
+                            <span>表示件数:</span>
+                            <select id="itemsPerPage"
+                                class="py-1 px-2 rounded-md border border-outline-variant bg-surface-bright text-on-surface-variant appearance-none"
+                                aria-label="1ページあたりの表示件数">
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button
+                                class="p-1 rounded-full hover:bg-surface-variant transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                title="前へ" id="prevPageBtn" aria-label="前のページへ"><span
+                                    class="material-icons text-lg">chevron_left</span></button>
+                            <div id="pagination-numbers" class="flex items-center gap-1"></div>
+                            <button
+                                class="p-1 rounded-full hover:bg-surface-variant transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                title="次へ" id="nextPageBtn" aria-label="次のページへ"><span
+                                    class="material-icons text-lg">chevron_right</span></button>
+                        </div>
+                        <div id="pageInfo" class="font-medium min-w-[120px] text-right">1 - 0 / 全 0件</div>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <button class="p-1 rounded-full hover:bg-surface-variant transition-colors disabled:opacity-50 disabled:cursor-not-allowed" title="前へ" id="prevPageBtn" aria-label="前のページへ"><span class="material-icons text-lg">chevron_left</span></button>
-                        <div id="pagination-numbers" class="flex items-center gap-1"></div>
-                        <button class="p-1 rounded-full hover:bg-surface-variant transition-colors disabled:opacity-50 disabled:cursor-not-allowed" title="次へ" id="nextPageBtn" aria-label="次のページへ"><span class="material-icons text-lg">chevron_right</span></button>
-                    </div>
-                    <div id="pageInfo" class="font-medium min-w-[120px] text-right">1 - 0 / 全 0件</div>
-                </div>
 
-            </div>
-        </main>
+                </div>
+            </main>
+        </div>
+
+        <!-- 5. フッター -->
+        <div id="footer-placeholder"></div>
+
     </div>
 
-    <!-- 5. フッター -->
-    <div id="footer-placeholder"></div>
+    <!-- JSファイル -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"
+        integrity="sha384-5JqMv4L/Xa0hfvtF06qboNdhvuYXUku9ZrhZh3bSk8VXF0A/RuSLHpLsSV9Zqhl6"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/ja.js"
+        integrity="sha384-mKor8U8jwukUkfxaFPCsxKF9S62PXq4gG7zcZ5yQ2x3KL1msprJZeFlKFEDeeb5V"
+        crossorigin="anonymous"></script>
+    <!-- First Login Tutorial Script -->
+    <script src="./src/first-login-tutorial.js" defer></script>
 
-</div>
+    <!-- Tippy.js and Popper.js for tooltips -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tippy.js@6.3.7/dist/tippy.umd.min.js"
+        integrity="sha384-pjtv4LzKGI/lGxchW/wd/upB/HsGOP/Q2iPYyDU8qo2bp4JLbN34hQkdAArvidZX"
+        crossorigin="anonymous"></script>
 
-<!-- JSファイル -->
-<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js" integrity="sha384-5JqMv4L/Xa0hfvtF06qboNdhvuYXUku9ZrhZh3bSk8VXF0A/RuSLHpLsSV9Zqhl6" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/ja.js" integrity="sha384-mKor8U8jwukUkfxaFPCsxKF9S62PXq4gG7zcZ5yQ2x3KL1msprJZeFlKFEDeeb5V" crossorigin="anonymous"></script>
-<!-- First Login Tutorial Script -->
-<script src="./src/first-login-tutorial.js" defer></script>
-
-<!-- Tippy.js and Popper.js for tooltips -->
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/tippy.js@6.3.7/dist/tippy.umd.min.js" integrity="sha384-pjtv4LzKGI/lGxchW/wd/upB/HsGOP/Q2iPYyDU8qo2bp4JLbN34hQkdAArvidZX" crossorigin="anonymous"></script>
-
-<script type="module" src="src/main.js"></script>
-<script type="module" src="src/testScenarioOverlay.js"></script>
+    <script type="module" src="src/main.js"></script>
+    <script type="module" src="src/testScenarioOverlay.js"></script>
 </body>
+
 </html>
