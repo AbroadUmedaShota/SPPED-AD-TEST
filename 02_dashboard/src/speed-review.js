@@ -1367,12 +1367,9 @@ function populateQuestionSelector(data) {
 
         let iconName = 'analytics';
         let iconClass = 'text-primary';
-        let tooltip = '';
 
         if (!isGraphable) {
             iconClass = 'text-on-surface-variant/60';
-            const reason = getBlankReason(questionDef?.type);
-            tooltip = `この設問は現在グラフ対象外です。理由: ${reason}`;
 
             // タイプに応じたアイコン設定
             const type = questionDef?.type;
@@ -1396,7 +1393,7 @@ function populateQuestionSelector(data) {
         const displayQuestion = `Q${index + 1}. ${question}`;
 
         button.innerHTML = `
-            <div class="flex items-center gap-3 truncate" title="${tooltip}">
+            <div class="flex items-center gap-3 truncate">
                 <span class="material-icons text-sm ${iconClass}">
                     ${iconName}
                 </span>
