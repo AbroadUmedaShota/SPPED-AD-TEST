@@ -1137,7 +1137,7 @@ function showQuestionSelectModal() {
         questions.forEach(question => {
             const button = document.createElement('button');
             const isActive = question === currentIndustryQuestion;
-            
+
             // 設問タイプを確認してグラフ化可能か判定
             const questionDef = currentSurvey?.details?.find(d => (d.question || d.text) === question);
             const isGraphable = questionDef && (questionDef.type === 'single_choice' || questionDef.type === 'multi_choice');
@@ -1357,23 +1357,50 @@ function populateQuestionSelector(data) {
         return;
     }
 
-    questions.forEach(question => {
+    questions.forEach((question, index) => {
         const button = document.createElement('button');
         const isActive = question === currentIndustryQuestion;
-        
+
         // 設問タイプを確認してグラフ化可能か判定
         const questionDef = currentSurvey?.details?.find(d => (d.question || d.text) === question);
         const isGraphable = questionDef && (questionDef.type === 'single_choice' || questionDef.type === 'multi_choice');
 
+        let iconName = 'analytics';
+        let iconClass = 'text-primary';
+        let tooltip = '';
+
+        if (!isGraphable) {
+            iconClass = 'text-on-surface-variant/60';
+            const reason = getBlankReason(questionDef?.type);
+            tooltip = `この設問は現在グラフ対象外です。理由: ${reason}`;
+
+            // タイプに応じたアイコン設定
+            const type = questionDef?.type;
+            if (['date', 'datetime', 'datetime_local', 'time'].includes(type)) {
+                iconName = 'event_note';
+            } else if (['text', 'free_text', 'handwriting', 'explanation'].includes(type)) {
+                iconName = 'notes';
+            } else if (type === 'number') {
+                iconName = 'calculate';
+            } else if (type && type.startsWith('matrix_')) {
+                iconName = 'grid_on';
+            } else {
+                iconName = 'help_outline';
+            }
+        }
+
         button.className = `w-full text-left px-4 py-3 rounded-xl transition-all flex items-center justify-between group ${isActive ? 'bg-primary/10 text-primary font-bold' : 'hover:bg-surface-variant text-on-surface'
             }`;
 
+        // 設問番号を追加 (Q1. 設問文)
+        const displayQuestion = `Q${index + 1}. ${question}`;
+
         button.innerHTML = `
-            <div class="flex items-center gap-3 truncate">
-                <span class="material-icons text-sm ${isGraphable ? 'text-primary' : 'text-on-surface-variant/60'}">
-                    ${isGraphable ? 'analytics' : 'subject'}
+            <div class="flex items-center gap-3 truncate" title="${tooltip}">
+                <span class="material-icons text-sm ${iconClass}">
+                    ${iconName}
                 </span>
-                <span class="truncate pr-4">${question}</span>
+                <span class="truncate pr-4">${displayQuestion}</span>
             </div>
             ${isActive ? '<span class="material-icons text-sm">check_circle</span>' : '<span class="material-icons text-sm opacity-0 group-hover:opacity-40 transition-opacity">chevron_right</span>'}
         `;
@@ -1904,7 +1931,7 @@ function renderTimeSeriesChart(data) {
 
     // 1. Determine bounds
     let startHour, endHour;
-    
+
     const hourIndices = data.map(item => {
         if (!item.answeredAt) return null;
         const d = new Date(item.answeredAt);
