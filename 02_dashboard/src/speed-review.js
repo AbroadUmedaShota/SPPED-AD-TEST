@@ -690,68 +690,10 @@ function handleQuestionSelectClick(newQuestion) {
     if (dynamicHeader) {
         dynamicHeader.textContent = prefix + truncateQuestion(newQuestion);
     }
-    const selectorContainer = document.getElementById('question-selector-container');
-    if (selectorContainer) {
-        const buttons = selectorContainer.querySelectorAll('button');
-        buttons.forEach(button => {
-            // button.title currently doesn't hold the raw question text because of innerHTML structure changes in populateQuestionSelector
-            // We need a more robust way to match buttons. 
-            // However, populateQuestionSelector recreates buttons on open, so 'active' class set here might be overwritten or not needed if modal is closed.
-            // But if this is called from within the modal (which it is), we should try to update it.
-            // Let's rely on the text content or re-render. 
-            // Actually, populateQuestionSelector sets the click handler, so when clicked, it re-renders? No.
-            // We just need to ensure consistency.
-            // NOTE: The previous implementation of populateQuestionSelector used button.innerHTML which includes spans.
-            // button.innerText might contain the 'analytics' text or 'Q1.' text.
-            // Simplest way is relative to the loop order if we can match it, but we don't have index here easily without re-querying.
-            // Since the modal closes immediately after selection, updating the active state strictly is less critical visually 
-            // unless the user re-opens it. But populateQuestionSelector is called again when opening?
-            // Let's check when populateQuestionSelector is called. It is called in initializePage. 
-            // It is NOT called every time the modal opens unless we add that logic.
-            // If it's static, we need to update active state.
-            // But I changed the button content significantly.
-            // The safest is to rely on the fact that we just selected `newQuestion`.
 
-            // For now, let's keep the header update as the primary goal.
-            // The active class update might assume button.title was set? 
-            // In my previous edit to populateQuestionSelector, I didn't set title on the button element itself, only on the inner div.
-            // So `button.title` is likely empty.
-            // I should fix that in populateQuestionSelector if I want to keep this logic, or change this logic.
-            // The user only asked for Qx display in header.
-            // Let's prioritize the header text.
-
-            // Finding the button by text content is risky due to truncation and prefixes.
-            // However, we know `questions` array index corresponds to DOM order if not re-sorted.
-            // `selectorContainer.children` should match `questions`.
-            if (questionIndex >= 0 && selectorContainer.children[questionIndex] === button) {
-                button.classList.add('active');
-                // Update icon style for active state if needed, but the button HTML handles strict rendering.
-                // Actually my CSS for active uses `bg-primary/10`, `text-primary`.
-                // The previous loop was `button.classList.toggle('active', button.title === newQuestion)`.
-                // I will update this loop to use index.
-            } else {
-                button.classList.remove('active');
-            }
-        });
-
-        // Correct loop using index
-        for (let i = 0; i < buttons.length; i++) {
-            buttons[i].classList.toggle('active', i === questionIndex);
-            // Update inner HTML style for active/inactive if needed? 
-            // My populateQuestionSelector handles initial render state. 
-            // If we stay on page, we should toggle classes.
-            // The previous logic for populateQuestionSelector set specific classes based on isActive.
-            // Just toggling .active class might not be enough if I hardcoded classes in HTML string based on isActive.
-            // But let's assume the CSS handles .active overrides or we accept it re-renders on page reload.
-            // Actually, `populateQuestionSelector` is called once in `initializePage`.
-            // We SHOULD re-render the list or manually update classes to match the selected state fully.
-            // Re-calling populateQuestionSelector(allCombinedData) might be safest/easiest to ensure full consistency 
-            // including "check_circle" icon vs "chevron_right".
-        }
-    }
-
-    // Re-render the selector because I changed the innerHTML structure based on isActive (check_circle vs chevron_right)
-    // and just toggling a class won't switch the icon.
+    // 選択状態の更新：
+    // populateQuestionSelectorを再呼び出しすることで、アイコン（check_circle）やスタイルを完全に更新する
+    // これによりDOM構造の不整合やクラスの競合を防ぐ
     populateQuestionSelector(allCombinedData);
 
     applyFilters();
@@ -1446,24 +1388,26 @@ function populateQuestionSelector(data) {
         const questionDef = currentSurvey?.details?.find(d => (d.question || d.text) === question);
         const isGraphable = questionDef && (questionDef.type === 'single_choice' || questionDef.type === 'multi_choice');
 
+        // デフォルト: グラフ化可能（青色・グラフアイコン）
         let iconName = 'analytics';
         let iconClass = 'text-primary';
 
         if (!isGraphable) {
+            // グラフ化不可: グレー・文書アイコン等
+            // ユーザー要望「アイコンで明らかに区別できるように」
+            // グラフ(analytics) vs 文書/テキスト(description) という対比にする
             iconClass = 'text-on-surface-variant/60';
 
-            // タイプに応じたアイコン設定
             const type = questionDef?.type;
             if (['date', 'datetime', 'datetime_local', 'time'].includes(type)) {
-                iconName = 'event_note';
-            } else if (['text', 'free_text', 'handwriting', 'explanation'].includes(type)) {
-                iconName = 'notes';
+                iconName = 'event'; // カレンダー
             } else if (type === 'number') {
-                iconName = 'calculate';
+                iconName = '123'; // 数字
             } else if (type && type.startsWith('matrix_')) {
-                iconName = 'grid_on';
+                iconName = 'grid_on'; // 表
             } else {
-                iconName = 'help_outline';
+                // テキスト、自由記述、その他は「文書」として統一
+                iconName = 'description';
             }
         }
 
