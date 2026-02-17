@@ -205,3 +205,9 @@ h6 {
     transform: scale(1.1);
     transition: transform 0.2s ease;
 }
+
+/* Fix for Hero Section Fallback Background */
+#premium-hero-section {
+    background-color: #0f172a;
+    /* slate-900 fallback */
+}
