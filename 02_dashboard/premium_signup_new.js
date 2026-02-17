@@ -654,7 +654,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Functional: First Month Free Campaign Logic ---
-    const campaignInfoSection = document.getElementById('campaign-info-section');
+    const campaignInfoSection = document.getElementById('integrated-campaign-container');
 
     // Check user status from localStorage (test scenario)
     const storedUserData = localStorage.getItem('simulationUserData');
@@ -684,31 +684,35 @@ document.addEventListener('DOMContentLoaded', () => {
             nextYear = nextYear + 1;
         }
 
+        // New Layout: No outer card, integrated directly
         const messageCampaign = `
-        <div class="bg-white border-2 border-amber-400 rounded-xl p-6 md:p-8 shadow-sm">
                     <div class="text-center mb-8">
-                        <span class="inline-block bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full mb-2">キャンペーン</span>
-                        <h2 class="text-xl md:text-2xl font-bold text-gray-800">
-                            登録した月の利用料が<span class="text-amber-500 mx-1">無料</span>になります
+                        <span class="inline-block bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full mb-3 border border-amber-200">
+                            <span class="flex items-center gap-1">
+                                <span class="material-icons text-xs">campaign</span> キャンペーン適用
+                            </span>
+                        </span>
+                        <h2 class="text-xl font-bold text-slate-900">
+                            登録した月の利用料が<span class="text-amber-500 mx-1 text-2xl drop-shadow-sm">無料</span>になります
                         </h2>
-                        <p class="text-gray-500 text-sm mt-2">
-                            月初めでも、月末でも、その月の末日まで料金はかかりません。
+                        <p class="text-slate-500 text-sm mt-2">
+                             月初めでも、月末でも、その月の末日まで料金はかかりません。
                         </p>
                     </div>
 
                     <!-- Visual Timeline -->
-                    <div class="flex flex-col md:flex-row items-stretch justify-center max-w-2xl mx-auto space-y-2 md:space-y-0 md:space-x-1">
+                    <div class="flex flex-col md:flex-row items-stretch justify-center max-w-2xl mx-auto space-y-3 md:space-y-0 md:space-x-1">
                         <!-- Month 1 (Free) -->
-                        <div class="flex-1 flex flex-col">
-                            <div class="bg-amber-400 text-white text-center py-2 font-bold rounded-t-lg md:rounded-tr-none md:rounded-l-lg relative overflow-hidden">
-                                <span class="relative z-10">${currentMonth}月 (登録月)</span>
+                        <div class="flex-1 flex flex-col shadow-sm rounded-lg overflow-hidden border border-amber-200">
+                            <div class="bg-gradient-to-r from-amber-400 to-amber-500 text-white text-center py-3 font-bold relative">
+                                <span class="relative z-10 drop-shadow-sm">${currentMonth}月 (登録月)</span>
                                 <div class="absolute inset-0 bg-white/20 transform -skew-x-12 translate-x-1/2"></div>
                             </div>
-                            <div class="bg-amber-50 border-x border-b border-amber-200 p-6 flex-1 flex items-center justify-center text-center rounded-b-lg md:rounded-bl-none md:rounded-br-none md:rounded-bl-lg">
+                            <div class="bg-amber-50/50 p-6 flex-1 flex items-center justify-center text-center">
                                 <div>
-                                    <div class="text-amber-600 font-bold text-xl mb-1">¥0</div>
-                                    <div class="text-xs text-amber-700 font-bold bg-amber-200/50 px-2 py-1 rounded">無料期間</div>
-                                    <div class="text-[10px] text-amber-600 mt-1">
+                                    <div class="text-amber-600 font-bold text-3xl mb-1">¥0</div>
+                                    <div class="inline-block text-xs text-amber-800 font-bold bg-amber-100 px-3 py-1 rounded-full mb-1">無料期間</div>
+                                    <div class="text-[10px] text-amber-600/80 mt-1 font-medium">
                                         (登録日 〜 ${currentMonth}/${lastDayOfMonth})
                                     </div>
                                 </div>
@@ -716,20 +720,20 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
 
                         <!-- Arrow (Desktop only) -->
-                        <div class="hidden md:flex items-center justify-center text-gray-300 z-10 -mx-3">
-                            <span class="material-icons text-4xl">arrow_forward</span>
+                        <div class="hidden md:flex items-center justify-center text-amber-300 z-10 -mx-3">
+                            <span class="material-icons text-4xl drop-shadow-sm">arrow_forward</span>
                         </div>
 
                         <!-- Month 2 (Paid) -->
-                        <div class="flex-1 flex flex-col">
-                            <div class="bg-gray-600 text-white text-center py-2 font-bold rounded-t-lg md:rounded-tl-none md:rounded-r-lg">
+                        <div class="flex-1 flex flex-col shadow-sm rounded-lg overflow-hidden border border-slate-200 opacity-90">
+                            <div class="bg-slate-600 text-white text-center py-3 font-bold">
                                 ${nextMonth}月 (翌月)
                             </div>
-                            <div class="bg-gray-50 border-x border-b border-gray-200 p-6 flex-1 flex items-center justify-center text-center rounded-b-lg md:rounded-br-lg">
+                            <div class="bg-white p-6 flex-1 flex items-center justify-center text-center">
                                 <div>
-                                    <div class="text-gray-700 font-bold text-xl mb-1">¥10,000</div>
-                                    <div class="text-xs text-gray-500">通常料金</div>
-                                    <div class="text-[10px] text-gray-400 mt-1">
+                                    <div class="text-slate-700 font-bold text-2xl mb-1">¥10,000</div>
+                                    <div class="text-xs text-slate-400 font-bold border border-slate-200 px-2 py-1 rounded inline-block">通常料金</div>
+                                    <div class="text-[10px] text-slate-400 mt-1">
                                         (1日 〜 末日)
                                     </div>
                                 </div>
@@ -737,13 +741,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>
 
-                    <div class="mt-8 text-center bg-gray-50 p-4 rounded-lg border border-gray-100">
-                        <p class="text-sm font-medium text-gray-700">
-                            現在のご登録なら、<span class="font-bold text-amber-600 text-lg">${currentMonth}月${lastDayOfMonth}日</span>まで無料で全機能をお試しいただけます。<br>
-                            <span class="text-xs text-gray-500 font-normal">※ 無料期間中に解約すれば、料金は一切かかりません。</span>
+                    <div class="mt-8 text-center">
+                        <p class="text-sm font-medium text-slate-600 bg-amber-50/50 border border-amber-100 inline-block px-6 py-3 rounded-full">
+                            現在のご登録なら、<span class="font-bold text-amber-600 border-b-2 border-amber-400">${currentMonth}月${lastDayOfMonth}日</span>まで無料で全機能をお試しいただけます。
                         </p>
                     </div>
-                </div>
         `;
 
         campaignInfoSection.innerHTML = messageCampaign;
