@@ -1856,17 +1856,12 @@ function buildMatrixCharts(question, questionId, answers, isMulti) {
             rowIndex,
             rowId: row.id,
             rowText: row.text,
-            rowText: row.text,
-            data: data, // Array matching columns order
-            labels: columns.map(c => c.text), // Add labels for Pie chart switching
+            data: data,
+            labels: columns.map(c => c.text),
             totalAnswers: answeredCount
         };
     });
 
-    // Build Series for Stacked Bar (Series = Columns)
-    // Transpose data: Series 1 (Column 1) -> [Row1-Val, Row2-Val, ...]
-    // Build Series for Stacked Bar (Series = Columns)
-    // Transpose data: Series 1 (Column 1) -> [Row1-Val, Row2-Val, ...]
     const matrixSeries = columns.map((col, colIndex) => {
         return {
             name: col.text,
@@ -1877,45 +1872,26 @@ function buildMatrixCharts(question, questionId, answers, isMulti) {
     const matrixRowTotals = rowDetails.map(d => d.totalAnswers);
     const totalAll = matrixRowTotals.reduce((a, b) => a + b, 0);
 
-    // Initial state setup for Matrix
-    let initialChartType = 'matrix_stacked_100';
+    let initialChartType = 'bar';
+    let selectorType = 'row';
     let initialData = [];
     let initialLabels = [];
     let initialTotal = 0;
 
-    // New property to determine what the selector switches
-    let selectorType = 'row'; // 'row' or 'column'
-
     if (isMulti) {
-        // MA: Bar Chart (Horizontal) with ROW Selector (Reverted to Row per user feedback)
-        // Rows (Categories) are selectable. Graph shows Columns distribution.
-        initialChartType = 'bar';
-        selectorType = 'row';
-
-        // Initial Data: First Row
-        const firstRow = rowDetails[0];
-        if (firstRow) {
-            initialData = firstRow.data;
-            initialLabels = columns.map(c => c.text); // Y-axis labels are Columns
-            initialTotal = firstRow.totalAnswers;
-        } else {
-            initialData = [];
-            initialLabels = [];
-        }
-
-    } else {
-        // SA: Donut Chart with Row Selector
-        initialChartType = 'pie';
-        selectorType = 'row';
-
         const firstRow = rowDetails[0];
         if (firstRow) {
             initialData = firstRow.data;
             initialLabels = columns.map(c => c.text);
             initialTotal = firstRow.totalAnswers;
-        } else {
-            initialData = [];
-            initialLabels = [];
+        }
+    } else { // SA
+        initialChartType = 'pie';
+        const firstRow = rowDetails[0];
+        if (firstRow) {
+            initialData = firstRow.data;
+            initialLabels = columns.map(c => c.text);
+            initialTotal = firstRow.totalAnswers;
         }
     }
 
@@ -1929,24 +1905,18 @@ function buildMatrixCharts(question, questionId, answers, isMulti) {
         matrixSeries: matrixSeries,
         matrixRowTotals: matrixRowTotals,
         matrixRowDetails: rowDetails,
-        matrixSelectorType: selectorType, // NEW
-
-        // Settings for current view
+        matrixSelectorType: selectorType,
         chartType: initialChartType,
         summaryType: 'matrix_table',
         includeTotalRow: true,
         allowToggle: false,
-
-        // Initial View Data
         data: initialData,
         labels: initialLabels,
         totalAnswers: isMulti ? totalAll : initialTotal,
-
-        // Initialize State for Selector
         matrixSelectedIndex: 0,
         matrixIndex: 1,
-        matrixTotal: selectorType === 'column' ? columns.length : rows.length,
-        matrixRowText: selectorType === 'column' ? (columns[0]?.text || '') : (rows[0]?.text || '')
+        matrixTotal: rows.length,
+        matrixRowText: rows.length > 0 ? rows[0].text : ''
     })];
 }
 

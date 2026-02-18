@@ -23,6 +23,7 @@ let currentSurvey = null;
 let availableDateRange = null;
 let currentSurveyId = '';
 let restoredUiState = null;
+let currentMatrixRowId = 'all';
 const imageUrlResolutionCache = new Map();
 const STORAGE_NAMESPACE = 'speedReview';
 
@@ -37,6 +38,9 @@ let attributeChart = null;  // Dashboard Chart Instance
 const REVIEW_CHART_PRIMARY = '#1a73e8';
 const REVIEW_CHART_FILL = 'rgba(26, 115, 232, 0.1)';
 const REVIEW_CHART_DONUT_PALETTE = COMMON_CHART_DONUT_PALETTE; // リモートの変更を取り込む
+
+// ApexCharts Instance
+let apexAttributeChart = null;
 
 const chartDataLabels = window.ChartDataLabels;
 if (chartDataLabels && window.Chart) {
@@ -358,26 +362,7 @@ async function resolveImageUrl(rawPath, surveyId) {
 }
 
 async function resolveMissingImageUrl(answerId, surveyId, side) {
-    const cacheKey = `${surveyId || ''}::${answerId || ''}::${side || ''}::missing`;
-    if (imageUrlResolutionCache.has(cacheKey)) {
-        return imageUrlResolutionCache.get(cacheKey);
-    }
-
-    // 失敗カウントが閾値を超えていたら、チェックせずに空文字を返す（どうせ見つからない）
-    if (failedImageFetchCount > FAILED_IMAGE_FETCH_THRESHOLD) {
-        imageUrlResolutionCache.set(cacheKey, '');
-        return '';
-    }
-
-    const candidates = buildMissingImageCandidates(answerId, surveyId, side);
-    for (const candidate of candidates) {
-        if (await canFetchAsset(candidate)) {
-            imageUrlResolutionCache.set(cacheKey, candidate);
-            return candidate;
-        }
-    }
-
-    imageUrlResolutionCache.set(cacheKey, '');
+    // パスの推測とfetchを停止し、常に空文字を返すことで404エラーを抑制する
     return '';
 }
 
@@ -687,6 +672,7 @@ function buildMatrixSummary(question, answers) {
 }
 
 function handleQuestionSelectClick(newQuestion) {
+    currentMatrixRowId = 'all'; // 設問が切り替わるたびにマトリクスの行選択をリセット
     currentIndustryQuestion = newQuestion;
     const dynamicHeader = document.getElementById('dynamic-question-header');
 
@@ -1379,7 +1365,8 @@ function populateQuestionSelector(data, targetContainer = null) {
         const isGraphable = questionDef && (
             SINGLE_CHOICE_TYPES.has(questionDef.type) ||
             MULTI_CHOICE_TYPES.has(questionDef.type) ||
-            MATRIX_SINGLE_TYPES.has(questionDef.type)
+            MATRIX_SINGLE_TYPES.has(questionDef.type) ||
+            MATRIX_MULTI_TYPES.has(questionDef.type)
         );
 
         // デフォルト: グラフ化可能（青色・グラフアイコン）
@@ -1737,7 +1724,7 @@ function processDataForTable(survey, answers) {
             };
         }
 
-        if (MATRIX_SINGLE_TYPES.has(question.type)) {
+        if (MATRIX_SINGLE_TYPES.has(question.type) || MATRIX_MULTI_TYPES.has(question.type)) {
             const summary = buildMatrixSummary(question, answers);
             if (summary.rows.length === 0 || summary.columns.length === 0) {
                 return {
@@ -1807,6 +1794,7 @@ function renderGraphDataTable(processedData) {
             return '';
         }
 
+        /*
         if (questionData.blankReason) {
             const reason = escapeHtml(questionData.blankReason);
             return `
@@ -1815,6 +1803,7 @@ function renderGraphDataTable(processedData) {
                 </div>
             `;
         }
+        */
 
         const renderTableBlock = (labels, data, totalVotes, includeTotalRow, totalAnswers, rowKey = null) => {
             const tableRows = labels.map((label, index) => {
@@ -2057,9 +2046,11 @@ function renderTimeSeriesChart(data) {
 }
 
 function renderAttributeChart(data) {
-    const ctx = document.getElementById('attributeChart');
-    if (!ctx) return;
-    const container = ctx.parentElement;
+    const canvas = document.getElementById('attributeChart');
+    const apexContainer = document.getElementById('attributeChartApex');
+    if (!canvas || !apexContainer) return;
+    
+    const container = canvas.parentElement;
 
     const renderEmptyState = (message, icon) => {
         if (attributeChart) {
@@ -2091,145 +2082,91 @@ function renderAttributeChart(data) {
                 });
             }
         }
-        ctx.classList.add('hidden');
+        canvas.classList.add('hidden');
+        apexContainer.classList.add('hidden');
     };
 
     const clearEmptyState = () => {
         if (!container) return;
         container.querySelector('.attribute-empty-state')?.remove();
-        ctx.classList.remove('hidden');
     };
 
-    // Aggregate by currentIndustryQuestion
-    const counts = {};
     const questionDef = currentSurvey?.details?.find(detail => detail.question === currentIndustryQuestion || detail.text === currentIndustryQuestion);
-    if (!questionDef || (!SINGLE_CHOICE_TYPES.has(questionDef.type) && !MULTI_CHOICE_TYPES.has(questionDef.type) && !MATRIX_SINGLE_TYPES.has(questionDef.type))) {
+
+    const controlsContainer = document.getElementById('matrix-controls-container');
+    if (controlsContainer) controlsContainer.innerHTML = '';
+
+    if (!questionDef) {
         renderEmptyState('設問を選択するとここに内訳が表示されます。', 'bar_chart');
         return;
     }
 
-    if (MATRIX_SINGLE_TYPES.has(questionDef.type)) {
-        const summary = buildMatrixSummary(questionDef, data || []);
-        if (summary.rows.length === 0 || summary.columns.length === 0) {
-            renderEmptyState('回答を待っています...', 'hourglass_empty');
-            return;
-        }
+    const isMatrix = MATRIX_SINGLE_TYPES.has(questionDef.type) || MATRIX_MULTI_TYPES.has(questionDef.type);
 
-        const rowLabels = summary.rows.map(row => row.text);
-        const columnLabels = summary.columns.map(col => col.text);
-        const rowTotals = summary.rowTotals;
-        const datasets = columnLabels.map((label, columnIndex) => {
-            const countsByRow = summary.counts.map(rowCounts => rowCounts[label] || 0);
-            const percentByRow = countsByRow.map((count, rowIndex) => {
-                const total = rowTotals[rowIndex] || 0;
-                return total > 0 ? (count / total) * 100 : 0;
+    if (isMatrix) {
+        if (controlsContainer && questionDef.rows && questionDef.rows.length > 1) {
+            const select = document.createElement('select');
+            select.className = 'py-1 px-2 pr-8 text-xs rounded-md border border-outline-variant bg-surface-bright text-on-surface-variant appearance-none';
+            select.setAttribute('aria-label', 'マトリクス表示項目');
+
+            if (MATRIX_MULTI_TYPES.has(questionDef.type)) {
+                const allOption = new Option('全行集計', 'all');
+                select.add(allOption);
+            }
+
+            questionDef.rows.forEach(row => {
+                const option = new Option(row.text, row.id);
+                select.add(option);
             });
-            return {
-                label,
-                data: percentByRow,
-                _rawCounts: countsByRow,
-                _rowTotals: rowTotals
-            };
-        });
+            
+            // If the current selection is not in the options (e.g. 'all' for SA), default to the first option.
+            if (!select.querySelector(`option[value="${currentMatrixRowId}"]`)) {
+                 currentMatrixRowId = select.options[0].value;
+            }
+            select.value = currentMatrixRowId;
 
-        if (datasets.every(dataset => dataset.data.every(value => value === 0))) {
-            renderEmptyState('回答を待っています...', 'hourglass_empty');
-            return;
+            select.addEventListener('change', (e) => {
+                currentMatrixRowId = e.target.value;
+                renderAttributeChart(data); // Re-render with new selection
+            });
+
+            controlsContainer.appendChild(select);
         }
 
         clearEmptyState();
+        canvas.style.display = 'none';
+        apexContainer.style.display = 'block';
+        apexContainer.classList.remove('hidden');
+        canvas.classList.add('hidden');
+
         if (attributeChart) {
             attributeChart.destroy();
+            attributeChart = null;
         }
-
-        const chartDatasets = datasets.map((dataset, index) => ({
-            label: dataset.label,
-            data: dataset.data,
-            backgroundColor: getChartColor(index),
-            borderColor: '#ffffff',
-            borderWidth: 2,
-            _rawCounts: dataset._rawCounts,
-            _rowTotals: dataset._rowTotals
-        }));
-
-        attributeChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: rowLabels,
-                datasets: chartDatasets
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                indexAxis: 'y',
-                scales: {
-                    x: {
-                        stacked: true,
-                        max: 100,
-                        ticks: {
-                            callback: value => `${value}%`
-                        }
-                    },
-                    y: {
-                        stacked: true
-                    }
-                },
-                plugins: {
-                    legend: {
-                        position: 'top',
-                        labels: { boxWidth: 12, font: { size: 11 }, usePointStyle: true },
-                        onClick: (event, legendItem, legend) => {
-                            const chart = legend.chart;
-                            const nextIndex = chart._legendFocusIndex === legendItem.datasetIndex ? null : legendItem.datasetIndex;
-                            applyLegendFocus(chart, nextIndex, 'dataset');
-                        },
-                        onHover: (event, legendItem, legend) => {
-                            updateLegendFade(legend.chart, legendItem.datasetIndex, 'dataset');
-                        },
-                        onLeave: (event, legendItem, legend) => {
-                            updateLegendFade(legend.chart, null, 'dataset');
-                        }
-                    },
-                    datalabels: {
-                        color: '#111827',
-                        font: { weight: 'bold', size: 10 },
-                        anchor: 'end',
-                        align: 'right',
-                        formatter: value => (value > 0 ? `${value.toFixed(1)}%` : ''),
-                        textStrokeColor: '#ffffff',
-                        textStrokeWidth: 3
-                    },
-                    tooltip: {
-                        callbacks: {
-                            title: () => '',
-                            label: context => {
-                                const rowLabel = context.label || '';
-                                const optionLabel = context.dataset.label || '';
-                                const countsByRow = context.dataset._rawCounts || [];
-                                const totals = context.dataset._rowTotals || [];
-                                const count = countsByRow[context.dataIndex] || 0;
-                                const total = totals[context.dataIndex] || 0;
-                                const percent = total > 0 ? ((count / total) * 100).toFixed(1) : '0.0';
-                                return `${rowLabel} > ${optionLabel}: ${count}件 (${percent}%)`;
-                            }
-                        }
-                    }
-                },
-                onHover: (event, elements, chart) => {
-                    if (elements && elements.length > 0) {
-                        const { datasetIndex, index } = elements[0];
-                        const rowLabel = chart.data.labels?.[index];
-                        const columnLabel = chart.data.datasets?.[datasetIndex]?.label;
-                        highlightMatrixTableRow(rowLabel, columnLabel);
-                    } else {
-                        clearMatrixTableHighlight();
-                    }
-                }
-            }
-        });
+        if (typeof renderMatrixChartApex === 'function') {
+            renderMatrixChartApex('attributeChartApex', questionDef, data || [], currentMatrixRowId, COMMON_CHART_DONUT_PALETTE);
+        } else {
+            console.error('renderMatrixChartApex function not found.');
+            apexContainer.innerHTML = '<p class="text-center text-on-surface-variant">マトリクスグラフの描画関数が見つかりません。</p>';
+        }
         return;
     }
 
+    const isChartable = SINGLE_CHOICE_TYPES.has(questionDef.type) || MULTI_CHOICE_TYPES.has(questionDef.type);
+
+    if (!isChartable) {
+        renderEmptyState(getBlankReason(questionDef.type) || 'この設問タイプはグラフ表示に対応していません。', 'info');
+        return;
+    }
+
+    // --- ここから先は Chart.js のロジック ---
+    clearEmptyState();
+    canvas.style.display = 'block';
+    apexContainer.style.display = 'none';
+    apexContainer.classList.add('hidden');
+    canvas.classList.remove('hidden');
+
+    const counts = {};
     (data || []).forEach(item => {
         const detail = findAnswerDetail(item, questionDef);
         let answer = detail?.answer;
@@ -2244,15 +2181,13 @@ function renderAttributeChart(data) {
             counts[label] = (counts[label] || 0) + 1;
         }
     });
-
-    // Sort by count desc
+    
     const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
     if (sorted.length === 0) {
         renderEmptyState('回答を待っています...', 'hourglass_empty');
         return;
     }
 
-    clearEmptyState();
     const labels = sorted.map(s => s[0]);
     const values = sorted.map(s => s[1]);
 
@@ -2260,7 +2195,7 @@ function renderAttributeChart(data) {
         attributeChart.destroy();
     }
 
-    attributeChart = new Chart(ctx, {
+    attributeChart = new Chart(canvas, {
         type: 'doughnut',
         data: {
             labels: labels,

@@ -8,6 +8,7 @@
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="service-top-style.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -250,9 +251,13 @@
                             <div class="flex flex-col md:flex-row gap-4 h-full">
                                 <!-- Attribute Chart -->
                                 <div class="flex-1 w-full md:w-1/2 flex flex-col">
-                                    <h3 class="text-sm font-medium mb-4 text-on-surface-variant">回答内容の内訳</h3>
+                                    <div class="flex justify-between items-center mb-4">
+                                        <h3 class="text-sm font-medium text-on-surface-variant">回答内容の内訳</h3>
+                                        <div id="matrix-controls-container"></div>
+                                    </div>
                                     <div class="relative min-h-[180px] w-full flex justify-center flex-1">
                                         <canvas id="attributeChart"></canvas>
+                                        <div id="attributeChartApex" class="w-full"></div>
                                     </div>
                                 </div>
                                 <!-- Data Table -->
@@ -447,6 +452,144 @@
     <script type="module" src="src/main.js"></script>
     <script type="module" src="src/speed-review.js?v=3"></script>
     <script type="module" src="src/testScenarioOverlay.js"></script>
+    <script>
+      function renderMatrixChartApex(canvasId, question, questionAnswers, selectedRowId, colorPalette) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return;
+        canvas.innerHTML = ''; // Clear previous chart
+
+        if (question.type === 'matrix_sa') {
+            const targetRowId = selectedRowId || (question.rows.length > 0 ? question.rows[0].id : null);
+            if (!targetRowId) return;
+
+            const optionsData = question.options;
+            const counts = {};
+            optionsData.forEach(opt => counts[opt.value] = 0);
+            let rowTotal = 0;
+
+            questionAnswers.forEach(resp => {
+                if (!resp || !resp.details) return;
+                const answerDetail = resp.details.find(d => d.question === question.text);
+                if (!answerDetail || !answerDetail.answer) return;
+
+                const answerForQuestion = answerDetail.answer;
+                const answerForRow = answerForQuestion[targetRowId];
+
+                if (answerForRow) {
+                    if (counts.hasOwnProperty(answerForRow)) {
+                        counts[answerForRow]++;
+                    }
+                    rowTotal++;
+                }
+            });
+
+            const chartData = optionsData.map(opt => counts[opt.value]);
+            const chartLabels = optionsData.map(opt => opt.text);
+            
+            const chartOptions = {
+                series: chartData,
+                labels: chartLabels,
+                chart: {
+                    type: 'donut',
+                    height: 250,
+                },
+                plotOptions: {
+                    pie: {
+                        donut: {
+                            labels: {
+                                show: true,
+                                total: {
+                                    show: true,
+                                    label: '回答数',
+                                    formatter: () => rowTotal
+                                }
+                            }
+                        }
+                    }
+                },
+                legend: {
+                    position: 'right',
+                },
+                tooltip: {
+                    y: {
+                        formatter: (val) => val + "件"
+                    }
+                },
+                colors: colorPalette
+            };
+            const chart = new ApexCharts(canvas, chartOptions);
+            chart.render();
+
+        } else if (question.type === 'matrix_ma') {
+            const optionsData = question.options;
+            const counts = {};
+            optionsData.forEach(opt => counts[opt.value] = 0);
+
+            questionAnswers.forEach(resp => {
+                if (!resp || !resp.details) return;
+                const answerDetail = resp.details.find(d => d.question === question.text);
+                if (!answerDetail || !answerDetail.answer) return;
+
+                const answer = answerDetail.answer;
+                if (!answer) return;
+                
+                let targetAnswer = answer;
+                // Filter by selected row if not 'all'
+                if (selectedRowId && selectedRowId !== 'all') {
+                    if (answer.hasOwnProperty(selectedRowId)) {
+                        targetAnswer = { [selectedRowId]: answer[selectedRowId] };
+                    } else {
+                        targetAnswer = {};
+                    }
+                }
+
+                Object.values(targetAnswer).forEach(selectedOptionsArray => {
+                    if (Array.isArray(selectedOptionsArray)) {
+                        selectedOptionsArray.forEach(optValue => {
+                            if (counts.hasOwnProperty(optValue)) {
+                                counts[optValue]++;
+                            }
+                        });
+                    }
+                });
+            });
+
+            const chartOptions = {
+                series: [{
+                    name: '回答数',
+                    data: optionsData.map(opt => counts[opt.value])
+                }],
+                chart: {
+                    type: 'bar',
+                    height: 350
+                },
+                colors: colorPalette,
+                plotOptions: {
+                    bar: {
+                        horizontal: true,
+                        distributed: true,
+                        borderRadius: 4,
+                    }
+                },
+                legend: {
+                    show: false
+                },
+                dataLabels: {
+                    enabled: true,
+                    formatter: (val) => val + "件"
+                },
+                xaxis: {
+                    categories: optionsData.map(o => o.text),
+                },
+                title: {
+                    text: selectedRowId === 'all' ? '選択肢ごとの合計回答数' : undefined
+                }
+            };
+            const chart = new ApexCharts(canvas, chartOptions);
+            chart.render();
+        }
+    }
+    </script>
 </body>
 
 </html>
