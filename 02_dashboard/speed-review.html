@@ -324,10 +324,11 @@
                                         <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[29%] min-w-[180px]"
                                             aria-sort="none">
                                             <button type="button"
-                                                class="sortable-header flex w-full items-center gap-1 text-left"
+                                                class="sortable-header flex w-full items-center gap-1 overflow-hidden text-left"
                                                 data-sort-key="dynamicQuestion">
-                                                <span id="dynamic-question-header">設問回答</span>
-                                                <span class="material-icons sort-icon opacity-40">unfold_more</span>
+                                                <span id="dynamic-question-header"
+                                                    class="min-w-0 flex-1 truncate">設問回答</span>
+                                                <span class="material-icons sort-icon opacity-40 shrink-0">unfold_more</span>
                                             </button>
                                         </th>
                                     </tr>
