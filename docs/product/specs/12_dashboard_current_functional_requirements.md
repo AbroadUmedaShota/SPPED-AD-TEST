@@ -1,95 +1,96 @@
-# Dashboard Functional Baseline (Current Implementation)
+# ダッシュボード機能ベースライン（現行実装）
 
-## Scope
-- Captures the behaviours currently implemented under `02_dashboard` as of 2025-10-20.
-- Focuses on features reachable from `index.html`, `surveyCreation.html`, `speed-review.html`, and related dashboards that rely on static datasets.
-- Login, admin, and other entry points are out of scope unless reused by the dashboard shell.
+## 対象範囲
+- 本資料は、2025-10-20 時点の `02_dashboard` 配下に実装済みの挙動を整理したものです。
+- 対象は `index.html`、`surveyCreation.html`、`speed-review.html` と、静的データセットを利用する関連ダッシュボード機能です。
+- ログイン画面、管理画面、その他の入口は、ダッシュボード共通シェルを再利用する場合を除き対象外です。
 
-## Data Sources and Path Resolution
-- `02_dashboard/src/utils.js` exposes `resolveDashboardDataPath` and `resolveDemoDataPath` to translate relative requests into `./data/...` および `./docs/examples/demo_...`（必要に応じて `../` を積み上げる相対パス）。返却値はいずれも `.` で始まり、HTML 配信元に依存せず同階層・下位階層からデータが解決できる。
-- Primary datasets include `data/core/surveys.json` (table view、詳細モーダル、作成画面の初期化を含む単一ソース), `data/core/invoices.json` (billing), and `data/core/groups.json` (sidebar context). デモ用データは `docs/examples/demo_*` に移設し、フォールバックを撤廃。
-- Sample responses and business-card payloads live under `docs/examples/demo_answers`, `docs/examples/demo_business-cards`, and `data/responses`; CSV paths are also supported by `speedReviewService`.
-- Write operations update in-memory arrays or `localStorage`; no server persistence is wired up in this codebase.
+## データソースとパス解決
+- `02_dashboard/src/utils.js` の `resolveDashboardDataPath` / `resolveDemoDataPath` は、相対リクエストを `./data/...` および `./docs/examples/demo_...` へ変換します（必要に応じて `../` を積み上げ）。返却値は常に `.` 始まりで、配信元 HTML の階層に依存せず解決可能です。
+- 主要データセットは `data/core/surveys.json`（一覧、詳細モーダル、作成画面の初期化の単一ソース）、`data/core/invoices.json`（請求）、`data/core/groups.json`（サイドバー文脈）です。デモデータは `docs/examples/demo_*` に配置し、ページによって `data/responses/*` / `data/surveys/enquete/*` フォールバックを併用します。
+- 回答・名刺データは `docs/examples/demo_answers`、`docs/examples/demo_business-cards`、`data/responses` に配置されています。CSV パスは `speedReviewService` でも対応します。
+- 書き込み系はメモリ配列または `localStorage` のみを更新し、サーバー永続化は未接続です。
 
-## Shell Navigation and Common UI
-- `02_dashboard/src/main.js` detects the active page via `document.body.dataset.pageId`, initialises page-specific modules, reloads the survey table on return visits to the index, and injects tutorial resume banners from `localStorage`.
-- Partial fragments under `02_dashboard/common/` are fetched through `loadCommonHtml`, which also rewrites relative asset paths.
-- Global widgets (sidebar, theme toggle, breadcrumbs, QR modal) are bootstrapped centrally; `showToast` and clipboard helpers are shared via `utils.js`.
-- `sidebarHandler.js` fetches groups, persists the selected group (`dashboard.selectedGroupId`), toggles the mobile drawer with scroll locking, and binds navigation items (including the account modal and logout placeholder).
+## シェル遷移と共通UI
+- `02_dashboard/src/main.js` は `document.body.dataset.pageId` でページ判定し、ページ別初期化、index 復帰時の一覧再読込、`localStorage` のチュートリアル再開バナー表示を行います。
+- `02_dashboard/common/` の共通断片は `loadCommonHtml` で取得され、相対アセットパスも同時に補正されます。
+- サイドバー、テーマ切替、パンくず、QR モーダル等のグローバルウィジェットは中央初期化されます。`showToast` とクリップボード補助は `utils.js` に共通化されています。
+- `sidebarHandler.js` はグループ取得、選択グループ永続化（`dashboard.selectedGroupId`）、モバイルドロワー制御、メニュー遷移（アカウントモーダル、ログアウトプレースホルダー含む）を担当します。
 
-## Survey List (`index.html`, `tableManager.js`)
-- Fetches surveys from `data/core/surveys.json`（bizcardSettingsのdataConversionPlan/bizcardRequestなどをトップレベルへ補完）、filters out entries mapped to `USER_STATUSES.DELETED`, and caches the result for reuse.
-- Provides keyword search, status dropdown (derived in `statusService.js`), date range filters (flatpickr), items-per-page selection, and group scoping from the sidebar; language changes trigger re-evaluation.
-- Table headers support ascending/descending sort with icon feedback, while pagination renders ellipsis buttons and keeps the current page within bounds.
-- Row actions include duplication (generates a new ID based on user and fiscal year), opening Speed Review, conditional downloads (disabled until lifecycle permits), launching the survey editor, copying the survey URL, and opening the detail modal.
-- `surveyDetailsModal.js` surfaces lifecycle metadata, quick links to Bizcard/thank-you/Speed Review screens, and download eligibility computed by `deriveSurveyLifecycleMeta`.
-- `downloadOptionsModal.js` lets operators choose export artefacts (answers, images, business cards) and, when needed, define constrained custom periods.
+## アンケート一覧（`index.html`, `tableManager.js`）
+- `data/core/surveys.json` から取得（`bizcardSettings` の `dataConversionPlan` / `bizcardRequest` などをトップレベル補完）し、`USER_STATUSES.DELETED` 相当を除外してキャッシュします。
+- キーワード検索、ステータス絞り込み（`statusService.js` 由来）、日付レンジ（flatpickr）、表示件数、サイドバー連動グループ絞り込みに対応し、言語切替時は再評価されます。
+- テーブルヘッダーは昇降順ソートとアイコンフィードバックに対応し、ページネーションは省略記号付きで境界を保持します。
+- 行アクションは複製（ユーザーID＋年度採番）、SPEEDレビュー遷移、条件付きダウンロード、編集画面起動、URLコピー、詳細モーダル起動を提供します。
+- `surveyDetailsModal.js` はライフサイクルメタデータ、Bizcard/サンクス/SPEEDレビュー導線、`deriveSurveyLifecycleMeta` に基づくダウンロード可否を表示します。
+- `downloadOptionsModal.js` は出力種別（回答・画像・名刺）選択と、必要時のカスタム期間設定に対応します。
 
-## Survey Authoring (`surveyCreation.html`, `surveyCreation.js`, `ui/surveyRenderer.js`)
-- Initialises from `fetchSurveyData` and optionally `loadSurveyDataFromLocalStorage`; unsaved changes trigger confirmation across in-page links, history navigation, and browser unload.
-- Multi-language authoring supports Japanese, English, Traditional/Simplified Chinese, and Vietnamese; up to three languages stay active while placeholders mirror the base language.
-- Question groups can be created, duplicated, reordered (Sortable integration), or removed; each question type supports duplication, deletion, and change of type with context-aware controls.
-- Supported types span free text, single choice, multiple choice, dropdown, numeric, matrix (single/multi), date/time, handwriting canvas, and explanation cards; metadata editors expose options, matrix rows/columns, numeric ranges, datetime limits, handwriting canvas size, and display toggles.
-- Outline sidebar renders an overview with jump links, QR modal hooks, and tutorial entry points (`tutorial.js`, `surveyCreationTutorial.js`).
-- Links to Bizcard, thank-you email, and thank-you screen settings carry the current survey ID; saving currently writes to `localStorage` only.
+## アンケート作成（`surveyCreation.html`, `surveyCreation.js`, `ui/surveyRenderer.js`）
+- `fetchSurveyData` と任意の `loadSurveyDataFromLocalStorage` で初期化し、未保存変更時はページ内リンク・履歴遷移・ブラウザ離脱で確認を出します。
+- 作成UIは日本語表示を基本としつつ、日本語・英語・中国語（繁体/簡体）・ベトナム語を扱う多言語作成に対応します。最大3言語を有効化可能です。
+- 設問グループは作成・複製・並べ替え（Sortable）・削除に対応し、各設問タイプは複製・削除・型変更をサポートします。
+- 対応設問は自由記述、単一選択、複数選択、ドロップダウン、数値、マトリクス（単一/複数）、日時、手書き、説明です。メタデータ編集で選択肢、行列、数値範囲、日時制約、手書きサイズ、表示制御を扱います。
+- アウトラインサイドバーはジャンプリンク、QRモーダル、チュートリアル導線（`tutorial.js`, `surveyCreationTutorial.js`）を提供します。
+- Bizcard、サンクスメール、サンクス画面設定へのリンクは `surveyId` を引き継ぎ、保存は現状 `localStorage` のみです。
 
-## Analytics and Review Tools
-### Speed Review (`speed-review.html`, `speed-review.js`)
-- `speedReviewService` parses CSV assets, merges answer rows with business-card data, and enriches them using the survey definition.
-- UI exposes search, industry question selector, context-dependent answer filter, date picker, and pagination (25 rows per page).
-- Detail modal supports view/edit modes, adapting controls for single-choice, multi-choice, and free-text questions; edits are applied to in-memory state and persisted only for the session.
+## 分析・レビュー機能
+### SPEEDレビュー（`speed-review.html`, `speed-review.js`）
+- `speedReviewService` は CSV を解析し、回答行と名刺データを結合し、アンケート定義で補完します。
+- UI は検索、表示設問選択、設問依存フィルター、日付フィルター、ページネーション（初期 25 件）を提供します。
+- 詳細モーダルは閲覧/編集モードを持ち、単一選択・複数選択・自由記述に応じた入力UIを出し分けます。編集はメモリ上のみ反映され、セッション内に限定されます。
 
-### Graph Page (`graph-page.html`, `graph-page.js`)
-- Loads survey definitions and answers from paths resolved via `resolveDashboardDataPath`（例: `./docs/examples/demo_surveys`, `./docs/examples/demo_answers`）。
-- Optional date range filtering limits the dataset before aggregation.
-- Produces chart-ready data for single and multi-choice questions while ensuring that predefined options with zero responses still appear in the output.
+### グラフ分析（`graph-page.html`, `graph-page.js`）
+- アンケート定義と回答を `resolveDemoDataPath` 経由で読み込みます（例: `./docs/examples/demo_surveys`, `./docs/examples/demo_answers`）。
+- 日付範囲フィルターで集計対象を絞り込めます。
+- 単一選択/複数選択をグラフ用データへ変換し、回答ゼロの既定選択肢も表示対象に含めます。
+- Excel 出力は設問ごとに `Q1`, `Q2`, ...（除外系は `Ex_番号`）のシートを生成し、`html2canvas`（`scale: 2`）でグラフを埋め込みます。進捗は非ブロッキングのフローティング表示で示し、実行中は `beforeunload` ガードを有効化します。
 
-### Survey Details and Downloads
-- `surveyDetailsModal.js` aggregates lifecycle metadata from `statusService` (download deadlines, conversion completion, bizcard requirements) and exposes direct navigation to related workflows.
-- `statusService.js` normalises raw status strings into user-facing states (`PRE_PERIOD`, `IN_PERIOD`, `POST_PERIOD`, `DATA_PROCESSING`, `DATA_READY`, `DOWNLOAD_CLOSED`), associates badge styling, and provides sort/filter helpers for the table.
+### アンケート詳細とダウンロード
+- `surveyDetailsModal.js` は `statusService` のライフサイクル情報（ダウンロード期限、データ化完了、名刺要件）を集約し、関連画面への導線を提供します。
+- `statusService.js` は生ステータスを `PRE_PERIOD`, `IN_PERIOD`, `POST_PERIOD`, `DATA_PROCESSING`, `DATA_READY`, `DOWNLOAD_CLOSED` へ正規化し、バッジ表示と一覧向けソート/フィルター補助を提供します。
 
-## Business Card Conversion (`bizcardSettings.html`, `bizcardSettings.js`)
-- Loads survey context and stored settings from `data/core/surveys.json`; defaults enable conversion with a 100-card request.
-- Plan and premium option catalogues come from `services/bizcardPlans.js`; UI updates dependent controls and memo sections accordingly.
-- Coupon validation uses a mocked dictionary; applying a coupon influences estimation and completion timing.
-- `calculateEstimate` returns amount, premium add-ons, minimum charge, and completion dates (survey end plus turnaround or coupon boost); summary cards reflect the computed values.
-- Saving relies on a mocked `saveBizcardSettings` promise; no back-end API is called.
+## 名刺データ化設定（`bizcardSettings.html`, `bizcardSettings.js`）
+- `data/core/surveys.json` から対象アンケート文脈と保存設定を読み込み、初期値はデータ化ON・100枚要求です。
+- プラン/オプション定義は `services/bizcardPlans.js` 由来で、UIは依存項目とメモ表示を連動更新します。
+- クーポン検証はモック辞書方式で、適用結果が見積・完了予定日に反映されます。
+- `calculateEstimate` は金額、オプション、最低料金、完了日（会期終了＋納期補正/クーポン短縮）を返し、サマリーカードへ反映します。
+- 保存はモック `saveBizcardSettings` Promise のみで、API 呼び出しはありません。
 
-## Thank-you Messaging
-### Email (`thankYouEmailSettings.html`, `thankYouEmailSettings.js`)
-- `getInitialData` fetches survey metadata and previously saved settings from `data/core/surveys.json`, supplementing mock templates and merge variables.
-- New configurations default to automatic sending; UI toggles enable/disable sections, update previews, and insert merge variables via `insertTextAtCursor`.
-- Save and send actions expose loading states and call mocked service functions (`saveThankYouEmailSettings`, `sendThankYouEmails`).
+## サンクスメッセージ
+### メール（`thankYouEmailSettings.html`, `thankYouEmailSettings.js`）
+- `getInitialData` は `data/core/surveys.json` からアンケート情報と既存設定を読み込み、モックテンプレートと差し込み変数を補います。
+- 新規設定は自動送信ONを初期値とし、UIは有効/無効切替、プレビュー更新、`insertTextAtCursor` による変数挿入に対応します。
+- 保存/送信はローディング状態を持ち、`saveThankYouEmailSettings` / `sendThankYouEmails`（モック）を呼びます。
 
-### Screen (`thankYouScreenSettings.html`, `thankYouScreenSettings.js`)
-- Prefills survey title and thank-you message, enforces a 500-character limit, and offers a toggle for allowing continuous answers.
-- Persists per-survey settings in `localStorage` (`thankYouScreenSettings_{id}`) and compares against the baseline to determine save and confirmation behaviour.
-- Integrates `showConfirmationModal` for destructive actions and adapts headings based on the active language.
+### 画面（`thankYouScreenSettings.html`, `thankYouScreenSettings.js`）
+- アンケートタイトルとサンクスメッセージを初期表示し、500文字制限と連続回答許可トグルを提供します。
+- 設定は `localStorage`（`thankYouScreenSettings_{id}`）へ保存し、基準値との差分で保存可否/確認挙動を制御します。
+- 破壊的操作は `showConfirmationModal` を利用し、見出し等はアクティブ言語に追随します。
 
-## Group Administration (`group-edit.html`, `groupEdit.js`)
-- Pulls group metadata via `groupService.js` (static JSON) and exposes toggles between creator billing and group billing views.
-- Billing info has view/edit modes with inline validation and change tracking separate from overall form dirtiness.
-- Member list renders cards with avatars, role dropdowns, status badges, delete buttons, and drag handles powered by Sortable.js; quick-sort buttons adjust role/status ordering with stateful indicators.
-- Confirmation modals guard deletion and navigation when unsaved changes exist; create/update/delete operations update only the in-memory `groups` cache.
+## グループ管理（`group-edit.html`, `groupEdit.js`）
+- `groupService.js`（静的JSON）からグループ情報を取得し、作成者請求/グループ請求の表示切替に対応します。
+- 請求情報は閲覧/編集モードとインラインバリデーションを備え、フォーム全体とは別に変更追跡します。
+- メンバー一覧はアバター、ロール選択、ステータスバッジ、削除、ドラッグハンドル（Sortable）を表示し、クイックソートで並び替え可能です。
+- 未保存時の遷移/削除は確認モーダルで保護し、CRUDはメモリ上の `groups` キャッシュ更新に留まります。
 
-## Billing (`invoiceList.html`, `invoiceDetail.html`)
-- Invoice list fetches `data/core/invoices.json`, filters by status, and renders cards with plan badges, billing period labels, and summary metadata; empty states surface contextual reload actions.
-- Detail view displays invoice metadata, amount breakdown, banking instructions, and status badge, and exposes XLSX downloads (static sample) plus a print view.
-- Status-driven logic disables print or download when the invoice is cancelled and ensures total and tax formatting through `Intl.NumberFormat`.
+## 請求（`invoiceList.html`, `invoiceDetail.html`）
+- 一覧は `data/core/invoices.json` を取得し、ステータス絞り込みとカード表示（プランバッジ、請求期間、要約情報）を行います。空状態には再読込導線を表示します。
+- 詳細は請求メタ情報、金額内訳、振込先、ステータスを表示し、XLSX（サンプル）ダウンロードと印刷導線を提供します。
+- ステータスに応じて印刷/ダウンロード可否を制御し、金額表示は `Intl.NumberFormat` を利用します。
 
-## Account and Security
-- Account info modal is lazy-loaded by `modalHandler.js`, populated via `accountInfoModal.js`, and reuses clipboard helpers for field copies.
-- Password change (`password_change.js`) implements a three-step wizard: mock validation of the current password, strength feedback with dynamic criteria, and completion messaging; visibility toggles and cancel confirmations are included.
-- Reset password (`reset-password.js`) delivers a strength meter powered by `zxcvbn`, visibility toggles, and client-side validation before displaying a success state.
+## アカウント・セキュリティ
+- アカウント情報モーダルは `modalHandler.js` により遅延読込し、`accountInfoModal.js` で描画、コピー操作は共通クリップボード補助を再利用します。
+- パスワード変更（`password_change.js`）は3ステップ（現パス検証モック、強度評価、完了表示）で、表示切替とキャンセル確認を備えます。
+- パスワードリセット（`reset-password.js`）は `zxcvbn` による強度メーター、表示切替、クライアント側バリデーション後の完了表示に対応します。
 
-## Shared Utilities and Infrastructure
-- `modalHandler.js` lazy-loads modal HTML, tracks scroll locking, registers close behaviours, and wires feature-specific callbacks (account info, survey details, group management, QR code, review detail).
-- `utils.js` centralises scroll locking, toast notifications, clipboard copy (with fallbacks), static file downloads, partial HTML loading, loading/message overlays, and a generic `debounce`.
-- `sidebarHandler.js` coordinates group selection with `tableManager.setGroupFilter`, manages responsive behaviour, and suppresses background scroll while overlays are open.
-- UI widgets such as date pickers, floating action buttons, theme toggles, and tutorial helpers live under `02_dashboard/src/lib` and `02_dashboard/src/ui` and are consumed by the screens above.
+## 共通ユーティリティ・基盤
+- `modalHandler.js` はモーダルHTML遅延読込、スクロールロック、クローズ挙動、機能別コールバック（アカウント/詳細/グループ/QR/レビュー詳細）を統合管理します。
+- `utils.js` はスクロールロック、トースト、クリップボードコピー（フォールバック含む）、静的ファイルDL、共通HTML読込、ローディング/メッセージ表示、`debounce` を提供します。
+- `sidebarHandler.js` は `tableManager.setGroupFilter` 連携、レスポンシブ制御、オーバーレイ表示中の背景スクロール抑止を担当します。
+- 日付ピッカー、FAB、テーマ切替、チュートリアル補助等のUI部品は `02_dashboard/src/lib` と `02_dashboard/src/ui` に集約されています。
 
-## Mocked or Missing Back-end Integration
-- Survey duplication, thank-you email save/send, bizcard settings save, coupon validation, group CRUD, password validation, and Speed Review edits operate entirely on client-side state.
-- Reloading the page discards changes because no persistence layer is implemented beyond `localStorage`.
-- CSV parsing expects static assets; file upload or approval workflows are not present.
-- Email delivery, download generation beyond bundled samples, and lifecycle status updates are simulated via toasts and console logging without server communication.
+## モック実装・未連携項目
+- アンケート複製、サンクスメール保存/送信、名刺設定保存、クーポン検証、グループCRUD、パスワード検証、SPEEDレビュー編集はクライアント側モック実装です。
+- ページ再読込で `localStorage` 以外の変更は失われます。
+- CSV解析は静的アセット前提で、ファイルアップロードや承認ワークフローは未実装です。
+- メール送信、サンプル以外のダウンロード生成、ライフサイクル更新はトースト/ログによる疑似挙動です。
