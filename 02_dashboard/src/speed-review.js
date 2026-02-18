@@ -60,6 +60,7 @@ const BLANK_TYPES = new Set([
     'datetime_local',
     'time',
     'handwriting',
+    'image',
     'explanation',
     ...MATRIX_MULTI_TYPES
 ]);
@@ -464,6 +465,8 @@ function getBlankReason(type) {
             return '日付・時刻入力のため';
         case 'handwriting':
             return '手書き入力のため';
+        case 'image':
+            return '画像入力のため';
         case 'explanation':
             return '説明カードのため';
         case 'matrix_sa':
@@ -669,6 +672,241 @@ function buildMatrixSummary(question, answers) {
         rowTotals,
         rowAnswered
     };
+}
+
+function isBlankAnswerValue(value) {
+    if (value === undefined || value === null) return true;
+    if (typeof value === 'string') return value.trim() === '';
+    if (Array.isArray(value)) return value.length === 0 || value.every(item => isBlankAnswerValue(item));
+    if (typeof value === 'object') return Object.keys(value).length === 0;
+    return false;
+}
+
+function flattenAnswerValue(value, result = []) {
+    if (value === undefined || value === null) return result;
+    if (Array.isArray(value)) {
+        value.forEach(item => flattenAnswerValue(item, result));
+        return result;
+    }
+    if (typeof value === 'object') {
+        const preferred = value.value ?? value.text ?? value.label ?? value.id ?? value.answer;
+        if (preferred !== undefined && preferred !== null && preferred !== value) {
+            flattenAnswerValue(preferred, result);
+            return result;
+        }
+        Object.values(value).forEach(item => flattenAnswerValue(item, result));
+        return result;
+    }
+    result.push(value);
+    return result;
+}
+
+function formatAnswerValue(value) {
+    if (value === undefined || value === null) return '';
+    if (typeof value === 'string') return value.trim();
+    if (typeof value === 'number') return Number.isFinite(value) ? String(value) : '';
+    if (typeof value === 'boolean') return value ? 'true' : 'false';
+    return String(value).trim();
+}
+
+function collectQuestionAnswerPayloads(question, answers) {
+    if (!Array.isArray(answers)) return [];
+    const payloads = [];
+    answers.forEach(answer => {
+        const detail = findAnswerDetail(answer, question);
+        if (!detail || isBlankAnswerValue(detail.answer)) return;
+        payloads.push(detail.answer);
+    });
+    return payloads;
+}
+
+function computeMedian(numbers) {
+    if (!Array.isArray(numbers) || numbers.length === 0) return null;
+    const sorted = [...numbers].sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
+    if (sorted.length % 2 === 0) {
+        return (sorted[mid - 1] + sorted[mid]) / 2;
+    }
+    return sorted[mid];
+}
+
+function parseTimeToMinutes(value) {
+    const match = String(value).trim().match(/^(\d{1,2}):(\d{2})/);
+    if (!match) return null;
+    const hours = Number(match[1]);
+    const minutes = Number(match[2]);
+    if (!Number.isFinite(hours) || !Number.isFinite(minutes) || hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
+        return null;
+    }
+    return (hours * 60) + minutes;
+}
+
+function parseChronologicalValue(type, value) {
+    if (type === 'time') {
+        return parseTimeToMinutes(value);
+    }
+    const ts = Date.parse(value);
+    return Number.isNaN(ts) ? null : ts;
+}
+
+function getNonChartSummaryIcon(type) {
+    switch (type) {
+        case 'text':
+        case 'free_text':
+            return 'notes';
+        case 'number':
+            return 'calculate';
+        case 'date':
+        case 'datetime':
+        case 'datetime_local':
+        case 'time':
+            return 'schedule';
+        case 'handwriting':
+            return 'draw';
+        case 'image':
+            return 'image';
+        case 'explanation':
+            return 'info';
+        default:
+            return 'description';
+    }
+}
+
+function buildNonChartSummary(question, answers) {
+    const payloads = collectQuestionAnswerPayloads(question, answers);
+    const totalCount = Array.isArray(answers) ? answers.length : 0;
+    const answeredCount = payloads.length;
+    const coverageRate = totalCount > 0 ? ((answeredCount / totalCount) * 100).toFixed(1) : '0.0';
+
+    const summary = {
+        type: question?.type || '',
+        icon: getNonChartSummaryIcon(question?.type),
+        title: getBlankReason(question?.type),
+        message: 'この設問タイプはグラフではなく要約表示を行います。',
+        metrics: [
+            { label: '回答件数', value: `${answeredCount.toLocaleString()} / ${totalCount.toLocaleString()}` },
+            { label: '入力率', value: `${coverageRate}%` }
+        ],
+        samples: []
+    };
+
+    if (question?.type === 'text' || question?.type === 'free_text') {
+        const textAnswers = payloads
+            .map(value => flattenAnswerValue(value).map(formatAnswerValue).filter(Boolean).join(' / '))
+            .filter(Boolean);
+        const avgLength = textAnswers.length > 0
+            ? Math.round(textAnswers.reduce((sum, value) => sum + value.length, 0) / textAnswers.length)
+            : 0;
+        summary.metrics.push({ label: '平均文字数', value: `${avgLength.toLocaleString()} 文字` });
+        summary.samples = [...new Set(textAnswers)].slice(0, 3);
+        if (summary.samples.length === 0) {
+            summary.message = 'まだ自由記述の回答がありません。';
+        }
+        return summary;
+    }
+
+    if (question?.type === 'number') {
+        const numericValues = payloads
+            .flatMap(value => flattenAnswerValue(value))
+            .map(raw => {
+                if (typeof raw === 'number') return raw;
+                const normalized = String(raw).replace(/,/g, '').trim();
+                if (normalized === '') return null;
+                const num = Number(normalized);
+                return Number.isFinite(num) ? num : null;
+            })
+            .filter(num => num !== null);
+
+        if (numericValues.length === 0) {
+            summary.message = '数値回答がまだありません。';
+            return summary;
+        }
+
+        const sum = numericValues.reduce((acc, value) => acc + value, 0);
+        const min = Math.min(...numericValues);
+        const max = Math.max(...numericValues);
+        const median = computeMedian(numericValues);
+        const average = sum / numericValues.length;
+        summary.metrics.push({ label: '最小値', value: min.toLocaleString() });
+        summary.metrics.push({ label: '中央値', value: median !== null ? median.toLocaleString() : '-' });
+        summary.metrics.push({ label: '最大値', value: max.toLocaleString() });
+        summary.metrics.push({ label: '平均値', value: average.toLocaleString(undefined, { maximumFractionDigits: 1 }) });
+        return summary;
+    }
+
+    if (question?.type === 'date' || question?.type === 'datetime' || question?.type === 'datetime_local' || question?.type === 'time') {
+        const values = payloads
+            .map(value => flattenAnswerValue(value).map(formatAnswerValue).filter(Boolean).join(' / '))
+            .filter(Boolean);
+
+        if (values.length === 0) {
+            summary.message = '日時回答がまだありません。';
+            return summary;
+        }
+
+        const frequency = new Map();
+        values.forEach(value => {
+            frequency.set(value, (frequency.get(value) || 0) + 1);
+        });
+        const mostFrequentEntry = [...frequency.entries()].sort((a, b) => b[1] - a[1])[0];
+        if (mostFrequentEntry) {
+            summary.metrics.push({ label: '最頻値', value: `${mostFrequentEntry[0]} (${mostFrequentEntry[1]}件)` });
+        }
+
+        const chronological = values
+            .map(value => ({ value, sortKey: parseChronologicalValue(question.type, value) }))
+            .filter(item => item.sortKey !== null)
+            .sort((a, b) => a.sortKey - b.sortKey);
+        if (chronological.length > 0) {
+            summary.metrics.push({ label: '最初', value: chronological[0].value });
+            summary.metrics.push({ label: '最後', value: chronological[chronological.length - 1].value });
+        }
+
+        summary.samples = [...new Set(values)].slice(0, 3);
+        return summary;
+    }
+
+    if (question?.type === 'handwriting' || question?.type === 'image') {
+        const missingCount = Math.max(totalCount - answeredCount, 0);
+        summary.metrics.push({ label: 'データあり', value: answeredCount.toLocaleString() });
+        summary.metrics.push({ label: '未提出', value: missingCount.toLocaleString() });
+        summary.message = '内容確認は回答詳細モーダルで行えます。';
+        return summary;
+    }
+
+    if (question?.type === 'explanation') {
+        summary.message = 'この設問は説明カードのため、回答は収集されません。';
+        return summary;
+    }
+
+    return summary;
+}
+
+function renderNonChartSummaryMetrics(summary) {
+    if (!summary || !Array.isArray(summary.metrics) || summary.metrics.length === 0) return '';
+    return summary.metrics.map(metric => `
+        <div class="rounded-md border border-outline-variant/50 bg-surface-variant/20 px-3 py-2">
+            <p class="text-[11px] font-semibold text-on-surface-variant">${escapeHtml(metric.label)}</p>
+            <p class="text-sm font-bold text-on-surface mt-1">${escapeHtml(metric.value)}</p>
+        </div>
+    `).join('');
+}
+
+function renderNonChartSummarySamples(summary, maxLength = 64) {
+    if (!summary || !Array.isArray(summary.samples) || summary.samples.length === 0) return '';
+    const items = summary.samples.map(sample => {
+        const normalized = String(sample);
+        const shortened = normalized.length > maxLength
+            ? `${normalized.slice(0, maxLength)}...`
+            : normalized;
+        return `<li class="rounded-md bg-surface-variant/20 px-3 py-2 text-xs text-on-surface-variant">${escapeHtml(shortened)}</li>`;
+    }).join('');
+    return `
+        <div class="space-y-2">
+            <p class="text-[11px] font-semibold uppercase tracking-wide text-on-surface-variant">サンプル回答</p>
+            <ul class="space-y-1">${items}</ul>
+        </div>
+    `;
 }
 
 function handleQuestionSelectClick(newQuestion) {
@@ -1763,6 +2001,7 @@ function processDataForTable(survey, answers) {
         const reason = BLANK_TYPES.has(question.type)
             ? getBlankReason(question.type)
             : '未対応の設問タイプ';
+        const nonChartSummary = buildNonChartSummary(question, answers);
 
         return {
             questionId,
@@ -1772,7 +2011,8 @@ function processDataForTable(survey, answers) {
             totalAnswers: 0,
             totalVotes: 0,
             includeTotalRow: false,
-            blankReason: reason
+            blankReason: reason,
+            nonChartSummary
         };
     });
 }
@@ -1800,17 +2040,6 @@ function renderGraphDataTable(processedData) {
         if (!questionData) {
             return '';
         }
-
-        /*
-        if (questionData.blankReason) {
-            const reason = escapeHtml(questionData.blankReason);
-            return `
-                <div class="p-4 rounded-lg bg-surface-variant text-on-surface-variant text-sm">
-                    この設問は現在グラフ対象外です。理由: ${reason}
-                </div>
-            `;
-        }
-        */
 
         const renderTableBlock = (labels, data, totalVotes, includeTotalRow, totalAnswers, rowKey = null) => {
             const tableRows = labels.map((label, index) => {
@@ -1858,6 +2087,26 @@ function renderGraphDataTable(processedData) {
             `;
         };
 
+        const renderNonChartSummaryBlock = (summary, reason) => {
+            if (!summary) return '';
+            const metricsHtml = renderNonChartSummaryMetrics(summary);
+            const samplesHtml = renderNonChartSummarySamples(summary, 56);
+            const reasonText = reason ? `<p class="text-xs text-on-surface-variant">${escapeHtml(reason)}</p>` : '';
+            return `
+                <div class="rounded-lg border border-outline-variant/50 bg-surface-variant/10 p-4 space-y-4">
+                    <div class="flex items-start gap-3">
+                        <span class="material-icons text-on-surface-variant">${escapeHtml(summary.icon || 'info')}</span>
+                        <div class="space-y-1">
+                            <p class="text-sm font-semibold text-on-surface">${escapeHtml(summary.message || 'この設問はサマリー表示です。')}</p>
+                            ${reasonText}
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${metricsHtml}</div>
+                    ${samplesHtml}
+                </div>
+            `;
+        };
+
         if (questionData.isMatrix) {
             const rows = questionData.matrixRows || [];
             const columns = questionData.matrixColumns || [];
@@ -1881,6 +2130,10 @@ function renderGraphDataTable(processedData) {
             }).join('');
         }
 
+        if (questionData.nonChartSummary) {
+            return renderNonChartSummaryBlock(questionData.nonChartSummary, questionData.blankReason);
+        }
+
         if (!questionData.labels || questionData.labels.length === 0) {
             return `
                 <div class="flex flex-col items-center justify-center text-center gap-2 py-6">
@@ -1901,6 +2154,7 @@ function renderDashboard(data) {
     const dashboardContainer = document.getElementById('analytics-dashboard');
     if (!dashboardContainer) return;
     dashboardContainer.classList.remove('hidden');
+    const nonChartNotice = document.getElementById('non-chart-question-notice');
 
     // 1. KPIs
     const totalElement = document.getElementById('kpi-total-answers');
@@ -1930,6 +2184,69 @@ function renderDashboard(data) {
         const prefix = questionIndex >= 0 ? `Q${questionIndex + 1}. ` : '';
 
         questionTitleEl.textContent = prefix + truncateQuestion(currentIndustryQuestion) || '未選択';
+    }
+
+    const questionDef = currentSurvey?.details?.find(detail =>
+        detail.question === currentIndustryQuestion || detail.text === currentIndustryQuestion
+    );
+    const isChartableQuestion = !!questionDef && (
+        SINGLE_CHOICE_TYPES.has(questionDef.type) ||
+        MULTI_CHOICE_TYPES.has(questionDef.type) ||
+        MATRIX_SINGLE_TYPES.has(questionDef.type) ||
+        MATRIX_MULTI_TYPES.has(questionDef.type)
+    );
+
+    if (!isChartableQuestion) {
+        if (nonChartNotice) {
+            const reason = getBlankReason(questionDef?.type);
+            nonChartNotice.classList.remove('hidden');
+            nonChartNotice.innerHTML = `
+                <div class="flex items-start gap-2">
+                    <span class="material-icons text-base text-on-surface-variant">info</span>
+                    <p>この設問はグラフ分析対象外です（${escapeHtml(reason)}）。回答詳細は一覧・詳細モーダルで確認してください。</p>
+                </div>
+            `;
+        }
+
+        // Keep the time-series chart visible even for non-chartable questions.
+        renderTimeSeriesChart(data);
+
+        if (attributeChart) {
+            attributeChart.destroy();
+            attributeChart = null;
+        }
+
+        const controlsContainer = document.getElementById('matrix-controls-container');
+        if (controlsContainer) controlsContainer.innerHTML = '';
+
+        const attributeCanvas = document.getElementById('attributeChart');
+        const apexContainer = document.getElementById('attributeChartApex');
+        if (attributeCanvas) {
+            attributeCanvas.classList.add('hidden');
+            attributeCanvas.style.display = 'none';
+            attributeCanvas.parentElement?.querySelector('.attribute-empty-state')?.remove();
+        }
+        if (apexContainer) {
+            apexContainer.classList.add('hidden');
+            apexContainer.style.display = 'none';
+            apexContainer.innerHTML = '';
+        }
+
+        const tableContainer = document.getElementById('graph-data-table-container');
+        if (tableContainer) {
+            tableContainer.innerHTML = `
+                <div class="flex flex-col items-center justify-center text-center gap-2 py-8 h-full">
+                    <span class="material-icons text-4xl text-on-surface-variant/30">notes</span>
+                    <p class="text-sm text-on-surface-variant">この設問タイプはグラフ集計対象外です。</p>
+                </div>
+            `;
+        }
+        return;
+    }
+
+    if (nonChartNotice) {
+        nonChartNotice.classList.add('hidden');
+        nonChartNotice.innerHTML = '';
     }
 
     // 2. Time Series Chart
@@ -2072,7 +2389,7 @@ function renderAttributeChart(data) {
                 empty.innerHTML = `
                     <span class="material-icons text-5xl text-on-surface-variant/20">${icon}</span>
                     <p class="text-sm text-on-surface-variant"></p>
-                    <button type="button" class="mt-2 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-xs font-semibold text-primary hover:bg-primary/10">
+                    <button type="button" class="mt-2 inline-flex items-center gap-2 whitespace-nowrap rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-xs font-semibold text-primary hover:bg-primary/10">
                         <span class="material-icons text-sm">tune</span>
                         設問を選択する
                     </button>
@@ -2091,6 +2408,52 @@ function renderAttributeChart(data) {
         }
         canvas.classList.add('hidden');
         apexContainer.classList.add('hidden');
+    };
+
+    const renderNonChartSummaryState = (summary, reason) => {
+        if (attributeChart) {
+            attributeChart.destroy();
+            attributeChart = null;
+        }
+        if (container) {
+            let empty = container.querySelector('.attribute-empty-state');
+            if (!empty) {
+                empty = document.createElement('div');
+                container.appendChild(empty);
+            }
+            empty.className = 'attribute-empty-state flex flex-col items-stretch justify-center text-left gap-3 py-4 h-full w-full';
+            const metricsHtml = renderNonChartSummaryMetrics(summary);
+            const samplesHtml = renderNonChartSummarySamples(summary, 44);
+            const reasonText = reason ? `<p class="text-xs text-on-surface-variant">${escapeHtml(reason)}</p>` : '';
+            empty.innerHTML = `
+                <div class="flex items-start gap-3">
+                    <span class="material-icons text-on-surface-variant mt-0.5">${escapeHtml(summary.icon || 'info')}</span>
+                    <div class="space-y-1">
+                        <p class="text-sm font-semibold text-on-surface">${escapeHtml(summary.message || 'この設問はサマリー表示です。')}</p>
+                        ${reasonText}
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 gap-2">${metricsHtml}</div>
+                ${samplesHtml}
+                <div class="pt-1">
+                    <button type="button" class="inline-flex items-center gap-2 whitespace-nowrap rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-xs font-semibold text-primary hover:bg-primary/10">
+                        <span class="material-icons text-sm">tune</span>
+                        設問を選択する
+                    </button>
+                </div>
+            `;
+            const actionBtn = empty.querySelector('button');
+            if (actionBtn && !actionBtn.hasAttribute('data-bound')) {
+                actionBtn.setAttribute('data-bound', 'true');
+                actionBtn.addEventListener('click', () => {
+                    showQuestionSelectModal();
+                });
+            }
+        }
+        canvas.classList.add('hidden');
+        apexContainer.classList.add('hidden');
+        apexContainer.style.display = 'none';
+        apexContainer.innerHTML = '';
     };
 
     const clearEmptyState = () => {
@@ -2162,7 +2525,8 @@ function renderAttributeChart(data) {
     const isChartable = SINGLE_CHOICE_TYPES.has(questionDef.type) || MULTI_CHOICE_TYPES.has(questionDef.type);
 
     if (!isChartable) {
-        renderEmptyState(getBlankReason(questionDef.type) || 'この設問タイプはグラフ表示に対応していません。', 'info');
+        const summary = buildNonChartSummary(questionDef, data || []);
+        renderNonChartSummaryState(summary, getBlankReason(questionDef.type));
         return;
     }
 
