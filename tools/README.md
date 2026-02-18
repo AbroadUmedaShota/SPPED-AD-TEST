@@ -6,7 +6,7 @@ Utility scripts and scratch files that support the mock dashboard workflow live 
 - `add_question_types.py`: Adds missing `type` fields to survey answer JSON documents by looking up matching entries in the survey definition file. Update the hard-coded input paths before running.
 - `csv_to_json.py`: Converts CSV data from standard input into formatted JSON. Useful for quick fixtures.
 - `csv_to_json.ps1`: Windows specific CSV-to-JSON converter with hard-coded paths. Edit the source and destination constants before executing.
-- `create_issue.sh`: GitHub CLI helper that files the feature request issue using `docs/templates/issue_body.md`. It now resolves the template relative to the repository root.
+- `create_issue.sh`: GitHub CLI helper that files the feature request issue using `docs/references/templates/issue_body.md`. It resolves the template relative to the repository root.
 - `delete_delete_bat_script.py`: Cleanup helper that removes the deprecated `delete_bat_script.py` from the dashboard directory if it reappears.
 
 ## Samples

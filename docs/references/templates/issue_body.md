@@ -1,1 +1,20 @@
-The current implementation displays a generic text "通常アンケート有り" for days with normal surveys. This was implemented in #111. The user has requested to display the actual survey names for better clarity.
+## 概要
+- 何を解決する Issue かを 1-2 行で記載してください。
+
+## 背景・現状課題
+- 現状の挙動:
+- 問題点:
+- 発生条件:
+
+## 期待する結果
+- 期待動作:
+- 受け入れ条件:
+
+## 影響範囲
+- 対象画面/機能:
+- 想定変更ファイル:
+- 関連データ:
+
+## 補足
+- 関連 Issue / PR:
+- 参考ドキュメント:

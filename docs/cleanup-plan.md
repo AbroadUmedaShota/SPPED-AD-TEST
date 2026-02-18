@@ -9,9 +9,14 @@
 - [2025-09-17] Moved group-edit demo under `02_dashboard/group-edit/` and linked it from the sidebar.
 - [2025-09-17] Added back-navigation guard (`pageshow`) to refresh survey list after bfcache restore.
 - [2025-09-18] Created `tools/` with a README and relocated automation helpers (`add_question_types.py`, `csv_to_json.*`, GitHub CLI scripts).
-- [2025-09-18] Moved issue/PR templates into `docs/templates/` and updated `tools/create_issue.sh` to consume the canonical `issue_body.md`.
+- [2025-09-18] Moved issue/PR templates into `docs/references/templates/` and updated automation scripts to consume canonical templates.
 - [2025-09-18] Consolidated reference artefacts under `docs/requirements/resources/` (現 `docs/references/resources/`) and triaged temporary files into `archive/temp/`.
 - [2025-10-27] Restructured `docs/` into `product/`, `handbook/`, `references/`, `changelog/`, `archive/`, and `ja/`; archived legacy form submissions under `docs/archive/forms/`.
+- [2026-02-18] Standardized docs navigation and template ownership: canonical templates are in `docs/references/templates/`, while historical samples moved to `docs/templates/examples/`.
+- [2026-02-18] Consolidated duplicate survey-answer specifications; canonical moved to `docs/product/specs/13_survey_answer_screen.md` and legacy file redirected.
+- [2026-02-18] Migrated premium requirements to `docs/product/specs/premium/` and converted legacy `docs/requirements/premium_*` files into redirects.
+- [2026-02-18] Consolidated first-login/performance requirements into canonical specs and converted legacy requirement files into redirects.
+- [2026-02-18] Migrated help-center requirements to `docs/product/specs/15_help_center_requirements.md` and converted legacy requirement file into redirect.
 
 ## Objectives
 - Consolidate duplicated source trees so the dashboard uses a single module set.
@@ -30,7 +35,7 @@
 - Login flow: keep under `01_login/`.
 - Shared mock data: move to a unified `data/` tree with subfolders per feature (e.g., `data/`, `data/login/`).
 - Documentation and non-runtime references: keep in `docs/product/` (specs/process/architecture), `docs/handbook/` (runbooks), `docs/references/` (templates/resources), `docs/changelog/` (logs), and isolate attachments under `docs/archive/`.
-- Utilities & scripts: create `tools/` (Python/PowerShell) and `templates/` (issue/pr bodies) to keep automation separate from app code.
+- Utilities & scripts: keep automation in `tools/` and use `docs/references/templates/` as the only Issue/PR template source.
 - Archives or reference material: create `archive/` for ZIPs, legacy datasets, and `.bak` snapshots that we want to keep but not ship.
 
 ## Phase 1 - Source Of Truth Alignment

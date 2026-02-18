@@ -1,9 +1,22 @@
-# Design Overview
+# 製品ドキュメント概要
 
-実装アーキテクチャ、データモデル、UI ガイドラインなど「どう実現するか」に関する資料を集約しています。
+`docs/product/` は、要件・設計・運用プロセスをまとめた製品ドキュメントの正本ディレクトリです。
 
-- **アーキテクチャ**: `01_ARCHITECTURE.md` でフロントエンド構成とフェーズ別の設計方針を整理しています。詳細なデータモデルは `architecture/02_data_model.md` を参照してください。
-- **コーディング規約**: `02_CODING_STANDARDS.md` に JavaScript/HTML/CSS のスタイル指針とレビュー観点を記載しています。
-- **UI ガイドライン**: `00_design_guideline.md`、`01_ui_messages.md`、`02_UI_COMPONENT_INTEGRATION.md` が UI パターン、文言統一、コンポーネント統合手順を提供します。
+## ディレクトリ構成
+- `overview/`: プロジェクト全体像、要件インデックス、画面遷移。
+- `architecture/`: アーキテクチャ方針、データモデル、データインベントリ。
+- `specs/`: サービス画面/管理画面の機能要件・画面仕様（`admin/`・`premium/` を含む）。
+- `processes/`: 業務プロセス、データフロー、KPI フロー。
+- `ui/`: デザインガイド、UI メッセージ、コンポーネント統合手順。
+- `standards/`: コーディング規約、レビュー観点。
 
-設計資料の更新時は、関連する要件ドキュメントとの整合性を確認し、必要に応じて `CHANGELOG.md` に記録してください。
+## 主要参照
+- アーキテクチャ: `architecture/01_ARCHITECTURE.md`
+- データモデル: `architecture/02_data_model.md`
+- データ配置: `architecture/data-inventory.md`
+- 画面仕様: `specs/README.md`
+- コーディング規約: `standards/02_CODING_STANDARDS.md`
+
+## 運用ルール
+- 仕様を更新した場合は、関連する `processes/` と `architecture/` の参照整合を確認する。
+- 実装差分を反映した場合は、必要に応じて `docs/changelog/CHANGELOG.md` に追記する。

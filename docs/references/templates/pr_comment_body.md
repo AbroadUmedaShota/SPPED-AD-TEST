@@ -1,20 +1,22 @@
-### Self-Review Report
+### セルフレビュー報告
 
-I have conducted a self-review and confirmed that the implementation aligns with the project's standards and the requirements of the Issue. All standard checks, including diff confirmation, convention adherence, and documentation updates, have been successfully passed.
-
----
-
-### Quality Gate Assessment
-
-- **Computational Complexity:** (Description of the evaluation)
-- **Security:** (Description of the evaluation)
-- **Scalability:** (Description of the evaluation)
+実装内容をセルフレビューし、Issue 要件・規約との整合を確認しました。
 
 ---
 
-### Design Trade-offs
+### 品質ゲート評価
 
-(Description of the design trade-offs, including why the current implementation was chosen and what other options were considered and discarded.)
+- 計算量:
+- セキュリティ:
+- スケーラビリティ:
 
 ---
-Please review and approve the merge.
+
+### 設計トレードオフ
+
+- 採用した方針:
+- 採用しなかった案:
+- 判断理由:
+
+---
+レビューをお願いします。

@@ -104,10 +104,10 @@ When performing operations that send multi-line text on GitHub (e.g., creating i
 
 | Action                | Filename to Use                        |
 | :-------------------- | :------------------------------------- |
-| Issue Creation        | `docs/templates/issue_body.md`         |
-| Issue Comment         | `docs/templates/issue_comment_body.md` |
-| Pull Request Creation | `docs/templates/pr_body.md`            |
-| Pull Request Comment  | `docs/templates/pr_comment_body.md`    |
+| Issue Creation        | `docs/references/templates/issue_body.md`         |
+| Issue Comment         | `docs/references/templates/issue_comment_body.md` |
+| Pull Request Creation | `docs/references/templates/pr_body.md`            |
+| Pull Request Comment  | `docs/references/templates/pr_comment_body.md`    |
 
 The AI will write the body content to the appropriate file and then use the `--body-file` option to pass it to the `gh` command. This avoids unexpected errors with command-line arguments and enforces a predictable workflow.
 
@@ -187,7 +187,7 @@ This workflow governs how the AI proposes and creates new Issues, ensuring they 
     *   Analyze the relevant code and documentation to understand the context and potential impact.
 3.  **Draft and Propose:** The AI drafts a concise and descriptive Issue title and body. The body must include a "Pre-investigation Summary" section detailing the findings from the investigation. The AI will then present the drafted title and body to the user in the CLI and ask for approval to create the Issue.
 4.  **User Approval:** The AI must wait for explicit user approval (e.g., "Yes, create it") before proceeding.
-5.  **Issue Creation:** Once approved, the AI will use the `gh issue create` command with the approved title and the standardized `docs/templates/issue_body.md` file to create the Issue on GitHub.
+5.  **Issue Creation:** Once approved, the AI will use the `gh issue create` command with the approved title and the standardized `docs/references/templates/issue_body.md` file to create the Issue on GitHub.
 
 #### **4.2.1. Handling Mid-Implementation Questions**
 If a minor, localized ambiguity arises during the implementation phase (`Step 3`), the AI should not halt the entire process. Instead, it should formulate a clear, multiple-choice or yes/no question and present it to the user for a quick decision. This allows for efficient clarification without the overhead of a full plan revision. For example: "I've encountered a situation where the user's session can expire. Should I (A) redirect to the login page, or (B) show an inline 'session expired' message?"
@@ -219,10 +219,10 @@ If a minor, localized ambiguity arises during the implementation phase (`Step 3`
     *   **Push the feature branch and set upstream:** Push the committed changes to the remote repository. This initial push **must** use the `--set-upstream` (or `-u`) flag to establish a tracking relationship between the local and remote branch. This is critical for the stability of subsequent workflow steps.
         *   **Command:** `git push --set-upstream origin {branch_name}`
     *   **Create a Pull Request:** To ensure the Pull Request body consistently includes the required issue link, the AI must follow this procedure:
-        1.  Open the `docs/templates/pr_body.md` file.
+        1.  Open the `docs/references/templates/pr_body.md` file.
         2.  Replace the `#{issue_number}` placeholder with the current issue number and update the description.
-        3.  Create the Pull Request using the prepared `docs/templates/pr_body.md` file.
-            *   **Command:** `gh pr create --title "..." --body-file docs/templates/pr_body.md`
+        3.  Create the Pull Request using the prepared `docs/references/templates/pr_body.md` file.
+            *   **Command:** `gh pr create --title "..." --body-file docs/references/templates/pr_body.md`
 
 #### **Step 4: Quality Gate and Self-Review**
 1.  **Trigger:** A Pull Request is created.
@@ -514,4 +514,3 @@ This section defines a context-aware workflow for the AI to follow when it disco
     *   **Action:** The AI will **first complete its current assigned task** to avoid disrupting the user's workflow.
     *   **Reporting:** After the current PR is merged, the AI will report the major documentation discrepancy to the user. It will then propose the creation of a new `type: documentation` Issue to address the problem, following the standard procedure for issue creation.
     
-

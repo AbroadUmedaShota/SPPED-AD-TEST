@@ -1,3 +1,9 @@
+---
+owner: product
+status: draft
+last_reviewed: 2026-02-18
+---
+
 # 初回ログインチュートリアル機能 要件定義書
 
 **バージョン: 2.0**

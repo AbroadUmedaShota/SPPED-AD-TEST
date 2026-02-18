@@ -57,9 +57,9 @@ flowchart TD
    - プラン判定は `planRestrictedComponent` で UI レベル制御、サーバー側は `plan_limits.multilingual.maxLocales` で検証（`docs/product/specs/11_plan_feature_restrictions.md:25`）。  
 
 2. **回答画面での名刺画像取得**  
-   - 多言語アンケートではヘッダーに言語切替ドロップダウンを表示（`docs/requirements/specifications/13_survey_answer_screen.md:26`）。  
-   - 名刺アップロードモーダルは 4 ステップ構成で表裏撮影・プレビューを案内し、多言語 UI 文言は `survey-answer.js` 内でロケール別にロード（同:60-86, `02_dashboard/src/survey-answer.js:270-451`）。  
-   - OCR による名刺言語自動判別を将来検証項目として定義し、アンケート言語と差異がある場合のフローも規定（`docs/requirements/specifications/13_survey_answer_screen.md:86-88` & `docs/product/specs/02_survey_creation.md:209-235`）。  
+   - 多言語アンケートではヘッダーに言語切替ドロップダウンを表示（`docs/product/specs/13_survey_answer_screen.md`）。  
+   - 名刺アップロードモーダルは 4 ステップ構成で表裏撮影・プレビューを案内し、多言語 UI 文言は `survey-answer.js` 内でロケール別にロード（`docs/product/specs/13_survey_answer_screen.md`, `02_dashboard/src/survey-answer.js:270-451`）。  
+   - OCR による名刺言語自動判別を将来検証項目として定義し、アンケート言語と差異がある場合のフローも規定（`docs/product/specs/13_survey_answer_screen.md` と `docs/product/specs/02_survey_creation.md`）。  
 
 3. **名刺データ化処理（バックオフィス）**  
    - `speedReviewService` が CSV 由来の名刺ファイル名を多言語メタデータと結合し、表裏の URL を保持（`02_dashboard/src/services/speedReviewService.js:136-237`）。  
@@ -82,7 +82,7 @@ flowchart TD
 - **Free/Standard**: 名刺データ化は日本語基準で最大 3 言語まで翻訳不可。多言語 UI 要素は非表示、＋料金で一部項目拡張のみ（`docs/product/specs/11_plan_feature_restrictions.md:11-24`）。  
 - **Premium**: 設問翻訳 3 言語まで、OCR の補助は手動差戻し。  
 - **Premium+ (Enterprise)**: 多言語（5 言語＋自動提案）、当日～超特急プランや SLA 通知、Export オプションを開放。`bizcardPlans.js` の「多言語対応」アドオンが追加料金を表す（`02_dashboard/src/services/bizcardPlans.js:96-102`）。  
-- **SLA 指標**: 回答画面では 3 秒以内応答、名刺アップロード時は進捗バー表示、サーバー保存時は暗号化を想定（`docs/requirements/specifications/13_survey_answer_screen.md:153-157`）。
+- **SLA 指標**: 回答画面では 3 秒以内応答、名刺アップロード時は進捗バー表示、サーバー保存時は暗号化を想定（`docs/product/specs/13_survey_answer_screen.md`）。
 
 ## 6. 運用・テスト観点
 - **手動検証**: `docs/handbook/testing/login_to_survey_answer_scenario.md:30` の ANS-006 で多言語切替と名刺処理の整合性を確認。  
@@ -91,7 +91,7 @@ flowchart TD
 
 ## 7. 参考ドキュメント
 - アンケート作成仕様: `docs/product/specs/02_survey_creation.md:41-235`  
-- 回答画面要件: `docs/requirements/specifications/13_survey_answer_screen.md:26-157`  
+- 回答画面要件: `docs/product/specs/13_survey_answer_screen.md`  
 - プラン制約一覧: `docs/product/specs/11_plan_feature_restrictions.md:11-134`  
 - データモデル定義: `docs/product/architecture/02_data_model.md:238-511`  
 - データフロー概要図: `docs/product/processes/05_data_flow_mapping.md:3-74`  

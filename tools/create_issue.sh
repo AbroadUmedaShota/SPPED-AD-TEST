@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-TEMPLATE_PATH="$ROOT_DIR/docs/templates/issue_body.md"
+TEMPLATE_PATH="$ROOT_DIR/docs/references/templates/issue_body.md"
 
 if [ ! -f "$TEMPLATE_PATH" ]; then
   echo "Template not found: $TEMPLATE_PATH" >&2
