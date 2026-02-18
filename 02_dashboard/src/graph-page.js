@@ -889,9 +889,21 @@ function renderChartSummaryTable(summaryId, chartData) {
                 const isMedia = ['image', 'photo', 'handwriting', 'file', 'file_upload', 'upload'].includes(chartData.questionType);
                 let valueHtml = escapeHtml(item.value);
                 if (isMedia && item.value && (item.value.startsWith('http') || item.value.startsWith('.') || item.value.startsWith('/'))) {
+                    let linkText = escapeHtml(item.value);
+                    if (item.answerId && item.surveyId) {
+                        const parts = item.answerId.split('-');
+                        const seq = parts.length > 0 ? parts[parts.length - 1] : '0000';
+                        const qNumMatch = (chartData.questionBaseId || chartData.questionId).match(/\d+/);
+                        const qNum = qNumMatch ? String(qNumMatch[0]).padStart(2, '0') : '00';
+                        const ext = item.value.split('.').pop();
+                        const safeExt = ext && ext.length < 5 ? ext : 'png';
+                        const type = item.type || 'image';
+                        linkText = `${item.surveyId}_${seq}_${qNum}_${type}.${safeExt}`;
+                    }
+
                     valueHtml = `<button type="button" onclick="window.previewImage('${escapeHtml(item.value)}')" class="text-primary hover:underline inline-flex items-center gap-1 group transition-colors text-left">
                         <span class="material-icons text-sm group-hover:text-primary-dark transition-colors">image</span>
-                        <span class="truncate border-b border-transparent group-hover:border-primary-dark transition-all">${escapeHtml(item.value)}</span>
+                        <span class="truncate border-b border-transparent group-hover:border-primary-dark transition-all">${linkText}</span>
                     </button>`;
                 }
                 return `
@@ -1987,7 +1999,10 @@ function buildListChart(question, questionId, answers, fallbackReason = '', ques
     const listEntries = collectListEntries(question, answers);
     const listAll = listEntries.map(entry => ({
         value: entry.value,
-        answeredAtLabel: entry.answeredAtLabel
+        answeredAtLabel: entry.answeredAtLabel,
+        answerId: entry.answerId,
+        surveyId: entry.surveyId,
+        type: entry.type
     }));
     return buildChartData({
         questionId,
@@ -2071,7 +2086,10 @@ function collectListEntries(question, answers) {
         entries.push({
             value,
             answeredAt,
-            answeredAtLabel: formatAnsweredAt(answeredAt)
+            answeredAtLabel: formatAnsweredAt(answeredAt),
+            answerId: answer.answerId,
+            surveyId: answer.surveyId,
+            type: detail.type || question.type
         });
     });
     entries.sort((a, b) => {

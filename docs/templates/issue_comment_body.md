@@ -1,28 +1,30 @@
 ### Implementation Proposal
 
-本Issueを解決するため、以下の計画で実装を進めます。
+To resolve this Issue, I will proceed with the implementation according to the following plan.
 
-#### 1. **事前調査のまとめ**
-- `tools/generate_dummy_answers.py` 内に `TARGET_COUNT = 100` という定数があります。
-- これを `500` に変更し、スクリプトを実行することで目的を達成できます。
+#### 1. **Pre-investigation Summary**
+- Confirmed `graph-page.js` handles list entry formatting in `collectListEntries` and `renderChartSummaryTable`.
+- Current implementation displays raw URLs or paths.
+- `answerId` exists in the data and can be parsed for sequence numbers.
 
-**変更対象ファイル:**
-- `tools/generate_dummy_answers.py`
+**Files to be changed:**
+- `02_dashboard/src/graph-page.js`
 
-#### 2. **プロジェクト目標への貢献**
-- 開発およびテスト用のデータセットを拡充し、品質向上に寄与します。
+#### 2. **Contribution to Project Goals**
+- Standardizes file naming for exported/displayed images, improving data management and readability.
 
-#### 3. **変更の概要**
-- `TARGET_COUNT` を 500 に変更。
-- スクリプト実行により `docs/examples/demo_answers/sv_0001_25060.json` を更新。
+#### 3. **Overview of Changes**
+- Formatting image links as `[surveyId]_[answerIdSeq]_[questionId]_[type].png`.
 
-#### 4. **各ファイルの具体的な作業内容**
-- `tools/generate_dummy_answers.py`:
-    - `TARGET_COUNT = 100` -> `TARGET_COUNT = 500`
+#### 4. **Specific Work Content for Each File**
+- `02_dashboard/src/graph-page.js`:
+    - Modify `collectListEntries` to include `answerId` and question metadata.
+    - Modify `renderChartSummaryTable` to generate the new filename format for links.
 
-#### 5. **完了の定義 (Definition of Done)**
-- [ ] `docs/examples/demo_answers/sv_0001_25060.json` に500件のデータが含まれていること。
-- [ ] `WEEKLY_CHANGELOG.md` に変更を記録する。
+#### 5. **Definition of Done**
+- [ ] Code changes implemented in `graph-page.js`.
+- [ ] Manual verification confirms correct filename format in the UI.
+- [ ] No regression in other chart types.
 
 ---
-承認いただける場合は、本コメントに "Approve" と返信するか、CLIで承認の旨をお伝えください。
+If you approve, please reply to this comment with "Approve".

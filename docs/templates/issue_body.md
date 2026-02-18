@@ -1,13 +1,13 @@
-### 概要
-`speed-review.html` の「Active Question」ボタンをクリックした際に表示される設問選択モーダルにおいて、以下の改善を行う。
+## 前提調査サマリー
+- `graph-page.html`は`graph-page.js`を使用しており、画像リンクは`collectListEntries`および`renderChartSummaryTable`関数で処理されています。
+- 現在はファイルパスやURLがそのまま表示されています。
+- アンケート回答データには`answerId`（例: `ans-sv_0003_26009-0001`）が含まれており、ここから連番を抽出可能です。
 
-1.  **設問番号の表示**: 各設問の頭に「Q1」「Q2」のような番号を表示する。
-2.  **グラフ化可否の明示**: グラフ化可能な設問とそうでない設問をアイコンで区別し、グラフ化できない場合はその理由（例：日付・時刻入力のため）を表示できるようにする。
+## 概要
+`graph-page.html`内の画像リンクの表示形式を以下の指定フォーマットに変更します。
+フォーマット: `[surveyId]_[answerId連番]_[questionId]_[type].png`
+例: `sv_0003_26009_0786_09_handwriting.png`
 
-### 変更内容
-- `src/speed-review.js` の `populateQuestionSelector` 関数を修正。
-- 設問リストの生成時に、インデックスを用いて「Qx. 」をプレフィックスとして追加。
-- グラフ化不可の設問に対して、アイコンを変更（例: `help_outline` 等）し、`title` 属性等を用いて理由を表示するロジックを追加。
-
-### 関連ファイル
-- `02_dashboard/src/speed-review.js`
+## 変更内容
+1. `graph-page.js`の`collectListEntries`関数を修正し、`answerId`と`questionId`をリスト項目データに含めるようにします。
+2. `renderChartSummaryTable`関数内のリスト表示ロジックを修正し、指定されたフォーマットでリンクテキストを生成するようにします。
