@@ -28,6 +28,7 @@ const displayOptions = {
     showGrid: false
 };
 const GRAPH_CHART_DONUT_PALETTE = COMMON_CHART_DONUT_PALETTE;
+const GRAPH_CHART_COLOR_PALETTE = COMMON_CHART_DONUT_PALETTE; // Use same palette for bar charts
 const GRAPH_CHART_MUTED_TEXT = '#6B6B6B';
 const GRAPH_CHART_TEXT = '#1A1A1A';
 const GRAPH_CHART_GRID = '#F1F1F1';
@@ -426,6 +427,7 @@ function renderCharts(chartsData) {
                         </div>
                     </div>
                     <div class="flex items-center gap-2 shrink-0">
+                        ${matrixSelectorHtml}
                         ${actionButtons}
                     </div>
                 </div>
@@ -492,7 +494,7 @@ function renderCharts(chartsData) {
             e.currentTarget.classList.remove('bg-surface', 'text-primary');
         });
     });
-    // Removed bindMatrixRowSelectorEvents();
+    bindMatrixRowSelectorEvents();
 
     const exportAllButton = document.getElementById('excel-export-all');
     if (exportAllButton) {
@@ -501,21 +503,35 @@ function renderCharts(chartsData) {
 }
 
 function buildMatrixRowSelector(chartData, chartId) {
-    if (!chartData.isMatrix || !Array.isArray(chartData.matrixRows) || chartData.matrixRows.length <= 1) {
-        return '';
+    if (!chartData.isMatrix) return '';
+
+    // Determine items to select (Rows or Columns)
+    let items = [];
+    let labelText = '表示項目';
+
+    if (chartData.matrixSelectorType === 'column') {
+        items = chartData.matrixColumns || [];
+        labelText = '表示列';
+    } else {
+        items = chartData.matrixRows || [];
     }
+
+    if (!Array.isArray(items) || items.length <= 1) return '';
+
     const currentIndex = Math.max(0, Number(chartData.matrixSelectedIndex || 0));
-    const optionsHtml = chartData.matrixRows.map((row, index) => `
-        <option value="${index}" ${index === currentIndex ? 'selected' : ''}>${escapeHtml(row.text)}</option>
+    const optionsHtml = items.map((item, index) => `
+        <option value="${index}" ${index === currentIndex ? 'selected' : ''}>${escapeHtml(item.text)}</option>
     `).join('');
+
     return `
         <label class="inline-flex items-center gap-2 text-xs text-on-surface-variant font-medium">
-            <span>表示項目</span>
+            <span>${labelText}</span>
             <select
-                class="px-2 py-1.5 rounded-md border border-outline-variant bg-surface text-on-surface text-xs"
+                class="px-2 py-1.5 pr-8 rounded-md border border-outline-variant bg-surface text-on-surface text-xs appearance-none cursor-pointer hover:border-primary transition-colors focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
                 data-role="matrix-row-selector"
                 data-chart-id="${chartId}"
                 aria-label="マトリクス表示項目"
+                style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236b7280%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 0.5rem center; background-size: 0.65em auto;"
             >
                 ${optionsHtml}
             </select>
@@ -536,8 +552,55 @@ function bindMatrixRowSelectorEvents() {
 
 function applyMatrixRowSelection(chartId, rowIndex) {
     const chartData = chartDataStore.get(chartId);
-    if (!chartData || !chartData.isMatrix || !Array.isArray(chartData.matrixRowDetails)) return;
+    if (!chartData || !chartData.isMatrix) return;
 
+    // Handle Column Selection (MA)
+    if (chartData.matrixSelectorType === 'column') {
+        // Switch Series based on selected Column index
+        const selectedColumn = chartData.matrixColumns[rowIndex];
+        if (!selectedColumn) return;
+
+        // Extract data for this column from all rows
+        // matrixSeries has data transposed: Series[ColIndex] -> [Row1, Row2...]
+        // So we just take the series at rowIndex
+        const targetSeries = chartData.matrixSeries[rowIndex];
+        if (!targetSeries) return;
+
+        chartData.matrixSelectedIndex = rowIndex;
+        chartData.matrixIndex = rowIndex + 1; // Display 1-based index
+        chartData.matrixRowText = selectedColumn.text;
+
+        // For Bar chart, data is simple array
+        chartData.data = targetSeries.data;
+        // chartData.labels is already set to Rows in buildMatrixCharts
+
+        // Update Chart Title etc
+        const card = document.querySelector(`[data-chart-card-id="${chartId}"]`);
+        if (card) {
+            const chip = card.querySelector('[data-role="question-chip"]');
+            if (chip) {
+                const baseChip = formatQuestionChip(chartData.questionBaseId || chartData.questionId);
+                chip.textContent = `${baseChip} [${chartData.matrixIndex}/${chartData.matrixColumns.length}]`;
+            }
+            const title = card.querySelector('[data-role="matrix-row-title"]');
+            if (title) {
+                title.textContent = selectedColumn.text;
+            }
+            // Update counts if needed? Total answers is per-respondent usually
+            // but for bar charts, maybe show sum of this column?
+            // Let's stick to valid respondents count (chartData.totalAnswers)
+        }
+
+        createChart(chartId, chartData, chartData.chartType);
+        // Summary table might need updates? 
+        // Summary table shows ALL data usually. We don't filter summary table.
+        // But maybe we want to highlight? For now, render as is.
+        renderChartSummaryTable(`summary-${chartId}`, chartData);
+        return;
+    }
+
+    // Handle Row Selection (SA)
+    if (!Array.isArray(chartData.matrixRowDetails)) return;
     const selected = chartData.matrixRowDetails[rowIndex];
     if (!selected) return;
 
@@ -601,7 +664,10 @@ function createChart(chartId, chartData, type) {
     // Base height + (row count * row height estimate)
     const baseHeight = 100; // Title, padding, etc.
     const rowHeight = 40;   // Height per bar
-    const calculatedHeight = isMatrixStacked
+
+    const isHorizontalBar = type === 'bar' && chartData.isMatrix; // Only treat Matrix Bar as strictly horizontal & auto-height for now
+
+    const calculatedHeight = (isMatrixStacked || isHorizontalBar)
         ? Math.max(350, baseHeight + (categoryLabels.length * rowHeight) + (legendConfig.height || 50))
         : (isDoughnut ? legendConfig.chartHeight : 350);
 
@@ -648,7 +714,7 @@ function createChart(chartId, chartData, type) {
             stacked: isMatrixStacked,
             stackType: isStacked100 ? '100%' : undefined
         },
-        colors: isMatrixStacked ? COMMON_CHART_DONUT_PALETTE : GRAPH_CHART_DONUT_PALETTE,
+        colors: isMatrixStacked ? COMMON_CHART_DONUT_PALETTE : (isDoughnut ? GRAPH_CHART_DONUT_PALETTE : GRAPH_CHART_COLOR_PALETTE),
         labels: categoryLabels,
         plotOptions: {
             pie: {
@@ -674,7 +740,7 @@ function createChart(chartId, chartData, type) {
                 }
             },
             bar: {
-                horizontal: true,
+                horizontal: isHorizontalBar || type === 'bar', // Default to horizontal for 'bar' type, or keep consistent
                 distributed: !isDoughnut && !isMatrixStacked,
                 borderRadius: 4, // Slightly smaller radius for stacked
                 barHeight: '60%', // Thinner bars for better spacing
@@ -766,7 +832,7 @@ function renderChartSummaryTable(summaryId, chartData) {
 
         const countByColumn = new Map(series.map(item => [item.name, item.data || []]));
         const headerCells = columns.map(col => `
-            <th class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums w-[84px]">${escapeHtml(col.text)}</th>
+            <th class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums min-w-[80px] whitespace-nowrap">${escapeHtml(col.text)}</th>
         `).join('');
         const bodyRows = rows.map((row, rowIndex) => {
             const total = Number(chartData.matrixRowTotals[rowIndex] || 0);
@@ -793,13 +859,13 @@ function renderChartSummaryTable(summaryId, chartData) {
         }).join('');
 
         container.innerHTML = `
-            <div class="chart-summary-scroll-area border border-outline-variant rounded-lg">
-                <table class="table-layout-fixed text-left text-sm">
+            <div class="chart-summary-scroll-area border border-outline-variant rounded-lg overflow-x-auto">
+                <table class="table-auto text-left text-sm">
                     <thead class="bg-surface-variant-soft text-on-surface-variant sticky top-0 z-10 shadow-[0_1px_0_0_rgba(0,0,0,0.05)]">
                         <tr>
-                            <th class="px-3 py-2 border-b border-outline-variant w-full">行項目</th>
+                            <th class="px-3 py-2 border-b border-outline-variant min-w-[150px] whitespace-nowrap">行項目</th>
                             ${headerCells}
-                            <th class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums w-[84px]">合計</th>
+                            <th class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums min-w-[60px] whitespace-nowrap">合計</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -823,9 +889,21 @@ function renderChartSummaryTable(summaryId, chartData) {
                 const isMedia = ['image', 'photo', 'handwriting', 'file', 'file_upload', 'upload'].includes(chartData.questionType);
                 let valueHtml = escapeHtml(item.value);
                 if (isMedia && item.value && (item.value.startsWith('http') || item.value.startsWith('.') || item.value.startsWith('/'))) {
+                    let linkText = escapeHtml(item.value);
+                    if (item.answerId && item.surveyId) {
+                        const parts = item.answerId.split('-');
+                        const seq = parts.length > 0 ? parts[parts.length - 1] : '0000';
+                        const qNumMatch = (chartData.questionBaseId || chartData.questionId).match(/\d+/);
+                        const qNum = qNumMatch ? String(qNumMatch[0]).padStart(2, '0') : '00';
+                        const ext = item.value.split('.').pop();
+                        const safeExt = ext && ext.length < 5 ? ext : 'png';
+                        const type = item.type || 'image';
+                        linkText = `${item.surveyId}_${seq}_${qNum}_${type}.${safeExt}`;
+                    }
+
                     valueHtml = `<button type="button" onclick="window.previewImage('${escapeHtml(item.value)}')" class="text-primary hover:underline inline-flex items-center gap-1 group transition-colors text-left">
                         <span class="material-icons text-sm group-hover:text-primary-dark transition-colors">image</span>
-                        <span class="truncate border-b border-transparent group-hover:border-primary-dark transition-all">${escapeHtml(item.value)}</span>
+                        <span class="truncate border-b border-transparent group-hover:border-primary-dark transition-all">${linkText}</span>
                     </button>`;
                 }
                 return `
@@ -867,13 +945,13 @@ function renderChartSummaryTable(summaryId, chartData) {
     const totalVotes = chartData.totalAnswers || 0;
 
     let html = `
-        <div class="chart-summary-scroll-area border border-outline-variant rounded-lg">
-            <table class="table-layout-fixed text-left text-sm">
+        <div class="chart-summary-scroll-area border border-outline-variant rounded-lg overflow-x-auto">
+            <table class="table-auto text-left text-sm">
                 <thead class="bg-surface-variant-soft text-on-surface-variant sticky top-0 z-10 shadow-[0_1px_0_0_rgba(0,0,0,0.05)]">
                     <tr>
-                        <th class="px-3 py-2 border-b border-outline-variant w-full">項目</th>
-                        <th class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums w-[80px]">件数</th>
-                        <th class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums w-[80px]">割合</th>
+                        <th class="px-3 py-2 border-b border-outline-variant min-w-[150px] whitespace-nowrap">項目</th>
+                        <th class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums w-[80px] whitespace-nowrap">件数</th>
+                        <th class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums w-[80px] whitespace-nowrap">割合</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -1085,24 +1163,233 @@ async function executeExcelExport(chartsData, options) {
 
                 if (options.includeCharts && !isBlank) {
                     await yieldToMain();
-                    // Capture the single stacked chart
-                    const chartElement = document.getElementById(`chart-${chartData.chartId}`);
-                    if (chartElement) {
-                        const canvas = await html2canvas(chartElement, { useCORS: true, backgroundColor: '#ffffff', scale: 2 });
-                        const base64Image = canvas.toDataURL('image/png');
-                        const imageId = workbook.addImage({ base64: base64Image, extension: 'png' });
 
-                        const ratio = canvas.height / canvas.width;
-                        const displayWidth = 550; // Slightly wider for matrix
-                        const displayHeight = displayWidth * ratio;
+                    if (chartData.chartType === 'pie' && chartData.isMatrix) {
+                        // Matrix Single: Export ALL rows as Pie Charts
+                        // Create a temporary hidden container for rendering
+                        const tempContainer = document.createElement('div');
+                        tempContainer.style.position = 'absolute';
+                        tempContainer.style.left = '-9999px';
+                        tempContainer.style.top = '-9999px';
+                        tempContainer.style.width = '600px';
+                        document.body.appendChild(tempContainer);
 
-                        // Place below table
-                        const startRow = 5 + rows.length + 2;
+                        const rowDetails = chartData.matrixRowDetails || [];
+                        let currentRowStart = 5 + rows.length + 3; // Start below table
 
-                        sheet.addImage(imageId, {
-                            tl: { col: 0, row: startRow },
-                            ext: { width: displayWidth, height: displayHeight }
-                        });
+                        for (let r = 0; r < rowDetails.length; r++) {
+                            const detail = rowDetails[r];
+                            const tempChartId = `temp-export-chart-${processedCount}-${r}`;
+                            const chartWrapper = document.createElement('div');
+                            chartWrapper.id = tempChartId;
+                            tempContainer.appendChild(chartWrapper);
+
+                            // Render Title
+                            const titleEl = document.createElement('div');
+                            titleEl.textContent = `${detail.rowText}`;
+                            titleEl.style.fontFamily = 'Noto Sans JP';
+                            titleEl.style.fontWeight = 'bold';
+                            titleEl.style.fontSize = '14px';
+                            titleEl.style.marginBottom = '5px';
+                            titleEl.style.textAlign = 'center';
+                            chartWrapper.appendChild(titleEl);
+
+                            const chartDiv = document.createElement('div');
+                            chartWrapper.appendChild(chartDiv);
+
+                            // Build temp chart data
+                            const tempChartData = {
+                                ...chartData,
+                                data: detail.data,
+                                totalAnswers: detail.totalAnswers,
+                                labels: chartData.matrixColumns.map(c => c.text)
+                            };
+
+                            // Create chart instance
+                            // Reuse createChart logic but we need access to it, or manually call ApexCharts
+                            const options = {
+                                series: tempChartData.data,
+                                chart: {
+                                    type: 'donut',
+                                    height: 300,
+                                    width: '100%',
+                                    animations: { enabled: false }, // Disable animation for faster export
+                                    fontFamily: "'Noto Sans JP', sans-serif"
+                                },
+                                colors: GRAPH_CHART_DONUT_PALETTE,
+                                labels: tempChartData.labels,
+                                plotOptions: {
+                                    pie: {
+                                        donut: {
+                                            size: '65%',
+                                            labels: {
+                                                show: true,
+                                                total: {
+                                                    show: true,
+                                                    label: '回答数',
+                                                    formatter: () => detail.totalAnswers.toLocaleString()
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                dataLabels: {
+                                    enabled: true,
+                                    formatter: (val) => Math.round(val) + "%",
+                                    style: { fontSize: '11px', fontWeight: 700, colors: ['#fff'] }
+                                },
+                                legend: { position: 'right', fontSize: '12px' }
+                            };
+
+                            const chart = new ApexCharts(chartDiv, options);
+                            chart.render();
+
+                            // Wait for render
+                            await new Promise(resolve => setTimeout(resolve, 500));
+
+                            // Capture
+                            try {
+                                const canvas = await html2canvas(chartWrapper, { useCORS: true, backgroundColor: '#ffffff', scale: 2 });
+                                const base64Image = canvas.toDataURL('image/png');
+                                const imageId = workbook.addImage({ base64: base64Image, extension: 'png' });
+
+                                const ratio = canvas.height / canvas.width;
+                                const displayWidth = 400;
+                                const displayHeight = displayWidth * ratio;
+
+                                sheet.addImage(imageId, {
+                                    tl: { col: 0, row: currentRowStart },
+                                    ext: { width: displayWidth, height: displayHeight }
+                                });
+
+                                // Move next position
+                                currentRowStart += Math.ceil(displayHeight / 20) + 2;
+
+                            } catch (e) {
+                                console.error('Error capturing matrix row chart', e);
+                            }
+
+                            chart.destroy();
+                            tempContainer.innerHTML = ''; // Clear for next
+                        }
+
+                        document.body.removeChild(tempContainer);
+
+                    } else if (chartData.isMatrix && chartData.chartType === 'bar') {
+                        // Matrix Multi (Row Selector): Export ALL ROWS as Bar Charts
+                        // Similar to Pie implementation but for Bar
+                        const tempContainer = document.createElement('div');
+                        tempContainer.style.position = 'absolute';
+                        tempContainer.style.left = '-9999px';
+                        tempContainer.style.top = '-9999px';
+                        tempContainer.style.width = '600px';
+                        document.body.appendChild(tempContainer);
+
+                        const rowDetails = chartData.matrixRowDetails || [];
+                        const columns = chartData.matrixColumns || [];
+                        let currentRowStart = 5 + rows.length + 3;
+
+                        for (let r = 0; r < rowDetails.length; r++) {
+                            const detail = rowDetails[r];
+                            const tempChartId = `temp-export-chart-ma-row-${processedCount}-${r}`;
+                            const chartWrapper = document.createElement('div');
+                            chartWrapper.id = tempChartId;
+                            tempContainer.appendChild(chartWrapper);
+
+                            // Title
+                            const titleEl = document.createElement('div');
+                            titleEl.textContent = `${detail.rowText}`; // Or use row total
+                            titleEl.style.fontFamily = 'Noto Sans JP';
+                            titleEl.style.fontWeight = 'bold';
+                            titleEl.style.fontSize = '14px';
+                            titleEl.style.marginBottom = '5px';
+                            titleEl.style.textAlign = 'center';
+                            chartWrapper.appendChild(titleEl);
+
+                            const chartDiv = document.createElement('div');
+                            chartWrapper.appendChild(chartDiv);
+
+                            // ApexCharts Options for Bar
+                            const options = {
+                                series: [{ name: '回答数', data: detail.data }],
+                                chart: {
+                                    type: 'bar',
+                                    height: 300,
+                                    width: '100%',
+                                    animations: { enabled: false },
+                                    fontFamily: "'Noto Sans JP', sans-serif",
+                                    toolbar: { show: false }
+                                },
+                                plotOptions: {
+                                    bar: {
+                                        horizontal: true,
+                                        barHeight: '60%',
+                                        distributed: true
+                                    }
+                                },
+                                colors: GRAPH_CHART_COLOR_PALETTE,
+                                dataLabels: { enabled: true },
+                                xaxis: {
+                                    categories: columns.map(c => c.text)
+                                },
+                                grid: {
+                                    xaxis: { lines: { show: true } }
+                                },
+                                legend: { show: false }
+                            };
+
+                            const chart = new ApexCharts(chartDiv, options);
+                            chart.render();
+                            await new Promise(resolve => setTimeout(resolve, 500));
+
+                            try {
+                                const canvas = await html2canvas(chartWrapper, { useCORS: true, backgroundColor: '#ffffff', scale: 2 });
+                                const base64Image = canvas.toDataURL('image/png');
+                                const imageId = workbook.addImage({ base64: base64Image, extension: 'png' });
+
+                                const ratio = canvas.height / canvas.width;
+                                const displayWidth = 400;
+                                const displayHeight = displayWidth * ratio;
+
+                                sheet.addImage(imageId, {
+                                    tl: { col: 0, row: currentRowStart },
+                                    ext: { width: displayWidth, height: displayHeight }
+                                });
+
+                                currentRowStart += Math.ceil(displayHeight / 20) + 2;
+
+                            } catch (e) {
+                                console.error('Error capturing matrix row bar chart', e);
+                            }
+                            chart.destroy();
+                            tempContainer.innerHTML = '';
+                        }
+                        document.body.removeChild(tempContainer);
+
+                    } else {
+                        // Capture the single stacked chart (fallback or MA stacked)
+                        // If we implemented 'column' selector, this block might be skipped for MA.
+                        // But wait, buildMatrixCharts sets 'column' selector for MA. 
+                        // So MA goes to the block above.
+                        // SA goes to 'pie' block above.
+                        // Regular stacked (if any left) goes here.
+
+                        const chartElement = document.getElementById(`chart-${chartData.chartId}`);
+                        if (chartElement) {
+                            const canvas = await html2canvas(chartElement, { useCORS: true, backgroundColor: '#ffffff', scale: 2 });
+                            const base64Image = canvas.toDataURL('image/png');
+                            const imageId = workbook.addImage({ base64: base64Image, extension: 'png' });
+
+                            const ratio = canvas.height / canvas.width;
+                            const displayWidth = 550;
+                            const displayHeight = displayWidth * ratio;
+                            const startRow = 5 + rows.length + 2;
+
+                            sheet.addImage(imageId, {
+                                tl: { col: 0, row: startRow },
+                                ext: { width: displayWidth, height: displayHeight }
+                            });
+                        }
                     }
                 }
             } else if (chartData.chartType === 'list') {
@@ -1569,11 +1856,15 @@ function buildMatrixCharts(question, questionId, answers, isMulti) {
             rowIndex,
             rowId: row.id,
             rowText: row.text,
+            rowText: row.text,
             data: data, // Array matching columns order
+            labels: columns.map(c => c.text), // Add labels for Pie chart switching
             totalAnswers: answeredCount
         };
     });
 
+    // Build Series for Stacked Bar (Series = Columns)
+    // Transpose data: Series 1 (Column 1) -> [Row1-Val, Row2-Val, ...]
     // Build Series for Stacked Bar (Series = Columns)
     // Transpose data: Series 1 (Column 1) -> [Row1-Val, Row2-Val, ...]
     const matrixSeries = columns.map((col, colIndex) => {
@@ -1586,6 +1877,48 @@ function buildMatrixCharts(question, questionId, answers, isMulti) {
     const matrixRowTotals = rowDetails.map(d => d.totalAnswers);
     const totalAll = matrixRowTotals.reduce((a, b) => a + b, 0);
 
+    // Initial state setup for Matrix
+    let initialChartType = 'matrix_stacked_100';
+    let initialData = [];
+    let initialLabels = [];
+    let initialTotal = 0;
+
+    // New property to determine what the selector switches
+    let selectorType = 'row'; // 'row' or 'column'
+
+    if (isMulti) {
+        // MA: Bar Chart (Horizontal) with ROW Selector (Reverted to Row per user feedback)
+        // Rows (Categories) are selectable. Graph shows Columns distribution.
+        initialChartType = 'bar';
+        selectorType = 'row';
+
+        // Initial Data: First Row
+        const firstRow = rowDetails[0];
+        if (firstRow) {
+            initialData = firstRow.data;
+            initialLabels = columns.map(c => c.text); // Y-axis labels are Columns
+            initialTotal = firstRow.totalAnswers;
+        } else {
+            initialData = [];
+            initialLabels = [];
+        }
+
+    } else {
+        // SA: Donut Chart with Row Selector
+        initialChartType = 'pie';
+        selectorType = 'row';
+
+        const firstRow = rowDetails[0];
+        if (firstRow) {
+            initialData = firstRow.data;
+            initialLabels = columns.map(c => c.text);
+            initialTotal = firstRow.totalAnswers;
+        } else {
+            initialData = [];
+            initialLabels = [];
+        }
+    }
+
     return [buildChartData({
         questionId,
         questionText: question.text,
@@ -1595,13 +1928,25 @@ function buildMatrixCharts(question, questionId, answers, isMulti) {
         matrixColumns: columns,
         matrixSeries: matrixSeries,
         matrixRowTotals: matrixRowTotals,
-        // For SA (Single Answer), use 100% stacked to show ratio distribution
-        // For MA (Multiple Answer), use normal stacked to show counts
-        chartType: isMulti ? 'matrix_stacked' : 'matrix_stacked_100',
+        matrixRowDetails: rowDetails,
+        matrixSelectorType: selectorType, // NEW
+
+        // Settings for current view
+        chartType: initialChartType,
         summaryType: 'matrix_table',
         includeTotalRow: true,
         allowToggle: false,
-        totalAnswers: totalAll // Grand total of respondent-rows (or responses)
+
+        // Initial View Data
+        data: initialData,
+        labels: initialLabels,
+        totalAnswers: isMulti ? totalAll : initialTotal,
+
+        // Initialize State for Selector
+        matrixSelectedIndex: 0,
+        matrixIndex: 1,
+        matrixTotal: selectorType === 'column' ? columns.length : rows.length,
+        matrixRowText: selectorType === 'column' ? (columns[0]?.text || '') : (rows[0]?.text || '')
     })];
 }
 
@@ -1634,6 +1979,7 @@ function buildChartData(data) {
         matrixRowTotals: data.matrixRowTotals || [],
         matrixSelectedIndex: Number.isFinite(data.matrixSelectedIndex) ? data.matrixSelectedIndex : 0,
         matrixRowDetails: data.matrixRowDetails || [],
+        matrixSelectorType: data.matrixSelectorType || 'row',
         questionType: data.questionType || ''
     };
 }
@@ -1653,7 +1999,10 @@ function buildListChart(question, questionId, answers, fallbackReason = '', ques
     const listEntries = collectListEntries(question, answers);
     const listAll = listEntries.map(entry => ({
         value: entry.value,
-        answeredAtLabel: entry.answeredAtLabel
+        answeredAtLabel: entry.answeredAtLabel,
+        answerId: entry.answerId,
+        surveyId: entry.surveyId,
+        type: entry.type
     }));
     return buildChartData({
         questionId,
@@ -1737,7 +2086,10 @@ function collectListEntries(question, answers) {
         entries.push({
             value,
             answeredAt,
-            answeredAtLabel: formatAnsweredAt(answeredAt)
+            answeredAtLabel: formatAnsweredAt(answeredAt),
+            answerId: answer.answerId,
+            surveyId: answer.surveyId,
+            type: detail.type || question.type
         });
     });
     entries.sort((a, b) => {
