@@ -1660,15 +1660,20 @@ function sortData(data) {
 function updateSortIcons() {
     document.querySelectorAll('.sortable-header').forEach(header => {
         const icon = header.querySelector('.sort-icon');
+        const headerCell = header.closest('th');
         if (!icon) return;
         if (header.dataset.sortKey === currentSortKey) {
             icon.textContent = currentSortOrder === 'asc' ? 'arrow_upward' : 'arrow_downward';
             icon.classList.remove('opacity-40');
-            header.setAttribute('aria-sort', currentSortOrder === 'asc' ? 'ascending' : 'descending');
+            if (headerCell) {
+                headerCell.setAttribute('aria-sort', currentSortOrder === 'asc' ? 'ascending' : 'descending');
+            }
         } else {
             icon.textContent = 'unfold_more';
             icon.classList.add('opacity-40');
-            header.setAttribute('aria-sort', 'none');
+            if (headerCell) {
+                headerCell.setAttribute('aria-sort', 'none');
+            }
         }
     });
 }
@@ -1688,12 +1693,14 @@ function setupSortListeners() {
 
     document.querySelectorAll('.sortable-header').forEach(header => {
         header.addEventListener('click', () => onSortHeaderActivate(header));
-        header.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault();
-                onSortHeaderActivate(header);
-            }
-        });
+        if (header.tagName !== 'BUTTON') {
+            header.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    onSortHeaderActivate(header);
+                }
+            });
+        }
     });
 }
 
