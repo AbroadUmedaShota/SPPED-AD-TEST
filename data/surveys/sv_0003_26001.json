@@ -174,34 +174,13 @@
     },
     {
       "id": "Q13",
-      "text": "【ダミー】サービス品質評価 (SA)",
-      "type": "matrix_sa",
-      "rows": [
-        { "id": "r1", "text": "機能A" },
-        { "id": "r2", "text": "機能B" },
-        { "id": "r3", "text": "機能C" }
-      ],
+      "text": "ご希望の連絡手段",
+      "type": "dropdown",
       "options": [
-        { "value": "5", "text": "大変満足" },
-        { "value": "4", "text": "満足" },
-        { "value": "3", "text": "普通" },
-        { "value": "2", "text": "不満" },
-        { "value": "1", "text": "大変不満" }
-      ]
-    },
-    {
-      "id": "Q14",
-      "text": "【ダミー】利用している機能 (MA)",
-      "type": "matrix_ma",
-      "rows": [
-        { "id": "r1", "text": "製品X" },
-        { "id": "r2", "text": "製品Y" }
-      ],
-      "options": [
-        { "value": "a", "text": "機能A" },
-        { "value": "b", "text": "機能B" },
-        { "value": "c", "text": "機能C" },
-        { "value": "d", "text": "機能D" }
+        "メール",
+        "電話",
+        "オンライン会議",
+        "訪問"
       ]
     }
   ]

@@ -2049,7 +2049,7 @@ function renderAttributeChart(data) {
     const canvas = document.getElementById('attributeChart');
     const apexContainer = document.getElementById('attributeChartApex');
     if (!canvas || !apexContainer) return;
-    
+
     const container = canvas.parentElement;
 
     const renderEmptyState = (message, icon) => {
@@ -2118,10 +2118,10 @@ function renderAttributeChart(data) {
                 const option = new Option(row.text, row.id);
                 select.add(option);
             });
-            
+
             // If the current selection is not in the options (e.g. 'all' for SA), default to the first option.
             if (!select.querySelector(`option[value="${currentMatrixRowId}"]`)) {
-                 currentMatrixRowId = select.options[0].value;
+                currentMatrixRowId = select.options[0].value;
             }
             select.value = currentMatrixRowId;
 
@@ -2181,7 +2181,7 @@ function renderAttributeChart(data) {
             counts[label] = (counts[label] || 0) + 1;
         }
     });
-    
+
     const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
     if (sorted.length === 0) {
         renderEmptyState('回答を待っています...', 'hourglass_empty');
@@ -2191,52 +2191,88 @@ function renderAttributeChart(data) {
     const labels = sorted.map(s => s[0]);
     const values = sorted.map(s => s[1]);
 
+    const isMulti = MULTI_CHOICE_TYPES.has(questionDef.type);
+    const chartType = isMulti ? 'bar' : 'doughnut';
+    const chartOptions = isMulti ? {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            x: {
+                beginAtZero: true,
+                grid: { display: true, color: '#f3f4f6' },
+                ticks: { font: { size: 10 } }
+            },
+            y: {
+                grid: { display: false },
+                ticks: { font: { size: 11 }, autoSkip: false }
+            }
+        },
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                callbacks: {
+                    label: (context) => `${context.parsed.x}件`
+                }
+            },
+            datalabels: {
+                anchor: 'end',
+                align: 'end',
+                color: '#4b5563',
+                font: { size: 10 },
+                formatter: (value) => value > 0 ? value : ''
+            }
+        }
+    } : {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '60%',
+        plugins: {
+            legend: {
+                position: 'right',
+                labels: { boxWidth: 12, font: { size: 11 }, usePointStyle: true },
+                onClick: (event, legendItem, legend) => {
+                    const chart = legend.chart;
+                    const nextIndex = chart._legendFocusIndex === legendItem.index ? null : legendItem.index;
+                    applyLegendFocus(chart, nextIndex, 'segment');
+                },
+                onHover: (event, legendItem, legend) => {
+                    updateLegendFade(legend.chart, legendItem.index, 'segment');
+                },
+                onLeave: (event, legendItem, legend) => {
+                    updateLegendFade(legend.chart, null, 'segment');
+                }
+            },
+            datalabels: {
+                color: '#111827',
+                font: { weight: 'bold', size: 10 },
+                anchor: 'center',
+                align: 'center',
+                formatter: value => (value > 0 ? value : ''),
+                textStrokeColor: '#ffffff',
+                textStrokeWidth: 3
+            }
+        }
+    };
+
     if (attributeChart) {
         attributeChart.destroy();
     }
 
     attributeChart = new Chart(canvas, {
-        type: 'doughnut',
+        type: chartType,
         data: {
             labels: labels,
             datasets: [{
                 data: values,
                 backgroundColor: labels.map((label, index) => getChartColor(index)),
                 borderColor: '#ffffff',
-                borderWidth: 2
+                borderWidth: 2,
+                barPercentage: 0.6,
+                categoryPercentage: 0.8
             }]
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '60%',
-            plugins: {
-                legend: {
-                    position: 'right',
-                    labels: { boxWidth: 12, font: { size: 11 }, usePointStyle: true },
-                    onClick: (event, legendItem, legend) => {
-                        const chart = legend.chart;
-                        const nextIndex = chart._legendFocusIndex === legendItem.index ? null : legendItem.index;
-                        applyLegendFocus(chart, nextIndex, 'segment');
-                    },
-                    onHover: (event, legendItem, legend) => {
-                        updateLegendFade(legend.chart, legendItem.index, 'segment');
-                    },
-                    onLeave: (event, legendItem, legend) => {
-                        updateLegendFade(legend.chart, null, 'segment');
-                    }
-                },
-                datalabels: {
-                    color: '#111827',
-                    font: { weight: 'bold', size: 10 },
-                    anchor: 'center',
-                    align: 'center',
-                    formatter: value => (value > 0 ? value : ''),
-                    textStrokeColor: '#ffffff',
-                    textStrokeWidth: 3
-                }
-            }
-        }
+        options: chartOptions
     });
 }
 
