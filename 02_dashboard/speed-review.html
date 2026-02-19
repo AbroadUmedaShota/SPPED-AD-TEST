@@ -213,7 +213,7 @@
                                 <!-- 右側：ナビゲーションエリア（セパレーター付き） -->
                                 <div
                                     class="shrink-0 flex items-center px-6 border-l border-outline-variant/50 bg-surface-variant/5 rounded-r-2xl">
-                                    <button id="graphButton"
+                                    <button id="graphButton" type="button"
                                         class="bg-primary text-white hover:bg-primary/90 shadow-md hover:shadow-lg text-xs font-bold py-2.5 px-5 rounded-xl flex items-center gap-2 transition-all hover:scale-105 active:scale-95 border-none">
                                         <span class="material-icons text-sm">analytics</span>
                                         <span class="whitespace-nowrap">詳細分析</span>
@@ -232,10 +232,10 @@
                                 <h3 class="text-sm font-medium text-on-surface-variant">時間帯別回答数</h3>
                                 <!-- Axis Mode Switch -->
                                 <div class="flex p-0.5 bg-surface-variant rounded-md">
-                                    <button id="ts-axis-auto-btn"
+                                    <button id="ts-axis-auto-btn" type="button"
                                         class="px-2 py-0.5 text-[10px] font-bold rounded-sm transition-all bg-surface text-primary shadow-sm"
                                         title="投稿がある範囲のみ表示">自動</button>
-                                    <button id="ts-axis-fixed-btn"
+                                    <button id="ts-axis-fixed-btn" type="button"
                                         class="px-2 py-0.5 text-[10px] font-bold rounded-sm transition-all text-on-surface-variant hover:text-on-surface"
                                         title="9:00-19:00で固定表示">固定</button>
                                 </div>
@@ -285,31 +285,51 @@
                                 id="reviewTable">
                                 <thead class="bg-surface-variant">
                                     <tr>
-                                        <th class="sortable-header px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[15%] cursor-pointer"
-                                            tabindex="0" role="button" aria-sort="none" data-sort-key="answerId">
-                                            <div class="flex items-center">回答ID<span
-                                                    class="material-icons sort-icon opacity-40">unfold_more</span></div>
+                                        <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[15%]"
+                                            aria-sort="none">
+                                            <button type="button"
+                                                class="sortable-header flex w-full items-center gap-1 text-left"
+                                                data-sort-key="answerId">
+                                                <span>回答ID</span>
+                                                <span class="material-icons sort-icon opacity-40">unfold_more</span>
+                                            </button>
                                         </th>
-                                        <th class="sortable-header px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[18%] min-w-[160px] cursor-pointer"
-                                            tabindex="0" role="button" aria-sort="none" data-sort-key="answeredAt">
-                                            <div class="flex items-center">回答日時<span
-                                                    class="material-icons sort-icon opacity-40">unfold_more</span></div>
+                                        <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[18%] min-w-[160px]"
+                                            aria-sort="none">
+                                            <button type="button"
+                                                class="sortable-header flex w-full items-center gap-1 text-left"
+                                                data-sort-key="answeredAt">
+                                                <span>回答日時</span>
+                                                <span class="material-icons sort-icon opacity-40">unfold_more</span>
+                                            </button>
                                         </th>
-                                        <th class="sortable-header px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[18%] min-w-[140px] cursor-pointer"
-                                            tabindex="0" role="button" aria-sort="none" data-sort-key="fullName">
-                                            <div class="flex items-center">氏名<span
-                                                    class="material-icons sort-icon opacity-40">unfold_more</span></div>
+                                        <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[18%] min-w-[140px]"
+                                            aria-sort="none">
+                                            <button type="button"
+                                                class="sortable-header flex w-full items-center gap-1 text-left"
+                                                data-sort-key="fullName">
+                                                <span>氏名</span>
+                                                <span class="material-icons sort-icon opacity-40">unfold_more</span>
+                                            </button>
                                         </th>
-                                        <th class="sortable-header px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[20%] cursor-pointer"
-                                            tabindex="0" role="button" aria-sort="none" data-sort-key="companyName">
-                                            <div class="flex items-center">会社名<span
-                                                    class="material-icons sort-icon opacity-40">unfold_more</span></div>
+                                        <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[20%]"
+                                            aria-sort="none">
+                                            <button type="button"
+                                                class="sortable-header flex w-full items-center gap-1 text-left"
+                                                data-sort-key="companyName">
+                                                <span>会社名</span>
+                                                <span class="material-icons sort-icon opacity-40">unfold_more</span>
+                                            </button>
                                         </th>
-                                        <th id="dynamic-question-header"
-                                            class="sortable-header px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[29%] min-w-[180px] cursor-pointer"
-                                            tabindex="0" role="button" aria-sort="none" data-sort-key="dynamicQuestion">
-                                            <div class="flex items-center">設問回答<span
-                                                    class="material-icons sort-icon opacity-40">unfold_more</span></div>
+                                        <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-[29%] min-w-[180px]"
+                                            aria-sort="none">
+                                            <button type="button"
+                                                class="sortable-header flex w-full items-center gap-1 overflow-hidden text-left"
+                                                data-sort-key="dynamicQuestion">
+                                                <span id="dynamic-question-header"
+                                                    class="min-w-0 flex-1 truncate">設問回答</span>
+                                                <span class="material-icons sort-icon opacity-40 shrink-0">unfold_more</span>
+                                            </button>
                                         </th>
                                     </tr>
                                 </thead>
@@ -331,12 +351,12 @@
                                 </select>
                             </div>
                             <div class="flex items-center gap-2">
-                                <button
+                                <button type="button"
                                     class="w-9 h-9 p-2 rounded-full hover:bg-surface-variant transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     title="前へ" id="prevPageBtn" aria-label="前のページへ"><span
                                         class="material-icons text-lg">chevron_left</span></button>
                                 <div id="pagination-numbers" class="flex items-center gap-1"></div>
-                                <button
+                                <button type="button"
                                     class="w-9 h-9 p-2 rounded-full hover:bg-surface-variant transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     title="次へ" id="nextPageBtn" aria-label="次のページへ"><span
                                         class="material-icons text-lg">chevron_right</span></button>
@@ -351,7 +371,7 @@
                 <aside id="right-sidebar"
                     class="fixed top-24 right-8 w-80 transition-transform duration-300 ease-in-out z-40 translate-x-0">
                     <!-- Toggle Button -->
-                    <button id="right-sidebar-toggle-btn"
+                    <button id="right-sidebar-toggle-btn" type="button"
                         class="absolute -left-10 top-8 bg-surface p-2 rounded-l-full shadow-lg hover:bg-surface-variant focus:outline-none focus:ring-2 ring-offset-2 ring-primary transition-colors flex items-center justify-center lg:flex"
                         aria-label="サイドバーを開閉する">
                         <span class="material-icons transition-transform duration-300">chevron_right</span>
@@ -369,10 +389,10 @@
 
                             <!-- Search Tabs -->
                             <div class="flex p-1 bg-surface-variant rounded-lg mb-6">
-                                <button id="simple-search-tab"
+                                <button id="simple-search-tab" type="button"
                                     class="search-tab-btn is-active flex-1 py-1.5 text-xs font-bold rounded-md transition-all bg-surface text-primary shadow-sm"
                                     data-tab="simple">簡易検索</button>
-                                <button id="detailed-search-tab"
+                                <button id="detailed-search-tab" type="button"
                                     class="search-tab-btn flex-1 py-1.5 text-xs font-bold rounded-md transition-all text-on-surface-variant hover:text-on-surface"
                                     data-tab="detailed">詳細検索</button>
                             </div>
@@ -427,7 +447,7 @@
                             </div>
 
                             <div class="space-y-4 pt-6 border-t border-outline-variant/30 mt-6">
-                                <button id="resetFiltersButton"
+                                <button id="resetFiltersButton" type="button"
                                     class="w-full px-4 py-2 rounded-md font-semibold transition-colors shadow-sm bg-secondary/10 text-secondary hover:bg-secondary/20 border-none"
                                     aria-label="フィルターをリセット">
                                     フィルターをリセット
@@ -438,7 +458,6 @@
                     </div>
                 </aside>
             </div>
-    </div>
     </main>
 
 
