@@ -49,6 +49,6 @@ flowchart TD
 
 ## 参照ドキュメント
 - `docs/product/processes/multilingualBizcardFlow.md`（既存フロー全体と不一致ハンドリング）
-- `docs/product/specs/02_survey_creation.md:211-227`（多言語回答フローの不一致・再割当分岐）
+- `docs/画面設計/specs/02_survey_creation.md:211-227`（多言語回答フローの不一致・再割当分岐）
 - `docs/product/architecture/02_data_model.md:238-361`（`input_business_cards` の `language_code` 整合性チェック）
-- `docs/product/specs/admin/00_admin_requirements_design.md:36-106`（言語別キュー管理と再割当要件）
+- `docs/画面設計/specs/admin/00_admin_requirements_design.md:36-106`（言語別キュー管理と再割当要件）

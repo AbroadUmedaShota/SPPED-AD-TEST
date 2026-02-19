@@ -7,7 +7,7 @@
 - 機能差分（JSON）: `data/core/plan-capabilities.json`
 - 請求・課金の前提: `docs/product/requirements/01_billing_and_invoicing_logic.md`
 - 多言語要件（プレミアム限定）: `docs/product/requirements/multilingual_requirements.md`
-- サービス検討（ドラフト）: `docs/service-consideration/`
+- サービス検討（ドラフト）: `docs/product/サービス企画/`
 
 ## いま資料上“プレミアム”として出ている要素（抜粋）
 - 多言語（作成/回答、最大ロケール数）

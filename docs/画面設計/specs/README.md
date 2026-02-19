@@ -1,6 +1,6 @@
 # 画面仕様ドキュメント運用ルール
 
-`docs/product/specs/` は、サービス画面と管理画面の要件定義・機能仕様の正本です。
+`docs/画面設計/specs/` は、サービス画面と管理画面の要件定義・機能仕様の正本です。
 
 ## 読み方
 - `00_*` から `14_*`: 主要画面の仕様書。
@@ -10,7 +10,7 @@
 - `premium/`: プレミアム登録・契約管理の要件群。
 
 ## 正本ルール
-- 新規仕様は必ず `docs/product/specs/` または `docs/product/specs/admin/` に作成する。
+- 新規仕様は必ず `docs/画面設計/specs/` または `docs/画面設計/specs/admin/` に作成する。
 - `docs/requirements/` 配下は移行中の旧要件として扱い、参照は段階的に置換する。
 - 同一テーマで複数ファイルがある場合は、片方を「参照専用（legacy）」と明記する。
 
@@ -21,7 +21,7 @@
 
 ## 当面の整理対象
 - [完了: 2026-02-18] `13_survey_answer_screen.md` を正本へ統合し、`docs/requirements/specifications/13_survey_answer_screen.md` は legacy redirect 化。
-- [完了: 2026-02-18] `premium_*_requirements.md` を `docs/product/specs/premium/` へ移管し、旧配置は legacy redirect 化。
+- [完了: 2026-02-18] `premium_*_requirements.md` を `docs/画面設計/specs/premium/` へ移管し、旧配置は legacy redirect 化。
 - [完了: 2026-02-18] `01_first-login-tutorial.md` と `performance_management.md` を正本へ統合し、旧配置は legacy redirect 化。
 - [完了: 2026-02-18] `help-center_requirements.md` を `15_help_center_requirements.md` として正本化し、旧配置は legacy redirect 化。
 - `speed_review` / `graph` 系仕様の参照先統一（仕様・実装・データフロー）。

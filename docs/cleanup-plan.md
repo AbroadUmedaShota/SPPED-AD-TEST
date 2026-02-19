@@ -13,10 +13,10 @@
 - [2025-09-18] Consolidated reference artefacts under `docs/requirements/resources/` (現 `docs/references/resources/`) and triaged temporary files into `archive/temp/`.
 - [2025-10-27] Restructured `docs/` into `product/`, `handbook/`, `references/`, `changelog/`, `archive/`, and `ja/`; archived legacy form submissions under `docs/archive/forms/`.
 - [2026-02-18] Standardized docs navigation and template ownership: canonical templates are in `docs/references/templates/`, while historical samples moved to `docs/templates/examples/`.
-- [2026-02-18] Consolidated duplicate survey-answer specifications; canonical moved to `docs/product/specs/13_survey_answer_screen.md` and legacy file redirected.
-- [2026-02-18] Migrated premium requirements to `docs/product/specs/premium/` and converted legacy `docs/requirements/premium_*` files into redirects.
+- [2026-02-18] Consolidated duplicate survey-answer specifications; canonical moved to `docs/画面設計/specs/13_survey_answer_screen.md` and legacy file redirected.
+- [2026-02-18] Migrated premium requirements to `docs/画面設計/specs/premium/` and converted legacy `docs/requirements/premium_*` files into redirects.
 - [2026-02-18] Consolidated first-login/performance requirements into canonical specs and converted legacy requirement files into redirects.
-- [2026-02-18] Migrated help-center requirements to `docs/product/specs/15_help_center_requirements.md` and converted legacy requirement file into redirect.
+- [2026-02-18] Migrated help-center requirements to `docs/画面設計/specs/15_help_center_requirements.md` and converted legacy requirement file into redirect.
 
 ## Objectives
 - Consolidate duplicated source trees so the dashboard uses a single module set.

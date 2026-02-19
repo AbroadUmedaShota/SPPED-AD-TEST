@@ -10,4 +10,4 @@
 
 ## 運用メモ
 - 旧配置 `docs/requirements/premium_*_requirements.md` は legacy redirect として維持します。
-- プレミアム機能の検討ドラフトは `docs/service-consideration/` を参照してください。
+- プレミアム機能の検討ドラフトは `docs/product/サービス企画/` を参照してください。

@@ -18,10 +18,10 @@
 
 ## 1. 参照ドキュメント
 - ステータス草案: `docs/changelog/status_draft.md`
-- ダッシュボード実装方針: `docs/product/specs/12_dashboard_current_functional_requirements.md`
+- ダッシュボード実装方針: `docs/画面設計/specs/12_dashboard_current_functional_requirements.md`
   - 画面で見せるステータスを正規化し、削除済みは除外している
   - ライフサイクルに応じてダウンロード可否を判定している
-- 画面要件: `docs/product/specs/00_screen_requirements.md`
+- 画面要件: `docs/画面設計/specs/00_screen_requirements.md`
   - `削除済み` / `不明` はフィルタ選択肢に出さない
 - 権限制御とステータス挙動: `docs/ja/user-permissions.md`
 - データモデル: `docs/product/architecture/02_data_model.md`
@@ -190,15 +190,15 @@ Premium保持期間         | 無期限                    | 1年               
 - 監査ログの保持期間と提供方法（誰がアクセスでき、どの形式で出すか）。
 
 ## 9. 画面別ステータス一覧（ドキュメント出典ベース）
-- ダッシュボード「アンケート一覧」 (`docs/product/specs/00_screen_requirements.md`)  
+- ダッシュボード「アンケート一覧」 (`docs/画面設計/specs/00_screen_requirements.md`)  
   - フィルタ・表示: 会期前 / 会期中 / データ精査中 / 完了 / 終了 / データ化なし （削除済み・不明は非表示）
-- ダッシュボード「請求（請求一覧・詳細）」 (`docs/product/specs/04_invoice_screen.md`)  
+- ダッシュボード「請求（請求一覧・詳細）」 (`docs/画面設計/specs/04_invoice_screen.md`)  
   - ステータス: 未入金 / 入金済 / 延滞 / 取消 （フィルタの初期値「すべて」を含む）
-- グループ編集（メンバー管理） (`docs/product/specs/group_edit_requirements.md`)  
+- グループ編集（メンバー管理） (`docs/画面設計/specs/group_edit_requirements.md`)  
   - バッジ並び順: グループ加入済 / グループ招待中 / アドレスエラー
-- 管理画面「クーポン管理」 (`docs/product/specs/admin/coupon_management_requirements.md`)  
+- 管理画面「クーポン管理」 (`docs/画面設計/specs/admin/coupon_management_requirements.md`)  
   - プルダウン: すべて / 有効 / 利用上限到達 / 利用停止 / 期限切れ
-- 管理画面「カレンダー管理」 (`docs/product/specs/admin/calendar-management_requirements.md`)  
+- 管理画面「カレンダー管理」 (`docs/画面設計/specs/admin/calendar-management_requirements.md`)  
   - 日付ステータス: 営業日 / 休業日 / 振替営業日  
   - SLA集計例で参照するタスク状態（例示）: データ入力待ち / 照合待ち
 

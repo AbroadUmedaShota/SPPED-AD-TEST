@@ -1,11 +1,11 @@
 # 製品ドキュメント概要
 
-`docs/product/` は、要件・設計・運用プロセスをまとめた製品ドキュメントの正本ディレクトリです。
+`docs/product/` は、サービス企画・アーキテクチャ・運用プロセスをまとめた製品ドキュメントの正本ディレクトリです。
 
 ## ディレクトリ構成
 - `overview/`: プロジェクト全体像、要件インデックス、画面遷移。
 - `architecture/`: アーキテクチャ方針、データモデル、データインベントリ。
-- `specs/`: サービス画面/管理画面の機能要件・画面仕様（`admin/`・`premium/` を含む）。
+- `サービス企画/`: サービス企画の検討資料（機能棚卸し、プラン比較、方針ドラフト）。
 - `processes/`: 業務プロセス、データフロー、KPI フロー。
 - `ui/`: デザインガイド、UI メッセージ、コンポーネント統合手順。
 - `standards/`: コーディング規約、レビュー観点。
@@ -14,7 +14,8 @@
 - アーキテクチャ: `architecture/01_ARCHITECTURE.md`
 - データモデル: `architecture/02_data_model.md`
 - データ配置: `architecture/data-inventory.md`
-- 画面仕様: `specs/README.md`
+- サービス企画: `サービス企画/README.md`
+- 画面仕様: `../画面設計/specs/README.md`
 - コーディング規約: `standards/02_CODING_STANDARDS.md`
 
 ## 運用ルール
