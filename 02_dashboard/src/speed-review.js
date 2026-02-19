@@ -47,7 +47,7 @@ if (chartDataLabels && window.Chart) {
     Chart.register(chartDataLabels);
 }
 
-const SINGLE_CHOICE_TYPES = new Set(['single_choice', 'dropdown']);
+const SINGLE_CHOICE_TYPES = new Set(['single_choice', 'dropdown', 'rating']);
 const MULTI_CHOICE_TYPES = new Set(['multi_choice']);
 const MATRIX_SINGLE_TYPES = new Set(['matrix_sa', 'matrix_single']);
 const MATRIX_MULTI_TYPES = new Set(['matrix_ma', 'matrix_multi', 'matrix_multiple']);
