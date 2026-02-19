@@ -148,6 +148,16 @@ function openNewSurveyModalWithSetup(afterOpen) {
         const displayTitleInput = document.getElementById('displayTitle');
         const periodRangeInput = document.getElementById('newSurveyPeriodRange');
 
+        // デフォルト値を設定（高速作成用）
+        const now = new Date();
+        const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+        if (surveyNameInput && !surveyNameInput.value) {
+            surveyNameInput.value = `アンケート_${dateStr}`;
+        }
+        if (displayTitleInput && !displayTitleInput.value) {
+            displayTitleInput.value = `アンケート`;
+        }
+
         const surveyNameError = document.getElementById('surveyName-error');
         const displayTitleError = document.getElementById('displayTitle-error');
         const periodRangeError = document.getElementById('newSurveyPeriodRange-error');

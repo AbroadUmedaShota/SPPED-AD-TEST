@@ -1,5 +1,5 @@
 import { initBreadcrumbs } from './breadcrumb.js';
-import { resolveDemoDataPath, showToast } from './utils.js';
+import { resolveDemoDataPath, resolveDashboardDataPath, showToast } from './utils.js';
 import { getSurveyPeriodRange, buildDateFilterOptions, applyDateFilterOptions, resolveDateRangeFromValue } from './services/dateFilterService.js';
 import { COMMON_CHART_DONUT_PALETTE } from './constants/chartPalette.js';
 
@@ -224,15 +224,33 @@ async function loadAndRenderCharts(surveyId) {
             throw new Error("アンケートIDが指定されていません。");
         }
 
+        // Helper to fetch with fallback
+        const fetchWithFallback = async (relativePath, type) => {
+            // 1. Try Dashboard Data (data/...)
+            const localUrl = resolveDashboardDataPath(relativePath);
+            try {
+                const res = await fetch(localUrl);
+                if (res.ok) return await res.json();
+            } catch (e) {
+                console.warn(`Local fetch failed for ${relativePath}`, e);
+            }
+
+            // 2. Try Demo Data (docs/examples/...)
+            const demoUrl = resolveDemoDataPath(relativePath);
+            try {
+                const res = await fetch(demoUrl);
+                if (res.ok) return await res.json();
+            } catch (e) {
+                console.warn(`Demo fetch failed for ${relativePath}`, e);
+            }
+
+            if (type === 'survey') throw new Error(`アンケート定義ファイルが見つかりません: ${relativePath}`);
+            return []; // Answers can be empty
+        };
+
         const [surveyDefinition, answers] = await Promise.all([
-            fetch(resolveDemoDataPath(`surveys/${surveyId}.json`)).then(res => {
-                if (!res.ok) throw new Error(`アンケート定義ファイルが見つかりません: ${surveyId}.json`);
-                return res.json();
-            }),
-            fetch(resolveDemoDataPath(`answers/${surveyId}.json`)).then(res => {
-                if (!res.ok) return [];
-                return res.json();
-            })
+            fetchWithFallback(`surveys/${surveyId}.json`, 'survey'),
+            fetchWithFallback(`responses/answers/${surveyId}.json`, 'answers')
         ]);
 
         currentSurvey = surveyDefinition;
@@ -240,7 +258,15 @@ async function loadAndRenderCharts(surveyId) {
             throw new Error(`アンケートID「${surveyId}」の定義が見つかりません。`);
         }
 
-        originalAnswers = answers;
+        // Unwrap answers if it's in the new format { surveyId: "...", answers: [...] }
+        let answersArray = answers;
+        if (answers && !Array.isArray(answers) && Array.isArray(answers.answers)) {
+            answersArray = answers.answers;
+        } else if (!Array.isArray(answers)) {
+            answersArray = []; // Fallback if data is malformed
+        }
+
+        originalAnswers = answersArray;
         availableDateRange = getSurveyPeriodRange(currentSurvey, originalAnswers);
 
         document.getElementById('survey-title').textContent = `グラフ分析: ${currentSurvey.name.ja}`;
@@ -888,20 +914,32 @@ function renderChartSummaryTable(summaryId, chartData) {
             ? rows.map(item => {
                 const isMedia = ['image', 'photo', 'handwriting', 'file', 'file_upload', 'upload'].includes(chartData.questionType);
                 let valueHtml = escapeHtml(item.value);
-                if (isMedia && item.value && (item.value.startsWith('http') || item.value.startsWith('.') || item.value.startsWith('/'))) {
+                if (isMedia && item.value && (item.value.startsWith('http') || item.value.startsWith('.') || item.value.startsWith('/') || item.value.startsWith('data:'))) {
                     let linkText = escapeHtml(item.value);
                     if (item.answerId && item.surveyId) {
-                        const parts = item.answerId.split('-');
-                        const seq = parts.length > 0 ? parts[parts.length - 1] : '0000';
+                        // Extract sequence (e.g. A001 -> 0001)
+                        const seqMatch = item.answerId.match(/\d+/);
+                        const seq = seqMatch ? String(seqMatch[0]).padStart(4, '0') : '0000';
+
+                        // Extract question number (e.g. Q9 -> 09)
                         const qNumMatch = (chartData.questionBaseId || chartData.questionId).match(/\d+/);
                         const qNum = qNumMatch ? String(qNumMatch[0]).padStart(2, '0') : '00';
-                        const ext = item.value.split('.').pop();
-                        const safeExt = ext && ext.length < 5 ? ext : 'png';
+
+                        // File extension
+                        let ext = 'png';
+                        if (!item.value.startsWith('data:')) {
+                            const parts = item.value.split('.');
+                            if (parts.length > 1) {
+                                const e = parts.pop();
+                                if (e.length < 5) ext = e;
+                            }
+                        }
+
                         const type = item.type || 'image';
-                        linkText = `${item.surveyId}_${seq}_${qNum}_${type}.${safeExt}`;
+                        linkText = `${item.surveyId}_${seq}_${qNum}_${type}.${ext}`;
                     }
 
-                    valueHtml = `<button type="button" onclick="window.previewImage('${escapeHtml(item.value)}')" class="text-primary hover:underline inline-flex items-center gap-1 group transition-colors text-left">
+                    valueHtml = `<button type="button" data-preview-url="${escapeHtml(item.value)}" onclick="window.previewImage(this.dataset.previewUrl)" class="text-primary hover:underline inline-flex items-center gap-1 group transition-colors text-left">
                         <span class="material-icons text-sm group-hover:text-primary-dark transition-colors">image</span>
                         <span class="truncate border-b border-transparent group-hover:border-primary-dark transition-all">${linkText}</span>
                     </button>`;
@@ -1607,7 +1645,17 @@ function normalizeQuestionText(text) {
 
 function findAnswerDetail(answer, question) {
     if (!answer || !answer.details) return null;
+
+    // 1. Try matching by questionId (Exact Match & Preferred)
+    if (question.id) {
+        const idMatch = answer.details.find(detail => detail && detail.questionId === question.id);
+        if (idMatch) return idMatch;
+    }
+
+    // 2. Fallback to text matching (Legacy support)
     const targetText = question.text || question.question || '';
+    if (!targetText) return null;
+
     const normalizedTarget = normalizeQuestionText(targetText);
     const details = answer.details.filter(detail => detail && detail.question);
 
