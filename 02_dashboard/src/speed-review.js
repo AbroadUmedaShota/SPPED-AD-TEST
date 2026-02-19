@@ -2069,34 +2069,36 @@ function renderAttributeChart(data) {
             if (!empty) {
                 empty = document.createElement('div');
                 empty.className = 'attribute-empty-state flex flex-col items-center justify-center text-center gap-2 py-6 h-full w-full';
-                empty.innerHTML = `
-                    <span class="material-icons text-5xl text-on-surface-variant/20">${icon}</span>
-                    <p class="text-sm text-on-surface-variant"></p>
-                    <button type="button" class="mt-2 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-xs font-semibold text-primary hover:bg-primary/10">
-                        <span class="material-icons text-sm">tune</span>
-                        設問を選択する
-                    </button>
-                `;
                 container.appendChild(empty);
             }
-            const messageEl = empty.querySelector('p');
-            if (messageEl) messageEl.textContent = message;
+            // アイコンとメッセージを毎回更新する（再利用時もアイコンが正しく変わるように）
+            empty.innerHTML = `
+                <span class="material-icons text-5xl text-on-surface-variant/20">${icon}</span>
+                <p class="text-sm text-on-surface-variant">${message}</p>
+                <button type="button" class="mt-2 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-xs font-semibold text-primary hover:bg-primary/10">
+                    <span class="material-icons text-sm">tune</span>
+                    設問を選択する
+                </button>
+            `;
             const actionBtn = empty.querySelector('button');
-            if (actionBtn && !actionBtn.hasAttribute('data-bound')) {
-                actionBtn.setAttribute('data-bound', 'true');
+            if (actionBtn) {
                 actionBtn.addEventListener('click', () => {
                     showQuestionSelectModal();
                 });
             }
         }
+        canvas.style.display = 'none';
         canvas.classList.add('hidden');
+        apexContainer.style.display = 'none';
         apexContainer.classList.add('hidden');
+
     };
 
     const clearEmptyState = () => {
         if (!container) return;
         container.querySelector('.attribute-empty-state')?.remove();
     };
+
 
     const questionDef = currentSurvey?.details?.find(detail => detail.question === currentIndustryQuestion || detail.text === currentIndustryQuestion);
 
@@ -2173,8 +2175,21 @@ function renderAttributeChart(data) {
     apexContainer.classList.add('hidden');
     canvas.classList.remove('hidden');
 
+    let allAnswers;
+    if (data) {
+        if (Array.isArray(data)) {
+            allAnswers = data;
+        } else if (data.answers && Array.isArray(data.answers)) {
+            allAnswers = data.answers;
+        } else {
+            allAnswers = [];
+        }
+    } else {
+        allAnswers = [];
+    }
+
     const counts = {};
-    (data || []).forEach(item => {
+    (allAnswers || []).forEach(item => {
         const detail = findAnswerDetail(item, questionDef);
         let answer = detail?.answer;
 
@@ -2443,15 +2458,31 @@ export async function initializePage() {
             const url = resolveDashboardDataPath(`responses/answers/${surveyId}.json`);
             console.log('Fetching answers from:', url); // ★デバッグ用ログ
             const r1 = await fetch(url);
-            answersData = r1.ok ? await r1.json() : [];
+            const data = r1.ok ? await r1.json() : [];
+            if (data && !Array.isArray(data) && Array.isArray(data.answers)) {
+                answersData = data.answers;
+            } else if (Array.isArray(data)) {
+                answersData = data;
+            } else {
+                answersData = [];
+            }
             console.log('Fetched answersData:', answersData); // ★デバッグ用ログ
         }
         if (!Array.isArray(personalInfoData) || personalInfoData.length === 0) {
+            // Try loading from data/responses/business-cards/
             const url = resolveDashboardDataPath(`responses/business-cards/${surveyId}.json`);
-            console.log('Fetching personal info from:', url); // ★デバッグ用ログ
+            console.log('Fetching personal info from:', url);
             const r2 = await fetch(url);
-            personalInfoData = r2.ok ? await r2.json() : [];
-            console.log('Fetched personalInfoData:', personalInfoData); // ★デバッグ用ログ
+            if (r2.ok) {
+                personalInfoData = await r2.json();
+            } else {
+                // Fallback: Try data/business-cards/ (in case of different directory structure)
+                const url2 = resolveDashboardDataPath(`business-cards/${surveyId}.json`);
+                console.log('Fetching personal info fallback from:', url2);
+                const r3 = await fetch(url2);
+                personalInfoData = r3.ok ? await r3.json() : [];
+            }
+            console.log('Fetched personalInfoData:', personalInfoData);
         }
         if (!enqueteDetailsData || !enqueteDetailsData.details) {
             const r3 = await fetch(resolveDashboardDataPath(`surveys/enquete/${surveyId}.json`));
@@ -2471,7 +2502,9 @@ export async function initializePage() {
                 question: detail.question || detail.text || ''
             }))
             : [];
-        currentSurvey.details = normalizedDetails;
+        if (normalizedDetails.length > 0) {
+            currentSurvey.details = normalizedDetails;
+        }
         const allowedRows = new Set([25, 50, 100, 200]);
         const allowedSortKeys = new Set(['answerId', 'answeredAt', 'fullName', 'companyName', 'dynamicQuestion']);
         if (restoredUiState && allowedRows.has(Number(restoredUiState.rowsPerPage))) {
@@ -2504,8 +2537,22 @@ export async function initializePage() {
             // 未データ化の場合はbusinessCardをnullのままにする（フォールバックしない）
             // これによりレンダラーがcardStatus='blank'と正しく判定できる
 
+            // 設問定義に基づいて、回答データのdetailsに設問文(question)を注入する
+            const enrichedDetails = (answer.details || []).map(detail => {
+                // 既にquestionがある場合はそのまま
+                if (detail.question) return detail;
+
+                // questionIdを使って設問定義を検索
+                const questionDef = currentSurvey.details.find(d => d.id === detail.questionId);
+                return {
+                    ...detail,
+                    question: questionDef ? (questionDef.text || questionDef.question) : ''
+                };
+            });
+
             return {
                 ...answer,
+                details: enrichedDetails,
                 survey: currentSurvey,
                 businessCard: businessCard,
                 cardImageViewState: JSON.parse(JSON.stringify(DEFAULT_CARD_IMAGE_VIEW_STATE))
