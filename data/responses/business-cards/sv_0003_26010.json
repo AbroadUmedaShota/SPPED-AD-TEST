@@ -1,0 +1,7002 @@
+[
+  {
+    "answerId": "ans-sv_0003_26010-00001",
+    "businessCard": {
+      "group1": {
+        "email": "user1@example.com"
+      },
+      "group2": {
+        "lastName": "田中",
+        "firstName": "翔太"
+      },
+      "group3": {
+        "companyName": "クリエイティブ・ホールディングス",
+        "department": "情報システム部",
+        "position": "リーダー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-1085-2007",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "digitizing",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0001_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0001_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00002",
+    "businessCard": {
+      "group1": {
+        "email": "user2@example.com"
+      },
+      "group2": {
+        "lastName": "田中",
+        "firstName": "由佳"
+      },
+      "group3": {
+        "companyName": "株式会社SPEED",
+        "department": "営業部",
+        "position": "部長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-2651-6161",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0002_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0002_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00003",
+    "businessCard": {
+      "group1": {
+        "email": "user3@example.com"
+      },
+      "group2": {
+        "lastName": "井上",
+        "firstName": "大輔"
+      },
+      "group3": {
+        "companyName": "テックイノベーション",
+        "department": "開発部",
+        "position": "一般社員"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-8881-5577",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0003_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0003_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00004",
+    "businessCard": {
+      "group1": {
+        "email": "user4@example.com"
+      },
+      "group2": {
+        "lastName": "木村",
+        "firstName": "健太"
+      },
+      "group3": {
+        "companyName": "未来ソリューションズ",
+        "department": "人事部",
+        "position": "リーダー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-1906-6313",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0004_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0004_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00005",
+    "businessCard": {
+      "group1": {
+        "email": "user5@example.com"
+      },
+      "group2": {
+        "lastName": "松本",
+        "firstName": "健太"
+      },
+      "group3": {
+        "companyName": "サイバーネティクス",
+        "department": "総務部",
+        "position": "課長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-5609-5283",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0005_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0005_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00006",
+    "businessCard": {
+      "group1": {
+        "email": "user6@example.com"
+      },
+      "group2": {
+        "lastName": "伊藤",
+        "firstName": "健一"
+      },
+      "group3": {
+        "companyName": "テックイノベーション",
+        "department": "開発部",
+        "position": "部長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-8805-1485",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0006_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0006_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00007",
+    "businessCard": {
+      "group1": {
+        "email": "user7@example.com"
+      },
+      "group2": {
+        "lastName": "山口",
+        "firstName": "翼"
+      },
+      "group3": {
+        "companyName": "クリエイティブ・ホールディングス",
+        "department": "営業部",
+        "position": "課長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-7216-2538",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0007_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0007_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00008",
+    "businessCard": {
+      "group1": {
+        "email": "user8@example.com"
+      },
+      "group2": {
+        "lastName": "林",
+        "firstName": "美優"
+      },
+      "group3": {
+        "companyName": "未来ソリューションズ",
+        "department": "情報システム部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-9335-4837",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0008_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0008_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00009",
+    "businessCard": {
+      "group1": {
+        "email": "user9@example.com"
+      },
+      "group2": {
+        "lastName": "加藤",
+        "firstName": "太郎"
+      },
+      "group3": {
+        "companyName": "グローバル商事",
+        "department": "情報システム部",
+        "position": "係長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-2808-6853",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0009_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0009_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00010",
+    "businessCard": {
+      "group1": {
+        "email": "user10@example.com"
+      },
+      "group2": {
+        "lastName": "清水",
+        "firstName": "健太"
+      },
+      "group3": {
+        "companyName": "ネクストワン",
+        "department": "総務部",
+        "position": "リーダー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-9605-9577",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "digitizing",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0010_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0010_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00011",
+    "businessCard": {
+      "group1": {
+        "email": "user11@example.com"
+      },
+      "group2": {
+        "lastName": "山口",
+        "firstName": "大樹"
+      },
+      "group3": {
+        "companyName": "アドバンストシステム",
+        "department": "総務部",
+        "position": "一般社員"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-6424-6034",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0011_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0011_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00012",
+    "businessCard": {
+      "group1": {
+        "email": "user12@example.com"
+      },
+      "group2": {
+        "lastName": "佐々木",
+        "firstName": "次郎"
+      },
+      "group3": {
+        "companyName": "サイバーネティクス",
+        "department": "開発部",
+        "position": "係長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-7881-6179",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0012_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0012_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00013",
+    "businessCard": {
+      "group1": {
+        "email": "user13@example.com"
+      },
+      "group2": {
+        "lastName": "松本",
+        "firstName": "陽子"
+      },
+      "group3": {
+        "companyName": "クリエイティブ・ホールディングス",
+        "department": "経営企画部",
+        "position": "係長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-4975-2042",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0013_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0013_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00014",
+    "businessCard": {
+      "group1": {
+        "email": "user14@example.com"
+      },
+      "group2": {
+        "lastName": "山本",
+        "firstName": "次郎"
+      },
+      "group3": {
+        "companyName": "クリエイティブ・ホールディングス",
+        "department": "人事部",
+        "position": "マネージャー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-7967-4950",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0014_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0014_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00015",
+    "businessCard": {
+      "group1": {
+        "email": "user15@example.com"
+      },
+      "group2": {
+        "lastName": "鈴木",
+        "firstName": "香織"
+      },
+      "group3": {
+        "companyName": "未来ソリューションズ",
+        "department": "デザイン部",
+        "position": "部長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-2709-4427",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0015_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0015_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00016",
+    "businessCard": {
+      "group1": {
+        "email": "user16@example.com"
+      },
+      "group2": {
+        "lastName": "加藤",
+        "firstName": "陽子"
+      },
+      "group3": {
+        "companyName": "グローバル商事",
+        "department": "情報システム部",
+        "position": "部長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-8740-9876",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0016_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0016_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00017",
+    "businessCard": {
+      "group1": {
+        "email": "user17@example.com"
+      },
+      "group2": {
+        "lastName": "加藤",
+        "firstName": "拓也"
+      },
+      "group3": {
+        "companyName": "クリエイティブ・ホールディングス",
+        "department": "情報システム部",
+        "position": "課長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-5414-5008",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0017_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0017_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00018",
+    "businessCard": {
+      "group1": {
+        "email": "user18@example.com"
+      },
+      "group2": {
+        "lastName": "伊藤",
+        "firstName": "拓也"
+      },
+      "group3": {
+        "companyName": "株式会社SPEED",
+        "department": "情報システム部",
+        "position": "部長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-8327-1932",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0018_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0018_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00019",
+    "businessCard": {
+      "group1": {
+        "email": "user19@example.com"
+      },
+      "group2": {
+        "lastName": "高橋",
+        "firstName": "健一"
+      },
+      "group3": {
+        "companyName": "データバンク",
+        "department": "営業部",
+        "position": "部長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-4903-6333",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0019_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0019_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00020",
+    "businessCard": {
+      "group1": {
+        "email": "user20@example.com"
+      },
+      "group2": {
+        "lastName": "小林",
+        "firstName": "直人"
+      },
+      "group3": {
+        "companyName": "ジャパンテック",
+        "department": "マーケティング部",
+        "position": "一般社員"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-7091-7344",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0020_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0020_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00021",
+    "businessCard": {
+      "group1": {
+        "email": "user21@example.com"
+      },
+      "group2": {
+        "lastName": "田中",
+        "firstName": "健太"
+      },
+      "group3": {
+        "companyName": "データバンク",
+        "department": "マーケティング部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-2964-7349",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0021_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0021_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00022",
+    "businessCard": {
+      "group1": {
+        "email": "user22@example.com"
+      },
+      "group2": {
+        "lastName": "渡辺",
+        "firstName": "大樹"
+      },
+      "group3": {
+        "companyName": "グローバル商事",
+        "department": "営業部",
+        "position": "リーダー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-4368-3484",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0022_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0022_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00023",
+    "businessCard": {
+      "group1": {
+        "email": "user23@example.com"
+      },
+      "group2": {
+        "lastName": "加藤",
+        "firstName": "健太"
+      },
+      "group3": {
+        "companyName": "クリエイティブ・ホールディングス",
+        "department": "総務部",
+        "position": "一般社員"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-6300-7746",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0023_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0023_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00024",
+    "businessCard": {
+      "group1": {
+        "email": "user24@example.com"
+      },
+      "group2": {
+        "lastName": "山本",
+        "firstName": "翼"
+      },
+      "group3": {
+        "companyName": "ジャパンテック",
+        "department": "人事部",
+        "position": "リーダー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-5999-3424",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0024_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0024_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00025",
+    "businessCard": {
+      "group1": {
+        "email": "user25@example.com"
+      },
+      "group2": {
+        "lastName": "木村",
+        "firstName": "七海"
+      },
+      "group3": {
+        "companyName": "ジャパンテック",
+        "department": "人事部",
+        "position": "部長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-8507-6020",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0025_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0025_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00026",
+    "businessCard": {
+      "group1": {
+        "email": "user26@example.com"
+      },
+      "group2": {
+        "lastName": "田中",
+        "firstName": "太郎"
+      },
+      "group3": {
+        "companyName": "テックイノベーション",
+        "department": "人事部",
+        "position": "リーダー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-2744-9352",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0026_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0026_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00027",
+    "businessCard": {
+      "group1": {
+        "email": "user27@example.com"
+      },
+      "group2": {
+        "lastName": "加藤",
+        "firstName": "香織"
+      },
+      "group3": {
+        "companyName": "クリエイティブ・ホールディングス",
+        "department": "デザイン部",
+        "position": "マネージャー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-2852-6579",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0027_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0027_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00028",
+    "businessCard": {
+      "group1": {
+        "email": "user28@example.com"
+      },
+      "group2": {
+        "lastName": "清水",
+        "firstName": "由佳"
+      },
+      "group3": {
+        "companyName": "データバンク",
+        "department": "開発部",
+        "position": "マネージャー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-1052-1656",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0028_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0028_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00029",
+    "businessCard": {
+      "group1": {
+        "email": "user29@example.com"
+      },
+      "group2": {
+        "lastName": "佐々木",
+        "firstName": "直人"
+      },
+      "group3": {
+        "companyName": "ジャパンテック",
+        "department": "デザイン部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-7657-2457",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0029_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0029_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00030",
+    "businessCard": {
+      "group1": {
+        "email": "user30@example.com"
+      },
+      "group2": {
+        "lastName": "渡辺",
+        "firstName": "健一"
+      },
+      "group3": {
+        "companyName": "テックイノベーション",
+        "department": "マーケティング部",
+        "position": "課長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-5430-8797",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0030_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0030_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00031",
+    "businessCard": {
+      "group1": {
+        "email": "user31@example.com"
+      },
+      "group2": {
+        "lastName": "木村",
+        "firstName": "大樹"
+      },
+      "group3": {
+        "companyName": "ジャパンテック",
+        "department": "マーケティング部",
+        "position": "部長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-9204-3709",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0031_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0031_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00032",
+    "businessCard": {
+      "group1": {
+        "email": "user32@example.com"
+      },
+      "group2": {
+        "lastName": "木村",
+        "firstName": "七海"
+      },
+      "group3": {
+        "companyName": "グローバル商事",
+        "department": "デザイン部",
+        "position": "課長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-3151-9873",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0032_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0032_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00033",
+    "businessCard": {
+      "group1": {
+        "email": "user33@example.com"
+      },
+      "group2": {
+        "lastName": "佐藤",
+        "firstName": "翔太"
+      },
+      "group3": {
+        "companyName": "株式会社SPEED",
+        "department": "営業部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-5687-5431",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0033_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0033_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00034",
+    "businessCard": {
+      "group1": {
+        "email": "user34@example.com"
+      },
+      "group2": {
+        "lastName": "清水",
+        "firstName": "次郎"
+      },
+      "group3": {
+        "companyName": "アドバンストシステム",
+        "department": "営業部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-8931-3288",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0034_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0034_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00035",
+    "businessCard": {
+      "group1": {
+        "email": "user35@example.com"
+      },
+      "group2": {
+        "lastName": "清水",
+        "firstName": "陽子"
+      },
+      "group3": {
+        "companyName": "ネクストワン",
+        "department": "経営企画部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-4605-5050",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0035_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0035_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00036",
+    "businessCard": {
+      "group1": {
+        "email": "user36@example.com"
+      },
+      "group2": {
+        "lastName": "高橋",
+        "firstName": "大輔"
+      },
+      "group3": {
+        "companyName": "クリエイティブ・ホールディングス",
+        "department": "マーケティング部",
+        "position": "部長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-9046-8861",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0036_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0036_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00037",
+    "businessCard": {
+      "group1": {
+        "email": "user37@example.com"
+      },
+      "group2": {
+        "lastName": "林",
+        "firstName": "翔太"
+      },
+      "group3": {
+        "companyName": "クリエイティブ・ホールディングス",
+        "department": "デザイン部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-5502-9609",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "digitizing",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0037_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0037_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00038",
+    "businessCard": {
+      "group1": {
+        "email": "user38@example.com"
+      },
+      "group2": {
+        "lastName": "小林",
+        "firstName": "あゆみ"
+      },
+      "group3": {
+        "companyName": "未来ソリューションズ",
+        "department": "営業部",
+        "position": "一般社員"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-2262-3166",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0038_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0038_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00039",
+    "businessCard": {
+      "group1": {
+        "email": "user39@example.com"
+      },
+      "group2": {
+        "lastName": "鈴木",
+        "firstName": "あゆみ"
+      },
+      "group3": {
+        "companyName": "ジャパンテック",
+        "department": "人事部",
+        "position": "係長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-3506-2229",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0039_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0039_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00040",
+    "businessCard": {
+      "group1": {
+        "email": "user40@example.com"
+      },
+      "group2": {
+        "lastName": "山田",
+        "firstName": "直人"
+      },
+      "group3": {
+        "companyName": "サイバーネティクス",
+        "department": "総務部",
+        "position": "一般社員"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-5964-3529",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0040_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0040_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00041",
+    "businessCard": {
+      "group1": {
+        "email": "user41@example.com"
+      },
+      "group2": {
+        "lastName": "佐々木",
+        "firstName": "花子"
+      },
+      "group3": {
+        "companyName": "ジャパンテック",
+        "department": "営業部",
+        "position": "部長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-1523-4187",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0041_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0041_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00042",
+    "businessCard": {
+      "group1": {
+        "email": "user42@example.com"
+      },
+      "group2": {
+        "lastName": "渡辺",
+        "firstName": "香織"
+      },
+      "group3": {
+        "companyName": "テックイノベーション",
+        "department": "マーケティング部",
+        "position": "部長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-8631-2311",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0042_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0042_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00043",
+    "businessCard": {
+      "group1": {
+        "email": "user43@example.com"
+      },
+      "group2": {
+        "lastName": "加藤",
+        "firstName": "香織"
+      },
+      "group3": {
+        "companyName": "株式会社SPEED",
+        "department": "総務部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-2933-7427",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0043_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0043_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00044",
+    "businessCard": {
+      "group1": {
+        "email": "user44@example.com"
+      },
+      "group2": {
+        "lastName": "中村",
+        "firstName": "翼"
+      },
+      "group3": {
+        "companyName": "ジャパンテック",
+        "department": "総務部",
+        "position": "部長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-8692-3966",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0044_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0044_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00045",
+    "businessCard": {
+      "group1": {
+        "email": "user45@example.com"
+      },
+      "group2": {
+        "lastName": "山本",
+        "firstName": "健一"
+      },
+      "group3": {
+        "companyName": "データバンク",
+        "department": "経営企画部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-4084-4233",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0045_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0045_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00046",
+    "businessCard": {
+      "group1": {
+        "email": "user46@example.com"
+      },
+      "group2": {
+        "lastName": "渡辺",
+        "firstName": "大樹"
+      },
+      "group3": {
+        "companyName": "未来ソリューションズ",
+        "department": "デザイン部",
+        "position": "課長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-4849-4905",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0046_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0046_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00047",
+    "businessCard": {
+      "group1": {
+        "email": "user47@example.com"
+      },
+      "group2": {
+        "lastName": "加藤",
+        "firstName": "由佳"
+      },
+      "group3": {
+        "companyName": "未来ソリューションズ",
+        "department": "デザイン部",
+        "position": "課長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-4272-6016",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0047_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0047_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00048",
+    "businessCard": {
+      "group1": {
+        "email": "user48@example.com"
+      },
+      "group2": {
+        "lastName": "田中",
+        "firstName": "太郎"
+      },
+      "group3": {
+        "companyName": "ジャパンテック",
+        "department": "人事部",
+        "position": "課長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-4797-2334",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0048_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0048_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00049",
+    "businessCard": {
+      "group1": {
+        "email": "user49@example.com"
+      },
+      "group2": {
+        "lastName": "小林",
+        "firstName": "太郎"
+      },
+      "group3": {
+        "companyName": "サイバーネティクス",
+        "department": "情報システム部",
+        "position": "マネージャー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-2573-3665",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0049_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0049_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00050",
+    "businessCard": {
+      "group1": {
+        "email": "user50@example.com"
+      },
+      "group2": {
+        "lastName": "松本",
+        "firstName": "あゆみ"
+      },
+      "group3": {
+        "companyName": "未来ソリューションズ",
+        "department": "開発部",
+        "position": "マネージャー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-7227-4477",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0050_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0050_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00051",
+    "businessCard": {
+      "group1": {
+        "email": "user51@example.com"
+      },
+      "group2": {
+        "lastName": "中村",
+        "firstName": "大樹"
+      },
+      "group3": {
+        "companyName": "テックイノベーション",
+        "department": "営業部",
+        "position": "一般社員"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-9576-6601",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0051_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0051_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00052",
+    "businessCard": {
+      "group1": {
+        "email": "user52@example.com"
+      },
+      "group2": {
+        "lastName": "山本",
+        "firstName": "翼"
+      },
+      "group3": {
+        "companyName": "株式会社SPEED",
+        "department": "人事部",
+        "position": "マネージャー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-8921-7957",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0052_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0052_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00053",
+    "businessCard": {
+      "group1": {
+        "email": "user53@example.com"
+      },
+      "group2": {
+        "lastName": "伊藤",
+        "firstName": "翔太"
+      },
+      "group3": {
+        "companyName": "クリエイティブ・ホールディングス",
+        "department": "情報システム部",
+        "position": "マネージャー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-2473-1530",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0053_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0053_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00054",
+    "businessCard": {
+      "group1": {
+        "email": "user54@example.com"
+      },
+      "group2": {
+        "lastName": "吉田",
+        "firstName": "健太"
+      },
+      "group3": {
+        "companyName": "テックイノベーション",
+        "department": "デザイン部",
+        "position": "部長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-9777-8218",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0054_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0054_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00055",
+    "businessCard": {
+      "group1": {
+        "email": "user55@example.com"
+      },
+      "group2": {
+        "lastName": "佐々木",
+        "firstName": "健太"
+      },
+      "group3": {
+        "companyName": "アドバンストシステム",
+        "department": "デザイン部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-7629-1619",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0055_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0055_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00056",
+    "businessCard": {
+      "group1": {
+        "email": "user56@example.com"
+      },
+      "group2": {
+        "lastName": "松本",
+        "firstName": "健太"
+      },
+      "group3": {
+        "companyName": "ネクストワン",
+        "department": "マーケティング部",
+        "position": "一般社員"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-8286-3147",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0056_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0056_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00057",
+    "businessCard": {
+      "group1": {
+        "email": "user57@example.com"
+      },
+      "group2": {
+        "lastName": "佐々木",
+        "firstName": "美優"
+      },
+      "group3": {
+        "companyName": "ジャパンテック",
+        "department": "情報システム部",
+        "position": "部長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-6216-1234",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0057_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0057_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00058",
+    "businessCard": {
+      "group1": {
+        "email": "user58@example.com"
+      },
+      "group2": {
+        "lastName": "林",
+        "firstName": "太郎"
+      },
+      "group3": {
+        "companyName": "クリエイティブ・ホールディングス",
+        "department": "開発部",
+        "position": "係長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-2670-5507",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0058_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0058_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00059",
+    "businessCard": {
+      "group1": {
+        "email": "user59@example.com"
+      },
+      "group2": {
+        "lastName": "佐々木",
+        "firstName": "美優"
+      },
+      "group3": {
+        "companyName": "クリエイティブ・ホールディングス",
+        "department": "デザイン部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-2765-5057",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0059_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0059_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00060",
+    "businessCard": {
+      "group1": {
+        "email": "user60@example.com"
+      },
+      "group2": {
+        "lastName": "伊藤",
+        "firstName": "直人"
+      },
+      "group3": {
+        "companyName": "テックイノベーション",
+        "department": "開発部",
+        "position": "マネージャー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-6932-1583",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0060_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0060_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00061",
+    "businessCard": {
+      "group1": {
+        "email": "user61@example.com"
+      },
+      "group2": {
+        "lastName": "斎藤",
+        "firstName": "翔太"
+      },
+      "group3": {
+        "companyName": "未来ソリューションズ",
+        "department": "開発部",
+        "position": "リーダー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-6620-3040",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0061_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0061_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00062",
+    "businessCard": {
+      "group1": {
+        "email": "user62@example.com"
+      },
+      "group2": {
+        "lastName": "山口",
+        "firstName": "直人"
+      },
+      "group3": {
+        "companyName": "テックイノベーション",
+        "department": "人事部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-8661-1588",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0062_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0062_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00063",
+    "businessCard": {
+      "group1": {
+        "email": "user63@example.com"
+      },
+      "group2": {
+        "lastName": "鈴木",
+        "firstName": "健太"
+      },
+      "group3": {
+        "companyName": "ネクストワン",
+        "department": "マーケティング部",
+        "position": "部長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-8155-1418",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "digitizing",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0063_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0063_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00064",
+    "businessCard": {
+      "group1": {
+        "email": "user64@example.com"
+      },
+      "group2": {
+        "lastName": "加藤",
+        "firstName": "花子"
+      },
+      "group3": {
+        "companyName": "データバンク",
+        "department": "経営企画部",
+        "position": "係長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-6831-5989",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0064_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0064_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00065",
+    "businessCard": {
+      "group1": {
+        "email": "user65@example.com"
+      },
+      "group2": {
+        "lastName": "吉田",
+        "firstName": "大樹"
+      },
+      "group3": {
+        "companyName": "テックイノベーション",
+        "department": "開発部",
+        "position": "リーダー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-3123-1457",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0065_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0065_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00066",
+    "businessCard": {
+      "group1": {
+        "email": "user66@example.com"
+      },
+      "group2": {
+        "lastName": "木村",
+        "firstName": "大樹"
+      },
+      "group3": {
+        "companyName": "データバンク",
+        "department": "開発部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-2785-3416",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "digitizing",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0066_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0066_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00067",
+    "businessCard": {
+      "group1": {
+        "email": "user67@example.com"
+      },
+      "group2": {
+        "lastName": "佐藤",
+        "firstName": "健一"
+      },
+      "group3": {
+        "companyName": "株式会社SPEED",
+        "department": "人事部",
+        "position": "マネージャー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-7478-3562",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "digitizing",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0067_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0067_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00068",
+    "businessCard": {
+      "group1": {
+        "email": "user68@example.com"
+      },
+      "group2": {
+        "lastName": "中村",
+        "firstName": "美咲"
+      },
+      "group3": {
+        "companyName": "クリエイティブ・ホールディングス",
+        "department": "マーケティング部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-8157-2074",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0068_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0068_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00069",
+    "businessCard": {
+      "group1": {
+        "email": "user69@example.com"
+      },
+      "group2": {
+        "lastName": "林",
+        "firstName": "翼"
+      },
+      "group3": {
+        "companyName": "株式会社SPEED",
+        "department": "営業部",
+        "position": "課長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-3678-7535",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0069_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0069_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00070",
+    "businessCard": {
+      "group1": {
+        "email": "user70@example.com"
+      },
+      "group2": {
+        "lastName": "林",
+        "firstName": "翔太"
+      },
+      "group3": {
+        "companyName": "ネクストワン",
+        "department": "情報システム部",
+        "position": "リーダー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-7253-2722",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0070_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0070_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00071",
+    "businessCard": {
+      "group1": {
+        "email": "user71@example.com"
+      },
+      "group2": {
+        "lastName": "伊藤",
+        "firstName": "太郎"
+      },
+      "group3": {
+        "companyName": "ネクストワン",
+        "department": "経営企画部",
+        "position": "係長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-6873-3053",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0071_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0071_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00072",
+    "businessCard": {
+      "group1": {
+        "email": "user72@example.com"
+      },
+      "group2": {
+        "lastName": "山口",
+        "firstName": "由佳"
+      },
+      "group3": {
+        "companyName": "ジャパンテック",
+        "department": "営業部",
+        "position": "係長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-4761-8552",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0072_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0072_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00073",
+    "businessCard": {
+      "group1": {
+        "email": "user73@example.com"
+      },
+      "group2": {
+        "lastName": "佐藤",
+        "firstName": "太郎"
+      },
+      "group3": {
+        "companyName": "サイバーネティクス",
+        "department": "デザイン部",
+        "position": "マネージャー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-5296-9900",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0073_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0073_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00074",
+    "businessCard": {
+      "group1": {
+        "email": "user74@example.com"
+      },
+      "group2": {
+        "lastName": "山本",
+        "firstName": "翔太"
+      },
+      "group3": {
+        "companyName": "クリエイティブ・ホールディングス",
+        "department": "経営企画部",
+        "position": "係長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-9542-2963",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0074_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0074_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00075",
+    "businessCard": {
+      "group1": {
+        "email": "user75@example.com"
+      },
+      "group2": {
+        "lastName": "吉田",
+        "firstName": "拓也"
+      },
+      "group3": {
+        "companyName": "アドバンストシステム",
+        "department": "営業部",
+        "position": "部長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-7367-7905",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0075_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0075_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00076",
+    "businessCard": {
+      "group1": {
+        "email": "user76@example.com"
+      },
+      "group2": {
+        "lastName": "伊藤",
+        "firstName": "誠"
+      },
+      "group3": {
+        "companyName": "グローバル商事",
+        "department": "情報システム部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-1627-8281",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0076_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0076_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00077",
+    "businessCard": {
+      "group1": {
+        "email": "user77@example.com"
+      },
+      "group2": {
+        "lastName": "佐々木",
+        "firstName": "健一"
+      },
+      "group3": {
+        "companyName": "ジャパンテック",
+        "department": "デザイン部",
+        "position": "リーダー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-1485-9292",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0077_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0077_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00078",
+    "businessCard": {
+      "group1": {
+        "email": "user78@example.com"
+      },
+      "group2": {
+        "lastName": "井上",
+        "firstName": "美咲"
+      },
+      "group3": {
+        "companyName": "クリエイティブ・ホールディングス",
+        "department": "営業部",
+        "position": "係長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-9816-8062",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0078_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0078_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00079",
+    "businessCard": {
+      "group1": {
+        "email": "user79@example.com"
+      },
+      "group2": {
+        "lastName": "鈴木",
+        "firstName": "翼"
+      },
+      "group3": {
+        "companyName": "ネクストワン",
+        "department": "情報システム部",
+        "position": "課長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-6442-4706",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0079_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0079_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00080",
+    "businessCard": {
+      "group1": {
+        "email": "user80@example.com"
+      },
+      "group2": {
+        "lastName": "佐藤",
+        "firstName": "あゆみ"
+      },
+      "group3": {
+        "companyName": "サイバーネティクス",
+        "department": "営業部",
+        "position": "係長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-2924-6556",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0080_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0080_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00081",
+    "businessCard": {
+      "group1": {
+        "email": "user81@example.com"
+      },
+      "group2": {
+        "lastName": "田中",
+        "firstName": "拓也"
+      },
+      "group3": {
+        "companyName": "サイバーネティクス",
+        "department": "デザイン部",
+        "position": "課長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-4654-8987",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0081_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0081_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00082",
+    "businessCard": {
+      "group1": {
+        "email": "user82@example.com"
+      },
+      "group2": {
+        "lastName": "田中",
+        "firstName": "健太"
+      },
+      "group3": {
+        "companyName": "テックイノベーション",
+        "department": "営業部",
+        "position": "部長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-5535-2906",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0082_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0082_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00083",
+    "businessCard": {
+      "group1": {
+        "email": "user83@example.com"
+      },
+      "group2": {
+        "lastName": "佐々木",
+        "firstName": "太郎"
+      },
+      "group3": {
+        "companyName": "ネクストワン",
+        "department": "開発部",
+        "position": "係長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-1780-9258",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0083_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0083_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00084",
+    "businessCard": {
+      "group1": {
+        "email": "user84@example.com"
+      },
+      "group2": {
+        "lastName": "松本",
+        "firstName": "健太"
+      },
+      "group3": {
+        "companyName": "ジャパンテック",
+        "department": "デザイン部",
+        "position": "マネージャー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-7097-7960",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0084_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0084_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00085",
+    "businessCard": {
+      "group1": {
+        "email": "user85@example.com"
+      },
+      "group2": {
+        "lastName": "吉田",
+        "firstName": "健太"
+      },
+      "group3": {
+        "companyName": "未来ソリューションズ",
+        "department": "人事部",
+        "position": "マネージャー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-2739-1330",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0085_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0085_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00086",
+    "businessCard": {
+      "group1": {
+        "email": "user86@example.com"
+      },
+      "group2": {
+        "lastName": "高橋",
+        "firstName": "真奈美"
+      },
+      "group3": {
+        "companyName": "サイバーネティクス",
+        "department": "デザイン部",
+        "position": "リーダー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-3453-2476",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0086_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0086_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00087",
+    "businessCard": {
+      "group1": {
+        "email": "user87@example.com"
+      },
+      "group2": {
+        "lastName": "高橋",
+        "firstName": "香織"
+      },
+      "group3": {
+        "companyName": "アドバンストシステム",
+        "department": "経営企画部",
+        "position": "課長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-5275-5172",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0087_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0087_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00088",
+    "businessCard": {
+      "group1": {
+        "email": "user88@example.com"
+      },
+      "group2": {
+        "lastName": "佐々木",
+        "firstName": "直人"
+      },
+      "group3": {
+        "companyName": "グローバル商事",
+        "department": "情報システム部",
+        "position": "部長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-6311-1995",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0088_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0088_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00089",
+    "businessCard": {
+      "group1": {
+        "email": "user89@example.com"
+      },
+      "group2": {
+        "lastName": "吉田",
+        "firstName": "あゆみ"
+      },
+      "group3": {
+        "companyName": "株式会社SPEED",
+        "department": "営業部",
+        "position": "部長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-4710-3322",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0089_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0089_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00090",
+    "businessCard": {
+      "group1": {
+        "email": "user90@example.com"
+      },
+      "group2": {
+        "lastName": "伊藤",
+        "firstName": "直人"
+      },
+      "group3": {
+        "companyName": "クリエイティブ・ホールディングス",
+        "department": "営業部",
+        "position": "課長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-7943-9033",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0090_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0090_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00091",
+    "businessCard": {
+      "group1": {
+        "email": "user91@example.com"
+      },
+      "group2": {
+        "lastName": "小林",
+        "firstName": "香織"
+      },
+      "group3": {
+        "companyName": "株式会社SPEED",
+        "department": "デザイン部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-6295-6797",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0091_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0091_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00092",
+    "businessCard": {
+      "group1": {
+        "email": "user92@example.com"
+      },
+      "group2": {
+        "lastName": "中村",
+        "firstName": "七海"
+      },
+      "group3": {
+        "companyName": "データバンク",
+        "department": "経営企画部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-3419-4462",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "digitizing",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0092_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0092_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00093",
+    "businessCard": {
+      "group1": {
+        "email": "user93@example.com"
+      },
+      "group2": {
+        "lastName": "松本",
+        "firstName": "七海"
+      },
+      "group3": {
+        "companyName": "グローバル商事",
+        "department": "人事部",
+        "position": "部長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-6936-5799",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0093_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0093_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00094",
+    "businessCard": {
+      "group1": {
+        "email": "user94@example.com"
+      },
+      "group2": {
+        "lastName": "吉田",
+        "firstName": "大輔"
+      },
+      "group3": {
+        "companyName": "ネクストワン",
+        "department": "情報システム部",
+        "position": "一般社員"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-6264-7532",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0094_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0094_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00095",
+    "businessCard": {
+      "group1": {
+        "email": "user95@example.com"
+      },
+      "group2": {
+        "lastName": "清水",
+        "firstName": "陽子"
+      },
+      "group3": {
+        "companyName": "テックイノベーション",
+        "department": "開発部",
+        "position": "一般社員"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-9308-9323",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0095_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0095_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00096",
+    "businessCard": {
+      "group1": {
+        "email": "user96@example.com"
+      },
+      "group2": {
+        "lastName": "松本",
+        "firstName": "美優"
+      },
+      "group3": {
+        "companyName": "クリエイティブ・ホールディングス",
+        "department": "総務部",
+        "position": "課長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-2231-4487",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0096_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0096_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00097",
+    "businessCard": {
+      "group1": {
+        "email": "user97@example.com"
+      },
+      "group2": {
+        "lastName": "中村",
+        "firstName": "健一"
+      },
+      "group3": {
+        "companyName": "データバンク",
+        "department": "総務部",
+        "position": "係長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-3881-2626",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0097_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0097_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00098",
+    "businessCard": {
+      "group1": {
+        "email": "user98@example.com"
+      },
+      "group2": {
+        "lastName": "林",
+        "firstName": "美優"
+      },
+      "group3": {
+        "companyName": "株式会社SPEED",
+        "department": "経営企画部",
+        "position": "課長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-6324-5093",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0098_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0098_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00099",
+    "businessCard": {
+      "group1": {
+        "email": "user99@example.com"
+      },
+      "group2": {
+        "lastName": "吉田",
+        "firstName": "健一"
+      },
+      "group3": {
+        "companyName": "アドバンストシステム",
+        "department": "総務部",
+        "position": "一般社員"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-9135-3319",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0099_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0099_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00100",
+    "businessCard": {
+      "group1": {
+        "email": "user100@example.com"
+      },
+      "group2": {
+        "lastName": "山本",
+        "firstName": "大輔"
+      },
+      "group3": {
+        "companyName": "グローバル商事",
+        "department": "マーケティング部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-1829-1441",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0100_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0100_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00101",
+    "businessCard": {
+      "group1": {
+        "email": "user101@example.com"
+      },
+      "group2": {
+        "lastName": "中村",
+        "firstName": "花子"
+      },
+      "group3": {
+        "companyName": "ネクストワン",
+        "department": "経営企画部",
+        "position": "一般社員"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-1102-4305",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0101_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0101_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00102",
+    "businessCard": {
+      "group1": {
+        "email": "user102@example.com"
+      },
+      "group2": {
+        "lastName": "田中",
+        "firstName": "香織"
+      },
+      "group3": {
+        "companyName": "株式会社SPEED",
+        "department": "情報システム部",
+        "position": "係長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-9128-3319",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "digitizing",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0102_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0102_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00103",
+    "businessCard": {
+      "group1": {
+        "email": "user103@example.com"
+      },
+      "group2": {
+        "lastName": "松本",
+        "firstName": "陽子"
+      },
+      "group3": {
+        "companyName": "ジャパンテック",
+        "department": "人事部",
+        "position": "リーダー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-8660-7349",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0103_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0103_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00104",
+    "businessCard": {
+      "group1": {
+        "email": "user104@example.com"
+      },
+      "group2": {
+        "lastName": "斎藤",
+        "firstName": "健太"
+      },
+      "group3": {
+        "companyName": "株式会社SPEED",
+        "department": "マーケティング部",
+        "position": "課長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-6207-4396",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0104_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0104_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00105",
+    "businessCard": {
+      "group1": {
+        "email": "user105@example.com"
+      },
+      "group2": {
+        "lastName": "木村",
+        "firstName": "由佳"
+      },
+      "group3": {
+        "companyName": "サイバーネティクス",
+        "department": "営業部",
+        "position": "課長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-5051-7133",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0105_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0105_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00106",
+    "businessCard": {
+      "group1": {
+        "email": "user106@example.com"
+      },
+      "group2": {
+        "lastName": "鈴木",
+        "firstName": "あゆみ"
+      },
+      "group3": {
+        "companyName": "ジャパンテック",
+        "department": "人事部",
+        "position": "マネージャー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-5647-5433",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0106_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0106_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00107",
+    "businessCard": {
+      "group1": {
+        "email": "user107@example.com"
+      },
+      "group2": {
+        "lastName": "山田",
+        "firstName": "花子"
+      },
+      "group3": {
+        "companyName": "ネクストワン",
+        "department": "開発部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-6594-4230",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0107_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0107_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00108",
+    "businessCard": {
+      "group1": {
+        "email": "user108@example.com"
+      },
+      "group2": {
+        "lastName": "吉田",
+        "firstName": "美咲"
+      },
+      "group3": {
+        "companyName": "テックイノベーション",
+        "department": "総務部",
+        "position": "部長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-5949-1317",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0108_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0108_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00109",
+    "businessCard": {
+      "group1": {
+        "email": "user109@example.com"
+      },
+      "group2": {
+        "lastName": "中村",
+        "firstName": "あゆみ"
+      },
+      "group3": {
+        "companyName": "サイバーネティクス",
+        "department": "情報システム部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-8130-2284",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0109_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0109_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00110",
+    "businessCard": {
+      "group1": {
+        "email": "user110@example.com"
+      },
+      "group2": {
+        "lastName": "佐々木",
+        "firstName": "健一"
+      },
+      "group3": {
+        "companyName": "クリエイティブ・ホールディングス",
+        "department": "総務部",
+        "position": "リーダー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-7385-6241",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0110_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0110_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00111",
+    "businessCard": {
+      "group1": {
+        "email": "user111@example.com"
+      },
+      "group2": {
+        "lastName": "山本",
+        "firstName": "陽子"
+      },
+      "group3": {
+        "companyName": "サイバーネティクス",
+        "department": "マーケティング部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-6619-6029",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0111_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0111_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00112",
+    "businessCard": {
+      "group1": {
+        "email": "user112@example.com"
+      },
+      "group2": {
+        "lastName": "佐藤",
+        "firstName": "大樹"
+      },
+      "group3": {
+        "companyName": "サイバーネティクス",
+        "department": "情報システム部",
+        "position": "マネージャー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-7492-3515",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0112_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0112_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00113",
+    "businessCard": {
+      "group1": {
+        "email": "user113@example.com"
+      },
+      "group2": {
+        "lastName": "渡辺",
+        "firstName": "翔太"
+      },
+      "group3": {
+        "companyName": "未来ソリューションズ",
+        "department": "情報システム部",
+        "position": "リーダー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-4569-2860",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0113_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0113_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00114",
+    "businessCard": {
+      "group1": {
+        "email": "user114@example.com"
+      },
+      "group2": {
+        "lastName": "井上",
+        "firstName": "花子"
+      },
+      "group3": {
+        "companyName": "ジャパンテック",
+        "department": "総務部",
+        "position": "リーダー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-5794-8220",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0114_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0114_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00115",
+    "businessCard": {
+      "group1": {
+        "email": "user115@example.com"
+      },
+      "group2": {
+        "lastName": "清水",
+        "firstName": "真奈美"
+      },
+      "group3": {
+        "companyName": "株式会社SPEED",
+        "department": "情報システム部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-5158-5632",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0115_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0115_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00116",
+    "businessCard": {
+      "group1": {
+        "email": "user116@example.com"
+      },
+      "group2": {
+        "lastName": "小林",
+        "firstName": "誠"
+      },
+      "group3": {
+        "companyName": "テックイノベーション",
+        "department": "情報システム部",
+        "position": "リーダー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-9076-2432",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0116_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0116_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00117",
+    "businessCard": {
+      "group1": {
+        "email": "user117@example.com"
+      },
+      "group2": {
+        "lastName": "伊藤",
+        "firstName": "直人"
+      },
+      "group3": {
+        "companyName": "クリエイティブ・ホールディングス",
+        "department": "営業部",
+        "position": "係長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-7824-1947",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0117_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0117_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00118",
+    "businessCard": {
+      "group1": {
+        "email": "user118@example.com"
+      },
+      "group2": {
+        "lastName": "加藤",
+        "firstName": "誠"
+      },
+      "group3": {
+        "companyName": "テックイノベーション",
+        "department": "情報システム部",
+        "position": "マネージャー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-8457-5371",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0118_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0118_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00119",
+    "businessCard": {
+      "group1": {
+        "email": "user119@example.com"
+      },
+      "group2": {
+        "lastName": "鈴木",
+        "firstName": "大樹"
+      },
+      "group3": {
+        "companyName": "データバンク",
+        "department": "開発部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-8214-1287",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0119_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0119_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00120",
+    "businessCard": {
+      "group1": {
+        "email": "user120@example.com"
+      },
+      "group2": {
+        "lastName": "木村",
+        "firstName": "拓也"
+      },
+      "group3": {
+        "companyName": "データバンク",
+        "department": "経営企画部",
+        "position": "課長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-7516-7949",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0120_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0120_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00121",
+    "businessCard": {
+      "group1": {
+        "email": "user121@example.com"
+      },
+      "group2": {
+        "lastName": "中村",
+        "firstName": "あゆみ"
+      },
+      "group3": {
+        "companyName": "グローバル商事",
+        "department": "情報システム部",
+        "position": "一般社員"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-5555-2263",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0121_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0121_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00122",
+    "businessCard": {
+      "group1": {
+        "email": "user122@example.com"
+      },
+      "group2": {
+        "lastName": "山口",
+        "firstName": "直人"
+      },
+      "group3": {
+        "companyName": "データバンク",
+        "department": "総務部",
+        "position": "係長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-7583-6828",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0122_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0122_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00123",
+    "businessCard": {
+      "group1": {
+        "email": "user123@example.com"
+      },
+      "group2": {
+        "lastName": "木村",
+        "firstName": "誠"
+      },
+      "group3": {
+        "companyName": "アドバンストシステム",
+        "department": "経営企画部",
+        "position": "一般社員"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-1591-3314",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0123_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0123_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00124",
+    "businessCard": {
+      "group1": {
+        "email": "user124@example.com"
+      },
+      "group2": {
+        "lastName": "伊藤",
+        "firstName": "七海"
+      },
+      "group3": {
+        "companyName": "株式会社SPEED",
+        "department": "総務部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-3192-8136",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0124_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0124_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00125",
+    "businessCard": {
+      "group1": {
+        "email": "user125@example.com"
+      },
+      "group2": {
+        "lastName": "斎藤",
+        "firstName": "大輔"
+      },
+      "group3": {
+        "companyName": "ネクストワン",
+        "department": "営業部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-9781-5656",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0125_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0125_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00126",
+    "businessCard": {
+      "group1": {
+        "email": "user126@example.com"
+      },
+      "group2": {
+        "lastName": "鈴木",
+        "firstName": "健一"
+      },
+      "group3": {
+        "companyName": "ネクストワン",
+        "department": "情報システム部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-8050-9863",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0126_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0126_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00127",
+    "businessCard": {
+      "group1": {
+        "email": "user127@example.com"
+      },
+      "group2": {
+        "lastName": "林",
+        "firstName": "太郎"
+      },
+      "group3": {
+        "companyName": "アドバンストシステム",
+        "department": "マーケティング部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-6730-1894",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0127_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0127_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00128",
+    "businessCard": {
+      "group1": {
+        "email": "user128@example.com"
+      },
+      "group2": {
+        "lastName": "高橋",
+        "firstName": "翔太"
+      },
+      "group3": {
+        "companyName": "テックイノベーション",
+        "department": "情報システム部",
+        "position": "一般社員"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-5262-6342",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0128_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0128_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00129",
+    "businessCard": {
+      "group1": {
+        "email": "user129@example.com"
+      },
+      "group2": {
+        "lastName": "松本",
+        "firstName": "陽子"
+      },
+      "group3": {
+        "companyName": "グローバル商事",
+        "department": "人事部",
+        "position": "係長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-6772-4542",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0129_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0129_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00130",
+    "businessCard": {
+      "group1": {
+        "email": "user130@example.com"
+      },
+      "group2": {
+        "lastName": "中村",
+        "firstName": "翼"
+      },
+      "group3": {
+        "companyName": "株式会社SPEED",
+        "department": "情報システム部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-7270-4163",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0130_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0130_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00131",
+    "businessCard": {
+      "group1": {
+        "email": "user131@example.com"
+      },
+      "group2": {
+        "lastName": "鈴木",
+        "firstName": "翔太"
+      },
+      "group3": {
+        "companyName": "テックイノベーション",
+        "department": "経営企画部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-4561-5821",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0131_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0131_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00132",
+    "businessCard": {
+      "group1": {
+        "email": "user132@example.com"
+      },
+      "group2": {
+        "lastName": "田中",
+        "firstName": "美咲"
+      },
+      "group3": {
+        "companyName": "クリエイティブ・ホールディングス",
+        "department": "人事部",
+        "position": "課長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-5107-3987",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0132_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0132_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00133",
+    "businessCard": {
+      "group1": {
+        "email": "user133@example.com"
+      },
+      "group2": {
+        "lastName": "高橋",
+        "firstName": "大輔"
+      },
+      "group3": {
+        "companyName": "未来ソリューションズ",
+        "department": "経営企画部",
+        "position": "部長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-1972-4541",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0133_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0133_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00134",
+    "businessCard": {
+      "group1": {
+        "email": "user134@example.com"
+      },
+      "group2": {
+        "lastName": "佐々木",
+        "firstName": "花子"
+      },
+      "group3": {
+        "companyName": "サイバーネティクス",
+        "department": "経営企画部",
+        "position": "係長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-3516-5587",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0134_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0134_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00135",
+    "businessCard": {
+      "group1": {
+        "email": "user135@example.com"
+      },
+      "group2": {
+        "lastName": "高橋",
+        "firstName": "七海"
+      },
+      "group3": {
+        "companyName": "データバンク",
+        "department": "デザイン部",
+        "position": "係長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-2603-5628",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0135_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0135_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00136",
+    "businessCard": {
+      "group1": {
+        "email": "user136@example.com"
+      },
+      "group2": {
+        "lastName": "井上",
+        "firstName": "七海"
+      },
+      "group3": {
+        "companyName": "クリエイティブ・ホールディングス",
+        "department": "人事部",
+        "position": "課長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-4971-1375",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0136_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0136_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00137",
+    "businessCard": {
+      "group1": {
+        "email": "user137@example.com"
+      },
+      "group2": {
+        "lastName": "林",
+        "firstName": "七海"
+      },
+      "group3": {
+        "companyName": "テックイノベーション",
+        "department": "情報システム部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-9474-9572",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0137_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0137_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00138",
+    "businessCard": {
+      "group1": {
+        "email": "user138@example.com"
+      },
+      "group2": {
+        "lastName": "吉田",
+        "firstName": "由佳"
+      },
+      "group3": {
+        "companyName": "サイバーネティクス",
+        "department": "総務部",
+        "position": "マネージャー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-4473-9065",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0138_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0138_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00139",
+    "businessCard": {
+      "group1": {
+        "email": "user139@example.com"
+      },
+      "group2": {
+        "lastName": "渡辺",
+        "firstName": "翼"
+      },
+      "group3": {
+        "companyName": "株式会社SPEED",
+        "department": "開発部",
+        "position": "一般社員"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-3059-9751",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0139_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0139_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00140",
+    "businessCard": {
+      "group1": {
+        "email": "user140@example.com"
+      },
+      "group2": {
+        "lastName": "山本",
+        "firstName": "陽子"
+      },
+      "group3": {
+        "companyName": "クリエイティブ・ホールディングス",
+        "department": "営業部",
+        "position": "部長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-4679-5252",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0140_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0140_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00141",
+    "businessCard": {
+      "group1": {
+        "email": "user141@example.com"
+      },
+      "group2": {
+        "lastName": "田中",
+        "firstName": "由佳"
+      },
+      "group3": {
+        "companyName": "クリエイティブ・ホールディングス",
+        "department": "総務部",
+        "position": "リーダー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-8112-9857",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0141_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0141_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00142",
+    "businessCard": {
+      "group1": {
+        "email": "user142@example.com"
+      },
+      "group2": {
+        "lastName": "高橋",
+        "firstName": "あゆみ"
+      },
+      "group3": {
+        "companyName": "未来ソリューションズ",
+        "department": "経営企画部",
+        "position": "リーダー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-8563-4231",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0142_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0142_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00143",
+    "businessCard": {
+      "group1": {
+        "email": "user143@example.com"
+      },
+      "group2": {
+        "lastName": "小林",
+        "firstName": "真奈美"
+      },
+      "group3": {
+        "companyName": "テックイノベーション",
+        "department": "マーケティング部",
+        "position": "係長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-6138-6237",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0143_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0143_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00144",
+    "businessCard": {
+      "group1": {
+        "email": "user144@example.com"
+      },
+      "group2": {
+        "lastName": "小林",
+        "firstName": "次郎"
+      },
+      "group3": {
+        "companyName": "テックイノベーション",
+        "department": "開発部",
+        "position": "部長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-6629-8821",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0144_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0144_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00145",
+    "businessCard": {
+      "group1": {
+        "email": "user145@example.com"
+      },
+      "group2": {
+        "lastName": "山田",
+        "firstName": "香織"
+      },
+      "group3": {
+        "companyName": "ネクストワン",
+        "department": "人事部",
+        "position": "一般社員"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-7157-1061",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0145_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0145_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00146",
+    "businessCard": {
+      "group1": {
+        "email": "user146@example.com"
+      },
+      "group2": {
+        "lastName": "井上",
+        "firstName": "健太"
+      },
+      "group3": {
+        "companyName": "データバンク",
+        "department": "人事部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-6236-5670",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0146_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0146_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00147",
+    "businessCard": {
+      "group1": {
+        "email": "user147@example.com"
+      },
+      "group2": {
+        "lastName": "加藤",
+        "firstName": "由佳"
+      },
+      "group3": {
+        "companyName": "ジャパンテック",
+        "department": "営業部",
+        "position": "一般社員"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-5454-8003",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0147_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0147_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00148",
+    "businessCard": {
+      "group1": {
+        "email": "user148@example.com"
+      },
+      "group2": {
+        "lastName": "佐藤",
+        "firstName": "拓也"
+      },
+      "group3": {
+        "companyName": "未来ソリューションズ",
+        "department": "営業部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-3278-1065",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0148_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0148_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00149",
+    "businessCard": {
+      "group1": {
+        "email": "user149@example.com"
+      },
+      "group2": {
+        "lastName": "鈴木",
+        "firstName": "七海"
+      },
+      "group3": {
+        "companyName": "アドバンストシステム",
+        "department": "開発部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-3603-3224",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0149_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0149_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00150",
+    "businessCard": {
+      "group1": {
+        "email": "user150@example.com"
+      },
+      "group2": {
+        "lastName": "吉田",
+        "firstName": "翔太"
+      },
+      "group3": {
+        "companyName": "ジャパンテック",
+        "department": "人事部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-9875-4262",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0150_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0150_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00151",
+    "businessCard": {
+      "group1": {
+        "email": "user151@example.com"
+      },
+      "group2": {
+        "lastName": "加藤",
+        "firstName": "七海"
+      },
+      "group3": {
+        "companyName": "ジャパンテック",
+        "department": "マーケティング部",
+        "position": "部長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-9729-9892",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0151_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0151_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00152",
+    "businessCard": {
+      "group1": {
+        "email": "user152@example.com"
+      },
+      "group2": {
+        "lastName": "井上",
+        "firstName": "真奈美"
+      },
+      "group3": {
+        "companyName": "データバンク",
+        "department": "デザイン部",
+        "position": "部長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-3781-4510",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0152_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0152_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00153",
+    "businessCard": {
+      "group1": {
+        "email": "user153@example.com"
+      },
+      "group2": {
+        "lastName": "山口",
+        "firstName": "次郎"
+      },
+      "group3": {
+        "companyName": "株式会社SPEED",
+        "department": "人事部",
+        "position": "部長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-2824-2412",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0153_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0153_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00154",
+    "businessCard": {
+      "group1": {
+        "email": "user154@example.com"
+      },
+      "group2": {
+        "lastName": "佐藤",
+        "firstName": "直人"
+      },
+      "group3": {
+        "companyName": "テックイノベーション",
+        "department": "開発部",
+        "position": "リーダー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-6249-6009",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0154_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0154_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00155",
+    "businessCard": {
+      "group1": {
+        "email": "user155@example.com"
+      },
+      "group2": {
+        "lastName": "木村",
+        "firstName": "美優"
+      },
+      "group3": {
+        "companyName": "クリエイティブ・ホールディングス",
+        "department": "デザイン部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-2651-3668",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0155_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0155_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00156",
+    "businessCard": {
+      "group1": {
+        "email": "user156@example.com"
+      },
+      "group2": {
+        "lastName": "山田",
+        "firstName": "美咲"
+      },
+      "group3": {
+        "companyName": "ネクストワン",
+        "department": "営業部",
+        "position": "一般社員"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-7771-8549",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "digitizing",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0156_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0156_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00157",
+    "businessCard": {
+      "group1": {
+        "email": "user157@example.com"
+      },
+      "group2": {
+        "lastName": "佐藤",
+        "firstName": "由佳"
+      },
+      "group3": {
+        "companyName": "ネクストワン",
+        "department": "マーケティング部",
+        "position": "リーダー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-3995-7353",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0157_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0157_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00158",
+    "businessCard": {
+      "group1": {
+        "email": "user158@example.com"
+      },
+      "group2": {
+        "lastName": "吉田",
+        "firstName": "七海"
+      },
+      "group3": {
+        "companyName": "ジャパンテック",
+        "department": "マーケティング部",
+        "position": "マネージャー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-3931-4194",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0158_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0158_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00159",
+    "businessCard": {
+      "group1": {
+        "email": "user159@example.com"
+      },
+      "group2": {
+        "lastName": "斎藤",
+        "firstName": "大樹"
+      },
+      "group3": {
+        "companyName": "グローバル商事",
+        "department": "マーケティング部",
+        "position": "課長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-7346-3809",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0159_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0159_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00160",
+    "businessCard": {
+      "group1": {
+        "email": "user160@example.com"
+      },
+      "group2": {
+        "lastName": "伊藤",
+        "firstName": "太郎"
+      },
+      "group3": {
+        "companyName": "サイバーネティクス",
+        "department": "経営企画部",
+        "position": "係長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-9382-3652",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0160_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0160_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00161",
+    "businessCard": {
+      "group1": {
+        "email": "user161@example.com"
+      },
+      "group2": {
+        "lastName": "清水",
+        "firstName": "健太"
+      },
+      "group3": {
+        "companyName": "アドバンストシステム",
+        "department": "営業部",
+        "position": "リーダー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-9290-6041",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0161_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0161_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00162",
+    "businessCard": {
+      "group1": {
+        "email": "user162@example.com"
+      },
+      "group2": {
+        "lastName": "渡辺",
+        "firstName": "美優"
+      },
+      "group3": {
+        "companyName": "サイバーネティクス",
+        "department": "営業部",
+        "position": "部長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-7135-1278",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0162_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0162_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00163",
+    "businessCard": {
+      "group1": {
+        "email": "user163@example.com"
+      },
+      "group2": {
+        "lastName": "木村",
+        "firstName": "美咲"
+      },
+      "group3": {
+        "companyName": "株式会社SPEED",
+        "department": "人事部",
+        "position": "マネージャー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-3283-8102",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0163_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0163_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00164",
+    "businessCard": {
+      "group1": {
+        "email": "user164@example.com"
+      },
+      "group2": {
+        "lastName": "清水",
+        "firstName": "陽子"
+      },
+      "group3": {
+        "companyName": "未来ソリューションズ",
+        "department": "人事部",
+        "position": "リーダー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-1873-9200",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "digitizing",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0164_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0164_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00165",
+    "businessCard": {
+      "group1": {
+        "email": "user165@example.com"
+      },
+      "group2": {
+        "lastName": "清水",
+        "firstName": "あゆみ"
+      },
+      "group3": {
+        "companyName": "テックイノベーション",
+        "department": "開発部",
+        "position": "マネージャー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-4717-8356",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0165_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0165_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00166",
+    "businessCard": {
+      "group1": {
+        "email": "user166@example.com"
+      },
+      "group2": {
+        "lastName": "山田",
+        "firstName": "陽子"
+      },
+      "group3": {
+        "companyName": "クリエイティブ・ホールディングス",
+        "department": "情報システム部",
+        "position": "リーダー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-3788-3045",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0166_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0166_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00167",
+    "businessCard": {
+      "group1": {
+        "email": "user167@example.com"
+      },
+      "group2": {
+        "lastName": "斎藤",
+        "firstName": "大輔"
+      },
+      "group3": {
+        "companyName": "テックイノベーション",
+        "department": "営業部",
+        "position": "部長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-6936-9343",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0167_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0167_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00168",
+    "businessCard": {
+      "group1": {
+        "email": "user168@example.com"
+      },
+      "group2": {
+        "lastName": "林",
+        "firstName": "あゆみ"
+      },
+      "group3": {
+        "companyName": "アドバンストシステム",
+        "department": "開発部",
+        "position": "リーダー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-3519-5478",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0168_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0168_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00169",
+    "businessCard": {
+      "group1": {
+        "email": "user169@example.com"
+      },
+      "group2": {
+        "lastName": "佐藤",
+        "firstName": "美優"
+      },
+      "group3": {
+        "companyName": "株式会社SPEED",
+        "department": "人事部",
+        "position": "係長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-2560-5701",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0169_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0169_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00170",
+    "businessCard": {
+      "group1": {
+        "email": "user170@example.com"
+      },
+      "group2": {
+        "lastName": "木村",
+        "firstName": "あゆみ"
+      },
+      "group3": {
+        "companyName": "サイバーネティクス",
+        "department": "デザイン部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-1014-9813",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0170_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0170_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00171",
+    "businessCard": {
+      "group1": {
+        "email": "user171@example.com"
+      },
+      "group2": {
+        "lastName": "田中",
+        "firstName": "花子"
+      },
+      "group3": {
+        "companyName": "未来ソリューションズ",
+        "department": "デザイン部",
+        "position": "係長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-7463-1056",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0171_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0171_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00172",
+    "businessCard": {
+      "group1": {
+        "email": "user172@example.com"
+      },
+      "group2": {
+        "lastName": "高橋",
+        "firstName": "香織"
+      },
+      "group3": {
+        "companyName": "グローバル商事",
+        "department": "開発部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-8402-8028",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0172_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0172_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00173",
+    "businessCard": {
+      "group1": {
+        "email": "user173@example.com"
+      },
+      "group2": {
+        "lastName": "山口",
+        "firstName": "由佳"
+      },
+      "group3": {
+        "companyName": "ネクストワン",
+        "department": "マーケティング部",
+        "position": "一般社員"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-1013-8914",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0173_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0173_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00174",
+    "businessCard": {
+      "group1": {
+        "email": "user174@example.com"
+      },
+      "group2": {
+        "lastName": "松本",
+        "firstName": "翔太"
+      },
+      "group3": {
+        "companyName": "クリエイティブ・ホールディングス",
+        "department": "営業部",
+        "position": "マネージャー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-4115-1401",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0174_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0174_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00175",
+    "businessCard": {
+      "group1": {
+        "email": "user175@example.com"
+      },
+      "group2": {
+        "lastName": "鈴木",
+        "firstName": "直人"
+      },
+      "group3": {
+        "companyName": "ジャパンテック",
+        "department": "人事部",
+        "position": "係長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-1473-6728",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0175_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0175_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00176",
+    "businessCard": {
+      "group1": {
+        "email": "user176@example.com"
+      },
+      "group2": {
+        "lastName": "山本",
+        "firstName": "健一"
+      },
+      "group3": {
+        "companyName": "クリエイティブ・ホールディングス",
+        "department": "人事部",
+        "position": "課長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-3526-3983",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0176_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0176_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00177",
+    "businessCard": {
+      "group1": {
+        "email": "user177@example.com"
+      },
+      "group2": {
+        "lastName": "木村",
+        "firstName": "七海"
+      },
+      "group3": {
+        "companyName": "グローバル商事",
+        "department": "情報システム部",
+        "position": "課長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-6994-1895",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0177_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0177_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00178",
+    "businessCard": {
+      "group1": {
+        "email": "user178@example.com"
+      },
+      "group2": {
+        "lastName": "山田",
+        "firstName": "太郎"
+      },
+      "group3": {
+        "companyName": "グローバル商事",
+        "department": "人事部",
+        "position": "一般社員"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-2396-2090",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0178_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0178_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00179",
+    "businessCard": {
+      "group1": {
+        "email": "user179@example.com"
+      },
+      "group2": {
+        "lastName": "伊藤",
+        "firstName": "直人"
+      },
+      "group3": {
+        "companyName": "ネクストワン",
+        "department": "営業部",
+        "position": "一般社員"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-9901-1751",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0179_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0179_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00180",
+    "businessCard": {
+      "group1": {
+        "email": "user180@example.com"
+      },
+      "group2": {
+        "lastName": "山本",
+        "firstName": "あゆみ"
+      },
+      "group3": {
+        "companyName": "データバンク",
+        "department": "総務部",
+        "position": "一般社員"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-2347-6832",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0180_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0180_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00181",
+    "businessCard": {
+      "group1": {
+        "email": "user181@example.com"
+      },
+      "group2": {
+        "lastName": "佐々木",
+        "firstName": "香織"
+      },
+      "group3": {
+        "companyName": "アドバンストシステム",
+        "department": "マーケティング部",
+        "position": "部長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-5676-1314",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0181_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0181_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00182",
+    "businessCard": {
+      "group1": {
+        "email": "user182@example.com"
+      },
+      "group2": {
+        "lastName": "山田",
+        "firstName": "由佳"
+      },
+      "group3": {
+        "companyName": "グローバル商事",
+        "department": "総務部",
+        "position": "部長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-5916-1849",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0182_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0182_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00183",
+    "businessCard": {
+      "group1": {
+        "email": "user183@example.com"
+      },
+      "group2": {
+        "lastName": "渡辺",
+        "firstName": "花子"
+      },
+      "group3": {
+        "companyName": "未来ソリューションズ",
+        "department": "マーケティング部",
+        "position": "部長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-6522-3275",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0183_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0183_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00184",
+    "businessCard": {
+      "group1": {
+        "email": "user184@example.com"
+      },
+      "group2": {
+        "lastName": "松本",
+        "firstName": "翼"
+      },
+      "group3": {
+        "companyName": "グローバル商事",
+        "department": "マーケティング部",
+        "position": "一般社員"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-5563-2268",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0184_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0184_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00185",
+    "businessCard": {
+      "group1": {
+        "email": "user185@example.com"
+      },
+      "group2": {
+        "lastName": "佐藤",
+        "firstName": "次郎"
+      },
+      "group3": {
+        "companyName": "グローバル商事",
+        "department": "デザイン部",
+        "position": "マネージャー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-9805-3258",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0185_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0185_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00186",
+    "businessCard": {
+      "group1": {
+        "email": "user186@example.com"
+      },
+      "group2": {
+        "lastName": "木村",
+        "firstName": "美咲"
+      },
+      "group3": {
+        "companyName": "データバンク",
+        "department": "デザイン部",
+        "position": "リーダー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-1014-8063",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0186_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0186_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00187",
+    "businessCard": {
+      "group1": {
+        "email": "user187@example.com"
+      },
+      "group2": {
+        "lastName": "佐々木",
+        "firstName": "花子"
+      },
+      "group3": {
+        "companyName": "テックイノベーション",
+        "department": "情報システム部",
+        "position": "課長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-7175-7768",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0187_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0187_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00188",
+    "businessCard": {
+      "group1": {
+        "email": "user188@example.com"
+      },
+      "group2": {
+        "lastName": "木村",
+        "firstName": "美咲"
+      },
+      "group3": {
+        "companyName": "サイバーネティクス",
+        "department": "経営企画部",
+        "position": "一般社員"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-7155-2124",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0188_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0188_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00189",
+    "businessCard": {
+      "group1": {
+        "email": "user189@example.com"
+      },
+      "group2": {
+        "lastName": "吉田",
+        "firstName": "健太"
+      },
+      "group3": {
+        "companyName": "アドバンストシステム",
+        "department": "経営企画部",
+        "position": "一般社員"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-3143-7604",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0189_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0189_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00190",
+    "businessCard": {
+      "group1": {
+        "email": "user190@example.com"
+      },
+      "group2": {
+        "lastName": "佐藤",
+        "firstName": "誠"
+      },
+      "group3": {
+        "companyName": "グローバル商事",
+        "department": "情報システム部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-6367-2636",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0190_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0190_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00191",
+    "businessCard": {
+      "group1": {
+        "email": "user191@example.com"
+      },
+      "group2": {
+        "lastName": "斎藤",
+        "firstName": "香織"
+      },
+      "group3": {
+        "companyName": "グローバル商事",
+        "department": "経営企画部",
+        "position": "一般社員"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-4261-8667",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0191_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0191_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00192",
+    "businessCard": {
+      "group1": {
+        "email": "user192@example.com"
+      },
+      "group2": {
+        "lastName": "高橋",
+        "firstName": "大輔"
+      },
+      "group3": {
+        "companyName": "アドバンストシステム",
+        "department": "経営企画部",
+        "position": "マネージャー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-5874-8666",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0192_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0192_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00193",
+    "businessCard": {
+      "group1": {
+        "email": "user193@example.com"
+      },
+      "group2": {
+        "lastName": "鈴木",
+        "firstName": "大輔"
+      },
+      "group3": {
+        "companyName": "グローバル商事",
+        "department": "デザイン部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-9597-8600",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0193_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0193_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00194",
+    "businessCard": {
+      "group1": {
+        "email": "user194@example.com"
+      },
+      "group2": {
+        "lastName": "山口",
+        "firstName": "太郎"
+      },
+      "group3": {
+        "companyName": "クリエイティブ・ホールディングス",
+        "department": "営業部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-9531-1542",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0194_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0194_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00195",
+    "businessCard": {
+      "group1": {
+        "email": "user195@example.com"
+      },
+      "group2": {
+        "lastName": "佐藤",
+        "firstName": "大輔"
+      },
+      "group3": {
+        "companyName": "クリエイティブ・ホールディングス",
+        "department": "開発部",
+        "position": "係長"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-4595-2655",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0195_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0195_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00196",
+    "businessCard": {
+      "group1": {
+        "email": "user196@example.com"
+      },
+      "group2": {
+        "lastName": "松本",
+        "firstName": "大樹"
+      },
+      "group3": {
+        "companyName": "未来ソリューションズ",
+        "department": "営業部",
+        "position": "主任"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-6404-6293",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0196_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0196_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00197",
+    "businessCard": {
+      "group1": {
+        "email": "user197@example.com"
+      },
+      "group2": {
+        "lastName": "佐藤",
+        "firstName": "次郎"
+      },
+      "group3": {
+        "companyName": "ジャパンテック",
+        "department": "総務部",
+        "position": "マネージャー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-7154-4882",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0197_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0197_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00198",
+    "businessCard": {
+      "group1": {
+        "email": "user198@example.com"
+      },
+      "group2": {
+        "lastName": "小林",
+        "firstName": "翼"
+      },
+      "group3": {
+        "companyName": "株式会社SPEED",
+        "department": "情報システム部",
+        "position": "マネージャー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-2539-2681",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0198_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0198_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00199",
+    "businessCard": {
+      "group1": {
+        "email": "user199@example.com"
+      },
+      "group2": {
+        "lastName": "佐々木",
+        "firstName": "美優"
+      },
+      "group3": {
+        "companyName": "データバンク",
+        "department": "デザイン部",
+        "position": "マネージャー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-9061-7752",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0199_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0199_2.svg"
+      }
+    }
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00200",
+    "businessCard": {
+      "group1": {
+        "email": "user200@example.com"
+      },
+      "group2": {
+        "lastName": "高橋",
+        "firstName": "直人"
+      },
+      "group3": {
+        "companyName": "テックイノベーション",
+        "department": "マーケティング部",
+        "position": "リーダー"
+      },
+      "group4": {
+        "postalCode": "",
+        "address1": "東京都千代田区...",
+        "address2": ""
+      },
+      "group5": {
+        "mobile": "",
+        "tel1": "03-8399-3005",
+        "fax": ""
+      },
+      "group6": {
+        "url": ""
+      },
+      "status": "done",
+      "imageUrl": {
+        "front": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0200_1.svg",
+        "back": "../media/generated/sv_0003_26010/bizcard/sv_0003_26010_0200_2.svg"
+      }
+    }
+  }
+]

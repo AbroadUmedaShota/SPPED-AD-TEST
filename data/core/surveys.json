@@ -5014,5 +5014,165 @@
         "type": "explanation"
       }
     ]
+  },
+  {
+    "id": "sv_0003_26010",
+    "groupId": "group_marketing",
+    "name": {
+      "ja": "マーケティング部サンプルアンケート (全タイプ & プレミアム)",
+      "en": "Marketing Dept. Sample Survey (All Types & Premium)"
+    },
+    "status": "会期中",
+    "answerCount": 200,
+    "periodStart": "2026-02-01",
+    "periodEnd": "2026-02-28",
+    "plan": "Premium",
+    "details": [
+      {
+        "id": "Q1",
+        "text": "展示会を知ったきっかけ (SA)",
+        "type": "single_choice",
+        "options": [
+          "招待状",
+          "Webサイト",
+          "SNS",
+          "知人の紹介",
+          "その他"
+        ]
+      },
+      {
+        "id": "Q2",
+        "text": "興味のある分野 (MA)",
+        "type": "multi_choice",
+        "options": [
+          "AI・機械学習",
+          "クラウドサービス",
+          "セキュリティ",
+          "IoT",
+          "VR/AR"
+        ]
+      },
+      {
+        "id": "Q3",
+        "text": "担当者名 (Text)",
+        "type": "text"
+      },
+      {
+        "id": "Q4",
+        "text": "ご意見・ご要望 (Free Text)",
+        "type": "free_text"
+      },
+      {
+        "id": "Q5",
+        "text": "導入予定時期 (Date)",
+        "type": "date"
+      },
+      {
+        "id": "Q6",
+        "text": "希望連絡時間 (Time)",
+        "type": "time"
+      },
+      {
+        "id": "Q7",
+        "text": "導入予定台数 (Number)",
+        "type": "number",
+        "min": 0,
+        "max": 1000,
+        "unit": "台"
+      },
+      {
+        "id": "Q8",
+        "text": "サービス満足度 (Matrix SA)",
+        "type": "matrix_sa",
+        "rows": [
+          {
+            "id": "r1",
+            "text": "機能性"
+          },
+          {
+            "id": "r2",
+            "text": "使いやすさ"
+          },
+          {
+            "id": "r3",
+            "text": "サポート"
+          },
+          {
+            "id": "r4",
+            "text": "価格"
+          }
+        ],
+        "options": [
+          {
+            "value": "5",
+            "text": "満足"
+          },
+          {
+            "value": "4",
+            "text": "やや満足"
+          },
+          {
+            "value": "3",
+            "text": "普通"
+          },
+          {
+            "value": "2",
+            "text": "やや不満"
+          },
+          {
+            "value": "1",
+            "text": "不満"
+          }
+        ]
+      },
+      {
+        "id": "Q9",
+        "text": "導入検討項目 (Matrix MA)",
+        "type": "matrix_ma",
+        "rows": [
+          {
+            "id": "r1",
+            "text": "本社"
+          },
+          {
+            "id": "r2",
+            "text": "支社"
+          }
+        ],
+        "options": [
+          {
+            "value": "a",
+            "text": "PC"
+          },
+          {
+            "value": "b",
+            "text": "タブレット"
+          },
+          {
+            "value": "c",
+            "text": "スマホ"
+          },
+          {
+            "value": "d",
+            "text": "サーバー"
+          }
+        ]
+      },
+      {
+        "id": "Q10",
+        "text": "電子署名 (Handwriting)",
+        "type": "handwriting"
+      },
+      {
+        "id": "Q11",
+        "text": "現場写真 (Image)",
+        "type": "image"
+      },
+      {
+        "id": "Q12",
+        "text": "※アンケートにご協力いただきありがとうございました。",
+        "type": "explanation"
+      }
+    ]
   }
 ]
