@@ -306,9 +306,9 @@ function main() {
   });
 
   const base = path.join(__dirname, '..');
-  const surveyFile = path.join(base, 'docs/examples/demo_surveys', `${SURVEY_ID}.json`);
-  const answerFile = path.join(base, 'docs/examples/demo_answers', `${SURVEY_ID}.json`);
-  const bizFile = path.join(base, 'docs/examples/demo_business-cards', `${SURVEY_ID}.json`);
+  const surveyFile = path.join(base, 'docs/サンプル/demo_surveys', `${SURVEY_ID}.json`);
+  const answerFile = path.join(base, 'docs/サンプル/demo_answers', `${SURVEY_ID}.json`);
+  const bizFile = path.join(base, 'docs/サンプル/demo_business-cards', `${SURVEY_ID}.json`);
   const coreSurveysFile = path.join(base, 'data/core/surveys.json');
 
   writeJson(surveyFile, survey);

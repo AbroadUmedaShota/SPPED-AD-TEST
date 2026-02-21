@@ -18,10 +18,10 @@ SPEED AD is an all-in-one web application designed to streamline the lead manage
 - `docs/`: Comprehensive project documentation.
 
 ## Documentation Index
-- **[Project Overview](docs/product/overview/00_PROJECT_OVERVIEW.md)**: Vision, scope, and core requirements.
-- **[Architecture](docs/product/architecture/01_ARCHITECTURE.md)**: System design and technology stack.
-- **[Setup Guide](docs/handbook/setup/04_SETUP.md)**: Environment setup and getting started.
-- **[Testing Guidelines](docs/handbook/testing/03_TESTING_GUIDELINES.md)**: QA strategy and execution.
+- **[Project Overview](docs/プロダクト/概要/00_PROJECT_OVERVIEW.md)**: Vision, scope, and core requirements.
+- **[Architecture](docs/プロダクト/アーキテクチャ/01_ARCHITECTURE.md)**: System design and technology stack.
+- **[Setup Guide](docs/ハンドブック/セットアップ/04_SETUP.md)**: Environment setup and getting started.
+- **[Testing Guidelines](docs/ハンドブック/テスト/03_TESTING_GUIDELINES.md)**: QA strategy and execution.
 - **[Weekly Changelog](WEEKLY_CHANGELOG.md)**: Recent development progress.
 - **[Gemini Development Guide](GEMINI.md)**: AI-driven development workflows and standards.
 

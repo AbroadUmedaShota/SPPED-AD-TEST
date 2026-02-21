@@ -16,7 +16,7 @@
 
 このフォルダ内の資料は「共有用コピー」です。詳細仕様の正本は以下を参照します。
 
-- `docs/product/specs/04_invoice_screen.md`
-- `docs/product/specs/04_invoice_detail_requirements.md`
-- `docs/product/specs/05_invoice_document.md`
-- `docs/handbook/testing/invoice_manual_checklist.md`
+- `docs/プロダクト/specs/04_invoice_screen.md`
+- `docs/プロダクト/specs/04_invoice_detail_requirements.md`
+- `docs/プロダクト/specs/05_invoice_document.md`
+- `docs/ハンドブック/テスト/invoice_manual_checklist.md`

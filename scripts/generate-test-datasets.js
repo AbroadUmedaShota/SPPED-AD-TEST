@@ -116,7 +116,7 @@ groups.forEach(group => {
         }
 
         const writeJson = (dir, name, data) => {
-            const p = path.join(__dirname, `../docs/examples/${dir}/${name}.json`);
+            const p = path.join(__dirname, `../docs/サンプル/${dir}/${name}.json`);
             if (!fs.existsSync(path.dirname(p))) fs.mkdirSync(path.dirname(p), { recursive: true });
             fs.writeFileSync(p, JSON.stringify(data, null, 2));
             if (dir === 'demo_surveys') {
