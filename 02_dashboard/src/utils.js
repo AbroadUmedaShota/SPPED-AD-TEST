@@ -4,7 +4,7 @@ let activeUIsCount = 0; // Tracks number of active UI overlays (modals, mobile s
 
 const DEFAULT_DASHBOARD_ROOT = './';
 const DEFAULT_DATA_ROOT = './data';
-const DEFAULT_DEMO_ROOT = './docs/examples';
+const DEFAULT_DEMO_ROOT = './docs/サンプル';
 
 function joinRelativePath(base, relativePath) {
   const cleanedBase = base ? base.replace(/\/+$/, '') : '';
@@ -90,7 +90,7 @@ function getDashboardDataRoot() {
 
 function getDemoDataRoot() {
   if (DASHBOARD_BASE_PATH !== null) {
-    return `${DASHBOARD_BASE_PATH}/docs/examples`;
+    return `${DASHBOARD_BASE_PATH}/docs/サンプル`;
   }
   return DEFAULT_DEMO_ROOT;
 }

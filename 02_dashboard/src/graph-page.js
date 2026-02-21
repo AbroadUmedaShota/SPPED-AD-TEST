@@ -235,7 +235,7 @@ async function loadAndRenderCharts(surveyId) {
                 console.warn(`Local fetch failed for ${relativePath}`, e);
             }
 
-            // 2. Try Demo Data (docs/examples/...)
+            // 2. Try Demo Data (docs/サンプル/...)
             const demoUrl = resolveDemoDataPath(relativePath);
             try {
                 const res = await fetch(demoUrl);

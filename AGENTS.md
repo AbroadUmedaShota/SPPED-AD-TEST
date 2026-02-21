@@ -9,14 +9,14 @@ The site delivers static HTML entry points at `02_dashboard/index.html` and `01_
 There is no build pipeline, so refreshing the browser reflects changes immediately.
 
 ## Coding Style & Naming Conventions
-Follow ES module syntax with 2-space indentation, trailing semicolons, and single quotes for strings. Use camelCase for functions and variables, PascalCase for classes, and lowerCamelCase filenames such as `tableManager.js`. Keep business logic isolated in `services/` modules and limit DOM manipulation to the `ui/` layer. Confirm any new patterns against `docs/product/standards/02_CODING_STANDARDS.md`.
+Follow ES module syntax with 2-space indentation, trailing semicolons, and single quotes for strings. Use camelCase for functions and variables, PascalCase for classes, and lowerCamelCase filenames such as `tableManager.js`. Keep business logic isolated in `services/` modules and limit DOM manipulation to the `ui/` layer. Confirm any new patterns against `docs/プロダクト/標準・規準/02_CODING_STANDARDS.md`.
 
 ## Testing Guidelines
-Automated tests are not yet in place; perform manual verification in Chromium or Firefox. Ensure data flows correctly from `data/*.json` through services into the rendered UI and keep the browser console free of errors. Consult `docs/handbook/testing/03_TESTING_GUIDELINES.md` for required manual coverage checklists.
+Automated tests are not yet in place; perform manual verification in Chromium or Firefox. Ensure data flows correctly from `data/*.json` through services into the rendered UI and keep the browser console free of errors. Consult `docs/ハンドブック/テスト/03_TESTING_GUIDELINES.md` for required manual coverage checklists.
 
 ## Commit & Pull Request Guidelines
 Use Conventional Commit prefixes (`feat:`, `fix:`, `chore:`, etc.) with concise subjects. Summarize key changes in bullet form within the body and reference related issues with `Closes #123` when applicable. Pull requests should list affected paths (e.g., `02_dashboard/src/ui/...`), include screenshots for visual updates, and document the manual tests performed.
 
 ## Security & Configuration Tips
-Never commit secrets; treat `data/*.json` as mock-only fixtures. Keep production endpoints configurable as described in `docs/product/architecture/01_ARCHITECTURE.md`, and document any new third-party dependency justifications in your pull request summary.
+Never commit secrets; treat `data/*.json` as mock-only fixtures. Keep production endpoints configurable as described in `docs/プロダクト/アーキテクチャ/01_ARCHITECTURE.md`, and document any new third-party dependency justifications in your pull request summary.
 

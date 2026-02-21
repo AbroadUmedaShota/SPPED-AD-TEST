@@ -101,9 +101,9 @@ function main() {
     const answers = generateAnswers(COUNT);
     const businessCards = generateBusinessCards(COUNT);
 
-    const surveyPath = path.join(__dirname, `../docs/examples/demo_surveys/${surveyId}.json`);
-    const answersPath = path.join(__dirname, `../docs/examples/demo_answers/${surveyId}.json`);
-    const businessCardsPath = path.join(__dirname, `../docs/examples/demo_business-cards/${surveyId}.json`);
+    const surveyPath = path.join(__dirname, `../docs/サンプル/demo_surveys/${surveyId}.json`);
+    const answersPath = path.join(__dirname, `../docs/サンプル/demo_answers/${surveyId}.json`);
+    const businessCardsPath = path.join(__dirname, `../docs/サンプル/demo_business-cards/${surveyId}.json`);
 
     [surveyPath, answersPath, businessCardsPath].forEach(p => {
         if (!fs.existsSync(path.dirname(p))) fs.mkdirSync(path.dirname(p), { recursive: true });
