@@ -358,7 +358,11 @@ function startBizcardUploadFlow() {
     const triggerFileInput = (useCamera, side, isEdit = false) => {
         currentSide = side; 
         isEditingSide = isEdit;
-        hiddenFileInput.capture = useCamera ? 'environment' : ''; 
+        if (useCamera) {
+            hiddenFileInput.setAttribute('capture', 'environment');
+        } else {
+            hiddenFileInput.removeAttribute('capture');
+        }
         hiddenFileInput.click(); 
     };
 
@@ -607,7 +611,7 @@ function startBizcardUploadFlow() {
                 <span class="flex-auto border-t-2 border-primary mx-2"></span>
                 <span class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center">3</span>
             </div>
-            <p class="text-center text-sm text-gray-600 mb-4">以下の内容でアップロードします。</p>
+            <p class="text-center text-sm text-gray-600 mb-4">以下の内容で保存します。</p>
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <p class="font-bold text-center mb-2">表面</p>
@@ -620,7 +624,7 @@ function startBizcardUploadFlow() {
             </div>
         `;
         showModal(DOMElements.bizcardUploadModal, '最終確認', body, {
-            saveText: 'アップロード完了',
+            saveText: '保存して回答に戻る',
             cancelText: '戻る',
             onSave: () => {
                 state.answers.bizcardImages = { ...localImages };
@@ -641,85 +645,131 @@ function startBizcardUploadFlow() {
     };
 
     const showBizcardEditModal = () => {
+        let editMode = null; // 'retake', 'delete', or null
+
         // 現在の画像を state から取得
         localImages = { ...(state.answers.bizcardImages || { front: null, back: null }) };
+
+        const updateInstructionText = () => {
+            const el = document.getElementById('bizcard-edit-instruction');
+            if (!el) return;
+            if (editMode === 'retake') {
+                el.textContent = '再撮影する画像をクリックしてください。';
+                el.className = 'text-center text-sm text-blue-600 font-bold mb-4';
+            } else if (editMode === 'delete') {
+                el.textContent = '削除する画像をクリックしてください。';
+                el.className = 'text-center text-sm text-red-600 font-bold mb-4';
+            } else {
+                el.textContent = 'アップロード済みの名刺画像です。';
+                el.className = 'text-center text-sm text-gray-600 mb-4';
+            }
+        };
 
         const createSideHTML = (side, title) => {
             const hasImage = !!localImages[side];
             const imageHTML = hasImage 
-                ? `<img src="${localImages[side]}" alt="名刺 ${title}" class="w-full rounded-md shadow-sm cursor-pointer bizcard-confirm-image mb-2">`
-                : `<div class="w-full h-32 flex items-center justify-center bg-gray-100 border border-dashed border-gray-300 rounded-md mb-2"><p class="text-sm text-gray-500">画像なし</p></div>`;
+                ? `<img src="${localImages[side]}" alt="名刺 ${title}" class="w-full rounded-md shadow-sm cursor-pointer bizcard-confirm-image mb-2 hover:opacity-80 transition-opacity" data-side="${side}">`
+                : `<div class="w-full h-32 flex items-center justify-center bg-gray-100 border border-dashed border-gray-300 rounded-md mb-2 cursor-pointer bizcard-confirm-image hover:bg-gray-200 transition-colors" data-side="${side}"><p class="text-sm text-gray-500">画像なし（タップで撮影）</p></div>`;
             
-            const buttonsHTML = hasImage
-                ? `
-                    <button type="button" class="btn-retake px-4 py-2 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 font-medium whitespace-nowrap" data-side="${side}">再撮影</button>
-                    <button type="button" class="btn-delete px-4 py-2 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200 ml-2 font-medium whitespace-nowrap" data-side="${side}">削除</button>
-                  `
-                : `<button type="button" class="btn-retake px-4 py-2 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 font-medium whitespace-nowrap" data-side="${side}">撮影</button>`;
-
             return `
-                <div class="flex flex-col items-center justify-between h-full">
+                <div class="flex flex-col items-center h-full">
                     <p class="font-bold text-center mb-2 text-gray-700">${title}</p>
                     <div class="flex-grow w-full flex items-center justify-center">
                         ${imageHTML}
-                    </div>
-                    <div class="mt-2 flex justify-center w-full">
-                        ${buttonsHTML}
                     </div>
                 </div>
             `;
         };
 
         const body = `
-            <p class="text-center text-sm text-gray-600 mb-4">アップロード済みの名刺画像です。個別に再撮影や削除が可能です。</p>
+            <p id="bizcard-edit-instruction" class="text-center text-sm text-gray-600 mb-4">アップロード済みの名刺画像です。</p>
             <div class="grid grid-cols-2 gap-4">
                 ${createSideHTML('front', '表面')}
                 ${createSideHTML('back', '裏面')}
             </div>
         `;
 
-        showModal(DOMElements.bizcardUploadModal, '名刺画像の確認・編集', body, {
-            cancelText: '閉じる',
-            saveText: '保存',
-            onSave: () => {
-                showToast('保存しました。');
-                DOMElements.bizcardUploadModal.style.display = 'none';
-            }
-        });
+        showModal(DOMElements.bizcardUploadModal, '名刺画像の確認・編集', body, {});
 
-        // Event Listeners for Edit Modal
-        DOMElements.bizcardUploadModal.querySelectorAll('.btn-retake').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const side = e.target.dataset.side;
-                showChoice(side, true); // true = isEdit
-            });
-        });
+        // フッターのボタンレイアウトを調整
+        const footer = DOMElements.bizcardUploadModal.querySelector('.rounded-b-lg');
+        if (footer) {
+            footer.classList.remove('justify-end');
+            footer.classList.add('justify-between', 'w-full', 'items-center');
+            footer.innerHTML = '';
 
-        DOMElements.bizcardUploadModal.querySelectorAll('.btn-delete').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const side = e.target.dataset.side;
-                localImages[side] = null;
-                state.answers.bizcardImages[side] = null;
-                state.hasUnsavedChanges = true;
-                
-                // 両方削除されたら
-                if (!state.answers.bizcardImages.front && !state.answers.bizcardImages.back) {
-                    state.answers.bizcardImages = null; // 完全にクリア
-                    showToast('名刺画像をすべて削除しました。');
-                    DOMElements.bizcardUploadModal.style.display = 'none';
-                    updateBizcardButtonState();
-                    return;
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'px-4 py-2 text-sm font-bold text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors';
+            deleteBtn.textContent = '削除';
+            deleteBtn.onclick = () => {
+                editMode = editMode === 'delete' ? null : 'delete';
+                updateInstructionText();
+                if(editMode === 'delete') {
+                    deleteBtn.classList.add('ring-4', 'ring-red-300');
+                    // 再撮影のリングを解除
+                    const retakeBtn = footer.querySelector('.btn-retake-mode');
+                    if(retakeBtn) retakeBtn.classList.remove('ring-4', 'ring-blue-300');
+                } else {
+                    deleteBtn.classList.remove('ring-4', 'ring-red-300');
                 }
-                
-                showToast(`${side === 'front' ? '表面' : '裏面'}の画像を削除しました。`);
-                showBizcardEditModal(); // 再描画
-                updateBizcardButtonState();
-            });
-        });
+            };
+            footer.appendChild(deleteBtn);
 
-        // 拡大表示
+            const retakeBtn = document.createElement('button');
+            retakeBtn.className = 'btn-retake-mode px-4 py-2 text-sm font-bold text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors';
+            retakeBtn.textContent = '再撮影';
+            retakeBtn.onclick = () => {
+                editMode = editMode === 'retake' ? null : 'retake';
+                updateInstructionText();
+                if(editMode === 'retake') {
+                    retakeBtn.classList.add('ring-4', 'ring-blue-300');
+                    // 削除のリングを解除
+                    deleteBtn.classList.remove('ring-4', 'ring-red-300');
+                } else {
+                    retakeBtn.classList.remove('ring-4', 'ring-blue-300');
+                }
+            };
+            footer.appendChild(retakeBtn);
+        }
+
+        // 画像サムネイルのクリックイベント
         DOMElements.bizcardUploadModal.querySelectorAll('.bizcard-confirm-image').forEach(img => {
-            img.addEventListener('click', (e) => openMagnifyModal(e.target.src));
+            img.addEventListener('click', (e) => {
+                const target = e.currentTarget;
+                const side = target.dataset.side;
+
+                if (editMode === 'retake') {
+                    showChoice(side, true); // true = isEdit
+                } else if (editMode === 'delete') {
+                    if (!localImages[side]) {
+                        showToast('削除する画像がありません。');
+                        return;
+                    }
+                    localImages[side] = null;
+                    state.answers.bizcardImages[side] = null;
+                    state.hasUnsavedChanges = true;
+                    
+                    // 両方削除されたら
+                    if (!state.answers.bizcardImages.front && !state.answers.bizcardImages.back) {
+                        state.answers.bizcardImages = null; // 完全にクリア
+                        showToast('名刺画像をすべて削除しました。');
+                        DOMElements.bizcardUploadModal.style.display = 'none';
+                        updateBizcardButtonState();
+                        return;
+                    }
+                    
+                    showToast(`${side === 'front' ? '表面' : '裏面'}の画像を削除しました。`);
+                    showBizcardEditModal(); // 再描画してモードをリセット
+                    updateBizcardButtonState();
+                } else {
+                    // 通常時: 画像があれば拡大、なければ再撮影モード
+                    if (target.tagName.toLowerCase() === 'img') {
+                        openMagnifyModal(target.src);
+                    } else {
+                        showChoice(side, true);
+                    }
+                }
+            });
         });
     };
 
