@@ -307,11 +307,28 @@ function autoResizeTextarea(element) {
 }
 
 // --- 名刺アップロードフロー ---
+// ボタン状態更新関数を追加
+function updateBizcardButtonState() {
+    if (!DOMElements.bizcardCameraButton) return;
+    const hasImages = state.answers.bizcardImages && 
+                      (state.answers.bizcardImages.front || state.answers.bizcardImages.back);
+    const textSpan = DOMElements.bizcardCameraButton.querySelector('span:nth-child(2)');
+    if (textSpan) {
+        textSpan.textContent = hasImages ? '再撮影' : '名刺を撮影';
+    }
+}
+
 let bizcardImages = { front: null, back: null };
 
 function startBizcardUploadFlow() {
     let localImages = { front: null, back: null };
     let currentSide = null; // New variable to track current side
+    let isEditingSide = false; // 特定の面だけを再撮影しているかのフラグ
+    
+    // 既存画像があればローカルにコピー
+    if (state.answers.bizcardImages && (state.answers.bizcardImages.front || state.answers.bizcardImages.back)) {
+        localImages = { ...state.answers.bizcardImages };
+    }
     
     // Create a single hidden file input element and reuse it
     const hiddenFileInput = document.createElement('input');
@@ -338,15 +355,34 @@ function startBizcardUploadFlow() {
         reader.readAsDataURL(file);
     };
 
-    const triggerFileInput = (useCamera, side) => {
-        currentSide = side; // Set currentSide before triggering click
-        hiddenFileInput.capture = useCamera ? 'environment' : ''; // Set capture attribute
-        hiddenFileInput.click(); // Trigger click on the reused input
+    const triggerFileInput = (useCamera, side, isEdit = false) => {
+        currentSide = side; 
+        isEditingSide = isEdit;
+        hiddenFileInput.capture = useCamera ? 'environment' : ''; 
+        hiddenFileInput.click(); 
     };
 
-    const showChoice = () => {
+    const showChoice = (side = 'front', isEdit = false) => {
+        const titleText = isEdit ? '再撮影' : '名刺をアップロード';
+        const descriptionText = isEdit ? '再撮影する画像のアップロード方法を選択してください。' : '名刺画像のアップロード方法を選択してください。';
+        
+        let stepIndicatorHTML = '';
+        if (!isEdit) {
+            stepIndicatorHTML = `
+                <!-- ステップインジケーター -->
+                <div class="flex items-center justify-center mb-4">
+                    <span class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center">1</span>
+                    <span class="flex-auto border-t-2 border-gray-200 mx-2"></span>
+                    <span class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center">2</span>
+                    <span class="flex-auto border-t-2 border-gray-200 mx-2"></span>
+                    <span class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center">3</span>
+                </div>
+            `;
+        }
+
         const body = `
-            <p class="text-center text-sm text-gray-600 mb-6">名刺画像のアップロード方法を選択してください。</p>
+            ${stepIndicatorHTML}
+            <p class="text-center text-sm text-gray-600 mb-6">${descriptionText}</p>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <!-- ストレージから選択カード -->
                 <div id="upload-storage" class="p-6 border rounded-lg text-center cursor-pointer hover:bg-gray-50 hover:border-primary transition-all">
@@ -362,13 +398,39 @@ function startBizcardUploadFlow() {
                 </div>
             </div>
         `;
-        showModal(DOMElements.bizcardUploadModal, '名刺をアップロード (1/4)', body, { cancelText: '閉じる' });
+        showModal(DOMElements.bizcardUploadModal, titleText, body, { 
+            cancelText: isEdit ? '戻る' : '閉じる',
+            onCancel: isEdit ? showBizcardEditModal : undefined
+        });
 
-        document.getElementById('upload-storage').addEventListener('click', () => triggerFileInput(false, 'front'));
-        document.getElementById('upload-camera').addEventListener('click', () => triggerFileInput(true, 'front'));
+        document.getElementById('upload-storage').addEventListener('click', () => triggerFileInput(false, side, isEdit));
+        document.getElementById('upload-camera').addEventListener('click', () => triggerFileInput(true, side, isEdit));
     };
 
     const showFrontPreview = () => {
+        if (isEditingSide) {
+            const body = `
+                <p class="text-center text-sm text-gray-600 mb-4">表面のプレビュー</p>
+                <div class="bg-gray-100 p-4 rounded-lg">
+                    <img src="${localImages.front}" alt="名刺 表面" class="max-w-full mx-auto rounded-md shadow-md">
+                </div>
+            `;
+            showModal(DOMElements.bizcardUploadModal, '内容の確認', body, {
+                saveText: '決定',
+                cancelText: '撮り直す',
+                onSave: () => {
+                    if (!state.answers.bizcardImages) state.answers.bizcardImages = {};
+                    state.answers.bizcardImages.front = localImages.front;
+                    state.hasUnsavedChanges = true;
+                    showToast('表面画像を更新しました。');
+                    showBizcardEditModal();
+                    updateBizcardButtonState();
+                },
+                onCancel: () => showChoice('front', true)
+            });
+            return;
+        }
+
         const body = `
             <!-- ステップインジケーター -->
             <div class="flex items-center justify-center mb-4">
@@ -388,7 +450,7 @@ function startBizcardUploadFlow() {
             saveText: '裏面を追加する',
             cancelText: '撮り直す',
             onSave: () => showBackChoice(),
-            onCancel: showChoice
+            onCancel: () => showChoice('front')
         });
 
         // フッターのボタンレイアウトを調整
@@ -405,7 +467,7 @@ function startBizcardUploadFlow() {
             const retakeButton = document.createElement('button');
             retakeButton.className = 'px-4 py-2 text-sm font-medium rounded-md hover:bg-surface-container-high';
             retakeButton.textContent = '撮り直す';
-            retakeButton.onclick = showChoice;
+            retakeButton.onclick = () => showChoice('front');
             footer.appendChild(retakeButton);
 
             // 4. 右側のボタン用コンテナを作成
@@ -452,20 +514,67 @@ function startBizcardUploadFlow() {
                 </div>
             </div>
         `;
-                showModal(DOMElements.bizcardUploadModal, '裏面の追加', body, { cancelText: '戻る', onCancel: showFrontPreview });
+        showModal(DOMElements.bizcardUploadModal, '裏面の追加', body, { cancelText: '戻る', onCancel: showFrontPreview });
         
-                const uploadStorageBack = document.getElementById('upload-storage-back');
-                const uploadCameraBack = document.getElementById('upload-camera-back');
+        // フッターのボタンレイアウトを調整し、スキップボタンを追加
+        const footer = DOMElements.bizcardUploadModal.querySelector('.rounded-b-lg');
+        if (footer) {
+            // 現在の戻るボタン（左側）と新しいスキップボタン（右側）を配置するためにレイアウト変更
+            footer.classList.remove('justify-end');
+            footer.classList.add('justify-between', 'w-full', 'items-center');
+
+            footer.innerHTML = ''; 
+
+            const backButton = document.createElement('button');
+            backButton.className = 'px-4 py-2 text-sm font-medium rounded-md hover:bg-surface-container-high';
+            backButton.textContent = '戻る';
+            backButton.onclick = showFrontPreview;
+            footer.appendChild(backButton);
+
+            const skipButtonContainer = document.createElement('div');
+            const skipButton = document.createElement('button');
+            skipButton.className = 'text-sm font-medium text-primary hover:underline px-4 py-2';
+            skipButton.textContent = '裏面をスキップして確認へ';
+            skipButton.onclick = showFinalConfirmation;
+            skipButtonContainer.appendChild(skipButton);
+            footer.appendChild(skipButtonContainer);
+        }
         
-                if (uploadStorageBack) {
-                    uploadStorageBack.addEventListener('click', () => triggerFileInput(false, 'back'));
-                }
-                if (uploadCameraBack) {
-                    uploadCameraBack.addEventListener('click', () => triggerFileInput(true, 'back'));
-                }
+        const uploadStorageBack = document.getElementById('upload-storage-back');
+        const uploadCameraBack = document.getElementById('upload-camera-back');
+        
+        if (uploadStorageBack) {
+            uploadStorageBack.addEventListener('click', () => triggerFileInput(false, 'back'));
+        }
+        if (uploadCameraBack) {
+            uploadCameraBack.addEventListener('click', () => triggerFileInput(true, 'back'));
+        }
     };
 
     const showBackPreview = () => {
+        if (isEditingSide) {
+            const body = `
+                <p class="text-center text-sm text-gray-600 mb-4">裏面のプレビュー</p>
+                <div class="bg-gray-100 p-4 rounded-lg">
+                    <img src="${localImages.back}" alt="名刺 裏面" class="max-w-full mx-auto rounded-md shadow-md">
+                </div>
+            `;
+            showModal(DOMElements.bizcardUploadModal, '内容の確認', body, {
+                saveText: '決定',
+                cancelText: '撮り直す',
+                onSave: () => {
+                    if (!state.answers.bizcardImages) state.answers.bizcardImages = {};
+                    state.answers.bizcardImages.back = localImages.back;
+                    state.hasUnsavedChanges = true;
+                    showToast('裏面画像を更新しました。');
+                    showBizcardEditModal();
+                    updateBizcardButtonState();
+                },
+                onCancel: () => showChoice('back', true)
+            });
+            return;
+        }
+
         const body = `
             <div class="flex items-center justify-center mb-4">
                 <span class="w-8 h-8 rounded-full border-2 border-primary flex items-center justify-center"><span class="material-icons text-primary">check</span></span>
@@ -489,7 +598,7 @@ function startBizcardUploadFlow() {
 
     const showFinalConfirmation = () => {
         const frontImageHTML = `<img src="${localImages.front}" alt="名刺 表面" class="w-full rounded-md shadow-sm cursor-pointer bizcard-confirm-image">`;
-        const backImageHTML = localImages.back ? `<img src="${localImages.back}" alt="名刺 裏面" class="w-full rounded-md shadow-sm cursor-pointer bizcard-confirm-image">` : '<div class="h-full flex items-center justify-center bg-gray-100 rounded-md"><p class="text-sm text-gray-500">裏面なし</p></div>';
+        const backImageHTML = localImages.back ? `<img src="${localImages.back}" alt="名刺 裏面" class="w-full rounded-md shadow-sm cursor-pointer bizcard-confirm-image">` : '<div class="h-full flex items-center justify-center bg-gray-100 rounded-md border border-dashed border-gray-300"><p class="text-sm text-gray-500">裏面なし</p></div>';
         const body = `
             <div class="flex items-center justify-center mb-4">
                 <span class="w-8 h-8 rounded-full border-2 border-primary flex items-center justify-center"><span class="material-icons text-primary">check</span></span>
@@ -518,6 +627,7 @@ function startBizcardUploadFlow() {
                 state.hasUnsavedChanges = true;
                 showToast('名刺画像を保存しました。');
                 DOMElements.bizcardUploadModal.style.display = 'none';
+                updateBizcardButtonState();
             },
             onCancel: () => localImages.back ? showBackPreview() : showFrontPreview()
         });
@@ -530,7 +640,95 @@ function startBizcardUploadFlow() {
         });
     };
 
-    showChoice();
+    const showBizcardEditModal = () => {
+        // 現在の画像を state から取得
+        localImages = { ...(state.answers.bizcardImages || { front: null, back: null }) };
+
+        const createSideHTML = (side, title) => {
+            const hasImage = !!localImages[side];
+            const imageHTML = hasImage 
+                ? `<img src="${localImages[side]}" alt="名刺 ${title}" class="w-full rounded-md shadow-sm cursor-pointer bizcard-confirm-image mb-2">`
+                : `<div class="w-full h-32 flex items-center justify-center bg-gray-100 border border-dashed border-gray-300 rounded-md mb-2"><p class="text-sm text-gray-500">画像なし</p></div>`;
+            
+            const buttonsHTML = hasImage
+                ? `
+                    <button type="button" class="btn-retake px-4 py-2 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 font-medium whitespace-nowrap" data-side="${side}">再撮影</button>
+                    <button type="button" class="btn-delete px-4 py-2 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200 ml-2 font-medium whitespace-nowrap" data-side="${side}">削除</button>
+                  `
+                : `<button type="button" class="btn-retake px-4 py-2 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 font-medium whitespace-nowrap" data-side="${side}">撮影</button>`;
+
+            return `
+                <div class="flex flex-col items-center justify-between h-full">
+                    <p class="font-bold text-center mb-2 text-gray-700">${title}</p>
+                    <div class="flex-grow w-full flex items-center justify-center">
+                        ${imageHTML}
+                    </div>
+                    <div class="mt-2 flex justify-center w-full">
+                        ${buttonsHTML}
+                    </div>
+                </div>
+            `;
+        };
+
+        const body = `
+            <p class="text-center text-sm text-gray-600 mb-4">アップロード済みの名刺画像です。個別に再撮影や削除が可能です。</p>
+            <div class="grid grid-cols-2 gap-4">
+                ${createSideHTML('front', '表面')}
+                ${createSideHTML('back', '裏面')}
+            </div>
+        `;
+
+        showModal(DOMElements.bizcardUploadModal, '名刺画像の確認・編集', body, {
+            cancelText: '閉じる',
+            saveText: '保存',
+            onSave: () => {
+                showToast('保存しました。');
+                DOMElements.bizcardUploadModal.style.display = 'none';
+            }
+        });
+
+        // Event Listeners for Edit Modal
+        DOMElements.bizcardUploadModal.querySelectorAll('.btn-retake').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const side = e.target.dataset.side;
+                showChoice(side, true); // true = isEdit
+            });
+        });
+
+        DOMElements.bizcardUploadModal.querySelectorAll('.btn-delete').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const side = e.target.dataset.side;
+                localImages[side] = null;
+                state.answers.bizcardImages[side] = null;
+                state.hasUnsavedChanges = true;
+                
+                // 両方削除されたら
+                if (!state.answers.bizcardImages.front && !state.answers.bizcardImages.back) {
+                    state.answers.bizcardImages = null; // 完全にクリア
+                    showToast('名刺画像をすべて削除しました。');
+                    DOMElements.bizcardUploadModal.style.display = 'none';
+                    updateBizcardButtonState();
+                    return;
+                }
+                
+                showToast(`${side === 'front' ? '表面' : '裏面'}の画像を削除しました。`);
+                showBizcardEditModal(); // 再描画
+                updateBizcardButtonState();
+            });
+        });
+
+        // 拡大表示
+        DOMElements.bizcardUploadModal.querySelectorAll('.bizcard-confirm-image').forEach(img => {
+            img.addEventListener('click', (e) => openMagnifyModal(e.target.src));
+        });
+    };
+
+    // 既存画像がある場合は編集モーダル、なければ初回アップロードフローを開始
+    if (state.answers.bizcardImages && (state.answers.bizcardImages.front || state.answers.bizcardImages.back)) {
+        showBizcardEditModal();
+    } else {
+        showChoice();
+    }
 }
 
 // ... (他の関数の間)
@@ -633,6 +831,7 @@ async function checkForDraft() {
                     state.answers = JSON.parse(draftData);
                     state.draftToRestore = true;
                     showToast('下書きを復元しました。');
+                    updateBizcardButtonState();
                 } catch (e) {
                     console.error('ドラフトの解析に失敗しました:', e);
                     localStorage.removeItem(draftKey);
