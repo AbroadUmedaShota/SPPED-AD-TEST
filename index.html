@@ -954,20 +954,22 @@
           <input type="password" id="password" name="password" class="form-group__input" required aria-required="true" autocomplete="current-password" aria-describedby="password-error">
           <div id="password-error" class="form-group__error-message" role="alert"></div>
         </div>
-        <div class="form-group">
-          <label class="form-options__checkbox-label" style="justify-content: flex-start; margin-bottom: 0;">
-            <input type="checkbox" id="login-terms-agree" name="login-terms-agree" class="form-options__checkbox-input" required aria-required="true">
-            <span style="font-weight: normal; font-size: 0.9rem;">
+        <!-- 利用規約同意チェックボックス -->
+        <div style="margin-bottom: 12px;">
+          <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer; font-size: 0.85rem; color: #333; line-height: 1.5;">
+            <input type="checkbox" id="login-terms-agree" name="login-terms-agree" class="form-options__checkbox-input" required aria-required="true" style="margin-top: 3px; flex-shrink: 0;">
+            <span>
               <a href="http://127.0.0.1:5500/02_dashboard/terms-of-service.html" target="_blank" rel="noopener noreferrer" class="form-options__link">利用規約</a>と<a href="https://www.abroad-o.com/rule.html" target="_blank" rel="noopener noreferrer" class="form-options__link">プライバシーポリシー</a>および<a href="02_dashboard/personal-data-protection-policy.html" target="_blank" rel="noopener noreferrer" class="form-options__link">個人情報保護方針</a>に同意する
             </span>
           </label>
           <div id="login-terms-agree-error" class="form-group__error-message" role="alert"></div>
         </div>
-        <div class="form-options">
-          <label class="form-options__checkbox-label">
+        <!-- ログイン状態保持 ＆ パスワードを忘れた方（横並び） -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.85rem; color: #333;">
             <input type="checkbox" name="remember" class="form-options__checkbox-input" aria-label="ログイン状態を保持する"> ログイン状態を保持する
           </label>
-          <a href="02_dashboard/forgot-password.html" class="form-options__link">パスワードを忘れた方</a>
+          <a href="02_dashboard/forgot-password.html" class="form-options__link" style="font-size: 0.85rem; white-space: nowrap;">パスワードを忘れた方</a>
         </div>
         <div class="scenario-accounts">
           <p class="scenario-accounts__title">シナリオテスト用アカウント（クリックで自動入力）</p>
