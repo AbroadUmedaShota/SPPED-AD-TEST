@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta charset="utf-8">
+<meta name="viewport" content="width=1200, initial-scale=1, maximum-scale=2, user-scalable=1">
+<title>SPEED-AD</title>
+<meta name="title" content="SPEED-AD">
+<meta name="keywords" content="SPEED-AD" >
+<meta name="description" content="SPEED-AD">
+<!--OGP-->
+<meta property="og:title" content="SPEED-AD">
+<meta property="og:type" content="website">
+<meta property="og:description" content="SPEED-AD">
+<meta property="og:url" content=" ">
+<meta property="og:site_name" content="SPEED-AD">
+<meta property="og:image" content="/img/ogp.jpg">
+<meta content="summary" name="twitter:card">
+<meta content="@twitter_acount" name="twitter:site">
+<link rel="icon" href="/img/favicon.ico">
+<link rel="apple-touch-icon-precomposed" href="/img/icon.png">
+<link rel="stylesheet" href="/css/page.css?20260313-0738">
+<script src="/js/jquery.js"></script>
+<script src="/js/plugin.js?20260313-0738"></script> 
+<script src="/js/jquery.inview.min.js"></script> 
+<script src='https://www.google.com/recaptcha/api.js'></script>
+<style>
+  .g-recaptcha div{
+    margin: 0 auto;
+  }
+</style>
+<script>
+	$(function () {
+  $('.box').on('inview', function (event, isInView, visiblePartX, visiblePartY) {
+    if (isInView) {
+      $(this).addClass('slideUp');
+    }
+  });
+		  $('.box .pic').on('inview', function (event, isInView, visiblePartX, visiblePartY) {
+    if (isInView) {
+      $(this).addClass('slide');
+    }
+  });
+});
+	</script>
+<link rel="stylesheet" href="/css/jquery.fullpage.min.css">
+<script>
+    $(function(){
+      $('#form').submit(function(){
+             var error = false;
+            $("#error-message").css("display","none");
+            $.ajax({
+                    url:'login',
+                    type:'POST',
+                    async: false,
+                    headers: {
+		                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+		            },
+                    data:{
+                        'userid': $('#login_id').val(),
+                        'password': $('#login_passwd').val(),
+                    }
+                })
+                .done(function(data){
+                  console.log(data)
+                    data=data.split(",")
+                    if(data[0].indexOf('true2') != -1){
+                      location.href="group_join?mail_token="+data[1]
+                    }else if(data[0].indexOf('true3') != -1){
+                      location.href="billing_get?id="+data[1]
+                    }else if(data[0].indexOf('true') != -1){
+                        //問題なかったので会員ページへ遷移
+                        $(".error-message").css("display","none");
+                         $(".error-message").text("");
+                            location.href="{{ route('survey.index') }}"
+                        //alert("OK");
+                        //top.html
+                        
+                    }else if(data[0].indexOf('false2') != -1){
+                        //IDかパスどちらか間違っていたのでエラー文を表示
+                        $(".error-message").css("display","");
+                        error = true;
+                        return false;
+                    }else if(data[0].indexOf('false') != -1){
+                        //IDかパスどちらか空白なのでエラー分を表示
+                        $(".error-message").css("display","");
+                        error = true;
+                        return false;
+                    }
+
+                })
+                .fail(function(data){
+                    
+                    console.log(data)
+                    location.reload();
+                    //alert(data);
+                    return false;
+                })
+             //if(error==true){
+                    error=false;
+                    return false;
+
+           // }
+            
+        });
+    });
+</script>
+</head>
+<body id="before-login">
+<script>
+	$(function () {
+  $(".register-btn").click(function () {
+    if($("#check").prop('checked')){
+
+      }else{
+        alert("利用規約とプライバシーポリシに同意されていません。")
+        return false;
+      }
+    if($('#new_login_id').val() && $('#new_login_id').val().match(/^([a-zA-Z0-9])+([a-zA-Z0-9*+\._-])*@([a-zA-Z0-9_-])+([a-zA-Z0-9\._-]+)+$/)){
+    $.ajax({
+                    url:'/php/mail.php',
+                    type:'POST',
+                    async: false,
+                    headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                    data:{
+                        'login_id': $('#new_login_id').val(),
+                        'g-recaptcha-response':$("#g-recaptcha-response").val(),
+                        'case_flag':1
+                    }
+                })
+                .done(function(data){
+                    console.log(data)
+                    if(data==99){
+                        alert("認証に失敗しました")
+                    //    location.href="https://speed-ad.com/"
+                    }else{
+                        $(".address-wrap").hide();
+                        $(".send-finish").show();
+                    }
+                    
+
+                })
+                .fail(function(data){
+                    
+                   
+                    return false;
+                })
+    
+		}else{
+        alert("メールアドレスが正しくありません。")
+        }
+  });
+});
+	</script>
+<header id="before">
+  <h1><img src="/img/logo.svg" alt="SPEED-AD"></h1>
+  <nav>
+      <ul>
+        <li class="login"><a href="#top">ログイン</a> 　</li>
+							<li class="register"><a data-target="register" class="modal-open"><span>無料ではじめる</span></a></li>
+      </ul>
+  </nav>
+</header>
+<main>
+  <div id="fullpage">
+    <div class="section " id="section0">
+      <div id="all">
+        <div id="text-box">
+          <ul>
+            <li> WEBアンケート作成</li>
+            <li>名刺のデータ化</li>
+            <li>御礼メールの送信</li>
+          </ul>
+          <h1><img src="img/logo.svg" alt="SPEED-AD"><span>～スピード アド～</span></h1>
+          <p>SPEED ADは、展示会やセミナーなどのイベント向けソリューションです。<br>
+            無料のWEBアンケート作成、名刺のデータ化、御礼メールの送信を一気通貫で提供し、獲得したリードの有効活用をワンストップで実現します</p>
+        </div>
+        <div id="input-box">
+          <form id="form" action="" method="post">
+            <input type="text" name="login_id" id="login_id" class="username" placeholder="メールアドレス" value="">
+            <!--
+<p class="error-message">エラー内容が出ます</p>
+-->
+            <input type="password" name="login_passwd" id="login_passwd" class="password" placeholder="パスワード" value="">
+            
+<p class="error-message" style="display: none;color: red;">ログイン情報が正しくありません。</p>
+
+            
+            <input type="submit"  value="ログイン" class="login" id="submit_login">
+            <!-- <p class="forgetpassword">パスワードを忘れた方は<a href="forgetpassword.php">こちら</a></p> -->
+            <p class="forgetpassword">パスワードを忘れた方は<a data-target="forgetpassword" class="modal-open"><span>こちら</span></a></a></p>
+            <p class="register"><a data-target="register" class="modal-open"><span>無料ではじめる</span></a></p>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="section" id="section1">
+      <article>
+        <div class="flex row">
+          <div class="pic"><img src="img/pic1.jpg" alt=""></div>
+          <section>
+            <h2 class="title1">WEBアンケートの作成</h2>
+            <p>直感的な操作で、誰でも簡単にWEBアンケートを無料で作成できます。<br>
+              作成したアンケートは、イベント来場者のスマホやタブレットでQRコードから読み込んで回答できます。<br>
+              アンケートの回答はイベント後すぐにCSVでダウンロードしてビジネスに活かせます。 </p>
+          </section>
+        </div>
+      </article>
+    </div>
+    <div class="section" id="section2">
+      <article>
+        <div class="flex">
+          <div class="pic"><img src="img/pic2.jpg" alt=""></div>
+          <section>
+            <h2 class="title2">名刺情報のデータ化</h2>
+            <p>WEBアンケートの回答と同時に、来場者の名刺を撮影＆添付できます。<br>
+              御礼メールに必須のメールアドレスと氏名は無料でデータ化できます。<br>
+              項目プランやスピードプランを組み合わせれば、自社のビジネススタイルに最も適した運用が可能です。 </p>
+          </section>
+        </div>
+      </article>
+    </div>
+    <div class="section" id="section3">
+      <article>
+        <div class="flex row">
+          <div class="pic"><img src="img/pic3.jpg" alt=""></div>
+          <section>
+            <h2 class="title3">御礼メールの送信（Coming Soon）</h2>
+            <p>イベント来場者に御礼メールを送る事ができます。<br>
+              メール文章は複数パターン用意でき、アンケートの回答に合わせて送信内容を変える事ができます。 </p>
+          </section>
+        </div>
+      </article>
+    </div>
+    <div class="section circle" id="section4">
+      <article>
+        <div class="no-flex">
+          <h2>様々なビジネススキームに、ベストフィット</h2>
+          <ul class="list">
+            <li>
+              <h3><span><em>STEP 01</em> - 出展企業様</span></h3>
+              <div class="text">
+                <p>パソコンで<br>
+                  WEBアンケート<br>
+                  作成</p>
+              </div>
+            </li>
+            <li>
+              <h3><span><em>STEP 02</em> - 出展企業様</span></h3>
+              <div class="text short">
+                <ul>
+                  <li>
+                    <h4>case01</h4>
+                    <p>展示会場のデスクプレートやパンフレットでQRコードを表示</p>
+                  </li>
+                  <li>
+                    <h4>case02</h4>
+                    <p>DMにアンケート回答用のURLを貼り付けて送信</p>
+                  </li>
+                  <li>
+                    <h4>case03</h4>
+                    <p>セミナー資料の末尾にQRコードを印刷</p>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            <li>
+              <h3><span><em>STEP 03</em> - 来場者</span></h3>
+              <div class="text">
+                <p>QRコードから<br>
+                  アンケートを回答、<br>
+                  同時に名刺撮影</p>
+              </div>
+            </li>
+            <li>
+              <h3><span><em>STEP 04</em> - 自動化</span></h3>
+              <div class="text">
+                <p>自動で名刺データ化、<br>
+                  そのまま御礼メール<br>
+                  送信</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </article>
+    </div>
+    <div class="section circle2" id="section5">
+      <article>
+        <div class="no-flex white">
+          <h2>あなたのビジネスを加速する充実な機能</h2>
+          <ul class="list2">
+            <li> <img src="img/icon1.png" alt="イメージ：豊富な設問タイプを設定可能">
+              <h3>豊富な設問タイプを設定可能</h3>
+              <p>WEBアンケートでは単回答/複数回答/自由回答形式の設問に加えて、年月/時間の回答やマトリックス状の設問など多様なフォームを作れます。</p>
+            </li>
+            <li> <img src="img/icon2.png" alt="イメージ：無料プランでメール送信まで可能">
+              <h3>無料プランでメール送信まで可能</h3>
+              <p>WEBアンケート作成、メールアドレスと氏名の名刺データ化、御礼メール（Coming Soon）は100件まで全て無料です。</p>
+            </li>
+            <li> <img src="img/icon3.png" alt="イメージ：高品質でスピーディーな名刺データ化">
+              <h3>高品質でスピーディーな名刺データ化</h3>
+              <p>オペレーターによる手入力と独自AIプログラムの併用で、高い入力精度でスピーディーなデータ化が可能です。</p>
+            </li>
+            <li> <img src="img/icon4.png" alt="イメージ：QRコード表示で非接触">
+              <h3>QRコード表示で非接触</h3>
+              <p>イベント来場者のスマホやタブレットから回答して貰う為、様々な展示会のスタイルに対応できます。</p>
+            </li>
+            <li> <img src="img/icon5.png" alt="イメージ：高セキュリティ環境">
+              <h3>高セキュリティ環境</h3>
+              <p>ISMS（ISO27001）、及びプライバシーマークを取得し、高いセキュリティ環境でサービス提供しています。</p>
+            </li>
+            <li> <img src="img/icon6.png" alt="イメージ：御礼メールを最短当日配信">
+              <h3>御礼メールを最短当日配信</h3>
+              <p>Coming Soon</p>
+            </li>
+          </ul>
+        </div>
+      </article>
+    </div>
+    <div class="section" id="section6">
+      <article class="tate">
+        <div class="no-flex white">
+          <h2>当社で提供するその他のサービス</h2>
+          <ul class="list3">
+            <li class="service1"> <a href="https://www.abroad-o.com/input.html" target="_blank">データ入力<br>
+              サービス<span class="arrow-round"></span></a> </li>
+            <li class="service2"><a href="https://www.abroad-o.com/aggregate.html" target="_blank">データ集計・<br>
+              解析サービス<span class="arrow-round"></span></a> </li>
+            <li class="service3"> <a href="https://www.abroad-o.com/scan.html" target="_blank">スキャニング<br>
+              サービス<span class="arrow-round"></span></a> </li>
+            <li class="service4"><a href="https://www.abroad-o.com/largeformat.html" target="_blank">大判の電子化<span class="arrow-round"></span></a> </li>
+            <li class="service5"><a href="https://www.abroad-o.com/film.html" target="_blank">フィルムの電子化<span class="arrow-round"></span></a> </li>
+            <li class="service6"><a href="https://www.abroad-o.com/edit.html" target="_blank">画像編集・<br>
+              加工サービス<span class="arrow-round"></span></a> </li>
+          </ul>
+        </div>
+							<footer id="before-footer">
+							<h2><img src="img/logo2.svg" alt="SPEED AD"></h2>
+								<ul style="padding-right: 30px;">
+								<li>
+									<h3>SPEED-ADについて</h3>
+									<p><a data-target="register" class="modal-open">無料ではじめる</a></p>
+                  <p><a href="#top">ログイン</a></p>
+                  <p><a data-target="contact" class="modal-open">お問い合わせ</a></p>
+                  <p><a href="/help">ヘルプ</a></p>
+      <!-- <li><a href="/help">ヘルプ</a></li> -->
+									</li>
+											<li style="white-space: nowrap;">
+									<h3>運営会社について</h3>
+									<p><a href="https://www.abroad-o.com/service.html" target="_blank">当社サービス</a></p>
+<p><a href="https://www.abroad-o.com/about.html" target="_blank">会社情報</a></p>
+<p><a href="https://speed-ad.com/tokushou" target="_blank">特定商取引法に基づく表記</a></p>
+<p><a href="https://speed-ad.com/kiyaku/" target="_blank">利用規約</a></p>
+<p><a href="https://www.abroad-o.com/rule.html" target="_blank">プライバシーポリシー</a></p>
+<!-- <p><a href="/help">ヘルプ</a></p> -->
+									</li>
+								</ul>
+							</footer>
+      </article>
+
+    </div>
+  </div>
+
+</main>
+<div id="contact" class="modal-content">
+        <div class="textarea short"> <p>SPEED AD事務局</p><p>運営会社：アブロードアウトソーシング株式会社</p><p>customer@speed-ad.com</p><a class="modal-close" href="javascript:void(0);">閉じる</a></p>
+        </div>
+      </div>
+<!--MODAL -->
+<div id="register" class="modal-content">
+  <div class="textarea short">
+    <form id="form" action="/requesturl" method="post">
+      <div id="title2">
+        <h2>新規アカウント作成</h2>
+        <div class="address-wrap">
+          <input type="text" name="login_id" id="new_login_id" class="mail-address" placeholder="メールアドレス" value="">
+          <input type="checkbox" name="check" id="check">
+          <label for="check"><a href="/kiyaku/" target="_blank">利用規約</a>と<a href="https://www.abroad-o.com/rule.html" target="_blank">プライバシーポリシー</a>に同意</label>
+          <div class="g-recaptcha" data-sitekey="6LfFpm8oAAAAAJl5CD-7PjSwPVIsr_Ym9277X6RX"></div>
+          <!--
+<p class="error-message">エラー内容が出ます</p>
+-->
+          <button type="button" onclick="mySubmit();" class="register-btn">登録</button>
+          <p class="edit"><a class="modal-close">閉じる</a></p>
+          <script>
+		const formSubmit = formId =>{
+    const form = document.getElementById(formId);
+    const arg = [form.action];
+    if( form.method === undefined || form.method.toUpperCase() === "POST")
+        arg.push({method:"POST",body:new FormData(form)} );
+
+    return fetch( ...arg ).then( response => 
+        response.status === 200 ? response.json() : Promise.reject(response.status)
+      );
+};
+												</script> 
+        </div>
+        <div class="send-finish">
+          <video playsinline muted loop autoplay>
+            <source src="img/mail.mp4" type="video/mp4">
+          </video>
+          <p>入力頂いたメールアドレスに<br>
+            認証用のメールを送信しました。<br>
+            受信トレイをご確認下さい。 </p>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="forgetpassword" class="modal-content">
+<script>
+  $(function () {
+  $(".register-btn2").click(function () {
+    
+    if($('#login_id_reset').val() && $('#login_id_reset').val().match(/^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([a-zA-Z0-9\._-]+)+$/)){
+      $(".password-wrap").hide();
+      $(".password-finish").show();
+      $.ajax({
+                      url:'php/mail.php',
+                      type:'POST',
+                      async: false,
+                      data:{
+                          'login_id': $('#login_id_reset').val(),
+                          'case_flag':2
+                      }
+                  })
+                  .done(function(data){
+                      alert("パスワード再発行メールを送信致しました。")
+                     
+                  })
+                  .fail(function(data){
+                      
+                     
+                      return false;
+                  })
+        
+      }else{
+        alert("入力内容が正しくありません。")
+      }
+    });
+    });
+//  });
+  </script>
+<div class="textarea short">
+
+  <h2>パスワード再設定</h2>
+  <div class="password-wrap">
+    <form id="form" action="/requesturl" method="post">
+
+      <input type="text" name="login_id" id="login_id_reset" class="username" placeholder="メールアドレス" value="">
+    <!--
+<p class="error-message">エラー内容が出ます</p>
+-->
+    
+  <button type="button" onclick="" class="register-btn2">送信</button>
+            
+  </form>
+<p class="edit"><a class="modal-close">閉じる</a></p>
+  </div>
+  <div class="password-finish">
+  <p>入力頂いたメールアドレスに<br>
+パスワード再設定用のメールを送信しました。<br>
+受信トレイをご確認下さい。
+</p>
+  </div>
+</div>
+    </div><script src="/js/jquery.fullpage.min.js"></script> 
+<script type="text/javascript">
+	$(document).ready(function() {
+
+ $('#fullpage').fullpage({
+        anchors: ['top', 'contents1', 'contents2','contents3','contents4','contents5','contents6'],
+        sectionsColor: ['#FFF', '#FFF', '#FFF', '#FFF', '#FFF','#FFF'],
+        navigation: true,
+        navigationPosition: 'right',
+        navigationTooltips: [],
+        responsiveWidth: 1200,
+//        afterResponsive: function(isResponsive){
+//     }
+ onLeave: function(index, nextIndex, direction){
+            if(index == 1 && direction =='down'){
+            //セクション１を下にスクロールしたとき実行されます
+                $('nav ul li.login').fadeIn();
+            }
+            else if(index == 2 && direction =='up')
+            //セクション２を上にスクロールしたときに実行されます
+  $('nav ul li.login').fadeOut();
+        }
+   });
+    });
+</script>
+</body>
+</html>
+

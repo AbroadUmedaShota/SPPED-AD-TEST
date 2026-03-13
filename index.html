@@ -6,6 +6,8 @@
   <meta name="description" content="SPEED AD - イベント運営と広告展開を支援するWEBソリューション向けログイン/サインアップページ">
   <meta name="keywords" content="ログイン, サインアップ, SPEED AD, イベント, 広告, セミナー">
   <title>SPEED-AD - ログイン</title>
+  <link rel="stylesheet" href="css/page.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/2.9.7/jquery.fullpage.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -71,29 +73,11 @@
       box-sizing: border-box;
     }
     body {
-      font-family: "Noto Sans JP", "Inter", sans-serif; /* Inter と Noto Sans JP を優先 */
-      background: url('https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=1950&q=80') center/cover no-repeat;
-      margin: var(--spacing-0);
-      padding: var(--spacing-0);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh; /* 画面全体をカバー */
-      color: var(--color-on-surface);
-      position: relative;
-      z-index: 0;
+      font-family: "Noto Sans JP", "Inter", sans-serif;
+      margin: 0;
+      padding: 0;
     }
-    body::before {
-      content: '';
-      position: absolute;
-      top: var(--spacing-0);
-      left: var(--spacing-0);
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.4); /* 暗いオーバーレイ */
-      backdrop-filter: brightness(0.6) blur(3px); /* 少しぼかしと暗さ */
-      z-index: -1;
-    }
+    
     /* モーダル表示中のbodyスタイル */
     body.is-modal-open {
       overflow: hidden; /* 背景のスクロールをロック */
@@ -102,7 +86,99 @@
       -- Layout Classes (BEM) --
       ページ全体のレイアウト構造
     */
-    .page-wrapper {
+    
+    /* Legacy Layout Styles */
+    #all {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        min-height: 100vh;
+        background: url("img/top-kv.jpg") no-repeat center;
+        background-size: cover;
+        padding: 0 10%;
+        box-sizing: border-box;
+        position: relative;
+    }
+    #all:before {
+        content: "";
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(180deg, rgba(100, 100, 100, 0.85), rgba(0, 17, 46, 0.85));
+        z-index: 1;
+    }
+    #text-box {
+        width: 50%;
+        position: relative;
+        z-index: 2;
+    }
+    #text-box ul {
+        display: flex;
+        width: 95%;
+        margin: 0 0 5vh 0;
+        padding: 0;
+        list-style: none;
+    }
+    #text-box ul li {
+        padding: 5px 20px;
+        text-align: center;
+        background: #fff;
+        font-weight: 500;
+        font-size: 1rem;
+    }
+    #text-box ul li:nth-child(1) { border: 1px solid #004ad0; color: #004ad0; margin-right: 10px; }
+    #text-box ul li:nth-child(2) { border: 1px solid #3200a2; color: #3200a2; margin-right: 10px; }
+    #text-box ul li:nth-child(3) { border: 1px solid #a50076; color: #a50076; }
+    #text-box h1 {
+        margin: 0 0 5vh 0;
+        display: flex;
+        align-items: center;
+    }
+    #text-box h1 img {
+        width: 50%;
+        margin: 0;
+    }
+    #text-box h1 span {
+        color: #fff;
+        margin-left: 30px;
+        display: inline-block;
+        font-weight: bold;
+        font-size: 1.5rem;
+    }
+    #text-box p {
+        text-align: left;
+        color: #fff;
+        font-weight: bold;
+        letter-spacing: 0.1em;
+        line-height: 1.6;
+    }
+    #input-box {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        max-width: 400px;
+    }
+    @media (max-width: 1024px) {
+        #all {
+            flex-direction: column;
+            padding: 5% 5%;
+        }
+        #text-box, #input-box {
+            width: 100%;
+        }
+        #text-box h1 {
+            flex-direction: column;
+        }
+        #text-box h1 span {
+            margin-top: 10px;
+            font-size: 1.2rem;
+        }
+    }
+\n    .page-wrapper {
       display: flex;
       align-items: center;
       justify-content: center;
@@ -137,14 +213,15 @@
       -- Form Container (BEM) --
       右側のフォームセクション
     */
-    .form-container {
-      background-color: var(--color-surface-bright); /* Material 3 surface */
-      padding: var(--spacing-10); /* 40px */
-      border-radius: var(--border-radius-lg); /* 16px */
-      box-shadow: var(--shadow-level-3); /* エレベーションレベル3 */
+    #before-login #input-box.form-container {
+      padding: 30px;
       width: 100%;
-      max-width: 400px; /* フォームコンテナの幅を具体的に指定 */
+      max-width: 450px;
+      background-color: rgba(0, 0, 0, 0.65) !important; /* Force override legacy CSS */
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
       box-sizing: border-box;
+      backdrop-filter: blur(4px);
     }
     /*
       -- Form Elements (BEM) --
@@ -152,10 +229,12 @@
     */
     .form-container__title {
       text-align: center;
-      margin-bottom: var(--spacing-8); /* 32px */
-      color: var(--color-on-surface);
-      font-size: 1.875rem; /* Material 3 headline-small 相当 */
+      margin-bottom: var(--spacing-8);
+      color: #fff;
+      font-size: 1.5rem; /* Material 3 headline-small 相当 (縮小) */
       font-weight: 700;
+      white-space: nowrap;
+      letter-spacing: 0.05em;
     }
     .form-group {
       margin-bottom: var(--spacing-6); /* 24px */
@@ -163,7 +242,7 @@
     /* ラベルのスタイル（浮動ラベル削除後のデフォルト） */
     .form-group__label {
       display: block;
-      margin-bottom: var(--spacing-2); /* 8px */
+      margin-bottom: var(--spacing-2);
       color: var(--color-on-surface);
       font-weight: 600;
       font-size: 0.95rem; /* 元の0.95remに戻す */
@@ -197,7 +276,7 @@
     }
     /* パスワードヒント (BEM) */
     .form-group__password-hint {
-      color: var(--color-on-surface-light); /* Hint color */
+      color: rgba(255, 255, 255, 0.7); /* Hint color */
       font-size: 0.8rem; /* Material 3 label-small 相当 */
       margin-top: var(--spacing-1); /* 4px */
       line-height: 1.4;
@@ -212,13 +291,13 @@
       gap: var(--spacing-2); /* 8px */
     }
     .form-options__checkbox-label {
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-1); /* 4px */
-        margin-bottom: var(--spacing-0);
-        font-weight: normal;
-        font-size: 0.9rem;
-        color: var(--color-on-surface); /* Material 3 on-surface */
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-1);
+      margin-bottom: var(--spacing-0);
+      font-weight: normal;
+      font-size: 0.9rem;
+      color: var(--color-on-surface);
     }
     .form-options__checkbox-input {
         width: auto;
@@ -227,7 +306,7 @@
         accent-color: var(--color-primary); /* Primary color for checkbox */
     }
     .form-options__link {
-      color: var(--color-primary);
+      color: var(--color-secondary);
       text-decoration: none;
       font-size: 0.9rem;
     }
@@ -283,12 +362,19 @@
       box-shadow: var(--shadow-level-2);
     }
     .button--google { /* google-button */
-      background-color: var(--color-surface-bright);
-      border: 1px solid var(--color-outline);
-      color: var(--color-on-surface-variant);
-      font-weight: 500;
+      background-color: #fff;
+      border: 1px solid #d1d5db;
+      color: #374151;
+      font-weight: 600;
       margin-top: var(--spacing-6); /* 24px */
-      box-shadow: var(--shadow-level-1);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      display: flex !important;
+      justify-content: center !important;
+      align-items: center !important;
+      gap: 10px;
+      padding: 12px 16px;
+      width: 100%;
+      border-radius: 8px;
     }
     .button--google:hover {
       background-color: var(--color-surface-dim);
@@ -342,7 +428,7 @@
       font-size: 0.9rem;
       font-weight: 600;
       margin: 0 0 var(--spacing-3);
-      color: var(--color-on-surface-variant);
+      color: var(--color-on-surface);
     }
     .scenario-accounts__list {
       list-style: none;
@@ -399,9 +485,9 @@
     */
     .divider {
       text-align: center;
-      margin: var(--spacing-7) var(--spacing-0); /* 28px 0 */
+      margin: var(--spacing-7) var(--spacing-0);
       position: relative;
-      color: var(--color-on-surface-light);
+      color: rgba(255,255,255,0.7);
       font-size: 0.85rem;
     }
     .divider::before,
@@ -420,8 +506,8 @@
       right: var(--spacing-0);
     }
     .divider__text {
-      padding: var(--spacing-0) var(--spacing-4); /* 0 16px */
-      background: var(--color-surface-bright); /* containerの背景色に合わせる */
+      padding: var(--spacing-0) var(--spacing-4);
+      background: transparent;
       position: relative;
       z-index: 1;
     }
@@ -435,7 +521,7 @@
       font-size: 0.85rem;
     }
     .sub-links__item {
-      color: var(--color-primary);
+      color: var(--color-secondary);
       text-decoration: none;
       margin: var(--spacing-0) var(--spacing-2); /* 0 8px */
     }
@@ -444,8 +530,8 @@
     }
     .footer {
       text-align: center;
-      margin-top: var(--spacing-8); /* 32px */
-      color: var(--color-on-surface-light);
+      margin-top: var(--spacing-8);
+      color: rgba(255,255,255,0.7);
       font-size: 0.8rem;
     }
     /*
@@ -531,7 +617,99 @@
       画面幅に応じたレイアウト調整 (4pxの倍数ブレークポイント)
     */
     @media (max-width: 1024px) { /* lg */
-      .page-wrapper {
+      
+    /* Legacy Layout Styles */
+    #all {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        min-height: 100vh;
+        background: url("img/top-kv.jpg") no-repeat center;
+        background-size: cover;
+        padding: 0 10%;
+        box-sizing: border-box;
+        position: relative;
+    }
+    #all:before {
+        content: "";
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(180deg, rgba(100, 100, 100, 0.85), rgba(0, 17, 46, 0.85));
+        z-index: 1;
+    }
+    #text-box {
+        width: 50%;
+        position: relative;
+        z-index: 2;
+    }
+    #text-box ul {
+        display: flex;
+        width: 95%;
+        margin: 0 0 5vh 0;
+        padding: 0;
+        list-style: none;
+    }
+    #text-box ul li {
+        padding: 5px 20px;
+        text-align: center;
+        background: #fff;
+        font-weight: 500;
+        font-size: 1rem;
+    }
+    #text-box ul li:nth-child(1) { border: 1px solid #004ad0; color: #004ad0; margin-right: 10px; }
+    #text-box ul li:nth-child(2) { border: 1px solid #3200a2; color: #3200a2; margin-right: 10px; }
+    #text-box ul li:nth-child(3) { border: 1px solid #a50076; color: #a50076; }
+    #text-box h1 {
+        margin: 0 0 5vh 0;
+        display: flex;
+        align-items: center;
+    }
+    #text-box h1 img {
+        width: 50%;
+        margin: 0;
+    }
+    #text-box h1 span {
+        color: #fff;
+        margin-left: 30px;
+        display: inline-block;
+        font-weight: bold;
+        font-size: 1.5rem;
+    }
+    #text-box p {
+        text-align: left;
+        color: #fff;
+        font-weight: bold;
+        letter-spacing: 0.1em;
+        line-height: 1.6;
+    }
+    #input-box {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        max-width: 400px;
+    }
+    @media (max-width: 1024px) {
+        #all {
+            flex-direction: column;
+            padding: 5% 5%;
+        }
+        #text-box, #input-box {
+            width: 100%;
+        }
+        #text-box h1 {
+            flex-direction: column;
+        }
+        #text-box h1 span {
+            margin-top: 10px;
+            font-size: 1.2rem;
+        }
+    }
+\n    .page-wrapper {
         flex-direction: column; /* 縦並びに */
         gap: var(--spacing-10); /* 40px */
         padding: var(--spacing-6); /* 24px */
@@ -565,10 +743,100 @@
         font-size: 0.7rem;
       }
 
-      body::before { /* 背景オーバーレイ調整 */
-        backdrop-filter: brightness(0.5) blur(2px);
-      }
-      .page-wrapper {
+      
+      
+    /* Legacy Layout Styles */
+    #all {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        min-height: 100vh;
+        background: url("img/top-kv.jpg") no-repeat center;
+        background-size: cover;
+        padding: 0 10%;
+        box-sizing: border-box;
+        position: relative;
+    }
+    #all:before {
+        content: "";
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(180deg, rgba(100, 100, 100, 0.85), rgba(0, 17, 46, 0.85));
+        z-index: 1;
+    }
+    #text-box {
+        width: 50%;
+        position: relative;
+        z-index: 2;
+    }
+    #text-box ul {
+        display: flex;
+        width: 95%;
+        margin: 0 0 5vh 0;
+        padding: 0;
+        list-style: none;
+    }
+    #text-box ul li {
+        padding: 5px 20px;
+        text-align: center;
+        background: #fff;
+        font-weight: 500;
+        font-size: 1rem;
+    }
+    #text-box ul li:nth-child(1) { border: 1px solid #004ad0; color: #004ad0; margin-right: 10px; }
+    #text-box ul li:nth-child(2) { border: 1px solid #3200a2; color: #3200a2; margin-right: 10px; }
+    #text-box ul li:nth-child(3) { border: 1px solid #a50076; color: #a50076; }
+    #text-box h1 {
+        margin: 0 0 5vh 0;
+        display: flex;
+        align-items: center;
+    }
+    #text-box h1 img {
+        width: 50%;
+        margin: 0;
+    }
+    #text-box h1 span {
+        color: #fff;
+        margin-left: 30px;
+        display: inline-block;
+        font-weight: bold;
+        font-size: 1.5rem;
+    }
+    #text-box p {
+        text-align: left;
+        color: #fff;
+        font-weight: bold;
+        letter-spacing: 0.1em;
+        line-height: 1.6;
+    }
+    #input-box {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        max-width: 400px;
+    }
+    @media (max-width: 1024px) {
+        #all {
+            flex-direction: column;
+            padding: 5% 5%;
+        }
+        #text-box, #input-box {
+            width: 100%;
+        }
+        #text-box h1 {
+            flex-direction: column;
+        }
+        #text-box h1 span {
+            margin-top: 10px;
+            font-size: 1.2rem;
+        }
+    }
+\n    .page-wrapper {
         padding: var(--spacing-4); /* 16px */
         gap: var(--spacing-8); /* 32px */
       }
@@ -578,13 +846,14 @@
       .info-panel__description {
         font-size: 0.9375rem;
       }
-      .form-container {
+      #before-login #input-box.form-container {
         padding: var(--spacing-8); /* 32px */
         max-width: 100%; /* スマホではいっぱいに近い幅 */
       }
       .form-container__title {
-        font-size: 1.75rem;
+        font-size: 1.3rem; 
         margin-bottom: var(--spacing-6); /* 24px */
+        white-space: nowrap;
       }
       .form-group {
         margin-bottom: var(--spacing-5); /* 20px */
@@ -650,19 +919,42 @@
            padding: var(--spacing-1); /* 4px */
        }
     }
-  </style>
+  
+    /* --- Specific Form Text Colors for Dark Background --- */
+    #before-login #input-box.form-container .form-group__label,
+    #before-login #input-box.form-container .form-options__checkbox-label,
+    #before-login #input-box.form-container .form-options__checkbox-label span,
+    #before-login #input-box.form-container .scenario-accounts__title,
+    #before-login #input-box.form-container .scenario-accounts__email,
+    #before-login #input-box.form-container .scenario-accounts__badge {
+        color: #fff !important;
+    }
+    #before-login #input-box.form-container .form-options {
+        color: #fff !important;
+    }
+    #before-login #input-box.form-container .divider::before,
+    #before-login #input-box.form-container .divider::after {
+        background: rgba(255, 255, 255, 0.3) !important;
+    }
+    </style>
+
 </head>
-<body>
-  <div class="page-wrapper" role="main">
-    <div class="info-panel">
-      <h2 class="info-panel__title">SPEED AD とは？</h2>
-      <p class="info-panel__description">
-        SPEED ADは、展示会やセミナーなどのイベント向けソリューションです。<br>
-        無料のWEBアンケート作成、名刺のデータ化、御礼メールの送信を一気通貫で提供し、
-        獲得したリードの有効活用をワンストップで実現します。
-      </p>
+<body id="before-login">
+  <main>
+  <div id="fullpage">
+    <div class="section " id="section0">
+      <div id="all" role="main">
+    <div id="text-box">
+      <ul>
+        <li>WEBアンケート作成</li>
+        <li>名刺のデータ化</li>
+        <li>御礼メールの送信</li>
+      </ul>
+      <h1><img src="img/logo.svg" alt="SPEED-AD"><span>～スピード アド～</span></h1>
+      <p>SPEED ADは、展示会やセミナーなどのイベント向けソリューションです。<br>
+        無料のWEBアンケート作成、名刺のデータ化、御礼メールの送信を一気通貫で提供し、獲得したリードの有効活用をワンストップで実現します</p>
     </div>
-    <div class="form-container">
+    <div id="input-box" class="form-container">
       <h1 class="form-container__title">SPEED AD ログイン</h1>
       <form id="login-form" novalidate>
         <div class="form-group">
@@ -726,15 +1018,165 @@
         Googleでログイン
       </button>
       <button class="button button--tonal" type="button">新規アカウント作成</button>
-      <div class="sub-links">
-        <a href="http://127.0.0.1:5500/02_dashboard/terms-of-service.html" class="sub-links__item">利用規約</a>｜<a href="https://www.abroad-o.com/rule.html" class="sub-links__item" target="_blank" rel="noopener noreferrer">プライバシー</a>｜<a href="02_dashboard/help-center.html" class="sub-links__item">サポート</a>
-      </div>
-      <div class="mt-4 text-center text-xs text-on-surface-light">
-          【開発者向け】 <a href="02_dashboard/changelog.html" class="hover:underline">変更履歴</a>
-      </div>
-      <div class="footer">© 2025 SPEED AD - All rights reserved.</div>
     </div>
   </div>
+    </div>
+<div class="section" id="section1">
+      <article>
+        <div class="flex row">
+          <div class="pic"><img src="img/pic1.jpg" alt=""></div>
+          <section>
+            <h2 class="title1">WEBアンケートの作成</h2>
+            <p>直感的な操作で、誰でも簡単にWEBアンケートを無料で作成できます。<br>
+              作成したアンケートは、イベント来場者のスマホやタブレットでQRコードから読み込んで回答できます。<br>
+              アンケートの回答はイベント後すぐにCSVでダウンロードしてビジネスに活かせます。 </p>
+          </section>
+        </div>
+      </article>
+    </div>
+    <div class="section" id="section2">
+      <article>
+        <div class="flex">
+          <div class="pic"><img src="img/pic2.jpg" alt=""></div>
+          <section>
+            <h2 class="title2">名刺情報のデータ化</h2>
+            <p>WEBアンケートの回答と同時に、来場者の名刺を撮影＆添付できます。<br>
+              御礼メールに必須のメールアドレスと氏名は無料でデータ化できます。<br>
+              項目プランやスピードプランを組み合わせれば、自社のビジネススタイルに最も適した運用が可能です。 </p>
+          </section>
+        </div>
+      </article>
+    </div>
+    <div class="section" id="section3">
+      <article>
+        <div class="flex row">
+          <div class="pic"><img src="img/pic3.jpg" alt=""></div>
+          <section>
+            <h2 class="title3">御礼メールの送信（Coming Soon）</h2>
+            <p>イベント来場者に御礼メールを送る事ができます。<br>
+              メール文章は複数パターン用意でき、アンケートの回答に合わせて送信内容を変える事ができます。 </p>
+          </section>
+        </div>
+      </article>
+    </div>
+    <div class="section circle" id="section4">
+      <article>
+        <div class="no-flex">
+          <h2>様々なビジネススキームに、ベストフィット</h2>
+          <ul class="list">
+            <li>
+              <h3><span><em>STEP 01</em> - 出展企業様</span></h3>
+              <div class="text">
+                <p>パソコンで<br>
+                  WEBアンケート<br>
+                  作成</p>
+              </div>
+            </li>
+            <li>
+              <h3><span><em>STEP 02</em> - 出展企業様</span></h3>
+              <div class="text short">
+                <ul>
+                  <li>
+                    <h4>case01</h4>
+                    <p>展示会場のデスクプレートやパンフレットでQRコードを表示</p>
+                  </li>
+                  <li>
+                    <h4>case02</h4>
+                    <p>DMにアンケート回答用のURLを貼り付けて送信</p>
+                  </li>
+                  <li>
+                    <h4>case03</h4>
+                    <p>セミナー資料の末尾にQRコードを印刷</p>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            <li>
+              <h3><span><em>STEP 03</em> - 来場者</span></h3>
+              <div class="text">
+                <p>QRコードから<br>
+                  アンケートを回答、<br>
+                  同時に名刺撮影</p>
+              </div>
+            </li>
+            <li>
+              <h3><span><em>STEP 04</em> - 自動化</span></h3>
+              <div class="text">
+                <p>自動で名刺データ化、<br>
+                  そのまま御礼メール<br>
+                  送信</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </article>
+    </div>
+    <div class="section circle2" id="section5">
+      <article>
+        <div class="no-flex white">
+          <h2>あなたのビジネスを加速する充実な機能</h2>
+          <ul class="list2">
+            <li> <img src="img/icon1.png" alt="イメージ：豊富な設問タイプを設定可能">
+              <h3>豊富な設問タイプを設定可能</h3>
+              <p>WEBアンケートでは単回答/複数回答/自由回答形式の設問に加えて、年月/時間の回答やマトリックス状の設問など多様なフォームを作れます。</p>
+            </li>
+            <li> <img src="img/icon2.png" alt="イメージ：無料プランでメール送信まで可能">
+              <h3>無料プランでメール送信まで可能</h3>
+              <p>WEBアンケート作成、メールアドレスと氏名の名刺データ化、御礼メール（Coming Soon）は100件まで全て無料です。</p>
+            </li>
+            <li> <img src="img/icon3.png" alt="イメージ：高品質でスピーディーな名刺データ化">
+              <h3>高品質でスピーディーな名刺データ化</h3>
+              <p>オペレーターによる手入力と独自AIプログラムの併用で、高い入力精度でスピーディーなデータ化が可能です。</p>
+            </li>
+            <li> <img src="img/icon4.png" alt="イメージ：QRコード表示で非接触">
+              <h3>QRコード表示で非接触</h3>
+              <p>イベント来場者のスマホやタブレットから回答して貰う為、様々な展示会のスタイルに対応できます。</p>
+            </li>
+            <li> <img src="img/icon5.png" alt="イメージ：高セキュリティ環境">
+              <h3>高セキュリティ環境</h3>
+              <p>ISMS（ISO27001）、及びプライバシーマークを取得し、高いセキュリティ環境でサービス提供しています。</p>
+            </li>
+            <li> <img src="img/icon6.png" alt="イメージ：御礼メールを最短当日配信">
+              <h3>御礼メールを最短当日配信</h3>
+              <p>Coming Soon</p>
+            </li>
+          </ul>
+        </div>
+      </article>
+    </div>
+    <div class="section" id="section6">
+      <article class="tate">
+        <div class="no-flex white">
+          <h2>当社で提供するその他のサービス</h2>
+          <ul class="list3">
+            <li class="service1"> <a href="https://www.abroad-o.com/input.html" target="_blank">データ入力<br>
+              サービス<span class="arrow-round"></span></a> </li>
+            <li class="service2"><a href="https://www.abroad-o.com/aggregate.html" target="_blank">データ集計・<br>
+              解析サービス<span class="arrow-round"></span></a> </li>
+            <li class="service3"> <a href="https://www.abroad-o.com/scan.html" target="_blank">スキャニング<br>
+              サービス<span class="arrow-round"></span></a> </li>
+            <li class="service4"><a href="https://www.abroad-o.com/largeformat.html" target="_blank">大判の電子化<span class="arrow-round"></span></a> </li>
+            <li class="service5"><a href="https://www.abroad-o.com/film.html" target="_blank">フィルムの電子化<span class="arrow-round"></span></a> </li>
+            <li class="service6"><a href="https://www.abroad-o.com/edit.html" target="_blank">画像編集・<br>
+              加工サービス<span class="arrow-round"></span></a> </li>
+          </ul>
+        </div>
+							
+    <footer id="before-footer" style="padding: 5vh 0; background: linear-gradient(180deg, #899bb3, #4b525d); margin: 0; color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; min-height: 45vh; box-sizing: border-box;"><div style="text-align: center; width: 100%;">
+      <div class="sub-links" style="margin-bottom: 20px;">
+        <a href="http://127.0.0.1:5500/02_dashboard/terms-of-service.html" class="sub-links__item" style="color: #fff; margin: 0 10px;">利用規約</a> | 
+        <a href="https://www.abroad-o.com/rule.html" class="sub-links__item" target="_blank" rel="noopener noreferrer" style="color: #fff; margin: 0 10px;">プライバシーポリシー</a> | 
+        <a href="02_dashboard/help-center.html" class="sub-links__item" style="color: #fff; margin: 0 10px;">サポート</a>
+      </div>
+      <div class="mt-4 text-center text-xs text-on-surface-light" style="margin-bottom: 20px; color: rgba(255,255,255,0.7); font-size: 13px;">
+          【開発者向け】<a href="02_dashboard/changelog.html" class="hover:underline" style="color: #fff; text-decoration: underline;">変更履歴</a>
+      </div>
+      <div class="footer" style="color: rgba(255,255,255,0.7); font-size: 12px; margin-top: 0;">&copy; 2025 SPEED AD - All rights reserved.</div>
+    </div></footer>
+  </article>
+    </div>
+  </div>
+</main>
   <!-- 新規アカウント作成モーダル -->
   <div class="modal modal--is-hidden" role="dialog" aria-modal="true" aria-labelledby="signup-modal-title">
     <div class="modal__content">
@@ -1162,6 +1604,23 @@
       });
     });
   </script>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/2.9.7/jquery.fullpage.min.js"></script>
+  <script type="text/javascript">
+    .ready(function() {
+      if(typeof $.fn.fullpage !== 'undefined') {
+        #fullpage.fullpage({
+          anchors: ['top', 'contents1', 'contents2','contents3','contents4','contents5','contents6'],
+          navigation: true,
+          navigationPosition: 'right',
+          responsiveWidth: 1024,
+          scrollOverflow: true
+        });
+      }
+    });
+  </script>
+
 </body>
 </html>
 <!-- 自己チェックリスト -->
