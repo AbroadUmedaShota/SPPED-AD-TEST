@@ -215,7 +215,9 @@ export function initBizcardSettings() {
      * Handles the cancel button click.
      */
     function handleCancel() {
-        const returnUrl = state.surveyId ? 'index.html' : 'surveyCreation.html';
+        const returnUrl = state.surveyId
+            ? `surveyCreation.html?surveyId=${encodeURIComponent(state.surveyId)}`
+            : 'surveyCreation.html';
         if (hasFormChanged()) {
             showConfirmationModal(
                 `変更が保存されていません。破棄して前の画面に戻りますか？`,

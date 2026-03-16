@@ -78,6 +78,40 @@ function getLanguageMeta(languageOptions = {}, code = FALLBACK_LANGUAGE) {
   return { code, label: code, shortLabel: code };
 }
 
+function ensureReferenceHintElement(group) {
+  if (!group) return null;
+  let hint = group.querySelector('.translation-reference-hint');
+  if (!hint) {
+    hint = document.createElement('p');
+    hint.className = 'translation-reference-hint text-xs text-text-sub mt-1 leading-snug hidden';
+    group.appendChild(hint);
+  }
+  return hint;
+}
+
+function setReferenceHintForInput(input, referenceText, baseLanguage = FALLBACK_LANGUAGE) {
+  if (!input) return;
+  const group = input.closest('.input-group');
+  if (!group) return;
+
+  const hint = ensureReferenceHintElement(group);
+  const lang = input.dataset.lang || group.dataset.lang || FALLBACK_LANGUAGE;
+  const hasReference = Boolean(referenceText && String(referenceText).trim());
+  const hasValue = Boolean(input.value && input.value.trim());
+  const shouldShow = lang !== baseLanguage && hasReference && !hasValue;
+
+  input.dataset.referenceText = hasReference ? String(referenceText) : '';
+
+  if (!hint) return;
+  hint.textContent = shouldShow ? `日本語: ${referenceText}` : '';
+  hint.classList.toggle('hidden', !shouldShow);
+}
+
+export function refreshReferenceHintForInput(input, baseLanguage = FALLBACK_LANGUAGE) {
+  if (!input) return;
+  setReferenceHintForInput(input, input.dataset.referenceText || '', baseLanguage);
+}
+
 function hydrateSingleLanguageField(container, value, languageOptions = {}, overrides = {}) {
     if (!container) return;
 
@@ -123,6 +157,12 @@ function hydrateSingleLanguageField(container, value, languageOptions = {}, over
 
         const input = group.querySelector('input, textarea');
         if (input) {
+            const fieldKey = overrides.fieldKey || container.dataset.fieldKey || 'field';
+            group.dataset.lang = langCode;
+            input.dataset.lang = langCode;
+            if (!input.id) {
+                input.id = `${fieldKey}_${langCode}`;
+            }
             input.value = getLocalizedText(value, langCode);
             const placeholderJa = overrides.placeholderJa ?? container.dataset.placeholderJa ?? ' ';
             const jaValue = getLocalizedText(value, 'ja');
@@ -130,33 +170,17 @@ function hydrateSingleLanguageField(container, value, languageOptions = {}, over
             if (langCode === 'ja') {
                 input.placeholder = placeholderJa;
             } else {
-                input.placeholder = jaValue || placeholderJa;
+                input.placeholder = ' ';
             }
 
-            // Add real-time placeholder updater for Japanese input
-            if (langCode === 'ja') {
-                const updater = (event) => {
-                    const currentJaValue = event.target.value || '';
-                    const otherInputGroups = container.querySelectorAll('.input-group:not([data-lang="ja"])');
-                    otherInputGroups.forEach(group => {
-                        const otherInput = group.querySelector('input, textarea');
-                        if (otherInput) {
-                            otherInput.placeholder = currentJaValue;
-                        }
-                    });
-                };
-
-                // Remove previous listener to avoid duplicates, then add the new one.
-                if (input._placeholderUpdater) {
-                    input.removeEventListener('input', input._placeholderUpdater);
-                }
-                input.addEventListener('input', updater);
-                input._placeholderUpdater = updater; // Store reference for removal
-            }
+            setReferenceHintForInput(input, langCode === 'ja' ? '' : jaValue);
         }
 
         const label = group.querySelector('.input-label');
         if (label) {
+            if (input?.id) {
+                label.setAttribute('for', input.id);
+            }
             const langMeta = getLanguageMeta(languageOptions, langCode);
             const baseLabel = overrides.label ?? container.dataset.label ?? '';
             let labelText = baseLabel;
@@ -242,8 +266,7 @@ function createMatrixRowItem(row, rowIndex, questionId, languageOptions) {
   if (editorLanguage === 'ja') {
     input.placeholder = `行${rowIndex + 1}`;
   } else {
-    const fallbackValue = getLocalizedText(row.text, 'ja');
-    input.placeholder = fallbackValue || `行${rowIndex + 1}`;
+    input.placeholder = ' ';
   }
   input.value = getLocalizedText(row.text, editorLanguage);
   inputGroup.appendChild(input);
@@ -253,6 +276,7 @@ function createMatrixRowItem(row, rowIndex, questionId, languageOptions) {
   label.setAttribute('for', input.id);
   label.textContent = `行（${langMeta.shortLabel || langMeta.label}）`;
   inputGroup.appendChild(label);
+  setReferenceHintForInput(input, editorLanguage === 'ja' ? '' : getLocalizedText(row.text, 'ja'));
 
   wrapper.appendChild(inputGroup);
 
@@ -290,8 +314,7 @@ function createMatrixColItem(col, colIndex, questionId, languageOptions) {
   if (editorLanguage === 'ja') {
     input.placeholder = `列${colIndex + 1}`;
   } else {
-    const fallbackValue = getLocalizedText(col.text, 'ja');
-    input.placeholder = fallbackValue || `列${colIndex + 1}`;
+    input.placeholder = ' ';
   }
   input.value = getLocalizedText(col.text, editorLanguage);
   inputGroup.appendChild(input);
@@ -301,6 +324,7 @@ function createMatrixColItem(col, colIndex, questionId, languageOptions) {
   label.setAttribute('for', input.id);
   label.textContent = `列（${langMeta.shortLabel || langMeta.label}）`;
   inputGroup.appendChild(label);
+  setReferenceHintForInput(input, editorLanguage === 'ja' ? '' : getLocalizedText(col.text, 'ja'));
 
   wrapper.appendChild(inputGroup);
 

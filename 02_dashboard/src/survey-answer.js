@@ -4,6 +4,12 @@
  */
 
 import { resolveDashboardDataPath } from './utils.js';
+import {
+    LANGUAGE_LABELS,
+    formatMessage,
+    normalizeLocale,
+    resolveLocalizedValue
+} from './services/i18n/messages.js';
 
 // --- 状態管理 ---
 const state = {
@@ -43,11 +49,115 @@ function initializeDOMElements() {
         submittingModal: document.getElementById('submitting-modal'),
         submittingProgressBar: document.getElementById('submitting-progress-bar'),
         submittingPercentage: document.getElementById('submitting-percentage'),
+        submittingText: document.getElementById('submitting-text'),
 
         // --- カラーピッカーテスト機能用要素 ---
         surveyMainWrapper: document.getElementById('survey-main-wrapper'),
         footer: document.querySelector('footer'),
     };
+}
+
+function getCurrentLocale() {
+    return normalizeLocale(
+        state.currentLanguage
+        || state.surveyData?.defaultAnswerLocale
+        || state.surveyData?.editorLanguage
+        || 'ja'
+    );
+}
+
+function t(path, params = {}) {
+    return formatMessage(getCurrentLocale(), path, params);
+}
+
+function resolveSurveyText(value) {
+    return resolveLocalizedValue(value, getCurrentLocale());
+}
+
+function isLocalizedTextObject(value) {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+        return false;
+    }
+    const keys = Object.keys(value);
+    if (!keys.length) {
+        return false;
+    }
+    return keys.some((key) => Object.prototype.hasOwnProperty.call(LANGUAGE_LABELS, normalizeLocale(key))
+        && typeof value[key] === 'string');
+}
+
+function collectLocalizedLocales(value, bucket) {
+    if (!isLocalizedTextObject(value)) {
+        return;
+    }
+    Object.keys(value).forEach((locale) => {
+        const normalized = normalizeLocale(locale);
+        if (Object.prototype.hasOwnProperty.call(LANGUAGE_LABELS, normalized)) {
+            bucket.add(normalized);
+        }
+    });
+}
+
+function getSurveyAvailableLocales() {
+    const locales = new Set(['ja']);
+    const append = (locale) => {
+        const normalized = normalizeLocale(locale);
+        if (Object.prototype.hasOwnProperty.call(LANGUAGE_LABELS, normalized)) {
+            locales.add(normalized);
+        }
+    };
+
+    (state.surveyData?.settings?.supportedLocales || []).forEach(append);
+    (state.surveyData?.activeLanguages || []).forEach(append);
+    (state.surveyData?.languages || []).forEach(append);
+
+    collectLocalizedLocales(state.surveyData?.displayTitle, locales);
+    collectLocalizedLocales(state.surveyData?.description, locales);
+
+    (state.surveyData?.questions || []).forEach((question) => {
+        collectLocalizedLocales(question?.text, locales);
+        (question?.options || []).forEach((option) => collectLocalizedLocales(option?.text, locales));
+        (question?.rows || []).forEach((row) => collectLocalizedLocales(row?.text, locales));
+        (question?.columns || []).forEach((column) => collectLocalizedLocales(column?.text, locales));
+    });
+
+    return [...locales];
+}
+
+function inferAvailableLanguages() {
+    const candidates = [];
+    const append = (locale) => {
+        const normalized = normalizeLocale(locale);
+        if (normalized && !candidates.includes(normalized)) {
+            candidates.push(normalized);
+        }
+    };
+
+    getSurveyAvailableLocales().forEach(append);
+
+    return candidates;
+}
+
+function applyStaticTranslations() {
+    document.documentElement.lang = getCurrentLocale();
+
+    const submitLabel = DOMElements.submitSurveyButton?.querySelector('span:last-child');
+    if (submitLabel) {
+        submitLabel.textContent = t('surveyAnswer.submitButton');
+    }
+
+    const bizcardCameraLabel = DOMElements.bizcardCameraButton?.querySelector('span:last-child');
+    if (bizcardCameraLabel) {
+        bizcardCameraLabel.textContent = t('surveyAnswer.bizcardCameraButton');
+    }
+
+    if (DOMElements.bizcardManualButton) {
+        DOMElements.bizcardManualButton.textContent = t('surveyAnswer.bizcardManualButton');
+    }
+
+    if (DOMElements.submittingText) {
+        DOMElements.submittingText.textContent = t('surveyAnswer.submitting');
+    }
 }
 
 // --- 初期化 ---
@@ -77,7 +187,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     } catch (error) {
         console.error('初期化エラー:', error);
-        displayError(error.message || 'アンケートの読み込みに失敗しました。');
+        displayError(error.message || t('surveyAnswer.loadingFailed'));
     } finally {
         showLoading(false);
     }
@@ -89,8 +199,9 @@ function initializeParams() {
     const params = new URLSearchParams(window.location.search);
     state.surveyId = params.get('surveyId');
     if (!state.surveyId) {
-        throw new Error('URLに surveyId が指定されていません。');
+        throw new Error(formatMessage('ja', 'surveyAnswer.missingSurveyId'));
     }
+    state.currentLanguage = normalizeLocale(params.get('answerLocale') || '');
 }
 
 function normalizeQuestion(rawQuestion, index) {
@@ -143,7 +254,7 @@ async function loadSurveyData() {
     const dataPath = resolveDashboardDataPath(`surveys/${state.surveyId}.json`);
     const response = await fetch(dataPath);
     if (!response.ok) {
-        throw new Error(`アンケート定義ファイルが見つかりません (ID: ${state.surveyId})`);
+        throw new Error(formatMessage('ja', 'surveyAnswer.surveyNotFound', { surveyId: state.surveyId }));
     }
     state.surveyData = await response.json();
 
@@ -153,6 +264,13 @@ async function loadSurveyData() {
 
     // プレミアム機能のチェックとUIの更新
     // NOTE: Temporarily calling this always for testing
+    if (!state.currentLanguage) {
+        state.currentLanguage = normalizeLocale(
+            state.surveyData?.defaultAnswerLocale
+            || state.surveyData?.editorLanguage
+            || 'ja'
+        );
+    }
     setupPremiumFeatures();
 }
 
@@ -951,6 +1069,7 @@ function startAutoSaveTimer() {
 // --- 描画関数 ---
 
 function renderSurvey() {
+    applyStaticTranslations();
     renderHeader();
     renderSurveyTitle();
     renderQuestions();
@@ -960,7 +1079,7 @@ function renderSurvey() {
 function renderHeader() {
     const { displayTitle } = state.surveyData;
     // DOMElements.headerText.innerHTML = ''; // コンテンツを削除
-    document.title = `SpeedAd - ${resolveLocalizedText(displayTitle) || 'アンケート回答'}`;
+    document.title = `SpeedAd - ${resolveSurveyText(displayTitle) || t('surveyAnswer.pageTitleFallback')}`;
 }
 
 function renderSurveyTitle() {
@@ -969,8 +1088,8 @@ function renderSurveyTitle() {
     if (titleContainer) {
         titleContainer.innerHTML = `
             <div class="bg-white border-2 border-gray-200 rounded-lg shadow-md p-6">
-                <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">${resolveLocalizedText(displayTitle) || 'アンケート'}</h1>
-                <p class="text-gray-600 mt-2">${resolveLocalizedText(description) || ''}</p>
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">${resolveSurveyText(displayTitle) || t('surveyAnswer.titleFallback')}</h1>
+                <p class="text-gray-600 mt-2">${resolveSurveyText(description) || ''}</p>
             </div>
         `;
     }
@@ -981,7 +1100,7 @@ function renderQuestions() {
     form.innerHTML = ''; // 既存の設問をクリア
 
     if (!Array.isArray(state.surveyData.questions) || state.surveyData.questions.length === 0) {
-        form.innerHTML = '<p class="text-center text-on-surface-variant">このアンケートには表示できる設問がありません。</p>';
+        form.innerHTML = `<p class="text-center text-on-surface-variant">${t('common.noQuestions')}</p>`;
         return;
     }
 
@@ -1000,7 +1119,7 @@ function createQuestionElement(question, index) {
     fieldset.dataset.questionId = question.id;
 
     const questionNumber = `Q.${String(index + 1).padStart(2, '0')}`;
-    const requiredText = question.required ? `<span class="text-red-600 font-bold text-xs">必須</span>` : '';
+    const requiredText = question.required ? `<span class="text-red-600 font-bold text-xs">${t('surveyAnswer.requiredBadge')}</span>` : '';
     
     const contentDiv = document.createElement('div');
     contentDiv.className = 'question-content';
@@ -1011,7 +1130,7 @@ function createQuestionElement(question, index) {
                 <div class="flex items-center">
                     <span class="text-lg font-bold text-gray-500 mr-3">${questionNumber}</span>${requiredText}
                 </div>
-                <p class="text-base font-semibold text-on-surface-variant mt-2">${resolveLocalizedText(question.text)}</p>
+                <p class="text-base font-semibold text-on-surface-variant mt-2">${resolveSurveyText(question.text)}</p>
             </div>
             <span class="material-icons accordion-icon text-on-surface-variant ml-4">expand_less</span>
         </div>
@@ -1046,9 +1165,9 @@ function createQuestionElement(question, index) {
                 let message = '';
 
                 if (max > 0 && len > max) {
-                    message = `${len - max}文字超過しています。`;
+                    message = t('validation.maxLength', { count: len - max });
                 } else if (min > 0 && len < min) {
-                    message = `あと${min - len}文字必要です。`;
+                    message = t('validation.minLength', { count: min - len });
                 }
 
                 if (message) {
@@ -1064,7 +1183,7 @@ function createQuestionElement(question, index) {
                 controlArea.innerHTML += `
                     <div class="flex items-center gap-3">
                         <input type="radio" id="${question.id}-${opt.value}" name="${question.id}" value="${opt.value}" class="form-radio text-primary">
-                        <label for="${question.id}-${opt.value}">${resolveLocalizedText(opt.text)}</label>
+                        <label for="${question.id}-${opt.value}">${resolveSurveyText(opt.text)}</label>
                     </div>`;
             });
             break;
@@ -1081,7 +1200,7 @@ function createQuestionElement(question, index) {
                 input.className = 'form-checkbox text-primary';
                 const label = document.createElement('label');
                 label.htmlFor = input.id;
-                label.textContent = resolveLocalizedText(opt.text);
+                label.textContent = resolveSurveyText(opt.text);
                 div.appendChild(input);
                 div.appendChild(label);
                 controlArea.appendChild(div);
@@ -1129,7 +1248,7 @@ function createQuestionElement(question, index) {
         case 'dropdown':
             let optionsHTML = '';
             question.options.forEach(opt => {
-                optionsHTML += `<option value="${opt.value}">${resolveLocalizedText(opt.text)}</option>`;
+                optionsHTML += `<option value="${opt.value}">${resolveSurveyText(opt.text)}</option>`;
             });
             controlArea.innerHTML = `<select name="${question.id}" class="w-full rounded-md border-gray-300 shadow-sm">${optionsHTML}</select>`;
             break;
@@ -1138,11 +1257,11 @@ function createQuestionElement(question, index) {
             const isSingleAnswer = question.type === 'matrix_sa';
             let tableHTML = '<div class="overflow-x-auto"><table class="min-w-full border-collapse border border-outline-variant"><thead><tr><th class="border border-outline-variant p-2 bg-surface-container"></th>';
             question.columns.forEach(col => {
-                tableHTML += `<th class="border border-outline-variant p-2 bg-surface-container text-sm font-medium">${resolveLocalizedText(col.text)}</th>`;
+                tableHTML += `<th class="border border-outline-variant p-2 bg-surface-container text-sm font-medium">${resolveSurveyText(col.text)}</th>`;
             });
             tableHTML += '</tr></thead><tbody>';
             question.rows.forEach(row => {
-                tableHTML += `<tr><td class="border border-outline-variant p-2 text-sm font-medium">${resolveLocalizedText(row.text)}</td>`;
+                tableHTML += `<tr><td class="border border-outline-variant p-2 text-sm font-medium">${resolveSurveyText(row.text)}</td>`;
                 question.columns.forEach(col => {
                     const inputType = isSingleAnswer ? 'radio' : 'checkbox';
                     const name = isSingleAnswer ? `${question.id}-${row.id}` : `${question.id}-${row.id}-${col.id}`;
@@ -1157,7 +1276,7 @@ function createQuestionElement(question, index) {
             controlArea.innerHTML = tableHTML;
             break;
         case 'explanation_card':
-            controlArea.innerHTML = `<p class="text-on-surface-variant">${resolveLocalizedText(question.text)}</p>`;
+            controlArea.innerHTML = `<p class="text-on-surface-variant">${resolveSurveyText(question.text)}</p>`;
             // 説明カードには凡例や枠線が不要な場合があるため、スタイルを調整
             break;
         case 'handwriting_space':
@@ -1412,32 +1531,27 @@ function setupPremiumFeatures() {
         return;
     }
 
-    let displayLanguages = state.surveyData.languages || [];
-    if (displayLanguages.length === 0) {
-        displayLanguages = ['en', 'zh-CN']; // テスト用のダミーデータ
+    const availableLanguages = inferAvailableLanguages();
+    const displayLanguages = availableLanguages.filter((locale) => locale !== 'ja');
+
+    if (!availableLanguages.includes(state.currentLanguage)) {
+        const requestedLocale = normalizeLocale(state.currentLanguage);
+        state.currentLanguage = availableLanguages.includes(requestedLocale)
+            ? requestedLocale
+            : (availableLanguages[0] || 'ja');
     }
-
-    const languageMap = {
-        'ja': '日本語',
-        'en': 'English',
-        'zh-CN': '中文(简体)',
-        'zh-TW': '中文(繁體)',
-        'vi': 'Tiếng Việt',
-    };
-
-    const availableLanguages = ['ja', ...displayLanguages];
 
     languageSelect.innerHTML = ''; // 既存のオプションをクリア
 
     // デフォルトの「Language」オプションを追加
     const defaultOption = document.createElement('option');
     defaultOption.value = '';
-    defaultOption.textContent = 'Language';
+    defaultOption.textContent = t('surveyAnswer.languageLabel');
     defaultOption.disabled = true;
     languageSelect.appendChild(defaultOption);
 
     availableLanguages.forEach(lang => {
-        const langName = languageMap[lang] || lang;
+        const langName = LANGUAGE_LABELS[lang] || lang;
         const option = document.createElement('option');
         option.value = lang;
         option.textContent = langName;
@@ -1445,12 +1559,12 @@ function setupPremiumFeatures() {
     });
 
     // 現在の言語に基づいて選択状態を設定
-    languageSelect.value = state.currentLanguage || '';
+    languageSelect.value = getCurrentLocale();
 
     // コンテナを表示
     const container = document.getElementById('language-switcher-container');
     if (container) {
-        container.classList.remove('hidden');
+        container.classList.toggle('hidden', availableLanguages.length <= 1);
     }
 
     // イベントリスナーを設定 (一度だけ)
@@ -1459,10 +1573,10 @@ function setupPremiumFeatures() {
         languageSelect.addEventListener('change', (e) => {
             const newLang = e.target.value;
             if (newLang !== state.currentLanguage) {
-                state.currentLanguage = newLang;
+                state.currentLanguage = normalizeLocale(newLang);
                 renderSurvey();
                 populateFormWithDraft();
-                showToast(`${languageMap[newLang] || newLang}に切り替えました`);
+                showToast(t('surveyAnswer.switchedLocale', { locale: LANGUAGE_LABELS[state.currentLanguage] || state.currentLanguage }));
             }
         });
     }
@@ -1526,7 +1640,7 @@ async function handleSubmit() {
     if (state.isSubmitting) return;
 
     if (!validateForm()) {
-        showToast('必須項目を入力してください。');
+        showToast(t('common.required'));
         return;
     }
 
@@ -1539,6 +1653,7 @@ async function handleSubmit() {
         const finalAnswers = {
             surveyId: state.surveyId,
             submittedAt: new Date().toISOString(),
+            answerLocale: getCurrentLocale(),
             answers: state.answers,
         };
 
@@ -1554,8 +1669,10 @@ async function handleSubmit() {
         state.hasUnsavedChanges = false;
 
         // サンクス画面へ遷移
-        let thankYouUrl = state.surveyData.thankYouScreenSettings?.url || 'thankYouScreen.html';
+        const thankYouSettings = state.surveyData.thankYouScreenSettings || state.surveyData.settings?.thankYouScreen || {};
+        let thankYouUrl = thankYouSettings.url || 'thankYouScreen.html';
         thankYouUrl += `?surveyId=${state.surveyId}`;
+        thankYouUrl += `&answerLocale=${encodeURIComponent(getCurrentLocale())}`;
         if (state.surveyData.plan === 'premium') {
             thankYouUrl += '&continuous=true';
         }
@@ -1563,7 +1680,7 @@ async function handleSubmit() {
 
     } catch (error) {
         console.error('送信エラー:', error);
-        displayError('回答の送信に失敗しました。');
+        displayError(t('surveyAnswer.submitFailed'));
         state.isSubmitting = false;
         DOMElements.submitSurveyButton.disabled = false;
         showSubmittingModal(false);
@@ -1621,16 +1738,6 @@ function displayError(message) {
     DOMElements.surveyForm.classList.add('hidden');
     DOMElements.errorContainer.innerHTML = `<p>${message}</p>`;
     DOMElements.errorContainer.classList.remove('hidden');
-}
-
-function resolveLocalizedText(value) {
-    if (typeof value === 'string') {
-        return value;
-    }
-    if (typeof value === 'object' && value !== null) {
-        return value[state.currentLanguage] || value['ja'] || Object.values(value)[0] || '';
-    }
-    return '';
 }
 
 // --- その他のユーティリティ ---
