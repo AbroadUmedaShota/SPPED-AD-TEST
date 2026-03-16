@@ -21,15 +21,18 @@
         <div class="max-w-md w-full space-y-8 p-10 bg-white rounded-lg shadow-xl">
             <div>
                 <img class="mx-auto h-12 w-auto" src="assets/svg/speedad_logo.svg" alt="SpeedAd Logo">
-                <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                    アンケートにご協力いただき<br>ありがとうございました！
-                </h2>
-                <p class="mt-2 text-center text-sm text-gray-600">
-                    お客様のご意見は今後のサービス改善に役立てさせていただきます。
-                </p>
+                <h2 id="thank-you-title" class="mt-6 text-center text-3xl font-extrabold text-gray-900"></h2>
+                <p id="thank-you-body" class="mt-2 text-center text-sm text-gray-600"></p>
             </div>
-
+            <div id="continuous-answer-container" class="hidden">
+                <a
+                    id="continuous-answer-button"
+                    href="#"
+                    class="mt-4 inline-flex w-full items-center justify-center rounded-full bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700"
+                ></a>
+            </div>
         </div>
     </div>
+    <script type="module" src="src/thankYouScreen.js"></script>
 </body>
 </html>

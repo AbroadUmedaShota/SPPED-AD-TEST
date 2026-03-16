@@ -32,3 +32,7 @@ yarn-error.log*
 *.bak
 tmp_marker.txt
 data/dashboard/user_credentials.json 
+
+# Build and test outputs
+/output/
+/test-results/

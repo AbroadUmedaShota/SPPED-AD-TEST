@@ -7,6 +7,7 @@ import { initThemeToggle } from './lib/themeToggle.js';
 import { fetchSurveyData, saveSurveyDataToLocalStorage, loadSurveyDataFromLocalStorage } from './services/surveyService.js';
 import {
     populateBasicInfo,
+    refreshReferenceHintForInput,
     renderAllQuestionGroups,
     displayErrorMessage,
     renderOutlineMap,
@@ -21,6 +22,7 @@ import {
     normalizePlanTier,
     getCapabilitiesForTier
 } from './services/planCapabilityService.js';
+import { formatMessage } from './services/i18n/messages.js';
 
 // --- Global State ---
 let surveyData = {};
@@ -33,6 +35,7 @@ let planFeatureState = {
     allowBranching: false,
     maxQuestions: null
 };
+let activeTranslationHighlights = [];
 const ADDITIONAL_SETTINGS_CONFIG = [
     { id: 'openBizcardSettingsBtn', path: 'bizcardSettings.html', feature: 'bizcard' },
     { id: 'openThankYouEmailSettingsBtn', path: 'thankYouEmailSettings.html', feature: 'thankYouEmail' },
@@ -52,6 +55,10 @@ let activeLanguages = [BASE_LANGUAGE];
 let editorLanguage = BASE_LANGUAGE;
 
 const additionalSettingsButtons = new Map();
+
+function t(path, params = {}) {
+    return formatMessage(currentLang || 'ja', path, params);
+}
 
 function toDateOnly(value) {
     if (value === null || value === undefined || value === '') return null;
@@ -274,35 +281,64 @@ function collectMissingTranslations(langs) {
     const missing = [];
     if (!Array.isArray(langs) || !langs.length) return missing;
 
-    const recordMissing = (value, pathLabel) => {
+    const recordMissing = (value, pathLabel, meta = {}) => {
         langs.forEach((lang) => {
             const textValue = getLocalizedValue(value, lang).trim();
             if (!textValue) {
-                missing.push({ lang, path: pathLabel });
+                missing.push({ lang, path: pathLabel, ...meta });
             }
         });
     };
 
-    recordMissing(surveyData.name, 'アンケート名');
-    recordMissing(surveyData.displayTitle, '表示タイトル');
-    recordMissing(surveyData.description, '説明');
+    recordMissing(surveyData.name, 'アンケート名', { fieldType: 'surveyName' });
+    recordMissing(surveyData.displayTitle, '表示タイトル', { fieldType: 'displayTitle' });
+    recordMissing(surveyData.description, '説明', { fieldType: 'description' });
 
     (surveyData.questionGroups || []).forEach((group, groupIndex) => {
-        recordMissing(group.title, `質問グループ${groupIndex + 1}`);
+        recordMissing(group.title, `質問グループ${groupIndex + 1}`, {
+            fieldType: 'groupTitle',
+            groupId: group.groupId
+        });
         (group.questions || []).forEach((question, questionIndex) => {
             const questionLabel = `質問${questionIndex + 1}`;
-            recordMissing(question.text, questionLabel);
+            recordMissing(question.text, questionLabel, {
+                fieldType: 'questionText',
+                groupId: group.groupId,
+                questionId: question.questionId
+            });
+            if (question.explanationText) {
+                recordMissing(question.explanationText, `${questionLabel} - 説明文`, {
+                    fieldType: 'explanationDescription',
+                    groupId: group.groupId,
+                    questionId: question.questionId
+                });
+            }
             if (Array.isArray(question.options)) {
                 question.options.forEach((opt, optIndex) => {
-                    recordMissing(opt.text, `${questionLabel} - 選択肢${optIndex + 1}`);
+                    recordMissing(opt.text, `${questionLabel} - 選択肢${optIndex + 1}`, {
+                        fieldType: 'optionText',
+                        groupId: group.groupId,
+                        questionId: question.questionId,
+                        optionIndex: optIndex
+                    });
                 });
             }
             if (question.matrix) {
                 (question.matrix.rows || []).forEach((row, rowIndex) => {
-                    recordMissing(row.text, `${questionLabel} - 行${rowIndex + 1}`);
+                    recordMissing(row.text, `${questionLabel} - 行${rowIndex + 1}`, {
+                        fieldType: 'matrixRow',
+                        groupId: group.groupId,
+                        questionId: question.questionId,
+                        rowIndex
+                    });
                 });
                 (question.matrix.cols || []).forEach((col, colIndex) => {
-                    recordMissing(col.text, `${questionLabel} - 列${colIndex + 1}`);
+                    recordMissing(col.text, `${questionLabel} - 列${colIndex + 1}`, {
+                        fieldType: 'matrixCol',
+                        groupId: group.groupId,
+                        questionId: question.questionId,
+                        colIndex
+                    });
                 });
             }
         });
@@ -389,6 +425,29 @@ function updateLocalization(target, key, lang, value) {
 window.getActiveSurveyLanguages = () => [...getActiveLanguages()];
 window.getSupportedSurveyLanguages = () => SUPPORTED_LANGUAGES.map((lang) => ({ ...lang }));
 window.getEditorSurveyLanguage = () => getEditorLanguage();
+
+function getTranslationProgressByLanguage(langs = []) {
+    const missingItems = collectMissingTranslations(langs);
+    const progress = new Map();
+
+    langs.forEach((lang) => {
+        progress.set(lang, {
+            missingCount: 0,
+            items: []
+        });
+    });
+
+    missingItems.forEach((item) => {
+        if (!progress.has(item.lang)) {
+            progress.set(item.lang, { missingCount: 0, items: [] });
+        }
+        const current = progress.get(item.lang);
+        current.missingCount += 1;
+        current.items.push(item);
+    });
+
+    return progress;
+}
 
 function ensureQuestionMeta(question) {
     if (!question || typeof question !== 'object') return {};
@@ -527,7 +586,7 @@ function updateTabIndicator() {
     }
 }
 
-function renderLanguageSettings({ activeLanguages, editorLanguage, languageMap }) {
+function renderLanguageSettings({ activeLanguages, editorLanguage, languageMap, translationProgress = new Map() }) {
     const panel = document.getElementById('languageSelectionPanel');
     const tabs = document.getElementById('languageEditorTabs');
 
@@ -537,6 +596,7 @@ function renderLanguageSettings({ activeLanguages, editorLanguage, languageMap }
 
         selectable.forEach((lang) => {
             const isSelected = activeLanguages.includes(lang.code);
+            const missingCount = translationProgress.get(lang.code)?.missingCount || 0;
             const button = document.createElement('button');
             button.type = 'button';
             button.dataset.lang = lang.code;
@@ -546,6 +606,7 @@ function renderLanguageSettings({ activeLanguages, editorLanguage, languageMap }
                 button.className = 'flex items-center gap-1.5 pl-3 pr-2 py-1.5 rounded-full border border-transparent bg-secondary-container text-on-secondary-container shadow-sm text-sm';
                 button.innerHTML = `
                     <span>${lang.label}</span>
+                    ${missingCount > 0 ? `<span class="translation-progress-badge">${missingCount}</span>` : ''}
                     <span class="material-icons text-base" data-action="remove">cancel</span>
                 `;
             } else {
@@ -564,6 +625,7 @@ function renderLanguageSettings({ activeLanguages, editorLanguage, languageMap }
         tabs.innerHTML = '';
         activeLanguages.forEach((code) => {
             const lang = languageMap.get(code) || { code, shortLabel: code, label: code };
+            const missingCount = translationProgress.get(code)?.missingCount || 0;
             const button = document.createElement('button');
             button.type = 'button';
             button.dataset.lang = code;
@@ -571,17 +633,166 @@ function renderLanguageSettings({ activeLanguages, editorLanguage, languageMap }
             const isActive = code === editorLanguage;
             button.setAttribute('aria-selected', isActive ? 'true' : 'false');
             button.className = `px-4 py-3 text-sm font-semibold transition-colors duration-200 ${isActive ? 'text-primary' : 'text-on-surface-variant hover:text-on-surface'}`;
-            button.textContent = lang.shortLabel || lang.label;
+            button.innerHTML = `
+                <span>${lang.shortLabel || lang.label}</span>
+                ${code !== BASE_LANGUAGE && missingCount > 0 ? `<span class="translation-progress-badge">未入力 ${missingCount}</span>` : ''}
+            `;
             tabs.appendChild(button);
         });
     }
 
     Promise.resolve().then(() => {
-        updateAllPlaceholders();
+        updateAllReferenceHints();
         updateOutlineActionsState();
         updateTabIndicator();
         bindLanguageControlEvents();
     });
+}
+
+function updateTranslationProgressIndicators() {
+    const progress = getTranslationProgressByLanguage(getEnabledExtraLanguages());
+
+    document.querySelectorAll('#languageEditorTabs button[data-lang]').forEach((button) => {
+        const lang = button.dataset.lang;
+        const missingCount = progress.get(lang)?.missingCount || 0;
+        const badge = button.querySelector('.translation-progress-badge');
+        if (badge) {
+            badge.textContent = `未入力 ${missingCount}`;
+            badge.classList.toggle('hidden', lang === BASE_LANGUAGE || missingCount <= 0);
+        }
+    });
+
+    document.querySelectorAll('#languageSelectionPanel button[data-lang]').forEach((button) => {
+        const lang = button.dataset.lang;
+        const missingCount = progress.get(lang)?.missingCount || 0;
+        const badge = button.querySelector('.translation-progress-badge');
+        if (badge) {
+            badge.textContent = String(missingCount);
+            badge.classList.toggle('hidden', missingCount <= 0);
+        }
+    });
+}
+
+function clearMissingTranslationHighlights() {
+    document.querySelectorAll('.translation-missing').forEach((element) => {
+        element.classList.remove('translation-missing');
+    });
+    document.querySelectorAll('.translation-missing-group').forEach((element) => {
+        element.classList.remove('translation-missing-group');
+    });
+    document.querySelectorAll('.translation-missing-tab').forEach((element) => {
+        element.classList.remove('translation-missing-tab');
+    });
+}
+
+function ensureContentExpanded(content) {
+    if (!content || !content.classList.contains('hidden')) return;
+    content.classList.remove('hidden');
+
+    const questionGroup = content.closest('.question-group');
+    if (questionGroup?.dataset.groupId) {
+        saveAccordionState(questionGroup.dataset.groupId, true);
+    } else if (content.id) {
+        saveAccordionState(content.id, true);
+    }
+
+    const header = content.id
+        ? document.querySelector(`[data-accordion-target="${content.id}"]`)
+        : questionGroup?.querySelector('.group-header');
+    if (header) {
+        header.setAttribute('aria-expanded', 'true');
+        const icon = header.querySelector('.expand-icon');
+        if (icon) icon.textContent = 'expand_less';
+    }
+}
+
+function resolveMissingItemElement(item) {
+    if (!item) return null;
+
+    if (item.fieldType === 'surveyName' || item.fieldType === 'displayTitle' || item.fieldType === 'description') {
+        return document.querySelector(`[data-field-key="${item.fieldType}"] .input-group[data-lang="${item.lang}"]`);
+    }
+
+    if (item.fieldType === 'groupTitle') {
+        return document.querySelector(`.question-group[data-group-id="${item.groupId}"] [data-field-key="groupTitle"] .input-group[data-lang="${item.lang}"]`);
+    }
+
+    if (item.fieldType === 'questionText') {
+        return document.querySelector(`.question-item[data-question-id="${item.questionId}"] [data-field-key="questionText"] .input-group[data-lang="${item.lang}"]`);
+    }
+
+    if (item.fieldType === 'explanationDescription') {
+        return document.querySelector(`.question-item[data-question-id="${item.questionId}"] [data-field-key="explanationDescription"] .input-group[data-lang="${item.lang}"]`);
+    }
+
+    if (item.fieldType === 'optionText') {
+        const optionItems = document.querySelectorAll(`.question-item[data-question-id="${item.questionId}"] .option-item`);
+        const optionItem = optionItems[item.optionIndex];
+        return optionItem?.querySelector(`.input-group[data-lang="${item.lang}"]`) || null;
+    }
+
+    if (item.fieldType === 'matrixRow') {
+        const input = document.querySelector(`.question-item[data-question-id="${item.questionId}"] .matrix-row-input[data-lang="${item.lang}"][data-index="${item.rowIndex}"]`);
+        return input?.closest('.input-group') || null;
+    }
+
+    if (item.fieldType === 'matrixCol') {
+        const input = document.querySelector(`.question-item[data-question-id="${item.questionId}"] .matrix-col-input[data-lang="${item.lang}"][data-index="${item.colIndex}"]`);
+        return input?.closest('.input-group') || null;
+    }
+
+    return null;
+}
+
+function applyMissingTranslationHighlights(items, activeLang = getEditorLanguage(), shouldScroll = false) {
+    clearMissingTranslationHighlights();
+    if (!Array.isArray(items) || !items.length) return;
+
+    activeTranslationHighlights = items;
+    const firstTargetItem = items.find((item) => item.lang === activeLang) || items[0];
+    const targets = items.filter((item) => item.lang === activeLang);
+
+    document.querySelectorAll('#languageEditorTabs button[data-lang]').forEach((button) => {
+        const hasMissing = items.some((item) => item.lang === button.dataset.lang);
+        button.classList.toggle('translation-missing-tab', hasMissing);
+    });
+
+    let firstElement = null;
+    targets.forEach((item) => {
+        const element = resolveMissingItemElement(item);
+        if (!element) return;
+
+        const accordionContent = element.closest('.accordion-content');
+        ensureContentExpanded(accordionContent);
+        const questionGroup = element.closest('.question-group');
+        if (questionGroup) {
+            questionGroup.classList.add('translation-missing-group');
+        }
+        element.classList.add('translation-missing');
+        if (!firstElement) {
+            firstElement = element;
+        }
+    });
+
+    if (!firstElement && firstTargetItem) {
+        firstElement = resolveMissingItemElement(firstTargetItem);
+    }
+
+    if (shouldScroll && firstElement) {
+        firstElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const input = firstElement.querySelector('input, textarea');
+        input?.focus({ preventScroll: true });
+    }
+}
+
+function refreshTranslationAssistUi() {
+    updateTranslationProgressIndicators();
+    if (activeTranslationHighlights.length > 0) {
+        const extras = getEnabledExtraLanguages();
+        const refreshed = collectMissingTranslations(extras);
+        activeTranslationHighlights = refreshed;
+        applyMissingTranslationHighlights(refreshed, getEditorLanguage(), false);
+    }
 }
 
 function bindLanguageControlEvents() {
@@ -772,6 +983,7 @@ function updateAndRenderAll() {
     }
     const multilingualEnabled = isMultilingualEnabled();
     const effectiveLanguages = getEnabledLanguages();
+    const translationProgress = getTranslationProgressByLanguage(getEnabledExtraLanguages());
 
     if (!multilingualEnabled) {
         setEditorLanguage(BASE_LANGUAGE);
@@ -783,6 +995,7 @@ function updateAndRenderAll() {
         activeLanguages: effectiveLanguages,
         editorLanguage: multilingualEnabled ? getEditorLanguage() : BASE_LANGUAGE,
         languageMap: LANGUAGE_MAP,
+        translationProgress,
         allowMultilingual: multilingualEnabled,
         allowBranching: planFeatureState.allowBranching,
         jumpTargets: buildJumpTargets(surveyData.questionGroups, currentLang)
@@ -804,6 +1017,7 @@ function updateAndRenderAll() {
     validateFormForSaveButton();
     setupSortables();
     enhanceAccordionA11y();
+    refreshTranslationAssistUi();
 
     const qrButton = document.getElementById('openQrModalBtn');
     if (qrButton) {
@@ -846,9 +1060,9 @@ function updateAndRenderAll() {
 
     });
 
-    // Ensure placeholders and outline actions are updated after rendering
+    // Ensure reference hints and outline actions are updated after rendering
     Promise.resolve().then(() => {
-        updateAllPlaceholders();
+        updateAllReferenceHints();
         updateOutlineActionsState();
     });
 }
@@ -1001,16 +1215,9 @@ function getQuestionCount() {
 }
 
 // --- Input Bindings ---
-function updateAllPlaceholders() {
-    document.querySelectorAll('.multi-lang-input-group').forEach(container => {
-        const jaInput = container.querySelector('input[data-lang="ja"], textarea[data-lang="ja"]');
-        if (jaInput && jaInput.value) {
-            const value = jaInput.value;
-            const otherInputs = container.querySelectorAll('input[data-lang]:not([data-lang="ja"]), textarea[data-lang]:not([data-lang="ja"])');
-            otherInputs.forEach(input => {
-                input.placeholder = value;
-            });
-        }
+function updateAllReferenceHints() {
+    document.querySelectorAll('.multi-lang-input-group input[data-lang], .multi-lang-input-group textarea[data-lang], .matrix-row-input, .matrix-col-input').forEach((input) => {
+        refreshReferenceHintForInput(input);
     });
 }
 
@@ -1058,13 +1265,8 @@ function setupInputBindings() {
                 updateLocalization(surveyData, 'description', lang, value);
             }
 
-            if (lang === 'ja') {
-                const otherInputs = container.querySelectorAll('input[data-lang]:not([data-lang="ja"]), textarea[data-lang]:not([data-lang="ja"])');
-                otherInputs.forEach(input => {
-                    input.placeholder = value;
-                });
-            }
-
+            refreshReferenceHintForInput(target);
+            refreshTranslationAssistUi();
             validateFormForSaveButton();
             setDirty(true);
         };
@@ -1084,18 +1286,6 @@ function setupInputBindings() {
     container.addEventListener('input', (e) => {
         const target = e.target;
 
-        // Update placeholders for other languages when Japanese input changes
-        if (target.dataset.lang === 'ja') {
-            const multiLangGroup = target.closest('.multi-lang-input-group');
-            if (multiLangGroup) {
-                const value = target.value || '';
-                const otherInputs = multiLangGroup.querySelectorAll('input[data-lang]:not([data-lang="ja"]), textarea[data-lang]:not([data-lang="ja"])');
-                otherInputs.forEach(input => {
-                    input.placeholder = value;
-                });
-            }
-        }
-
         if (target.dataset && target.dataset.configType) {
             handleQuestionConfigInput(target);
             return;
@@ -1109,6 +1299,8 @@ function setupInputBindings() {
             if (group) {
                 const lang = target.dataset.lang || getEditorLanguage();
                 updateLocalization(group, 'title', lang, target.value || '');
+                refreshReferenceHintForInput(target);
+                refreshTranslationAssistUi();
                 setDirty(true);
                 validateFormForSaveButton();
                 renderOutlineMap();
@@ -1128,6 +1320,8 @@ function setupInputBindings() {
             const question = group?.questions?.find((q) => q.questionId === questionId);
             if (question) {
                 updateLocalization(question, 'text', lang, target.value || '');
+                refreshReferenceHintForInput(target);
+                refreshTranslationAssistUi();
                 setDirty(true);
                 validateFormForSaveButton();
                 renderOutlineMap();
@@ -1150,6 +1344,8 @@ function setupInputBindings() {
             if (question && Array.isArray(question.options) && optionIndex > -1 && optionIndex < question.options.length) {
                 question.options[optionIndex].text = normalizeLocalization(question.options[optionIndex].text);
                 question.options[optionIndex].text[lang] = target.value || '';
+                refreshReferenceHintForInput(target);
+                refreshTranslationAssistUi();
                 setDirty(true);
                 validateFormForSaveButton();
             }
@@ -1169,6 +1365,8 @@ function setupInputBindings() {
             if (question && question.matrix && Array.isArray(question.matrix.rows) && question.matrix.rows[index]) {
                 question.matrix.rows[index].text = normalizeLocalization(question.matrix.rows[index].text);
                 question.matrix.rows[index].text[lang] = target.value || '';
+                refreshReferenceHintForInput(target);
+                refreshTranslationAssistUi();
                 setDirty(true);
                 validateFormForSaveButton();
             }
@@ -1188,6 +1386,8 @@ function setupInputBindings() {
             if (question && question.matrix && Array.isArray(question.matrix.cols) && question.matrix.cols[index]) {
                 question.matrix.cols[index].text = normalizeLocalization(question.matrix.cols[index].text);
                 question.matrix.cols[index].text[lang] = target.value || '';
+                refreshReferenceHintForInput(target);
+                refreshTranslationAssistUi();
                 setDirty(true);
                 validateFormForSaveButton();
             }
@@ -1209,6 +1409,8 @@ function setupInputBindings() {
                     question.explanationText = normalizeLocalization(question.explanationText);
                 }
                 question.explanationText[lang] = target.value || '';
+                refreshReferenceHintForInput(target);
+                refreshTranslationAssistUi();
                 setDirty(true);
                 validateFormForSaveButton();
             }
@@ -1983,7 +2185,7 @@ function setupEventListeners() {
             const periodEndVal = (surveyData.periodEnd || '').trim();
 
             if (!baseName || !baseTitle || !periodStartVal || !periodEndVal) {
-                showToast('必須項目を入力してください。', 'error');
+                showToast(t('surveyCreation.requiredInput'), 'error');
                 return;
             }
 
@@ -1993,12 +2195,13 @@ function setupEventListeners() {
 
             // Only validate that the start date is in the future for NEW surveys.
             if (isNewSurvey && (!startDateObj || (today && startDateObj.getTime() <= today.getTime()))) {
-                showToast('開始日は翌日以降の日付を選択してください。', 'error');
+                showToast(t('surveyCreation.startDateFuture'), 'error');
                 return;
             }
 
             const extras = getEnabledExtraLanguages();
             const missing = collectMissingTranslations(extras);
+            const missingByLanguage = getTranslationProgressByLanguage(extras);
 
             const performSave = () => {
                 saveSurveyDataToLocalStorage(surveyData);
@@ -2017,17 +2220,31 @@ function setupEventListeners() {
             let confirmationTitle = '保存の確認';
 
             if (missing.length > 0) {
-                const summary = extras.map((lang) => {
+                applyMissingTranslationHighlights(missing, getEditorLanguage(), true);
+                const summaryItems = extras.map((lang) => {
                     const meta = getLanguageMeta(lang);
                     const label = meta?.label || lang;
-                    const count = missing.filter((item) => item.lang === lang).length;
-                    return `${label}：${count}件`;
-                }).join(' / ');
-                confirmationMessage = `選択された追加言語で未入力の項目があります。\n${summary}\nこの状態で保存しますか？`;
+                    const count = missingByLanguage.get(lang)?.missingCount || 0;
+                    if (count <= 0) return '';
+                    const sample = missingByLanguage.get(lang)?.items?.slice(0, 3).map((item) => item.path).join(' / ');
+                    return `<li><strong>${label}</strong>: ${count}件${sample ? `<br><span class="text-sm text-on-surface-variant">${sample}</span>` : ''}</li>`;
+                }).filter(Boolean).join('');
+                confirmationMessage = `
+                    <p>選択された追加言語で未入力の項目があります。</p>
+                    <ul class="mt-3 list-disc pl-5 space-y-2">${summaryItems}</ul>
+                    <p class="mt-3">この状態で保存しますか？</p>
+                `;
                 confirmationTitle = '未翻訳の確認';
+            } else {
+                activeTranslationHighlights = [];
+                clearMissingTranslationHighlights();
             }
 
-            showConfirmationModal(confirmationMessage, performSave, confirmationTitle);
+            showConfirmationModal(confirmationMessage, performSave, {
+                title: confirmationTitle,
+                confirmText: '保存する',
+                cancelText: 'キャンセル'
+            });
         });
     }
 
@@ -2042,7 +2259,7 @@ function setupEventListeners() {
                         setDirty(false); // Clear dirty state before redirect
                         window.location.href = 'index.html'; // Redirect
                     },
-                    '編集のキャンセル'
+                    { title: '編集のキャンセル' }
                 );
             } else {
                 window.location.href = 'index.html'; // Redirect directly if no changes
@@ -2367,8 +2584,8 @@ function validateFormForSaveButton() {
         }
     };
 
-    setFieldError('surveyName', !nameVal, 'この入力は必須です');
-    setFieldError('displayTitle', !titleVal, 'この入力は必須です');
+    setFieldError('surveyName', !nameVal, t('surveyCreation.requiredField'));
+    setFieldError('displayTitle', !titleVal, t('surveyCreation.requiredField'));
 
     const periodRangeInput = document.getElementById('periodRange');
     const rangeError = document.getElementById('periodRangeError');
@@ -2381,7 +2598,7 @@ function validateFormForSaveButton() {
     if (rangeError) {
         let errorMessage = '';
         if (startMissing || endMissing) {
-            errorMessage = 'この入力は必須です';
+            errorMessage = t('surveyCreation.requiredField');
         } else if (!dateOrderValid) {
             errorMessage = '終了日は開始日以降に設定してください。';
         } else if (!startDateValid) {
@@ -2584,9 +2801,9 @@ function setupPreviewSwitcher() {
                             let message = '';
 
                             if (max > 0 && len > max) {
-                                message = `${len - max}文字超過しています。`;
+                                message = t('surveyCreation.maxLength', { count: len - max });
                             } else if (min > 0 && len < min) {
-                                message = `あと${min - len}文字必要です。`;
+                                message = t('surveyCreation.minLength', { count: min - len });
                             }
 
                             if (message) {
@@ -2811,9 +3028,9 @@ function renderSurveyPreview() {
                         let message = '';
 
                         if (maxLength > 0 && len > maxLength) {
-                            message = `${len - maxLength}文字超過しています。`;
+                            message = t('surveyCreation.maxLength', { count: len - maxLength });
                         } else if (minLength > 0 && len < minLength) {
-                            message = `あと${minLength - len}文字必要です。`;
+                            message = t('surveyCreation.minLength', { count: minLength - len });
                         }
 
                         console.log(`Input length: ${len}, min: ${minLength}, max: ${maxLength}, message: "${message}"`); // Debug log

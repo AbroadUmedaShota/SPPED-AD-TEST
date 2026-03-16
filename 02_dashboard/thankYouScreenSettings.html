@@ -31,12 +31,14 @@
 
                     <!-- 回答後の文言設定 -->
                     <section class="mb-8">
-                        <h2 class="text-xl font-semibold text-text-main mb-4">回答後の文言設定</h2>
+                        <h2 id="thankYouMessageSectionTitle" class="text-xl font-semibold text-text-main mb-4">回答後の文言設定</h2>
+                        <div id="thankYouLanguageTabs" class="mb-4 flex flex-wrap gap-2 hidden"></div>
                         <div class="relative">
                             <textarea id="thankYouMessage" class="input-field h-32" placeholder=" "></textarea>
-                            <label for="thankYouMessage" class="input-label">サンクスメッセージ</label>
+                            <label id="thankYouMessageLabel" for="thankYouMessage" class="input-label">サンクスメッセージ</label>
                         </div>
-                        <p class="text-sm text-text-sub mt-2">アンケート回答後に表示されるメッセージです。空欄の場合、デフォルトのメッセージが表示されます。</p>
+                        <p id="thankYouMessageReferenceHint" class="text-xs text-text-sub mt-1 leading-snug hidden"></p>
+                        <p id="thankYouMessageDescription" class="text-sm text-text-sub mt-2">アンケート回答後に表示されるメッセージです。空欄の場合、デフォルトのメッセージが表示されます。</p>
                         <div class="mt-1 flex justify-end text-xs text-text-sub">
                             <span id="thankYouMessageCounter">0/500</span>
                         </div>
@@ -45,11 +47,11 @@
 
                     <!-- 連続回答機能の可否 -->
                     <section class="mb-8">
-                        <h2 class="text-xl font-semibold text-text-main mb-4">連続回答機能</h2>
+                        <h2 id="continuousSectionTitle" class="text-xl font-semibold text-text-main mb-4">連続回答機能</h2>
                         <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
                             <div>
-                                <h3 class="font-medium text-text-main">連続回答を許可する</h3>
-                                <p class="text-sm text-text-sub mt-1">回答完了後、同じ端末で続けて別の回答ができるようにします。</p>
+                                <h3 id="continuousLabel" class="font-medium text-text-main">連続回答を許可する</h3>
+                                <p id="continuousDescription" class="text-sm text-text-sub mt-1">回答完了後、同じ端末で続けて別の回答ができるようにします。</p>
                             </div>
                             <label for="allowContinuousAnswer" class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" id="allowContinuousAnswer" role="switch" class="sr-only peer" checked>
