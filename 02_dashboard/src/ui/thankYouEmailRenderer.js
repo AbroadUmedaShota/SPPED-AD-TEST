@@ -45,7 +45,14 @@ function cacheDOMElements() {
     // ボタン
     dom.saveButton = document.getElementById('saveThankYouEmailSettingsBtn');
     dom.sendEmailButton = document.getElementById('sendThankYouEmailBtn');
-    dom.cancelButton = document.getElementById('cancelThankYouEmailSettings');
+
+    // ページネーション
+    dom.paginationContainer = document.getElementById('paginationContainer');
+    dom.totalRecipientCountInTable = document.getElementById('totalRecipientCountInTable');
+    dom.currentPageRange = document.getElementById('currentPageRange');
+    dom.prevPageBtn = document.getElementById('prevPageBtn');
+    dom.nextPageBtn = document.getElementById('nextPageBtn');
+    dom.pageNumbers = document.getElementById('pageNumbers');
 }
 
 /**
@@ -154,35 +161,41 @@ export function updateUI(isEnabled, status) {
 }
 
 /**
- * 宛先テーブルを行単位で描画します。
+ * 宛先テーブルを行単位で描画します（ページネーション対応）。
  */
-export function renderRecipientRows(recipients, status, onCheckboxChange) {
+export function renderRecipientRows(recipients, status, onCheckboxChange, pagination = { currentPage: 1, itemsPerPage: 20 }) {
     if (!dom.recipientTableBody) cacheDOMElements();
     
     dom.recipientTableBody.innerHTML = '';
     const isSent = status === 'after_event_sent';
-    const isReady = status === 'after_event_ready';
+    
+    // ページネーション計算
+    const totalCount = recipients.length;
+    const { currentPage, itemsPerPage } = pagination;
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, totalCount);
+    const paginatedRecipients = recipients.slice(startIndex, endIndex);
 
-    recipients.forEach(rec => {
+    paginatedRecipients.forEach(rec => {
         const tr = document.createElement('tr');
-        tr.className = `hover:bg-surface-container-low transition-colors ${(!rec.sendEnabled && !isSent) ? 'opacity-50' : ''}`;
+        tr.className = `hover:bg-primary/5 transition-colors ${(!rec.sendEnabled && !isSent) ? 'opacity-50' : ''}`;
         
         // ステータスバッジの生成
         let statusBadge = '';
         if (isSent || rec.status === 'excluded') {
             switch(rec.status) {
                 case 'sent':
-                    statusBadge = '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-success-container text-success">送信済み</span>';
+                    statusBadge = '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#e6f4ea] text-[#1e7e34]">送信済み</span>';
                     break;
                 case 'sent_with_warning':
-                    statusBadge = '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-success-container text-success border border-warning/30" title="空変数あり"><span class="material-icons text-[14px] mr-1">warning</span>送信済み</span>';
+                    statusBadge = '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#e6f4ea] text-[#1e7e34] ring-1 ring-inset ring-amber-400" title="空変数あり"><span class="material-icons text-[14px] mr-1 text-amber-500">warning</span>送信済み</span>';
                     break;
                 case 'failed':
-                    statusBadge = `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-error-container text-error" title="${rec.errorMsg || '送信失敗'}"><span class="material-icons text-[14px] mr-1">info</span>送信失敗</span>`;
+                    statusBadge = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#fce8e6] text-[#d93025]" title="${rec.errorMsg || '送信失敗'}"><span class="material-icons text-[14px] mr-1">info</span>送信失敗</span>`;
                     break;
                 case 'excluded':
                 default:
-                    statusBadge = '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-surface-container-highest text-on-surface-variant">対象外</span>';
+                    statusBadge = '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#f1f3f4] text-[#5f6368]">対象外</span>';
             }
         }
 
@@ -191,8 +204,8 @@ export function renderRecipientRows(recipients, status, onCheckboxChange) {
                 <input type="checkbox" class="recipient-cb form-checkbox text-primary rounded-md focus:ring-primary h-5 w-5 cursor-pointer" 
                     data-id="${rec.id}" ${rec.sendEnabled ? 'checked' : ''} ${isSent ? 'disabled' : ''}>
             </td>
-            <td class="p-4 font-medium text-on-surface">${rec.company}</td>
-            <td class="p-4">${rec.name}</td>
+            <td class="p-4 font-bold text-on-surface">${rec.company}</td>
+            <td class="p-4 font-medium">${rec.name}</td>
             <td class="p-4 text-on-surface-variant font-mono text-xs">${rec.email}</td>
             <td class="p-4">${statusBadge}</td>
         `;
@@ -207,6 +220,64 @@ export function renderRecipientRows(recipients, status, onCheckboxChange) {
 
         dom.recipientTableBody.appendChild(tr);
     });
+
+    // ページネーションUIの更新
+    updatePaginationUI(totalCount, pagination);
+}
+
+/**
+ * ページネーションUIを更新します。
+ */
+function updatePaginationUI(totalCount, { currentPage, itemsPerPage }) {
+    if (!dom.paginationContainer) return;
+
+    if (totalCount <= itemsPerPage) {
+        dom.paginationContainer.classList.add('hidden');
+        return;
+    }
+
+    dom.paginationContainer.classList.remove('hidden');
+    dom.totalRecipientCountInTable.textContent = totalCount.toLocaleString();
+    
+    const startIndex = (currentPage - 1) * itemsPerPage + 1;
+    const endIndex = Math.min(currentPage * itemsPerPage, totalCount);
+    dom.currentPageRange.textContent = `${startIndex} - ${endIndex}`;
+
+    const totalPages = Math.ceil(totalCount / itemsPerPage);
+    dom.prevPageBtn.disabled = currentPage === 1;
+    dom.nextPageBtn.disabled = currentPage === totalPages;
+
+    // ページ番号の描画（簡易版：現在のページとその前後のみ）
+    dom.pageNumbers.innerHTML = '';
+    const maxVisible = 5;
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+    
+    if (endPage - startPage < maxVisible - 1) {
+        startPage = Math.max(1, endPage - maxVisible + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+        const btn = document.createElement('button');
+        btn.className = `w-8 h-8 rounded-full transition-colors ${i === currentPage ? 'bg-primary text-white' : 'hover:bg-surface-variant text-on-surface-variant'}`;
+        btn.textContent = i;
+        btn.dataset.page = i;
+        dom.pageNumbers.appendChild(btn);
+    }
+}
+
+/**
+ * ページネーションのイベントリスナーを設定します。
+ */
+export function setupPaginationListeners(onPageChange) {
+    if (!dom.prevPageBtn) cacheDOMElements();
+
+    dom.prevPageBtn.onclick = () => onPageChange('prev');
+    dom.nextPageBtn.onclick = () => onPageChange('next');
+    dom.pageNumbers.onclick = (e) => {
+        const page = e.target.dataset.page;
+        if (page) onPageChange(parseInt(page));
+    };
 }
 
 /**
