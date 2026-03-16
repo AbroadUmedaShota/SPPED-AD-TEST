@@ -11,6 +11,7 @@ import {
     populateVariables,
     updateUI,
     renderRecipientRows,
+    setupPaginationListeners,
     updateCostUI,
     setButtonLoading
 } from './ui/thankYouEmailRenderer.js';
@@ -44,7 +45,11 @@ export function initThankYouEmailSettings() {
         emailTemplates: [],
         variables: [],
         recipients: [],
-        currentStatus: 'after_event_ready'
+        currentStatus: 'after_event_ready',
+        pagination: {
+            currentPage: 1,
+            itemsPerPage: 20
+        }
     };
 
     /**
@@ -128,54 +133,48 @@ export function initThankYouEmailSettings() {
                 state.recipients.forEach(r => {
                     if (r.status !== 'excluded') r.sendEnabled = isChecked;
                 });
-                renderRecipientRows(state.recipients, state.currentStatus, handleRowCheckboxChange);
+                renderRecipientRows(state.recipients, state.currentStatus, handleRowCheckboxChange, state.pagination);
                 updateCostFromState();
             });
         }
+
+        // ページネーション設定
+        setupPaginationListeners(handlePageChange);
     }
 
     function initEstimateSidebarToggle() {
         const sidebar = document.getElementById('estimateSidebar');
         const toggleBtn = document.getElementById('toggleEstimateSidebarBtn');
-        const overlay = document.getElementById('estimateSidebarOverlay');
+        const closeBtn = document.getElementById('closeEstimateSidebarBtn');
 
         if (!sidebar || !toggleBtn) {
             return;
         }
 
-        const toggleIcon = toggleBtn.querySelector('.material-icons');
-        let hasUserInteracted = false;
-
         const applySidebarState = (isCollapsed) => {
-            if (!toggleIcon) return;
             if (isCollapsed) {
                 sidebar.classList.add('translate-x-full');
-                toggleIcon.textContent = 'chevron_left';
                 toggleBtn.setAttribute('aria-expanded', 'false');
-                if (overlay) overlay.classList.remove('is-visible');
             } else {
                 sidebar.classList.remove('translate-x-full');
-                toggleIcon.textContent = 'chevron_right';
                 toggleBtn.setAttribute('aria-expanded', 'true');
-                if (overlay) overlay.classList.add('is-visible');
             }
         };
 
         toggleBtn.addEventListener('click', () => {
-            hasUserInteracted = true;
             const isCollapsed = sidebar.classList.contains('translate-x-full');
             applySidebarState(!isCollapsed);
         });
 
-        if (overlay) {
-            overlay.addEventListener('click', () => {
-                hasUserInteracted = true;
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
                 applySidebarState(true);
             });
         }
 
-        // 常に表示状態で開始（勝手に収納しない）
-        applySidebarState(false);
+        // 初期状態：1440px以上なら表示、それ以下なら隠す
+        const isSmallScreen = window.innerWidth < 1440;
+        applySidebarState(isSmallScreen);
     }
 
     async function handleScenarioSwitch(e) {
@@ -196,35 +195,44 @@ export function initThankYouEmailSettings() {
         const globalAlert = document.getElementById('globalStatusAlert');
         const resultCountDisplay = document.getElementById('sendResultCountDisplay');
 
-        // Reset display
-        tableWrapper.classList.add('hidden');
-        conditionMsg.classList.add('hidden');
-        globalAlert.classList.add('hidden');
-        resultCountDisplay.classList.add('hidden');
+        // 安全装置：要素が見つからない場合は処理をスキップ
+        if (tableWrapper) tableWrapper.classList.add('hidden');
+        if (conditionMsg) conditionMsg.classList.add('hidden');
+        if (globalAlert) globalAlert.classList.add('hidden');
+        if (resultCountDisplay) resultCountDisplay.classList.add('hidden');
 
         if (status === 'before_or_during_event' || status === 'after_event_processing') {
-            conditionMsg.classList.remove('hidden');
-            const msg = conditionMsg.querySelector('p');
-            if (msg) msg.textContent = status === 'before_or_during_event' 
-                ? '会期終了後、名刺データ化が完了すると対象者が表示されます。' 
-                : '現在アンケートおよび名刺データ化を処理中です。完了次第、対象者が表示されます。';
+            if (conditionMsg) {
+                conditionMsg.classList.remove('hidden');
+                const msg = conditionMsg.querySelector('p');
+                if (msg) msg.textContent = status === 'before_or_during_event' 
+                    ? '会期終了後、名刺データ化が完了すると対象者が表示されます。' 
+                    : '現在アンケートおよび名刺データ化を処理中です。完了次第、対象者が表示されます。';
+            }
             updateCostUI(0, 0, status);
         } else if (status === 'period_expired') {
-            globalAlert.classList.remove('hidden');
-            globalAlert.className = 'px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 bg-error-container text-on-error-container';
-            globalAlert.innerHTML = '<span class="material-icons text-sm">error</span>期限切れ';
+            if (globalAlert) {
+                globalAlert.classList.remove('hidden');
+                globalAlert.className = 'px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 bg-error-container text-on-error-container';
+                globalAlert.innerHTML = '<span class="material-icons text-sm">error</span>期限切れ';
+            }
             updateCostUI(0, 0, status);
         } else {
             // ready or sent
-            tableWrapper.classList.remove('hidden');
-            renderRecipientRows(state.recipients, status, handleRowCheckboxChange);
+            if (tableWrapper) tableWrapper.classList.remove('hidden');
+            // ページネーション情報を渡して描画
+            renderRecipientRows(state.recipients, status, handleRowCheckboxChange, state.pagination);
             updateCostFromState();
+        }
 
-            if (status === 'after_event_sent') {
+        if (status === 'after_event_sent') {
+            if (globalAlert) {
                 globalAlert.classList.remove('hidden');
                 globalAlert.className = 'px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 bg-success-container text-on-success-container';
                 globalAlert.innerHTML = '<span class="material-icons text-sm">check_circle</span>送信完了';
-                
+            }
+            
+            if (resultCountDisplay) {
                 resultCountDisplay.classList.remove('hidden');
                 const successCount = state.recipients.filter(r => r.status === 'sent' || r.status === 'sent_with_warning').length;
                 resultCountDisplay.textContent = `結果：${successCount}件`;
@@ -234,13 +242,33 @@ export function initThankYouEmailSettings() {
         handleRealtimePreview(status);
     }
 
+    /**
+     * ページ変更を処理します。
+     */
+    function handlePageChange(target) {
+        const totalPages = Math.ceil(state.recipients.length / state.pagination.itemsPerPage);
+        
+        if (target === 'prev') {
+            state.pagination.currentPage = Math.max(1, state.pagination.currentPage - 1);
+        } else if (target === 'next') {
+            state.pagination.currentPage = Math.min(totalPages, state.pagination.currentPage + 1);
+        } else if (typeof target === 'number') {
+            state.pagination.currentPage = target;
+        }
+
+        renderRecipientRows(state.recipients, state.currentStatus, handleRowCheckboxChange, state.pagination);
+        
+        // ページ移動時にテーブルトップへスクロール（親切設計！）
+        document.getElementById('recipientTableWrapper').scrollTop = 0;
+    }
+
     function handleRowCheckboxChange(id, isChecked) {
         const rec = state.recipients.find(r => r.id === id);
         if (rec) rec.sendEnabled = isChecked;
         
         // Update Select All checkbox state
         const enabledRecs = state.recipients.filter(r => r.status !== 'excluded');
-        selectAllCb.checked = enabledRecs.every(r => r.sendEnabled);
+        selectAllCb.checked = enabledRecs.length > 0 && enabledRecs.every(r => r.sendEnabled);
         
         updateCostFromState();
         handleRealtimePreview();
@@ -274,43 +302,48 @@ export function initThankYouEmailSettings() {
         let missingVarsSet = new Set();
         let missingCount = 0;
 
-        if (state.recipients && state.recipients.length > 0) {
-            const rec = state.recipients[0];
-            const dataMap = {
-                '会社名': rec.company, '部署名': rec.department, '役職': rec.title,
-                '氏名': rec.name, 'アンケート名': state.surveyData.name?.ja || '展示会名',
-                '自社担当者名': '担当 太郎'
-            };
-            
-            previewHTML = previewHTML.replace(/\{\{([^}]+)\}\}/g, (match, p1) => {
-                return dataMap[p1] !== undefined ? dataMap[p1] : match;
-            });
-            
-            // Check missing vars across enabled recipients
-            if (status === 'after_event_ready') {
-                const varsInBody = [...bodyText.matchAll(/\{\{([^}]+)\}\}/g)].map(m => m[1]);
-                state.recipients.forEach(r => {
-                    if (!r.sendEnabled) return;
-                    let hasMissing = false;
-                    varsInBody.forEach(v => {
-                        const val = r[v === '会社名' ? 'company' : v === '氏名' ? 'name' : v === '部署名' ? 'department' : v === '役職' ? 'title' : ''];
-                        if (val !== undefined && val.trim() === '') {
-                            missingVarsSet.add(v);
-                            hasMissing = true;
-                        }
-                    });
-                    if (hasMissing) missingCount++;
+        // 宛先データがある場合は1件目のデータを使用、ない場合はプレースホルダーを使用
+        const rec = (state.recipients && state.recipients.length > 0) ? state.recipients[0] : null;
+        
+        const dataMap = {
+            '会社名': rec?.company || '（株式会社サンプル）',
+            '部署名': rec?.department || '（営業部）',
+            '役職': rec?.title || '（課長）',
+            '氏名': rec?.name || '（山田 太郎）',
+            'アンケート名': state.surveyData?.name?.ja || state.surveyData?.surveyName || '（展示会名）',
+            '自社担当者名': '（担当 船長）'
+        };
+        
+        // 変数置換
+        previewHTML = previewHTML.replace(/\{\{([^}]+)\}\}/g, (match, p1) => {
+            const val = dataMap[p1];
+            return val !== undefined ? val : match;
+        });
+        
+        // 未設定項目のチェック (送信待機中のみ)
+        if (status === 'after_event_ready' && state.recipients.length > 0) {
+            const varsInBody = [...bodyText.matchAll(/\{\{([^}]+)\}\}/g)].map(m => m[1]);
+            state.recipients.forEach(r => {
+                if (!r.sendEnabled) return;
+                let hasMissing = false;
+                varsInBody.forEach(v => {
+                    const key = v === '会社名' ? 'company' : v === '氏名' ? 'name' : v === '部署名' ? 'department' : v === '役職' ? 'title' : '';
+                    if (key && (r[key] === undefined || r[key] === null || r[key].trim() === '')) {
+                        missingVarsSet.add(v);
+                        hasMissing = true;
+                    }
                 });
-            }
+                if (hasMissing) missingCount++;
+            });
         }
 
         previewArea.innerHTML = previewHTML;
         
-        if (missingCount > 0) {
+        if (missingCount > 0 && warningAlert) {
             missingVarsSpan.textContent = Array.from(missingVarsSet).join('、');
             missingCountSpan.textContent = missingCount;
             warningAlert.classList.remove('hidden');
-        } else {
+        } else if (warningAlert) {
             warningAlert.classList.add('hidden');
         }
     }
