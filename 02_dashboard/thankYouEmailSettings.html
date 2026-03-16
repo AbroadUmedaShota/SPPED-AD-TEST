@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SPEED-AD - お礼メール設定</title>
+    <!-- Prevent favicon 404 error -->
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <!-- Material Icons CDN -->
@@ -42,7 +44,7 @@
             <div class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-72 bg-gradient-to-br from-primary/10 via-secondary/10 to-tertiary/10 blur-3xl"></div>
             
             <!-- 再び中央固定 (max-w-1024px, mx-auto) -->
-            <div id="main-container" class="max-w-[1024px] mx-auto w-full flex flex-col gap-8 transition-all duration-500">
+            <div id="main-container" class="max-w-[1024px] mx-auto w-full flex flex-col gap-10 transition-all duration-500">
                 <!-- パンくずリスト & デモ用シナリオ切替 -->
                 <div class="flex flex-wrap justify-between items-center gap-4">
                     <div id="breadcrumb-container" class="flex-1"></div>
@@ -68,9 +70,9 @@
                 </div>
 
         <!-- アンケート基本情報 -->
-        <section class="rounded-3xl border border-outline-variant/60 bg-surface p-6 shadow-sm">
-            <div class="flex items-center gap-2 mb-4">
-                <h2 class="text-on-surface text-lg font-bold">アンケート基本情報</h2>
+        <section class="rounded-[2rem] border border-outline-variant/30 bg-surface p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+            <div class="flex items-center gap-2 mb-6">
+                <h2 class="text-on-surface text-xl font-black tracking-tight">アンケート基本情報</h2>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="space-y-1">
@@ -107,9 +109,9 @@
         </section>
 
         <!-- 送信方法の設定セクション -->
-        <section class="bg-surface p-6 rounded-3xl border border-outline-variant/60 shadow-sm space-y-6">
+        <section class="bg-surface p-8 rounded-[2rem] border border-outline-variant/30 shadow-[0_8px_30px_rgb(0,0,0,0.04)] space-y-8">
             <div class="flex items-center gap-2">
-                <h2 class="text-on-surface text-lg font-bold">送信設定</h2>
+                <h2 class="text-on-surface text-xl font-black tracking-tight">送信設定</h2>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <label class="group relative flex cursor-pointer rounded-2xl border border-outline-variant p-5 transition-all hover:bg-surface-container-low has-[:checked]:border-primary has-[:checked]:bg-primary-container/10 has-[:checked]:ring-2 has-[:checked]:ring-primary/20">
@@ -154,10 +156,10 @@
         </section>
 
                 <!-- メール内容設定 -->
-                <div class="bg-surface p-6 rounded-3xl border border-outline-variant/60 shadow-sm space-y-6">
+                <div class="bg-surface p-8 rounded-[2rem] border border-outline-variant/30 shadow-[0_8px_30px_rgb(0,0,0,0.04)] space-y-8">
                     <div class="flex flex-wrap items-center justify-between gap-4 mb-2">
                         <div class="flex items-center gap-2">
-                            <h2 class="text-on-surface text-lg font-bold">メール内容設定</h2>
+                            <h2 class="text-on-surface text-xl font-black tracking-tight">メール内容設定</h2>
                         </div>
                         <div class="w-full sm:w-72">
                             <div class="input-group !mt-0 !mb-0">
@@ -183,9 +185,9 @@
                                 <span class="material-icons text-primary text-base">add_circle</span>
                                 差し込み変数を挿入
                             </div>
-                            <span class="material-icons transition-transform duration-300" id="variablesToggleIcon">expand_more</span>
+                            <span class="material-icons transition-transform duration-300" id="variablesToggleIcon" style="transform: rotate(180deg)">expand_more</span>
                         </button>
-                        <div id="variableContainerWrapper" class="hidden transition-all duration-300 overflow-hidden">
+                        <div id="variableContainerWrapper" class="transition-all duration-300 overflow-hidden">
                             <div id="variableContainer" class="flex flex-wrap gap-2 p-2"></div>
                         </div>
                     </div>
@@ -218,9 +220,9 @@
                 </div>
 
                 <!-- 送信対象者リスト -->
-                <div class="bg-surface rounded-3xl border border-outline-variant/60 shadow-sm overflow-hidden flex flex-col">
-                    <div class="p-6 border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
-                        <h2 class="text-on-surface text-lg font-bold flex items-center gap-2">
+                <div class="bg-surface rounded-[2rem] border border-outline-variant/30 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden flex flex-col">
+                    <div class="p-6 border-b border-outline-variant/50 flex justify-between items-center bg-surface-container-lowest">
+                        <h2 class="text-on-surface text-xl font-black tracking-tight flex items-center gap-2">
                             <span class="material-icons text-on-surface-variant">people</span>
                             送信対象者リスト
                         </h2>
@@ -250,7 +252,7 @@
                         <!-- 左側: 表示件数プルダウン -->
                         <div class="flex items-center gap-2 text-xs text-on-surface-variant font-medium justify-start">
                             <label for="itemsPerPageSelect" class="sr-only">表示件数:</label>
-                            <select id="itemsPerPageSelect" class="bg-white border border-outline-variant rounded-md px-1 py-1 text-xs w-[4.5rem] focus:ring-primary focus:border-primary">
+                            <select id="itemsPerPageSelect" class="bg-white border border-outline-variant rounded-md px-1 py-1 text-xs w-[4.5rem] focus:ring-primary focus:border-primary text-center">
                                 <option value="20">20件</option>
                                 <option value="50">50件</option>
                                 <option value="100">100件</option>
