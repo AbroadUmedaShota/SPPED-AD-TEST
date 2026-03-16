@@ -110,6 +110,18 @@ export function initThankYouEmailSettings() {
 
         saveButton.addEventListener('click', handleSaveSettings);
         sendEmailButton.addEventListener('click', handleSendEmails);
+
+        const sendConfirmCancelBtn = document.getElementById('sendConfirmCancelBtn');
+        if (sendConfirmCancelBtn) {
+            sendConfirmCancelBtn.addEventListener('click', () => {
+                document.getElementById('sendConfirmModal').classList.add('hidden');
+            });
+        }
+        
+        const sendConfirmExecuteBtn = document.getElementById('sendConfirmExecuteBtn');
+        if (sendConfirmExecuteBtn) {
+            sendConfirmExecuteBtn.addEventListener('click', executeSendEmails);
+        }
         scenarioSelector.addEventListener('change', handleScenarioSwitch);
 
         // Variables toggle
@@ -131,7 +143,8 @@ export function initThankYouEmailSettings() {
             selectAllCb.addEventListener('change', (e) => {
                 const isChecked = e.target.checked;
                 state.recipients.forEach(r => {
-                    if (r.status !== 'excluded') r.sendEnabled = isChecked;
+                    r.sendEnabled = isChecked;
+                    r.status = isChecked ? 'pending' : 'excluded';
                 });
                 renderRecipientRows(state.recipients, state.currentStatus, handleRowCheckboxChange, state.pagination);
                 updateCostFromState();
@@ -139,7 +152,7 @@ export function initThankYouEmailSettings() {
         }
 
         // ページネーション設定
-        setupPaginationListeners(handlePageChange);
+        setupPaginationListeners(handlePageChange, handleItemsPerPageChange);
     }
 
     function initEstimateSidebarToggle() {
@@ -151,35 +164,91 @@ export function initThankYouEmailSettings() {
             return;
         }
 
-        const applySidebarState = (isCollapsed) => {
-            if (isCollapsed) {
-                sidebar.classList.add('translate-x-full');
-                toggleBtn.setAttribute('aria-expanded', 'false');
+        // アニメーション用のクラスを追加
+        sidebar.classList.add('transition-all', 'duration-500', 'ease-in-out', 'transform');
+
+        const applySidebarState = () => {
+            // 被り防止：コンテンツエリア(max-w-1024px)の右端 + サイドバー幅 + バッファ が画面幅に収まるか動的に判定
+            // ※ main-content は flex-1 で画面幅いっぱいになるので、実際のコンテンツ幅基準の main-container を使用
+            const mainContainer = document.getElementById('main-container');
+            const sidebarWidth = sidebar.offsetWidth || 350;
+            const BUFFER = 16; // 余白バッファ（px）
+
+            let mainRight = 0;
+            if (mainContainer) {
+                const mainRect = mainContainer.getBoundingClientRect();
+                // コンテンツエリアのright端（画面左端からの距離）
+                mainRight = mainRect.right;
+            }
+
+            // 画面右端からメイン右端までの残りスペース
+            const availableSpace = window.innerWidth - mainRight;
+            const hasEnoughSpace = availableSpace >= sidebarWidth + BUFFER;
+
+            if (!hasEnoughSpace) {
+                // スペース不足: サイドバーを右に隠す
+                sidebar.classList.add('translate-x-full', 'opacity-0', 'pointer-events-none');
+                sidebar.classList.remove('translate-x-0', 'opacity-100');
+                sidebar.style.right = '';
             } else {
-                sidebar.classList.remove('translate-x-full');
-                toggleBtn.setAttribute('aria-expanded', 'true');
+                // スペース十分: 余白の中央に配置
+                const rightOffset = (availableSpace - sidebarWidth) / 2;
+                sidebar.style.right = Math.max(0, rightOffset) + 'px';
+                sidebar.classList.remove('hidden', 'translate-x-full', 'opacity-0', 'pointer-events-none');
+                sidebar.classList.add('fixed', 'translate-x-0', 'opacity-100');
             }
         };
 
-        toggleBtn.addEventListener('click', () => {
-            const isCollapsed = sidebar.classList.contains('translate-x-full');
-            applySidebarState(!isCollapsed);
-        });
+        // ウィンドウリサイズ時にも適用
+        window.addEventListener('resize', applySidebarState);
 
         if (closeBtn) {
             closeBtn.addEventListener('click', () => {
-                applySidebarState(true);
+                sidebar.classList.add('translate-x-full', 'opacity-0');
             });
         }
 
-        // 初期状態：1440px以上なら表示、それ以下なら隠す
-        const isSmallScreen = window.innerWidth < 1440;
-        applySidebarState(isSmallScreen);
+        // 初期実行
+        applySidebarState();
     }
 
     async function handleScenarioSwitch(e) {
         state.currentStatus = e.target.value;
+        
+        // デモ用：送信完了シナリオに切り替えた際、ステータスをランダムに割り振る
+        if (state.currentStatus === 'after_event_sent') {
+            state.recipients.forEach((r, index) => {
+                if (!r.sendEnabled) {
+                    r.status = 'excluded';
+                } else {
+                    // 90%成功、5%警告、5%失敗の割合でシミュレート
+                    const rand = Math.random();
+                    if (rand < 0.90) r.status = 'sent';
+                    else if (rand < 0.95) r.status = 'sent_with_warning';
+                    else {
+                        r.status = 'failed';
+                        r.errorMsg = '宛先不明またはドメインエラー';
+                    }
+                }
+            });
+        } else {
+            // 待機状態などに戻す場合はpendingに戻す
+            state.recipients.forEach(r => {
+                if (r.status !== 'excluded') r.status = 'pending';
+            });
+        }
+
         await applyScenario(state.currentStatus);
+    }
+    
+    /**
+     * 表示件数の変更を処理します。
+     */
+    function handleItemsPerPageChange(newLimit) {
+        state.pagination.itemsPerPage = newLimit;
+        state.pagination.currentPage = 1; // 件数が変わったら1ページ目に戻す
+        renderRecipientRows(state.recipients, state.currentStatus, handleRowCheckboxChange, state.pagination);
+        document.getElementById('recipientTableWrapper').scrollTop = 0;
     }
 
     async function applyScenario(status) {
@@ -216,10 +285,25 @@ export function initThankYouEmailSettings() {
                 globalAlert.className = 'px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 bg-error-container text-on-error-container';
                 globalAlert.innerHTML = '<span class="material-icons text-sm">error</span>期限切れ';
             }
+            // テーブルが存在すれば表示しつつグレーアウト（参照可能・操作不可）
+            if (state.recipients.length > 0) {
+                if (tableWrapper) {
+                    tableWrapper.classList.remove('hidden');
+                    tableWrapper.style.opacity = '0.5';
+                    tableWrapper.style.pointerEvents = 'none';
+                }
+                renderRecipientRows(state.recipients, status, handleRowCheckboxChange, state.pagination);
+            } else {
+                if (conditionMsg) conditionMsg.classList.remove('hidden');
+            }
             updateCostUI(0, 0, status);
         } else {
-            // ready or sent
-            if (tableWrapper) tableWrapper.classList.remove('hidden');
+            // ready or sent - グレーアウト解除
+            if (tableWrapper) {
+                tableWrapper.style.opacity = '';
+                tableWrapper.style.pointerEvents = '';
+                tableWrapper.classList.remove('hidden');
+            }
             // ページネーション情報を渡して描画
             renderRecipientRows(state.recipients, status, handleRowCheckboxChange, state.pagination);
             updateCostFromState();
@@ -264,11 +348,17 @@ export function initThankYouEmailSettings() {
 
     function handleRowCheckboxChange(id, isChecked) {
         const rec = state.recipients.find(r => r.id === id);
-        if (rec) rec.sendEnabled = isChecked;
+        if (rec) {
+            rec.sendEnabled = isChecked;
+            rec.status = isChecked ? 'pending' : 'excluded';
+        }
         
         // Update Select All checkbox state
         const enabledRecs = state.recipients.filter(r => r.status !== 'excluded');
         selectAllCb.checked = enabledRecs.length > 0 && enabledRecs.every(r => r.sendEnabled);
+        
+        // ステータスバッジの表示もあるのでテーブルを再描画
+        renderRecipientRows(state.recipients, state.currentStatus, handleRowCheckboxChange, state.pagination);
         
         updateCostFromState();
         handleRealtimePreview();
@@ -286,14 +376,16 @@ export function initThankYouEmailSettings() {
 
     function handleRealtimePreview(statusOverride = null) {
         const bodyText = emailBodyTextarea.value;
-        const previewArea = document.getElementById('previewArea');
+        const subjectText = emailSubjectInput.value;
+        const previewSubject = document.getElementById('previewSubject');
+        const previewBody = document.getElementById('previewBody');
         const warningAlert = document.getElementById('variableWarningAlert');
         const missingVarsSpan = document.getElementById('missingVariablesText');
         const missingCountSpan = document.getElementById('missingVariablesCount');
 
         const status = statusOverride || state.currentStatus;
 
-        if (!previewArea) return;
+        if (!previewBody || !previewSubject) return;
 
         let previewHTML = bodyText
             .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
@@ -305,24 +397,37 @@ export function initThankYouEmailSettings() {
         // 宛先データがある場合は1件目のデータを使用、ない場合はプレースホルダーを使用
         const rec = (state.recipients && state.recipients.length > 0) ? state.recipients[0] : null;
         
+        const repName = window.dummyUserData 
+            ? `${window.dummyUserData.lastName || ''} ${window.dummyUserData.firstName || ''}`.trim()
+            : '';
+            
         const dataMap = {
             '会社名': rec?.company || '（株式会社サンプル）',
             '部署名': rec?.department || '（営業部）',
             '役職': rec?.title || '（課長）',
             '氏名': rec?.name || '（山田 太郎）',
             'アンケート名': state.surveyData?.name?.ja || state.surveyData?.surveyName || '（展示会名）',
-            '自社担当者名': '（担当 船長）'
+            '自社担当者名': repName || '（担当者名）'
         };
         
-        // 変数置換
+        // 変数置換 (本文)
         previewHTML = previewHTML.replace(/\{\{([^}]+)\}\}/g, (match, p1) => {
             const val = dataMap[p1];
             return val !== undefined ? val : match;
         });
-        
+
+        // 変数置換 (件名)
+        let subjectHTML = subjectText
+            .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        subjectHTML = subjectHTML.replace(/\{\{([^}]+)\}\}/g, (match, p1) => {
+            const val = dataMap[p1];
+            return val !== undefined ? val : match;
+        });
+
         // 未設定項目のチェック (送信待機中のみ)
         if (status === 'after_event_ready' && state.recipients.length > 0) {
-            const varsInBody = [...bodyText.matchAll(/\{\{([^}]+)\}\}/g)].map(m => m[1]);
+            const varsInBody = [...`${subjectText} ${bodyText}`.matchAll(/\{\{([^}]+)\}\}/g)].map(m => m[1]);
             state.recipients.forEach(r => {
                 if (!r.sendEnabled) return;
                 let hasMissing = false;
@@ -337,7 +442,8 @@ export function initThankYouEmailSettings() {
             });
         }
 
-        previewArea.innerHTML = previewHTML;
+        previewSubject.innerHTML = subjectHTML || '<span class="text-on-surface-variant/50 font-normal">（件名が未入力です）</span>';
+        previewBody.innerHTML = previewHTML;
         
         if (missingCount > 0 && warningAlert) {
             missingVarsSpan.textContent = Array.from(missingVarsSet).join('、');
@@ -387,7 +493,7 @@ export function initThankYouEmailSettings() {
         }
     }
 
-    async function handleSendEmails() {
+    function handleSendEmails() {
         const activeCount = state.recipients.filter(r => r.sendEnabled).length;
         if (activeCount === 0) return showToast('送信対象がいません。', 'info');
 
@@ -395,21 +501,53 @@ export function initThankYouEmailSettings() {
         const billableCount = Math.max(0, activeCount - FREE_LIMIT);
         const cost = billableCount * 1;
 
-        if (confirm(`お礼メールを${activeCount}件送信しますか？\n合計金額（予想）: ¥${cost.toLocaleString()} (税別)\nこの操作は取り消せません。`)) {
-            setButtonLoading(sendEmailButton, true);
-            try {
-                await sendThankYouEmails(state.surveyId);
-                showToast('送信を開始しました。', 'success');
-                state.currentStatus = 'after_event_sent';
-                scenarioSelector.value = 'after_event_sent';
-                state.recipients.forEach(r => { if(r.sendEnabled) r.status = 'sent'; });
-                await applyScenario('after_event_sent');
-            } catch (e) {
-                showToast('送信に失敗しました。', 'error');
-            } finally {
-                setButtonLoading(sendEmailButton, false);
-            }
+        document.getElementById('modalActiveCount').textContent = activeCount;
+        document.getElementById('modalCost').textContent = `¥${cost.toLocaleString()}`;
+        document.getElementById('sendConfirmModal').classList.remove('hidden');
+    }
+
+    async function executeSendEmails() {
+        const sendConfirmExecuteBtn = document.getElementById('sendConfirmExecuteBtn');
+        const defaultText = sendConfirmExecuteBtn.querySelector('span:not(.material-icons)').textContent;
+        
+        // ボタンのテキストを送信中に変更し、ローディング状態に
+        sendConfirmExecuteBtn.querySelector('span:not(.material-icons)').textContent = '送信中...';
+        setButtonLoading(sendConfirmExecuteBtn, true);
+        
+        try {
+            await sendThankYouEmails(state.surveyId);
+        } catch (e) {
+            // モック用：APIからエラーが返っても、フロントでは成功扱いにする
+            console.warn('API error ignored for mock demonstration:', e);
         }
+        
+        // モック用の意図的なタイムラグ（送信中の通信状態を演出）
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        showToast('送信を開始しました。', 'success');
+        state.currentStatus = 'after_event_sent';
+        
+        // 成功したていでステータスを更新する
+        state.recipients.forEach(r => {
+            if (!r.sendEnabled) {
+                r.status = 'excluded';
+            } else {
+                const rand = Math.random();
+                if (rand < 0.90) r.status = 'sent';
+                else if (rand < 0.95) r.status = 'sent_with_warning';
+                else {
+                    r.status = 'failed';
+                    r.errorMsg = '宛先不明またはドメインエラー';
+                }
+            }
+        });
+
+        scenarioSelector.value = 'after_event_sent';
+        await applyScenario('after_event_sent');
+        
+        setButtonLoading(sendConfirmExecuteBtn, false);
+        sendConfirmExecuteBtn.querySelector('span:not(.material-icons)').textContent = defaultText;
+        document.getElementById('sendConfirmModal').classList.add('hidden');
     }
 
     initializePage();

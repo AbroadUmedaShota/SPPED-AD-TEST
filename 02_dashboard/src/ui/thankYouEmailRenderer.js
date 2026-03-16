@@ -178,24 +178,49 @@ export function renderRecipientRows(recipients, status, onCheckboxChange, pagina
 
     paginatedRecipients.forEach(rec => {
         const tr = document.createElement('tr');
-        tr.className = `hover:bg-primary/5 transition-colors ${(!rec.sendEnabled && !isSent) ? 'opacity-50' : ''}`;
+        const isExcluded = rec.status === 'excluded';
+        
+        // デモ用：送信完了シナリオなら、pendingステータスもsentとして扱う
+        let displayStatus = rec.status;
+        if (isSent && displayStatus === 'pending') {
+            displayStatus = 'sent';
+        }
+
+        // ステータスに応じた行の背景色設定
+        let rowBgClass = 'hover:bg-primary/5';
+        if (isSent || isExcluded) {
+            switch(displayStatus) {
+                case 'sent':
+                case 'sent_with_warning':
+                    rowBgClass = 'bg-green-50 hover:bg-green-100'; // 明るい緑
+                    break;
+                case 'failed':
+                    rowBgClass = 'bg-red-50 hover:bg-red-100'; // 明るい赤
+                    break;
+                case 'excluded':
+                    rowBgClass = 'bg-gray-100 hover:bg-gray-200'; // グレー
+                    break;
+            }
+        }
+        
+        tr.className = `transition-colors ${rowBgClass} ${(!rec.sendEnabled && !isSent && !isExcluded) ? 'opacity-50' : ''}`;
         
         // ステータスバッジの生成
         let statusBadge = '';
-        if (isSent || rec.status === 'excluded') {
-            switch(rec.status) {
+        if (isSent || isExcluded) {
+            switch(displayStatus) {
                 case 'sent':
-                    statusBadge = '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#e6f4ea] text-[#1e7e34]">送信済み</span>';
+                    statusBadge = '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-black bg-white/90 text-green-700 border border-green-200 shadow-sm">送信完了</span>';
                     break;
                 case 'sent_with_warning':
-                    statusBadge = '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#e6f4ea] text-[#1e7e34] ring-1 ring-inset ring-amber-400" title="空変数あり"><span class="material-icons text-[14px] mr-1 text-amber-500">warning</span>送信済み</span>';
+                    statusBadge = '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-black bg-white/90 text-green-700 ring-1 ring-inset ring-amber-400 border border-green-200 shadow-sm" title="空変数あり"><span class="material-icons text-[14px] mr-1 text-amber-500">warning</span>送信完了</span>';
                     break;
                 case 'failed':
-                    statusBadge = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#fce8e6] text-[#d93025]" title="${rec.errorMsg || '送信失敗'}"><span class="material-icons text-[14px] mr-1">info</span>送信失敗</span>`;
+                    statusBadge = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-black bg-white/90 text-red-700 border border-red-200 shadow-sm" title="${rec.errorMsg || '送信失敗'}"><span class="material-icons text-[14px] mr-1">info</span>送信エラー</span>`;
                     break;
                 case 'excluded':
                 default:
-                    statusBadge = '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#f1f3f4] text-[#5f6368]">対象外</span>';
+                    statusBadge = '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-black bg-white/90 text-gray-600 border border-gray-200 shadow-sm">対象外</span>';
             }
         }
 
@@ -210,11 +235,14 @@ export function renderRecipientRows(recipients, status, onCheckboxChange, pagina
             <td class="p-4">${statusBadge}</td>
         `;
 
+        // isExcluded 判定は、現在ステータスではなく、ここで描画する際の isExcluded 判定に基づく
         if (!isSent) {
             const cb = tr.querySelector('.recipient-cb');
             cb.addEventListener('change', (e) => {
-                tr.classList.toggle('opacity-50', !e.target.checked);
-                onCheckboxChange(parseInt(e.target.dataset.id), e.target.checked);
+                const isChecked = e.target.checked;
+                tr.classList.toggle('opacity-50', !isChecked);
+                // ステータスバッジの更新（DOMを直接書き換えるか、親に任せて再描画させるか。今回は親に再描画させる方針を前提とするため、ステータス変更は親のハンドラに任せる）
+                onCheckboxChange(parseInt(e.target.dataset.id), isChecked);
             });
         }
 
@@ -269,15 +297,24 @@ function updatePaginationUI(totalCount, { currentPage, itemsPerPage }) {
 /**
  * ページネーションのイベントリスナーを設定します。
  */
-export function setupPaginationListeners(onPageChange) {
+export function setupPaginationListeners(onPageChange, onItemsPerPageChange) {
     if (!dom.prevPageBtn) cacheDOMElements();
+    dom.itemsPerPageSelect = document.getElementById('itemsPerPageSelect');
 
-    dom.prevPageBtn.onclick = () => onPageChange('prev');
-    dom.nextPageBtn.onclick = () => onPageChange('next');
-    dom.pageNumbers.onclick = (e) => {
-        const page = e.target.dataset.page;
-        if (page) onPageChange(parseInt(page));
-    };
+    if (dom.prevPageBtn) dom.prevPageBtn.onclick = () => onPageChange('prev');
+    if (dom.nextPageBtn) dom.nextPageBtn.onclick = () => onPageChange('next');
+    if (dom.pageNumbers) {
+        dom.pageNumbers.onclick = (e) => {
+            const page = e.target.dataset.page;
+            if (page) onPageChange(parseInt(page));
+        };
+    }
+    
+    if (dom.itemsPerPageSelect && onItemsPerPageChange) {
+        dom.itemsPerPageSelect.addEventListener('change', (e) => {
+            onItemsPerPageChange(parseInt(e.target.value));
+        });
+    }
 }
 
 /**

@@ -35,10 +35,10 @@ const generateMockRecipients = (count) => {
         const company = companies[i % companies.length];
         const dept = departments[i % departments.length];
         const title = titles[i % titles.length];
-        const name = `${names[i % names.length]} (${i})`;
+        const name = names[i % names.length];
         const email = `user${i}@example.com`;
         const sendEnabled = i % 10 !== 0; // 10件に1件は初期チェック外す
-        const status = (i % 20 === 0) ? 'excluded' : 'pending'; // 20件に1件は対象外
+        const status = sendEnabled ? 'pending' : 'excluded'; // チェックが外れている場合は対象外
 
         data.push({
             id: i,
@@ -58,12 +58,29 @@ const generateMockRecipients = (count) => {
 
 const mockRecipientsData = generateMockRecipients(500);
 
+const DEFAULT_SUBJECT = 'この度はご来場いただきありがとうございました';
+const DEFAULT_BODY = `{{会社名}}
+{{部署名}} {{役職}}
+{{氏名}} 様
+
+この度は「{{アンケート名}}」にご参加いただきまして、誠にありがとうございました。
+
+お忙しい中、貴重なお時間をいただきましたことを心より感謝申し上げます。
+いただいたご意見・ご要望は今後のサービス改善に活かしてまいります。
+
+改めてご不明な点やご質問等がございましたら、お気軽にご連絡ください。
+
+どうぞよろしくお願いいたします。
+
+---
+{{自社担当者名}}`;
+
 const mockEmailTemplates = {
-    'default': { id: 'default', name: 'デフォルトテンプレート', subject: 'ご来場ありがとうございました', body: '本日はご来場いただき、誠にありがとうございました。\n\n株式会社〇〇\n{会社名} {氏名}様' },
-    'special': { id: 'special', name: '特別オファー', subject: '【特別オファー】ご来場者様限定', body: '先日は、弊社ブースにお立ち寄りいただき、誠にありがとうございました。\n\n{会社名} {氏名}様\n\n特別なご案内がございます。' },
+    'default': { id: 'default', name: '標準文面（初期設定）', subject: DEFAULT_SUBJECT, body: DEFAULT_BODY },
+    'special': { id: 'special', name: '特別オファー', subject: '【特別オファー】ご来場者様限定', body: `{{会社名}} {{氏名}}様\n\n先日は、弊社ブースにお立ち寄りいただき、誠にありがとうございました。\n\n特別なご案内がございます。\n\n{{自社担当者名}}` },
 };
 
-const mockVariables = ['会社名', '氏名', '部署名', '役職'];
+const mockVariables = ['会社名', '部署名', '役職', '氏名', 'アンケート名', '自社担当者名'];
 
 // --- Service Functions ---
 
@@ -101,16 +118,16 @@ export async function getInitialData(surveyId) {
             : { 
                 thankYouEmailEnabled: true, 
                 sendMethod: 'manual',
-                emailTemplateId: '',
-                emailSubject: '',
-                emailBody: ''
+                emailTemplateId: 'default',
+                emailSubject: DEFAULT_SUBJECT,
+                emailBody: DEFAULT_BODY
               };
 
         return {
             surveyData: surveyData,
             emailSettings: settings,
             emailTemplates: Object.values(mockEmailTemplates),
-            variables: mockVariables
+            variables: mockVariables.map(v => ({ name: v, value: v }))
         };
 
     } catch (error) {
