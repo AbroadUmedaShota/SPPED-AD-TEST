@@ -7,8 +7,27 @@ import { resolveDashboardDataPath } from '../utils.js';
 
 // --- Mock Data ---
 
-
-
+/**
+ * @typedef {Object} Recipient
+ * @property {number}  id          - 内部識別ID
+ * @property {string}  company     - 企業名
+ * @property {string}  department  - 部署名（空文字の場合あり）
+ * @property {string}  title       - 役職名（空文字の場合あり）
+ * @property {string}  name        - 氏名
+ * @property {string}  email       - メールアドレス
+ * @property {boolean} sendEnabled - 送信チェックボックスの初期値
+ * @property {string}  status      - 'pending' | 'sent' | 'sent_with_warning' | 'failed' | 'excluded'
+ * @property {string}  [errorMsg]  - status が 'failed' の場合のエラー理由
+ * @property {boolean} [hasEmptyVariable] - true の場合、差し込み変数に空値が含まれていた（⚠️表示の根拠）
+ * @property {string}  [sentAt]    - 送信日時（ISO 8601。未送信・対象外は undefined）
+ */
+const mockRecipientsData = [
+    { id: 1, company: '株式会社A', department: '営業部', title: '部長', name: '山田 太郎', email: 'yamada@example.com', sendEnabled: true, status: 'pending', hasEmptyVariable: false },
+    { id: 2, company: 'B株式会社', department: '', title: '', name: '佐藤 花子', email: 'sato@example.com', sendEnabled: true, status: 'pending', hasEmptyVariable: true }, // Empty variables
+    { id: 3, company: 'Cコーポレーション', department: '開発部', title: 'マネージャー', name: '鈴木 一郎', email: 'suzuki@example.com', sendEnabled: true, status: 'pending', hasEmptyVariable: false },
+    { id: 4, company: '合同会社D', department: 'マーケティング部', title: 'リーダー', name: '田中 美咲', email: 'tanaka@example.com', sendEnabled: false, status: 'excluded', hasEmptyVariable: false }, // Initially excluded
+    { id: 5, company: 'E商事', department: '総務部', title: '', name: '高橋 健太', email: 'takahashi@example.com', sendEnabled: true, status: 'pending', hasEmptyVariable: true },
+];
 
 const mockEmailTemplates = {
     'default': { id: 'default', name: 'デフォルトテンプレート', subject: 'ご来場ありがとうございました', body: '本日はご来場いただき、誠にありがとうございました。\n\n株式会社〇〇\n{会社名} {氏名}様' },
@@ -69,6 +88,17 @@ export async function getInitialData(surveyId) {
         console.error('Failed to get initial data:', error);
         throw new Error('Failed to load initial data.');
     }
+}
+
+/**
+ * アンケートIDに紐づく回答者（送信対象者）のモックデータを取得します。
+ * @param {string} surveyId 
+ * @returns {Promise<Array<Recipient>>}
+ */
+export async function getRecipientsData(surveyId) {
+    // In a real app, you'd fetch based on surveyId. Here we return mock data.
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return JSON.parse(JSON.stringify(mockRecipientsData)); // Deep copy to avoid mutating original mock
 }
 
 /**

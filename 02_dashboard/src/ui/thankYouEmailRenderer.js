@@ -81,7 +81,7 @@ export function populateVariables(variables, onVariableClick) {
         const item = document.createElement('a');
         item.href = '#';
         item.className = 'block px-4 py-2 text-sm text-on-surface hover:bg-surface-variant';
-        item.textContent = `{${variable}}`;
+        item.textContent = `{{${variable}}}`;
         item.addEventListener('click', (e) => {
             e.preventDefault();
             onVariableClick(variable);
