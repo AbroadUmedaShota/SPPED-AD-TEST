@@ -38,6 +38,17 @@
                 <!-- タイトルエリア -->
                 <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant">
                     <h1 class="text-on-background text-2xl sm:text-3xl font-bold leading-tight tracking-tight" id="pageTitle">アンケート『<span id="surveyNameInTitle"></span>』のお礼メール設定</h1>
+                    <!-- シナリオコントロール（モック用） -->
+                    <div class="flex items-center gap-2">
+                        <label for="scenarioSelector" class="text-sm font-semibold text-on-surface">シナリオ切替 (Dev):</label>
+                        <select id="scenarioSelector" class="px-3 py-1.5 border border-outline rounded-md text-sm bg-surface">
+                            <option value="before_or_during_event">① 会期前・会期中</option>
+                            <option value="after_event_processing">② データ化処理中</option>
+                            <option value="after_event_ready">③ 送信待機 (完了)</option>
+                            <option value="after_event_sent">④ 送信完了</option>
+                            <option value="period_expired">⑤ 送信期間外</option>
+                        </select>
+                    </div>
                 </div>
 
                 <!-- アンケート基本情報表示エリア -->
@@ -75,8 +86,9 @@
 
                             <!-- Email Subject -->
                             <div class="input-group">
-                                <input type="text" id="emailSubject" placeholder=" " class="input-field">
+                                <input type="text" id="emailSubject" placeholder=" " class="input-field" maxlength="255">
                                 <label for="emailSubject" class="input-label">メール件名</label>
+                                <p class="text-xs text-on-surface-variant mt-1 text-right"><span id="subjectCharCount">0</span> / 255文字</p>
                             </div>
 
                             <!-- Email Body & Variables -->
@@ -91,7 +103,12 @@
                                 <textarea id="emailBody" rows="10" placeholder=" " class="input-field"></textarea>
                                 <div id="emailBodyRealtimePreview" class="mt-4 p-4 bg-surface-container rounded-lg text-sm">
                                     <h4 class="font-bold mb-2 text-on-surface-variant">リアルタイムプレビュー</h4>
-                                    <p class="text-on-surface-variant">ここにメール本文のリアルタイムプレビューが表示されます。</p>
+                                    <!-- 変数未設定アラート領域 -->
+                                    <div id="variableWarningAlert" class="hidden mb-3 p-3 bg-[#fef7e0] text-[#b06000] rounded-md text-xs font-bold flex items-start gap-2 border border-[#fce8b2]">
+                                        <span class="material-icons text-base leading-none">warning</span>
+                                        <span>※ 注意：「<span id="missingVariablesText"></span>」が未設定の対象者が<span id="missingVariablesCount"></span>名含まれています。</span>
+                                    </div>
+                                    <p id="previewContent" class="text-on-surface-variant">ここにメール本文のリアルタイムプレビューが表示されます。</p>
                                 </div>
                             </div>
                         </div>
@@ -132,17 +149,63 @@
 
                             <!-- All settings fields container (for enable/disable logic) -->
                             <div id="thankYouEmailSettingsFields" class="space-y-6">
-                                <!-- Recipient List -->
+                                <!-- Recipient List & Cost -->
                                 <div class="p-4 bg-surface-container rounded-lg text-sm">
-                                    <h4 class="font-bold mb-2 text-on-surface-variant">送信対象者リスト</h4>
-                                    <div id="recipientList">
-                                        <p class="text-on-surface-variant text-sm">送信対象者: <span id="recipientCount" class="font-bold">0件</span></p>
-                                        <p id="recipientConditionMessage" class="text-sm text-on-surface-variant mt-2">会期終了後、名刺データ化が完了すると対象者が表示されます。</p>
+                                    
+                                    <!-- Cost calculation block -->
+                                    <div id="costCalculationBlock" class="mb-4 p-3 bg-surface border border-outline-variant rounded-md flex flex-col gap-1">
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-on-surface-variant font-semibold">送信対象件数</span>
+                                            <span class="font-bold"><span id="recipientCount">0</span>件 / 全<span id="totalRecipientCount">0</span>件</span>
+                                        </div>
+                                        <div class="flex justify-between items-center text-xs text-on-surface-variant">
+                                            <span>無料枠残数</span>
+                                            <span><span id="freeLimitCount">100</span>件まで無料</span>
+                                        </div>
+                                        <div class="flex justify-between items-center border-t border-outline-variant mt-2 pt-2">
+                                            <span class="text-on-surface font-bold">ご請求見込み金額</span>
+                                            <div class="text-right">
+                                                <span class="text-lg font-bold text-primary"><span id="estimatedCost">0</span>円</span>
+                                                <span class="text-xs text-on-surface-variant ml-1">（※税別）</span>
+                                            </div>
+                                        </div>
+                                        <div id="finalCostBlock" class="hidden flex justify-between items-center border-t border-outline-variant mt-2 pt-2">
+                                            <span class="text-on-surface font-bold">確定金額</span>
+                                            <div class="text-right">
+                                                <span class="text-lg font-bold text-primary"><span id="finalCost">0</span>円</span>
+                                                <span class="text-xs text-on-surface-variant ml-1">（※税別）</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <h4 class="font-bold mb-2 text-on-surface-variant flex justify-between items-end">
+                                        <span>送信対象者リスト</span>
+                                        <span id="sendResultCountDisplay" class="hidden text-xs text-primary bg-primary/10 px-2 py-1 rounded">送信結果：0件</span>
+                                    </h4>
+                                    
+                                    <!-- Global status alert -->
+                                    <div id="globalStatusAlert" class="hidden mb-3 p-3 rounded-md text-sm font-semibold flex items-center gap-2"></div>
+                                    
+                                    <div id="recipientListContainer" class="bg-surface border border-outline-variant rounded-md overflow-hidden flex flex-col max-h-[400px]">
+                                        <div id="recipientConditionMessage" class="p-4 text-center text-sm text-on-surface-variant">
+                                            会期終了後、名刺データ化が完了すると対象者が表示されます。
+                                        </div>
+                                        <!-- Table Header -->
+                                        <div id="recipientTableHeader" class="hidden grid grid-cols-[40px_1fr_1fr_1.5fr_100px] gap-2 p-2 bg-surface-variant text-on-surface-variant text-xs font-bold border-b border-outline-variant sticky top-0">
+                                            <div class="flex items-center justify-center">
+                                                <input type="checkbox" id="selectAllRecipients" class="form-checkbox text-primary rounded rounded-sm focus:ring-primary h-4 w-4">
+                                            </div>
+                                            <div>企業名</div>
+                                            <div>氏名</div>
+                                            <div>メールアドレス</div>
+                                            <div id="statusHeaderColumn">ステータス</div>
+                                        </div>
+                                        <!-- Virtual Scroll Container for Rows -->
+                                        <div id="recipientTableBody" class="hidden overflow-y-auto overflow-x-hidden relative flex-1">
+                                            <!-- Rows rendered by JS -->
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                             <div id="sendEmailStatus" class="mt-4 text-center text-sm text-on-surface-variant">
-                                <!-- Send status: Sending / Sent / Failed -->
                             </div>
                         </div>
                     </div>
