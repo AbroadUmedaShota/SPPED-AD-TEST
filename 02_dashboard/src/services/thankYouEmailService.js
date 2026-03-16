@@ -21,13 +21,42 @@ import { resolveDashboardDataPath } from '../utils.js';
  * @property {boolean} [hasEmptyVariable] - true の場合、差し込み変数に空値が含まれていた（⚠️表示の根拠）
  * @property {string}  [sentAt]    - 送信日時（ISO 8601。未送信・対象外は undefined）
  */
-const mockRecipientsData = [
-    { id: 1, company: '株式会社A', department: '営業部', title: '部長', name: '山田 太郎', email: 'yamada@example.com', sendEnabled: true, status: 'pending', hasEmptyVariable: false },
-    { id: 2, company: 'B株式会社', department: '', title: '', name: '佐藤 花子', email: 'sato@example.com', sendEnabled: true, status: 'pending', hasEmptyVariable: true }, // Empty variables
-    { id: 3, company: 'Cコーポレーション', department: '開発部', title: 'マネージャー', name: '鈴木 一郎', email: 'suzuki@example.com', sendEnabled: true, status: 'pending', hasEmptyVariable: false },
-    { id: 4, company: '合同会社D', department: 'マーケティング部', title: 'リーダー', name: '田中 美咲', email: 'tanaka@example.com', sendEnabled: false, status: 'excluded', hasEmptyVariable: false }, // Initially excluded
-    { id: 5, company: 'E商事', department: '総務部', title: '', name: '高橋 健太', email: 'takahashi@example.com', sendEnabled: true, status: 'pending', hasEmptyVariable: true },
-];
+/**
+ * 500件のモックデータを生成します。
+ */
+const generateMockRecipients = (count) => {
+    const companies = ['株式会社A', 'B株式会社', 'Cコーポレーション', '合同会社D', 'E商事', 'Fシステム', 'Gテック', 'Hフーズ', 'I建設', 'J銀行'];
+    const departments = ['営業部', '開発部', 'マーケティング部', '総務部', '人事部', '経理部', '広報部', '法務部', 'カスタマーサクセス', ''];
+    const titles = ['部長', '課長', 'マネージャー', 'リーダー', '係長', '主任', '一般職', '代表取締役', '役員', ''];
+    const names = ['山田 太郎', '佐藤 花子', '鈴木 一郎', '田中 美咲', '高橋 健太', '伊藤 結衣', '渡辺 直樹', '中村 真由美', '小林 剛', '加藤 恵'];
+
+    const data = [];
+    for (let i = 1; i <= count; i++) {
+        const company = companies[i % companies.length];
+        const dept = departments[i % departments.length];
+        const title = titles[i % titles.length];
+        const name = `${names[i % names.length]} (${i})`;
+        const email = `user${i}@example.com`;
+        const sendEnabled = i % 10 !== 0; // 10件に1件は初期チェック外す
+        const status = (i % 20 === 0) ? 'excluded' : 'pending'; // 20件に1件は対象外
+
+        data.push({
+            id: i,
+            company: `${company} ${i}`,
+            department: dept,
+            title: title,
+            name: name,
+            email: email,
+            sendEnabled: sendEnabled,
+            status: status,
+            hasEmptyVariable: dept === '' || title === '',
+            sentAt: undefined
+        });
+    }
+    return data;
+};
+
+const mockRecipientsData = generateMockRecipients(500);
 
 const mockEmailTemplates = {
     'default': { id: 'default', name: 'デフォルトテンプレート', subject: 'ご来場ありがとうございました', body: '本日はご来場いただき、誠にありがとうございました。\n\n株式会社〇〇\n{会社名} {氏名}様' },

@@ -29,7 +29,6 @@ export function initThankYouEmailSettings() {
     
     const saveButton = document.getElementById('saveThankYouEmailSettingsBtn');
     const sendEmailButton = document.getElementById('sendThankYouEmailBtn');
-    const cancelButton = document.getElementById('cancelThankYouEmailSettings');
 
     // Sidebar elements
     const estimateSidebar = document.getElementById('estimateSidebar');
@@ -106,7 +105,6 @@ export function initThankYouEmailSettings() {
 
         saveButton.addEventListener('click', handleSaveSettings);
         sendEmailButton.addEventListener('click', handleSendEmails);
-        cancelButton.addEventListener('click', handleCancel);
         scenarioSelector.addEventListener('change', handleScenarioSwitch);
 
         // Variables toggle
@@ -176,17 +174,8 @@ export function initThankYouEmailSettings() {
             });
         }
 
-        // Initialize state (start as collapsed to be consistent)
-        applySidebarState(true);
-        
-        // Show then auto-collapse after a short delay (like bizcardSettings)
-        setTimeout(() => {
-            applySidebarState(false); // Briefly show
-            setTimeout(() => {
-                if (hasUserInteracted) return;
-                applySidebarState(true); // Automatically collapse
-            }, 800);
-        }, 100);
+        // 常に表示状態で開始（勝手に収納しない）
+        applySidebarState(false);
     }
 
     async function handleScenarioSwitch(e) {
@@ -388,11 +377,6 @@ export function initThankYouEmailSettings() {
                 setButtonLoading(sendEmailButton, false);
             }
         }
-    }
-
-    function handleCancel() {
-        const returnUrl = state.surveyId ? 'index.html' : 'surveyCreation.html';
-        window.location.href = returnUrl;
     }
 
     initializePage();
