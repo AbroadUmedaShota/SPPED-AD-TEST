@@ -93,6 +93,7 @@ export function initThankYouEmailSettings() {
             populateTemplates(state.emailTemplates);
             populateVariables(state.variables, handleVariableClick);
             setInitialFormValues(state.emailSettings);
+            updateSendMethodCardSelection();
 
             setupEventListeners();
             initEstimateSidebarToggle();
@@ -256,7 +257,12 @@ export function initThankYouEmailSettings() {
     }
 
     async function applyScenario(status) {
-        if (state.recipients.length === 0 && (status === 'after_event_ready' || status === 'after_event_sent' || status === 'after_event_processing')) {
+        if (state.recipients.length === 0 && (
+            status === 'after_event_ready' ||
+            status === 'after_event_sent' ||
+            status === 'after_event_processing' ||
+            status === 'period_expired'
+        )) {
             state.recipients = await getRecipientsData(state.surveyId);
         }
 
@@ -299,6 +305,10 @@ export function initThankYouEmailSettings() {
         if (globalAlert) globalAlert.classList.add('hidden');
         if (resultCountDisplay) resultCountDisplay.classList.add('hidden');
 
+        // 期限切れバナーをリセット（一旦非表示）
+        const expiredBanner = document.getElementById('expiredPeriodBanner');
+        if (expiredBanner) expiredBanner.classList.add('hidden');
+
         if (status === 'before_or_during_event') {
             if (conditionMsg) {
                 conditionMsg.classList.remove('hidden');
@@ -307,10 +317,21 @@ export function initThankYouEmailSettings() {
             }
             updateCostFromState();
         } else if (status === 'period_expired') {
-            if (globalAlert) {
-                globalAlert.classList.remove('hidden');
-                globalAlert.className = 'px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 bg-error-container text-on-error-container';
-                globalAlert.innerHTML = '<span class="material-icons text-sm">error</span>期限切れ';
+            // 上部バナーを表示
+            if (expiredBanner) {
+                expiredBanner.classList.remove('hidden');
+                void expiredBanner.offsetWidth;
+
+                // 「対象者リストを見る」ボタンのスムーズスクロール
+                const scrollBtn = document.getElementById('scrollToRecipientListBtn');
+                if (scrollBtn) {
+                    const newBtn = scrollBtn.cloneNode(true);
+                    scrollBtn.replaceWith(newBtn);
+                    newBtn.addEventListener('click', () => {
+                        const target = document.getElementById('recipientTableWrapper');
+                        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    });
+                }
             }
             // テーブルが存在すれば表示しつつグレーアウト（参照可能・操作不可）
             if (state.recipients.length > 0) {
@@ -558,7 +579,23 @@ export function initThankYouEmailSettings() {
         }
     }
 
+    /**
+     * 送信設定カードの選択状態をJSで制御します。
+     */
+    function updateSendMethodCardSelection() {
+        const cards = document.querySelectorAll('.send-method-card');
+        cards.forEach(card => {
+            const radio = card.querySelector('input[type="radio"]');
+            if (radio && radio.checked) {
+                card.classList.add('selected');
+            } else {
+                card.classList.remove('selected');
+            }
+        });
+    }
+
     function handleFormChange() {
+        updateSendMethodCardSelection();
         const selectedMethod = document.querySelector('input[name="sendMethod"]:checked')?.value;
         const isEnabled = selectedMethod !== 'none';
         updateUI(isEnabled, state.currentStatus);
