@@ -70,17 +70,14 @@ const DEFAULT_BODY = `{{会社名}}
 
 改めてご不明な点やご質問等がございましたら、お気軽にご連絡ください。
 
-どうぞよろしくお願いいたします。
-
----
-{{自社担当者名}}`;
+どうぞよろしくお願いいたします。`;
 
 const mockEmailTemplates = {
     'default': { id: 'default', name: '標準文面（初期設定）', subject: DEFAULT_SUBJECT, body: DEFAULT_BODY },
-    'special': { id: 'special', name: '特別オファー', subject: '【特別オファー】ご来場者様限定', body: `{{会社名}} {{氏名}}様\n\n先日は、弊社ブースにお立ち寄りいただき、誠にありがとうございました。\n\n特別なご案内がございます。\n\n{{自社担当者名}}` },
+    'special': { id: 'special', name: '特別オファー', subject: '【特別オファー】ご来場者様限定', body: `{{会社名}} {{氏名}}様\n\n先日は、弊社ブースにお立ち寄りいただき、誠にありがとうございました。\n\n特別なご案内がございます。` },
 };
 
-const mockVariables = ['会社名', '部署名', '役職', '氏名', 'アンケート名', '自社担当者名'];
+const mockVariables = ['会社名', '部署名', '役職', '氏名', 'アンケート名'];
 
 // --- Service Functions ---
 
@@ -127,7 +124,11 @@ export async function getInitialData(surveyId) {
             surveyData: surveyData,
             emailSettings: settings,
             emailTemplates: Object.values(mockEmailTemplates),
-            variables: mockVariables.map(v => ({ name: v, value: v }))
+            variables: mockVariables.map(v => ({ 
+                name: v, 
+                value: v,
+                category: v === 'アンケート名' ? 'survey' : 'recipient'
+            }))
         };
 
     } catch (error) {

@@ -117,7 +117,13 @@ export function populateVariables(variables, onVariableClick) {
     variables.forEach(variable => {
         const badge = document.createElement('button');
         badge.type = 'button';
-        badge.className = 'variable-badge px-3 py-1.5 bg-secondary-container text-on-secondary-container rounded-full text-xs font-bold hover:shadow-md transition-all flex items-center gap-1';
+        
+        // カテゴリに応じて色分け（他社宛：secondary、自社/アンケート：amber）
+        const colorClass = variable.category === 'survey' 
+            ? 'bg-amber-100 text-amber-900 border border-amber-200' 
+            : 'bg-secondary-container text-on-secondary-container';
+
+        badge.className = `variable-badge px-3 py-1.5 ${colorClass} rounded-full text-xs font-bold hover:shadow-md transition-all flex items-center gap-1`;
         badge.innerHTML = `<span class="material-icons text-xs">add</span>{{${variable.name}}}`;
         badge.addEventListener('click', () => onVariableClick(variable.name));
         dom.variableContainer.appendChild(badge);
@@ -168,6 +174,8 @@ export function renderRecipientRows(recipients, status, onCheckboxChange, pagina
     
     dom.recipientTableBody.innerHTML = '';
     const isSent = status === 'after_event_sent';
+    const isProcessing = status === 'after_event_processing';
+    const isExpired = status === 'period_expired';
     
     // ページネーション計算
     const totalCount = recipients.length;
@@ -188,60 +196,69 @@ export function renderRecipientRows(recipients, status, onCheckboxChange, pagina
 
         // ステータスに応じた行の背景色設定
         let rowBgClass = 'hover:bg-primary/5';
-        if (isSent || isExcluded) {
+        if (isExpired) {
+            rowBgClass = ''; // 期限切れ時は背景なし（グレーアウトはwrapper側で制御）
+        } else if (isSent || isExcluded) {
             switch(displayStatus) {
                 case 'sent':
-                case 'sent_with_warning':
-                    rowBgClass = 'bg-green-50 hover:bg-green-100'; // 明るい緑
+                    rowBgClass = 'bg-green-50 hover:bg-green-100';
                     break;
                 case 'failed':
-                    rowBgClass = 'bg-red-50 hover:bg-red-100'; // 明るい赤
+                    rowBgClass = 'bg-red-50 hover:bg-red-100';
                     break;
                 case 'excluded':
-                    rowBgClass = 'bg-gray-100 hover:bg-gray-200'; // グレー
+                    rowBgClass = 'bg-gray-100 hover:bg-gray-200';
                     break;
             }
         }
         
         tr.className = `transition-colors ${rowBgClass} ${(!rec.sendEnabled && !isSent && !isExcluded) ? 'opacity-50' : ''}`;
         
-        // ステータスバッジの生成
+        // データ化中の判定
+        const isEntryProcessing = isProcessing && (!rec.company || !rec.name);
+        
+        // ステータスバッジの生成（期限切れ時は非表示）
         let statusBadge = '';
-        if (isSent || isExcluded) {
-            switch(displayStatus) {
-                case 'sent':
-                    statusBadge = '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-black bg-white/90 text-green-700 border border-green-200 shadow-sm">送信完了</span>';
-                    break;
-                case 'sent_with_warning':
-                    statusBadge = '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-black bg-white/90 text-green-700 ring-1 ring-inset ring-amber-400 border border-green-200 shadow-sm" title="空変数あり"><span class="material-icons text-[14px] mr-1 text-amber-500">warning</span>送信完了</span>';
-                    break;
-                case 'failed':
-                    statusBadge = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-black bg-white/90 text-red-700 border border-red-200 shadow-sm" title="${rec.errorMsg || '送信失敗'}"><span class="material-icons text-[14px] mr-1">info</span>送信エラー</span>`;
-                    break;
-                case 'excluded':
-                default:
-                    statusBadge = '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-black bg-white/90 text-gray-600 border border-gray-200 shadow-sm">対象外</span>';
+        if (!isExpired) {
+            if (isEntryProcessing) {
+                statusBadge = '<span class="processing-text text-xs">データ化中</span>';
+            } else if (isSent || isExcluded) {
+                switch(displayStatus) {
+                    case 'sent':
+                        statusBadge = '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-black bg-white/90 text-green-700 border border-green-200 shadow-sm">送信完了</span>';
+                        break;
+                    case 'failed':
+                        statusBadge = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-black bg-white/90 text-red-700 border border-red-200 shadow-sm" title="${rec.errorMsg || '送信失敗'}"><span class="material-icons text-[14px] mr-1">info</span>送信エラー</span>`;
+                        break;
+                    case 'excluded':
+                    default:
+                        statusBadge = '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-black bg-white/90 text-gray-600 border border-gray-200 shadow-sm">対象外</span>';
+                }
+            } else if (isProcessing) {
+                statusBadge = '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-black bg-blue-50 text-blue-700 border border-blue-200 shadow-sm">データ化完了</span>';
             }
         }
+
+        const companyDisp = isEntryProcessing ? '<span class="processing-text text-xs">データ化中</span>' : rec.company;
+        const nameDisp = isEntryProcessing ? '<span class="processing-text text-xs">データ化中</span>' : rec.name;
+        const emailDisp = isEntryProcessing ? '---' : rec.email;
 
         tr.innerHTML = `
             <td class="p-4 text-center">
                 <input type="checkbox" class="recipient-cb form-checkbox text-primary rounded-md focus:ring-primary h-5 w-5 cursor-pointer" 
-                    data-id="${rec.id}" ${rec.sendEnabled ? 'checked' : ''} ${isSent ? 'disabled' : ''}>
+                    data-id="${rec.id}" ${rec.sendEnabled ? 'checked' : ''} ${(isSent || isEntryProcessing) ? 'disabled' : ''}>
             </td>
-            <td class="p-4 font-bold text-on-surface">${rec.company}</td>
-            <td class="p-4 font-medium">${rec.name}</td>
-            <td class="p-4 text-on-surface-variant font-mono text-xs">${rec.email}</td>
+            <td class="p-4 font-bold text-on-surface">${companyDisp}</td>
+            <td class="p-4 font-medium">${nameDisp}</td>
+            <td class="p-4 text-on-surface-variant font-mono text-xs">${emailDisp}</td>
             <td class="p-4">${statusBadge}</td>
         `;
 
-        // isExcluded 判定は、現在ステータスではなく、ここで描画する際の isExcluded 判定に基づく
-        if (!isSent) {
+        if (!isSent && !isEntryProcessing) {
             const cb = tr.querySelector('.recipient-cb');
             cb.addEventListener('change', (e) => {
                 const isChecked = e.target.checked;
                 tr.classList.toggle('opacity-50', !isChecked);
-                // ステータスバッジの更新（DOMを直接書き換えるか、親に任せて再描画させるか。今回は親に再描画させる方針を前提とするため、ステータス変更は親のハンドラに任せる）
                 onCheckboxChange(parseInt(e.target.dataset.id), isChecked);
             });
         }
@@ -320,31 +337,115 @@ export function setupPaginationListeners(onPageChange, onItemsPerPageChange) {
 /**
  * 費用表示を更新します。
  */
-export function updateCostUI(activeCount, totalCount, status) {
-    if (!dom.recipientCount) cacheDOMElements();
+export function renderEstimate(estimate, status) {
+    if (!dom.estimatedAmount) cacheDOMElements();
 
-    const FREE_LIMIT = 100;
-    const UNIT_PRICE = 1;
+    const amountEl = dom.estimatedAmount;
+    const countDisplay = document.getElementById('recipientCountDisplay');
+    const billableCountDisplay = document.getElementById('billableCountDisplay');
+    const estimateBreakdown = document.getElementById('estimateBreakdown');
 
-    // 無料枠の適用数（送信対象が100通以下ならその数、100通以上なら100通）
-    const freeApplied = Math.min(activeCount, FREE_LIMIT);
-    // 課金対象（送信対象 - 無料枠、マイナスにならないように）
-    const billable = Math.max(0, activeCount - FREE_LIMIT);
-    const cost = billable * UNIT_PRICE;
-
-    dom.recipientCount.textContent = activeCount.toLocaleString();
-    if (dom.totalRecipientCount) dom.totalRecipientCount.textContent = totalCount.toLocaleString();
-    if (dom.freeTierApplied) dom.freeTierApplied.textContent = freeApplied.toLocaleString();
-    if (dom.billableCount) dom.billableCount.textContent = billable.toLocaleString();
-
-    dom.estimatedAmount.textContent = `¥${cost.toLocaleString()}`;
+    // 税込合計をメインに表示
+    if (amountEl) {
+        amountEl.textContent = `¥${estimate.totalWithTax.toLocaleString()}`;
+    }
     
-    if (status === 'after_event_sent') {
-        dom.costLabel.textContent = '確定合計金額';
-        dom.costLabel.classList.add('text-success');
+    if (countDisplay) {
+        countDisplay.textContent = `${estimate.activeCount.toLocaleString()} 名`;
+    }
+
+    if (billableCountDisplay) {
+        // 課金対象件数（送信数 - 無料枠100）
+        const billable = Math.max(0, estimate.activeCount - 100);
+        billableCountDisplay.textContent = `${billable.toLocaleString()} 通`;
+    }
+
+    // 内訳の更新（より詳細に！）
+    if (estimateBreakdown) {
+        let html = `
+            <div class="space-y-2 border-b border-outline-variant/30 pb-3 mb-3">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs">お礼メール基本料金 (¥${estimate.unitPrice} × ${estimate.activeCount}名)</span>
+                    <span class="font-medium">¥${estimate.baseAmount.toLocaleString()}</span>
+                </div>
+                <div class="flex justify-between items-center text-success font-bold text-xs">
+                    <span class="flex items-center gap-1">
+                        <span class="material-icons text-[14px]">info</span>
+                        無料枠適用 (100名分)
+                    </span>
+                    <span>- ¥${estimate.freeDiscount.toLocaleString()}</span>
+                </div>
+        `;
+
+        // クーポンがある場合
+        if (estimate.couponDiscount > 0) {
+            html += `
+                <div class="flex justify-between items-center text-secondary font-bold text-xs">
+                    <span class="flex items-center gap-1">
+                        <span class="material-icons text-[14px]">confirmation_number</span>
+                        クーポン値引き
+                    </span>
+                    <span>- ¥${estimate.couponDiscount.toLocaleString()}</span>
+                </div>
+            `;
+        }
+
+        html += `
+            </div>
+            <div class="space-y-1">
+                <div class="flex justify-between items-center text-xs">
+                    <span class="text-on-surface-variant">税抜合計 (小計)</span>
+                    <span class="font-bold">¥${estimate.subtotal.toLocaleString()}</span>
+                </div>
+                <div class="flex justify-between items-center text-xs">
+                    <span class="text-on-surface-variant font-medium">消費税 (10%)</span>
+                    <span class="font-medium">¥${estimate.tax.toLocaleString()}</span>
+                </div>
+                <div class="flex justify-between items-center pt-2 mt-1 border-t border-dashed border-outline-variant text-on-surface">
+                    <span class="text-sm font-black">税込合計金額</span>
+                    <span class="text-lg font-black tracking-tight">¥${estimate.totalWithTax.toLocaleString()}</span>
+                </div>
+            </div>
+        `;
+
+        estimateBreakdown.innerHTML = html;
+        estimateBreakdown.className = "p-4 rounded-2xl bg-surface-container-low/50 border border-outline-variant/20 space-y-1";
+    }
+}
+
+/**
+ * クーポン検証結果をUIに反映します。
+ */
+export function displayCouponResult(result) {
+    const feedbackEl = document.getElementById('couponFeedback');
+    const messageEl = document.getElementById('couponMessage');
+    const errorEl = document.getElementById('couponCodeErrorMessage');
+    const couponCodeInput = document.getElementById('couponCode');
+
+    if (!feedbackEl) return;
+
+    feedbackEl.classList.remove('hidden', 'bg-success-container', 'text-on-success-container', 'bg-error-container', 'text-on-error-container');
+    if (errorEl) errorEl.textContent = '';
+    if (messageEl) messageEl.textContent = '';
+
+    if (result.success) {
+        feedbackEl.classList.add('hidden'); // 成功時はメッセージエリアで出す
+        if (messageEl) {
+            messageEl.textContent = result.message;
+            messageEl.className = 'text-sm text-secondary font-bold animate-pulse';
+        }
+        if (couponCodeInput) {
+            couponCodeInput.classList.remove('border-error');
+            couponCodeInput.classList.add('border-secondary');
+        }
     } else {
-        dom.costLabel.textContent = '合計金額（予想）';
-        dom.costLabel.classList.remove('text-success');
+        if (errorEl) {
+            errorEl.textContent = result.message;
+        }
+        if (couponCodeInput) {
+            couponCodeInput.classList.add('border-error');
+            couponCodeInput.classList.remove('border-secondary');
+        }
     }
 }
 
