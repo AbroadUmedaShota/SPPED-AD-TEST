@@ -177,7 +177,7 @@
                 <div class="space-y-2">
                     <p class="text-[10px] text-on-surface-variant font-black uppercase tracking-widest flex items-center gap-1">
                         アンケート名
-                        <span class="material-icons text-primary/40 text-sm cursor-help">info</span>
+                        <span class="material-icons text-primary/40 text-sm cursor-help" title="御社内でアンケートを識別するための名前です。&#10;回答者の画面では表示されません。">help_outline</span>
                     </p>
                     <p id="surveyNameDisplay" class="text-on-surface font-bold text-lg">---</p>
                 </div>
@@ -186,7 +186,10 @@
                     <p id="surveyIdDisplay" class="text-on-surface font-mono font-bold bg-surface-container-low px-2 py-1 rounded-md inline-block">---</p>
                 </div>
                 <div class="space-y-2">
-                    <p class="text-[10px] text-on-surface-variant font-black uppercase tracking-widest">会期期間</p>
+                    <p class="text-[10px] text-on-surface-variant font-black uppercase tracking-widest flex items-center gap-1">
+                        会期期間
+                        <span class="material-icons text-primary/40 text-sm cursor-help" title="アンケートの有効回答期間です。&#10;この期間前に登録された回答はサンプルとしてデータ格納されます。&#10;この期間後はアンケートの回答が出来なくなります。&#10;開始日は、アンケート新規作成日の翌日から設定する事ができます。&#10;終了日は、開始日と同日～30日後までの日にちで設定する事ができます。&#10;会期開始後は、以下の変更ができなくなります。&#10;・アンケート名や展示会会期の変更。&#10;・アンケートの設問の変更、またアンケートの削除。&#10;・名刺データ化設定の変更。">help_outline</span>
+                    </p>
                     <p id="surveyPeriodDisplay" class="text-on-surface font-bold">---</p>
                 </div>
             </div>
@@ -200,42 +203,45 @@
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- 手動送信 -->
-                <label class="group relative flex flex-col gap-3 p-6 rounded-2xl border-2 border-outline-variant/50 cursor-pointer transition-all hover:bg-surface-container-low has-[:checked]:border-primary has-[:checked]:bg-primary/[0.03] shadow-sm h-full">
+                <label class="send-method-card selected relative flex flex-col gap-3 p-6 rounded-2xl cursor-pointer shadow-sm h-full" for="method-manual">
                     <input type="radio" name="sendMethod" id="method-manual" value="manual" class="sr-only" checked>
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center group-has-[:checked]:bg-primary group-has-[:checked]:text-white transition-colors">
+                        <div class="card-icon w-10 h-10 rounded-full flex items-center justify-center">
                             <span class="material-icons">send</span>
                         </div>
                         <span class="font-black text-on-surface">手動送信</span>
                     </div>
                     <p class="text-xs text-on-surface-variant leading-relaxed font-medium">データ化完了後、内容を確認してから手動で送信します。</p>
-                    <span class="material-icons text-primary absolute top-6 right-6 text-2xl opacity-0 group-has-[:checked]:opacity-100 transition-opacity">check_circle</span>
+                    <span class="card-check-icon material-icons text-primary absolute top-6 right-6 text-2xl">check_circle</span>
                 </label>
 
                 <!-- 自動送信 -->
-                <label class="group relative flex flex-col gap-3 p-6 rounded-2xl border-2 border-outline-variant/50 cursor-pointer transition-all hover:bg-surface-container-low has-[:checked]:border-primary has-[:checked]:bg-primary/[0.03] shadow-sm h-full">
+                <label class="send-method-card relative flex flex-col gap-3 p-6 rounded-2xl cursor-pointer shadow-sm h-full" for="method-auto">
                     <input type="radio" name="sendMethod" id="method-auto" value="auto" class="sr-only">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center group-has-[:checked]:bg-primary group-has-[:checked]:text-white transition-colors">
+                        <div class="card-icon w-10 h-10 rounded-full flex items-center justify-center">
                             <span class="material-icons">flash_on</span>
                         </div>
                         <span class="font-black text-on-surface">自動送信</span>
                     </div>
                     <p class="text-xs text-on-surface-variant leading-relaxed font-medium">データ化完了を検知次第、即座にメールを自動送信します。</p>
-                    <span class="material-icons text-primary absolute top-6 right-6 text-2xl opacity-0 group-has-[:checked]:opacity-100 transition-opacity">check_circle</span>
+                    <span class="card-check-icon material-icons text-primary absolute top-6 right-6 text-2xl">check_circle</span>
                 </label>
 
                 <!-- 送信しない -->
-                <label class="group relative flex flex-col gap-3 p-6 rounded-2xl border-2 border-outline-variant/50 cursor-pointer transition-all hover:bg-surface-container-low has-[:checked]:border-primary has-[:checked]:bg-primary/[0.03] shadow-sm h-full">
+                <label class="send-method-card relative flex flex-col gap-3 p-6 rounded-2xl cursor-pointer shadow-sm h-full" for="method-none">
                     <input type="radio" name="sendMethod" id="method-none" value="none" class="sr-only">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center group-has-[:checked]:bg-primary group-has-[:checked]:text-white transition-colors">
+                        <div class="card-icon w-10 h-10 rounded-full flex items-center justify-center">
                             <span class="material-icons">block</span>
                         </div>
-                        <span class="font-black text-on-surface">送信しない</span>
+                        <span class="font-black text-on-surface flex items-center gap-1">
+                            送信しない
+                            <span class="material-icons text-primary/40 text-sm cursor-help" title="「御礼メールを送らない」を選択すると、御礼メールの送信確認メールが届かなくなります。&#10;「御礼メールを送る」を選択していた場合も、送信確認メールのURLから「送信する」ボタンを押すまでは御礼メールは送られません。">help_outline</span>
+                        </span>
                     </div>
                     <p class="text-xs text-on-surface-variant leading-relaxed font-medium">このアンケートではお礼メール機能を使用しません。</p>
-                    <span class="material-icons text-primary absolute top-6 right-6 text-2xl opacity-0 group-has-[:checked]:opacity-100 transition-opacity">check_circle</span>
+                    <span class="card-check-icon material-icons text-primary absolute top-6 right-6 text-2xl">check_circle</span>
                 </label>
             </div>
         </section>
