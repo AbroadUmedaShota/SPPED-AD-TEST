@@ -60,46 +60,6 @@
                     .4em 0 0 #9CA3AF;
             }
         }
-
-        /* 送信設定カード: 選択状態 */
-        .send-method-card {
-            border: 2px solid rgba(var(--md-sys-color-outline-variant, 198 206 218) / 0.5);
-            transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
-        }
-        .send-method-card:hover {
-            background-color: rgba(var(--md-sys-color-surface-container-low, 241 244 249) / 1);
-        }
-        .send-method-card.selected {
-            border-color: var(--md-sys-color-primary, #4361ee);
-            background-color: rgba(67, 97, 238, 0.04);
-            box-shadow: 0 0 0 1px var(--md-sys-color-primary, #4361ee);
-        }
-        /* 選択時のアイコン背景 */
-        .send-method-card .card-icon {
-            background-color: rgb(var(--md-sys-color-surface-container-high, 225 230 238));
-            color: inherit;
-            transition: background-color 0.2s ease, color 0.2s ease;
-        }
-        .send-method-card.selected .card-icon {
-            background-color: var(--md-sys-color-primary, #4361ee);
-            color: white;
-        }
-        /* 選択済みチェックアイコン */
-        .send-method-card .card-check-icon {
-            opacity: 0;
-            transition: opacity 0.2s ease;
-        }
-        .send-method-card.selected .card-check-icon {
-            opacity: 1;
-        }
-        /* 送信期限切れバナー */
-        @keyframes bannerSlideIn {
-            from { opacity: 0; transform: translateY(-12px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-        #expiredPeriodBanner {
-            animation: bannerSlideIn 0.4s ease forwards;
-        }
     </style>
 </head>
 <body class="bg-background text-on-background font-sans">
@@ -145,28 +105,6 @@
                     </h1>
                 </div>
 
-                <!-- 期限切れアラートバナー (STEP5時のみ表示) -->
-                <div id="expiredPeriodBanner" class="hidden">
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 rounded-2xl border-2 border-red-300 bg-red-50 p-5 shadow-md">
-                        <div class="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-full bg-red-100 border border-red-200">
-                            <span class="material-icons text-red-500 text-2xl">timer_off</span>
-                        </div>
-                        <div class="flex-1 space-y-1 min-w-0">
-                            <p class="text-red-700 font-black text-base leading-snug flex items-center gap-2">
-                                <span class="inline-block w-2 h-2 rounded-full bg-red-500 flex-shrink-0"></span>
-                                お礼メールの送信期限が終了しています。
-                            </p>
-                            <p class="text-red-600/80 text-sm font-medium leading-relaxed">
-                                引き続きご連絡を希望される場合は、下のリストからデータをご確認の上、お手元のメールソフトよりご送信ください。
-                            </p>
-                        </div>
-                        <button id="scrollToRecipientListBtn" type="button" class="flex-shrink-0 inline-flex items-center gap-2 rounded-xl bg-red-100 hover:bg-red-200 text-red-700 font-bold text-sm px-4 py-2.5 transition-colors border border-red-200 cursor-pointer">
-                            <span class="material-icons text-base">people</span>
-                            対象者リストを見る
-                        </button>
-                    </div>
-                </div>
-
         <!-- アンケート基本情報 -->
         <section class="rounded-3xl border border-outline-variant bg-white p-8 shadow-sm">
             <div class="flex items-center gap-2 mb-6">
@@ -200,42 +138,42 @@
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- 手動送信 -->
-                <label class="send-method-card selected relative flex flex-col gap-3 p-6 rounded-2xl cursor-pointer shadow-sm h-full" for="method-manual">
+                <label class="group relative flex flex-col gap-3 p-6 rounded-2xl border-2 border-outline-variant/50 cursor-pointer transition-all hover:bg-surface-container-low has-[:checked]:border-primary has-[:checked]:bg-primary/[0.03] shadow-sm h-full">
                     <input type="radio" name="sendMethod" id="method-manual" value="manual" class="sr-only" checked>
                     <div class="flex items-center gap-3">
-                        <div class="card-icon w-10 h-10 rounded-full flex items-center justify-center">
+                        <div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center group-has-[:checked]:bg-primary group-has-[:checked]:text-white transition-colors">
                             <span class="material-icons">send</span>
                         </div>
                         <span class="font-black text-on-surface">手動送信</span>
                     </div>
                     <p class="text-xs text-on-surface-variant leading-relaxed font-medium">データ化完了後、内容を確認してから手動で送信します。</p>
-                    <span class="card-check-icon material-icons text-primary absolute top-6 right-6 text-2xl">check_circle</span>
+                    <span class="material-icons text-primary absolute top-6 right-6 text-2xl opacity-0 group-has-[:checked]:opacity-100 transition-opacity">check_circle</span>
                 </label>
 
                 <!-- 自動送信 -->
-                <label class="send-method-card relative flex flex-col gap-3 p-6 rounded-2xl cursor-pointer shadow-sm h-full" for="method-auto">
+                <label class="group relative flex flex-col gap-3 p-6 rounded-2xl border-2 border-outline-variant/50 cursor-pointer transition-all hover:bg-surface-container-low has-[:checked]:border-primary has-[:checked]:bg-primary/[0.03] shadow-sm h-full">
                     <input type="radio" name="sendMethod" id="method-auto" value="auto" class="sr-only">
                     <div class="flex items-center gap-3">
-                        <div class="card-icon w-10 h-10 rounded-full flex items-center justify-center">
+                        <div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center group-has-[:checked]:bg-primary group-has-[:checked]:text-white transition-colors">
                             <span class="material-icons">flash_on</span>
                         </div>
                         <span class="font-black text-on-surface">自動送信</span>
                     </div>
                     <p class="text-xs text-on-surface-variant leading-relaxed font-medium">データ化完了を検知次第、即座にメールを自動送信します。</p>
-                    <span class="card-check-icon material-icons text-primary absolute top-6 right-6 text-2xl">check_circle</span>
+                    <span class="material-icons text-primary absolute top-6 right-6 text-2xl opacity-0 group-has-[:checked]:opacity-100 transition-opacity">check_circle</span>
                 </label>
 
                 <!-- 送信しない -->
-                <label class="send-method-card relative flex flex-col gap-3 p-6 rounded-2xl cursor-pointer shadow-sm h-full" for="method-none">
+                <label class="group relative flex flex-col gap-3 p-6 rounded-2xl border-2 border-outline-variant/50 cursor-pointer transition-all hover:bg-surface-container-low has-[:checked]:border-primary has-[:checked]:bg-primary/[0.03] shadow-sm h-full">
                     <input type="radio" name="sendMethod" id="method-none" value="none" class="sr-only">
                     <div class="flex items-center gap-3">
-                        <div class="card-icon w-10 h-10 rounded-full flex items-center justify-center">
+                        <div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center group-has-[:checked]:bg-primary group-has-[:checked]:text-white transition-colors">
                             <span class="material-icons">block</span>
                         </div>
                         <span class="font-black text-on-surface">送信しない</span>
                     </div>
                     <p class="text-xs text-on-surface-variant leading-relaxed font-medium">このアンケートではお礼メール機能を使用しません。</p>
-                    <span class="card-check-icon material-icons text-primary absolute top-6 right-6 text-2xl">check_circle</span>
+                    <span class="material-icons text-primary absolute top-6 right-6 text-2xl opacity-0 group-has-[:checked]:opacity-100 transition-opacity">check_circle</span>
                 </label>
             </div>
         </section>
