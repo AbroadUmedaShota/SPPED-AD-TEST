@@ -651,3 +651,5 @@ export function initThankYouEmailSettings() {
 
     initializePage();
 }
+
+initThankYouEmailSettings();

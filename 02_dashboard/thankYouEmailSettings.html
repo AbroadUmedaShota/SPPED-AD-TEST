@@ -60,6 +60,46 @@
                     .4em 0 0 #9CA3AF;
             }
         }
+
+        /* 送信設定カード: 選択状態 */
+        .send-method-card {
+            border: 2px solid rgba(var(--md-sys-color-outline-variant, 198 206 218) / 0.5);
+            transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .send-method-card:hover {
+            background-color: rgba(var(--md-sys-color-surface-container-low, 241 244 249) / 1);
+        }
+        .send-method-card.selected {
+            border-color: var(--md-sys-color-primary, #4361ee);
+            background-color: rgba(67, 97, 238, 0.04);
+            box-shadow: 0 0 0 1px var(--md-sys-color-primary, #4361ee);
+        }
+        /* 選択時のアイコン背景 */
+        .send-method-card .card-icon {
+            background-color: rgb(var(--md-sys-color-surface-container-high, 225 230 238));
+            color: inherit;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .send-method-card.selected .card-icon {
+            background-color: var(--md-sys-color-primary, #4361ee);
+            color: white;
+        }
+        /* 選択済みチェックアイコン */
+        .send-method-card .card-check-icon {
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .send-method-card.selected .card-check-icon {
+            opacity: 1;
+        }
+        /* 送信期限切れバナー */
+        @keyframes bannerSlideIn {
+            from { opacity: 0; transform: translateY(-12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        #expiredPeriodBanner {
+            animation: bannerSlideIn 0.4s ease forwards;
+        }
     </style>
 </head>
 <body class="bg-background text-on-background font-sans">
@@ -103,6 +143,28 @@
                     <h1 class="text-on-background text-2xl sm:text-3xl font-black tracking-tight" id="pageTitle">
                         アンケート『[アンケート名]』のお礼メール設定
                     </h1>
+                </div>
+
+                <!-- 期限切れアラートバナー (STEP5時のみ表示) -->
+                <div id="expiredPeriodBanner" class="hidden">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 rounded-2xl border-2 border-red-300 bg-red-50 p-5 shadow-md">
+                        <div class="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-full bg-red-100 border border-red-200">
+                            <span class="material-icons text-red-500 text-2xl">timer_off</span>
+                        </div>
+                        <div class="flex-1 space-y-1 min-w-0">
+                            <p class="text-red-700 font-black text-base leading-snug flex items-center gap-2">
+                                <span class="inline-block w-2 h-2 rounded-full bg-red-500 flex-shrink-0"></span>
+                                お礼メールの送信期限が終了しています。
+                            </p>
+                            <p class="text-red-600/80 text-sm font-medium leading-relaxed">
+                                引き続きご連絡を希望される場合は、下のリストからデータをご確認の上、お手元のメールソフトよりご送信ください。
+                            </p>
+                        </div>
+                        <button id="scrollToRecipientListBtn" type="button" class="flex-shrink-0 inline-flex items-center gap-2 rounded-xl bg-red-100 hover:bg-red-200 text-red-700 font-bold text-sm px-4 py-2.5 transition-colors border border-red-200 cursor-pointer">
+                            <span class="material-icons text-base">people</span>
+                            対象者リストを見る
+                        </button>
+                    </div>
                 </div>
 
         <!-- アンケート基本情報 -->
