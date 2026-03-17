@@ -97,8 +97,8 @@ export function setInitialFormValues(settings) {
 export function populateTemplates(templates) {
     if (!dom.emailTemplateSelect) cacheDOMElements();
     
-    // 初期状態を保持しつつ追加
-    dom.emailTemplateSelect.innerHTML = '<option value="">標準文面（初期設定）</option>';
+    // 重複を避けるため、既存のオプションをクリアしてから templates の内容を描画
+    dom.emailTemplateSelect.innerHTML = '';
     templates.forEach(template => {
         const option = document.createElement('option');
         option.value = template.id;
