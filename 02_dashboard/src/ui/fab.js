@@ -21,6 +21,7 @@ export function initializeFab(containerId, actions) {
 
     setupFabMenuActions(mainButton, menu, icon, actions);
     makeFabDraggable(fabContainer, mainButton, menu, icon);
+    syncMenuState(mainButton, menu, icon, false);
 }
 
 /**
@@ -55,15 +56,29 @@ function toggleMenu(mainButton, menu, icon, forceClose = null) {
         shouldOpen = !isExpanded;
     }
 
+    syncMenuState(mainButton, menu, icon, shouldOpen);
+}
+
+function syncMenuState(mainButton, menu, icon, shouldOpen) {
     mainButton.setAttribute('aria-expanded', String(shouldOpen));
-    
-    // アイコンのテキストを切り替え、回転クラスを適用
+    mainButton.setAttribute('aria-label', shouldOpen ? '設問追加メニューを閉じる' : '設問追加メニューを開く');
+
     icon.textContent = shouldOpen ? 'close' : 'add';
     icon.classList.toggle('rotate-45', shouldOpen);
 
-    if (shouldOpen) { // Open menu
+    menu.hidden = !shouldOpen;
+    menu.setAttribute('aria-hidden', shouldOpen ? 'false' : 'true');
+    if ('inert' in menu) {
+        menu.inert = !shouldOpen;
+    } else if (shouldOpen) {
+        menu.removeAttribute('inert');
+    } else {
+        menu.setAttribute('inert', '');
+    }
+
+    if (shouldOpen) {
         menu.classList.remove('opacity-0', 'pointer-events-none', 'scale-95');
-    } else { // Close menu
+    } else {
         menu.classList.add('opacity-0', 'pointer-events-none', 'scale-95');
     }
 }

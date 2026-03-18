@@ -71,7 +71,7 @@
                   <span class="material-icons expand-icon">expand_less</span>
                 </div>
                 <div id="basicInfoContent" class="accordion-content p-4 space-y-6">
-                  <section id="language-settings-section" class="space-y-4" data-pro-only="true">
+                  <section id="language-settings-section" class="space-y-4 hidden" data-pro-only="true" aria-hidden="true">
                     <div class="flex flex-col gap-3 rounded-lg border border-outline-variant bg-surface-container-lowest p-4">
                       <div class="relative flex flex-wrap items-center justify-between gap-4" id="multilingual-toggle-wrapper">
                         <div>
@@ -120,6 +120,8 @@
                           aria-required="true" aria-describedby="surveyNameError">
                         <label for="surveyName_ja" class="input-label">アンケート名（管理用）<span
                             class="text-error">*</span></label>
+                        <button type="button" class="help-trigger help-icon-button material-icons" data-help-key="surveyName"
+                          data-help-target="survey-name" aria-label="アンケート名の説明を表示">help_outline</button>
                       </div>
                       <div id="surveyNameError" class="error-message text-error text-sm mt-1 hidden" aria-live="polite"></div>
                     </div>
@@ -131,6 +133,8 @@
                         <input type="text" id="displayTitle_ja" placeholder="(例) 新製品に関する満足度を教えてください" class="input-field"
                           required aria-required="true" aria-describedby="displayTitleError">
                         <label for="displayTitle_ja" class="input-label">表示タイトル<span class="text-error">*</span></label>
+                        <button type="button" class="help-trigger help-icon-button material-icons" data-help-key="surveyDisplayTitle"
+                          data-help-target="display-title" aria-label="表示タイトルの説明を表示">help_outline</button>
                       </div>
                       <div id="displayTitleError" class="error-message text-error text-sm mt-1 hidden"
                         aria-live="polite"></div>
@@ -143,6 +147,8 @@
                         <textarea id="description_ja" placeholder="(例) 本調査は新サービスの改善のためにご協力をお願いします。"
                           class="input-field h-24 resize-y" aria-describedby="descriptionError"></textarea>
                         <label for="description_ja" class="input-label">説明</label>
+                        <button type="button" class="help-trigger help-icon-button material-icons" data-help-key="surveyDescription"
+                          data-help-target="survey-description" aria-label="説明の説明を表示">help_outline</button>
                       </div>
                       <div id="descriptionError" class="error-message text-error text-sm mt-1 hidden"
                         aria-live="polite"></div>
@@ -150,12 +156,15 @@
 
                     <!-- 期間 -->
                     <div class="input-group md:col-span-2">
-                      <div class="relative">
+                      <div class="input-with-trailing-actions">
                         <input type="text" id="periodRange" class="input-field pr-10" placeholder=" " required
                           aria-required="true" aria-describedby="periodRangeError">
                         <label for="periodRange" class="input-label">アンケート期間<span class="text-error">*</span></label>
-                        <span role="button" tabindex="0"
-                          class="material-icons absolute top-1/2 right-3 -translate-y-1/2 text-on-surface-variant cursor-pointer">calendar_today</span>
+                        <div class="field-trailing-actions">
+                          <span role="button" tabindex="0" class="field-action-button material-icons">calendar_today</span>
+                          <button type="button" class="help-trigger help-icon-button material-icons" data-help-key="surveyPeriod"
+                            data-help-target="survey-period" aria-label="アンケート期間の説明を表示">help_outline</button>
+                        </div>
                       </div>
                       <div id="periodRangeError" class="error-message text-error text-sm mt-1 hidden"
                         aria-live="polite"></div>
@@ -176,7 +185,11 @@
                   <div
                     class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
                     <div>
-                      <h3 class="font-medium text-text-main">名刺画像添付を有効にする</h3>
+                      <div class="flex items-center gap-1">
+                        <h3 class="font-medium text-text-main">名刺画像添付を有効にする</h3>
+                        <button type="button" class="help-trigger help-inline-button material-icons" data-help-key="noBizcardCapture"
+                          data-help-target="bizcard-enabled" aria-label="名刺画像添付設定の説明を表示">help_outline</button>
+                      </div>
                       <p class="text-sm text-text-sub mt-1">アンケート回答時に、名刺の撮影を依頼するステップを追加します。</p>
                     </div>
                     <label for="bizcardEnabled" class="relative inline-flex items-center cursor-pointer">
@@ -211,7 +224,11 @@
 
               <!-- メモ -->
               <section>
-                <h2 id="section-memo" class="text-on-surface text-xl font-semibold mb-4">メモ</h2>
+                <div class="flex items-center gap-1 mb-4">
+                  <h2 id="section-memo" class="text-on-surface text-xl font-semibold">メモ</h2>
+                  <button type="button" class="help-trigger help-inline-button material-icons" data-help-key="internalMemo"
+                    data-help-target="survey-memo" aria-label="メモの説明を表示">help_outline</button>
+                </div>
                 <div class="input-group">
                   <textarea id="memo" placeholder=" " class="input-field h-24 resize-y"></textarea>
                   <label for="memo" class="input-label">メモ</label>
@@ -233,7 +250,8 @@
                 <button type="button" id="showPreviewBtn"
                   class="min-w-[100px] px-6 py-3 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors">プレビュー表示</button>
                 <button type="button" id="openQrModalBtn"
-                  class="min-w-[100px] px-6 py-3 rounded-full border border-primary text-primary font-semibold transition-colors hover:bg-primary/10">QRコード</button>
+                  class="min-w-[100px] px-6 py-3 rounded-full border border-primary text-primary font-semibold transition-colors hover:bg-primary/10 opacity-50 cursor-not-allowed"
+                  disabled aria-disabled="true">QRコード</button>
                 <button type="button" id="cancelCreateSurvey"
                   class="min-w-[100px] px-6 py-3 rounded-full border border-outline-variant text-on-surface-variant font-semibold transition-colors hover:bg-surface-variant">キャンセル</button>
                 <button type="button" id="createSurveyBtn"
@@ -265,17 +283,19 @@
     </div>
 
     <button id="outline-map-toggle-btn"
-      class="fixed top-[20%] -translate-y-1/2 right-[18rem] w-8 h-16 bg-surface hover:bg-surface-container-high rounded-l-lg shadow-lg flex items-center justify-center border-y border-l border-outline-variant transition-all duration-300 ease-in-out z-40 focus:outline-none focus:ring-2 focus:ring-primary">
+      class="hidden lg:flex fixed top-[20%] -translate-y-1/2 right-[18rem] w-8 h-16 bg-surface hover:bg-surface-container-high rounded-l-lg shadow-lg items-center justify-center border-y border-l border-outline-variant transition-all duration-300 ease-in-out z-40 focus:outline-none focus:ring-2 focus:ring-primary">
       <span class="material-icons transition-transform duration-300">chevron_left</span>
     </button>
 
     <div id="fab-container" class="fixed bottom-8 right-8 z-[9999]">
       <button id="fab-main-button"
-        class="w-16 h-16 bg-primary text-on-primary rounded-full flex items-center justify-center shadow-lg hover:bg-primary-dark transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-4 focus:ring-primary-container">
+        class="w-16 h-16 bg-primary text-on-primary rounded-full flex items-center justify-center shadow-lg hover:bg-primary-dark transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-4 focus:ring-primary-container"
+        aria-expanded="false" aria-controls="fab-menu" aria-label="設問追加メニューを開く">
         <span class="material-icons text-4xl transition-transform duration-300">add</span>
       </button>
       <div id="fab-menu"
-        class="absolute bottom-20 right-0 w-72 bg-surface rounded-2xl shadow-2xl transition-all duration-300 transform scale-95 opacity-0 pointer-events-none origin-bottom-right">
+        class="absolute bottom-20 right-0 w-72 bg-surface rounded-2xl shadow-2xl transition-all duration-300 transform scale-95 opacity-0 pointer-events-none origin-bottom-right"
+        hidden aria-hidden="true" inert role="menu" aria-label="設問追加メニュー">
         <div class="py-2">
           <button data-question-type="group"
             class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
@@ -327,6 +347,8 @@
             class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
             <span class="material-icons text-on-surface-variant mr-4">draw</span>
             <span>手書きスペース</span>
+            <span class="help-trigger help-inline-button material-icons ml-auto" data-help-key="handwritingSpace"
+              data-help-target="handwriting-type" aria-label="手書きスペースの説明を表示">help_outline</span>
           </button>
           <button data-question-type="explanation_card"
             class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
@@ -355,54 +377,74 @@
 
   <!-- Template: Group -->
   <template id="questionGroupTemplate">
-    <div class="question-group border border-outline-variant rounded-lg bg-surface-container-lowest" data-group-id="">
-      <div class="group-header flex justify-between items-center p-4 bg-surface-variant rounded-t-lg cursor-pointer"
-        data-accordion-target="">
-        <div class="flex-grow flex items-center gap-2">
-          <span class="material-icons text-on-surface-variant handle cursor-move"
+    <section class="question-group question-builder-group" data-group-id="">
+      <div class="group-header question-builder-group__header" data-accordion-target="">
+        <div class="question-builder-group__main">
+          <span class="material-icons text-on-surface-variant handle cursor-move question-builder-handle"
             title="ドラッグで並べ替え">drag_indicator</span>
           <div class="flex-1 multi-lang-input-group" data-field-key="groupTitle" data-input-type="input"
-            data-label="グループタイトル" data-placeholder-ja="グループタイトル (日本語)">
-            <div class="input-group" data-lang="ja">
-              <input type="text"
-                class="input-field w-full bg-transparent focus:bg-surface text-lg font-semibold group-title-input"
-                data-lang="ja" placeholder="グループタイトル (日本語)">
-              <label class="input-label">グループタイトル</label>
+            data-label="グループタイトル" data-placeholder-ja="グループタイトルを入力">
+            <div class="input-group input-group-stacked question-builder-field" data-lang="ja">
+              <label class="input-label" for="groupTitle_ja">グループタイトル</label>
+              <input type="text" id="groupTitle_ja"
+                class="input-field question-builder-input group-title-input"
+                data-lang="ja" placeholder="グループタイトルを入力">
             </div>
           </div>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="question-builder-group__meta">
+          <span class="question-builder-count-badge" data-group-question-count>0問</span>
+          <span class="question-builder-status-badge hidden" data-group-issue-count></span>
+        </div>
+        <div class="question-builder-group__actions" data-no-toggle>
           <button type="button" class="icon-button duplicate-group-btn" aria-label="グループを複製" title="グループを複製"><span
               class="material-icons">content_copy</span></button>
           <button type="button" class="icon-button delete-group-btn" aria-label="グループを削除" title="グループを削除"><span
               class="material-icons text-error">delete</span></button>
-          <span class="material-icons expand-icon">expand_less</span>
+          <button type="button" class="icon-button question-builder-toggle-btn" aria-label="グループを開閉" data-no-toggle>
+            <span class="material-icons expand-icon">expand_less</span>
+          </button>
         </div>
       </div>
-      <div class="questions-list p-4 space-y-4 accordion-content"></div>
-      <div class="mt-4 flex justify-end px-4 pb-4">
-        <button type="button"
-          class="add-question-btn inline-flex items-center gap-2 px-4 py-2 rounded-full border border-outline-variant text-sm font-semibold text-on-surface hover:bg-surface-variant transition-colors"
-          data-question-type="free_answer">
-          <span class="material-icons text-base">add</span>
-          <span>設問を追加</span>
-        </button>
+      <div class="accordion-content question-builder-group__body">
+        <div class="questions-list space-y-4"></div>
+        <div class="mt-6 flex justify-end">
+          <button type="button"
+            class="add-question-btn inline-flex items-center gap-2 px-4 py-2 rounded-full border border-outline-variant text-sm font-semibold text-on-surface hover:bg-surface-variant transition-colors">
+            <span class="material-icons text-base">add</span>
+            <span>設問を追加</span>
+          </button>
+        </div>
       </div>
-    </div>
+    </section>
   </template>
 
   <!-- Template: Question -->
   <template id="questionTemplate">
-    <div class="question-item p-4 border border-outline-variant rounded-md bg-surface" data-question-id=""
-      data-question-type="">
-      <div class="flex justify-between items-center mb-4">
-        <div class="flex items-center gap-3 flex-wrap">
-          <span class="material-icons text-on-surface-variant handle cursor-move"
+    <article class="question-item question-builder-card" data-question-id="" data-question-type="">
+      <div class="accordion-header question-card-summary" data-accordion-target="">
+        <div class="question-card-summary__left">
+          <span class="material-icons text-on-surface-variant handle cursor-move question-builder-handle"
             title="ドラッグで並び替え">drag_indicator</span>
-
-          <select
-            class="question-type-select w-48 border border-outline-variant rounded-md text-sm px-2 py-1 bg-surface text-on-surface"
-            aria-label="設問タイプを選択">
+          <span class="question-card-summary__number" data-question-number>Q1</span>
+          <div class="question-card-summary__content">
+            <div class="question-card-summary__meta">
+              <span class="question-card-summary__type-label" data-question-type-label>自由記述</span>
+              <span class="question-builder-required-badge hidden" data-question-required-badge>必須</span>
+            </div>
+            <p class="question-card-summary__title" data-question-summary-text>設問文を入力してください</p>
+            <div class="question-card-summary__status" data-question-status-badges></div>
+          </div>
+        </div>
+        <div class="question-card-summary__right" data-no-toggle>
+          <div class="question-type-control" data-no-toggle>
+            <button type="button" class="current-type-trigger" data-current-type-trigger aria-haspopup="true" aria-expanded="false">
+              <span class="current-type-trigger__label" data-current-type-label>自由記述</span>
+              <span class="material-icons current-type-trigger__icon">expand_more</span>
+            </button>
+            <div class="question-type-menu hidden" data-question-type-menu></div>
+          </div>
+          <select class="question-type-select sr-only" aria-label="設問タイプを選択">
             <option value="free_answer">自由記述</option>
             <option value="single_answer">単一選択</option>
             <option value="multi_answer">複数選択</option>
@@ -414,162 +456,211 @@
             <option value="handwriting">手書きスペース</option>
             <option value="explanation_card">説明カード</option>
           </select>
-        </div>
-        <div class="flex items-center gap-2">
           <button type="button" class="icon-button duplicate-question-btn" aria-label="設問を複製" title="設問を複製"><span
               class="material-icons">content_copy</span></button>
           <button type="button" class="icon-button delete-question-btn" aria-label="設問を削除" title="設問を削除"><span
               class="material-icons text-error">delete</span></button>
+          <button type="button" class="icon-button question-builder-toggle-btn" aria-label="設問を開閉" data-no-toggle>
+            <span class="material-icons expand-icon">expand_more</span>
+          </button>
         </div>
       </div>
 
-      <div class="multi-lang-input-group mt-4" data-field-key="questionText" data-input-type="input" data-label="設問文"
-        data-placeholder-ja="設問文を入力">
-        <div class="input-group" data-lang="ja">
-          <input type="text" class="input-field question-text-input" data-lang="ja" placeholder="設問文を入力">
-          <label class="input-label">設問文</label>
-        </div>
-      </div>
+      <div class="accordion-content question-detail-panel hidden">
+        <section class="question-detail-section">
+          <div class="question-detail-section__header">
+            <h4 class="question-detail-section__title">基本設定</h4>
+            <p class="question-detail-section__description">設問文と必須設定を編集します。</p>
+          </div>
+          <div class="question-detail-grid">
+            <div class="multi-lang-input-group question-detail-grid__full" data-field-key="questionText" data-input-type="input" data-label="設問文"
+              data-placeholder-ja="設問文を入力">
+              <div class="input-group input-group-stacked question-builder-field" data-lang="ja">
+                <label class="input-label">設問文</label>
+                <input type="text" class="input-field question-builder-input question-text-input" data-lang="ja" placeholder="設問文を入力">
+              </div>
+            </div>
+            <div class="question-builder-inline-toggle">
+              <input type="checkbox"
+                class="required-checkbox h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary">
+              <label class="required-label ml-2 block text-sm text-on-surface-variant">必須回答にする</label>
+            </div>
+          </div>
+        </section>
 
-      <div class="mt-2 flex items-center justify-end">
-        <div class="flex items-center">
-          <input type="checkbox"
-            class="required-checkbox h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary">
-          <label class="required-label ml-2 block text-sm text-on-surface-variant">必須回答にする</label>
-        </div>
-      </div>
+        <section class="question-detail-section">
+          <div class="question-detail-section__header">
+            <h4 class="question-detail-section__title">回答内容設定</h4>
+            <p class="question-detail-section__description">回答形式に応じた設定を行います。</p>
+          </div>
 
-      <div data-config-section="multi_answer" class="hidden mt-4 pt-4 border-t border-outline-variant space-y-3">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="input-group">
-            <input type="number" data-config-type="multi_answer" data-config-field="maxSelections" min="1"
-              class="input-field" placeholder="1">
-            <label class="input-label">最大選択可能数</label>
+          <div data-config-section="multi_answer" class="hidden question-detail-grid">
+            <div class="input-group input-group-stacked question-builder-field">
+              <label class="input-label">最大選択可能数</label>
+              <input type="number" data-config-type="multi_answer" data-config-field="maxSelections" min="1"
+                class="input-field question-builder-input" placeholder="1">
+            </div>
           </div>
-        </div>
-      </div>
 
-      <div class="multi-lang-input-group mt-4 hidden" data-config-section="explanation_card"
-        data-field-key="explanationDescription" data-input-type="textarea" data-label="説明文"
-        data-placeholder-ja="説明文を入力">
-        <div class="input-group" data-lang="ja">
-          <textarea class="input-field h-24 resize-y explanation-description-input" data-lang="ja"
-            placeholder="説明文を入力"></textarea>
-          <label class="input-label">説明文</label>
-        </div>
-      </div>
+          <div class="multi-lang-input-group hidden" data-config-section="explanation_card"
+            data-field-key="explanationDescription" data-input-type="textarea" data-label="説明文"
+            data-placeholder-ja="説明文を入力">
+            <div class="input-group input-group-stacked question-builder-field" data-lang="ja">
+              <label class="input-label">説明文</label>
+              <textarea class="input-field question-builder-input h-24 resize-y explanation-description-input" data-lang="ja"
+                placeholder="説明文を入力"></textarea>
+            </div>
+          </div>
 
-      <div class="mt-4 space-y-2 options-container"></div>
+          <div data-config-section="choice_options" class="hidden choice-options-panel">
+            <div class="space-y-2 options-container"></div>
+            <div class="choice-options-panel__actions">
+              <button type="button" class="add-option-btn inline-flex items-center gap-2 rounded-full border border-outline-variant px-4 py-2 text-sm font-semibold text-on-surface hover:bg-surface-variant transition-colors">
+                <span class="material-icons text-base">add</span>
+                <span>選択肢を追加</span>
+              </button>
+            </div>
+            <div class="option-bulk-editor">
+              <button type="button" class="option-bulk-toggle" data-option-bulk-toggle aria-expanded="false">
+                <span>選択肢を一括入力</span>
+                <span class="material-icons option-bulk-toggle__icon">expand_more</span>
+              </button>
+              <div class="option-bulk-panel hidden" data-option-bulk-panel>
+                <div class="input-group input-group-stacked question-builder-field mt-4">
+                  <label class="input-label">選択肢を一括入力</label>
+                  <textarea class="input-field question-builder-input option-bulk-input h-28 resize-y"
+                    placeholder="1行に1つずつ入力してください&#10;例: 価格&#10;機能&#10;サポート"></textarea>
+                  <p class="text-xs text-on-surface-variant mt-1">入力済みの選択肢をまとめて置き換えます。</p>
+                  <div class="mt-3 flex justify-end">
+                    <button type="button" class="option-bulk-apply-btn inline-flex items-center gap-2 rounded-full bg-secondary-container px-4 py-2 text-sm font-semibold text-on-secondary-container transition-colors hover:bg-secondary-container/80">
+                      <span class="material-icons text-base">playlist_add</span>
+                      <span>一括反映</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-      <div class="matrix-editor hidden mt-4 space-y-4">
-        <div>
-          <h4 class="text-base font-medium text-on-surface-variant mb-2">行</h4>
-          <div class="matrix-rows-list space-y-2"></div>
-          <button type="button" class="text-sm text-primary hover:underline mt-2 add-matrix-row-btn">+ 行を追加</button>
-        </div>
-        <div>
-          <h4 class="text-base font-medium text-on-surface-variant mb-2">列</h4>
-          <div class="matrix-cols-list space-y-2"></div>
-          <button type="button" class="text-sm text-primary hover:underline mt-2 add-matrix-col-btn">+ 列を追加</button>
-        </div>
-      </div>
+          <div class="matrix-editor hidden mt-4 space-y-6">
+            <div class="question-builder-subsection">
+              <div class="question-builder-subsection__header">
+                <h5 class="question-builder-subsection__title">行</h5>
+                <button type="button" class="add-matrix-row-btn text-sm font-semibold text-primary hover:underline">+ 行を追加</button>
+              </div>
+              <div class="matrix-rows-list space-y-3"></div>
+            </div>
+            <div class="question-builder-subsection">
+              <div class="question-builder-subsection__header">
+                <h5 class="question-builder-subsection__title">列</h5>
+                <button type="button" class="add-matrix-col-btn text-sm font-semibold text-primary hover:underline">+ 列を追加</button>
+              </div>
+              <div class="matrix-cols-list space-y-3"></div>
+            </div>
+          </div>
 
-      <!-- Configuration Sections -->
-      <div data-config-section="free_answer" class="hidden mt-4 pt-4 border-t border-outline-variant space-y-3">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="input-group">
-            <input type="number" data-config-type="text" data-config-field="minLength" min="0" class="input-field"
-              placeholder="0">
-            <label class="input-label">最小文字数 (0で無制限)</label>
+          <div data-config-section="free_answer" class="hidden question-detail-grid">
+            <div class="input-group input-group-stacked question-builder-field">
+              <label class="input-label">最小文字数 (0で無制限)</label>
+              <input type="number" data-config-type="text" data-config-field="minLength" min="0" class="input-field question-builder-input"
+                placeholder="0">
+            </div>
+            <div class="input-group input-group-stacked question-builder-field">
+              <label class="input-label">最大文字数 (0で無制限)</label>
+              <input type="number" data-config-type="text" data-config-field="maxLength" min="0" class="input-field question-builder-input"
+                placeholder="0">
+            </div>
           </div>
-          <div class="input-group">
-            <input type="number" data-config-type="text" data-config-field="maxLength" min="0" class="input-field"
-              placeholder="0">
-            <label class="input-label">最大文字数 (0で無制限)</label>
+
+          <div data-config-section="number" class="hidden question-detail-grid">
+            <div class="input-group input-group-stacked question-builder-field">
+              <label class="input-label">最小値</label>
+              <input type="number" data-config-type="number" data-config-field="min" class="input-field question-builder-input"
+                placeholder="指定なし">
+            </div>
+            <div class="input-group input-group-stacked question-builder-field">
+              <label class="input-label">最大値</label>
+              <input type="number" data-config-type="number" data-config-field="max" class="input-field question-builder-input"
+                placeholder="指定なし">
+            </div>
+            <div class="input-group input-group-stacked question-builder-field">
+              <label class="input-label">単位</label>
+              <input type="text" data-config-type="number" data-config-field="unitLabel" class="input-field question-builder-input"
+                placeholder="例: 歳, 円, cm">
+            </div>
+            <div class="input-group input-group-stacked question-builder-field">
+              <label class="input-label">ステップ（矢印での増減量）</label>
+              <input type="number" data-config-type="number" data-config-field="step" min="0" class="input-field question-builder-input"
+                placeholder="1">
+            </div>
           </div>
-        </div>
-      </div>
-      <div data-config-section="number" class="hidden mt-4 pt-4 border-t border-outline-variant space-y-3">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="input-group">
-            <input type="number" data-config-type="number" data-config-field="min" class="input-field"
-              placeholder="指定なし">
-            <label class="input-label">最小値</label>
-          </div>
-          <div class="input-group">
-            <input type="number" data-config-type="number" data-config-field="max" class="input-field"
-              placeholder="指定なし">
-            <label class="input-label">最大値</label>
-          </div>
-          <div class="input-group">
-            <input type="text" data-config-type="number" data-config-field="unitLabel" class="input-field"
-              placeholder="例: 歳, 円, cm">
-            <label class="input-label">単位</label>
-          </div>
-          <div class="input-group">
-            <input type="number" data-config-type="number" data-config-field="step" min="0" class="input-field"
-              placeholder="1">
-            <label class="input-label">ステップ（矢印での増減量）</label>
-          </div>
-        </div>
-      </div>
-      <div data-config-section="date_time" class="hidden mt-4 pt-4 border-t border-outline-variant space-y-3">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="col-span-2 flex items-center gap-4">
-            <div class="flex items-center">
+
+          <div data-config-section="date_time" class="hidden question-detail-grid">
+            <div class="question-builder-inline-toggle">
               <input type="checkbox" data-config-type="date_time" data-config-field="showDate"
                 class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary">
               <label class="ml-2 block text-sm text-on-surface-variant">日付を表示</label>
             </div>
-            <div class="flex items-center">
+            <div class="question-builder-inline-toggle">
               <input type="checkbox" data-config-type="date_time" data-config-field="showTime"
                 class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary">
               <label class="ml-2 block text-sm text-on-surface-variant">時間を表示</label>
             </div>
           </div>
-        </div>
-      </div>
-      <div data-config-section="handwriting" class="hidden mt-4 pt-4 border-t border-outline-variant space-y-3">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="input-group">
-            <select data-config-type="handwriting" data-config-field="canvasHeightPreset" class="input-field">
-              <option value="200">標準 (200px)</option>
-              <option value="100">小 (100px)</option>
-              <option value="300">中 (300px)</option>
-              <option value="500">大 (500px)</option>
-              <option value="custom">カスタム</option>
-            </select>
-            <label class="input-label">描画エリアの高さ</label>
+
+          <div data-config-section="handwriting" class="hidden question-detail-grid">
+            <div class="input-group input-group-stacked question-builder-field">
+              <label class="input-label">描画エリアの高さ</label>
+              <select data-config-type="handwriting" data-config-field="canvasHeightPreset" class="input-field question-builder-input">
+                <option value="200">標準 (200px)</option>
+                <option value="100">小 (100px)</option>
+                <option value="300">中 (300px)</option>
+                <option value="500">大 (500px)</option>
+                <option value="custom">カスタム</option>
+              </select>
+            </div>
+            <div class="input-group input-group-stacked question-builder-field hidden" data-handwriting-sub-config="customHeight">
+              <label class="input-label">カスタムの高さ (px)</label>
+              <input type="number" data-config-type="handwriting" data-config-field="canvasHeight" min="50"
+                class="input-field question-builder-input" placeholder="50以上の数値を入力">
+            </div>
           </div>
-          <div class="input-group hidden" data-handwriting-sub-config="customHeight">
-            <input type="number" data-config-type="handwriting" data-config-field="canvasHeight" min="50"
-              class="input-field" placeholder="50以上の数値を入力">
-            <label class="input-label">カスタムの高さ (px)</label>
+        </section>
+
+        <section class="question-detail-section">
+          <div class="question-detail-section__header">
+            <h4 class="question-detail-section__title">高度設定</h4>
+            <p class="question-detail-section__description">必要な場合のみ条件分岐を設定します。</p>
           </div>
-        </div>
+          <button type="button" class="advanced-settings-toggle" data-advanced-settings-toggle aria-expanded="false">
+            <span>条件分岐を設定する</span>
+            <span class="material-icons advanced-settings-toggle__icon">expand_more</span>
+          </button>
+          <div class="advanced-settings-panel hidden" data-advanced-settings-panel>
+            <div data-config-section="jump" class="space-y-2 mt-4">
+              <div class="input-group input-group-stacked question-builder-field">
+                <label class="input-label">ジャンプ先</label>
+                <select data-config-type="jump" data-config-field="targetQuestionId" class="input-field question-builder-input jump-target-select">
+                  <option value="">次の設問へ</option>
+                </select>
+              </div>
+              <p class="text-xs text-on-surface-variant hidden" data-jump-locked-message>プレミアムプランで利用できます。</p>
+            </div>
+          </div>
+        </section>
       </div>
-      <div data-config-section="jump" class="mt-4 pt-4 border-t border-outline-variant space-y-2">
-        <h4 class="text-base font-medium text-on-surface-variant">条件分岐（ジャンプ）</h4>
-        <p class="text-sm text-on-surface-variant">回答後に移動する設問を設定します。</p>
-        <div class="input-group">
-          <select data-config-type="jump" data-config-field="targetQuestionId" class="input-field jump-target-select">
-            <option value="">次の設問へ</option>
-          </select>
-          <label class="input-label">ジャンプ先</label>
-        </div>
-        <p class="text-xs text-on-surface-variant hidden" data-jump-locked-message>プレミアムプランで利用できます。</p>
-      </div>
-    </div>
+    </article>
   </template>
 
   <!-- Template: Option -->
   <template id="optionTemplate">
-    <div class="option-item flex items-start gap-2">
+    <div class="option-item question-builder-option">
+      <span class="material-icons text-on-surface-variant cursor-move option-handle handle mt-3">drag_indicator</span>
       <div class="flex-grow multi-lang-input-group" data-field-key="optionText" data-input-type="input" data-label="選択肢"
-        data-placeholder-ja="(例) とても満足">
-        <div class="input-group" data-lang="ja">
-          <input type="text" data-lang="ja" class="input-field option-text-input" placeholder="(例) とても満足">
+        data-placeholder-ja="選択肢を入力">
+        <div class="input-group input-group-stacked question-builder-field" data-lang="ja">
           <label class="input-label">選択肢</label>
+          <input type="text" data-lang="ja" class="input-field question-builder-input option-text-input" placeholder="選択肢を入力">
         </div>
       </div>
       <button type="button" class="icon-button delete-option-btn mt-2" aria-label="選択肢を削除"><span

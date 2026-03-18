@@ -1,6 +1,7 @@
 import { showToast } from './utils.js';
 import { closeModal } from './modalHandler.js';
 import { createGroup, updateGroup, deleteGroup, fetchGroups, getGroupsInMemory } from './groupService.js';
+import { initHelpPopovers } from './ui/helpPopover.js';
 
 let currentMembers = []; // モーダル内で管理するメンバーリスト
 let currentGroupId = null; // 現在編集中のグループのID
@@ -13,6 +14,7 @@ let currentGroupId = null; // 現在編集中のグループのID
  */
 export async function initGroupManagementModal(modalElement, groupId = null) {
     currentGroupId = groupId;
+    initHelpPopovers(modalElement);
     const groupForm = modalElement.querySelector('#groupForm');
     const addMemberBtn = modalElement.querySelector('#addMemberBtn');
     const memberEmailInput = modalElement.querySelector('#memberEmail');

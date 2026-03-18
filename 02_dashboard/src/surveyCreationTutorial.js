@@ -18,8 +18,8 @@ function startSurveyCreationTutorial() {
             { selector: '#fab-main-button', title: '設問の追加', description: 'グループが作成されました。次に、画面右下の『+』ボタンをクリックして、最初の質問を追加してください。', position: 'left', showButtons: true },
             { selector: 'button[data-question-type="free_answer"]', title: '設問形式の選択', description: '追加する設問の形式を選択します。まず、自由に文章で回答してもらう「フリーアンサー」を追加してみましょう。', position: 'left', showButtons: true },
             { selector: '.question-item:last-child .question-text-input[data-lang="ja"]', title: '設問の作成（記述式）', description: '質問が追加されました。こちらに質問文をご入力ください。この『記述式』は、回答者が文章で自由に回答する形式の設問です。（例：弊社サービスを何でお知りになりましたか？）', position: 'bottom', showButtons: true },
-            { selector: '.question-item:last-child .question-type-select', title: '設問形式の変更', description: '次に、設問形式を「単一選択」に変更します。ドロップダウンをクリックして「単一選択」を選んでください。', position: 'bottom', showButtons: true },
-            { selector: '.question-item:last-child .question-type-select', title: '設問形式の自動変更', description: '設問形式を「単一選択」に自動で変更します。', position: 'bottom', showButtons: true },
+            { selector: '.question-item:last-child [data-current-type-trigger]', title: '設問形式の変更', description: '次に、設問形式を「単一選択」に変更します。右側の回答形式ボタンを押して候補を開いてください。', position: 'bottom', showButtons: true },
+            { selector: '.question-item:last-child [data-current-type-trigger]', title: '設問形式の自動変更', description: '設問形式メニューから「単一選択」を選びます。', position: 'bottom', showButtons: true },
             { selector: '.question-item:last-child .question-text-input[data-lang="ja"]', title: '設問の作成（単一選択）', description: '設問形式が「単一選択」になりました。こちらに質問文をご入力ください。（例：最も満足している点をお選びください）', position: 'bottom', showButtons: true },
             { selector: '.question-item:last-child .option-item:nth-child(1) .option-text-input[data-lang="ja"]', title: '選択肢の入力', description: '最初の選択肢を入力します。（例：価格）', position: 'bottom', showButtons: true },
             { selector: '.question-item:last-child .option-item:nth-child(2) .option-text-input[data-lang="ja"]', title: '選択肢の入力', description: '二番目の選択肢を入力します。（例：機能）', position: 'bottom', showButtons: true },
@@ -59,13 +59,13 @@ function startSurveyCreationTutorial() {
                     position: fixed;
                     border-radius: 8px;
                     box-shadow: 0 0 0 5000px rgba(0, 0, 0, 0.7);
-                    z-index: 10001;
+                    z-index: var(--z-tutorial-highlight);
                     pointer-events: none;
                     transition: top 0.3s ease-in-out, left 0.3s ease-in-out, width 0.3s ease-in-out, height 0.3s ease-in-out;
                 }
                 .custom-tutorial-highlight-target {
                     position: relative;
-                    z-index: 10001;
+                    z-index: var(--z-tutorial-highlight);
                     pointer-events: auto;
                 }
                 /* Popover base styles */
@@ -77,7 +77,7 @@ function startSurveyCreationTutorial() {
                     padding: 15px 20px;
                     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
                     max-width: 350px;
-                    z-index: 10002;
+                    z-index: var(--z-tutorial-popover);
                     transition: opacity 0.3s ease;
                     opacity: 1;
                 }

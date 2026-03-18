@@ -1,14 +1,10 @@
-/**
- * surveyRenderer.js
- * Renders the survey creation UI based on the surveyData object.
- */
-
 const I18N = {
   questionTypes: {
     ja: {
       free_answer: '自由記述',
       single_answer: '単一選択',
       multi_answer: '複数選択',
+      dropdown: 'ドロップダウン',
       number_answer: '数値入力',
       matrix_sa: 'マトリクス（単一）',
       matrix_ma: 'マトリクス（複数）',
@@ -20,6 +16,7 @@ const I18N = {
       free_answer: 'Free Text',
       single_answer: 'Single Choice',
       multi_answer: 'Multiple Choice',
+      dropdown: 'Dropdown',
       number_answer: 'Number',
       matrix_sa: 'Matrix (Single)',
       matrix_ma: 'Matrix (Multiple)',
@@ -30,26 +27,42 @@ const I18N = {
   },
   labels: {
     ja: {
-      addOption: '+ 選択肢を追加',
+      addOption: '選択肢を追加',
       noQuestions: '設問はまだありません。',
-      noGroups: '質問グループはまだありません。',
-      unknownType: '不明なタイプ'
+      noGroups: '設問グループはまだありません。',
+      unknownType: '不明なタイプ',
+      untitledGroup: '無題のグループ',
+      untitledQuestion: '設問文を入力してください'
     },
     en: {
-      addOption: '+ Add option',
+      addOption: 'Add option',
       noQuestions: 'No questions.',
       noGroups: 'No question groups.',
-      unknownType: 'Unknown type'
+      unknownType: 'Unknown type',
+      untitledGroup: 'Untitled group',
+      untitledQuestion: 'Enter the question text'
     }
   }
 };
+
+const QUESTION_TYPE_ORDER = [
+  'free_answer',
+  'single_answer',
+  'multi_answer',
+  'dropdown',
+  'number_answer',
+  'matrix_sa',
+  'matrix_ma',
+  'date_time',
+  'handwriting',
+  'explanation_card'
+];
 
 const FALLBACK_LANGUAGE = 'ja';
 
 const DEFAULT_NUMERIC_META = { min: '', max: '', step: 1, unitLabel: '', unitSystem: 'metric' };
 const DEFAULT_DATETIME_META = { inputMode: 'date', timezone: 'Asia/Tokyo', minDateTime: '', maxDateTime: '', allowPast: true, allowFuture: true };
 const DEFAULT_HANDWRITING_META = { canvasWidth: 600, canvasHeight: 200, penColor: '#000000', penWidth: 2, backgroundPattern: 'plain' };
-
 
 function t(dict, key, lang) {
   const table = I18N[dict]?.[lang] || I18N[dict]?.ja || {};
@@ -58,11 +71,11 @@ function t(dict, key, lang) {
 
 function getLocalizedText(value, lang) {
   if (value && typeof value === 'object' && !Array.isArray(value)) {
-    const v = value[lang];
-    return typeof v === 'string' ? v : (v ?? '');
+    const localized = value[lang];
+    return typeof localized === 'string' ? localized : localized ?? '';
   }
   if (typeof value === 'string') {
-    return lang === 'ja' ? value : '';
+    return lang === FALLBACK_LANGUAGE ? value : '';
   }
   return '';
 }
@@ -70,12 +83,23 @@ function getLocalizedText(value, lang) {
 function getLanguageMeta(languageOptions = {}, code = FALLBACK_LANGUAGE) {
   const { languageMap } = languageOptions;
   if (languageMap && typeof languageMap.get === 'function') {
-    const meta = languageMap.get(code);
-    if (meta) {
-      return meta;
-    }
+    return languageMap.get(code) || { code, label: code, shortLabel: code };
   }
   return { code, label: code, shortLabel: code };
+}
+
+function getDisplayText(value, languageOptions = {}) {
+  const editorLanguage = languageOptions.editorLanguage || FALLBACK_LANGUAGE;
+  const current = getLocalizedText(value, editorLanguage).trim();
+  if (current) return current;
+  return getLocalizedText(value, FALLBACK_LANGUAGE).trim();
+}
+
+function getStoredAccordionState(key, defaultState) {
+  if (!key) return defaultState;
+  const value = localStorage.getItem(`accordionState_${key}`);
+  if (value === null) return defaultState;
+  return value !== 'false';
 }
 
 function ensureReferenceHintElement(group) {
@@ -113,100 +137,83 @@ export function refreshReferenceHintForInput(input, baseLanguage = FALLBACK_LANG
 }
 
 function hydrateSingleLanguageField(container, value, languageOptions = {}, overrides = {}) {
-    if (!container) return;
+  if (!container) return;
 
-    const { activeLanguages = ['ja'], editorLanguage = 'ja' } = languageOptions;
-    const errorElement = container.querySelector('.error-message');
+  const { activeLanguages = [FALLBACK_LANGUAGE], editorLanguage = FALLBACK_LANGUAGE } = languageOptions;
+  const errorElement = container.querySelector('.error-message');
+  const existingGroups = new Map();
 
-    const existingGroups = new Map();
-    container.querySelectorAll('.input-group[data-lang]').forEach(group => {
-        existingGroups.set(group.dataset.lang, group);
-    });
+  container.querySelectorAll('.input-group[data-lang]').forEach((group) => {
+    existingGroups.set(group.dataset.lang, group);
+  });
 
-    const jaTemplate = existingGroups.get('ja');
-    if (!jaTemplate) {
-        console.warn('hydrateSingleLanguageField: Japanese template not found.');
-        return;
+  const jaTemplate = existingGroups.get(FALLBACK_LANGUAGE);
+  if (!jaTemplate) return;
+
+  activeLanguages.forEach((langCode) => {
+    if (!existingGroups.has(langCode)) {
+      const fieldKey = overrides.fieldKey || container.dataset.fieldKey || 'field';
+      let html = jaTemplate.outerHTML;
+      html = html.replace(new RegExp(`(data-lang=)["']${FALLBACK_LANGUAGE}["']`, 'g'), `$1"${langCode}"`);
+      html = html.replace(new RegExp(`(id=)["']${fieldKey}_${FALLBACK_LANGUAGE}["']`, 'g'), `$1"${fieldKey}_${langCode}"`);
+      html = html.replace(new RegExp(`(for=)["']${fieldKey}_${FALLBACK_LANGUAGE}["']`, 'g'), `$1"${fieldKey}_${langCode}"`);
+
+      if (errorElement) {
+        errorElement.insertAdjacentHTML('beforebegin', html);
+      } else {
+        container.insertAdjacentHTML('beforeend', html);
+      }
+    }
+    existingGroups.delete(langCode);
+  });
+
+  existingGroups.forEach((group) => group.remove());
+
+  container.querySelectorAll('.input-group[data-lang]').forEach((group) => {
+    const langCode = group.dataset.lang;
+    if (!activeLanguages.includes(langCode)) return;
+
+    group.classList.toggle('hidden', langCode !== editorLanguage);
+
+    const input = group.querySelector('input, textarea');
+    if (input) {
+      const fieldKey = overrides.fieldKey || container.dataset.fieldKey || 'field';
+      group.dataset.lang = langCode;
+      input.dataset.lang = langCode;
+      if (!input.id) {
+        input.id = `${fieldKey}_${langCode}`;
+      }
+
+      input.value = getLocalizedText(value, langCode);
+      const placeholderBase = overrides.placeholderJa ?? container.dataset.placeholderJa ?? '';
+      input.placeholder = langCode === FALLBACK_LANGUAGE ? placeholderBase : '';
+      setReferenceHintForInput(input, langCode === FALLBACK_LANGUAGE ? '' : getLocalizedText(value, FALLBACK_LANGUAGE));
     }
 
-    activeLanguages.forEach(langCode => {
-        if (!existingGroups.has(langCode)) {
-            const fieldKey = overrides.fieldKey || container.dataset.fieldKey || 'field';
-            let newHtml = jaTemplate.outerHTML;
-            
-            newHtml = newHtml.replace(new RegExp(`(data-lang=)["']ja["']`, 'g'), `$1"${langCode}"`);
-            newHtml = newHtml.replace(new RegExp(`(id=)["']${fieldKey}_ja["']`, 'g'), `$1"${fieldKey}_${langCode}"`);
-            newHtml = newHtml.replace(new RegExp(`(for=)["']${fieldKey}_ja["']`, 'g'), `$1"${fieldKey}_${langCode}"`);
-
-            if (errorElement) {
-                errorElement.insertAdjacentHTML('beforebegin', newHtml);
-            } else {
-                container.insertAdjacentHTML('beforeend', newHtml);
-            }
-        }
-        existingGroups.delete(langCode);
-    });
-
-    existingGroups.forEach(group => group.remove());
-
-    container.querySelectorAll('.input-group[data-lang]').forEach(group => {
-        const langCode = group.dataset.lang;
-        if (!activeLanguages.includes(langCode)) return;
-
-        group.classList.toggle('hidden', langCode !== editorLanguage);
-
-        const input = group.querySelector('input, textarea');
-        if (input) {
-            const fieldKey = overrides.fieldKey || container.dataset.fieldKey || 'field';
-            group.dataset.lang = langCode;
-            input.dataset.lang = langCode;
-            if (!input.id) {
-                input.id = `${fieldKey}_${langCode}`;
-            }
-            input.value = getLocalizedText(value, langCode);
-            const placeholderJa = overrides.placeholderJa ?? container.dataset.placeholderJa ?? ' ';
-            const jaValue = getLocalizedText(value, 'ja');
-
-            if (langCode === 'ja') {
-                input.placeholder = placeholderJa;
-            } else {
-                input.placeholder = ' ';
-            }
-
-            setReferenceHintForInput(input, langCode === 'ja' ? '' : jaValue);
-        }
-
-        const label = group.querySelector('.input-label');
-        if (label) {
-            if (input?.id) {
-                label.setAttribute('for', input.id);
-            }
-            const langMeta = getLanguageMeta(languageOptions, langCode);
-            const baseLabel = overrides.label ?? container.dataset.label ?? '';
-            let labelText = baseLabel;
-            if (activeLanguages.length > 1) {
-                labelText += `（${langMeta.shortLabel || langMeta.label}）`;
-            }
-            const isRequired = overrides.required ?? (container.dataset.required === 'true');
-            if (isRequired && baseLabel) {
-                labelText += '<span class="text-error">*</span>';
-            }
-            label.innerHTML = labelText;
-        }
-    });
+    const label = group.querySelector('.input-label');
+    if (label) {
+      if (input?.id) label.setAttribute('for', input.id);
+      const baseLabel = overrides.label ?? container.dataset.label ?? '';
+      const isRequired = overrides.required ?? (container.dataset.required === 'true');
+      const langMeta = getLanguageMeta(languageOptions, langCode);
+      let labelText = baseLabel;
+      if (activeLanguages.length > 1) {
+        labelText += `（${langMeta.shortLabel || langMeta.label}）`;
+      }
+      if (isRequired && baseLabel) {
+        labelText += '<span class="text-error">*</span>';
+      }
+      label.innerHTML = labelText;
+    }
+  });
 }
 
 export function populateBasicInfo(surveyData, languageOptions = {}) {
   if (!surveyData) return;
 
-  const surveyNameGroup = document.querySelector('[data-field-key="surveyName"]');
-  hydrateSingleLanguageField(surveyNameGroup, surveyData.name, languageOptions, { fieldKey: 'surveyName' });
-
-  const displayTitleGroup = document.querySelector('[data-field-key="displayTitle"]');
-  hydrateSingleLanguageField(displayTitleGroup, surveyData.displayTitle, languageOptions, { fieldKey: 'displayTitle' });
-
-  const descriptionGroup = document.querySelector('[data-field-key="description"]');
-  hydrateSingleLanguageField(descriptionGroup, surveyData.description, languageOptions, { fieldKey: 'description' });
+  hydrateSingleLanguageField(document.querySelector('[data-field-key="surveyName"]'), surveyData.name, languageOptions, { fieldKey: 'surveyName' });
+  hydrateSingleLanguageField(document.querySelector('[data-field-key="displayTitle"]'), surveyData.displayTitle, languageOptions, { fieldKey: 'displayTitle' });
+  hydrateSingleLanguageField(document.querySelector('[data-field-key="description"]'), surveyData.description, languageOptions, { fieldKey: 'description' });
 
   const periodRangeInput = document.getElementById('periodRange');
   if (periodRangeInput && periodRangeInput._flatpickr) {
@@ -217,352 +224,307 @@ export function populateBasicInfo(surveyData, languageOptions = {}) {
     }
   }
 
-
-
   const deadlineInput = document.getElementById('deadline');
   const memoTextarea = document.getElementById('memo');
-
   if (deadlineInput) deadlineInput.value = surveyData.deadline || '';
   if (memoTextarea) memoTextarea.value = surveyData.memo || '';
 }
 
-function createOptionElement(option, questionId, optionIndex, languageOptions, uiLang) {
-  const optionTemplate = document.getElementById('optionTemplate');
-  const optionFragment = optionTemplate.content.cloneNode(true);
-  const optionItem = optionFragment.querySelector('.option-item');
-  const optionGroup = optionItem.querySelector('.multi-lang-input-group');
-  hydrateSingleLanguageField(optionGroup, option.text, languageOptions, {
-    fieldKey: `option_${questionId}_${optionIndex}`,
-    label: '選択肢'
-  });
-  const optionInput = optionItem.querySelector('.option-text-input');
-  if (optionInput) {
-    optionInput.dataset.lang = languageOptions.editorLanguage || FALLBACK_LANGUAGE;
-    optionInput.dataset.index = optionIndex;
-  }
-  return optionFragment;
+function createStatusBadge(text, variant = '') {
+  const badge = document.createElement('span');
+  badge.className = `question-status-badge${variant ? ` ${variant}` : ''}`;
+  badge.textContent = text;
+  return badge;
 }
 
-function createMatrixRowItem(row, rowIndex, questionId, languageOptions) {
-  const editorLanguage = languageOptions.editorLanguage || FALLBACK_LANGUAGE;
-  const langMeta = getLanguageMeta(languageOptions, editorLanguage);
-  const wrapper = document.createElement('div');
-  wrapper.className = 'matrix-row-item flex items-start gap-2';
-  wrapper.setAttribute('data-index', String(rowIndex));
+function countMissingTranslations(value, languageOptions = {}) {
+  const activeLanguages = Array.isArray(languageOptions.activeLanguages) ? languageOptions.activeLanguages : [FALLBACK_LANGUAGE];
+  if (activeLanguages.length <= 1 || !languageOptions.allowMultilingual) return 0;
 
-  const handle = document.createElement('span');
-  handle.className = 'material-icons text-on-surface-variant matrix-handle cursor-move mt-3';
-  handle.textContent = 'drag_indicator';
-  wrapper.appendChild(handle);
-
-  const inputGroup = document.createElement('div');
-  inputGroup.className = 'flex-grow input-group';
-  const input = document.createElement('input');
-  input.type = 'text';
-  input.className = 'input-field matrix-row-input';
-  input.dataset.index = String(rowIndex);
-  input.dataset.lang = editorLanguage;
-  input.id = `matrix_row_${questionId}_${rowIndex}_${editorLanguage}`;
-  if (editorLanguage === 'ja') {
-    input.placeholder = `行${rowIndex + 1}`;
-  } else {
-    input.placeholder = ' ';
-  }
-  input.value = getLocalizedText(row.text, editorLanguage);
-  inputGroup.appendChild(input);
-
-  const label = document.createElement('label');
-  label.className = 'input-label';
-  label.setAttribute('for', input.id);
-  label.textContent = `行（${langMeta.shortLabel || langMeta.label}）`;
-  inputGroup.appendChild(label);
-  setReferenceHintForInput(input, editorLanguage === 'ja' ? '' : getLocalizedText(row.text, 'ja'));
-
-  wrapper.appendChild(inputGroup);
-
-  const deleteBtn = document.createElement('button');
-  deleteBtn.type = 'button';
-  deleteBtn.className = 'icon-button delete-matrix-row-btn mt-2';
-  deleteBtn.setAttribute('aria-label', '行を削除');
-  deleteBtn.setAttribute('data-index', String(rowIndex));
-  deleteBtn.innerHTML = '<span class="material-icons text-error">remove_circle_outline</span>';
-  wrapper.appendChild(deleteBtn);
-
-  return wrapper;
+  return activeLanguages.filter((code) => code !== FALLBACK_LANGUAGE).reduce((sum, code) => {
+    const translated = getLocalizedText(value, code).trim();
+    return sum + (translated ? 0 : 1);
+  }, 0);
 }
 
-function createMatrixColItem(col, colIndex, questionId, languageOptions) {
-  const editorLanguage = languageOptions.editorLanguage || FALLBACK_LANGUAGE;
-  const langMeta = getLanguageMeta(languageOptions, editorLanguage);
-  const wrapper = document.createElement('div');
-  wrapper.className = 'matrix-col-item flex items-start gap-2';
-  wrapper.setAttribute('data-index', String(colIndex));
+function getQuestionStatus(question, languageOptions = {}) {
+  const statuses = [];
+  const textMissing = !getLocalizedText(question.text, FALLBACK_LANGUAGE).trim();
+  if (textMissing) statuses.push({ text: '未入力', variant: 'is-danger' });
 
-  const handle = document.createElement('span');
-  handle.className = 'material-icons text-on-surface-variant matrix-handle cursor-move mt-3';
-  handle.textContent = 'drag_indicator';
-  wrapper.appendChild(handle);
-
-  const inputGroup = document.createElement('div');
-  inputGroup.className = 'flex-grow input-group';
-  const input = document.createElement('input');
-  input.type = 'text';
-  input.className = 'input-field matrix-col-input';
-  input.dataset.index = String(colIndex);
-  input.dataset.lang = editorLanguage;
-  input.id = `matrix_col_${questionId}_${colIndex}_${editorLanguage}`;
-  if (editorLanguage === 'ja') {
-    input.placeholder = `列${colIndex + 1}`;
-  } else {
-    input.placeholder = ' ';
-  }
-  input.value = getLocalizedText(col.text, editorLanguage);
-  inputGroup.appendChild(input);
-
-  const label = document.createElement('label');
-  label.className = 'input-label';
-  label.setAttribute('for', input.id);
-  label.textContent = `列（${langMeta.shortLabel || langMeta.label}）`;
-  inputGroup.appendChild(label);
-  setReferenceHintForInput(input, editorLanguage === 'ja' ? '' : getLocalizedText(col.text, 'ja'));
-
-  wrapper.appendChild(inputGroup);
-
-  const deleteBtn = document.createElement('button');
-  deleteBtn.type = 'button';
-  deleteBtn.className = 'icon-button delete-matrix-col-btn mt-2';
-  deleteBtn.setAttribute('aria-label', '列を削除');
-  deleteBtn.setAttribute('data-index', String(colIndex));
-  deleteBtn.innerHTML = '<span class="material-icons text-error">remove_circle_outline</span>';
-  wrapper.appendChild(deleteBtn);
-
-  return wrapper;
-}
-
-function renderQuestion(question, uiLang, index, languageOptions = {}) {
-  const template = document.getElementById('questionTemplate');
-  const fragment = template.content.cloneNode(true);
-  const questionItem = fragment.querySelector('.question-item');
-  const requiredCheckbox = fragment.querySelector('.required-checkbox');
-  const matrixEditor = fragment.querySelector('.matrix-editor');
-  const typeSelect = fragment.querySelector('.question-type-select');
-
-  const editorLanguage = languageOptions.editorLanguage || FALLBACK_LANGUAGE;
-
-  questionItem.dataset.questionId = question.questionId;
-  if (question.type) questionItem.dataset.questionType = question.type;
-
-
-  if (typeSelect) {
-    const supported = ['free_answer', 'single_answer', 'multi_answer', 'dropdown', 'number_answer', 'matrix_sa', 'matrix_ma', 'date_time', 'handwriting', 'explanation_card'];
-    typeSelect.value = supported.includes(question.type) ? question.type : 'free_answer';
-  }
-
-  const questionTextGroup = questionItem.querySelector('.multi-lang-input-group[data-field-key="questionText"]');
-  if (questionTextGroup) {
-    hydrateSingleLanguageField(questionTextGroup, question.text, languageOptions, {
-      fieldKey: `questionText_${question.questionId}`,
-      label: '設問文'
-    });
-    const textInput = questionTextGroup.querySelector('.question-text-input');
-    if (textInput) {
-      textInput.dataset.lang = editorLanguage;
-    }
-  }
-
-  if (requiredCheckbox) {
-    requiredCheckbox.checked = !!question.required;
-    const requiredLabel = fragment.querySelector('.required-label');
-    const checkboxId = `q_${question.questionId}_required`;
-    requiredCheckbox.id = checkboxId;
-    if (requiredLabel) {
-      requiredLabel.setAttribute('for', checkboxId);
-    }
-  }
-
-  const optionsContainer = fragment.querySelector('.options-container');
-  if (optionsContainer) {
-    optionsContainer.innerHTML = '';
-    const supportsOptions = question.type === 'single_answer' || question.type === 'multi_answer' || question.type === 'dropdown';
-    if (supportsOptions) {
-      const list = Array.isArray(question.options) ? question.options : [];
-      list.forEach((opt, optIndex) => {
-        const optionFragment = createOptionElement(opt, question.questionId, optIndex, languageOptions, uiLang);
-        optionsContainer.appendChild(optionFragment);
-      });
-      const addOptionButton = document.createElement('button');
-      addOptionButton.type = 'button';
-      addOptionButton.className = 'text-sm text-primary hover:underline mt-2 add-option-btn';
-      addOptionButton.textContent = t('labels', 'addOption', uiLang);
-      optionsContainer.appendChild(addOptionButton);
-    }
+  const supportsOptions = ['single_answer', 'multi_answer', 'dropdown'].includes(question.type);
+  if (supportsOptions && (!Array.isArray(question.options) || question.options.length < 2)) {
+    statuses.push({ text: '選択肢不足', variant: 'is-warning' });
   }
 
   const isMatrix = question.type === 'matrix_sa' || question.type === 'matrix_ma';
-  if (matrixEditor) {
-    matrixEditor.classList.toggle('hidden', !isMatrix);
-  }
   if (isMatrix) {
-    const matrix = question.matrix || { rows: [], cols: [] };
-    const matrixRowsList = matrixEditor.querySelector('.matrix-rows-list');
-    const matrixColsList = matrixEditor.querySelector('.matrix-cols-list');
-    if (matrixRowsList) {
-      matrixRowsList.innerHTML = '';
-      (matrix.rows || []).forEach((row, rowIndex) => {
-        matrixRowsList.appendChild(createMatrixRowItem(row, rowIndex, question.questionId, languageOptions));
-      });
-    }
-    if (matrixColsList) {
-      matrixColsList.innerHTML = '';
-      (matrix.cols || []).forEach((col, colIndex) => {
-        matrixColsList.appendChild(createMatrixColItem(col, colIndex, question.questionId, languageOptions));
-      });
-    }
+    const rows = Array.isArray(question.matrix?.rows) ? question.matrix.rows.length : 0;
+    const cols = Array.isArray(question.matrix?.cols) ? question.matrix.cols.length : 0;
+    if (rows === 0 || cols === 0) statuses.push({ text: '行列不足', variant: 'is-warning' });
   }
 
-  applyNumberConfig(questionItem, question);
-  applyDateTimeConfig(questionItem, question);
-  applyHandwritingConfig(questionItem, question);
-  applyTextValidationConfig(questionItem, question);
-  applyExplanationCardConfig(questionItem, question, languageOptions);
-  applyMultiAnswerConfig(questionItem, question);
-  applyJumpConfig(questionItem, question, languageOptions);
+  if (question.meta?.jump?.targetQuestionId) statuses.push({ text: '分岐あり', variant: 'is-info' });
 
-  return questionItem;
+  const translationMissing = countMissingTranslations(question.text, languageOptions);
+  if (translationMissing > 0) statuses.push({ text: '未翻訳あり', variant: 'is-warning' });
+
+  return statuses;
 }
 
-function applyExplanationCardConfig(questionItem, question, languageOptions) {
-  const section = questionItem.querySelector('[data-config-section="explanation_card"]');
-  if (!section) return;
-  if (question.type !== 'explanation_card') {
-    section.classList.add('hidden');
-    return;
-  }
-  section.classList.remove('hidden');
-  hydrateSingleLanguageField(section, question.explanationText, languageOptions, {
-    fieldKey: `explanationDescription_${question.questionId}`,
-    label: '説明文'
+function getGroupIssueCount(group, languageOptions = {}) {
+  return (group.questions || []).reduce((count, question) => count + getQuestionStatus(question, languageOptions).length, 0);
+}
+
+function createTypeMenuItem(type, activeType, uiLang) {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = `question-type-menu-item${type === activeType ? ' is-active' : ''}`;
+  button.dataset.questionTypeOption = type;
+  const helpIcon = type === 'handwriting'
+    ? `<span class="help-trigger help-inline-button material-icons" data-help-key="handwritingSpace" data-help-target="handwriting-type" aria-label="${t('questionTypes', type, uiLang)}の説明を表示">help_outline</span>`
+    : '';
+  button.innerHTML = `
+    <span class="question-type-menu-item__content">
+      <span>${t('questionTypes', type, uiLang)}</span>
+      ${helpIcon}
+    </span>
+    <span class="material-icons question-type-menu-item__check">check</span>
+  `;
+  return button;
+}
+
+function createOptionElement(option, questionId, optionIndex, languageOptions = {}) {
+  const template = document.getElementById('optionTemplate');
+  const fragment = template.content.cloneNode(true);
+  const optionItem = fragment.querySelector('.option-item');
+  const optionGroup = optionItem.querySelector('.multi-lang-input-group');
+
+  hydrateSingleLanguageField(optionGroup, option.text, languageOptions, {
+    fieldKey: `option_${questionId}_${optionIndex}`,
+    label: '選択肢',
+    placeholderJa: '選択肢を入力'
   });
+
+  const input = optionItem.querySelector('.option-text-input');
+  if (input) {
+    input.dataset.lang = languageOptions.editorLanguage || FALLBACK_LANGUAGE;
+    input.dataset.index = String(optionIndex);
+  }
+
+  return optionItem;
 }
 
+function createMatrixItem(type, value, index, questionId, languageOptions = {}) {
+  const editorLanguage = languageOptions.editorLanguage || FALLBACK_LANGUAGE;
+  const langMeta = getLanguageMeta(languageOptions, editorLanguage);
+  const wrapper = document.createElement('div');
+  wrapper.className = `${type}-item`;
+  wrapper.dataset.index = String(index);
+
+  const handle = document.createElement('span');
+  handle.className = 'material-icons text-on-surface-variant matrix-handle handle cursor-move mt-3';
+  handle.textContent = 'drag_indicator';
+  wrapper.appendChild(handle);
+
+  const group = document.createElement('div');
+  group.className = 'flex-grow input-group input-group-stacked question-builder-field';
+  group.dataset.lang = editorLanguage;
+
+  const label = document.createElement('label');
+  label.className = 'input-label';
+
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = `input-field question-builder-input ${type}-input`;
+  input.dataset.index = String(index);
+  input.dataset.lang = editorLanguage;
+  input.id = `${type}_${questionId}_${index}_${editorLanguage}`;
+  input.placeholder = editorLanguage === FALLBACK_LANGUAGE ? `${type === 'matrix-row' ? '行' : '列'}${index + 1}` : '';
+  input.value = getLocalizedText(value.text, editorLanguage);
+
+  label.setAttribute('for', input.id);
+  label.textContent = `${type === 'matrix-row' ? '行' : '列'}（${langMeta.shortLabel || langMeta.label}）`;
+
+  group.append(label, input);
+  wrapper.appendChild(group);
+
+  const deleteBtn = document.createElement('button');
+  deleteBtn.type = 'button';
+  deleteBtn.className = `icon-button delete-${type}-btn mt-2`;
+  deleteBtn.dataset.index = String(index);
+  deleteBtn.setAttribute('aria-label', `${type === 'matrix-row' ? '行' : '列'}を削除`);
+  deleteBtn.innerHTML = '<span class="material-icons text-error">remove_circle_outline</span>';
+  wrapper.appendChild(deleteBtn);
+
+  setReferenceHintForInput(input, editorLanguage === FALLBACK_LANGUAGE ? '' : getLocalizedText(value.text, FALLBACK_LANGUAGE));
+
+  return wrapper;
+}
+
+function createMatrixRowItem(row, rowIndex, questionId, languageOptions = {}) {
+  return createMatrixItem('matrix-row', row, rowIndex, questionId, languageOptions);
+}
+
+function createMatrixColItem(col, colIndex, questionId, languageOptions = {}) {
+  return createMatrixItem('matrix-col', col, colIndex, questionId, languageOptions);
+}
+
+function applyTextValidationConfig(questionItem, question) {
+  const section = questionItem.querySelector('[data-config-section="free_answer"]');
+  if (!section) return;
+  const visible = question.type === 'free_answer';
+  section.classList.toggle('hidden', !visible);
+  if (!visible) return;
+
+  const validation = question.meta?.validation?.text || { minLength: '', maxLength: '' };
+  const minInput = section.querySelector('[data-config-field="minLength"]');
+  const maxInput = section.querySelector('[data-config-field="maxLength"]');
+  if (minInput) minInput.value = validation.minLength ?? '';
+  if (maxInput) maxInput.value = validation.maxLength ?? '';
+}
+
+function applyMultiAnswerConfig(questionItem, question) {
+  const section = questionItem.querySelector('[data-config-section="multi_answer"]');
+  if (!section) return;
+  const visible = question.type === 'multi_answer';
+  section.classList.toggle('hidden', !visible);
+  if (!visible) return;
+
+  const maxSelectionsInput = section.querySelector('[data-config-field="maxSelections"]');
+  if (maxSelectionsInput) {
+    const optionCount = Array.isArray(question.options) ? question.options.length : 1;
+    maxSelectionsInput.value = question.meta?.maxSelections ?? optionCount;
+    maxSelectionsInput.max = String(optionCount);
+  }
+}
 
 function applyNumberConfig(questionItem, question) {
   const section = questionItem.querySelector('[data-config-section="number"]');
   if (!section) return;
-  if (question.type !== 'number_answer') {
-    section.classList.add('hidden');
-    return;
-  }
-  section.classList.remove('hidden');
-  const numeric = (question.meta && question.meta.validation && question.meta.validation.numeric) || DEFAULT_NUMERIC_META;
+  const visible = question.type === 'number_answer';
+  section.classList.toggle('hidden', !visible);
+  if (!visible) return;
+
+  const numeric = question.meta?.validation?.numeric || DEFAULT_NUMERIC_META;
   const minInput = section.querySelector('[data-config-field="min"]');
-  if (minInput) minInput.value = numeric.min ?? '';
   const maxInput = section.querySelector('[data-config-field="max"]');
-  if (maxInput) maxInput.value = numeric.max ?? '';
   const stepInput = section.querySelector('[data-config-field="step"]');
-  if (stepInput) stepInput.value = numeric.step ?? 1;
   const unitLabelInput = section.querySelector('[data-config-field="unitLabel"]');
+  if (minInput) minInput.value = numeric.min ?? '';
+  if (maxInput) maxInput.value = numeric.max ?? '';
+  if (stepInput) stepInput.value = numeric.step ?? 1;
   if (unitLabelInput) unitLabelInput.value = numeric.unitLabel || '';
 }
 
 function applyDateTimeConfig(questionItem, question) {
   const section = questionItem.querySelector('[data-config-section="date_time"]');
   if (!section) return;
-  if (question.type !== 'date_time') {
-    section.classList.add('hidden');
-    return;
-  }
-  section.classList.remove('hidden');
-  const config = question.meta?.dateTimeConfig || DEFAULT_DATETIME_META;
-  const mode = config.inputMode || 'datetime'; // Default to datetime if not set
+  const visible = question.type === 'date_time';
+  section.classList.toggle('hidden', !visible);
+  if (!visible) return;
 
+  const config = question.meta?.dateTimeConfig || DEFAULT_DATETIME_META;
+  const mode = config.inputMode || 'datetime';
   const showDateCheckbox = section.querySelector('[data-config-field="showDate"]');
   const showTimeCheckbox = section.querySelector('[data-config-field="showTime"]');
-
-  if (showDateCheckbox) {
-    showDateCheckbox.checked = (mode === 'date' || mode === 'datetime');
-  }
-  if (showTimeCheckbox) {
-    showTimeCheckbox.checked = (mode === 'time' || mode === 'datetime');
-  }
+  if (showDateCheckbox) showDateCheckbox.checked = mode === 'date' || mode === 'datetime';
+  if (showTimeCheckbox) showTimeCheckbox.checked = mode === 'time' || mode === 'datetime';
 }
 
 function applyHandwritingConfig(questionItem, question) {
   const section = questionItem.querySelector('[data-config-section="handwriting"]');
   if (!section) return;
-  if (question.type !== 'handwriting') {
-    section.classList.add('hidden');
-    return;
-  }
-  section.classList.remove('hidden');
+  const visible = question.type === 'handwriting';
+  section.classList.toggle('hidden', !visible);
+  if (!visible) return;
+
   const config = question.meta?.handwritingConfig || DEFAULT_HANDWRITING_META;
-  
   const presetSelect = section.querySelector('[data-config-field="canvasHeightPreset"]');
   const customHeightGroup = section.querySelector('[data-handwriting-sub-config="customHeight"]');
   const customHeightInput = section.querySelector('[data-config-field="canvasHeight"]');
+  if (!presetSelect || !customHeightGroup || !customHeightInput) return;
 
-  if (presetSelect && customHeightGroup && customHeightInput) {
-    const height = config.canvasHeight ?? 200;
-    const presetValues = ['100', '200', '300', '500'];
-    
-    if (presetValues.includes(String(height))) {
-      presetSelect.value = String(height);
-      customHeightGroup.classList.add('hidden');
-    } else {
-      presetSelect.value = 'custom';
-      customHeightGroup.classList.remove('hidden');
-      customHeightInput.value = height;
-    }
+  const height = config.canvasHeight ?? 200;
+  const presetValues = ['100', '200', '300', '500'];
+  if (presetValues.includes(String(height))) {
+    presetSelect.value = String(height);
+    customHeightGroup.classList.add('hidden');
+  } else {
+    presetSelect.value = 'custom';
+    customHeightGroup.classList.remove('hidden');
+    customHeightInput.value = height;
   }
 }
 
-function applyTextValidationConfig(questionItem, question) {
-    const section = questionItem.querySelector('[data-config-section="free_answer"]');
-    if (!section) return;
+function applyExplanationCardConfig(questionItem, question, languageOptions = {}) {
+  const section = questionItem.querySelector('[data-config-section="explanation_card"]');
+  if (!section) return;
+  const visible = question.type === 'explanation_card';
+  section.classList.toggle('hidden', !visible);
+  if (!visible) return;
 
-    if (question.type !== 'free_answer') {
-        section.classList.add('hidden');
-        return;
-    }
-    section.classList.remove('hidden');
-
-    const validation = question.meta?.validation?.text || { minLength: '', maxLength: '' };
-
-    const minLengthInput = section.querySelector('[data-config-field="minLength"]');
-    if (minLengthInput) {
-        minLengthInput.value = validation.minLength ?? '';
-    }
-
-    const maxLengthInput = section.querySelector('[data-config-field="maxLength"]');
-    if (maxLengthInput) {
-        maxLengthInput.value = validation.maxLength ?? '';
-    }
+  hydrateSingleLanguageField(section, question.explanationText, languageOptions, {
+    fieldKey: `explanationDescription_${question.questionId}`,
+    label: '説明文',
+    placeholderJa: '説明文を入力'
+  });
 }
 
-function applyMultiAnswerConfig(questionItem, question) {
-    const section = questionItem.querySelector('[data-config-section="multi_answer"]');
-    if (!section) return;
+function applyChoiceOptions(questionItem, question, languageOptions = {}) {
+  const section = questionItem.querySelector('[data-config-section="choice_options"]');
+  if (!section) return;
+  const visible = ['single_answer', 'multi_answer', 'dropdown'].includes(question.type);
+  section.classList.toggle('hidden', !visible);
+  if (!visible) return;
 
-    if (question.type !== 'multi_answer') {
-        section.classList.add('hidden');
-        return;
-    }
-    section.classList.remove('hidden');
+  const optionsContainer = section.querySelector('.options-container');
+  if (optionsContainer) {
+    optionsContainer.innerHTML = '';
+    (question.options || []).forEach((option, optionIndex) => {
+      optionsContainer.appendChild(createOptionElement(option, question.questionId, optionIndex, languageOptions));
+    });
+  }
 
-    const maxSelectionsInput = section.querySelector('[data-config-field="maxSelections"]');
-    if (maxSelectionsInput) {
-        const meta = question.meta || {};
-        const numOptions = Array.isArray(question.options) ? question.options.length : 1;
-        maxSelectionsInput.value = meta.maxSelections ?? numOptions;
-        maxSelectionsInput.max = numOptions;
-    }
+  const bulkInput = section.querySelector('.option-bulk-input');
+  if (bulkInput) {
+    bulkInput.value = (question.options || []).map((option) => getLocalizedText(option.text, FALLBACK_LANGUAGE)).join('\n');
+  }
+
+  const bulkPanel = section.querySelector('[data-option-bulk-panel]');
+  const bulkToggle = section.querySelector('[data-option-bulk-toggle]');
+  if (bulkPanel && bulkToggle) {
+    bulkPanel.classList.add('hidden');
+    bulkToggle.setAttribute('aria-expanded', 'false');
+  }
 }
 
-function applyJumpConfig(questionItem, question, languageOptions) {
+function applyMatrixConfig(questionItem, question, languageOptions = {}) {
+  const matrixEditor = questionItem.querySelector('.matrix-editor');
+  if (!matrixEditor) return;
+  const visible = question.type === 'matrix_sa' || question.type === 'matrix_ma';
+  matrixEditor.classList.toggle('hidden', !visible);
+  if (!visible) return;
+
+  const matrixRowsList = matrixEditor.querySelector('.matrix-rows-list');
+  const matrixColsList = matrixEditor.querySelector('.matrix-cols-list');
+  if (matrixRowsList) {
+    matrixRowsList.innerHTML = '';
+    (question.matrix?.rows || []).forEach((row, rowIndex) => {
+      matrixRowsList.appendChild(createMatrixRowItem(row, rowIndex, question.questionId, languageOptions));
+    });
+  }
+  if (matrixColsList) {
+    matrixColsList.innerHTML = '';
+    (question.matrix?.cols || []).forEach((col, colIndex) => {
+      matrixColsList.appendChild(createMatrixColItem(col, colIndex, question.questionId, languageOptions));
+    });
+  }
+}
+
+function applyJumpConfig(questionItem, question, languageOptions = {}) {
   const section = questionItem.querySelector('[data-config-section="jump"]');
   if (!section) return;
-
-  const allowBranching = languageOptions.allowBranching === true;
   const isExplanation = question.type === 'explanation_card';
   section.classList.toggle('hidden', isExplanation);
   if (isExplanation) return;
@@ -571,51 +533,202 @@ function applyJumpConfig(questionItem, question, languageOptions) {
   const lockedMessage = section.querySelector('[data-jump-locked-message]');
   if (!select) return;
 
+  const allowBranching = languageOptions.allowBranching === true;
   const targets = Array.isArray(languageOptions.jumpTargets) ? languageOptions.jumpTargets : [];
-  const availableTargets = targets.filter(target => target.id !== question.questionId);
-
+  const availableTargets = targets.filter((target) => target.id !== question.questionId);
   select.innerHTML = '<option value="">次の設問へ</option>';
-  availableTargets.forEach(target => {
+  availableTargets.forEach((target) => {
     const option = document.createElement('option');
     option.value = target.id;
     option.textContent = target.label || target.id;
     select.appendChild(option);
   });
 
-  const targetValue = question.meta?.jump?.targetQuestionId || '';
-  select.value = targetValue;
+  select.value = question.meta?.jump?.targetQuestionId || '';
   select.disabled = !allowBranching;
   select.setAttribute('aria-disabled', allowBranching ? 'false' : 'true');
-
-  if (lockedMessage) {
-    lockedMessage.classList.toggle('hidden', allowBranching);
-  }
+  if (lockedMessage) lockedMessage.classList.toggle('hidden', allowBranching);
 }
 
+function bindStackedFieldLabels(root, fieldPrefix) {
+  root.querySelectorAll('.input-group.input-group-stacked.question-builder-field').forEach((group, index) => {
+    const label = group.querySelector('.input-label');
+    const control = group.querySelector('input, textarea, select');
+    if (!label || !control) return;
+
+    if (!control.id) {
+      control.id = `${fieldPrefix}-${index}`;
+    }
+    label.setAttribute('for', control.id);
+  });
+}
+
+function bindInlineToggleLabels(root, fieldPrefix) {
+  root.querySelectorAll('.question-builder-inline-toggle').forEach((wrapper, index) => {
+    const label = wrapper.querySelector('label');
+    const control = wrapper.querySelector('input[type="checkbox"], input[type="radio"]');
+    if (!label || !control) return;
+
+    if (!control.id) {
+      control.id = `${fieldPrefix}-toggle-${index}`;
+    }
+    label.setAttribute('for', control.id);
+  });
+}
+
+function bindQuestionDetailLabels(questionItem, questionId) {
+  if (!questionItem || !questionId) return;
+  bindStackedFieldLabels(questionItem, `question-${questionId}-field`);
+  bindInlineToggleLabels(questionItem, `question-${questionId}`);
+}
+
+function renderQuestion(question, uiLang, index, languageOptions = {}) {
+  const template = document.getElementById('questionTemplate');
+  const fragment = template.content.cloneNode(true);
+  const questionItem = fragment.querySelector('.question-item');
+  const summary = fragment.querySelector('.question-card-summary');
+  const detailPanel = fragment.querySelector('.question-detail-panel');
+  const requiredCheckbox = fragment.querySelector('.required-checkbox');
+  const typeSelect = fragment.querySelector('.question-type-select');
+  const typeTrigger = fragment.querySelector('[data-current-type-trigger]');
+  const typeTriggerLabel = fragment.querySelector('[data-current-type-label]');
+  const typeMenu = fragment.querySelector('[data-question-type-menu]');
+  const questionTextGroup = fragment.querySelector('.multi-lang-input-group[data-field-key="questionText"]');
+
+  questionItem.dataset.questionId = question.questionId;
+  questionItem.dataset.questionType = question.type || 'free_answer';
+  questionItem.id = `question-${question.questionId}`;
+
+  const detailId = `question-detail-${question.questionId}`;
+  const isExpanded = getStoredAccordionState(question.questionId, false);
+  if (summary) {
+    summary.dataset.accordionTarget = detailId;
+    summary.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+  }
+  if (detailPanel) {
+    detailPanel.id = detailId;
+    detailPanel.classList.toggle('hidden', !isExpanded);
+  }
+
+  const questionNumber = fragment.querySelector('[data-question-number]');
+  if (questionNumber) questionNumber.textContent = `Q${index + 1}`;
+
+  const summaryText = fragment.querySelector('[data-question-summary-text]');
+  if (summaryText) summaryText.textContent = getDisplayText(question.text, languageOptions) || t('labels', 'untitledQuestion', uiLang);
+
+  const typeLabel = fragment.querySelector('[data-question-type-label]');
+  if (typeLabel) typeLabel.textContent = t('questionTypes', question.type, uiLang);
+
+  const requiredBadge = fragment.querySelector('[data-question-required-badge]');
+  if (requiredBadge) requiredBadge.classList.toggle('hidden', !question.required);
+
+  const statusContainer = fragment.querySelector('[data-question-status-badges]');
+  if (statusContainer) {
+    statusContainer.innerHTML = '';
+    const statuses = getQuestionStatus(question, languageOptions);
+    statuses.slice(0, 2).forEach((status) => {
+      statusContainer.appendChild(createStatusBadge(status.text, status.variant));
+    });
+    if (statuses.length > 2) {
+      statusContainer.appendChild(createStatusBadge(`+${statuses.length - 2}`, 'is-info'));
+    }
+  }
+
+  if (typeSelect) typeSelect.value = QUESTION_TYPE_ORDER.includes(question.type) ? question.type : 'free_answer';
+  if (typeSelect) {
+    typeSelect.id = `question-type-${question.questionId}`;
+    typeSelect.name = `questionType_${question.questionId}`;
+  }
+
+  if (typeTriggerLabel) {
+    typeTriggerLabel.textContent = t('questionTypes', question.type, uiLang);
+  }
+  if (typeMenu) {
+    typeMenu.innerHTML = '';
+    QUESTION_TYPE_ORDER.forEach((type) => {
+      typeMenu.appendChild(createTypeMenuItem(type, question.type, uiLang));
+    });
+  }
+  if (typeTrigger) typeTrigger.setAttribute('aria-expanded', 'false');
+
+  hydrateSingleLanguageField(questionTextGroup, question.text, languageOptions, {
+    fieldKey: `questionText_${question.questionId}`,
+    label: '設問文',
+    placeholderJa: '設問文を入力'
+  });
+
+  const textInput = questionItem.querySelector('.question-text-input');
+  if (textInput) textInput.dataset.lang = languageOptions.editorLanguage || FALLBACK_LANGUAGE;
+  if (requiredCheckbox) requiredCheckbox.checked = Boolean(question.required);
+
+  applyTextValidationConfig(questionItem, question);
+  applyMultiAnswerConfig(questionItem, question);
+  applyNumberConfig(questionItem, question);
+  applyDateTimeConfig(questionItem, question);
+  applyHandwritingConfig(questionItem, question);
+  applyExplanationCardConfig(questionItem, question, languageOptions);
+  applyChoiceOptions(questionItem, question, languageOptions);
+  applyMatrixConfig(questionItem, question, languageOptions);
+  applyJumpConfig(questionItem, question, languageOptions);
+
+  const advancedPanel = questionItem.querySelector('[data-advanced-settings-panel]');
+  const advancedToggle = questionItem.querySelector('[data-advanced-settings-toggle]');
+  if (advancedPanel && advancedToggle) {
+    const hasJump = Boolean(question.meta?.jump?.targetQuestionId);
+    advancedPanel.classList.toggle('hidden', !hasJump);
+    advancedToggle.setAttribute('aria-expanded', hasJump ? 'true' : 'false');
+  }
+
+  bindQuestionDetailLabels(questionItem, question.questionId);
+
+  return questionItem;
+}
 
 function renderQuestionGroup(group, uiLang, languageOptions = {}) {
   const template = document.getElementById('questionGroupTemplate');
   const fragment = template.content.cloneNode(true);
   const groupItem = fragment.querySelector('.question-group');
+  const header = fragment.querySelector('.group-header');
+  const body = fragment.querySelector('.question-builder-group__body');
   const questionsList = fragment.querySelector('.questions-list');
+  const titleGroup = fragment.querySelector('.multi-lang-input-group');
 
   groupItem.dataset.groupId = group.groupId;
+  groupItem.id = `group-${group.groupId}`;
 
-  const titleGroup = groupItem.querySelector('.multi-lang-input-group');
-  if (titleGroup) {
-    hydrateSingleLanguageField(titleGroup, group.title, languageOptions, {
-      fieldKey: `groupTitle_${group.groupId}`,
-      label: 'グループタイトル'
-    });
-    const titleInput = titleGroup.querySelector('.group-title-input');
-    if (titleInput) {
-      titleInput.dataset.lang = languageOptions.editorLanguage || FALLBACK_LANGUAGE;
-    }
+  const bodyId = `group-body-${group.groupId}`;
+  const isExpanded = getStoredAccordionState(group.groupId, true);
+  if (header) {
+    header.dataset.accordionTarget = bodyId;
+    header.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+  }
+  if (body) {
+    body.id = bodyId;
+    body.classList.toggle('hidden', !isExpanded);
+  }
+
+  hydrateSingleLanguageField(titleGroup, group.title, languageOptions, {
+    fieldKey: `groupTitle_${group.groupId}`,
+    label: 'グループタイトル',
+    placeholderJa: 'グループタイトルを入力'
+  });
+
+  const titleInput = groupItem.querySelector('.group-title-input');
+  if (titleInput) titleInput.dataset.lang = languageOptions.editorLanguage || FALLBACK_LANGUAGE;
+
+  const countBadge = groupItem.querySelector('[data-group-question-count]');
+  if (countBadge) countBadge.textContent = `${(group.questions || []).length}問`;
+
+  const issueBadge = groupItem.querySelector('[data-group-issue-count]');
+  const issueCount = getGroupIssueCount(group, languageOptions);
+  if (issueBadge) {
+    issueBadge.textContent = issueCount > 0 ? `${issueCount}件の確認事項` : '';
+    issueBadge.classList.toggle('hidden', issueCount === 0);
   }
 
   if (questionsList) {
     questionsList.innerHTML = '';
-    if (Array.isArray(group.questions) && group.questions.length) {
+    if (Array.isArray(group.questions) && group.questions.length > 0) {
       group.questions.forEach((question, index) => {
         questionsList.appendChild(renderQuestion(question, uiLang, index, languageOptions));
       });
@@ -635,70 +748,91 @@ export function renderAllQuestionGroups(groups, uiLang, languageOptions = {}) {
   if (!container) return;
 
   container.innerHTML = '';
-  if (Array.isArray(groups) && groups.length) {
-    groups.forEach((group) => {
-      container.appendChild(renderQuestionGroup(group, uiLang, languageOptions));
-    });
-  } else {
+  if (!Array.isArray(groups) || groups.length === 0) {
     const empty = document.createElement('p');
     empty.className = 'text-on-surface-variant p-4';
     empty.textContent = t('labels', 'noGroups', uiLang);
     container.appendChild(empty);
-  }
-}
-
-export function renderOutlineMap() {
-  const outlineMapContainer = document.getElementById('outline-map-container');
-  if (!outlineMapContainer) return;
-
-  const mainContent = document.getElementById('survey-content-area');
-  if (!mainContent) return;
-
-  const headings = Array.from(mainContent.querySelectorAll('h2, .group-title-input, .question-text-input'));
-  if (!headings.length) {
-    outlineMapContainer.innerHTML = '';
     return;
   }
 
-  let html = '<h3 class="text-lg font-semibold mb-4">目次</h3><ul class="space-y-2">';
-  headings.forEach((h, idx) => {
-    const isQuestion = h.classList.contains('question-text-input');
-    const isGroup = h.classList.contains('group-title-input');
-    
-    let targetElement;
-    let text;
-    let level = 2;
-
-    if (isQuestion) {
-        targetElement = h.closest('.question-item');
-        text = h.value || '';
-        level = 3;
-    } else if (isGroup) {
-        targetElement = h.closest('.question-group');
-        text = h.value || '';
-        level = 2;
-    } else { // h2
-        targetElement = h;
-        text = h.textContent || '';
-        level = 1;
-    }
-
-    if (!targetElement) return;
-    if (!targetElement.id) {
-      targetElement.id = `section-gen-${idx}`;
-    }
-
-    const paddingLeft = (level - 1) * 16;
-    if (!text.trim()) return;
-
-    html += `
-      <li>
-        <a href="#${targetElement.id}" class="block text-on-surface-variant hover:text-primary text-sm truncate" style="padding-left: ${paddingLeft}px;" title="${text}">${text}</a>
-      </li>
-    `;
+  groups.forEach((group) => {
+    container.appendChild(renderQuestionGroup(group, uiLang, languageOptions));
   });
-  html += '</ul>';
-  outlineMapContainer.innerHTML = html;
+}
+
+export function renderOutlineMap() {
+  const list = document.getElementById('outline-map-list');
+  if (!list) return;
+
+  const groupElements = Array.from(document.querySelectorAll('.question-group'));
+  list.innerHTML = '';
+
+  if (groupElements.length === 0) {
+    const empty = document.createElement('p');
+    empty.className = 'text-sm text-on-surface-variant';
+    empty.textContent = '設問を追加すると編集ナビが表示されます。';
+    list.appendChild(empty);
+    return;
+  }
+
+  groupElements.forEach((groupElement) => {
+    const section = document.createElement('section');
+    section.className = 'outline-nav-section';
+
+    const groupToggle = document.createElement('button');
+    groupToggle.type = 'button';
+    groupToggle.className = 'outline-nav-group-toggle';
+    groupToggle.dataset.outlineGroupToggle = groupElement.dataset.groupId || '';
+
+    const titleInput = groupElement.querySelector('.group-title-input');
+    const questionItems = Array.from(groupElement.querySelectorAll('.question-item'));
+    const issueCount = questionItems.reduce((count, item) => count + item.querySelectorAll('.question-status-badge').length, 0);
+
+    const groupText = document.createElement('span');
+    groupText.className = 'outline-nav-group-text';
+
+    const groupLabel = document.createElement('span');
+    groupLabel.className = 'outline-nav-group-label';
+    groupLabel.textContent = titleInput?.value?.trim() || t('labels', 'untitledGroup', FALLBACK_LANGUAGE);
+
+    const groupMeta = document.createElement('span');
+    groupMeta.className = 'outline-nav-group-meta';
+    groupMeta.textContent = issueCount > 0 ? `${questionItems.length}問 / ${issueCount}件の確認事項` : `${questionItems.length}問`;
+    groupText.append(groupLabel, groupMeta);
+    const toggleIcon = document.createElement('span');
+    toggleIcon.className = 'material-icons';
+    toggleIcon.textContent = 'expand_more';
+    groupToggle.append(groupText, toggleIcon);
+    section.appendChild(groupToggle);
+
+    const questionList = document.createElement('div');
+    questionList.className = 'outline-nav-question-list hidden';
+    questionList.dataset.outlineGroupQuestions = groupElement.dataset.groupId || '';
+
+    questionItems.forEach((questionItem) => {
+      const questionLink = document.createElement('a');
+      questionLink.href = `#${questionItem.id}`;
+      questionLink.className = 'outline-nav-question-link';
+      questionLink.dataset.outlineQuestionId = questionItem.dataset.questionId || '';
+
+      const questionLabel = document.createElement('span');
+      questionLabel.className = 'outline-nav-question-label';
+      questionLabel.textContent = questionItem.querySelector('[data-question-summary-text]')?.textContent?.trim() || t('labels', 'untitledQuestion', FALLBACK_LANGUAGE);
+
+      const typeLabel = questionItem.querySelector('[data-question-type-label]')?.textContent?.trim() || '';
+      const statuses = Array.from(questionItem.querySelectorAll('.question-status-badge')).map((badge) => badge.textContent.trim()).filter(Boolean);
+      const questionMeta = document.createElement('span');
+      questionMeta.className = 'outline-nav-question-meta';
+      questionMeta.textContent = statuses.length > 0 ? `${typeLabel} / ${statuses.join(' / ')}` : typeLabel;
+
+      questionLink.append(questionLabel, questionMeta);
+      questionList.appendChild(questionLink);
+    });
+
+    section.appendChild(questionList);
+    list.appendChild(section);
+  });
 }
 
 export function displayErrorMessage() {
@@ -708,33 +842,34 @@ export function displayErrorMessage() {
 }
 
 export function updateOutlineActionsState() {
-    const outlineActions = document.getElementById('outline-action-buttons');
-    const outlineMapList = document.getElementById('outline-map-list');
-    if (!outlineActions || !outlineMapList) return;
+  const outlineActions = document.getElementById('outline-action-buttons');
+  const outlineMapList = document.getElementById('outline-map-list');
+  if (!outlineActions || !outlineMapList) return;
 
-    const hasContent = outlineMapList.hasChildNodes();
-    outlineActions.classList.toggle('hidden', !hasContent);
+  const hasOutlineEntries = Boolean(
+    outlineMapList.querySelector('[data-outline-group-toggle], .outline-nav-question-link')
+  );
+  outlineActions.classList.toggle('hidden', !hasOutlineEntries);
+  if (!hasOutlineEntries) return;
 
-    if (!hasContent) return;
+  const mainSaveBtn = document.getElementById('createSurveyBtn');
+  const mainPreviewBtn = document.getElementById('showPreviewBtn');
+  const outlineSaveBtn = outlineActions.querySelector('[data-outline-action="save"]');
+  const outlinePreviewBtn = outlineActions.querySelector('[data-outline-action="preview"]');
 
-    const mainSaveBtn = document.getElementById('createSurveyBtn');
-    const mainPreviewBtn = document.getElementById('showPreviewBtn');
-    const outlineSaveBtn = outlineActions.querySelector('[data-outline-action="save"]');
-    const outlinePreviewBtn = outlineActions.querySelector('[data-outline-action="preview"]');
-
-    if (mainSaveBtn && outlineSaveBtn) {
-        outlineSaveBtn.disabled = mainSaveBtn.disabled;
-        if (!outlineSaveBtn.dataset.listener) {
-            outlineSaveBtn.addEventListener('click', () => mainSaveBtn.click());
-            outlineSaveBtn.dataset.listener = 'true';
-        }
+  if (mainSaveBtn && outlineSaveBtn) {
+    outlineSaveBtn.disabled = mainSaveBtn.disabled;
+    if (!outlineSaveBtn.dataset.listener) {
+      outlineSaveBtn.addEventListener('click', () => mainSaveBtn.click());
+      outlineSaveBtn.dataset.listener = 'true';
     }
+  }
 
-    if (mainPreviewBtn && outlinePreviewBtn) {
-        outlinePreviewBtn.disabled = mainPreviewBtn.disabled;
-        if (!outlinePreviewBtn.dataset.listener) {
-            outlinePreviewBtn.addEventListener('click', () => mainPreviewBtn.click());
-            outlinePreviewBtn.dataset.listener = 'true';
-        }
+  if (mainPreviewBtn && outlinePreviewBtn) {
+    outlinePreviewBtn.disabled = mainPreviewBtn.disabled;
+    if (!outlinePreviewBtn.dataset.listener) {
+      outlinePreviewBtn.addEventListener('click', () => mainPreviewBtn.click());
+      outlinePreviewBtn.dataset.listener = 'true';
     }
+  }
 }

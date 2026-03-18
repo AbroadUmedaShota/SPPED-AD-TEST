@@ -13,35 +13,34 @@
                 <input class="input-field" id="surveyName" name="surveyName" placeholder=" " type="text" required />
                 <label class="input-label" for="surveyName">アンケート名</label>
                 <p class="error-message hidden" id="surveyName-error"></p>
-                <button type="button" class="help-icon-button material-icons" data-tooltip-id="new-survey-name-tooltip"
-                    aria-label="アンケート名の説明を表示">help_outline</button>
-                <div id="new-survey-name-tooltip" class="help-popover hidden" role="tooltip">
-                    <p class="text-xs leading-snug text-on-surface-variant">社内向けの管理名称です。回答者には表示されません。</p>
-                </div>
+                <button type="button" class="help-trigger help-icon-button material-icons" data-help-key="surveyName"
+                    data-help-target="new-survey-name" aria-label="アンケート名の説明を表示">help_outline</button>
             </div>
             <div class="input-group">
                 <input class="input-field" id="displayTitle" name="displayTitle" placeholder=" " type="text" required />
                 <label class="input-label" for="displayTitle">表示タイトル</label>
                 <p class="error-message hidden" id="displayTitle-error"></p>
-                <button type="button" class="help-icon-button material-icons"
-                    data-tooltip-id="new-display-title-tooltip" aria-label="表示タイトルの説明を表示">help_outline</button>
-                <div id="new-display-title-tooltip" class="help-popover hidden" role="tooltip">
-                    <p class="text-xs leading-snug text-on-surface-variant">回答者に表示されるタイトルです。イベント名等、外部向けの名称を設定してください。</p>
-                </div>
+                <button type="button" class="help-trigger help-icon-button material-icons"
+                    data-help-key="surveyDisplayTitle" data-help-target="new-display-title"
+                    aria-label="表示タイトルの説明を表示">help_outline</button>
             </div>
             <div class="input-group">
                 <textarea class="input-field" id="surveyMemo" name="surveyMemo" placeholder=" " rows="3"></textarea>
                 <label class="input-label" for="surveyMemo">メモ（任意）</label>
                 <p class="error-message hidden" id="surveyMemo-error"></p>
+                <button type="button" class="help-trigger help-icon-button material-icons" data-help-key="internalMemo"
+                    data-help-target="new-survey-memo" aria-label="メモの説明を表示">help_outline</button>
             </div>
             <div class="input-group" id="newSurveyPeriodRangeWrapper">
-                <div class="relative">
+                <div class="input-with-trailing-actions">
                     <input type="text" id="newSurveyPeriodRange" name="newSurveyPeriodRange" placeholder=" "
                         class="input-field pr-10" required data-input data-toggle>
                     <label class="input-label" for="newSurveyPeriodRange" data-toggle>回答期間</label>
-                    <span
-                        class="material-icons absolute top-1/2 right-3 -translate-y-1/2 text-on-surface-variant cursor-pointer"
-                        data-toggle>calendar_today</span>
+                    <div class="field-trailing-actions">
+                        <span class="field-action-button material-icons" data-toggle aria-hidden="true">calendar_today</span>
+                        <button type="button" class="help-trigger help-icon-button material-icons" data-help-key="surveyPeriod"
+                            data-help-target="new-survey-period" aria-label="回答期間の説明を表示">help_outline</button>
+                    </div>
                 </div>
                 <p class="error-message hidden" id="newSurveyPeriodRange-error"></p>
             </div>

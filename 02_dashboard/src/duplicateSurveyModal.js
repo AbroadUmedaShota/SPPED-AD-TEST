@@ -1,5 +1,6 @@
 import { handleOpenModal, closeModal } from './modalHandler.js';
 import { showToast, resolveDashboardAssetPath } from './utils.js';
+import { initHelpPopovers } from './ui/helpPopover.js';
 
 // --- DOM Elements ---
 let modal;
@@ -12,34 +13,6 @@ let confirmBtn;
 let cancelBtn;
 let closeBtn;
 let periodRangeInstance = null;
-
-let activeDuplicateSurveyPopover = null;
-
-function closeDuplicateSurveyPopover() {
-    if (!activeDuplicateSurveyPopover) return;
-    const { button, popover } = activeDuplicateSurveyPopover;
-    if (popover) popover.classList.add('hidden');
-    if (button) button.setAttribute('aria-expanded', 'false');
-    activeDuplicateSurveyPopover = null;
-}
-
-document.addEventListener('click', (event) => {
-    if (!activeDuplicateSurveyPopover) return;
-    const { button, popover } = activeDuplicateSurveyPopover;
-    if ((button && button.contains(event.target)) || (popover && popover.contains(event.target))) {
-        return;
-    }
-    closeDuplicateSurveyPopover();
-});
-
-document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') {
-        closeDuplicateSurveyPopover();
-    }
-});
-
-
-
 
 /**
  * Initializes DOM elements for the duplicate survey modal.
@@ -143,30 +116,7 @@ const setupEventListeners = () => {
     closeBtn.removeEventListener('click', closeDuplicateSurveyModal);
     closeBtn.addEventListener('click', closeDuplicateSurveyModal);
 
-    // Initialize Help Popovers
-    const helpButtons = modal.querySelectorAll('.help-icon-button');
-    helpButtons.forEach((button) => {
-        if (button.dataset.bound === 'true') return;
-
-        button.addEventListener('click', (e) => {
-            e.stopPropagation();
-            e.preventDefault();
-
-            const tooltipId = button.dataset.tooltipId;
-            const popover = document.getElementById(tooltipId);
-            if (!popover) return;
-
-            if (activeDuplicateSurveyPopover && activeDuplicateSurveyPopover.popover === popover) {
-                closeDuplicateSurveyPopover();
-            } else {
-                closeDuplicateSurveyPopover();
-                popover.classList.remove('hidden');
-                button.setAttribute('aria-expanded', 'true');
-                activeDuplicateSurveyPopover = { button, popover };
-            }
-        });
-        button.dataset.bound = 'true';
-    });
+    initHelpPopovers(modal);
 };
 
 /**

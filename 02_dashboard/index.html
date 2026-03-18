@@ -164,7 +164,11 @@
                                 <tr>
                                     <th
                                         class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-32">
-                                        アクション</th>
+                                        <span class="inline-flex items-center gap-1" data-help-target="survey-actions">
+                                            <span>アクション</span>
+                                            <button type="button" class="help-trigger help-inline-button material-icons"
+                                                data-help-key="surveyListActions" aria-label="アクションの説明を表示">help_outline</button>
+                                        </span></th>
                                     <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-24 sortable-header cursor-pointer"
                                         data-sort-key="id" data-sort-order="asc" aria-label="アンケートIDで並べ替え"
                                         aria-sort="none" tabindex="0">
@@ -173,9 +177,13 @@
                                             class="material-icons text-xs align-middle opacity-40 sort-icon">unfold_more</span>
                                     </th>
                                     <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider sortable-header cursor-pointer"
-                                        data-sort-key="name" data-sort-order="asc" title="アンケート名（社内管理用）"
+                                        data-sort-key="name" data-sort-order="asc"
                                         aria-label="アンケート名で並べ替え" aria-sort="none" tabindex="0">
-                                        アンケート名
+                                        <span class="inline-flex items-center gap-1" data-help-target="survey-name">
+                                            <span>アンケート名</span>
+                                            <button type="button" class="help-trigger help-inline-button material-icons"
+                                                data-help-key="surveyName" aria-label="アンケート名の説明を表示">help_outline</button>
+                                        </span>
                                         <span
                                             class="material-icons text-xs align-middle opacity-40 sort-icon">unfold_more</span>
                                     </th>
@@ -194,9 +202,13 @@
                                             class="material-icons text-xs align-middle opacity-40 sort-icon">unfold_more</span>
                                     </th>
                                     <th class="px-4 py-3 text-left text-on-surface-variant text-xs font-semibold uppercase tracking-wider w-48 sortable-header cursor-pointer"
-                                        data-sort-key="periodStart" data-sort-order="asc" title="回答受付期間"
+                                        data-sort-key="periodStart" data-sort-order="asc"
                                         aria-label="展示会会期で並べ替え" aria-sort="none" tabindex="0">
-                                        展示会会期
+                                        <span class="inline-flex items-center gap-1" data-help-target="survey-period">
+                                            <span>展示会会期</span>
+                                            <button type="button" class="help-trigger help-inline-button material-icons"
+                                                data-help-key="surveyPeriod" aria-label="展示会会期の説明を表示">help_outline</button>
+                                        </span>
                                         <span
                                             class="material-icons text-xs align-middle opacity-40 sort-icon">unfold_more</span>
                                     </th>

@@ -23,6 +23,7 @@ import {
     getCapabilitiesForTier
 } from './services/planCapabilityService.js';
 import { formatMessage } from './services/i18n/messages.js';
+import { initHelpPopovers } from './ui/helpPopover.js';
 
 // --- Global State ---
 let surveyData = {};
@@ -53,6 +54,8 @@ const BASE_LANGUAGE = 'ja';
 
 let activeLanguages = [BASE_LANGUAGE];
 let editorLanguage = BASE_LANGUAGE;
+let pendingFocusQuestionId = null;
+let pendingFocusGroupId = null;
 
 const additionalSettingsButtons = new Map();
 
@@ -72,10 +75,123 @@ function openPremiumFeatureModal() {
     handleOpenModal('premiumFeatureModalOverlay', resolveDashboardAssetPath('modals/premiumFeatureModal.html'));
 }
 
+function canOpenQrModal() {
+    return Boolean(currentSurveyId && String(currentSurveyId).trim());
+}
+
+function updateQrButtonState() {
+    const qrButton = document.getElementById('openQrModalBtn');
+    if (!qrButton) return;
+
+    const enabled = canOpenQrModal();
+    qrButton.disabled = !enabled;
+    qrButton.setAttribute('aria-disabled', enabled ? 'false' : 'true');
+    qrButton.classList.toggle('opacity-50', !enabled);
+    qrButton.classList.toggle('cursor-not-allowed', !enabled);
+    qrButton.classList.toggle('pointer-events-none', !enabled);
+}
+
 // --- Dirty State Management ---
 function setDirty(dirty) {
     if (isDirty !== dirty) {
         isDirty = dirty;
+    }
+}
+
+function saveAccordionPreference(key, isOpen) {
+    if (!key) return;
+    localStorage.setItem(`accordionState_${key}`, String(isOpen));
+}
+
+function markQuestionForEditing(groupId, questionId) {
+    pendingFocusGroupId = groupId;
+    pendingFocusQuestionId = questionId;
+    saveAccordionPreference(groupId, true);
+    saveAccordionPreference(questionId, true);
+}
+
+function applyPendingBuilderFocus() {
+    if (pendingFocusGroupId) {
+        const groupHeader = document.querySelector(`.question-group[data-group-id="${pendingFocusGroupId}"] .group-header`);
+        const groupBody = document.getElementById(`group-body-${pendingFocusGroupId}`);
+        if (groupHeader && groupBody) {
+            groupBody.classList.remove('hidden');
+            groupHeader.setAttribute('aria-expanded', 'true');
+            const icon = groupHeader.querySelector('.expand-icon');
+            if (icon) icon.textContent = 'expand_less';
+        }
+    }
+
+    if (!pendingFocusQuestionId) return;
+
+    const questionItem = document.querySelector(`.question-item[data-question-id="${pendingFocusQuestionId}"]`);
+    const detailPanel = document.getElementById(`question-detail-${pendingFocusQuestionId}`);
+    const summary = questionItem?.querySelector('.question-card-summary');
+    const input = questionItem?.querySelector('.question-text-input');
+    if (questionItem && detailPanel && summary) {
+        detailPanel.classList.remove('hidden');
+        summary.setAttribute('aria-expanded', 'true');
+        const icon = summary.querySelector('.expand-icon');
+        if (icon) icon.textContent = 'expand_less';
+        questionItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    if (input) {
+        input.focus();
+        input.select();
+    }
+    pendingFocusQuestionId = null;
+    pendingFocusGroupId = null;
+}
+
+function closeAllTypeMenus() {
+    document.querySelectorAll('[data-question-type-menu]').forEach((menu) => menu.classList.add('hidden'));
+    document.querySelectorAll('[data-current-type-trigger]').forEach((trigger) => trigger.setAttribute('aria-expanded', 'false'));
+}
+
+function updateOutlineSelection(activeQuestionId = null) {
+    document.querySelectorAll('.outline-nav-question-link, .outline-nav-group-toggle').forEach((link) => {
+        link.classList.remove('is-active');
+    });
+    document.querySelectorAll('[data-outline-group-toggle] .material-icons').forEach((icon) => {
+        icon.textContent = 'expand_more';
+    });
+
+    let currentQuestionId = activeQuestionId;
+    if (!currentQuestionId) {
+        const hash = window.location.hash || '';
+        if (hash.startsWith('#question-')) {
+            currentQuestionId = hash.replace('#question-', '');
+        }
+    }
+
+    const activeQuestionLink = currentQuestionId
+        ? document.querySelector(`.outline-nav-question-link[data-outline-question-id="${currentQuestionId}"]`)
+        : null;
+    if (activeQuestionLink) {
+        activeQuestionLink.classList.add('is-active');
+        const groupId = activeQuestionLink.closest('[data-outline-group-questions]')?.dataset.outlineGroupQuestions;
+        const groupList = groupId ? document.querySelector(`[data-outline-group-questions="${groupId}"]`) : null;
+        const groupToggle = groupId ? document.querySelector(`[data-outline-group-toggle="${groupId}"]`) : null;
+        if (groupList) groupList.classList.remove('hidden');
+        if (groupToggle) {
+            groupToggle.classList.add('is-active');
+            const icon = groupToggle.querySelector('.material-icons');
+            if (icon) icon.textContent = 'expand_less';
+        }
+        return;
+    }
+
+    const hash = window.location.hash || '';
+    if (hash.startsWith('#group-')) {
+        const groupId = hash.replace('#group-', '');
+        const groupToggle = document.querySelector(`[data-outline-group-toggle="${groupId}"]`);
+        const groupList = document.querySelector(`[data-outline-group-questions="${groupId}"]`);
+        if (groupToggle) groupToggle.classList.add('is-active');
+        if (groupList) {
+            groupList.classList.remove('hidden');
+            const icon = groupToggle?.querySelector('.material-icons');
+            if (icon) icon.textContent = 'expand_less';
+        }
     }
 }
 
@@ -197,6 +313,17 @@ function normalizeActiveLanguages(langs = []) {
             normalized.push(lang);
         }
     });
+
+    document.body.addEventListener('focusin', (event) => {
+        const questionItem = event.target.closest('.question-item');
+        if (questionItem?.dataset.questionId) {
+            updateOutlineSelection(questionItem.dataset.questionId);
+        }
+    });
+
+    window.addEventListener('hashchange', () => {
+        updateOutlineSelection();
+    });
     return normalized;
 }
 
@@ -234,7 +361,7 @@ function setEditorLanguage(lang) {
 }
 
 function canUseMultilingual() {
-    return planFeatureState.allowMultilingual === true;
+    return planFeatureState.allowMultilingual === true && window.__currentAccountType !== 'free';
 }
 
 function isMultilingualEnabled() {
@@ -1003,8 +1130,8 @@ function updateAndRenderAll() {
 
     const languageSection = document.getElementById('language-settings-section');
     if (languageSection) {
-        languageSection.classList.remove('hidden');
-        languageSection.setAttribute('aria-hidden', 'false');
+        languageSection.classList.toggle('hidden', !multilingualAllowed);
+        languageSection.setAttribute('aria-hidden', multilingualAllowed ? 'false' : 'true');
     }
 
     updateMultilingualToggleUI(multilingualAllowed, multilingualEnabled);
@@ -1013,30 +1140,35 @@ function updateAndRenderAll() {
     populateBasicInfo(surveyData, languageOptions);
     renderAllQuestionGroups(surveyData.questionGroups, currentLang, languageOptions);
     renderOutlineMap();
+    updateOutlineSelection(pendingFocusQuestionId);
+    applyPendingBuilderFocus();
+    initHelpPopovers(document);
 
     validateFormForSaveButton();
     setupSortables();
     enhanceAccordionA11y();
     refreshTranslationAssistUi();
 
-    const qrButton = document.getElementById('openQrModalBtn');
-    if (qrButton) {
-        // Always enabled for mock purposes
-        qrButton.setAttribute('aria-disabled', 'false');
-        qrButton.classList.remove('opacity-50');
+    updateQrButtonState();
 
-        if (!qrButton.dataset.qrModalListenerAttached) {
-            qrButton.addEventListener('click', (e) => {
+    const qrButton = document.getElementById('openQrModalBtn');
+    if (qrButton && !qrButton.dataset.qrModalListenerAttached) {
+        qrButton.addEventListener('click', (e) => {
+            if (!canOpenQrModal()) {
                 e.preventDefault();
                 e.stopPropagation();
-                handleOpenModal(
-                    'qrCodeModal',
-                    resolveDashboardAssetPath('modals/qrCodeModal.html'),
-                    () => populateQrCodeModal({ surveyId: currentSurveyId })
-                );
-            });
-            qrButton.dataset.qrModalListenerAttached = 'true';
-        }
+                return;
+            }
+
+            e.preventDefault();
+            e.stopPropagation();
+            handleOpenModal(
+                'qrCodeModal',
+                resolveDashboardAssetPath('modals/qrCodeModal.html'),
+                () => populateQrCodeModal({ surveyId: currentSurveyId })
+            );
+        });
+        qrButton.dataset.qrModalListenerAttached = 'true';
     }
 
     updateOutlineActionsState();
@@ -1080,44 +1212,34 @@ function updateMultilingualToggleUI(multilingualAllowed, multilingualEnabled) {
 
     const currentAccountType = window.__currentAccountType;
     console.log(`[surveyCreation] updateMultilingualToggleUI: currentAccountType is '${currentAccountType}'`);
-    const isFreeAccount = currentAccountType === 'free';
 
-    // フリーアカウントの場合の処理
-    if (isFreeAccount) {
-        toggle.checked = false; // 強制的にオフ
-        toggle.disabled = true; // 無効化
+    if (!multilingualAllowed) {
+        toggle.checked = false;
+        toggle.disabled = true;
         toggle.setAttribute('aria-disabled', 'true');
         if (toggleLabel) {
-            toggleLabel.classList.add('pointer-events-none'); // クリックイベントを無効化
-        }
-
-        if (multilingualToggleWrapper) {
-            multilingualToggleWrapper.classList.add('relative'); // オーバーレイの基準
+            toggleLabel.classList.add('pointer-events-none', 'opacity-50', 'cursor-not-allowed');
         }
         if (multilingualPremiumOverlay) {
-            multilingualPremiumOverlay.classList.remove('hidden'); // オーバーレイを表示
-            // クリックイベントを追加 (重複登録防止)
-            if (!multilingualPremiumOverlay.dataset.listenerAttached) {
-                multilingualPremiumOverlay.addEventListener('click', openPremiumFeatureModal);
-                multilingualPremiumOverlay.dataset.listenerAttached = 'true';
-            }
+            multilingualPremiumOverlay.classList.add('hidden');
         }
         if (lockedMessage) {
-            lockedMessage.classList.remove('hidden'); // ロックメッセージを表示
+            lockedMessage.classList.add('hidden');
         }
         if (offMessage) {
-            offMessage.classList.add('hidden'); // 通常のオフメッセージは非表示
+            offMessage.classList.add('hidden');
         }
         if (controls) {
-            controls.classList.add('hidden'); // 多言語コントロールは非表示
+            controls.classList.add('hidden');
             controls.setAttribute('aria-hidden', 'true');
         }
-        return; // 以降の処理はスキップ
+        return;
     }
 
     // プレミアムアカウントの場合の通常の処理
     if (toggleLabel) {
         toggleLabel.classList.remove('pointer-events-none'); // クリックイベントを有効化
+        toggleLabel.classList.remove('opacity-50', 'cursor-not-allowed');
     }
     if (multilingualPremiumOverlay) {
         multilingualPremiumOverlay.classList.add('hidden'); // オーバーレイを非表示
@@ -1845,17 +1967,20 @@ function saveAccordionState(id, isOpen) {
  * localStorageからアコーディオンの開閉状態を復元する
  */
 function restoreAccordionState() {
-    const accordionItems = document.querySelectorAll('.accordion-item, .question-group');
+    const accordionItems = document.querySelectorAll('.accordion-item, .question-group, .question-item');
     accordionItems.forEach(item => {
-        const header = item.querySelector('.accordion-header, .group-header');
+        const header = item.querySelector('.accordion-header, .group-header, .question-card-summary');
         if (!header) return;
 
         const contentId = header.dataset.accordionTarget;
-        const content = contentId ? document.getElementById(contentId) : item.querySelector('.accordion-content');
+        const content = contentId ? document.getElementById(contentId) : item.querySelector('.accordion-content, .question-detail-panel');
         const icon = header.querySelector('.expand-icon');
 
         if (content) {
-            const isStoredOpen = localStorage.getItem(`accordionState_${contentId || item.dataset.groupId}`) !== 'false';
+            const storageKey = item.dataset.questionId || item.dataset.groupId || contentId;
+            const fallbackOpen = item.classList.contains('question-item') ? false : true;
+            const storedValue = localStorage.getItem(`accordionState_${storageKey}`);
+            const isStoredOpen = storedValue === null ? fallbackOpen : storedValue !== 'false';
 
             content.classList.toggle('hidden', !isStoredOpen);
             if (icon) {
@@ -1873,15 +1998,14 @@ function initializeAccordion() {
     const toggle = (header) => {
         if (!header) return;
         const contentId = header.getAttribute('data-accordion-target');
-        // 動的に生成されるグループヘッダーの場合、contentIdがないことがあるので、親要素からコンテンツを探す
         const content = contentId
             ? document.getElementById(contentId)
-            : header.closest('.question-group')?.querySelector('.accordion-content');
+            : header.closest('.question-item')?.querySelector('.question-detail-panel')
+                || header.closest('.question-group')?.querySelector('.accordion-content')
+                || header.closest('.accordion-item')?.querySelector('.accordion-content');
 
         const icon = header.querySelector('.expand-icon');
         if (!content) return;
-
-        const isOpen = !content.classList.contains('hidden');
 
         content.classList.toggle('hidden');
         const isNowOpen = !content.classList.contains('hidden');
@@ -1891,18 +2015,19 @@ function initializeAccordion() {
         }
         header.setAttribute('aria-expanded', isNowOpen ? 'true' : 'false');
 
-        // 動的グループの場合はgroupIdを、静的な場合はcontentIdをキーにする
-        const storageKey = contentId || header.closest('.question-group')?.dataset.groupId;
+        const storageKey =
+            header.closest('.question-item')?.dataset.questionId
+            || header.closest('.question-group')?.dataset.groupId
+            || contentId;
         if (storageKey) {
             saveAccordionState(storageKey, isNowOpen);
         }
     };
 
     document.body.addEventListener('click', (event) => {
-        const header = event.target.closest('.accordion-header, .group-header');
+        const header = event.target.closest('.accordion-header, .group-header, .question-card-summary');
         if (header) {
-            // input, button, select, and drag handles are excluded from toggling the accordion
-            if (event.target.closest('input, button, select, .handle')) {
+            if (event.target.closest('input, button, select, textarea, .handle, [data-no-toggle]')) {
                 return;
             }
             toggle(header);
@@ -1911,10 +2036,9 @@ function initializeAccordion() {
 
     document.body.addEventListener('keydown', (event) => {
         if (event.key !== 'Enter' && event.key !== ' ') return;
-        const header = event.target.closest('.accordion-header, .group-header');
+        const header = event.target.closest('.accordion-header, .group-header, .question-card-summary');
         if (!header) return;
-        // inputやbuttonなど、ヘッダー内のインタラクティブな要素は除外
-        if (event.target.closest('input, button, select')) {
+        if (event.target.closest('input, button, select, textarea, [data-no-toggle]')) {
             return;
         }
         event.preventDefault();
@@ -2049,7 +2173,6 @@ function setupEventListeners() {
     document.body.addEventListener('change', (event) => {
         const target = event.target;
 
-        // Handle question type change
         const select = target.closest('.question-type-select');
         if (select) {
             const questionItem = select.closest('.question-item');
@@ -2076,6 +2199,7 @@ function setupEventListeners() {
                     question.required = checkbox.checked;
                     setDirty(true);
                     validateFormForSaveButton();
+                    updateAndRenderAll();
                 }
             }
             return;
@@ -2087,6 +2211,9 @@ function setupEventListeners() {
     // --- Delegated Click-to-Action Listeners ---
     document.body.addEventListener('click', (event) => {
         const target = event.target;
+        if (!target.closest('.question-type-control')) {
+            closeAllTypeMenus();
+        }
         const deleteGroupBtn = target.closest('.delete-group-btn');
         const duplicateGroupBtn = target.closest('.duplicate-group-btn');
         const addQuestionBtn = target.closest('.add-question-btn');
@@ -2094,6 +2221,96 @@ function setupEventListeners() {
         const duplicateQuestionBtn = target.closest('.duplicate-question-btn');
         const addOptionBtn = target.closest('.add-option-btn');
         const deleteOptionBtn = target.closest('.delete-option-btn');
+        const toggleBtn = target.closest('.question-builder-toggle-btn');
+        const typeTriggerBtn = target.closest('[data-current-type-trigger]');
+        const typeChipBtn = target.closest('[data-question-type-option]');
+        const bulkApplyBtn = target.closest('.option-bulk-apply-btn');
+        const bulkToggleBtn = target.closest('[data-option-bulk-toggle]');
+        const advancedToggleBtn = target.closest('[data-advanced-settings-toggle]');
+        const outlineGroupToggleBtn = target.closest('[data-outline-group-toggle]');
+
+        if (toggleBtn) {
+            const header = toggleBtn.closest('.question-card-summary, .group-header');
+            if (header) {
+                header.click();
+            }
+            return;
+        }
+        if (typeTriggerBtn) {
+            const menu = typeTriggerBtn.parentElement?.querySelector('[data-question-type-menu]');
+            if (!menu) return;
+            const willOpen = menu.classList.contains('hidden');
+            closeAllTypeMenus();
+            menu.classList.toggle('hidden', !willOpen);
+            typeTriggerBtn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+            return;
+        }
+        if (typeChipBtn) {
+            const questionItem = typeChipBtn.closest('.question-item');
+            const groupEl = typeChipBtn.closest('.question-group');
+            const select = questionItem?.querySelector('.question-type-select');
+            if (!questionItem || !groupEl || !select) return;
+            select.value = typeChipBtn.dataset.questionTypeOption;
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+            closeAllTypeMenus();
+            return;
+        }
+        if (bulkToggleBtn) {
+            const panel = bulkToggleBtn.parentElement?.querySelector('[data-option-bulk-panel]');
+            if (!panel) return;
+            const willOpen = panel.classList.contains('hidden');
+            panel.classList.toggle('hidden', !willOpen);
+            bulkToggleBtn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+            const icon = bulkToggleBtn.querySelector('.material-icons');
+            if (icon) icon.textContent = willOpen ? 'expand_less' : 'expand_more';
+            return;
+        }
+        if (advancedToggleBtn) {
+            const panel = advancedToggleBtn.parentElement?.querySelector('[data-advanced-settings-panel]');
+            if (!panel) return;
+            const willOpen = panel.classList.contains('hidden');
+            panel.classList.toggle('hidden', !willOpen);
+            advancedToggleBtn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+            const icon = advancedToggleBtn.querySelector('.material-icons');
+            if (icon) icon.textContent = willOpen ? 'expand_less' : 'expand_more';
+            return;
+        }
+        if (outlineGroupToggleBtn) {
+            const groupId = outlineGroupToggleBtn.dataset.outlineGroupToggle;
+            const list = groupId ? document.querySelector(`[data-outline-group-questions="${groupId}"]`) : null;
+            if (!list) return;
+            const willOpen = list.classList.contains('hidden');
+            list.classList.toggle('hidden', !willOpen);
+            const icon = outlineGroupToggleBtn.querySelector('.material-icons');
+            if (icon) icon.textContent = willOpen ? 'expand_less' : 'expand_more';
+            return;
+        }
+        if (bulkApplyBtn) {
+            const questionItem = bulkApplyBtn.closest('.question-item');
+            const groupEl = bulkApplyBtn.closest('.question-group');
+            const textarea = questionItem?.querySelector('.option-bulk-input');
+            if (!questionItem || !groupEl || !textarea) return;
+            const groupId = groupEl.dataset.groupId;
+            const questionId = questionItem.dataset.questionId;
+            const question = surveyData.questionGroups.find(g => g.groupId === groupId)?.questions.find(q => q.questionId === questionId);
+            if (!question) return;
+
+            const lines = textarea.value
+                .split(/\r?\n/)
+                .map(line => line.trim())
+                .filter(Boolean);
+
+            question.options = lines.map((line) => ({
+                text: normalizeLocalization({ ja: line })
+            }));
+            if (question.type === 'multi_answer') {
+                const meta = ensureQuestionMeta(question);
+                meta.maxSelections = Math.max(question.options.length, 1);
+            }
+            setDirty(true);
+            updateAndRenderAll();
+            return;
+        }
 
         if (deleteGroupBtn) {
             const groupId = deleteGroupBtn.closest('.question-group').dataset.groupId;
@@ -2304,10 +2521,12 @@ function handleAddNewQuestionGroup() {
 
     const newGroup = {
         groupId: `group_${Date.now()}`,
-        title: normalizeLocalization({ ja: '新しい質問グループ' }),
+        title: normalizeLocalization({ ja: '' }),
         questions: []
     };
     surveyData.questionGroups.push(newGroup);
+    pendingFocusGroupId = newGroup.groupId;
+    saveAccordionPreference(newGroup.groupId, true);
     setDirty(true);
     updateAndRenderAll();
 }
@@ -2328,6 +2547,7 @@ function handleDuplicateQuestionGroup(groupId) {
     newGroup.questions.forEach(q => q.questionId = `q_${Date.now()}_${Math.random()}`);
     const index = surveyData.questionGroups.findIndex(g => g.groupId === groupId);
     surveyData.questionGroups.splice(index + 1, 0, newGroup);
+    saveAccordionPreference(newGroup.groupId, true);
     setDirty(true);
     updateAndRenderAll();
 }
@@ -2357,7 +2577,7 @@ function handleAddNewQuestion(groupId, questionType, creationOptions = {}) {
     const newQuestion = {
         questionId: `q_${Date.now()}`,
         type: questionType,
-        text: normalizeLocalization({ ja: '新しい設問' }),
+        text: normalizeLocalization({ ja: '' }),
         required: false
     };
 
@@ -2375,6 +2595,7 @@ function handleAddNewQuestion(groupId, questionType, creationOptions = {}) {
 
     initializeQuestionMeta(newQuestion);
     targetGroup.questions.push(newQuestion);
+    markQuestionForEditing(targetGroup.groupId, newQuestion.questionId);
     setDirty(true);
     updateAndRenderAll();
 }
@@ -2399,6 +2620,7 @@ function handleDuplicateQuestion(groupId, questionId) {
     newQuestion.questionId = `q_${Date.now()}`;
     const index = group.questions.findIndex(q => q.questionId === questionId);
     group.questions.splice(index + 1, 0, newQuestion);
+    markQuestionForEditing(groupId, newQuestion.questionId);
     setDirty(true);
     updateAndRenderAll();
 }
@@ -2414,6 +2636,8 @@ function handleAddOption(groupId, questionId) {
             meta.maxSelections = question.options.length;
         }
 
+        saveAccordionPreference(groupId, true);
+        saveAccordionPreference(questionId, true);
         setDirty(true);
         updateAndRenderAll();
     }
@@ -2434,6 +2658,8 @@ function handleAddMatrixRow(groupId, questionId) {
     q.matrix = q.matrix || { rows: [], cols: [] };
     q.matrix.rows = q.matrix.rows || [];
     q.matrix.rows.push({ text: normalizeLocalization({ ja: `行${q.matrix.rows.length + 1}` }) });
+    saveAccordionPreference(groupId, true);
+    saveAccordionPreference(questionId, true);
     setDirty(true);
     updateAndRenderAll();
 }
@@ -2444,6 +2670,8 @@ function handleAddMatrixCol(groupId, questionId) {
     q.matrix = q.matrix || { rows: [], cols: [] };
     q.matrix.cols = q.matrix.cols || [];
     q.matrix.cols.push({ text: normalizeLocalization({ ja: `列${q.matrix.cols.length + 1}` }) });
+    saveAccordionPreference(groupId, true);
+    saveAccordionPreference(questionId, true);
     setDirty(true);
     updateAndRenderAll();
 }
@@ -2515,6 +2743,7 @@ function handleChangeQuestionType(groupId, questionId, newType) {
         if ('explanationText' in question) delete question.explanationText;
     }
 
+    markQuestionForEditing(groupId, questionId);
     updateAndRenderAll();
 }
 
@@ -2624,14 +2853,18 @@ function validateFormForSaveButton() {
 
 // Ensure accordion headers are keyboard/AT friendly
 function enhanceAccordionA11y() {
-    const headers = document.querySelectorAll('.accordion-header, .group-header');
+    const headers = document.querySelectorAll('.accordion-header, .group-header, .question-card-summary');
     headers.forEach(header => {
         const contentId = header.getAttribute('data-accordion-target');
         header.setAttribute('role', 'button');
         header.setAttribute('tabindex', '0');
         if (contentId) header.setAttribute('aria-controls', contentId);
-        const content = contentId ? document.getElementById(contentId) : null;
-        const isOpen = content ? (getComputedStyle(content).display !== 'none') : true;
+        const content = contentId
+            ? document.getElementById(contentId)
+            : header.closest('.question-item')?.querySelector('.question-detail-panel')
+                || header.closest('.question-group')?.querySelector('.accordion-content')
+                || null;
+        const isOpen = content ? !content.classList.contains('hidden') : true;
         header.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
     });
 }
@@ -3111,11 +3344,11 @@ try {
 function initOutlineMapToggle() {
     const toggleBtn = document.getElementById('outline-map-toggle-btn');
     const outlineContainer = document.getElementById('outline-map-container');
-    const btnIcon = toggleBtn.querySelector('.material-icons');
-
-    if (!toggleBtn || !outlineContainer || !btnIcon) {
+    if (!toggleBtn || !outlineContainer) {
         return;
     }
+    const btnIcon = toggleBtn.querySelector('.material-icons');
+    if (!btnIcon) return;
 
     // Default state is open
     let isOutlineOpen = true;

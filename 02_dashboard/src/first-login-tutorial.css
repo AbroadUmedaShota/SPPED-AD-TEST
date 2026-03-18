@@ -5,7 +5,7 @@
     right: 0;
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.7);
-    z-index: 9999;
+    z-index: var(--z-tutorial-overlay);
     pointer-events: none;
     transition: clip-path 0.3s ease-in-out;
 }
@@ -18,7 +18,7 @@
     padding: 15px 20px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     max-width: 300px;
-    z-index: 10000;
+    z-index: var(--z-tutorial-popover);
     opacity: 0;
     transform: translateY(10px);
     transition: opacity 0.3s ease, transform 0.3s ease;
@@ -72,11 +72,11 @@
 
 /* モーダル内の要素がハイライトされる際の調整 */
 .modal-overlay.tutorial-active {
-    z-index: 10001 !important;
+    z-index: var(--z-tutorial-highlight) !important;
 }
 .modal-overlay.tutorial-active .tutorial-highlighter {
-    z-index: 10002 !important;
+    z-index: var(--z-tutorial-popover) !important;
 }
 .modal-overlay.tutorial-active .tutorial-tooltip {
-    z-index: 10003 !important;
+    z-index: calc(var(--z-tutorial-popover) + 1) !important;
 }

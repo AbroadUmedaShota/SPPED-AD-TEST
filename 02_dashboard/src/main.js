@@ -36,6 +36,7 @@ import { initBugReportPage } from './bug-report.js';
 import { showConfirmationModal } from './confirmationModal.js';
 
 import { showToast, copyTextToClipboard, loadCommonHtml, resolveDashboardAssetPath } from './utils.js';
+import { initHelpPopovers } from './ui/helpPopover.js';
 
 function showTutorialResumeBanner() {
     if (document.getElementById('tutorialResumeBanner')) {
@@ -93,33 +94,6 @@ function showTutorialResumeBanner() {
     }
 }
 
-
-// --- New Survey Modal Help Popover Logic ---
-let activeNewSurveyPopover = null;
-
-function closeNewSurveyPopover() {
-    if (!activeNewSurveyPopover) return;
-    const { button, popover } = activeNewSurveyPopover;
-    if (popover) popover.classList.add('hidden');
-    if (button) button.setAttribute('aria-expanded', 'false');
-    activeNewSurveyPopover = null;
-}
-
-document.addEventListener('click', (event) => {
-    if (!activeNewSurveyPopover) return;
-    const { button, popover } = activeNewSurveyPopover;
-    if ((button && button.contains(event.target)) || (popover && popover.contains(event.target))) {
-        return;
-    }
-    closeNewSurveyPopover();
-});
-
-document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') {
-        closeNewSurveyPopover();
-    }
-});
-
 function openNewSurveyModalWithSetup(afterOpen) {
     handleOpenModal('newSurveyModal', resolveDashboardAssetPath('modals/newSurveyModal.html'), () => {
         // Initialize flatpickr for the new range input
@@ -168,30 +142,10 @@ function openNewSurveyModalWithSetup(afterOpen) {
             { input: periodRangeInput, error: periodRangeError }
         ];
 
-        // Initialize Help Popovers
-        const helpButtons = document.querySelectorAll('#newSurveyModal .help-icon-button');
-        helpButtons.forEach((button) => {
-            if (button.dataset.bound === 'true') return;
-
-            button.addEventListener('click', (e) => {
-                e.stopPropagation();
-                e.preventDefault();
-
-                const tooltipId = button.dataset.tooltipId;
-                const popover = document.getElementById(tooltipId);
-                if (!popover) return;
-
-                if (activeNewSurveyPopover && activeNewSurveyPopover.popover === popover) {
-                    closeNewSurveyPopover();
-                } else {
-                    closeNewSurveyPopover();
-                    popover.classList.remove('hidden');
-                    button.setAttribute('aria-expanded', 'true');
-                    activeNewSurveyPopover = { button, popover };
-                }
-            });
-            button.dataset.bound = 'true';
-        });
+        const modalRoot = document.getElementById('newSurveyModal');
+        if (modalRoot) {
+            initHelpPopovers(modalRoot);
+        }
 
         const hideAllErrors = () => {
             inputs.forEach(({ input, error }) => {
@@ -504,6 +458,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             break;
 
     }
+
+    initHelpPopovers(document);
 
 
 

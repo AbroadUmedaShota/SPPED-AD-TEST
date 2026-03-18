@@ -3,6 +3,7 @@ import { initializeAccountInfoModalFunctionality, populateAccountInfoModal } fro
 import { setupSurveyDetailsModalListeners, populateSurveyDetails } from './surveyDetailsModal.js';
 import { initGroupManagementModal } from './groupManagementModal.js';
 import { setupQrCodeModalListeners } from './qrCodeModal.js';
+import { closeActiveHelpPopover } from './ui/helpPopover.js';
 
 
 
@@ -263,6 +264,7 @@ export function openModal(modalId) {
 export function closeModal(modalId) {
     console.log(`[modalHandler] closeModal: Attempting to close modalId: ${modalId}`);
     const modal = document.getElementById(modalId);
+    closeActiveHelpPopover();
     
     if (modal) {
         modal.dataset.state = 'closed';

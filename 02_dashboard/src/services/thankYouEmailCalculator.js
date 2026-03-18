@@ -25,14 +25,20 @@ export function calculateThankYouEmailEstimate(activeCount, coupon = null) {
     const amountAfterFree = Math.max(0, baseAmount - freeDiscount);
 
     // 4. クーポン適用
+    // Current coupon contract comes from validateCoupon(): { success, type, value }.
+    // Keep a compatibility fallback for older discountType/discountValue-shaped objects.
     let couponDiscount = 0;
     if (coupon && coupon.success) {
-        if (coupon.discountType === 'fixed') {
-            couponDiscount = coupon.discountValue;
-        } else if (coupon.discountType === 'percent') {
-            couponDiscount = Math.floor(amountAfterFree * (coupon.discountValue / 100));
+        const couponType = coupon.type || coupon.discountType || null;
+        const couponValue = Number(coupon.value ?? coupon.discountValue ?? 0);
+
+        if (couponType === 'discount' || couponType === 'fixed') {
+            couponDiscount = couponValue;
+        } else if (couponType === 'percent') {
+            couponDiscount = Math.floor(amountAfterFree * (couponValue / 100));
         }
     }
+    couponDiscount = Math.min(Math.max(0, couponDiscount), amountAfterFree);
 
     // 5. 税抜合計金額
     const subtotal = Math.max(0, amountAfterFree - couponDiscount);

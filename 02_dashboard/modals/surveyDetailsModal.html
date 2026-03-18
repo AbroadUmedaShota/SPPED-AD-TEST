@@ -37,23 +37,18 @@
                         <input type="text" id="detail_surveyNameInternal" name="name"
                             class="input-field edit-mode hidden">
                         <label for="detail_surveyNameInternal" class="input-label font-bold">アンケート名（社内管理用）</label>
-                        <button type="button" class="help-icon-button material-icons"
-                            data-tooltip-id="survey-name-tooltip" aria-label="アンケート名と表示タイトルの違いを表示">help_outline</button>
-                        <div id="survey-name-tooltip" class="help-popover hidden" role="tooltip">
-                            <p class="text-xs leading-snug text-on-surface-variant">社内向けの管理名称です。回答者には表示されません。</p>
-                        </div>
+                        <button type="button" class="help-trigger help-icon-button material-icons"
+                            data-help-key="surveyName" data-help-target="detail-survey-name"
+                            aria-label="アンケート名の説明を表示">help_outline</button>
                     </div>
                     <div class="md:col-span-2 input-group">
                         <p id="detail_displayTitle_view" class="text-on-surface text-base view-mode"></p>
                         <input type="text" id="detail_displayTitle" name="displayTitle"
                             class="input-field edit-mode hidden">
                         <label for="detail_displayTitle" class="input-label font-bold">表示タイトル</label>
-                        <button type="button" class="help-icon-button material-icons"
-                            data-tooltip-id="display-title-tooltip" aria-label="表示タイトルの説明を表示">help_outline</button>
-                        <div id="display-title-tooltip" class="help-popover hidden" role="tooltip">
-                            <p class="text-xs leading-snug text-on-surface-variant">
-                                回答者に表示されるタイトルです。イベント名など外部向けの名称を設定してください。</p>
-                        </div>
+                        <button type="button" class="help-trigger help-icon-button material-icons"
+                            data-help-key="surveyDisplayTitle" data-help-target="detail-display-title"
+                            aria-label="表示タイトルの説明を表示">help_outline</button>
                     </div>
                     <div class="md:col-span-2 input-group">
                         <p id="detail_surveyMemo_view" class="text-on-surface text-base whitespace-pre-wrap view-mode">
@@ -61,9 +56,16 @@
                         <textarea id="detail_surveyMemo" name="memo" class="input-field edit-mode hidden"
                             rows="3"></textarea>
                         <label for="detail_surveyMemo" class="input-label font-bold">メモ</label>
+                        <button type="button" class="help-trigger help-icon-button material-icons" data-help-key="internalMemo"
+                            data-help-target="detail-internal-memo" aria-label="メモの説明を表示">help_outline</button>
                     </div>
                     <div class="md:col-span-2">
-                        <label class="text-on-surface-variant text-sm font-bold view-mode">展示会会期</label>
+                        <div class="flex items-center gap-1">
+                            <label class="text-on-surface-variant text-sm font-bold view-mode">展示会会期</label>
+                            <button type="button" class="help-trigger help-inline-button material-icons"
+                                data-help-key="surveyPeriod" data-help-target="detail-survey-period"
+                                aria-label="展示会会期の説明を表示">help_outline</button>
+                        </div>
                         <p id="detail_surveyPeriod_view" class="text-on-surface text-base view-mode"></p>
                         <div class="flex items-center gap-2 edit-mode hidden">
                             <div class="input-group relative flex-1 mt-0 mb-0">
@@ -98,7 +100,12 @@
                         <p id="detail_dataCompletionDate_view" class="text-on-surface text-base view-mode"></p>
                     </div>
                     <div>
-                        <label class="text-on-surface-variant text-sm font-bold">ダウンロード期限</label>
+                        <div class="flex items-center gap-1">
+                            <label class="text-on-surface-variant text-sm font-bold">ダウンロード期限</label>
+                            <button type="button" class="help-trigger help-inline-button material-icons"
+                                data-help-key="downloadDeadline" data-help-target="download-deadline"
+                                aria-label="ダウンロード期限の説明を表示">help_outline</button>
+                        </div>
                         <p id="detail_deadline_view" class="text-on-surface text-base view-mode"></p>
                     </div>
                 </div>
@@ -145,6 +152,7 @@
                         placeholder=" ">
                     <label for="detail_surveyUrl" class="input-label font-bold">アンケートURL</label>
                 </div>
+                <p class="text-xs text-on-surface-variant">モック環境では相対パスを表示します。</p>
                 <div class="text-center">
                     <img id="detail_qrCodeImage" alt="QR Code"
                         class="mx-auto mb-4 border border-outline-variant p-2 rounded" />

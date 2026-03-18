@@ -4,53 +4,10 @@ import { openDuplicateSurveyModal } from './duplicateSurveyModal.js';
 import { updateSurveyData } from './tableManager.js'; // tableManagerからインポート
 import { deriveSurveyLifecycleMeta, USER_STATUSES } from './services/statusService.js';
 import { closeModal } from './modalHandler.js';
+import { buildSurveyAnswerUrl } from './qrCodeModal.js';
+import { initHelpPopovers } from './ui/helpPopover.js';
 
 let currentEditingSurvey = null; // 現在編集中のアンケートデータを保持する変数
-let activeHelpPopover = null;
-
-function closeActiveHelpPopover() {
-    if (!activeHelpPopover) return;
-    const { button, popover } = activeHelpPopover;
-    popover.classList.add('hidden');
-    button.setAttribute('aria-expanded', 'false');
-    activeHelpPopover = null;
-}
-
-function toggleHelpPopover(button) {
-    if (!button) return;
-    const tooltipId = button.dataset.tooltipId;
-    if (!tooltipId) return;
-    const modalRoot = document.getElementById('surveyDetailsModal');
-    if (!modalRoot) return;
-    const popover = modalRoot.querySelector(`#${tooltipId}`);
-    if (!popover) return;
-
-    if (activeHelpPopover && activeHelpPopover.popover === popover) {
-        closeActiveHelpPopover();
-        return;
-    }
-
-    closeActiveHelpPopover();
-    popover.classList.remove('hidden');
-    button.setAttribute('aria-expanded', 'true');
-    activeHelpPopover = { button, popover };
-}
-
-function handleGlobalClick(event) {
-    if (!activeHelpPopover) return;
-    const { button, popover } = activeHelpPopover;
-    if (button.contains(event.target) || popover.contains(event.target)) {
-        return;
-    }
-    closeActiveHelpPopover();
-}
-
-document.addEventListener('click', handleGlobalClick);
-document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') {
-        closeActiveHelpPopover();
-    }
-});
 
 // Listen for language changes to update the modal if it's open
 document.addEventListener('languagechange', () => {
@@ -70,8 +27,6 @@ export function setupSurveyDetailsModalListeners(modalElement) {
         console.warn("surveyDetailsModal element not provided to setupSurveyDetailsModalListeners.");
         return;
     }
-
-    closeActiveHelpPopover();
 
     const editSurveyBtn = modalElement.querySelector('#editSurveyBtn');
     const duplicateSurveyBtn = modalElement.querySelector('#duplicateSurveyBtn');
@@ -116,22 +71,7 @@ export function setupSurveyDetailsModalListeners(modalElement) {
         surveyUrlInput.dataset.bound = 'true';
     }
 
-    const helpButtons = modalElement.querySelectorAll('.help-icon-button');
-    helpButtons.forEach((button) => {
-        if (button.dataset.bound === 'true') return;
-        button.setAttribute('aria-expanded', 'false');
-        button.addEventListener('click', (event) => {
-            event.stopPropagation();
-            toggleHelpPopover(button);
-        });
-        button.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault();
-                toggleHelpPopover(button);
-            }
-        });
-        button.dataset.bound = 'true';
-    });
+    initHelpPopovers(modalElement);
 
     // Add new listeners
     if (editSurveyBtn) editSurveyBtn.addEventListener('click', () => {
@@ -253,7 +193,6 @@ function handleDetailDownload() {
  * @param {object} survey The survey data object.
  */
 export function populateSurveyDetails(survey) {
-    closeActiveHelpPopover();
     currentEditingSurvey = survey; // Store the survey object for editing
 
     const modal = document.getElementById('surveyDetailsModal');
@@ -348,7 +287,7 @@ export function populateSurveyDetails(survey) {
     detail_thankYouEmailSettings_view.textContent = survey.thankYouEmailSettings || '設定なし';
 
     // Non-editable fields
-    const qrUrl = `survey-answer.html?surveyId=${survey.id}`;
+    const qrUrl = buildSurveyAnswerUrl(survey.id);
     detail_surveyUrl.value = qrUrl;
     detail_qrCodeImage.src = `sample_qr.png`; // survey.id を使って動的に生成
 

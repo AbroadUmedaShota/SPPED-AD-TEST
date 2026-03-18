@@ -345,7 +345,7 @@ export function renderEstimate(estimate, status) {
     const billableCountDisplay = document.getElementById('billableCountDisplay');
     const estimateBreakdown = document.getElementById('estimateBreakdown');
 
-    // 税込合計をメインに表示
+    // 主表示は税込合計
     if (amountEl) {
         amountEl.textContent = `¥${estimate.totalWithTax.toLocaleString()}`;
     }
@@ -371,7 +371,7 @@ export function renderEstimate(estimate, status) {
                 <div class="flex justify-between items-center text-success font-bold text-xs">
                     <span class="flex items-center gap-1">
                         <span class="material-icons text-[14px]">info</span>
-                        無料枠適用 (100名分)
+                        無料枠適用 (${estimate.freeAppliedCount.toLocaleString()}名分)
                     </span>
                     <span>- ¥${estimate.freeDiscount.toLocaleString()}</span>
                 </div>

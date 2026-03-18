@@ -53,7 +53,11 @@
 
                     <!-- 画面ヘッダー -->
                     <div class="flex flex-wrap items-center justify-between mb-6 gap-4 pb-4 border-b border-outline-variant">
-                        <h1 class="text-on-background text-headline-large font-bold leading-tight tracking-tight">グループ管理</h1>
+                        <div class="flex items-center gap-2">
+                            <h1 class="text-on-background text-headline-large font-bold leading-tight tracking-tight">グループ管理</h1>
+                            <button type="button" class="help-trigger help-inline-button material-icons" data-help-key="groupOverview"
+                                data-help-target="group-overview" aria-label="グループの説明を表示">help_outline</button>
+                        </div>
                         <div class="input-group w-full sm:w-64">
                             <select id="groupSelector" class="input-field">
                                 <option value="GROUP001" selected>営業部</option>
@@ -149,12 +153,8 @@
                             <button class="section-header" aria-expanded="true">
                                 <div class="flex items-center gap-2">
                                     <h2 class="text-xl font-bold text-on-surface">メンバー管理</h2>
-                                    <div class="group relative flex items-center">
-                                        <span class="material-icons text-on-surface-variant cursor-help" style="font-size: 18px;">help_outline</span>
-                                        <div class="absolute bottom-full left-1/2 z-50 -translate-x-1/2 mb-2 w-72 p-3 rounded-lg shadow-lg text-sm opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" style="background-color: #1A1A1A; color: #FFFFFF;">
-                                            メンバーの招待や権限の管理を行います。ドラッグ&ドロップで表示順を変更できますが、これは管理上の表示順であり、権限の序列を示すものではありません。
-                                        </div>
-                                    </div>
+                                    <button type="button" class="help-trigger help-inline-button material-icons" data-help-key="groupMemberManagement"
+                                        data-help-target="group-member-management" aria-label="メンバー管理の説明を表示">help_outline</button>
                                 </div>
                                 <span class="material-icons expand-icon">expand_more</span>
                             </button>

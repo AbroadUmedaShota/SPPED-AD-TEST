@@ -1,7 +1,11 @@
 <div id="newGroupModal" class="modal-overlay hidden" aria-labelledby="newGroupModalTitle" aria-modal="true" role="dialog">
     <div class="modal-content-transition relative w-full max-w-3xl p-6 rounded-xl shadow-lg bg-surface transform transition-all duration-300 ease-out">
         <div class="flex justify-between items-center mb-6">
-            <h2 id="newGroupModalTitle" class="text-on-surface text-xl font-bold">グループ新規作成</h2>
+            <div class="flex items-center gap-2">
+                <h2 id="newGroupModalTitle" class="text-on-surface text-xl font-bold">グループ新規作成</h2>
+                <button type="button" class="help-trigger help-inline-button material-icons" data-help-key="groupOverview"
+                    data-help-target="new-group-overview" aria-label="グループの説明を表示">help_outline</button>
+            </div>
             <button class="text-on-surface-variant hover:text-on-surface" id="closeNewGroupModalBtn" aria-label="モーダルを閉じる">
                 <span class="material-icons">close</span>
             </button>

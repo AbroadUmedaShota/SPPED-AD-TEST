@@ -1,7 +1,10 @@
 import { showToast, downloadFile, copyTextToClipboard } from './utils.js';
 import { closeModal } from './modalHandler.js';
 
-const DEFAULT_QR_IMAGE_SRC = 'sample_qr.png';
+export function buildSurveyAnswerUrl(surveyId) {
+    if (!surveyId) return '';
+    return `survey-answer.html?surveyId=${surveyId}`;
+}
 
 /**
  * Initializes elements specific to the QR Code Modal.
@@ -16,9 +19,6 @@ export function setupQrCodeModalListeners(modalElement) {
 
     const downloadQrCodeBtn = modalElement.querySelector('#downloadQrCodeBtn');
     const copyUrlBtn = modalElement.querySelector('#copyUrlBtn');
-    const qrCodeImage = modalElement.querySelector('#qrCodeImage');
-    const surveyUrlInput = modalElement.querySelector('#surveyUrlInput');
-
     // Remove existing listeners to prevent duplication
     if (downloadQrCodeBtn) downloadQrCodeBtn.removeEventListener('click', handleDownloadQrCode);
     if (copyUrlBtn) copyUrlBtn.removeEventListener('click', handleCopyUrl);
@@ -35,35 +35,55 @@ export function setupQrCodeModalListeners(modalElement) {
     if (footerCloseBtn) {
         footerCloseBtn.addEventListener('click', () => closeModal('qrCodeModal'));
     }
-
-    if (qrCodeImage && !qrCodeImage.src) {
-        qrCodeImage.src = DEFAULT_QR_IMAGE_SRC;
-    }
-}
-
-function buildSurveyQrUrl(surveyId) {
-    if (!surveyId) return '';
-    return `survey-answer.html?surveyId=${surveyId}`;
 }
 
 export function populateQrCodeModal({ surveyId, surveyUrl, qrImageSrc } = {}) {
-    if (!surveyId && !surveyUrl && !qrImageSrc) return;
-
     const modalElement = document.getElementById('qrCodeModal');
     if (!modalElement) return;
 
     const qrCodeImage = modalElement.querySelector('#qrCodeImage');
+    const qrCodePlaceholder = modalElement.querySelector('#qrCodeImagePlaceholder');
+    const qrCodeHint = modalElement.querySelector('#qrCodeImageHint');
     const surveyUrlInput = modalElement.querySelector('#surveyUrlInput');
-    const resolvedUrl = surveyUrl || buildSurveyQrUrl(surveyId);
+    const downloadQrCodeBtn = modalElement.querySelector('#downloadQrCodeBtn');
+    const copyUrlBtn = modalElement.querySelector('#copyUrlBtn');
+    const resolvedUrl = surveyUrl || buildSurveyAnswerUrl(surveyId);
+    const hasQrImage = Boolean(qrImageSrc);
+    const hasUrl = Boolean(resolvedUrl);
 
-    if (surveyUrlInput && resolvedUrl) {
-        surveyUrlInput.textContent = resolvedUrl;
+    if (surveyUrlInput) {
+        surveyUrlInput.textContent = resolvedUrl || '保存済みアンケートのURLを表示します。';
         surveyUrlInput.dataset.surveyId = surveyId || '';
     }
 
     if (qrCodeImage) {
-        qrCodeImage.src = qrImageSrc || qrCodeImage.src || DEFAULT_QR_IMAGE_SRC;
+        qrCodeImage.src = hasQrImage ? qrImageSrc : '';
         qrCodeImage.dataset.surveyId = surveyId || '';
+        qrCodeImage.classList.toggle('hidden', !hasQrImage);
+    }
+
+    if (qrCodePlaceholder) {
+        qrCodePlaceholder.classList.toggle('hidden', hasQrImage);
+    }
+
+    if (qrCodeHint) {
+        qrCodeHint.textContent = hasQrImage
+            ? 'このQRコードをスキャンしてアンケートに回答してください。'
+            : 'QRコード画像は未設定です。右側のURLは利用できます。';
+    }
+
+    if (downloadQrCodeBtn) {
+        downloadQrCodeBtn.disabled = !hasQrImage;
+        downloadQrCodeBtn.setAttribute('aria-disabled', hasQrImage ? 'false' : 'true');
+        downloadQrCodeBtn.classList.toggle('opacity-50', !hasQrImage);
+        downloadQrCodeBtn.classList.toggle('cursor-not-allowed', !hasQrImage);
+    }
+
+    if (copyUrlBtn) {
+        copyUrlBtn.disabled = !hasUrl;
+        copyUrlBtn.setAttribute('aria-disabled', hasUrl ? 'false' : 'true');
+        copyUrlBtn.classList.toggle('opacity-50', !hasUrl);
+        copyUrlBtn.classList.toggle('cursor-not-allowed', !hasUrl);
     }
 }
 

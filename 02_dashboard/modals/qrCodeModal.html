@@ -13,8 +13,11 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <!-- Left: QR Code Image -->
                 <div class="text-center">
-                    <img id="qrCodeImage" alt="QR Code" class="mx-auto border border-outline-variant p-2 rounded-lg w-full max-w-[250px]" src="sample_qr.png" />
-                    <p class="text-on-surface-variant text-sm mt-4">このQRコードをスキャンしてアンケートに回答してください。</p>
+                    <img id="qrCodeImage" alt="QR Code" class="mx-auto border border-outline-variant p-2 rounded-lg w-full max-w-[250px] hidden" />
+                    <div id="qrCodeImagePlaceholder" class="mx-auto flex min-h-[250px] max-w-[250px] items-center justify-center rounded-lg border border-dashed border-outline-variant bg-surface-container-low px-6 text-sm text-on-surface-variant">
+                        QRコード画像は未設定です。
+                    </div>
+                    <p id="qrCodeImageHint" class="text-on-surface-variant text-sm mt-4">QRコード画像は未設定です。右側のURLは利用できます。</p>
                 </div>
 
                 <!-- Right: URL and Actions -->
@@ -23,16 +26,17 @@
                         <label class="text-on-surface-variant text-sm font-medium">アンケートURL</label>
                         <div class="mt-1 relative">
                             <div id="surveyUrlInput" 
-                                 class="w-full bg-surface-bright border border-outline-variant rounded-md py-2 px-3 text-on-surface cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary overflow-x-auto whitespace-nowrap">https://survey.speedad.com/qr/survey_id_xyz</div>
+                                 class="w-full bg-surface-bright border border-outline-variant rounded-md py-2 px-3 text-on-surface cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary overflow-x-auto whitespace-nowrap">保存済みアンケートのURLを表示します。</div>
                         </div>
+                        <p class="mt-2 text-xs text-on-surface-variant">モック環境では相対パスを表示します。</p>
                     </div>
                     <div class="space-y-3 mt-6">
-                        <button id="downloadQrCodeBtn" class="w-full flex items-center justify-center gap-2 bg-secondary-container text-on-secondary-container py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal transition-colors hover:bg-secondary-container/80" aria-label="QRコードをダウンロード">
+                        <button id="downloadQrCodeBtn" class="w-full flex items-center justify-center gap-2 bg-secondary-container text-on-secondary-container py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal transition-colors hover:bg-secondary-container/80 opacity-50 cursor-not-allowed" aria-label="QRコードをダウンロード" disabled aria-disabled="true">
                             <span class="material-icons text-lg">download</span>
                             QRコードをダウンロード
                         </button>
-                        <button id="copyUrlBtn" class="w-full flex items-center justify-center gap-2 bg-secondary-container text-on-secondary-container py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal transition-colors hover:bg-secondary-container/80" 
-                                aria-label="URLをコピー">
+                        <button id="copyUrlBtn" class="w-full flex items-center justify-center gap-2 bg-secondary-container text-on-secondary-container py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal transition-colors hover:bg-secondary-container/80 opacity-50 cursor-not-allowed" 
+                                aria-label="URLをコピー" disabled aria-disabled="true">
                             <span class="material-icons text-lg">content_copy</span>
                             URLをコピー
                         </button>

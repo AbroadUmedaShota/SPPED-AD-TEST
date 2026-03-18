@@ -45,9 +45,9 @@
                 <div class="rounded-3xl border border-outline-variant/60 bg-surface p-6 shadow-sm">
                     <h2 class="text-on-surface text-xl font-bold mb-4">アンケート基本情報</h2>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-on-surface-variant">
-                        <div><span class="font-bold text-on-surface">アンケート名:</span> <span id="surveyNameDisplay"></span></div>
+                        <div data-help-target="bizcard-survey-name"><span class="font-bold text-on-surface">アンケート名:</span> <span id="surveyNameDisplay"></span><button type="button" class="help-trigger help-inline-button material-icons ml-1" data-help-key="surveyName" aria-label="アンケート名の説明を表示">help_outline</button></div>
                         <div><span class="font-bold text-on-surface">ID:</span> <span id="surveyIdDisplay"></span></div>
-                        <div><span class="font-bold text-on-surface">会期:</span> <span id="surveyPeriodDisplay"></span></div>
+                        <div data-help-target="bizcard-survey-period"><span class="font-bold text-on-surface">会期:</span> <span id="surveyPeriodDisplay"></span><button type="button" class="help-trigger help-inline-button material-icons ml-1" data-help-key="surveyPeriod" aria-label="会期の説明を表示">help_outline</button></div>
                     </div>
                 </div>
 
@@ -59,8 +59,11 @@
                             <!-- データ化項目プラン -->
                             <div class="space-y-4">
                                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                                    <div>
-                                        <h2 class="text-on-surface text-xl font-bold">データ化項目プラン</h2>
+                                    <div data-help-target="bizcard-plan">
+                                        <div class="flex items-center gap-1">
+                                            <h2 class="text-on-surface text-xl font-bold">データ化項目プラン</h2>
+                                            <button type="button" class="help-trigger help-inline-button material-icons" data-help-key="bizcardPlanAndSpeed" aria-label="データ化項目プランの説明を表示">help_outline</button>
+                                        </div>
                                         <p class="text-sm text-on-surface-variant">名刺データの読み取り範囲や課金方式をプランごとに比較しながら選択できます。</p>
                                     </div>
                                     <span class="inline-flex items-center gap-2 rounded-full bg-primary-container px-4 py-2 text-sm font-semibold text-on-primary-container">
@@ -90,6 +93,14 @@
                                 </div>
                                 <div id="premiumOptionsContainer" class="grid gap-4 md:grid-cols-2"></div>
                                 <p class="text-sm text-on-surface-variant">※ プレミアムオプションは選択内容に応じてご請求見込み金額に反映されます。</p>
+                            </div>
+
+                            <div class="rounded-2xl border border-outline-variant bg-surface-container-low p-4" data-help-target="bizcard-disable-note">
+                                <div class="flex items-center gap-2">
+                                    <h3 class="text-sm font-semibold text-on-surface">名刺のデータ化は行わない</h3>
+                                    <button type="button" class="help-trigger help-inline-button material-icons" data-help-key="noBizcardDigitization" aria-label="名刺のデータ化を行わない設定の説明を表示">help_outline</button>
+                                </div>
+                                <p class="mt-2 text-sm text-on-surface-variant">名刺画像を取得してもデータ化を依頼しない場合の注意事項です。</p>
                             </div>
 
                         </div>
@@ -193,9 +204,10 @@
                         </div>
                         <div class="space-y-5">
                             <div class="space-y-2">
-                                <div class="input-group">
+                                <div class="input-group" data-help-target="bizcard-request">
                                     <input type="number" id="bizcardRequest" min="0" placeholder=" " class="input-field pr-10" value="100">
                                     <label for="bizcardRequest" class="input-label">見込み枚数</label>
+                                    <button type="button" class="help-trigger help-icon-button material-icons" data-help-key="expectedBizcardCount" aria-label="見込み枚数の説明を表示">help_outline</button>
                                     <span class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm pointer-events-none">枚</span>
                                     <p class="input-error-message"></p>
                                 </div>
@@ -213,9 +225,10 @@
                                 <div id="estimateBreakdown" class="text-sm leading-relaxed text-on-surface-variant"></div>
                             </div>
                             <div class="rounded-2xl bg-surface-bright p-5 border border-outline-variant space-y-3">
-                                <div class="input-group">
+                                <div class="input-group" data-help-target="bizcard-coupon">
                                     <input type="text" id="couponCode" placeholder=" " class="input-field pr-20">
                                     <label for="couponCode" class="input-label">クーポンコード</label>
+                                    <button type="button" class="help-trigger help-icon-button material-icons" data-help-key="couponCode" aria-label="クーポンコードの説明を表示">help_outline</button>
                                     <button id="applyCouponBtn" type="button" class="coupon-action-button coupon-action-button--apply absolute right-2 top-1/2 -translate-y-1/2 rounded-md px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline-none">適用</button>
                                     <div id="couponLoadingIndicator" class="hidden absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2">
                                         <span class="material-icons animate-spin text-on-surface-variant">sync</span>
