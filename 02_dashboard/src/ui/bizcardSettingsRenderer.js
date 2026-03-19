@@ -95,12 +95,54 @@ export function updateSettingsVisibility() {
 
 /**
  * 見積もり結果をUIに反映します。
- * @param {object} estimate - 計算された見積もり { amount, completionDate }。
+ * @param {object} estimate - 計算された見積もり { amount, completionDate, turnaroundDays, calculationBaseDate }。
  */
 export function renderEstimate(estimate) {
     if (!dom.estimatedAmountSpan) cacheDOMElements();
-    dom.estimatedAmountSpan.textContent = `¥${estimate.amount.toLocaleString()}`;
-    dom.estimatedCompletionDateSpan.textContent = estimate.completionDate;
+    
+    // 金額の変化を強調する演出 (D案: スロット風カウントアップ)
+    const oldAmountStr = dom.estimatedAmountSpan.textContent.replace(/[^\d]/g, '');
+    const oldAmount = parseInt(oldAmountStr, 10) || 0;
+    const newAmount = estimate.amount;
+    
+    if (oldAmount !== newAmount) {
+        // アニメーション実行
+        const duration = 400; // 0.4秒
+        const startTime = performance.now();
+        
+        const animate = (currentTime) => {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            
+            // イージング（後半を少しゆっくりに）
+            const easedProgress = 1 - Math.pow(1 - progress, 3);
+            const currentAmount = Math.floor(oldAmount + (newAmount - oldAmount) * easedProgress);
+            
+            dom.estimatedAmountSpan.textContent = `¥${currentAmount.toLocaleString()}`;
+            
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            } else {
+                dom.estimatedAmountSpan.textContent = `¥${newAmount.toLocaleString()}`;
+                dom.estimatedAmountSpan.classList.remove('text-primary', 'scale-105');
+            }
+        };
+        
+        dom.estimatedAmountSpan.classList.add('text-primary', 'scale-105', 'transition-transform');
+        requestAnimationFrame(animate);
+    } else {
+        dom.estimatedAmountSpan.textContent = `¥${newAmount.toLocaleString()}`;
+    }
+
+    // 納期の根拠（B案）を表示
+    dom.estimatedCompletionDateSpan.innerHTML = `
+        <div class="flex flex-col items-end">
+            <span>${estimate.completionDate}</span>
+            <span class="text-[10px] font-normal text-on-surface-variant/70 mt-0.5">
+                (起算日 ${estimate.calculationBaseDate || '未定'} ＋ 納期 ${estimate.turnaroundDays || 0}日)
+            </span>
+        </div>
+    `;
     if (dom.estimateBreakdown) {
         const lang = document.documentElement.lang || 'ja';
         const cards = estimate.requestedCards ?? 0;
@@ -327,6 +369,11 @@ export function renderDataConversionPlans(plans, selectedPlan) {
   });
 }
 
+/**
+ * プレミアムオプションを描画します（C案：カードスタイル）。
+ * @param {Array<object>} optionGroups - 表示するオプション一覧。
+ * @param {object} selections - 選択中のオプション。
+ */
 export function renderPremiumOptions(optionGroups, selections) {
   if (!dom.premiumOptionsContainer) cacheDOMElements();
   const container = dom.premiumOptionsContainer;
@@ -338,91 +385,143 @@ export function renderPremiumOptions(optionGroups, selections) {
   container.innerHTML = '';
 
   optionGroups.forEach(group => {
-    const card = document.createElement('div');
-    card.className = 'rounded-xl border border-outline-variant/60 bg-surface p-4 shadow-sm';
-
-    const header = document.createElement('div');
-    header.className = 'flex items-start justify-between gap-3';
-
-    const titleBlock = document.createElement('div');
-    titleBlock.className = 'space-y-1';
-    const title = document.createElement('p');
-    title.className = 'text-sm font-semibold text-on-surface';
-    title.textContent = getLocalizedText(group.title, lang);
-    titleBlock.appendChild(title);
-
-    const description = document.createElement('p');
-    description.className = 'text-xs text-on-surface-variant';
-    description.textContent = getLocalizedText(group.description, lang);
-    titleBlock.appendChild(description);
-    header.appendChild(titleBlock);
-
-    if (group.unitPriceLabel) {
-      const badge = document.createElement('span');
-      badge.className = 'rounded-full border border-primary/40 bg-primary/5 px-3 py-1 text-[11px] font-semibold text-primary';
-      badge.textContent = getLocalizedText(group.unitPriceLabel, lang);
-      header.appendChild(badge);
-    }
-
-    card.appendChild(header);
-
     if (group.type === 'toggle') {
       const optionId = `premium-${group.value}`;
-      const toggleLabel = document.createElement('label');
-      toggleLabel.setAttribute('for', optionId);
-      toggleLabel.className = 'mt-3 flex items-center justify-between rounded-lg border border-outline-variant/50 bg-surface-container-highest px-3 py-2';
-
-      const textLabel = document.createElement('span');
-      textLabel.className = 'text-sm text-on-surface-variant';
-      textLabel.textContent = lang === 'ja' ? '必要に応じてチェックしてください' : 'Check to enable';
+      const isSelected = Boolean(normalizedSelections[group.value]);
+      
+      const card = document.createElement('label');
+      card.setAttribute('for', optionId);
+      card.className = [
+        'relative flex cursor-pointer flex-col rounded-2xl border-2 p-5 transition-all duration-200 bg-surface select-none',
+        isSelected 
+          ? 'border-primary ring-1 ring-primary/20 bg-primary/5 shadow-md scale-[1.01] z-10' 
+          : 'border-outline-variant/60 hover:border-primary/40 hover:bg-surface-variant hover:shadow-sm'
+      ].join(' ');
 
       const input = document.createElement('input');
       input.type = 'checkbox';
       input.id = optionId;
       input.name = 'premiumMultilingual';
-      input.className = 'h-4 w-4 rounded border-outline text-primary focus:ring-primary';
-      input.checked = Boolean(normalizedSelections[group.value]);
+      input.className = 'sr-only';
+      input.checked = isSelected;
 
-      toggleLabel.append(textLabel, input);
-      card.appendChild(toggleLabel);
+      const header = document.createElement('div');
+      header.className = 'flex items-start justify-between mb-2';
+      
+      const titleBlock = document.createElement('div');
+      titleBlock.className = 'flex items-center gap-2.5';
+      
+      const iconDiv = document.createElement('div');
+      iconDiv.className = `flex h-9 w-9 items-center justify-center rounded-xl ${isSelected ? 'bg-primary text-white' : 'bg-surface-variant text-on-surface-variant'} shadow-sm shrink-0 transition-colors`;
+      const iconSpan = document.createElement('span');
+      iconSpan.className = 'material-icons text-[18px]';
+      iconSpan.textContent = group.icon || 'star';
+      iconDiv.appendChild(iconSpan);
+      titleBlock.appendChild(iconDiv);
+      
+      const titleText = document.createElement('span');
+      titleText.className = [
+          'font-bold text-sm',
+          isSelected ? 'text-primary' : 'text-on-surface'
+      ].join(' ');
+      titleText.textContent = getLocalizedText(group.title, lang);
+      titleBlock.appendChild(titleText);
+      
+      const checkUi = document.createElement('div');
+      checkUi.className = [
+          'flex h-6 w-6 items-center justify-center rounded-full border-2 transition-all',
+          isSelected ? 'border-primary bg-primary' : 'border-outline-variant bg-surface'
+      ].join(' ');
+      const checkIcon = document.createElement('span');
+      checkIcon.className = 'material-icons text-white text-[16px] transition-transform duration-200';
+      checkIcon.style.transform = isSelected ? 'scale(1)' : 'scale(0)';
+      checkIcon.textContent = 'check';
+      checkUi.appendChild(checkIcon);
+      
+      header.append(titleBlock, checkUi);
+      
+      const desc = document.createElement('p');
+      desc.className = 'text-xs text-on-surface-variant leading-relaxed mb-3';
+      desc.textContent = getLocalizedText(group.description, lang);
+      
+      const priceBadge = document.createElement('div');
+      priceBadge.className = 'mt-auto pt-2 border-t border-outline-variant/30';
+      if (group.unitPriceLabel) {
+          const badge = document.createElement('span');
+          badge.className = 'text-[11px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded';
+          badge.textContent = getLocalizedText(group.unitPriceLabel, lang);
+          priceBadge.appendChild(badge);
+      }
+
+      card.append(input, header, desc, priceBadge);
+      container.appendChild(card);
     }
 
     if (group.type === 'multi' && Array.isArray(group.options)) {
-      const list = document.createElement('div');
-      list.className = 'mt-3 grid gap-2';
-
       group.options.forEach(option => {
         const optionId = `premium-${group.value}-${option.value}`;
-        const optionLabel = document.createElement('label');
-        optionLabel.setAttribute('for', optionId);
-        optionLabel.className = 'flex items-start gap-3 rounded-lg border border-outline-variant/50 bg-surface-container-highest px-3 py-2';
+        const isSelected = additionalItems.has(option.value);
+
+        const card = document.createElement('label');
+        card.setAttribute('for', optionId);
+        card.className = [
+          'relative flex cursor-pointer flex-col rounded-2xl border-2 p-5 transition-all duration-200 bg-surface select-none',
+          isSelected 
+            ? 'border-primary ring-1 ring-primary/20 bg-primary/5 shadow-md scale-[1.01] z-10' 
+            : 'border-outline-variant/60 hover:border-primary/40 hover:bg-surface-variant hover:shadow-sm'
+        ].join(' ');
 
         const input = document.createElement('input');
         input.type = 'checkbox';
         input.id = optionId;
         input.name = 'premiumAdditionalItems';
         input.value = option.value;
-        input.className = 'mt-1 h-4 w-4 rounded border-outline text-primary focus:ring-primary';
-        input.checked = additionalItems.has(option.value);
+        input.className = 'sr-only';
+        input.checked = isSelected;
 
-        const textStack = document.createElement('div');
-        textStack.className = 'flex flex-col';
-        const optionTitle = document.createElement('p');
-        optionTitle.className = 'text-sm font-medium text-on-surface';
-        optionTitle.textContent = getLocalizedText(option.title, lang);
-        const optionDescription = document.createElement('p');
-        optionDescription.className = 'text-xs text-on-surface-variant';
-        optionDescription.textContent = getLocalizedText(option.description, lang);
-        textStack.append(optionTitle, optionDescription);
-
-        optionLabel.append(input, textStack);
-        list.appendChild(optionLabel);
+        const header = document.createElement('div');
+        header.className = 'flex items-start justify-between mb-2';
+        
+        const titleBlock = document.createElement('div');
+        titleBlock.className = 'flex items-center gap-2.5';
+        
+        const iconDiv = document.createElement('div');
+        iconDiv.className = `flex h-9 w-9 items-center justify-center rounded-xl ${isSelected ? 'bg-primary text-white' : 'bg-surface-variant text-on-surface-variant'} shadow-sm shrink-0 transition-colors`;
+        const iconSpan = document.createElement('span');
+        iconSpan.className = 'material-icons text-[18px]';
+        iconSpan.textContent = option.icon || 'add_circle';
+        iconDiv.appendChild(iconSpan);
+        titleBlock.appendChild(iconDiv);
+        
+        const titleText = document.createElement('span');
+        titleText.className = [
+            'font-bold text-sm',
+            isSelected ? 'text-primary' : 'text-on-surface'
+        ].join(' ');
+        titleText.textContent = getLocalizedText(option.title, lang);
+        titleBlock.appendChild(titleText);
+        
+        const checkUi = document.createElement('div');
+        checkUi.className = [
+            'flex h-6 w-6 items-center justify-center rounded-full border-2 transition-all',
+            isSelected ? 'border-primary bg-primary' : 'border-outline-variant bg-surface'
+        ].join(' ');
+        const checkIcon = document.createElement('span');
+        checkIcon.className = 'material-icons text-white text-[16px] transition-transform duration-200';
+        checkIcon.style.transform = isSelected ? 'scale(1)' : 'scale(0)';
+        checkIcon.textContent = 'check';
+        checkUi.appendChild(checkIcon);
+        
+        header.append(titleBlock, checkUi);
+        
+        const desc = document.createElement('p');
+        desc.className = 'text-xs text-on-surface-variant leading-relaxed mb-3';
+        desc.textContent = getLocalizedText(option.description, lang);
+        
+        card.append(input, header, desc);
+        container.appendChild(card);
       });
-
-      card.appendChild(list);
     }
-
-    container.appendChild(card);
   });
 }
 /**

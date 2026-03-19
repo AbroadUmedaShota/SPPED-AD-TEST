@@ -73,6 +73,7 @@ export function calculateEstimate(settings, appliedCoupon = null, surveyEndDate 
 
     // 4. 完了予定日を計算
     const startDate = surveyEndDate ? new Date(surveyEndDate) : new Date();
+    const calculationBaseDate = new Date(startDate); // 基点の日付を保持
     const completionDate = new Date(startDate.setDate(startDate.getDate() + completionDays));
     const formattedCompletionDate = completionDate.toLocaleDateString('ja-JP');
 
@@ -83,6 +84,8 @@ export function calculateEstimate(settings, appliedCoupon = null, surveyEndDate 
     return {
         amount,
         completionDate: formattedCompletionDate,
+        turnaroundDays: completionDays,
+        calculationBaseDate: calculationBaseDate.toLocaleDateString('ja-JP'),
         unitPrice,
         requestedCards,
         preDiscount,
