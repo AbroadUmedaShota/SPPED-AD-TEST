@@ -80,9 +80,9 @@ export async function initInvoiceDetailPage() {
           // @ts-ignore
           sheet.style.boxShadow = 'none';
           // @ts-ignore
-          sheet.style.minHeight = '296mm';
+          sheet.style.minHeight = '280mm'; // 余白を考慮して少し小さめに
           // @ts-ignore
-          sheet.style.height = '296mm';
+          sheet.style.height = 'auto'; // 印刷時は自動に任せる
           // @ts-ignore
           sheet.style.maxHeight = 'none';
           // @ts-ignore
@@ -90,7 +90,7 @@ export async function initInvoiceDetailPage() {
           // @ts-ignore
           sheet.style.position = 'relative';
           // @ts-ignore
-          sheet.style.padding = '10mm 15mm 30mm 15mm'; // 下部パディング30mm
+          sheet.style.padding = '10mm 15mm 15mm 15mm'; // 下部パディングを15mmに縮小
           // @ts-ignore
           sheet.style.boxSizing = 'border-box';
 
@@ -98,9 +98,8 @@ export async function initInvoiceDetailPage() {
           if (pageNumEl) {
             // @ts-ignore
             pageNumEl.style.position = 'absolute';
-            // 2ページ目以降はもっと下げる
             // @ts-ignore
-            pageNumEl.style.bottom = index === 0 ? '5mm' : '3mm';
+            pageNumEl.style.bottom = '5mm';
             // @ts-ignore
             pageNumEl.style.right = '15mm';
             // @ts-ignore
@@ -390,7 +389,8 @@ function paginateInvoiceItems(items, page1) {
     unitPrice: 10000,
     amount: 10000
   }, 'page-1');
-  const safeFirstPageCapacity = Math.min(firstPageCapacity, baseFirstRowHeight * 14);
+  // 1枚目はサマリーが多いため、明細は最大8行程度に制限して A4サイズ超過を防ぐ
+  const safeFirstPageCapacity = Math.min(firstPageCapacity, baseFirstRowHeight * 8);
 
   const pages = [];
   let currentPage = [];
@@ -429,19 +429,20 @@ function getDetailPageCapacity(pageElement, pageType) {
     if (!pageElement && targetPage.parentNode) {
       targetPage.parentNode.removeChild(targetPage);
     }
-    return pageType === 'page-1' ? 336 : 700;
+    return pageType === 'page-1' ? 300 : 650;
   }
 
   const tbodyRect = tbody.getBoundingClientRect();
   const pageNumberRect = pageNumber.getBoundingClientRect();
   const tableStyle = window.getComputedStyle(table);
-  const capacity = Math.max(0, pageNumberRect.top - tbodyRect.top - parseFloat(tableStyle.marginTop || '0') - 8);
+  // 安全のため、計算されたキャパシティからさらに 20px 程度のマージンを差し引く（既存の8pxから28pxに変更）
+  const capacity = Math.max(0, pageNumberRect.top - tbodyRect.top - parseFloat(tableStyle.marginTop || '0') - 28);
 
   if (!pageElement && targetPage.parentNode) {
     targetPage.parentNode.removeChild(targetPage);
   }
 
-  return capacity || (pageType === 'page-1' ? 336 : 700);
+  return capacity || (pageType === 'page-1' ? 300 : 650);
 }
 
 function measureDetailRowHeight(item, pageType) {
