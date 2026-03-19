@@ -58,7 +58,7 @@ export async function fetchBizcardSettings(surveyId) {
         }
         // フォールバック用のデフォルト設定
         return {
-            bizcardEnabled: false,
+            bizcardEnabled: true,
             bizcardRequest: 100,
             dataConversionPlan: 'normal',
             dataConversionSpeed: 'normal',

@@ -65,6 +65,7 @@ export function initBizcardSettings() {
         appliedCoupon: null,
         isCouponApplied: false,
         isCouponProcessing: false,
+        isAppliedInThisScreen: false,
         isSkipped: false
     };
 
@@ -112,7 +113,8 @@ export function initBizcardSettings() {
 
             const sharedCouponKey = 'sharedCoupon_' + (state.surveyId || 'temp');
             const sharedCoupon = localStorage.getItem(sharedCouponKey);
-            const normalizedCouponCode = (sharedCoupon !== null ? sharedCoupon : (settingsData.couponCode || '')).trim();
+            const savedBizcardCoupon = (settingsData.couponCode || '').trim();
+            const normalizedCouponCode = (sharedCoupon !== null ? sharedCoupon : savedBizcardCoupon).trim();
             settingsData.couponCode = normalizedCouponCode;
 
             if (normalizedCouponCode) {
@@ -121,9 +123,11 @@ export function initBizcardSettings() {
                     if (validation.success) {
                         state.appliedCoupon = { ...validation, code: normalizedCouponCode };
                         state.isCouponApplied = true;
+                        state.isAppliedInThisScreen = (sharedCoupon === null || sharedCoupon === savedBizcardCoupon);
                     } else {
                         state.appliedCoupon = null;
                         state.isCouponApplied = false;
+                        state.isAppliedInThisScreen = false;
                         localStorage.removeItem(sharedCouponKey); // Clean up invalid
                     }
                 } catch (couponError) {
@@ -360,6 +364,7 @@ export function initBizcardSettings() {
                 state.appliedCoupon = { ...result, code };
                 state.settings.couponCode = code;
                 state.isCouponApplied = true;
+                state.isAppliedInThisScreen = true;
                 
                 // Sync to localStorage
                 const sharedCouponKey = 'sharedCoupon_' + (state.surveyId || 'temp');
@@ -525,6 +530,7 @@ export function initBizcardSettings() {
         const inputContainer = document.getElementById('couponInputContainer');
         const appliedContainer = document.getElementById('couponAppliedContainer');
         const codeDisplay = document.getElementById('appliedCouponCodeDisplay');
+        const sourceDisplay = document.getElementById('appliedCouponSourceDisplay');
         const applyLoading = document.getElementById('couponLoadingIndicator');
 
         if (!inputContainer || !appliedContainer) return;
@@ -532,7 +538,16 @@ export function initBizcardSettings() {
         if (state.isCouponApplied && state.appliedCoupon) {
             inputContainer.classList.add('hidden');
             appliedContainer.classList.remove('hidden');
-            if(codeDisplay) codeDisplay.textContent = state.appliedCoupon.code;
+            if (codeDisplay) codeDisplay.textContent = state.appliedCoupon.code;
+            
+            if (sourceDisplay) {
+                if (state.isAppliedInThisScreen) {
+                    sourceDisplay.classList.add('hidden');
+                } else {
+                    sourceDisplay.textContent = '※他設定より適用（共有）';
+                    sourceDisplay.classList.remove('hidden');
+                }
+            }
         } else {
             inputContainer.classList.remove('hidden');
             appliedContainer.classList.add('hidden');

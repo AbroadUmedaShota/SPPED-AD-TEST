@@ -1,66 +1,27 @@
-## 概要
+### Pre-investigation Summary
+- `bizcardSettings.html` 100行目に過去に削除されたはずの「プリセット」という文言がコメントで残存していることを確認。
+- `bizcardSettings.html` 256行目にて、適用中クーポンのソース表示が `<p id="appliedCouponSourceDisplay">※お礼メール設定より適用</p>` とハードコーディングされている。
+- `src/bizcardSettings.js` の `updateCouponSectionUI` 内にて、上記テキストを動的に切り替えるロジックが存在しないため、自画面で適用しても常に「お礼メール設定より適用」と表示されてしまう状態を確認。
 
-名刺データ化設定画面（`bizcardSettings.html`）の「見込み枚数」入力エリアのUI/UXを改善する。
-現状の単純な矩形 `<input type="number">` を、直感的に操作可能なスライダー＋プリセットボタン＋ステッパー構成のインタラクティブUIへ刷新する。
+### Contribution to Project Goals
+- UIの正確な状態反映によるユーザー体験（UX）の向上
+- コメントの適正化によるコードの保守性（メンテナンス性）の向上
 
----
+### Overview of Changes
+- クーポンの適用元の動的表示ロジックの追加
+- HTMLの古いコメントの除去
 
-## 背景・理由
+### Specific Work Content for Each File
+- `02_dashboard/bizcardSettings.html`:
+  - `<!-- 見込み枚数（スライダー＋プリセット＋ステッパー） -->` を `<!-- 見込み枚数（スライダー＋ステッパー） -->` に修正。
+  - `id="appliedCouponSourceDisplay"` の初期テキストを削除し、必要に応じて非表示クラスを付与する。
+- `02_dashboard/src/bizcardSettings.js`:
+  - `updateCouponSectionUI` 等で、クーポンが本画面で新規適用されたのか、LocalStorage (Shared) 経由で他画面から適用されたのかを判定。
+  - その判定に基づき、`appliedCouponSourceDisplay` の文言や表示/非表示を動的に切り替えるロジックを追加する。
 
-現状の「見込み枚数」入力は矩形の数値入力ボックス1つのみで、以下の課題がある：
+### Definition of Done
+- [ ] HTMLの不要なコメントが削除されている。
+- [ ] クーポンが自画面で適用された場合と、他画面から適用された場合で、表示文言が正しく制御される（自画面適用時は非表示にするなど）。
+- [ ] 手動テストでの動作確認が完了し、エラーログが出ていないことを確認。
 
-1. **数値のスケール感が伝わらない**: 何百枚という数値を単純なボックスに手入力するだけで、量の感覚や値段変化が直感に訴えない
-2. **最低請求に関する注意書きの視認性が低い**: 料金に直結する重要情報（50枚未満でも50枚分課金）が画面下部の小テキストに埋もれている
-3. **入力操作のフリクションが高い**: スマートなSaaSの料金設定UIと比較してUX品質に差がある
-
----
-
-## 事前調査サマリー
-
-- `bizcardSettings.html` L101–L118: 現在の「見込み枚数」セクション。`<input type="number" id="bizcardRequest">` + 「枚」ラベルのみ
-- `bizcardSettingsRenderer.js` L97–L167: `renderEstimate` が `minChargeNotice` の表示制御を担当
-- `bizcardSettings.js`: 数値変更時に `handleBizcardRequestChange` が呼ばれ、見積もりが再計算される
-
----
-
-## 変更内容
-
-### `bizcardSettings.html`
-- 「見込み枚数」セクションのHTMLを以下の構成に全面書き換え：
-  - **ステッパーボタン**（`[-]` `[+]`）: クリックで1枚単位増減
-  - **スライダー**（`<input type="range">`）: 50〜1000の範囲でドラッグ操作
-  - **プリセットボタン群**（50 / 100 / 200 / 500 枚）: クリックで即座にセット
-  - **最低請求バッジ**のインライン表示エリア（条件で赤/グレー切替）
-
-### `bizcardSettingsRenderer.js`
-- 新規DOM要素（スライダー、プリセットボタン）のキャッシュ追加
-- モジュール内のスライダー/入力値の双方向同期ロジック
-
-### `bizcardSettings.js`
-- スライダー `input` イベントハンドラ追加
-- プリセットボタン `click` イベントハンドラ追加（50/100/200/500）
-- ステッパーボタン `click` イベントハンドラ追加（最小0、上限1000ガード）
-
----
-
-## Definition of Done
-
-- [ ] スライダーを動かすと見込み枚数と右カラム金額がリアルタイムに変わること
-- [ ] プリセットボタン（50/100/200/500）クリックで数値が即座にセットされること
-- [ ] ステッパーの `[+]` `[-]` ボタンで1ずつ増減できること
-- [ ] 最低請求バッジが50枚未満で赤、それ以上でグレーに変わること
-- [ ] コンソールエラーがないこと
-- [ ] WEEKLY_CHANGELOG.md が更新されていること
-
----
-
-## 関連ファイル
-
-- `02_dashboard/bizcardSettings.html`
-- `02_dashboard/src/ui/bizcardSettingsRenderer.js`
-- `02_dashboard/src/bizcardSettings.js`
-- `docs/要件定義/03_bizcardSettings_requirements.md`
-
----
-
-*CLIにてユーザー承認済み（2026-03-19）*
+※User approval confirmed on the CLI
