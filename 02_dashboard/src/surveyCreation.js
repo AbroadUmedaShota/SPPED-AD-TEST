@@ -217,6 +217,7 @@ function initUnloadConfirmation() {
     // Push an initial state to the history. This allows us to intercept the first back button press.
     history.pushState(null, '', null);
 
+
     const popstateHandler = (event) => {
         if (isDirty) {
             // When the user clicks 'back', popstate fires. We immediately push the state back
@@ -289,6 +290,42 @@ window.disableUnloadConfirmation = () => {
 window.enableUnloadConfirmation = () => {
     window.addEventListener('beforeunload', handleBeforeUnload);
 };
+
+// --- Shared Coupon Indicator ---
+function updateSharedCouponIndicator() {
+    const indicator = document.getElementById('surveyGlobalCouponIndicator');
+    const codeTxt = document.getElementById('surveyGlobalCouponCodeTxt');
+    if (!indicator || !codeTxt) return;
+
+    const currentUrlParams = new URLSearchParams(window.location.search);
+    const sid = currentUrlParams.get('id') || currentSurveyId;
+    const sharedCouponKey = 'sharedCoupon_' + (sid || 'temp');
+    
+    // Check localStorage first
+    let code = localStorage.getItem(sharedCouponKey);
+    
+    // Fallback to surveyData settings if none in localStorage
+    if (code === null) {
+        if (surveyData?.settings?.couponCode) {
+            code = surveyData.settings.couponCode;
+        } else if (surveyData?.settings?.bizcard?.couponCode) {
+            code = surveyData.settings.bizcard.couponCode;
+        } else if (surveyData?.settings?.thankYouEmail?.couponCode) {
+            code = surveyData.settings.thankYouEmail.couponCode;
+        } else {
+            code = '';
+        }
+    }
+
+    if (code) {
+        codeTxt.textContent = code;
+        indicator.classList.remove('hidden');
+    } else {
+        indicator.classList.add('hidden');
+        codeTxt.textContent = '';
+    }
+}
+
 
 
 
@@ -1940,6 +1977,10 @@ async function initializePage() {
         }
 
         initUnloadConfirmation();
+        
+        updateSharedCouponIndicator();
+        window.addEventListener('focus', updateSharedCouponIndicator);
+
         document.dispatchEvent(new CustomEvent('pageInitialized'));
 
         // Expose functions to global scope for tutorial

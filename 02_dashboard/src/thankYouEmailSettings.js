@@ -89,6 +89,34 @@ export function initThankYouEmailSettings() {
 
             state.initialEmailSettings = JSON.parse(JSON.stringify(state.emailSettings));
 
+            // ----- Setup Shared Coupon -----
+            const sharedCouponKey = 'sharedCoupon_' + (state.surveyId || 'temp');
+            const sharedCoupon = localStorage.getItem(sharedCouponKey);
+            const normalizedCouponCode = (sharedCoupon !== null ? sharedCoupon : (state.emailSettings.couponCode || '')).trim();
+            state.emailSettings.couponCode = normalizedCouponCode;
+
+            if (normalizedCouponCode) {
+                try {
+                    const validation = await validateCoupon(normalizedCouponCode);
+                    if (validation.success) {
+                        state.appliedCoupon = { ...validation, code: normalizedCouponCode };
+                        state.isCouponApplied = true;
+                    } else {
+                        state.appliedCoupon = null;
+                        state.isCouponApplied = false;
+                        localStorage.removeItem(sharedCouponKey); // Clean up invalid
+                    }
+                } catch (couponError) {
+                    console.error('初期クーポン検証エラー:', couponError);
+                    state.appliedCoupon = null;
+                    state.isCouponApplied = false;
+                }
+            } else {
+                state.appliedCoupon = null;
+                state.isCouponApplied = false;
+            }
+            // ---------------------------------
+
             renderSurveyInfo(state.surveyData, state.surveyId);
             populateTemplates(state.emailTemplates);
             populateVariables(state.variables, handleVariableClick);
@@ -109,7 +137,9 @@ export function initThankYouEmailSettings() {
 
     function setupEventListeners() {
         sendMethodRadios.forEach(radio => radio.addEventListener('change', handleFormChange));
-        emailTemplateSelect.addEventListener('change', handleTemplateChange);
+        if (emailTemplateSelect) {
+            emailTemplateSelect.addEventListener('change', handleTemplateChange);
+        }
         emailBodyTextarea.addEventListener('input', () => handleRealtimePreview());
         emailSubjectInput.addEventListener('input', (e) => {
             document.getElementById('subjectCharCount').textContent = e.target.value.length;
@@ -421,6 +451,12 @@ export function initThankYouEmailSettings() {
         if (currentMode === 'remove' && state.appliedCoupon) {
             state.appliedCoupon = null;
             state.isCouponApplied = false;
+            state.emailSettings.couponCode = '';
+            
+            // Sync to localStorage
+            const sharedCouponKey = 'sharedCoupon_' + (state.surveyId || 'temp');
+            localStorage.removeItem(sharedCouponKey);
+
             couponCodeInput.value = '';
             displayCouponResult({ success: true, message: 'クーポンを削除しました' });
             updateCouponSectionUI();
@@ -442,6 +478,11 @@ export function initThankYouEmailSettings() {
             displayCouponResult(result);
             if (result.success) {
                 state.appliedCoupon = { ...result, code };
+                state.emailSettings.couponCode = code;
+                
+                // Sync to localStorage
+                const sharedCouponKey = 'sharedCoupon_' + (state.surveyId || 'temp');
+                localStorage.setItem(sharedCouponKey, code);
             } else {
                 state.appliedCoupon = null;
             }
@@ -555,6 +596,7 @@ export function initThankYouEmailSettings() {
     }
 
     function handleTemplateChange() {
+        if (!emailTemplateSelect) return;
         const selectedTemplate = state.emailTemplates.find(t => t.id === emailTemplateSelect.value);
         if (selectedTemplate) {
             emailSubjectInput.value = selectedTemplate.subject || '';
@@ -570,7 +612,7 @@ export function initThankYouEmailSettings() {
         const settings = {
             thankYouEmailEnabled: selectedMethod !== 'none',
             sendMethod: selectedMethod === 'none' ? 'manual' : selectedMethod,
-            emailTemplateId: emailTemplateSelect.value,
+            emailTemplateId: emailTemplateSelect ? emailTemplateSelect.value : null,
             emailSubject: emailSubjectInput.value,
             emailBody: emailBodyTextarea.value,
             couponCode: state.appliedCoupon ? state.appliedCoupon.code : null

@@ -206,7 +206,7 @@
               <!-- 追加設定 -->
               <section>
                 <h2 id="section-additional-settings" class="text-on-surface text-xl font-semibold mb-4">追加設定</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                   <div class="input-group">
                     <button type="button" id="openBizcardSettingsBtn"
                       class="additional-settings-button min-w-[100px] px-6 py-3 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors">名刺データ化設定</button>
@@ -218,6 +218,18 @@
                   <div class="input-group">
                     <button type="button" id="openThankYouScreenSettingsBtn"
                       class="additional-settings-button text-center min-w-[100px] px-6 py-3 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors">サンクス画面設定</button>
+                  </div>
+                </div>
+                
+                <!-- 共通クーポン適用状態表示 -->
+                <div id="surveyGlobalCouponIndicator" class="hidden p-4 rounded-lg bg-surface-variant flex items-center justify-between border border-secondary mt-4">
+                  <div class="flex items-start gap-3">
+                    <span class="material-icons text-secondary mt-0.5">local_offer</span>
+                    <div>
+                      <span class="font-bold text-sm block text-on-surface">クーポン適用中</span>
+                      <span id="surveyGlobalCouponCodeTxt" class="text-lg font-bold tracking-wider text-secondary"></span>
+                      <p class="text-xs text-on-surface-variant mt-1">※ クーポンは名刺データ化・お礼メールなどアンケート全体の総額からお値引きされます。</p>
+                    </div>
                   </div>
                 </div>
               </section>

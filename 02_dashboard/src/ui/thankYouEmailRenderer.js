@@ -83,7 +83,7 @@ export function setInitialFormValues(settings) {
     const radio = document.querySelector(`input[name="sendMethod"][value="${sendMethod}"]`);
     if (radio) radio.checked = true;
 
-    dom.emailTemplateSelect.value = settings.emailTemplateId || '';
+    if (dom.emailTemplateSelect) dom.emailTemplateSelect.value = settings.emailTemplateId || '';
     dom.emailSubjectInput.value = settings.emailSubject || '';
     dom.emailBodyTextarea.value = settings.emailBody || '';
     
@@ -96,6 +96,7 @@ export function setInitialFormValues(settings) {
  */
 export function populateTemplates(templates) {
     if (!dom.emailTemplateSelect) cacheDOMElements();
+    if (!dom.emailTemplateSelect) return;
     
     // 重複を避けるため、既存のオプションをクリアしてから templates の内容を描画
     dom.emailTemplateSelect.innerHTML = '';

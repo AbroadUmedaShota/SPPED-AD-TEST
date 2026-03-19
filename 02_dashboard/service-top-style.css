@@ -2707,3 +2707,8 @@ body.dark-mode .outline-highlight {
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
+
+/* Fix for tooltips inside disabled (pointer-events-none) containers */
+.pointer-events-none .help-trigger {
+    pointer-events: auto;
+}
