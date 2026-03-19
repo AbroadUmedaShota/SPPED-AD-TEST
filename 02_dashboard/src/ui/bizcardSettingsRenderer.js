@@ -35,6 +35,9 @@ function cacheDOMElements() {
     dom.estimatedCompletionDateSpan = document.getElementById('estimatedCompletionDate');
     dom.estimateBreakdown = document.getElementById('estimateBreakdown');
     dom.minChargeNotice = document.getElementById('minChargeNotice');
+    dom.minChargeNoticeText = document.getElementById('minChargeNoticeText');
+    dom.bizcardRequestSlider = document.getElementById('bizcardRequestSlider');
+    dom.bizcardRequestPresets = document.getElementById('bizcardRequestPresets');
     dom.saveButton = document.getElementById('saveBizcardSettingsBtn');
     dom.saveButtonText = document.getElementById('saveBizcardSettingsBtnText');
     dom.saveButtonLoading = document.getElementById('saveBizcardSettingsBtnLoading');
@@ -144,17 +147,31 @@ export function renderEstimate(estimate) {
             </div>
         `;
     }
+    // minChargeNotice: new structure is <div id="minChargeNotice"><span material-icons/><span id="minChargeNoticeText"/></div>
     if (dom.minChargeNotice) {
+        if (!dom.minChargeNoticeText) dom.minChargeNoticeText = document.getElementById('minChargeNoticeText');
         const requestedCards = estimate.requestedCards ?? 0;
         const minChargeCards = estimate.minChargeCards ?? (requestedCards > 0 ? Math.ceil(requestedCards * 0.5) : 0);
         if (requestedCards > 0 && (estimate.minCharge ?? 0) > 0 && minChargeCards > 0) {
             const cardsText = minChargeCards.toLocaleString();
             const amountText = (estimate.minCharge ?? 0).toLocaleString();
-            dom.minChargeNotice.textContent = `※ 実際の件数が${cardsText}枚に満たない場合でも${cardsText}枚分（¥${amountText}）をご請求します。`;
+            if (dom.minChargeNoticeText) {
+                dom.minChargeNoticeText.textContent = `実際の件数が${cardsText}枚に満たない場合でも${cardsText}枚分（¥${amountText}）をご請求します。`;
+            }
             dom.minChargeNotice.classList.remove('hidden');
+            dom.minChargeNotice.classList.add('flex');
+
+            if (requestedCards < minChargeCards) {
+                dom.minChargeNotice.classList.add('text-error', 'bg-error/10', 'border-error/20');
+                dom.minChargeNotice.classList.remove('text-on-surface-variant', 'bg-surface-variant/30', 'border-outline-variant/40');
+            } else {
+                dom.minChargeNotice.classList.remove('text-error', 'bg-error/10', 'border-error/20');
+                dom.minChargeNotice.classList.add('text-on-surface-variant', 'bg-surface-variant/30', 'border-outline-variant/40');
+            }
         } else {
-            dom.minChargeNotice.textContent = '';
+            if (dom.minChargeNoticeText) dom.minChargeNoticeText.textContent = '';
             dom.minChargeNotice.classList.add('hidden');
+            dom.minChargeNotice.classList.remove('flex');
         }
     }
 }
@@ -174,108 +191,140 @@ export function renderDataConversionPlans(plans, selectedPlan) {
   const normalizedPlan = selectedPlan || DEFAULT_PLAN;
   container.innerHTML = '';
 
-  const tableWrapper = document.createElement('div');
-  tableWrapper.className = 'overflow-hidden rounded-xl border border-outline-variant/60 bg-surface shadow-sm';
-
-  const table = document.createElement('table');
-  table.className = 'min-w-full table-fixed';
-  table.setAttribute('role', 'presentation');
-
-  const thead = document.createElement('thead');
-  thead.className = 'bg-surface-container text-left text-xs font-semibold uppercase tracking-widest text-on-surface-variant';
-
-  const headerRow = document.createElement('tr');
-  const headers = [
-    { label: '', className: 'w-12 px-4 py-3 text-center sm:px-6' },
-    { label: lang === 'ja' ? 'プラン名' : 'Plan', className: 'px-4 py-3 sm:px-6' },
-    { label: lang === 'ja' ? '単価' : 'Unit price', className: 'px-4 py-3 text-right sm:px-6' },
-    { label: lang === 'ja' ? '項目数' : 'Fields', className: 'px-4 py-3 text-right sm:px-6' },
-    { label: lang === 'ja' ? '納期' : 'Turnaround', className: 'px-4 py-3 text-right sm:px-6' }
-  ];
-
-  headers.forEach(header => {
-    const th = document.createElement('th');
-    th.scope = 'col';
-    th.className = header.className;
-    th.textContent = header.label;
-    headerRow.appendChild(th);
-  });
-  thead.appendChild(headerRow);
-
-  const tbody = document.createElement('tbody');
-  tbody.className = 'divide-y divide-outline-variant/30';
-
   plans.forEach(plan => {
     const isSelected = plan.value === normalizedPlan;
-    const row = document.createElement('tr');
-    row.className = [
-      'cursor-pointer transition-colors',
-      isSelected ? 'bg-primary/10' : 'hover:bg-surface-container-highest'
+    
+    const label = document.createElement('label');
+    label.className = [
+      'relative flex cursor-pointer flex-col rounded-2xl border-2 p-5 transition-all duration-200 bg-surface text-left select-none',
+      isSelected 
+        ? 'border-primary ring-1 ring-primary/20 bg-primary/5 shadow-md scale-[1.01] z-10' 
+        : 'border-outline-variant/60 hover:border-primary/40 hover:bg-surface-variant hover:shadow-sm'
     ].join(' ');
 
-    const selectCell = document.createElement('td');
-    selectCell.className = 'px-4 py-4 text-center sm:px-6';
     const input = document.createElement('input');
     input.type = 'radio';
     input.name = 'dataConversionPlan';
     input.value = plan.value;
     input.id = `data-plan-${plan.value}`;
-    input.className = 'h-4 w-4 border-outline text-primary focus:ring-primary';
+    input.className = 'peer sr-only';
     input.checked = isSelected;
-    selectCell.appendChild(input);
-    row.appendChild(selectCell);
 
-    const planCell = document.createElement('td');
-    planCell.className = 'px-4 py-4 sm:px-6';
-    const planStack = document.createElement('div');
-    planStack.className = 'flex flex-col gap-1';
-    const title = document.createElement('p');
-    title.className = isSelected
-      ? 'text-sm font-semibold text-primary'
-      : 'text-sm font-semibold text-on-surface';
-    title.textContent = getLocalizedText(plan.title, lang);
-    planStack.appendChild(title);
-
-    const description = getLocalizedText(plan.description, lang);
-    const tagline = getLocalizedText(plan.tagline, lang);
-    const helperText = description || tagline;
-    if (helperText) {
-      const note = document.createElement('p');
-      note.className = 'text-xs text-on-surface-variant';
-      note.textContent = helperText;
-      planStack.appendChild(note);
+    const header = document.createElement('div');
+    header.className = 'flex items-start justify-between border-b border-outline-variant/50 pb-3 mb-3 shrink-0';
+    
+    const titleFlex = document.createElement('div');
+    titleFlex.className = 'flex items-center gap-2.5';
+    
+    if (plan.icon) {
+       const iconDiv = document.createElement('div');
+       iconDiv.className = `flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br ${plan.accentGradient} text-white shadow-sm shrink-0`;
+       const iconSpan = document.createElement('span');
+       iconSpan.className = 'material-icons text-[18px]';
+       iconSpan.textContent = plan.icon;
+       iconDiv.appendChild(iconSpan);
+       titleFlex.appendChild(iconDiv);
     }
-    planCell.appendChild(planStack);
-    row.appendChild(planCell);
-
-    const priceCell = document.createElement('td');
-    priceCell.className = 'px-4 py-4 text-right text-sm font-semibold sm:px-6';
-    priceCell.textContent = getLocalizedText(plan.unitPriceLabel || plan.price, lang);
-    row.appendChild(priceCell);
-
-    const itemCell = document.createElement('td');
-    itemCell.className = 'px-4 py-4 text-right text-sm font-semibold sm:px-6';
-    itemCell.textContent = getLocalizedText(plan.itemCountLabel, lang);
-    row.appendChild(itemCell);
-
-    const turnaroundCell = document.createElement('td');
-    turnaroundCell.className = 'px-4 py-4 text-right text-sm font-semibold sm:px-6';
-    turnaroundCell.textContent = getLocalizedText(plan.turnaroundLabel, lang);
-    row.appendChild(turnaroundCell);
-
-    row.addEventListener('click', event => {
-      const target = event.target;
-      if (target instanceof HTMLInputElement) return;
+    
+    const titleInfo = document.createElement('div');
+    titleInfo.className = 'flex flex-col';
+    
+    const titleWrapper = document.createElement('div');
+    titleWrapper.className = 'flex items-center gap-1.5 flex-wrap';
+    
+    const titleText = document.createElement('span');
+    titleText.className = [
+        'font-bold text-base leading-tight',
+        isSelected ? 'text-primary' : 'text-on-surface'
+    ].join(' ');
+    titleText.textContent = getLocalizedText(plan.title, lang);
+    titleWrapper.appendChild(titleText);
+    
+    if (plan.badge) {
+        const badge = document.createElement('span');
+        badge.className = 'rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold text-primary border border-primary/20 shrink-0';
+        badge.textContent = getLocalizedText(plan.badge, lang);
+        titleWrapper.appendChild(badge);
+    }
+    
+    titleInfo.appendChild(titleWrapper);
+    titleFlex.appendChild(titleInfo);
+    
+    const radioUiContainer = document.createElement('div');
+    radioUiContainer.className = 'flex h-6 w-6 items-center justify-center shrink-0 mt-0.5 ml-2';
+    
+    const radioUi = document.createElement('div');
+    radioUi.className = [
+        'flex h-5 w-5 items-center justify-center rounded-full border-2 transition-all',
+        isSelected ? 'border-primary bg-primary shadow-sm shadow-primary/30' : 'border-outline-variant bg-surface'
+    ].join(' ');
+    const radioInner = document.createElement('div');
+    radioInner.className = [
+        'h-2 w-2 rounded-full bg-surface transition-transform duration-200',
+        isSelected ? 'scale-100' : 'scale-0'
+    ].join(' ');
+    radioUi.appendChild(radioInner);
+    radioUiContainer.appendChild(radioUi);
+    
+    header.append(titleFlex, radioUiContainer);
+    
+    const body = document.createElement('div');
+    body.className = 'flex-1 flex flex-col justify-between';
+    
+    const features = [
+       { icon: 'sell', label: lang === 'ja' ? '単価' : 'Price', value: getLocalizedText(plan.unitPriceLabel || plan.price, lang) },
+       { icon: 'data_object', label: lang === 'ja' ? '項目数' : 'Fields', value: getLocalizedText(plan.itemCountLabel, lang) },
+       { icon: 'schedule', label: lang === 'ja' ? '納期' : 'Speed', value: getLocalizedText(plan.turnaroundLabel, lang) }
+    ];
+    
+    const ul = document.createElement('ul');
+    ul.className = 'space-y-2 text-sm text-on-surface mb-3';
+    features.forEach(f => {
+       const li = document.createElement('li');
+       li.className = 'flex items-center justify-between border-b border-outline-variant/30 pb-1.5 last:border-0 last:pb-0';
+       
+       const liLeft = document.createElement('div');
+       liLeft.className = 'flex items-center gap-1.5 text-on-surface-variant';
+       const listIcon = document.createElement('span');
+       listIcon.className = 'material-icons text-[14px] opacity-70';
+       listIcon.textContent = f.icon;
+       const listLabel = document.createElement('span');
+       listLabel.className = 'font-semibold text-[13px]';
+       listLabel.textContent = f.label;
+       liLeft.append(listIcon, listLabel);
+       
+       const liRight = document.createElement('span');
+       liRight.className = 'font-bold text-[14px]';
+       liRight.textContent = f.value;
+       
+       li.append(liLeft, liRight);
+       ul.appendChild(li);
+    });
+    
+    const bottomSection = document.createElement('div');
+    bottomSection.className = 'mt-auto pt-2';
+    
+    if (plan.tagline) {
+        const tagline = document.createElement('p');
+        tagline.className = [
+            'text-[11px] font-bold p-1.5 rounded text-center transition-colors',
+            isSelected ? 'text-primary bg-primary/10' : 'text-on-surface-variant bg-surface-container-highest'
+        ].join(' ');
+        tagline.textContent = getLocalizedText(plan.tagline, lang);
+        bottomSection.appendChild(tagline);
+    }
+    
+    body.append(ul, bottomSection);
+    
+    label.addEventListener('click', event => {
+      if (event.target === input) return;
       input.checked = true;
       input.dispatchEvent(new Event('change', { bubbles: true }));
     });
-
-    tbody.appendChild(row);
+    
+    label.append(input, header, body);
+    container.appendChild(label);
   });
-
-  table.append(thead, tbody);
-  tableWrapper.appendChild(table);
-  container.appendChild(tableWrapper);
 }
 
 export function renderPremiumOptions(optionGroups, selections) {
