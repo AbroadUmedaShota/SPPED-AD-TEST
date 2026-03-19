@@ -100,46 +100,54 @@ export function updateSettingsVisibility() {
 export function renderEstimate(estimate) {
     if (!dom.estimatedAmountSpan) cacheDOMElements();
     
-    // 金額の変化を強調する演出 (D案: スロット風カウントアップ)
+    // 前のアニメーションがあれば停止 (連打対策)
+    if (dom.amountAnimationId) {
+        cancelAnimationFrame(dom.amountAnimationId);
+    }
+
     const oldAmountStr = dom.estimatedAmountSpan.textContent.replace(/[^\d]/g, '');
     const oldAmount = parseInt(oldAmountStr, 10) || 0;
     const newAmount = estimate.amount;
+    const lang = document.documentElement.lang || 'ja';
     
     if (oldAmount !== newAmount) {
-        // アニメーション実行
-        const duration = 400; // 0.4秒
+        // アニメーション実行 (D案: スロット風)
+        const duration = 400;
         const startTime = performance.now();
         
         const animate = (currentTime) => {
             const elapsed = currentTime - startTime;
             const progress = Math.min(elapsed / duration, 1);
-            
-            // イージング（後半を少しゆっくりに）
             const easedProgress = 1 - Math.pow(1 - progress, 3);
             const currentAmount = Math.floor(oldAmount + (newAmount - oldAmount) * easedProgress);
             
             dom.estimatedAmountSpan.textContent = `¥${currentAmount.toLocaleString()}`;
             
             if (progress < 1) {
-                requestAnimationFrame(animate);
+                dom.amountAnimationId = requestAnimationFrame(animate);
             } else {
                 dom.estimatedAmountSpan.textContent = `¥${newAmount.toLocaleString()}`;
                 dom.estimatedAmountSpan.classList.remove('text-primary', 'scale-105');
+                dom.amountAnimationId = null;
             }
         };
         
         dom.estimatedAmountSpan.classList.add('text-primary', 'scale-105', 'transition-transform');
-        requestAnimationFrame(animate);
+        dom.amountAnimationId = requestAnimationFrame(animate);
     } else {
         dom.estimatedAmountSpan.textContent = `¥${newAmount.toLocaleString()}`;
     }
 
-    // 納期の根拠（B案）を表示
+    // 納期の根拠（B案）を表示 (多言語対応)
+    const baseDateLabel = lang === 'ja' ? '起算日' : 'Base Date';
+    const turnaroundLabel = lang === 'ja' ? '納期' : 'Turnaround';
+    const daysLabel = lang === 'ja' ? '日' : 'days';
+
     dom.estimatedCompletionDateSpan.innerHTML = `
         <div class="flex flex-col items-end">
             <span>${estimate.completionDate}</span>
             <span class="text-[10px] font-normal text-on-surface-variant/70 mt-0.5">
-                (起算日 ${estimate.calculationBaseDate || '未定'} ＋ 納期 ${estimate.turnaroundDays || 0}日)
+                (${baseDateLabel} ${estimate.calculationBaseDate || '—'} ＋ ${turnaroundLabel} ${estimate.turnaroundDays || 0}${daysLabel})
             </span>
         </div>
     `;
@@ -370,7 +378,7 @@ export function renderDataConversionPlans(plans, selectedPlan) {
 }
 
 /**
- * プレミアムオプションを描画します（C案：カードスタイル）。
+ * プレミアムオプションを描画します（C案：グループ化カードスタイル）。
  * @param {Array<object>} optionGroups - 表示するオプション一覧。
  * @param {object} selections - 選択中のオプション。
  */
@@ -383,146 +391,143 @@ export function renderPremiumOptions(optionGroups, selections) {
   const normalizedSelections = selections || {};
   const additionalItems = new Set(normalizedSelections.additionalItems || []);
   container.innerHTML = '';
+  
+  // コンテナのグリッドを解除して縦並びのグループ構成にする
+  container.className = 'space-y-8';
 
-  optionGroups.forEach(group => {
-    if (group.type === 'toggle') {
-      const optionId = `premium-${group.value}`;
-      const isSelected = Boolean(normalizedSelections[group.value]);
-      
-      const card = document.createElement('label');
-      card.setAttribute('for', optionId);
-      card.className = [
-        'relative flex cursor-pointer flex-col rounded-2xl border-2 p-5 transition-all duration-200 bg-surface select-none',
-        isSelected 
-          ? 'border-primary ring-1 ring-primary/20 bg-primary/5 shadow-md scale-[1.01] z-10' 
-          : 'border-outline-variant/60 hover:border-primary/40 hover:bg-surface-variant hover:shadow-sm'
-      ].join(' ');
+  const createCard = (id, name, value, isSelected, title, icon, description, unitPriceLabel) => {
+    const card = document.createElement('label');
+    card.setAttribute('for', id);
+    card.className = [
+      'relative flex cursor-pointer flex-col rounded-2xl border-2 p-5 transition-all duration-200 bg-surface select-none h-full',
+      isSelected 
+        ? 'border-primary ring-1 ring-primary/20 bg-primary/5 shadow-md scale-[1.01] z-10' 
+        : 'border-outline-variant/60 hover:border-primary/40 hover:bg-surface-variant hover:shadow-sm'
+    ].join(' ');
 
-      const input = document.createElement('input');
-      input.type = 'checkbox';
-      input.id = optionId;
-      input.name = 'premiumMultilingual';
-      input.className = 'sr-only';
-      input.checked = isSelected;
+    const input = document.createElement('input');
+    input.type = 'checkbox';
+    input.id = id;
+    input.name = name;
+    if (value) input.value = value;
+    input.className = 'sr-only';
+    input.checked = isSelected;
 
-      const header = document.createElement('div');
-      header.className = 'flex items-start justify-between mb-2';
-      
-      const titleBlock = document.createElement('div');
-      titleBlock.className = 'flex items-center gap-2.5';
-      
-      const iconDiv = document.createElement('div');
-      iconDiv.className = `flex h-9 w-9 items-center justify-center rounded-xl ${isSelected ? 'bg-primary text-white' : 'bg-surface-variant text-on-surface-variant'} shadow-sm shrink-0 transition-colors`;
-      const iconSpan = document.createElement('span');
-      iconSpan.className = 'material-icons text-[18px]';
-      iconSpan.textContent = group.icon || 'star';
-      iconDiv.appendChild(iconSpan);
-      titleBlock.appendChild(iconDiv);
-      
-      const titleText = document.createElement('span');
-      titleText.className = [
-          'font-bold text-sm',
-          isSelected ? 'text-primary' : 'text-on-surface'
-      ].join(' ');
-      titleText.textContent = getLocalizedText(group.title, lang);
-      titleBlock.appendChild(titleText);
-      
-      const checkUi = document.createElement('div');
-      checkUi.className = [
-          'flex h-6 w-6 items-center justify-center rounded-full border-2 transition-all',
-          isSelected ? 'border-primary bg-primary' : 'border-outline-variant bg-surface'
-      ].join(' ');
-      const checkIcon = document.createElement('span');
-      checkIcon.className = 'material-icons text-white text-[16px] transition-transform duration-200';
-      checkIcon.style.transform = isSelected ? 'scale(1)' : 'scale(0)';
-      checkIcon.textContent = 'check';
-      checkUi.appendChild(checkIcon);
-      
-      header.append(titleBlock, checkUi);
-      
-      const desc = document.createElement('p');
-      desc.className = 'text-xs text-on-surface-variant leading-relaxed mb-3';
-      desc.textContent = getLocalizedText(group.description, lang);
-      
-      const priceBadge = document.createElement('div');
-      priceBadge.className = 'mt-auto pt-2 border-t border-outline-variant/30';
-      if (group.unitPriceLabel) {
-          const badge = document.createElement('span');
-          badge.className = 'text-[11px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded';
-          badge.textContent = getLocalizedText(group.unitPriceLabel, lang);
-          priceBadge.appendChild(badge);
-      }
+    const header = document.createElement('div');
+    header.className = 'flex items-start justify-between mb-2';
+    
+    const titleBlock = document.createElement('div');
+    titleBlock.className = 'flex items-center gap-2.5';
+    
+    const iconDiv = document.createElement('div');
+    iconDiv.className = `flex h-9 w-9 items-center justify-center rounded-xl ${isSelected ? 'bg-primary text-white' : 'bg-surface-variant text-on-surface-variant'} shadow-sm shrink-0 transition-colors`;
+    const iconSpan = document.createElement('span');
+    iconSpan.className = 'material-icons text-[18px]';
+    iconSpan.textContent = icon || 'star';
+    iconDiv.appendChild(iconSpan);
+    titleBlock.appendChild(iconDiv);
+    
+    const titleText = document.createElement('span');
+    titleText.className = [
+        'font-bold text-sm',
+        isSelected ? 'text-primary' : 'text-on-surface'
+    ].join(' ');
+    titleText.textContent = getLocalizedText(title, lang);
+    titleBlock.appendChild(titleText);
+    
+    const checkUi = document.createElement('div');
+    checkUi.className = [
+        'flex h-6 w-6 items-center justify-center rounded-full border-2 transition-all',
+        isSelected ? 'border-primary bg-primary' : 'border-outline-variant bg-surface'
+    ].join(' ');
+    const checkIcon = document.createElement('span');
+    checkIcon.className = 'material-icons text-white text-[16px] transition-transform duration-200';
+    checkIcon.style.transform = isSelected ? 'scale(1)' : 'scale(0)';
+    checkIcon.textContent = 'check';
+    checkUi.appendChild(checkIcon);
+    
+    header.append(titleBlock, checkUi);
+    
+    const desc = document.createElement('p');
+    desc.className = 'text-xs text-on-surface-variant leading-relaxed mb-3';
+    desc.textContent = getLocalizedText(description, lang);
+    
+    card.append(input, header, desc);
 
-      card.append(input, header, desc, priceBadge);
-      container.appendChild(card);
+    if (unitPriceLabel) {
+        const priceBadge = document.createElement('div');
+        priceBadge.className = 'mt-auto pt-2 border-t border-outline-variant/30';
+        const badge = document.createElement('span');
+        badge.className = 'text-[11px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded';
+        badge.textContent = getLocalizedText(unitPriceLabel, lang);
+        priceBadge.appendChild(badge);
+        card.appendChild(priceBadge);
     }
 
-    if (group.type === 'multi' && Array.isArray(group.options)) {
-      group.options.forEach(option => {
-        const optionId = `premium-${group.value}-${option.value}`;
-        const isSelected = additionalItems.has(option.value);
+    return card;
+  };
 
-        const card = document.createElement('label');
-        card.setAttribute('for', optionId);
-        card.className = [
-          'relative flex cursor-pointer flex-col rounded-2xl border-2 p-5 transition-all duration-200 bg-surface select-none',
-          isSelected 
-            ? 'border-primary ring-1 ring-primary/20 bg-primary/5 shadow-md scale-[1.01] z-10' 
-            : 'border-outline-variant/60 hover:border-primary/40 hover:bg-surface-variant hover:shadow-sm'
-        ].join(' ');
+  // --- グループ1: サービス・アップグレード ---
+  const upgradeGroup = optionGroups.find(g => g.value === 'multilingual');
+  if (upgradeGroup) {
+    const section = document.createElement('div');
+    section.className = 'space-y-3';
+    
+    const head = document.createElement('h3');
+    head.className = 'text-[11px] font-black text-primary uppercase tracking-widest flex items-center gap-2 px-1';
+    head.innerHTML = '<span class="material-icons text-[14px]">upgrade</span> Service Upgrade';
+    section.appendChild(head);
 
-        const input = document.createElement('input');
-        input.type = 'checkbox';
-        input.id = optionId;
-        input.name = 'premiumAdditionalItems';
-        input.value = option.value;
-        input.className = 'sr-only';
-        input.checked = isSelected;
+    const grid = document.createElement('div');
+    grid.className = 'grid gap-4 sm:grid-cols-2';
+    
+    const isSelected = Boolean(normalizedSelections[upgradeGroup.value]);
+    const card = createCard(
+        `premium-${upgradeGroup.value}`,
+        'premiumMultilingual',
+        null,
+        isSelected,
+        upgradeGroup.title,
+        upgradeGroup.icon,
+        upgradeGroup.description,
+        upgradeGroup.unitPriceLabel
+    );
+    grid.appendChild(card);
+    section.appendChild(grid);
+    container.appendChild(section);
+  }
 
-        const header = document.createElement('div');
-        header.className = 'flex items-start justify-between mb-2';
-        
-        const titleBlock = document.createElement('div');
-        titleBlock.className = 'flex items-center gap-2.5';
-        
-        const iconDiv = document.createElement('div');
-        iconDiv.className = `flex h-9 w-9 items-center justify-center rounded-xl ${isSelected ? 'bg-primary text-white' : 'bg-surface-variant text-on-surface-variant'} shadow-sm shrink-0 transition-colors`;
-        const iconSpan = document.createElement('span');
-        iconSpan.className = 'material-icons text-[18px]';
-        iconSpan.textContent = option.icon || 'add_circle';
-        iconDiv.appendChild(iconSpan);
-        titleBlock.appendChild(iconDiv);
-        
-        const titleText = document.createElement('span');
-        titleText.className = [
-            'font-bold text-sm',
-            isSelected ? 'text-primary' : 'text-on-surface'
-        ].join(' ');
-        titleText.textContent = getLocalizedText(option.title, lang);
-        titleBlock.appendChild(titleText);
-        
-        const checkUi = document.createElement('div');
-        checkUi.className = [
-            'flex h-6 w-6 items-center justify-center rounded-full border-2 transition-all',
-            isSelected ? 'border-primary bg-primary' : 'border-outline-variant bg-surface'
-        ].join(' ');
-        const checkIcon = document.createElement('span');
-        checkIcon.className = 'material-icons text-white text-[16px] transition-transform duration-200';
-        checkIcon.style.transform = isSelected ? 'scale(1)' : 'scale(0)';
-        checkIcon.textContent = 'check';
-        checkUi.appendChild(checkIcon);
-        
-        header.append(titleBlock, checkUi);
-        
-        const desc = document.createElement('p');
-        desc.className = 'text-xs text-on-surface-variant leading-relaxed mb-3';
-        desc.textContent = getLocalizedText(option.description, lang);
-        
-        card.append(input, header, desc);
-        container.appendChild(card);
-      });
-    }
-  });
+  // --- グループ2: 抽出項目の追加 ---
+  const additionalGroup = optionGroups.find(g => g.value === 'additionalItems');
+  if (additionalGroup && Array.isArray(additionalGroup.options)) {
+    const section = document.createElement('div');
+    section.className = 'space-y-3';
+    
+    const head = document.createElement('h3');
+    head.className = 'text-[11px] font-black text-primary uppercase tracking-widest flex items-center gap-2 px-1';
+    head.innerHTML = '<span class="material-icons text-[14px]">add_task</span> Extraction Details';
+    section.appendChild(head);
+
+    const grid = document.createElement('div');
+    grid.className = 'grid gap-4 sm:grid-cols-2 lg:grid-cols-3';
+    
+    additionalGroup.options.forEach(option => {
+      const isSelected = additionalItems.has(option.value);
+      const card = createCard(
+          `premium-${additionalGroup.value}-${option.value}`,
+          'premiumAdditionalItems',
+          option.value,
+          isSelected,
+          option.title,
+          option.icon,
+          option.description,
+          null
+      );
+      grid.appendChild(card);
+    });
+    section.appendChild(grid);
+    container.appendChild(section);
+  }
 }
 /**
  * クーポン適用の結果メッセージを表示します。
@@ -556,7 +561,7 @@ export function validateForm(isSkipped = false) {
     const errorEl = dom.bizcardRequestInput.parentElement.querySelector('.input-error-message');
     
     if (isNaN(value) || value <= 0) {
-        if (errorEl) errorEl.textContent = '依頼枚数は1枚以上入力してください。';
+        if (errorEl) errorEl.textContent = '1枚以上必要です';
         dom.bizcardRequestInput.classList.add('border-error');
         isValid = false;
     } else {

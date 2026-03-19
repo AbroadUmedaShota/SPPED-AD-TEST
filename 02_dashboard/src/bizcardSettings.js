@@ -204,7 +204,8 @@ export function initBizcardSettings() {
          * Centralized handler: update state + sync all UI controls + re-calculate estimate.
          */
         function setRequestCount(newVal) {
-            const clamped = Math.max(0, Math.min(9999, Math.round(newVal) || 0));
+            const parsed = parseInt(newVal, 10);
+            const clamped = Math.max(0, Math.min(9999, isNaN(parsed) ? 0 : Math.round(parsed)));
             state.settings.bizcardRequest = clamped;
             if (bizcardRequestInput) bizcardRequestInput.value = clamped;
             if (bizcardRequestSlider) bizcardRequestSlider.value = Math.min(clamped, 5000);
@@ -262,6 +263,10 @@ export function initBizcardSettings() {
             skipBizcardToggleContainer.classList.replace('bg-surface-container-low', 'bg-blue-500/10');
             skipBizcardToggleContainer.classList.add('border-blue-500/30');
             
+            // クーポン入力も無効化
+            if (couponCodeInput) couponCodeInput.disabled = true;
+            if (applyCouponBtn) applyCouponBtn.disabled = true;
+
             // Re-validate to remove error borders if they existed
             if (bizcardRequestInput) bizcardRequestInput.classList.remove('border-error');
         } else {
@@ -269,6 +274,10 @@ export function initBizcardSettings() {
             rightColumnDisabledOverlay.classList.add('hidden');
             skipBizcardToggleContainer.classList.replace('bg-blue-500/10', 'bg-surface-container-low');
             skipBizcardToggleContainer.classList.remove('border-blue-500/30');
+
+            // クーポン入力を有効化
+            if (couponCodeInput) couponCodeInput.disabled = false;
+            if (applyCouponBtn) applyCouponBtn.disabled = false;
         }
     }
 
