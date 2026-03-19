@@ -113,7 +113,8 @@ export function populateTemplates(templates) {
  */
 export function populateVariables(variables, onVariableClick) {
     if (!dom.variableContainer) cacheDOMElements();
-    
+    if (!dom.variableContainer) return;  // 要素が存在しない場合は何もしない
+
     dom.variableContainer.innerHTML = '';
     variables.forEach(variable => {
         const badge = document.createElement('button');
