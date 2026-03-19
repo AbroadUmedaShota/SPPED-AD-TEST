@@ -60,16 +60,19 @@ function cacheDOMElements() {
  */
 export function renderSurveyInfo(surveyData, surveyId) {
     if (!dom.surveyNameDisplay) cacheDOMElements();
-    
+    if (!dom.surveyNameDisplay) return;
+
     const surveyName = (surveyData.name && surveyData.name.ja) ? surveyData.name.ja : (surveyData.surveyName || '---');
     dom.surveyNameDisplay.textContent = surveyName;
     if (dom.pageTitle) {
         dom.pageTitle.textContent = `アンケート『${surveyName}』のお礼メール設定`;
     }
-    dom.surveyIdDisplay.textContent = surveyId || '---';
-    dom.surveyPeriodDisplay.textContent = (surveyData.periodStart && surveyData.periodEnd) 
-        ? `${surveyData.periodStart} - ${surveyData.periodEnd}` 
-        : '---';
+    if (dom.surveyIdDisplay) dom.surveyIdDisplay.textContent = surveyId || '---';
+    if (dom.surveyPeriodDisplay) {
+        dom.surveyPeriodDisplay.textContent = (surveyData.periodStart && surveyData.periodEnd)
+            ? `${surveyData.periodStart} - ${surveyData.periodEnd}`
+            : '---';
+    }
 }
 
 /**
@@ -77,7 +80,8 @@ export function renderSurveyInfo(surveyData, surveyId) {
  */
 export function setInitialFormValues(settings) {
     if (!dom.emailSubjectInput) cacheDOMElements();
-    
+    if (!dom.emailSubjectInput) return;
+
     // 送信方法のラジオボタン設定
     const sendMethod = settings.thankYouEmailEnabled ? (settings.sendMethod || 'manual') : 'none';
     const radio = document.querySelector(`input[name="sendMethod"][value="${sendMethod}"]`);
@@ -85,8 +89,8 @@ export function setInitialFormValues(settings) {
 
     if (dom.emailTemplateSelect) dom.emailTemplateSelect.value = settings.emailTemplateId || '';
     dom.emailSubjectInput.value = settings.emailSubject || '';
-    dom.emailBodyTextarea.value = settings.emailBody || '';
-    
+    if (dom.emailBodyTextarea) dom.emailBodyTextarea.value = settings.emailBody || '';
+
     // 文字数カウント更新
     if (dom.subjectCharCount) dom.subjectCharCount.textContent = (settings.emailSubject || '').length;
 }
