@@ -65,6 +65,16 @@ function resolvePlanCode(invoice) {
   return '';
 }
 
+function resolveContractType(invoice) {
+  const explicitType = invoice?.contractType;
+  if (explicitType === 'GROUP' || explicitType === 'PERSONAL') {
+    return explicitType;
+  }
+
+  const planCode = resolvePlanCode(invoice);
+  return planCode === 'GROUP' ? 'GROUP' : 'PERSONAL';
+}
+
 function createPlanBadge(invoice) {
   const label = resolvePlanLabel(invoice);
   const badge = document.createElement('span');
@@ -197,11 +207,10 @@ function createInvoiceCard(invoice) {
   metaBlock.appendChild(invoiceNum);
 
   // Type Badge (Group/Personal) - Logic simplified as per request
-  const planCode = resolvePlanCode(invoice);
   let typeText = '個人';
   let typeClasses = ['bg-sky-50', 'text-sky-700', 'border-sky-100']; // Lighter/Subtle
 
-  if (planCode === 'GROUP' || planCode === 'PREMIUM' || planCode === 'PREMIUM_PLUS') {
+  if (resolveContractType(invoice) === 'GROUP') {
     typeText = 'グループ';
     typeClasses = ['bg-indigo-50', 'text-indigo-700', 'border-indigo-100'];
   }

@@ -13,6 +13,23 @@ export async function fetchInvoices() {
   return Array.isArray(data) ? data : [];
 }
 
+async function fetchGroupAccountIds() {
+  const response = await fetch(resolveDashboardDataPath('core/groups.json'));
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  const groups = await response.json();
+  return new Set(
+    (Array.isArray(groups) ? groups : [])
+      .map(group => group?.accountId)
+      .filter(Boolean)
+  );
+}
+
+function resolveContractType(invoice, groupAccountIds) {
+  return groupAccountIds.has(invoice?.accountId) ? 'GROUP' : 'PERSONAL';
+}
+
 /**
  * 指定した ID の請求書を取得する。
  * @param {string} id - 請求書ID。
@@ -20,6 +37,7 @@ export async function fetchInvoices() {
  */
 export async function fetchInvoiceById(id) {
   const invoices = await fetchInvoices();
+  const groupAccountIds = await fetchGroupAccountIds();
 
   // Check for Aggregated ID
   if (id.startsWith('AGG-')) {
@@ -38,8 +56,7 @@ export async function fetchInvoiceById(id) {
         const mm = String(d.getMonth() + 1).padStart(2, '0');
         const mKey = `${yyyy}${mm}`;
 
-        const isGroup = inv.plan?.code !== 'STANDARD';
-        const tKey = isGroup ? 'GROUP' : 'PERSONAL';
+        const tKey = resolveContractType(inv, groupAccountIds);
 
         return mKey === targetMonth && tKey === targetType;
       });
@@ -72,6 +89,7 @@ export async function fetchInvoiceById(id) {
         subtotalTaxable: 0,
         subtotalNonTaxable: 0,
         tax: 0,
+        contractType: targetType,
         plan: {
           code: targetType === 'GROUP' ? 'GROUP' : 'PERSONAL',
           displayName: targetType === 'GROUP' ? 'Group' : 'Personal'
@@ -88,7 +106,7 @@ export async function fetchInvoiceById(id) {
         // Add Subtotal row
         merged.items.push({
           isSubtotal: true,
-          itemName: '',
+          itemName: '請求書小計',
           description: '小計',
           quantity: null,
           unitPrice: null,
@@ -117,6 +135,7 @@ export async function fetchInvoiceById(id) {
   if (invoice) {
     const totals = calculateInvoiceTotals(invoice.items);
     Object.assign(invoice, totals);
+    invoice.contractType = resolveContractType(invoice, groupAccountIds);
 
     // Format ID for display: YY-UID(5)-SEQ(3)
     const d = new Date(invoice.issueDate);

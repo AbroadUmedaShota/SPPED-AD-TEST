@@ -333,6 +333,12 @@
       height: 20px;
     }
 
+    .invoice-sheet .details-table td:nth-child(2),
+    .invoice-sheet .details-table td:nth-child(3) {
+      word-break: break-word;
+      overflow-wrap: anywhere;
+    }
+
     /* 列幅設定 */
     .invoice-sheet .col-no {
       width: 5%;
@@ -382,10 +388,7 @@
 
     /* Spacer Row */
     .invoice-sheet .details-table tr.spacer-row td {
-      border-left: 1px solid #000;
-      border-right: 1px solid #000;
-      border-top: none;
-      border-bottom: none;
+      background-color: #fff !important;
     }
 
     /* Subtotal Row */
@@ -467,7 +470,7 @@
           <header class="flex flex-wrap gap-4 justify-between items-center mb-6 pb-4 border-b border-outline-variant">
             <div>
               <h1 class="text-on-background text-2xl sm:text-3xl font-bold leading-tight tracking-tight">請求書詳細</h1>
-              <p class="text-sm text-on-surface-variant mt-2">契約プランごとの請求内容と明細、振込先を確認できます。 </p>
+              <p class="text-sm text-on-surface-variant mt-2">請求内訳、明細、振込先を請求書形式で確認できます。</p>
             </div>
             <div class="flex gap-2 items-center"><button
                 class="button-primary inline-flex items-center px-3 py-1 text-sm font-semibold rounded-md"
@@ -529,7 +532,7 @@
                     <table class="summary-table">
                       <tr>
                         <th class="bg-header">件名</th>
-                        <td class="text-right" id="sheet-billing-period">SPEED AD利用料</td>
+                        <td class="text-right" id="sheet-billing-period">SPEED AD利用料 2025年08月分</td>
                       </tr>
                       <tr>
                         <th class="bg-header">小計(課税対象)</th>

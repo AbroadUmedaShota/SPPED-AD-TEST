@@ -25,6 +25,15 @@
       box-sizing: border-box;
     }
 
+    .print-page {
+      width: 170mm;
+      min-height: 257mm;
+      margin: 0 auto 12mm;
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+    }
+
     .invoice-header {
       display: flex;
       justify-content: space-between;
@@ -127,9 +136,19 @@
       white-space: nowrap;
     }
 
+    .invoice-details td:nth-child(2),
+    .invoice-details td:nth-child(3) {
+      word-break: break-word;
+      overflow-wrap: anywhere;
+    }
+
     .subtotal-row {
       background-color: #fafafa;
       font-weight: 600;
+    }
+
+    .spacer-row td {
+      background-color: #fff;
     }
 
     .notes-section {
@@ -140,15 +159,32 @@
       font-size: 9pt;
     }
 
+    .page-number {
+      margin-top: auto;
+      padding-top: 6mm;
+      text-align: right;
+      font-size: 9pt;
+    }
+
     @media print {
       body, html {
         margin: 0;
         padding: 0;
       }
-      .invoice-container {
-        width: 100%;
-        margin: 0;
+      .invoice-container,
+      .print-page {
+        width: 170mm;
+        margin: 0 auto;
         box-shadow: none;
+      }
+      .print-page {
+        min-height: 257mm;
+        page-break-after: always;
+        break-after: page;
+      }
+      .print-page:last-child {
+        page-break-after: auto;
+        break-after: auto;
       }
     }
   </style>
@@ -158,14 +194,8 @@
 
   <script type="module">
     import { fetchInvoiceById } from './src/services/invoiceService.js';
+    import { resolveDashboardDataPath } from './src/utils.js';
 
-    const CATEGORY_ORDER = ['BASE', 'ADD_ON', 'ONE_TIME', 'CREDIT'];
-    const CATEGORY_LABELS = {
-      BASE: '小計（基本料金）',
-      ADD_ON: '小計（追加オプション）',
-      ONE_TIME: '小計（一時費用）',
-      CREDIT: '小計（調整額）'
-    };
     const STATUS_LABELS = {
       unpaid: '未入金',
       paid: '入金済',
@@ -189,6 +219,8 @@
           return;
         }
 
+        await populateBillingInfo(invoice);
+
         const container = document.getElementById('invoice-content');
         container.innerHTML = generateInvoiceHTML(invoice);
         setTimeout(() => window.print(), 300);
@@ -206,107 +238,475 @@
       `;
     }
 
+    async function populateBillingInfo(invoice) {
+      const [users, groups] = await Promise.all([
+        fetch(resolveDashboardDataPath('core/users.json')).then(response => response.json()),
+        fetch(resolveDashboardDataPath('core/groups.json')).then(response => response.json())
+      ]);
+
+      const userAccount = (Array.isArray(users) ? users : []).find(user => user.accountId === invoice.accountId);
+      if (userAccount) {
+        if (userAccount.billingAddressType === 'different' && userAccount.billingCompanyName) {
+          invoice.corporateName = userAccount.billingCompanyName;
+          invoice.contactPerson = `${userAccount.billingLastName} ${userAccount.billingFirstName}`;
+        } else {
+          invoice.corporateName = userAccount.companyName;
+          invoice.contactPerson = `${userAccount.lastName} ${userAccount.firstName}`;
+        }
+        return;
+      }
+
+      const groupAccount = (Array.isArray(groups) ? groups : []).find(group => group.accountId === invoice.accountId);
+      if (!groupAccount) return;
+
+      if (groupAccount.billing?.type === 'group') {
+        invoice.corporateName = groupAccount.billing.corporateName ?? '-';
+        invoice.contactPerson = groupAccount.billing.contactPerson ?? '-';
+        return;
+      }
+
+      if (groupAccount.billing?.type === 'creator') {
+        const creator = (Array.isArray(users) ? users : []).find(user => user.email === groupAccount.billing.creatorId);
+        if (!creator) return;
+
+        if (creator.billingAddressType === 'different' && creator.billingCompanyName) {
+          invoice.corporateName = creator.billingCompanyName;
+          invoice.contactPerson = `${creator.billingLastName} ${creator.billingFirstName}`;
+        } else {
+          invoice.corporateName = creator.companyName;
+          invoice.contactPerson = `${creator.lastName} ${creator.firstName}`;
+        }
+      }
+    }
+
     function generateInvoiceHTML(invoice) {
       const currency = new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY' });
       const issueDate = formatDate(invoice.issueDate);
-      const planSummary = describePlan(invoice);
-      const addOnSummary = describeAddOns(invoice?.addOns);
+      const contractSummary = describeContractType(invoice);
+      const chargeSummary = summarizeChargeItems(invoice);
       const billingPeriod = formatBillingPeriod(invoice?.billingPeriod);
       const statusLabel = STATUS_LABELS[invoice.status] ?? '不明';
       const bankInfo = invoice.bankInfo ?? {};
       const notesHtml = invoice.notes ? escapeHtml(invoice.notes).replace(/\n/g, '<br>') : '';
+      const rows = buildPrintRows(sortInvoiceItemsForDisplay(invoice.items ?? []), currency);
+      const pages = paginatePrintRows(rows, Boolean(notesHtml));
+
+      return pages.map((pageRows, pageIndex) => {
+        const detailsTitle = pageIndex === 0 ? '請求明細' : '請求明細（続き）';
+        const notesSection = pageIndex === 0 && notesHtml ? `
+          <section class="notes-section">
+            <strong>備考</strong>
+            <p style="margin-top: 4px;">${notesHtml}</p>
+          </section>
+        ` : '';
+
+        return `
+          <section class="print-page">
+            ${pageIndex === 0 ? `
+              <div class="invoice-header">
+                <div>
+                  <h1 class="invoice-title">請求書</h1>
+                  <div class="invoice-header-info" style="text-align:left;">
+                    <p>発行日: ${escapeHtml(issueDate)}</p>
+                    <p>請求書番号: ${escapeHtml(invoice.invoiceId)}</p>
+                  </div>
+                </div>
+                <div class="invoice-header-info">
+                  <p class="fw-bold">SPEED AD 株式会社</p>
+                  <p>東京都千代田区神田○○ 1-2-3</p>
+                  <p>TEL: 03-1234-5678</p>
+                  <p>登録番号: T9011701016647</p>
+                </div>
+              </div>
+
+              <section class="invoice-to">
+                <p class="company-name">${escapeHtml(invoice.corporateName ?? '-')} 御中</p>
+                <p class="contact-name">${escapeHtml(invoice.contactPerson ?? '-')} 様</p>
+              </section>
+
+              <section class="invoice-summary">
+                <table>
+                  <tbody>
+                    <tr>
+                      <th>請求対象期間</th>
+                      <td>${escapeHtml(billingPeriod)}</td>
+                    </tr>
+                    <tr>
+                      <th>契約区分</th>
+                      <td>${escapeHtml(contractSummary)}</td>
+                    </tr>
+                    <tr>
+                      <th>請求内訳</th>
+                      <td>${escapeHtml(chargeSummary)}</td>
+                    </tr>
+                    <tr>
+                      <th>ステータス</th>
+                      <td>${escapeHtml(statusLabel)}</td>
+                    </tr>
+                    <tr>
+                      <th>小計（課税）</th>
+                      <td>${formatAmount(invoice.subtotalTaxable, currency)}</td>
+                    </tr>
+                    <tr>
+                      <th>小計（非課税）</th>
+                      <td>${formatAmount(invoice.subtotalNonTaxable, currency)}</td>
+                    </tr>
+                    <tr>
+                      <th>消費税</th>
+                      <td>${formatAmount(invoice.tax, currency)}</td>
+                    </tr>
+                    <tr class="total-row">
+                      <th>合計（税込）</th>
+                      <td>${formatAmount(invoice.totalAmount, currency)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <table>
+                  <tbody>
+                    <tr>
+                      <th>振込先銀行</th>
+                      <td>${escapeHtml(bankInfo.bankName ?? '-')}</td>
+                    </tr>
+                    <tr>
+                      <th>支店名</th>
+                      <td>${escapeHtml(bankInfo.branchName ?? '-')}</td>
+                    </tr>
+                    <tr>
+                      <th>口座種別</th>
+                      <td>${escapeHtml(bankInfo.accountType ?? '-')}</td>
+                    </tr>
+                    <tr>
+                      <th>口座番号</th>
+                      <td>${escapeHtml(bankInfo.accountNumber ?? '-')}</td>
+                    </tr>
+                    <tr>
+                      <th>口座名義</th>
+                      <td>${escapeHtml(bankInfo.accountHolder ?? '-')}</td>
+                    </tr>
+                    <tr>
+                      <th>支払期限</th>
+                      <td>${escapeHtml(formatDate(invoice.dueDate))}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+            ` : ''}
+
+            <section class="invoice-details">
+              <h2>${detailsTitle}</h2>
+              <table>
+                <thead>
+                  <tr>
+                    <th>No.</th>
+                    <th>項目</th>
+                    <th>内訳</th>
+                    <th>数量</th>
+                    <th>単価</th>
+                    <th>金額</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${renderItemRows(pageRows, pageIndex === 0 ? 'first' : 'continued', pageIndex === 0 && Boolean(notesHtml))}
+                </tbody>
+              </table>
+            </section>
+
+            ${notesSection}
+            <div class="page-number">${pageIndex + 1}/${pages.length}</div>
+          </section>
+        `;
+      }).join('');
+    }
+
+    function buildPrintRows(items, currencyFormatter) {
+      if (!Array.isArray(items) || items.length === 0) {
+        return [];
+      }
+
+      const rows = [];
+      let lineNumber = 1;
+      const chunks = splitInvoiceItemChunks(items);
+
+      chunks.forEach(chunk => {
+        const displayItems = buildPrintDisplayItemsForChunk(chunk.items);
+        displayItems.forEach(item => {
+          if (item.kind === 'subtotal') {
+            rows.push({
+              kind: 'subtotal',
+              groupKey: item.groupKey,
+              lineNumber: '',
+              itemName: '',
+              description: '',
+              quantityText: '',
+              unitPriceText: '',
+              amountText: currencyFormatter.format(item.amount),
+              subtotalLabel: item.subtotalLabel
+            });
+            return;
+          }
+
+          rows.push({
+            kind: 'item',
+            groupKey: item.groupKey,
+            lineNumber: lineNumber++,
+            itemName: item.itemName ?? '-',
+            description: item.description ?? '',
+            quantityText: formatQuantity(item.quantity, item.unit),
+            unitPriceText: typeof item.unitPrice === 'number' ? currencyFormatter.format(item.unitPrice) : '',
+            amountText: currencyFormatter.format(typeof item.amount === 'number' ? item.amount : 0)
+          });
+        });
+
+        if (chunk.subtotal) {
+          rows.push({
+            kind: 'subtotal',
+            groupKey: 'invoice-subtotal',
+            lineNumber: '',
+            itemName: '',
+            description: '',
+            quantityText: '',
+            unitPriceText: '',
+            amountText: currencyFormatter.format(typeof chunk.subtotal.amount === 'number' ? chunk.subtotal.amount : 0),
+            subtotalLabel: chunk.subtotal.itemName ?? '請求書小計'
+          });
+        }
+      });
+
+      return rows;
+    }
+
+    function paginatePrintRows(rows, hasNotesOnFirstPage = false) {
+      if (!Array.isArray(rows) || rows.length === 0) {
+        return [[]];
+      }
+
+      const firstCapacity = getPrintPageCapacity('first', hasNotesOnFirstPage);
+      const followingCapacity = getPrintPageCapacity('continued');
+      const baseFirstRowHeight = measurePrintRowHeight({
+        kind: 'item',
+        lineNumber: '1',
+        itemName: 'プレミアム利用料',
+        description: '2025年8月分 月額10,000円',
+        quantityText: '1ヶ月',
+        unitPriceText: '￥10,000',
+        amountText: '￥10,000'
+      }, 'first');
+      const safeFirstCapacity = Math.min(firstCapacity, baseFirstRowHeight * 14);
+
+      const pages = [];
+      let currentPage = [];
+      let currentHeight = 0;
+      let currentCapacity = safeFirstCapacity;
+
+      rows.forEach(row => {
+        const pageType = pages.length === 0 ? 'first' : 'continued';
+        const rowHeight = measurePrintRowHeight(row, pageType);
+
+        if (currentPage.length > 0 && currentHeight + rowHeight > currentCapacity) {
+          if (row.kind === 'subtotal') {
+            const previousRow = currentPage[currentPage.length - 1];
+            if (previousRow?.groupKey === row.groupKey && currentPage.length > 1) {
+              currentPage.pop();
+              currentHeight -= measurePrintRowHeight(previousRow, pageType);
+              pages.push(currentPage);
+              currentPage = [previousRow];
+              currentCapacity = followingCapacity;
+              currentHeight = measurePrintRowHeight(previousRow, 'continued');
+            } else {
+              pages.push(currentPage);
+              currentPage = [];
+              currentHeight = 0;
+              currentCapacity = followingCapacity;
+            }
+          } else {
+            pages.push(currentPage);
+            currentPage = [];
+            currentHeight = 0;
+            currentCapacity = followingCapacity;
+          }
+        }
+
+        currentPage.push(row);
+        currentHeight += measurePrintRowHeight(row, pages.length === 0 ? 'first' : 'continued');
+      });
+
+      if (currentPage.length > 0 || pages.length === 0) {
+        pages.push(currentPage);
+      }
+
+      return pages;
+    }
+
+    function renderItemRows(rows, pageType = 'first', includeNotes = false) {
+      if (!Array.isArray(rows) || rows.length === 0) {
+        return `
+          <tr>
+            <td colspan="6" style="text-align:center; padding:12px;">明細が登録されていません。</td>
+          </tr>
+        `;
+      }
+
+      let html = rows.map(row => {
+        if (row.kind === 'subtotal') {
+          return `
+            <tr class="subtotal-row">
+              <td></td>
+              <td colspan="4" style="text-align:right;">${escapeHtml(row.subtotalLabel ?? '小計')}</td>
+              <td style="text-align:right;">${escapeHtml(row.amountText)}</td>
+            </tr>
+          `;
+        }
+
+        return `
+            <tr>
+              <td style="text-align:center;">${escapeHtml(row.lineNumber)}</td>
+              <td>${escapeHtml(row.itemName)}</td>
+              <td>${escapeHtml(row.description)}</td>
+              <td style="text-align:right;">${escapeHtml(row.quantityText)}</td>
+              <td style="text-align:right;">${escapeHtml(row.unitPriceText)}</td>
+              <td style="text-align:right;">${escapeHtml(row.amountText)}</td>
+            </tr>
+          `;
+      }).join('');
+
+      const pageCapacity = getPrintPageCapacity(pageType, includeNotes);
+      const usedHeight = rows.reduce((total, row) => total + measurePrintRowHeight(row, pageType), 0);
+      const blankRowHeight = measurePrintRowHeight({
+        kind: 'spacer',
+        lineNumber: '',
+        itemName: '',
+        description: '',
+        quantityText: '',
+        unitPriceText: '',
+        amountText: ''
+      }, pageType);
+      const remainingPageHeight = Math.max(0, pageCapacity - usedHeight);
+      const spacerRows = blankRowHeight > 0 ? Math.floor(remainingPageHeight / blankRowHeight) : 0;
+
+      for (let index = 0; index < spacerRows; index += 1) {
+        html += `
+          <tr class="spacer-row" aria-hidden="true">
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+        `;
+      }
+
+      return html;
+    }
+
+    function getPrintPageCapacity(pageType, includeNotes = false) {
+      const measurePage = createPrintMeasurePage(pageType, includeNotes);
+      const tbody = measurePage.querySelector('tbody');
+      const pageNumber = measurePage.querySelector('.page-number');
+      const capacity = tbody && pageNumber
+        ? Math.max(0, pageNumber.getBoundingClientRect().top - tbody.getBoundingClientRect().top - 8)
+        : (pageType === 'first' ? 336 : 700);
+
+      if (measurePage.parentNode) {
+        measurePage.parentNode.removeChild(measurePage);
+      }
+
+      return capacity || (pageType === 'first' ? 336 : 700);
+    }
+
+    function measurePrintRowHeight(row, pageType) {
+      const measurePage = createPrintMeasurePage(pageType);
+      const tbody = measurePage.querySelector('tbody');
+      if (!tbody) {
+        if (measurePage.parentNode) {
+          measurePage.parentNode.removeChild(measurePage);
+        }
+        return 28;
+      }
+
+      tbody.innerHTML = renderMeasureRow(row);
+      const tr = tbody.querySelector('tr');
+      const height = tr?.getBoundingClientRect().height ?? 28;
+
+      if (measurePage.parentNode) {
+        measurePage.parentNode.removeChild(measurePage);
+      }
+
+      return height;
+    }
+
+    function renderMeasureRow(row) {
+      if (row.kind === 'subtotal') {
+        return `
+          <tr class="subtotal-row">
+            <td></td>
+            <td colspan="4" style="text-align:right;">${escapeHtml(row.subtotalLabel ?? '小計')}</td>
+            <td style="text-align:right;">${escapeHtml(row.amountText ?? '')}</td>
+          </tr>
+        `;
+      }
+
+      if (row.kind === 'spacer') {
+        return `
+          <tr class="spacer-row" aria-hidden="true">
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+        `;
+      }
 
       return `
-        <div class="invoice-header">
-          <div>
-            <h1 class="invoice-title">請求書</h1>
-            <div class="invoice-header-info" style="text-align:left;">
-              <p>発行日: ${escapeHtml(issueDate)}</p>
-              <p>請求書番号: ${escapeHtml(invoice.invoiceId)}</p>
+        <tr>
+          <td style="text-align:center;">${escapeHtml(row.lineNumber)}</td>
+          <td>${escapeHtml(row.itemName)}</td>
+          <td>${escapeHtml(row.description)}</td>
+          <td style="text-align:right;">${escapeHtml(row.quantityText)}</td>
+          <td style="text-align:right;">${escapeHtml(row.unitPriceText)}</td>
+          <td style="text-align:right;">${escapeHtml(row.amountText)}</td>
+        </tr>
+      `;
+    }
+
+    function createPrintMeasurePage(pageType, includeNotes = false) {
+      const page = document.createElement('section');
+      page.className = 'print-page';
+      page.style.position = 'absolute';
+      page.style.visibility = 'hidden';
+      page.style.left = '-9999px';
+      page.style.top = '0';
+      page.style.zIndex = '-1';
+      page.innerHTML = `
+        ${pageType === 'first' ? `
+          <div class="invoice-header">
+            <div>
+              <h1 class="invoice-title">請求書</h1>
+              <div class="invoice-header-info" style="text-align:left;">
+                <p>発行日: 2025年09月05日</p>
+                <p>請求書番号: 25-00005-002</p>
+              </div>
+            </div>
+            <div class="invoice-header-info">
+              <p class="fw-bold">SPEED AD 株式会社</p>
+              <p>東京都千代田区神田○○ 1-2-3</p>
+              <p>TEL: 03-1234-5678</p>
+              <p>登録番号: T9011701016647</p>
             </div>
           </div>
-          <div class="invoice-header-info">
-            <p class="fw-bold">SPEED AD 株式会社</p>
-            <p>東京都千代田区神田○○ 1-2-3</p>
-            <p>TEL: 03-1234-5678</p>
-            <p>登録番号: T9011701016647</p>
-          </div>
-        </div>
-
-        <section class="invoice-to">
-          <p class="company-name">${escapeHtml(invoice.corporateName ?? '-')} 御中</p>
-          <p class="contact-name">${escapeHtml(invoice.contactPerson ?? '-')} 様</p>
-        </section>
-
-        <section class="invoice-summary">
-          <table>
-            <tbody>
-              <tr>
-                <th>請求対象期間</th>
-                <td>${escapeHtml(billingPeriod)}</td>
-              </tr>
-              <tr>
-                <th>契約プラン</th>
-                <td>${escapeHtml(planSummary)}</td>
-              </tr>
-              <tr>
-                <th>追加オプション</th>
-                <td>${escapeHtml(addOnSummary)}</td>
-              </tr>
-              <tr>
-                <th>ステータス</th>
-                <td>${escapeHtml(statusLabel)}</td>
-              </tr>
-              <tr>
-                <th>小計（課税）</th>
-                <td>${formatAmount(invoice.subtotalTaxable, currency)}</td>
-              </tr>
-              <tr>
-                <th>小計（非課税）</th>
-                <td>${formatAmount(invoice.subtotalNonTaxable, currency)}</td>
-              </tr>
-              <tr>
-                <th>消費税</th>
-                <td>${formatAmount(invoice.tax, currency)}</td>
-              </tr>
-              <tr class="total-row">
-                <th>合計（税込）</th>
-                <td>${formatAmount(invoice.totalAmount, currency)}</td>
-              </tr>
-            </tbody>
-          </table>
-          <table>
-            <tbody>
-              <tr>
-                <th>振込先銀行</th>
-                <td>${escapeHtml(bankInfo.bankName ?? '-')}</td>
-              </tr>
-              <tr>
-                <th>支店名</th>
-                <td>${escapeHtml(bankInfo.branchName ?? '-')}</td>
-              </tr>
-              <tr>
-                <th>口座種別</th>
-                <td>${escapeHtml(bankInfo.accountType ?? '-')}</td>
-              </tr>
-              <tr>
-                <th>口座番号</th>
-                <td>${escapeHtml(bankInfo.accountNumber ?? '-')}</td>
-              </tr>
-              <tr>
-                <th>口座名義</th>
-                <td>${escapeHtml(bankInfo.accountHolder ?? '-')}</td>
-              </tr>
-              <tr>
-                <th>支払期限</th>
-                <td>${escapeHtml(formatDate(invoice.dueDate))}</td>
-              </tr>
-            </tbody>
-          </table>
-        </section>
-
+          <section class="invoice-to">
+            <p class="company-name">請求先会社</p>
+            <p class="contact-name">担当者 様</p>
+          </section>
+          <section class="invoice-summary">
+            <table><tbody><tr><th>請求対象期間</th><td>2025年08月01日 〜 2025年08月31日</td></tr><tr><th>契約区分</th><td>個人契約</td></tr><tr><th>請求内訳</th><td>プレミアム利用料 / 名刺データ化費用</td></tr><tr><th>ステータス</th><td>入金済</td></tr><tr><th>小計（課税）</th><td>￥15,040</td></tr><tr><th>小計（非課税）</th><td>￥0</td></tr><tr><th>消費税</th><td>￥1,504</td></tr><tr class="total-row"><th>合計（税込）</th><td>￥16,544</td></tr></tbody></table>
+            <table><tbody><tr><th>振込先銀行</th><td>三井住友銀行</td></tr><tr><th>支店名</th><td>小岩支店</td></tr><tr><th>口座種別</th><td>普通</td></tr><tr><th>口座番号</th><td>7128447</td></tr><tr><th>口座名義</th><td>アブロードアウトソーシング株式会社</td></tr><tr><th>支払期限</th><td>2025年10月05日</td></tr></tbody></table>
+          </section>
+        ` : ''}
         <section class="invoice-details">
-          <h2>請求明細</h2>
+          <h2>${pageType === 'first' ? '請求明細' : '請求明細（続き）'}</h2>
           <table>
             <thead>
               <tr>
@@ -318,81 +718,176 @@
                 <th>金額</th>
               </tr>
             </thead>
-            <tbody>
-              ${renderItemRows(invoice.items ?? [], currency)}
-            </tbody>
+            <tbody></tbody>
           </table>
         </section>
-
-        ${notesHtml ? `
+        ${pageType === 'first' && includeNotes ? `
           <section class="notes-section">
             <strong>備考</strong>
-            <p style="margin-top: 4px;">${notesHtml}</p>
+            <p style="margin-top: 4px;">備考テキスト</p>
           </section>
         ` : ''}
+        <div class="page-number">1/1</div>
       `;
+      document.body.appendChild(page);
+      return page;
     }
 
-    function renderItemRows(items, currencyFormatter) {
-      if (!Array.isArray(items) || items.length === 0) {
-        return `
-          <tr>
-            <td colspan="6" style="text-align:center; padding:12px;">明細が登録されていません。</td>
-          </tr>
-        `;
-      }
+    function describeContractType(invoice) {
+      return invoice?.contractType === 'GROUP' ? 'グループ契約' : '個人契約';
+    }
 
-      const rows = [];
-      let lineNumber = 1;
-
-      CATEGORY_ORDER.forEach(category => {
-        const categoryItems = items.filter(item => (item.category ?? '').toUpperCase() === category);
-        if (categoryItems.length === 0) return;
-
-        let subtotal = 0;
-        categoryItems.forEach(item => {
-          const quantityText = formatQuantity(item.quantity, item.unit);
-          const unitPriceText = typeof item.unitPrice === 'number' ? currencyFormatter.format(item.unitPrice) : '';
-          const amount = typeof item.amount === 'number' ? item.amount : 0;
-          subtotal += amount;
-
-          rows.push(`
-            <tr>
-              <td style="text-align:center;">${lineNumber++}</td>
-              <td>${escapeHtml(item.itemName ?? '-')}</td>
-              <td>${escapeHtml(item.description ?? '')}</td>
-              <td style="text-align:right;">${escapeHtml(quantityText)}</td>
-              <td style="text-align:right;">${escapeHtml(unitPriceText)}</td>
-              <td style="text-align:right;">${currencyFormatter.format(amount)}</td>
-            </tr>
-          `);
-        });
-
-        rows.push(`
-          <tr class="subtotal-row">
-            <td></td>
-            <td colspan="4" style="text-align:right;">${CATEGORY_LABELS[category] ?? '小計'}</td>
-            <td style="text-align:right;">${currencyFormatter.format(subtotal)}</td>
-          </tr>
-        `);
+    function summarizeChargeItems(invoice) {
+      const labels = [];
+      const items = sortInvoiceItemsForDisplay(Array.isArray(invoice?.items) ? invoice.items : []);
+      items.forEach(item => {
+        const label = detectChargeLabel(item);
+        if (!label || labels.includes(label)) return;
+        labels.push(label);
       });
 
-      return rows.join('');
+      return labels.length > 0 ? labels.join(' / ') : '明細参照';
     }
 
-    function describePlan(invoice) {
-      const plan = invoice?.plan;
-      if (!plan) return '-';
-      const billingLabel = plan.billingType === 'annual' ? '年額' : '月額';
-      return `${plan.displayName ?? '-'}（${billingLabel}）`;
+    function detectChargeLabel(item) {
+      const knownLabels = [
+        'プレミアム利用料',
+        '追加アカウント料金',
+        '名刺データ化費用',
+        'お礼メール送信費用',
+        'クーポン値引き'
+      ];
+
+      if (knownLabels.includes(item?.itemName)) {
+        return item.itemName;
+      }
+
+      const description = typeof item?.description === 'string' ? item.description : '';
+      return knownLabels.find(label => description.includes(label)) ?? '';
     }
 
-    function describeAddOns(addOns) {
-      if (!Array.isArray(addOns) || addOns.length === 0) return 'なし';
-      return addOns.map(addOn => {
-        const quantityText = formatQuantity(addOn.quantity, addOn.unit);
-        return quantityText ? `${addOn.displayName} ${quantityText}` : addOn.displayName;
-      }).join(' / ');
+    function splitInvoiceItemChunks(items) {
+      const chunks = [];
+      let currentItems = [];
+
+      (Array.isArray(items) ? items : []).forEach(item => {
+        if (item?.isSubtotal) {
+          chunks.push({ items: currentItems, subtotal: item });
+          currentItems = [];
+          return;
+        }
+
+        currentItems.push(item);
+      });
+
+      if (currentItems.length > 0 || chunks.length === 0) {
+        chunks.push({ items: currentItems, subtotal: null });
+      }
+
+      return chunks;
+    }
+
+    function buildPrintDisplayItemsForChunk(items) {
+      if (!Array.isArray(items) || items.length === 0) return [];
+
+      const rows = [];
+      const contractItems = [];
+      const surveyGroupMap = new Map();
+      const otherItems = [];
+
+      items.forEach(item => {
+        const chargeLabel = detectChargeLabel(item);
+        if (chargeLabel === 'プレミアム利用料' || chargeLabel === '追加アカウント料金') {
+          contractItems.push(item);
+          return;
+        }
+
+        if (
+          chargeLabel === '名刺データ化費用' ||
+          chargeLabel === 'お礼メール送信費用' ||
+          chargeLabel === 'クーポン値引き'
+        ) {
+          const surveyName = item?.itemName ?? 'アンケート';
+          if (!surveyGroupMap.has(surveyName)) {
+            surveyGroupMap.set(surveyName, []);
+          }
+          surveyGroupMap.get(surveyName).push(item);
+          return;
+        }
+
+        otherItems.push(item);
+      });
+
+      if (contractItems.length > 0) {
+        const sortedContractItems = sortInvoiceItemsForDisplay(contractItems);
+        rows.push(...sortedContractItems.map(item => ({ ...item, kind: 'item', groupKey: 'contract-group' })));
+        rows.push({
+          kind: 'subtotal',
+          groupKey: 'contract-group',
+          subtotalLabel: `${buildContractSubtotalLabel(sortedContractItems)} 小計`,
+          amount: sumItemAmounts(sortedContractItems)
+        });
+      }
+
+      surveyGroupMap.forEach((surveyItems, surveyName) => {
+        const sortedSurveyItems = sortInvoiceItemsForDisplay(surveyItems);
+        rows.push(...sortedSurveyItems.map(item => ({ ...item, kind: 'item', groupKey: `survey:${surveyName}` })));
+        rows.push({
+          kind: 'subtotal',
+          groupKey: `survey:${surveyName}`,
+          subtotalLabel: `${surveyName} 小計`,
+          amount: sumItemAmounts(sortedSurveyItems)
+        });
+      });
+
+      if (otherItems.length > 0) {
+        rows.push(...otherItems.map(item => ({ ...item, kind: 'item', groupKey: 'other-group' })));
+      }
+
+      return rows;
+    }
+
+    function buildContractSubtotalLabel(items) {
+      const labels = [];
+      if (items.some(item => detectChargeLabel(item) === 'プレミアム利用料')) {
+        labels.push('プレミアムプラン');
+      }
+      if (items.some(item => detectChargeLabel(item) === '追加アカウント料金')) {
+        labels.push('グループアカウント料金');
+      }
+      return labels.length > 0 ? labels.join('・') : '契約関連';
+    }
+
+    function sumItemAmounts(items) {
+      return (Array.isArray(items) ? items : []).reduce((total, item) => total + (typeof item?.amount === 'number' ? item.amount : 0), 0);
+    }
+
+    function sortInvoiceItemsForDisplay(items) {
+      if (!Array.isArray(items)) return [];
+
+      const chargeOrder = {
+        'プレミアム利用料': 0,
+        '追加アカウント料金': 1,
+        '名刺データ化費用': 2,
+        'お礼メール送信費用': 3,
+        'クーポン値引き': 4
+      };
+
+      return items
+        .map((item, index) => ({ item, index }))
+        .sort((left, right) => {
+          const leftLabel = detectChargeLabel(left.item);
+          const rightLabel = detectChargeLabel(right.item);
+          const leftRank = chargeOrder[leftLabel] ?? 99;
+          const rightRank = chargeOrder[rightLabel] ?? 99;
+
+          if (leftRank !== rightRank) {
+            return leftRank - rightRank;
+          }
+
+          return left.index - right.index;
+        })
+        .map(entry => entry.item);
     }
 
     function formatDate(value) {

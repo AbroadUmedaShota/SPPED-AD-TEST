@@ -1,5 +1,20 @@
 import { fetchInvoices } from './services/invoiceService.js';
 import { renderInvoices, showLoading, hideLoading, showMessage } from './ui/invoiceRenderer.js';
+import { resolveDashboardDataPath } from './utils.js';
+
+async function fetchGroupAccountIds() {
+  const response = await fetch(resolveDashboardDataPath('core/groups.json'));
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const groups = await response.json();
+  return new Set(
+    (Array.isArray(groups) ? groups : [])
+      .map(group => group?.accountId)
+      .filter(Boolean)
+  );
+}
 
 let allInvoices = [];
 let hasLoadedInvoices = false;
@@ -43,7 +58,7 @@ export async function initInvoiceListPage() {
     const safeInvoices = Array.isArray(invoices) ? invoices : [];
 
     // Aggregate invoices for display
-    const aggregatedInvoices = aggregateInvoices(safeInvoices);
+    const aggregatedInvoices = await aggregateInvoices(safeInvoices);
 
     // Store globally for filtering
     allInvoices = aggregatedInvoices;
@@ -75,7 +90,8 @@ export async function initInvoiceListPage() {
   }
 }
 
-function aggregateInvoices(invoices) {
+async function aggregateInvoices(invoices) {
+  const groupAccountIds = await fetchGroupAccountIds();
   const groups = {};
 
   invoices.forEach(inv => {
@@ -87,10 +103,7 @@ function aggregateInvoices(invoices) {
     const mm = String(date.getMonth() + 1).padStart(2, '0');
     const monthKey = `${yyyy}${mm}`;
 
-    // Determine if Group or Personal based on Plan
-    // Standard = Personal, Premium/Others = Group
-    const isGroup = inv.plan?.code !== 'STANDARD';
-    const typeKey = isGroup ? 'GROUP' : 'PERSONAL';
+    const typeKey = groupAccountIds.has(inv.accountId) ? 'GROUP' : 'PERSONAL';
 
     const key = `AGG-${monthKey}-${typeKey}`;
 
@@ -101,9 +114,10 @@ function aggregateInvoices(invoices) {
         billingPeriod: inv.billingPeriod,
         totalAmount: 0,
         status: 'paid', // Default to paid, downgrade if any unpaid found
+        contractType: typeKey,
         plan: {
-          code: isGroup ? 'GROUP' : 'PERSONAL',
-          displayName: isGroup ? 'Group' : 'Personal'
+          code: typeKey,
+          displayName: typeKey === 'GROUP' ? 'Group' : 'Personal'
         },
         originalInvoices: []
       };
