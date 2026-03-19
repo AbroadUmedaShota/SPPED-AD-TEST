@@ -437,20 +437,31 @@ export function displayCouponResult(couponResult) {
 
 /**
  * 入力検証を行い、エラーメッセージを表示・非表示します。
+ * @param {boolean} isSkipped - スキップ状態かどうか。
  * @returns {boolean} 検証が成功したかどうか。
  */
-export function validateForm() {
-    if (!dom.bizcardRequestInput) cacheDOMElements();
+export function validateForm(isSkipped = false) {
+    if (!dom.bizcardRequestInput || !dom.saveButton) cacheDOMElements();
     let isValid = true;
     
+    // スキップされている場合は常に有効とする
+    if (isSkipped) {
+        const errorEl = dom.bizcardRequestInput.parentElement.querySelector('.input-error-message');
+        if (errorEl) errorEl.textContent = '';
+        dom.bizcardRequestInput.classList.remove('border-error');
+        dom.saveButton.disabled = false;
+        return true;
+    }
+
     const value = parseInt(dom.bizcardRequestInput.value || 0, 10);
     const errorEl = dom.bizcardRequestInput.parentElement.querySelector('.input-error-message');
-    if (value <= 0) {
-        errorEl.textContent = '依頼枚数は1以上の数値を入力してください。';
+    
+    if (isNaN(value) || value <= 0) {
+        if (errorEl) errorEl.textContent = '依頼枚数は1枚以上入力してください。';
         dom.bizcardRequestInput.classList.add('border-error');
         isValid = false;
     } else {
-        errorEl.textContent = '';
+        if (errorEl) errorEl.textContent = '';
         dom.bizcardRequestInput.classList.remove('border-error');
     }
 
