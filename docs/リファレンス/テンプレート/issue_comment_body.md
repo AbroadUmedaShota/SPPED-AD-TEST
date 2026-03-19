@@ -3,35 +3,36 @@
 To resolve this Issue, I will proceed with the implementation according to the following plan.
 
 #### 1. **Pre-investigation Summary**
-- `02_dashboard/thankYouEmailSettings.html` の現状を確認したところ、「アンケート名」にはすでに `info` アイコンが存在しますが、`title` 属性がありません。
-- 「会期期間」および「送信しない」セクションにはヘルプ用のアイコンが存在しません。
-- プロジェクトの仕様（`docs/画面設計/仕様/tooltip_spec.md`）に基づき、`help_outline` アイコンを使用し、標準の `title` 属性でツールチップを実現します。
+- `02_dashboard/src/invoiceDetail.js` の `paginateInvoiceItems` 関数内で、1枚目の許容行数（`safeFirstPageCapacity`）が `baseFirstRowHeight * 14` とハードコーディングされている箇所が、A4サイズ超過の主な原因。
+- 現状の1枚目レイアウト（ヘッダー、宛名、差出人、金額サマリー、振込先、備考）は合計で A4の約 60% 以上を占有していると推定される。
+- PDF出力時に `padding-bottom: 30mm` が動的に付与される際、実質的な有効高さがさらに削られるため、明細が14行あると確実にオーバーフローする。
 
 **Files to be changed:**
-- `02_dashboard/thankYouEmailSettings.html`
-- `docs/画面設計/仕様/tooltip_spec.md` (仕様書の更新)
+- `02_dashboard/src/invoiceDetail.js`
+- `02_dashboard/invoice-detail.html`
 
 #### 2. **Contribution to Project Goals**
-- ユーザーが各設定項目の意味や制約を正しく理解できるようになり、誤設定の防止と操作性の向上に寄与します。
+- 請求書の印刷品質を確保し、プロフェッショナルな帳票出力を実現。
+- ページ跨ぎによるレイアウト崩れを防ぎ、ユーザーの不信感を払拭。
 
 #### 3. **Overview of Changes**
-- `thankYouEmailSettings.html` 内の3箇所にヘルプアイコン（`help_outline`）を追加または更新し、ユーザーの要望に基づいた説明文を `title` 属性として設定します。
+- 1枚目の明細行数を 8行程度に制限し、余裕を持って A4に収める。
+- ページ番号の配置と余白設定を PDF 出力時と整合させる。
+- 行の高さ計算にバッファを設け、フォントサイズや折り返しによる予期せぬ高さ増大に対応。
 
 #### 4. **Specific Work Content for Each File**
-- `02_dashboard/thankYouEmailSettings.html`:
-    - 「アンケート名」の `info` アイコンを `help_outline` に変更し、要望通りの説明文を `title` に設定。
-    - 「会期期間」の見出し横に `help_outline` アイコンを追加し、改行を含めた詳細な説明を `title` に設定。
-    - 「送信しない」のラベル内、見出し横に `help_outline` アイコンを追加し、説明文を `title` に設定。
-- `docs/画面設計/仕様/tooltip_spec.md`:
-    - 「送信しない」のツールチップ仕様をドキュメントに追加。
+- `02_dashboard/src/invoiceDetail.js`:
+  - `paginateInvoiceItems`: `safeFirstPageCapacity` を 14行から **8行** 相当に変更。
+  - `getDetailPageCapacity`: キャパシティ計算時に **20px のマージン（安全マージン）** を差し引くように修正。
+  - `downloadPdfBtn` クリック時のスタイル適用: 30mm の padding-bottom を **15mm** に変更し、その分を `min-height` の計算に反映させる。
+- `02_dashboard/invoice-detail.html`:
+  - `summary-container` や `notes-area` の上下マージンを微調整（数px単位）し、垂直方向の圧迫を軽減。
 
 #### 5. **Definition of Done**
-- [x] All necessary code changes have been implemented.
-- [ ] New tests have been added to cover the changes. (UI/HTML変更のため、目視確認を主とする)
-- [ ] All existing and new tests pass.
-- [ ] The documentation has been updated to reflect the changes.
-- [ ] `WEEKLY_CHANGELOG.md` has been updated with the changes.
-- [ ] The implementation has been manually verified.
+- [ ] 1枚目の請求書が、明細行数に関わらず A4サイズ（297mm）以内に収まっている。
+- [ ] 1枚目に入り切らない明細が、正しく2枚目以降に送られている。
+- [ ] PDFダウンロード時に、ページ番号や表の罫線が不自然な位置で切れていない。
+- [ ] 手動で「帳票ダウンロード」を実行し、生成されたPDFのレイアウトが正常であることを確認。
 
 ---
 If you approve, please reply to this comment with "Approve".
