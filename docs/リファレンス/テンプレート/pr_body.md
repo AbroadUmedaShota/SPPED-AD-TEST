@@ -1,25 +1,35 @@
-Closes #261
+## 変更概要
 
-## 概要
-- お礼メール設定画面の要件定義書（`02_thankYouEmailSettings_requirements.md`）に基づき、シナリオごとのUI切替、送信コストの計算、送信対象者リストの仮想表示、及びリアルタイムプレビュー機能などを実装しました。
+名刺データ化設定画面の「見込み枚数」入力エリアを、単純な矩形 input box からインタラクティブなスライダー＋ステッパー構成のUIへ刷新。
+展示会での大量名刺収集ユースケース（数千枚規模）を考慮した設計。
 
-## 変更内容
-- `02_dashboard/thankYouEmailSettings.html`: 会期前/後などのシナリオを切り替えるプルダウン（開発用）、送信対象者の仮想リスト・件数・金額表示エリア、プレビュー警告エリアを追加。
-- `02_dashboard/src/thankYouEmailSettings.js`: シナリオごとの状態管理、コスト計算、対象者リストのレンダリング、変数挿入時のリアルタイムプレビュー更新、送受信時のダミーロジックを実装。
-- `02_dashboard/src/ui/thankYouEmailRenderer.js`: 対象者リストのUI制御、変数置換時の修正などを対応。
-- `02_dashboard/src/services/thankYouEmailService.js`: 送信対象者リストのモックデータ（`getRecipientsData`）を追加。
+## 変更ファイル
 
-## 影響範囲
-- 対象画面/機能: お礼メール設定画面
-- データ/API 影響: 一部モック関数を追加・修正
-- 既存フローへの影響: 特になし
+- `02_dashboard/bizcardSettings.html`
+- `02_dashboard/src/ui/bizcardSettingsRenderer.js`
+- `02_dashboard/src/bizcardSettings.js`
+- `WEEKLY_CHANGELOG.md`
 
-## 動作確認
-1. `$ python -m http.server 8000` などのサーバーを起動し、`http://localhost:8000/02_dashboard/thankYouEmailSettings.html?surveyId=sv_0001` へアクセスする。
-2. シナリオセレクタを使用して、「会期前・会期中」「名刺データ化後（未送信）」「送信完了」「送信期間外」の各状態でのUI表示やボタンの挙動を確認する。
-3. プレビュー画面で変数を挿入し、モックデータで空の値を持つユーザーが選択された場合の警告バッジ表示を確認する。
+## 変更内容詳細
 
-## テスト結果
-- [x] 手動テスト実施済み (※レビュー内でUI確認を依頼)
+### UI改善 (`bizcardSettings.html`)
+- ステッパーボタン（`[-]` / `[+]`）: クリックで1枚単位の増減
+- レンジスライダー（0〜5,000枚、ステップ50）: ドラッグで直感的に枚数設定。スライダーと数値入力は双方向同期
+- 最低請求バッジをインラインカード型に変更（条件で赤/グレー自動切替）
+- 旧UIのクイック選択プリセットボタン群は削除
+
+### ロジック (`bizcardSettings.js`)
+- `setRequestCount()` ヘルパー追加: スライダー・ステッパー・直接入力の3系統の値変更を一元管理
+- ステッパーおよびスライダーのイベントハンドラ追加
+
+### レンダラー (`bizcardSettingsRenderer.js`)
+- `minChargeNotice` の更新ロジックを新HTML構造（`<div>` + `<span id="minChargeNoticeText">`）に適合させリファクタリング
+
+## 手動確認事項
+
+- [x] スライダーを動かすと見込み枚数と右カラム金額がリアルタイムに変わること
+- [x] ステッパーの `[+]` `[-]` ボタンで1ずつ増減できること
+- [x] 最低請求バッジが条件に応じて赤/グレーに変わること
 - [x] コンソールエラーなし
-- [x] 仕様ドキュメント更新済み
+
+Closes #276
