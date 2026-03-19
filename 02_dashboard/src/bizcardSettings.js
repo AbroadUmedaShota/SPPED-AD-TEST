@@ -8,11 +8,7 @@ import { calculateEstimate } from './services/bizcardCalculator.js';
 import {
     renderSurveyInfo,
     setInitialFormValues,
-    updateSettingsVisibility,
     renderEstimate,
-    displayCouponResult,
-    validateForm,
-    setSaveButtonLoading,
     renderDataConversionPlans,
     renderPremiumOptions
 } from './ui/bizcardSettingsRenderer.js';
@@ -33,12 +29,33 @@ export function initBizcardSettings() {
     const dataConversionPlanSelection = document.getElementById('dataConversionPlanSelection');
     const couponCodeInput = document.getElementById('couponCode');
     const applyCouponBtn = document.getElementById('applyCouponBtn');
+    const removeCouponBtn = document.getElementById('removeCouponBtn');
     const saveButton = document.getElementById('saveBizcardSettingsBtn');
     const cancelButton = document.getElementById('cancelBizcardSettings');
     const toggleMemoSectionBtn = document.getElementById('toggleMemoSection');
     const memoSection = document.getElementById('memoSection');
     const internalMemoInput = document.getElementById('internalMemo');
     const premiumOptionsContainer = document.getElementById('premiumOptionsContainer');
+    
+    const skipBizcardToggle = document.getElementById('skipBizcardToggle');
+    const skipBizcardToggleContainer = document.getElementById('skipBizcardToggleContainer');
+    const bizcardFormActiveArea = document.getElementById('bizcardFormActiveArea');
+    const rightColumnDisabledOverlay = document.getElementById('rightColumnDisabledOverlay');
+    // New UI controls: stepper / slider / presets
+    const bizcardRequestDecBtn = document.getElementById('bizcardRequestDecBtn');
+    const bizcardRequestIncBtn = document.getElementById('bizcardRequestIncBtn');
+    const bizcardRequestSlider = document.getElementById('bizcardRequestSlider');
+
+    // Modals
+    const bizcardDetailsModal = document.getElementById('bizcardDetailsModal');
+    const openBizcardDetailsModalBtn = document.getElementById('openBizcardDetailsModalBtn');
+    const closeBizcardDetailsModalBtn = document.getElementById('closeBizcardDetailsModalBtn');
+    const closeBizcardDetailsModalActionBtn = document.getElementById('closeBizcardDetailsModalActionBtn');
+
+    const billingNotesModal = document.getElementById('billingNotesModal');
+    const openBillingNotesModalBtn = document.getElementById('openBillingNotesModalBtn');
+    const closeBillingNotesModalBtn = document.getElementById('closeBillingNotesModalBtn');
+    const closeBillingNotesModalActionBtn = document.getElementById('closeBillingNotesModalActionBtn');
 
     // --- State Management ---
     let state = {
@@ -47,13 +64,10 @@ export function initBizcardSettings() {
         initialSettings: {},
         appliedCoupon: null,
         isCouponApplied: false,
-        couponButtonMode: 'apply',
-        isCouponProcessing: false
+        isCouponProcessing: false,
+        isSkipped: false
     };
 
-    /**
-     * Initializes the page, fetches data, and sets up event listeners.
-     */
     async function initializePage() {
         const urlParams = new URLSearchParams(window.location.search);
         state.surveyId = urlParams.get('surveyId');
@@ -63,13 +77,11 @@ export function initBizcardSettings() {
 
         try {
             if (state.surveyId) {
-                // --- Existing Survey Mode ---
                 [surveyData, settingsData] = await Promise.all([
                     fetchSurveyData(state.surveyId),
                     fetchBizcardSettings(state.surveyId)
                 ]);
             } else {
-                // --- New Survey (Temp) Mode ---
                 const tempDataString = localStorage.getItem('tempSurveyData');
                 if (!tempDataString) {
                     showToast('一時的なアンケートデータが見つかりません。作成画面からやり直してください。', 'error');
@@ -77,7 +89,6 @@ export function initBizcardSettings() {
                     return;
                 }
                 const tempData = JSON.parse(tempDataString);
-                
                 surveyData = {
                     id: null,
                     name: tempData.name,
@@ -85,29 +96,25 @@ export function initBizcardSettings() {
                     periodStart: tempData.periodStart,
                     periodEnd: tempData.periodEnd,
                 };
-                
                 settingsData = tempData.settings?.bizcard || {};
-                // Ensure default values are set for new survey settings
-                if (!settingsData.dataConversionPlan) {
-                    settingsData.dataConversionPlan = DEFAULT_PLAN;
-                }
+                if (!settingsData.dataConversionPlan) settingsData.dataConversionPlan = DEFAULT_PLAN;
             }
 
-            // --- Common Initialization Logic ---
-            settingsData.bizcardEnabled = true;
+            settingsData.bizcardEnabled = settingsData.bizcardEnabled !== false; // Default true if not explicitly false
+            state.isSkipped = !settingsData.bizcardEnabled;
+
             settingsData.dataConversionPlan = normalizePlanValue(settingsData.dataConversionPlan);
             const planConfig = getPlanConfig(settingsData.dataConversionPlan);
             settingsData.dataConversionSpeed = planConfig?.speedValue || getPlanConfig(DEFAULT_PLAN)?.speedValue || 'normal';
             settingsData.premiumOptions = normalizePremiumOptions(settingsData.premiumOptions);
             const parsedBizcardRequest = parseInt(settingsData.bizcardRequest, 10);
-            settingsData.bizcardRequest = Number.isFinite(parsedBizcardRequest) && parsedBizcardRequest >= 0
-                ? parsedBizcardRequest
-                : 100;
+            settingsData.bizcardRequest = Number.isFinite(parsedBizcardRequest) && parsedBizcardRequest >= 0 ? parsedBizcardRequest : 100;
 
-            const normalizedCouponCode = (settingsData.couponCode || '').trim();
+            const sharedCouponKey = 'sharedCoupon_' + (state.surveyId || 'temp');
+            const sharedCoupon = localStorage.getItem(sharedCouponKey);
+            const normalizedCouponCode = (sharedCoupon !== null ? sharedCoupon : (settingsData.couponCode || '')).trim();
             settingsData.couponCode = normalizedCouponCode;
 
-            let initialCouponFeedback = null;
             if (normalizedCouponCode) {
                 try {
                     const validation = await validateCoupon(normalizedCouponCode);
@@ -117,16 +124,12 @@ export function initBizcardSettings() {
                     } else {
                         state.appliedCoupon = null;
                         state.isCouponApplied = false;
+                        localStorage.removeItem(sharedCouponKey); // Clean up invalid
                     }
-                    initialCouponFeedback = validation;
                 } catch (couponError) {
                     console.error('初期クーポン検証エラー:', couponError);
                     state.appliedCoupon = null;
                     state.isCouponApplied = false;
-                    initialCouponFeedback = {
-                        success: false,
-                        message: '保存済みのクーポン確認に失敗しました。再度適用してください。'
-                    };
                 }
             }
 
@@ -137,13 +140,14 @@ export function initBizcardSettings() {
 
             renderSurveyInfo(surveyData, state.surveyId);
             setInitialFormValues(state.settings);
-            if (initialCouponFeedback) {
-                displayCouponResult(initialCouponFeedback);
+            
+            if (skipBizcardToggle) {
+                skipBizcardToggle.checked = state.isSkipped;
+                applySkipState();
             }
 
             setupEventListeners();
             updateFullUI();
-            initEstimateSidebarToggle();
 
         } catch (error) {
             console.error('初期化エラー:', error);
@@ -151,47 +155,111 @@ export function initBizcardSettings() {
         }
     }
 
-    /**
-     * Sets up all event listeners for the page.
-     */
     function setupEventListeners() {
-        const formElements = [
-            bizcardRequestInput,
-            dataConversionPlanSelection
-        ];
-        formElements.forEach(el => {
-            if(el) el.addEventListener('change', (e) => handleFormChange(e));
+        const formElements = [bizcardRequestInput, dataConversionPlanSelection];
+        formElements.forEach(el => { if(el) el.addEventListener('change', handleFormChange); });
+        if(bizcardRequestInput) bizcardRequestInput.addEventListener('input', handleFormChange);
+
+        if (premiumOptionsContainer) premiumOptionsContainer.addEventListener('change', handlePremiumOptionChange);
+        if (couponCodeInput) couponCodeInput.addEventListener('input', () => { document.getElementById('couponCodeErrorMessage')?.classList.add('hidden'); });
+        if (applyCouponBtn) applyCouponBtn.addEventListener('click', handleApplyCoupon);
+        if (removeCouponBtn) removeCouponBtn.addEventListener('click', handleRemoveCoupon);
+        if (saveButton) saveButton.addEventListener('click', handleSaveSettings);
+        if (cancelButton) cancelButton.addEventListener('click', handleCancel);
+        
+        // Use click or change on checkbox
+        if (skipBizcardToggle) skipBizcardToggle.addEventListener('change', (e) => {
+            state.isSkipped = e.target.checked;
+            state.settings.bizcardEnabled = !state.isSkipped;
+            applySkipState();
+            updateFullUI();
         });
-        if(bizcardRequestInput) bizcardRequestInput.addEventListener('input', (e) => handleFormChange(e));
 
-        if (premiumOptionsContainer) {
-            premiumOptionsContainer.addEventListener('change', handlePremiumOptionChange);
-        }
-
-        if (couponCodeInput) {
-            couponCodeInput.addEventListener('input', handleCouponInputChange);
-        }
-        if(applyCouponBtn) applyCouponBtn.addEventListener('click', handleApplyCoupon);
-        if(saveButton) saveButton.addEventListener('click', handleSaveSettings);
-        if(cancelButton) cancelButton.addEventListener('click', handleCancel);
-        if(toggleMemoSectionBtn) {
+        if (toggleMemoSectionBtn) {
             toggleMemoSectionBtn.addEventListener('click', () => {
                 if(memoSection) memoSection.classList.toggle('hidden');
                 const icon = toggleMemoSectionBtn.querySelector('.material-icons');
                 if(icon) icon.classList.toggle('rotate-180');
             });
         }
+
+        // Modals
+        if (openBizcardDetailsModalBtn) openBizcardDetailsModalBtn.addEventListener('click', () => bizcardDetailsModal?.showModal());
+        if (closeBizcardDetailsModalBtn) closeBizcardDetailsModalBtn.addEventListener('click', () => bizcardDetailsModal?.close());
+        if (closeBizcardDetailsModalActionBtn) closeBizcardDetailsModalActionBtn.addEventListener('click', () => bizcardDetailsModal?.close());
+
+        if (openBillingNotesModalBtn) openBillingNotesModalBtn.addEventListener('click', () => billingNotesModal?.showModal());
+        if (closeBillingNotesModalBtn) closeBillingNotesModalBtn.addEventListener('click', () => billingNotesModal?.close());
+        if (closeBillingNotesModalActionBtn) closeBillingNotesModalActionBtn.addEventListener('click', () => billingNotesModal?.close());
+
+        // --- New stepper / slider / preset event handlers ---
+        /**
+         * Centralized handler: update state + sync all UI controls + re-calculate estimate.
+         */
+        function setRequestCount(newVal) {
+            const clamped = Math.max(0, Math.min(9999, Math.round(newVal) || 0));
+            state.settings.bizcardRequest = clamped;
+            if (bizcardRequestInput) bizcardRequestInput.value = clamped;
+            if (bizcardRequestSlider) bizcardRequestSlider.value = Math.min(clamped, 5000);
+            updateFullUI();
+        }
+
+
+        if (bizcardRequestDecBtn) {
+            bizcardRequestDecBtn.addEventListener('click', () => {
+                const current = parseInt(bizcardRequestInput?.value || 0, 10);
+                setRequestCount(current - 1);
+            });
+        }
+        if (bizcardRequestIncBtn) {
+            bizcardRequestIncBtn.addEventListener('click', () => {
+                const current = parseInt(bizcardRequestInput?.value || 0, 10);
+                setRequestCount(current + 1);
+            });
+        }
+        if (bizcardRequestSlider) {
+            bizcardRequestSlider.addEventListener('input', () => {
+                setRequestCount(parseInt(bizcardRequestSlider.value, 10));
+            });
+        }
+
+        // Keep slider in sync when user types directly in the number input
+        if (bizcardRequestInput) {
+            bizcardRequestInput.addEventListener('input', () => {
+                const val = parseInt(bizcardRequestInput.value, 10);
+                if (!isNaN(val)) {
+                    if (bizcardRequestSlider) bizcardRequestSlider.value = Math.min(val, 5000);
+                }
+            });
+        }
     }
 
-    /**
-     * Checks if the form has been modified compared to its initial state.
-     * @returns {boolean} True if the form has changed, false otherwise.
-     */
+    function applySkipState() {
+        if (!bizcardFormActiveArea || !rightColumnDisabledOverlay) return;
+        
+        if (state.isSkipped) {
+            bizcardFormActiveArea.classList.add('opacity-40', 'pointer-events-none', 'grayscale');
+            rightColumnDisabledOverlay.classList.remove('hidden');
+            skipBizcardToggleContainer.classList.replace('bg-surface-container-low', 'bg-blue-500/10');
+            skipBizcardToggleContainer.classList.add('border-blue-500/30');
+            
+            // Re-validate to remove error borders if they existed
+            if (bizcardRequestInput) bizcardRequestInput.classList.remove('border-error');
+        } else {
+            bizcardFormActiveArea.classList.remove('opacity-40', 'pointer-events-none', 'grayscale');
+            rightColumnDisabledOverlay.classList.add('hidden');
+            skipBizcardToggleContainer.classList.replace('bg-blue-500/10', 'bg-surface-container-low');
+            skipBizcardToggleContainer.classList.remove('border-blue-500/30');
+        }
+    }
+
     function hasFormChanged() {
+        // Form states
         const currentSettings = {
-            bizcardRequest: Math.max(0, parseInt(bizcardRequestInput.value, 10) || 0),
+            bizcardEnabled: !skipBizcardToggle.checked,
+            bizcardRequest: Math.max(0, parseInt(bizcardRequestInput?.value || 0, 10)),
             dataConversionPlan: document.querySelector('input[name="dataConversionPlan"]:checked')?.value,
-            internalMemo: internalMemoInput.value || '',
+            internalMemo: internalMemoInput?.value || '',
             premiumOptions: getPremiumSelectionsFromDom()
         };
 
@@ -199,21 +267,34 @@ export function initBizcardSettings() {
         const initialPremium = normalizePremiumOptions(initial.premiumOptions);
         const currentPremium = normalizePremiumOptions(currentSettings.premiumOptions);
 
-        if (currentSettings.bizcardRequest != initial.bizcardRequest) return true;
-        if (currentSettings.dataConversionPlan != initial.dataConversionPlan) return true;
+        if (currentSettings.bizcardEnabled !== initial.bizcardEnabled) return true;
+        
+        if (!state.isSkipped) {
+            if (currentSettings.bizcardRequest != initial.bizcardRequest) return true;
+            if (currentSettings.dataConversionPlan != initial.dataConversionPlan) return true;
+            if (currentPremium.multilingual !== initialPremium.multilingual) return true;
+            if (!areArraysEqual(currentPremium.additionalItems, initialPremium.additionalItems)) return true;
+        }
+
         if (currentSettings.internalMemo.trim() !== (initial.internalMemo || '').trim()) return true;
 
-        if (currentPremium.multilingual !== initialPremium.multilingual) return true;
-        if (!areArraysEqual(currentPremium.additionalItems, initialPremium.additionalItems)) return true;
-
-        if ((couponCodeInput.value || '') !== (initial.couponCode || '')) return true;
+        const sharedCouponKey = 'sharedCoupon_' + (state.surveyId || 'temp');
+        const initialCoupon = localStorage.getItem(sharedCouponKey) !== null ? localStorage.getItem(sharedCouponKey) : (initial.couponCode || '');
+        const currentCouponCode = state.appliedCoupon ? state.appliedCoupon.code : couponCodeInput?.value || '';
+        
+        if (currentCouponCode !== initialCoupon) return true;
 
         return false;
     }
 
-    /**
-     * Handles the cancel button click.
-     */
+    // Warn before unload if dirty
+    window.addEventListener('beforeunload', (e) => {
+        if (hasFormChanged()) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    });
+
     function handleCancel() {
         const returnUrl = state.surveyId
             ? `surveyCreation.html?surveyId=${encodeURIComponent(state.surveyId)}`
@@ -222,278 +303,258 @@ export function initBizcardSettings() {
             showConfirmationModal(
                 `変更が保存されていません。破棄して前の画面に戻りますか？`,
                 () => { window.location.href = returnUrl; },
-                '変更を破棄'
+                '変更を破棄して戻る'
             );
         } else {
             window.location.href = returnUrl;
         }
     }
 
-    /**
-     * Handles changes in form inputs and updates the UI accordingly.
-     */
     function handleFormChange(event) {
-        const target = event.target;
-        if (!target) return;
+        if (!event.target) return;
+        const name = event.target.name || event.target.id;
+        const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
 
-        const name = target.name || target.id;
-        const value = target.type === 'checkbox' ? target.checked : target.value;
-
-        switch (name) {
-            case 'dataConversionPlan':
-                {
-                    const normalizedPlan = normalizePlanValue(value);
-                    state.settings.dataConversionPlan = normalizedPlan;
-                    const linkedSpeed = getPlanConfig(normalizedPlan)?.speedValue
-                        || getPlanConfig(DEFAULT_PLAN)?.speedValue
-                        || 'normal';
-                    state.settings.dataConversionSpeed = linkedSpeed;
-                }
-                break;
-            case 'bizcardRequest':
-                state.settings.bizcardRequest = Math.max(0, parseInt(value, 10) || 0);
-                break;
+        if (name === 'dataConversionPlan') {
+            const normalizedPlan = normalizePlanValue(value);
+            state.settings.dataConversionPlan = normalizedPlan;
+            const linkedSpeed = getPlanConfig(normalizedPlan)?.speedValue || getPlanConfig(DEFAULT_PLAN)?.speedValue || 'normal';
+            state.settings.dataConversionSpeed = linkedSpeed;
+        } else if (name === 'bizcardRequest') {
+            state.settings.bizcardRequest = Math.max(0, parseInt(value, 10) || 0);
         }
-
         updateFullUI();
     }
 
     function handlePremiumOptionChange(event) {
-        const target = event.target;
-        if (!target || !target.name) {
-            return;
-        }
-
+        if (!event.target || !event.target.name) return;
         state.settings.premiumOptions = normalizePremiumOptions(state.settings.premiumOptions);
 
-        if (target.name === 'premiumMultilingual') {
-            state.settings.premiumOptions.multilingual = target.checked;
-        }
-
-        if (target.name === 'premiumAdditionalItems') {
-            const value = target.value;
+        if (event.target.name === 'premiumMultilingual') {
+            state.settings.premiumOptions.multilingual = event.target.checked;
+        } else if (event.target.name === 'premiumAdditionalItems') {
+            const value = event.target.value;
             const items = new Set(state.settings.premiumOptions.additionalItems || []);
-            if (target.checked) {
-                items.add(value);
-            } else {
-                items.delete(value);
-            }
+            if (event.target.checked) items.add(value);
+            else items.delete(value);
             state.settings.premiumOptions.additionalItems = Array.from(items);
         }
-
         updateFullUI();
     }
 
-    function handleCouponInputChange() {
-        updateCouponSectionUI();
-    }
-
-    /**
-     * Handles the coupon application logic.
-     */
     async function handleApplyCoupon() {
-        if (state.isCouponProcessing) {
-            return;
-        }
-
-        const currentMode = state.couponButtonMode;
-
-        if (currentMode === 'remove' && state.appliedCoupon) {
-            state.appliedCoupon = null;
-            state.isCouponApplied = false;
-            state.settings.couponCode = '';
-            couponCodeInput.value = '';
-            displayCouponResult({ success: true, message: 'クーポンを削除しました' });
-            updateFullUI();
-            return;
-        }
+        if (state.isCouponProcessing) return;
 
         const code = couponCodeInput.value.trim();
         if (!code) {
-            displayCouponResult({ success: false, message: 'クーポンコードを入力してください。' });
+            showCouponError('クーポンコードを入力してください。');
             return;
         }
 
         state.isCouponProcessing = true;
         updateCouponSectionUI();
 
-        const previousCoupon = state.appliedCoupon;
-
         try {
             const result = await validateCoupon(code);
-            displayCouponResult(result);
             if (result.success) {
                 state.appliedCoupon = { ...result, code };
                 state.settings.couponCode = code;
+                state.isCouponApplied = true;
+                
+                // Sync to localStorage
+                const sharedCouponKey = 'sharedCoupon_' + (state.surveyId || 'temp');
+                localStorage.setItem(sharedCouponKey, code);
+
+                couponCodeInput.value = '';
+                document.getElementById('couponCodeErrorMessage')?.classList.add('hidden');
+                showToast(`クーポン「${code}」を適用しました。`, 'success');
             } else {
-                if (previousCoupon && previousCoupon.code && previousCoupon.code !== code) {
-                    state.appliedCoupon = previousCoupon;
-                    state.settings.couponCode = previousCoupon.code;
-                } else {
-                    state.appliedCoupon = null;
-                    state.settings.couponCode = '';
-                }
+                showCouponError(result.message || '無効なクーポンコードです。');
             }
         } catch (error) {
             console.error('クーポン検証エラー:', error);
-            displayCouponResult({ success: false, message: 'クーポンの検証中にエラーが発生しました。再度お試しください。' });
-            if (previousCoupon && previousCoupon.code) {
-                state.appliedCoupon = previousCoupon;
-                state.settings.couponCode = previousCoupon.code;
-            } else {
-                state.appliedCoupon = null;
-                state.settings.couponCode = '';
-            }
+            showCouponError('クーポンの検証中にエラーが発生しました。');
         } finally {
             state.isCouponProcessing = false;
+            updateCouponSectionUI();
             updateFullUI();
         }
     }
 
-    /**
-     * Handles saving the settings.
-     */
+    function handleRemoveCoupon() {
+        showConfirmationModal('クーポンを解除すると、アンケート全体の料金お値引きが取り消されます。解除しますか？', () => {
+            state.appliedCoupon = null;
+            state.isCouponApplied = false;
+            state.settings.couponCode = '';
+            
+            // Sync to localStorage
+            const sharedCouponKey = 'sharedCoupon_' + (state.surveyId || 'temp');
+            localStorage.removeItem(sharedCouponKey);
+
+            couponCodeInput.value = '';
+            showToast('クーポンを解除しました。', 'success');
+            updateCouponSectionUI();
+            updateFullUI();
+        }, 'クーポンを解除');
+    }
+
+    function showCouponError(message) {
+        const errorContainer = document.getElementById('couponCodeErrorMessage');
+        const errorText = document.getElementById('couponCodeErrorText');
+        if (errorContainer && errorText) {
+            errorText.textContent = message;
+            errorContainer.classList.remove('hidden');
+        }
+    }
+
     async function handleSaveSettings() {
-        if (!validateForm()) {
-            showToast('入力内容にエラーがあります。ご確認ください。', 'error');
-            return;
-        }
-
-        setSaveButtonLoading(true);
-
-        // --- New Survey (Temp) Mode ---
-        if (!state.surveyId) {
-            try {
-                const tempDataString = localStorage.getItem('tempSurveyData');
-                const surveyDataForUpdate = tempDataString ? JSON.parse(tempDataString) : {};
-
-                if (!surveyDataForUpdate.settings) surveyDataForUpdate.settings = {};
-                surveyDataForUpdate.settings.bizcard = {
-                    ...state.settings,
-                    couponCode: state.appliedCoupon ? state.appliedCoupon.code : null,
-                    internalMemo: internalMemoInput.value
-                };
-                
-                localStorage.setItem('tempSurveyData', JSON.stringify(surveyDataForUpdate));
-
-                showToast('設定を一時保存しました。', 'success');
-                setTimeout(() => { window.location.href = 'surveyCreation.html'; }, 1000);
-            } catch (error) {
-                console.error('一時データへの保存エラー:', error);
-                showToast('設定の一時保存に失敗しました。', 'error');
-                setSaveButtonLoading(false);
+        // Validation check (only if not skipped)
+        if (!state.isSkipped && bizcardRequestInput) {
+            const value = parseInt(bizcardRequestInput.value || 0, 10);
+            if (value <= 0) {
+                showToast('依頼枚数は1以上を入力してください。', 'error');
+                bizcardRequestInput.classList.add('border-error');
+                return;
             }
-            return; 
         }
+
+        const btnLoading = document.getElementById('saveBizcardSettingsBtnLoading');
+        const btnText = document.getElementById('saveBizcardSettingsBtnText');
         
-        // --- Existing Survey Mode ---
-        const finalSettings = {
-            ...state.settings,
-            surveyId: state.surveyId,
-            couponCode: state.appliedCoupon ? state.appliedCoupon.code : null,
-            internalMemo: internalMemoInput.value
+        saveButton.disabled = true;
+        btnText.classList.add('opacity-0');
+        btnLoading.classList.remove('hidden');
+
+        // Form elements disabling
+        document.body.style.pointerEvents = 'none';
+
+        const finalizeSave = () => {
+            saveButton.disabled = false;
+            btnText.classList.remove('opacity-0');
+            btnLoading.classList.add('hidden');
+            document.body.style.pointerEvents = 'auto';
         };
 
         try {
-            const result = await saveBizcardSettings(finalSettings);
-            if (result.success) {
-                sessionStorage.setItem(`updatedSurvey_${finalSettings.surveyId}`, JSON.stringify(finalSettings));
-                showToast('名刺データ化設定を保存し、依頼を確定しました！', 'success');
-                setTimeout(() => window.location.href = 'index.html', 1000);
+            const savedData = {
+                ...state.settings,
+                bizcardEnabled: !state.isSkipped,
+                couponCode: state.appliedCoupon ? state.appliedCoupon.code : null,
+                internalMemo: internalMemoInput ? internalMemoInput.value : ''
+            };
+
+            if (!state.surveyId) {
+                const tempDataString = localStorage.getItem('tempSurveyData');
+                const surveyDataForUpdate = tempDataString ? JSON.parse(tempDataString) : {};
+                if (!surveyDataForUpdate.settings) surveyDataForUpdate.settings = {};
+                surveyDataForUpdate.settings.bizcard = savedData;
+                localStorage.setItem('tempSurveyData', JSON.stringify(surveyDataForUpdate));
+                showToast('設定を一時保存しました。', 'success');
+                setTimeout(() => { window.location.href = 'surveyCreation.html'; }, 800);
             } else {
-                showToast(result.message || '設定の保存に失敗しました。', 'error');
-                setSaveButtonLoading(false);
+                savedData.surveyId = state.surveyId;
+                const result = await saveBizcardSettings(savedData);
+                if (result.success) {
+                    sessionStorage.setItem(`updatedSurvey_${savedData.surveyId}`, JSON.stringify(savedData));
+                    showToast('名刺データ化設定を保存しました！', 'success');
+                    setTimeout(() => window.location.href = 'surveyCreation.html', 800);
+                } else {
+                    showToast(result.message || '設定の保存に失敗しました。', 'error');
+                }
             }
         } catch (error) {
             console.error('設定保存エラー:', error);
             showToast('設定の保存中にエラーが発生しました。', 'error');
-            setSaveButtonLoading(false);
+        } finally {
+            if (!state.surveyId || !saveButton.disabled) finalizeSave();
         }
     }
 
-    /**
-     * Updates all relevant parts of the UI based on the current state.
-     */
     function updateFullUI() {
-        const settingsFields = document.getElementById('bizcardSettingsFields');
-        if(settingsFields) {
-            settingsFields.classList.remove('hidden');
-        }
-
         state.settings.dataConversionPlan = normalizePlanValue(state.settings.dataConversionPlan);
         const selectedPlanConfig = getPlanConfig(state.settings.dataConversionPlan);
-        state.settings.dataConversionSpeed = selectedPlanConfig?.speedValue
-            || getPlanConfig(DEFAULT_PLAN)?.speedValue
-            || 'normal';
+        state.settings.dataConversionSpeed = selectedPlanConfig?.speedValue || getPlanConfig(DEFAULT_PLAN)?.speedValue || 'normal';
         state.settings.premiumOptions = normalizePremiumOptions(state.settings.premiumOptions);
 
         const parsedBizcardRequest = parseInt(state.settings.bizcardRequest, 10);
-        state.settings.bizcardRequest = Number.isFinite(parsedBizcardRequest) && parsedBizcardRequest >= 0
-            ? parsedBizcardRequest
-            : 100;
+        state.settings.bizcardRequest = Number.isFinite(parsedBizcardRequest) && parsedBizcardRequest >= 0 ? parsedBizcardRequest : 100;
 
-        if (bizcardRequestInput) {
+        if (bizcardRequestInput && document.activeElement !== bizcardRequestInput) {
             bizcardRequestInput.value = state.settings.bizcardRequest;
+        }
+        // Keep slider in sync with state
+        if (bizcardRequestSlider) {
+            bizcardRequestSlider.value = Math.min(state.settings.bizcardRequest, 5000);
         }
 
         renderDataConversionPlans(DATA_CONVERSION_PLANS, state.settings.dataConversionPlan);
         renderPremiumOptions(PREMIUM_OPTION_GROUPS, state.settings.premiumOptions);
 
-        const estimate = calculateEstimate(state.settings, state.appliedCoupon, state.surveyData?.periodEnd);
+        // Calculate estimate (force zeroes if skipped)
+        const estimateSettings = state.isSkipped ? { ...state.settings, bizcardRequest: 0, dataConversionPlan: 'none', premiumOptions: { multilingual: false, additionalItems: [] } } : state.settings;
+        
+        const estimate = calculateEstimate(estimateSettings, state.appliedCoupon, state.surveyData?.periodEnd);
+        
+        if (state.isSkipped) {
+            estimate.amount = 0;
+            estimate.minCharge = 0;
+            estimate.requestedCards = 0;
+            estimate.premiumTotal = 0;
+            const ed = document.getElementById('estimatedCompletionDate');
+            if (ed) ed.textContent = 'データ化を実施しない';
+        }
+
         renderEstimate(estimate);
         updateCouponSectionUI();
-        validateForm();
+        
+        // Handle validation logic
+        if (!state.isSkipped && bizcardRequestInput) {
+            const value = parseInt(bizcardRequestInput.value || 0, 10);
+            if (value > 0) {
+                 bizcardRequestInput.classList.remove('border-error');
+                 saveButton.disabled = false;
+            } else {
+                 saveButton.disabled = true;
+            }
+        } else {
+            if(saveButton) saveButton.disabled = false;
+        }
     }
 
     function updateCouponSectionUI() {
-        const couponLoadingIndicator = document.getElementById('couponLoadingIndicator');
-        if (!couponCodeInput || !applyCouponBtn || !couponLoadingIndicator) {
-            return;
+        const inputContainer = document.getElementById('couponInputContainer');
+        const appliedContainer = document.getElementById('couponAppliedContainer');
+        const codeDisplay = document.getElementById('appliedCouponCodeDisplay');
+        const applyLoading = document.getElementById('couponLoadingIndicator');
+
+        if (!inputContainer || !appliedContainer) return;
+
+        if (state.isCouponApplied && state.appliedCoupon) {
+            inputContainer.classList.add('hidden');
+            appliedContainer.classList.remove('hidden');
+            if(codeDisplay) codeDisplay.textContent = state.appliedCoupon.code;
+        } else {
+            inputContainer.classList.remove('hidden');
+            appliedContainer.classList.add('hidden');
         }
-
-        const trimmedValue = couponCodeInput.value.trim();
-        const appliedCoupon = state.appliedCoupon;
-        const hasAppliedCoupon = Boolean(appliedCoupon);
-
-        let mode = 'apply';
-        if (hasAppliedCoupon) {
-            const appliedCode = appliedCoupon.code || '';
-            if (trimmedValue && trimmedValue !== appliedCode) {
-                mode = 'change';
-            } else {
-                mode = 'remove';
-            }
-        }
-
-        state.isCouponApplied = hasAppliedCoupon;
-        state.couponButtonMode = mode;
-
-        const labels = {
-            apply: '適用',
-            change: '変更',
-            remove: '削除'
-        };
-        const ariaLabels = {
-            apply: '入力したクーポンコードを適用する',
-            change: '入力したクーポンコードで適用内容を変更する',
-            remove: '適用済みのクーポンを削除する'
-        };
-
-        couponCodeInput.disabled = state.isCouponProcessing;
 
         if (state.isCouponProcessing) {
-            applyCouponBtn.classList.add('hidden');
-            couponLoadingIndicator.classList.remove('hidden');
+            applyCouponBtn?.classList.add('hidden');
+            applyLoading?.classList.remove('hidden');
+            if(couponCodeInput) couponCodeInput.disabled = true;
         } else {
-            applyCouponBtn.classList.remove('hidden');
-            couponLoadingIndicator.classList.add('hidden');
-
-            applyCouponBtn.textContent = labels[mode];
-            applyCouponBtn.setAttribute('aria-label', ariaLabels[mode]);
-            applyCouponBtn.setAttribute('aria-pressed', mode === 'remove' ? 'true' : 'false');
-            
-            applyCouponBtn.classList.remove('coupon-action-button--apply', 'coupon-action-button--change', 'coupon-action-button--remove');
-            applyCouponBtn.classList.add(`coupon-action-button--${mode}`);
+            applyCouponBtn?.classList.remove('hidden');
+            applyLoading?.classList.add('hidden');
+            if(couponCodeInput) couponCodeInput.disabled = false;
+        }
+        
+        const couponSectionWrapper = document.getElementById('couponSectionWrapper');
+        if (couponSectionWrapper) {
+            if (state.isSkipped) {
+                couponSectionWrapper.classList.add('opacity-50', 'pointer-events-none', 'grayscale', 'bg-surface');
+            } else {
+                couponSectionWrapper.classList.remove('opacity-50', 'pointer-events-none', 'grayscale', 'bg-surface');
+            }
         }
     }
 
@@ -505,53 +566,6 @@ export function initBizcardSettings() {
             multilingual: Boolean(multilingualInput?.checked),
             additionalItems: additionalInputs.map(input => input.value)
         };
-    }
-
-    function initEstimateSidebarToggle() {
-        const sidebar = document.getElementById('estimateSidebar');
-        const toggleBtn = document.getElementById('toggleEstimateSidebarBtn');
-        const overlay = document.getElementById('estimateSidebarOverlay');
-
-        if (!sidebar || !toggleBtn) {
-            return;
-        }
-
-        const toggleIcon = toggleBtn.querySelector('.material-icons');
-        let hasUserInteracted = false;
-
-        const applySidebarState = (isCollapsed) => {
-            if (!toggleIcon) return;
-            if (isCollapsed) {
-                sidebar.classList.add('translate-x-full');
-                toggleIcon.textContent = 'chevron_left';
-                toggleBtn.setAttribute('aria-expanded', 'false');
-                if (overlay) overlay.classList.remove('is-visible');
-            } else {
-                sidebar.classList.remove('translate-x-full');
-                toggleIcon.textContent = 'chevron_right';
-                toggleBtn.setAttribute('aria-expanded', 'true');
-                if (overlay) overlay.classList.add('is-visible');
-            }
-        };
-
-        toggleBtn.addEventListener('click', () => {
-            hasUserInteracted = true;
-            const isCollapsed = sidebar.classList.contains('translate-x-full');
-            applySidebarState(!isCollapsed);
-        });
-
-        if (overlay) {
-            overlay.addEventListener('click', () => {
-                hasUserInteracted = true;
-                applySidebarState(true);
-            });
-        }
-
-        applySidebarState(sidebar.classList.contains('translate-x-full'));
-        setTimeout(() => {
-            if (hasUserInteracted) return;
-            applySidebarState(true);
-        }, 800);
     }
 
     function areArraysEqual(a = [], b = []) {
