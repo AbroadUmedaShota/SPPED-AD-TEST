@@ -305,8 +305,9 @@ function setupEventListeners() {
         DOMElements.submitSurveyButton.addEventListener('click', handleSubmit);
     }
     if (DOMElements.bizcardCameraButton) {
-        DOMElements.bizcardCameraButton.addEventListener('click', startBizcardUploadFlow);
+        DOMElements.bizcardCameraButton.addEventListener('click', () => startBizcardUploadFlow());
     }
+    initBizcardPreviewListeners();
     if (DOMElements.bizcardManualButton) {
         DOMElements.bizcardManualButton.addEventListener('click', () => {
             const formId = 'manual-bizcard-form';
@@ -428,21 +429,147 @@ function autoResizeTextarea(element) {
 // ボタン状態更新関数を追加
 function updateBizcardButtonState() {
     if (!DOMElements.bizcardCameraButton) return;
-    const hasImages = state.answers.bizcardImages && 
+    const hasImages = state.answers.bizcardImages &&
                       (state.answers.bizcardImages.front || state.answers.bizcardImages.back);
     const textSpan = DOMElements.bizcardCameraButton.querySelector('span:nth-child(2)');
     if (textSpan) {
-        textSpan.textContent = hasImages ? '再撮影' : '名刺を撮影';
+        textSpan.textContent = hasImages ? '撮影済み' : '名刺を撮影';
+    }
+    if (hasImages) {
+        DOMElements.bizcardCameraButton.disabled = true;
+        DOMElements.bizcardCameraButton.classList.remove('bg-blue-100', 'text-blue-800', 'hover:bg-blue-200');
+        DOMElements.bizcardCameraButton.classList.add('bg-gray-100', 'text-gray-400', 'cursor-not-allowed');
+    } else {
+        DOMElements.bizcardCameraButton.disabled = false;
+        DOMElements.bizcardCameraButton.classList.remove('bg-gray-100', 'text-gray-400', 'cursor-not-allowed');
+        DOMElements.bizcardCameraButton.classList.add('bg-blue-100', 'text-blue-800', 'hover:bg-blue-200');
+    }
+}
+
+// 名刺プレビューエリアを更新する
+function updateBizcardPreview() {
+    const previewArea = document.getElementById('bizcard-preview-area');
+    const frontImg = document.getElementById('bizcard-preview-front');
+    const backImg = document.getElementById('bizcard-preview-back');
+    const backEmpty = document.getElementById('bizcard-preview-back-empty');
+    const backActions = document.getElementById('bizcard-preview-back-actions');
+    if (!previewArea || !frontImg || !backImg || !backEmpty || !backActions) return;
+
+    const images = state.answers.bizcardImages;
+    const hasFront = !!(images && images.front);
+    const hasBack = !!(images && images.back);
+
+    if (!hasFront && !hasBack) {
+        previewArea.classList.add('hidden');
+        return;
+    }
+
+    previewArea.classList.remove('hidden');
+
+    // 表面
+    if (hasFront) {
+        frontImg.src = images.front;
+    }
+
+    // 裏面
+    if (hasBack) {
+        backImg.src = images.back;
+        backImg.classList.remove('hidden');
+        backEmpty.classList.add('hidden');
+        backActions.classList.remove('bizcard-preview-back-actions-hidden');
+    } else {
+        backImg.classList.add('hidden');
+        backEmpty.classList.remove('hidden');
+        backActions.classList.add('bizcard-preview-back-actions-hidden');
+    }
+}
+
+// プレビューエリアのイベントリスナーを初期化する（一度だけ呼ぶ）
+function initBizcardPreviewListeners() {
+    const frontImg = document.getElementById('bizcard-preview-front');
+    const backImg = document.getElementById('bizcard-preview-back');
+    const backEmpty = document.getElementById('bizcard-preview-back-empty');
+    const retakeFront = document.getElementById('bizcard-retake-front');
+    const deleteFront = document.getElementById('bizcard-delete-front');
+    const retakeBack = document.getElementById('bizcard-retake-back');
+    const deleteBack = document.getElementById('bizcard-delete-back');
+
+    // コンテナクリック → 拡大表示（ボタン以外の領域）
+    const frontContainer = document.getElementById('bizcard-preview-front-container');
+    const backContainer = document.getElementById('bizcard-preview-back-container');
+    if (frontContainer) frontContainer.addEventListener('click', () => {
+        if (frontImg && frontImg.src) openMagnifyModal(frontImg.src);
+    });
+    if (backContainer) backContainer.addEventListener('click', () => {
+        if (backImg && !backImg.classList.contains('hidden') && backImg.src) openMagnifyModal(backImg.src);
+    });
+
+    // 裏面「追加」クリック → 裏面撮影フローを起動
+    if (backEmpty) backEmpty.addEventListener('click', (e) => {
+        e.stopPropagation();
+        startBizcardUploadFlow('back');
+    });
+
+    // ボタンはバブリングを止めて各処理のみ実行
+    if (retakeFront) retakeFront.addEventListener('click', (e) => {
+        e.stopPropagation();
+        startBizcardUploadFlow('front');
+    });
+    if (deleteFront) deleteFront.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showBizcardDeleteConfirm('front');
+    });
+    if (retakeBack) retakeBack.addEventListener('click', (e) => {
+        e.stopPropagation();
+        startBizcardUploadFlow('back');
+    });
+    if (deleteBack) deleteBack.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showBizcardDeleteConfirm('back');
+    });
+}
+
+function showBizcardDeleteConfirm(side) {
+    const label = side === 'front' ? '表面' : '裏面';
+    showModal(DOMElements.bizcardUploadModal, '画像の削除', `
+        <p class="text-center text-gray-700">${label}の画像を削除してもよろしいですか？</p>
+    `, {
+        saveText: '削除する',
+        cancelText: 'キャンセル',
+        onSave: () => {
+            if (!state.answers.bizcardImages) return;
+            state.answers.bizcardImages[side] = null;
+            state.hasUnsavedChanges = true;
+            if (!state.answers.bizcardImages.front && !state.answers.bizcardImages.back) {
+                state.answers.bizcardImages = null;
+            }
+            DOMElements.bizcardUploadModal.style.display = 'none';
+            updateBizcardButtonState();
+            updateBizcardPreview();
+            showToast(`${label}の画像を削除しました。`);
+        },
+        onCancel: () => {
+            DOMElements.bizcardUploadModal.style.display = 'none';
+        },
+    });
+
+    // 削除ボタンを赤くする
+    const saveBtn = DOMElements.bizcardUploadModal.querySelector('#modal-save-button');
+    if (saveBtn) {
+        saveBtn.classList.remove('bg-primary', 'hover:bg-primary-dark', 'text-on-primary');
+        saveBtn.classList.add('bg-red-600', 'hover:bg-red-700', 'text-white');
     }
 }
 
 let bizcardImages = { front: null, back: null };
 
-function startBizcardUploadFlow() {
+// targetSide: 'front' | 'back' | null
+// nullの場合は通常の初回フロー（表面から開始）
+function startBizcardUploadFlow(targetSide = null) {
     let localImages = { front: null, back: null };
     let currentSide = null; // New variable to track current side
-    let isEditingSide = false; // 特定の面だけを再撮影しているかのフラグ
-    
+    let isEditingSide = !!targetSide; // 特定の面だけを再撮影しているかのフラグ
+
     // 既存画像があればローカルにコピー
     if (state.answers.bizcardImages && (state.answers.bizcardImages.front || state.answers.bizcardImages.back)) {
         localImages = { ...state.answers.bizcardImages };
@@ -485,8 +612,8 @@ function startBizcardUploadFlow() {
     };
 
     const showChoice = (side = 'front', isEdit = false) => {
-        const titleText = isEdit ? '再撮影' : '名刺をアップロード';
-        const descriptionText = isEdit ? '再撮影する画像のアップロード方法を選択してください。' : '名刺画像のアップロード方法を選択してください。';
+        const titleText = isEdit ? '再撮影' : '名刺を撮影';
+        const descriptionText = isEdit ? '再撮影する画像の選択方法を選んでください。' : '名刺画像の選択方法を選んでください。';
         
         let stepIndicatorHTML = '';
         if (!isEdit) {
@@ -545,8 +672,9 @@ function startBizcardUploadFlow() {
                     state.answers.bizcardImages.front = localImages.front;
                     state.hasUnsavedChanges = true;
                     showToast('表面画像を更新しました。');
-                    showBizcardEditModal();
+                    DOMElements.bizcardUploadModal.style.display = 'none';
                     updateBizcardButtonState();
+                    updateBizcardPreview();
                 },
                 onCancel: () => showChoice('front', true)
             });
@@ -689,8 +817,9 @@ function startBizcardUploadFlow() {
                     state.answers.bizcardImages.back = localImages.back;
                     state.hasUnsavedChanges = true;
                     showToast('裏面画像を更新しました。');
-                    showBizcardEditModal();
+                    DOMElements.bizcardUploadModal.style.display = 'none';
                     updateBizcardButtonState();
+                    updateBizcardPreview();
                 },
                 onCancel: () => showChoice('back', true)
             });
@@ -750,6 +879,7 @@ function startBizcardUploadFlow() {
                 showToast('名刺画像を保存しました。');
                 DOMElements.bizcardUploadModal.style.display = 'none';
                 updateBizcardButtonState();
+                updateBizcardPreview();
             },
             onCancel: () => localImages.back ? showBackPreview() : showFrontPreview()
         });
@@ -891,9 +1021,10 @@ function startBizcardUploadFlow() {
         });
     };
 
-    // 既存画像がある場合は編集モーダル、なければ初回アップロードフローを開始
-    if (state.answers.bizcardImages && (state.answers.bizcardImages.front || state.answers.bizcardImages.back)) {
-        showBizcardEditModal();
+    // targetSide が指定された場合はその面の選択から開始（再撮影・追加）
+    // それ以外は表面の選択から開始
+    if (targetSide) {
+        showChoice(targetSide, true);
     } else {
         showChoice();
     }

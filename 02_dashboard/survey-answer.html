@@ -47,6 +47,25 @@
             transform: translateY(-100%);
             transition: transform 0.3s ease-in-out;
         }
+
+        /* --- 名刺プレビュー --- */
+        .bizcard-preview-img {
+            width: 100%;
+            height: auto;
+            max-height: 160px;
+            object-fit: contain;
+            background-color: #f3f4f6;
+            border-radius: 6px;
+        }
+        .bizcard-preview-back-empty {
+            height: 160px;
+        }
+        .bizcard-preview-back-actions-hidden {
+            display: none !important;
+        }
+        #submitting-progress-bar {
+            width: 0%;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -73,6 +92,36 @@
                     <!-- エラーメッセージ表示領域 -->
                 </div>
                 <form id="survey-form" class="space-y-6"></form>
+
+                <!-- 名刺プレビューエリア（撮影後に表示） -->
+                <div id="bizcard-preview-area" class="hidden w-full bg-white border border-gray-200 rounded-lg shadow-sm p-4 mb-4 mt-6">
+                    <p class="text-sm font-medium text-gray-600 mb-3">撮影済み名刺</p>
+                    <div class="flex gap-4">
+                        <div class="flex-1">
+                            <p class="text-xs text-center text-gray-500 mb-2">表面</p>
+                            <div id="bizcard-preview-front-container" class="relative group">
+                                <img id="bizcard-preview-front" src="" alt="名刺 表面" class="bizcard-preview-img w-full rounded-md shadow-sm cursor-pointer">
+                                <div class="absolute inset-0 hidden group-hover:flex items-center justify-center gap-2 bg-black bg-opacity-40 rounded-md">
+                                    <button id="bizcard-retake-front" type="button" class="px-2 py-1 text-xs font-bold text-white bg-blue-600 rounded hover:bg-blue-700">再撮影</button>
+                                    <button id="bizcard-delete-front" type="button" class="px-2 py-1 text-xs font-bold text-white bg-red-600 rounded hover:bg-red-700">削除</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-1" id="bizcard-preview-back-wrapper">
+                            <p class="text-xs text-center text-gray-500 mb-2">裏面</p>
+                            <div id="bizcard-preview-back-container" class="relative group">
+                                <img id="bizcard-preview-back" src="" alt="名刺 裏面" class="bizcard-preview-img w-full rounded-md shadow-sm cursor-pointer hidden">
+                                <div id="bizcard-preview-back-empty" class="bizcard-preview-back-empty w-full flex items-center justify-center bg-gray-100 border border-dashed border-gray-300 rounded-md text-xs text-gray-400 cursor-pointer hover:bg-gray-200">
+                                    裏面を追加
+                                </div>
+                                <div class="absolute inset-0 hidden group-hover:flex items-center justify-center gap-2 bg-black bg-opacity-40 rounded-md bizcard-preview-back-actions-hidden" id="bizcard-preview-back-actions">
+                                    <button id="bizcard-retake-back" type="button" class="px-2 py-1 text-xs font-bold text-white bg-blue-600 rounded hover:bg-blue-700">再撮影</button>
+                                    <button id="bizcard-delete-back" type="button" class="px-2 py-1 text-xs font-bold text-white bg-red-600 rounded hover:bg-red-700">削除</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
 
@@ -100,7 +149,7 @@
         <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-sm text-center">
             <p id="submitting-text" class="text-lg font-semibold mb-4">送信中...</p>
             <div class="w-full bg-gray-200 rounded-full h-4">
-                <div id="submitting-progress-bar" class="bg-blue-600 h-4 rounded-full transition-all duration-300 ease-out" style="width: 0%"></div>
+                <div id="submitting-progress-bar" class="bg-blue-600 h-4 rounded-full transition-all duration-300 ease-out"></div>
             </div>
             <p id="submitting-percentage" class="text-sm text-gray-600 mt-2">0%</p>
         </div>
