@@ -58,19 +58,10 @@
 
     /* Accordion transitions */
     .v2-accordion-body {
-      overflow: hidden;
-      transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
-      max-height: 2000px;
-      opacity: 1;
+      display: block;
     }
     .v2-accordion-body.v2-collapsed {
-      max-height: 0 !important;
-      opacity: 0;
-      pointer-events: none;
-      padding-top: 0 !important;
-      padding-bottom: 0 !important;
-      border-top-width: 0 !important;
-      margin-top: 0 !important;
+      display: none !important;
     }
     .v2-accordion-trigger[aria-expanded="false"] [data-accordion-icon] {
       transform: rotate(180deg);
@@ -194,41 +185,47 @@
           <div class="grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8 items-start relative">
 
             <!-- ============================== -->
-            <!-- 1. SETTING COLUMN (Left Area)  -->
+            <!-- 0. BASIC INFO (Top Spanning)   -->
             <!-- ============================== -->
-            <div id="settings-column" class="md:col-span-4 lg:col-span-3 flex flex-col gap-5 sticky-panel">
-              
-              <!-- 1. 基本情報 (Basic Info) -->
-              <div class="bg-white border text-gray-800 rounded-xl shadow-sm overflow-hidden border-gray-200">
+            <div class="md:col-span-12 lg:col-span-9 lg:row-start-1 mb-2 lg:mb-0 w-full min-w-0">
+              <div class="bg-white border text-gray-800 rounded-xl shadow-sm overflow-visible border-gray-200">
                 <button type="button" class="v2-accordion-trigger w-full flex items-center justify-between px-5 py-4 bg-gray-50 hover:bg-gray-100 transition-colors" data-accordion-v2="basicInfoBody" aria-expanded="true">
                   <h2 class="text-base font-bold flex items-center gap-2"><span class="material-icons text-primary">feed</span>基本情報</h2>
                   <span class="material-icons text-gray-500" data-accordion-icon>expand_less</span>
                 </button>
-                <div id="basicInfoBody" class="v2-accordion-body p-5 flex flex-col gap-4">
-                  <!-- Survey Name (Admin) -->
-                  <div class="input-group mb-0">
-                    <input type="text" id="surveyName_ja" placeholder=" " class="input-field" maxlength="50" required>
-                    <label for="surveyName_ja" class="input-label">アンケート名 (管理用)<span class="text-error">*</span></label>
-                  </div>
-                  <!-- Display Title -->
-                  <div class="input-group mb-0 multi-lang-input-group" data-lang="ja">
-                    <input type="text" id="displayTitle_ja" placeholder=" " class="input-field" maxlength="100" required>
-                    <label for="displayTitle_ja" class="input-label">表示タイトル<span class="text-error">*</span></label>
-                  </div>
-                  <!-- Description -->
-                  <div class="input-group mb-0 multi-lang-input-group" data-lang="ja">
-                    <textarea id="description_ja" placeholder=" " class="input-field min-h-[5rem] resize-y" maxlength="500"></textarea>
-                    <label for="description_ja" class="input-label">説明</label>
-                  </div>
-                  <!-- Period Range -->
-                  <div class="input-group mb-0 relative">
-                    <input type="text" id="periodRange" placeholder=" " class="input-field pr-10" required>
-                    <label for="periodRange" class="input-label">アンケート期間<span class="text-error">*</span></label>
-                    <span class="material-icons absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 pointer-events-none">calendar_today</span>
+                <div id="basicInfoBody" class="v2-accordion-body p-5">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-5 gap-y-6">
+                    <!-- Survey Name (Admin) -->
+                    <div class="input-group mb-0">
+                      <input type="text" id="surveyName_ja" placeholder=" " class="input-field" maxlength="50" required>
+                      <label for="surveyName_ja" class="input-label">アンケート名 (管理用)<span class="text-error">*</span></label>
+                    </div>
+                    <!-- Display Title -->
+                    <div class="input-group mb-0 multi-lang-input-group" data-lang="ja">
+                      <input type="text" id="displayTitle_ja" placeholder=" " class="input-field" maxlength="100" required>
+                      <label for="displayTitle_ja" class="input-label">表示タイトル<span class="text-error">*</span></label>
+                    </div>
+                    <!-- Description -->
+                    <div class="input-group mb-0 multi-lang-input-group md:row-span-2 flex flex-col" data-lang="ja">
+                      <textarea id="description_ja" placeholder=" " class="input-field min-h-[5rem] flex-1 resize-y" maxlength="500"></textarea>
+                      <label for="description_ja" class="input-label">説明</label>
+                    </div>
+                    <!-- Period Range -->
+                    <div class="input-group mb-0 relative">
+                      <input type="text" id="periodRange" placeholder=" " class="input-field pr-10" required>
+                      <label for="periodRange" class="input-label">アンケート期間<span class="text-error">*</span></label>
+                      <span class="material-icons absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 pointer-events-none">calendar_today</span>
+                    </div>
                   </div>
                 </div>
               </div>
+            </div>
 
+            <!-- ============================== -->
+            <!-- 1. SETTING COLUMN (Left Area)  -->
+            <!-- ============================== -->
+            <div id="settings-column" class="md:col-span-4 lg:col-span-3 lg:col-start-1 lg:row-start-2 flex flex-col gap-5 sticky-panel w-full min-w-0">
+              
               <!-- 2. 連携設定 (Integration Settings) -->
               <div class="bg-white border text-gray-800 rounded-xl shadow-sm overflow-hidden border-gray-200">
                 <button type="button" class="v2-accordion-trigger w-full flex items-center justify-between px-5 py-4 bg-gray-50 hover:bg-gray-100 transition-colors" data-accordion-v2="integrationBody" aria-expanded="true">
@@ -365,7 +362,7 @@
             <!-- ============================== -->
             <!-- 2. QUESTION COLUMN (Center)    -->
             <!-- ============================== -->
-            <div id="questions-column" class="md:col-span-8 lg:col-span-6 flex flex-col gap-6">
+            <div id="questions-column" class="md:col-span-8 lg:col-span-6 lg:col-start-4 lg:row-start-2 flex flex-col gap-6 w-full min-w-0">
               
               <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm min-h-[50vh]">
                 <div class="flex items-center justify-between border-b pb-4 mb-6">
@@ -402,7 +399,7 @@
             <!-- ============================== -->
             <!-- 3. OUTLINE PANEL (Right Area)  -->
             <!-- ============================== -->
-            <div id="outline-column" class="hidden lg:flex lg:col-span-3 flex-col gap-5 sticky-panel glass-panel bg-white/80 p-0 border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+            <div id="outline-column" class="hidden lg:flex lg:col-span-3 lg:col-start-10 lg:row-start-1 lg:row-span-2 flex-col gap-5 sticky-panel glass-panel bg-white/80 p-0 border border-gray-200 rounded-xl shadow-sm overflow-hidden">
               
               <div class="p-5 overflow-y-auto flex-1 border-b">
                 <h3 class="text-xs font-black tracking-widest text-gray-400 uppercase mb-4 flex items-center gap-1">
