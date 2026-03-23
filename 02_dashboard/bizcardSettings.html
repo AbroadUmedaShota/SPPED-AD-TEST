@@ -92,13 +92,13 @@
                             <div class="flex items-center justify-between rounded-2xl border border-outline-variant bg-surface-container-low p-5 transition-colors duration-300" id="skipBizcardToggleContainer" data-help-target="bizcard-disable-note">
                                 <div>
                                     <h3 class="text-base font-bold text-on-surface flex items-center gap-2">
-                                        名刺のデータ化は行わない
+                                        名刺のデータ化を行う
                                         <button type="button" class="help-trigger help-inline-button material-icons text-on-surface-variant hover:text-primary transition-colors" data-help-key="noBizcardDigitization" aria-label="名刺のデータ化を行わない設定の説明を表示">help_outline</button>
                                     </h3>
-                                    <p class="text-sm text-on-surface-variant mt-1 transition-colors duration-300">名刺画像を取得してもシステムによるデータ化を依頼しない場合はONにしてください。</p>
+                                    <p class="text-sm text-on-surface-variant mt-1 transition-colors duration-300">名刺画像を取得してもシステムによるデータ化を依頼しない場合はOFFにしてください。</p>
                                 </div>
                                 <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" id="skipBizcardToggle" class="sr-only peer">
+                                    <input type="checkbox" id="skipBizcardToggle" class="sr-only peer" checked>
                                     <div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
                                 </label>
                             </div>
@@ -131,17 +131,16 @@
                                         </div>
 
                                         <!-- ステッパー（数値表示中央） -->
-                                        <div class="flex items-center justify-center gap-3">
-                                            <div class="flex items-center gap-1">
-                                                <button type="button" id="bizcardRequestDec100Btn"
-                                                    class="flex h-9 w-9 items-center justify-center rounded-lg border border-outline-variant bg-surface text-on-surface-variant text-[11px] font-bold shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30"
-                                                    aria-label="100枚減らす">-100</button>
-                                                <button type="button" id="bizcardRequestDecBtn"
-                                                    class="flex h-11 w-11 items-center justify-center rounded-full border-2 border-outline-variant bg-surface text-on-surface-variant shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30"
-                                                    aria-label="1枚減らす">
-                                                    <span class="material-icons text-xl select-none">remove</span>
-                                                </button>
-                                            </div>
+                                        <div class="flex items-center justify-center gap-2">
+                                            <button type="button" id="bizcardRequestDec100Btn"
+                                                class="flex h-10 w-16 items-center justify-center rounded-lg border border-outline-variant bg-surface text-on-surface-variant text-sm font-bold shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                                                aria-label="100枚減らす">-100</button>
+                                            <button type="button" id="bizcardRequestDec10Btn"
+                                                class="flex h-10 w-12 items-center justify-center rounded-lg border border-outline-variant bg-surface text-on-surface-variant text-sm font-bold shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                                                aria-label="10枚減らす">-10</button>
+                                            <button type="button" id="bizcardRequestDecBtn"
+                                                class="flex h-10 w-10 items-center justify-center rounded-lg border border-outline-variant bg-surface text-on-surface-variant text-lg font-bold shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                                                aria-label="1枚減らす">−</button>
 
                                             <div class="flex items-baseline gap-2">
                                                 <div class="relative group">
@@ -153,30 +152,15 @@
                                                 <span class="font-bold text-xl text-on-surface-variant select-none">枚</span>
                                             </div>
 
-                                            <div class="flex items-center gap-1">
-                                                <button type="button" id="bizcardRequestIncBtn"
-                                                    class="flex h-11 w-11 items-center justify-center rounded-full border-2 border-outline-variant bg-surface text-on-surface-variant shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30"
-                                                    aria-label="1枚増やす">
-                                                    <span class="material-icons text-xl select-none">add</span>
-                                                </button>
-                                                <button type="button" id="bizcardRequestInc100Btn"
-                                                    class="flex h-9 w-9 items-center justify-center rounded-lg border border-outline-variant bg-surface text-on-surface-variant text-[11px] font-bold shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30"
-                                                    aria-label="100枚増やす">+100</button>
-                                            </div>
-                                        </div>
-
-                                        <!-- スライダー -->
-                                        <div class="px-2 flex flex-col gap-1.5">
-                                            <input type="range" id="bizcardRequestSlider" min="0" max="5000" step="50" value="100"
-                                                class="w-full h-2 rounded-full appearance-none bg-outline-variant/40 cursor-pointer accent-primary focus:outline-none"
-                                                aria-label="見込み枚数スライダー">
-                                            <div class="flex justify-between text-[11px] text-on-surface-variant font-medium px-0.5">
-                                                <span>0</span>
-                                                <span>1,000</span>
-                                                <span>2,000</span>
-                                                <span>3,000</span>
-                                                <span>5,000+</span>
-                                            </div>
+                                            <button type="button" id="bizcardRequestIncBtn"
+                                                class="flex h-10 w-10 items-center justify-center rounded-lg border border-outline-variant bg-surface text-on-surface-variant text-lg font-bold shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                                                aria-label="1枚増やす">＋</button>
+                                            <button type="button" id="bizcardRequestInc10Btn"
+                                                class="flex h-10 w-12 items-center justify-center rounded-lg border border-outline-variant bg-surface text-on-surface-variant text-sm font-bold shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                                                aria-label="10枚増やす">+10</button>
+                                            <button type="button" id="bizcardRequestInc100Btn"
+                                                class="flex h-10 w-16 items-center justify-center rounded-lg border border-outline-variant bg-surface text-on-surface-variant text-sm font-bold shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                                                aria-label="100枚増やす">+100</button>
                                         </div>
 
                                         <!-- 最低請求バッジ（インライン） -->

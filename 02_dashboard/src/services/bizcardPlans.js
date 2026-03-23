@@ -98,8 +98,6 @@ const PREMIUM_OPTION_GROUPS = [
             ja: '日本語に加えて中国語（繁体字・簡体字）など複数言語の翻訳入力を追加します。',
             en: 'Add translation entry fields so cards can be processed in Japanese, Traditional/Simplified Chinese, and other languages.'
         },
-        unitPrice: 100,
-
         icon: 'language'
     },
     {

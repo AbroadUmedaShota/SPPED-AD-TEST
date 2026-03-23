@@ -46,9 +46,9 @@ export function initBizcardSettings() {
     const bizcardRequestDecBtn = document.getElementById('bizcardRequestDecBtn');
     const bizcardRequestIncBtn = document.getElementById('bizcardRequestIncBtn');
     const bizcardRequestDec100Btn = document.getElementById('bizcardRequestDec100Btn');
+    const bizcardRequestDec10Btn = document.getElementById('bizcardRequestDec10Btn');
+    const bizcardRequestInc10Btn = document.getElementById('bizcardRequestInc10Btn');
     const bizcardRequestInc100Btn = document.getElementById('bizcardRequestInc100Btn');
-    const bizcardRequestSlider = document.getElementById('bizcardRequestSlider');
-
     // Modals
     const bizcardDetailsModal = document.getElementById('bizcardDetailsModal');
     const openBizcardDetailsModalBtn = document.getElementById('openBizcardDetailsModalBtn');
@@ -149,7 +149,7 @@ export function initBizcardSettings() {
             setInitialFormValues(state.settings);
             
             if (skipBizcardToggle) {
-                skipBizcardToggle.checked = state.isSkipped;
+                skipBizcardToggle.checked = !state.isSkipped;
                 applySkipState();
             }
 
@@ -176,7 +176,7 @@ export function initBizcardSettings() {
         
         // Use click or change on checkbox
         if (skipBizcardToggle) skipBizcardToggle.addEventListener('change', (e) => {
-            state.isSkipped = e.target.checked;
+            state.isSkipped = !e.target.checked;
             state.settings.bizcardEnabled = !state.isSkipped;
             applySkipState();
             updateFullUI();
@@ -208,7 +208,6 @@ export function initBizcardSettings() {
             const clamped = Math.max(0, Math.min(9999, isNaN(parsed) ? 0 : Math.round(parsed)));
             state.settings.bizcardRequest = clamped;
             if (bizcardRequestInput) bizcardRequestInput.value = clamped;
-            if (bizcardRequestSlider) bizcardRequestSlider.value = Math.min(clamped, 5000);
             updateFullUI();
         }
 
@@ -231,24 +230,29 @@ export function initBizcardSettings() {
                 setRequestCount(current - 100);
             });
         }
+        if (bizcardRequestDec10Btn) {
+            bizcardRequestDec10Btn.addEventListener('click', () => {
+                const current = parseInt(bizcardRequestInput?.value || 0, 10);
+                setRequestCount(current - 10);
+            });
+        }
+        if (bizcardRequestInc10Btn) {
+            bizcardRequestInc10Btn.addEventListener('click', () => {
+                const current = parseInt(bizcardRequestInput?.value || 0, 10);
+                setRequestCount(current + 10);
+            });
+        }
         if (bizcardRequestInc100Btn) {
             bizcardRequestInc100Btn.addEventListener('click', () => {
                 const current = parseInt(bizcardRequestInput?.value || 0, 10);
                 setRequestCount(current + 100);
             });
         }
-        if (bizcardRequestSlider) {
-            bizcardRequestSlider.addEventListener('input', () => {
-                setRequestCount(parseInt(bizcardRequestSlider.value, 10));
-            });
-        }
-
-        // Keep slider in sync when user types directly in the number input
         if (bizcardRequestInput) {
             bizcardRequestInput.addEventListener('input', () => {
                 const val = parseInt(bizcardRequestInput.value, 10);
                 if (!isNaN(val)) {
-                    if (bizcardRequestSlider) bizcardRequestSlider.value = Math.min(val, 5000);
+                    setRequestCount(val);
                 }
             });
         }
@@ -284,7 +288,7 @@ export function initBizcardSettings() {
     function hasFormChanged() {
         // Form states
         const currentSettings = {
-            bizcardEnabled: !skipBizcardToggle.checked,
+            bizcardEnabled: skipBizcardToggle.checked,
             bizcardRequest: Math.max(0, parseInt(bizcardRequestInput?.value || 0, 10)),
             dataConversionPlan: document.querySelector('input[name="dataConversionPlan"]:checked')?.value,
             internalMemo: internalMemoInput?.value || '',
@@ -507,11 +511,6 @@ export function initBizcardSettings() {
         if (bizcardRequestInput && document.activeElement !== bizcardRequestInput) {
             bizcardRequestInput.value = state.settings.bizcardRequest;
         }
-        // Keep slider in sync with state
-        if (bizcardRequestSlider) {
-            bizcardRequestSlider.value = Math.min(state.settings.bizcardRequest, 5000);
-        }
-
         renderDataConversionPlans(DATA_CONVERSION_PLANS, state.settings.dataConversionPlan);
         renderPremiumOptions(PREMIUM_OPTION_GROUPS, state.settings.premiumOptions);
 

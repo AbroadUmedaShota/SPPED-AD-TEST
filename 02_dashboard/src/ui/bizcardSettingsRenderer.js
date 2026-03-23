@@ -36,7 +36,6 @@ function cacheDOMElements() {
     dom.estimateBreakdown = document.getElementById('estimateBreakdown');
     dom.minChargeNotice = document.getElementById('minChargeNotice');
     dom.minChargeNoticeText = document.getElementById('minChargeNoticeText');
-    dom.bizcardRequestSlider = document.getElementById('bizcardRequestSlider');
     dom.bizcardRequestPresets = document.getElementById('bizcardRequestPresets');
     dom.saveButton = document.getElementById('saveBizcardSettingsBtn');
     dom.saveButtonText = document.getElementById('saveBizcardSettingsBtnText');
