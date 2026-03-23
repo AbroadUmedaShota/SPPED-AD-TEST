@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SPEED-AD - アンケート作成・編集</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: 'var(--color-primary)',
+            secondary: 'var(--color-secondary)',
+            error: 'var(--color-error)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Material Icons CDN -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  
+  <!-- flatpickr CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  
+  <!-- Custom Base CSS -->
+  <link rel="stylesheet" href="service-top-style.css">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+  <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+  
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval'">
+  <!-- Papa Parse -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+
+  <style>
+    /* UI Custom Overrides for V2 */
+    .sticky-panel {
+      position: sticky;
+      top: 5rem;
+      max-height: calc(100vh - 6rem);
+      overflow-y: auto;
+      scrollbar-width: thin;
+      overscroll-behavior: contain;
+    }
+    .sticky-panel::-webkit-scrollbar {
+      width: 6px;
+    }
+    .sticky-panel::-webkit-scrollbar-thumb {
+      background-color: var(--color-outline-variant);
+      border-radius: 4px;
+    }
+
+    /* Accordion transitions */
+    .v2-accordion-body {
+      overflow: hidden;
+      transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
+      max-height: 2000px;
+      opacity: 1;
+    }
+    .v2-accordion-body.v2-collapsed {
+      max-height: 0 !important;
+      opacity: 0;
+      pointer-events: none;
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+      border-top-width: 0 !important;
+      margin-top: 0 !important;
+    }
+    .v2-accordion-trigger[aria-expanded="false"] [data-accordion-icon] {
+      transform: rotate(180deg);
+    }
+    [data-accordion-icon] {
+      transition: transform 0.3s ease;
+    }
+
+    /* Drag effects */
+    .dragging-item {
+      background-color: #f0fdf4 !important; /* light green for visibility */
+      opacity: 0.9;
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+      border: 2px solid var(--color-primary);
+      z-index: 50;
+      border-radius: 0.5rem;
+    }
+
+    /* Input floating labels & groups */
+    .input-group { position: relative; margin-bottom: 1rem; }
+    .input-field {
+      width: 100%;
+      border-radius: 0.5rem;
+      border: 1px solid var(--color-outline-variant);
+      padding: 0.75rem 1rem;
+      background-color: var(--color-surface);
+      color: var(--color-on-surface);
+      transition: all 0.2s ease;
+    }
+    .input-field:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1); /* Primary color shadow */
+    }
+    .input-label {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--color-on-surface-variant);
+      font-size: 0.875rem;
+      transition: all 0.2s ease;
+      pointer-events: none;
+      background: var(--color-surface);
+      padding: 0 0.25rem;
+    }
+    .input-field:focus + .input-label,
+    .input-field:not(:placeholder-shown) + .input-label {
+      top: 0;
+      font-size: 0.75rem;
+      color: var(--color-primary);
+    }
+    
+    textarea.input-field {
+      padding-top: 1.25rem;
+    }
+    textarea.input-field + .input-label {
+      top: 1rem;
+    }
+
+    /* Glassmorphism touches for panels */
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    /* Outline Map active item indicator */
+    .outline-item.active {
+      background-color: rgba(66, 133, 244, 0.1);
+      color: var(--color-primary);
+      font-weight: 600;
+      border-left: 3px solid var(--color-primary);
+      padding-left: 0.75em;
+    }
+
+    /* Toast container */
+    #toast-container {
+      position: fixed;
+      top: 5rem;
+      right: 1.5rem;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    /* Lang Tabs setup */
+    .lang-tab-handle { cursor: grab; }
+  </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900" data-page-id="survey-creation-v2">
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container"></div>
+
+  <div class="relative flex min-h-screen flex-col">
+    <!-- Header Placeholder -->
+    <div id="header-placeholder" class="fixed top-0 w-full z-40 bg-white shadow-sm h-16 flex items-center px-4">
+      <div class="font-bold text-xl text-primary tracking-wide">SPEED-AD</div>
+    </div>
+
+    <div class="flex flex-1 pt-16">
+      
+      <!-- Main Content Container Wrapper -->
+      <main class="flex flex-1 flex-col py-6 px-4 sm:px-6 lg:px-8 pb-32">
+        <div class="w-full max-w-7xl mx-auto">
+          
+          <!-- Breadcrumbs -->
+          <nav id="breadcrumb-container" class="mb-4 text-sm text-gray-500 flex items-center gap-2">
+            <a href="#" class="hover:text-primary transition-colors">ダッシュボード</a>
+            <span class="material-icons text-sm">chevron_right</span>
+            <span class="font-medium text-gray-900">アンケート作成・編集</span>
+          </nav>
+
+          <!-- Heading -->
+          <h1 class="text-3xl font-extrabold tracking-tight mb-8">アンケート作成・編集</h1>
+
+          <!-- 3-Area Grid Layout -->
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8 items-start relative">
+
+            <!-- ============================== -->
+            <!-- 1. SETTING COLUMN (Left Area)  -->
+            <!-- ============================== -->
+            <div id="settings-column" class="md:col-span-4 lg:col-span-3 flex flex-col gap-5 sticky-panel">
+              
+              <!-- 1. 基本情報 (Basic Info) -->
+              <div class="bg-white border text-gray-800 rounded-xl shadow-sm overflow-hidden border-gray-200">
+                <button type="button" class="v2-accordion-trigger w-full flex items-center justify-between px-5 py-4 bg-gray-50 hover:bg-gray-100 transition-colors" data-accordion-v2="basicInfoBody" aria-expanded="true">
+                  <h2 class="text-base font-bold flex items-center gap-2"><span class="material-icons text-primary">feed</span>基本情報</h2>
+                  <span class="material-icons text-gray-500" data-accordion-icon>expand_less</span>
+                </button>
+                <div id="basicInfoBody" class="v2-accordion-body p-5 flex flex-col gap-4">
+                  <!-- Survey Name (Admin) -->
+                  <div class="input-group mb-0">
+                    <input type="text" id="surveyName_ja" placeholder=" " class="input-field" maxlength="50" required>
+                    <label for="surveyName_ja" class="input-label">アンケート名 (管理用)<span class="text-error">*</span></label>
+                  </div>
+                  <!-- Display Title -->
+                  <div class="input-group mb-0 multi-lang-input-group" data-lang="ja">
+                    <input type="text" id="displayTitle_ja" placeholder=" " class="input-field" maxlength="100" required>
+                    <label for="displayTitle_ja" class="input-label">表示タイトル<span class="text-error">*</span></label>
+                  </div>
+                  <!-- Description -->
+                  <div class="input-group mb-0 multi-lang-input-group" data-lang="ja">
+                    <textarea id="description_ja" placeholder=" " class="input-field min-h-[5rem] resize-y" maxlength="500"></textarea>
+                    <label for="description_ja" class="input-label">説明</label>
+                  </div>
+                  <!-- Period Range -->
+                  <div class="input-group mb-0 relative">
+                    <input type="text" id="periodRange" placeholder=" " class="input-field pr-10" required>
+                    <label for="periodRange" class="input-label">アンケート期間<span class="text-error">*</span></label>
+                    <span class="material-icons absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 pointer-events-none">calendar_today</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 2. 連携設定 (Integration Settings) -->
+              <div class="bg-white border text-gray-800 rounded-xl shadow-sm overflow-hidden border-gray-200">
+                <button type="button" class="v2-accordion-trigger w-full flex items-center justify-between px-5 py-4 bg-gray-50 hover:bg-gray-100 transition-colors" data-accordion-v2="integrationBody" aria-expanded="true">
+                  <h2 class="text-base font-bold flex items-center gap-2" id="section-integration-settings"><span class="material-icons text-primary">link</span>連携設定</h2>
+                  <span class="material-icons text-gray-500" data-accordion-icon>expand_less</span>
+                </button>
+                <div id="integrationBody" class="v2-accordion-body p-5 space-y-5">
+                  <!-- Bizcard Toggle -->
+                  <div class="flex items-start justify-between bg-gray-50 p-3 rounded-lg border border-gray-100">
+                    <div class="flex-1 pr-3">
+                      <p class="font-bold text-sm">名刺画像添付機能</p>
+                      <p class="text-xs text-gray-500 mt-1 leading-snug">回答時に名刺撮影ステップを追加します。OFFにすると関連設定が無効化されます。</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer flex-shrink-0 mt-1">
+                      <input type="checkbox" id="bizcardEnabled" class="sr-only peer">
+                      <div class="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 peer-focus:ring-2 peer-focus:ring-green-300 transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+                    </label>
+                  </div>
+                  <!-- Multilingual Toggle -->
+                  <div class="flex items-start justify-between bg-gray-50 p-3 rounded-lg border border-gray-100 relative">
+                    <div class="flex-1 pr-3">
+                      <p class="font-bold text-sm text-amber-700 flex items-center gap-1"><span class="material-icons text-[16px]">stars</span>多言語機能 (Premium)</p>
+                      <p class="text-xs text-gray-500 mt-1 leading-snug">複数言語でアンケートを提供します。</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer flex-shrink-0 mt-1">
+                      <input type="checkbox" id="multilingualEnabledToggle" class="sr-only peer">
+                      <div class="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 peer-focus:ring-2 peer-focus:ring-green-300 transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+                    </label>
+                  </div>
+                  <!-- Multilingual Config UI -->
+                  <div id="multilingual-controls" class="hidden border-t pt-4">
+                    <p class="text-xs font-bold text-gray-700 mb-2">追加可能言語</p>
+                    <div id="languageSelectionPanel" class="flex flex-wrap gap-2 mb-4">
+                      <!-- Rendered by JS -->
+                    </div>
+                    <p class="text-xs text-gray-500 mb-1">最左タブ = 第一言語 (デフォルト表示)</p>
+                    <div id="languageEditorTabsV2" class="flex items-center flex-wrap gap-1 border-b border-gray-200" role="tablist">
+                      <!-- Rendered by JS -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. 追加設定 (Additional Settings) -->
+              <div class="bg-white border text-gray-800 rounded-xl shadow-sm overflow-hidden border-gray-200">
+                <button type="button" class="v2-accordion-trigger w-full flex items-center justify-between px-5 py-4 bg-gray-50 hover:bg-gray-100 transition-colors" data-accordion-v2="additionalSettingsBody" aria-expanded="true">
+                  <h2 class="text-base font-bold flex items-center gap-2" id="section-additional-settings"><span class="material-icons text-primary">settings_suggest</span>追加設定</h2>
+                  <span class="material-icons text-gray-500" data-accordion-icon>expand_less</span>
+                </button>
+                <div id="additionalSettingsBody" class="v2-accordion-body p-4 space-y-4">
+                  <!-- Bizcard Data Config -->
+                  <div id="bizcardDataSettingsSection" class="border border-gray-200 rounded-lg opacity-40 pointer-events-none transition-opacity">
+                    <button type="button" class="v2-accordion-trigger w-full flex items-center justify-between px-4 py-3 bg-gray-50" data-accordion-v2="bizcardDataBody" aria-expanded="false">
+                      <span class="text-sm font-bold">名刺データ化設定</span>
+                      <span class="material-icons text-sm" data-accordion-icon>expand_more</span>
+                    </button>
+                    <div id="bizcardDataBody" class="v2-accordion-body v2-collapsed p-4 border-t">
+                      <div class="input-group mb-3">
+                        <select id="bizcardOcrMode" class="input-field" required>
+                          <option value="standard">標準（自動）</option>
+                          <option value="manual">手動確認</option>
+                        </select>
+                        <label class="input-label bg-white px-1">データ化モード</label>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Thank You Email Config -->
+                  <div id="thankYouEmailSettingsSection" class="border border-gray-200 rounded-lg opacity-40 pointer-events-none transition-opacity">
+                    <button type="button" class="v2-accordion-trigger w-full flex items-center justify-between px-4 py-3 bg-gray-50" data-accordion-v2="thankYouEmailBody" aria-expanded="false">
+                      <span class="text-sm font-bold">お礼メール設定</span>
+                      <span class="material-icons text-sm" data-accordion-icon>expand_more</span>
+                    </button>
+                    <div id="thankYouEmailBody" class="v2-accordion-body v2-collapsed p-4 border-t space-y-4 shadow-inner bg-gray-50">
+                      <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm font-bold">メール送信機能</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                          <input type="checkbox" id="thankYouEmailEnabled" class="sr-only peer">
+                          <div class="w-9 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div>
+                        </label>
+                      </div>
+                      <div class="input-group mb-0">
+                        <input type="text" id="thankYouEmailSubject" placeholder=" " class="input-field bg-white">
+                        <label class="input-label bg-transparent">件名</label>
+                      </div>
+                      <div class="input-group mb-0">
+                        <textarea id="thankYouEmailBody_content" placeholder=" " class="input-field min-h-[5rem] bg-white"></textarea>
+                        <label class="input-label bg-transparent">本文</label>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Thank You Screen Config (Integrated) -->
+                  <div class="border border-gray-200 rounded-lg">
+                    <button type="button" class="v2-accordion-trigger w-full flex items-center justify-between px-4 py-3 bg-gray-50" data-accordion-v2="thankYouScreenBody" aria-expanded="false">
+                      <span class="text-sm font-bold">サンクス画面設定</span>
+                      <span class="material-icons text-sm" data-accordion-icon>expand_more</span>
+                    </button>
+                    <div id="thankYouScreenBody" class="v2-accordion-body v2-collapsed p-4 border-t space-y-4 shadow-inner bg-gray-50">
+                      <div class="input-group mb-0 multi-lang-input-group" data-lang="ja">
+                        <textarea id="thankYouMessage_ja" placeholder=" " class="input-field min-h-[5rem] bg-white" maxlength="500"></textarea>
+                        <label class="input-label bg-transparent">サンクスメッセージ</label>
+                      </div>
+                      <div class="flex justify-between items-center">
+                        <div>
+                          <p class="font-bold text-sm">連続回答の許可</p>
+                          <p class="text-[10px] text-gray-500 mt-1">同端末で続けて回答を受け付けます</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
+                          <input type="checkbox" id="allowContinuousAnswer" class="sr-only peer">
+                          <div class="w-9 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 4. メモ (Memo) -->
+              <div class="bg-white border text-gray-800 rounded-xl shadow-sm overflow-hidden border-gray-200">
+                <button type="button" class="v2-accordion-trigger w-full flex items-center justify-between px-5 py-4 bg-gray-50 hover:bg-gray-100 transition-colors" data-accordion-v2="memoBody" aria-expanded="true">
+                  <h2 class="text-base font-bold flex items-center gap-2" id="section-memo"><span class="material-icons text-primary">edit_note</span>管理メモ</h2>
+                  <span class="material-icons text-gray-500" data-accordion-icon>expand_less</span>
+                </button>
+                <div id="memoBody" class="v2-accordion-body p-4">
+                  <div class="input-group mb-0">
+                    <textarea id="memo" placeholder=" " class="input-field min-h-[6rem] bg-gray-50" maxlength="1000"></textarea>
+                    <label class="input-label bg-transparent text-gray-500">管理者のみ閲覧可能</label>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+            <!-- /SETTING COLUMN -->
+
+            <!-- ============================== -->
+            <!-- 2. QUESTION COLUMN (Center)    -->
+            <!-- ============================== -->
+            <div id="questions-column" class="md:col-span-8 lg:col-span-6 flex flex-col gap-6">
+              
+              <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm min-h-[50vh]">
+                <div class="flex items-center justify-between border-b pb-4 mb-6">
+                  <h2 class="text-xl font-bold flex items-center gap-2 text-gray-800">
+                    <span class="material-icons text-primary">format_list_bulleted</span>設問リスト
+                  </h2>
+                  <span id="questionCountBadge" class="text-sm font-bold text-primary bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">0問</span>
+                </div>
+
+                <!-- Flat Question List Container -->
+                <div id="questionListContainer" class="space-y-4 mb-8">
+                  <div id="questionListEmpty" class="text-center py-16 px-4 bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl">
+                    <span class="material-icons text-5xl text-gray-300 block mb-3">note_add</span>
+                    <p class="text-gray-500 font-medium text-sm">設問がありません。</p>
+                    <p class="text-gray-400 text-xs mt-1">下のボタンから設問を追加して作成を始めてください。</p>
+                  </div>
+                </div>
+
+                <!-- Create Question Button (Inline inlineQuestionTypeMenu logic) -->
+                <div id="addQuestionInlineArea" class="relative">
+                  <button type="button" id="addQuestionInlineBtn" class="w-full flex items-center justify-center gap-2 py-4 rounded-xl border-2 border-dashed border-gray-300 text-gray-500 font-bold hover:border-primary hover:bg-indigo-50 hover:text-primary transition-all duration-200 group">
+                    <span class="material-icons group-hover:scale-125 transition-transform">add_circle_outline</span>
+                    設問を追加する
+                  </button>
+                  <div id="inlineQuestionTypeMenu" class="hidden absolute top-full mt-2 w-full z-10 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden p-2 grid grid-cols-2 gap-1 animate-fade-in-down">
+                    <!-- Populated by JS -->
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            <!-- /QUESTION COLUMN -->
+
+            <!-- ============================== -->
+            <!-- 3. OUTLINE PANEL (Right Area)  -->
+            <!-- ============================== -->
+            <div id="outline-column" class="hidden lg:flex lg:col-span-3 flex-col gap-5 sticky-panel glass-panel bg-white/80 p-0 border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+              
+              <div class="p-5 overflow-y-auto flex-1 border-b">
+                <h3 class="text-xs font-black tracking-widest text-gray-400 uppercase mb-4 flex items-center gap-1">
+                  <span class="material-icons text-sm">toc</span> ドキュメントマップ
+                </h3>
+                <nav id="outline-map-list" class="space-y-1 text-sm font-medium">
+                  <!-- Section outlines -->
+                  <a href="#basicInfoBody" class="outline-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-600 transition-colors">
+                    <span class="material-icons text-sm opacity-60">info</span> 基本情報
+                  </a>
+                  <a href="#integrationBody" class="outline-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-600 transition-colors">
+                    <span class="material-icons text-sm opacity-60">link</span> 連携設定
+                  </a>
+                  <a href="#additionalSettingsBody" class="outline-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-600 transition-colors">
+                    <span class="material-icons text-sm opacity-60">tune</span> 追加設定
+                  </a>
+                  <a href="#memoBody" class="outline-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-600 transition-colors">
+                    <span class="material-icons text-sm opacity-60">sticky_note_2</span> メモ
+                  </a>
+                  
+                  <div class="h-px bg-gray-200 my-4 mx-2"></div>
+                  
+                  <!-- Question Outlines populated by JS -->
+                  <div id="outline-questions-list" class="space-y-1 text-sm"></div>
+                </nav>
+              </div>
+
+              <!-- Sticky Actions mapped here -->
+              <div class="p-5 bg-gray-50 flex flex-col gap-3" id="outline-action-buttons">
+                <button type="button" id="showPreviewBtn" class="w-full flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm">
+                  <span class="material-icons text-[18px]">visibility</span> プレビュー
+                </button>
+                <div class="grid grid-cols-2 gap-3">
+                  <button type="button" id="openQrModalBtn" class="flex items-center justify-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-bold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm disabled:opacity-40 disabled:cursor-not-allowed" disabled>
+                    <span class="material-icons text-[16px]">qr_code</span> QR発行
+                  </button>
+                  <button type="button" id="cancelCreateSurvey" class="flex items-center justify-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-bold text-red-700 hover:bg-red-100 transition-colors shadow-sm">
+                    キャンセル
+                  </button>
+                </div>
+                <!-- SAVE ACTION -->
+                <button type="button" id="createSurveyBtn" class="w-full flex items-center justify-center gap-2 rounded-lg bg-primary text-white px-4 py-3.5 text-base font-bold hover:bg-blue-600 transition-colors shadow-md mt-2 disabled:bg-gray-300 disabled:cursor-not-allowed">
+                  <span class="material-icons text-[20px]">save</span> アンケート保存
+                </button>
+              </div>
+
+            </div>
+            <!-- /OUTLINE PANEL -->
+
+          </div>
+          <!-- END 3-AREA GRID -->
+
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Mobile Fixed Action Bar (Bottom) - Only shows <= md screens -->
+  <div id="mobile-action-bar" class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] h-20 z-50 flex items-center justify-between px-4 pb-4 pt-2 gap-1 sm:gap-2">
+    <button type="button" id="showPreviewBtnMobile" class="flex-1 flex flex-col items-center justify-center text-gray-600 hover:text-primary transition-colors">
+      <span class="material-icons text-xl">visibility</span>
+      <span class="text-[10px] font-bold mt-0.5">プレビュー</span>
+    </button>
+    <button type="button" id="openQrModalBtnMobile" class="flex-1 flex flex-col items-center justify-center text-gray-600 hover:text-primary transition-colors opacity-40 cursor-not-allowed" disabled>
+      <span class="material-icons text-xl">qr_code</span>
+      <span class="text-[10px] font-bold mt-0.5">QR発行</span>
+    </button>
+    <button type="button" id="cancelCreateSurveyMobile" class="flex-1 flex flex-col items-center justify-center text-red-500 hover:text-red-700 transition-colors">
+      <span class="material-icons text-xl">close</span>
+      <span class="text-[10px] font-bold mt-0.5">キャンセル</span>
+    </button>
+    <button type="button" id="createSurveyBtnMobile" class="flex-[2] bg-primary text-white rounded-full py-2.5 px-2 sm:px-4 font-bold text-sm shadow inline-flex items-center justify-center gap-1 sm:gap-2 disabled:bg-gray-300">
+      <span class="material-icons text-sm">save</span> 保存する
+    </button>
+  </div>
+
+  <!-- Main Floating Action Button (FAB) -->
+  <div id="fab-container" class="fixed bottom-24 lg:bottom-10 right-4 lg:right-10 z-[100]">
+    <button type="button" id="fab-main-button" class="w-14 h-14 bg-primary text-white rounded-full flex items-center justify-center shadow-xl hover:shadow-primary/40 hover:scale-110 transition-all focus:outline-none focus:ring-4 focus:ring-blue-200 group">
+      <span class="material-icons text-3xl group-hover:rotate-90 transition-transform duration-300">add</span>
+    </button>
+    <!-- FAB Menu Items populated by JS logic -->
+    <div id="fab-menu" class="absolute bottom-16 right-0 w-64 bg-white rounded-2xl shadow-2xl p-2 transition-all duration-200 origin-bottom-right scale-95 opacity-0 pointer-events-none hidden mt-2 h-[60vh] overflow-y-auto">
+      <!-- Generated by JS -->
+    </div>
+  </div>
+
+  <!-- Dialogs & Modals -->
+  <div id="questionTypeChangeDialog" class="fixed inset-0 bg-gray-900/60 z-[1000] hidden items-center justify-center p-4 backdrop-blur-sm" role="dialog" aria-modal="true">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 animate-fade-in-up">
+      <h3 class="text-lg font-bold text-gray-900 mb-2 flex items-center gap-2"><span class="material-icons text-amber-500">warning</span> タイプ変更の確認</h3>
+      <p class="text-sm text-gray-600 mb-6 leading-relaxed">設問のタイプを変更すると、入力済みの選択肢や詳細設定が破棄される場合があります。本当によろしいですか？</p>
+      <div class="flex flex-col-reverse sm:flex-row justify-end gap-3">
+        <button type="button" id="typeChangeCancel" class="w-full sm:w-auto px-5 py-2.5 rounded-lg border border-gray-300 text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors">
+          キャンセル
+        </button>
+        <button type="button" id="typeChangeConfirm" class="w-full sm:w-auto px-5 py-2.5 rounded-lg bg-red-600 text-white text-sm font-bold hover:bg-red-700 transition-colors shadow-sm">
+          変更をコミット
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS Dependencies -->
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
+
+  <!-- External JS Module -->
+  <script type="module" src="src/surveyCreation-v2.js"></script>
+  
+  <style>
+    /* Small Animations */
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-in-up { animation: fadeInUp 0.3s ease-out forwards; }
+    
+    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-in-down { animation: fadeInDown 0.2s ease-out forwards; }
+  </style>
+
+</body>
+</html>
