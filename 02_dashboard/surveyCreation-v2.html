@@ -181,44 +181,68 @@
           <!-- Heading -->
           <h1 class="text-3xl font-extrabold tracking-tight mb-8">アンケート作成・編集</h1>
 
-          <!-- 3-Area Grid Layout -->
-          <div class="grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8 items-start relative">
+            <!-- ============================== -->
+            <!-- 0. BASIC INFO & MEMO (Top)     -->
+            <!-- ============================== -->
+            <div class="md:col-span-12 lg:col-span-9 lg:row-start-1 mb-4 lg:mb-0 w-full min-w-0 flex flex-col gap-6">
 
-            <!-- ============================== -->
-            <!-- 0. BASIC INFO (Top Spanning)   -->
-            <!-- ============================== -->
-            <div class="md:col-span-12 lg:col-span-9 lg:row-start-1 mb-2 lg:mb-0 w-full min-w-0">
-              <div class="bg-white border text-gray-800 rounded-xl shadow-sm overflow-visible border-gray-200">
-                <button type="button" class="v2-accordion-trigger w-full flex items-center justify-between px-5 py-4 bg-gray-50 hover:bg-gray-100 transition-colors" data-accordion-v2="basicInfoBody" aria-expanded="true">
-                  <h2 class="text-base font-bold flex items-center gap-2"><span class="material-icons text-primary">feed</span>基本情報</h2>
-                  <span class="material-icons text-gray-500" data-accordion-icon>expand_less</span>
-                </button>
-                <div id="basicInfoBody" class="v2-accordion-body p-5">
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-5 gap-y-6">
-                    <!-- Survey Name (Admin) -->
-                    <div class="input-group mb-0">
-                      <input type="text" id="surveyName_ja" placeholder=" " class="input-field" maxlength="50" required>
-                      <label for="surveyName_ja" class="input-label">アンケート名 (管理用)<span class="text-error">*</span></label>
-                    </div>
-                    <!-- Display Title -->
-                    <div class="input-group mb-0 multi-lang-input-group" data-lang="ja">
-                      <input type="text" id="displayTitle_ja" placeholder=" " class="input-field" maxlength="100" required>
-                      <label for="displayTitle_ja" class="input-label">表示タイトル<span class="text-error">*</span></label>
-                    </div>
-                    <!-- Description -->
-                    <div class="input-group mb-0 multi-lang-input-group md:row-span-2 flex flex-col" data-lang="ja">
-                      <textarea id="description_ja" placeholder=" " class="input-field min-h-[5rem] flex-1 resize-y" maxlength="500"></textarea>
-                      <label for="description_ja" class="input-label">説明</label>
-                    </div>
-                    <!-- Period Range -->
-                    <div class="input-group mb-0 relative">
-                      <input type="text" id="periodRange" placeholder=" " class="input-field pr-10" required>
-                      <label for="periodRange" class="input-label">アンケート期間<span class="text-error">*</span></label>
-                      <span class="material-icons absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 pointer-events-none">calendar_today</span>
-                    </div>
+              <!-- === BASIC INFO CARD (Bizcard Data Settings style) === -->
+              <div id="basicInfoBody" class="rounded-2xl border border-gray-200 bg-white p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)] overflow-hidden relative group">
+                  <div class="absolute inset-0 bg-gradient-to-r from-blue-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+                  <div class="relative z-10 grid grid-cols-1 md:grid-cols-[2fr_1fr_1.5fr] gap-6 md:gap-0 divide-y md:divide-y-0 md:divide-x divide-gray-200">
+                      <!-- Survey Name -->
+                      <div class="flex flex-col gap-1.5 pb-4 md:pb-0 md:pr-4">
+                          <span class="text-[10px] font-black text-primary uppercase tracking-wider flex items-center gap-1">
+                              <span class="material-icons text-[14px]">label</span> Survey Name
+                          </span>
+                          <div class="flex items-center gap-1.5 mt-1">
+                              <span class="text-base font-bold text-gray-800 leading-tight" id="surveyNameDisplay">未設定</span>
+                              <!-- 既存機能破壊防止用 Hidden Input -->
+                              <input type="hidden" id="surveyName_ja" value="">
+                              <input type="hidden" id="displayTitle_ja" value="">
+                              <textarea id="description_ja" class="hidden"></textarea>
+                              <button type="button" class="material-icons text-gray-400 hover:text-primary transition-colors text-[16px]">help_outline</button>
+                          </div>
+                      </div>
+
+                      <!-- ID -->
+                      <div class="flex flex-col gap-1.5 py-4 md:py-0 md:px-6">
+                          <span class="text-[10px] font-black text-primary uppercase tracking-wider flex items-center gap-1">
+                              <span class="material-icons text-[14px]">fingerprint</span> ID
+                          </span>
+                          <div class="mt-1">
+                              <span class="text-sm font-mono font-bold text-gray-600 bg-gray-100 px-2 py-0.5 rounded w-fit select-all" id="surveyIdDisplay">未設定</span>
+                          </div>
+                      </div>
+
+                      <!-- Event Period -->
+                      <div class="flex flex-col gap-1.5 pt-4 md:pt-0 md:pl-6">
+                          <span class="text-[10px] font-black text-primary uppercase tracking-wider flex items-center gap-1">
+                              <span class="material-icons text-[14px]">calendar_today</span> Event Period
+                          </span>
+                          <div class="flex items-center gap-1.5 mt-1">
+                              <span class="text-sm font-bold text-gray-800" id="surveyPeriodDisplay">未設定</span>
+                              <input type="hidden" id="periodRange" value="">
+                              <button type="button" class="material-icons text-gray-400 hover:text-primary transition-colors text-[16px]">help_outline</button>
+                          </div>
+                      </div>
                   </div>
-                </div>
               </div>
+
+              <!-- === MEMO CARD === -->
+              <div id="memoBody" class="bg-white border text-gray-800 rounded-xl shadow-sm border-gray-200 p-5">
+                  <div class="flex items-center gap-2 mb-4">
+                    <span class="material-icons text-primary">edit_note</span>
+                    <h2 class="text-base font-bold">管理メモ</h2>
+                    <span class="text-xs text-gray-400 ml-auto bg-gray-100 px-2 py-1 rounded">管理者のみ閲覧可能</span>
+                  </div>
+                  <div class="input-group mb-0">
+                    <textarea id="memo" placeholder=" " class="input-field min-h-[5rem] bg-gray-50 resize-y" maxlength="1000"></textarea>
+                    <label for="memo" class="input-label bg-transparent">メモ内容</label>
+                  </div>
+              </div>
+
             </div>
 
             <!-- ============================== -->
@@ -338,20 +362,6 @@
                         </label>
                       </div>
                     </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- 4. メモ (Memo) -->
-              <div class="bg-white border text-gray-800 rounded-xl shadow-sm overflow-hidden border-gray-200">
-                <button type="button" class="v2-accordion-trigger w-full flex items-center justify-between px-5 py-4 bg-gray-50 hover:bg-gray-100 transition-colors" data-accordion-v2="memoBody" aria-expanded="true">
-                  <h2 class="text-base font-bold flex items-center gap-2" id="section-memo"><span class="material-icons text-primary">edit_note</span>管理メモ</h2>
-                  <span class="material-icons text-gray-500" data-accordion-icon>expand_less</span>
-                </button>
-                <div id="memoBody" class="v2-accordion-body p-4">
-                  <div class="input-group mb-0">
-                    <textarea id="memo" placeholder=" " class="input-field min-h-[6rem] bg-gray-50" maxlength="1000"></textarea>
-                    <label class="input-label bg-transparent text-gray-500">管理者のみ閲覧可能</label>
                   </div>
                 </div>
               </div>

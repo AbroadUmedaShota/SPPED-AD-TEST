@@ -993,12 +993,21 @@ async function loadSurveyData(surveyId) {
     const nameInput = document.getElementById('surveyName_ja');
     if(nameInput) nameInput.value = surveyNameJa || `アンケート ${surveyId}`;
     
+    const nameDisp = document.getElementById('surveyNameDisplay');
+    if(nameDisp) nameDisp.textContent = surveyNameJa || `アンケート ${surveyId}`;
+    
+    const idDisp = document.getElementById('surveyIdDisplay');
+    if(idDisp) idDisp.textContent = surveyId;
+    
     const titleInput = document.getElementById('displayTitle_ja');
     if(titleInput) titleInput.value = surveyNameJa;
     
     const periodInput = document.getElementById('periodRange');
-    if(periodInput && json.periodStart && json.periodEnd) {
-      periodInput.value = `${json.periodStart} to ${json.periodEnd}`;
+    const periodDisp = document.getElementById('surveyPeriodDisplay');
+    if(json.periodStart && json.periodEnd) {
+      const pStr = `${json.periodStart} - ${json.periodEnd}`;
+      if(periodInput) periodInput.value = pStr;
+      if(periodDisp) periodDisp.textContent = pStr;
     }
     
     const typeMap = {
