@@ -47,17 +47,40 @@
                     <!-- ====== 左カラム (メインエリア 65%) ====== -->
                     <div class="w-full lg:w-[65%] flex flex-col gap-6">
                         
-                        <!-- アンケート基本情報 -->
-                        <div class="rounded-2xl border border-outline-variant/60 bg-surface p-5 shadow-sm">
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-on-surface-variant">
-                                <div data-help-target="bizcard-survey-name">
-                                    <span class="font-bold text-on-surface">アンケート名:</span> <span id="surveyNameDisplay"></span>
-                                    <button type="button" class="help-trigger help-inline-button material-icons ml-1" data-help-key="surveyName" aria-label="アンケート名の説明を表示">help_outline</button>
+                        <!-- アンケート基本情報：SPEED-AD Standard Style -->
+                        <div class="rounded-2xl border border-outline-variant/60 bg-surface p-6 shadow-sm overflow-hidden relative group">
+                            <!-- 背景のアクセント（ホバー時に少しだけ変化） -->
+                            <div class="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+                            <div class="relative z-10 grid grid-cols-1 md:grid-cols-[2fr_1fr_1.5fr] gap-6 md:gap-0 divide-y md:divide-y-0 md:divide-x divide-outline-variant/30">
+                                <!-- アンケート名 -->
+                                <div class="flex flex-col gap-1.5 pb-4 md:pb-0" data-help-target="bizcard-survey-name">
+                                    <span class="text-[10px] font-black text-primary uppercase tracking-wider flex items-center gap-1">
+                                        <span class="material-icons text-[14px]">label</span> Survey Name
+                                    </span>
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="text-base font-bold text-on-surface leading-tight" id="surveyNameDisplay">業種別実用テンプレート (個人アカウント)</span>
+                                        <button type="button" class="help-trigger material-icons text-on-surface-variant/40 hover:text-primary transition-colors text-[18px]" data-help-key="surveyName" aria-label="アンケート名の説明を表示">help_outline</button>
+                                    </div>
                                 </div>
-                                <div><span class="font-bold text-on-surface">ID:</span> <span id="surveyIdDisplay"></span></div>
-                                <div data-help-target="bizcard-survey-period">
-                                    <span class="font-bold text-on-surface">会期:</span> <span id="surveyPeriodDisplay"></span>
-                                    <button type="button" class="help-trigger help-inline-button material-icons ml-1" data-help-key="surveyPeriod" aria-label="会期の説明を表示">help_outline</button>
+
+                                <!-- ID -->
+                                <div class="flex flex-col gap-1.5 py-4 md:py-0 md:pl-6">
+                                    <span class="text-[10px] font-black text-primary uppercase tracking-wider flex items-center gap-1">
+                                        <span class="material-icons text-[14px]">fingerprint</span> ID
+                                    </span>
+                                    <span class="text-sm font-mono font-bold text-on-surface-variant bg-surface-variant/50 px-2 py-0.5 rounded w-fit select-all" id="surveyIdDisplay">sv_0001_26008</span>
+                                </div>
+
+                                <!-- 会期 -->
+                                <div class="flex flex-col gap-1.5 pt-4 md:pt-0 md:pl-6" data-help-target="bizcard-survey-period">
+                                    <span class="text-[10px] font-black text-primary uppercase tracking-wider flex items-center gap-1">
+                                        <span class="material-icons text-[14px]">calendar_today</span> Event Period
+                                    </span>
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="text-sm font-bold text-on-surface" id="surveyPeriodDisplay">2026-01-04 - 2026-01-17</span>
+                                        <button type="button" class="help-trigger material-icons text-on-surface-variant/40 hover:text-primary transition-colors text-[18px]" data-help-key="surveyPeriod" aria-label="会期の説明を表示">help_outline</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -108,25 +131,38 @@
                                         </div>
 
                                         <!-- ステッパー（数値表示中央） -->
-                                        <div class="flex items-center justify-center gap-4">
-                                            <button type="button" id="bizcardRequestDecBtn"
-                                                class="flex h-11 w-11 items-center justify-center rounded-full border-2 border-outline-variant bg-surface text-on-surface-variant shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30"
-                                                aria-label="1枚減らす">
-                                                <span class="material-icons text-xl select-none">remove</span>
-                                            </button>
+                                        <div class="flex items-center justify-center gap-3">
+                                            <div class="flex items-center gap-1">
+                                                <button type="button" id="bizcardRequestDec100Btn"
+                                                    class="flex h-9 w-9 items-center justify-center rounded-lg border border-outline-variant bg-surface text-on-surface-variant text-[11px] font-bold shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                                                    aria-label="100枚減らす">-100</button>
+                                                <button type="button" id="bizcardRequestDecBtn"
+                                                    class="flex h-11 w-11 items-center justify-center rounded-full border-2 border-outline-variant bg-surface text-on-surface-variant shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                                                    aria-label="1枚減らす">
+                                                    <span class="material-icons text-xl select-none">remove</span>
+                                                </button>
+                                            </div>
 
                                             <div class="flex items-baseline gap-2">
-                                                <input type="number" id="bizcardRequest" min="0" max="9999" placeholder="100"
-                                                    class="w-32 rounded-xl border-2 border-outline-variant bg-surface px-3 py-2 text-center font-black text-4xl text-on-surface shadow-inner transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
-                                                    value="100">
+                                                <div class="relative group">
+                                                    <input type="number" id="bizcardRequest" min="0" max="9999" placeholder="100"
+                                                        class="w-32 rounded-xl border-2 border-outline-variant bg-surface px-3 py-2 text-center font-black text-4xl text-on-surface shadow-inner transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
+                                                        value="100">
+                                                    <div class="input-error-message text-center text-[10px] text-error font-bold leading-tight mt-1 h-3"></div>
+                                                </div>
                                                 <span class="font-bold text-xl text-on-surface-variant select-none">枚</span>
                                             </div>
 
-                                            <button type="button" id="bizcardRequestIncBtn"
-                                                class="flex h-11 w-11 items-center justify-center rounded-full border-2 border-outline-variant bg-surface text-on-surface-variant shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30"
-                                                aria-label="1枚増やす">
-                                                <span class="material-icons text-xl select-none">add</span>
-                                            </button>
+                                            <div class="flex items-center gap-1">
+                                                <button type="button" id="bizcardRequestIncBtn"
+                                                    class="flex h-11 w-11 items-center justify-center rounded-full border-2 border-outline-variant bg-surface text-on-surface-variant shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                                                    aria-label="1枚増やす">
+                                                    <span class="material-icons text-xl select-none">add</span>
+                                                </button>
+                                                <button type="button" id="bizcardRequestInc100Btn"
+                                                    class="flex h-9 w-9 items-center justify-center rounded-lg border border-outline-variant bg-surface text-on-surface-variant text-[11px] font-bold shadow-sm transition-all hover:border-primary hover:text-primary hover:bg-primary/5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                                                    aria-label="100枚増やす">+100</button>
+                                            </div>
                                         </div>
 
                                         <!-- スライダー -->
@@ -150,8 +186,7 @@
                                         </div>
                                     </div>
                                     <p class="text-[13px] text-on-surface-variant leading-relaxed">
-                                        ※未選択の場合は設定を完了できません。<br>
-                                        ※請求は毎月末締め・翌月末払いです。ご請求見込み金額（税抜）を右カラムにて確認してください。
+                                        ※未選択の場合は設定を完了できません。請求は毎月末締め・翌月末払いです。ご請求見込み金額（税抜）を右カラムにて確認してください。
                                     </p>
                                 </div>
 

@@ -10,7 +10,8 @@ import {
     setInitialFormValues,
     renderEstimate,
     renderDataConversionPlans,
-    renderPremiumOptions
+    renderPremiumOptions,
+    validateForm
 } from './ui/bizcardSettingsRenderer.js';
 import { showToast } from './utils.js';
 import { showConfirmationModal } from './confirmationModal.js';
@@ -44,6 +45,8 @@ export function initBizcardSettings() {
     // New UI controls: stepper / slider / presets
     const bizcardRequestDecBtn = document.getElementById('bizcardRequestDecBtn');
     const bizcardRequestIncBtn = document.getElementById('bizcardRequestIncBtn');
+    const bizcardRequestDec100Btn = document.getElementById('bizcardRequestDec100Btn');
+    const bizcardRequestInc100Btn = document.getElementById('bizcardRequestInc100Btn');
     const bizcardRequestSlider = document.getElementById('bizcardRequestSlider');
 
     // Modals
@@ -201,7 +204,8 @@ export function initBizcardSettings() {
          * Centralized handler: update state + sync all UI controls + re-calculate estimate.
          */
         function setRequestCount(newVal) {
-            const clamped = Math.max(0, Math.min(9999, Math.round(newVal) || 0));
+            const parsed = parseInt(newVal, 10);
+            const clamped = Math.max(0, Math.min(9999, isNaN(parsed) ? 0 : Math.round(parsed)));
             state.settings.bizcardRequest = clamped;
             if (bizcardRequestInput) bizcardRequestInput.value = clamped;
             if (bizcardRequestSlider) bizcardRequestSlider.value = Math.min(clamped, 5000);
@@ -219,6 +223,18 @@ export function initBizcardSettings() {
             bizcardRequestIncBtn.addEventListener('click', () => {
                 const current = parseInt(bizcardRequestInput?.value || 0, 10);
                 setRequestCount(current + 1);
+            });
+        }
+        if (bizcardRequestDec100Btn) {
+            bizcardRequestDec100Btn.addEventListener('click', () => {
+                const current = parseInt(bizcardRequestInput?.value || 0, 10);
+                setRequestCount(current - 100);
+            });
+        }
+        if (bizcardRequestInc100Btn) {
+            bizcardRequestInc100Btn.addEventListener('click', () => {
+                const current = parseInt(bizcardRequestInput?.value || 0, 10);
+                setRequestCount(current + 100);
             });
         }
         if (bizcardRequestSlider) {
@@ -247,6 +263,10 @@ export function initBizcardSettings() {
             skipBizcardToggleContainer.classList.replace('bg-surface-container-low', 'bg-blue-500/10');
             skipBizcardToggleContainer.classList.add('border-blue-500/30');
             
+            // クーポン入力も無効化
+            if (couponCodeInput) couponCodeInput.disabled = true;
+            if (applyCouponBtn) applyCouponBtn.disabled = true;
+
             // Re-validate to remove error borders if they existed
             if (bizcardRequestInput) bizcardRequestInput.classList.remove('border-error');
         } else {
@@ -254,6 +274,10 @@ export function initBizcardSettings() {
             rightColumnDisabledOverlay.classList.add('hidden');
             skipBizcardToggleContainer.classList.replace('bg-blue-500/10', 'bg-surface-container-low');
             skipBizcardToggleContainer.classList.remove('border-blue-500/30');
+
+            // クーポン入力を有効化
+            if (couponCodeInput) couponCodeInput.disabled = false;
+            if (applyCouponBtn) applyCouponBtn.disabled = false;
         }
     }
 
@@ -414,13 +438,9 @@ export function initBizcardSettings() {
 
     async function handleSaveSettings() {
         // Validation check (only if not skipped)
-        if (!state.isSkipped && bizcardRequestInput) {
-            const value = parseInt(bizcardRequestInput.value || 0, 10);
-            if (value <= 0) {
-                showToast('依頼枚数は1以上を入力してください。', 'error');
-                bizcardRequestInput.classList.add('border-error');
-                return;
-            }
+        if (!state.isSkipped && !validateForm(state.isSkipped)) {
+            showToast('入力内容に不備があります。確認してください。', 'error');
+            return;
         }
 
         const btnLoading = document.getElementById('saveBizcardSettingsBtnLoading');
@@ -513,17 +533,7 @@ export function initBizcardSettings() {
         updateCouponSectionUI();
         
         // Handle validation logic
-        if (!state.isSkipped && bizcardRequestInput) {
-            const value = parseInt(bizcardRequestInput.value || 0, 10);
-            if (value > 0) {
-                 bizcardRequestInput.classList.remove('border-error');
-                 saveButton.disabled = false;
-            } else {
-                 saveButton.disabled = true;
-            }
-        } else {
-            if(saveButton) saveButton.disabled = false;
-        }
+        validateForm(state.isSkipped);
     }
 
     function updateCouponSectionUI() {
