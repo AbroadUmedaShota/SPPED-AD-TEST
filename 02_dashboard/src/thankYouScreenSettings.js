@@ -258,6 +258,7 @@ export async function initThankYouScreenSettings() {
   const interactiveControls = [thankYouMessageInput, allowContinuousAnswerToggle, saveButton];
   const urlParams = new URLSearchParams(window.location.search);
   const surveyId = urlParams.get('surveyId');
+  const fromPage = urlParams.get('from') === 'v2' ? 'surveyCreation-v2.html' : 'surveyCreation.html';
   let survey = null;
   let initialSettings;
   let editorLanguage = BASE_LANGUAGE;
@@ -273,7 +274,7 @@ export async function initThankYouScreenSettings() {
       const tempDataString = localStorage.getItem('tempSurveyData');
       if (!tempDataString) {
         showToast(formatMessage(uiLanguage, 'thankYouSettings.tempDataMissing'), 'error');
-        setTimeout(() => { window.location.href = 'surveyCreation.html'; }, 2000);
+        setTimeout(() => { window.location.href = fromPage; }, 2000);
         disableThankYouScreenForm(interactiveControls, uiLanguage, formatMessage(uiLanguage, 'thankYouSettings.tempDataMissing'));
         return;
       }
@@ -378,14 +379,14 @@ export async function initThankYouScreenSettings() {
     initialSettings = JSON.parse(JSON.stringify(settingsToSave));
     showToast(formatMessage(uiLanguage, 'thankYouSettings.saved'), 'success');
     if (!surveyId) {
-      setTimeout(() => { window.location.href = 'surveyCreation.html'; }, 1000);
+      setTimeout(() => { window.location.href = fromPage; }, 1000);
     }
   });
 
   cancelButton.addEventListener('click', () => {
     const returnUrl = surveyId
-      ? `surveyCreation.html?surveyId=${encodeURIComponent(surveyId)}`
-      : 'surveyCreation.html';
+      ? `${fromPage}?surveyId=${encodeURIComponent(surveyId)}`
+      : fromPage;
     const currentSettings = {
       thankYouMessage: buildLocalizedMessage(settingsState.thankYouMessage),
       allowContinuousAnswer: Boolean(settingsState.allowContinuousAnswer)

@@ -4,6 +4,10 @@ const breadcrumbPaths = {
         { name: 'アンケート一覧', link: 'index.html' },
         { name: 'アンケート作成・編集' },
     ],
+    'surveyCreation-v2.html': [
+        { name: 'アンケート一覧', link: 'index.html' },
+        { name: 'アンケート作成・編集' },
+    ],
     'speed-review.html': [
         { name: 'アンケート一覧', link: 'index.html' },
         { name: 'SPEEDレビュー' },
@@ -29,7 +33,7 @@ const breadcrumbPaths = {
     ],
     'thankYouScreenSettings.html': [
         { name: 'アンケート一覧', link: 'index.html' },
-        { name: 'アンケート作成・編集', link: 'surveyCreation.html' },
+        { name: 'アンケート作成・編集', link: '#' },
         { name: 'サンクス画面設定' },
     ],
     'group-edit.html': [
@@ -51,7 +55,7 @@ const breadcrumbPaths = {
     ],
 };
 
-function generateBreadcrumbs(currentPage, surveyId = null) {
+function generateBreadcrumbs(currentPage, surveyId = null, fromPage = 'surveyCreation.html') {
     // graph-page.htmlは別ディレクトリにあるため、キーを正規化
     const pageKey = currentPage.includes('graph-page.html') ? 'graph-page.html' : currentPage;
     const paths = breadcrumbPaths[pageKey];
@@ -66,8 +70,8 @@ function generateBreadcrumbs(currentPage, surveyId = null) {
                 // graph-page.htmlからの相対パスを考慮
                 link = `../02_dashboard/speed-review.html?surveyId=${surveyId}`;
             } else {
-                // デフォルトはsurveyCreation.htmlへのリンク
-                link = `surveyCreation.html?surveyId=${surveyId}`;
+                // from パラメータに応じて返り先を切り替え
+                link = `${fromPage}?surveyId=${surveyId}`;
             }
         }
 
@@ -96,8 +100,9 @@ export function initBreadcrumbs() {
 
     const urlParams = new URLSearchParams(window.location.search);
     const surveyId = urlParams.get('surveyId');
+    const fromPage = urlParams.get('from') === 'v2' ? 'surveyCreation-v2.html' : 'surveyCreation.html';
 
-    const breadcrumbHtml = generateBreadcrumbs(currentPage, surveyId);
+    const breadcrumbHtml = generateBreadcrumbs(currentPage, surveyId, fromPage);
     const shouldHideBreadcrumb = !breadcrumbHtml || (!breadcrumbHtml.includes('chevron_right') && /アンケート一覧/.test(breadcrumbHtml));
     if (shouldHideBreadcrumb) {
         container.innerHTML = '';

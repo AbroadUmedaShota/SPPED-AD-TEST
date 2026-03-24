@@ -3,25 +3,127 @@
  * アンケート作成・編集 v2 ページ専用スクリプト
  */
 
-import { loadCommonHtml } from './utils.js';
+import { loadCommonHtml, resolveDashboardAssetPath } from './utils.js';
 import { initSidebarHandler } from './sidebarHandler.js';
 import { initBreadcrumbs } from './breadcrumb.js';
 import { initializeDatepickers } from './ui/datepicker.js';
 import { initHelpPopovers } from './ui/helpPopover.js';
 import { initThemeToggle } from './lib/themeToggle.js';
+import { handleOpenModal } from './modalHandler.js';
+import { populateQrCodeModal } from './qrCodeModal.js';
 
 function showToast(message, type = 'info') {
   const container = document.getElementById('toast-container');
   if (!container) return;
-  const typeClass = type === 'success' ? 'v2-toast--success'
-    : type === 'error' ? 'v2-toast--error'
-    : type === 'warning' ? 'v2-toast--warning'
-    : 'v2-toast--success';
+  const map = {
+    success: { cls: 'v2-toast--success', icon: 'check_circle' },
+    error:   { cls: 'v2-toast--error',   icon: 'error' },
+    warning: { cls: 'v2-toast--warning', icon: 'warning' },
+    info:    { cls: 'v2-toast--info',    icon: 'info' },
+  };
+  const { cls, icon: iconName } = map[type] ?? map.info;
   const toast = document.createElement('div');
-  toast.className = `v2-toast ${typeClass}`;
-  toast.textContent = message;
+  toast.className = `v2-toast ${cls}`;
+  const iconEl = document.createElement('span');
+  iconEl.className = 'material-icons text-[18px]';
+  iconEl.textContent = iconName;
+  toast.append(iconEl, document.createTextNode(message));
   container.appendChild(toast);
-  setTimeout(() => toast.remove(), 3000);
+  setTimeout(() => toast.remove(), 3500);
+}
+
+function trapFocus(modal, firstEl, lastEl) {
+  const onKeydown = (e) => {
+    if (e.key !== 'Tab') return;
+    if (e.shiftKey) {
+      if (document.activeElement === firstEl) { e.preventDefault(); lastEl.focus(); }
+    } else {
+      if (document.activeElement === lastEl) { e.preventDefault(); firstEl.focus(); }
+    }
+  };
+  modal.addEventListener('keydown', onKeydown);
+  return () => modal.removeEventListener('keydown', onKeydown);
+}
+
+function showNotice(message, type = 'info') {
+  const modal = document.getElementById('noticeModal');
+  const iconEl = document.getElementById('noticeModalIcon');
+  const titleEl = document.getElementById('noticeModalTitle');
+  const bodyEl = document.getElementById('noticeModalBody');
+  const okBtn = document.getElementById('noticeModalOk');
+  if (!modal) return;
+
+  const config = {
+    success: { icon: 'check_circle', color: 'text-green-500', title: '完了' },
+    error:   { icon: 'error',        color: 'text-red-500',   title: 'エラー' },
+    warning: { icon: 'warning',      color: 'text-amber-500', title: '注意' },
+    info:    { icon: 'info',         color: 'text-blue-500',  title: 'お知らせ' },
+  }[type] ?? { icon: 'info', color: 'text-blue-500', title: 'お知らせ' };
+
+  iconEl.className = `material-icons text-2xl flex-shrink-0 mt-0.5 ${config.color}`;
+  iconEl.textContent = config.icon;
+  titleEl.textContent = config.title;
+  bodyEl.textContent = message;
+
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+  const prevFocus = document.activeElement;
+  okBtn.focus();
+
+  const removeTrap = trapFocus(modal, okBtn, okBtn);
+
+  const close = () => {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    okBtn.removeEventListener('click', close);
+    modal.removeEventListener('click', onBackdrop);
+    modal.removeEventListener('keydown', onEscape);
+    removeTrap();
+    prevFocus?.focus();
+  };
+  const onBackdrop = (e) => { if (e.target === modal) close(); };
+  const onEscape = (e) => { if (e.key === 'Escape') close(); };
+  okBtn.addEventListener('click', close);
+  modal.addEventListener('click', onBackdrop);
+  modal.addEventListener('keydown', onEscape);
+}
+
+function showConfirm(title, message, okLabel, onOk) {
+  const modal = document.getElementById('confirmModal');
+  const titleEl = document.getElementById('confirmModalTitle');
+  const bodyEl = document.getElementById('confirmModalBody');
+  const okBtn = document.getElementById('confirmModalOk');
+  const cancelBtn = document.getElementById('confirmModalCancel');
+  if (!modal) { if (confirm(message)) onOk(); return; }
+
+  titleEl.textContent = title;
+  bodyEl.textContent = message;
+  okBtn.textContent = okLabel;
+
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+  const prevFocus = document.activeElement;
+  cancelBtn.focus();
+
+  const removeTrap = trapFocus(modal, cancelBtn, okBtn);
+
+  const close = () => {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    okBtn.removeEventListener('click', onConfirm);
+    cancelBtn.removeEventListener('click', close);
+    modal.removeEventListener('click', onBackdrop);
+    modal.removeEventListener('keydown', onEscape);
+    removeTrap();
+    prevFocus?.focus();
+  };
+  const onConfirm = () => { close(); onOk(); };
+  const onBackdrop = (e) => { if (e.target === modal) close(); };
+  const onEscape = (e) => { if (e.key === 'Escape') close(); };
+  okBtn.addEventListener('click', onConfirm);
+  cancelBtn.addEventListener('click', close);
+  modal.addEventListener('click', onBackdrop);
+  modal.addEventListener('keydown', onEscape);
 }
 
 // ─────────────────────────────────────────
@@ -64,130 +166,14 @@ let sortables = {
   options: {}
 };
 
-// ─────────────────────────────────────────
-// 自動保存 / 下書き機能
-// ─────────────────────────────────────────
-let saveTimeout = null;
-const DRAFT_KEY = 'survey_draft_new'; // 実際には surveyId などで分ける
+// 一度でも操作されたフィールドのみエラーを表示するための管理
+const touchedFields = new Set();
 
-function queueAutoSave() {
-  if (saveTimeout) clearTimeout(saveTimeout);
-  saveTimeout = setTimeout(saveDraft, 5000);
-}
-
-function saveDraft() {
-  const draft = {
-    surveyName: document.getElementById('surveyName_ja')?.value || '',
-    periodRange: document.getElementById('periodRange')?.value || '',
-    bizcardEnabled: document.getElementById('bizcardEnabled')?.checked || false,
-    multilingual: isMultilingual,
-    currentLangs: currentLangs,
-    activeLang: activeLang,
-    allowContinuousAnswer: document.getElementById('allowContinuousAnswer')?.checked || false,
-    memo: document.getElementById('memo')?.value || '',
-    bizcardOcrMode: document.getElementById('bizcardOcrMode')?.value || 'standard',
-    thankYouEmailEnabled: document.getElementById('thankYouEmailEnabled')?.checked || false,
-    thankYouEmailSubject: document.getElementById('thankYouEmailSubject')?.value || '',
-    thankYouEmailBody_content: document.getElementById('thankYouEmailBody_content')?.value || '',
-    
-    // 多言語フィールド
-    multiLangInputs: {},
-    questions: questions
-  };
-
-  document.querySelectorAll('.multi-lang-input-group').forEach(group => {
-    const key = group.dataset.fieldKey;
-    draft.multiLangInputs[key] = {};
-    group.querySelectorAll('[data-lang]').forEach(langDiv => {
-      const code = langDiv.dataset.lang;
-      const input = langDiv.querySelector('input, textarea');
-      if (input) draft.multiLangInputs[key][code] = input.value;
-    });
-  });
-
-  try {
-    const json = JSON.stringify(draft);
-    if (json.length > 5000000) {
-      console.warn("Draft too large to save to localStorage");
-      return;
-    }
-    localStorage.setItem(DRAFT_KEY, json);
-    console.log("Draft auto-saved.");
-  } catch(e) {
-    console.warn("Failed to save draft", e);
-  }
-}
-
-function loadDraftIfAny() {
-  const json = localStorage.getItem(DRAFT_KEY);
-  if (!json) return false;
-  
-  if (!confirm('未保存の下書きがあります。復元しますか？')) {
-    localStorage.removeItem(DRAFT_KEY);
-    return false;
-  }
-  
-  try {
-    const draft = JSON.parse(json);
-    
-    // Basic restores
-    if(draft.surveyName) document.getElementById('surveyName_ja').value = draft.surveyName;
-    if(draft.periodRange) document.getElementById('periodRange').value = draft.periodRange;
-    if(draft.bizcardEnabled) {
-      document.getElementById('bizcardEnabled').checked = draft.bizcardEnabled;
-      document.getElementById('bizcardEnabled').dispatchEvent(new Event('change'));
-    }
-    if(draft.multilingual) {
-      document.getElementById('multilingualEnabledToggle').checked = true;
-      document.getElementById('multilingualEnabledToggle').dispatchEvent(new Event('change'));
-    }
-    if(draft.allowContinuousAnswer) document.getElementById('allowContinuousAnswer').checked = draft.allowContinuousAnswer;
-    if(draft.memo) document.getElementById('memo').value = draft.memo;
-    
-    // MultiLang States
-    currentLangs = draft.currentLangs || ['ja'];
-    activeLang = draft.activeLang || 'ja';
-    isMultilingual = draft.multilingual || false;
-    
-    renderLangSelectionAndTabs();
-    
-    // MultiLang inputs
-    Object.entries(draft.multiLangInputs || {}).forEach(([key, langsObj]) => {
-      const group = document.querySelector(`.multi-lang-input-group[data-field-key="${key}"]`);
-      if (group) {
-        Object.entries(langsObj).forEach(([lang, val]) => {
-          ensureMultiLangInputExists(group, lang);
-          const input = group.querySelector(`[data-lang="${lang}"] textarea, [data-lang="${lang}"] input`);
-          if (input) input.value = val;
-        });
-      }
-    });
-    
-    // Questions
-    questions = draft.questions || [];
-    renderAllQuestions();
-    
-    showToast('下書きを復元しました', 'success');
-  } catch(e) {
-    console.warn("Error restoring draft", e);
-  }
-  return true;
-}
-
-window.addEventListener('beforeunload', (e) => {
-  // 保存ボタン押下時等は例外にする処理が必要。暫定対応。
-  if (localStorage.getItem(DRAFT_KEY)) {
-    e.preventDefault();
-    e.returnValue = '';
-  }
-});
-
-// 入力イベントで自動保存スケジュール
+// 入力イベントでバリデーション更新
 document.addEventListener('input', (e) => {
   if (e.target.matches('input, textarea, select')) {
-    queueAutoSave();
-    updateOutline(); // リアルタイムバリデーション反映
-    updateSaveButtonState();
+    if (e.target.id) touchedFields.add(e.target.id);
+    updateOutline(); // updateTranslationBadges も内部で呼ばれる
   }
 });
 
@@ -216,7 +202,7 @@ function ensureMultiLangInputExists(group, lang) {
     labelText, 
     isRequired ? el('span', {class: 'text-error'}, '*') : null
   );
-  
+
   div.append(inputEl, labelEl);
   group.appendChild(div);
 }
@@ -238,6 +224,7 @@ function updateMultiLangVisibility() {
   document.querySelectorAll('[data-lang-wrapper]').forEach(wrapper => {
     wrapper.classList.toggle('hidden', wrapper.dataset.langWrapper !== activeLang);
   });
+  updateTranslationBadges();
 }
 
 function renderLangSelectionAndTabs() {
@@ -247,31 +234,46 @@ function renderLangSelectionAndTabs() {
 
   // 選択パネル
   panel.innerHTML = '';
-  SUPPORTED_LANGS.filter(l => l.code !== 'ja').forEach(l => {
-    const lbl = el('label', { class: 'flex items-center gap-2 px-3 py-1.5 border border-outline-variant rounded-full text-sm cursor-pointer hover:bg-surface-variant transition-colors' });
-    const cb = el('input', { 
-      type: 'checkbox', 
-      value: l.code, 
-      class: 'h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary',
-      checked: currentLangs.includes(l.code),
-      onchange: (e) => {
-        if(e.target.checked) {
+  panel.classList.add('flex', 'flex-wrap', 'gap-2', 'mb-2');
+  SUPPORTED_LANGS.forEach(l => {
+    const isSelected = currentLangs.includes(l.code);
+    
+    const btn = el('button', {
+      type: 'button',
+      class: `relative flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 overflow-hidden group outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary ${
+        isSelected 
+        ? 'bg-blue-50 text-blue-700 border-2 border-blue-400 shadow-[0_0_12px_rgba(96,165,250,0.3)] scale-100' 
+        : 'bg-white text-gray-500 border border-gray-200 hover:border-gray-300 hover:bg-gray-50 hover:shadow-sm scale-95 hover:scale-100 opacity-80 hover:opacity-100'
+      }`,
+      onclick: (e) => {
+        if(isSelected) {
+          if(currentLangs.length <= 1) {
+            showToast('最低1つの言語を選択してください', 'warning');
+            return;
+          }
+          currentLangs = currentLangs.filter(c => c !== l.code);
+        } else {
           if(currentLangs.length >= 3) {
-            e.target.checked = false;
-            showToast('追加できる言語は最大3言語（日本語含む）です', 'warning');
+            showToast('第一言語含む選択可能言語数は3言語までです', 'warning');
             return;
           }
           currentLangs.push(l.code);
-        } else {
-          currentLangs = currentLangs.filter(c => c !== l.code);
         }
         if(!currentLangs.includes(activeLang)) activeLang = currentLangs[0];
-        onLangsChanged();
-        queueAutoSave();
+        renderLangSelectionAndTabs();
       }
     });
-    lbl.append(cb, l.name);
-    panel.appendChild(lbl);
+
+    const shine = el('div', { class: 'absolute inset-0 bg-gradient-to-tr from-white/0 via-white/50 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity -translate-x-full group-hover:translate-x-full duration-700 ease-in-out z-0' });
+    
+    const iconSpan = el('span', { 
+      class: `material-icons text-[18px] relative z-10 transition-all duration-300 ease-out ${isSelected ? 'scale-100 rotate-0 text-blue-500' : 'scale-75 text-gray-300 opacity-50'}` 
+    }, isSelected ? 'check_circle' : 'add_circle_outline');
+
+    const txt = el('span', { class: 'relative z-10' }, l.name);
+
+    btn.append(shine, iconSpan, txt);
+    panel.appendChild(btn);
   });
 
   // タブ
@@ -284,16 +286,17 @@ function renderLangSelectionAndTabs() {
       onclick: () => {
         activeLang = langCode;
         updateMultiLangVisibility();
-        queueAutoSave();
+        updateOutline();
       }
     });
-    const handle = el('span', { class: 'material-icons lang-tab-handle' }, 'drag_indicator');
-    const txt = el('span', {}, langObj ? langObj.name : langCode);
+
+    const iconSpan = el('span', { class: 'material-icons text-[16px] opacity-70' }, 'translate');
+    const txt = el('span', { class: 'truncate font-medium' }, langObj ? langObj.name : langCode);
     
     // 未入力警告アイコン（仮実装）
-    const warn = el('span', { class: 'material-icons text-error text-[14px] hidden', 'data-tab-warning': '' }, 'warning');
+    const warn = el('span', { class: 'material-icons text-error text-[14px] hidden ml-auto', 'data-tab-warning': '' }, 'warning');
     
-    tab.append(handle, txt, warn);
+    tab.append(iconSpan, txt, warn);
     tabsContainer.appendChild(tab);
   });
 
@@ -318,14 +321,13 @@ function initLangTabsSortable() {
   
   if (sortables.langTabs) sortables.langTabs.destroy();
   sortables.langTabs = new Sortable(container, {
-    handle: '.lang-tab-handle',
+    handle: '.lang-tab',
     animation: 150,
     group: 'language-tabs',
     onEnd: () => {
       const newOrder = [];
       container.querySelectorAll('.lang-tab').forEach(t => newOrder.push(t.dataset.lang));
       currentLangs = newOrder;
-      queueAutoSave();
     }
   });
 }
@@ -333,18 +335,94 @@ function initLangTabsSortable() {
 function initMultilingualToggle() {
   const toggle = document.getElementById('multilingualEnabledToggle');
   const controls = document.getElementById('multilingual-controls');
+  const mainTabs = document.getElementById('mainAreaMultilingualTabs');
   if (!toggle || !controls) return;
 
   toggle.addEventListener('change', () => {
     isMultilingual = toggle.checked;
     controls.classList.toggle('hidden', !toggle.checked);
+    if (mainTabs) {
+      mainTabs.style.visibility = toggle.checked ? 'visible' : 'hidden';
+    }
+    const basicInfoBody = document.getElementById('basicInfoBody');
+    basicInfoBody?.classList.toggle('rounded-tl-none', toggle.checked);
+    basicInfoBody?.classList.toggle('rounded-tr-none', toggle.checked);
+    document.body.classList.toggle('has-multi-lang-tabs', toggle.checked);
+
     if(!isMultilingual) {
       currentLangs = ['ja'];
       activeLang = 'ja';
       renderLangSelectionAndTabs();
     }
-    queueAutoSave();
   });
+}
+
+function initLangTabWidthTracking() {
+  const mainTabs     = document.getElementById('mainAreaMultilingualTabs');
+  const basicInfo    = document.getElementById('basicInfoBody');
+  const questionsCol = document.getElementById('questions-column');
+  if (!mainTabs || !basicInfo || !questionsCol) return;
+
+  // タブは sticky。貼り付き時だけ margin-left + width で幅・位置を追従させる。
+  // margin-left を使うことで left/transform の循環計算バグを回避する。
+  let rafId = null;
+
+  function getHeaderH() {
+    const headerEl = document.getElementById('header-placeholder')?.firstElementChild
+                  || document.querySelector('header');
+    return headerEl ? headerEl.offsetHeight : 64;
+  }
+
+  function updateTabPosition() {
+    if (mainTabs.style.visibility !== 'visible') {
+      reset();
+      return;
+    }
+
+    const headerH   = getHeaderH();
+    const tabsRect  = mainTabs.getBoundingClientRect();
+
+    // sticky で貼り付いているか: top が headerH とほぼ一致
+    const isStuck = Math.abs(tabsRect.top - headerH) < 4;
+
+    if (!isStuck) {
+      reset();
+      return;
+    }
+
+    // 貼り付き時: タブの親要素の左端を基準に margin-left で位置補正
+    const parentRect = mainTabs.parentElement.getBoundingClientRect();
+    const basicRect  = basicInfo.getBoundingClientRect();
+    const questRect  = questionsCol.getBoundingClientRect();
+    const tabsH      = mainTabs.offsetHeight;
+
+    const questVisible = questRect.top < headerH + tabsH + 40;
+    const targetRect   = questVisible ? questRect : basicRect;
+
+    mainTabs.style.marginLeft = (targetRect.left - parentRect.left) + 'px';
+    mainTabs.style.width      = targetRect.width + 'px';
+  }
+
+  function reset() {
+    mainTabs.style.marginLeft = '';
+    mainTabs.style.width      = '';
+  }
+
+  function onScroll() {
+    if (rafId) return;
+    rafId = requestAnimationFrame(() => {
+      rafId = null;
+      updateTabPosition();
+    });
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
+
+  const toggle = document.getElementById('multilingualEnabledToggle');
+  if (toggle) {
+    toggle.addEventListener('change', () => setTimeout(updateTabPosition, 50));
+  }
 }
 
 // ─────────────────────────────────────────
@@ -391,6 +469,10 @@ function el(tag, attrs = {}, ...children) {
     if (k === 'class') node.className = v;
     else if (k === 'style') node.style.cssText = v;
     else if (k.startsWith('on') && typeof v === 'function') node.addEventListener(k.slice(2), v);
+    else if (typeof v === 'boolean') {
+      if (v) node.setAttribute(k, '');
+      else node.removeAttribute(k);
+    }
     else node.setAttribute(k, v);
   }
   for (const child of children) {
@@ -403,6 +485,7 @@ function el(tag, attrs = {}, ...children) {
 function icon(name, extraClass = '') {
   return el('span', { class: `material-icons${extraClass ? ' ' + extraClass : ''}` }, name);
 }
+
 
 // ─────────────────────────────────────────
 // 設問リスト制御
@@ -425,16 +508,17 @@ function renumberQuestions() {
 
   updateOutline();
   updateEmptyState();
-  queueAutoSave();
 }
 
 function updateEmptyState() {
   const container = document.getElementById('questionListContainer');
   const emptyMsg = document.getElementById('questionListEmpty');
+  const inlineArea = document.getElementById('addQuestionInlineArea');
   const badge = document.getElementById('questionCountBadge');
   if (!container) return;
   const count = container.querySelectorAll('[data-question-id]').length;
   if (emptyMsg) emptyMsg.classList.toggle('hidden', count > 0);
+  if (inlineArea) inlineArea.classList.toggle('hidden', count === 0);
   if (badge) badge.textContent = `${count}問`;
 }
 
@@ -442,19 +526,128 @@ function updateEmptyState() {
 // バリデーション＆アウトラインパネル
 // ─────────────────────────────────────────
 
+function setFieldError(fieldId, hasError) {
+  const showError = hasError && touchedFields.has(fieldId);
+  const input = document.getElementById(fieldId);
+  const errorEl = document.getElementById(`${fieldId}Error`);
+  if (input) input.classList.toggle('input-error', showError);
+  if (errorEl) errorEl.classList.toggle('hidden', !showError);
+}
+
+// ─────────────────────────────────────────
+// 翻訳進捗
+// ─────────────────────────────────────────
+
+/**
+ * 指定言語で未翻訳の項目数を返す。
+ * 対象: multi-lang-input-group の入力値 + 各設問の text / options / matrixRows / matrixCols
+ */
+function countMissingForLang(lang) {
+  let count = 0;
+
+  // 基本情報のマルチ言語フィールド（displayTitle, description など）
+  document.querySelectorAll('.multi-lang-input-group').forEach(group => {
+    const input = group.querySelector(`[data-lang="${lang}"] input, [data-lang="${lang}"] textarea`);
+    if (input && !input.value.trim()) count++;
+  });
+
+  // 設問
+  questions.forEach(q => {
+    if (!q.text?.[lang]?.trim()) count++;
+    if (CHOICE_TYPES.has(q.type)) {
+      (q.options || []).forEach(opt => { if (!opt[lang]?.trim()) count++; });
+    }
+    if (MATRIX_TYPES.has(q.type)) {
+      (q.matrixRows || []).forEach(r => { if (!r[lang]?.trim()) count++; });
+      (q.matrixCols || []).forEach(c => { if (!c[lang]?.trim()) count++; });
+    }
+  });
+
+  return count;
+}
+
+/**
+ * 指定設問・指定言語で未翻訳の項目数を返す（設問カードのバッジ用）
+ */
+function countMissingForQuestion(q, lang) {
+  let count = 0;
+  if (!q.text?.[lang]?.trim()) count++;
+  if (CHOICE_TYPES.has(q.type)) {
+    (q.options || []).forEach(opt => { if (!opt[lang]?.trim()) count++; });
+  }
+  if (MATRIX_TYPES.has(q.type)) {
+    (q.matrixRows || []).forEach(r => { if (!r[lang]?.trim()) count++; });
+    (q.matrixCols || []).forEach(c => { if (!c[lang]?.trim()) count++; });
+  }
+  return count;
+}
+
+/**
+ * 言語タブの「未入力 N」バッジ & 設問カードの未翻訳バッジを更新する
+ */
+function updateTranslationBadges() {
+  if (!isMultilingual) return;
+  const extraLangs = currentLangs.slice(1); // 第一言語(ja)以外
+
+  // 言語タブのバッジ
+  document.querySelectorAll('#languageEditorTabsV2 .lang-tab[data-lang]').forEach(tab => {
+    const lang = tab.dataset.lang;
+    if (lang === currentLangs[0]) return;
+    const count = countMissingForLang(lang);
+    let badge = tab.querySelector('.translation-progress-badge');
+    if (count > 0) {
+      if (!badge) {
+        badge = el('span', { class: 'translation-progress-badge' });
+        tab.appendChild(badge);
+      }
+      badge.textContent = `未入力 ${count}`;
+    } else if (badge) {
+      badge.remove();
+    }
+  });
+
+  // 設問カードの未翻訳バッジ
+  // アクティブタブが追加言語のときだけ、その言語の未翻訳数を表示する
+  const showLang = activeLang !== currentLangs[0] ? activeLang : null;
+  questions.forEach(q => {
+    const card = document.getElementById(`question-${q.id}`);
+    if (!card) return;
+    const missing = showLang ? countMissingForQuestion(q, showLang) : 0;
+    let badge = card.querySelector('[data-untranslated-badge]');
+    if (missing > 0) {
+      if (!badge) {
+        badge = el('span', {
+          class: 'translation-progress-badge flex-shrink-0',
+          'data-untranslated-badge': ''
+        });
+        const header = card.querySelector('.q-card-header');
+        const deleteBtn = header?.querySelector('.v2-icon-btn--danger');
+        if (deleteBtn) header.insertBefore(badge, deleteBtn);
+      }
+      badge.textContent = `未翻訳 ${missing}`;
+    } else if (badge) {
+      badge.remove();
+    }
+  });
+}
+
 function validateForm() {
-  let hasBlocker = false;
-  
   const surveyName = document.getElementById('surveyName_ja')?.value?.trim();
   const displayTitle = document.getElementById('displayTitle_ja')?.value?.trim();
   const periodRange = document.getElementById('periodRange')?.value?.trim();
-  
-  if(!surveyName || !displayTitle || !periodRange) hasBlocker = true;
-  if(questions.length === 0) hasBlocker = true;
-  
-  // 選択肢系の検証
+
+  const nameErr = !surveyName;
+  const titleErr = !displayTitle;
+  const periodErr = !periodRange;
+
+  setFieldError('surveyName_ja', nameErr);
+  setFieldError('displayTitle_ja', titleErr);
+  setFieldError('periodRange', periodErr);
+
+  let hasBlocker = nameErr || titleErr || periodErr;
+  if (questions.length === 0) hasBlocker = true;
   questions.forEach(q => {
-    if(CHOICE_TYPES.has(q.type) && (!q.options || q.options.length < 2)) hasBlocker = true;
+    if (CHOICE_TYPES.has(q.type) && (!q.options || q.options.length < 2)) hasBlocker = true;
   });
 
   return !hasBlocker;
@@ -468,10 +661,9 @@ function updateSaveButtonState() {
 }
 
 function checkValidationForSection(idOrFn) {
-  // 簡易バリデーション (赤ぽっち用)
   if(idOrFn === 'basicInfoBody') {
-    return !document.getElementById('surveyName_ja')?.value.trim() || 
-           !document.getElementById('displayTitle_ja')?.value.trim() || 
+    return !document.getElementById('surveyName_ja')?.value.trim() ||
+           !document.getElementById('displayTitle_ja')?.value.trim() ||
            !document.getElementById('periodRange')?.value.trim();
   }
   return false;
@@ -483,7 +675,7 @@ function updateOutline() {
   
   // Basic Settings Outline Dots
   document.querySelectorAll('#outline-map-list > a.outline-item').forEach(a => {
-    const targetId = a.getAttribute('href').replace('#', '');
+    const targetId = a.dataset.scrollTarget;
     const hasError = checkValidationForSection(targetId);
     let dot = a.querySelector('.error-dot');
     if(hasError) {
@@ -503,13 +695,17 @@ function updateOutline() {
     let hasError = CHOICE_TYPES.has(q.type) && (!q.options || q.options.length < 2);
     if (!q.text?.[currentLangs[0]]) hasError = true;
 
+    // 未翻訳チェック: 追加言語タブ表示中のみ、その言語の未翻訳数を表示
+    const showLang = isMultilingual && activeLang !== currentLangs[0] ? activeLang : null;
+    const totalMissing = showLang ? countMissingForQuestion(q, showLang) : 0;
+
     const a = el('a', {
-      class: 'flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-surface-variant text-on-surface-variant transition-colors cursor-pointer text-xs',
+      class: 'flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-surface-variant text-on-surface-variant transition-colors cursor-pointer text-xs outline-item',
       href: '#',
+      'data-question-id': q.id,
       onclick: (e) => {
         e.preventDefault();
         card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        // Optionally focus
       }
     },
       el('span', { class: `text-xs font-medium flex-shrink-0 ${hasError ? 'text-error' : 'text-primary'}` }, `Q${i + 1}`),
@@ -517,10 +713,16 @@ function updateOutline() {
     );
     if(hasError) {
       a.appendChild(el('span', {class:'text-error font-bold flex-shrink-0 ml-auto'}, '●'));
+    } else if (totalMissing > 0) {
+      a.appendChild(el('span', {
+        class: 'flex-shrink-0 ml-auto w-2 h-2 rounded-full bg-red-500',
+        title: `未翻訳 ${totalMissing}件`
+      }));
     }
     outlineList.appendChild(a);
   });
   updateSaveButtonState();
+  updateTranslationBadges();
 }
 
 // ─────────────────────────────────────────
@@ -529,7 +731,10 @@ function updateOutline() {
 function renderAllQuestions() {
   const container = document.getElementById('questionListContainer');
   if(!container) return;
+  // 空状態表示は container 外に退避してから innerHTML をクリアする
+  const emptyMsg = document.getElementById('questionListEmpty');
   container.innerHTML = '';
+  if (emptyMsg) container.appendChild(emptyMsg);
   questions.forEach((q, idx) => {
     container.appendChild(buildQuestionCard(q, idx));
   });
@@ -539,40 +744,74 @@ function renderAllQuestions() {
 
 function buildQuestionCard(q, index) {
   const card = el('article', {
-    class: 'question-card bg-surface border border-outline-variant rounded-xl overflow-hidden',
+    class: 'question-card bg-white border border-gray-300/80 rounded-2xl shadow-sm hover:shadow-md hover:border-indigo-300 transition-all duration-300 relative group overflow-hidden focus-within:ring-2 focus-within:ring-indigo-100',
     'data-question-id': q.id,
     'data-question-type': q.type,
     id: `question-${q.id}`
   });
 
-  // ヘッダー
-  const header = el('div', { class: 'q-card-header flex items-center gap-2 px-4 py-3 cursor-pointer select-none bg-surface' });
-  header.addEventListener('click', (e) => { if (!e.target.closest('button')) toggleCard(card); });
+  const decLineBorderColor = 'bg-gray-200 group-hover:bg-primary';
+  const decLine = el('div', { class: `absolute left-0 top-0 bottom-0 w-1.5 ${decLineBorderColor} transition-colors z-10` });
 
-  const handle = el('span', { class: 'material-icons text-on-surface-variant q-drag-handle flex-shrink-0 cursor-grab', title: '並び替え' }, 'drag_indicator');
-  const numEl = el('span', { class: 'text-sm font-bold text-primary flex-shrink-0', 'data-question-number': '' }, `Q${index + 1}`);
-  const typeLabel = el('span', { class: 'text-xs bg-surface-variant text-on-surface-variant px-1.5 py-0.5 rounded flex-shrink-0' }, getTypeLabel(q.type));
-  const requiredBadge = el('span', { class: `text-xs bg-error text-on-error px-1.5 py-0.5 rounded flex-shrink-0${q.required ? '' : ' hidden'}`, 'data-required-badge': '' }, '必須');
-  const summaryText = el('p', { class: 'text-sm text-on-surface truncate flex-1 min-w-0', 'data-question-summary-text': '' }, q.text[currentLangs[0]] || '設問文を入力してください');
+  const header = el('div', { class: 'q-card-header flex items-center gap-3 px-5 py-4 cursor-pointer select-none bg-white relative z-0' });
+  header.addEventListener('click', (e) => { if (!e.target.closest('button') && !e.target.closest('input')) toggleCard(card); });
 
-  const duplicateBtn = el('button', { type: 'button', class: 'v2-icon-btn flex-shrink-0', onclick: (e) => { e.stopPropagation(); duplicateQuestion(q.id); } }, icon('content_copy', 'text-base'));
-  const deleteBtn = el('button', { type: 'button', class: 'v2-icon-btn v2-icon-btn--danger flex-shrink-0', onclick: (e) => { e.stopPropagation(); deleteQuestion(q.id); } }, icon('delete', 'text-base text-error'));
+  const handle = el('span', { class: 'material-icons text-gray-300 hover:text-gray-500 q-drag-handle flex-shrink-0 cursor-grab p-1 -ml-2 rounded hover:bg-gray-100 transition-colors', title: '並び替え' }, 'drag_indicator');
   
-  const toggleIcon = icon('expand_more', 'text-base transition-transform duration-200');
-  toggleIcon.style.transform = 'rotate(180deg)'; 
-  const toggleBtn = el('button', { type: 'button', class: 'v2-icon-btn flex-shrink-0', 'data-toggle-btn': '', onclick: (e) => { e.stopPropagation(); toggleCard(card); } }, toggleIcon);
+  const numEl = el('span', { class: 'text-sm font-black text-primary flex-shrink-0 bg-blue-50 px-2 py-1 rounded-lg border border-blue-100', 'data-question-number': '' }, `Q${index + 1}`);
+  
+  const typeLabel = el('span', { class: 'text-[11px] font-bold bg-gray-50 text-gray-600 px-2.5 py-1 rounded-lg flex-shrink-0 flex items-center gap-1 border border-gray-200 shadow-sm' }, 
+    icon(QUESTION_TYPES[q.type]?.icon || 'help', 'text-[14px] opacity-70'),
+    getTypeLabel(q.type)
+  );
 
-  header.append(handle, numEl, typeLabel, requiredBadge, summaryText, duplicateBtn, deleteBtn, toggleBtn);
+  const reqBg = q.required ? 'bg-red-50 border-red-200 text-red-600' : 'bg-gray-50 border-gray-200 text-gray-400';
+  const requiredBadge = el('span', {
+    class: `text-[11px] font-bold px-2.5 py-1 rounded-lg flex-shrink-0 cursor-pointer select-none transition-colors border shadow-sm ${reqBg}`,
+    'data-required-badge': '',
+    role: 'button',
+    tabindex: '0',
+    title: '必須/任意を切り替え',
+    'aria-label': q.required ? '必須（クリックで任意に変更）' : '任意（クリックで必須に変更）',
+    'aria-pressed': String(q.required),
+  }, q.required ? '必須' : '任意');
 
-  // 詳細
-  const detail = el('div', { class: 'q-card-detail border-t border-outline-variant', 'data-detail-panel': '' });
+  const summaryText = el('p', { class: 'text-sm font-bold text-gray-800 truncate flex-1 min-w-0 px-2', 'data-question-summary-text': '' }, q.text[currentLangs[0]] || '設問文を入力してください');
+
+  const actionGroup = el('div', { class: 'flex items-center gap-1 ml-auto shrink-0 opacity-0 group-hover:opacity-100 transition-opacity' });
+
+  const duplicateBtn = el('button', { type: 'button', class: 'w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors', title: '設問を複製', onclick: (e) => { e.stopPropagation(); duplicateQuestion(q.id); } }, icon('content_copy', 'text-[18px]'));
+
+  const deleteBtn = el('button', { type: 'button', class: 'w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-red-50 hover:text-red-600 transition-colors', title: '設問を削除', onclick: (e) => { e.stopPropagation(); deleteQuestion(q.id); } }, icon('delete_outline', 'text-[18px]'));
+
+  actionGroup.append(duplicateBtn, deleteBtn);
+
+  function syncRequired(val) {
+    q.required = val;
+    const newBg = q.required ? 'bg-red-50 border-red-200 text-red-600' : 'bg-gray-50 border-gray-200 text-gray-400';
+    requiredBadge.className = `text-[11px] font-bold px-2.5 py-1 rounded-lg flex-shrink-0 cursor-pointer select-none transition-colors border shadow-sm ${newBg}`;
+    requiredBadge.textContent = q.required ? '必須' : '任意';
+    requiredBadge.setAttribute('aria-label', q.required ? '必須（クリックで任意に変更）' : '任意（クリックで必須に変更）');
+    requiredBadge.setAttribute('aria-pressed', String(q.required));
+  }
+
+  requiredBadge.addEventListener('click', (e) => { e.stopPropagation(); syncRequired(!q.required); });
+  requiredBadge.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); syncRequired(!q.required); } });
+
+  const toggleIcon = icon('expand_more', 'text-[24px] transition-transform duration-300 text-gray-400 group-hover:text-primary');
+  toggleIcon.style.transform = 'rotate(180deg)';
+  const toggleBtn = el('button', { type: 'button', class: 'w-8 h-8 rounded-full flex items-center justify-center hover:bg-indigo-50 text-gray-600 ml-1 transition-colors', 'data-toggle-btn': '', onclick: (e) => { e.stopPropagation(); toggleCard(card); } }, toggleIcon);
+
+  header.append(handle, numEl, typeLabel, requiredBadge, summaryText, actionGroup, toggleBtn);
+
+  const detail = el('div', { class: 'q-card-detail border-t border-gray-100 bg-gray-50/30', 'data-detail-panel': '' });
   detail.appendChild(buildBasicSection(q, card));
   
   const ansSec = buildAnswerSection(q);
   if (ansSec) detail.appendChild(ansSec);
   detail.appendChild(buildAdvancedSection(q));
 
-  card.append(header, detail);
+  card.append(decLine, header, detail);
   return card;
 }
 
@@ -586,13 +825,12 @@ function toggleCard(card) {
 }
 
 function buildBasicSection(q, cardNode) {
-  const section = el('section', { class: 'p-4 space-y-3' });
-  section.appendChild(el('h4', { class: 'text-sm font-semibold text-on-surface' }, '基本設定'));
+  const section = el('section', { class: 'px-5 py-4 space-y-4' });
+  section.appendChild(el('h4', { class: 'text-sm font-bold text-gray-700 flex items-center gap-1.5' }, icon('edit_note', 'text-[18px] text-gray-400'), '基本設定'));
 
-  // 設問文（多言語対応）
   const wrappers = currentLangs.map(lang => {
     const input = el('input', {
-      type: 'text', class: 'input-field w-full', placeholder: ' ',
+      type: 'text', class: 'input-field w-full bg-white font-bold text-sm', placeholder: ' ',
       value: q.text[lang] || '',
       oninput: (e) => {
         if(!q.text) q.text = {};
@@ -601,26 +839,19 @@ function buildBasicSection(q, cardNode) {
           const sum = cardNode.querySelector('[data-question-summary-text]');
           if(sum) sum.textContent = e.target.value || '設問文を入力してください';
           updateOutline();
+        } else {
+          updateTranslationBadges();
         }
       }
     });
-    const label = el('label', {class: 'input-label'}, `設問文 (${lang})`);
-    const group = el('div', {class: 'input-group'});
+    const label = el('label', {class: 'input-label bg-transparent'}, `設問文 (${lang})`);
+    const group = el('div', {class: 'input-group mb-0'});
+    
     group.append(input, label);
     const wrap = el('div', {'data-lang-wrapper': lang}, group);
     return wrap;
   });
   wrappers.forEach(w => section.appendChild(w));
-
-  const checkbox = el('input', {
-    type: 'checkbox', class: 'h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary',
-    checked: q.required,
-    onchange: (e) => {
-      q.required = e.target.checked;
-      cardNode.querySelector('[data-required-badge]')?.classList.toggle('hidden', !q.required);
-    }
-  });
-  section.appendChild(el('div', { class: 'flex items-center gap-2' }, checkbox, el('label', {class: 'text-sm text-on-surface-variant'}, '必須回答にする')));
 
   return section;
 }
@@ -628,15 +859,14 @@ function buildBasicSection(q, cardNode) {
 function buildAnswerSection(q) {
   if (CHOICE_TYPES.has(q.type)) return buildChoiceSection(q);
   if (MATRIX_TYPES.has(q.type)) return buildMatrixSection(q);
-  // (簡易化: その他のタイプも同様に実装)
-  return el('section', {class: 'px-4 pb-4'}, el('p', {class: 'text-xs text-on-surface-variant'}, `${getTypeLabel(q.type)}の回答設定`));
+  return el('section', {class: 'px-5 pb-5'}, el('div', {class: 'bg-white border border-gray-200 rounded-xl p-4 text-center'}, el('p', {class: 'text-xs text-gray-500 font-bold'}, `${getTypeLabel(q.type)}の回答設定`)));
 }
 
 function buildChoiceSection(q) {
-  const section = el('section', { class: 'px-4 pb-4 space-y-3 border-t border-outline-variant pt-4' });
-  section.appendChild(el('h4', { class: 'text-sm font-semibold text-on-surface' }, '選択肢設定'));
+  const section = el('section', { class: 'px-5 pb-5 space-y-4 border-t border-gray-100 pt-4' });
+  section.appendChild(el('h4', { class: 'text-sm font-bold text-gray-700 flex items-center gap-1.5' }, icon('list_alt', 'text-[18px] text-gray-400'), '選択肢設定'));
 
-  const optionsList = el('div', { class: 'space-y-2', id: `options-list-${q.id}` });
+  const optionsList = el('div', { class: 'space-y-2.5', id: `options-list-${q.id}` });
   (q.options || []).forEach((opt, idx) => {
     optionsList.appendChild(buildOptionRow(q, idx, opt));
   });
@@ -644,7 +874,7 @@ function buildChoiceSection(q) {
 
   const addBtn = el('button', {
     type: 'button',
-    class: 'inline-flex items-center gap-2 rounded-full border border-outline-variant px-4 py-2 text-sm font-semibold text-on-surface hover:bg-surface-variant transition-colors mt-2',
+    class: 'inline-flex items-center justify-center gap-2 rounded-xl border border-dashed border-gray-300 bg-white px-4 py-2 text-sm font-bold text-gray-500 hover:border-primary hover:text-primary hover:bg-indigo-50 transition-colors mt-3 w-full sm:w-auto shadow-sm',
     onclick: () => {
       if (!q.options) q.options = [];
       const newOpt = {};
@@ -653,32 +883,27 @@ function buildChoiceSection(q) {
       const row = buildOptionRow(q, q.options.length - 1, newOpt);
       optionsList.appendChild(row);
       updateMultiLangVisibility();
-      queueAutoSave();
     }
-  }, icon('add', 'text-base'), '選択肢を追加');
+  }, icon('add', 'text-[18px]'), '選択肢を追加');
   section.appendChild(addBtn);
 
-  // 遅延してSortable初期化
   setTimeout(() => {
     if(sortables.options[q.id]) sortables.options[q.id].destroy();
     sortables.options[q.id] = new Sortable(optionsList, {
       handle: '.option-drag-handle',
       animation: 100,
+      ghostClass: 'opacity-50',
       group: `options-${q.id}`,
       onEnd: () => {
-        // DOM順序から配列を再構築
         const newOpts = [];
         optionsList.querySelectorAll('[data-option-index]').forEach(row => {
           const oldIdx = parseInt(row.dataset.optionIndex, 10);
           newOpts.push(q.options[oldIdx]);
         });
         q.options = newOpts;
-        
-        // idx を再振り当て
         optionsList.querySelectorAll('[data-option-index]').forEach((row, i) => {
           row.dataset.optionIndex = i;
         });
-        queueAutoSave();
         updateOutline();
       }
     });
@@ -688,27 +913,31 @@ function buildChoiceSection(q) {
 }
 
 function buildOptionRow(q, idx, optValObj) {
-  const row = el('div', { class: 'flex items-center gap-2', 'data-option-index': idx });
-  const handle = el('span', { class: 'material-icons text-on-surface-variant cursor-grab text-base flex-shrink-0 option-drag-handle' }, 'drag_indicator');
+  const row = el('div', { class: 'flex items-center gap-2 group/opt', 'data-option-index': idx });
+  const handle = el('span', { class: 'material-icons text-gray-300 hover:text-gray-500 cursor-grab text-[20px] flex-shrink-0 option-drag-handle px-1 py-2 hover:bg-gray-100 rounded transition-colors' }, 'drag_indicator');
 
-  const inputsWrap = el('div', { class: 'flex-1' });
+  const inputsWrap = el('div', { class: 'flex-1 space-y-1.5' });
   currentLangs.forEach(lang => {
+    const wrap = el('div', {'data-lang-wrapper': lang});
     const input = el('input', {
       type: 'text',
-      class: 'w-full border border-outline-variant rounded-lg px-3 py-1.5 text-sm bg-surface text-on-surface focus:outline-none focus:border-primary',
+      class: 'w-full border border-gray-200 rounded-xl px-3 py-2 text-sm bg-white text-gray-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm hover:border-gray-300 transition-colors',
       value: optValObj[lang] || '',
       placeholder: `選択肢 (${lang})`,
       oninput: (e) => {
         const curIdx = parseInt(row.dataset.optionIndex,10);
         if(q.options[curIdx]) q.options[curIdx][lang] = e.target.value;
+        if (lang !== currentLangs[0]) updateTranslationBadges();
       }
     });
-    inputsWrap.appendChild(el('div', {'data-lang-wrapper': lang}, input));
+
+    wrap.appendChild(input);
+    inputsWrap.appendChild(wrap);
   });
 
   const deleteBtn = el('button', {
     type: 'button',
-    class: 'v2-icon-btn v2-icon-btn--danger flex-shrink-0',
+    class: 'w-9 h-9 flex items-center justify-center rounded-xl text-gray-300 hover:bg-red-50 hover:text-red-600 transition-colors flex-shrink-0 opacity-0 group-hover/opt:opacity-100 focus:opacity-100',
     onclick: () => {
       const parent = row.parentNode;
       if (parent.children.length <= 1) {
@@ -717,24 +946,20 @@ function buildOptionRow(q, idx, optValObj) {
       const curIdx = parseInt(row.dataset.optionIndex,10);
       q.options.splice(curIdx, 1);
       row.remove();
-      // idx再振り当て
       parent.querySelectorAll('[data-option-index]').forEach((r, i) => r.dataset.optionIndex = i);
       updateOutline();
-      queueAutoSave();
     }
-  }, icon('close', 'text-base text-error'));
+  }, icon('close', 'text-[20px]'));
 
   row.append(handle, inputsWrap, deleteBtn);
   return row;
 }
 
 function buildMatrixSection(q) {
-  const section = el('section', { class: 'px-4 pb-4 space-y-4 border-t border-outline-variant pt-4' });
-  section.appendChild(el('h4', { class: 'text-sm font-semibold text-on-surface' }, 'マトリックス設定'));
+  const section = el('section', { class: 'px-5 pb-5 space-y-5 border-t border-gray-100 pt-4' });
+  section.appendChild(el('h4', { class: 'text-sm font-bold text-gray-700 flex items-center gap-1.5' }, icon('grid_on', 'text-[18px] text-gray-400'), 'マトリックス設定'));
 
-  // 行
   section.appendChild(buildMatrixList(q, 'rows', '行'));
-  // 列
   section.appendChild(buildMatrixList(q, 'cols', '列'));
 
   return section;
@@ -742,16 +967,16 @@ function buildMatrixSection(q) {
 
 function buildMatrixList(q, key, label) {
   const fieldKey = key === 'rows' ? 'matrixRows' : 'matrixCols';
-  const wrap = el('div', { class: 'space-y-2' });
-  wrap.appendChild(el('p', { class: 'text-xs font-semibold text-on-surface-variant' }, `${label}ラベル`));
+  const wrap = el('div', { class: 'space-y-3 bg-white border border-gray-100 p-4 rounded-xl shadow-sm' });
+  wrap.appendChild(el('p', { class: 'text-xs font-bold text-gray-500 bg-gray-50 px-2 py-1 inline-block rounded-md border border-gray-200' }, `${label}ラベル`));
 
-  const list = el('div', { class: 'space-y-1.5', 'data-matrix-list': fieldKey });
+  const list = el('div', { class: 'space-y-2', 'data-matrix-list': fieldKey });
   (q[fieldKey] || []).forEach((vObj, i) => list.appendChild(buildMatrixRow(q, fieldKey, i, vObj)));
   wrap.appendChild(list);
 
   const addBtn = el('button', {
     type: 'button',
-    class: 'text-sm text-primary flex items-center gap-1 hover:underline',
+    class: 'text-sm text-primary font-bold flex items-center gap-1 hover:text-blue-700 transition-colors mt-2 p-1 rounded hover:bg-indigo-50',
     onclick: () => {
       if (!q[fieldKey]) q[fieldKey] = [];
       const newObj = {};
@@ -759,34 +984,37 @@ function buildMatrixList(q, key, label) {
       q[fieldKey].push(newObj);
       list.appendChild(buildMatrixRow(q, fieldKey, q[fieldKey].length - 1, newObj));
       updateMultiLangVisibility();
-      queueAutoSave();
     }
-  }, icon('add', 'text-sm'), `${label}を追加`);
+  }, icon('add_circle_outline', 'text-[18px]'), `${label}を追加`);
   wrap.appendChild(addBtn);
   return wrap;
 }
 
 function buildMatrixRow(q, fieldKey, idx, valObj) {
-  const row = el('div', { class: 'flex items-center gap-2', 'data-matrix-row': idx });
+  const row = el('div', { class: 'flex items-center gap-2 group/mat', 'data-matrix-row': idx });
   
-  const inputsWrap = el('div', { class: 'flex-1' });
+  const inputsWrap = el('div', { class: 'flex-1 space-y-1.5' });
   currentLangs.forEach(lang => {
+    const wrap = el('div', {'data-lang-wrapper': lang});
     const input = el('input', {
       type: 'text',
-      class: 'w-full border border-outline-variant rounded-lg px-3 py-1 text-sm bg-surface text-on-surface focus:outline-none focus:border-primary',
+      class: 'w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm bg-gray-50 text-gray-800 focus:outline-none focus:bg-white focus:border-primary focus:ring-1 focus:ring-primary transition-colors',
       value: valObj[lang] || '',
       placeholder: `ラベル (${lang})`,
       oninput: (e) => {
         const curIdx = parseInt(row.dataset.matrixRow,10);
         if(q[fieldKey] && q[fieldKey][curIdx]) q[fieldKey][curIdx][lang] = e.target.value;
+        if (lang !== currentLangs[0]) updateTranslationBadges();
       }
     });
-    inputsWrap.appendChild(el('div', {'data-lang-wrapper': lang}, input));
+
+    wrap.appendChild(input);
+    inputsWrap.appendChild(wrap);
   });
 
   const delBtn = el('button', {
     type: 'button',
-    class: 'v2-icon-btn v2-icon-btn--danger flex-shrink-0',
+    class: 'w-8 h-8 flex items-center justify-center rounded-lg text-gray-300 hover:bg-red-50 hover:text-red-600 transition-colors flex-shrink-0 opacity-0 group-hover/mat:opacity-100 focus:opacity-100',
     onclick: () => {
       const parentList = row.parentNode;
       if (parentList.children.length <= 1) { showToast('最低1つ必要です', 'warning'); return; }
@@ -794,35 +1022,35 @@ function buildMatrixRow(q, fieldKey, idx, valObj) {
       if (q[fieldKey]) q[fieldKey].splice(curIdx, 1);
       row.remove();
       parentList.querySelectorAll('[data-matrix-row]').forEach((r, i) => r.dataset.matrixRow = i);
-      queueAutoSave();
     }
-  }, icon('close', 'text-base text-error'));
+  }, icon('close', 'text-[18px]'));
   row.append(inputsWrap, delBtn);
   return row;
 }
 
 function buildAdvancedSection(q) {
-  const section = el('section', { class: 'px-4 pb-4 border-t border-outline-variant pt-4' });
+  const section = el('section', { class: 'px-5 py-4 border-t border-gray-100 bg-gray-100/50 flex flex-col items-center justify-center' });
 
   const toggleBtn = el('button', {
     type: 'button',
-    class: 'flex items-center gap-2 text-sm text-on-surface-variant hover:text-primary transition-colors',
+    class: 'flex items-center justify-center gap-2 text-sm font-bold text-gray-500 hover:text-primary bg-white border border-gray-200 shadow-sm px-4 py-2 rounded-full transition-all hover:shadow-md w-full sm:w-auto',
     'aria-expanded': 'false',
     onclick: (e) => {
       const panel = section.querySelector('[data-jump-panel]');
       const isOpen = e.currentTarget.getAttribute('aria-expanded') === 'true';
       e.currentTarget.setAttribute('aria-expanded', String(!isOpen));
       panel?.classList.toggle('hidden', isOpen);
-      const ic = e.currentTarget.querySelector('.material-icons');
-      if (ic) ic.textContent = isOpen ? 'chevron_right' : 'expand_more';
+      const ic = e.currentTarget.querySelector('.material-icons:last-child');
+      if (ic) ic.style.transform = isOpen ? 'rotate(-180deg)' : 'rotate(0deg)';
     }
   },
-    icon('chevron_right', 'text-base transition-transform'),
-    '高度設定（条件分岐）'
+    icon('tune', 'text-[18px] opacity-70'),
+    '高度設定（条件分岐等）',
+    icon('expand_more', 'text-[20px] transition-transform duration-300 opacity-50 ml-2')
   );
 
-  const panel = el('div', { class: 'hidden mt-3 space-y-2', 'data-jump-panel': '' });
-  panel.appendChild(el('p', { class: 'text-xs text-on-surface-variant' }, 'この設問の回答に応じてジャンプ先を設定できます。（プレミアム機能）'));
+  const panel = el('div', { class: 'hidden mt-4 space-y-2 w-full', 'data-jump-panel': '' });
+  panel.appendChild(el('p', { class: 'text-xs text-gray-500 text-center flex items-center justify-center gap-1' }, icon('lock', 'text-[14px]'), 'この設問の回答に応じてジャンプ先を設定できます。（プレミアム機能）'));
 
   section.append(toggleBtn, panel);
   return section;
@@ -834,23 +1062,30 @@ function buildAdvancedSection(q) {
 function addQuestion(type) {
   const q = defaultQuestion(type);
   questions.push(q);
-  renderAllQuestions();
-  const card = document.getElementById(`question-${q.id}`);
-  if(card) {
-    setTimeout(() => {
-      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 50);
+  const container = document.getElementById('questionListContainer');
+  if (container) {
+    const card = buildQuestionCard(q, questions.length - 1);
+    container.appendChild(card);
+    renumberQuestions();
+    updateMultiLangVisibility();
+    setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
   }
 }
 
 function deleteQuestion(id) {
-  if (!confirm('削除しますか？')) return;
-  questions = questions.filter(q => q.id !== id);
-  if(sortables.options[id]) {
-    sortables.options[id].destroy();
-    delete sortables.options[id];
-  }
-  renderAllQuestions();
+  showConfirm(
+    '設問を削除',
+    'この設問を削除しますか？削除すると元に戻せません。',
+    '削除する',
+    () => {
+      questions = questions.filter(q => q.id !== id);
+      if(sortables.options[id]) {
+        sortables.options[id].destroy();
+        delete sortables.options[id];
+      }
+      renderAllQuestions();
+    }
+  );
 }
 
 function duplicateQuestion(id) {
@@ -862,8 +1097,19 @@ function duplicateQuestion(id) {
     if(copy.text && copy.text[l]) copy.text[l] += ' (コピー)';
   });
   questions.splice(srcIdx + 1, 0, copy);
-  renderAllQuestions();
-  setTimeout(() => document.getElementById(`question-${copy.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
+  const container = document.getElementById('questionListContainer');
+  if (container) {
+    const srcCard = document.getElementById(`question-${id}`);
+    const card = buildQuestionCard(copy, srcIdx + 1);
+    if (srcCard && srcCard.nextSibling) {
+      container.insertBefore(card, srcCard.nextSibling);
+    } else {
+      container.appendChild(card);
+    }
+    renumberQuestions();
+    updateMultiLangVisibility();
+    setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
+  }
 }
 
 function initSortable() {
@@ -884,42 +1130,470 @@ function initSortable() {
 // FAB / Inline Add
 // ─────────────────────────────────────────
 function initFab() {
+  const fabContainer = document.getElementById('fab-container');
   const fabBtn = document.getElementById('fab-main-button');
   const fabMenu = document.getElementById('fab-menu');
-  if (!fabBtn || !fabMenu) return;
+  if (!fabBtn || !fabMenu || !fabContainer) return;
 
   function close() {
     fabBtn.setAttribute('aria-expanded', 'false');
     fabMenu.classList.add('scale-95', 'opacity-0', 'pointer-events-none');
-    setTimeout(() => fabMenu.hidden = true, 300);
+    setTimeout(() => { fabMenu.classList.add('hidden'); }, 300);
   }
 
+  // ドラッグ機能
+  let isDragging = false;
+  let hasDragged = false;
+  let offsetX, offsetY;
+
+  fabBtn.addEventListener('mousedown', (e) => {
+    if (e.button !== 0) return;
+    isDragging = true;
+    hasDragged = false;
+    const rect = fabContainer.getBoundingClientRect();
+    offsetX = e.clientX - rect.left;
+    offsetY = e.clientY - rect.top;
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    hasDragged = true;
+    fabBtn.style.cursor = 'grabbing';
+
+    let newLeft = e.clientX - offsetX;
+    let newTop = e.clientY - offsetY;
+
+    const { width, height } = fabContainer.getBoundingClientRect();
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    if (newLeft < 0) newLeft = 0;
+    if (newTop < 0) newTop = 0;
+    if (newLeft + width > vw) newLeft = vw - width;
+    if (newTop + height > vh) newTop = vh - height;
+
+    fabContainer.style.left = `${newLeft}px`;
+    fabContainer.style.top = `${newTop}px`;
+    fabContainer.style.bottom = 'auto';
+    fabContainer.style.right = 'auto';
+  });
+
+  document.addEventListener('mouseup', (e) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    isDragging = false;
+    fabBtn.style.cursor = 'pointer';
+  });
+
+  fabBtn.addEventListener('dragstart', (e) => e.preventDefault());
+
   fabBtn.addEventListener('click', () => {
+    if (hasDragged) return;
     if (fabBtn.getAttribute('aria-expanded') === 'true') {
       close();
     } else {
       fabBtn.setAttribute('aria-expanded', 'true');
-      fabMenu.hidden = false;
+      fabMenu.classList.remove('hidden');
       fabMenu.removeAttribute('inert');
       requestAnimationFrame(() => fabMenu.classList.remove('scale-95', 'opacity-0', 'pointer-events-none'));
     }
   });
 
-  fabMenu.querySelectorAll('[data-question-type]').forEach(b => {
-    b.addEventListener('click', () => { close(); addQuestion(b.dataset.questionType); });
+  if (fabMenu.children.length === 0) {
+    const listWrap = el('div', { class: 'py-2 flex flex-col gap-1' });
+    Object.entries(QUESTION_TYPES).forEach(([type, def]) => {
+      const b = el('button', {
+        type: 'button',
+        class: 'w-full flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 transition-colors rounded-lg text-sm font-semibold',
+        'data-question-type': type
+      }, icon(def.icon, 'text-gray-500 mr-3 opacity-80'), def.label);
+      b.addEventListener('click', () => { close(); addQuestion(type); });
+      listWrap.appendChild(b);
+    });
+    fabMenu.appendChild(listWrap);
+  } else {
+    fabMenu.querySelectorAll('[data-question-type]').forEach(b => {
+      b.addEventListener('click', () => { close(); addQuestion(b.dataset.questionType); });
+    });
+  }
+
+  // 外クリックでメニューを閉じる
+  document.addEventListener('click', (e) => {
+    if (fabContainer.contains(e.target)) return;
+    if (fabBtn.getAttribute('aria-expanded') === 'true') close();
   });
 }
 
 function initInlineAddButton() {
+  // 設問タイプボタンを生成してメニューに追加するヘルパー
+  function populateMenu(menu, onSelect) {
+    Object.entries(QUESTION_TYPES).forEach(([type, def]) => {
+      const b = el('button', {
+        type: 'button',
+        class: 'flex items-center gap-2 px-3 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-semibold text-gray-700 shadow-sm hover:bg-indigo-50 hover:border-primary hover:text-primary transition-colors',
+        'data-question-type': type
+      }, icon(def.icon, 'text-base opacity-60'), def.label);
+      b.addEventListener('click', () => { onSelect(); addQuestion(type); });
+      menu.appendChild(b);
+    });
+  }
+
+  // 空状態メニュー（最初の設問を追加ボタン用）― インライン展開
+  const firstBtn = document.getElementById('addFirstQuestionBtn');
+  const firstMenu = document.getElementById('inlineQuestionTypeMenu');
+  if (firstBtn && firstMenu) {
+    const closeFirst = () => firstMenu.classList.replace('grid', 'hidden');
+    populateMenu(firstMenu, closeFirst);
+    firstBtn.addEventListener('click', () => {
+      const isOpen = firstMenu.classList.contains('grid');
+      if (isOpen) closeFirst(); else firstMenu.classList.replace('hidden', 'grid');
+    });
+  }
+
+  // 設問追加エリアメニュー（設問を追加するボタン用）
   const btn = document.getElementById('addQuestionInlineBtn');
-  const menu = document.getElementById('inlineQuestionTypeMenu');
+  const menu = document.getElementById('inlineQuestionTypeMenuBottom');
+  if (!btn || !menu) return;
+  populateMenu(menu, () => menu.classList.add('hidden'));
+  btn.addEventListener('click', e => { e.stopPropagation(); menu.classList.toggle('hidden'); });
+  document.addEventListener('click', e => {
+    if (!btn.contains(e.target) && !menu.contains(e.target)) menu.classList.add('hidden');
+  });
+}
+
+function initOutlineScrollSpy() {
+  const OFFSET = 120; // px from top to consider "active"
+
+  const setActive = (key) => {
+    document.querySelectorAll('#outline-map-list .outline-item').forEach(a => {
+      a.classList.toggle('active', a.dataset.scrollTarget === key);
+    });
+    document.querySelectorAll('#outline-questions-list a[data-question-id]').forEach(a => {
+      a.classList.toggle('active', a.dataset.questionId === key);
+    });
+  };
+
+  const getTargets = () => {
+    const targets = [];
+    [
+      { el: document.getElementById('basicInfoBody'),          key: 'basicInfoBody' },
+      { el: document.getElementById('integrationBody'),        key: 'integrationBody' },
+      { el: document.getElementById('additionalSettingsBody'), key: 'additionalSettingsBody' },
+      ...Array.from(document.querySelectorAll('#questionListContainer [data-question-id]')).map(targetEl => ({
+        el: targetEl, key: targetEl.dataset.questionId
+      })),
+      ...((() => {
+        const btn = document.getElementById('thankYouAccordionBtn');
+        return btn && btn.getAttribute('aria-expanded') === 'true'
+          ? [{ el: btn, key: 'thankYouAccordionBtn' }]
+          : [];
+      })()),
+    ].forEach(({ el, key }) => { if (el) targets.push({ el, key }); });
+    return targets;
+  };
+
+  const update = () => {
+    const targets = getTargets();
+    if (!targets.length) return;
+
+    // Find the last target whose top edge has passed OFFSET from the top of viewport
+    let active = targets[0];
+    for (const t of targets) {
+      if (t.el.getBoundingClientRect().top <= OFFSET) {
+        active = t;
+      }
+    }
+
+    // 末尾付近のターゲットはOFFSETに届かない場合があるため、
+    // 次のターゲットがビューポート下半分に入り始めたら順番にアクティブを進める
+    let activeIndex = targets.indexOf(active);
+    while (activeIndex < targets.length - 1) {
+      const next = targets[activeIndex + 1];
+      if (next.el.getBoundingClientRect().top < window.innerHeight * 0.6) {
+        active = next;
+        activeIndex++;
+      } else {
+        break;
+      }
+    }
+
+    setActive(active.key);
+  };
+
+  window.addEventListener('scroll', update, { passive: true });
+  update();
+
+  // Re-run when questions are added/removed
+  const questionList = document.getElementById('questionListContainer');
+  if (questionList) {
+    new MutationObserver(update).observe(questionList, { childList: true });
+  }
+
+  return update;
+}
+
+function initOutlineScrollLinks() {
+  document.querySelectorAll('#outline-map-list [data-scroll-target]').forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      const targetId = link.dataset.scrollTarget;
+      const target = document.getElementById(targetId);
+      if (!target) return;
+
+      // 左カラムの sticky コンテナ内にある場合はそちらをスクロール
+      const stickyPanel = target.closest('.sticky-panel');
+      if (stickyPanel) {
+        const offsetTop = target.offsetTop - stickyPanel.offsetTop;
+        stickyPanel.scrollTo({ top: offsetTop, behavior: 'smooth' });
+      } else {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      // サンクス画面の場合はアコーディオンを開く
+      if (targetId === 'thankYouAccordionBtn') {
+        const body = document.getElementById('thankYouAccordionBody');
+        const iconEl = document.getElementById('thankYouAccordionIcon');
+        if (body && body.classList.contains('hidden')) {
+          target.setAttribute('aria-expanded', 'true');
+          body.classList.remove('hidden');
+          if (iconEl) iconEl.style.transform = 'rotate(180deg)';
+        }
+      }
+    });
+  });
+}
+
+function initThankYouAccordion(onToggle) {
+  const btn = document.getElementById('thankYouAccordionBtn');
+  const body = document.getElementById('thankYouAccordionBody');
+  const icon = document.getElementById('thankYouAccordionIcon');
+  if (!btn || !body) return;
+  btn.addEventListener('click', () => {
+    const isOpen = btn.getAttribute('aria-expanded') === 'true';
+    btn.setAttribute('aria-expanded', String(!isOpen));
+    body.classList.toggle('hidden', isOpen);
+    if (icon) icon.style.transform = isOpen ? '' : 'rotate(180deg)';
+    if (onToggle) onToggle();
+  });
+}
+
+function initMobileAddButton() {
+  const btn = document.getElementById('addQuestionMobileBtn');
+  const menu = document.getElementById('mobileQuestionTypeMenu');
   if (!btn || !menu) return;
 
+  // Populate menu if empty
+  if (menu.children.length === 0) {
+    Object.entries(QUESTION_TYPES).forEach(([type, def]) => {
+      const b = el('button', {
+        type: 'button',
+        class: 'flex items-center gap-2 px-3 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-semibold text-gray-700 shadow-sm hover:bg-indigo-50 hover:border-primary hover:text-primary transition-colors',
+        'data-question-type': type
+      }, icon(def.icon, 'text-base opacity-60'), def.label);
+      b.addEventListener('click', () => { menu.classList.add('hidden'); addQuestion(type); });
+      menu.appendChild(b);
+    });
+  }
+
   btn.addEventListener('click', e => { e.stopPropagation(); menu.classList.toggle('hidden'); });
-  menu.querySelectorAll('[data-question-type]').forEach(b => {
-    b.addEventListener('click', () => { menu.classList.add('hidden'); addQuestion(b.dataset.questionType); });
+  document.addEventListener('click', e => {
+    if (!btn.contains(e.target) && !menu.contains(e.target)) menu.classList.add('hidden');
   });
-  document.addEventListener('click', e => { if(!btn.contains(e.target)) menu.classList.add('hidden'); });
+}
+
+// ─────────────────────────────────────────
+// Outline Map Drawer Toggle Logic
+// ─────────────────────────────────────────
+function initOutlineToggle() {
+  const toggleBtn = document.getElementById('outline-map-toggle-btn');
+  const outlineColumn = document.getElementById('outline-column');
+  const toggleIcon = document.getElementById('outline-map-toggle-icon');
+
+  if (!toggleBtn || !outlineColumn) return;
+
+  toggleBtn.addEventListener('click', () => {
+    const isClosed = outlineColumn.classList.contains('translate-x-full');
+    
+    if (isClosed) {
+      outlineColumn.classList.remove('translate-x-full');
+      toggleBtn.style.transform = 'translateX(-288px)'; // shift btn left by 72 (w-72 = 288px)
+      if (toggleIcon) toggleIcon.style.transform = 'rotate(180deg)';
+    } else {
+      outlineColumn.classList.add('translate-x-full');
+      toggleBtn.style.transform = 'translateX(0)';
+      if (toggleIcon) toggleIcon.style.transform = 'rotate(0deg)';
+    }
+  });
+}
+
+// ─────────────────────────────────────────
+// QRモーダル制御
+// ─────────────────────────────────────────
+function openQrModal() {
+  const surveyId = document.body.dataset.currentSurveyId || null;
+  handleOpenModal(
+    'qrCodeModal',
+    resolveDashboardAssetPath('modals/qrCodeModal.html'),
+    () => populateQrCodeModal({ surveyId })
+  );
+}
+
+function initQrButtons() {
+  document.getElementById('openQrModalBtn')?.addEventListener('click', openQrModal);
+  document.getElementById('openQrModalBtnMobile')?.addEventListener('click', openQrModal);
+}
+
+// ─────────────────────────────────────────
+// プレビュー
+// ─────────────────────────────────────────
+function buildPreviewData() {
+  const getVal = (id) => (document.getElementById(id)?.value || '').trim();
+
+  // 多言語テキストフィールドを収集
+  const buildMultiLangField = (fieldKey) => {
+    const result = {};
+    currentLangs.forEach(lang => {
+      const el = document.getElementById(`${fieldKey}_${lang}`);
+      result[lang] = el?.value?.trim() || '';
+    });
+    return result;
+  };
+
+  // 期間パース
+  const periodRange = getVal('periodRange');
+  const [periodStart, periodEnd] = periodRange.split(' 〜 ').map(s => s?.trim() || '');
+
+  // 設問データを survey-answer.js が期待する形式に変換
+  const normalizedQuestions = questions.map(q => {
+    const cfg = q.config || {};
+    const base = {
+      id: String(q.id),
+      type: q.type,
+      text: q.text || {},
+      required: q.required || false,
+      meta: q.meta || {},
+    };
+
+    if (CHOICE_TYPES.has(q.type)) {
+      base.options = (q.options || []).map((opt, i) => ({
+        text: typeof opt === 'object' ? opt : { ja: String(opt) },
+        value: `opt_${i}`,
+      }));
+    }
+
+    if (MATRIX_TYPES.has(q.type)) {
+      base.rows = (q.matrixRows || []).map((r, i) => ({
+        id: `row_${i}`,
+        text: typeof r === 'object' ? r : { ja: String(r) },
+      }));
+      base.columns = (q.matrixCols || []).map((c, i) => ({
+        id: `col_${i}`,
+        value: `col_${i}`,
+        text: typeof c === 'object' ? c : { ja: String(c) },
+      }));
+    }
+
+    if (q.type === 'free_answer' && (cfg.minLength || cfg.maxLength)) {
+      base.meta = {
+        ...base.meta,
+        validation: { text: { minLength: cfg.minLength || 0, maxLength: cfg.maxLength || 0 } },
+      };
+    }
+
+    if (q.type === 'number_answer') {
+      base.min = cfg.min !== '' ? cfg.min : undefined;
+      base.max = cfg.max !== '' ? cfg.max : undefined;
+      base.step = cfg.step !== '' ? cfg.step : 1;
+    }
+
+    if (q.type === 'date_time') {
+      const showDate = cfg.showDate !== false;
+      const showTime = cfg.showTime === true;
+      base.meta = {
+        ...base.meta,
+        dateTimeConfig: {
+          inputMode: showDate && showTime ? 'datetime' : showTime ? 'time' : 'date',
+        },
+      };
+    }
+
+    if (q.type === 'handwriting') {
+      base.meta = {
+        ...base.meta,
+        handwritingConfig: { canvasHeight: cfg.height || 200 },
+      };
+    }
+
+    if (q.type === 'explanation_card') {
+      // explanation_cardはtextとして表示されるのみ
+      const desc = cfg.description;
+      if (desc && typeof desc === 'object') {
+        base.text = desc;
+      }
+    }
+
+    return base;
+  });
+
+  return {
+    displayTitle: buildMultiLangField('displayTitle'),
+    description: buildMultiLangField('description'),
+    periodStart: periodStart || '',
+    periodEnd: periodEnd || '',
+    editorLanguage: currentLangs[0] || 'ja',
+    activeLanguages: currentLangs,
+    questions: normalizedQuestions,
+  };
+}
+
+function openPreview() {
+  try {
+    const data = buildPreviewData();
+    localStorage.setItem('surveyPreviewData', JSON.stringify(data));
+    handleOpenModal(
+      'surveyPreviewModalV2',
+      resolveDashboardAssetPath('modals/surveyPreviewModalV2.html'),
+      () => {
+        const iframe = document.getElementById('surveyPreviewIframe');
+        if (iframe) {
+          iframe.src = resolveDashboardAssetPath('survey-answer.html') + '?preview=1';
+        }
+
+        // デバイス切り替えボタンのイベント（<script>タグは innerHTML 挿入時に実行されないためここで設定）
+        const phoneBtn = document.getElementById('v2-preview-phone-btn');
+        const tabletBtn = document.getElementById('v2-preview-tablet-btn');
+        const frame = document.getElementById('v2-preview-device-frame');
+        if (!phoneBtn || !tabletBtn || !frame) return;
+
+        const setPhone = () => {
+          frame.style.width = '390px';
+          frame.style.height = '844px';
+          phoneBtn.classList.add('bg-surface', 'text-on-surface', 'shadow-sm');
+          phoneBtn.classList.remove('text-on-surface-variant');
+          tabletBtn.classList.remove('bg-surface', 'text-on-surface', 'shadow-sm');
+          tabletBtn.classList.add('text-on-surface-variant');
+        };
+        const setTablet = () => {
+          frame.style.width = '768px';
+          frame.style.height = '1024px';
+          tabletBtn.classList.add('bg-surface', 'text-on-surface', 'shadow-sm');
+          tabletBtn.classList.remove('text-on-surface-variant');
+          phoneBtn.classList.remove('bg-surface', 'text-on-surface', 'shadow-sm');
+          phoneBtn.classList.add('text-on-surface-variant');
+        };
+        phoneBtn.addEventListener('click', setPhone);
+        tabletBtn.addEventListener('click', setTablet);
+      }
+    );
+  } catch (e) {
+    console.error('プレビューの表示に失敗しました', e);
+    showToast('プレビューの表示に失敗しました', 'error');
+  }
+}
+
+function initPreviewButtons() {
+  document.getElementById('showPreviewBtn')?.addEventListener('click', openPreview);
+  document.getElementById('showPreviewBtnMobile')?.addEventListener('click', openPreview);
 }
 
 // ─────────────────────────────────────────
@@ -931,26 +1605,21 @@ function initSaveButton() {
 }
 
 function attemptSave() {
+  // 保存試行時は全必須フィールドを touched 扱いにしてエラーを表示する
+  ['surveyName_ja', 'displayTitle_ja', 'periodRange'].forEach(id => touchedFields.add(id));
+
   if (!validateForm()) {
-    showToast('保存に失敗しました（詳細は各項目を確認してください）', 'error');
-    // 自動スクロール: 最初のエラーへの移動処理
-    const errDot = document.querySelector('.error-dot');
-    if(errDot) {
-      const linkTarget = errDot.closest('a').getAttribute('href').replace('#', '');
-      if(linkTarget && document.getElementById(linkTarget)) {
-         document.getElementById(linkTarget).scrollIntoView({behavior: 'smooth', block: 'center'});
-      } else {
-         const card = errDot.closest('a').onclick; 
-         if(card) card({preventDefault:()=>{}}); // Quick hack to invoke scroll inside outline listener
-      }
+    if (questions.length === 0) {
+      showToast('設問を1件以上追加してください', 'error');
+      document.getElementById('addFirstQuestionBtn')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     } else {
-       // Error dots logic missed it, fallback
-       document.querySelector('.input-field:invalid')?.scrollIntoView({behavior: 'smooth', block: 'center'});
+      showToast('保存に失敗しました（詳細は各項目を確認してください）', 'error');
+      const firstError = document.querySelector('.input-error');
+      if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
     return;
   }
-  
-  localStorage.removeItem(DRAFT_KEY);
+
   showToast('アンケートを保存しました', 'success');
   // API送信などの後続処理...
 }
@@ -977,6 +1646,12 @@ async function loadFromUrlParams() {
       // 将来的に dataset や hidden に持たせる場合を想定
       document.body.dataset.currentSurveyId = surveyId;
       await loadSurveyData(surveyId);
+
+      // 関連設定リンクに surveyId パラメータを付与
+      const bizcardLink = document.getElementById('linkBizcardSettings');
+      if (bizcardLink) bizcardLink.href = `./bizcardSettings.html?surveyId=${encodeURIComponent(surveyId)}&from=v2`;
+      const emailLink = document.getElementById('linkThankYouEmailSettings');
+      if (emailLink) emailLink.href = `./thankYouEmailSettings.html?surveyId=${encodeURIComponent(surveyId)}&from=v2`;
     }
   } catch (e) {
     console.warn('URLパラメータの解析に失敗しました', e);
@@ -1092,19 +1767,23 @@ async function init() {
   });
 
   initMultilingualToggle();
+  initLangTabWidthTracking();
   initFab();
   initInlineAddButton();
+  initMobileAddButton();
+  initOutlineScrollLinks();
+  const scrollSpyUpdate = initOutlineScrollSpy();
+  initThankYouAccordion(scrollSpyUpdate);
+  initOutlineToggle();
   initSortable();
   initSaveButton();
+  initQrButtons();
+  initPreviewButtons();
 
-  // Load Draft
-  const restored = loadDraftIfAny();
-  if(!restored) {
-    await loadFromUrlParams(); // URLからパラメータを復元
-    renderLangSelectionAndTabs();
-    updateOutline();
-    updateEmptyState();
-  }
+  await loadFromUrlParams();
+  renderLangSelectionAndTabs();
+  updateOutline();
+  updateEmptyState();
 }
 
 document.addEventListener('DOMContentLoaded', init);
