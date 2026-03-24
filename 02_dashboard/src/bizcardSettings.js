@@ -63,6 +63,7 @@ export function initBizcardSettings() {
     // --- State Management ---
     let state = {
         surveyId: null,
+        fromPage: 'surveyCreation.html',
         settings: {},
         initialSettings: {},
         appliedCoupon: null,
@@ -75,6 +76,7 @@ export function initBizcardSettings() {
     async function initializePage() {
         const urlParams = new URLSearchParams(window.location.search);
         state.surveyId = urlParams.get('surveyId');
+        state.fromPage = urlParams.get('from') === 'v2' ? 'surveyCreation-v2.html' : 'surveyCreation.html';
 
         let surveyData;
         let settingsData;
@@ -89,7 +91,7 @@ export function initBizcardSettings() {
                 const tempDataString = localStorage.getItem('tempSurveyData');
                 if (!tempDataString) {
                     showToast('一時的なアンケートデータが見つかりません。作成画面からやり直してください。', 'error');
-                    setTimeout(() => { window.location.href = 'surveyCreation.html'; }, 2000);
+                    setTimeout(() => { window.location.href = state.fromPage; }, 2000);
                     return;
                 }
                 const tempData = JSON.parse(tempDataString);
@@ -329,8 +331,8 @@ export function initBizcardSettings() {
 
     function handleCancel() {
         const returnUrl = state.surveyId
-            ? `surveyCreation.html?surveyId=${encodeURIComponent(state.surveyId)}`
-            : 'surveyCreation.html';
+            ? `${state.fromPage}?surveyId=${encodeURIComponent(state.surveyId)}`
+            : state.fromPage;
         if (hasFormChanged()) {
             showConfirmationModal(
                 `変更が保存されていません。破棄して前の画面に戻りますか？`,
@@ -479,14 +481,14 @@ export function initBizcardSettings() {
                 surveyDataForUpdate.settings.bizcard = savedData;
                 localStorage.setItem('tempSurveyData', JSON.stringify(surveyDataForUpdate));
                 showToast('設定を一時保存しました。', 'success');
-                setTimeout(() => { window.location.href = 'surveyCreation.html'; }, 800);
+                setTimeout(() => { window.location.href = state.fromPage; }, 800);
             } else {
                 savedData.surveyId = state.surveyId;
                 const result = await saveBizcardSettings(savedData);
                 if (result.success) {
                     sessionStorage.setItem(`updatedSurvey_${savedData.surveyId}`, JSON.stringify(savedData));
                     showToast('名刺データ化設定を保存しました！', 'success');
-                    setTimeout(() => window.location.href = 'surveyCreation.html', 800);
+                    setTimeout(() => window.location.href = `${state.fromPage}?surveyId=${encodeURIComponent(state.surveyId)}`, 800);
                 } else {
                     showToast(result.message || '設定の保存に失敗しました。', 'error');
                 }

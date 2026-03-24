@@ -167,17 +167,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         showLoading(true); // 初期化後にローディングを表示
         initializeParams();
         await loadSurveyData();
-        setupEventListeners();
-        await checkForDraft();
-        renderSurvey();
-        if (state.draftToRestore) {
-            populateFormWithDraft();
+        if (state.isPreviewMode) {
+            // プレビューモード: 送信・名刺・フッター関連UIを非表示
+            const footer = document.querySelector('footer');
+            if (footer) footer.style.display = 'none';
+            document.getElementById('bizcard-camera-button')?.closest('footer') && null;
+            const previewBanner = document.createElement('div');
+            previewBanner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#f59e0b;color:#fff;text-align:center;padding:6px 12px;font-size:13px;font-weight:bold;z-index:9999;';
+            previewBanner.textContent = 'プレビューモード — 回答データは送信されません';
+            document.body.prepend(previewBanner);
+            renderSurvey();
+        } else {
+            setupEventListeners();
+            await checkForDraft();
+            renderSurvey();
+            if (state.draftToRestore) {
+                populateFormWithDraft();
+            }
+            startAutoSaveTimer();
+            setupLeaveConfirmation();
+            // setupHeaderScrollBehavior();
+            disablePullToRefresh();
+            history.pushState(null, '', location.href); // <-- Add this line
         }
-        startAutoSaveTimer();
-        setupLeaveConfirmation();
-        // setupHeaderScrollBehavior();
-        disablePullToRefresh();
-        history.pushState(null, '', location.href); // <-- Add this line
 
         // テキストエリアの自動リサイズ
         DOMElements.surveyForm.addEventListener('input', (e) => {
@@ -197,7 +209,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 function initializeParams() {
     const params = new URLSearchParams(window.location.search);
-    state.surveyId = params.get('surveyId');
+    state.isPreviewMode = params.get('preview') === '1';
+    state.surveyId = params.get('surveyId') || (state.isPreviewMode ? '__preview__' : null);
     if (!state.surveyId) {
         throw new Error(formatMessage('ja', 'surveyAnswer.missingSurveyId'));
     }
@@ -251,12 +264,20 @@ function normalizeOptions(options, questionId) {
 }
 
 async function loadSurveyData() {
-    const dataPath = resolveDashboardDataPath(`surveys/${state.surveyId}.json`);
-    const response = await fetch(dataPath);
-    if (!response.ok) {
-        throw new Error(formatMessage('ja', 'surveyAnswer.surveyNotFound', { surveyId: state.surveyId }));
+    if (state.isPreviewMode) {
+        const previewJson = localStorage.getItem('surveyPreviewData');
+        if (!previewJson) {
+            throw new Error('プレビューデータが見つかりません。');
+        }
+        state.surveyData = JSON.parse(previewJson);
+    } else {
+        const dataPath = resolveDashboardDataPath(`surveys/${state.surveyId}.json`);
+        const response = await fetch(dataPath);
+        if (!response.ok) {
+            throw new Error(formatMessage('ja', 'surveyAnswer.surveyNotFound', { surveyId: state.surveyId }));
+        }
+        state.surveyData = await response.json();
     }
-    state.surveyData = await response.json();
 
     // データ構造の正規化
     const rawQuestions = state.surveyData.questions || state.surveyData.details || [];

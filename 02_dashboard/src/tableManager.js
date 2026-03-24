@@ -147,7 +147,7 @@ function sortByHeader(header) {
 
         // Sorting on currentFilteredData directly
         currentFilteredData.sort((a, b) => {
-            const lang = window.getCurrentLanguage();
+            const lang = typeof window.getCurrentLanguage === 'function' ? window.getCurrentLanguage() : 'ja';
             let aValue, bValue;
 
             // Get values based on sortKey, handling multi-language names
@@ -330,7 +330,7 @@ function renderTableRows(surveysToRender) {
     }
 
     const fragment = document.createDocumentFragment();
-    const lang = window.getCurrentLanguage();
+    const lang = typeof window.getCurrentLanguage === 'function' ? window.getCurrentLanguage() : 'ja';
 
 
     surveysToRender.forEach(survey => {
@@ -716,7 +716,7 @@ export function applyFiltersAndPagination() {
 
         const startDate = startDateInputVal ? new Date(startDateInputVal) : null;
         const endDate = endDateInputVal ? new Date(endDateInputVal) : null;
-        const lang = window.getCurrentLanguage();
+        const lang = typeof window.getCurrentLanguage === 'function' ? window.getCurrentLanguage() : 'ja';
 
         currentFilteredData = allSurveyData.filter(survey => {
             const surveyName = (survey.name && typeof survey.name === 'object')
