@@ -336,6 +336,7 @@
                           <div class="input-group mb-0 w-full">
                               <input type="text" id="surveyName_ja" placeholder=" " title="アンケート名" aria-label="アンケート名" class="input-field bg-white w-full" required aria-describedby="surveyName_jaError">
                               <label class="input-label bg-transparent">アンケート名 (管理用)<span class="text-error">*</span></label>
+                              <button type="button" class="help-trigger help-icon-button material-icons" data-help-key="surveyName" aria-label="アンケート名の説明を表示">help_outline</button>
                           </div>
                           <div id="surveyName_jaError" class="hidden text-error text-xs mt-1 flex items-center gap-1" aria-live="polite"><span class="material-icons text-[14px]">error_outline</span><span>要確認: アンケート名を入力してください</span></div>
                           
@@ -344,6 +345,7 @@
                               <div class="input-group mb-0 w-full" data-lang="ja">
                                   <input type="text" id="displayTitle_ja" placeholder=" " title="表示タイトル" aria-label="表示タイトル" class="input-field bg-white w-full" required aria-describedby="displayTitle_jaError">
                                   <label class="input-label bg-transparent">表示タイトル (回答者向け)<span class="text-error">*</span></label>
+                                  <button type="button" class="help-trigger help-icon-button material-icons" data-help-key="surveyDisplayTitle" aria-label="表示タイトルの説明を表示">help_outline</button>
                               </div>
                           </div>
                           <div id="displayTitle_jaError" class="hidden text-error text-xs mt-1 flex items-center gap-1" aria-live="polite"><span class="material-icons text-[14px]">error_outline</span><span>要確認: 表示タイトルを入力してください</span></div>
@@ -351,8 +353,9 @@
                           <!-- Description (Multi-lang wrapper) -->
                           <div class="multi-lang-input-group flex-1 flex flex-col pt-1 w-full" data-field-key="description" data-input-type="textarea" data-label="説明" data-required="false">
                               <div class="input-group mb-0 flex-1 flex flex-col w-full" data-lang="ja">
-                                  <textarea id="description_ja" placeholder=" " title="説明文" aria-label="説明文" class="input-field min-h-[5rem] w-full bg-white resize-y text-sm pt-4"></textarea>
+                                  <textarea id="description_ja" placeholder=" " title="説明文" aria-label="説明文" class="input-field min-h-[5rem] flex-1 w-full bg-white resize-y text-sm pt-4"></textarea>
                                   <label class="input-label bg-transparent">説明文</label>
+                                  <button type="button" class="help-trigger help-icon-button material-icons" data-help-key="surveyDescription" aria-label="説明文の説明を表示">help_outline</button>
                               </div>
                           </div>
                       </div>
@@ -370,6 +373,7 @@
                           <div class="flex flex-col gap-1.5">
                               <span class="text-[10px] font-black text-primary uppercase tracking-wider flex items-center gap-1">
                                   <span class="material-icons text-[14px]">calendar_today</span> 開催期間
+                                  <button type="button" class="help-trigger help-inline-button material-icons" data-help-key="surveyPeriod" aria-label="開催期間の説明を表示">help_outline</button>
                               </span>
                               <div class="flex items-center gap-2 w-full">
                                   <input type="text" id="periodRange" class="input-field bg-white w-full text-sm font-bold" placeholder="期間を選択" aria-describedby="periodRangeError">
@@ -379,7 +383,9 @@
                           
                           <div class="flex flex-col gap-1.5 flex-1 mt-1 w-full">
                               <span class="text-[10px] font-black text-primary uppercase tracking-wider flex items-center justify-between gap-1 w-full pb-1">
-                                  <span class="flex items-center gap-1"><span class="material-icons text-[14px]">edit_note</span> 管理メモ</span>
+                                  <span class="flex items-center gap-1"><span class="material-icons text-[14px]">edit_note</span> 管理メモ
+                                      <button type="button" class="help-trigger help-inline-button material-icons" data-help-key="internalMemo" aria-label="管理メモの説明を表示">help_outline</button>
+                                  </span>
                               </span>
                               <textarea id="memo" placeholder="管理者用メモをここに入力..." class="input-field bg-yellow-50 resize-y w-full min-h-[6rem] text-sm leading-relaxed" maxlength="1000"></textarea>
                           </div>
@@ -406,7 +412,9 @@
                   <!-- Bizcard Toggle -->
                   <div class="flex items-start justify-between bg-gray-50 p-3 rounded-lg border border-gray-100">
                     <div class="flex-1 pr-3">
-                      <p class="font-bold text-sm">名刺画像添付機能</p>
+                      <p class="font-bold text-sm flex items-center gap-1">名刺画像添付機能
+                        <button type="button" class="help-trigger help-inline-button material-icons" data-help-key="noBizcardCapture" aria-label="名刺画像添付機能の説明を表示">help_outline</button>
+                      </p>
                       <p class="text-xs text-gray-500 mt-1 leading-snug">回答時に名刺撮影ステップを追加します。OFFにすると関連設定が無効化されます。</p>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer flex-shrink-0 mt-1">

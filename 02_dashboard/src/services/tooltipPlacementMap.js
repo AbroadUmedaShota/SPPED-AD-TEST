@@ -95,6 +95,51 @@ export const tooltipPlacementMap = {
       status: 'placed'
     }
   ],
+  'surveyCreation-v2.html': [
+    {
+      sourceSheet: '注釈②アンケート作成',
+      tooltipKey: 'surveyName',
+      target: '[data-help-key="surveyName"]',
+      status: 'placed'
+    },
+    {
+      sourceSheet: '注釈②アンケート作成',
+      tooltipKey: 'surveyDisplayTitle',
+      target: '[data-help-key="surveyDisplayTitle"]',
+      status: 'placed'
+    },
+    {
+      sourceSheet: '注釈②アンケート作成',
+      tooltipKey: 'surveyDescription',
+      target: '[data-help-key="surveyDescription"]',
+      status: 'placed'
+    },
+    {
+      sourceSheet: '注釈②アンケート作成',
+      tooltipKey: 'surveyPeriod',
+      target: '[data-help-key="surveyPeriod"]',
+      status: 'placed'
+    },
+    {
+      sourceSheet: '注釈②アンケート作成',
+      tooltipKey: 'internalMemo',
+      target: '[data-help-key="internalMemo"]',
+      status: 'placed'
+    },
+    {
+      sourceSheet: '注釈②アンケート作成',
+      tooltipKey: 'handwritingSpace',
+      target: '[data-help-key="handwritingSpace"]',
+      status: 'placed',
+      note: '手書きスペース設問カードのtypeLabelバッジにdata-help-keyを付与（JS動的生成）'
+    },
+    {
+      sourceSheet: '注釈②アンケート作成',
+      tooltipKey: 'noBizcardCapture',
+      target: '[data-help-key="noBizcardCapture"]',
+      status: 'placed'
+    }
+  ],
   'modals/newSurveyModal.html': [
     {
       sourceSheet: '注釈②アンケート作成',

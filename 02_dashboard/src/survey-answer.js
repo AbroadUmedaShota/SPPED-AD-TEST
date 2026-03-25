@@ -1550,8 +1550,8 @@ function createQuestionElement(question, index) {
                     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
                     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
                     return {
-                        x: (clientX - rect.left),
-                        y: (clientY - rect.top)
+                        x: (clientX - rect.left) * dpr,
+                        y: (clientY - rect.top) * dpr
                     };
                 };
 

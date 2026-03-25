@@ -760,7 +760,15 @@ function buildQuestionCard(q, index) {
   
   const numEl = el('span', { class: 'text-sm font-black text-primary flex-shrink-0 bg-blue-50 px-2 py-1 rounded-lg border border-blue-100', 'data-question-number': '' }, `Q${index + 1}`);
   
-  const typeLabel = el('span', { class: 'text-[11px] font-bold bg-gray-50 text-gray-600 px-2.5 py-1 rounded-lg flex-shrink-0 flex items-center gap-1 border border-gray-200 shadow-sm' }, 
+  const typeLabelAttrs = { class: 'text-[11px] font-bold bg-gray-50 text-gray-600 px-2.5 py-1 rounded-lg flex-shrink-0 flex items-center gap-1 border border-gray-200 shadow-sm' };
+  if (q.type === 'handwriting') {
+    typeLabelAttrs['data-help-key'] = 'handwritingSpace';
+    typeLabelAttrs['role'] = 'button';
+    typeLabelAttrs['tabindex'] = '0';
+    typeLabelAttrs['aria-label'] = '手書きスペースの説明を表示';
+    typeLabelAttrs['title'] = '手書きスペースについて';
+  }
+  const typeLabel = el('span', typeLabelAttrs,
     icon(QUESTION_TYPES[q.type]?.icon || 'help', 'text-[14px] opacity-70'),
     getTypeLabel(q.type)
   );
@@ -1565,6 +1573,11 @@ function openPreview() {
         const frame = document.getElementById('v2-preview-device-frame');
         if (!phoneBtn || !tabletBtn || !frame) return;
 
+        const reloadIframe = () => {
+          if (iframe) {
+            iframe.src = resolveDashboardAssetPath('survey-answer.html') + '?preview=1';
+          }
+        };
         const setPhone = () => {
           frame.style.width = '390px';
           frame.style.height = '844px';
@@ -1572,6 +1585,7 @@ function openPreview() {
           phoneBtn.classList.remove('text-on-surface-variant');
           tabletBtn.classList.remove('bg-surface', 'text-on-surface', 'shadow-sm');
           tabletBtn.classList.add('text-on-surface-variant');
+          reloadIframe();
         };
         const setTablet = () => {
           frame.style.width = '768px';
@@ -1580,6 +1594,7 @@ function openPreview() {
           tabletBtn.classList.remove('text-on-surface-variant');
           phoneBtn.classList.remove('bg-surface', 'text-on-surface', 'shadow-sm');
           phoneBtn.classList.add('text-on-surface-variant');
+          reloadIframe();
         };
         phoneBtn.addEventListener('click', setPhone);
         tabletBtn.addEventListener('click', setTablet);
