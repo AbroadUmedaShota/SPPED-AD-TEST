@@ -483,6 +483,41 @@ function icon(name, extraClass = '') {
   return el('span', { class: `material-icons${extraClass ? ' ' + extraClass : ''}` }, name);
 }
 
+function smoothScrollTo(scrollable, targetY, duration = 400) {
+  const start = scrollable.scrollTop;
+  const diff = targetY - start;
+  let startTime = null;
+  function ease(t) { return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t; }
+  function step(now) {
+    if (!startTime) startTime = now;
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    scrollable.scrollTop = start + diff * ease(progress);
+    if (progress < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function smoothScrollIntoView(el, block = 'center', duration = 400) {
+  const scrollable = document.scrollingElement || document.documentElement;
+  const rect = el.getBoundingClientRect();
+  const scrollableRect = { top: 0, height: window.innerHeight };
+  let targetY;
+  if (block === 'center') {
+    targetY = scrollable.scrollTop + rect.top - scrollableRect.height / 2 + rect.height / 2;
+  } else {
+    targetY = scrollable.scrollTop + rect.top - 80;
+  }
+  smoothScrollTo(scrollable, targetY, duration);
+}
+
+function smoothScrollIntoViewInPanel(panel, target, duration = 400) {
+  const panelRect = panel.getBoundingClientRect();
+  const targetRect = target.getBoundingClientRect();
+  const offsetTop = panel.scrollTop + targetRect.top - panelRect.top - panelRect.height / 2 + targetRect.height / 2;
+  smoothScrollTo(panel, offsetTop, duration);
+}
+
 
 // ─────────────────────────────────────────
 // 設問リスト制御
@@ -702,7 +737,7 @@ function updateOutline() {
       'data-question-id': q.id,
       onclick: (e) => {
         e.preventDefault();
-        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        smoothScrollIntoView(card, 'center');
       }
     },
       el('span', { class: `text-xs font-medium flex-shrink-0 ${hasError ? 'text-error' : 'text-primary'}` }, `Q${i + 1}`),
@@ -757,18 +792,122 @@ function buildQuestionCard(q, index) {
   
   const numEl = el('span', { class: 'text-sm font-black text-primary flex-shrink-0 bg-blue-50 px-2 py-1 rounded-lg border border-blue-100', 'data-question-number': '' }, `Q${index + 1}`);
   
-  const typeLabelAttrs = { class: 'text-[11px] font-bold bg-gray-50 text-gray-600 px-2.5 py-1 rounded-lg flex-shrink-0 flex items-center gap-1 border border-gray-200 shadow-sm' };
-  if (q.type === 'handwriting') {
-    typeLabelAttrs['data-help-key'] = 'handwritingSpace';
-    typeLabelAttrs['role'] = 'button';
-    typeLabelAttrs['tabindex'] = '0';
-    typeLabelAttrs['aria-label'] = '手書きスペースの説明を表示';
-    typeLabelAttrs['title'] = '手書きスペースについて';
-  }
-  const typeLabel = el('span', typeLabelAttrs,
+  // --- インラインポップオーバー式タイプ変更 ---
+  const typeWrapper = el('div', { class: 'relative flex-shrink-0', style: 'z-index: 30;' });
+
+  const typeBadge = el('span', {
+    class: 'text-[11px] font-bold bg-gray-50 text-gray-600 px-2.5 py-1 rounded-lg flex items-center gap-1 border border-gray-200 shadow-sm cursor-pointer hover:bg-indigo-50 hover:border-indigo-300 hover:text-indigo-700 transition-colors',
+    role: 'button',
+    tabindex: '0',
+    title: '設問タイプを変更',
+    'aria-label': `設問タイプ: ${getTypeLabel(q.type)}（クリックで変更）`,
+  },
     icon(QUESTION_TYPES[q.type]?.icon || 'help', 'text-[14px] opacity-70'),
-    getTypeLabel(q.type)
+    el('span', { 'data-type-badge-label': '' }, getTypeLabel(q.type)),
+    icon('unfold_more', 'text-[12px] opacity-40 ml-0.5')
   );
+
+  const typePopover = el('div', {
+    class: 'hidden fixed bg-white border border-gray-200 rounded-xl shadow-xl p-3 w-56',
+    style: 'z-index: 9999;'
+  });
+  document.body.appendChild(typePopover);
+
+  function buildTypePopoverContent(pendingType) {
+    typePopover.innerHTML = '';
+    const grid = el('div', { class: 'grid grid-cols-1 gap-1' });
+    Object.entries(QUESTION_TYPES).forEach(([type, def]) => {
+      const isCurrent = type === q.type;
+      const btn = el('button', {
+        type: 'button',
+        class: `flex items-center gap-2 px-3 py-2 rounded-lg border text-xs font-semibold transition-colors w-full text-left ${
+          isCurrent
+            ? 'border-indigo-300 bg-indigo-50 text-indigo-700 cursor-default'
+            : 'border-transparent bg-transparent text-gray-700 hover:bg-indigo-50 hover:text-indigo-700'
+        }`,
+      },
+        icon(def.icon, 'text-[14px] opacity-70'),
+        def.label,
+        ...(isCurrent ? [el('span', { class: 'ml-auto text-[9px] font-bold bg-indigo-100 text-indigo-500 px-1.5 py-0.5 rounded' }, '現在')] : [])
+      );
+      if (!isCurrent) {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const fromChoice = CHOICE_TYPES.has(q.type);
+          const toChoice = CHOICE_TYPES.has(type);
+          const fromMatrix = MATRIX_TYPES.has(q.type);
+          const toMatrix = MATRIX_TYPES.has(type);
+          const needsReset = !(fromChoice && toChoice) && !(fromMatrix && toMatrix);
+          if (needsReset && (q.options?.length || q.matrixRows?.length)) {
+            // 確認行を表示
+            typePopover.innerHTML = '';
+            const warn = el('p', { class: 'text-xs text-gray-600 mb-3 leading-snug' },
+              `「${def.label}」に変更すると選択肢・詳細設定がリセットされます。`
+            );
+            const confirmRow = el('div', { class: 'flex gap-2' });
+            const confirmBtn = el('button', { type: 'button', class: 'flex-1 bg-indigo-600 text-white text-xs font-bold py-1.5 rounded-lg hover:bg-indigo-700 transition-colors' }, '変更する');
+            const cancelBtn = el('button', { type: 'button', class: 'flex-1 bg-gray-100 text-gray-600 text-xs font-bold py-1.5 rounded-lg hover:bg-gray-200 transition-colors' }, '戻る');
+            confirmBtn.addEventListener('click', (e) => { e.stopPropagation(); doTypeChange(type); });
+            cancelBtn.addEventListener('click', (e) => { e.stopPropagation(); buildTypePopoverContent(); });
+            confirmRow.append(confirmBtn, cancelBtn);
+            typePopover.append(warn, confirmRow);
+          } else {
+            doTypeChange(type);
+          }
+        });
+      }
+      grid.appendChild(btn);
+    });
+    typePopover.appendChild(grid);
+  }
+
+  function doTypeChange(newType) {
+    applyTypeChange(q, card, newType);
+    // バッジ表示を更新
+    const labelEl = typeBadge.querySelector('[data-type-badge-label]');
+    const iconEl = typeBadge.querySelector('.material-icons');
+    if (labelEl) labelEl.textContent = getTypeLabel(newType);
+    if (iconEl) iconEl.textContent = QUESTION_TYPES[newType]?.icon || 'help';
+    closeTypePopover();
+  }
+
+  function positionPopover() {
+    const rect = typeBadge.getBoundingClientRect();
+    const popoverWidth = 224; // w-56
+    let left = rect.right - popoverWidth;
+    if (left < 8) left = 8;
+    typePopover.style.top = `${rect.bottom + 4}px`;
+    typePopover.style.left = `${left}px`;
+  }
+
+  function closeTypePopover() {
+    typePopover.classList.add('hidden');
+    document.removeEventListener('click', onOutsideClick, true);
+    window.removeEventListener('scroll', closeTypePopover, true);
+    window.removeEventListener('resize', closeTypePopover);
+  }
+
+  function onOutsideClick(e) {
+    if (!typeWrapper.contains(e.target) && !typePopover.contains(e.target)) closeTypePopover();
+  }
+
+  typeBadge.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (!typePopover.classList.contains('hidden')) { closeTypePopover(); return; }
+    buildTypePopoverContent();
+    positionPopover();
+    typePopover.classList.remove('hidden');
+    document.addEventListener('click', onOutsideClick, true);
+    window.addEventListener('scroll', closeTypePopover, true);
+    window.addEventListener('resize', closeTypePopover);
+  });
+  typeBadge.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); typeBadge.click(); }
+    if (e.key === 'Escape') closeTypePopover();
+  });
+
+  typeWrapper.append(typeBadge);
+  const typeLabel = typeWrapper; // 既存の参照名を維持
 
   const reqBg = q.required ? 'bg-red-50 border-red-200 text-red-600' : 'bg-gray-50 border-gray-200 text-gray-400';
   const requiredBadge = el('span', {
@@ -807,12 +946,12 @@ function buildQuestionCard(q, index) {
   toggleIcon.style.transform = 'rotate(180deg)';
   const toggleBtn = el('button', { type: 'button', class: 'w-8 h-8 rounded-full flex items-center justify-center hover:bg-indigo-50 text-gray-600 ml-1 transition-colors', 'data-toggle-btn': '', onclick: (e) => { e.stopPropagation(); toggleCard(card); } }, toggleIcon);
 
-  header.append(handle, numEl, typeLabel, requiredBadge, summaryText, actionGroup, toggleBtn);
+  header.append(handle, numEl, summaryText, actionGroup, toggleBtn);
 
   const detail = el('div', { class: 'q-card-detail border-t border-gray-100 bg-gray-50/30', 'data-detail-panel': '' });
-  detail.appendChild(buildBasicSection(q, card));
-  
-  const ansSec = buildAnswerSection(q);
+  detail.appendChild(buildBasicSection(q, card, requiredBadge));
+
+  const ansSec = buildAnswerSection(q, typeLabel);
   if (ansSec) detail.appendChild(ansSec);
   detail.appendChild(buildAdvancedSection(q));
 
@@ -829,47 +968,55 @@ function toggleCard(card) {
   if (toggleIcon) toggleIcon.style.transform = isOpen ? '' : 'rotate(180deg)';
 }
 
-function buildBasicSection(q, cardNode) {
+function buildBasicSection(q, cardNode, requiredBadge) {
   const section = el('section', { class: 'px-5 py-4 space-y-4' });
-  section.appendChild(el('h4', { class: 'text-sm font-bold text-gray-700 flex items-center gap-1.5' }, icon('edit_note', 'text-[18px] text-gray-400'), '基本設定'));
+  const sectionHeader = el('div', { class: 'flex items-center gap-2' });
+  sectionHeader.appendChild(el('h4', { class: 'text-sm font-bold text-gray-700 flex items-center gap-1.5' }, icon('edit_note', 'text-[18px] text-gray-400'), '基本設定'));
+  sectionHeader.appendChild(requiredBadge);
+  section.appendChild(sectionHeader);
 
-  const wrappers = currentLangs.map(lang => {
+  currentLangs.forEach((lang) => {
     const input = el('input', {
       type: 'text', class: 'input-field w-full bg-white font-bold text-sm', placeholder: ' ',
       value: q.text[lang] || '',
       oninput: (e) => {
-        if(!q.text) q.text = {};
+        if (!q.text) q.text = {};
         q.text[lang] = e.target.value;
-        if(lang === currentLangs[0]) {
+        if (lang === currentLangs[0]) {
           const sum = cardNode.querySelector('[data-question-summary-text]');
-          if(sum) sum.textContent = e.target.value || '設問文を入力してください';
+          if (sum) sum.textContent = e.target.value || '設問文を入力してください';
           updateOutline();
         } else {
           updateTranslationBadges();
         }
       }
     });
-    const label = el('label', {class: 'input-label bg-transparent'}, `設問文 (${lang})`);
-    const group = el('div', {class: 'input-group mb-0'});
-    
-    group.append(input, label);
-    const wrap = el('div', {'data-lang-wrapper': lang}, group);
-    return wrap;
+    const group = el('div', { class: 'input-group mb-0' });
+    group.append(input, el('label', { class: 'input-label bg-transparent' }, `設問文 (${lang})`));
+    section.appendChild(el('div', { 'data-lang-wrapper': lang }, group));
   });
-  wrappers.forEach(w => section.appendChild(w));
 
   return section;
 }
 
-function buildAnswerSection(q) {
-  if (CHOICE_TYPES.has(q.type)) return buildChoiceSection(q);
-  if (MATRIX_TYPES.has(q.type)) return buildMatrixSection(q);
-  return el('section', {class: 'px-5 pb-5'}, el('div', {class: 'bg-white border border-gray-200 rounded-xl p-4 text-center'}, el('p', {class: 'text-xs text-gray-500 font-bold'}, `${getTypeLabel(q.type)}の回答設定`)));
+function buildAnswerSection(q, typeLabel) {
+  if (CHOICE_TYPES.has(q.type)) return buildChoiceSection(q, typeLabel);
+  if (MATRIX_TYPES.has(q.type)) return buildMatrixSection(q, typeLabel);
+  const section = el('section', {class: 'px-5 pb-5 border-t border-gray-100 pt-4'});
+  const hdr = el('div', {class: 'flex items-center justify-between gap-2 mb-3'});
+  hdr.appendChild(el('h4', {class: 'text-sm font-bold text-gray-700 flex items-center gap-1.5'}, icon('tune', 'text-[18px] text-gray-400'), '回答設定'));
+  if (typeLabel) hdr.appendChild(typeLabel);
+  section.appendChild(hdr);
+  section.appendChild(el('div', {class: 'bg-white border border-gray-200 rounded-xl p-4 text-center'}, el('p', {class: 'text-xs text-gray-500 font-bold'}, `${getTypeLabel(q.type)}の回答設定`)));
+  return section;
 }
 
-function buildChoiceSection(q) {
+function buildChoiceSection(q, typeLabel) {
   const section = el('section', { class: 'px-5 pb-5 space-y-4 border-t border-gray-100 pt-4' });
-  section.appendChild(el('h4', { class: 'text-sm font-bold text-gray-700 flex items-center gap-1.5' }, icon('list_alt', 'text-[18px] text-gray-400'), '選択肢設定'));
+  const hdr = el('div', { class: 'flex items-center justify-between gap-2' });
+  hdr.appendChild(el('h4', { class: 'text-sm font-bold text-gray-700 flex items-center gap-1.5' }, icon('list_alt', 'text-[18px] text-gray-400'), '選択肢設定'));
+  if (typeLabel) hdr.appendChild(typeLabel);
+  section.appendChild(hdr);
 
   const optionsList = el('div', { class: 'space-y-2.5', id: `options-list-${q.id}` });
   (q.options || []).forEach((opt, idx) => {
@@ -960,9 +1107,12 @@ function buildOptionRow(q, idx, optValObj) {
   return row;
 }
 
-function buildMatrixSection(q) {
+function buildMatrixSection(q, typeLabel) {
   const section = el('section', { class: 'px-5 pb-5 space-y-5 border-t border-gray-100 pt-4' });
-  section.appendChild(el('h4', { class: 'text-sm font-bold text-gray-700 flex items-center gap-1.5' }, icon('grid_on', 'text-[18px] text-gray-400'), 'マトリックス設定'));
+  const hdr = el('div', { class: 'flex items-center justify-between gap-2' });
+  hdr.appendChild(el('h4', { class: 'text-sm font-bold text-gray-700 flex items-center gap-1.5' }, icon('grid_on', 'text-[18px] text-gray-400'), 'マトリックス設定'));
+  if (typeLabel) hdr.appendChild(typeLabel);
+  section.appendChild(hdr);
 
   section.appendChild(buildMatrixList(q, 'rows', '行'));
   section.appendChild(buildMatrixList(q, 'cols', '列'));
@@ -1062,6 +1212,145 @@ function buildAdvancedSection(q) {
 }
 
 // ─────────────────────────────────────────
+// 設問タイプ変更ダイアログ
+// ─────────────────────────────────────────
+function showTypeChangeDialog(q, card) {
+  const dialog = document.getElementById('questionTypeChangeDialog');
+  const grid = document.getElementById('typeChangeGrid');
+  const confirmPhase = document.getElementById('typeChangeConfirmPhase');
+  const warningText = document.getElementById('typeChangeWarningText');
+  const confirmBtn = document.getElementById('typeChangeConfirm');
+  const cancelBtn = document.getElementById('typeChangeCancel');
+  const closeBtn = document.getElementById('typeChangeClose');
+  if (!dialog || !grid) return;
+
+  // 初期化
+  grid.innerHTML = '';
+  confirmPhase.classList.add('hidden');
+  let pendingType = null;
+
+  // タイプ選択グリッドを生成
+  Object.entries(QUESTION_TYPES).forEach(([type, def]) => {
+    const isCurrent = type === q.type;
+    const btn = el('button', {
+      type: 'button',
+      class: `flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm font-semibold transition-colors ${
+        isCurrent
+          ? 'border-indigo-400 bg-indigo-50 text-indigo-700 cursor-default ring-2 ring-indigo-200'
+          : 'border-gray-200 bg-white text-gray-700 hover:bg-indigo-50 hover:border-indigo-400 hover:text-indigo-700'
+      }`,
+      ...(isCurrent ? { 'aria-current': 'true' } : {}),
+    },
+      icon(def.icon, 'text-base opacity-70'),
+      def.label,
+      ...(isCurrent ? [el('span', { class: 'ml-auto text-[10px] font-bold bg-indigo-100 text-indigo-600 px-1.5 py-0.5 rounded' }, '現在')] : [])
+    );
+
+    if (!isCurrent) {
+      btn.addEventListener('click', () => {
+        pendingType = type;
+
+        // 警告テキスト生成
+        const fromChoice = CHOICE_TYPES.has(q.type);
+        const toChoice = CHOICE_TYPES.has(type);
+        const fromMatrix = MATRIX_TYPES.has(q.type);
+        const toMatrix = MATRIX_TYPES.has(type);
+
+        let warn = `「${QUESTION_TYPES[q.type].label}」から「${def.label}」に変更します。`;
+        if (fromChoice && toChoice) {
+          warn += '選択肢はそのまま引き継がれます。';
+        } else if (fromMatrix && toMatrix) {
+          warn += '行・列の設定はそのまま引き継がれます。';
+        } else {
+          warn += '入力済みの選択肢・詳細設定はリセットされます。';
+        }
+
+        warningText.textContent = warn;
+
+        // ボタンのハイライト更新
+        grid.querySelectorAll('button').forEach(b => b.classList.remove('ring-2', 'ring-indigo-300', 'border-indigo-400', 'bg-indigo-50', 'text-indigo-700'));
+        btn.classList.add('ring-2', 'ring-indigo-300', 'border-indigo-400', 'bg-indigo-50', 'text-indigo-700');
+
+        confirmPhase.classList.remove('hidden');
+        confirmBtn.focus();
+      });
+    }
+    grid.appendChild(btn);
+  });
+
+  dialog.classList.remove('hidden');
+  dialog.classList.add('flex');
+  const prevFocus = document.activeElement;
+
+  const close = () => {
+    dialog.classList.add('hidden');
+    dialog.classList.remove('flex');
+    confirmBtn.removeEventListener('click', onConfirm);
+    cancelBtn.removeEventListener('click', close);
+    closeBtn.removeEventListener('click', close);
+    dialog.removeEventListener('click', onBackdrop);
+    dialog.removeEventListener('keydown', onEscape);
+    prevFocus?.focus();
+  };
+
+  const onConfirm = () => {
+    if (!pendingType) return;
+    applyTypeChange(q, card, pendingType);
+    close();
+  };
+
+  const onBackdrop = (e) => { if (e.target === dialog) close(); };
+  const onEscape = (e) => { if (e.key === 'Escape') close(); };
+
+  confirmBtn.addEventListener('click', onConfirm);
+  cancelBtn.addEventListener('click', close);
+  closeBtn.addEventListener('click', close);
+  dialog.addEventListener('click', onBackdrop);
+  dialog.addEventListener('keydown', onEscape);
+}
+
+function applyTypeChange(q, card, newType) {
+  const oldType = q.type;
+  const fromChoice = CHOICE_TYPES.has(oldType);
+  const toChoice = CHOICE_TYPES.has(newType);
+  const fromMatrix = MATRIX_TYPES.has(oldType);
+  const toMatrix = MATRIX_TYPES.has(newType);
+
+  // タイプを更新
+  q.type = newType;
+
+  // データの引き継ぎ/リセット
+  if (fromChoice && toChoice) {
+    // 選択肢系→選択肢系: 選択肢をそのまま保持
+  } else if (fromMatrix && toMatrix) {
+    // マトリックス同士: 行・列をそのまま保持
+  } else {
+    // それ以外: 不要なデータを削除し、新タイプのデフォルトを適用
+    delete q.options;
+    delete q.matrixRows;
+    delete q.matrixCols;
+    delete q.config;
+
+    const defaults = defaultQuestion(newType);
+    if (defaults.options)     q.options     = defaults.options;
+    if (defaults.matrixRows)  q.matrixRows  = defaults.matrixRows;
+    if (defaults.matrixCols)  q.matrixCols  = defaults.matrixCols;
+    if (defaults.config)      q.config      = defaults.config;
+  }
+
+  // カードを差し替え
+  const container = document.getElementById('questionListContainer');
+  if (!container) return;
+  const idx = questions.findIndex(item => item.id === q.id);
+  const newCard = buildQuestionCard(q, idx < 0 ? 0 : idx);
+  card.replaceWith(newCard);
+  renumberQuestions();
+  updateMultiLangVisibility();
+
+  showToast(`設問タイプを「${QUESTION_TYPES[newType].label}」に変更しました`, 'success');
+}
+
+// ─────────────────────────────────────────
 // 追加・削除・複製・Sortable
 // ─────────────────────────────────────────
 function addQuestion(type) {
@@ -1073,7 +1362,7 @@ function addQuestion(type) {
     container.appendChild(card);
     renumberQuestions();
     updateMultiLangVisibility();
-    setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
+    setTimeout(() => smoothScrollIntoView(card, 'center'), 50);
   }
 }
 
@@ -1113,7 +1402,7 @@ function duplicateQuestion(id) {
     }
     renumberQuestions();
     updateMultiLangVisibility();
-    setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
+    setTimeout(() => smoothScrollIntoView(card, 'center'), 50);
   }
 }
 
@@ -1348,10 +1637,9 @@ function initOutlineScrollLinks() {
       // 左カラムの sticky コンテナ内にある場合はそちらをスクロール
       const stickyPanel = target.closest('.sticky-panel');
       if (stickyPanel) {
-        const offsetTop = target.offsetTop - stickyPanel.offsetTop;
-        stickyPanel.scrollTo({ top: offsetTop, behavior: 'smooth' });
+        smoothScrollIntoViewInPanel(stickyPanel, target);
       } else {
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        smoothScrollIntoView(target, 'start');
       }
 
       // サンクス画面の場合はアコーディオンを開く
@@ -1623,11 +1911,12 @@ function attemptSave() {
   if (!validateForm()) {
     if (questions.length === 0) {
       showToast('設問を1件以上追加してください', 'error');
-      document.getElementById('addFirstQuestionBtn')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const firstBtn = document.getElementById('addFirstQuestionBtn');
+      if (firstBtn) smoothScrollIntoView(firstBtn, 'center');
     } else {
       showToast('保存に失敗しました（詳細は各項目を確認してください）', 'error');
       const firstError = document.querySelector('.input-error');
-      if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (firstError) smoothScrollIntoView(firstError, 'center');
     }
     return;
   }
