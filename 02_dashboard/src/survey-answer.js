@@ -1447,10 +1447,10 @@ function createQuestionElement(question, index) {
                 <div class="handwriting-container">
                     <div class="toolbox">
                         <div class="tool-group">
-                            <button type="button" id="${question.id}-pen-tool" class="tool-button active" title="ペン">
+                            <button type="button" id="${question.id}-pen-tool" class="tool-button" title="ペンモードをオンにする">
                                 <span class="material-icons">edit</span>
                             </button>
-                            <button type="button" id="${question.id}-eraser-tool" class="tool-button" title="消しゴム">
+                            <button type="button" id="${question.id}-eraser-tool" class="tool-button" title="消しゴム" disabled>
                                 <span class="material-icons">layers_clear</span>
                             </button>
                         </div>
@@ -1472,7 +1472,15 @@ function createQuestionElement(question, index) {
                             </button>
                         </div>
                     </div>
-                    <canvas id="${canvasId}" class="border border-gray-400 rounded-md w-full" style="touch-action: none;" height="${canvasHeight}"></canvas>
+                    <div class="relative">
+                        <canvas id="${canvasId}" class="border border-gray-400 rounded-md w-full" style="touch-action: auto;" height="${canvasHeight}"></canvas>
+                        <div id="${question.id}-canvas-overlay" class="absolute inset-0 flex items-center justify-center bg-gray-50/80 rounded-md cursor-pointer" title="タップしてペンモードをオン">
+                            <div class="flex flex-col items-center gap-1 text-gray-400 pointer-events-none">
+                                <span class="material-icons text-3xl">edit_off</span>
+                                <span class="text-xs font-medium">ペンモードがオフです</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             `;
 
@@ -1492,6 +1500,24 @@ function createQuestionElement(question, index) {
                 // 描画状態
                 let drawing = false;
                 let tool = 'pen'; // 'pen' or 'eraser'
+                let penModeActive = false;
+
+                const canvasOverlay = document.getElementById(`${question.id}-canvas-overlay`);
+
+                function setPenMode(active) {
+                    penModeActive = active;
+                    canvas.style.touchAction = active ? 'none' : 'auto';
+                    if (canvasOverlay) canvasOverlay.style.display = active ? 'none' : 'flex';
+                    penTool.classList.toggle('active', active && tool === 'pen');
+                    eraserTool.disabled = !active;
+                    if (!active) {
+                        tool = 'pen';
+                        ctx.globalCompositeOperation = 'source-over';
+                        ctx.strokeStyle = colorPicker.value;
+                        eraserTool.classList.remove('active');
+                        penTool.classList.remove('active');
+                    }
+                }
                 
                 // 履歴管理
                 let history = [ctx.getImageData(0, 0, canvas.width, canvas.height)];
@@ -1517,8 +1543,8 @@ function createQuestionElement(question, index) {
                 // --- 関数定義 ---
 
                 function updateToolButtons() {
-                    penTool.classList.toggle('active', tool === 'pen');
-                    eraserTool.classList.toggle('active', tool === 'eraser');
+                    penTool.classList.toggle('active', penModeActive && tool === 'pen');
+                    eraserTool.classList.toggle('active', penModeActive && tool === 'eraser');
                 }
 
                 function updateHistoryButtons() {
@@ -1562,6 +1588,7 @@ function createQuestionElement(question, index) {
                 };
 
                 const startDrawing = (e) => {
+                    if (!penModeActive) return;
                     e.preventDefault();
                     drawing = true;
                     const pos = getPos(e);
@@ -1570,7 +1597,7 @@ function createQuestionElement(question, index) {
                 };
 
                 const draw = (e) => {
-                    if (!drawing) return;
+                    if (!drawing || !penModeActive) return;
                     e.preventDefault();
                     const pos = getPos(e);
                     ctx.lineTo(pos.x, pos.y);
@@ -1588,17 +1615,28 @@ function createQuestionElement(question, index) {
 
                 // ツール選択
                 penTool.addEventListener('click', () => {
-                    tool = 'pen';
-                    ctx.globalCompositeOperation = 'source-over';
-                    ctx.strokeStyle = colorPicker.value;
-                    updateToolButtons();
+                    if (!penModeActive) {
+                        // ペンモードをオン
+                        setPenMode(true);
+                    } else if (tool !== 'pen') {
+                        // 消しゴムからペンに切り替え
+                        tool = 'pen';
+                        ctx.globalCompositeOperation = 'source-over';
+                        ctx.strokeStyle = colorPicker.value;
+                        updateToolButtons();
+                    } else {
+                        // ペンモードをオフ
+                        setPenMode(false);
+                    }
                 });
 
                 eraserTool.addEventListener('click', () => {
+                    if (!penModeActive) return;
                     tool = 'eraser';
                     ctx.globalCompositeOperation = 'destination-out';
                     updateToolButtons();
                 });
+
 
                 // プロパティ変更
                 colorPicker.addEventListener('input', (e) => {

@@ -163,6 +163,7 @@ let activeLang = 'ja';
 let sortables = {
   questions: null,
   langTabs: null,
+  outline: null,
   options: {}
 };
 
@@ -753,6 +754,26 @@ function updateOutline() {
     }
     outlineList.appendChild(a);
   });
+
+  // アウトラインのドラッグ並び替え
+  if (typeof Sortable !== 'undefined') {
+    if (sortables.outline) sortables.outline.destroy();
+    sortables.outline = new Sortable(outlineList, {
+      animation: 150,
+      ghostClass: 'dragging-item',
+      onEnd: (evt) => {
+        if (evt.oldIndex === evt.newIndex) return;
+        const container = document.getElementById('questionListContainer');
+        if (!container) return;
+        const cards = Array.from(container.querySelectorAll('[data-question-id]'));
+        const moved = cards.splice(evt.oldIndex, 1)[0];
+        cards.splice(evt.newIndex, 0, moved);
+        cards.forEach(card => container.appendChild(card));
+        renumberQuestions();
+      }
+    });
+  }
+
   updateSaveButtonState();
   updateTranslationBadges();
 }
