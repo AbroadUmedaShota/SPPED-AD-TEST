@@ -168,15 +168,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         initializeParams();
         await loadSurveyData();
         if (state.isPreviewMode) {
-            // プレビューモード: 送信・名刺・フッター関連UIを非表示
-            const footer = document.querySelector('footer');
-            if (footer) footer.style.display = 'none';
-            document.getElementById('bizcard-camera-button')?.closest('footer') && null;
-            const previewBanner = document.createElement('div');
-            previewBanner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#f59e0b;color:#fff;text-align:center;padding:6px 12px;font-size:13px;font-weight:bold;z-index:9999;';
-            previewBanner.textContent = 'プレビューモード — 回答データは送信されません';
-            document.body.prepend(previewBanner);
             renderSurvey();
+            if (DOMElements.submitSurveyButton) {
+                DOMElements.submitSurveyButton.addEventListener('click', handleSubmit);
+            }
+            if (DOMElements.bizcardCameraButton) {
+                DOMElements.bizcardCameraButton.addEventListener('click', () => showToast('プレビューのため、この機能は使用できません'));
+            }
+            if (DOMElements.bizcardManualButton) {
+                DOMElements.bizcardManualButton.addEventListener('click', () => showToast('プレビューのため、この機能は使用できません'));
+            }
         } else {
             setupEventListeners();
             await checkForDraft();
@@ -325,12 +326,17 @@ function setupEventListeners() {
     if (DOMElements.submitSurveyButton) {
         DOMElements.submitSurveyButton.addEventListener('click', handleSubmit);
     }
+    const isPreview = new URLSearchParams(window.location.search).get('preview') === '1';
     if (DOMElements.bizcardCameraButton) {
-        DOMElements.bizcardCameraButton.addEventListener('click', () => startBizcardUploadFlow());
+        DOMElements.bizcardCameraButton.addEventListener('click', () => {
+            if (isPreview) { showToast('プレビューのため、この機能は使用できません'); return; }
+            startBizcardUploadFlow();
+        });
     }
     initBizcardPreviewListeners();
     if (DOMElements.bizcardManualButton) {
         DOMElements.bizcardManualButton.addEventListener('click', () => {
+            if (isPreview) { showToast('プレビューのため、この機能は使用できません'); return; }
             const formId = 'manual-bizcard-form';
             const body = `
             <form id="${formId}" class="space-y-4">
@@ -1822,6 +1828,33 @@ async function handleSubmit() {
 
         // サンクス画面へ遷移
         const thankYouSettings = state.surveyData.thankYouScreenSettings || state.surveyData.settings?.thankYouScreen || {};
+
+        if (state.isPreviewMode) {
+            // プレビュー: iframe内でサンクス画面をインライン描画
+            const thankYouMessage = (thankYouSettings.thankYouMessage
+                ? (typeof thankYouSettings.thankYouMessage === 'object'
+                    ? (thankYouSettings.thankYouMessage[getCurrentLocale()] || thankYouSettings.thankYouMessage.ja || '')
+                    : thankYouSettings.thankYouMessage)
+                : '') || 'ご回答ありがとうございました。';
+            document.open();
+            document.write(`<!DOCTYPE html><html lang="ja"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"><\/script>
+</head><body class="bg-blue-50 min-h-screen flex items-center justify-center py-12 px-4">
+<div class="max-w-md w-full bg-white rounded-lg shadow-xl p-10 text-center space-y-4">
+  <svg class="mx-auto w-16 h-16 text-green-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+  </svg>
+  <h2 class="text-2xl font-extrabold text-gray-900">回答完了</h2>
+  <p class="text-sm text-gray-600">${thankYouMessage}</p>
+  <p class="text-xs text-amber-600 font-bold mt-4">※ プレビューモードのため回答データは送信されていません</p>
+</div>
+</body></html>`);
+            document.close();
+            return;
+        }
+
         let thankYouUrl = thankYouSettings.url || 'thankYouScreen.html';
         thankYouUrl += `?surveyId=${state.surveyId}`;
         thankYouUrl += `&answerLocale=${encodeURIComponent(getCurrentLocale())}`;
