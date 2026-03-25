@@ -1,16 +1,14 @@
 
-
-const flatpickrInstance = window.flatpickr;
-const JAPANESE_LOCALE = flatpickrInstance?.l10ns?.ja ?? flatpickrInstance?.l10ns?.default ?? {};
-
 /**
  * 日付ピッカーを初期化する
  */
 export function initializeDatepickers(isNewSurvey = false) {
+    const flatpickrInstance = window.flatpickr;
     if (!flatpickrInstance) {
         console.warn('flatpickr is not loaded.');
         return;
     }
+    const JAPANESE_LOCALE = flatpickrInstance?.l10ns?.ja ?? flatpickrInstance?.l10ns?.default ?? {};
     if (Object.keys(JAPANESE_LOCALE).length > 0) {
         flatpickrInstance.localize(JAPANESE_LOCALE);
     }
@@ -29,11 +27,23 @@ export function initializeDatepickers(isNewSurvey = false) {
         rangeOptions.minDate = tomorrow;
     }
 
-    flatpickrInstance('#periodRange', rangeOptions);
+    const periodInput = document.getElementById('periodRange');
+    if (periodInput && !periodInput._flatpickr) {
+        const fp = flatpickrInstance(periodInput, rangeOptions);
+
+        // カレンダーアイコンクリックでピッカーを開く
+        const calendarIcon = periodInput.parentElement?.querySelector('[aria-label="カレンダーを開く"]');
+        if (calendarIcon) {
+            calendarIcon.addEventListener('click', () => fp.open());
+        }
+    }
 
     // Keep the deadline picker initialization
-    flatpickrInstance('#deadlineWrapper', {
-        wrap: true, // This one still uses a wrapper
-        dateFormat: 'Y-m-d',
-    });
+    const deadlineWrapper = document.getElementById('deadlineWrapper');
+    if (deadlineWrapper && !deadlineWrapper.querySelector('input')?._flatpickr) {
+        flatpickrInstance('#deadlineWrapper', {
+            wrap: true,
+            dateFormat: 'Y-m-d',
+        });
+    }
 }
