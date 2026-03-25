@@ -292,11 +292,8 @@ function renderLangSelectionAndTabs() {
 
     const iconSpan = el('span', { class: 'material-icons text-[16px] opacity-70' }, 'translate');
     const txt = el('span', { class: 'truncate font-medium' }, langObj ? langObj.name : langCode);
-    
-    // 未入力警告アイコン（仮実装）
-    const warn = el('span', { class: 'material-icons text-error text-[14px] hidden ml-auto', 'data-tab-warning': '' }, 'warning');
-    
-    tab.append(iconSpan, txt, warn);
+
+    tab.append(iconSpan, txt);
     tabsContainer.appendChild(tab);
   });
 
@@ -1773,13 +1770,25 @@ async function init() {
 
   // Toggles
   const bizToggle = document.getElementById('bizcardEnabled');
-  bizToggle?.addEventListener('change', () => {
-    const on = bizToggle.checked;
+  const _applyBizcardLinkState = (on) => {
     ['bizcardDataSettingsSection', 'thankYouEmailSettingsSection'].forEach(id => {
       const el = document.getElementById(id);
-      if(el) { el.classList.toggle('opacity-50', !on); el.classList.toggle('pointer-events-none', !on); }
+      if (!el) return;
+      el.classList.toggle('opacity-40', !on);
+      el.classList.toggle('pointer-events-none', !on);
+      el.classList.toggle('grayscale', !on);
+      if (!on) {
+        el.dataset.savedHref = el.getAttribute('href') ?? '';
+        el.removeAttribute('href');
+        el.setAttribute('aria-disabled', 'true');
+      } else {
+        if (el.dataset.savedHref) el.setAttribute('href', el.dataset.savedHref);
+        el.removeAttribute('aria-disabled');
+      }
     });
-  });
+  };
+  bizToggle?.addEventListener('change', () => _applyBizcardLinkState(bizToggle.checked));
+  if (bizToggle) _applyBizcardLinkState(bizToggle.checked);
 
   initMultilingualToggle();
   initLangTabWidthTracking();
