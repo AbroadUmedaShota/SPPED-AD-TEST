@@ -306,12 +306,6 @@ export const tooltipPlacementMap = {
       tooltipKey: 'groupOverview',
       target: '[data-help-target="group-overview"]',
       status: 'placed'
-    },
-    {
-      sourceSheet: '現行モック独自',
-      tooltipKey: 'groupMemberManagement',
-      target: '[data-help-target="group-member-management"]',
-      status: 'placed'
     }
   ]
 };
