@@ -36,3 +36,9 @@ data/dashboard/user_credentials.json
 # Build and test outputs
 /output/
 /test-results/
+
+# Local reference materials
+/00_Abroad⇔Rep/SPEEDレビュー・グラフ分析・請求書関連QA.xlsx
+/docs/プロダクト/サービス企画/backlog_wiki_drafts/
+/docs/プロダクト/ロゴ制作/
+/docs/メモ/meetings/2026-03-26_abroad_regular_mtg_minutes.md
