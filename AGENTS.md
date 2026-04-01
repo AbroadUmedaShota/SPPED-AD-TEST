@@ -1,22 +1,61 @@
 # Repository Guidelines
 
-## Project Structure & Module Organization
-The site delivers static HTML entry points at `02_dashboard/index.html` and `01_login/login-top.html`. Place business logic modules in `02_dashboard/src/services/` or `src/services/`, keep DOM render helpers under `02_dashboard/src/ui/` and `src/ui/`, and share cross-cutting utilities through `src/utils.js`. Store mock datasets in `data/*.json` and review context and standards in `docs/README.md` before creating features.
+## Project Structure & Source of Truth
+This repository is a static mock development workspace for SPEED AD. The main working areas are `02_dashboard/` for user-facing screens, `03_admin/` for admin screens, `04_first-login/` for the first-login tutorial flow, `data/` for mock JSON, and `docs/` for project documentation.
 
-## Build, Test, and Development Commands
-- `python -m http.server 8000` - Serve the repository root and open `http://localhost:8000/02_dashboard/index.html` for dashboard work.
-- `npx serve .` - Lightweight alternative; browse to `/02_dashboard` after launch.
-There is no build pipeline, so refreshing the browser reflects changes immediately.
+- Start dashboard work from `02_dashboard/index.html`.
+- Start admin work from `03_admin/index.html`.
+- Start first-login flow checks from `04_first-login/index.html`.
+- Treat `docs/` as the canonical location for specifications, process notes, and templates.
+- Treat `docs/要件定義/` as a migration area only; new or revised specs should go to `docs/画面設計/仕様/` or `docs/プロダクト/`.
 
-## Coding Style & Naming Conventions
-Follow ES module syntax with 2-space indentation, trailing semicolons, and single quotes for strings. Use camelCase for functions and variables, PascalCase for classes, and lowerCamelCase filenames such as `tableManager.js`. Keep business logic isolated in `services/` modules and limit DOM manipulation to the `ui/` layer. Confirm any new patterns against `docs/プロダクト/標準・規準/02_CODING_STANDARDS.md`.
+## Implementation Boundaries
+- Put dashboard business logic in `02_dashboard/src/services/`.
+- Put dashboard DOM rendering and interaction helpers in `02_dashboard/src/ui/`.
+- Share dashboard cross-cutting helpers through `02_dashboard/src/utils.js`.
+- Put admin page scripts in `03_admin/src/` and admin shared HTML fragments in `03_admin/common/`.
+- Keep reusable dashboard HTML fragments in `02_dashboard/common/`.
+- Keep mock datasets under the repository-root `data/` directory as the source of truth.
+
+## Shared Frontend Rules
+- Common headers, sidebars, and footers should be loaded from `02_dashboard/common/` or `03_admin/common/` via `loadCommonHtml(...)`.
+- When a page lives in a nested directory, verify relative common asset resolution and use `window.__COMMON_BASE_PATH` only when the standard structure is not enough.
+- Dashboard-side JSON access should use `resolveDashboardDataPath(...)` instead of hard-coded relative paths.
+- Follow the existing standard choices for interactive controls: `flatpickr` for date inputs and `Sortable.js` for drag-and-drop ordering.
+- Keep business logic out of HTML files when a screen already has a script module.
+
+## Build, Run, and Verification
+- `python -m http.server 8000` serves the repository root. Main checks are `http://localhost:8000/02_dashboard/index.html`, `http://localhost:8000/03_admin/index.html`, and `http://localhost:8000/04_first-login/index.html`.
+- `npx serve .` is an acceptable alternative for static serving.
+- There is no root build pipeline or required npm script flow. Refreshing the browser reflects file changes directly.
+- Before starting implementation, review `docs/README.md`, the relevant spec under `docs/画面設計/仕様/`, and any product-level policy under `docs/プロダクト/`.
+
+## Coding Style & Documentation Expectations
+- Use ES modules, 2-space indentation, trailing semicolons, and single quotes.
+- Use camelCase for variables and functions, PascalCase for classes, and lowerCamelCase for filenames such as `tableManager.js`.
+- Keep service-layer concerns separate from UI-layer concerns.
+- Align new UI patterns and interaction behavior with `docs/プロダクト/標準・規準/02_CODING_STANDARDS.md`.
+- If implementation changes behavior, update the corresponding documentation in `docs/` within the same workstream.
+- For new or revised specifications, prefer `docs/画面設計/仕様/`; for product policy, architecture, or cross-screen rules, prefer `docs/プロダクト/`.
 
 ## Testing Guidelines
-Automated tests are not yet in place; perform manual verification in Chromium or Firefox. Ensure data flows correctly from `data/*.json` through services into the rendered UI and keep the browser console free of errors. Consult `docs/ハンドブック/テスト/03_TESTING_GUIDELINES.md` for required manual coverage checklists.
+- Automated tests are not yet the primary workflow; manual verification is required.
+- Minimum browser coverage is Chrome, Firefox, and Edge. Safari should be checked when a macOS environment is available or the change is browser-sensitive.
+- Confirm that data loads correctly from `data/*.json` through services into the rendered UI.
+- Keep the browser console free of errors and verify that network requests for mock JSON resolve successfully.
+- Check the main user flow affected by the change, including screen transitions and modal behavior where relevant.
+- Verify responsive behavior at representative desktop, tablet, and mobile widths.
+- Use `docs/ハンドブック/テスト/03_TESTING_GUIDELINES.md` as the detailed manual test baseline.
 
-## Commit & Pull Request Guidelines
-Use Conventional Commit prefixes (`feat:`, `fix:`, `chore:`, etc.) with concise subjects. Summarize key changes in bullet form within the body and reference related issues with `Closes #123` when applicable. Pull requests should list affected paths (e.g., `02_dashboard/src/ui/...`), include screenshots for visual updates, and document the manual tests performed.
+## Commit, PR, and Change Hygiene
+- Use Conventional Commit prefixes such as `feat:`, `fix:`, and `chore:`.
+- Keep commit subjects concise and describe notable changes in the body when needed.
+- Pull requests should list affected areas, link the related spec or issue, and note any updated documentation.
+- UI changes should include screenshots or equivalent visual evidence.
+- PR descriptions should record the manual tests performed, including browsers checked and major scenarios covered.
 
-## Security & Configuration Tips
-Never commit secrets; treat `data/*.json` as mock-only fixtures. Keep production endpoints configurable as described in `docs/プロダクト/アーキテクチャ/01_ARCHITECTURE.md`, and document any new third-party dependency justifications in your pull request summary.
-
+## Security & Configuration
+- Never commit secrets or real production credentials.
+- Treat `data/*.json` as mock fixtures, not production data.
+- Keep future production endpoints configurable rather than hard-coded.
+- Document any new third-party dependency and the reason it was introduced in the PR summary.
