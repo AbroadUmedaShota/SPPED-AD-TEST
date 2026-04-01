@@ -5,6 +5,7 @@
 ## ディレクトリ構成
 - `overview/`: プロジェクト全体像、要件インデックス、画面遷移。
 - `architecture/`: アーキテクチャ方針、データモデル、データインベントリ。
+- `体制/`: 開発体制、運用体制、責任分界の整理。
 - `サービス企画/`: サービス企画の検討資料（機能棚卸し、プラン比較、方針ドラフト）。
 - `processes/`: 業務プロセス、データフロー、KPI フロー。
 - `要件/`: 製品横断の要件整理。請求・課金ロジックや多言語要件などを管理。
@@ -15,6 +16,7 @@
 - アーキテクチャ: `architecture/01_ARCHITECTURE.md`
 - データモデル: `architecture/02_data_model.md`
 - データ配置: `architecture/data-inventory.md`
+- 体制: `体制/README.md`
 - サービス企画: `サービス企画/README.md`
 - 請求ロジック棚卸し: `要件/02_billing_logic_inventory.md`
 - 画面仕様: `../画面設計/仕様/README.md`
