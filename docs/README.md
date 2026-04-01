@@ -5,6 +5,9 @@
 ## カテゴリ別インデックス
 
 ### 製品ドキュメント (`docs/プロダクト/`)
+- **最初に読むべき文書**
+  - `UIデザイン/00_design_guideline.md`: 実装の正本CSS `02_dashboard/service-top-style.css` を基準にしたデザインガイドライン。
+  - `UIデザイン/02_UI_COMPONENT_INTEGRATION.md`: 共通UIコンポーネントの組み込み手順と画面実装の導線。
 - `概要/00_PROJECT_OVERVIEW.md`: 製品の背景と目的、主要ユースケース。
 - `概要/requirements-overview.md`: 仕様書の読み方と参照先の索引。
 - `概要/screen-transition-diagram.md`: 画面遷移図（Mermaid 形式）。
@@ -62,8 +65,10 @@
 - 仕様書・要件書は front-matter で `owner`, `status`, `last_reviewed` を付与し、ドラフト/レビュー済みを明示する。
 - テンプレートの正本は `docs/リファレンス/テンプレート/` とし、`docs/テンプレート/` には補助資料・実例のみを置く。
 - アーカイブ移動時は `docs/アーカイブ/README.md` に移動元と移動日を記録する。
+- デザインシステム更新時は、関連文書の更新に加えて README 導線（`docs/README.md` と `docs/プロダクト/README.md`）も更新する。
 
 ## 運用メモ
+- 実装の正本CSSは `02_dashboard/service-top-style.css`。管理画面向けの拡張CSSは `03_admin/src/admin-style.css` とし、UI仕様の参照時に混同しないこと。
 - 共通ヘッダーやサイドバーなどの HTML は `02_dashboard/common/` から `loadCommonHtml(...)` で読み込む。`window.__COMMON_BASE_PATH` を確認すること。
 - ダッシュボード用 JSON はリポジトリ直下の `data/` 配下に統一。新規データは `resolveDashboardDataPath` を経由して参照すること。
 - `docs/サンプル/` は `SPEEDレビュー` と `グラフ詳細` のデモ表示にも使われるため、移動時は実装側パスを同時更新すること。
