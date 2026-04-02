@@ -272,6 +272,53 @@
       background-color: #e5e7eb;
     }
 
+    /* Insert Separator (設問間の挿入ゾーン) */
+    .insert-separator {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 2rem;
+      margin: 0;
+    }
+    .insert-separator__line {
+      position: absolute;
+      inset: 50% 0;
+      height: 2px;
+      border-radius: 9999px;
+      background-color: transparent;
+      transition: background-color 0.2s ease;
+    }
+    .insert-separator__btn {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.25rem 0.875rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--color-primary);
+      background: #fff;
+      border: 2px solid var(--color-primary);
+      border-radius: 9999px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      opacity: 0;
+      transform: scale(0.92);
+      transition: opacity 0.15s ease, transform 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+      white-space: nowrap;
+      z-index: 10;
+    }
+    .insert-separator:hover .insert-separator__line {
+      background-color: var(--color-primary);
+    }
+    .insert-separator:hover .insert-separator__btn {
+      opacity: 1;
+      transform: scale(1);
+    }
+    .insert-separator__btn:hover {
+      background-color: var(--color-primary);
+      color: #fff;
+    }
     /* Small Animations */
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     .animate-fade-in-up { animation: fadeInUp 0.3s ease-out forwards; }
@@ -397,55 +444,74 @@
             </div>
 
             <!-- ============================== -->
-            <!-- 1. SETTING COLUMN (Left Area)  -->
+            <!-- 1. QUESTION COLUMN (Left/Main) -->
             <!-- ============================== -->
-            <div id="settings-column" class="md:col-span-4 lg:col-span-3 lg:col-start-1 lg:row-start-2 flex flex-col gap-5 sticky-panel w-full min-w-0">
-              
-              <!-- 2. 連携設定 (Integration Settings) -->
-              <div class="bg-white border text-gray-800 rounded-xl shadow-sm overflow-hidden border-gray-200 shrink-0">
-                <button type="button" class="v2-accordion-trigger w-full flex items-center justify-between px-5 py-4 bg-gray-50 hover:bg-gray-100 transition-colors" data-accordion-v2="integrationBody" aria-expanded="true">
-                  <h2 class="text-base font-bold flex items-center gap-2" id="section-integration-settings"><span class="material-icons text-primary">extension</span>オプション機能</h2>
-                  <span class="material-icons text-gray-500" data-accordion-icon>expand_less</span>
+            <div id="questions-column-wrapper" class="md:col-span-12 lg:col-span-9 lg:col-start-1 lg:row-start-2 flex flex-col gap-5 w-full min-w-0">
+
+            <!-- SETTINGS (Options + Related) embedded at top of main column -->
+            <div id="settings-column" class="flex flex-col gap-3 w-full min-w-0">
+
+              <!-- カード1: 多言語機能 -->
+              <div class="bg-amber-50 border border-amber-200 rounded-xl shadow-sm overflow-hidden">
+                <button type="button" class="v2-accordion-trigger w-full flex items-center justify-between px-5 py-3 hover:bg-amber-100/50 transition-colors" data-accordion-v2="multilingualCardBody" aria-expanded="true">
+                  <h2 class="text-sm font-bold text-amber-800 flex items-center gap-2">
+                    <span class="material-icons text-amber-500 text-[18px]">stars</span>多言語機能
+                    <span class="text-[10px] font-black bg-amber-200 text-amber-800 px-1.5 py-0.5 rounded-full">Premium</span>
+                  </h2>
+                  <span class="material-icons text-amber-400 text-[18px]" data-accordion-icon>expand_less</span>
                 </button>
-                <div id="integrationBody" class="v2-accordion-body p-5 space-y-5">
-                  <!-- Bizcard Toggle -->
-                  <div class="flex items-start justify-between bg-gray-50 p-3 rounded-lg border border-gray-100">
-                    <div class="flex-1 pr-3">
-                      <p class="font-bold text-sm flex items-center gap-1">名刺画像添付機能
-                        <button type="button" class="help-trigger help-inline-button material-icons" data-help-key="noBizcardCapture" aria-label="名刺画像添付機能の説明を表示">help_outline</button>
-                      </p>
-                      <p class="text-xs text-gray-500 mt-1 leading-snug">回答時に名刺撮影ステップを追加します。OFFにすると関連設定が無効化されます。</p>
+                <div id="multilingualCardBody" class="v2-accordion-body border-t border-amber-100 px-5 py-3 flex flex-col gap-3">
+                  <!-- トグル -->
+                  <div class="flex items-center justify-between gap-3">
+                    <div class="min-w-0">
+                      <p class="font-bold text-sm text-amber-800 leading-tight">多言語機能を有効にする</p>
+                      <p class="text-xs text-amber-700/70 mt-0.5 leading-snug">複数言語でアンケートを提供します。</p>
                     </div>
-                    <label class="relative inline-flex items-center cursor-pointer flex-shrink-0 mt-1">
+                    <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
+                      <input type="checkbox" id="multilingualEnabledToggle" class="sr-only peer">
+                      <div class="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-amber-500 peer-focus:ring-2 peer-focus:ring-amber-300 transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+                    </label>
+                  </div>
+                  <!-- Multilingual Config UI -->
+                  <div id="multilingual-controls" class="hidden border-t border-amber-200 pt-3">
+                    <p class="text-xs font-bold text-amber-800 mb-2">追加可能言語</p>
+                    <div id="languageSelectionPanel" class="flex flex-wrap gap-2">
+                      <!-- Rendered by JS -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- カード2: オプション機能 -->
+              <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                <button type="button" class="v2-accordion-trigger w-full flex items-center justify-between px-5 py-3 bg-gray-50 hover:bg-gray-100 transition-colors" data-accordion-v2="optionsCardBody" aria-expanded="false">
+                  <h2 class="text-sm font-bold text-gray-700 flex items-center gap-2">
+                    <span class="material-icons text-primary text-[18px]">extension</span>オプション機能
+                  </h2>
+                  <span class="material-icons text-gray-400 text-[18px]" data-accordion-icon>expand_more</span>
+                </button>
+                <div id="optionsCardBody" class="v2-accordion-body v2-collapsed border-t border-gray-100 px-5 py-3 flex gap-4">
+                  <!-- 名刺画像添付 -->
+                  <div class="flex-1 flex items-center justify-between gap-3">
+                    <div class="min-w-0">
+                      <p class="font-bold text-sm text-gray-700 flex items-center gap-1 leading-tight">名刺画像添付機能
+                        <button type="button" class="help-trigger help-inline-button material-icons text-[14px]" data-help-key="noBizcardCapture" aria-label="名刺画像添付機能の説明を表示">help_outline</button>
+                      </p>
+                      <p class="text-xs text-gray-400 mt-0.5 leading-snug">回答時に名刺撮影ステップを追加</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
                       <input type="checkbox" id="bizcardEnabled" class="sr-only peer" checked>
                       <div class="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 peer-focus:ring-2 peer-focus:ring-green-300 transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
                     </label>
                   </div>
-                  <!-- Multilingual Toggle -->
-                  <div class="flex items-start justify-between bg-gray-50 p-3 rounded-lg border border-gray-100 relative">
-                    <div class="flex-1 pr-3">
-                      <p class="font-bold text-sm text-amber-700 flex items-center gap-1"><span class="material-icons text-[16px]">stars</span>多言語機能 (Premium)</p>
-                      <p class="text-xs text-gray-500 mt-1 leading-snug">複数言語でアンケートを提供します。</p>
+                  <div class="w-px bg-gray-100 self-stretch"></div>
+                  <!-- 連続回答 -->
+                  <div class="flex-1 flex items-center justify-between gap-3">
+                    <div class="min-w-0">
+                      <p class="font-bold text-sm text-gray-700 leading-tight">連続回答の許可</p>
+                      <p class="text-xs text-gray-400 mt-0.5 leading-snug">同端末で続けて回答を受け付ける</p>
                     </div>
-                    <label class="relative inline-flex items-center cursor-pointer flex-shrink-0 mt-1">
-                      <input type="checkbox" id="multilingualEnabledToggle" class="sr-only peer">
-                      <div class="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 peer-focus:ring-2 peer-focus:ring-green-300 transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
-                    </label>
-                  </div>
-                  <!-- Multilingual Config UI -->
-                  <div id="multilingual-controls" class="hidden border-t pt-4">
-                    <p class="text-xs font-bold text-gray-700 mb-2">追加可能言語</p>
-                    <div id="languageSelectionPanel" class="flex flex-wrap gap-2 mb-0">
-                      <!-- Rendered by JS -->
-                    </div>
-                  </div>
-                  <!-- Continuous Answer Toggle -->
-                  <div class="flex items-start justify-between bg-gray-50 p-3 rounded-lg border border-gray-100">
-                    <div class="flex-1 pr-3">
-                      <p class="font-bold text-sm">連続回答の許可</p>
-                      <p class="text-xs text-gray-500 mt-1 leading-snug">同端末で続けて回答を受け付けます。</p>
-                    </div>
-                    <label class="relative inline-flex items-center cursor-pointer flex-shrink-0 mt-1">
+                    <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
                       <input type="checkbox" id="allowContinuousAnswer" class="sr-only peer" checked>
                       <div class="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 peer-focus:ring-2 peer-focus:ring-green-300 transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
                     </label>
@@ -453,37 +519,39 @@
                 </div>
               </div>
 
-              <!-- 3. 追加設定 (Additional Settings) -->
-              <div class="bg-white border text-gray-800 rounded-xl shadow-sm overflow-hidden border-gray-200 shrink-0">
-                <button type="button" class="v2-accordion-trigger w-full flex items-center justify-between px-5 py-4 bg-gray-50 hover:bg-gray-100 transition-colors" data-accordion-v2="additionalSettingsBody" aria-expanded="true">
-                  <h2 class="text-base font-bold flex items-center gap-2" id="section-additional-settings"><span class="material-icons text-primary">settings</span>関連設定</h2>
-                  <span class="material-icons text-gray-500" data-accordion-icon>expand_less</span>
+              <!-- カード3: 関連設定 -->
+              <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                <button type="button" class="v2-accordion-trigger w-full flex items-center justify-between px-5 py-3 bg-gray-50 hover:bg-gray-100 transition-colors" data-accordion-v2="relatedSettingsCardBody" aria-expanded="false">
+                  <h2 class="text-sm font-bold text-gray-700 flex items-center gap-2">
+                    <span class="material-icons text-primary text-[18px]">settings</span>関連設定
+                  </h2>
+                  <span class="material-icons text-gray-400 text-[18px]" data-accordion-icon>expand_more</span>
                 </button>
-                <div id="additionalSettingsBody" class="v2-accordion-body p-4 space-y-3">
-                  <a id="bizcardDataSettingsSection" href="./bizcardSettings.html" class="w-full flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-primary transition-colors group">
-                    <div class="flex items-center gap-2">
-                       <span class="material-icons text-gray-400 group-hover:text-primary">document_scanner</span>
-                       <span class="text-sm font-bold text-gray-700 group-hover:text-primary">名刺データ化設定</span>
+                <div id="relatedSettingsCardBody" class="v2-accordion-body v2-collapsed border-t border-gray-100 px-4 py-3 flex gap-3">
+                  <a id="bizcardDataSettingsSection" href="./bizcardSettings.html" class="flex-1 flex items-center justify-between px-3 py-2.5 border border-gray-200 rounded-lg bg-gray-50 hover:bg-white hover:border-primary hover:shadow-sm transition-all group">
+                    <div class="flex items-center gap-2 min-w-0">
+                      <span class="material-icons text-[18px] text-gray-400 group-hover:text-primary shrink-0">document_scanner</span>
+                      <span class="text-xs font-bold text-gray-600 group-hover:text-primary truncate">名刺データ化設定</span>
                     </div>
-                    <span class="material-icons text-sm opacity-50 text-gray-400 group-hover:text-primary">arrow_forward_ios</span>
+                    <span class="material-icons text-[14px] text-gray-300 group-hover:text-primary shrink-0">arrow_forward_ios</span>
                   </a>
-                  <a id="thankYouEmailSettingsSection" href="./thankYouEmailSettings.html" class="w-full flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-primary transition-colors group">
-                    <div class="flex items-center gap-2">
-                       <span class="material-icons text-gray-400 group-hover:text-primary">mark_email_read</span>
-                       <span class="text-sm font-bold text-gray-700 group-hover:text-primary">お礼メール設定</span>
+                  <a id="thankYouEmailSettingsSection" href="./thankYouEmailSettings.html" class="flex-1 flex items-center justify-between px-3 py-2.5 border border-gray-200 rounded-lg bg-gray-50 hover:bg-white hover:border-primary hover:shadow-sm transition-all group">
+                    <div class="flex items-center gap-2 min-w-0">
+                      <span class="material-icons text-[18px] text-gray-400 group-hover:text-primary shrink-0">mark_email_read</span>
+                      <span class="text-xs font-bold text-gray-600 group-hover:text-primary truncate">お礼メール設定</span>
                     </div>
-                    <span class="material-icons text-sm opacity-50 text-gray-400 group-hover:text-primary">arrow_forward_ios</span>
+                    <span class="material-icons text-[14px] text-gray-300 group-hover:text-primary shrink-0">arrow_forward_ios</span>
                   </a>
                 </div>
               </div>
 
             </div>
-            <!-- /SETTING COLUMN -->
+            <!-- /SETTINGS EMBEDDED -->
 
             <!-- ============================== -->
-            <!-- 2. QUESTION COLUMN (Center)    -->
+            <!-- 2. QUESTION LIST               -->
             <!-- ============================== -->
-            <div id="questions-column" class="md:col-span-8 lg:col-span-9 xl:col-span-6 lg:col-start-4 xl:col-start-4 lg:row-start-2 flex flex-col gap-6 w-full min-w-0">
+            <div id="questions-column" class="flex flex-col gap-6 w-full min-w-0">
               
               <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm min-h-[50vh]">
                 <div class="flex items-center justify-between border-b border-gray-100 pb-4 mb-6">
@@ -496,7 +564,7 @@
                 <!-- Multilingual Tabs removed and moved to the global top Area -->
 
                 <!-- Flat Question List Container -->
-                <div id="questionListContainer" class="space-y-5 mb-8">
+                <div id="questionListContainer" class="mb-8">
                   <div id="questionListEmpty" class="py-12 px-6 bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-100 rounded-2xl transition-all">
                     <div class="text-center">
                       <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white mb-4 shadow-md border border-indigo-100">
@@ -545,13 +613,16 @@
 
               </div>
             </div>
-            <!-- /QUESTION COLUMN -->
+            <!-- /QUESTION LIST -->
+
+            </div>
+            <!-- /QUESTION COLUMN WRAPPER -->
 
 
             <!-- ============================== -->
             <!-- 3. OUTLINE PANEL (Right Area)  -->
             <!-- ============================== -->
-            <div id="outline-column" class="hidden lg:flex fixed xl:sticky top-24 xl:top-[5rem] right-0 z-50 xl:z-auto w-72 xl:w-auto h-auto xl:h-auto translate-x-full xl:translate-x-0 transition-transform duration-300 ease-in-out lg:col-span-3 xl:col-span-3 xl:col-start-10 lg:row-start-2 flex-col gap-0 xl:gap-5 sticky-panel glass-panel bg-white/95 xl:bg-white/80 p-0 border-l xl:border border-gray-200 rounded-l-2xl xl:rounded-xl shadow-2xl xl:shadow-sm overflow-hidden">
+            <div id="outline-column" class="hidden lg:flex fixed xl:sticky top-24 xl:top-[5rem] right-0 z-50 xl:z-auto w-72 xl:w-auto h-auto xl:h-auto translate-x-full xl:translate-x-0 transition-transform duration-300 ease-in-out lg:col-span-3 xl:col-span-3 lg:col-start-10 xl:col-start-10 lg:row-start-2 flex-col gap-0 xl:gap-5 sticky-panel glass-panel bg-white/95 xl:bg-white/80 p-0 border-l xl:border border-gray-200 rounded-l-2xl xl:rounded-xl shadow-2xl xl:shadow-sm overflow-hidden">
 
               <div class="p-5 overflow-y-auto border-b" style="max-height: calc(100vh - 18rem);">
                 <h3 class="text-xs font-black tracking-widest text-gray-400 uppercase mb-4 flex items-center gap-1">

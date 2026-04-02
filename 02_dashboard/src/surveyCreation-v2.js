@@ -539,6 +539,7 @@ function renumberQuestions() {
   });
   questions = newOrder;
 
+  rebuildSeparators();
   updateOutline();
   updateEmptyState();
 }
@@ -791,7 +792,7 @@ function renderAllQuestions() {
   questions.forEach((q, idx) => {
     container.appendChild(buildQuestionCard(q, idx));
   });
-  renumberQuestions();
+  renumberQuestions(); // 内部で rebuildSeparators も呼ぶ
   updateMultiLangVisibility();
 }
 
@@ -1374,14 +1375,137 @@ function applyTypeChange(q, card, newType) {
 // ─────────────────────────────────────────
 // 追加・削除・複製・Sortable
 // ─────────────────────────────────────────
+
+/**
+ * 設問と設問の間に表示する「ここに追加」セパレーター
+ * insertIndex: このインデックスの位置（前のカードの直後）に挿入するセパレーター
+ */
+function buildInsertSeparator(insertIndex) {
+  const sep = el('div', {
+    class: 'insert-separator',
+    'data-insert-index': String(insertIndex),
+    'aria-hidden': 'true'
+  });
+
+  const line = el('div', { class: 'insert-separator__line' });
+
+  const btn = el('button', {
+    type: 'button',
+    class: 'insert-separator__btn',
+    title: 'ここに設問を追加',
+  },
+    icon('add', 'text-[14px]'),
+    'ここに追加'
+  );
+
+  let insertPopover = null;
+
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openInsertTypeMenu(btn, insertIndex);
+  });
+
+  sep.append(line, btn);
+  return sep;
+}
+
+/** セパレーターのタイプ選択ポップオーバーを開く */
+function openInsertTypeMenu(anchorEl, insertIndex) {
+  // 既存のポップオーバーを閉じる
+  const existing = document.getElementById('insertTypePopover');
+  if (existing) existing.remove();
+
+  const popover = el('div', {
+    id: 'insertTypePopover',
+    class: 'fixed bg-white border border-gray-200 rounded-xl shadow-xl p-3 w-64',
+    style: 'z-index: 9999;'
+  });
+
+  const title = el('p', { class: 'text-[11px] font-black text-gray-400 uppercase tracking-wider mb-2 px-1' }, '追加する設問タイプ');
+  const grid = el('div', { class: 'grid grid-cols-1 gap-0.5' });
+
+  Object.entries(QUESTION_TYPES).forEach(([type, def]) => {
+    const b = el('button', {
+      type: 'button',
+      class: 'flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-gray-700 hover:bg-indigo-50 hover:text-primary transition-colors w-full text-left',
+    },
+      icon(def.icon, 'text-[14px] opacity-60'),
+      def.label
+    );
+    b.addEventListener('click', (e) => {
+      e.stopPropagation();
+      popover.remove();
+      insertQuestionAt(type, insertIndex);
+    });
+    grid.appendChild(b);
+  });
+
+  popover.append(title, grid);
+  document.body.appendChild(popover);
+
+  // アンカー位置に配置
+  const rect = anchorEl.getBoundingClientRect();
+  const popW = 256;
+  let left = rect.left + rect.width / 2 - popW / 2;
+  if (left < 8) left = 8;
+  if (left + popW > window.innerWidth - 8) left = window.innerWidth - popW - 8;
+  const top = rect.bottom + 6;
+  popover.style.left = `${left}px`;
+  popover.style.top = `${top}px`;
+
+  // 外クリック・Escapeで閉じる
+  const close = (e) => {
+    if (e.type === 'keydown' && e.key !== 'Escape') return;
+    if (e.type === 'click' && popover.contains(e.target)) return;
+    popover.remove();
+    document.removeEventListener('click', close, true);
+    document.removeEventListener('keydown', close);
+  };
+  setTimeout(() => {
+    document.addEventListener('click', close, true);
+    document.addEventListener('keydown', close);
+  }, 0);
+}
+
+/** 指定インデックスの位置に設問を挿入する */
+function insertQuestionAt(type, insertIndex) {
+  const q = defaultQuestion(type);
+  questions.splice(insertIndex, 0, q);
+  // renderAllQuestions で全再描画（セパレーターも再配置される）
+  const container = document.getElementById('questionListContainer');
+  if (!container) return;
+  renderAllQuestions();
+  const card = document.getElementById(`question-${q.id}`);
+  if (card) setTimeout(() => smoothScrollIntoView(card, 'center'), 50);
+}
+
+/** コンテナ内のセパレーターを現在のカード配置に合わせて再構築する */
+function rebuildSeparators() {
+  const container = document.getElementById('questionListContainer');
+  if (!container) return;
+  // 既存セパレーターを除去
+  container.querySelectorAll('.insert-separator').forEach(s => s.remove());
+  // カード間にセパレーターを挿入（先頭カードの前も含む）
+  const cards = Array.from(container.querySelectorAll('[data-question-id]'));
+  cards.forEach((card, i) => {
+    // 先頭カードの前にも挿入（insertIndex = 0）
+    if (i === 0) {
+      card.before(buildInsertSeparator(0));
+    }
+    // 各カードの直後（insertIndex = i+1）
+    card.after(buildInsertSeparator(i + 1));
+  });
+}
+
 function addQuestion(type) {
   const q = defaultQuestion(type);
   questions.push(q);
   const container = document.getElementById('questionListContainer');
   if (container) {
     const card = buildQuestionCard(q, questions.length - 1);
+    // 末尾追加エリアの直前に挿入（セパレーターの後、末尾ボタンの前）
     container.appendChild(card);
-    renumberQuestions();
+    renumberQuestions(); // 内部で rebuildSeparators も呼ぶ
     updateMultiLangVisibility();
     setTimeout(() => smoothScrollIntoView(card, 'center'), 50);
   }
@@ -1412,19 +1536,9 @@ function duplicateQuestion(id) {
     if(copy.text && copy.text[l]) copy.text[l] += ' (コピー)';
   });
   questions.splice(srcIdx + 1, 0, copy);
-  const container = document.getElementById('questionListContainer');
-  if (container) {
-    const srcCard = document.getElementById(`question-${id}`);
-    const card = buildQuestionCard(copy, srcIdx + 1);
-    if (srcCard && srcCard.nextSibling) {
-      container.insertBefore(card, srcCard.nextSibling);
-    } else {
-      container.appendChild(card);
-    }
-    renumberQuestions();
-    updateMultiLangVisibility();
-    setTimeout(() => smoothScrollIntoView(card, 'center'), 50);
-  }
+  renderAllQuestions();
+  const card = document.getElementById(`question-${copy.id}`);
+  if (card) setTimeout(() => smoothScrollIntoView(card, 'center'), 50);
 }
 
 function initSortable() {
