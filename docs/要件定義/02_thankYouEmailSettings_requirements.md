@@ -1,3 +1,6 @@
+> [!WARNING]
+> 本文書は旧配置の legacy 要件です。正本は `docs/画面設計/仕様/17_thank_you_email_settings_requirements.md` を参照してください。今後の更新は新正本で行います。
+
 # お礼メール設定画面（thankYouEmailSettings）要件定義・実装詳細設計書
 
 > **文書管理**
