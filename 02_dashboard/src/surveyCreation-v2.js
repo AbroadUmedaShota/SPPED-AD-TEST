@@ -997,16 +997,22 @@ function buildBasicSection(q, cardNode, requiredBadge) {
   sectionHeader.appendChild(requiredBadge);
   section.appendChild(sectionHeader);
 
+  const firstLang = currentLangs[0];
   currentLangs.forEach((lang) => {
+    const isFirst = lang === firstLang;
     const input = el('input', {
       type: 'text', class: 'input-field w-full bg-white font-bold text-sm', placeholder: ' ',
       value: q.text[lang] || '',
       oninput: (e) => {
         if (!q.text) q.text = {};
         q.text[lang] = e.target.value;
-        if (lang === currentLangs[0]) {
+        if (isFirst) {
           const sum = cardNode.querySelector('[data-question-summary-text]');
           if (sum) sum.textContent = e.target.value || '設問文を入力してください';
+          section.querySelectorAll('[data-ref-hint]').forEach(hint => {
+            hint.textContent = e.target.value || '';
+            hint.classList.toggle('hidden', !e.target.value);
+          });
           updateOutline();
         } else {
           updateTranslationBadges();
@@ -1015,7 +1021,16 @@ function buildBasicSection(q, cardNode, requiredBadge) {
     });
     const group = el('div', { class: 'input-group mb-0' });
     group.append(input, el('label', { class: 'input-label bg-transparent' }, `設問文 (${lang})`));
-    section.appendChild(el('div', { 'data-lang-wrapper': lang }, group));
+    const wrapper = el('div', { 'data-lang-wrapper': lang }, group);
+    if (!isFirst) {
+      const refText = q.text[firstLang] || '';
+      const hint = el('p', {
+        class: `ref-lang-hint${refText ? '' : ' hidden'}`,
+        'data-ref-hint': ''
+      }, refText);
+      wrapper.appendChild(hint);
+    }
+    section.appendChild(wrapper);
   });
 
   return section;
@@ -1091,7 +1106,9 @@ function buildOptionRow(q, idx, optValObj) {
   const handle = el('span', { class: 'material-icons text-gray-300 hover:text-gray-500 cursor-grab text-[20px] flex-shrink-0 option-drag-handle px-1 py-2 hover:bg-gray-100 rounded transition-colors' }, 'drag_indicator');
 
   const inputsWrap = el('div', { class: 'flex-1 space-y-1.5' });
+  const firstLangOpt = currentLangs[0];
   currentLangs.forEach(lang => {
+    const isFirst = lang === firstLangOpt;
     const wrap = el('div', {'data-lang-wrapper': lang});
     const input = el('input', {
       type: 'text',
@@ -1101,11 +1118,27 @@ function buildOptionRow(q, idx, optValObj) {
       oninput: (e) => {
         const curIdx = parseInt(row.dataset.optionIndex,10);
         if(q.options[curIdx]) q.options[curIdx][lang] = e.target.value;
-        if (lang !== currentLangs[0]) updateTranslationBadges();
+        if (isFirst) {
+          inputsWrap.querySelectorAll('[data-ref-hint]').forEach(hint => {
+            hint.textContent = e.target.value || '';
+            hint.classList.toggle('hidden', !e.target.value);
+          });
+        } else {
+          updateTranslationBadges();
+        }
       }
     });
-
-    wrap.appendChild(input);
+    if (!isFirst) {
+      const refText = optValObj[firstLangOpt] || '';
+      const hint = el('p', {
+        class: `ref-lang-hint${refText ? '' : ' hidden'}`,
+        'data-ref-hint': ''
+      }, refText);
+      wrap.appendChild(input);
+      wrap.appendChild(hint);
+    } else {
+      wrap.appendChild(input);
+    }
     inputsWrap.appendChild(wrap);
   });
 
@@ -1171,7 +1204,9 @@ function buildMatrixRow(q, fieldKey, idx, valObj) {
   const row = el('div', { class: 'flex items-center gap-2 group/mat', 'data-matrix-row': idx });
   
   const inputsWrap = el('div', { class: 'flex-1 space-y-1.5' });
+  const firstLangMat = currentLangs[0];
   currentLangs.forEach(lang => {
+    const isFirst = lang === firstLangMat;
     const wrap = el('div', {'data-lang-wrapper': lang});
     const input = el('input', {
       type: 'text',
@@ -1181,11 +1216,27 @@ function buildMatrixRow(q, fieldKey, idx, valObj) {
       oninput: (e) => {
         const curIdx = parseInt(row.dataset.matrixRow,10);
         if(q[fieldKey] && q[fieldKey][curIdx]) q[fieldKey][curIdx][lang] = e.target.value;
-        if (lang !== currentLangs[0]) updateTranslationBadges();
+        if (isFirst) {
+          inputsWrap.querySelectorAll('[data-ref-hint]').forEach(hint => {
+            hint.textContent = e.target.value || '';
+            hint.classList.toggle('hidden', !e.target.value);
+          });
+        } else {
+          updateTranslationBadges();
+        }
       }
     });
-
-    wrap.appendChild(input);
+    if (!isFirst) {
+      const refText = valObj[firstLangMat] || '';
+      const hint = el('p', {
+        class: `ref-lang-hint${refText ? '' : ' hidden'}`,
+        'data-ref-hint': ''
+      }, refText);
+      wrap.appendChild(input);
+      wrap.appendChild(hint);
+    } else {
+      wrap.appendChild(input);
+    }
     inputsWrap.appendChild(wrap);
   });
 
@@ -1397,8 +1448,6 @@ function buildInsertSeparator(insertIndex) {
     icon('add', 'text-[14px]'),
     'ここに追加'
   );
-
-  let insertPopover = null;
 
   btn.addEventListener('click', (e) => {
     e.stopPropagation();

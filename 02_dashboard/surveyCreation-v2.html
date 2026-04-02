@@ -272,6 +272,23 @@
       background-color: #e5e7eb;
     }
 
+    /* 第一言語参照ヒント (多言語モード時、第二・第三言語入力欄の下に表示) */
+    .ref-lang-hint {
+      font-size: 0.7rem;
+      color: var(--color-on-surface-variant, #6b7280);
+      margin-top: 0.2rem;
+      padding-left: 0.25rem;
+      line-height: 1.4;
+      opacity: 0.6;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .ref-lang-hint::before {
+      content: '参照: ';
+      font-weight: 700;
+    }
+
     /* Insert Separator (設問間の挿入ゾーン) */
     .insert-separator {
       position: relative;
