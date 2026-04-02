@@ -1,684 +1,814 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SPEED-AD - アンケート作成</title>
+  <title>SPEED-AD - アンケート作成・編集</title>
+  
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: 'var(--color-primary)',
+            secondary: 'var(--color-secondary)',
+            error: 'var(--color-error)'
+          }
+        }
+      }
+    }
+  </script>
+
   <!-- Material Icons CDN -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  
   <!-- flatpickr CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <!-- Custom CSS -->
+  
+  <!-- Custom Base CSS -->
   <link rel="stylesheet" href="service-top-style.css">
-  <!-- Custom Fonts -->
+  
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
-  <link as="style"
-    href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900"
-    onload="this.rel='stylesheet'" rel="stylesheet">
+  <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+  
   <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval'">
-  <!-- Papa Parse CSV Parser -->
+  <!-- Papa Parse -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
-  <style>
-    .dragging-item {
-      background-color: #c8ebfb !important;
-      /* Light blue */
-      opacity: 0.7 !important;
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    }
-  </style>
 
+  <!-- JS Dependencies (defer: DOMコンテンツ解析をブロックせず、順序保証) -->
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js" defer></script>
+
+  <style>
+    /* UI Custom Overrides for V2 */
+    .sticky-panel {
+      position: sticky;
+      top: 5rem;
+      max-height: calc(100vh - 7rem);
+      overflow-y: auto;
+      overflow-x: auto; /* Fallback for horizontal squish */
+      scrollbar-width: thin;
+      overscroll-behavior: contain;
+      padding-bottom: 1.5rem; /* Breathing room at bottom */
+    }
+    body.has-multi-lang-tabs .sticky-panel {
+      top: 8rem;
+      max-height: calc(100vh - 10rem);
+    }
+    
+    @media (max-width: 1023px) {
+      .sticky-panel {
+        /* Clear the 5rem bottom action bar */
+        max-height: calc(100vh - 12rem);
+        padding-bottom: 2rem;
+      }
+      body.has-multi-lang-tabs .sticky-panel {
+        max-height: calc(100vh - 15rem);
+      }
+    }
+
+    /* Drawer mode (lg〜xl): outline-column はコンテンツ高さに合わせ、画面全体に間延びさせない */
+    @media (min-width: 1024px) and (max-width: 1279px) {
+      #outline-column {
+        height: auto !important;
+        max-height: calc(100vh - 7rem);
+        top: 6rem;
+        overflow: hidden;
+      }
+    }
+    .sticky-panel::-webkit-scrollbar {
+      width: 6px;
+    }
+    .sticky-panel::-webkit-scrollbar-thumb {
+      background-color: var(--color-outline-variant);
+      border-radius: 4px;
+    }
+
+    /* Accordion transitions */
+    .v2-accordion-body {
+      display: block;
+    }
+    .v2-accordion-body.v2-collapsed {
+      display: none !important;
+    }
+    .v2-accordion-trigger[aria-expanded="false"] [data-accordion-icon] {
+      transform: rotate(180deg);
+    }
+    [data-accordion-icon] {
+      transition: transform 0.3s ease;
+    }
+
+    /* Drag effects */
+    .dragging-item {
+      background-color: var(--color-primary-container, #f0fdf4) !important;
+      opacity: 0.9;
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+      border: 2px solid var(--color-primary);
+      z-index: 50;
+      border-radius: 0.5rem;
+    }
+
+    /* Input floating labels & groups */
+    .input-group { position: relative; margin-bottom: 1rem; }
+    .input-field {
+      width: 100%;
+      border-radius: 0.5rem;
+      border: 1px solid var(--color-outline-variant);
+      padding: 0.75rem 1rem;
+      background-color: var(--color-surface);
+      color: var(--color-on-surface);
+      transition: all 0.2s ease;
+    }
+    .input-field:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1); /* Primary color shadow */
+    }
+    .input-label {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--color-on-surface-variant);
+      font-size: 0.875rem;
+      transition: all 0.2s ease;
+      pointer-events: none;
+      background: var(--color-surface);
+      padding: 0 0.25rem;
+    }
+    .input-field:focus + .input-label,
+    .input-field:not(:placeholder-shown) + .input-label {
+      top: 0;
+      font-size: 0.75rem;
+      color: var(--color-primary);
+    }
+    
+    textarea.input-field {
+      padding-top: 1.25rem;
+      resize: vertical !important;
+    }
+    textarea.input-field + .input-label {
+      top: 1rem;
+      z-index: 1; /* textareaのリサイズ時にラベルがテキスト内容と重なるのを防ぐ */
+    }
+
+    /* Translation missing badge */
+    .translation-progress-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 0.375rem;
+      padding: 0.1rem 0.45rem;
+      border-radius: 999px;
+      background-color: rgba(217, 48, 37, 0.12);
+      color: var(--color-error);
+      font-size: 0.7rem;
+      font-weight: 700;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+
+    /* Inline field error state */
+    .input-error {
+      border-color: var(--color-error) !important;
+      box-shadow: 0 0 0 1px var(--color-error);
+    }
+
+    /* Glassmorphism touches for panels */
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    /* Outline Map active item indicator */
+    .outline-item.active {
+      background-color: rgba(66, 133, 244, 0.1);
+      color: var(--color-primary);
+      font-weight: 600;
+      border-left: 3px solid var(--color-primary);
+      padding-left: 0.75em;
+    }
+
+    /* Toast */
+    #toast-container {
+      position: fixed;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      pointer-events: none;
+    }
+    .v2-toast {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.625rem 1.25rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      white-space: nowrap;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      animation: fadeInUp 0.25s ease-out forwards;
+      pointer-events: auto;
+    }
+    .v2-toast--success { background: #dcfce7; color: #166534; }
+    .v2-toast--error   { background: #fee2e2; color: #991b1b; }
+    .v2-toast--warning { background: #fef3c7; color: #92400e; }
+    .v2-toast--info    { background: #dbeafe; color: #1e40af; }
+
+    /* Chrome-like Lang Tabs */
+    .lang-tab {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.375rem;
+      padding: 0.625rem 0.75rem 0.625rem 1rem;
+      cursor: grab;
+      -webkit-user-select: none;
+      user-select: none;
+      transition: background-color 0.2s, color 0.2s;
+      border-radius: 0.75rem 0.75rem 0 0;
+      border: 1px solid transparent;
+      border-bottom: none;
+      position: relative;
+      margin-bottom: -1px; /* Overlap border */
+      z-index: 10;
+      color: #6b7280;
+      min-width: 110px;
+      font-size: 0.875rem;
+    }
+    .lang-tab .translation-progress-badge {
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+    .lang-tab:active { cursor: grabbing; }
+    .lang-tab:hover:not(.active) {
+      background-color: #e5e7eb;
+      color: #374151;
+    }
+    .lang-tab.active {
+      background-color: #ffffff;
+      border-color: #e5e7eb;
+      color: var(--color-primary);
+      font-weight: 700;
+      z-index: 20;
+    }
+    .lang-tab:not(.active)::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background-color: #e5e7eb;
+    }
+
+    /* 第一言語参照ヒント (多言語モード時、第二・第三言語入力欄の下に表示) */
+    .ref-lang-hint {
+      font-size: 0.7rem;
+      color: var(--color-on-surface-variant, #6b7280);
+      margin-top: 0.2rem;
+      padding-left: 0.25rem;
+      line-height: 1.4;
+      opacity: 0.6;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .ref-lang-hint::before {
+      content: '参照: ';
+      font-weight: 700;
+    }
+
+    /* Insert Separator (設問間の挿入ゾーン) */
+    .insert-separator {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 2rem;
+      margin: 0;
+    }
+    .insert-separator__line {
+      position: absolute;
+      inset: 50% 0;
+      height: 2px;
+      border-radius: 9999px;
+      background-color: transparent;
+      transition: background-color 0.2s ease;
+    }
+    .insert-separator__btn {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.25rem 0.875rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--color-primary);
+      background: #fff;
+      border: 2px solid var(--color-primary);
+      border-radius: 9999px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      opacity: 0;
+      transform: scale(0.92);
+      transition: opacity 0.15s ease, transform 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+      white-space: nowrap;
+      z-index: 10;
+    }
+    .insert-separator:hover .insert-separator__line {
+      background-color: var(--color-primary);
+    }
+    .insert-separator:hover .insert-separator__btn {
+      opacity: 1;
+      transform: scale(1);
+    }
+    .insert-separator__btn:hover {
+      background-color: var(--color-primary);
+      color: #fff;
+    }
+    /* Small Animations */
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-in-up { animation: fadeInUp 0.3s ease-out forwards; }
+
+    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-in-down { animation: fadeInDown 0.2s ease-out forwards; }
+  </style>
 </head>
 
-<body class="bg-background text-on-background" data-page-id="survey-creation">
+<body class="bg-gray-50 text-gray-900 overflow-x-hidden relative" data-page-id="survey-creation">
 
-  <!-- App Wrapper -->
   <div class="relative flex min-h-screen flex-col">
-
     <!-- Mobile Sidebar Overlay -->
     <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay lg:hidden"></div>
 
     <!-- Header -->
     <div id="header-placeholder"></div>
 
-    <div class="flex flex-1 pt-16 bg-background">
+    <div class="flex flex-1 pt-16">
       <!-- Sidebar -->
       <div id="sidebar-placeholder"></div>
+      
+      <!-- Main Content Container Wrapper -->
+      <main class="flex flex-1 flex-col py-6 px-4 sm:px-6 lg:px-8 pb-32">
+        <div class="w-full max-w-7xl mx-auto">
+          
+          <!-- Breadcrumbs -->
+          <nav id="breadcrumb-container" aria-label="パンくずリスト" class="mb-4 text-sm text-gray-500 flex items-center gap-2">
+            <a href="#" class="hover:text-primary transition-colors">ダッシュボード</a>
+            <span class="material-icons text-sm">chevron_right</span>
+            <span class="font-medium text-gray-900">アンケート作成・編集</span>
+          </nav>
 
-      <!-- Main Content -->
-      <main class="flex flex-1 flex-col items-center py-8 px-4 sm:px-6 lg:px-8">
-        <div class="w-full max-w-7xl mx-auto flex flex-col gap-6 lg:grid lg:grid-cols-1 lg:items-start">
-          <div id="survey-content-area" class="flex flex-col w-full max-w-6xl mx-auto flex-1 lg:col-span-1">
-            <!-- Breadcrumb -->
-            <div id="breadcrumb-container" class="mb-4"></div>
+          <!-- Heading -->
+          <h1 class="text-3xl font-extrabold tracking-tight mb-8">アンケート作成・編集</h1>
 
-            <!-- Title Area -->
-            <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant"
-              id="surveyTitleArea">
-              <h1 class="text-on-background text-2xl sm:text-3xl font-bold leading-tight tracking-tight">アンケート作成・編集</h1>
+          <!-- STICKY GLOBAL TABS LIFTED OUT OF GRID -->
+          <div id="mainAreaMultilingualTabs" class="sticky top-16 z-40 pt-2 pb-0 w-full bg-gray-50" style="transition: width 0.25s ease, margin-left 0.25s ease; visibility: hidden;">
+            <div class="bg-gray-100 pt-2 px-2 pb-[1px] flex items-end gap-1 rounded-t-xl border-x border-t border-gray-200 max-w-full overflow-hidden relative">
+              <div id="languageEditorTabsV2" class="flex items-end gap-1 w-full overflow-x-auto relative z-10" style="scrollbar-width: none;" role="tablist">
+                <!-- Rendered by JS -->
+              </div>
+            </div>
+            <!-- The active tab overlaps this line -->
+            <div class="h-[3px] w-full bg-gradient-to-r from-blue-500 via-indigo-400 to-primary rounded-b-sm shadow-[0_2px_10px_rgba(99,102,241,0.2)] relative z-0"></div>
+          </div>
+
+          <!-- 3-AREA GRID CONTAINER -->
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start mt-[-1px]">
+
+
+            <!-- ============================== -->
+            <!-- 0. BASIC INFO & MEMO (Top)     -->
+            <!-- ============================== -->
+            <div class="md:col-span-12 lg:col-span-12 lg:col-start-1 lg:row-start-1 mb-2 lg:mb-4 w-full min-w-0 flex flex-col gap-6">
+              
+              <!-- === BASIC INFO CARD === -->
+              <div id="basicInfoBody" class="rounded-2xl border border-gray-200 bg-white px-6 py-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)] overflow-hidden relative group">
+                  <div class="absolute inset-0 bg-gradient-to-r from-blue-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-0"></div>
+
+                  <div class="relative z-10 grid grid-cols-1 md:grid-cols-5 gap-5 md:gap-0 divide-y md:divide-y-0 md:divide-x divide-gray-200">
+
+                      <!-- Left Column: Main Settings -->
+                      <div class="flex flex-col gap-3 pb-4 md:pb-0 md:pr-6 md:col-span-3">
+                          <!-- Survey Name -->
+                          <div class="input-group mb-0 w-full">
+                              <input type="text" id="surveyName_ja" placeholder=" " title="アンケート名" aria-label="アンケート名" class="input-field bg-white w-full" required aria-describedby="surveyName_jaError">
+                              <label class="input-label bg-transparent">アンケート名 (管理用)<span class="text-error">*</span></label>
+                              <button type="button" class="help-trigger help-icon-button material-icons" data-help-key="surveyName" aria-label="アンケート名の説明を表示">help_outline</button>
+                          </div>
+                          <div id="surveyName_jaError" class="hidden text-error text-xs mt-1 flex items-center gap-1" aria-live="polite"><span class="material-icons text-[14px]">error_outline</span><span>要確認: アンケート名を入力してください</span></div>
+
+                          <!-- Display Title (Multi-lang wrapper) -->
+                          <div class="multi-lang-input-group w-full" data-field-key="displayTitle" data-input-type="text" data-label="表示タイトル" data-required="true">
+                              <div class="input-group mb-0 w-full" data-lang="ja">
+                                  <input type="text" id="displayTitle_ja" placeholder=" " title="表示タイトル" aria-label="表示タイトル" class="input-field bg-white w-full" required aria-describedby="displayTitle_jaError">
+                                  <label class="input-label bg-transparent">表示タイトル (回答者向け)<span class="text-error">*</span></label>
+                                  <button type="button" class="help-trigger help-icon-button material-icons" data-help-key="surveyDisplayTitle" aria-label="表示タイトルの説明を表示">help_outline</button>
+                              </div>
+                          </div>
+                          <div id="displayTitle_jaError" class="hidden text-error text-xs mt-1 flex items-center gap-1" aria-live="polite"><span class="material-icons text-[14px]">error_outline</span><span>要確認: 表示タイトルを入力してください</span></div>
+
+                          <!-- アンケートID & 開催期間（横並び） -->
+                          <div class="flex items-start gap-4 mt-1">
+                              <!-- アンケートID -->
+                              <div class="flex flex-col gap-1.5 shrink-0 w-2/5">
+                                  <span class="text-[10px] font-black text-primary uppercase tracking-wider flex items-center gap-1">
+                                      <span class="material-icons text-[14px]">fingerprint</span> アンケートID
+                                  </span>
+                                  <span class="text-sm font-mono font-bold text-gray-600 bg-gray-100 px-3 py-1.5 rounded-lg w-fit select-all" id="surveyIdDisplay">発行前</span>
+                              </div>
+
+                              <!-- 開催期間 -->
+                              <div class="flex flex-col gap-1.5 flex-1 min-w-0">
+                                  <span class="text-[10px] font-black text-primary uppercase tracking-wider flex items-center gap-1">
+                                      <span class="material-icons text-[14px]">calendar_today</span> 開催期間
+                                      <button type="button" class="help-trigger help-inline-button material-icons" data-help-key="surveyPeriod" aria-label="開催期間の説明を表示">help_outline</button>
+                                  </span>
+                                  <div class="flex items-center gap-2 w-full relative">
+                                      <input type="text" id="periodRange" class="input-field bg-white w-full text-sm font-bold pr-10" placeholder="期間を選択" aria-describedby="periodRangeError">
+                                      <span role="button" tabindex="0" class="material-icons absolute right-3 text-gray-400 hover:text-primary cursor-pointer transition-colors text-[18px]" aria-label="カレンダーを開く">calendar_today</span>
+                                  </div>
+                                  <div id="periodRangeError" class="hidden text-error text-xs mt-1 flex items-center gap-1" aria-live="polite"><span class="material-icons text-[14px]">error_outline</span><span>要確認: 期間を設定してください</span></div>
+                              </div>
+                          </div>
+                      </div>
+
+                      <!-- Right Column: Description -->
+                      <div class="flex flex-col pt-4 md:pt-0 md:pl-6 h-full md:col-span-2">
+                          <!-- Description (Multi-lang wrapper) -->
+                          <div class="multi-lang-input-group flex flex-col flex-1 w-full" data-field-key="description" data-input-type="textarea" data-label="説明" data-required="false">
+                              <div class="input-group mb-0 flex flex-col flex-1 w-full" data-lang="ja">
+                                  <textarea id="description_ja" placeholder=" " title="説明文" aria-label="説明文" class="input-field w-full bg-white resize-y text-sm pt-4" style="min-height: 120px; height: 100%;"></textarea>
+                                  <label class="input-label bg-transparent">説明文</label>
+                                  <button type="button" class="help-trigger help-icon-button material-icons" data-help-key="surveyDescription" aria-label="説明文の説明を表示">help_outline</button>
+                              </div>
+                          </div>
+                      </div>
+
+                  </div>
+              </div>
+
             </div>
 
-            <!-- Form Card -->
-            <div class="bg-surface p-6 rounded-xl space-y-6">
-              <!-- 基本情報 -->
-              <div class="accordion-item border border-outline-variant rounded-lg mb-4">
-                <div
-                  class="accordion-header flex justify-between items-center cursor-pointer p-4 bg-surface-variant rounded-t-lg"
-                  data-accordion-target="basicInfoContent">
-                  <h2 id="section-basic-info" class="text-on-surface text-xl font-semibold">基本情報</h2>
-                  <span class="material-icons expand-icon">expand_less</span>
-                </div>
-                <div id="basicInfoContent" class="accordion-content p-4 space-y-6">
-                  <section id="language-settings-section" class="space-y-4 hidden" data-pro-only="true" aria-hidden="true">
-                    <div class="flex flex-col gap-3 rounded-lg border border-outline-variant bg-surface-container-lowest p-4">
-                      <div class="relative flex flex-wrap items-center justify-between gap-4" id="multilingual-toggle-wrapper">
-                        <div>
-                          <h3 class="text-on-surface text-lg font-semibold">アンケート多言語機能の有効化</h3>
-                          <p class="text-sm text-on-surface-variant">アンケートごとに多言語入力を切り替えます。</p>
-                        </div>
-                        <label for="multilingualEnabledToggle" class="relative inline-flex items-center cursor-pointer">
-                          <input type="checkbox" id="multilingualEnabledToggle" role="switch" class="sr-only peer">
-                          <div
-                            class="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-500">
-                          </div>
-                        </label>
-                        <!-- ここにオーバーレイを追加 -->
-                        <div id="multilingual-premium-overlay" class="absolute inset-0 bg-surface/50 rounded-lg flex items-center justify-center hidden cursor-pointer z-10" title="プレミアムプラン限定">
-                            <span class="text-primary font-bold text-sm bg-surface px-3 py-1 rounded-full shadow-md">プレミアムプラン限定</span>
-                        </div>
-                      </div>
-                      <p class="text-xs text-on-surface-variant hidden" data-multilingual-off-message>ONにすると追加言語と翻訳入力欄が表示されます。</p>
-                      <p class="text-xs text-amber-700 hidden" data-multilingual-locked-message>プレミアムプランで利用できます。</p>
+            <!-- ============================== -->
+            <!-- 1. QUESTION COLUMN (Left/Main) -->
+            <!-- ============================== -->
+            <div id="questions-column-wrapper" class="md:col-span-12 lg:col-span-9 lg:col-start-1 lg:row-start-2 flex flex-col gap-5 w-full min-w-0">
+
+            <!-- SETTINGS (Options + Related) embedded at top of main column -->
+            <div id="settings-column" class="flex flex-col gap-3 w-full min-w-0">
+
+              <!-- カード1: 多言語機能 -->
+              <div class="bg-amber-50 border border-amber-200 rounded-xl shadow-sm overflow-hidden">
+                <button type="button" class="v2-accordion-trigger w-full flex items-center justify-between px-5 py-3 hover:bg-amber-100/50 transition-colors" data-accordion-v2="multilingualCardBody" aria-expanded="true">
+                  <h2 class="text-sm font-bold text-amber-800 flex items-center gap-2">
+                    <span class="material-icons text-amber-500 text-[18px]">stars</span>多言語機能
+                    <span class="text-[10px] font-black bg-amber-200 text-amber-800 px-1.5 py-0.5 rounded-full">Premium</span>
+                  </h2>
+                  <span class="material-icons text-amber-400 text-[18px]" data-accordion-icon>expand_less</span>
+                </button>
+                <div id="multilingualCardBody" class="v2-accordion-body border-t border-amber-100 px-5 py-3 flex flex-col gap-3">
+                  <!-- トグル -->
+                  <div class="flex items-center justify-between gap-3">
+                    <div class="min-w-0">
+                      <p class="font-bold text-sm text-amber-800 leading-tight">多言語機能を有効にする</p>
+                      <p class="text-xs text-amber-700/70 mt-0.5 leading-snug">複数言語でアンケートを提供します。</p>
                     </div>
-                    <div id="multilingual-controls" class="space-y-4">
-                      <div>
-                        <h3 class="text-on-surface text-lg font-semibold">追加言語</h3>
-                        <p class="text-sm text-on-surface-variant mb-2">アンケートで利用する言語を選択してください。</p>
-                        <div id="languageSelectionPanel" class="flex flex-wrap gap-2" role="group" aria-label="追加言語">
-                        </div>
-                      </div>
-                      <div class="mt-4">
-                        <h3 class="text-on-surface text-lg font-semibold">入力言語</h3>
-                        <p class="text-sm text-on-surface-variant mb-2">各項目のテキストを入力する言語を選択してください。</p>
-                        <div class="relative border-b border-outline-variant">
-                          <div id="languageEditorTabs" class="relative flex items-center gap-4" role="tablist"
-                            aria-label="入力言語タブ"></div>
-                          <span id="language-tab-indicator"
-                            class="absolute bottom-0 h-0.5 bg-primary transition-all duration-300"></span>
-                        </div>
-                      </div>
+                    <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
+                      <input type="checkbox" id="multilingualEnabledToggle" class="sr-only peer">
+                      <div class="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-amber-500 peer-focus:ring-2 peer-focus:ring-amber-300 transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+                    </label>
+                  </div>
+                  <!-- Multilingual Config UI -->
+                  <div id="multilingual-controls" class="hidden border-t border-amber-200 pt-3">
+                    <p class="text-xs font-bold text-amber-800 mb-2">追加可能言語</p>
+                    <div id="languageSelectionPanel" class="flex flex-wrap gap-2">
+                      <!-- Rendered by JS -->
                     </div>
-                  </section>
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- アンケート名（管理用）: 多言語 -->
-                    <div class="multi-lang-input-group" data-field-key="surveyName" data-input-type="input"
-                      data-label="アンケート名（管理用）" data-placeholder-ja="(例) 新製品調査" data-required="true">
-                      <div class="input-group" data-lang="ja">
-                        <input type="text" id="surveyName_ja" placeholder="(例) 新製品調査" class="input-field" required
-                          aria-required="true" aria-describedby="surveyNameError">
-                        <label for="surveyName_ja" class="input-label">アンケート名（管理用）<span
-                            class="text-error">*</span></label>
-                        <button type="button" class="help-trigger help-icon-button material-icons" data-help-key="surveyName"
-                          data-help-target="survey-name" aria-label="アンケート名の説明を表示">help_outline</button>
-                      </div>
-                      <div id="surveyNameError" class="error-message text-error text-sm mt-1 hidden" aria-live="polite"></div>
-                    </div>
-
-                    <!-- 表示タイトル: 多言語 -->
-                    <div class="multi-lang-input-group" data-field-key="displayTitle" data-input-type="input"
-                      data-label="表示タイトル" data-placeholder-ja="(例) 新製品に関する満足度を教えてください" data-required="true">
-                      <div class="input-group" data-lang="ja">
-                        <input type="text" id="displayTitle_ja" placeholder="(例) 新製品に関する満足度を教えてください" class="input-field"
-                          required aria-required="true" aria-describedby="displayTitleError">
-                        <label for="displayTitle_ja" class="input-label">表示タイトル<span class="text-error">*</span></label>
-                        <button type="button" class="help-trigger help-icon-button material-icons" data-help-key="surveyDisplayTitle"
-                          data-help-target="display-title" aria-label="表示タイトルの説明を表示">help_outline</button>
-                      </div>
-                      <div id="displayTitleError" class="error-message text-error text-sm mt-1 hidden"
-                        aria-live="polite"></div>
-                    </div>
-
-                    <!-- 説明: 多言語 -->
-                    <div class="multi-lang-input-group md:col-span-2" data-field-key="description"
-                      data-input-type="textarea" data-label="説明" data-placeholder-ja="(例) 本調査は新サービスの改善のためにご協力をお願いします。">
-                      <div class="input-group" data-lang="ja">
-                        <textarea id="description_ja" placeholder="(例) 本調査は新サービスの改善のためにご協力をお願いします。"
-                          class="input-field h-24 resize-y" aria-describedby="descriptionError"></textarea>
-                        <label for="description_ja" class="input-label">説明</label>
-                        <button type="button" class="help-trigger help-icon-button material-icons" data-help-key="surveyDescription"
-                          data-help-target="survey-description" aria-label="説明の説明を表示">help_outline</button>
-                      </div>
-                      <div id="descriptionError" class="error-message text-error text-sm mt-1 hidden"
-                        aria-live="polite"></div>
-                    </div>
-
-                    <!-- 期間 -->
-                    <div class="input-group md:col-span-2">
-                      <div class="input-with-trailing-actions">
-                        <input type="text" id="periodRange" class="input-field pr-10" placeholder=" " required
-                          aria-required="true" aria-describedby="periodRangeError">
-                        <label for="periodRange" class="input-label">アンケート期間<span class="text-error">*</span></label>
-                        <div class="field-trailing-actions">
-                          <span role="button" tabindex="0" class="field-action-button material-icons">calendar_today</span>
-                          <button type="button" class="help-trigger help-icon-button material-icons" data-help-key="surveyPeriod"
-                            data-help-target="survey-period" aria-label="アンケート期間の説明を表示">help_outline</button>
-                        </div>
-                      </div>
-                      <div id="periodRangeError" class="error-message text-error text-sm mt-1 hidden"
-                        aria-live="polite"></div>
-                    </div>
-
-
-
-
                   </div>
                 </div>
               </div>
 
-              <!-- 連携設定 -->
-              <section>
-                <h2 id="section-integration-settings" class="text-on-surface text-xl font-semibold mb-4">連携設定</h2>
-                <div class="space-y-4">
-                  <!-- 名刺画像添付機能の有効化 -->
-                  <div
-                    class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-                    <div>
-                      <div class="flex items-center gap-1">
-                        <h3 class="font-medium text-text-main">名刺画像添付を有効にする</h3>
-                        <button type="button" class="help-trigger help-inline-button material-icons" data-help-key="noBizcardCapture"
-                          data-help-target="bizcard-enabled" aria-label="名刺画像添付設定の説明を表示">help_outline</button>
-                      </div>
-                      <p class="text-sm text-text-sub mt-1">アンケート回答時に、名刺の撮影を依頼するステップを追加します。</p>
+              <!-- カード2: オプション機能 -->
+              <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                <button type="button" class="v2-accordion-trigger w-full flex items-center justify-between px-5 py-3 bg-gray-50 hover:bg-gray-100 transition-colors" data-accordion-v2="optionsCardBody" aria-expanded="false">
+                  <h2 class="text-sm font-bold text-gray-700 flex items-center gap-2">
+                    <span class="material-icons text-primary text-[18px]">extension</span>オプション機能
+                  </h2>
+                  <span class="material-icons text-gray-400 text-[18px]" data-accordion-icon>expand_more</span>
+                </button>
+                <div id="optionsCardBody" class="v2-accordion-body v2-collapsed border-t border-gray-100 px-5 py-3 flex gap-4">
+                  <!-- 名刺画像添付 -->
+                  <div class="flex-1 flex items-center justify-between gap-3">
+                    <div class="min-w-0">
+                      <p class="font-bold text-sm text-gray-700 flex items-center gap-1 leading-tight">名刺画像添付機能
+                        <button type="button" class="help-trigger help-inline-button material-icons text-[14px]" data-help-key="noBizcardCapture" aria-label="名刺画像添付機能の説明を表示">help_outline</button>
+                      </p>
+                      <p class="text-xs text-gray-400 mt-0.5 leading-snug">回答時に名刺撮影ステップを追加</p>
                     </div>
-                    <label for="bizcardEnabled" class="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" id="bizcardEnabled" role="switch" class="sr-only peer">
-                      <div
-                        class="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-500">
-                      </div>
+                    <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
+                      <input type="checkbox" id="bizcardEnabled" class="sr-only peer" checked>
+                      <div class="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 peer-focus:ring-2 peer-focus:ring-green-300 transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
                     </label>
                   </div>
-                  <p class="text-sm text-text-sub mt-2">※この設定をオフにすると、お礼メール設定と名刺データ化設定が利用できなくなります。</p>
+                  <div class="w-px bg-gray-100 self-stretch"></div>
+                  <!-- 連続回答 -->
+                  <div class="flex-1 flex items-center justify-between gap-3">
+                    <div class="min-w-0">
+                      <p class="font-bold text-sm text-gray-700 leading-tight">連続回答の許可</p>
+                      <p class="text-xs text-gray-400 mt-0.5 leading-snug">同端末で続けて回答を受け付ける</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
+                      <input type="checkbox" id="allowContinuousAnswer" class="sr-only peer" checked>
+                      <div class="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 peer-focus:ring-2 peer-focus:ring-green-300 transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+                    </label>
+                  </div>
                 </div>
-              </section>
+              </div>
 
-              <!-- 追加設定 -->
-              <section>
-                <h2 id="section-additional-settings" class="text-on-surface text-xl font-semibold mb-4">追加設定</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                  <div class="input-group">
-                    <button type="button" id="openBizcardSettingsBtn"
-                      class="additional-settings-button min-w-[100px] px-6 py-3 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors">名刺データ化設定</button>
+              <!-- カード3: 関連設定 -->
+              <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                <button type="button" class="v2-accordion-trigger w-full flex items-center justify-between px-5 py-3 bg-gray-50 hover:bg-gray-100 transition-colors" data-accordion-v2="relatedSettingsCardBody" aria-expanded="false">
+                  <h2 class="text-sm font-bold text-gray-700 flex items-center gap-2">
+                    <span class="material-icons text-primary text-[18px]">settings</span>関連設定
+                  </h2>
+                  <span class="material-icons text-gray-400 text-[18px]" data-accordion-icon>expand_more</span>
+                </button>
+                <div id="relatedSettingsCardBody" class="v2-accordion-body v2-collapsed border-t border-gray-100 px-4 py-3 flex flex-wrap gap-3">
+                  <a id="openBizcardSettingsBtn" href="./bizcardSettings.html" class="flex-1 flex items-center justify-between px-3 py-2.5 border border-gray-200 rounded-lg bg-gray-50 hover:bg-white hover:border-primary hover:shadow-sm transition-all group">
+                    <div class="flex items-center gap-2 min-w-0">
+                      <span class="material-icons text-[18px] text-gray-400 group-hover:text-primary shrink-0">document_scanner</span>
+                      <span class="text-xs font-bold text-gray-600 group-hover:text-primary truncate">名刺データ化設定</span>
+                    </div>
+                    <span class="material-icons text-[14px] text-gray-300 group-hover:text-primary shrink-0">arrow_forward_ios</span>
+                  </a>
+                  <a id="openThankYouEmailSettingsBtn" href="./thankYouEmailSettings.html" class="flex-1 flex items-center justify-between px-3 py-2.5 border border-gray-200 rounded-lg bg-gray-50 hover:bg-white hover:border-primary hover:shadow-sm transition-all group">
+                    <div class="flex items-center gap-2 min-w-0">
+                      <span class="material-icons text-[18px] text-gray-400 group-hover:text-primary shrink-0">mark_email_read</span>
+                      <span class="text-xs font-bold text-gray-600 group-hover:text-primary truncate">お礼メール設定</span>
+                    </div>
+                    <span class="material-icons text-[14px] text-gray-300 group-hover:text-primary shrink-0">arrow_forward_ios</span>
+                  </a>
+                  <a id="openThankYouScreenSettingsBtn" href="./thankYouScreenSettings.html" class="flex-1 min-w-[180px] flex items-center justify-between px-3 py-2.5 border border-gray-200 rounded-lg bg-gray-50 hover:bg-white hover:border-primary hover:shadow-sm transition-all group">
+                    <div class="flex items-center gap-2 min-w-0">
+                      <span class="material-icons text-[18px] text-gray-400 group-hover:text-primary shrink-0">task_alt</span>
+                      <span class="text-xs font-bold text-gray-600 group-hover:text-primary truncate">サンクス画面設定</span>
+                    </div>
+                    <span class="material-icons text-[14px] text-gray-300 group-hover:text-primary shrink-0">arrow_forward_ios</span>
+                  </a>
+                </div>
+              </div>
+
+            </div>
+            <!-- /SETTINGS EMBEDDED -->
+
+            <!-- ============================== -->
+            <!-- 2. QUESTION LIST               -->
+            <!-- ============================== -->
+            <div id="questions-column" class="flex flex-col gap-6 w-full min-w-0">
+              
+              <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm min-h-[50vh]">
+                <div class="flex items-center justify-between border-b border-gray-100 pb-4 mb-6">
+                  <h2 class="text-xl font-bold flex items-center gap-2 text-gray-800">
+                    <span class="material-icons text-primary text-[24px] -ml-1">format_list_bulleted</span>設問リスト
+                  </h2>
+                  <span id="questionCountBadge" class="text-sm font-bold text-primary bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">0問</span>
+                </div>
+
+                <!-- Multilingual Tabs removed and moved to the global top Area -->
+
+                <!-- Flat Question List Container -->
+                <div id="questionListContainer" class="mb-8">
+                  <div id="questionListEmpty" class="py-12 px-6 bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-100 rounded-2xl transition-all">
+                    <div class="text-center">
+                      <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white mb-4 shadow-md border border-indigo-100">
+                        <span class="material-icons text-5xl text-indigo-300">note_add</span>
+                      </div>
+                      <p class="text-indigo-900 font-bold text-lg mb-1">設問がありません</p>
+                      <p class="text-indigo-400 text-sm mb-6">最初の設問を追加して、アンケートの作成を始めましょう。</p>
+                      <button type="button" id="addFirstQuestionBtn" class="inline-flex items-center gap-2 bg-white text-primary border-2 border-primary px-6 py-3 rounded-xl font-bold shadow-sm hover:bg-primary hover:text-white hover:-translate-y-0.5 transition-all outline-none focus:ring-4 focus:ring-blue-100">
+                        <span class="material-icons text-[20px]">add_circle_outline</span> 最初の設問を追加
+                      </button>
+                    </div>
+                    <div id="inlineQuestionTypeMenu" class="hidden mt-6 grid grid-cols-2 gap-2 animate-fade-in-up">
+                      <!-- Populated by JS -->
+                    </div>
                   </div>
-                  <div class="input-group">
-                    <button type="button" id="openThankYouEmailSettingsBtn"
-                      class="additional-settings-button min-w-[100px] px-6 py-3 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors">お礼メール設定</button>
-                  </div>
-                  <div class="input-group">
-                    <button type="button" id="openThankYouScreenSettingsBtn"
-                      class="additional-settings-button text-center min-w-[100px] px-6 py-3 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors">サンクス画面設定</button>
+                </div>
+
+                <!-- Create Question Button (Inline inlineQuestionTypeMenu logic) -->
+                <div id="addQuestionInlineArea" class="relative hidden">
+                  <button type="button" id="addQuestionInlineBtn" class="w-full flex items-center justify-center gap-2 py-4 rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 text-gray-500 font-bold hover:border-primary hover:bg-indigo-50 hover:text-primary transition-all duration-300 group outline-none focus:ring-4 focus:ring-blue-100">
+                    <span class="material-icons group-hover:scale-125 transition-transform text-[20px]">add_circle_outline</span>
+                    設問を追加する
+                  </button>
+                  <div id="inlineQuestionTypeMenuBottom" class="hidden absolute top-full mt-2 w-full z-10 bg-white border border-gray-100 rounded-2xl shadow-xl overflow-hidden p-3 grid grid-cols-2 gap-2 animate-fade-in-down">
+                    <!-- Populated by JS -->
                   </div>
                 </div>
                 
-                <!-- 共通クーポン適用状態表示 -->
-                <div id="surveyGlobalCouponIndicator" class="hidden p-4 rounded-lg bg-surface-variant flex items-center justify-between border border-secondary mt-4">
-                  <div class="flex items-start gap-3">
-                    <span class="material-icons text-secondary mt-0.5">local_offer</span>
-                    <div>
-                      <span class="font-bold text-sm block text-on-surface">クーポン適用中</span>
-                      <span id="surveyGlobalCouponCodeTxt" class="text-lg font-bold tracking-wider text-secondary"></span>
-                      <p class="text-xs text-on-surface-variant mt-1">※ クーポンは名刺データ化・お礼メールなどアンケート全体の総額からお値引きされます。</p>
+                <!-- Thank You Screen Accordion -->
+                <div class="border border-indigo-100 bg-indigo-50/20 rounded-xl overflow-hidden shrink-0 mt-8 transition-all hover:bg-indigo-50/50">
+                  <button type="button" id="thankYouAccordionBtn" class="w-full flex items-center justify-between px-5 py-4 hover:bg-indigo-50/50 transition-colors outline-none focus:bg-indigo-50 group" aria-expanded="true">
+                    <h3 class="text-sm font-bold flex items-center gap-2 text-indigo-900 border-l-4 border-transparent group-hover:border-indigo-400 pl-2 -ml-5 transition-all">
+                      <span class="material-icons text-indigo-500 text-[18px]">task_alt</span> サンクス画面（回答完了メッセージ）
+                    </h3>
+                    <span class="material-icons text-indigo-400 text-[20px] transition-transform duration-300" id="thankYouAccordionIcon" style="transform: rotate(180deg)">expand_more</span>
+                  </button>
+                  <div id="thankYouAccordionBody" class="px-5 py-5 border-t border-indigo-50 bg-white">
+                    <div class="multi-lang-input-group" data-field-key="thankYouMessage" data-input-type="textarea" data-label="完了メッセージ" data-required="false">
+                      <div class="input-group mb-0" data-lang="ja">
+                        <textarea id="thankYouMessage_ja" placeholder=" " class="input-field min-h-[5rem] bg-gray-50 resize-y text-sm pt-4 border-gray-200 focus:bg-white focus:ring-2 focus:ring-indigo-100" maxlength="500"></textarea>
+                        <label class="input-label bg-transparent">完了メッセージ (回答後に表示)</label>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </section>
 
-              <!-- メモ -->
-              <section>
-                <div class="flex items-center gap-1 mb-4">
-                  <h2 id="section-memo" class="text-on-surface text-xl font-semibold">メモ</h2>
-                  <button type="button" class="help-trigger help-inline-button material-icons" data-help-key="internalMemo"
-                    data-help-target="survey-memo" aria-label="メモの説明を表示">help_outline</button>
-                </div>
-                <div class="input-group">
-                  <textarea id="memo" placeholder=" " class="input-field h-24 resize-y"></textarea>
-                  <label for="memo" class="input-label">メモ</label>
-                </div>
-              </section>
-
-              <!-- 設問設定 -->
-              <section>
-                <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
-                  <h2 id="section-question-settings" class="text-on-surface text-xl font-semibold">設問設定</h2>
-                  <button type="button" id="addNewGroupBtn"
-                    class="min-w-[140px] px-4 py-2 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors hover:bg-secondary-container/80">設問グループを追加</button>
-                </div>
-                <div id="questionGroupsContainer" class="space-y-6 mb-6"></div>
-              </section>
-
-              <!-- Actions -->
-              <div class="flex justify-end gap-4 pt-4">
-                <button type="button" id="showPreviewBtn"
-                  class="min-w-[100px] px-6 py-3 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors">プレビュー表示</button>
-                <button type="button" id="openQrModalBtn"
-                  class="min-w-[100px] px-6 py-3 rounded-full border border-primary text-primary font-semibold transition-colors hover:bg-primary/10 opacity-50 cursor-not-allowed"
-                  disabled aria-disabled="true">QRコード</button>
-                <button type="button" id="cancelCreateSurvey"
-                  class="min-w-[100px] px-6 py-3 rounded-full border border-outline-variant text-on-surface-variant font-semibold transition-colors hover:bg-surface-variant">キャンセル</button>
-                <button type="button" id="createSurveyBtn"
-                  class="min-w-[100px] px-6 py-3 rounded-full bg-primary text-on-primary font-semibold transition-colors shadow-md"
-                  disabled>アンケート保存</button>
               </div>
             </div>
-          </div>
-          <div id="outline-map-container"
-            class="hidden lg:flex fixed top-24 right-0 h-auto max-h-[calc(100vh-8rem)] w-72 flex-col bg-surface border border-outline-variant rounded-xl p-4 transition-transform duration-300 ease-in-out z-30">
-            <div id="outline-map-scroll" class="flex-1 overflow-y-auto">
-              <div id="outline-map-list" class="space-y-2"></div>
+            <!-- /QUESTION LIST -->
+
             </div>
-            <div id="outline-action-buttons" class="mt-4 space-y-2 hidden">
-              <button type="button" data-outline-action="preview"
-                class="w-full inline-flex items-center justify-center gap-2 rounded-full border border-outline-variant px-4 py-2 text-sm font-semibold text-on-surface hover:bg-surface-variant transition-colors">
-                <span class="material-icons text-base">visibility</span>
-                <span>プレビュー表示</span>
-              </button>
-              <button type="button" data-outline-action="save"
-                class="w-full inline-flex items-center justify-center gap-2 rounded-full bg-primary text-on-primary px-4 py-2 text-sm font-semibold shadow-sm hover:bg-primary-dark transition-colors">
-                <span class="material-icons text-base">save</span>
-                <span>アンケート保存</span>
-              </button>
+            <!-- /QUESTION COLUMN WRAPPER -->
+
+
+            <!-- ============================== -->
+            <!-- 3. OUTLINE PANEL (Right Area)  -->
+            <!-- ============================== -->
+            <div id="outline-column" class="hidden lg:flex fixed xl:sticky top-24 xl:top-[5rem] right-0 z-50 xl:z-auto w-72 xl:w-auto h-auto xl:h-auto translate-x-full xl:translate-x-0 transition-transform duration-300 ease-in-out lg:col-span-3 xl:col-span-3 lg:col-start-10 xl:col-start-10 lg:row-start-2 flex-col gap-0 xl:gap-5 sticky-panel glass-panel bg-white/95 xl:bg-white/80 p-0 border-l xl:border border-gray-200 rounded-l-2xl xl:rounded-xl shadow-2xl xl:shadow-sm overflow-hidden">
+
+              <div class="p-5 overflow-y-auto border-b" style="max-height: calc(100vh - 18rem);">
+                <h3 class="text-xs font-black tracking-widest text-gray-400 uppercase mb-4 flex items-center gap-1">
+                  <span class="material-icons text-sm">toc</span> 設問ナビ
+                </h3>
+                <nav id="outline-map-list" aria-label="設問ナビ" class="space-y-1 text-sm font-medium">
+                  <!-- Question Outlines populated by JS -->
+                  <div id="outline-questions-list" class="space-y-1 text-sm"></div>
+
+                </nav>
+              </div>
+
+              <!-- Sidebar Actions -->
+              <div class="p-5 bg-gray-50 flex flex-col gap-3" id="outline-action-buttons">
+                <button type="button" id="showPreviewBtn" class="w-full flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm">
+                  <span class="material-icons text-[18px]">visibility</span> プレビュー
+                </button>
+                <button type="button" id="openQrModalBtn" class="w-full flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm opacity-50 cursor-not-allowed" disabled aria-disabled="true">
+                  <span class="material-icons text-[18px]">qr_code</span> QR発行
+                </button>
+                <button type="button" id="createSurveyBtn" class="w-full flex items-center justify-center gap-2 rounded-lg bg-primary text-white px-4 py-3 text-sm font-bold hover:bg-blue-600 transition-colors shadow-md disabled:bg-gray-300 disabled:cursor-not-allowed" disabled aria-disabled="true">
+                  <span class="material-icons text-[18px]">save</span> アンケートを保存する
+                </button>
+                <button type="button" id="cancelCreateSurvey" class="w-full flex items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-bold text-gray-500 hover:bg-gray-50 transition-colors">
+                  <span class="material-icons text-[18px]">close</span> キャンセル
+                </button>
+              </div>
+
             </div>
+            <!-- /OUTLINE PANEL -->
+
           </div>
+          <!-- END 3-AREA GRID -->
+
         </div>
       </main>
     </div>
 
-    <button id="outline-map-toggle-btn"
-      class="hidden lg:flex fixed top-[20%] -translate-y-1/2 right-[18rem] w-8 h-16 bg-surface hover:bg-surface-container-high rounded-l-lg shadow-lg items-center justify-center border-y border-l border-outline-variant transition-all duration-300 ease-in-out z-40 focus:outline-none focus:ring-2 focus:ring-primary">
-      <span class="material-icons transition-transform duration-300">chevron_left</span>
-    </button>
-
-    <div id="fab-container" class="fixed bottom-8 right-8 z-[9999]">
-      <button id="fab-main-button"
-        class="w-16 h-16 bg-primary text-on-primary rounded-full flex items-center justify-center shadow-lg hover:bg-primary-dark transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-4 focus:ring-primary-container"
-        aria-expanded="false" aria-controls="fab-menu" aria-label="設問追加メニューを開く">
-        <span class="material-icons text-4xl transition-transform duration-300">add</span>
-      </button>
-      <div id="fab-menu"
-        class="absolute bottom-20 right-0 w-72 bg-surface rounded-2xl shadow-2xl transition-all duration-300 transform scale-95 opacity-0 pointer-events-none origin-bottom-right"
-        hidden aria-hidden="true" inert role="menu" aria-label="設問追加メニュー">
-        <div class="py-2">
-          <button data-question-type="group"
-            class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
-            <span class="material-icons text-on-surface-variant mr-4">view_sidebar</span>
-            <span>設問グループを追加</span>
-          </button>
-
-          <button data-question-type="free_answer"
-            class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
-            <span class="material-icons text-on-surface-variant mr-4">short_text</span>
-            <span>フリーアンサー</span>
-          </button>
-          <button data-question-type="single_answer"
-            class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
-            <span class="material-icons text-on-surface-variant mr-4">radio_button_checked</span>
-            <span>シングルアンサー</span>
-          </button>
-          <button data-question-type="multi_answer"
-            class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
-            <span class="material-icons text-on-surface-variant mr-4">check_box</span>
-            <span>マルチアンサー</span>
-          </button>
-          <button data-question-type="number_answer"
-            class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
-            <span class="material-icons text-on-surface-variant mr-4">pin</span>
-            <span>数値回答</span>
-          </button>
-          <button data-question-type="dropdown"
-            class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
-            <span class="material-icons text-on-surface-variant mr-4">arrow_drop_down_circle</span>
-            <span>ドロップダウン回答</span>
-          </button>
-          <button data-question-type="matrix_sa"
-            class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
-            <span class="material-icons text-on-surface-variant mr-4">view_list</span>
-            <span>マトリックス(SA)</span>
-          </button>
-          <button data-question-type="matrix_ma"
-            class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
-            <span class="material-icons text-on-surface-variant mr-4">grid_view</span>
-            <span>マトリックス(MA)</span>
-          </button>
-          <button data-question-type="date_time"
-            class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
-            <span class="material-icons text-on-surface-variant mr-4">event</span>
-            <span>日付/時間</span>
-          </button>
-          <button data-question-type="handwriting"
-            class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
-            <span class="material-icons text-on-surface-variant mr-4">draw</span>
-            <span>手書きスペース</span>
-            <span class="help-trigger help-inline-button material-icons ml-auto" data-help-key="handwritingSpace"
-              data-help-target="handwriting-type" aria-label="手書きスペースの説明を表示">help_outline</span>
-          </button>
-          <button data-question-type="explanation_card"
-            class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-variant transition-colors">
-            <span class="material-icons text-on-surface-variant mr-4">info_outline</span>
-            <span>説明カード</span>
-          </button>
-        </div>
-      </div>
-    </div>
-
+    <!-- Footer Placeholder -->
     <div id="footer-placeholder"></div>
   </div>
 
-  <!-- flatpickr JS -->
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
-  <!-- Sortable.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  <!--
+    Mobile Fixed Action Bar (lg未満のみ表示)
+    NOTE: プレビュー/QR発行/保存の各ボタンはデスクトップ側(アウトラインパネル内)にも同等のボタンが存在する。
+    - デスクトップ: #showPreviewBtn / #openQrModalBtn / #createSurveyBtn
+    - モバイル    : #showPreviewBtnMobile / #openQrModalBtnMobile / #createSurveyBtnMobile
+    JSでは両セットのIDを同一ハンドラーに紐づけること。
+  -->
+  <div id="mobile-action-bar" class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] h-20 z-50 flex items-center justify-between px-4 pb-4 pt-2 gap-1 sm:gap-2">
+    <button type="button" id="showPreviewBtnMobile" class="flex-1 flex flex-col items-center justify-center text-gray-600 hover:text-primary transition-colors">
+      <span class="material-icons text-xl">visibility</span>
+      <span class="text-[10px] font-bold mt-0.5">プレビュー</span>
+    </button>
+    <button type="button" id="openQrModalBtnMobile" class="flex-1 flex flex-col items-center justify-center text-gray-600 hover:text-primary transition-colors">
+      <span class="material-icons text-xl">qr_code</span>
+      <span class="text-[10px] font-bold mt-0.5">QR発行</span>
+    </button>
+    <button type="button" id="addQuestionMobileBtn" class="flex-1 flex flex-col items-center justify-center text-primary hover:text-blue-700 transition-colors relative">
+      <span class="material-icons text-xl">add_circle</span>
+      <span class="text-[10px] font-bold mt-0.5">設問追加</span>
+    </button>
+    <button type="button" id="createSurveyBtnMobile" class="flex-[2] bg-primary text-white rounded-full py-2.5 px-2 sm:px-4 font-bold text-sm shadow inline-flex items-center justify-center gap-1 sm:gap-2 disabled:bg-gray-300">
+      <span class="material-icons text-sm">save</span> 保存する
+    </button>
+  </div>
 
-  <!-- First Login Tutorial -->
-  <link rel="stylesheet" href="./src/first-login-tutorial.css">
-  <script src="./src/first-login-tutorial.js" defer></script>
+  <!-- Main Floating Action Button (FAB) - Desktop only -->
+  <div id="fab-container" class="hidden lg:block fixed bottom-10 right-10 z-[100]">
+    <button type="button" id="fab-main-button" class="w-14 h-14 bg-primary text-white rounded-full flex items-center justify-center shadow-xl hover:shadow-primary/40 hover:scale-110 transition-all focus:outline-none focus:ring-4 focus:ring-blue-200 group">
+      <span class="material-icons text-3xl group-hover:rotate-90 transition-transform duration-300">add</span>
+    </button>
+    <!-- FAB Menu Items populated by JS logic -->
+    <div id="fab-menu" class="absolute bottom-16 right-0 w-64 bg-white rounded-2xl shadow-2xl p-2 transition-all duration-200 origin-bottom-right scale-95 opacity-0 pointer-events-none hidden mt-2 h-auto max-h-[60vh] overflow-y-auto">
+      <!-- Generated by JS -->
+    </div>
+  </div>
 
-  <!-- Page JS -->
+  <!--
+    Outline Drawer Toggle Button (lg=1024px〜xl=1279px のみ表示)
+    XL以上ではアウトラインパネルがグリッド内にスタティック配置されるため、このトグルは不要（xl:hidden）。
+    lg〜xlではアウトラインパネルが fixed のドロワーになるため、このボタンで開閉する。
+  -->
+  <button id="outline-map-toggle-btn"
+    class="hidden lg:flex xl:hidden fixed top-48 right-0 w-10 h-20 bg-white hover:bg-primary hover:text-white rounded-l-xl shadow-[-3px_0_8px_rgba(0,0,0,0.12)] flex-col items-center justify-center gap-0.5 border-y border-l border-gray-200 transition-all duration-300 ease-in-out z-40 focus:outline-none focus:ring-2 focus:ring-primary group"
+    title="設問ナビを開閉">
+    <span class="material-icons transition-transform duration-300 text-gray-500 group-hover:text-white text-[18px]" id="outline-map-toggle-icon">chevron_left</span>
+    <span class="text-[9px] font-black tracking-wider text-gray-400 group-hover:text-white leading-none" style="writing-mode: vertical-rl; text-orientation: mixed;">NAV</span>
+  </button>
+
+  <!-- Mobile Add Question Type Menu (triggered by mobile footer button) -->
+  <div id="mobileQuestionTypeMenu" class="lg:hidden hidden fixed bottom-20 left-4 right-4 z-[200] bg-white rounded-2xl shadow-2xl border border-gray-200 p-3 grid grid-cols-2 gap-2 animate-fade-in-up">
+    <!-- Generated by JS -->
+  </div>
+
+  <!-- Dialogs & Modals -->
+
+  <!-- 通知モーダル (showNotice用) -->
+  <div id="noticeModal" class="fixed inset-0 bg-gray-900/60 z-[1100] hidden items-center justify-center p-4 backdrop-blur-sm" role="alertdialog" aria-modal="true" aria-labelledby="noticeModalTitle">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 animate-fade-in-up">
+      <div class="flex items-start gap-3 mb-5">
+        <span id="noticeModalIcon" class="material-icons text-2xl flex-shrink-0 mt-0.5"></span>
+        <div>
+          <p id="noticeModalTitle" class="text-base font-bold text-gray-900"></p>
+          <p id="noticeModalBody" class="text-sm text-gray-600 mt-1 leading-relaxed"></p>
+        </div>
+      </div>
+      <div class="flex justify-end">
+        <button type="button" id="noticeModalOk" class="px-6 py-2.5 rounded-lg bg-primary text-white text-sm font-bold hover:bg-blue-600 transition-colors shadow-sm">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 確認ダイアログ (showConfirm用) -->
+  <div id="confirmModal" class="fixed inset-0 bg-gray-900/60 z-[1100] hidden items-center justify-center p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 animate-fade-in-up">
+      <div class="flex items-start gap-3 mb-5">
+        <span id="confirmModalIcon" class="material-icons text-2xl flex-shrink-0 mt-0.5 text-amber-500">warning</span>
+        <div>
+          <p id="confirmModalTitle" class="text-base font-bold text-gray-900"></p>
+          <p id="confirmModalBody" class="text-sm text-gray-600 mt-1 leading-relaxed"></p>
+        </div>
+      </div>
+      <div class="flex justify-end gap-3">
+        <button type="button" id="confirmModalCancel" class="px-5 py-2.5 rounded-lg border border-gray-300 text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors">キャンセル</button>
+        <button type="button" id="confirmModalOk" class="px-5 py-2.5 rounded-lg bg-red-600 text-white text-sm font-bold hover:bg-red-700 transition-colors shadow-sm"></button>
+      </div>
+    </div>
+  </div>
+
+  <div id="questionTypeChangeDialog" class="fixed inset-0 bg-gray-900/60 z-[1000] hidden items-center justify-center p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="typeChangeDlgTitle">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 animate-fade-in-up">
+      <div class="flex items-center justify-between mb-4">
+        <h3 id="typeChangeDlgTitle" class="text-lg font-bold text-gray-900 flex items-center gap-2">
+          <span class="material-icons text-indigo-500">swap_horiz</span> 設問タイプを変更
+        </h3>
+        <button type="button" id="typeChangeClose" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors" aria-label="閉じる">
+          <span class="material-icons text-[20px]">close</span>
+        </button>
+      </div>
+      <p class="text-xs text-gray-500 mb-4 leading-relaxed">変更先のタイプを選択してください。選択肢や詳細設定が一部リセットされる場合があります。</p>
+      <div id="typeChangeGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-5"></div>
+      <!-- 確認フェーズ -->
+      <div id="typeChangeConfirmPhase" class="hidden border-t border-gray-100 pt-4">
+        <p class="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 mb-4 flex items-start gap-2">
+          <span class="material-icons text-amber-500 text-[18px] flex-shrink-0 mt-0.5">warning</span>
+          <span id="typeChangeWarningText"></span>
+        </p>
+        <div class="flex flex-col-reverse sm:flex-row justify-end gap-3">
+          <button type="button" id="typeChangeCancel" class="w-full sm:w-auto px-5 py-2.5 rounded-lg border border-gray-300 text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors">
+            キャンセル
+          </button>
+          <button type="button" id="typeChangeConfirm" class="w-full sm:w-auto px-5 py-2.5 rounded-lg bg-red-600 text-white text-sm font-bold hover:bg-red-700 transition-colors shadow-sm">
+            タイプを変更する
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- External JS Module -->
   <script type="module" src="src/surveyCreation.js"></script>
 
-  <!-- Template: Group -->
-  <template id="questionGroupTemplate">
-    <section class="question-group question-builder-group" data-group-id="">
-      <div class="group-header question-builder-group__header" data-accordion-target="">
-        <div class="question-builder-group__main">
-          <span class="material-icons text-on-surface-variant handle cursor-move question-builder-handle"
-            title="ドラッグで並べ替え">drag_indicator</span>
-          <div class="flex-1 multi-lang-input-group" data-field-key="groupTitle" data-input-type="input"
-            data-label="グループタイトル" data-placeholder-ja="グループタイトルを入力">
-            <div class="input-group input-group-stacked question-builder-field" data-lang="ja">
-              <label class="input-label" for="groupTitle_ja">グループタイトル</label>
-              <input type="text" id="groupTitle_ja"
-                class="input-field question-builder-input group-title-input"
-                data-lang="ja" placeholder="グループタイトルを入力">
-            </div>
-          </div>
-        </div>
-        <div class="question-builder-group__meta">
-          <span class="question-builder-count-badge" data-group-question-count>0問</span>
-          <span class="question-builder-status-badge hidden" data-group-issue-count></span>
-        </div>
-        <div class="question-builder-group__actions" data-no-toggle>
-          <button type="button" class="icon-button duplicate-group-btn" aria-label="グループを複製" title="グループを複製"><span
-              class="material-icons">content_copy</span></button>
-          <button type="button" class="icon-button delete-group-btn" aria-label="グループを削除" title="グループを削除"><span
-              class="material-icons text-error">delete</span></button>
-          <button type="button" class="icon-button question-builder-toggle-btn" aria-label="グループを開閉" data-no-toggle>
-            <span class="material-icons expand-icon">expand_less</span>
-          </button>
-        </div>
-      </div>
-      <div class="accordion-content question-builder-group__body">
-        <div class="questions-list space-y-4"></div>
-        <div class="mt-6 flex justify-end">
-          <button type="button"
-            class="add-question-btn inline-flex items-center gap-2 px-4 py-2 rounded-full border border-outline-variant text-sm font-semibold text-on-surface hover:bg-surface-variant transition-colors">
-            <span class="material-icons text-base">add</span>
-            <span>設問を追加</span>
-          </button>
-        </div>
-      </div>
-    </section>
-  </template>
-
-  <!-- Template: Question -->
-  <template id="questionTemplate">
-    <article class="question-item question-builder-card" data-question-id="" data-question-type="">
-      <div class="accordion-header question-card-summary" data-accordion-target="">
-        <div class="question-card-summary__left">
-          <span class="material-icons text-on-surface-variant handle cursor-move question-builder-handle"
-            title="ドラッグで並び替え">drag_indicator</span>
-          <span class="question-card-summary__number" data-question-number>Q1</span>
-          <div class="question-card-summary__content">
-            <div class="question-card-summary__meta">
-              <span class="question-card-summary__type-label" data-question-type-label>自由記述</span>
-              <span class="question-builder-required-badge hidden" data-question-required-badge>必須</span>
-            </div>
-            <p class="question-card-summary__title" data-question-summary-text>設問文を入力してください</p>
-            <div class="question-card-summary__status" data-question-status-badges></div>
-          </div>
-        </div>
-        <div class="question-card-summary__right" data-no-toggle>
-          <div class="question-type-control" data-no-toggle>
-            <button type="button" class="current-type-trigger" data-current-type-trigger aria-haspopup="true" aria-expanded="false">
-              <span class="current-type-trigger__label" data-current-type-label>自由記述</span>
-              <span class="material-icons current-type-trigger__icon">expand_more</span>
-            </button>
-            <div class="question-type-menu hidden" data-question-type-menu></div>
-          </div>
-          <select class="question-type-select sr-only" aria-label="設問タイプを選択">
-            <option value="free_answer">自由記述</option>
-            <option value="single_answer">単一選択</option>
-            <option value="multi_answer">複数選択</option>
-            <option value="dropdown">ドロップダウン回答</option>
-            <option value="number_answer">数値入力</option>
-            <option value="matrix_sa">マトリクス（単一）</option>
-            <option value="matrix_ma">マトリクス（複数）</option>
-            <option value="date_time">日付/時刻</option>
-            <option value="handwriting">手書きスペース</option>
-            <option value="explanation_card">説明カード</option>
-          </select>
-          <button type="button" class="icon-button duplicate-question-btn" aria-label="設問を複製" title="設問を複製"><span
-              class="material-icons">content_copy</span></button>
-          <button type="button" class="icon-button delete-question-btn" aria-label="設問を削除" title="設問を削除"><span
-              class="material-icons text-error">delete</span></button>
-          <button type="button" class="icon-button question-builder-toggle-btn" aria-label="設問を開閉" data-no-toggle>
-            <span class="material-icons expand-icon">expand_more</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="accordion-content question-detail-panel hidden">
-        <section class="question-detail-section">
-          <div class="question-detail-section__header">
-            <h4 class="question-detail-section__title">基本設定</h4>
-            <p class="question-detail-section__description">設問文と必須設定を編集します。</p>
-          </div>
-          <div class="question-detail-grid">
-            <div class="multi-lang-input-group question-detail-grid__full" data-field-key="questionText" data-input-type="input" data-label="設問文"
-              data-placeholder-ja="設問文を入力">
-              <div class="input-group input-group-stacked question-builder-field" data-lang="ja">
-                <label class="input-label">設問文</label>
-                <input type="text" class="input-field question-builder-input question-text-input" data-lang="ja" placeholder="設問文を入力">
-              </div>
-            </div>
-            <div class="question-builder-inline-toggle">
-              <input type="checkbox"
-                class="required-checkbox h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary">
-              <label class="required-label ml-2 block text-sm text-on-surface-variant">必須回答にする</label>
-            </div>
-          </div>
-        </section>
-
-        <section class="question-detail-section">
-          <div class="question-detail-section__header">
-            <h4 class="question-detail-section__title">回答内容設定</h4>
-            <p class="question-detail-section__description">回答形式に応じた設定を行います。</p>
-          </div>
-
-          <div data-config-section="multi_answer" class="hidden question-detail-grid">
-            <div class="input-group input-group-stacked question-builder-field">
-              <label class="input-label">最大選択可能数</label>
-              <input type="number" data-config-type="multi_answer" data-config-field="maxSelections" min="1"
-                class="input-field question-builder-input" placeholder="1">
-            </div>
-          </div>
-
-          <div class="multi-lang-input-group hidden" data-config-section="explanation_card"
-            data-field-key="explanationDescription" data-input-type="textarea" data-label="説明文"
-            data-placeholder-ja="説明文を入力">
-            <div class="input-group input-group-stacked question-builder-field" data-lang="ja">
-              <label class="input-label">説明文</label>
-              <textarea class="input-field question-builder-input h-24 resize-y explanation-description-input" data-lang="ja"
-                placeholder="説明文を入力"></textarea>
-            </div>
-          </div>
-
-          <div data-config-section="choice_options" class="hidden choice-options-panel">
-            <div class="space-y-2 options-container"></div>
-            <div class="choice-options-panel__actions">
-              <button type="button" class="add-option-btn inline-flex items-center gap-2 rounded-full border border-outline-variant px-4 py-2 text-sm font-semibold text-on-surface hover:bg-surface-variant transition-colors">
-                <span class="material-icons text-base">add</span>
-                <span>選択肢を追加</span>
-              </button>
-            </div>
-            <div class="option-bulk-editor">
-              <button type="button" class="option-bulk-toggle" data-option-bulk-toggle aria-expanded="false">
-                <span>選択肢を一括入力</span>
-                <span class="material-icons option-bulk-toggle__icon">expand_more</span>
-              </button>
-              <div class="option-bulk-panel hidden" data-option-bulk-panel>
-                <div class="input-group input-group-stacked question-builder-field mt-4">
-                  <label class="input-label">選択肢を一括入力</label>
-                  <textarea class="input-field question-builder-input option-bulk-input h-28 resize-y"
-                    placeholder="1行に1つずつ入力してください&#10;例: 価格&#10;機能&#10;サポート"></textarea>
-                  <p class="text-xs text-on-surface-variant mt-1">入力済みの選択肢をまとめて置き換えます。</p>
-                  <div class="mt-3 flex justify-end">
-                    <button type="button" class="option-bulk-apply-btn inline-flex items-center gap-2 rounded-full bg-secondary-container px-4 py-2 text-sm font-semibold text-on-secondary-container transition-colors hover:bg-secondary-container/80">
-                      <span class="material-icons text-base">playlist_add</span>
-                      <span>一括反映</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="matrix-editor hidden mt-4 space-y-6">
-            <div class="question-builder-subsection">
-              <div class="question-builder-subsection__header">
-                <h5 class="question-builder-subsection__title">行</h5>
-                <button type="button" class="add-matrix-row-btn text-sm font-semibold text-primary hover:underline">+ 行を追加</button>
-              </div>
-              <div class="matrix-rows-list space-y-3"></div>
-            </div>
-            <div class="question-builder-subsection">
-              <div class="question-builder-subsection__header">
-                <h5 class="question-builder-subsection__title">列</h5>
-                <button type="button" class="add-matrix-col-btn text-sm font-semibold text-primary hover:underline">+ 列を追加</button>
-              </div>
-              <div class="matrix-cols-list space-y-3"></div>
-            </div>
-          </div>
-
-          <div data-config-section="free_answer" class="hidden question-detail-grid">
-            <div class="input-group input-group-stacked question-builder-field">
-              <label class="input-label">最小文字数 (0で無制限)</label>
-              <input type="number" data-config-type="text" data-config-field="minLength" min="0" class="input-field question-builder-input"
-                placeholder="0">
-            </div>
-            <div class="input-group input-group-stacked question-builder-field">
-              <label class="input-label">最大文字数 (0で無制限)</label>
-              <input type="number" data-config-type="text" data-config-field="maxLength" min="0" class="input-field question-builder-input"
-                placeholder="0">
-            </div>
-          </div>
-
-          <div data-config-section="number" class="hidden question-detail-grid">
-            <div class="input-group input-group-stacked question-builder-field">
-              <label class="input-label">最小値</label>
-              <input type="number" data-config-type="number" data-config-field="min" class="input-field question-builder-input"
-                placeholder="指定なし">
-            </div>
-            <div class="input-group input-group-stacked question-builder-field">
-              <label class="input-label">最大値</label>
-              <input type="number" data-config-type="number" data-config-field="max" class="input-field question-builder-input"
-                placeholder="指定なし">
-            </div>
-            <div class="input-group input-group-stacked question-builder-field">
-              <label class="input-label">単位</label>
-              <input type="text" data-config-type="number" data-config-field="unitLabel" class="input-field question-builder-input"
-                placeholder="例: 歳, 円, cm">
-            </div>
-            <div class="input-group input-group-stacked question-builder-field">
-              <label class="input-label">ステップ（矢印での増減量）</label>
-              <input type="number" data-config-type="number" data-config-field="step" min="0" class="input-field question-builder-input"
-                placeholder="1">
-            </div>
-          </div>
-
-          <div data-config-section="date_time" class="hidden question-detail-grid">
-            <div class="question-builder-inline-toggle">
-              <input type="checkbox" data-config-type="date_time" data-config-field="showDate"
-                class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary">
-              <label class="ml-2 block text-sm text-on-surface-variant">日付を表示</label>
-            </div>
-            <div class="question-builder-inline-toggle">
-              <input type="checkbox" data-config-type="date_time" data-config-field="showTime"
-                class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary">
-              <label class="ml-2 block text-sm text-on-surface-variant">時間を表示</label>
-            </div>
-          </div>
-
-          <div data-config-section="handwriting" class="hidden question-detail-grid">
-            <div class="input-group input-group-stacked question-builder-field">
-              <label class="input-label">描画エリアの高さ</label>
-              <select data-config-type="handwriting" data-config-field="canvasHeightPreset" class="input-field question-builder-input">
-                <option value="200">標準 (200px)</option>
-                <option value="100">小 (100px)</option>
-                <option value="300">中 (300px)</option>
-                <option value="500">大 (500px)</option>
-                <option value="custom">カスタム</option>
-              </select>
-            </div>
-            <div class="input-group input-group-stacked question-builder-field hidden" data-handwriting-sub-config="customHeight">
-              <label class="input-label">カスタムの高さ (px)</label>
-              <input type="number" data-config-type="handwriting" data-config-field="canvasHeight" min="50"
-                class="input-field question-builder-input" placeholder="50以上の数値を入力">
-            </div>
-          </div>
-        </section>
-
-        <section class="question-detail-section">
-          <div class="question-detail-section__header">
-            <h4 class="question-detail-section__title">高度設定</h4>
-            <p class="question-detail-section__description">必要な場合のみ条件分岐を設定します。</p>
-          </div>
-          <button type="button" class="advanced-settings-toggle" data-advanced-settings-toggle aria-expanded="false">
-            <span>条件分岐を設定する</span>
-            <span class="material-icons advanced-settings-toggle__icon">expand_more</span>
-          </button>
-          <div class="advanced-settings-panel hidden" data-advanced-settings-panel>
-            <div data-config-section="jump" class="space-y-2 mt-4">
-              <div class="input-group input-group-stacked question-builder-field">
-                <label class="input-label">ジャンプ先</label>
-                <select data-config-type="jump" data-config-field="targetQuestionId" class="input-field question-builder-input jump-target-select">
-                  <option value="">次の設問へ</option>
-                </select>
-              </div>
-              <p class="text-xs text-on-surface-variant hidden" data-jump-locked-message>プレミアムプランで利用できます。</p>
-            </div>
-          </div>
-        </section>
-      </div>
-    </article>
-  </template>
-
-  <!-- Template: Option -->
-  <template id="optionTemplate">
-    <div class="option-item question-builder-option">
-      <span class="material-icons text-on-surface-variant cursor-move option-handle handle mt-3">drag_indicator</span>
-      <div class="flex-grow multi-lang-input-group" data-field-key="optionText" data-input-type="input" data-label="選択肢"
-        data-placeholder-ja="選択肢を入力">
-        <div class="input-group input-group-stacked question-builder-field" data-lang="ja">
-          <label class="input-label">選択肢</label>
-          <input type="text" data-lang="ja" class="input-field question-builder-input option-text-input" placeholder="選択肢を入力">
-        </div>
-      </div>
-      <button type="button" class="icon-button delete-option-btn mt-2" aria-label="選択肢を削除"><span
-          class="material-icons text-error">remove_circle_outline</span></button>
-    </div>
-  </template>
 </body>
-
 </html>

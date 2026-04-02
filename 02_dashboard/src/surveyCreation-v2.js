@@ -167,6 +167,23 @@ let sortables = {
   options: {}
 };
 
+function isV2Page() {
+  return window.location.pathname.endsWith('/surveyCreation-v2.html')
+    || window.location.pathname.endsWith('surveyCreation-v2.html');
+}
+
+function buildRelatedSettingsUrl(path, surveyId) {
+  const params = new URLSearchParams();
+  if (surveyId) {
+    params.set('surveyId', surveyId);
+  }
+  if (isV2Page()) {
+    params.set('from', 'v2');
+  }
+  const query = params.toString();
+  return `./${path}${query ? `?${query}` : ''}`;
+}
+
 // 一度でも操作されたフィールドのみエラーを表示するための管理
 const touchedFields = new Set();
 
@@ -2133,10 +2150,12 @@ async function loadFromUrlParams() {
       await loadSurveyData(surveyId);
 
       // 関連設定リンクに surveyId パラメータを付与
-      const bizcardLink = document.getElementById('linkBizcardSettings');
-      if (bizcardLink) bizcardLink.href = `./bizcardSettings.html?surveyId=${encodeURIComponent(surveyId)}&from=v2`;
-      const emailLink = document.getElementById('linkThankYouEmailSettings');
-      if (emailLink) emailLink.href = `./thankYouEmailSettings.html?surveyId=${encodeURIComponent(surveyId)}&from=v2`;
+      const bizcardLink = document.getElementById('openBizcardSettingsBtn') || document.getElementById('bizcardDataSettingsSection') || document.getElementById('linkBizcardSettings');
+      if (bizcardLink) bizcardLink.href = buildRelatedSettingsUrl('bizcardSettings.html', surveyId);
+      const emailLink = document.getElementById('openThankYouEmailSettingsBtn') || document.getElementById('thankYouEmailSettingsSection') || document.getElementById('linkThankYouEmailSettings');
+      if (emailLink) emailLink.href = buildRelatedSettingsUrl('thankYouEmailSettings.html', surveyId);
+      const thankYouScreenLink = document.getElementById('openThankYouScreenSettingsBtn') || document.getElementById('linkThankYouScreenSettings');
+      if (thankYouScreenLink) thankYouScreenLink.href = buildRelatedSettingsUrl('thankYouScreenSettings.html', surveyId);
     }
   } catch (e) {
     console.warn('URLパラメータの解析に失敗しました', e);
@@ -2244,7 +2263,7 @@ async function init() {
   // Toggles
   const bizToggle = document.getElementById('bizcardEnabled');
   const _applyBizcardLinkState = (on) => {
-    ['bizcardDataSettingsSection', 'thankYouEmailSettingsSection'].forEach(id => {
+    ['openBizcardSettingsBtn', 'openThankYouEmailSettingsBtn', 'bizcardDataSettingsSection', 'thankYouEmailSettingsSection'].forEach(id => {
       const el = document.getElementById(id);
       if (!el) return;
       el.classList.toggle('opacity-40', !on);
