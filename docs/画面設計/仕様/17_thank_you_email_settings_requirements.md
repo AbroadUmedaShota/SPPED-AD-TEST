@@ -9,7 +9,7 @@ last_reviewed: 2026-04-02
 ## 1. 文書目的
 - 本書は、お礼メール設定画面の本番実装時における正本仕様を定義する。
 - 現行の `02_dashboard/thankYouEmailSettings.html` は参照実装であり、本書の正本性は本番要件にある。
-- 旧配置の `docs/要件定義/02_thankYouEmailSettings_requirements.md` は legacy とし、今後の更新は本書で行う。
+- 旧配置の legacy 要件は社内 private 管理へ移管済みとし、今後の更新は本書で行う。
 
 ## 2. 画面概要
 - 対象画面は、アンケート回答者へのお礼メール送信設定、送信対象確認、送信実行、送信結果確認を行う画面とする。

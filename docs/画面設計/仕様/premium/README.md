@@ -10,5 +10,5 @@
 - `premium_cancellation_requirements.md`: 解約手続き/完了画面要件。
 
 ## 運用メモ
-- 旧配置 `docs/要件定義/premium_*_requirements.md` は legacy redirect として維持します。
-- プレミアム機能の検討ドラフトは `docs/プロダクト/サービス企画/` を参照してください。
+- 旧配置の premium legacy 要件は社内 private 管理へ移管しています。
+- プレミアム機能の検討ドラフトは shared repo に置かず、必要な仕様判断のみを本ディレクトリへ反映します。

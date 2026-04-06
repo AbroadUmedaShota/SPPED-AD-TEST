@@ -11,7 +11,7 @@
 
 ## 正本ルール
 - 新規仕様は必ず `docs/画面設計/仕様/` または `docs/画面設計/仕様/admin/` に作成する。
-- `docs/要件定義/` 配下は移行中の旧要件として扱い、参照は段階的に置換する。
+- 旧要件は社内 private 管理へ移管済みであり、shared repo では新規更新しない。
 - 同一テーマで複数ファイルがある場合は、片方を「参照専用（legacy）」と明記する。
 
 ## 記載ルール
@@ -20,7 +20,8 @@
 - データパス記述は `data/` と `docs/サンプル/` のどちらを参照するか明示する。
 
 ## 当面の整理対象
-- [完了: 2026-02-18] `13_survey_answer_screen.md` を正本へ統合し、`docs/要件定義/specifications/13_survey_answer_screen.md` は legacy redirect 化。
+- [完了: 2026-02-18] `13_survey_answer_screen.md` を正本へ統合し、旧要件は社内 private 管理へ移管。
+- [完了: 2026-04-06] `docs/画面改修/` の survey creation 関連資料を `docs/画面設計/仕様/` に移管。
 - [完了: 2026-02-18] `premium_*_requirements.md` を `docs/画面設計/仕様/premium/` へ移管し、旧配置は legacy redirect 化。
 - [完了: 2026-02-18] `01_first-login-tutorial.md` と `performance_management.md` を正本へ統合し、旧配置は legacy redirect 化。
 - [完了: 2026-02-18] `help-center_requirements.md` を `15_help_center_requirements.md` として正本化し、旧配置は legacy redirect 化。

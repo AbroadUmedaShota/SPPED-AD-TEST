@@ -6,9 +6,9 @@
 - ログイン画面、管理画面、その他の入口は、ダッシュボード共通シェルを再利用する場合を除き対象外です。
 
 ## データソースとパス解決
-- `02_dashboard/src/utils.js` の `resolveDashboardDataPath` / `resolveDemoDataPath` は、相対リクエストを `./data/...` および `./docs/サンプル/demo_...` へ変換します（必要に応じて `../` を積み上げ）。返却値は常に `.` 始まりで、配信元 HTML の階層に依存せず解決可能です。
-- 主要データセットは `data/core/surveys.json`（一覧、詳細モーダル、作成画面の初期化の単一ソース）、`data/core/invoices.json`（請求）、`data/core/groups.json`（サイドバー文脈）です。デモデータは `docs/サンプル/demo_*` に配置し、ページによって `data/responses/*` / `data/surveys/enquete/*` フォールバックを併用します。
-- 回答・名刺データは `docs/サンプル/demo_answers`、`docs/サンプル/demo_business-cards`、`data/responses` に配置されています。CSV パスは `speedReviewService` でも対応します。
+- `02_dashboard/src/utils.js` の `resolveDashboardDataPath` / `resolveDemoDataPath` は、相対リクエストを `./data/...` および `./data/demo/demo_...` へ変換します（必要に応じて `../` を積み上げ）。返却値は常に `.` 始まりで、配信元 HTML の階層に依存せず解決可能です。
+- 主要データセットは `data/core/surveys.json`（一覧、詳細モーダル、作成画面の初期化の単一ソース）、`data/core/invoices.json`（請求）、`data/core/groups.json`（サイドバー文脈）です。デモデータは `data/demo/demo_*` に配置し、ページによって `data/responses/*` / `data/surveys/enquete/*` フォールバックを併用します。
+- 回答・名刺データは `data/demo/demo_answers`、`data/demo/demo_business-cards`、`data/responses` に配置されています。CSV パスは `speedReviewService` でも対応します。
 - 書き込み系はメモリ配列または `localStorage` のみを更新し、サーバー永続化は未接続です。
 
 ## シェル遷移と共通UI
@@ -40,7 +40,7 @@
 - 詳細モーダルは閲覧/編集モードを持ち、単一選択・複数選択・自由記述に応じた入力UIを出し分けます。編集はメモリ上のみ反映され、セッション内に限定されます。
 
 ### グラフ分析（`graph-page.html`, `graph-page.js`）
-- アンケート定義と回答を `resolveDemoDataPath` 経由で読み込みます（例: `./docs/サンプル/demo_surveys`, `./docs/サンプル/demo_answers`）。
+- アンケート定義と回答を `resolveDemoDataPath` 経由で読み込みます（例: `./data/demo/demo_surveys`, `./data/demo/demo_answers`）。
 - 日付範囲フィルターで集計対象を絞り込めます。
 - 単一選択/複数選択をグラフ用データへ変換し、回答ゼロの既定選択肢も表示対象に含めます。
 - Excel 出力は設問ごとに `Q1`, `Q2`, ...（除外系は `Ex_番号`）のシートを生成し、`html2canvas`（`scale: 2`）でグラフを埋め込みます。進捗は非ブロッキングのフローティング表示で示し、実行中は `beforeunload` ガードを有効化します。

@@ -7,7 +7,8 @@ This repository is a static mock development workspace for SPEED AD. The main wo
 - Start admin work from `03_admin/index.html`.
 - Start first-login flow checks from `04_first-login/index.html`.
 - Treat `docs/` as the canonical location for specifications, process notes, and templates.
-- Treat `docs/要件定義/` as a migration area only; new or revised specs should go to `docs/画面設計/仕様/` or `docs/プロダクト/`.
+- Treat `docs/legacy-要件定義/` as an externalized legacy index only; new or revised specs should go to `docs/画面設計/仕様/`.
+- Use `docs/リファレンス/共有規約/02_SHARED_DOC_BOUNDARY_RULES.md` as the source of truth for whether a document belongs in the shared repo or private management.
 
 ## Implementation Boundaries
 - Put dashboard business logic in `02_dashboard/src/services/`.
@@ -28,15 +29,15 @@ This repository is a static mock development workspace for SPEED AD. The main wo
 - `python -m http.server 8000` serves the repository root. Main checks are `http://localhost:8000/02_dashboard/index.html`, `http://localhost:8000/03_admin/index.html`, and `http://localhost:8000/04_first-login/index.html`.
 - `npx serve .` is an acceptable alternative for static serving.
 - There is no root build pipeline or required npm script flow. Refreshing the browser reflects file changes directly.
-- Before starting implementation, review `docs/README.md`, the relevant spec under `docs/画面設計/仕様/`, and any product-level policy under `docs/プロダクト/`.
+- Before starting implementation, review `docs/README.md`, the relevant spec under `docs/画面設計/仕様/`, and any shared handbook/reference docs needed for the task.
 
 ## Coding Style & Documentation Expectations
 - Use ES modules, 2-space indentation, trailing semicolons, and single quotes.
 - Use camelCase for variables and functions, PascalCase for classes, and lowerCamelCase for filenames such as `tableManager.js`.
 - Keep service-layer concerns separate from UI-layer concerns.
-- Align new UI patterns and interaction behavior with `docs/プロダクト/標準・規準/02_CODING_STANDARDS.md`.
+- Align new UI patterns and interaction behavior with `docs/リファレンス/共有規約/01_SHARED_CODING_STANDARDS.md`.
 - If implementation changes behavior, update the corresponding documentation in `docs/` within the same workstream.
-- For new or revised specifications, prefer `docs/画面設計/仕様/`; for product policy, architecture, or cross-screen rules, prefer `docs/プロダクト/`.
+- For new or revised specifications, prefer `docs/画面設計/仕様/`. Internal product policy and business planning docs are managed outside the shared repo.
 
 ## Testing Guidelines
 - Automated tests are not yet the primary workflow; manual verification is required.
