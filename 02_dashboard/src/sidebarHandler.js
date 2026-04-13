@@ -22,7 +22,7 @@ const NAV_ITEMS = [
     { id: 'logout', href: '#', icon: 'logout', label: 'ログアウト', preventAutoClose: true }
 ];
 
-const SUPPORT_ITEM = { id: 'support', href: 'help-center.html', icon: 'help_outline', label: 'サポート' };
+const SUPPORT_ITEM = { id: 'support', href: 'https://support.speed-ad.com/help/', icon: 'help_outline', label: 'サポート' };
 
 const MEDIA_QUERY = window.matchMedia('(min-width: 1024px)');
 const SELECTED_GROUP_STORAGE_KEY = 'dashboard.selectedGroupId';
@@ -168,6 +168,10 @@ function populateSupportLink() {
     link.className = 'flex items-center gap-3 rounded-md px-3 py-2 text-on-surface hover:bg-surface-variant hover:text-primary text-sm font-medium transition-colors';
     link.setAttribute('aria-label', SUPPORT_ITEM.label);
     link.id = `${SUPPORT_ITEM.id}Button`;
+    if (/^https?:\/\//.test(SUPPORT_ITEM.href)) {
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+    }
 
     link.innerHTML = `
         <span class="material-icons text-xl">${SUPPORT_ITEM.icon}</span>
