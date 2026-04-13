@@ -1,5 +1,8 @@
 # Repository Guidelines
 
+## Subagent Defaults
+- When using subagents, default the delegated model to `gpt-5.4-mini` unless a stronger model is explicitly required by the task.
+
 ## Project Structure & Source of Truth
 This repository is a static mock development workspace for SPEED AD. The main working areas are `02_dashboard/` for user-facing screens, `03_admin/` for admin screens, `04_first-login/` for the first-login tutorial flow, `data/` for mock JSON, and `docs/` for project documentation.
 
@@ -36,8 +39,16 @@ This repository is a static mock development workspace for SPEED AD. The main wo
 - Use camelCase for variables and functions, PascalCase for classes, and lowerCamelCase for filenames such as `tableManager.js`.
 - Keep service-layer concerns separate from UI-layer concerns.
 - Align new UI patterns and interaction behavior with `docs/リファレンス/共有規約/01_SHARED_CODING_STANDARDS.md`.
+- For AI-facing responsibility boundaries, use `docs/リファレンス/共有規約/04_AI_RESPONSIBILITY_BOUNDARY.md` as the shared reference.
 - If implementation changes behavior, update the corresponding documentation in `docs/` within the same workstream.
 - For new or revised specifications, prefer `docs/画面設計/仕様/`. Internal product policy and business planning docs are managed outside the shared repo.
+
+## AI Responsibility Notes
+- Treat `docs/画面設計/仕様/` as the source of truth for UI experience, copy, display conditions, and user guidance.
+- Treat save, API, authz, and data-integrity rules as server-side concerns that must stand independently of UI gating.
+- When an operation flow requires assignment, reassignment, status transitions, or operator handling, capture the implementation-ready rule in shared docs instead of relying on private notes.
+- Do not store raw organization structure, personnel details, or meeting rationale in this repo.
+- Use this file only as a navigation aid; responsibility-boundary details live in `docs/リファレンス/共有規約/04_AI_RESPONSIBILITY_BOUNDARY.md`.
 
 ## Testing Guidelines
 - Automated tests are not yet the primary workflow; manual verification is required.
