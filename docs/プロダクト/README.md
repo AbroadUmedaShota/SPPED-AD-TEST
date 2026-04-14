@@ -11,3 +11,13 @@
 
 WEBMTG 関連資料、Backlog 返答案、社内向け状況整理、担当者別アクション履歴などの本文資料は private 管理対象です。
 ローカル作業用にこの配下へ一時配置しても、shared repo へは追加せず、必要な実装仕様だけを `docs/画面設計/仕様/` または `docs/リファレンス/共有規約/` へ再編集して転記します。
+
+## main マージ時の扱い
+
+- `docs/プロダクト/` 配下の Markdown / Excel / 会議記録は、README 本体を除き shared main の管理対象にしません。
+- main に残す必要がある内容は、以下のいずれかへ統合します。
+  - 実装仕様: `docs/画面設計/仕様/`
+  - 共有規約・責任分界: `docs/リファレンス/共有規約/`
+- 例:
+  - support 配下の URL / assets ルールは `docs/画面設計/仕様/15_help_center_requirements.md` 側へ統合する
+  - Backlog 返答案、WEBMTG メモ、状況管理 Excel は local/private のままとし、shared 側へは載せない

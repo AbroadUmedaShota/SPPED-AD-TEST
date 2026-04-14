@@ -1,7 +1,7 @@
 ---
 owner: product
 status: draft
-last_reviewed: 2026-02-18
+last_reviewed: 2026-04-14
 ---
 
 # ヘルプセンターページ 要件定義書
@@ -63,3 +63,66 @@ last_reviewed: 2026-02-18
 - `02_dashboard/src/help-center.js`
 - `02_dashboard/src/help-content.js`
 - `02_dashboard/src/help-center.css`
+
+## 8. Support 配下サイトの共通アセット運用ルール
+
+`SPDAD2026-73` で整理した support 配下の運用ルールを、共有仕様としてここに統合する。
+本章は `02_dashboard/help-center.html` の実装詳細ではなく、`support.speed-ad.com` / `stg.support.speed-ad.com` 配下の FAQ / Help / Tutorial 導線に適用する共通ルールである。
+
+### 8.1 対象 URL
+- `/faq/`
+- `/help/`
+- `/tutorial/`
+
+### 8.2 配置方針
+- ページ本体は `/faq/`, `/help/`, `/tutorial/` 配下に置く。
+- 共通利用する `css`, `js`, `img` は `/assets/` 配下に集約する。
+- 各機能専用のリソースのみを `/assets/img/faq/`, `/assets/img/help/`, `/assets/img/tutorial/` のように用途別で分ける。
+
+想定ディレクトリ構成:
+
+```text
+/
+  faq/
+    index.html
+  help/
+    index.html
+  tutorial/
+    index.html
+  assets/
+    css/
+      common.20260414.css
+      faq.20260414.css
+      help.20260414.css
+      tutorial.20260414.css
+    js/
+      common.20260414.js
+      faq.20260414.js
+      help.20260414.js
+      tutorial.20260414.js
+    img/
+      common/
+      faq/
+      help/
+      tutorial/
+```
+
+### 8.3 参照ルール
+- HTML からの参照パスはルート相対で統一する。
+- 例:
+  - `/assets/css/common.20260414.css`
+  - `/assets/js/tutorial.20260414.js`
+  - `/assets/img/common/logo.svg`
+- `../assets/...` や `../../img/...` のような相対参照は採用しない。
+
+### 8.4 キャッシュ運用
+- 共通 CSS / JS の更新時は、キャッシュ影響を避けるためバージョン付きファイル名で運用する。
+- 例:
+  - `common.20260414.css`
+  - `common.20260414.js`
+- 本番と検証はドメインのみを変え、ディレクトリ構造とファイル命名規則は統一する。
+
+### 8.5 非採用方針
+- `/faq/`, `/help/`, `/tutorial/` 配下へ共通画像や共通 JS を重複配置する構成
+- 共通 CSS / JS を同一ファイル名の上書きのみで運用する構成
+- 相対参照に依存した配置構成
