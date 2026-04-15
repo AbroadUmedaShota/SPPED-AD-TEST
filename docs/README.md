@@ -35,6 +35,7 @@
   - `01_SHARED_CODING_STANDARDS.md`: 実装時の共通コーディング規約。
   - `02_SHARED_DOC_BOUNDARY_RULES.md`: shared/private の文書境界ルール。
   - `03_PRIVATE_DOCS_MIGRATION_MAP.md`: private 移管マップと旧配置対応表。
+  - `04_AI_RESPONSIBILITY_BOUNDARY.md`: AI/実装向けの責任分界ルール。
 
 ### 会議資料・メモ
 - `会議録/` と `メモ/meetings/` は社内 private 管理へ移管済みです。
@@ -65,6 +66,7 @@
 - テンプレートの正本は `docs/リファレンス/テンプレート/` とし、`docs/テンプレート/` には補助資料・実例のみを置く。
 - アーカイブ移動時は `docs/アーカイブ/README.md` に移動元と移動日を記録する。
 - shared/private の境界判断は `docs/リファレンス/共有規約/02_SHARED_DOC_BOUNDARY_RULES.md` を正本とする。
+- AI向けの責任分界ルールは `docs/リファレンス/共有規約/04_AI_RESPONSIBILITY_BOUNDARY.md` を参照する。
 
 ## 運用メモ
 - 共通ヘッダーやサイドバーなどの HTML は `02_dashboard/common/` から `loadCommonHtml(...)` で読み込む。`window.__COMMON_BASE_PATH` を確認すること。
