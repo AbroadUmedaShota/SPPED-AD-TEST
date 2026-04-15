@@ -58,10 +58,10 @@
       "from": "2025-08-01",
       "to": "2025-08-31"
     },
-    "subtotalTaxable": 15040,
+    "subtotalTaxable": 15000,
     "subtotalNonTaxable": 0,
-    "tax": 1504,
-    "totalAmount": 16544,
+    "tax": 1500,
+    "totalAmount": 16500,
     "status": "paid",
     "bankInfo": {
       "bankName": "三井住友銀行",
@@ -97,17 +97,6 @@
         "taxable": true
       },
       {
-        "lineId": "INV-2025-09-002-ADDON-2",
-        "category": "ADD_ON",
-        "itemName": "商談後ヒアリングアンケート",
-        "description": "お礼メール送信費用 / 無料枠100通超過分",
-        "quantity": 40,
-        "unit": "通",
-        "unitPrice": 1,
-        "amount": 40,
-        "taxable": true
-      },
-      {
         "lineId": "INV-2025-09-002-CREDIT-1",
         "category": "CREDIT",
         "itemName": "商談後ヒアリングアンケート",
@@ -135,10 +124,10 @@
       "from": "2025-08-01",
       "to": "2025-08-31"
     },
-    "subtotalTaxable": 23050,
+    "subtotalTaxable": 24920,
     "subtotalNonTaxable": 0,
-    "tax": 2305,
-    "totalAmount": 25355,
+    "tax": 2492,
+    "totalAmount": 27412,
     "status": "overdue",
     "bankInfo": {
       "bankName": "三井住友銀行",
@@ -166,7 +155,7 @@
         "lineId": "INV-2025-09-003-ADDON-1",
         "category": "ADD_ON",
         "itemName": "追加アカウント料金",
-        "description": "全5アカウント中 無料2アカウントを除く追加3アカウント分",
+        "description": "請求対象 3アカウント",
         "quantity": 3,
         "unit": "名",
         "unitPrice": 300,
@@ -177,22 +166,22 @@
         "lineId": "INV-2025-09-003-ADDON-2",
         "category": "ADD_ON",
         "itemName": "営業部リード精査アンケート",
-        "description": "名刺データ化費用 / オンデマンドプラン",
-        "quantity": 60,
+        "description": "名刺データ化費用 / 特急プラン",
+        "quantity": 140,
         "unit": "枚",
-        "unitPrice": 200,
-        "amount": 12000,
+        "unitPrice": 100,
+        "amount": 14000,
         "taxable": true
       },
       {
         "lineId": "INV-2025-09-003-ADDON-3",
         "category": "ADD_ON",
         "itemName": "営業部リード精査アンケート",
-        "description": "お礼メール送信費用 / 無料枠100通超過分",
-        "quantity": 150,
+        "description": "お礼メール送信費用 / 送信対象120件 / 無料100件控除",
+        "quantity": 20,
         "unit": "通",
         "unitPrice": 1,
-        "amount": 150,
+        "amount": 20,
         "taxable": true
       }
     ]
@@ -276,7 +265,7 @@
         "lineId": "INV-2025-10-002-ADDON-1",
         "category": "ADD_ON",
         "itemName": "追加アカウント料金",
-        "description": "全4アカウント中 無料2アカウントを除く追加2アカウント分",
+        "description": "請求対象 2アカウント",
         "quantity": 2,
         "unit": "名",
         "unitPrice": 300,
@@ -358,6 +347,325 @@
         "unit": "枚",
         "unitPrice": 50,
         "amount": 2500,
+        "taxable": true
+      }
+    ]
+  },
+  {
+    "invoiceId": "INV-2025-11-001",
+    "accountId": "ACC-006",
+    "plan": {
+      "code": "STANDARD",
+      "displayName": "Standard",
+      "billingType": "monthly"
+    },
+    "addOns": [],
+    "issueDate": "2025-11-05",
+    "dueDate": "2025-12-05",
+    "billingPeriod": {
+      "from": "2025-10-01",
+      "to": "2025-10-31"
+    },
+    "subtotalTaxable": 4000,
+    "subtotalNonTaxable": 0,
+    "tax": 400,
+    "totalAmount": 4400,
+    "status": "paid",
+    "bankInfo": {
+      "bankName": "三井住友銀行",
+      "bankCode": "0009",
+      "branchName": "小岩支店",
+      "branchCode": "643",
+      "accountType": "普通",
+      "accountNumber": "7128447",
+      "accountHolder": "アブロードアウトソーシング株式会社"
+    },
+    "notes": "単発アンケート中心の個人請求サンプルです。",
+    "items": [
+      {
+        "lineId": "INV-2025-11-001-ADDON-1",
+        "category": "ADD_ON",
+        "itemName": "秋季リード獲得アンケート",
+        "description": "名刺データ化費用 / 通常プラン",
+        "quantity": 100,
+        "unit": "枚",
+        "unitPrice": 50,
+        "amount": 5000,
+        "taxable": true
+      },
+      {
+        "lineId": "INV-2025-11-001-CREDIT-1",
+        "category": "CREDIT",
+        "itemName": "秋季リード獲得アンケート",
+        "description": "クーポン値引き / トライアルクーポン適用",
+        "quantity": 1,
+        "unit": "件",
+        "unitPrice": -1000,
+        "amount": -1000,
+        "taxable": true
+      }
+    ]
+  },
+  {
+    "invoiceId": "INV-2025-11-002",
+    "accountId": "ACC-005",
+    "plan": {
+      "code": "PREMIUM",
+      "displayName": "Premium",
+      "billingType": "monthly"
+    },
+    "addOns": [],
+    "issueDate": "2025-11-11",
+    "dueDate": "2025-12-11",
+    "billingPeriod": {
+      "from": "2025-10-01",
+      "to": "2025-10-31"
+    },
+    "subtotalTaxable": 26540,
+    "subtotalNonTaxable": 0,
+    "tax": 2654,
+    "totalAmount": 29194,
+    "status": "unpaid",
+    "bankInfo": {
+      "bankName": "三井住友銀行",
+      "bankCode": "0009",
+      "branchName": "小岩支店",
+      "branchCode": "643",
+      "accountType": "普通",
+      "accountNumber": "7128447",
+      "accountHolder": "アブロードアウトソーシング株式会社"
+    },
+    "notes": "プレミアム契約と複数アンケート明細の組み合わせ確認用サンプルです。",
+    "items": [
+      {
+        "lineId": "INV-2025-11-002-BASE-1",
+        "category": "BASE",
+        "itemName": "プレミアム利用料",
+        "description": "2025年10月分",
+        "quantity": 1,
+        "unit": "ヶ月",
+        "unitPrice": 10000,
+        "amount": 10000,
+        "taxable": true
+      },
+      {
+        "lineId": "INV-2025-11-002-ADDON-1",
+        "category": "ADD_ON",
+        "itemName": "来場者満足度アンケート",
+        "description": "名刺データ化費用 / 特急プラン",
+        "quantity": 140,
+        "unit": "枚",
+        "unitPrice": 100,
+        "amount": 14000,
+        "taxable": true
+      },
+      {
+        "lineId": "INV-2025-11-002-ADDON-2",
+        "category": "ADD_ON",
+        "itemName": "来場者満足度アンケート",
+        "description": "お礼メール送信費用 / 送信対象140件 / 無料100件控除",
+        "quantity": 40,
+        "unit": "通",
+        "unitPrice": 1,
+        "amount": 40,
+        "taxable": true
+      },
+      {
+        "lineId": "INV-2025-11-002-ADDON-3",
+        "category": "ADD_ON",
+        "itemName": "展示会アフターフォローアンケート",
+        "description": "名刺データ化費用 / オンデマンドプラン",
+        "quantity": 20,
+        "unit": "枚",
+        "unitPrice": 200,
+        "amount": 4000,
+        "taxable": true
+      },
+      {
+        "lineId": "INV-2025-11-002-CREDIT-1",
+        "category": "CREDIT",
+        "itemName": "展示会アフターフォローアンケート",
+        "description": "クーポン値引き / 秋季キャンペーンクーポン適用",
+        "quantity": 1,
+        "unit": "件",
+        "unitPrice": -1500,
+        "amount": -1500,
+        "taxable": true
+      }
+    ]
+  },
+  {
+    "invoiceId": "INV-2025-11-003",
+    "accountId": "ACC-002",
+    "plan": {
+      "code": "PREMIUM",
+      "displayName": "Premium",
+      "billingType": "monthly"
+    },
+    "addOns": [],
+    "issueDate": "2025-11-14",
+    "dueDate": "2025-12-14",
+    "billingPeriod": {
+      "from": "2025-10-01",
+      "to": "2025-10-31"
+    },
+    "subtotalTaxable": 30200,
+    "subtotalNonTaxable": 0,
+    "tax": 3020,
+    "totalAmount": 33220,
+    "status": "unpaid",
+    "bankInfo": {
+      "bankName": "三井住友銀行",
+      "bankCode": "0009",
+      "branchName": "小岩支店",
+      "branchCode": "643",
+      "accountType": "普通",
+      "accountNumber": "7128447",
+      "accountHolder": "アブロードアウトソーシング株式会社"
+    },
+    "notes": "複数アンケートと小計、複数ページ表示を確認するための長尺サンプルです。",
+    "items": [
+      {
+        "lineId": "INV-2025-11-003-BASE-1",
+        "category": "BASE",
+        "itemName": "プレミアム利用料",
+        "description": "営業部グループ 2025年10月分",
+        "quantity": 1,
+        "unit": "ヶ月",
+        "unitPrice": 10000,
+        "amount": 10000,
+        "taxable": true
+      },
+      {
+        "lineId": "INV-2025-11-003-ADDON-1",
+        "category": "ADD_ON",
+        "itemName": "追加アカウント料金",
+        "description": "請求対象 4アカウント",
+        "quantity": 4,
+        "unit": "名",
+        "unitPrice": 300,
+        "amount": 1200,
+        "taxable": true
+      },
+      {
+        "lineId": "INV-2025-11-003-ADDON-2",
+        "category": "ADD_ON",
+        "itemName": "秋展示会商談化アンケート",
+        "description": "名刺データ化費用 / 特急プラン",
+        "quantity": 90,
+        "unit": "枚",
+        "unitPrice": 100,
+        "amount": 9000,
+        "taxable": true
+      },
+      {
+        "lineId": "INV-2025-11-003-CREDIT-1",
+        "category": "CREDIT",
+        "itemName": "秋展示会商談化アンケート",
+        "description": "クーポン値引き / 展示会来場特典クーポン適用",
+        "quantity": 1,
+        "unit": "件",
+        "unitPrice": -2000,
+        "amount": -2000,
+        "taxable": true
+      },
+      {
+        "lineId": "INV-2025-11-003-ADDON-4",
+        "category": "ADD_ON",
+        "itemName": "展示会後フォローアンケート",
+        "description": "名刺データ化費用 / 超特急プラン",
+        "quantity": 40,
+        "unit": "枚",
+        "unitPrice": 150,
+        "amount": 6000,
+        "taxable": true
+      },
+      {
+        "lineId": "INV-2025-11-003-ADDON-6",
+        "category": "ADD_ON",
+        "itemName": "来場者属性分析アンケート",
+        "description": "名刺データ化費用 / オンデマンドプラン",
+        "quantity": 25,
+        "unit": "枚",
+        "unitPrice": 200,
+        "amount": 5000,
+        "taxable": true
+      },
+      {
+        "lineId": "INV-2025-11-003-CREDIT-2",
+        "category": "CREDIT",
+        "itemName": "来場者属性分析アンケート",
+        "description": "クーポン値引き / 分析オプション値引き適用",
+        "quantity": 1,
+        "unit": "件",
+        "unitPrice": -500,
+        "amount": -500,
+        "taxable": true
+      },
+      {
+        "lineId": "INV-2025-11-003-ADDON-8",
+        "category": "ADD_ON",
+        "itemName": "当日運営レポートアンケート",
+        "description": "名刺データ化費用 / 通常プラン",
+        "quantity": 30,
+        "unit": "枚",
+        "unitPrice": 50,
+        "amount": 1500,
+        "taxable": true
+      }
+    ]
+  },
+  {
+    "invoiceId": "INV-2025-11-004",
+    "accountId": "ACC-003",
+    "plan": {
+      "code": "STANDARD",
+      "displayName": "Standard",
+      "billingType": "monthly"
+    },
+    "addOns": [],
+    "issueDate": "2025-11-21",
+    "dueDate": "2025-12-21",
+    "billingPeriod": {
+      "from": "2025-10-01",
+      "to": "2025-10-31"
+    },
+    "subtotalTaxable": 3800,
+    "subtotalNonTaxable": 0,
+    "tax": 380,
+    "totalAmount": 4180,
+    "status": "paid",
+    "bankInfo": {
+      "bankName": "三井住友銀行",
+      "bankCode": "0009",
+      "branchName": "小岩支店",
+      "branchCode": "643",
+      "accountType": "普通",
+      "accountNumber": "7128447",
+      "accountHolder": "アブロードアウトソーシング株式会社"
+    },
+    "notes": "グループ契約で追加アカウント料金のみを含む最小構成の確認用サンプルです。",
+    "items": [
+      {
+        "lineId": "INV-2025-11-004-ADDON-1",
+        "category": "ADD_ON",
+        "itemName": "追加アカウント料金",
+        "description": "請求対象 1アカウント",
+        "quantity": 1,
+        "unit": "名",
+        "unitPrice": 300,
+        "amount": 300,
+        "taxable": true
+      },
+      {
+        "lineId": "INV-2025-11-004-ADDON-2",
+        "category": "ADD_ON",
+        "itemName": "月例ウェビナーアンケート",
+        "description": "名刺データ化費用 / 通常プラン",
+        "quantity": 70,
+        "unit": "枚",
+        "unitPrice": 50,
+        "amount": 3500,
         "taxable": true
       }
     ]

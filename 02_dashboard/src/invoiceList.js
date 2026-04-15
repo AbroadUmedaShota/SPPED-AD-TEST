@@ -1,20 +1,7 @@
 import { fetchInvoices } from './services/invoiceService.js';
+import { fetchAllUsers } from './services/userService.js';
+import { fetchAllGroups } from './services/groupService.js';
 import { renderInvoices, showLoading, hideLoading, showMessage } from './ui/invoiceRenderer.js';
-import { resolveDashboardDataPath } from './utils.js';
-
-async function fetchGroupAccountIds() {
-  const response = await fetch(resolveDashboardDataPath('core/groups.json'));
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-
-  const groups = await response.json();
-  return new Set(
-    (Array.isArray(groups) ? groups : [])
-      .map(group => group?.accountId)
-      .filter(Boolean)
-  );
-}
 
 let allInvoices = [];
 let hasLoadedInvoices = false;
@@ -56,12 +43,10 @@ export async function initInvoiceListPage() {
   try {
     const invoices = await fetchInvoices();
     const safeInvoices = Array.isArray(invoices) ? invoices : [];
-
-    // Aggregate invoices for display
-    const aggregatedInvoices = await aggregateInvoices(safeInvoices);
+    const preparedInvoices = await prepareInvoicesForList(safeInvoices);
 
     // Store globally for filtering
-    allInvoices = aggregatedInvoices;
+    allInvoices = preparedInvoices;
     hasLoadedInvoices = true;
 
     if (allInvoices.length === 0) {
@@ -90,90 +75,78 @@ export async function initInvoiceListPage() {
   }
 }
 
-async function aggregateInvoices(invoices) {
-  const groupAccountIds = await fetchGroupAccountIds();
-  const groups = {};
+async function prepareInvoicesForList(invoices) {
+  const [users, groups] = await Promise.all([fetchAllUsers(), fetchAllGroups()]);
+  const userByAccountId = new Map(
+    (Array.isArray(users) ? users : [])
+      .map(user => [user?.accountId, user])
+      .filter(([accountId]) => Boolean(accountId))
+  );
+  const groupByAccountId = new Map(
+    (Array.isArray(groups) ? groups : [])
+      .map(group => [group?.accountId, group])
+      .filter(([accountId]) => Boolean(accountId))
+  );
 
-  invoices.forEach(inv => {
-    if (!inv.issueDate) return;
-    const date = new Date(inv.issueDate);
-    if (isNaN(date.getTime())) return;
+  return (Array.isArray(invoices) ? invoices : [])
+    .filter(invoice => {
+      const issueDate = new Date(invoice?.issueDate);
+      return !Number.isNaN(issueDate.getTime());
+    })
+    .map(invoice => enrichInvoiceForList(invoice, userByAccountId, groupByAccountId))
+    .sort((left, right) => {
+      const leftDate = new Date(left.issueDate).getTime();
+      const rightDate = new Date(right.issueDate).getTime();
+      if (leftDate !== rightDate) {
+        return rightDate - leftDate;
+      }
+      return String(right.invoiceId).localeCompare(String(left.invoiceId));
+    });
+}
 
-    const yyyy = date.getFullYear();
-    const mm = String(date.getMonth() + 1).padStart(2, '0');
-    const monthKey = `${yyyy}${mm}`;
+function enrichInvoiceForList(invoice, userByAccountId, groupByAccountId) {
+  const groupAccount = groupByAccountId.get(invoice?.accountId) ?? null;
+  const userAccount = userByAccountId.get(invoice?.accountId) ?? null;
+  const isGroupAccount = groupAccount?.billing?.type === 'group';
 
-    const typeKey = groupAccountIds.has(inv.accountId) ? 'GROUP' : 'PERSONAL';
+  return {
+    ...invoice,
+    contractType: isGroupAccount ? 'GROUP' : 'PERSONAL',
+    displayId: formatInvoiceDisplayId(invoice),
+    accountName: groupAccount?.name ?? '個人アカウント',
+    corporateName: resolveBillingRecipient(groupAccount, userAccount, invoice)
+  };
+}
 
-    const key = `AGG-${monthKey}-${typeKey}`;
+function formatInvoiceDisplayId(invoice) {
+  const issueDate = new Date(invoice?.issueDate);
+  const yy = Number.isNaN(issueDate.getTime()) ? '--' : issueDate.getFullYear().toString().slice(-2);
+  const accountId = typeof invoice?.accountId === 'string' ? invoice.accountId : '';
+  const uid = accountId.replace(/\D/g, '').padStart(5, '0') || '00000';
+  const invoiceId = typeof invoice?.invoiceId === 'string' ? invoice.invoiceId : '';
+  const idParts = invoiceId.split('-');
+  const lastPart = idParts[idParts.length - 1];
+  const seq = !Number.isNaN(Number(lastPart)) ? lastPart : '001';
+  return `${yy}-${uid}-${seq}`;
+}
 
-    if (!groups[key]) {
-      groups[key] = {
-        invoiceId: key,
-        issueDate: inv.issueDate, // Use the date of the first encountered invoice
-        billingPeriod: inv.billingPeriod,
-        totalAmount: 0,
-        status: 'paid', // Default to paid, downgrade if any unpaid found
-        contractType: typeKey,
-        plan: {
-          code: typeKey,
-          displayName: typeKey === 'GROUP' ? 'Group' : 'Personal'
-        },
-        originalInvoices: []
-      };
+function resolveBillingRecipient(groupAccount, userAccount, invoice) {
+  if (groupAccount?.billing?.type === 'group' && groupAccount.billing.corporateName) {
+    return groupAccount.billing.corporateName;
+  }
+
+  if (userAccount) {
+    if (userAccount.billingAddressType === 'different' && userAccount.billingCompanyName) {
+      return userAccount.billingCompanyName;
     }
-
-    const group = groups[key];
-    group.totalAmount += (inv.totalAmount || 0);
-    group.originalInvoices.push(inv);
-
-    if (group.originalInvoices.length > 0) {
-      const base = group.originalInvoices[0];
-      const d = new Date(base.issueDate);
-      const yy = d.getFullYear().toString().slice(-2);
-      const accNum = base.accountId ? base.accountId.replace(/\D/g, '') : '0';
-      const uid = accNum.padStart(5, '0');
-
-      const idParts = base.invoiceId.split('-');
-      const seq = idParts.length > 0 && !isNaN(idParts[idParts.length - 1])
-        ? idParts[idParts.length - 1]
-        : '001';
-
-      group.displayId = `${yy}-${uid}-${seq}`;
+    if (userAccount.companyName) {
+      return userAccount.companyName;
     }
+  }
 
-    // Status logic: If any invoice in the group is 'overdue', group is overdue.
-    // If any is 'unpaid', group is 'unpaid' (unless overdue takes precedence).
-    // If all 'paid', group is 'paid'.
-    // Priority: Overdue > Unpaid > Paid > Canceled
-    if (inv.status === 'overdue') {
-      group.status = 'overdue';
-    } else if (inv.status === 'unpaid' && group.status !== 'overdue') {
-      group.status = 'unpaid';
-    } else if (inv.status === 'canceled' && group.status === 'paid') {
-      // If only canceled invoices, status is canceled? 
-      // If mixed with paid, maybe kept paid? Simplified:
-      group.status = 'canceled';
-    }
-    // If current group status is paid, and we encounter unpaid/overdue, it will update.
-    // If current is overdue, it stays overdue.
-  });
+  if (groupAccount?.name) {
+    return groupAccount.name;
+  }
 
-  // Post-process status to ensure logic consistency (optional, but above loop logic is rough)
-  // Refined Status Logic:
-  Object.values(groups).forEach(group => {
-    const statuses = group.originalInvoices.map(i => i.status);
-    if (statuses.includes('overdue')) {
-      group.status = 'overdue';
-    } else if (statuses.includes('unpaid')) {
-      group.status = 'unpaid';
-    } else if (statuses.every(s => s === 'canceled')) {
-      group.status = 'canceled';
-    } else {
-      group.status = 'paid';
-    }
-  });
-
-  // Convert to array and Sort by date descending (Newest first)
-  return Object.values(groups).sort((a, b) => new Date(b.issueDate) - new Date(a.issueDate));
+  return invoice?.accountId ?? '-';
 }

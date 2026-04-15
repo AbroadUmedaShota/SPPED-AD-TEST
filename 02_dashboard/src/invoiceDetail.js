@@ -227,38 +227,40 @@ async function loadInvoiceDetail(invoiceId) {
 
     let billingInfo = { corporateName: '-', contactPerson: '-' };
     let accountFound = false;
+    const groupBillingAccount = groups.find(group => group.accountId === invoice.accountId && group?.billing?.type === 'group');
 
-    // Search for account in users
-    const userAccount = users.find(u => u.accountId === invoice.accountId);
-    if (userAccount) {
+    if (groupBillingAccount) {
       accountFound = true;
-      if (userAccount.billingAddressType === 'different' && userAccount.billingCompanyName) {
-        billingInfo.corporateName = userAccount.billingCompanyName;
-        billingInfo.contactPerson = `${userAccount.billingLastName} ${userAccount.billingFirstName}`;
-      } else {
-        billingInfo.corporateName = userAccount.companyName;
-        billingInfo.contactPerson = `${userAccount.lastName} ${userAccount.firstName}`;
+      billingInfo.corporateName = groupBillingAccount.billing.corporateName;
+      billingInfo.contactPerson = groupBillingAccount.billing.contactPerson;
+    }
+
+    if (!accountFound) {
+      const userAccount = users.find(user => user.accountId === invoice.accountId);
+      if (userAccount) {
+        accountFound = true;
+        if (userAccount.billingAddressType === 'different' && userAccount.billingCompanyName) {
+          billingInfo.corporateName = userAccount.billingCompanyName;
+          billingInfo.contactPerson = `${userAccount.billingLastName} ${userAccount.billingFirstName}`;
+        } else {
+          billingInfo.corporateName = userAccount.companyName;
+          billingInfo.contactPerson = `${userAccount.lastName} ${userAccount.firstName}`;
+        }
       }
     }
 
-    // If not found in users, search in groups
     if (!accountFound) {
-      const groupAccount = groups.find(g => g.accountId === invoice.accountId);
-      if (groupAccount) {
-        accountFound = true;
-        if (groupAccount.billing && groupAccount.billing.type === 'group') {
-          billingInfo.corporateName = groupAccount.billing.corporateName;
-          billingInfo.contactPerson = groupAccount.billing.contactPerson;
-        } else if (groupAccount.billing && groupAccount.billing.type === 'creator') {
-          const creator = await fetchUserByEmail(groupAccount.billing.creatorId);
-          if (creator) {
-            if (creator.billingAddressType === 'different' && creator.billingCompanyName) {
-              billingInfo.corporateName = creator.billingCompanyName;
-              billingInfo.contactPerson = `${creator.billingLastName} ${creator.billingFirstName}`;
-            } else {
-              billingInfo.corporateName = creator.companyName;
-              billingInfo.contactPerson = `${creator.lastName} ${creator.firstName}`;
-            }
+      const creatorBillingAccount = groups.find(group => group.accountId === invoice.accountId && group?.billing?.type === 'creator');
+      if (creatorBillingAccount?.billing?.creatorId) {
+        const creator = await fetchUserByEmail(creatorBillingAccount.billing.creatorId);
+        if (creator) {
+          accountFound = true;
+          if (creator.billingAddressType === 'different' && creator.billingCompanyName) {
+            billingInfo.corporateName = creator.billingCompanyName;
+            billingInfo.contactPerson = `${creator.billingLastName} ${creator.billingFirstName}`;
+          } else {
+            billingInfo.corporateName = creator.companyName;
+            billingInfo.contactPerson = `${creator.lastName} ${creator.firstName}`;
           }
         }
       }
@@ -351,11 +353,11 @@ function renderInvoiceSheet(invoice) {
       const newPage = document.createElement('div');
       newPage.className = `invoice-sheet page-2`;
       newPage.innerHTML = `
-        <div style="font-size: 10pt; margin-bottom: 2px;">ご請求明細</div>
+        <div class="details-section-title">ご請求明細</div>
         <table class="details-table">
            <thead>
               <tr class="bg-header">
-                 <th class="col-no"></th>
+                 <th class="col-no">No.</th>
                  <th class="col-item1">品 名 １</th>
                  <th class="col-item2">品 名 ２</th>
                  <th class="col-qty">数 量</th>
@@ -382,30 +384,40 @@ function paginateInvoiceItems(items, page1) {
 
   const firstPageCapacity = getDetailPageCapacity(page1, 'page-1');
   const followingPageCapacity = getDetailPageCapacity(null, 'page-2');
-  const baseFirstRowHeight = measureDetailRowHeight({
-    itemName: 'プレミアム利用料',
-    description: '2025年8月分 月額10,000円',
-    quantity: 1,
-    unitPrice: 10000,
-    amount: 10000
-  }, 'page-1');
-  // 1枚目はサマリーが多いため、明細は最大8行程度に制限して A4サイズ超過を防ぐ
-  const safeFirstPageCapacity = Math.min(firstPageCapacity, baseFirstRowHeight * 8);
+  const blankSubtotalSpacerHeight = measureDetailRowHeight({ isSpacer: true }, 'page-2');
 
   const pages = [];
   let currentPage = [];
   let currentHeight = 0;
-  let currentCapacity = safeFirstPageCapacity;
+  let currentCapacity = firstPageCapacity;
 
   items.forEach(item => {
     const pageType = pages.length === 0 ? 'page-1' : 'page-2';
-    const rowHeight = measureDetailRowHeight(item, pageType);
+    const spacerHeight = item?.isSubtotal ? blankSubtotalSpacerHeight : 0;
+    const rowHeight = measureDetailRowHeight(item, pageType) + spacerHeight;
 
     if (currentPage.length > 0 && currentHeight + rowHeight > currentCapacity) {
-      pages.push(currentPage);
-      currentPage = [];
-      currentHeight = 0;
-      currentCapacity = followingPageCapacity;
+      if (item?.isSubtotal) {
+        const previousRow = currentPage[currentPage.length - 1];
+        if (previousRow?.groupKey === item.groupKey && currentPage.length > 1) {
+          currentPage.pop();
+          currentHeight -= measureDetailRowHeight(previousRow, pageType);
+          pages.push(currentPage);
+          currentPage = [previousRow];
+          currentCapacity = followingPageCapacity;
+          currentHeight = measureDetailRowHeight(previousRow, 'page-2');
+        } else {
+          pages.push(currentPage);
+          currentPage = [];
+          currentHeight = 0;
+          currentCapacity = followingPageCapacity;
+        }
+      } else {
+        pages.push(currentPage);
+        currentPage = [];
+        currentHeight = 0;
+        currentCapacity = followingPageCapacity;
+      }
     }
 
     currentPage.push(item);
@@ -539,11 +551,11 @@ function renderPageRows(tbody, items, pageNum) {
     html += `
       <tr class="${isSubtotal ? 'subtotal-row' : (isSpacer ? 'spacer-row' : '')}">
         <td class="col-no">${no}</td>
-        <td>${item.itemName ?? '-'}</td>
-        <td>${item.description ?? ''}</td>
+        <td class="col-item1">${item.itemName ?? '-'}</td>
+        <td class="col-item2">${item.description ?? ''}</td>
         <td class="col-qty">${quantity}</td>
         <td class="col-price">${unitPrice}</td>
-        <td class="col-amount">${amount}</td>
+        <td class="col-amount${isSubtotal ? ' subtotal-amount' : ''}">${amount}</td>
       </tr>
     `;
 
@@ -679,9 +691,15 @@ function detectChargeLabel(item) {
 function buildDetailDisplayItems(items) {
   const chunks = splitInvoiceItemChunks(items);
   const rows = [];
+  const aggregateContractItems = chunks.some(chunk => chunk.subtotal);
+
+  if (aggregateContractItems) {
+    const contractItems = chunks.flatMap(chunk => partitionDetailItems(chunk.items).contractItems);
+    rows.push(...buildContractRows(contractItems, 'contract-group'));
+  }
 
   chunks.forEach(chunk => {
-    rows.push(...buildDetailRowsForChunk(chunk.items));
+    rows.push(...buildDetailRowsForChunk(chunk.items, { includeContractItems: !aggregateContractItems }));
     if (chunk.subtotal) {
       rows.push(chunk.subtotal);
     }
@@ -711,15 +729,37 @@ function splitInvoiceItemChunks(items) {
   return chunks;
 }
 
-function buildDetailRowsForChunk(items) {
+function buildDetailRowsForChunk(items, options = {}) {
   if (!Array.isArray(items) || items.length === 0) return [];
 
   const rows = [];
+  const { includeContractItems = true } = options;
+  const { contractItems, surveyGroupMap, otherItems } = partitionDetailItems(items);
+
+  if (includeContractItems) {
+    rows.push(...buildContractRows(contractItems, 'contract-group'));
+  }
+
+  surveyGroupMap.forEach((surveyItems, surveyName) => {
+    const sortedSurveyItems = sortInvoiceItemsForDisplay(surveyItems);
+    const groupKey = `survey:${surveyName}`;
+    rows.push(...sortedSurveyItems.map(item => ({ ...item, groupKey })));
+    rows.push(buildSubtotalItem(surveyName, sumItemAmounts(sortedSurveyItems), groupKey));
+  });
+
+  if (otherItems.length > 0) {
+    rows.push(...otherItems);
+  }
+
+  return rows;
+}
+
+function partitionDetailItems(items) {
   const contractItems = [];
   const surveyGroupMap = new Map();
   const otherItems = [];
 
-  items.forEach(item => {
+  (Array.isArray(items) ? items : []).forEach(item => {
     const chargeLabel = detectChargeLabel(item);
     if (chargeLabel === 'プレミアム利用料' || chargeLabel === '追加アカウント料金') {
       contractItems.push(item);
@@ -742,28 +782,23 @@ function buildDetailRowsForChunk(items) {
     otherItems.push(item);
   });
 
-  if (contractItems.length > 0) {
-    const sortedContractItems = sortInvoiceItemsForDisplay(contractItems);
-    rows.push(...sortedContractItems);
-    rows.push(buildSubtotalItem(buildContractSubtotalLabel(sortedContractItems), sumItemAmounts(sortedContractItems)));
-  }
-
-  surveyGroupMap.forEach((surveyItems, surveyName) => {
-    const sortedSurveyItems = sortInvoiceItemsForDisplay(surveyItems);
-    rows.push(...sortedSurveyItems);
-    rows.push(buildSubtotalItem(surveyName, sumItemAmounts(sortedSurveyItems)));
-  });
-
-  if (otherItems.length > 0) {
-    rows.push(...otherItems);
-  }
-
-  return rows;
+  return { contractItems, surveyGroupMap, otherItems };
 }
 
-function buildSubtotalItem(itemName, amount) {
+function buildContractRows(items, groupKey) {
+  if (!Array.isArray(items) || items.length === 0) return [];
+
+  const sortedContractItems = sortInvoiceItemsForDisplay(items);
+  return [
+    ...sortedContractItems.map(item => ({ ...item, groupKey })),
+    buildSubtotalItem(buildContractSubtotalLabel(sortedContractItems), sumItemAmounts(sortedContractItems), groupKey)
+  ];
+}
+
+function buildSubtotalItem(itemName, amount, groupKey = '') {
   return {
     isSubtotal: true,
+    groupKey,
     itemName,
     description: '小計',
     quantity: null,

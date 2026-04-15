@@ -73,10 +73,13 @@
 - メンバー一覧はアバター、ロール選択、ステータスバッジ、削除、ドラッグハンドル（Sortable）を表示し、クイックソートで並び替え可能です。
 - 未保存時の遷移/削除は確認モーダルで保護し、CRUDはメモリ上の `groups` キャッシュ更新に留まります。
 
-## 請求（`invoiceList.html`, `invoiceDetail.html`）
-- 一覧は `data/core/invoices.json` を取得し、ステータス絞り込みとカード表示（プランバッジ、請求期間、要約情報）を行います。空状態には再読込導線を表示します。
-- 詳細は請求メタ情報、金額内訳、振込先、ステータスを表示し、XLSX（サンプル）ダウンロードと印刷導線を提供します。
-- ステータスに応じて印刷/ダウンロード可否を制御し、金額表示は `Intl.NumberFormat` を利用します。
+## 請求（`invoiceList.html`, `invoice-detail.html`, `invoice-print.html`）
+- 利用者向け請求の正本は `docs/画面設計/仕様/請求関連仕様マップ.md` を入口とし、画面横断要件は `04_invoice_screen.md`、帳票/PDF/印刷要件は `05_invoice_document.md` を参照します。
+- 一覧は `data/core/invoices.json` を請求書単位で表示し、個人アカウント請求と各グループアカウント請求を同一時系列に並べます。カードには請求先アカウント名と請求先を表示し、空状態と取得失敗時には再読み込み導線を表示します。
+- 詳細は主導線として `INV-...` を受け付け、`users/groups` から請求先を解決して A4 の Invoice Sheet を画面内に描画します。PDF ダウンロードは `html2pdf` で `#invoice-sheet-container` を対象に生成します。
+- 改ページは固定件数ではなく実表示高さに基づいて動的に行います。`AGG-...` は内部互換用に残り、指定時は `invoiceService.js` が `isSubtotal` 行を挿入します。
+- 印刷ページは同じ `id` 仕様を使って印刷用 HTML を生成し、描画後に `window.print()` を自動実行します。`isSubtotal` 行の扱いは詳細/PDF と印刷で差分があります。
+- `02_dashboard/seikyuusyo_sample.html` は現行導線の正本ではなく、サンプル/参考実装として扱います。
 
 ## アカウント・セキュリティ
 - アカウント情報モーダルは `modalHandler.js` により遅延読込し、`accountInfoModal.js` で描画、コピー操作は共通クリップボード補助を再利用します。

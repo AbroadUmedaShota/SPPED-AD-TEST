@@ -1,146 +1,126 @@
-# INV-002 請求書詳細（Invoice Sheet）画面要件定義書
-
-最終更新日: 2026-01-15
-
+---
+owner: shared-docs
+status: draft
+last_reviewed: 2026-04-15
 ---
 
-## 1. 目的
+# INV-002 請求書詳細（Invoice Sheet）補助仕様
 
-利用者が、請求月の請求内容を「請求書レイアウト（A4）」で確認し、同一内容を PDF としてダウンロードできること。
+## 1. 位置づけ
 
----
+- 本書は `02_dashboard/invoice-detail.html` 固有の画面骨格、DOM、操作要件を整理する補助仕様です。
+- 利用者向け請求の正本は以下を優先します。
+  - 画面横断要件: `docs/画面設計/仕様/04_invoice_screen.md`
+  - 帳票/PDF/印刷要件: `docs/画面設計/仕様/05_invoice_document.md`
+  - 手動検証: `docs/ハンドブック/テスト/invoice_manual_checklist.md`
+- 本書では、帳票レイアウト、改ページ、金額計算、印刷との差分を重複定義しません。詳細ルールは `05_invoice_document.md` を参照してください。
+- 品目1 / 品目2 の定義、具体課金名の canonical 表記、`従量課金` を表示ラベルに使わない方針は `04_invoice_screen.md` と `05_invoice_document.md` を正本とします。
 
 ## 2. 対象画面
 
 - パス: `02_dashboard/invoice-detail.html`
 - URL: `invoice-detail.html?id={id}`
-  - `id` は `INV-...`（請求書ID）または `AGG-...`（月次集計ID）
+- `id` は以下のいずれかを受け付けます。
+  - 元請求書 ID: `INV-YYYY-MM-SEQ`
+  - 集計 ID: `AGG-YYYYMM-{GROUP|PERSONAL}`（内部互換用）
 
----
+一覧（INV-001）からの遷移は、原則として元請求書 ID（`INV-...`）を使用します。
 
-## 3. データ取得・依存
+## 3. データ取得と依存
 
-### 3.1 データ取得
+### 3.1 利用サービス
 
-- 取得API（モック実装）: `02_dashboard/src/services/invoiceService.js` の `fetchInvoiceById(id)`
-- データソース: `data/core/invoices.json`
+- 取得: `02_dashboard/src/services/invoiceService.js` の `fetchInvoiceById(id)`
+- 請求先解決:
+  - `02_dashboard/src/services/userService.js`
+  - `02_dashboard/src/services/groupService.js`
 
-### 3.2 請求先情報の解決
+### 3.2 データソース
 
-詳細画面では `accountId` から請求先表示名を解決し、請求書データへ `corporateName` / `contactPerson` を付与する。
+- 請求書: `data/core/invoices.json`
+- 請求先（個人）: `data/core/users.json`
+- 請求先（グループ）: `data/core/groups.json`
 
-- 参照:
-  - `data/core/users.json`
-  - `data/core/groups.json`
+### 3.3 請求先情報の解決
 
-解決ルールは `02_dashboard/src/invoiceDetail.js` の実装に準拠する。
+- 詳細画面では `accountId` から `corporateName` / `contactPerson` を解決し、画面表示用の請求先情報を組み立てます。
+- 解決優先度と分岐条件は `02_dashboard/src/invoiceDetail.js` の現行実装を正とします。
 
-### 3.3 集計ID（`AGG-...`）の扱い
+### 3.4 集計 ID（`AGG-...`）の扱い
 
-- 集計IDを指定した場合、`fetchInvoiceById` は該当月・該当種別に属する複数請求書をまとめて返す。
-- 返却データの `items[]` は、各請求書の `items[]` を連結し、各請求書の末尾に「小計」行を追加する。
-  - 小計行の特徴: `isSubtotal: true`, `description: '小計'`, `amount: {その請求書の合計額}`
+- `AGG-...` は legacy/internal 互換用の受け口です。
+- `fetchInvoiceById(id)` は `AGG-...` 指定時に、該当月・該当契約種別の複数請求書を 1 件として返します。
+- 返却データの `items[]` には、元請求書ごとの `isSubtotal: true` 行が挿入されます。
+- `isSubtotal` 行は INV-002 の画面/PDF では表示対象です。印刷ページ（INV-003）の差分ルールは `05_invoice_document.md` を参照してください。
 
----
+## 4. 画面骨格
 
-## 4. UI要件
-
-### 4.1 画面骨格
+### 4.1 ページ構成
 
 - `data-page-id="invoice-detail"`
-- 共通ヘッダー/サイドバー/フッターが表示される（ダッシュボードの通常レイアウト）
+- ダッシュボード共通のヘッダー/サイドバー/フッターを表示します。
+- 主要アクションは `帳票ダウンロード` のみです。
 
-### 4.2 ヘッダー領域
+### 4.2 主要 DOM
 
-- タイトル: `請求書詳細`
-- 主要アクション:
-  - `帳票ダウンロード`（`#downloadPdfBtn`）
-
-### 4.3 状態表示（オーバーレイ）
-
-| 種別 | DOM | 要件 |
+| 種別 | DOM | 用途 |
 | :--- | :--- | :--- |
+| 帳票ダウンロード | `#downloadPdfBtn` | INV-002 から PDF を生成する起点 |
 | ローディング | `#invoice-detail-loading-overlay` | データ取得中、PDF生成中に表示 |
 | メッセージ | `#invoice-detail-message-overlay` | 異常系文言を表示 |
+| 帳票全体 | `#invoice-sheet-container` | PDF 生成対象コンテナ |
+| 1ページ目テンプレート | `#invoice-page-1` | 1ページ目の帳票レイアウト |
+| 1ページ目明細 tbody | `#sheet-details-tbody-1` | 初期ページの明細出力先 |
+| 1ページ目ページ番号 | `#page-number-1` | `{current}/{total}` 表示 |
 
-### 4.4 Invoice Sheet（請求書レイアウト）
+### 4.3 代表表示項目
 
-#### 4.4.1 コンテナ
+| 項目 | 表示先（ID） |
+| :--- | :--- |
+| 発行日 | `#sheet-issue-date` |
+| 請求書番号 | `#sheet-invoice-number` |
+| 宛名（会社） | `#sheet-corporate-name` |
+| 宛名（担当者） | `#sheet-contact-person` |
+| 件名 | `#sheet-billing-period` |
+| 課税小計 | `#sheet-subtotal-taxable` |
+| 消費税等 | `#sheet-tax-amount` |
+| 非課税小計 | `#sheet-subtotal-non-taxable` |
+| 合計（税込） | `#sheet-total-amount` |
+| 支払期限 | `#sheet-due-date` |
 
-- `#invoice-sheet-container` の配下に A4 用紙レイアウトを描画する。
-- 1ページ目のテンプレート要素は `#invoice-page-1` として DOM に存在し、明細の増加に応じて追加ページを生成する。
+表示フォーマット、明細列定義、品目1 / 品目2 の表記、金額計算、改ページは `05_invoice_document.md` を正本とします。
 
-#### 4.4.2 表示項目（代表）
+## 5. 操作要件
 
-| 項目 | 表示先（ID） | 仕様 |
-| :--- | :--- | :--- |
-| 発行日 | `#sheet-issue-date` | `YYYY年MM月DD日` |
-| 請求書番号 | `#sheet-invoice-number` | `YY-ユーザーID5桁-連番3桁` |
-| 宛名（会社） | `#sheet-corporate-name` | `御中` は固定文言 |
-| 宛名（担当者） | `#sheet-contact-person` | `様` は固定文言 |
-| 件名 | `#sheet-billing-period` | 表示文言に請求対象月（`billingPeriod.from` を基準）を含める |
-| 小計（課税） | `#sheet-subtotal-taxable` | JPY通貨形式 |
-| 消費税等 | `#sheet-tax-amount` | JPY通貨形式 |
-| 小計（非課税） | `#sheet-subtotal-non-taxable` | JPY通貨形式 |
-| 合計（税込） | `#sheet-total-amount` | `¥ 12,345` 相当の表記 |
-| 振込先（銀行名） | `#sheet-bank-name` | 銀行名（必要に応じてコード併記） |
-| 振込先（支店名） | `#sheet-branch-name` | 支店名（必要に応じてコード併記） |
-| 振込先（口座種別） | `#sheet-account-type` | 文字列を表示 |
-| 振込先（口座番号） | `#sheet-account-number` | 文字列を表示 |
-| 振込先（口座名義） | `#sheet-account-holder` | 文字列を表示 |
-| 支払期限 | `#sheet-due-date` | `YYYY年MM月DD日` |
+### 5.1 帳票ダウンロード
 
-#### 4.4.3 明細テーブル
+- `#downloadPdfBtn` 押下で `#invoice-sheet-container` を PDF 化して保存します。
+- ファイル名は `invoice-{id}.pdf` とし、`{id}` は URL パラメータ値をそのまま使用します。
+- 出力仕様、改ページ、PDF 用スタイル調整は `05_invoice_document.md` を正本とします。
 
-- 列: `No.` / `品名１` / `品名２` / `数量` / `単価` / `金額`
-- 行データ:
-  - `itemName` → 品名１
-  - `description` → 品名２
-  - `quantity` + `unit` → 数量
-  - `unitPrice` → 単価
-  - `amount` → 金額
-- `isSubtotal: true` の行は小計行として扱い、No. は空欄で表示する。
+### 5.2 状態表示
 
-#### 4.4.4 ページ分割
+- 初期ロード時は `#invoice-detail-loading-overlay` を表示します。
+- PDF 生成時も同じローディングオーバーレイを使用します。
+- 異常時は `#invoice-detail-message-overlay` に文言を表示します。
 
-- 1ページ目は明細20行まで表示する。
-- 2ページ目以降は1ページあたり明細42行まで表示する。
-- ページ番号は `{current}/{total}` 形式で表示する。
+## 6. 異常系
 
----
+| 条件 | 表示文言 |
+| :--- | :--- |
+| `id` 未指定 | `請求書IDが指定されていません。` |
+| `id` が存在しない | `対象の請求書が見つかりませんでした。` |
+| データ取得失敗 | `請求データの取得に失敗しました。` または例外メッセージ |
 
-## 5. 帳票ダウンロード（PDF）要件
+## 7. 実装参照
 
-### 5.1 概要
+- 画面初期化・請求先解決・PDF 生成: `02_dashboard/src/invoiceDetail.js`
+- ID 解決・`AGG-...` 結合・税計算: `02_dashboard/src/services/invoiceService.js`
+- 帳票本体 DOM: `02_dashboard/invoice-detail.html`
 
-- `#downloadPdfBtn` 押下で、Invoice Sheet を PDF としてダウンロードできる。
+## 8. 受け入れ確認の観点
 
-### 5.2 出力仕様
-
-- 生成対象: `#invoice-sheet-container`
-- 用紙: A4 縦
-- ファイル名: `invoice-{id}.pdf`
-  - `{id}` は URL パラメータの値（表示用に整形した請求書番号ではない）
-
-### 5.3 実装指示（再現のためのポイント）
-
-- PDF生成時は、画面表示用の影や余白を抑制し、ページごとに改ページされるようスタイルを調整する。
-- 生成後は、画面表示のスタイルに戻す。
-
----
-
-## 6. 異常系要件
-
-| 条件 | 表示文言（例） | 備考 |
-| :--- | :--- | :--- |
-| `id` 未指定 | `請求書IDが指定されていません。` | |
-| `id` が存在しない | `対象の請求書が見つかりませんでした。` | |
-| データ取得に失敗 | `請求データの取得に失敗しました。` | 実装では例外メッセージが出る場合がある |
-
----
-
-## 7. 受け入れ基準（抜粋）
-
-- `id` 指定で開くと、請求書レイアウトが表示される。
-- 明細が多い請求書ではページが自動追加され、ページ番号が整合する。
-- `帳票ダウンロード` でPDFが生成され、A4縦で崩れない。
+- `id` 指定で帳票レイアウトが表示されること
+- `AGG-...` 指定で集計請求が正しく展開されること（内部互換確認）
+- `帳票ダウンロード` で PDF が生成されること
+- 詳細確認の手順は `docs/ハンドブック/テスト/invoice_manual_checklist.md` を参照すること

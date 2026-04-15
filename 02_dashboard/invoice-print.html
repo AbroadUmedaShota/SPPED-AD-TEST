@@ -244,7 +244,16 @@
         fetch(resolveDashboardDataPath('core/groups.json')).then(response => response.json())
       ]);
 
-      const userAccount = (Array.isArray(users) ? users : []).find(user => user.accountId === invoice.accountId);
+      const safeUsers = Array.isArray(users) ? users : [];
+      const safeGroups = Array.isArray(groups) ? groups : [];
+      const groupAccount = safeGroups.find(group => group.accountId === invoice.accountId && group?.billing?.type === 'group');
+      if (groupAccount) {
+        invoice.corporateName = groupAccount.billing.corporateName ?? '-';
+        invoice.contactPerson = groupAccount.billing.contactPerson ?? '-';
+        return;
+      }
+
+      const userAccount = safeUsers.find(user => user.accountId === invoice.accountId);
       if (userAccount) {
         if (userAccount.billingAddressType === 'different' && userAccount.billingCompanyName) {
           invoice.corporateName = userAccount.billingCompanyName;
@@ -256,17 +265,9 @@
         return;
       }
 
-      const groupAccount = (Array.isArray(groups) ? groups : []).find(group => group.accountId === invoice.accountId);
-      if (!groupAccount) return;
-
-      if (groupAccount.billing?.type === 'group') {
-        invoice.corporateName = groupAccount.billing.corporateName ?? '-';
-        invoice.contactPerson = groupAccount.billing.contactPerson ?? '-';
-        return;
-      }
-
-      if (groupAccount.billing?.type === 'creator') {
-        const creator = (Array.isArray(users) ? users : []).find(user => user.email === groupAccount.billing.creatorId);
+      const creatorBillingAccount = safeGroups.find(group => group.accountId === invoice.accountId && group?.billing?.type === 'creator');
+      if (creatorBillingAccount?.billing?.type === 'creator') {
+        const creator = safeUsers.find(user => user.email === creatorBillingAccount.billing.creatorId);
         if (!creator) return;
 
         if (creator.billingAddressType === 'different' && creator.billingCompanyName) {

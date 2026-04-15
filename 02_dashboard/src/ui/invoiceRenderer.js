@@ -57,6 +57,18 @@ function resolveBillingRecipient(invoice) {
   return '-';
 }
 
+function resolveAccountLabel(invoice) {
+  if (invoice?.accountName && invoice.accountName.trim() !== '') {
+    return invoice.accountName;
+  }
+
+  if (resolveContractType(invoice) === 'GROUP') {
+    return 'グループアカウント';
+  }
+
+  return '個人アカウント';
+}
+
 function resolvePlanCode(invoice) {
   const code = invoice?.plan?.code;
   if (typeof code === 'string' && code.trim() !== '') {
@@ -221,6 +233,12 @@ function createInvoiceCard(invoice) {
   typeBadge.textContent = typeText;
   metaBlock.appendChild(typeBadge);
 
+  const infoGrid = document.createElement('div');
+  infoGrid.className = 'grid gap-3 sm:grid-cols-2';
+  wrapper.appendChild(infoGrid);
+
+  infoGrid.appendChild(createMetadataItem('請求先アカウント', resolveAccountLabel(invoice)));
+  infoGrid.appendChild(createMetadataItem('請求先', resolveBillingRecipient(invoice)));
 
   /* --- BODY ROW: Amount Only --- */
   const bodyRow = document.createElement('div');

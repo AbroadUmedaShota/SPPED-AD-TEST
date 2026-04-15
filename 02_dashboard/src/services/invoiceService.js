@@ -21,6 +21,7 @@ async function fetchGroupAccountIds() {
   const groups = await response.json();
   return new Set(
     (Array.isArray(groups) ? groups : [])
+      .filter(group => group?.billing?.type === 'group')
       .map(group => group?.accountId)
       .filter(Boolean)
   );

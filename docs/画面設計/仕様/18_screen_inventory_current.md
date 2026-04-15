@@ -38,13 +38,13 @@ last_reviewed: 2026-04-07
 | U-08 | 利用者向け | お礼メール設定 | `02_dashboard/thankYouEmailSettings.html` | `17_thank_you_email_settings_requirements.md` | 正本あり | HTMLあり | 送信対象・送信条件・名刺データ化完了後導線を整理する | 旧一覧の `/thanks_mail` 相当 |
 | U-09 | 利用者向け | サンクス画面設定 | `02_dashboard/thankYouScreenSettings.html` | `08_thank_you_screen_settings.md` | 正本あり | HTMLあり | 回答完了画面との責務分離を確認する |  |
 | U-10 | 利用者向け | グループ管理 | `02_dashboard/group-edit.html` | `group_edit_requirements.md`, `03_ux_group_creation_modal.md` | 正本あり | HTMLあり | グループ情報、請求先情報、メンバー管理、未保存変更確認のサービス設計を整理する |  |
-| U-11 | 利用者向け | 請求書一覧 | `02_dashboard/invoiceList.html` | `04_invoice_screen.md`, `請求書関連ページ_仕様共有資料.md` | 正本あり | HTMLあり | 請求書詳細・印刷との導線を確認する |  |
-| U-12 | 利用者向け | 請求書詳細 | `02_dashboard/invoice-detail.html` | `04_invoice_detail_requirements.md`, `請求書関連ページ_仕様共有資料.md` | 正本あり | HTMLあり | 表示項目と印刷用画面の差分を確認する |  |
-| U-13 | 利用者向け | 請求書印刷 | `02_dashboard/invoice-print.html`, `02_dashboard/seikyuusyo_sample.html` | `05_invoice_document.md`, `請求書関連ページ_仕様共有資料.md` | 正本あり | HTMLあり | `seikyuusyo_sample.html` の現行扱いを確認する | サンプルHTMLを含む |
+| U-11 | 利用者向け | 請求書一覧 | `02_dashboard/invoiceList.html` | `請求関連仕様マップ.md`, `04_invoice_screen.md` | 正本あり | HTMLあり | 個人アカウント請求とグループアカウント請求を請求書単位で識別表示し、詳細・印刷へ `INV-...` 遷移することを確認する |  |
+| U-12 | 利用者向け | 請求書詳細 | `02_dashboard/invoice-detail.html` | `請求関連仕様マップ.md`, `04_invoice_detail_requirements.md`, `05_invoice_document.md` | 正本あり | HTMLあり | DOM/画面骨格と帳票正本の責務分離を確認する |  |
+| U-13 | 利用者向け | 請求書印刷 | `02_dashboard/invoice-print.html`, `02_dashboard/seikyuusyo_sample.html` | `請求関連仕様マップ.md`, `05_invoice_document.md` | 正本あり | HTMLあり | `seikyuusyo_sample.html` はサンプル/参考実装として扱う | サンプルHTMLを含む |
 | U-14 | 利用者向け | パスワード再設定 | `02_dashboard/forgot-password.html`, `02_dashboard/reset-password.html`, `02_dashboard/reset-password-complete.html` | `10_password_reset_feature.md` | 正本あり | HTMLあり | ログイン画面との導線を確認する |  |
 | U-15 | 利用者向け | パスワード変更 | `02_dashboard/password_change.html` | `09_password_change_screen.md` | 正本あり | HTMLあり | 完了画面との遷移を確認する |  |
 | U-16 | 利用者向け | パスワード変更完了 | `02_dashboard/password-change-complete.html` | `09_password_change_screen.md` | 正本あり | HTMLあり | 完了後のログイン画面復帰導線を確認する |  |
-| U-17 | 利用者向け | プレミアム関連 | `02_dashboard/premium_signup.html`, `premium_signup_new.html`, `premium_registration_spa.html`, `premium_registration_complete.html`, `premium_cancel.html`, `premium_cancel_complete.html` | `premium/` 配下仕様, `11_plan_feature_restrictions.md` | 正本あり | HTMLあり | 旧・新signupの採用関係、登録・完了・解約導線を確認する | プラン制限と連動 |
+| U-17 | 利用者向け | プレミアム関連 | `02_dashboard/premium_signup.html`, `premium_signup_new.html`, `premium_registration_spa.html`, `premium_registration_complete.html`, `premium_cancel.html`, `premium_cancel_complete.html` | `premium/` 配下仕様, `11_plan_feature_restrictions.md`, `請求関連仕様マップ.md` | 正本あり | HTMLあり | 旧・新signupの採用関係に加え、請求表現の shared/private 境界を確認する | プラン制限と連動 |
 | U-18 | 法務・ヘルプ | ヘルプセンター / FAQ | `02_dashboard/help-center.html`, `help-content.html`, `faq.html` | `15_help_center_requirements.md` | 正本あり | HTMLあり | ヘルプセンターと個別コンテンツの管理方法を確認する |  |
 | U-19 | 法務・ヘルプ | 法務ページ | `02_dashboard/terms-of-service.html`, `specified-commercial-transactions.html`, `personal-data-protection-policy.html` | 旧画面一覧 / 未確認 | 未確認 | HTMLあり | 正本仕様の要否を確認する | 利用規約、特商法、個人情報保護方針 |
 | U-20 | 利用者向け | 更新履歴 | `02_dashboard/changelog.html` | 未確認 | 未確認 | HTMLあり | 画面仕様として管理するか、運用補助扱いにするか確認する |  |
@@ -55,7 +55,7 @@ last_reviewed: 2026-04-07
 | A-03 | 管理者向け | 利用者詳細 | `03_admin/user-detail.html` | `admin/user_detail_requirements.md` | 正本あり | HTMLあり | 編集可能項目と閲覧項目の境界を確認する |  |
 | A-04 | 管理者向け | アンケート管理 | `03_admin/survey-management.html` | `admin/survey_management_requirements.md` | 正本あり | HTMLあり | 利用者側アンケート一覧との操作差分を確認する |  |
 | A-05 | 管理者向け | アンケート詳細 | `03_admin/survey-detail.html` | `admin/survey_detail_requirements.md` | 正本あり | HTMLあり | 更新系操作ルールと閲覧情報の範囲を確認する |  |
-| A-06 | 管理者向け | 請求管理 | `03_admin/billing-management.html` | `admin/billing_management_requirements.md` | 正本あり | HTMLあり | 請求書関連画面との接続を確認する |  |
+| A-06 | 管理者向け | 請求管理 | `03_admin/billing-management.html` | `請求関連仕様マップ.md`, `admin/billing_management_requirements.md` | 正本あり | HTMLあり | 利用者向け請求書とは別責務であることと相互参照先を確認する |  |
 | A-07 | 管理者向け | クーポン管理 | `03_admin/coupon-management.html` | `admin/coupon_management_requirements.md` | 正本あり | HTMLあり | クーポン系モーダルとの接続を確認する |  |
 | A-08 | 管理者向け | 営業日カレンダー管理 | `03_admin/calendar-management.html` | `admin/calendar-management_requirements.md` | 正本あり | HTMLあり | 休業日計算への反映範囲を確認する |  |
 | A-09 | 管理者向け | データ入力状況 | `03_admin/data-entry/index.html` | `admin/data_entry_requirements.md` | 正本あり | HTMLあり | `data-entry-management.html` / `data_entry.html` はMoved扱いでよいか確認する |  |
@@ -104,7 +104,7 @@ last_reviewed: 2026-04-07
 | グループ設定画面_申し込み完了画面 | `/groupplan2` | 未確認 | 現行で廃止済みか確認 |
 | グループ参加画面 | `/group_join` | 未確認 | 招待参加フローの現行導線確認 |
 | ユーザー管理画面 / ユーザー追加画面 | `/user_admin`, `/user_admin_add` | `group-edit.html` 周辺 | 利用者側のメンバー管理へ統合されたか確認 |
-| 請求書画面 | `/admin/invoice` | `03_admin/billing-management.html` / 利用者側請求書画面 | 管理者側請求書画面の有無確認 |
+| 請求書画面 | `/admin/invoice` | `03_admin/billing-management.html` / 利用者側請求書画面 | 管理者側請求管理と利用者向け請求書を別責務として扱う |
 
 ### 5.2. 現行HTMLはあるが仕様書の対応が未確認
 
@@ -114,7 +114,7 @@ last_reviewed: 2026-04-07
 | `02_dashboard/bug-report.html` | `speed-ad-不具合報告-form/index.html` との使い分け |
 | `02_dashboard/help-content.html` | `help-center.html` 配下コンテンツとして扱うか |
 | `02_dashboard/premium_signup.html`, `premium_signup_new.html` | 現行採用ページの確定 |
-| `02_dashboard/seikyuusyo_sample.html` | サンプルか現行印刷導線か |
+| `02_dashboard/seikyuusyo_sample.html` | サンプル/参考実装として別枠扱いでよいか（現行導線の正本には含めない） |
 | `03_admin/data_entry.html`, `03_admin/data-entry-management.html` | `Moved` タイトルのため旧導線扱いでよいか |
 | `03_admin/BY-*`, `03_admin/sample/*` | 旧・サンプル画面として別枠管理でよいか |
 
