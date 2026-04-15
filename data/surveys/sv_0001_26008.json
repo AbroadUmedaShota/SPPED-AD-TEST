@@ -144,6 +144,18 @@
       ]
     },
     {
+      "id": "Q12",
+      "text": "総合満足度",
+      "type": "rating_scale",
+      "meta": {
+        "ratingScaleConfig": {
+          "points": 5,
+          "minLabel": { "ja": "非常に不満", "en": "Very Dissatisfied" },
+          "maxLabel": { "ja": "非常に満足", "en": "Very Satisfied" }
+        }
+      }
+    },
+    {
       "id": "Q13",
       "text": "担当者の対応評価",
       "type": "matrix_sa",
@@ -221,6 +233,20 @@
       "id": "Q15",
       "text": "※入力完了後、送信ボタンを押してください",
       "type": "explanation"
+    },
+    {
+      "id": "Q16",
+      "text": "知人・同僚へのご推薦度",
+      "type": "rating_scale",
+      "meta": {
+        "ratingScaleConfig": {
+          "points": 10,
+          "minLabel": { "ja": "まったく推奨しない", "en": "Not at all" },
+          "maxLabel": { "ja": "強く推奨する", "en": "Extremely likely" },
+          "showMidLabel": true,
+          "midLabel": { "ja": "どちらでもない", "en": "Neutral" }
+        }
+      }
     }
   ]
 }

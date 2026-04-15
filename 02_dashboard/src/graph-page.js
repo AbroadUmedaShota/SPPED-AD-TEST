@@ -7,6 +7,28 @@ document.addEventListener('DOMContentLoaded', () => {
     initGraphPage();
 });
 
+function generateScaleGradient(points) {
+    const stops = [
+        [220, 38, 38],   // red-600
+        [234, 88, 12],   // orange-600
+        [202, 138, 4],   // yellow-600
+        [22, 163, 74],   // green-600
+        [21, 128, 61],   // green-700
+    ];
+    const colors = [];
+    for (let i = 0; i < points; i++) {
+        const t = points <= 1 ? 0.5 : i / (points - 1);
+        const seg = t * (stops.length - 1);
+        const idx = Math.min(Math.floor(seg), stops.length - 2);
+        const f = seg - idx;
+        const r = Math.round(stops[idx][0] + (stops[idx + 1][0] - stops[idx][0]) * f);
+        const g = Math.round(stops[idx][1] + (stops[idx + 1][1] - stops[idx][1]) * f);
+        const b = Math.round(stops[idx][2] + (stops[idx + 1][2] - stops[idx][2]) * f);
+        colors.push(`rgb(${r}, ${g}, ${b})`);
+    }
+    return colors;
+}
+
 // --- Global State ---
 const chartInstances = {};
 const chartDataStore = new Map();
@@ -19,14 +41,16 @@ let availableDateRange = null;
 let chartSequence = 0;
 let isExporting = false; // 書き出し中フラグ
 
-// 表示オプションの状態管理
-const displayOptions = {
+// 表示オプションの状態管理（localStorageから復元）
+const DISPLAY_OPTIONS_STORAGE_KEY = 'graphPage_displayOptions';
+const DISPLAY_OPTIONS_DEFAULTS = {
     showSummary: true,
     showDataLabels: true,
     showCenterText: true,
     showTable: true,
     showGrid: false
 };
+const displayOptions = loadDisplayOptions();
 const GRAPH_CHART_DONUT_PALETTE = COMMON_CHART_DONUT_PALETTE;
 const GRAPH_CHART_COLOR_PALETTE = COMMON_CHART_DONUT_PALETTE; // Use same palette for bar charts
 const GRAPH_CHART_MUTED_TEXT = '#6B6B6B';
@@ -151,8 +175,11 @@ function setupFilterEventListeners() {
     Object.entries(optIds).forEach(([id, key]) => {
         const el = document.getElementById(id);
         if (el) {
+            // Restore saved state to checkbox
+            el.checked = displayOptions[key];
             el.addEventListener('change', (e) => {
                 displayOptions[key] = e.target.checked;
+                saveDisplayOptions();
                 triggerChartUpdate();
             });
         }
@@ -250,7 +277,11 @@ async function loadAndRenderCharts(surveyId) {
 
         const [surveyDefinition, answers] = await Promise.all([
             fetchWithFallback(`surveys/${surveyId}.json`, 'survey'),
+            // Try responses/answers/ first (production path), then answers/ (demo path)
             fetchWithFallback(`responses/answers/${surveyId}.json`, 'answers')
+                .then(data => Array.isArray(data) && data.length === 0
+                    ? fetchWithFallback(`answers/${surveyId}.json`, 'answers')
+                    : data)
         ]);
 
         currentSurvey = surveyDefinition;
@@ -293,8 +324,18 @@ function processDataForCharts(survey, answers) {
     const charts = [];
     chartSequence = 0;
 
-    survey.details.forEach((question, index) => {
+    // Sort details by question ID number to ensure correct display order (Q1, Q2, ... Q12, Q13, ...)
+    const sortedDetails = [...survey.details].sort((a, b) => {
+        const numA = parseInt(String(a.id || '').replace(/\D/g, ''), 10) || 0;
+        const numB = parseInt(String(b.id || '').replace(/\D/g, ''), 10) || 0;
+        return numA - numB;
+    });
+
+    sortedDetails.forEach((question, index) => {
         const questionId = question.id || `q${index + 1}`;
+
+        // Skip explanation type — no answerable content
+        if (question.type === 'explanation') return;
 
         if (MATRIX_SINGLE_TYPES.has(question.type)) {
             const matrixCharts = buildMatrixCharts(question, questionId, answers, false);
@@ -332,6 +373,25 @@ function processDataForCharts(survey, answers) {
                 includeTotalRow: false,
                 allowToggle: false,
                 ...summary
+            }));
+            return;
+        }
+
+        if (question.type === 'rating_scale') {
+            const summary = buildRatingScaleSummary(question, answers);
+            charts.push(buildChartData({
+                questionId,
+                questionText: question.text,
+                chartType: 'bar',
+                summaryType: 'rating_table',
+                includeTotalRow: true,
+                allowToggle: false,
+                questionType: 'rating_scale',
+                ratingScaleAverage: summary.average,
+                ratingScalePoints: summary.points,
+                labels: summary.labels,
+                data: summary.data,
+                totalAnswers: summary.totalAnswers
             }));
             return;
         }
@@ -393,18 +453,29 @@ function renderCharts(chartsData) {
 
         let insightHtml = '';
         if (displayOptions.showSummary && !isBlank && !isList && !isMatrix && chartData.labels.length > 0) {
-            const maxIdx = chartData.data.indexOf(Math.max(...chartData.data));
-            const topLabel = chartData.labels[maxIdx];
-            const topVal = chartData.data[maxIdx];
-            const topPercent = chartData.totalAnswers > 0 ? Math.round((topVal / chartData.totalAnswers) * 100) : 0;
+            if (chartData.questionType === 'rating_scale') {
+                const avg = Number(chartData.ratingScaleAverage || 0).toFixed(2);
+                const points = chartData.ratingScalePoints || 5;
+                insightHtml = `
+                    <div class="flex items-center gap-2 bg-primary/5 border border-primary/10 px-3 py-1 rounded-full">
+                        <span class="text-[10px] font-bold text-primary uppercase tracking-wider">Avg</span>
+                        <span class="text-xs font-black text-primary">${avg} <span class="font-normal text-on-surface-variant">/ ${points}</span></span>
+                    </div>
+                `;
+            } else {
+                const maxIdx = chartData.data.indexOf(Math.max(...chartData.data));
+                const topLabel = chartData.labels[maxIdx];
+                const topVal = chartData.data[maxIdx];
+                const topPercent = chartData.totalAnswers > 0 ? Math.round((topVal / chartData.totalAnswers) * 100) : 0;
 
-            insightHtml = `
-                <div class="flex items-center gap-2 bg-primary/5 border border-primary/10 px-3 py-1 rounded-full">
-                    <span class="text-[10px] font-bold text-primary uppercase tracking-wider">Top</span>
-                    <span class="text-xs font-bold text-on-surface truncate max-w-[100px]">${escapeHtml(topLabel)}</span>
-                    <span class="text-xs font-black text-primary">${topPercent}%</span>
-                </div>
-            `;
+                insightHtml = `
+                    <div class="flex items-center gap-2 bg-primary/5 border border-primary/10 px-3 py-1 rounded-full">
+                        <span class="text-[10px] font-bold text-primary uppercase tracking-wider">Top</span>
+                        <span class="text-xs font-bold text-on-surface truncate max-w-[100px]">${escapeHtml(topLabel)}</span>
+                        <span class="text-xs font-black text-primary">${topPercent}%</span>
+                    </div>
+                `;
+            }
         }
 
         const hasSummaryTable = chartData.summaryType === 'table' || chartData.summaryType === 'matrix_table';
@@ -740,7 +811,9 @@ function createChart(chartId, chartData, type) {
             stacked: isMatrixStacked,
             stackType: isStacked100 ? '100%' : undefined
         },
-        colors: isMatrixStacked ? COMMON_CHART_DONUT_PALETTE : (isDoughnut ? GRAPH_CHART_DONUT_PALETTE : GRAPH_CHART_COLOR_PALETTE),
+        colors: isMatrixStacked ? COMMON_CHART_DONUT_PALETTE
+            : chartData.questionType === 'rating_scale' ? generateScaleGradient(chartData.data.length)
+            : (isDoughnut ? GRAPH_CHART_DONUT_PALETTE : GRAPH_CHART_COLOR_PALETTE),
         labels: categoryLabels,
         plotOptions: {
             pie: {
@@ -900,6 +973,53 @@ function renderChartSummaryTable(summaryId, chartData) {
                             <td class="px-3 py-2">合計</td>
                             ${totalRow}
                             <td class="px-3 py-2 text-right font-mono tabular-nums">${totalAll}件</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        `;
+        return;
+    }
+
+    if (chartData.summaryType === 'rating_table') {
+        const totalVotes = chartData.totalAnswers || 0;
+        const avg = Number(chartData.ratingScaleAverage || 0).toFixed(2);
+        const points = chartData.ratingScalePoints || 5;
+        const tableRows = (chartData.labels || []).map((label, i) => {
+            const count = chartData.data[i] || 0;
+            const pct = totalVotes > 0 ? ((count / totalVotes) * 100).toFixed(1) : '0.0';
+            return `
+                <tr>
+                    <td class="px-3 py-2 border-b border-outline-variant align-top">
+                        <div class="cell-truncate-container">${escapeHtml(label)}</div>
+                    </td>
+                    <td class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums align-top">${count}件</td>
+                    <td class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums align-top">${pct}%</td>
+                </tr>
+            `;
+        }).join('');
+        container.innerHTML = `
+            <div class="chart-summary-scroll-area border border-outline-variant rounded-lg overflow-x-auto">
+                <table class="table-auto text-left text-sm w-full">
+                    <thead class="bg-surface-variant-soft text-on-surface-variant sticky top-0 z-10 shadow-[0_1px_0_0_rgba(0,0,0,0.05)]">
+                        <tr>
+                            <th class="px-3 py-2 border-b border-outline-variant min-w-[150px] whitespace-nowrap">スコア</th>
+                            <th class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums w-[80px] whitespace-nowrap">件数</th>
+                            <th class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums w-[80px] whitespace-nowrap">割合</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${tableRows}
+                        <tr class="font-semibold bg-surface-variant/5">
+                            <td class="px-3 py-2">合計</td>
+                            <td class="px-3 py-2 text-right font-mono tabular-nums">${totalVotes}件</td>
+                            <td class="px-3 py-2 text-right font-mono tabular-nums">100.0%</td>
+                        </tr>
+                        <tr class="bg-primary/5">
+                            <td class="px-3 py-2 text-sm font-semibold text-primary">
+                                <span class="inline-flex items-center gap-1"><span class="material-icons text-sm">linear_scale</span>平均スコア</span>
+                            </td>
+                            <td class="px-3 py-2 text-right font-mono tabular-nums font-bold text-primary" colspan="2">${avg} / ${points}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -1136,16 +1256,16 @@ async function executeExcelExport(chartsData, options) {
 
             await yieldToMain();
 
-            const questionNo = `Q${processedCount}`;
+            const questionNo = formatQuestionChip(chartData.questionId);
             const isBlank = chartData.chartType === 'blank';
 
             if (isBlank && !options.includeExclusions) continue;
 
-            const sheetName = isBlank ? `Ex_${processedCount}` : questionNo;
+            const sheetName = isBlank ? `Ex_${questionNo}` : questionNo;
             const sheet = workbook.addWorksheet(sheetName, { views: [{ showGridLines: false }] });
 
             if (options.includeTOC) {
-                const row = tocSheet.addRow([processedCount, chartData.questionText, sheetName]);
+                const row = tocSheet.addRow([questionNo, chartData.questionText, sheetName]);
                 row.getCell(3).value = { text: sheetName, hyperlink: `#'${sheetName}'!A1` };
                 row.getCell(3).font = { color: { argb: 'FF0000FF' }, underline: true };
             }
@@ -1522,6 +1642,21 @@ async function executeExcelExport(chartsData, options) {
 }
 
 // --- Utility Functions ---
+
+function loadDisplayOptions() {
+    try {
+        const stored = localStorage.getItem(DISPLAY_OPTIONS_STORAGE_KEY);
+        if (stored) return { ...DISPLAY_OPTIONS_DEFAULTS, ...JSON.parse(stored) };
+    } catch (e) { /* ignore */ }
+    return { ...DISPLAY_OPTIONS_DEFAULTS };
+}
+
+function saveDisplayOptions() {
+    try {
+        localStorage.setItem(DISPLAY_OPTIONS_STORAGE_KEY, JSON.stringify(displayOptions));
+    } catch (e) { /* ignore */ }
+}
+
 function showLoading(isLoading) {
     document.getElementById('loading-indicator').style.display = isLoading ? 'block' : 'none';
     if (isLoading) {
@@ -1646,9 +1781,9 @@ function normalizeQuestionText(text) {
 function findAnswerDetail(answer, question) {
     if (!answer || !answer.details) return null;
 
-    // 1. Try matching by questionId (Exact Match & Preferred)
+    // 1. Try matching by questionId or id (Exact Match & Preferred)
     if (question.id) {
-        const idMatch = answer.details.find(detail => detail && detail.questionId === question.id);
+        const idMatch = answer.details.find(detail => detail && (detail.questionId === question.id || detail.id === question.id));
         if (idMatch) return idMatch;
     }
 
@@ -1763,6 +1898,52 @@ function buildChoiceSummary(question, answers, isMulti) {
         data: entries.map(entry => entry.count),
         totalAnswers: answeredCount
     };
+}
+
+function buildRatingScaleSummary(question, answers) {
+    const cfg = question.config || question.meta?.ratingScaleConfig || {};
+    const points = Math.max(2, Number(cfg.points) || 5);
+
+    const resolveLabel = (val) => {
+        if (!val) return '';
+        if (typeof val === 'string') return val;
+        if (typeof val === 'object') return val.ja || val.en || Object.values(val)[0] || '';
+        return '';
+    };
+    const minLabel = resolveLabel(cfg.minLabel);
+    const maxLabel = resolveLabel(cfg.maxLabel);
+    const midLabel = cfg.showMidLabel ? resolveLabel(cfg.midLabel) : '';
+
+    const counts = {};
+    for (let i = 1; i <= points; i++) counts[i] = 0;
+
+    let answeredCount = 0;
+    let totalScore = 0;
+
+    answers.forEach(answer => {
+        const detail = findAnswerDetail(answer, question);
+        if (!detail || detail.answer === undefined || detail.answer === null || detail.answer === '') return;
+        const num = parseInt(String(detail.answer), 10);
+        if (!isNaN(num) && num >= 1 && num <= points) {
+            counts[num] = (counts[num] || 0) + 1;
+            answeredCount++;
+            totalScore += num;
+        }
+    });
+
+    const average = answeredCount > 0 ? totalScore / answeredCount : 0;
+
+    const midPoint = Math.ceil(points / 2);
+    const labels = [];
+    for (let i = 1; i <= points; i++) {
+        if (i === 1 && minLabel) labels.push(`${i} (${minLabel})`);
+        else if (i === points && maxLabel) labels.push(`${i} (${maxLabel})`);
+        else if (i === midPoint && midLabel) labels.push(`${i} (${midLabel})`);
+        else labels.push(String(i));
+    }
+    const data = labels.map((_, i) => counts[i + 1] || 0);
+
+    return { labels, data, totalAnswers: answeredCount, average, points, minLabel, maxLabel, midLabel };
 }
 
 function normalizeMatrixRows(rows = []) {
@@ -1998,7 +2179,9 @@ function buildChartData(data) {
         matrixSelectedIndex: Number.isFinite(data.matrixSelectedIndex) ? data.matrixSelectedIndex : 0,
         matrixRowDetails: data.matrixRowDetails || [],
         matrixSelectorType: data.matrixSelectorType || 'row',
-        questionType: data.questionType || ''
+        questionType: data.questionType || '',
+        ratingScaleAverage: data.ratingScaleAverage ?? null,
+        ratingScalePoints: data.ratingScalePoints ?? null
     };
 }
 

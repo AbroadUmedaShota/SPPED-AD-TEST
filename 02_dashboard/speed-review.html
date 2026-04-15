@@ -541,6 +541,7 @@
             };
             const chart = new ApexCharts(canvas, chartOptions);
             chart.render();
+            return chart;
 
         } else if (question.type === 'matrix_ma') {
             const optionsData = question.options;
@@ -609,6 +610,7 @@
             };
             const chart = new ApexCharts(canvas, chartOptions);
             chart.render();
+            return chart;
         }
     }
     </script>

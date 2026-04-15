@@ -219,10 +219,27 @@ function initializeParams() {
 }
 
 function normalizeQuestion(rawQuestion, index) {
+    const rawType = String(rawQuestion.type).toLowerCase();
     const type = normalizeQuestionType(rawQuestion.type);
-    const options = (type === 'single_answer' || type === 'multi_answer' || type === 'dropdown') 
+    const isMatrix = (type === 'matrix_sa' || type === 'matrix_ma');
+    const options = (type === 'single_answer' || type === 'multi_answer' || type === 'dropdown')
         ? normalizeOptions(rawQuestion.options || rawQuestion.choices, rawQuestion.id || `q${index}`)
         : [];
+
+    // マトリクス設問: columns が無い場合は options をカラムとして使用
+    const columns = isMatrix
+        ? normalizeOptions(rawQuestion.columns || rawQuestion.options || [], rawQuestion.id || `q${index}`)
+        : (rawQuestion.columns || []);
+
+    const meta = { ...rawQuestion.meta };
+    // 旧 "time" タイプは date_time に正規化されるが、時刻のみ表示にする
+    if (rawType === 'time' && !meta.dateTimeConfig) {
+        meta.dateTimeConfig = { inputMode: 'time' };
+    }
+    // 旧 "date" タイプも日付のみ表示にする
+    if (rawType === 'date' && !meta.dateTimeConfig) {
+        meta.dateTimeConfig = { inputMode: 'date' };
+    }
 
     return {
         ...rawQuestion,
@@ -231,8 +248,9 @@ function normalizeQuestion(rawQuestion, index) {
         text: rawQuestion.text || rawQuestion.title,
         required: rawQuestion.required || rawQuestion.isRequired || false,
         options: options,
-        columns: rawQuestion.columns || [],
+        columns: columns,
         rows: rawQuestion.rows || [],
+        meta: meta,
     };
 }
 
@@ -242,7 +260,8 @@ function normalizeQuestionType(type) {
     if (t.includes('multi') || t.includes('check')) return 'multi_answer';
     if (t.includes('free') || t.includes('text')) return 'free_answer';
     if (t.includes('number')) return 'number_answer';
-    if (t.includes('date')) return 'date_time';
+    if (t.includes('date') || t === 'time') return 'date_time';
+    if (t.includes('image')) return 'image_upload';
     if (t.includes('dropdown')) return 'dropdown';
     if (t.includes('matrix_sa')) return 'matrix_sa';
     if (t.includes('matrix_ma')) return 'matrix_ma';
@@ -1422,8 +1441,9 @@ function createQuestionElement(question, index) {
                 tableHTML += `<tr><td class="border border-outline-variant p-2 text-sm font-medium">${resolveSurveyText(row.text)}</td>`;
                 question.columns.forEach(col => {
                     const inputType = isSingleAnswer ? 'radio' : 'checkbox';
-                    const name = isSingleAnswer ? `${question.id}-${row.id}` : `${question.id}-${row.id}-${col.id}`;
-                    const id = `${question.id}-${row.id}-${col.id}`;
+                    const colId = col.id || col.value;
+                    const name = isSingleAnswer ? `${question.id}-${row.id}` : `${question.id}-${row.id}-${colId}`;
+                    const id = `${question.id}-${row.id}-${colId}`;
                     tableHTML += '<td class="border border-outline-variant p-2 text-center">';
                     tableHTML += `<input type="${inputType}" id="${id}" name="${name}" value="${col.value}" class="form-${inputType} text-primary">`;
                     tableHTML += '</td>';
@@ -1433,6 +1453,69 @@ function createQuestionElement(question, index) {
             tableHTML += '</tbody></table></div>';
             controlArea.innerHTML = tableHTML;
             break;
+        case 'rating_scale': {
+            const rsCfg = question.meta?.ratingScaleConfig || {};
+            const rsPoints = rsCfg.points || 5;
+            const rsMinLabel = resolveSurveyText(rsCfg.minLabel) || '';
+            const rsMaxLabel = resolveSurveyText(rsCfg.maxLabel) || '';
+            const rsShowMid = !!rsCfg.showMidLabel;
+            const rsMidLabel = rsShowMid ? (resolveSurveyText(rsCfg.midLabel) || '') : '';
+
+            // 隠しフィールド（回答値保持）
+            const rsHidden = document.createElement('input');
+            rsHidden.type = 'hidden';
+            rsHidden.name = question.id;
+            rsHidden.value = '';
+            controlArea.appendChild(rsHidden);
+
+            // ボタン行
+            const rsBtnRow = document.createElement('div');
+            rsBtnRow.className = 'flex items-center gap-1.5 sm:gap-2';
+
+            for (let i = 1; i <= rsPoints; i++) {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.textContent = String(i);
+                btn.dataset.value = String(i);
+                btn.className = 'flex-1 h-10 sm:h-11 rounded-xl border-2 border-gray-300 bg-white text-sm font-bold text-gray-500 transition-all hover:border-primary hover:text-primary hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-primary/40';
+                btn.addEventListener('click', () => {
+                    rsHidden.value = btn.dataset.value;
+                    rsBtnRow.querySelectorAll('button').forEach(b => {
+                        const selected = b === btn;
+                        b.className = selected
+                            ? 'flex-1 h-10 sm:h-11 rounded-xl border-2 border-primary bg-primary text-white text-sm font-bold shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-primary/40'
+                            : 'flex-1 h-10 sm:h-11 rounded-xl border-2 border-gray-300 bg-white text-sm font-bold text-gray-500 transition-all hover:border-primary hover:text-primary hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-primary/40';
+                    });
+                });
+                rsBtnRow.appendChild(btn);
+            }
+            controlArea.appendChild(rsBtnRow);
+
+            // 端ラベル行
+            if (rsMinLabel || rsMaxLabel || rsShowMid) {
+                const rsLabelRow = document.createElement('div');
+                rsLabelRow.className = 'flex items-start justify-between text-xs text-gray-400 font-semibold mt-1 px-0.5';
+
+                const rsLeft = document.createElement('span');
+                rsLeft.className = 'max-w-[38%] text-left leading-snug';
+                rsLeft.textContent = rsMinLabel;
+
+                const rsRight = document.createElement('span');
+                rsRight.className = 'max-w-[38%] text-right leading-snug';
+                rsRight.textContent = rsMaxLabel;
+
+                if (rsShowMid && rsMidLabel) {
+                    const rsMid = document.createElement('span');
+                    rsMid.className = 'max-w-[24%] text-center leading-snug';
+                    rsMid.textContent = rsMidLabel;
+                    rsLabelRow.append(rsLeft, rsMid, rsRight);
+                } else {
+                    rsLabelRow.append(rsLeft, rsRight);
+                }
+                controlArea.appendChild(rsLabelRow);
+            }
+            break;
+        }
         case 'explanation_card':
             controlArea.innerHTML = `<p class="text-on-surface-variant">${resolveSurveyText(question.text)}</p>`;
             // 説明カードには凡例や枠線が不要な場合があるため、スタイルを調整
@@ -1680,6 +1763,42 @@ function createQuestionElement(question, index) {
 
             }, 0);
             break;
+        case 'image_upload': {
+            const imageInput = document.createElement('input');
+            imageInput.type = 'file';
+            imageInput.accept = 'image/*';
+            imageInput.name = question.id;
+            imageInput.className = 'hidden';
+
+            const previewArea = document.createElement('div');
+            previewArea.className = 'mt-2';
+
+            const uploadBtn = document.createElement('div');
+            uploadBtn.className = 'p-6 border-2 border-dashed rounded-lg text-center cursor-pointer hover:bg-gray-50 hover:border-primary transition-all';
+            uploadBtn.innerHTML = `
+                <span class="material-icons text-4xl text-gray-400">photo_camera</span>
+                <p class="text-sm text-gray-500 mt-2">${t('survey.tapToCapture') || '写真を撮影またはファイルを選択'}</p>
+            `;
+
+            uploadBtn.addEventListener('click', () => imageInput.click());
+
+            imageInput.addEventListener('change', () => {
+                const file = imageInput.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    previewArea.innerHTML = `<img src="${e.target.result}" class="max-w-full max-h-64 rounded-lg mt-2" alt="preview">`;
+                    state.answers[question.id] = e.target.result;
+                    state.hasUnsavedChanges = true;
+                };
+                reader.readAsDataURL(file);
+            });
+
+            controlArea.appendChild(imageInput);
+            controlArea.appendChild(uploadBtn);
+            controlArea.appendChild(previewArea);
+            break;
+        }
         default:
             controlArea.innerHTML = `<p class="text-sm text-error">未対応の設問タイプです: ${question.type}</p>`;
     }
@@ -1689,11 +1808,17 @@ function createQuestionElement(question, index) {
         const question = state.surveyData.questions.find(q => q.id === questionId);
 
         if (question.type === 'date_time') {
-            const dateValue = fieldset.querySelector(`input[name=\"${questionId}_date\"]`).value;
-            const timeValue = fieldset.querySelector(`input[name=\"${questionId}_time\"]`).value;
+            const dateEl = fieldset.querySelector(`input[name="${questionId}_date"]`);
+            const timeEl = fieldset.querySelector(`input[name="${questionId}_time"]`);
+            const dateValue = dateEl ? dateEl.value : '';
+            const timeValue = timeEl ? timeEl.value : '';
 
-            if (dateValue) { // 時刻は任意でも良い場合を考慮
-                state.answers[questionId] = `${dateValue}${timeValue ? 'T' + timeValue : ''}`;
+            if (dateValue && timeValue) {
+                state.answers[questionId] = `${dateValue}T${timeValue}`;
+            } else if (dateValue) {
+                state.answers[questionId] = dateValue;
+            } else if (timeValue) {
+                state.answers[questionId] = timeValue;
             } else {
                 delete state.answers[questionId];
             }

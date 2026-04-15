@@ -5,11 +5,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "その他",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "クラウド移行",
@@ -18,31 +20,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者1",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "導入メリットが明確です。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 2,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "5",
@@ -53,16 +61,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -99,6 +110,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "4",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "10",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -114,11 +137,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "金融・保険",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "セキュリティ強化",
@@ -127,31 +152,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者2",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "初期費用がネックです。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 4,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "1",
@@ -162,16 +193,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -208,6 +242,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "1",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "8",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -223,11 +269,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "金融・保険",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "AI活用",
@@ -236,31 +284,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者3",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "UIが洗練されています。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 2,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "5",
@@ -271,16 +325,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -317,6 +374,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "3",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "8",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -332,11 +401,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "金融・保険",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "セキュリティ強化",
@@ -345,31 +416,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者4",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "UIが洗練されています。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 3,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "5",
@@ -380,16 +457,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -425,6 +505,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "3",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "9",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -440,11 +532,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "製造業",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "セキュリティ強化",
@@ -453,31 +547,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者5",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "既存ツールとの競合が心配です。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 3,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "1",
@@ -488,16 +588,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -534,6 +637,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "5",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "10",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -549,11 +664,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "金融・保険",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "クラウド移行",
@@ -562,31 +679,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者6",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "初期費用がネックです。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 3,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "1",
@@ -597,16 +720,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -642,6 +768,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "4",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "9",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -657,11 +795,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "IT・情報通信",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "クラウド移行",
@@ -670,31 +810,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者7",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "UIが洗練されています。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 4,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "4",
@@ -705,16 +851,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -750,6 +899,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "5",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "5",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -765,11 +926,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "製造業",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "コスト削減",
@@ -778,31 +941,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者8",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "UIが洗練されています。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 4,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "5",
@@ -813,16 +982,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -860,6 +1032,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "2",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "2",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -875,11 +1059,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "IT・情報通信",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "クラウド移行",
@@ -888,31 +1074,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者9",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "既存ツールとの競合が心配です。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 1,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "3",
@@ -923,16 +1115,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -969,6 +1164,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "4",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "6",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -984,11 +1191,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "その他",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "クラウド移行",
@@ -997,31 +1206,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者10",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "導入メリットが明確です。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 1,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "3",
@@ -1032,16 +1247,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -1079,6 +1297,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "1",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "6",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -1094,11 +1324,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "IT・情報通信",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "コスト削減",
@@ -1107,31 +1339,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者11",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "資料を確認します。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 4,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "2",
@@ -1142,16 +1380,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -1186,6 +1427,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "3",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "5",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -1201,11 +1454,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "小売・流通",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "セキュリティ強化",
@@ -1214,31 +1469,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者12",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "操作が非常にスムーズです。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 2,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "4",
@@ -1249,16 +1510,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -1294,6 +1558,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "4",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "10",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -1309,11 +1585,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "その他",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "コスト削減",
@@ -1322,31 +1600,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者13",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "導入メリットが明確です。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 3,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "5",
@@ -1357,16 +1641,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -1402,6 +1689,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "1",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "10",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -1417,11 +1716,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "金融・保険",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "クラウド移行",
@@ -1430,31 +1731,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者14",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "操作が非常にスムーズです。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 3,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "5",
@@ -1465,16 +1772,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -1509,6 +1819,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "3",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "6",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -1524,11 +1846,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "製造業",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "AI活用",
@@ -1537,31 +1861,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者15",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "操作に慣れが必要です。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 4,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "2",
@@ -1572,16 +1902,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -1617,6 +1950,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "4",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "8",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -1632,11 +1977,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "小売・流通",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "コスト削減",
@@ -1645,31 +1992,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者16",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "概ね満足です。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 4,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "4",
@@ -1680,16 +2033,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -1726,6 +2082,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "4",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "7",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -1741,11 +2109,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "製造業",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "AI活用",
@@ -1754,31 +2124,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者17",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "導入メリットが明確です。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 4,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "3",
@@ -1789,16 +2165,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -1834,6 +2213,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "3",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "10",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -1849,11 +2240,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "製造業",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "クラウド移行",
@@ -1862,31 +2255,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者18",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "操作に慣れが必要です。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 1,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "1",
@@ -1897,16 +2296,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -1941,6 +2343,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "4",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "7",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -1956,11 +2370,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "製造業",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "DX推進",
@@ -1969,31 +2385,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者19",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "概ね満足です。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 5,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "4",
@@ -2004,16 +2426,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -2049,6 +2474,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "5",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "6",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -2064,11 +2501,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "その他",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "AI活用",
@@ -2077,31 +2516,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者20",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "操作に慣れが必要です。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 5,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "2",
@@ -2112,16 +2557,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -2157,6 +2605,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "1",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "5",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -2172,11 +2632,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "その他",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "セキュリティ強化",
@@ -2185,31 +2647,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者21",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "操作が非常にスムーズです。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 2,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "4",
@@ -2220,16 +2688,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -2266,6 +2737,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "5",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "8",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -2281,11 +2764,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "製造業",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "コスト削減",
@@ -2294,31 +2779,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者22",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "初期費用がネックです。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 3,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "1",
@@ -2329,16 +2820,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -2375,6 +2869,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "4",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "6",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -2390,11 +2896,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "金融・保険",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "クラウド移行",
@@ -2403,31 +2911,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者23",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "既存ツールとの競合が心配です。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 3,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "3",
@@ -2438,16 +2952,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -2484,6 +3001,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "3",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "8",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -2499,11 +3028,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "その他",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "クラウド移行",
@@ -2512,31 +3043,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者24",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "導入メリットが明確です。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 5,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "5",
@@ -2547,16 +3084,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -2593,6 +3133,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "3",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "10",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -2608,11 +3160,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "金融・保険",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "クラウド移行",
@@ -2621,31 +3175,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者25",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "導入メリットが明確です。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 5,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "3",
@@ -2656,16 +3216,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -2701,6 +3264,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "5",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "7",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -2716,11 +3291,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "その他",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "コスト削減",
@@ -2729,31 +3306,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者26",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "概ね満足です。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 5,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "4",
@@ -2764,16 +3347,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -2809,6 +3395,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "3",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "5",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -2824,11 +3422,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "金融・保険",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "DX推進",
@@ -2837,31 +3437,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者27",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "概ね満足です。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 2,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "2",
@@ -2872,16 +3478,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -2917,6 +3526,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "2",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "10",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -2932,11 +3553,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "金融・保険",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "クラウド移行",
@@ -2945,31 +3568,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者28",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "操作に慣れが必要です。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 5,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "1",
@@ -2980,16 +3609,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -3026,6 +3658,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "2",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "8",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -3041,11 +3685,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "その他",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "AI活用",
@@ -3054,31 +3700,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者29",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "資料を確認します。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 3,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "4",
@@ -3089,16 +3741,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -3134,6 +3789,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "5",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "3",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -3149,11 +3816,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "製造業",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "セキュリティ強化",
@@ -3162,31 +3831,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者30",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "初期費用がネックです。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 2,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "1",
@@ -3197,16 +3872,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -3242,6 +3920,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "4",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "2",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -3257,11 +3947,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "IT・情報通信",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "コスト削減",
@@ -3270,31 +3962,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者31",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "導入メリットが明確です。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 4,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "5",
@@ -3305,16 +4003,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -3350,6 +4051,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "5",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "3",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -3365,11 +4078,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "IT・情報通信",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "クラウド移行",
@@ -3378,31 +4093,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者32",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "初期費用がネックです。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 3,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "1",
@@ -3413,16 +4134,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -3457,6 +4181,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "5",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "8",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -3472,11 +4208,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "製造業",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "セキュリティ強化",
@@ -3485,31 +4223,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者33",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "初期費用がネックです。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 3,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "1",
@@ -3520,16 +4264,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -3565,6 +4312,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "4",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "9",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -3580,11 +4339,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "製造業",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "クラウド移行",
@@ -3593,31 +4354,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者34",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "概ね満足です。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 4,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "2",
@@ -3628,16 +4395,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -3673,6 +4443,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "5",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "7",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -3688,11 +4470,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "金融・保険",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "コスト削減",
@@ -3701,31 +4485,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者35",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "操作が非常にスムーズです。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 4,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "3",
@@ -3736,16 +4526,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -3781,6 +4574,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "4",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "3",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -3796,11 +4601,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "IT・情報通信",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "セキュリティ強化",
@@ -3809,31 +4616,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者36",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "導入メリットが明確です。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 1,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "5",
@@ -3844,16 +4657,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -3889,6 +4705,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "4",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "7",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -3904,11 +4732,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "その他",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "コスト削減",
@@ -3917,31 +4747,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者37",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "初期費用がネックです。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 3,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "2",
@@ -3952,16 +4788,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -3999,6 +4838,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "5",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "10",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -4014,11 +4865,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "IT・情報通信",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "クラウド移行",
@@ -4027,31 +4880,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者38",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "操作に慣れが必要です。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 4,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "2",
@@ -4062,16 +4921,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -4107,6 +4969,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "4",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "8",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -4122,11 +4996,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "その他",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "コスト削減",
@@ -4135,31 +5011,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者39",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "UIが洗練されています。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 4,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "5",
@@ -4170,16 +5052,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -4216,6 +5101,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "5",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "10",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -4231,11 +5128,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "その他",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "クラウド移行",
@@ -4244,31 +5143,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者40",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "操作に慣れが必要です。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 1,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "1",
@@ -4279,16 +5184,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -4325,6 +5233,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "4",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "10",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -4340,11 +5260,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "IT・情報通信",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "セキュリティ強化",
@@ -4353,31 +5275,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者41",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "既存ツールとの競合が心配です。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 5,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "2",
@@ -4388,16 +5316,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -4433,6 +5364,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "5",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "1",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -4448,11 +5391,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "金融・保険",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "セキュリティ強化",
@@ -4461,31 +5406,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者42",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "継続して検討します。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 2,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "2",
@@ -4496,16 +5447,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -4541,6 +5495,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "1",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "9",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -4556,11 +5522,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "その他",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "AI活用",
@@ -4569,31 +5537,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者43",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "操作が非常にスムーズです。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 4,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "3",
@@ -4604,16 +5578,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -4650,6 +5627,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "3",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "9",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -4665,11 +5654,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "その他",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "クラウド移行",
@@ -4678,31 +5669,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者44",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "導入メリットが明確です。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 5,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "3",
@@ -4713,16 +5710,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -4758,6 +5758,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "3",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "8",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -4773,11 +5785,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "IT・情報通信",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "AI活用",
@@ -4786,31 +5800,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者45",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "導入メリットが明確です。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 4,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "5",
@@ -4821,16 +5841,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -4867,6 +5890,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "2",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "6",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -4882,11 +5917,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "製造業",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "コスト削減",
@@ -4895,31 +5932,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者46",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "初期費用がネックです。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 5,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "1",
@@ -4930,16 +5973,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -4975,6 +6021,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "3",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "8",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -4990,11 +6048,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "その他",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "クラウド移行",
@@ -5003,31 +6063,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者47",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "UIが洗練されています。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 1,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "5",
@@ -5038,16 +6104,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -5084,6 +6153,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "2",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "4",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -5099,11 +6180,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "その他",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "コスト削減",
@@ -5112,31 +6195,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者48",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "初期費用がネックです。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 2,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "1",
@@ -5147,16 +6236,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -5192,6 +6284,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "3",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "7",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -5207,11 +6311,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "小売・流通",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "AI活用",
@@ -5220,31 +6326,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者49",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "初期費用がネックです。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 3,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "2",
@@ -5255,16 +6367,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -5300,6 +6415,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "4",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "7",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -5315,11 +6442,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "IT・情報通信",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "AI活用",
@@ -5328,31 +6457,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者50",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "初期費用がネックです。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 4,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "1",
@@ -5363,16 +6498,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -5408,6 +6546,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "4",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "10",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -5423,11 +6573,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "IT・情報通信",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "AI活用",
@@ -5436,31 +6588,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者51",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "UIが洗練されています。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 1,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "4",
@@ -5471,16 +6629,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -5518,6 +6679,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "4",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "10",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
@@ -5533,11 +6706,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "製造業",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "AI活用",
@@ -5546,31 +6721,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者52",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "操作が非常にスムーズです。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 1,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "3",
@@ -5581,16 +6762,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -5629,6 +6813,18 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "3",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "6",
+        "type": "rating_scale"
+      },
+      {
         "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
@@ -5642,11 +6838,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "製造業",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "AI活用",
@@ -5655,31 +6853,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者53",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "操作に慣れが必要です。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 4,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "2",
@@ -5690,16 +6894,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -5736,6 +6943,18 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "3",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "8",
+        "type": "rating_scale"
+      },
+      {
         "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
@@ -5749,11 +6968,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "IT・情報通信",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "AI活用",
@@ -5762,31 +6983,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者54",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "概ね満足です。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 3,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "3",
@@ -5797,16 +7024,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -5845,6 +7075,18 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "5",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "4",
+        "type": "rating_scale"
+      },
+      {
         "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
@@ -5858,11 +7100,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "小売・流通",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "セキュリティ強化",
@@ -5871,31 +7115,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者55",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "導入メリットが明確です。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 2,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "4",
@@ -5906,16 +7156,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -5953,6 +7206,18 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "4",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "10",
+        "type": "rating_scale"
+      },
+      {
         "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
@@ -5966,11 +7231,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "小売・流通",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "DX推進",
@@ -5979,31 +7246,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者56",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "操作が非常にスムーズです。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 2,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "5",
@@ -6014,16 +7287,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -6063,6 +7339,18 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "4",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "10",
+        "type": "rating_scale"
+      },
+      {
         "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
@@ -6076,11 +7364,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "金融・保険",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "セキュリティ強化",
@@ -6089,31 +7379,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者57",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "初期費用がネックです。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 5,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "1",
@@ -6124,16 +7420,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -6172,6 +7471,18 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "3",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "6",
+        "type": "rating_scale"
+      },
+      {
         "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
@@ -6185,11 +7496,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "製造業",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "セキュリティ強化",
@@ -6198,31 +7511,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者58",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "導入メリットが明確です。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 5,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "5",
@@ -6233,16 +7552,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -6281,6 +7603,18 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "5",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "8",
+        "type": "rating_scale"
+      },
+      {
         "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
@@ -6294,11 +7628,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "IT・情報通信",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "クラウド移行",
@@ -6307,31 +7643,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者59",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "UIが洗練されています。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 5,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "4",
@@ -6342,16 +7684,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -6390,6 +7735,18 @@
         "type": "matrix_ma"
       },
       {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "3",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "8",
+        "type": "rating_scale"
+      },
+      {
         "id": "Q15",
         "question": "※入力完了後、送信ボタンを押してください",
         "answer": null,
@@ -6403,11 +7760,13 @@
     "answeredAt": "2026-01-10 10:00:00",
     "details": [
       {
+        "id": "Q1",
         "question": "ご所属の業界",
         "answer": "製造業",
         "type": "single_choice"
       },
       {
+        "id": "Q2",
         "question": "興味のあるソリューション (複数回答)",
         "answer": [
           "DX推進",
@@ -6416,31 +7775,37 @@
         "type": "multi_choice"
       },
       {
+        "id": "Q3",
         "question": "担当者名",
         "answer": "テスト 利用者60",
         "type": "text"
       },
       {
+        "id": "Q4",
         "question": "具体的なお悩み・ご要望",
         "answer": "操作に慣れが必要です。",
         "type": "free_text"
       },
       {
+        "id": "Q5",
         "question": "来場人数",
         "answer": 4,
         "type": "number"
       },
       {
+        "id": "Q6",
         "question": "次回商談希望日",
         "answer": "2026-02-15",
         "type": "date"
       },
       {
+        "id": "Q7",
         "question": "連絡希望時間帯",
         "answer": "14:00",
         "type": "time"
       },
       {
+        "id": "Q8",
         "question": "製品満足度詳細",
         "answer": {
           "r1": "1",
@@ -6451,16 +7816,19 @@
         "type": "matrix_sa"
       },
       {
+        "id": "Q9",
         "question": "承諾の署名",
         "answer": "../media/hanko.png",
         "type": "handwriting"
       },
       {
+        "id": "Q10",
         "question": "現場の状況写真",
         "answer": "../media/縦表 .png",
         "type": "image"
       },
       {
+        "id": "Q11",
         "question": "評価マトリクス(MA)",
         "answer": {
           "r1": [
@@ -6497,6 +7865,18 @@
           ]
         },
         "type": "matrix_ma"
+      },
+      {
+        "id": "Q12",
+        "question": "総合満足度",
+        "answer": "4",
+        "type": "rating_scale"
+      },
+      {
+        "id": "Q16",
+        "question": "知人・同僚へのご推薦度",
+        "answer": "4",
+        "type": "rating_scale"
       },
       {
         "id": "Q15",
