@@ -16,7 +16,7 @@ last_reviewed: 2026-04-07
 
 | 項目 | 値 |
 | :--- | :--- |
-| 区分 | 利用者向け / 管理者向け / 初回ログイン / モーダル / 法務・ヘルプ / 旧・サンプル |
+| 区分 | 公開/ログイン前 / 利用者向け / 管理者向け / 初回ログイン / モーダル / 法務・ヘルプ / 旧・サンプル |
 | 仕様状態 | 正本あり / 補足仕様あり / 旧資料のみ / 未確認 |
 | 実装状態 | HTMLあり / モックあり / Moved/旧導線 / 共通部品 / 未確認 |
 | 設計確認 | 画面責務、導線、関連画面との境界、現行採用ページなど、サービス設計上の確認事項 |
@@ -25,6 +25,9 @@ last_reviewed: 2026-04-07
 
 | No | 区分 | 画面名 | 現行HTML/導線 | 関連仕様 | 仕様状態 | 実装状態 | 設計確認 | 備考 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| P-01 | 公開/ログイン前 | お客様のお声 一覧 | `customer-voices/index.html`, `index.html` から導線追加 | `19_customer_voice_public_pages.md` | 正本あり | HTMLあり | ログイン前トップからの信頼補強導線として、一覧から各詳細へ分岐する責務を整理する | `data/customer-voices.json` を参照 |
+| P-02 | 公開/ログイン前 | お客様のお声 詳細（モニター企業） | `customer-voices/company-monitor.html`, `customer-voices/index.html` から遷移 | `19_customer_voice_public_pages.md` | 正本あり | HTMLあり | 先行利用モニター企業の利用価値を、課題・運用・変化の流れで伝える | 匿名化前提 |
+| P-03 | 公開/ログイン前 | お客様のお声 詳細（大学） | `customer-voices/university-survey.html`, `customer-voices/index.html` から遷移 | `19_customer_voice_public_pages.md` | 正本あり | HTMLあり | アンケート単機能利用でも成立する導入イメージを伝える | 匿名化前提 |
 | U-01 | 利用者向け | アンケート一覧 | `02_dashboard/index.html` | `00_screen_requirements.md`, `12_dashboard_current_functional_requirements.md` | 正本あり | HTMLあり | ダッシュボードの中心画面として、一覧・詳細モーダル・作成入口・ダウンロード導線の責務を整理する |  |
 | U-02 | 利用者向け | アンケート作成・編集 | `02_dashboard/surveyCreation.html`, `02_dashboard/surveyCreation-v2.html` | `01_*`, `02_*` survey creation 系仕様 | 正本あり | HTMLあり | v1/v2の現行採用関係を明記する | 仕様ファイルが複数あるため参照先整理対象 |
 | U-03 | 利用者向け | アンケート回答 | `02_dashboard/survey-answer.html` | `13_survey_answer_screen.md` | 正本あり | HTMLあり | 回答送信後の完了画面導線との接続を確認する | 旧一覧の `/questionnaire_answer` 相当 |
