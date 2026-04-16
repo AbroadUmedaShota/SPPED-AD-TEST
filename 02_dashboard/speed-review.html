@@ -258,7 +258,7 @@
                                         <h3 class="text-sm font-medium text-on-surface-variant">回答内容の内訳</h3>
                                         <div id="matrix-controls-container"></div>
                                     </div>
-                                    <div class="relative min-h-[180px] w-full flex justify-center flex-1">
+                                    <div class="relative min-h-[180px] w-full flex justify-center flex-1 overflow-hidden">
                                         <canvas id="attributeChart"></canvas>
                                         <div id="attributeChartApex" class="w-full"></div>
                                     </div>
@@ -513,7 +513,7 @@
                 labels: chartLabels,
                 chart: {
                     type: 'donut',
-                    height: 250,
+                    height: 220,
                 },
                 plotOptions: {
                     pie: {
@@ -530,7 +530,10 @@
                     }
                 },
                 legend: {
-                    position: 'right',
+                    position: 'bottom',
+                    fontSize: '12px',
+                    labels: { colors: '#6b7280' },
+                    itemMargin: { horizontal: 6, vertical: 2 },
                 },
                 tooltip: {
                     y: {

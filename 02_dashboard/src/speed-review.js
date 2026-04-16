@@ -2618,10 +2618,6 @@ function renderAttributeChart(data) {
         }
 
         clearEmptyState();
-        canvas.style.display = 'none';
-        apexContainer.style.display = 'block';
-        apexContainer.classList.remove('hidden');
-        canvas.classList.add('hidden');
 
         if (attributeChart) {
             attributeChart.destroy();
@@ -2631,6 +2627,12 @@ function renderAttributeChart(data) {
             apexAttributeChart.destroy();
             apexAttributeChart = null;
         }
+
+        canvas.style.display = 'none';
+        canvas.classList.add('hidden');
+        apexContainer.style.display = 'block';
+        apexContainer.classList.remove('hidden');
+
         if (typeof renderMatrixChartApex === 'function') {
             apexAttributeChart = renderMatrixChartApex('attributeChartApex', questionDef, data || [], currentMatrixRowId, COMMON_CHART_DONUT_PALETTE) || null;
         } else {
@@ -2643,19 +2645,20 @@ function renderAttributeChart(data) {
     if (questionDef.type === 'rating_scale') {
         const summary = buildRatingScaleSummary(questionDef, data || []);
         clearEmptyState();
-        canvas.style.display = 'none';
-        canvas.classList.add('hidden');
-        apexContainer.style.display = 'block';
-        apexContainer.classList.remove('hidden');
 
-        if (apexAttributeChart) {
-            apexAttributeChart.destroy();
-            apexAttributeChart = null;
-        }
         if (attributeChart) {
             attributeChart.destroy();
             attributeChart = null;
         }
+        if (apexAttributeChart) {
+            apexAttributeChart.destroy();
+            apexAttributeChart = null;
+        }
+
+        canvas.style.display = 'none';
+        canvas.classList.add('hidden');
+        apexContainer.style.display = 'block';
+        apexContainer.classList.remove('hidden');
 
         if (summary.totalAnswers === 0) {
             renderEmptyState('回答を待っています...', 'hourglass_empty');
