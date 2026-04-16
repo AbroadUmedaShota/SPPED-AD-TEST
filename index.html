@@ -6,6 +6,7 @@
   <meta name="description" content="SPEED AD - イベント運営と広告展開を支援するWEBソリューション向けログイン/サインアップページ">
   <meta name="keywords" content="ログイン, サインアップ, SPEED AD, イベント, 広告, セミナー">
   <title>SPEED-AD - ログイン</title>
+  <link rel="icon" href="img/logo2.svg" type="image/svg+xml">
   <link rel="stylesheet" href="css/page.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/2.9.7/jquery.fullpage.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -536,6 +537,213 @@
       color: rgba(255,255,255,0.7);
       font-size: 0.8rem;
     }
+    .hero-secondary-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--spacing-2);
+      margin-top: var(--spacing-6);
+      padding: var(--spacing-3) var(--spacing-5);
+      border: 1px solid rgba(255, 255, 255, 0.34);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+      backdrop-filter: blur(8px);
+    }
+    .hero-secondary-cta:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.68);
+      background: rgba(255, 255, 255, 0.16);
+    }
+    .hero-secondary-cta::after {
+      content: '→';
+      font-size: 1rem;
+    }
+    .voice-teaser-section {
+      background:
+        radial-gradient(circle at top left, rgba(76, 201, 240, 0.16), transparent 28%),
+        linear-gradient(135deg, #f8f7f2 0%, #f0efe6 52%, #ebe5da 100%);
+    }
+    .voice-teaser-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-8);
+      padding: min(8vh, 64px) min(6vw, 64px);
+    }
+    .voice-teaser__intro {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: var(--spacing-6);
+      flex-wrap: wrap;
+    }
+    .voice-teaser__kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--spacing-2);
+      margin: 0 0 var(--spacing-3);
+      color: #365e92;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+    .voice-teaser__kicker::before {
+      content: '';
+      width: 40px;
+      height: 1px;
+      background: rgba(54, 94, 146, 0.52);
+    }
+    .voice-teaser__title {
+      margin: 0;
+      color: #122033;
+      font-size: clamp(2rem, 4vw, 3.4rem);
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+    }
+    .voice-teaser__description {
+      max-width: 560px;
+      margin: var(--spacing-4) 0 0;
+      color: #4b5a70;
+      line-height: 1.9;
+      font-size: 0.98rem;
+    }
+    .voice-teaser__status {
+      margin: 0;
+      padding: var(--spacing-2) var(--spacing-4);
+      border-radius: 999px;
+      background: rgba(18, 32, 51, 0.06);
+      color: #32445f;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+    .voice-teaser__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: var(--spacing-5);
+    }
+    .voice-teaser-card {
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+      overflow: hidden;
+      border: 1px solid rgba(18, 32, 51, 0.08);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.88);
+      box-shadow: 0 22px 48px rgba(28, 37, 64, 0.08);
+    }
+    .voice-teaser-card__media {
+      position: relative;
+      height: 220px;
+      overflow: hidden;
+    }
+    .voice-teaser-card__media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .voice-teaser-card__media::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 10%, rgba(12, 18, 36, 0.48));
+    }
+    .voice-teaser-card__body {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      gap: var(--spacing-4);
+      padding: var(--spacing-6);
+    }
+    .voice-teaser-card__label-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-2);
+      align-items: center;
+    }
+    .voice-teaser-card__label {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 0 var(--spacing-3);
+      border-radius: 999px;
+      background: rgba(123, 44, 191, 0.08);
+      color: #5a189a;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+    .voice-teaser-card__title {
+      margin: 0;
+      color: #111827;
+      font-size: 1.45rem;
+      line-height: 1.2;
+      letter-spacing: -0.03em;
+    }
+    .voice-teaser-card__summary {
+      margin: 0;
+      color: #4b5563;
+      font-size: 0.95rem;
+      line-height: 1.8;
+    }
+    .voice-teaser-card__features {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-2);
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .voice-teaser-card__features li {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      padding: 0 var(--spacing-3);
+      border-radius: 999px;
+      border: 1px solid rgba(17, 24, 39, 0.08);
+      background: rgba(248, 250, 252, 0.94);
+      color: #1f2937;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+    .voice-teaser__empty {
+      margin: 0;
+      padding: var(--spacing-8);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.72);
+      color: #4b5563;
+      text-align: center;
+      font-weight: 600;
+    }
+    .voice-teaser__actions {
+      display: flex;
+      justify-content: flex-start;
+    }
+    .voice-teaser__link {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--spacing-2);
+      min-height: 50px;
+      padding: 0 var(--spacing-6);
+      border-radius: 999px;
+      background: linear-gradient(135deg, #122033, #22426c);
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      box-shadow: 0 18px 40px rgba(18, 32, 51, 0.2);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .voice-teaser__link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 22px 44px rgba(18, 32, 51, 0.26);
+    }
+    .voice-teaser__link::after {
+      content: '→';
+    }
     /*
       -- Modal Styles (BEM) --
       モーダルウィンドウのスタイル
@@ -956,6 +1164,7 @@
       <h1><img src="img/logo.svg" alt="SPEED-AD"><span>～スピード アド～</span></h1>
       <p>SPEED ADは、展示会やセミナーなどのイベント向けソリューションです。<br>
         無料のWEBアンケート作成、名刺のデータ化、御礼メールの送信を一気通貫で提供し、獲得したリードの有効活用をワンストップで実現します</p>
+      <a class="hero-secondary-cta" href="customer-voices/index.html">お客様のお声を見る</a>
     </div>
     <div id="input-box" class="form-container">
       <h1 class="form-container__title">SPEED AD ログイン</h1>
@@ -1149,7 +1358,28 @@
         </div>
       </article>
     </div>
-    <div class="section" id="section6">
+    <div class="section voice-teaser-section" id="section6">
+      <article class="voice-teaser-wrap">
+        <div class="voice-teaser__intro">
+          <div>
+            <p class="voice-teaser__kicker">Customer Voices</p>
+            <h2 class="voice-teaser__title">お客様のお声</h2>
+            <p class="voice-teaser__description">
+              先行利用モニター企業と、アンケート機能のみを利用した大学の2事例を公開しています。
+              導入前の課題から、実際の運用イメージ、導入後の変化までを短く整理した信頼補強用のページです。
+            </p>
+          </div>
+          <p class="voice-teaser__status" id="customer-voice-teaser-status">読み込み中</p>
+        </div>
+        <div class="voice-teaser__grid" id="customer-voice-teaser-grid">
+          <p class="voice-teaser__empty">公開事例を読み込んでいます。</p>
+        </div>
+        <div class="voice-teaser__actions">
+          <a class="voice-teaser__link" href="customer-voices/index.html">詳細を見る</a>
+        </div>
+      </article>
+    </div>
+    <div class="section" id="section7">
       <article class="tate">
         <div class="no-flex white">
           <h2>当社で提供するその他のサービス</h2>
@@ -1174,6 +1404,7 @@
         <h3>SPEED-ADについて</h3>
         <p><a href="index.html">無料ではじめる</a></p>
         <p><a href="index.html#top">ログイン</a></p>
+        <p><a href="customer-voices/index.html">お客様のお声</a></p>
         <p><a href="index.html">お問い合わせ</a></p>
         <p><a href="https://support.speed-ad.com/help/" target="_blank" rel="noopener noreferrer">ヘルプ</a></p>
       </li>
@@ -1274,6 +1505,8 @@
       const termsAgreeError = document.getElementById('terms-agree-error');
       const signupAccountButton = signupForm.querySelector('.button--filled');
       const googleButtonModal = modalContent.querySelector('.button--google');
+      const customerVoiceTeaserGrid = document.getElementById('customer-voice-teaser-grid');
+      const customerVoiceTeaserStatus = document.getElementById('customer-voice-teaser-status');
       function resolveAppPath(relativePath) {
         if (!relativePath) {
           return relativePath;
@@ -1288,6 +1521,71 @@
           }
         }
         return `${basePath}${relativePath}`;
+      }
+      function escapeHtml(value) {
+        return String(value ?? '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+      async function loadCustomerVoiceTeasers() {
+        if (!customerVoiceTeaserGrid || !customerVoiceTeaserStatus) {
+          return;
+        }
+        try {
+          const response = await fetch(resolveAppPath('data/customer-voices.json'));
+          if (!response.ok) {
+            throw new Error(`Failed to load customer voices: ${response.status}`);
+          }
+          const payload = await response.json();
+          const voices = Array.isArray(payload?.voices)
+            ? payload.voices.filter((voice) => voice?.publishStatus === 'published').slice(0, 2)
+            : [];
+          customerVoiceTeaserStatus.textContent = voices.length ? `${voices.length}件の公開事例` : '公開準備中';
+          if (!voices.length) {
+            customerVoiceTeaserGrid.innerHTML = '<p class="voice-teaser__empty">公開準備中です。詳細ページは後日追加されます。</p>';
+            return;
+          }
+          customerVoiceTeaserGrid.innerHTML = voices.map((voice) => {
+            const features = Array.isArray(voice.usedFeatures) ? voice.usedFeatures.slice(0, 3) : [];
+            const featureList = features.length
+              ? `<ul class="voice-teaser-card__features">${features.map((feature) => `<li>${escapeHtml(feature)}</li>`).join('')}</ul>`
+              : '';
+            return `
+              <article class="voice-teaser-card">
+                <div class="voice-teaser-card__media">
+                  <img src="${resolveAppPath(voice.heroImage || 'img/top-kv.jpg')}" alt="${escapeHtml(voice.label)}のイメージ">
+                </div>
+                <div class="voice-teaser-card__body">
+                  <div class="voice-teaser-card__label-row">
+                    <span class="voice-teaser-card__label">${escapeHtml(voice.organizationType || '導入事例')}</span>
+                    <span class="voice-teaser-card__label">導入事例</span>
+                  </div>
+                  <h3 class="voice-teaser-card__title">${escapeHtml(voice.label)}</h3>
+                  <p class="voice-teaser-card__summary">${escapeHtml(voice.listingSummary || '')}</p>
+                  ${featureList}
+                </div>
+              </article>
+            `;
+          }).join('');
+        } catch (error) {
+          console.warn('お客様のお声の読み込みに失敗しました:', error);
+          customerVoiceTeaserStatus.textContent = '読み込み失敗';
+          customerVoiceTeaserGrid.innerHTML = '<p class="voice-teaser__empty">公開事例を読み込めませんでした。時間をおいて再度お試しください。</p>';
+        }
+      }
+      function maybeOpenSignupFromIntent() {
+        const searchParams = new URLSearchParams(window.location.search);
+        if (searchParams.get('intent') !== 'signup') {
+          return;
+        }
+        showModal();
+        searchParams.delete('intent');
+        const queryString = searchParams.toString();
+        const nextUrl = `${window.location.pathname}${queryString ? `?${queryString}` : ''}${window.location.hash || '#top'}`;
+        window.history.replaceState({}, document.title, nextUrl);
       }
       // --- シナリオアカウントのクリック処理 ---
       const scenarioLinks = document.querySelectorAll('.scenario-accounts__link');
@@ -1316,10 +1614,6 @@
         setTimeout(() => {
           if (signupNameInput) {
             signupNameInput.focus();
-            // フォーカスが当たったか確認し、当たっていなければログを出す
-            if (document.activeElement !== signupNameInput) {
-                console.warn('Focus did not land on signupNameInput as expected.');
-            }
           }
         }, 100); // 100msの遅延
       }
@@ -1616,6 +1910,8 @@
             }
         }
       });
+      loadCustomerVoiceTeasers();
+      maybeOpenSignupFromIntent();
     });
   </script>
 
@@ -1625,11 +1921,11 @@
     $(document).ready(function() {
       if(typeof $.fn.fullpage !== 'undefined') {
         $('#fullpage').fullpage({
-          anchors: ['top', 'contents1', 'contents2', 'contents3', 'contents4', 'contents5', 'contents6'],
+          anchors: ['top', 'contents1', 'contents2', 'contents3', 'contents4', 'contents5', 'voices', 'contents6'],
           navigation: true,
           navigationPosition: 'right',
           responsiveWidth: 1024,
-          scrollOverflow: true,
+          scrollOverflow: false,
           autoScrolling: true,
           scrollingSpeed: 700,
           fitToSection: true,
