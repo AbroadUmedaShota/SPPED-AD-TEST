@@ -1302,22 +1302,32 @@ function buildRatingScaleSection(q, typeLabel) {
   function buildPreview() {
     previewWrap.innerHTML = '';
     const pts = cfg.points || 5;
-    const dots = el('div', { class: 'flex items-center justify-between gap-1' });
+    const minText = cfg.minLabel?.[currentLangs[0]] || '低い';
+    const maxText = cfg.maxLabel?.[currentLangs[0]] || '高い';
+    const midText = cfg.showMidLabel ? (cfg.midLabel?.[currentLangs[0]] || 'どちらでもない') : '';
+
+    // メイン行（左ラベル + ラジオ群 + 右ラベル）
+    const mainRow = el('div', { class: 'flex items-start gap-3' });
+
+    const leftLabel = el('span', { class: 'text-xs text-gray-500 font-medium pt-0.5 shrink-0 max-w-[60px] leading-snug' }, minText);
+
+    const radioGroup = el('div', { class: 'flex items-start justify-between flex-1' });
     for (let i = 1; i <= pts; i++) {
-      const dot = el('div', {
-        class: 'flex flex-col items-center gap-1 flex-1'
-      },
-        el('div', { class: 'w-8 h-8 rounded-full border-2 border-gray-300 bg-gray-50 flex items-center justify-center text-xs font-bold text-gray-500' }, String(i)),
-        el('span', { class: 'text-[10px] text-gray-300' }, String(i))
+      const item = el('div', { class: 'flex flex-col items-center gap-1' },
+        el('div', { class: 'w-5 h-5 rounded-full border-2 border-gray-300 bg-white' }),
+        el('span', { class: 'text-[10px] text-gray-500 font-medium' }, String(i))
       );
-      dots.appendChild(dot);
+      radioGroup.appendChild(item);
     }
-    const labelsRow = el('div', { class: 'flex justify-between text-[11px] text-gray-400 font-semibold mt-1 px-1' },
-      el('span', { class: 'max-w-[40%] text-left truncate text-primary/70' }, cfg.minLabel?.[currentLangs[0]] || '低い'),
-      ...(cfg.showMidLabel ? [el('span', { class: 'max-w-[20%] text-center truncate text-gray-400' }, cfg.midLabel?.[currentLangs[0]] || 'どちらでもない')] : []),
-      el('span', { class: 'max-w-[40%] text-right truncate text-primary/70' }, cfg.maxLabel?.[currentLangs[0]] || '高い')
-    );
-    previewWrap.append(dots, labelsRow);
+
+    const rightLabel = el('span', { class: 'text-xs text-gray-500 font-medium pt-0.5 shrink-0 max-w-[60px] leading-snug text-right' }, maxText);
+
+    mainRow.append(leftLabel, radioGroup, rightLabel);
+    previewWrap.appendChild(mainRow);
+
+    if (midText) {
+      previewWrap.appendChild(el('div', { class: 'text-center text-[10px] text-gray-400 font-medium mt-1' }, midText));
+    }
   }
   buildPreview();
   section.appendChild(previewWrap);
@@ -1330,9 +1340,10 @@ function buildRatingScaleSection(q, typeLabel) {
   const CLASS_ACTIVE   = 'px-3 py-1.5 rounded-lg border text-sm font-bold transition-colors bg-primary text-white border-primary shadow';
   const CLASS_INACTIVE = 'px-3 py-1.5 rounded-lg border text-sm font-bold transition-colors bg-white border-gray-200 text-gray-600 hover:border-primary hover:text-primary';
 
-  // 固定チップ: 3・4
+  // 固定チップ: 3・4・5（5段階がデフォルト）
+  const FIXED_POINTS = [3, 4, 5];
   const fixedChips = [];
-  [3, 4].forEach(n => {
+  FIXED_POINTS.forEach(n => {
     const btn = el('button', {
       type: 'button',
       class: cfg.points === n ? CLASS_ACTIVE : CLASS_INACTIVE,
@@ -1346,22 +1357,23 @@ function buildRatingScaleSection(q, typeLabel) {
     pointsBtns.appendChild(btn);
   });
 
-  // 5〜10 用の手入力エリア（チップ風ラッパー）
+  // カスタム入力（6〜10段階）
+  const isCustom = cfg.points >= 6;
   const nChipWrap = el('div', {
-    class: `flex items-center gap-1 px-2 py-1 rounded-lg border text-sm font-bold transition-colors cursor-default ${cfg.points >= 5 ? 'border-primary bg-primary/5 text-primary' : 'border-gray-200 bg-white text-gray-600'}`,
-    title: '5〜10段階を手入力で指定'
+    class: `flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm font-bold transition-colors cursor-default ${isCustom ? 'border-primary bg-primary/5 text-primary' : 'border-gray-200 bg-white text-gray-600 hover:border-primary hover:text-primary'}`,
+    title: '6〜10段階を手入力で指定'
   });
   const nInput = el('input', {
     type: 'number',
-    min: '5',
+    min: '6',
     max: '10',
-    value: String(cfg.points >= 5 ? cfg.points : 5),
-    class: 'w-10 text-center bg-transparent border-none outline-none font-bold text-sm [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
-    'aria-label': 'N段階（5〜10）',
+    value: String(cfg.points >= 6 ? cfg.points : 6),
+    class: 'w-8 text-center bg-transparent border-none outline-none font-bold text-sm [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
+    'aria-label': 'カスタム段階数（6〜10）',
   });
   nInput.addEventListener('input', () => {
     let v = parseInt(nInput.value, 10);
-    if (isNaN(v) || v < 5) v = 5;
+    if (isNaN(v) || v < 6) v = 6;
     if (v > 10) v = 10;
     nInput.value = String(v);
     cfg.points = v;
@@ -1369,19 +1381,19 @@ function buildRatingScaleSection(q, typeLabel) {
     buildPreview();
   });
   nInput.addEventListener('focus', () => {
-    cfg.points = parseInt(nInput.value, 10) || 5;
+    cfg.points = parseInt(nInput.value, 10) || 6;
     syncPointsUI();
     buildPreview();
   });
-  nChipWrap.append(nInput, el('span', {}, 'N段階'));
+  nChipWrap.append(el('span', { class: 'text-xs' }, 'カスタム'), nInput, el('span', {}, '段階'));
   pointsBtns.appendChild(nChipWrap);
 
   function syncPointsUI() {
     fixedChips.forEach((btn, i) => {
-      btn.className = cfg.points === [3, 4][i] ? CLASS_ACTIVE : CLASS_INACTIVE;
+      btn.className = cfg.points === FIXED_POINTS[i] ? CLASS_ACTIVE : CLASS_INACTIVE;
     });
-    const isN = cfg.points >= 5;
-    nChipWrap.className = `flex items-center gap-1 px-2 py-1 rounded-lg border text-sm font-bold transition-colors cursor-default ${isN ? 'border-primary bg-primary/5 text-primary' : 'border-gray-200 bg-white text-gray-600'}`;
+    const isN = cfg.points >= 6;
+    nChipWrap.className = `flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm font-bold transition-colors cursor-default ${isN ? 'border-primary bg-primary/5 text-primary' : 'border-gray-200 bg-white text-gray-600 hover:border-primary hover:text-primary'}`;
     if (isN && parseInt(nInput.value, 10) !== cfg.points) nInput.value = String(cfg.points);
   }
 

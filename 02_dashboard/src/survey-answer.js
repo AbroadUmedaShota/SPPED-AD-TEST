@@ -1222,6 +1222,7 @@ function populateFormWithDraft() {
                 elements.forEach(el => {
                     if (el.value === answer) {
                         el.checked = true;
+                        el.dispatchEvent(new Event('change', { bubbles: true }));
                     }
                 });
             } else if (elements[0].type === 'checkbox') {
@@ -1460,60 +1461,97 @@ function createQuestionElement(question, index) {
             const rsMaxLabel = resolveSurveyText(rsCfg.maxLabel) || '';
             const rsShowMid = !!rsCfg.showMidLabel;
             const rsMidLabel = rsShowMid ? (resolveSurveyText(rsCfg.midLabel) || '') : '';
+            const rsMidIndex = Math.ceil(rsPoints / 2); // 中間ポイントのインデックス
 
-            // 隠しフィールド（回答値保持）
-            const rsHidden = document.createElement('input');
-            rsHidden.type = 'hidden';
-            rsHidden.name = question.id;
-            rsHidden.value = '';
-            controlArea.appendChild(rsHidden);
+            // 外枠コンテナ
+            const rsContainer = document.createElement('div');
+            rsContainer.className = 'border border-gray-200 rounded-xl px-4 py-5 sm:px-6';
 
-            // ボタン行
-            const rsBtnRow = document.createElement('div');
-            rsBtnRow.className = 'flex items-center gap-1.5 sm:gap-2';
+            // メイン行（左ラベル + ラジオ群 + 右ラベル）
+            const rsMainRow = document.createElement('div');
+            rsMainRow.className = 'flex items-start gap-3 sm:gap-4';
+
+            // 左ラベル
+            const rsLeftLabel = document.createElement('span');
+            rsLeftLabel.className = 'text-xs sm:text-sm text-gray-500 font-medium pt-1 shrink-0 max-w-[60px] sm:max-w-[80px] leading-snug';
+            rsLeftLabel.textContent = rsMinLabel;
+
+            // ラジオボタン群
+            const rsRadioGroup = document.createElement('div');
+            rsRadioGroup.className = 'flex items-start justify-between flex-1';
+
+            // 中間ラベル表示エリア（常時表示）
+            let rsMidDisplay = null;
+            if (rsShowMid && rsMidLabel) {
+                rsMidDisplay = document.createElement('div');
+                rsMidDisplay.className = 'text-center text-xs text-gray-400 font-medium mt-2';
+                rsMidDisplay.textContent = rsMidLabel;
+            }
+
 
             for (let i = 1; i <= rsPoints; i++) {
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.textContent = String(i);
-                btn.dataset.value = String(i);
-                btn.className = 'flex-1 h-10 sm:h-11 rounded-xl border-2 border-gray-300 bg-white text-sm font-bold text-gray-500 transition-all hover:border-primary hover:text-primary hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-primary/40';
-                btn.addEventListener('click', () => {
-                    rsHidden.value = btn.dataset.value;
-                    rsBtnRow.querySelectorAll('button').forEach(b => {
-                        const selected = b === btn;
-                        b.className = selected
-                            ? 'flex-1 h-10 sm:h-11 rounded-xl border-2 border-primary bg-primary text-white text-sm font-bold shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-primary/40'
-                            : 'flex-1 h-10 sm:h-11 rounded-xl border-2 border-gray-300 bg-white text-sm font-bold text-gray-500 transition-all hover:border-primary hover:text-primary hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-primary/40';
+                const label = document.createElement('label');
+                label.className = 'flex flex-col items-center gap-1.5 cursor-pointer group';
+
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = question.id;
+                radio.value = String(i);
+                radio.className = 'sr-only peer';
+
+                // カスタムラジオ円
+                const circle = document.createElement('span');
+                circle.className = 'w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 border-gray-300 transition-all flex items-center justify-center group-hover:border-primary peer-checked:border-primary peer-checked:bg-white peer-focus-visible:ring-2 peer-focus-visible:ring-primary/40';
+
+                // 内側の塗りつぶし丸
+                const innerDot = document.createElement('span');
+                innerDot.className = 'w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-primary scale-0 transition-transform peer-checked:scale-100';
+
+                circle.appendChild(innerDot);
+
+                // 番号テキスト
+                const numText = document.createElement('span');
+                numText.className = 'text-xs sm:text-sm text-gray-500 font-medium';
+                numText.textContent = String(i);
+
+                label.append(radio, circle, numText);
+
+                // peer-checked CSS がネイティブで動かない場合のフォールバック（JS制御）
+                radio.addEventListener('change', () => {
+                    rsRadioGroup.querySelectorAll('label').forEach(lbl => {
+                        const r = lbl.querySelector('input[type="radio"]');
+                        const c = lbl.querySelector('span:first-of-type');
+                        const d = c?.querySelector('span');
+                        if (r && r.checked) {
+                            c.classList.remove('border-gray-300');
+                            c.classList.add('border-primary');
+                            if (d) { d.classList.remove('scale-0'); d.classList.add('scale-100'); }
+                        } else {
+                            c.classList.add('border-gray-300');
+                            c.classList.remove('border-primary');
+                            if (d) { d.classList.add('scale-0'); d.classList.remove('scale-100'); }
+                        }
                     });
                 });
-                rsBtnRow.appendChild(btn);
+
+                rsRadioGroup.appendChild(label);
             }
-            controlArea.appendChild(rsBtnRow);
 
-            // 端ラベル行
-            if (rsMinLabel || rsMaxLabel || rsShowMid) {
-                const rsLabelRow = document.createElement('div');
-                rsLabelRow.className = 'flex items-start justify-between text-xs text-gray-400 font-semibold mt-1 px-0.5';
+            // 右ラベル
+            const rsRightLabel = document.createElement('span');
+            rsRightLabel.className = 'text-xs sm:text-sm text-gray-500 font-medium pt-1 shrink-0 max-w-[60px] sm:max-w-[80px] leading-snug text-right';
+            rsRightLabel.textContent = rsMaxLabel;
 
-                const rsLeft = document.createElement('span');
-                rsLeft.className = 'max-w-[38%] text-left leading-snug';
-                rsLeft.textContent = rsMinLabel;
+            rsMainRow.append(rsLeftLabel, rsRadioGroup, rsRightLabel);
+            rsContainer.appendChild(rsMainRow);
 
-                const rsRight = document.createElement('span');
-                rsRight.className = 'max-w-[38%] text-right leading-snug';
-                rsRight.textContent = rsMaxLabel;
-
-                if (rsShowMid && rsMidLabel) {
-                    const rsMid = document.createElement('span');
-                    rsMid.className = 'max-w-[24%] text-center leading-snug';
-                    rsMid.textContent = rsMidLabel;
-                    rsLabelRow.append(rsLeft, rsMid, rsRight);
-                } else {
-                    rsLabelRow.append(rsLeft, rsRight);
-                }
-                controlArea.appendChild(rsLabelRow);
+            // 中間ラベルをコンテナ末尾に追加（常時表示）
+            if (rsMidDisplay) {
+                rsContainer.appendChild(rsMidDisplay);
             }
+
+
+            controlArea.appendChild(rsContainer);
             break;
         }
         case 'explanation_card':
