@@ -54,8 +54,8 @@ last_reviewed: 2026-04-15
 - 中央に公開中の事例一覧を表示する
 - 各事例カードには以下を表示する
   - 区分ラベル (`organizationType`)
-  - 事例名 (`label`)
-  - 要約 (`listingSummary`)
+  - 事例名 (`voicePageLabel` があればそれを優先し、なければ `label`)
+  - 要約 (`voicePageSummary` があればそれを優先し、なければ `listingSummary`)
   - 利用機能 (`usedFeatures`)
 - 下部に `無料ではじめる` / `ログインはこちら` を再掲する
 
@@ -83,6 +83,7 @@ last_reviewed: 2026-04-15
 
 - 事例本文の正本は `data/customer-voices.json` とする
 - 一覧ページ、詳細ページ、ログイン前トップのティザーは同一 JSON を参照する
+- ログイン前トップのティザーは `label` / `listingSummary` を使い、`customer-voices/` 配下では `voicePageLabel` / `voicePageSummary` がある場合にそちらを優先する
 
 ### 5.2. 最低限の項目
 
@@ -108,6 +109,8 @@ last_reviewed: 2026-04-15
 - `heroImage`
 - `accent`
 - `accentStrong`
+- `voicePageLabel`
+- `voicePageSummary`
 - `quote.role`
 
 任意項目が未入力の場合、対応する表示ブロックは非表示とし、空セクションを出さない。

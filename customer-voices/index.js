@@ -1,6 +1,8 @@
 import {
   escapeHtml,
   getPublishedVoices,
+  getVoicePageLabel,
+  getVoicePageSummary,
   loadVoiceCollection,
   renderFeatureList,
   resolveAppRootPath,
@@ -8,6 +10,8 @@ import {
 } from './shared.js';
 
 function renderVoiceCard(voice, index) {
+  const label = getVoicePageLabel(voice);
+  const summary = getVoicePageSummary(voice);
   return `
     <a
       class="voice-listing-card"
@@ -16,15 +20,15 @@ function renderVoiceCard(voice, index) {
       style="transition-delay: ${index * 70}ms;"
     >
       <div class="voice-listing-card__media">
-        <img src="${resolveAppRootPath(voice.heroImage || 'img/top-kv.jpg')}" alt="${escapeHtml(voice.label)}のイメージ">
+        <img src="${resolveAppRootPath(voice.heroImage || 'img/top-kv.jpg')}" alt="${escapeHtml(label)}のイメージ">
       </div>
       <div class="voice-listing-card__content">
         <div class="voice-listing-card__meta">
           <span class="voice-pill">${escapeHtml(voice.organizationType)}</span>
           <span class="voice-pill">導入事例</span>
         </div>
-        <h2 class="voice-listing-card__title">${escapeHtml(voice.label)}</h2>
-        <p class="voice-listing-card__summary">${escapeHtml(voice.listingSummary)}</p>
+        <h2 class="voice-listing-card__title">${escapeHtml(label)}</h2>
+        <p class="voice-listing-card__summary">${escapeHtml(summary)}</p>
         ${renderFeatureList(voice.usedFeatures || [])}
         <span class="voice-inline-link">詳細を見る</span>
       </div>
