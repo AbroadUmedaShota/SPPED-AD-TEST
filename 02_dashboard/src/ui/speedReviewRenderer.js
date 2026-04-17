@@ -89,6 +89,17 @@ function formatAnswerValueForDisplay(answer, questionDef) {
     }
 
     const questionType = questionDef?.type;
+
+    if (questionType === 'rating_scale') {
+        const cfg = questionDef?.config || questionDef?.meta?.ratingScaleConfig || {};
+        const points = Math.max(2, Number(cfg.points) || 5);
+        const num = parseInt(String(answer), 10);
+        if (isNaN(num) || num < 1 || num > points) return String(answer);
+        const filled = '●'.repeat(num);
+        const empty = '○'.repeat(points - num);
+        return `${num} / ${points}  ${filled}${empty}`;
+    }
+
     const isMatrixType = MATRIX_SINGLE_TYPES.has(questionType) || MATRIX_MULTI_TYPES.has(questionType);
     if (isMatrixType) {
         const rows = normalizeMatrixRows(questionDef?.rows || []);

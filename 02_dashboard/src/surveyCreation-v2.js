@@ -134,6 +134,7 @@ const QUESTION_TYPES = {
   single_answer:    { label: 'シングルアンサー',  icon: 'radio_button_checked' },
   multi_answer:     { label: 'マルチアンサー',    icon: 'check_box' },
   dropdown:         { label: 'ドロップダウン回答', icon: 'arrow_drop_down_circle' },
+  rating_scale:     { label: '評定尺度',          icon: 'linear_scale' },
   number_answer:    { label: '数値回答',          icon: 'pin' },
   matrix_sa:        { label: 'マトリックス(SA)',  icon: 'view_list' },
   matrix_ma:        { label: 'マトリックス(MA)',  icon: 'grid_view' },
@@ -460,6 +461,9 @@ function defaultQuestion(type) {
     base.matrixRows = [{ja: '行1'}, {ja: '行2'}];
     base.matrixCols = [{ja: '列1'}, {ja: '列2'}];
   }
+  if (type === 'rating_scale') {
+    base.config = { points: 5, minLabel: { ja: '' }, maxLabel: { ja: '' }, showMidLabel: false, midLabel: { ja: '' } };
+  }
   if (type === 'number_answer') {
     base.config = { min: '', max: '', unit: '', step: '' };
   }
@@ -629,6 +633,11 @@ function countMissingForQuestion(q, lang) {
   if (MATRIX_TYPES.has(q.type)) {
     (q.matrixRows || []).forEach(r => { if (!r[lang]?.trim()) count++; });
     (q.matrixCols || []).forEach(c => { if (!c[lang]?.trim()) count++; });
+  }
+  if (q.type === 'rating_scale') {
+    if (!q.config?.minLabel?.[lang]?.trim()) count++;
+    if (!q.config?.maxLabel?.[lang]?.trim()) count++;
+    if (q.config?.showMidLabel && !q.config?.midLabel?.[lang]?.trim()) count++;
   }
   return count;
 }
@@ -1056,6 +1065,7 @@ function buildBasicSection(q, cardNode, requiredBadge) {
 function buildAnswerSection(q, typeLabel) {
   if (CHOICE_TYPES.has(q.type)) return buildChoiceSection(q, typeLabel);
   if (MATRIX_TYPES.has(q.type)) return buildMatrixSection(q, typeLabel);
+  if (q.type === 'rating_scale') return buildRatingScaleSection(q, typeLabel);
   const section = el('section', {class: 'px-5 pb-5 border-t border-gray-100 pt-4'});
   const hdr = el('div', {class: 'flex items-center justify-between gap-2 mb-3'});
   hdr.appendChild(el('h4', {class: 'text-sm font-bold text-gray-700 flex items-center gap-1.5'}, icon('tune', 'text-[18px] text-gray-400'), '回答設定'));
@@ -1271,6 +1281,200 @@ function buildMatrixRow(q, fieldKey, idx, valObj) {
   }, icon('close', 'text-[18px]'));
   row.append(inputsWrap, delBtn);
   return row;
+}
+
+function buildRatingScaleSection(q, typeLabel) {
+  if (!q.config) q.config = { points: 5, minLabel: { ja: '' }, maxLabel: { ja: '' }, showMidLabel: false, midLabel: { ja: '' } };
+  const cfg = q.config;
+  if (!cfg.minLabel) cfg.minLabel = { ja: '' };
+  if (!cfg.maxLabel) cfg.maxLabel = { ja: '' };
+  if (!cfg.midLabel) cfg.midLabel = { ja: '' };
+
+  const section = el('section', { class: 'px-5 pb-5 space-y-4 border-t border-gray-100 pt-4' });
+  const hdr = el('div', { class: 'flex items-center justify-between gap-2' });
+  hdr.appendChild(el('h4', { class: 'text-sm font-bold text-gray-700 flex items-center gap-1.5' }, icon('linear_scale', 'text-[18px] text-gray-400'), '尺度設定'));
+  if (typeLabel) hdr.appendChild(typeLabel);
+  section.appendChild(hdr);
+
+  // Scale points preview
+  const previewWrap = el('div', { class: 'bg-white border border-gray-200 rounded-xl p-4 space-y-2' });
+
+  function buildPreview() {
+    previewWrap.innerHTML = '';
+    const pts = cfg.points || 5;
+    const minText = cfg.minLabel?.[currentLangs[0]] || '低い';
+    const maxText = cfg.maxLabel?.[currentLangs[0]] || '高い';
+    const midText = cfg.showMidLabel ? (cfg.midLabel?.[currentLangs[0]] || 'どちらでもない') : '';
+
+    // メイン行（左ラベル + ラジオ群 + 右ラベル）
+    const mainRow = el('div', { class: 'flex items-start gap-3' });
+
+    const leftLabel = el('span', { class: 'text-xs text-gray-500 font-medium pt-0.5 shrink-0 max-w-[60px] leading-snug' }, minText);
+
+    const radioGroup = el('div', { class: 'flex items-start justify-between flex-1' });
+    for (let i = 1; i <= pts; i++) {
+      const item = el('div', { class: 'flex flex-col items-center gap-1' },
+        el('div', { class: 'w-5 h-5 rounded-full border-2 border-gray-300 bg-white' }),
+        el('span', { class: 'text-[10px] text-gray-500 font-medium' }, String(i))
+      );
+      radioGroup.appendChild(item);
+    }
+
+    const rightLabel = el('span', { class: 'text-xs text-gray-500 font-medium pt-0.5 shrink-0 max-w-[60px] leading-snug text-right' }, maxText);
+
+    mainRow.append(leftLabel, radioGroup, rightLabel);
+    previewWrap.appendChild(mainRow);
+
+    if (midText) {
+      previewWrap.appendChild(el('div', { class: 'text-center text-[10px] text-gray-400 font-medium mt-1' }, midText));
+    }
+  }
+  buildPreview();
+  section.appendChild(previewWrap);
+
+  // Points selector
+  const pointsWrap = el('div', { class: 'space-y-1.5' });
+  pointsWrap.appendChild(el('p', { class: 'text-xs font-bold text-gray-500' }, '尺度のポイント数'));
+  const pointsBtns = el('div', { class: 'flex flex-wrap items-center gap-2' });
+
+  const CLASS_ACTIVE   = 'px-3 py-1.5 rounded-lg border text-sm font-bold transition-colors bg-primary text-white border-primary shadow';
+  const CLASS_INACTIVE = 'px-3 py-1.5 rounded-lg border text-sm font-bold transition-colors bg-white border-gray-200 text-gray-600 hover:border-primary hover:text-primary';
+
+  // 固定チップ: 3・4・5（5段階がデフォルト）
+  const FIXED_POINTS = [3, 4, 5];
+  const fixedChips = [];
+  FIXED_POINTS.forEach(n => {
+    const btn = el('button', {
+      type: 'button',
+      class: cfg.points === n ? CLASS_ACTIVE : CLASS_INACTIVE,
+    }, `${n}段階`);
+    btn.addEventListener('click', () => {
+      cfg.points = n;
+      syncPointsUI();
+      buildPreview();
+    });
+    fixedChips.push(btn);
+    pointsBtns.appendChild(btn);
+  });
+
+  // カスタム入力（6〜10段階）
+  const isCustom = cfg.points >= 6;
+  const nChipWrap = el('div', {
+    class: `flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm font-bold transition-colors cursor-default ${isCustom ? 'border-primary bg-primary/5 text-primary' : 'border-gray-200 bg-white text-gray-600 hover:border-primary hover:text-primary'}`,
+    title: '6〜10段階を手入力で指定'
+  });
+  const nInput = el('input', {
+    type: 'number',
+    min: '6',
+    max: '10',
+    value: String(cfg.points >= 6 ? cfg.points : 6),
+    class: 'w-8 text-center bg-transparent border-none outline-none font-bold text-sm [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
+    'aria-label': 'カスタム段階数（6〜10）',
+  });
+  nInput.addEventListener('input', () => {
+    let v = parseInt(nInput.value, 10);
+    if (isNaN(v) || v < 6) v = 6;
+    if (v > 10) v = 10;
+    nInput.value = String(v);
+    cfg.points = v;
+    syncPointsUI();
+    buildPreview();
+  });
+  nInput.addEventListener('focus', () => {
+    cfg.points = parseInt(nInput.value, 10) || 6;
+    syncPointsUI();
+    buildPreview();
+  });
+  nChipWrap.append(el('span', { class: 'text-xs' }, 'カスタム'), nInput, el('span', {}, '段階'));
+  pointsBtns.appendChild(nChipWrap);
+
+  function syncPointsUI() {
+    fixedChips.forEach((btn, i) => {
+      btn.className = cfg.points === FIXED_POINTS[i] ? CLASS_ACTIVE : CLASS_INACTIVE;
+    });
+    const isN = cfg.points >= 6;
+    nChipWrap.className = `flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm font-bold transition-colors cursor-default ${isN ? 'border-primary bg-primary/5 text-primary' : 'border-gray-200 bg-white text-gray-600 hover:border-primary hover:text-primary'}`;
+    if (isN && parseInt(nInput.value, 10) !== cfg.points) nInput.value = String(cfg.points);
+  }
+
+  pointsWrap.appendChild(pointsBtns);
+  section.appendChild(pointsWrap);
+
+  // Label inputs (multi-lang)
+  function buildLabelInput(labelKey, labelTitle) {
+    const wrap = el('div', { class: 'space-y-1.5' });
+    wrap.appendChild(el('p', { class: 'text-xs font-bold text-gray-500' }, labelTitle));
+    const firstLang = currentLangs[0];
+    currentLangs.forEach(lang => {
+      const isFirst = lang === firstLang;
+      const langWrap = el('div', { 'data-lang-wrapper': lang });
+      const input = el('input', {
+        type: 'text',
+        class: 'w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors',
+        value: cfg[labelKey]?.[lang] || '',
+        placeholder: `ラベル (${lang})`,
+        oninput: (e) => {
+          if (!cfg[labelKey]) cfg[labelKey] = {};
+          cfg[labelKey][lang] = e.target.value;
+          if (isFirst) buildPreview();
+          else updateTranslationBadges();
+        }
+      });
+      if (!isFirst) {
+        const refText = cfg[labelKey]?.[firstLang] || '';
+        const hint = el('p', { class: `ref-lang-hint${refText ? '' : ' hidden'}`, 'data-ref-hint': '' }, refText);
+        langWrap.append(input, hint);
+      } else {
+        langWrap.appendChild(input);
+      }
+      wrap.appendChild(langWrap);
+    });
+    return wrap;
+  }
+
+  const labelsGrid = el('div', { class: 'grid grid-cols-1 sm:grid-cols-2 gap-3' });
+  labelsGrid.appendChild(buildLabelInput('minLabel', '最小値ラベル（左端）'));
+  labelsGrid.appendChild(buildLabelInput('maxLabel', '最大値ラベル（右端）'));
+  section.appendChild(labelsGrid);
+
+  // Mid label toggle
+  const midCB = el('input', {
+    type: 'checkbox',
+    class: 'w-4 h-4 accent-primary pointer-events-none flex-shrink-0',
+  });
+  midCB.checked = !!cfg.showMidLabel;
+
+  const midBody = el('div', { class: `px-4 pb-3${cfg.showMidLabel ? '' : ' hidden'}` });
+  midBody.appendChild(buildLabelInput('midLabel', '中間ラベル'));
+
+  const midSection = el('div', { class: 'rounded-xl border border-gray-200 bg-gray-50 overflow-hidden' });
+
+  const midToggleRow = el('div', {
+    class: 'flex items-center gap-3 px-4 py-3 cursor-pointer select-none hover:bg-gray-100 transition-colors',
+    role: 'checkbox',
+    'aria-checked': String(!!cfg.showMidLabel),
+    tabindex: '0',
+  });
+  midToggleRow.append(
+    midCB,
+    el('span', { class: 'text-sm font-semibold text-gray-700' }, '中間ラベルを表示する')
+  );
+
+  function toggleMid() {
+    cfg.showMidLabel = !cfg.showMidLabel;
+    midCB.checked = cfg.showMidLabel;
+    midToggleRow.setAttribute('aria-checked', String(cfg.showMidLabel));
+    midBody.classList.toggle('hidden', !cfg.showMidLabel);
+    buildPreview();
+  }
+
+  midToggleRow.addEventListener('click', toggleMid);
+  midToggleRow.addEventListener('keydown', (e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggleMid(); } });
+
+  midSection.append(midToggleRow, midBody);
+  section.appendChild(midSection);
+
+  return section;
 }
 
 function buildAdvancedSection(q) {
@@ -2015,6 +2219,19 @@ function buildPreviewData() {
       base.meta = {
         ...base.meta,
         handwritingConfig: { canvasHeight: cfg.height || 200 },
+      };
+    }
+
+    if (q.type === 'rating_scale') {
+      base.meta = {
+        ...base.meta,
+        ratingScaleConfig: {
+          points:       cfg.points       || 5,
+          minLabel:     cfg.minLabel     || { ja: '' },
+          maxLabel:     cfg.maxLabel     || { ja: '' },
+          showMidLabel: !!cfg.showMidLabel,
+          midLabel:     cfg.midLabel     || { ja: '' },
+        },
       };
     }
 

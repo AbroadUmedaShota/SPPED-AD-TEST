@@ -39,6 +39,28 @@ const REVIEW_CHART_PRIMARY = '#1a73e8';
 const REVIEW_CHART_FILL = 'rgba(26, 115, 232, 0.1)';
 const REVIEW_CHART_DONUT_PALETTE = COMMON_CHART_DONUT_PALETTE; // リモートの変更を取り込む
 
+function generateScaleGradient(points) {
+    const stops = [
+        [220, 38, 38],   // red-600
+        [234, 88, 12],   // orange-600
+        [202, 138, 4],   // yellow-600
+        [22, 163, 74],   // green-600
+        [21, 128, 61],   // green-700
+    ];
+    const colors = [];
+    for (let i = 0; i < points; i++) {
+        const t = points <= 1 ? 0.5 : i / (points - 1);
+        const seg = t * (stops.length - 1);
+        const idx = Math.min(Math.floor(seg), stops.length - 2);
+        const f = seg - idx;
+        const r = Math.round(stops[idx][0] + (stops[idx + 1][0] - stops[idx][0]) * f);
+        const g = Math.round(stops[idx][1] + (stops[idx + 1][1] - stops[idx][1]) * f);
+        const b = Math.round(stops[idx][2] + (stops[idx + 1][2] - stops[idx][2]) * f);
+        colors.push(`rgb(${r}, ${g}, ${b})`);
+    }
+    return colors;
+}
+
 // ApexCharts Instance
 let apexAttributeChart = null;
 
@@ -72,6 +94,17 @@ const DEFAULT_CARD_IMAGE_VIEW_STATE = {
 // プレミアム機能案内モーダルを開く関数
 function openPremiumFeatureModal() {
     handleOpenModal('premiumFeatureModalOverlay', resolveDashboardAssetPath('modals/premiumFeatureModal.html'));
+}
+
+function getQuestionNumber(questionLabel) {
+    const details = currentSurvey?.details;
+    if (!details) return -1;
+    return details.findIndex(d => (d.question || d.text || d.id) === questionLabel);
+}
+
+function formatQuestionPrefix(questionLabel) {
+    const idx = getQuestionNumber(questionLabel);
+    return idx >= 0 ? `Q${idx + 1}. ` : '';
 }
 
 function getScopedStorageKey(suffix) {
@@ -423,7 +456,10 @@ function highlightMatrixTableRow(rowLabel, columnLabel) {
     clearMatrixTableHighlight();
     const rowKey = normalizeDataKey(rowLabel);
     const columnKey = normalizeDataKey(columnLabel);
-    const selector = `.graph-data-table__row[data-matrix-row="${rowKey}"][data-matrix-column="${columnKey}"]`;
+    // CSS.escape でセレクタ特殊文字を安全にエスケープ
+    const safeRowKey = CSS.escape(rowKey);
+    const safeColumnKey = CSS.escape(columnKey);
+    const selector = `.graph-data-table__row[data-matrix-row="${safeRowKey}"][data-matrix-column="${safeColumnKey}"]`;
     const targetRow = container.querySelector(selector);
     if (targetRow) {
         targetRow.classList.add('is-highlighted');
@@ -772,6 +808,52 @@ function getNonChartSummaryIcon(type) {
     }
 }
 
+function buildRatingScaleSummary(question, answers) {
+    const cfg = question.config || question.meta?.ratingScaleConfig || {};
+    const points = Math.max(2, Number(cfg.points) || 5);
+
+    const resolveLabel = (val) => {
+        if (!val) return '';
+        if (typeof val === 'string') return val;
+        if (typeof val === 'object') return val.ja || val.en || Object.values(val)[0] || '';
+        return '';
+    };
+    const minLabel = resolveLabel(cfg.minLabel);
+    const maxLabel = resolveLabel(cfg.maxLabel);
+    const midLabel = cfg.showMidLabel ? resolveLabel(cfg.midLabel) : '';
+
+    const counts = {};
+    for (let i = 1; i <= points; i++) counts[i] = 0;
+
+    let answeredCount = 0;
+    let totalScore = 0;
+
+    (answers || []).forEach(answer => {
+        const detail = findAnswerDetail(answer, question);
+        if (!detail || detail.answer === undefined || detail.answer === null || detail.answer === '') return;
+        const num = parseInt(String(detail.answer), 10);
+        if (!isNaN(num) && num >= 1 && num <= points) {
+            counts[num] = (counts[num] || 0) + 1;
+            answeredCount++;
+            totalScore += num;
+        }
+    });
+
+    const average = answeredCount > 0 ? totalScore / answeredCount : 0;
+
+    const midPoint = Math.ceil(points / 2);
+    const labels = [];
+    for (let i = 1; i <= points; i++) {
+        if (i === 1 && minLabel) labels.push(`${i} (${minLabel})`);
+        else if (i === points && maxLabel) labels.push(`${i} (${maxLabel})`);
+        else if (i === midPoint && midLabel) labels.push(`${i} (${midLabel})`);
+        else labels.push(String(i));
+    }
+    const data = labels.map((_, i) => counts[i + 1] || 0);
+
+    return { labels, data, totalAnswers: answeredCount, average, points, minLabel, maxLabel, midLabel };
+}
+
 function buildNonChartSummary(question, answers) {
     const payloads = collectQuestionAnswerPayloads(question, answers);
     const totalCount = Array.isArray(answers) ? answers.length : 0;
@@ -914,28 +996,7 @@ function handleQuestionSelectClick(newQuestion) {
     currentIndustryQuestion = newQuestion;
     const dynamicHeader = document.getElementById('dynamic-question-header');
 
-    // 設問番号を特定するロジック (populateQuestionSelectorと同じ順序で)
-    let questionIndex = -1;
-    const questions = [];
-    const pushQuestion = (label) => {
-        if (!label || questions.includes(label)) return;
-        questions.push(label);
-    };
-
-    if (Array.isArray(allCombinedData) && allCombinedData.length > 0) {
-        allCombinedData.forEach(item => {
-            if (Array.isArray(item.details)) {
-                item.details.forEach(detail => {
-                    pushQuestion(detail.question || detail.text || detail.id);
-                });
-            }
-        });
-    }
-    if (questions.length === 0 && currentSurvey?.details) {
-        currentSurvey.details.forEach(detail => pushQuestion(detail.question || detail.text || detail.id));
-    }
-    questionIndex = questions.indexOf(newQuestion);
-    const prefix = questionIndex >= 0 ? `Q${questionIndex + 1}. ` : '';
+    const prefix = formatQuestionPrefix(newQuestion);
 
     if (dynamicHeader) {
         dynamicHeader.textContent = prefix + truncateQuestion(newQuestion);
@@ -975,8 +1036,9 @@ function setupWheelZoomListeners(modalContext) {
     if (!modalContext) return;
     const zoomContainers = modalContext.querySelectorAll('[data-zoom-src]');
     zoomContainers.forEach(container => {
-        // 重複登録を避けるために一度削除
-        container.removeEventListener('wheel', handleWheelZoom);
+        // 既にリスナー登録済みならスキップ（重複防止）
+        if (container.hasAttribute('data-wheel-zoom-attached')) return;
+        container.setAttribute('data-wheel-zoom-attached', 'true');
         container.addEventListener('wheel', handleWheelZoom, { passive: false });
     });
 }
@@ -1129,8 +1191,11 @@ function handleDetailClick(answerId) {
     if (item) {
         currentItemInModal = item;
         isModalInEditMode = false;
+        const capturedItem = item; // レースコンディション防止: コールバック時点の item を固定
         handleOpenModal('reviewDetailModalOverlay', resolveDashboardAssetPath('modals/reviewDetailModal.html'), () => {
-            renderModalContent(item, false);
+            // コールバック実行時に currentItemInModal が変わっていたらスキップ
+            if (currentItemInModal !== capturedItem) return;
+            renderModalContent(capturedItem, false);
             updateModalFooter(); // Initialize footer with correct buttons
             setupModalEventListeners();
 
@@ -1448,18 +1513,8 @@ function displayPage(page, data = allCombinedData) {
     const pageInfo = document.getElementById('pageInfo');
     if (!tableBody || !pageInfo) return;
 
-    const sortedData = [...data].sort((a, b) => {
-        const getAnswer = (item) => item.details?.find(d => d.question === currentIndustryQuestion)?.answer;
-        const answerA = getAnswer(a);
-        const answerB = getAnswer(b);
-        const isUnanswered = (answer) => answer === '-' || answer === '' || answer == null;
-        const isUnansweredA = isUnanswered(answerA);
-        const isUnansweredB = isUnanswered(answerB);
-        if (isUnansweredA === isUnansweredB) {
-            return 0;
-        }
-        return isUnansweredA ? 1 : -1;
-    });
+    // sortData() によるソート結果をそのまま使う（上書きしない）
+    const sortedData = data;
 
     tableBody.innerHTML = '';
     const startIndex = (page - 1) * rowsPerPage;
@@ -1571,7 +1626,13 @@ function populateQuestionSelector(data, targetContainer = null) {
         questions.push(label);
     };
 
-    if (Array.isArray(data) && data.length > 0) {
+    // 設問定義を正とし、全設問を定義順に列挙する（explanation含む）
+    if (currentSurvey?.details) {
+        currentSurvey.details.forEach(detail => pushQuestion(detail.question || detail.text || detail.id));
+    }
+
+    // 設問定義がない場合のフォールバック: 回答データから収集
+    if (questions.length === 0 && Array.isArray(data) && data.length > 0) {
         data.forEach(item => {
             if (Array.isArray(item.details)) {
                 item.details.forEach(detail => {
@@ -1581,16 +1642,13 @@ function populateQuestionSelector(data, targetContainer = null) {
         });
     }
 
-    if (questions.length === 0 && currentSurvey?.details) {
-        currentSurvey.details.forEach(detail => pushQuestion(detail.question || detail.text || detail.id));
-    }
     container.innerHTML = '';
     if (questions.length === 0) {
         container.innerHTML = '<p class="p-4 text-center text-on-surface-variant">設問情報がありません。</p>';
         return;
     }
 
-    questions.forEach((question, index) => {
+    questions.forEach((question) => {
         const button = document.createElement('button');
         const isActive = question === currentIndustryQuestion;
 
@@ -1604,7 +1662,8 @@ function populateQuestionSelector(data, targetContainer = null) {
             SINGLE_CHOICE_TYPES.has(questionDef.type) ||
             MULTI_CHOICE_TYPES.has(questionDef.type) ||
             MATRIX_SINGLE_TYPES.has(questionDef.type) ||
-            MATRIX_MULTI_TYPES.has(questionDef.type)
+            MATRIX_MULTI_TYPES.has(questionDef.type) ||
+            questionDef.type === 'rating_scale'
         );
 
         // デフォルト: グラフ化可能（青色・グラフアイコン）
@@ -1628,8 +1687,8 @@ function populateQuestionSelector(data, targetContainer = null) {
 
         button.className = `w-full text-left py-3 rounded-r-xl transition-all flex items-center justify-between group ${activeClass}`;
 
-        // 設問番号を追加 (Q1. 設問文)
-        const displayQuestion = `Q${index + 1}. ${question}`;
+        // 設問番号を設問定義の順序から取得（explanation等もカウントに含める）
+        const displayQuestion = formatQuestionPrefix(question) + question;
         console.log(`[populateQuestionSelector] Rendering: ${displayQuestion}`);
 
         button.innerHTML = `
@@ -1998,6 +2057,23 @@ function processDataForTable(survey, answers) {
             };
         }
 
+        if (question.type === 'rating_scale') {
+            const summary = buildRatingScaleSummary(question, answers);
+            return {
+                questionId,
+                questionText: question.text,
+                labels: summary.labels,
+                data: summary.data,
+                totalAnswers: summary.totalAnswers,
+                totalVotes: summary.totalAnswers,
+                includeTotalRow: true,
+                blankReason: '',
+                isRatingScale: true,
+                ratingScaleAverage: summary.average,
+                ratingScalePoints: summary.points
+            };
+        }
+
         const reason = BLANK_TYPES.has(question.type)
             ? getBlankReason(question.type)
             : '未対応の設問タイプ';
@@ -2130,6 +2206,50 @@ function renderGraphDataTable(processedData) {
             }).join('');
         }
 
+        if (questionData.isRatingScale) {
+            const avg = Number(questionData.ratingScaleAverage || 0).toFixed(2);
+            const points = questionData.ratingScalePoints || 5;
+            const totalVotes = questionData.totalAnswers || 0;
+            const tableRows = (questionData.labels || []).map((label, i) => {
+                const count = questionData.data[i] || 0;
+                const pct = totalVotes > 0 ? ((count / totalVotes) * 100).toFixed(1) : '0.0';
+                return `
+                    <tr class="border-b border-outline-variant/30 last:border-b-0 graph-data-table__row">
+                        <td class="px-3 py-2 text-sm text-on-surface graph-data-table__label" title="${escapeHtml(label)}">${escapeHtml(label)}</td>
+                        <td class="px-3 py-2 text-sm text-on-surface text-right">${count}</td>
+                        <td class="px-3 py-2 text-sm text-on-surface-variant text-right">${pct}%</td>
+                    </tr>
+                `;
+            }).join('');
+            return `
+                <div class="rounded-lg border border-outline-variant/50">
+                    <table class="graph-data-table w-full text-left table-fixed">
+                        <thead class="bg-surface-variant/30">
+                            <tr class="border-b border-outline-variant/50">
+                                <th class="px-3 py-2 text-xs font-semibold text-on-surface-variant w-1/2">スコア</th>
+                                <th class="px-3 py-2 text-xs font-semibold text-on-surface-variant text-right">回答数</th>
+                                <th class="px-3 py-2 text-xs font-semibold text-on-surface-variant text-right">割合</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-outline-variant/30">
+                            ${tableRows}
+                            <tr class="border-b border-outline-variant/30 font-semibold graph-table-total-row">
+                                <td class="px-3 py-2 text-sm text-on-surface">合計</td>
+                                <td class="px-3 py-2 text-sm text-on-surface text-right">${totalVotes}</td>
+                                <td class="px-3 py-2 text-sm text-on-surface-variant text-right">100.0%</td>
+                            </tr>
+                            <tr class="bg-primary/5">
+                                <td class="px-3 py-2 text-sm font-semibold text-primary">
+                                    <span class="inline-flex items-center gap-1"><span class="material-icons text-sm">linear_scale</span>平均スコア</span>
+                                </td>
+                                <td class="px-3 py-2 text-sm font-bold text-primary text-right" colspan="2">${avg} / ${points}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
         if (questionData.nonChartSummary) {
             return renderNonChartSummaryBlock(questionData.nonChartSummary, questionData.blankReason);
         }
@@ -2164,24 +2284,7 @@ function renderDashboard(data) {
     // Update Question Title
     const questionTitleEl = document.getElementById('dashboard-current-question');
     if (questionTitleEl) {
-        // 設問番号を特定するロジック
-        let questionIndex = -1;
-        const questions = [];
-        const pushQuestion = (label) => {
-            if (!label || questions.includes(label)) return;
-            questions.push(label);
-        };
-        // Get questions from combined data or survey definition
-        if (allCombinedData.length > 0) {
-            allCombinedData.forEach(item => {
-                item.details?.forEach(detail => pushQuestion(detail.question || detail.text || detail.id));
-            });
-        }
-        if (questions.length === 0 && currentSurvey?.details) {
-            currentSurvey.details.forEach(detail => pushQuestion(detail.question || detail.text || detail.id));
-        }
-        questionIndex = questions.indexOf(currentIndustryQuestion);
-        const prefix = questionIndex >= 0 ? `Q${questionIndex + 1}. ` : '';
+        const prefix = formatQuestionPrefix(currentIndustryQuestion);
 
         questionTitleEl.textContent = prefix + truncateQuestion(currentIndustryQuestion) || '未選択';
     }
@@ -2193,7 +2296,8 @@ function renderDashboard(data) {
         SINGLE_CHOICE_TYPES.has(questionDef.type) ||
         MULTI_CHOICE_TYPES.has(questionDef.type) ||
         MATRIX_SINGLE_TYPES.has(questionDef.type) ||
-        MATRIX_MULTI_TYPES.has(questionDef.type)
+        MATRIX_MULTI_TYPES.has(questionDef.type) ||
+        questionDef.type === 'rating_scale'
     );
 
     if (!isChartableQuestion) {
@@ -2381,6 +2485,10 @@ function renderAttributeChart(data) {
             attributeChart.destroy();
             attributeChart = null;
         }
+        if (apexAttributeChart) {
+            apexAttributeChart.destroy();
+            apexAttributeChart = null;
+        }
         if (container) {
             let empty = container.querySelector('.attribute-empty-state');
             if (!empty) {
@@ -2415,6 +2523,10 @@ function renderAttributeChart(data) {
         if (attributeChart) {
             attributeChart.destroy();
             attributeChart = null;
+        }
+        if (apexAttributeChart) {
+            apexAttributeChart.destroy();
+            apexAttributeChart = null;
         }
         if (container) {
             let empty = container.querySelector('.attribute-empty-state');
@@ -2506,21 +2618,100 @@ function renderAttributeChart(data) {
         }
 
         clearEmptyState();
-        canvas.style.display = 'none';
-        apexContainer.style.display = 'block';
-        apexContainer.classList.remove('hidden');
-        canvas.classList.add('hidden');
 
         if (attributeChart) {
             attributeChart.destroy();
             attributeChart = null;
         }
+        if (apexAttributeChart) {
+            apexAttributeChart.destroy();
+            apexAttributeChart = null;
+        }
+
+        canvas.style.display = 'none';
+        canvas.classList.add('hidden');
+        apexContainer.style.display = 'block';
+        apexContainer.classList.remove('hidden');
+
         if (typeof renderMatrixChartApex === 'function') {
-            renderMatrixChartApex('attributeChartApex', questionDef, data || [], currentMatrixRowId, COMMON_CHART_DONUT_PALETTE);
+            apexAttributeChart = renderMatrixChartApex('attributeChartApex', questionDef, data || [], currentMatrixRowId, COMMON_CHART_DONUT_PALETTE) || null;
         } else {
             console.error('renderMatrixChartApex function not found.');
             apexContainer.innerHTML = '<p class="text-center text-on-surface-variant">マトリクスグラフの描画関数が見つかりません。</p>';
         }
+        return;
+    }
+
+    if (questionDef.type === 'rating_scale') {
+        const summary = buildRatingScaleSummary(questionDef, data || []);
+        clearEmptyState();
+
+        if (attributeChart) {
+            attributeChart.destroy();
+            attributeChart = null;
+        }
+        if (apexAttributeChart) {
+            apexAttributeChart.destroy();
+            apexAttributeChart = null;
+        }
+
+        canvas.style.display = 'none';
+        canvas.classList.add('hidden');
+        apexContainer.style.display = 'block';
+        apexContainer.classList.remove('hidden');
+
+        if (summary.totalAnswers === 0) {
+            renderEmptyState('回答を待っています...', 'hourglass_empty');
+            return;
+        }
+
+        const avg = summary.average.toFixed(2);
+        const scaleGradient = generateScaleGradient(summary.points);
+        const chartOptions = {
+            series: [{ name: '件数', data: summary.data }],
+            chart: {
+                type: 'bar',
+                height: 220,
+                fontFamily: "'Noto Sans JP', sans-serif",
+                toolbar: { show: false },
+                animations: { enabled: true, easing: 'easeinout', speed: 600 }
+            },
+            plotOptions: {
+                bar: {
+                    horizontal: true,
+                    distributed: true,
+                    borderRadius: 4,
+                    barHeight: '60%',
+                    dataLabels: { position: 'top' }
+                }
+            },
+            colors: scaleGradient,
+            dataLabels: {
+                enabled: true,
+                formatter: (val) => val > 0 ? val + '件' : '',
+                style: { fontSize: '11px', fontWeight: 700, colors: ['#374151'] },
+                offsetX: 28
+            },
+            legend: { show: false },
+            xaxis: {
+                categories: summary.labels,
+                labels: { show: true, style: { fontSize: '11px' } }
+            },
+            yaxis: {
+                labels: { show: true, style: { fontSize: '12px', fontWeight: 600 } }
+            },
+            tooltip: {
+                y: { formatter: (val) => val + '件' }
+            },
+            title: {
+                text: `平均スコア: ${avg} / ${summary.points}`,
+                align: 'right',
+                style: { fontSize: '11px', fontWeight: 700, color: '#6b7280' }
+            },
+            grid: { show: false }
+        };
+        apexAttributeChart = new ApexCharts(apexContainer, chartOptions);
+        apexAttributeChart.render();
         return;
     }
 
@@ -2534,6 +2725,10 @@ function renderAttributeChart(data) {
 
     // --- ここから先は Chart.js のロジック ---
     clearEmptyState();
+    if (apexAttributeChart) {
+        apexAttributeChart.destroy();
+        apexAttributeChart = null;
+    }
     canvas.style.display = 'block';
     apexContainer.style.display = 'none';
     apexContainer.classList.add('hidden');
@@ -2672,6 +2867,12 @@ function setupSidebarToggle() {
 
     if (!sidebar || !toggleBtn || !icon || !mainContentWrapper || !overlay) return;
 
+    // 前回のタイマーが残っていたらクリア（再初期化時の安全策）
+    if (sidebar._autoCloseTimer) {
+        clearTimeout(sidebar._autoCloseTimer);
+        sidebar._autoCloseTimer = null;
+    }
+
     let isSidebarOpen = true; // 初期状態は開いている
     let autoCloseTimer;
     const AUTO_CLOSE_DELAY = 2500; // 2.5秒後に自動的に閉じる (調整可能)
@@ -2706,6 +2907,7 @@ function setupSidebarToggle() {
                 updateSidebarState();
             }
         }, AUTO_CLOSE_DELAY);
+        sidebar._autoCloseTimer = autoCloseTimer; // 再初期化時にクリアできるよう保持
     };
 
     // 初期表示処理
@@ -2942,6 +3144,18 @@ export async function initializePage() {
                 await new Promise(r => setTimeout(r, 10));
             }
             console.log('画像のURL解決処理が終了しました (Completed or Stopped)');
+            // 画像URL解決完了後、表示中のインライン行の画像を更新する
+            document.querySelectorAll('.inline-detail-row').forEach(row => {
+                const answerId = row.dataset.answerId || row.previousElementSibling?.dataset.answerId;
+                const item = findItemByAnswerId(answerId);
+                if (!item) return;
+                const frontImg = row.querySelector('img[data-image-side="front"]');
+                const backImg = row.querySelector('img[data-image-side="back"]');
+                const frontUrl = item.businessCard?.imageUrl?.front;
+                const backUrl = item.businessCard?.imageUrl?.back;
+                if (frontImg && frontUrl && frontImg.src !== frontUrl) frontImg.src = frontUrl;
+                if (backImg && backUrl && backImg.src !== backUrl) backImg.src = backUrl;
+            });
         })();
 
         allCombinedData.forEach(item => ensureCardImageViewState(item));

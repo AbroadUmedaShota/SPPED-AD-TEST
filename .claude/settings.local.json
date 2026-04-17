@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(grep -E \"\\\\.\\(html|js\\)$\")"
+      "Bash(grep -E \"\\\\.\\(html|js\\)$\")",
+      "Bash(ls -lh /c/Users/user/Desktop/workspace20/SPPED-AD-TEST/02_dashboard/src/survey*.js)"
     ]
   }
 }
