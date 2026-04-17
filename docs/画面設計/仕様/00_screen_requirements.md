@@ -24,6 +24,7 @@ related_docs:
   - ./16_bizcard_settings_requirements.md
   - ./17_thank_you_email_settings_requirements.md
   - ./18_screen_inventory_current.md
+  - ./20_thank_you_completion_screen.md
   - ./tooltip_spec.md
   - ./group_edit_requirements.md
   - ./2025-10-04_dashboard_requirement_alignment.md
