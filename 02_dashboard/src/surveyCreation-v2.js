@@ -11,6 +11,22 @@ import { initHelpPopovers } from './ui/helpPopover.js';
 import { initThemeToggle } from './lib/themeToggle.js';
 import { handleOpenModal } from './modalHandler.js';
 import { populateQrCodeModal } from './qrCodeModal.js';
+import { formatMessage, normalizeLocale } from './services/i18n/messages.js';
+
+function getCurrentLocale() {
+  if (typeof window.getCurrentLanguage === 'function') {
+    try {
+      return normalizeLocale(window.getCurrentLanguage());
+    } catch (_) {
+      return 'ja';
+    }
+  }
+  try {
+    return normalizeLocale(localStorage.getItem('language') || 'ja');
+  } catch (_) {
+    return 'ja';
+  }
+}
 
 function showToast(message, type = 'info') {
   const container = document.getElementById('toast-container');
@@ -581,12 +597,18 @@ function updateEmptyState() {
 // バリデーション＆アウトラインパネル
 // ─────────────────────────────────────────
 
-function setFieldError(fieldId, hasError) {
+function setFieldError(fieldId, hasError, messageKey) {
   const showError = hasError && touchedFields.has(fieldId);
   const input = document.getElementById(fieldId);
   const errorEl = document.getElementById(`${fieldId}Error`);
   if (input) input.classList.toggle('input-error', showError);
-  if (errorEl) errorEl.classList.toggle('hidden', !showError);
+  if (errorEl) {
+    errorEl.classList.toggle('hidden', !showError);
+    if (messageKey) {
+      const textSpan = errorEl.querySelector('span:not(.material-icons)');
+      if (textSpan) textSpan.textContent = formatMessage(getCurrentLocale(), messageKey);
+    }
+  }
 }
 
 // ─────────────────────────────────────────
@@ -700,9 +722,9 @@ function validateForm() {
   const titleErr = !displayTitle;
   const periodErr = !periodRange;
 
-  setFieldError('surveyName_ja', nameErr);
-  setFieldError('displayTitle_ja', titleErr);
-  setFieldError('periodRange', periodErr);
+  setFieldError('surveyName_ja', nameErr, 'surveyCreation.validation.surveyNameRequired');
+  setFieldError('displayTitle_ja', titleErr, 'surveyCreation.validation.displayTitleRequired');
+  setFieldError('periodRange', periodErr, 'surveyCreation.validation.periodRequired');
 
   let hasBlocker = nameErr || titleErr || periodErr;
   if (questions.length === 0) hasBlocker = true;

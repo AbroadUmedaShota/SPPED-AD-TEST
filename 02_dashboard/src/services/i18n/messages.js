@@ -78,7 +78,12 @@ export const messages = {
       startDateFuture: '開始日は翌日以降の日付を選択してください。',
       requiredField: 'この入力は必須です',
       minLength: 'あと{count}文字必要です。',
-      maxLength: '{count}文字超過しています。'
+      maxLength: '{count}文字超過しています。',
+      validation: {
+        surveyNameRequired: '要確認: アンケート名を入力してください',
+        displayTitleRequired: '要確認: 表示タイトルを入力してください',
+        periodRequired: '要確認: 期間を設定してください'
+      }
     }
   },
   en: {
@@ -137,7 +142,12 @@ export const messages = {
       startDateFuture: 'Please select a start date that is at least one day in the future.',
       requiredField: 'This field is required.',
       minLength: '{count} more characters required.',
-      maxLength: '{count} characters over the limit.'
+      maxLength: '{count} characters over the limit.',
+      validation: {
+        surveyNameRequired: 'Please enter the survey name.',
+        displayTitleRequired: 'Please enter the display title.',
+        periodRequired: 'Please set the survey period.'
+      }
     }
   }
 };
