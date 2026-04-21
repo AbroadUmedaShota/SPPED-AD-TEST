@@ -149,6 +149,134 @@ export const messages = {
         periodRequired: 'Please set the survey period.'
       }
     }
+  },
+  'zh-CN': {
+    common: {
+      required: '请填写必填项。',
+      noQuestions: '此问卷暂无可显示的题目。'
+    },
+    validation: {
+      minLength: '还需输入 {count} 个字符。',
+      maxLength: '已超出 {count} 个字符。'
+    },
+    surveyAnswer: {
+      pageTitleFallback: '问卷回答',
+      titleFallback: '问卷',
+      languageLabel: 'Language',
+      switchedLocale: '已切换为 {locale}',
+      submitFailed: '提交回答失败。',
+      loadingFailed: '加载问卷失败。',
+      missingSurveyId: 'URL 中未指定 surveyId。',
+      surveyNotFound: '未找到问卷定义文件（ID：{surveyId}）',
+      requiredBadge: '必填',
+      submitButton: '提交',
+      bizcardCameraButton: '拍摄名片',
+      bizcardManualButton: '没有名片',
+      submitting: '正在提交...'
+    },
+    thankYouScreen: {
+      documentTitle: 'SpeedAd - 问卷回答完成',
+      title: '感谢您参与本次问卷调查！',
+      body: '您的宝贵意见将用于我们今后的服务改进。',
+      continuousAnswerButton: '继续回答'
+    },
+    thankYouSettings: {
+      pageTitleFallback: '感谢页面设置',
+      pageTitle: '问卷「{name}」的感谢页面设置',
+      sectionTitle: '提交后文案设置',
+      fieldLabel: '感谢信息',
+      fieldDescription: '提交问卷后显示的信息。留空时将显示默认信息。',
+      counterError: '感谢信息请控制在 {count} 个字符以内。',
+      saved: '设置已保存。',
+      tempSaveFailed: '临时保存设置失败。',
+      tempDataMissing: '未找到临时问卷数据，请从创建页面重新开始。',
+      loadFailed: '加载问卷数据失败。',
+      allowContinuousOn: '已启用连续回答。',
+      allowContinuousOff: '已停用连续回答。',
+      continuousSectionTitle: '连续回答功能',
+      continuousLabel: '允许连续回答',
+      continuousDescription: '提交完成后，允许在同一设备上继续提交其他回答。',
+      cancel: '取消',
+      save: '保存',
+      premiumNoticeTitle: '高级功能说明',
+      premiumMessage: '感谢信息的自定义功能可在高级套餐（即将推出）中使用。'
+    },
+    surveyCreation: {
+      requiredInput: '请填写必填项。',
+      startDateFuture: '开始日期请选择次日及以后的日期。',
+      requiredField: '此项为必填项',
+      minLength: '还需输入 {count} 个字符。',
+      maxLength: '已超出 {count} 个字符。',
+      validation: {
+        surveyNameRequired: '请输入问卷名称。',
+        displayTitleRequired: '请输入显示标题。',
+        periodRequired: '请设置问卷期间。'
+      }
+    }
+  },
+  'zh-TW': {
+    common: {
+      required: '請填寫必填欄位。',
+      noQuestions: '此問卷中沒有可顯示的題目。'
+    },
+    validation: {
+      minLength: '還需要 {count} 個字。',
+      maxLength: '已超過 {count} 個字。'
+    },
+    surveyAnswer: {
+      pageTitleFallback: '問卷回答',
+      titleFallback: '問卷',
+      languageLabel: 'Language',
+      switchedLocale: '已切換為 {locale}',
+      submitFailed: '回答送出失敗。',
+      loadingFailed: '問卷載入失敗。',
+      missingSurveyId: '網址中未指定 surveyId。',
+      surveyNotFound: '找不到問卷定義檔案（ID：{surveyId}）',
+      requiredBadge: '必填',
+      submitButton: '送出',
+      bizcardCameraButton: '拍攝名片',
+      bizcardManualButton: '手邊沒有名片',
+      submitting: '送出中...'
+    },
+    thankYouScreen: {
+      documentTitle: 'SpeedAd - 問卷回答完成',
+      title: '感謝您協助填寫本問卷！',
+      body: '您的寶貴意見將協助我們持續改善服務品質。',
+      continuousAnswerButton: '繼續回答'
+    },
+    thankYouSettings: {
+      pageTitleFallback: '感謝頁面設定',
+      pageTitle: '問卷「{name}」的感謝頁面設定',
+      sectionTitle: '回答後的訊息設定',
+      fieldLabel: '感謝訊息',
+      fieldDescription: '此訊息會在填答者送出問卷後顯示。若留空，將顯示預設訊息。',
+      counterError: '感謝訊息請控制在 {count} 個字以內。',
+      saved: '設定已儲存。',
+      tempSaveFailed: '設定暫存失敗。',
+      tempDataMissing: '找不到暫存的問卷資料，請從建立畫面重新開始。',
+      loadFailed: '問卷資料載入失敗。',
+      allowContinuousOn: '已啟用連續回答。',
+      allowContinuousOff: '已停用連續回答。',
+      continuousSectionTitle: '連續回答功能',
+      continuousLabel: '允許連續回答',
+      continuousDescription: '填答完成後，允許在相同裝置上繼續送出另一份回答。',
+      cancel: '取消',
+      save: '儲存',
+      premiumNoticeTitle: '進階功能說明',
+      premiumMessage: '感謝訊息的自訂功能將於進階方案（預計推出）中提供。'
+    },
+    surveyCreation: {
+      requiredInput: '請填寫必填欄位。',
+      startDateFuture: '開始日期請選擇隔日以後的日期。',
+      requiredField: '此欄位為必填',
+      minLength: '還需要 {count} 個字。',
+      maxLength: '已超過 {count} 個字。',
+      validation: {
+        surveyNameRequired: '請輸入問卷名稱。',
+        displayTitleRequired: '請輸入顯示標題。',
+        periodRequired: '請設定問卷期間。'
+      }
+    }
   }
 };
 
