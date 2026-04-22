@@ -1,8 +1,6 @@
 import {
   escapeHtml,
   getPublishedVoices,
-  getVoicePageLabel,
-  getVoicePageSummary,
   loadVoiceCollection,
   refreshRevealAnimations,
   renderBullets,
@@ -11,6 +9,14 @@ import {
   resolveAppRootPath,
   setupRevealAnimations,
 } from './shared.js';
+
+function getVoicePageLabel(voice = {}) {
+  return voice.voicePageLabel || voice.label || '';
+}
+
+function getVoicePageSummary(voice = {}) {
+  return voice.voicePageSummary || voice.listingSummary || '';
+}
 
 function setSectionHtml(sectionId, bodyId, html) {
   const section = document.getElementById(sectionId);

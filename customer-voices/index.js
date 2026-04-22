@@ -1,14 +1,20 @@
 import {
   escapeHtml,
   getPublishedVoices,
-  getVoicePageLabel,
-  getVoicePageSummary,
   loadVoiceCollection,
   refreshRevealAnimations,
   renderFeatureList,
   resolveAppRootPath,
   setupRevealAnimations,
 } from './shared.js';
+
+function getVoicePageLabel(voice = {}) {
+  return voice.voicePageLabel || voice.label || '';
+}
+
+function getVoicePageSummary(voice = {}) {
+  return voice.voicePageSummary || voice.listingSummary || '';
+}
 
 function renderVoiceCard(voice, index) {
   const label = getVoicePageLabel(voice);
