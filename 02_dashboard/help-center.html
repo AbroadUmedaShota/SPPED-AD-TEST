@@ -47,18 +47,29 @@
                 <div class="relative max-w-2xl mx-auto">
                     <h1 class="text-4xl font-bold tracking-tight text-white text-shadow-sm mb-4">どんなことでお困りですか？</h1>
                     <p class="text-lg text-gray-200 text-shadow-sm mb-8">キーワードを入力して、関連記事を検索できます。</p>
-                    <form action="#" method="GET" class="relative">
+                    <form action="#" method="GET" role="search" class="relative">
                         <span class="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-white text-2xl pointer-events-none">search</span>
-                        <input type="search" name="query" placeholder="例：アンケートの作り方" class="w-full h-16 pl-14 pr-6 py-2 text-lg bg-surface border-2 border-outline rounded-full focus:ring-primary focus:border-primary transition text-gray-900 placeholder-gray-400">
+                        <input type="search" name="query" aria-label="ヘルプを検索" placeholder="例：配信停止、料金プランの比較、レポートの見方" class="w-full h-16 pl-14 pr-6 py-2 text-lg bg-surface border-2 border-outline rounded-full focus:ring-primary focus:border-primary transition text-gray-900 placeholder-gray-400">
                     </form>
+                    <div class="mt-6 flex flex-wrap justify-center gap-2" aria-label="人気のキーワード">
+                        <span class="text-sm text-gray-200 text-shadow-sm mr-2">よく検索されるキーワード:</span>
+                        <a href="help-content.html?search=%E3%82%A2%E3%83%B3%E3%82%B1%E3%83%BC%E3%83%88%E4%BD%9C%E6%88%90" class="keyword-chip">アンケート作成</a>
+                        <a href="help-content.html?search=%E6%96%99%E9%87%91%E3%83%97%E3%83%A9%E3%83%B3" class="keyword-chip">料金プラン</a>
+                        <a href="help-content.html?search=%E3%83%AD%E3%82%B0%E3%82%A4%E3%83%B3" class="keyword-chip">ログイン</a>
+                        <a href="help-content.html?search=QR%E3%82%B3%E3%83%BC%E3%83%89" class="keyword-chip">QRコード</a>
+                        <a href="help-content.html?search=%E3%83%80%E3%82%A6%E3%83%B3%E3%83%AD%E3%83%BC%E3%83%89" class="keyword-chip">ダウンロード</a>
+                    </div>
                 </div>
             </section>
 
             <!-- メインコンテンツコンテナ (パンくずリスト以降の全コンテンツ) -->
             <div class="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-
-                <!-- パンくずリストコンテナ -->
-                <!-- <div id="breadcrumb-container" class="py-6"></div> -->
+                <nav aria-label="パンくず" class="py-6">
+                    <ol class="flex items-center flex-wrap text-sm">
+                        <li class="flex items-center"><a href="index.html" class="text-secondary hover:underline">アンケート一覧</a><span class="material-icons text-on-surface-variant mx-1" style="font-size:1rem;">chevron_right</span></li>
+                        <li class="flex items-center"><span class="text-on-surface-variant font-medium">ヘルプセンター</span></li>
+                    </ol>
+                </nav>
 
                 <!-- 2. よく読まれているカテゴリ -->
                 <section class="pt-16 pb-8">
@@ -70,9 +81,18 @@
                         <!-- Add Pagination -->
                         <div class="swiper-pagination"></div>
                         <!-- Add Navigation -->
-                        <div class="swiper-button-prev"></div>
-                        <div class="swiper-button-next"></div>
+                        <div class="swiper-button-prev" aria-label="前へ"></div>
+                        <div class="swiper-button-next" aria-label="次へ"></div>
                     </div>
+                </section>
+
+                <!-- 2.5 人気記事ピックアップ -->
+                <section class="pt-8 pb-8 border-t border-outline-variant">
+                    <h2 class="text-2xl font-bold text-on-background text-center mb-10">よく読まれている記事</h2>
+                    <div id="popular-articles-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- JSで記事が動的に挿入されます -->
+                    </div>
+                    <p id="popular-articles-empty" class="text-center text-on-surface-variant hidden">記事の読み込み中...</p>
                 </section>
 
                 <!-- 3. すべてのカテゴリから探す -->
@@ -92,18 +112,13 @@
                             </a>
                             <a href="help-content.html?category=how-to-use" class="category-card group block bg-surface rounded-xl p-6 text-center shadow-sm hover:shadow-lg transition-shadow duration-300">
                                 <div class="inline-block p-4 bg-primary-container rounded-full mb-4"><span class="material-icons text-4xl text-on-primary-container">build</span></div>
-                                <h3 class="text-lg font-semibold text-on-surface mb-1">SPEEDADの使い方</h3>
+                                <h3 class="text-lg font-semibold text-on-surface mb-1">SPEED-ADの使い方</h3>
                                 <p class="text-sm text-on-surface-variant">各機能の具体的な操作方法</p>
                             </a>
-                            <a href="help-content.html?category=plans" class="category-card group block bg-surface rounded-xl p-6 text-center shadow-sm hover:shadow-lg transition-shadow duration-300">
-                                <div class="inline-block p-4 bg-primary-container rounded-full mb-4"><span class="material-icons text-4xl text-on-primary-container">sell</span></div>
-                                <h3 class="text-lg font-semibold text-on-surface mb-1">料金</h3>
-                                <p class="text-sm text-on-surface-variant">プラン内容やアップグレード</p>
-                            </a>
-                            <a href="help-content.html?category=billing" class="category-card group block bg-surface rounded-xl p-6 text-center shadow-sm hover:shadow-lg transition-shadow duration-300">
+                            <a href="help-content.html?category=plans-billing" class="category-card group block bg-surface rounded-xl p-6 text-center shadow-sm hover:shadow-lg transition-shadow duration-300">
                                 <div class="inline-block p-4 bg-primary-container rounded-full mb-4"><span class="material-icons text-4xl text-on-primary-container">receipt_long</span></div>
-                                <h3 class="text-lg font-semibold text-on-surface mb-1">ご請求・お支払い</h3>
-                                <p class="text-sm text-on-surface-variant">請求書や支払い方法など</p>
+                                <h3 class="text-lg font-semibold text-on-surface mb-1">料金・請求</h3>
+                                <p class="text-sm text-on-surface-variant">プラン内容・お支払い・請求書</p>
                             </a>
                             <a href="faq.html" class="category-card group block bg-surface rounded-xl p-6 text-center shadow-sm hover:shadow-lg transition-shadow duration-300">
                                 <div class="inline-block p-4 bg-primary-container rounded-full mb-4"><span class="material-icons text-4xl text-on-primary-container">help_outline</span></div>
@@ -129,19 +144,25 @@
                     </div>
                 </section>
 
-                <!-- 4. お知らせ -->
-                <section class="pt-8 pb-16 border-t border-outline-variant">
-                    <div class="max-w-6xl mx-auto">
-                        <h2 class="text-2xl font-bold text-on-background text-center mb-10">お知らせ</h2>
-                        <div id="notifications-list" class="space-y-4">
-                            <!-- JSによりお知らせアイテムが動的に挿入されます -->
-                        </div>
-                        <nav id="notifications-pagination" class="flex justify-center items-center gap-4 mt-10">
-                            <!-- JSによりページネーションが動的に挿入されます -->
-                        </nav>
-                    </div>
-                </section>
             </div>
+
+            <!-- 5. 解決しなかった場合 -->
+            <section class="mt-8 mb-16 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-primary-container rounded-xl p-8 text-center">
+                    <h2 class="text-xl font-bold text-on-primary-container mb-2">解決しませんでしたか？</h2>
+                    <p class="text-on-primary-container mb-6">サポートチームがお手伝いします。お気軽にお問い合わせください。</p>
+                    <div class="flex flex-wrap justify-center gap-3">
+                        <a href="bug-report.html" class="inline-flex items-center gap-2 bg-primary text-on-primary px-6 py-3 rounded-full font-semibold hover:opacity-90 transition">
+                            <span class="material-icons">mail</span>
+                            お問い合わせ
+                        </a>
+                        <a href="faq.html" class="inline-flex items-center gap-2 bg-surface text-primary border border-primary px-6 py-3 rounded-full font-semibold hover:bg-primary-container transition">
+                            <span class="material-icons">help_outline</span>
+                            よくある質問を見る
+                        </a>
+                    </div>
+                </div>
+            </section>
         </main>
     </div>
 

@@ -1,64 +1,61 @@
 import { resolveDashboardDataPath } from './utils.js';
+import { resolveLocalizedValue } from './services/i18n/messages.js';
+
+function escapeHtml(str) {
+    if (str == null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function loc(value) {
+    const lang = (typeof window !== 'undefined' && window.getCurrentLanguage) ? window.getCurrentLanguage() : 'ja';
+    return resolveLocalizedValue(value, lang, 'ja');
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     const helpCenterApp = {
         elements: {
             searchInput: document.querySelector('input[name="query"]'),
             searchForm: document.querySelector('.help-center-hero form'),
-            notificationsList: document.getElementById('notifications-list'),
-            paginationContainer: document.getElementById('notifications-pagination'),
             featuredCarouselWrapper: document.getElementById('featured-carousel-wrapper'),
+            popularArticlesList: document.getElementById('popular-articles-list'),
+            popularArticlesEmpty: document.getElementById('popular-articles-empty'),
         },
         state: {
-            notifications: [],
             articles: [],
-            currentPage: 1,
-            itemsPerPage: 6,
         },
 
         async init() {
             if (this.elements.searchForm) {
                 this.elements.searchForm.addEventListener('submit', this.handleSearchSubmit.bind(this));
             }
-            this.addAccordionEventListener();
             await this.loadData();
-            this.renderNotifications();
-            this.renderPagination();
             this.renderFeaturedCarousel();
+            this.renderPopularArticles();
             this.initSwiper();
-        },
-
-        addAccordionEventListener() {
-            if (!this.elements.notificationsList) return;
-            this.elements.notificationsList.addEventListener('click', (event) => {
-                const button = event.target.closest('.notification-item button');
-                if (button) {
-                    const item = button.closest('.notification-item');
-                    const icon = button.querySelector('.material-icons');
-                    
-                    item.classList.toggle('is-open');
-                    const isOpen = item.classList.contains('is-open');
-                    icon.classList.toggle('rotate-180', isOpen);
-                }
+            document.addEventListener('languagechange', () => {
+                this.renderFeaturedCarousel();
+                this.renderPopularArticles();
             });
         },
 
         async loadData() {
             try {
-                const [notificationsRes, articlesRes] = await Promise.all([
-                    fetch(resolveDashboardDataPath('notifications.json')),
-                    fetch(resolveDashboardDataPath('help_articles.json'))
-                ]);
-                if (!notificationsRes.ok) throw new Error('お知らせデータの読み込みに失敗しました。');
+                const articlesRes = await fetch(resolveDashboardDataPath('help_articles.json'));
                 if (!articlesRes.ok) throw new Error('記事データの読み込みに失敗しました。');
-                
-                this.state.notifications = await notificationsRes.json();
+
                 const articlesData = await articlesRes.json();
                 this.state.articles = articlesData.categories;
 
             } catch (error) {
                 console.error("データの読み込み中にエラーが発生しました:", error);
-                if(this.elements.notificationsList) this.elements.notificationsList.innerHTML = `<p class="text-error">${error.message}</p>`;
+                if (this.elements.featuredCarouselWrapper) {
+                    this.elements.featuredCarouselWrapper.innerHTML = `<p class="text-error p-4 text-center">データの読み込みに失敗しました。</p>`;
+                }
             }
         },
 
@@ -70,101 +67,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
 
-        renderNotifications() {
-            if (!this.elements.notificationsList) return;
-            
-            const startIndex = (this.state.currentPage - 1) * this.state.itemsPerPage;
-            const endIndex = startIndex + this.state.itemsPerPage;
-            const paginatedItems = this.state.notifications.slice(startIndex, endIndex);
-
-            this.elements.notificationsList.innerHTML = paginatedItems.map(item => `
-                <div class="notification-item border-b border-outline-variant">
-                    <button class="w-full text-left p-4 focus:outline-none">
-                        <div class="flex justify-between items-center">
-                            <div class="flex items-center">
-                                <span class="text-sm text-on-surface-variant mr-4">${item.date}</span>
-                                <h4 class="font-semibold text-on-surface">${item.title}</h4>
-                            </div>
-                            <span class="material-icons text-on-surface-variant transition-transform">expand_more</span>
-                        </div>
-                    </button>
-                    <div class="notification-content text-on-surface-variant px-4 pb-4">
-                        <p>${item.content}</p>
-                    </div>
-                </div>
-            `).join('');
-        },
-
-        renderPagination() {
-            if (!this.elements.paginationContainer) return;
-
-            const totalPages = Math.ceil(this.state.notifications.length / this.state.itemsPerPage);
-            if (totalPages <= 1) {
-                this.elements.paginationContainer.innerHTML = '';
-                return;
-            }
-
-            let paginationHtml = `
-                <button id="prev-page" class="pagination-arrow" ${this.state.currentPage === 1 ? 'disabled' : ''}>
-                    <span class="material-icons">chevron_left</span>
-                </button>
-            `;
-
-            for (let i = 1; i <= totalPages; i++) {
-                paginationHtml += `
-                    <button class="pagination-number ${i === this.state.currentPage ? 'active' : ''}" data-page="${i}">
-                        ${i}
-                    </button>
-                `;
-            }
-
-            paginationHtml += `
-                <button id="next-page" class="pagination-arrow" ${this.state.currentPage === totalPages ? 'disabled' : ''}>
-                    <span class="material-icons">chevron_right</span>
-                </button>
-            `;
-
-            this.elements.paginationContainer.innerHTML = paginationHtml;
-            this.addPaginationEventListeners();
-        },
-
-        addPaginationEventListeners() {
-            this.elements.paginationContainer.querySelectorAll('.pagination-number').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    this.state.currentPage = parseInt(e.currentTarget.dataset.page);
-                    this.renderNotifications();
-                    this.renderPagination();
-                });
-            });
-
-            const prevButton = document.getElementById('prev-page');
-            if (prevButton) {
-                prevButton.addEventListener('click', () => {
-                    if (this.state.currentPage > 1) {
-                        this.state.currentPage--;
-                        this.renderNotifications();
-                        this.renderPagination();
-                    }
-                });
-            }
-
-            const nextButton = document.getElementById('next-page');
-            if (nextButton) {
-                nextButton.addEventListener('click', () => {
-                    const totalPages = Math.ceil(this.state.notifications.length / this.state.itemsPerPage);
-                    if (this.state.currentPage < totalPages) {
-                        this.state.currentPage++;
-                        this.renderNotifications();
-                        this.renderPagination();
-                    }
-                });
-            }
-        },
-
         renderFeaturedCarousel() {
             if (!this.elements.featuredCarouselWrapper) return;
 
-            const featuredCategoryIds = ['getting-started', 'how-to-use', 'account', 'troubleshooting', 'faq'];
+            const featuredCategoryIds = ['getting-started', 'how-to-use', 'account', 'troubleshooting', 'plans-billing'];
             const duplicatedCategoryIds = [...featuredCategoryIds, ...featuredCategoryIds]; // ループ再生のためにスライドを複製
 
             const categoryIcons = {
@@ -172,23 +78,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 'how-to-use': 'build',
                 account: 'account_circle',
                 troubleshooting: 'support_agent',
-                faq: 'help_outline'
+                'plans-billing': 'receipt_long'
             };
 
             const slidesHtml = duplicatedCategoryIds.map(id => {
                 const category = this.state.articles.find(c => c.id === id);
                 if (!category) return '';
 
-                const questionsHtml = category.questions.slice(0, 3).map(q => 
-                    `<li><a href="help-content.html?article=${q.id}" class="flex items-center gap-2 text-on-surface-variant hover:text-primary text-sm transition-colors"><span class="material-icons text-base">chevron_right</span>${q.question}</a></li>`
+                const questionsHtml = category.questions.slice(0, 3).map(q =>
+                    `<li><a href="help-content.html?article=${escapeHtml(q.id)}" class="flex items-center gap-2 text-on-surface-variant hover:text-primary text-sm transition-colors"><span class="material-icons text-base">chevron_right</span>${escapeHtml(loc(q.question))}</a></li>`
                 ).join('');
 
                 return `
                     <div class="swiper-slide h-auto">
                         <div class="highlight-card bg-surface rounded-xl p-8 shadow-lg h-full flex flex-col">
-                            <a href="help-content.html?category=${category.id}" class="flex items-center gap-4 mb-4">
+                            <a href="help-content.html?category=${escapeHtml(category.id)}" class="flex items-center gap-4 mb-4">
                                 <span class="material-icons text-3xl text-primary">${categoryIcons[id] || 'help_outline'}</span>
-                                <h3 class="text-xl font-semibold text-on-surface">${category.name}</h3>
+                                <h3 class="text-xl font-semibold text-on-surface">${escapeHtml(loc(category.name))}</h3>
                             </a>
                             <ul class="space-y-3 text-sm flex-grow">
                                 ${questionsHtml}
@@ -201,6 +107,38 @@ document.addEventListener('DOMContentLoaded', () => {
             this.elements.featuredCarouselWrapper.innerHTML = slidesHtml;
         },
 
+        renderPopularArticles() {
+            if (!this.elements.popularArticlesList) return;
+
+            const allQuestions = this.state.articles.flatMap(cat =>
+                cat.questions.map(q => ({ ...q, categoryName: cat.name, categoryId: cat.id }))
+            );
+            const featured = allQuestions.filter(q => q.isFeatured).slice(0, 6);
+
+            if (featured.length === 0) {
+                this.elements.popularArticlesList.innerHTML = '';
+                if (this.elements.popularArticlesEmpty) {
+                    this.elements.popularArticlesEmpty.textContent = '公開中の記事はまだありません。';
+                    this.elements.popularArticlesEmpty.classList.remove('hidden');
+                }
+                return;
+            }
+
+            if (this.elements.popularArticlesEmpty) {
+                this.elements.popularArticlesEmpty.classList.add('hidden');
+            }
+
+            this.elements.popularArticlesList.innerHTML = featured.map(article => `
+                <a href="help-content.html?article=${escapeHtml(article.id)}" class="popular-article-card block bg-surface rounded-lg p-4 border border-outline-variant hover:border-primary hover:shadow-md transition">
+                    <p class="text-xs text-primary font-semibold mb-1">${escapeHtml(loc(article.categoryName))}</p>
+                    <h3 class="text-base font-semibold text-on-surface flex items-start gap-2">
+                        <span>${escapeHtml(loc(article.question))}</span>
+                        <span class="material-icons text-on-surface-variant text-base ml-auto flex-shrink-0">chevron_right</span>
+                    </h3>
+                </a>
+            `).join('');
+        },
+
         initSwiper() {
             if (!document.getElementById('featured-carousel')) return;
 
@@ -209,8 +147,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 slidesPerView: 1,
                 spaceBetween: 16,
                 autoplay: {
-                    delay: 5000,
-                    disableOnInteraction: false, // ユーザー操作後も自動再生を継続
+                    delay: 6000,
+                    disableOnInteraction: true,
+                    pauseOnMouseEnter: true,
                 },
                 pagination: {
                     el: '.swiper-pagination',
@@ -219,6 +158,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 navigation: {
                     nextEl: '.swiper-button-next',
                     prevEl: '.swiper-button-prev',
+                },
+                a11y: {
+                    prevSlideMessage: '前のスライド',
+                    nextSlideMessage: '次のスライド',
+                    paginationBulletMessage: 'スライド {{index}} へ移動',
                 },
                 breakpoints: {
                     768: {

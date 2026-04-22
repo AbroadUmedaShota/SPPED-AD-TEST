@@ -1,4 +1,34 @@
 import { resolveDashboardDataPath } from './utils.js';
+import { resolveLocalizedValue } from './services/i18n/messages.js';
+
+function escapeHtml(str) {
+    if (str == null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function loc(value) {
+    const lang = (typeof window !== 'undefined' && window.getCurrentLanguage) ? window.getCurrentLanguage() : 'ja';
+    return resolveLocalizedValue(value, lang, 'ja');
+}
+
+const FEEDBACK_STORAGE_KEY = 'helpArticleFeedback';
+
+function getFeedbackStore() {
+    try {
+        const raw = localStorage.getItem(FEEDBACK_STORAGE_KEY);
+        return raw ? JSON.parse(raw) : {};
+    } catch (_e) {
+        return {};
+    }
+}
+
+function setFeedbackStore(store) {
+    try {
+        localStorage.setItem(FEEDBACK_STORAGE_KEY, JSON.stringify(store));
+    } catch (_e) { /* no-op */ }
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     const helpContentApp = {
@@ -39,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const searchTerm = params.get('search');
 
             if (!this.state.faqData) return;
-            
+
             this.state.searchTerm = searchTerm || '';
 
             if (articleId) {
@@ -55,14 +85,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.state.currentCategory = this.state.faqData.categories.find(c => c.id === categorySlug);
             }
         },
-        
+
         addEventListeners() {
             this.elements.displayArea.addEventListener('click', (event) => {
                 const feedbackBtn = event.target.closest('.feedback-btn');
                 if (feedbackBtn) {
                     const feedbackSection = feedbackBtn.closest('.feedback-section');
+                    const articleId = feedbackSection?.dataset.articleId;
+                    const vote = feedbackBtn.dataset.vote || 'yes';
+                    if (articleId) {
+                        const store = getFeedbackStore();
+                        store[articleId] = { vote, at: new Date().toISOString() };
+                        setFeedbackStore(store);
+                    }
                     feedbackSection.innerHTML = '<p class="text-on-surface-variant">ご協力ありがとうございました。</p>';
                 }
+            });
+
+            document.addEventListener('languagechange', () => {
+                this.render();
             });
         },
 
@@ -88,11 +129,11 @@ document.addEventListener('DOMContentLoaded', () => {
             ];
 
             if (this.state.searchTerm) {
-                items.push({ name: `検索結果: "${this.state.searchTerm}"` });
+                items.push({ name: `検索結果: "${escapeHtml(this.state.searchTerm)}"` });
             } else if (this.state.currentCategory) {
-                items.push({ name: this.state.currentCategory.name, link: `help-content.html?category=${this.state.currentCategory.id}` });
+                items.push({ name: loc(this.state.currentCategory.name), link: `help-content.html?category=${this.state.currentCategory.id}` });
                 if (this.state.currentArticle) {
-                    items.push({ name: this.state.currentArticle.question });
+                    items.push({ name: loc(this.state.currentArticle.question) });
                 }
             }
 
@@ -110,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         renderTitle() {
-            const title = this.state.currentArticle ? this.state.currentArticle.question : this.state.currentCategory.name;
+            const title = this.state.currentArticle ? loc(this.state.currentArticle.question) : loc(this.state.currentCategory.name);
             this.elements.titleArea.innerHTML = `
                 <h1 class="text-on-background text-headline-large font-bold leading-tight tracking-tight">${title}</h1>
             `;
@@ -127,8 +168,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const articlesHtml = articles.map(article => `
                 <a href="help-content.html?article=${article.id}" class="article-list-item block border-b border-outline-variant py-4 hover:bg-surface-variant -mx-4 px-4">
-                    <h2 class="text-lg font-semibold text-on-surface mb-1">${article.question}</h2>
-                    <p class="text-sm text-on-surface-variant">${article.answer.substring(0, 80)}...</p>
+                    <h2 class="text-lg font-semibold text-on-surface mb-1">${loc(article.question)}</h2>
+                    <p class="text-sm text-on-surface-variant">${loc(article.answer).substring(0, 80)}...</p>
                 </a>
             `).join('');
 
@@ -136,19 +177,18 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         renderArticleDetail() {
+            const videoUrl = this.state.currentArticle.videoUrl;
+            const videoEmbed = videoUrl ? `<div class="video-embed mb-6"><iframe src="${escapeHtml(videoUrl)}" title="${escapeHtml(loc(this.state.currentArticle.question))}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>` : '';
             const articleHtml = `
                 <article class="help-content-article">
-                    <p class="text-sm text-on-surface-variant mb-4">最終更新日: 2025/11/10</p>
+                    <p class="text-sm text-on-surface-variant mb-4">最終更新日: ${escapeHtml(this.state.currentArticle.updatedAt || '—')}</p>
+                    ${videoEmbed}
                     <div class="prose max-w-none text-on-surface">
-                        ${this.state.currentArticle.answer.replace(/\n/g, '<br>')}
+                        ${loc(this.state.currentArticle.answer).replace(/\n/g, '<br>')}
                     </div>
                 </article>
-                <section class="feedback-section mt-12 py-8 border-t border-b border-outline-variant text-center">
-                    <h3 class="font-semibold text-on-surface mb-3">この記事は参考になりましたか？</h3>
-                    <div class="flex justify-center gap-4">
-                        <button class="feedback-btn"><span class="material-icons mr-2">thumb_up</span>はい</button>
-                        <button class="feedback-btn"><span class="material-icons mr-2">thumb_down</span>いいえ</button>
-                    </div>
+                <section class="feedback-section mt-12 py-8 border-t border-b border-outline-variant text-center" data-article-id="${escapeHtml(this.state.currentArticle.id)}">
+                    ${this.renderFeedbackUI()}
                 </section>
                 <section class="related-articles-section mt-12">
                     <h3 class="text-xl font-bold text-on-background mb-4">他によく読まれている記事</h3>
@@ -160,6 +200,21 @@ document.addEventListener('DOMContentLoaded', () => {
             this.elements.displayArea.innerHTML = articleHtml;
         },
 
+        renderFeedbackUI() {
+            const store = getFeedbackStore();
+            const existing = store[this.state.currentArticle.id];
+            if (existing) {
+                return `<p class="text-on-surface-variant">ご協力ありがとうございました。</p>`;
+            }
+            return `
+                <h3 class="font-semibold text-on-surface mb-3">この記事は参考になりましたか？</h3>
+                <div class="flex justify-center gap-4">
+                    <button class="feedback-btn" data-vote="yes"><span class="material-icons mr-2">thumb_up</span>はい</button>
+                    <button class="feedback-btn" data-vote="no"><span class="material-icons mr-2">thumb_down</span>いいえ</button>
+                </div>
+            `;
+        },
+
         getRelatedArticles() {
             const allQuestions = this.state.faqData.categories.flatMap(cat => cat.questions);
             const related = allQuestions
@@ -169,24 +224,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
             return related.map(article => `
                 <a href="help-content.html?article=${article.id}" class="related-article-link">
-                    <span class="font-semibold">${article.question}</span>
+                    <span class="font-semibold">${loc(article.question)}</span>
                     <span class="material-icons">chevron_right</span>
                 </a>
             `).join('');
         },
-        
+
         renderSearchResults() {
             const lowerCaseSearchTerm = this.state.searchTerm.toLowerCase();
             const searchKeywords = lowerCaseSearchTerm.split(/\s+/).filter(Boolean);
-            
-            const results = this.state.faqData.categories.flatMap(category => 
-                category.questions.map(question => ({...question, categoryName: category.name}))
+
+            const results = this.state.faqData.categories.flatMap(category =>
+                category.questions.map(question => ({...question, categoryName: loc(category.name)}))
             ).filter(question => {
-                const content = `${question.question} ${question.answer}`.toLowerCase();
+                const content = `${loc(question.question)} ${loc(question.answer)}`.toLowerCase();
                 return searchKeywords.every(keyword => content.includes(keyword));
             });
 
-            this.elements.titleArea.innerHTML = `<h1 class="text-on-background text-headline-large font-bold">「${this.state.searchTerm}」の検索結果 (${results.length}件)</h1>`;
+            this.elements.titleArea.innerHTML = `<h1 class="text-on-background text-headline-large font-bold">「${escapeHtml(this.state.searchTerm)}」の検索結果 (${results.length}件)</h1>`;
 
             if (results.length === 0) {
                 this.elements.displayArea.innerHTML = '<p class="text-center text-on-surface-variant">該当する記事は見つかりませんでした。</p>';
@@ -194,18 +249,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const resultsHtml = results.map(article => {
-                let highlightedQuestion = article.question;
-                let highlightedAnswer = article.answer.substring(0, 120) + '...';
-                
+                let highlightedQuestion = escapeHtml(loc(article.question));
+                let highlightedAnswer = escapeHtml(loc(article.answer).substring(0, 120)) + '...';
+
                 searchKeywords.forEach(keyword => {
-                    const regex = new RegExp(keyword, 'gi');
+                    const regex = new RegExp(escapeHtml(keyword), 'gi');
                     highlightedQuestion = highlightedQuestion.replace(regex, '<mark>$&</mark>');
                     highlightedAnswer = highlightedAnswer.replace(regex, '<mark>$&</mark>');
                 });
 
                 return `
                     <a href="help-content.html?article=${article.id}" class="article-list-item block border-b border-outline-variant py-4 hover:bg-surface-variant -mx-4 px-4">
-                        <p class="text-xs text-on-surface-variant mb-1">${article.categoryName}</p>
+                        <p class="text-xs text-on-surface-variant mb-1">${escapeHtml(article.categoryName)}</p>
                         <h2 class="text-lg font-semibold text-on-surface mb-2">${highlightedQuestion}</h2>
                         <p class="text-sm text-on-surface-variant">${highlightedAnswer}</p>
                     </a>
