@@ -33,6 +33,14 @@ export function getPublishedVoices(collection) {
     : [];
 }
 
+export function getVoicePageLabel(voice = {}) {
+  return voice.voicePageLabel || voice.label || '';
+}
+
+export function getVoicePageSummary(voice = {}) {
+  return voice.voicePageSummary || voice.listingSummary || '';
+}
+
 export function renderFeatureList(items = []) {
   if (!Array.isArray(items) || items.length === 0) {
     return '';
