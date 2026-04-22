@@ -4,6 +4,7 @@ import {
   getVoicePageLabel,
   getVoicePageSummary,
   loadVoiceCollection,
+  refreshRevealAnimations,
   renderBullets,
   renderFeatureList,
   renderParagraphs,
@@ -87,6 +88,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
         </section>
       `;
+      refreshRevealAnimations(main);
     }
     if (aside) {
       aside.innerHTML = '';
