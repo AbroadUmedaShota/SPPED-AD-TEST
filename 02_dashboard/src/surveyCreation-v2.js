@@ -61,7 +61,7 @@ function trapFocus(modal, firstEl, lastEl) {
   return () => modal.removeEventListener('keydown', onKeydown);
 }
 
-function showNotice(message, type = 'info') {
+function showNotice(message, type = 'info', titleOverride = null) {
   const modal = document.getElementById('noticeModal');
   const iconEl = document.getElementById('noticeModalIcon');
   const titleEl = document.getElementById('noticeModalTitle');
@@ -78,7 +78,7 @@ function showNotice(message, type = 'info') {
 
   iconEl.className = `material-icons text-2xl flex-shrink-0 mt-0.5 ${config.color}`;
   iconEl.textContent = config.icon;
-  titleEl.textContent = config.title;
+  titleEl.textContent = titleOverride ?? config.title;
   bodyEl.textContent = message;
 
   modal.classList.remove('hidden');
@@ -205,12 +205,15 @@ function buildRelatedSettingsUrl(path, surveyId) {
 const touchedFields = new Set();
 
 // 入力イベントでバリデーション更新
-document.addEventListener('input', (e) => {
+function handleFieldChange(e) {
   if (e.target.matches('input, textarea, select')) {
     if (e.target.id) touchedFields.add(e.target.id);
     updateOutline(); // updateTranslationBadges も内部で呼ばれる
+    updateSaveButtonState();
   }
-});
+}
+document.addEventListener('input', handleFieldChange);
+document.addEventListener('change', handleFieldChange);
 
 // ─────────────────────────────────────────
 // 多言語設定処理
@@ -579,6 +582,7 @@ function renumberQuestions() {
   rebuildSeparators();
   updateOutline();
   updateEmptyState();
+  updateSaveButtonState();
 }
 
 function updateEmptyState() {
@@ -2350,7 +2354,12 @@ function attemptSave() {
 
   if (!validateForm()) {
     if (questions.length === 0) {
-      showToast('設問を1件以上追加してください', 'error');
+      const locale = getCurrentLocale();
+      const title = formatMessage(locale, 'surveyCreation.validation.noQuestionsTitle');
+      const body = formatMessage(locale, 'surveyCreation.validation.noQuestionsBody')
+        + ' '
+        + formatMessage(locale, 'surveyCreation.validation.noQuestionsRecommendation');
+      showNotice(body, 'warning', title);
       const firstBtn = document.getElementById('addFirstQuestionBtn');
       if (firstBtn) smoothScrollIntoView(firstBtn, 'center');
     } else {
@@ -2373,11 +2382,32 @@ async function loadFromUrlParams() {
     const params = new URLSearchParams(window.location.search);
     const surveyId = params.get('surveyId');
     const surveyName = params.get('surveyName');
+    const displayTitle = params.get('displayTitle');
+    const periodStart = params.get('periodStart');
+    const periodEnd = params.get('periodEnd');
 
     if (surveyName) {
       const nameInput = document.getElementById('surveyName_ja');
       if (nameInput) {
         nameInput.value = surveyName;
+      }
+    }
+
+    if (displayTitle) {
+      const titleInput = document.getElementById('displayTitle_ja');
+      if (titleInput) {
+        titleInput.value = displayTitle;
+      }
+    }
+
+    if (periodStart && periodEnd) {
+      const periodInput = document.getElementById('periodRange');
+      if (periodInput) {
+        if (periodInput._flatpickr) {
+          periodInput._flatpickr.setDate([periodStart, periodEnd], false);
+        } else {
+          periodInput.value = `${periodStart} 〜 ${periodEnd}`;
+        }
       }
     }
 
@@ -2396,6 +2426,10 @@ async function loadFromUrlParams() {
       const thankYouScreenLink = document.getElementById('openThankYouScreenSettingsBtn') || document.getElementById('linkThankYouScreenSettings');
       if (thankYouScreenLink) thankYouScreenLink.href = buildRelatedSettingsUrl('thankYouScreenSettings.html', surveyId);
     }
+
+    // JS からの value 代入では input/change イベントが発火しないため、
+    // 保存ボタン状態を明示的に再評価する
+    updateSaveButtonState();
   } catch (e) {
     console.warn('URLパラメータの解析に失敗しました', e);
   }

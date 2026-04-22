@@ -82,7 +82,10 @@ export const messages = {
       validation: {
         surveyNameRequired: '要確認: アンケート名を入力してください',
         displayTitleRequired: '要確認: 表示タイトルを入力してください',
-        periodRequired: '要確認: 期間を設定してください'
+        periodRequired: '要確認: 期間を設定してください',
+        noQuestionsTitle: '設問が登録されていません',
+        noQuestionsBody: 'アンケートには最低1件の設問が必要なため、現状では保存できません。',
+        noQuestionsRecommendation: '推奨対応：画面中央の「最初の設問を追加」ボタンから、1問以上の設問を登録してください。'
       }
     }
   },
@@ -146,7 +149,10 @@ export const messages = {
       validation: {
         surveyNameRequired: 'Please enter the survey name.',
         displayTitleRequired: 'Please enter the display title.',
-        periodRequired: 'Please set the survey period.'
+        periodRequired: 'Please set the survey period.',
+        noQuestionsTitle: 'No questions have been registered',
+        noQuestionsBody: 'At least one question is required, so the survey cannot be saved in its current state.',
+        noQuestionsRecommendation: 'Recommended action: add at least one question using the "Add first question" button in the center of the screen.'
       }
     }
   },
@@ -210,7 +216,10 @@ export const messages = {
       validation: {
         surveyNameRequired: '请输入问卷名称。',
         displayTitleRequired: '请输入显示标题。',
-        periodRequired: '请设置问卷期间。'
+        periodRequired: '请设置问卷期间。',
+        noQuestionsTitle: '尚未登记任何题目',
+        noQuestionsBody: '问卷至少需要 1 个题目，当前状态下无法保存。',
+        noQuestionsRecommendation: '建议操作：请通过页面中央的「添加第一个题目」按钮，至少登记 1 个题目。'
       }
     }
   },
@@ -274,7 +283,10 @@ export const messages = {
       validation: {
         surveyNameRequired: '請輸入問卷名稱。',
         displayTitleRequired: '請輸入顯示標題。',
-        periodRequired: '請設定問卷期間。'
+        periodRequired: '請設定問卷期間。',
+        noQuestionsTitle: '尚未登錄任何題目',
+        noQuestionsBody: '問卷至少需要 1 個題目，目前狀態下無法儲存。',
+        noQuestionsRecommendation: '建議操作：請透過頁面中央的「新增第一個題目」按鈕，至少登錄 1 個題目。'
       }
     }
   }

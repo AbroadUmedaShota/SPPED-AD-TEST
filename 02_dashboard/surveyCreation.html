@@ -606,6 +606,14 @@
                 <!-- Flat Question List Container -->
                 <div id="questionListContainer" class="mb-8">
                   <div id="questionListEmpty" class="py-12 px-6 bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-100 rounded-2xl transition-all">
+                    <!-- 保存ブロック警告（設問0件では保存不可。PM指定） -->
+                    <div class="flex items-start gap-3 bg-amber-50 border border-amber-300 text-amber-800 rounded-xl px-4 py-3 mb-6 text-left" role="alert">
+                      <span class="material-icons text-amber-500 text-[22px] flex-shrink-0 mt-0.5">warning_amber</span>
+                      <div class="flex-1 min-w-0">
+                        <p class="font-bold text-sm">保存するには設問を1件以上追加してください</p>
+                        <p class="text-xs mt-1 leading-relaxed"><span class="font-bold">推奨対応：</span>下の「最初の設問を追加」ボタンから、シングルアンサー等の基本設問を少なくとも1問登録してください。</p>
+                      </div>
+                    </div>
                     <div class="text-center">
                       <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white mb-4 shadow-md border border-indigo-100">
                         <span class="material-icons text-5xl text-indigo-300">note_add</span>
