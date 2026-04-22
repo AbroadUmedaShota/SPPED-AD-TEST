@@ -3,15 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="SPEED AD を先行利用したT社の導入事例ページです。">
-  <title>T社 | SPEED AD お客様のお声</title>
+  <meta name="description" content="THK株式会社が展示会で集めた声を、次のフォローへつなげやすくした導入事例ページです。">
+  <title>THK株式会社 | SPEED AD お客様のお声</title>
   <link rel="icon" href="../img/logo2.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;800&family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&family=Noto+Sans+JP:wght@400;500;600;700;800&family=Zen+Old+Mincho:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./company-monitor.css">
 </head>
-<body class="voice-page" data-voice-slug="company-monitor">
+<body class="voice-page voice-company-monitor" data-voice-slug="company-monitor">
   <header class="voice-header">
     <div class="voice-header__inner">
       <a class="voice-brand" href="../index.html">
@@ -29,69 +30,95 @@
   </header>
 
   <main>
-    <div class="voice-shell">
-      <section class="voice-detail-hero">
-        <div class="voice-detail-hero__inner">
-          <div data-reveal>
-            <p class="voice-eyebrow" id="voice-hero-eyebrow">導入事例</p>
-            <h1 class="voice-detail-hero__title" id="voice-hero-title">読み込み中...</h1>
-            <p class="voice-detail-hero__lead" id="voice-hero-lead">導入事例データを読み込んでいます。</p>
-            <div class="voice-detail-hero__meta" id="voice-hero-meta"></div>
-            <div class="voice-detail-hero__actions">
+    <div class="voice-shell company-story-shell">
+      <section class="company-story-hero">
+        <div class="company-story-hero__body">
+          <div class="company-story-hero__content" data-reveal>
+            <p class="company-story-hero__eyebrow" id="voice-hero-eyebrow">Customer Voices / 導入事例</p>
+            <p class="company-story-hero__company" id="voice-hero-company">読み込み中...</p>
+            <h1 class="company-story-hero__headline" id="voice-hero-headline">導入事例データを読み込んでいます。</h1>
+            <p class="company-story-hero__summary" id="voice-hero-summary">表示内容を準備しています。</p>
+            <div class="company-story-hero__meta" id="voice-hero-meta"></div>
+            <div class="voice-hero__actions">
               <a class="voice-button voice-button--primary" href="../index.html?intent=signup#top">無料ではじめる</a>
               <a class="voice-button voice-button--secondary" href="../index.html#top">ログインはこちら</a>
             </div>
           </div>
-          <div class="voice-detail-hero__media" data-reveal>
-            <img id="voice-hero-image" src="../img/pic2.jpg" alt="導入事例イメージ">
-          </div>
+
+          <figure class="company-story-hero__media" data-reveal>
+            <img id="voice-hero-image" src="../img/pic2.jpg" alt="THK株式会社 導入事例イメージ">
+            <figcaption class="company-story-hero__caption" id="voice-hero-caption">キービジュアルを読み込んでいます。</figcaption>
+          </figure>
         </div>
       </section>
 
-      <div class="voice-detail-layout">
-        <div class="voice-detail-main" id="voice-detail-main">
-          <section class="voice-detail-section" id="voice-overview" data-reveal>
-            <h2>概要</h2>
-            <div class="voice-detail-body" id="voice-overview-body"></div>
-          </section>
+      <section class="company-story-highlights" id="voice-highlights-section" data-reveal>
+        <div class="company-story-highlights__grid" id="voice-highlight-grid"></div>
+      </section>
 
-          <section class="voice-detail-section" id="voice-challenge" data-reveal>
-            <h2>導入前の課題</h2>
-            <div class="voice-detail-body" id="voice-challenge-body"></div>
-          </section>
-
-          <section class="voice-detail-section" id="voice-operation" data-reveal>
-            <h2>運用イメージ</h2>
-            <div class="voice-detail-body" id="voice-operation-body"></div>
-          </section>
-
-          <section class="voice-detail-section" id="voice-outcome" data-reveal>
-            <h2>導入後の変化</h2>
-            <div class="voice-detail-body" id="voice-outcome-body"></div>
-          </section>
+      <section class="company-story-quote" id="voice-quote-section" data-reveal>
+        <p class="company-story-quote__eyebrow">担当者コメント</p>
+        <div class="company-story-quote__body">
+          <blockquote class="company-story-quote__text" id="voice-quote-text"></blockquote>
+          <p class="company-story-quote__meta" id="voice-quote-meta"></p>
         </div>
+      </section>
 
-        <aside class="voice-detail-aside" id="voice-detail-aside">
-          <section class="voice-detail-card" id="voice-features" data-reveal>
+      <section class="company-story-figure company-story-figure--primary" id="voice-body-image-primary-section" data-reveal>
+        <figure class="company-story-figure__inner">
+          <img id="voice-body-image-primary" src="../img/pic3.jpg" alt="展示会会場イメージ">
+          <figcaption class="company-story-figure__caption" id="voice-body-image-primary-caption"></figcaption>
+        </figure>
+      </section>
+
+      <section class="company-story-compare">
+        <article class="company-story-panel company-story-panel--challenge" id="voice-challenge-section" data-reveal>
+          <p class="company-story-panel__eyebrow">Before</p>
+          <h2>導入前の課題</h2>
+          <div class="voice-detail-body" id="voice-challenge-body"></div>
+        </article>
+
+        <article class="company-story-panel company-story-panel--outcome" id="voice-outcome-section" data-reveal>
+          <p class="company-story-panel__eyebrow">After</p>
+          <h2>導入後の変化</h2>
+          <div class="voice-detail-body" id="voice-outcome-body"></div>
+        </article>
+      </section>
+
+      <section class="company-story-section company-story-section--timeline" id="voice-operation-section" data-reveal>
+        <p class="company-story-section__eyebrow">Flow</p>
+        <h2>運用イメージ</h2>
+        <div id="voice-operation-body"></div>
+      </section>
+
+      <section class="company-story-grid">
+        <section class="company-story-section" id="voice-overview-section" data-reveal>
+          <p class="company-story-section__eyebrow">Overview</p>
+          <h2>概要</h2>
+          <div class="voice-detail-body" id="voice-overview-body"></div>
+        </section>
+
+        <aside class="company-story-stack">
+          <section class="company-story-card" id="voice-features-section" data-reveal>
+            <p class="company-story-section__eyebrow">Features</p>
             <h2>利用した機能</h2>
             <div class="voice-detail-body" id="voice-features-body"></div>
           </section>
 
-          <section class="voice-detail-card" id="voice-quote" data-reveal>
-            <h2>担当者コメント</h2>
-            <div class="voice-quote">
-              <p class="voice-quote__text" id="voice-quote-text"></p>
-              <p class="voice-quote__meta" id="voice-quote-meta"></p>
-            </div>
+          <section class="company-story-figure company-story-figure--secondary" id="voice-body-image-secondary-section" data-reveal>
+            <figure class="company-story-figure__inner">
+              <img id="voice-body-image-secondary" src="../img/pic2.jpg" alt="展示会ブースイメージ">
+              <figcaption class="company-story-figure__caption" id="voice-body-image-secondary-caption"></figcaption>
+            </figure>
           </section>
         </aside>
-      </div>
+      </section>
 
-      <section class="voice-cta" data-reveal>
+      <section class="voice-cta company-story-cta" data-reveal>
         <h2>次の行動</h2>
         <p>
-          先行利用の事例は、会場での回収導線と会期後の初動を整えるところから始まっています。
-          自社のイベント運用でもまずは無料で導線を作り、必要な機能を段階的に広げられます。
+          THK株式会社の事例も、会場での回収導線を一度整えてみるところから始まりました。
+          自社のイベント運用でも、まずは無料で導線を試し、必要に応じて名刺取得やレビュー運用へ少しずつ広げられます。
         </p>
         <div class="voice-cta__actions">
           <a class="voice-button voice-button--secondary" href="./index.html">他の事例を見る</a>
@@ -100,12 +127,12 @@
       </section>
 
       <footer class="voice-footer">
-        <p>公開可能な範囲で内容を要約し、匿名化した導入事例です。</p>
+        <p>公開可能な範囲で内容を要約し、THK株式会社の承認済み情報に基づいて構成した導入事例です。</p>
         <a class="voice-nav__link" href="../index.html#top">ログイン前ページへ戻る</a>
       </footer>
     </div>
   </main>
 
-  <script type="module" src="./detail.js"></script>
+  <script type="module" src="./company-monitor.js"></script>
 </body>
 </html>
