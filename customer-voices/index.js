@@ -2,6 +2,7 @@ import {
   escapeHtml,
   getPublishedVoices,
   loadVoiceCollection,
+  refreshRevealAnimations,
   renderFeatureList,
   resolveAppRootPath,
   setupRevealAnimations,
@@ -46,6 +47,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const voices = getPublishedVoices(collection);
     count.textContent = `${voices.length}件の公開事例`;
     grid.innerHTML = voices.map(renderVoiceCard).join('');
+    refreshRevealAnimations(grid);
   } catch (error) {
     count.textContent = '公開準備中';
     grid.innerHTML = `
@@ -56,5 +58,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
     `;
+    refreshRevealAnimations(grid);
   }
 });
