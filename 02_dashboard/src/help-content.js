@@ -30,6 +30,101 @@ function setFeedbackStore(store) {
     } catch (_e) { /* no-op */ }
 }
 
+function renderArticleBody(rawText) {
+    if (!rawText) return '';
+    const lines = String(rawText).split(/\r?\n/);
+    const out = [];
+    let listType = null; // 'ul' | 'ol' | null
+    let paragraphBuffer = [];
+
+    const flushParagraph = () => {
+        if (paragraphBuffer.length) {
+            out.push(`<p>${inline(paragraphBuffer.join(' '))}</p>`);
+            paragraphBuffer = [];
+        }
+    };
+    const closeList = () => {
+        if (listType) {
+            out.push(`</${listType}>`);
+            listType = null;
+        }
+    };
+    const openList = (type) => {
+        if (listType !== type) {
+            closeList();
+            out.push(`<${type}>`);
+            listType = type;
+        }
+    };
+
+    function inline(text) {
+        let safe = escapeHtml(text);
+        safe = safe.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+        safe = safe.replace(/\`([^\`]+)\`/g, '<code>$1</code>');
+        // [label](url) — url は内部ヘルプ記事・外部URLいずれも許容。内部は相対リンク化。
+        safe = safe.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_m, label, url) => {
+            const safeUrl = url.replace(/["'<>]/g, '');
+            return `<a href="${safeUrl}" class="text-primary hover:underline">${label}</a>`;
+        });
+        return safe;
+    }
+
+    for (const raw of lines) {
+        const line = raw.trimEnd();
+
+        if (!line.trim()) {
+            flushParagraph();
+            closeList();
+            continue;
+        }
+
+        let m;
+        // 見出し  ## Heading
+        m = /^##\s+(.+)$/.exec(line);
+        if (m) {
+            flushParagraph();
+            closeList();
+            out.push(`<h3>${inline(m[1])}</h3>`);
+            continue;
+        }
+
+        // 引用  > note
+        m = /^>\s+(.+)$/.exec(line);
+        if (m) {
+            flushParagraph();
+            closeList();
+            out.push(`<blockquote>${inline(m[1])}</blockquote>`);
+            continue;
+        }
+
+        // 順序付きリスト  1. item
+        m = /^(\d+)\.\s+(.+)$/.exec(line);
+        if (m) {
+            flushParagraph();
+            openList('ol');
+            out.push(`<li>${inline(m[2])}</li>`);
+            continue;
+        }
+
+        // 箇条書き  - item
+        m = /^-\s+(.+)$/.exec(line);
+        if (m) {
+            flushParagraph();
+            openList('ul');
+            out.push(`<li>${inline(m[1])}</li>`);
+            continue;
+        }
+
+        // 通常段落
+        closeList();
+        paragraphBuffer.push(line);
+    }
+    flushParagraph();
+    closeList();
+
+    return out.join('\n');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const helpContentApp = {
         elements: {
@@ -166,6 +261,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+            const countLabel = `<p class="text-sm text-on-surface-variant mb-4">全${articles.length}件</p>`;
+
             const articlesHtml = articles.map(article => `
                 <a href="help-content.html?article=${article.id}" class="article-list-item block border-b border-outline-variant py-4 hover:bg-surface-variant -mx-4 px-4">
                     <h2 class="text-lg font-semibold text-on-surface mb-1">${loc(article.question)}</h2>
@@ -173,7 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </a>
             `).join('');
 
-            this.elements.displayArea.innerHTML = `<div class="space-y-2">${articlesHtml}</div>`;
+            this.elements.displayArea.innerHTML = countLabel + `<div class="space-y-2">${articlesHtml}</div>`;
         },
 
         renderArticleDetail() {
@@ -183,13 +280,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 <article class="help-content-article">
                     <p class="text-sm text-on-surface-variant mb-4">最終更新日: ${escapeHtml(this.state.currentArticle.updatedAt || '—')}</p>
                     ${videoEmbed}
-                    <div class="prose max-w-none text-on-surface">
-                        ${loc(this.state.currentArticle.answer).replace(/\n/g, '<br>')}
+                    <div class="prose max-w-none text-on-surface help-article-body">
+                        ${renderArticleBody(loc(this.state.currentArticle.answer))}
                     </div>
                 </article>
                 <section class="feedback-section mt-12 py-8 border-t border-b border-outline-variant text-center" data-article-id="${escapeHtml(this.state.currentArticle.id)}">
                     ${this.renderFeedbackUI()}
                 </section>
+                <div class="mt-8 text-center">
+                    <a href="help-content.html?category=${escapeHtml(this.state.currentCategory?.id || '')}" class="inline-flex items-center gap-1 text-primary hover:underline">
+                        <span class="material-icons text-base">arrow_back</span>
+                        ${escapeHtml(loc(this.state.currentCategory?.name) || 'カテゴリ一覧')}に戻る
+                    </a>
+                </div>
                 <section class="related-articles-section mt-12">
                     <h3 class="text-xl font-bold text-on-background mb-4">他によく読まれている記事</h3>
                     <div class="grid grid-cols-1 gap-4">
