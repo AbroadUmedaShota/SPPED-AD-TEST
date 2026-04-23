@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="service-top-style.css">
-    <!-- ヘルプセンター共通スタイル（キーワードチップ / mark / feedback-btn 等を流用） -->
+    <!-- ヘルプセンター共通スタイル（sticky検索 / mark / feedback-btn / keyword-chip 等を流用） -->
     <link rel="stylesheet" href="src/help-center.css">
     <!-- FAQページ専用CSS -->
     <link rel="stylesheet" href="assets/css/faq.css">
@@ -37,34 +37,66 @@
         <!-- メインコンテンツ -->
         <main class="flex flex-1 flex-col" id="main-content">
 
+            <!-- スクロール時に表示される縮小版検索バー -->
+            <div id="faq-sticky-search" class="hc-sticky-search" hidden>
+                <div class="hc-sticky-search__inner">
+                    <form role="search" aria-label="FAQ検索(縮小版)" class="hc-sticky-search__form" id="faq-sticky-form">
+                        <span class="material-icons hc-sticky-search__icon" aria-hidden="true">search</span>
+                        <input
+                            type="search"
+                            id="faq-sticky-search-input"
+                            name="query"
+                            aria-label="質問をキーワードで検索"
+                            placeholder="FAQを検索..."
+                            class="hc-sticky-search__input"
+                            autocomplete="off">
+                    </form>
+                </div>
+            </div>
+
+            <!-- パンくずリスト (ヒーロー上部) -->
+            <div class="hc-breadcrumb-top">
+                <div id="breadcrumb-container"></div>
+            </div>
+
             <!-- ヒーローセクション -->
-            <section class="relative help-center-hero faq-hero px-4 sm:px-6 lg:px-8 py-16 text-center">
-                <div class="relative max-w-2xl mx-auto">
-                    <h1 class="text-4xl font-bold tracking-tight text-white text-shadow-sm mb-4">よくある質問</h1>
-                    <p class="text-lg text-gray-200 text-shadow-sm mb-8">お困りごとをキーワードで検索、またはカテゴリから探せます。</p>
-                    <form role="search" class="relative" onsubmit="return false;">
-                        <span class="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-white text-2xl pointer-events-none" aria-hidden="true">search</span>
-                        <input type="search" id="search-box" name="query" aria-label="質問をキーワードで検索" placeholder="例：パスワード、料金プラン、名刺データ化" class="w-full h-16 pl-14 pr-14 py-2 text-lg bg-surface border-2 border-outline rounded-full focus:ring-primary focus:border-primary transition text-gray-900 placeholder-gray-400">
+            <section class="faq-hero" aria-labelledby="faq-hero-title">
+                <div class="faq-hero__bg" aria-hidden="true">
+                    <div class="faq-hero__grid"></div>
+                    <div class="faq-hero__glow faq-hero__glow--1"></div>
+                    <div class="faq-hero__glow faq-hero__glow--2"></div>
+                </div>
+                <div class="faq-hero__inner">
+                    <p class="faq-hero__eyebrow">SPEED-AD FAQ</p>
+                    <h1 id="faq-hero-title" class="faq-hero__title">よくある質問</h1>
+                    <p class="faq-hero__subtitle">多くの方が知りたい疑問をまとめました。キーワード検索やカテゴリから、最短3ステップで答えが見つかります。</p>
+
+                    <form role="search" aria-label="FAQ検索" class="faq-search" id="faq-search-form">
+                        <span class="material-icons faq-search__icon" aria-hidden="true">search</span>
+                        <input
+                            type="search"
+                            id="search-box"
+                            name="query"
+                            aria-label="質問をキーワードで検索"
+                            placeholder="例：パスワード、料金プラン、名刺データ化"
+                            class="faq-search__input"
+                            autocomplete="off">
                         <button type="button" id="clear-search-btn" class="faq-clear-btn hidden" aria-label="検索キーワードをクリア">
                             <span class="material-icons" aria-hidden="true">close</span>
                         </button>
                     </form>
-                    <div id="popular-keywords-wrapper" class="mt-6 flex flex-wrap justify-center gap-2" aria-label="人気のキーワード">
+
+                    <div id="popular-keywords-wrapper" class="faq-keywords" aria-label="人気のキーワード">
                         <!-- JSで動的に生成 -->
                     </div>
                 </div>
             </section>
 
             <!-- メインコンテンツコンテナ -->
-            <div class="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-
-                <!-- パンくずリストコンテナ -->
-                <nav aria-label="パンくず" class="py-6">
-                    <div id="breadcrumb-container"></div>
-                </nav>
+            <div class="faq-main">
 
                 <!-- ローディングインジケーター -->
-                <div id="loading-indicator" class="text-center py-10 hidden" aria-live="polite" aria-busy="true">
+                <div id="loading-indicator" class="text-center py-10 hidden" role="status" aria-live="polite">
                     <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
                     <p class="mt-4 text-on-surface-variant">読み込み中...</p>
                 </div>
@@ -75,64 +107,67 @@
                 <!-- FAQコンテンツ -->
                 <div id="faq-container" class="hidden pb-8">
 
-                    <!-- カテゴリカード -->
-                    <section id="category-cards-section" class="pb-8" aria-labelledby="category-cards-title">
-                        <h2 id="category-cards-title" class="text-2xl font-bold text-on-background text-center mb-8">カテゴリから探す</h2>
-                        <div id="category-cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <!-- JSで動的に生成 -->
+                    <!-- カテゴリカード (bento) -->
+                    <section id="category-cards-section" class="pt-4 pb-8" aria-labelledby="category-cards-title">
+                        <div class="hc-section-heading">
+                            <h2 id="category-cards-title" class="hc-section-heading__title">カテゴリから探す</h2>
+                            <p class="hc-section-heading__subtitle">気になるトピックから、代表的な質問をプレビューできます</p>
                         </div>
-                    </section>
-
-                    <!-- 注目の質問 -->
-                    <section id="featured-questions" class="pt-8 pb-8 border-t border-outline-variant" aria-labelledby="featured-title">
-                        <h2 id="featured-title" class="text-2xl font-bold text-on-background mb-6 flex items-center gap-2">
-                            <span class="material-icons text-primary" aria-hidden="true">star</span>
-                            注目の質問
-                        </h2>
-                        <div id="featured-questions-list" class="space-y-4">
+                        <div id="category-cards" class="hc-category-grid">
                             <!-- JSで動的に生成 -->
                         </div>
                     </section>
 
                     <!-- 検索結果ステータス（件数・クリア導線） -->
-                    <div id="search-status" class="pt-6 hidden" aria-live="polite" aria-atomic="true"></div>
+                    <div id="search-status" class="pt-2 hidden" aria-live="polite" aria-atomic="true"></div>
 
-                    <!-- カテゴリ別Q&Aリスト -->
+                    <!-- すべての質問 (コンパクト表示) -->
                     <section id="faq-list-section" class="pt-8 pb-8 border-t border-outline-variant" aria-labelledby="faq-list-title">
-                        <h2 id="faq-list-title" class="text-2xl font-bold text-on-background mb-6">すべての質問</h2>
-                        <div id="faq-list" class="space-y-12">
+                        <div class="hc-section-heading">
+                            <h2 id="faq-list-title" class="hc-section-heading__title">すべての質問</h2>
+                            <p class="hc-section-heading__subtitle">カテゴリごとに展開してご覧いただけます</p>
+                        </div>
+                        <div id="faq-list" class="space-y-10">
                             <!-- JSで動的に生成 -->
                         </div>
                         <div id="no-results-message" class="text-center py-12 hidden">
                             <span class="material-icons text-5xl text-on-surface-variant mb-3" aria-hidden="true">search_off</span>
                             <p class="font-bold text-on-background">ご指定のキーワードに一致する質問は見つかりませんでした。</p>
-                            <p class="text-sm text-on-surface-variant mt-1">単語を変えてお試しください。</p>
-                            <button type="button" id="reset-search-btn" class="mt-4 inline-flex items-center gap-2 bg-surface text-primary border border-primary px-5 py-2 rounded-full font-semibold hover:bg-primary-container transition">
-                                <span class="material-icons" aria-hidden="true">refresh</span>
-                                検索をクリアしてすべて表示
-                            </button>
+                            <p class="text-sm text-on-surface-variant mt-1">別のキーワードをお試しいただくか、下の導線からサポートまでお気軽にお問い合わせください。</p>
+                            <div class="mt-4 flex flex-wrap justify-center gap-3">
+                                <button type="button" id="reset-search-btn" class="hc-cta__btn hc-cta__btn--ghost">
+                                    <span class="material-icons" aria-hidden="true">refresh</span>
+                                    検索をクリアしてすべて表示
+                                </button>
+                                <a href="bug-report.html" class="hc-cta__btn hc-cta__btn--primary">
+                                    <span class="material-icons" aria-hidden="true">mail</span>
+                                    サポートに問い合わせる
+                                </a>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 解決しなかった場合 -->
+                    <section class="faq-cta-wrap" aria-labelledby="faq-cta-title">
+                        <div class="hc-cta">
+                            <div class="hc-cta__text">
+                                <h2 id="faq-cta-title" class="hc-cta__title">解決しませんでしたか？</h2>
+                                <p class="hc-cta__subtitle">ヘルプセンターの記事やサポートチームがお手伝いします。</p>
+                            </div>
+                            <div class="hc-cta__actions">
+                                <a href="help-center.html" class="hc-cta__btn hc-cta__btn--ghost">
+                                    <span class="material-icons" aria-hidden="true">menu_book</span>
+                                    ヘルプセンターを見る
+                                </a>
+                                <a href="bug-report.html" class="hc-cta__btn hc-cta__btn--primary">
+                                    <span class="material-icons" aria-hidden="true">mail</span>
+                                    お問い合わせ
+                                </a>
+                            </div>
                         </div>
                     </section>
                 </div>
             </div>
-
-            <!-- 解決しなかった場合 -->
-            <section class="mt-8 mb-16 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-                <div class="bg-primary-container rounded-xl p-8 text-center">
-                    <h2 class="text-xl font-bold text-on-primary-container mb-2">解決しませんでしたか？</h2>
-                    <p class="text-on-primary-container mb-6">ヘルプセンターの記事やサポートチームがお手伝いします。</p>
-                    <div class="flex flex-wrap justify-center gap-3">
-                        <a href="help-center.html" class="inline-flex items-center gap-2 bg-surface text-primary border border-primary px-6 py-3 rounded-full font-semibold hover:bg-primary-container transition">
-                            <span class="material-icons" aria-hidden="true">menu_book</span>
-                            ヘルプセンターを見る
-                        </a>
-                        <a href="bug-report.html" class="inline-flex items-center gap-2 bg-primary text-on-primary px-6 py-3 rounded-full font-semibold hover:opacity-90 transition">
-                            <span class="material-icons" aria-hidden="true">mail</span>
-                            お問い合わせ
-                        </a>
-                    </div>
-                </div>
-            </section>
 
         </main>
     </div>

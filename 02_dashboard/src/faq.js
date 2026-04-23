@@ -1,5 +1,22 @@
-import { resolveDashboardDataPath } from './utils.js';
+import { resolveDashboardDataPath, debounce } from './utils.js';
 import { escapeHtml, highlightText } from './shared/escape.js';
+
+// カテゴリID → アクセントカラー / アイコン
+const CATEGORY_META = {
+    'general':  { icon: 'help_outline',      accent: '#4285F4' },
+    'account':  { icon: 'account_circle',    accent: '#7e57c2' },
+    'plans':    { icon: 'workspace_premium', accent: '#f4b400' },
+    'billing':  { icon: 'receipt_long',      accent: '#0f9d58' },
+    'features': { icon: 'tune',              accent: '#00acc1' },
+};
+
+function getAccent(categoryId) {
+    return CATEGORY_META[categoryId]?.accent || '#4285F4';
+}
+
+function getIcon(categoryId, fallback) {
+    return CATEGORY_META[categoryId]?.icon || fallback || 'help_outline';
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     const faqApp = {
@@ -7,18 +24,21 @@ document.addEventListener('DOMContentLoaded', () => {
             loadingIndicator: document.getElementById('loading-indicator'),
             errorMessage: document.getElementById('error-message'),
             faqContainer: document.getElementById('faq-container'),
-            featuredList: document.getElementById('featured-questions-list'),
-            featuredSection: document.getElementById('featured-questions'),
             faqList: document.getElementById('faq-list'),
             faqListSection: document.getElementById('faq-list-section'),
             noResultsMessage: document.getElementById('no-results-message'),
             resetSearchBtn: document.getElementById('reset-search-btn'),
             searchBox: document.getElementById('search-box'),
             clearSearchBtn: document.getElementById('clear-search-btn'),
+            searchForm: document.getElementById('faq-search-form'),
             categoryCards: document.getElementById('category-cards'),
             categoryCardsSection: document.getElementById('category-cards-section'),
             popularKeywordsWrapper: document.getElementById('popular-keywords-wrapper'),
             searchStatus: document.getElementById('search-status'),
+            stickySearch: document.getElementById('faq-sticky-search'),
+            stickySearchInput: document.getElementById('faq-sticky-search-input'),
+            stickySearchForm: document.getElementById('faq-sticky-form'),
+            heroSection: document.querySelector('.faq-hero'),
         },
 
         state: {
@@ -27,6 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
             error: null,
             searchTerm: '',
             activeQuestionId: null,
+            preSearchActiveQuestionId: null,
             feedbackStatus: {},
             isComposing: false,
         },
@@ -66,7 +87,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.renderPopularKeywords();
                 this.renderCategoryCards();
                 const filteredData = this.getFilteredData();
-                this.renderFeaturedQuestions(filteredData);
                 this.renderFaqList(filteredData);
                 this.renderSearchStatus(filteredData);
             }
@@ -89,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
                 .join('');
             popularKeywordsWrapper.innerHTML = `
-                <span class="text-sm text-gray-200 text-shadow-sm mr-2">よく検索されるキーワード:</span>
+                <span class="faq-keywords__label">よく検索されるキーワード:</span>
                 ${chipsHtml}
             `;
         },
@@ -97,81 +117,88 @@ document.addEventListener('DOMContentLoaded', () => {
         renderCategoryCards() {
             const { categoryCards, categoryCardsSection } = this.elements;
             if (!categoryCards) return;
+            // 検索中はカテゴリカード非表示（ジャンプ先が検索結果に無いため）
+            if (this.state.searchTerm.trim()) {
+                categoryCardsSection?.classList.add('hidden');
+                return;
+            }
             const categories = this.state.allData.categories || [];
-            if (categories.length === 0) {
+            const visibleCategories = categories.filter(cat => Array.isArray(cat.questions) && cat.questions.length > 0);
+            if (visibleCategories.length === 0) {
                 categoryCardsSection?.classList.add('hidden');
                 return;
             }
             categoryCardsSection?.classList.remove('hidden');
-            categoryCards.innerHTML = categories
-                .map(category => {
-                    const safeId = escapeHtml(category.id);
-                    const safeName = escapeHtml(category.name);
-                    const safeDesc = escapeHtml(category.description || '');
-                    const safeIcon = escapeHtml(category.icon || 'help_outline');
-                    const count = Array.isArray(category.questions) ? category.questions.length : 0;
-                    return `
-                        <a href="#cat-${safeId}" class="faq-category-card" data-category-id="${safeId}">
-                            <span class="category-icon"><span class="material-icons" aria-hidden="true">${safeIcon}</span></span>
-                            <span class="flex-1 min-w-0">
-                                <span class="category-name">${safeName}</span>
-                                <span class="category-desc">${safeDesc}</span>
-                            </span>
-                            <span class="category-count" aria-label="${count}件">${count}</span>
-                        </a>
-                    `;
-                })
-                .join('');
-        },
+            categoryCards.innerHTML = visibleCategories.map(category => {
+                const safeId = escapeHtml(category.id);
+                const safeName = escapeHtml(category.name);
+                const safeDesc = escapeHtml(category.description || '');
+                const icon = getIcon(category.id, category.icon);
+                const accent = getAccent(category.id);
+                const count = category.questions.length;
+                // 注目質問があれば優先、無ければ先頭から3件プレビュー
+                const preview = category.questions.filter(q => q.isFeatured).slice(0, 3);
+                const filled = preview.length >= 3
+                    ? preview
+                    : [...preview, ...category.questions.filter(q => !q.isFeatured).slice(0, 3 - preview.length)];
 
-        renderFeaturedQuestions(data) {
-            const { featuredList, featuredSection } = this.elements;
-            if (!featuredList) return;
-            const searchTerm = this.state.searchTerm.trim();
-            // 検索中は注目質問セクションを隠す（結果と重複を避ける）
-            if (searchTerm) {
-                featuredSection?.classList.add('hidden');
-                featuredList.innerHTML = '';
-                return;
-            }
-            const allQuestions = (data.categories || []).flatMap(cat =>
-                (cat.questions || []).map(q => ({ ...q, _categoryId: cat.id, _categoryName: cat.name }))
-            );
-            const featured = allQuestions.filter(q => q.isFeatured);
-            if (featured.length === 0) {
-                featuredSection?.classList.add('hidden');
-                featuredList.innerHTML = '';
-                return;
-            }
-            featuredSection?.classList.remove('hidden');
-            featuredList.innerHTML = featured.map(q => this.getQuestionHtml(q, { featured: true })).join('');
+                const previewHtml = filled.map(q => `
+                    <li class="faq-category-card__question">
+                        <span class="material-icons" aria-hidden="true">chevron_right</span>
+                        <span>${escapeHtml(q.question || '')}</span>
+                    </li>
+                `).join('');
+
+                return `
+                    <a href="#cat-${safeId}" class="faq-category-card" data-category-id="${safeId}" style="--hc-accent: ${accent};" aria-label="${safeName} (${count}件)">
+                        <span class="faq-category-card__count-badge" aria-hidden="true">${count}件</span>
+                        <div class="faq-category-card__header">
+                            <span class="faq-category-card__icon" aria-hidden="true"><span class="material-icons">${escapeHtml(icon)}</span></span>
+                            <div class="faq-category-card__title-wrap">
+                                <h3 class="faq-category-card__title">${safeName}</h3>
+                                ${safeDesc ? `<p class="faq-category-card__desc">${safeDesc}</p>` : ''}
+                            </div>
+                        </div>
+                        ${previewHtml ? `<ul class="faq-category-card__questions">${previewHtml}</ul>` : ''}
+                        <span class="faq-category-card__more">
+                            すべて見る
+                            <span class="material-icons" aria-hidden="true">arrow_forward</span>
+                        </span>
+                    </a>
+                `;
+            }).join('');
         },
 
         renderFaqList(data) {
             const { faqList, noResultsMessage, faqListSection } = this.elements;
+            const searchTerm = this.state.searchTerm.trim();
             const hasResults = (data.categories || []).some(cat => (cat.questions || []).length > 0);
 
             if (hasResults) {
                 const categoriesHtml = data.categories.map(category => {
-                    if ((category.questions || []).length === 0) return '';
+                    const questions = category.questions || [];
+                    if (questions.length === 0) return '';
                     const safeId = escapeHtml(category.id);
                     const safeName = escapeHtml(category.name);
                     const safeDesc = escapeHtml(category.description || '');
-                    const safeIcon = escapeHtml(category.icon || 'help_outline');
+                    const icon = getIcon(category.id, category.icon);
+                    const accent = getAccent(category.id);
                     return `
-                        <section id="cat-${safeId}" class="faq-category-block">
+                        <section id="cat-${safeId}" class="faq-category-block" tabindex="-1" style="--hc-accent: ${accent};">
                             <h3 class="faq-category-heading">
-                                <span class="material-icons" aria-hidden="true">${safeIcon}</span>
+                                <span class="material-icons" aria-hidden="true">${escapeHtml(icon)}</span>
                                 <span>${safeName}</span>
                                 ${safeDesc ? `<span class="faq-category-desc">${safeDesc}</span>` : ''}
                             </h3>
                             <div class="space-y-3">
-                                ${category.questions.map(q => this.getQuestionHtml(q)).join('')}
+                                ${questions.map(q => this.getQuestionHtml(q)).join('')}
                             </div>
                         </section>
                     `;
                 }).join('');
                 faqList.innerHTML = categoriesHtml;
+                // 展開中の質問がある場合、その answer の hidden を外す
+                this.syncAccordionVisibility();
             } else {
                 faqList.innerHTML = '';
             }
@@ -186,6 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const searchTerm = this.state.searchTerm.trim();
             if (!searchTerm) {
                 searchStatus.classList.add('hidden');
+                searchStatus.classList.remove('faq-search-status');
                 searchStatus.innerHTML = '';
                 return;
             }
@@ -194,8 +222,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 0
             );
             const safeTerm = escapeHtml(searchTerm);
-            searchStatus.className = 'faq-search-status';
-            searchStatus.classList.toggle('hidden', false);
+            searchStatus.classList.add('faq-search-status');
+            searchStatus.classList.remove('hidden');
             searchStatus.innerHTML = `
                 <span class="material-icons" aria-hidden="true">filter_alt</span>
                 <span>「<strong>${safeTerm}</strong>」の検索結果：<span class="count">${count}</span>件</span>
@@ -210,19 +238,21 @@ document.addEventListener('DOMContentLoaded', () => {
             const isFeatured = options.featured || question.isFeatured;
             const safeId = escapeHtml(question.id);
             const answerId = `faq-answer-${safeId}`;
+            const questionId = `faq-question-${safeId}`;
             const searchTerm = this.state.searchTerm.trim();
             const questionHtml = highlightText(question.question || '', searchTerm);
             const answerHtml = highlightText(question.answer || '', searchTerm).replace(/\n/g, '<br>');
+            const hiddenAttr = isOpen ? '' : 'hidden';
             return `
                 <div class="faq-item ${isOpen ? 'is-open' : ''} ${isFeatured ? 'is-featured' : ''}" data-id="${safeId}">
-                    <button class="faq-question" type="button" aria-expanded="${isOpen ? 'true' : 'false'}" aria-controls="${answerId}">
+                    <button id="${questionId}" class="faq-question" type="button" aria-expanded="${isOpen ? 'true' : 'false'}" aria-controls="${answerId}">
                         <span class="faq-question-label">
                             <span class="faq-q-mark" aria-hidden="true">Q</span>
                             <span>${questionHtml}</span>
                         </span>
                         <span class="material-icons faq-icon" aria-hidden="true">expand_more</span>
                     </button>
-                    <div class="faq-answer" id="${answerId}" role="region">
+                    <div class="faq-answer" id="${answerId}" role="region" aria-labelledby="${questionId}" ${hiddenAttr}>
                         <p>${answerHtml}</p>
                         ${this.getFeedbackHtml(question.id)}
                     </div>
@@ -276,6 +306,16 @@ document.addEventListener('DOMContentLoaded', () => {
             return { ...allData, categories: filteredCategories };
         },
 
+        /* ========== アコーディオンの hidden 同期 ========== */
+        syncAccordionVisibility() {
+            document.querySelectorAll('.faq-answer').forEach(el => {
+                const item = el.closest('.faq-item');
+                const isOpen = item?.classList.contains('is-open');
+                if (isOpen) el.removeAttribute('hidden');
+                else el.setAttribute('hidden', '');
+            });
+        },
+
         handleFaqClick(event) {
             const questionElement = event.target.closest('.faq-question');
             if (!questionElement) return;
@@ -289,7 +329,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const btn = item.querySelector('.faq-question');
                 btn?.setAttribute('aria-expanded', 'false');
                 const answer = item.querySelector('.faq-answer');
-                if (answer) answer.style.removeProperty('--faq-answer-height');
+                if (answer) {
+                    answer.style.removeProperty('--faq-answer-height');
+                    answer.setAttribute('hidden', '');
+                }
             });
 
             if (!wasOpen) {
@@ -298,7 +341,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.state.activeQuestionId = clickedFaqItem.dataset.id || null;
                 const answer = clickedFaqItem.querySelector('.faq-answer');
                 if (answer) {
-                    // 動的高さ計算（max-height 固定値の代わり）
+                    answer.removeAttribute('hidden');
+                    // 動的高さ計算
                     const height = answer.scrollHeight;
                     answer.style.setProperty('--faq-answer-height', `${height + 16}px`);
                 }
@@ -311,7 +355,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const feedbackBtn = event.target.closest('.feedback-btn');
             if (!feedbackBtn) return;
 
-            // 検索結果ステータスのクリアボタン
             if (feedbackBtn.dataset.action === 'clear-search') {
                 this.clearSearch();
                 return;
@@ -327,6 +370,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const feedbackSection = feedbackBtn.closest('.feedback-section');
             if (feedbackSection) {
+                feedbackSection.setAttribute('role', 'status');
+                feedbackSection.setAttribute('aria-live', 'polite');
                 feedbackSection.innerHTML = `
                     <span class="feedback-thanks">
                         <span class="material-icons" aria-hidden="true">check_circle</span>
@@ -346,7 +391,24 @@ document.addEventListener('DOMContentLoaded', () => {
             this.elements.searchBox.focus();
         },
 
+        /* ========== カテゴリカード: アンカー遷移後にフォーカス移譲 ========== */
+        handleCategoryCardClick(event) {
+            const card = event.target.closest('.faq-category-card');
+            if (!card) return;
+            const id = card.dataset.categoryId;
+            if (!id) return;
+            // ブラウザの既定のハッシュ遷移に加えて、到着先セクションへフォーカスを飛ばす
+            setTimeout(() => {
+                const target = document.getElementById(`cat-${id}`);
+                if (target) target.focus({ preventScroll: true });
+            }, 0);
+        },
+
         handleSearch() {
+            const enteringSearch = !this.state.searchTerm && !!this.elements.searchBox.value.trim();
+            if (enteringSearch) {
+                this.state.preSearchActiveQuestionId = this.state.activeQuestionId;
+            }
             this.state.searchTerm = this.elements.searchBox.value;
             this.elements.clearSearchBtn.classList.toggle('hidden', !this.state.searchTerm);
             this.state.activeQuestionId = null;
@@ -355,11 +417,62 @@ document.addEventListener('DOMContentLoaded', () => {
 
         clearSearch() {
             this.elements.searchBox.value = '';
+            if (this.elements.stickySearchInput) {
+                this.elements.stickySearchInput.value = '';
+            }
             this.state.searchTerm = '';
             this.elements.clearSearchBtn.classList.add('hidden');
-            this.state.activeQuestionId = null;
+            this.state.activeQuestionId = this.state.preSearchActiveQuestionId || null;
+            this.state.preSearchActiveQuestionId = null;
             this.renderUI();
             this.elements.searchBox.focus();
+            if (this.state.activeQuestionId) {
+                queueMicrotask(() => {
+                    const item = document.querySelector(`.faq-item[data-id="${CSS.escape(this.state.activeQuestionId)}"]`);
+                    const answer = item?.querySelector('.faq-answer');
+                    if (answer) {
+                        answer.removeAttribute('hidden');
+                        const height = answer.scrollHeight;
+                        answer.style.setProperty('--faq-answer-height', `${height + 16}px`);
+                    }
+                });
+            }
+        },
+
+        /* ========== Sticky search ========== */
+        bindStickySearch() {
+            const sticky = this.elements.stickySearch;
+            const hero = this.elements.heroSection;
+            const input = this.elements.stickySearchInput;
+            if (!sticky || !hero) return;
+
+            const onScroll = () => {
+                const threshold = hero.offsetTop + hero.offsetHeight - 80;
+                if (window.scrollY > threshold) {
+                    if (!sticky.hidden) return;
+                    sticky.hidden = false;
+                    requestAnimationFrame(() => sticky.classList.add('is-visible'));
+                } else {
+                    sticky.classList.remove('is-visible');
+                    setTimeout(() => {
+                        if (!sticky.classList.contains('is-visible')) sticky.hidden = true;
+                    }, 250);
+                }
+            };
+            window.addEventListener('scroll', onScroll, { passive: true });
+            onScroll();
+
+            if (input) {
+                input.addEventListener('input', debounce(() => {
+                    this.elements.searchBox.value = input.value;
+                    this.handleSearch();
+                }, 250));
+                this.elements.stickySearchForm?.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.elements.searchBox.value = input.value;
+                    this.handleSearch();
+                });
+            }
         },
 
         loadFeedbackStatus() {
@@ -383,7 +496,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         addEventListeners() {
-            const { faqContainer, searchBox, clearSearchBtn, resetSearchBtn, popularKeywordsWrapper, searchStatus } = this.elements;
+            const { faqContainer, searchBox, searchForm, clearSearchBtn, resetSearchBtn, popularKeywordsWrapper, searchStatus, categoryCards } = this.elements;
 
             faqContainer.addEventListener('click', (event) => {
                 this.handleFaqClick(event);
@@ -398,9 +511,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.handleFeedbackClick(event);
             });
 
+            categoryCards?.addEventListener('click', (event) => {
+                this.handleCategoryCardClick(event);
+            });
+
+            // Search form submit (インライン onsubmit の代替)
+            searchForm?.addEventListener('submit', (event) => {
+                event.preventDefault();
+                this.handleSearch();
+            });
+
             let searchTimeout;
             searchBox.addEventListener('input', () => {
-                if (this.state.isComposing) return; // IME 確定前はスキップ
+                if (this.state.isComposing) return;
                 clearTimeout(searchTimeout);
                 searchTimeout = setTimeout(() => this.handleSearch(), 250);
             });
@@ -425,11 +548,22 @@ document.addEventListener('DOMContentLoaded', () => {
             resetSearchBtn?.addEventListener('click', () => {
                 this.clearSearch();
             });
+
+            window.addEventListener('resize', debounce(() => {
+                const openItem = document.querySelector('.faq-item.is-open');
+                if (!openItem) return;
+                const answer = openItem.querySelector('.faq-answer');
+                if (!answer) return;
+                answer.style.removeProperty('--faq-answer-height');
+                const height = answer.scrollHeight;
+                answer.style.setProperty('--faq-answer-height', `${height + 16}px`);
+            }, 150));
         },
 
         async init() {
             this.loadFeedbackStatus();
             this.addEventListeners();
+            this.bindStickySearch();
             await this.fetchFaqData();
         }
     };

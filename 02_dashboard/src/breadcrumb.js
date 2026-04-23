@@ -50,7 +50,6 @@ const breadcrumbPaths = {
         { name: 'ヘルプセンター' },
     ],
     'faq.html': [
-        { name: 'アンケート一覧', link: 'index.html' },
         { name: 'ヘルプセンター', link: 'help-center.html' },
         { name: 'よくある質問' },
     ],

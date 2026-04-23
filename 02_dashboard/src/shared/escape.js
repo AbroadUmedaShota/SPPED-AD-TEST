@@ -20,8 +20,11 @@ export function highlightText(text, keyword) {
     if (!keyword) return safeText;
     const trimmed = String(keyword).trim();
     if (!trimmed) return safeText;
+    // スペース区切りの複数キーワードを OR パターン化（AND 検索のハイライトと整合）
+    const tokens = trimmed.split(/\s+/).filter(Boolean).map(escapeRegex);
+    if (tokens.length === 0) return safeText;
     try {
-        const pattern = new RegExp(escapeRegex(trimmed), 'gi');
+        const pattern = new RegExp(tokens.join('|'), 'gi');
         return safeText.replace(pattern, (match) => `<mark>${match}</mark>`);
     } catch {
         return safeText;
