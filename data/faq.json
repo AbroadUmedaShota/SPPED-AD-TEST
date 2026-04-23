@@ -1,8 +1,18 @@
 {
+  "popularKeywords": [
+    "料金プラン",
+    "パスワード",
+    "アンケート作成",
+    "請求書",
+    "名刺データ化",
+    "お礼メール"
+  ],
   "categories": [
     {
       "id": "general",
       "name": "基本機能について",
+      "icon": "help_outline",
+      "description": "基本機能・サービスの概要",
       "questions": [
         {
           "id": "gen001",
@@ -21,6 +31,8 @@
     {
       "id": "account",
       "name": "アカウント・セキュリティ",
+      "icon": "account_circle",
+      "description": "ログイン・アカウント設定",
       "questions": [
         {
           "id": "acc001",
@@ -49,6 +61,8 @@
     {
       "id": "plans",
       "name": "料金プランについて",
+      "icon": "workspace_premium",
+      "description": "プラン比較・アップグレード",
       "questions": [
         {
           "id": "plan001",
@@ -73,6 +87,8 @@
     {
       "id": "billing",
       "name": "請求・お支払いについて",
+      "icon": "receipt_long",
+      "description": "請求書・お支払い",
       "questions": [
         {
           "id": "bil002",
@@ -91,6 +107,8 @@
     {
       "id": "features",
       "name": "機能の詳細について",
+      "icon": "tune",
+      "description": "各機能の詳細と使い方",
       "questions": [
         {
           "id": "func000",

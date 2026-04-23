@@ -49,6 +49,11 @@ const breadcrumbPaths = {
         { name: 'アンケート一覧', link: 'index.html' },
         { name: 'ヘルプセンター' },
     ],
+    'faq.html': [
+        { name: 'アンケート一覧', link: 'index.html' },
+        { name: 'ヘルプセンター', link: 'help-center.html' },
+        { name: 'よくある質問' },
+    ],
     'premium_signup_new.html': [
         { name: 'ホーム', link: 'index.html' },
         { name: 'プレミアムプラン' },

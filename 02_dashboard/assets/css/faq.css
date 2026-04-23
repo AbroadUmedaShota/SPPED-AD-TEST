@@ -1,82 +1,411 @@
-/* アコーディオン */
+/* ========================================
+   FAQページ専用スタイル
+   help-center.css のトンマナに合わせる
+   ======================================== */
+
+/* ヒーローセクション（背景画像なし／プライマリ系グラデ） */
+.faq-hero {
+    min-height: 280px;
+    background-image: linear-gradient(135deg, var(--color-primary, #6750a4) 0%, #4b3f8a 60%, #2d2454 100%);
+    background-color: var(--color-primary, #6750a4);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.faq-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    /* help-center-hero の暗幕 overlay をリセット（FAQ はグラデ自体が濃色のため不要） */
+    background-color: transparent;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background-image:
+        radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.08), transparent 55%),
+        radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.06), transparent 55%);
+    pointer-events: none;
+}
+
+.faq-hero > .relative {
+    position: relative;
+    z-index: 1;
+}
+
+.faq-clear-btn {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    background-color: var(--color-surface-variant, #e7e2ec);
+    color: var(--color-on-surface-variant, #49454f);
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.faq-clear-btn:hover {
+    transform: translateY(-50%) scale(1.08);
+    background-color: var(--color-primary-container, #eaddff);
+    color: var(--color-primary, #6750a4);
+}
+
+.faq-clear-btn:focus-visible {
+    outline: 2px solid var(--color-primary, #6750a4);
+    outline-offset: 2px;
+}
+
+.faq-clear-btn.hidden {
+    display: none;
+}
+
+/* カテゴリカード（help-center の .category-card をベースに FAQ 用スケール） */
+.faq-category-card {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 1rem 1.25rem;
+    background-color: var(--color-surface, #fffbff);
+    border: 1px solid var(--color-outline-variant, #cac4d0);
+    border-radius: 0.75rem;
+    color: var(--color-on-surface, #1d1b20);
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.25s ease, border-color 0.2s ease;
+}
+
+.faq-category-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.07);
+    border-color: var(--color-primary, #6750a4);
+}
+
+.faq-category-card:focus-visible {
+    outline: 2px solid var(--color-primary, #6750a4);
+    outline-offset: 2px;
+}
+
+.faq-category-card .category-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 9999px;
+    background-color: var(--color-primary-container, #eaddff);
+    color: var(--color-on-primary-container, #21005d);
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+}
+
+.faq-category-card:hover .category-icon {
+    transform: scale(1.08);
+}
+
+.faq-category-card .category-name {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--color-on-surface, #1d1b20);
+    margin-bottom: 0.125rem;
+}
+
+.faq-category-card .category-desc {
+    font-size: 0.8125rem;
+    color: var(--color-on-surface-variant, #49454f);
+    line-height: 1.4;
+}
+
+.faq-category-card .category-count {
+    margin-left: auto;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-primary, #6750a4);
+    background-color: var(--color-primary-container, #eaddff);
+    padding: 0.125rem 0.625rem;
+    border-radius: 9999px;
+    flex-shrink: 0;
+}
+
+/* カテゴリセクション見出し */
+.faq-category-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-on-surface, #1d1b20);
+    padding: 0.25rem 0 0.25rem 0.875rem;
+    border-left: 4px solid var(--color-primary, #6750a4);
+    margin-bottom: 1rem;
+}
+
+.faq-category-heading .material-icons {
+    color: var(--color-primary, #6750a4);
+    font-size: 1.5rem;
+}
+
+.faq-category-heading .faq-category-desc {
+    font-size: 0.8125rem;
+    font-weight: 400;
+    color: var(--color-on-surface-variant, #49454f);
+    margin-left: 0.5rem;
+}
+
+/* アコーディオン本体 */
 .faq-item {
-    border: 1px solid var(--color-outline); /* Tailwind gray-200 */
-    border-radius: 0.5rem; /* 8px */
+    border: 1px solid var(--color-outline-variant, #cac4d0);
+    border-radius: 0.75rem;
+    background-color: var(--color-surface, #fffbff);
     overflow: hidden;
-    transition: box-shadow 0.2s ease-in-out;
+    transition: border-color 0.2s ease, box-shadow 0.25s ease, transform 0.2s ease;
 }
 
 .faq-item:hover {
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    border-color: var(--color-primary, #6750a4);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+}
+
+.faq-item.is-open {
+    border-color: var(--color-primary, #6750a4);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.08);
 }
 
 .faq-question {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 1rem;
     width: 100%;
-    padding: 1rem; /* 16px */
+    padding: 1rem 1.25rem;
     cursor: pointer;
-    background-color: var(--color-surface-variant); /* Tailwind gray-50 */
-    font-weight: 600; /* semibold */
+    background-color: transparent;
+    border: none;
+    font-weight: 600;
     text-align: left;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--color-on-surface, #1d1b20);
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .faq-question:hover {
-    background-color: var(--color-base-border-divider); /* Tailwind gray-100 */
+    background-color: var(--color-surface-variant, #e7e2ec);
+    color: var(--color-primary, #6750a4);
+}
+
+.faq-question:focus-visible {
+    outline: 2px solid var(--color-primary, #6750a4);
+    outline-offset: -2px;
+}
+
+.faq-question .faq-question-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    flex: 1;
+}
+
+.faq-question .faq-q-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 9999px;
+    background-color: var(--color-primary-container, #eaddff);
+    color: var(--color-primary, #6750a4);
+    font-weight: 700;
+    font-size: 0.875rem;
+    flex-shrink: 0;
 }
 
 .faq-icon {
-    transition: transform 0.3s ease-in-out;
-    color: var(--color-on-surface-variant); /* Tailwind gray-500 */
+    transition: transform 0.3s ease, color 0.2s ease;
+    color: var(--color-on-surface-variant, #49454f);
+    flex-shrink: 0;
+}
+
+.faq-item.is-open .faq-icon {
+    transform: rotate(180deg);
+    color: var(--color-primary, #6750a4);
 }
 
 .faq-answer {
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.4s ease-in-out;
-    padding: 0 1rem;
+    transition: max-height 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+    padding: 0 1.25rem;
+    color: var(--color-on-surface-variant, #49454f);
 }
 
 .faq-item.is-open .faq-answer {
-    max-height: 1000px; /* 十分な高さを確保 */
-    padding: 1.5rem 1rem; /* 24px 16px */
-    border-top: 1px solid var(--color-outline);
-    line-height: 1.6;
+    max-height: var(--faq-answer-height, 2000px);
+    padding: 1.25rem 1.25rem 1.5rem;
+    border-top: 1px solid var(--color-outline-variant, #cac4d0);
+    line-height: 1.8;
 }
 
-.faq-item.is-open .faq-icon {
-    transform: rotate(180deg);
+.faq-answer p {
+    word-break: break-word;
 }
 
-/* フィードバックUI */
+/* 「注目の質問」バッジ */
+.faq-item.is-featured .faq-question::before {
+    content: 'Pick';
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.125rem 0.5rem;
+    margin-right: 0.5rem;
+    border-radius: 9999px;
+    background-color: var(--color-state-warning, #fff3cd);
+    color: var(--color-state-on-warning, #664d03);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+/* フィードバックUI（help-center.css の .feedback-btn に合わせる） */
 .feedback-section {
-    margin-top: 1.5rem; /* 24px */
-    padding-top: 1rem; /* 16px */
-    border-top: 1px dashed var(--color-outline); /* Tailwind gray-300 */
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px dashed var(--color-outline-variant, #cac4d0);
     text-align: center;
-    font-size: 0.875rem; /* 14px */
-    color: var(--color-on-surface-variant); /* Tailwind gray-600 */
+    font-size: 0.875rem;
+    color: var(--color-on-surface-variant, #49454f);
 }
 
-.feedback-buttons button {
-    margin: 0 0.5rem; /* 8px */
-    padding: 0.25rem 0.75rem; /* 4px 12px */
-    border-radius: 9999px; /* rounded-full */
-    border: 1px solid var(--color-outline); /* Tailwind gray-300 */
+.feedback-section .feedback-label {
+    display: inline-block;
+    margin-bottom: 0.75rem;
+}
+
+.feedback-buttons {
+    display: inline-flex;
+    gap: 0.625rem;
+}
+
+.feedback-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 1.125rem;
+    border: 1px solid var(--color-outline, #79747e);
+    border-radius: 9999px;
+    background-color: var(--color-surface, #fffbff);
+    color: var(--color-on-surface-variant, #49454f);
+    font-size: 0.875rem;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
 }
 
-.feedback-buttons button:hover {
-    background-color: var(--color-surface-variant); /* Tailwind gray-100 */
+.feedback-btn:hover {
+    background-color: var(--color-surface-variant, #e7e2ec);
+    color: var(--color-primary, #6750a4);
+    border-color: var(--color-primary, #6750a4);
 }
 
-.feedback-buttons button:disabled {
+.feedback-btn:active {
+    transform: scale(0.97);
+}
+
+.feedback-btn:focus-visible {
+    outline: 2px solid var(--color-primary, #6750a4);
+    outline-offset: 2px;
+}
+
+.feedback-btn:disabled {
     cursor: not-allowed;
-    opacity: 0.7;
+    opacity: 0.6;
 }
 
 .feedback-thanks {
-    font-weight: 500; /* medium */
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    background-color: var(--color-primary-container, #eaddff);
+    color: var(--color-on-primary-container, #21005d);
+    font-weight: 600;
+    animation: faqFadeIn 0.35s ease-out;
+}
+
+.feedback-thanks .material-icons {
+    font-size: 1.125rem;
+}
+
+/* 検索結果ステータス */
+.faq-search-status {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background-color: var(--color-primary-container, #eaddff);
+    color: var(--color-on-primary-container, #21005d);
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+}
+
+.faq-search-status .count {
+    font-weight: 700;
+}
+
+/* 検索ハイライト（help-center.css の mark スタイル上書き：トーン合わせ） */
+.faq-item mark,
+#featured-questions-list mark {
+    background-color: var(--color-state-warning, #fff3cd);
+    color: var(--color-state-on-warning, #664d03);
+    padding: 0.05em 0.2em;
+    border-radius: 0.2em;
+}
+
+/* ローディング/空状態 */
+#loading-indicator,
+#no-results-message,
+#error-message {
+    color: var(--color-on-surface-variant, #49454f);
+}
+
+#error-message {
+    padding: 1rem;
+    border-radius: 0.75rem;
+    background-color: #fff5f5;
+    color: #b42318;
+    border: 1px solid #f3c5c5;
+    text-align: center;
+}
+
+/* アニメーション */
+@keyframes faqFadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.faq-item {
+    animation: faqFadeIn 0.3s ease-out both;
+}
+
+/* モーション低減設定への配慮 */
+@media (prefers-reduced-motion: reduce) {
+    .faq-item,
+    .faq-answer,
+    .faq-icon,
+    .faq-clear-btn,
+    .feedback-btn,
+    .feedback-thanks,
+    .faq-category-card,
+    .faq-category-card .category-icon {
+        animation: none !important;
+        transition: none !important;
+    }
 }
