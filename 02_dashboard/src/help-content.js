@@ -1,6 +1,21 @@
 import { resolveDashboardDataPath } from './utils.js';
 import { resolveLocalizedValue } from './services/i18n/messages.js';
 
+// カテゴリごとの表示メタ (help-center.js と同期)
+const CATEGORY_META = {
+    'getting-started':  { icon: 'flag',           accent: '#5B7DFF' },
+    'account':          { icon: 'account_circle', accent: '#8B6DB8' },
+    'how-to-use':       { icon: 'build',          accent: '#3BAA8E' },
+    'plans-billing':    { icon: 'receipt_long',   accent: '#D4A642' },
+    'troubleshooting':  { icon: 'support_agent',  accent: '#C85646' },
+    'tutorial':         { icon: 'school',         accent: '#2EACB9' },
+    'misc':             { icon: 'more_horiz',     accent: '#7A7A7A' },
+};
+
+function getCategoryMeta(id) {
+    return CATEGORY_META[id] || { icon: 'help_outline', accent: '#4285F4' };
+}
+
 function escapeHtml(str) {
     if (str == null) return '';
     return String(str)
@@ -137,6 +152,8 @@ document.addEventListener('DOMContentLoaded', () => {
             currentCategory: null,
             currentArticle: null,
             searchTerm: '',
+            sortOrder: 'featured', // 'featured' | 'newest' | 'title'
+            filterTerm: '',         // カテゴリ内検索
         },
 
         async init() {
@@ -185,7 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.elements.displayArea.addEventListener('click', (event) => {
                 const feedbackBtn = event.target.closest('.feedback-btn');
                 if (feedbackBtn) {
-                    const feedbackSection = feedbackBtn.closest('.feedback-section');
+                    const feedbackSection = feedbackBtn.closest('[data-article-id]');
                     const articleId = feedbackSection?.dataset.articleId;
                     const vote = feedbackBtn.dataset.vote || 'yes';
                     if (articleId) {
@@ -193,7 +210,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         store[articleId] = { vote, at: new Date().toISOString() };
                         setFeedbackStore(store);
                     }
-                    feedbackSection.innerHTML = '<p class="text-on-surface-variant">ご協力ありがとうございました。</p>';
+                    feedbackSection.innerHTML = `<p class="hc-feedback__done" role="status" tabindex="-1"><span class="material-icons" aria-hidden="true">check_circle</span>ご協力ありがとうございました。</p>`;
+                    const done = feedbackSection.querySelector('.hc-feedback__done');
+                    if (done) done.focus();
                 }
             });
 
@@ -207,10 +226,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (this.state.searchTerm) {
                 this.renderSearchResults();
             } else if (this.state.currentArticle) {
-                this.renderTitle();
                 this.renderArticleDetail();
             } else if (this.state.currentCategory) {
-                this.renderTitle();
                 this.renderArticleList();
             } else {
                 this.renderNotFound();
@@ -219,12 +236,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         renderBreadcrumbs() {
             let items = [
-                { name: 'アンケート一覧', link: 'index.html' },
+                { name: 'ダッシュボード', link: 'index.html' },
                 { name: 'ヘルプセンター', link: 'help-center.html' }
             ];
 
             if (this.state.searchTerm) {
-                items.push({ name: `検索結果: "${escapeHtml(this.state.searchTerm)}"` });
+                items.push({ name: `検索結果: "${this.state.searchTerm}"` });
             } else if (this.state.currentCategory) {
                 items.push({ name: loc(this.state.currentCategory.name), link: `help-content.html?category=${this.state.currentCategory.id}` });
                 if (this.state.currentArticle) {
@@ -232,105 +249,255 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            const breadcrumbHtml = `<nav aria-label="Breadcrumb"><ol class="flex items-center flex-wrap space-x-1 text-sm">` +
+            const html = `<nav aria-label="Breadcrumb"><ol>` +
                 items.map((item, index) => {
                     const isLast = index === items.length - 1;
-                    const linkElement = isLast
-                        ? `<span class="text-on-surface-variant font-medium">${item.name}</span>`
-                        : `<a href="${item.link}" class="text-secondary hover:underline">${item.name}</a>`;
-                    const separator = isLast ? '' : `<span class="material-icons text-on-surface-variant mx-1" style="font-size: 1rem;">chevron_right</span>`;
-                    return `<li class="flex items-center">${linkElement}${separator}</li>`;
+                    const linkHtml = isLast
+                        ? `<span class="text-on-surface-variant" aria-current="page">${escapeHtml(item.name)}</span>`
+                        : `<a href="${escapeHtml(item.link)}">${escapeHtml(item.name)}</a>`;
+                    const separator = isLast ? '' : `<span class="material-icons" aria-hidden="true" style="margin:0 0.25rem;">chevron_right</span>`;
+                    return `<li style="display:flex;align-items:center;">${linkHtml}${separator}</li>`;
                 }).join('') + `</ol></nav>`;
 
-            this.elements.breadcrumbContainer.innerHTML = breadcrumbHtml;
-        },
-
-        renderTitle() {
-            const title = this.state.currentArticle ? loc(this.state.currentArticle.question) : loc(this.state.currentCategory.name);
-            this.elements.titleArea.innerHTML = `
-                <h1 class="text-on-background text-headline-large font-bold leading-tight tracking-tight">${title}</h1>
-            `;
+            this.elements.breadcrumbContainer.innerHTML = html;
         },
 
         renderArticleList() {
-            const articles = this.state.faqData.categories
-                .find(c => c.id === this.state.currentCategory.id)?.questions || [];
+            const cat = this.state.currentCategory;
+            const meta = getCategoryMeta(cat.id);
+            const catName = loc(cat.name);
+            const catDesc = loc(cat.longDescription) || loc(cat.description) || '';
 
-            if (articles.length === 0) {
-                this.elements.displayArea.innerHTML = '<p class="text-center text-on-surface-variant">このカテゴリにはまだ記事がありません。</p>';
-                return;
+            const allArticles = this.state.faqData.categories
+                .find(c => c.id === cat.id)?.questions || [];
+
+            // フィルタ（カテゴリ内検索）
+            let articles = allArticles;
+            if (this.state.filterTerm) {
+                const q = this.state.filterTerm.toLowerCase();
+                articles = allArticles.filter(a => {
+                    const hay = `${loc(a.question)} ${loc(a.summary || a.answer || '')}`.toLowerCase();
+                    return hay.includes(q);
+                });
             }
 
-            const countLabel = `<p class="text-sm text-on-surface-variant mb-4">全${articles.length}件</p>`;
+            // ソート
+            articles = this.sortArticles(articles);
 
-            const articlesHtml = articles.map(article => `
-                <a href="help-content.html?article=${article.id}" class="article-list-item block border-b border-outline-variant py-4 hover:bg-surface-variant -mx-4 px-4">
-                    <h2 class="text-lg font-semibold text-on-surface mb-1">${loc(article.question)}</h2>
-                    <p class="text-sm text-on-surface-variant">${loc(article.answer).substring(0, 80)}...</p>
+            // タイトルエリア: カテゴリヘッダー
+            this.elements.titleArea.innerHTML = `
+                <header class="hc-content-header" style="--hc-accent: ${meta.accent};">
+                    <p class="hc-content-header__eyebrow">
+                        <span class="material-icons" aria-hidden="true">${meta.icon}</span>
+                        カテゴリ
+                    </p>
+                    <h1 class="hc-content-header__title">${escapeHtml(catName)}</h1>
+                    ${catDesc ? `<p class="hc-content-header__desc">${escapeHtml(catDesc)}</p>` : ''}
+                    <div class="hc-content-header__meta">
+                        <span class="hc-count-pill"><span class="material-icons" aria-hidden="true">article</span>${allArticles.length}件の記事</span>
+                    </div>
+                </header>
+            `;
+
+            // ツールバー + リスト
+            const toolbarHtml = `
+                <div class="hc-content-toolbar">
+                    <label class="hc-content-toolbar__search">
+                        <span class="material-icons" aria-hidden="true">search</span>
+                        <input type="search" class="hc-content-toolbar__search-input"
+                            id="hc-content-filter" aria-label="${escapeHtml(catName)}内を検索"
+                            placeholder="このカテゴリ内を検索" value="${escapeHtml(this.state.filterTerm)}">
+                    </label>
+                    <div class="hc-content-toolbar__sort">
+                        <label class="hc-content-toolbar__sort-label" for="hc-content-sort">並び順:</label>
+                        <select id="hc-content-sort" class="hc-content-toolbar__sort-select" aria-label="並び順">
+                            <option value="featured" ${this.state.sortOrder === 'featured' ? 'selected' : ''}>おすすめ順</option>
+                            <option value="newest" ${this.state.sortOrder === 'newest' ? 'selected' : ''}>新着順</option>
+                            <option value="title" ${this.state.sortOrder === 'title' ? 'selected' : ''}>タイトル順</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+
+            if (articles.length === 0) {
+                const emptyHtml = this.renderEmptyState(cat);
+                this.elements.displayArea.innerHTML = toolbarHtml + emptyHtml;
+            } else {
+                const listHtml = articles.map(a => this.renderListItem(a, meta)).join('');
+                this.elements.displayArea.innerHTML = toolbarHtml + `<div class="hc-content-list">${listHtml}</div>`;
+            }
+
+            this.bindToolbarEvents();
+        },
+
+        sortArticles(articles) {
+            const arr = [...articles];
+            const lang = (typeof window !== 'undefined' && window.getCurrentLanguage) ? window.getCurrentLanguage() : 'ja';
+            switch (this.state.sortOrder) {
+                case 'newest':
+                    return arr.sort((a, b) => String(b.updatedAt || '').localeCompare(String(a.updatedAt || '')));
+                case 'title':
+                    return arr.sort((a, b) => String(loc(a.question)).localeCompare(String(loc(b.question)), lang));
+                case 'featured':
+                default:
+                    return arr.sort((a, b) => {
+                        if (!!b.isFeatured !== !!a.isFeatured) return (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0);
+                        return String(b.updatedAt || '').localeCompare(String(a.updatedAt || ''));
+                    });
+            }
+        },
+
+        renderListItem(article, meta) {
+            const title = loc(article.question);
+            const summary = loc(article.summary) || (loc(article.answer) ? loc(article.answer).replace(/\s+/g, ' ').slice(0, 100) : '');
+            const metaHtml = [];
+            if (article.isFeatured) {
+                metaHtml.push(`<span class="hc-content-item__badge hc-content-item__badge--featured"><span class="material-icons" aria-hidden="true">star</span>よく読まれている</span>`);
+            }
+            if (article.updatedAt) {
+                metaHtml.push(`<span class="hc-content-item__badge hc-content-item__badge--updated">更新: ${escapeHtml(article.updatedAt)}</span>`);
+            }
+
+            return `
+                <a class="hc-content-item" href="help-content.html?article=${encodeURIComponent(article.id)}" style="--hc-accent: ${meta.accent};" aria-label="${escapeHtml(title)}">
+                    <div class="hc-content-item__body">
+                        ${metaHtml.length ? `<div class="hc-content-item__meta">${metaHtml.join('')}</div>` : ''}
+                        <h2 class="hc-content-item__title">${escapeHtml(title)}</h2>
+                        ${summary ? `<p class="hc-content-item__summary">${escapeHtml(summary)}</p>` : ''}
+                    </div>
+                    <span class="material-icons hc-content-item__chevron" aria-hidden="true">chevron_right</span>
                 </a>
-            `).join('');
+            `;
+        },
 
-            this.elements.displayArea.innerHTML = countLabel + `<div class="space-y-2">${articlesHtml}</div>`;
+        renderEmptyState(cat) {
+            const otherCats = (this.state.faqData.categories || [])
+                .filter(c => c.id !== cat.id)
+                .slice(0, 4);
+            const links = otherCats.map(c => {
+                const m = getCategoryMeta(c.id);
+                return `<a class="hc-content-empty__link" href="help-content.html?category=${encodeURIComponent(c.id)}" style="color:${m.accent};border-color:${m.accent};"><span class="material-icons" aria-hidden="true">${m.icon}</span>${escapeHtml(loc(c.name))}</a>`;
+            }).join('');
+            const isFiltered = !!this.state.filterTerm;
+            return `
+                <div class="hc-content-empty" role="status">
+                    <div class="hc-content-empty__icon"><span class="material-icons" aria-hidden="true">search_off</span></div>
+                    <p class="hc-content-empty__title">${isFiltered ? '該当する記事が見つかりません' : 'このカテゴリにはまだ記事がありません'}</p>
+                    <p class="hc-content-empty__desc">${isFiltered ? 'キーワードを変えて再検索するか、他のカテゴリをご覧ください。' : '他のカテゴリに関連する記事があるかもしれません。'}</p>
+                    <div class="hc-content-empty__actions">${links}</div>
+                </div>
+            `;
+        },
+
+        bindToolbarEvents() {
+            const filterInput = document.getElementById('hc-content-filter');
+            const sortSelect = document.getElementById('hc-content-sort');
+            if (filterInput) {
+                filterInput.addEventListener('input', (e) => {
+                    this.state.filterTerm = e.target.value;
+                    this.renderArticleList();
+                    requestAnimationFrame(() => {
+                        const el = document.getElementById('hc-content-filter');
+                        if (el) {
+                            el.focus();
+                            const v = el.value; el.value = ''; el.value = v;
+                        }
+                    });
+                });
+            }
+            if (sortSelect) {
+                sortSelect.addEventListener('change', (e) => {
+                    this.state.sortOrder = e.target.value;
+                    this.renderArticleList();
+                });
+            }
         },
 
         renderArticleDetail() {
-            const videoUrl = this.state.currentArticle.videoUrl;
-            const videoEmbed = videoUrl ? `<div class="video-embed mb-6"><iframe src="${escapeHtml(videoUrl)}" title="${escapeHtml(loc(this.state.currentArticle.question))}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>` : '';
-            const articleHtml = `
+            const article = this.state.currentArticle;
+            const cat = this.state.currentCategory;
+            const meta = cat ? getCategoryMeta(cat.id) : { icon: 'help_outline', accent: '#4285F4' };
+            const title = loc(article.question);
+
+            const videoUrl = article.videoUrl;
+            const videoEmbed = videoUrl ? `<div class="video-embed mb-6"><iframe src="${escapeHtml(videoUrl)}" title="${escapeHtml(title)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>` : '';
+
+            this.elements.titleArea.innerHTML = `
+                <header class="hc-content-header" style="--hc-accent: ${meta.accent};">
+                    ${cat ? `<p class="hc-content-header__eyebrow"><span class="material-icons" aria-hidden="true">${meta.icon}</span>${escapeHtml(loc(cat.name))}</p>` : ''}
+                    <h1 class="hc-content-header__title">${escapeHtml(title)}</h1>
+                    <div class="hc-article-meta">
+                        ${article.updatedAt ? `<span>更新: ${escapeHtml(article.updatedAt)}</span>` : ''}
+                        ${article.isFeatured ? `<span class="hc-content-item__badge hc-content-item__badge--featured"><span class="material-icons" aria-hidden="true">star</span>よく読まれている</span>` : ''}
+                    </div>
+                </header>
+            `;
+
+            this.elements.displayArea.innerHTML = `
                 <article class="help-content-article">
-                    <p class="text-sm text-on-surface-variant mb-4">最終更新日: ${escapeHtml(this.state.currentArticle.updatedAt || '—')}</p>
                     ${videoEmbed}
-                    <div class="prose max-w-none text-on-surface help-article-body">
-                        ${renderArticleBody(loc(this.state.currentArticle.answer))}
+                    <div class="prose max-w-none help-article-body">
+                        ${renderArticleBody(loc(article.answer))}
                     </div>
                 </article>
-                <section class="feedback-section mt-12 py-8 border-t border-b border-outline-variant text-center" data-article-id="${escapeHtml(this.state.currentArticle.id)}">
+                <section class="hc-feedback" data-article-id="${escapeHtml(article.id)}" aria-label="記事のフィードバック">
                     ${this.renderFeedbackUI()}
                 </section>
-                <div class="mt-8 text-center">
-                    <a href="help-content.html?category=${escapeHtml(this.state.currentCategory?.id || '')}" class="inline-flex items-center gap-1 text-primary hover:underline">
-                        <span class="material-icons text-base">arrow_back</span>
-                        ${escapeHtml(loc(this.state.currentCategory?.name) || 'カテゴリ一覧')}に戻る
+                <div style="margin-top:1.5rem;">
+                    <a href="help-content.html?category=${escapeHtml(cat?.id || '')}" class="hc-article-back">
+                        <span class="material-icons" aria-hidden="true">arrow_back</span>
+                        ${escapeHtml(loc(cat?.name) || 'カテゴリ一覧')}に戻る
                     </a>
                 </div>
-                <section class="related-articles-section mt-12">
-                    <h3 class="text-xl font-bold text-on-background mb-4">他によく読まれている記事</h3>
-                    <div class="grid grid-cols-1 gap-4">
+                <section class="hc-related" aria-labelledby="hc-related-title">
+                    <h2 class="hc-related__title" id="hc-related-title">他によく読まれている記事</h2>
+                    <div class="hc-content-list">
                         ${this.getRelatedArticles()}
                     </div>
                 </section>
             `;
-            this.elements.displayArea.innerHTML = articleHtml;
         },
 
         renderFeedbackUI() {
             const store = getFeedbackStore();
             const existing = store[this.state.currentArticle.id];
             if (existing) {
-                return `<p class="text-on-surface-variant">ご協力ありがとうございました。</p>`;
+                return `<p class="hc-feedback__done" role="status"><span class="material-icons" aria-hidden="true">check_circle</span>ご協力ありがとうございました。</p>`;
             }
             return `
-                <h3 class="font-semibold text-on-surface mb-3">この記事は参考になりましたか？</h3>
-                <div class="flex justify-center gap-4">
-                    <button class="feedback-btn" data-vote="yes"><span class="material-icons mr-2">thumb_up</span>はい</button>
-                    <button class="feedback-btn" data-vote="no"><span class="material-icons mr-2">thumb_down</span>いいえ</button>
+                <h3 class="hc-feedback__title">この記事は参考になりましたか？</h3>
+                <div class="hc-feedback__actions">
+                    <button type="button" class="hc-feedback__btn feedback-btn" data-vote="yes"><span class="material-icons" aria-hidden="true">thumb_up</span>はい</button>
+                    <button type="button" class="hc-feedback__btn feedback-btn" data-vote="no"><span class="material-icons" aria-hidden="true">thumb_down</span>いいえ</button>
                 </div>
             `;
         },
 
         getRelatedArticles() {
-            const allQuestions = this.state.faqData.categories.flatMap(cat => cat.questions);
+            const allQuestions = this.state.faqData.categories.flatMap(cat =>
+                cat.questions.map(q => ({ ...q, _categoryId: cat.id }))
+            );
             const related = allQuestions
                 .filter(q => q.id !== this.state.currentArticle.id && q.isFeatured)
                 .sort(() => 0.5 - Math.random())
                 .slice(0, 3);
 
-            return related.map(article => `
-                <a href="help-content.html?article=${article.id}" class="related-article-link">
-                    <span class="font-semibold">${loc(article.question)}</span>
-                    <span class="material-icons">chevron_right</span>
-                </a>
-            `).join('');
+            if (related.length === 0) return `<p class="hc-feedback__done">関連記事はまだありません。</p>`;
+
+            return related.map(article => {
+                const m = getCategoryMeta(article._categoryId);
+                const title = loc(article.question);
+                const summary = loc(article.summary) || (loc(article.answer) ? loc(article.answer).replace(/\s+/g, ' ').slice(0, 80) : '');
+                return `
+                    <a class="hc-content-item" href="help-content.html?article=${encodeURIComponent(article.id)}" style="--hc-accent: ${m.accent};" aria-label="${escapeHtml(title)}">
+                        <div class="hc-content-item__body">
+                            <h3 class="hc-content-item__title">${escapeHtml(title)}</h3>
+                            ${summary ? `<p class="hc-content-item__summary">${escapeHtml(summary)}</p>` : ''}
+                        </div>
+                        <span class="material-icons hc-content-item__chevron" aria-hidden="true">chevron_right</span>
+                    </a>
+                `;
+            }).join('');
         },
 
         renderSearchResults() {
@@ -338,44 +505,78 @@ document.addEventListener('DOMContentLoaded', () => {
             const searchKeywords = lowerCaseSearchTerm.split(/\s+/).filter(Boolean);
 
             const results = this.state.faqData.categories.flatMap(category =>
-                category.questions.map(question => ({...question, categoryName: loc(category.name)}))
-            ).filter(question => {
-                const content = `${loc(question.question)} ${loc(question.answer)}`.toLowerCase();
-                return searchKeywords.every(keyword => content.includes(keyword));
+                category.questions.map(q => ({...q, _categoryName: loc(category.name), _categoryId: category.id}))
+            ).filter(q => {
+                const content = `${loc(q.question)} ${loc(q.answer)}`.toLowerCase();
+                return searchKeywords.every(kw => content.includes(kw));
             });
 
-            this.elements.titleArea.innerHTML = `<h1 class="text-on-background text-headline-large font-bold">「${escapeHtml(this.state.searchTerm)}」の検索結果 (${results.length}件)</h1>`;
+            this.elements.titleArea.innerHTML = `
+                <header class="hc-content-header">
+                    <p class="hc-content-header__eyebrow"><span class="material-icons" aria-hidden="true">search</span>検索結果</p>
+                    <h1 class="hc-content-header__title">「${escapeHtml(this.state.searchTerm)}」の検索結果</h1>
+                    <div class="hc-content-header__meta">
+                        <span class="hc-count-pill" role="status" aria-live="polite"><span class="material-icons" aria-hidden="true">article</span>${results.length}件</span>
+                    </div>
+                </header>
+            `;
 
             if (results.length === 0) {
-                this.elements.displayArea.innerHTML = '<p class="text-center text-on-surface-variant">該当する記事は見つかりませんでした。</p>';
+                this.elements.displayArea.innerHTML = `
+                    <div class="hc-content-empty" role="status">
+                        <div class="hc-content-empty__icon"><span class="material-icons" aria-hidden="true">search_off</span></div>
+                        <p class="hc-content-empty__title">該当する記事は見つかりませんでした</p>
+                        <p class="hc-content-empty__desc">別のキーワードでお試しください。</p>
+                    </div>
+                `;
                 return;
             }
 
+            const escRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             const resultsHtml = results.map(article => {
+                const m = getCategoryMeta(article._categoryId);
                 let highlightedQuestion = escapeHtml(loc(article.question));
-                let highlightedAnswer = escapeHtml(loc(article.answer).substring(0, 120)) + '...';
-
-                searchKeywords.forEach(keyword => {
-                    const regex = new RegExp(escapeHtml(keyword), 'gi');
-                    highlightedQuestion = highlightedQuestion.replace(regex, '<mark>$&</mark>');
-                    highlightedAnswer = highlightedAnswer.replace(regex, '<mark>$&</mark>');
+                const summaryRaw = loc(article.summary) || (loc(article.answer) ? loc(article.answer).replace(/\s+/g, ' ').slice(0, 140) : '');
+                let highlightedSummary = escapeHtml(summaryRaw);
+                searchKeywords.forEach(kw => {
+                    const re = new RegExp(escRe(kw), 'gi');
+                    highlightedQuestion = highlightedQuestion.replace(re, '<mark>$&</mark>');
+                    highlightedSummary = highlightedSummary.replace(re, '<mark>$&</mark>');
                 });
-
                 return `
-                    <a href="help-content.html?article=${article.id}" class="article-list-item block border-b border-outline-variant py-4 hover:bg-surface-variant -mx-4 px-4">
-                        <p class="text-xs text-on-surface-variant mb-1">${escapeHtml(article.categoryName)}</p>
-                        <h2 class="text-lg font-semibold text-on-surface mb-2">${highlightedQuestion}</h2>
-                        <p class="text-sm text-on-surface-variant">${highlightedAnswer}</p>
+                    <a class="hc-content-item" href="help-content.html?article=${encodeURIComponent(article.id)}" style="--hc-accent: ${m.accent};" aria-label="${escapeHtml(loc(article.question))}">
+                        <div class="hc-content-item__body">
+                            <div class="hc-content-item__meta">
+                                <span class="hc-content-item__badge hc-content-item__badge--featured"><span class="material-icons" aria-hidden="true">${m.icon}</span>${escapeHtml(article._categoryName)}</span>
+                            </div>
+                            <h2 class="hc-content-item__title">${highlightedQuestion}</h2>
+                            <p class="hc-content-item__summary">${highlightedSummary}</p>
+                        </div>
+                        <span class="material-icons hc-content-item__chevron" aria-hidden="true">chevron_right</span>
                     </a>
                 `;
             }).join('');
 
-            this.elements.displayArea.innerHTML = `<div class="space-y-2">${resultsHtml}</div>`;
+            this.elements.displayArea.innerHTML = `<div class="hc-content-list">${resultsHtml}</div>`;
         },
 
         renderNotFound() {
-            this.elements.titleArea.innerHTML = `<h1 class="text-on-background text-headline-large font-bold">コンテンツが見つかりません</h1>`;
-            this.elements.displayArea.innerHTML = '<p class="text-center text-on-surface-variant">お探しのページは見つかりませんでした。ヘルプセンターのトップから再度お探しください。</p>';
+            this.elements.titleArea.innerHTML = `
+                <header class="hc-content-header">
+                    <p class="hc-content-header__eyebrow"><span class="material-icons" aria-hidden="true">error_outline</span>ページが見つかりません</p>
+                    <h1 class="hc-content-header__title">コンテンツが見つかりません</h1>
+                </header>
+            `;
+            this.elements.displayArea.innerHTML = `
+                <div class="hc-content-empty" role="status">
+                    <div class="hc-content-empty__icon"><span class="material-icons" aria-hidden="true">help_outline</span></div>
+                    <p class="hc-content-empty__title">お探しのページは見つかりませんでした</p>
+                    <p class="hc-content-empty__desc">ヘルプセンターのトップから再度お探しください。</p>
+                    <div class="hc-content-empty__actions">
+                        <a href="help-center.html" class="hc-content-empty__link"><span class="material-icons" aria-hidden="true">home</span>ヘルプセンターへ</a>
+                    </div>
+                </div>
+            `;
         }
     };
 

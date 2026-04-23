@@ -14,8 +14,6 @@
     <link rel="stylesheet" href="service-top-style.css">
     <!-- Help Center CSS -->
     <link rel="stylesheet" href="src/help-center.css">
-    <!-- Swiper.js CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
     <!-- Custom Fonts -->
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
     <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
@@ -36,136 +34,107 @@
         <div id="sidebar-placeholder"></div>
 
         <!-- 4. メインコンテンツ -->
-        <main class="flex flex-1 flex-col" id="main-content">
-            
-            <!-- ヒーローセクション (フル幅) -->
-            <section class="relative help-center-hero px-4 sm:px-6 lg:px-8 py-16 text-center">
-                <!-- 背景画像コンテナ -->
-                <div class="max-w-6xl mx-auto h-full absolute inset-0">
-                    <div class="absolute inset-0 bg-cover bg-center opacity-10"></div>
-                </div>
-                <div class="relative max-w-2xl mx-auto">
-                    <h1 class="text-4xl font-bold tracking-tight text-white text-shadow-sm mb-4">どんなことでお困りですか？</h1>
-                    <p class="text-lg text-gray-200 text-shadow-sm mb-8">キーワードを入力して、関連記事を検索できます。</p>
-                    <form action="#" method="GET" role="search" class="relative" aria-haspopup="listbox" aria-expanded="false" aria-owns="search-suggestions">
-                        <span class="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-white text-2xl pointer-events-none">search</span>
-                        <input type="search" name="query" aria-label="ヘルプを検索" aria-controls="search-suggestions" aria-autocomplete="list" placeholder="例：配信停止、料金プランの比較、レポートの見方" class="w-full h-16 pl-14 pr-6 py-2 text-lg bg-surface border-2 border-outline rounded-full focus:ring-primary focus:border-primary transition text-gray-900 placeholder-gray-400">
+        <main class="flex flex-1 flex-col" id="main-content" aria-label="ヘルプセンター">
+
+            <!-- スクロール時に表示される縮小版検索バー -->
+            <div id="hc-sticky-search" class="hc-sticky-search" hidden>
+                <div class="hc-sticky-search__inner">
+                    <form action="help-content.html" method="GET" role="search" class="hc-sticky-search__form">
+                        <span class="material-icons hc-sticky-search__icon" aria-hidden="true">search</span>
+                        <input
+                            type="search"
+                            name="search"
+                            aria-label="ヘルプを検索（常に表示）"
+                            placeholder="ヘルプを検索..."
+                            class="hc-sticky-search__input">
                     </form>
-                    <div id="search-suggestions" class="search-suggestions hidden" role="listbox" aria-label="検索候補">
-                        <!-- JSにより検索候補が動的に挿入されます -->
-                    </div>
-                    <div id="popular-keywords-wrapper" class="mt-6 flex flex-wrap justify-center gap-2" aria-label="人気のキーワード">
-                        <span class="text-sm text-gray-200 text-shadow-sm mr-2">よく検索されるキーワード:</span>
-                        <a href="help-content.html?search=%E3%82%A2%E3%83%B3%E3%82%B1%E3%83%BC%E3%83%88%E4%BD%9C%E6%88%90" class="keyword-chip">アンケート作成</a>
-                        <a href="help-content.html?search=%E6%96%99%E9%87%91%E3%83%97%E3%83%A9%E3%83%B3" class="keyword-chip">料金プラン</a>
-                        <a href="help-content.html?search=%E3%83%AD%E3%82%B0%E3%82%A4%E3%83%B3" class="keyword-chip">ログイン</a>
-                        <a href="help-content.html?search=QR%E3%82%B3%E3%83%BC%E3%83%89" class="keyword-chip">QRコード</a>
-                        <a href="help-content.html?search=%E3%83%80%E3%82%A6%E3%83%B3%E3%83%AD%E3%83%BC%E3%83%89" class="keyword-chip">ダウンロード</a>
+                </div>
+            </div>
+
+            <!-- パンくずリスト (ヒーロー上部) -->
+            <div class="hc-breadcrumb-top">
+                <div id="breadcrumb-container"></div>
+            </div>
+
+            <!-- ヒーローセクション -->
+            <section class="hc-hero" aria-labelledby="hc-hero-title">
+                <div class="hc-hero__bg" aria-hidden="true">
+                    <div class="hc-hero__grid"></div>
+                    <div class="hc-hero__glow hc-hero__glow--1"></div>
+                    <div class="hc-hero__glow hc-hero__glow--2"></div>
+                </div>
+                <div class="hc-hero__inner">
+                    <p class="hc-hero__eyebrow">SPEED-AD Help Center</p>
+                    <h1 id="hc-hero-title" class="hc-hero__title">どんなことでお困りですか？</h1>
+                    <p class="hc-hero__subtitle">キーワード検索、またはカテゴリから記事を探せます。</p>
+
+                    <form action="help-content.html" method="GET" role="search" class="hc-search">
+                        <span class="material-icons hc-search__icon" aria-hidden="true">search</span>
+                        <input
+                            type="search"
+                            id="hc-search-input"
+                            name="search"
+                            role="combobox"
+                            aria-label="ヘルプを検索"
+                            aria-controls="hc-suggestions"
+                            aria-expanded="false"
+                            aria-autocomplete="list"
+                            aria-haspopup="listbox"
+                            placeholder="例：配信停止、料金、レポートの見方"
+                            class="hc-search__input"
+                            autocomplete="off">
+                        <div id="hc-suggestions" class="hc-suggestions" role="listbox" aria-live="polite" aria-atomic="false" aria-label="検索候補" hidden></div>
+                    </form>
+
+                    <div id="hc-popular-keywords" class="hc-keywords" aria-label="よく検索されるキーワード">
+                        <!-- JSで動的生成 -->
                     </div>
                 </div>
             </section>
 
-            <!-- メインコンテンツコンテナ (パンくずリスト以降の全コンテンツ) -->
-            <div class="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                <nav aria-label="パンくず" class="py-6">
-                    <ol class="flex items-center flex-wrap text-sm">
-                        <li class="flex items-center"><a href="index.html" class="text-secondary hover:underline">アンケート一覧</a><span class="material-icons text-on-surface-variant mx-1" style="font-size:1rem;">chevron_right</span></li>
-                        <li class="flex items-center"><span class="text-on-surface-variant font-medium">ヘルプセンター</span></li>
-                    </ol>
-                </nav>
-
-                <!-- 2. よく読まれているカテゴリ -->
-                <section class="pt-16 pb-8">
-                    <h2 class="text-2xl font-bold text-on-background text-center mb-10">よく読まれているカテゴリ</h2>
-                    <div class="swiper-container relative" id="featured-carousel">
-                        <div class="swiper-wrapper" id="featured-carousel-wrapper">
-                            <!-- JSでカテゴリのスライドが動的に挿入されます -->
-                        </div>
-                        <!-- Add Pagination -->
-                        <div class="swiper-pagination"></div>
-                        <!-- Add Navigation -->
-                        <div class="swiper-button-prev" aria-label="前へ"></div>
-                        <div class="swiper-button-next" aria-label="次へ"></div>
+            <!-- メインコンテンツコンテナ -->
+            <div class="hc-main">
+                <!-- カテゴリ (bento grid, 各カードに上位記事3件プレビュー) -->
+                <section class="hc-categories" aria-labelledby="hc-categories-title">
+                    <div class="hc-section-heading">
+                        <h2 id="hc-categories-title" class="hc-section-heading__title">カテゴリから探す</h2>
+                        <p class="hc-section-heading__subtitle">目的別に記事をまとめました</p>
+                    </div>
+                    <div id="hc-category-grid" class="hc-category-grid">
+                        <!-- JSで動的生成 -->
                     </div>
                 </section>
 
-                <!-- 2.5 人気記事ピックアップ -->
-                <section class="pt-8 pb-8 border-t border-outline-variant">
-                    <h2 class="text-2xl font-bold text-on-background text-center mb-10">よく読まれている記事</h2>
-                    <div id="popular-articles-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <!-- JSで記事が動的に挿入されます -->
+                <!-- 人気記事 -->
+                <section class="hc-popular" aria-labelledby="hc-popular-title">
+                    <div class="hc-section-heading">
+                        <h2 id="hc-popular-title" class="hc-section-heading__title">よく読まれている記事</h2>
+                        <p class="hc-section-heading__subtitle">多くのユーザーに選ばれた記事</p>
                     </div>
-                    <p id="popular-articles-empty" class="text-center text-on-surface-variant hidden">記事の読み込み中...</p>
+                    <div id="hc-popular-articles" class="hc-popular-grid">
+                        <!-- JSで動的生成 -->
+                    </div>
+                    <p id="hc-popular-empty" class="hc-popular-empty" role="status" hidden>記事を読み込み中...</p>
                 </section>
 
-                <!-- 3. すべてのカテゴリから探す -->
-                <section class="pt-8 pb-16 border-t border-outline-variant">
-                    <div class="max-w-6xl mx-auto">
-                        <h2 class="text-2xl font-bold text-on-background text-center mb-10">すべてのカテゴリから探す</h2>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            <a href="help-content.html?category=getting-started" class="category-card group block bg-surface rounded-xl p-6 text-center shadow-sm hover:shadow-lg transition-shadow duration-300">
-                                <div class="inline-block p-4 bg-primary-container rounded-full mb-4"><span class="material-icons text-4xl text-on-primary-container">flag</span></div>
-                                <h3 class="text-lg font-semibold text-on-surface mb-1">はじめに</h3>
-                                <p class="text-sm text-on-surface-variant">初期設定や画面の見方など</p>
-                            </a>
-                            <a href="help-content.html?category=account" class="category-card group block bg-surface rounded-xl p-6 text-center shadow-sm hover:shadow-lg transition-shadow duration-300">
-                                <div class="inline-block p-4 bg-primary-container rounded-full mb-4"><span class="material-icons text-4xl text-on-primary-container">account_circle</span></div>
-                                <h3 class="text-lg font-semibold text-on-surface mb-1">アカウント設定</h3>
-                                <p class="text-sm text-on-surface-variant">登録情報やセキュリティ設定</p>
-                            </a>
-                            <a href="help-content.html?category=how-to-use" class="category-card group block bg-surface rounded-xl p-6 text-center shadow-sm hover:shadow-lg transition-shadow duration-300">
-                                <div class="inline-block p-4 bg-primary-container rounded-full mb-4"><span class="material-icons text-4xl text-on-primary-container">build</span></div>
-                                <h3 class="text-lg font-semibold text-on-surface mb-1">SPEED-ADの使い方</h3>
-                                <p class="text-sm text-on-surface-variant">各機能の具体的な操作方法</p>
-                            </a>
-                            <a href="help-content.html?category=plans-billing" class="category-card group block bg-surface rounded-xl p-6 text-center shadow-sm hover:shadow-lg transition-shadow duration-300">
-                                <div class="inline-block p-4 bg-primary-container rounded-full mb-4"><span class="material-icons text-4xl text-on-primary-container">receipt_long</span></div>
-                                <h3 class="text-lg font-semibold text-on-surface mb-1">料金・請求</h3>
-                                <p class="text-sm text-on-surface-variant">プラン内容・お支払い・請求書</p>
-                            </a>
-                            <a href="faq.html" class="category-card group block bg-surface rounded-xl p-6 text-center shadow-sm hover:shadow-lg transition-shadow duration-300">
-                                <div class="inline-block p-4 bg-primary-container rounded-full mb-4"><span class="material-icons text-4xl text-on-primary-container">help_outline</span></div>
-                                <h3 class="text-lg font-semibold text-on-surface mb-1">よくある質問</h3>
-                                <p class="text-sm text-on-surface-variant">サービス全般に関するご質問</p>
-                            </a>
-                            <a href="help-content.html?category=tutorial" class="category-card group block bg-surface rounded-xl p-6 text-center shadow-sm hover:shadow-lg transition-shadow duration-300">
-                                <div class="inline-block p-4 bg-primary-container rounded-full mb-4"><span class="material-icons text-4xl text-on-primary-container">school</span></div>
-                                <h3 class="text-lg font-semibold text-on-surface mb-1">チュートリアル</h3>
-                                <p class="text-sm text-on-surface-variant">動画で使い方を学ぶ</p>
-                            </a>
-                            <a href="help-content.html?category=troubleshooting" class="category-card group block bg-surface rounded-xl p-6 text-center shadow-sm hover:shadow-lg transition-shadow duration-300">
-                                <div class="inline-block p-4 bg-primary-container rounded-full mb-4"><span class="material-icons text-4xl text-on-primary-container">support_agent</span></div>
-                                <h3 class="text-lg font-semibold text-on-surface mb-1">困ったときは</h3>
-                                <p class="text-sm text-on-surface-variant">ログインや表示の問題など</p>
-                            </a>
-                            <a href="help-content.html?category=misc" class="category-card group block bg-surface rounded-xl p-6 text-center shadow-sm hover:shadow-lg transition-shadow duration-300">
-                                <div class="inline-block p-4 bg-primary-container rounded-full mb-4"><span class="material-icons text-4xl text-on-primary-container">more_horiz</span></div>
-                                <h3 class="text-lg font-semibold text-on-surface mb-1">その他</h3>
-                                <p class="text-sm text-on-surface-variant">上記以外のすべて</p>
-                            </a>
-                        </div>
+                <!-- お問い合わせCTA -->
+                <section class="hc-cta" aria-labelledby="hc-cta-title">
+                    <div class="hc-cta__text">
+                        <h2 id="hc-cta-title" class="hc-cta__title">お探しの答えは見つかりましたか？</h2>
+                        <p class="hc-cta__subtitle">解決しなかった場合は、サポートチームがお手伝いします。</p>
                     </div>
-                </section>
-
-            </div>
-
-            <!-- 5. 解決しなかった場合 -->
-            <section class="mt-8 mb-16 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="bg-primary-container rounded-xl p-8 text-center">
-                    <h2 class="text-xl font-bold text-on-primary-container mb-2">解決しませんでしたか？</h2>
-                    <p class="text-on-primary-container mb-6">サポートチームがお手伝いします。お気軽にお問い合わせください。</p>
-                    <div class="flex flex-wrap justify-center gap-3">
-                        <a href="bug-report.html" class="inline-flex items-center gap-2 bg-primary text-on-primary px-6 py-3 rounded-full font-semibold hover:opacity-90 transition">
-                            <span class="material-icons">mail</span>
+                    <div class="hc-cta__actions">
+                        <a href="bug-report.html" class="hc-cta__btn hc-cta__btn--primary">
+                            <span class="material-icons" aria-hidden="true">mail</span>
                             お問い合わせ
                         </a>
-                        <a href="faq.html" class="inline-flex items-center gap-2 bg-surface text-primary border border-primary px-6 py-3 rounded-full font-semibold hover:bg-primary-container transition">
-                            <span class="material-icons">help_outline</span>
+                        <a href="faq.html" class="hc-cta__btn hc-cta__btn--ghost">
+                            <span class="material-icons" aria-hidden="true">help_outline</span>
                             よくある質問を見る
                         </a>
                     </div>
-                </div>
-            </section>
+                </section>
+            </div>
         </main>
     </div>
 
@@ -175,7 +144,6 @@
 </div>
 
 <!-- JSファイル -->
-<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
 <script type="module" src="src/main.js"></script>
 <script type="module" src="src/help-center.js"></script>
 </body>
