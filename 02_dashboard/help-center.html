@@ -47,11 +47,14 @@
                 <div class="relative max-w-2xl mx-auto">
                     <h1 class="text-4xl font-bold tracking-tight text-white text-shadow-sm mb-4">どんなことでお困りですか？</h1>
                     <p class="text-lg text-gray-200 text-shadow-sm mb-8">キーワードを入力して、関連記事を検索できます。</p>
-                    <form action="#" method="GET" role="search" class="relative">
+                    <form action="#" method="GET" role="search" class="relative" aria-haspopup="listbox" aria-expanded="false" aria-owns="search-suggestions">
                         <span class="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-white text-2xl pointer-events-none">search</span>
-                        <input type="search" name="query" aria-label="ヘルプを検索" placeholder="例：配信停止、料金プランの比較、レポートの見方" class="w-full h-16 pl-14 pr-6 py-2 text-lg bg-surface border-2 border-outline rounded-full focus:ring-primary focus:border-primary transition text-gray-900 placeholder-gray-400">
+                        <input type="search" name="query" aria-label="ヘルプを検索" aria-controls="search-suggestions" aria-autocomplete="list" placeholder="例：配信停止、料金プランの比較、レポートの見方" class="w-full h-16 pl-14 pr-6 py-2 text-lg bg-surface border-2 border-outline rounded-full focus:ring-primary focus:border-primary transition text-gray-900 placeholder-gray-400">
                     </form>
-                    <div class="mt-6 flex flex-wrap justify-center gap-2" aria-label="人気のキーワード">
+                    <div id="search-suggestions" class="search-suggestions hidden" role="listbox" aria-label="検索候補">
+                        <!-- JSにより検索候補が動的に挿入されます -->
+                    </div>
+                    <div id="popular-keywords-wrapper" class="mt-6 flex flex-wrap justify-center gap-2" aria-label="人気のキーワード">
                         <span class="text-sm text-gray-200 text-shadow-sm mr-2">よく検索されるキーワード:</span>
                         <a href="help-content.html?search=%E3%82%A2%E3%83%B3%E3%82%B1%E3%83%BC%E3%83%88%E4%BD%9C%E6%88%90" class="keyword-chip">アンケート作成</a>
                         <a href="help-content.html?search=%E6%96%99%E9%87%91%E3%83%97%E3%83%A9%E3%83%B3" class="keyword-chip">料金プラン</a>
