@@ -79,6 +79,10 @@
         top: 6rem;
         overflow: hidden;
       }
+      /* Drawer mode では outline がドロワー退避するため、メイン列はグリッド全幅を使う */
+      #questions-column-wrapper {
+        grid-column: 1 / -1 !important;
+      }
     }
     .sticky-panel::-webkit-scrollbar {
       width: 6px;
@@ -479,7 +483,7 @@
             <!-- ============================== -->
             <!-- 1. QUESTION COLUMN (Left/Main) -->
             <!-- ============================== -->
-            <div id="questions-column-wrapper" class="md:col-span-12 lg:col-span-9 lg:col-start-1 lg:row-start-2 flex flex-col gap-5 w-full min-w-0">
+            <div id="questions-column-wrapper" class="md:col-span-12 lg:col-span-12 xl:col-span-9 lg:col-start-1 lg:row-start-2 flex flex-col gap-5 w-full min-w-0">
 
             <!-- SETTINGS (Options + Related) embedded at top of main column -->
             <div id="settings-column" class="flex flex-col gap-3 w-full min-w-0">
@@ -670,7 +674,7 @@
             <!-- ============================== -->
             <!-- 3. OUTLINE PANEL (Right Area)  -->
             <!-- ============================== -->
-            <div id="outline-column" class="hidden lg:flex fixed xl:sticky top-24 xl:top-[5rem] right-0 z-50 xl:z-auto w-72 xl:w-auto h-auto xl:h-auto translate-x-full xl:translate-x-0 transition-transform duration-300 ease-in-out lg:col-span-3 xl:col-span-3 lg:col-start-10 xl:col-start-10 lg:row-start-2 flex-col gap-0 xl:gap-5 sticky-panel glass-panel bg-white/95 xl:bg-white/80 p-0 border-l xl:border border-gray-200 rounded-l-2xl xl:rounded-xl shadow-2xl xl:shadow-sm overflow-hidden">
+            <div id="outline-column" class="hidden lg:flex fixed xl:sticky top-24 xl:top-[5rem] right-0 z-50 xl:z-auto w-72 xl:w-auto h-auto xl:h-auto translate-x-full xl:translate-x-0 transition-transform duration-300 ease-in-out xl:col-span-3 xl:col-start-10 xl:row-start-2 flex-col gap-0 xl:gap-5 sticky-panel glass-panel bg-white/95 xl:bg-white/80 p-0 border-l xl:border border-gray-200 rounded-l-2xl xl:rounded-xl shadow-2xl xl:shadow-sm overflow-hidden">
 
               <div class="p-5 overflow-y-auto border-b" style="max-height: calc(100vh - 18rem);">
                 <h3 class="text-xs font-black tracking-widest text-gray-400 uppercase mb-4 flex items-center gap-1">
