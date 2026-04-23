@@ -27,17 +27,48 @@
                 <div id="breadcrumb-container" class="mb-4"></div>
                 <h1 class="text-2xl font-bold text-text-main mb-6" id="pageTitle">サンクス画面設定</h1>
 
-                <div class="max-w-4xl mx-auto p-8 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+                <div class="max-w-4xl mx-auto mb-4 flex flex-wrap items-center justify-end gap-2 text-xs">
+                  <label for="testScenarioSelect" class="font-semibold text-gray-500">テストシナリオ:</label>
+                  <select id="testScenarioSelect" class="border border-gray-300 rounded px-2 py-1 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/30">
+                    <option value="">（通常フロー）</option>
+                    <option value="premium-single">Premium / 単一言語</option>
+                    <option value="premium-multi-2">Premium / 2言語</option>
+                    <option value="premium-multi-3">Premium / 3言語</option>
+                    <option value="free">Freeプラン（機能制限）</option>
+                  </select>
+                </div>
+
+                <div id="thankYouPremiumNotice" class="hidden max-w-4xl mx-auto mb-4">
+                  <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
+                    <span class="material-icons text-amber-500 text-[22px] flex-shrink-0 mt-0.5">stars</span>
+                    <div class="flex-1 min-w-0">
+                      <p id="thankYouPremiumNoticeTitle" class="font-bold text-sm text-amber-800 flex items-center gap-2">
+                        プレミアム機能のご案内
+                        <span class="text-[10px] font-black bg-amber-200 text-amber-800 px-1.5 py-0.5 rounded-full">Premium</span>
+                      </p>
+                      <p id="thankYouPremiumNoticeMessage" class="text-xs text-amber-700 mt-1 leading-relaxed"></p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="max-w-4xl mx-auto p-8 bg-white rounded-lg shadow-md">
 
                     <!-- 回答後の文言設定 -->
                     <section class="mb-8">
                         <h2 id="thankYouMessageSectionTitle" class="text-xl font-semibold text-text-main mb-4">回答後の文言設定</h2>
-                        <div id="thankYouLanguageTabs" class="mb-4 flex flex-wrap gap-2 hidden"></div>
-                        <div class="relative">
-                            <textarea id="thankYouMessage" class="input-field h-32" placeholder=" "></textarea>
+                        <div id="thankYouLanguageTabsWrapper" class="hidden mb-0">
+                          <div class="bg-gray-100 pt-2 px-2 pb-[1px] flex items-end gap-1 rounded-t-xl border-x border-t border-gray-200 max-w-full overflow-hidden relative">
+                            <div id="thankYouLanguageTabs" class="flex items-end gap-1 w-full overflow-x-auto relative z-10" style="scrollbar-width: none;" role="tablist" aria-label="サンクスメッセージ 言語切替">
+                              <!-- Rendered by JS -->
+                            </div>
+                          </div>
+                          <div class="h-[3px] w-full bg-gradient-to-r from-blue-500 via-indigo-400 to-primary rounded-b-sm"></div>
+                        </div>
+                        <div class="relative mt-3">
+                            <textarea id="thankYouMessage" class="input-field h-32" placeholder=" " aria-describedby="thankYouMessageDescription"></textarea>
                             <label id="thankYouMessageLabel" for="thankYouMessage" class="input-label">サンクスメッセージ</label>
                         </div>
-                        <p id="thankYouMessageReferenceHint" class="text-xs text-text-sub mt-1 leading-snug hidden"></p>
+                        <p id="thankYouMessageReferenceHint" class="ref-lang-hint hidden"></p>
                         <p id="thankYouMessageDescription" class="text-sm text-text-sub mt-2">アンケート回答後に表示されるメッセージです。空欄の場合、デフォルトのメッセージが表示されます。</p>
                         <div class="mt-1 flex justify-end text-xs text-text-sub">
                             <span id="thankYouMessageCounter">0/500</span>
@@ -48,14 +79,14 @@
                     <!-- 連続回答機能の可否 -->
                     <section class="mb-8">
                         <h2 id="continuousSectionTitle" class="text-xl font-semibold text-text-main mb-4">連続回答機能</h2>
-                        <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                        <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
                             <div>
                                 <h3 id="continuousLabel" class="font-medium text-text-main">連続回答を許可する</h3>
                                 <p id="continuousDescription" class="text-sm text-text-sub mt-1">回答完了後、同じ端末で続けて別の回答ができるようにします。</p>
                             </div>
                             <label for="allowContinuousAnswer" class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" id="allowContinuousAnswer" role="switch" class="sr-only peer" checked>
-                                <div class="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-500"></div>
+                                <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
                             </label>
                         </div>
                     </section>

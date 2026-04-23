@@ -70,13 +70,17 @@ function generateBreadcrumbs(currentPage, surveyId = null, fromPage = 'surveyCre
         let link = path.link;
 
         // 動的リンクの処理
-        if (link === '#' && surveyId) {
+        if (link === '#') {
             if (path.name === 'SPEEDレビュー') {
                 // graph-page.htmlからの相対パスを考慮
-                link = `../02_dashboard/speed-review.html?surveyId=${surveyId}`;
+                link = surveyId
+                    ? `../02_dashboard/speed-review.html?surveyId=${surveyId}`
+                    : '../02_dashboard/speed-review.html';
             } else {
-                // from パラメータに応じて返り先を切り替え
-                link = `${fromPage}?surveyId=${surveyId}`;
+                // from パラメータに応じて返り先を切り替え（surveyId 無しでも遷移先を確保）
+                link = surveyId
+                    ? `${fromPage}?surveyId=${surveyId}`
+                    : fromPage;
             }
         }
 

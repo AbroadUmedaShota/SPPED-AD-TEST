@@ -2007,12 +2007,6 @@ function initOutlineScrollSpy() {
       ...Array.from(document.querySelectorAll('#questionListContainer [data-question-id]')).map(targetEl => ({
         el: targetEl, key: targetEl.dataset.questionId
       })),
-      ...((() => {
-        const btn = document.getElementById('thankYouAccordionBtn');
-        return btn && btn.getAttribute('aria-expanded') === 'true'
-          ? [{ el: btn, key: 'thankYouAccordionBtn' }]
-          : [];
-      })()),
     ].forEach(({ el, key }) => { if (el) targets.push({ el, key }); });
     return targets;
   };
@@ -2072,32 +2066,7 @@ function initOutlineScrollLinks() {
       } else {
         smoothScrollIntoView(target, 'start');
       }
-
-      // サンクス画面の場合はアコーディオンを開く
-      if (targetId === 'thankYouAccordionBtn') {
-        const body = document.getElementById('thankYouAccordionBody');
-        const iconEl = document.getElementById('thankYouAccordionIcon');
-        if (body && body.classList.contains('hidden')) {
-          target.setAttribute('aria-expanded', 'true');
-          body.classList.remove('hidden');
-          if (iconEl) iconEl.style.transform = 'rotate(180deg)';
-        }
-      }
     });
-  });
-}
-
-function initThankYouAccordion(onToggle) {
-  const btn = document.getElementById('thankYouAccordionBtn');
-  const body = document.getElementById('thankYouAccordionBody');
-  const icon = document.getElementById('thankYouAccordionIcon');
-  if (!btn || !body) return;
-  btn.addEventListener('click', () => {
-    const isOpen = btn.getAttribute('aria-expanded') === 'true';
-    btn.setAttribute('aria-expanded', String(!isOpen));
-    body.classList.toggle('hidden', isOpen);
-    if (icon) icon.style.transform = isOpen ? '' : 'rotate(180deg)';
-    if (onToggle) onToggle();
   });
 }
 
@@ -2561,8 +2530,7 @@ async function init() {
   initInlineAddButton();
   initMobileAddButton();
   initOutlineScrollLinks();
-  const scrollSpyUpdate = initOutlineScrollSpy();
-  initThankYouAccordion(scrollSpyUpdate);
+  initOutlineScrollSpy();
   initOutlineToggle();
   initSortable();
   initSaveButton();

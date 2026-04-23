@@ -71,7 +71,11 @@ export const messages = {
       cancel: 'キャンセル',
       save: '保存する',
       premiumNoticeTitle: 'プレミアム機能のご案内',
-      premiumMessage: 'サンクスメッセージのカスタマイズはプレミアムプラン（今後実装予定）でご利用いただけます。'
+      premiumMessage: 'サンクスメッセージのカスタマイズはプレミアムプラン（今後実装予定）でご利用いただけます。',
+      unsavedChanges: '未保存の変更があります。このページを離れますか？',
+      missingTranslationBadge: '未入力',
+      errorNoticeTitle: 'お知らせ',
+      scenarioSaveSkipped: 'テストシナリオ表示中のため保存はスキップされました。'
     },
     surveyCreation: {
       requiredInput: '必須項目を入力してください。',
@@ -138,7 +142,11 @@ export const messages = {
       cancel: 'Cancel',
       save: 'Save',
       premiumNoticeTitle: 'Premium feature notice',
-      premiumMessage: 'Thank-you message customization is available with the premium plan (coming soon).'
+      premiumMessage: 'Thank-you message customization is available with the premium plan (coming soon).',
+      unsavedChanges: 'You have unsaved changes. Leave this page?',
+      missingTranslationBadge: 'Untranslated',
+      errorNoticeTitle: 'Notice',
+      scenarioSaveSkipped: 'Save was skipped because a test scenario is active.'
     },
     surveyCreation: {
       requiredInput: 'Please fill in the required fields.',
@@ -205,7 +213,11 @@ export const messages = {
       cancel: '取消',
       save: '保存',
       premiumNoticeTitle: '高级功能说明',
-      premiumMessage: '感谢信息的自定义功能可在高级套餐（即将推出）中使用。'
+      premiumMessage: '感谢信息的自定义功能可在高级套餐（即将推出）中使用。',
+      unsavedChanges: '有未保存的更改。确定要离开此页面吗？',
+      missingTranslationBadge: '未填写',
+      errorNoticeTitle: '提示',
+      scenarioSaveSkipped: '正在显示测试场景，已跳过保存。'
     },
     surveyCreation: {
       requiredInput: '请填写必填项。',
@@ -272,7 +284,11 @@ export const messages = {
       cancel: '取消',
       save: '儲存',
       premiumNoticeTitle: '進階功能說明',
-      premiumMessage: '感謝訊息的自訂功能將於進階方案（預計推出）中提供。'
+      premiumMessage: '感謝訊息的自訂功能將於進階方案（預計推出）中提供。',
+      unsavedChanges: '有尚未儲存的變更。確定要離開此頁面嗎？',
+      missingTranslationBadge: '未填寫',
+      errorNoticeTitle: '提示',
+      scenarioSaveSkipped: '正在顯示測試情境，已略過儲存。'
     },
     surveyCreation: {
       requiredInput: '請填寫必填欄位。',
