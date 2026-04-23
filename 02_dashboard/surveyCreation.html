@@ -488,46 +488,15 @@
             <!-- SETTINGS (Options + Related) embedded at top of main column -->
             <div id="settings-column" class="flex flex-col gap-3 w-full min-w-0">
 
-              <!-- カード1: 多言語機能 -->
-              <div class="bg-amber-50 border border-amber-200 rounded-xl shadow-sm overflow-hidden">
-                <button type="button" class="v2-accordion-trigger w-full flex items-center justify-between px-5 py-3 hover:bg-amber-100/50 transition-colors" data-accordion-v2="multilingualCardBody" aria-expanded="true">
-                  <h2 class="text-sm font-bold text-amber-800 flex items-center gap-2">
-                    <span class="material-icons text-amber-500 text-[18px]">stars</span>多言語機能
-                    <span class="text-[10px] font-black bg-amber-200 text-amber-800 px-1.5 py-0.5 rounded-full">Premium</span>
-                  </h2>
-                  <span class="material-icons text-amber-400 text-[18px]" data-accordion-icon>expand_less</span>
-                </button>
-                <div id="multilingualCardBody" class="v2-accordion-body border-t border-amber-100 px-5 py-3 flex flex-col gap-3">
-                  <!-- トグル -->
-                  <div class="flex items-center justify-between gap-3">
-                    <div class="min-w-0">
-                      <p class="font-bold text-sm text-amber-800 leading-tight">多言語機能を有効にする</p>
-                      <p class="text-xs text-amber-700/70 mt-0.5 leading-snug">複数言語でアンケートを提供します。</p>
-                    </div>
-                    <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
-                      <input type="checkbox" id="multilingualEnabledToggle" class="sr-only peer">
-                      <div class="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-amber-500 peer-focus:ring-2 peer-focus:ring-amber-300 transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
-                    </label>
-                  </div>
-                  <!-- Multilingual Config UI -->
-                  <div id="multilingual-controls" class="hidden border-t border-amber-200 pt-3">
-                    <p class="text-xs font-bold text-amber-800 mb-2">追加可能言語</p>
-                    <div id="languageSelectionPanel" class="flex flex-wrap gap-2">
-                      <!-- Rendered by JS -->
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- カード2: オプション機能 -->
+              <!-- カード1: オプション機能 -->
               <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-                <button type="button" class="v2-accordion-trigger w-full flex items-center justify-between px-5 py-3 bg-gray-50 hover:bg-gray-100 transition-colors" data-accordion-v2="optionsCardBody" aria-expanded="false">
+                <button type="button" class="v2-accordion-trigger w-full flex items-center justify-between px-5 py-3 bg-gray-50 hover:bg-gray-100 transition-colors" data-accordion-v2="optionsCardBody" aria-expanded="true">
                   <h2 class="text-sm font-bold text-gray-700 flex items-center gap-2">
                     <span class="material-icons text-primary text-[18px]">extension</span>オプション機能
                   </h2>
-                  <span class="material-icons text-gray-400 text-[18px]" data-accordion-icon>expand_more</span>
+                  <span class="material-icons text-gray-400 text-[18px]" data-accordion-icon>expand_less</span>
                 </button>
-                <div id="optionsCardBody" class="v2-accordion-body v2-collapsed border-t border-gray-100 px-5 py-3 flex gap-4">
+                <div id="optionsCardBody" class="v2-accordion-body border-t border-gray-100 px-5 py-3 flex gap-4">
                   <!-- 名刺画像添付 -->
                   <div class="flex-1 flex items-center justify-between gap-3">
                     <div class="min-w-0">
@@ -549,22 +518,22 @@
                       <p class="text-xs text-gray-400 mt-0.5 leading-snug">同端末で続けて回答を受け付ける</p>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
-                      <input type="checkbox" id="allowContinuousAnswer" class="sr-only peer" checked>
+                      <input type="checkbox" id="allowContinuousAnswer" class="sr-only peer">
                       <div class="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 peer-focus:ring-2 peer-focus:ring-green-300 transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
                     </label>
                   </div>
                 </div>
               </div>
 
-              <!-- カード3: 関連設定 -->
+              <!-- カード2: 関連設定 -->
               <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-                <button type="button" class="v2-accordion-trigger w-full flex items-center justify-between px-5 py-3 bg-gray-50 hover:bg-gray-100 transition-colors" data-accordion-v2="relatedSettingsCardBody" aria-expanded="false">
+                <button type="button" class="v2-accordion-trigger w-full flex items-center justify-between px-5 py-3 bg-gray-50 hover:bg-gray-100 transition-colors" data-accordion-v2="relatedSettingsCardBody" aria-expanded="true">
                   <h2 class="text-sm font-bold text-gray-700 flex items-center gap-2">
                     <span class="material-icons text-primary text-[18px]">settings</span>関連設定
                   </h2>
-                  <span class="material-icons text-gray-400 text-[18px]" data-accordion-icon>expand_more</span>
+                  <span class="material-icons text-gray-400 text-[18px]" data-accordion-icon>expand_less</span>
                 </button>
-                <div id="relatedSettingsCardBody" class="v2-accordion-body v2-collapsed border-t border-gray-100 px-4 py-3 flex flex-wrap gap-3">
+                <div id="relatedSettingsCardBody" class="v2-accordion-body border-t border-gray-100 px-4 py-3 flex flex-wrap gap-3">
                   <a id="openBizcardSettingsBtn" href="./bizcardSettings.html" class="flex-1 flex items-center justify-between px-3 py-2.5 border border-gray-200 rounded-lg bg-gray-50 hover:bg-white hover:border-primary hover:shadow-sm transition-all group">
                     <div class="flex items-center gap-2 min-w-0">
                       <span class="material-icons text-[18px] text-gray-400 group-hover:text-primary shrink-0">document_scanner</span>
@@ -586,6 +555,37 @@
                     </div>
                     <span class="material-icons text-[14px] text-gray-300 group-hover:text-primary shrink-0">arrow_forward_ios</span>
                   </a>
+                </div>
+              </div>
+
+              <!-- カード3: 多言語機能 -->
+              <div class="bg-amber-50 border border-amber-200 rounded-xl shadow-sm overflow-hidden">
+                <button type="button" class="v2-accordion-trigger w-full flex items-center justify-between px-5 py-3 hover:bg-amber-100/50 transition-colors" data-accordion-v2="multilingualCardBody" aria-expanded="false">
+                  <h2 class="text-sm font-bold text-amber-800 flex items-center gap-2">
+                    <span class="material-icons text-amber-500 text-[18px]">stars</span>多言語機能
+                    <span class="text-[10px] font-black bg-amber-200 text-amber-800 px-1.5 py-0.5 rounded-full">Premium</span>
+                  </h2>
+                  <span class="material-icons text-amber-400 text-[18px]" data-accordion-icon>expand_more</span>
+                </button>
+                <div id="multilingualCardBody" class="v2-accordion-body v2-collapsed border-t border-amber-100 px-5 py-3 flex flex-col gap-3">
+                  <!-- トグル -->
+                  <div class="flex items-center justify-between gap-3">
+                    <div class="min-w-0">
+                      <p class="font-bold text-sm text-amber-800 leading-tight">多言語機能を有効にする</p>
+                      <p class="text-xs text-amber-700/70 mt-0.5 leading-snug">複数言語でアンケートを提供します。</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
+                      <input type="checkbox" id="multilingualEnabledToggle" class="sr-only peer">
+                      <div class="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-amber-500 peer-focus:ring-2 peer-focus:ring-amber-300 transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+                    </label>
+                  </div>
+                  <!-- Multilingual Config UI -->
+                  <div id="multilingual-controls" class="hidden border-t border-amber-200 pt-3">
+                    <p class="text-xs font-bold text-amber-800 mb-2">追加可能言語</p>
+                    <div id="languageSelectionPanel" class="flex flex-wrap gap-2">
+                      <!-- Rendered by JS -->
+                    </div>
+                  </div>
                 </div>
               </div>
 
