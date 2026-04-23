@@ -31,7 +31,12 @@ yarn-error.log*
 # Custom
 *.bak
 tmp_marker.txt
-data/dashboard/user_credentials.json 
+data/dashboard/user_credentials.json
+
+# Claude Code / MCP (個人環境用)
+.mcp.json
+.playwright-mcp/
+check-*.png
 
 # Build and test outputs
 /output/
