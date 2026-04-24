@@ -71,7 +71,7 @@ review_cycle: quarterly
 
 ### 3.1 15番仕様との矛盾解消
 
-`15_help_center_requirements.md` §8 に記載の `/help/`・`/faq/`・`/tutorial/` は**旧案**である。本書のURL構造（`/help-center/`・`/help-content/<slug>/`・`/faq/` 等）を正本とする。15番仕様は本書確定後に追従改訂する（§10 参照）。
+本書のURL構造は `/help/`・`/help-content/<slug>/`・`/faq/` 等を正本とする。`15_help_center_requirements.md` §8 の `/help/`・`/faq/` と一致（従来案内していた `/help-center/` は廃止、`/help/` に統一）。`/tutorial/` は本書スコープ外。
 
 ### 3.2 サブドメイン別のCookie／計測方針（概要）
 
@@ -87,7 +87,7 @@ review_cycle: quarterly
 
 | 画面 | 現在のパス（Before） | 新URL（After） |
 | --- | --- | --- |
-| ヘルプセンター | `02_dashboard/help-center.html` | `https://support.speed-ad.com/help-center/` |
+| ヘルプセンター | `02_dashboard/help.html` | `https://support.speed-ad.com/help/` |
 | 記事詳細 | `02_dashboard/help-content.html` | `https://support.speed-ad.com/help-content/<slug>/` |
 | よくある質問 | `02_dashboard/faq.html` | `https://support.speed-ad.com/faq/` |
 | 不具合報告フォーム | `02_dashboard/bug-report.html` | `https://support.speed-ad.com/bug-report/` |
@@ -211,7 +211,7 @@ SPPED-AD-TEST/
 │   └── src/sidebarHandler.js        # サイドバー「サポート」を絶対URLへ
 │
 └── 05_support/                      # support.speed-ad.com
-    ├── help-center/index.html
+    ├── help/index.html
     ├── help-content/<slug>/index.html  # ビルド時生成 or rewrite
     ├── faq/index.html
     ├── bug-report/index.html
@@ -279,17 +279,17 @@ SPPED-AD-TEST/
 
 | 旧URL（Before） | 新URL（After） | 備考 |
 |---|---|---|
-| `/help-center.html` | `https://support.speed-ad.com/help-center/` | ヘルプTOP |
+| `/help.html` | `https://support.speed-ad.com/help/` | ヘルプTOP |
 | `/help-content.html` | `https://support.speed-ad.com/help-content/` | slug未指定時 |
-| `/help-content.html?article=<id>` | `https://support.speed-ad.com/help-content/<slug>/` | `id→slug`変換。変換失敗時は `/help-center/` へ301（404ではない） |
+| `/help-content.html?article=<id>` | `https://support.speed-ad.com/help-content/<slug>/` | `id→slug`変換。変換失敗時は `/help/` へ301（404ではない） |
 | `/faq.html` | `https://support.speed-ad.com/faq/` | |
 | `/bug-report.html` | `https://support.speed-ad.com/bug-report/` | |
 | `/terms-of-service.html` | `https://support.speed-ad.com/terms/` | §4.8準拠（別分岐） |
 | `/specified-commercial-transactions.html` | `https://support.speed-ad.com/tokushoho/` | §4.8準拠（別分岐） |
 | `/personal-data-protection-policy.html` | `https://support.speed-ad.com/privacy/` | §4.8準拠（別分岐） |
 | `/changelog.html` | `https://support.speed-ad.com/changelog/` | 実在確認後のみ301対象 |
-| `/help-content.html?category=<cat>` | `/help-center/?category=<cat>` | カテゴリパラメータをTOPへ |
-| `/help-content.html?search=<query>` | `/help-center/?search=<query>` | 検索パラメータをTOPへ |
+| `/help-content.html?category=<cat>` | `/help/?category=<cat>` | カテゴリパラメータをTOPへ |
+| `/help-content.html?search=<query>` | `/help/?search=<query>` | 検索パラメータをTOPへ |
 | `/faq.html?search=<query>` | `/faq/?search=<query>` | FAQ検索 |
 
 **クエリエンコーディング：** UTF-8統一（Shift_JIS混入・二重エンコードを防ぐため）。
@@ -387,7 +387,7 @@ SPPED-AD-TEST/
 - ヘルプ → FAQ：`../faq/`
 - ヘルプ → お問い合わせ：`../bug-report/`
 - FAQ → お問い合わせ：`../bug-report/`
-- 記事詳細 → ヘルプTOP：`../help-center/`
+- 記事詳細 → ヘルプTOP：`../help/`
 
 **デプロイ構成変更（サブディレクトリ配置等）で相対パスが機能しなくなった場合：** 絶対URL（`https://support.speed-ad.com/...`）へフォールバック。構成変更時は相互リンクの動作検証を必須とする。
 
@@ -498,16 +498,16 @@ CI自動化可能項目は自動化、手動項目はチェックリスト化。
 | ケース | 期待挙動 | エラーページ文言・代替導線 |
 |---|---|---|
 | 存在しないslug（`/help-content/nonexistent/`） | HTTP 404 | 「お探しのページが見つかりません。[ヘルプセンターへ戻る]」 |
-| 大文字URL（`/Help-Center/`） | 小文字へ301 | — |
-| 末尾スラッシュなし（`/help-center`） | 末尾スラッシュありへ301 | — |
+| 大文字URL（`/Help/`） | 小文字へ301 | — |
+| 末尾スラッシュなし（`/help`） | 末尾スラッシュありへ301 | — |
 | `www` 付き（`www.support.speed-ad.com`） | 正規形式へ301（どちらを正規にするかは §9#11） | — |
 | `http://` アクセス | `https://` へ301 | — |
-| クエリ付き（`/help-center/?foo=bar`） | クエリ保持でリダイレクト（もしくは除去。実装時確定） | — |
+| クエリ付き（`/help/?foo=bar`） | クエリ保持でリダイレクト（もしくは除去。実装時確定） | — |
 | 記号・特殊文字slug（`../../../etc`） | ホワイトリスト検証で400/404 | 「不正なURLです。[ヘルプセンターへ戻る]」 |
 | リダイレクトループ | 500 or 静的エラーページ | 「一時的なエラーが発生しました」 |
 | HTTP 500系 | エラーページ | 一次：`[不具合報告] をお試しください`／二次（`/bug-report/`到達不能時）：`外部ステータスページをご確認ください` |
 | 通常404 | HTTP 404 + エラーページ | 「お探しのページが見つかりません」 |
-| 旧URL `?article=<無効id>` | `/help-center/` へ301 | — |
+| 旧URL `?article=<無効id>` | `/help/` へ301 | — |
 | オープンリダイレクト攻撃：`?redirect=https://attacker.example.com` | HTTP 400 | 「不正なリダイレクト要求です」 |
 | 同：プロトコル偽装（`https:\\attacker.example.com`） | HTTP 400 | 同上 |
 | 同：プロトコル相対URL（`//attacker.example.com`） | HTTP 400 | 同上 |

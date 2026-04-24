@@ -237,7 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderBreadcrumbs() {
             let items = [
                 { name: 'ダッシュボード', link: 'index.html' },
-                { name: 'ヘルプセンター', link: 'help-center.html' }
+                { name: 'ヘルプセンター', link: 'help.html' }
             ];
 
             if (this.state.searchTerm) {
@@ -573,7 +573,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <p class="hc-content-empty__title">お探しのページは見つかりませんでした</p>
                     <p class="hc-content-empty__desc">ヘルプセンターのトップから再度お探しください。</p>
                     <div class="hc-content-empty__actions">
-                        <a href="help-center.html" class="hc-content-empty__link"><span class="material-icons" aria-hidden="true">home</span>ヘルプセンターへ</a>
+                        <a href="help.html" class="hc-content-empty__link"><span class="material-icons" aria-hidden="true">home</span>ヘルプセンターへ</a>
                     </div>
                 </div>
             `;

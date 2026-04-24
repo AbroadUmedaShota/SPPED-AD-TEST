@@ -45,12 +45,12 @@ const breadcrumbPaths = {
         { name: '請求書一覧', link: 'invoiceList.html' },
         { name: '請求書詳細' },
     ],
-    'help-center.html': [
+    'help.html': [
         { name: 'アンケート一覧', link: 'index.html' },
         { name: 'ヘルプセンター' },
     ],
     'faq.html': [
-        { name: 'ヘルプセンター', link: 'help-center.html' },
+        { name: 'ヘルプセンター', link: 'help.html' },
         { name: 'よくある質問' },
     ],
     'premium_signup_new.html': [

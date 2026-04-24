@@ -7,7 +7,7 @@ last_reviewed: 2026-04-23
 # ヘルプセンターページ 要件定義書
 
 > **TL;DR（この文書の位置づけ）**
-> - 対象は `02_dashboard/help-center.html`（トップ）と `help-content.html`（カテゴリ/記事/検索結果）の2画面。
+> - 対象は `02_dashboard/help.html`（トップ）と `help-content.html`（カテゴリ/記事/検索結果）の2画面。
 > - 本書は「現行実装のトレースドキュメント」。HTML/JS/CSS のソースを根拠に書き、過去メモと実装が食い違っていた箇所は実装側に合わせて整合済み。
 > - 将来拡張（KPI 計測、CMS 化、サーバー送信フィードバック等）は §9 に分離。
 > - セキュリティ交渉不可項目（XSS 対策・`published` 配信制御・入力バリデーション）は §4.2.2 / §4.3 / §4.2.1 に集約。
@@ -39,7 +39,7 @@ last_reviewed: 2026-04-23
 
 ### 1.5 対象範囲 / 対象外
 
-**対象**: `02_dashboard/` の `help-center.html` / `help-content.html`、および §8 の `support.speed-ad.com` 配下の共通アセット運用ルール。
+**対象**: `02_dashboard/` の `help.html` / `help-content.html`、および §8 の `support.speed-ad.com` 配下の共通アセット運用ルール。
 **対象外**（§9 参照のみ）: サーバー送信フィードバック、閲覧ログベースおすすめ算出、ROI 試算、SaaS 代替ツール比較。
 
 ### 1.6 主要設定値一覧
@@ -74,10 +74,10 @@ last_reviewed: 2026-04-23
 
 ## 2. 対象画面
 
-- `02_dashboard/help-center.html`（トップ）
+- `02_dashboard/help.html`（トップ）
 - `02_dashboard/help-content.html`（カテゴリ一覧 / 記事詳細 / 検索結果）
 
-**アクセス経路**: ダッシュボードのサイドバーまたはヘッダー内「ヘルプ」リンクから遷移。URL 例: `https://[本番ドメイン TBD]/02_dashboard/help-center.html`。
+**アクセス経路**: ダッシュボードのサイドバーまたはヘッダー内「ヘルプ」リンクから遷移。URL 例: `https://[本番ドメイン TBD]/02_dashboard/help.html`。
 
 **権限・認証**: ダッシュボードログイン済みユーザーのみアクセス可。ロール別の表示差異は現行なし。未認証時はログイン画面へリダイレクト（§5.4）。
 
@@ -105,7 +105,7 @@ last_reviewed: 2026-04-23
 > - §4.3 はデータソース（`help_articles.json` と `published` 配信制御）。
 > - `support.speed-ad.com` 配下は別スコープ（§8）。
 
-### 4.1 トップページ（`help-center.html`）
+### 4.1 トップページ（`help.html`）
 
 #### 4.1.1 ヒーローセクション（検索フォーム） [**MVP**]
 
@@ -250,7 +250,7 @@ URL 正規化・canonical タグ付与は Phase 2 で確定。
 
 #### 4.2.4 パンくず [**MVP**]
 
-- 先頭に「ダッシュボード（`index.html`）→ ヘルプセンター（`help-center.html`）」を常に表示。
+- 先頭に「ダッシュボード（`index.html`）→ ヘルプセンター（`help.html`）」を常に表示。
 - モード別の末尾要素:
   - 検索結果: `検索結果: "<keyword>"`（リンクなし）
   - カテゴリ一覧: カテゴリ名（`help-content.html?category=<id>` へのリンク）
@@ -445,7 +445,7 @@ URL 正規化・canonical タグ付与は Phase 2 で確定。
 
 | # | 手順 | 期待結果 |
 |---|------|---------|
-| A1 | `help-center.html` を開き「設定」と入力 | サジェストが 1 件以上 |
+| A1 | `help.html` を開き「設定」と入力 | サジェストが 1 件以上 |
 | A2 | 入力を 1 文字に戻す | サジェストが閉じる |
 | A3 | スクロールでヒーローを隠す | スティッキーバーがフェードイン（`is-visible` 付与から CSS transition 完了まで 250ms 以内、かつスクロール発生から付与まで 1 フレーム約 16ms 以内） |
 | A4 | `?article=<存在しない ID>` でアクセス | 404 表示 |
@@ -481,7 +481,7 @@ URL 正規化・canonical タグ付与は Phase 2 で確定。
 
 ## 7. 関連ファイル
 
-- `02_dashboard/help-center.html`
+- `02_dashboard/help.html`
 - `02_dashboard/help-content.html`
 - `02_dashboard/src/help-center.js`（クライアント完結。i18n ユーティリティに依存）
 - `02_dashboard/src/help-content.js`（クライアント完結。i18n ユーティリティに依存）
