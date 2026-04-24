@@ -5,5 +5,9 @@
       "Bash(ls -lh /c/Users/user/Desktop/workspace20/SPPED-AD-TEST/02_dashboard/src/survey*.js)",
       "mcp__playwright__browser_take_screenshot"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "playwright"
+  ],
+  "enableAllProjectMcpServers": true
 }
