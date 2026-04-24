@@ -9,14 +9,14 @@ last_reviewed: 2026-04-24
 | 項目 | 値 |
 | --- | --- |
 | 対象画面 | `02_dashboard/forgot-password.html` / `reset-password.html` / `reset-password-complete.html` |
-| 正本区分 | 画面モックアップを正とする |
+| 正本区分 | 本書を正本とする |
 | owner | product |
 | last_reviewed | 2026-04-24 |
 
 ## 1. 文書目的
 
 - 本書は、ログイン前のパスワードリセット機能の要件を定義する。
-- 画面モックアップ（3 画面）およびペア実装を正本とする。
+- 本書を正本とする。
 - ログイン後のパスワード変更（旧パスワードを入力した更新）は本書の対象外とし、`02_password_change_screen.md` を参照する。
 
 ## 2. 画面概要

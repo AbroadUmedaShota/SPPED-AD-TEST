@@ -9,14 +9,14 @@ last_reviewed: 2026-04-24
 | 項目 | 値 |
 | --- | --- |
 | 対象画面 | `terms-of-service.html` / `personal-data-protection-policy.html` / `specified-commercial-transactions.html` |
-| 正本区分 | 画面モックアップを正とする |
+| 正本区分 | 本書を正本とする |
 | owner | product |
 | last_reviewed | 2026-04-24 |
 
 ## 1. 文書目的
 
 - 本書は、法務 3 静的ページ（利用規約・個人情報保護方針・特定商取引法に基づく表示）の要件を定義する。
-- 画面モックアップを正本とし、法令上の最小要件と運用規定をまとめる。
+- 本書を正本とし、法令上の最小要件と運用規定をまとめる。
 - 3 画面とも JavaScript ロジックを持たない完全静的ページであり、共通シェル（header / sidebar / footer）と Tailwind CSS のみで構成される。
 
 ## 2. 画面概要

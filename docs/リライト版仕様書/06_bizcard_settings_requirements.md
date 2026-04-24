@@ -9,14 +9,14 @@ last_reviewed: 2026-04-24
 | 項目 | 値 |
 | --- | --- |
 | 対象画面 | `02_dashboard/bizcardSettings.html` |
-| 正本区分 | 画面モックアップを正とする |
+| 正本区分 | 本書を正本とする |
 | owner | product |
 | last_reviewed | 2026-04-24 |
 
 ## 1. 文書目的
 
 - 本書は、名刺データ化設定画面の要件を定義する。
-- 画面モックアップ（`02_dashboard/bizcardSettings.html` およびペア実装）を正本とする。
+- 本書を正本とする。
 - 旧「本書が正」方針は破棄済み。
 
 ## 2. 画面概要

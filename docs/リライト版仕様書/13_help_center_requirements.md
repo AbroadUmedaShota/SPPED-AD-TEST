@@ -9,14 +9,14 @@ last_reviewed: 2026-04-24
 | 項目 | 値 |
 | --- | --- |
 | 対象画面 | `02_dashboard/help.html`（トップ） / `02_dashboard/help-content.html`（カテゴリ・記事・検索結果） |
-| 正本区分 | 画面モックアップを正とする |
+| 正本区分 | 本書を正本とする |
 | owner | product |
 | last_reviewed | 2026-04-24 |
 
 ## 1. 文書目的
 
 - 本書は、ダッシュボード配下ヘルプセンターの要件を定義する。
-- 画面モックアップ（`02_dashboard/help.html` / `help-content.html` およびペア実装）を正本とする。
+- 本書を正本とする。
 - 旧「本書が正」方針は破棄済み。
 - `support.speed-ad.com` 配下の公開サポートサイトは別スコープ（§8）。
 

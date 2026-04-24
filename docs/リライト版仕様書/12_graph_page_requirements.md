@@ -9,14 +9,14 @@ last_reviewed: 2026-04-24
 | 項目 | 値 |
 | --- | --- |
 | 対象画面 | `02_dashboard/graph-page.html` |
-| 正本区分 | 画面モックアップを正とする |
+| 正本区分 | 本書を正本とする |
 | owner | product |
 | last_reviewed | 2026-04-24 |
 
 ## 1. 文書目的
 
 - 本書は、グラフ分析画面の要件を定義する。
-- 画面モックアップ（`02_dashboard/graph-page.html` およびペア実装）を正本とする。
+- 本書を正本とする。
 - 旧 `07_graph_analysis.md`（Insight Finder 構想）と旧 `12_graph_page_requirements.md` v1.x を本書に統合する。旧 `07_graph_analysis.md` は `_archive/` 退避対象。
 
 ## 2. 画面概要
