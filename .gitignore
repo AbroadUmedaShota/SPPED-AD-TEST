@@ -37,6 +37,7 @@ data/dashboard/user_credentials.json
 .mcp.json
 .playwright-mcp/
 check-*.png
+.tmp_backlog/
 
 # Build and test outputs
 /output/
