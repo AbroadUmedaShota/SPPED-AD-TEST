@@ -17,7 +17,7 @@ out_of_scope:
   - 通知メール文面・SLA・保守運用条件
 related_docs:
   - ./01_screen_flow.md
-  - ./02_survey_creation.md
+  - ./01_survey_creation_requirements.md
   - ./06_speed_review.md
   - ./11_plan_feature_restrictions.md
   - ./13_survey_answer_screen.md
@@ -617,7 +617,7 @@ flowchart TB
 
 - 課金・請求書関連ページ群。請求書一覧、個別請求書の明細表示、印刷用ビューを提供する。
 
-#### 5.10.11. サポートページ（`help-center.html` / `help-content.html` / `faq.html` / `bug-report.html` / `changelog.html`）
+#### 5.10.11. サポートページ（`help.html` / `help-content.html` / `faq.html` / `bug-report.html` / `changelog.html`）
 
 - ヘルプ系の静的ページ群。ヘルプセンタートップ、個別記事、FAQ、不具合報告フォーム、変更履歴を提供する。サイドバーのサポート導線（§5.2.3）およびフッター（§5.3）から到達する。
 
