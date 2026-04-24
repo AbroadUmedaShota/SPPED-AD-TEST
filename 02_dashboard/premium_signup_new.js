@@ -186,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="mt-8 pt-6 border-t border-white/10 grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
                                 <div class="flex items-center gap-2 text-white/90 text-sm">
                                     <span class="material-icons text-emerald-400 text-sm">check</span>
-                                    データ保存期間： <span class="font-bold text-white">無期限</span>
+                                    データ保存期間： <span class="font-bold text-white">最長1年</span>
                                 </div>
                                 <div class="flex items-center gap-2 text-white/90 text-sm">
                                     <span class="material-icons text-emerald-400 text-sm">check</span>
