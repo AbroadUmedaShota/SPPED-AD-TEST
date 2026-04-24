@@ -391,17 +391,25 @@ document.addEventListener('DOMContentLoaded', () => {
             this.elements.searchBox.focus();
         },
 
-        /* ========== カテゴリカード: アンカー遷移後にフォーカス移譲 ========== */
+        /* ========== カテゴリカード: スムーズスクロール + フォーカス移譲 ========== */
         handleCategoryCardClick(event) {
             const card = event.target.closest('.faq-category-card');
             if (!card) return;
             const id = card.dataset.categoryId;
             if (!id) return;
-            // ブラウザの既定のハッシュ遷移に加えて、到着先セクションへフォーカスを飛ばす
+            const target = document.getElementById(`cat-${id}`);
+            if (!target) return;
+
+            event.preventDefault();
+
+            const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            target.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth', block: 'start' });
+
+            history.pushState(null, '', `#cat-${id}`);
+
             setTimeout(() => {
-                const target = document.getElementById(`cat-${id}`);
-                if (target) target.focus({ preventScroll: true });
-            }, 0);
+                target.focus({ preventScroll: true });
+            }, prefersReduced ? 0 : 600);
         },
 
         handleSearch() {

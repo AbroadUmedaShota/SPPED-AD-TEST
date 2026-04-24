@@ -393,6 +393,12 @@ input.faq-search__input[type="search"]:focus {
 /* ============================================
    6. カテゴリ別Q&A セクション見出し
    ============================================ */
+/* カテゴリアンカー遷移時: メインヘッダー(4rem) + sticky 検索バー(約3.5rem) の下に
+   見出しが潜り込まないよう scroll-margin-top を確保 */
+.faq-category-block {
+    scroll-margin-top: 7rem;
+}
+
 .faq-category-heading {
     display: flex;
     align-items: center;
