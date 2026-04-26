@@ -8,7 +8,6 @@
   <title>SPEED-AD - ログイン</title>
   <link rel="icon" href="img/logo2.svg" type="image/svg+xml">
   <link rel="stylesheet" href="css/page.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/2.9.7/jquery.fullpage.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1154,7 +1153,8 @@
   <main>
   <div id="fullpage">
     <div class="section " id="section0">
-      <div id="all" role="main">
+      <div id="top" aria-hidden="true"></div>
+      <div id="all">
     <div id="text-box">
       <ul>
         <li>WEBアンケート作成</li>
@@ -1164,7 +1164,10 @@
       <h1><img src="img/logo.svg" alt="SPEED-AD"><span>～スピード アド～</span></h1>
       <p>SPEED ADは、展示会やセミナーなどのイベント向けソリューションです。<br>
         無料のWEBアンケート作成、名刺のデータ化、御礼メールの送信を一気通貫で提供し、獲得したリードの有効活用をワンストップで実現します</p>
-      <a class="hero-secondary-cta" href="customer-voices/index.html">お客様のお声を見る</a>
+      <div class="hero-cta-group">
+        <a class="hero-primary-cta" href="?intent=signup#top">無料ではじめる</a>
+        <a class="hero-secondary-cta" href="customer-voices/index.html">お客様のお声を見る</a>
+      </div>
     </div>
     <div id="input-box" class="form-container">
       <h1 class="form-container__title">SPEED AD ログイン</h1>
@@ -1184,7 +1187,7 @@
           <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer; font-size: 0.85rem; color: #333; line-height: 1.5;">
             <input type="checkbox" id="login-terms-agree" name="login-terms-agree" class="form-options__checkbox-input" required aria-required="true" style="margin-top: 3px; flex-shrink: 0;">
             <span>
-              <a href="http://127.0.0.1:5500/02_dashboard/terms-of-service.html" target="_blank" rel="noopener noreferrer" class="form-options__link">利用規約</a>と<a href="https://www.abroad-o.com/rule.html" target="_blank" rel="noopener noreferrer" class="form-options__link">プライバシーポリシー</a>および<a href="02_dashboard/personal-data-protection-policy.html" target="_blank" rel="noopener noreferrer" class="form-options__link">個人情報保護方針</a>に同意する
+              <a href="02_dashboard/terms-of-service.html" target="_blank" rel="noopener noreferrer" class="form-options__link">利用規約</a>と<a href="https://www.abroad-o.com/rule.html" target="_blank" rel="noopener noreferrer" class="form-options__link">プライバシーポリシー</a>および<a href="02_dashboard/personal-data-protection-policy.html" target="_blank" rel="noopener noreferrer" class="form-options__link">個人情報保護方針</a>に同意する
             </span>
           </label>
           <div id="login-terms-agree-error" class="form-group__error-message" role="alert"></div>
@@ -1196,8 +1199,8 @@
           </label>
           <a href="02_dashboard/forgot-password.html" class="form-options__link" style="font-size: 0.85rem; white-space: nowrap;">パスワードを忘れた方</a>
         </div>
-        <div class="scenario-accounts">
-          <p class="scenario-accounts__title">シナリオテスト用アカウント（クリックで自動入力）</p>
+        <details class="scenario-accounts">
+          <summary class="scenario-accounts__title">シナリオテスト用アカウント</summary>
           <ul class="scenario-accounts__list">
             <li>
               <a href="#" class="scenario-accounts__link" data-email="user">
@@ -1218,7 +1221,7 @@
               </a>
             </li>
           </ul>
-        </div>
+        </details>
         <button class="button button--filled" type="submit">
           <span class="button__spinner"></span>
           ログイン
@@ -1231,7 +1234,7 @@
         <img class="button--google__logo" src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo">
         Googleでログイン
       </button>
-      <button class="button button--tonal" type="button">新規アカウント作成</button>
+      <p class="signup-inline-link">新規利用の方は <a href="?intent=signup#top" data-signup-trigger>無料アカウント作成</a></p>
     </div>
   </div>
     </div>
@@ -1402,10 +1405,10 @@
     <ul>
       <li>
         <h3>SPEED-ADについて</h3>
-        <p><a href="index.html">無料ではじめる</a></p>
-        <p><a href="index.html#top">ログイン</a></p>
+        <p><a class="footer-primary-cta" href="?intent=signup#top">無料ではじめる</a></p>
+        <p><a href="#top">ログイン</a></p>
         <p><a href="customer-voices/index.html">お客様のお声</a></p>
-        <p><a href="index.html">お問い合わせ</a></p>
+        <p><a href="02_dashboard/bug-report.html">お問い合わせ</a></p>
         <p><a href="https://support.speed-ad.com/help/" target="_blank" rel="noopener noreferrer">ヘルプ</a></p>
       </li>
       <li>
@@ -1453,7 +1456,7 @@
             <label class="form-options__checkbox-label" style="justify-content: flex-start; margin-bottom: 0;">
                 <input type="checkbox" id="terms-agree" name="terms-agree" class="form-options__checkbox-input" required aria-required="true">
                 <span style="font-weight: normal; font-size: 0.9rem;">
-                    <a href="http://127.0.0.1:5500/02_dashboard/terms-of-service.html" target="_blank" rel="noopener noreferrer" class="form-options__link">利用規約</a>と<a href="https://www.abroad-o.com/rule.html" target="_blank" rel="noopener noreferrer" class="form-options__link">プライバシーポリシー</a>および<a href="02_dashboard/personal-data-protection-policy.html" target="_blank" rel="noopener noreferrer" class="form-options__link">個人情報保護方針</a>に同意する
+                    <a href="02_dashboard/terms-of-service.html" target="_blank" rel="noopener noreferrer" class="form-options__link">利用規約</a>と<a href="https://www.abroad-o.com/rule.html" target="_blank" rel="noopener noreferrer" class="form-options__link">プライバシーポリシー</a>および<a href="02_dashboard/personal-data-protection-policy.html" target="_blank" rel="noopener noreferrer" class="form-options__link">個人情報保護方針</a>に同意する
                 </span>
             </label>
             <div id="terms-agree-error" class="form-group__error-message" role="alert"></div>
@@ -1487,7 +1490,7 @@
       const loginTermsAgreeError = document.getElementById('login-terms-agree-error');
       const loginButton = loginForm.querySelector('.button--filled');
       const googleButtonMain = document.querySelector('.form-container > .button--google');
-      const signupButtonMain = document.querySelector('.button--tonal');
+      const signupButtonMain = document.querySelector('[data-signup-trigger], .button--tonal');
       const modalOverlay = document.querySelector('.modal'); // BEM
       const modalContent = document.querySelector('.modal__content'); // BEM
       const modalCloseButton = document.querySelector('.modal__close-button'); // BEM
@@ -1507,6 +1510,33 @@
       const googleButtonModal = modalContent.querySelector('.button--google');
       const customerVoiceTeaserGrid = document.getElementById('customer-voice-teaser-grid');
       const customerVoiceTeaserStatus = document.getElementById('customer-voice-teaser-status');
+      const pageMain = document.querySelector('main');
+      const modalFocusableSelector = [
+        'a[href]',
+        'button:not([disabled])',
+        'input:not([disabled])',
+        'select:not([disabled])',
+        'textarea:not([disabled])',
+        '[tabindex]:not([tabindex="-1"])'
+      ].join(',');
+      let modalReturnFocusElement = null;
+      let modalFocusTimeoutId = null;
+      function getModalFocusableElements() {
+        return Array.from(modalContent.querySelectorAll(modalFocusableSelector))
+          .filter((element) => element.offsetParent !== null);
+      }
+      function setBackgroundInert(isInert) {
+        if (!pageMain) {
+          return;
+        }
+        if (isInert) {
+          pageMain.setAttribute('aria-hidden', 'true');
+          pageMain.setAttribute('inert', '');
+          return;
+        }
+        pageMain.removeAttribute('aria-hidden');
+        pageMain.removeAttribute('inert');
+      }
       function resolveAppPath(relativePath) {
         if (!relativePath) {
           return relativePath;
@@ -1608,21 +1638,39 @@
       }
       // --- モーダルの表示/非表示関数 ---
       function showModal() {
+        modalReturnFocusElement = document.activeElement instanceof HTMLElement ? document.activeElement : signupButtonMain;
         modalOverlay.classList.remove('modal--is-hidden');
         document.body.classList.add('is-modal-open');
+        setBackgroundInert(true);
+        modalCloseButton?.focus({ preventScroll: true });
         // モーダルが表示されるアニメーションを考慮し、少し遅延させてからフォーカスを試みる
-        setTimeout(() => {
-          if (signupNameInput) {
-            signupNameInput.focus();
+        if (modalFocusTimeoutId) {
+          clearTimeout(modalFocusTimeoutId);
+        }
+        modalFocusTimeoutId = setTimeout(() => {
+          modalFocusTimeoutId = null;
+          if (modalOverlay.classList.contains('modal--is-hidden')) {
+            return;
           }
+          const focusableElements = getModalFocusableElements();
+          const firstFocusableElement = focusableElements[0] || signupNameInput || modalCloseButton;
+          firstFocusableElement?.focus();
         }, 100); // 100msの遅延
       }
       function hideModal() {
         modalOverlay.classList.add('modal--is-hidden');
         document.body.classList.remove('is-modal-open');
-        if (signupButtonMain) {
+        setBackgroundInert(false);
+        if (modalFocusTimeoutId) {
+          clearTimeout(modalFocusTimeoutId);
+          modalFocusTimeoutId = null;
+        }
+        if (modalReturnFocusElement && document.contains(modalReturnFocusElement)) {
+           modalReturnFocusElement.focus();
+        } else if (signupButtonMain) {
            signupButtonMain.focus();
         }
+        modalReturnFocusElement = null;
         clearSignupFormErrors();
         signupForm.reset();
       }
@@ -1710,8 +1758,29 @@
         modalCloseButton.addEventListener('click', hideModal);
       }
       document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && !modalOverlay.classList.contains('modal--is-hidden')) {
+        const isModalOpen = !modalOverlay.classList.contains('modal--is-hidden');
+        if (!isModalOpen) {
+          return;
+        }
+        if (event.key === 'Escape') {
           hideModal();
+          return;
+        }
+        if (event.key === 'Tab') {
+          const focusableElements = getModalFocusableElements();
+          if (!focusableElements.length) {
+            event.preventDefault();
+            return;
+          }
+          const firstFocusableElement = focusableElements[0];
+          const lastFocusableElement = focusableElements[focusableElements.length - 1];
+          if (event.shiftKey && document.activeElement === firstFocusableElement) {
+            event.preventDefault();
+            lastFocusableElement.focus();
+          } else if (!event.shiftKey && document.activeElement === lastFocusableElement) {
+            event.preventDefault();
+            firstFocusableElement.focus();
+          }
         }
       });
       if (showLoginLinkFromModal) {
@@ -1915,32 +1984,11 @@
     });
   </script>
 
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/2.9.7/jquery.fullpage.min.js"></script>
-  <script type="text/javascript">
-    $(document).ready(function() {
-      if(typeof $.fn.fullpage !== 'undefined') {
-        $('#fullpage').fullpage({
-          anchors: ['top', 'contents1', 'contents2', 'contents3', 'contents4', 'contents5', 'voices', 'contents6'],
-          navigation: true,
-          navigationPosition: 'right',
-          responsiveWidth: 1024,
-          scrollOverflow: false,
-          autoScrolling: true,
-          scrollingSpeed: 700,
-          fitToSection: true,
-          keyboardScrolling: true,
-          touchSensitivity: 15
-        });
-      }
-    });
-  </script>
-
 </body>
 </html>
 <!-- 自己チェックリスト -->
 <!-- コントラスト OK: 主要テキストと背景、ボタンとテキストのコントラストはWCAG AAを満たすようにカラー変数を設定済み（ツールで確認推奨） -->
-<!-- ランドマーク OK: role="main", role="dialog", aria-labelledby, aria-modal, aria-describedby など WAI-ARIA ロールを適切に配置 -->
+<!-- ランドマーク OK: main 要素、role="dialog", aria-labelledby, aria-modal, aria-describedby など WAI-ARIA ロールを適切に配置 -->
 <!-- レスポンシブ OK: @media クエリにより、sm, md, lg, xl のブレークポイントでレイアウトが適切に変化することを確認 -->
 <!-- 4px グリッド OK: margin, padding, font-size, border-radius など主要なサイズを4の倍数で定義・調整 -->
 <!-- 浮動ラベル削除 OK: 浮動ラベルのHTML構造とCSSルールを削除し、標準的なラベル配置に戻っていることを確認 -->

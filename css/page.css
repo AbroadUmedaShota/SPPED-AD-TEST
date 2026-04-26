@@ -197,6 +197,15 @@ a:hover {
     text-decoration: none;
 }
 
+#before-login a:focus-visible,
+#before-login button:focus-visible,
+#before-login input:focus-visible,
+#before-login summary:focus-visible {
+    outline: 3px solid #38bdf8;
+    outline-offset: 4px;
+    box-shadow: 0 0 0 6px rgba(56, 189, 248, 0.24);
+}
+
 a img,
 img {
     border: 0;
@@ -4069,6 +4078,194 @@ body.lock {
 @media screen and (max-width: 736px) {
     label {
         font-weight: normal;
+    }
+}
+
+/* Login-front review fixes: keep the existing page structure while reducing visual noise. */
+#before-login .hero-cta-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 24px;
+}
+
+#before-login .hero-primary-cta,
+#before-login .hero-secondary-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 0 24px;
+    border-radius: 999px;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+#before-login .hero-primary-cta {
+    background: linear-gradient(90deg, #c412a2, #2138bc);
+    color: #fff;
+    box-shadow: 0 16px 34px rgba(33, 56, 188, 0.28);
+}
+
+#before-login .hero-secondary-cta {
+    border: 1px solid rgba(255, 255, 255, 0.52);
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+#before-login #input-box.form-container {
+    max-width: 400px !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18) !important;
+}
+
+#before-login #input-box .scenario-accounts {
+    margin: 10px 0 12px;
+    padding: 10px 12px;
+    border: 1px dashed #cbd5e1;
+    border-radius: 12px;
+    background: #f8fafc;
+}
+
+#before-login #input-box .scenario-accounts__title {
+    margin: 0;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+}
+
+#before-login #input-box .scenario-accounts[open] .scenario-accounts__title {
+    margin-bottom: 10px;
+}
+
+#before-login .signup-inline-link {
+    margin: 12px 0 0;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+}
+
+#before-login .signup-inline-link a {
+    color: #2138bc;
+    font-weight: 800;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+#before-login #section7 article.tate {
+    min-height: auto;
+    height: auto;
+    overflow: visible;
+}
+
+#before-login #section7 article .no-flex.white {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 7vh 5% 5vh;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+}
+
+#before-login #section7 article .no-flex ul.list3 {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 28px;
+}
+
+#before-login #section7 article .no-flex ul.list3 li {
+    width: auto;
+}
+
+#before-login #section7 article .no-flex ul.list3 li a {
+    min-height: 72px;
+    height: auto;
+    padding: 14px 18px;
+    border-width: 1px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.72);
+    box-shadow: none;
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+#before-login #section7 article .no-flex ul.list3 li a .arrow-round {
+    right: 16px;
+    left: auto;
+    bottom: 18px;
+    transform: scale(0.78);
+    transform-origin: right center;
+}
+
+#before-login article.tate footer#before-footer {
+    height: auto;
+    min-height: 0;
+    padding: 42px 5% !important;
+    background: #f8fafc;
+}
+
+#before-login article.tate footer#before-footer ul {
+    width: min(680px, 58%);
+}
+
+#before-login article.tate footer#before-footer .footer-primary-cta {
+    display: inline-flex;
+    width: auto;
+    min-height: 40px;
+    align-items: center;
+    padding: 0 18px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #c412a2, #2138bc);
+    color: #fff;
+}
+
+@media (max-width: 900px) {
+    #before-login #section7 article .no-flex ul.list3 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    #before-login article.tate footer#before-footer {
+        display: block;
+    }
+
+    #before-login article.tate footer#before-footer h2,
+    #before-login article.tate footer#before-footer ul {
+        width: 100%;
+    }
+
+    #before-login article.tate footer#before-footer ul {
+        margin-top: 24px;
+    }
+}
+
+@media (max-width: 600px) {
+    #before-login .hero-cta-group {
+        flex-direction: column;
+    }
+
+    #before-login .hero-primary-cta,
+    #before-login .hero-secondary-cta {
+        width: 100%;
+    }
+
+    #before-login #section7 article .no-flex ul.list3 {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    #before-login #section7 article .no-flex ul.list3 li a {
+        min-height: 56px;
+    }
+
+    #before-login article.tate footer#before-footer ul {
+        display: block;
+    }
+
+    #before-login article.tate footer#before-footer ul li {
+        width: 100%;
     }
 }
 
