@@ -1,0 +1,226 @@
+/* ============================================================
+   BEFORE/AFTER + UI MOCKUP shared styles (works under all 3 themes)
+   ============================================================ */
+
+/* ──────────────────────────────────────────
+   Before / After comparison cards
+   ────────────────────────────────────────── */
+.theme .ba-grid{
+  display: grid; grid-template-columns: 1fr auto 1fr;
+  gap: 0; align-items: stretch;
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+.theme .ba-col{ padding: 32px; display: flex; flex-direction: column; gap: 16px; }
+.theme .ba-col.before{ background: var(--bg-soft); }
+.theme .ba-col.after{ background: linear-gradient(135deg, rgba(29,78,216,.04), transparent 70%); }
+.theme-b .ba-col.after{ background: linear-gradient(135deg, rgba(94,106,210,.08), transparent 70%); }
+
+.theme .ba-tag{
+  display: inline-flex; align-items: center; gap: 6px; align-self: flex-start;
+  font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+  letter-spacing: .08em; text-transform: uppercase;
+  padding: 4px 10px; border-radius: 6px;
+}
+.theme .ba-tag.before{
+  background: rgba(100,116,139,.12); color: var(--fg-muted);
+}
+.theme .ba-tag.after{
+  background: rgba(29,78,216,.12); color: var(--primary);
+}
+.theme-b .ba-tag.after{ background: rgba(94,106,210,.18); color: #a5b4fc; }
+
+.theme .ba-divider{
+  width: 1px; background: var(--line);
+  position: relative;
+}
+.theme .ba-divider::after{
+  content: "→"; position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  width: 32px; height: 32px; border-radius: 999px;
+  background: var(--bg-elev); border: 1px solid var(--line);
+  display: grid; place-items: center;
+  font-size: 14px; font-weight: 600; color: var(--primary);
+}
+
+.theme .ba-row{
+  display: flex; align-items: flex-start; gap: 12px;
+  font-size: 14px; line-height: 1.5;
+}
+.theme .ba-row .ic{
+  width: 22px; height: 22px; flex-shrink: 0; margin-top: 1px;
+  display: grid; place-items: center; border-radius: 6px;
+  font-size: 13px; font-weight: 700;
+}
+.theme .ba-row.bad .ic{ background: rgba(239,68,68,.12); color: #dc2626; }
+.theme-b .ba-row.bad .ic{ background: rgba(239,68,68,.18); color: #fca5a5; }
+.theme .ba-row.good .ic{ background: rgba(16,185,129,.14); color: #059669; }
+.theme-b .ba-row.good .ic{ background: rgba(16,185,129,.18); color: #6ee7b7; }
+.theme .ba-row.bad{ color: var(--fg-muted); }
+.theme .ba-row.good{ color: var(--fg); font-weight: 500; }
+
+/* ──────────────────────────────────────────
+   UI Mockup — Excel export panel
+   ────────────────────────────────────────── */
+.theme .ui-mock{
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  font-family: var(--font-body);
+}
+.theme .ui-mock-bar{
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px; background: var(--bg-soft);
+  border-bottom: 1px solid var(--line-soft);
+  font-family: var(--font-mono); font-size: 11px; color: var(--fg-faint);
+}
+.theme .ui-mock-bar .dots{ display: flex; gap: 5px; }
+.theme .ui-mock-bar .dots span{ width: 9px; height: 9px; border-radius: 999px; background: var(--line); }
+.theme .ui-mock-bar .dots span:nth-child(1){ background: #ff5f57; }
+.theme .ui-mock-bar .dots span:nth-child(2){ background: #febc2e; }
+.theme .ui-mock-bar .dots span:nth-child(3){ background: #28c840; }
+.theme .ui-mock-bar .url{ flex: 1; text-align: center; }
+
+/* Excel data table */
+.theme .ui-tbl{ font-size: 12px; }
+.theme .ui-tbl-row{
+  display: grid; grid-template-columns: 32px 1.4fr 1fr .8fr .8fr;
+  border-bottom: 1px solid var(--line-soft);
+  align-items: center;
+}
+.theme .ui-tbl-row > div{ padding: 8px 12px; }
+.theme .ui-tbl-row.head{
+  background: var(--bg-soft);
+  font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+  color: var(--fg-faint); text-transform: uppercase; letter-spacing: .06em;
+}
+.theme .ui-tbl-row .num{ color: var(--fg-faint); font-family: var(--font-mono); font-size: 10px; text-align: center; }
+.theme .ui-tbl-row .name{ color: var(--fg); font-weight: 500; }
+.theme .ui-tbl-row .co{ color: var(--fg-muted); }
+.theme .ui-tbl-row .date{ color: var(--fg-muted); font-family: var(--font-mono); font-size: 11px; }
+.theme .ui-tbl-row .tag{
+  display: inline-block; padding: 2px 8px; border-radius: 4px;
+  font-size: 10px; font-weight: 500;
+}
+.theme .ui-tbl-row .tag.g{ background: rgba(16,185,129,.14); color: #059669; }
+.theme-b .ui-tbl-row .tag.g{ background: rgba(16,185,129,.2); color: #6ee7b7; }
+.theme .ui-tbl-row .tag.b{ background: rgba(29,78,216,.14); color: var(--primary); }
+.theme-b .ui-tbl-row .tag.b{ background: rgba(94,106,210,.2); color: #a5b4fc; }
+.theme .ui-tbl-row .tag.a{ background: rgba(245,158,11,.16); color: #b45309; }
+.theme-b .ui-tbl-row .tag.a{ background: rgba(245,158,11,.2); color: #fcd34d; }
+
+.theme .ui-mock-action{
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px; background: var(--bg-soft);
+  border-top: 1px solid var(--line-soft);
+  font-size: 12px; color: var(--fg-muted);
+}
+.theme .ui-mock-action .btn-mini{
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border-radius: 6px;
+  background: var(--primary); color: white;
+  font-size: 12px; font-weight: 500;
+}
+
+/* ──────────────────────────────────────────
+   Slack notification mockup
+   ────────────────────────────────────────── */
+.theme .ui-slack{
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  padding: 16px;
+  display: flex; gap: 12px; align-items: flex-start;
+  font-size: 13px;
+  position: relative;
+}
+.theme .ui-slack .av{
+  width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0;
+  background: linear-gradient(135deg, #4a154b, #611f69);
+  color: white; display: grid; place-items: center;
+  font-size: 16px; font-weight: 700;
+}
+.theme .ui-slack .body{ flex: 1; min-width: 0; }
+.theme .ui-slack .head-line{
+  display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px;
+}
+.theme .ui-slack .nm{ font-weight: 700; color: var(--fg); }
+.theme .ui-slack .bot{
+  font-size: 9px; padding: 1px 4px; border-radius: 3px;
+  background: var(--bg-soft); color: var(--fg-faint);
+  border: 1px solid var(--line-soft);
+  font-family: var(--font-mono); font-weight: 600; letter-spacing: .04em;
+}
+.theme .ui-slack .ts{ font-size: 11px; color: var(--fg-faint); }
+.theme .ui-slack .msg{ color: var(--fg); margin-bottom: 8px; }
+.theme .ui-slack .lead-card{
+  border-left: 3px solid var(--primary);
+  background: var(--bg-soft);
+  padding: 10px 12px; border-radius: 0 6px 6px 0;
+  font-size: 12px;
+}
+.theme .ui-slack .lead-card .name{ font-weight: 600; color: var(--fg); margin-bottom: 4px; }
+.theme .ui-slack .lead-card .meta{ color: var(--fg-muted); font-size: 11px; }
+.theme .ui-slack .lead-card .meta .k{ color: var(--fg-faint); }
+
+/* ──────────────────────────────────────────
+   Timeline of post-event workflow
+   ────────────────────────────────────────── */
+.theme .timeline{
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 0;
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+.theme .tl-step{
+  padding: 24px; position: relative;
+  border-right: 1px solid var(--line-soft);
+}
+.theme .tl-step:last-child{ border-right: 0; }
+.theme .tl-step .when{
+  font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+  letter-spacing: .08em; text-transform: uppercase;
+  color: var(--fg-faint); margin-bottom: 8px;
+}
+.theme .tl-step .when.now{ color: var(--primary); }
+.theme .tl-step h4{
+  font-size: 14px; font-weight: 600; margin-bottom: 6px;
+  color: var(--fg); letter-spacing: -.005em;
+}
+.theme .tl-step p{ font-size: 12px; color: var(--fg-muted); line-height: 1.5; }
+.theme .tl-step .premium-tag{
+  display: inline-flex; align-items: center; gap: 4px;
+  margin-top: 10px;
+  font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+  letter-spacing: .06em;
+  padding: 3px 8px; border-radius: 4px;
+  background: rgba(29,78,216,.1); color: var(--primary);
+}
+.theme-b .tl-step .premium-tag{ background: rgba(94,106,210,.18); color: #a5b4fc; }
+.theme .tl-step .blocked-tag{
+  display: inline-flex; align-items: center; gap: 4px;
+  margin-top: 10px;
+  font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+  letter-spacing: .06em;
+  padding: 3px 8px; border-radius: 4px;
+  background: rgba(239,68,68,.12); color: #dc2626;
+}
+.theme-b .tl-step .blocked-tag{ background: rgba(239,68,68,.18); color: #fca5a5; }
+
+/* Section heads (theme-agnostic helper) */
+.theme .ba-head{ text-align: center; margin-bottom: 32px; }
+.theme .ba-head h2{
+  font-size: 36px; line-height: 1.15; letter-spacing: -.025em;
+  font-weight: 700; margin-bottom: 12px;
+}
+.theme-b .ba-head h2{ font-weight: 600; }
+.theme .ba-head p{ font-size: 16px; max-width: 620px; margin: 0 auto; color: var(--fg-muted); }
+
+.theme .ba-stack{ display: flex; flex-direction: column; gap: 24px; }
+.theme .ui-pair{
+  display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+}
