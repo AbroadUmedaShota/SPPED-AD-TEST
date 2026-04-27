@@ -11,6 +11,69 @@ const MAX_MESSAGE_LENGTH = 500;
 const STORAGE_KEY_PREFIX = 'thankYouScreenSettings_';
 const PREMIUM_PLAN_KEYWORDS = ['premium', 'professional', 'pro'];
 const BASE_LANGUAGE = 'ja';
+
+const TEST_SCENARIOS = {
+  'premium-single': {
+    plan: 'Premium',
+    name: { ja: '[TEST] Premium / 単一言語' },
+    activeLanguages: ['ja'],
+    thankYouMessage: { ja: 'ご回答ありがとうございました。' },
+    allowContinuousAnswer: false
+  },
+  'premium-multi-2': {
+    plan: 'Premium',
+    name: { ja: '[TEST] Premium / 2言語' },
+    activeLanguages: ['ja', 'en'],
+    thankYouMessage: { ja: 'ご回答ありがとうございました。', en: '' },
+    allowContinuousAnswer: false
+  },
+  'premium-multi-3': {
+    plan: 'Premium',
+    name: { ja: '[TEST] Premium / 3言語' },
+    activeLanguages: ['ja', 'en', 'zh-Hant'],
+    thankYouMessage: { ja: 'ご回答ありがとうございました。', en: '', 'zh-Hant': '' },
+    allowContinuousAnswer: false
+  },
+  'free': {
+    plan: 'Free',
+    name: { ja: '[TEST] Freeプラン' },
+    activeLanguages: ['ja'],
+    thankYouMessage: { ja: '' },
+    allowContinuousAnswer: false
+  }
+};
+
+function buildScenarioSurvey(key) {
+  const def = TEST_SCENARIOS[key];
+  if (!def) return null;
+  return {
+    id: `test-scenario-${key}`,
+    ...def
+  };
+}
+
+function initTestScenarioSelector() {
+  const select = document.getElementById('testScenarioSelect');
+  if (!select) return null;
+  const params = new URLSearchParams(window.location.search);
+  const current = params.get('scenario') || '';
+  if (select.querySelector(`option[value="${current}"]`)) {
+    select.value = current;
+  }
+  select.addEventListener('change', () => {
+    const next = select.value;
+    const nextParams = new URLSearchParams(window.location.search);
+    if (next) {
+      nextParams.set('scenario', next);
+    } else {
+      nextParams.delete('scenario');
+    }
+    nextParams.delete('surveyId');
+    const query = nextParams.toString();
+    window.location.href = `${window.location.pathname}${query ? `?${query}` : ''}`;
+  });
+  return current;
+}
 const SUPPORTED_LANGUAGES = [
   { code: 'ja', label: '日本語', shortLabel: '日本語' },
   { code: 'en', label: 'English', shortLabel: 'English' },
@@ -152,21 +215,45 @@ function applyStaticTexts(uiLanguage) {
   if (continuousDescription) continuousDescription.textContent = formatMessage(uiLanguage, 'thankYouSettings.continuousDescription');
   if (cancelButton) cancelButton.textContent = formatMessage(uiLanguage, 'thankYouSettings.cancel');
   if (saveButton) saveButton.textContent = formatMessage(uiLanguage, 'thankYouSettings.save');
+
+  const premiumNoticeTitleEl = document.getElementById('thankYouPremiumNoticeTitle');
+  if (premiumNoticeTitleEl) {
+    const badgeHTML = '<span class="text-[10px] font-black bg-amber-200 text-amber-800 px-1.5 py-0.5 rounded-full">Premium</span>';
+    premiumNoticeTitleEl.innerHTML = `${formatMessage(uiLanguage, 'thankYouSettings.premiumNoticeTitle')} ${badgeHTML}`;
+  }
 }
 
-function renderLanguageTabs(activeLanguages, editorLanguage) {
+function renderLanguageTabs(activeLanguages, editorLanguage, settingsState, uiLanguage) {
   const tabs = document.getElementById('thankYouLanguageTabs');
+  const wrapper = document.getElementById('thankYouLanguageTabsWrapper');
   if (!tabs) return;
   tabs.innerHTML = '';
-  tabs.classList.toggle('hidden', activeLanguages.length <= 1);
+  const shouldHide = activeLanguages.length <= 1;
+  tabs.classList.toggle('hidden', shouldHide);
+  if (wrapper) wrapper.classList.toggle('hidden', shouldHide);
 
   activeLanguages.forEach((code) => {
     const meta = getLanguageMeta(code);
+    const isActive = code === editorLanguage;
     const button = document.createElement('button');
     button.type = 'button';
+    button.setAttribute('role', 'tab');
     button.dataset.lang = code;
-    button.className = `px-4 py-2 text-sm font-semibold transition-colors duration-200 ${code === editorLanguage ? 'text-primary border-b-2 border-primary' : 'text-on-surface-variant border-b-2 border-transparent'}`;
+    button.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    button.setAttribute('aria-controls', 'thankYouMessage');
+    button.className = `lang-tab${isActive ? ' active' : ''}`;
     button.textContent = meta.shortLabel || meta.label;
+
+    const badge = document.createElement('span');
+    badge.className = 'translation-progress-badge';
+    const isBase = code === BASE_LANGUAGE;
+    const value = (settingsState && settingsState.thankYouMessage && settingsState.thankYouMessage[code]) || '';
+    const isMissing = !isBase && value.trim() === '';
+    if (isBase || !isMissing) {
+      badge.classList.add('hidden');
+    }
+    badge.textContent = formatMessage(uiLanguage, 'thankYouSettings.missingTranslationBadge');
+    button.appendChild(badge);
     tabs.appendChild(button);
   });
 }
@@ -205,7 +292,7 @@ function updateReferenceHint(settingsState, editorLanguage) {
   const currentValue = settingsState.thankYouMessage[editorLanguage] || '';
   const shouldShow = Boolean(referenceText.trim() && !currentValue.trim());
 
-  hint.textContent = shouldShow ? `${getLanguageMeta(BASE_LANGUAGE).label}: ${referenceText}` : '';
+  hint.textContent = shouldShow ? referenceText : '';
   hint.classList.toggle('hidden', !shouldShow);
 }
 
@@ -216,29 +303,42 @@ function syncTextarea(textarea, settingsState, editorLanguage) {
   updateReferenceHint(settingsState, editorLanguage);
 }
 
-function disableThankYouScreenForm(controls, uiLanguage, message) {
-  controls.forEach((control) => {
-    if (control) {
-      control.disabled = true;
-    }
-  });
+function showPremiumNotice(message) {
+  const notice = document.getElementById('thankYouPremiumNotice');
+  const messageEl = document.getElementById('thankYouPremiumNoticeMessage');
+  if (!notice || !messageEl) return;
+  messageEl.textContent = message || '';
+  notice.classList.remove('hidden');
+}
 
+function showErrorNotice(title, message) {
   const mainContent = document.getElementById('main-content');
-  if (message && mainContent) {
-    const noticeContainer = document.createElement('div');
-    noticeContainer.className = 'max-w-4xl mx-auto -mt-4 mb-6';
-    noticeContainer.innerHTML = `
-      <div class="p-4 bg-blue-50 border border-blue-200 text-blue-800 rounded-lg shadow">
-        <div class="flex items-start">
-          <span class="material-icons mr-3 text-blue-600">info</span>
-          <div>
-            <p class="font-semibold">${formatMessage(uiLanguage, 'thankYouSettings.premiumNoticeTitle')}</p>
-            <p class="text-sm">${message}</p>
-          </div>
-        </div>
+  if (!mainContent) return;
+  const noticeContainer = document.createElement('div');
+  noticeContainer.className = 'max-w-4xl mx-auto mb-4';
+  noticeContainer.innerHTML = `
+    <div class="p-4 bg-blue-50 border border-blue-200 text-blue-800 rounded-lg shadow flex items-start gap-3">
+      <span class="material-icons text-blue-600 flex-shrink-0 mt-0.5">info</span>
+      <div class="flex-1 min-w-0">
+        <p class="font-semibold" data-notice-title></p>
+        <p class="text-sm mt-1" data-notice-body></p>
       </div>
-    `;
-    mainContent.insertBefore(noticeContainer, mainContent.children[2] || null);
+    </div>
+  `;
+  const titleEl = noticeContainer.querySelector('[data-notice-title]');
+  const bodyEl = noticeContainer.querySelector('[data-notice-body]');
+  if (titleEl) titleEl.textContent = title || '';
+  if (bodyEl) bodyEl.textContent = message || '';
+  mainContent.insertBefore(noticeContainer, mainContent.children[2] || null);
+}
+
+function disableThankYouScreenForm(controls, uiLanguage, message, type = 'premium') {
+  controls.forEach((control) => { if (control) control.disabled = true; });
+  if (!message) return;
+  if (type === 'premium') {
+    showPremiumNotice(message);
+  } else {
+    showErrorNotice(formatMessage(uiLanguage, 'thankYouSettings.errorNoticeTitle'), message);
   }
 }
 
@@ -255,6 +355,8 @@ export async function initThankYouScreenSettings() {
 
   applyStaticTexts(uiLanguage);
 
+  const scenarioKey = initTestScenarioSelector();
+
   const interactiveControls = [thankYouMessageInput, allowContinuousAnswerToggle, saveButton];
   const urlParams = new URLSearchParams(window.location.search);
   const surveyId = urlParams.get('surveyId');
@@ -264,27 +366,33 @@ export async function initThankYouScreenSettings() {
   let editorLanguage = BASE_LANGUAGE;
   let activeLanguages = [BASE_LANGUAGE];
 
-  try {
-    if (surveyId) {
-      survey = await getSurveyById(surveyId);
-      if (!survey) {
-        throw new Error('Survey not found');
+  const scenarioSurvey = scenarioKey ? buildScenarioSurvey(scenarioKey) : null;
+
+  if (scenarioSurvey) {
+    survey = scenarioSurvey;
+  } else {
+    try {
+      if (surveyId) {
+        survey = await getSurveyById(surveyId);
+        if (!survey) {
+          throw new Error('Survey not found');
+        }
+      } else {
+        const tempDataString = localStorage.getItem('tempSurveyData');
+        if (!tempDataString) {
+          showToast(formatMessage(uiLanguage, 'thankYouSettings.tempDataMissing'), 'error');
+          setTimeout(() => { window.location.href = fromPage; }, 2000);
+          disableThankYouScreenForm(interactiveControls, uiLanguage, formatMessage(uiLanguage, 'thankYouSettings.tempDataMissing'), 'error');
+          return;
+        }
+        survey = JSON.parse(tempDataString);
       }
-    } else {
-      const tempDataString = localStorage.getItem('tempSurveyData');
-      if (!tempDataString) {
-        showToast(formatMessage(uiLanguage, 'thankYouSettings.tempDataMissing'), 'error');
-        setTimeout(() => { window.location.href = fromPage; }, 2000);
-        disableThankYouScreenForm(interactiveControls, uiLanguage, formatMessage(uiLanguage, 'thankYouSettings.tempDataMissing'));
-        return;
-      }
-      survey = JSON.parse(tempDataString);
+    } catch (error) {
+      console.error('Failed to initialize thank-you screen settings:', error);
+      showToast(formatMessage(uiLanguage, 'thankYouSettings.loadFailed'), 'error');
+      disableThankYouScreenForm(interactiveControls, uiLanguage, formatMessage(uiLanguage, 'thankYouSettings.loadFailed'), 'error');
+      return;
     }
-  } catch (error) {
-    console.error('Failed to initialize thank-you screen settings:', error);
-    showToast(formatMessage(uiLanguage, 'thankYouSettings.loadFailed'), 'error');
-    disableThankYouScreenForm(interactiveControls, uiLanguage, formatMessage(uiLanguage, 'thankYouSettings.loadFailed'));
-    return;
   }
 
   activeLanguages = normalizeActiveLanguages(survey?.activeLanguages || [BASE_LANGUAGE]);
@@ -308,7 +416,7 @@ export async function initThankYouScreenSettings() {
   initialSettings = JSON.parse(JSON.stringify(settingsState));
 
   renderPageTitle(survey, uiLanguage);
-  renderLanguageTabs(activeLanguages, editorLanguage);
+  renderLanguageTabs(activeLanguages, editorLanguage, settingsState, uiLanguage);
   syncTextarea(thankYouMessageInput, settingsState, editorLanguage);
   allowContinuousAnswerToggle.checked = Boolean(settingsState.allowContinuousAnswer);
   updateThankYouMessageMeta(thankYouMessageInput, settingsState, editorLanguage, uiLanguage);
@@ -323,6 +431,7 @@ export async function initThankYouScreenSettings() {
     settingsState.thankYouMessage[editorLanguage] = thankYouMessageInput.value || '';
     updateReferenceHint(settingsState, editorLanguage);
     updateThankYouMessageMeta(thankYouMessageInput, settingsState, editorLanguage, uiLanguage);
+    renderLanguageTabs(activeLanguages, editorLanguage, settingsState, uiLanguage);
   });
 
   allowContinuousAnswerToggle.addEventListener('change', () => {
@@ -343,7 +452,7 @@ export async function initThankYouScreenSettings() {
       return;
     }
     editorLanguage = nextLanguage;
-    renderLanguageTabs(activeLanguages, editorLanguage);
+    renderLanguageTabs(activeLanguages, editorLanguage, settingsState, uiLanguage);
     syncTextarea(thankYouMessageInput, settingsState, editorLanguage);
     updateThankYouMessageMeta(thankYouMessageInput, settingsState, editorLanguage, uiLanguage);
   });
@@ -352,6 +461,11 @@ export async function initThankYouScreenSettings() {
     if (!updateThankYouMessageMeta(thankYouMessageInput, settingsState, editorLanguage, uiLanguage)) {
       showToast(formatMessage(uiLanguage, 'thankYouSettings.counterError', { count: MAX_MESSAGE_LENGTH }), 'error');
       thankYouMessageInput.focus();
+      return;
+    }
+
+    if (scenarioKey) {
+      showToast(formatMessage(uiLanguage, 'thankYouSettings.scenarioSaveSkipped'), 'info');
       return;
     }
 
@@ -384,6 +498,10 @@ export async function initThankYouScreenSettings() {
   });
 
   cancelButton.addEventListener('click', () => {
+    if (scenarioKey) {
+      window.location.href = window.location.pathname;
+      return;
+    }
     const returnUrl = surveyId
       ? `${fromPage}?surveyId=${encodeURIComponent(surveyId)}`
       : fromPage;
@@ -393,7 +511,7 @@ export async function initThankYouScreenSettings() {
     };
     if (hasSettingsChanged(currentSettings, initialSettings)) {
       showConfirmationModal(
-        '未保存の変更があります。このページを離れますか？',
+        formatMessage(uiLanguage, 'thankYouSettings.unsavedChanges'),
         () => { window.location.href = returnUrl; }
       );
     } else {

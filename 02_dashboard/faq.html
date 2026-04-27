@@ -12,6 +12,8 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="service-top-style.css">
+    <!-- ヘルプセンター共通スタイル（sticky検索 / mark / feedback-btn / keyword-chip 等を流用） -->
+    <link rel="stylesheet" href="src/help-center.css">
     <!-- FAQページ専用CSS -->
     <link rel="stylesheet" href="assets/css/faq.css">
     <!-- Custom Fonts -->
@@ -33,59 +35,140 @@
         <div id="sidebar-placeholder"></div>
 
         <!-- メインコンテンツ -->
-        <main class="flex flex-1 flex-col py-8 px-4 sm:px-6 lg:px-8" id="main-content">
-            <div class="flex flex-col w-full max-w-4xl mx-auto flex-1">
-                <!-- パンくずリストコンテナ -->
-                <div id="breadcrumb-container" class="mb-4"></div>
+        <main class="flex flex-1 flex-col" id="main-content">
 
-                <!-- タイトルエリア -->
-                <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-outline-variant">
-                    <h1 class="text-on-background text-headline-large font-bold leading-tight tracking-tight">よくある質問</h1>
+            <!-- スクロール時に表示される縮小版検索バー -->
+            <div id="faq-sticky-search" class="hc-sticky-search" hidden>
+                <div class="hc-sticky-search__inner">
+                    <form role="search" aria-label="FAQ検索(縮小版)" class="hc-sticky-search__form" id="faq-sticky-form">
+                        <span class="material-icons hc-sticky-search__icon" aria-hidden="true">search</span>
+                        <input
+                            type="search"
+                            id="faq-sticky-search-input"
+                            name="query"
+                            aria-label="質問をキーワードで検索"
+                            placeholder="FAQを検索..."
+                            class="hc-sticky-search__input"
+                            autocomplete="off">
+                    </form>
                 </div>
+            </div>
+
+            <!-- パンくずリスト (ヒーロー上部) -->
+            <div class="hc-breadcrumb-top">
+                <div id="breadcrumb-container"></div>
+            </div>
+
+            <!-- ヒーローセクション -->
+            <section class="faq-hero" aria-labelledby="faq-hero-title">
+                <div class="faq-hero__bg" aria-hidden="true">
+                    <div class="faq-hero__grid"></div>
+                    <div class="faq-hero__glow faq-hero__glow--1"></div>
+                    <div class="faq-hero__glow faq-hero__glow--2"></div>
+                </div>
+                <div class="faq-hero__inner">
+                    <p class="faq-hero__eyebrow">SPEED-AD FAQ</p>
+                    <h1 id="faq-hero-title" class="faq-hero__title">よくある質問</h1>
+                    <p class="faq-hero__subtitle">多くの方が知りたい疑問をまとめました。キーワード検索やカテゴリから、最短3ステップで答えが見つかります。</p>
+
+                    <form role="search" aria-label="FAQ検索" class="faq-search" id="faq-search-form">
+                        <span class="material-icons faq-search__icon" aria-hidden="true">search</span>
+                        <input
+                            type="search"
+                            id="search-box"
+                            name="query"
+                            aria-label="質問をキーワードで検索"
+                            placeholder="例：パスワード、料金プラン、名刺データ化"
+                            class="faq-search__input"
+                            autocomplete="off">
+                        <button type="button" id="clear-search-btn" class="faq-clear-btn hidden" aria-label="検索キーワードをクリア">
+                            <span class="material-icons" aria-hidden="true">close</span>
+                        </button>
+                    </form>
+
+                    <div id="popular-keywords-wrapper" class="faq-keywords" aria-label="人気のキーワード">
+                        <!-- JSで動的に生成 -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- メインコンテンツコンテナ -->
+            <div class="faq-main">
 
                 <!-- ローディングインジケーター -->
-                <div id="loading-indicator" class="text-center py-10 hidden">
+                <div id="loading-indicator" class="text-center py-10 hidden" role="status" aria-live="polite">
                     <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
                     <p class="mt-4 text-on-surface-variant">読み込み中...</p>
                 </div>
 
                 <!-- エラーメッセージ -->
-                <div id="error-message" class="text-center py-10 hidden">
-                    <!-- JSでメッセージを挿入 -->
-                </div>
+                <div id="error-message" class="hidden my-8" role="alert" aria-live="assertive"></div>
 
                 <!-- FAQコンテンツ -->
-                <div id="faq-container" class="hidden">
-                    <!-- 検索ボックス -->
-                    <div id="search-container" class="mb-8">
-                        <div class="relative">
-                            <input type="text" id="search-box" placeholder="キーワードで検索" class="input-field pl-10 w-full">
-                            <span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
-                            <button id="clear-search-btn" class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hidden">&times;</button>
-                        </div>
-                    </div>
+                <div id="faq-container" class="hidden pb-8">
 
-                    <!-- 注目の質問 -->
-                    <section id="featured-questions" class="mb-12">
-                        <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
-                            <span class="material-icons text-primary">star</span>
-                            注目の質問
-                        </h2>
-                        <div id="featured-questions-list" class="space-y-4">
+                    <!-- カテゴリカード (bento) -->
+                    <section id="category-cards-section" class="pt-4 pb-8" aria-labelledby="category-cards-title">
+                        <div class="hc-section-heading">
+                            <h2 id="category-cards-title" class="hc-section-heading__title">カテゴリから探す</h2>
+                            <p class="hc-section-heading__subtitle">気になるトピックから、代表的な質問をプレビューできます</p>
+                        </div>
+                        <div id="category-cards" class="hc-category-grid">
                             <!-- JSで動的に生成 -->
                         </div>
                     </section>
 
-                    <!-- カテゴリ別Q&Aリスト -->
-                    <div id="faq-list" class="space-y-10">
-                        <!-- JSで動的に生成 -->
-                    </div>
-                     <div id="no-results-message" class="text-center py-10 hidden">
-                        <p class="font-bold">ご指定のキーワードに一致する質問は見つかりませんでした。</p>
-                        <p class="text-sm text-on-surface-variant">単語を変えてお試しください。</p>
-                    </div>
+                    <!-- 検索結果ステータス（件数・クリア導線） -->
+                    <div id="search-status" class="pt-2 hidden" aria-live="polite" aria-atomic="true"></div>
+
+                    <!-- すべての質問 (コンパクト表示) -->
+                    <section id="faq-list-section" class="pt-8 pb-8 border-t border-outline-variant" aria-labelledby="faq-list-title">
+                        <div class="hc-section-heading">
+                            <h2 id="faq-list-title" class="hc-section-heading__title">すべての質問</h2>
+                            <p class="hc-section-heading__subtitle">カテゴリごとに展開してご覧いただけます</p>
+                        </div>
+                        <div id="faq-list" class="space-y-10">
+                            <!-- JSで動的に生成 -->
+                        </div>
+                        <div id="no-results-message" class="text-center py-12 hidden">
+                            <span class="material-icons text-5xl text-on-surface-variant mb-3" aria-hidden="true">search_off</span>
+                            <p class="font-bold text-on-background">ご指定のキーワードに一致する質問は見つかりませんでした。</p>
+                            <p class="text-sm text-on-surface-variant mt-1">別のキーワードをお試しいただくか、下の導線からサポートまでお気軽にお問い合わせください。</p>
+                            <div class="mt-4 flex flex-wrap justify-center gap-3">
+                                <button type="button" id="reset-search-btn" class="hc-cta__btn hc-cta__btn--ghost">
+                                    <span class="material-icons" aria-hidden="true">refresh</span>
+                                    検索をクリアしてすべて表示
+                                </button>
+                                <a href="bug-report.html" class="hc-cta__btn hc-cta__btn--primary">
+                                    <span class="material-icons" aria-hidden="true">mail</span>
+                                    サポートに問い合わせる
+                                </a>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 解決しなかった場合 -->
+                    <section class="faq-cta-wrap" aria-labelledby="faq-cta-title">
+                        <div class="hc-cta">
+                            <div class="hc-cta__text">
+                                <h2 id="faq-cta-title" class="hc-cta__title">解決しませんでしたか？</h2>
+                                <p class="hc-cta__subtitle">ヘルプセンターの記事やサポートチームがお手伝いします。</p>
+                            </div>
+                            <div class="hc-cta__actions">
+                                <a href="help.html" class="hc-cta__btn hc-cta__btn--ghost">
+                                    <span class="material-icons" aria-hidden="true">menu_book</span>
+                                    ヘルプセンターを見る
+                                </a>
+                                <a href="bug-report.html" class="hc-cta__btn hc-cta__btn--primary">
+                                    <span class="material-icons" aria-hidden="true">mail</span>
+                                    お問い合わせ
+                                </a>
+                            </div>
+                        </div>
+                    </section>
                 </div>
             </div>
+
         </main>
     </div>
 

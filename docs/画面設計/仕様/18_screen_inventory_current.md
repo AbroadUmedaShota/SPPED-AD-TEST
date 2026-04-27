@@ -44,8 +44,8 @@ last_reviewed: 2026-04-07
 | U-14 | 利用者向け | パスワード再設定 | `02_dashboard/forgot-password.html`, `02_dashboard/reset-password.html`, `02_dashboard/reset-password-complete.html` | `10_password_reset_feature.md` | 正本あり | HTMLあり | ログイン画面との導線を確認する |  |
 | U-15 | 利用者向け | パスワード変更 | `02_dashboard/password_change.html` | `09_password_change_screen.md` | 正本あり | HTMLあり | 完了画面との遷移を確認する |  |
 | U-16 | 利用者向け | パスワード変更完了 | `02_dashboard/password-change-complete.html` | `09_password_change_screen.md` | 正本あり | HTMLあり | 完了後のログイン画面復帰導線を確認する |  |
-| U-17 | 利用者向け | プレミアム関連 | `02_dashboard/premium_signup.html`, `premium_signup_new.html`, `premium_registration_spa.html`, `premium_registration_complete.html`, `premium_cancel.html`, `premium_cancel_complete.html` | `premium/` 配下仕様, `11_plan_feature_restrictions.md`, `請求関連仕様マップ.md` | 正本あり | HTMLあり | 旧・新signupの採用関係に加え、請求表現の shared/private 境界を確認する | プラン制限と連動 |
-| U-18 | 法務・ヘルプ | ヘルプセンター / FAQ | `02_dashboard/help-center.html`, `help-content.html`, `faq.html` | `15_help_center_requirements.md` | 正本あり | HTMLあり | ヘルプセンターと個別コンテンツの管理方法を確認する |  |
+| U-17 | 利用者向け | プレミアム関連 | `02_dashboard/premium_signup.html`, `premium_signup_new.html`, `premium_registration_spa.html`, `premium_registration_complete.html`, `premium_cancel.html`, `premium_cancel_complete.html` | `premium/` 配下仕様, `11_plan_feature_restrictions.md`, `請求関連仕様マップ.md` | 正本あり | HTMLあり | 旧・新signupの採用関係、登録・完了・解約導線、請求表現の shared/private 境界を確認する | プラン制限と連動 |
+| U-18 | 法務・ヘルプ | ヘルプセンター / FAQ | `02_dashboard/help.html`, `help-content.html`, `faq.html` | `15_help_center_requirements.md` | 正本あり | HTMLあり | ヘルプセンターと個別コンテンツの管理方法を確認する |  |
 | U-19 | 法務・ヘルプ | 法務ページ | `02_dashboard/terms-of-service.html`, `specified-commercial-transactions.html`, `personal-data-protection-policy.html` | 旧画面一覧 / 未確認 | 未確認 | HTMLあり | 正本仕様の要否を確認する | 利用規約、特商法、個人情報保護方針 |
 | U-20 | 利用者向け | 更新履歴 | `02_dashboard/changelog.html` | 未確認 | 未確認 | HTMLあり | 画面仕様として管理するか、運用補助扱いにするか確認する |  |
 | U-21 | 利用者向け | 不具合報告 | `02_dashboard/bug-report.html`, `02_dashboard/speed-ad-不具合報告-form/index.html` | `test_requirements.md` / 未確認 | 未確認 | HTMLあり | 通常画面とフォームディレクトリの使い分け、送信先責務を確認する |  |
@@ -112,7 +112,7 @@ last_reviewed: 2026-04-07
 | :--- | :--- |
 | `02_dashboard/changelog.html` | 画面仕様として管理するか、運用補助扱いにするか |
 | `02_dashboard/bug-report.html` | `speed-ad-不具合報告-form/index.html` との使い分け |
-| `02_dashboard/help-content.html` | `help-center.html` 配下コンテンツとして扱うか |
+| `02_dashboard/help-content.html` | `help.html` 配下コンテンツとして扱うか |
 | `02_dashboard/premium_signup.html`, `premium_signup_new.html` | 現行採用ページの確定 |
 | `02_dashboard/seikyuusyo_sample.html` | サンプル/参考実装として別枠扱いでよいか（現行導線の正本には含めない） |
 | `03_admin/data_entry.html`, `03_admin/data-entry-management.html` | `Moved` タイトルのため旧導線扱いでよいか |

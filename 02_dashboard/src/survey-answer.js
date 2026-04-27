@@ -2036,7 +2036,7 @@ async function handleSubmit() {
                 ? (typeof thankYouSettings.thankYouMessage === 'object'
                     ? (thankYouSettings.thankYouMessage[getCurrentLocale()] || thankYouSettings.thankYouMessage.ja || '')
                     : thankYouSettings.thankYouMessage)
-                : '') || 'ご回答ありがとうございました。';
+                : '') || formatMessage(getCurrentLocale(), 'thankYouScreen.body');
             document.open();
             document.write(`<!DOCTYPE html><html lang="ja"><head>
 <meta charset="UTF-8">

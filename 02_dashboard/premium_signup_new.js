@@ -7,12 +7,14 @@ document.addEventListener('DOMContentLoaded', () => {
         scenarioSwitcherButton.addEventListener('click', (event) => {
             event.stopPropagation(); // Prevent document click from immediately closing it
             scenarioSwitcherMenu.classList.toggle('hidden');
+            scenarioSwitcherButton.setAttribute('aria-expanded', String(!scenarioSwitcherMenu.classList.contains('hidden')));
         });
 
         // Click outside to close the menu
         document.addEventListener('click', (event) => {
             if (!scenarioSwitcherMenu.contains(event.target) && !scenarioSwitcherButton.contains(event.target)) {
                 scenarioSwitcherMenu.classList.add('hidden');
+                scenarioSwitcherButton.setAttribute('aria-expanded', 'false');
             }
         });
     }
@@ -96,14 +98,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to update the UI based on the current scenario
     const updateUiForScenario = (currentScenarioConfig) => {
-        const signupButtonContainer = document.querySelector('.bg-blue-50 .flex-shrink-0');
-        const signupButton = signupButtonContainer ? signupButtonContainer.querySelector('a') : null;
+        const signupButtons = Array.from(document.querySelectorAll('[data-role="primary-signup-cta"]'));
+        const updateSignupButtons = (label) => {
+            signupButtons.forEach(button => {
+                button.href = 'premium_registration_spa.html';
+                button.innerHTML = `
+                    <span>${label}</span>
+                    <span class="material-icons text-base" aria-hidden="true">arrow_forward</span>
+                `;
+            });
+        };
 
         // --- 1. Hero Section & Main Content Replacement (For Premium & Free Trial) ---
         if (currentScenarioConfig.is_premium_member) {
             // Existing Premium Member (Active or Cancelled)
             const fileHeroSection = document.getElementById('premium-hero-section');
             if (fileHeroSection) {
+                fileHeroSection.className = 'relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 text-white shadow-sm';
                 // Calculate Dynamic Date (End of Current Month)
                 const today = new Date();
                 const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
@@ -120,18 +131,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     statusBadgeHtml = `
                         <div class="inline-flex items-center gap-2 py-2 px-5 rounded-full bg-gray-600/50 backdrop-blur-sm border border-gray-400 text-gray-200 text-sm font-bold tracking-wider mb-6">
                             <span class="material-icons text-gray-300 text-lg">event_busy</span>
-                            Status: Auto-Renewal Off (自動更新停止中)
+                            解約予約中
                         </div>
                     `;
-                    renewalLabel = '利用期限 (自動更新停止中)';
+                    renewalLabel = '利用可能期限';
                     heroBgClass = 'border-gray-500/50';
                     alertHtml = `
                         <div class="mt-8 bg-gray-800/50 rounded-lg p-4 border border-gray-600 text-left">
                             <p class="text-gray-200 text-sm flex items-start gap-2">
                                 <span class="material-icons text-amber-400 text-lg mt-0.5">warning</span>
                                 <span>
-                                    現在、解約手続きが完了しています。<br>
-                                    <span class="font-bold text-white">${dateStr}</span> までは全機能をご利用いただけますが、翌日以降フリープランへ自動移行されます。
+                                    現在、次回更新の停止を予約しています。<br>
+                                    <span class="font-bold text-white">${dateStr}</span> まではPremium機能をご利用いただけます。継続する場合は自動更新を再開してください。
                                 </span>
                             </p>
                         </div>
@@ -186,7 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="mt-8 pt-6 border-t border-white/10 grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
                                 <div class="flex items-center gap-2 text-white/90 text-sm">
                                     <span class="material-icons text-emerald-400 text-sm">check</span>
-                                    データ保存期間： <span class="font-bold text-white">無期限</span>
+                                    データ保存期間： <span class="font-bold text-white">最長1年</span>
                                 </div>
                                 <div class="flex items-center gap-2 text-white/90 text-sm">
                                     <span class="material-icons text-emerald-400 text-sm">check</span>
@@ -198,7 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 </div>
                                     <div class="flex items-center gap-2 text-white/90 text-sm">
                                     <span class="material-icons text-emerald-400 text-sm">check</span>
-                                    SPEEDレビュー： <span class="font-bold text-white">利用可能</span>
+                                    グラフ表示・CSV活用： <span class="font-bold text-white">利用可能</span>
                                 </div>
                             </div>
 
@@ -293,6 +304,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Free Trial User
             const fileHeroSection = document.getElementById('premium-hero-section');
             if (fileHeroSection) {
+                fileHeroSection.className = 'relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 text-white shadow-sm';
                 // Calculate Free Trial End Date (End of current month)
                 const today = new Date();
                 const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
@@ -436,15 +448,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 // CTAボタンの変更
-                if (signupButton) {
-                    signupButton.href = 'premium_registration_spa.html';
-                    signupButton.innerHTML = `
-                        再加入する
-                    `;
-                }
+                updateSignupButtons('再加入する');
 
                 // 料金セクションに再加入者向けメッセージを追加
-                const pricingSection = document.querySelector('.bg-blue-50.border.border-blue-100');
+                const pricingSection = document.querySelector('[data-role="pricing-card"]')
+                    || document.querySelector('.bg-blue-50.border.border-blue-100');
                 if (pricingSection && !document.getElementById('rejoin-billing-notice')) {
                     const billingNotice = document.createElement('div');
                     billingNotice.id = 'rejoin-billing-notice';
@@ -470,51 +478,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
             } else {
                 // 新規ユーザー向けUI (デフォルト)
-                if (signupButton) {
-                    signupButton.href = 'premium_registration_spa.html';
-                    signupButton.innerHTML = `
-                        今すぐ申し込む
-                    `;
-                }
+                updateSignupButtons('今すぐ申し込む');
             }
 
             // ページ下部のCTAセクションも変更
-            const bottomCtaSection = document.querySelector('.bg-gradient-to-br.from-blue-600.via-blue-500.to-indigo-600');
+            const bottomCtaSection = document.querySelector('[data-role="final-cta-section"]');
             if (bottomCtaSection) {
                 const bottomCtaTitle = bottomCtaSection.querySelector('h2');
-                const bottomCtaButton = bottomCtaSection.querySelector('a[href="premium_registration_spa.html"]');
-                const bottomCtaDescription = bottomCtaSection.querySelector('p.text-blue-50');
+                const bottomCtaButton = bottomCtaSection.querySelector('[data-role="final-signup-cta"]');
+                const bottomCtaDescription = bottomCtaSection.querySelector('[data-role="final-cta-description"]');
 
                 if (currentScenarioConfig.is_rejoining_user) {
                     // 再加入者向けに変更
                     if (bottomCtaTitle) {
-                        bottomCtaTitle.innerHTML = 'もう一度、一緒に<br class="hidden sm:inline">業務を効率化しませんか？';
+                        bottomCtaTitle.innerHTML = '展示会後の動きを、<em>もう一度整える。</em>';
                     }
                     if (bottomCtaDescription) {
-                        bottomCtaDescription.textContent = 'プレミアム機能で、再び生産性を最大化しましょう。';
+                        bottomCtaDescription.textContent = 'プレミアム機能で、展示会後の情報整理をもう一度進められます。';
                     }
                     if (bottomCtaButton) {
                         bottomCtaButton.innerHTML = `
-                            <span class="flex items-center justify-center gap-2">
-                                <span class="text-lg">再加入する</span>
-                                <span class="material-icons">arrow_forward</span>
-                            </span>
+                            <span>再加入する</span>
+                            <span class="material-icons icon" aria-hidden="true">arrow_forward</span>
                         `;
                     }
                 } else {
                     // 新規ユーザー向け(デフォルト)
                     if (bottomCtaTitle) {
-                        bottomCtaTitle.innerHTML = '今すぐプレミアムプランを<br class="hidden sm:inline">始めませんか？';
+                        bottomCtaTitle.innerHTML = '展示会後の動きを、<em>もう止めない。</em>';
                     }
                     if (bottomCtaDescription) {
-                        bottomCtaDescription.textContent = '業務効率が劇的に向上します。最短1分で登録完了。';
+                        bottomCtaDescription.textContent = '不安な点を確認したうえで、現在のアカウントから申込画面へ進めます。';
                     }
                     if (bottomCtaButton) {
                         bottomCtaButton.innerHTML = `
-                            <span class="flex items-center justify-center gap-2">
-                                <span class="text-lg">今すぐ申し込む</span>
-                                <span class="material-icons">arrow_forward</span>
-                            </span>
+                            <span>今すぐ申し込む</span>
+                            <span class="material-icons icon" aria-hidden="true">arrow_forward</span>
                         `;
                     }
                 }
@@ -523,7 +522,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // 「初月無料」メッセージの表示制御 (既存ロジック維持)
             const firstMonthFreeMessage = document.getElementById('first-month-free-message');
             if (firstMonthFreeMessage) {
-                if (currentScenarioConfig.is_rejoining_user) {
+                if (currentScenarioConfig.is_rejoining_user || currentScenarioConfig.is_premium_member || currentScenarioConfig.is_free_trial) {
                     firstMonthFreeMessage.classList.add('hidden');
                 } else {
                     firstMonthFreeMessage.classList.remove('hidden');
@@ -573,10 +572,366 @@ document.addEventListener('DOMContentLoaded', () => {
     // Run initial scenario handling
     handleInitialScenario();
 
+    const scrollToCurrentHash = () => {
+        if (!window.location.hash) return;
+        const target = document.getElementById(decodeURIComponent(window.location.hash.slice(1)));
+        if (!target) return;
+        target.scrollIntoView({ block: 'start' });
+    };
+
+    setTimeout(scrollToCurrentHash, 100);
+    setTimeout(scrollToCurrentHash, 600);
+    window.addEventListener('hashchange', () => {
+        setTimeout(scrollToCurrentHash, 100);
+    });
+
+    const featureRoot = document.querySelector('[data-role="premium-features"]');
+    if (featureRoot) {
+        const featurePanel = featureRoot.querySelector('#premium-feature-panel');
+        const featureTabs = Array.from(featureRoot.querySelectorAll('.featC-tab'));
+        const features = [
+            {
+                icon: 'inventory_2',
+                title: '最長1年データ保存',
+                short: '最長1年保存',
+                spec: '365 DAYS',
+                description: '契約期間中、回答データを最長1年間保管します。展示会直後の確認だけでなく、後続施策や振り返りにも使いやすくなります。',
+                scenario: '会期後しばらく経ってから、営業側で回答や名刺情報を再確認したいときに役立ちます。',
+                mock: 'storage',
+                specs: [
+                    ['保存期間', '最長1年'],
+                    ['対象', '回答データ'],
+                    ['用途', '確認・振り返り'],
+                    ['条件', '契約期間中'],
+                ],
+            },
+            {
+                icon: 'gesture',
+                title: '設問分岐・画像・手書き',
+                short: '高度な入力',
+                spec: 'ADVANCED',
+                description: '設問分岐、画像アップロード、手書き入力に対応します。展示会ブースで集めたい情報に合わせて、回答フォームを組み立てやすくします。',
+                scenario: '来場者の回答内容に応じて追加質問を出したい場合や、写真・手書き情報も残したい場合に使えます。',
+                mock: 'form',
+                specs: [
+                    ['設問分岐', '対応'],
+                    ['画像', 'アップロード対応'],
+                    ['手書き', '入力対応'],
+                    ['設定', '設問単位で調整'],
+                ],
+            },
+            {
+                icon: 'download',
+                title: 'Excel/CSV出力',
+                short: 'Excel/CSV出力',
+                spec: 'XLSX / CSV',
+                description: '整理済みデータをExcel/CSV形式で出力できます。社内共有や集計、レポート作成に使いやすい形で扱えます。',
+                scenario: '展示会後に回答データを営業や関係部署へ共有し、次の対応や月次資料へつなげたいときに使えます。',
+                mock: 'excel',
+                specs: [
+                    ['出力形式', 'Excel / CSV'],
+                    ['用途', '集計・共有'],
+                    ['レポート', '作成に活用'],
+                    ['対象', '回答データ'],
+                ],
+            },
+            {
+                icon: 'insert_chart',
+                title: 'グラフ化・CSV活用',
+                short: 'グラフ化・CSV活用',
+                spec: 'GRAPH / CSV',
+                description: '回答データを一覧化・グラフ化し、展示会後の傾向を視覚的に確認できます。Premiumではグラフ化ページのCSV出力を使い、社内共有や資料作成にも活用できます。',
+                scenario: '回答結果をグラフで把握し、CSVにして報告資料や営業共有へつなげたいときに使えます。',
+                mock: 'review',
+                specs: [
+                    ['表示', '一覧・グラフ'],
+                    ['出力', 'CSV対応'],
+                    ['用途', '資料作成'],
+                    ['対象', '回答データ'],
+                ],
+            },
+            {
+                icon: 'domain',
+                title: '独自ドメイン送信',
+                short: '独自ドメイン送信',
+                spec: 'DOMAIN',
+                description: 'お礼メールなどの送信元を、自社ドメインで整えられます。回答後の連絡を自社ブランドに合わせて見せやすくします。',
+                scenario: '展示会後のお礼メールや通知メールを、自社の送信元として整えたい場合に使えます。',
+                mock: 'mail',
+                specs: [
+                    ['送信元', '自社ドメイン'],
+                    ['用途', 'お礼メールなど'],
+                    ['設定', '申込後に確認'],
+                    ['目的', '対外表示の整理'],
+                ],
+            },
+            {
+                icon: 'language',
+                title: '多言語対応',
+                short: '多言語対応',
+                spec: 'MULTI LANG',
+                description: '作成画面・回答画面の多言語表示に対応します。海外来場者や多言語での案内が必要な展示会でも、回答導線を整えやすくします。',
+                scenario: '海外来場者向けに、回答画面や作成画面を多言語で扱いたい場合に使えます。',
+                mock: 'lang',
+                specs: [
+                    ['対象', '作成画面・回答画面'],
+                    ['用途', '海外来場者対応'],
+                    ['表示', '多言語表示'],
+                    ['設定', '画面に応じて確認'],
+                ],
+            },
+        ];
+
+        const mockTemplates = {
+            storage: `
+                <div class="featC-mock">
+                    <div class="featC-mock-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="ttl">storage / events</span></div>
+                    <div class="featC-mock-body mock-storage">
+                        <div class="row"><span class="name">展示会 2026 Spring</span><span class="badge">ACTIVE</span><span class="date">D-285</span></div>
+                        <div class="row"><span class="name">名古屋展示会 Q4</span><span class="badge warn">180日</span><span class="date">D-185</span></div>
+                        <div class="row"><span class="name">Osaka EXPO Autumn</span><span class="badge warn">240日</span><span class="date">D-125</span></div>
+                        <div class="meter"><i style="width: 34%;"></i></div>
+                        <div class="meter-lbl"><span>event data</span><span>365 DAYS MAX</span></div>
+                    </div>
+                </div>
+            `,
+            form: `
+                <div class="featC-mock">
+                    <div class="featC-mock-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="ttl">survey / preview</span></div>
+                    <div class="featC-mock-body mock-form">
+                        <div class="q"><div class="qlbl">Q1</div><div class="opt"><span class="radio on"></span>業種を選択</div></div>
+                        <div class="arrow">branch</div>
+                        <div class="q branch"><div class="qlbl">Q2</div><div class="opt"><span class="radio"></span>追加質問を表示</div></div>
+                        <div class="q"><div class="qlbl">IMAGE</div><div class="opt"><span class="material-icons text-base" aria-hidden="true">image</span>画像を添付</div></div>
+                        <div class="q"><div class="qlbl">HANDWRITE</div><div class="opt"><span class="material-icons text-base" aria-hidden="true">draw</span>手書き入力</div></div>
+                    </div>
+                </div>
+            `,
+            excel: `
+                <div class="featC-mock">
+                    <div class="featC-mock-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="ttl">export / table</span></div>
+                    <div class="featC-mock-body mock-excel">
+                        <div class="toolbar"><span class="tb-btn primary">XLSX</span><span class="tb-btn">CSV</span></div>
+                        <div class="head"><span>#</span><span>Company</span><span>Name</span><span>Status</span></div>
+                        <div class="row"><span class="num">01</span><span>Sample Co.</span><span>Tanaka</span><span>新規</span></div>
+                        <div class="row alt"><span class="num">02</span><span>Demo Inc.</span><span>Sato</span><span>確認中</span></div>
+                        <div class="row"><span class="num">03</span><span>Lead Ltd.</span><span>Suzuki</span><span>共有済</span></div>
+                    </div>
+                </div>
+            `,
+            review: `
+                <div class="featC-mock">
+                    <div class="featC-mock-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="ttl">graph / export</span></div>
+                    <div class="featC-mock-body mock-review">
+                        <div class="pane chart"><div class="ph">GRAPH</div><div class="body">
+                            <div class="bar-row"><span>興味あり</span><i style="width: 82%;"></i><b>82</b></div>
+                            <div class="bar-row"><span>資料希望</span><i style="width: 58%;"></i><b>58</b></div>
+                            <div class="bar-row"><span>後日連絡</span><i style="width: 36%;"></i><b>36</b></div>
+                        </div></div>
+                        <div class="pane data"><div class="ph">CSV</div><div class="body">
+                            <div class="row"><span class="k">回答項目</span><span class="v">集計</span></div>
+                            <div class="row edited"><span class="k">出力形式</span><span class="v">CSV</span></div>
+                            <div class="row"><span class="k">用途</span><span class="v">資料化</span></div>
+                        </div></div>
+                        <div class="ftnote">graph page CSV export</div>
+                    </div>
+                </div>
+            `,
+            mail: `
+                <div class="featC-mock">
+                    <div class="featC-mock-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="ttl">mail / preview</span></div>
+                    <div class="featC-mock-body mock-mail">
+                        <div class="head">
+                            <div class="row"><span class="k">From</span><span class="v">marketing@<span class="domain">your-company.co.jp</span></span></div>
+                            <div class="row"><span class="k">To</span><span class="v">visitor@example.com</span></div>
+                            <div class="row"><span class="k">Subject</span><span class="v">ご来場ありがとうございました</span></div>
+                        </div>
+                        <div class="body">
+                            <div class="greet">展示会へご来場いただきありがとうございました。</div>
+                            <div>回答内容に応じて、担当よりご連絡いたします。</div>
+                            <div class="sig">SPEED-AD Premium</div>
+                        </div>
+                    </div>
+                </div>
+            `,
+            lang: `
+                <div class="featC-mock">
+                    <div class="featC-mock-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="ttl">language / form</span></div>
+                    <div class="featC-mock-body mock-lang">
+                        <div class="switcher"><span class="l on">JA</span><span class="l">EN</span><span class="l">ZH</span><span class="l">KO</span></div>
+                        <div class="form-row"><div class="lbl">QUESTION</div><div class="val">会社名を入力してください</div></div>
+                        <div class="form-row"><div class="lbl">QUESTION</div><div class="val">興味のある製品を選択してください</div></div>
+                        <div class="form-row"><div class="lbl">GUIDE</div><div class="val">表示言語を切り替えて回答できます</div></div>
+                    </div>
+                </div>
+            `,
+        };
+
+        let activeFeatureIndex = 0;
+        let featureRotationTimer = null;
+        let featureSwitchTimer = null;
+        let isFeatureRotationPaused = false;
+        let hasManualFeatureSelection = false;
+        const featureRotationInterval = 5000;
+        const featureTransitionDuration = 180;
+
+        const updateFeatureContent = (index) => {
+            const feature = features[index];
+            if (!feature || !featurePanel) return;
+            activeFeatureIndex = index;
+            featureTabs.forEach((tab, tabIndex) => {
+                const isActive = tabIndex === index;
+                tab.classList.toggle('active', isActive);
+                tab.setAttribute('aria-selected', String(isActive));
+            });
+            featurePanel.innerHTML = `
+                <div class="left">
+                    <div class="ptag"><span class="num">${String(index + 1).padStart(2, '0')}</span><span>${feature.spec}</span></div>
+                    <h3>${feature.title}</h3>
+                    <p class="pdesc">${feature.description}</p>
+                    <div class="scenario">
+                        <span class="ic"><span class="material-icons icon" aria-hidden="true">lightbulb</span></span>
+                        <div class="body">
+                            <div class="lbl">こんな場面で</div>
+                            <div class="txt">${feature.scenario}</div>
+                        </div>
+                    </div>
+                    <div class="specs">
+                        ${feature.specs.map(([key, value]) => `<div><div class="k">${key}</div><div class="v">${value}</div></div>`).join('')}
+                    </div>
+                </div>
+                <div class="right">
+                    ${mockTemplates[feature.mock]}
+                </div>
+            `;
+        };
+
+        const renderFeature = (index, shouldAnimate = true) => {
+            if (!features[index] || !featurePanel) return;
+            if (index === activeFeatureIndex && featurePanel.innerHTML.trim()) return;
+            if (featureSwitchTimer) {
+                clearTimeout(featureSwitchTimer);
+                featureSwitchTimer = null;
+            }
+            if (!shouldAnimate || !featurePanel.innerHTML.trim()) {
+                featurePanel.classList.remove('is-switching');
+                updateFeatureContent(index);
+                return;
+            }
+            featurePanel.classList.add('is-switching');
+            featureSwitchTimer = setTimeout(() => {
+                updateFeatureContent(index);
+                requestAnimationFrame(() => {
+                    featurePanel.classList.remove('is-switching');
+                });
+            }, featureTransitionDuration);
+        };
+
+        const stopFeatureRotation = () => {
+            if (featureRotationTimer) {
+                clearInterval(featureRotationTimer);
+                featureRotationTimer = null;
+            }
+        };
+
+        const startFeatureRotation = () => {
+            stopFeatureRotation();
+            if (isFeatureRotationPaused || hasManualFeatureSelection || features.length < 2) return;
+            featureRotationTimer = setInterval(() => {
+                renderFeature((activeFeatureIndex + 1) % features.length);
+            }, featureRotationInterval);
+        };
+
+        featureTabs.forEach((tab, index) => {
+            tab.addEventListener('click', () => {
+                hasManualFeatureSelection = true;
+                stopFeatureRotation();
+                renderFeature(index);
+            });
+        });
+        featureRoot.addEventListener('mouseenter', () => {
+            isFeatureRotationPaused = true;
+            stopFeatureRotation();
+        });
+        featureRoot.addEventListener('mouseleave', () => {
+            isFeatureRotationPaused = false;
+            startFeatureRotation();
+        });
+        featureRoot.addEventListener('focusin', () => {
+            isFeatureRotationPaused = true;
+            stopFeatureRotation();
+        });
+        featureRoot.addEventListener('focusout', () => {
+            if (featureRoot.contains(document.activeElement)) return;
+            isFeatureRotationPaused = false;
+            startFeatureRotation();
+        });
+        renderFeature(0, false);
+        startFeatureRotation();
+    }
+
     // --- Contact Modal Logic ---
     const openSupportModalLink = document.getElementById('open-support-modal'); // Still get the element in case it's used elsewhere
     const contactModal = document.getElementById('contactModal');
     const closeContactModalBtn = document.getElementById('closeContactModalBtn');
+    let activeModal = null;
+    let lastFocusedElement = null;
+
+    const getFocusableElements = (modal) => Array.from(modal.querySelectorAll(
+        'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )).filter(element => element.offsetParent !== null || element === document.activeElement);
+
+    const activateModalFocus = (modal, opener = document.activeElement) => {
+        activeModal = modal;
+        lastFocusedElement = opener instanceof HTMLElement ? opener : null;
+        const focusableElements = getFocusableElements(modal);
+        const firstFocusableElement = focusableElements[0];
+        if (firstFocusableElement) {
+            firstFocusableElement.focus();
+        } else {
+            modal.setAttribute('tabindex', '-1');
+            modal.focus();
+        }
+    };
+
+    const deactivateModalFocus = (modal) => {
+        if (activeModal === modal) {
+            activeModal = null;
+        }
+        if (lastFocusedElement && document.contains(lastFocusedElement)) {
+            lastFocusedElement.focus();
+        }
+        lastFocusedElement = null;
+    };
+
+    document.addEventListener('keydown', (event) => {
+        if (!activeModal) return;
+
+        if (event.key === 'Escape') {
+            if (activeModal === contactModal) closeContactModal();
+            if (activeModal === resumeModal) closeResumeModal();
+            if (activeModal === resumeSuccessModal) closeResumeSuccessModal();
+            return;
+        }
+
+        if (event.key !== 'Tab') return;
+
+        const focusableElements = getFocusableElements(activeModal);
+        if (!focusableElements.length) {
+            event.preventDefault();
+            return;
+        }
+
+        const firstFocusableElement = focusableElements[0];
+        const lastFocusableElement = focusableElements[focusableElements.length - 1];
+        if (event.shiftKey && document.activeElement === firstFocusableElement) {
+            event.preventDefault();
+            lastFocusableElement.focus();
+        } else if (!event.shiftKey && document.activeElement === lastFocusableElement) {
+            event.preventDefault();
+            firstFocusableElement.focus();
+        }
+    });
 
 
 
@@ -586,6 +941,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             contactModal.classList.remove('hidden');
             void contactModal.offsetWidth; // Force reflow
+            contactModal.classList.add('show');
             contactModal.classList.remove('opacity-0');
 
             // 必要に応じて、モーダルコンテンツのトランジションクラスも操作
@@ -593,6 +949,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (modalContent) {
                 modalContent.classList.remove('scale-95');
             }
+            activateModalFocus(contactModal);
         } else {
 
         }
@@ -601,6 +958,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function closeContactModal() {
 
         if (contactModal) {
+            contactModal.classList.remove('show');
             contactModal.classList.add('opacity-0');
             const modalContent = contactModal.querySelector('.modal-content-transition');
             if (modalContent) {
@@ -608,6 +966,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             setTimeout(() => {
                 contactModal.classList.add('hidden');
+                deactivateModalFocus(contactModal);
             }, 300); // Transition duration
         }
     }
@@ -617,6 +976,13 @@ document.addEventListener('DOMContentLoaded', () => {
         closeContactModalBtn.addEventListener('click', closeContactModal);
     } else {
 
+    }
+
+    if (openSupportModalLink) {
+        openSupportModalLink.addEventListener('click', (event) => {
+            event.preventDefault();
+            openContactModal();
+        });
     }
 
     // グローバル関数として closeModal を定義（contactModal.htmlのonclick属性用）
@@ -637,37 +1003,25 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Sticky CTA Scroll Logic
-    const stickyCta = document.getElementById('sticky-cta');
-    const heroSection = document.querySelector('.hero-section');
-
-    if (stickyCta && heroSection) {
-        window.addEventListener('scroll', () => {
-            const heroBottom = heroSection.getBoundingClientRect().bottom;
-            // Show sticky CTA when Hero section is scrolled out of view
-            if (heroBottom < 0) {
-                stickyCta.classList.remove('translate-y-full');
-            } else {
-                stickyCta.classList.add('translate-y-full');
-            }
-        });
-    }
-
     // --- Functional: First Month Free Campaign Logic ---
     const campaignInfoSection = document.getElementById('integrated-campaign-container');
 
     // Check user status from localStorage (test scenario)
     const storedUserData = localStorage.getItem('simulationUserData');
+    const storedScenario = localStorage.getItem('currentScenario');
     let isEligibleForFreeCampaign = true; // デフォルトは新規ユーザー
 
     if (storedUserData) {
         try {
             const userData = JSON.parse(storedUserData);
-            // 再加入ユーザーまたは既存プレミアム会員の場合はキャンペーン対象外
-            isEligibleForFreeCampaign = !userData.is_rejoining_user && !userData.is_premium_member;
+            // 再加入ユーザー、既存プレミアム会員、無料トライアル中はキャンペーン対象外
+            isEligibleForFreeCampaign = !userData.is_rejoining_user && !userData.is_premium_member && !userData.is_free_trial;
         } catch (e) {
             console.error('Failed to parse user data:', e);
         }
+    } else if (storedScenario && scenarioConfigs[storedScenario]) {
+        const scenarioData = scenarioConfigs[storedScenario];
+        isEligibleForFreeCampaign = !scenarioData.is_rejoining_user && !scenarioData.is_premium_member && !scenarioData.is_free_trial;
     }
 
     if (campaignInfoSection && isEligibleForFreeCampaign) {
@@ -684,67 +1038,15 @@ document.addEventListener('DOMContentLoaded', () => {
             nextYear = nextYear + 1;
         }
 
-        // New Layout: No outer card, integrated directly
         const messageCampaign = `
-                    <div class="text-center mb-8">
-                        <span class="inline-block bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full mb-3 border border-amber-200">
-                            <span class="flex items-center gap-1">
-                                <span class="material-icons text-xs">campaign</span> キャンペーン適用
-                            </span>
-                        </span>
-                        <h2 class="text-xl font-bold text-slate-900">
-                            登録した月の利用料が<span class="text-amber-500 mx-1 text-2xl drop-shadow-sm">無料</span>になります
-                        </h2>
-                        <p class="text-slate-500 text-sm mt-2">
-                             月初めでも、月末でも、その月の末日まで料金はかかりません。
-                        </p>
-                    </div>
-
-                    <!-- Visual Timeline -->
-                    <div class="flex flex-col md:flex-row items-stretch justify-center max-w-2xl mx-auto space-y-3 md:space-y-0 md:space-x-1">
-                        <!-- Month 1 (Free) -->
-                        <div class="flex-1 flex flex-col shadow-sm rounded-lg overflow-hidden border border-amber-200">
-                            <div class="bg-gradient-to-r from-amber-400 to-amber-500 text-white text-center py-3 font-bold relative">
-                                <span class="relative z-10 drop-shadow-sm">${currentMonth}月 (登録月)</span>
-                                <div class="absolute inset-0 bg-white/20 transform -skew-x-12 translate-x-1/2"></div>
-                            </div>
-                            <div class="bg-amber-50/50 p-6 flex-1 flex items-center justify-center text-center">
-                                <div>
-                                    <div class="text-amber-600 font-bold text-3xl mb-1">¥0</div>
-                                    <div class="inline-block text-xs text-amber-800 font-bold bg-amber-100 px-3 py-1 rounded-full mb-1">無料期間</div>
-                                    <div class="text-[10px] text-amber-600/80 mt-1 font-medium">
-                                        (登録日 〜 ${currentMonth}/${lastDayOfMonth})
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="flex items-start gap-3">
+                        <span class="material-icons text-amber-600 text-xl" aria-hidden="true">campaign</span>
+                        <div>
+                            <p class="text-sm font-bold text-slate-950">初月無料キャンペーン</p>
+                            <p class="mt-1 text-sm leading-6 text-slate-700">
+                                新規登録の場合、登録月の月額利用料は0円です（${currentMonth}月${lastDayOfMonth}日まで）。翌月以降は月額10,000円（税別）が発生します。
+                            </p>
                         </div>
-
-                        <!-- Arrow (Desktop only) -->
-                        <div class="hidden md:flex items-center justify-center text-amber-300 z-10 -mx-3">
-                            <span class="material-icons text-4xl drop-shadow-sm">arrow_forward</span>
-                        </div>
-
-                        <!-- Month 2 (Paid) -->
-                        <div class="flex-1 flex flex-col shadow-sm rounded-lg overflow-hidden border border-slate-200 opacity-90">
-                            <div class="bg-slate-600 text-white text-center py-3 font-bold">
-                                ${nextMonth}月 (翌月)
-                            </div>
-                            <div class="bg-white p-6 flex-1 flex items-center justify-center text-center">
-                                <div>
-                                    <div class="text-slate-700 font-bold text-2xl mb-1">¥10,000</div>
-                                    <div class="text-xs text-slate-400 font-bold border border-slate-200 px-2 py-1 rounded inline-block">通常料金</div>
-                                    <div class="text-[10px] text-slate-400 mt-1">
-                                        (1日 〜 末日)
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mt-8 text-center">
-                        <p class="text-sm font-medium text-slate-600 bg-amber-50/50 border border-amber-100 inline-block px-6 py-3 rounded-full">
-                            現在のご登録なら、<span class="font-bold text-amber-600 border-b-2 border-amber-400">${currentMonth}月${lastDayOfMonth}日</span>まで無料で全機能をお試しいただけます。
-                        </p>
                     </div>
         `;
 
@@ -754,24 +1056,74 @@ document.addEventListener('DOMContentLoaded', () => {
     // 再加入ユーザー（isEligibleForFreeCampaign = false）の場合は何も表示しない
 
     // --- FAQ Accordion Logic (2-column grid with animation) ---
+    const premiumFaqSection = document.getElementById('premium-faq');
+
+    if (premiumFaqSection) {
+        document.addEventListener('click', (event) => {
+            const faqLink = event.target instanceof Element ? event.target.closest('a[href="#premium-faq"]') : null;
+
+            if (!faqLink) {
+                return;
+            }
+
+            event.preventDefault();
+
+            if (!premiumFaqSection.hasAttribute('tabindex')) {
+                premiumFaqSection.setAttribute('tabindex', '-1');
+            }
+
+            premiumFaqSection.focus({ preventScroll: true });
+            premiumFaqSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            if (window.location.hash !== '#premium-faq') {
+                window.history.pushState(null, '', '#premium-faq');
+            }
+        });
+    }
+
     const faqCards = document.querySelectorAll('.faq-card');
 
     faqCards.forEach(card => {
         const question = card.querySelector('.faq-question');
         const answer = card.querySelector('.faq-answer');
 
-        question.addEventListener('click', () => {
-            const isOpen = question.getAttribute('aria-expanded') === 'true';
+        if (!question || !answer) {
+            return;
+        }
+
+        const setFaqState = (isOpen) => {
+            question.setAttribute('aria-expanded', String(isOpen));
+            answer.classList.toggle('open', isOpen);
+            answer.setAttribute('aria-hidden', String(!isOpen));
 
             if (isOpen) {
-                // Close
-                answer.classList.remove('open');
-                question.setAttribute('aria-expanded', 'false');
-            } else {
-                // Open
-                answer.classList.add('open');
-                question.setAttribute('aria-expanded', 'true');
+                answer.hidden = false;
+                answer.style.maxHeight = '0px';
+                requestAnimationFrame(() => {
+                    answer.style.maxHeight = `${answer.scrollHeight}px`;
+                });
+                return;
             }
+
+            answer.style.maxHeight = '0px';
+        };
+
+        answer.addEventListener('transitionend', (event) => {
+            if (event.propertyName === 'max-height' && question.getAttribute('aria-expanded') !== 'true') {
+                answer.hidden = true;
+            }
+        });
+
+        const initialIsOpen = question.getAttribute('aria-expanded') === 'true';
+        setFaqState(initialIsOpen);
+
+        if (!initialIsOpen) {
+            answer.hidden = true;
+        }
+
+        question.addEventListener('click', () => {
+            const isOpen = question.getAttribute('aria-expanded') === 'true';
+            setFaqState(!isOpen);
         });
     });
 
@@ -801,6 +1153,7 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 resumeModal.style.opacity = '1';
                 resumeModalContent.style.transform = 'scale(1)';
+                activateModalFocus(resumeModal);
             }, 10);
         }
     }
@@ -811,16 +1164,12 @@ document.addEventListener('DOMContentLoaded', () => {
             resumeModalContent.style.transform = 'scale(0.95)';
             setTimeout(() => {
                 resumeModal.style.display = 'none';
+                deactivateModalFocus(resumeModal);
             }, 300);
         }
     }
 
     function openResumeSuccessModal() {
-        console.log('openResumeSuccessModal called!'); // Debug log
-        console.log('resumeSuccessModal:', resumeSuccessModal); // Debug log
-        console.log('resumeSuccessModalContent:', resumeSuccessModalContent); // Debug log
-        console.log('nextRenewalDateSpan:', nextRenewalDateSpan); // Debug log
-
         // Calculate next renewal date (end of current month)
         const today = new Date();
         const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
@@ -828,18 +1177,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (nextRenewalDateSpan) {
             nextRenewalDateSpan.textContent = dateStr;
-            console.log('Set next renewal date to:', dateStr); // Debug log
         } else {
             console.error('nextRenewalDateSpan not found!'); // Debug log
         }
 
         if (resumeSuccessModal) {
-            console.log('Setting display to flex...'); // Debug log
             resumeSuccessModal.style.display = 'flex';
             setTimeout(() => {
-                console.log('Setting opacity to 1...'); // Debug log
                 resumeSuccessModal.style.opacity = '1';
                 resumeSuccessModalContent.style.transform = 'scale(1)';
+                activateModalFocus(resumeSuccessModal);
             }, 10);
         } else {
             console.error('resumeSuccessModal not found!'); // Debug log
@@ -852,6 +1199,7 @@ document.addEventListener('DOMContentLoaded', () => {
             resumeSuccessModalContent.style.transform = 'scale(0.95)';
             setTimeout(() => {
                 resumeSuccessModal.style.display = 'none';
+                deactivateModalFocus(resumeSuccessModal);
 
                 // Update localStorage to remove cancellation status
                 const currentScenario = localStorage.getItem('currentScenario');
@@ -882,7 +1230,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Confirm button - close confirmation modal and show success modal (using event delegation)
     document.addEventListener('click', (e) => {
         if (e.target.closest('#confirmResumeBtn')) {
-            console.log('Confirm button clicked!'); // Debug log
             // Here you would normally make an API call to resume the subscription
             // For now, we'll just simulate success
 
@@ -891,7 +1238,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Wait a bit, then show success modal
             setTimeout(() => {
-                console.log('Opening success modal...'); // Debug log
                 openResumeSuccessModal();
             }, 400);
         }

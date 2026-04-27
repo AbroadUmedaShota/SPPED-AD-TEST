@@ -11,6 +11,22 @@ import { initHelpPopovers } from './ui/helpPopover.js';
 import { initThemeToggle } from './lib/themeToggle.js';
 import { handleOpenModal } from './modalHandler.js';
 import { populateQrCodeModal } from './qrCodeModal.js';
+import { formatMessage, normalizeLocale } from './services/i18n/messages.js';
+
+function getCurrentLocale() {
+  if (typeof window.getCurrentLanguage === 'function') {
+    try {
+      return normalizeLocale(window.getCurrentLanguage());
+    } catch (_) {
+      return 'ja';
+    }
+  }
+  try {
+    return normalizeLocale(localStorage.getItem('language') || 'ja');
+  } catch (_) {
+    return 'ja';
+  }
+}
 
 function showToast(message, type = 'info') {
   const container = document.getElementById('toast-container');
@@ -45,7 +61,7 @@ function trapFocus(modal, firstEl, lastEl) {
   return () => modal.removeEventListener('keydown', onKeydown);
 }
 
-function showNotice(message, type = 'info') {
+function showNotice(message, type = 'info', titleOverride = null) {
   const modal = document.getElementById('noticeModal');
   const iconEl = document.getElementById('noticeModalIcon');
   const titleEl = document.getElementById('noticeModalTitle');
@@ -62,7 +78,7 @@ function showNotice(message, type = 'info') {
 
   iconEl.className = `material-icons text-2xl flex-shrink-0 mt-0.5 ${config.color}`;
   iconEl.textContent = config.icon;
-  titleEl.textContent = config.title;
+  titleEl.textContent = titleOverride ?? config.title;
   bodyEl.textContent = message;
 
   modal.classList.remove('hidden');
@@ -189,12 +205,15 @@ function buildRelatedSettingsUrl(path, surveyId) {
 const touchedFields = new Set();
 
 // 入力イベントでバリデーション更新
-document.addEventListener('input', (e) => {
+function handleFieldChange(e) {
   if (e.target.matches('input, textarea, select')) {
     if (e.target.id) touchedFields.add(e.target.id);
     updateOutline(); // updateTranslationBadges も内部で呼ばれる
+    updateSaveButtonState();
   }
-});
+}
+document.addEventListener('input', handleFieldChange);
+document.addEventListener('change', handleFieldChange);
 
 // ─────────────────────────────────────────
 // 多言語設定処理
@@ -563,6 +582,7 @@ function renumberQuestions() {
   rebuildSeparators();
   updateOutline();
   updateEmptyState();
+  updateSaveButtonState();
 }
 
 function updateEmptyState() {
@@ -581,12 +601,18 @@ function updateEmptyState() {
 // バリデーション＆アウトラインパネル
 // ─────────────────────────────────────────
 
-function setFieldError(fieldId, hasError) {
+function setFieldError(fieldId, hasError, messageKey) {
   const showError = hasError && touchedFields.has(fieldId);
   const input = document.getElementById(fieldId);
   const errorEl = document.getElementById(`${fieldId}Error`);
   if (input) input.classList.toggle('input-error', showError);
-  if (errorEl) errorEl.classList.toggle('hidden', !showError);
+  if (errorEl) {
+    errorEl.classList.toggle('hidden', !showError);
+    if (messageKey) {
+      const textSpan = errorEl.querySelector('span:not(.material-icons)');
+      if (textSpan) textSpan.textContent = formatMessage(getCurrentLocale(), messageKey);
+    }
+  }
 }
 
 // ─────────────────────────────────────────
@@ -700,9 +726,9 @@ function validateForm() {
   const titleErr = !displayTitle;
   const periodErr = !periodRange;
 
-  setFieldError('surveyName_ja', nameErr);
-  setFieldError('displayTitle_ja', titleErr);
-  setFieldError('periodRange', periodErr);
+  setFieldError('surveyName_ja', nameErr, 'surveyCreation.validation.surveyNameRequired');
+  setFieldError('displayTitle_ja', titleErr, 'surveyCreation.validation.displayTitleRequired');
+  setFieldError('periodRange', periodErr, 'surveyCreation.validation.periodRequired');
 
   let hasBlocker = nameErr || titleErr || periodErr;
   if (questions.length === 0) hasBlocker = true;
@@ -1981,12 +2007,6 @@ function initOutlineScrollSpy() {
       ...Array.from(document.querySelectorAll('#questionListContainer [data-question-id]')).map(targetEl => ({
         el: targetEl, key: targetEl.dataset.questionId
       })),
-      ...((() => {
-        const btn = document.getElementById('thankYouAccordionBtn');
-        return btn && btn.getAttribute('aria-expanded') === 'true'
-          ? [{ el: btn, key: 'thankYouAccordionBtn' }]
-          : [];
-      })()),
     ].forEach(({ el, key }) => { if (el) targets.push({ el, key }); });
     return targets;
   };
@@ -2046,32 +2066,7 @@ function initOutlineScrollLinks() {
       } else {
         smoothScrollIntoView(target, 'start');
       }
-
-      // サンクス画面の場合はアコーディオンを開く
-      if (targetId === 'thankYouAccordionBtn') {
-        const body = document.getElementById('thankYouAccordionBody');
-        const iconEl = document.getElementById('thankYouAccordionIcon');
-        if (body && body.classList.contains('hidden')) {
-          target.setAttribute('aria-expanded', 'true');
-          body.classList.remove('hidden');
-          if (iconEl) iconEl.style.transform = 'rotate(180deg)';
-        }
-      }
     });
-  });
-}
-
-function initThankYouAccordion(onToggle) {
-  const btn = document.getElementById('thankYouAccordionBtn');
-  const body = document.getElementById('thankYouAccordionBody');
-  const icon = document.getElementById('thankYouAccordionIcon');
-  if (!btn || !body) return;
-  btn.addEventListener('click', () => {
-    const isOpen = btn.getAttribute('aria-expanded') === 'true';
-    btn.setAttribute('aria-expanded', String(!isOpen));
-    body.classList.toggle('hidden', isOpen);
-    if (icon) icon.style.transform = isOpen ? '' : 'rotate(180deg)';
-    if (onToggle) onToggle();
   });
 }
 
@@ -2328,7 +2323,12 @@ function attemptSave() {
 
   if (!validateForm()) {
     if (questions.length === 0) {
-      showToast('設問を1件以上追加してください', 'error');
+      const locale = getCurrentLocale();
+      const title = formatMessage(locale, 'surveyCreation.validation.noQuestionsTitle');
+      const body = formatMessage(locale, 'surveyCreation.validation.noQuestionsBody')
+        + ' '
+        + formatMessage(locale, 'surveyCreation.validation.noQuestionsRecommendation');
+      showNotice(body, 'warning', title);
       const firstBtn = document.getElementById('addFirstQuestionBtn');
       if (firstBtn) smoothScrollIntoView(firstBtn, 'center');
     } else {
@@ -2351,11 +2351,32 @@ async function loadFromUrlParams() {
     const params = new URLSearchParams(window.location.search);
     const surveyId = params.get('surveyId');
     const surveyName = params.get('surveyName');
+    const displayTitle = params.get('displayTitle');
+    const periodStart = params.get('periodStart');
+    const periodEnd = params.get('periodEnd');
 
     if (surveyName) {
       const nameInput = document.getElementById('surveyName_ja');
       if (nameInput) {
         nameInput.value = surveyName;
+      }
+    }
+
+    if (displayTitle) {
+      const titleInput = document.getElementById('displayTitle_ja');
+      if (titleInput) {
+        titleInput.value = displayTitle;
+      }
+    }
+
+    if (periodStart && periodEnd) {
+      const periodInput = document.getElementById('periodRange');
+      if (periodInput) {
+        if (periodInput._flatpickr) {
+          periodInput._flatpickr.setDate([periodStart, periodEnd], false);
+        } else {
+          periodInput.value = `${periodStart} 〜 ${periodEnd}`;
+        }
       }
     }
 
@@ -2374,6 +2395,10 @@ async function loadFromUrlParams() {
       const thankYouScreenLink = document.getElementById('openThankYouScreenSettingsBtn') || document.getElementById('linkThankYouScreenSettings');
       if (thankYouScreenLink) thankYouScreenLink.href = buildRelatedSettingsUrl('thankYouScreenSettings.html', surveyId);
     }
+
+    // JS からの value 代入では input/change イベントが発火しないため、
+    // 保存ボタン状態を明示的に再評価する
+    updateSaveButtonState();
   } catch (e) {
     console.warn('URLパラメータの解析に失敗しました', e);
   }
@@ -2505,8 +2530,7 @@ async function init() {
   initInlineAddButton();
   initMobileAddButton();
   initOutlineScrollLinks();
-  const scrollSpyUpdate = initOutlineScrollSpy();
-  initThankYouAccordion(scrollSpyUpdate);
+  initOutlineScrollSpy();
   initOutlineToggle();
   initSortable();
   initSaveButton();

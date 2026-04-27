@@ -79,6 +79,10 @@
         top: 6rem;
         overflow: hidden;
       }
+      /* Drawer mode では outline がドロワー退避するため、メイン列はグリッド全幅を使う */
+      #questions-column-wrapper {
+        grid-column: 1 / -1 !important;
+      }
     }
     .sticky-panel::-webkit-scrollbar {
       width: 6px;
@@ -415,6 +419,22 @@
                                   <label class="input-label bg-transparent">表示タイトル (回答者向け)<span class="text-error">*</span></label>
                                   <button type="button" class="help-trigger help-icon-button material-icons" data-help-key="surveyDisplayTitle" aria-label="表示タイトルの説明を表示">help_outline</button>
                               </div>
+                              <div class="input-group mb-0 w-full hidden" data-lang="en">
+                                  <input type="text" id="displayTitle_en" placeholder=" " title="Display title" aria-label="Display title" class="input-field bg-white w-full" maxlength="100">
+                                  <label class="input-label bg-transparent">Display title</label>
+                              </div>
+                              <div class="input-group mb-0 w-full hidden" data-lang="zh-CN">
+                                  <input type="text" id="displayTitle_zh-CN" placeholder=" " title="显示标题" aria-label="显示标题" class="input-field bg-white w-full" maxlength="100">
+                                  <label class="input-label bg-transparent">显示标题</label>
+                              </div>
+                              <div class="input-group mb-0 w-full hidden" data-lang="zh-TW">
+                                  <input type="text" id="displayTitle_zh-TW" placeholder=" " title="顯示標題" aria-label="顯示標題" class="input-field bg-white w-full" maxlength="100">
+                                  <label class="input-label bg-transparent">顯示標題</label>
+                              </div>
+                              <div class="input-group mb-0 w-full hidden" data-lang="vi">
+                                  <input type="text" id="displayTitle_vi" placeholder=" " title="Tiêu đề hiển thị" aria-label="Tiêu đề hiển thị" class="input-field bg-white w-full" maxlength="100">
+                                  <label class="input-label bg-transparent">Tiêu đề hiển thị</label>
+                              </div>
                           </div>
                           <div id="displayTitle_jaError" class="hidden text-error text-xs mt-1 flex items-center gap-1" aria-live="polite"><span class="material-icons text-[14px]">error_outline</span><span>要確認: 表示タイトルを入力してください</span></div>
 
@@ -463,51 +483,20 @@
             <!-- ============================== -->
             <!-- 1. QUESTION COLUMN (Left/Main) -->
             <!-- ============================== -->
-            <div id="questions-column-wrapper" class="md:col-span-12 lg:col-span-9 lg:col-start-1 lg:row-start-2 flex flex-col gap-5 w-full min-w-0">
+            <div id="questions-column-wrapper" class="md:col-span-12 lg:col-span-12 xl:col-span-9 lg:col-start-1 lg:row-start-2 flex flex-col gap-5 w-full min-w-0">
 
             <!-- SETTINGS (Options + Related) embedded at top of main column -->
             <div id="settings-column" class="flex flex-col gap-3 w-full min-w-0">
 
-              <!-- カード1: 多言語機能 -->
-              <div class="bg-amber-50 border border-amber-200 rounded-xl shadow-sm overflow-hidden">
-                <button type="button" class="v2-accordion-trigger w-full flex items-center justify-between px-5 py-3 hover:bg-amber-100/50 transition-colors" data-accordion-v2="multilingualCardBody" aria-expanded="true">
-                  <h2 class="text-sm font-bold text-amber-800 flex items-center gap-2">
-                    <span class="material-icons text-amber-500 text-[18px]">stars</span>多言語機能
-                    <span class="text-[10px] font-black bg-amber-200 text-amber-800 px-1.5 py-0.5 rounded-full">Premium</span>
-                  </h2>
-                  <span class="material-icons text-amber-400 text-[18px]" data-accordion-icon>expand_less</span>
-                </button>
-                <div id="multilingualCardBody" class="v2-accordion-body border-t border-amber-100 px-5 py-3 flex flex-col gap-3">
-                  <!-- トグル -->
-                  <div class="flex items-center justify-between gap-3">
-                    <div class="min-w-0">
-                      <p class="font-bold text-sm text-amber-800 leading-tight">多言語機能を有効にする</p>
-                      <p class="text-xs text-amber-700/70 mt-0.5 leading-snug">複数言語でアンケートを提供します。</p>
-                    </div>
-                    <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
-                      <input type="checkbox" id="multilingualEnabledToggle" class="sr-only peer">
-                      <div class="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-amber-500 peer-focus:ring-2 peer-focus:ring-amber-300 transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
-                    </label>
-                  </div>
-                  <!-- Multilingual Config UI -->
-                  <div id="multilingual-controls" class="hidden border-t border-amber-200 pt-3">
-                    <p class="text-xs font-bold text-amber-800 mb-2">追加可能言語</p>
-                    <div id="languageSelectionPanel" class="flex flex-wrap gap-2">
-                      <!-- Rendered by JS -->
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- カード2: オプション機能 -->
+              <!-- カード1: オプション機能 -->
               <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-                <button type="button" class="v2-accordion-trigger w-full flex items-center justify-between px-5 py-3 bg-gray-50 hover:bg-gray-100 transition-colors" data-accordion-v2="optionsCardBody" aria-expanded="false">
+                <button type="button" class="v2-accordion-trigger w-full flex items-center justify-between px-5 py-3 bg-gray-50 hover:bg-gray-100 transition-colors" data-accordion-v2="optionsCardBody" aria-expanded="true">
                   <h2 class="text-sm font-bold text-gray-700 flex items-center gap-2">
                     <span class="material-icons text-primary text-[18px]">extension</span>オプション機能
                   </h2>
-                  <span class="material-icons text-gray-400 text-[18px]" data-accordion-icon>expand_more</span>
+                  <span class="material-icons text-gray-400 text-[18px]" data-accordion-icon>expand_less</span>
                 </button>
-                <div id="optionsCardBody" class="v2-accordion-body v2-collapsed border-t border-gray-100 px-5 py-3 flex gap-4">
+                <div id="optionsCardBody" class="v2-accordion-body border-t border-gray-100 px-5 py-3 flex gap-4">
                   <!-- 名刺画像添付 -->
                   <div class="flex-1 flex items-center justify-between gap-3">
                     <div class="min-w-0">
@@ -521,30 +510,18 @@
                       <div class="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 peer-focus:ring-2 peer-focus:ring-green-300 transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
                     </label>
                   </div>
-                  <div class="w-px bg-gray-100 self-stretch"></div>
-                  <!-- 連続回答 -->
-                  <div class="flex-1 flex items-center justify-between gap-3">
-                    <div class="min-w-0">
-                      <p class="font-bold text-sm text-gray-700 leading-tight">連続回答の許可</p>
-                      <p class="text-xs text-gray-400 mt-0.5 leading-snug">同端末で続けて回答を受け付ける</p>
-                    </div>
-                    <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
-                      <input type="checkbox" id="allowContinuousAnswer" class="sr-only peer" checked>
-                      <div class="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 peer-focus:ring-2 peer-focus:ring-green-300 transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
-                    </label>
-                  </div>
                 </div>
               </div>
 
-              <!-- カード3: 関連設定 -->
+              <!-- カード2: 関連設定 -->
               <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-                <button type="button" class="v2-accordion-trigger w-full flex items-center justify-between px-5 py-3 bg-gray-50 hover:bg-gray-100 transition-colors" data-accordion-v2="relatedSettingsCardBody" aria-expanded="false">
+                <button type="button" class="v2-accordion-trigger w-full flex items-center justify-between px-5 py-3 bg-gray-50 hover:bg-gray-100 transition-colors" data-accordion-v2="relatedSettingsCardBody" aria-expanded="true">
                   <h2 class="text-sm font-bold text-gray-700 flex items-center gap-2">
                     <span class="material-icons text-primary text-[18px]">settings</span>関連設定
                   </h2>
-                  <span class="material-icons text-gray-400 text-[18px]" data-accordion-icon>expand_more</span>
+                  <span class="material-icons text-gray-400 text-[18px]" data-accordion-icon>expand_less</span>
                 </button>
-                <div id="relatedSettingsCardBody" class="v2-accordion-body v2-collapsed border-t border-gray-100 px-4 py-3 flex flex-wrap gap-3">
+                <div id="relatedSettingsCardBody" class="v2-accordion-body border-t border-gray-100 px-4 py-3 flex flex-wrap gap-3">
                   <a id="openBizcardSettingsBtn" href="./bizcardSettings.html" class="flex-1 flex items-center justify-between px-3 py-2.5 border border-gray-200 rounded-lg bg-gray-50 hover:bg-white hover:border-primary hover:shadow-sm transition-all group">
                     <div class="flex items-center gap-2 min-w-0">
                       <span class="material-icons text-[18px] text-gray-400 group-hover:text-primary shrink-0">document_scanner</span>
@@ -569,6 +546,37 @@
                 </div>
               </div>
 
+              <!-- カード3: 多言語機能 -->
+              <div class="bg-amber-50 border border-amber-200 rounded-xl shadow-sm overflow-hidden">
+                <button type="button" class="v2-accordion-trigger w-full flex items-center justify-between px-5 py-3 hover:bg-amber-100/50 transition-colors" data-accordion-v2="multilingualCardBody" aria-expanded="false">
+                  <h2 class="text-sm font-bold text-amber-800 flex items-center gap-2">
+                    <span class="material-icons text-amber-500 text-[18px]">stars</span>多言語機能
+                    <span class="text-[10px] font-black bg-amber-200 text-amber-800 px-1.5 py-0.5 rounded-full">Premium</span>
+                  </h2>
+                  <span class="material-icons text-amber-400 text-[18px]" data-accordion-icon>expand_more</span>
+                </button>
+                <div id="multilingualCardBody" class="v2-accordion-body v2-collapsed border-t border-amber-100 px-5 py-3 flex flex-col gap-3">
+                  <!-- トグル -->
+                  <div class="flex items-center justify-between gap-3">
+                    <div class="min-w-0">
+                      <p class="font-bold text-sm text-amber-800 leading-tight">多言語機能を有効にする</p>
+                      <p class="text-xs text-amber-700/70 mt-0.5 leading-snug">複数言語でアンケートを提供します。</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
+                      <input type="checkbox" id="multilingualEnabledToggle" class="sr-only peer">
+                      <div class="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-amber-500 peer-focus:ring-2 peer-focus:ring-amber-300 transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+                    </label>
+                  </div>
+                  <!-- Multilingual Config UI -->
+                  <div id="multilingual-controls" class="hidden border-t border-amber-200 pt-3">
+                    <p class="text-xs font-bold text-amber-800 mb-2">追加可能言語</p>
+                    <div id="languageSelectionPanel" class="flex flex-wrap gap-2">
+                      <!-- Rendered by JS -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+
             </div>
             <!-- /SETTINGS EMBEDDED -->
 
@@ -590,6 +598,14 @@
                 <!-- Flat Question List Container -->
                 <div id="questionListContainer" class="mb-8">
                   <div id="questionListEmpty" class="py-12 px-6 bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-100 rounded-2xl transition-all">
+                    <!-- 保存ブロック警告（設問0件では保存不可。PM指定） -->
+                    <div class="flex items-start gap-3 bg-amber-50 border border-amber-300 text-amber-800 rounded-xl px-4 py-3 mb-6 text-left" role="alert">
+                      <span class="material-icons text-amber-500 text-[22px] flex-shrink-0 mt-0.5">warning_amber</span>
+                      <div class="flex-1 min-w-0">
+                        <p class="font-bold text-sm">保存するには設問を1件以上追加してください</p>
+                        <p class="text-xs mt-1 leading-relaxed"><span class="font-bold">推奨対応：</span>下の「最初の設問を追加」ボタンから、シングルアンサー等の基本設問を少なくとも1問登録してください。</p>
+                      </div>
+                    </div>
                     <div class="text-center">
                       <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white mb-4 shadow-md border border-indigo-100">
                         <span class="material-icons text-5xl text-indigo-300">note_add</span>
@@ -617,24 +633,6 @@
                   </div>
                 </div>
                 
-                <!-- Thank You Screen Accordion -->
-                <div class="border border-indigo-100 bg-indigo-50/20 rounded-xl overflow-hidden shrink-0 mt-8 transition-all hover:bg-indigo-50/50">
-                  <button type="button" id="thankYouAccordionBtn" class="w-full flex items-center justify-between px-5 py-4 hover:bg-indigo-50/50 transition-colors outline-none focus:bg-indigo-50 group" aria-expanded="true">
-                    <h3 class="text-sm font-bold flex items-center gap-2 text-indigo-900 border-l-4 border-transparent group-hover:border-indigo-400 pl-2 -ml-5 transition-all">
-                      <span class="material-icons text-indigo-500 text-[18px]">task_alt</span> サンクス画面（回答完了メッセージ）
-                    </h3>
-                    <span class="material-icons text-indigo-400 text-[20px] transition-transform duration-300" id="thankYouAccordionIcon" style="transform: rotate(180deg)">expand_more</span>
-                  </button>
-                  <div id="thankYouAccordionBody" class="px-5 py-5 border-t border-indigo-50 bg-white">
-                    <div class="multi-lang-input-group" data-field-key="thankYouMessage" data-input-type="textarea" data-label="完了メッセージ" data-required="false">
-                      <div class="input-group mb-0" data-lang="ja">
-                        <textarea id="thankYouMessage_ja" placeholder=" " class="input-field min-h-[5rem] bg-gray-50 resize-y text-sm pt-4 border-gray-200 focus:bg-white focus:ring-2 focus:ring-indigo-100" maxlength="500"></textarea>
-                        <label class="input-label bg-transparent">完了メッセージ (回答後に表示)</label>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
               </div>
             </div>
             <!-- /QUESTION LIST -->
@@ -646,7 +644,7 @@
             <!-- ============================== -->
             <!-- 3. OUTLINE PANEL (Right Area)  -->
             <!-- ============================== -->
-            <div id="outline-column" class="hidden lg:flex fixed xl:sticky top-24 xl:top-[5rem] right-0 z-50 xl:z-auto w-72 xl:w-auto h-auto xl:h-auto translate-x-full xl:translate-x-0 transition-transform duration-300 ease-in-out lg:col-span-3 xl:col-span-3 lg:col-start-10 xl:col-start-10 lg:row-start-2 flex-col gap-0 xl:gap-5 sticky-panel glass-panel bg-white/95 xl:bg-white/80 p-0 border-l xl:border border-gray-200 rounded-l-2xl xl:rounded-xl shadow-2xl xl:shadow-sm overflow-hidden">
+            <div id="outline-column" class="hidden lg:flex fixed xl:sticky top-24 xl:top-[5rem] right-0 z-50 xl:z-auto w-72 xl:w-auto h-auto xl:h-auto translate-x-full xl:translate-x-0 transition-transform duration-300 ease-in-out xl:col-span-3 xl:col-start-10 xl:row-start-2 flex-col gap-0 xl:gap-5 sticky-panel glass-panel bg-white/95 xl:bg-white/80 p-0 border-l xl:border border-gray-200 rounded-l-2xl xl:rounded-xl shadow-2xl xl:shadow-sm overflow-hidden">
 
               <div class="p-5 overflow-y-auto border-b" style="max-height: calc(100vh - 18rem);">
                 <h3 class="text-xs font-black tracking-widest text-gray-400 uppercase mb-4 flex items-center gap-1">

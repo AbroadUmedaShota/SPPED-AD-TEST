@@ -22,7 +22,7 @@ const NAV_ITEMS = [
     { id: 'logout', href: '#', icon: 'logout', label: 'ログアウト', preventAutoClose: true }
 ];
 
-const SUPPORT_ITEM = { id: 'support', href: 'https://support.speed-ad.com/help/', icon: 'help_outline', label: 'サポート' };
+const SUPPORT_ITEM = { id: 'support', href: 'help.html', icon: 'help_outline', label: 'サポート' };
 
 const MEDIA_QUERY = window.matchMedia('(min-width: 1024px)');
 const SELECTED_GROUP_STORAGE_KEY = 'dashboard.selectedGroupId';
