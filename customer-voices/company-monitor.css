@@ -208,12 +208,23 @@ body.voice-company-monitor::before {
 }
 
 .company-story-figure {
-  overflow: hidden;
   border-radius: 30px;
 }
 
 .company-story-figure__inner {
+  position: relative;
+  overflow: hidden;
   margin: 0;
+  border-radius: 30px;
+  background: #ebe5d7;
+}
+
+.company-story-figure__inner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 46%, rgba(10, 13, 24, 0.42) 100%);
+  pointer-events: none;
 }
 
 .company-story-figure__inner img {
@@ -223,11 +234,15 @@ body.voice-company-monitor::before {
 }
 
 .company-story-figure__caption {
+  position: absolute;
+  left: 22px;
+  right: 22px;
+  bottom: 20px;
+  z-index: 1;
   margin: 0;
-  padding: 16px 22px 18px;
-  font-size: 0.9rem;
-  line-height: 1.8;
-  color: var(--voice-company-muted);
+  font-size: 0.86rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.92);
 }
 
 .company-story-figure--primary {
