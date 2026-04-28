@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const stepInput = document.getElementById('step-input');
     const stepConfirm = document.getElementById('step-confirm');
     const stepComplete = document.getElementById('step-complete');
+    const registrationShell = document.getElementById('premium-registration-shell');
 
     // Modal Elements
     const accountCheckModal = document.getElementById('account-check-modal');
@@ -50,6 +51,74 @@ document.addEventListener('DOMContentLoaded', () => {
     const preventLeaveModal = document.getElementById('prevent-leave-modal');
     const preventLeaveConfirmBtn = document.getElementById('prevent-leave-confirm-btn');
     const preventLeaveCancelBtn = document.getElementById('prevent-leave-cancel-btn');
+
+    let activeModal = null;
+    let lastFocusedElement = null;
+
+    const getFocusableElements = (modal) => Array.from(modal.querySelectorAll(
+        'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )).filter(element => element.offsetParent !== null || element === document.activeElement);
+
+    function handleModalKeydown(event) {
+        if (!activeModal) return;
+
+        if (event.key === 'Escape') {
+            if (activeModal === accountCheckModal) closeAccountCheckModal();
+            if (activeModal === preventLeaveModal) hidePreventLeaveModal();
+            return;
+        }
+
+        if (event.key !== 'Tab') return;
+
+        const focusableElements = getFocusableElements(activeModal);
+        if (!focusableElements.length) {
+            event.preventDefault();
+            return;
+        }
+
+        const firstFocusableElement = focusableElements[0];
+        const lastFocusableElement = focusableElements[focusableElements.length - 1];
+        if (event.shiftKey && document.activeElement === firstFocusableElement) {
+            event.preventDefault();
+            lastFocusableElement.focus();
+        } else if (!event.shiftKey && document.activeElement === lastFocusableElement) {
+            event.preventDefault();
+            firstFocusableElement.focus();
+        }
+    }
+
+    function activateModalFocus(modal, initialFocusElement = null) {
+        activeModal = modal;
+        lastFocusedElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+        document.addEventListener('keydown', handleModalKeydown);
+        const focusTarget = initialFocusElement || getFocusableElements(modal)[0] || modal;
+        if (focusTarget === modal) {
+            modal.setAttribute('tabindex', '-1');
+        }
+        setTimeout(() => focusTarget.focus(), 0);
+    }
+
+    function deactivateModalFocus(modal) {
+        if (activeModal !== modal) return;
+        activeModal = null;
+        document.removeEventListener('keydown', handleModalKeydown);
+        if (lastFocusedElement && document.contains(lastFocusedElement) && lastFocusedElement.offsetParent !== null) {
+            lastFocusedElement.focus();
+        }
+        lastFocusedElement = null;
+    }
+
+    function closeAccountCheckModal() {
+        if (!accountCheckModal) return;
+        accountCheckModal.classList.add('opacity-0');
+        if (accountCheckModalContent) {
+            accountCheckModalContent.classList.add('scale-95');
+        }
+        setTimeout(() => {
+            accountCheckModal.classList.add('hidden');
+            deactivateModalFocus(accountCheckModal);
+        }, 300);
+    }
 
 
     let currentScreen = 'input'; // Initial screen
@@ -132,6 +201,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Show/Hide Sections with simple transition
         Object.values(steps).forEach(s => s.el.classList.add('hidden'));
         steps[stepNum].el.classList.remove('hidden');
+        if (registrationShell) {
+            registrationShell.classList.toggle('premium-registration-shell--complete', stepNum === 3);
+        }
         window.scrollTo({ top: 0, behavior: 'smooth' });
 
         // Update currentScreen and hasUnsavedChanges when screen changes
@@ -393,7 +465,7 @@ document.addEventListener('DOMContentLoaded', () => {
             billingMessage = `
                 <p class="font-bold text-red-600 mt-2">※本日から契約開始となり、当月分の料金（満額）が発生します。</p>
                 <p class="text-xs mt-1 text-gray-600">契約期間: ${todayFormatted} 〜 ${endOfMonthFormatted}</p>
-                <p class="mt-2">プレミアム機能はすぐにご利用いただけます。<br>お支払いは後日発行される請求書にてお願いいたします。</p>
+                <p class="mt-2">利用可能なPremium機能はすぐにご利用いただけます。近日対応の機能は、提供開始後に画面上でご案内します。<br>お支払いは後日発行される請求書にてお願いいたします。</p>
             `;
         } else {
             const now = new Date();
@@ -404,6 +476,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p class="font-bold text-green-600 mt-2">※現在のお申し込みは初月無料です！</p>
                 <p>実際の課金は<span class="font-bold">${nextMonthFormatted}</span>から開始されます。</p>
                 <p>ご入金は課金開始月の月末までにお願いいたします。</p>
+                <p class="mt-2">利用可能なPremium機能は登録後すぐにご利用いただけます。近日対応の機能は、提供開始後に画面上でご案内します。</p>
             `;
         }
 
@@ -428,8 +501,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Hide Modal if not skipped
         if (!skipModal) {
-            accountCheckModal.classList.add('opacity-0');
-            setTimeout(() => accountCheckModal.classList.add('hidden'), 300);
+            closeAccountCheckModal();
         }
 
         // Validate and Decide Logic
@@ -465,9 +537,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function checkAccountInfo() {
         const userData = window.dummyUserData;
 
-        // すでにプレミアム会員の場合は完了画面へ
+        // すでにプレミアム会員の場合は契約状況へ戻す
         if (userData.is_premium_member) {
-            setProcessStep(3);
+            localStorage.setItem('currentScenario', userData.is_cancelled ? 'premium-cancelled' : 'premium-member');
+            window.location.href = 'premium_signup_new.html';
             return;
         }
 
@@ -492,6 +565,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => {
                     accountCheckModal.classList.remove('opacity-0');
                     accountCheckModalContent.classList.remove('scale-95');
+                    activateModalFocus(accountCheckModal, btnUseInfo);
                 }, 50);
             }
         } else {
@@ -504,8 +578,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnInputManual) {
         btnInputManual.addEventListener('click', () => {
             // Hide Modal
-            accountCheckModal.classList.add('opacity-0');
-            setTimeout(() => accountCheckModal.classList.add('hidden'), 300);
+            closeAccountCheckModal();
             setProcessStep(1);
             hasUnsavedChanges = true;
         });
@@ -614,6 +687,7 @@ document.addEventListener('DOMContentLoaded', () => {
             void preventLeaveModal.offsetWidth;
             preventLeaveModal.classList.remove('opacity-0');
             preventLeaveModal.classList.add('opacity-100');
+            activateModalFocus(preventLeaveModal, preventLeaveCancelBtn);
         }
     }
 
@@ -624,7 +698,10 @@ document.addEventListener('DOMContentLoaded', () => {
             preventLeaveModal.classList.remove('opacity-100');
             setTimeout(() => {
                 preventLeaveModal.classList.add('hidden');
-                delete preventLeaveConfirmBtn.dataset.targetUrl;
+                if (preventLeaveConfirmBtn) {
+                    delete preventLeaveConfirmBtn.dataset.targetUrl;
+                }
+                deactivateModalFocus(preventLeaveModal);
             }, 300);
         }
     }

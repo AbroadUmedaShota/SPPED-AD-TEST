@@ -5,18 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>プレミアムプラン解約完了 - Speed Ad</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Inter:wght@400;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Inter:wght@400;600;700;800;900&display=swap"
         rel="stylesheet">
-    <!-- Global CSS -->
     <link href="service-top-style.css" rel="stylesheet">
     <link href="premium_signup_new.css" rel="stylesheet">
     <style>
@@ -28,61 +25,100 @@
 </head>
 
 <body class="text-gray-800">
-
     <div class="relative flex min-h-screen flex-col overflow-x-hidden">
-        <!-- Header (Dynamic) -->
         <div id="header-placeholder"></div>
 
         <div class="flex flex-1 pt-16 bg-background">
-            <!-- Sidebar -->
             <div id="sidebar-placeholder"></div>
 
-            <main class="flex-1 w-full ml-0 md:ml-64 px-4 py-8 md:py-12 flex justify-center items-center">
-                <div class="max-w-lg w-full">
+            <main class="flex-1 w-full ml-0 md:ml-64 px-4 py-8 md:py-12 flex justify-center">
+                <div class="premium-cancel-complete-card">
+                    <nav class="mb-6 flex items-center gap-2 text-sm font-bold text-slate-500" aria-label="パンくず">
+                        <a class="hover:text-blue-600" href="index.html">ホーム</a>
+                        <span class="material-icons text-base" aria-hidden="true">chevron_right</span>
+                        <a class="hover:text-blue-600" href="premium_signup_new.html">プレミアムプラン</a>
+                        <span class="material-icons text-base" aria-hidden="true">chevron_right</span>
+                        <span class="text-slate-800">自動更新停止完了</span>
+                    </nav>
 
-                    <div class="bg-white p-8 md:p-12 rounded-xl shadow-lg border border-gray-100 text-center">
-                        <div class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <span class="material-icons text-blue-600 text-5xl">check_circle</span>
+                    <section class="premium-account-hero premium-account-hero--paused hero-section relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                        <div class="premium-account-card">
+                            <p class="premium-account-section-label">ご利用ありがとうございました</p>
+                            <div class="premium-account-profile">
+                                <div class="premium-cancel-status-icon" aria-hidden="true">
+                                    <span class="material-icons">volunteer_activism</span>
+                                </div>
+                                <div class="premium-account-profile__body">
+                                    <p class="premium-account-greeting">Thank you</p>
+                                    <h1>これまでのご利用、ありがとうございました</h1>
+                                    <div class="premium-account-meta">
+                                        <span class="premium-account-badge premium-account-badge--paused">
+                                            <span class="material-icons" aria-hidden="true">pause_circle</span>
+                                            AUTO-RENEWAL OFF
+                                        </span>
+                                        <span>利用可能期限: <strong id="premium-expiry-date">202X年X月X日</strong></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="premium-cancel-complete-message">
+                                <span class="material-icons" aria-hidden="true">check_circle</span>
+                                <div>
+                                    <h2>自動更新の停止手続きが完了しました</h2>
+                                    <p>利用可能期限までは、引き続きPremium機能をご利用いただけます。また必要になった際は、プレミアムプラン画面から再開できます。</p>
+                                </div>
+                            </div>
+                            <div class="premium-account-notice premium-account-notice--warning">
+                                <span class="material-icons" aria-hidden="true">event_available</span>
+                                <p>
+                                    <strong>期限まではPremium機能を利用できます。</strong>
+                                    期間終了後はStandardプランへ自動的に移行します。
+                                </p>
+                            </div>
+                            <dl class="premium-account-detail-list">
+                                <div>
+                                    <dt>利用可能期限</dt>
+                                    <dd><span data-role="premium-expiry-date">202X年X月X日</span>までは、最長1年保存・CSV出力・多言語対応を利用できます。</dd>
+                                </div>
+                                <div>
+                                    <dt>期限後</dt>
+                                    <dd>保存期間や出力など、Standardプランの利用条件に切り替わります。</dd>
+                                </div>
+                                <div>
+                                    <dt>また使うとき</dt>
+                                    <dd>必要になった場合は、プレミアムプラン画面から自動更新を再開できます。</dd>
+                                </div>
+                            </dl>
+                            <div class="premium-account-support-footer">
+                                <span class="material-icons" aria-hidden="true">support_agent</span>
+                                <p>
+                                    <strong>サポートが必要ですか？</strong>
+                                    ご利用についてのご質問は、お問い合わせフォームまたはサポートセンターまでお寄せください。
+                                </p>
+                                <div>
+                                    <a href="bug-report.html">お問い合わせ</a>
+                                    <a href="https://support.speed-ad.com/help/" target="_blank" rel="noopener noreferrer">サポートセンター</a>
+                                </div>
+                            </div>
+                            <div class="premium-cancel-actions">
+                                <a href="index.html" class="premium-cancel-button premium-cancel-button--secondary">
+                                    ダッシュボードへ戻る
+                                </a>
+                                <a href="premium_signup_new.html" class="premium-cancel-button premium-cancel-button--primary">
+                                    プレミアムプラン画面へ
+                                    <span class="material-icons text-base" aria-hidden="true">arrow_forward</span>
+                                </a>
+                            </div>
                         </div>
-
-                        <h1 class="text-2xl font-bold text-gray-900 mb-4">
-                            自動更新を停止しました
-                        </h1>
-
-                        <p class="text-gray-600 mb-8 leading-relaxed">
-                            プレミアムプランの自動更新を停止しました。<br>
-                            現在の契約期間終了日までは、引き続きプレミアム機能をご利用いただけます。
-                        </p>
-
-                        <div class="bg-gray-50 p-4 rounded-lg mb-8 text-sm text-left">
-                            <h3 class="font-bold text-gray-700 mb-2">今後のご利用について</h3>
-                            <p class="text-gray-600 mb-2">
-                                ・契約期間終了後、自動的にフリープラン（Standard）へ移行します。<br>
-                                ・フリープラン移行後、プレミアム専用機能および保存データの一部に制限がかかります。
-                            </p>
-                        </div>
-
-                        <p class="text-gray-600 mb-8">
-                            これまでのご利用、誠にありがとうございました。<br>
-                            またのご利用を心よりお待ちしております。
-                        </p>
-
-                        <a href="index.html"
-                            class="inline-block w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-full shadow-md transition duration-200 transform hover:-translate-y-1">
-                            ダッシュボードへ戻る
-                        </a>
-                    </div>
-
+                    </section>
                 </div>
             </main>
         </div>
 
-        <!-- Footer (Dynamic) -->
         <div id="footer-placeholder"></div>
     </div>
 
-    <!-- Scripts -->
     <script type="module" src="src/main.js"></script>
+    <script src="premium_cancel.js"></script>
 </body>
 
 </html>

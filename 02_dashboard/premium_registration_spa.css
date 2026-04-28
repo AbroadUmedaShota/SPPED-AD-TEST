@@ -11,14 +11,463 @@
     --premium-bg-gradient: radial-gradient(circle at center, #1e40af 0%, #1e3a8a 40%, #172554 100%);
 }
 
+.premium-registration-shell {
+    transition: max-width 0.2s ease;
+}
+
+.premium-registration-shell.premium-registration-shell--complete {
+    max-width: 56rem;
+}
+
 #step-complete {
     position: relative;
-    overflow: hidden;
-    color: white;
-    background: var(--premium-bg-gradient);
+    overflow: visible;
+    color: #0f172a;
+    background: linear-gradient(135deg, #ffffff 0%, #fffaf0 42%, #eff6ff 100%);
+    border: 1px solid #ead7ac;
     border-radius: 1rem;
-    padding: 4rem 2rem;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    padding: 1.25rem;
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+}
+
+.premium-registration-complete-card {
+    position: relative;
+    display: grid;
+    gap: 1rem;
+    width: 100%;
+    border: 1px solid #e8d9b7;
+    border-left: 4px solid #f59e0b;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.94);
+    padding: 1.35rem;
+    box-shadow: 0 14px 36px rgba(120, 53, 15, 0.08);
+}
+
+.premium-registration-section-label {
+    margin: 0;
+    color: #b45309;
+    font-size: 0.68rem;
+    font-weight: 800;
+    line-height: 1.35;
+    letter-spacing: 0;
+}
+
+.premium-registration-profile {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-width: 0;
+}
+
+.premium-registration-status-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.4rem;
+    height: 3.4rem;
+    flex: 0 0 auto;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #f59e0b 0%, #1d4ed8 100%);
+    color: #ffffff;
+    box-shadow: 0 12px 28px rgba(245, 158, 11, 0.25);
+}
+
+.premium-registration-status-icon .material-icons {
+    font-size: 1.55rem;
+}
+
+.premium-registration-profile__body {
+    min-width: 0;
+}
+
+.premium-registration-greeting {
+    margin: 0 0 0.15rem;
+    color: #b45309;
+    font-size: 0.72rem;
+    font-weight: 900;
+}
+
+.premium-registration-profile h2 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 1.25rem;
+    font-weight: 900;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+.premium-registration-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem 0.75rem;
+    align-items: center;
+    margin-top: 0.45rem;
+    color: #64748b;
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+.premium-registration-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    width: fit-content;
+    border: 1px solid #fcd34d;
+    border-radius: 999px;
+    background: #fffbeb;
+    padding: 0.35rem 0.65rem;
+    color: #b45309;
+    font-size: 0.68rem;
+    font-weight: 800;
+}
+
+.premium-registration-badge .material-icons {
+    font-size: 0.95rem;
+}
+
+.premium-registration-celebration {
+    display: grid;
+    grid-template-columns: 2.3rem minmax(0, 1fr);
+    gap: 0.8rem;
+    align-items: start;
+    border: 1px solid #fde68a;
+    border-radius: 0.95rem;
+    background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%);
+    padding: 1rem;
+}
+
+.premium-registration-celebration > .material-icons {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.3rem;
+    height: 2.3rem;
+    border-radius: 0.75rem;
+    background: #ffffff;
+    color: #d97706;
+    box-shadow: inset 0 0 0 1px #fde68a;
+}
+
+.premium-registration-celebration h3 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 0.95rem;
+    font-weight: 900;
+    line-height: 1.45;
+}
+
+.premium-registration-celebration p {
+    margin: 0.35rem 0 0;
+    color: #475569;
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1.7;
+}
+
+.premium-registration-notice,
+.premium-registration-planned-note {
+    display: flex;
+    gap: 0.65rem;
+    align-items: flex-start;
+    border: 1px solid #bfdbfe;
+    border-radius: 0.85rem;
+    background: #eff6ff;
+    padding: 0.9rem 1rem;
+    color: #1d4ed8;
+}
+
+.premium-registration-planned-note {
+    margin-top: 1rem;
+    border-color: #d4dbe5;
+    background: #f8fafc;
+    color: #475569;
+}
+
+.premium-registration-notice .material-icons,
+.premium-registration-planned-note .material-icons {
+    flex: 0 0 auto;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.premium-registration-notice p,
+.premium-registration-planned-note p {
+    margin: 0;
+    font-size: 0.76rem;
+    font-weight: 700;
+    line-height: 1.65;
+}
+
+.premium-registration-notice strong,
+.premium-registration-planned-note strong {
+    font-weight: 900;
+}
+
+.premium-registration-detail-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    margin: 0;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.85rem;
+    background: #f8fafc;
+    overflow: hidden;
+}
+
+.premium-registration-detail-list div {
+    display: grid;
+    grid-template-columns: minmax(7rem, 12rem) minmax(0, 1fr);
+    align-items: start;
+    gap: 0.25rem;
+    min-width: 0;
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.premium-registration-detail-list div:last-child {
+    border-bottom: 0;
+}
+
+.premium-registration-detail-list dt {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.68rem;
+    font-weight: 900;
+    line-height: 1.4;
+}
+
+.premium-registration-detail-list dd {
+    margin: 0;
+    color: #0f172a;
+    font-size: 0.78rem;
+    font-weight: 800;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.premium-registration-detail-list a {
+    color: #2563eb;
+    font-weight: 900;
+    text-decoration: none;
+}
+
+.premium-registration-detail-list a:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+    text-underline-offset: 0.16em;
+}
+
+.premium-registration-support-footer {
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    gap: 0.85rem 1rem;
+    align-items: center;
+    border: 1px solid #dbe3ee;
+    border-radius: 0.85rem;
+    background: #f8fafc;
+    padding: 0.85rem 1rem;
+}
+
+.premium-registration-support-footer > .material-icons {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.6rem;
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 1rem;
+}
+
+.premium-registration-support-footer p {
+    margin: 0;
+    color: #475569;
+    font-size: 0.76rem;
+    font-weight: 700;
+    line-height: 1.65;
+}
+
+.premium-registration-support-footer strong {
+    color: #0f172a;
+    font-weight: 900;
+}
+
+.premium-registration-support-footer div {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 1.25rem;
+    row-gap: 0.65rem;
+    grid-column: 2 / -1;
+    justify-content: center;
+}
+
+.premium-registration-support-footer a {
+    color: #2563eb;
+    font-weight: 900;
+    text-decoration: underline;
+    text-underline-offset: 0.16em;
+}
+
+.premium-registration-support-footer a:hover {
+    color: #1d4ed8;
+}
+
+.premium-registration-summary {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-top: 1rem;
+}
+
+.premium-registration-summary-card {
+    display: grid;
+    grid-template-columns: 2.2rem minmax(0, 1fr);
+    gap: 0.8rem;
+    align-items: start;
+    border: 1px solid #dbe3ee;
+    border-left: 4px solid #dbe3ee;
+    border-radius: 0.875rem;
+    background: #ffffff;
+    padding: 0.95rem 1rem;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+}
+
+.premium-registration-summary-card--active {
+    border-left-color: #14b8a6;
+    background: linear-gradient(180deg, #f7fffd 0%, #ffffff 100%);
+}
+
+.premium-registration-summary-card__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 0.65rem;
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.premium-registration-summary-card--active .premium-registration-summary-card__icon {
+    background: #f0fdfa;
+    color: #0f766e;
+}
+
+.premium-registration-summary-card h3 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 0.9rem;
+    font-weight: 900;
+    line-height: 1.45;
+}
+
+.premium-registration-summary-card p {
+    margin: 0.3rem 0 0;
+    color: #475569;
+    font-size: 0.76rem;
+    line-height: 1.65;
+}
+
+.premium-registration-summary-card ul {
+    display: grid;
+    gap: 0.3rem;
+    margin: 0.65rem 0 0;
+    padding-left: 1rem;
+    color: #64748b;
+    font-size: 0.72rem;
+    line-height: 1.45;
+}
+
+.premium-registration-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.25rem;
+    justify-content: flex-end;
+    margin-top: 0.75rem;
+}
+
+.premium-registration-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    min-height: 2.9rem;
+    border-radius: 999px;
+    padding: 0.8rem 1.25rem;
+    font-size: 0.9rem;
+    font-weight: 900;
+    line-height: 1;
+    text-decoration: none;
+    transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.premium-registration-button--secondary {
+    border: 1px solid #dbe3ee;
+    background: #ffffff;
+    color: #475569;
+}
+
+.premium-registration-button--secondary:hover {
+    border-color: #bfdbfe;
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
+.premium-registration-button--primary {
+    border: 1px solid #2563eb;
+    background: #2563eb;
+    color: #ffffff;
+    box-shadow: 0 12px 24px rgba(37, 99, 235, 0.16);
+}
+
+.premium-registration-button--primary:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+@media (max-width: 640px) {
+    #step-complete {
+        padding: 1rem;
+    }
+
+    .premium-registration-complete-card {
+        padding: 1rem;
+    }
+
+    .premium-registration-profile {
+        align-items: flex-start;
+    }
+
+    .premium-registration-detail-list div {
+        grid-template-columns: 1fr;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .premium-registration-detail-list div:last-child {
+        border-bottom: 0;
+    }
+
+    .premium-registration-support-footer {
+        grid-template-columns: 2rem minmax(0, 1fr);
+    }
+
+    .premium-registration-support-footer div {
+        grid-column: 1 / -1;
+        justify-content: stretch;
+    }
+
+    .premium-registration-support-footer a {
+        flex: 1 1 8rem;
+    }
+
+    .premium-registration-actions {
+        flex-direction: column-reverse;
+    }
+
+    .premium-registration-button {
+        width: 100%;
+    }
 }
 
 /* Background Effects */

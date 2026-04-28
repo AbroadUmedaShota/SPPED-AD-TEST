@@ -19,6 +19,16 @@
     <link href="service-top-style.css" rel="stylesheet">
     <!-- Premium Signup New CSS -->
     <link href="premium_signup_new.css" rel="stylesheet">
+    <script>
+        try {
+            const storedScenario = localStorage.getItem('currentScenario');
+            if (['premium-member', 'premium-free-trial', 'premium-cancelled'].includes(storedScenario)) {
+                document.documentElement.classList.add('premium-state-pending');
+            }
+        } catch (error) {
+            document.documentElement.classList.remove('premium-state-pending');
+        }
+    </script>
 </head>
 
 <body class="text-gray-800 premium-bg-animated">
@@ -68,11 +78,14 @@
                                     PREMIUM PLAN
                                 </span>
                                 <h1 class="premium-split-hero__title">
-                                    展示会後のリードを、<br>
-                                    <span>営業へ渡せる状態に整える。</span>
+                                    埋もれる展示会リードを、<br>
+                                    <span>次の商談へ動かす。</span>
                                 </h1>
                                 <p class="premium-split-hero__lead">
-                                    最長1年保存、CSV出力、独自ドメイン送信、多言語対応で、展示会後の回答・名刺データを共有しやすくします。
+                                    最長1年保存、CSV出力、多言語対応で、展示会後の回答・名刺データを共有・分析しやすい状態に整えます。
+                                </p>
+                                <p class="premium-split-hero__copy-note">
+                                    コピー方針: 展示会後のリードが未整理のまま埋もれる課題と、商談化へ進める価値を短く示す案です。最終文言は代表確認で決定します。
                                 </p>
                             </div>
 
@@ -137,10 +150,10 @@
                                         <em>CSV</em>
                                     </li>
                                     <li>
-                                        <span class="material-icons" aria-hidden="true">alternate_email</span>
-                                        <strong>独自ドメイン送信</strong>
-                                        <span>送信元を自社ドメインで整えやすくする機能</span>
-                                        <em>DOMAIN</em>
+                                        <span class="material-icons" aria-hidden="true">receipt_long</span>
+                                        <strong>請求書払い</strong>
+                                        <span>初期費用0円で、社内決裁にも進めやすい支払い方法</span>
+                                        <em>INVOICE</em>
                                     </li>
                                     <li>
                                         <span class="material-icons" aria-hidden="true">language</span>
@@ -177,35 +190,36 @@
                                         <span class="label">FEATURES</span>
                                         <h2>Premiumに含まれる機能</h2>
                                         <p class="sub">保存・入力・出力・確認・対外表示・回答導線を、展示会後の運用に合わせます。</p>
+                                        <p class="premium-feature-note">※ 一部機能は順次提供予定です。詳細は各機能の説明内で確認できます。</p>
                                     </div>
                                 </div>
-                                <div class="featC-tabbar" role="tablist" aria-label="Premiumに含まれる機能">
-                                    <button class="featC-tab active" type="button" role="tab" aria-selected="true" aria-controls="premium-feature-panel" data-feature-index="0">
+                                <div class="featC-tabbar" aria-label="Premiumに含まれる機能">
+                                    <button class="featC-tab active" type="button" aria-pressed="true" data-feature-index="0">
                                         <span class="ic"><span class="material-icons icon" aria-hidden="true">inventory_2</span></span>
                                         <span class="t">最長1年保存</span>
                                     </button>
-                                    <button class="featC-tab" type="button" role="tab" aria-selected="false" aria-controls="premium-feature-panel" data-feature-index="1">
+                                    <button class="featC-tab" type="button" aria-pressed="false" data-feature-index="1">
                                         <span class="ic"><span class="material-icons icon" aria-hidden="true">gesture</span></span>
                                         <span class="t">高度な入力</span>
                                     </button>
-                                    <button class="featC-tab" type="button" role="tab" aria-selected="false" aria-controls="premium-feature-panel" data-feature-index="2">
+                                    <button class="featC-tab" type="button" aria-pressed="false" data-feature-index="2">
                                         <span class="ic"><span class="material-icons icon" aria-hidden="true">download</span></span>
                                         <span class="t">CSV出力</span>
                                     </button>
-                                    <button class="featC-tab" type="button" role="tab" aria-selected="false" aria-controls="premium-feature-panel" data-feature-index="3">
-                                        <span class="ic"><span class="material-icons icon" aria-hidden="true">insert_chart</span></span>
-                                        <span class="t">グラフ化・CSV活用</span>
+                                    <button class="featC-tab" type="button" aria-pressed="false" data-feature-index="3">
+                                        <span class="ic"><span class="material-icons icon" aria-hidden="true">rate_review</span></span>
+                                        <span class="t">レビュー・CSV</span>
                                     </button>
-                                    <button class="featC-tab" type="button" role="tab" aria-selected="false" aria-controls="premium-feature-panel" data-feature-index="4">
+                                    <button class="featC-tab" type="button" aria-pressed="false" data-feature-index="4">
                                         <span class="ic"><span class="material-icons icon" aria-hidden="true">domain</span></span>
-                                        <span class="t">独自ドメイン送信</span>
+                                        <span class="t">対外表示・連携</span>
                                     </button>
-                                    <button class="featC-tab" type="button" role="tab" aria-selected="false" aria-controls="premium-feature-panel" data-feature-index="5">
+                                    <button class="featC-tab" type="button" aria-pressed="false" data-feature-index="5">
                                         <span class="ic"><span class="material-icons icon" aria-hidden="true">language</span></span>
                                         <span class="t">多言語対応</span>
                                     </button>
                                 </div>
-                                <div id="premium-feature-panel" class="featC-panel" role="tabpanel" tabindex="0">
+                                <div id="premium-feature-panel" class="featC-panel" role="region" aria-live="polite" aria-label="Premium機能の説明" tabindex="0">
                                     <div class="left">
                                         <div class="ptag"><span class="num">01</span><span>365 DAYS</span></div>
                                         <h3>最長1年データ保存</h3>
@@ -243,44 +257,45 @@
                                 <div class="mb-6">
                                     <div>
                                         <p class="text-xs font-bold tracking-wide text-blue-700">PLAN COMPARISON</p>
-                                        <h2 class="mt-2 text-2xl font-bold text-slate-950">課題別プラン比較</h2>
+                                        <h2 class="mt-2 text-2xl font-bold text-slate-950">運用で差が出るポイント比較</h2>
+                                        <p class="mt-2 text-sm leading-7 text-slate-600">機能名ではなく、展示会後の運用で差が出る場面ごとに比較しています。</p>
                                     </div>
                                 </div>
                                 <details class="premium-comparison-details md:hidden">
                                     <summary class="rounded-lg border border-slate-200 px-4 py-3 text-sm font-bold text-blue-700">
-                                        詳細比較8項目を見る
+                                        運用差分8項目を見る
                                     </summary>
                                     <div class="premium-comparison-list mt-4 rounded-xl border border-slate-200 bg-white">
                                         <div
                                             class="premium-comparison-header hidden border-b border-slate-200 px-5 py-3 text-xs font-bold uppercase tracking-wide text-slate-500 md:grid md:grid-cols-[1.1fr_1fr_1.25fr]">
-                                            <div>課題</div>
+                                            <div>見直したい運用</div>
                                             <div>Standard</div>
                                             <div>Premium</div>
                                         </div>
                                         <article class="premium-comparison-row">
-                                            <h3 class="premium-comparison-topic">追加設問・機能</h3>
+                                            <h3 class="premium-comparison-topic">回答方法を広げたい</h3>
                                             <div class="premium-comparison-plan">
                                                 <span class="premium-comparison-label">Standard</span>
-                                                <p>利用不可</p>
+                                                <p>テキスト中心</p>
                                             </div>
                                             <div class="premium-comparison-plan premium-comparison-plan-featured">
                                                 <span class="premium-comparison-label">Premium</span>
-                                                <p>設問分岐・画像アップロード・手書き入力に対応</p>
+                                                <p>提供中: 画像アップロード / 手書き入力。<span class="premium-planned-inline">順次提供予定:</span> 設問分岐</p>
                                             </div>
                                         </article>
                                         <article class="premium-comparison-row">
-                                            <h3 class="premium-comparison-topic">アンケート構成</h3>
+                                            <h3 class="premium-comparison-topic">長いフォームを整理したい</h3>
                                             <div class="premium-comparison-plan">
                                                 <span class="premium-comparison-label">Standard</span>
                                                 <p>1ページ完結</p>
                                             </div>
                                             <div class="premium-comparison-plan premium-comparison-plan-featured">
                                                 <span class="premium-comparison-label">Premium</span>
-                                                <p>改ページ・進捗バー表示で長いフォームも整理</p>
+                                                <p><span class="premium-planned-inline">順次提供予定:</span> 改ページ / 進捗バー</p>
                                             </div>
                                         </article>
                                         <article class="premium-comparison-row">
-                                            <h3 class="premium-comparison-topic">多言語対応</h3>
+                                            <h3 class="premium-comparison-topic">海外来場者にも配布したい</h3>
                                             <div class="premium-comparison-plan">
                                                 <span class="premium-comparison-label">Standard</span>
                                                 <p>利用不可</p>
@@ -291,18 +306,18 @@
                                             </div>
                                         </article>
                                         <article class="premium-comparison-row">
-                                            <h3 class="premium-comparison-topic">お礼メール</h3>
+                                            <h3 class="premium-comparison-topic">回答後の連絡を整えたい</h3>
                                             <div class="premium-comparison-plan">
                                                 <span class="premium-comparison-label">Standard</span>
                                                 <p>制限あり</p>
                                             </div>
                                             <div class="premium-comparison-plan premium-comparison-plan-featured">
                                                 <span class="premium-comparison-label">Premium</span>
-                                                <p>独自ドメイン送信・条件分岐を利用可能</p>
+                                                <p>提供中: 自動配信 / 条件分岐。<span class="premium-planned-inline">順次提供予定:</span> 独自ドメイン送信</p>
                                             </div>
                                         </article>
                                         <article class="premium-comparison-row">
-                                            <h3 class="premium-comparison-topic">データ化スピード</h3>
+                                            <h3 class="premium-comparison-topic">会期中に優先処理したい</h3>
                                             <div class="premium-comparison-plan">
                                                 <span class="premium-comparison-label">Standard</span>
                                                 <p>通常対応</p>
@@ -313,18 +328,18 @@
                                             </div>
                                         </article>
                                         <article class="premium-comparison-row">
-                                            <h3 class="premium-comparison-topic">分析・レポート</h3>
+                                            <h3 class="premium-comparison-topic">会期後すぐ共有・分析したい</h3>
                                             <div class="premium-comparison-plan">
                                                 <span class="premium-comparison-label">Standard</span>
-                                                <p>グラフ表示の閲覧のみ</p>
+                                                <p>画面確認中心</p>
                                             </div>
                                             <div class="premium-comparison-plan premium-comparison-plan-featured">
                                                 <span class="premium-comparison-label">Premium</span>
-                                                <p>グラフ表示とCSV出力に対応</p>
+                                                <p>提供中: CSV出力。<span class="premium-planned-inline">順次提供予定:</span> SPEEDレビュー</p>
                                             </div>
                                         </article>
                                         <article class="premium-comparison-row">
-                                            <h3 class="premium-comparison-topic">データ保存期間</h3>
+                                            <h3 class="premium-comparison-topic">次回施策までデータを残したい</h3>
                                             <div class="premium-comparison-plan">
                                                 <span class="premium-comparison-label">Standard</span>
                                                 <p>30日</p>
@@ -335,14 +350,14 @@
                                             </div>
                                         </article>
                                         <article class="premium-comparison-row">
-                                            <h3 class="premium-comparison-topic">ブランド管理</h3>
+                                            <h3 class="premium-comparison-topic">対外表示と外部連携を整えたい</h3>
                                             <div class="premium-comparison-plan">
                                                 <span class="premium-comparison-label">Standard</span>
-                                                <p>標準表示</p>
+                                                <p>標準表示・手動共有中心</p>
                                             </div>
                                             <div class="premium-comparison-plan premium-comparison-plan-featured">
                                                 <span class="premium-comparison-label">Premium</span>
-                                                <p>自社ドメイン送信・ロゴ非表示を想定</p>
+                                                <p><span class="premium-planned-inline">順次提供予定:</span> ロゴ非表示 / Slack・SFA・CRM連携 / 独自ドメイン送信</p>
                                             </div>
                                         </article>
                                     </div>
@@ -350,34 +365,34 @@
                                 <div class="premium-comparison-list mt-4 hidden rounded-xl border border-slate-200 bg-white md:block">
                                     <div
                                         class="premium-comparison-header hidden border-b border-slate-200 px-5 py-3 text-xs font-bold uppercase tracking-wide text-slate-500 md:grid md:grid-cols-[1.1fr_1fr_1.25fr]">
-                                        <div>課題</div>
+                                        <div>見直したい運用</div>
                                         <div>Standard</div>
                                         <div>Premium</div>
                                     </div>
                                     <article class="premium-comparison-row">
-                                        <h3 class="premium-comparison-topic">追加設問・機能</h3>
+                                        <h3 class="premium-comparison-topic">回答方法を広げたい</h3>
                                         <div class="premium-comparison-plan">
                                             <span class="premium-comparison-label">Standard</span>
-                                            <p>利用不可</p>
+                                            <p>テキスト中心</p>
                                         </div>
                                         <div class="premium-comparison-plan premium-comparison-plan-featured">
                                             <span class="premium-comparison-label">Premium</span>
-                                            <p>設問分岐・画像アップロード・手書き入力に対応</p>
+                                            <p>提供中: 画像アップロード / 手書き入力。<span class="premium-planned-inline">順次提供予定:</span> 設問分岐</p>
                                         </div>
                                     </article>
                                     <article class="premium-comparison-row">
-                                        <h3 class="premium-comparison-topic">アンケート構成</h3>
+                                        <h3 class="premium-comparison-topic">長いフォームを整理したい</h3>
                                         <div class="premium-comparison-plan">
                                             <span class="premium-comparison-label">Standard</span>
                                             <p>1ページ完結</p>
                                         </div>
                                         <div class="premium-comparison-plan premium-comparison-plan-featured">
                                             <span class="premium-comparison-label">Premium</span>
-                                            <p>改ページ・進捗バー表示で長いフォームも整理</p>
+                                            <p><span class="premium-planned-inline">順次提供予定:</span> 改ページ / 進捗バー</p>
                                         </div>
                                     </article>
                                     <article class="premium-comparison-row">
-                                        <h3 class="premium-comparison-topic">多言語対応</h3>
+                                        <h3 class="premium-comparison-topic">海外来場者にも配布したい</h3>
                                         <div class="premium-comparison-plan">
                                             <span class="premium-comparison-label">Standard</span>
                                             <p>利用不可</p>
@@ -388,18 +403,18 @@
                                         </div>
                                     </article>
                                     <article class="premium-comparison-row">
-                                        <h3 class="premium-comparison-topic">お礼メール</h3>
+                                        <h3 class="premium-comparison-topic">回答後の連絡を整えたい</h3>
                                         <div class="premium-comparison-plan">
                                             <span class="premium-comparison-label">Standard</span>
                                             <p>制限あり</p>
                                         </div>
                                         <div class="premium-comparison-plan premium-comparison-plan-featured">
                                             <span class="premium-comparison-label">Premium</span>
-                                            <p>独自ドメイン送信・条件分岐を利用可能</p>
+                                            <p>提供中: 自動配信 / 条件分岐。<span class="premium-planned-inline">順次提供予定:</span> 独自ドメイン送信</p>
                                         </div>
                                     </article>
                                     <article class="premium-comparison-row">
-                                        <h3 class="premium-comparison-topic">データ化スピード</h3>
+                                        <h3 class="premium-comparison-topic">会期中に優先処理したい</h3>
                                         <div class="premium-comparison-plan">
                                             <span class="premium-comparison-label">Standard</span>
                                             <p>通常対応</p>
@@ -410,18 +425,18 @@
                                         </div>
                                     </article>
                                     <article class="premium-comparison-row">
-                                        <h3 class="premium-comparison-topic">分析・レポート</h3>
+                                        <h3 class="premium-comparison-topic">会期後すぐ共有・分析したい</h3>
                                         <div class="premium-comparison-plan">
                                             <span class="premium-comparison-label">Standard</span>
-                                            <p>グラフ表示の閲覧のみ</p>
+                                            <p>画面確認中心</p>
                                         </div>
                                         <div class="premium-comparison-plan premium-comparison-plan-featured">
                                             <span class="premium-comparison-label">Premium</span>
-                                            <p>グラフ表示とCSV出力に対応</p>
+                                            <p>提供中: CSV出力。<span class="premium-planned-inline">順次提供予定:</span> SPEEDレビュー</p>
                                         </div>
                                     </article>
                                     <article class="premium-comparison-row">
-                                        <h3 class="premium-comparison-topic">データ保存期間</h3>
+                                        <h3 class="premium-comparison-topic">次回施策までデータを残したい</h3>
                                         <div class="premium-comparison-plan">
                                             <span class="premium-comparison-label">Standard</span>
                                             <p>30日</p>
@@ -432,14 +447,14 @@
                                         </div>
                                     </article>
                                     <article class="premium-comparison-row">
-                                        <h3 class="premium-comparison-topic">ブランド管理</h3>
+                                        <h3 class="premium-comparison-topic">対外表示と外部連携を整えたい</h3>
                                         <div class="premium-comparison-plan">
                                             <span class="premium-comparison-label">Standard</span>
-                                            <p>標準表示</p>
+                                            <p>標準表示・手動共有中心</p>
                                         </div>
                                         <div class="premium-comparison-plan premium-comparison-plan-featured">
                                             <span class="premium-comparison-label">Premium</span>
-                                            <p>自社ドメイン送信・ロゴ非表示を想定</p>
+                                            <p><span class="premium-planned-inline">順次提供予定:</span> ロゴ非表示 / Slack・SFA・CRM連携 / 独自ドメイン送信</p>
                                         </div>
                                     </article>
                                 </div>
@@ -447,9 +462,10 @@
 
                             <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
                                 <div class="mb-6">
-                                    <p class="text-xs font-bold tracking-wide text-blue-700">WORKFLOW</p>
+                                    <p class="text-xs font-bold tracking-wide text-blue-700">BASIC FLOW</p>
                                     <h2 class="mt-2 text-2xl font-bold text-slate-950">会期後の動きに合わせて、情報を使える形で残す。</h2>
                                     <p class="mt-2 text-sm leading-7 text-slate-600">会期直後の整理から、営業への引き渡し、次回施策の振り返りまでを時間軸に沿って支えます。</p>
+                                    <p class="premium-coming-soon-note">この流れはStandard / Premium共通の運用例です。Premiumでは、最長1年保存やCSV出力により、共有・振り返りのしやすさを補強します。</p>
                                 </div>
                                 <figure class="premium-workflow-diagram mb-6">
                                     <img src="../img/premium/premium-workflow-diagram.png"
@@ -479,8 +495,9 @@
                                             </div>
                                         </div>
                                         <article class="rounded-xl border border-slate-200 bg-slate-50 p-5">
+                                            <span class="mb-3 inline-flex rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">Premiumで強化: CSV出力</span>
                                             <h3 class="font-bold text-slate-950">出力データを共有し、担当者が次の連絡に進める</h3>
-                                            <p class="mt-2 text-sm leading-6 text-slate-600">グラフ表示やCSV出力で、営業側が次のアクションや社内資料へつなげやすい状態に整えます。</p>
+                                            <p class="mt-2 text-sm leading-6 text-slate-600">CSV出力で、営業側が次のアクションや社内資料へつなげやすい状態に整えます。SPEEDレビューは提供予定です。</p>
                                         </article>
                                     </li>
                                     <li class="relative grid gap-3 md:grid-cols-[9rem_1fr] md:gap-6">
@@ -505,6 +522,7 @@
                                             </div>
                                         </div>
                                         <article class="rounded-xl border border-slate-200 bg-slate-50 p-5">
+                                            <span class="mb-3 inline-flex rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">Premiumで強化: 最長1年保存</span>
                                             <h3 class="font-bold text-slate-950">後続施策へ活用</h3>
                                             <p class="mt-2 text-sm leading-6 text-slate-600">契約期間中、最長1年保存された回答を継続的な確認に使えます。</p>
                                         </article>
@@ -633,7 +651,19 @@
                                             </button>
                                         </h3>
                                         <div id="premium-faq-answer-6" class="faq-answer" role="region" aria-labelledby="premium-faq-question-6" aria-hidden="true" hidden>
-                                            <p class="text-sm leading-7 text-slate-600">利用にはドメイン認証などの設定が必要です。設定内容は申込後の案内に沿って確認できます。</p>
+                                            <p class="text-sm leading-7 text-slate-600">独自ドメイン送信、ロゴ非表示、Slack/SFA/CRM連携は提供予定です。提供開始後は、ドメイン認証や連携設定などの内容を申込後の案内に沿って確認できます。</p>
+                                        </div>
+                                    </div>
+                                    <div class="faq-card py-4">
+                                        <h3 class="font-bold text-slate-800">
+                                            <button class="faq-question flex w-full items-center justify-between gap-4 text-left"
+                                                aria-expanded="false" aria-controls="premium-faq-answer-10" id="premium-faq-question-10">
+                                                <span>Q. 提供予定の機能は申込後すぐ使えますか？</span>
+                                                <span class="material-icons faq-icon text-slate-400" aria-hidden="true">expand_more</span>
+                                            </button>
+                                        </h3>
+                                        <div id="premium-faq-answer-10" class="faq-answer" role="region" aria-labelledby="premium-faq-question-10" aria-hidden="true" hidden>
+                                            <p class="text-sm leading-7 text-slate-600">設問分岐、改ページ、進捗バー、SPEEDレビュー、独自ドメイン送信、ロゴ非表示、Slack/SFA/CRM連携は順次提供予定です。リリース予定日は未定のため、提供開始後に画面上で案内します。</p>
                                         </div>
                                     </div>
                                     <div class="faq-card py-4">

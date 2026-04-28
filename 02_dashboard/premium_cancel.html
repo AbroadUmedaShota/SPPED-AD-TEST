@@ -5,241 +5,191 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>プレミアムプラン解約手続き - Speed Ad</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Inter:wght@400;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Inter:wght@400;600;700;800;900&display=swap"
         rel="stylesheet">
-    <!-- Global CSS -->
     <link href="service-top-style.css" rel="stylesheet">
-    <!-- Reuse premium_signup_new.css for gradients and card styles -->
     <link href="premium_signup_new.css" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', 'Noto Sans JP', sans-serif;
             background-color: #f8fafc;
         }
-
-        /* Custom styles specific to cancellation page if not covered by premium_signup_new.css */
-        .status-card {
-            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
-            color: white;
-        }
     </style>
 </head>
 
 <body class="text-gray-800">
-
     <div class="relative flex min-h-screen flex-col overflow-x-hidden">
-        <!-- Header (Dynamic) -->
         <div id="header-placeholder"></div>
 
         <div class="flex flex-1 pt-16 bg-background">
-            <!-- Sidebar -->
             <div id="sidebar-placeholder"></div>
 
             <main class="flex-1 w-full ml-0 md:ml-64 px-4 py-8 md:py-12 flex justify-center">
-                <div class="max-w-4xl w-full">
+                <div class="premium-cancel-page">
+                    <nav class="mb-6 flex items-center gap-2 text-sm font-bold text-slate-500" aria-label="パンくず">
+                        <a class="hover:text-blue-600" href="index.html">ホーム</a>
+                        <span class="material-icons text-base" aria-hidden="true">chevron_right</span>
+                        <a class="hover:text-blue-600" href="premium_signup_new.html">プレミアムプラン</a>
+                        <span class="material-icons text-base" aria-hidden="true">chevron_right</span>
+                        <span class="text-slate-800">自動更新の停止</span>
+                    </nav>
 
-                    <!-- Page Title -->
-                    <h1 class="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-8">
-                        プレミアムプラン解約手続き
-                    </h1>
-
-                    <!-- Current Status Section -->
-                    <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8 border border-gray-100">
-                        <div class="status-card p-6 md:p-8 text-center relative overflow-hidden">
-                            <!-- Decorative background elements similar to premium signup -->
-                            <div class="absolute inset-0 opacity-10">
-                                <div
-                                    class="absolute top-0 right-0 w-64 h-64 bg-white rounded-full translate-x-1/3 -translate-y-1/3">
+                    <section class="premium-account-hero premium-account-hero--paused hero-section relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                        <div class="premium-account-card">
+                            <p class="premium-account-section-label">自動更新の停止手続き</p>
+                            <div class="premium-account-profile">
+                                <div class="premium-cancel-status-icon" aria-hidden="true">
+                                    <span class="material-icons">event_busy</span>
                                 </div>
-                                <div
-                                    class="absolute bottom-0 left-0 w-48 h-48 bg-white rounded-full -translate-x-1/2 translate-y-1/2">
+                                <div class="premium-account-profile__body">
+                                    <p class="premium-account-greeting">Premium Plan</p>
+                                    <h1>自動更新を停止しますか？</h1>
+                                    <div class="premium-account-meta">
+                                        <span class="premium-account-badge premium-account-badge--paused">
+                                            <span class="material-icons" aria-hidden="true">workspace_premium</span>
+                                            Premium
+                                        </span>
+                                        <span>有効期限: <strong id="premium-expiry-date">202X年X月X日</strong> まで</span>
+                                    </div>
                                 </div>
                             </div>
-
-                            <div class="relative z-10">
-                                <h2 class="text-lg font-medium text-blue-100 mb-2">現在のプランステータス</h2>
-                                <div
-                                    class="inline-flex items-center gap-2 py-2 px-6 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 shadow-lg text-white text-xl font-bold tracking-wider mb-4">
-                                    <span class="material-icons text-white">stars</span>
-                                    Premium Plan
-                                </div>
-                                <p class="text-xl text-white">
-                                    有効期限: <span id="premium-expiry-date" class="font-bold">202X年X月X日</span> まで
+                            <div class="premium-account-notice premium-account-notice--warning">
+                                <span class="material-icons" aria-hidden="true">info</span>
+                                <p>
+                                    <strong>自動更新を停止しても、期限まではPremium機能を利用できます。</strong>
+                                    期間終了後はStandardプランへ移行し、保存期間や出力など一部の利用条件が変わります。
                                 </p>
                             </div>
-                        </div>
-
-                        <!-- Impact Section -->
-                        <div class="p-6 md:p-8 bg-blue-50">
-                            <h3 class="text-center font-bold text-gray-800 mb-6 flex items-center justify-center">
-                                <span class="material-icons text-amber-500 mr-2">warning</span>
-                                解約すると以下の機能が利用できなくなります
-                            </h3>
-
-                            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                <!-- Feature 1 -->
-                                <div
-                                    class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex flex-col items-center text-center opacity-70">
-                                    <div class="bg-gray-100 p-3 rounded-full mb-3 text-gray-500">
-                                        <span class="material-icons">cloud_off</span>
-                                    </div>
-                                    <h4 class="font-bold text-sm text-gray-600">データ最長1年保存</h4>
+                            <dl class="premium-account-detail-list">
+                                <div>
+                                    <dt>期限まで</dt>
+                                    <dd>最長1年保存、CSV出力、多言語対応などを引き続き利用できます。</dd>
                                 </div>
-                                <!-- Feature 2 -->
-                                <div
-                                    class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex flex-col items-center text-center opacity-70">
-                                    <div class="bg-gray-100 p-3 rounded-full mb-3 text-gray-500">
-                                        <span class="material-icons">file_download_off</span>
-                                    </div>
-                                    <h4 class="font-bold text-sm text-gray-600">Excelレポート出力</h4>
+                                <div>
+                                    <dt>期限後の変更</dt>
+                                    <dd>保存期間・出力・入力拡張などはStandardプランの利用条件へ戻ります。</dd>
                                 </div>
-                                <!-- Feature 3 -->
-                                <div
-                                    class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex flex-col items-center text-center opacity-70">
-                                    <div class="bg-gray-100 p-3 rounded-full mb-3 text-gray-500">
-                                        <span class="material-icons">rate_review</span>
-                                    </div>
-                                    <h4 class="font-bold text-sm text-gray-600">SPEEDレビュー</h4>
+                                <div>
+                                    <dt>順次提供予定</dt>
+                                    <dd>SPEEDレビュー / 独自ドメイン送信 / ロゴ非表示 / Slack・SFA・CRM連携</dd>
                                 </div>
-                                <!-- Feature 4 -->
-                                <div
-                                    class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex flex-col items-center text-center opacity-70">
-                                    <div class="bg-gray-100 p-3 rounded-full mb-3 text-gray-500">
-                                        <span class="material-icons">gesture</span>
-                                    </div>
-                                    <h4 class="font-bold text-sm text-gray-600">高度な入力対応</h4>
-                                </div>
-                                <!-- Feature 5 -->
-                                <div
-                                    class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex flex-col items-center text-center opacity-70">
-                                    <div class="bg-gray-100 p-3 rounded-full mb-3 text-gray-500">
-                                        <span class="material-icons">hub</span>
-                                    </div>
-                                    <h4 class="font-bold text-sm text-gray-600">外部システム連携</h4>
-                                </div>
-                                <!-- Feature 6 -->
-                                <div
-                                    class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex flex-col items-center text-center opacity-70">
-                                    <div class="bg-gray-100 p-3 rounded-full mb-3 text-gray-500">
-                                        <span class="material-icons">support_agent</span>
-                                    </div>
-                                    <h4 class="font-bold text-sm text-gray-600">優先サポート</h4>
+                            </dl>
+                            <div class="premium-account-support-footer">
+                                <span class="material-icons" aria-hidden="true">support_agent</span>
+                                <p>
+                                    <strong>サポートが必要ですか？</strong>
+                                    ご利用についてのご質問は、お問い合わせフォームまたはサポートセンターまでお寄せください。
+                                </p>
+                                <div>
+                                    <a href="bug-report.html">お問い合わせ</a>
+                                    <a href="https://support.speed-ad.com/help/" target="_blank" rel="noopener noreferrer">サポートセンター</a>
                                 </div>
                             </div>
-                            <p class="text-xs text-gray-600 text-center mt-6">
-                                ※解約手続き（自動更新の停止）を行っても、<span
-                                    class="font-bold text-gray-800">現在の契約期間終了日</span>まではプレミアム機能を引き続きご利用いただけます。<br>
-                                期間終了後、自動的にフリープランへ移行し、機能が制限されます。
-                            </p>
                         </div>
-                    </div>
+                    </section>
 
-                    <!-- Survey Form -->
-                    <div class="bg-white p-6 md:p-10 rounded-xl shadow-lg border border-gray-100 mb-8">
-                        <h2 class="text-lg font-bold text-gray-800 mb-6 border-b pb-4">
-                            アンケート（任意）
-                            <span
-                                class="block text-sm font-normal text-gray-500 mt-1">今後のサービス改善のため、よろしければ理由をお聞かせください。</span>
-                        </h2>
+                    <section class="premium-cancel-section" aria-labelledby="cancel-reason-title">
+                        <div class="premium-cancel-section__head">
+                            <span class="material-icons" aria-hidden="true">edit_note</span>
+                            <div>
+                                <p class="premium-cancel-eyebrow">OPTIONAL</p>
+                                <h2 id="cancel-reason-title">解約理由（任意）</h2>
+                                <p>今後のサービス改善のため、よろしければ理由をお聞かせください。未選択でも手続きできます。</p>
+                            </div>
+                        </div>
 
                         <form id="cancel-form">
-                            <div class="space-y-4 mb-6">
-                                <label
-                                    class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition">
-                                    <input type="radio" name="cancelReason" value="usage_frequency"
-                                        class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300">
-                                    <span class="ml-3 text-gray-700">利用頻度が減った</span>
+                            <div class="premium-cancel-reason-list">
+                                <label class="premium-cancel-reason-option">
+                                    <input type="radio" name="cancelReason" value="price">
+                                    <span>価格が高い</span>
                                 </label>
-
-                                <label
-                                    class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition">
-                                    <input type="radio" name="cancelReason" value="price"
-                                        class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300">
-                                    <span class="ml-3 text-gray-700">価格が見合わない</span>
+                                <label class="premium-cancel-reason-option">
+                                    <input type="radio" name="cancelReason" value="usability">
+                                    <span>機能が使いにくい</span>
                                 </label>
-
-                                <label
-                                    class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition">
-                                    <input type="radio" name="cancelReason" value="competitor"
-                                        class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300">
-                                    <span class="ml-3 text-gray-700">他社サービスに切り替える</span>
+                                <label class="premium-cancel-reason-option">
+                                    <input type="radio" name="cancelReason" value="usage_frequency">
+                                    <span>利用頻度が減った</span>
                                 </label>
-
-                                <label
-                                    class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition">
-                                    <input type="radio" name="cancelReason" value="other"
-                                        class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300">
-                                    <span class="ml-3 text-gray-700">その他</span>
+                                <label class="premium-cancel-reason-option">
+                                    <input type="radio" name="cancelReason" value="competitor">
+                                    <span>他社サービスへ移行</span>
                                 </label>
-
-                                <!-- Other Reason Text Area (Hidden by default) -->
-                                <div id="other-reason-container" class="hidden ml-8 mt-2">
-                                    <textarea id="otherReasonDetail" name="otherReasonDetail" rows="3"
-                                        class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition text-sm"
-                                        placeholder="具体的な理由をお聞かせください"></textarea>
-                                </div>
+                                <label class="premium-cancel-reason-option">
+                                    <input type="radio" name="cancelReason" value="other">
+                                    <span>その他</span>
+                                </label>
                             </div>
 
-                            <!-- Actions -->
-                            <div class="flex flex-col-reverse md:flex-row justify-center gap-4 mt-10">
-                                <a href="index.html"
-                                    class="flex-1 md:flex-initial text-center bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-bold py-4 px-8 rounded-full shadow-sm transition duration-200">
-                                    キャンセルして戻る
+                            <div id="other-reason-container" class="hidden mt-3">
+                                <textarea id="otherReasonDetail" name="otherReasonDetail" rows="3"
+                                    class="premium-cancel-textarea"
+                                    placeholder="具体的な理由をお聞かせください"></textarea>
+                            </div>
+
+                            <div class="premium-cancel-actions mt-8">
+                                <a href="premium_signup_new.html" class="premium-cancel-button premium-cancel-button--secondary">
+                                    <span class="material-icons text-base" aria-hidden="true">arrow_back</span>
+                                    プレミアムプラン画面へ戻る
                                 </a>
-                                <button type="button" id="cancel-button"
-                                    class="flex-1 md:flex-initial bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-12 rounded-full shadow-md transition duration-200">
-                                    解約する
+                                <button type="button" id="cancel-button" class="premium-cancel-button premium-cancel-button--danger">
+                                    自動更新の停止へ進む
+                                    <span class="material-icons text-base" aria-hidden="true">arrow_forward</span>
                                 </button>
                             </div>
                         </form>
-                    </div>
+                    </section>
                 </div>
             </main>
         </div>
 
-        <!-- Footer (Dynamic) -->
         <div id="footer-placeholder"></div>
     </div>
 
-    <!-- Cancel Confirmation Modal -->
     <div id="cancelConfirmationModal"
-        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden opacity-0 transition-opacity duration-300">
-        <div class="bg-white rounded-xl shadow-2xl p-8 max-w-sm w-full mx-4 transform scale-95 transition-transform duration-300"
+        class="fixed inset-0 bg-slate-900 bg-opacity-50 flex items-center justify-center z-50 hidden opacity-0 transition-opacity duration-300 p-4"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="cancelConfirmationTitle">
+        <div class="premium-cancel-modal-card transform scale-95 transition-transform duration-300"
             id="cancel-confirmation-content">
-            <div class="text-center mb-6">
-                <span class="material-icons text-red-500 text-5xl mb-2">warning_amber</span>
-                <h3 class="text-xl font-bold text-gray-900">本当に解約しますか？</h3>
+            <div class="flex items-start gap-4">
+                <span class="premium-cancel-modal-icon" aria-hidden="true">
+                    <span class="material-icons">warning_amber</span>
+                </span>
+                <div>
+                    <p class="premium-cancel-eyebrow">CONFIRM</p>
+                    <h3 id="cancelConfirmationTitle" class="m-0 text-xl font-black text-slate-900">自動更新を停止しますか？</h3>
+                    <p class="mt-3 text-sm leading-7 text-slate-600">
+                        次回の契約更新は行われません。現在の契約期間満了までは、そのままPremium機能をご利用いただけます。
+                    </p>
+                </div>
             </div>
 
-            <p class="text-gray-600 mb-8 text-center text-sm">
-                解約手続きを行うと、次回の契約更新は行われません。<br>
-                現在の契約期間満了までは、そのままプレミアム機能をご利用いただけます。<br>
-                自動更新を停止してもよろしいですか？
-            </p>
+            <div class="premium-account-notice premium-account-notice--warning mt-5">
+                <span class="material-icons" aria-hidden="true">event_available</span>
+                <p><strong>期限までは利用可能です。</strong> 期間終了後はStandardプランへ移行します。</p>
+            </div>
 
-            <div class="flex flex-col gap-3">
-                <button type="button" id="confirm-cancel-btn"
-                    class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg shadow transition duration-200">
+            <div class="mt-6 grid gap-3">
+                <button type="button" id="confirm-cancel-btn" class="premium-cancel-button premium-cancel-button--danger w-full">
                     自動更新を停止する
                 </button>
-                <button type="button" id="cancel-cancel-btn"
-                    class="w-full bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-bold py-3 rounded-lg shadow-sm transition duration-200">
-                    キャンセル（解約しない）
+                <button type="button" id="cancel-cancel-btn" class="premium-cancel-button premium-cancel-button--secondary w-full">
+                    キャンセル（停止しない）
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Scripts -->
     <script type="module" src="src/main.js"></script>
     <script src="premium_cancel.js"></script>
 </body>

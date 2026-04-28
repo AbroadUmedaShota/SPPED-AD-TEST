@@ -109,360 +109,203 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         };
 
+        const renderStatusMeta = (items) => items.map(item => `<span>${item}</span>`).join('');
+
+        const renderAccountActionCard = ({ href, id = '', icon, title, description, tone = '' }) => `
+            <a href="${href}" ${id ? `id="${id}"` : ''} class="premium-member-action-card ${tone}">
+                <div class="premium-member-action-card__icon">
+                    <span class="material-icons" aria-hidden="true">${icon}</span>
+                </div>
+                <div>
+                    <h3>${title}</h3>
+                    <p>${description}</p>
+                </div>
+                <span class="material-icons premium-member-action-card__arrow" aria-hidden="true">chevron_right</span>
+            </a>
+        `;
+
+        const renderAccountNotice = ({ tone, icon, title, description }) => `
+            <div class="premium-account-notice premium-account-notice--${tone}">
+                <span class="material-icons" aria-hidden="true">${icon}</span>
+                <p><strong>${title}</strong>${description}</p>
+            </div>
+        `;
+
+        const renderAccountSupportFooter = () => `
+            <div class="premium-account-support-footer">
+                <span class="material-icons" aria-hidden="true">support_agent</span>
+                <p>
+                    <strong>サポートが必要ですか？</strong>
+                    ご利用についてのご質問は、お問い合わせフォームまたはサポートセンターまでお寄せください。
+                </p>
+                <div>
+                    <a href="#" id="open-support-modal">お問い合わせ</a>
+                    <a href="https://support.speed-ad.com/help/" target="_blank" rel="noopener noreferrer">サポートセンター</a>
+                </div>
+            </div>
+        `;
+
+        const renderAccountDetailRows = (rows = []) => rows.length ? `
+            <dl class="premium-account-detail-list">
+                ${rows.map(row => `
+                    <div>
+                        <dt>${row.label}</dt>
+                        <dd>${row.value}</dd>
+                    </div>
+                `).join('')}
+            </dl>
+        ` : '';
+
+        const renderAccountHero = (target, config) => {
+            target.className = `premium-account-hero premium-account-hero--${config.tone} hero-section relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm`;
+            target.innerHTML = `
+                <div class="premium-account-card">
+                    <p class="premium-account-section-label">${config.sectionLabel}</p>
+                    <div class="premium-account-profile">
+                        <div class="premium-account-avatar premium-account-avatar--${config.tone}" aria-hidden="true">AT</div>
+                        <div class="premium-account-profile__body">
+                            <p class="premium-account-greeting">こんにちは</p>
+                            <h1>${config.userName} 様</h1>
+                            <div class="premium-account-meta">
+                                <span class="premium-account-badge premium-account-badge--${config.tone}">
+                                    <span class="material-icons" aria-hidden="true">${config.statusIcon}</span>
+                                    ${config.statusLabel}
+                                </span>
+                                ${renderStatusMeta(config.meta)}
+                            </div>
+                        </div>
+                    </div>
+                    ${renderAccountDetailRows(config.details)}
+                    <div class="premium-member-action-grid">
+                        ${config.actions.map(renderAccountActionCard).join('')}
+                    </div>
+                    ${config.notice ? renderAccountNotice(config.notice) : ''}
+                    ${renderAccountSupportFooter()}
+                </div>
+            `;
+        };
+
         // --- 1. Hero Section & Main Content Replacement (For Premium & Free Trial) ---
         if (currentScenarioConfig.is_premium_member) {
-            // Existing Premium Member (Active or Cancelled)
             const fileHeroSection = document.getElementById('premium-hero-section');
+            const today = new Date();
+            const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+            const dateStr = `${endOfMonth.getFullYear()}年${endOfMonth.getMonth() + 1}月${endOfMonth.getDate()}日`;
+            const userName = `${currentScenarioConfig.lastName} ${currentScenarioConfig.firstName}`;
+            const isCancelled = currentScenarioConfig.is_cancelled;
+
             if (fileHeroSection) {
-                fileHeroSection.className = 'premium-split-hero premium-account-hero hero-section relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm';
-                // Calculate Dynamic Date (End of Current Month)
-                const today = new Date();
-                const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-                const dateStr = `${endOfMonth.getFullYear()}年${endOfMonth.getMonth() + 1}月${endOfMonth.getDate()}日`;
-
-                // Status configuration based on cancellation state
-                let statusBadgeHtml = '';
-                let renewalLabel = '次回更新予定日';
-                let alertHtml = ''; // For cancelled state
-                let statusToneClass = 'premium-account-badge--active';
-                let planStateLabel = 'Premium機能を利用中';
-                let heroLead = '契約状況と請求書、プラン管理の導線をこの画面から確認できます。';
-
-                if (currentScenarioConfig.is_cancelled) {
-                    // Cancelled State
-                    statusToneClass = 'premium-account-badge--paused';
-                    planStateLabel = '自動更新停止中';
-                    heroLead = `${dateStr} まではPremium機能をご利用いただけます。継続する場合は自動更新を再開してください。`;
-                    statusBadgeHtml = `
-                        <span class="premium-account-badge ${statusToneClass}">
-                            <span class="material-icons" aria-hidden="true">event_busy</span>
-                            Status: Auto-Renewal Off
-                        </span>
-                    `;
-                    renewalLabel = '利用可能期限';
-                    alertHtml = `
-                        <div class="premium-account-alert">
-                            <p>
-                                <span class="material-icons" aria-hidden="true">warning</span>
-                                <span>
-                                    翌日以降はフリープランへ移行します。継続利用する場合は、下の「自動更新を再開する」から手続きしてください。
-                                </span>
-                            </p>
-                        </div>
-                    `;
-                } else {
-                    // Active State
-                    statusBadgeHtml = `
-                        <span class="premium-account-badge ${statusToneClass}">
-                            <span class="material-icons" aria-hidden="true">check_circle</span>
-                            Status: Active
-                        </span>
-                    `;
-                }
-
-                fileHeroSection.innerHTML = `
-                    <div class="premium-split-hero__layout relative z-10">
-                        <div class="premium-split-hero__copy">
-                            ${statusBadgeHtml}
-                            <h1 class="premium-split-hero__title">
-                                ${currentScenarioConfig.lastName} ${currentScenarioConfig.firstName} 様の<br>
-                                <span>Premium契約状況</span>
-                            </h1>
-                            <p class="premium-split-hero__lead">${heroLead}</p>
-                        </div>
-
-                        <aside class="premium-account-status-panel" aria-label="現在の契約状況">
-                            <p class="hero-price-meta">CURRENT PLAN</p>
-                            <h2>Premium Plan</h2>
-                            <div class="premium-account-plan-state">
-                                <span class="material-icons" aria-hidden="true">workspace_premium</span>
-                                <div>
-                                    <strong>${planStateLabel}</strong>
-                                    <small>保存・出力・多言語機能が有効です</small>
-                                </div>
-                            </div>
-                            <dl class="premium-hero-price-panel__conditions">
-                                <div>
-                                    <dt>${renewalLabel}</dt>
-                                    <dd>${dateStr}</dd>
-                                </div>
-                                <div>
-                                    <dt>月額利用料</dt>
-                                    <dd>¥10,000（税別）</dd>
-                                </div>
-                                <div>
-                                    <dt>支払い方法</dt>
-                                    <dd>請求書払い</dd>
-                                </div>
-                                <div>
-                                    <dt>請求タイミング</dt>
-                                    <dd>月末締め翌月末払い</dd>
-                                </div>
-                            </dl>
-                            ${alertHtml}
-                        </aside>
-
-                        <div class="premium-split-hero__details">
-                            <ul class="premium-hero-feature-list" aria-label="利用中のPremium機能">
-                                <li>
-                                    <span class="material-icons" aria-hidden="true">inventory_2</span>
-                                    <strong>最長1年保存</strong>
-                                    <span>契約期間中、回答データを長期保管</span>
-                                    <em>ACTIVE</em>
-                                </li>
-                                <li>
-                                    <span class="material-icons" aria-hidden="true">download</span>
-                                    <strong>CSV出力</strong>
-                                    <span>整理済みデータを共有しやすい形式で出力</span>
-                                    <em>ACTIVE</em>
-                                </li>
-                                <li>
-                                    <span class="material-icons" aria-hidden="true">alternate_email</span>
-                                    <strong>独自ドメイン送信</strong>
-                                    <span>送信元を自社ドメインで整えやすくします</span>
-                                    <em>ACTIVE</em>
-                                </li>
-                                <li>
-                                    <span class="material-icons" aria-hidden="true">language</span>
-                                    <strong>多言語対応</strong>
-                                    <span>作成画面・回答画面を多言語表示に対応</span>
-                                    <em>ACTIVE</em>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                `;
+                renderAccountHero(fileHeroSection, {
+                    tone: isCancelled ? 'paused' : 'active',
+                    sectionLabel: isCancelled ? '解約予約中' : '契約状況',
+                    userName,
+                    statusIcon: isCancelled ? 'pause_circle' : 'check_circle',
+                    statusLabel: isCancelled ? 'AUTO-RENEWAL OFF' : 'ACTIVE',
+                    meta: isCancelled
+                        ? [`利用可能期限: ${dateStr}`, '満了後: Standardへ移行']
+                        : ['現在のプラン: Premium', `次回更新日: ${dateStr}`],
+                    details: isCancelled ? [
+                        { label: '期限まで', value: 'Premium機能を引き続き利用できます' },
+                        { label: '期限後', value: 'Standardプランの利用条件へ移行します' },
+                        { label: '順次提供予定', value: 'ロゴ非表示 / Slack・SFA・CRM連携 / 独自ドメイン送信' },
+                    ] : [
+                        { label: '利用中の機能', value: '最長1年保存 / CSV出力 / 多言語対応' },
+                        { label: '順次提供予定', value: 'ロゴ非表示 / Slack・SFA・CRM連携 / 独自ドメイン送信' },
+                    ],
+                    actions: isCancelled ? [
+                        {
+                            href: 'invoiceList.html',
+                            icon: 'receipt_long',
+                            title: '請求書を確認する',
+                            description: '過去の請求書や支払い状況を確認できます。',
+                        },
+                        {
+                            href: '#',
+                            id: 'resume-subscription-button',
+                            icon: 'autorenew',
+                            title: '自動更新を再開する',
+                            description: '利用期限後も継続してPremium機能をご利用いただけます。',
+                            tone: 'premium-member-action-card--primary',
+                        },
+                    ] : [
+                        {
+                            href: 'invoiceList.html',
+                            icon: 'receipt_long',
+                            title: '請求書を確認する',
+                            description: '過去の請求書や支払い状況を確認できます。',
+                        },
+                        {
+                            href: 'premium_cancel.html',
+                            icon: 'cancel',
+                            title: 'プランを解約する',
+                            description: '自動更新を停止し、利用期限まで機能を使えます。',
+                            tone: 'premium-member-action-card--danger',
+                        },
+                    ],
+                    notice: isCancelled ? {
+                        tone: 'warning',
+                        icon: 'error_outline',
+                        title: `${dateStr}`,
+                        description: ' をもって自動更新が停止します。翌日以降はStandardプランへ移行し、保存期間やCSV出力などのPremium機能はご利用いただけなくなります。',
+                    } : null,
+                });
             }
 
-            // Main Content Replacement for Premium Member
             const fileMainContent = document.getElementById('premium-main-content');
             if (fileMainContent) {
-                // Determine Main Actions based on cancellation state
-                let mainActionsHtml = '';
-
-                if (currentScenarioConfig.is_cancelled) {
-                    mainActionsHtml = `
-                        <!-- Invoice Action -->
-                        <a href="invoiceList.html" class="premium-member-action-card">
-                            <div class="premium-member-action-card__icon">
-                                <span class="material-icons" aria-hidden="true">receipt_long</span>
-                            </div>
-                            <div>
-                                <h3>請求書を確認する</h3>
-                                <p>過去の請求書をダウンロード</p>
-                            </div>
-                            <span class="material-icons premium-member-action-card__arrow" aria-hidden="true">chevron_right</span>
-                        </a>
-
-                        <!-- Resume Subscription Action (Highlight) -->
-                         <a href="#" id="resume-subscription-button" class="premium-member-action-card premium-member-action-card--primary">
-                            <div class="premium-member-action-card__icon">
-                                <span class="material-icons" aria-hidden="true">autorenew</span>
-                            </div>
-                            <div>
-                                <h3>自動更新を再開する</h3>
-                                <p>解約をキャンセルし、プランを継続</p>
-                            </div>
-                            <span class="material-icons premium-member-action-card__arrow" aria-hidden="true">chevron_right</span>
-                        </a>
-                    `;
-                } else {
-                    mainActionsHtml = `
-                        <!-- Invoice Action -->
-                        <a href="invoiceList.html" class="premium-member-action-card">
-                            <div class="premium-member-action-card__icon">
-                                <span class="material-icons" aria-hidden="true">receipt_long</span>
-                            </div>
-                            <div>
-                                <h3>請求書を確認する</h3>
-                                <p>過去の請求書をダウンロード</p>
-                            </div>
-                            <span class="material-icons premium-member-action-card__arrow" aria-hidden="true">chevron_right</span>
-                        </a>
-
-                        <!-- Cancel Action -->
-                        <a href="premium_cancel.html" class="premium-member-action-card premium-member-action-card--danger">
-                            <div class="premium-member-action-card__icon">
-                                <span class="material-icons" aria-hidden="true">cancel</span>
-                            </div>
-                            <div>
-                                <h3>プランを解約する</h3>
-                                <p>解約のお手続きはこちら</p>
-                            </div>
-                            <span class="material-icons premium-member-action-card__arrow" aria-hidden="true">chevron_right</span>
-                        </a>
-                    `;
-                }
-
-                fileMainContent.classList.remove('-mt-8');
-                fileMainContent.classList.add('mt-8');
-                fileMainContent.innerHTML = `
-                    <!-- Quick Actions -->
-                    <div class="premium-member-action-grid">
-                        ${mainActionsHtml}
-                    </div>
-                    
-                    <!-- Support Section -->
-                    <div class="premium-member-support">
-                        <div>
-                            <p class="premium-member-support__label">SUPPORT</p>
-                            <h3>お困りですか？</h3>
-                            <p>ご不明な点や不具合がございましたら、サポートチームまでお問い合わせください。</p>
-                        </div>
-                        <a href="bug-report.html">
-                            <span class="material-icons" aria-hidden="true">support_agent</span>
-                            サポートへ問い合わせ
-                        </a>
-                    </div>
-                `;
-
+                fileMainContent.classList.add('hidden');
+                fileMainContent.innerHTML = '';
             }
 
         } else if (currentScenarioConfig.is_free_trial) {
-            // Free Trial User
             const fileHeroSection = document.getElementById('premium-hero-section');
+            const today = new Date();
+            const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+            const trialEndDateStr = `${endOfMonth.getFullYear()}年${endOfMonth.getMonth() + 1}月${endOfMonth.getDate()}日`;
+            const nextMonthFirst = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+            const billingStartDateStr = `${nextMonthFirst.getFullYear()}年${nextMonthFirst.getMonth() + 1}月${nextMonthFirst.getDate()}日`;
+
             if (fileHeroSection) {
-                fileHeroSection.className = 'premium-split-hero premium-account-hero hero-section relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm';
-                // Calculate Free Trial End Date (End of current month)
-                const today = new Date();
-                const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-                const trialEndDateStr = `${endOfMonth.getFullYear()}年${endOfMonth.getMonth() + 1}月${endOfMonth.getDate()}日`;
-
-                // Calculate First Billing Date (1st of next month)
-                const nextMonthFirst = new Date(today.getFullYear(), today.getMonth() + 1, 1);
-                const billingStartDateStr = `${nextMonthFirst.getFullYear()}年${nextMonthFirst.getMonth() + 1}月${nextMonthFirst.getDate()}日`;
-
-                fileHeroSection.innerHTML = `
-                    <div class="premium-split-hero__layout relative z-10">
-                        <div class="premium-split-hero__copy">
-                            <span class="premium-account-badge premium-account-badge--trial">
-                                <span class="material-icons" aria-hidden="true">hourglass_top</span>
-                                Status: Free Trial
-                            </span>
-                            <h1 class="premium-split-hero__title">
-                                ${currentScenarioConfig.lastName} ${currentScenarioConfig.firstName} 様の<br>
-                                <span>Premium無料トライアル</span>
-                            </h1>
-                            <p class="premium-split-hero__lead">
-                                ${trialEndDateStr} までPremium機能を無料でお試しいただけます。初回請求予定日と終了導線をこの画面から確認できます。
-                            </p>
-                        </div>
-
-                        <aside class="premium-account-status-panel premium-account-status-panel--trial" aria-label="現在のトライアル状況">
-                            <p class="hero-price-meta">CURRENT PLAN</p>
-                            <h2>Premium Trial</h2>
-                            <span class="premium-account-status-panel__flag">FREE</span>
-                            <div class="premium-account-plan-state premium-account-plan-state--trial">
-                                <span class="material-icons" aria-hidden="true">workspace_premium</span>
-                                <div>
-                                    <strong>無料トライアル中</strong>
-                                    <small>保存・出力・多言語機能をお試し利用できます</small>
-                                </div>
-                            </div>
-                            <dl class="premium-hero-price-panel__conditions">
-                                <div>
-                                    <dt>トライアル期限</dt>
-                                    <dd>${trialEndDateStr}</dd>
-                                </div>
-                                <div>
-                                    <dt>初回請求予定日</dt>
-                                    <dd>${billingStartDateStr}</dd>
-                                </div>
-                                <div>
-                                    <dt>月額利用料</dt>
-                                    <dd>¥10,000（税別）</dd>
-                                </div>
-                                <div>
-                                    <dt>支払い方法</dt>
-                                    <dd>請求書払い</dd>
-                                </div>
-                            </dl>
-                            <div class="premium-account-alert premium-account-alert--trial">
-                                <p>
-                                    <span class="material-icons" aria-hidden="true">info</span>
-                                    <span>期間中に終了すれば料金はかかりません。継続する場合は、初回請求予定日から月額利用料が発生します。</span>
-                                </p>
-                            </div>
-                        </aside>
-
-                        <div class="premium-split-hero__details">
-                            <ul class="premium-hero-feature-list" aria-label="無料トライアルで利用中のPremium機能">
-                                <li>
-                                    <span class="material-icons" aria-hidden="true">inventory_2</span>
-                                    <strong>最長1年保存</strong>
-                                    <span>トライアル中もPremium保存期間を確認できます</span>
-                                    <em>TRIAL</em>
-                                </li>
-                                <li>
-                                    <span class="material-icons" aria-hidden="true">download</span>
-                                    <strong>CSV出力</strong>
-                                    <span>整理済みデータを共有しやすい形式で出力</span>
-                                    <em>TRIAL</em>
-                                </li>
-                                <li>
-                                    <span class="material-icons" aria-hidden="true">alternate_email</span>
-                                    <strong>独自ドメイン送信</strong>
-                                    <span>送信元を自社ドメインで整えやすくします</span>
-                                    <em>TRIAL</em>
-                                </li>
-                                <li>
-                                    <span class="material-icons" aria-hidden="true">language</span>
-                                    <strong>多言語対応</strong>
-                                    <span>作成画面・回答画面を多言語表示に対応</span>
-                                    <em>TRIAL</em>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                `;
+                renderAccountHero(fileHeroSection, {
+                    tone: 'trial',
+                    sectionLabel: '無料トライアル中',
+                    userName: `${currentScenarioConfig.lastName} ${currentScenarioConfig.firstName}`,
+                    statusIcon: 'hourglass_top',
+                    statusLabel: 'FREE TRIAL',
+                    meta: [`トライアル終了: ${trialEndDateStr}`, `初回請求予定日: ${billingStartDateStr} ¥10,000（税別）`],
+                    details: [
+                        { label: '確認できる機能', value: '保存期間 / CSV出力 / 多言語対応' },
+                        { label: '終了後', value: `${billingStartDateStr}から月額¥10,000（税別）が請求されます` },
+                        { label: '順次提供予定', value: 'ロゴ非表示 / Slack・SFA・CRM連携 / 独自ドメイン送信' },
+                    ],
+                    actions: [
+                        {
+                            href: 'invoiceList.html',
+                            icon: 'receipt_long',
+                            title: '請求書を確認する（空状態）',
+                            description: 'トライアル中のため発行済み請求書はありません。',
+                        },
+                        {
+                            href: 'premium_cancel.html',
+                            icon: 'cancel',
+                            title: 'トライアルを終了する',
+                            description: '期限前に終了するとStandardプランへ戻ります。',
+                            tone: 'premium-member-action-card--danger',
+                        },
+                    ],
+                    notice: {
+                        tone: 'trial',
+                        icon: 'info',
+                        title: 'トライアル期間中',
+                        description: ` ${trialEndDateStr}まではPremium機能が無料でご利用いただけます。期限を迎えると、${billingStartDateStr}から月額¥10,000（税別）が自動的に請求されます。`,
+                    },
+                });
             }
 
-            // Main Content Replacement for Free Trial
             const fileMainContent = document.getElementById('premium-main-content');
             if (fileMainContent) {
-                fileMainContent.classList.remove('-mt-8');
-                fileMainContent.classList.add('mt-8');
-                fileMainContent.innerHTML = `
-                    <!-- Quick Actions -->
-                    <div class="premium-member-action-grid">
-                        <!-- Invoice Action (Likely empty for trial but keeps layout consistent) -->
-                        <a href="invoiceList.html" class="premium-member-action-card">
-                            <div class="premium-member-action-card__icon">
-                                <span class="material-icons" aria-hidden="true">receipt_long</span>
-                            </div>
-                            <div>
-                                <h3>請求書を確認する</h3>
-                                <p>現在は請求書はありません</p>
-                            </div>
-                            <span class="material-icons premium-member-action-card__arrow" aria-hidden="true">chevron_right</span>
-                        </a>
-
-                        <!-- Cancel Action -->
-                        <a href="premium_cancel.html" class="premium-member-action-card premium-member-action-card--danger">
-                            <div class="premium-member-action-card__icon">
-                                <span class="material-icons" aria-hidden="true">cancel</span>
-                            </div>
-                            <div>
-                                <h3>無料トライアルを終了する</h3>
-                                <p>終了のお手続きはこちら</p>
-                            </div>
-                            <span class="material-icons premium-member-action-card__arrow" aria-hidden="true">chevron_right</span>
-                        </a>
-                    </div>
-                    
-                    <!-- Support Section -->
-                    <div class="premium-member-support">
-                        <div>
-                            <p class="premium-member-support__label">SUPPORT</p>
-                            <h3>お困りですか？</h3>
-                            <p>ご不明な点や不具合がございましたら、サポートチームまでお問い合わせください。</p>
-                        </div>
-                        <a href="bug-report.html">
-                            <span class="material-icons" aria-hidden="true">support_agent</span>
-                            サポートへ問い合わせ
-                        </a>
-                    </div>
-                `;
+                fileMainContent.classList.add('hidden');
+                fileMainContent.innerHTML = '';
             }
 
         } else {
@@ -535,6 +378,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const bottomCtaTitle = bottomCtaSection.querySelector('h2');
                 const bottomCtaButton = bottomCtaSection.querySelector('[data-role="final-signup-cta"]');
                 const bottomCtaDescription = bottomCtaSection.querySelector('[data-role="final-cta-description"]');
+                const bottomCtaMeta = bottomCtaSection.querySelector('.meta-row');
 
                 if (currentScenarioConfig.is_rejoining_user) {
                     // 再加入者向けに変更
@@ -550,6 +394,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             <span class="material-icons icon" aria-hidden="true">arrow_forward</span>
                         `;
                     }
+                    if (bottomCtaMeta) {
+                        bottomCtaMeta.innerHTML = `
+                            <span><span class="material-icons icon" aria-hidden="true">check_circle</span>再加入できます</span>
+                            <span><span class="material-icons icon" aria-hidden="true">check_circle</span>当月分から課金</span>
+                            <span><span class="material-icons icon" aria-hidden="true">check_circle</span>請求書払い対応</span>
+                            <span><span class="material-icons icon" aria-hidden="true">check_circle</span>設定を引き継ぎ</span>
+                        `;
+                    }
                 } else {
                     // 新規ユーザー向け(デフォルト)
                     if (bottomCtaTitle) {
@@ -562,6 +414,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         bottomCtaButton.innerHTML = `
                             <span>今すぐ申し込む</span>
                             <span class="material-icons icon" aria-hidden="true">arrow_forward</span>
+                        `;
+                    }
+                    if (bottomCtaMeta) {
+                        bottomCtaMeta.innerHTML = `
+                            <span><span class="material-icons icon" aria-hidden="true">check_circle</span>初月無料（新規のみ）</span>
+                            <span><span class="material-icons icon" aria-hidden="true">check_circle</span>初期費用 0円</span>
+                            <span><span class="material-icons icon" aria-hidden="true">check_circle</span>請求書払い対応</span>
+                            <span><span class="material-icons icon" aria-hidden="true">check_circle</span>追加アカウント・従量課金あり</span>
                         `;
                     }
                 }
@@ -602,6 +462,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Update UI based on the current scenario
         updateUiForScenario(currentScenarioConfig);
+        document.documentElement.classList.remove('premium-state-pending');
     };
 
 
@@ -655,16 +516,16 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             {
                 icon: 'gesture',
-                title: '設問分岐・画像・手書き',
+                title: '高度な入力対応',
                 short: '高度な入力',
                 spec: 'ADVANCED',
-                description: '設問分岐、画像アップロード、手書き入力に対応します。展示会ブースで集めたい情報に合わせて、回答フォームを組み立てやすくします。',
-                scenario: '来場者の回答内容に応じて追加質問を出したい場合や、写真・手書き情報も残したい場合に使えます。',
+                description: '画像アップロード、手書き入力に対応します。展示会ブースで集めたい情報に合わせて、回答フォームを組み立てやすくします。',
+                scenario: '写真・手書き情報を残したい場合に使えます。',
                 mock: 'form',
                 specs: [
-                    ['設問分岐', '対応'],
                     ['画像', 'アップロード対応'],
                     ['手書き', '入力対応'],
+                    ['設問分岐', '開発中'],
                     ['設定', '設問単位で調整'],
                 ],
             },
@@ -684,33 +545,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 ],
             },
             {
-                icon: 'insert_chart',
-                title: 'グラフ化・CSV活用',
-                short: 'グラフ化・CSV活用',
-                spec: 'GRAPH / CSV',
-                description: '回答データを一覧化・グラフ化し、展示会後の傾向を視覚的に確認できます。Premiumではグラフ化ページのCSV出力を使い、社内共有や資料作成にも活用できます。',
-                scenario: '回答結果をグラフで把握し、CSVにして報告資料や営業共有へつなげたいときに使えます。',
+                icon: 'rate_review',
+                title: 'SPEEDレビュー・CSV活用',
+                short: 'レビュー・CSV',
+                spec: 'REVIEW / CSV',
+                description: '回答データをCSV出力し、社内共有や資料作成に活用できます。',
+                scenario: '回答結果をCSVにして報告資料や営業共有へつなげたいときに使えます。',
                 mock: 'review',
                 specs: [
-                    ['表示', '一覧・グラフ'],
                     ['出力', 'CSV対応'],
+                    ['SPEEDレビュー', '開発中'],
                     ['用途', '資料作成'],
                     ['対象', '回答データ'],
                 ],
             },
             {
                 icon: 'domain',
-                title: '独自ドメイン送信',
-                short: '独自ドメイン送信',
-                spec: 'DOMAIN',
-                description: 'お礼メールなどの送信元を、自社ドメインで整えられます。回答後の連絡を自社ブランドに合わせて見せやすくします。',
-                scenario: '展示会後のお礼メールや通知メールを、自社の送信元として整えたい場合に使えます。',
+                title: '対外表示・外部連携',
+                short: '対外表示・連携',
+                spec: 'BRAND / CONNECT',
+                description: '対外表示と後続ツール連携を整えやすくします。',
+                scenario: '対外表示や社内連携を整えたい場合に使えます。',
                 mock: 'mail',
                 specs: [
-                    ['送信元', '自社ドメイン'],
-                    ['用途', 'お礼メールなど'],
-                    ['設定', '申込後に確認'],
-                    ['目的', '対外表示の整理'],
+                    ['ロゴ非表示', '開発中'],
+                    ['Slack/SFA/CRM', '開発中'],
+                    ['独自ドメイン送信', '開発中'],
+                    ['設定', '提供開始後に案内'],
                 ],
             },
             {
@@ -748,8 +609,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="featC-mock-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="ttl">survey / preview</span></div>
                     <div class="featC-mock-body mock-form">
                         <div class="q"><div class="qlbl">Q1</div><div class="opt"><span class="radio on"></span>業種を選択</div></div>
-                        <div class="arrow">branch</div>
-                        <div class="q branch"><div class="qlbl">Q2</div><div class="opt"><span class="radio"></span>追加質問を表示</div></div>
+                        <div class="arrow">in development</div>
+                        <div class="q branch"><div class="qlbl">Q2</div><div class="opt"><span class="radio"></span>設問分岐 <span class="premium-coming-soon-badge">開発中</span></div></div>
                         <div class="q"><div class="qlbl">IMAGE</div><div class="opt"><span class="material-icons text-base" aria-hidden="true">image</span>画像を添付</div></div>
                         <div class="q"><div class="qlbl">HANDWRITE</div><div class="opt"><span class="material-icons text-base" aria-hidden="true">draw</span>手書き入力</div></div>
                     </div>
@@ -769,9 +630,9 @@ document.addEventListener('DOMContentLoaded', () => {
             `,
             review: `
                 <div class="featC-mock">
-                    <div class="featC-mock-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="ttl">graph / export</span></div>
+                    <div class="featC-mock-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="ttl">review / export</span></div>
                     <div class="featC-mock-body mock-review">
-                        <div class="pane chart"><div class="ph">GRAPH</div><div class="body">
+                        <div class="pane chart"><div class="ph">SPEED REVIEW</div><div class="body">
                             <div class="bar-row"><span>興味あり</span><i style="width: 82%;"></i><b>82</b></div>
                             <div class="bar-row"><span>資料希望</span><i style="width: 58%;"></i><b>58</b></div>
                             <div class="bar-row"><span>後日連絡</span><i style="width: 36%;"></i><b>36</b></div>
@@ -781,22 +642,21 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="row edited"><span class="k">出力形式</span><span class="v">CSV</span></div>
                             <div class="row"><span class="k">用途</span><span class="v">資料化</span></div>
                         </div></div>
-                        <div class="ftnote">graph page CSV export</div>
+                        <div class="ftnote">CSV export / 順次提供予定: SPEEDレビュー</div>
                     </div>
                 </div>
             `,
             mail: `
                 <div class="featC-mock">
-                    <div class="featC-mock-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="ttl">mail / preview</span></div>
+                    <div class="featC-mock-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="ttl">brand / connect</span></div>
                     <div class="featC-mock-body mock-mail">
                         <div class="head">
-                            <div class="row"><span class="k">From</span><span class="v">marketing@<span class="domain">your-company.co.jp</span></span></div>
-                            <div class="row"><span class="k">To</span><span class="v">visitor@example.com</span></div>
-                            <div class="row"><span class="k">Subject</span><span class="v">ご来場ありがとうございました</span></div>
+                            <div class="row"><span class="k">Status</span><span class="v">順次提供予定</span></div>
+                            <div class="row"><span class="k">Scope</span><span class="v">Logo / Domain / Slack・SFA・CRM</span></div>
                         </div>
                         <div class="body">
-                            <div class="greet">展示会へご来場いただきありがとうございました。</div>
-                            <div>回答内容に応じて、担当よりご連絡いたします。</div>
+                            <div class="greet">対外表示と後続連携を整える設定です。</div>
+                            <div>提供開始後、申込後の案内に沿って設定できます。</div>
                             <div class="sig">SPEED-AD Premium</div>
                         </div>
                     </div>
@@ -820,6 +680,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let featureSwitchTimer = null;
         let isFeatureRotationPaused = false;
         let hasManualFeatureSelection = false;
+        const featureAutoRotationEnabled = false;
         const featureRotationInterval = 5000;
         const featureTransitionDuration = 180;
 
@@ -830,7 +691,7 @@ document.addEventListener('DOMContentLoaded', () => {
             featureTabs.forEach((tab, tabIndex) => {
                 const isActive = tabIndex === index;
                 tab.classList.toggle('active', isActive);
-                tab.setAttribute('aria-selected', String(isActive));
+                tab.setAttribute('aria-pressed', String(isActive));
             });
             featurePanel.innerHTML = `
                 <div class="left">
@@ -845,7 +706,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>
                     <div class="specs">
-                        ${feature.specs.map(([key, value]) => `<div><div class="k">${key}</div><div class="v">${value}</div></div>`).join('')}
+                        ${feature.specs.map(([key, value]) => `<div><div class="k">${key}</div><div class="v">${value === '開発中' ? '<span class="premium-coming-soon-badge">開発中</span>' : value}</div></div>`).join('')}
                     </div>
                 </div>
                 <div class="right">
@@ -884,7 +745,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const startFeatureRotation = () => {
             stopFeatureRotation();
-            if (isFeatureRotationPaused || hasManualFeatureSelection || features.length < 2) return;
+            if (!featureAutoRotationEnabled || isFeatureRotationPaused || hasManualFeatureSelection || features.length < 2) return;
             featureRotationTimer = setInterval(() => {
                 renderFeature((activeFeatureIndex + 1) % features.length);
             }, featureRotationInterval);
@@ -915,7 +776,6 @@ document.addEventListener('DOMContentLoaded', () => {
             startFeatureRotation();
         });
         renderFeature(0, false);
-        startFeatureRotation();
     }
 
     // --- Contact Modal Logic ---
