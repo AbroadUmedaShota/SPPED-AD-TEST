@@ -37,6 +37,7 @@ export function initThankYouEmailSettings() {
     // Sidebar elements (New IDs)
     const couponCodeInput = document.getElementById('couponCode');
     const applyCouponBtn = document.getElementById('applyCouponBtn');
+    const removeCouponBtn = document.getElementById('removeCouponBtn');
 
     // --- State ---
     let state = {
@@ -121,9 +122,11 @@ export function initThankYouEmailSettings() {
             populateTemplates(state.emailTemplates);
             populateVariables(state.variables, handleVariableClick);
             setInitialFormValues(state.emailSettings);
+            if (couponCodeInput) couponCodeInput.value = state.emailSettings.couponCode || '';
             updateSendMethodCardSelection();
 
             setupEventListeners();
+            updateCouponSectionUI();
             
             // Apply initial scenario
             scenarioSelector.value = state.currentStatus;
@@ -153,6 +156,9 @@ export function initThankYouEmailSettings() {
         }
         if (applyCouponBtn) {
             applyCouponBtn.addEventListener('click', handleApplyCoupon);
+        }
+        if (removeCouponBtn) {
+            removeCouponBtn.addEventListener('click', removeAppliedCoupon);
         }
 
         const sendConfirmCancelBtn = document.getElementById('sendConfirmCancelBtn');
@@ -409,35 +415,50 @@ export function initThankYouEmailSettings() {
         const trimmedValue = couponCodeInput.value.trim();
         const appliedCoupon = state.appliedCoupon;
         const hasAppliedCoupon = Boolean(appliedCoupon);
+        const appliedCode = appliedCoupon?.code || '';
+        const isEditingAppliedCode = hasAppliedCoupon && (!trimmedValue || trimmedValue === appliedCode);
 
         let mode = 'apply';
-        if (hasAppliedCoupon) {
-            const appliedCode = appliedCoupon.code || '';
-            if (trimmedValue && trimmedValue !== appliedCode) {
-                mode = 'change';
-            } else {
-                mode = 'remove';
-            }
+        if (hasAppliedCoupon && trimmedValue && trimmedValue !== appliedCode) {
+            mode = 'change';
         }
 
         state.isCouponApplied = hasAppliedCoupon;
         state.couponButtonMode = mode;
 
-        const labels = { apply: '適用', change: '変更', remove: '削除' };
+        const labels = { apply: '適用', change: '変更' };
 
         couponCodeInput.disabled = state.isCouponProcessing;
 
         if (state.isCouponProcessing) {
             applyCouponBtn.classList.add('hidden');
+            removeCouponBtn?.classList.add('hidden');
             couponLoadingIndicator.classList.remove('hidden');
         } else {
-            applyCouponBtn.classList.remove('hidden');
+            applyCouponBtn.classList.toggle('hidden', isEditingAppliedCode);
+            removeCouponBtn?.classList.toggle('hidden', !hasAppliedCoupon);
             couponLoadingIndicator.classList.add('hidden');
             applyCouponBtn.textContent = labels[mode];
             
             applyCouponBtn.classList.remove('coupon-action-button--apply', 'coupon-action-button--change', 'coupon-action-button--remove');
             applyCouponBtn.classList.add(`coupon-action-button--${mode}`);
         }
+    }
+
+    function removeAppliedCoupon() {
+        if (!state.appliedCoupon) return;
+
+        state.appliedCoupon = null;
+        state.isCouponApplied = false;
+        state.emailSettings.couponCode = '';
+
+        const sharedCouponKey = 'sharedCoupon_' + (state.surveyId || 'temp');
+        localStorage.removeItem(sharedCouponKey);
+
+        couponCodeInput.value = '';
+        displayCouponResult({ success: true, message: 'クーポンを削除しました' });
+        updateCouponSectionUI();
+        updateCostFromState();
     }
 
     /**
@@ -448,19 +469,8 @@ export function initThankYouEmailSettings() {
 
         const currentMode = state.couponButtonMode;
 
-        if (currentMode === 'remove' && state.appliedCoupon) {
-            state.appliedCoupon = null;
-            state.isCouponApplied = false;
-            state.emailSettings.couponCode = '';
-            
-            // Sync to localStorage
-            const sharedCouponKey = 'sharedCoupon_' + (state.surveyId || 'temp');
-            localStorage.removeItem(sharedCouponKey);
-
-            couponCodeInput.value = '';
-            displayCouponResult({ success: true, message: 'クーポンを削除しました' });
-            updateCouponSectionUI();
-            updateCostFromState();
+        if (currentMode === 'remove') {
+            removeAppliedCoupon();
             return;
         }
 

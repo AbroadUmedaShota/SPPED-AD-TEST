@@ -2192,6 +2192,21 @@ n    border-color: var(--color-secondary);
 .input-with-trailing-actions .input-field {
     padding-right: 5.5rem;
 }
+
+.coupon-input-group .input-field {
+    padding-right: 10rem;
+}
+
+.coupon-field-actions {
+    gap: 0.375rem;
+    flex-wrap: nowrap;
+}
+
+.coupon-field-actions .coupon-action-button,
+.coupon-field-actions #couponLoadingIndicator {
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
 .field-trailing-actions {
     position: absolute;
     top: 50%;

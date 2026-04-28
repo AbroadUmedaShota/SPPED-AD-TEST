@@ -437,12 +437,15 @@
                                 </div>
                             </div>
                             <div class="rounded-2xl bg-surface-bright p-5 border border-outline-variant space-y-3">
-                                <div class="input-group">
-                                    <input type="text" id="couponCode" placeholder=" " class="input-field pr-20">
+                                <div class="input-group input-with-trailing-actions coupon-input-group">
+                                    <input type="text" id="couponCode" placeholder=" " class="input-field">
                                     <label for="couponCode" class="input-label">クーポンコード</label>
-                                    <button id="applyCouponBtn" type="button" class="coupon-action-button coupon-action-button--apply absolute right-2 top-1/2 -translate-y-1/2 rounded-md px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline-none">適用</button>
-                                    <div id="couponLoadingIndicator" class="hidden absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2">
-                                        <span class="material-icons animate-spin text-on-surface-variant">sync</span>
+                                    <div class="field-trailing-actions coupon-field-actions">
+                                        <button id="applyCouponBtn" type="button" class="coupon-action-button coupon-action-button--apply rounded-md px-3 py-1.5 text-xs font-bold shadow-sm focus-visible:outline-none">適用</button>
+                                        <button id="removeCouponBtn" type="button" class="coupon-action-button coupon-action-button--remove hidden rounded-md px-3 py-1.5 text-xs font-bold shadow-sm focus-visible:outline-none">削除</button>
+                                        <div id="couponLoadingIndicator" class="hidden px-3 py-1.5">
+                                            <span class="material-icons animate-spin text-on-surface-variant text-base">sync</span>
+                                        </div>
                                     </div>
                                     <p class="input-error-message" id="couponCodeErrorMessage"></p>
                                 </div>
