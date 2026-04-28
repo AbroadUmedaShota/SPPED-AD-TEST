@@ -408,7 +408,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         bottomCtaTitle.innerHTML = '展示会後の動きを、<em>もう止めない。</em>';
                     }
                     if (bottomCtaDescription) {
-                        bottomCtaDescription.textContent = '不安な点を確認したうえで、現在のアカウントから申込画面へ進めます。';
+                        bottomCtaDescription.textContent = '初月無料・解約はいつでも。リスクなく、Premiumの効果を確かめられます。';
                     }
                     if (bottomCtaButton) {
                         bottomCtaButton.innerHTML = `
