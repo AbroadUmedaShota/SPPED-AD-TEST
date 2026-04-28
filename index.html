@@ -1238,6 +1238,16 @@
     </div>
   </div>
     </div>
+    <div class="public-news-section" id="public-news-section" data-news-endpoint="data/news.json" data-news-detail-url="https://support.speed-ad.com/news/" hidden>
+      <article class="public-news-bar" aria-labelledby="public-news-title">
+        <div class="public-news-bar__heading">
+          <p class="public-news-bar__eyebrow">NEWS</p>
+          <h2 id="public-news-title">お知らせ</h2>
+        </div>
+        <div class="public-news-list" id="public-news-list" aria-live="polite"></div>
+        <a class="public-news-bar__link" href="https://support.speed-ad.com/news/" target="_blank" rel="noopener noreferrer">一覧を見る</a>
+      </article>
+    </div>
 <div class="section" id="section1">
       <article>
         <div class="flex row">
@@ -1510,6 +1520,8 @@
       const googleButtonModal = modalContent.querySelector('.button--google');
       const customerVoiceTeaserGrid = document.getElementById('customer-voice-teaser-grid');
       const customerVoiceTeaserStatus = document.getElementById('customer-voice-teaser-status');
+      const publicNewsSection = document.getElementById('public-news-section');
+      const publicNewsList = document.getElementById('public-news-list');
       const pageMain = document.querySelector('main');
       const modalFocusableSelector = [
         'a[href]',
@@ -1541,6 +1553,9 @@
         if (!relativePath) {
           return relativePath;
         }
+        if (/^(https?:)?\/\//.test(relativePath)) {
+          return relativePath;
+        }
         const { pathname } = window.location;
         let basePath = pathname;
         if (!basePath.endsWith('/')) {
@@ -1559,6 +1574,49 @@
           .replace(/>/g, '&gt;')
           .replace(/"/g, '&quot;')
           .replace(/'/g, '&#39;');
+      }
+      async function loadPublicNews() {
+        if (!publicNewsSection || !publicNewsList) {
+          return;
+        }
+        const newsEndpoint = publicNewsSection.dataset.newsEndpoint || 'data/news.json';
+        const fallbackNewsUrl = publicNewsSection.dataset.newsDetailUrl || 'https://support.speed-ad.com/news/';
+        try {
+          const response = await fetch(resolveAppPath(newsEndpoint));
+          if (!response.ok) {
+            throw new Error(`Failed to load public news: ${response.status}`);
+          }
+          const payload = await response.json();
+          const items = Array.isArray(payload?.items)
+            ? payload.items.filter((item) => item?.title).slice(0, 3)
+            : [];
+          if (!items.length) {
+            publicNewsSection.hidden = true;
+            return;
+          }
+          publicNewsList.innerHTML = items.map((item) => {
+            const displayDate = item.displayDate || item.date || item.publishedAt || '';
+            const dateTime = item.date || item.publishedAt || '';
+            const summary = item.summary ? `<p>${escapeHtml(item.summary)}</p>` : '';
+            const url = item.url || fallbackNewsUrl;
+            const timeMarkup = displayDate
+              ? `<time datetime="${escapeHtml(dateTime || displayDate)}">${escapeHtml(displayDate)}</time>`
+              : '';
+            return `
+              <a class="public-news-item" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">
+                ${timeMarkup}
+                <span class="public-news-item__body">
+                  <strong>${escapeHtml(item.title)}</strong>
+                  ${summary}
+                </span>
+              </a>
+            `;
+          }).join('');
+          publicNewsSection.hidden = false;
+        } catch (error) {
+          console.warn('お知らせの読み込みに失敗しました:', error);
+          publicNewsSection.hidden = true;
+        }
       }
       async function loadCustomerVoiceTeasers() {
         if (!customerVoiceTeaserGrid || !customerVoiceTeaserStatus) {
@@ -1979,6 +2037,7 @@
             }
         }
       });
+      loadPublicNews();
       loadCustomerVoiceTeasers();
       maybeOpenSignupFromIntent();
     });

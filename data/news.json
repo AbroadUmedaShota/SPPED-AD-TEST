@@ -1,0 +1,26 @@
+{
+  "updatedAt": "2026-04-28",
+  "items": [
+    {
+      "date": "2026-04-28",
+      "displayDate": "2026.04.28",
+      "title": "ログイン前ページのお知らせ欄を準備中です",
+      "summary": "本番では support.speed-ad.com 側の静的JSONを正本にし、ログイン前ページには最大3件を表示する想定です。",
+      "url": "https://support.speed-ad.com/news/login-front-news/"
+    },
+    {
+      "date": "2026-04-27",
+      "displayDate": "2026.04.27",
+      "title": "公開トップの導線整理を進めています",
+      "summary": "無料ではじめる、お客様のお声、サポート導線の役割を分け、初回訪問時に迷いにくい構成へ整えています。",
+      "url": "https://support.speed-ad.com/news/public-top-navigation/"
+    },
+    {
+      "date": "2026-04-24",
+      "displayDate": "2026.04.24",
+      "title": "モック画面と開発環境の差分整理を継続しています",
+      "summary": "本番アプリ、公開LP、静的サブドメインに分けて、回収対象と参考保持対象を確認しています。",
+      "url": "https://support.speed-ad.com/news/mock-screen-recovery/"
+    }
+  ]
+}
