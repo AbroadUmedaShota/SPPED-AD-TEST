@@ -37,6 +37,7 @@ function cacheDOMElements() {
     dom.freeTierApplied = document.getElementById('freeTierApplied');
     dom.billableCount = document.getElementById('billableCount');
     dom.estimatedAmount = document.getElementById('estimatedAmount');
+    dom.estimateBreakdown = document.getElementById('estimateBreakdown');
     dom.sendResultCountDisplay = document.getElementById('sendResultCountDisplay');
     dom.estimateSidebar = document.getElementById('estimateSidebar');
     dom.estimateSidebarOverlay = document.getElementById('estimateSidebarOverlay');
@@ -349,73 +350,94 @@ export function renderEstimate(estimate, status) {
     const amountEl = dom.estimatedAmount;
     const countDisplay = document.getElementById('recipientCountDisplay');
     const billableCountDisplay = document.getElementById('billableCountDisplay');
-    const estimateBreakdown = document.getElementById('estimateBreakdown');
+    const estimateBreakdown = dom.estimateBreakdown || document.getElementById('estimateBreakdown');
 
-    // 主表示は税込合計
     if (amountEl) {
-        amountEl.textContent = `¥${estimate.totalWithTax.toLocaleString()}`;
+        if (dom.amountAnimationId) {
+            cancelAnimationFrame(dom.amountAnimationId);
+        }
+
+        const oldAmountStr = amountEl.textContent.replace(/[^\d]/g, '');
+        const oldAmount = parseInt(oldAmountStr, 10) || 0;
+        const newAmount = estimate.totalWithTax;
+
+        if (oldAmount !== newAmount) {
+            const duration = 400;
+            const startTime = performance.now();
+
+            const animate = currentTime => {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easedProgress = 1 - Math.pow(1 - progress, 3);
+                const currentAmount = Math.floor(oldAmount + (newAmount - oldAmount) * easedProgress);
+
+                amountEl.textContent = `¥${currentAmount.toLocaleString()}`;
+
+                if (progress < 1) {
+                    dom.amountAnimationId = requestAnimationFrame(animate);
+                } else {
+                    amountEl.textContent = `¥${newAmount.toLocaleString()}`;
+                    amountEl.classList.remove('text-primary', 'scale-105');
+                    dom.amountAnimationId = null;
+                }
+            };
+
+            amountEl.classList.add('text-primary', 'scale-105', 'transition-transform');
+            dom.amountAnimationId = requestAnimationFrame(animate);
+        } else {
+            amountEl.textContent = `¥${newAmount.toLocaleString()}`;
+        }
     }
-    
+
     if (countDisplay) {
         countDisplay.textContent = `${estimate.activeCount.toLocaleString()} 名`;
     }
 
     if (billableCountDisplay) {
-        // 課金対象件数（送信数 - 無料枠100）
         const billable = Math.max(0, estimate.activeCount - 100);
         billableCountDisplay.textContent = `${billable.toLocaleString()} 通`;
     }
 
-    // 内訳の更新（より詳細に！）
     if (estimateBreakdown) {
-        let html = `
-            <div class="space-y-2 border-b border-outline-variant/30 pb-3 mb-3">
-                <div class="flex justify-between items-center">
-                    <span class="text-xs">お礼メール基本料金 (¥${estimate.unitPrice} × ${estimate.activeCount}名)</span>
-                    <span class="font-medium">¥${estimate.baseAmount.toLocaleString()}</span>
-                </div>
-                <div class="flex justify-between items-center text-success font-bold text-xs">
-                    <span class="flex items-center gap-1">
-                        <span class="material-icons text-[14px]">info</span>
-                        無料枠適用 (${estimate.freeAppliedCount.toLocaleString()}名分)
-                    </span>
-                    <span>- ¥${estimate.freeDiscount.toLocaleString()}</span>
-                </div>
-        `;
+        const billable = Math.max(0, estimate.activeCount - 100);
+        const breakdownLines = [
+            `お礼メール基本料金（${estimate.activeCount.toLocaleString()}名 × ${estimate.unitPrice.toLocaleString()}円）　¥${estimate.baseAmount.toLocaleString()}`,
+            `無料枠適用（${estimate.freeAppliedCount.toLocaleString()}名分）　- ¥${estimate.freeDiscount.toLocaleString()}`,
+            estimate.couponDiscount > 0 ? `クーポン値引き　- ¥${estimate.couponDiscount.toLocaleString()}` : ''
+        ].filter(Boolean).join('<br>');
 
-        // クーポンがある場合
-        if (estimate.couponDiscount > 0) {
-            html += `
-                <div class="flex justify-between items-center text-secondary font-bold text-xs">
-                    <span class="flex items-center gap-1">
-                        <span class="material-icons text-[14px]">confirmation_number</span>
-                        クーポン値引き
-                    </span>
-                    <span>- ¥${estimate.couponDiscount.toLocaleString()}</span>
+        const html = `
+            <div class="space-y-3 text-on-surface-variant">
+                <div class="flex items-center justify-between text-sm">
+                    <span class="text-on-surface-variant">無料枠</span>
+                    <span class="text-base font-semibold text-on-surface">${estimate.freeAppliedCount.toLocaleString()}名分 / 100名</span>
                 </div>
-            `;
-        }
-
-        html += `
-            </div>
-            <div class="space-y-1">
-                <div class="flex justify-between items-center text-xs">
-                    <span class="text-on-surface-variant">税抜合計 (小計)</span>
-                    <span class="font-bold">¥${estimate.subtotal.toLocaleString()}</span>
+                <div class="flex items-center justify-between text-sm">
+                    <span class="text-on-surface-variant">課金単価</span>
+                    <span class="text-base font-semibold text-on-surface">${billable.toLocaleString()}通 × ${estimate.unitPrice.toLocaleString()}円</span>
                 </div>
-                <div class="flex justify-between items-center text-xs">
-                    <span class="text-on-surface-variant font-medium">消費税 (10%)</span>
-                    <span class="font-medium">¥${estimate.tax.toLocaleString()}</span>
+                <div class="space-y-2">
+                    <div class="text-xs uppercase tracking-widest text-on-surface-variant">内訳</div>
+                    <div class="rounded-2xl border border-outline-variant bg-surface p-3 text-xs leading-relaxed">
+                        ${breakdownLines || '—'}
+                    </div>
                 </div>
-                <div class="flex justify-between items-center pt-2 mt-1 border-t border-dashed border-outline-variant text-on-surface">
-                    <span class="text-sm font-black">税込合計金額</span>
-                    <span class="text-lg font-black tracking-tight">¥${estimate.totalWithTax.toLocaleString()}</span>
+                <div class="space-y-1">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-on-surface-variant">税抜合計（小計）</span>
+                        <span class="font-bold text-on-surface">¥${estimate.subtotal.toLocaleString()}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-on-surface-variant font-medium">消費税（10%）</span>
+                        <span class="font-medium text-on-surface">¥${estimate.tax.toLocaleString()}</span>
+                    </div>
                 </div>
+                <div class="text-sm font-semibold text-on-surface">＝ ご請求見込み金額 ¥${estimate.totalWithTax.toLocaleString()}（税込）</div>
             </div>
         `;
 
         estimateBreakdown.innerHTML = html;
-        estimateBreakdown.className = "p-4 rounded-2xl bg-surface-container-low/50 border border-outline-variant/20 space-y-1";
+        estimateBreakdown.className = 'text-sm leading-relaxed text-on-surface-variant';
     }
 }
 
@@ -423,30 +445,21 @@ export function renderEstimate(estimate, status) {
  * クーポン検証結果をUIに反映します。
  */
 export function displayCouponResult(result) {
-    const feedbackEl = document.getElementById('couponFeedback');
-    const messageEl = document.getElementById('couponMessage');
     const errorEl = document.getElementById('couponCodeErrorMessage');
+    const errorTextEl = document.getElementById('couponCodeErrorText');
     const couponCodeInput = document.getElementById('couponCode');
 
-    if (!feedbackEl) return;
-
-    feedbackEl.classList.remove('hidden', 'bg-success-container', 'text-on-success-container', 'bg-error-container', 'text-on-error-container');
-    if (errorEl) errorEl.textContent = '';
-    if (messageEl) messageEl.textContent = '';
+    if (errorEl) errorEl.classList.add('hidden');
+    if (errorTextEl) errorTextEl.textContent = '';
 
     if (result.success) {
-        feedbackEl.classList.add('hidden'); // 成功時はメッセージエリアで出す
-        if (messageEl) {
-            messageEl.textContent = result.message;
-            messageEl.className = 'text-sm text-secondary font-bold animate-pulse';
-        }
         if (couponCodeInput) {
             couponCodeInput.classList.remove('border-error');
-            couponCodeInput.classList.add('border-secondary');
         }
     } else {
-        if (errorEl) {
-            errorEl.textContent = result.message;
+        if (errorEl && errorTextEl) {
+            errorTextEl.textContent = result.message;
+            errorEl.classList.remove('hidden');
         }
         if (couponCodeInput) {
             couponCodeInput.classList.add('border-error');

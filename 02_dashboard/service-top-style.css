@@ -377,7 +377,7 @@ body.dark-mode .invoice-plan-badge--premium {
     pointer-events: auto;
 }
 
-@media (max-width: 1279.98px) {
+@media (min-width: 1280px) {
     .estimate-sidebar-overlay {
         display: none;
     }
@@ -385,6 +385,63 @@ body.dark-mode .invoice-plan-badge--premium {
 
 #estimateSidebar {
     z-index: 40;
+}
+
+.estimate-drawer-toggle {
+    display: none;
+}
+
+@media (max-width: 1279.98px) {
+    body.estimate-drawer-open {
+        overflow: hidden;
+    }
+
+    .estimate-drawer {
+        position: fixed !important;
+        top: 5.5rem !important;
+        right: 0 !important;
+        width: min(92vw, 26rem) !important;
+        max-height: calc(100vh - 6.5rem) !important;
+        transform: translateX(calc(100% - 3rem));
+        transition: transform 0.3s ease;
+        z-index: 45;
+    }
+
+    .estimate-drawer.is-open {
+        transform: translateX(0);
+    }
+
+    .estimate-drawer-card {
+        max-height: calc(100vh - 6.5rem) !important;
+        border-top-right-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+        box-shadow: 0 18px 45px rgba(15, 23, 42, 0.22);
+    }
+
+    .estimate-drawer-toggle {
+        position: absolute;
+        left: -2.75rem;
+        top: 1.75rem;
+        display: flex;
+        width: 2.75rem;
+        height: 3.25rem;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(148, 163, 184, 0.42);
+        border-right: 0;
+        border-radius: 9999px 0 0 9999px;
+        background: var(--color-base-card);
+        color: var(--color-primary);
+        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.18);
+        transition: background-color 0.2s ease, color 0.2s ease;
+        z-index: 46;
+    }
+
+    .estimate-drawer-toggle:hover,
+    .estimate-drawer-toggle:focus-visible {
+        background-color: var(--color-base-hover);
+        outline: none;
+    }
 }
 
 .button-primary:hover {

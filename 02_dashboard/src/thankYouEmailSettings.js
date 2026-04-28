@@ -21,6 +21,7 @@ import {
 import { showConfirmationModal } from './confirmationModal.js';
 import { showToast } from './utils.js';
 import { insertTextAtCursor } from './utils.js';
+import { initEstimateSidebarDrawer } from './ui/estimateSidebarDrawer.js';
 
 export function initThankYouEmailSettings() {
     // --- DOM Elements ---
@@ -38,6 +39,10 @@ export function initThankYouEmailSettings() {
     const couponCodeInput = document.getElementById('couponCode');
     const applyCouponBtn = document.getElementById('applyCouponBtn');
     const removeCouponBtn = document.getElementById('removeCouponBtn');
+    const billingNotesModal = document.getElementById('billingNotesModal');
+    const openBillingNotesModalBtn = document.getElementById('openBillingNotesModalBtn');
+    const closeBillingNotesModalBtn = document.getElementById('closeBillingNotesModalBtn');
+    const closeBillingNotesModalActionBtn = document.getElementById('closeBillingNotesModalActionBtn');
 
     // --- State ---
     let state = {
@@ -55,7 +60,6 @@ export function initThankYouEmailSettings() {
         },
         appliedCoupon: null,
         isCouponApplied: false,
-        couponButtonMode: 'apply',
         isCouponProcessing: false
     };
 
@@ -126,6 +130,7 @@ export function initThankYouEmailSettings() {
             updateSendMethodCardSelection();
 
             setupEventListeners();
+            initEstimateSidebarDrawer();
             updateCouponSectionUI();
             
             // Apply initial scenario
@@ -159,6 +164,15 @@ export function initThankYouEmailSettings() {
         }
         if (removeCouponBtn) {
             removeCouponBtn.addEventListener('click', removeAppliedCoupon);
+        }
+        if (openBillingNotesModalBtn) {
+            openBillingNotesModalBtn.addEventListener('click', () => billingNotesModal?.showModal());
+        }
+        if (closeBillingNotesModalBtn) {
+            closeBillingNotesModalBtn.addEventListener('click', () => billingNotesModal?.close());
+        }
+        if (closeBillingNotesModalActionBtn) {
+            closeBillingNotesModalActionBtn.addEventListener('click', () => billingNotesModal?.close());
         }
 
         const sendConfirmCancelBtn = document.getElementById('sendConfirmCancelBtn');
@@ -409,39 +423,29 @@ export function initThankYouEmailSettings() {
      * クーポン適用セクションのUIを更新します。
      */
     function updateCouponSectionUI() {
+        const inputContainer = document.getElementById('couponInputContainer');
+        const appliedContainer = document.getElementById('couponAppliedContainer');
+        const codeDisplay = document.getElementById('appliedCouponCodeDisplay');
         const couponLoadingIndicator = document.getElementById('couponLoadingIndicator');
-        if (!couponCodeInput || !applyCouponBtn || !couponLoadingIndicator) return;
+        if (!couponCodeInput || !applyCouponBtn || !couponLoadingIndicator || !inputContainer || !appliedContainer) return;
 
-        const trimmedValue = couponCodeInput.value.trim();
-        const appliedCoupon = state.appliedCoupon;
-        const hasAppliedCoupon = Boolean(appliedCoupon);
-        const appliedCode = appliedCoupon?.code || '';
-        const isEditingAppliedCode = hasAppliedCoupon && (!trimmedValue || trimmedValue === appliedCode);
-
-        let mode = 'apply';
-        if (hasAppliedCoupon && trimmedValue && trimmedValue !== appliedCode) {
-            mode = 'change';
-        }
-
+        const hasAppliedCoupon = Boolean(state.appliedCoupon);
         state.isCouponApplied = hasAppliedCoupon;
-        state.couponButtonMode = mode;
-
-        const labels = { apply: '適用', change: '変更' };
 
         couponCodeInput.disabled = state.isCouponProcessing;
 
+        inputContainer.classList.toggle('hidden', hasAppliedCoupon);
+        appliedContainer.classList.toggle('hidden', !hasAppliedCoupon);
+        if (codeDisplay) {
+            codeDisplay.textContent = state.appliedCoupon?.code || '';
+        }
+
         if (state.isCouponProcessing) {
             applyCouponBtn.classList.add('hidden');
-            removeCouponBtn?.classList.add('hidden');
             couponLoadingIndicator.classList.remove('hidden');
         } else {
-            applyCouponBtn.classList.toggle('hidden', isEditingAppliedCode);
-            removeCouponBtn?.classList.toggle('hidden', !hasAppliedCoupon);
+            applyCouponBtn.classList.remove('hidden');
             couponLoadingIndicator.classList.add('hidden');
-            applyCouponBtn.textContent = labels[mode];
-            
-            applyCouponBtn.classList.remove('coupon-action-button--apply', 'coupon-action-button--change', 'coupon-action-button--remove');
-            applyCouponBtn.classList.add(`coupon-action-button--${mode}`);
         }
     }
 
@@ -467,13 +471,6 @@ export function initThankYouEmailSettings() {
     async function handleApplyCoupon() {
         if (state.isCouponProcessing) return;
 
-        const currentMode = state.couponButtonMode;
-
-        if (currentMode === 'remove') {
-            removeAppliedCoupon();
-            return;
-        }
-
         const code = couponCodeInput.value.trim();
         if (!code) {
             displayCouponResult({ success: false, message: 'クーポンコードを入力してください。' });
@@ -489,6 +486,7 @@ export function initThankYouEmailSettings() {
             if (result.success) {
                 state.appliedCoupon = { ...result, code };
                 state.emailSettings.couponCode = code;
+                couponCodeInput.value = '';
                 
                 // Sync to localStorage
                 const sharedCouponKey = 'sharedCoupon_' + (state.surveyId || 'temp');

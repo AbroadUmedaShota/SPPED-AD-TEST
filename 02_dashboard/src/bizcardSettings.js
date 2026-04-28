@@ -23,6 +23,7 @@ import {
     normalizePlanValue,
     normalizePremiumOptions
 } from './services/bizcardPlans.js';
+import { initEstimateSidebarDrawer } from './ui/estimateSidebarDrawer.js';
 
 export function initBizcardSettings() {
     // --- DOM Element Cache ---
@@ -156,6 +157,7 @@ export function initBizcardSettings() {
             }
 
             setupEventListeners();
+            initEstimateSidebarDrawer();
             updateFullUI();
 
         } catch (error) {

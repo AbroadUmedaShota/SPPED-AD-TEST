@@ -117,8 +117,8 @@ last_reviewed: 2026-04-24
     └── <main id="main-content">
         ├── #breadcrumb-container                       … パンくず注入（§2）
         ├── <h1 id="pageTitle">                         … 「アンケート『[名]』の名刺データ化設定」
-        └── <div class="flex lg:flex-row gap-8 ...">    … 2 カラムコンテナ
-            ├── 左カラム (lg:w-[65%])
+        └── <div class="flex xl:flex-row gap-8 ...">    … 2 カラムコンテナ
+            ├── 左カラム (xl:w-[65%])
             │   ├── アンケート基本情報カード              … 名前 / ID / 会期（renderSurveyInfo）
             │   └── <section id="bizcardSettingsFields">
             │       ├── #skipBizcardToggleContainer     … 有効/無効切替 (#skipBizcardToggle)
@@ -136,8 +136,8 @@ last_reviewed: 2026-04-24
             │               ├── #toggleMemoSection (折り畳みボタン)
             │               └── #memoSection (default .hidden)
             │                   └── #internalMemo (textarea)
-            └── 右カラム (lg:w-[35%] lg:sticky lg:top-24)
-                └── 料金見積もりサマリーカード
+            └── 右カラム (xl:w-[35%] xl:sticky xl:top-24)
+                └── 料金見積もりカード（見出しは「料金見積もり」に統一、狭幅時は右端タブで開閉）
                     ├── #rightColumnDisabledOverlay     … スキップ時 .absolute で全面を覆う
                     ├── #estimatedAmount                … ¥0 初期表示、400ms カウントアップ
                     ├── #estimatedCompletionDate        … 起算日 + 納期で算出
@@ -157,8 +157,8 @@ last_reviewed: 2026-04-24
 
 ### 4.2 2 カラム構成とレスポンシブ
 
-- モバイル・タブレット（`<lg`）: 左右を縦積み。右カラムも sticky ではなく通常フローに入る。
-- `lg` 以上（1024px 超）: 左 65% / 右 35%、右カラム `sticky top-24` で `max-h-[calc(100vh-8rem)]` の範囲内にとどまる。
+- `xl` 未満: 左カラムは全幅表示。`#estimateSidebar` を右端ドロワーとして扱い、`#estimateSidebarToggleBtn` と `#estimateSidebarOverlay` で料金見積もりを開閉できる。格納済みの見積もり領域分の余白は残さない。
+- `xl` 以上（1280px 以上）: 左 65% / 右 35%、右カラム `sticky top-24` で `max-h-[calc(100vh-8rem)]` の範囲内にとどまる。
 - カラム内カードは `rounded-2xl` / `rounded-3xl` + `border-outline-variant/60` + `shadow-sm` で統一。
 
 ### 4.3 左カラム（STEP1 / STEP2 / STEP3）

@@ -37,6 +37,7 @@ import { showConfirmationModal } from './confirmationModal.js';
 
 import { showToast, copyTextToClipboard, loadCommonHtml, resolveDashboardAssetPath } from './utils.js';
 import { initHelpPopovers } from './ui/helpPopover.js';
+import { initEstimateSidebarDrawer } from './ui/estimateSidebarDrawer.js';
 
 function showTutorialResumeBanner() {
     if (document.getElementById('tutorialResumeBanner')) {
@@ -460,6 +461,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     initHelpPopovers(document);
+    initEstimateSidebarDrawer();
 
 
 
