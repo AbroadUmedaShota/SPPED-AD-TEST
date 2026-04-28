@@ -2,7 +2,7 @@
 owner: product
 status: draft
 document_type: 方針メモ（ADRではなくPRD前段の備忘仕様）
-last_reviewed: 2026-04-23
+last_reviewed: 2026-04-28
 review_cycle: quarterly
 ---
 
@@ -95,6 +95,8 @@ review_cycle: quarterly
 | 特定商取引法表示 | `02_dashboard/specified-commercial-transactions.html` | `https://support.speed-ad.com/tokushoho/` |
 | 個人情報保護方針 | `02_dashboard/personal-data-protection-policy.html` | `https://support.speed-ad.com/privacy/` |
 | 更新履歴 | `02_dashboard/changelog.html`（実在する場合） | `https://support.speed-ad.com/changelog/` |
+| お知らせ一覧/詳細 | 新規（ログイン前トップのティザーから接続） | `https://support.speed-ad.com/news/`, `https://support.speed-ad.com/news/<slug>/` |
+| お知らせJSON | 新規（ログイン前トップの最大3件表示で参照） | `https://support.speed-ad.com/news.json` |
 | ログイン前画面 | `index.html`（ルート） | **据え置き**（変更なし） |
 
 ---
@@ -417,6 +419,7 @@ SPPED-AD-TEST/
 | 11 | URL正規化ルール（www有無／末尾スラッシュ／クエリ保持） | M1 | 開発リード |
 | 12 | HSTS preload 採用可否 | M3前 | 開発リード＋セキュリティ |
 | 13 | 個人情報インシデント対応プレイブック | M3前 | 個人情報保護責任者＋セキュリティ |
+| 14 | `/news/` と `news.json` の運用方式（CORS取得／ビルド同梱、キャッシュ、公開フロー） | M1 | PO＋開発リード |
 
 ---
 
