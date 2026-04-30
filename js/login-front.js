@@ -183,27 +183,50 @@
           : [];
         customerVoiceTeaserStatus.textContent = voices.length ? `${voices.length}件の公開事例` : '公開準備中';
         if (!voices.length) {
-          customerVoiceTeaserGrid.innerHTML = '<p class="voice-teaser__empty">公開準備中です。詳細ページは後日追加されます。</p>';
+          customerVoiceTeaserGrid.setAttribute('aria-busy', 'false');
+          customerVoiceTeaserGrid.innerHTML = '<p class="voice-teaser__empty">事例は順次公開予定です。一覧ページからもご確認いただけます。</p>';
           return;
         }
+        customerVoiceTeaserGrid.setAttribute('aria-busy', 'false');
         customerVoiceTeaserGrid.innerHTML = voices.map((voice) => {
-          const quoteText = voice.quote?.text || voice.listingSummary || '';
-          const author = voice.publicQuoteAuthor || voice.quote?.author || voice.label || '';
-          const authorParts = author.split(/\s+/);
-          const authorName = authorParts[0] || author;
-          const authorRole = authorParts.slice(1).join(' ');
+          const heroImage = resolveAppPath(voice.heroImage || 'img/top-kv.jpg');
+          const orgType = voice.organizationType || voice.label || '';
+          const title = voice.voicePageHeadline || voice.voicePageLabel || voice.label || '';
+          const quoteText = voice.teaserQuote || (voice.quote?.text ? voice.quote.text.slice(0, 100) + (voice.quote.text.length > 100 ? '…' : '') : '') || voice.listingSummary || '';
+          const author = voice.publicQuoteAuthor || voice.quote?.author || '';
+          const descriptor = voice.organizationDescriptor || '';
+          const detailUrl = `customer-voices/${voice.slug || ''}.html`;
+          const accent = voice.accent || '#f3e2c1';
+          const accentStrong = voice.accentStrong || accent;
+          const features = Array.isArray(voice.teaserTags) ? voice.teaserTags.slice(0, 4) : (Array.isArray(voice.usedFeatures) ? voice.usedFeatures.slice(0, 4) : []);
+          const altText = title ? title + 'のイメージ' : '公開事例の写真';
+          const featureChips = features.length
+            ? `<ul class="voice-teaser-card__chips" aria-label="活用した機能">${features.map((f) => `<li>${escapeHtml(f)}</li>`).join('')}</ul>`
+            : '';
+          const styleAttr = `style="--voice-accent: ${escapeHtml(accent)}; --voice-accent-strong: ${escapeHtml(accentStrong)};"`;
           return `
-            <article class="voice-teaser-card">
-              <blockquote class="voice-teaser-card__quote">${escapeHtml(quoteText)}</blockquote>
-              <p class="voice-teaser-card__author">${escapeHtml(authorName)}</p>
-              ${authorRole ? `<p class="voice-teaser-card__role">${escapeHtml(authorRole)}</p>` : ''}
-            </article>
+            <a class="voice-teaser-card" href="${escapeHtml(detailUrl)}" ${styleAttr} aria-label="${escapeHtml(title + ' の事例を読む')}">
+              <span class="voice-teaser-card__stripe" aria-hidden="true"></span>
+              <div class="voice-teaser-card__media">
+                <img src="${escapeHtml(heroImage)}" alt="${escapeHtml(altText)}" loading="lazy">
+              </div>
+              <div class="voice-teaser-card__body">
+                ${orgType ? `<span class="voice-teaser-card__pill">${escapeHtml(orgType)}</span>` : ''}
+                ${title ? `<h3 class="voice-teaser-card__title">${escapeHtml(title)}</h3>` : ''}
+                <blockquote class="voice-teaser-card__quote">${escapeHtml(quoteText)}</blockquote>
+                ${featureChips}
+                ${descriptor ? `<p class="voice-teaser-card__descriptor">${escapeHtml(descriptor)}</p>` : ''}
+                ${author ? `<p class="voice-teaser-card__author">${escapeHtml(author)}</p>` : ''}
+                <span class="voice-teaser-card__more" aria-hidden="true">詳細を見る <span aria-hidden="true">→</span></span>
+              </div>
+            </a>
           `;
         }).join('');
       } catch (error) {
         console.warn('お客様のお声の読み込みに失敗しました:', error);
         customerVoiceTeaserStatus.textContent = '読み込み失敗';
-        customerVoiceTeaserGrid.innerHTML = '<p class="voice-teaser__empty">公開事例を読み込めませんでした。時間をおいて再度お試しください。</p>';
+        customerVoiceTeaserGrid.setAttribute('aria-busy', 'false');
+        customerVoiceTeaserGrid.innerHTML = '<p class="voice-teaser__empty">公開事例を表示できません。<a class="voice-teaser__inline-link" href="customer-voices/index.html">一覧ページから事例を見る</a></p>';
       }
     }
 

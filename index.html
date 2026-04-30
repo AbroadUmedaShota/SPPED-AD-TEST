@@ -24,18 +24,25 @@
         <div class="hero__copy">
           <h1 id="hero-title">SPEED<br>AD</h1>
           <p class="hero__statement">展示会の出会いを、<br>確かな成果へ。</p>
+          <p class="hero__statement-note">※キャッチコピー募集中</p>
           <p class="hero__lead">
             QRアンケート・名刺データ化・御礼メールで<br>展示会後の追客業務を、もっとスマートに。
           </p>
           <div class="hero__actions" aria-label="主要導線">
-            <a class="cta-button cta-button--primary" href="?intent=signup#top" data-signup-trigger>無料ではじめる <span aria-hidden="true">→</span></a>
+            <a class="cta-button cta-button--primary" href="?intent=signup#top" data-signup-trigger>
+              <span class="cta-button__text">
+                <span class="cta-button__label">無料ではじめる</span>
+                <span class="cta-button__sub">新規アカウント登録はこちら</span>
+              </span>
+              <span class="cta-button__arrow" aria-hidden="true">→</span>
+            </a>
             <a class="text-link text-link--light" href="customer-voices/index.html">お客様のお声を見る <span aria-hidden="true">→</span></a>
           </div>
         </div>
 
         <aside id="input-box" class="form-container login-panel" aria-labelledby="login-title">
-          <p class="login-panel__eyebrow">既存ユーザーの方</p>
-          <h2 id="login-title" class="form-container__title">すでにアカウントをお持ちの方はこちらから</h2>
+          <p class="login-panel__eyebrow">LOGIN</p>
+          <h2 id="login-title" class="form-container__title">ログイン</h2>
           <form id="login-form" novalidate>
             <div class="form-group">
               <label for="email" class="form-group__label">メールアドレス</label>
@@ -59,18 +66,19 @@
             <div class="form-check">
               <label class="form-check__label">
                 <input type="checkbox" id="login-terms-agree" name="login-terms-agree" class="form-options__checkbox-input" required aria-required="true" checked>
-                <span><a href="02_dashboard/terms-of-service.html" target="_blank" rel="noopener noreferrer">利用規約</a>と<a href="https://www.abroad-o.com/rule.html" target="_blank" rel="noopener noreferrer">プライバシーポリシー</a>および<a href="02_dashboard/personal-data-protection-policy.html" target="_blank" rel="noopener noreferrer">個人情報保護方針</a>に同意する</span>
+                <span><a href="02_dashboard/terms-of-service.html" target="_blank" rel="noopener noreferrer">利用規約</a>と<a href="https://www.abroad-o.com/rule.html" target="_blank" rel="noopener noreferrer">プライバシーポリシー <span aria-hidden="true">↗</span></a>および<a href="02_dashboard/personal-data-protection-policy.html" target="_blank" rel="noopener noreferrer">個人情報保護方針</a>に同意する</span>
               </label>
               <div id="login-terms-agree-error" class="form-group__error-message" role="alert"></div>
             </div>
-            <div class="form-row">
-              <label class="form-row__remember">
-                <input type="checkbox" id="remember-account" name="remember" class="form-options__checkbox-input" aria-label="アカウントを記憶する">
-                <span>アカウント記憶</span>
+            <div class="form-toggle">
+              <label class="form-toggle__label">
+                <input type="checkbox" id="remember-account" name="remember" class="form-toggle__input">
+                <span class="form-toggle__track" aria-hidden="true"><span class="form-toggle__thumb"></span></span>
+                <span class="form-toggle__text">ログイン状態を保持する</span>
               </label>
-              <a href="02_dashboard/forgot-password.html">パスワードを忘れた方</a>
             </div>
             <button class="button button--filled" type="submit"><span class="button__spinner" aria-hidden="true"></span>ログイン <span aria-hidden="true">→</span></button>
+            <a class="login-panel__forgot" href="02_dashboard/forgot-password.html">パスワードを忘れた方</a>
           </form>
           <div class="divider" role="separator" aria-label="または">
             <span class="divider__text">または</span>
@@ -98,7 +106,7 @@
           <h2 id="public-news-title" class="visually-hidden">お知らせ</h2>
         </div>
         <div class="public-news-list" id="public-news-list" aria-live="polite"></div>
-        <a class="public-news-bar__link" href="https://support.speed-ad.com/news/" target="_blank" rel="noopener noreferrer">一覧を見る <span aria-hidden="true">→</span></a>
+        <a class="public-news-bar__link" href="https://support.speed-ad.com/news/" target="_blank" rel="noopener noreferrer">一覧を見る <span aria-hidden="true">↗</span></a>
       </div>
     </section>
 
@@ -315,12 +323,29 @@
           <div>
             <p class="section-kicker section-kicker--light">VOICE</p>
             <h2 id="voice-title" class="voice-teaser__title">お客様の声</h2>
-            <p class="voice-teaser__description">多くの企業様にご利用いただき、成果につながっています。</p>
+            <p class="voice-teaser__description">展示会の現場で、SPEED ADがどう使われているか。<br>導入企業のリアルな運用と、得られた変化を公開しています。</p>
           </div>
           <p class="voice-teaser__status" id="customer-voice-teaser-status">読み込み中</p>
         </div>
-        <div class="voice-teaser__grid" id="customer-voice-teaser-grid" aria-live="polite">
-          <p class="voice-teaser__empty">公開事例を読み込んでいます。</p>
+        <div class="voice-teaser__grid" id="customer-voice-teaser-grid" aria-live="polite" aria-busy="true">
+          <div class="voice-teaser-card voice-teaser-card--skeleton" aria-hidden="true">
+            <div class="voice-teaser-card__media voice-teaser-card__media--skeleton"></div>
+            <div class="voice-teaser-card__body">
+              <div class="voice-teaser-card__skeleton-line voice-teaser-card__skeleton-line--short"></div>
+              <div class="voice-teaser-card__skeleton-line"></div>
+              <div class="voice-teaser-card__skeleton-line"></div>
+              <div class="voice-teaser-card__skeleton-line voice-teaser-card__skeleton-line--medium"></div>
+            </div>
+          </div>
+          <div class="voice-teaser-card voice-teaser-card--skeleton" aria-hidden="true">
+            <div class="voice-teaser-card__media voice-teaser-card__media--skeleton"></div>
+            <div class="voice-teaser-card__body">
+              <div class="voice-teaser-card__skeleton-line voice-teaser-card__skeleton-line--short"></div>
+              <div class="voice-teaser-card__skeleton-line"></div>
+              <div class="voice-teaser-card__skeleton-line"></div>
+              <div class="voice-teaser-card__skeleton-line voice-teaser-card__skeleton-line--medium"></div>
+            </div>
+          </div>
         </div>
         <a class="voice-teaser__link" href="customer-voices/index.html">すべての声を見る <span aria-hidden="true">→</span></a>
       </div>
@@ -328,36 +353,43 @@
 
     <section class="related-services" aria-labelledby="related-title">
       <div class="related-services__heading">
-        <p class="section-kicker">RELATED SERVICES</p>
-        <h2 id="related-title">関連サービス</h2>
+        <p class="section-kicker">OTHER SERVICES</p>
+        <h2 id="related-title">当社サービス</h2>
+        <p class="related-services__lead">Abroad Outsourcing が手がける、データ実務サービスです。</p>
       </div>
-      <nav class="related-services__list" aria-label="関連サービス">
-        <a href="https://www.abroad-o.com/input.html" target="_blank" rel="noopener noreferrer"><span class="related-services__name">データ入力<br>サービス</span><span class="related-services__arrow" aria-hidden="true">→</span></a>
-        <a href="https://www.abroad-o.com/aggregate.html" target="_blank" rel="noopener noreferrer"><span class="related-services__name">データ集計・解析<br>サービス</span><span class="related-services__arrow" aria-hidden="true">→</span></a>
-        <a href="https://www.abroad-o.com/scan.html" target="_blank" rel="noopener noreferrer"><span class="related-services__name">スキャニング<br>サービス</span><span class="related-services__arrow" aria-hidden="true">→</span></a>
-        <a href="https://www.abroad-o.com/largeformat.html" target="_blank" rel="noopener noreferrer"><span class="related-services__name">大判の電子化</span><span class="related-services__arrow" aria-hidden="true">→</span></a>
-        <a href="https://www.abroad-o.com/film.html" target="_blank" rel="noopener noreferrer"><span class="related-services__name">フィルムの電子化</span><span class="related-services__arrow" aria-hidden="true">→</span></a>
-        <a href="https://www.abroad-o.com/edit.html" target="_blank" rel="noopener noreferrer"><span class="related-services__name">画像編集・加工<br>サービス</span><span class="related-services__arrow" aria-hidden="true">→</span></a>
+      <nav class="related-services__list" aria-label="当社サービス">
+        <a href="https://www.abroad-o.com/input.html" target="_blank" rel="noopener noreferrer"><span class="related-services__name">データ入力</span><span class="related-services__arrow" aria-hidden="true">↗</span></a>
+        <a href="https://www.abroad-o.com/aggregate.html" target="_blank" rel="noopener noreferrer"><span class="related-services__name">データ集計・解析</span><span class="related-services__arrow" aria-hidden="true">↗</span></a>
+        <a href="https://www.abroad-o.com/scan.html" target="_blank" rel="noopener noreferrer"><span class="related-services__name">スキャニング</span><span class="related-services__arrow" aria-hidden="true">↗</span></a>
+        <a href="https://www.abroad-o.com/largeformat.html" target="_blank" rel="noopener noreferrer"><span class="related-services__name">大判の電子化</span><span class="related-services__arrow" aria-hidden="true">↗</span></a>
+        <a href="https://www.abroad-o.com/film.html" target="_blank" rel="noopener noreferrer"><span class="related-services__name">フィルムの電子化</span><span class="related-services__arrow" aria-hidden="true">↗</span></a>
+        <a href="https://www.abroad-o.com/edit.html" target="_blank" rel="noopener noreferrer"><span class="related-services__name">画像編集・加工</span><span class="related-services__arrow" aria-hidden="true">↗</span></a>
       </nav>
     </section>
 
     <section class="final-cta" aria-labelledby="final-cta-title">
       <h2 id="final-cta-title">展示会の出会いを、確かな成果へ。</h2>
-      <a class="cta-button cta-button--light" href="?intent=signup#top" data-signup-trigger>無料ではじめる <span aria-hidden="true">→</span></a>
+      <a class="cta-button cta-button--light" href="?intent=signup#top" data-signup-trigger>
+        <span class="cta-button__text">
+          <span class="cta-button__label">無料ではじめる</span>
+          <span class="cta-button__sub">新規アカウント登録はこちら</span>
+        </span>
+        <span class="cta-button__arrow" aria-hidden="true">→</span>
+      </a>
     </section>
   </main>
 
   <footer class="site-footer">
     <div class="site-footer__identity">
       <a class="site-footer__brand" href="#top">SPEED AD</a>
-      <p>© 2026 SPEED AD Inc.</p>
+      <p>© 2026 Abroad Outsourcing Co.,Inc.</p>
     </div>
     <nav aria-label="フッター">
       <a href="#public-news-title">お知らせ</a>
-      <a href="https://support.speed-ad.com/help/" target="_blank" rel="noopener noreferrer">サポート</a>
-      <a href="https://www.abroad-o.com/rule.html" target="_blank" rel="noopener noreferrer">プライバシーポリシー</a>
+      <a href="https://support.speed-ad.com/help/" target="_blank" rel="noopener noreferrer">サポート <span aria-hidden="true">↗</span></a>
+      <a href="https://www.abroad-o.com/rule.html" target="_blank" rel="noopener noreferrer">プライバシーポリシー <span aria-hidden="true">↗</span></a>
       <a href="02_dashboard/terms-of-service.html" target="_blank" rel="noopener noreferrer">利用規約</a>
-      <a href="https://www.abroad-o.com/" target="_blank" rel="noopener noreferrer">会社概要</a>
+      <a href="https://www.abroad-o.com/" target="_blank" rel="noopener noreferrer">会社概要 <span aria-hidden="true">↗</span></a>
     </nav>
     <a class="site-footer__pagetop" href="#top" aria-label="ページ先頭へ">↑</a>
   </footer>
@@ -391,7 +423,7 @@
         <div class="form-check">
           <label class="form-check__label">
             <input type="checkbox" id="terms-agree" name="terms-agree" class="form-options__checkbox-input" required aria-required="true">
-            <span><a href="02_dashboard/terms-of-service.html" target="_blank" rel="noopener noreferrer">利用規約</a>と<a href="https://www.abroad-o.com/rule.html" target="_blank" rel="noopener noreferrer">プライバシーポリシー</a>および<a href="02_dashboard/personal-data-protection-policy.html" target="_blank" rel="noopener noreferrer">個人情報保護方針</a>に同意する</span>
+            <span><a href="02_dashboard/terms-of-service.html" target="_blank" rel="noopener noreferrer">利用規約</a>と<a href="https://www.abroad-o.com/rule.html" target="_blank" rel="noopener noreferrer">プライバシーポリシー <span aria-hidden="true">↗</span></a>および<a href="02_dashboard/personal-data-protection-policy.html" target="_blank" rel="noopener noreferrer">個人情報保護方針</a>に同意する</span>
           </label>
           <div id="terms-agree-error" class="form-group__error-message" role="alert"></div>
         </div>

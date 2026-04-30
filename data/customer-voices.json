@@ -63,7 +63,10 @@
       "publishStatus": "published",
       "heroImage": "img/customer-voices/thk-monitor-hero.jpg",
       "accent": "#2757f5",
-      "accentStrong": "#1238b3"
+      "accentStrong": "#1238b3",
+      "teaserQuote": "会期中から回答内容と名刺情報を確認できる形まで整えられたことで、次の営業アクションにつなげやすくなりました。",
+      "organizationDescriptor": "東証プライム上場 / 機械要素部品メーカー",
+      "teaserTags": ["紙運用からの脱却", "会期中レビュー", "営業判断の高速化"]
     },
     {
       "slug": "university-survey",
@@ -102,7 +105,10 @@
       "publishStatus": "published",
       "heroImage": "img/pic1.jpg",
       "accent": "#0f8f85",
-      "accentStrong": "#0a5f59"
+      "accentStrong": "#0a5f59",
+      "teaserQuote": "アンケート機能だけで始めましたが、紙運用より準備と集計の両方が軽くなりました。",
+      "organizationDescriptor": "私立総合大学 / 広報部門",
+      "teaserTags": ["紙アンケート廃止", "当日中の集計", "学生スタッフ運用"]
     }
   ]
 }
