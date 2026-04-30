@@ -25,7 +25,7 @@ last_reviewed: 2026-04-07
 
 | No | 区分 | 画面名 | 現行HTML/導線 | 関連仕様 | 仕様状態 | 実装状態 | 設計確認 | 備考 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| P-01 | 公開/ログイン前 | お客様のお声 一覧 | `customer-voices/index.html`, `index.html` から導線追加 | `19_customer_voice_public_pages.md` | 正本あり | HTMLあり | ログイン前トップからの信頼補強導線として、一覧から各詳細へ分岐する責務を整理する | `data/customer-voices.json` を参照 |
+| P-01 | 公開/ログイン前 | お客様のお声 一覧 | `customer-voices/index.html`, `index.html`（刷新済みログイン前トップのファーストビュー内導線）から導線追加 | `19_customer_voice_public_pages.md`, `24_public_login_front_requirements.md` | 正本あり | HTMLあり | 刷新済みログイン前トップの信頼補強導線として、一覧から各詳細へ分岐する責務を整理する | `data/customer-voices.json` を参照 |
 | P-02 | 公開/ログイン前 | お客様のお声 詳細（モニター企業） | `customer-voices/company-monitor.html`, `customer-voices/index.html` から遷移 | `19_customer_voice_public_pages.md` | 正本あり | HTMLあり | 先行利用モニター企業の利用価値を、課題・運用・変化の流れで伝える | 匿名化前提 |
 | P-03 | 公開/ログイン前 | お客様のお声 詳細（大学） | `customer-voices/university-survey.html`, `customer-voices/index.html` から遷移 | `19_customer_voice_public_pages.md` | 正本あり | HTMLあり | アンケート単機能利用でも成立する導入イメージを伝える | 匿名化前提 |
 | U-01 | 利用者向け | アンケート一覧 | `02_dashboard/index.html` | `00_screen_requirements.md`, `12_dashboard_current_functional_requirements.md` | 正本あり | HTMLあり | ダッシュボードの中心画面として、一覧・詳細モーダル・作成入口・ダウンロード導線の責務を整理する |  |

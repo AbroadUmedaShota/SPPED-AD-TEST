@@ -38,6 +38,7 @@ data/dashboard/user_credentials.json
 .playwright-mcp/
 .playwright-cli/
 check-*.png
+tmp-*.png
 .tmp_backlog/
 
 # Build and test outputs

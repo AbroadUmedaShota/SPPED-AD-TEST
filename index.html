@@ -3,1445 +3,371 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="SPEED AD - イベント運営と広告展開を支援するWEBソリューション向けログイン/サインアップページ">
-  <meta name="keywords" content="ログイン, サインアップ, SPEED AD, イベント, 広告, セミナー">
-  <title>SPEED-AD - ログイン</title>
+  <meta name="description" content="SPEED AD - 展示会の出会いを、確かな成果へつなげるイベント追客支援サービス">
+  <meta name="keywords" content="SPEED AD, 展示会, WEBアンケート, 名刺データ化, 御礼メール, ログイン">
+  <title>SPEED AD - 展示会の出会いを、確かな成果へ。</title>
   <link rel="icon" href="img/logo2.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="css/page.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    /*
-      -- CSS Variables --
-      Material 3 Dynamic Color Scheme を意識し、ブランド主要色から派生。
-      WCAG 2.2 AA (推奨 AAA 7:1) 対応。ライト & ダークモード自動切替はJS実装が必要ですが、CSSでは変数を定義します。
-    */
-    :root {
-      /* ブランド主要色: {{brand_primary_color}} を中心に生成 */
-      --color-primary: #7b2cbf; /* 紫 */
-      --color-primary-hover: #5a189a; /* 濃い紫 */
-      --color-primary-container: #ede2ff; /* 明るい紫の背景 */
-      --color-on-primary-container: #260058; /* その上のテキスト */
-      /* ブランド副次色: {{brand_secondary_color}} を中心に生成 */
-      --color-secondary: #4cc9f0; /* 水色 */
-      --color-secondary-hover: #0093c4; /* 濃い水色 */
-      --color-secondary-container: #ccf3ff; /* 明るい水色の背景 */
-      --color-on-secondary-container: #001f28; /* その上のテキスト */
-      /* アクセントグラデーション */
-      --gradient-accent: linear-gradient(to right, var(--color-primary), var(--color-secondary));
-      /* グレー系色 */
-      --color-surface-dim: #f9fafb; /* 薄いグレー背景 (Material 3 surface dim) */
-      --color-surface-bright: #ffffff; /* 明るい背景 (Material 3 surface bright) */
-      --color-outline: #e0e0e0; /* グレーの線 (Material 3 outline) */
-      --color-on-surface: #111827; /* 濃いテキスト色 (Material 3 on surface) */
-      --color-on-surface-variant: #6b7280; /* 中間テキスト色 (Material 3 on surface variant) */
-      --color-on-surface-light: #9ca3af; /* 薄いテキスト色 (Material 3 on surface light) */
-      /* エラー色 */
-      --color-error: #d9534f; /* 赤色 (Material 3 error) */
-      --color-on-error-container: #410002;
-      --color-error-container: #ffdad6;
-      /* シャドウ (Material 3 Elevation) */
-      --shadow-level-0: 0 0 0 rgba(0,0,0,0);
-      --shadow-level-1: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.04);
-      --shadow-level-2: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
-      --shadow-level-3: 0 10px 15px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.08);
-      --shadow-level-4: 0 20px 25px rgba(0, 0, 0, 0.2), 0 8px 10px rgba(0, 0, 0, 0.08);
-      --shadow-level-5: 0 25px 50px rgba(0, 0, 0, 0.25), 0 10px 15px rgba(0, 0, 0, 0.1);
-      /* レイアウト間隔 (4pxの倍数) */
-      --spacing-0: 0rem;
-      --spacing-1: 0.25rem; /* 4px */
-      --spacing-2: 0.5rem;  /* 8px */
-      --spacing-3: 0.75rem; /* 12px */
-      --spacing-4: 1rem;    /* 16px */
-      --spacing-5: 1.25rem; /* 20px */
-      --spacing-6: 1.5rem;  /* 24px */
-      --spacing-7: 1.75rem; /* 28px */
-      --spacing-8: 2rem;    /* 32px */
-      --spacing-10: 2.5rem; /* 40px */
-      --spacing-16: 4rem;   /* 64px */
-      /* 角丸 */
-      --border-radius-sm: 0.25rem; /* 4px */
-      --border-radius-md: 0.5rem;  /* 8px */
-      --border-radius-lg: 1rem;    /* 16px */
-    }
-    /*
-      -- Base Styles --
-      基本的な要素のリセットや共通スタイル
-    */
-    *, *::before, *::after {
-      box-sizing: border-box;
-    }
-    body {
-      font-family: "Noto Sans JP", "Inter", sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-    
-    /* モーダル表示中のbodyスタイル */
-    body.is-modal-open {
-      overflow: hidden; /* 背景のスクロールをロック */
-    }
-    /*
-      -- Layout Classes (BEM) --
-      ページ全体のレイアウト構造
-    */
-    
-    /* Legacy Layout Styles */
-    #all {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-        min-height: 100vh;
-        background: url("img/top-kv.jpg") no-repeat center;
-        background-size: cover;
-        padding: 0 10%;
-        box-sizing: border-box;
-        position: relative;
-    }
-    #all:before {
-        content: "";
-        display: block;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(180deg, rgba(100, 100, 100, 0.85), rgba(0, 17, 46, 0.85));
-        z-index: 1;
-    }
-    #text-box {
-        width: 50%;
-        position: relative;
-        z-index: 2;
-    }
-    #text-box ul {
-        display: flex;
-        width: 95%;
-        margin: 0 0 5vh 0;
-        padding: 0;
-        list-style: none;
-    }
-    #text-box ul li {
-        padding: 5px 20px;
-        text-align: center;
-        background: #fff;
-        font-weight: 500;
-        font-size: 1rem;
-    }
-    #text-box ul li:nth-child(1) { border: 1px solid #004ad0; color: #004ad0; margin-right: 10px; }
-    #text-box ul li:nth-child(2) { border: 1px solid #3200a2; color: #3200a2; margin-right: 10px; }
-    #text-box ul li:nth-child(3) { border: 1px solid #a50076; color: #a50076; }
-    #text-box h1 {
-        margin: 0 0 5vh 0;
-        display: flex;
-        align-items: center;
-    }
-    #text-box h1 img {
-        width: 50%;
-        margin: 0;
-    }
-    #text-box h1 span {
-        color: #fff;
-        margin-left: 30px;
-        display: inline-block;
-        font-weight: bold;
-        font-size: 1.5rem;
-    }
-    #text-box p {
-        text-align: left;
-        color: #fff;
-        font-weight: bold;
-        letter-spacing: 0.1em;
-        line-height: 1.6;
-    }
-    #input-box {
-        position: relative;
-        z-index: 2;
-        width: 100%;
-        max-width: 400px;
-    }
-    @media (max-width: 1024px) {
-        #all {
-            flex-direction: column;
-            padding: 5% 5%;
-        }
-        #text-box, #input-box {
-            width: 100%;
-        }
-        #text-box h1 {
-            flex-direction: column;
-        }
-        #text-box h1 span {
-            margin-top: 10px;
-            font-size: 1.2rem;
-        }
-    }
-\n    .page-wrapper {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      max-width: 1280px; /* デスクトップ時最大幅 */
-      gap: var(--spacing-16); /* 64px */
-      padding: var(--spacing-8); /* 32px */
-      box-sizing: border-box;
-      z-index: 1; /* モーダルより下に */
-    }
-    /*
-      -- Info Panel (BEM) --
-      左側の説明セクション
-    */
-    .info-panel {
-      flex: 1;
-      color: var(--color-surface-bright);
-      max-width: 550px;
-      text-shadow: 0 2px 6px rgba(0,0,0,0.4); /* テキストの可読性向上 */
-    }
-    .info-panel__title {
-      font-size: 2.5rem; /* Material 3 display-small 相当 */
-      font-weight: 700;
-      margin-bottom: var(--spacing-6); /* 24px */
-      line-height: 1.3;
-    }
-    .info-panel__description {
-      line-height: 1.8;
-      font-size: 1.125rem; /* Material 3 body-large 相当 */
-    }
-    /*
-      -- Form Container (BEM) --
-      右側のフォームセクション
-    */
-    #before-login #input-box.form-container {
-      padding: 30px;
-      width: 100%;
-      max-width: 450px;
-      background-color: #ffffff !important; /* Force override legacy CSS */
-      border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-      box-sizing: border-box;
-      backdrop-filter: blur(4px);
-    }
-    /*
-      -- Form Elements (BEM) --
-      入力フィールド、ラベル、ボタンなどのスタイル
-    */
-    .form-container__title {
-      text-align: center;
-      margin-bottom: var(--spacing-8);
-      color: var(--color-on-surface);
-      font-size: 1.5rem; /* Material 3 headline-small 相当 (縮小) */
-      font-weight: 700;
-      white-space: nowrap;
-      letter-spacing: 0.05em;
-    }
-    .form-group {
-      margin-bottom: var(--spacing-6); /* 24px */
-    }
-    /* ラベルのスタイル（浮動ラベル削除後のデフォルト） */
-    .form-group__label {
-      display: block;
-      margin-bottom: var(--spacing-2);
-      color: var(--color-on-surface);
-      font-weight: 600;
-      font-size: 0.95rem; /* 元の0.95remに戻す */
-    }
-    .form-group__input {
-      width: 100%;
-      padding: var(--spacing-3) var(--spacing-4); /* 12px 16px */
-      border: 1px solid var(--color-outline); /* Material 3 outline */
-      border-radius: var(--border-radius-md); /* 8px */
-      font-size: 1rem; /* Material 3 body-large 相当 */
-      box-sizing: border-box;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-    .form-group__input:focus {
-      outline: none;
-      border-color: var(--color-primary);
-      box-shadow: 0 0 0 3px rgba(123, 44, 191, 0.2), var(--shadow-level-1); /* Fluent 2 / Material 3 類似のフォーカスリング */
-    }
-    /* エラーメッセージスタイル (BEM) */
-    .form-group__error-message {
-      color: var(--color-error);
-      font-size: 0.875rem; /* Material 3 label-small 相当 */
-      margin-top: var(--spacing-1); /* 4px */
-      min-height: 1.2em; /* メッセージがない時のがたつき防止 */
-    }
-    .form-group__input[aria-invalid="true"] {
-        border-color: var(--color-error);
-    }
-    .form-group__input[aria-invalid="true"]:focus {
-        box-shadow: 0 0 0 3px rgba(217, 83, 79, 0.2), var(--shadow-level-1);
-    }
-    /* パスワードヒント (BEM) */
-    .form-group__password-hint {
-      color: rgba(255, 255, 255, 0.7); /* Hint color */
-      font-size: 0.8rem; /* Material 3 label-small 相当 */
-      margin-top: var(--spacing-1); /* 4px */
-      line-height: 1.4;
-    }
-    .form-options {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.9rem;
-      margin-bottom: var(--spacing-6); /* 24px */
-      flex-wrap: wrap; /* 要素が多い場合に折り返し */
-      gap: var(--spacing-2); /* 8px */
-    }
-    .form-options__checkbox-label {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-1);
-      margin-bottom: var(--spacing-0);
-      font-weight: normal;
-      font-size: 0.9rem;
-      color: var(--color-on-surface);
-    }
-    .form-options__checkbox-input {
-        width: auto;
-        margin: var(--spacing-0); /* デフォルトマージンをリセット */
-        /* チェックボックスのスタイル調整 (Fluent 2 / Material 3 類似) */
-        accent-color: var(--color-primary); /* Primary color for checkbox */
-    }
-    .form-options__link {
-      color: var(--color-secondary);
-      text-decoration: none;
-      font-size: 0.9rem;
-    }
-    .form-options__link:hover {
-      text-decoration: underline;
-    }
-    .button { /* 汎用ボタンクラス */
-      width: 100%;
-      padding: var(--spacing-3) var(--spacing-4); /* 12px 16px */
-      border: none;
-      border-radius: var(--border-radius-md); /* 8px */
-      font-size: 1rem;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.2, 0, 0, 1); /* Motion duration & easing */
-      text-align: center;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: var(--spacing-2); /* 8px */
-      box-shadow: var(--shadow-level-0); /* Default no shadow */
-    }
-    .button:hover {
-        transform: translateY(-2px); /* フェードスライドアップ */
-        box-shadow: var(--shadow-level-2); /* ホバー時のシャドウ */
-    }
-    .button.is-loading {
-        pointer-events: none; /* クリック不可に */
-        opacity: 0.8;
-    }
-    /* ボタンバリアント */
-    .button--filled { /* login-button */
-      background: var(--gradient-accent);
-      color: var(--color-surface-bright); /* Material 3 on-primary */
-      margin-top: var(--spacing-2); /* 8px */
-    }
-    .button--filled:hover {
-      box-shadow: var(--shadow-level-3); /* さらに強いシャドウ */
-    }
-    .button--filled.is-loading {
-        background: var(--color-primary); /* ローディング中はグラデーションを固定 */
-        opacity: 0.8;
-    }
-    .button--tonal { /* signup-button */
-      background: var(--color-primary-container); /* Material 3 tonal button background */
-      border: 1px solid var(--color-primary); /* Material 3 tonal button border (optional) */
-      color: var(--color-on-primary-container); /* Material 3 tonal button text */
-      margin-top: var(--spacing-4); /* 16px */
-    }
-    .button--tonal:hover {
-      background: var(--color-primary-hover); /* Material 3 tonal hover */
-      color: var(--color-surface-bright);
-      box-shadow: var(--shadow-level-2);
-    }
-    .button--google { /* google-button */
-      background-color: #fff;
-      border: 1px solid #d1d5db;
-      color: #374151;
-      font-weight: 600;
-      margin-top: var(--spacing-6); /* 24px */
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-      position: relative !important;
-      display: flex !important;
-      justify-content: center !important;
-      align-items: center !important;
-      padding: 12px 16px;
-      width: 100%;
-      border-radius: 8px;
-    }
-    .button--google__logo {
-      width: 20px;
-      height: 20px;
-      position: absolute;
-      left: 16px;
-    }
-    .button--google:hover {
-      background-color: var(--color-surface-dim);
-      border-color: #ccc;
-      box-shadow: var(--shadow-level-2);
-    }
-    
-    /* ローディングスピナー (BEM) */
-    .button__spinner {
-        border: 3px solid rgba(255, 255, 255, 0.3); /* 白ボタン用 */
-        border-top: 3px solid var(--color-surface-bright); /* 白ボタン用 */
-        border-radius: 50%;
-        width: 20px;
-        height: 20px;
-        animation: spin 0.8s linear infinite;
-        margin-right: var(--spacing-2); /* 8px */
-        display: none; /* Hide by default */
-    }
-    .button--filled .button__spinner {
-        border-top-color: var(--color-surface-bright);
-        border-color: rgba(255, 255, 255, 0.3);
-    }
-    .button--tonal .button__spinner {
-        border-top: 3px solid var(--color-on-primary-container);
-        border: 3px solid rgba(123, 44, 191, 0.3);
-    }
-    .button--google .button__spinner {
-        border-top: 3px solid var(--color-on-surface-variant);
-        border: 3px solid rgba(107, 114, 128, 0.3);
-    }
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-    /*
-      -- Scenario Accounts (BEM) --
-      テストアカウント案内
-    */
-    .scenario-accounts {
-      margin-top: var(--spacing-6);
-      padding: var(--spacing-5);
-      background: rgba(76, 201, 240, 0.08);
-      border: 1px solid rgba(76, 201, 240, 0.3);
-      border-radius: var(--border-radius-md);
-    }
-    .scenario-accounts__title {
-      font-size: 0.9rem;
-      font-weight: 600;
-      margin: 0 0 var(--spacing-3);
-      color: var(--color-on-surface);
-    }
-    .scenario-accounts__list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: var(--spacing-2);
-      padding: var(--spacing-0);
-      margin: var(--spacing-0);
-    }
-    .scenario-accounts__list li {
-      margin: var(--spacing-0);
-      width: 100%;
-    }
-    .scenario-accounts__link {
-      display: inline-flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: var(--spacing-2);
-      width: 100%;
-      text-decoration: none;
-      color: var(--color-on-surface);
-      border: 1px solid var(--color-outline);
-      border-radius: var(--border-radius-md);
-      background: var(--color-surface-dim);
-      padding: var(--spacing-2) var(--spacing-3);
-      font-size: 0.9rem;
-      font-weight: 500;
-      transition: border-color 0.2s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.2s cubic-bezier(0.2, 0, 0, 1), transform 0.2s cubic-bezier(0.2, 0, 0, 1);
-    }
-    .scenario-accounts__link:hover {
-      border-color: var(--color-primary);
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-level-1);
-    }
-    .scenario-accounts__email {
-      font-weight: 600;
-      letter-spacing: 0.01em;
-    }
-    .scenario-accounts__badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 0 var(--spacing-2);
-      border-radius: 999px;
-      background: rgba(123, 44, 191, 0.12);
-      color: var(--color-primary);
-      font-size: 0.75rem;
-      font-weight: 600;
-      line-height: 1.4;
-    }
-
-    /*
-      -- Utility Classes (BEM) --
-      汎用的なスタイル
-    */
-    .divider {
-      text-align: center;
-      margin: var(--spacing-7) var(--spacing-0);
-      position: relative;
-      color: rgba(255,255,255,0.7);
-      font-size: 0.85rem;
-    }
-    .divider::before,
-    .divider::after {
-      content: "";
-      height: 1px;
-      background: var(--color-outline);
-      position: absolute;
-      top: 50%;
-      width: calc(50% - var(--spacing-8)); /* 「または」の文字幅+paddingを考慮 (約32px) */
-    }
-    .divider::before {
-      left: var(--spacing-0);
-    }
-    .divider::after {
-      right: var(--spacing-0);
-    }
-    .divider__text {
-      padding: var(--spacing-0) var(--spacing-4);
-      background: transparent;
-      position: relative;
-      z-index: 1;
-    }
-    /*
-      -- Footer & Links (BEM) --
-      フッターと下部のリンク
-    */
-    .sub-links {
-      text-align: center;
-      margin-top: var(--spacing-6); /* 24px */
-      font-size: 0.85rem;
-    }
-    .sub-links__item {
-      color: var(--color-secondary);
-      text-decoration: none;
-      margin: var(--spacing-0) var(--spacing-2); /* 0 8px */
-    }
-    .sub-links__item:hover {
-      text-decoration: underline;
-    }
-    .footer {
-      text-align: center;
-      margin-top: var(--spacing-8);
-      color: rgba(255,255,255,0.7);
-      font-size: 0.8rem;
-    }
-    .hero-secondary-cta {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--spacing-2);
-      margin-top: var(--spacing-6);
-      padding: var(--spacing-3) var(--spacing-5);
-      border: 1px solid rgba(255, 255, 255, 0.34);
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.08);
-      color: #ffffff;
-      text-decoration: none;
-      font-weight: 600;
-      letter-spacing: 0.03em;
-      transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
-      backdrop-filter: blur(8px);
-    }
-    .hero-secondary-cta:hover {
-      transform: translateY(-2px);
-      border-color: rgba(255, 255, 255, 0.68);
-      background: rgba(255, 255, 255, 0.16);
-    }
-    .hero-secondary-cta::after {
-      content: '→';
-      font-size: 1rem;
-    }
-    .voice-teaser-section {
-      background:
-        radial-gradient(circle at top left, rgba(76, 201, 240, 0.16), transparent 28%),
-        linear-gradient(135deg, #f8f7f2 0%, #f0efe6 52%, #ebe5da 100%);
-    }
-    .voice-teaser-wrap {
-      display: flex;
-      flex-direction: column;
-      gap: var(--spacing-8);
-      padding: min(8vh, 64px) min(6vw, 64px);
-    }
-    .voice-teaser__intro {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      gap: var(--spacing-6);
-      flex-wrap: wrap;
-    }
-    .voice-teaser__kicker {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--spacing-2);
-      margin: 0 0 var(--spacing-3);
-      color: #365e92;
-      font-size: 0.8rem;
-      font-weight: 700;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-    }
-    .voice-teaser__kicker::before {
-      content: '';
-      width: 40px;
-      height: 1px;
-      background: rgba(54, 94, 146, 0.52);
-    }
-    .voice-teaser__title {
-      margin: 0;
-      color: #122033;
-      font-size: clamp(2rem, 4vw, 3.4rem);
-      line-height: 1.05;
-      letter-spacing: -0.04em;
-    }
-    .voice-teaser__description {
-      max-width: 560px;
-      margin: var(--spacing-4) 0 0;
-      color: #4b5a70;
-      line-height: 1.9;
-      font-size: 0.98rem;
-    }
-    .voice-teaser__status {
-      margin: 0;
-      padding: var(--spacing-2) var(--spacing-4);
-      border-radius: 999px;
-      background: rgba(18, 32, 51, 0.06);
-      color: #32445f;
-      font-size: 0.85rem;
-      font-weight: 700;
-    }
-    .voice-teaser__grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: var(--spacing-5);
-    }
-    .voice-teaser-card {
-      display: flex;
-      flex-direction: column;
-      min-height: 100%;
-      overflow: hidden;
-      border: 1px solid rgba(18, 32, 51, 0.08);
-      border-radius: 24px;
-      background: rgba(255, 255, 255, 0.88);
-      box-shadow: 0 22px 48px rgba(28, 37, 64, 0.08);
-    }
-    .voice-teaser-card__media {
-      position: relative;
-      height: 220px;
-      overflow: hidden;
-    }
-    .voice-teaser-card__media img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .voice-teaser-card__media::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(180deg, transparent 10%, rgba(12, 18, 36, 0.48));
-    }
-    .voice-teaser-card__body {
-      display: flex;
-      flex: 1;
-      flex-direction: column;
-      gap: var(--spacing-4);
-      padding: var(--spacing-6);
-    }
-    .voice-teaser-card__label-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--spacing-2);
-      align-items: center;
-    }
-    .voice-teaser-card__label {
-      display: inline-flex;
-      align-items: center;
-      min-height: 30px;
-      padding: 0 var(--spacing-3);
-      border-radius: 999px;
-      background: rgba(123, 44, 191, 0.08);
-      color: #5a189a;
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 0.03em;
-    }
-    .voice-teaser-card__title {
-      margin: 0;
-      color: #111827;
-      font-size: 1.45rem;
-      line-height: 1.2;
-      letter-spacing: -0.03em;
-    }
-    .voice-teaser-card__summary {
-      margin: 0;
-      color: #4b5563;
-      font-size: 0.95rem;
-      line-height: 1.8;
-    }
-    .voice-teaser-card__features {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--spacing-2);
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
-    .voice-teaser-card__features li {
-      display: inline-flex;
-      align-items: center;
-      min-height: 34px;
-      padding: 0 var(--spacing-3);
-      border-radius: 999px;
-      border: 1px solid rgba(17, 24, 39, 0.08);
-      background: rgba(248, 250, 252, 0.94);
-      color: #1f2937;
-      font-size: 0.82rem;
-      font-weight: 600;
-    }
-    .voice-teaser__empty {
-      margin: 0;
-      padding: var(--spacing-8);
-      border-radius: 24px;
-      background: rgba(255, 255, 255, 0.72);
-      color: #4b5563;
-      text-align: center;
-      font-weight: 600;
-    }
-    .voice-teaser__actions {
-      display: flex;
-      justify-content: flex-start;
-    }
-    .voice-teaser__link {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--spacing-2);
-      min-height: 50px;
-      padding: 0 var(--spacing-6);
-      border-radius: 999px;
-      background: linear-gradient(135deg, #122033, #22426c);
-      color: #ffffff;
-      text-decoration: none;
-      font-weight: 700;
-      letter-spacing: 0.03em;
-      box-shadow: 0 18px 40px rgba(18, 32, 51, 0.2);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .voice-teaser__link:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 22px 44px rgba(18, 32, 51, 0.26);
-    }
-    .voice-teaser__link::after {
-      content: '→';
-    }
-    /*
-      -- Modal Styles (BEM) --
-      モーダルウィンドウのスタイル
-    */
-    .modal { /* .modal-overlay */
-      position: fixed;
-      top: var(--spacing-0);
-      left: var(--spacing-0);
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.6); /* 透過オーバーレイ */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000; /* 他の要素の上に表示 */
-      opacity: 1; /* 初期状態は表示 */
-      visibility: visible;
-      transition: opacity 0.3s cubic-bezier(0.2, 0, 0, 1), visibility 0.3s cubic-bezier(0.2, 0, 0, 1); /* Motion duration & easing */
-    }
-    .modal--is-hidden { /* 非表示状態 */
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none; /* 非表示時は下の要素をクリック不可に */
-    }
-    .modal__content {
-      background-color: var(--color-surface-bright);
-      padding: var(--spacing-10); /* 40px */
-      border-radius: var(--border-radius-lg); /* 16px */
-      box-shadow: var(--shadow-level-4); /* エレベーションレベル4 */
-      width: 95%; /* レスポンシブ対応 */
-      max-width: 450px; /* 最大幅 */
-      position: relative; /* 閉じるボタンの基準 */
-      transform: translateY(var(--spacing-0)); /* 初期位置 */
-      transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1); /* Motion duration & easing */
-      box-sizing: border-box;
-      max-height: calc(100vh - 4rem); /* 画面の高さから上下4remのマージンを引いた高さを最大値とする */
-      overflow-y: auto; /* コンテンツがはみ出す場合は縦スクロールを表示 */
-    }
-    .modal--is-hidden .modal__content { /* 非表示時のアニメーション */
-       transform: translateY(-20px); /* fade-slide-up */
-    }
-    .modal__title {
-      text-align: center;
-      margin-top: var(--spacing-0);
-      margin-bottom: var(--spacing-7); /* 28px */
-      color: var(--color-on-surface);
-      font-size: 1.625rem; /* Material 3 headline-small 相当 */
-      font-weight: 700;
-    }
-    .modal__close-button {
-      position: absolute;
-      top: var(--spacing-0); /* 0px */
-      right: var(--spacing-0); /* 0px */
-      background: none;
-      border: none;
-      font-size: 1.8rem; /* Material 3 icon size */
-      cursor: pointer;
-      color: var(--color-on-surface-light); /* 薄い色 */
-      transition: color 0.2s cubic-bezier(0.2, 0, 0, 1);
-      line-height: 1; /* ボタン内の文字の高さ */
-      padding: var(--spacing-2); /* 8px - クリックしやすい領域を確保 */
-    }
-    .modal__close-button:hover {
-      color: var(--color-on-surface-variant); /* ホバーで少し濃く */
-    }
-    /* モーダル内のGoogleボタン */
-    .modal__content .button--google {
-        margin-top: var(--spacing-6); /* 24px */
-    }
-     /* モーダル内のサインアップボタン (ここではアカウント作成ボタン) */
-     .modal__content .button--filled {
-         margin-top: var(--spacing-6); /* 24px */
-     }
-     /* モーダル内のサブリンク */
-     .modal__content .sub-links {
-        margin-top: var(--spacing-6); /* 24px */
-        font-size: 0.85rem;
-     }
-    /* モーダル内のinput枠を明示的にグレーで表示（白背景と同化しないように） */
-    .modal__content .form-group__input {
-        border: 1.5px solid #9ca3af !important; /* 明確なグレーボーダー */
-        background-color: #ffffff !important;
-        color: #111827 !important;
-    }
-    .modal__content .form-group__input:focus {
-        border-color: var(--color-primary) !important;
-        box-shadow: 0 0 0 3px rgba(123, 44, 191, 0.2) !important;
-    }
-    .modal__content .form-group__label {
-        color: #111827 !important;
-    }
-    .modal__content .form-group__error-message {
-        color: var(--color-error) !important;
-    }
-    /*
-      -- Responsive Design --
-      画面幅に応じたレイアウト調整 (4pxの倍数ブレークポイント)
-    */
-    @media (max-width: 1024px) { /* lg */
-      
-    /* Legacy Layout Styles */
-    #all {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-        min-height: 100vh;
-        background: url("img/top-kv.jpg") no-repeat center;
-        background-size: cover;
-        padding: 0 10%;
-        box-sizing: border-box;
-        position: relative;
-    }
-    #all:before {
-        content: "";
-        display: block;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(180deg, rgba(100, 100, 100, 0.85), rgba(0, 17, 46, 0.85));
-        z-index: 1;
-    }
-    #text-box {
-        width: 50%;
-        position: relative;
-        z-index: 2;
-    }
-    #text-box ul {
-        display: flex;
-        width: 95%;
-        margin: 0 0 5vh 0;
-        padding: 0;
-        list-style: none;
-    }
-    #text-box ul li {
-        padding: 5px 20px;
-        text-align: center;
-        background: #fff;
-        font-weight: 500;
-        font-size: 1rem;
-    }
-    #text-box ul li:nth-child(1) { border: 1px solid #004ad0; color: #004ad0; margin-right: 10px; }
-    #text-box ul li:nth-child(2) { border: 1px solid #3200a2; color: #3200a2; margin-right: 10px; }
-    #text-box ul li:nth-child(3) { border: 1px solid #a50076; color: #a50076; }
-    #text-box h1 {
-        margin: 0 0 5vh 0;
-        display: flex;
-        align-items: center;
-    }
-    #text-box h1 img {
-        width: 50%;
-        margin: 0;
-    }
-    #text-box h1 span {
-        color: #fff;
-        margin-left: 30px;
-        display: inline-block;
-        font-weight: bold;
-        font-size: 1.5rem;
-    }
-    #text-box p {
-        text-align: left;
-        color: #fff;
-        font-weight: bold;
-        letter-spacing: 0.1em;
-        line-height: 1.6;
-    }
-    #input-box {
-        position: relative;
-        z-index: 2;
-        width: 100%;
-        max-width: 400px;
-    }
-    @media (max-width: 1024px) {
-        #all {
-            flex-direction: column;
-            padding: 5% 5%;
-        }
-        #text-box, #input-box {
-            width: 100%;
-        }
-        #text-box h1 {
-            flex-direction: column;
-        }
-        #text-box h1 span {
-            margin-top: 10px;
-            font-size: 1.2rem;
-        }
-    }
-\n    .page-wrapper {
-        flex-direction: column; /* 縦並びに */
-        gap: var(--spacing-10); /* 40px */
-        padding: var(--spacing-6); /* 24px */
-      }
-      .info-panel {
-        max-width: 100%;
-        text-align: center;
-      }
-      .info-panel__title {
-        font-size: 2.25rem;
-        margin-bottom: var(--spacing-4); /* 16px */
-      }
-      .info-panel__description {
-        font-size: 1rem;
-      }
-      .form-container {
-        max-width: 450px; /* タブレットでのフォーム幅 */
-      }
-      .modal__content {
-         max-width: 450px; /* モーダル幅もタブレット向けに調整 */
-      }
-    }
-    @media (max-width: 768px) { /* md */
-      .scenario-accounts {
-        padding: var(--spacing-4); /* 16px */
-      }
-      .scenario-accounts__link {
-        font-size: 0.85rem;
-      }
-      .scenario-accounts__badge {
-        font-size: 0.7rem;
-      }
-
-      
-      
-    /* Legacy Layout Styles */
-    #all {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-        min-height: 100vh;
-        background: url("img/top-kv.jpg") no-repeat center;
-        background-size: cover;
-        padding: 0 10%;
-        box-sizing: border-box;
-        position: relative;
-    }
-    #all:before {
-        content: "";
-        display: block;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(180deg, rgba(100, 100, 100, 0.85), rgba(0, 17, 46, 0.85));
-        z-index: 1;
-    }
-    #text-box {
-        width: 50%;
-        position: relative;
-        z-index: 2;
-    }
-    #text-box ul {
-        display: flex;
-        width: 95%;
-        margin: 0 0 5vh 0;
-        padding: 0;
-        list-style: none;
-    }
-    #text-box ul li {
-        padding: 5px 20px;
-        text-align: center;
-        background: #fff;
-        font-weight: 500;
-        font-size: 1rem;
-    }
-    #text-box ul li:nth-child(1) { border: 1px solid #004ad0; color: #004ad0; margin-right: 10px; }
-    #text-box ul li:nth-child(2) { border: 1px solid #3200a2; color: #3200a2; margin-right: 10px; }
-    #text-box ul li:nth-child(3) { border: 1px solid #a50076; color: #a50076; }
-    #text-box h1 {
-        margin: 0 0 5vh 0;
-        display: flex;
-        align-items: center;
-    }
-    #text-box h1 img {
-        width: 50%;
-        margin: 0;
-    }
-    #text-box h1 span {
-        color: #fff;
-        margin-left: 30px;
-        display: inline-block;
-        font-weight: bold;
-        font-size: 1.5rem;
-    }
-    #text-box p {
-        text-align: left;
-        color: #fff;
-        font-weight: bold;
-        letter-spacing: 0.1em;
-        line-height: 1.6;
-    }
-    #input-box {
-        position: relative;
-        z-index: 2;
-        width: 100%;
-        max-width: 400px;
-    }
-    @media (max-width: 1024px) {
-        #all {
-            flex-direction: column;
-            padding: 5% 5%;
-        }
-        #text-box, #input-box {
-            width: 100%;
-        }
-        #text-box h1 {
-            flex-direction: column;
-        }
-        #text-box h1 span {
-            margin-top: 10px;
-            font-size: 1.2rem;
-        }
-    }
-\n    .page-wrapper {
-        padding: var(--spacing-4); /* 16px */
-        gap: var(--spacing-8); /* 32px */
-      }
-       .info-panel__title {
-         font-size: 2rem;
-       }
-      .info-panel__description {
-        font-size: 0.9375rem;
-      }
-      #before-login #input-box.form-container {
-        padding: var(--spacing-8); /* 32px */
-        max-width: 100%; /* スマホではいっぱいに近い幅 */
-      }
-      .form-container__title {
-        font-size: 1.3rem; 
-        margin-bottom: var(--spacing-6); /* 24px */
-        white-space: nowrap;
-      }
-      .form-group {
-        margin-bottom: var(--spacing-5); /* 20px */
-      }
-      .form-group__label {
-        font-size: 0.9375rem; /* body-medium 相当 */
-        margin-bottom: var(--spacing-1); /* 4px */
-      }
-      .form-group__input {
-        padding: var(--spacing-3) var(--spacing-4); /* 12px 16px */
-        font-size: 0.9375rem;
-      }
-      .form-group__error-message {
-         font-size: 0.8125rem;
-         margin-top: var(--spacing-1); /* 4px */
-      }
-       .form-group__password-hint {
-           font-size: 0.75rem;
-       }
-      .form-options {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: var(--spacing-3); /* 12px */
-        font-size: 0.875rem;
-        margin-bottom: var(--spacing-5); /* 20px */
-      }
-       .form-options__checkbox-label {
-           font-size: 0.875rem;
-       }
-      .button {
-        padding: var(--spacing-3) var(--spacing-4); /* 12px 16px */
-        font-size: 0.9375rem;
-      }
-       .button--google {
-           font-size: 0.9375rem;
-       }
-      .divider {
-         margin: var(--spacing-6) var(--spacing-0); /* 24px 0 */
-         font-size: 0.8125rem;
-      }
-       .divider__text {
-            padding: var(--spacing-0) var(--spacing-3); /* 0 12px */
-       }
-       .sub-links {
-           font-size: 0.8125rem;
-           margin-top: var(--spacing-4); /* 16px */
-       }
-       .footer {
-           margin-top: var(--spacing-6); /* 24px */
-           font-size: 0.75rem;
-       }
-       .modal__content {
-            padding: var(--spacing-6); /* 24px */
-       }
-       .modal__title {
-           font-size: 1.5rem;
-           margin-bottom: var(--spacing-6); /* 24px */
-       }
-       .modal__close-button {
-           font-size: 1.5rem;
-           top: 0.5rem; /* 8px */
-           right: 0.5rem; /* 8px */
-           padding: var(--spacing-1); /* 4px */
-       }
-    }
-  
-
-    </style>
-
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&family=Noto+Serif+JP:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/login-front.css">
 </head>
 <body id="before-login">
-  <main>
-  <div id="fullpage">
-    <div class="section " id="section0">
-      <div id="top" aria-hidden="true"></div>
-      <div id="all">
-    <div id="text-box">
-      <ul>
-        <li>WEBアンケート作成</li>
-        <li>名刺のデータ化</li>
-        <li>御礼メールの送信</li>
-      </ul>
-      <h1><img src="img/logo.svg" alt="SPEED-AD"><span>～スピード アド～</span></h1>
-      <p>SPEED ADは、展示会やセミナーなどのイベント向けソリューションです。<br>
-        無料のWEBアンケート作成、名刺のデータ化、御礼メールの送信を一気通貫で提供し、獲得したリードの有効活用をワンストップで実現します</p>
-      <div class="hero-cta-group">
-        <a class="hero-primary-cta" href="?intent=signup#top">無料ではじめる</a>
-        <a class="hero-secondary-cta" href="customer-voices/index.html">お客様のお声を見る</a>
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero__media" aria-hidden="true"></div>
+      <div class="hero__shade" aria-hidden="true"></div>
+      <header class="hero__brand">
+        <a class="brand-link" href="#top" aria-label="SPEED AD トップへ">SPEED AD</a>
+      </header>
+      <div class="hero__inner">
+        <div class="hero__copy">
+          <h1 id="hero-title">SPEED<br>AD</h1>
+          <p class="hero__statement">展示会の出会いを、<br>確かな成果へ。</p>
+          <p class="hero__lead">
+            QRアンケート・名刺データ化・御礼メールで<br>展示会後の追客業務を、もっとスマートに。
+          </p>
+          <div class="hero__actions" aria-label="主要導線">
+            <a class="cta-button cta-button--primary" href="?intent=signup#top" data-signup-trigger>無料ではじめる <span aria-hidden="true">→</span></a>
+            <a class="text-link text-link--light" href="customer-voices/index.html">お客様のお声を見る <span aria-hidden="true">→</span></a>
+          </div>
+        </div>
+
+        <aside id="input-box" class="form-container login-panel" aria-labelledby="login-title">
+          <p class="login-panel__eyebrow">既存ユーザーの方</p>
+          <h2 id="login-title" class="form-container__title">すでにアカウントをお持ちの方はこちらから</h2>
+          <form id="login-form" novalidate>
+            <div class="form-group">
+              <label for="email" class="form-group__label">メールアドレス</label>
+              <input type="email" id="email" name="email" class="form-group__input" required aria-required="true" autocomplete="email" aria-describedby="email-error" placeholder="メールアドレス">
+              <div id="email-error" class="form-group__error-message" role="alert"></div>
+            </div>
+            <div class="form-group">
+              <label for="password" class="form-group__label">パスワード</label>
+              <div class="password-field">
+                <input type="password" id="password" name="password" class="form-group__input" required aria-required="true" autocomplete="current-password" aria-describedby="password-error" placeholder="パスワード">
+                <button class="password-toggle" type="button" aria-label="パスワードを表示する" aria-pressed="false">
+                  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/>
+                    <circle cx="12" cy="12" r="2.5"/>
+                    <path class="password-toggle__slash" d="M4 20 20 4"/>
+                  </svg>
+                </button>
+              </div>
+              <div id="password-error" class="form-group__error-message" role="alert"></div>
+            </div>
+            <div class="form-check">
+              <label class="form-check__label">
+                <input type="checkbox" id="login-terms-agree" name="login-terms-agree" class="form-options__checkbox-input" required aria-required="true" checked>
+                <span><a href="02_dashboard/terms-of-service.html" target="_blank" rel="noopener noreferrer">利用規約</a>と<a href="https://www.abroad-o.com/rule.html" target="_blank" rel="noopener noreferrer">プライバシーポリシー</a>および<a href="02_dashboard/personal-data-protection-policy.html" target="_blank" rel="noopener noreferrer">個人情報保護方針</a>に同意する</span>
+              </label>
+              <div id="login-terms-agree-error" class="form-group__error-message" role="alert"></div>
+            </div>
+            <div class="form-row">
+              <label class="form-row__remember">
+                <input type="checkbox" id="remember-account" name="remember" class="form-options__checkbox-input" aria-label="アカウントを記憶する">
+                <span>アカウント記憶</span>
+              </label>
+              <a href="02_dashboard/forgot-password.html">パスワードを忘れた方</a>
+            </div>
+            <button class="button button--filled" type="submit"><span class="button__spinner" aria-hidden="true"></span>ログイン <span aria-hidden="true">→</span></button>
+          </form>
+          <div class="divider" role="separator" aria-label="または">
+            <span class="divider__text">または</span>
+          </div>
+          <button class="button button--google" type="button">
+            <img class="button--google__logo" src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="">
+            Googleでログイン
+          </button>
+          <details class="scenario-accounts">
+            <summary class="scenario-accounts__title">テスト用アカウントはこちら <span aria-hidden="true">→</span></summary>
+            <ul class="scenario-accounts__list">
+              <li><a href="#" class="scenario-accounts__link" data-email="user"><span class="scenario-accounts__email">user</span><span class="scenario-accounts__badge">標準</span></a></li>
+              <li><a href="#" class="scenario-accounts__link" data-email="new"><span class="scenario-accounts__email">new</span><span class="scenario-accounts__badge">新規</span></a></li>
+              <li><a href="#" class="scenario-accounts__link" data-email="admin"><span class="scenario-accounts__email">admin</span><span class="scenario-accounts__badge">管理者</span></a></li>
+            </ul>
+          </details>
+        </aside>
       </div>
-    </div>
-    <div id="input-box" class="form-container">
-      <h1 class="form-container__title">SPEED AD ログイン</h1>
-      <form id="login-form" novalidate>
-        <div class="form-group">
-          <label for="email" class="form-group__label">メールアドレス</label>
-          <input type="email" id="email" name="email" class="form-group__input" required aria-required="true" autocomplete="email" aria-describedby="email-error">
-          <div id="email-error" class="form-group__error-message" role="alert"></div>
-        </div>
-        <div class="form-group">
-          <label for="password" class="form-group__label">パスワード</label>
-          <input type="password" id="password" name="password" class="form-group__input" required aria-required="true" autocomplete="current-password" aria-describedby="password-error">
-          <div id="password-error" class="form-group__error-message" role="alert"></div>
-        </div>
-        <!-- 利用規約同意チェックボックス -->
-        <div style="margin-bottom: 12px;">
-          <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer; font-size: 0.85rem; color: #333; line-height: 1.5;">
-            <input type="checkbox" id="login-terms-agree" name="login-terms-agree" class="form-options__checkbox-input" required aria-required="true" style="margin-top: 3px; flex-shrink: 0;">
-            <span>
-              <a href="02_dashboard/terms-of-service.html" target="_blank" rel="noopener noreferrer" class="form-options__link">利用規約</a>と<a href="https://www.abroad-o.com/rule.html" target="_blank" rel="noopener noreferrer" class="form-options__link">プライバシーポリシー</a>および<a href="02_dashboard/personal-data-protection-policy.html" target="_blank" rel="noopener noreferrer" class="form-options__link">個人情報保護方針</a>に同意する
-            </span>
-          </label>
-          <div id="login-terms-agree-error" class="form-group__error-message" role="alert"></div>
-        </div>
-        <!-- ログイン状態保持 ＆ パスワードを忘れた方（横並び） -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.85rem; color: #333;">
-            <input type="checkbox" name="remember" class="form-options__checkbox-input" aria-label="ログイン状態を保持する"> ログイン状態を保持する
-          </label>
-          <a href="02_dashboard/forgot-password.html" class="form-options__link" style="font-size: 0.85rem; white-space: nowrap;">パスワードを忘れた方</a>
-        </div>
-        <details class="scenario-accounts">
-          <summary class="scenario-accounts__title">シナリオテスト用アカウント</summary>
-          <ul class="scenario-accounts__list">
-            <li>
-              <a href="#" class="scenario-accounts__link" data-email="user">
-                <span class="scenario-accounts__email">user</span>
-                <span class="scenario-accounts__badge">標準</span>
-              </a>
-            </li>
-            <li>
-              <a href="#" class="scenario-accounts__link" data-email="new">
-                <span class="scenario-accounts__email">new</span>
-                <span class="scenario-accounts__badge">新規</span>
-              </a>
-            </li>
-            <li>
-              <a href="#" class="scenario-accounts__link" data-email="admin">
-                <span class="scenario-accounts__email">admin</span>
-                <span class="scenario-accounts__badge">管理者</span>
-              </a>
-            </li>
-          </ul>
-        </details>
-        <button class="button button--filled" type="submit">
-          <span class="button__spinner"></span>
-          ログイン
-        </button>
-      </form>
-      <div class="divider">
-        <span class="divider__text">または</span>
-      </div>
-      <button class="button button--google" type="button">
-        <img class="button--google__logo" src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo">
-        Googleでログイン
-      </button>
-      <p class="signup-inline-link">新規利用の方は <a href="?intent=signup#top" data-signup-trigger>無料アカウント作成</a></p>
-    </div>
-  </div>
-    </div>
-    <div class="public-news-section" id="public-news-section" data-news-endpoint="data/news.json" data-news-detail-url="https://support.speed-ad.com/news/" hidden>
-      <article class="public-news-bar" aria-labelledby="public-news-title">
+    </section>
+
+    <section class="public-news-section" id="public-news-section" data-news-endpoint="data/news.json" data-news-detail-url="https://support.speed-ad.com/news/" hidden aria-labelledby="public-news-title">
+      <div class="public-news-bar">
         <div class="public-news-bar__heading">
           <p class="public-news-bar__eyebrow">NEWS</p>
-          <h2 id="public-news-title">お知らせ</h2>
+          <h2 id="public-news-title" class="visually-hidden">お知らせ</h2>
         </div>
         <div class="public-news-list" id="public-news-list" aria-live="polite"></div>
-        <a class="public-news-bar__link" href="https://support.speed-ad.com/news/" target="_blank" rel="noopener noreferrer">一覧を見る</a>
-      </article>
-    </div>
-<div class="section" id="section1">
-      <article>
-        <div class="flex row">
-          <div class="pic"><img src="img/pic1.jpg" alt=""></div>
-          <section>
-            <h2 class="title1">WEBアンケートの作成</h2>
-            <p>直感的な操作で、誰でも簡単にWEBアンケートを無料で作成できます。<br>
-              作成したアンケートは、イベント来場者のスマホやタブレットでQRコードから読み込んで回答できます。<br>
-              アンケートの回答はイベント後すぐにCSVでダウンロードしてビジネスに活かせます。 </p>
-          </section>
+        <a class="public-news-bar__link" href="https://support.speed-ad.com/news/" target="_blank" rel="noopener noreferrer">一覧を見る <span aria-hidden="true">→</span></a>
+      </div>
+    </section>
+
+    <section class="section-block features-section" aria-labelledby="features-title">
+      <div class="section-grid section-grid--intro">
+        <div class="section-heading">
+          <p class="section-kicker">FEATURES</p>
+          <h2 id="features-title">SPEED ADで<br>できること</h2>
+          <p>展示会後のフォローを支える3つの主要機能で、出会いを成果に変えます。</p>
+          <a class="text-link" href="#capabilities">機能の詳細を見る <span aria-hidden="true">→</span></a>
         </div>
-      </article>
-    </div>
-    <div class="section" id="section2">
-      <article>
-        <div class="flex">
-          <div class="pic"><img src="img/pic2.jpg" alt=""></div>
-          <section>
-            <h2 class="title2">名刺情報のデータ化</h2>
-            <p>WEBアンケートの回答と同時に、来場者の名刺を撮影＆添付できます。<br>
-              御礼メールに必須のメールアドレスと氏名は無料でデータ化できます。<br>
-              項目プランやスピードプランを組み合わせれば、自社のビジネススタイルに最も適した運用が可能です。 </p>
-          </section>
+        <div class="feature-cards">
+          <article class="feature-card">
+            <span class="feature-card__number">01</span>
+            <div class="feature-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 32 32" focusable="false">
+                <path d="M11 6h10m-7-2h4l1 4h-6l1-4Z"/>
+                <path d="M9 8H7v20h18V8h-2"/>
+                <path d="m11 19 3 3 7-8"/>
+                <circle cx="24" cy="26" r="3"/>
+              </svg>
+            </div>
+            <h3>WEBアンケート作成</h3>
+            <p>来場者向けの質問を作成。回答はリアルタイムに集計。</p>
+          </article>
+          <article class="feature-card">
+            <span class="feature-card__number">02</span>
+            <div class="feature-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 32 32" focusable="false">
+                <rect x="4" y="7" width="24" height="18" rx="1"/>
+                <circle cx="11" cy="14" r="2.5"/>
+                <path d="M8 21c.8-2.4 5.2-2.4 6 0"/>
+                <path d="M18 13h6m-6 5h6m-6 5h4"/>
+              </svg>
+            </div>
+            <h3>名刺情報のデータ化</h3>
+            <p>名刺を撮影するだけで、正確にデータ化。手入力の手間を削減します。</p>
+          </article>
+          <article class="feature-card">
+            <span class="feature-card__number">03</span>
+            <div class="feature-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 32 32" focusable="false">
+                <path d="M3 15 28 4 18 28l-4-10-11-3Z"/>
+                <path d="m14 18 14-14"/>
+              </svg>
+            </div>
+            <h3>御礼メールの送信</h3>
+            <p>テンプレートで効率的に、パーソナライズされた御礼メールを自動送信。</p>
+          </article>
         </div>
-      </article>
-    </div>
-    <div class="section" id="section3">
-      <article>
-        <div class="flex row">
-          <div class="pic"><img src="img/pic3.jpg" alt=""></div>
-          <section>
-            <h2 class="title3">御礼メールの送信（Coming Soon）</h2>
-            <p>イベント来場者に御礼メールを送る事ができます。<br>
-              メール文章は複数パターン用意でき、アンケートの回答に合わせて送信内容を変える事ができます。 </p>
-          </section>
+      </div>
+    </section>
+
+    <section class="section-block flow-section" aria-labelledby="flow-title">
+      <div class="section-heading section-heading--center">
+        <p class="section-kicker">FLOW</p>
+        <h2 id="flow-title"><span>展示会の流れに</span><br><span>寄り添う設計</span></h2>
+      </div>
+      <ol class="flow-list">
+        <li>
+          <span class="flow-list__number">01</span>
+          <span class="flow-list__icon" aria-hidden="true">
+            <svg viewBox="0 0 32 32" focusable="false">
+              <path d="M6 23 23 6l3 3L9 26l-5 1 2-4Z"/>
+              <path d="m20 9 3 3"/>
+            </svg>
+          </span>
+          <h3>準備</h3>
+          <p>アンケートとメールを準備。</p>
+        </li>
+        <li>
+          <span class="flow-list__number">02</span>
+          <span class="flow-list__icon" aria-hidden="true">
+            <svg viewBox="0 0 32 32" focusable="false">
+              <path d="M5 5h7v7H5zM20 5h7v7h-7zM5 20h7v7H5z"/>
+              <path d="M20 20h3v3h-3zM24 24h3v3h-3zM20 26h2M26 20h1"/>
+            </svg>
+          </span>
+          <h3>QR回答</h3>
+          <p>来場者がQRから回答。その場でデータを取得。</p>
+        </li>
+        <li>
+          <span class="flow-list__number">03</span>
+          <span class="flow-list__icon" aria-hidden="true">
+            <svg viewBox="0 0 32 32" focusable="false">
+              <path d="M10 10h3l2-3h5l2 3h2a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V13a3 3 0 0 1 3-3h2Z"/>
+              <circle cx="16" cy="18" r="5"/>
+            </svg>
+          </span>
+          <h3>名刺撮影</h3>
+          <p>名刺を撮影しデータ化。</p>
+        </li>
+        <li>
+          <span class="flow-list__number">04</span>
+          <span class="flow-list__icon" aria-hidden="true">
+            <svg viewBox="0 0 32 32" focusable="false">
+              <circle cx="16" cy="10" r="4"/>
+              <path d="M9 26c1-6 13-6 14 0"/>
+              <circle cx="8" cy="14" r="3"/>
+              <circle cx="24" cy="14" r="3"/>
+              <path d="M3 25c.5-4 7-4 8-1M21 24c1-3 7-3 8 1"/>
+            </svg>
+          </span>
+          <h3>追客</h3>
+          <p>御礼メールでスムーズに追客。</p>
+        </li>
+      </ol>
+    </section>
+
+    <section class="section-block capabilities-section" id="capabilities" aria-labelledby="capabilities-title">
+      <div class="section-grid section-grid--capabilities">
+        <div class="section-heading">
+          <p class="section-kicker">REASONS</p>
+          <h2 id="capabilities-title">選ばれる理由</h2>
         </div>
-      </article>
-    </div>
-    <div class="section circle" id="section4">
-      <article>
-        <div class="no-flex">
-          <h2>様々なビジネススキームに、ベストフィット</h2>
-          <ul class="list">
-            <li>
-              <h3><span><em>STEP 01</em> - 出展企業様</span></h3>
-              <div class="text">
-                <p>パソコンで<br>
-                  WEBアンケート<br>
-                  作成</p>
-              </div>
-            </li>
-            <li>
-              <h3><span><em>STEP 02</em> - 出展企業様</span></h3>
-              <div class="text short">
-                <ul>
-                  <li>
-                    <h4>case01</h4>
-                    <p>展示会場のデスクプレートやパンフレットでQRコードを表示</p>
-                  </li>
-                  <li>
-                    <h4>case02</h4>
-                    <p>DMにアンケート回答用のURLを貼り付けて送信</p>
-                  </li>
-                  <li>
-                    <h4>case03</h4>
-                    <p>セミナー資料の末尾にQRコードを印刷</p>
-                  </li>
-                </ul>
-              </div>
-            </li>
-            <li>
-              <h3><span><em>STEP 03</em> - 来場者</span></h3>
-              <div class="text">
-                <p>QRコードから<br>
-                  アンケートを回答、<br>
-                  同時に名刺撮影</p>
-              </div>
-            </li>
-            <li>
-              <h3><span><em>STEP 04</em> - 自動化</span></h3>
-              <div class="text">
-                <p>自動で名刺データ化、<br>
-                  そのまま御礼メール<br>
-                  送信</p>
-              </div>
-            </li>
-          </ul>
+        <div class="capability-list">
+          <article class="capability-item">
+            <div class="capability-item__icon" aria-hidden="true">
+              <svg viewBox="0 0 32 32" focusable="false">
+                <circle cx="14" cy="9" r="5"/>
+                <path d="M5 27c1-7 16-7 18 0"/>
+                <path d="m21 19 3 3 5-7"/>
+              </svg>
+            </div>
+            <span class="capability-item__number">01</span>
+            <div class="capability-item__body">
+              <h3>アンケート作成が簡単</h3>
+              <p>展示会やイベント向けの設問をブラウザで準備し、QR回答導線につなげられます。</p>
+            </div>
+          </article>
+          <article class="capability-item">
+            <div class="capability-item__icon" aria-hidden="true">
+              <svg viewBox="0 0 32 32" focusable="false">
+                <path d="M5 27h22"/>
+                <path d="M8 23V13h4v10"/>
+                <path d="M14 23V7h4v16"/>
+                <path d="M20 23V11h4v12"/>
+                <path d="m22 8 4-4 2 5"/>
+              </svg>
+            </div>
+            <span class="capability-item__number">02</span>
+            <div class="capability-item__body">
+              <h3>回答状況を確認</h3>
+              <p>グラフ分析やSPEEDレビューで、回答データや状況を確認できる導線を用意しています。</p>
+            </div>
+          </article>
+          <article class="capability-item">
+            <div class="capability-item__icon" aria-hidden="true">
+              <svg viewBox="0 0 32 32" focusable="false">
+                <rect x="4" y="7" width="24" height="18" rx="1"/>
+                <circle cx="11" cy="14" r="2.5"/>
+                <path d="M8 21c.8-2.4 5.2-2.4 6 0"/>
+                <path d="M18 13h6m-6 5h6m-6 5h4"/>
+              </svg>
+            </div>
+            <span class="capability-item__number">03</span>
+            <div class="capability-item__body">
+              <h3>名刺情報のデータ化</h3>
+              <p>名刺画像と回答情報を同じ流れで扱えるよう、データ化設定と確認導線を整備しています。</p>
+            </div>
+          </article>
+          <article class="capability-item">
+            <div class="capability-item__icon" aria-hidden="true">
+              <svg viewBox="0 0 32 32" focusable="false">
+                <rect x="4" y="8" width="24" height="16" rx="1"/>
+                <path d="m5 9 11 9 11-9"/>
+                <path d="m6 23 8-7m12 7-8-7"/>
+              </svg>
+            </div>
+            <span class="capability-item__number">04</span>
+            <div class="capability-item__body">
+              <h3>フォロー設定へつなぐ</h3>
+              <p>対象者確認、テンプレート、費用見積もりを含む御礼メール設定画面への導線を整理しています。</p>
+            </div>
+          </article>
+          <article class="capability-item">
+            <div class="capability-item__icon" aria-hidden="true">
+              <svg viewBox="0 0 32 32" focusable="false">
+                <circle cx="16" cy="9" r="4"/>
+                <path d="M9 27c1-6 13-6 14 0"/>
+                <circle cx="7" cy="15" r="3"/>
+                <circle cx="25" cy="15" r="3"/>
+                <path d="M2 26c.5-4 7-4 8-1M22 25c1-3 7-3 8 1"/>
+              </svg>
+            </div>
+            <span class="capability-item__number">05</span>
+            <div class="capability-item__body">
+              <h3>チーム運用に備える</h3>
+              <p>グループ管理をもとに、複数名での編集や共有範囲を扱える運用導線を整備しています。</p>
+            </div>
+          </article>
+          <article class="capability-item">
+            <div class="capability-item__icon" aria-hidden="true">
+              <svg viewBox="0 0 32 32" focusable="false">
+                <path d="M7 19v-4a9 9 0 0 1 18 0v4"/>
+                <path d="M7 19h4v7H8a3 3 0 0 1-3-3v-1a3 3 0 0 1 2-3Z"/>
+                <path d="M25 19h-4v7h3a3 3 0 0 0 3-3v-1a3 3 0 0 0-2-3Z"/>
+                <path d="M21 26c0 2-2 3-5 3"/>
+              </svg>
+            </div>
+            <span class="capability-item__number">06</span>
+            <div class="capability-item__body">
+              <h3>サポート情報を確認</h3>
+              <p>ヘルプ記事やFAQから、アンケート作成、名刺データ化、お礼メールの使い方を確認できます。</p>
+            </div>
+          </article>
         </div>
-      </article>
-    </div>
-    <div class="section circle2" id="section5">
-      <article>
-        <div class="no-flex white">
-          <h2>あなたのビジネスを加速する充実な機能</h2>
-          <ul class="list2">
-            <li> <img src="img/icon1.png" alt="イメージ：豊富な設問タイプを設定可能">
-              <h3>豊富な設問タイプを設定可能</h3>
-              <p>WEBアンケートでは単回答/複数回答/自由回答形式の設問に加えて、年月/時間の回答やマトリックス状の設問など多様なフォームを作れます。</p>
-            </li>
-            <li> <img src="img/icon2.png" alt="イメージ：無料プランでメール送信まで可能">
-              <h3>無料プランでメール送信まで可能</h3>
-              <p>WEBアンケート作成、メールアドレスと氏名の名刺データ化、御礼メール（Coming Soon）は100件まで全て無料です。</p>
-            </li>
-            <li> <img src="img/icon3.png" alt="イメージ：高品質でスピーディーな名刺データ化">
-              <h3>高品質でスピーディーな名刺データ化</h3>
-              <p>オペレーターによる手入力と独自AIプログラムの併用で、高い入力精度でスピーディーなデータ化が可能です。</p>
-            </li>
-            <li> <img src="img/icon4.png" alt="イメージ：QRコード表示で非接触">
-              <h3>QRコード表示で非接触</h3>
-              <p>イベント来場者のスマホやタブレットから回答して貰う為、様々な展示会のスタイルに対応できます。</p>
-            </li>
-            <li> <img src="img/icon5.png" alt="イメージ：高セキュリティ環境">
-              <h3>高セキュリティ環境</h3>
-              <p>ISMS（ISO27001）、及びプライバシーマークを取得し、高いセキュリティ環境でサービス提供しています。</p>
-            </li>
-            <li> <img src="img/icon6.png" alt="イメージ：御礼メールを最短当日配信">
-              <h3>御礼メールを最短当日配信</h3>
-              <p>Coming Soon</p>
-            </li>
-          </ul>
-        </div>
-      </article>
-    </div>
-    <div class="section voice-teaser-section" id="section6">
-      <article class="voice-teaser-wrap">
+      </div>
+    </section>
+
+    <section class="voice-teaser-section" aria-labelledby="voice-title">
+      <div class="voice-teaser-wrap">
         <div class="voice-teaser__intro">
           <div>
-            <p class="voice-teaser__kicker">Customer Voices</p>
-            <h2 class="voice-teaser__title">お客様のお声</h2>
-            <p class="voice-teaser__description">
-              先行利用モニター企業と、アンケート機能のみを利用した大学の2事例を公開しています。
-              導入前の課題から、実際の運用イメージ、導入後の変化までを短く整理した信頼補強用のページです。
-            </p>
+            <p class="section-kicker section-kicker--light">VOICE</p>
+            <h2 id="voice-title" class="voice-teaser__title">お客様の声</h2>
+            <p class="voice-teaser__description">多くの企業様にご利用いただき、成果につながっています。</p>
           </div>
           <p class="voice-teaser__status" id="customer-voice-teaser-status">読み込み中</p>
         </div>
-        <div class="voice-teaser__grid" id="customer-voice-teaser-grid">
+        <div class="voice-teaser__grid" id="customer-voice-teaser-grid" aria-live="polite">
           <p class="voice-teaser__empty">公開事例を読み込んでいます。</p>
         </div>
-        <div class="voice-teaser__actions">
-          <a class="voice-teaser__link" href="customer-voices/index.html">詳細を見る</a>
-        </div>
-      </article>
+        <a class="voice-teaser__link" href="customer-voices/index.html">すべての声を見る <span aria-hidden="true">→</span></a>
+      </div>
+    </section>
+
+    <section class="related-services" aria-labelledby="related-title">
+      <div class="related-services__heading">
+        <p class="section-kicker">RELATED SERVICES</p>
+        <h2 id="related-title">関連サービス</h2>
+      </div>
+      <nav class="related-services__list" aria-label="関連サービス">
+        <a href="https://www.abroad-o.com/input.html" target="_blank" rel="noopener noreferrer"><span class="related-services__name">データ入力<br>サービス</span><span class="related-services__arrow" aria-hidden="true">→</span></a>
+        <a href="https://www.abroad-o.com/aggregate.html" target="_blank" rel="noopener noreferrer"><span class="related-services__name">データ集計・解析<br>サービス</span><span class="related-services__arrow" aria-hidden="true">→</span></a>
+        <a href="https://www.abroad-o.com/scan.html" target="_blank" rel="noopener noreferrer"><span class="related-services__name">スキャニング<br>サービス</span><span class="related-services__arrow" aria-hidden="true">→</span></a>
+        <a href="https://www.abroad-o.com/largeformat.html" target="_blank" rel="noopener noreferrer"><span class="related-services__name">大判の電子化</span><span class="related-services__arrow" aria-hidden="true">→</span></a>
+        <a href="https://www.abroad-o.com/film.html" target="_blank" rel="noopener noreferrer"><span class="related-services__name">フィルムの電子化</span><span class="related-services__arrow" aria-hidden="true">→</span></a>
+        <a href="https://www.abroad-o.com/edit.html" target="_blank" rel="noopener noreferrer"><span class="related-services__name">画像編集・加工<br>サービス</span><span class="related-services__arrow" aria-hidden="true">→</span></a>
+      </nav>
+    </section>
+
+    <section class="final-cta" aria-labelledby="final-cta-title">
+      <h2 id="final-cta-title">展示会の出会いを、確かな成果へ。</h2>
+      <a class="cta-button cta-button--light" href="?intent=signup#top" data-signup-trigger>無料ではじめる <span aria-hidden="true">→</span></a>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer__identity">
+      <a class="site-footer__brand" href="#top">SPEED AD</a>
+      <p>© 2026 SPEED AD Inc.</p>
     </div>
-    <div class="section" id="section7">
-      <article class="tate">
-        <div class="no-flex white">
-          <h2>当社で提供するその他のサービス</h2>
-          <ul class="list3">
-            <li class="service1"> <a href="https://www.abroad-o.com/input.html" target="_blank">データ入力<br>
-              サービス<span class="arrow-round"></span></a> </li>
-            <li class="service2"><a href="https://www.abroad-o.com/aggregate.html" target="_blank">データ集計・<br>
-              解析サービス<span class="arrow-round"></span></a> </li>
-            <li class="service3"> <a href="https://www.abroad-o.com/scan.html" target="_blank">スキャニング<br>
-              サービス<span class="arrow-round"></span></a> </li>
-            <li class="service4"><a href="https://www.abroad-o.com/largeformat.html" target="_blank">大判の電子化<span class="arrow-round"></span></a> </li>
-            <li class="service5"><a href="https://www.abroad-o.com/film.html" target="_blank">フィルムの電子化<span class="arrow-round"></span></a> </li>
-            <li class="service6"><a href="https://www.abroad-o.com/edit.html" target="_blank">画像編集・<br>
-              加工サービス<span class="arrow-round"></span></a> </li>
-          </ul>
-        </div>
-							
-    <footer id="before-footer">
-    <h2 style="font-size: 26px; font-weight: 800; letter-spacing: 2px; color: #222; white-space: nowrap;">SPEED AD</h2>
-    <ul>
-      <li>
-        <h3>SPEED-ADについて</h3>
-        <p><a class="footer-primary-cta" href="?intent=signup#top">無料ではじめる</a></p>
-        <p><a href="#top">ログイン</a></p>
-        <p><a href="customer-voices/index.html">お客様のお声</a></p>
-        <p><a href="02_dashboard/bug-report.html">お問い合わせ</a></p>
-        <p><a href="https://support.speed-ad.com/help/" target="_blank" rel="noopener noreferrer">ヘルプ</a></p>
-      </li>
-      <li>
-        <h3>運営会社について</h3>
-        <p><a href="https://www.abroad-o.com/service.html" target="_blank" rel="noopener noreferrer">当社サービス</a></p>
-        <p><a href="https://www.abroad-o.com/about.html" target="_blank" rel="noopener noreferrer">会社情報</a></p>
-        <p><a href="https://speed-ad.com/tokushou" target="_blank" rel="noopener noreferrer">特定商取引法に基づく表記</a></p>
-        <p><a href="02_dashboard/terms-of-service.html">利用規約</a></p>
-        <p><a href="https://www.abroad-o.com/rule.html" target="_blank" rel="noopener noreferrer">プライバシーポリシー</a></p>
-      </li>
-    </ul>
+    <nav aria-label="フッター">
+      <a href="#public-news-title">お知らせ</a>
+      <a href="https://support.speed-ad.com/help/" target="_blank" rel="noopener noreferrer">サポート</a>
+      <a href="https://www.abroad-o.com/rule.html" target="_blank" rel="noopener noreferrer">プライバシーポリシー</a>
+      <a href="02_dashboard/terms-of-service.html" target="_blank" rel="noopener noreferrer">利用規約</a>
+      <a href="https://www.abroad-o.com/" target="_blank" rel="noopener noreferrer">会社概要</a>
+    </nav>
+    <a class="site-footer__pagetop" href="#top" aria-label="ページ先頭へ">↑</a>
   </footer>
-  </article>
-    </div>
-  </div>
-</main>
-  <!-- 新規アカウント作成モーダル -->
+
   <div class="modal modal--is-hidden" role="dialog" aria-modal="true" aria-labelledby="signup-modal-title">
     <div class="modal__content">
-      <button class="modal__close-button" aria-label="モーダルを閉じる">×</button>
+      <button class="modal__close-button" aria-label="モーダルを閉じる" type="button">×</button>
       <h2 id="signup-modal-title" class="modal__title">新規アカウント作成</h2>
-      <form id="signup-form">
-         <div class="form-group">
+      <form id="signup-form" novalidate>
+        <div class="form-group">
           <label for="signup-name" class="form-group__label">お名前（任意）</label>
           <input type="text" id="signup-name" name="signup-name" class="form-group__input" autocomplete="name" placeholder="例）山田 太郎">
           <div id="signup-name-error" class="form-group__error-message" role="alert"></div>
@@ -1457,600 +383,31 @@
           <div id="signup-password-error" class="form-group__error-message" role="alert"></div>
           <div id="signup-password-hint" class="form-group__password-hint">8文字以上、半角英数字（記号推奨）を組み合わせてください。</div>
         </div>
-         <div class="form-group">
+        <div class="form-group">
           <label for="signup-password-confirm" class="form-group__label">パスワード確認</label>
           <input type="password" id="signup-password-confirm" name="signup-password-confirm" class="form-group__input" required aria-required="true" autocomplete="new-password" aria-describedby="signup-password-confirm-error">
           <div id="signup-password-confirm-error" class="form-group__error-message" role="alert"></div>
         </div>
-        <div class="form-group">
-            <label class="form-options__checkbox-label" style="justify-content: flex-start; margin-bottom: 0;">
-                <input type="checkbox" id="terms-agree" name="terms-agree" class="form-options__checkbox-input" required aria-required="true">
-                <span style="font-weight: normal; font-size: 0.9rem;">
-                    <a href="02_dashboard/terms-of-service.html" target="_blank" rel="noopener noreferrer" class="form-options__link">利用規約</a>と<a href="https://www.abroad-o.com/rule.html" target="_blank" rel="noopener noreferrer" class="form-options__link">プライバシーポリシー</a>および<a href="02_dashboard/personal-data-protection-policy.html" target="_blank" rel="noopener noreferrer" class="form-options__link">個人情報保護方針</a>に同意する
-                </span>
-            </label>
-            <div id="terms-agree-error" class="form-group__error-message" role="alert"></div>
+        <div class="form-check">
+          <label class="form-check__label">
+            <input type="checkbox" id="terms-agree" name="terms-agree" class="form-options__checkbox-input" required aria-required="true">
+            <span><a href="02_dashboard/terms-of-service.html" target="_blank" rel="noopener noreferrer">利用規約</a>と<a href="https://www.abroad-o.com/rule.html" target="_blank" rel="noopener noreferrer">プライバシーポリシー</a>および<a href="02_dashboard/personal-data-protection-policy.html" target="_blank" rel="noopener noreferrer">個人情報保護方針</a>に同意する</span>
+          </label>
+          <div id="terms-agree-error" class="form-group__error-message" role="alert"></div>
         </div>
-        <button class="button button--filled" type="submit">
-          <span class="button__spinner"></span>
-          アカウント作成
-        </button>
+        <button class="button button--filled" type="submit"><span class="button__spinner" aria-hidden="true"></span>アカウントを作成</button>
       </form>
-      <div class="divider">
+      <div class="divider" role="separator" aria-label="または">
         <span class="divider__text">または</span>
       </div>
       <button class="button button--google" type="button">
-        <img class="button--google__logo" src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo">
+        <img class="button--google__logo" src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="">
         Googleでサインアップ
       </button>
-      <div class="sub-links">
-        アカウントをお持ちですか？ <a href="#" id="show-login-from-modal" class="sub-links__item">ログインはこちら</a>
-      </div>
+      <p class="sub-links">アカウントをお持ちですか？ <a href="#" id="show-login-from-modal" class="sub-links__item">ログインはこちら</a></p>
     </div>
   </div>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // --- 要素の取得 (BEMクラス名に更新) ---
-      const loginForm = document.getElementById('login-form');
-      const emailInput = document.getElementById('email');
-      const passwordInput = document.getElementById('password');
-      const emailError = document.getElementById('email-error');
-      const passwordError = document.getElementById('password-error');
-      const loginTermsAgreeCheckbox = document.getElementById('login-terms-agree');
-      const loginTermsAgreeError = document.getElementById('login-terms-agree-error');
-      const loginButton = loginForm.querySelector('.button--filled');
-      const googleButtonMain = document.querySelector('.form-container > .button--google');
-      const signupButtonMain = document.querySelector('[data-signup-trigger], .button--tonal');
-      const modalOverlay = document.querySelector('.modal'); // BEM
-      const modalContent = document.querySelector('.modal__content'); // BEM
-      const modalCloseButton = document.querySelector('.modal__close-button'); // BEM
-      const signupForm = document.getElementById('signup-form');
-      const showLoginLinkFromModal = document.getElementById('show-login-from-modal');
-      const signupNameInput = document.getElementById('signup-name');
-      const signupEmailInput = document.getElementById('signup-email');
-      const signupPasswordInput = document.getElementById('signup-password');
-      const signupPasswordConfirmInput = document.getElementById('signup-password-confirm');
-      const termsAgreeCheckbox = document.getElementById('terms-agree');
-      const signupNameError = document.getElementById('signup-name-error');
-      const signupEmailError = document.getElementById('signup-email-error');
-      const signupPasswordError = document.getElementById('signup-password-error');
-      const signupPasswordConfirmError = document.getElementById('signup-password-confirm-error');
-      const termsAgreeError = document.getElementById('terms-agree-error');
-      const signupAccountButton = signupForm.querySelector('.button--filled');
-      const googleButtonModal = modalContent.querySelector('.button--google');
-      const customerVoiceTeaserGrid = document.getElementById('customer-voice-teaser-grid');
-      const customerVoiceTeaserStatus = document.getElementById('customer-voice-teaser-status');
-      const publicNewsSection = document.getElementById('public-news-section');
-      const publicNewsList = document.getElementById('public-news-list');
-      const pageMain = document.querySelector('main');
-      const modalFocusableSelector = [
-        'a[href]',
-        'button:not([disabled])',
-        'input:not([disabled])',
-        'select:not([disabled])',
-        'textarea:not([disabled])',
-        '[tabindex]:not([tabindex="-1"])'
-      ].join(',');
-      let modalReturnFocusElement = null;
-      let modalFocusTimeoutId = null;
-      function getModalFocusableElements() {
-        return Array.from(modalContent.querySelectorAll(modalFocusableSelector))
-          .filter((element) => element.offsetParent !== null);
-      }
-      function setBackgroundInert(isInert) {
-        if (!pageMain) {
-          return;
-        }
-        if (isInert) {
-          pageMain.setAttribute('aria-hidden', 'true');
-          pageMain.setAttribute('inert', '');
-          return;
-        }
-        pageMain.removeAttribute('aria-hidden');
-        pageMain.removeAttribute('inert');
-      }
-      function resolveAppPath(relativePath) {
-        if (!relativePath) {
-          return relativePath;
-        }
-        if (/^(https?:)?\/\//.test(relativePath)) {
-          return relativePath;
-        }
-        const { pathname } = window.location;
-        let basePath = pathname;
-        if (!basePath.endsWith('/')) {
-          if (basePath.includes('.')) {
-            basePath = basePath.slice(0, basePath.lastIndexOf('/') + 1);
-          } else {
-            basePath = `${basePath}/`;
-          }
-        }
-        return `${basePath}${relativePath}`;
-      }
-      function escapeHtml(value) {
-        return String(value ?? '')
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;')
-          .replace(/'/g, '&#39;');
-      }
-      async function loadPublicNews() {
-        if (!publicNewsSection || !publicNewsList) {
-          return;
-        }
-        const newsEndpoint = publicNewsSection.dataset.newsEndpoint || 'data/news.json';
-        const fallbackNewsUrl = publicNewsSection.dataset.newsDetailUrl || 'https://support.speed-ad.com/news/';
-        try {
-          const response = await fetch(resolveAppPath(newsEndpoint));
-          if (!response.ok) {
-            throw new Error(`Failed to load public news: ${response.status}`);
-          }
-          const payload = await response.json();
-          const items = Array.isArray(payload?.items)
-            ? payload.items.filter((item) => item?.title).slice(0, 3)
-            : [];
-          if (!items.length) {
-            publicNewsSection.hidden = true;
-            return;
-          }
-          publicNewsList.innerHTML = items.map((item) => {
-            const displayDate = item.displayDate || item.date || item.publishedAt || '';
-            const dateTime = item.date || item.publishedAt || '';
-            const summary = item.summary ? `<p>${escapeHtml(item.summary)}</p>` : '';
-            const url = item.url || fallbackNewsUrl;
-            const timeMarkup = displayDate
-              ? `<time datetime="${escapeHtml(dateTime || displayDate)}">${escapeHtml(displayDate)}</time>`
-              : '';
-            return `
-              <a class="public-news-item" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">
-                ${timeMarkup}
-                <span class="public-news-item__body">
-                  <strong>${escapeHtml(item.title)}</strong>
-                  ${summary}
-                </span>
-              </a>
-            `;
-          }).join('');
-          publicNewsSection.hidden = false;
-        } catch (error) {
-          console.warn('お知らせの読み込みに失敗しました:', error);
-          publicNewsSection.hidden = true;
-        }
-      }
-      async function loadCustomerVoiceTeasers() {
-        if (!customerVoiceTeaserGrid || !customerVoiceTeaserStatus) {
-          return;
-        }
-        try {
-          const response = await fetch(resolveAppPath('data/customer-voices.json'));
-          if (!response.ok) {
-            throw new Error(`Failed to load customer voices: ${response.status}`);
-          }
-          const payload = await response.json();
-          const voices = Array.isArray(payload?.voices)
-            ? payload.voices.filter((voice) => voice?.publishStatus === 'published').slice(0, 2)
-            : [];
-          customerVoiceTeaserStatus.textContent = voices.length ? `${voices.length}件の公開事例` : '公開準備中';
-          if (!voices.length) {
-            customerVoiceTeaserGrid.innerHTML = '<p class="voice-teaser__empty">公開準備中です。詳細ページは後日追加されます。</p>';
-            return;
-          }
-          customerVoiceTeaserGrid.innerHTML = voices.map((voice) => {
-            const features = Array.isArray(voice.usedFeatures) ? voice.usedFeatures.slice(0, 3) : [];
-            const featureList = features.length
-              ? `<ul class="voice-teaser-card__features">${features.map((feature) => `<li>${escapeHtml(feature)}</li>`).join('')}</ul>`
-              : '';
-            return `
-              <article class="voice-teaser-card">
-                <div class="voice-teaser-card__media">
-                  <img src="${resolveAppPath(voice.heroImage || 'img/top-kv.jpg')}" alt="${escapeHtml(voice.label)}のイメージ">
-                </div>
-                <div class="voice-teaser-card__body">
-                  <div class="voice-teaser-card__label-row">
-                    <span class="voice-teaser-card__label">${escapeHtml(voice.organizationType || '導入事例')}</span>
-                    <span class="voice-teaser-card__label">導入事例</span>
-                  </div>
-                  <h3 class="voice-teaser-card__title">${escapeHtml(voice.label)}</h3>
-                  <p class="voice-teaser-card__summary">${escapeHtml(voice.listingSummary || '')}</p>
-                  ${featureList}
-                </div>
-              </article>
-            `;
-          }).join('');
-        } catch (error) {
-          console.warn('お客様のお声の読み込みに失敗しました:', error);
-          customerVoiceTeaserStatus.textContent = '読み込み失敗';
-          customerVoiceTeaserGrid.innerHTML = '<p class="voice-teaser__empty">公開事例を読み込めませんでした。時間をおいて再度お試しください。</p>';
-        }
-      }
-      function maybeOpenSignupFromIntent() {
-        const searchParams = new URLSearchParams(window.location.search);
-        if (searchParams.get('intent') !== 'signup') {
-          return;
-        }
-        showModal();
-        searchParams.delete('intent');
-        const queryString = searchParams.toString();
-        const nextUrl = `${window.location.pathname}${queryString ? `?${queryString}` : ''}${window.location.hash || '#top'}`;
-        window.history.replaceState({}, document.title, nextUrl);
-      }
-      // --- シナリオアカウントのクリック処理 ---
-      const scenarioLinks = document.querySelectorAll('.scenario-accounts__link');
-      scenarioLinks.forEach(link => {
-        link.addEventListener('click', (event) => {
-          event.preventDefault();
-          const email = event.currentTarget?.dataset.email;
-          if (emailInput && email) {
-            emailInput.value = email;
-            // パスワードが不要なので、ログインボタンにフォーカスを移す
-            loginButton.focus();
-            // 表示されている可能性のあるエラーメッセージをクリア
-            clearLoginFormErrors();
-          }
-        });
-      });
-      // --- 初期フォーカス ---
-      if (emailInput) {
-        emailInput.focus();
-      }
-      // --- モーダルの表示/非表示関数 ---
-      function showModal() {
-        modalReturnFocusElement = document.activeElement instanceof HTMLElement ? document.activeElement : signupButtonMain;
-        modalOverlay.classList.remove('modal--is-hidden');
-        document.body.classList.add('is-modal-open');
-        setBackgroundInert(true);
-        modalCloseButton?.focus({ preventScroll: true });
-        // モーダルが表示されるアニメーションを考慮し、少し遅延させてからフォーカスを試みる
-        if (modalFocusTimeoutId) {
-          clearTimeout(modalFocusTimeoutId);
-        }
-        modalFocusTimeoutId = setTimeout(() => {
-          modalFocusTimeoutId = null;
-          if (modalOverlay.classList.contains('modal--is-hidden')) {
-            return;
-          }
-          const focusableElements = getModalFocusableElements();
-          const firstFocusableElement = focusableElements[0] || signupNameInput || modalCloseButton;
-          firstFocusableElement?.focus();
-        }, 100); // 100msの遅延
-      }
-      function hideModal() {
-        modalOverlay.classList.add('modal--is-hidden');
-        document.body.classList.remove('is-modal-open');
-        setBackgroundInert(false);
-        if (modalFocusTimeoutId) {
-          clearTimeout(modalFocusTimeoutId);
-          modalFocusTimeoutId = null;
-        }
-        if (modalReturnFocusElement && document.contains(modalReturnFocusElement)) {
-           modalReturnFocusElement.focus();
-        } else if (signupButtonMain) {
-           signupButtonMain.focus();
-        }
-        modalReturnFocusElement = null;
-        clearSignupFormErrors();
-        signupForm.reset();
-      }
-      // --- エラーメッセージ表示/クリア関数 ---
-      function displayError(inputElement, errorElement, message) {
-          errorElement.textContent = message;
-          inputElement.setAttribute('aria-invalid', message !== "");
-          if (message && inputElement.offsetParent) {
-              // inputElement.scrollIntoView({ behavior: 'smooth', block: 'center' }); // 自動スクロールは煩わしい場合があるのでコメントアウト
-          }
-      }
-      function clearError(inputElement, errorElement) {
-          errorElement.textContent = "";
-          inputElement.setAttribute('aria-invalid', 'false');
-      }
-      function clearLoginFormErrors() {
-          clearError(emailInput, emailError);
-          clearError(passwordInput, passwordError);
-          if (loginTermsAgreeCheckbox) {
-              clearError(loginTermsAgreeCheckbox, loginTermsAgreeError);
-          }
-      }
-      function clearSignupFormErrors() {
-          clearError(signupNameInput, signupNameError);
-          clearError(signupEmailInput, signupEmailError);
-          clearError(signupPasswordInput, signupPasswordError);
-          clearError(signupPasswordConfirmInput, signupPasswordConfirmError);
-          clearError(termsAgreeCheckbox, termsAgreeError);
-      }
-      // --- ボタンのローディング状態管理 ---
-      function showLoading(buttonElement, loadingText = '処理中...') {
-          buttonElement.classList.add('is-loading');
-          buttonElement.setAttribute('disabled', 'true');
-          const spinner = buttonElement.querySelector('.button__spinner'); // BEM
-          if (spinner) {
-              spinner.style.display = 'inline-block';
-          }
-          // テキストノードから元のテキストを正確に保存 (スピナーが存在する場合の考慮)
-          buttonElement.dataset.originalText = Array.from(buttonElement.childNodes)
-              .filter(node => node.nodeType === Node.TEXT_NODE && node.nodeValue.trim() !== '')
-              .map(node => node.nodeValue.trim())
-              .join(' ');
-          const textNode = Array.from(buttonElement.childNodes).find(node => node.nodeType === Node.TEXT_NODE && node.nodeValue.trim() !== '');
-          if (textNode) {
-              textNode.nodeValue = loadingText;
-          } else {
-              buttonElement.textContent = loadingText;
-          }
-      }
-      function hideLoading(buttonElement) {
-          buttonElement.classList.remove('is-loading');
-          buttonElement.removeAttribute('disabled');
-          const spinner = buttonElement.querySelector('.button__spinner'); // BEM
-          if (spinner) {
-              spinner.style.display = 'none';
-          }
-          if (buttonElement.dataset.originalText) {
-              // 元のテキストを復元する際は、スピナーの後のテキストノードを更新
-              const textNode = Array.from(buttonElement.childNodes).find(node => node.nodeType === Node.TEXT_NODE && node.nodeValue.trim() !== '');
-              if (textNode) {
-                  textNode.nodeValue = buttonElement.dataset.originalText;
-              } else {
-                  buttonElement.textContent = buttonElement.dataset.originalText; // フォールバック
-              }
-              delete buttonElement.dataset.originalText;
-          }
-      }
-      // --- イベントリスナーの設定 ---
-      if (signupButtonMain) {
-        signupButtonMain.addEventListener('click', (event) => {
-          event.preventDefault();
-          showModal();
-          // モーダルが表示されたらボタンからフォーカスを外す
-          event.currentTarget.blur();
-        });
-      }
-      if (modalOverlay) {
-        modalOverlay.addEventListener('click', (event) => {
-          if (event.target === modalOverlay) {
-            hideModal();
-          }
-        });
-      }
-      if (modalCloseButton) {
-        modalCloseButton.addEventListener('click', hideModal);
-      }
-      document.addEventListener('keydown', (event) => {
-        const isModalOpen = !modalOverlay.classList.contains('modal--is-hidden');
-        if (!isModalOpen) {
-          return;
-        }
-        if (event.key === 'Escape') {
-          hideModal();
-          return;
-        }
-        if (event.key === 'Tab') {
-          const focusableElements = getModalFocusableElements();
-          if (!focusableElements.length) {
-            event.preventDefault();
-            return;
-          }
-          const firstFocusableElement = focusableElements[0];
-          const lastFocusableElement = focusableElements[focusableElements.length - 1];
-          if (event.shiftKey && document.activeElement === firstFocusableElement) {
-            event.preventDefault();
-            lastFocusableElement.focus();
-          } else if (!event.shiftKey && document.activeElement === lastFocusableElement) {
-            event.preventDefault();
-            firstFocusableElement.focus();
-          }
-        }
-      });
-      if (showLoginLinkFromModal) {
-           showLoginLinkFromModal.addEventListener('click', (event) => {
-               event.preventDefault();
-               hideModal();
-               if (emailInput) {
-                   emailInput.focus();
-               }
-           });
-      }
-      [googleButtonMain, googleButtonModal].forEach(button => {
-          if (button) {
-              button.addEventListener('click', async (event) => {
-                  event.preventDefault();
-                  showLoading(button, '連携中...');
-                  try {
-                      await new Promise(resolve => setTimeout(resolve, 1500));
-                      alert('Google認証シミュレーション: 成功しました！');
-                  } catch (error) {
-                      console.error('Google認証エラー:', error);
-                      alert('Google認証に失敗しました。');
-                  } finally {
-                      hideLoading(button);
-                  }
-              });
-          }
-      });
-      // --- フォーム送信とバリデーション ---
-      if (loginForm) {
-        loginForm.addEventListener('submit', async function(event) {
-          event.preventDefault();
-          if (!validateLoginForm()) {
-            return;
-          }
-          showLoading(loginButton, 'ログイン中...');
-          try {
-            // ログイン処理をシミュレート
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            // ボタンのテキストを変更して通知
-            const textNode = Array.from(loginButton.childNodes).find(node => node.nodeType === Node.TEXT_NODE && node.nodeValue.trim() !== '');
-            if (textNode) {
-              textNode.nodeValue = 'モックです。2秒後に遷移します...';
-            }
-            // 2秒待ってから画面遷移
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            const userEmail = emailInput.value.trim();
-            let targetUrl = resolveAppPath('02_dashboard/index.html'); // デフォルト
-            let tutorialStatus = 'completed';
-            if (userEmail === 'admin') {
-              targetUrl = resolveAppPath('03_admin/index.html');
-            } else if (userEmail === 'new') {
-              targetUrl = resolveAppPath('04_first-login/index.html');
-              tutorialStatus = 'pending';
-            }
-            // ログイン種別ごとにチュートリアル状態を同期
-            try {
-              localStorage.setItem('speedad-tutorial-status', tutorialStatus);
-              localStorage.removeItem('speedad-tutorial-last-survey-params');
-            } catch (storageError) {
-              console.warn('ローカルストレージにチュートリアル状態を保存できませんでした:', storageError);
-            }
-            window.location.href = targetUrl;
-          } catch (error) {
-            console.error('ログインエラー:', error);
-            displayError(passwordInput, passwordError, 'メールアドレスまたはパスワードが正しくありません。');
-          } finally {
-            hideLoading(loginButton);
-          }
-        });
-      }
-      function validateLoginForm() {
-        let isValid = true;
-        clearLoginFormErrors();
-        const emailValue = emailInput.value.trim();
-        const allowedTestUsers = ['user', 'new', 'admin'];
-        if (!emailValue) {
-            displayError(emailInput, emailError, "メールアドレスを入力してください。");
-            isValid = false;
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue) && !allowedTestUsers.includes(emailValue)) {
-          displayError(emailInput, emailError, "有効なメールアドレスを入力してください。");
-          isValid = false;
-        }
-        // テスト用アカウントでない場合のみ、パスワードの検証を行う
-        if (!allowedTestUsers.includes(emailValue)) {
-          if (!passwordInput.value) {
-               displayError(passwordInput, passwordError, "パスワードを入力してください。");
-               isValid = false;
-          } else if (passwordInput.value.length < 8) {
-            displayError(passwordInput, passwordError, "パスワードは8文字以上である必要があります。");
-            isValid = false;
-          }
-        }
-        if (loginTermsAgreeCheckbox && !loginTermsAgreeCheckbox.checked) {
-          displayError(loginTermsAgreeCheckbox, loginTermsAgreeError, "利用規約とプライバシーポリシーへの同意が必要です。");
-          isValid = false;
-        }
-        return isValid;
-      }
-      if (signupForm) {
-           signupForm.addEventListener('submit', async function(event) {
-               event.preventDefault();
-               if (!validateSignupForm()) {
-                   return;
-               }
-               showLoading(signupAccountButton, '作成中...');
-               try {
-                   await new Promise(resolve => setTimeout(resolve, 2000));
-                   alert('アカウントが作成されました！ログインしてください。');
-                   hideModal();
-                   emailInput.value = signupEmailInput.value;
-                   passwordInput.focus();
-               } catch (error) {
-                   console.error('サインアップエラー:', error);
-                   displayError(signupEmailInput, signupEmailError, 'このメールアドレスは既に使用されています。');
-               } finally {
-                   hideLoading(signupAccountButton);
-               }
-           });
-      }
-      function validateSignupForm() {
-          let isValid = true;
-          clearSignupFormErrors();
-          if (!signupEmailInput.value.trim()) {
-              displayError(signupEmailInput, signupEmailError, "メールアドレスを入力してください。");
-              isValid = false;
-          } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(signupEmailInput.value)) {
-              displayError(signupEmailInput, signupEmailError, "有効なメールアドレスを入力してください。");
-              isValid = false;
-          }
-          if (!signupPasswordInput.value) {
-              displayError(signupPasswordInput, signupPasswordError, "パスワードを入力してください。");
-              isValid = false;
-          } else if (signupPasswordInput.value.length < 8) {
-              displayError(signupPasswordInput, signupPasswordError, "パスワードは8文字以上である必要があります。");
-              isValid = false;
-          } else if (!/[A-Za-z]/.test(signupPasswordInput.value) || !/[0-9]/.test(signupPasswordInput.value)) {
-              displayError(signupPasswordInput, signupPasswordError, "パスワードは半角英数字を組み合わせてください。");
-              isValid = false;
-          }
-          if (!signupPasswordConfirmInput.value) {
-               displayError(signupPasswordConfirmInput, signupPasswordConfirmError, "確認用パスワードを入力してください。");
-               isValid = false;
-          } else if (signupPasswordConfirmInput.value !== signupPasswordInput.value) {
-              displayError(signupPasswordConfirmInput, signupPasswordConfirmError, "パスワードが一致しません。");
-              if (signupPasswordInput.value && signupPasswordInput.getAttribute('aria-invalid') === 'false') {
-                  displayError(signupPasswordInput, signupPasswordError, "パスワードが一致しません。");
-              }
-              isValid = false;
-          }
-          if (!termsAgreeCheckbox.checked) {
-              displayError(termsAgreeCheckbox, termsAgreeError, "利用規約とプライバシーポリシーへの同意が必要です。");
-              isValid = false;
-          }
-          return isValid;
-      }
-      // --- 入力時のエラークリア ---
-      const inputsToClear = [
-        emailInput, passwordInput, loginTermsAgreeCheckbox,
-        signupNameInput, signupEmailInput, signupPasswordInput, signupPasswordConfirmInput,
-        termsAgreeCheckbox
-      ];
-      inputsToClear.forEach(input => {
-        if (input) {
-            input.addEventListener('input', () => {
-                let errorElement;
-                if (input === emailInput) errorElement = emailError;
-                else if (input === passwordInput) errorElement = passwordError;
-                else if (input === loginTermsAgreeCheckbox) errorElement = loginTermsAgreeError;
-                else if (input === signupNameInput) errorElement = signupNameError;
-                else if (input === signupEmailInput) errorElement = signupEmailError;
-                else if (input === signupPasswordInput) errorElement = signupPasswordError;
-                else if (input === signupPasswordConfirmInput) errorElement = signupPasswordConfirmError;
-                else if (input === termsAgreeCheckbox) errorElement = termsAgreeError;
-                if (errorElement && input.getAttribute('aria-invalid') === 'true') {
-                     clearError(input, errorElement);
-                }
-                if (input.id === 'signup-password-confirm' && signupPasswordInput.value === signupPasswordConfirmInput.value) {
-                     if(signupPasswordInput.getAttribute('aria-invalid') === 'true' && signupPasswordError.textContent === "パスワードが一致しません。") {
-                          clearError(signupPasswordInput, signupPasswordError);
-                     }
-                }
-                 if (input.id === 'signup-password' && signupPasswordInput.value === signupPasswordConfirmInput.value) {
-                     if(signupPasswordConfirmInput.getAttribute('aria-invalid') === 'true' && signupPasswordConfirmError.textContent === "パスワードが一致しません。") {
-                         clearError(signupPasswordConfirmInput, signupPasswordConfirmError);
-                     }
-                 }
-            });
-            if (input.type === 'checkbox') {
-                input.addEventListener('change', () => {
-                    if (input.checked && input.getAttribute('aria-invalid') === 'true') {
-                        const errorElement = input === loginTermsAgreeCheckbox ? loginTermsAgreeError : termsAgreeError;
-                        clearError(input, errorElement);
-                    }
-                });
-            }
-        }
-      });
-      loadPublicNews();
-      loadCustomerVoiceTeasers();
-      maybeOpenSignupFromIntent();
-    });
-  </script>
 
+  <script src="js/login-front.js" defer></script>
 </body>
 </html>
-<!-- 自己チェックリスト -->
-<!-- コントラスト OK: 主要テキストと背景、ボタンとテキストのコントラストはWCAG AAを満たすようにカラー変数を設定済み（ツールで確認推奨） -->
-<!-- ランドマーク OK: main 要素、role="dialog", aria-labelledby, aria-modal, aria-describedby など WAI-ARIA ロールを適切に配置 -->
-<!-- レスポンシブ OK: @media クエリにより、sm, md, lg, xl のブレークポイントでレイアウトが適切に変化することを確認 -->
-<!-- 4px グリッド OK: margin, padding, font-size, border-radius など主要なサイズを4の倍数で定義・調整 -->
-<!-- 浮動ラベル削除 OK: 浮動ラベルのHTML構造とCSSルールを削除し、標準的なラベル配置に戻っていることを確認 -->
-<!-- BEM OK: クラス名が Block__Element--Modifier の規則に従って定義されていることを確認 -->
-<!-- 浮動ラベル削除 OK: 浮動ラベルのHTML構造とCSSルールを削除し、標準的なラベル配置に戻っていることを確認 -->
-<!-- BEM OK: クラス名が Block__Element--Modifier の規則に従って定義されていることを確認 -->
