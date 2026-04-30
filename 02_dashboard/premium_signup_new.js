@@ -87,6 +87,58 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    const premiumSignupStateClassNames = [
+        'premium-signup-state',
+        'premium-signup-state--signup',
+        'premium-signup-state--contracted',
+        'premium-signup-state--new',
+        'premium-signup-state--rejoin',
+        'premium-signup-state--premium-member',
+        'premium-signup-state--free-trial',
+        'premium-signup-state--premium-cancelled',
+    ];
+
+    const getPremiumSignupState = (config) => {
+        if (config.is_premium_member) {
+            return config.is_cancelled ? 'premium-cancelled' : 'premium-member';
+        }
+
+        if (config.is_free_trial) {
+            return 'free-trial';
+        }
+
+        if (config.is_rejoining_user) {
+            return 'rejoin';
+        }
+
+        return 'new';
+    };
+
+    const applyPremiumSignupStateClasses = (config) => {
+        const stateKey = getPremiumSignupState(config);
+        const stateGroup = stateKey === 'premium-member' || stateKey === 'free-trial' || stateKey === 'premium-cancelled'
+            ? 'contracted'
+            : 'signup';
+        const stateClasses = [
+            'premium-signup-state',
+            `premium-signup-state--${stateGroup}`,
+            `premium-signup-state--${stateKey}`,
+        ];
+
+        [document.body, document.getElementById('main-content')].forEach((target) => {
+            if (!target) {
+                return;
+            }
+
+            target.classList.remove(...premiumSignupStateClassNames);
+            target.classList.add(...stateClasses);
+            target.dataset.premiumSignupState = stateKey;
+            target.dataset.premiumSignupGroup = stateGroup;
+        });
+
+        return { stateKey, stateGroup };
+    };
+
     // Function to apply a scenario and store it in localStorage
     const applyScenario = (scenarioKey) => {
         const config = scenarioConfigs[scenarioKey];
@@ -98,6 +150,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to update the UI based on the current scenario
     const updateUiForScenario = (currentScenarioConfig) => {
+        const { stateKey, stateGroup } = applyPremiumSignupStateClasses(currentScenarioConfig);
+        const isContractState = stateGroup === 'contracted';
         const signupButtons = Array.from(document.querySelectorAll('[data-role="primary-signup-cta"]'));
         const updateSignupButtons = (label) => {
             signupButtons.forEach(button => {
@@ -200,17 +254,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     sectionLabel: isCancelled ? '解約予約中' : '契約状況',
                     userName,
                     statusIcon: isCancelled ? 'pause_circle' : 'check_circle',
-                    statusLabel: isCancelled ? 'AUTO-RENEWAL OFF' : 'ACTIVE',
+                    statusLabel: isCancelled ? '解約予約中' : '利用中',
                     meta: isCancelled
                         ? [`利用可能期限: ${dateStr}`, '満了後: Standardへ移行']
-                        : ['現在のプラン: Premium', `次回更新日: ${dateStr}`],
+                        : ['現在のプラン: Premium', `次回更新予定: ${dateStr}`],
                     details: isCancelled ? [
                         { label: '期限まで', value: 'Premium機能を引き続き利用できます' },
                         { label: '期限後', value: 'Standardプランの利用条件へ移行します' },
-                        { label: '順次提供予定', value: 'ロゴ非表示 / Slack・SFA・CRM連携 / 独自ドメイン送信' },
                     ] : [
-                        { label: '利用中の機能', value: '最長1年保存 / CSV出力 / 多言語対応' },
-                        { label: '順次提供予定', value: 'ロゴ非表示 / Slack・SFA・CRM連携 / 独自ドメイン送信' },
+                        { label: '利用中の機能', value: '保存期間最長1年 / 画像・名刺データDL / CSV出力 / SPEEDレビュー' },
+                        { label: '確認導線', value: '請求書の確認と自動更新の停止手続き' },
                     ],
                     actions: isCancelled ? [
                         {
@@ -251,12 +304,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
 
-            const fileMainContent = document.getElementById('premium-main-content');
-            if (fileMainContent) {
-                fileMainContent.classList.add('hidden');
-                fileMainContent.innerHTML = '';
-            }
-
         } else if (currentScenarioConfig.is_free_trial) {
             const fileHeroSection = document.getElementById('premium-hero-section');
             const today = new Date();
@@ -271,12 +318,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     sectionLabel: '無料トライアル中',
                     userName: `${currentScenarioConfig.lastName} ${currentScenarioConfig.firstName}`,
                     statusIcon: 'hourglass_top',
-                    statusLabel: 'FREE TRIAL',
-                    meta: [`トライアル終了: ${trialEndDateStr}`, `初回請求予定日: ${billingStartDateStr} ¥10,000（税別）`],
+                    statusLabel: '無料期間中',
+                    meta: [`無料期間終了: ${trialEndDateStr}`, `初回請求予定: ${billingStartDateStr} / 月額¥10,000（税別）`],
                     details: [
-                        { label: '確認できる機能', value: '保存期間 / CSV出力 / 多言語対応' },
+                        { label: '確認できる機能', value: '保存期間最長1年 / 画像・名刺データDL / CSV出力 / SPEEDレビュー' },
                         { label: '終了後', value: `${billingStartDateStr}から月額¥10,000（税別）が請求されます` },
-                        { label: '順次提供予定', value: 'ロゴ非表示 / Slack・SFA・CRM連携 / 独自ドメイン送信' },
+                        { label: '確認導線', value: '請求書は未発行のため、契約確認と終了手続きが中心です' },
                     ],
                     actions: [
                         {
@@ -300,12 +347,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         description: ` ${trialEndDateStr}まではPremium機能が無料でご利用いただけます。期限を迎えると、${billingStartDateStr}から月額¥10,000（税別）が自動的に請求されます。`,
                     },
                 });
-            }
-
-            const fileMainContent = document.getElementById('premium-main-content');
-            if (fileMainContent) {
-                fileMainContent.classList.add('hidden');
-                fileMainContent.innerHTML = '';
             }
 
         } else {
@@ -426,15 +467,27 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
             }
+        }
 
-            // 「初月無料」メッセージの表示制御 (既存ロジック維持)
-            const firstMonthFreeMessage = document.getElementById('first-month-free-message');
-            if (firstMonthFreeMessage) {
-                if (currentScenarioConfig.is_rejoining_user || currentScenarioConfig.is_premium_member || currentScenarioConfig.is_free_trial) {
-                    firstMonthFreeMessage.classList.add('hidden');
-                } else {
-                    firstMonthFreeMessage.classList.remove('hidden');
-                }
+        const fileMainContent = document.getElementById('premium-main-content');
+        if (fileMainContent) {
+            fileMainContent.classList.toggle('hidden', isContractState);
+            if (isContractState) {
+                fileMainContent.setAttribute('aria-hidden', 'true');
+            } else {
+                fileMainContent.removeAttribute('aria-hidden');
+            }
+            fileMainContent.dataset.premiumSignupState = stateKey;
+            fileMainContent.dataset.premiumSignupGroup = stateGroup;
+        }
+
+        // 「初月無料」メッセージの表示制御 (既存ロジック維持)
+        const firstMonthFreeMessage = document.getElementById('first-month-free-message');
+        if (firstMonthFreeMessage) {
+            if (currentScenarioConfig.is_rejoining_user || currentScenarioConfig.is_premium_member || currentScenarioConfig.is_free_trial) {
+                firstMonthFreeMessage.classList.add('hidden');
+            } else {
+                firstMonthFreeMessage.classList.remove('hidden');
             }
         }
     };
@@ -692,7 +745,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const isActive = tabIndex === index;
                 tab.classList.toggle('active', isActive);
                 tab.setAttribute('aria-pressed', String(isActive));
+                tab.setAttribute('aria-selected', String(isActive));
+                tab.setAttribute('tabindex', isActive ? '0' : '-1');
             });
+            featurePanel.setAttribute('aria-labelledby', `premium-feature-tab-${index}`);
             featurePanel.innerHTML = `
                 <div class="left">
                     <div class="ptag"><span class="num">${String(index + 1).padStart(2, '0')}</span><span>${feature.spec}</span></div>
@@ -756,6 +812,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 hasManualFeatureSelection = true;
                 stopFeatureRotation();
                 renderFeature(index);
+            });
+
+            tab.addEventListener('keydown', (event) => {
+                const keyActions = {
+                    ArrowLeft: (index - 1 + featureTabs.length) % featureTabs.length,
+                    ArrowUp: (index - 1 + featureTabs.length) % featureTabs.length,
+                    ArrowRight: (index + 1) % featureTabs.length,
+                    ArrowDown: (index + 1) % featureTabs.length,
+                    Home: 0,
+                    End: featureTabs.length - 1,
+                };
+                const nextIndex = keyActions[event.key];
+
+                if (nextIndex === undefined) {
+                    return;
+                }
+
+                event.preventDefault();
+                hasManualFeatureSelection = true;
+                stopFeatureRotation();
+                renderFeature(nextIndex);
+                featureTabs[nextIndex].focus();
             });
         });
         featureRoot.addEventListener('mouseenter', () => {
@@ -960,6 +1038,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         campaignInfoSection.innerHTML = messageCampaign;
         campaignInfoSection.classList.remove('hidden');
+    } else if (campaignInfoSection) {
+        campaignInfoSection.classList.add('hidden');
     }
     // 再加入ユーザー（isEligibleForFreeCampaign = false）の場合は何も表示しない
 
