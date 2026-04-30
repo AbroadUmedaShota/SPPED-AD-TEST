@@ -14,10 +14,9 @@ import {
 /**
  * 見積もりを計算します。
  * @param {object} settings - ユーザーが選択した設定。
- * @param {object|null} appliedCoupon - 適用されたクーポン情報。
  * @returns {object} 計算結果 { amount: number, completionDate: string }。
  */
-export function calculateEstimate(settings, appliedCoupon = null, surveyEndDate = null) {
+export function calculateEstimate(settings, surveyEndDate = null) {
     if (!settings.bizcardEnabled) {
         return { amount: 0, completionDate: '未定' };
     }
@@ -58,18 +57,10 @@ export function calculateEstimate(settings, appliedCoupon = null, surveyEndDate 
         }
     });
 
-    // 3. クーポン適用
-    const preDiscount = amount;
-    let couponAmount = 0;
-    if (appliedCoupon) {
-        if (appliedCoupon.type === 'discount') {
-            couponAmount = Math.min(preDiscount, Math.max(0, appliedCoupon.value || 0));
-            amount = Math.max(0, preDiscount - couponAmount);
-        }
-        if (appliedCoupon.type === 'speedBoost') {
-            completionDays = Math.max(0.1, completionDays - appliedCoupon.value);
-        }
-    }
+    const subtotal = amount;            // 税抜・クーポン未適用
+    const preDiscount = subtotal;       // 互換用（旧名残）
+    const couponAmount = 0;             // 常に 0（値引きは aggregator 側でのみ）
+    const couponPercent = 0;
 
     // 4. 完了予定日を計算
     const startDate = surveyEndDate ? new Date(surveyEndDate) : new Date();
@@ -77,20 +68,20 @@ export function calculateEstimate(settings, appliedCoupon = null, surveyEndDate 
     const completionDate = new Date(startDate.setDate(startDate.getDate() + completionDays));
     const formattedCompletionDate = completionDate.toLocaleDateString('ja-JP');
 
-    const couponPercent = preDiscount > 0 ? Math.round((couponAmount / preDiscount) * 100) : 0;
     const minChargeCards = Math.ceil(requestedCards * 0.5);
     const minCharge = minChargeCards > 0 ? minChargeCards * unitPrice : 0;
 
     return {
-        amount,
+        amount,                  // ＝ subtotal（互換維持）
+        subtotal,                // 新設: 税抜・クーポン未適用
         completionDate: formattedCompletionDate,
         turnaroundDays: completionDays,
         calculationBaseDate: calculationBaseDate.toLocaleDateString('ja-JP'),
         unitPrice,
         requestedCards,
         preDiscount,
-        couponAmount,
-        couponPercent,
+        couponAmount: 0,         // 互換: 常に 0
+        couponPercent: 0,
         minCharge,
         minChargeCards,
         premiumTotal,

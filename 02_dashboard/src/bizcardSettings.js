@@ -11,8 +11,10 @@ import {
     renderEstimate,
     renderDataConversionPlans,
     renderPremiumOptions,
-    validateForm
+    validateForm,
+    renderSurveyTotalBlock
 } from './ui/bizcardSettingsRenderer.js';
+import { getSurveySubtotals, setSurveySubtotal, computeSurveyTotalEstimate } from './services/surveyEstimateAggregator.js';
 import { showToast } from './utils.js';
 import { showConfirmationModal } from './confirmationModal.js';
 import {
@@ -520,11 +522,13 @@ export function initBizcardSettings() {
 
         // Calculate estimate (force zeroes if skipped)
         const estimateSettings = state.isSkipped ? { ...state.settings, bizcardRequest: 0, dataConversionPlan: 'none', premiumOptions: { multilingual: false, additionalItems: [] } } : state.settings;
-        
-        const estimate = calculateEstimate(estimateSettings, state.appliedCoupon, state.surveyData?.periodEnd);
-        
+
+        // ① 自画面の見積もり（クーポン金額値引きは含まない）
+        const estimate = calculateEstimate(estimateSettings, state.surveyData?.periodEnd);
+
         if (state.isSkipped) {
             estimate.amount = 0;
+            estimate.subtotal = 0;
             estimate.minCharge = 0;
             estimate.requestedCards = 0;
             estimate.premiumTotal = 0;
@@ -532,9 +536,26 @@ export function initBizcardSettings() {
             if (ed) ed.textContent = 'データ化を実施しない';
         }
 
+        // ② 自画面 subtotal を localStorage へ書き戻す
+        setSurveySubtotal(state.surveyId, 'bizcard', estimate.subtotal);
+
+        // ③ 他画面の subtotal を取得
+        const subs = getSurveySubtotals(state.surveyId);
+        const otherSubtotal = subs.thankYou ? subs.thankYou.subtotal : null;
+
+        // ④ アンケート全体料金を計算
+        const surveyTotal = computeSurveyTotalEstimate({
+            bizcardSubtotal: estimate.subtotal,
+            thankYouSubtotal: otherSubtotal,
+            coupon: state.appliedCoupon,
+            taxRate: 0.1
+        });
+
+        // ⑤ 描画
         renderEstimate(estimate);
+        renderSurveyTotalBlock(surveyTotal, { otherScope: 'thankYou', isOtherMissing: surveyTotal.missing.includes('thankYou') });
         updateCouponSectionUI();
-        
+
         // Handle validation logic
         validateForm(state.isSkipped);
     }

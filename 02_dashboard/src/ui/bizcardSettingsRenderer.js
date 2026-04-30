@@ -166,10 +166,8 @@ export function renderEstimate(estimate) {
         const premiumLine = premiumTotal > 0
             ? `＋ ${cards.toLocaleString()}件 × プレミアム加算 ${premiumUnit.toLocaleString()}円`
             : '';
-        const couponLine = couponAmt > 0
-            ? `ー クーポンお値引き ${couponAmt.toLocaleString()}円（${couponPct}%相当）`
-            : '';
-        const breakdownLines = [baseLine, premiumLine, couponLine].filter(Boolean).join('<br>');
+        // クーポン値引きは renderSurveyTotalBlock 側でのみ表示する
+        const breakdownLines = [baseLine, premiumLine].filter(Boolean).join('<br>');
         const premiumSelections = Array.isArray(estimate.selectedPremiumOptions)
             ? estimate.selectedPremiumOptions
             : [];
@@ -191,7 +189,7 @@ export function renderEstimate(estimate) {
                 </div>
               </div>
               ${premiumSummary}
-              <div class="text-sm font-semibold text-on-surface">＝ ご請求見込み金額 ¥${estimate.amount.toLocaleString()}（＋税）</div>
+              <div class="text-sm font-semibold text-on-surface">＝ 名刺データ化の小計 ¥${estimate.amount.toLocaleString()}（税抜）</div>
               ${minChargeLine}
             </div>
         `;
@@ -581,4 +579,67 @@ export function setSaveButtonLoading(isLoading) {
     dom.saveButton.disabled = isLoading;
     dom.saveButtonText.classList.toggle('hidden', isLoading);
     dom.saveButtonLoading.classList.toggle('hidden', !isLoading);
+}
+
+/**
+ * アンケート全体ブロックの描画。両画面で共通利用可能な構造。
+ * @param {object} surveyTotal - computeSurveyTotalEstimate の戻り値
+ * @param {{ otherScope: 'bizcard'|'thankYou', isOtherMissing: boolean }} ctx
+ */
+export function renderSurveyTotalBlock(surveyTotal, ctx) {
+    const $ = (id) => document.getElementById(id);
+    if (!$('surveyTotalSubtotal')) return; // ブロック未存在画面では noop
+
+    // 内訳数値
+    $('surveyTotalBizcardAmount') && ($('surveyTotalBizcardAmount').textContent = surveyTotal.bizcardSubtotal.toLocaleString());
+
+    const thankYouAmountEl = $('surveyTotalThankYouAmount');
+    const thankYouMissingEl = $('surveyTotalThankYouMissing');
+    const bizcardAmountWrap = $('surveyTotalBizcardAmount')?.parentElement;
+    const bizcardMissingEl = $('surveyTotalBizcardMissing');
+
+    // 片方未設定時のプレースホルダ（thankYou側）
+    const isThankYouMissing = surveyTotal.missing.includes('thankYou');
+    if (thankYouAmountEl && thankYouMissingEl) {
+        if (isThankYouMissing) {
+            thankYouAmountEl.classList.add('hidden');
+            thankYouMissingEl.classList.remove('hidden');
+        } else {
+            thankYouAmountEl.classList.remove('hidden');
+            thankYouMissingEl.classList.add('hidden');
+            thankYouAmountEl.textContent = `¥${surveyTotal.thankYouSubtotal.toLocaleString()}`;
+        }
+    }
+
+    // 片方未設定時のプレースホルダ（bizcard側）
+    const isBizcardMissing = surveyTotal.missing.includes('bizcard');
+    if (bizcardAmountWrap && bizcardMissingEl) {
+        if (isBizcardMissing) {
+            bizcardAmountWrap.classList.add('hidden');
+            bizcardMissingEl.classList.remove('hidden');
+        } else {
+            bizcardAmountWrap.classList.remove('hidden');
+            bizcardMissingEl.classList.add('hidden');
+        }
+    }
+
+    // 集計
+    $('surveyTotalSubtotal').textContent = surveyTotal.subtotalAll.toLocaleString();
+    $('surveyTotalTax').textContent = surveyTotal.tax.toLocaleString();
+    $('surveyTotalWithTax').textContent = surveyTotal.totalWithTax.toLocaleString();
+
+    // クーポン値引行 (適用時のみ可視化)
+    const couponLineEl = $('surveyTotalCouponLine');
+    const afterLineEl = $('surveyTotalAfterCouponLine');
+    if (surveyTotal.couponApplied && surveyTotal.couponAmount > 0) {
+        couponLineEl?.classList.remove('hidden');
+        afterLineEl?.classList.remove('hidden');
+        $('surveyTotalCouponAmount').textContent = surveyTotal.couponAmount.toLocaleString();
+        $('surveyTotalAfterCoupon').textContent = surveyTotal.afterCoupon.toLocaleString();
+        const pctEl = $('surveyTotalCouponPercent');
+        if (pctEl) pctEl.textContent = surveyTotal.couponPercent > 0 ? `(${surveyTotal.couponPercent}%相当)` : '';
+    } else {
+        couponLineEl?.classList.add('hidden');
+        afterLineEl?.classList.add('hidden');
+    }
 }

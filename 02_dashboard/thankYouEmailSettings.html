@@ -102,7 +102,7 @@
         }
     </style>
 </head>
-<body class="bg-background text-on-background font-sans">
+<body class="bg-background text-on-background">
 
 <div class="relative flex min-h-screen flex-col">
     <!-- サイドバー用オーバーレイ (モバイルメニュー用のみ維持) -->
@@ -387,27 +387,14 @@
 
 
 
-                <!-- アクションボタン -->
-                <div class="flex flex-col sm:flex-row items-center justify-end gap-4 pt-2 pb-12">
-                    <button id="sendThankYouEmailBtn" class="w-full sm:w-auto rounded-2xl bg-secondary text-on-secondary px-12 py-5 text-base font-black shadow-lg transition-all hover:bg-secondary/90 hover:-translate-y-1 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3" disabled>
-                        <span class="material-icons">send</span>
-                        <span>お礼メールを送信する</span>
-                        <span id="sendThankYouEmailBtnLoading" class="hidden material-icons animate-spin text-sm">sync</span>
-                    </button>
-                    <button id="saveThankYouEmailSettingsBtn" class="w-full sm:w-auto rounded-2xl bg-primary text-on-primary px-12 py-5 text-base font-black shadow-lg transition-all hover:bg-primary/90 hover:-translate-y-1 hover:shadow-xl flex items-center justify-center gap-3">
-                        <span class="material-icons">save</span>
-                        <span>設定を保存する</span>
-                        <span id="saveThankYouEmailSettingsBtnLoading" class="hidden material-icons animate-spin text-sm">sync</span>
-                    </button>
-                </div>
                     </div>
 
                 <div id="estimateSidebarOverlay" class="estimate-sidebar-overlay"></div>
-                <aside id="estimateSidebar" class="estimate-drawer w-full xl:w-[35%] xl:sticky xl:top-24 self-start">
+                <aside id="estimateSidebar" class="estimate-drawer w-full xl:w-[35%] xl:sticky xl:top-24 max-h-[calc(100vh-8rem)]">
                     <button id="estimateSidebarToggleBtn" type="button" class="estimate-drawer-toggle" aria-label="料金見積もりを開閉する" aria-expanded="false">
                         <span class="material-icons transition-transform duration-300">chevron_left</span>
                     </button>
-                    <div class="estimate-drawer-card rounded-3xl border border-outline-variant/60 bg-surface p-6 shadow-sm flex flex-col gap-6 h-full overflow-y-auto custom-scrollbar relative">
+                    <div class="estimate-drawer-card rounded-3xl border border-outline-variant/60 bg-surface p-5 shadow-sm flex flex-col gap-4 h-full overflow-y-auto custom-scrollbar relative">
                         <div class="flex items-center justify-between border-b border-outline-variant pb-3 z-20">
                             <div class="flex items-center gap-1.5">
                                 <h2 class="text-lg font-bold text-on-surface">料金見積もり</h2>
@@ -420,24 +407,24 @@
                         </div>
 
                         <!-- 金額と対象件数 -->
-                        <div class="space-y-3 z-20">
-                            <div class="rounded-2xl bg-surface-bright p-5 shadow-inner border border-outline-variant relative overflow-hidden group">
+                        <div class="space-y-2 z-20">
+                            <div class="rounded-2xl bg-surface-bright p-4 shadow-inner border border-outline-variant relative overflow-hidden group">
                                 <div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-110"></div>
                                 <p class="text-sm text-on-surface-variant font-semibold flex items-center justify-between relative z-10">
-                                    ご請求見込み金額（税込）
-                                    <span class="text-[10px] bg-outline-variant/30 px-2 py-0.5 rounded text-on-surface-variant">お礼メール分</span>
+                                    お礼メールの小計（税込）
+                                    <span class="text-[10px] bg-outline-variant/30 px-2 py-0.5 rounded text-on-surface-variant">お礼メール分のみ</span>
                                 </p>
-                                <div id="estimatedAmount" class="mt-2 text-right text-4xl font-black tracking-tight text-on-surface transition-all duration-300 relative z-10">¥0</div>
+                                <div id="estimatedAmount" class="mt-1 text-right text-3xl font-black tracking-tight text-on-surface transition-all duration-300 relative z-10">¥0</div>
                             </div>
 
-                            <div class="flex items-center justify-between rounded-xl bg-surface-container-lowest p-4 border border-outline-variant hover:border-outline transition-colors">
+                            <div class="flex items-center justify-between rounded-xl bg-surface-container-lowest p-3 border border-outline-variant hover:border-outline transition-colors">
                                 <span class="text-sm font-semibold text-on-surface-variant flex items-center gap-2">
                                     <span class="material-icons text-base text-primary">send</span>送信対象者数
                                 </span>
                                 <span id="recipientCountDisplay" class="text-base font-bold text-on-surface">0 名</span>
                             </div>
 
-                            <div class="flex items-center justify-between rounded-xl bg-surface-container-lowest p-4 border border-outline-variant hover:border-outline transition-colors">
+                            <div class="flex items-center justify-between rounded-xl bg-surface-container-lowest p-3 border border-outline-variant hover:border-outline transition-colors">
                                 <span class="text-sm font-semibold text-on-surface-variant flex items-center gap-2">
                                     <span class="material-icons text-base text-primary">paid</span>課金対象件数
                                 </span>
@@ -445,16 +432,74 @@
                             </div>
                         </div>
 
-                        <!-- 詳細内訳と注意事項のリンク -->
+                        <!-- 詳細内訳 -->
                         <div class="px-2 space-y-2 z-20">
                             <div id="estimateBreakdown" class="text-sm leading-relaxed text-on-surface-variant"></div>
-                            <button type="button" id="openBillingNotesModalBtn" class="text-primary text-xs font-semibold hover:underline flex items-center gap-1 mt-3 focus:outline-none bg-primary/5 hover:bg-primary/10 px-3 py-2 rounded-lg transition-colors w-full justify-center border border-primary/20">
-                                <span class="material-icons text-[14px]">info</span> ご請求・お支払いに関する注意事項
+                        </div>
+
+                        <!-- アンケート全体ブロック -->
+                        <div class="estimate-block-survey-total rounded-2xl border border-primary/30 bg-primary/5 p-4 z-20 space-y-2" data-block="surveyTotal">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-sm font-bold text-on-surface flex items-center gap-1.5">
+                                    <span class="material-icons text-base text-primary">receipt_long</span>
+                                    アンケート全体料金（このアンケートの請求見込み）
+                                </h3>
+                            </div>
+
+                            <!-- 内訳: 名刺 / お礼メール (常時表示) -->
+                            <div class="space-y-1.5 text-xs">
+                                <div class="flex justify-between" id="surveyTotalBizcardLine">
+                                    <span class="text-on-surface-variant">名刺データ化分</span>
+                                    <span class="font-semibold text-on-surface">¥<span id="surveyTotalBizcardAmount">0</span></span>
+                                    <span class="text-on-surface-variant/70 italic hidden" id="surveyTotalBizcardMissing">未設定（後ほど反映されます）</span>
+                                </div>
+                                <div class="flex justify-between" id="surveyTotalThankYouLine">
+                                    <span class="text-on-surface-variant">お礼メール分</span>
+                                    <span class="font-semibold text-on-surface" id="surveyTotalThankYouAmount">¥0</span>
+                                    <span class="text-on-surface-variant/70 italic hidden" id="surveyTotalThankYouMissing">未設定（後ほど反映されます）</span>
+                                </div>
+                            </div>
+
+                            <hr class="border-outline-variant/40">
+
+                            <!-- 集計: 税抜小計 / クーポン値引(条件) / 税抜割引後(条件) / 消費税 / 税込 -->
+                            <div class="space-y-1 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-on-surface-variant">税抜小計</span>
+                                    <span class="font-semibold text-on-surface">¥<span id="surveyTotalSubtotal">0</span></span>
+                                </div>
+                                <div class="flex justify-between estimate-coupon-line hidden" id="surveyTotalCouponLine">
+                                    <span class="text-on-surface-variant">クーポン値引き
+                                        <span class="text-[10px] text-primary" id="surveyTotalCouponPercent"></span>
+                                    </span>
+                                    <span class="font-semibold text-error">- ¥<span id="surveyTotalCouponAmount">0</span></span>
+                                </div>
+                                <div class="flex justify-between hidden" id="surveyTotalAfterCouponLine">
+                                    <span class="text-on-surface-variant">税抜割引後</span>
+                                    <span class="font-semibold text-on-surface">¥<span id="surveyTotalAfterCoupon">0</span></span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-on-surface-variant">消費税(10%)</span>
+                                    <span class="font-medium text-on-surface">¥<span id="surveyTotalTax">0</span></span>
+                                </div>
+                                <div class="flex justify-between pt-1 border-t border-outline-variant/40">
+                                    <span class="font-bold text-on-surface">税込請求見込み</span>
+                                    <span class="font-black text-primary text-lg">¥<span id="surveyTotalWithTax">0</span></span>
+                                </div>
+                            </div>
+
+                            <p class="text-[10px] text-on-surface-variant/80 italic">
+                                ※クーポン値引きはアンケート全体の料金に対して1回適用されます
+                            </p>
+
+                            <button type="button" id="openBillingNotesModalBtn" class="text-primary text-xs font-semibold hover:underline flex items-center gap-1 focus:outline-none">
+                                <span class="material-icons text-[14px]">info</span>
+                                ご請求・お支払いに関する注意事項
                             </button>
                         </div>
 
                         <!-- クーポン適用エリア -->
-                        <div class="rounded-2xl bg-surface-container-low p-5 border border-outline-variant space-y-3 z-20 transition-colors duration-300 relative" id="couponSectionWrapper" data-help-target="thank-you-email-coupon">
+                        <div class="rounded-2xl bg-surface-container-low p-4 border border-outline-variant space-y-2 z-20 transition-colors duration-300 relative" id="couponSectionWrapper" data-help-target="thank-you-email-coupon">
                             <label class="text-sm font-bold text-on-surface flex items-center gap-1.5">
                                 割引クーポン
                                 <button type="button" class="help-trigger help-inline-button material-icons text-on-surface-variant hover:text-primary transition-colors" data-help-key="couponCode" aria-label="クーポンコードの説明を表示">help_outline</button>
@@ -490,6 +535,18 @@
                                     <button id="removeCouponBtn" type="button" class="text-xs font-semibold text-error/80 hover:text-error hover:bg-error/10 px-2 py-1.5 rounded transition-colors focus:outline-none flex-shrink-0 border border-transparent hover:border-error/30">解除</button>
                                 </div>
                             </div>
+                        </div>
+
+                        <!-- アクションボタン -->
+                        <div class="pt-3 border-t border-outline-variant flex flex-col gap-2 mt-auto z-20">
+                            <button id="saveThankYouEmailSettingsBtn" class="w-full rounded-full button-primary px-6 py-3 text-base font-bold shadow-md transition-all hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:active:scale-100 flex justify-center items-center group focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                                <span>設定を保存する</span>
+                                <span id="saveThankYouEmailSettingsBtnLoading" class="hidden material-icons animate-spin ml-2">sync</span>
+                            </button>
+                            <button id="sendThankYouEmailBtn" class="w-full rounded-full border border-outline-variant px-6 py-2.5 text-sm font-bold text-on-surface shadow-sm transition-colors hover:bg-surface-variant hover:border-outline focus:outline-none focus:ring-2 focus:ring-outline-variant focus:ring-offset-1 active:bg-outline-variant/20 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                <span>お礼メールを送信する</span>
+                                <span id="sendThankYouEmailBtnLoading" class="hidden material-icons animate-spin ml-2">sync</span>
+                            </button>
                         </div>
                     </div>
                 </aside>
@@ -530,7 +587,10 @@
                 <h3 class="text-xl font-bold text-on-surface">お礼メール送信確認</h3>
                 <p class="text-sm text-on-surface-variant leading-relaxed">
                     お礼メールを <span id="modalActiveCount" class="font-bold text-primary text-base">0</span> 件送信します。<br>
-                    合計金額（予想）: <span id="modalCost" class="font-bold text-primary text-base">¥0</span> (税込)
+                    お礼メール分（予想）: <span id="modalCost" class="font-bold text-primary text-base">¥0</span> (税込)
+                </p>
+                <p class="text-[11px] text-on-surface-variant/80 italic mt-1">
+                    ※クーポン適用後の請求はアンケート全体料金から算出されます
                 </p>
             </div>
             <div class="bg-surface-container-low p-4 rounded-2xl border border-warning/30 bg-warning/5 text-warning text-sm font-medium flex items-start gap-2">

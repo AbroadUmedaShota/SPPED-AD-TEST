@@ -16,8 +16,10 @@ import {
     setupPaginationListeners,
     renderEstimate,
     displayCouponResult,
-    setButtonLoading
+    setButtonLoading,
+    renderSurveyTotalBlock
 } from './ui/thankYouEmailRenderer.js';
+import { getSurveySubtotals, setSurveySubtotal, computeSurveyTotalEstimate } from './services/surveyEstimateAggregator.js';
 import { showConfirmationModal } from './confirmationModal.js';
 import { showToast } from './utils.js';
 import { insertTextAtCursor } from './utils.js';
@@ -415,8 +417,30 @@ export function initThankYouEmailSettings() {
 
     function updateCostFromState() {
         const activeCount = state.recipients.filter(r => r.sendEnabled && r.status !== 'excluded').length;
-        const estimate = calculateThankYouEmailEstimate(activeCount, state.appliedCoupon);
+        // (1) 自画面見積もり（クーポン非反映）
+        const estimate = calculateThankYouEmailEstimate(activeCount);
         renderEstimate(estimate, state.currentStatus);
+
+        // (2) 自画面 subtotal（税抜）を localStorage へ保存
+        setSurveySubtotal(state.surveyId, 'thankYou', estimate.subtotal);
+
+        // (3) 他画面の subtotal を取得
+        const subs = getSurveySubtotals(state.surveyId);
+        const otherSubtotal = subs.bizcard ? subs.bizcard.subtotal : null;
+
+        // (4) アンケート全体料金を計算
+        const surveyTotal = computeSurveyTotalEstimate({
+            bizcardSubtotal: otherSubtotal,
+            thankYouSubtotal: estimate.subtotal,
+            coupon: state.appliedCoupon,
+            taxRate: 0.1
+        });
+
+        // (5) 全体ブロック描画
+        renderSurveyTotalBlock(surveyTotal, {
+            otherScope: 'bizcard',
+            isOtherMissing: surveyTotal.missing.includes('bizcard')
+        });
     }
 
     /**
@@ -640,7 +664,7 @@ export function initThankYouEmailSettings() {
         const activeCount = state.recipients.filter(r => r.sendEnabled).length;
         if (activeCount === 0) return showToast('送信対象がいません。', 'info');
 
-        const estimate = calculateThankYouEmailEstimate(activeCount, state.appliedCoupon);
+        const estimate = calculateThankYouEmailEstimate(activeCount); // クーポン非反映 = お礼メール分のみ
 
         document.getElementById('modalActiveCount').textContent = activeCount;
         document.getElementById('modalCost').textContent = `¥${estimate.totalWithTax.toLocaleString()}`;
