@@ -450,6 +450,7 @@ export function initThankYouEmailSettings() {
         const inputContainer = document.getElementById('couponInputContainer');
         const appliedContainer = document.getElementById('couponAppliedContainer');
         const codeDisplay = document.getElementById('appliedCouponCodeDisplay');
+        const sourceDisplay = document.getElementById('appliedCouponSourceDisplay');
         const couponLoadingIndicator = document.getElementById('couponLoadingIndicator');
         if (!couponCodeInput || !applyCouponBtn || !couponLoadingIndicator || !inputContainer || !appliedContainer) return;
 
@@ -462,6 +463,26 @@ export function initThankYouEmailSettings() {
         appliedContainer.classList.toggle('hidden', !hasAppliedCoupon);
         if (codeDisplay) {
             codeDisplay.textContent = state.appliedCoupon?.code || '';
+        }
+
+        if (sourceDisplay) {
+            if (hasAppliedCoupon) {
+                const scopeKey = 'sharedCouponScope_' + (state.surveyId || 'temp');
+                const scope = localStorage.getItem(scopeKey);
+                if (scope === 'thankYou') {
+                    // 自画面適用なので適用元ラベルは非表示
+                    sourceDisplay.classList.add('hidden');
+                } else if (scope === 'bizcard') {
+                    sourceDisplay.textContent = '※名刺データ化設定で適用（共有）';
+                    sourceDisplay.classList.remove('hidden');
+                } else {
+                    // フォールバック（scope 未設定）
+                    sourceDisplay.textContent = '※他設定より適用（共有）';
+                    sourceDisplay.classList.remove('hidden');
+                }
+            } else {
+                sourceDisplay.classList.add('hidden');
+            }
         }
 
         if (state.isCouponProcessing) {
@@ -482,6 +503,8 @@ export function initThankYouEmailSettings() {
 
         const sharedCouponKey = 'sharedCoupon_' + (state.surveyId || 'temp');
         localStorage.removeItem(sharedCouponKey);
+        const scopeKey = 'sharedCouponScope_' + (state.surveyId || 'temp');
+        localStorage.removeItem(scopeKey);
 
         couponCodeInput.value = '';
         displayCouponResult({ success: true, message: 'クーポンを削除しました' });
@@ -515,6 +538,8 @@ export function initThankYouEmailSettings() {
                 // Sync to localStorage
                 const sharedCouponKey = 'sharedCoupon_' + (state.surveyId || 'temp');
                 localStorage.setItem(sharedCouponKey, code);
+                const scopeKey = 'sharedCouponScope_' + (state.surveyId || 'temp');
+                localStorage.setItem(scopeKey, 'thankYou');
             } else {
                 state.appliedCoupon = null;
             }

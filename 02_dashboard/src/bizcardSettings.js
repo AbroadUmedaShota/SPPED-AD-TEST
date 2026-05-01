@@ -403,6 +403,8 @@ export function initBizcardSettings() {
                 // Sync to localStorage
                 const sharedCouponKey = 'sharedCoupon_' + (state.surveyId || 'temp');
                 localStorage.setItem(sharedCouponKey, code);
+                const scopeKey = 'sharedCouponScope_' + (state.surveyId || 'temp');
+                localStorage.setItem(scopeKey, 'bizcard');
 
                 couponCodeInput.value = '';
                 document.getElementById('couponCodeErrorMessage')?.classList.add('hidden');
@@ -429,6 +431,8 @@ export function initBizcardSettings() {
             // Sync to localStorage
             const sharedCouponKey = 'sharedCoupon_' + (state.surveyId || 'temp');
             localStorage.removeItem(sharedCouponKey);
+            const scopeKey = 'sharedCouponScope_' + (state.surveyId || 'temp');
+            localStorage.removeItem(scopeKey);
 
             couponCodeInput.value = '';
             showToast('クーポンを解除しました。', 'success');
@@ -578,7 +582,12 @@ export function initBizcardSettings() {
                 if (state.isAppliedInThisScreen) {
                     sourceDisplay.classList.add('hidden');
                 } else {
-                    sourceDisplay.textContent = '※他設定より適用（共有）';
+                    const scopeKey = 'sharedCouponScope_' + (state.surveyId || 'temp');
+                    const scope = localStorage.getItem(scopeKey);
+                    let sourceLabel = '※他設定より適用（共有）'; // フォールバック
+                    if (scope === 'thankYou') sourceLabel = '※お礼メール設定で適用（共有）';
+                    else if (scope === 'bizcard') sourceLabel = '※他設定より適用（共有）';
+                    sourceDisplay.textContent = sourceLabel;
                     sourceDisplay.classList.remove('hidden');
                 }
             }
