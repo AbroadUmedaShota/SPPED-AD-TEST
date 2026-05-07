@@ -465,6 +465,18 @@ export function initThankYouEmailSettings() {
             codeDisplay.textContent = state.appliedCoupon?.code || '';
         }
 
+        // クーポン折りたたみ <details> の開閉と要約ラベル
+        const couponDetailsEl = document.getElementById('couponSectionWrapper');
+        const couponSummaryStatusEl = document.getElementById('couponSummaryStatus');
+        if (couponDetailsEl && 'open' in couponDetailsEl) {
+            couponDetailsEl.open = hasAppliedCoupon;
+        }
+        if (couponSummaryStatusEl) {
+            couponSummaryStatusEl.textContent = hasAppliedCoupon
+                ? `適用中: ${state.appliedCoupon?.code || ''}`
+                : '未適用';
+        }
+
         if (sourceDisplay) {
             if (hasAppliedCoupon) {
                 const scopeKey = 'sharedCouponScope_' + (state.surveyId || 'temp');

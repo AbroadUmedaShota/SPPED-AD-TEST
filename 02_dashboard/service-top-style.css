@@ -389,8 +389,38 @@ body.dark-mode .invoice-plan-badge--premium {
 
 @media (min-width: 1280px) {
     #estimateSidebar > .estimate-drawer-card {
-        max-height: inherit;
+        max-height: none;
+        height: auto;
+        overflow: visible;
     }
+}
+
+@media (max-width: 1279.98px) {
+    #estimateSidebar > .estimate-drawer-card {
+        height: 100%;
+        overflow-y: auto;
+    }
+}
+
+/* 折りたたみ詳細セクション (estimate sidebar の <details>) */
+.estimate-collapsible > summary {
+    list-style: none;
+}
+.estimate-collapsible > summary::-webkit-details-marker {
+    display: none;
+}
+.estimate-collapsible-icon {
+    transition: transform 0.2s ease;
+}
+.estimate-collapsible[open] > summary .estimate-collapsible-icon {
+    transform: rotate(180deg);
+}
+.estimate-collapsible > summary:hover {
+    background-color: rgba(15, 23, 42, 0.03);
+}
+.estimate-collapsible > summary:focus-visible {
+    outline: 2px solid var(--md-sys-color-primary, #4361ee);
+    outline-offset: 2px;
 }
 
 .estimate-drawer-toggle {
