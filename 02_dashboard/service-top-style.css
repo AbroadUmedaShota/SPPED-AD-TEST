@@ -387,6 +387,12 @@ body.dark-mode .invoice-plan-badge--premium {
     z-index: 40;
 }
 
+@media (min-width: 1280px) {
+    #estimateSidebar > .estimate-drawer-card {
+        max-height: inherit;
+    }
+}
+
 .estimate-drawer-toggle {
     display: none;
 }
