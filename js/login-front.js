@@ -679,6 +679,8 @@
     });
 
     restoreRememberedAccount();
+    setupSiteTopHamburger();
+    setupHeroCopyPicker();
 
     if (loginForm && emailInput) {
       emailInput.focus();
@@ -687,6 +689,203 @@
     loadPublicNews();
     loadCustomerVoiceTeasers();
     maybeOpenSignupFromIntent();
+  }
+
+  const HERO_COPY_GROUPS = [
+    {
+      label: 'A. 重厚・和風',
+      variants: [
+        { id: 'A1', label: 'A1. 展示会の一会を、確かな商談へ。', statement: '展示会の一会を、<br>確かな商談へ。', lead: 'QR受付・名刺整理・御礼配信を一貫して。<br>展示会後の一手を、淀みなく。', reason: '【A.重厚・和風／矜持】既存「〜へ。」語尾を継承、抽象「成果」を「商談」に具体化。漢字比65%でセリフ書体と整合。' },
+        { id: 'A2', label: 'A2. 展示会の邂逅を、成果に変える。', statement: '展示会の邂逅を、<br>成果に変える。', lead: '来場者情報の集約から御礼配信まで、<br>追客の所作を一本に整える。', reason: '【A.重厚・和風／古風】「邂逅」で和の重みを強める。動詞着地で具体性も両立。' },
+        { id: 'A3', label: 'A3. 出会いの記憶を、組織の資産へ。', statement: '出会いの記憶を、<br>組織の資産へ。', lead: 'QRで集めた回答も、名刺の情報も、御礼メールの記録も。<br>すべてを組織の知見へ。', reason: '【A.重厚・和風／誠実】個人の名刺を組織の資産に転換するエンタープライズ訴求。' }
+      ]
+    },
+    {
+      label: 'B. 動詞着地・BeforeAfter',
+      variants: [
+        { id: 'B1', label: 'B1. 展示会の名刺を、商談に変える。', statement: '展示会の名刺を、<br>商談に変える。', lead: 'QR回答・名刺データ化・御礼メールを一気通貫。<br>展示会"後"の追客に特化したSaaS。', reason: '【B.動詞着地／直截】3秒理解。動詞「変える」で価値を即着地。CTA直結型。' },
+        { id: 'B2', label: 'B2. 出会いを、商談に育てる。', statement: '出会いを、商談に育てる。', lead: 'QRアンケート・名刺データ化・御礼メールで、<br>展示会の一期一会を継続的な関係へ。', reason: '【B.動詞着地／育成】「育てる」でナーチャリングのニュアンス。中長期的な関係訴求。' },
+        { id: 'B3', label: 'B3. 名刺を、売上の起点に。', statement: '名刺を、売上の起点に。', lead: 'QRアンケート・名刺データ化・御礼メールで、<br>来場者を確度の高い商談に転換します。', reason: '【B.動詞着地／ビジネス直結】売上に直接紐づける、決裁者向けのストレート訴求。' }
+      ]
+    },
+    {
+      label: 'C. 時間軸・スピード',
+      variants: [
+        { id: 'C1', label: 'C1. 会期後72時間が、商談率を決める。', statement: '会期後72時間が、<br>商談率を決める。', lead: 'QR回答・名刺データ化・御礼メールを当日中に。<br>展示会の熱量を逃さない仕組み。', reason: '【C.時間軸／緊急性】「72時間」で具体的な勝負の窓を提示。数値根拠の用意が必須。' },
+        { id: 'C2', label: 'C2. 展示会の熱を、冷ます前に。', statement: '展示会の熱を、冷ます前に。', lead: 'QRアンケートも名刺データも、御礼メールも。<br>会期翌日には届けられる速度で。', reason: '【C.時間軸／余韻】熱量が冷める前に動く必要性を訴求。比喩で重さも残す。' },
+        { id: 'C3', label: 'C3. 翌日には、追客が動き出す。', statement: '翌日には、追客が動き出す。', lead: 'QR受付・名刺データ化・御礼メールが連動。<br>展示会終了とともに追客が始まります。', reason: '【C.時間軸／スピード】「翌日」で展示会後の即応性を可視化。プロダクト体験訴求。' }
+      ]
+    },
+    {
+      label: 'D. 価格・無料訴求',
+      variants: [
+        { id: 'D1', label: 'D1. 100名まで無料。展示会の追客SaaS。', statement: '100名まで無料。<br>展示会の追客SaaS。', lead: 'QRアンケート・名刺データ化・御礼メールが揃って、<br>100名まで完全無料で使えます。', reason: '【D.価格／CVR最優先】無料訴求と特化型SaaSの差別化を冒頭固定。CVR向上に直結。' },
+        { id: 'D2', label: 'D2. 1通から、追客を整える。', statement: '1通から、追客を整える。', lead: 'QRアンケート・名刺データ化・御礼メールを必要な分だけ。<br>展示会のフォローを始めやすく。', reason: '【D.価格／スモールスタート】小さく始められる柔軟性訴求。「整える」で品格保持。' }
+      ]
+    },
+    {
+      label: 'E. 痛点・機会損失',
+      variants: [
+        { id: 'E1', label: 'E1. その名刺、眠らせていませんか。', statement: 'その名刺、<br>眠らせていませんか。', lead: 'QRアンケート・名刺データ化・御礼メールで、<br>集めた情報を確実な接点に変える。', reason: '【E.痛点／罪悪感】問いかけで内省を誘発。SNS引用性高、ブランド想起残存。' },
+        { id: 'E2', label: 'E2. 失注の半分は、追客の遅れから。', statement: '失注の半分は、<br>追客の遅れから。', lead: 'QR回答・名刺データ化・御礼メールで、<br>展示会後の追客を最速で届ける仕組み。', reason: '【E.痛点／データ】営業組織の課題に直接刺す。数値根拠の用意が前提。' },
+        { id: 'E3', label: 'E3. 集めた名刺を、眠らせない。', statement: '集めた名刺を、眠らせない。', lead: 'QRアンケート・名刺データ化・御礼メールを連動させ、<br>すべての出会いに次の一手を。', reason: '【E.痛点／守りの強さ】コミット型の言い切りで強い決意を表現。' }
+      ]
+    },
+    {
+      label: 'F. 問いかけ',
+      variants: [
+        { id: 'F1', label: 'F1. 展示会後、本当に届いていますか。', statement: '展示会後、<br>本当に届いていますか。', lead: 'QRアンケート・名刺データ化・御礼メールを一括で。<br>展示会の出会いを、確実に商談へ。', reason: '【F.問いかけ／内省】読み手にメールが届いているか自問させる、誠実トーン。' },
+        { id: 'F2', label: 'F2. その出会い、商談まで運べていますか。', statement: 'その出会い、<br>商談まで運べていますか。', lead: 'QR回答・名刺データ化・御礼メールが連携。<br>来場者を商談まで丁寧に運びます。', reason: '【F.問いかけ／共感喚起】商談化までの距離を意識させる、現場目線。' }
+      ]
+    },
+    {
+      label: 'G. ジョブ理論・解決系',
+      variants: [
+        { id: 'G1', label: 'G1. 展示会の追客を、属人化から解放する。', statement: '展示会の追客を、<br>属人化から解放する。', lead: 'QR受付・名刺データ化・御礼メールをチームで運用。<br>誰が担当しても同じ品質で動きます。', reason: '【G.ジョブ理論／組織課題】属人化＝展示会担当者の最大の悩み。組織導入訴求。' },
+        { id: 'G2', label: 'G2. 来場者の熱量を、商談に変える仕組み。', statement: '来場者の熱量を、<br>商談に変える仕組み。', lead: 'QRアンケート・名刺データ化・御礼メールを連携し、<br>来場者を商談に変える追客プロセスを自動化。', reason: '【G.ジョブ理論／プロダクト原理】仕組み化で属人性を排除する価値訴求。' }
+      ]
+    },
+    {
+      label: 'H. 短文・キャッチ',
+      variants: [
+        { id: 'H1', label: 'H1. 出会いから、商談へ。', statement: '出会いから、商談へ。', lead: 'QR回答・名刺データ化・御礼メールが、<br>展示会の追客を最短ルートで支援します。', reason: '【H.短文／ミニマル】9字。最短で価値を伝える宣言型。背景画像と組合せで余白を活かす。' },
+        { id: 'H2', label: 'H2. 展示会後を、変える。', statement: '展示会後を、変える。', lead: 'QRアンケート・名刺データ化・御礼メールで、<br>展示会後の追客業務を根本から変えます。', reason: '【H.短文／宣言】9字。動詞着地と短さで強い印象。意味は抽象的。' }
+      ]
+    },
+    {
+      label: 'I. ブランド名活用',
+      variants: [
+        { id: 'I1', label: 'I1. その出会いに、SPEEDを。', statement: 'その出会いに、SPEEDを。', lead: 'QRアンケート・名刺データ化・御礼メールが揃ったSPEED ADで、<br>展示会の追客を最速に。', reason: '【I.ブランド／プロダクト訴求】サービス名を直接織り込み、想起と速度感を結びつける。' },
+        { id: 'I2', label: 'I2. 展示会の出会いを、最短で商談へ。', statement: '展示会の出会いを、<br>最短で商談へ。', lead: 'QR回答・名刺データ化・御礼メールを一気通貫。<br>展示会後の追客を、最短ルートで支援します。', reason: '【I.ブランド／継承】既存「出会いを〜へ。」を継承し、「最短」でSPEED ADの名前を暗示。' }
+      ]
+    }
+  ];
+
+  function setupHeroCopyPicker() {
+    const toggle = document.getElementById('hero-copy-picker-toggle');
+    const panel = document.getElementById('hero-copy-picker-panel');
+    const select = document.getElementById('hero-copy-picker-select');
+    const statementEl = document.getElementById('hero-statement');
+    const leadEl = document.getElementById('hero-lead');
+    const reasonEl = document.getElementById('hero-copy-picker-reason');
+    if (!toggle || !panel || !select || !statementEl || !leadEl || !reasonEl) {
+      return;
+    }
+
+    const STORAGE_KEY = 'speedad-hero-copy-variant';
+    const DEFAULT_VARIANT = {
+      id: 'default',
+      statement: '展示会の出会いを、<br>確かな成果へ。',
+      lead: 'QRアンケート・名刺データ化・御礼メールで<br>展示会後の追客業務を、もっとスマートに。',
+      reason: 'デフォルト（現行コピー）。SPEED ADブランドの上質トーンを担う。キャッチコピー募集中。'
+    };
+
+    const allVariants = new Map();
+    allVariants.set(DEFAULT_VARIANT.id, DEFAULT_VARIANT);
+
+    const defaultGroupEl = document.createElement('optgroup');
+    defaultGroupEl.label = 'デフォルト';
+    const defaultOption = document.createElement('option');
+    defaultOption.value = DEFAULT_VARIANT.id;
+    defaultOption.textContent = 'デフォルト（現行）';
+    defaultGroupEl.appendChild(defaultOption);
+    select.appendChild(defaultGroupEl);
+
+    HERO_COPY_GROUPS.forEach((group) => {
+      const optgroup = document.createElement('optgroup');
+      optgroup.label = group.label;
+      group.variants.forEach((variant) => {
+        allVariants.set(variant.id, variant);
+        const option = document.createElement('option');
+        option.value = variant.id;
+        option.textContent = variant.label;
+        optgroup.appendChild(option);
+      });
+      select.appendChild(optgroup);
+    });
+
+    function applyVariant(id) {
+      const variant = allVariants.get(id) || DEFAULT_VARIANT;
+      statementEl.innerHTML = variant.statement;
+      if (variant.lead) {
+        leadEl.innerHTML = variant.lead;
+      }
+      reasonEl.textContent = variant.reason;
+    }
+
+    function setExpanded(isOpen) {
+      toggle.setAttribute('aria-expanded', String(isOpen));
+      panel.hidden = !isOpen;
+    }
+
+    toggle.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const isOpen = toggle.getAttribute('aria-expanded') === 'true';
+      setExpanded(!isOpen);
+    });
+
+    select.addEventListener('change', (event) => {
+      const value = event.target.value;
+      applyVariant(value);
+      try {
+        window.localStorage.setItem(STORAGE_KEY, value);
+      } catch (_error) {
+        /* localStorage unavailable */
+      }
+    });
+
+    document.addEventListener('click', (event) => {
+      if (toggle.getAttribute('aria-expanded') !== 'true') {
+        return;
+      }
+      if (toggle.contains(event.target) || panel.contains(event.target)) {
+        return;
+      }
+      setExpanded(false);
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
+        setExpanded(false);
+        toggle.focus();
+      }
+    });
+
+    let savedId = DEFAULT_VARIANT.id;
+    try {
+      savedId = window.localStorage.getItem(STORAGE_KEY) || DEFAULT_VARIANT.id;
+    } catch (_error) {
+      /* localStorage unavailable */
+    }
+    if (allVariants.has(savedId)) {
+      select.value = savedId;
+      applyVariant(savedId);
+    }
+  }
+
+  function setupSiteTopHamburger() {
+    const hamburger = document.getElementById('site-top-hamburger');
+    const nav = document.getElementById('site-top-nav');
+    if (!hamburger || !nav) {
+      return;
+    }
+    function setExpanded(isOpen) {
+      hamburger.setAttribute('aria-expanded', String(isOpen));
+      hamburger.setAttribute('aria-label', isOpen ? 'メニューを閉じる' : 'メニューを開く');
+    }
+    hamburger.addEventListener('click', () => {
+      const isOpen = hamburger.getAttribute('aria-expanded') === 'true';
+      setExpanded(!isOpen);
+    });
+    nav.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => setExpanded(false));
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && hamburger.getAttribute('aria-expanded') === 'true') {
+        setExpanded(false);
+        hamburger.focus();
+      }
+    });
   }
 
   if (document.readyState === 'loading') {
