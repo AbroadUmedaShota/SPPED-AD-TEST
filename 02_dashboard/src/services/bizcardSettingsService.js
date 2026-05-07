@@ -8,7 +8,9 @@ import { resolveDashboardDataPath } from '../utils.js';
 // --- Mock Data for Coupons (as backend is not implemented) ---
 const mockCoupons = {
     'SAVE10': { type: 'discount', value: 1000, message: 'クーポン「SAVE10」が適用されました (-¥1,000)。' },
-    'test': { type: 'discount', value: 10000, message: 'テスト用クーポン「test」が適用されました (-¥10,000)。' }
+    'test': { type: 'discount', value: 10000, message: 'テスト用クーポン「test」が適用されました (-¥10,000)。' },
+    'PCT10': { type: 'percent', value: 10, message: 'クーポン「PCT10」が適用されました (10%引き)。' },
+    'HALF': { type: 'percent', value: 50, message: 'テスト用クーポン「HALF」が適用されました (50%引き)。' }
 };
 
 /**

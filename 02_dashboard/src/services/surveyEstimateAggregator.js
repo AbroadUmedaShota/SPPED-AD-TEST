@@ -121,7 +121,9 @@ export function setSurveySubtotal(surveyId, scope, subtotal) {
  * @param {Object} params
  * @param {number|null} params.bizcardSubtotal  名刺データ化の税抜小計（null = 未設定 → 0 扱い）
  * @param {number|null} params.thankYouSubtotal お礼メールの税抜小計（null = 未設定 → 0 扱い）
- * @param {{ type: string, value: number, code: string }|null} [params.coupon]
+ * @param {{ type: 'discount'|'percent'|string, value: number, code: string }|null} [params.coupon]
+ *   coupon.type は現状 `'discount'`（固定金額値引き）と `'percent'`（パーセント値引き）の2種をサポート。
+ *   未指定/不明値は後方互換のため `'discount'` 扱い。
  * @param {number} [params.taxRate=0.1] 消費税率
  * @returns {{
  *   subtotalAll: number,
@@ -147,9 +149,17 @@ export function computeSurveyTotalEstimate({ bizcardSubtotal, thankYouSubtotal, 
 
     const subtotalAll = bizcard + thankYou;
 
-    const couponAmount = coupon
-        ? Math.min(subtotalAll, Math.max(0, Number(coupon.value) || 0))
-        : 0;
+    let couponAmount = 0;
+    if (coupon) {
+        const rawValue = Math.max(0, Number(coupon.value) || 0);
+        if (coupon.type === 'percent') {
+            const pct = Math.min(100, rawValue);
+            couponAmount = Math.floor(subtotalAll * pct / 100);
+        } else {
+            // 'discount' (固定金額) または type 不明（デフォルトを固定金額扱い）
+            couponAmount = Math.min(subtotalAll, rawValue);
+        }
+    }
 
     const afterCoupon = Math.max(0, subtotalAll - couponAmount);
     const tax = Math.floor(afterCoupon * taxRate);
