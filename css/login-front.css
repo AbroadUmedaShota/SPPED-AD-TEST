@@ -25,6 +25,27 @@ html {
   scroll-behavior: smooth;
 }
 
+:where(
+  #top,
+  #hero-title,
+  #hero-statement,
+  #hero-lead,
+  #input-box,
+  #login-title,
+  #public-news-title,
+  #features-title,
+  #flow-title,
+  #capabilities,
+  #capabilities-title,
+  #voice-title,
+  #related-title,
+  #final-cta-title,
+  #signup-modal-title,
+  section[id]
+) {
+  scroll-margin-top: 80px;
+}
+
 body {
   margin: 0;
   color: var(--ink);
@@ -132,7 +153,7 @@ img {
 .hero__shade {
   z-index: -1;
   background:
-    linear-gradient(90deg, rgba(2, 17, 32, 0.98) 0%, rgba(2, 17, 32, 0.94) 18%, rgba(2, 17, 32, 0.78) 42%, rgba(2, 17, 32, 0.46) 66%, rgba(2, 17, 32, 0.2) 100%),
+    linear-gradient(90deg, rgba(2, 17, 32, 0.98) 0%, rgba(2, 17, 32, 0.94) 18%, rgba(2, 17, 32, 0.82) 42%, rgba(2, 17, 32, 0.62) 66%, rgba(2, 17, 32, 0.55) 100%),
     linear-gradient(180deg, rgba(2, 17, 32, 0.1), rgba(2, 17, 32, 0.66));
 }
 
@@ -200,18 +221,22 @@ img {
 }
 
 .site-top-header__nav-link {
-  text-decoration: none;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 4px;
   color: rgba(255, 255, 255, 0.86);
   font-family: var(--latin);
   font-size: 0.78rem;
   font-weight: 600;
   letter-spacing: 0.16em;
-  transition: color 0.2s ease;
+  transition: color 0.2s ease, text-decoration-color 0.2s ease, text-underline-offset 0.2s ease;
 }
 
 .site-top-header__nav-link:hover,
 .site-top-header__nav-link:focus-visible {
   color: var(--gold);
+  text-decoration-color: currentColor;
+  text-underline-offset: 6px;
 }
 
 .site-top-header__cta {
@@ -316,15 +341,15 @@ img {
   font-size: clamp(4.06rem, 9.1vw, 7.84rem);
   font-weight: 500;
   letter-spacing: 0;
-  line-height: 0.82;
+  line-height: 0.92;
 }
 
 .hero__statement {
   margin: 28px 0 0;
   font-family: var(--serif);
   font-size: clamp(1.85rem, 3.1vw, 2.7rem);
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-weight: 500;
+  letter-spacing: 0.04em;
   line-height: 1.48;
 }
 
@@ -486,9 +511,9 @@ img {
   max-width: 520px;
   margin: 18px 0 0;
   font-size: clamp(0.98rem, 1.25vw, 1.08rem);
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  line-height: 1.9;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1.8;
 }
 
 .hero__actions {
@@ -519,12 +544,28 @@ img {
   padding: 0 24px;
   border: 1px solid rgba(255, 255, 255, 0.65);
   border-radius: 999px;
+  transition: transform .15s ease, box-shadow .2s ease, background-color .2s ease, color .2s ease;
+}
+
+.cta-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px -12px rgba(2, 17, 32, .35);
+}
+
+.cta-button:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 10px -6px rgba(2, 17, 32, .3);
 }
 
 .cta-button--primary,
 .cta-button--light {
   background: rgba(251, 250, 247, 0.96);
   color: var(--ink);
+}
+
+.cta-button--primary:hover,
+.cta-button--light:hover {
+  box-shadow: 0 8px 20px -12px rgba(2, 17, 32, .28);
 }
 
 .cta-button--light {
@@ -559,10 +600,87 @@ img {
 .text-link {
   min-height: 44px;
   border-bottom: 1px solid currentColor;
+  transition: color .2s ease, border-color .2s ease, opacity .2s ease;
+}
+
+.text-link:hover {
+  opacity: 0.78;
+}
+
+.text-link:active {
+  opacity: 0.6;
 }
 
 .text-link--light {
   color: var(--white);
+}
+
+.public-news-bar__link {
+  transition: color .2s ease, text-decoration-color .2s ease, text-underline-offset .2s ease;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 3px;
+}
+
+.public-news-bar__link:hover,
+.public-news-bar__link:focus-visible {
+  color: var(--gold);
+  text-decoration-color: currentColor;
+  text-underline-offset: 4px;
+}
+
+.voice-teaser__link {
+  transition: color .2s ease, border-color .2s ease, opacity .2s ease;
+}
+
+.voice-teaser__link:hover,
+.voice-teaser__link:focus-visible {
+  opacity: 0.82;
+}
+
+.related-services__list a {
+  transition: color .2s ease, background-color .2s ease;
+}
+
+.related-services__list a:hover,
+.related-services__list a:focus-visible {
+  color: var(--gold);
+  background: rgba(199, 164, 107, 0.06);
+}
+
+.related-services__list a:hover .related-services__name,
+.related-services__list a:focus-visible .related-services__name {
+  color: var(--gold);
+}
+
+.site-footer nav a {
+  transition: color .2s ease, text-decoration-color .2s ease, text-underline-offset .2s ease;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 3px;
+}
+
+.site-footer nav a:hover,
+.site-footer nav a:focus-visible {
+  color: var(--white);
+  text-decoration-color: currentColor;
+  text-underline-offset: 4px;
+}
+
+.site-footer__pagetop {
+  transition: color .2s ease, border-color .2s ease, background-color .2s ease, transform .15s ease;
+}
+
+.site-footer__pagetop:hover,
+.site-footer__pagetop:focus-visible {
+  color: var(--white);
+  border-color: var(--white);
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
+}
+
+.site-footer__pagetop:active {
+  transform: translateY(0);
 }
 
 .login-panel {
@@ -627,6 +745,13 @@ img {
   border-radius: 0.5rem;
   color: var(--white);
   background: rgba(2, 17, 32, 0.42);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-group__input:focus,
+.form-group__input:focus-visible {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(199, 164, 107, 0.18);
 }
 
 .form-group__input::placeholder {
@@ -796,11 +921,13 @@ img {
   font-size: 0.78rem;
   text-decoration: underline;
   text-underline-offset: 3px;
+  transition: color .2s ease, text-underline-offset .2s ease;
 }
 
 .login-panel__forgot:hover,
 .login-panel__forgot:focus-visible {
   color: var(--white);
+  text-underline-offset: 4px;
 }
 
 .button {
@@ -821,12 +948,34 @@ img {
 .button--filled {
   background: #062445;
   color: var(--white);
+  transition: transform .15s ease, box-shadow .2s ease, background-color .2s ease, color .2s ease;
+}
+
+.button--filled:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px -12px rgba(2, 17, 32, .55);
+}
+
+.button--filled:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 10px -6px rgba(2, 17, 32, .45);
 }
 
 .button--google {
   border-color: rgba(255, 255, 255, 0.28);
   color: var(--white);
   background: rgba(255, 255, 255, 0.07);
+  transition: transform .15s ease, box-shadow .2s ease, background-color .2s ease, color .2s ease, border-color .2s ease;
+}
+
+.button--google:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px -12px rgba(2, 17, 32, .35);
+}
+
+.button--google:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 10px -6px rgba(2, 17, 32, .3);
 }
 
 .button--google__logo {
@@ -952,7 +1101,7 @@ img {
 
 .public-news-bar__eyebrow {
   margin: 0;
-  color: var(--gold);
+  color: #9d7d51;
   font-family: var(--latin);
   font-size: 0.76rem;
   font-weight: 700;
