@@ -596,6 +596,19 @@ export function initBizcardSettings() {
             appliedContainer.classList.add('hidden');
         }
 
+        // クーポン折りたたみ <details> の開閉と要約ラベル
+        const hasAppliedCoupon = Boolean(state.isCouponApplied && state.appliedCoupon);
+        const couponDetailsEl = document.getElementById('couponSectionWrapper');
+        const couponSummaryStatusEl = document.getElementById('couponSummaryStatus');
+        if (couponDetailsEl && 'open' in couponDetailsEl) {
+            couponDetailsEl.open = hasAppliedCoupon;
+        }
+        if (couponSummaryStatusEl) {
+            couponSummaryStatusEl.textContent = hasAppliedCoupon
+                ? `適用中: ${state.appliedCoupon?.code || ''}`
+                : '未適用';
+        }
+
         if (state.isCouponProcessing) {
             applyCouponBtn?.classList.add('hidden');
             applyLoading?.classList.remove('hidden');
