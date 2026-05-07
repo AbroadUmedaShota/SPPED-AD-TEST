@@ -99,9 +99,15 @@ last_reviewed: 2026-05-01
 ### 4.4 クーポン
 - 1 アンケートにつき 1 クーポンのみ適用可能。
 - クーポンは **アンケート全体料金（名刺データ化小計 + お礼メール小計）に対して 1 回のみ適用** する。画面別小計には反映しない。
-- 値引種別は **`discount`（金額値引き）のみ** をスコープとする。納期短縮型（旧 `speedBoost`）は本書のスコープ外であり、プロダクトとして対応しない。
+- 対応するクーポンタイプは以下の 2 種をスコープとする。納期短縮型（旧 `speedBoost`）は本書のスコープ外であり、プロダクトとして対応しない。
+
+  | type | 概要 | `value` の意味 | 計算式 |
+  | --- | --- | --- | --- |
+  | `discount` | 金額値引き（固定額） | 値引き円（円、0 以上の整数） | `couponAmount = min(subtotalAll, max(0, value))` |
+  | `percent` | パーセント値引き | 値引き率（%、0〜100 にクランプ） | `couponAmount = floor(subtotalAll × min(100, value) / 100)` |
+
 - クーポンコード検証はサーバーに問い合わせる。
-  - 成功時: `discountType: 'discount'`、割引値、メッセージ、適用可否を返す。
+  - 成功時: `type`（`'discount'` / `'percent'`）、`value`、メッセージ、適用可否を返す。
   - 失敗時: 入力欄に紐づくエラーを表示する。
 - 解除時は確認後にサーバー側の適用状態を更新する。
 - 状態としては `state.appliedCoupon` に **単一オブジェクト** で保持する（配列は禁止）。共有キー `sharedCoupon_{surveyId}` で姉妹画面と同じクーポンを共有する。
@@ -137,6 +143,9 @@ last_reviewed: 2026-05-01
   - 戻り値の `couponAmount` / `couponPercent` は互換目的で常に `0` を返す（実体は集計層）。
 - **全体集計（`surveyEstimateAggregator.computeSurveyTotalEstimate`）**: 名刺・お礼メール双方の小計、クーポン、税率を受け取り、全体料金（税抜小計 → 値引き → 税抜割引後 → 消費税 → 税込）を返す純粋関数。
   - クーポン値引きはこの関数でのみ実施する（計算層ガード）。
+  - `couponAmount` の算出はクーポン `type` により以下のように分岐する。
+    - `discount`: `couponAmount = min(subtotalAll, max(0, value))`
+    - `percent`:  `couponAmount = floor(subtotalAll × min(100, value) / 100)`（`value` は 0〜100 にクランプ）
   - 完了予定日は責務外。
 
 ### 5.3 見積結果
@@ -168,7 +177,7 @@ last_reviewed: 2026-05-01
 - データ化有効/無効、見込み枚数、プラン、オプション、社内メモ、競合制御情報
 
 ### 6.3 クーポン検証で必要な情報
-- クーポンコード、適用可否、割引種別（`discount` のみ）、割引値、メッセージ、適用後の全体料金プレビュー
+- クーポンコード、適用可否、`type`（`'discount'` / `'percent'`）、`value`（`discount` は値引き円、`percent` は値引き率%）、メッセージ、適用後の全体料金プレビュー
 - `speedBoost` 等の納期短縮型はスコープ外。サーバ側でも本画面向けには返さない想定とする。
 
 ### 6.4 アンケート全体料金共有のためのクライアント永続化（暫定）
@@ -217,7 +226,7 @@ last_reviewed: 2026-05-01
 
 - **プラン連動（`plan-capabilities.json`）が未適用** — 契約プラン別の表示制限・上限が効かない
 - **保存処理** — 保存時はサーバーへ送信し、成功/失敗を画面に表示する
-- **クーポン検証** — サーバー側で有効性を確認する。`discountType` は `discount` のみを返却対象とする
+- **クーポン検証** — サーバー側で有効性を確認する。`type` は `'discount'`（金額値引き）／ `'percent'`（パーセント値引き）の 2 種を返却対象とする
 - **プレミアム多言語の単価が未定義** — 料金加算ロジックが実質無効
 - **追加項目の料金加算ロジックなし** — 選択肢表示のみで金額に反映されない
 - **クーポン共有キー（`sharedCoupon_*`）がクライアント localStorage** — サーバ側管理へ移行
@@ -238,7 +247,7 @@ last_reviewed: 2026-05-01
 | `POST /api/surveys/{surveyId}/bizcard-settings/estimate` | 画面別小計（名刺分）の再計算 | `{ bizcardEnabled, bizcardRequest, dataConversionPlan, premiumOptions }` | 200 画面別小計（§5.3 参照）／ 400 バリデーション |
 | `GET /api/surveys/{surveyId}/total-estimate` | アンケート全体料金プレビュー | — | 200 `{ bizcardSubtotal, thankYouSubtotal, subtotalAll, couponAmount, afterCoupon, tax, totalWithTax, missing[] }` |
 | `PUT /api/surveys/{surveyId}/bizcard-settings` | 設定保存 | `{ ...設定, version }` | 200 `{ settings, version }` ／ 409 競合 ／ 400 ／ 403 |
-| `POST /api/surveys/{surveyId}/coupons/validate` | クーポン検証（`discountType: 'discount'` のみ） | `{ code }` | 200 `{ valid, discountType, discountValue, message, surveyTotalPreview }` ／ 400 |
+| `POST /api/surveys/{surveyId}/coupons/validate` | クーポン検証（`type: 'discount'` / `'percent'`） | `{ code }` | 200 `{ valid, type, value, message, surveyTotalPreview }` ／ 400 |
 | `DELETE /api/surveys/{surveyId}/coupons` | クーポン解除 | — | 200 `{ surveyTotalPreview }` |
 
 - 画面別小計はクーポン未適用の税抜額のみを返却する。クーポン値引きは `total-estimate` / `coupons/validate` の応答にのみ含める。
@@ -300,6 +309,8 @@ last_reviewed: 2026-05-01
 - [ ] **画面別小計（`#estimatedAmount` および詳細内訳）にはクーポン値引きが反映されない**（純粋な税抜小計）
 - [ ] **クーポン値引行および「税抜割引後」行はアンケート全体ブロック（`.estimate-block-survey-total`）配下にのみ出現する**
 - [ ] クーポン適用/解除でアンケート全体料金（税抜割引後・税込請求見込み）のみが変動する
+- [ ] クーポン `type: 'discount'` 適用時に、`value` 円が固定額として全体ブロックの値引き行に反映される（`couponAmount = min(subtotalAll, max(0, value))`）
+- [ ] クーポン `type: 'percent'` 適用時に、`subtotalAll` に対するパーセント値引きが全体ブロックに反映される（例: PCT10 で 10%、HALF で 50% 値引き。`couponAmount = floor(subtotalAll × min(100, value) / 100)`）
 - [ ] お礼メール側の設定が完了している場合、全体ブロックに該当小計が表示される。未完了の場合「未設定（後ほど反映されます）」が表示される
 - [ ] 完了予定日はサーバ算出値が表示される（クライアントで再計算しない）
 - [ ] 保存後の再読込で保存内容が完全再現される（`surveyEstimate_*` 経由で姉妹画面とも整合）
