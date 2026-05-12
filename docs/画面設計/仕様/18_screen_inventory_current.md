@@ -1,7 +1,7 @@
 ---
 owner: product
 status: draft
-last_reviewed: 2026-04-07
+last_reviewed: 2026-04-28
 ---
 
 # SPEED AD 現行画面一覧・サービス設計整理
@@ -121,3 +121,42 @@ last_reviewed: 2026-04-07
 ## 6. 別枠管理
 
 `02_dashboard/common/`, `02_dashboard/components/`, `03_admin/common/` は共通部品として扱い、画面一覧には含めない。`03_admin/BY-*`, `03_admin/sample/*`, `old/`, `Moved` タイトルのHTMLは旧・サンプル・移行導線として別枠管理し、現行画面の正本には含めない。
+
+## 7. モック回収判定台帳（23連動）
+
+本章は、`23_mock_screen_recovery_plan.md` に基づき、モック画面を本番アプリ、公開LP、静的サブドメイン、参考保持、廃止候補へ分類するための実行台帳である。
+既存の画面一覧は現行HTMLと仕様の対応を俯瞰するために維持し、回収可否や回収先の判断は本章で管理する。
+
+### 7.1. 判定状態定義
+
+| 判定状態 | 意味 |
+| :--- | :--- |
+| 未着手 | 回収分類をまだ判断していない |
+| 判定中 | 既存資料を確認中で、分類または回収先が未確定 |
+| 要確認 | PO、法務、開発リード、運用担当などの確認が必要 |
+| 判定確定 | 回収分類、回収先、次アクションが確定している |
+| 廃止候補確定 | 本番導線へ入れず、参考保持または削除検討へ回すことが確定している |
+
+### 7.2. 初期判定
+
+| No | 画面名/モーダル | 回収分類 | 回収先ホスト | 判定状態 | 根拠資料 | 次アクション | owner | due |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| R-001 | ログイン前トップ | 公開LP回収 | `speed-ad.com` | 要確認 | `index.html`, `23_mock_screen_recovery_plan.md`, PR #289 | PR #289 取り込み後にお知らせ欄と公開導線の追加実装へ進める | product/dev | 未定 |
+| R-002 | お知らせ一覧/詳細 | 静的サブドメイン回収 | `support.speed-ad.com` | 要確認 | `23_mock_screen_recovery_plan.md`, `21_support_site_separation_spec.md` | `/news/` と `news.json` を support 側URL台帳へ追加し、CORSまたはビルド同梱方式を確定する | product/dev | 未定 |
+| R-003 | ヘルプ/FAQ | 静的サブドメイン回収 | `support.speed-ad.com` | 要確認 | `15_help_center_requirements.md`, `21_support_site_separation_spec.md`, `2026-04-24_dev_mock_diff_report.md` | 旧URLの301、記事URL、FAQ検索導線を support 仕様へ寄せる | product/dev | 未定 |
+| R-004 | 問い合わせ/不具合報告 | 静的サブドメイン回収 | `support.speed-ad.com` | 要確認 | `21_support_site_separation_spec.md`, `2026-04-24_dev_mock_diff_report.md` | 外部フォーム、`bug-report.html`、`contactModal.html` の一本化方針を決める | product/dev | 未定 |
+| R-005 | 規約/法務ページ | 静的サブドメイン回収 | `support.speed-ad.com` | 要確認 | `21_support_site_separation_spec.md`, `2026-04-24_dev_mock_diff_report.md` | 法務確認、版管理、同意記録、旧URL保持方針を確定する | legal/product | 未定 |
+| R-006 | お客様のお声 | 公開LP回収 | `speed-ad.com` | 判定中 | `19_customer_voice_public_pages.md`, `data/customer-voices.json` | 公開安全性と本番公開URLを確認し、support系静的面とは分離する | product | 未定 |
+| R-007 | ダッシュボード/アンケート作成/設定系 | アプリ回収 | `app.speed-ad.com` | 判定中 | `00_screen_requirements.md`, `12_dashboard_current_functional_requirements.md`, `2026-04-24_dev_mock_diff_report.md` | 開発環境との差分が大きい画面から画面単位で回収判断する | product/dev | 未定 |
+| R-008 | 初回ログインチュートリアル | アプリ回収 | `app.speed-ad.com` | 要確認 | `00_first-login_tutorial_requirements.md`, `04_first-login/index.html` | 初回ユーザー状態で開発環境確認を行う | product/dev | 未定 |
+| R-009 | 管理者画面 | アプリ回収 | `app.speed-ad.com` | 判定中 | `docs/画面設計/仕様/admin/README.md`, `03_admin/` | 利用者向け回収とは別フェーズで管理者仕様と照合する | product/dev | 未定 |
+| R-010 | 旧・サンプル・Moved画面 | 参考保持 | `repo-reference` | 判定中 | `18_screen_inventory_current.md` | 本番導線へ含めず、削除候補は別PRで理由付き整理する | product/dev | 未定 |
+
+### 7.3. 更新ルール
+
+- 1判定ごとに根拠資料を必ず記録する
+- `要確認` のまま画面実装へ進めない
+- `support.speed-ad.com` へ移す対象は、旧URL保持、301リダイレクト、切り戻し期間の扱いを確認する
+- `news.json`、`/news/` など新しい公開面を追加する場合は、台帳と support 仕様の両方に反映する
+- `index.html` / `css/page.css` を触る作業は、PR #289 の取り込み状態を確認してから別ブランチで実施する
+- 実装状況や仕様状態が未確定の場合は、既存の一覧表を書き換えず、本章の判定状態で管理する
