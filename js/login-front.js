@@ -775,9 +775,9 @@
     const STORAGE_KEY = 'speedad-hero-copy-variant';
     const DEFAULT_VARIANT = {
       id: 'default',
-      statement: '展示会の出会いを、<br>確かな成果へ。',
-      lead: 'QRアンケート・名刺データ化・御礼メールで<br>展示会後の追客業務を、もっとスマートに。',
-      reason: 'デフォルト（現行コピー）。SPEED ADブランドの上質トーンを担う。キャッチコピー募集中。'
+      statement: '営業プロセスの無駄をゼロにする、<br>次世代のリード獲得ツール。',
+      lead: 'Webアンケートで来場者情報を集め、<br>名刺データ化と御礼メールで展示会後の追客をスムーズに。',
+      reason: 'デフォルト（現行コピー）。営業プロセスの無駄を減らすリード獲得ツールとして訴求。'
     };
 
     const allVariants = new Map();
