@@ -775,7 +775,7 @@
     const STORAGE_KEY = 'speedad-hero-copy-variant';
     const DEFAULT_VARIANT = {
       id: 'default',
-      statement: '営業プロセスの無駄をゼロにする、<br>次世代のリード獲得ツール。',
+      statement: '営業プロセスの無駄をゼロにする<br>次世代のリード獲得ツール。',
       lead: 'Webアンケートで来場者情報を集め、<br>名刺データ化と御礼メールで展示会後の追客をスムーズに。',
       reason: 'デフォルト（現行コピー）。営業プロセスの無駄を減らすリード獲得ツールとして訴求。'
     };
