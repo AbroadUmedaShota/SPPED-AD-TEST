@@ -1,24 +1,35 @@
-# SPEED AD 管理者画面 要件定義ドキュメント集
+---
+owner: product
+status: draft
+last_reviewed: 2026-05-15
+---
 
-本ディレクトリは管理者画面 (`03_admin/`) 向けの画面別要件定義書をまとめています。サービス画面側と同様に、個別画面の目的・構成・機能要件を明文化することで、実装・レビュー・運用の基準を共有します。
+# 管理者画面仕様
 
-## 収録ドキュメント
-- [管理者ダッシュボード 要件定義書](./dashboard_requirements.md)
-- [利用者アカウント管理画面 要件定義書](./user_management_requirements.md)
-- [利用者詳細画面 要件定義書](./user_detail_requirements.md)
-- [オペレーター管理画面 要件定義書](./operator_management_requirements.md)
-- [データ入力状況 要件定義書](./data_entry_requirements.md)
-- [照合管理画面 要件定義書](./reconciliation_management_requirements.md)
-- [実績管理画面 要件定義書](./performance_management_requirements.md)
-- [請求管理画面 要件定義書](./billing_management_requirements.md)
-- [クーポン管理画面 要件定義書](./coupon_management_requirements.md)
-- [エスカレーション対応画面 要件定義書](./escalation_management_requirements.md)
-- [アンケート管理画面 要件定義書](./survey_management_requirements.md)
-- [アンケート詳細画面 要件定義書](./survey_detail_requirements.md)
-- [営業日カレンダー管理 要件定義書](./calendar-management_requirements.md)
-- [管理者機能 全体設計ドキュメント](./00_admin_requirements_design.md)
+このディレクトリは、SPEED AD 管理者画面資料の正本置き場です。
 
-## 運用メモ
-- 画面別ドキュメントはバージョン管理し、UI変更時は該当ファイルを更新してください。
-- データモデル例はモック実装 (`03_admin/src/` および `data/`) と整合するよう更新します。
-- 追加画面を作成する際は本ディレクトリに新しい要件定義書を追加し、READMEの一覧を更新してください。
+既存の管理者画面資料は削除済みとして扱い、ここから完全新規で再作成します。`03_admin/` のHTMLは「参考: 現行モック」として確認できますが、仕様上の正解や正本根拠にはしません。
+
+## まず読む資料
+
+| 資料 | 目的 |
+| --- | --- |
+| [00_admin_documentation_rules.md](./00_admin_documentation_rules.md) | 管理者画面資料の作成ルール、番号帯、禁止事項 |
+
+## 作成順序
+
+1. `00_`: 資料ルール、全体方針、用語
+2. `01_`: サービス構造、管理対象、責務境界
+3. `10_`: 顧客・企業・ユーザー・グループ
+4. `20_`: アンケート、設問、公開、回答
+5. `30_`: 名刺データ、入力、照合、エスカレーション
+6. `40_`: 請求、クーポン、営業日、期限前提
+7. `50_`: オペレーター、権限、実績
+8. `90_`: 参考、差分、移行メモ
+
+## 禁止事項
+
+- 削除済みの旧管理者資料を正本として参照しない。
+- 本番DB/API、Backlog進捗、スケジュールを仕様根拠にしない。
+- `03_admin/`、`BY-*`、`sample/`、`Moved` HTMLをそのまま正解扱いしない。
+- 個別画面仕様から先に作らず、先にサービス構造と責務境界を定義する。

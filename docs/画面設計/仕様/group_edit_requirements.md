@@ -607,8 +607,7 @@ state: `state.currentSort = { key: null | 'role' | 'status', order: 'asc' | 'des
 | 仕様書 | 関係 |
 |--------|------|
 | [03_ux_group_creation_modal.md](./03_ux_group_creation_modal.md) | `newGroupModal` + `groupManagementModal.js` の仕様を扱う別文書（§5.9）。`allowBillingInfoView` 等の記述は本画面の請求先トグル（§5.4）と競合するため将来統合時に整理が必要。 |
-| [admin/user_management_requirements.md](./admin/user_management_requirements.md) | 管理者ロールでのグループ横断管理。本画面は「自身が管理するグループ」に限定され、管理者画面の「全ユーザー横断のグループ付与/剥奪」とは別レイヤー。権限判定ロジックは同期必須。 |
+| 管理者画面資料（再作成待ち） | 管理者ロールでのグループ横断管理は、管理者画面資料を完全新規で作り直す際に再定義する。本画面は「自身が管理するグループ」に限定される。 |
 | [06_bizcard_settings_requirements.md](../../リライト版仕様書/06_bizcard_settings_requirements.md) | 「グループ管理者宛に請求される」仕様の根拠（§1.3）。`useGroupBilling` / `billingInfo` の整合が bizcard / thank-you の請求先決定に影響。 |
 | [00_screen_requirements.md](./00_screen_requirements.md) | 画面一覧・遷移の全体インデックス。 |
 | [18_screen_inventory_current.md](./18_screen_inventory_current.md) | 現行実装の画面棚卸し。本画面の実装ステータスを追跡。 |
-

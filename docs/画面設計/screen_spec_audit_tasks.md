@@ -115,36 +115,36 @@
 
 | 画面 | 仕様書 | 完 |
 |------|--------|----|
-| [index.html](../../03_admin/index.html) | [admin/dashboard_requirements.md](仕様/admin/dashboard_requirements.md) | ☐ |
-| [survey-management.html](../../03_admin/survey-management.html) | [admin/survey_management_requirements.md](仕様/admin/survey_management_requirements.md) | ☐ |
-| [survey-detail.html](../../03_admin/survey-detail.html) | [admin/survey_detail_requirements.md](仕様/admin/survey_detail_requirements.md) | ☐ |
-| [user-management.html](../../03_admin/user-management.html) | [admin/user_management_requirements.md](仕様/admin/user_management_requirements.md) | ☐ |
-| [user-detail.html](../../03_admin/user-detail.html) | [admin/user_detail_requirements.md](仕様/admin/user_detail_requirements.md) | ☐ |
-| [operator-management.html](../../03_admin/operator-management.html) | [admin/operator_management_requirements.md](仕様/admin/operator_management_requirements.md) | ☐ |
-| [coupon-management.html](../../03_admin/coupon-management.html) | [admin/coupon_management_requirements.md](仕様/admin/coupon_management_requirements.md) | ☐ |
-| [billing-management.html](../../03_admin/billing-management.html) | [admin/billing_management_requirements.md](仕様/admin/billing_management_requirements.md) | ☐ |
-| [calendar-management.html](../../03_admin/calendar-management.html) | [admin/calendar-management_requirements.md](仕様/admin/calendar-management_requirements.md) | ☐ |
-| [escalations.html](../../03_admin/escalations.html) | [admin/escalation_management_requirements.md](仕様/admin/escalation_management_requirements.md) | ☐ |
-| [performance-management.html](../../03_admin/performance-management.html) | [admin/performance_management_requirements.md](仕様/admin/performance_management_requirements.md) | ☐ |
-| [data-entry-management.html](../../03_admin/data-entry-management.html) | [admin/data_entry_requirements.md](仕様/admin/data_entry_requirements.md) | ☐ |
+| [index.html](../../03_admin/index.html) | 管理者資料再作成待ち | ☐ |
+| [survey-management.html](../../03_admin/survey-management.html) | 管理者資料再作成待ち | ☐ |
+| [survey-detail.html](../../03_admin/survey-detail.html) | 管理者資料再作成待ち | ☐ |
+| [user-management.html](../../03_admin/user-management.html) | 管理者資料再作成待ち | ☐ |
+| [user-detail.html](../../03_admin/user-detail.html) | 管理者資料再作成待ち | ☐ |
+| [operator-management.html](../../03_admin/operator-management.html) | 管理者資料再作成待ち | ☐ |
+| [coupon-management.html](../../03_admin/coupon-management.html) | 管理者資料再作成待ち | ☐ |
+| [billing-management.html](../../03_admin/billing-management.html) | 管理者資料再作成待ち | ☐ |
+| [calendar-management.html](../../03_admin/calendar-management.html) | 管理者資料再作成待ち | ☐ |
+| [escalations.html](../../03_admin/escalations.html) | 管理者資料再作成待ち | ☐ |
+| [performance-management.html](../../03_admin/performance-management.html) | 管理者資料再作成待ち | ☐ |
+| [data-entry-management.html](../../03_admin/data-entry-management.html) | 管理者資料再作成待ち | ☐ |
 
 ## 03_admin データ入力・オペレーター
 
 | 画面 | 仕様書 | 完 |
 |------|--------|----|
-| [data_entry.html](../../03_admin/data_entry.html) | [admin/data_entry_requirements.md](仕様/admin/data_entry_requirements.md) | ☐ |
+| [data_entry.html](../../03_admin/data_entry.html) | 管理者資料再作成待ち | ☐ |
 | [data-entry/index.html](../../03_admin/data-entry/index.html) | 同上 | ☐ |
 | [data-entry/form.html](../../03_admin/data-entry/form.html) | 同上 | ☐ |
 | [sample/data_entry_admin_form.html](../../03_admin/sample/data_entry_admin_form.html) | 同上 | ☐ |
 | [BY-212.html](../../03_admin/BY-211_オペレーター入力画面/BY-212/BY-212.html) | 同上 | ☐ |
 | [BY-213.html](../../03_admin/BY-211_オペレーター入力画面/BY-213/BY-213.html) | 同上 | ☐ |
-| [BY-231.html](../../03_admin/BY-231_オペレーター管理画面/BY-231/BY-231.html) | [admin/operator_management_requirements.md](仕様/admin/operator_management_requirements.md) | ☐ |
+| [BY-231.html](../../03_admin/BY-231_オペレーター管理画面/BY-231/BY-231.html) | 管理者資料再作成待ち | ☐ |
 
 ## 03_admin 照合
 
 | 画面 | 仕様書 | 完 |
 |------|--------|----|
-| [reconciliation/index.html](../../03_admin/reconciliation/index.html) | [admin/reconciliation_management_requirements.md](仕様/admin/reconciliation_management_requirements.md) | ☐ |
+| [reconciliation/index.html](../../03_admin/reconciliation/index.html) | 管理者資料再作成待ち | ☐ |
 | [reconciliation/list.html](../../03_admin/reconciliation/list.html) | 同上 | ☐ |
 | [reconciliation/detail.html](../../03_admin/reconciliation/detail.html) | 同上 | ☐ |
 | [BY-222.html](../../03_admin/BY-221_照合画面/BY-222/BY-222.html) | 同上 | ☐ |
@@ -157,11 +157,11 @@
 | 画面 | 仕様書 | 完 |
 |------|--------|----|
 | [confirmationModal.html](../../03_admin/modals/confirmationModal.html) | — | ☐ |
-| [newCouponModal.html](../../03_admin/modals/newCouponModal.html) | [admin/coupon_management_requirements.md](仕様/admin/coupon_management_requirements.md) | ☐ |
+| [newCouponModal.html](../../03_admin/modals/newCouponModal.html) | 管理者資料再作成待ち | ☐ |
 | [editCouponModal.html](../../03_admin/modals/editCouponModal.html) | 同上 | ☐ |
 | [couponDetailModal.html](../../03_admin/modals/couponDetailModal.html) | 同上 | ☐ |
 | [bulkCreateCouponModal.html](../../03_admin/modals/bulkCreateCouponModal.html) | 同上 | ☐ |
-| [groupManagementModal.html](../../03_admin/modals/groupManagementModal.html) | [admin/user_management_requirements.md](仕様/admin/user_management_requirements.md) | ☐ |
+| [groupManagementModal.html](../../03_admin/modals/groupManagementModal.html) | 管理者資料再作成待ち | ☐ |
 | [sendEmailModal.html](../../03_admin/modals/sendEmailModal.html) | — | ☐ |
 
 ## 初回ログイン・公開ページ

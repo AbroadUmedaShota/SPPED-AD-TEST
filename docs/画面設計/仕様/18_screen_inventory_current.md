@@ -10,7 +10,7 @@ last_reviewed: 2026-04-07
 
 本資料は、SPEED AD のサービス設計を画面単位で俯瞰するための一覧である。現行画面、関連仕様、実装HTMLを突き合わせ、画面構成・導線・責務分担の未整理点を洗い出すことを目的とする。
 
-旧アーカイブ資料 `docs/アーカイブ/speedad-backlog-wiki-2026-03-24/pages/14_1095216_screen-list.md` は参考資料であり、現行運用の正本ではない。現行仕様の正本は `docs/画面設計/仕様/` および `docs/画面設計/仕様/admin/` に置く。
+旧アーカイブ資料 `docs/アーカイブ/speedad-backlog-wiki-2026-03-24/pages/14_1095216_screen-list.md` は参考資料であり、現行運用の正本ではない。現行仕様の正本は `docs/画面設計/仕様/` に置く。管理者画面資料は `docs/画面設計/仕様/admin/00_admin_documentation_rules.md` に従って完全新規で再作成する。
 
 ## 2. 凡例
 
@@ -50,22 +50,22 @@ last_reviewed: 2026-04-07
 | U-20 | 利用者向け | 更新履歴 | `02_dashboard/changelog.html` | 未確認 | 未確認 | HTMLあり | 画面仕様として管理するか、運用補助扱いにするか確認する |  |
 | U-21 | 利用者向け | 不具合報告 | `02_dashboard/bug-report.html`, `02_dashboard/speed-ad-不具合報告-form/index.html` | `test_requirements.md` / 未確認 | 未確認 | HTMLあり | 通常画面とフォームディレクトリの使い分け、送信先責務を確認する |  |
 | F-01 | 初回ログイン | 初回ログインチュートリアル | `04_first-login/index.html` | `00_first-login_tutorial_requirements.md` | 正本あり | HTMLあり | ダッシュボード再開バナーとの関係を確認する |  |
-| A-01 | 管理者向け | 管理者ダッシュボード | `03_admin/index.html` | `admin/dashboard_requirements.md`, `admin/00_admin_requirements_design.md` | 正本あり | HTMLあり | 権限別表示と各管理画面への入口を整理する |  |
-| A-02 | 管理者向け | 利用者管理 | `03_admin/user-management.html` | `admin/user_management_requirements.md` | 正本あり | HTMLあり | 詳細画面との導線を確認する |  |
-| A-03 | 管理者向け | 利用者詳細 | `03_admin/user-detail.html` | `admin/user_detail_requirements.md` | 正本あり | HTMLあり | 編集可能項目と閲覧項目の境界を確認する |  |
-| A-04 | 管理者向け | アンケート管理 | `03_admin/survey-management.html` | `admin/survey_management_requirements.md` | 正本あり | HTMLあり | 利用者側アンケート一覧との操作差分を確認する |  |
-| A-05 | 管理者向け | アンケート詳細 | `03_admin/survey-detail.html` | `admin/survey_detail_requirements.md` | 正本あり | HTMLあり | 更新系操作ルールと閲覧情報の範囲を確認する |  |
-| A-06 | 管理者向け | 請求管理 | `03_admin/billing-management.html` | `請求関連仕様マップ.md`, `admin/billing_management_requirements.md` | 正本あり | HTMLあり | 利用者向け請求書とは別責務であることと相互参照先を確認する |  |
-| A-07 | 管理者向け | クーポン管理 | `03_admin/coupon-management.html` | `admin/coupon_management_requirements.md` | 正本あり | HTMLあり | クーポン系モーダルとの接続を確認する |  |
-| A-08 | 管理者向け | 営業日カレンダー管理 | `03_admin/calendar-management.html` | `admin/calendar-management_requirements.md` | 正本あり | HTMLあり | 休業日計算への反映範囲を確認する |  |
-| A-09 | 管理者向け | データ入力状況 | `03_admin/data-entry/index.html` | `admin/data_entry_requirements.md` | 正本あり | HTMLあり | `data-entry-management.html` / `data_entry.html` はMoved扱いでよいか確認する |  |
-| A-10 | 管理者向け | データ入力フォーム | `03_admin/data-entry/form.html` | `admin/data_entry_requirements.md` | 正本あり | HTMLあり | BY系旧画面との対応を確認する |  |
-| A-11 | 管理者向け | 照合管理 | `03_admin/reconciliation/index.html` | `admin/reconciliation_management_requirements.md` | 正本あり | HTMLあり | 一覧・詳細との役割分担を確認する |  |
-| A-12 | 管理者向け | 照合一覧 | `03_admin/reconciliation/list.html` | `admin/reconciliation_management_requirements.md` | 正本あり | HTMLあり | BY系旧画面との対応を確認する |  |
-| A-13 | 管理者向け | 照合詳細 | `03_admin/reconciliation/detail.html` | `admin/reconciliation_management_requirements.md` | 正本あり | HTMLあり | 照合保存・エスカレーション処理の画面責務を確認する |  |
-| A-14 | 管理者向け | オペレーター管理 | `03_admin/operator-management.html` | `admin/operator_management_requirements.md` | 正本あり | HTMLあり | BY系旧画面との対応を確認する |  |
-| A-15 | 管理者向け | 実績管理 | `03_admin/performance-management.html` | `admin/performance_management_requirements.md` | 正本あり | HTMLあり | オペレーター権限別表示を確認する |  |
-| A-16 | 管理者向け | エスカレーション対応 | `03_admin/escalations.html` | `admin/escalation_management_requirements.md` | 正本あり | HTMLあり | 照合詳細からの連携を確認する |  |
+| A-01 | 管理者向け | 管理者ダッシュボード | `03_admin/index.html` | 未設定 | 再作成予定 | HTMLあり | 管理者画面資料を完全新規で作り直すため、既存仕様は削除済み |  |
+| A-02 | 管理者向け | 利用者管理 | `03_admin/user-management.html` | 未設定 | 再作成予定 | HTMLあり | 管理者画面資料を完全新規で作り直すため、既存仕様は削除済み |  |
+| A-03 | 管理者向け | 利用者詳細 | `03_admin/user-detail.html` | 未設定 | 再作成予定 | HTMLあり | 管理者画面資料を完全新規で作り直すため、既存仕様は削除済み |  |
+| A-04 | 管理者向け | アンケート管理 | `03_admin/survey-management.html` | 未設定 | 再作成予定 | HTMLあり | 管理者画面資料を完全新規で作り直すため、既存仕様は削除済み |  |
+| A-05 | 管理者向け | アンケート詳細 | `03_admin/survey-detail.html` | 未設定 | 再作成予定 | HTMLあり | 管理者画面資料を完全新規で作り直すため、既存仕様は削除済み |  |
+| A-06 | 管理者向け | 請求管理 | `03_admin/billing-management.html` | 未設定 | 再作成予定 | HTMLあり | 管理者画面資料を完全新規で作り直すため、既存仕様は削除済み |  |
+| A-07 | 管理者向け | クーポン管理 | `03_admin/coupon-management.html` | 未設定 | 再作成予定 | HTMLあり | 管理者画面資料を完全新規で作り直すため、既存仕様は削除済み |  |
+| A-08 | 管理者向け | 営業日カレンダー管理 | `03_admin/calendar-management.html` | 未設定 | 再作成予定 | HTMLあり | 管理者画面資料を完全新規で作り直すため、既存仕様は削除済み |  |
+| A-09 | 管理者向け | データ入力状況 | `03_admin/data-entry/index.html` | 未設定 | 再作成予定 | HTMLあり | 管理者画面資料を完全新規で作り直すため、既存仕様は削除済み |  |
+| A-10 | 管理者向け | データ入力フォーム | `03_admin/data-entry/form.html` | 未設定 | 再作成予定 | HTMLあり | 管理者画面資料を完全新規で作り直すため、既存仕様は削除済み |  |
+| A-11 | 管理者向け | 照合管理 | `03_admin/reconciliation/index.html` | 未設定 | 再作成予定 | HTMLあり | 管理者画面資料を完全新規で作り直すため、既存仕様は削除済み |  |
+| A-12 | 管理者向け | 照合一覧 | `03_admin/reconciliation/list.html` | 未設定 | 再作成予定 | HTMLあり | 管理者画面資料を完全新規で作り直すため、既存仕様は削除済み |  |
+| A-13 | 管理者向け | 照合詳細 | `03_admin/reconciliation/detail.html` | 未設定 | 再作成予定 | HTMLあり | 管理者画面資料を完全新規で作り直すため、既存仕様は削除済み |  |
+| A-14 | 管理者向け | オペレーター管理 | `03_admin/operator-management.html` | 未設定 | 再作成予定 | HTMLあり | 管理者画面資料を完全新規で作り直すため、既存仕様は削除済み |  |
+| A-15 | 管理者向け | 実績管理 | `03_admin/performance-management.html` | 未設定 | 再作成予定 | HTMLあり | 管理者画面資料を完全新規で作り直すため、既存仕様は削除済み |  |
+| A-16 | 管理者向け | エスカレーション対応 | `03_admin/escalations.html` | 未設定 | 再作成予定 | HTMLあり | 管理者画面資料を完全新規で作り直すため、既存仕様は削除済み |  |
 
 ## 4. モーダル一覧
 
@@ -85,8 +85,8 @@ last_reviewed: 2026-04-07
 | M-12 | グループ管理 | メンバー詳細 | `02_dashboard/modals/memberDetailModal.html` | メンバー詳細確認 | 正本あり | HTMLあり | 招待中・参加後状態の表示責務を確認する |
 | M-13 | プレミアム関連 | プレミアム機能案内 | `02_dashboard/modals/premiumFeatureModal.html` | 有料機能への誘導 | 正本あり | HTMLあり | プラン制限仕様との整合を確認する |
 | M-14 | 共通 | 確認 / キャンセル確認 | `02_dashboard/modals/confirmationModal.html`, `cancelConfirmationModal.html` | 汎用確認 | 補足仕様あり | HTMLあり | 未保存変更確認などの共通利用範囲を確認する |
-| M-15 | 管理者 / クーポン | クーポン作成・編集・詳細 | `03_admin/modals/newCouponModal.html`, `editCouponModal.html`, `couponDetailModal.html`, `bulkCreateCouponModal.html` | クーポン管理のCRUD補助 | 正本あり | HTMLあり | 本体画面との操作差分を確認する |
-| M-16 | 管理者 / 共通 | 確認 | `03_admin/modals/confirmationModal.html` | 管理者側汎用確認 | 補足仕様あり | HTMLあり | 各画面での利用範囲を確認する |
+| M-15 | 管理者 / クーポン | クーポン作成・編集・詳細 | `03_admin/modals/newCouponModal.html`, `editCouponModal.html`, `couponDetailModal.html`, `bulkCreateCouponModal.html` | クーポン管理のCRUD補助 | 再作成予定 | HTMLあり | 管理者画面資料を完全新規で作り直すため、既存仕様は削除済み |
+| M-16 | 管理者 / 共通 | 確認 | `03_admin/modals/confirmationModal.html` | 管理者側汎用確認 | 再作成予定 | HTMLあり | 管理者画面資料を完全新規で作り直すため、既存仕様は削除済み |
 | M-17 | 管理者 / ユーザー・アンケート | メール送信 | `03_admin/modals/sendEmailModal.html` | 利用者向けメール送信 | 未確認 | HTMLあり | 送信条件・権限を確認する |
 | M-18 | 管理者 / グループ | グループ管理 | `03_admin/modals/groupManagementModal.html` | 管理者側グループ操作 | 未確認 | HTMLあり | 利用者側グループ管理との責務を確認する |
 
