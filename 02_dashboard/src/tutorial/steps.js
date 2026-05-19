@@ -1,0 +1,261 @@
+// steps.js
+// チュートリアル全 20 ステップ定義（仕様書 §4 参照）
+//
+// 各ステップフィールド:
+//   id        : ステップ番号（1..20）
+//   block     : 'A' | 'B' | 'C' | 'D'
+//   target    : 対象要素 CSS セレクタ（null の場合は画面中央）
+//   mode      : 'info' | 'autofill' | 'user-action' | 'user-action-bridge'
+//                - info               = 説明のみ（「次へ」表示）
+//                - autofill           = 自動入力（システムが値を入れ、「次へ」表示）
+//                - user-action        = ユーザー操作（対象クリックで進行、「次へ」非表示）
+//                - user-action-bridge = ユーザー操作＋システム後続処理
+//   placement : 'top' | 'bottom' | 'left' | 'right' | 'center'
+//   title     : 吹き出しタイトル
+//   body      : 吹き出し本文（文字列リテラル。innerHTML 注入禁止）
+//   autoInput : 自動入力用ペイロード（mode='autofill' のときのみ）
+//
+// id=8, id=17, id=20 は user-action-bridge（本番ハンドラに代えてチュートリアルが続行処理を担う）。
+
+const TOMORROW_OFFSET_DAYS = 1;
+const PERIOD_LENGTH_DAYS = 3;
+
+function buildPeriodRange() {
+  const start = new Date();
+  start.setDate(start.getDate() + TOMORROW_OFFSET_DAYS);
+  start.setHours(0, 0, 0, 0);
+  const end = new Date(start);
+  end.setDate(end.getDate() + PERIOD_LENGTH_DAYS);
+  end.setHours(23, 59, 0, 0);
+  return [start, end];
+}
+
+export const TUTORIAL_STEPS = [
+  // ------------------------------------------------------------
+  // ブロック A: アンケート一覧
+  // ------------------------------------------------------------
+  {
+    id: 1,
+    block: 'A',
+    target: null,
+    mode: 'info',
+    placement: 'center',
+    title: 'ダッシュボード',
+    body: 'ここがアンケートを管理する画面です。これからアンケート作成の流れを順番にご案内します。',
+  },
+  {
+    id: 2,
+    block: 'A',
+    target: '#surveyTable',
+    mode: 'info',
+    placement: 'top',
+    title: 'アンケート一覧',
+    body: 'ここがアンケート一覧です。作成済みアンケートが一覧表示されます。',
+  },
+  {
+    id: 3,
+    block: 'A',
+    target: '#openNewSurveyModalBtn',
+    mode: 'user-action',
+    placement: 'bottom',
+    title: '新規作成ボタン',
+    body: '右上の「アンケート新規作成」ボタンを押してください。',
+  },
+
+  // ------------------------------------------------------------
+  // ブロック B: 新規作成モーダル（同ページ内）
+  // ------------------------------------------------------------
+  {
+    id: 4,
+    block: 'B',
+    target: '#newSurveyModal .modal-content-transition',
+    mode: 'info',
+    placement: 'right',
+    title: '新規作成モーダル',
+    body: 'ここでアンケートの基本情報を入力します。',
+    waitForElement: true,
+  },
+  {
+    id: 5,
+    block: 'B',
+    target: '#newSurveyModal #surveyName',
+    mode: 'autofill',
+    placement: 'right',
+    title: 'アンケート名（管理用）',
+    body: 'アンケート名（管理用）に「初めてのアンケート」を自動入力しました。社内管理用の名前で、回答者には表示されません。',
+    autoInput: { kind: 'text', value: '初めてのアンケート' },
+  },
+  {
+    id: 6,
+    block: 'B',
+    target: '#newSurveyModal #displayTitle',
+    mode: 'autofill',
+    placement: 'right',
+    title: '表示タイトル（回答者表示）',
+    body: '表示タイトルに「製品Aに関する満足度調査」を自動入力しました。これは回答者の画面に表示されます。',
+    autoInput: { kind: 'text', value: '製品Aに関する満足度調査' },
+  },
+  {
+    id: 7,
+    block: 'B',
+    target: '#newSurveyPeriodRange',
+    mode: 'autofill',
+    placement: 'right',
+    title: '回答期間',
+    body: '回答期間を翌日から 3 日間で自動入力しました。',
+    autoInput: { kind: 'flatpickr-range', getRange: buildPeriodRange },
+  },
+  {
+    id: 8,
+    block: 'B',
+    target: '#createSurveyFromModalBtn',
+    mode: 'user-action-bridge',
+    placement: 'top',
+    title: '作成する（練習・保存されません）',
+    body: '内容を確認したら「作成する」ボタンを押してください。これは練習のため、実際のアンケート一覧には追加されません。続けて作成画面の使い方を見てみましょう。',
+  },
+
+  // ------------------------------------------------------------
+  // ブロック C: アンケート作成画面（surveyCreation.html?tutorial=1&step=9）
+  // ------------------------------------------------------------
+  {
+    id: 9,
+    block: 'C',
+    target: '#basicInfoBody',
+    mode: 'info',
+    placement: 'right',
+    title: '基本情報の反映確認',
+    body: '前の画面で入力した情報がここに反映されています。',
+  },
+  {
+    id: 10,
+    block: 'C',
+    target: '#settings-column',
+    mode: 'info',
+    placement: 'left',
+    title: '設定カードの紹介',
+    body: '名刺データ化・お礼メール・サンクス画面はここから個別に設定できます。今回はそのまま進みます。',
+  },
+  {
+    id: 11,
+    block: 'C',
+    target: '#addFirstQuestionBtn',
+    mode: 'user-action',
+    placement: 'top',
+    title: '最初の設問を追加',
+    body: '「最初の設問を追加」ボタンを押してください。',
+  },
+  {
+    id: 12,
+    block: 'C',
+    target: '#inlineQuestionTypeMenu button[data-question-type="single_answer"]',
+    waitForElement: true,
+    mode: 'user-action',
+    placement: 'right',
+    title: 'シングルアンサーを選択',
+    body: '「シングルアンサー」を押してください。1 つだけ選べる選択肢の設問です。',
+    waitForElement: true,
+  },
+  {
+    id: 13,
+    block: 'C',
+    target: null, // 直前に挿入された .question-item を index.js が動的解決
+    targetResolver: 'lastInsertedQuestion',
+    mode: 'autofill',
+    placement: 'right',
+    title: '設問文と選択肢の自動入力',
+    body: '設問文と 4 つの選択肢を自動入力しました。確認できたら「次へ」を押してください。',
+    autoInput: {
+      kind: 'question-single',
+      questionText: '製品Aの満足度はいかがですか？',
+      options: ['とても満足', '満足', 'やや不満', '不満'],
+    },
+  },
+  {
+    id: 14,
+    block: 'C',
+    target: '#addQuestionInlineBtn',
+    waitForElement: true,
+    mode: 'user-action',
+    placement: 'top',
+    title: '2 問目を追加',
+    body: '設問の下にある「設問を追加」ボタンを押してください。',
+    waitForElement: true,
+  },
+  {
+    id: 15,
+    block: 'C',
+    target: '#inlineQuestionTypeMenuBottom button[data-question-type="rating_scale"]',
+    waitForElement: true,
+    mode: 'user-action',
+    placement: 'right',
+    title: '評定尺度を選択',
+    body: '「評定尺度」を押してください。満足度などを段階で評価してもらう設問です。',
+    waitForElement: true,
+  },
+  {
+    id: 16,
+    block: 'C',
+    target: null,
+    targetResolver: 'lastInsertedQuestion',
+    mode: 'autofill',
+    placement: 'right',
+    title: '評定尺度の設定',
+    body: '設問文とポイント数（5 段階）、両端のラベルを自動入力しました。',
+    autoInput: {
+      kind: 'question-rating',
+      questionText: '今回のサービス全体の満足度をお聞かせください。',
+      points: 5,
+      minLabel: 'とても不満',
+      maxLabel: 'とても満足',
+    },
+  },
+  {
+    id: 17,
+    block: 'C',
+    target: '#createSurveyBtn',
+    mode: 'user-action-bridge',
+    placement: 'left',
+    title: 'アンケートを作成（練習・保存されません）',
+    body: '右側の「アンケートを作成」ボタンを押してください。これは練習のため、実際には保存されず、アンケート一覧にも追加されません。続けて QR コードの確認方法を見てみましょう。',
+  },
+
+  // ------------------------------------------------------------
+  // ブロック D: QR コード確認 〜 完了
+  // ------------------------------------------------------------
+  {
+    id: 18,
+    block: 'D',
+    target: '#openQrModalBtn',
+    mode: 'user-action',
+    placement: 'left',
+    title: 'QR コードを表示',
+    body: '「QR コード」ボタンが有効になりました。押して QR コードを表示してみましょう。',
+  },
+  {
+    id: 19,
+    block: 'D',
+    target: '#qrCodeModal .modal-content-transition',
+    mode: 'info',
+    placement: 'left',
+    title: 'QR コードの使い方',
+    body: 'この QR コードを展示会で配布したり画面に表示することで、来場者がアンケートに回答できます。',
+    waitForElement: true,
+  },
+  {
+    id: 20,
+    block: 'D',
+    target: null,
+    mode: 'user-action-bridge',
+    placement: 'center',
+    title: 'チュートリアル完了',
+    body: 'お疲れさまでした。「完了」を押してダッシュボードへ戻ります。',
+    completeButtonLabel: '完了',
+  },
+];
+
+export const TOTAL_STEPS = TUTORIAL_STEPS.length;
+
+export function getStepById(id) {
+  return TUTORIAL_STEPS.find((s) => s.id === id) || null;
+}

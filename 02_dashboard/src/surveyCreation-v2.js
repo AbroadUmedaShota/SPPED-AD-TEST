@@ -2318,6 +2318,12 @@ function initSaveButton() {
 }
 
 function attemptSave() {
+  // tutorial-guard
+  if (window.SpeedAD?.tutorial?.shouldBlock('attemptSave')) {
+    window.SpeedAD.tutorial.handleAttemptSave();
+    return;
+  }
+
   // 保存試行時は全必須フィールドを touched 扱いにしてエラーを表示する
   ['surveyName_ja', 'displayTitle_ja', 'periodRange'].forEach(id => touchedFields.add(id));
 

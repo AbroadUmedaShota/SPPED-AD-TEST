@@ -39,62 +39,6 @@ import { showToast, copyTextToClipboard, loadCommonHtml, resolveDashboardAssetPa
 import { initHelpPopovers } from './ui/helpPopover.js';
 import { initEstimateSidebarDrawer } from './ui/estimateSidebarDrawer.js';
 
-function showTutorialResumeBanner() {
-    if (document.getElementById('tutorialResumeBanner')) {
-        return;
-    }
-
-    const mainContent = document.getElementById('main-content');
-    const banner = document.createElement('div');
-    banner.id = 'tutorialResumeBanner';
-    banner.className = 'mb-6 rounded-xl border border-indigo-200 bg-indigo-50 p-5 shadow-sm';
-    banner.innerHTML = `
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div class="text-left">
-                <p class="text-base font-semibold text-indigo-900">作成チュートリアルが途中です</p>
-                <p class="text-sm text-indigo-900/80 mt-1">前回の続きから再開するか、チュートリアルを終了するか選択してください。</p>
-            </div>
-            <div class="flex flex-col sm:flex-row gap-2">
-                <button type="button" data-action="resume" class="inline-flex items-center justify-center rounded-full bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition-colors">続きから再開</button>
-                <button type="button" data-action="dismiss" class="inline-flex items-center justify-center rounded-full border border-indigo-200 px-5 py-2 text-sm font-semibold text-indigo-700 bg-white hover:bg-indigo-50 transition-colors">終了する</button>
-            </div>
-        </div>
-    `;
-
-    if (mainContent) {
-        const firstChild = mainContent.firstElementChild;
-        if (firstChild) {
-            mainContent.insertBefore(banner, firstChild);
-        } else {
-            mainContent.appendChild(banner);
-        }
-    } else {
-        document.body.insertBefore(banner, document.body.firstChild);
-    }
-
-    const resumeBtn = banner.querySelector('[data-action="resume"]');
-    const dismissBtn = banner.querySelector('[data-action="dismiss"]');
-
-    if (resumeBtn) {
-        resumeBtn.addEventListener('click', () => {
-            const params = localStorage.getItem('speedad-tutorial-last-survey-params');
-            const targetUrl = params ? `surveyCreation.html?${params}` : 'surveyCreation.html';
-            banner.remove();
-            localStorage.setItem('speedad-tutorial-status', 'survey-creation-started');
-            window.location.href = targetUrl;
-        });
-    }
-
-    if (dismissBtn) {
-        dismissBtn.addEventListener('click', () => {
-            localStorage.setItem('speedad-tutorial-status', 'completed');
-            localStorage.removeItem('speedad-tutorial-last-survey-params');
-            banner.remove();
-            showToast('チュートリアルを終了しました', 'info');
-        });
-    }
-}
-
 function openNewSurveyModalWithSetup(afterOpen) {
     handleOpenModal('newSurveyModal', resolveDashboardAssetPath('modals/newSurveyModal.html'), () => {
         // Initialize flatpickr for the new range input
@@ -226,6 +170,18 @@ function openNewSurveyModalWithSetup(afterOpen) {
                 return;
             }
 
+            // tutorial-guard
+            if (window.SpeedAD?.tutorial?.shouldBlock('createSurveyFromModal')) {
+                window.SpeedAD.tutorial.handleCreateSurveyFromModal({
+                    surveyName,
+                    displayTitle,
+                    memo: surveyMemo,
+                    periodStart: surveyStartDate,
+                    periodEnd: surveyEndDate,
+                });
+                return;
+            }
+
             // Build query parameters
             const params = new URLSearchParams();
             params.set('surveyName', surveyName);
@@ -235,7 +191,6 @@ function openNewSurveyModalWithSetup(afterOpen) {
             params.set('periodEnd', surveyEndDate);
 
             // Redirect to the creation page with parameters
-            localStorage.setItem('speedad-tutorial-last-survey-params', params.toString());
             window.location.href = `surveyCreation.html?${params.toString()}`;
         });
 
@@ -335,11 +290,6 @@ window.copyUrl = async function (inputElement) {
     if (inputElement && inputElement.value) {
         await copyTextToClipboard(inputElement.value);
     }
-};
-// チュートリアル関数をグローバルに公開
-window.startSurveyCreationTutorial = () => {
-    // この関数は surveyCreationTutorial.js で上書きされる
-    console.log('startSurveyCreationTutorial called from placeholder');
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -466,15 +416,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
 
-    // A generic click handler for the survey modal button for non-tutorial use.
-    // The tutorial will add its own specific listener.
     const openNewSurveyModalBtn = document.getElementById('openNewSurveyModalBtn');
     if (openNewSurveyModalBtn) {
         openNewSurveyModalBtn.addEventListener('click', () => {
-            // This check prevents the generic listener from firing if the tutorial is active
-            if (!document.getElementById('tutorial-svg-overlay')) {
-                openNewSurveyModalWithSetup();
-            }
+            openNewSurveyModalWithSetup();
         });
     }
 
@@ -483,20 +428,4 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Adjust on window resize
     window.addEventListener('resize', adjustLayout);
-
-    // --- Tutorial Initialization ---
-    // This is called last, after all other page elements are loaded and initialized.
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('start_tutorial') === 'true') {
-        if (typeof window.startSpeedAdTutorial === 'function') {
-            // A brief delay for good measure, to ensure rendering is 100% complete.
-            setTimeout(() => {
-                window.startSpeedAdTutorial();
-                // Clean the URL
-                history.replaceState(null, '', window.location.pathname);
-            }, 100);
-        } else {
-            console.error("Tutorial function not found. Was tutorial.js loaded correctly?");
-        }
-    }
 });

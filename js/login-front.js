@@ -561,16 +561,20 @@
           const userEmail = emailInput?.value.trim() || '';
           persistRememberedAccount(userEmail);
           let targetUrl = resolveAppPath('02_dashboard/index.html');
-          let tutorialStatus = 'completed';
+          let isNewUser = false;
           if (userEmail === 'admin') {
             targetUrl = resolveAppPath('03_admin/index.html');
           } else if (userEmail === 'new') {
-            targetUrl = resolveAppPath('04_first-login/index.html');
-            tutorialStatus = 'pending';
+            targetUrl = resolveAppPath('02_dashboard/index.html?tutorial=1&step=1');
+            isNewUser = true;
           }
           try {
-            localStorage.setItem('speedad-tutorial-status', tutorialStatus);
-            localStorage.removeItem('speedad-tutorial-last-survey-params');
+            if (isNewUser) {
+              localStorage.removeItem('speedad-tutorial-completed');
+              localStorage.removeItem('speedad-tutorial-progress');
+            } else {
+              localStorage.setItem('speedad-tutorial-completed', 'true');
+            }
           } catch (storageError) {
             console.warn('ローカルストレージにチュートリアル状態を保存できませんでした:', storageError);
           }
