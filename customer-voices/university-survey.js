@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (heroMeta) {
       heroMeta.innerHTML = `
         <span class="voice-pill">${escapeHtml(voice.organizationType || '導入事例')}</span>
-        <span class="voice-pill">学内イベント運用</span>
+        <span class="voice-pill">アンケート機能のみで運用</span>
         <span class="voice-pill">公開中</span>
       `;
     }
@@ -167,7 +167,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       'voice-body-image-primary-caption',
       voice.bodyImagePrimary,
       voice.bodyImagePrimaryCaption,
-      `${label} 学内イベント運用イメージ`
+      `${label} 実態調査運用イメージ`
     );
     setHtml('voice-challenge-section', 'voice-challenge-body', renderBullets(voice.challenge));
     setHtml('voice-outcome-section', 'voice-outcome-body', renderBullets(voice.outcome));
