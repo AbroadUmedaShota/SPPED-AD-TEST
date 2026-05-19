@@ -156,25 +156,12 @@
     margin: 0 auto;
 }
 
-.hc-hero__eyebrow {
-    display: inline-block;
-    padding: 0.25rem 0.75rem;
-    border: 1px solid rgba(255, 255, 255, 0.35);
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.9);
-    margin-bottom: 1.25rem;
-}
-
 .hc-hero__title {
     font-size: clamp(1.875rem, 4vw, 2.75rem);
     font-weight: 800;
     line-height: 1.2;
     color: #ffffff;
-    margin-bottom: 0.75rem;
+    margin: 0 0 0.75rem;
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     letter-spacing: -0.01em;
 }

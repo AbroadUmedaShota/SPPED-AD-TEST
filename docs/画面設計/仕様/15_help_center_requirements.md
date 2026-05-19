@@ -497,23 +497,32 @@ URL 正規化・canonical タグ付与は Phase 2 で確定。
 
 ## 8. Support 配下サイトの共通アセット運用ルール
 
-> **TL;DR**: 本章は `support.speed-ad.com` / `stg.support.speed-ad.com` 配下（`/faq/`, `/help/`, `/tutorial/`）の共通アセット運用ルール。**§4 のダッシュボード配下ヘルプセンターとは別スコープ**（`SPDAD2026-73` 由来）。
+> **TL;DR**: 本章は `support.speed-ad.com` / `stg.support.speed-ad.com` 配下（`/help/`, `/help-content/`, `/faq/`, `/bug-report/`, `/plans/`, `/news/`）の共通アセット運用ルール。**§4 のダッシュボード配下ヘルプセンターとは別スコープ**（`SPDAD2026-73` 由来）。URL正本は `21_support_site_separation_spec.md` とする。
 
 ### 8.1 対象 URL / 配置 / 参照
 
-- 対象 URL: `/faq/`, `/help/`, `/tutorial/`。
-- ページ本体は各配下、共通 `css` / `js` / `img` は `/assets/` 配下に集約。機能専用リソースは `/assets/img/faq/` のように用途別で分ける。
+- 対象 URL: `/help/`, `/help-content/`, `/faq/`, `/bug-report/`, `/plans/`, `/news/`, `/news/<slug>/`, `/news.json`。規約・更新履歴は `21_support_site_separation_spec.md` の移設対象として扱う。
+- `/tutorial/` はサブドメイン独立ページではなく、ヘルプ記事カテゴリ内のチュートリアル記事として扱う。
+- ページ本体は各配下、共通 `header.html` / `footer.html` は `/common/` 配下、共通 `css` / `js` / `img` は `/assets/` 配下に集約。機能専用リソースは `/assets/img/faq/` のように用途別で分ける。
 - HTML からの参照はルート相対で統一（例: `/assets/css/common.20260414.css`）。`../assets/...` のような相対参照は不採用。
 
 ```text
 /
   faq/index.html
   help/index.html
-  tutorial/index.html
+  help-content/index.html
+  bug-report/index.html
+  plans/index.html
+  news/index.html
+  news/<slug>/index.html
+  news.json
+  common/
+    header.html
+    footer.html
   assets/
-    css/  (common|faq|help|tutorial).YYYYMMDD.css
-    js/   (common|faq|help|tutorial).YYYYMMDD.js
-    img/  common/ faq/ help/ tutorial/
+    css/  (support-shell|faq|help|support-info).YYYYMMDD.css
+    js/   (support-shell|faq|help).YYYYMMDD.js
+    img/  common/ faq/ help/
 ```
 
 ### 8.2 キャッシュ運用
@@ -530,7 +539,7 @@ URL 正規化・canonical タグ付与は Phase 2 で確定。
 - 本番・検証はドメイン分離のため、Cookie と localStorage は自動分離。
 - **CSP [Should]**: `default-src 'self'` を基本、外部リソースは明示許可。**理由**: 万一 XSS 混入時も外部ドメインへのリソース取得・外部送信を防ぐため。
 - **HSTS [Should]**: `max-age=31536000; includeSubDomains`。**理由**: HTTPS への強制接続で中間者攻撃を防ぐため。
-- **`<meta>` robots [Nice]**: `/help/`, `/faq/`, `/tutorial/` 配下の `<head>` に `<meta name="robots" content="noindex, nofollow">` を必須付与（外部検索エンジンインデックス防止）。
+- **`<meta>` robots [Nice]**: `/help/`, `/help-content/`, `/faq/`, `/bug-report/`, `/plans/`, `/news/` 配下の `<head>` に `<meta name="robots" content="noindex, nofollow">` を必須付与（外部検索エンジンインデックス防止）。
 - 第三者委託（CDN 等）運用は本要件書の対象外。
 
 ### 8.4 非採用方針

@@ -8,27 +8,15 @@
   <link rel="icon" href="/assets/img/speedad_logo.svg" type="image/svg+xml">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/service-top-style.css">
-  <link rel="stylesheet" href="/assets/css/help-center.css">
+  <link rel="stylesheet" href="/assets/css/help-center.css?v=20260519-hero-label">
   <link rel="stylesheet" href="/assets/css/faq.css">
-  <link rel="stylesheet" href="/assets/css/support-shell.css">
+  <link rel="stylesheet" href="/assets/css/support-shell.css?v=20260518-body-reset">
   <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
   <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
 </head>
-<body data-page-id="faq">
+<body data-page-id="faq" data-support-section="faq">
 <div class="support-shell">
-  <header class="support-header">
-    <div class="support-header__inner">
-      <a class="support-brand" href="/help/" aria-label="SPEED-AD サポート">
-        <img src="/assets/img/speedad_logo.svg" alt="" width="32" height="32">
-        <span>SPEED-AD Support</span>
-      </a>
-      <nav class="support-nav" aria-label="サポートサイト">
-        <a href="/help/">ヘルプ</a>
-        <a href="/faq/">FAQ</a>
-        <a href="/bug-report/">お問い合わせ</a>
-      </nav>
-    </div>
-  </header>
+  <div id="support-header-placeholder"></div>
 
   <main class="support-main" id="main-content" aria-label="よくある質問">
     <div id="faq-sticky-search" class="hc-sticky-search" hidden>
@@ -112,17 +100,9 @@
     </div>
   </main>
 
-  <footer class="support-footer">
-    <div class="support-footer__inner">
-      <p>&copy; SPEED-AD</p>
-      <div class="support-footer__links">
-        <a href="/help/">ヘルプ</a>
-        <a href="/faq/">FAQ</a>
-        <a href="/bug-report/">お問い合わせ</a>
-      </div>
-    </div>
-  </footer>
+  <div id="support-footer-placeholder"></div>
 </div>
-<script type="module" src="/assets/js/faq.js"></script>
+<script type="module" src="/assets/js/support-shell.js?v=20260519-plans-news"></script>
+<script type="module" src="/assets/js/faq.js?v=20260519-plans-link"></script>
 </body>
 </html>

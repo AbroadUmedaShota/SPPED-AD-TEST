@@ -18,6 +18,13 @@ function getIcon(categoryId, fallback) {
     return CATEGORY_META[categoryId]?.icon || fallback || 'help_outline';
 }
 
+function linkSupportReferences(answerHtml) {
+    return answerHtml.replace(
+        /料金プラン比較表/g,
+        '<a href="/plans/">料金プラン比較表</a>'
+    );
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const faqApp = {
         elements: {
@@ -241,7 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const questionId = `faq-question-${safeId}`;
             const searchTerm = this.state.searchTerm.trim();
             const questionHtml = highlightText(question.question || '', searchTerm);
-            const answerHtml = highlightText(question.answer || '', searchTerm).replace(/\n/g, '<br>');
+            const answerHtml = linkSupportReferences(highlightText(question.answer || '', searchTerm)).replace(/\n/g, '<br>');
             const hiddenAttr = isOpen ? '' : 'hidden';
             return `
                 <div class="faq-item ${isOpen ? 'is-open' : ''} ${isFeatured ? 'is-featured' : ''}" data-id="${safeId}">
