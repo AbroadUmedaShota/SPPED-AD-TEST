@@ -1,0 +1,351 @@
+ID,用語,カテゴリ,出典種別,出典ID,出典箇所,文脈での意味,備考
+T-001,利用者アカウント,業務概念,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§2.1 ユーザー管理一覧,サービス利用者が使用するアカウント,モックアップでは「利用者アカウント管理」と表示
+T-002,ユーザー管理,画面機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§1 文書目的,管理者がサービス利用者のアカウントを管理する画面,
+T-003,ユーザー管理一覧,画面機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§2.1,管理者が利用者アカウントの検索・絞り込み・一覧閲覧を行う起点となる画面,
+T-004,ユーザー詳細モーダル,画面機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§2.2,特定ユーザーの基本情報・請求情報・サービス設定・内部メモ・契約状態・履歴・紐付きアンケートを確認し操作するモーダル,
+T-005,SPEED AD 管理者,ロール権限,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),対象ユーザー,社内のオペレーション担当者,
+T-006,アカウントID,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.1.1 ユーザー一覧表示,利用者アカウントを一意に識別する識別子,
+T-007,会社名,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.1.1,利用者が属する企業名,
+T-008,部署,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.1.2 詳細フィルタ,利用者が属する部門,
+T-009,役職,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.1.2,利用者の職位,
+T-010,氏名,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.1.1,利用者の人名,
+T-011,メールアドレス,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.1.1,利用者のメール連絡先,
+T-012,契約ステータス,状態,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.1.1,利用者の契約状態（有効・一時停止・解約）,
+T-013,契約プラン,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.1.1,ユーザーが契約している利用プラン（無料・プレミアム）,
+T-014,管理フラグ,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.1.1,ユーザーの管理上の優先度・注意度（重要・要注意・関係者）,
+T-015,最終ログイン日時,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.1.1,ユーザーが最後にログインした日時,
+T-016,キーワード,操作機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.1.2 検索・フィルタリング,氏名・メールアドレス・アカウントIDの部分一致検索,
+T-017,有効,状態,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§4.1 契約ステータスに応じた操作制限,利用可能な正常な契約状態,
+T-018,一時停止,状態,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§4.1,ユーザーアカウントの利用を一時停止した状態,
+T-019,解約,状態,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§4.1,ユーザーとの契約を終了した状態,
+T-020,無料,業務概念,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.1.2,契約プランの無料版,
+T-021,プレミアム,業務概念,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.1.2,契約プランの有料版,
+T-022,重要,状態,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.1.2,管理フラグの値（優先度が高い）,
+T-023,要注意,状態,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.1.2,管理フラグの値（注意が必要）,
+T-024,関係者,状態,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.1.2,管理フラグの値（関係者として注視）,
+T-025,詳細フィルタ,操作機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.1.2,部署・役職・作成日・最終ログイン条件で追加的に絞り込みを行う機能,
+T-026,アカウント作成日,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.1.2,アカウントが作成された日付,
+T-027,検索条件,操作機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.1.2,複数の検索パラメータの組み合わせ,
+T-028,保存済み条件,操作機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.1.2,保存して再利用できる検索条件セット,
+T-029,リセット機能,操作機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.1.2,検索条件をクリアする機能,
+T-030,CSVエクスポート,操作機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.1.3,検索条件に合致するユーザー全件をCSV形式で出力する操作,
+T-031,アブロードマネージャー,ロール権限,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§7.2 権限・認可,authority=4。社内最上位ロール。アカウント発行・契約・請求・セキュリティ設定・一括出力を担当,
+T-032,アブロードスタッフ,ロール権限,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§7.2,authority=3。通常管理者ロール。問い合わせ対応・状況確認・軽微な顧客情報更新・定型通知を担当,
+T-033,オペレーター管理者,ロール権限,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§7.2,authority=2。AD-02対象外のロール,
+T-034,オペレーター,ロール権限,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§7.2,authority=1。AD-02対象外のロール,
+T-035,詳細表示,操作機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.2.1,一覧行から対象ユーザーを選択して詳細モーダルを開く操作,
+T-036,基本情報,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§2.2,氏名・カナ・電話・会社名・部署・役職,
+T-037,請求情報,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.2.2,請求書宛名・請求先メール・郵便番号・住所,
+T-038,サービス設定,操作機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.2.2,権限ロール・利用モジュール・通知設定・MFA必須・IP制限の設定,
+T-039,内部メモ,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.2.7,ユーザーに関する社内共有事項を記録するメモ,
+T-040,変更を保存,操作機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.2.2,基本情報・請求情報・サービス設定・内部メモをまとめてAPI送信する操作,
+T-041,アカウント一時停止,操作機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.2.3,契約ステータスが「有効」のユーザーを「一時停止」に変更する操作,
+T-042,再開,操作機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.2.3,契約ステータスが「一時停止」のユーザーを「有効」に戻す操作,
+T-043,確認ダイアログ,画面機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.2.3,操作実行前に確認を求めるダイアログ,
+T-044,管理者操作ログ,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§7.4 ログ・監査,管理者による操作を記録するログ,
+T-045,ユーザー削除,操作機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.2.4,解約済みユーザーのアカウントを削除する操作,
+T-046,論理削除,操作機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.2.4,削除フラグを設定する削除方式（物理削除ではない）,
+T-047,パスワードリセットメール送信,操作機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.2.5,パスワード再設定メールを送信する操作,
+T-048,メールアドレスの管理者変更,操作機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.2.6,アブロードマネージャーがユーザーのメールアドレスを直接変更する操作,
+T-049,変更通知メール,操作機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.2.6,メールアドレス変更完了後に新アドレスへ送信するメール,
+T-050,直近変更サマリ,操作機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.2.7,最新の変更日時・操作者・操作種別・変更対象を要約表示,
+T-051,追記履歴,画面機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.2.7,メモを時系列で蓄積・表示する方式,
+T-052,新規ユーザー招待,操作機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.3.1,メールアドレスを入力して招待メールを送信する操作,
+T-053,招待メール,業務概念,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.3.1,本登録用の有効期限付きURLを含むメール,
+T-054,有効期限付きURL,業務概念,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.3.1,72時間有効な本登録用URL,
+T-055,仮アカウント,業務概念,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.3.1,招待状態で作成される未登録アカウント,
+T-056,招待中,状態,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.3.1,招待メール送信後でユーザー未登録の状態,
+T-057,登録済み,状態,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.3.1,招待URLから本登録が完了した状態,
+T-058,期限切れ,状態,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.3.1,招待URLの有効期限が過ぎた状態,
+T-059,取消済み,状態,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.3.1,管理者が招待をキャンセルした状態,
+T-060,正規アカウント,業務概念,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.3.1,招待が完了した本登録済みのアカウント,
+T-061,ワンタイム性,業務概念,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.3.1,招待URLを1回限りの使用に限定する性質,
+T-062,招待管理,操作機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.3.2,招待中・期限切れ・取消済みの未登録招待を管理する機能,
+T-063,招待先メールアドレス,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.3.2,招待する対象のメールアドレス,
+T-064,招待日時,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.3.2,招待メール送信日時,
+T-065,招待メール再送,操作機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.3.2,未登録招待に対して招待メールを再度送信する操作,
+T-066,招待キャンセル,操作機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.3.2,招待を取消済みに変更する操作,
+T-067,契約ステータス管理,操作機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.4.1,ユーザーの契約ステータスを変更する機能,
+T-068,プラン管理,操作機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.4.2,利用可能な契約プランを管理する機能,
+T-069,変更理由,操作機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.4.2,プラン変更時に管理者が入力する理由,
+T-070,個人データエクスポート,操作機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.5.1,特定ユーザーに紐付く開示対象の個人データを一括でエクスポート,
+T-071,JSON形式,操作機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.5.1,個人データの出力形式の一つ,
+T-072,管理者→ユーザーへのメール送信,操作機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.6.1,ユーザー詳細モーダルから対象ユーザーに直接メールを送信する操作,
+T-073,自由入力メール送信,操作機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.6.1,件名・本文を自由入力するメール送信（社内最上位ロールのみ）,
+T-074,定型通知,操作機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.6.1,本文が固定されたシステム通知メール,
+T-075,メール送信履歴,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.6.2,管理者が送信したメールの履歴,
+T-076,ログイン履歴,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.7.1,ユーザーのログイン日時・IPアドレス・デバイス・ブラウザ・結果の履歴,
+T-077,ログイン日時,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.7.1,ユーザーがログインした日時,
+T-078,IPアドレス,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.7.1,ユーザーがログインしたIPアドレス,
+T-079,デバイス種別,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.7.1,デスクトップまたはモバイル,
+T-080,ブラウザ,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.7.1,ユーザーがアクセスに使用したブラウザ,
+T-081,ログイン結果,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.7.1,ログイン成功/失敗の結果,
+T-082,操作日時,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.7.2,管理者が操作を行った日時,
+T-083,操作種別,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.7.2,ステータス変更・プラン変更・削除などの操作の種類,
+T-084,操作者,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.7.2,操作を実行した管理者,
+T-085,変更前の値,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.7.2,変更前のデータ値,
+T-086,変更後の値,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.7.2,変更後のデータ値,
+T-087,請求状態サマリ,操作機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.8.1,当該ユーザーの請求ステータス・未入金有無・直近請求日・金額を表示,
+T-088,最新請求ステータス,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.8.1,ユーザーの現在の請求状態,
+T-089,未入金有無,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.8.1,未払い請求の有無,
+T-090,直近請求日,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.8.1,最新の請求日,
+T-091,直近請求金額,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.8.1,最新の請求金額,
+T-092,AD-04請求管理画面,業務概念,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.8.1,ユーザー詳細からリンク先となる請求管理画面,
+T-093,紐付きアンケート参照,操作機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.9,ユーザーが所有するアンケートの一覧を確認する操作,
+T-094,アンケート名,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.9.1,アンケートの名称,
+T-095,ステータス（アンケート）,状態,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.9.1,アンケートの状態（実施中・準備中・草稿・終了）,
+T-096,会期,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.9.1,アンケートの開催期間,
+T-097,データ化プラン,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.9.1,アンケート回答データ化の契約内容,
+T-098,名刺処理進捗,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.9.1,名刺データ処理の進捗状況,
+T-099,請求予定金額,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.9.1,アンケート実施による見込み請求金額,
+T-100,ステータスサマリ,操作機能,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.9.1,実施中・準備中・草稿・終了の件数を一覧上部に表示,
+T-101,AD-03アンケート管理,業務概念,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.9.2,ユーザー詳細からリンク先となるアンケート管理画面,
+T-102,AD-12アンケート詳細,業務概念,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.9.2,ユーザー詳細からリンク先となるアンケート詳細画面,
+T-103,削除状態,状態,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§4.3 削除状態に応じた操作制限,未削除または論理削除済み,
+T-104,未削除,状態,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§4.3,ユーザーが削除されていない正常な状態,
+T-105,論理削除済み,状態,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§4.3,ユーザーが論理削除フラグで削除された状態,
+T-106,削除フラグ,データマスタ,ローカル仕様書,AD-02 (27_admin_user_management_requirements.md),§3.2.4,deleted_atフィールド,
+T-107,新規ユーザー招待,操作機能,モックアップ,user-management.html,検索フォーム（ボタン）,メールアドレスを入力して招待メールを送信する操作,仕様書と同一表記
+T-108,利用者一覧,画面機能,モックアップ,user-management.html,テーブル領域,アカウント情報を一覧表示するテーブル,
+T-109,CSVエクスポート,操作機能,モックアップ,user-management.html,テーブル領域（ボタン）,現在の検索条件に合致するユーザーをCSV形式で出力する,仕様書と同一表記
+T-110,新規アカウント作成,操作機能,モックアップ,user-management.html,テーブル領域（ボタン）,新しいアカウントを作成する操作,「新規ユーザー招待」とワードチョイス違い
+T-111,停止フラグ,データマスタ,モックアップ,user-management.html,テーブルカラム,一時停止状態を示すフラグ,
+T-112,Pro,業務概念,モックアップ,user-management.html,テーブルカラム「契約プラン」,有料プラン,仕様書「プレミアム」とワードチョイス違い
+T-113,Enterprise,業務概念,モックアップ,user-management.html,テーブルカラム「契約プラン」,エンタープライズプラン,
+T-114,詳細,操作機能,モックアップ,user-management.html,テーブル操作列,ユーザー詳細を表示する操作,
+T-115,停止,操作機能,モックアップ,user-management.html,テーブル操作列,ユーザーアカウントを停止する操作,「一時停止」とワードチョイス違い
+T-116,再開,操作機能,モックアップ,user-management.html,テーブル操作列,停止状態から再開する操作,
+T-117,保存,操作機能,モックアップ,user-management.html,ユーザー詳細セクション（ボタン）,変更内容を保存する操作,「変更を保存」とワードチョイス違い
+T-118,アカウント停止,操作機能,モックアップ,user-management.html,ユーザー詳細セクション（ボタン）,アカウントを停止する操作,「アカウント一時停止」とワードチョイス違い
+T-119,初期化メール再送,操作機能,モックアップ,user-management.html,ユーザー詳細セクション（ボタン）,パスワードリセットメールを再送する操作,
+T-120,プラン／オプション変更,操作機能,モックアップ,user-management.html,ユーザー詳細セクション（ボタン）,契約プランまたはオプションを変更する操作,
+T-121,管理フラグ更新,操作機能,モックアップ,user-management.html,ユーザー詳細セクション（ボタン）,管理フラグを更新する操作,
+T-122,連絡先・請求情報を表示,操作機能,モックアップ,user-management.html,詳細情報セクション（折りたたみ）,電話・郵便番号・住所・請求書宛名・請求先メール・請求グループを表示,
+T-123,請求グループ,データマスタ,モックアップ,user-management.html,連絡先・請求情報セクション,複数ユーザーをグループ化した請求単位,
+T-124,サービス設定を表示,操作機能,モックアップ,user-management.html,詳細情報セクション（折りたたみ）,権限ロール・利用モジュール・通知設定・ログイン制御を表示,
+T-125,利用モジュール,データマスタ,モックアップ,user-management.html,サービス設定セクション,ユーザーが使用できるシステムのモジュール,
+T-126,権限ロール,データマスタ,モックアップ,user-management.html,サービス設定セクション,ユーザーの権限レベル,
+T-127,通知設定,データマスタ,モックアップ,user-management.html,サービス設定セクション,メール・Slackなど通知の設定,
+T-128,ログイン制御,データマスタ,モックアップ,user-management.html,サービス設定セクション,MFA必須・IP制限などのセキュリティ設定,
+T-129,MFA必須,業務概念,モックアップ,user-management.html,サービス設定セクション,多要素認証を必須にする設定,
+T-130,IP制限,業務概念,モックアップ,user-management.html,サービス設定セクション,特定IPアドレスからのみアクセスを許可する設定,
+T-131,社内VPN,業務概念,モックアップ,user-management.html,サービス設定セクション,会社内のVPN環境,
+T-132,種別フィルタ,操作機能,モックアップ,user-management.html,変更履歴セクション（ボタン）,操作種別で変更履歴を絞り込む機能,
+T-133,すべての履歴を見る,操作機能,モックアップ,user-management.html,変更履歴セクション（ボタン）,より多くの変更履歴を表示する操作,
+T-134,運用管理者,ロール権限,モックアップ,user-management.html,ユーザー詳細セクション,ユーザー権限の一つ,
+T-135,一般ユーザー,ロール権限,モックアップ,user-detail.html,サービス設定セクション,権限ロールの選択肢,
+T-136,閲覧のみ,ロール権限,モックアップ,user-detail.html,サービス設定セクション,権限ロールの選択肢（閲覧権限のみ）,
+T-137,アンケート作成,データマスタ,モックアップ,user-detail.html,利用モジュール,利用可能なモジュール,
+T-138,データ入力管理,データマスタ,モックアップ,user-detail.html,利用モジュール,利用可能なモジュール,
+T-139,ダッシュボード,データマスタ,モックアップ,user-detail.html,利用モジュール,利用可能なモジュール,
+T-140,請求管理,データマスタ,モックアップ,user-detail.html,利用モジュール,利用可能なモジュール,
+T-141,メール通知,業務概念,モックアップ,user-detail.html,通知設定,メールで通知を送信する設定,
+T-142,Slack,業務概念,モックアップ,user-detail.html,通知設定,Slack連携による通知設定,
+T-143,Webhook,業務概念,モックアップ,user-detail.html,通知設定,Webhook経由の通知設定,
+T-144,パスワード初期化リンクを送信,操作機能,モックアップ,user-detail.html,基本情報セクション（ボタン）,パスワードリセットメールを送信する操作,
+T-145,アカウント権限を変更,操作機能,モックアップ,user-detail.html,基本情報セクション（ボタン）,ユーザーのアカウント権限を変更する操作,
+T-146,請求・連絡先情報,操作機能,モックアップ,user-detail.html,詳細設定セクション,請求書宛名・請求先メール・郵便番号・住所の設定,
+T-147,電話番号,データマスタ,モックアップ,user-detail.html,請求・連絡先情報,ユーザーの電話番号,
+T-148,郵便番号,データマスタ,モックアップ,user-detail.html,請求・連絡先情報,ユーザーの郵便番号,
+T-149,住所,データマスタ,モックアップ,user-detail.html,請求・連絡先情報,ユーザーの住所,
+T-150,請求書宛名,データマスタ,モックアップ,user-detail.html,請求・連絡先情報,請求書送付先の企業名・敬称,
+T-151,請求先メール,データマスタ,モックアップ,user-detail.html,請求・連絡先情報,請求書受取先のメールアドレス,
+T-152,所有アンケート,操作機能,モックアップ,user-detail.html,アンケート一覧セクション,ユーザーが作成・管理するアンケートの一覧,
+T-153,公開中,状態,モックアップ,user-detail.html,所有アンケートテーブル,アンケートが公開されている状態,
+T-154,準備中,状態,モックアップ,user-detail.html,所有アンケートテーブル,アンケートが準備中の状態,
+T-155,草稿,状態,モックアップ,user-detail.html,所有アンケートテーブル,アンケートが草稿状態,
+T-156,終了,状態,モックアップ,user-detail.html,所有アンケートテーブル,アンケートが終了した状態,
+T-157,未処理タスク,データマスタ,モックアップ,user-detail.html,所有アンケートテーブル,実施中のアンケートで残されているタスク,
+T-158,入力,操作機能,モックアップ,user-detail.html,所有アンケートテーブル「未処理タスク」,回答データの入力作業,
+T-159,照合,操作機能,モックアップ,user-detail.html,所有アンケートテーブル「未処理タスク」,入力データの照合作業,
+T-160,新規アンケート,操作機能,モックアップ,user-detail.html,所有アンケートセクション（ボタン）,新しいアンケートを作成する操作,
+T-161,操作履歴,画面機能,モックアップ,user-detail.html,詳細設定セクション（折りたたみ）,ユーザーに対する管理者の操作履歴,
+T-162,一覧に戻る,操作機能,モックアップ,user-detail.html,ヘッダー（ボタン）,ユーザー一覧画面に戻る操作,
+T-163,ユーザー ID,データマスタ,モックアップ,user-detail.html,ページヘッダー,ユーザーを一意に識別するID,「アカウントID」とワードチョイス違い
+T-164,Pro (年間),業務概念,モックアップ,user-detail.html,ステータスセクション,年間契約のProプラン,
+T-165,名刺自動化,業務概念,モックアップ,user-detail.html,ステータスセクション,名刺処理を自動化するオプション,
+T-166,OCR強化,業務概念,モックアップ,user-detail.html,ステータスセクション,光学文字認識を強化するオプション,
+T-167,フラグを更新,操作機能,モックアップ,user-detail.html,管理フラグセクション（ボタン）,管理フラグの値を変更する操作,
+T-168,アンケート一覧を開く,操作機能,モックアップ,user-detail.html,関連アンケートセクション（ボタン）,ユーザーが所有するアンケート一覧を表示する操作,
+T-169,タスクを見る,操作機能,モックアップ,user-detail.html,所有アンケートテーブル（ボタン）,当該アンケートの未処理タスク一覧を表示,
+T-170,照合へ,操作機能,モックアップ,user-detail.html,所有アンケートテーブル（ボタン）,照合作業画面に遷移する操作,
+T-171,オペレーター管理,画面機能,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§2.1,オペレーターアカウント検索・絞り込み・一覧閲覧の起点画面,
+T-172,オペレーター詳細モーダル,画面機能,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§2.2,特定オペレーターの基本情報・所属・権限・言語・パスワード管理・履歴を確認するモーダル,
+T-173,グループ管理モーダル,画面機能,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§2.3,オペレーター所属グループ（会社単位）の作成・編集・削除、メンバー管理を行うモーダル,
+T-174,Lv1 オペレーター,ロール権限,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.1.2,authority=1。AD-09アクセス不可の最下位ロール,
+T-175,Lv2 オペレーター管理者,ロール権限,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.1.2,authority=2。自グループ内のオペレーターのみアクセス可能,テナント分離対象
+T-176,Lv3 アブロードスタッフ,ロール権限,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.1.2,authority=3。全グループ横断アクセス可だが発行・権限変更・パスワード直接設定は不可,
+T-177,Lv4 アブロードマネージャー,ロール権限,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.1.2,authority=4。最高権限でフルアクセス、全グループ横断,最少1名在籍必須
+T-178,有効,状態,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.1.1,オペレーター稼働中の状態,
+T-179,無効,状態,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.1.1,オペレーター非稼働状態（退職・休暇・契約終了等）,
+T-180,招待中,状態,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.1.1,仮アカウント状態。招待URL有効期限内,
+T-181,オペレーター ID,データマスタ,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.1.1,オペレーターを識別するID,
+T-182,権限,データマスタ,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.1.1,Lv1〜Lv4の権限レベル,
+T-183,所属グループ,データマスタ,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.1.1,オペレーターが属する企業/法人単位のグループ,
+T-184,対応可能言語,データマスタ,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.1.2,オペレーターが対応可能な言語マスタ,
+T-185,パスワード初期化メール,操作機能,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.2.5,オペレーターメール宛に再設定用URLを含むメール送信,Lv4/Lv3/Lv2(自グループLv1のみ)実行可
+T-186,パスワード直接設定,操作機能,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.2.6,管理者が新パスワードを直接入力して即時確定する操作,Lv4限定。本人通知メール送信必須
+T-187,有効化,操作機能,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.2.3,無効のオペレーターを有効に変更する操作,
+T-188,無効化,操作機能,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.2.3,有効のオペレーターを無効に変更する操作,セッション失効
+T-189,オペレーター削除,操作機能,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.2.4,無効化済みオペレーターを論理削除する操作,Lv4限定。取消不可、二重確認必須
+T-190,権限変更,操作機能,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.2.2,オペレーターの権限レベルを変更する操作,Lv4限定
+T-191,所属グループ変更,操作機能,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.2.2,オペレーターの所属グループを別グループへ移動,Lv4限定。過去ログのgroup_idは変わらない
+T-192,新規オペレーター招待,業務概念,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.3.1,メール・氏名・所属・権限を入力して招待メール送信,Lv4限定
+T-193,72時間有効,業務概念,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.3.1,招待URLの有効期限,期限超過で「期限切れ」遷移
+T-194,招待状態,業務概念,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§4.1,招待中/登録済み/期限切れ/取消済みの招待フロー状態,
+T-195,招待再送,操作機能,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.3.2,既存招待の新トークン・有効期限を再発行,Lv4/Lv3実行可。旧トークン失効
+T-196,一括選択,操作機能,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.4.1,チェックボックスで複数オペレーターを選択,全選択/全解除提供
+T-197,一括権限変更,操作機能,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.4.2,複数オペレーターに新権限を一括適用,Lv4限定
+T-198,一括所属変更,操作機能,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.4.3,複数オペレーターを別グループに一括移動,Lv4限定
+T-199,一括ステータス変更,操作機能,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.4.4,複数オペレーターのステータスを一括変更,Lv4/Lv3。Lv2は自グループLv1のみ
+T-200,一括削除,操作機能,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.4.5,複数の無効化済みオペレーターを一括論理削除,Lv4限定。文字列入力による二重確認
+T-201,グループ作成,操作機能,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.5.1,グループ管理モーダルから新規グループを作成,Lv4限定
+T-202,グループ編集,操作機能,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.5.2,既存グループのグループ名を変更,Lv4限定
+T-203,グループ名,データマスタ,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.5.1,グループの識別名称,
+T-204,グループ削除,操作機能,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.5.4,既存グループを削除,Lv4限定。メンバー0名が前提条件
+T-205,メンバー追加,操作機能,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.5.3,グループに未所属のオペレーターを追加,Lv4限定
+T-206,メンバー削除,操作機能,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.5.3,グループからオペレーターを削除（グループ離脱のみ）,Lv4限定。オペレーター自体は削除されない
+T-207,更新ログ,業務概念,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.6.1,AD-09上の全管理者操作を時系列タイムライン表示,サイドバー表示。種別フィルタ可能
+T-208,操作ログ,業務概念,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.6.2,特定オペレーターへの管理者操作履歴,詳細モーダル内表示
+T-209,ログイン履歴,業務概念,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.6.3,オペレーターのログイン日時・IP・デバイス・ブラウザ・成功/失敗,最新50件。期間フィルタ可能
+T-210,言語マスタ,データマスタ,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§7.3,id, name, sort_order, deleted_at を持つ対応可能言語マスタ,DB直接更新で運用
+T-211,グループ,データマスタ,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§2.3,オペレーター所属企業/法人単位（オレンジグループ・アブロード本体・外注先等）,テナント単位として扱い
+T-212,オペレーター（総称）,ロール権限,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§1,名刺データ化業務に従事する社内/社外アカウント,Lv1〜Lv4全体の総称
+T-213,テナント分離,その他,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§4.4,グループをテナント単位として、Lv2のアクセス範囲をグループ内に限定,
+T-214,自グループ,その他,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.1.2,Lv2がアクセス可能なグループ（操作者のgroup_id）,
+T-215,管理者,ロール権限,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§1.1,社内オペレーション担当/オペレーター管理者（Lv2〜Lv4）,AD-09対象ユーザー総称
+T-216,二重確認,操作機能,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.2.4,オペレーター削除時に氏名入力、一括削除時に文字列入力,不可逆操作の安全装置
+T-217,セッション失効,その他,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.2.3,無効化時に対象アカウントの既存セッションを失効,refresh token失効
+T-218,再有効化,操作機能,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.2.3,無効化済みオペレーターを有効に戻す操作,再認証必須
+T-219,本登録,業務概念,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.3.1,招待URL経由でパスワード設定を完了し仮アカウントを正規化,
+T-220,仮アカウント昇格,操作機能,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.3.1,招待URL本登録完了時に仮アカウントを正規アカウントへ昇格,
+T-221,情報更新ログ,画面機能,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.6.1,更新ログ・サイドバー領域の別名,
+T-222,Idempotency-Key,その他,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§6,API多重実行防止用キー,副作用API対象
+T-223,複雑度要件,その他,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.2.6,パスワード直接設定時のサーバー側複雑度再検証,要件未達時はエラー表示
+T-224,なりすましリスク,その他,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§7.2,パスワード直接設定がLv4限定の理由,
+T-225,復元,操作機能,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§4.3,論理削除済みオペレーターを有効状態に戻す操作,AD-09では提供しない
+T-226,タブ,画面機能,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§2.2,オペレーター詳細モーダル内のセクション切り替えUI,折りたたみセクションの代替可
+T-227,折りたたみセクション,画面機能,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§2.2,オペレーター詳細モーダル内のセクション切り替えUI,タブの代替可
+T-228,パスワード管理エリア,画面機能,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§2.2,オペレーター詳細モーダル内のパスワード初期化・直接設定領域,
+T-229,履歴エリア,画面機能,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§2.2,オペレーター詳細モーダル内のログイン履歴・操作ログ領域,
+T-230,基本情報エリア,画面機能,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§2.2,オペレーター詳細モーダル内のID・氏名・メール・所属・権限・言語・ステータス配置領域,
+T-231,AD-10 で実績を見る,業務概念,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§2.2,オペレーター詳細モーダルから AD-10実績管理へのリンク,当該オペレーターフィルタ状態で遷移
+T-232,AD-10 実績管理,画面機能,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§2.2,オペレーターの処理実績・KPI等を分析する画面,
+T-233,全件数,その他,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§6,ページネーション表示対象の全検索結果件数,
+T-234,最大100件,その他,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§6,一括操作の同期処理上限,それ以上はバックグラウンド処理
+T-235,バックグラウンド処理,操作機能,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§6,一括操作が100件を超える場合の非同期処理,完了通知実装必須
+T-236,オレンジグループ,データマスタ,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§2.3,グループの具体例（所属会社単位）,
+T-237,アブロード本体,データマスタ,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§2.3,グループの具体例（所属会社単位）,
+T-238,外注先 A 社,データマスタ,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§2.3,グループの具体例（所属会社単位）,
+T-239,対象オペレーター名,データマスタ,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.6.1,操作の対象となったオペレーター氏名,
+T-240,日時,データマスタ,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.6.1,管理者操作の実行日時,
+T-241,理由,データマスタ,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.6.2,パスワード直接設定等で入力される操作理由,入力がある場合のみ記録
+T-242,成功,状態,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.6.3,ログイン成功時の結果,
+T-243,失敗,状態,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§3.6.3,ログイン失敗時の結果,
+T-244,オペレーター入力画面,画面機能,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§1,BY-211_業務オペレーター向け作業画面,AD-09対象外
+T-245,照合画面,画面機能,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§1,BY-221_業務オペレーター向け作業画面,AD-09対象外
+T-246,業務用オペレーター管理,画面機能,ローカル仕様書,AD-09 (28_admin_operator_management_requirements.md),§1,BY-231_業務オペレーター向け管理画面,AD-09対象外
+T-247,グループ管理ボタン,画面機能,モックアップ,operator-management.html,ヘッダー,グループ管理モーダルを開くボタン,
+T-248,オペレーター招待ボタン,画面機能,モックアップ,operator-management.html,ヘッダー,オペレーター招待モーダルを開くボタン,
+T-249,オペレーター一覧,画面機能,モックアップ,operator-management.html,メインコンテンツ,テーブル形式のオペレーター一覧表示,ページネーション付き
+T-250,選択チェックボックス,画面機能,モックアップ,operator-management.html,テーブル行,オペレーター複数選択用チェックボックス,
+T-251,全選択チェック,画面機能,モックアップ,operator-management.html,テーブルヘッダ,全行を一括選択するチェックボックス,
+T-252,一括操作セクション,画面機能,モックアップ,operator-management.html,テーブル上部,複数選択時に表示される一括操作ボタン領域,条件付き表示
+T-253,一括削除ボタン,画面機能,モックアップ,operator-management.html,一括操作セクション,一括削除実行ボタン,
+T-254,一括権限変更ボタン,画面機能,モックアップ,operator-management.html,一括操作セクション,一括権限変更実行ボタン,
+T-255,一括所属変更ボタン,画面機能,モックアップ,operator-management.html,一括操作セクション,一括所属変更実行ボタン,
+T-256,一括ステータス変更ボタン,画面機能,モックアップ,operator-management.html,一括操作セクション,一括ステータス変更実行ボタン,
+T-257,ツールボックス,画面機能,モックアップ,operator-management.html,サイドバー,フィルタ・更新ログを表示する折りたたみパネル,右側固定サイドバー
+T-258,フィルター,画面機能,モックアップ,operator-management.html,ツールボックス上部,検索・分類・パフォーマンス条件入力エリア,
+T-259,検索欄,画面機能,モックアップ,operator-management.html,フィルター,氏名・メール・IDでの検索入力欄,
+T-260,分類,画面機能,モックアップ,operator-management.html,フィルター,権限・所属グループ・言語・ステータスフィルタ,
+T-261,パフォーマンス,画面機能,モックアップ,operator-management.html,ツールボックス,総完了件数範囲フィルタ,
+T-262,総完了件数,データマスタ,モックアップ,operator-management.html,パフォーマンスフィルタ,処理済み案件数の範囲指定,仕様書では「総処理数」
+T-263,リセットボタン,画面機能,モックアップ,operator-management.html,フィルター下部,フィルタ条件をリセット,
+T-264,更新ログセクション,画面機能,モックアップ,operator-management.html,ツールボックス下部,管理者操作を時系列表示,
+T-265,ソートボタン,画面機能,モックアップ,operator-management.html,テーブルヘッダ,昇順・降順・解除を切り替え,
+T-266,表示件数セレクト,画面機能,モックアップ,operator-management.html,テーブル下部,25/50/100件表示を切り替え,
+T-267,ページネーション,画面機能,モックアップ,operator-management.html,テーブル下部,ページ切り替えナビゲーション,
+T-268,グループ作成タブ,画面機能,モックアップ,groupManagementModal.html,モーダルヘッダ,新しいグループを作成するタブ,
+T-269,グループ編集タブ,画面機能,モックアップ,groupManagementModal.html,モーダルヘッダ,既存グループを編集するタブ,
+T-270,グループ名入力欄,画面機能,モックアップ,groupManagementModal.html,グループ作成タブ,グループ名を入力するテキスト欄,
+T-271,作成ボタン,画面機能,モックアップ,groupManagementModal.html,グループ作成タブ,グループ作成実行ボタン,
+T-272,グループ選択ドロップダウン,画面機能,モックアップ,groupManagementModal.html,グループ編集タブ,編集対象グループを選択,
+T-273,グループ編集コンテナ,画面機能,モックアップ,groupManagementModal.html,グループ編集タブ,メンバー管理領域（条件付き表示）,
+T-274,所属メンバー,画面機能,モックアップ,groupManagementModal.html,グループ編集コンテナ,選択グループのメンバーオペレーター一覧,
+T-275,メンバー追加コントロール,画面機能,モックアップ,groupManagementModal.html,グループ編集コンテナ,未所属オペレーター追加UI,
+T-276,メンバーセレクト,画面機能,モックアップ,groupManagementModal.html,メンバー追加コントロール,未所属オペレーターのドロップダウン,
+T-277,追加ボタン,画面機能,モックアップ,groupManagementModal.html,メンバー追加コントロール,メンバーをグループに追加,
+T-278,グループを削除ボタン,画面機能,モックアップ,groupManagementModal.html,グループ編集コンテナ下部,グループ削除実行ボタン,
+T-279,実績管理,画面機能,モックアップ,performance-management.html,ページタイトル,システムの実績管理機能を示す主画面,
+T-280,CSV出力,操作機能,モックアップ,performance-management.html,ヘッダーボタン,データをCSV形式でダウンロード,「CSVエクスポート」とワードチョイス違い
+T-281,指標設定,操作機能,モックアップ,performance-management.html,ヘッダーボタン,KPIやパラメータの設定を行う機能,
+T-282,絞り込み条件,画面機能,モックアップ,performance-management.html,フィルタエリア,データを条件で絞り込むアコーディオン,
+T-283,キーワード検索,操作機能,モックアップ,performance-management.html,絞り込み条件,名前・ID・所属グループなどで検索,
+T-284,対象期間,操作機能,モックアップ,performance-management.html,絞り込み条件（個人・グループ共通）,検索対象の期間範囲を指定,
+T-285,稼働状態,状態,モックアップ,performance-management.html,フィルタ（個人単位）,稼働中か未稼働かの状態分類,
+T-286,稼働あり,状態,モックアップ,performance-management.html,稼働状態オプション,アクティブに稼働している状態,
+T-287,未稼働,状態,モックアップ,performance-management.html,稼働状態オプション,稼働実績がない状態,
+T-288,展示会・案件,データマスタ,モックアップ,performance-management.html,フィルタ（個人単位）,プロジェクト・イベント分類,
+T-289,グループ（フィルタ）,データマスタ,モックアップ,performance-management.html,フィルタ（個人単位）,組織的なグループ分け,
+T-290,達成状況,状態,モックアップ,performance-management.html,フィルタ（個人単位）,KPI達成の可否を示す状態,
+T-291,達成,状態,モックアップ,performance-management.html,達成状況オプション,KPIを達成した状態,
+T-292,未達,状態,モックアップ,performance-management.html,達成状況オプション,KPIに達しなかった状態,
+T-293,品質レベル,データマスタ,モックアップ,performance-management.html,フィルタ（個人単位）,正確さに基づく品質分類,
+T-294,高品質,状態,モックアップ,performance-management.html,品質レベルオプション,99%以上の正確さの状態,
+T-295,要注意（品質）,状態,モックアップ,performance-management.html,品質レベルオプション,95%未満の正確さで注意が必要,AD-02「要注意」（管理フラグ）とワードチョイス同・文脈違い
+T-296,グループ名検索,操作機能,モックアップ,performance-management.html,絞り込み条件（グループ単位）,グループ名でデータを検索,
+T-297,パフォーマンス（指標）,状態,モックアップ,performance-management.html,フィルタ（グループ単位）,グループの業務成績評価分類,
+T-298,優秀層,状態,モックアップ,performance-management.html,パフォーマンスオプション,業績が優れているグループ,Starと同義
+T-299,Star,状態,モックアップ,performance-management.html,パフォーマンスオプション,優秀なパフォーマンス評価ラベル,優秀層と同義
+T-300,要改善,状態,モックアップ,performance-management.html,パフォーマンスオプション,改善が必要なグループ,Criticalと同義
+T-301,Critical,状態,モックアップ,performance-management.html,パフォーマンスオプション,要改善な評価ラベル,要改善と同義
+T-302,グループ規模,データマスタ,モックアップ,performance-management.html,フィルタ（グループ単位）,グループの構成人数による分類,
+T-303,大規模,状態,モックアップ,performance-management.html,グループ規模オプション,多くの構成員を持つグループ,
+T-304,中規模,状態,モックアップ,performance-management.html,グループ規模オプション,中程度の構成員数のグループ,
+T-305,小規模,状態,モックアップ,performance-management.html,グループ規模オプション,少数の構成員のグループ,
+T-306,コスパ,データマスタ,モックアップ,performance-management.html,フィルタ（グループ単位）,コスト・パフォーマンス指標,
+T-307,CPY,業務概念,モックアップ,performance-management.html,フィルタ・モーダル,コスト・パフォーマンスの短縮形,
+T-308,良い,状態,モックアップ,performance-management.html,コスパオプション,コスパが1.0以上の状態,
+T-309,普通,状態,モックアップ,performance-management.html,コスパオプション,中程度のコスパ状態,
+T-310,悪い,状態,モックアップ,performance-management.html,コスパオプション,コスパが0.8未満の状態,
+T-311,納期遵守率,データマスタ,モックアップ,performance-management.html,フィルタ（グループ単位）,納期を守った業務の割合,
+T-312,100%,状態,モックアップ,performance-management.html,納期遵守率オプション,納期遵守が完全な状態,
+T-313,98%未満,状態,モックアップ,performance-management.html,納期遵守率オプション,納期遵守率が低い状態,
+T-314,条件をリセット,操作機能,モックアップ,performance-management.html,フィルタエリア,設定された絞り込み条件をクリア,
+T-315,個人単位,画面機能,モックアップ,performance-management.html,タブ,オペレーター個人ごとの実績表示,
+T-316,グループ単位,画面機能,モックアップ,performance-management.html,タブ,グループ単位での実績表示,
+T-317,指標・パラメータ設定,画面機能,モックアップ,performance-management.html,モーダルタイトル,KPIと計算用単価の設定画面,
+T-318,目標KPI,業務概念,モックアップ,performance-management.html,パラメータ設定モーダル,達成すべき目標KPI群,
+T-319,目標入力数,データマスタ,モックアップ,performance-management.html,パラメータ設定モーダル,月間で目指す処理枚数,単位:枚/月
+T-320,許容エラー率,データマスタ,モックアップ,performance-management.html,パラメータ設定モーダル,許容する最大エラー率,単位:%
+T-321,目標平均処理時間,データマスタ,モックアップ,performance-management.html,パラメータ設定モーダル,1枚あたりの目標処理時間,単位:秒/枚
+T-322,計算用単価,業務概念,モックアップ,performance-management.html,パラメータ設定モーダル,報酬計算に使う単価群,
+T-323,有効作業単価,データマスタ,モックアップ,performance-management.html,パラメータ設定モーダル,有効な作業1枚あたりの単価,単位:円/枚
+T-324,管理者修正単価,データマスタ,モックアップ,performance-management.html,パラメータ設定モーダル,管理者が修正した作業の単価,単位:円/枚
+T-325,設定を保存,操作機能,モックアップ,performance-management.html,パラメータ設定モーダル,パラメータ変更を確定して保存,
+T-326,キャンセル,操作機能,モックアップ,performance-management.html,パラメータ設定モーダル,設定変更を破棄して閉じる,
+T-327,オペレーター名,データマスタ,モックアップ,performance-management.html,オペレーター詳細モーダル,個別オペレーターの氏名,
+T-328,有効作業数,データマスタ,モックアップ,performance-management.html,オペレーター詳細モーダル,有効な処理を完了した数,
+T-329,エラー率,データマスタ,モックアップ,performance-management.html,オペレーター詳細モーダル・グループ詳細,エラーの発生割合,
+T-330,推定報酬額,データマスタ,モックアップ,performance-management.html,オペレーター詳細モーダル,オペレーターが受け取る予定の報酬,
+T-331,処理枚数 & エラー率推移,画面機能,モックアップ,performance-management.html,オペレーター詳細モーダル・グラフ,処理数とエラー率の時系列推移,
+T-332,項目別エラー傾向,画面機能,モックアップ,performance-management.html,オペレーター詳細モーダル・グラフ,項目ごとのエラー発生パターン,
+T-333,詳細分析,画面機能,モックアップ,performance-management.html,オペレーター詳細モーダル,オペレーターの詳しい業績分析セクション,
+T-334,総入力数,データマスタ,モックアップ,performance-management.html,詳細分析,オペレーターが処理した全枚数,
+T-335,平均処理時間,データマスタ,モックアップ,performance-management.html,詳細分析,1枚あたりの平均所要時間,
+T-336,修正発生コスト,データマスタ,モックアップ,performance-management.html,詳細分析,エラー修正にかかった推定コスト,
+T-337,最終稼働日,データマスタ,モックアップ,performance-management.html,詳細分析,オペレーターが最後に稼働した日付,
+T-338,グループ名（詳細）,データマスタ,モックアップ,performance-management.html,グループ詳細モーダル,グループを識別する名称,
+T-339,稼働人数,データマスタ,モックアップ,performance-management.html,グループ詳細モーダル,現在稼働中のグループ内メンバー数,
+T-340,最大処理能力,データマスタ,モックアップ,performance-management.html,グループ詳細モーダル,グループが処理可能な最大枚数,
+T-341,平均品質,データマスタ,モックアップ,performance-management.html,グループ詳細モーダル,グループの平均的な品質指標,
+T-342,合計報酬額,データマスタ,モックアップ,performance-management.html,グループ詳細モーダル,グループ全体の報酬総額,
+T-343,日次処理数の推移,画面機能,モックアップ,performance-management.html,グループ詳細モーダル・グラフ,グループの日ごとの処理数変化,
+T-344,パフォーマンス分布,画面機能,モックアップ,performance-management.html,グループ詳細モーダル・グラフ,グループ内オペレーターの業績分布図,
+T-345,所属オペレーター,画面機能,モックアップ,performance-management.html,グループ詳細モーダル,グループに所属するオペレーター一覧,
+T-346,課題対象順,操作機能,モックアップ,performance-management.html,所属オペレーター一覧,改善課題の優先度順でソート,
+T-347,完了数,データマスタ,モックアップ,performance-management.html,グループ詳細・オペレーター一覧列,完了した処理の枚数,
+T-348,Avg Time,データマスタ,モックアップ,performance-management.html,グループ詳細・オペレーター一覧列,平均処理時間,「平均処理時間」と同義
+T-349,正確さ,データマスタ,モックアップ,performance-management.html,グループ詳細・オペレーター一覧列,処理品質の正確度,
+T-350,報酬額,データマスタ,モックアップ,performance-management.html,グループ詳細・オペレーター一覧列,オペレーターの個別報酬額,
