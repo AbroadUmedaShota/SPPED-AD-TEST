@@ -88,9 +88,9 @@ function renderTimeline(items = []) {
 
 function buildFallbackHighlights(voice) {
   return [
-    { label: '導入前', value: voice.challenge?.[0] || '紙の回収情報が分散' },
-    { label: '回収導線', value: voice.operationImage?.[1] || '回答と名刺取得を同じ流れで回収' },
-    { label: '導入後', value: voice.outcome?.[0] || '会期後の共有と初動が進めやすく' },
+    { label: '導入前', value: voice.challenge?.[0] || '紙運用で工程が連なり、調査期間が圧迫されていた' },
+    { label: '運用フロー', value: voice.operationImage?.[1] || '配布資料のQRから対象者がスマートフォンで回答' },
+    { label: '導入後', value: voice.outcome?.[0] || '紙運用のコストを抑え、調査期間を確保' },
   ];
 }
 
@@ -142,7 +142,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     setText('voice-hero-summary', summary);
     setText(
       'voice-hero-caption',
-      voice.voicePageImageCaption || '学内掲示と配布資料のQRから、来場者がスマートフォンで回答するイメージです。'
+      voice.voicePageImageCaption || '配布資料に印刷したQRコードから、対象者がスマートフォンで回答するイメージです。'
     );
 
     const heroImage = document.getElementById('voice-hero-image');
