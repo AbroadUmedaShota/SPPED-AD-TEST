@@ -1,0 +1,431 @@
+// Navigation state handling
+
+const INDEX_PAGE_PATHS = new Set(['index.html', '']);
+window.__INDEX_PAGE_SEEN = window.__INDEX_PAGE_SEEN || false;
+
+window.addEventListener('pageshow', async () => {
+    const page = window.location.pathname.split('/').pop();
+    if (INDEX_PAGE_PATHS.has(page)) {
+        if (window.__INDEX_PAGE_SEEN) {
+            const { reloadSurveyData } = await import('./tableManager.js');
+            await reloadSurveyData();
+        }
+        window.__INDEX_PAGE_SEEN = true;
+    }
+});
+// --- Imports ---
+
+
+import { handleOpenModal, closeModal, openModal } from './modalHandler.js';
+import { initTableManager, applyFiltersAndPagination } from './tableManager.js';
+import { initSidebarHandler, adjustLayout } from './sidebarHandler.js';
+import { initThemeToggle } from './lib/themeToggle.js';
+import { openAccountInfoModal } from './accountInfoModal.js';
+import { openDuplicateSurveyModal } from './duplicateSurveyModal.js';
+import { initBreadcrumbs } from './breadcrumb.js';
+import { initBizcardSettings } from './bizcardSettings.js';
+import { initThankYouEmailSettings } from './thankYouEmailSettings.js';
+import { initThankYouScreenSettings } from './thankYouScreenSettings.js';
+import { initInvoiceListPage } from './invoiceList.js';
+import { initInvoiceDetailPage } from './invoiceDetail.js';
+import { initIndexPage } from './indexPage.js';
+import { initializePage as initSpeedReviewPage } from './speed-review.js'; // Import initializePage from speed-review.js
+import { initGroupEditPage } from './groupEdit.js';
+import { initPasswordChange } from './password_change.js';
+import { initBugReportPage } from './bug-report.js';
+import { showConfirmationModal } from './confirmationModal.js';
+
+import { showToast, copyTextToClipboard, loadCommonHtml, resolveDashboardAssetPath } from './utils.js';
+import { initHelpPopovers } from './ui/helpPopover.js';
+import { initEstimateSidebarDrawer } from './ui/estimateSidebarDrawer.js';
+
+function openNewSurveyModalWithSetup(afterOpen) {
+    handleOpenModal('newSurveyModal', resolveDashboardAssetPath('modals/newSurveyModal.html'), () => {
+        // Initialize flatpickr for the new range input
+        const tomorrow = new Date();
+        tomorrow.setHours(0, 0, 0, 0);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        const periodRangePicker = window.flatpickr('#newSurveyPeriodRangeWrapper', {
+            wrap: true,
+            mode: 'range',
+            dateFormat: 'Y-m-d',
+            locale: 'ja',
+            minDate: tomorrow,
+            allowInput: true // Allow manual input
+        });
+
+        const createSurveyBtn = document.getElementById('createSurveyFromModalBtn');
+        if (!createSurveyBtn) {
+            if (typeof afterOpen === 'function') {
+                afterOpen({ periodRangePicker: null, createSurveyBtn: null });
+            }
+            return;
+        }
+
+        const surveyNameInput = document.getElementById('surveyName');
+        const displayTitleInput = document.getElementById('displayTitle');
+        const periodRangeInput = document.getElementById('newSurveyPeriodRange');
+
+        // デフォルト値を設定（高速作成用）
+        const now = new Date();
+        const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+        if (surveyNameInput && !surveyNameInput.value) {
+            surveyNameInput.value = `アンケート_${dateStr}`;
+        }
+        if (displayTitleInput && !displayTitleInput.value) {
+            displayTitleInput.value = `アンケート`;
+        }
+
+        const surveyNameError = document.getElementById('surveyName-error');
+        const displayTitleError = document.getElementById('displayTitle-error');
+        const periodRangeError = document.getElementById('newSurveyPeriodRange-error');
+
+        const inputs = [
+            { input: surveyNameInput, error: surveyNameError },
+            { input: displayTitleInput, error: displayTitleError },
+            { input: periodRangeInput, error: periodRangeError }
+        ];
+
+        const modalRoot = document.getElementById('newSurveyModal');
+        if (modalRoot) {
+            initHelpPopovers(modalRoot);
+        }
+
+        const hideAllErrors = () => {
+            inputs.forEach(({ input, error }) => {
+                input.classList.remove('border-red-500');
+                error.classList.add('hidden');
+                error.textContent = '';
+            });
+        };
+
+        const showError = (input, error, message) => {
+            input.classList.add('border-red-500');
+            error.textContent = message;
+            error.classList.remove('hidden');
+        };
+
+        createSurveyBtn.addEventListener('click', (e) => {
+            e.preventDefault(); // Prevent default form submission
+            hideAllErrors();
+            let isValid = true;
+
+            // Get values
+            const surveyName = surveyNameInput.value.trim();
+            const displayTitle = displayTitleInput.value.trim();
+            const surveyMemo = document.getElementById('surveyMemo').value.trim();
+            const fallbackFlatpickr = periodRangeInput && periodRangeInput._flatpickr;
+            const selectedDates = Array.isArray(periodRangePicker && periodRangePicker.selectedDates)
+                ? periodRangePicker.selectedDates
+                : (fallbackFlatpickr && Array.isArray(fallbackFlatpickr.selectedDates) ? fallbackFlatpickr.selectedDates : []);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            // --- Validation ---
+            if (!surveyName) {
+                showError(surveyNameInput, surveyNameError, 'アンケート名を入力してください。');
+                isValid = false;
+            }
+            if (!displayTitle) {
+                showError(displayTitleInput, displayTitleError, '表示タイトルを入力してください。');
+                isValid = false;
+            }
+            if (selectedDates.length < 2) {
+                showError(periodRangeInput, periodRangeError, '回答期間を選択してください。');
+                isValid = false;
+            } else {
+                const rangeStart = new Date(selectedDates[0]);
+                rangeStart.setHours(0, 0, 0, 0);
+                const rangeEnd = new Date(selectedDates[1]);
+                rangeEnd.setHours(0, 0, 0, 0);
+
+                if (rangeStart <= today) {
+                    showError(periodRangeInput, periodRangeError, '開始日は翌日以降を選択してください。');
+                    isValid = false;
+                } else if (rangeEnd <= rangeStart) {
+                    showError(periodRangeInput, periodRangeError, '終了日は開始日より後の日付を選択してください。');
+                    isValid = false;
+                }
+            }
+
+            if (!isValid) {
+                return;
+            }
+
+            const activePicker = periodRangePicker || fallbackFlatpickr;
+            const formatDate = (date) => {
+                if (activePicker && typeof activePicker.formatDate === 'function') {
+                    return activePicker.formatDate(date, 'Y-m-d');
+                }
+                const safeDate = date instanceof Date ? date : new Date(date);
+                return Number.isNaN(safeDate.getTime()) ? '' : safeDate.toISOString().split('T')[0];
+            };
+
+            const surveyStartDate = formatDate(selectedDates[0]);
+            const surveyEndDate = formatDate(selectedDates[1]);
+
+            if (!surveyStartDate || !surveyEndDate) {
+                showError(periodRangeInput, periodRangeError, '回答期間を選択してください。');
+                return;
+            }
+
+            // tutorial-guard
+            if (window.SpeedAD?.tutorial?.shouldBlock('createSurveyFromModal')) {
+                window.SpeedAD.tutorial.handleCreateSurveyFromModal({
+                    surveyName,
+                    displayTitle,
+                    memo: surveyMemo,
+                    periodStart: surveyStartDate,
+                    periodEnd: surveyEndDate,
+                });
+                return;
+            }
+
+            // Build query parameters
+            const params = new URLSearchParams();
+            params.set('surveyName', surveyName);
+            params.set('displayTitle', displayTitle);
+            if (surveyMemo) params.set('memo', surveyMemo);
+            params.set('periodStart', surveyStartDate);
+            params.set('periodEnd', surveyEndDate);
+
+            // Redirect to the creation page with parameters
+            window.location.href = `surveyCreation.html?${params.toString()}`;
+        });
+
+        if (typeof afterOpen === 'function') {
+            afterOpen({ periodRangePicker, createSurveyBtn });
+        }
+    });
+}
+
+window.openNewSurveyModalWithSetup = openNewSurveyModalWithSetup;
+
+// --- Language Switcher ---
+function initLanguageSwitcher() {
+    const languageSwitcherButton = document.getElementById('language-switcher-button');
+    const languageSwitcherDropdown = document.getElementById('language-switcher-dropdown');
+    const currentLanguageText = document.getElementById('current-language-text');
+
+    if (!languageSwitcherButton || !languageSwitcherDropdown || !currentLanguageText) {
+        // Elements might not be present on all pages, so we exit gracefully.
+        return;
+    }
+
+    languageSwitcherButton.setAttribute('aria-haspopup', 'listbox');
+    languageSwitcherButton.setAttribute('aria-expanded', 'false');
+
+    const updateSelectionState = (lang) => {
+        languageSwitcherDropdown.querySelectorAll('a[data-lang]').forEach((link) => {
+            const isActive = link.getAttribute('data-lang') === lang;
+            link.classList.toggle('is-active', isActive);
+            link.setAttribute('aria-checked', isActive);
+        });
+    };
+
+    const setLanguage = (lang) => {
+        localStorage.setItem('language', lang);
+        currentLanguageText.textContent = lang === 'ja' ? '日本語' : 'English';
+        document.documentElement.lang = lang; // Update the lang attribute of the <html> tag
+
+        // Dispatch a custom event to notify other parts of the app
+        document.dispatchEvent(new CustomEvent('languagechange', { detail: { lang } }));
+
+        updateSelectionState(lang);
+        languageSwitcherDropdown.classList.add('hidden');
+        languageSwitcherButton.setAttribute('aria-expanded', 'false');
+    };
+
+    const toggleDropdownVisibility = () => {
+        const isHidden = languageSwitcherDropdown.classList.toggle('hidden');
+        languageSwitcherButton.setAttribute('aria-expanded', isHidden ? 'false' : 'true');
+    };
+
+    languageSwitcherButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleDropdownVisibility();
+    });
+
+    document.addEventListener('click', () => {
+        if (!languageSwitcherDropdown.classList.contains('hidden')) {
+            languageSwitcherDropdown.classList.add('hidden');
+            languageSwitcherButton.setAttribute('aria-expanded', 'false');
+        }
+    });
+
+    languageSwitcherDropdown.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const target = e.target.closest('a[data-lang]');
+        if (target) {
+            const lang = target.getAttribute('data-lang');
+            setLanguage(lang);
+        }
+    });
+
+    // Set initial language from storage or default to Japanese
+    const currentLang = localStorage.getItem('language') || 'ja';
+    setLanguage(currentLang);
+}
+
+window.getCurrentLanguage = () => {
+    return localStorage.getItem('language') || 'ja';
+};
+
+
+// script.js の最上部に移動 (DOMContentLoadedイベントリスナーの外側)
+// ダミーユーザーデータ (本来はAPIから取得)
+// windowオブジェクトにアタッチすることで、HTMLのonclickから参照可能にする
+
+
+
+// Expose functions to global scope if needed by inline HTML (e.g., onclick attributes)
+window.handleOpenModal = handleOpenModal;
+window.openAccountInfoModal = openAccountInfoModal;
+window.openDuplicateSurveyModal = openDuplicateSurveyModal;
+window.showToast = showToast;
+window.closeModal = closeModal;
+window.openModal = openModal;
+window.copyUrl = async function (inputElement) {
+    if (inputElement && inputElement.value) {
+        await copyTextToClipboard(inputElement.value);
+    }
+};
+
+document.addEventListener('DOMContentLoaded', async () => {
+
+    // 共通要素の読み込み（動的パス解決）
+    await loadCommonHtml('header-placeholder', 'common/header.html');
+    await loadCommonHtml('sidebar-placeholder', 'common/sidebar.html', initSidebarHandler);
+    await loadCommonHtml('footer-placeholder', 'common/footer.html');
+
+    // --- External Link Confirmation ---
+    // This runs after all common HTML is loaded, ensuring footer links are included.
+    // フッター内のリンクは外部リンク処理の対象外とする
+    const links = document.querySelectorAll('main a');
+    const currentHost = window.location.hostname;
+
+    links.forEach(link => {
+        // Check if the link has an href, a hostname, and the hostname is different from the current host.
+        // Also checks that hostname is not empty, to avoid issues with file:/// protocol.
+        if (link.href && link.hostname && link.hostname !== currentHost) {
+            link.classList.add('external-link');
+
+            // Ensure it opens in a new tab and is secure.
+            link.setAttribute('target', '_blank');
+            link.setAttribute('rel', 'noopener noreferrer');
+
+            // To prevent adding multiple listeners if this script were to run again, add a flag.
+            if (link.dataset.externalLinkChecked) {
+                return;
+            }
+            link.dataset.externalLinkChecked = 'true';
+
+            link.addEventListener('click', (event) => {
+                // Prevent the default link navigation
+                event.preventDefault();
+
+                // Show custom confirmation modal instead
+                showConfirmationModal(
+                    '外部サイトへ移動します。<br>よろしければ"進む"をクリックしてください<br>', // message
+                    () => { // onConfirm
+                        window.open(link.href, '_blank', 'noopener,noreferrer');
+                    },
+                    { // options
+                        title: '外部リンクの確認',
+                        confirmText: '進む',
+                        cancelText: 'キャンセル',
+                        url: link.href
+                    }
+                );
+            });
+        }
+    });
+
+    // Initialize the language switcher after the header is loaded
+    initLanguageSwitcher();
+
+    const currentPage = window.location.pathname.split('/').pop() || '';
+    const isIndexPage = currentPage === '' || currentPage === 'index.html';
+
+    // --- Global Escape Key Listener for Modals & Sidebar ---
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            // Close all open modals
+            document.querySelectorAll('.modal-overlay[data-state="open"]').forEach(modal => {
+                closeModal(modal.id);
+            });
+            // Close mobile sidebar if open
+            const mobileSidebarOverlay = document.getElementById('mobileSidebarOverlay');
+            if (mobileSidebarOverlay && mobileSidebarOverlay.classList.contains('is-visible')) {
+                // Assuming toggleMobileSidebar is exported from sidebarHandler
+                // and accessible here, or re-import it.
+                // For now, directly manipulate classes as a fallback if not imported.
+                const sidebar = document.getElementById('sidebar');
+                if (sidebar) {
+                    sidebar.classList.remove('is-open-mobile');
+                    mobileSidebarOverlay.classList.remove('is-visible');
+                }
+            }
+        }
+    });
+
+    // Initialize common modules
+    initThemeToggle();
+    initBreadcrumbs();
+
+    // Page-specific initializations
+    switch (currentPage) {
+        case 'index.html':
+        case '': // root path
+            initIndexPage();
+            break;
+        case 'invoiceList.html':
+            initInvoiceListPage();
+            break;
+        case 'bizcardSettings.html':
+            initBizcardSettings();
+            break;
+        case 'thankYouEmailSettings.html':
+            initThankYouEmailSettings();
+            break;
+        case 'thankYouScreenSettings.html':
+            initThankYouScreenSettings();
+            break;
+        case 'invoice-detail.html':
+            initInvoiceDetailPage();
+            break;
+        case 'speed-review.html':
+            initSpeedReviewPage(); // Call the imported function
+            break;
+        case 'group-edit.html':
+            initGroupEditPage();
+            break;
+        case 'password_change.html':
+            initPasswordChange();
+            break;
+        case 'bug-report.html':
+            initBugReportPage();
+            break;
+
+    }
+
+    initHelpPopovers(document);
+    initEstimateSidebarDrawer();
+
+
+
+
+    const openNewSurveyModalBtn = document.getElementById('openNewSurveyModalBtn');
+    if (openNewSurveyModalBtn) {
+        openNewSurveyModalBtn.addEventListener('click', () => {
+            openNewSurveyModalWithSetup();
+        });
+    }
+
+    // Initial layout adjustment on load
+    adjustLayout();
+
+    // Adjust on window resize
+    window.addEventListener('resize', adjustLayout);
+});

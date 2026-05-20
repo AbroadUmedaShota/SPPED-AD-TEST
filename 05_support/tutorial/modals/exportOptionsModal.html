@@ -1,0 +1,71 @@
+<!-- Export Options Modal -->
+<div id="exportOptionsModal" class="modal-overlay" data-state="closed">
+    <div class="modal-content-transition bg-surface w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden">
+        <!-- Header -->
+        <div class="px-6 py-4 border-b border-outline-variant flex justify-between items-center bg-surface-variant/10">
+            <div class="flex items-center gap-3">
+                <span class="material-icons text-primary">description</span>
+                <h2 class="text-lg font-bold text-on-surface">Excelレポート出力設定</h2>
+            </div>
+            <button class="close-modal-btn text-on-surface-variant hover:bg-surface-variant/20 p-2 rounded-full transition-colors">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="p-6 space-y-6">
+            <p class="text-sm text-on-surface-variant">出力するレポートの内容をカスタマイズしてください。設問数が多い場合、画像の生成に時間がかかることがあります。</p>
+
+            <div class="space-y-4">
+                <h3 class="text-xs font-black text-on-surface-variant uppercase tracking-widest">構成設定</h3>
+                
+                <div class="grid grid-cols-1 gap-3">
+                    <!-- Include TOC -->
+                    <label class="flex items-center gap-3 p-4 rounded-xl border border-outline-variant hover:bg-surface-variant/5 cursor-pointer transition-colors">
+                        <input type="checkbox" id="export-opt-toc" class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" checked>
+                        <div class="flex-1">
+                            <span class="block text-sm font-bold text-on-surface">目次シートを含める</span>
+                            <span class="block text-[11px] text-on-surface-variant">各設問シートへのハイパーリンク付き目次を作成します。</span>
+                        </div>
+                    </label>
+
+                    <!-- Include Charts -->
+                    <label class="flex items-center gap-3 p-4 rounded-xl border border-outline-variant hover:bg-surface-variant/5 cursor-pointer transition-colors">
+                        <input type="checkbox" id="export-opt-charts" class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" checked>
+                        <div class="flex-1">
+                            <span class="block text-sm font-bold text-on-surface">グラフ画像を含める</span>
+                            <span class="block text-[11px] text-on-surface-variant">集計表の横に現在のグラフのキャプチャを挿入します。</span>
+                        </div>
+                    </label>
+
+                    <!-- Include Matrix Details -->
+                    <label class="flex items-center gap-3 p-4 rounded-xl border border-outline-variant hover:bg-surface-variant/5 cursor-pointer transition-colors">
+                        <input type="checkbox" id="export-opt-matrix-all" class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" checked>
+                        <div class="flex-1">
+                            <span class="block text-sm font-bold text-on-surface">マトリクス設問の全項目を出力</span>
+                            <span class="block text-[11px] text-on-surface-variant">表示中の項目だけでなく、全行のデータを1つの表にまとめます。</span>
+                        </div>
+                    </label>
+
+                    <!-- Include Exclusions -->
+                    <label class="flex items-center gap-3 p-4 rounded-xl border border-outline-variant hover:bg-surface-variant/5 cursor-pointer transition-colors">
+                        <input type="checkbox" id="export-opt-exclusions" class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" checked>
+                        <div class="flex-1">
+                            <span class="block text-sm font-bold text-on-surface">対象外設問リストを含める</span>
+                            <span class="block text-[11px] text-on-surface-variant">自由記述などグラフ化できない設問の一覧を末尾に追加します。</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="px-6 py-4 bg-surface-variant/5 border-t border-outline-variant flex justify-end gap-3">
+            <button id="cancel-export-btn" class="px-6 py-2 rounded-lg text-sm font-bold text-on-surface-variant hover:bg-surface-variant/20 transition-colors">キャンセル</button>
+            <button id="confirm-export-btn" class="button-primary px-8 py-2 rounded-lg text-sm font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-2">
+                <span class="material-icons text-sm">download</span>
+                <span>レポートを生成</span>
+            </button>
+        </div>
+    </div>
+</div>

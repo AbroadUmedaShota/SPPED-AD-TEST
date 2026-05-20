@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<!-- ⚠ 02_dashboard/surveyCreation.html のコピー（チュートリアル専用ページ）。元画面の構造変更時は本ファイルも同期すること。 -->
+<!-- ⚠ 02_dashboard/surveyCreation.html のコピー（05_support/tutorial/ 自己完結バンドル）。元画面の構造変更時は本ファイルおよび同梱 src/ 等の同期が必要。 -->
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SPEED-AD - アンケート作成・編集</title>
-  <script>window.__COMMON_BASE_PATH = '../02_dashboard/';</script>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -30,10 +29,10 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   
   <!-- Custom Base CSS -->
-  <link rel="stylesheet" href="../02_dashboard/service-top-style.css">
+  <link rel="stylesheet" href="service-top-style.css">
 
   <!-- Tutorial CSS -->
-  <link rel="stylesheet" href="../02_dashboard/src/tutorial/tutorial.css">
+  <link rel="stylesheet" href="src/tutorial/tutorial.css">
   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
@@ -527,21 +526,21 @@
                   <span class="material-icons text-gray-400 text-[18px]" data-accordion-icon>expand_less</span>
                 </button>
                 <div id="relatedSettingsCardBody" class="v2-accordion-body border-t border-gray-100 px-4 py-3 flex flex-wrap gap-3">
-                  <a id="openBizcardSettingsBtn" href="../02_dashboard/bizcardSettings.html" class="flex-1 flex items-center justify-between px-3 py-2.5 border border-gray-200 rounded-lg bg-gray-50 hover:bg-white hover:border-primary hover:shadow-sm transition-all group">
+                  <a id="openBizcardSettingsBtn" href="../../02_dashboard/bizcardSettings.html" class="flex-1 flex items-center justify-between px-3 py-2.5 border border-gray-200 rounded-lg bg-gray-50 hover:bg-white hover:border-primary hover:shadow-sm transition-all group">
                     <div class="flex items-center gap-2 min-w-0">
                       <span class="material-icons text-[18px] text-gray-400 group-hover:text-primary shrink-0">document_scanner</span>
                       <span class="text-xs font-bold text-gray-600 group-hover:text-primary truncate">名刺データ化設定</span>
                     </div>
                     <span class="material-icons text-[14px] text-gray-300 group-hover:text-primary shrink-0">arrow_forward_ios</span>
                   </a>
-                  <a id="openThankYouEmailSettingsBtn" href="../02_dashboard/thankYouEmailSettings.html" class="flex-1 flex items-center justify-between px-3 py-2.5 border border-gray-200 rounded-lg bg-gray-50 hover:bg-white hover:border-primary hover:shadow-sm transition-all group">
+                  <a id="openThankYouEmailSettingsBtn" href="../../02_dashboard/thankYouEmailSettings.html" class="flex-1 flex items-center justify-between px-3 py-2.5 border border-gray-200 rounded-lg bg-gray-50 hover:bg-white hover:border-primary hover:shadow-sm transition-all group">
                     <div class="flex items-center gap-2 min-w-0">
                       <span class="material-icons text-[18px] text-gray-400 group-hover:text-primary shrink-0">mark_email_read</span>
                       <span class="text-xs font-bold text-gray-600 group-hover:text-primary truncate">お礼メール設定</span>
                     </div>
                     <span class="material-icons text-[14px] text-gray-300 group-hover:text-primary shrink-0">arrow_forward_ios</span>
                   </a>
-                  <a id="openThankYouScreenSettingsBtn" href="../02_dashboard/thankYouScreenSettings.html" class="flex-1 min-w-[180px] flex items-center justify-between px-3 py-2.5 border border-gray-200 rounded-lg bg-gray-50 hover:bg-white hover:border-primary hover:shadow-sm transition-all group">
+                  <a id="openThankYouScreenSettingsBtn" href="../../02_dashboard/thankYouScreenSettings.html" class="flex-1 min-w-[180px] flex items-center justify-between px-3 py-2.5 border border-gray-200 rounded-lg bg-gray-50 hover:bg-white hover:border-primary hover:shadow-sm transition-all group">
                     <div class="flex items-center gap-2 min-w-0">
                       <span class="material-icons text-[18px] text-gray-400 group-hover:text-primary shrink-0">task_alt</span>
                       <span class="text-xs font-bold text-gray-600 group-hover:text-primary truncate">サンクス画面設定</span>
@@ -811,8 +810,8 @@
   </div>
 
   <!-- External JS Module -->
-  <script type="module" src="../02_dashboard/src/surveyCreation.js"></script>
-  <script type="module" src="../02_dashboard/src/tutorial/index.js"></script>
+  <script type="module" src="src/surveyCreation.js"></script>
+  <script type="module" src="src/tutorial/index.js"></script>
 
 </body>
 </html>

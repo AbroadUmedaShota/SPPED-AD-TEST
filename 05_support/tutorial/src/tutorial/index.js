@@ -536,8 +536,8 @@ function finishAndExit({ markComplete }) {
   else clearProgress();
   destroyOverlay();
   detachNewQuestionObserver();
-  // チュートリアルは tutorial/ 配下で動作するため、退出先は実ダッシュボードへ固定する
-  window.location.assign('../02_dashboard/index.html');
+  // `05_support/tutorial/` 配下で動作するため、退出先は実ダッシュボードへ固定する
+  window.location.assign('../../02_dashboard/index.html');
 }
 
 // ---------- ページ遷移 ----------
