@@ -71,7 +71,7 @@ review_cycle: quarterly
 
 ### 3.1 15番仕様との矛盾解消
 
-本書のURL構造は `/help/`・`/help-content/<slug>/`・`/faq/` 等を正本とする。`15_help_center_requirements.md` §8 の `/help/`・`/faq/` と一致（従来案内していた `/help-center/` は廃止、`/help/` に統一）。`/tutorial/` はサブドメイン独立ページとしては本書スコープ外とし、ヘルプ記事カテゴリ内のチュートリアル記事として扱う。
+本書のURL構造は `/help/`・`/help-content/<slug>/`・`/faq/` 等を正本とする。`15_help_center_requirements.md` §8 の `/help/`・`/faq/` と一致（従来案内していた `/help-center/` は廃止、`/help/` に統一）。要件変更により `/tutorial/` はサブドメイン配下の独立ページとして扱い、ヘルプ記事データ内のカテゴリ `tutorial` と相互に接続する。
 
 ### 3.2 サブドメイン別のCookie／計測方針（概要）
 
@@ -91,18 +91,18 @@ review_cycle: quarterly
 | 記事詳細 | `02_dashboard/help-content.html` | `https://support.speed-ad.com/help-content/<slug>/` |
 | よくある質問 | `02_dashboard/faq.html` | `https://support.speed-ad.com/faq/` |
 | 不具合報告フォーム | `02_dashboard/bug-report.html` | `https://support.speed-ad.com/bug-report/` |
+| チュートリアル | 新規（初回ログインガイド・再視聴導線から接続） | `https://support.speed-ad.com/tutorial/` |
 | 料金プラン比較表 | 新規（FAQ・フッター・ヘルプ内導線から接続） | `https://support.speed-ad.com/plans/` |
 | 利用規約 | `02_dashboard/terms-of-service.html` | `https://support.speed-ad.com/terms/` |
 | 特定商取引法表示 | `02_dashboard/specified-commercial-transactions.html` | `https://support.speed-ad.com/tokushoho/` |
 | 個人情報保護方針 | `02_dashboard/personal-data-protection-policy.html` | `https://support.speed-ad.com/privacy/` |
-| 更新履歴 | `02_dashboard/changelog.html`（実在する場合） | `https://support.speed-ad.com/changelog/` |
 | お知らせ一覧/詳細 | 新規（ログイン前トップのティザーから接続） | `https://support.speed-ad.com/news/`, `https://support.speed-ad.com/news/<slug>/` |
 | お知らせJSON | 新規（ログイン前トップの最大3件表示で参照） | `https://support.speed-ad.com/news.json` |
 | ログイン前画面 | `index.html`（ルート） | **据え置き**（変更なし） |
 
 ### 3.4 サポートサイト共通シェル
 
-`support.speed-ad.com` 配下は、ダッシュボード共通部品ではなく公開サポートサイト専用シェルを正とする。ヘッダーはブランド `SPEED-AD Support` と主要導線（ヘルプ、FAQ、お問い合わせ）に限定し、法務・お知らせ・更新履歴はフッター常設リンクまたはページ内導線に寄せる。
+`support.speed-ad.com` 配下は、ダッシュボード共通部品ではなく公開サポートサイト専用シェルを正とする。ヘッダーはブランド `SPEED-AD Support` と主要導線（ヘルプ、FAQ、お問い合わせ）に限定し、法務・お知らせはフッター常設リンクまたはページ内導線に寄せる。
 
 ヘッダーの標準色は薄青系のブランド背景とする。ダッシュボード本体の濃い単色ヘッダーは持ち込まず、公開ヘルプサイトとして軽い印象を保ちながらブランド色を出す。
 
@@ -110,7 +110,7 @@ review_cycle: quarterly
 
 ### 3.5 サポートサブドメイン画面推移図
 
-`/plans/` と `/news/` は、`support.speed-ad.com` 配下の公開サポートサイトページとして扱う。ヘッダー常設ナビは最小構成（ヘルプ、FAQ、お問い合わせ）を維持し、料金表・お知らせ・法務系ページはフッター、FAQ本文、ヘルプ記事、ログイン前トップのティザーから接続する。
+`/tutorial/`, `/plans/`, `/news/` は、`support.speed-ad.com` 配下の公開サポートサイトページとして扱う。ヘッダー常設ナビは最小構成（ヘルプ、FAQ、お問い合わせ）を維持し、チュートリアル・料金表・お知らせ・法務系ページはフッター、FAQ本文、ヘルプ記事、ログイン前トップのティザーから接続する。`/changelog/` は本番の独立ページ対象外とする。
 
 ```mermaid
 flowchart TD
@@ -125,18 +125,19 @@ flowchart TD
     SupportFooter["support 共通フッター"] --> Help
     SupportFooter --> FAQ
     SupportFooter --> Contact
+    SupportFooter --> Tutorial["/tutorial/"]
     SupportFooter --> Plans["/plans/"]
     SupportFooter --> NewsList["/news/"]
     SupportFooter --> Terms["/terms/"]
     SupportFooter --> Privacy["/privacy/"]
     SupportFooter --> Tokushoho["/tokushoho/"]
-    SupportFooter --> Changelog["/changelog/"]
 
     Help -->|検索・カテゴリ| HelpContent["/help-content/<slug>/"]
     Help --> FAQ
     Help --> Contact
     HelpContent --> Help
     HelpContent --> Contact
+    HelpContent --> Tutorial
     HelpContent --> Plans
 
     FAQ -->|料金プラン比較表リンク| Plans
@@ -255,6 +256,14 @@ EU域内ユーザーのアクセスを想定範囲に含める場合、reCAPTCHA
 - `/news/` はお知らせ一覧、`/news/<slug>/` はお知らせ詳細、`/news.json` は公開ニュースフィードを正とする。
 - `/news.json` は `updatedAt` と `items[]` を持つ静的JSONとし、ログイン前トップが最大3件を参照できる前提で管理する。
 - お知らせ本文は公開可能な内容に限定し、社内事情・未確定リリース予定・顧客名・運用上の内部メモを含めない。
+- `/changelog/` は本番環境の support サブドメイン配下には配置しない。更新履歴に相当する利用者向け告知は `/news/` に集約する。
+
+### 4.13 `/tutorial/` の扱い
+
+- `/tutorial/` は、初回ログインガイドや再視聴手順を案内するサポートサブドメイン上の独立ページとする。
+- 実際のチュートリアル再生はログイン後アプリ内の機能で行い、support側ページは入口・説明・関連ヘルプ記事への導線を担う。
+- ヘルプ記事データ内のカテゴリ `tutorial` は維持し、詳細な手順記事は `/help-content/<slug>/` または互換クエリで表示する。
+- 将来、動画・キャプチャ・ステップ別ガイドを公開する場合も `/tutorial/` を入口に集約する。
 
 ---
 
@@ -276,6 +285,7 @@ SPPED-AD-TEST/
     ├── help-content/<slug>/index.html  # ビルド時生成 or rewrite
     ├── faq/index.html
     ├── bug-report/index.html
+    ├── tutorial/index.html
     ├── plans/index.html
     ├── news/index.html
     ├── news/<slug>/index.html
@@ -283,7 +293,6 @@ SPPED-AD-TEST/
     ├── terms/index.html
     ├── tokushoho/index.html
     ├── privacy/index.html
-    ├── changelog/index.html            # 実在確認後にのみ配置
     ├── common/
     │   ├── header.html                  # サポートサイト専用ヘッダー
     │   └── footer.html                  # サポートサイト専用フッター
@@ -352,10 +361,10 @@ SPPED-AD-TEST/
 | `/help-content.html?article=<id>` | `https://support.speed-ad.com/help-content/<slug>/` | `id→slug`変換。変換失敗時は `/help/` へ301（404ではない） |
 | `/faq.html` | `https://support.speed-ad.com/faq/` | |
 | `/bug-report.html` | `https://support.speed-ad.com/bug-report/` | |
+| `/tutorial.html` | `https://support.speed-ad.com/tutorial/` | 実在する場合 |
 | `/terms-of-service.html` | `https://support.speed-ad.com/terms/` | §4.8準拠（別分岐） |
 | `/specified-commercial-transactions.html` | `https://support.speed-ad.com/tokushoho/` | §4.8準拠（別分岐） |
 | `/personal-data-protection-policy.html` | `https://support.speed-ad.com/privacy/` | §4.8準拠（別分岐） |
-| `/changelog.html` | `https://support.speed-ad.com/changelog/` | 実在確認後のみ301対象 |
 | `/help-content.html?category=<cat>` | `/help/?category=<cat>` | カテゴリパラメータをTOPへ |
 | `/help-content.html?search=<query>` | `/help/?search=<query>` | 検索パラメータをTOPへ |
 | `/faq.html?search=<query>` | `/faq/?search=<query>` | FAQ検索 |
@@ -455,15 +464,18 @@ SPPED-AD-TEST/
 - ヘルプ → FAQ：`/faq/`
 - ヘルプ → お問い合わせ：`/bug-report/`
 - ヘルプ記事 → ヘルプTOP：`/help/`
+- ヘルプ記事 → チュートリアル：`/tutorial/`
 - ヘルプ記事 → 料金プラン：`/plans/`
 - FAQ → 料金プラン：`/plans/`
 - FAQ → お問い合わせ：`/bug-report/`
+- チュートリアル → ヘルプ記事：`/help-content/<slug>/`
 - 料金プラン → お問い合わせ：`/bug-report/`
 - お知らせ一覧 → お知らせ詳細：`/news/<slug>/`
 - お知らせ詳細 → お知らせ一覧：`/news/`
 - 共通フッター → 料金プラン：`/plans/`
 - 共通フッター → お知らせ：`/news/`
-- 共通フッター → 規約3種・更新履歴：`/terms/`, `/privacy/`, `/tokushoho/`, `/changelog/`
+- 共通フッター → チュートリアル：`/tutorial/`
+- 共通フッター → 規約3種：`/terms/`, `/privacy/`, `/tokushoho/`
 
 **デプロイ構成変更（サブディレクトリ配置等）で相対パスが機能しなくなった場合：** 絶対URL（`https://support.speed-ad.com/...`）へフォールバック。構成変更時は相互リンクの動作検証を必須とする。
 
@@ -494,8 +506,9 @@ SPPED-AD-TEST/
 | 12 | HSTS preload 採用可否 | M3前 | 開発リード＋セキュリティ |
 | 13 | 個人情報インシデント対応プレイブック | M3前 | 個人情報保護責任者＋セキュリティ |
 | 14 | `/news/` と `news.json` の運用方式（CORS取得／ビルド同梱、キャッシュ、公開フロー） | M1 | PO＋開発リード |
-| 15 | フッター常設リンクの公開開始順（規約3種、`/news/`, `/changelog/`） | M1 | 開発リード＋PO |
+| 15 | フッター常設リンクの公開開始順（規約3種、`/news/`） | M1 | 開発リード＋PO |
 | 16 | `/plans/` の公開価格文言レビュー（Standard料金、キャンペーン条件、税表記） | M1 | PO＋法務＋開発リード |
+| 17 | `/tutorial/` に掲載する動画・画像・アプリ内再生導線の範囲 | M1 | PO＋CS＋開発リード |
 
 ---
 
@@ -503,7 +516,7 @@ SPPED-AD-TEST/
 
 | ドキュメント | 本書との差分・上書き範囲 | 期限 | 担当者 |
 |---|---|---|---|
-| `15_help_center_requirements.md` | §8のURL構造（`/help/`・`/faq/`・`/tutorial/`）は旧案。本書のURL構造を正本とし、`/tutorial/` はヘルプ記事カテゴリ扱いへ追従改訂する。 | 本書確定後M1 | 開発リード |
+| `15_help_center_requirements.md` | §8のsupport配下URL構造は本書を正本とする。`/tutorial/` は独立ページ、ヘルプ記事カテゴリ `tutorial` は関連記事群として扱う。 | 本書確定後M1 | 開発リード |
 | `18_screen_inventory_current.md` | support移設画面の「ホスト」列を更新。 | M1 | 開発リード |
 | `00_screen_requirements.md` | サポートサイト分離後のURL・ドメイン情報は本書が正本。齟齬時は別途調整。 | 適宜 | 開発リード |
 
@@ -718,7 +731,7 @@ WCAG 2.1 AA準拠を目標。検証ツール・項目はPRD/ADRで確定。
 
 | フェーズ | 内容 |
 |---|---|
-| 準備 | デプロイ構成確定・ドメイン／SSL設定・フォルダ構成・JS棚卸し・`help_articles.json` 移設・Markdownリンク一括書換・`changelog.html` 実在確認 |
+| 準備 | デプロイ構成確定・ドメイン／SSL設定・フォルダ構成・JS棚卸し・`help_articles.json` 移設・Markdownリンク一括書換 |
 | 検証 | ステージングでのリダイレクト全件検証・リンクチェッカー・非機能要件・セキュリティ検証 |
 | 段階公開 | 一部ページから順次切替（影響範囲限定） |
 | 全面切替 | 全ページ新URL公開・旧URLリダイレクト有効化・Search Console再送信 |
