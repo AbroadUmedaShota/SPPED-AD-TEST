@@ -150,12 +150,25 @@ export function showStuckHint(text) {
     }
   }
   hint.textContent = text || '';
+
+  // 詰まり時の緊急脱出: user-action ステップで非表示中の「次へ」を一時開放する。
+  // スキップ確定（=完了扱い）以外の前進手段を提供する。
+  const nextBtn = coachmarkEl.querySelector('.tutorial-coachmark__next');
+  if (nextBtn && nextBtn.style.display === 'none') {
+    nextBtn.style.display = '';
+    nextBtn.dataset.tutorialStuckRevealed = '1';
+  }
 }
 
 export function hideStuckHint() {
   if (!coachmarkEl) return;
   const hint = coachmarkEl.querySelector('.tutorial-coachmark__stuck-hint');
   if (hint?.parentNode) hint.parentNode.removeChild(hint);
+  const nextBtn = coachmarkEl.querySelector('.tutorial-coachmark__next');
+  if (nextBtn?.dataset?.tutorialStuckRevealed === '1') {
+    nextBtn.style.display = 'none';
+    delete nextBtn.dataset.tutorialStuckRevealed;
+  }
 }
 
 function scrollIntoViewIfNeeded(el) {

@@ -573,7 +573,7 @@
               localStorage.removeItem('speedad-tutorial-completed');
               localStorage.removeItem('speedad-tutorial-progress');
             } else {
-              localStorage.setItem('speedad-tutorial-completed', 'true');
+              localStorage.setItem('speedad-tutorial-completed', '1');
             }
           } catch (storageError) {
             console.warn('ローカルストレージにチュートリアル状態を保存できませんでした:', storageError);

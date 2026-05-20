@@ -28,7 +28,7 @@ import {
   markCompleted,
   isCompleted,
 } from './state.js';
-import { installGlobalApi } from './guards.js';
+import { installGlobalApi, enableTargetForTutorial } from './guards.js';
 import { loadCommonHtml } from '../utils.js';
 
 const COMMON_HTML_TARGETS = [
@@ -163,12 +163,88 @@ function goToStep(stepId) {
   currentStepIndex = TUTORIAL_STEPS.findIndex((s) => s.id === stepId);
   writeProgress(stepId);
 
+  if (stepId === 9) {
+    applyBasicInfoHandoff();
+  }
+
   resolveTargetAndRender(step);
+}
+
+const HANDOFF_STORAGE_KEY = 'speedad-tutorial-handoff';
+
+function applyBasicInfoHandoff() {
+  let formData = null;
+  if (typeof window.localStorage !== 'undefined') {
+    const raw = window.localStorage.getItem(HANDOFF_STORAGE_KEY);
+    if (raw) {
+      try {
+        formData = JSON.parse(raw);
+      } catch (_e) {
+        formData = null;
+      }
+      window.localStorage.removeItem(HANDOFF_STORAGE_KEY);
+    }
+  }
+
+  const nameInput = document.getElementById('surveyName_ja');
+  const titleInput = document.getElementById('displayTitle_ja');
+  const periodInput = document.getElementById('periodRange');
+
+  // handoff も無く、フィールドが既に埋まっている（リロード or ユーザー編集後）の場合は上書きしない
+  if (!formData) {
+    const filled = (el) => el && typeof el.value === 'string' && el.value.trim() !== '';
+    if (filled(nameInput) && filled(titleInput) && filled(periodInput)) return;
+  }
+
+  let surveyName, displayTitle, periodStart, periodEnd;
+  if (formData && formData.surveyName && formData.displayTitle && formData.periodStart && formData.periodEnd) {
+    surveyName = formData.surveyName;
+    displayTitle = formData.displayTitle;
+    periodStart = new Date(formData.periodStart);
+    periodEnd = new Date(formData.periodEnd);
+  } else {
+    surveyName = '初めてのアンケート';
+    displayTitle = '製品Aに関する満足度調査';
+    const start = new Date();
+    start.setDate(start.getDate() + 1);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(start);
+    end.setDate(end.getDate() + 3);
+    end.setHours(23, 59, 0, 0);
+    periodStart = start;
+    periodEnd = end;
+  }
+
+  if (nameInput) setInputValue(nameInput, surveyName);
+  if (titleInput) setInputValue(titleInput, displayTitle);
+
+  if (periodInput) {
+    let fp = periodInput._flatpickr;
+    if (!fp) {
+      let node = periodInput.parentElement;
+      while (node && !fp) {
+        if (node._flatpickr) { fp = node._flatpickr; break; }
+        node = node.parentElement;
+      }
+    }
+    if (fp && typeof fp.setDate === 'function') {
+      fp.setDate([periodStart, periodEnd], true);
+    } else {
+      const fmt = (d) => `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
+      setInputValue(periodInput, `${fmt(periodStart)} 〜 ${fmt(periodEnd)}`);
+    }
+  }
 }
 
 function resolveTargetAndRender(step) {
   // ターゲットが waitForElement 指定なら出現を待つ
   const finalize = (targetEl) => {
+    // チュートリアル中の user-action 系ステップで対象が disabled の場合は強制 enable
+    if (targetEl && (step.mode === 'user-action' || step.mode === 'user-action-bridge')) {
+      if (targetEl.disabled === true || targetEl.getAttribute('aria-disabled') === 'true') {
+        enableTargetForTutorial(targetEl);
+      }
+    }
     renderStep(step, targetEl);
     applyStepBehavior(step, targetEl);
   };
@@ -179,9 +255,60 @@ function resolveTargetAndRender(step) {
       finalize(lastInsertedQuestionEl);
     } else {
       // 直前ステップで挿入されたはずだが取得できなかった場合のフォールバック
-      const items = document.querySelectorAll('.question-item');
+      const items = document.querySelectorAll('.question-card');
       finalize(items.length > 0 ? items[items.length - 1] : null);
     }
+    return;
+  }
+
+  if (step.targetResolver === 'lastInsertedQuestionField') {
+    let card = lastInsertedQuestionEl;
+    if (!card) {
+      // フォールバック: DOM 上の最新 .question-card
+      const items = document.querySelectorAll('.question-card');
+      card = items.length > 0 ? items[items.length - 1] : null;
+    }
+    if (!card) {
+      finalize(null);
+      return;
+    }
+    let el = null;
+    if (step.fieldPath === 'questionText') {
+      el = card.querySelector('[data-lang-wrapper] input.input-field');
+    } else if (step.fieldPath === 'option') {
+      const qid = card.dataset.questionId;
+      const list = qid ? card.querySelector(`#options-list-${qid}`) : null;
+      if (list) {
+        // optionIndex までの row が存在しなければ「選択肢を追加」ボタンを click して補充
+        let currentCount = list.querySelectorAll('[data-option-index]').length;
+        if (currentCount <= step.optionIndex) {
+          const buttons = card.querySelectorAll('button');
+          let addBtn = null;
+          buttons.forEach((b) => {
+            if (!addBtn && b.textContent && b.textContent.includes('選択肢を追加')) {
+              addBtn = b;
+            }
+          });
+          if (addBtn) {
+            let safety = 0;
+            while (currentCount <= step.optionIndex && safety < 10) {
+              addBtn.click();
+              currentCount = list.querySelectorAll('[data-option-index]').length;
+              safety += 1;
+            }
+          }
+        }
+        const row = list.querySelector(`[data-option-index="${step.optionIndex}"]`);
+        el = row?.querySelector('[data-lang-wrapper] input') || null;
+      }
+    } else if (step.fieldPath === 'minLabel') {
+      const grids = card.querySelectorAll('.grid > div');
+      el = grids[0]?.querySelector('[data-lang-wrapper] input') || null;
+    } else if (step.fieldPath === 'maxLabel') {
+      const grids = card.querySelectorAll('.grid > div');
+      el = grids[1]?.querySelector('[data-lang-wrapper] input') || null;
+    }
+    finalize(el);
     return;
   }
 
@@ -279,18 +406,6 @@ function runAutoInput(step, targetEl) {
     setInputsReadonly([targetEl]);
     return;
   }
-
-  if (ai.kind === 'question-single' && targetEl) {
-    const inputs = fillQuestionTextAndOptions(targetEl, ai.questionText, ai.options);
-    setInputsReadonly(inputs);
-    return;
-  }
-
-  if (ai.kind === 'question-rating' && targetEl) {
-    const inputs = fillRatingQuestion(targetEl, ai);
-    setInputsReadonly(inputs);
-    return;
-  }
 }
 
 function setInputValue(input, value) {
@@ -298,70 +413,6 @@ function setInputValue(input, value) {
   input.value = value;
   input.dispatchEvent(new Event('input', { bubbles: true }));
   input.dispatchEvent(new Event('change', { bubbles: true }));
-}
-
-/**
- * 多言語入力構造（仕様書 §4.3 冒頭）に従い、設問文と選択肢を埋める。
- * @returns {HTMLInputElement[]} readonly 化対象
- */
-function fillQuestionTextAndOptions(questionItemEl, questionText, options) {
-  const filled = [];
-  // 設問文: .multi-lang-input-group[data-field-key="questionText"] .question-text-input
-  const qGroup = questionItemEl.querySelector('.multi-lang-input-group[data-field-key="questionText"]');
-  const qInputs = qGroup ? qGroup.querySelectorAll('.question-text-input') : [];
-  qInputs.forEach((inp) => {
-    setInputValue(inp, questionText);
-    filled.push(inp);
-  });
-
-  // 選択肢: .options-container 配下 .multi-lang-input-group 内 input
-  const optsContainer = questionItemEl.querySelector('.options-container');
-  if (optsContainer && Array.isArray(options)) {
-    const groups = optsContainer.querySelectorAll('.multi-lang-input-group');
-    options.forEach((val, idx) => {
-      const group = groups[idx];
-      if (!group) return;
-      const inputs = group.querySelectorAll('input');
-      inputs.forEach((inp) => {
-        setInputValue(inp, val);
-        filled.push(inp);
-      });
-    });
-  }
-  return filled;
-}
-
-function fillRatingQuestion(questionItemEl, ai) {
-  const filled = [];
-  // 設問文
-  const qGroup = questionItemEl.querySelector('.multi-lang-input-group[data-field-key="questionText"]');
-  const qInputs = qGroup ? qGroup.querySelectorAll('.question-text-input') : [];
-  qInputs.forEach((inp) => {
-    setInputValue(inp, ai.questionText);
-    filled.push(inp);
-  });
-  // ポイント数（select or input いずれにも対応）
-  const pointsField = questionItemEl.querySelector('[data-field-key="ratingPoints"], select[name*="points"], input[name*="points"]');
-  if (pointsField) {
-    setInputValue(pointsField, String(ai.points));
-    filled.push(pointsField);
-  }
-  // 最小ラベル / 最大ラベル
-  const minGroup = questionItemEl.querySelector('.multi-lang-input-group[data-field-key="minLabel"]');
-  const maxGroup = questionItemEl.querySelector('.multi-lang-input-group[data-field-key="maxLabel"]');
-  if (minGroup) {
-    minGroup.querySelectorAll('input').forEach((inp) => {
-      setInputValue(inp, ai.minLabel);
-      filled.push(inp);
-    });
-  }
-  if (maxGroup) {
-    maxGroup.querySelectorAll('input').forEach((inp) => {
-      setInputValue(inp, ai.maxLabel);
-      filled.push(inp);
-    });
-  }
-  return filled;
 }
 
 function bindUserActionListener(step, targetEl) {
@@ -374,7 +425,7 @@ function bindUserActionListener(step, targetEl) {
     stuckHintTimerId = null;
   }
   stuckHintTimerId = window.setTimeout(() => {
-    showStuckHint('ボタンが反応しないときは『スキップ』で進めます');
+    showStuckHint('ボタンが反応しないときは『次へ』で先に進めます');
     stuckHintTimerId = null;
   }, 6000);
 
@@ -414,9 +465,10 @@ function bindUserActionListener(step, targetEl) {
 }
 
 function captureLastInsertedQuestionIfNeeded(step) {
-  // ステップ 12 / 15 のクリック直後に最新 .question-item を記録しておく
-  if (step.id === 12 || step.id === 15) {
-    const items = document.querySelectorAll('.question-item');
+  // ステップ 12 / 19 のクリック直後に最新 .question-card を記録しておく
+  // （新ステップ列でシングルアンサー選択=12, 評定尺度選択=19）
+  if (step.id === 12 || step.id === 19) {
+    const items = document.querySelectorAll('.question-card');
     if (items.length > 0) {
       lastInsertedQuestionEl = items[items.length - 1];
     }
@@ -515,10 +567,10 @@ function installNewQuestionObserver() {
     for (const m of mutations) {
       m.addedNodes.forEach((node) => {
         if (!(node instanceof HTMLElement)) return;
-        if (node.classList?.contains('question-item')) {
+        if (node.classList?.contains('question-card')) {
           lastInsertedQuestionEl = node;
         }
-        const nested = node.querySelector?.('.question-item');
+        const nested = node.querySelector?.('.question-card');
         if (nested) lastInsertedQuestionEl = nested;
       });
     }

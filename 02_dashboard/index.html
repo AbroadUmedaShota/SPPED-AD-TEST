@@ -32,7 +32,7 @@
       // 初回ログイン強制リダイレクト（モック段階：localStorage 完了フラグで判定）
       (function () {
         var params = new URLSearchParams(location.search);
-        var completed = localStorage.getItem('speedad-tutorial-completed') === 'true';
+        var completed = localStorage.getItem('speedad-tutorial-completed') === '1';
         if (!completed && params.get('tutorial') !== '1') {
           params.set('tutorial', '1');
           params.set('step', '1');

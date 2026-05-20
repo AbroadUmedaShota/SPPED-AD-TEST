@@ -740,6 +740,7 @@ function validateForm() {
 }
 
 function updateSaveButtonState() {
+  if (window.SpeedAD?.tutorial?.isActive?.()) return; // tutorial-guard
   const valid = validateForm();
   document.getElementById('createSurveyBtn').disabled = !valid;
   const mobBtn = document.getElementById('createSurveyBtnMobile');
