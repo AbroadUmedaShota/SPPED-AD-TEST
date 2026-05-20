@@ -565,7 +565,7 @@
           if (userEmail === 'admin') {
             targetUrl = resolveAppPath('03_admin/index.html');
           } else if (userEmail === 'new') {
-            targetUrl = resolveAppPath('02_dashboard/index.html?tutorial=1&step=1');
+            targetUrl = resolveAppPath('tutorial/index.html?tutorial=1&step=1');
             isNewUser = true;
           }
           try {

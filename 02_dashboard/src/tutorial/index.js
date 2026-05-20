@@ -536,9 +536,8 @@ function finishAndExit({ markComplete }) {
   else clearProgress();
   destroyOverlay();
   detachNewQuestionObserver();
-  // ?tutorial=1 を外して dashboard へ
-  const base = window.location.pathname.split('/').slice(0, -1).join('/');
-  window.location.assign(`${base}/index.html`);
+  // チュートリアルは tutorial/ 配下で動作するため、退出先は実ダッシュボードへ固定する
+  window.location.assign('../02_dashboard/index.html');
 }
 
 // ---------- ページ遷移 ----------

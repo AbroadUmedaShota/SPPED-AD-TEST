@@ -8,7 +8,7 @@ last_reviewed: 2026-05-20
 
 | 項目 | 値 |
 | --- | --- |
-| 対象画面 | `02_dashboard/index.html`・`02_dashboard/surveyCreation.html` に重ねるオーバーレイ |
+| 対象画面 | `tutorial/index.html`・`tutorial/surveyCreation.html`（チュートリアル専用ディレクトリ。`02_dashboard/` の対応画面のコピー） |
 | 起動方式 | クエリパラメータ `?tutorial=1[&step=N]` |
 | 正本区分 | 本書を正本とする |
 | owner | product |
@@ -27,7 +27,8 @@ last_reviewed: 2026-05-20
 ## 2. 画面概要
 
 - 初めて SPEED AD を利用する運用担当者が、アンケート一覧 → 新規作成 → 設問追加（基本＋特殊）→ アンケート作成 → QR コード確認 までの基本フローを誘導付きで体験する。
-- **実画面（`02_dashboard/index.html`・`surveyCreation.html`）に薄い JS レイヤーを重ねる**方式とする。チュートリアル専用ページは作らない。
+- チュートリアルは専用ディレクトリ **`tutorial/` 配下の独立ページ（`tutorial/index.html`・`tutorial/surveyCreation.html`）** で動作する。これらは実画面 `02_dashboard/index.html`・`02_dashboard/surveyCreation.html` のコピーに薄い JS レイヤーを重ねたもので、JS／CSS／共通HTML／モーダル等のアセットは複製せず `02_dashboard/` 側を参照する。`tutorial/index.html` の冒頭で `window.__COMMON_BASE_PATH` を設定し、アセットを `02_dashboard/` 基準で解決する。
+- 実 `02_dashboard/` 画面はチュートリアル用スクリプトの読み込み・強制リダイレクトを一切持たない。同一 URL 上でダッシュボードとチュートリアルが同居することによるリロード時の誤起動を避けるため、チュートリアルを専用ディレクトリに分離する。
 - 起動判定は URL クエリパラメータ `?tutorial=1` で行う。本番／モック共通。
 - チュートリアル中の操作は本番データに反映させない（フォーム送信・`localStorage` 書き込み等はガードでインターセプトする、§5.4）。
 - ユーザーが「練習である」ことを誤認しないよう、**画面常時表示の練習モードバッジ**（§3.7）と**保存系アクションでの明示的な吹き出し文言**（§4.2 #8 / §4.3 #23）の 2 段構えで知らせる。
@@ -61,7 +62,7 @@ last_reviewed: 2026-05-20
 | `guards.js` | 本番モジュールへの差し込みフック（§5.4） |
 | `tutorial.css` | マスク・吹き出し・進行バー・スキップモーダルのスタイル |
 
-`02_dashboard/index.html`・`surveyCreation.html` の末尾で `tutorial/index.js` と `tutorial.css` を読み込む。`?tutorial=1` が無ければ何もしない（実画面は通常動作）。
+チュートリアル専用ディレクトリ `tutorial/` を新設し、`tutorial/index.html`（`02_dashboard/index.html` のコピー）と `tutorial/surveyCreation.html`（`02_dashboard/surveyCreation.html` のコピー）を置く。両ページは末尾で `02_dashboard/src/tutorial/index.js` と `tutorial.css` を読み込み、冒頭で `window.__COMMON_BASE_PATH` を設定して共通HTML・モーダル・アセットを `02_dashboard/` 側から解決する。`tutorial/index.html` は `?tutorial=1` が無ければ自動付与してチュートリアルを起動する。
 
 ### 3.2 オーバーレイ
 - 画面全体を半透明マスクで覆い、ハイライト対象要素のみ切り抜いて操作可能にする。
@@ -131,7 +132,7 @@ last_reviewed: 2026-05-20
 - 「始める」押下後にそれらを表示してステップ 1 を開始する。
 - このプレリュードはステップカウントに含めない（「ステップ 01 / 26」表記は変わらない）。
 
-### 4.1 ブロック A: アンケート一覧（`02_dashboard/index.html?tutorial=1`）
+### 4.1 ブロック A: アンケート一覧（`tutorial/index.html?tutorial=1`）
 
 | # | ステップ | 対象要素 | 進行方式 | 自動入力 / ユーザー操作 | 吹き出し本文例 |
 | --- | --- | --- | --- | --- | --- |
@@ -149,9 +150,9 @@ last_reviewed: 2026-05-20
 | 5 | アンケート名（管理用） | `#newSurveyModal #surveyName` | 自動入力 | システムが `初めてのアンケート` を入力 | 「アンケート名（管理用）に『初めてのアンケート』を自動入力しました。社内管理用の名前で、回答者には表示されません。」 |
 | 6 | 表示タイトル（回答者表示） | `#newSurveyModal #displayTitle` | 自動入力 | システムが `製品Aに関する満足度調査` を入力 | 「表示タイトルに『製品Aに関する満足度調査』を自動入力しました。これは回答者の画面に表示されます。」 |
 | 7 | 回答期間 | `#newSurveyPeriodRange` | 自動入力 | システムが「翌日 〜 翌日+3」を flatpickr の `_flatpickr.setDate([start, end], true)` 経由で入力 | 「回答期間を翌日から 3 日間で自動入力しました。」 |
-| 8 | 作成する（練習・保存されません） | `#createSurveyFromModalBtn` | ユーザー操作＋システム後続処理 | ユーザーがクリック。`main.js` の本番リダイレクト処理を §5.4 ガードでインターセプトし、`surveyCreation.html?tutorial=1&step=9` へ遷移 | 「内容を確認したら『作成する』ボタンを押してください。**これは練習のため、実際のアンケート一覧には追加されません。** 続けて作成画面の使い方を見てみましょう。」 |
+| 8 | 作成する（練習・保存されません） | `#createSurveyFromModalBtn` | ユーザー操作＋システム後続処理 | ユーザーがクリック。`main.js` の本番リダイレクト処理を §5.4 ガードでインターセプトし、`tutorial/surveyCreation.html?tutorial=1&step=9` へ遷移 | 「内容を確認したら『作成する』ボタンを押してください。**これは練習のため、実際のアンケート一覧には追加されません。** 続けて作成画面の使い方を見てみましょう。」 |
 
-### 4.3 ブロック C: アンケート作成画面（`02_dashboard/surveyCreation.html?tutorial=1&step=9`）
+### 4.3 ブロック C: アンケート作成画面（`tutorial/surveyCreation.html?tutorial=1&step=9`）
 
 設問カードは `surveyCreation-v2.js` の `buildQuestionCard` で動的生成される（`.question-card[data-question-id]`）。設問文は基本設定セクション配下の `[data-lang-wrapper]` 内 `input.input-field`、選択肢は `#options-list-${qid}` 配下 `[data-option-index]` の `[data-lang-wrapper]` 内 input、評定尺度のラベルは labelsGrid 配下 1 番目（minLabel）／ 2 番目（maxLabel）の `[data-lang-wrapper]` 内 input に書く。設問の追加・タイプ選択はユーザーが自分でクリックし、テキスト入力のみシステムが自動入力する。
 
@@ -203,7 +204,7 @@ last_reviewed: 2026-05-20
 
 ### 5.3 ナビゲーション
 - ページ遷移を伴うステップ（#8, #26）は、遷移前に進行状態を `localStorage` に書き出し、遷移先 URL にも `?tutorial=1&step=N` を付与する。
-- 遷移先ページの `tutorial/index.js` は、URL クエリと `localStorage` の進行状態を突き合わせて該当ステップから再開する。
+- 遷移先ページの `02_dashboard/src/tutorial/index.js` は、URL クエリと `localStorage` の進行状態を突き合わせて該当ステップから再開する。
 - **再開描画前に、共通HTML（ヘッダー / サイドバー / フッター）の非同期注入完了を `loadCommonHtml` の Promise で `await` してからスポットライト位置計算・吹き出し描画を開始する**。注入完了を待たずに `getBoundingClientRect()` を呼ぶと、共通領域分のレイアウトが未確定でハイライトと吹き出しの位置がずれる。
 
 ### 5.4 本番モジュールへのガードと差し替え
@@ -215,7 +216,7 @@ last_reviewed: 2026-05-20
 
 | 本番モジュール / アクション | チュートリアル時の挙動 | 補足 |
 | --- | --- | --- |
-| `main.js` `createSurveyFromModalBtn` クリックハンドラ（アンケート新規作成リダイレクト） | 本来の遷移 URL を上書きし、`surveyCreation.html?tutorial=1&step=9` 付きで遷移 | 既存ハンドラに `// tutorial-guard` で1〜2行差し込み |
+| `main.js` `createSurveyFromModalBtn` クリックハンドラ（アンケート新規作成リダイレクト） | 本来の遷移 URL を上書きし、`tutorial/surveyCreation.html?tutorial=1&step=9` 付きで遷移 | 既存ハンドラに `// tutorial-guard` で1〜2行差し込み。実 `02_dashboard/` 画面ではチュートリアル層が読み込まれず `window.SpeedAD.tutorial` が未定義のためガードは作動せず、通常動作する |
 | `surveyCreation-v2.js#attemptSave`（「アンケートを作成」ボタンハンドラ） | 現状は `showToast` のみで API・`localStorage` 書き込み無し。ガード差し込みではなく、チュートリアル側で QR ボタン有効化＋ステップ 24 進行を実行 | 本番化時は保存 API 呼び出しが追加されるため、その時点で改めてガード差し込みが必要（§13 関連） |
 | `qrCodeModal.js` 起動（ステップ 24） | 通常どおり開く | ガード不要 |
 
@@ -257,7 +258,7 @@ last_reviewed: 2026-05-20
 | 引継ぎ用 | `speedad-tutorial-handoff` | `localStorage` | ブロック B モーダルで入力した基本情報（`surveyName` / `displayTitle` / `periodStart` / `periodEnd` / `memo`）の JSON 文字列 | ステップ 9 マウント時に読み出して即削除（一度きり）|
 
 - 進行状態は `localStorage` に保存し、リロード・タブ閉じ・別タブ・別セッション間で引き継ぐ。
-- 引継ぎ用 `speedad-tutorial-handoff` は、ステップ 8 で「作成する」を押した瞬間にモーダル入力値を保存し、`surveyCreation.html?step=9` 到達時に作成画面側のフィールド（`#surveyName_ja` / `#displayTitle_ja` / `#periodRange`）へ注入してから削除する。ページ間で URL クエリに値を載せずに済ませる経路。
+- 引継ぎ用 `speedad-tutorial-handoff` は、ステップ 8 で「作成する」を押した瞬間にモーダル入力値を保存し、`tutorial/surveyCreation.html?step=9` 到達時に作成画面側のフィールド（`#surveyName_ja` / `#displayTitle_ja` / `#periodRange`）へ注入してから削除する。ページ間で URL クエリに値を載せずに済ませる経路。
 - チュートリアル中に入力された値・作成されたアンケートは、本番のアンケート一覧 JSON・`localStorage` の `surveyCreationData` 等に保存しない（§5.4 ガード）。
 - 完了フラグの確定タイミングは以下のいずれか:
   - 完了画面の「完了」押下（ステップ 26）
@@ -269,8 +270,8 @@ last_reviewed: 2026-05-20
 
 | 起点 | 完了フラグ | 進行状態 | 動作 |
 | --- | --- | --- | --- |
-| 初回ログイン | 未設定 | 無 | ログイン直後に `02_dashboard/index.html?tutorial=1&step=1` へ遷移 |
-| 中断後の再ログイン | 未設定 | 有 | ログイン直後に該当ページの `?tutorial=1&step=N` へ遷移、保存ステップから再開 |
+| 初回ログイン | 未設定 | 無 | ログイン直後に `tutorial/index.html?tutorial=1&step=1` へ遷移 |
+| 中断後の再ログイン | 未設定 | 有 | ログイン直後に `tutorial/` 配下の該当ページの `?tutorial=1&step=N` へ遷移、保存ステップから再開 |
 | 完了済みユーザーのログイン | true | — | 通常どおり `02_dashboard/index.html` へ遷移する |
 | `?tutorial=1` 付き URL の直接アクセス | — | — | 完了フラグの有無にかかわらず再生する（QA・確認用途）。完了フラグは自動更新しない |
 
@@ -341,8 +342,8 @@ last_reviewed: 2026-05-20
 | 離脱パターン | 再開挙動 |
 | --- | --- |
 | リロード（F5） | 同一 URL の `?tutorial=1` でロードされるため、同一ステップから自動再開（マスク・吹き出しも復元） |
-| `?tutorial=1` を外したアドレスバー操作 | 本番側で完了フラグ未設定を検知 → 強制的に `?tutorial=1&step=N` 付き URL に戻す（§13.1） |
-| タブ閉じ・ブラウザ閉じ | 次回ログイン時に強制リダイレクトされ、保存ステップから再開。当該ステップがブロック C 以降なら `surveyCreation.html?tutorial=1&step=N` へ自動転送 |
+| `tutorial/` ページで `?tutorial=1` を外したアドレスバー操作 | `tutorial/index.html` が `?tutorial=1` を自動付与し、進行状態に応じたステップで再開する。実 `02_dashboard/` 画面へ移動した場合はチュートリアルを離脱し、再開は次回ログイン時の §7 エントリーポイント判定に委ねる |
+| タブ閉じ・ブラウザ閉じ | 次回ログイン時に強制リダイレクトされ、保存ステップから再開。当該ステップがブロック C 以降なら `tutorial/surveyCreation.html?tutorial=1&step=N` へ自動転送 |
 | ブラウザ「戻る」「進む」 | URL に `?tutorial=1` が付いていればその場のステップから再開、外れていれば直前項目と同様 |
 
 ### 9.3 進行状態のリセット契機
@@ -365,7 +366,7 @@ last_reviewed: 2026-05-20
 ## 11. 手動確認観点
 
 ### 11.1 起動・通過
-- 新規アカウントで初回ログインすると、ダッシュボードに `?tutorial=1` 付きで遷移しチュートリアルが起動する。
+- 新規アカウントで初回ログインすると、`tutorial/index.html?tutorial=1&step=1` へ遷移しチュートリアルが起動する。
 - ブロック A 〜 D の全 26 ステップを最後まで通過できる。
 - ページ遷移を伴うステップ（#8 → #9、#26 → 完了）で進行状態と URL クエリが引き継がれる。
 - マスク内の要素はクリックできず、ハイライト対象のみ操作できる。
@@ -393,9 +394,9 @@ last_reviewed: 2026-05-20
 
 ### 11.5 離脱からの再開
 - 任意のステップでリロードしても、同じステップが復元される。
-- 任意のステップでタブを閉じた後、再ログインすると保存ステップから再開する（ブロック C 以降なら `surveyCreation.html?tutorial=1&step=N` へ自動遷移）。
+- 任意のステップでタブを閉じた後、再ログインすると保存ステップから再開する（ブロック C 以降なら `tutorial/surveyCreation.html?tutorial=1&step=N` へ自動遷移）。
 - ブロック B のモーダル表示中に離脱しても、再開時にモーダルが開き直された状態から再開する。
-- `?tutorial=1` を外したアドレスバー操作で本番ダッシュボードへ抜けようとしても、完了フラグ未設定なら強制的に `?tutorial=1&step=N` 付き URL に戻る。
+- `tutorial/index.html` で `?tutorial=1` を外しても、チュートリアルページが自動でクエリを付与し、進行状態に応じたステップで再開する。
 - `localStorage` の `speedad-tutorial-progress` を手動で削除すると、次回アクセス時にブロック A の先頭から開始する。
 
 ## 12. 既存実装の廃止
@@ -416,8 +417,9 @@ last_reviewed: 2026-05-20
 ## 13. 本番化要件
 
 ### 13.1 新規アカウント判定と強制遷移
-- 初回ログイン判定はサーバー側のユーザー属性（例: `first_login: true`）で行う。ログイン認証成功時に判定し、`true` の場合は `02_dashboard/index.html?tutorial=1&step=1`（または進行状態に応じた step）へ強制リダイレクトする。
-- 完了フラグ未設定のユーザーが本番ダッシュボード URL（`?tutorial=1` なし）を直打ちした場合の強制リダイレクトは、CloudFront / API Gateway / アプリケーションサーバーいずれの層で行うかを開発会社と確認する。
+
+- 初回ログイン判定はサーバー側のユーザー属性（例: `first_login: true`）で行う。ログイン認証成功時に判定し、`true` の場合は `tutorial/index.html?tutorial=1&step=1`（または進行状態に応じた step）へ遷移する。
+- 実 `02_dashboard/` 画面はチュートリアル誘導を持たないため、チュートリアルへの誘導はログイン認証成功時の遷移先判定に一本化する。初回ログイン未完了ユーザーが実 `02_dashboard/` 画面を直接開いた場合の扱い（チュートリアルへ誘導するか、そのまま閲覧を許容するか）は開発会社と確認する。
 - ログインルートとリダイレクト先の整合も同時に確認する。
 
 ### 13.2 完了状態とスキップ状態の保存
