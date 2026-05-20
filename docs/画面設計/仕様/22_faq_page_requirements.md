@@ -9,7 +9,7 @@ last_reviewed: 2026-04-23
 ## 1. 概要
 
 **TL;DR**
-- これは SPEED-AD ダッシュボード内の **FAQ ページ**（`02_dashboard/faq.html`）単体の要件定義書。
+- これは SPEED AD ダッシュボード内の **FAQ ページ**（`02_dashboard/faq.html`）単体の要件定義書。
 - 仕様の範囲は「画面構成／検索／カテゴリカード／アコーディオン／フィードバック／データ構造」までで、**フロントエンド完結のクライアントアプリ**としての挙動を定義する。
 - バックエンドは `data/faq.json` の静的ファイル fetch のみ。サーバ連携・DB・認証は扱わない。
 
@@ -74,7 +74,7 @@ last_reviewed: 2026-04-23
 
 - ルート: `.faq-hero`。背景は `linear-gradient(135deg, #1f3a8a 0%, #4285F4 55%, #6ba4ff 100%)` に装飾グリッド `.faq-hero__grid` とグロー `.faq-hero__glow--1/2` を重ねる。装飾レイヤー `.faq-hero__bg` は `aria-hidden="true"`（装飾のためスクリーンリーダーから隠す）。
 - 中身（`.faq-hero__inner`, `max-width: 48rem`）
-  - エアブロウ `.faq-hero__eyebrow`「SPEED-AD FAQ」
+  - エアブロウ `.faq-hero__eyebrow`「SPEED AD FAQ」
   - タイトル `h1#faq-hero-title.faq-hero__title`「よくある質問」
   - サブタイトル `.faq-hero__subtitle`
 - 検索フォーム `<form role="search" aria-label="FAQ検索" id="faq-search-form" class="faq-search">`

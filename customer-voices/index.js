@@ -55,14 +55,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   try {
     const collection = await loadVoiceCollection();
     const voices = getPublishedVoices(collection);
-    count.textContent = `${voices.length}件の公開事例`;
+    count.textContent = `${voices.length}件の導入事例`;
     grid.innerHTML = voices.map(renderVoiceCard).join('');
     refreshRevealAnimations(grid);
   } catch (error) {
     count.textContent = '公開準備中';
     grid.innerHTML = `
       <div class="voice-detail-card" data-reveal>
-        <h2>お客様のお声を準備しています</h2>
+        <h2>導入事例を準備しています</h2>
         <div class="voice-detail-body">
           <p>導入事例の読み込みに失敗しました。時間をおいて再度お試しください。</p>
         </div>

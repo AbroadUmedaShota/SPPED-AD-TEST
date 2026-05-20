@@ -131,12 +131,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       : buildFallbackHighlights(voice);
     const quoteAuthor = voice.publicQuoteAuthor || voice.quote?.author || '';
 
-    document.title = `${label} | SPEED AD お客様のお声`;
+    document.title = `${label} | SPEED AD 導入事例`;
     document.documentElement.style.setProperty('--voice-accent', voice.accent || '#2757f5');
     document.documentElement.style.setProperty('--voice-accent-strong', voice.accentStrong || voice.accent || '#1238b3');
     document.documentElement.style.setProperty('--voice-accent-soft', `${voice.accent || '#2757f5'}16`);
 
-    setText('voice-hero-eyebrow', `${voice.organizationType || '導入事例'} / Customer Voices`);
+    setText('voice-hero-eyebrow', voice.organizationType ? `${voice.organizationType} / 導入事例` : '導入事例');
     setText('voice-hero-company', label);
     setText('voice-hero-headline', headline);
     setText('voice-hero-summary', summary);
@@ -192,7 +192,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       quoteSection.hidden = true;
     }
   } catch (error) {
-    setText('voice-hero-company', 'お客様のお声');
+    setText('voice-hero-company', '導入事例');
     setText('voice-hero-headline', '事例を表示できませんでした');
     setText('voice-hero-summary', '読み込みに失敗したため、一覧ページから再度お試しください。');
     setText('voice-hero-caption', '公開状態とデータ定義を確認してください。');

@@ -49,12 +49,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const label = getVoicePageLabel(voice);
     const summary = getVoicePageSummary(voice);
 
-    document.title = `${label} | SPEED AD お客様のお声`;
+    document.title = `${label} | SPEED AD 導入事例`;
     document.documentElement.style.setProperty('--voice-accent', voice.accent || '#2757f5');
     document.documentElement.style.setProperty('--voice-accent-strong', voice.accentStrong || voice.accent || '#1238b3');
     document.documentElement.style.setProperty('--voice-accent-soft', `${voice.accent || '#2757f5'}1a`);
 
-    document.getElementById('voice-hero-eyebrow').textContent = `${voice.organizationType} / お客様のお声`;
+    document.getElementById('voice-hero-eyebrow').textContent = `${voice.organizationType} / 導入事例`;
     document.getElementById('voice-hero-title').textContent = label;
     document.getElementById('voice-hero-lead').textContent = summary;
     document.getElementById('voice-hero-image').src = resolveAppRootPath(voice.heroImage || 'img/top-kv.jpg');
