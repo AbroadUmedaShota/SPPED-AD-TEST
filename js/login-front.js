@@ -775,8 +775,14 @@
     if (!toggle || !panel || !select || !statementEl || !leadEl || !reasonEl) {
       return;
     }
+    const customBlock = document.getElementById('hero-copy-picker-custom');
+    const customStatementInput = document.getElementById('hero-copy-picker-custom-statement');
+    const customLeadInput = document.getElementById('hero-copy-picker-custom-lead');
 
     const STORAGE_KEY = 'speedad-hero-copy-variant';
+    const CUSTOM_ID = 'custom';
+    const CUSTOM_STATEMENT_KEY = 'speedad-hero-copy-custom-statement';
+    const CUSTOM_LEAD_KEY = 'speedad-hero-copy-custom-lead';
     const DEFAULT_VARIANT = {
       id: 'default',
       statement: '営業プロセスの無駄をゼロにする<br>次世代のリード獲得ツール。',
@@ -794,6 +800,15 @@
     defaultOption.textContent = 'デフォルト（現行）';
     defaultGroupEl.appendChild(defaultOption);
     select.appendChild(defaultGroupEl);
+    if (customBlock && customStatementInput && customLeadInput) {
+      const customGroupEl = document.createElement('optgroup');
+      customGroupEl.label = 'カスタム';
+      const customOption = document.createElement('option');
+      customOption.value = CUSTOM_ID;
+      customOption.textContent = 'カスタム入力（自由記述）';
+      customGroupEl.appendChild(customOption);
+      select.appendChild(customGroupEl);
+    }
 
     HERO_COPY_GROUPS.forEach((group) => {
       const optgroup = document.createElement('optgroup');
@@ -808,7 +823,49 @@
       select.appendChild(optgroup);
     });
 
+    function multilineToHtml(text) {
+      return escapeHtml(text).replace(/\r?\n/g, '<br>');
+    }
+
+    function htmlToMultiline(html) {
+      return String(html ?? '').replace(/<br\s*\/?>/gi, '\n');
+    }
+
+    function applyCustom() {
+      if (!customStatementInput || !customLeadInput) {
+        return;
+      }
+      statementEl.innerHTML = multilineToHtml(customStatementInput.value);
+      leadEl.innerHTML = multilineToHtml(customLeadInput.value);
+    }
+
+    function saveCustom() {
+      if (!customStatementInput || !customLeadInput) {
+        return;
+      }
+      try {
+        window.localStorage.setItem(CUSTOM_STATEMENT_KEY, customStatementInput.value);
+        window.localStorage.setItem(CUSTOM_LEAD_KEY, customLeadInput.value);
+      } catch (_error) {
+        /* localStorage unavailable */
+      }
+    }
+
     function applyVariant(id) {
+      if (id === CUSTOM_ID && customBlock && customStatementInput && customLeadInput) {
+        customBlock.hidden = false;
+        if (!customStatementInput.value && !customLeadInput.value) {
+          customStatementInput.value = htmlToMultiline(DEFAULT_VARIANT.statement);
+          customLeadInput.value = htmlToMultiline(DEFAULT_VARIANT.lead);
+          saveCustom();
+        }
+        applyCustom();
+        reasonEl.textContent = 'カスタム入力モード。見出しとリード文を自由に編集できます（入力内容はブラウザに保存されます）。';
+        return;
+      }
+      if (customBlock) {
+        customBlock.hidden = true;
+      }
       const variant = allVariants.get(id) || DEFAULT_VARIANT;
       statementEl.innerHTML = variant.statement;
       if (variant.lead) {
@@ -837,6 +894,17 @@
         /* localStorage unavailable */
       }
     });
+    if (customStatementInput && customLeadInput) {
+      [customStatementInput, customLeadInput].forEach((field) => {
+        field.addEventListener('input', () => {
+          if (select.value !== CUSTOM_ID) {
+            return;
+          }
+          applyCustom();
+          saveCustom();
+        });
+      });
+    }
 
     document.addEventListener('click', (event) => {
       if (toggle.getAttribute('aria-expanded') !== 'true') {
@@ -861,7 +929,16 @@
     } catch (_error) {
       /* localStorage unavailable */
     }
-    if (allVariants.has(savedId)) {
+    if (customStatementInput && customLeadInput) {
+      try {
+        customStatementInput.value = window.localStorage.getItem(CUSTOM_STATEMENT_KEY) || '';
+        customLeadInput.value = window.localStorage.getItem(CUSTOM_LEAD_KEY) || '';
+      } catch (_error) {
+        /* localStorage unavailable */
+      }
+    }
+    const canUseCustom = Boolean(customBlock && customStatementInput && customLeadInput);
+    if (allVariants.has(savedId) || (savedId === CUSTOM_ID && canUseCustom)) {
       select.value = savedId;
       applyVariant(savedId);
     }
