@@ -1,0 +1,2434 @@
+import { initBreadcrumbs } from './breadcrumb.js';
+import { resolveDemoDataPath, resolveDashboardDataPath, showToast } from './utils.js';
+import { getSurveyPeriodRange, buildDateFilterOptions, applyDateFilterOptions, resolveDateRangeFromValue } from './services/dateFilterService.js';
+import { COMMON_CHART_DONUT_PALETTE } from './constants/chartPalette.js';
+
+document.addEventListener('DOMContentLoaded', () => {
+    initGraphPage();
+});
+
+function generateScaleGradient(points) {
+    const stops = [
+        [220, 38, 38],   // red-600
+        [234, 88, 12],   // orange-600
+        [202, 138, 4],   // yellow-600
+        [22, 163, 74],   // green-600
+        [21, 128, 61],   // green-700
+    ];
+    const colors = [];
+    for (let i = 0; i < points; i++) {
+        const t = points <= 1 ? 0.5 : i / (points - 1);
+        const seg = t * (stops.length - 1);
+        const idx = Math.min(Math.floor(seg), stops.length - 2);
+        const f = seg - idx;
+        const r = Math.round(stops[idx][0] + (stops[idx + 1][0] - stops[idx][0]) * f);
+        const g = Math.round(stops[idx][1] + (stops[idx + 1][1] - stops[idx][1]) * f);
+        const b = Math.round(stops[idx][2] + (stops[idx + 1][2] - stops[idx][2]) * f);
+        colors.push(`rgb(${r}, ${g}, ${b})`);
+    }
+    return colors;
+}
+
+// --- Global State ---
+const chartInstances = {};
+const chartDataStore = new Map();
+let originalAnswers = [];
+let currentSurvey = null;
+let startDatePicker = null;
+let endDatePicker = null;
+let currentDateFilter = null;
+let availableDateRange = null;
+let chartSequence = 0;
+let isExporting = false; // 書き出し中フラグ
+
+// 表示オプションの状態管理（localStorageから復元）
+const DISPLAY_OPTIONS_STORAGE_KEY = 'graphPage_displayOptions';
+const DISPLAY_OPTIONS_DEFAULTS = {
+    showSummary: true,
+    showDataLabels: true,
+    showCenterText: true,
+    showTable: true,
+    showGrid: false
+};
+const displayOptions = loadDisplayOptions();
+const GRAPH_CHART_DONUT_PALETTE = COMMON_CHART_DONUT_PALETTE;
+const GRAPH_CHART_COLOR_PALETTE = COMMON_CHART_DONUT_PALETTE; // Use same palette for bar charts
+const GRAPH_CHART_MUTED_TEXT = '#6B6B6B';
+const GRAPH_CHART_TEXT = '#1A1A1A';
+const GRAPH_CHART_GRID = '#F1F1F1';
+
+const SINGLE_CHOICE_TYPES = new Set(['single_choice', 'dropdown', 'rating']);
+const MULTI_CHOICE_TYPES = new Set(['multi_choice', 'ranking']);
+const MATRIX_SINGLE_TYPES = new Set(['matrix_sa', 'matrix_single']);
+const MATRIX_MULTI_TYPES = new Set(['matrix_ma', 'matrix_multi', 'matrix_multiple']);
+const BLANK_TYPES = new Set([
+    'text',
+    'free_text',
+    'free_answer',
+    'number',
+    'date',
+    'datetime',
+    'datetime_local',
+    'time',
+    'handwriting',
+    'image',
+    'photo',
+    'file',
+    'file_upload',
+    'upload',
+    'explanation'
+]);
+
+/**
+ * Initializes the graph page.
+ */
+async function initGraphPage() {
+    initBreadcrumbs();
+    const urlParams = new URLSearchParams(window.location.search);
+    const surveyId = urlParams.get('surveyId') || 'sv_0001_24001';
+
+    // 離脱防止イベント
+    window.addEventListener('beforeunload', (event) => {
+        if (isExporting) {
+            event.preventDefault();
+            event.returnValue = ''; // ブラウザ標準の警告を表示
+        }
+    });
+
+    await loadAndRenderCharts(surveyId);
+    setupFilterEventListeners();
+}
+
+/**
+ * Sets up all filter related event listeners.
+ */
+function setupFilterEventListeners() {
+    flatpickr.localize(flatpickr.l10ns.ja);
+
+    const startEl = document.getElementById('startDateInput');
+    const endEl = document.getElementById('endDateInput');
+    const daySelect = document.getElementById('dayFilterSelect');
+    const detailedContent = document.getElementById('detailed-search-content');
+    const resetBtn = document.getElementById('resetFiltersButton');
+
+    if (daySelect) {
+        const options = buildDateFilterOptions(availableDateRange);
+        applyDateFilterOptions(daySelect, options);
+    }
+
+    const fpConfig = {
+        enableTime: true,
+        dateFormat: 'Y-m-d H:i',
+        minDate: availableDateRange?.start || null,
+        maxDate: availableDateRange?.end || null,
+        onChange: () => {
+            if (startDatePicker && endDatePicker) {
+                const start = startDatePicker.selectedDates[0];
+                const end = endDatePicker.selectedDates[0];
+                if (start && end) {
+                    currentDateFilter = [start, end];
+                    triggerChartUpdate();
+                }
+            }
+        }
+    };
+
+    if (startEl && endEl) {
+        startDatePicker = flatpickr(startEl, fpConfig);
+        endDatePicker = flatpickr(endEl, fpConfig);
+    }
+
+    if (daySelect) {
+        daySelect.addEventListener('change', (e) => {
+            const val = e.target.value;
+
+            if (val === 'custom') {
+                if (detailedContent) detailedContent.classList.remove('hidden');
+                return;
+            } else {
+                if (detailedContent) detailedContent.classList.add('hidden');
+            }
+
+            const range = resolveDateRangeFromValue(val, availableDateRange);
+            currentDateFilter = range;
+            if (range && startDatePicker && endDatePicker) {
+                startDatePicker.setDate(range[0], false);
+                endDatePicker.setDate(range[1], false);
+            }
+            triggerChartUpdate();
+        });
+    }
+
+    if (resetBtn) {
+        resetBtn.addEventListener('click', handleResetFilters);
+    }
+
+    // --- Display Options Logic ---
+    const optIds = {
+        'opt-show-summary': 'showSummary',
+        'opt-show-datalabels': 'showDataLabels',
+        'opt-show-center-text': 'showCenterText',
+        'opt-show-table': 'showTable',
+        'opt-show-grid': 'showGrid'
+    };
+
+    Object.entries(optIds).forEach(([id, key]) => {
+        const el = document.getElementById(id);
+        if (el) {
+            // Restore saved state to checkbox
+            el.checked = displayOptions[key];
+            el.addEventListener('change', (e) => {
+                displayOptions[key] = e.target.checked;
+                saveDisplayOptions();
+                triggerChartUpdate();
+            });
+        }
+    });
+
+    const initialRange = resolveDateRangeFromValue('all', availableDateRange);
+    if (daySelect && daySelect.querySelector('option[value="all"]')) {
+        daySelect.value = 'all';
+    }
+    if (initialRange) {
+        currentDateFilter = initialRange;
+        if (startDatePicker && endDatePicker) {
+            startDatePicker.setDate(initialRange[0], false);
+            endDatePicker.setDate(initialRange[1], false);
+        }
+    }
+}
+
+/**
+ * Handles the reset filters button click.
+ */
+function handleResetFilters() {
+    currentDateFilter = null;
+    const allRange = resolveDateRangeFromValue('all', availableDateRange);
+    if (allRange) {
+        currentDateFilter = allRange;
+        if (startDatePicker) startDatePicker.setDate(allRange[0], false);
+        if (endDatePicker) endDatePicker.setDate(allRange[1], false);
+    } else {
+        if (startDatePicker) startDatePicker.clear();
+        if (endDatePicker) endDatePicker.clear();
+    }
+    const daySelect = document.getElementById('dayFilterSelect');
+    if (daySelect) daySelect.value = 'all';
+
+    const detailedContent = document.getElementById('detailed-search-content');
+    if (detailedContent) detailedContent.classList.add('hidden');
+
+    triggerChartUpdate();
+}
+
+/**
+ * Triggers a chart update based on the current date filter.
+ */
+function triggerChartUpdate() {
+    let answersToProcess = originalAnswers;
+
+    if (currentDateFilter && currentDateFilter.length === 2) {
+        const [startDate, endDate] = currentDateFilter;
+        answersToProcess = originalAnswers.filter(answer => {
+            if (!answer.answeredAt) return false;
+            const itemDate = new Date(answer.answeredAt);
+            return itemDate >= startDate && itemDate <= endDate;
+        });
+    }
+
+    const chartData = processDataForCharts(currentSurvey, answersToProcess);
+    renderCharts(chartData);
+}
+
+/**
+ * Fetches all necessary data and renders the charts.
+ * @param {string} surveyId The ID of the survey to display.
+ */
+async function loadAndRenderCharts(surveyId) {
+    showLoading(true);
+    try {
+        if (!surveyId) {
+            throw new Error("アンケートIDが指定されていません。");
+        }
+
+        // Helper to fetch with fallback
+        const fetchWithFallback = async (relativePath, type) => {
+            // 1. Try Dashboard Data (data/...)
+            const localUrl = resolveDashboardDataPath(relativePath);
+            try {
+                const res = await fetch(localUrl);
+                if (res.ok) return await res.json();
+            } catch (e) {
+                console.warn(`Local fetch failed for ${relativePath}`, e);
+            }
+
+            // 2. Try Demo Data (docs/サンプル/...)
+            const demoUrl = resolveDemoDataPath(relativePath);
+            try {
+                const res = await fetch(demoUrl);
+                if (res.ok) return await res.json();
+            } catch (e) {
+                console.warn(`Demo fetch failed for ${relativePath}`, e);
+            }
+
+            if (type === 'survey') throw new Error(`アンケート定義ファイルが見つかりません: ${relativePath}`);
+            return []; // Answers can be empty
+        };
+
+        const [surveyDefinition, answers] = await Promise.all([
+            fetchWithFallback(`surveys/${surveyId}.json`, 'survey'),
+            // Try responses/answers/ first (production path), then answers/ (demo path)
+            fetchWithFallback(`responses/answers/${surveyId}.json`, 'answers')
+                .then(data => Array.isArray(data) && data.length === 0
+                    ? fetchWithFallback(`answers/${surveyId}.json`, 'answers')
+                    : data)
+        ]);
+
+        currentSurvey = surveyDefinition;
+        if (!currentSurvey) {
+            throw new Error(`アンケートID「${surveyId}」の定義が見つかりません。`);
+        }
+
+        // Unwrap answers if it's in the new format { surveyId: "...", answers: [...] }
+        let answersArray = answers;
+        if (answers && !Array.isArray(answers) && Array.isArray(answers.answers)) {
+            answersArray = answers.answers;
+        } else if (!Array.isArray(answers)) {
+            answersArray = []; // Fallback if data is malformed
+        }
+
+        originalAnswers = answersArray;
+        availableDateRange = getSurveyPeriodRange(currentSurvey, originalAnswers);
+
+        document.getElementById('survey-title').textContent = `グラフ分析: ${currentSurvey.name.ja}`;
+
+        const chartData = processDataForCharts(currentSurvey, originalAnswers);
+        renderCharts(chartData);
+
+    } catch (error) {
+        showError(error.message);
+    } finally {
+        showLoading(false);
+    }
+}
+
+/**
+ * Processes raw survey data into a format suitable for charting.
+ * @param {object} survey The survey definition object.
+ * @param {Array} answers The array of answer objects.
+ * @returns {Array} An array of objects, each representing a chart.
+ */
+function processDataForCharts(survey, answers) {
+    if (!survey.details) return [];
+
+    const charts = [];
+    chartSequence = 0;
+
+    // Sort details by question ID number to ensure correct display order (Q1, Q2, ... Q12, Q13, ...)
+    const sortedDetails = [...survey.details].sort((a, b) => {
+        const numA = parseInt(String(a.id || '').replace(/\D/g, ''), 10) || 0;
+        const numB = parseInt(String(b.id || '').replace(/\D/g, ''), 10) || 0;
+        return numA - numB;
+    });
+
+    sortedDetails.forEach((question, index) => {
+        const questionId = question.id || `q${index + 1}`;
+
+        // Skip explanation type — no answerable content
+        if (question.type === 'explanation') return;
+
+        if (MATRIX_SINGLE_TYPES.has(question.type)) {
+            const matrixCharts = buildMatrixCharts(question, questionId, answers, false);
+            charts.push(...matrixCharts);
+            return;
+        }
+
+        if (MATRIX_MULTI_TYPES.has(question.type)) {
+            const matrixCharts = buildMatrixCharts(question, questionId, answers, true);
+            charts.push(...matrixCharts);
+            return;
+        }
+
+        if (SINGLE_CHOICE_TYPES.has(question.type)) {
+            const summary = buildChoiceSummary(question, answers, false);
+            charts.push(buildChartData({
+                questionId,
+                questionText: question.text,
+                chartType: 'pie',
+                summaryType: 'table',
+                includeTotalRow: true,
+                allowToggle: false,
+                ...summary
+            }));
+            return;
+        }
+
+        if (MULTI_CHOICE_TYPES.has(question.type)) {
+            const summary = buildChoiceSummary(question, answers, true);
+            charts.push(buildChartData({
+                questionId,
+                questionText: question.text,
+                chartType: 'bar',
+                summaryType: 'table',
+                includeTotalRow: false,
+                allowToggle: false,
+                ...summary
+            }));
+            return;
+        }
+
+        if (question.type === 'rating_scale') {
+            const summary = buildRatingScaleSummary(question, answers);
+            charts.push(buildChartData({
+                questionId,
+                questionText: question.text,
+                chartType: 'bar',
+                summaryType: 'rating_table',
+                includeTotalRow: true,
+                allowToggle: false,
+                questionType: 'rating_scale',
+                ratingScaleAverage: summary.average,
+                ratingScalePoints: summary.points,
+                labels: summary.labels,
+                data: summary.data,
+                totalAnswers: summary.totalAnswers
+            }));
+            return;
+        }
+
+        if (BLANK_TYPES.has(question.type)) {
+            charts.push(buildListChart(question, questionId, answers, '', question.type));
+            return;
+        }
+
+        charts.push(buildListChart(question, questionId, answers, '未対応の設問タイプ', question.type));
+    });
+
+    return charts;
+}
+
+/**
+ * Renders all charts onto the page.
+ * @param {Array} chartsData Data for all charts to be rendered.
+ */
+function renderCharts(chartsData) {
+    const container = document.getElementById('charts-container');
+    container.innerHTML = '';
+    chartDataStore.clear();
+
+    Object.keys(chartInstances).forEach(key => {
+        if (chartInstances[key] && typeof chartInstances[key].destroy === 'function') {
+            chartInstances[key].destroy();
+        }
+        delete chartInstances[key];
+    });
+
+    if (chartsData.length === 0) {
+        container.innerHTML = '<p class="text-on-surface-variant lg:col-span-2">このアンケートにグラフ化可能な質問がありません。</p>';
+        return;
+    }
+
+    chartsData.forEach(chartData => {
+        const chartId = `chart-${chartData.chartId}`;
+        const card = document.createElement('div');
+        card.dataset.chartCardId = chartId;
+        const isMatrix = Boolean(chartData.isMatrix);
+        const matrixBorder = isMatrix ? '<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary/40"></div>' : '';
+        card.className = `${isMatrix ? 'relative ' : ''}bg-surface rounded-2xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col`;
+
+        const actionButtons = buildActionButtons(chartData, chartId);
+        const chartArea = buildChartArea(chartData, chartId);
+        const questionTitle = escapeHtml(chartData.questionText);
+        const parentTitle = escapeHtml(chartData.matrixParentText || chartData.questionText);
+        const rowTitle = escapeHtml(chartData.matrixRowText || '');
+        const baseChip = formatQuestionChip(chartData.questionBaseId || chartData.questionId);
+        const questionChip = isMatrix
+            ? `${baseChip} [${chartData.matrixIndex}/${chartData.matrixTotal}]`
+            : baseChip;
+
+        const isBlank = chartData.chartType === 'blank';
+        const isList = chartData.chartType === 'list';
+        const iconName = isBlank ? 'subject' : 'analytics';
+        const iconColor = isBlank ? 'text-on-surface-variant/60' : 'text-primary';
+
+        let insightHtml = '';
+        if (displayOptions.showSummary && !isBlank && !isList && !isMatrix && chartData.labels.length > 0) {
+            if (chartData.questionType === 'rating_scale') {
+                const avg = Number(chartData.ratingScaleAverage || 0).toFixed(2);
+                const points = chartData.ratingScalePoints || 5;
+                insightHtml = `
+                    <div class="flex items-center gap-2 bg-primary/5 border border-primary/10 px-3 py-1 rounded-full">
+                        <span class="text-[10px] font-bold text-primary uppercase tracking-wider">Avg</span>
+                        <span class="text-xs font-black text-primary">${avg} <span class="font-normal text-on-surface-variant">/ ${points}</span></span>
+                    </div>
+                `;
+            } else {
+                const maxIdx = chartData.data.indexOf(Math.max(...chartData.data));
+                const topLabel = chartData.labels[maxIdx];
+                const topVal = chartData.data[maxIdx];
+                const topPercent = chartData.totalAnswers > 0 ? Math.round((topVal / chartData.totalAnswers) * 100) : 0;
+
+                insightHtml = `
+                    <div class="flex items-center gap-2 bg-primary/5 border border-primary/10 px-3 py-1 rounded-full">
+                        <span class="text-[10px] font-bold text-primary uppercase tracking-wider">Top</span>
+                        <span class="text-xs font-bold text-on-surface truncate max-w-[100px]">${escapeHtml(topLabel)}</span>
+                        <span class="text-xs font-black text-primary">${topPercent}%</span>
+                    </div>
+                `;
+            }
+        }
+
+        const hasSummaryTable = chartData.summaryType === 'table' || chartData.summaryType === 'matrix_table';
+        const summaryArea = hasSummaryTable
+            ? `<div id="summary-${chartId}" class="text-sm ${isList ? 'flex-1 min-h-0' : ''}"></div>`
+            : '';
+
+        const titleHtml = isMatrix
+            ? `<span class="font-bold text-on-surface block mb-1">${parentTitle}</span><span class="font-normal text-on-surface" data-role="matrix-row-title">${rowTitle}</span>`
+            : questionTitle;
+        const matrixSelectorHtml = buildMatrixRowSelector(chartData, chartId);
+
+        const shouldShowSummary = Boolean(summaryArea) && (displayOptions.showTable || isList);
+        const summarySectionClass = isList
+            ? 'flex-1 flex flex-col min-h-0'
+            : 'mt-2 pt-6 border-t border-outline-variant/30';
+        const summarySectionStyle = isList ? ' style="min-height: 350px;"' : '';
+        const controlsRowHtml = isList
+            ? ''
+            : `
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex justify-start">
+                        ${buildChartTypeButtons(chartData, chartId)}
+                    </div>
+                </div>
+            `;
+        const chartAreaBlock = chartArea
+            ? `
+                <div class="w-full">
+                    ${chartArea}
+                </div>
+            `
+            : '';
+
+        card.innerHTML = `
+            ${matrixBorder}
+            <div class="p-5 border-b border-outline-variant/50 bg-surface-variant/10">
+                <div class="flex justify-between items-start gap-4">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="w-8 h-8 rounded-lg bg-white shadow-sm border border-outline-variant flex items-center justify-center shrink-0">
+                            <span class="material-icons text-lg ${iconColor}">${iconName}</span>
+                        </div>
+                        <div class="min-w-0">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-surface-variant text-on-surface-variant border border-outline-variant mb-1" data-role="question-chip">${questionChip}</span>
+                            <h3 class="text-base ${isMatrix ? '' : 'font-bold '}text-on-surface leading-tight line-clamp-2" title="${questionTitle}">${titleHtml}</h3>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        ${matrixSelectorHtml}
+                        ${actionButtons}
+                    </div>
+                </div>
+                <div class="flex items-center justify-between mt-4">
+                    <p class="text-[11px] font-medium text-on-surface-variant uppercase tracking-widest" data-role="valid-answers">有効回答: ${chartData.totalAnswers}件</p>
+                    ${insightHtml}
+                </div>
+            </div>
+
+            <div class="p-5 flex-1 flex flex-col gap-6">
+                ${controlsRowHtml}
+
+                ${chartAreaBlock}
+
+                ${shouldShowSummary ? `
+                <div class="${summarySectionClass}"${summarySectionStyle}>
+                    <div class="flex items-center gap-2 mb-4 text-on-surface-variant">
+                        <span class="material-icons text-sm">list_alt</span>
+                        <span class="text-xs font-bold uppercase tracking-wider">詳細データ</span>
+                    </div>
+                    ${summaryArea}
+                </div>` : ''}
+            </div>
+        `;
+
+        container.appendChild(card);
+        chartDataStore.set(chartId, chartData);
+
+        if (chartData.chartType !== 'blank' && chartData.chartType !== 'list') {
+            try {
+                createChart(chartId, chartData, chartData.chartType);
+            } catch (error) {
+                console.error('チャート描画に失敗しました:', chartData.questionId, error);
+                const chartContainer = document.getElementById(chartId);
+                if (chartContainer) {
+                    chartContainer.innerHTML = '<div class="p-4 text-sm text-error">チャート描画に失敗しました。</div>';
+                }
+            }
+        }
+
+        if (chartData.summaryType === 'table' || chartData.summaryType === 'matrix_table') {
+            try {
+                renderChartSummaryTable(`summary-${chartId}`, chartData);
+            } catch (error) {
+                console.error('サマリー描画に失敗しました:', chartData.questionId, error);
+            }
+        }
+    });
+
+    document.querySelectorAll('.chart-type-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const { chartId, chartType } = e.currentTarget.dataset;
+            const data = chartDataStore.get(chartId);
+            if (!data) return;
+            createChart(chartId, data, chartType);
+
+            const buttons = e.currentTarget.parentElement.querySelectorAll('.chart-type-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('active', 'bg-primary', 'text-on-primary');
+                btn.classList.add('bg-surface', 'text-primary');
+            });
+
+            e.currentTarget.classList.add('active', 'bg-primary', 'text-on-primary');
+            e.currentTarget.classList.remove('bg-surface', 'text-primary');
+        });
+    });
+    bindMatrixRowSelectorEvents();
+
+    const exportAllButton = document.getElementById('excel-export-all');
+    if (exportAllButton) {
+        exportAllButton.onclick = () => showExportOptionsModal(chartsData);
+    }
+}
+
+function buildMatrixRowSelector(chartData, chartId) {
+    if (!chartData.isMatrix) return '';
+
+    // Determine items to select (Rows or Columns)
+    let items = [];
+    let labelText = '表示項目';
+
+    if (chartData.matrixSelectorType === 'column') {
+        items = chartData.matrixColumns || [];
+        labelText = '表示列';
+    } else {
+        items = chartData.matrixRows || [];
+    }
+
+    if (!Array.isArray(items) || items.length <= 1) return '';
+
+    const currentIndex = Math.max(0, Number(chartData.matrixSelectedIndex || 0));
+    const optionsHtml = items.map((item, index) => `
+        <option value="${index}" ${index === currentIndex ? 'selected' : ''}>${escapeHtml(item.text)}</option>
+    `).join('');
+
+    return `
+        <label class="inline-flex items-center gap-2 text-xs text-on-surface-variant font-medium">
+            <span>${labelText}</span>
+            <select
+                class="px-2 py-1.5 pr-8 rounded-md border border-outline-variant bg-surface text-on-surface text-xs appearance-none cursor-pointer hover:border-primary transition-colors focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                data-role="matrix-row-selector"
+                data-chart-id="${chartId}"
+                aria-label="マトリクス表示項目"
+                style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236b7280%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 0.5rem center; background-size: 0.65em auto;"
+            >
+                ${optionsHtml}
+            </select>
+        </label>
+    `;
+}
+
+function bindMatrixRowSelectorEvents() {
+    document.querySelectorAll('[data-role="matrix-row-selector"]').forEach(select => {
+        select.addEventListener('change', (event) => {
+            const chartId = event.currentTarget.dataset.chartId;
+            const rowIndex = Number(event.currentTarget.value);
+            if (!chartId || Number.isNaN(rowIndex)) return;
+            applyMatrixRowSelection(chartId, rowIndex);
+        });
+    });
+}
+
+function applyMatrixRowSelection(chartId, rowIndex) {
+    const chartData = chartDataStore.get(chartId);
+    if (!chartData || !chartData.isMatrix) return;
+
+    // Handle Column Selection (MA)
+    if (chartData.matrixSelectorType === 'column') {
+        // Switch Series based on selected Column index
+        const selectedColumn = chartData.matrixColumns[rowIndex];
+        if (!selectedColumn) return;
+
+        // Extract data for this column from all rows
+        // matrixSeries has data transposed: Series[ColIndex] -> [Row1, Row2...]
+        // So we just take the series at rowIndex
+        const targetSeries = chartData.matrixSeries[rowIndex];
+        if (!targetSeries) return;
+
+        chartData.matrixSelectedIndex = rowIndex;
+        chartData.matrixIndex = rowIndex + 1; // Display 1-based index
+        chartData.matrixRowText = selectedColumn.text;
+
+        // For Bar chart, data is simple array
+        chartData.data = targetSeries.data;
+        // chartData.labels is already set to Rows in buildMatrixCharts
+
+        // Update Chart Title etc
+        const card = document.querySelector(`[data-chart-card-id="${chartId}"]`);
+        if (card) {
+            const chip = card.querySelector('[data-role="question-chip"]');
+            if (chip) {
+                const baseChip = formatQuestionChip(chartData.questionBaseId || chartData.questionId);
+                chip.textContent = `${baseChip} [${chartData.matrixIndex}/${chartData.matrixColumns.length}]`;
+            }
+            const title = card.querySelector('[data-role="matrix-row-title"]');
+            if (title) {
+                title.textContent = selectedColumn.text;
+            }
+            // Update counts if needed? Total answers is per-respondent usually
+            // but for bar charts, maybe show sum of this column?
+            // Let's stick to valid respondents count (chartData.totalAnswers)
+        }
+
+        createChart(chartId, chartData, chartData.chartType);
+        // Summary table might need updates? 
+        // Summary table shows ALL data usually. We don't filter summary table.
+        // But maybe we want to highlight? For now, render as is.
+        renderChartSummaryTable(`summary-${chartId}`, chartData);
+        return;
+    }
+
+    // Handle Row Selection (SA)
+    if (!Array.isArray(chartData.matrixRowDetails)) return;
+    const selected = chartData.matrixRowDetails[rowIndex];
+    if (!selected) return;
+
+    chartData.matrixSelectedIndex = rowIndex;
+    chartData.matrixIndex = rowIndex + 1;
+    chartData.matrixRowText = selected.rowText;
+    chartData.labels = selected.labels;
+    chartData.data = selected.data;
+    chartData.totalAnswers = selected.totalAnswers;
+
+    const card = document.querySelector(`[data-chart-card-id="${chartId}"]`);
+    if (card) {
+        const chip = card.querySelector('[data-role="question-chip"]');
+        if (chip) {
+            const baseChip = formatQuestionChip(chartData.questionBaseId || chartData.questionId);
+            chip.textContent = `${baseChip} [${chartData.matrixIndex}/${chartData.matrixTotal}]`;
+        }
+        const title = card.querySelector('[data-role="matrix-row-title"]');
+        if (title) {
+            title.textContent = selected.rowText;
+        }
+        const answers = card.querySelector('[data-role="valid-answers"]');
+        if (answers) {
+            answers.textContent = `有効回答: ${chartData.totalAnswers}件`;
+        }
+    }
+
+    createChart(chartId, chartData, chartData.chartType);
+    renderChartSummaryTable(`summary-${chartId}`, chartData);
+}
+
+/**
+ * Creates or updates an ApexCharts instance.
+ */
+function createChart(chartId, chartData, type) {
+    const container = document.getElementById(chartId);
+    if (!container) return;
+
+    if (chartInstances[chartId]) {
+        chartInstances[chartId].destroy();
+    }
+
+    const isMatrixStacked = type === 'matrix_stacked' || type === 'matrix_stacked_100';
+    const isStacked100 = type === 'matrix_stacked_100';
+    const isDoughnut = type === 'pie';
+
+    // For Matrix Stacked, Categories are the Rows
+    const categoryLabels = isMatrixStacked
+        ? (chartData.matrixRows || []).map(row => row.text)
+        : chartData.labels;
+
+    // Determine Legend Configuration
+    // For Stacked, series names are used in legend
+    const legendSource = isMatrixStacked
+        ? (chartData.matrixSeries || []).map(s => s.name)
+        : categoryLabels;
+
+    const legendConfig = getLegendConfig(legendSource);
+
+    // Dynamic Height Calculation for Matrix
+    // Base height + (row count * row height estimate)
+    const baseHeight = 100; // Title, padding, etc.
+    const rowHeight = 40;   // Height per bar
+
+    const isHorizontalBar = type === 'bar' && chartData.isMatrix; // Only treat Matrix Bar as strictly horizontal & auto-height for now
+
+    const calculatedHeight = (isMatrixStacked || isHorizontalBar)
+        ? Math.max(350, baseHeight + (categoryLabels.length * rowHeight) + (legendConfig.height || 50))
+        : (isDoughnut ? legendConfig.chartHeight : 350);
+
+    const matrixRowTotals = chartData.matrixRowTotals || [];
+
+    const tooltipForStacked = ({ series, seriesIndex, dataPointIndex, w }) => {
+        const rowLabel = w.globals.labels?.[dataPointIndex] || '';
+        const seriesLabel = w.globals.seriesNames?.[seriesIndex] || '';
+        const count = Number(series?.[seriesIndex]?.[dataPointIndex] || 0);
+        const total = Number(matrixRowTotals[dataPointIndex] || 0);
+
+        // If 100% stacked, ApexCharts shows percentage in tooltip automatically? 
+        // No, custom tooltip replaces it. We want to show Count AND Percentage relative to Row Total.
+        const ratio = total > 0 ? ((count / total) * 100).toFixed(1) : '0.0';
+
+        return `
+            <div class="apexcharts-tooltip-series-group apexcharts-active" style="order: 1; display: flex;">
+                <span class="apexcharts-tooltip-marker" style="background-color: ${w.globals.colors[seriesIndex]};"></span>
+                <div class="apexcharts-tooltip-text" style="font-family: Helvetica, Arial, sans-serif; font-size: 12px; margin-left: 5px;">
+                    <div class="apexcharts-tooltip-y-group">
+                        <span class="apexcharts-tooltip-text-y-label">${escapeHtml(seriesLabel)}: </span>
+                        <span class="apexcharts-tooltip-text-y-value">${count}件 (${ratio}%)</span>
+                    </div>
+                </div>
+            </div>
+            <div style="padding: 4px 8px; font-size: 11px; color: #666; border-top: 1px solid #eee; margin-top: 4px;">
+                ${escapeHtml(rowLabel)} (全体: ${total}件)
+            </div>
+        `;
+    };
+
+    const options = {
+        series: isMatrixStacked
+            ? (chartData.matrixSeries || [])
+            : (isDoughnut ? chartData.data : [{ name: '件数', data: chartData.data }]),
+        chart: {
+            type: isDoughnut ? 'donut' : 'bar',
+            height: calculatedHeight,
+            width: '100%',
+            fontFamily: "'Noto Sans JP', sans-serif",
+            toolbar: { show: false },
+            animations: { enabled: true, easing: 'easeinout', speed: 800 },
+            padding: { top: 10, right: 10, bottom: 10, left: 10 },
+            stacked: isMatrixStacked,
+            stackType: isStacked100 ? '100%' : undefined
+        },
+        colors: isMatrixStacked ? COMMON_CHART_DONUT_PALETTE
+            : chartData.questionType === 'rating_scale' ? generateScaleGradient(chartData.data.length)
+            : (isDoughnut ? GRAPH_CHART_DONUT_PALETTE : GRAPH_CHART_COLOR_PALETTE),
+        labels: categoryLabels,
+        plotOptions: {
+            pie: {
+                donut: {
+                    size: '72%',
+                    labels: {
+                        show: displayOptions.showCenterText,
+                        total: {
+                            show: true,
+                            label: '有効回答数',
+                            fontSize: '14px',
+                            fontWeight: 600,
+                            color: GRAPH_CHART_MUTED_TEXT,
+                            formatter: () => chartData.totalAnswers.toLocaleString()
+                        },
+                        value: {
+                            fontSize: '32px',
+                            fontWeight: 800,
+                            color: GRAPH_CHART_TEXT,
+                            offsetY: 5
+                        }
+                    }
+                }
+            },
+            bar: {
+                horizontal: isHorizontalBar || type === 'bar', // Default to horizontal for 'bar' type, or keep consistent
+                distributed: !isDoughnut && !isMatrixStacked,
+                borderRadius: 4, // Slightly smaller radius for stacked
+                barHeight: '60%', // Thinner bars for better spacing
+                dataLabels: { position: 'top' }
+            }
+        },
+        dataLabels: {
+            enabled: isMatrixStacked ? true : displayOptions.showDataLabels,
+            formatter: (val, opts) => {
+                if (isDoughnut) return Math.round(val) + "%";
+                if (isStacked100) return Math.round(val) + "%"; // Show % on bar for 100% stacked
+                return val > 0 ? val : ""; // Hide 0 counts to reduce clutter
+            },
+            style: {
+                fontSize: '11px',
+                fontWeight: 700,
+                colors: isDoughnut ? ['#fff'] : (isMatrixStacked ? ['#fff'] : [GRAPH_CHART_TEXT])
+            },
+            offsetX: isDoughnut ? 0 : (isMatrixStacked ? 0 : 40),
+            dropShadow: { enabled: isMatrixStacked } // Better visibility on colored bars
+        },
+        legend: {
+            show: isDoughnut || isMatrixStacked,
+            position: isMatrixStacked ? 'bottom' : legendConfig.position, // Matrix legend at bottom usually better
+            height: undefined, // Let it flow
+            fontSize: '13px',
+            fontFamily: "'Noto Sans JP', sans-serif",
+            markers: { radius: 12, width: 12, height: 12 },
+            itemMargin: { horizontal: 8, vertical: 4 }
+        },
+        grid: {
+            show: displayOptions.showGrid,
+            borderColor: GRAPH_CHART_GRID,
+            padding: { left: 20, right: 40 }
+        },
+        xaxis: {
+            categories: categoryLabels,
+            labels: {
+                show: !isDoughnut,
+                style: { fontSize: '12px', fontWeight: 500 },
+                formatter: (val) => {
+                    if (isStacked100) return val + "%"; // X-axis is %
+                    return val;
+                }
+            },
+            max: isStacked100 ? 100 : undefined
+        },
+        yaxis: {
+            labels: {
+                show: !isDoughnut,
+                maxWidth: 200,
+                style: { fontSize: '13px', fontWeight: 600 },
+                formatter: (value) => {
+                    // Truncate long row labels
+                    if (typeof value === 'string' && value.length > 15) {
+                        return value.substring(0, 15) + '...';
+                    }
+                    return value;
+                }
+            }
+        },
+        stroke: { show: true, width: 1, colors: ['#fff'] },
+        tooltip: isMatrixStacked
+            ? { shared: true, intersect: false, custom: tooltipForStacked }
+            : { shared: false, intersect: true }
+    };
+
+    chartInstances[chartId] = new ApexCharts(container, options);
+    chartInstances[chartId].render();
+}
+
+/**
+ * Renders the summary table for a chart.
+ */
+function renderChartSummaryTable(summaryId, chartData) {
+    const container = document.getElementById(summaryId);
+    if (!container) return;
+
+    if (chartData.summaryType === 'matrix_table') {
+        const rows = chartData.matrixRows || [];
+        const columns = chartData.matrixColumns || [];
+        const series = chartData.matrixSeries || [];
+        const totalAll = (chartData.matrixRowTotals || []).reduce((sum, total) => sum + total, 0);
+
+        if (rows.length === 0 || columns.length === 0 || series.length === 0) {
+            container.innerHTML = '<p class="text-on-surface-variant text-sm">集計データがありません。</p>';
+            return;
+        }
+
+        const countByColumn = new Map(series.map(item => [item.name, item.data || []]));
+        const headerCells = columns.map(col => `
+            <th class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums min-w-[80px] whitespace-nowrap">${escapeHtml(col.text)}</th>
+        `).join('');
+        const bodyRows = rows.map((row, rowIndex) => {
+            const total = Number(chartData.matrixRowTotals[rowIndex] || 0);
+            const cells = columns.map(col => {
+                const values = countByColumn.get(col.text) || [];
+                const count = Number(values[rowIndex] || 0);
+                const ratio = total > 0 ? ((count / total) * 100).toFixed(1) : '0.0';
+                return `<td class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums align-top">${count}件<span class="text-[10px] text-on-surface-variant ml-1">(${ratio}%)</span></td>`;
+            }).join('');
+            return `
+                <tr>
+                    <td class="px-3 py-2 border-b border-outline-variant align-top">
+                        <div class="cell-truncate-container" title="${escapeHtml(row.text)}">${escapeHtml(row.text)}</div>
+                    </td>
+                    ${cells}
+                    <td class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums align-top">${total}件</td>
+                </tr>
+            `;
+        }).join('');
+        const totalRow = columns.map(col => {
+            const values = countByColumn.get(col.text) || [];
+            const subtotal = values.reduce((sum, count) => sum + Number(count || 0), 0);
+            return `<td class="px-3 py-2 text-right font-mono tabular-nums">${subtotal}件</td>`;
+        }).join('');
+
+        container.innerHTML = `
+            <div class="chart-summary-scroll-area border border-outline-variant rounded-lg overflow-x-auto">
+                <table class="table-auto text-left text-sm">
+                    <thead class="bg-surface-variant-soft text-on-surface-variant sticky top-0 z-10 shadow-[0_1px_0_0_rgba(0,0,0,0.05)]">
+                        <tr>
+                            <th class="px-3 py-2 border-b border-outline-variant min-w-[150px] whitespace-nowrap">行項目</th>
+                            ${headerCells}
+                            <th class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums min-w-[60px] whitespace-nowrap">合計</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${bodyRows}
+                        <tr class="font-semibold bg-surface-variant/5">
+                            <td class="px-3 py-2">合計</td>
+                            ${totalRow}
+                            <td class="px-3 py-2 text-right font-mono tabular-nums">${totalAll}件</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        `;
+        return;
+    }
+
+    if (chartData.summaryType === 'rating_table') {
+        const totalVotes = chartData.totalAnswers || 0;
+        const avg = Number(chartData.ratingScaleAverage || 0).toFixed(2);
+        const points = chartData.ratingScalePoints || 5;
+        const tableRows = (chartData.labels || []).map((label, i) => {
+            const count = chartData.data[i] || 0;
+            const pct = totalVotes > 0 ? ((count / totalVotes) * 100).toFixed(1) : '0.0';
+            return `
+                <tr>
+                    <td class="px-3 py-2 border-b border-outline-variant align-top">
+                        <div class="cell-truncate-container">${escapeHtml(label)}</div>
+                    </td>
+                    <td class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums align-top">${count}件</td>
+                    <td class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums align-top">${pct}%</td>
+                </tr>
+            `;
+        }).join('');
+        container.innerHTML = `
+            <div class="chart-summary-scroll-area border border-outline-variant rounded-lg overflow-x-auto">
+                <table class="table-auto text-left text-sm w-full">
+                    <thead class="bg-surface-variant-soft text-on-surface-variant sticky top-0 z-10 shadow-[0_1px_0_0_rgba(0,0,0,0.05)]">
+                        <tr>
+                            <th class="px-3 py-2 border-b border-outline-variant min-w-[150px] whitespace-nowrap">スコア</th>
+                            <th class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums w-[80px] whitespace-nowrap">件数</th>
+                            <th class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums w-[80px] whitespace-nowrap">割合</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${tableRows}
+                        <tr class="font-semibold bg-surface-variant/5">
+                            <td class="px-3 py-2">合計</td>
+                            <td class="px-3 py-2 text-right font-mono tabular-nums">${totalVotes}件</td>
+                            <td class="px-3 py-2 text-right font-mono tabular-nums">100.0%</td>
+                        </tr>
+                        <tr class="bg-primary/5">
+                            <td class="px-3 py-2 text-sm font-semibold text-primary">
+                                <span class="inline-flex items-center gap-1"><span class="material-icons text-sm">linear_scale</span>平均スコア</span>
+                            </td>
+                            <td class="px-3 py-2 text-right font-mono tabular-nums font-bold text-primary" colspan="2">${avg} / ${points}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        `;
+        return;
+    }
+
+    if (chartData.chartType === 'list') {
+        const rows = chartData.listAll || [];
+        const itemsHtml = rows.length > 0
+            ? rows.map(item => {
+                const isMedia = ['image', 'photo', 'handwriting', 'file', 'file_upload', 'upload'].includes(chartData.questionType);
+                let valueHtml = escapeHtml(item.value);
+                if (isMedia && item.value && (item.value.startsWith('http') || item.value.startsWith('.') || item.value.startsWith('/') || item.value.startsWith('data:'))) {
+                    let linkText = escapeHtml(item.value);
+                    if (item.answerId && item.surveyId) {
+                        // Extract sequence (e.g. A001 -> 0001)
+                        const seqMatch = item.answerId.match(/\d+/);
+                        const seq = seqMatch ? String(seqMatch[0]).padStart(4, '0') : '0000';
+
+                        // Extract question number (e.g. Q9 -> 09)
+                        const qNumMatch = (chartData.questionBaseId || chartData.questionId).match(/\d+/);
+                        const qNum = qNumMatch ? String(qNumMatch[0]).padStart(2, '0') : '00';
+
+                        // File extension
+                        let ext = 'png';
+                        if (!item.value.startsWith('data:')) {
+                            const parts = item.value.split('.');
+                            if (parts.length > 1) {
+                                const e = parts.pop();
+                                if (e.length < 5) ext = e;
+                            }
+                        }
+
+                        const type = item.type || 'image';
+                        linkText = `${item.surveyId}_${seq}_${qNum}_${type}.${ext}`;
+                    }
+
+                    valueHtml = `<button type="button" data-preview-url="${escapeHtml(item.value)}" onclick="window.previewImage(this.dataset.previewUrl)" class="text-primary hover:underline inline-flex items-center gap-1 group transition-colors text-left">
+                        <span class="material-icons text-sm group-hover:text-primary-dark transition-colors">image</span>
+                        <span class="truncate border-b border-transparent group-hover:border-primary-dark transition-all">${linkText}</span>
+                    </button>`;
+                }
+                return `
+                <tr>
+                    <td class="px-3 py-2 border-b border-outline-variant align-top">
+                        <div class="cell-truncate-container" title="${escapeHtml(item.value)}">${valueHtml}</div>
+                    </td>
+                    <td class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums align-top whitespace-nowrap text-on-surface-variant text-[11px]">${escapeHtml(item.answeredAtLabel)}</td>
+                </tr>
+            `;
+            }).join('')
+            : `
+                <tr>
+                    <td class="px-3 py-3 text-on-surface-variant" colspan="2">回答がありません。</td>
+                </tr>
+            `;
+        const shownCount = rows.length;
+        const footerHtml = `<p class="pt-3 text-xs text-on-surface-variant text-right">${shownCount} / ${rows.length}件を表示中</p>`;
+
+        container.innerHTML = `
+            <div class="chart-summary-scroll-area chart-summary-scroll-area--list-15 border border-outline-variant rounded-lg">
+                <table class="table-layout-fixed text-left text-sm">
+                    <thead class="bg-surface-variant-soft text-on-surface-variant sticky top-0 z-10 shadow-[0_1px_0_0_rgba(0,0,0,0.05)]">
+                        <tr>
+                            <th class="px-3 py-2 border-b border-outline-variant w-full">回答</th>
+                            <th class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums w-[100px]">回答日時</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${itemsHtml}
+                    </tbody>
+                </table>
+            </div>
+            ${footerHtml}
+        `;
+        return;
+    }
+
+    const totalVotes = chartData.totalAnswers || 0;
+
+    let html = `
+        <div class="chart-summary-scroll-area border border-outline-variant rounded-lg overflow-x-auto">
+            <table class="table-auto text-left text-sm">
+                <thead class="bg-surface-variant-soft text-on-surface-variant sticky top-0 z-10 shadow-[0_1px_0_0_rgba(0,0,0,0.05)]">
+                    <tr>
+                        <th class="px-3 py-2 border-b border-outline-variant min-w-[150px] whitespace-nowrap">項目</th>
+                        <th class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums w-[80px] whitespace-nowrap">件数</th>
+                        <th class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums w-[80px] whitespace-nowrap">割合</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    chartData.labels.forEach((label, index) => {
+        const count = chartData.data[index] || 0;
+        const percentage = totalVotes > 0 ? ((count / totalVotes) * 100).toFixed(1) : '0.0';
+        html += `
+            <tr>
+                <td class="px-3 py-2 border-b border-outline-variant align-top">
+                    <div class="cell-truncate-container" title="${escapeHtml(label)}">${escapeHtml(label)}</div>
+                </td>
+                <td class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums align-top">${count}件</td>
+                <td class="px-3 py-2 border-b border-outline-variant text-right font-mono tabular-nums align-top">${percentage}%</td>
+            </tr>
+        `;
+    });
+
+    if (chartData.includeTotalRow) {
+        const totalPercentage = totalVotes > 0 ? '100.0%' : '0.0%';
+        html += `
+            <tr class="font-semibold bg-surface-variant/5">
+                <td class="px-3 py-2">合計</td>
+                <td class="px-3 py-2 text-right font-mono tabular-nums">${totalVotes}件</td>
+                <td class="px-3 py-2 text-right font-mono tabular-nums">${totalPercentage}</td>
+            </tr>
+        `;
+    }
+
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+    container.innerHTML = html;
+}
+
+async function showExportOptionsModal(chartsData) {
+    const container = document.getElementById('export-options-modal-container');
+    if (!container.innerHTML) {
+        const response = await fetch('modals/exportOptionsModal.html');
+        container.innerHTML = await response.text();
+    }
+
+    const modal = document.getElementById('exportOptionsModal');
+    const confirmBtn = document.getElementById('confirm-export-btn');
+    const cancelBtn = document.getElementById('cancel-export-btn');
+    const closeBtn = modal.querySelector('.close-modal-btn');
+
+    const openModal = () => {
+        modal.setAttribute('data-state', 'open');
+        document.body.classList.add('overflow-hidden');
+    };
+
+    const closeModal = () => {
+        modal.setAttribute('data-state', 'closed');
+        document.body.classList.remove('overflow-hidden');
+    };
+
+    confirmBtn.onclick = () => {
+        const options = {
+            includeTOC: document.getElementById('export-opt-toc').checked,
+            includeCharts: document.getElementById('export-opt-charts').checked,
+            includeMatrixFull: document.getElementById('export-opt-matrix-all').checked,
+            includeExclusions: document.getElementById('export-opt-exclusions').checked
+        };
+        closeModal();
+        executeExcelExport(chartsData, options);
+    };
+
+    cancelBtn.onclick = closeModal;
+    closeBtn.onclick = closeModal;
+    openModal();
+}
+
+async function executeExcelExport(chartsData, options) {
+    const ExcelJSInstance = window.ExcelJS || (typeof ExcelJS !== 'undefined' ? ExcelJS : null);
+    if (!ExcelJSInstance || typeof ExcelJSInstance.Workbook !== 'function') {
+        alert('Excelエクスポート用のライブラリ(ExcelJS)が読み込めませんでした。');
+        return;
+    }
+
+    const exportBtn = document.getElementById('excel-export-all');
+    const originalBtnHtml = exportBtn.innerHTML;
+    const overlay = document.getElementById('export-progress-overlay');
+    const progressText = document.getElementById('export-progress-text');
+    const progressBar = document.getElementById('export-progress-bar');
+    const progressPercent = document.getElementById('export-progress-percent');
+    const progressIcon = document.getElementById('export-progress-icon');
+    const successIconClass = 'text-success';
+    let exportSucceeded = false;
+
+    const yieldToMain = () => new Promise(resolve => setTimeout(resolve, 50));
+
+    try {
+        isExporting = true;
+        if (exportBtn) {
+            exportBtn.disabled = true;
+            exportBtn.style.opacity = '0.7';
+            exportBtn.innerHTML = `
+                <span class="material-icons animate-spin text-sm mr-2">sync</span>
+                <span>出力タスク実行中</span>
+            `;
+        }
+        if (overlay) {
+            overlay.classList.remove('hidden', 'opacity-0');
+            overlay.classList.add('opacity-100');
+        }
+        if (progressIcon) {
+            progressIcon.textContent = 'sync';
+            progressIcon.classList.add('animate-spin', 'text-primary');
+            progressIcon.classList.remove(successIconClass);
+        }
+        if (progressPercent) progressPercent.textContent = '0%';
+
+        const workbook = new ExcelJSInstance.Workbook();
+        const totalCharts = chartsData.length;
+        let processedCount = 0;
+
+        // 目次シートの準備
+        let tocSheet = null;
+        if (options.includeTOC) {
+            tocSheet = workbook.addWorksheet('目次', { views: [{ showGridLines: false }] });
+            tocSheet.addRow(['分析レポート 目次']).font = { bold: true, size: 18 };
+            tocSheet.addRow([`アンケート: ${currentSurvey?.name?.ja || ''}`]);
+            tocSheet.addRow([`出力日時: ${new Date().toLocaleString('ja-JP')}`]);
+            tocSheet.addRow([]);
+            tocSheet.addRow(['No.', '設問内容', 'シート']);
+            tocSheet.getRow(5).font = { bold: true };
+            tocSheet.getRow(5).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE0EDFF' } };
+            tocSheet.getColumn(1).width = 6;
+            tocSheet.getColumn(2).width = 60;
+            tocSheet.getColumn(3).width = 15;
+        }
+
+        for (let i = 0; i < chartsData.length; i++) {
+            const chartData = chartsData[i];
+            processedCount++;
+            const percent = Math.round((processedCount / totalCharts) * 100);
+            if (progressText) progressText.textContent = `${totalCharts}件中 ${processedCount}件目を処理中...`;
+            if (progressBar) progressBar.style.width = `${percent}%`;
+            if (progressPercent) progressPercent.textContent = `${percent}%`;
+
+            await yieldToMain();
+
+            const questionNo = formatQuestionChip(chartData.questionId);
+            const isBlank = chartData.chartType === 'blank';
+
+            if (isBlank && !options.includeExclusions) continue;
+
+            const sheetName = isBlank ? `Ex_${questionNo}` : questionNo;
+            const sheet = workbook.addWorksheet(sheetName, { views: [{ showGridLines: false }] });
+
+            if (options.includeTOC) {
+                const row = tocSheet.addRow([questionNo, chartData.questionText, sheetName]);
+                row.getCell(3).value = { text: sheetName, hyperlink: `#'${sheetName}'!A1` };
+                row.getCell(3).font = { color: { argb: 'FF0000FF' }, underline: true };
+            }
+
+            const titleRow = sheet.addRow([`${questionNo}: ${chartData.questionText}`]);
+            titleRow.font = { bold: true, size: 16 };
+            sheet.addRow([]);
+
+            if (chartData.summaryType === 'matrix_table') {
+                // For Matrix, we now just take the single stacked chart image
+                const rows = chartData.matrixRows || [];
+                const columns = chartData.matrixColumns || [];
+                const rowDetails = chartData.matrixRowDetails || []; // We removed this from chartData potentially, wait. 
+                // In new buildMatrixCharts, we return 'data' in rowDetails. Wait.
+                // Re-checking buildMatrixCharts...
+                // I removed matrixRowDetails from the return object in buildMatrixCharts!
+                // Ah, chartData.matrixSeries has the data now. 
+                // But simplified summary table logic in 'renderChartSummaryTable' (which I didn't edit) might break?
+                // renderChartSummaryTable uses chartData.matrixRows, matrixColumns, matrixSeries, matrixRowTotals.
+                // It iterates matrixRows and fills cells.
+
+                // Let's implement Excel table building specifically for new structure
+
+                const header = ['行項目', ...columns.map(c => c.text), '合計'];
+
+                // Reconstruct row data from Series to rows
+                // Series k -> data[rowIndex] is count for column k at row rowIndex
+                const tableRows = rows.map((row, rIdx) => {
+                    const counts = columns.map((col, cIdx) => {
+                        const series = chartData.matrixSeries[cIdx];
+                        return series.data[rIdx] || 0;
+                    });
+                    const rowTotal = chartData.matrixRowTotals[rIdx] || 0;
+                    return [row.text, ...counts, rowTotal];
+                });
+
+                sheet.addTable({
+                    name: `Table_${questionNo}`,
+                    ref: 'A3',
+                    headerRow: true,
+                    style: { theme: 'TableStyleMedium2', showRowStripes: true },
+                    columns: header.map(name => ({ name, filterButton: false })),
+                    rows: tableRows
+                });
+
+                sheet.getColumn(1).width = 30;
+                columns.forEach((_, cIdx) => {
+                    sheet.getColumn(2 + cIdx).width = 12;
+                    sheet.getColumn(2 + cIdx).numFmt = '#,##0"件"';
+                });
+                sheet.getColumn(2 + columns.length).width = 12;
+                sheet.getColumn(2 + columns.length).numFmt = '#,##0"件"';
+
+                if (options.includeCharts && !isBlank) {
+                    await yieldToMain();
+
+                    if (chartData.chartType === 'pie' && chartData.isMatrix) {
+                        // Matrix Single: Export ALL rows as Pie Charts
+                        // Create a temporary hidden container for rendering
+                        const tempContainer = document.createElement('div');
+                        tempContainer.style.position = 'absolute';
+                        tempContainer.style.left = '-9999px';
+                        tempContainer.style.top = '-9999px';
+                        tempContainer.style.width = '600px';
+                        document.body.appendChild(tempContainer);
+
+                        const rowDetails = chartData.matrixRowDetails || [];
+                        let currentRowStart = 5 + rows.length + 3; // Start below table
+
+                        for (let r = 0; r < rowDetails.length; r++) {
+                            const detail = rowDetails[r];
+                            const tempChartId = `temp-export-chart-${processedCount}-${r}`;
+                            const chartWrapper = document.createElement('div');
+                            chartWrapper.id = tempChartId;
+                            tempContainer.appendChild(chartWrapper);
+
+                            // Render Title
+                            const titleEl = document.createElement('div');
+                            titleEl.textContent = `${detail.rowText}`;
+                            titleEl.style.fontFamily = 'Noto Sans JP';
+                            titleEl.style.fontWeight = 'bold';
+                            titleEl.style.fontSize = '14px';
+                            titleEl.style.marginBottom = '5px';
+                            titleEl.style.textAlign = 'center';
+                            chartWrapper.appendChild(titleEl);
+
+                            const chartDiv = document.createElement('div');
+                            chartWrapper.appendChild(chartDiv);
+
+                            // Build temp chart data
+                            const tempChartData = {
+                                ...chartData,
+                                data: detail.data,
+                                totalAnswers: detail.totalAnswers,
+                                labels: chartData.matrixColumns.map(c => c.text)
+                            };
+
+                            // Create chart instance
+                            // Reuse createChart logic but we need access to it, or manually call ApexCharts
+                            const options = {
+                                series: tempChartData.data,
+                                chart: {
+                                    type: 'donut',
+                                    height: 300,
+                                    width: '100%',
+                                    animations: { enabled: false }, // Disable animation for faster export
+                                    fontFamily: "'Noto Sans JP', sans-serif"
+                                },
+                                colors: GRAPH_CHART_DONUT_PALETTE,
+                                labels: tempChartData.labels,
+                                plotOptions: {
+                                    pie: {
+                                        donut: {
+                                            size: '65%',
+                                            labels: {
+                                                show: true,
+                                                total: {
+                                                    show: true,
+                                                    label: '回答数',
+                                                    formatter: () => detail.totalAnswers.toLocaleString()
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                dataLabels: {
+                                    enabled: true,
+                                    formatter: (val) => Math.round(val) + "%",
+                                    style: { fontSize: '11px', fontWeight: 700, colors: ['#fff'] }
+                                },
+                                legend: { position: 'right', fontSize: '12px' }
+                            };
+
+                            const chart = new ApexCharts(chartDiv, options);
+                            chart.render();
+
+                            // Wait for render
+                            await new Promise(resolve => setTimeout(resolve, 500));
+
+                            // Capture
+                            try {
+                                const canvas = await html2canvas(chartWrapper, { useCORS: true, backgroundColor: '#ffffff', scale: 2 });
+                                const base64Image = canvas.toDataURL('image/png');
+                                const imageId = workbook.addImage({ base64: base64Image, extension: 'png' });
+
+                                const ratio = canvas.height / canvas.width;
+                                const displayWidth = 400;
+                                const displayHeight = displayWidth * ratio;
+
+                                sheet.addImage(imageId, {
+                                    tl: { col: 0, row: currentRowStart },
+                                    ext: { width: displayWidth, height: displayHeight }
+                                });
+
+                                // Move next position
+                                currentRowStart += Math.ceil(displayHeight / 20) + 2;
+
+                            } catch (e) {
+                                console.error('Error capturing matrix row chart', e);
+                            }
+
+                            chart.destroy();
+                            tempContainer.innerHTML = ''; // Clear for next
+                        }
+
+                        document.body.removeChild(tempContainer);
+
+                    } else if (chartData.isMatrix && chartData.chartType === 'bar') {
+                        // Matrix Multi (Row Selector): Export ALL ROWS as Bar Charts
+                        // Similar to Pie implementation but for Bar
+                        const tempContainer = document.createElement('div');
+                        tempContainer.style.position = 'absolute';
+                        tempContainer.style.left = '-9999px';
+                        tempContainer.style.top = '-9999px';
+                        tempContainer.style.width = '600px';
+                        document.body.appendChild(tempContainer);
+
+                        const rowDetails = chartData.matrixRowDetails || [];
+                        const columns = chartData.matrixColumns || [];
+                        let currentRowStart = 5 + rows.length + 3;
+
+                        for (let r = 0; r < rowDetails.length; r++) {
+                            const detail = rowDetails[r];
+                            const tempChartId = `temp-export-chart-ma-row-${processedCount}-${r}`;
+                            const chartWrapper = document.createElement('div');
+                            chartWrapper.id = tempChartId;
+                            tempContainer.appendChild(chartWrapper);
+
+                            // Title
+                            const titleEl = document.createElement('div');
+                            titleEl.textContent = `${detail.rowText}`; // Or use row total
+                            titleEl.style.fontFamily = 'Noto Sans JP';
+                            titleEl.style.fontWeight = 'bold';
+                            titleEl.style.fontSize = '14px';
+                            titleEl.style.marginBottom = '5px';
+                            titleEl.style.textAlign = 'center';
+                            chartWrapper.appendChild(titleEl);
+
+                            const chartDiv = document.createElement('div');
+                            chartWrapper.appendChild(chartDiv);
+
+                            // ApexCharts Options for Bar
+                            const options = {
+                                series: [{ name: '回答数', data: detail.data }],
+                                chart: {
+                                    type: 'bar',
+                                    height: 300,
+                                    width: '100%',
+                                    animations: { enabled: false },
+                                    fontFamily: "'Noto Sans JP', sans-serif",
+                                    toolbar: { show: false }
+                                },
+                                plotOptions: {
+                                    bar: {
+                                        horizontal: true,
+                                        barHeight: '60%',
+                                        distributed: true
+                                    }
+                                },
+                                colors: GRAPH_CHART_COLOR_PALETTE,
+                                dataLabels: { enabled: true },
+                                xaxis: {
+                                    categories: columns.map(c => c.text)
+                                },
+                                grid: {
+                                    xaxis: { lines: { show: true } }
+                                },
+                                legend: { show: false }
+                            };
+
+                            const chart = new ApexCharts(chartDiv, options);
+                            chart.render();
+                            await new Promise(resolve => setTimeout(resolve, 500));
+
+                            try {
+                                const canvas = await html2canvas(chartWrapper, { useCORS: true, backgroundColor: '#ffffff', scale: 2 });
+                                const base64Image = canvas.toDataURL('image/png');
+                                const imageId = workbook.addImage({ base64: base64Image, extension: 'png' });
+
+                                const ratio = canvas.height / canvas.width;
+                                const displayWidth = 400;
+                                const displayHeight = displayWidth * ratio;
+
+                                sheet.addImage(imageId, {
+                                    tl: { col: 0, row: currentRowStart },
+                                    ext: { width: displayWidth, height: displayHeight }
+                                });
+
+                                currentRowStart += Math.ceil(displayHeight / 20) + 2;
+
+                            } catch (e) {
+                                console.error('Error capturing matrix row bar chart', e);
+                            }
+                            chart.destroy();
+                            tempContainer.innerHTML = '';
+                        }
+                        document.body.removeChild(tempContainer);
+
+                    } else {
+                        // Capture the single stacked chart (fallback or MA stacked)
+                        // If we implemented 'column' selector, this block might be skipped for MA.
+                        // But wait, buildMatrixCharts sets 'column' selector for MA. 
+                        // So MA goes to the block above.
+                        // SA goes to 'pie' block above.
+                        // Regular stacked (if any left) goes here.
+
+                        const chartElement = document.getElementById(`chart-${chartData.chartId}`);
+                        if (chartElement) {
+                            const canvas = await html2canvas(chartElement, { useCORS: true, backgroundColor: '#ffffff', scale: 2 });
+                            const base64Image = canvas.toDataURL('image/png');
+                            const imageId = workbook.addImage({ base64: base64Image, extension: 'png' });
+
+                            const ratio = canvas.height / canvas.width;
+                            const displayWidth = 550;
+                            const displayHeight = displayWidth * ratio;
+                            const startRow = 5 + rows.length + 2;
+
+                            sheet.addImage(imageId, {
+                                tl: { col: 0, row: startRow },
+                                ext: { width: displayWidth, height: displayHeight }
+                            });
+                        }
+                    }
+                }
+            } else if (chartData.chartType === 'list') {
+                const listRows = (chartData.listAll || []).map(item => [item.value, item.answeredAtLabel]);
+                sheet.addTable({
+                    name: `Table_${questionNo}`,
+                    ref: 'A3',
+                    headerRow: true,
+                    columns: [{ name: '回答' }, { name: '回答日時' }],
+                    rows: listRows.length > 0 ? listRows : [['回答なし', '']]
+                });
+                sheet.getColumn(1).width = 60;
+                sheet.getColumn(2).width = 20;
+            } else {
+                const rows = chartData.labels.map((label, index) => {
+                    const count = chartData.data[index] || 0;
+                    const total = chartData.totalAnswers || 1;
+                    return [label, count, count / total];
+                });
+
+                sheet.addTable({
+                    name: `Table_${questionNo}`,
+                    ref: 'A3',
+                    headerRow: true,
+                    totalsRow: chartData.includeTotalRow,
+                    style: { theme: 'TableStyleMedium2', showRowStripes: true },
+                    columns: [
+                        { name: '項目', totalsRowLabel: '合計' },
+                        { name: '回答数', totalsRowFunction: 'sum' },
+                        { name: '割合' }
+                    ],
+                    rows: rows
+                });
+
+                sheet.getColumn(1).width = 40;
+                sheet.getColumn(2).width = 12;
+                sheet.getColumn(3).width = 12;
+                sheet.getColumn(2).numFmt = '#,##0"件"';
+                sheet.getColumn(3).numFmt = '0.0%';
+
+                if (options.includeCharts && !isBlank) {
+                    const chartElement = document.getElementById(`chart-${chartData.chartId}`);
+                    if (chartElement) {
+                        const canvas = await html2canvas(chartElement, { useCORS: true, backgroundColor: '#ffffff', scale: 2 });
+                        const base64Image = canvas.toDataURL('image/png');
+                        const imageId = workbook.addImage({ base64: base64Image, extension: 'png' });
+
+                        const ratio = canvas.height / canvas.width;
+                        const displayWidth = 480;
+                        const displayHeight = displayWidth * ratio;
+
+                        sheet.addImage(imageId, {
+                            tl: { col: 4, row: 2 },
+                            ext: { width: displayWidth, height: displayHeight }
+                        });
+                    }
+                }
+            }
+        }
+
+        if (progressText) progressText.textContent = `ファイルを保存しています...`;
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const url = window.URL.createObjectURL(blob);
+        const anchor = document.createElement('a');
+        const filename = `${sanitizeFilename(currentSurvey?.name?.ja || 'survey')}_分析レポート.xlsx`;
+        anchor.href = url;
+        anchor.download = filename;
+        anchor.click();
+        window.URL.revokeObjectURL(url);
+
+        showToast('分析レポートの出力が完了しました！', 'success');
+        exportSucceeded = true;
+    } catch (error) {
+        console.error('Excel出力エラー:', error);
+        showToast('Excelの生成中にエラーが発生しました。', 'error');
+    } finally {
+        isExporting = false;
+        if (exportBtn) {
+            exportBtn.disabled = false;
+            exportBtn.style.opacity = '1';
+            exportBtn.innerHTML = originalBtnHtml;
+        }
+        if (overlay) {
+            if (exportSucceeded) {
+                showExportCompletion(overlay, progressIcon, progressText, progressPercent);
+            } else {
+                overlay.classList.add('hidden');
+            }
+        }
+    }
+}
+
+// --- Utility Functions ---
+
+function loadDisplayOptions() {
+    try {
+        const stored = localStorage.getItem(DISPLAY_OPTIONS_STORAGE_KEY);
+        if (stored) return { ...DISPLAY_OPTIONS_DEFAULTS, ...JSON.parse(stored) };
+    } catch (e) { /* ignore */ }
+    return { ...DISPLAY_OPTIONS_DEFAULTS };
+}
+
+function saveDisplayOptions() {
+    try {
+        localStorage.setItem(DISPLAY_OPTIONS_STORAGE_KEY, JSON.stringify(displayOptions));
+    } catch (e) { /* ignore */ }
+}
+
+function showLoading(isLoading) {
+    document.getElementById('loading-indicator').style.display = isLoading ? 'block' : 'none';
+    if (isLoading) {
+        const container = document.getElementById('charts-container');
+        const skeletonCard = `
+            <div class="bg-surface rounded-2xl border border-outline-variant shadow-sm overflow-hidden flex flex-col animate-pulse">
+                <div class="p-5 border-b border-outline-variant/50 bg-surface-variant/5">
+                    <div class="flex justify-between items-start gap-4">
+                        <div class="flex items-center gap-3 w-full">
+                            <div class="w-8 h-8 rounded-lg bg-surface-variant/50 shrink-0"></div>
+                            <div class="flex-1">
+                                <div class="h-2 w-12 bg-surface-variant/50 rounded-full mb-2"></div>
+                                <div class="h-4 w-3/4 bg-surface-variant/50 rounded-full"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-5 flex-1 flex flex-col gap-6">
+                    <div class="w-full h-48 bg-surface-variant/30 rounded-xl"></div>
+                    <div class="space-y-3">
+                        <div class="h-3 w-full bg-surface-variant/20 rounded-full"></div>
+                        <div class="h-3 w-5/6 bg-surface-variant/20 rounded-full"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+        container.innerHTML = skeletonCard.repeat(4);
+        showError('', false);
+    }
+}
+
+function showError(message, show = true) {
+    const container = document.getElementById('error-display');
+    const msgElem = document.getElementById('error-message');
+    if (show) {
+        msgElem.textContent = message;
+        container.classList.remove('hidden');
+    } else {
+        container.classList.add('hidden');
+    }
+}
+
+function toHalfWidthDigits(value) {
+    return String(value).replace(/[０-９]/g, char => String.fromCharCode(char.charCodeAt(0) - 0xFEE0));
+}
+
+function formatQuestionChip(questionId) {
+    if (!questionId) return 'Q';
+    const raw = String(questionId);
+    const match = raw.match(/q\s*([0-9０-９]+)/i);
+    if (match) {
+        return `Q${toHalfWidthDigits(match[1])}`;
+    }
+    return raw.toUpperCase();
+}
+
+function getLegendConfig(labels = []) {
+    const labelStrings = labels.map(label => String(label ?? ''));
+    const totalLength = labelStrings.reduce((sum, label) => sum + label.length, 0);
+    const maxLength = Math.max(0, ...labelStrings.map(label => label.length));
+    const shouldPlaceRight = labelStrings.length > 6 || maxLength >= 12 || totalLength >= 60;
+    return {
+        position: shouldPlaceRight ? 'right' : 'bottom',
+        height: shouldPlaceRight ? 220 : undefined,
+        itemMargin: shouldPlaceRight ? { horizontal: 8, vertical: 6 } : { horizontal: 15, vertical: 8 },
+        chartHeight: shouldPlaceRight ? 380 : 350
+    };
+}
+
+function showExportCompletion(overlay, progressIcon, progressText, progressPercent) {
+    if (!overlay) return;
+    if (progressIcon) {
+        progressIcon.textContent = 'check_circle';
+        progressIcon.classList.remove('animate-spin');
+        progressIcon.classList.add('text-success');
+        progressIcon.classList.remove('text-primary');
+    }
+    if (progressText) progressText.textContent = '完了しました';
+    if (progressPercent) progressPercent.textContent = '100%';
+
+    overlay.classList.remove('hidden');
+    overlay.classList.remove('opacity-0');
+    overlay.classList.add('opacity-100');
+
+    setTimeout(() => {
+        overlay.classList.add('opacity-0');
+        setTimeout(() => {
+            overlay.classList.add('hidden');
+            overlay.classList.remove('opacity-0');
+            overlay.classList.remove('opacity-100');
+        }, 700);
+    }, 2500);
+}
+
+function escapeHtml(value) {
+    if (value === undefined || value === null) return '';
+    return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function getBlankReason(type) {
+    switch (type) {
+        case 'text': case 'free_text': return '自由記述のため';
+        case 'number': return '数値入力のため';
+        case 'date': case 'datetime': case 'datetime_local': case 'time': return '日付・時刻入力のため';
+        case 'handwriting': return '手書き入力のため';
+        case 'explanation': return '説明カードのため';
+        default: return '未対応の設問タイプ';
+    }
+}
+
+function normalizeQuestionText(text) {
+    if (!text) return '';
+    return String(text)
+        .toLowerCase()
+        .replace(/^[\s　]*q[0-9０-９]+[._、:：\s-]*/i, '')
+        .replace(/[()（）【】\[\]「」『』]/g, '')
+        .replace(/matrix|single|multi|choice|rating|sa|ma/gi, '')
+        .replace(/\s+/g, '')
+        .trim();
+}
+
+function findAnswerDetail(answer, question) {
+    if (!answer || !answer.details) return null;
+
+    // 1. Try matching by questionId or id (Exact Match & Preferred)
+    if (question.id) {
+        const idMatch = answer.details.find(detail => detail && (detail.questionId === question.id || detail.id === question.id));
+        if (idMatch) return idMatch;
+    }
+
+    // 2. Fallback to text matching (Legacy support)
+    const targetText = question.text || question.question || '';
+    if (!targetText) return null;
+
+    const normalizedTarget = normalizeQuestionText(targetText);
+    const details = answer.details.filter(detail => detail && detail.question);
+
+    const exact = details.find(detail => detail.question === targetText);
+    if (exact) return exact;
+
+    const normalizedMatch = details.find(detail => normalizeQuestionText(detail.question) === normalizedTarget);
+    if (normalizedMatch) return normalizedMatch;
+
+    if (normalizedTarget.length < 2) return null;
+
+    const fuzzyCandidates = details
+        .map(detail => ({ detail, normalized: normalizeQuestionText(detail.question) }))
+        .filter(item => item.normalized && (item.normalized.includes(normalizedTarget) || normalizedTarget.includes(item.normalized)))
+        .sort((a, b) => b.normalized.length - a.normalized.length);
+
+    if (fuzzyCandidates.length > 0) {
+        return fuzzyCandidates[0].detail;
+    }
+
+    if (MATRIX_SINGLE_TYPES.has(question.type) || MATRIX_MULTI_TYPES.has(question.type)) {
+        const matrixDetail = details.find(detail => detail.type === question.type || String(detail.type || '').startsWith('matrix_'));
+        if (matrixDetail) return matrixDetail;
+    }
+
+    return null;
+}
+
+function normalizeChoiceOptions(options = [], type = '') {
+    const isRating = type === 'rating';
+    const numericValues = [];
+    const labels = [];
+    const map = new Map();
+    options.forEach((opt, index) => {
+        if (opt && typeof opt === 'object') {
+            const value = opt.value ?? opt.id ?? opt.text ?? `option_${index + 1}`;
+            const text = opt.text ?? opt.label ?? opt.value ?? opt.id ?? String(value);
+            const label = isRating ? formatRatingLabel(value, options.length) : text;
+            if (isRating && !Number.isNaN(Number(value))) numericValues.push(Number(value));
+            labels.push(label);
+            map.set(String(value), label);
+            map.set(String(text), label);
+        } else if (opt !== undefined && opt !== null) {
+            const text = String(opt);
+            const label = isRating ? formatRatingLabel(opt, options.length) : text;
+            if (isRating && !Number.isNaN(Number(opt))) numericValues.push(Number(opt));
+            labels.push(label);
+            map.set(text, label);
+        }
+    });
+    if (isRating && numericValues.length > 0) {
+        const maxStars = Math.max(...numericValues);
+        labels.forEach((label, index) => {
+            const raw = options[index];
+            if (raw === undefined || raw === null) return;
+            const rawValue = typeof raw === 'object' ? (raw.value ?? raw.id ?? raw.text) : raw;
+            const rebuilt = formatRatingLabel(rawValue, maxStars);
+            labels[index] = rebuilt;
+            map.set(String(rawValue), rebuilt);
+        });
+    }
+    return { labels, map };
+}
+
+function resolveOptionLabel(value, optionsInfo) {
+    if (value === undefined || value === null || value === '') return null;
+    if (typeof value === 'object') {
+        const raw = value.value ?? value.text ?? value.label ?? value.id;
+        if (raw !== undefined && raw !== null) {
+            return optionsInfo.map.get(String(raw)) || String(raw);
+        }
+        return null;
+    }
+    return optionsInfo.map.get(String(value)) || String(value);
+}
+
+function buildChoiceSummary(question, answers, isMulti) {
+    const counts = {};
+    let answeredCount = 0;
+    const optionsInfo = normalizeChoiceOptions(question.options || [], question.type);
+    answers.forEach(answer => {
+        const detail = findAnswerDetail(answer, question);
+        if (!detail || detail.answer === undefined || detail.answer === null || detail.answer === '') return;
+        const answerValue = detail.answer;
+        const selections = Array.isArray(answerValue) ? answerValue : [answerValue];
+        if (selections.length === 0) return;
+        answeredCount += 1;
+        selections.forEach(selection => {
+            const label = resolveOptionLabel(selection, optionsInfo);
+            if (!label) return;
+            counts[label] = (counts[label] || 0) + 1;
+        });
+    });
+    const labels = optionsInfo.labels.length > 0 ? optionsInfo.labels : Object.keys(counts);
+    const entries = labels.map((label, index) => ({
+        label,
+        count: counts[label] || 0,
+        index
+    }));
+    if (isMulti) {
+        entries.sort((a, b) => (b.count - a.count) || (a.index - b.index));
+    }
+    return {
+        labels: entries.map(entry => entry.label),
+        data: entries.map(entry => entry.count),
+        totalAnswers: answeredCount
+    };
+}
+
+function buildRatingScaleSummary(question, answers) {
+    const cfg = question.config || question.meta?.ratingScaleConfig || {};
+    const points = Math.max(2, Number(cfg.points) || 5);
+
+    const resolveLabel = (val) => {
+        if (!val) return '';
+        if (typeof val === 'string') return val;
+        if (typeof val === 'object') return val.ja || val.en || Object.values(val)[0] || '';
+        return '';
+    };
+    const minLabel = resolveLabel(cfg.minLabel);
+    const maxLabel = resolveLabel(cfg.maxLabel);
+    const midLabel = cfg.showMidLabel ? resolveLabel(cfg.midLabel) : '';
+
+    const counts = {};
+    for (let i = 1; i <= points; i++) counts[i] = 0;
+
+    let answeredCount = 0;
+    let totalScore = 0;
+
+    answers.forEach(answer => {
+        const detail = findAnswerDetail(answer, question);
+        if (!detail || detail.answer === undefined || detail.answer === null || detail.answer === '') return;
+        const num = parseInt(String(detail.answer), 10);
+        if (!isNaN(num) && num >= 1 && num <= points) {
+            counts[num] = (counts[num] || 0) + 1;
+            answeredCount++;
+            totalScore += num;
+        }
+    });
+
+    const average = answeredCount > 0 ? totalScore / answeredCount : 0;
+
+    const midPoint = Math.ceil(points / 2);
+    const labels = [];
+    for (let i = 1; i <= points; i++) {
+        if (i === 1 && minLabel) labels.push(`${i} (${minLabel})`);
+        else if (i === points && maxLabel) labels.push(`${i} (${maxLabel})`);
+        else if (i === midPoint && midLabel) labels.push(`${i} (${midLabel})`);
+        else labels.push(String(i));
+    }
+    const data = labels.map((_, i) => counts[i + 1] || 0);
+
+    return { labels, data, totalAnswers: answeredCount, average, points, minLabel, maxLabel, midLabel };
+}
+
+function normalizeMatrixRows(rows = []) {
+    return rows.map((row, index) => {
+        if (row && typeof row === 'object') {
+            const id = row.id ?? row.value ?? row.text ?? `row_${index + 1}`;
+            const text = row.text ?? row.label ?? row.value ?? row.id ?? String(id);
+            return { id: String(id), text: String(text) };
+        }
+        const text = row !== undefined && row !== null ? String(row) : `row_${index + 1}`;
+        return { id: text, text };
+    });
+}
+
+function normalizeMatrixColumns(columns = []) {
+    return columns.map((column, index) => {
+        if (column && typeof column === 'object') {
+            const value = column.value ?? column.id ?? column.text ?? `col_${index + 1}`;
+            const text = column.text ?? column.label ?? column.value ?? column.id ?? String(value);
+            return { value: String(value), text: String(text) };
+        }
+        const text = column !== undefined && column !== null ? String(column) : `col_${index + 1}`;
+        return { value: text, text };
+    });
+}
+
+function normalizeMatrixKey(value) {
+    if (value === undefined || value === null) return '';
+    return String(value).toLowerCase().replace(/[\s　._-]+/g, '');
+}
+
+function getMatrixRowKeyCandidates(row) {
+    const candidates = new Set();
+    const add = (value) => {
+        if (value === undefined || value === null || value === '') return;
+        candidates.add(String(value));
+    };
+    add(row?.id);
+    add(row?.text);
+
+    const rawId = String(row?.id || '');
+    const rMatch = rawId.match(/^r(\d+)$/i);
+    const rowMatch = rawId.match(/^row(\d+)$/i);
+    const numberMatch = rawId.match(/^(\d+)$/);
+
+    if (rMatch) {
+        add(`row${rMatch[1]}`);
+        add(rMatch[1]);
+    }
+    if (rowMatch) {
+        add(`r${rowMatch[1]}`);
+        add(rowMatch[1]);
+    }
+    if (numberMatch) {
+        add(`r${numberMatch[1]}`);
+        add(`row${numberMatch[1]}`);
+    }
+
+    return candidates;
+}
+
+function extractMatrixRowResponses(answerValue, row) {
+    if (!answerValue) return [];
+    const rowKeySet = new Set(Array.from(getMatrixRowKeyCandidates(row)).map(normalizeMatrixKey));
+    if (Array.isArray(answerValue)) {
+        const matched = answerValue.filter(item => {
+            if (!item || typeof item !== 'object') return false;
+            const rowId = item.rowId ?? item.row ?? item.key ?? item.id;
+            const rowText = item.rowText ?? item.label ?? item.text;
+            return rowKeySet.has(normalizeMatrixKey(rowId)) || rowKeySet.has(normalizeMatrixKey(rowText));
+        });
+        if (matched.length === 0) return [];
+        return matched.flatMap(item => normalizeMatrixValue(item.value ?? item.column ?? item.answer ?? item.selection));
+    }
+    if (typeof answerValue === 'object') {
+        for (const [key, value] of Object.entries(answerValue)) {
+            if (rowKeySet.has(normalizeMatrixKey(key))) {
+                return normalizeMatrixValue(value);
+            }
+        }
+    }
+    return [];
+}
+
+function normalizeMatrixValue(value) {
+    if (value === undefined || value === null || value === '') return [];
+    if (Array.isArray(value)) return value.filter(item => item !== undefined && item !== null && item !== '');
+    return [value];
+}
+
+function resolveMatrixColumnLabel(value, columns) {
+    if (value === undefined || value === null || value === '') return null;
+    if (typeof value === 'object') {
+        const raw = value.value ?? value.text ?? value.label ?? value.id;
+        if (raw !== undefined && raw !== null) return resolveMatrixColumnLabel(raw, columns);
+        return null;
+    }
+    const valueStr = String(value);
+    const column = columns.find(col => col.value === valueStr || col.text === valueStr);
+    return column ? column.text : valueStr;
+}
+
+// --- Refactored Matrix Logic for Stacked Bars ---
+
+function buildMatrixCharts(question, questionId, answers, isMulti) {
+    const rows = normalizeMatrixRows(question.rows || []);
+    const columns = normalizeMatrixColumns(question.columns || question.options || []);
+
+    if (rows.length === 0 || columns.length === 0) {
+        return [buildBlankChart(questionId, question.text)];
+    }
+
+    const rowDetails = rows.map((row, rowIndex) => {
+        const counts = {};
+        columns.forEach(col => { counts[col.text] = 0; });
+        let answeredCount = 0;
+
+        answers.forEach(answer => {
+            const detail = findAnswerDetail(answer, question);
+            if (!detail || detail.answer === undefined || detail.answer === null || detail.answer === '') return;
+            const responses = extractMatrixRowResponses(detail.answer, row);
+            if (responses.length === 0) return;
+
+            // Check if this row was actually answered (count as 1 respondent)
+            answeredCount += 1;
+
+            responses.forEach(response => {
+                const label = resolveMatrixColumnLabel(response, columns);
+                if (!label) return;
+                if (!Object.prototype.hasOwnProperty.call(counts, label)) { counts[label] = 0; }
+                counts[label] += 1;
+            });
+        });
+
+        // Ensure order matches columns definition
+        const data = columns.map(col => counts[col.text] || 0);
+
+        return {
+            rowIndex,
+            rowId: row.id,
+            rowText: row.text,
+            data: data,
+            labels: columns.map(c => c.text),
+            totalAnswers: answeredCount
+        };
+    });
+
+    const matrixSeries = columns.map((col, colIndex) => {
+        return {
+            name: col.text,
+            data: rowDetails.map(detail => detail.data[colIndex])
+        };
+    });
+
+    const matrixRowTotals = rowDetails.map(d => d.totalAnswers);
+    const totalAll = matrixRowTotals.reduce((a, b) => a + b, 0);
+
+    let initialChartType = 'bar';
+    let selectorType = 'row';
+    let initialData = [];
+    let initialLabels = [];
+    let initialTotal = 0;
+
+    if (isMulti) {
+        const firstRow = rowDetails[0];
+        if (firstRow) {
+            initialData = firstRow.data;
+            initialLabels = columns.map(c => c.text);
+            initialTotal = firstRow.totalAnswers;
+        }
+    } else { // SA
+        initialChartType = 'pie';
+        const firstRow = rowDetails[0];
+        if (firstRow) {
+            initialData = firstRow.data;
+            initialLabels = columns.map(c => c.text);
+            initialTotal = firstRow.totalAnswers;
+        }
+    }
+
+    return [buildChartData({
+        questionId,
+        questionText: question.text,
+        questionBaseId: questionId,
+        isMatrix: true,
+        matrixRows: rows,
+        matrixColumns: columns,
+        matrixSeries: matrixSeries,
+        matrixRowTotals: matrixRowTotals,
+        matrixRowDetails: rowDetails,
+        matrixSelectorType: selectorType,
+        chartType: initialChartType,
+        summaryType: 'matrix_table',
+        includeTotalRow: true,
+        allowToggle: false,
+        data: initialData,
+        labels: initialLabels,
+        totalAnswers: isMulti ? totalAll : initialTotal,
+        matrixSelectedIndex: 0,
+        matrixIndex: 1,
+        matrixTotal: rows.length,
+        matrixRowText: rows.length > 0 ? rows[0].text : ''
+    })];
+}
+
+function buildChartData(data) {
+    chartSequence += 1;
+    return {
+        chartId: `${data.questionId}_${chartSequence}`,
+        questionId: data.questionId,
+        questionBaseId: data.questionBaseId || '',
+        questionText: data.questionText,
+        isMatrix: Boolean(data.isMatrix),
+        matrixIndex: data.matrixIndex || 0,
+        matrixTotal: data.matrixTotal || 0,
+        matrixParentText: data.matrixParentText || '',
+        matrixRowText: data.matrixRowText || '',
+        labels: data.labels || [],
+        data: data.data || [],
+        totalAnswers: data.totalAnswers || 0,
+        chartType: data.chartType || 'blank',
+        summaryType: data.summaryType || 'none',
+        includeTotalRow: Boolean(data.includeTotalRow),
+        allowToggle: Boolean(data.allowToggle),
+        blankMessage: data.blankMessage || '',
+        blankReason: data.blankReason || '',
+        listItems: data.listItems || [],
+        listAll: data.listAll || [],
+        matrixRows: data.matrixRows || [],
+        matrixColumns: data.matrixColumns || [],
+        matrixSeries: data.matrixSeries || [],
+        matrixRowTotals: data.matrixRowTotals || [],
+        matrixSelectedIndex: Number.isFinite(data.matrixSelectedIndex) ? data.matrixSelectedIndex : 0,
+        matrixRowDetails: data.matrixRowDetails || [],
+        matrixSelectorType: data.matrixSelectorType || 'row',
+        questionType: data.questionType || '',
+        ratingScaleAverage: data.ratingScaleAverage ?? null,
+        ratingScalePoints: data.ratingScalePoints ?? null
+    };
+}
+
+function buildBlankChart(questionId, questionText, reason) {
+    return buildChartData({
+        questionId,
+        questionText,
+        chartType: 'blank',
+        summaryType: 'none',
+        blankMessage: reason ? `この設問は現在グラフ対象外です。理由: ${reason}` : 'この設問は現在グラフ対象外です。',
+        blankReason: reason || ''
+    });
+}
+
+function buildListChart(question, questionId, answers, fallbackReason = '', questionType = '') {
+    const listEntries = collectListEntries(question, answers);
+    const listAll = listEntries.map(entry => ({
+        value: entry.value,
+        answeredAtLabel: entry.answeredAtLabel,
+        answerId: entry.answerId,
+        surveyId: entry.surveyId,
+        type: entry.type
+    }));
+    return buildChartData({
+        questionId,
+        questionText: question.text,
+        chartType: 'list',
+        summaryType: 'table',
+        includeTotalRow: false,
+        allowToggle: false,
+        listItems: listAll.slice(0, 3),
+        listAll,
+        blankReason: fallbackReason,
+        questionType: questionType || question.type
+    });
+}
+
+function buildActionButtons(chartData, chartId) {
+    return '';
+}
+
+function buildChartTypeButtons(chartData, chartId) {
+    if (!chartData.allowToggle) return '';
+    const isBar = chartData.chartType === 'bar';
+    const isPie = chartData.chartType === 'pie';
+    return `
+        <div class="mb-4">
+            <div class="inline-flex rounded-md shadow-sm" role="group">
+                <button type="button" data-chart-id="${chartId}" data-chart-type="bar" 
+                    class="chart-type-btn ${isBar ? 'active bg-primary text-on-primary' : 'bg-surface text-primary'} px-4 py-2 text-sm font-medium border border-primary rounded-l-lg hover:bg-primary hover:text-on-primary focus:z-10 focus:ring-2 focus:ring-primary transition-colors">
+                    棒グラフ
+                </button>
+                <button type="button" data-chart-id="${chartId}" data-chart-type="pie" 
+                    class="chart-type-btn ${isPie ? 'active bg-primary text-on-primary' : 'bg-surface text-primary'} px-4 py-2 text-sm font-medium border border-primary rounded-r-lg hover:bg-primary hover:text-on-primary focus:z-10 focus:ring-2 focus:ring-primary transition-colors">
+                    円グラフ
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+function buildChartArea(chartData, chartId) {
+    if (chartData.chartType === 'blank') {
+        return `<div class="p-6 rounded-xl bg-surface-variant/50 text-on-surface-variant text-sm border border-outline-variant/30 italic">${escapeHtml(chartData.blankMessage)}</div>`;
+    }
+    if (chartData.chartType === 'list') {
+        return '';
+    }
+    return `<div class="w-full min-h-[350px]"><div id="${chartId}" class="w-full h-full"></div></div>`;
+}
+
+function buildChartAreaStatic(chartData, chartId) {
+    // This was duplicated, merged into buildChartArea
+}
+
+function sanitizeFilename(name) {
+    return String(name || 'chart').replace(/[<>:"/\\|?*]/g, '_').slice(0, 80);
+}
+
+function sanitizeSheetName(name) {
+    const sanitized = String(name || 'Sheet1').replace(/[\[\]\*\/\\?\:]/g, '_').slice(0, 31);
+    return sanitized || 'Sheet1';
+}
+
+function ensureUniqueSheetName(baseName, usedNames) {
+    const base = baseName || 'Sheet1';
+    const count = usedNames.get(base) || 0;
+    usedNames.set(base, count + 1);
+    if (count === 0) return base;
+    const suffix = `_${count + 1}`;
+    const trimmedBase = base.slice(0, 31 - suffix.length);
+    return `${trimmedBase}${suffix}`;
+}
+
+function collectListEntries(question, answers) {
+    const entries = [];
+    answers.forEach(answer => {
+        const detail = findAnswerDetail(answer, question);
+        if (!detail || detail.answer === undefined || detail.answer === null || detail.answer === '') return;
+        const value = formatListValue(detail.answer);
+        if (!value) return;
+        const answeredAt = answer.answeredAt ? new Date(answer.answeredAt) : null;
+        entries.push({
+            value,
+            answeredAt,
+            answeredAtLabel: formatAnsweredAt(answeredAt),
+            answerId: answer.answerId,
+            surveyId: answer.surveyId,
+            type: detail.type || question.type
+        });
+    });
+    entries.sort((a, b) => {
+        const aTime = a.answeredAt ? a.answeredAt.getTime() : 0;
+        const bTime = b.answeredAt ? b.answeredAt.getTime() : 0;
+        return bTime - aTime;
+    });
+    return entries;
+}
+
+function formatListValue(value) {
+    if (Array.isArray(value)) {
+        const items = value.map(item => formatListValue(item)).filter(Boolean);
+        return items.length > 0 ? items.join('、') : null;
+    }
+    if (typeof value === 'object') {
+        const named = value.fileName || value.filename || value.name || value.title;
+        if (named) return String(named);
+
+        const rawUrl = value.url || value.src || value.path || value.fileUrl || value.imageUrl;
+        if (rawUrl) {
+            const urlText = String(rawUrl);
+            const cleanUrl = urlText.split('?')[0];
+            const fileName = cleanUrl.split('/').filter(Boolean).pop();
+            return fileName || cleanUrl;
+        }
+
+        const mime = String(value.mimeType || value.type || '').toLowerCase();
+        if (mime.includes('image') || Object.prototype.hasOwnProperty.call(value, 'image')) {
+            return '（画像回答）';
+        }
+
+        const text = value.text || value.label || value.value;
+        if (text !== undefined && text !== null && String(text).trim() !== '') {
+            return String(text).trim();
+        }
+
+        return '（添付・オブジェクト回答）';
+    }
+    const text = String(value).trim();
+    return text === '' ? null : text;
+}
+
+function formatAnsweredAt(dateValue) {
+    if (!dateValue || Number.isNaN(dateValue.getTime())) return '—';
+    const month = String(dateValue.getMonth() + 1).padStart(2, '0');
+    const day = String(dateValue.getDate()).padStart(2, '0');
+    const hour = String(dateValue.getHours()).padStart(2, '0');
+    const minute = String(dateValue.getMinutes()).padStart(2, '0');
+    return `${month}/${day} ${hour}:${minute}`;
+}
+
+function formatRatingLabel(value, maxStars = 5) {
+    const num = Number(value);
+    if (Number.isNaN(num)) return String(value);
+    const stars = '★'.repeat(Math.max(0, Math.min(num, maxStars)));
+    return `${num} (${stars})`;
+}
+
+// --- Image Preview Modal Logic ---
+window.previewImage = function (startUrl) {
+    let modal = document.getElementById('image-preview-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'image-preview-modal';
+        modal.className = 'fixed inset-0 z-[200] hidden items-center justify-center p-4';
+        modal.innerHTML = `
+            <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onclick="window.closePreviewImage()"></div>
+            <div class="relative bg-surface rounded-2xl shadow-2xl max-w-5xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-fade-in-up">
+                <div class="p-4 border-b border-outline-variant flex justify-between items-center bg-surface-variant/30">
+                    <h3 class="font-bold text-on-surface flex items-center gap-2">
+                        <span class="material-icons text-primary">image</span>
+                        <span>画像プレビュー</span>
+                    </h3>
+                    <button onclick="window.closePreviewImage()" class="p-2 rounded-full hover:bg-on-surface/10 text-on-surface-variant transition-colors flex items-center justify-center">
+                        <span class="material-icons">close</span>
+                    </button>
+                </div>
+                <div class="flex-1 overflow-auto bg-surface-variant/5 border-b border-outline-variant/50 p-6 flex items-center justify-center relative min-h-[300px]">
+                     <img id="preview-image-element" src="" alt="Preview" class="max-w-full max-h-[70vh] object-contain rounded-lg shadow-sm transition-all duration-300 opacity-0">
+                     <div id="preview-loading" class="absolute inset-0 flex items-center justify-center text-primary">
+                        <div class="animate-spin rounded-full h-10 w-10 border-4 border-primary border-t-transparent"></div>
+                     </div>
+                     <div id="preview-error" class="hidden absolute inset-0 flex flex-col items-center justify-center text-error animate-fade-in">
+                        <span class="material-icons text-4xl mb-2">broken_image</span>
+                        <p class="font-bold">画像を読み込めませんでした</p>
+                     </div>
+                </div>
+                <div class="p-4 bg-surface flex justify-end gap-2">
+                    <a id="preview-download-link" href="#" target="_blank" class="button-secondary text-sm px-4 py-2 rounded-lg flex items-center gap-2">
+                        <span class="material-icons text-sm">open_in_new</span>
+                        <span>新しいタブで開く</span>
+                    </a>
+                    <button onclick="window.closePreviewImage()" class="button-primary text-sm px-6 py-2 rounded-lg">閉じる</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    const img = document.getElementById('preview-image-element');
+    const loading = document.getElementById('preview-loading');
+    const error = document.getElementById('preview-error');
+    const dlLink = document.getElementById('preview-download-link');
+
+    // Reset state
+    img.style.opacity = '0';
+    img.src = '';
+    loading.classList.remove('hidden');
+    error.classList.add('hidden');
+
+    // Set new source
+    img.onload = () => {
+        loading.classList.add('hidden');
+        img.style.opacity = '1';
+    };
+    img.onerror = () => {
+        loading.classList.add('hidden');
+        error.classList.remove('hidden');
+    };
+
+    img.src = startUrl;
+    dlLink.href = startUrl;
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    document.body.classList.add('overflow-hidden');
+};
+
+window.closePreviewImage = function () {
+    const modal = document.getElementById('image-preview-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        document.body.classList.remove('overflow-hidden');
+        const img = document.getElementById('preview-image-element');
+        if (img) {
+            img.src = ''; // Clear src to stop loading if pending
+        }
+    }
+};

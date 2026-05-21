@@ -59,8 +59,8 @@ last_reviewed: 2026-04-28
 ログイン前トップの現行実装状況は `24_public_login_front_requirements.md` を参照する。
 `/customer-voices/` 配下は、ログイン前トップから接続される公開の信頼補強導線として扱う。
 
-現行実装では、ログイン前トップのティザー、一覧ページ、詳細ページが `data/customer-voices.json` を参照し、`voicePageLabel` / `voicePageSummary` などの公開表示用項目がある場合はそちらを優先する。
-承認済みの実名企業を掲載する場合、公開表示上の企業名には敬称を付ける。THK株式会社 様 事例では `THK株式会社 様` を標準表記とする。
+現行実装では、ログイン前トップのティザーは `data/customer-voices.json` の `voicePageHeadline` / `voicePageLabel` / `label` と `publicQuoteAuthor` / `quote.author` を使い、公開事例ページ側では `voicePageLabel` / `voicePageSummary` があればそちらを優先する。
+このため、承認済みの実名掲載事例では、ログイン前トップのティザーを含む公開表示で敬称付き表記を維持できる。THK株式会社 様 事例では `THK株式会社 様` を標準表記とする。
 
 ## 4. 画面仕様
 
@@ -102,8 +102,9 @@ last_reviewed: 2026-04-28
 
 - 事例本文の正本は `data/customer-voices.json` とする
 - 一覧ページ、詳細ページ、ログイン前トップのティザーは同一 JSON を参照する
-- ログイン前トップのティザー、一覧ページ、詳細ページでは `voicePageLabel` / `voicePageSummary` などの公開表示用項目がある場合にそちらを優先する
-- THK株式会社 様 事例の専用詳細ページでは、追加の任意項目を使ってヒーロー見出し・要点カード・公開用肩書きを描画する
+- ログイン前トップのティザーは `voicePageHeadline` / `voicePageLabel` / `label` と `publicQuoteAuthor` / `quote.author` を使い、`/customer-voices/` 配下では `voicePageLabel` / `voicePageSummary` がある場合にそちらを優先する
+- 承認済みの実名掲載事例は、公開表示で会社名に敬称を付ける。例: `THK株式会社 様`
+- THK 事例の専用詳細ページでは、追加の任意項目を使ってヒーロー見出し・要点カード・公開用肩書きを描画する
 
 ### 5.2. 最低限の項目
 
@@ -192,7 +193,7 @@ last_reviewed: 2026-04-28
 ### 8.1. 方針メモ
 
 - 主軸は「展示会運用の整理と会期後初動の速さ」とする
-- `/customer-voices/` 配下およびログイン前トップのティザーでは `THK株式会社 様` を実名表示する
+- `/customer-voices/` 配下とログイン前トップのティザーでは、承認済み実名を `THK株式会社 様` の敬称付きで表示する
 - 詳細ページ冒頭は会社紹介より先に、何が変わったかが一読で伝わる成果見出しを置く
 - THK株式会社 様らしさは「紙運用からの移行」「回答・名刺・メモの分断」「会期後フォロー判断の遅れ」で表現する
 - 会社説明は補助情報に留め、`LMガイド` `機械要素部品` `メカトロ関連製品` までの公開安全な粒度に制限する

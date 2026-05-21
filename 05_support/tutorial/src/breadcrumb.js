@@ -1,0 +1,121 @@
+const breadcrumbPaths = {
+    'index.html': [{ name: 'アンケート一覧', link: 'index.html' }],
+    'surveyCreation.html': [
+        { name: 'アンケート一覧', link: 'index.html' },
+        { name: 'アンケート作成・編集' },
+    ],
+    'surveyCreation-v2.html': [
+        { name: 'アンケート一覧', link: 'index.html' },
+        { name: 'アンケート作成・編集' },
+    ],
+    'speed-review.html': [
+        { name: 'アンケート一覧', link: 'index.html' },
+        { name: 'SPEEDレビュー' },
+    ],
+    'graph-page.html': [
+        { name: 'アンケート一覧', link: '../02_dashboard/index.html' },
+        { name: 'SPEEDレビュー', link: '#' }, // 動的リンクのプレースホルダー
+        { name: 'グラフ分析' },
+    ],
+    'bizcardSettings.html': [
+        { name: 'アンケート一覧', link: 'index.html' },
+        { name: 'アンケート作成・編集', link: '#' },
+        { name: '名刺データ化設定' },
+    ],
+    'invoiceList.html': [
+        { name: 'アンケート一覧', link: 'index.html' },
+        { name: '請求書一覧' },
+    ],
+    'thankYouEmailSettings.html': [
+        { name: 'アンケート一覧', link: 'index.html' },
+        { name: 'アンケート作成・編集', link: '#' },
+        { name: 'お礼メール設定' },
+    ],
+    'thankYouScreenSettings.html': [
+        { name: 'アンケート一覧', link: 'index.html' },
+        { name: 'アンケート作成・編集', link: '#' },
+        { name: 'サンクス画面設定' },
+    ],
+    'group-edit.html': [
+        { name: 'アンケート一覧', link: 'index.html' },
+        { name: 'グループ編集' },
+    ],
+    'invoice-detail.html': [
+        { name: 'アンケート一覧', link: 'index.html' },
+        { name: '請求書一覧', link: 'invoiceList.html' },
+        { name: '請求書詳細' },
+    ],
+    'help.html': [
+        { name: 'アンケート一覧', link: 'index.html' },
+        { name: 'ヘルプセンター' },
+    ],
+    'faq.html': [
+        { name: 'ヘルプセンター', link: 'help.html' },
+        { name: 'よくある質問' },
+    ],
+    'premium_signup_new.html': [
+        { name: 'ホーム', link: 'index.html' },
+        { name: 'プレミアムプラン' },
+    ],
+};
+
+function generateBreadcrumbs(currentPage, surveyId = null, fromPage = 'surveyCreation.html') {
+    // graph-page.htmlは別ディレクトリにあるため、キーを正規化
+    const pageKey = currentPage.includes('graph-page.html') ? 'graph-page.html' : currentPage;
+    const paths = breadcrumbPaths[pageKey];
+    if (!paths) return '';
+
+    const breadcrumbItems = paths.map((path, index) => {
+        let link = path.link;
+
+        // 動的リンクの処理
+        if (link === '#') {
+            if (path.name === 'SPEEDレビュー') {
+                // graph-page.htmlからの相対パスを考慮
+                link = surveyId
+                    ? `../02_dashboard/speed-review.html?surveyId=${surveyId}`
+                    : '../02_dashboard/speed-review.html';
+            } else {
+                // from パラメータに応じて返り先を切り替え（surveyId 無しでも遷移先を確保）
+                link = surveyId
+                    ? `${fromPage}?surveyId=${surveyId}`
+                    : fromPage;
+            }
+        }
+
+        const isLast = index === paths.length - 1 || !path.link;
+        const linkElement = isLast
+            ? `<span class="text-on-surface-variant font-medium">${path.name}</span>`
+            : `<a href="${link}" class="text-secondary hover:underline">${path.name}</a>`;
+
+        const separator = isLast ? '' : `<span class="material-icons text-on-surface-variant mx-1">chevron_right</span>`;
+
+        return `<li class="flex items-center">${linkElement}${separator}</li>`;
+    }).join('');
+
+    return `<nav aria-label="Breadcrumb"><ol class="flex items-center space-x-1 text-sm">${breadcrumbItems}</ol></nav>`;
+}
+
+export function initBreadcrumbs() {
+    const container = document.getElementById('breadcrumb-container');
+    if (!container) return;
+
+    const currentPage = window.location.pathname.split('/').pop();
+    // help-content.html は独自のパンくずリスト処理を持つため、共通処理をスキップ
+    if (currentPage === 'help-content.html') {
+        return;
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const surveyId = urlParams.get('surveyId');
+    const fromPage = urlParams.get('from') === 'v2' ? 'surveyCreation-v2.html' : 'surveyCreation.html';
+
+    const breadcrumbHtml = generateBreadcrumbs(currentPage, surveyId, fromPage);
+    const shouldHideBreadcrumb = !breadcrumbHtml || (!breadcrumbHtml.includes('chevron_right') && /アンケート一覧/.test(breadcrumbHtml));
+    if (shouldHideBreadcrumb) {
+        container.innerHTML = '';
+        return;
+    }
+
+    container.innerHTML = breadcrumbHtml;
+}

@@ -472,6 +472,17 @@
         <p class="hero-copy-picker__hint">モックアップ用ツール / 選択はブラウザに保存されます</p>
       </div>
       <select id="hero-copy-picker-select" class="hero-copy-picker__select" aria-label="キャッチコピー候補"></select>
+      <div id="hero-copy-picker-custom" class="hero-copy-picker__custom" hidden>
+        <p class="hero-copy-picker__custom-note">改行はそのまま反映されます。「カスタム入力」を選ぶと現在のコピーが初期値として入ります。</p>
+        <label class="hero-copy-picker__field">
+          <span class="hero-copy-picker__field-label">見出し</span>
+          <textarea id="hero-copy-picker-custom-statement" class="hero-copy-picker__textarea" rows="2" placeholder="例：営業プロセスの無駄をゼロにする&#10;次世代のリード獲得ツール。"></textarea>
+        </label>
+        <label class="hero-copy-picker__field">
+          <span class="hero-copy-picker__field-label">リード文</span>
+          <textarea id="hero-copy-picker-custom-lead" class="hero-copy-picker__textarea" rows="3" placeholder="例：Webアンケートで来場者情報を集め、&#10;名刺データ化と御礼メールで展示会後の追客をスムーズに。"></textarea>
+        </label>
+      </div>
       <div class="hero-copy-picker__reason-wrap">
         <p class="hero-copy-picker__reason-title" lang="en">DIRECTION &amp; RATIONALE</p>
         <p id="hero-copy-picker-reason" class="hero-copy-picker__reason"></p>
@@ -479,6 +490,6 @@
     </div>
   </div>
 
-  <script src="js/login-front.js?v=20260514-copy" defer></script>
+  <script src="js/login-front.js?v=20260520-custom" defer></script>
 </body>
 </html>

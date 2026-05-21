@@ -13,6 +13,16 @@
 import { isCompleted as readCompletedFlag } from './state.js';
 
 const QR_BTN_SELECTOR = '#openQrModalBtn';
+const HANDOFF_STORAGE_KEY = 'speedad-tutorial-handoff';
+
+export function enableTargetForTutorial(el) {
+  if (!el) return false;
+  el.removeAttribute('disabled');
+  el.removeAttribute('aria-disabled');
+  el.classList.remove('opacity-50');
+  el.classList.remove('cursor-not-allowed');
+  return true;
+}
 
 let internalHooks = {
   /**
@@ -38,13 +48,7 @@ function isActiveNow() {
 }
 
 function enableQrButton() {
-  const btn = document.querySelector(QR_BTN_SELECTOR);
-  if (!btn) return false;
-  btn.removeAttribute('disabled');
-  btn.removeAttribute('aria-disabled');
-  btn.classList.remove('opacity-50');
-  btn.classList.remove('cursor-not-allowed');
-  return true;
+  return enableTargetForTutorial(document.querySelector(QR_BTN_SELECTOR));
 }
 
 const api = {
@@ -62,8 +66,11 @@ const api = {
    * 本番リダイレクトを行わず、チュートリアル付き URL で作成画面に遷移する。
    * formData は将来の入力引き継ぎ用に受け取るが、本仕様では参照しない（モック）。
    */
-  handleCreateSurveyFromModal(_formData) {
+  handleCreateSurveyFromModal(formData) {
     if (!isActiveNow()) return;
+    if (formData && typeof window.localStorage !== 'undefined') {
+      window.localStorage.setItem(HANDOFF_STORAGE_KEY, JSON.stringify(formData));
+    }
     if (typeof internalHooks.redirectWithTutorial === 'function') {
       internalHooks.redirectWithTutorial('surveyCreation.html', 9);
     } else {

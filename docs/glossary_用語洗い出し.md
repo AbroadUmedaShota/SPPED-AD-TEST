@@ -1,0 +1,211 @@
+<style>
+@page { size: A3 landscape; margin: 10mm; }
+body { font-family: "Yu Gothic","Meiryo","Hiragino Sans",sans-serif; font-size: 9px; line-height: 1.45; color: #1f2937; }
+h1 { font-size: 19px; margin: 0 0 2px; }
+.meta { color: #64748b; font-size: 10px; margin: 0 0 12px; }
+h2 { font-size: 12.5px; background: #eff6ff; border-left: 5px solid #2563eb; padding: 5px 9px; margin: 18px 0 6px; page-break-after: avoid; }
+h3 { font-size: 11px; color: #1e40af; border-bottom: 1.5px solid #93c5fd; padding-bottom: 2px; margin: 14px 0 4px; page-break-after: avoid; }
+table { border-collapse: collapse; width: 100%; table-layout: fixed; margin-bottom: 6px; }
+thead { display: table-header-group; }
+th { background: #2563eb; color: #fff; font-size: 8.5px; padding: 4px 5px; border: 1px solid #1e40af; text-align: left; }
+td { border: 1px solid #cbd5e1; padding: 3px 5px; vertical-align: top; word-break: break-word; }
+tbody tr:nth-child(even) { background: #f4f7fb; }
+tr { page-break-inside: avoid; }
+table.main th:nth-child(1), table.main td:nth-child(1) { width: 5%; }
+table.main th:nth-child(2), table.main td:nth-child(2) { width: 8%; }
+table.main th:nth-child(3), table.main td:nth-child(3) { width: 16%; }
+table.main th:nth-child(4), table.main td:nth-child(4) { width: 26%; }
+table.main th:nth-child(5), table.main td:nth-child(5) { width: 16%; }
+table.main th:nth-child(6), table.main td:nth-child(6) { width: 6%; }
+table.main th:nth-child(7), table.main td:nth-child(7) { width: 12%; }
+table.main th:nth-child(8), table.main td:nth-child(8) { width: 11%; }
+table.collision th:nth-child(1), table.collision td:nth-child(1) { width: 10%; }
+table.collision th:nth-child(2), table.collision td:nth-child(2) { width: 24%; }
+table.collision th:nth-child(3), table.collision td:nth-child(3) { width: 24%; }
+table.collision th:nth-child(4), table.collision td:nth-child(4) { width: 24%; }
+table.collision th:nth-child(5), table.collision td:nth-child(5) { width: 18%; }
+</style>
+
+# 用語洗い出し表（SPEED AD 全画面）
+
+<p class="meta">作成日：2026-05-20／対象：ユーザー側・admin側 全画面のHTMLモックアップ＋仕様書／A3横で印刷想定／「判断欄」は記入用に空欄</p>
+
+## 凡例
+
+- 本資料は SPEED AD（名刺データ化・アンケートサービス）の **用語ブレを検討するための資料** です。関係者でレビューし、表記統一の方針を決めるための叩き台として使用します。
+- 「表記バリエーション」は実際に画面・仕様書に出現した文字列を **原文ママ** で並べています。括弧の全角・半角、スペースの有無、長音の有無もそのまま記載しています。
+- **本資料では統一の判断（どれが正しい／廃止／推奨か）は一切行っていません。** 「判断欄」は空欄です。レビュー時に記入してください。
+- 「備考」は事実の記述のみです。仕様・数値の食い違いは「※仕様不一致」と明記しています。
+- 6人の抽出担当（R1〜R6）が出した原票を統合し、別ページに重複出現するだけの語は1グループに集約しています。全画面で単一表記に一貫し曖昧さの無い汎用語は主表から省いています。
+
+## 用語ブレ グルーピング表
+
+### 業務概念（サービス・機能の呼称）
+
+<table class="main">
+<thead>
+<tr><th>グループID</th><th>カテゴリ</th><th>概念（中立な説明）</th><th>表記バリエーション</th><th>出現画面・箇所</th><th>区分</th><th>備考</th><th>判断欄</th></tr>
+</thead>
+<tbody>
+<tr><td>A-01</td><td>業務概念</td><td>サービスそのものの名称（ブランド名）</td><td>SPEED AD ／ SPEED-AD ／ SpeedAd ／ Speed AD - Admin ／ SPEED-AD Support ／ SPEED AD 株式会社</td><td>SPEED AD=ログイン前index等／SPEED-AD=ヘッダー・フッター・サポートサイト全般／SpeedAd=パスワード変更・規約のtitleタグ／Speed AD - Admin=admin全画面ヘッダー</td><td>両方</td><td>同一サービス名にスペース有・ハイフン有・キャメルケースの3表記。adminヘッダーは「Speed AD」、請求書は「SPEED AD 株式会社」</td><td> </td></tr>
+<tr><td>A-02</td><td>業務概念</td><td>会期終了後に回答者へ送るメール機能</td><td>お礼メール ／ 御礼メール ／ お礼メール設定 ／ 御礼メール設定 ／ お礼メール送信費用 ／ 御礼メール送信 ／ ThankYouメール</td><td>お礼メール=surveyCreation・surveyDetailsModal・お礼メール設定画面／御礼メール=surveyDetailsModalの一部フィールド・ログイン前index・機能制限仕様書／お礼メール送信費用=請求書印刷／御礼メール送信=請求書サンプル／ThankYouメール=admin survey-detail</td><td>両方</td><td>「お礼」と「御礼」が同一モーダル内・同一ページ内でも混在。請求書帳票でも「お礼メール送信費用」と「御礼メール送信」が分岐</td><td> </td></tr>
+<tr><td>A-03</td><td>業務概念</td><td>名刺画像をテキスト情報に変換しDB登録する機能・プロセス</td><td>名刺データ化 ／ 名刺情報のデータ化 ／ 名刺画像添付機能 ／ データ化</td><td>名刺データ化=設定画面・料金プラン・FLOW等／名刺情報のデータ化=ログイン前index機能カード／名刺画像添付機能=surveyCreationのトグル／データ化=要件定義書の用語定義</td><td>両方</td><td>機能名としての表記ゆれ。「名刺画像添付機能」は回答時の名刺撮影ステップ有効化トグルを指す</td><td> </td></tr>
+<tr><td>A-04</td><td>業務概念</td><td>回答完了後に表示される画面</td><td>サンクス画面 ／ 回答完了画面 ／ サンクス画面設定 ／ サンクス画面（回答完了メッセージ）</td><td>回答完了画面=仕様書10（正式）／サンクス画面=仕様書08（別称）／サンクス画面設定=HTMLの設定画面タイトル／サンクス画面（回答完了メッセージ）=surveyCreation-v2アコーディオン</td><td>ユーザー側</td><td>同一画面に複数呼称。仕様書間でも「回答完了画面」と「サンクス画面」が分岐</td><td> </td></tr>
+<tr><td>A-05</td><td>業務概念</td><td>回答データを集計しグラフ表示する画面</td><td>グラフ分析 ／ 詳細分析 ／ 詳細分析ページ ／ SPEED-AD - グラフ分析</td><td>グラフ分析=graph-page・仕様書07/12／詳細分析=speed-reviewの遷移ボタン／詳細分析ページ=旧仕様書06／SPEED-AD - グラフ分析=タブタイトル</td><td>ユーザー側</td><td>画面名と遷移ボタン名で呼称が異なる</td><td> </td></tr>
+<tr><td>A-06</td><td>業務概念</td><td>回答内容を確認・編集する画面</td><td>SPEEDレビュー ／ SPEED-AD - SPEEDレビュー</td><td>SPEEDレビュー=speed-review・仕様書06/11・surveyDetailsModalボタン／SPEED-AD - SPEEDレビュー=タブタイトル</td><td>ユーザー側</td><td>画面名はスペースなしで統一。タブタイトルのみ製品名部分が「-」区切り</td><td> </td></tr>
+<tr><td>A-07</td><td>業務概念</td><td>ログイン前にユーザー自身でパスワードを再設定する動線</td><td>パスワードをお忘れですか？ ／ パスワードの再設定 ／ 再設定完了 ／ パスワード再設定完了 ／ パスワードリセット ／ パスワードを忘れた方</td><td>forgot-password・reset-password・reset-password-complete各画面／パスワードリセット=仕様書01/10／パスワードを忘れた方=index.htmlログインパネル</td><td>ユーザー側</td><td>「再設定」「リセット」が混在。下記A-08（ログイン後のパスワード変更）と区別が必要</td><td> </td></tr>
+<tr><td>A-08</td><td>業務概念</td><td>ログイン後に旧パスワード入力のうえ更新する動線</td><td>パスワード変更 ／ パスワードを忘れた場合 ／ パスワードを変更する</td><td>パスワード変更=password_change・password-change-complete／パスワードを忘れた場合=password_change step1内リンク／パスワードを変更する=アカウント情報モーダル内導線</td><td>ユーザー側</td><td>A-07（リセット）とA-08（変更）が文脈で混在。「パスワードを忘れた場合」はログイン後画面内に出現</td><td> </td></tr>
+<tr><td>A-09</td><td>業務概念</td><td>利用者向けのヘルプ・FAQ・問い合わせ機能</td><td>ヘルプセンター ／ ヘルプ ／ SPEED-AD Help Center ／ よくある質問 ／ FAQ ／ SPEED-AD FAQ ／ お問い合わせ ／ サポート</td><td>ヘルプセンター=help・help-content・フッター／ヘルプ=サポートサイトナビ／よくある質問・FAQ=faqページ・ナビ／お問い合わせ・サポート=フッター・CTAボタン</td><td>ユーザー側</td><td>「ヘルプ」と「ヘルプセンター」、「FAQ」と「よくある質問」が短縮形・正式形で混在</td><td> </td></tr>
+<tr><td>A-10</td><td>業務概念</td><td>不具合・質問を報告するフォーム画面</td><td>不具合報告 ／ SPEED AD 不具合報告フォーム ／ 不具合報告フォーム ／ お問い合わせ ／ お問い合わせ（不具合報告・ご質問）</td><td>不具合報告=bug-report画面タイトル・仕様書15／SPEED AD 不具合報告フォーム=フォーム内h1／お問い合わせ=サポートサイトナビ・FAQ/helpのCTAボタン（bug-reportへリンク）</td><td>ユーザー側</td><td>同一画面（bug-report）の呼称がナビでは「お問い合わせ」、ページ内では「不具合報告」と乖離</td><td> </td></tr>
+<tr><td>A-11</td><td>業務概念</td><td>プレミアムプランの利用を終了する操作</td><td>自動更新の停止 ／ 解約 ／ 自動更新を停止する ／ プレミアムプラン解約の確認 ／ はい、解約する ／ 自動更新の再開 ／ 自動更新再開</td><td>自動更新の停止=premium_cancel画面タイトル・ボタン／解約=cancelConfirmationModal／自動更新の再開・自動更新再開=仕様書18</td><td>ユーザー側</td><td>同一操作を「自動更新の停止」と「解約」で表記。仕様書は「自動更新の停止」を正式操作名とするがモーダルは「解約」を使用</td><td> </td></tr>
+<tr><td>A-12</td><td>業務概念</td><td>管理者・システム操作の記録</td><td>変更履歴 ／ 操作履歴 ／ 操作ログ ／ 更新ログ ／ ステータス遷移ログ ／ 対応履歴 ／ 利用ログ ／ 証跡ログ ／ 監査ログ</td><td>変更履歴=user-management／操作履歴=user-detail／操作ログ=survey-detail／更新ログ=operator-management・calendar-management／ステータス遷移ログ=billing-management／対応履歴=escalations／利用ログ=couponDetailModal</td><td>両方</td><td>同種概念（操作の記録）に多数の呼称。データソースが共通か別かはレビューで要確認</td><td> </td></tr>
+<tr><td>A-13</td><td>業務概念</td><td>管理者画面のトップページ</td><td>管理者ダッシュボード ／ ダッシュボード ／ 管理者ホーム</td><td>管理者ダッシュボード=admin index h1・titleタグ／ダッシュボード=サイドバーナビ／管理者ホーム=仕様書60</td><td>admin側</td><td>同一画面に3種の呼称</td><td> </td></tr>
+<tr><td>A-14</td><td>業務概念</td><td>SPEED ADを利用する契約主体／その操作者</td><td>顧客・企業 ／ ユーザー ／ 利用者 ／ 登録ユーザー ／ 顧客 ／ ユーザー・グループ ／ 利用者アカウント</td><td>ユーザー管理=adminサイドバー／利用者アカウント管理=admin画面タイトル／顧客・企業・顧客一覧・顧客詳細=仕様書01/60／登録ユーザー=利用規約の法的用語</td><td>両方</td><td>同じ対象に「ユーザー」「利用者」「顧客」が混在。利用規約では「登録ユーザー」を法的定義語として使用</td><td> </td></tr>
+<tr><td>A-15</td><td>業務概念</td><td>アンケートに回答する人</td><td>回答ユーザー ／ 回答者 ／ 回答者向け</td><td>回答ユーザー=利用規約の法的用語／回答者向け=surveyCreation「表示タイトル (回答者向け)」</td><td>ユーザー側</td><td>利用規約の法的定義語は「回答ユーザー」（アンケート回答者及び名刺画像アップロード者）</td><td> </td></tr>
+<tr><td>A-16</td><td>業務概念</td><td>名刺データ入力作業を行う担当者</td><td>オペレーター ／ オペレータ ／ 作業者 ／ 入力者</td><td>オペレーター=operator-management等の正式名称／オペレータ=BY-231検索フォーム（長音なし）／作業者=仕様書50／入力者=BY-213ヘッダー</td><td>admin側</td><td>同一画面（BY-231）内でも「オペレーター」と「オペレータ」が混在。仕様書は「作業者」も使用</td><td> </td></tr>
+<tr><td>A-17</td><td>業務概念</td><td>会社単位など利用者の共同利用単位</td><td>グループ ／ ユーザーグループ ／ 所属グループ ／ 担当グループ ／ 請求グループ</td><td>グループ管理=ユーザー側group-edit・admin operator-management／担当グループ=admin survey-management／請求グループ=admin user-management／所属グループ=operator-management</td><td>両方</td><td>用途別の修飾（担当・請求・所属）と無印「グループ」が混在</td><td> </td></tr>
+<tr><td>A-18</td><td>業務概念</td><td>名刺データ化のスピード別プラン</td><td>お試し ／ 通常 ／ 特急 ／ 超特急 ／ オンデマンド ／ 標準データ化プラン / 通常速度 ／ standard / normal</td><td>お試し〜オンデマンド=仕様書16（trial/normal/express/superExpress/onDemand）／標準データ化プラン・通常速度=admin survey-detail設定値／standard・normal=admin survey-detailの英語表示値</td><td>両方</td><td>日本語プラン名と内部英語値（standard/normal等）が画面によって混在。「通常」と「通常速度」「normal」が同一速度を指す</td><td> </td></tr>
+<tr><td>A-19</td><td>業務概念</td><td>名刺データ化の入力作業優先度</td><td>入力優先度 ／ オンデマンド ／ 超特急 ／ 特急 ／ 通常</td><td>入力優先度=admin_requirements.md（オンデマンド > 超特急 > 特急 > 通常）</td><td>admin側</td><td>A-18のデータ化プランと同じ語（オンデマンド/特急等）が「入力優先度」としても使われる</td><td> </td></tr>
+<tr><td>A-20</td><td>業務概念</td><td>アンケート設問の入力形式</td><td>フリーアンサー／シングルアンサー／マルチアンサー／ドロップダウン回答／評定尺度／数値回答／マトリックス(SA)／マトリックス(MA)／日付/時間／手書きスペース／説明カード（リライト版04）　|　自由記述／単一選択／複数選択／ドロップダウン／数値／マトリクス（単一/複数）／日時／手書き／説明（旧仕様書01）　|　単一選択／複数選択／評価尺度（仕様書12）　|　記述式／単一選択（チュートリアル仕様書00）</td><td>リライト版04・旧仕様書01・グラフ分析仕様書12・チュートリアル仕様書00／FABメニュー（fab.html）はリライト版表記</td><td>ユーザー側</td><td>設問タイプ名が新旧で別体系。仕様書12は「評価尺度」、04は「評定尺度」、R1抽出では「評定尺度」と「評価尺度」両方が確認されている</td><td> </td></tr>
+<tr><td>A-21</td><td>業務概念</td><td>マトリクス型設問の表記</td><td>マトリックス(SA) ／ マトリックス(MA) ／ マトリクス SA ／ マトリクス MA ／ マトリクス設問（SA） ／ マトリクス（単一/複数）</td><td>マトリックス(SA)/(MA)=仕様書04・fab.html／マトリクス SA/MA=仕様書12／マトリクス設問（SA）=matrix-comparison.html／マトリクス（単一/複数）=旧仕様書01</td><td>ユーザー側</td><td>「マトリックス」と「マトリクス」、SA/MAの括弧種別が4種類混在</td><td> </td></tr>
+<tr><td>A-22</td><td>業務概念</td><td>名刺データ化で対象とする項目数のプラン</td><td>無料項目プラン ／ スタンダード項目プラン ／ データ化項目プラン ／ 無料 ／ スタンダード ／ 無料項目プランでデータ化される2項目 ／ スタンダード項目プランでデータ化される10項目</td><td>名刺データ化設定画面の詳細仕様モーダル・surveyDetailsModal</td><td>ユーザー側</td><td>項目数プランの呼称。「データ化項目プラン」「項目プラン」と修飾が揺れる</td><td> </td></tr>
+<tr><td>A-23</td><td>業務概念</td><td>管理者画面でのアンケートの呼称</td><td>アンケート ／ アンケート案件 ／ 案件</td><td>アンケート=要件定義書の用語定義・各管理画面／アンケート案件=仕様書01（管理者画面の中心単位）／案件=calendar-management・escalations等</td><td>admin側</td><td>「アンケート」「案件」「アンケート案件」が同一対象を指す可能性。レビューで要確認</td><td> </td></tr>
+</tbody>
+</table>
+
+### 状態・ステータス
+
+<table class="main">
+<thead>
+<tr><th>グループID</th><th>カテゴリ</th><th>概念（中立な説明）</th><th>表記バリエーション</th><th>出現画面・箇所</th><th>区分</th><th>備考</th><th>判断欄</th></tr>
+</thead>
+<tbody>
+<tr><td>S-01</td><td>状態</td><td>アンケートが公開前／準備中の状態</td><td>会期前 ／ 発行前 ／ 準備中 ／ 草稿 ／ 下書き</td><td>会期前=ユーザー側index・admin reconciliation／発行前=surveyCreationのID欄／準備中=admin user-detail・survey-management／草稿=admin survey-managementバッジ／下書き=仕様書20</td><td>両方</td><td>同一仕様書系内でも「草稿」（HTML）と「下書き」（仕様書20）が分岐。「準備中」はサポートサイトの画面状態でも使用</td><td> </td></tr>
+<tr><td>S-02</td><td>状態</td><td>アンケートが公開中／稼働中の状態</td><td>会期中 ／ 公開中 ／ 実施中</td><td>会期中=ユーザー側index・admin reconciliation／公開中=admin user-detail・仕様書20／実施中=admin survey-management・survey-detailバッジ</td><td>両方</td><td>admin内でHTML（実施中）と仕様書20（公開中）が分岐。ユーザー側は「会期中」</td><td> </td></tr>
+<tr><td>S-03</td><td>状態</td><td>アンケートの会期が終了した状態（複数の派生）</td><td>会期終了 ／ 会期終了（データ化中） ／ 会期終了（データ化完了） ／ 会期終了（DL期限終了） ／ 会期終了（データ化無し） ／ 会期終了（照合待ち） ／ 終了 ／ 会期中オンデマンド</td><td>ユーザー側index・仕様書03=会期終了の4派生／admin reconciliation=会期終了（データ化無し/中/照合待ち）／終了=admin survey-managementバッジ</td><td>両方</td><td>ユーザー側とadmin側で「会期終了」の派生表記が異なる（DL期限終了 vs 照合待ち 等）</td><td> </td></tr>
+<tr><td>S-04</td><td>状態</td><td>名刺データ化処理が進行中／完了の状態</td><td>データ化中 ／ データ化進行中 ／ 進行中 ／ データ化完了 ／ 完了 ／ 名刺処理完了 ／ 正常完了</td><td>データ化完了/データ化進行中=speed-review.html／全て・完了・進行中=仕様書11／データ化中=お礼メール設定仕様書07／名刺処理完了=admin survey-management／正常完了=admin survey-detailバッジ</td><td>両方</td><td>同一フィルターでHTML（データ化完了/データ化進行中）と仕様書11（完了/進行中）が「データ化」プレフィックスの有無で分岐</td><td> </td></tr>
+<tr><td>S-05</td><td>状態</td><td>アカウント／契約が有効・利用中の状態</td><td>有効 ／ 利用中 ／ 稼働中</td><td>有効=admin user-management・operator-management／利用中=仕様書10／稼働中=仕様書50・BY-213バッジ</td><td>admin側</td><td>利用者アカウントとオペレーターで有効状態の語が異なる</td><td> </td></tr>
+<tr><td>S-06</td><td>状態</td><td>アカウント／オペレーターが利用不可・停止の状態</td><td>無効 ／ 一時停止 ／ 強制ロック ／ 解約 ／ 停止 ／ 停止中 ／ 休止 ／ 退会相当</td><td>無効=operator-management（suspended日本語表示）／一時停止・強制ロック・解約=admin user-management契約ステータス／停止中・休止=仕様書50／退会相当=仕様書10（正式名称未確定の旨明記）</td><td>admin側</td><td>HTMLは2値（有効/無効）、仕様書50は4値（稼働中/停止中/休止/割当不可）と粒度が異なる。仕様書10は「退会相当」を正式名称未確定としている</td><td> </td></tr>
+<tr><td>S-07</td><td>状態</td><td>招待が送られ承諾待ちの状態</td><td>グループ招待中 ／ 招待中</td><td>グループ招待中=ユーザー側group-edit・group_edit_requirements／招待中=仕様書05・admin仕様書10</td><td>両方</td><td>「グループ」プレフィックスの有無</td><td> </td></tr>
+<tr><td>S-08</td><td>状態</td><td>グループへの加入が完了した状態</td><td>グループ加入済 ／ 加入済</td><td>グループ加入済=ユーザー側group-edit・group_edit_requirements／加入済=仕様書05</td><td>ユーザー側</td><td>「グループ」プレフィックスの有無</td><td> </td></tr>
+<tr><td>S-09</td><td>状態</td><td>請求書の支払い完了状態</td><td>入金済 ／ 入金済み</td><td>入金済=請求書一覧・印刷（ユーザー側）／入金済み=admin billing-management・仕様書40</td><td>両方</td><td>送り仮名「み」の有無。ユーザー側請求書は「入金済」、admin側は「入金済み」</td><td> </td></tr>
+<tr><td>S-10</td><td>状態</td><td>請求書の支払い未完了状態</td><td>未入金 ／ 入金待ち ／ 未請求</td><td>未入金=ユーザー側請求書一覧・印刷／入金待ち=admin billing-management・仕様書40／未請求=admin billing-management KPI・仕様書40</td><td>両方</td><td>「未入金」「入金待ち」は支払い前、「未請求」は請求書未発行を指す（意味の粒度が異なる可能性）</td><td> </td></tr>
+<tr><td>S-11</td><td>状態</td><td>請求書の支払い期日を超過した状態</td><td>延滞 ／ 支払遅延</td><td>延滞=ユーザー側請求書一覧・印刷／支払遅延=admin billing-management KPIカード</td><td>両方</td><td>同一概念にユーザー側「延滞」、admin側「支払遅延」</td><td> </td></tr>
+<tr><td>S-12</td><td>状態</td><td>請求書が発行された状態</td><td>請求済み</td><td>仕様書40（HTMLでは未出現の旨明記）</td><td>admin側</td><td>仕様書のみに存在しHTML側に対応表記なし。※仕様不一致の可能性</td><td> </td></tr>
+<tr><td>S-13</td><td>状態</td><td>照合で値が一致した状態</td><td>一致 ／ 一致済み</td><td>一致=reconciliation/index・list・BY-222の列見出し・KPI／一致済み=reconciliation/listのステータス値</td><td>admin側</td><td>名詞形「一致」と動詞完了形「一致済み」が同一画面群で混在</td><td> </td></tr>
+<tr><td>S-14</td><td>状態</td><td>照合で値が一致しない状態</td><td>不一致 ／ 差異あり ／ 差異 ／ 差分</td><td>不一致=reconciliation/list・BY-222の列見出し・KPI／差異あり=reconciliation/listのステータス値／差異=仕様書30例外種別／差分=差分ハイライト・フッター表示</td><td>admin側</td><td>「不一致」「差異」「差分」が同概念に混在。S-14とG-30（差分ハイライト）は関連</td><td> </td></tr>
+<tr><td>S-15</td><td>状態</td><td>クーポンが現在使用可能な状態</td><td>有効</td><td>coupon-management・BY-231（内部値 ACTIVE）</td><td>admin側</td><td>同じ「有効」がアカウント有効（S-05）とクーポン有効の両方に使用（同音異義）</td><td> </td></tr>
+<tr><td>S-16</td><td>状態</td><td>クーポンが利用上限到達・停止・期限切れの状態</td><td>利用上限到達 ／ 利用停止 ／ 期限切れ ／ 停止</td><td>利用上限到達（LIMIT_REACHED）・利用停止（INACTIVE）・期限切れ（EXPIRED）=coupon-management／停止=仕様書40</td><td>admin側</td><td>HTML（利用停止）と仕様書40（停止）でクーポン停止状態の語が分岐</td><td> </td></tr>
+<tr><td>S-17</td><td>状態</td><td>お礼メールの送信状態</td><td>送信待ち ／ 送信済み ／ 失敗 ／ 除外 ／ データ化中</td><td>仕様書07（お礼メール設定の送信ステータス値）</td><td>ユーザー側</td><td>5値で管理。「データ化中」はメール送信前の名刺データ化処理中を指す</td><td> </td></tr>
+<tr><td>S-18</td><td>状態</td><td>名刺データ入力・照合作業の進行状態</td><td>未着手 ／ 入力中 ／ 入力完了 ／ 照合中 ／ 差戻し ／ 例外 ／ データ化中 ／ アップ待ち ／ アップ完了 ／ データ化なし</td><td>未着手〜例外=仕様書30／データ化中・アップ待ち・アップ完了・データ化なし=BY-222作業ステータス</td><td>admin側</td><td>仕様書30の状態値とBY-222のステータス選択肢が別体系。「データ化中」はS-04・S-17とも重複</td><td> </td></tr>
+<tr><td>S-19</td><td>状態</td><td>エスカレーション案件の対応状態</td><td>未対応 ／ 対応中 ／ 完了 ／ 対応完了</td><td>未対応・対応中=escalationsステータス値／完了=escalationsボタン／対応完了 (今週)=escalations KPIラベル</td><td>admin側</td><td>「完了」はエスカレ完了・名刺入力完了など複数文脈で使用（同音異義、下記コリジョン表参照）</td><td> </td></tr>
+<tr><td>S-20</td><td>状態</td><td>パスワード強度インジケーターの段階</td><td>弱い ／ 普通 ／ 安全</td><td>仕様書01/09（zxcvbnスコア3段階表示）</td><td>ユーザー側</td><td>3段階表示。「普通」はCPY指標（G-25）等でも使われる汎用語</td><td> </td></tr>
+<tr><td>S-21</td><td>状態</td><td>プレミアムプランのユーザー状態</td><td>再加入ユーザー ／ 既存プレミアム会員 ／ 無料トライアル会員 ／ 無料トライアル ／ 解約予約中（期間満了待ち） ／ 解約予約中</td><td>premium_signup_new（シナリオラベル）／仕様書18（状態ラベル）</td><td>ユーザー側</td><td>HTML（解約予約中（期間満了待ち））と仕様書18（解約予約中）で注記の有無が異なる</td><td> </td></tr>
+</tbody>
+</table>
+
+### データ項目・フィールド
+
+<table class="main">
+<thead>
+<tr><th>グループID</th><th>カテゴリ</th><th>概念（中立な説明）</th><th>表記バリエーション</th><th>出現画面・箇所</th><th>区分</th><th>備考</th><th>判断欄</th></tr>
+</thead>
+<tbody>
+<tr><td>D-01</td><td>データ項目</td><td>アンケートの開催・回答受付期間</td><td>展示会会期 ／ 開催期間 ／ 回答期間 ／ 会期 ／ 会期期間 ／ 会期（開始）／会期（終了）</td><td>展示会会期=index・surveyDetailsModalのテーブルヘッダー／開催期間=surveyCreationフィールド／回答期間=newSurveyModal・duplicateSurveyModal・チュートリアル仕様書／会期=名刺データ化設定・admin各画面／会期期間=お礼メール設定</td><td>両方</td><td>同一概念に「展示会会期」「開催期間」「回答期間」「会期」「会期期間」の5表記。要件定義書の用語定義は「会期」</td><td> </td></tr>
+<tr><td>D-02</td><td>データ項目</td><td>内部管理用のアンケート名フィールド</td><td>アンケート名 (管理用) ／ アンケート名（管理用、ja 固定、必須、最大 100 字） ／ アンケート名（社内管理用） ／ アンケート名</td><td>アンケート名 (管理用)=surveyCreation／アンケート名（社内管理用）=surveyDetailsModal／アンケート名（管理用…）=仕様書04</td><td>ユーザー側</td><td>「管理用」と「社内管理用」が混在。半角/全角括弧も混在</td><td> </td></tr>
+<tr><td>D-03</td><td>データ項目</td><td>回答者に表示されるアンケートのタイトル</td><td>表示タイトル (回答者向け) ／ 表示タイトル</td><td>表示タイトル (回答者向け)=surveyCreation／表示タイトル=newSurveyModal・duplicateSurveyModal・admin survey-detail・チュートリアル仕様書</td><td>ユーザー側</td><td>「(回答者向け)」注記の有無</td><td> </td></tr>
+<tr><td>D-04</td><td>データ項目</td><td>アンケートに付ける任意の補足メモ</td><td>メモ（任意） ／ メモ ／ 社内管理用メモ（任意） ／ 社内管理用メモ ／ 内部メモ ／ メモ内容 ／ メモ (任意)</td><td>メモ（任意）=newSurveyModal／メモ=surveyDetailsModal／社内管理用メモ（任意）=名刺データ化設定HTML／社内管理用メモ=仕様書16／内部メモ=admin user-management等／メモ (任意)=クーポン各モーダル</td><td>両方</td><td>「（任意）」注記の有無、「社内管理用」「内部」の修飾が混在</td><td> </td></tr>
+<tr><td>D-05</td><td>データ項目</td><td>利用者アカウントの識別子</td><td>アンケートID ／ アカウントID ／ ユーザー ID ／ オペレーターID ／ オペレータID ／ ID</td><td>アカウントID=admin user-managementテーブル列／ユーザー ID=user-detail項目ラベル／オペレーターID=operator-management・BY-231／オペレータID=BY-231検索フォーム</td><td>両方</td><td>同一画面（user-detail）内で「ユーザー ID」と「アカウントID」が混在。BY-231内で「オペレーターID」と「オペレータID」が混在</td><td> </td></tr>
+<tr><td>D-06</td><td>データ項目</td><td>請求書を識別する番号</td><td>請求書番号 ／ 請求書番号 :</td><td>請求書番号=請求書一覧・詳細・印刷／請求書番号 :=invoice-detail帳票ラベル（スペース区切り）</td><td>両方</td><td>帳票内ラベルはコロン前にスペース。書式は「YY-ユーザーID5桁-連番3桁」（請求関連仕様マップ）</td><td> </td></tr>
+<tr><td>D-07</td><td>データ項目</td><td>請求明細テーブルの品名列</td><td>品 名 １ ／ 品 名 ２ ／ 品名1 ／ 品名2 ／ 項目 ／ 内訳</td><td>品 名 １/２=invoice-detail（文字間スペース）／品名1/2=seikyuusyo_sample／項目・内訳=invoice-print</td><td>ユーザー側</td><td>同じ品名データが3画面で別ラベル。invoice-printは「項目」「内訳」と語自体が異なる</td><td> </td></tr>
+<tr><td>D-08</td><td>データ項目</td><td>請求書の支払期日</td><td>お 支 払 期 日 ／ お支払期日 ／ 支払期限 ／ 支払時期および方法</td><td>お 支 払 期 日=invoice-detail（文字間スペース）／お支払期日=seikyuusyo_sample／支払期限=invoice-print・仕様書25／支払時期および方法=特定商取引法ページ</td><td>ユーザー側</td><td>「期日」と「期限」は語感が異なる（期日＝指定日、期限＝締切）。文字間スペースの有無も混在</td><td> </td></tr>
+<tr><td>D-09</td><td>データ項目</td><td>振込先の口座種別</td><td>口 座 種 類 ／ 口座種類 ／ 口座種別</td><td>口 座 種 類=invoice-detail（文字間スペース）／口座種類=seikyuusyo_sample／口座種別=invoice-print</td><td>ユーザー側</td><td>「種類」と「種別」が混在</td><td> </td></tr>
+<tr><td>D-10</td><td>データ項目</td><td>請求書の税込合計金額ラベル</td><td>合計ご請求金額 ／ 合計（税込）</td><td>合計ご請求金額=invoice-detail・seikyuusyo_sample／合計（税込）=invoice-print・仕様書25</td><td>ユーザー側</td><td>丁寧体（ご請求）と括弧注記で表現が異なる</td><td> </td></tr>
+<tr><td>D-11</td><td>データ項目</td><td>請求書の課税対象小計ラベル</td><td>小計(課税対象) ／ 小計（課税）</td><td>小計(課税対象)=invoice-detail・seikyuusyo_sample（半角括弧）／小計（課税）=invoice-print・仕様書25（全角括弧）</td><td>ユーザー側</td><td>括弧の全角/半角、語（課税対象/課税）が混在。非課税側も同様に「小計(非課税)」「小計（非課税）」</td><td> </td></tr>
+<tr><td>D-12</td><td>データ項目</td><td>消費税の合計ラベル</td><td>消費税等 ／ 消費税 ／ 消費税（10%） ／ 消費税(10%)</td><td>消費税等=invoice-detail・seikyuusyo_sample／消費税=invoice-print／消費税（10%）=名刺データ化設定（全角括弧）／消費税(10%)=お礼メール設定（半角括弧）</td><td>ユーザー側</td><td>「等」の有無、括弧の全角/半角が混在</td><td> </td></tr>
+<tr><td>D-13</td><td>データ項目</td><td>請求書帳票のタイトル</td><td>御 請 求 書 ／ 御請求書 ／ 請求書</td><td>御 請 求 書=invoice-detail（文字間スペース）／御請求書=seikyuusyo_sample／請求書=invoice-print</td><td>ユーザー側</td><td>「御」の有無、文字間スペースの有無</td><td> </td></tr>
+<tr><td>D-14</td><td>データ項目</td><td>クーポン値引きの品目名</td><td>クーポン値引き ／ クーポンお値引き</td><td>クーポン値引き=invoice-print・名刺データ化設定／クーポンお値引き=seikyuusyo_sample</td><td>ユーザー側</td><td>敬語「お」の有無</td><td> </td></tr>
+<tr><td>D-15</td><td>データ項目</td><td>請求書の発行日ラベル</td><td>発 行 日 : ／ 発行日: yyyy/mm/dd</td><td>発 行 日 :=invoice-detail（文字間スペース）／発行日:=seikyuusyo_sample</td><td>ユーザー側</td><td>文字間スペースの有無</td><td> </td></tr>
+<tr><td>D-16</td><td>データ項目</td><td>請求の対象区分</td><td>契約区分 ／ 個人契約 ／ グループ契約 ／ 個人アカウント ／ グループアカウント</td><td>契約区分=請求書一覧・印刷／個人契約・グループ契約=invoice-print・仕様書25／個人アカウント・グループアカウント=請求書一覧説明文</td><td>ユーザー側</td><td>区分名と区分値が混在</td><td> </td></tr>
+<tr><td>D-17</td><td>データ項目</td><td>請求先（宛名）の氏名フィールド</td><td>請求書送付先_氏名 ／ 請求先氏名 ／ 請求書宛名 ／ ご請求書の宛名</td><td>請求書送付先_氏名=ユーザー側group-edit（アンダースコア区切り）／請求先氏名=仕様書05／請求書宛名=admin user-management／ご請求書の宛名=accountInfoModal</td><td>両方</td><td>HTMLのアンダースコア区切りラベルと仕様書表記が大きく異なる</td><td> </td></tr>
+<tr><td>D-18</td><td>データ項目</td><td>名刺の部署フィールド</td><td>部署 ／ 部署名 ／ 部署・役職 ／ 請求先部署名</td><td>部署=admin user-management・data-entry/form／部署名=user-managementプレースホルダー・BY-212・BY-213／部署・役職=user-management列見出し</td><td>両方</td><td>同一フィールドに「部署」「部署名」が混在</td><td> </td></tr>
+<tr><td>D-19</td><td>データ項目</td><td>名刺の役職フィールド</td><td>役職 ／ 役職名</td><td>役職=admin user-managementフォームラベル／役職名=user-managementプレースホルダー・BY-212・BY-213</td><td>admin側</td><td>同一フィールドに「役職」「役職名」が混在</td><td> </td></tr>
+<tr><td>D-20</td><td>データ項目</td><td>名刺の住所2（建物名）フィールド</td><td>住所2（建物名） ／ 住所2(建物名) ／ 建物名 ／ 建物名・階数</td><td>住所2（建物名）=BY-212（全角括弧）／住所2(建物名)=BY-213（半角括弧）／建物名=survey-answer手入力欄／建物名・階数=accountInfoModal</td><td>両方</td><td>同一フィールドで括弧の全角/半角が異なる</td><td> </td></tr>
+<tr><td>D-21</td><td>データ項目</td><td>名刺・回答者の氏名フィールド</td><td>氏名 ／ 氏名カナ ／ 氏名（姓） ／ 氏名（名） ／ 姓 ／ 名 ／ フリガナ ／ フリ ガナ ／ 氏名カナ</td><td>氏名=各画面共通／氏名（姓）／氏名（名）=BY-212／姓・名=BY-213・survey-answer手入力欄／フリガナ=data-entry/form／氏名カナ=admin user-detail</td><td>両方</td><td>姓名分割時のラベルが「氏名（姓）」「姓」で異なる。カナのラベルが「フリガナ」「氏名カナ」で混在</td><td> </td></tr>
+<tr><td>D-22</td><td>データ項目</td><td>回答者の所属会社名フィールド</td><td>会社名 ／ 企業名 ／ 会社名（請求先） ／ 会社名／所属</td><td>会社名=各画面共通の列見出し・ラベル／企業名=お礼メール設定の列見出し・admin user-managementプレースホルダー／会社名（請求先）=accountInfoModal</td><td>両方</td><td>「会社名」と「企業名」が同一概念に混在</td><td> </td></tr>
+<tr><td>D-23</td><td>データ項目</td><td>クーポンの有効期間フィールド</td><td>有効期限 ／ 有効期間 (開始) ／ 有効期間 (終了) ／ 有効期限 (開始) ／ 有効期限 (終了)</td><td>有効期限=coupon-management一覧列・検索／有効期間 (開始/終了)=couponDetailModal／有効期限 (開始/終了)=newCouponModal・editCouponModal</td><td>admin側</td><td>同一クーポン期間フィールドに「有効期間」と「有効期限」が混在</td><td> </td></tr>
+<tr><td>D-24</td><td>データ項目</td><td>名刺データ化の納品期限</td><td>納品期日 ／ 納品予定 ／ データ化完了予定日 ／ 完了予定日 ／ データ化完了日</td><td>納品期日=reconciliation/index・BY-222／納品予定=仕様書40／データ化完了予定日=surveyDetailsModal／完了予定日=名刺データ化設定／データ化完了日=admin survey-detail</td><td>両方</td><td>HTML（納品期日）と仕様書40（納品予定）が分岐。「完了予定日」「完了日」も近接概念</td><td> </td></tr>
+<tr><td>D-25</td><td>データ項目</td><td>オペレーターが処理した名刺件数</td><td>総入力数 ／ 有効作業数 ／ 完了数 ／ 処理枚数 ／ 総処理数 ／ 総完了件数 ／ 有効作業単価</td><td>総入力数=performance-management詳細分析／有効作業数=performance-management KPI／完了数=グループ内オペレーター一覧／処理枚数=BY-213統計／総処理数=operator-management列／総完了件数=operator-managementフィルター</td><td>admin側</td><td>「作業した名刺件数」を指すと思われる語が複数。意味の粒度が同一かレビューで要確認</td><td> </td></tr>
+<tr><td>D-26</td><td>データ項目</td><td>メール本文に挿入する変数</td><td>差し込み変数 ／ {{会社名}}／{{部署名}}／{{役職}}／{{氏名}}／{{アンケート名}}</td><td>仕様書07（お礼メール設定の差し込み変数）／sendEmailModal（admin、会社名・クーポンコードの差し込みボタン）</td><td>両方</td><td>変数キー「{{役職}}」と他箇所フィールド名「役職名」（D-19）で語尾が異なる</td><td> </td></tr>
+<tr><td>D-27</td><td>データ項目</td><td>名刺の電話番号フィールド</td><td>電話番号 ／ 電話 ／ 電話番号1 ／ 電話番号2 ／ 電話番号2つ目 ／ 携帯番号 ／ FAX番号</td><td>電話番号=各画面共通／電話=特定商取引法ページ／電話番号1・電話番号2=BY-212・BY-213／電話番号2つ目=仕様書16プレミアムオプション</td><td>両方</td><td>2つ目の電話番号が「電話番号2」「電話番号2つ目」で表記が異なる</td><td> </td></tr>
+</tbody>
+</table>
+
+### 操作機能・UI部品・ナビゲーション・メッセージ
+
+<table class="main">
+<thead>
+<tr><th>グループID</th><th>カテゴリ</th><th>概念（中立な説明）</th><th>表記バリエーション</th><th>出現画面・箇所</th><th>区分</th><th>備考</th><th>判断欄</th></tr>
+</thead>
+<tbody>
+<tr><td>G-01</td><td>操作機能</td><td>入力内容を保存する操作のボタン</td><td>保存 ／ 保存する ／ 設定を保存する ／ 設定を保存して依頼を確定 ／ 更新を保存 ／ 変更を保存 ／ メモを保存 ／ 設定を保存</td><td>保存=group-edit・admin user-management・BY-223／保存する=thankYouScreenSettings・accountInfoModal・editCouponModal／設定を保存して依頼を確定=名刺データ化設定／更新を保存=billing-management／変更を保存=admin user-detail・survey-detail</td><td>両方</td><td>保存系ボタンに「する」の有無、対象語の有無で多数のパターン</td><td> </td></tr>
+<tr><td>G-02</td><td>操作機能</td><td>検索条件・フィルターを初期化する操作</td><td>リセット ／ クリア ／ フィルターをリセット ／ フィルターをクリア ／ 条件をリセット ／ 並び替えをリセット ／ 検索をクリアしてすべて表示</td><td>リセット=graph-page・admin user-management・coupon-management／クリア=admin survey-management・changelog・password_change／フィルターをリセット=index・speed-review・reconciliation/index／条件をリセット=performance-management</td><td>両方</td><td>同一機能（条件初期化）に「リセット」「クリア」が混在。同一admin内でも画面ごとに異なる</td><td> </td></tr>
+<tr><td>G-03</td><td>操作機能</td><td>新規アンケートを作成する操作</td><td>アンケート新規作成 ／ アンケート作成・編集 ／ + アンケート新規作成 ／ 新規アンケート ／ 新規アンケート登録 ／ 新規アンケート作成</td><td>アンケート新規作成=indexボタン・newSurveyModalタイトル／アンケート作成・編集=surveyCreation画面タイトル／新規アンケート=admin user-detail／新規アンケート登録=admin survey-management</td><td>両方</td><td>「作成」「登録」、接頭辞「+」「新規」の有無が混在</td><td> </td></tr>
+<tr><td>G-04</td><td>操作機能</td><td>データをCSV形式で書き出す操作</td><td>CSV出力 ／ CSVエクスポート ／ 一覧CSV出力 ／ カレンダーCSV出力 ／ 全レコードDL ／ CSVをダウンロード ／ CSVダウンロード ／ 一覧CSV出力</td><td>CSV出力=billing-management・escalations・reconciliation/list・performance-management／CSVエクスポート=coupon-management・admin user-management／一覧CSV出力=admin survey-management／カレンダーCSV出力=calendar-management／全レコードDL=BY-222</td><td>両方</td><td>CSV書き出し系ボタンが画面ごとに異なる</td><td> </td></tr>
+<tr><td>G-05</td><td>操作機能</td><td>アンケートを保存する操作のボタン</td><td>アンケートを保存する ／ 保存する ／ アンケートを保存</td><td>アンケートを保存する=surveyCreationデスクトップ／保存する=surveyCreationモバイル／アンケートを保存=チュートリアル仕様書00</td><td>ユーザー側</td><td>同一画面（surveyCreation）内でデスクトップ/モバイルでラベルが異なる</td><td> </td></tr>
+<tr><td>G-06</td><td>操作機能</td><td>設問を追加する操作のボタン</td><td>設問を追加する ／ 最初の設問を追加 ／ 設問追加 ／ 質問グループを追加</td><td>設問を追加する=surveyCreation通常表示／最初の設問を追加=surveyCreation空状態／設問追加=surveyCreationモバイル／質問グループを追加=fab.html</td><td>ユーザー側</td><td>同一画面内で状態・デバイスにより表記が異なる</td><td> </td></tr>
+<tr><td>G-07</td><td>操作機能</td><td>確認ダイアログで処理を実行するボタン</td><td>実行 ／ はい、送信する ／ 送信する ／ この内容で登録する</td><td>実行=confirmationModal（ユーザー側・admin側）／はい、送信する=サンクス画面設定の名刺未添付確認／送信する=お礼メール送信確認モーダル</td><td>両方</td><td>確認ダイアログの実行ボタンが文脈で表記が異なる</td><td> </td></tr>
+<tr><td>G-08</td><td>操作機能</td><td>パスワード初期化メールを送る操作</td><td>初期化メール再送 ／ パスワード初期化リンクを送信 ／ パスワード初期化メール送信 ／ パスワードリセットメールを送信</td><td>初期化メール再送=admin user-management／パスワード初期化リンクを送信=admin user-detail／パスワード初期化メール送信=operator-management／パスワードリセットメール=operator-management確認文</td><td>admin側</td><td>同一系操作に「リンク」「メール」「再送」が混在</td><td> </td></tr>
+<tr><td>G-09</td><td>操作機能</td><td>名刺画像を回転する操作</td><td>左回転 ／ 右回転 ／ 反時計回りに90度回転 ／ 時計回りに90度回転</td><td>左回転・右回転=data-entry/form・reconciliation/detail（ボタンラベル）／反時計回りに90度回転・時計回りに90度回転=BY-223（aria-label）</td><td>admin側</td><td>同一操作がボタンラベルとaria-labelで表記が異なる</td><td> </td></tr>
+<tr><td>G-10</td><td>操作機能</td><td>権限・管理フラグを更新する操作</td><td>管理フラグ更新 ／ フラグを更新 ／ アカウント権限を変更 ／ 一括権限変更 ／ 権限変更</td><td>管理フラグ更新=admin user-management／フラグを更新=admin user-detail／アカウント権限を変更=user-detail／権限変更=operator-management更新ログ種別</td><td>admin側</td><td>同一画面群内でフラグ更新の表記が「管理フラグ更新」「フラグを更新」で異なる</td><td> </td></tr>
+<tr><td>G-11</td><td>操作機能</td><td>エスカレーションを登録する操作</td><td>エスカレーション ／ エスカレ ／ エスカレ登録 ／ 要エスカレ ／ エスカレーション登録 ／ エスカレーション内容の確認</td><td>エスカレーション=escalations・reconciliation各選択肢・スキップ理由（正式名）／エスカレ=reconciliation/detail・BY-223ボタン・reconciliation/indexステータス／要エスカレ=reconciliation/list</td><td>admin側</td><td>正式名「エスカレーション」と短縮形「エスカレ」が混在</td><td> </td></tr>
+<tr><td>G-12</td><td>操作機能</td><td>クーポン利用回数を無制限にする設定</td><td>無制限 ／ 無制限にする</td><td>無制限=bulkCreateCouponModal／無制限にする=newCouponModal・editCouponModal</td><td>admin側</td><td>同じ操作のチェックボックスラベルが異なる</td><td> </td></tr>
+<tr><td>G-13</td><td>操作機能</td><td>モーダルを閉じる操作（確認済みを兼ねる場合あり）</td><td>閉じる ／ 確認しました</td><td>閉じる=各モーダル共通／確認しました=名刺データ化設定の詳細仕様モーダル</td><td>両方</td><td>名刺データ化設定の詳細仕様モーダルは「閉じる」と「確認しました」の2ボタンが併存</td><td> </td></tr>
+<tr><td>G-14</td><td>UI部品</td><td>権限・役割を選択するフィールドのラベル</td><td>権限 ／ 役割 ／ 権限ロール ／ 権限レベル ／ 権限区分</td><td>権限=ユーザー側group-edit招待フォーム・admin operator-management／役割=newGroupModal／権限ロール=admin user-management・user-detail／権限レベル=BY-231／権限区分=要件定義書</td><td>両方</td><td>同種フィールドのラベルが「権限」「役割」「権限ロール」「権限レベル」で混在</td><td> </td></tr>
+<tr><td>G-15</td><td>UI部品</td><td>グループの一般メンバーを示す権限選択肢</td><td>一般 ／ 一般メンバー ／ 一般ユーザー</td><td>一般=ユーザー側group-edit招待フォーム／一般メンバー=newGroupModal／一般ユーザー=admin user-detail権限ロール</td><td>両方</td><td>権限選択肢の表記長が異なる</td><td> </td></tr>
+<tr><td>G-16</td><td>業務概念</td><td>オペレーターの権限ロール（4段階）</td><td>オペレーター(Lv1) ／ オペレーター管理者(Lv2) ／ Abroadスタッフ(Lv3) ／ Abroadマネージャー(Lv4)　|　レベル1_オペレーター ／ レベル2_オペレーター管理者 ／ レベル3_アブロードスタッフ ／ レベル4_アブロードマネージャー　|　マネージャー／スタッフ／オペレーター管理者／オペレーター</td><td>オペレーター(Lv1)〜=operator-management（JS）／レベル1_オペレーター〜=BY-231選択肢／マネージャー・スタッフ等=要件定義書の権限区分</td><td>admin側</td><td>同一4段階ロールが「Lv1〜4」体系と「レベル1_〜4_」体系で別表記。「Abroad」と「アブロード」の英字/カナも混在</td><td> </td></tr>
+<tr><td>G-17</td><td>UI部品</td><td>プレミアム限定機能を示すバッジ</td><td>Premium ／ プレミアム ／ プレミアムプラン ／ Premium (月額) ／ Free (無料)</td><td>Premium=surveyCreation・surveyDetailsModal・サンクス画面設定バッジ／プレミアム=旧仕様書06／プレミアムプラン=料金プラン・premium_signup／Premium (月額)・Free (無料)=機能制限仕様書11</td><td>ユーザー側</td><td>英字「Premium」と日本語「プレミアム/プレミアムプラン」が混在</td><td> </td></tr>
+<tr><td>G-18</td><td>業務概念</td><td>契約プランの名称体系</td><td>Free ／ Standard ／ Premium ／ Enterprise　|　無料プラン／スタンダードプラン／プレミアムプラン　|　Basic／Pro／Enterprise／Custom</td><td>Free/Standard/Premium=料金プラン・premium_signup・admin survey-management／Enterprise=機能制限仕様書11（他で未登場）／無料/スタンダード/プレミアムプラン=料金プランの日本語名／Basic/Pro/Enterprise/Custom=admin user-managementの利用者プラン</td><td>両方</td><td>ユーザー側プラン（Free/Standard/Premium）とadmin利用者プラン（Basic/Pro/Enterprise/Custom）が別体系。Enterpriseは複数体系に出現</td><td> </td></tr>
+<tr><td>G-19</td><td>UI部品</td><td>デバイス表示切替ボタンのラベル</td><td>スマートフォン表示 ／ タブレット表示 ／ スマートフォン ／ タブレット</td><td>スマートフォン表示・タブレット表示=surveyPreviewModal（v1）／スマートフォン・タブレット=surveyPreviewModalV2（v2）</td><td>ユーザー側</td><td>v1/v2で「表示」の有無が異なる</td><td> </td></tr>
+<tr><td>G-20</td><td>UI部品</td><td>ページネーションの件数表示フォーマット</td><td>1 - 0 / 全 0件 ／ N件表示中 ／ 0件表示中 ／ 件中 ／ 全256件中 1 - 25件を表示 ／ 0件中 0〜0件を表示 ／ 1,284件中 1〜50件を表示</td><td>1 - 0 / 全 0件=index・speed-review／N件表示中=請求書一覧仕様書／件中=admin user-management／全256件中…=admin survey-management／0件中 0〜0件…=coupon-management</td><td>両方</td><td>件数表示のフォーマットが画面ごとに異なる（区切り記号「-」「〜」、「全」「表示中」「を表示」）</td><td> </td></tr>
+<tr><td>G-21</td><td>UI部品</td><td>チュートリアルの練習モードを示すバッジ</td><td>🎓 練習モード ／ PRACTICE MODE</td><td>仕様書31（チュートリアル）</td><td>ユーザー側</td><td>日本語バッジと英語バッジが併記</td><td> </td></tr>
+<tr><td>G-22</td><td>業務概念</td><td>名刺データ化のダウンロード種別</td><td>回答データ ／ 名刺入力＋回答データ ／ 名刺入力+回答データ ／ 名刺入力データ ／ 画像データ</td><td>名刺入力＋回答データ=仕様書03（全角プラス）／名刺入力+回答データ=downloadOptionsModal（半角プラス）</td><td>ユーザー側</td><td>同一ダウンロード種別で全角/半角プラス記号が混在</td><td> </td></tr>
+<tr><td>G-23</td><td>業務概念</td><td>不具合報告フォームの報告タイプ</td><td>Simple（簡易報告） ／ Detailed（詳細報告） ／ 報告タイプ</td><td>仕様書15（ラジオボタン選択肢）</td><td>ユーザー側</td><td>英語＋日本語併記の選択肢</td><td> </td></tr>
+<tr><td>G-24</td><td>状態</td><td>名刺データ化設定における会期の表示状態</td><td>未定 ／ 未設定（後ほど反映されます） ／ 設定なし ／ 未適用</td><td>未定=名刺データ化設定の完了予定日／未設定（後ほど反映されます）=お礼メール未設定時／設定なし=仕様書03の御礼メール設定／未適用=クーポン未適用</td><td>ユーザー側</td><td>「未設定」「未定」「設定なし」「未適用」が近接概念で混在</td><td> </td></tr>
+<tr><td>G-25</td><td>状態</td><td>実績管理のパフォーマンス・品質段階ラベル</td><td>優秀層 (Star) ／ 要改善 (Critical) ／ 高品質 (99%以上) ／ 要注意 (95%未満) ／ 良い (1.0以上) ／ 普通 ／ 悪い (0.8未満)</td><td>performance-management（パフォーマンス・品質レベル・CPYのフィルター選択肢）</td><td>admin側</td><td>段階名に英語併記（Star/Critical）と日本語のみ（良い/普通/悪い）が混在</td><td> </td></tr>
+<tr><td>G-26</td><td>業務概念</td><td>名刺データ入力・照合の比較テーブルの入力列</td><td>オペレーター1／オペレーター2／オペレーター3　|　入力1／入力2／入力3</td><td>オペレーター1〜3=reconciliation/detail列見出し／入力1〜3=BY-223列見出し</td><td>admin側</td><td>同種の照合比較テーブルで列見出しが「オペレーターN」「入力N」と異なる</td><td> </td></tr>
+<tr><td>G-27</td><td>業務概念</td><td>照合比較テーブルの確定値の列</td><td>確定値 ／ 完成内容 ／ 完成データ</td><td>確定値=reconciliation/detail／完成内容=BY-223列見出し／完成データ確認=BY-222ボタン</td><td>admin側</td><td>照合の最終値を「確定値」「完成内容」で表記</td><td> </td></tr>
+<tr><td>G-28</td><td>ナビゲーション</td><td>admin側サイドバーの請求管理メニュー項目</td><td>請求管理 ／ 請求書管理</td><td>請求管理=billing-management・admin sidebar・BY-212等／請求書管理=BY-212・BY-222・BY-231のナビ（請求管理と別名で併存）</td><td>admin側</td><td>同一ナビに「請求管理」「請求書管理」が併存</td><td> </td></tr>
+<tr><td>G-29</td><td>ナビゲーション</td><td>admin側の照合作業画面の呼称</td><td>照合管理 ／ 照合一覧 ／ 照合タスク一覧 ／ 照合画面 ／ 照合画面ダッシュボード ／ 照合詳細 ／ 名刺情報照合 ／ 照合管理一覧</td><td>照合管理=reconciliation/index／照合一覧=reconciliation/list／照合画面=BY-212ナビ／照合画面ダッシュボード=BY-231ナビ・BY-222タイトル／名刺情報照合=BY-223</td><td>admin側</td><td>同一画面を指すナビ項目が「照合画面」「照合画面ダッシュボード」で異なる</td><td> </td></tr>
+<tr><td>G-30</td><td>操作機能</td><td>差分箇所をハイライト表示する操作</td><td>差分ハイライト ／ 差分: 氏名 (要確認)</td><td>差分ハイライト=data-entry/form・reconciliation/detailボタン／差分: 氏名 (要確認)=reconciliation/detailフッター</td><td>admin側</td><td>「差分」はS-14（不一致/差異）と語が重複</td><td> </td></tr>
+<tr><td>G-31</td><td>メッセージ</td><td>不可逆操作であることを警告するメッセージ</td><td>この操作は取り消せません。本当によろしいですか？ ／ この操作は元に戻せません。 ／ この設定を本当に削除しますか？この操作は元に戻せません。</td><td>取り消せません=お礼メール設定送信前確認／元に戻せません=newGroupModalグループ削除・calendar-management削除確認</td><td>両方</td><td>同趣旨の不可逆操作警告で「取り消せません」「元に戻せません」が混在</td><td> </td></tr>
+<tr><td>G-32</td><td>メッセージ</td><td>メールアドレス形式不正のバリデーションエラー</td><td>有効なメールアドレスを入力してください。 ／ メールアドレスの形式が正しくありません。 ／ 有効なメールアドレス形式で入力してください。</td><td>有効なメールアドレスを入力してください=仕様書group_edit_requirements／メールアドレスの形式が正しくありません=仕様書05／有効なメールアドレス形式で入力してください=仕様書03_ux_group_creation_modal</td><td>ユーザー側</td><td>同一バリデーションエラーで文言が3通り</td><td> </td></tr>
+<tr><td>G-33</td><td>メッセージ</td><td>メンバーリストが空のときの表示</td><td>現在メンバーはいません。 ／ メンバーを追加してください。</td><td>現在メンバーはいません=newGroupModal（HTML）／メンバーを追加してください=仕様書03_ux_group_creation_modal</td><td>ユーザー側</td><td>同じ空状態でHTMLと仕様書の文言が異なる</td><td> </td></tr>
+<tr><td>G-34</td><td>UI部品</td><td>読み込み中のローディング表示</td><td>読み込み中 ／ 読み込み中... ／ 読み込み中です… ／ 記事を読み込み中... ／ 設問を読み込み中... ／ グラフを生成しています...</td><td>読み込み中=ログイン前index・memberDetailModal／読み込み中...=ダッシュボードindex・faq・help／読み込み中です…=請求書一覧仕様書／記事を読み込み中...=help</td><td>両方</td><td>「中」止め、三点リーダー（...）、三点リーダー（…）の有無・種別が混在</td><td> </td></tr>
+<tr><td>G-35</td><td>業務概念</td><td>料金見積もりの小計表示（名刺・お礼メール）</td><td>名刺データ化の小計（税抜） ／ お礼メールの小計（税込） ／ 名刺機能分のみ ／ お礼メール分のみ ／ 名刺データ化分 ／ お礼メール分 ／ お礼メール分（予想）</td><td>名刺データ化設定・お礼メール設定のサイドバー見積もり</td><td>ユーザー側</td><td>名刺側小計は税抜、お礼メール側小計は税込と課税表示が異なる。「予想」注記の有無も混在</td><td> </td></tr>
+</tbody>
+</table>
+
+## 同音異義の衝突
+
+同じ語が画面・文脈によって別の概念を指している箇所。表記統一とは別に、語の意味が衝突していないかの確認が必要。
+
+<table class="collision">
+<thead>
+<tr><th>語</th><th>概念A</th><th>概念B</th><th>概念C・以降</th><th>注意点</th></tr>
+</thead>
+<tbody>
+<tr><td>有効</td><td>アカウント／契約が利用可能な状態（admin user-management）</td><td>クーポンが使用可能な状態（coupon-management、内部値ACTIVE）</td><td>オペレーターが稼働可能な状態（operator-management）</td><td>3つの異なるエンティティの状態に同一語。フィルター・バッジで混在</td></tr>
+<tr><td>無効</td><td>オペレーターが利用不可の状態（operator-management、内部値suspended）</td><td>クーポンコードが不正（「無効なクーポンコードです。」16番仕様書）</td><td>—</td><td>「状態としての無効」と「入力値の不正としての無効」が衝突</td></tr>
+<tr><td>完了</td><td>エスカレーション対応の完了（escalationsボタン・KPI）</td><td>名刺データ入力の完了（data-entry/formボタン）</td><td>クーポン一括作成の完了（bulkCreateCouponModal「作成完了」）／データ化完了（speed-review）</td><td>多数の業務文脈で「完了」が使われ、文脈依存で意味が変わる</td></tr>
+<tr><td>準備中</td><td>アンケートが公開前の状態（admin user-detail・survey-managementバッジ）</td><td>画面・機能が未実装のプレースホルダー状態（05_support/bug-report「お問い合わせフォームは準備中です」、ニュース記事）</td><td>—</td><td>「業務上のステータス」と「開発上の未完成」が同語</td></tr>
+<tr><td>詳細</td><td>詳細画面へ遷移するボタン（admin user-management・survey-management等）</td><td>カレンダー詳細パネルのタブ名（calendar-management）</td><td>エスカレーション内容の詳細説明ラベル（escalations詳細パネル）</td><td>R6抽出で「アンケート詳細タブと同名ラベルが異なる箇所あり」と指摘あり</td></tr>
+<tr><td>所属</td><td>オペレーターが属するグループ（operator-management・BY-231、「所属グループ」と関係が曖昧）</td><td>利用者の組織上の部署（user-managementの「部署・役職」）</td><td>—</td><td>「オペレーターの所属グループ」と「利用者の組織上の部署」で意味が異なる</td></tr>
+<tr><td>普通</td><td>パスワード強度インジケーターの中間段階（仕様書01/09）</td><td>名刺データ化プランの「通常」とは別の、CPY指標が普通の段階（performance-management）</td><td>マトリクス評価選択肢の中間（matrix-comparison「普通」）</td><td>強度・コスパ指標・評価選択肢で同語</td></tr>
+<tr><td>停止</td><td>利用者アカウントを停止する操作（admin user-management「停止」「アカウント停止」）</td><td>アンケートが停止中の状態（仕様書20）</td><td>クーポンが停止された状態（仕様書40・couponDetailModal「クーポンを停止する」）</td><td>アカウント・アンケート・クーポンで「停止」が状態にも操作にも使われる</td></tr>
+<tr><td>会期</td><td>アンケートの回答受付期間そのもの（要件定義書の用語定義）</td><td>名刺データ化設定・お礼メール設定の期間表示フィールドのラベル（「会期」「会期期間」）</td><td>アンケートの開催期間を指す各種ラベル（「展示会会期」「開催期間」「回答期間」D-01参照）</td><td>概念としての会期とフィールドラベルとしての会期。D-01と合わせて確認</td></tr>
+<tr><td>グループ</td><td>利用者の共同利用単位（会社単位、ユーザー側group-edit・admin operator-management）</td><td>設問グループ＝設問をまとめる機能（旧仕様書01、リライト版では廃止）／FABの「質問グループを追加」</td><td>名刺データ化の項目グループ（admin_requirements「グループ（項目群）別入力対象件数」）</td><td>「利用単位のグループ」「設問グループ」「項目群グループ」が同語で別概念</td></tr>
+<tr><td>データ化中</td><td>名刺データ化処理が進行中のアンケート状態（speed-review・index）</td><td>お礼メール送信ステータスの一値（仕様書07）</td><td>名刺入力作業の作業ステータス（BY-222）</td><td>同語が3つの異なるステータス体系に出現（S-04・S-17・S-18参照）</td></tr>
+<tr><td>確認</td><td>確認ダイアログのデフォルトタイトル（confirmationModal）</td><td>「設定確認」「内容確認」「入金確認」など各種確認操作ボタン</td><td>プレミアム登録SPAのステップ2ラベル「確認」</td><td>ダイアログ名・操作ボタン・ステップ名で同語</td></tr>
+</tbody>
+</table>
