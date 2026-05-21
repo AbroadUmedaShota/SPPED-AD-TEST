@@ -247,6 +247,21 @@ body {
   outline: none;
 }
 
+.support-nav__external {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: 0.25rem;
+  border: 1px solid #9ec1ff;
+  background: #fff;
+  color: #1f5fbf !important;
+}
+
+.support-nav__external:hover,
+.support-nav__external:focus-visible {
+  background: #f4f8ff !important;
+}
+
 .support-main {
   flex: 1;
   background: linear-gradient(180deg, #eaf3ff 0%, #f7fbff 12rem, #ffffff 30rem, #f8fbff 100%);
