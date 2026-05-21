@@ -12,6 +12,23 @@ last_reviewed: 2026-04-07
 
 旧アーカイブ資料 `docs/アーカイブ/speedad-backlog-wiki-2026-03-24/pages/14_1095216_screen-list.md` は参考資料であり、現行運用の正本ではない。現行仕様の正本は `docs/画面設計/仕様/` に置く。管理者画面資料は `docs/画面設計/仕様/admin/00_admin_documentation_rules.md` に従って完全新規で再作成する。
 
+### 1.1 本番配置の判断基準
+
+本番環境の配置は、画面が「動的機能の画面」か「静的情報提供の画面」かで分ける。
+
+- `app.speed-ad.com`: ログイン、保存、回答送信、設定変更、集計、請求、申込など、サービス状態を変更または参照する動的機能画面。
+- `support.speed-ad.com`: ヘルプ、FAQ、法務表示、お知らせ、料金表、導入事例、チュートリアル案内など、静的に閲覧できる公開・準公開コンテンツ。
+
+この基準により、初回ログインチュートリアルは `/tutorial/`、導入事例一覧・詳細は `/customer-voices/` 配下として support サブドメインに整理する。ログイン前トップ `index.html` は認証・登録導線の入口であるため据え置く。
+
+### 1.2 ユーザー確認対象のドメイン別サマリ
+
+| 配置先 | ユーザー側で確認できる画面 | 扱い |
+| :--- | :--- | :--- |
+| メインドメイン / `app.speed-ad.com` | ログイン前トップ、ログイン、新規登録、パスワード再設定、ダッシュボード、アンケート作成・編集、アンケート回答、回答完了、SPEEDレビュー、グラフ分析、名刺データ化設定、お礼メール設定、サンクス画面設定、グループ管理、請求書、プラン申込・解約、パスワード変更 | 本番の動的機能画面。認証、保存、回答送信、申込、請求、設定変更を伴うため app 側に置く。 |
+| サポートサブドメイン / `support.speed-ad.com` | ヘルプ、ヘルプ記事、FAQ、不具合報告、料金プラン比較表、お知らせ、導入事例一覧・詳細、初回ログインチュートリアル、利用規約、プライバシー、特定商取引法表示 | 静的情報提供・サポート導線。ダッシュボード共通シェルを持ち込まず、support 専用シェルで管理する。 |
+| 本番対象外 | 更新履歴 | 本番の support 独立ページにはしない。利用者向け告知は `/news/` に集約する。 |
+
 ## 2. 凡例
 
 | 項目 | 値 |
@@ -25,9 +42,9 @@ last_reviewed: 2026-04-07
 
 | No | 区分 | 画面名 | 現行HTML/導線 | 関連仕様 | 仕様状態 | 実装状態 | 設計確認 | 備考 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| P-01 | 公開/ログイン前 | 導入事例 一覧 | `customer-voices/index.html`, `index.html`（刷新済みログイン前トップのファーストビュー内導線）から導線追加 | `19_customer_voice_public_pages.md`, `24_public_login_front_requirements.md` | 正本あり | HTMLあり | 刷新済みログイン前トップの信頼補強導線として、一覧から各詳細へ分岐する責務を整理する | `data/customer-voices.json` を参照 |
-| P-02 | 公開/ログイン前 | 導入事例 詳細（モニター企業） | `customer-voices/company-monitor.html`, `customer-voices/index.html` から遷移 | `19_customer_voice_public_pages.md` | 正本あり | HTMLあり | 先行利用モニター企業の利用価値を、課題・運用・変化の流れで伝える | 匿名化前提 |
-| P-03 | 公開/ログイン前 | 導入事例 詳細（大学） | `customer-voices/university-survey.html`, `customer-voices/index.html` から遷移 | `19_customer_voice_public_pages.md` | 正本あり | HTMLあり | アンケート単機能利用でも成立する導入イメージを伝える | 匿名化前提 |
+| P-01 | 公開/ログイン前 | 導入事例 一覧 | `https://support.speed-ad.com/customer-voices/`（移行元: `customer-voices/index.html`）, `index.html`（刷新済みログイン前トップ）から導線接続 | `19_customer_voice_public_pages.md`, `21_support_site_separation_spec.md`, `24_public_login_front_requirements.md` | 正本あり | HTMLあり | 静的な信頼補強コンテンツとして support サブドメインに置き、一覧から各詳細へ分岐する | `data/customer-voices.json` を参照 |
+| P-02 | 公開/ログイン前 | 導入事例 詳細（モニター企業） | `https://support.speed-ad.com/customer-voices/company-monitor/`（移行元: `customer-voices/company-monitor.html`） | `19_customer_voice_public_pages.md`, `21_support_site_separation_spec.md` | 正本あり | HTMLあり | 先行利用モニター企業の利用価値を、課題・運用・変化の流れで伝える | support サブドメイン配下、匿名化・許諾確認前提 |
+| P-03 | 公開/ログイン前 | 導入事例 詳細（大学） | `https://support.speed-ad.com/customer-voices/university-survey/`（移行元: `customer-voices/university-survey.html`） | `19_customer_voice_public_pages.md`, `21_support_site_separation_spec.md` | 正本あり | HTMLあり | アンケート単機能利用でも成立する導入イメージを伝える | support サブドメイン配下、匿名化前提 |
 | U-01 | 利用者向け | アンケート一覧 | `02_dashboard/index.html` | `00_screen_requirements.md`, `12_dashboard_current_functional_requirements.md` | 正本あり | HTMLあり | ダッシュボードの中心画面として、一覧・詳細モーダル・作成入口・ダウンロード導線の責務を整理する |  |
 | U-02 | 利用者向け | アンケート作成・編集 | `02_dashboard/surveyCreation.html`, `02_dashboard/surveyCreation-v2.html` | `01_*`, `02_*` survey creation 系仕様 | 正本あり | HTMLあり | v1/v2の現行採用関係を明記する | 仕様ファイルが複数あるため参照先整理対象 |
 | U-03 | 利用者向け | アンケート回答 | `02_dashboard/survey-answer.html` | `13_survey_answer_screen.md` | 正本あり | HTMLあり | 回答送信後の完了画面導線との接続を確認する | 旧一覧の `/questionnaire_answer` 相当 |
@@ -45,11 +62,11 @@ last_reviewed: 2026-04-07
 | U-15 | 利用者向け | パスワード変更 | `02_dashboard/password_change.html` | `09_password_change_screen.md` | 正本あり | HTMLあり | 完了画面との遷移を確認する |  |
 | U-16 | 利用者向け | パスワード変更完了 | `02_dashboard/password-change-complete.html` | `09_password_change_screen.md` | 正本あり | HTMLあり | 完了後のログイン画面復帰導線を確認する |  |
 | U-17 | 利用者向け | プレミアム関連 | `02_dashboard/premium_signup.html`, `premium_signup_new.html`, `premium_registration_spa.html`, `premium_registration_complete.html`, `premium_cancel.html`, `premium_cancel_complete.html` | `premium/` 配下仕様, `11_plan_feature_restrictions.md`, `請求関連仕様マップ.md` | 正本あり | HTMLあり | 旧・新signupの採用関係、登録・完了・解約導線、請求表現の shared/private 境界を確認する | プラン制限と連動 |
-| U-18 | 法務・ヘルプ | ヘルプセンター / FAQ | `02_dashboard/help.html`, `help-content.html`, `faq.html` | `15_help_center_requirements.md` | 正本あり | HTMLあり | ヘルプセンターと個別コンテンツの管理方法を確認する |  |
-| U-19 | 法務・ヘルプ | 法務ページ | `02_dashboard/terms-of-service.html`, `specified-commercial-transactions.html`, `personal-data-protection-policy.html` | 旧画面一覧 / 未確認 | 未確認 | HTMLあり | 正本仕様の要否を確認する | 利用規約、特商法、個人情報保護方針 |
-| U-20 | 利用者向け | 更新履歴 | `02_dashboard/changelog.html` | 未確認 | 未確認 | HTMLあり | 画面仕様として管理するか、運用補助扱いにするか確認する |  |
-| U-21 | 利用者向け | 不具合報告 | `02_dashboard/bug-report.html`, `02_dashboard/speed-ad-不具合報告-form/index.html` | `test_requirements.md` / 未確認 | 未確認 | HTMLあり | 通常画面とフォームディレクトリの使い分け、送信先責務を確認する |  |
-| F-01 | 初回ログイン | 初回ログインチュートリアル | `04_first-login/index.html` | `00_first-login_tutorial_requirements.md` | 正本あり | HTMLあり | ダッシュボード再開バナーとの関係を確認する |  |
+| U-18 | 法務・ヘルプ | ヘルプセンター / FAQ | `https://support.speed-ad.com/help/`, `/help-content/<slug>/`, `/faq/`（移行元: `02_dashboard/help.html`, `help-content.html`, `faq.html`） | `15_help_center_requirements.md`, `21_support_site_separation_spec.md` | 正本あり | HTMLあり | 静的サポートコンテンツとして support サブドメインで管理する |  |
+| U-19 | 法務・ヘルプ | 法務ページ | `https://support.speed-ad.com/terms/`, `/tokushoho/`, `/privacy/`（移行元: `02_dashboard/terms-of-service.html`, `specified-commercial-transactions.html`, `personal-data-protection-policy.html`） | `21_support_site_separation_spec.md` | 正本あり | HTMLあり | 法定表示として support サブドメインで常時到達可能にする | 利用規約、特商法、個人情報保護方針 |
+| U-20 | 利用者向け | 更新履歴 | `02_dashboard/changelog.html` | `21_support_site_separation_spec.md` | 方針あり | HTMLあり | 本番の support サブドメイン独立ページ対象外。利用者向け告知は `/news/` に集約する | 既存HTMLは移行対象外 |
+| U-21 | 利用者向け | 不具合報告 | `https://support.speed-ad.com/bug-report/`（移行元: `02_dashboard/bug-report.html`, `02_dashboard/speed-ad-不具合報告-form/index.html`） | `21_support_site_separation_spec.md`, `test_requirements.md` / 未確認 | 方針あり | HTMLあり | サポート問い合わせ・不具合報告として support サブドメインに置く。送信処理は別途API/CSRF方針を確認する |  |
+| F-01 | 初回ログイン | 初回ログインチュートリアル | `https://support.speed-ad.com/tutorial/`（移行元: `04_first-login/index.html`） | `00_first-login_tutorial_requirements.md`, `21_support_site_separation_spec.md` | 正本あり | HTMLあり | 静的な初回操作案内・再視聴導線として support サブドメインに置く。アプリ側は必要に応じて導線のみ持つ |  |
 | A-01 | 管理者向け | 管理者ダッシュボード | `03_admin/index.html` | 未設定 | 再作成予定 | HTMLあり | 管理者画面資料を完全新規で作り直すため、既存仕様は削除済み |  |
 | A-02 | 管理者向け | 利用者管理 | `03_admin/user-management.html` | 未設定 | 再作成予定 | HTMLあり | 管理者画面資料を完全新規で作り直すため、既存仕様は削除済み |  |
 | A-03 | 管理者向け | 利用者詳細 | `03_admin/user-detail.html` | 未設定 | 再作成予定 | HTMLあり | 管理者画面資料を完全新規で作り直すため、既存仕様は削除済み |  |

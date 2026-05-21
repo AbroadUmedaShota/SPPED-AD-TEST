@@ -15,11 +15,13 @@ last_reviewed: 2026-04-28
 
 本書は、刷新されたログイン前トップ (`index.html`) から遷移する公開導線として追加する「導入事例」ページ群の表示仕様・導線・データ管理方針を定義する。
 
+本番URLは `support.speed-ad.com` 配下を正本とする。導入事例はログイン・保存・申込などの動的機能を持たない静的な信頼補強コンテンツであるため、サポートサブドメインに配置する。
+
 対象ページは以下の 3 画面とする。
 
-- `customer-voices/index.html`: 導入事例一覧ページ
-- `customer-voices/company-monitor.html`: 先行導入企業の詳細ページ
-- `customer-voices/university-survey.html`: アンケート機能を利用した大学の詳細ページ
+- `https://support.speed-ad.com/customer-voices/`: 導入事例一覧ページ
+- `https://support.speed-ad.com/customer-voices/company-monitor/`: 先行導入企業の詳細ページ
+- `https://support.speed-ad.com/customer-voices/university-survey/`: アンケート機能を利用した大学の詳細ページ
 
 ## 2. 目的
 
@@ -38,14 +40,14 @@ last_reviewed: 2026-04-28
 3. 機能紹介後のティザーセクション: 2 事例の要約カード + `詳細を見る`
 4. フッター常設リンク: `導入事例`
 
-`導入事例` 関連導線の遷移先は `customer-voices/index.html` とする。`無料ではじめる` は `?intent=signup#top` でログイン前トップの新規アカウント作成モーダルへ接続する。
+`導入事例` 関連導線の遷移先は `https://support.speed-ad.com/customer-voices/` とする。`無料ではじめる` は `https://app.speed-ad.com/?intent=signup#top` でログイン前トップの新規アカウント作成モーダルへ接続する。
 
 ### 3.2. ページ間導線
 
 - 一覧ページから各詳細ページへ遷移できること
 - 各詳細ページ下部に `他の事例を見る` を配置し、一覧へ戻れること
-- 一覧ページおよび詳細ページの主 CTA は `無料ではじめる` とし、遷移先は `../index.html?intent=signup#top` とする
-- 副 CTA は `ログインはこちら` とし、遷移先は `../index.html#top` とする
+- 一覧ページおよび詳細ページの主 CTA は `無料ではじめる` とし、遷移先は `https://app.speed-ad.com/?intent=signup#top` とする
+- 副 CTA は `ログインはこちら` とし、遷移先は `https://app.speed-ad.com/#top` とする
 
 ### 3.3. ログイン前トップ復帰時の挙動
 
@@ -55,7 +57,7 @@ last_reviewed: 2026-04-28
 ### 3.4. ログイン前トップとの現行接続状態
 
 ログイン前トップの現行実装状況は `24_public_login_front_requirements.md` を参照する。
-`customer-voices/` 配下は、ログイン前トップから接続される公開の信頼補強導線として扱う。
+`/customer-voices/` 配下は、ログイン前トップから接続される公開の信頼補強導線として扱う。
 
 現行実装では、ログイン前トップのティザー、一覧ページ、詳細ページが `data/customer-voices.json` を参照し、`voicePageLabel` / `voicePageSummary` などの公開表示用項目がある場合はそちらを優先する。
 承認済みの実名企業を掲載する場合、公開表示上の企業名には敬称を付ける。THK株式会社 様 事例では `THK株式会社 様` を標準表記とする。
@@ -90,7 +92,7 @@ last_reviewed: 2026-04-28
 - `company-monitor.html` は THK株式会社 様 事例専用のエディトリアルレイアウトを許容し、他の詳細ページは共通テンプレートを継続利用する
 - 企業事例は「先行導入で得た価値」を主軸にする
 - 大学事例は「アンケート単機能でも成立する手軽さ」を主軸にする
-- 事例本文は要約表現を基本とし、`customer-voices/` 配下では承認済みの企業名・ロゴを掲載可とする
+- 事例本文は要約表現を基本とし、`/customer-voices/` 配下では承認済みの企業名・ロゴを掲載可とする
 - 承認済みの実名企業を公開表示する場合、見出し・本文・引用者名・画像代替テキストなど、閲覧者に見える企業名には敬称を付ける
 - 正式所属、個人フルネーム、会議経緯、承認前の具体数値は掲載しない
 
@@ -167,19 +169,20 @@ last_reviewed: 2026-04-28
 
 ## 6. 実装メモ
 
-- 画面追加先はルート配下の `customer-voices/`
-- スタイルは `customer-voices/styles.css`
-- 共通ロジックは `customer-voices/shared.js`
-- 一覧描画は `customer-voices/index.js`
-- 共通詳細描画は `customer-voices/detail.js`
-- THK株式会社 様 事例専用描画は `customer-voices/company-monitor.js`
-- THK株式会社 様 事例専用スタイルは `customer-voices/company-monitor.css`
+- 本番配置先は `05_support/customer-voices/`
+- 移行元のルート配下 `customer-voices/` は、公開切替時に `https://support.speed-ad.com/customer-voices/` へ 301 リダイレクトする
+- スタイルは support 側へ移設後も `customer-voices/styles.css` 相当を維持する
+- 共通ロジックは `customer-voices/shared.js` 相当
+- 一覧描画は `customer-voices/index.js` 相当
+- 共通詳細描画は `customer-voices/detail.js` 相当
+- THK株式会社 様 事例専用描画は `customer-voices/company-monitor.js` 相当
+- THK株式会社 様 事例専用スタイルは `customer-voices/company-monitor.css` 相当
 
 ## 7. 確認項目
 
-- `index.html` の 3 導線から一覧ページへ到達できること
+- `index.html` の 3 導線から `https://support.speed-ad.com/customer-voices/` へ到達できること
 - 一覧ページの各カードから正しい詳細ページへ遷移できること
-- `../index.html?intent=signup#top` でサインアップモーダルが自動表示されること
+- `https://app.speed-ad.com/?intent=signup#top` でサインアップモーダルが自動表示されること
 - `data/customer-voices.json` の任意項目が欠けてもレイアウト崩れや空セクションがないこと
 - デスクトップ / タブレット / モバイルで表示崩れがないこと
 - コンソールエラー、リンク切れ、画像切れがないこと
@@ -189,7 +192,7 @@ last_reviewed: 2026-04-28
 ### 8.1. 方針メモ
 
 - 主軸は「展示会運用の整理と会期後初動の速さ」とする
-- `customer-voices/` 配下およびログイン前トップのティザーでは `THK株式会社 様` を実名表示する
+- `/customer-voices/` 配下およびログイン前トップのティザーでは `THK株式会社 様` を実名表示する
 - 詳細ページ冒頭は会社紹介より先に、何が変わったかが一読で伝わる成果見出しを置く
 - THK株式会社 様らしさは「紙運用からの移行」「回答・名刺・メモの分断」「会期後フォロー判断の遅れ」で表現する
 - 会社説明は補助情報に留め、`LMガイド` `機械要素部品` `メカトロ関連製品` までの公開安全な粒度に制限する

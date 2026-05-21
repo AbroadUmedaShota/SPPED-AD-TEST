@@ -69,17 +69,30 @@ review_cycle: quarterly
 
 **この章のサマリ：** どの画面が `app.speed-ad.com` に残り、どの画面が `support.speed-ad.com` へ移るかを一覧する。Before/After URL表はこの章の核となる。
 
-### 3.1 15番仕様との矛盾解消
+### 3.1 配置判断基準
+
+本番環境化時の配置先は、画面の責務で判断する。
+
+| 配置先 | 判断基準 | 代表例 |
+|---|---|---|
+| `app.speed-ad.com` | 認証、保存、申込、回答送信、集計、請求、設定変更など、ユーザー操作によりサービス状態が変わる動的機能画面 | ダッシュボード、アンケート作成、回答、分析、請求、プラン申込、アカウント設定 |
+| `support.speed-ad.com` | 公開説明、ヘルプ、FAQ、法務表示、お知らせ、導入事例、料金表、チュートリアル案内など、静的に閲覧できる情報提供画面 | ヘルプ、FAQ、規約、料金プラン比較表、お知らせ、導入事例、初回ログインチュートリアル案内 |
+
+初回ログインチュートリアルは、従来の `04_first-login/index.html` を本番の独立アプリ画面として維持せず、サポートサブドメインの `/tutorial/` に移行する。ログイン後アプリ側に残るものは、必要に応じて `/tutorial/` へ送る導線またはアプリ内の補助起動ポイントに限定する。
+
+導入事例一覧・詳細は、ログイン前トップから接続される信頼補強コンテンツであり、サービス状態を変更しない静的画面のため、`support.speed-ad.com/customer-voices/` 配下へ置く。
+
+### 3.2 15番仕様との矛盾解消
 
 本書のURL構造は `/help/`・`/help-content/<slug>/`・`/faq/` 等を正本とする。`15_help_center_requirements.md` §8 の `/help/`・`/faq/` と一致（従来案内していた `/help-center/` は廃止、`/help/` に統一）。要件変更により `/tutorial/` はサブドメイン配下の独立ページとして扱い、ヘルプ記事データ内のカテゴリ `tutorial` と相互に接続する。
 
-### 3.2 サブドメイン別のCookie／計測方針（概要）
+### 3.3 サブドメイン別のCookie／計測方針（概要）
 
 - **Cookie scope：** Domain属性を `.speed-ad.com` とすればサブドメイン間でCookie共有される。共有するか個別にするかは §4 で詳細定義。
 - **CSRFトークン：** サポートサイトのフォーム（`/bug-report/` 等）は独立したCSRFトークン（Cross-Site Request Forgery。別サイトからユーザー権限で意図しないリクエストを送らせる攻撃への対策トークン）を発行する。
 - **Cookie同意：** サブドメイン間で同意状態を共有する方針。詳細は §9#8。
 
-### 3.3 URL振り分け表（Before → After）
+### 3.4 URL振り分け表（Before → After）
 
 **何が起きるか：** 旧URL（リポジトリ内の既存HTMLパス／ダッシュボード配下）にアクセスがあった場合、新URL（サポートサブドメイン）へ301リダイレクトされる。ブックマークや外部リンクも切れない。
 
@@ -91,8 +104,10 @@ review_cycle: quarterly
 | 記事詳細 | `02_dashboard/help-content.html` | `https://support.speed-ad.com/help-content/<slug>/` |
 | よくある質問 | `02_dashboard/faq.html` | `https://support.speed-ad.com/faq/` |
 | 不具合報告フォーム | `02_dashboard/bug-report.html` | `https://support.speed-ad.com/bug-report/` |
-| チュートリアル | 新規（初回ログインガイド・再視聴導線から接続） | `https://support.speed-ad.com/tutorial/` |
+| チュートリアル | `04_first-login/index.html`（初回ログインガイド・再視聴導線） | `https://support.speed-ad.com/tutorial/` |
 | 料金プラン比較表 | 新規（FAQ・フッター・ヘルプ内導線から接続） | `https://support.speed-ad.com/plans/` |
+| 導入事例一覧 | `customer-voices/index.html` | `https://support.speed-ad.com/customer-voices/` |
+| 導入事例詳細 | `customer-voices/company-monitor.html`, `customer-voices/university-survey.html` | `https://support.speed-ad.com/customer-voices/<slug>/` |
 | 利用規約 | `02_dashboard/terms-of-service.html` | `https://support.speed-ad.com/terms/` |
 | 特定商取引法表示 | `02_dashboard/specified-commercial-transactions.html` | `https://support.speed-ad.com/tokushoho/` |
 | 個人情報保護方針 | `02_dashboard/personal-data-protection-policy.html` | `https://support.speed-ad.com/privacy/` |
@@ -100,7 +115,7 @@ review_cycle: quarterly
 | お知らせJSON | 新規（ログイン前トップの最大3件表示で参照） | `https://support.speed-ad.com/news.json` |
 | ログイン前画面 | `index.html`（ルート） | **据え置き**（変更なし） |
 
-### 3.4 サポートサイト共通シェル
+### 3.5 サポートサイト共通シェル
 
 `support.speed-ad.com` 配下は、ダッシュボード共通部品ではなく公開サポートサイト専用シェルを正とする。ヘッダーはブランド `SPEED AD Support` と主要導線（ヘルプ、FAQ、お問い合わせ）に限定し、法務・お知らせはフッター常設リンクまたはページ内導線に寄せる。
 
@@ -108,14 +123,15 @@ review_cycle: quarterly
 
 サブドメイン側にはダッシュボード型の左サイドバーを設けない。ヘルプ記事カテゴリ、パンくず、検索、関連リンクで回遊を担保し、ログイン後アプリ内のサイドバー操作説明とは責務を分ける。
 
-### 3.5 サポートサブドメイン画面推移図
+### 3.6 サポートサブドメイン画面推移図
 
-`/tutorial/`, `/plans/`, `/news/` は、`support.speed-ad.com` 配下の公開サポートサイトページとして扱う。ヘッダー常設ナビは最小構成（ヘルプ、FAQ、お問い合わせ）を維持し、チュートリアル・料金プラン・お知らせ・法務系ページはフッター、FAQ本文、ヘルプ記事、ログイン前トップのティザーから接続する。`/changelog/` は本番の独立ページ対象外とする。
+`/tutorial/`, `/plans/`, `/news/`, `/customer-voices/` は、`support.speed-ad.com` 配下の公開サポートサイトページとして扱う。ヘッダー常設ナビは最小構成（ヘルプ、FAQ、お問い合わせ）を維持し、チュートリアル・料金プラン・お知らせ・導入事例・法務系ページはフッター、FAQ本文、ヘルプ記事、ログイン前トップのティザーから接続する。`/changelog/` は本番の独立ページ対象外とする。
 
 ```mermaid
 flowchart TD
     PublicTop["ログイン前トップ /"] -->|お知らせ最大3件を取得| NewsFeed["/news.json"]
     PublicTop -->|お知らせ詳細| NewsDetail["/news/<slug>/"]
+    PublicTop -->|導入事例| Voices["/customer-voices/"]
     PublicTop -->|サポート導線| Help["/help/"]
 
     AppFooter["app.speed-ad.com 共通フッター"] --> Help
@@ -128,6 +144,7 @@ flowchart TD
     SupportFooter --> Tutorial["/tutorial/"]
     SupportFooter --> Plans["/plans/"]
     SupportFooter --> NewsList["/news/"]
+    SupportFooter --> Voices
     SupportFooter --> Terms["/terms/"]
     SupportFooter --> Privacy["/privacy/"]
     SupportFooter --> Tokushoho["/tokushoho/"]
@@ -143,6 +160,10 @@ flowchart TD
     FAQ -->|料金プラン比較表リンク| Plans
     FAQ --> Contact
     Plans --> Contact
+
+    Voices --> VoiceDetail["/customer-voices/<slug>/"]
+    VoiceDetail --> Voices
+    VoiceDetail --> PublicTop
 
     NewsList --> NewsDetail
     NewsDetail --> NewsList
@@ -248,6 +269,7 @@ EU域内ユーザーのアクセスを想定範囲に含める場合、reCAPTCHA
 - 記事詳細URLは**パス方式** `/help-content/<slug>/` を採用。
 - 規約3種（利用規約・特定商取引法表示・個人情報保護方針）はsupport配下へ統合。
 - ログイン前画面（`index.html`）は対象外。現行ルート直下構成を維持。
+- 本番環境の配置は §3.1 の判断基準に従い、動的機能画面は `app.speed-ad.com`、静的情報提供画面は `support.speed-ad.com` を原則とする。
 
 ### 4.12 `/plans/` と `/news/` の扱い
 
@@ -260,10 +282,19 @@ EU域内ユーザーのアクセスを想定範囲に含める場合、reCAPTCHA
 
 ### 4.13 `/tutorial/` の扱い
 
-- `/tutorial/` は、初回ログインガイドや再視聴手順を案内するサポートサブドメイン上の独立ページとする。
-- 実際のチュートリアル再生はログイン後アプリ内の機能で行い、support側ページは入口・説明・関連ヘルプ記事への導線を担う。
+- `/tutorial/` は、初回ログインチュートリアルの本番配置先とする。従来の `04_first-login/index.html` は移行元として扱い、本番URLの正本にはしない。
+- support側ページは、初回ログイン時の操作案内、再視聴手順、関連ヘルプ記事、必要に応じたログイン後アプリへの導線を担う。
+- ログイン後アプリ側で初回判定や補助起動ポイントを持つ場合も、独立ページとしての説明・閲覧体験は `/tutorial/` に集約する。
 - ヘルプ記事データ内のカテゴリ `tutorial` は維持し、詳細な手順記事は `/help-content/<slug>/` または互換クエリで表示する。
 - 将来、動画・キャプチャ・ステップ別ガイドを公開する場合も `/tutorial/` を入口に集約する。
+
+### 4.14 `/customer-voices/` の扱い
+
+- `/customer-voices/` は導入事例一覧、`/customer-voices/<slug>/` は導入事例詳細の正本URLとする。
+- 導入事例はログイン前トップの信頼補強コンテンツであり、ログイン・申込・保存などの動的機能を持たないため、supportサブドメイン配下に置く。
+- 既存の `customer-voices/*.html` は移行元として扱い、本番公開時は 301 リダイレクトまたは静的ホスティングのrewriteで新URLへ接続する。
+- `data/customer-voices.json` は公開表示用データに限定し、承認前情報、社内メモ、個人名、未公開数値を含めない。
+- ログイン前トップからの「導入事例を見る」「詳細を見る」は、`https://support.speed-ad.com/customer-voices/` または各詳細URLへ接続する。
 
 ---
 
@@ -287,6 +318,8 @@ SPPED-AD-TEST/
     ├── bug-report/index.html
     ├── tutorial/index.html
     ├── plans/index.html
+    ├── customer-voices/index.html
+    ├── customer-voices/<slug>/index.html
     ├── news/index.html
     ├── news/<slug>/index.html
     ├── news.json
@@ -362,6 +395,12 @@ SPPED-AD-TEST/
 | `/faq.html` | `https://support.speed-ad.com/faq/` | |
 | `/bug-report.html` | `https://support.speed-ad.com/bug-report/` | |
 | `/tutorial.html` | `https://support.speed-ad.com/tutorial/` | 実在する場合 |
+| `/04_first-login/` | `https://support.speed-ad.com/tutorial/` | 初回ログインチュートリアル移行元 |
+| `/04_first-login/index.html` | `https://support.speed-ad.com/tutorial/` | 初回ログインチュートリアル移行元 |
+| `/customer-voices/` | `https://support.speed-ad.com/customer-voices/` | 導入事例一覧 |
+| `/customer-voices/index.html` | `https://support.speed-ad.com/customer-voices/` | 導入事例一覧 |
+| `/customer-voices/company-monitor.html` | `https://support.speed-ad.com/customer-voices/company-monitor/` | 導入事例詳細 |
+| `/customer-voices/university-survey.html` | `https://support.speed-ad.com/customer-voices/university-survey/` | 導入事例詳細 |
 | `/terms-of-service.html` | `https://support.speed-ad.com/terms/` | §4.8準拠（別分岐） |
 | `/specified-commercial-transactions.html` | `https://support.speed-ad.com/tokushoho/` | §4.8準拠（別分岐） |
 | `/personal-data-protection-policy.html` | `https://support.speed-ad.com/privacy/` | §4.8準拠（別分岐） |
@@ -418,7 +457,9 @@ SPPED-AD-TEST/
 | `02_dashboard/src/sidebarHandler.js` | サイドバー「サポート」リンク | `https://support.speed-ad.com/help/` へ遷移 |
 | `02_dashboard/premium_signup_new.html` / `.js` | お問い合わせリンク | |
 | `02_dashboard/premium_registration_spa.html` | 利用規約リンク | |
-| `index.html`（ルート） | 利用規約・個人情報保護方針リンク（行1187付近のlocalhost混入も修正対象） | `rel` 必須 |
+| `index.html`（ルート） | 利用規約・個人情報保護方針・導入事例リンク（行1187付近のlocalhost混入も修正対象） | `rel` 必須 |
+| `04_first-login/index.html` | `/tutorial/` への移行・旧URLリダイレクト | 本番では support 側を正本にする |
+| `customer-voices/*.html` | `/customer-voices/` 配下への移行・旧URLリダイレクト | 本番では support 側を正本にする |
 
 完全なパス・行番号リストは実装前の棚卸しで確定し、実装仕様書へ記載。
 
@@ -452,6 +493,7 @@ SPPED-AD-TEST/
 - `02_dashboard/` 配下のサポート系以外のファイル変更
 - support側のUI/UXデザイン変更
 - `index.html` のコンテンツ・デザイン変更（URL絶対化のみ対象）
+- 導入事例本文や初回ログインチュートリアル本文の新規制作（移行先URLと配置責務の整理のみ対象）
 
 ---
 
@@ -472,8 +514,12 @@ SPPED-AD-TEST/
 - 料金プラン → お問い合わせ：`/bug-report/`
 - お知らせ一覧 → お知らせ詳細：`/news/<slug>/`
 - お知らせ詳細 → お知らせ一覧：`/news/`
+- 導入事例一覧 → 導入事例詳細：`/customer-voices/<slug>/`
+- 導入事例詳細 → 導入事例一覧：`/customer-voices/`
+- 導入事例詳細 → 無料ではじめる：`https://app.speed-ad.com/?intent=signup#top`
 - 共通フッター → 料金プラン：`/plans/`
 - 共通フッター → お知らせ：`/news/`
+- 共通フッター → 導入事例：`/customer-voices/`
 - 共通フッター → チュートリアル：`/tutorial/`
 - 共通フッター → 規約3種：`/terms/`, `/privacy/`, `/tokushoho/`
 
@@ -509,6 +555,7 @@ SPPED-AD-TEST/
 | 15 | フッター常設リンクの公開開始順（規約3種、`/news/`） | M1 | 開発リード＋PO |
 | 16 | `/plans/` の公開価格文言レビュー（Standard料金、キャンペーン条件、税表記） | M1 | PO＋法務＋開発リード |
 | 17 | `/tutorial/` に掲載する動画・画像・アプリ内再生導線の範囲 | M1 | PO＋CS＋開発リード |
+| 18 | `/customer-voices/` の本番移行時に公開する事例、実名表示、画像・ロゴ利用許諾 | M1 | PO＋マーケ＋法務＋開発リード |
 
 ---
 
@@ -517,7 +564,9 @@ SPPED-AD-TEST/
 | ドキュメント | 本書との差分・上書き範囲 | 期限 | 担当者 |
 |---|---|---|---|
 | `15_help_center_requirements.md` | §8のsupport配下URL構造は本書を正本とする。`/tutorial/` は独立ページ、ヘルプ記事カテゴリ `tutorial` は関連記事群として扱う。 | 本書確定後M1 | 開発リード |
-| `18_screen_inventory_current.md` | support移設画面の「ホスト」列を更新。 | M1 | 開発リード |
+| `18_screen_inventory_current.md` | support移設画面の配置先を更新。初回ログインチュートリアルと導入事例はsupport側へ整理する。 | M1 | 開発リード |
+| `19_customer_voice_public_pages.md` | 導入事例の本番URLは `/customer-voices/` 配下の support サブドメインを正本とする。 | M1 | 開発リード |
+| `00_first-login_tutorial_requirements.md` | 初回ログインチュートリアルの本番URLは `/tutorial/` を正本とし、旧 `04_first-login/` は移行元にする。 | M1 | 開発リード |
 | `00_screen_requirements.md` | サポートサイト分離後のURL・ドメイン情報は本書が正本。齟齬時は別途調整。 | 適宜 | 開発リード |
 
 ---
