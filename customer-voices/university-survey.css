@@ -83,12 +83,12 @@ body.voice-university-survey::before {
 
 .company-story-hero__headline {
   margin: 14px 0 0;
-  max-width: 12em;
+  max-width: 16em;
   font-family: var(--voice-company-serif);
-  font-size: clamp(2.7rem, 5vw, 5rem);
+  font-size: clamp(1.9rem, 3vw, 2.6rem);
   font-weight: 700;
-  line-height: 1.08;
-  letter-spacing: -0.04em;
+  line-height: 1.32;
+  letter-spacing: -0.02em;
   color: #1a1a18;
   white-space: pre-line;
 }
