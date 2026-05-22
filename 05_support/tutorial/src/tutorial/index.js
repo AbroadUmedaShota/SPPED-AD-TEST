@@ -20,6 +20,7 @@ import {
   repositionAll,
   showStuckHint,
   hideStuckHint,
+  showAccountCtaScreen,
 } from './overlay.js';
 import {
   readProgress,
@@ -27,6 +28,9 @@ import {
   clearProgress,
   markCompleted,
   isCompleted,
+  setEntryType,
+  getEntryType,
+  clearEntryType,
 } from './state.js';
 import { installGlobalApi, enableTargetForTutorial } from './guards.js';
 import { loadCommonHtml } from '../utils.js';
@@ -42,7 +46,8 @@ let bootstrapped = false;
 let lastInsertedQuestionEl = null;
 let questionObserver = null;
 let activeUserActionCleanup = null;
-let stuckHintTimerId = null; // G4: 6 秒後にヒント表示用
+let stuckHintTimerId = null; // G4: 4 秒後にヒント表示用
+let escapeTargetEl = null; // #18: 緊急脱出時に代行クリックする対象要素
 
 // ---------- 起動 ----------
 
@@ -73,7 +78,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     onComplete: handleComplete,
   });
 
-  installInterceptors();
   installNewQuestionObserver();
 
   const startStep = resolveStartStep();
@@ -83,10 +87,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 中断再開・URL での step 指定時はスキップして直接該当ステップへ。
   const progress = readProgress();
   const isFreshStart = !progress && startStep === 1;
+  // フレッシュ起動時のみエントリ種別を確定する。中断再開・ページ跨ぎでは
+  // 再設定しないため index.html→surveyCreation.html の遷移でも保持される。
+  if (isFreshStart) {
+    const isTrial = new URLSearchParams(window.location.search).get('trial') === '1';
+    setEntryType(isTrial ? 'trial' : 'standard');
+  }
   if (isFreshStart) {
     showWelcome({
       onStart: () => goToStep(1),
-      onSkip: () => showSkipConfirm(),
+      // welcome 画面自体が確認の役割を果たすため、確認モーダルを挟まず直接離脱する
+      onSkip: () => finishAndExit({ markComplete: true }),
     });
   } else {
     goToStep(startStep);
@@ -239,28 +250,25 @@ function applyBasicInfoHandoff() {
 function resolveTargetAndRender(step) {
   // ターゲットが waitForElement 指定なら出現を待つ
   const finalize = (targetEl) => {
+    const isUserAction = step.mode === 'user-action' || step.mode === 'user-action-bridge';
     // チュートリアル中の user-action 系ステップで対象が disabled の場合は強制 enable
-    if (targetEl && (step.mode === 'user-action' || step.mode === 'user-action-bridge')) {
+    if (targetEl && isUserAction) {
       if (targetEl.disabled === true || targetEl.getAttribute('aria-disabled') === 'true') {
         enableTargetForTutorial(targetEl);
       }
     }
     renderStep(step, targetEl);
+    // 救済: user-action 系で対象要素が取得できなかった場合、クリックリスナーも
+    // ヒントタイマーも張られず進行手段が無くなるため、即座にヒントを出して「次へ」を開放する。
+    // ただし完了ボタン付きステップ（最終ステップ）は「完了」ボタンが前進手段なので対象外。
+    if (!targetEl && isUserAction && !step.completeButtonLabel) {
+      showStuckHint('この操作はスキップできます。『次へ』で先に進めます');
+      return;
+    }
     applyStepBehavior(step, targetEl);
   };
 
   // 動的解決
-  if (step.targetResolver === 'lastInsertedQuestion') {
-    if (lastInsertedQuestionEl) {
-      finalize(lastInsertedQuestionEl);
-    } else {
-      // 直前ステップで挿入されたはずだが取得できなかった場合のフォールバック
-      const items = document.querySelectorAll('.question-card');
-      finalize(items.length > 0 ? items[items.length - 1] : null);
-    }
-    return;
-  }
-
   if (step.targetResolver === 'lastInsertedQuestionField') {
     let card = lastInsertedQuestionEl;
     if (!card) {
@@ -419,7 +427,7 @@ function bindUserActionListener(step, targetEl) {
   if (!targetEl) {
     return;
   }
-  // G4: クリック検出の救済 — 6 秒間クリックが無ければ吹き出しフッターにヒントを表示。
+  // G4: クリック検出の救済 — 4 秒間クリックが無ければ吹き出しフッターにヒントを表示。
   if (stuckHintTimerId) {
     window.clearTimeout(stuckHintTimerId);
     stuckHintTimerId = null;
@@ -427,23 +435,28 @@ function bindUserActionListener(step, targetEl) {
   stuckHintTimerId = window.setTimeout(() => {
     showStuckHint('ボタンが反応しないときは『次へ』で先に進めます');
     stuckHintTimerId = null;
-  }, 6000);
+    // #18: ヒント表示後の「次へ」緊急脱出で本来のクリックを代行できるよう対象を保持
+    escapeTargetEl = targetEl;
+  }, 4000);
+
+  // M-4: クリック前の .question-card 件数を控えておき、増加を検出してから記録する
+  const cardCountBeforeClick = document.querySelectorAll('.question-card').length;
 
   const handler = (ev) => {
-    // クリックが入ったらヒントタイマーは破棄
+    // クリックが入ったらヒントタイマー・緊急脱出対象は破棄
     if (stuckHintTimerId) {
       window.clearTimeout(stuckHintTimerId);
       stuckHintTimerId = null;
     }
+    escapeTargetEl = null;
     // user-action-bridge は本番ハンドラが guards 経由で進行を引き継ぐ
     // user-action はそのまま次ステップへ
     if (step.mode === 'user-action') {
       // 対象クリックは本来の動作（モーダルを開く、メニューを開く等）をそのまま走らせ、
-      // ステップ前進はマイクロタスク後に行う
-      window.setTimeout(() => {
-        captureLastInsertedQuestionIfNeeded(step);
+      // 設問カードの増加を検出してからステップ前進する
+      captureLastInsertedQuestionIfNeeded(step, cardCountBeforeClick, () => {
         advanceStep();
-      }, 50);
+      });
     }
   };
   targetEl.addEventListener('click', handler, { once: true });
@@ -464,15 +477,34 @@ function bindUserActionListener(step, targetEl) {
   };
 }
 
-function captureLastInsertedQuestionIfNeeded(step) {
+function captureLastInsertedQuestionIfNeeded(step, baselineCount, done) {
   // ステップ 12 / 19 のクリック直後に最新 .question-card を記録しておく
   // （新ステップ列でシングルアンサー選択=12, 評定尺度選択=19）
-  if (step.id === 12 || step.id === 19) {
-    const items = document.querySelectorAll('.question-card');
-    if (items.length > 0) {
-      lastInsertedQuestionEl = items[items.length - 1];
-    }
+  if (step.id !== 12 && step.id !== 19) {
+    done();
+    return;
   }
+  // M-4: renderAllQuestions が innerHTML 全消去→再生成するため固定待ちでは古いカードを掴む。
+  // .question-card 件数が baseline を超えるまでポーリング（最大 1 秒・50ms 間隔）して検出後に記録。
+  const start = Date.now();
+  const poll = () => {
+    const items = document.querySelectorAll('.question-card');
+    if (items.length > baselineCount) {
+      lastInsertedQuestionEl = items[items.length - 1];
+      done();
+      return;
+    }
+    if (Date.now() - start > 1000) {
+      // タイムアウト: 増加を検出できなくても末尾カードを安全側で記録して前進
+      if (items.length > 0) {
+        lastInsertedQuestionEl = items[items.length - 1];
+      }
+      done();
+      return;
+    }
+    window.setTimeout(poll, 50);
+  };
+  poll();
 }
 
 function cleanupActiveStep() {
@@ -485,6 +517,7 @@ function cleanupActiveStep() {
     window.clearTimeout(stuckHintTimerId);
     stuckHintTimerId = null;
   }
+  escapeTargetEl = null;
   hideStuckHint();
   clearReadonlyTracking();
 }
@@ -492,6 +525,19 @@ function cleanupActiveStep() {
 // ---------- 進行コールバック ----------
 
 function handleNext() {
+  // #18: 緊急脱出（stuck hint 経由の前進）時、対象要素が存在すれば本来のクリックを
+  // 代行してから前進する。対象が無ければ前進のみ。
+  if (escapeTargetEl) {
+    const el = escapeTargetEl;
+    escapeTargetEl = null;
+    if (document.body.contains(el)) {
+      try {
+        el.click();
+      } catch (_e) {
+        /* noop: クリック失敗時も前進は継続 */
+      }
+    }
+  }
   advanceStep();
 }
 
@@ -532,10 +578,21 @@ function advanceStep() {
 }
 
 function finishAndExit({ markComplete }) {
+  const isTrial = getEntryType() === 'trial';
   if (markComplete) markCompleted();
   else clearProgress();
-  destroyOverlay();
+  clearEntryType();
   detachNewQuestionObserver();
+  destroyOverlay();
+  // お試しユーザーは実ダッシュボードへ遷移せず、アカウント作成 CTA 画面へ誘導する。
+  // showAccountCtaScreen は内部で ensureRoot するため destroyOverlay 後に呼ぶ。
+  if (isTrial) {
+    showAccountCtaScreen({
+      onCreateAccount: () => window.location.assign('../../index.html?intent=signup'),
+      onClose: () => window.location.assign('../../index.html'),
+    });
+    return;
+  }
   // `05_support/tutorial/` 配下で動作するため、退出先は実ダッシュボードへ固定する
   window.location.assign('../../02_dashboard/index.html');
 }
@@ -548,13 +605,7 @@ function redirectWithTutorial(url, stepId) {
   window.location.assign(`${url}${sep}tutorial=1&step=${stepId}`);
 }
 
-// ---------- 本番ハンドラへの簡易インターセプト ----------
-
-function installInterceptors() {
-  // ステップ 11 / 14 のような「クリックで menu が出る」ステップで、出現後に
-  // 自動でステップを進めはしないが、menu 出現を検知して targetResolver で参照可能にする等の保守作業はここに集約する。
-  // 現状は何もしない（guards.js が本番ハンドラ側からの呼び出しを受ける）。
-}
+// ---------- 設問カード出現の監視 ----------
 
 function installNewQuestionObserver() {
   // 実画面の設問リストコンテナ ID は `questionListContainer`。見つからなければ body にフォールバック

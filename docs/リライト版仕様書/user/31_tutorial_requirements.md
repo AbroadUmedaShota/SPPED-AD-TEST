@@ -256,6 +256,7 @@ last_reviewed: 2026-05-20
 | 進行状態 | `speedad-tutorial-progress` | `localStorage` | 現在のステップ番号、各入力ステップで自動入力した値 | 完了到達／スキップ確定で削除 |
 | 完了フラグ | `speedad-tutorial-completed` | `localStorage` | boolean | 永続（明示的なリセットまで） |
 | 引継ぎ用 | `speedad-tutorial-handoff` | `localStorage` | ブロック B モーダルで入力した基本情報（`surveyName` / `displayTitle` / `periodStart` / `periodEnd` / `memo`）の JSON 文字列 | ステップ 9 マウント時に読み出して即削除（一度きり）|
+| お試し種別 | `speedad-tutorial-entry` | `localStorage` | 公開サイトからのお試しアクセス（`?trial=1`）か否か（`trial` / `standard`） | 完了到達／スキップ確定で削除 |
 
 - 進行状態は `localStorage` に保存し、リロード・タブ閉じ・別タブ・別セッション間で引き継ぐ。
 - 引継ぎ用 `speedad-tutorial-handoff` は、ステップ 8 で「作成する」を押した瞬間にモーダル入力値を保存し、`05_support/tutorial/surveyCreation.html?step=9` 到達時に作成画面側のフィールド（`#surveyName_ja` / `#displayTitle_ja` / `#periodRange`）へ注入してから削除する。ページ間で URL クエリに値を載せずに済ませる経路。
@@ -274,9 +275,19 @@ last_reviewed: 2026-05-20
 | 中断後の再ログイン | 未設定 | 有 | ログイン直後に `tutorial/` 配下の該当ページの `?tutorial=1&step=N` へ遷移、保存ステップから再開 |
 | 完了済みユーザーのログイン | true | — | 通常どおり `02_dashboard/index.html` へ遷移する |
 | `?tutorial=1` 付き URL の直接アクセス | — | — | 完了フラグの有無にかかわらず再生する（QA・確認用途）。完了フラグは自動更新しない |
+| 公開サイトからのお試しアクセス | — | — | 公開トップ・サポートサイトの「チュートリアル」導線（`?trial=1` 付き）から起動。お試しモードで再生し、完了・スキップ時はアカウント作成導線（§7.1）へ接続する |
 
 - 初回ログイン判定は本番ではサーバー側の `first_login` フラグで行う（§13）。モックアップ段階では `localStorage` の完了フラグの有無で代替する。
 - 既存の `04_first-login/index.html`（ウェルカム画面）は本仕様では使用しない。本書策定後に廃止または「始める」ボタン 1 つに簡素化する方針で開発会社と確認する。
+
+### 7.1 お試しユーザーのアカウント作成導線
+
+- アカウント未保有のユーザーが、公開トップ（`index.html`）およびサポートサイト共通フッターの「チュートリアル」リンクからチュートリアルを体験できる。これらの導線リンクには `?trial=1` を付与する。
+- `?trial=1` 付きで起動したセッションを「お試しモード」とし、フレッシュ起動時に種別を `localStorage`（`speedad-tutorial-entry`、§6）へ保存する。中断再開・ページ跨ぎでは保持する。
+- お試しモードでは、完了（ブロック D 最終ステップ）・スキップ確定・ようこそ画面「あとで」のいずれの離脱でも `02_dashboard/index.html` へは遷移せず、全画面の「アカウント作成 CTA 画面」を表示する（§9 の既定の退出先を上書きする）。
+- CTA 画面は 2 アクション: 「アカウントを作成」（公開トップのサインアップ `index.html?intent=signup` へ遷移）／「閉じる」（公開トップ `index.html` へ遷移）。
+- 初回ログイン経由（アカウント保有者）のセッションは従来どおり、完了・スキップ時に `02_dashboard/index.html` へ遷移する。
+- 本番では公開サイトとアプリ（`02_dashboard/`）がドメインを跨ぐため、CTA からサインアップへの遷移先は絶対 URL とする（§13.1 と同じ論点）。
 
 ## 8. 視覚仕様
 

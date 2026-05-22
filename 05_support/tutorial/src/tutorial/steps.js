@@ -1,8 +1,8 @@
 // steps.js
-// チュートリアル全 26 ステップ定義（仕様書 §4 参照）
+// チュートリアル全 30 ステップ定義（仕様書 §4 参照）
 //
 // 各ステップフィールド:
-//   id        : ステップ番号（1..26）
+//   id        : ステップ番号（1..30）
 //   block     : 'A' | 'B' | 'C' | 'D'
 //   target    : 対象要素 CSS セレクタ（null の場合は画面中央 or 動的解決）
 //   mode      : 'info' | 'autofill' | 'user-action' | 'user-action-bridge'
@@ -17,8 +17,9 @@
 //   targetResolver : 'lastInsertedQuestionField' 等、動的にターゲットを解決する場合
 //   fieldPath / optionIndex : targetResolver='lastInsertedQuestionField' 時の解決パラメタ
 //
-// id=8, id=23, id=26 は user-action-bridge（本番ハンドラに代えてチュートリアルが続行処理を担う）。
+// id=8, id=29, id=30 は user-action-bridge（本番ハンドラに代えてチュートリアルが続行処理を担う）。
 // 旧 step 13（シングルアンサー一括）と旧 step 16（評定尺度一括）はフィールド単位に分解済み。
+// ブロック D（id=23..30）はプレビュー確認 → QR → 保存 → 完了 の順。
 
 const TOMORROW_OFFSET_DAYS = 1;
 const PERIOD_LENGTH_DAYS = 3;
@@ -43,7 +44,7 @@ export const TUTORIAL_STEPS = [
     target: null,
     mode: 'info',
     placement: 'center',
-    title: 'ダッシュボード',
+    title: 'アンケート作成の流れを学ぶ',
     body: 'ここがアンケートを管理する画面です。これからアンケート作成の流れを順番にご案内します。',
   },
   {
@@ -52,7 +53,7 @@ export const TUTORIAL_STEPS = [
     target: '#surveyTable',
     mode: 'info',
     placement: 'top',
-    title: 'アンケート一覧',
+    title: 'アンケート一覧を確認',
     body: 'ここがアンケート一覧です。作成済みアンケートが一覧表示されます。',
   },
   {
@@ -61,7 +62,7 @@ export const TUTORIAL_STEPS = [
     target: '#openNewSurveyModalBtn',
     mode: 'user-action',
     placement: 'bottom',
-    title: '新規作成ボタン',
+    title: '新規作成ボタンを押す',
     body: '右上の「アンケート新規作成」ボタンを押してください。',
   },
 
@@ -74,8 +75,8 @@ export const TUTORIAL_STEPS = [
     target: '#newSurveyModal .modal-content-transition',
     mode: 'info',
     placement: 'right',
-    title: '新規作成モーダル',
-    body: 'ここでアンケートの基本情報を入力します。',
+    title: '基本情報を入力する',
+    body: 'ここでアンケートの基本情報を入力します。今回は練習のため、こちらで自動入力していきます。',
     waitForElement: true,
   },
   {
@@ -84,8 +85,8 @@ export const TUTORIAL_STEPS = [
     target: '#newSurveyModal #surveyName',
     mode: 'autofill',
     placement: 'right',
-    title: 'アンケート名（管理用）',
-    body: 'ここがアンケート名（管理用）です。社内管理用の名前で、回答者には表示されません。練習のため「初めてのアンケート」を自動入力しました。確認できたら「次へ」を押してください。',
+    title: 'アンケート名を入力',
+    body: '社内管理用の名前で、回答者には表示されません。練習のため「初めてのアンケート」を自動入力しました。',
     autoInput: { kind: 'text', value: '初めてのアンケート' },
   },
   {
@@ -94,8 +95,8 @@ export const TUTORIAL_STEPS = [
     target: '#newSurveyModal #displayTitle',
     mode: 'autofill',
     placement: 'right',
-    title: '表示タイトル（回答者表示）',
-    body: 'ここが表示タイトルです。回答者の画面に表示される名称です。練習のため「製品Aに関する満足度調査」を自動入力しました。確認できたら「次へ」を押してください。',
+    title: '表示タイトルを入力',
+    body: '回答者の画面に表示される名称です。練習のため「製品Aに関する満足度調査」を自動入力しました。',
     autoInput: { kind: 'text', value: '製品Aに関する満足度調査' },
   },
   {
@@ -104,8 +105,8 @@ export const TUTORIAL_STEPS = [
     target: '#newSurveyPeriodRange',
     mode: 'autofill',
     placement: 'right',
-    title: '回答期間',
-    body: 'ここが回答期間です。回答を受け付ける開始日と終了日を指定します。練習のため翌日から 3 日間を自動入力しました。確認できたら「次へ」を押してください。',
+    title: '回答期間を設定',
+    body: '回答を受け付ける開始日と終了日を指定します。練習のため翌日から 3 日間を自動入力しました。',
     autoInput: { kind: 'flatpickr-range', getRange: buildPeriodRange },
   },
   {
@@ -115,7 +116,7 @@ export const TUTORIAL_STEPS = [
     mode: 'user-action-bridge',
     placement: 'top',
     title: '作成する（練習・保存されません）',
-    body: '内容を確認したら「作成する」ボタンを押してください。これは練習のため、実際のアンケート一覧には追加されません。続けて作成画面の使い方を見てみましょう。',
+    body: '内容を確認したら「作成する」ボタンを押してください。続けて作成画面の使い方を見てみましょう。',
   },
 
   // ------------------------------------------------------------
@@ -127,7 +128,8 @@ export const TUTORIAL_STEPS = [
     target: '#basicInfoBody',
     mode: 'info',
     placement: 'right',
-    title: '基本情報の反映確認',
+    hideBack: true,
+    title: '基本情報の反映を確認',
     body: '前の画面で入力した情報がここに反映されています。',
   },
   {
@@ -136,7 +138,7 @@ export const TUTORIAL_STEPS = [
     target: '#settings-column',
     mode: 'info',
     placement: 'left',
-    title: '設定カードの紹介',
+    title: '設定カードを確認',
     body: '名刺データ化・お礼メール・サンクス画面はここから個別に設定できます。今回はそのまま進みます。',
   },
   {
@@ -168,8 +170,8 @@ export const TUTORIAL_STEPS = [
     fieldPath: 'questionText',
     mode: 'autofill',
     placement: 'right',
-    title: 'シングルアンサーの設問文',
-    body: 'ここが設問文です。回答者に何を聞くかを書く欄です。練習のため「製品Aの満足度はいかがですか？」を自動入力しました。確認できたら「次へ」を押してください。',
+    title: '設問文を入力',
+    body: '回答者に何を聞くかを書く欄です。練習のため「製品Aの満足度はいかがですか？」を自動入力しました。',
     autoInput: { kind: 'text', value: '製品Aの満足度はいかがですか？' },
   },
   {
@@ -181,8 +183,8 @@ export const TUTORIAL_STEPS = [
     optionIndex: 0,
     mode: 'autofill',
     placement: 'right',
-    title: '選択肢1',
-    body: 'ここが選択肢1です。回答者が選べる選択肢の1つ目です。練習のため「とても満足」を自動入力しました。確認できたら「次へ」を押してください。',
+    title: '選択肢1を入力',
+    body: '回答者が選べる選択肢の1つ目です。練習のため「とても満足」を自動入力しました。',
     autoInput: { kind: 'text', value: 'とても満足' },
   },
   {
@@ -194,8 +196,8 @@ export const TUTORIAL_STEPS = [
     optionIndex: 1,
     mode: 'autofill',
     placement: 'right',
-    title: '選択肢2',
-    body: 'ここが選択肢2です。回答者が選べる選択肢の2つ目です。練習のため「満足」を自動入力しました。確認できたら「次へ」を押してください。',
+    title: '選択肢2を入力',
+    body: '回答者が選べる選択肢の2つ目です。練習のため「満足」を自動入力しました。',
     autoInput: { kind: 'text', value: '満足' },
   },
   {
@@ -207,8 +209,8 @@ export const TUTORIAL_STEPS = [
     optionIndex: 2,
     mode: 'autofill',
     placement: 'right',
-    title: '選択肢3',
-    body: 'ここが選択肢3です。回答者が選べる選択肢の3つ目です。練習のため「やや不満」を自動入力しました。確認できたら「次へ」を押してください。',
+    title: '選択肢3を入力',
+    body: '回答者が選べる選択肢の3つ目です。練習のため「やや不満」を自動入力しました。',
     autoInput: { kind: 'text', value: 'やや不満' },
   },
   {
@@ -220,8 +222,8 @@ export const TUTORIAL_STEPS = [
     optionIndex: 3,
     mode: 'autofill',
     placement: 'right',
-    title: '選択肢4',
-    body: 'ここが選択肢4です。回答者が選べる選択肢の4つ目です。練習のため「不満」を自動入力しました。確認できたら「次へ」を押してください。',
+    title: '選択肢4を入力',
+    body: '回答者が選べる選択肢の4つ目です。練習のため「不満」を自動入力しました。',
     autoInput: { kind: 'text', value: '不満' },
   },
 
@@ -255,8 +257,8 @@ export const TUTORIAL_STEPS = [
     fieldPath: 'questionText',
     mode: 'autofill',
     placement: 'right',
-    title: '評定尺度の設問文',
-    body: 'ここが設問文です。回答者に何を聞くかを書く欄です。練習のため「今回のサービス全体の満足度をお聞かせください。」を自動入力しました。確認できたら「次へ」を押してください。',
+    title: '設問文を入力',
+    body: '回答者に何を聞くかを書く欄です。練習のため「今回のサービス全体の満足度をお聞かせください。」を自動入力しました。',
     autoInput: { kind: 'text', value: '今回のサービス全体の満足度をお聞かせください。' },
   },
   {
@@ -267,8 +269,8 @@ export const TUTORIAL_STEPS = [
     fieldPath: 'minLabel',
     mode: 'autofill',
     placement: 'right',
-    title: '最小値ラベル（左端）',
-    body: 'ここが最小値ラベルです。評定尺度の左端（最低評価）に表示される文言です。練習のため「とても不満」を自動入力しました。確認できたら「次へ」を押してください。',
+    title: '最小値ラベルを入力',
+    body: '評定尺度の左端（最低評価）に表示される文言です。練習のため「とても不満」を自動入力しました。',
     autoInput: { kind: 'text', value: 'とても不満' },
   },
   {
@@ -279,51 +281,89 @@ export const TUTORIAL_STEPS = [
     fieldPath: 'maxLabel',
     mode: 'autofill',
     placement: 'right',
-    title: '最大値ラベル（右端）',
-    body: 'ここが最大値ラベルです。評定尺度の右端（最高評価）に表示される文言です。練習のため「とても満足」を自動入力しました。確認できたら「次へ」を押してください。',
+    title: '最大値ラベルを入力',
+    body: '評定尺度の右端（最高評価）に表示される文言です。練習のため「とても満足」を自動入力しました。',
     autoInput: { kind: 'text', value: 'とても満足' },
   },
 
+  // ------------------------------------------------------------
+  // ブロック D: プレビュー確認 〜 QR・保存・完了
+  // ------------------------------------------------------------
   {
     id: 23,
-    block: 'C',
-    target: '#createSurveyBtn',
-    mode: 'user-action-bridge',
+    block: 'D',
+    target: '#showPreviewBtn',
+    mode: 'user-action',
     placement: 'left',
-    title: 'アンケートを作成（練習・保存されません）',
-    body: '右側の「アンケートを作成」ボタンを押してください。これは練習のため、実際には保存されず、アンケート一覧にも追加されません。続けて QR コードの確認方法を見てみましょう。',
+    title: 'プレビューを開く',
+    body: '右側の「プレビュー」ボタンを押してください。回答者にどのように表示されるかを確認できます。',
   },
-
-  // ------------------------------------------------------------
-  // ブロック D: QR コード確認 〜 完了
-  // ------------------------------------------------------------
   {
     id: 24,
+    block: 'D',
+    target: '#v2-preview-tablet-btn',
+    waitForElement: true,
+    mode: 'user-action',
+    placement: 'bottom',
+    title: '表示サイズを切り替える',
+    body: '「タブレット」を押してみましょう。スマートフォン表示とタブレット表示で、回答画面の見え方の違いを確認できます。',
+  },
+  {
+    id: 25,
+    block: 'D',
+    target: '#v2-preview-device-frame',
+    waitForElement: true,
+    mode: 'info',
+    placement: 'left',
+    title: '回答とサンクス画面を確認',
+    body: 'プレビュー内のアンケートに回答し、最後に「送信」を押してみましょう。回答者に表示される「サンクス画面」まで確認できます。確認できたら「次へ」を押してください。',
+  },
+  {
+    id: 26,
+    block: 'D',
+    target: '#surveyPreviewModalV2 button.bg-secondary-container',
+    waitForElement: true,
+    mode: 'user-action',
+    placement: 'top',
+    title: 'プレビューを閉じる',
+    body: '確認できたら「閉じる」を押してプレビューを閉じます。',
+  },
+  {
+    id: 27,
     block: 'D',
     target: '#openQrModalBtn',
     mode: 'user-action',
     placement: 'left',
     title: 'QR コードを表示',
-    body: '「QR コード」ボタンを押して QR コードを表示してみましょう。',
+    body: '「QR 発行」ボタンを押して QR コードを表示してみましょう。',
   },
   {
-    id: 25,
+    id: 28,
     block: 'D',
-    target: '#qrCodeModal .modal-content-transition',
-    mode: 'info',
-    placement: 'left',
-    title: 'QR コードの使い方',
-    body: 'この QR コードを展示会で配布したり画面に表示することで、来場者がアンケートに回答できます。',
+    target: '#footerCloseQrCodeModalBtn',
     waitForElement: true,
+    mode: 'user-action',
+    placement: 'top',
+    title: 'QR コードの使い方を確認',
+    body: 'アンケートを保存すると、ここに回答用の QR コードが発行されます。展示会で配布したり画面に表示することで、来場者がアンケートに回答できます。確認できたら「閉じる」を押してください。',
   },
   {
-    id: 26,
+    id: 29,
+    block: 'D',
+    target: '#createSurveyBtn',
+    mode: 'user-action-bridge',
+    placement: 'left',
+    title: 'アンケートを保存する',
+    body: '右側の「アンケートを保存する」ボタンを押してください。保存してもこの画面のまま、ダッシュボードへ自動では移動しません。（練習のため実際には保存されません）',
+  },
+  {
+    id: 30,
     block: 'D',
     target: null,
     mode: 'user-action-bridge',
     placement: 'center',
     title: 'チュートリアル完了',
-    body: 'お疲れさまでした。「完了」を押してダッシュボードへ戻ります。',
+    body: 'お疲れさまでした。これでアンケート作成の基本フローは完了です。「完了」を押すとアンケート一覧へ移動します。',
     completeButtonLabel: '完了',
   },
 ];

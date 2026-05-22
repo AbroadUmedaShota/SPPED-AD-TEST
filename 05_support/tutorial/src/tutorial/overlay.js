@@ -7,9 +7,14 @@ const SPOTLIGHT_RADIUS = 8;
 const PULSE_DURATION_MS = 200;
 const PULSE_COUNT = 2;
 const POSITION_TRANSITION_MS = 150;
+const MOBILE_BREAKPOINT = 768; // #6: この幅以下では right/left placement を不可とする
+const COACHMARK_FALLBACK_W = 400; // #8: CSS 実幅に合わせたフォールバック
+const COACHMARK_FALLBACK_H = 200; // #9: CSS 実高に寄せたフォールバック
+const CONNECTOR_REACH = 24; // bottom/top コネクタが伸びる距離（#25 のクランプ加味用）
 
 let rootEl = null; // .tutorial-root
 let maskEl = null; // .tutorial-mask（SVG 切り抜き）
+let cutoutRectEl = null; // SVG 切り抜き rect（#10: transition 統一のため保持）
 let spotlightEl = null; // .tutorial-spotlight（枠）
 let coachmarkEl = null; // .tutorial-coachmark
 let pointerEl = null; // .tutorial-pointer
@@ -18,7 +23,7 @@ let skipModalEl = null; // .tutorial-skip-modal
 let welcomeScreenEl = null; // .tutorial-welcome
 let progressStepLabelEl = null;
 let progressFillEl = null;
-let coachmarkStepBadgeEl = null;
+let srLiveEl = null; // #12: aria-live SR 専用領域
 
 let currentTargetEl = null;
 let currentStep = null;
@@ -26,9 +31,14 @@ let totalSteps = 20;
 let trackedReadonlyInputs = []; // {el, originalReadonly}
 let resizeHandlerBound = null;
 let scrollHandlerBound = null;
+let scrollRafId = null; // #21: scroll スロットル用 rAF id
 let windowClickGuardBound = null;
+let coachmarkKeydownBound = null; // #3/#4: コーチマーク内キーボード処理
+let animationSettleHandlerBound = null; // 対象の transition/animation 完了追従
 let pulseTimerId = null;
 let targetWatchObserver = null; // G9: 対象要素消失監視
+let targetResizeObserver = null; // 対象要素のサイズ変化（モーダル展開等）追従
+let inertedSiblings = []; // #3: inert を付与した body 直下要素
 
 let onNextCb = null;
 let onPrevCb = null;
@@ -46,20 +56,72 @@ export function initOverlay({ total } = {}) {
   buildCoachmark();
   buildPointer();
   resizeHandlerBound = () => repositionAll();
-  scrollHandlerBound = () => repositionAll();
+  // #21: scroll は capture + 全要素再計算が重いため requestAnimationFrame でスロットルする。
+  scrollHandlerBound = () => {
+    if (scrollRafId != null) return;
+    scrollRafId = window.requestAnimationFrame(() => {
+      scrollRafId = null;
+      repositionAll();
+    });
+  };
   window.addEventListener('resize', resizeHandlerBound);
   window.addEventListener('scroll', scrollHandlerBound, true);
+
+  // #3/#4: コーチマーク表示中のキーボード処理。
+  //   - Tab/Shift+Tab はコーチマーク内でフォーカスを循環（フォーカストラップ）
+  //   - ESC は離脱導線として skip 確認モーダルを開く
+  coachmarkKeydownBound = (ev) => {
+    // skip モーダル表示中は当該モーダルの keydown に委ねる（ESC=続ける挙動を維持）
+    if (skipModalEl || welcomeScreenEl) return;
+    if (!coachmarkEl || coachmarkEl.style.display === 'none') return;
+    if (ev.key === 'Escape') {
+      ev.preventDefault();
+      showSkipConfirm();
+      return;
+    }
+    if (ev.key === 'Tab') {
+      handleCoachmarkTab(ev);
+    }
+  };
+  document.addEventListener('keydown', coachmarkKeydownBound, true);
 
   // 対象外クリックを capture phase で判定。スポットライト対象とチュートリアル UI のみ通す。
   windowClickGuardBound = (ev) => {
     if (!currentTargetEl) return;
+    // プログラム的なクリック（チュートリアル自身が行う「選択肢を追加」ボタンの
+    // click() 等）はガード対象外。ユーザーの実クリック（isTrusted=true）だけを誘導する。
+    if (!ev.isTrusted) return;
     if (rootEl && rootEl.contains(ev.target)) return; // チュートリアル UI（吹き出し等）はそのまま
-    if (currentTargetEl === ev.target || currentTargetEl.contains(ev.target)) return; // 対象要素は通す
+    // 対象要素のクリックを通すのは user-action 系ステップのみ。
+    // info / autofill ステップは「次へ」で進む想定。対象がモーダル等のコンテナのとき、
+    // 内部のボタン（「作成する」等）を押して工程を飛ばすのを防ぐ。
+    const isUserActionStep = currentStep
+      && (currentStep.mode === 'user-action' || currentStep.mode === 'user-action-bridge');
+    if (isUserActionStep && (currentTargetEl === ev.target || currentTargetEl.contains(ev.target))) {
+      return; // 対象要素は通す
+    }
     ev.preventDefault();
     ev.stopPropagation();
     pulseAttention();
   };
   window.addEventListener('click', windowClickGuardBound, true);
+
+  // 対象要素の CSS トランジション/アニメーション完了時に再配置する。
+  // ResizeObserver は transform を検知しないため、モーダルの scale 展開アニメ等は
+  // こちらで完了を捉えてスポットライト枠・吹き出しを最終位置へ補正する。
+  animationSettleHandlerBound = (ev) => {
+    if (!currentTargetEl) return;
+    const t = ev.target;
+    if (
+      t === currentTargetEl
+      || (currentTargetEl.contains && currentTargetEl.contains(t))
+      || (t && t.contains && t.contains(currentTargetEl))
+    ) {
+      repositionAll();
+    }
+  };
+  document.addEventListener('transitionend', animationSettleHandlerBound, true);
+  document.addEventListener('animationend', animationSettleHandlerBound, true);
 
   // G9: 対象要素が DOM から切り離されたら再解決を試み、駄目なら中央フォールバック。
   targetWatchObserver = new MutationObserver(() => {
@@ -75,34 +137,65 @@ export function initOverlay({ total } = {}) {
         return;
       }
     }
-    // 再解決失敗 → スポットライト非表示・吹き出し中央
+    // #5: 再解決失敗 → スポットライト非表示・吹き出し中央。
+    // 暗幕だけ残って手がかりが消えるのを防ぐため、本文にメッセージを出し「次へ」を開放する。
     currentTargetEl = null;
     repositionAll();
+    showStuckHint('対象が見つかりません。「次へ」で進めます。');
   });
   targetWatchObserver.observe(document.body, { childList: true, subtree: true });
+
+  // 対象要素のサイズ変化（モーダルの展開アニメーション、遅延レイアウト等）に追従して
+  // 再配置する。描画時にレイアウト未確定でも、確定後の resize でスポットライト枠・
+  // 吹き出しが正しい位置へ補正される。
+  if (typeof ResizeObserver !== 'undefined') {
+    targetResizeObserver = new ResizeObserver(() => repositionAll());
+  }
 }
 
 export function destroyOverlay() {
   if (resizeHandlerBound) window.removeEventListener('resize', resizeHandlerBound);
   if (scrollHandlerBound) window.removeEventListener('scroll', scrollHandlerBound, true);
   if (windowClickGuardBound) window.removeEventListener('click', windowClickGuardBound, true);
+  if (coachmarkKeydownBound) document.removeEventListener('keydown', coachmarkKeydownBound, true);
+  if (animationSettleHandlerBound) {
+    document.removeEventListener('transitionend', animationSettleHandlerBound, true);
+    document.removeEventListener('animationend', animationSettleHandlerBound, true);
+    animationSettleHandlerBound = null;
+  }
+  if (scrollRafId != null) {
+    window.cancelAnimationFrame(scrollRafId);
+    scrollRafId = null;
+  }
   // G9: MutationObserver 停止
   if (targetWatchObserver) {
     targetWatchObserver.disconnect();
     targetWatchObserver = null;
   }
+  if (targetResizeObserver) {
+    targetResizeObserver.disconnect();
+    targetResizeObserver = null;
+  }
+  // #3: 背後ページの inert を確実に解除
+  releaseBackgroundInert();
   clearReadonlyTracking();
   if (rootEl?.parentNode) rootEl.parentNode.removeChild(rootEl);
   rootEl = null;
   maskEl = null;
+  cutoutRectEl = null;
   spotlightEl = null;
   coachmarkEl = null;
   pointerEl = null;
   progressBarEl = null;
   skipModalEl = null;
+  welcomeScreenEl = null;
   progressStepLabelEl = null;
   progressFillEl = null;
-  coachmarkStepBadgeEl = null;
+  srLiveEl = null;
+  resizeHandlerBound = null;
+  scrollHandlerBound = null;
+  windowClickGuardBound = null;
+  coachmarkKeydownBound = null;
   currentTargetEl = null;
   currentStep = null;
 }
@@ -120,11 +213,18 @@ export function renderStep(step, targetEl) {
   hideStuckHint();
   currentStep = step;
   currentTargetEl = targetEl;
+  // 対象のサイズ変化に追従させる（モーダル等が展開しきった後に枠を補正）。
+  if (targetResizeObserver) {
+    targetResizeObserver.disconnect();
+    if (targetEl) targetResizeObserver.observe(targetEl);
+  }
   updateProgress(step.id);
   if (targetEl) scrollIntoViewIfNeeded(targetEl);
   updateMaskAndSpotlight(targetEl);
   updateCoachmark(step, targetEl);
   updatePointer(step, targetEl);
+  // #12: ステップ遷移を SR へ通知（タイトル＋本文相当）
+  announceStep(step);
   trapFocus();
 }
 
@@ -243,13 +343,18 @@ export function showSkipConfirm() {
   if (skipModalEl) return;
   skipModalEl = buildSkipModal();
   rootEl.appendChild(skipModalEl);
-  const confirmBtn = skipModalEl.querySelector('[data-skip-action="confirm"]');
-  confirmBtn?.focus();
+  // #19: 離脱を後押ししないよう、初期フォーカスは「続ける」(cancel) に置く。
+  const cancelBtn = skipModalEl.querySelector('[data-skip-action="cancel"]');
+  try { cancelBtn?.focus(); } catch (_e) { /* noop */ }
 }
 
 export function hideSkipConfirm() {
   if (skipModalEl?.parentNode) skipModalEl.parentNode.removeChild(skipModalEl);
   skipModalEl = null;
+  // skip モーダルを閉じたらコーチマークへフォーカスを戻し、トラップを継続させる。
+  if (coachmarkEl && coachmarkEl.style.display !== 'none') {
+    trapFocus();
+  }
 }
 
 export function showWelcome({ onStart, onSkip } = {}) {
@@ -257,6 +362,13 @@ export function showWelcome({ onStart, onSkip } = {}) {
   ensureRoot();
   welcomeScreenEl = buildWelcomeScreen();
   rootEl.appendChild(welcomeScreenEl);
+  // #27: welcome 自身が dialog/aria-modal を持つ間、rootEl の dialog ロールは外して
+  // モーダルの二重ネストを解消する（#11 と整合）。
+  rootEl.removeAttribute('role');
+  rootEl.removeAttribute('aria-modal');
+  rootEl.removeAttribute('aria-label');
+  // #3: welcome 表示中も背後ページを inert 化する
+  applyBackgroundInert();
   // 進行バー・マスク等の通常チュートリアル UI は非表示にして welcome に集中させる
   if (progressBarEl) progressBarEl.style.display = 'none';
   if (maskEl) maskEl.style.display = 'none';
@@ -279,12 +391,48 @@ export function showWelcome({ onStart, onSkip } = {}) {
 export function hideWelcome() {
   if (welcomeScreenEl?.parentNode) welcomeScreenEl.parentNode.removeChild(welcomeScreenEl);
   welcomeScreenEl = null;
+  // #3: welcome フェーズで付与した背後ページの inert を解除する。
+  // コーチマーク表示フェーズでは user-action 対象をクリックさせるため inert を残さない。
+  releaseBackgroundInert();
+  // #27: welcome 終了後、rootEl の dialog ロールを復元（コーチマーク表示フェーズ）
+  rootEl?.setAttribute('role', 'dialog');
+  rootEl?.setAttribute('aria-modal', 'true');
+  rootEl?.setAttribute('aria-label', 'SPEED AD チュートリアル');
   // 通常チュートリアル UI を復活
   if (progressBarEl) progressBarEl.style.display = '';
   if (maskEl) maskEl.style.display = '';
   if (coachmarkEl) coachmarkEl.style.display = '';
   if (spotlightEl) spotlightEl.style.display = '';
   if (pointerEl) pointerEl.style.display = '';
+}
+
+/**
+ * チュートリアル完了/スキップ後、アカウント未保有のお試しユーザー向けに表示する
+ * 全画面 CTA 画面。index.js が finishAndExit 内で destroyOverlay() を呼んだ後に
+ * 呼び出すため、rootEl は破棄済み。自前で ensureRoot() してルートを用意する。
+ * 終端画面のため 1 回表示のみで冪等化・hide 関数は持たない。
+ */
+export function showAccountCtaScreen({ onCreateAccount, onClose } = {}) {
+  ensureRoot();
+  const ctaScreenEl = buildAccountCtaScreen();
+  rootEl.appendChild(ctaScreenEl);
+  // CTA 画面自身が dialog/aria-modal を持つため、rootEl の dialog ロールは外して
+  // モーダルの二重ネストを解消する（welcome と同じ作法）。
+  rootEl.removeAttribute('role');
+  rootEl.removeAttribute('aria-modal');
+  rootEl.removeAttribute('aria-label');
+  // 背後ページを inert 化して操作不能にする。
+  applyBackgroundInert();
+
+  const createBtn = ctaScreenEl.querySelector('.tutorial-account-cta__create');
+  const closeBtn = ctaScreenEl.querySelector('.tutorial-account-cta__close');
+  createBtn?.addEventListener('click', () => {
+    onCreateAccount && onCreateAccount();
+  });
+  closeBtn?.addEventListener('click', () => {
+    onClose && onClose();
+  });
+  createBtn?.focus();
 }
 
 // ---------- 構築 ----------
@@ -296,7 +444,17 @@ function ensureRoot() {
   rootEl.setAttribute('role', 'dialog');
   rootEl.setAttribute('aria-modal', 'true');
   rootEl.setAttribute('aria-label', 'SPEED AD チュートリアル');
+  // #11: コーチマークのタイトル/本文を dialog のラベル・説明として参照する。
+  rootEl.setAttribute('aria-labelledby', 'tutorial-coachmark-title');
+  rootEl.setAttribute('aria-describedby', 'tutorial-coachmark-body');
   document.body.appendChild(rootEl);
+
+  // #12: ステップ遷移を読み上げる SR 専用領域。CSS（tutorial-sr-only）は別担当が定義。
+  srLiveEl = document.createElement('div');
+  srLiveEl.className = 'tutorial-sr-only';
+  srLiveEl.setAttribute('aria-live', 'polite');
+  srLiveEl.setAttribute('aria-atomic', 'true');
+  rootEl.appendChild(srLiveEl);
 }
 
 function buildProgressBar() {
@@ -358,6 +516,12 @@ function buildMask() {
   cutout.setAttribute('rx', String(SPOTLIGHT_RADIUS));
   cutout.setAttribute('ry', String(SPOTLIGHT_RADIUS));
   cutout.setAttribute('fill', 'black');
+  // #10: spotlightEl(枠) は CSS transition で 150ms 補間されるため、
+  // SVG cutout rect の x/y/width/height にも同じ transition を付けてジャンプを揃える。
+  cutout.style.transition =
+    `x ${POSITION_TRANSITION_MS}ms ease-out, y ${POSITION_TRANSITION_MS}ms ease-out, ` +
+    `width ${POSITION_TRANSITION_MS}ms ease-out, height ${POSITION_TRANSITION_MS}ms ease-out`;
+  cutoutRectEl = cutout;
   mask.appendChild(cutout);
   defs.appendChild(mask);
   svg.appendChild(defs);
@@ -382,25 +546,25 @@ function buildMask() {
 function buildCoachmark() {
   coachmarkEl = document.createElement('div');
   coachmarkEl.className = 'tutorial-coachmark';
-  coachmarkEl.setAttribute('role', 'dialog');
+  // #11: role="dialog" は rootEl が保持するため、コーチマーク側からは外して二重ネストを解消。
+  // タイトル/本文へ id を付与し、rootEl が aria-labelledby/describedby で参照する。
+  coachmarkEl.setAttribute('tabindex', '-1'); // #7: 安全な初期フォーカス先
 
   const headerEl = document.createElement('div');
   headerEl.className = 'tutorial-coachmark__header';
 
-  const stepBadgeEl = document.createElement('span');
-  stepBadgeEl.className = 'tutorial-coachmark__step-badge';
-  stepBadgeEl.textContent = `${padStep(1)} / ${padStep(totalSteps)}`;
-  coachmarkStepBadgeEl = stepBadgeEl;
-  headerEl.appendChild(stepBadgeEl);
+  // #13: コーチマーク内 step-badge は廃止（進行バーへ一本化）。
 
   const titleEl = document.createElement('h2');
   titleEl.className = 'tutorial-coachmark__title';
+  titleEl.id = 'tutorial-coachmark-title';
   headerEl.appendChild(titleEl);
 
   coachmarkEl.appendChild(headerEl);
 
   const bodyEl = document.createElement('p');
   bodyEl.className = 'tutorial-coachmark__body';
+  bodyEl.id = 'tutorial-coachmark-body';
   coachmarkEl.appendChild(bodyEl);
 
   const footer = document.createElement('div');
@@ -439,7 +603,8 @@ function buildCoachmark() {
 
   const hint = document.createElement('span');
   hint.className = 'tutorial-coachmark__hint';
-  hint.textContent = 'クリックして次へ';
+  // #15: 押す対象を明示する文言にする。
+  hint.textContent = 'ハイライトされた箇所をクリックしてください';
   footer.appendChild(hint);
 
   coachmarkEl.appendChild(footer);
@@ -485,7 +650,8 @@ function buildSkipModal() {
 
   const body = document.createElement('p');
   body.className = 'tutorial-skip-modal__body';
-  body.textContent = '終了するとアンケート一覧画面に移動します。';
+  // #28: 実遷移先はステップ 1（ダッシュボード）。呼称をステップ 1 と揃える。
+  body.textContent = '終了するとダッシュボードに移動します。';
   panel.appendChild(body);
 
   const footer = document.createElement('div');
@@ -550,7 +716,8 @@ function buildWelcomeScreen() {
 
   const body = document.createElement('p');
   body.className = 'tutorial-welcome__body';
-  body.textContent = 'アンケート作成から QR 発行までの基本フローを、5 分ほどで体験しましょう。';
+  // #29: 26 ステップの実所要と乖離するため、断定を避けた控えめな表現にする。
+  body.textContent = 'アンケート作成から QR 発行までの基本フローを、数分で体験しましょう。';
   panel.appendChild(body);
 
   const actions = document.createElement('div');
@@ -576,6 +743,55 @@ function buildWelcomeScreen() {
   return overlay;
 }
 
+function buildAccountCtaScreen() {
+  const overlay = document.createElement('div');
+  overlay.className = 'tutorial-account-cta';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+  overlay.setAttribute('aria-labelledby', 'tutorial-account-cta-title');
+
+  const panel = document.createElement('div');
+  panel.className = 'tutorial-account-cta__panel';
+
+  const eyebrow = document.createElement('div');
+  eyebrow.className = 'tutorial-account-cta__eyebrow';
+  eyebrow.textContent = 'SPEED AD';
+  panel.appendChild(eyebrow);
+
+  const title = document.createElement('h1');
+  title.className = 'tutorial-account-cta__title';
+  title.id = 'tutorial-account-cta-title';
+  title.textContent = 'アカウントを作成して、はじめましょう';
+  panel.appendChild(title);
+
+  const body = document.createElement('p');
+  body.className = 'tutorial-account-cta__body';
+  body.textContent =
+    'ここまでがアンケート作成の基本フローです。アカウントを作成すると、'
+    + '実際にアンケートを公開して回答を集められます。';
+  panel.appendChild(body);
+
+  const actions = document.createElement('div');
+  actions.className = 'tutorial-account-cta__actions';
+
+  const closeBtn = document.createElement('button');
+  closeBtn.type = 'button';
+  closeBtn.className = 'tutorial-account-cta__close';
+  closeBtn.textContent = '閉じる';
+  actions.appendChild(closeBtn);
+
+  const createBtn = document.createElement('button');
+  createBtn.type = 'button';
+  createBtn.className = 'tutorial-account-cta__create';
+  createBtn.textContent = 'アカウントを作成';
+  actions.appendChild(createBtn);
+
+  panel.appendChild(actions);
+  overlay.appendChild(panel);
+
+  return overlay;
+}
+
 // ---------- 更新 ----------
 
 function padStep(n) {
@@ -583,11 +799,9 @@ function padStep(n) {
 }
 
 function updateProgress(stepId) {
+  // #13: 進捗表示は進行バーへ一本化（コーチマーク内 step-badge は廃止）。
   if (progressStepLabelEl) {
     progressStepLabelEl.textContent = `${padStep(stepId)} / ${padStep(totalSteps)}`;
-  }
-  if (coachmarkStepBadgeEl) {
-    coachmarkStepBadgeEl.textContent = `${padStep(stepId)} / ${padStep(totalSteps)}`;
   }
   if (progressFillEl) {
     const pct = Math.min(100, Math.max(0, (stepId / totalSteps) * 100));
@@ -596,7 +810,7 @@ function updateProgress(stepId) {
 }
 
 function updateMaskAndSpotlight(targetEl) {
-  const cutout = maskEl?.querySelector('#tutorial-mask-cutout-rect');
+  const cutout = cutoutRectEl || maskEl?.querySelector('#tutorial-mask-cutout-rect');
   if (!cutout || !spotlightEl) return;
 
   if (!targetEl) {
@@ -654,40 +868,24 @@ function updateCoachmark(step, targetEl) {
     hint.style.display = isUserAction ? '' : 'none';
   }
 
-  // 「戻る」は先頭以外で表示
+  // 「戻る」は先頭以外で表示。M-2: ページ境界ステップ（step.hideBack）では非表示。
   if (prevBtn) {
-    prevBtn.style.display = step.id > 1 ? '' : 'none';
+    const showPrev = step.id > 1 && step.hideBack !== true;
+    prevBtn.style.display = showPrev ? '' : 'none';
   }
 
-  // 位置決め
+  // 位置決め。#9: 本文セット直後は高さが未確定なため、
+  // レイアウト確定後（次フレーム）に再度位置を計算してずれを補正する。
   positionCoachmark(step, targetEl);
+  window.requestAnimationFrame(() => {
+    if (currentStep === step) positionCoachmark(step, targetEl);
+  });
 }
 
-function positionCoachmark(step, targetEl) {
-  if (!coachmarkEl) return;
-  const placement = step.placement || 'bottom';
-  const notch = coachmarkEl.querySelector('.tutorial-coachmark__notch');
-  if (notch) notch.dataset.placement = placement;
-
-  // center placement または target なしの場合は画面中央
-  if (placement === 'center' || !targetEl) {
-    coachmarkEl.style.transition = `all ${POSITION_TRANSITION_MS}ms ease-out`;
-    coachmarkEl.style.left = '50%';
-    coachmarkEl.style.top = '50%';
-    coachmarkEl.style.transform = 'translate(-50%, -50%)';
-    if (notch) notch.style.display = 'none';
-    return;
-  }
-  if (notch) notch.style.display = '';
-
-  const rect = targetEl.getBoundingClientRect();
-  const cmRect = coachmarkEl.getBoundingClientRect();
-  const coachmarkW = cmRect.width || 320;
-  const coachmarkH = cmRect.height || 160;
-  const gap = 16;
+// 指定 placement での吹き出し左上座標を計算する（クランプ前の素の値）。
+function computeRawPosition(placement, rect, coachmarkW, coachmarkH, gap) {
   let left = 0;
   let top = 0;
-
   switch (placement) {
     case 'top':
       left = rect.left + rect.width / 2 - coachmarkW / 2;
@@ -707,19 +905,144 @@ function positionCoachmark(step, targetEl) {
       top = rect.bottom + gap;
       break;
   }
+  return { left, top };
+}
 
-  // G8: 吹き出しの画面内クランプ
-  //   - top: 進行バー 48px + 余白 8px = 56px を下端、画面高 - 高さ - 8px を上端
-  //   - left: 8px を左端、画面幅 - 幅 - 8px を右端
+// 2 つの矩形（left/top/width/height）が重なるか判定する。
+function rectsOverlap(a, b) {
+  return (
+    a.left < b.left + b.width &&
+    a.left + a.width > b.left &&
+    a.top < b.top + b.height &&
+    a.top + a.height > b.top
+  );
+}
+
+function positionCoachmark(step, targetEl) {
+  if (!coachmarkEl) return;
+  const notch = coachmarkEl.querySelector('.tutorial-coachmark__notch');
+
+  // center placement または target なしの場合は画面中央
+  let placement = step.placement || 'bottom';
+  if (placement === 'center' || !targetEl) {
+    if (notch) {
+      notch.dataset.placement = 'center';
+      notch.style.display = 'none';
+      notch.style.left = '';
+      notch.style.top = '';
+      notch.style.transform = '';
+    }
+    coachmarkEl.style.transition = `all ${POSITION_TRANSITION_MS}ms ease-out`;
+    coachmarkEl.style.left = '50%';
+    coachmarkEl.style.top = '50%';
+    coachmarkEl.style.transform = 'translate(-50%, -50%)';
+    return;
+  }
+
   const vw = window.innerWidth;
   const vh = window.innerHeight;
-  top = Math.max(56, Math.min(top, vh - coachmarkH - 8));
-  left = Math.max(8, Math.min(left, vw - coachmarkW - 8));
+  const rect = targetEl.getBoundingClientRect();
+  const cmRect = coachmarkEl.getBoundingClientRect();
+  // #8/#9: フォールバックを CSS 実寸（幅 400 / 高さ 200+）に合わせる。
+  const coachmarkW = cmRect.width || COACHMARK_FALLBACK_W;
+  const coachmarkH = cmRect.height || COACHMARK_FALLBACK_H;
+  const gap = 16;
+
+  // #6: モバイル幅では right/left を不可とし bottom/top に倒す。
+  // 対象が画面下寄り（下側に吹き出しが収まらない）なら top、それ以外は bottom。
+  if (vw <= MOBILE_BREAKPOINT && (placement === 'right' || placement === 'left')) {
+    const fitsBelow = rect.bottom + gap + coachmarkH <= vh - 8;
+    placement = fitsBelow ? 'bottom' : 'top';
+  }
+
+  // #1: 候補 placement を順に試し、ターゲットと重ならず画面内に収まる配置を選ぶ。
+  //   right↔left, top↔bottom の反対側をフォールバック候補に含める。
+  const opposite = { right: 'left', left: 'right', top: 'bottom', bottom: 'top' };
+  const candidates = [placement];
+  if (opposite[placement]) candidates.push(opposite[placement]);
+
+  const targetBox = {
+    left: rect.left,
+    top: rect.top,
+    width: rect.width,
+    height: rect.height,
+  };
+
+  let chosen = null;
+  let firstPos = null;
+  for (let i = 0; i < candidates.length; i += 1) {
+    const cand = candidates[i];
+    const pos = computeRawPosition(cand, rect, coachmarkW, coachmarkH, gap);
+    if (i === 0) firstPos = { placement: cand, ...pos };
+    const onScreen =
+      pos.left >= 8 &&
+      pos.left + coachmarkW <= vw - 8 &&
+      pos.top >= 56 &&
+      pos.top + coachmarkH <= vh - 8;
+    const box = { left: pos.left, top: pos.top, width: coachmarkW, height: coachmarkH };
+    if (onScreen && !rectsOverlap(box, targetBox)) {
+      chosen = { placement: cand, ...pos };
+      break;
+    }
+  }
+  // どの候補も収まらない場合は最初の候補を使う（クランプで可能な限り見せる）。
+  if (!chosen) chosen = firstPos;
+
+  placement = chosen.placement;
+  let { left, top } = chosen;
+
+  if (notch) {
+    notch.dataset.placement = placement;
+    notch.style.display = '';
+  }
+
+  // G8/#25: 吹き出しの画面内クランプ。
+  //   - top: 進行バー 48px + 余白 8px = 56px を下端。
+  //     bottom placement はコネクタが上へ伸びるため、その分（CONNECTOR_REACH）下げて
+  //     コネクタが進行バーへ食い込まないようにする。
+  //   - left: 8px を左端、画面幅 - 幅 - 8px を右端。
+  const topFloor = placement === 'bottom' ? 56 + CONNECTOR_REACH : 56;
+  const clampedTop = Math.max(topFloor, Math.min(top, vh - coachmarkH - 8));
+  const clampedLeft = Math.max(8, Math.min(left, vw - coachmarkW - 8));
+  top = clampedTop;
+  left = clampedLeft;
 
   coachmarkEl.style.transition = `all ${POSITION_TRANSITION_MS}ms ease-out`;
   coachmarkEl.style.transform = 'none';
   coachmarkEl.style.left = `${left}px`;
   coachmarkEl.style.top = `${top}px`;
+
+  // #2: クランプで吹き出しがずれてもコネクタがターゲット中心を指すよう、JS で動的補正。
+  adjustConnector(notch, placement, rect, left, top, coachmarkW, coachmarkH);
+}
+
+/**
+ * #2: コネクタ（ノッチ）位置の動的補正。
+ * CSS は left:50% 等の固定配置だが、クランプで吹き出しがずれるとターゲットを指さなくなる。
+ * top/bottom placement は水平方向、left/right placement は垂直方向のオフセットを
+ * 吹き出し座標基準に再計算し、ターゲット中心へ向ける。
+ */
+function adjustConnector(notch, placement, targetRect, cmLeft, cmTop, cmW, cmH) {
+  if (!notch) return;
+  const targetCx = targetRect.left + targetRect.width / 2;
+  const targetCy = targetRect.top + targetRect.height / 2;
+  const edgePad = 12; // コネクタが吹き出し角からはみ出さないための余白
+
+  if (placement === 'top' || placement === 'bottom') {
+    // 吹き出し内 X 座標としてターゲット中心を表現し、両端を edgePad でクランプ。
+    let connLeft = targetCx - cmLeft;
+    connLeft = Math.max(edgePad, Math.min(connLeft, cmW - edgePad));
+    notch.style.left = `${connLeft}px`;
+    notch.style.top = '';
+    notch.style.transform = 'translateX(-50%)';
+  } else {
+    // left / right placement: 垂直方向を補正。
+    let connTop = targetCy - cmTop;
+    connTop = Math.max(edgePad, Math.min(connTop, cmH - edgePad));
+    notch.style.top = `${connTop}px`;
+    notch.style.left = '';
+    notch.style.transform = 'translateY(-50%)';
+  }
 }
 
 function updatePointer(step, targetEl) {
@@ -740,11 +1063,112 @@ function updatePointer(step, targetEl) {
   pointerEl.style.pointerEvents = 'none';
 }
 
+/**
+ * #3: コーチマーク内のフォーカス可能要素一覧を返す（display:none のものは除外）。
+ */
+function getCoachmarkFocusable() {
+  if (!coachmarkEl) return [];
+  const nodes = coachmarkEl.querySelectorAll(
+    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+  );
+  return Array.prototype.filter.call(nodes, (el) => {
+    if (el.disabled) return false;
+    if (el.style.display === 'none') return false;
+    // 祖先まで遡って非表示でないか確認
+    return el.offsetParent !== null || el === document.activeElement;
+  });
+}
+
+/**
+ * #3/#7: Tab / Shift+Tab を完全手動で循環させるフォーカストラップ。
+ * コーチマーク内のフォーカス可能要素に加え、user-action ステップでは
+ * ハイライト対象も循環に含め、キーボードのみのユーザーが対象を直接操作できるようにする。
+ */
+function handleCoachmarkTab(ev) {
+  const focusable = getCoachmarkFocusable();
+  // #7: user-action 系ステップではハイライト対象もタブ循環に含める。
+  const isUserAction = currentStep
+    && (currentStep.mode === 'user-action' || currentStep.mode === 'user-action-bridge');
+  if (isUserAction && currentTargetEl && document.contains(currentTargetEl)) {
+    focusable.push(currentTargetEl);
+  }
+  if (focusable.length === 0) {
+    // フォーカス可能要素が無ければコーチマーク本体に留める。
+    ev.preventDefault();
+    try { coachmarkEl.focus({ preventScroll: true }); } catch (_e) { /* noop */ }
+    return;
+  }
+  // 完全手動循環: 常に next/prev を明示制御する。
+  ev.preventDefault();
+  const active = document.activeElement;
+  let idx = focusable.indexOf(active);
+  if (idx === -1) {
+    // コーチマーク本体(tabindex=-1)等、リスト外にフォーカスがある場合は端から開始。
+    idx = ev.shiftKey ? 0 : focusable.length - 1;
+  }
+  const nextIdx = ev.shiftKey
+    ? (idx - 1 + focusable.length) % focusable.length
+    : (idx + 1) % focusable.length;
+  try { focusable[nextIdx].focus({ preventScroll: true }); } catch (_e) { /* noop */ }
+}
+
+/**
+ * #3/#7: ステップ表示時の自動フォーカス。
+ *   - 「次へ」ボタンが表示されていればそこへ（#7: 「スキップ」へ当たって誤離脱するのを防ぐ）。
+ *   - user-action ステップで「次へ」非表示のときは「スキップ」を初期フォーカスせず、
+ *     コーチマーク本体（tabindex=-1）へフォーカスする。
+ */
 function trapFocus() {
   if (!coachmarkEl) return;
-  const focusable = coachmarkEl.querySelector('button:not([style*="display: none"])');
-  // 直近の自動フォーカスは「次へ」または「スキップ」
-  if (focusable) {
-    try { focusable.focus({ preventScroll: true }); } catch (_e) { /* noop */ }
+  const nextBtn = coachmarkEl.querySelector('.tutorial-coachmark__next');
+  let focusTarget = null;
+  if (nextBtn && nextBtn.style.display !== 'none') {
+    focusTarget = nextBtn;
+  } else {
+    focusTarget = coachmarkEl; // 安全な要素（スキップは避ける）
   }
+  try { focusTarget.focus({ preventScroll: true }); } catch (_e) { /* noop */ }
+}
+
+// ---------- #3: 背後ページの inert 制御 ----------
+
+/**
+ * tutorial-root 以外の body 直下要素へ inert を付与し、背後ページを操作不能にする。
+ * destroyOverlay で releaseBackgroundInert により確実に解除する。
+ */
+function applyBackgroundInert() {
+  if (!rootEl || !document.body) return;
+  const children = Array.prototype.slice.call(document.body.children);
+  children.forEach((el) => {
+    if (el === rootEl) return;
+    if (el.hasAttribute('inert')) return; // 既に inert（多重付与の冪等化）
+    if (inertedSiblings.indexOf(el) !== -1) return;
+    el.setAttribute('inert', '');
+    inertedSiblings.push(el);
+  });
+}
+
+function releaseBackgroundInert() {
+  inertedSiblings.forEach((el) => {
+    if (el && el.removeAttribute) el.removeAttribute('inert');
+  });
+  inertedSiblings = [];
+}
+
+// ---------- #12: SR 通知 ----------
+
+/**
+ * ステップ遷移時にタイトル＋本文相当を aria-live 領域へ流し込み、SR に通知する。
+ */
+function announceStep(step) {
+  if (!srLiveEl) return;
+  const title = step.title || '';
+  const body = step.body || '';
+  const stepLabel = `ステップ ${padStep(step.id)} / ${padStep(totalSteps)}`;
+  // 同一テキスト連続でも再通知されるよう一旦空にしてから設定する。
+  srLiveEl.textContent = '';
+  window.requestAnimationFrame(() => {
+    if (!srLiveEl) return;
+    srLiveEl.textContent = [stepLabel, title, body].filter(Boolean).join('。 ');
+  });
 }
