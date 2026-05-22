@@ -1,5 +1,5 @@
 const APP_ROOT_PREFIX = window.location.pathname.includes('/customer-voices/') ? '../' : '';
-const VOICE_COLLECTION_VERSION = '20260522-quote-author';
+const VOICE_COLLECTION_VERSION = '20260522-remove-primary-caption';
 
 export function resolveAppRootPath(path) {
   if (!path) {

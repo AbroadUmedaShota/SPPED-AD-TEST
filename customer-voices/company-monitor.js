@@ -9,7 +9,7 @@ import {
   renderParagraphs,
   resolveAppRootPath,
   setupRevealAnimations,
-} from './shared.js?v=20260522-quote-author';
+} from './shared.js?v=20260522-remove-primary-caption';
 
 function setHtml(sectionId, bodyId, html) {
   const section = document.getElementById(sectionId);
