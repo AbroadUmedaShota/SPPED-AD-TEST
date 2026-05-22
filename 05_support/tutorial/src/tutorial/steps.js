@@ -373,7 +373,7 @@ export const TUTORIAL_STEPS = [
     mode: 'user-action-bridge',
     placement: 'center',
     title: 'チュートリアル完了',
-    body: 'お疲れさまでした。これでアンケート作成の基本フローは完了です。「完了」を押すとアンケート一覧へ移動します。',
+    body: 'お疲れさまでした。これでアンケート作成の基本フローは完了です。「完了」を押すと、アカウント作成のご案内が表示されます。',
     completeButtonLabel: '完了',
   },
 ];

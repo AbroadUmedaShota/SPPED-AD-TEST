@@ -407,8 +407,8 @@ export function hideWelcome() {
 }
 
 /**
- * チュートリアル完了/スキップ後、アカウント未保有のお試しユーザー向けに表示する
- * 全画面 CTA 画面。index.js が finishAndExit 内で destroyOverlay() を呼んだ後に
+ * チュートリアル完了/スキップ後、全ユーザー共通で表示する終端の全画面 CTA 画面。
+ * index.js が finishAndExit 内で destroyOverlay() を呼んだ後に
  * 呼び出すため、rootEl は破棄済み。自前で ensureRoot() してルートを用意する。
  * 終端画面のため 1 回表示のみで冪等化・hide 関数は持たない。
  */
@@ -650,8 +650,7 @@ function buildSkipModal() {
 
   const body = document.createElement('p');
   body.className = 'tutorial-skip-modal__body';
-  // #28: 実遷移先はステップ 1（ダッシュボード）。呼称をステップ 1 と揃える。
-  body.textContent = '終了するとダッシュボードに移動します。';
+  body.textContent = '終了すると、アカウント作成のご案内が表示されます。';
   panel.appendChild(body);
 
   const footer = document.createElement('div');

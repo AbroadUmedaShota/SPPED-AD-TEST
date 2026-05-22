@@ -28,9 +28,6 @@ import {
   clearProgress,
   markCompleted,
   isCompleted,
-  setEntryType,
-  getEntryType,
-  clearEntryType,
 } from './state.js';
 import { installGlobalApi, enableTargetForTutorial } from './guards.js';
 import { loadCommonHtml } from '../utils.js';
@@ -87,12 +84,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 中断再開・URL での step 指定時はスキップして直接該当ステップへ。
   const progress = readProgress();
   const isFreshStart = !progress && startStep === 1;
-  // フレッシュ起動時のみエントリ種別を確定する。中断再開・ページ跨ぎでは
-  // 再設定しないため index.html→surveyCreation.html の遷移でも保持される。
-  if (isFreshStart) {
-    const isTrial = new URLSearchParams(window.location.search).get('trial') === '1';
-    setEntryType(isTrial ? 'trial' : 'standard');
-  }
   if (isFreshStart) {
     showWelcome({
       onStart: () => goToStep(1),
@@ -578,23 +569,16 @@ function advanceStep() {
 }
 
 function finishAndExit({ markComplete }) {
-  const isTrial = getEntryType() === 'trial';
   if (markComplete) markCompleted();
   else clearProgress();
-  clearEntryType();
   detachNewQuestionObserver();
   destroyOverlay();
-  // お試しユーザーは実ダッシュボードへ遷移せず、アカウント作成 CTA 画面へ誘導する。
+  // 完了・スキップともにアカウント作成 CTA 画面で終端する単一フロー。
   // showAccountCtaScreen は内部で ensureRoot するため destroyOverlay 後に呼ぶ。
-  if (isTrial) {
-    showAccountCtaScreen({
-      onCreateAccount: () => window.location.assign('../../index.html?intent=signup'),
-      onClose: () => window.location.assign('../../index.html'),
-    });
-    return;
-  }
-  // `05_support/tutorial/` 配下で動作するため、退出先は実ダッシュボードへ固定する
-  window.location.assign('../../02_dashboard/index.html');
+  showAccountCtaScreen({
+    onCreateAccount: () => window.location.assign('../../index.html?intent=signup'),
+    onClose: () => window.location.assign('../../index.html'),
+  });
 }
 
 // ---------- ページ遷移 ----------
