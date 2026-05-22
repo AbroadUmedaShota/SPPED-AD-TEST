@@ -517,16 +517,25 @@ function cleanupActiveStep() {
 
 function handleNext() {
   // #18: 緊急脱出（stuck hint 経由の前進）時、対象要素が存在すれば本来のクリックを
-  // 代行してから前進する。対象が無ければ前進のみ。
+  // 代行する。対象が無ければ前進のみ。
   if (escapeTargetEl) {
     const el = escapeTargetEl;
     escapeTargetEl = null;
+    // クリック代行で currentStepIndex が変わり得るため、現ステップを先に控える。
+    const stepBeforeClick = TUTORIAL_STEPS[currentStepIndex];
     if (document.body.contains(el)) {
       try {
         el.click();
       } catch (_e) {
         /* noop: クリック失敗時も前進は継続 */
       }
+    }
+    // user-action-bridge は本番ハンドラ（§5.4 ガード）がクリックを受けて
+    // goToStep / redirect で進行を引き継ぐ。ここで advanceStep すると二重進行になり、
+    // ステップ 30 の緊急脱出で完了ステップ（31）が飛ばされてしまう。
+    // ブリッジ系ではクリック代行のみとし、前進はガードに委ねる。
+    if (stepBeforeClick && stepBeforeClick.mode === 'user-action-bridge') {
+      return;
     }
   }
   advanceStep();
