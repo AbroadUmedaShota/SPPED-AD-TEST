@@ -650,8 +650,7 @@ function buildSkipModal() {
 
   const body = document.createElement('p');
   body.className = 'tutorial-skip-modal__body';
-  // #28: 実遷移先はステップ 1（ダッシュボード）。呼称をステップ 1 と揃える。
-  body.textContent = '終了するとダッシュボードに移動します。';
+  body.textContent = '終了すると、アカウント作成のご案内が表示されます。';
   panel.appendChild(body);
 
   const footer = document.createElement('div');
