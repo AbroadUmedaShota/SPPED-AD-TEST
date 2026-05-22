@@ -1,4 +1,5 @@
 const APP_ROOT_PREFIX = window.location.pathname.includes('/customer-voices/') ? '../' : '';
+const VOICE_COLLECTION_VERSION = '20260522-quote-author';
 
 export function resolveAppRootPath(path) {
   if (!path) {
@@ -20,7 +21,7 @@ export function escapeHtml(value) {
 }
 
 export async function loadVoiceCollection() {
-  const response = await fetch(resolveAppRootPath('data/customer-voices.json'));
+  const response = await fetch(resolveAppRootPath(`data/customer-voices.json?v=${VOICE_COLLECTION_VERSION}`));
   if (!response.ok) {
     throw new Error(`Failed to load customer voices: ${response.status}`);
   }

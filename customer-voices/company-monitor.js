@@ -9,7 +9,7 @@ import {
   renderParagraphs,
   resolveAppRootPath,
   setupRevealAnimations,
-} from './shared.js';
+} from './shared.js?v=20260522-quote-author';
 
 function setHtml(sectionId, bodyId, html) {
   const section = document.getElementById(sectionId);
@@ -102,8 +102,6 @@ function hideSectionsOnError() {
     'voice-challenge-section',
     'voice-outcome-section',
     'voice-operation-section',
-    'voice-overview-section',
-    'voice-features-section',
     'voice-body-image-secondary-section',
   ].forEach((id) => {
     const section = document.getElementById(id);
@@ -172,8 +170,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     setHtml('voice-challenge-section', 'voice-challenge-body', renderBullets(voice.challenge));
     setHtml('voice-outcome-section', 'voice-outcome-body', renderBullets(voice.outcome));
     setHtml('voice-operation-section', 'voice-operation-body', renderTimeline(voice.operationImage));
-    setHtml('voice-overview-section', 'voice-overview-body', renderParagraphs(voice.overview));
-    setHtml('voice-features-section', 'voice-features-body', renderFeatureList(voice.usedFeatures));
     setFigure(
       'voice-body-image-secondary-section',
       'voice-body-image-secondary',
