@@ -1,8 +1,8 @@
 // steps.js
-// チュートリアル全 30 ステップ定義（仕様書 §4 参照）
+// チュートリアル全 31 ステップ定義（仕様書 §4 参照）
 //
 // 各ステップフィールド:
-//   id        : ステップ番号（1..30）
+//   id        : ステップ番号（1..31）
 //   block     : 'A' | 'B' | 'C' | 'D'
 //   target    : 対象要素 CSS セレクタ（null の場合は画面中央 or 動的解決）
 //   mode      : 'info' | 'autofill' | 'user-action' | 'user-action-bridge'
@@ -17,9 +17,9 @@
 //   targetResolver : 'lastInsertedQuestionField' 等、動的にターゲットを解決する場合
 //   fieldPath / optionIndex : targetResolver='lastInsertedQuestionField' 時の解決パラメタ
 //
-// id=8, id=29, id=30 は user-action-bridge（本番ハンドラに代えてチュートリアルが続行処理を担う）。
+// id=8, id=30, id=31 は user-action-bridge（本番ハンドラに代えてチュートリアルが続行処理を担う）。
 // 旧 step 13（シングルアンサー一括）と旧 step 16（評定尺度一括）はフィールド単位に分解済み。
-// ブロック D（id=23..30）はプレビュー確認 → QR → 保存 → 完了 の順。
+// ブロック D（id=23..31）はプレビュー確認 → QR → 保存 → 完了 の順。
 
 const TOMORROW_OFFSET_DAYS = 1;
 const PERIOD_LENGTH_DAYS = 3;
@@ -301,25 +301,35 @@ export const TUTORIAL_STEPS = [
   {
     id: 24,
     block: 'D',
-    target: '#v2-preview-tablet-btn',
+    target: '#surveyPreviewModalV2 .modal-content-transition',
     waitForElement: true,
-    mode: 'user-action',
-    placement: 'bottom',
-    title: '表示サイズを切り替える',
-    body: '「タブレット」を押してみましょう。スマートフォン表示とタブレット表示で、回答画面の見え方の違いを確認できます。',
+    mode: 'info',
+    placement: 'left',
+    title: 'スマートフォン表示を確認',
+    body: 'プレビューが開きました。最初は回答者のスマートフォン画面です。プレビュー内のアンケートに回答して「送信」を押すと、サンクス画面（回答完了画面）まで確認できます。',
   },
   {
     id: 25,
     block: 'D',
-    target: '#v2-preview-device-frame',
+    target: '#v2-preview-tablet-btn',
     waitForElement: true,
-    mode: 'info',
-    placement: 'left',
-    title: '回答とサンクス画面を確認',
-    body: 'プレビュー内のアンケートに回答し、最後に「送信」を押してみましょう。回答者に表示される「サンクス画面」まで確認できます。確認できたら「次へ」を押してください。',
+    mode: 'user-action',
+    placement: 'bottom',
+    title: 'タブレット表示に切り替える',
+    body: '「タブレット」ボタンを押してください。表示サイズを切り替えられます。',
   },
   {
     id: 26,
+    block: 'D',
+    target: '#surveyPreviewModalV2 .modal-content-transition',
+    waitForElement: true,
+    mode: 'info',
+    placement: 'left',
+    title: 'タブレット表示を確認',
+    body: 'タブレットでの見え方に切り替わりました。スマートフォンとタブレットで、回答画面の見え方の違いを確認できます。',
+  },
+  {
+    id: 27,
     block: 'D',
     target: '#surveyPreviewModalV2 button.bg-secondary-container',
     waitForElement: true,
@@ -329,7 +339,7 @@ export const TUTORIAL_STEPS = [
     body: '確認できたら「閉じる」を押してプレビューを閉じます。',
   },
   {
-    id: 27,
+    id: 28,
     block: 'D',
     target: '#openQrModalBtn',
     mode: 'user-action',
@@ -338,7 +348,7 @@ export const TUTORIAL_STEPS = [
     body: '「QR 発行」ボタンを押して QR コードを表示してみましょう。',
   },
   {
-    id: 28,
+    id: 29,
     block: 'D',
     target: '#footerCloseQrCodeModalBtn',
     waitForElement: true,
@@ -348,7 +358,7 @@ export const TUTORIAL_STEPS = [
     body: 'アンケートを保存すると、ここに回答用の QR コードが発行されます。展示会で配布したり画面に表示することで、来場者がアンケートに回答できます。確認できたら「閉じる」を押してください。',
   },
   {
-    id: 29,
+    id: 30,
     block: 'D',
     target: '#createSurveyBtn',
     mode: 'user-action-bridge',
@@ -357,7 +367,7 @@ export const TUTORIAL_STEPS = [
     body: '右側の「アンケートを保存する」ボタンを押してください。保存してもこの画面のまま、ダッシュボードへ自動では移動しません。（練習のため実際には保存されません）',
   },
   {
-    id: 30,
+    id: 31,
     block: 'D',
     target: null,
     mode: 'user-action-bridge',
