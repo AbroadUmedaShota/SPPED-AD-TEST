@@ -6,6 +6,7 @@
 
 const PROGRESS_KEY = 'speedad-tutorial-progress';
 const COMPLETED_KEY = 'speedad-tutorial-completed';
+const ENTRY_KEY = 'speedad-tutorial-entry';
 
 function safeGetItem(key) {
   try {
@@ -64,7 +65,20 @@ export function isCompleted() {
   return safeGetItem(COMPLETED_KEY) === '1';
 }
 
+export function setEntryType(type) {
+  safeSetItem(ENTRY_KEY, type);
+}
+
+export function getEntryType() {
+  return safeGetItem(ENTRY_KEY);
+}
+
+export function clearEntryType() {
+  safeRemoveItem(ENTRY_KEY);
+}
+
 export function resetAll() {
   safeRemoveItem(PROGRESS_KEY);
   safeRemoveItem(COMPLETED_KEY);
+  safeRemoveItem(ENTRY_KEY);
 }

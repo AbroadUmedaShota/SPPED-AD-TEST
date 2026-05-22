@@ -1,32 +1,41 @@
 /* tutorial.css
- * SPEED AD チュートリアル UI（仕様書 §8）
- *   - グラスモーフィズム + ホログラフィック方向
- *   - マスク + スポットライト枠（二重リング & パルス）
- *   - コーチマーク（グラス枠 + グラデボーダー）
- *   - 発光ドット型ポインタ（同心円パルス）
+ * SPEED AD チュートリアル UI
+ *   - サービス本体の配色（白基調 + Google Blue #4285F4 のフラットな Material デザイン）に準拠
+ *   - service-top-style.css の CSS カスタムプロパティ（--color-*）を var() 参照し、
+ *     サービスがダークモード（body.dark-mode）のときは自動追従する
+ *   - マスク + スポットライト枠（青リング & パルス）
+ *   - コーチマーク（カード + 青枠）
+ *   - 青ドット型ポインタ（同心円パルス）
  *   - 進行バー + 練習モードバッジ
  *   - スキップ確認モーダル
  */
 
 :root {
-  /* ----- ホログラフィック / グラスモーフィズム パレット ----- */
-  --tut-bg-deep: #0B1220;
-  --tut-glass: rgba(15, 23, 42, 0.78);
-  --tut-glass-light: rgba(15, 23, 42, 0.72);
-  --tut-stroke-cyan: #22D3EE;
-  --tut-stroke-violet: #A78BFA;
-  --tut-accent-cyan: #22D3EE;
-  --tut-accent-cyan-glow: rgba(34, 211, 238, 0.55);
-  --tut-accent-violet: #A78BFA;
-  --tut-accent-violet-glow: rgba(167, 139, 250, 0.55);
-  --tut-text: rgba(255, 255, 255, 0.95);
-  --tut-text-sub: rgba(203, 213, 225, 0.75);
+  /* ----- サービス配色準拠パレット -----
+     service-top-style.css の --color-* トークンを参照。
+     サービス未読込環境でも破綻しないようフォールバック値を併記する。 */
+  --tut-bg-deep: var(--color-base-background-main, #FFFFFF);
+  --tut-glass: var(--color-base-card, #FFFFFF);
+  --tut-glass-light: var(--color-base-card, #FFFFFF);
+  --tut-surface-sub: var(--color-base-background-sub, #F8F8F8);
+  --tut-border: var(--color-base-border-divider, #E0E0E0);
+  --tut-stroke-cyan: var(--color-brand-base-primary, #4285F4);
+  --tut-stroke-violet: var(--color-button-primary-hover-bg, #3367D6);
+  --tut-accent-cyan: var(--color-brand-base-primary, #4285F4);
+  --tut-accent-cyan-glow: rgba(66, 133, 244, 0.30);
+  --tut-accent-violet: var(--color-button-primary-hover-bg, #3367D6);
+  --tut-accent-violet-glow: rgba(51, 103, 214, 0.22);
+  --tut-on-accent: var(--color-button-primary-text, #FFFFFF);
+  --tut-text: var(--color-text-main, #1A1A1A);
+  --tut-text-sub: var(--color-text-sub, #6B6B6B);
+  --tut-scrim: var(--color-scrim, rgba(0, 0, 0, 0.15));
+  --tut-shadow-soft: var(--color-base-shadow-soft, 0 1px 2px 0 rgba(0, 0, 0, 0.05));
   --tut-mono: 'JetBrains Mono', 'Inter', ui-monospace, 'SF Mono', Menlo, monospace;
 
   /* ----- 後方互換用エイリアス ----- */
   --tutorial-primary: var(--tut-accent-cyan);
   --tutorial-primary-glow: var(--tut-accent-cyan-glow);
-  --tutorial-mask-color: rgba(11, 18, 32, 0.6);
+  --tutorial-mask-color: var(--tut-scrim);
   --tutorial-bubble-bg: var(--tut-glass);
   --tutorial-bubble-text: var(--tut-text);
   --tutorial-bubble-subtext: var(--tut-text-sub);
@@ -41,6 +50,21 @@
   font-family: inherit;
 }
 
+/* ----- スクリーンリーダー専用（視覚的に隠す）-----
+   overlay.js の aria-live 領域がこのクラスを使用する。 */
+.tutorial-sr-only {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* ============================================================
    マスク
    ============================================================ */
@@ -49,42 +73,40 @@
   inset: 0;
   pointer-events: none; /* SVG 自体はクリック透過。対象外クリックは overlay.js の window レベル capture で判定 */
   z-index: 9020;
+  /* サービスのモーダル scrim 準拠の無彩色。ごく薄い青みのみ残す */
   background:
-    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(34, 211, 238, 0.05), transparent 70%),
-    radial-gradient(ellipse 60% 50% at 100% 100%, rgba(167, 139, 250, 0.06), transparent 70%);
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(66, 133, 244, 0.04), transparent 70%),
+    radial-gradient(ellipse 60% 50% at 100% 100%, rgba(66, 133, 244, 0.03), transparent 70%);
 }
 
 /* ============================================================
-   スポットライト枠（二重リング + パルス）
+   スポットライト枠（青リング + パルス）
    ============================================================ */
 .tutorial-spotlight {
   position: fixed;
   pointer-events: none;
   z-index: 9030;
-  border: 1px solid var(--tut-accent-cyan);
+  border: 2px solid var(--tut-accent-cyan);
   border-radius: 8px;
   box-shadow:
-    0 0 0 1px rgba(34, 211, 238, 0.45),
+    0 0 0 1px rgba(66, 133, 244, 0.35),
     0 0 4px 1px var(--tut-accent-cyan-glow),
-    0 0 8px 2px rgba(34, 211, 238, 0.35),
-    0 0 12px 4px var(--tut-accent-violet-glow);
+    0 0 8px 2px rgba(66, 133, 244, 0.22);
   animation: tutorial-spotlight-pulse 1.6s ease-in-out infinite;
 }
 
 @keyframes tutorial-spotlight-pulse {
   0%, 100% {
     box-shadow:
-      0 0 0 1px rgba(34, 211, 238, 0.45),
+      0 0 0 1px rgba(66, 133, 244, 0.35),
       0 0 4px 1px var(--tut-accent-cyan-glow),
-      0 0 6px 2px rgba(34, 211, 238, 0.3),
-      0 0 8px 3px var(--tut-accent-violet-glow);
+      0 0 6px 2px rgba(66, 133, 244, 0.18);
   }
   50% {
     box-shadow:
-      0 0 0 1px rgba(34, 211, 238, 0.75),
+      0 0 0 1px rgba(66, 133, 244, 0.55),
       0 0 8px 3px var(--tut-accent-cyan-glow),
-      0 0 12px 5px rgba(34, 211, 238, 0.5),
-      0 0 16px 6px var(--tut-accent-violet-glow);
+      0 0 12px 5px rgba(66, 133, 244, 0.32);
   }
 }
 
@@ -104,52 +126,29 @@
   }
   50% {
     transform: scale(1.03);
-    filter: brightness(1.25);
+    filter: brightness(1.08);
   }
 }
 
 /* ============================================================
-   コーチマーク（グラス + グラデボーダー）
+   コーチマーク（白カード + 青枠）
    ============================================================ */
 .tutorial-coachmark {
   position: fixed;
   width: 400px;
   padding: 24px;
-  border-radius: 16px;
+  border-radius: 12px;
   background: var(--tut-glass);
-  -webkit-backdrop-filter: blur(20px) saturate(150%);
-  backdrop-filter: blur(20px) saturate(150%);
   color: var(--tut-text);
   z-index: 9050;
   pointer-events: auto;
   font-size: 15px;
   line-height: 1.7;
+  border: 1px solid var(--tut-border);
   box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.4),
-    0 0 0 1px rgba(255, 255, 255, 0.04) inset;
-  /* グラデーション枠を border-image で実現 */
-  border: 1px solid transparent;
-  background-clip: padding-box;
+    0 8px 24px rgba(0, 0, 0, 0.16),
+    0 0 0 1px rgba(66, 133, 244, 0.10);
   animation: tutorial-coachmark-in 240ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-/* border-image で角丸が落ちる環境向けに擬似要素でグラデ枠を重ねる */
-.tutorial-coachmark::before {
-  content: "";
-  position: absolute;
-  inset: -1px;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(135deg, var(--tut-stroke-cyan), var(--tut-stroke-violet));
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-          mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-          mask-composite: exclude;
-  pointer-events: none;
 }
 
 @keyframes tutorial-coachmark-in {
@@ -165,8 +164,12 @@
 
 @media (max-width: 768px) {
   .tutorial-coachmark {
-    width: calc(100vw - 32px);
-    max-width: calc(100vw - 32px);
+    /* モバイルでは中央寄せの固定幅に収め、画面端からのはみ出しを防ぐ */
+    width: calc(100vw - 24px);
+    max-width: calc(100vw - 24px);
+    left: 12px !important;
+    right: 12px !important;
+    padding: 18px;
   }
 }
 
@@ -176,24 +179,6 @@
   gap: 12px;
   align-items: center;
   margin-bottom: 12px;
-}
-
-.tutorial-coachmark__step-badge {
-  display: inline-flex;
-  align-items: center;
-  font-family: var(--tut-mono);
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--tut-accent-cyan);
-  background: transparent;
-  border: 1px solid var(--tut-accent-cyan);
-  padding: 2px 8px;
-  border-radius: 4px;
-  letter-spacing: 0.08em;
-  line-height: 1.4;
-  white-space: nowrap;
-  -webkit-user-select: none;
-  user-select: none;
 }
 
 .tutorial-coachmark__title {
@@ -215,6 +200,7 @@
 /* ----- フッター ----- */
 .tutorial-coachmark__footer {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   margin-top: 20px;
@@ -233,6 +219,7 @@
   cursor: pointer;
   padding: 4px 0;
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .tutorial-coachmark__skip:hover {
@@ -241,45 +228,46 @@
 }
 
 .tutorial-coachmark__prev {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: var(--tut-surface-sub);
+  border: 1px solid var(--tut-border);
   color: var(--tut-text);
   font-size: 14px;
   padding: 6px 14px;
   border-radius: 8px;
   cursor: pointer;
+  white-space: nowrap;
   transition: background-color 160ms ease, border-color 160ms ease;
 }
 
 .tutorial-coachmark__prev:hover {
-  background: rgba(255, 255, 255, 0.14);
-  border-color: rgba(255, 255, 255, 0.28);
+  background: var(--tut-border);
+  border-color: var(--tut-border);
 }
 
 .tutorial-coachmark__next {
-  background: linear-gradient(135deg, var(--tut-accent-cyan), var(--tut-accent-violet));
+  background: var(--tut-accent-cyan);
   border: none;
-  color: #0B1220;
+  color: var(--tut-on-accent);
   font-size: 14px;
   font-weight: 600;
   padding: 6px 16px;
   border-radius: 8px;
   cursor: pointer;
-  box-shadow: 0 0 12px rgba(34, 211, 238, 0.35);
-  transition: box-shadow 200ms ease, transform 160ms ease;
+  white-space: nowrap;
+  transition: background-color 200ms ease, transform 160ms ease;
 }
 
 .tutorial-coachmark__next:hover {
-  box-shadow:
-    0 0 16px rgba(34, 211, 238, 0.6),
-    0 0 24px rgba(167, 139, 250, 0.45);
+  background: var(--tut-accent-violet);
 }
 
 .tutorial-coachmark__hint {
+  flex-basis: 100%;
   font-size: 13px;
   color: var(--tut-accent-cyan);
   font-family: var(--tut-mono);
-  margin-left: 8px;
+  margin-left: 0;
+  text-align: right;
 }
 
 /* G4: 6秒間クリック検出が無いときに表示する救済ヒント。
@@ -294,7 +282,7 @@
 }
 
 /* ============================================================
-   コネクタ（発光細線）
+   コネクタ（細線）
    - 新規: .tutorial-coachmark__connector
    - 後方互換: .tutorial-coachmark__notch（同スタイルを適用）
    ============================================================ */
@@ -302,7 +290,6 @@
 .tutorial-coachmark__notch {
   position: absolute;
   background: var(--tut-accent-cyan);
-  box-shadow: 0 0 8px var(--tut-accent-cyan-glow);
   pointer-events: none;
   /* デフォルトでは旧三角形の border ハックを無効化 */
   border: none;
@@ -316,7 +303,7 @@
   bottom: -24px;
   left: 50%;
   transform: translateX(-50%);
-  width: 1px;
+  width: 2px;
   height: 24px;
 }
 
@@ -326,7 +313,7 @@
   top: -24px;
   left: 50%;
   transform: translateX(-50%);
-  width: 1px;
+  width: 2px;
   height: 24px;
 }
 
@@ -337,7 +324,7 @@
   top: 50%;
   transform: translateY(-50%);
   width: 24px;
-  height: 1px;
+  height: 2px;
 }
 
 /* right: コーチマーク左端から左に伸びる横線 */
@@ -347,11 +334,43 @@
   top: 50%;
   transform: translateY(-50%);
   width: 24px;
-  height: 1px;
+  height: 2px;
+}
+
+/* モバイルではコネクタを短くして画面外への突き出しを抑える */
+@media (max-width: 768px) {
+  .tutorial-coachmark__connector[data-placement="top"],
+  .tutorial-coachmark__notch[data-placement="top"],
+  .tutorial-coachmark__connector[data-placement="bottom"],
+  .tutorial-coachmark__notch[data-placement="bottom"] {
+    height: 16px;
+  }
+  .tutorial-coachmark__connector[data-placement="top"],
+  .tutorial-coachmark__notch[data-placement="top"] {
+    bottom: -16px;
+  }
+  .tutorial-coachmark__connector[data-placement="bottom"],
+  .tutorial-coachmark__notch[data-placement="bottom"] {
+    top: -16px;
+  }
+  .tutorial-coachmark__connector[data-placement="left"],
+  .tutorial-coachmark__notch[data-placement="left"],
+  .tutorial-coachmark__connector[data-placement="right"],
+  .tutorial-coachmark__notch[data-placement="right"] {
+    width: 16px;
+  }
+  .tutorial-coachmark__connector[data-placement="left"],
+  .tutorial-coachmark__notch[data-placement="left"] {
+    right: -16px;
+  }
+  .tutorial-coachmark__connector[data-placement="right"],
+  .tutorial-coachmark__notch[data-placement="right"] {
+    left: -16px;
+  }
 }
 
 /* ============================================================
-   ポインタ（発光ドット + 同心円パルス 3層）
+   ポインタ（青ドット + 同心円パルス 3層）
    ============================================================ */
 .tutorial-pointer {
   position: fixed;
@@ -365,7 +384,7 @@
   justify-content: center;
 }
 
-/* 中央の発光ドット */
+/* 中央の青ドット */
 .tutorial-pointer::after {
   content: "";
   position: absolute;
@@ -374,7 +393,7 @@
   border-radius: 50%;
   background: var(--tut-accent-cyan);
   box-shadow:
-    0 0 16px var(--tut-accent-cyan-glow),
+    0 0 12px var(--tut-accent-cyan-glow),
     0 0 4px rgba(255, 255, 255, 0.8) inset;
   z-index: 2;
 }
@@ -389,7 +408,7 @@
   margin-top: -12px;
   margin-left: -12px;
   border-radius: 50%;
-  border: 1px solid var(--tut-accent-cyan);
+  border: 2px solid var(--tut-accent-cyan);
   background: transparent;
   opacity: 0;
   animation: tutorial-pointer-ring 1.4s ease-out infinite;
@@ -410,7 +429,7 @@
 @keyframes tutorial-pointer-ring {
   0% {
     transform: scale(1);
-    opacity: 0.75;
+    opacity: 0.7;
   }
   100% {
     transform: scale(2.6);
@@ -432,9 +451,7 @@
   left: 0;
   right: 0;
   height: 48px;
-  background: var(--tut-glass-light);
-  -webkit-backdrop-filter: blur(16px) saturate(140%);
-  backdrop-filter: blur(16px) saturate(140%);
+  background: var(--tut-glass);
   color: var(--tut-text);
   display: flex;
   align-items: center;
@@ -442,10 +459,8 @@
   padding: 0 20px;
   z-index: 9100;
   pointer-events: auto;
-  /* 下端のグラデボーダー */
-  border-bottom: 1px solid transparent;
-  background-clip: padding-box;
-  box-shadow: 0 1px 0 0 transparent;
+  border-bottom: 1px solid var(--tut-border);
+  box-shadow: var(--tut-shadow-soft);
 }
 
 .tutorial-progressbar::after {
@@ -454,8 +469,8 @@
   left: 0;
   right: 0;
   bottom: -1px;
-  height: 1px;
-  background: linear-gradient(90deg, var(--tut-stroke-cyan), var(--tut-stroke-violet));
+  height: 2px;
+  background: var(--tut-accent-cyan);
   pointer-events: none;
 }
 
@@ -463,8 +478,8 @@
   font-family: var(--tut-mono);
   font-size: 11px;
   font-weight: 600;
-  color: var(--tut-accent-cyan);
-  background: transparent;
+  color: var(--tut-on-accent);
+  background: var(--tut-accent-cyan);
   border: 1px solid var(--tut-accent-cyan);
   padding: 3px 10px;
   border-radius: 4px;
@@ -494,10 +509,28 @@
   white-space: nowrap;
 }
 
+/* モバイルでは note を折り返し可にし、「保存されません」が省略で消えないようにする */
+@media (max-width: 768px) {
+  .tutorial-progressbar {
+    height: auto;
+    min-height: 48px;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    padding: 8px 16px;
+  }
+  .tutorial-progressbar__note {
+    flex-basis: 100%;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    line-height: 1.4;
+  }
+}
+
 .tutorial-progressbar__bar {
   width: 220px;
   height: 4px;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--tut-surface-sub);
   border-radius: 999px;
   overflow: hidden;
 }
@@ -505,10 +538,7 @@
 .tutorial-progressbar__fill {
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, var(--tut-accent-cyan), var(--tut-accent-violet));
-  box-shadow:
-    0 0 8px var(--tut-accent-cyan-glow),
-    0 0 12px var(--tut-accent-violet-glow);
+  background: var(--tut-accent-cyan);
   border-radius: inherit;
   transition: width 220ms ease-out;
 }
@@ -519,9 +549,7 @@
 .tutorial-skip-modal {
   position: fixed;
   inset: 0;
-  background: rgba(11, 18, 32, 0.6);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
+  background: var(--tut-scrim);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -532,36 +560,15 @@
 .tutorial-skip-modal__panel {
   position: relative;
   background: var(--tut-glass);
-  -webkit-backdrop-filter: blur(20px) saturate(150%);
-  backdrop-filter: blur(20px) saturate(150%);
   color: var(--tut-text);
   width: min(420px, calc(100vw - 32px));
   padding: 24px;
-  border-radius: 16px;
-  border: 1px solid transparent;
-  background-clip: padding-box;
+  border-radius: 12px;
+  border: 1px solid var(--tut-border);
   box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.45),
-    0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+    0 8px 32px rgba(0, 0, 0, 0.22),
+    0 0 0 1px rgba(66, 133, 244, 0.10);
   animation: tutorial-coachmark-in 240ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.tutorial-skip-modal__panel::before {
-  content: "";
-  position: absolute;
-  inset: -1px;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(135deg, var(--tut-stroke-cyan), var(--tut-stroke-violet));
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-          mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-          mask-composite: exclude;
-  pointer-events: none;
 }
 
 .tutorial-skip-modal__title {
@@ -585,9 +592,27 @@
   gap: 8px;
 }
 
+/* 「終了する」(.confirm) を控えめスタイルに、
+   「続ける」(.cancel) をプライマリ強調スタイルに入れ替え。 */
 .tutorial-skip-modal__cancel {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: var(--tut-accent-cyan);
+  border: none;
+  color: var(--tut-on-accent);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 200ms ease;
+}
+
+.tutorial-skip-modal__cancel:hover {
+  background: var(--tut-accent-violet);
+}
+
+.tutorial-skip-modal__confirm {
+  background: var(--tut-surface-sub);
+  border: 1px solid var(--tut-border);
   color: var(--tut-text);
   padding: 8px 16px;
   border-radius: 8px;
@@ -596,28 +621,9 @@
   transition: background-color 160ms ease, border-color 160ms ease;
 }
 
-.tutorial-skip-modal__cancel:hover {
-  background: rgba(255, 255, 255, 0.14);
-  border-color: rgba(255, 255, 255, 0.28);
-}
-
-.tutorial-skip-modal__confirm {
-  background: linear-gradient(135deg, var(--tut-accent-cyan), var(--tut-accent-violet));
-  border: none;
-  color: #0B1220;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 0 12px rgba(34, 211, 238, 0.35);
-  transition: box-shadow 200ms ease;
-}
-
 .tutorial-skip-modal__confirm:hover {
-  box-shadow:
-    0 0 16px rgba(34, 211, 238, 0.6),
-    0 0 24px rgba(167, 139, 250, 0.45);
+  background: var(--tut-border);
+  border-color: var(--tut-border);
 }
 
 /* ============================================================
@@ -632,12 +638,10 @@
   align-items: center;
   justify-content: center;
   padding: 24px;
+  /* 無彩色スクリム + ごく薄い青みのみ */
   background:
-    radial-gradient(ellipse 70% 50% at 50% 35%, rgba(34, 211, 238, 0.12), transparent 70%),
-    radial-gradient(ellipse 60% 50% at 50% 100%, rgba(167, 139, 250, 0.10), transparent 70%),
-    rgba(11, 18, 32, 0.85);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
+    radial-gradient(ellipse 70% 50% at 50% 35%, rgba(66, 133, 244, 0.06), transparent 70%),
+    var(--tut-scrim);
   animation: tutorial-welcome-fade 280ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -650,37 +654,15 @@
   position: relative;
   width: min(520px, 100%);
   padding: 48px 40px;
-  border-radius: 20px;
+  border-radius: 16px;
   background: var(--tut-glass);
-  -webkit-backdrop-filter: blur(24px) saturate(160%);
-  backdrop-filter: blur(24px) saturate(160%);
   color: var(--tut-text);
   text-align: center;
-  border: 1px solid transparent;
-  background-clip: padding-box;
+  border: 1px solid var(--tut-border);
   box-shadow:
-    0 24px 64px rgba(0, 0, 0, 0.5),
-    0 0 48px rgba(34, 211, 238, 0.15),
-    0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+    0 24px 48px rgba(0, 0, 0, 0.24),
+    0 0 0 1px rgba(66, 133, 244, 0.10);
   animation: tutorial-welcome-panel-in 360ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.tutorial-welcome__panel::before {
-  content: "";
-  position: absolute;
-  inset: -1px;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(135deg, var(--tut-stroke-cyan), var(--tut-stroke-violet));
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-          mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-          mask-composite: exclude;
-  pointer-events: none;
 }
 
 @keyframes tutorial-welcome-panel-in {
@@ -709,11 +691,7 @@
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.2;
-  background: linear-gradient(135deg, #FFFFFF, var(--tut-accent-cyan));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
+  color: var(--tut-text);
 }
 
 .tutorial-welcome__body {
@@ -747,25 +725,159 @@
 }
 
 .tutorial-welcome__start {
-  background: linear-gradient(135deg, var(--tut-accent-cyan), var(--tut-accent-violet));
+  background: var(--tut-accent-cyan);
   border: none;
-  color: #0B1220;
+  color: var(--tut-on-accent);
   font-size: 16px;
   font-weight: 600;
   padding: 12px 32px;
   border-radius: 10px;
   cursor: pointer;
   letter-spacing: 0.02em;
-  box-shadow:
-    0 4px 16px rgba(34, 211, 238, 0.4),
-    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-  transition: box-shadow 200ms ease, transform 160ms ease;
+  box-shadow: 0 4px 12px rgba(66, 133, 244, 0.28);
+  transition: background-color 200ms ease, box-shadow 200ms ease, transform 160ms ease;
 }
 
 .tutorial-welcome__start:hover {
-  box-shadow:
-    0 6px 24px rgba(34, 211, 238, 0.6),
-    0 0 32px rgba(167, 139, 250, 0.45),
-    0 0 0 1px rgba(255, 255, 255, 0.18) inset;
+  background: var(--tut-accent-violet);
+  box-shadow: 0 6px 18px rgba(66, 133, 244, 0.36);
   transform: translateY(-1px);
+}
+
+/* ============================================================
+   アカウント作成 CTA 画面（チュートリアル完了 / スキップ後）
+   - ようこそ画面（.tutorial-welcome）と同系統の見た目で構成
+   ============================================================ */
+.tutorial-account-cta {
+  position: fixed;
+  inset: 0;
+  z-index: 9300;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  /* 無彩色スクリム + ごく薄い青みのみ */
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 35%, rgba(66, 133, 244, 0.06), transparent 70%),
+    var(--tut-scrim);
+  animation: tutorial-welcome-fade 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.tutorial-account-cta__panel {
+  position: relative;
+  width: min(520px, 100%);
+  padding: 48px 40px;
+  border-radius: 16px;
+  background: var(--tut-glass);
+  color: var(--tut-text);
+  text-align: center;
+  border: 1px solid var(--tut-border);
+  box-shadow:
+    0 24px 48px rgba(0, 0, 0, 0.24),
+    0 0 0 1px rgba(66, 133, 244, 0.10);
+  animation: tutorial-welcome-panel-in 360ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.tutorial-account-cta__eyebrow {
+  font-family: var(--tut-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  color: var(--tut-accent-cyan);
+  margin-bottom: 16px;
+}
+
+.tutorial-account-cta__title {
+  margin: 0 0 20px;
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--tut-text);
+}
+
+.tutorial-account-cta__body {
+  margin: 0 0 32px;
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--tut-text-sub);
+}
+
+.tutorial-account-cta__actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+}
+
+.tutorial-account-cta__close {
+  background: transparent;
+  border: none;
+  color: var(--tut-text-sub);
+  font-size: 14px;
+  padding: 10px 16px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: color 160ms ease;
+}
+
+.tutorial-account-cta__close:hover {
+  color: var(--tut-text);
+  text-decoration: underline;
+}
+
+.tutorial-account-cta__create {
+  background: var(--tut-accent-cyan);
+  border: none;
+  color: var(--tut-on-accent);
+  font-size: 16px;
+  font-weight: 600;
+  padding: 12px 32px;
+  border-radius: 10px;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 12px rgba(66, 133, 244, 0.28);
+  transition: background-color 200ms ease, box-shadow 200ms ease, transform 160ms ease;
+}
+
+.tutorial-account-cta__create:hover {
+  background: var(--tut-accent-violet);
+  box-shadow: 0 6px 18px rgba(66, 133, 244, 0.36);
+  transform: translateY(-1px);
+}
+
+/* ============================================================
+   prefers-reduced-motion: アニメーションを抑制
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .tutorial-spotlight,
+  .tutorial-spotlight.is-attention-pulse,
+  .tutorial-coachmark,
+  .tutorial-coachmark.is-attention-pulse,
+  .tutorial-pointer__ring,
+  .tutorial-skip-modal__panel,
+  .tutorial-welcome,
+  .tutorial-welcome__panel,
+  .tutorial-account-cta,
+  .tutorial-account-cta__panel {
+    animation: none !important;
+  }
+
+  .tutorial-coachmark__next,
+  .tutorial-coachmark__prev,
+  .tutorial-skip-modal__cancel,
+  .tutorial-skip-modal__confirm,
+  .tutorial-welcome__start,
+  .tutorial-welcome__skip,
+  .tutorial-account-cta__create,
+  .tutorial-account-cta__close,
+  .tutorial-progressbar__fill {
+    transition: none !important;
+  }
+
+  /* パルスリングは静止表示にせず非表示にする（残像防止） */
+  .tutorial-pointer__ring {
+    opacity: 0 !important;
+  }
 }

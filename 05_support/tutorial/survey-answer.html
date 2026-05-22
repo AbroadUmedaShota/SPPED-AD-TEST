@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpeedAd - アンケート回答</title>
+    <link rel="icon" href="assets/svg/speedad_logo.svg" type="image/svg+xml">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="service-top-style.css">
+    <link rel="stylesheet" href="src/toolbox.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+    <style>
+        /* --- Layout Fixes & Overrides --- */
+        body {
+            padding-left: 0 !important;
+        }
+        .survey-content-wrapper {
+            max-width: 768px; /* max-w-3xl */
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            width: 100%;
+        }
+
+        /* --- Custom Component Styles --- */
+        .survey-question-card {
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .survey-question-card.is-required {
+            border-left: 4px solid transparent;
+        }
+        .survey-question-card .question-content {
+            padding: 1.5rem;
+        }
+
+        /* --- Header Scroll Behavior --- */
+        .header-unpinned {
+            transform: translateY(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        /* --- 名刺プレビュー --- */
+        .bizcard-preview-img {
+            width: 100%;
+            height: auto;
+            max-height: 160px;
+            object-fit: contain;
+            background-color: #f3f4f6;
+            border-radius: 6px;
+        }
+        .bizcard-preview-back-empty {
+            height: 160px;
+        }
+        .bizcard-preview-back-actions-hidden {
+            display: none !important;
+        }
+        #submitting-progress-bar {
+            width: 0%;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <div id="survey-main-wrapper" style="background-color: #E0F2F7;" class="text-gray-800 min-h-screen">
+        <!-- ローディングインジケーター -->
+        <div id="loading-indicator" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+
+
+
+
+        <!-- メインコンテンツ -->
+        <main id="main-content" class="py-2">
+            <div class="survey-content-wrapper">
+                        <!-- Language Switcher -->
+                <div id="language-switcher-container" class="relative flex justify-end items-center mb-4">
+                    <select id="language-select" class="w-40 block pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-100 focus:border-indigo-500 sm:text-sm rounded-md">
+                        <!-- Language options will be dynamically inserted here by JS -->
+                    </select>
+                </div>                <div id="survey-title-container" class="mb-6"></div>
+                <div id="error-container" class="hidden bg-red-100 text-red-700 p-4 rounded-lg mb-6" role="alert">
+                    <!-- エラーメッセージ表示領域 -->
+                </div>
+                <form id="survey-form" class="space-y-6"></form>
+
+                <!-- 名刺プレビューエリア（撮影後に表示） -->
+                <div id="bizcard-preview-area" class="hidden w-full bg-white border border-gray-200 rounded-lg shadow-sm p-4 mb-4 mt-6">
+                    <p class="text-sm font-medium text-gray-600 mb-3">撮影済み名刺</p>
+                    <div class="flex gap-4">
+                        <div class="flex-1">
+                            <p class="text-xs text-center text-gray-500 mb-2">表面</p>
+                            <div id="bizcard-preview-front-container" class="relative group">
+                                <img id="bizcard-preview-front" src="" alt="名刺 表面" class="bizcard-preview-img w-full rounded-md shadow-sm cursor-pointer">
+                                <div class="absolute inset-0 hidden group-hover:flex items-center justify-center gap-2 bg-black bg-opacity-40 rounded-md">
+                                    <button id="bizcard-retake-front" type="button" class="px-2 py-1 text-xs font-bold text-white bg-blue-600 rounded hover:bg-blue-700">再撮影</button>
+                                    <button id="bizcard-delete-front" type="button" class="px-2 py-1 text-xs font-bold text-white bg-red-600 rounded hover:bg-red-700">削除</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-1" id="bizcard-preview-back-wrapper">
+                            <p class="text-xs text-center text-gray-500 mb-2">裏面</p>
+                            <div id="bizcard-preview-back-container" class="relative group">
+                                <img id="bizcard-preview-back" src="" alt="名刺 裏面" class="bizcard-preview-img w-full rounded-md shadow-sm cursor-pointer hidden">
+                                <div id="bizcard-preview-back-empty" class="bizcard-preview-back-empty w-full flex items-center justify-center bg-gray-100 border border-dashed border-gray-300 rounded-md text-xs text-gray-400 cursor-pointer hover:bg-gray-200">
+                                    裏面を追加
+                                </div>
+                                <div class="absolute inset-0 hidden group-hover:flex items-center justify-center gap-2 bg-black bg-opacity-40 rounded-md bizcard-preview-back-actions-hidden" id="bizcard-preview-back-actions">
+                                    <button id="bizcard-retake-back" type="button" class="px-2 py-1 text-xs font-bold text-white bg-blue-600 rounded hover:bg-blue-700">再撮影</button>
+                                    <button id="bizcard-delete-back" type="button" class="px-2 py-1 text-xs font-bold text-white bg-red-600 rounded hover:bg-red-700">削除</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- フッター -->
+        <footer class="bg-white shadow-md py-6">
+            <div class="survey-content-wrapper flex flex-col items-center gap-4">
+                <div class="w-full grid grid-cols-2 gap-4">
+                    <button id="bizcard-camera-button" type="button" class="w-full justify-center flex items-center gap-2 px-4 py-2 border rounded-full text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 whitespace-nowrap">
+                        <span class="material-icons">photo_camera</span>
+                        <span>名刺を撮影</span>
+                    </button>
+                    <button id="submit-survey-button" type="button" class="w-full justify-center flex items-center px-6 py-2 bg-blue-600 text-white rounded-full text-sm font-bold shadow-sm hover:bg-blue-700 disabled:opacity-50 whitespace-nowrap">
+                        送信する
+                    </button>
+                </div>
+                <div>
+                    <button id="bizcard-manual-button" type="button" class="text-sm font-medium text-blue-600 hover:underline whitespace-nowrap">名刺が手元に無い方</button>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Modals & Other Overlays -->
+    <div id="submitting-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-sm text-center">
+            <p id="submitting-text" class="text-lg font-semibold mb-4">送信中...</p>
+            <div class="w-full bg-gray-200 rounded-full h-4">
+                <div id="submitting-progress-bar" class="bg-blue-600 h-4 rounded-full transition-all duration-300 ease-out"></div>
+            </div>
+            <p id="submitting-percentage" class="text-sm text-gray-600 mt-2">0%</p>
+        </div>
+    </div>
+    <div id="bizcard-upload-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50"></div>
+    <div id="manual-input-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50"></div>
+    <div id="leave-confirm-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50"></div>
+    <div id="draft-restore-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50"></div>
+    <div id="image-magnify-modal" class="fixed inset-0 bg-black bg-opacity-75 hidden items-center justify-center z-[60]"></div>
+            <div id="toast-notification" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-gray-800 text-white py-2 px-4 rounded-lg shadow-lg hidden transform transition-all duration-300 ease-in-out">
+                <p id="toast-message" class="whitespace-nowrap overflow-hidden text-ellipsis"></p>
+            </div>
+        
+            <script type="module" src="src/survey-answer.js"></script></body>
+</html>

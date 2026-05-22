@@ -5,7 +5,7 @@
 //   - isActive()                   : ?tutorial=1 が URL に付いているか
 //   - shouldBlock(action)          : チュートリアル中に本番ハンドラを止めるべきか
 //   - handleCreateSurveyFromModal  : 「作成する」差し替え（surveyCreation.html?tutorial=1&step=9 へ）
-//   - handleAttemptSave            : 「アンケートを作成」差し替え（QR ボタン有効化 → ステップ 18）
+//   - handleAttemptSave            : 「アンケートを保存する」差し替え（保存後 → ステップ 30 完了へ）
 //   - isCompleted()                : 完了フラグ
 //
 // 内部処理（チュートリアル進行の続行）は index.js から注入される _internal フック経由で行う。
@@ -81,14 +81,14 @@ const api = {
   },
 
   /**
-   * 「アンケートを作成」差し替え。本番ハンドラは showToast のみのためガード差し込みではなく、
-   * チュートリアル側で QR ボタン有効化＋ステップ 18 進行を実行する。
+   * 「アンケートを保存する」差し替え。本番ハンドラは showToast のみで画面遷移しないため、
+   * チュートリアル側で完了ステップ（30）への進行を実行する。
    */
   handleAttemptSave() {
     if (!isActiveNow()) return;
     enableQrButton();
     if (typeof internalHooks.goToStep === 'function') {
-      internalHooks.goToStep(18);
+      internalHooks.goToStep(30);
     }
   },
 
