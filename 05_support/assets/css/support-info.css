@@ -170,6 +170,15 @@
   line-height: 1.7;
 }
 
+.plan-compare tr.is-premium-only th,
+.plan-compare tr.is-premium-only td {
+  background: #fffaf0;
+}
+
+.plan-compare tr.is-premium-only th {
+  color: #6f4e00;
+}
+
 .support-note {
   border: 1px solid #d8e4f7;
   border-radius: 0.5rem;
@@ -438,6 +447,11 @@ body[data-page-id="plans"] .support-page__hero .support-button {
   border-radius: 0.5rem;
   background: #fff;
   padding: 0.875rem;
+}
+
+.plans-rate-strip div.is-premium-only {
+  border-color: #ead39a;
+  background: #fffaf0;
 }
 
 .plans-rate-strip span {

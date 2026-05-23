@@ -311,7 +311,7 @@ SPPED-AD-TEST/
 │   ├── common/footer.html           # リンクを絶対URLへ差し替え
 │   └── src/sidebarHandler.js        # サイドバー「サポート」を絶対URLへ
 │
-└── 05_support/                      # support.speed-ad.com
+└── 05_support/                      # support.speed-ad.com のドキュメントルート
     ├── help/index.html
     ├── help-content/<slug>/index.html  # ビルド時生成 or rewrite
     ├── faq/index.html
@@ -330,11 +330,23 @@ SPPED-AD-TEST/
     │   ├── header.html                  # サポートサイト専用ヘッダー
     │   └── footer.html                  # サポートサイト専用フッター
     ├── assets/
+    │   ├── css/                         # support側CSS
+    │   ├── img/                         # support側画像
     │   └── js/support-shell.js          # 共通シェル注入とアクティブ表示
     ├── src/
     ├── service-top-style.css
     └── data/
 ```
+
+本番では `05_support/` 配下を `support.speed-ad.com/` の直下として配信する。たとえば `05_support/plans/index.html` は `https://support.speed-ad.com/plans/`、`05_support/assets/css/support-shell.css` は `https://support.speed-ad.com/assets/css/support-shell.css`、`05_support/common/header.html` は `https://support.speed-ad.com/common/header.html` として解決される。
+
+ローカルで本番同等に確認する場合は、リポジトリルートではなく `05_support/` をドキュメントルートにして配信する。
+
+```bash
+python -m http.server 8001 --directory 05_support
+```
+
+確認URLは `http://localhost:8001/plans/` のように本番URL構造と同じパスを使う。`http://localhost:8000/05_support/plans/index.html` は、`/assets/...` や `/common/...` がリポジトリルート側へ解決されるため、本番同等確認には使わない。
 
 ### 5.1 共有アセットの取り扱い
 
@@ -502,6 +514,8 @@ SPPED-AD-TEST/
 **この章のサマリ：** サポートサイト内部の遷移はルート相対パスで記述。デプロイ構成変更で崩れた場合の対応方針を添える。
 
 サポートサイト内部の遷移は同一サブドメインゆえ、ルート相対パスで記述する。ネストされた `/news/<slug>/` や将来の `/help-content/<slug>/` でもリンク解決を安定させるため、`../faq/` などの階層相対は原則使わない。
+
+CSS・JavaScript・画像・共通HTMLも同じ前提で、`/assets/...` と `/common/...` のルート相対パスを標準とする。これは `05_support/` を本番ドキュメントルートとして配信する前提のため、ローカル確認の都合で `../assets/...` へ寄せない。
 
 - ヘルプ → FAQ：`/faq/`
 - ヘルプ → お問い合わせ：`/bug-report/`
