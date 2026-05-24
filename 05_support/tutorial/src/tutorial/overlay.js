@@ -588,7 +588,7 @@ function buildMask() {
   blackOut.setAttribute('y', '0');
   blackOut.setAttribute('width', '100%');
   blackOut.setAttribute('height', '100%');
-  blackOut.setAttribute('fill', 'rgba(0, 0, 0, 0.55)');
+  blackOut.setAttribute('fill', 'rgba(0, 0, 0, 0.7)');
   blackOut.setAttribute('mask', 'url(#tutorial-mask-cutout)');
   svg.appendChild(blackOut);
 
