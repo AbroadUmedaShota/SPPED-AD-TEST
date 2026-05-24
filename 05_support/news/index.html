@@ -5,59 +5,76 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
   <title>お知らせ | SPEED AD Support</title>
-  <link rel="icon" href="/assets/img/speedad_logo.svg" type="image/svg+xml">
+  <link rel="icon" href="../assets/img/speedad_logo.svg" type="image/svg+xml">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/css/service-top-style.css">
-  <link rel="stylesheet" href="/assets/css/help-center.css?v=20260519-hero-label">
-  <link rel="stylesheet" href="/assets/css/support-info.css?v=20260519-plans-news">
-  <link rel="stylesheet" href="/assets/css/support-shell.css?v=20260521-main-domain-link">
-  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
-  <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Noto+Serif+JP:wght@500;600;700&family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap">
+  <link rel="stylesheet" href="../assets/css/support-shell.css?v=20260524-timeline-cool">
+  <link rel="stylesheet" href="../assets/css/news.css?v=20260524-timeline-cool">
 </head>
 <body data-page-id="news">
 <div class="support-shell">
   <div id="support-header-placeholder"></div>
 
   <main class="support-main" id="main-content" aria-label="お知らせ">
-    <div class="support-page">
-      <div class="hc-breadcrumb-top">
-        <nav aria-label="Breadcrumb"><ol><li><a href="/help/">ヘルプセンター</a></li><li><span class="material-icons" aria-hidden="true">chevron_right</span></li><li><span>お知らせ</span></li></ol></nav>
+
+    <!-- Tint band: breadcrumb -->
+    <nav class="hc-tint" aria-label="パンくず">
+      <ol class="breadcrumb">
+        <li><a href="/help/">ヘルプセンター</a></li>
+        <li class="sep" aria-hidden="true">›</li>
+        <li class="current">お知らせ</li>
+      </ol>
+    </nav>
+
+    <!-- Hero -->
+    <header class="hero" aria-labelledby="page-title">
+      <p class="ph-eyebrow">News &amp; Updates · Timeline</p>
+      <div class="hero-row">
+        <div class="hero-main">
+          <h1 id="page-title">お知らせ</h1>
+          <p class="sub">SPEED AD のアップデート情報、メンテナンス予定、サービスに関するお知らせをお届けします。月別タイムラインで時系列順に並びます。</p>
+        </div>
+        <div class="ph-meta" id="ph-meta">
+          <!-- JS で 件数 / Last Updated / 月数 を描画 -->
+        </div>
       </div>
+    </header>
 
-      <section class="support-page__hero" aria-labelledby="news-title">
-        <p class="support-page__label"><span class="material-icons" aria-hidden="true">campaign</span>お知らせ</p>
-        <h1 id="news-title" class="support-page__title">サービスからのお知らせ</h1>
-        <p class="support-page__lead">SPEED ADの公開情報、サポートサイト更新、開発環境での確認状況などを掲載します。</p>
-      </section>
+    <!-- Featured (PICK) -->
+    <section class="feat-wrap" aria-label="ピックアップ">
+      <a class="feat" id="featured" href="#" hidden>
+        <div class="feat-date">
+          <span class="day"></span>
+          <span class="mo"></span>
+          <span class="yr"></span>
+        </div>
+        <div class="feat-body">
+          <span class="news-tag" data-feat-tag></span>
+          <h2 data-feat-title></h2>
+          <p data-feat-summary></p>
+        </div>
+        <span class="feat-arr" aria-hidden="true">→</span>
+      </a>
+    </section>
 
-      <section class="support-section" aria-labelledby="news-list-title">
-        <div class="support-section__heading">
-          <h2 id="news-list-title">最新のお知らせ</h2>
-          <p>ログイン前トップにも連携できる公開ニュースフィードと同じ内容です。</p>
-        </div>
-        <div class="news-list">
-          <a class="news-card" href="/news/login-front-news/">
-            <div class="news-meta"><time datetime="2026-04-28">2026.04.28</time><span class="news-tag">サイト運用</span></div>
-            <h2>ログイン前ページのお知らせ欄を準備中です</h2>
-            <p>本番では support.speed-ad.com 側の静的JSONを正本にし、ログイン前ページには最大3件を表示する想定です。</p>
-          </a>
-          <a class="news-card" href="/news/public-top-navigation/">
-            <div class="news-meta"><time datetime="2026-04-27">2026.04.27</time><span class="news-tag">導線改善</span></div>
-            <h2>公開トップの導線整理を進めています</h2>
-            <p>無料ではじめる、導入事例、サポート導線の役割を分け、初回訪問時に迷いにくい構成へ整えています。</p>
-          </a>
-          <a class="news-card" href="/news/mock-screen-recovery/">
-            <div class="news-meta"><time datetime="2026-04-24">2026.04.24</time><span class="news-tag">開発状況</span></div>
-            <h2>モック画面と開発環境の差分整理を継続しています</h2>
-            <p>本番アプリ、公開LP、静的サブドメインに分けて、回収対象と参考保持対象を確認しています。</p>
-          </a>
-        </div>
-      </section>
-    </div>
+    <!-- Timeline -->
+    <section class="timeline" aria-labelledby="timeline-title">
+      <h2 id="timeline-title" class="visually-hidden">記事タイムライン</h2>
+      <div class="tl-status" id="tl-status" hidden>
+        <span>全 <b id="tl-count">0</b> 件</span>
+        <span class="dot-sep">·</span>
+        <span>新しい順</span>
+      </div>
+      <div id="timeline-body" aria-live="polite"></div>
+    </section>
+
   </main>
 
   <div id="support-footer-placeholder"></div>
 </div>
-<script type="module" src="/assets/js/support-shell.js?v=20260519-plans-news"></script>
+<script type="module" src="../assets/js/support-shell.js?v=20260524-timeline-cool"></script>
+<script type="module" src="../assets/js/news-list.js?v=20260524-timeline-cool"></script>
 </body>
 </html>

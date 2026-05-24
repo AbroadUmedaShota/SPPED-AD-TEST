@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1280" />
+<title>お知らせ｜SPEED AD Support — 案C Timeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500;600;700&family=Noto+Sans+JP:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --hc-white:#ffffff;
+    --hc-tint-top:#dde7f3;
+    --hc-tint-mid:#e8edf4;
+    --hc-pill-bg:#aac8de;
+    --hc-pill-fg:#1f3144;
+    --hc-cta:#1a1f2a;
+    --hc-link:#2a2a2a;
+
+    --canvas:#eef2f8;
+    --canvas-2:#e6ecf4;
+    --paper:#ffffff;
+    --line:#d4dde9;
+    --line-soft:#e6ecf4;
+    --ink:#14202f;
+    --ink-2:#344256;
+    --ink-3:#6a7689;
+    --ink-4:#9aa4b6;
+    --gold:#b08544;
+    --gold-2:#caa770;
+
+    --serif:'Noto Serif JP','Hiragino Mincho ProN','Yu Mincho',serif;
+    --sans:'Noto Sans JP',-apple-system,'Hiragino Sans',sans-serif;
+    --latin-serif:'Cormorant Garamond','Noto Serif JP',serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--canvas);color:var(--ink);font-family:var(--sans);line-height:1.7;-webkit-font-smoothing:antialiased;}
+  a{color:inherit;text-decoration:none}
+
+  /* Header (shared) */
+  .hc-header{background:var(--hc-white);height:72px;display:flex;align-items:center;padding:0 56px;gap:32px;position:relative;z-index:5;}
+  .hc-brand{display:flex;align-items:center;gap:12px;}
+  .hc-logo{width:34px;height:34px;display:flex;align-items:center;justify-content:center;}
+  .hc-logo svg{width:100%;height:100%;display:block;}
+  .hc-brand-text{font-weight:700;font-size:17px;letter-spacing:.02em;color:var(--ink);}
+  .hc-nav{display:flex;gap:0;margin-left:auto;align-items:center;}
+  .hc-nav a{padding:9px 22px;font-size:14px;color:var(--hc-link);letter-spacing:.04em;border-radius:999px;}
+  .hc-nav a:hover{background:rgba(0,0,0,.04);}
+  .hc-nav a.on{background:var(--hc-pill-bg);color:var(--hc-pill-fg);font-weight:500;}
+  .hc-cta{margin-left:18px;background:var(--hc-cta);color:#fff;padding:11px 22px;border-radius:999px;font-size:13.5px;letter-spacing:.04em;display:inline-flex;align-items:center;gap:6px;}
+
+  .hc-tint{background:linear-gradient(180deg, var(--hc-tint-top) 0%, var(--hc-tint-mid) 60%, var(--canvas) 100%);padding:18px 56px 24px;}
+  .breadcrumb{font-size:13px;color:var(--ink-2);display:flex;align-items:center;gap:10px;letter-spacing:.04em;}
+  .breadcrumb a{color:var(--ink-2);}
+  .breadcrumb a:hover{color:var(--gold);}
+  .breadcrumb .sep{color:var(--ink-4);}
+
+  /* Hero — masthead style */
+  .hero{padding:56px 56px 24px;background:var(--canvas);}
+  .ph-eyebrow{font-family:var(--latin-serif);font-size:12.5px;letter-spacing:.42em;color:var(--gold);text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:14px;}
+  .ph-eyebrow::after{content:"";flex:0 0 60px;height:1px;background:var(--gold);opacity:.5;}
+  .hero-row{display:grid;grid-template-columns:1fr auto;gap:48px;align-items:end;}
+  .hero h1{font-family:var(--serif);font-weight:600;font-size:72px;line-height:1;letter-spacing:.04em;color:var(--ink);}
+  .hero .sub{font-size:14px;color:var(--ink-3);line-height:1.9;margin-top:18px;max-width:620px;}
+  .ph-meta{display:flex;gap:24px;align-items:flex-end;}
+  .ph-meta .col{font-family:var(--latin-serif);font-size:11px;letter-spacing:.28em;color:var(--ink-4);text-transform:uppercase;text-align:right;}
+  .ph-meta .col b{display:block;color:var(--ink);font-family:var(--latin-serif);font-size:28px;font-weight:500;letter-spacing:.04em;margin-bottom:4px;line-height:1;}
+
+  /* Featured top story */
+  .feat-wrap{padding:24px 56px 8px;}
+  .feat{display:grid;grid-template-columns:280px 1fr auto;gap:36px;align-items:start;background:var(--paper);border:1px solid var(--line);padding:36px 40px;position:relative;text-decoration:none;color:inherit;cursor:pointer;transition:box-shadow .2s;}
+  .feat:hover{box-shadow:0 24px 56px rgba(20,32,47,.10);}
+  .feat::before{content:"PICK";position:absolute;left:-1px;top:-1px;background:var(--gold);color:#fff;font-family:var(--latin-serif);font-size:10.5px;letter-spacing:.4em;padding:5px 12px;}
+  .feat-date{font-family:var(--latin-serif);}
+  .feat-date .day{font-size:88px;font-weight:500;line-height:.9;color:var(--ink);letter-spacing:.02em;}
+  .feat-date .mo{font-size:14px;letter-spacing:.32em;color:var(--ink-3);text-transform:uppercase;margin-top:6px;display:block;}
+  .feat-date .yr{font-size:11px;letter-spacing:.32em;color:var(--ink-4);margin-top:4px;display:block;}
+  .feat-body .news-tag{margin-bottom:14px;}
+  .feat-body h2{font-family:var(--serif);font-weight:600;font-size:26px;line-height:1.45;color:var(--ink);letter-spacing:.02em;margin-bottom:14px;}
+  .feat:hover .feat-body h2{color:var(--gold);}
+  .feat-body p{font-size:13.5px;color:var(--ink-2);line-height:1.95;max-width:680px;}
+  .feat-arr{font-family:var(--latin-serif);font-size:34px;color:var(--ink-3);align-self:center;transition:transform .15s, color .15s;}
+  .feat:hover .feat-arr{transform:translateX(8px);color:var(--ink);}
+
+  /* Common pill */
+  .news-tag{display:inline-block;font-size:12px;padding:5px 14px;border-radius:999px;background:var(--hc-pill-bg);color:var(--hc-pill-fg);letter-spacing:.04em;line-height:1;font-weight:500;}
+  .news-tag[data-category="アップデート"]   { background:#d6e3ee; color:#1f3144; }
+  .news-tag[data-category="お知らせ"]       { background:#aac8de; color:#1f3144; }
+  .news-tag[data-category="メンテナンス"]   { background:#e8d6a3; color:#5e4413; }
+  .news-tag[data-category="障害情報"]       { background:#e6b6b0; color:#7a221d; }
+  .news-tag[data-category="プレスリリース"] { background:#cfd6a8; color:#4a4d2a; }
+
+  /* Timeline */
+  .timeline{padding:48px 56px 80px;position:relative;}
+  .tl-status{font-family:var(--latin-serif);font-size:11px;letter-spacing:.32em;color:var(--ink-4);text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:12px;}
+  .tl-status::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--gold);}
+
+  .tl-month{display:grid;grid-template-columns:200px 1fr;gap:32px;align-items:start;padding:36px 0 12px;border-top:1px solid var(--line);}
+  .tl-month-label{position:sticky;top:24px;font-family:var(--latin-serif);}
+  .tl-month-label .num{font-size:44px;font-weight:500;color:var(--ink);letter-spacing:.04em;line-height:1;}
+  .tl-month-label .name{font-size:13px;letter-spacing:.36em;color:var(--gold);text-transform:uppercase;margin-top:8px;display:block;}
+  .tl-month-label .ct{font-size:11px;letter-spacing:.24em;color:var(--ink-4);text-transform:uppercase;margin-top:14px;display:block;border-top:1px solid var(--line-soft);padding-top:10px;}
+
+  .tl-items{position:relative;padding-left:32px;}
+  .tl-items::before{content:"";position:absolute;left:6px;top:6px;bottom:6px;width:1px;background:var(--line);}
+
+  .tl-item{display:grid;grid-template-columns:90px 110px 1fr 28px;gap:24px;padding:18px 0;align-items:start;cursor:pointer;text-decoration:none;color:inherit;position:relative;border-top:1px dashed transparent;transition:background .15s;}
+  .tl-item + .tl-item{border-top-color:var(--line-soft);}
+  .tl-item::before{content:"";position:absolute;left:-32px;top:24px;width:13px;height:13px;border-radius:50%;background:var(--canvas);border:1px solid var(--ink-4);}
+  .tl-item:hover::before{background:var(--gold);border-color:var(--gold);}
+  .tl-item:hover .ti-title{color:var(--gold);}
+  .tl-item:hover .ti-arr{transform:translateX(4px);color:var(--ink);}
+
+  .ti-date{font-family:var(--latin-serif);font-size:20px;font-weight:500;color:var(--ink);letter-spacing:.04em;line-height:1.1;}
+  .ti-date small{display:block;font-size:10px;letter-spacing:.3em;color:var(--ink-4);text-transform:uppercase;margin-top:6px;}
+  .ti-tag{padding-top:2px;}
+  .ti-body{min-width:0;}
+  .ti-title{font-family:var(--serif);font-weight:600;font-size:15.5px;line-height:1.55;color:var(--ink);letter-spacing:.02em;margin-bottom:6px;transition:color .15s;}
+  .ti-sum{font-size:12.5px;color:var(--ink-3);line-height:1.85;}
+  .ti-arr{font-family:var(--latin-serif);font-size:18px;color:var(--ink-3);transition:all .15s;align-self:center;}
+
+  /* Footer */
+  .hc-footer{background:var(--hc-white);border-top:1px solid var(--line-soft);padding:32px 56px;display:flex;align-items:center;gap:24px;font-size:12.5px;color:var(--ink-3);}
+  .hc-footer .brand{font-weight:700;color:var(--ink);}
+  .hc-footer .links{display:flex;gap:22px;}
+  .hc-footer .links a:hover{color:var(--gold);}
+  .hc-footer .right{margin-left:auto;font-family:var(--latin-serif);letter-spacing:.16em;text-transform:uppercase;font-size:11px;}
+</style>
+</head>
+<body data-screen-label="03 News List · Timeline Cool">
+
+  <header class="hc-header">
+    <div class="hc-brand">
+      <span class="hc-logo"><svg viewBox="0 0 32 32" fill="none"><path d="M16 4 L28 26 L4 26 Z" fill="#1a1a1a"/></svg></span>
+      <span class="hc-brand-text">SPEED AD Support</span>
+    </div>
+    <nav class="hc-nav">
+      <a>ヘルプ</a>
+      <a>FAQ</a>
+      <a class="on">お知らせ</a>
+      <a>お問い合わせ</a>
+    </nav>
+    <a class="hc-cta">公式サイト <span style="font-size:11px;">↗</span></a>
+  </header>
+
+  <div class="hc-tint">
+    <nav class="breadcrumb" aria-label="パンくず">
+      <a>ヘルプセンター</a>
+      <span class="sep">›</span>
+      <span>お知らせ</span>
+    </nav>
+  </div>
+
+  <header class="hero">
+    <div class="ph-eyebrow">News &amp; Updates · Timeline</div>
+    <div class="hero-row">
+      <div>
+        <h1>お知らせ</h1>
+        <p class="sub">SPEED AD のアップデート情報、メンテナンス予定、サービスに関するお知らせをお届けします。月別のタイムラインで一覧できます。</p>
+      </div>
+      <div class="ph-meta">
+        <div class="col"><b>12</b>Articles</div>
+        <div class="col"><b>2026.05</b>Latest</div>
+        <div class="col"><b>2026.05.21</b>Updated</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Featured top story -->
+  <div class="feat-wrap">
+    <a class="feat" href="News Detail - 案C Timeline Cool.html">
+      <div class="feat-date">
+        <div class="day">21</div>
+        <span class="mo">May</span>
+        <span class="yr">2026 · WED</span>
+      </div>
+      <div class="feat-body">
+        <span class="news-tag" data-category="アップデート">アップデート</span>
+        <h2>QR回答フローを刷新 ― 来場者の離脱率を約 32% 改善する新UIをリリースしました</h2>
+        <p>会場でのQR読み取り後の導線を全面刷新。設問遷移・自動保存・回答中断/再開に対応し、テーマカラー設定と多言語対応（日・英・中）を追加しました。</p>
+      </div>
+      <span class="feat-arr">→</span>
+    </a>
+  </div>
+
+  <!-- Timeline -->
+  <section class="timeline" aria-live="polite">
+    <div class="tl-status"><span>全 12 件</span><span style="opacity:.5;">·</span><span>新しい順</span></div>
+
+    <!-- 2026.05 -->
+    <div class="tl-month">
+      <div class="tl-month-label">
+        <div class="num">05</div>
+        <span class="name">May 2026</span>
+        <span class="ct">4 Articles</span>
+      </div>
+      <div class="tl-items">
+
+        <a class="tl-item">
+          <div class="ti-date">05.18<small>SUN</small></div>
+          <div class="ti-tag"><span class="news-tag" data-category="アップデート">アップデート</span></div>
+          <div class="ti-body">
+            <h3 class="ti-title">名刺データのCSV書き出しでカスタム列定義に対応しました</h3>
+            <p class="ti-sum">エクスポート時に出力する列を任意の順序で指定可能になりました。組織テンプレートとして保存も可能です。</p>
+          </div>
+          <span class="ti-arr">→</span>
+        </a>
+
+        <a class="tl-item">
+          <div class="ti-date">05.15<small>THU</small></div>
+          <div class="ti-tag"><span class="news-tag" data-category="メンテナンス">メンテナンス</span></div>
+          <div class="ti-body">
+            <h3 class="ti-title">【予定】5月25日(月) 2:00–4:00 ストレージ拡張に伴うサービス停止</h3>
+            <p class="ti-sum">対象: 全プラン。該当時間帯はログイン・回答画面ともに利用不可となります。中断/再開機能でデータは保護されます。</p>
+          </div>
+          <span class="ti-arr">→</span>
+        </a>
+
+        <a class="tl-item">
+          <div class="ti-date">05.12<small>MON</small></div>
+          <div class="ti-tag"><span class="news-tag" data-category="プレスリリース">プレスリリース</span></div>
+          <div class="ti-body">
+            <h3 class="ti-title">SPEED AD、東京ビッグサイト「販促 EXPO 2026」に出展いたします</h3>
+            <p class="ti-sum">ブース番号: E2-32 / 6月10日(水)–12日(金)。当日はライブデモと個別相談会を実施します。</p>
+          </div>
+          <span class="ti-arr">→</span>
+        </a>
+
+        <a class="tl-item">
+          <div class="ti-date">05.08<small>FRI</small></div>
+          <div class="ti-tag"><span class="news-tag" data-category="アップデート">アップデート</span></div>
+          <div class="ti-body">
+            <h3 class="ti-title">御礼メールテンプレートに「差し込み変数のプレビュー」機能を追加</h3>
+            <p class="ti-sum">編集中に実際の差し込み結果を確認できるようになりました。氏名・会社名・回答内容に対応しています。</p>
+          </div>
+          <span class="ti-arr">→</span>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- 2026.04 -->
+    <div class="tl-month">
+      <div class="tl-month-label">
+        <div class="num">04</div>
+        <span class="name">Apr 2026</span>
+        <span class="ct">5 Articles</span>
+      </div>
+      <div class="tl-items">
+
+        <a class="tl-item">
+          <div class="ti-date">04.30<small>TUE</small></div>
+          <div class="ti-tag"><span class="news-tag" data-category="障害情報">障害情報</span></div>
+          <div class="ti-body">
+            <h3 class="ti-title">【復旧済】4月30日(火) 14:18–14:42 一部ユーザーのログイン障害について</h3>
+            <p class="ti-sum">原因: 認証基盤の負荷上昇 / 影響範囲: 全体の約 6% / 認証経路の自動フェイルオーバー設定を実施しました。</p>
+          </div>
+          <span class="ti-arr">→</span>
+        </a>
+
+        <a class="tl-item">
+          <div class="ti-date">04.28<small>SUN</small></div>
+          <div class="ti-tag"><span class="news-tag" data-category="アップデート">アップデート</span></div>
+          <div class="ti-body">
+            <h3 class="ti-title">リード管理ボードのカンバンビューをリリース</h3>
+            <p class="ti-sum">追客状況をステータス別に可視化できる新ビューを公開しました。ドラッグ操作で状態変更が可能、フィルタ条件は保存できます。</p>
+          </div>
+          <span class="ti-arr">→</span>
+        </a>
+
+        <a class="tl-item">
+          <div class="ti-date">04.22<small>MON</small></div>
+          <div class="ti-tag"><span class="news-tag" data-category="お知らせ">お知らせ</span></div>
+          <div class="ti-body">
+            <h3 class="ti-title">サポート窓口の応答時間目安を更新しました</h3>
+            <p class="ti-sum">平日 9:00–18:00 / 平均初回返信時間: 約 1.6 営業時間（直近 30 日実績）。優先サポートは約 0.4 営業時間です。</p>
+          </div>
+          <span class="ti-arr">→</span>
+        </a>
+
+        <a class="tl-item">
+          <div class="ti-date">04.15<small>MON</small></div>
+          <div class="ti-tag"><span class="news-tag" data-category="メンテナンス">メンテナンス</span></div>
+          <div class="ti-body">
+            <h3 class="ti-title">ゴールデンウィーク期間のサポート体制について</h3>
+            <p class="ti-sum">4月29日(月)〜5月6日(月)はメール対応のみとなります。緊急時は契約者様向け緊急連絡先までご連絡ください。</p>
+          </div>
+          <span class="ti-arr">→</span>
+        </a>
+
+        <a class="tl-item">
+          <div class="ti-date">04.10<small>WED</small></div>
+          <div class="ti-tag"><span class="news-tag" data-category="アップデート">アップデート</span></div>
+          <div class="ti-body">
+            <h3 class="ti-title">名刺OCRエンジンを v3 に更新 ― 認識精度が向上</h3>
+            <p class="ti-sum">縦書き・英字混在レイアウトに対応。手書き名刺の認識率は当社測定で 78% → 91% に改善しました。</p>
+          </div>
+          <span class="ti-arr">→</span>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- 2026.03 -->
+    <div class="tl-month">
+      <div class="tl-month-label">
+        <div class="num">03</div>
+        <span class="name">Mar 2026</span>
+        <span class="ct">2 Articles</span>
+      </div>
+      <div class="tl-items">
+
+        <a class="tl-item">
+          <div class="ti-date">03.28<small>SAT</small></div>
+          <div class="ti-tag"><span class="news-tag" data-category="アップデート">アップデート</span></div>
+          <div class="ti-body">
+            <h3 class="ti-title">権限ロール「閲覧者(限定)」を追加 ― 個人情報を伏せた状態での共有が可能に</h3>
+            <p class="ti-sum">メールアドレス・電話番号などをマスクした状態でレポートを共有できる新ロールを追加しました。</p>
+          </div>
+          <span class="ti-arr">→</span>
+        </a>
+
+        <a class="tl-item">
+          <div class="ti-date">03.18<small>WED</small></div>
+          <div class="ti-tag"><span class="news-tag" data-category="お知らせ">お知らせ</span></div>
+          <div class="ti-body">
+            <h3 class="ti-title">プライバシーポリシーを改定しました</h3>
+            <p class="ti-sum">第三者提供に関する記載を明確化しました。施行日は 2026 年 5 月 1 日です。</p>
+          </div>
+          <span class="ti-arr">→</span>
+        </a>
+
+      </div>
+    </div>
+
+  </section>
+
+  <footer class="hc-footer">
+    <span class="brand">SPEED AD Support</span>
+    <span>© 2026 SPEED AD Inc.</span>
+    <div class="links">
+      <a>ヘルプセンター</a>
+      <a>お問い合わせ</a>
+      <a>プライバシーポリシー</a>
+      <a>利用規約</a>
+    </div>
+    <span class="right">案 C · Timeline Cool</span>
+  </footer>
+
+</body>
+</html>

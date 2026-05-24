@@ -1,0 +1,1127 @@
+/* ============================================================
+   News (Timeline Cool 案C 準拠)
+   - 適用範囲: body[data-page-id="news"] / body[data-page-id="news-detail"]
+   - 既存 support-shell.css の影響下で動作。グローバルセレクタ/グローバル変数は触らない。
+   - 値はデザインモック (アーカイブ/design_handoff_news_timeline_cool/news-list.html, news-detail.html)
+     および README の Design Tokens を厳密に踏襲。
+   - フォント (Cormorant Garamond / Noto Serif JP / Noto Sans JP) は HTML 側で <link> 済み前提。
+   ============================================================ */
+
+/* ============================================================
+   1. Scoped Tokens
+   ============================================================ */
+body[data-page-id="news"],
+body[data-page-id="news-detail"] {
+  /* Body palette (cool paper + gold accent) */
+  --canvas:    #eef2f8;
+  --canvas-2:  #e6ecf4;
+  --paper:     #ffffff;
+  --line:      #d4dde9;
+  --line-soft: #e6ecf4;
+  --ink:       #14202f;
+  --ink-2:     #344256;
+  --ink-3:     #6a7689;
+  --ink-4:     #9aa4b6;
+  --gold:      #b08544;
+  --gold-2:    #caa770;
+  --gold-soft: #d8c79b;
+
+  /* Category tints */
+  --tint-update:   #d6e3ee;
+  --tint-info:     #aac8de;
+  --tint-maint:    #e8d6a3;
+  --tint-incident: #e6b6b0;
+  --tint-press:    #cfd6a8;
+
+  /* Typography */
+  --serif:        'Noto Serif JP','Hiragino Mincho ProN','Yu Mincho',serif;
+  --sans:         'Noto Sans JP',-apple-system,'Hiragino Sans',sans-serif;
+  --latin-serif:  'Cormorant Garamond','Noto Serif JP',serif;
+}
+
+/* Container: viewport より小さく中央寄せ。他のサポートページと同様に左右余白を確保 */
+body[data-page-id="news"] .support-main,
+body[data-page-id="news-detail"] .support-main {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+}
+
+/* Body background override (scoped) */
+body[data-page-id="news"],
+body[data-page-id="news-detail"] {
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================================
+   2. Tint Band & Breadcrumb (共通: 一覧/詳細)
+   ============================================================ */
+body[data-page-id="news"] .hc-tint,
+body[data-page-id="news-detail"] .hc-tint {
+  background: linear-gradient(180deg, #dde7f3 0%, #e8edf4 60%, var(--canvas) 100%);
+  padding: 18px 56px 24px;
+}
+
+body[data-page-id="news"] .breadcrumb,
+body[data-page-id="news-detail"] .breadcrumb {
+  font-size: 13px;
+  color: var(--ink-2);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: .04em;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+body[data-page-id="news"] .breadcrumb li,
+body[data-page-id="news-detail"] .breadcrumb li {
+  display: inline-flex;
+  align-items: center;
+}
+
+body[data-page-id="news"] .breadcrumb a,
+body[data-page-id="news-detail"] .breadcrumb a {
+  color: var(--ink-2);
+  text-decoration: none;
+  transition: color .15s;
+}
+
+body[data-page-id="news"] .breadcrumb a:hover,
+body[data-page-id="news-detail"] .breadcrumb a:hover {
+  color: var(--gold);
+}
+
+body[data-page-id="news"] .breadcrumb .sep,
+body[data-page-id="news-detail"] .breadcrumb .sep {
+  color: var(--ink-4);
+}
+
+body[data-page-id="news"] .breadcrumb .current,
+body[data-page-id="news-detail"] .breadcrumb .current {
+  color: var(--ink);
+}
+
+body[data-page-id="news-detail"] .breadcrumb .current {
+  max-width: 680px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   3. News Tag (共通 / 5バリアント)
+   - base: pill 999px、Noto Sans 12px / 500
+   ============================================================ */
+body[data-page-id="news"] .news-tag,
+body[data-page-id="news-detail"] .news-tag {
+  display: inline-block;
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .04em;
+  line-height: 1;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: var(--tint-info);
+  color: #1f3144;
+}
+
+body[data-page-id="news"] .news-tag.news-tag--update,
+body[data-page-id="news-detail"] .news-tag.news-tag--update {
+  background: var(--tint-update);
+  color: #1f3144;
+}
+
+body[data-page-id="news"] .news-tag.news-tag--info,
+body[data-page-id="news-detail"] .news-tag.news-tag--info {
+  background: var(--tint-info);
+  color: #1f3144;
+}
+
+body[data-page-id="news"] .news-tag.news-tag--maint,
+body[data-page-id="news-detail"] .news-tag.news-tag--maint {
+  background: var(--tint-maint);
+  color: #5e4413;
+}
+
+body[data-page-id="news"] .news-tag.news-tag--incident,
+body[data-page-id="news-detail"] .news-tag.news-tag--incident {
+  background: var(--tint-incident);
+  color: #7a221d;
+}
+
+body[data-page-id="news"] .news-tag.news-tag--press,
+body[data-page-id="news-detail"] .news-tag.news-tag--press {
+  background: var(--tint-press);
+  color: #4a4d2a;
+}
+
+/* ============================================================
+   4. List Hero (masthead)
+   ============================================================ */
+body[data-page-id="news"] .hero {
+  padding: 56px 56px 24px;
+  background: var(--canvas);
+}
+
+body[data-page-id="news"] .ph-eyebrow {
+  font-family: var(--latin-serif);
+  font-size: 12.5px;
+  letter-spacing: .42em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin: 0 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+body[data-page-id="news"] .ph-eyebrow::after {
+  content: "";
+  flex: 0 0 60px;
+  height: 1px;
+  background: var(--gold);
+  opacity: .5;
+}
+
+body[data-page-id="news"] .hero-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 48px;
+  align-items: end;
+}
+
+body[data-page-id="news"] .hero h1 {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 72px;
+  line-height: 1;
+  letter-spacing: .04em;
+  color: var(--ink);
+  margin: 0;
+}
+
+body[data-page-id="news"] .hero .sub {
+  font-size: 14px;
+  color: var(--ink-3);
+  line-height: 1.9;
+  margin-top: 18px;
+  max-width: 620px;
+}
+
+body[data-page-id="news"] .ph-meta {
+  display: flex;
+  gap: 24px;
+  align-items: flex-end;
+}
+
+body[data-page-id="news"] .ph-meta .row {
+  font-family: var(--latin-serif);
+  font-size: 11px;
+  letter-spacing: .28em;
+  color: var(--ink-4);
+  text-transform: uppercase;
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+body[data-page-id="news"] .ph-meta .row b {
+  display: block;
+  color: var(--ink);
+  font-family: var(--latin-serif);
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: .04em;
+  line-height: 1;
+}
+
+body[data-page-id="news"] .ph-meta .row span {
+  font-family: var(--latin-serif);
+  font-size: 11px;
+  letter-spacing: .28em;
+  color: var(--ink-4);
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   5. Featured (PICK)
+   ============================================================ */
+body[data-page-id="news"] .feat-wrap {
+  padding: 24px 56px 8px;
+}
+
+body[data-page-id="news"] .feat {
+  display: grid;
+  grid-template-columns: 280px 1fr auto;
+  gap: 36px;
+  align-items: start;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  padding: 36px 40px;
+  position: relative;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: box-shadow .2s, transform .2s;
+}
+
+body[data-page-id="news"] .feat::before {
+  content: "PICK";
+  position: absolute;
+  left: -1px;
+  top: -1px;
+  background: var(--gold);
+  color: #fff;
+  font-family: var(--latin-serif);
+  font-size: 10.5px;
+  letter-spacing: .4em;
+  padding: 5px 12px;
+}
+
+body[data-page-id="news"] .feat:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 24px 56px rgba(20, 32, 47, .10);
+}
+
+body[data-page-id="news"] .feat-date {
+  font-family: var(--latin-serif);
+}
+
+body[data-page-id="news"] .feat-date .day {
+  font-size: 88px;
+  font-weight: 500;
+  line-height: .9;
+  color: var(--ink);
+  letter-spacing: .02em;
+  display: block;
+}
+
+body[data-page-id="news"] .feat-date .mo {
+  font-size: 14px;
+  letter-spacing: .32em;
+  color: var(--ink-3);
+  text-transform: uppercase;
+  margin-top: 6px;
+  display: block;
+}
+
+body[data-page-id="news"] .feat-date .yr {
+  font-size: 11px;
+  letter-spacing: .32em;
+  color: var(--ink-4);
+  margin-top: 4px;
+  display: block;
+}
+
+body[data-page-id="news"] .feat-body .news-tag {
+  margin-bottom: 14px;
+}
+
+body[data-page-id="news"] .feat-body h2 {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 26px;
+  line-height: 1.45;
+  color: var(--ink);
+  letter-spacing: .02em;
+  margin: 0 0 14px;
+  transition: color .15s;
+}
+
+body[data-page-id="news"] .feat:hover .feat-body h2 {
+  color: var(--gold);
+}
+
+body[data-page-id="news"] .feat-body p {
+  font-size: 13.5px;
+  color: var(--ink-2);
+  line-height: 1.95;
+  max-width: 680px;
+  margin: 0;
+}
+
+body[data-page-id="news"] .feat-arr {
+  font-family: var(--latin-serif);
+  font-size: 34px;
+  color: var(--ink-3);
+  align-self: center;
+  transition: transform .15s, color .15s;
+}
+
+body[data-page-id="news"] .feat:hover .feat-arr {
+  transform: translateX(8px);
+  color: var(--ink);
+}
+
+/* ============================================================
+   6. Timeline
+   ============================================================ */
+body[data-page-id="news"] .timeline {
+  padding: 48px 56px 80px;
+  position: relative;
+}
+
+body[data-page-id="news"] .tl-status {
+  font-family: var(--latin-serif);
+  font-size: 11px;
+  letter-spacing: .32em;
+  color: var(--ink-4);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+body[data-page-id="news"] .tl-status::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+}
+
+body[data-page-id="news"] .tl-status b {
+  color: var(--ink-2);
+  font-weight: 500;
+}
+
+body[data-page-id="news"] .tl-month {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 32px;
+  align-items: start;
+  padding: 36px 0 12px;
+  border-top: 1px solid var(--line);
+}
+
+body[data-page-id="news"] .tl-month-label {
+  position: sticky;
+  top: 24px;
+  font-family: var(--latin-serif);
+}
+
+body[data-page-id="news"] .tl-month-label .num {
+  font-size: 44px;
+  font-weight: 500;
+  color: var(--ink);
+  letter-spacing: .04em;
+  line-height: 1;
+}
+
+body[data-page-id="news"] .tl-month-label .name {
+  font-size: 13px;
+  letter-spacing: .36em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-top: 8px;
+  display: block;
+}
+
+body[data-page-id="news"] .tl-month-label .ct {
+  font-size: 11px;
+  letter-spacing: .24em;
+  color: var(--ink-4);
+  text-transform: uppercase;
+  margin-top: 14px;
+  display: block;
+  border-top: 1px solid var(--line-soft);
+  padding-top: 10px;
+}
+
+body[data-page-id="news"] .tl-items {
+  position: relative;
+  padding-left: 32px;
+}
+
+body[data-page-id="news"] .tl-items::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 6px;
+  bottom: 6px;
+  width: 1px;
+  background: var(--line);
+}
+
+body[data-page-id="news"] .tl-item {
+  display: grid;
+  grid-template-columns: 90px 110px 1fr 28px;
+  gap: 24px;
+  padding: 18px 0;
+  align-items: start;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  position: relative;
+  border-top: 1px dashed transparent;
+  transition: background .15s;
+}
+
+body[data-page-id="news"] .tl-item + .tl-item {
+  border-top-color: var(--line-soft);
+}
+
+body[data-page-id="news"] .tl-item::before {
+  content: "";
+  position: absolute;
+  left: -32px;
+  top: 24px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--canvas);
+  border: 1px solid var(--ink-4);
+}
+
+body[data-page-id="news"] .tl-item:hover::before {
+  background: var(--gold);
+  border-color: var(--gold);
+}
+
+body[data-page-id="news"] .tl-item:hover .ti-title {
+  color: var(--gold);
+}
+
+body[data-page-id="news"] .tl-item:hover .ti-arr {
+  transform: translateX(4px);
+  color: var(--ink);
+}
+
+body[data-page-id="news"] .ti-date {
+  font-family: var(--latin-serif);
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--ink);
+  letter-spacing: .04em;
+  line-height: 1.1;
+}
+
+body[data-page-id="news"] .ti-date time {
+  font-family: var(--latin-serif);
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--ink);
+  letter-spacing: .04em;
+  line-height: 1.1;
+}
+
+body[data-page-id="news"] .ti-date small {
+  display: block;
+  font-size: 10px;
+  letter-spacing: .3em;
+  color: var(--ink-4);
+  text-transform: uppercase;
+  margin-top: 6px;
+}
+
+body[data-page-id="news"] .ti-tag {
+  padding-top: 2px;
+}
+
+body[data-page-id="news"] .ti-body {
+  min-width: 0;
+}
+
+body[data-page-id="news"] .ti-title {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 15.5px;
+  line-height: 1.55;
+  color: var(--ink);
+  letter-spacing: .02em;
+  margin: 0 0 6px;
+  transition: color .15s;
+}
+
+body[data-page-id="news"] .ti-sum {
+  font-size: 12.5px;
+  color: var(--ink-3);
+  line-height: 1.85;
+  margin: 0;
+}
+
+body[data-page-id="news"] .ti-arr {
+  font-family: var(--latin-serif);
+  font-size: 18px;
+  color: var(--ink-3);
+  transition: transform .15s, color .15s;
+  align-self: center;
+}
+
+/* ============================================================
+   7. List - Empty / Error state
+   ============================================================ */
+body[data-page-id="news"] .news-state {
+  margin: 0 0 24px;
+  padding: 60px 40px;
+  background: var(--paper);
+  border: 1px dashed var(--line);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+}
+
+body[data-page-id="news"] .news-state__eyebrow {
+  font-family: var(--latin-serif);
+  font-size: 10.5px;
+  letter-spacing: .42em;
+  color: var(--ink-4);
+  text-transform: uppercase;
+}
+
+body[data-page-id="news"] .news-state__title {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 20px;
+  color: var(--ink);
+  letter-spacing: .02em;
+  margin: 0;
+}
+
+body[data-page-id="news"] .news-state__text {
+  font-size: 13px;
+  color: var(--ink-3);
+  max-width: 520px;
+  line-height: 1.9;
+  margin: 0;
+}
+
+body[data-page-id="news"] .news-state--error .news-state__title {
+  color: #a8312a;
+}
+
+/* ============================================================
+   8. Article Hero
+   ============================================================ */
+body[data-page-id="news-detail"] .article-hero {
+  padding: 48px 56px 36px;
+  background: var(--canvas);
+}
+
+body[data-page-id="news-detail"] .ah-eyebrow {
+  font-family: var(--latin-serif);
+  font-size: 12.5px;
+  letter-spacing: .42em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin: 0 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+body[data-page-id="news-detail"] .ah-eyebrow::after {
+  content: "";
+  width: 48px;
+  height: 1px;
+  background: var(--gold);
+  opacity: .5;
+}
+
+body[data-page-id="news-detail"] .ah-meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+  font-family: var(--latin-serif);
+  font-size: 13px;
+  letter-spacing: .28em;
+  color: var(--ink-3);
+  text-transform: uppercase;
+}
+
+body[data-page-id="news-detail"] .ah-meta time {
+  font-family: var(--latin-serif);
+  font-size: 15px;
+  color: var(--ink);
+  font-weight: 500;
+  letter-spacing: .04em;
+}
+
+body[data-page-id="news-detail"] .ah-meta .sep {
+  color: var(--ink-4);
+}
+
+body[data-page-id="news-detail"] .ah-meta .read {
+  font-family: var(--latin-serif);
+  font-size: 13px;
+  letter-spacing: .28em;
+  color: var(--ink-3);
+  text-transform: uppercase;
+}
+
+body[data-page-id="news-detail"] .article-hero h1 {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 38px;
+  line-height: 1.45;
+  letter-spacing: .02em;
+  color: var(--ink);
+  max-width: 920px;
+  margin: 0;
+}
+
+/* Double rule under article hero */
+body[data-page-id="news-detail"] .ah-rule {
+  margin-top: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+body[data-page-id="news-detail"] .ah-rule::before,
+body[data-page-id="news-detail"] .ah-rule::after {
+  content: "";
+  height: 1px;
+  background: var(--line);
+}
+
+body[data-page-id="news-detail"] .ah-rule::after {
+  margin-left: 36px;
+  background: var(--gold);
+  opacity: .4;
+}
+
+/* ============================================================
+   9. Article Grid + Main
+   ============================================================ */
+body[data-page-id="news-detail"] .article-grid {
+  padding: 40px 56px 80px;
+  display: grid;
+  grid-template-columns: 1fr 240px;
+  gap: 64px;
+  align-items: start;
+  background: var(--canvas);
+}
+
+body[data-page-id="news-detail"] .article-main {
+  min-width: 0;
+  max-width: 780px;
+}
+
+/* ============================================================
+   10. Article Lede + Drop cap
+   ============================================================ */
+body[data-page-id="news-detail"] .article-lede {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 2.0;
+  color: var(--ink);
+  margin: 0 0 32px;
+}
+
+body[data-page-id="news-detail"] .article-lede::first-letter {
+  font-family: var(--serif);
+  font-size: 48px;
+  font-weight: 600;
+  color: var(--gold);
+  float: left;
+  line-height: 1;
+  padding: 6px 12px 0 0;
+}
+
+/* ============================================================
+   11. Article Body
+   ============================================================ */
+body[data-page-id="news-detail"] .article-body {
+  font-size: 14.5px;
+  line-height: 2.0;
+  color: var(--ink-2);
+}
+
+body[data-page-id="news-detail"] .article-body h2 {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 22px;
+  line-height: 1.5;
+  color: var(--ink);
+  letter-spacing: .02em;
+  border-left: 3px solid var(--gold);
+  padding-left: 18px;
+  margin: 48px 0 20px;
+  scroll-margin-top: 32px;
+}
+
+body[data-page-id="news-detail"] .article-body h3 {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--ink);
+  letter-spacing: .02em;
+  margin: 32px 0 14px;
+}
+
+body[data-page-id="news-detail"] .article-body p {
+  margin: 0 0 24px;
+}
+
+body[data-page-id="news-detail"] .article-body strong,
+body[data-page-id="news-detail"] .article-body b {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+body[data-page-id="news-detail"] .article-body a {
+  color: var(--gold);
+  border-bottom: 1px solid var(--gold);
+  text-decoration: none;
+  transition: opacity .15s;
+}
+
+body[data-page-id="news-detail"] .article-body a:hover {
+  opacity: .7;
+}
+
+body[data-page-id="news-detail"] .article-body ul {
+  list-style: none;
+  margin: 0 0 24px;
+  padding: 0;
+}
+
+body[data-page-id="news-detail"] .article-body ul li {
+  position: relative;
+  padding-left: 22px;
+  margin-bottom: 10px;
+  color: var(--ink-2);
+  line-height: 1.95;
+}
+
+body[data-page-id="news-detail"] .article-body ul li::before {
+  content: "\25C6"; /* ◆ */
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--gold);
+  font-size: 11px;
+  line-height: 2.4;
+}
+
+body[data-page-id="news-detail"] .article-body ol {
+  padding-left: 22px;
+  margin: 0 0 24px;
+}
+
+body[data-page-id="news-detail"] .article-body ol li {
+  margin-bottom: 8px;
+  line-height: 1.95;
+}
+
+body[data-page-id="news-detail"] .article-body figure {
+  margin: 32px 0;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  padding: 18px;
+}
+
+body[data-page-id="news-detail"] .article-body figure .placeholder {
+  aspect-ratio: 16 / 9;
+  background: repeating-linear-gradient(135deg, #e6ecf4 0 12px, #eef2f8 12px 24px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--latin-serif);
+  font-size: 12px;
+  letter-spacing: .32em;
+  color: var(--ink-4);
+  text-transform: uppercase;
+}
+
+body[data-page-id="news-detail"] .article-body figure figcaption {
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--ink-3);
+  margin-top: 10px;
+  line-height: 1.7;
+}
+
+body[data-page-id="news-detail"] .article-body blockquote {
+  margin: 24px 0;
+  padding: 18px 22px;
+  background: var(--canvas-2);
+  border-left: 3px solid var(--ink-4);
+  font-family: var(--serif);
+  font-size: 15px;
+  color: var(--ink-2);
+  line-height: 1.85;
+}
+
+body[data-page-id="news-detail"] .article-body code {
+  font-family: 'JetBrains Mono','Consolas',monospace;
+  font-size: 12.5px;
+  background: var(--canvas-2);
+  padding: 2px 6px;
+  border-radius: 3px;
+  color: var(--ink);
+}
+
+/* ============================================================
+   12. Article Foot (back-link + share)
+   ============================================================ */
+body[data-page-id="news-detail"] .article-foot {
+  margin-top: 56px;
+  padding-top: 32px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+body[data-page-id="news-detail"] .back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--latin-serif);
+  font-size: 13px;
+  letter-spacing: .24em;
+  color: var(--ink-2);
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--ink-4);
+  padding: 4px 2px;
+  text-decoration: none;
+  transition: color .15s, border-color .15s;
+}
+
+body[data-page-id="news-detail"] .back-link::before {
+  content: "\2190"; /* ← */
+  font-size: 16px;
+}
+
+body[data-page-id="news-detail"] .back-link:hover {
+  color: var(--gold);
+  border-color: var(--gold);
+}
+
+body[data-page-id="news-detail"] .share {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+body[data-page-id="news-detail"] .share-label {
+  font-family: var(--latin-serif);
+  font-size: 11px;
+  letter-spacing: .36em;
+  color: var(--ink-4);
+  text-transform: uppercase;
+  margin-right: 6px;
+}
+
+body[data-page-id="news-detail"] .share-btn {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color .15s, color .15s, background .15s;
+  border-radius: 999px;
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .04em;
+}
+
+body[data-page-id="news-detail"] .share-btn:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+  background: #fff;
+}
+
+body[data-page-id="news-detail"] .share-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ============================================================
+   13. Article Aside (TOC + Related)
+   ============================================================ */
+body[data-page-id="news-detail"] .article-aside {
+  position: sticky;
+  top: 24px;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+body[data-page-id="news-detail"] .aside-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  padding: 22px 22px 24px;
+}
+
+body[data-page-id="news-detail"] .aside-eyebrow {
+  font-family: var(--latin-serif);
+  font-size: 10.5px;
+  letter-spacing: .42em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin: 0 0 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+body[data-page-id="news-detail"] .aside-eyebrow::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+body[data-page-id="news-detail"] .aside-title {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink);
+  margin: 0 0 14px;
+  letter-spacing: .04em;
+}
+
+/* TOC */
+body[data-page-id="news-detail"] .toc {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+body[data-page-id="news-detail"] .toc li {
+  display: block;
+}
+
+body[data-page-id="news-detail"] .toc a {
+  display: block;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  padding: 6px 8px;
+  border-left: 2px solid var(--line);
+  text-decoration: none;
+  transition: color .15s, border-left-color .15s, background .15s;
+}
+
+body[data-page-id="news-detail"] .toc a:hover {
+  color: var(--gold);
+  border-left-color: var(--gold);
+  background: var(--canvas-2);
+}
+
+body[data-page-id="news-detail"] .toc a.on {
+  color: var(--ink);
+  border-left-color: var(--gold);
+  font-weight: 500;
+}
+
+/* Related */
+body[data-page-id="news-detail"] .related {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+body[data-page-id="news-detail"] .related-item {
+  padding: 12px 0;
+  border-top: 1px dashed var(--line-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+  transition: opacity .15s;
+}
+
+body[data-page-id="news-detail"] .related-item:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+body[data-page-id="news-detail"] .related-item a {
+  color: inherit;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+body[data-page-id="news-detail"] .r-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--latin-serif);
+  font-size: 11px;
+  letter-spacing: .18em;
+  color: var(--ink-3);
+}
+
+body[data-page-id="news-detail"] .r-meta time {
+  color: var(--ink-2);
+  font-weight: 500;
+}
+
+body[data-page-id="news-detail"] .r-meta .news-tag {
+  font-size: 10px;
+  padding: 2px 8px;
+  letter-spacing: .04em;
+}
+
+body[data-page-id="news-detail"] .r-title {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--ink);
+  margin: 0;
+  transition: color .15s;
+}
+
+body[data-page-id="news-detail"] .related-item:hover .r-title {
+  color: var(--gold);
+}
+
+/* ============================================================
+   14. Toast (URL コピー後の通知 / document body 直下)
+   ============================================================ */
+body[data-page-id="news-detail"] .toast {
+  position: fixed;
+  left: 50%;
+  bottom: 32px;
+  transform: translate(-50%, 16px);
+  background: var(--ink);
+  color: #fff;
+  padding: 10px 20px;
+  font-size: 13px;
+  letter-spacing: .04em;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s, transform .2s;
+  border-radius: 4px;
+  z-index: 50;
+}
+
+body[data-page-id="news-detail"] .toast.on {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
