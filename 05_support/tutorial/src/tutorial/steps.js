@@ -1,5 +1,5 @@
 // steps.js
-// チュートリアル全 27 ステップ定義（旧34stepから構造圧縮：選択肢一括autofill、関連設定統合、プレビュー操作圧縮）
+// チュートリアル全 28 ステップ定義（旧34stepから構造圧縮：選択肢一括autofill、関連設定統合、プレビュー操作圧縮）
 //
 // 各ステップフィールド:
 //   id, block, target, contextTarget, mode, placement, title, body
@@ -12,9 +12,10 @@
 //   hideBack           : 戻るボタン非表示（ページ境界）
 //   completeButtonLabel: 次へボタンを完了ラベルに差し替え
 //
-// id 8, 26, 27 は user-action-bridge（本番ハンドラ経由 or 完了）。
+// id 8, 27, 28 は user-action-bridge（本番ハンドラ経由 or 完了）。
 // step 23（タブレット切替 user-action）+ step 24（タブレット表示確認 info, onLeaveActionでプレビュー閉じ）に分離。
-// 旧10は新10〜13に分割（名刺画像添付/名刺データ化/お礼メール/回答完了画面）、選択肢4個別は新17に統合（multi-option一括）、評定尺度3個別は新20に統合（rating-bundle一括）、QRモーダル閉じるはonLeaveActionで自動close（新25→26遷移時）。
+// step 25（QR表示 user-action）+ step 26（QR確認 info, onLeaveActionでQR閉じ）に分離。
+// 旧10は新10〜13に分割（名刺画像添付/名刺データ化/お礼メール/回答完了画面）、選択肢4個別は新17に統合（multi-option一括）、評定尺度3個別は新20に統合（rating-bundle一括）。
 
 const TOMORROW_OFFSET_DAYS = 1;
 const PERIOD_LENGTH_DAYS = 3;
@@ -180,17 +181,23 @@ export const TUTORIAL_STEPS = [
   },
   {
     id: 25, block: 'D', target: '#openQrModalBtn', mode: 'user-action', placement: 'left',
-    onLeaveAction: 'closeQrModal',
     title: 'QR コードを表示',
-    body: '回答用のQRコードを表示してみましょう。これは来場者にスマートフォンで読み取ってもらい、アンケートに回答してもらうためのQRコードです。『QR発行』ボタンを押してください。',
+    body: '回答用のQRコードを表示してみましょう。『QR発行』ボタンを押してください。',
   },
   {
-    id: 26, block: 'D', target: '#createSurveyBtn', mode: 'user-action-bridge', placement: 'left',
+    id: 26, block: 'D', target: '#qrCodeModal .modal-content-transition', waitForElement: true,
+    mode: 'info', placement: 'left',
+    onLeaveAction: 'closeQrModal',
+    title: 'QR コードを確認',
+    body: 'これが回答用QRコードです。来場者にスマートフォンで読み取ってもらい、アンケートに回答してもらうために使います。展示会で配布したり画面に表示することで運用できます。確認できたら、下の『次へ』ボタンを押してください。',
+  },
+  {
+    id: 27, block: 'D', target: '#createSurveyBtn', mode: 'user-action-bridge', placement: 'left',
     title: 'アンケートを保存する',
     body: '画面右側の『アンケートを保存する』ボタンを押してください。保存してもこの画面のまま、ダッシュボードへ自動では移動しません。（練習のため実際には保存されません）',
   },
   {
-    id: 27, block: 'D', target: null, mode: 'user-action-bridge', placement: 'center',
+    id: 28, block: 'D', target: null, mode: 'user-action-bridge', placement: 'center',
     title: 'チュートリアル完了',
     body: 'お疲れさまでした。これでアンケート作成の基本フローは完了です。アカウントを作成すると、今練習したものを実際に公開して回答を集められます。下の『完了』ボタンを押してください。',
     completeButtonLabel: '完了',
