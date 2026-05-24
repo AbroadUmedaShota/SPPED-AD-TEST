@@ -121,13 +121,6 @@ img {
   isolation: isolate;
 }
 
-@media (min-width: 1101px) {
-  main:has(> .public-news-section:not([hidden])) .hero,
-  main:has(> .public-news-section:not([hidden])) .hero__inner {
-    min-height: calc(100vh - 98px);
-  }
-}
-
 .hero__media,
 .hero__shade {
   position: absolute;

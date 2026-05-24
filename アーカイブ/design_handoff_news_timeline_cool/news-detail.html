@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1280" />
+<title>QR回答フローを刷新 ― 来場者の離脱率を約 32% 改善する新UIをリリースしました｜お知らせ — SPEED AD Support</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500;600;700&family=Noto+Sans+JP:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  /*
+    仕様 §3.3 — 記事ごとの差分は 5 箇所のみ:
+      ① <title>
+      ② breadcrumb 末尾の記事タイトル
+      ③ <time datetime> 属性と表示日付
+      ④ .news-tag の内容
+      ⑤ 本文 (.article-body 配下)
+    上記以外（ヒーロー・aside・タイポ・配色）はテンプレート固定。
+  */
+  :root{
+    --hc-white:#ffffff;
+    --hc-tint-top:#dde7f3;
+    --hc-tint-mid:#e8edf4;
+    --hc-pill-bg:#aac8de;
+    --hc-pill-fg:#1f3144;
+    --hc-cta:#1a1f2a;
+    --hc-link:#2a2a2a;
+
+    --canvas:#eef2f8;
+    --canvas-2:#e6ecf4;
+    --paper:#ffffff;
+    --line:#d4dde9;
+    --line-soft:#e6ecf4;
+    --ink:#14202f;
+    --ink-2:#344256;
+    --ink-3:#6a7689;
+    --ink-4:#9aa4b6;
+    --gold:#b08544;
+    --gold-2:#caa770;
+    --gold-soft:#d8c79b;
+
+    --tint-update:#d6e3ee;
+    --tint-info:#cfd6e6;
+    --tint-maint:#e8d6a3;
+    --tint-incident:#e6b6b0;
+    --tint-press:#cfd6a8;
+
+    --serif:'Noto Serif JP','Hiragino Mincho ProN','Yu Mincho',serif;
+    --sans:'Noto Sans JP',-apple-system,'Hiragino Sans',sans-serif;
+    --latin-serif:'Cormorant Garamond','Noto Serif JP',serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--canvas);color:var(--ink);font-family:var(--sans);line-height:1.85;-webkit-font-smoothing:antialiased;}
+  a{color:inherit;text-decoration:none}
+
+  /* ─── Header (matches existing shell) ─── */
+  .hc-header{background:var(--hc-white);height:72px;display:flex;align-items:center;padding:0 56px;gap:32px;position:relative;z-index:5;}
+  .hc-brand{display:flex;align-items:center;gap:12px;}
+  .hc-logo{width:34px;height:34px;display:flex;align-items:center;justify-content:center;}
+  .hc-logo svg{width:100%;height:100%;display:block;}
+  .hc-brand-text{font-weight:700;font-size:17px;letter-spacing:.02em;color:var(--ink);}
+  .hc-nav{display:flex;gap:0;margin-left:auto;align-items:center;}
+  .hc-nav a{padding:9px 22px;font-size:14px;color:var(--hc-link);letter-spacing:.04em;border-radius:999px;}
+  .hc-nav a:hover{background:rgba(0,0,0,.04);}
+  .hc-nav a.on{background:var(--hc-pill-bg);color:var(--hc-pill-fg);font-weight:500;}
+  .hc-cta{margin-left:18px;background:var(--hc-cta);color:#fff;padding:11px 22px;border-radius:999px;font-size:13.5px;letter-spacing:.04em;display:inline-flex;align-items:center;gap:6px;}
+
+  .hc-tint{background:linear-gradient(180deg, var(--hc-tint-top) 0%, var(--hc-tint-mid) 60%, var(--canvas) 100%);padding:18px 56px 24px;}
+  .breadcrumb{font-size:13px;color:var(--ink-2);display:flex;align-items:center;gap:10px;letter-spacing:.04em;}
+  .breadcrumb a{color:var(--ink-2);}
+  .breadcrumb a:hover{color:var(--gold);}
+  .breadcrumb .sep{color:var(--ink-4);}
+  .breadcrumb .current{color:var(--ink);max-width:680px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+  /* ─── Article Hero ─── */
+  .article-hero{padding:48px 56px 36px;background:var(--canvas);}
+  .ah-meta{display:flex;align-items:center;gap:14px;margin-bottom:24px;font-family:var(--latin-serif);font-size:13px;letter-spacing:.28em;color:var(--ink-3);text-transform:uppercase;}
+  .ah-meta time{font-family:var(--latin-serif);font-size:15px;color:var(--ink);font-weight:500;letter-spacing:.04em;}
+  .ah-meta .sep{color:var(--ink-4);}
+  .news-tag{display:inline-block;font-size:12px;padding:5px 14px;border-radius:999px;background:var(--hc-pill-bg);color:var(--hc-pill-fg);letter-spacing:.04em;line-height:1;font-weight:500;font-family:var(--sans);}
+  .news-tag[data-category="アップデート"]   { background:#d6e3ee; color:#1f3144; }
+  .news-tag[data-category="お知らせ"]       { background:#aac8de; color:#1f3144; }
+  .news-tag[data-category="メンテナンス"]   { background:#e8d6a3; color:#5e4413; }
+  .news-tag[data-category="障害情報"]       { background:#e6b6b0; color:#7a221d; }
+  .news-tag[data-category="プレスリリース"] { background:#cfd6a8; color:#4a4d2a; }
+  .ah-eyebrow{font-family:var(--latin-serif);font-size:12.5px;letter-spacing:.42em;color:var(--gold);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:12px;}
+  .ah-eyebrow::after{content:"";width:48px;height:1px;background:var(--gold);opacity:.5;}
+  .article-hero h1{font-family:var(--serif);font-weight:600;font-size:38px;line-height:1.45;letter-spacing:.02em;color:var(--ink);max-width:920px;}
+
+  /* Decorative double rule */
+  .ah-rule{margin-top:32px;display:flex;flex-direction:column;gap:3px;}
+  .ah-rule::before,.ah-rule::after{content:"";height:1px;background:var(--line);}
+  .ah-rule::after{margin-left:36px;background:var(--gold);opacity:.4;}
+
+  /* ─── Article body grid ─── */
+  .article-grid{padding:40px 56px 80px;display:grid;grid-template-columns:1fr 240px;gap:64px;align-items:start;background:var(--canvas);}
+
+  /* ─── Article main ─── */
+  .article-main{min-width:0;max-width:780px;}
+  .article-lede{font-family:var(--serif);font-weight:500;font-size:18px;line-height:2.0;color:var(--ink);margin-bottom:32px;}
+  .article-lede::first-letter{font-family:var(--serif);font-size:48px;font-weight:600;color:var(--gold);float:left;line-height:1;padding:6px 12px 0 0;}
+
+  .article-body{font-size:14.5px;line-height:2.0;color:var(--ink-2);}
+  .article-body p{margin-bottom:24px;}
+  .article-body p b, .article-body p strong{color:var(--ink);font-weight:500;}
+  .article-body h2{font-family:var(--serif);font-weight:600;font-size:22px;line-height:1.5;color:var(--ink);letter-spacing:.02em;border-left:3px solid var(--gold);padding-left:18px;margin:48px 0 20px;scroll-margin-top:32px;}
+  .article-body h3{font-family:var(--serif);font-weight:600;font-size:17px;line-height:1.5;color:var(--ink);letter-spacing:.02em;margin:32px 0 14px;}
+  .article-body ul{list-style:none;margin:0 0 24px;padding:0;}
+  .article-body ul li{position:relative;padding-left:22px;margin-bottom:10px;color:var(--ink-2);line-height:1.95;}
+  .article-body ul li::before{content:"◆";position:absolute;left:0;top:0;color:var(--gold);font-size:11px;line-height:2.4;}
+  .article-body ol{padding-left:22px;margin-bottom:24px;}
+  .article-body ol li{margin-bottom:8px;line-height:1.95;}
+  .article-body figure{margin:32px 0;border:1px solid var(--line);background:var(--paper);padding:18px;}
+  .article-body figure .placeholder{aspect-ratio:16/9;background:repeating-linear-gradient(135deg, #e6ecf4 0 12px, #eef2f8 12px 24px);display:flex;align-items:center;justify-content:center;font-family:var(--latin-serif);font-size:12px;letter-spacing:.32em;color:var(--ink-4);text-transform:uppercase;}
+  .article-body figure figcaption{font-family:var(--sans);font-size:12px;color:var(--ink-3);margin-top:10px;line-height:1.7;}
+  .article-body blockquote{margin:24px 0;padding:18px 22px;background:var(--canvas-2);border-left:3px solid var(--ink-4);font-family:var(--serif);font-size:15px;color:var(--ink-2);line-height:1.85;}
+  .article-body code{font-family:'JetBrains Mono','Consolas',monospace;font-size:12.5px;background:var(--canvas-2);padding:2px 6px;border-radius:3px;color:var(--ink);}
+
+  /* ─── Article foot (back-link + share) ─── */
+  .article-foot{margin-top:56px;padding-top:32px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;}
+  .back-link{display:inline-flex;align-items:center;gap:10px;font-family:var(--latin-serif);font-size:13px;letter-spacing:.24em;color:var(--ink-2);text-transform:uppercase;border-bottom:1px solid var(--ink-4);padding:4px 2px;transition:color .15s, border-color .15s;}
+  .back-link::before{content:"←";font-size:16px;}
+  .back-link:hover{color:var(--gold);border-color:var(--gold);}
+  .share{display:flex;align-items:center;gap:8px;}
+  .share .lab{font-family:var(--latin-serif);font-size:11px;letter-spacing:.36em;color:var(--ink-4);text-transform:uppercase;margin-right:6px;}
+  .share button{width:36px;height:36px;border:1px solid var(--line);background:var(--paper);color:var(--ink-2);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;border-radius:999px;font-family:var(--sans);font-size:11px;font-weight:500;letter-spacing:.04em;}
+  .share button:hover{border-color:var(--ink);color:var(--ink);background:#fff;}
+  .share button svg{width:14px;height:14px;}
+
+  /* ─── Aside (TOC + Related) ─── */
+  .article-aside{position:sticky;top:24px;display:flex;flex-direction:column;gap:24px;}
+  .aside-card{background:var(--paper);border:1px solid var(--line);padding:22px 22px 24px;}
+  .aside-eyebrow{font-family:var(--latin-serif);font-size:10.5px;letter-spacing:.42em;color:var(--gold);text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:10px;}
+  .aside-eyebrow::after{content:"";flex:1;height:1px;background:var(--line);}
+  .aside-title{font-family:var(--serif);font-weight:600;font-size:15px;line-height:1.5;color:var(--ink);margin-bottom:14px;letter-spacing:.04em;}
+
+  .toc{display:flex;flex-direction:column;gap:8px;}
+  .toc a{font-size:12.5px;line-height:1.6;color:var(--ink-2);padding:6px 8px;border-left:2px solid var(--line);transition:all .15s;}
+  .toc a:hover{color:var(--gold);border-left-color:var(--gold);background:var(--canvas-2);}
+  .toc a.on{color:var(--ink);border-left-color:var(--gold);font-weight:500;}
+
+  .related{display:flex;flex-direction:column;}
+  .related-item{padding:12px 0;border-top:1px dashed var(--line-soft);display:flex;flex-direction:column;gap:6px;cursor:pointer;transition:opacity .15s;}
+  .related-item:first-child{border-top:none;padding-top:0;}
+  .related-item:hover .r-title{color:var(--gold);}
+  .r-meta{display:flex;align-items:center;gap:8px;font-family:var(--latin-serif);font-size:11px;letter-spacing:.18em;color:var(--ink-3);}
+  .r-meta time{color:var(--ink-2);font-weight:500;}
+  .r-meta .news-tag{font-size:10px;padding:2px 8px;letter-spacing:.04em;}
+  .r-title{font-family:var(--serif);font-weight:500;font-size:12.5px;line-height:1.55;color:var(--ink);transition:color .15s;}
+
+  /* ─── Footer ─── */
+  .hc-footer{background:var(--hc-white);border-top:1px solid var(--line-soft);padding:32px 56px;display:flex;align-items:center;gap:24px;font-size:12.5px;color:var(--ink-3);}
+  .hc-footer .brand{font-weight:700;color:var(--ink);}
+  .hc-footer .links{display:flex;gap:22px;}
+  .hc-footer .links a:hover{color:var(--gold);}
+  .hc-footer .right{margin-left:auto;font-family:var(--latin-serif);letter-spacing:.16em;text-transform:uppercase;font-size:11px;}
+
+  /* Toast for copy URL */
+  .toast{position:fixed;left:50%;bottom:32px;transform:translate(-50%, 16px);background:var(--ink);color:#fff;padding:10px 20px;font-size:13px;letter-spacing:.04em;opacity:0;pointer-events:none;transition:all .2s;border-radius:4px;z-index:50;}
+  .toast.show{opacity:1;transform:translate(-50%,0);}
+</style>
+</head>
+<body data-screen-label="04 News Detail · Timeline Cool">
+
+  <header class="hc-header">
+    <div class="hc-brand">
+      <span class="hc-logo"><svg viewBox="0 0 32 32" fill="none"><path d="M16 4 L28 26 L4 26 Z" fill="#1a1a1a"/></svg></span>
+      <span class="hc-brand-text">SPEED AD Support</span>
+    </div>
+    <nav class="hc-nav">
+      <a>ヘルプ</a>
+      <a>FAQ</a>
+      <a class="on">お知らせ</a>
+      <a>お問い合わせ</a>
+    </nav>
+    <a class="hc-cta">公式サイト <span style="font-size:11px;">↗</span></a>
+  </header>
+
+  <div class="hc-tint">
+    <!-- ②  breadcrumb 末尾の記事タイトル -->
+    <nav class="breadcrumb" aria-label="パンくず">
+      <a>ヘルプセンター</a>
+      <span class="sep">›</span>
+      <a href="News List - 案C Timeline Cool.html">お知らせ</a>
+      <span class="sep">›</span>
+      <span class="current">QR回答フローを刷新 ― 来場者の離脱率を約 32% 改善する新UIをリリース</span>
+    </nav>
+  </div>
+
+  <!-- ─── Article hero ─── -->
+  <header class="article-hero">
+    <div class="ah-eyebrow">News &amp; Updates · Article</div>
+    <div class="ah-meta">
+      <!-- ③ -->
+      <time datetime="2026-05-21">2026.05.21</time>
+      <span class="sep">·</span>
+      <!-- ④ -->
+      <span class="news-tag" data-category="アップデート">アップデート</span>
+      <span class="sep">·</span>
+      <span>READ <b style="color:var(--ink);font-weight:500;">4 MIN</b></span>
+    </div>
+    <!-- ② -->
+    <h1>QR回答フローを刷新 ― 来場者の離脱率を約 32% 改善する新UIをリリースしました</h1>
+    <div class="ah-rule"></div>
+  </header>
+
+  <!-- ─── Body grid ─── -->
+  <div class="article-grid">
+    <article class="article-main">
+
+      <!-- リード文 (ドロップキャップ対象) -->
+      <p class="article-lede">
+        SPEED AD のフラッグシップ機能である「QR回答フロー」を全面的に刷新いたしました。会場での QR 読み取り後の体験を再設計し、設問遷移・自動保存・回答中断/再開・テーマカラー設定・多言語対応（日・英・中）に対応。社内ベータ運用での測定では <b>来場者の離脱率が平均 31.7%（最大 42%）改善</b> しました。
+      </p>
+
+      <!-- ⑤ 本文 -->
+      <section class="article-body">
+
+        <h2 id="section-1">刷新の背景</h2>
+        <p>従来の回答フローは、設問数が 6 問を超えると離脱率が急激に上昇する傾向がありました。回答途中で会場を移動した来場者がそのまま戻ってこないケースが多く、運用現場からは「中断と再開を前提とした設計にしてほしい」という要望を多くいただいておりました。</p>
+        <p>今回のリリースは、その課題を構造から見直したものです。設問の表示方法・保存タイミング・端末跨ぎでの再開・回答画面のトーン設定までを一気通貫で再設計しました。</p>
+
+        <h2 id="section-2">主な変更点</h2>
+        <p>本リリースに含まれる変更は次のとおりです。実装の重点は <strong>「迷わせない・失わせない・続けられる」</strong> の 3 つに置きました。</p>
+        <ul>
+          <li><strong>段階的な設問遷移</strong> — 1 画面 1 設問を基本とし、進捗バーを常時表示。残り設問数を明示することで離脱の判断を遅らせます。</li>
+          <li><strong>自動保存</strong> — 入力直後にローカル＋サーバへ自動保存。通信が不安定な会場でも回答が失われません。</li>
+          <li><strong>中断 / 再開</strong> — 中断 URL を発行し、別端末からでも続きから再開可能に。当日中であれば回答状態が引き継がれます。</li>
+          <li><strong>テーマカラー設定</strong> — 主催者ブランドの色味に合わせて回答画面を変更できます。</li>
+          <li><strong>多言語対応</strong> — 日本語 / 英語 / 中国語（簡体）に対応。来場者の OS 言語から自動判定します。</li>
+        </ul>
+
+        <h2 id="section-3">改善効果（社内ベータ）</h2>
+        <p>2026 年 3 月〜4 月の社内ベータ運用（合計 12 イベント / 累計 4,820 回答）における計測値です。</p>
+        <ul>
+          <li><strong>離脱率</strong>: 24.8% → <strong>17.0%</strong>（−31.7%）</li>
+          <li><strong>平均回答時間</strong>: 3 分 42 秒 → 2 分 18 秒（−37.8%）</li>
+          <li><strong>中断後の再開率</strong>: 集計対象外 → <strong>61.3%</strong>（新規指標）</li>
+          <li><strong>会場あたりの完了回答数</strong>: +28.4%（同条件比較）</li>
+        </ul>
+        <blockquote>
+          「設問が短く感じられるようになった」「途中でブースを離れても続きから戻れるのが助かる」 — ベータ参加企業ご担当者様より
+        </blockquote>
+
+        <h2 id="section-4">利用方法</h2>
+        <p>本機能は SPEED AD 全プランで本日より自動的に有効化されます。既存のフォームも追加設定なしで新しい UI に切り替わります。テーマカラー設定および多言語切替の設定は、管理画面の「フォーム設定」配下の「表示設定」タブからご利用いただけます。</p>
+        <h3>関連設定の場所</h3>
+        <p>テーマカラーは <code>フォーム設定 ＞ 表示設定 ＞ ブランディング</code>、多言語は同じ画面の <code>表示設定 ＞ 言語</code> から切り替え可能です。</p>
+
+        <h2 id="section-5">今後の予定</h2>
+        <p>本リリースに続き、6 月中旬には <strong>事後アンケート</strong> と <strong>御礼メール</strong> の自動生成連携を予定しています。回答完了後の追客導線を、サポート側で自動的に構築できるようになります。</p>
+        <p>その他のロードマップは <a href="#" style="color:var(--gold);border-bottom:1px solid var(--gold);">プロダクトロードマップ</a> をご参照ください。</p>
+
+      </section>
+
+      <!-- 記事末尾: back-link + SNS share -->
+      <div class="article-foot">
+        <a class="back-link" href="News List - 案C Timeline Cool.html">お知らせ一覧へ</a>
+        <div class="share">
+          <span class="lab">Share</span>
+          <button title="共有" aria-label="共有">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          </button>
+          <button title="X (Twitter)" aria-label="X (Twitter) でシェア">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </button>
+          <button title="LinkedIn" aria-label="LinkedIn でシェア">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.063 2.063 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          </button>
+          <button title="URL コピー" aria-label="URL コピー" id="copy-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </button>
+        </div>
+      </div>
+
+    </article>
+
+    <!-- ─── Right aside ─── -->
+    <aside class="article-aside" aria-label="関連情報">
+
+      <!-- TOC -->
+      <div class="aside-card">
+        <div class="aside-eyebrow">Contents</div>
+        <div class="aside-title">この記事の目次</div>
+        <nav class="toc">
+          <a href="#section-1">刷新の背景</a>
+          <a href="#section-2" class="on">主な変更点</a>
+          <a href="#section-3">改善効果（社内ベータ）</a>
+          <a href="#section-4">利用方法</a>
+          <a href="#section-5">今後の予定</a>
+        </nav>
+      </div>
+
+      <!-- Related -->
+      <div class="aside-card">
+        <div class="aside-eyebrow">Related</div>
+        <div class="aside-title">関連のお知らせ</div>
+        <div class="related">
+
+          <a class="related-item">
+            <div class="r-meta">
+              <time>2026.05.18</time>
+              <span class="news-tag" data-category="アップデート">アップデート</span>
+            </div>
+            <div class="r-title">名刺データのCSV書き出しでカスタム列定義に対応</div>
+          </a>
+
+          <a class="related-item">
+            <div class="r-meta">
+              <time>2026.05.15</time>
+              <span class="news-tag" data-category="メンテナンス">メンテナンス</span>
+            </div>
+            <div class="r-title">5月25日(月) 2:00–4:00 ストレージ拡張のお知らせ</div>
+          </a>
+
+          <a class="related-item">
+            <div class="r-meta">
+              <time>2026.05.08</time>
+              <span class="news-tag" data-category="アップデート">アップデート</span>
+            </div>
+            <div class="r-title">御礼メールテンプレートに差し込み変数プレビュー追加</div>
+          </a>
+
+          <a class="related-item">
+            <div class="r-meta">
+              <time>2026.04.28</time>
+              <span class="news-tag" data-category="アップデート">アップデート</span>
+            </div>
+            <div class="r-title">リード管理ボードのカンバンビューをリリース</div>
+          </a>
+
+        </div>
+      </div>
+
+    </aside>
+  </div>
+
+  <footer class="hc-footer">
+    <span class="brand">SPEED AD Support</span>
+    <span>© 2026 SPEED AD Inc.</span>
+    <div class="links">
+      <a>ヘルプセンター</a>
+      <a href="News List - 案C Timeline Cool.html">お知らせ</a>
+      <a>お問い合わせ</a>
+      <a>プライバシーポリシー</a>
+    </div>
+    <span class="right">News Detail · Timeline Cool</span>
+  </footer>
+
+  <div class="toast" id="toast">URLをコピーしました</div>
+
+  <script>
+    // URL copy + TOC scroll-spy (lightweight, no deps)
+    (function(){
+      var copyBtn = document.getElementById('copy-btn');
+      var toast = document.getElementById('toast');
+      if (copyBtn) {
+        copyBtn.addEventListener('click', function(){
+          try {
+            navigator.clipboard.writeText(location.href);
+          } catch(e) {}
+          toast.classList.add('show');
+          setTimeout(function(){ toast.classList.remove('show'); }, 1600);
+        });
+      }
+      // Smooth-scroll TOC anchors
+      document.querySelectorAll('.toc a').forEach(function(a){
+        a.addEventListener('click', function(e){
+          var hash = a.getAttribute('href');
+          var el = document.querySelector(hash);
+          if (el) {
+            e.preventDefault();
+            window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 24, behavior:'smooth' });
+            document.querySelectorAll('.toc a').forEach(function(b){ b.classList.remove('on'); });
+            a.classList.add('on');
+          }
+        });
+      });
+    })();
+  </script>
+
+</body>
+</html>

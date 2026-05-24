@@ -42,12 +42,22 @@
     return /^https?:\/\//i.test(String(value ?? ''));
   }
 
+  function isValidRelativeNewsPath(value) {
+    return typeof value === 'string' && /^05_support\/news\/([a-z0-9_-]+\/?)?$/i.test(value);
+  }
+
   function pickPublicNewsUrl(candidateUrl, fallbackUrl) {
     if (isHttpUrl(candidateUrl)) {
       return candidateUrl;
     }
+    if (isValidRelativeNewsPath(candidateUrl)) {
+      return resolveAppPath(candidateUrl);
+    }
     if (isHttpUrl(fallbackUrl)) {
       return fallbackUrl;
+    }
+    if (isValidRelativeNewsPath(fallbackUrl)) {
+      return resolveAppPath(fallbackUrl);
     }
     return 'https://support.speed-ad.com/news/';
   }
@@ -128,7 +138,7 @@
       if (!publicNewsSection || !publicNewsList) {
         return;
       }
-      const newsEndpoint = publicNewsSection.dataset.newsEndpoint || 'data/news.json';
+      const newsEndpoint = publicNewsSection.dataset.newsEndpoint || '05_support/assets/data/news.json';
       const fallbackNewsUrl = publicNewsSection.dataset.newsDetailUrl || 'https://support.speed-ad.com/news/';
       try {
         const response = await fetch(resolveAppPath(newsEndpoint));

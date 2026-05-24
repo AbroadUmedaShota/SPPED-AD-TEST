@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1280" />
+<title>QR回答フローを刷新 ― 来場者の離脱率を約 32% 改善する新UIをリリースしました｜お知らせ — SPEED AD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500;600;700&family=Noto+Sans+JP:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --navy:#0c1a2e; --navy-2:#0a1626; --navy-deep:#070f1c;
+    --cream:#f5efe5; --paper:#faf6ee;
+    --line:#e3dccb; --line-soft:#ece4d2;
+    --ink:#1a1a1a; --ink-2:#3a3a3a; --ink-3:#6b6b6b; --ink-4:#9a9489;
+    --gold:#b59561; --gold-2:#caa770;
+    --shell:#d9d2c2;
+    --serif:'Noto Serif JP','Hiragino Mincho ProN','Yu Mincho',serif;
+    --sans:'Noto Sans JP',-apple-system,'Hiragino Sans',sans-serif;
+    --latin-serif:'Cormorant Garamond','Noto Serif JP',serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--shell);color:var(--ink);font-family:var(--sans);line-height:1.7;-webkit-font-smoothing:antialiased;}
+  a{color:inherit;text-decoration:none}
+  button{font-family:inherit;cursor:pointer;background:none;border:none;color:inherit}
+  .page{width:1200px;margin:0 auto;background:var(--cream);overflow:hidden;}
+
+  /* ─── Common Help Center header (shared with List page) ─── */
+  .help-header{background:var(--navy-deep);color:#fff;display:flex;align-items:center;gap:0;height:60px;padding:0 56px;border-bottom:1px solid rgba(255,255,255,.08);}
+  .help-header .brand{font-weight:700;letter-spacing:.04em;font-size:14px;color:#fff;}
+  .help-header .sep{width:1px;height:18px;background:rgba(255,255,255,.18);margin:0 18px;}
+  .help-header .center-label{font-family:var(--latin-serif);font-size:12px;letter-spacing:.32em;color:var(--gold-2);text-transform:uppercase;}
+  .help-header .nav{display:flex;gap:0;margin-left:48px;}
+  .help-header .nav a{font-size:13px;color:rgba(255,255,255,.7);padding:0 18px;height:60px;display:flex;align-items:center;letter-spacing:.04em;border-bottom:2px solid transparent;}
+  .help-header .nav a:hover{color:#fff;}
+  .help-header .nav a.on{color:#fff;border-bottom-color:var(--gold);}
+  .help-header .spacer{flex:1;}
+  .help-header .right{display:flex;align-items:center;gap:18px;font-size:12.5px;color:rgba(255,255,255,.7);}
+  .help-header .right .search-ico{width:32px;height:32px;border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;cursor:pointer;}
+  .help-header .right .login{font-size:12px;letter-spacing:.08em;color:#fff;border:1px solid rgba(255,255,255,.35);padding:8px 18px;}
+
+  /* ─── Breadcrumb ─── */
+  .breadcrumb{
+    padding:18px 56px;border-bottom:1px solid var(--line);background:var(--paper);
+    font-size:12px;color:var(--ink-3);display:flex;align-items:center;gap:10px;letter-spacing:.04em;
+  }
+  .breadcrumb a{color:var(--ink-2);}
+  .breadcrumb a:hover{color:var(--gold);}
+  .breadcrumb .sep{color:var(--ink-4);}
+  .breadcrumb .current{color:var(--ink);max-width:680px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+  /* ─── Article ─── */
+  .article{padding:64px 56px 24px;display:grid;grid-template-columns:1fr 240px;gap:64px;}
+  .article-main{max-width:760px;}
+
+  .article-head{padding-bottom:36px;border-bottom:1px solid var(--line);margin-bottom:48px;}
+  .article-eyebrow{font-family:var(--latin-serif);font-size:11.5px;letter-spacing:.4em;color:var(--gold);text-transform:uppercase;margin-bottom:18px;}
+  .article-meta{display:flex;align-items:center;gap:12px;margin-bottom:24px;}
+  .news-tag{
+    display:inline-block;font-size:10.5px;letter-spacing:.18em;padding:4px 10px;
+    color:var(--gold);border:1px solid var(--gold);text-transform:uppercase;
+    font-family:var(--latin-serif);font-weight:500;
+  }
+  .news-tag.update{color:var(--navy);border-color:var(--navy);}
+  .news-tag.maint{color:#8a5a0c;border-color:#c79338;background:#fbf2dc;}
+  .news-tag.info{color:#5b6a4e;border-color:#5b6a4e;}
+  .news-tag.press{color:var(--gold);border-color:var(--gold);}
+  .article-meta time{
+    font-family:var(--latin-serif);font-size:14px;letter-spacing:.06em;color:var(--ink-2);font-weight:500;
+  }
+  .article-meta time .ymd{color:var(--ink-3);font-size:11px;letter-spacing:.18em;text-transform:uppercase;margin-left:6px;}
+
+  .article h1{
+    font-family:var(--serif);font-weight:600;font-size:38px;line-height:1.45;
+    color:var(--ink);letter-spacing:.02em;
+  }
+
+  .article-lede{
+    font-size:16px;line-height:2;color:var(--ink-2);margin-bottom:48px;
+    padding-bottom:32px;border-bottom:1px solid var(--line-soft);
+  }
+  .article-lede::first-letter{
+    font-family:var(--serif);font-size:48px;font-weight:600;color:var(--gold);
+    float:left;line-height:1;padding:6px 12px 0 0;
+  }
+
+  .article-body{font-size:14.5px;line-height:2;color:var(--ink-2);}
+  .article-body h2{
+    font-family:var(--serif);font-weight:600;font-size:24px;color:var(--ink);
+    letter-spacing:.02em;line-height:1.5;margin:56px 0 20px;padding-left:18px;border-left:3px solid var(--gold);
+  }
+  .article-body h3{
+    font-family:var(--serif);font-weight:600;font-size:17px;color:var(--ink);
+    letter-spacing:.04em;margin:36px 0 12px;
+  }
+  .article-body p{margin-bottom:20px;}
+  .article-body ul{margin:0 0 24px;padding-left:0;list-style:none;}
+  .article-body li{
+    position:relative;padding-left:24px;margin-bottom:10px;font-size:14px;line-height:1.95;color:var(--ink-2);
+  }
+  .article-body li::before{
+    content:"◆";position:absolute;left:0;color:var(--gold);font-size:9px;top:10px;
+  }
+  .article-body strong{font-weight:600;color:var(--ink);}
+
+  /* Highlight card inside article */
+  .release-card{
+    background:#fff;border:1px solid var(--line);padding:28px 32px;margin:32px 0;
+    display:grid;grid-template-columns:1fr auto auto;gap:32px;align-items:center;
+  }
+  .release-card .lab{font-family:var(--latin-serif);font-size:11px;letter-spacing:.32em;color:var(--gold);text-transform:uppercase;margin-bottom:6px;}
+  .release-card h4{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);letter-spacing:.02em;}
+  .release-card .stat{display:flex;flex-direction:column;align-items:flex-end;padding-left:24px;border-left:1px solid var(--line);font-family:var(--latin-serif);}
+  .release-card .stat b{font-size:32px;font-weight:500;color:var(--ink);letter-spacing:.04em;line-height:1;}
+  .release-card .stat span{font-size:10.5px;color:var(--ink-3);letter-spacing:.28em;text-transform:uppercase;margin-top:6px;}
+
+  /* Article foot — back link (spec §3.3, §5.3) */
+  .article-foot{
+    margin-top:56px;padding:36px 0 16px;border-top:1px solid var(--line);
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  .back-link{
+    display:inline-flex;align-items:center;gap:14px;font-family:var(--latin-serif);
+    font-size:13px;letter-spacing:.24em;color:var(--ink);text-transform:uppercase;
+    border:1px solid var(--ink);padding:14px 22px;transition:all .15s;
+  }
+  .back-link:hover{background:var(--navy);color:#fff;border-color:var(--navy);}
+  .back-link .arr{font-size:16px;}
+  .share-row{display:flex;gap:14px;font-family:var(--latin-serif);font-size:11px;letter-spacing:.24em;color:var(--ink-3);text-transform:uppercase;align-items:center;}
+  .share-row a{border-bottom:1px solid var(--line);padding-bottom:3px;}
+  .share-row a:hover{color:var(--gold);border-color:var(--gold);}
+
+  /* ─── Aside ─── */
+  .article-aside{position:sticky;top:24px;align-self:start;}
+  .aside-card{background:#fff;border:1px solid var(--line);padding:24px;margin-bottom:14px;}
+  .aside-eyebrow{font-family:var(--latin-serif);font-size:10.5px;letter-spacing:.4em;color:var(--gold);text-transform:uppercase;margin-bottom:12px;}
+  .aside-card h3{font-family:var(--serif);font-weight:600;font-size:15px;color:var(--ink);letter-spacing:.02em;margin-bottom:14px;line-height:1.5;}
+  .related-list li{
+    list-style:none;padding:12px 0;border-top:1px solid var(--line-soft);display:flex;flex-direction:column;gap:4px;cursor:pointer;
+  }
+  .related-list li:first-child{border-top:none;padding-top:0;}
+  .related-list .date{font-family:var(--latin-serif);font-size:11px;color:var(--ink-3);letter-spacing:.18em;}
+  .related-list .ti{font-family:var(--serif);font-size:13px;color:var(--ink-2);line-height:1.55;font-weight:500;}
+  .related-list li:hover .ti{color:var(--gold);}
+  .toc-list{font-size:12.5px;color:var(--ink-2);line-height:1.85;list-style:none;}
+  .toc-list li{padding:6px 0;border-bottom:1px dashed var(--line-soft);}
+  .toc-list li:last-child{border-bottom:none;}
+  .toc-list a:hover{color:var(--gold);}
+  .toc-list .num{font-family:var(--latin-serif);color:var(--ink-4);margin-right:8px;font-size:11px;letter-spacing:.1em;}
+
+  /* ─── Footer ─── */
+  .foot{background:var(--navy-deep);color:rgba(255,255,255,.55);padding:36px 56px;font-size:12px;display:flex;align-items:center;gap:32px;letter-spacing:.04em;border-top:1px solid rgba(255,255,255,.08);}
+  .foot .brand{color:#fff;font-weight:700;}
+  .foot-links{display:flex;gap:24px;}
+  .foot-links a:hover{color:#fff;}
+  .foot-back{margin-left:auto;display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.7);font-family:var(--latin-serif)}
+  .foot-back .arr{width:30px;height:30px;border:1px solid rgba(255,255,255,.3);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Common Help Center header -->
+  <header class="help-header">
+    <span class="brand">SPEED AD</span>
+    <span class="sep"></span>
+    <span class="center-label">Help Center</span>
+    <nav class="nav">
+      <a href="/help/">ヘルプホーム</a>
+      <a href="/help/faq/">よくある質問</a>
+      <a class="on" href="/05_support/news/">お知らせ</a>
+      <a href="/help/contact/">お問い合わせ</a>
+    </nav>
+    <span class="spacer"></span>
+    <div class="right">
+      <span class="search-ico">⌕</span>
+      <a class="login">ログイン →</a>
+    </div>
+  </header>
+
+  <!-- Breadcrumb (spec §3.3: ヘルプセンター > お知らせ > 記事タイトル) -->
+  <nav class="breadcrumb" aria-label="パンくず">
+    <a href="/help/">ヘルプセンター</a>
+    <span class="sep">›</span>
+    <a href="/05_support/news/">お知らせ</a>
+    <span class="sep">›</span>
+    <span class="current">QR回答フローを刷新 ― 来場者の離脱率を約 32% 改善する新UIをリリースしました</span>
+  </nav>
+
+  <!-- ─── Article ─── -->
+  <div class="article">
+    <article class="article-main">
+
+      <header class="article-head">
+        <div class="article-eyebrow">News &amp; Updates</div>
+        <div class="article-meta">
+          <span class="news-tag update">アップデート</span>
+          <time datetime="2026-05-21">2026.05.21<span class="ymd">Wed</span></time>
+        </div>
+        <h1>QR回答フローを刷新 ― 来場者の離脱率を約 32% 改善する新UIをリリースしました</h1>
+      </header>
+
+      <p class="article-lede">
+        会場で来場者が QR コードを読み込んでから回答完了に至るまでの導線を、SPEED AD として初めて全面的に見直しました。
+        新しい設問遷移、自動保存、回答途中の中断と再開に対応し、紙アンケートからの移行をよりスムーズに行えるようにしています。
+        本リリースは全プランで自動適用され、追加設定なくご利用いただけます。
+      </p>
+
+      <div class="article-body">
+
+        <h2>背景 ― 「読み込みから離脱まで」の構造的な課題</h2>
+        <p>
+          展示会・イベント会場での回答フローには、紙アンケートの体験から生まれた前提が数多く残っていました。
+          設問数が増えるほどスクロールが長くなり、途中で離脱した来場者を呼び戻す手段がない ― これは、回答率の頭打ちの主因のひとつでした。
+        </p>
+        <p>
+          直近 6 ヶ月、当社で運用された 412 件のアンケート回答ログを分析した結果、<strong>回答開始から完了までの間に約 38% の来場者が離脱</strong>していたことが明らかになりました。
+          そのうち過半数が、設問 4 〜 6 番目で離脱しています。今回のアップデートは、この区間の体験を抜本的に改善することを目的としています。
+        </p>
+
+        <h2>主な変更点</h2>
+
+        <h3>1. ステップ式の設問遷移</h3>
+        <p>これまでの長いスクロール形式から、1 ステップ 1 〜 3 問の表示形式へ変更しました。残りステップ数は常に画面上部に表示され、来場者は完了までの距離を把握しながら回答できます。</p>
+
+        <h3>2. 自動保存と中断 / 再開</h3>
+        <p>回答内容は設問ごとに自動保存されます。来場者が一度ブラウザを閉じても、同じ QR コードからアクセスし直すことで、続きから回答を再開できます。再開時はワンタップで遷移し、追加の認証は不要です。</p>
+
+        <h3>3. テーマカラーと多言語対応</h3>
+        <p>回答画面の基調色を、ブランドカラーに合わせて 6 色から選択できるようになりました。あわせて、回答インターフェースを日本語・英語・中国語（簡体）の 3 言語で出し分け可能です。来場者の端末言語に応じて自動切替する設定も用意しています。</p>
+
+        <ul>
+          <li>所要時間: 既存設問の自動移行（追加コスト無し）</li>
+          <li>対応プラン: 無料 / スタンダード / プレミアム のすべて</li>
+          <li>適用日: 2026 年 5 月 21 日 09:00 以降の新規回答セッションから順次適用</li>
+        </ul>
+
+        <div class="release-card">
+          <div>
+            <div class="lab">Measured Impact</div>
+            <h4>初週ベータ実測値 ― 12 イベント / 来場者 4,820 名</h4>
+          </div>
+          <div class="stat"><b>32%</b><span>Drop-off ↓</span></div>
+          <div class="stat"><b>+18%</b><span>Completion ↑</span></div>
+        </div>
+
+        <h2>既存の回答フォームへの影響</h2>
+        <p>
+          公開中のアンケートも自動的に新フォーマットへ移行されます。設問の文言や回答ロジックには変更を加えていません。<strong>移行をプレビューしてから本番適用したい</strong>場合は、管理画面の「アンケート設定」内に新設された「新フロー プレビュー」より、本番に影響を与えずに動作を確認できます。
+        </p>
+        <p>
+          紙アンケートからの移行をご検討中のお客様には、移行支援のオンライン相談会も随時開催しています。詳細は<a style="color:var(--gold);border-bottom:1px solid var(--gold);">サポート窓口</a>までお問い合わせください。
+        </p>
+
+        <h2>今後の予定</h2>
+        <p>
+          次の四半期では、回答途中での名刺撮影 ― 一枚撮りで会社情報を自動補完する機能を追加予定です。あわせて、回答結果のリアルタイム分析ダッシュボードもアップデートを予定しています。
+          進捗は随時、本お知らせページにてお伝えします。
+        </p>
+      </div>
+
+      <!-- Article foot — back to list (spec §3.3, §5.3) -->
+      <footer class="article-foot">
+        <a class="back-link" href="/05_support/news/">
+          <span class="arr">←</span> お知らせ一覧へ
+        </a>
+        <div class="share-row">
+          <span>Share</span>
+          <a>X (Twitter)</a>
+          <a>LinkedIn</a>
+          <a>URL コピー</a>
+        </div>
+      </footer>
+
+    </article>
+
+    <!-- Aside: TOC + related (optional, doesn't affect spec compliance) -->
+    <aside class="article-aside">
+      <div class="aside-card">
+        <div class="aside-eyebrow">Contents</div>
+        <ul class="toc-list">
+          <li><a><span class="num">01</span>背景 ― 構造的な課題</a></li>
+          <li><a><span class="num">02</span>主な変更点</a></li>
+          <li><a><span class="num">03</span>既存フォームへの影響</a></li>
+          <li><a><span class="num">04</span>今後の予定</a></li>
+        </ul>
+      </div>
+      <div class="aside-card">
+        <div class="aside-eyebrow">Related</div>
+        <h3 style="margin-bottom:6px;">関連のお知らせ</h3>
+        <ul class="related-list">
+          <li>
+            <span class="date">2026.05.18 · UPDATE</span>
+            <span class="ti">名刺データのCSV書き出しでカスタム列定義に対応しました</span>
+          </li>
+          <li>
+            <span class="date">2026.05.08 · UPDATE</span>
+            <span class="ti">御礼メールテンプレートに「差し込み変数のプレビュー」機能を追加</span>
+          </li>
+          <li>
+            <span class="date">2026.04.28 · UPDATE</span>
+            <span class="ti">リード管理ボードのカンバンビューを公開しました</span>
+          </li>
+          <li>
+            <span class="date">2026.04.10 · UPDATE</span>
+            <span class="ti">名刺OCRエンジンを v3 に更新 ― 認識精度が向上</span>
+          </li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Common footer -->
+  <footer class="foot">
+    <span class="brand">SPEED AD</span>
+    <span>© 2026 SPEED AD Inc.</span>
+    <div class="foot-links">
+      <a href="/help/">ヘルプセンター</a>
+      <a href="/05_support/news/">お知らせ</a>
+      <a href="/help/contact/">お問い合わせ</a>
+      <a href="/privacy/">プライバシーポリシー</a>
+      <a href="/terms/">利用規約</a>
+      <a href="/company/">会社概要</a>
+    </div>
+    <a class="foot-back" href="#top"><span>Back to top</span><span class="arr">↑</span></a>
+  </footer>
+
+</div>
+</body>
+</html>
