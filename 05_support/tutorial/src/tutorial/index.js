@@ -87,8 +87,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (isFreshStart) {
     showWelcome({
       onStart: () => goToStep(1),
-      // welcome 画面自体が確認の役割を果たすため、確認モーダルを挟まず直接離脱する
-      onSkip: () => finishAndExit({ markComplete: true }),
+      // welcome 画面自体が確認の役割を果たすため、確認モーダルを挟まず直接離脱する。
+      // ただし welcome段階での離脱は「未完了」扱いにし、次回再表示できるよう CTA画面のみ見せて去ってもらう。
+      onSkip: () => finishAndExit({ markComplete: false }),
     });
   } else {
     goToStep(startStep);
@@ -160,6 +161,13 @@ function goToStep(stepId) {
   const step = getStepById(stepId);
   if (!step) return;
 
+  // 前ステップの onLeaveAction を実行（モーダル自動close等）
+  // 同stepの再render時には呼ばない
+  const prevStep = TUTORIAL_STEPS[currentStepIndex];
+  if (prevStep && prevStep.id !== stepId && prevStep.onLeaveAction) {
+    applyLeaveAction(prevStep.onLeaveAction);
+  }
+
   cleanupActiveStep();
 
   currentStepIndex = TUTORIAL_STEPS.findIndex((s) => s.id === stepId);
@@ -170,6 +178,20 @@ function goToStep(stepId) {
   }
 
   resolveTargetAndRender(step);
+}
+
+function applyLeaveAction(action) {
+  if (action === 'closePreviewModal') {
+    const btn = document.querySelector('#surveyPreviewModalV2 button.bg-secondary-container');
+    if (btn) {
+      try { btn.click(); } catch (_e) { /* noop */ }
+    }
+  } else if (action === 'closeQrModal') {
+    const btn = document.querySelector('#footerCloseQrCodeModalBtn');
+    if (btn) {
+      try { btn.click(); } catch (_e) { /* noop */ }
+    }
+  }
 }
 
 const HANDOFF_STORAGE_KEY = 'speedad-tutorial-handoff';
@@ -239,6 +261,17 @@ function applyBasicInfoHandoff() {
 }
 
 function resolveTargetAndRender(step) {
+  // contextTarget（外側 弱ハイライト）を先に解決しておく。
+  // 見つからなくてもエラーにせず null を渡し、targetEl のみで従来描画にフォールバックする。
+  let contextEl = null;
+  if (step.contextTarget) {
+    try {
+      contextEl = document.querySelector(step.contextTarget);
+    } catch (_e) {
+      contextEl = null;
+    }
+  }
+
   // ターゲットが waitForElement 指定なら出現を待つ
   const finalize = (targetEl) => {
     const isUserAction = step.mode === 'user-action' || step.mode === 'user-action-bridge';
@@ -248,7 +281,7 @@ function resolveTargetAndRender(step) {
         enableTargetForTutorial(targetEl);
       }
     }
-    renderStep(step, targetEl);
+    renderStep(step, targetEl, contextEl);
     // 救済: user-action 系で対象要素が取得できなかった場合、クリックリスナーも
     // ヒントタイマーも張られず進行手段が無くなるため、即座にヒントを出して「次へ」を開放する。
     // ただし完了ボタン付きステップ（最終ステップ）は「完了」ボタンが前進手段なので対象外。
@@ -308,6 +341,31 @@ function resolveTargetAndRender(step) {
       el = grids[1]?.querySelector('[data-lang-wrapper] input') || null;
     }
     finalize(el);
+    return;
+  }
+
+  // 新: 直近質問カード内の選択肢リストコンテナ全体を返す（multi-option用）
+  if (step.targetResolver === 'lastInsertedQuestionFieldOptionsAll') {
+    let card = lastInsertedQuestionEl;
+    if (!card) {
+      const items = document.querySelectorAll('.question-card');
+      card = items.length > 0 ? items[items.length - 1] : null;
+    }
+    if (!card) { finalize(null); return; }
+    const qid = card.dataset.questionId;
+    const list = qid ? card.querySelector(`#options-list-${qid}`) : null;
+    finalize(list);
+    return;
+  }
+
+  // 新: 直近質問カード（評定尺度）要素自体を返す（rating-bundle用）
+  if (step.targetResolver === 'lastInsertedQuestionFieldRatingAll') {
+    let card = lastInsertedQuestionEl;
+    if (!card) {
+      const items = document.querySelectorAll('.question-card');
+      card = items.length > 0 ? items[items.length - 1] : null;
+    }
+    finalize(card);
     return;
   }
 
@@ -405,6 +463,67 @@ function runAutoInput(step, targetEl) {
     setInputsReadonly([targetEl]);
     return;
   }
+
+  // 選択肢4つを一括autofill（targetResolver='lastInsertedQuestionFieldOptionsAll' で
+  // 選択肢リストコンテナ要素 (#options-list-XXX) が targetEl に来る前提）
+  if (ai.kind === 'multi-option' && targetEl) {
+    const values = Array.isArray(ai.values) ? ai.values : [];
+    // 不足分は「選択肢を追加」ボタンで補充
+    const card = targetEl.closest('.question-card');
+    if (card) {
+      let currentCount = targetEl.querySelectorAll('[data-option-index]').length;
+      if (currentCount < values.length) {
+        const addBtn = Array.prototype.find.call(card.querySelectorAll('button'),
+          (b) => b.textContent && b.textContent.includes('選択肢を追加'));
+        if (addBtn) {
+          let safety = 0;
+          while (currentCount < values.length && safety < 20) {
+            addBtn.click();
+            currentCount = targetEl.querySelectorAll('[data-option-index]').length;
+            safety += 1;
+          }
+        }
+      }
+    }
+    const inputsToReadonly = [];
+    values.forEach((value, idx) => {
+      const row = targetEl.querySelector(`[data-option-index="${idx}"]`);
+      const input = row?.querySelector('[data-lang-wrapper] input');
+      if (input) {
+        setInputValue(input, value);
+        inputsToReadonly.push(input);
+      }
+    });
+    setInputsReadonly(inputsToReadonly);
+    return;
+  }
+
+  // 評定尺度の設問文＋min/maxを一括autofill（targetResolver='lastInsertedQuestionFieldRatingAll'）
+  // targetEl は .question-card 要素自体が来る前提
+  if (ai.kind === 'rating-bundle' && targetEl) {
+    const card = targetEl;
+    const inputsToReadonly = [];
+    // 設問文
+    const qInput = card.querySelector('[data-lang-wrapper] input.input-field');
+    if (qInput && ai.text != null) {
+      setInputValue(qInput, ai.text);
+      inputsToReadonly.push(qInput);
+    }
+    // min/max ラベル
+    const grids = card.querySelectorAll('.grid > div');
+    const minInput = grids[0]?.querySelector('[data-lang-wrapper] input');
+    const maxInput = grids[1]?.querySelector('[data-lang-wrapper] input');
+    if (minInput && ai.minLabel != null) {
+      setInputValue(minInput, ai.minLabel);
+      inputsToReadonly.push(minInput);
+    }
+    if (maxInput && ai.maxLabel != null) {
+      setInputValue(maxInput, ai.maxLabel);
+      inputsToReadonly.push(maxInput);
+    }
+    setInputsReadonly(inputsToReadonly);
+    return;
+  }
 }
 
 function setInputValue(input, value) {
@@ -424,11 +543,11 @@ function bindUserActionListener(step, targetEl) {
     stuckHintTimerId = null;
   }
   stuckHintTimerId = window.setTimeout(() => {
-    showStuckHint('ボタンが反応しないときは『次へ』で先に進めます');
+    showStuckHint('うまく押せない場合は『次へ』で続けられます');
     stuckHintTimerId = null;
     // #18: ヒント表示後の「次へ」緊急脱出で本来のクリックを代行できるよう対象を保持
     escapeTargetEl = targetEl;
-  }, 4000);
+  }, 8000);
 
   // M-4: クリック前の .question-card 件数を控えておき、増加を検出してから記録する
   const cardCountBeforeClick = document.querySelectorAll('.question-card').length;
@@ -469,9 +588,9 @@ function bindUserActionListener(step, targetEl) {
 }
 
 function captureLastInsertedQuestionIfNeeded(step, baselineCount, done) {
-  // ステップ 12 / 19 のクリック直後に最新 .question-card を記録しておく
-  // （新ステップ列でシングルアンサー選択=12, 評定尺度選択=19）
-  if (step.id !== 12 && step.id !== 19) {
+  // ステップ 15 / 19 のクリック直後に最新 .question-card を記録しておく
+  // シングルアンサー選択=15, 評定尺度選択=19（step10を4分割し+3シフト）
+  if (step.id !== 15 && step.id !== 19) {
     done();
     return;
   }

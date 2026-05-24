@@ -110,6 +110,20 @@
   }
 }
 
+/* ----- 外側 弱ハイライト枠（contextTarget 用） -----
+   内側スポットライトより控えめな見た目。z-index は内側と同等以下に揃え、
+   pulse アニメーションは付けない（注目は内側に集中させる）。 */
+.tutorial-spotlight--context {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9030;
+  border: 1px dashed rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+  background: transparent;
+  box-shadow: none;
+  transition: all 150ms ease-out;
+}
+
 /* 視線誘導パルス（200ms × 2回）— 維持 */
 .tutorial-spotlight.is-attention-pulse {
   animation: tutorial-attention-pulse 200ms ease-in-out 2;
@@ -148,19 +162,47 @@
   box-shadow:
     0 8px 24px rgba(0, 0, 0, 0.16),
     0 0 0 1px rgba(66, 133, 244, 0.10);
-  animation: tutorial-coachmark-in 240ms cubic-bezier(0.22, 1, 0.36, 1);
+  /* ステップ切替フェード用：transition で確実に opacity/transform を補間する。
+     keyframe animation だと inline style と競合するため transition に統一。
+     left/top は positionCoachmark で別途扱う（POSITION_TRANSITION_MS と同期）。
+     体感優先で 500ms（瞬間切替に絶対見えないよう厚めに）。 */
+  transition: opacity 500ms ease-out, transform 500ms ease-out;
 }
 
-@keyframes tutorial-coachmark-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* 右上のクローズ（×）ボタン。スキップ動線の発見性を高めるための独立 UI。 */
+.tutorial-coachmark__close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--tut-text-sub);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 160ms ease, color 160ms ease;
 }
+
+.tutorial-coachmark__close:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--tut-text);
+}
+
+.tutorial-coachmark__close:focus-visible {
+  outline: 2px solid var(--tut-accent-cyan);
+  outline-offset: 1px;
+}
+
+/* tutorial-coachmark-in keyframe は inline style と競合するため削除。
+   フェードイン/フェードアウトは inline style.opacity / transform を切り替えて
+   base transition で補間する方式に統一済み（renderStep を参照）。 */
 
 @media (max-width: 768px) {
   .tutorial-coachmark {
@@ -196,6 +238,12 @@
   line-height: 1.7;
   color: var(--tut-text-sub);
 }
+
+/* ステップ切替フェードは base transition + inline style で実装（renderStep）。
+   旧 is-fading-out/in クラスは削除済み。pointer-events のみ JS で制御する必要がない
+   ため、フェードアウト中に二重クリック防止が必要ならこのコメント以下にセレクタを足す。 */
+
+/* title/body 個別フェードは coachmark 全体のフェードに統一済み（forced reflow削減）。 */
 
 /* ----- フッター ----- */
 .tutorial-coachmark__footer {
@@ -701,6 +749,17 @@
   color: var(--tut-text-sub);
 }
 
+/* 2 行構成時の段間調整。1 行目（lead）は本文色を少し濃く、2 行目（invite）は通常の sub 色。 */
+.tutorial-welcome__body--lead {
+  margin: 0 0 12px;
+  color: var(--tut-text);
+}
+
+.tutorial-welcome__body--invite {
+  margin: 0 0 32px;
+  color: var(--tut-text-sub);
+}
+
 .tutorial-welcome__actions {
   display: flex;
   justify-content: center;
@@ -798,10 +857,43 @@
 }
 
 .tutorial-account-cta__body {
-  margin: 0 0 32px;
+  margin: 0 0 20px;
   font-size: 15px;
   line-height: 1.8;
   color: var(--tut-text-sub);
+}
+
+/* 体験した機能の箇条書き。チェックマークは ::before で付与する。 */
+.tutorial-account-cta__features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 28px;
+  text-align: left;
+  display: inline-block;
+}
+
+.tutorial-account-cta__features li {
+  position: relative;
+  padding-left: 24px;
+  margin: 0 0 8px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--tut-text);
+}
+
+.tutorial-account-cta__features li:last-child {
+  margin-bottom: 0;
+}
+
+.tutorial-account-cta__features li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--tut-accent-cyan);
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.6;
 }
 
 .tutorial-account-cta__actions {
@@ -847,6 +939,15 @@
   transform: translateY(-1px);
 }
 
+/* 不安解消note: actions の下に小さく弱めの色で表示する。 */
+.tutorial-account-cta__note {
+  margin: 16px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--tut-text-sub);
+  opacity: 0.85;
+}
+
 /* ============================================================
    prefers-reduced-motion: アニメーションを抑制
    ============================================================ */
@@ -855,6 +956,8 @@
   .tutorial-spotlight.is-attention-pulse,
   .tutorial-coachmark,
   .tutorial-coachmark.is-attention-pulse,
+  .tutorial-coachmark__title.is-step-changed,
+  .tutorial-coachmark__body.is-step-changed,
   .tutorial-pointer__ring,
   .tutorial-skip-modal__panel,
   .tutorial-welcome,
@@ -872,8 +975,15 @@
   .tutorial-welcome__skip,
   .tutorial-account-cta__create,
   .tutorial-account-cta__close,
-  .tutorial-progressbar__fill {
+  .tutorial-progressbar__fill,
+  .tutorial-spotlight--context {
     transition: none !important;
+  }
+
+  /* ステップ切替時のフェード遷移を抑制：即時に表示状態へ戻す */
+  .tutorial-coachmark.is-fading-out {
+    opacity: 1 !important;
+    transform: none !important;
   }
 
   /* パルスリングは静止表示にせず非表示にする（残像防止） */
