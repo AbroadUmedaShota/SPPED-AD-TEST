@@ -165,8 +165,8 @@
   /* ステップ切替フェード用：transition で確実に opacity/transform を補間する。
      keyframe animation だと inline style と競合するため transition に統一。
      left/top は positionCoachmark で別途扱う（POSITION_TRANSITION_MS と同期）。
-     体感優先で 350ms（短すぎると瞬間切替に見えるため）。 */
-  transition: opacity 350ms ease-out, transform 350ms ease-out;
+     体感優先で 500ms（瞬間切替に絶対見えないよう厚めに）。 */
+  transition: opacity 500ms ease-out, transform 500ms ease-out;
 }
 
 /* 右上のクローズ（×）ボタン。スキップ動線の発見性を高めるための独立 UI。 */
@@ -243,24 +243,7 @@
    旧 is-fading-out/in クラスは削除済み。pointer-events のみ JS で制御する必要がない
    ため、フェードアウト中に二重クリック防止が必要ならこのコメント以下にセレクタを足す。 */
 
-/* ステップ切替時の title/body フェード+スライドイン
-   overlay.js が is-step-changed を再付与してアニメーションを再発火させる。
-   テキストの瞬間置換による視線疲労を軽減するため、薄く 220ms かけて差し替える。 */
-@keyframes tutorial-content-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(3px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.tutorial-coachmark__title.is-step-changed,
-.tutorial-coachmark__body.is-step-changed {
-  animation: tutorial-content-fade-in 220ms cubic-bezier(0.22, 1, 0.36, 1);
-}
+/* title/body 個別フェードは coachmark 全体のフェードに統一済み（forced reflow削減）。 */
 
 /* ----- フッター ----- */
 .tutorial-coachmark__footer {

@@ -251,15 +251,15 @@ export function renderStep(step, targetEl, contextEl = null) {
   };
 
   if (isStepChange && coachmarkEl && coachmarkEl.style.display !== 'none') {
-    // フェードアウト: 体感優先でスケール・移動量を大きめに（scale 0.88・translateY 12px）。
-    // CSS の transition 350ms と合わせる。
+    // フェードアウト: 体感優先でスケール・移動量を最大化（scale 0.75・translateY 25px）。
+    // CSS の transition 500ms と合わせる。フェード途中の被視認性を担保する。
     coachmarkEl.style.pointerEvents = 'none';
     coachmarkEl.style.opacity = '0';
-    coachmarkEl.style.transform = 'scale(0.88) translateY(12px)';
+    coachmarkEl.style.transform = 'scale(0.75) translateY(25px)';
     window.setTimeout(() => {
       if (coachmarkEl) coachmarkEl.style.pointerEvents = '';
       applyUpdate();
-    }, 350);
+    }, 500);
   } else {
     applyUpdate();
   }
@@ -903,19 +903,6 @@ function padStep(n) {
   return String(n).padStart(2, '0');
 }
 
-/**
- * ステップ切替時にコーチマークの title/body 内容を再アニメーション。
- * クラス再付与でフェード+わずかなスライドイン（CSS keyframes）を再発火させる。
- */
-function triggerContentFadeIn(el) {
-  if (!el) return;
-  el.classList.remove('is-step-changed');
-  // reflow を強制して animation を再発火させる
-  // eslint-disable-next-line no-unused-expressions
-  void el.offsetWidth;
-  el.classList.add('is-step-changed');
-}
-
 // ブロック表記マッピング。steps.js の step.block (A/B/C/D) を「Step N/4 ・ ラベル」表示に変換。
 // 26という分母の数字を見せず、「あと何ブロックで終わる」感を直感的に伝える。
 const BLOCK_LABELS = {
@@ -1020,10 +1007,7 @@ function updateCoachmark(step, targetEl) {
   // textContent のみ使用（仕様書 §10）
   if (titleEl) titleEl.textContent = step.title || '';
   if (bodyEl) bodyEl.textContent = step.body || '';
-
-  // ステップ切替時の content フェード+スライドイン（瞬間置換による"ぱっぱ"感を緩和）
-  triggerContentFadeIn(titleEl);
-  triggerContentFadeIn(bodyEl);
+  // 注: title/body 個別のフェードは renderStep のコーチマーク全体フェードに統合（forced reflow削減）
 
   // 「次へ」ボタンの表示制御
   const isUserAction = step.mode === 'user-action' || (step.mode === 'user-action-bridge' && !step.completeButtonLabel);
@@ -1104,7 +1088,7 @@ function positionCoachmark(step, targetEl) {
       notch.style.transform = '';
     }
     coachmarkEl.style.transition =
-      `opacity 350ms ease-out, transform 350ms ease-out, ` +
+      `opacity 500ms ease-out, transform 500ms ease-out, ` +
       `left ${POSITION_TRANSITION_MS}ms ease-out, top ${POSITION_TRANSITION_MS}ms ease-out`;
     coachmarkEl.style.left = '50%';
     coachmarkEl.style.top = '50%';
@@ -1181,7 +1165,7 @@ function positionCoachmark(step, targetEl) {
   left = clampedLeft;
 
   coachmarkEl.style.transition =
-    `opacity 350ms ease-out, transform 350ms ease-out, ` +
+    `opacity 500ms ease-out, transform 500ms ease-out, ` +
     `left ${POSITION_TRANSITION_MS}ms ease-out, top ${POSITION_TRANSITION_MS}ms ease-out`;
   coachmarkEl.style.transform = 'none';
   coachmarkEl.style.left = `${left}px`;
