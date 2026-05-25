@@ -13,7 +13,8 @@ const COACHMARK_FADE_MS = 180;
 const MOBILE_BREAKPOINT = 768; // #6: この幅以下では right/left placement を不可とする
 const COACHMARK_FALLBACK_W = 400; // #8: CSS 実幅に合わせたフォールバック
 const COACHMARK_FALLBACK_H = 200; // #9: CSS 実高に寄せたフォールバック
-const CONNECTOR_REACH = 24; // bottom/top コネクタが伸びる距離（#25 のクランプ加味用）
+const CONNECTOR_REACH = 14; // bottom/top コネクタが伸びる距離（#25 のクランプ加味用）。
+                            // 旧 24px はスポットライト枠を突き抜けてターゲットに被っていたため短縮。
 
 let rootEl = null; // .tutorial-root
 let maskEl = null; // .tutorial-mask（SVG 切り抜き）
@@ -907,11 +908,15 @@ function buildAccountCtaScreen(variant = 'complete') {
 
   const body = document.createElement('p');
   body.className = 'tutorial-account-cta__body';
+  // ※ チュートリアル内の練習データはアカウントへ引き継がれない（誤解を避けるため
+  // 「練習したもの」を実際に公開できる、といった表現は使わない）。
+  // ※ コーチマーク body と同様に改行で意味のまとまりを切る。CSS の pre-line は
+  //   .tutorial-account-cta__body にも別途付与する（下記 CSS 変更を参照）。
   body.textContent = isWelcomeSkip
-    ? 'SPEED ADは、展示会アンケートと名刺データ化をQR1枚で完結できるサービスです。'
+    ? 'SPEED ADは、展示会アンケートと名刺データ化をQR1枚で完結できるサービスです。\n'
       + 'アカウントを作成すると、すぐに本番でご利用いただけます。'
-    : 'ここまでがアンケート作成の基本フローです。アカウントを作成すると、'
-      + '実際にアンケートを公開して回答を集められます。';
+    : 'ここまでがアンケート作成の基本フローです。\n'
+      + 'アカウントを作成すると、ご自身でアンケートを作成・公開して回答を集められます。';
   panel.appendChild(body);
 
   // 機能の箇条書き。チェックマークは ::before で付与する。
@@ -1160,7 +1165,10 @@ function positionCoachmark(step, targetEl) {
   // #8/#9: フォールバックを CSS 実寸（幅 400 / 高さ 200+）に合わせる。
   const coachmarkW = cmRect.width || COACHMARK_FALLBACK_W;
   const coachmarkH = cmRect.height || COACHMARK_FALLBACK_H;
-  const gap = 16;
+  // ターゲットとコーチマーク間のクリアランス。
+  // コネクタ長（CONNECTOR_REACH=14）+ スポットライト枠（pad 4 + border 3 = 7）の合計
+  // よりも大きく取り、コネクタ先端がスポットライト境界の外側で止まるようにする。
+  const gap = 22;
 
   // #6: モバイル幅では right/left を不可とし bottom/top に倒す。
   // 対象が画面下寄り（下側に吹き出しが収まらない）なら top、それ以外は bottom。

@@ -269,6 +269,9 @@
   font-size: 15px;
   line-height: 1.7;
   color: var(--tut-text-sub);
+  /* steps.js の body 文字列に含まれる \n を「視覚的な改行」として描画する。
+     連続スペースは折り返し用に collapse、改行のみ保持する pre-line を採用。 */
+  white-space: pre-line;
 }
 
 /* ステップ切替フェードは base transition + inline style で実装（renderStep）。
@@ -372,75 +375,77 @@
   height: 0;
 }
 
-/* top: コーチマーク下端から下に伸びる縦線 */
+/* top: コーチマーク下端から下に伸びる縦線。
+   旧 24px はターゲットへ食い込んでいたため 14px に短縮（gap 22px と合わせて
+   コネクタ先端がスポットライト境界の外側 +1px で止まる）。 */
 .tutorial-coachmark__connector[data-placement="top"],
 .tutorial-coachmark__notch[data-placement="top"] {
-  bottom: -24px;
+  bottom: -14px;
   left: 50%;
   transform: translateX(-50%);
   width: 2px;
-  height: 24px;
+  height: 14px;
 }
 
 /* bottom: コーチマーク上端から上に伸びる縦線 */
 .tutorial-coachmark__connector[data-placement="bottom"],
 .tutorial-coachmark__notch[data-placement="bottom"] {
-  top: -24px;
+  top: -14px;
   left: 50%;
   transform: translateX(-50%);
   width: 2px;
-  height: 24px;
+  height: 14px;
 }
 
 /* left: コーチマーク右端から右に伸びる横線 */
 .tutorial-coachmark__connector[data-placement="left"],
 .tutorial-coachmark__notch[data-placement="left"] {
-  right: -24px;
+  right: -14px;
   top: 50%;
   transform: translateY(-50%);
-  width: 24px;
+  width: 14px;
   height: 2px;
 }
 
 /* right: コーチマーク左端から左に伸びる横線 */
 .tutorial-coachmark__connector[data-placement="right"],
 .tutorial-coachmark__notch[data-placement="right"] {
-  left: -24px;
+  left: -14px;
   top: 50%;
   transform: translateY(-50%);
-  width: 24px;
+  width: 14px;
   height: 2px;
 }
 
-/* モバイルではコネクタを短くして画面外への突き出しを抑える */
+/* モバイルではさらに短くして画面外への突き出しを抑える */
 @media (max-width: 768px) {
   .tutorial-coachmark__connector[data-placement="top"],
   .tutorial-coachmark__notch[data-placement="top"],
   .tutorial-coachmark__connector[data-placement="bottom"],
   .tutorial-coachmark__notch[data-placement="bottom"] {
-    height: 16px;
+    height: 10px;
   }
   .tutorial-coachmark__connector[data-placement="top"],
   .tutorial-coachmark__notch[data-placement="top"] {
-    bottom: -16px;
+    bottom: -10px;
   }
   .tutorial-coachmark__connector[data-placement="bottom"],
   .tutorial-coachmark__notch[data-placement="bottom"] {
-    top: -16px;
+    top: -10px;
   }
   .tutorial-coachmark__connector[data-placement="left"],
   .tutorial-coachmark__notch[data-placement="left"],
   .tutorial-coachmark__connector[data-placement="right"],
   .tutorial-coachmark__notch[data-placement="right"] {
-    width: 16px;
+    width: 10px;
   }
   .tutorial-coachmark__connector[data-placement="left"],
   .tutorial-coachmark__notch[data-placement="left"] {
-    right: -16px;
+    right: -10px;
   }
   .tutorial-coachmark__connector[data-placement="right"],
   .tutorial-coachmark__notch[data-placement="right"] {
-    left: -16px;
+    left: -10px;
   }
 }
 
@@ -1025,6 +1030,8 @@
   font-size: 15px;
   line-height: 1.8;
   color: var(--tut-text-sub);
+  /* overlay.js が body 文字列に含める \n を改行として描画する。 */
+  white-space: pre-line;
 }
 
 /* 体験した機能の箇条書き。チェックマークは ::before で付与する。 */
