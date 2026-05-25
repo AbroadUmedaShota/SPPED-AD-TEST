@@ -22,7 +22,9 @@
       "Bash(xargs -I {} sed -i 's/phase2a-img/phase2a-img2/g' {})",
       "Bash(xargs -I {} sed -i 's/phase2a-img2/phase2a-img3/g' {})",
       "Bash(xargs -I {} sed -i 's/phase2a-img3/phase2a-img4/g' {})",
-      "Bash(curl -s \"http://127.0.0.1:5500/05_support/assets/js/utils.js?v=20260525-phase2a-img5\")"
+      "Bash(curl -s \"http://127.0.0.1:5500/05_support/assets/js/utils.js?v=20260525-phase2a-img5\")",
+      "Bash(npx --version)",
+      "Bash(npx playwright *)"
     ]
   },
   "enableAllProjectMcpServers": true,

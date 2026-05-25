@@ -196,7 +196,11 @@ export async function fetchSurveyData() {
     const loadingIndicator = document.getElementById('loading-indicator');
     if (loadingIndicator) loadingIndicator.classList.remove('hidden');
 
-    const fetchStats = { successCount: 0, failureCount: 0, totalCount: 0 };
+    // hasError: 実際の fetch / parse 失敗を表すフラグ。
+    // 空配列（正常な「データ 0 件」状態）と取得失敗を区別する目的で導入。
+    // 旧ロジックは successCount === 0 を一律失敗扱いしていたため、空 surveys.json で
+    // 「アンケートデータの取得に失敗しました」エラーオーバーレイが誤表示されていた。
+    const fetchStats = { successCount: 0, failureCount: 0, totalCount: 0, hasError: false };
 
     try {
         const coreUrl = resolveDashboardDataPath('core/surveys.json');
@@ -242,6 +246,7 @@ export async function fetchSurveyData() {
     } catch (error) {
         console.error('Error fetching survey data:', error);
         fetchStats.failureCount = fetchStats.totalCount || 0;
+        fetchStats.hasError = true;
         return { surveys: [], fetchStats };
     } finally {
         if (loadingIndicator) loadingIndicator.classList.add('hidden');
@@ -279,7 +284,9 @@ async function loadAndRenderSurveyData({ suppressToastOnError = false } = {}) {
         }
     }
 
-    if (fetchStats.successCount === 0) {
+    // 実際の fetch / parse エラー時のみオーバーレイ + トーストを出す。
+    // 空配列（surveys が 0 件）は正常状態なので、renderTableRows のゼロ件 UI に任せる。
+    if (fetchStats.hasError) {
         showSurveyFetchError(fetchStats);
         if (!suppressToastOnError) {
             showToast('データ取得に失敗しました（JSONへのアクセスを確認してください）', 'error', 5000);
@@ -314,11 +321,14 @@ function renderTableRows(surveysToRender) {
     surveyTableBody.innerHTML = ''; // Clear existing rows
 
     if (surveysToRender.length === 0) {
+        // チュートリアル自己完結バンドルでは初期データ（surveys.json）が空のため、
+        // ここに来るのは原則「まだアンケートが1件もない」初回ユーザー状態。
+        // 「検索結果なし」風の文言は誤解を生むため、初回ユーザー向けに調整する。
         const noResultsRow = document.createElement('tr');
         noResultsRow.innerHTML = `
             <td colspan="6" class="text-center py-8 text-on-surface-variant">
-                <p class="text-lg font-medium">該当するアンケートが見つかりませんでした。</p>
-                <p class="text-sm mt-2">検索条件を変更するか、新しいアンケートを作成してください。</p>
+                <p class="text-lg font-medium">まだアンケートはありません</p>
+                <p class="text-sm mt-2">右上の『アンケート新規作成』からはじめましょう。</p>
             </td>
         `;
         surveyTableBody.appendChild(noResultsRow);

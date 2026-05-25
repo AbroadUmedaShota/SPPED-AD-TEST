@@ -89,7 +89,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       onStart: () => goToStep(1),
       // welcome 画面自体が確認の役割を果たすため、確認モーダルを挟まず直接離脱する。
       // ただし welcome段階での離脱は「未完了」扱いにし、次回再表示できるよう CTA画面のみ見せて去ってもらう。
-      onSkip: () => finishAndExit({ markComplete: false }),
+      // variant='welcome-skip' で CTA 画面の eyebrow/本文を「完了」表現から「サービス紹介」表現に切り替える。
+      onSkip: () => finishAndExit({ markComplete: false, variant: 'welcome-skip' }),
     });
   } else {
     goToStep(startStep);
@@ -537,7 +538,13 @@ function bindUserActionListener(step, targetEl) {
   if (!targetEl) {
     return;
   }
-  // G4: クリック検出の救済 — 4 秒間クリックが無ければ吹き出しフッターにヒントを表示。
+  // 「次へ」を常時表示するようになったため、user-action 系ステップに入った瞬間から
+  // escapeTargetEl をセットして handleNext で代行クリックできる状態にしておく。
+  // これにより、ユーザーがハイライトを押さなくても「次へ」連打でフロー全体を進められる。
+  escapeTargetEl = targetEl;
+
+  // G4: クリック検出の救済 — 一定時間クリックが無ければ吹き出しフッターにヒントを表示。
+  // 「次へ」自体は常に押せるが、選択肢の存在を明示的に伝えるためヒントは残す。
   if (stuckHintTimerId) {
     window.clearTimeout(stuckHintTimerId);
     stuckHintTimerId = null;
@@ -545,8 +552,6 @@ function bindUserActionListener(step, targetEl) {
   stuckHintTimerId = window.setTimeout(() => {
     showStuckHint('うまく押せない場合は『次へ』で続けられます');
     stuckHintTimerId = null;
-    // #18: ヒント表示後の「次へ」緊急脱出で本来のクリックを代行できるよう対象を保持
-    escapeTargetEl = targetEl;
   }, 8000);
 
   // M-4: クリック前の .question-card 件数を控えておき、増加を検出してから記録する
@@ -635,26 +640,24 @@ function cleanupActiveStep() {
 // ---------- 進行コールバック ----------
 
 function handleNext() {
-  // #18: 緊急脱出（stuck hint 経由の前進）時、対象要素が存在すれば本来のクリックを
-  // 代行する。対象が無ければ前進のみ。
+  // user-action / user-action-bridge ステップでは bindUserActionListener が
+  // escapeTargetEl をセットしている。「次へ」押下時は本来のクリックを代行し、
+  // その後の進行は以下のどちらかが引き取る:
+  //   - user-action: targetEl の click ハンドラ（{once:true}）が advanceStep を呼ぶ
+  //   - user-action-bridge: 本番ハンドラ（§5.4 ガード）が goToStep / redirect を呼ぶ
+  // どちらの場合も handleNext からの advanceStep は不要（二重進行を避ける）。
+  // クリック代行が物理的に失敗した（target が DOM から外れている等）ときのみ
+  // フォールバックで advanceStep を呼ぶ。
   if (escapeTargetEl) {
     const el = escapeTargetEl;
     escapeTargetEl = null;
-    // クリック代行で currentStepIndex が変わり得るため、現ステップを先に控える。
-    const stepBeforeClick = TUTORIAL_STEPS[currentStepIndex];
     if (document.body.contains(el)) {
       try {
         el.click();
+        return;
       } catch (_e) {
-        /* noop: クリック失敗時も前進は継続 */
+        /* fall through: クリック失敗時は手動 advance に倒す */
       }
-    }
-    // user-action-bridge は本番ハンドラ（§5.4 ガード）がクリックを受けて
-    // goToStep / redirect で進行を引き継ぐ。ここで advanceStep すると二重進行になり、
-    // ステップ 30 の緊急脱出で完了ステップ（31）が飛ばされてしまう。
-    // ブリッジ系ではクリック代行のみとし、前進はガードに委ねる。
-    if (stepBeforeClick && stepBeforeClick.mode === 'user-action-bridge') {
-      return;
     }
   }
   advanceStep();
@@ -696,16 +699,18 @@ function advanceStep() {
   goToStep(next.id);
 }
 
-function finishAndExit({ markComplete }) {
+function finishAndExit({ markComplete, variant = 'complete' }) {
   if (markComplete) markCompleted();
   else clearProgress();
   detachNewQuestionObserver();
   destroyOverlay();
   // 完了・スキップともにアカウント作成 CTA 画面で終端する単一フロー。
+  // variant で「完了」表記と「サービス紹介」表記を切り分ける（welcome 段階離脱は後者）。
   // showAccountCtaScreen は内部で ensureRoot するため destroyOverlay 後に呼ぶ。
   showAccountCtaScreen({
     onCreateAccount: () => window.location.assign('../../index.html?intent=signup'),
     onClose: () => window.location.assign('../../index.html'),
+    variant,
   });
 }
 

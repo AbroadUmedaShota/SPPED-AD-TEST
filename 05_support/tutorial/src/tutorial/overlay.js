@@ -6,7 +6,10 @@ const TARGET_PAD = 4; // スポットライト切り抜き余白（仕様書 §8
 const SPOTLIGHT_RADIUS = 8;
 const PULSE_DURATION_MS = 200;
 const PULSE_COUNT = 2;
-const POSITION_TRANSITION_MS = 240;
+// 体感速度の調整: 旧 240ms は「もっさり」感が強かったため、位置補間を 120ms に短縮。
+// step 切替フェードも同様に 500ms → 180ms に圧縮（COACHMARK_FADE_MS）。
+const POSITION_TRANSITION_MS = 120;
+const COACHMARK_FADE_MS = 180;
 const MOBILE_BREAKPOINT = 768; // #6: この幅以下では right/left placement を不可とする
 const COACHMARK_FALLBACK_W = 400; // #8: CSS 実幅に合わせたフォールバック
 const COACHMARK_FALLBACK_H = 200; // #9: CSS 実高に寄せたフォールバック
@@ -73,6 +76,7 @@ export function initOverlay({ total } = {}) {
   // #3/#4: コーチマーク表示中のキーボード処理。
   //   - Tab/Shift+Tab はコーチマーク内でフォーカスを循環（フォーカストラップ）
   //   - ESC は離脱導線として skip 確認モーダルを開く
+  //   - Space / Enter は「次へ」を発火（フォーカス位置によらず進行できる）
   coachmarkKeydownBound = (ev) => {
     // skip モーダル表示中は当該モーダルの keydown に委ねる（ESC=続ける挙動を維持）
     if (skipModalEl || welcomeScreenEl) return;
@@ -84,6 +88,27 @@ export function initOverlay({ total } = {}) {
     }
     if (ev.key === 'Tab') {
       handleCoachmarkTab(ev);
+      return;
+    }
+    if (ev.key === ' ' || ev.key === 'Spacebar' || ev.key === 'Enter') {
+      // フォーム要素（autofill 対象の入力欄等）に直接フォーカスがある場合は本来の入力動作を優先。
+      const active = document.activeElement;
+      if (active) {
+        const tag = active.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || active.isContentEditable) {
+          return;
+        }
+        // コーチマーク内のボタン（戻る・スキップ等）にフォーカスが当たっている場合は、
+        // ブラウザ標準のキー＝そのボタンの click を尊重して干渉しない。
+        if (tag === 'BUTTON' && coachmarkEl.contains(active)) {
+          return;
+        }
+      }
+      const nextBtn = coachmarkEl.querySelector('.tutorial-coachmark__next');
+      if (nextBtn && nextBtn.style.display !== 'none' && !nextBtn.disabled) {
+        ev.preventDefault();
+        nextBtn.click();
+      }
     }
   };
   document.addEventListener('keydown', coachmarkKeydownBound, true);
@@ -251,15 +276,15 @@ export function renderStep(step, targetEl, contextEl = null) {
   };
 
   if (isStepChange && coachmarkEl && coachmarkEl.style.display !== 'none') {
-    // フェードアウト: 体感優先でスケール・移動量を最大化（scale 0.75・translateY 25px）。
-    // CSS の transition 500ms と合わせる。フェード途中の被視認性を担保する。
+    // フェードアウト: COACHMARK_FADE_MS（180ms）と合わせる。
+    // 旧 500ms はもっさり感が強かったため短縮。scale/translate も控えめに（0.92 / 12px）。
     coachmarkEl.style.pointerEvents = 'none';
     coachmarkEl.style.opacity = '0';
-    coachmarkEl.style.transform = 'scale(0.75) translateY(25px)';
+    coachmarkEl.style.transform = 'scale(0.92) translateY(12px)';
     window.setTimeout(() => {
       if (coachmarkEl) coachmarkEl.style.pointerEvents = '';
       applyUpdate();
-    }, 500);
+    }, COACHMARK_FADE_MS);
   } else {
     applyUpdate();
   }
@@ -448,10 +473,14 @@ export function hideWelcome() {
  * index.js が finishAndExit 内で destroyOverlay() を呼んだ後に
  * 呼び出すため、rootEl は破棄済み。自前で ensureRoot() してルートを用意する。
  * 終端画面のため 1 回表示のみで冪等化・hide 関数は持たない。
+ *
+ * variant: 'complete' = チュートリアル完遂/スキップ確定経由。「チュートリアル完了」eyebrow。
+ *          'welcome-skip' = welcome 画面の「サービス概要を見る」経由（未着手離脱）。
+ *                           完了表現を避け、サービス紹介寄りの文言に切り替える。
  */
-export function showAccountCtaScreen({ onCreateAccount, onClose } = {}) {
+export function showAccountCtaScreen({ onCreateAccount, onClose, variant = 'complete' } = {}) {
   ensureRoot();
-  const ctaScreenEl = buildAccountCtaScreen();
+  const ctaScreenEl = buildAccountCtaScreen(variant);
   rootEl.appendChild(ctaScreenEl);
   // CTA 画面自身が dialog/aria-modal を持つため、rootEl の dialog ロールは外して
   // モーダルの二重ネストを解消する（welcome と同じ作法）。
@@ -512,7 +541,11 @@ function buildProgressBar() {
 
   const note = document.createElement('span');
   note.className = 'tutorial-progressbar__note';
-  note.textContent = 'これは体験用ツアーです。入力内容は保存されません（アカウント作成後に本番でご利用いただけます）。';
+  // 体験用案内: ①入力非保存 ②開発中の旨 ③Space/Enter でも進めるショートカット を併記。
+  note.textContent =
+    'これは体験用ツアーです。入力内容は保存されません。'
+    + '画面は開発中のため、リリース版とは一部異なる場合があります。'
+    + 'Space / Enter でも次へ進めます。';
   progressBarEl.appendChild(note);
 
   const fillWrap = document.createElement('div');
@@ -675,11 +708,10 @@ function buildCoachmark() {
   });
   footer.appendChild(nextBtn);
 
-  const hint = document.createElement('span');
-  hint.className = 'tutorial-coachmark__hint';
-  // #15: 押す対象を明示する文言にする。
-  hint.textContent = 'ハイライトされた箇所をクリックしてください';
-  footer.appendChild(hint);
+  // 旧 .tutorial-coachmark__hint（「ハイライトされた箇所をクリックしてください」）は廃止。
+  //   - body の指示文と内容が重複していた
+  //   - 「次へ」常時表示化により、クリックは唯一の進行手段ではなくなった
+  //   - スポットライト + ポインタ + body 指示文 + 常時の「次へ」で十分伝わる
 
   coachmarkEl.appendChild(footer);
 
@@ -800,6 +832,14 @@ function buildWelcomeScreen() {
   bodyInvite.textContent = 'アンケート作成からQR発行までの基本フローを、数分で体験しましょう。';
   panel.appendChild(bodyInvite);
 
+  // 開発中バージョンの注意書き。リリース版との差分を着手前に明示する。
+  const devNotice = document.createElement('p');
+  devNotice.className = 'tutorial-welcome__notice';
+  devNotice.textContent =
+    '※ チュートリアル内で表示している画面は現在開発中のバージョンです。'
+    + '実際のリリース版とは一部の画面・項目が異なる場合があります。';
+  panel.appendChild(devNotice);
+
   const actions = document.createElement('div');
   actions.className = 'tutorial-welcome__actions';
 
@@ -818,14 +858,35 @@ function buildWelcomeScreen() {
   actions.appendChild(startBtn);
 
   panel.appendChild(actions);
+
+  // キーボードショートカットの案内。進行バーの note にも記載しているが、
+  // 着手前にも気付けるよう welcome 画面でも明示する（actions の直下に控えめに）。
+  const kbdHint = document.createElement('p');
+  kbdHint.className = 'tutorial-welcome__kbd-hint';
+  // DOM ファクトリ縛りのため kbd タグも createElement で組み立てる。
+  kbdHint.appendChild(document.createTextNode('チュートリアル中は '));
+  const kbdSpace = document.createElement('kbd');
+  kbdSpace.className = 'tutorial-kbd';
+  kbdSpace.textContent = 'Space';
+  kbdHint.appendChild(kbdSpace);
+  kbdHint.appendChild(document.createTextNode(' / '));
+  const kbdEnter = document.createElement('kbd');
+  kbdEnter.className = 'tutorial-kbd';
+  kbdEnter.textContent = 'Enter';
+  kbdHint.appendChild(kbdEnter);
+  kbdHint.appendChild(document.createTextNode(' キーでも『次へ』に進めます。'));
+  panel.appendChild(kbdHint);
+
   overlay.appendChild(panel);
 
   return overlay;
 }
 
-function buildAccountCtaScreen() {
+function buildAccountCtaScreen(variant = 'complete') {
+  const isWelcomeSkip = variant === 'welcome-skip';
   const overlay = document.createElement('div');
   overlay.className = 'tutorial-account-cta';
+  if (isWelcomeSkip) overlay.classList.add('tutorial-account-cta--welcome-skip');
   overlay.setAttribute('role', 'dialog');
   overlay.setAttribute('aria-modal', 'true');
   overlay.setAttribute('aria-labelledby', 'tutorial-account-cta-title');
@@ -835,7 +896,7 @@ function buildAccountCtaScreen() {
 
   const eyebrow = document.createElement('div');
   eyebrow.className = 'tutorial-account-cta__eyebrow';
-  eyebrow.textContent = 'チュートリアル完了';
+  eyebrow.textContent = isWelcomeSkip ? 'SPEED ADでできること' : 'チュートリアル完了';
   panel.appendChild(eyebrow);
 
   const title = document.createElement('h1');
@@ -846,12 +907,15 @@ function buildAccountCtaScreen() {
 
   const body = document.createElement('p');
   body.className = 'tutorial-account-cta__body';
-  body.textContent =
-    'ここまでがアンケート作成の基本フローです。アカウントを作成すると、'
-    + '実際にアンケートを公開して回答を集められます。';
+  body.textContent = isWelcomeSkip
+    ? 'SPEED ADは、展示会アンケートと名刺データ化をQR1枚で完結できるサービスです。'
+      + 'アカウントを作成すると、すぐに本番でご利用いただけます。'
+    : 'ここまでがアンケート作成の基本フローです。アカウントを作成すると、'
+      + '実際にアンケートを公開して回答を集められます。';
   panel.appendChild(body);
 
-  // 体験した機能の箇条書き。チェックマークは ::before で付与する。
+  // 機能の箇条書き。チェックマークは ::before で付与する。
+  // complete: 「体験した機能」、welcome-skip: 「ご利用いただける機能」のニュアンス。
   const features = document.createElement('ul');
   features.className = 'tutorial-account-cta__features';
   const featureItems = [
@@ -1002,25 +1066,18 @@ function updateCoachmark(step, targetEl) {
   const bodyEl = coachmarkEl.querySelector('.tutorial-coachmark__body');
   const nextBtn = coachmarkEl.querySelector('.tutorial-coachmark__next');
   const prevBtn = coachmarkEl.querySelector('.tutorial-coachmark__prev');
-  const hint = coachmarkEl.querySelector('.tutorial-coachmark__hint');
 
   // textContent のみ使用（仕様書 §10）
   if (titleEl) titleEl.textContent = step.title || '';
   if (bodyEl) bodyEl.textContent = step.body || '';
   // 注: title/body 個別のフェードは renderStep のコーチマーク全体フェードに統合（forced reflow削減）
 
-  // 「次へ」ボタンの表示制御
-  const isUserAction = step.mode === 'user-action' || (step.mode === 'user-action-bridge' && !step.completeButtonLabel);
+  // 「次へ」ボタンは常に表示し、user-action 系でも「次へ次へ」で進めるようにする。
+  // user-action / user-action-bridge では index.js の handleNext が代行クリックを行うことで
+  // 本来のアクション（モーダルを開く・ページ遷移など）を発火させつつ進行を継続する。
   if (nextBtn) {
-    if (isUserAction) {
-      nextBtn.style.display = 'none';
-    } else {
-      nextBtn.style.display = '';
-      nextBtn.textContent = step.completeButtonLabel || '次へ';
-    }
-  }
-  if (hint) {
-    hint.style.display = isUserAction ? '' : 'none';
+    nextBtn.style.display = '';
+    nextBtn.textContent = step.completeButtonLabel || '次へ';
   }
 
   // 「戻る」は先頭以外で表示。M-2: ページ境界ステップ（step.hideBack）では非表示。
@@ -1088,7 +1145,7 @@ function positionCoachmark(step, targetEl) {
       notch.style.transform = '';
     }
     coachmarkEl.style.transition =
-      `opacity 500ms ease-out, transform 500ms ease-out, ` +
+      `opacity ${COACHMARK_FADE_MS}ms ease-out, transform ${COACHMARK_FADE_MS}ms ease-out, ` +
       `left ${POSITION_TRANSITION_MS}ms ease-out, top ${POSITION_TRANSITION_MS}ms ease-out`;
     coachmarkEl.style.left = '50%';
     coachmarkEl.style.top = '50%';
@@ -1165,7 +1222,7 @@ function positionCoachmark(step, targetEl) {
   left = clampedLeft;
 
   coachmarkEl.style.transition =
-    `opacity 500ms ease-out, transform 500ms ease-out, ` +
+    `opacity ${COACHMARK_FADE_MS}ms ease-out, transform ${COACHMARK_FADE_MS}ms ease-out, ` +
     `left ${POSITION_TRANSITION_MS}ms ease-out, top ${POSITION_TRANSITION_MS}ms ease-out`;
   coachmarkEl.style.transform = 'none';
   coachmarkEl.style.left = `${left}px`;
