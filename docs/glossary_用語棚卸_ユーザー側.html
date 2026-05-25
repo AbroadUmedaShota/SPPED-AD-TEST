@@ -19,25 +19,89 @@ td.cat { font-size:7.8pt; }
 td.iso { font-size:7.6pt; }
 td.src { background:#fffdf3 !important; }
 td.genba { font-size:7.4pt; color:#555; }
-td.judge { background:#fff !important; }
-col.c-id{width:3.4%;} col.c-cat{width:5.6%;} col.c-con{width:15.5%;}
-col.c-s1{width:13.5%;} col.c-s2{width:13.5%;} col.c-s3{width:13.5%;}
-col.c-iso{width:7.5%;} col.c-gen{width:19.8%;} col.c-jud{width:7.7%;}
+td.judge { background:#fff7e6 !important; }
+td.memo { background:#f4faf4 !important; }
+col.c-id{width:3%;} col.c-cat{width:4.5%;} col.c-con{width:13%;}
+col.c-s1{width:11.5%;} col.c-s2{width:11.5%;} col.c-s3{width:11.5%;}
+col.c-iso{width:5.5%;} col.c-gen{width:14.5%;} col.c-jud{width:11%;} col.c-memo{width:14%;}
 .varydiff { color:#b3261e; font-weight:bold; }
+
+/* === 採用判定 UI === */
+.chip {
+  display:inline-block; margin:1px 2px 1px 0; padding:1px 6px;
+  font: inherit; font-size:8.2pt; line-height:1.35;
+  background:#fff; color:#b3261e; border:0.8px solid #c8b48a;
+  border-radius:10px; cursor:pointer; max-width:100%;
+  word-break:break-all; text-align:left;
+}
+.chip:hover { background:#fff0d6; border-color:#a07b3a; }
+.chip.chip-selected {
+  background:#1f3a5f; color:#fff; border-color:#1f3a5f; font-weight:bold;
+}
+.adopt-input {
+  width:100%; box-sizing:border-box; padding:2px 4px;
+  font: inherit; font-size:8.6pt; color:#1a1a1a;
+  border:1px solid #d6c89b; border-radius:3px; background:#fffefa;
+}
+.adopt-input:focus { outline:none; border-color:#1f3a5f; background:#fff; }
+.adopt-input:not(:placeholder-shown) { background:#fff7d8; font-weight:bold; }
+.memo-input {
+  width:100%; box-sizing:border-box; padding:2px 4px;
+  font: inherit; font-size:8.4pt; color:#1a1a1a;
+  border:1px solid #c5d9c5; border-radius:3px; background:#fafffa;
+  resize:vertical; min-height:32px;
+}
+.memo-input:focus { outline:none; border-color:#2f7a3a; background:#fff; }
+
+/* === ツールバー === */
+.toolbar {
+  position: sticky; top: 0; z-index: 10;
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  margin:6px 0 10px; padding:6px 8px;
+  background:#1f3a5f; color:#fff; border-radius:4px;
+  font-size:8.8pt;
+}
+.toolbar button {
+  font: inherit; font-size:8.6pt; padding:3px 10px;
+  background:#fff; color:#1f3a5f; border:1px solid #fff;
+  border-radius:3px; cursor:pointer; font-weight:bold;
+}
+.toolbar button:hover { background:#dce6f0; }
+.toolbar button.danger { color:#b3261e; }
+.toolbar .count { margin-left:auto; font-weight:bold; }
+.toolbar .hint { font-size:8.2pt; opacity:.85; }
+
+@media print {
+  .toolbar { display:none; }
+  .chip { border:none; background:transparent; color:#b3261e; padding:0; cursor:default; }
+  .chip.chip-selected { background:transparent; color:#1f3a5f; text-decoration:underline; }
+  .adopt-input, .memo-input { border:none; background:transparent; }
+}
 </style></head><body>
 <h1>SPEED AD ユーザー側 用語棚卸表（表記ゆれ抽出版）</h1>
 <p class="lead">作成日 2026-05-20 ／ 対象: admin画面を除くユーザー側全画面 ／
 出典3系統 ①ユーザー側画面HTML ②仕様書Markdown ③Backlog wiki(SPDAD2026)。
-複数ソース間／同一ソース内で表記がゆれている概念のみを抽出。統一表記の決定・推奨はしていない（判断欄は記入用に空欄）。</p>
+複数ソース間／同一ソース内で表記がゆれている概念のみを抽出。統一表記の決定・推奨はしていない（採用欄は記入用に空欄）。</p>
 
 <ul class="summary"><li>全抽出概念 2026 のうち、表記ゆれのある <b>455 概念</b>に絞り込み（単一ソースのみ・完全一致は除外）。</li>
 <li>第1部 ①ユーザー画面が絡む表記ゆれ（最優先・画面の言語統一に直結）: 323</li>
 <li>第2部 ②仕様書↔③Backlog wiki 間のみの表記ゆれ（ドキュメント間の不一致）: 111</li>
 <li>第3部 軽微な差（コード識別子のみ／半角スペース差のみ）: 21</li>
 </ul>
+
+<div class="toolbar">
+  <span>採用語の選定：①②③のチップをクリックで【採用】欄に反映（再クリックで解除・複数選択可）。手入力可。メモも記入可。</span>
+  <button type="button" id="btn-export-csv">CSVダウンロード</button>
+  <button type="button" id="btn-import-csv">CSV読み込み</button>
+  <input type="file" id="csv-file" accept=".csv,text/csv" style="display:none">
+  <button type="button" id="btn-clear-all" class="danger">全クリア</button>
+  <span class="hint">（保存先: このブラウザの localStorage）</span>
+  <span class="count" id="decision-count">採用済 0 / 455</span>
+</div>
+
 <h2>第1部 ①ユーザー画面が絡む表記ゆれ（最優先・画面の言語統一に直結）（323件）</h2>
-<table><colgroup><col class="c-id"><col class="c-cat"><col class="c-con"><col class="c-s1"><col class="c-s2"><col class="c-s3"><col class="c-iso"><col class="c-gen"><col class="c-jud"></colgroup>
-<tr><th>ID</th><th>カテゴリ</th><th>概念（意味）</th><th>①ユーザー画面</th><th>②仕様書</th><th>③Backlog wiki</th><th>ソース間の異同</th><th>出典場所</th><th>判断欄</th></tr>
+<table><colgroup><col class="c-id"><col class="c-cat"><col class="c-con"><col class="c-s1"><col class="c-s2"><col class="c-s3"><col class="c-iso"><col class="c-gen"><col class="c-jud"><col class="c-memo"></colgroup>
+<tr><th>ID</th><th>カテゴリ</th><th>概念（意味）</th><th>①ユーザー画面</th><th>②仕様書</th><th>③Backlog wiki</th><th>ソース間の異同</th><th>出典場所</th><th>採用</th><th>メモ</th></tr>
 <tr><td class="id">G-0001</td><td class="cat">業務概念</td><td>料金プラン区分の1つ（Free／無料プラン）</td><td class="src"><span class="varydiff">Free</span></td><td class="src"><span class="varydiff">Free / Free (無料)</span></td><td class="src"><span class="varydiff">Free</span></td><td class="iso">表記ゆれ［①②③］</td><td class="genba">①: 05_support/plans/index.html ／<br>②: docs/リライト版仕様書/user/03_dashboard_survey_list_requirements.md §2、docs/画面設計/仕様/11_plan_feature_restrictions.md 2 ／<br>③: wiki:3201_アンケート一覧画面 要件定義書</td><td class="judge">&nbsp;</td></tr>
 <tr><td class="id">G-0002</td><td class="cat">業務概念</td><td>展示会・セミナー向けリード獲得サービスの名称（SPEED AD／SPEED-AD）</td><td class="src"><span class="varydiff">SPEED AD / SPEED-AD</span></td><td class="src"></td><td class="src"><span class="varydiff">SPEED AD</span></td><td class="iso">表記ゆれ［①③］</td><td class="genba">①: index.html、02_dashboard/index.html、legacy_login.html ／<br>③: wiki:10_プロダクト概要、wiki:Home</td><td class="judge">&nbsp;</td></tr>
 <tr><td class="id">G-0003</td><td class="cat">業務概念</td><td>個人情報保護方針の問い合わせ窓口名称（SPEED AD 運営事務局／SPEED AD事務局）</td><td class="src"><span class="varydiff">SPEED AD 運営事務局 / SPEED AD事務局</span></td><td class="src"></td><td class="src"></td><td class="iso">表記ゆれ［①］</td><td class="genba">①: 02_dashboard/personal-data-protection-policy.html、legacy_login.html</td><td class="judge">&nbsp;</td></tr>
@@ -363,8 +427,8 @@ col.c-iso{width:7.5%;} col.c-gen{width:19.8%;} col.c-jud{width:7.7%;}
 <tr><td class="id">G-0323</td><td class="cat">画面機能・UI部品</td><td>回答数の時間帯別折れ線グラフ（時間帯別回答数グラフ）</td><td class="src"><span class="varydiff">時間帯別回答数</span></td><td class="src"><span class="varydiff">時間帯別回答数 / 時間帯別回答数グラフ</span></td><td class="src"><span class="varydiff">時間帯別回答数グラフ</span></td><td class="iso">表記ゆれ［①②③］</td><td class="genba">①: 02_dashboard/speed-review.html ／<br>②: docs/画面設計/仕様/06_speed_review.md, docs/リライト版仕様書/user/11_speed_review.md ／<br>③: wiki:2214_SPEEDレビュー画面 要件定義書</td><td class="judge">&nbsp;</td></tr>
 </table>
 <h2>第2部 ②仕様書↔③Backlog wiki 間のみの表記ゆれ（ドキュメント間の不一致）（111件）</h2>
-<table><colgroup><col class="c-id"><col class="c-cat"><col class="c-con"><col class="c-s1"><col class="c-s2"><col class="c-s3"><col class="c-iso"><col class="c-gen"><col class="c-jud"></colgroup>
-<tr><th>ID</th><th>カテゴリ</th><th>概念（意味）</th><th>①ユーザー画面</th><th>②仕様書</th><th>③Backlog wiki</th><th>ソース間の異同</th><th>出典場所</th><th>判断欄</th></tr>
+<table><colgroup><col class="c-id"><col class="c-cat"><col class="c-con"><col class="c-s1"><col class="c-s2"><col class="c-s3"><col class="c-iso"><col class="c-gen"><col class="c-jud"><col class="c-memo"></colgroup>
+<tr><th>ID</th><th>カテゴリ</th><th>概念（意味）</th><th>①ユーザー画面</th><th>②仕様書</th><th>③Backlog wiki</th><th>ソース間の異同</th><th>出典場所</th><th>採用</th><th>メモ</th></tr>
 <tr><td class="id">G-0324</td><td class="cat">業務概念</td><td>プレミアム限定機能に触れた時の加入誘導の導線（アップセル導線／プラン別制限・アップセル）</td><td class="src"></td><td class="src"></td><td class="src"><span class="varydiff">アップセル導線 / プラン別制限/アップセル</span></td><td class="iso">表記ゆれ［③］</td><td class="genba">③: wiki:プレミアムプラン（⽉額）機能一覧：粒度分解（ドラフト）</td><td class="judge">&nbsp;</td></tr>
 <tr><td class="id">G-0325</td><td class="cat">業務概念</td><td>アンケートの回答を回収する機能（アンケート回答回収／回答回収）</td><td class="src"></td><td class="src"></td><td class="src"><span class="varydiff">アンケート回答回収 / 回答回収</span></td><td class="iso">表記ゆれ［③］</td><td class="genba">③: wiki:10_プロダクト概要、wiki:42_業務フロー</td><td class="judge">&nbsp;</td></tr>
 <tr><td class="id">G-0326</td><td class="cat">業務概念</td><td>請求先モードの1つ。グループ個別の請求先を設定（グループ専用の請求先を利用／グループ専用請求先）</td><td class="src"></td><td class="src"><span class="varydiff">グループ専用の請求先を利用 / グループ専用請求先</span></td><td class="src"><span class="varydiff">グループ専用の請求先を利用</span></td><td class="iso">表記ゆれ［②③］</td><td class="genba">②: docs/リライト版仕様書/user/05_group_edit_requirements.md §3.3、§9 ／<br>③: wiki:2216_グループ編集画面 要件定義書</td><td class="judge">&nbsp;</td></tr>
@@ -478,8 +542,8 @@ col.c-iso{width:7.5%;} col.c-gen{width:19.8%;} col.c-jud{width:7.7%;}
 <tr><td class="id">G-0434</td><td class="cat">画面機能・UI部品</td><td>アンケート一覧画面の日付範囲絞り込みUI（期間フィルター）</td><td class="src"></td><td class="src"><span class="varydiff">期間フィルター</span></td><td class="src"><span class="varydiff">期間フィルタ</span></td><td class="iso">表記ゆれ［②③］</td><td class="genba">②: docs/画面設計/仕様/00_screen_requirements.md ／<br>③: wiki:32_アンケート一覧・ダッシュボード要件</td><td class="judge">&nbsp;</td></tr>
 </table>
 <h2>第3部 軽微な差（コード識別子のみ／半角スペース差のみ）（21件）</h2>
-<table><colgroup><col class="c-id"><col class="c-cat"><col class="c-con"><col class="c-s1"><col class="c-s2"><col class="c-s3"><col class="c-iso"><col class="c-gen"><col class="c-jud"></colgroup>
-<tr><th>ID</th><th>カテゴリ</th><th>概念（意味）</th><th>①ユーザー画面</th><th>②仕様書</th><th>③Backlog wiki</th><th>ソース間の異同</th><th>出典場所</th><th>判断欄</th></tr>
+<table><colgroup><col class="c-id"><col class="c-cat"><col class="c-con"><col class="c-s1"><col class="c-s2"><col class="c-s3"><col class="c-iso"><col class="c-gen"><col class="c-jud"><col class="c-memo"></colgroup>
+<tr><th>ID</th><th>カテゴリ</th><th>概念（意味）</th><th>①ユーザー画面</th><th>②仕様書</th><th>③Backlog wiki</th><th>ソース間の異同</th><th>出典場所</th><th>採用</th><th>メモ</th></tr>
 <tr><td class="id">G-0435</td><td class="cat">業務概念</td><td>クーポン誤反映を防ぐデータ層・計算層・表示層の責務分離（3層ガード）</td><td class="src"></td><td class="src"><span class="varydiff">3 層ガード</span></td><td class="src"><span class="varydiff">3層ガード</span></td><td class="iso">軽微差［②③］</td><td class="genba">②: docs/リライト版仕様書/user/07_thank_you_email_settings_requirements.md §6.8 ／<br>③: wiki:お礼メール設定画面 要件定義書</td><td class="judge">&nbsp;</td></tr>
 <tr><td class="id">G-0436</td><td class="cat">業務概念</td><td>入力値を空白区切りし全単語が含まれる質問のみを残すフィルタ方式（AND検索）</td><td class="src"></td><td class="src"><span class="varydiff">AND 検索</span></td><td class="src"><span class="varydiff">AND検索</span></td><td class="iso">軽微差［②③］</td><td class="genba">②: docs/リライト版仕様書/user/14_faq_page_requirements.md §4.3 ／<br>③: wiki:345_FAQページ 要件定義書</td><td class="judge">&nbsp;</td></tr>
 <tr><td class="id">G-0437</td><td class="cat">業務概念</td><td>single_answer/multi_answer/dropdownを総称する設問タイプ分類（CHOICE系）</td><td class="src"></td><td class="src"><span class="varydiff">CHOICE 系</span></td><td class="src"><span class="varydiff">CHOICE系</span></td><td class="iso">軽微差［②③］</td><td class="genba">②: docs/リライト版仕様書/user/04_survey_creation_requirements.md §4.3、docs/画面設計/仕様/01_survey_creation_requirements.md 5.3.3 ／<br>③: wiki:2223_アンケート作成・編集画面 要件定義書</td><td class="judge">&nbsp;</td></tr>
@@ -502,4 +566,236 @@ col.c-iso{width:7.5%;} col.c-gen{width:19.8%;} col.c-jud{width:7.7%;}
 <tr><td class="id">G-0454</td><td class="cat">画面機能・UI部品</td><td>流れ／運用イメージセクションの英字ラベル（FLOW）</td><td class="src"><span class="varydiff">FLOW / Flow</span></td><td class="src"><span class="varydiff">FLOW</span></td><td class="src"></td><td class="iso">軽微差［①②］</td><td class="genba">①: index.html, customer-voices/company-monitor.html ／<br>②: docs/画面設計/仕様/24_public_login_front_requirements.md</td><td class="judge">&nbsp;</td></tr>
 <tr><td class="id">G-0455</td><td class="cat">画面機能・UI部品</td><td>名刺データ化設定画面の呼出元画面（surveyCreation.html / surveyCreation-v2.html）</td><td class="src"></td><td class="src"></td><td class="src"><span class="varydiff">surveyCreation-v2.html / surveyCreation.html</span></td><td class="iso">軽微差［③］</td><td class="genba">③: wiki:名刺データ化設定画面 要件定義書</td><td class="judge">&nbsp;</td></tr>
 </table>
+
+<script>
+(function() {
+  'use strict';
+  var STORAGE_PREFIX = 'glossary-decision:v1:';
+  var SOURCE_LABELS = ['①ユーザー画面', '②仕様書', '③Backlog wiki'];
+
+  function loadRow(id) {
+    var raw = localStorage.getItem(STORAGE_PREFIX + id);
+    if (!raw) return null;
+    try { return JSON.parse(raw); } catch (e) { return null; }
+  }
+  function saveRow(id, adopt, memo) {
+    if (!adopt && !memo) {
+      localStorage.removeItem(STORAGE_PREFIX + id);
+    } else {
+      localStorage.setItem(STORAGE_PREFIX + id, JSON.stringify({ adopt: adopt || '', memo: memo || '' }));
+    }
+  }
+  function updateCount() {
+    var total = document.querySelectorAll('tr[data-row-id]').length;
+    var n = 0;
+    document.querySelectorAll('.adopt-input').forEach(function (i) {
+      if (i.value.trim()) n++;
+    });
+    var el = document.getElementById('decision-count');
+    if (el) el.textContent = '採用済 ' + n + ' / ' + total;
+  }
+  function getAdoptedList(tr) {
+    var raw = tr.querySelector('.adopt-input').value;
+    if (!raw.trim()) return [];
+    return raw.split(' / ').map(function (s) { return s.trim(); }).filter(Boolean);
+  }
+  function setAdoptedList(tr, list) {
+    tr.querySelector('.adopt-input').value = list.join(' / ');
+  }
+  function updateChipHighlight(tr) {
+    var list = getAdoptedList(tr);
+    tr.querySelectorAll('.chip').forEach(function (chip) {
+      chip.classList.toggle('chip-selected', list.indexOf(chip.dataset.value) >= 0);
+    });
+  }
+
+  function processRow(tr) {
+    var idCell = tr.querySelector('td.id');
+    if (!idCell) return;
+    var id = idCell.textContent.trim();
+    tr.dataset.rowId = id;
+
+    var srcCells = tr.querySelectorAll('td.src');
+    srcCells.forEach(function (cell, idx) {
+      var span = cell.querySelector('.varydiff');
+      var rawText = span ? span.textContent.trim() : '';
+      tr.dataset['src' + (idx + 1)] = rawText;
+      if (!rawText) { cell.innerHTML = ''; return; }
+      var variants = rawText.split(' / ').map(function (s) { return s.trim(); }).filter(Boolean);
+      cell.innerHTML = '';
+      variants.forEach(function (v) {
+        var chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'chip';
+        chip.textContent = v;
+        chip.dataset.value = v;
+        chip.title = SOURCE_LABELS[idx] + ' の表記「' + v + '」を採用欄に追加／解除（複数選択可）';
+        chip.addEventListener('click', function () {
+          var list = getAdoptedList(tr);
+          var pos = list.indexOf(v);
+          if (pos >= 0) list.splice(pos, 1);
+          else list.push(v);
+          setAdoptedList(tr, list);
+          saveRow(id, tr.querySelector('.adopt-input').value, tr.querySelector('.memo-input').value);
+          updateChipHighlight(tr);
+          updateCount();
+        });
+        cell.appendChild(chip);
+      });
+    });
+
+    var judgeCell = tr.querySelector('td.judge');
+    judgeCell.innerHTML = '';
+    var adoptInput = document.createElement('input');
+    adoptInput.type = 'text';
+    adoptInput.className = 'adopt-input';
+    adoptInput.placeholder = '採用語（複数は / で区切る）';
+    adoptInput.addEventListener('input', function () {
+      saveRow(id, adoptInput.value, tr.querySelector('.memo-input').value);
+      updateChipHighlight(tr);
+      updateCount();
+    });
+    judgeCell.appendChild(adoptInput);
+
+    var memoCell = document.createElement('td');
+    memoCell.className = 'memo';
+    var memoInput = document.createElement('textarea');
+    memoInput.className = 'memo-input';
+    memoInput.placeholder = 'メモ…';
+    memoInput.rows = 2;
+    memoInput.addEventListener('input', function () {
+      saveRow(id, adoptInput.value, memoInput.value);
+    });
+    memoCell.appendChild(memoInput);
+    tr.appendChild(memoCell);
+
+    var saved = loadRow(id);
+    if (saved) {
+      adoptInput.value = saved.adopt || '';
+      memoInput.value = saved.memo || '';
+      updateChipHighlight(tr);
+    }
+  }
+
+  function csvEscape(s) {
+    s = (s == null) ? '' : String(s);
+    return '"' + s.replace(/"/g, '""') + '"';
+  }
+  function exportCsv() {
+    var header = ['ID', 'カテゴリ', '概念', '①ユーザー画面', '②仕様書', '③Backlog wiki', 'ソース間の異同', '採用', 'メモ'];
+    var lines = [header.map(csvEscape).join(',')];
+    document.querySelectorAll('tr[data-row-id]').forEach(function (tr) {
+      var tds = tr.querySelectorAll('td');
+      var row = [
+        tr.dataset.rowId,
+        tds[1] ? tds[1].textContent.trim() : '',
+        tds[2] ? tds[2].textContent.trim() : '',
+        tr.dataset.src1 || '',
+        tr.dataset.src2 || '',
+        tr.dataset.src3 || '',
+        tds[6] ? tds[6].textContent.trim() : '',
+        tr.querySelector('.adopt-input').value,
+        tr.querySelector('.memo-input').value
+      ];
+      lines.push(row.map(csvEscape).join(','));
+    });
+    var csv = '﻿' + lines.join('\r\n');
+    var blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    var ts = new Date().toISOString().slice(0, 16).replace(/[-:T]/g, '');
+    a.href = url;
+    a.download = 'glossary_decisions_' + ts + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+
+  function parseCsv(text) {
+    if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+    var rows = [], row = [], cur = '', inQuote = false, i = 0, c;
+    while (i < text.length) {
+      c = text[i];
+      if (inQuote) {
+        if (c === '"') {
+          if (text[i + 1] === '"') { cur += '"'; i += 2; continue; }
+          inQuote = false; i++; continue;
+        }
+        cur += c; i++; continue;
+      }
+      if (c === '"') { inQuote = true; i++; continue; }
+      if (c === ',') { row.push(cur); cur = ''; i++; continue; }
+      if (c === '\r') { i++; continue; }
+      if (c === '\n') { row.push(cur); rows.push(row); row = []; cur = ''; i++; continue; }
+      cur += c; i++;
+    }
+    if (cur !== '' || row.length > 0) { row.push(cur); rows.push(row); }
+    return rows;
+  }
+  function importCsv(file) {
+    var reader = new FileReader();
+    reader.onload = function () {
+      var rows = parseCsv(reader.result);
+      if (!rows.length) { alert('CSVが空です'); return; }
+      var header = rows[0];
+      var idIdx = header.indexOf('ID');
+      var adoptIdx = header.indexOf('採用');
+      var memoIdx = header.indexOf('メモ');
+      if (idIdx < 0 || adoptIdx < 0) {
+        alert('CSVヘッダに「ID」「採用」列が必要です');
+        return;
+      }
+      var count = 0;
+      for (var r = 1; r < rows.length; r++) {
+        var row = rows[r];
+        var id = row[idIdx];
+        if (!id) continue;
+        var tr = document.querySelector('tr[data-row-id="' + id + '"]');
+        if (!tr) continue;
+        var ai = tr.querySelector('.adopt-input');
+        var mi = tr.querySelector('.memo-input');
+        ai.value = row[adoptIdx] || '';
+        if (memoIdx >= 0) mi.value = row[memoIdx] || '';
+        saveRow(id, ai.value, mi.value);
+        updateChipHighlight(tr);
+        count++;
+      }
+      updateCount();
+      alert(count + ' 件を読み込みました');
+    };
+    reader.readAsText(file, 'utf-8');
+  }
+
+  function clearAll() {
+    if (!confirm('全ての採用語・メモを削除します。よろしいですか？\n（この操作は取り消せません。先にCSVダウンロード推奨）')) return;
+    Object.keys(localStorage).forEach(function (k) {
+      if (k.indexOf(STORAGE_PREFIX) === 0) localStorage.removeItem(k);
+    });
+    document.querySelectorAll('.adopt-input').forEach(function (i) { i.value = ''; });
+    document.querySelectorAll('.memo-input').forEach(function (i) { i.value = ''; });
+    document.querySelectorAll('tr[data-row-id]').forEach(updateChipHighlight);
+    updateCount();
+  }
+
+  document.querySelectorAll('table tr').forEach(processRow);
+  updateCount();
+
+  var btnCsv = document.getElementById('btn-export-csv');
+  if (btnCsv) btnCsv.addEventListener('click', exportCsv);
+  var btnClear = document.getElementById('btn-clear-all');
+  if (btnClear) btnClear.addEventListener('click', clearAll);
+  var btnImport = document.getElementById('btn-import-csv');
+  var fileInput = document.getElementById('csv-file');
+  if (btnImport && fileInput) {
+    btnImport.addEventListener('click', function () { fileInput.click(); });
+    fileInput.addEventListener('change', function () {
+      if (fileInput.files && fileInput.files[0]) {
+        importCsv(fileInput.files[0]);
+        fileInput.value = '';
+      }
+    });
+  }
+})();
+</script>
 </body></html>
