@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>お知らせ｜SPEED-AD Support</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/css/news.css">
+</head>
+<body data-screen-label="News List">
+
+<!-- ===== Support Header ===== -->
+<header class="support-header">
+  <a class="support-header__brand" href="../../index.html">
+    <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="#111827" d="M12 2 L22 20 H2 Z"/>
+    </svg>
+    <span>SPEED-AD Support</span>
+  </a>
+  <nav class="support-header__nav" aria-label="サポートナビ">
+    <a href="../help/">ヘルプ</a>
+    <a href="../faq/">FAQ</a>
+    <a href="./" class="is-active">お知らせ</a>
+    <a href="../contact/">お問い合わせ</a>
+  </nav>
+</header>
+
+<!-- ===== Breadcrumb ===== -->
+<div class="tint-band">
+  <nav class="breadcrumb" aria-label="パンくず">
+    <a href="../help/">ヘルプセンター</a>
+    <span class="breadcrumb__sep">/</span>
+    <span class="breadcrumb__current">お知らせ</span>
+  </nav>
+</div>
+
+<main class="page">
+
+  <!-- ===== Hero ===== -->
+  <section class="news-hero" aria-labelledby="news-h1">
+    <div>
+      <div class="news-hero__eyebrow">News &amp; Updates</div>
+      <h1 class="news-hero__title" id="news-h1">お知らせ</h1>
+      <p class="news-hero__sub">SPEED-AD のアップデート・メンテナンス情報・障害報告などを掲載しています。新しい順に表示しています。</p>
+    </div>
+    <div class="news-hero__meta">
+      <div class="news-hero__meta-item">
+        <span class="label">Articles</span>
+        <span class="value" id="meta-count">—</span>
+      </div>
+      <div class="news-hero__meta-item">
+        <span class="label">Last Updated</span>
+        <span class="value" id="meta-updated">—</span>
+      </div>
+      <div class="news-hero__meta-item">
+        <span class="label">Months</span>
+        <span class="value" id="meta-months">—</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Featured (PICK) ===== -->
+  <section class="featured" aria-label="ピックアップ">
+    <div id="featured-slot"></div>
+  </section>
+
+  <!-- ===== Timeline ===== -->
+  <section class="timeline" aria-live="polite">
+    <h2 class="timeline__section-head">Archive</h2>
+    <div id="timeline-body"></div>
+  </section>
+
+</main>
+
+<footer class="support-footer">
+  © 2026 SPEED-AD. All rights reserved.
+</footer>
+
+<script>
+/* ========================================================
+   Simple list renderer (fetch + inline fallback)
+   ======================================================== */
+const DATA_URL = "../../assets/data/news.json";
+
+const MONTH_EN = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+const DOW_EN   = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
+
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[c])); }
+function pad(n){ return String(n).padStart(2,"0"); }
+function parseDate(s){ const [y,m,d]=s.split("-").map(Number); return new Date(y, m-1, d); }
+function ymKey(d){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}`; }
+function isValidRel(u){ return typeof u === "string" && /^05_support\/news\/[\w\-]+\/$/.test(u); }
+function detailHref(u){ return "../" + u.replace(/^05_support\/news\//, ""); }
+
+function tagsHtml(item){
+  const t = (item.tags && item.tags.length) ? item.tags.slice(0,1) : (item.category ? [item.category] : []);
+  return t.map(x => `<span class="tag">${esc(x)}</span>`).join("");
+}
+
+function renderFeatured(item){
+  if(!item || !isValidRel(item.url)) return "";
+  const d = parseDate(item.date);
+  return `
+    <a class="featured__card" href="${esc(detailHref(item.url))}">
+      <span class="featured__badge">PICK</span>
+      <div class="featured__date">
+        <div class="featured__day">${pad(d.getDate())}</div>
+        <div class="featured__ym">${MONTH_EN[d.getMonth()]} · ${d.getFullYear()}</div>
+      </div>
+      <div class="featured__body">
+        <div class="featured__tags">${tagsHtml(item)}</div>
+        <h3 class="featured__title">${esc(item.title)}</h3>
+        <p class="featured__summary">${esc(item.summary)}</p>
+      </div>
+      <div class="featured__arrow" aria-hidden="true">→</div>
+    </a>`;
+}
+
+function groupByMonth(items){
+  const map = new Map();
+  for(const it of items){
+    const d = parseDate(it.date);
+    const k = ymKey(d);
+    if(!map.has(k)) map.set(k, { year: d.getFullYear(), month: d.getMonth()+1, items: [] });
+    map.get(k).items.push(it);
+  }
+  return [...map.values()].sort((a,b)=> b.year - a.year || b.month - a.month);
+}
+
+function renderTimeline(items){
+  const groups = groupByMonth(items);
+  return groups.map(g => {
+    const rows = g.items.map(it => {
+      if(!isValidRel(it.url)) return "";
+      const d = parseDate(it.date);
+      return `
+        <a class="tl-item" href="${esc(detailHref(it.url))}">
+          <div class="tl-item__date">
+            ${pad(d.getMonth()+1)}.${pad(d.getDate())}
+            <span class="dow">${DOW_EN[d.getDay()]}</span>
+          </div>
+          <div class="tl-item__tags">${tagsHtml(it)}</div>
+          <div class="tl-item__body">
+            <h3 class="tl-item__title">${esc(it.title)}</h3>
+            <p class="tl-item__summary">${esc(it.summary)}</p>
+          </div>
+          <div class="tl-item__arrow" aria-hidden="true">→</div>
+        </a>`;
+    }).join("");
+    return `
+      <div class="month-group">
+        <div class="month-head">
+          <div>
+            <div class="month-head__num">${pad(g.month)}</div>
+            <div class="month-head__name">${MONTH_EN[g.month-1]}</div>
+          </div>
+          <div>
+            <div class="month-head__year">${g.year}</div>
+            <div class="month-head__count">${g.items.length} Article${g.items.length>1?"s":""}</div>
+          </div>
+        </div>
+        <div class="month-items">${rows}</div>
+      </div>`;
+  }).join("");
+}
+
+async function loadNewsList(){
+  let data;
+  try {
+    const r = await fetch(DATA_URL, { cache: "no-cache" });
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    data = await r.json();
+  } catch(e){
+    document.getElementById("timeline-body").innerHTML =
+      `<div class="news-state">お知らせの読み込みに失敗しました。時間をおいて再度お試しください。</div>`;
+    return;
+  }
+
+  const items = (data.items || []).slice().sort((a,b)=> b.date.localeCompare(a.date));
+  if(items.length === 0){
+    document.getElementById("featured-slot").innerHTML = "";
+    document.getElementById("timeline-body").innerHTML =
+      `<div class="news-state">現在お知らせはありません。</div>`;
+    return;
+  }
+
+  // hero meta
+  document.getElementById("meta-count").textContent = items.length;
+  const upd = data.updatedAt ? data.updatedAt.replace(/-/g, ".") : "—";
+  document.getElementById("meta-updated").textContent = upd;
+  const months = new Set(items.map(it => ymKey(parseDate(it.date))));
+  document.getElementById("meta-months").textContent = months.size;
+
+  // featured
+  document.getElementById("featured-slot").innerHTML = renderFeatured(items[0]);
+
+  // timeline (全件)
+  document.getElementById("timeline-body").innerHTML = renderTimeline(items);
+}
+
+loadNewsList();
+</script>
+</body>
+</html>

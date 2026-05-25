@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>お知らせ｜SPEED-AD Support (Card Grid)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/css/news.css">
+<style>
+  /* === Variant C: Card Grid === */
+  .c-hero {
+    padding: 56px 0 36px;
+    text-align: center;
+    border-bottom: 1px solid var(--line);
+  }
+  .c-hero__eyebrow {
+    font-size: 11.5px; letter-spacing: 0.18em; color: var(--brand);
+    font-weight: 600; text-transform: uppercase; margin-bottom: 14px;
+  }
+  .c-hero__title {
+    font-size: 44px; font-weight: 700; margin: 0 0 14px;
+    letter-spacing: -0.01em; line-height: 1.2;
+  }
+  .c-hero__sub {
+    font-size: 14px; color: var(--muted); margin: 0 auto; max-width: 520px;
+  }
+
+  .c-pick {
+    margin: 36px 0 12px;
+  }
+  .c-pick__card {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 0;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    background: #fff;
+    transition: box-shadow .18s ease, transform .18s ease, border-color .18s ease;
+  }
+  .c-pick__card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: #C7D6EE;
+    transform: translateY(-2px);
+  }
+  .c-pick__visual {
+    background: var(--brand);
+    color: #fff;
+    padding: 36px 36px 32px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 220px;
+    position: relative;
+  }
+  .c-pick__badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 10.5px; font-weight: 700; letter-spacing: 0.18em;
+    background: rgba(255,255,255,0.18); padding: 4px 10px; border-radius: 4px;
+    align-self: flex-start;
+  }
+  .c-pick__date {
+    font-size: 13px; opacity: 0.85; letter-spacing: 0.06em;
+    font-variant-numeric: tabular-nums;
+    margin-top: 24px;
+  }
+  .c-pick__day {
+    font-size: 72px; font-weight: 600; line-height: 1;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+  .c-pick__content {
+    padding: 32px 36px;
+    display: flex; flex-direction: column; gap: 12px;
+    justify-content: center;
+  }
+  .c-pick__tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .c-pick__title {
+    font-size: 22px; font-weight: 700; line-height: 1.45; margin: 0; color: var(--ink);
+  }
+  .c-pick__summary { font-size: 13.5px; color: var(--muted); margin: 0; line-height: 1.8; }
+  .c-pick__more {
+    font-size: 13px; color: var(--brand); font-weight: 500;
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 4px;
+  }
+
+  .c-section {
+    padding: 28px 0 80px;
+  }
+  .c-section__head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .c-section__title {
+    font-size: 13px; font-weight: 600; letter-spacing: 0.16em;
+    color: var(--muted); text-transform: uppercase; margin: 0;
+  }
+  .c-section__total {
+    font-size: 12px; color: var(--muted-2); font-variant-numeric: tabular-nums;
+  }
+  .c-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .c-card {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 22px;
+    background: #fff;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: box-shadow .18s ease, transform .18s ease, border-color .18s ease;
+  }
+  .c-card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: #C7D6EE;
+    transform: translateY(-2px);
+  }
+  .c-card__head {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  }
+  .c-card__date {
+    font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums;
+    letter-spacing: 0.04em;
+  }
+  .c-card__title {
+    font-size: 15px; font-weight: 600; line-height: 1.55; color: var(--ink); margin: 0;
+  }
+  .c-card__summary {
+    font-size: 12.5px; color: var(--muted); margin: 0; line-height: 1.7;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .c-card__foot {
+    margin-top: auto;
+    padding-top: 8px;
+    font-size: 12px; color: var(--brand);
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  @media (max-width: 900px) {
+    .c-grid { grid-template-columns: 1fr; }
+    .c-pick__card { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body data-screen-label="News List — Card Grid">
+
+<header class="support-header">
+  <a class="support-header__brand" href="../../../index.html">
+    <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="#111827" d="M12 2 L22 20 H2 Z"/>
+    </svg>
+    <span>SPEED-AD Support</span>
+  </a>
+  <nav class="support-header__nav" aria-label="サポートナビ">
+    <a href="#">ヘルプ</a>
+    <a href="#">FAQ</a>
+    <a href="#" class="is-active">お知らせ</a>
+    <a href="#">お問い合わせ</a>
+  </nav>
+</header>
+
+<div class="tint-band">
+  <nav class="breadcrumb" aria-label="パンくず">
+    <a href="#">ヘルプセンター</a>
+    <span class="breadcrumb__sep">/</span>
+    <span class="breadcrumb__current">お知らせ</span>
+  </nav>
+</div>
+
+<main class="page">
+
+  <section class="c-hero">
+    <div class="c-hero__eyebrow">News &amp; Updates</div>
+    <h1 class="c-hero__title">お知らせ</h1>
+    <p class="c-hero__sub">SPEED-AD のアップデート・メンテナンス情報・障害報告などを掲載しています。</p>
+  </section>
+
+  <section class="c-pick" aria-label="ピックアップ">
+    <div id="c-pick-slot"></div>
+  </section>
+
+  <section class="c-section">
+    <div class="c-section__head">
+      <h2 class="c-section__title">All Updates</h2>
+      <span class="c-section__total" id="c-total">—</span>
+    </div>
+    <div class="c-grid" id="c-grid" aria-live="polite"></div>
+  </section>
+
+</main>
+
+<footer class="support-footer">© 2026 SPEED-AD. All rights reserved.</footer>
+
+<script>
+const DATA_URL = "../../assets/data/news.json";
+const MONTH_EN = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[c])); }
+function pad(n){ return String(n).padStart(2,"0"); }
+function parseDate(s){ const [y,m,d]=s.split("-").map(Number); return new Date(y, m-1, d); }
+function isValidRel(u){ return typeof u === "string" && /^05_support\/news\/[\w\-]+\/$/.test(u); }
+function detailHref(u){ return "../" + u.replace(/^05_support\/news\//, ""); }
+function tagsHtml(item){
+  const t = (item.tags && item.tags.length) ? item.tags.slice(0,1) : (item.category ? [item.category] : []);
+  return t.map(x => `<span class="tag">${esc(x)}</span>`).join("");
+}
+
+function renderPick(it){
+  if(!it || !isValidRel(it.url)) return "";
+  const d = parseDate(it.date);
+  return `
+    <a class="c-pick__card" href="${esc(detailHref(it.url))}">
+      <div class="c-pick__visual">
+        <span class="c-pick__badge">PICK</span>
+        <div>
+          <div class="c-pick__day">${pad(d.getDate())}</div>
+          <div class="c-pick__date">${MONTH_EN[d.getMonth()]} · ${d.getFullYear()}</div>
+        </div>
+      </div>
+      <div class="c-pick__content">
+        <div class="c-pick__tags">${tagsHtml(it)}</div>
+        <h3 class="c-pick__title">${esc(it.title)}</h3>
+        <p class="c-pick__summary">${esc(it.summary)}</p>
+        <div class="c-pick__more">記事を読む →</div>
+      </div>
+    </a>`;
+}
+
+function renderGrid(items){
+  return items.map(it => {
+    if(!isValidRel(it.url)) return "";
+    const d = parseDate(it.date);
+    return `
+      <a class="c-card" href="${esc(detailHref(it.url))}">
+        <div class="c-card__head">
+          <span class="c-card__date">${d.getFullYear()}.${pad(d.getMonth()+1)}.${pad(d.getDate())}</span>
+          ${tagsHtml(it)}
+        </div>
+        <h3 class="c-card__title">${esc(it.title)}</h3>
+        <p class="c-card__summary">${esc(it.summary)}</p>
+        <div class="c-card__foot">詳細を見る →</div>
+      </a>`;
+  }).join("");
+}
+
+async function load(){
+  let data;
+  try {
+    const r = await fetch(DATA_URL, { cache: "no-cache" });
+    if(!r.ok) throw new Error();
+    data = await r.json();
+  } catch(e){
+    document.getElementById("c-grid").innerHTML = `<div class="news-state">読み込みに失敗しました。</div>`;
+    return;
+  }
+  const items = (data.items || []).slice().sort((a,b)=> b.date.localeCompare(a.date));
+  document.getElementById("c-pick-slot").innerHTML = renderPick(items[0]);
+  document.getElementById("c-grid").innerHTML = renderGrid(items);
+  document.getElementById("c-total").textContent = items.length + " 件";
+}
+load();
+</script>
+</body>
+</html>
