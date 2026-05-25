@@ -376,76 +376,76 @@
 }
 
 /* top: コーチマーク下端から下に伸びる縦線。
-   旧 24px はターゲットへ食い込んでいたため 14px に短縮（gap 22px と合わせて
-   コネクタ先端がスポットライト境界の外側 +1px で止まる）。 */
+   スポットライトの視覚エッジ（pad 4 + border 3 + outline 2 = 9px）を
+   突き抜けないよう、gap 26 と合わせて先端 +16 = エッジ外側 +7px で止まる長さ。 */
 .tutorial-coachmark__connector[data-placement="top"],
 .tutorial-coachmark__notch[data-placement="top"] {
-  bottom: -14px;
+  bottom: -10px;
   left: 50%;
   transform: translateX(-50%);
   width: 2px;
-  height: 14px;
+  height: 10px;
 }
 
 /* bottom: コーチマーク上端から上に伸びる縦線 */
 .tutorial-coachmark__connector[data-placement="bottom"],
 .tutorial-coachmark__notch[data-placement="bottom"] {
-  top: -14px;
+  top: -10px;
   left: 50%;
   transform: translateX(-50%);
   width: 2px;
-  height: 14px;
+  height: 10px;
 }
 
 /* left: コーチマーク右端から右に伸びる横線 */
 .tutorial-coachmark__connector[data-placement="left"],
 .tutorial-coachmark__notch[data-placement="left"] {
-  right: -14px;
+  right: -10px;
   top: 50%;
   transform: translateY(-50%);
-  width: 14px;
+  width: 10px;
   height: 2px;
 }
 
 /* right: コーチマーク左端から左に伸びる横線 */
 .tutorial-coachmark__connector[data-placement="right"],
 .tutorial-coachmark__notch[data-placement="right"] {
-  left: -14px;
+  left: -10px;
   top: 50%;
   transform: translateY(-50%);
-  width: 14px;
+  width: 10px;
   height: 2px;
 }
 
-/* モバイルではさらに短くして画面外への突き出しを抑える */
+/* モバイルではさらに短くする */
 @media (max-width: 768px) {
   .tutorial-coachmark__connector[data-placement="top"],
   .tutorial-coachmark__notch[data-placement="top"],
   .tutorial-coachmark__connector[data-placement="bottom"],
   .tutorial-coachmark__notch[data-placement="bottom"] {
-    height: 10px;
+    height: 8px;
   }
   .tutorial-coachmark__connector[data-placement="top"],
   .tutorial-coachmark__notch[data-placement="top"] {
-    bottom: -10px;
+    bottom: -8px;
   }
   .tutorial-coachmark__connector[data-placement="bottom"],
   .tutorial-coachmark__notch[data-placement="bottom"] {
-    top: -10px;
+    top: -8px;
   }
   .tutorial-coachmark__connector[data-placement="left"],
   .tutorial-coachmark__notch[data-placement="left"],
   .tutorial-coachmark__connector[data-placement="right"],
   .tutorial-coachmark__notch[data-placement="right"] {
-    width: 10px;
+    width: 8px;
   }
   .tutorial-coachmark__connector[data-placement="left"],
   .tutorial-coachmark__notch[data-placement="left"] {
-    right: -10px;
+    right: -8px;
   }
   .tutorial-coachmark__connector[data-placement="right"],
   .tutorial-coachmark__notch[data-placement="right"] {
-    left: -10px;
+    left: -8px;
   }
 }
 

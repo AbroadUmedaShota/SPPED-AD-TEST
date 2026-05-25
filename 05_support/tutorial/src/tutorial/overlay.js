@@ -13,8 +13,11 @@ const COACHMARK_FADE_MS = 180;
 const MOBILE_BREAKPOINT = 768; // #6: この幅以下では right/left placement を不可とする
 const COACHMARK_FALLBACK_W = 400; // #8: CSS 実幅に合わせたフォールバック
 const COACHMARK_FALLBACK_H = 200; // #9: CSS 実高に寄せたフォールバック
-const CONNECTOR_REACH = 14; // bottom/top コネクタが伸びる距離（#25 のクランプ加味用）。
-                            // 旧 24px はスポットライト枠を突き抜けてターゲットに被っていたため短縮。
+// コネクタ長。スポットライトの視覚エッジ
+// （TARGET_PAD 4 + border 3 + box-shadow 0 0 0 2px の硬いアウトライン = 9px）を
+// 必ず外側で止まるように設計する。gap - CONNECTOR_REACH = 26 - 10 = 16px のクリアランス。
+// 旧 14 では gap 22 と合わせて先端 +8px となり 9px の硬エッジに 1px 食い込んでいた。
+const CONNECTOR_REACH = 10;
 
 let rootEl = null; // .tutorial-root
 let maskEl = null; // .tutorial-mask（SVG 切り抜き）
@@ -1186,9 +1189,9 @@ function positionCoachmark(step, targetEl) {
   const coachmarkW = cmRect.width || COACHMARK_FALLBACK_W;
   const coachmarkH = cmRect.height || COACHMARK_FALLBACK_H;
   // ターゲットとコーチマーク間のクリアランス。
-  // コネクタ長（CONNECTOR_REACH=14）+ スポットライト枠（pad 4 + border 3 = 7）の合計
-  // よりも大きく取り、コネクタ先端がスポットライト境界の外側で止まるようにする。
-  const gap = 22;
+  // CONNECTOR_REACH(10) + スポットライト視覚エッジ(9: pad 4 + border 3 + outline 2) = 19
+  // を上回るよう 26px とし、先端をスポットライト境界の外側で +7px 浮かせて被りを根絶する。
+  const gap = 26;
 
   // #6: モバイル幅では right/left を不可とし bottom/top に倒す。
   // 対象が画面下寄り（下側に吹き出しが収まらない）なら top、それ以外は bottom。
@@ -1198,10 +1201,18 @@ function positionCoachmark(step, targetEl) {
   }
 
   // #1: 候補 placement を順に試し、ターゲットと重ならず画面内に収まる配置を選ぶ。
-  //   right↔left, top↔bottom の反対側をフォールバック候補に含める。
-  const opposite = { right: 'left', left: 'right', top: 'bottom', bottom: 'top' };
-  const candidates = [placement];
-  if (opposite[placement]) candidates.push(opposite[placement]);
+  //   旧仕様は対面のみフォールバックしていたが、step 11-13 のように
+  //   ターゲットが右側パネルかつ「左右いずれもコーチマーク幅 (400px) が入らない」
+  //   状況では押し込みクランプで画面端に貼り付き、コネクタが対象を指さなくなっていた。
+  //   そこで直交方向 (top/bottom ↔ left/right) もフォールバックに含めて、
+  //   どこかで自然に収まる位置を見つけられるようにする。
+  const fallbackOrder = {
+    left:   ['left', 'right', 'bottom', 'top'],
+    right:  ['right', 'left', 'bottom', 'top'],
+    top:    ['top', 'bottom', 'right', 'left'],
+    bottom: ['bottom', 'top', 'right', 'left'],
+  };
+  const candidates = (fallbackOrder[placement] || [placement]).slice();
 
   const targetBox = {
     left: rect.left,
