@@ -33,10 +33,10 @@ body[data-page-id="news-detail"] {
   --tint-incident: #e6b6b0;
   --tint-press:    #cfd6a8;
 
-  /* Typography */
-  --serif:        'Noto Serif JP','Hiragino Mincho ProN','Yu Mincho',serif;
+  /* Typography (全体をゴシック寄せ。--serif / --latin-serif は名称踏襲のままサンセリフを指す) */
   --sans:         'Noto Sans JP',-apple-system,'Hiragino Sans',sans-serif;
-  --latin-serif:  'Cormorant Garamond','Noto Serif JP',serif;
+  --serif:        'Noto Sans JP',-apple-system,'Hiragino Sans',sans-serif;
+  --latin-serif:  'Noto Sans JP',-apple-system,'Hiragino Sans',sans-serif;
 }
 
 /* Container: viewport より小さく中央寄せ。他のサポートページと同様に左右余白を確保 */
@@ -261,7 +261,7 @@ body[data-page-id="news"] .feat-wrap {
 
 body[data-page-id="news"] .feat {
   display: grid;
-  grid-template-columns: clamp(160px, 18vw, 220px) minmax(0, 1fr) clamp(180px, 18vw, 240px) auto;
+  grid-template-columns: clamp(160px, 18vw, 220px) minmax(0, 1fr) auto;
   gap: clamp(20px, 2.4vw, 32px);
   align-items: start;
   background: var(--paper);
@@ -455,7 +455,7 @@ body[data-page-id="news"] .tl-items::before {
 
 body[data-page-id="news"] .tl-item {
   display: grid;
-  grid-template-columns: 90px 110px minmax(0, 1fr) 96px 28px;
+  grid-template-columns: 90px 110px minmax(0, 1fr) 28px;
   gap: 20px;
   padding: 18px 0;
   align-items: start;
@@ -1419,105 +1419,16 @@ body[data-page-id="news-detail"] .contact-link:hover {
 }
 
 /* ============================================================
-   Article images: Featured banner / Timeline thumb / Hero banner
+   Article images: 採用なし（feat-image / ti-thumb / article-banner は廃止）
    ============================================================ */
-body[data-page-id="news"] .feat-image {
-  position: relative;
-  margin: 0;
-  padding: 0;
-  width: 240px;
-  aspect-ratio: 16 / 9;
-  border-radius: 12px;
-  overflow: hidden;
-  background: var(--canvas-2);
-  align-self: center;
-}
-
-body[data-page-id="news"] .feat-image img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  border: 0;
-}
-
-body[data-page-id="news"] .ti-thumb {
-  position: relative;
-  margin: 0;
-  padding: 0;
-  width: 96px;
-  aspect-ratio: 3 / 2;
-  border-radius: 6px;
-  overflow: hidden;
-  background: var(--canvas-2);
-  align-self: center;
-}
-
-body[data-page-id="news"] .ti-thumb img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  border: 0;
-}
-
-body[data-page-id="news-detail"] .article-banner {
-  position: relative;
-  margin: 0 0 32px;
-  padding: 0;
-  aspect-ratio: 16 / 6;
-  border-radius: 14px;
-  overflow: hidden;
-  background: var(--canvas-2);
-  border: 0;
-}
-
-body[data-page-id="news-detail"] .article-banner img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  border: 0;
-}
 
 @media (max-width: 768px) {
   body[data-page-id="news"] .feat {
     grid-template-columns: 1fr;
-    grid-template-areas: none;
     gap: 18px;
   }
-  body[data-page-id="news"] .feat-date {
-    order: 2;
-    grid-area: auto;
-  }
-  body[data-page-id="news"] .feat-body {
-    order: 3;
-    grid-area: auto;
-  }
-  body[data-page-id="news"] .feat-image {
-    order: 1;
-    grid-area: auto;
-    width: 100%;
-    aspect-ratio: 16 / 9;
-  }
   body[data-page-id="news"] .feat-arr {
-    order: 4;
-    grid-area: auto;
     align-self: flex-end;
-  }
-  body[data-page-id="news"] .ti-thumb {
-    display: none;
-  }
-  body[data-page-id="news-detail"] .article-banner {
-    margin: 0 0 24px;
-    border-radius: 10px;
-    aspect-ratio: 16 / 9;
   }
 }
 
@@ -1525,9 +1436,6 @@ body[data-page-id="news-detail"] .article-banner img {
    15. Responsive — Laptop / sub-FullHD (≤ 1280px)
    ============================================================ */
 @media (max-width: 1280px) {
-  body[data-page-id="news"] .feat-image {
-    width: clamp(180px, 18vw, 220px);
-  }
   body[data-page-id="news"] .ph-meta {
     gap: 16px;
   }
@@ -1554,27 +1462,12 @@ body[data-page-id="news-detail"] .article-banner img {
     text-align: left;
   }
 
-  /* ----- List: PICK (image top, date+body+arrow row below) ----- */
+  /* ----- List: PICK (date+body+arrow row) ----- */
   body[data-page-id="news"] .feat {
     grid-template-columns: clamp(110px, 14vw, 140px) minmax(0, 1fr) auto;
-    grid-template-areas:
-      "image image image"
-      "date  body  arr";
     gap: 20px 24px;
   }
-  body[data-page-id="news"] .feat-image {
-    grid-area: image;
-    width: 100%;
-    aspect-ratio: 16 / 7;
-  }
-  body[data-page-id="news"] .feat-date {
-    grid-area: date;
-  }
-  body[data-page-id="news"] .feat-body {
-    grid-area: body;
-  }
   body[data-page-id="news"] .feat-arr {
-    grid-area: arr;
     align-self: center;
   }
   body[data-page-id="news"] .feat-date .day {
@@ -1608,9 +1501,9 @@ body[data-page-id="news-detail"] .article-banner img {
     border-top: 0;
   }
 
-  /* ----- List: Timeline item (slim columns, keep thumb visible) ----- */
+  /* ----- List: Timeline item (slim columns) ----- */
   body[data-page-id="news"] .tl-item {
-    grid-template-columns: 76px 100px minmax(0, 1fr) 80px 24px;
+    grid-template-columns: 76px 100px minmax(0, 1fr) 24px;
     gap: 16px;
   }
 

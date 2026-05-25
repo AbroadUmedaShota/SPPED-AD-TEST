@@ -14,7 +14,6 @@ import {
   resolveSupportBasePath,
   isNewArticle,
   isPinned,
-  resolveNewsImagePath,
 } from './utils.js';
 
 const NEWS_URL_PATTERN = /^05_support\/news\/[a-z0-9_-]+\/?$/i;
@@ -221,27 +220,6 @@ function decorateCurrentArticle(item) {
   if (badgeHtml) meta.insertAdjacentHTML('beforeend', badgeHtml);
 }
 
-/**
- * 記事 hero と本文の間にバナー画像を差し込む。
- * item.image があればその画像、なければデフォルト SVG を使う。
- */
-function insertHeroBanner(item) {
-  if (document.querySelector('.article-banner')) return;
-  const main = document.querySelector('.article-main');
-  if (!main) return;
-  const src = resolveNewsImagePath(item.image, item.category);
-  const alt = item.image ? (item.title || '') : '';
-  const figure = document.createElement('figure');
-  figure.className = 'article-banner';
-  if (!item.image) figure.classList.add('article-banner--default');
-  const img = document.createElement('img');
-  img.src = src;
-  img.alt = alt;
-  img.loading = 'lazy';
-  figure.appendChild(img);
-  main.insertBefore(figure, main.firstChild);
-}
-
 async function loadArticleNav() {
   const main = document.querySelector('.article-main');
   if (!main) return;
@@ -259,7 +237,6 @@ async function loadArticleNav() {
     if (idx === -1) return;
 
     decorateCurrentArticle(valid[idx]);
-    insertHeroBanner(valid[idx]);
 
     const newer = idx > 0 ? valid[idx - 1] : null;
     const older = idx < valid.length - 1 ? valid[idx + 1] : null;

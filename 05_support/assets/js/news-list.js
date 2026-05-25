@@ -14,7 +14,6 @@ import {
   resolveSupportBasePath,
   isNewArticle,
   isPinned,
-  resolveNewsImagePath,
 } from './utils.js';
 
 const NEWS_JSON_PATH = resolveSupportDataPath('news.json');
@@ -185,12 +184,6 @@ function renderFeatured(item) {
 
   const summaryEl = featured.querySelector('[data-feat-summary]');
   if (summaryEl) summaryEl.textContent = item.summary || '';
-
-  const imgEl = featured.querySelector('[data-feat-image]');
-  if (imgEl) {
-    imgEl.src = resolveNewsImagePath(item.image, item.category);
-    imgEl.alt = item.image ? (item.title || '') : '';
-  }
 }
 
 /**
@@ -220,9 +213,6 @@ function renderTimeline(items) {
       const tagClass = tagVariant ? `news-tag ${tagVariant}` : 'news-tag';
       const dateAttr = escapeHtml(item.date || '');
 
-      const imgSrc = escapeHtml(resolveNewsImagePath(item.image, item.category));
-      const imgAlt = item.image ? escapeHtml(item.title || '') : '';
-
       return `
         <a class="tl-item" href="${escapeHtml(slug)}">
           <div class="ti-date">
@@ -237,9 +227,6 @@ function renderTimeline(items) {
             <h3 class="ti-title">${escapeHtml(item.title || '')}</h3>
             <p class="ti-sum">${escapeHtml(item.summary || '')}</p>
           </div>
-          <figure class="ti-thumb">
-            <img src="${imgSrc}" alt="${imgAlt}" loading="lazy">
-          </figure>
           <span class="ti-arr" aria-hidden="true">→</span>
         </a>
       `;
