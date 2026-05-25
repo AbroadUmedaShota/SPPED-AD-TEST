@@ -1309,8 +1309,12 @@ function updatePointer(step, targetEl) {
     return;
   }
   const rect = targetEl.getBoundingClientRect();
-  const cx = rect.left + rect.width / 2;
-  const cy = rect.top + rect.height / 2;
+  // ボタンの中央へ被せると文字に重なって読みにくいため、右上コーナー側へ寄せる。
+  // ターゲットが極端に小さい場合（icon 単独等）は inset を半分でクランプして中央寄りに留め、
+  // ポインタがターゲットの外側にはみ出さないようにする。
+  const inset = Math.min(12, rect.width / 2, rect.height / 2);
+  const cx = rect.right - inset;
+  const cy = rect.top + inset;
   pointerEl.style.transition = `opacity ${POSITION_TRANSITION_MS}ms ease-out`;
   pointerEl.style.opacity = '1';
   pointerEl.style.left = `${cx - 24}px`;
