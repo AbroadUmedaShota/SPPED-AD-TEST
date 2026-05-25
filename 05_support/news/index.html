@@ -6,86 +6,43 @@
   <meta name="robots" content="noindex, nofollow">
   <title>お知らせ | SPEED AD Support</title>
   <link rel="icon" href="../assets/img/speedad_logo.svg" type="image/svg+xml">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Noto+Serif+JP:wght@500;600;700&family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap">
-  <link rel="stylesheet" href="../assets/css/support-shell.css?v=20260525-phase2b-rwd">
-  <link rel="stylesheet" href="../assets/css/news.css?v=20260525-phase2b-rwd">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/support-shell.css?v=20260525-news-b">
+  <link rel="stylesheet" href="../assets/css/news.css?v=20260525-news-b">
 </head>
 <body data-page-id="news">
 <div class="support-shell">
   <div id="support-header-placeholder"></div>
-
   <main class="support-main" id="main-content" aria-label="お知らせ">
 
-    <!-- Tint band: breadcrumb -->
     <nav class="hc-tint" aria-label="パンくず">
       <ol class="breadcrumb">
         <li><a href="/help/">ヘルプセンター</a></li>
-        <li class="sep" aria-hidden="true">›</li>
+        <li class="sep" aria-hidden="true">/</li>
         <li class="current">お知らせ</li>
       </ol>
     </nav>
 
-    <!-- Hero -->
-    <header class="hero" aria-labelledby="page-title">
-      <p class="ph-eyebrow">News &amp; Updates · Timeline</p>
-      <div class="hero-row">
-        <div class="hero-main">
-          <h1 id="page-title">お知らせ</h1>
-          <p class="sub">SPEED AD のアップデート情報、メンテナンス予定、サービスに関するお知らせをお届けします。月別タイムラインで時系列順に並びます。</p>
-        </div>
-        <div class="ph-meta" id="ph-meta">
-          <!-- JS で 件数 / Last Updated / 月数 を描画 -->
-        </div>
+    <section class="b-hero">
+      <div class="b-hero__eyebrow">News &amp; Updates</div>
+      <div class="b-hero__row">
+        <h1 class="b-hero__title">お知らせ</h1>
+        <div class="b-hero__count"><strong id="b-count">—</strong> 件 / 最終更新 <span id="b-updated">—</span></div>
       </div>
-    </header>
-
-    <!-- Category filter -->
-    <nav class="news-filter" id="news-filter" aria-label="カテゴリ絞り込み" hidden></nav>
-
-    <!-- Featured (PICK) -->
-    <section class="feat-wrap" aria-label="ピックアップ">
-      <a class="feat" id="featured" href="#" hidden>
-        <div class="feat-date">
-          <span class="day"></span>
-          <span class="mo"></span>
-          <span class="yr"></span>
-        </div>
-        <div class="feat-body">
-          <span class="news-tag" data-feat-tag></span>
-          <h2 data-feat-title></h2>
-          <p data-feat-summary></p>
-        </div>
-        <span class="feat-arr" aria-hidden="true">→</span>
-      </a>
     </section>
 
-    <!-- Timeline -->
-    <section class="timeline" aria-labelledby="timeline-title">
-      <h2 id="timeline-title" class="visually-hidden">記事タイムライン</h2>
-      <div class="tl-status" id="tl-status" hidden>
-        <span>全 <b id="tl-count">0</b> 件</span>
-        <span class="dot-sep">·</span>
-        <span>新しい順</span>
-      </div>
-      <div id="timeline-body" aria-live="polite"></div>
-    </section>
+    <div class="b-toolbar" id="b-filters" role="tablist" aria-label="カテゴリ"></div>
 
-    <!-- Contact CTA -->
-    <section class="contact-cta" aria-label="お問い合わせ">
-      <p class="contact-cta__eyebrow">Contact</p>
-      <p class="contact-cta__title">お探しの情報が見つからないときは</p>
-      <p class="contact-cta__text">お知らせに掲載のないご質問や、機能・運用についてのご相談は、お問い合わせフォームよりお寄せください。サポート担当よりご返信いたします。</p>
-      <a class="contact-cta__btn" href="../bug-report/">お問い合わせ <span aria-hidden="true">→</span></a>
+    <section class="b-list" aria-live="polite">
+      <div id="b-body"></div>
     </section>
 
   </main>
-
   <div id="support-footer-placeholder"></div>
 </div>
-<script type="module" src="../assets/js/support-shell.js?v=20260525-phase2b-rwd"></script>
-<script type="module" src="../assets/js/news-list.js?v=20260525-phase2b-rwd"></script>
+<script type="module" src="../assets/js/support-shell.js?v=20260525-news-b"></script>
+<script type="module" src="../assets/js/news-list.js?v=20260525-news-b"></script>
 </body>
 </html>
