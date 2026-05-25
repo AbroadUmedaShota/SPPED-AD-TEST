@@ -648,6 +648,26 @@ function buildCoachmark() {
   // タイトル/本文へ id を付与し、rootEl が aria-labelledby/describedby で参照する。
   coachmarkEl.setAttribute('tabindex', '-1'); // #7: 安全な初期フォーカス先
 
+  // コーチマーク内の click が document までバブルしないようにする（バブル段階で停止）。
+  //
+  // 背景: app 側コードに document 級の "外側クリックでメニューを閉じる" リスナーが
+  // 複数ある（例: surveyCreation-v2.js の #inlineQuestionTypeMenuBottom / FAB メニュー）。
+  // step 18 の「次へ」を押すと handleNext が対象要素を代行クリックしてメニューを開くが、
+  // 元の nextBtn click が document までバブルした時点で
+  //   ev.target = nextBtn → btn にも menu にも contains されない → "外側クリック" 判定
+  // となってメニューが即座に閉じられ、step 19 のターゲット（メニュー内のボタン）が
+  // display:none 下で getBoundingClientRect = (0,0,0,0) を返してコーチマークが
+  // 画面左上に飛ぶ事象を引き起こす。
+  //
+  // coachmarkEl のバブル段階で propagation を止めることで、コーチマーク発のクリックが
+  // app の document リスナーに到達しなくなり、メニューが閉じない。
+  // 注: 進行制御 (windowClickGuardBound) は window の capture 段階で先行するため影響しない。
+  // 注: コーチマーク内部のボタン (next/prev/skip/close) 自身のハンドラはターゲット段階で
+  //     既に実行されてから coachmarkEl にバブルしてくるため、ここで停止しても動作する。
+  coachmarkEl.addEventListener('click', (ev) => {
+    ev.stopPropagation();
+  });
+
   const headerEl = document.createElement('div');
   headerEl.className = 'tutorial-coachmark__header';
 
