@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
-  <title>ログイン前ページのお知らせ欄を準備中です｜お知らせ — SPEED AD</title>
+  <title>SPEED AD を 2026 年 6 月 1 日に正式リリースしました｜お知らせ — SPEED AD</title>
   <link rel="icon" href="../../assets/img/speedad_logo.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,51 +24,39 @@
         <li class="sep" aria-hidden="true">/</li>
         <li><a href="../">お知らせ</a></li>
         <li class="sep" aria-hidden="true">/</li>
-        <li class="current">ログイン前ページのお知らせ欄を準備中です</li>
+        <li class="current">SPEED AD を 2026 年 6 月 1 日に正式リリースしました</li>
       </ol>
     </nav>
 
     <header class="article-hero">
       <p class="ah-eyebrow">News &amp; Updates · Article</p>
       <div class="ah-meta">
-        <time datetime="2026-04-28">2026.04.28 TUE</time>
+        <time datetime="2026-06-01">2026.06.01 MON</time>
         <span class="dot" aria-hidden="true"></span>
-        <span class="tag">お知らせ</span>
+        <span class="tag">プレスリリース</span>
         <span class="dot" aria-hidden="true"></span>
         <span class="read">READ — MIN</span>
       </div>
-      <h1>ログイン前ページのお知らせ欄を準備中です</h1>
+      <h1>SPEED AD を 2026 年 6 月 1 日に正式リリースしました</h1>
       <div class="ah-rule" aria-hidden="true"></div>
     </header>
 
     <div class="article-grid">
       <article class="article-main">
 
-        <p class="article-lede">ログイン前トップに表示するお知らせ欄について、本番運用に向けて構成と連携の整備を進めています。サブドメインの公開 JSON を正本とし、ログイン前ページには最新3件を抜粋表示する想定です。掲載基準・差し替え手順を含めて固まり次第、正式運用へ切り替えます。</p>
+        <p class="article-lede">2026 年 6 月 1 日（月）、SPEED AD を正式リリースしました。本日よりアカウント作成と有料プランのご契約を受け付けています。一部の機能は引き続き開発中で、今後も継続してアップデートをお届けします。</p>
 
         <div class="article-body">
-          <h2 id="section-1">想定する正本構成</h2>
-          <p>お知らせの正本データは、サポートサブドメイン（support.speed-ad.com）配下の静的 JSON として配置する予定です。ログイン前ページからは fetch で読み込み、最新の上位3件のみを表示します。</p>
-          <ul>
-            <li><code>/news.json</code> の <code>items</code> 配列を date 降順で取得</li>
-            <li>ログイン前ページには上位3件のみを抜粋（タイトル＋日付）</li>
-            <li>詳細リンクは <code>05_support/news/&lt;slug&gt;/</code> に接続</li>
-            <li>取得失敗時はお知らせセクションを非表示にし、ログイン導線を阻害しない</li>
-          </ul>
 
-          <h2 id="section-2">掲載基準（運用ルール）</h2>
-          <p>すべてのお知らせを無条件に正本へ載せるのではなく、以下の基準で掲載対象を選別します。</p>
-          <ul>
-            <li>サービスの利用に直接関係する情報（アップデート・メンテナンス・障害情報）</li>
-            <li>導入企業・対外向けの広報情報（プレスリリース・出展案内）</li>
-            <li>内部進捗の報告・予告など、対外向けに整っていないものは原則対象外</li>
-          </ul>
+          <h2 id="section-1">正式リリースの概要</h2>
+          <p>2026 年 6 月 1 日（月）より、SPEED AD のアカウント作成を一般のお客様に開放します。展示会・カンファレンス現場でのアンケート回収と名刺データ化を一気通貫で扱える基本機能を、本日よりご利用いただけます。</p>
 
-          <h2 id="section-3">差し替え・更新フロー</h2>
-          <p>正本 JSON の更新は、コンテンツ担当者がリポジトリの <code>05_support/assets/data/news.json</code> を編集し、PR レビューを経て本番反映する流れを想定しています。Push 後、CDN キャッシュは最大10分で切り替わります。</p>
+          <h2 id="section-2">アカウント作成のご案内</h2>
+          <p>本日 6 月 1 日（月）より、アカウント作成画面を公開しています。ログイン前のトップページからご自身で登録手続きを行ってください。ご不明点は、お問い合わせフォームよりサポート担当までご連絡ください。</p>
 
-          <h2 id="section-4">現状の表示について</h2>
-          <p>本ページを含め、現時点のお知らせ各記事は本番運用のモックアップとして用意したものです。内容・日付・件数はいずれもサンプルであり、正式運用開始時に整理し直します。</p>
+          <h2 id="section-3">開発の継続について</h2>
+          <p>正式リリース時点で公開している機能は SPEED AD の全機能ではありません。一部の機能は現在も開発を継続しており、順次追加・改善を進めます。追加リリースや仕様変更のお知らせは、本ページにて随時お届けします。</p>
+
         </div>
 
         <footer class="article-foot">
