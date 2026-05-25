@@ -364,6 +364,10 @@ img {
   font-family: var(--sans);
 }
 
+.hero-copy-picker.is-dragging {
+  user-select: none;
+}
+
 .hero-copy-picker__gear {
   display: inline-flex;
   align-items: center;
@@ -376,10 +380,15 @@ img {
   background: rgba(2, 17, 32, 0.86);
   color: rgba(255, 255, 255, 0.92);
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.4);
-  cursor: pointer;
+  cursor: grab;
+  touch-action: none;
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.hero-copy-picker.is-dragging .hero-copy-picker__gear {
+  cursor: grabbing;
 }
 
 .hero-copy-picker__gear:hover,
@@ -412,6 +421,16 @@ img {
   box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55);
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
+}
+
+.hero-copy-picker--panel-below .hero-copy-picker__panel {
+  top: calc(100% + 12px);
+  bottom: auto;
+}
+
+.hero-copy-picker--align-left .hero-copy-picker__panel {
+  right: auto;
+  left: 0;
 }
 
 .hero-copy-picker__panel[hidden] {
@@ -483,6 +502,12 @@ img {
   display: flex;
   flex-direction: column;
   gap: 5px;
+}
+
+.hero-copy-picker__theme-field {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
 }
 
 .hero-copy-picker__field-label {
@@ -738,18 +763,122 @@ img {
   justify-self: end;
   width: clamp(292px, 25vw, 334px);
   padding: 26px 24px 20px;
-  border: 1px solid rgba(255, 255, 255, 0.32);
+  --login-panel-bg: rgba(244, 237, 226, 0.4);
+  --login-panel-border: rgba(255, 255, 255, 0.32);
+  --login-panel-shadow: 0 18px 48px rgba(0, 0, 0, 0.22);
+  --login-panel-text: var(--white);
+  --login-panel-muted: rgba(255, 255, 255, 0.72);
+  --login-panel-soft: rgba(255, 255, 255, 0.82);
+  --login-panel-accent: #ddc190;
+  --login-panel-input-bg: rgba(2, 17, 32, 0.42);
+  --login-panel-input-border: rgba(255, 255, 255, 0.55);
+  --login-panel-input-text: var(--white);
+  --login-panel-placeholder: rgba(255, 255, 255, 0.92);
+  --login-panel-button-bg: #062445;
+  --login-panel-button-text: var(--white);
+  --login-panel-google-bg: rgba(255, 255, 255, 0.07);
+  --login-panel-google-border: rgba(255, 255, 255, 0.28);
+  --login-panel-google-text: var(--white);
+  --login-panel-divider: rgba(255, 255, 255, 0.25);
+  --login-panel-list-bg: rgba(2, 17, 32, 0.92);
+  --login-panel-list-border: rgba(255, 255, 255, 0.22);
+  border: 1px solid var(--login-panel-border);
   border-radius: 0.875rem;
-  background: rgba(244, 237, 226, 0.4);
-  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.22);
+  background: var(--login-panel-bg);
+  box-shadow: var(--login-panel-shadow);
   -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
   transform: translateY(40px);
 }
 
+#before-login[data-login-panel-theme="a1"] .login-panel {
+  --login-panel-bg: linear-gradient(160deg, rgba(2, 18, 36, 0.9), rgba(3, 31, 61, 0.76));
+  --login-panel-border: rgba(128, 177, 228, 0.34);
+  --login-panel-shadow: 0 22px 58px rgba(0, 13, 30, 0.42);
+  --login-panel-accent: #b9d8ff;
+  --login-panel-input-bg: rgba(255, 255, 255, 0.08);
+  --login-panel-input-border: rgba(185, 216, 255, 0.34);
+  --login-panel-button-bg: #0b5bcc;
+  --login-panel-google-bg: rgba(255, 255, 255, 0.09);
+  --login-panel-google-border: rgba(185, 216, 255, 0.25);
+  --login-panel-list-bg: rgba(2, 18, 36, 0.94);
+}
+
+#before-login[data-login-panel-theme="e1"] .login-panel {
+  --login-panel-bg: linear-gradient(160deg, rgba(250, 244, 232, 0.86), rgba(224, 207, 178, 0.58));
+  --login-panel-border: rgba(255, 255, 255, 0.74);
+  --login-panel-shadow: 0 22px 58px rgba(30, 20, 8, 0.24);
+  --login-panel-text: #10213a;
+  --login-panel-muted: rgba(16, 33, 58, 0.72);
+  --login-panel-soft: rgba(16, 33, 58, 0.82);
+  --login-panel-accent: #8b6a37;
+  --login-panel-input-bg: rgba(255, 255, 255, 0.64);
+  --login-panel-input-border: rgba(16, 33, 58, 0.2);
+  --login-panel-input-text: #10213a;
+  --login-panel-placeholder: rgba(16, 33, 58, 0.68);
+  --login-panel-button-bg: #0b4ca3;
+  --login-panel-google-bg: rgba(255, 255, 255, 0.56);
+  --login-panel-google-border: rgba(16, 33, 58, 0.18);
+  --login-panel-google-text: #10213a;
+  --login-panel-divider: rgba(16, 33, 58, 0.18);
+  --login-panel-list-bg: rgba(250, 244, 232, 0.96);
+  --login-panel-list-border: rgba(16, 33, 58, 0.16);
+}
+
+#before-login[data-login-panel-theme="d1"] .login-panel {
+  --login-panel-bg: linear-gradient(160deg, rgba(28, 31, 36, 0.9), rgba(53, 55, 59, 0.74));
+  --login-panel-border: rgba(221, 193, 144, 0.32);
+  --login-panel-shadow: 0 22px 58px rgba(0, 0, 0, 0.42);
+  --login-panel-accent: #ddc190;
+  --login-panel-input-bg: rgba(255, 255, 255, 0.1);
+  --login-panel-input-border: rgba(255, 255, 255, 0.3);
+  --login-panel-button-bg: #082d5a;
+  --login-panel-google-bg: rgba(255, 255, 255, 0.08);
+  --login-panel-google-border: rgba(255, 255, 255, 0.22);
+  --login-panel-list-bg: rgba(28, 31, 36, 0.94);
+}
+
+#before-login[data-login-panel-theme="e2"] .login-panel {
+  --login-panel-bg: linear-gradient(160deg, rgba(255, 253, 247, 0.9), rgba(239, 229, 207, 0.66));
+  --login-panel-border: rgba(211, 185, 137, 0.48);
+  --login-panel-shadow: 0 22px 58px rgba(23, 24, 28, 0.22);
+  --login-panel-text: #07182d;
+  --login-panel-muted: rgba(7, 24, 45, 0.7);
+  --login-panel-soft: rgba(7, 24, 45, 0.82);
+  --login-panel-accent: #9c7435;
+  --login-panel-input-bg: rgba(255, 255, 255, 0.74);
+  --login-panel-input-border: rgba(7, 24, 45, 0.18);
+  --login-panel-input-text: #07182d;
+  --login-panel-placeholder: rgba(7, 24, 45, 0.66);
+  --login-panel-button-bg: #073b7a;
+  --login-panel-google-bg: rgba(255, 255, 255, 0.68);
+  --login-panel-google-border: rgba(7, 24, 45, 0.16);
+  --login-panel-google-text: #07182d;
+  --login-panel-divider: rgba(7, 24, 45, 0.16);
+  --login-panel-list-bg: rgba(255, 253, 247, 0.98);
+  --login-panel-list-border: rgba(7, 24, 45, 0.14);
+}
+
+#before-login[data-login-panel-theme="g6"] .login-panel {
+  --login-panel-bg:
+    linear-gradient(rgba(30, 32, 39, 0.86), rgba(30, 32, 39, 0.86)) padding-box,
+    linear-gradient(120deg, rgba(190, 27, 174, 0.72), rgba(42, 77, 196, 0.78)) border-box;
+  --login-panel-border: transparent;
+  --login-panel-shadow: 0 24px 64px rgba(6, 9, 18, 0.48);
+  --login-panel-accent: #d8b8ff;
+  --login-panel-input-bg: rgba(255, 255, 255, 0.09);
+  --login-panel-input-border: rgba(255, 255, 255, 0.28);
+  --login-panel-button-bg: linear-gradient(90deg, #c217a9 0%, #2b4fc4 100%);
+  --login-panel-google-bg: rgba(255, 255, 255, 0.08);
+  --login-panel-google-border: rgba(255, 255, 255, 0.24);
+  --login-panel-divider: rgba(255, 255, 255, 0.22);
+  --login-panel-list-bg: rgba(30, 32, 39, 0.96);
+  --login-panel-list-border: rgba(216, 184, 255, 0.2);
+}
+
 .login-panel__eyebrow {
   margin: 0 0 8px;
-  color: #ddc190;
+  color: var(--login-panel-accent);
   font-family: var(--latin);
   font-size: 0.7rem;
   font-weight: 700;
@@ -758,7 +887,7 @@ img {
 
 .form-container__title {
   margin: 0 0 18px;
-  color: var(--white);
+  color: var(--login-panel-text, var(--white));
   font-family: var(--serif);
   font-size: 1.4rem;
   font-weight: 600;
@@ -791,21 +920,21 @@ img {
   width: 100%;
   min-height: 46px;
   padding: 0 16px;
-  border: 1px solid rgba(255, 255, 255, 0.55);
+  border: 1px solid var(--login-panel-input-border, rgba(255, 255, 255, 0.55));
   border-radius: 0.5rem;
-  color: var(--white);
-  background: rgba(2, 17, 32, 0.42);
+  color: var(--login-panel-input-text, var(--white));
+  background: var(--login-panel-input-bg, rgba(2, 17, 32, 0.42));
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .form-group__input:focus,
 .form-group__input:focus-visible {
-  border-color: var(--gold);
-  box-shadow: 0 0 0 3px rgba(199, 164, 107, 0.18);
+  border-color: var(--login-panel-accent, var(--gold));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--login-panel-accent, var(--gold)) 22%, transparent);
 }
 
 .form-group__input::placeholder {
-  color: rgba(255, 255, 255, 0.92);
+  color: var(--login-panel-placeholder, rgba(255, 255, 255, 0.92));
   opacity: 1;
 }
 
@@ -829,7 +958,7 @@ img {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: rgba(255, 255, 255, 0.72);
+  color: var(--login-panel-muted, rgba(255, 255, 255, 0.72));
   background: transparent;
   cursor: pointer;
 }
@@ -850,7 +979,7 @@ img {
 
 .password-toggle:hover,
 .password-toggle:focus-visible {
-  color: var(--white);
+  color: var(--login-panel-text, var(--white));
 }
 
 .form-group__input[aria-invalid="true"],
@@ -880,7 +1009,7 @@ img {
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  color: rgba(255, 255, 255, 0.95);
+  color: var(--login-panel-text, rgba(255, 255, 255, 0.95));
   font-size: 0.78rem;
   line-height: 1.55;
 }
@@ -906,7 +1035,7 @@ img {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--login-panel-soft, rgba(255, 255, 255, 0.8));
   font-size: 0.78rem;
   cursor: pointer;
   -webkit-user-select: none;
@@ -931,8 +1060,8 @@ img {
   width: 32px;
   height: 18px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.22);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: color-mix(in srgb, var(--login-panel-text, #ffffff) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--login-panel-text, #ffffff) 34%, transparent);
   transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
@@ -949,8 +1078,8 @@ img {
 }
 
 .form-toggle__input:checked ~ .form-toggle__track {
-  background: rgba(255, 255, 255, 0.9);
-  border-color: rgba(255, 255, 255, 0.95);
+  background: var(--login-panel-accent, rgba(255, 255, 255, 0.9));
+  border-color: var(--login-panel-accent, rgba(255, 255, 255, 0.95));
 }
 
 .form-toggle__input:checked ~ .form-toggle__track .form-toggle__thumb {
@@ -967,7 +1096,7 @@ img {
   display: block;
   margin-top: 12px;
   text-align: center;
-  color: rgba(255, 255, 255, 0.72);
+  color: var(--login-panel-muted, rgba(255, 255, 255, 0.72));
   font-size: 0.78rem;
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -976,7 +1105,7 @@ img {
 
 .login-panel__forgot:hover,
 .login-panel__forgot:focus-visible {
-  color: var(--white);
+  color: var(--login-panel-text, var(--white));
   text-underline-offset: 4px;
 }
 
@@ -996,8 +1125,8 @@ img {
 }
 
 .button--filled {
-  background: #062445;
-  color: var(--white);
+  background: var(--login-panel-button-bg, #062445);
+  color: var(--login-panel-button-text, var(--white));
   transition: transform .15s ease, box-shadow .2s ease, background-color .2s ease, color .2s ease;
 }
 
@@ -1012,9 +1141,9 @@ img {
 }
 
 .button--google {
-  border-color: rgba(255, 255, 255, 0.28);
-  color: var(--white);
-  background: rgba(255, 255, 255, 0.07);
+  border-color: var(--login-panel-google-border, rgba(255, 255, 255, 0.28));
+  color: var(--login-panel-google-text, var(--white));
+  background: var(--login-panel-google-bg, rgba(255, 255, 255, 0.07));
   transition: transform .15s ease, box-shadow .2s ease, background-color .2s ease, color .2s ease, border-color .2s ease;
 }
 
@@ -1054,7 +1183,7 @@ img {
   align-items: center;
   gap: 14px;
   margin: 14px 0;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--login-panel-muted, rgba(255, 255, 255, 0.7));
   font-size: 0.78rem;
 }
 
@@ -1063,13 +1192,13 @@ img {
   content: "";
   height: 1px;
   flex: 1;
-  background: rgba(255, 255, 255, 0.25);
+  background: var(--login-panel-divider, rgba(255, 255, 255, 0.25));
 }
 
 .scenario-accounts {
   position: relative;
   margin-top: 12px;
-  color: rgba(255, 255, 255, 0.82);
+  color: var(--login-panel-soft, rgba(255, 255, 255, 0.82));
   font-size: 0.8rem;
   z-index: 4;
 }
@@ -1095,8 +1224,8 @@ img {
   gap: 8px;
   padding: 10px;
   margin: 0;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  background: rgba(2, 17, 32, 0.92);
+  border: 1px solid var(--login-panel-list-border, rgba(255, 255, 255, 0.22));
+  background: var(--login-panel-list-bg, rgba(2, 17, 32, 0.92));
   box-shadow: 0 14px 34px rgba(0, 0, 0, 0.26);
   backdrop-filter: blur(10px);
   list-style: none;
@@ -1110,7 +1239,7 @@ img {
   padding: 8px 10px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   background: rgba(255, 255, 255, 0.08);
-  color: var(--white);
+  color: var(--login-panel-text, var(--white));
   text-decoration: none;
 }
 
@@ -1121,7 +1250,7 @@ img {
 }
 
 .scenario-accounts__badge {
-  color: #ddc190;
+  color: var(--login-panel-accent, #ddc190);
 }
 
 .public-news-section {

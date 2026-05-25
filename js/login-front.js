@@ -695,6 +695,7 @@
     restoreRememberedAccount();
     setupSiteTopHamburger();
     setupHeroCopyPicker();
+    setupLoginPanelThemePicker();
 
     if (loginForm && emailInput) {
       emailInput.focus();
@@ -778,11 +779,12 @@
   function setupHeroCopyPicker() {
     const toggle = document.getElementById('hero-copy-picker-toggle');
     const panel = document.getElementById('hero-copy-picker-panel');
+    const picker = toggle?.closest('[data-mock-tool]');
     const select = document.getElementById('hero-copy-picker-select');
     const statementEl = document.getElementById('hero-statement');
     const leadEl = document.getElementById('hero-lead');
     const reasonEl = document.getElementById('hero-copy-picker-reason');
-    if (!toggle || !panel || !select || !statementEl || !leadEl || !reasonEl) {
+    if (!toggle || !panel || !picker || !select || !statementEl || !leadEl || !reasonEl) {
       return;
     }
     const customBlock = document.getElementById('hero-copy-picker-custom');
@@ -790,6 +792,7 @@
     const customLeadInput = document.getElementById('hero-copy-picker-custom-lead');
 
     const STORAGE_KEY = 'speedad-hero-copy-variant';
+    const POSITION_STORAGE_KEY = 'speedad-mock-tool-position';
     const CUSTOM_ID = 'custom';
     const CUSTOM_STATEMENT_KEY = 'speedad-hero-copy-custom-statement';
     const CUSTOM_LEAD_KEY = 'speedad-hero-copy-custom-lead';
@@ -887,10 +890,122 @@
     function setExpanded(isOpen) {
       toggle.setAttribute('aria-expanded', String(isOpen));
       panel.hidden = !isOpen;
+      updatePanelPlacement();
     }
+
+    function clampPosition(left, top) {
+      const rect = toggle.getBoundingClientRect();
+      const width = rect.width || 44;
+      const height = rect.height || 44;
+      const margin = 12;
+      return {
+        left: Math.min(Math.max(margin, left), window.innerWidth - width - margin),
+        top: Math.min(Math.max(margin, top), window.innerHeight - height - margin)
+      };
+    }
+
+    function updatePanelPlacement() {
+      const rect = picker.getBoundingClientRect();
+      const shouldAlignLeft = rect.left < 380;
+      const shouldOpenBelow = rect.top < Math.min(220, window.innerHeight * 0.34);
+      picker.classList.toggle('hero-copy-picker--align-left', shouldAlignLeft);
+      picker.classList.toggle('hero-copy-picker--panel-below', shouldOpenBelow);
+    }
+
+    function applyPickerPosition(position) {
+      const next = clampPosition(position.left, position.top);
+      picker.style.left = `${next.left}px`;
+      picker.style.top = `${next.top}px`;
+      picker.style.right = 'auto';
+      picker.style.bottom = 'auto';
+      updatePanelPlacement();
+    }
+
+    function savePickerPosition() {
+      const rect = picker.getBoundingClientRect();
+      try {
+        window.localStorage.setItem(POSITION_STORAGE_KEY, JSON.stringify({ left: rect.left, top: rect.top }));
+      } catch (_error) {
+        /* localStorage unavailable */
+      }
+    }
+
+    function restorePickerPosition() {
+      try {
+        const rawPosition = window.localStorage.getItem(POSITION_STORAGE_KEY);
+        if (!rawPosition) {
+          updatePanelPlacement();
+          return;
+        }
+        const position = JSON.parse(rawPosition);
+        if (Number.isFinite(position?.left) && Number.isFinite(position?.top)) {
+          applyPickerPosition(position);
+          return;
+        }
+      } catch (_error) {
+        /* localStorage unavailable or invalid */
+      }
+      updatePanelPlacement();
+    }
+
+    let dragState = null;
+    let didDrag = false;
+
+    toggle.addEventListener('pointerdown', (event) => {
+      if (event.button !== 0 && event.pointerType === 'mouse') {
+        return;
+      }
+      const rect = picker.getBoundingClientRect();
+      dragState = {
+        pointerId: event.pointerId,
+        startX: event.clientX,
+        startY: event.clientY,
+        left: rect.left,
+        top: rect.top
+      };
+      didDrag = false;
+      toggle.setPointerCapture?.(event.pointerId);
+    });
+
+    toggle.addEventListener('pointermove', (event) => {
+      if (!dragState || dragState.pointerId !== event.pointerId) {
+        return;
+      }
+      const dx = event.clientX - dragState.startX;
+      const dy = event.clientY - dragState.startY;
+      if (!didDrag && Math.hypot(dx, dy) < 6) {
+        return;
+      }
+      didDrag = true;
+      picker.classList.add('is-dragging');
+      applyPickerPosition({
+        left: dragState.left + dx,
+        top: dragState.top + dy
+      });
+    });
+
+    function finishDrag(event) {
+      if (!dragState || dragState.pointerId !== event.pointerId) {
+        return;
+      }
+      if (didDrag) {
+        savePickerPosition();
+      }
+      picker.classList.remove('is-dragging');
+      toggle.releasePointerCapture?.(event.pointerId);
+      dragState = null;
+    }
+
+    toggle.addEventListener('pointerup', finishDrag);
+    toggle.addEventListener('pointercancel', finishDrag);
 
     toggle.addEventListener('click', (event) => {
       event.stopPropagation();
+      if (didDrag) {
+        event.preventDefault();
+        didDrag = false;
+        return;
+      }
       const isOpen = toggle.getAttribute('aria-expanded') === 'true';
       setExpanded(!isOpen);
     });
@@ -933,6 +1048,16 @@
       }
     });
 
+    window.addEventListener('resize', () => {
+      const rect = picker.getBoundingClientRect();
+      if (picker.style.left && picker.style.top) {
+        applyPickerPosition({ left: rect.left, top: rect.top });
+        savePickerPosition();
+        return;
+      }
+      updatePanelPlacement();
+    });
+
     let savedId = DEFAULT_VARIANT.id;
     try {
       savedId = window.localStorage.getItem(STORAGE_KEY) || DEFAULT_VARIANT.id;
@@ -951,6 +1076,43 @@
     if (allVariants.has(savedId) || (savedId === CUSTOM_ID && canUseCustom)) {
       select.value = savedId;
       applyVariant(savedId);
+    }
+    restorePickerPosition();
+  }
+
+  function setupLoginPanelThemePicker() {
+    const select = document.getElementById('login-panel-theme-select');
+    const loginPanel = document.getElementById('input-box');
+    if (!select || !loginPanel) {
+      return;
+    }
+    const STORAGE_KEY = 'speedad-login-panel-theme';
+    const allowedThemes = new Set(['', 'a1', 'e1', 'd1', 'e2', 'g6']);
+
+    function applyTheme(themeId) {
+      const nextThemeId = allowedThemes.has(themeId) ? themeId : '';
+      if (nextThemeId) {
+        document.body.dataset.loginPanelTheme = nextThemeId;
+      } else {
+        delete document.body.dataset.loginPanelTheme;
+      }
+      select.value = nextThemeId;
+    }
+
+    select.addEventListener('change', (event) => {
+      const themeId = event.target.value;
+      applyTheme(themeId);
+      try {
+        window.localStorage.setItem(STORAGE_KEY, themeId);
+      } catch (_error) {
+        /* localStorage unavailable */
+      }
+    });
+
+    try {
+      applyTheme(window.localStorage.getItem(STORAGE_KEY) || '');
+    } catch (_error) {
+      applyTheme('');
     }
   }
 
