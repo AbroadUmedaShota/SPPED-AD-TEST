@@ -9,7 +9,13 @@
    - JSON 由来文字列は HTML エスケープ。url は形式検証して描画スキップ。
    ============================================================ */
 
-import { resolveSupportDataPath, resolveSupportBasePath } from './utils.js';
+import {
+  resolveSupportDataPath,
+  resolveSupportBasePath,
+  isNewArticle,
+  isPinned,
+  resolveNewsImagePath,
+} from './utils.js';
 
 const NEWS_URL_PATTERN = /^05_support\/news\/[a-z0-9_-]+\/?$/i;
 const RELATED_MAX = 4;
@@ -197,7 +203,46 @@ function initScrollSpy() {
  * - 「前の記事」= 公開が古い（idx+1）、「次の記事」= 公開が新しい（idx-1）。
  * - 両端では片側のみ表示し、グリッド側の配置クラスで左右を維持する。
  */
-async function loadPrevNext() {
+function renderArticleBadges(item) {
+  const parts = [];
+  if (isPinned(item)) parts.push('<span class="news-badge news-badge--pinned">重要</span>');
+  if (isNewArticle(item)) parts.push('<span class="news-badge news-badge--new">NEW</span>');
+  return parts.join('');
+}
+
+/**
+ * 記事ヘッダーのメタ行に 重要 / NEW バッジを差し込む。
+ */
+function decorateCurrentArticle(item) {
+  const meta = document.querySelector('.article-hero .ah-meta');
+  if (!meta) return;
+  meta.querySelectorAll('.news-badge').forEach((b) => b.remove());
+  const badgeHtml = renderArticleBadges(item);
+  if (badgeHtml) meta.insertAdjacentHTML('beforeend', badgeHtml);
+}
+
+/**
+ * 記事 hero と本文の間にバナー画像を差し込む。
+ * item.image があればその画像、なければデフォルト SVG を使う。
+ */
+function insertHeroBanner(item) {
+  if (document.querySelector('.article-banner')) return;
+  const main = document.querySelector('.article-main');
+  if (!main) return;
+  const src = resolveNewsImagePath(item.image, item.category);
+  const alt = item.image ? (item.title || '') : '';
+  const figure = document.createElement('figure');
+  figure.className = 'article-banner';
+  if (!item.image) figure.classList.add('article-banner--default');
+  const img = document.createElement('img');
+  img.src = src;
+  img.alt = alt;
+  img.loading = 'lazy';
+  figure.appendChild(img);
+  main.insertBefore(figure, main.firstChild);
+}
+
+async function loadArticleNav() {
   const main = document.querySelector('.article-main');
   if (!main) return;
   const foot = main.querySelector('.article-foot');
@@ -212,6 +257,9 @@ async function loadPrevNext() {
     const currentSlug = getCurrentSlug();
     const idx = valid.findIndex((item) => getSlugFromUrl(item.url) === currentSlug);
     if (idx === -1) return;
+
+    decorateCurrentArticle(valid[idx]);
+    insertHeroBanner(valid[idx]);
 
     const newer = idx > 0 ? valid[idx - 1] : null;
     const older = idx < valid.length - 1 ? valid[idx + 1] : null;
@@ -231,8 +279,27 @@ async function loadPrevNext() {
     if (foot) main.insertBefore(nav, foot);
     else main.appendChild(nav);
   } catch (error) {
-    console.error('[news-detail] Failed to load prev/next:', error);
+    console.error('[news-detail] Failed to load article nav:', error);
   }
+}
+
+/**
+ * 記事フッターに「お問い合わせ」リンクを差し込む。
+ * back-link の直後・share の直前に配置。
+ */
+function insertContactLink() {
+  const foot = document.querySelector('.article-foot');
+  if (!foot) return;
+  if (foot.querySelector('.contact-link')) return;
+  const base = resolveSupportBasePath();
+  const href = `${base}/bug-report/`;
+  const link = document.createElement('a');
+  link.className = 'contact-link';
+  link.setAttribute('href', href);
+  link.textContent = 'お問い合わせはこちら →';
+  const share = foot.querySelector('.share');
+  if (share) foot.insertBefore(link, share);
+  else foot.appendChild(link);
 }
 
 function renderPrevNextLink(item, dir, base) {
@@ -252,6 +319,7 @@ function renderPrevNextLink(item, dir, base) {
 buildTOC();
 setReadMin();
 bindShareButtons();
+insertContactLink();
 loadRelated();
-loadPrevNext();
+loadArticleNav();
 initScrollSpy();

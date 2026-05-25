@@ -9,7 +9,13 @@
    - JSON 由来文字列は HTML エスケープ。url は形式検証（仕様 §6）。
    ============================================================ */
 
-import { resolveSupportDataPath, resolveSupportBasePath } from './utils.js';
+import {
+  resolveSupportDataPath,
+  resolveSupportBasePath,
+  isNewArticle,
+  isPinned,
+  resolveNewsImagePath,
+} from './utils.js';
 
 const NEWS_JSON_PATH = resolveSupportDataPath('news.json');
 
@@ -88,6 +94,20 @@ function sortItemsByDateDesc(items) {
 }
 
 /**
+ * バッジ HTML を生成。重要 → NEW の順で並べる。
+ */
+function renderBadges(item) {
+  const parts = [];
+  if (isPinned(item)) {
+    parts.push('<span class="news-badge news-badge--pinned">重要</span>');
+  }
+  if (isNewArticle(item)) {
+    parts.push('<span class="news-badge news-badge--new">NEW</span>');
+  }
+  return parts.join('');
+}
+
+/**
  * 'YYYY-MM' 単位で月別グルーピング。配列順は入力順（既に date 降順）を維持。
  */
 function groupByMonth(items) {
@@ -153,11 +173,24 @@ function renderFeatured(item) {
     tagEl.className = tagVariant ? `news-tag ${tagVariant}` : 'news-tag';
   }
 
+  // バッジ（重要 / NEW）を tag の直後に再構築する。
+  featured.querySelectorAll('.news-badge').forEach((b) => b.remove());
+  if (tagEl) {
+    const badgeHtml = renderBadges(item);
+    if (badgeHtml) tagEl.insertAdjacentHTML('afterend', badgeHtml);
+  }
+
   const titleEl = featured.querySelector('[data-feat-title]');
   if (titleEl) titleEl.textContent = item.title || '';
 
   const summaryEl = featured.querySelector('[data-feat-summary]');
   if (summaryEl) summaryEl.textContent = item.summary || '';
+
+  const imgEl = featured.querySelector('[data-feat-image]');
+  if (imgEl) {
+    imgEl.src = resolveNewsImagePath(item.image, item.category);
+    imgEl.alt = item.image ? (item.title || '') : '';
+  }
 }
 
 /**
@@ -187,6 +220,9 @@ function renderTimeline(items) {
       const tagClass = tagVariant ? `news-tag ${tagVariant}` : 'news-tag';
       const dateAttr = escapeHtml(item.date || '');
 
+      const imgSrc = escapeHtml(resolveNewsImagePath(item.image, item.category));
+      const imgAlt = item.image ? escapeHtml(item.title || '') : '';
+
       return `
         <a class="tl-item" href="${escapeHtml(slug)}">
           <div class="ti-date">
@@ -195,11 +231,15 @@ function renderTimeline(items) {
           </div>
           <div class="ti-tag">
             <span class="${tagClass}">${escapeHtml(tagLabel)}</span>
+            ${renderBadges(item)}
           </div>
           <div class="ti-body">
             <h3 class="ti-title">${escapeHtml(item.title || '')}</h3>
             <p class="ti-sum">${escapeHtml(item.summary || '')}</p>
           </div>
+          <figure class="ti-thumb">
+            <img src="${imgSrc}" alt="${imgAlt}" loading="lazy">
+          </figure>
           <span class="ti-arr" aria-hidden="true">→</span>
         </a>
       `;
@@ -226,6 +266,18 @@ function renderEmptyState() {
       <div class="news-state__eyebrow">No Items</div>
       <h3 class="news-state__title">現在お知らせはありません</h3>
       <p class="news-state__text">新しいお知らせが公開され次第、こちらに表示されます。</p>
+    </div>
+  `;
+}
+
+function renderNoResultsState() {
+  const body = document.getElementById('timeline-body');
+  if (!body) return;
+  body.innerHTML = `
+    <div class="news-state">
+      <div class="news-state__eyebrow">No Results</div>
+      <h3 class="news-state__title">該当するお知らせがありません</h3>
+      <p class="news-state__text">カテゴリの絞り込みを「すべて」に戻すか、別のカテゴリでお試しください。</p>
     </div>
   `;
 }
@@ -334,11 +386,17 @@ function renderFiltered() {
 
   if (filtered.length === 0) {
     hideFeatured();
-    renderEmptyState();
+    if (currentCategory) {
+      renderNoResultsState();
+    } else {
+      renderEmptyState();
+    }
     return;
   }
 
-  renderFeatured(filtered[0]);
+  // Featured は pinned 優先、なければ最新（タイムラインは日付降順のまま）
+  const featuredItem = filtered.find(isPinned) || filtered[0];
+  renderFeatured(featuredItem);
   renderTimeline(filtered);
 }
 
@@ -354,8 +412,8 @@ async function loadNewsList() {
     const data = await response.json();
     const items = Array.isArray(data?.items) ? data.items : [];
 
-    const sorted = sortItemsByDateDesc(items);
-    allItems = sorted.filter((item) => isValidNewsUrl(item?.url));
+    const validItems = items.filter((item) => isValidNewsUrl(item?.url));
+    allItems = sortItemsByDateDesc(validItems);
 
     const groups = groupByMonth(allItems);
     setMeta({

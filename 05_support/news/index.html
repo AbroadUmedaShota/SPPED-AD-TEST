@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Noto+Serif+JP:wght@500;600;700&family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap">
-  <link rel="stylesheet" href="../assets/css/support-shell.css?v=20260525-phase1">
-  <link rel="stylesheet" href="../assets/css/news.css?v=20260525-phase1">
+  <link rel="stylesheet" href="../assets/css/support-shell.css?v=20260525-phase2b-rwd">
+  <link rel="stylesheet" href="../assets/css/news.css?v=20260525-phase2b-rwd">
 </head>
 <body data-page-id="news">
 <div class="support-shell">
@@ -58,6 +58,9 @@
           <h2 data-feat-title></h2>
           <p data-feat-summary></p>
         </div>
+        <figure class="feat-image">
+          <img data-feat-image alt="" loading="lazy">
+        </figure>
         <span class="feat-arr" aria-hidden="true">→</span>
       </a>
     </section>
@@ -73,11 +76,19 @@
       <div id="timeline-body" aria-live="polite"></div>
     </section>
 
+    <!-- Contact CTA -->
+    <section class="contact-cta" aria-label="お問い合わせ">
+      <p class="contact-cta__eyebrow">Contact</p>
+      <p class="contact-cta__title">お探しの情報が見つからないときは</p>
+      <p class="contact-cta__text">お知らせに掲載のないご質問や、機能・運用についてのご相談は、お問い合わせフォームよりお寄せください。サポート担当よりご返信いたします。</p>
+      <a class="contact-cta__btn" href="../bug-report/">お問い合わせ <span aria-hidden="true">→</span></a>
+    </section>
+
   </main>
 
   <div id="support-footer-placeholder"></div>
 </div>
-<script type="module" src="../assets/js/support-shell.js?v=20260525-phase1"></script>
-<script type="module" src="../assets/js/news-list.js?v=20260525-phase1"></script>
+<script type="module" src="../assets/js/support-shell.js?v=20260525-phase2b-rwd"></script>
+<script type="module" src="../assets/js/news-list.js?v=20260525-phase2b-rwd"></script>
 </body>
 </html>

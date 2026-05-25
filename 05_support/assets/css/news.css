@@ -63,7 +63,7 @@ body[data-page-id="news-detail"] {
 body[data-page-id="news"] .hc-tint,
 body[data-page-id="news-detail"] .hc-tint {
   background: linear-gradient(180deg, #dde7f3 0%, #e8edf4 60%, var(--canvas) 100%);
-  padding: 18px 56px 24px;
+  padding: clamp(14px, 2vw, 18px) clamp(18px, 4vw, 56px) clamp(18px, 2.4vw, 24px);
 }
 
 body[data-page-id="news"] .breadcrumb,
@@ -130,6 +130,7 @@ body[data-page-id="news-detail"] .news-tag {
   border-radius: 999px;
   background: var(--tint-info);
   color: #1f3144;
+  white-space: nowrap;
 }
 
 body[data-page-id="news"] .news-tag.news-tag--update,
@@ -166,7 +167,7 @@ body[data-page-id="news-detail"] .news-tag.news-tag--press {
    4. List Hero (masthead)
    ============================================================ */
 body[data-page-id="news"] .hero {
-  padding: 56px 56px 24px;
+  padding: clamp(32px, 4vw, 56px) clamp(18px, 4vw, 56px) clamp(18px, 2.4vw, 24px);
   background: var(--canvas);
 }
 
@@ -200,8 +201,8 @@ body[data-page-id="news"] .hero-row {
 body[data-page-id="news"] .hero h1 {
   font-family: var(--serif);
   font-weight: 600;
-  font-size: 72px;
-  line-height: 1;
+  font-size: clamp(36px, 5.2vw, 72px);
+  line-height: 1.05;
   letter-spacing: .04em;
   color: var(--ink);
   margin: 0;
@@ -255,17 +256,17 @@ body[data-page-id="news"] .ph-meta .row span {
    5. Featured (PICK)
    ============================================================ */
 body[data-page-id="news"] .feat-wrap {
-  padding: 24px 56px 8px;
+  padding: 24px clamp(18px, 4vw, 56px) 8px;
 }
 
 body[data-page-id="news"] .feat {
   display: grid;
-  grid-template-columns: 280px 1fr auto;
-  gap: 36px;
+  grid-template-columns: clamp(160px, 18vw, 220px) minmax(0, 1fr) clamp(180px, 18vw, 240px) auto;
+  gap: clamp(20px, 2.4vw, 32px);
   align-items: start;
   background: var(--paper);
   border: 1px solid var(--line);
-  padding: 36px 40px;
+  padding: clamp(24px, 3vw, 36px) clamp(20px, 3vw, 40px);
   position: relative;
   text-decoration: none;
   color: inherit;
@@ -296,7 +297,7 @@ body[data-page-id="news"] .feat-date {
 }
 
 body[data-page-id="news"] .feat-date .day {
-  font-size: 88px;
+  font-size: clamp(56px, 7vw, 88px);
   font-weight: 500;
   line-height: .9;
   color: var(--ink);
@@ -365,7 +366,7 @@ body[data-page-id="news"] .feat:hover .feat-arr {
    6. Timeline
    ============================================================ */
 body[data-page-id="news"] .timeline {
-  padding: 48px 56px 80px;
+  padding: clamp(32px, 4vw, 48px) clamp(18px, 4vw, 56px) clamp(48px, 6vw, 80px);
   position: relative;
 }
 
@@ -396,10 +397,10 @@ body[data-page-id="news"] .tl-status b {
 
 body[data-page-id="news"] .tl-month {
   display: grid;
-  grid-template-columns: 200px 1fr;
-  gap: 32px;
+  grid-template-columns: clamp(140px, 16vw, 200px) 1fr;
+  gap: clamp(20px, 2.4vw, 32px);
   align-items: start;
-  padding: 36px 0 12px;
+  padding: clamp(24px, 3vw, 36px) 0 12px;
   border-top: 1px solid var(--line);
 }
 
@@ -410,7 +411,7 @@ body[data-page-id="news"] .tl-month-label {
 }
 
 body[data-page-id="news"] .tl-month-label .num {
-  font-size: 44px;
+  font-size: clamp(32px, 3.6vw, 44px);
   font-weight: 500;
   color: var(--ink);
   letter-spacing: .04em;
@@ -454,8 +455,8 @@ body[data-page-id="news"] .tl-items::before {
 
 body[data-page-id="news"] .tl-item {
   display: grid;
-  grid-template-columns: 90px 110px 1fr 28px;
-  gap: 24px;
+  grid-template-columns: 90px 110px minmax(0, 1fr) 96px 28px;
+  gap: 20px;
   padding: 18px 0;
   align-items: start;
   cursor: pointer;
@@ -605,7 +606,7 @@ body[data-page-id="news"] .news-state--error .news-state__title {
    8. Article Hero
    ============================================================ */
 body[data-page-id="news-detail"] .article-hero {
-  padding: 48px 56px 36px;
+  padding: clamp(32px, 4vw, 48px) clamp(18px, 4vw, 56px) clamp(24px, 3vw, 36px);
   background: var(--canvas);
 }
 
@@ -664,7 +665,7 @@ body[data-page-id="news-detail"] .ah-meta .read {
 body[data-page-id="news-detail"] .article-hero h1 {
   font-family: var(--serif);
   font-weight: 600;
-  font-size: 38px;
+  font-size: clamp(24px, 3.6vw, 38px);
   line-height: 1.45;
   letter-spacing: .02em;
   color: var(--ink);
@@ -697,10 +698,10 @@ body[data-page-id="news-detail"] .ah-rule::after {
    9. Article Grid + Main
    ============================================================ */
 body[data-page-id="news-detail"] .article-grid {
-  padding: 40px 56px 80px;
+  padding: clamp(28px, 4vw, 40px) clamp(18px, 4vw, 56px) clamp(48px, 6vw, 80px);
   display: grid;
-  grid-template-columns: 1fr 240px;
-  gap: 64px;
+  grid-template-columns: 1fr clamp(200px, 22vw, 240px);
+  gap: clamp(32px, 4vw, 64px);
   align-items: start;
   background: var(--canvas);
 }
@@ -1154,6 +1155,7 @@ body[data-page-id="news"] .news-filter__chip {
   font-size: 13px;
   font-weight: 500;
   line-height: 1.4;
+  white-space: nowrap;
   cursor: pointer;
   transition: border-color .15s ease, color .15s ease, background .15s ease, transform .12s ease;
 }
@@ -1204,7 +1206,7 @@ body[data-page-id="news"] .news-filter__chip--press:not(.is-active) {
   background: color-mix(in srgb, var(--tint-press) 24%, var(--paper));
 }
 
-@media (max-width: 720px) {
+@media (max-width: 768px) {
   body[data-page-id="news"] .news-filter {
     padding: 0 18px;
     overflow-x: auto;
@@ -1282,7 +1284,7 @@ body[data-page-id="news-detail"] .pn-title {
   overflow: hidden;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 768px) {
   body[data-page-id="news-detail"] .article-prev-next {
     grid-template-columns: 1fr;
   }
@@ -1293,5 +1295,462 @@ body[data-page-id="news-detail"] .pn-title {
   body[data-page-id="news-detail"] .pn-link.pn-next {
     text-align: left;
     align-items: flex-start;
+  }
+}
+
+/* ============================================================
+   Badges (重要 / NEW) — list & detail 共通
+   ============================================================ */
+body[data-page-id="news"] .news-badge,
+body[data-page-id="news-detail"] .news-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  margin-left: 6px;
+  border-radius: 999px;
+  font-family: var(--latin-serif);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.4;
+  vertical-align: middle;
+}
+
+body[data-page-id="news"] .news-badge--pinned,
+body[data-page-id="news-detail"] .news-badge--pinned {
+  background: color-mix(in srgb, var(--tint-incident) 65%, var(--paper));
+  color: #8a3a32;
+  border: 1px solid color-mix(in srgb, var(--tint-incident) 95%, var(--paper));
+}
+
+body[data-page-id="news"] .news-badge--new,
+body[data-page-id="news-detail"] .news-badge--new {
+  background: var(--gold);
+  color: var(--paper);
+}
+
+/* ============================================================
+   Contact CTA (news list — timeline 直下)
+   ============================================================ */
+body[data-page-id="news"] .contact-cta {
+  margin: 48px 28px 56px;
+  padding: 32px 28px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  text-align: center;
+}
+
+body[data-page-id="news"] .contact-cta__eyebrow {
+  margin: 0 0 10px;
+  font-family: var(--latin-serif);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--gold);
+  text-transform: uppercase;
+}
+
+body[data-page-id="news"] .contact-cta__title {
+  margin: 0 0 8px;
+  font-family: var(--serif);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+body[data-page-id="news"] .contact-cta__text {
+  margin: 0 auto 20px;
+  max-width: 540px;
+  font-size: 13.5px;
+  line-height: 1.75;
+  color: var(--ink-2);
+}
+
+body[data-page-id="news"] .contact-cta__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: 999px;
+  text-decoration: none;
+  font-size: 13.5px;
+  font-weight: 600;
+  transition: background .15s ease, transform .12s ease;
+}
+
+body[data-page-id="news"] .contact-cta__btn:hover {
+  background: var(--ink-2);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+  body[data-page-id="news"] .contact-cta {
+    margin: 36px 18px 40px;
+    padding: 24px 20px;
+  }
+}
+
+/* ============================================================
+   Contact link (news detail — article-foot 内)
+   ============================================================ */
+body[data-page-id="news-detail"] .contact-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gold);
+  text-decoration: none;
+  background: color-mix(in srgb, var(--gold-soft) 22%, var(--paper));
+  border: 1px solid color-mix(in srgb, var(--gold-soft) 60%, var(--paper));
+  transition: background .15s ease, color .15s ease, transform .12s ease;
+}
+
+body[data-page-id="news-detail"] .contact-link:hover {
+  background: var(--gold);
+  color: var(--paper);
+  transform: translateY(-1px);
+}
+
+/* ============================================================
+   Article images: Featured banner / Timeline thumb / Hero banner
+   ============================================================ */
+body[data-page-id="news"] .feat-image {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  width: 240px;
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--canvas-2);
+  align-self: center;
+}
+
+body[data-page-id="news"] .feat-image img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border: 0;
+}
+
+body[data-page-id="news"] .ti-thumb {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  width: 96px;
+  aspect-ratio: 3 / 2;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--canvas-2);
+  align-self: center;
+}
+
+body[data-page-id="news"] .ti-thumb img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border: 0;
+}
+
+body[data-page-id="news-detail"] .article-banner {
+  position: relative;
+  margin: 0 0 32px;
+  padding: 0;
+  aspect-ratio: 16 / 6;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--canvas-2);
+  border: 0;
+}
+
+body[data-page-id="news-detail"] .article-banner img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border: 0;
+}
+
+@media (max-width: 768px) {
+  body[data-page-id="news"] .feat {
+    grid-template-columns: 1fr;
+    grid-template-areas: none;
+    gap: 18px;
+  }
+  body[data-page-id="news"] .feat-date {
+    order: 2;
+    grid-area: auto;
+  }
+  body[data-page-id="news"] .feat-body {
+    order: 3;
+    grid-area: auto;
+  }
+  body[data-page-id="news"] .feat-image {
+    order: 1;
+    grid-area: auto;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+  }
+  body[data-page-id="news"] .feat-arr {
+    order: 4;
+    grid-area: auto;
+    align-self: flex-end;
+  }
+  body[data-page-id="news"] .ti-thumb {
+    display: none;
+  }
+  body[data-page-id="news-detail"] .article-banner {
+    margin: 0 0 24px;
+    border-radius: 10px;
+    aspect-ratio: 16 / 9;
+  }
+}
+
+/* ============================================================
+   15. Responsive — Laptop / sub-FullHD (≤ 1280px)
+   ============================================================ */
+@media (max-width: 1280px) {
+  body[data-page-id="news"] .feat-image {
+    width: clamp(180px, 18vw, 220px);
+  }
+  body[data-page-id="news"] .ph-meta {
+    gap: 16px;
+  }
+  body[data-page-id="news"] .ph-meta .row b {
+    font-size: 24px;
+  }
+}
+
+/* ============================================================
+   16. Responsive — Tablet (≤ 1024px)
+   ============================================================ */
+@media (max-width: 1024px) {
+  /* ----- List: Hero ----- */
+  body[data-page-id="news"] .hero-row {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    align-items: start;
+  }
+  body[data-page-id="news"] .ph-meta {
+    justify-content: flex-start;
+    gap: 28px;
+  }
+  body[data-page-id="news"] .ph-meta .row {
+    text-align: left;
+  }
+
+  /* ----- List: PICK (image top, date+body+arrow row below) ----- */
+  body[data-page-id="news"] .feat {
+    grid-template-columns: clamp(110px, 14vw, 140px) minmax(0, 1fr) auto;
+    grid-template-areas:
+      "image image image"
+      "date  body  arr";
+    gap: 20px 24px;
+  }
+  body[data-page-id="news"] .feat-image {
+    grid-area: image;
+    width: 100%;
+    aspect-ratio: 16 / 7;
+  }
+  body[data-page-id="news"] .feat-date {
+    grid-area: date;
+  }
+  body[data-page-id="news"] .feat-body {
+    grid-area: body;
+  }
+  body[data-page-id="news"] .feat-arr {
+    grid-area: arr;
+    align-self: center;
+  }
+  body[data-page-id="news"] .feat-date .day {
+    font-size: clamp(48px, 7vw, 64px);
+  }
+
+  /* ----- List: Timeline (month label becomes a 1-row header) ----- */
+  body[data-page-id="news"] .tl-month {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  body[data-page-id="news"] .tl-month-label {
+    position: static;
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  body[data-page-id="news"] .tl-month-label .num {
+    font-size: 28px;
+  }
+  body[data-page-id="news"] .tl-month-label .name {
+    margin-top: 0;
+  }
+  body[data-page-id="news"] .tl-month-label .ct {
+    margin-top: 0;
+    margin-left: auto;
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  /* ----- List: Timeline item (slim columns, keep thumb visible) ----- */
+  body[data-page-id="news"] .tl-item {
+    grid-template-columns: 76px 100px minmax(0, 1fr) 80px 24px;
+    gap: 16px;
+  }
+
+  /* ----- Detail: 1-column with aside moved below ----- */
+  body[data-page-id="news-detail"] .article-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  body[data-page-id="news-detail"] .article-aside {
+    position: static;
+  }
+  body[data-page-id="news-detail"] .article-main {
+    max-width: none;
+  }
+}
+
+/* ============================================================
+   17. Responsive — Mobile (≤ 768px) — extra rules
+   既存の散在ブロック (filter / prev-next / contact-cta / feat) と合わせて適用
+   ============================================================ */
+@media (max-width: 768px) {
+  /* ----- List: Hero meta inline ----- */
+  body[data-page-id="news"] .ph-meta {
+    flex-wrap: wrap;
+    gap: 14px 20px;
+  }
+  body[data-page-id="news"] .ph-meta .row {
+    text-align: left;
+  }
+  body[data-page-id="news"] .ph-meta .row b {
+    font-size: 20px;
+  }
+
+  /* ----- List: Timeline — month label compact ----- */
+  body[data-page-id="news"] .tl-month-label .num {
+    font-size: 24px;
+  }
+  body[data-page-id="news"] .tl-month-label .name {
+    font-size: 12px;
+    letter-spacing: .28em;
+  }
+
+  /* ----- List: Timeline item — 2-row layout ----- */
+  body[data-page-id="news"] .tl-items {
+    padding-left: 20px;
+  }
+  body[data-page-id="news"] .tl-items::before {
+    left: 4px;
+  }
+  body[data-page-id="news"] .tl-item {
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+      "date tag  arr"
+      "body body body";
+    gap: 6px 12px;
+    padding: 14px 0;
+  }
+  body[data-page-id="news"] .tl-item::before {
+    left: -20px;
+    top: 22px;
+    width: 10px;
+    height: 10px;
+  }
+  body[data-page-id="news"] .ti-date {
+    grid-area: date;
+    font-size: 15px;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  body[data-page-id="news"] .ti-date time {
+    font-size: 15px;
+  }
+  body[data-page-id="news"] .ti-date small {
+    display: inline-block;
+    margin-top: 0;
+    font-size: 9.5px;
+  }
+  body[data-page-id="news"] .ti-tag {
+    grid-area: tag;
+    align-self: center;
+    justify-self: start;
+    padding-top: 0;
+  }
+  body[data-page-id="news"] .ti-body {
+    grid-area: body;
+  }
+  body[data-page-id="news"] .ti-title {
+    font-size: 14.5px;
+  }
+  body[data-page-id="news"] .ti-sum {
+    font-size: 12px;
+    line-height: 1.7;
+  }
+  body[data-page-id="news"] .ti-arr {
+    grid-area: arr;
+    align-self: center;
+    justify-self: end;
+    font-size: 16px;
+  }
+
+  /* ----- Detail: breadcrumb wrap long titles ----- */
+  body[data-page-id="news-detail"] .breadcrumb {
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+  body[data-page-id="news-detail"] .breadcrumb .current {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: initial;
+    max-width: none;
+    line-height: 1.5;
+  }
+
+  /* ----- Detail: hero meta wrap ----- */
+  body[data-page-id="news-detail"] .ah-meta {
+    flex-wrap: wrap;
+    row-gap: 8px;
+    gap: 10px 14px;
+  }
+
+  /* ----- Detail: lede drop cap restraint ----- */
+  body[data-page-id="news-detail"] .article-lede {
+    font-size: 16px;
+    line-height: 1.9;
+  }
+  body[data-page-id="news-detail"] .article-lede::first-letter {
+    font-size: 40px;
+    padding: 4px 10px 0 0;
+  }
+
+  /* ----- Detail: article-foot stacks ----- */
+  body[data-page-id="news-detail"] .article-foot {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  /* ----- Detail: aside-card slimmer padding ----- */
+  body[data-page-id="news-detail"] .aside-card {
+    padding: 18px 18px 20px;
   }
 }

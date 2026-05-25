@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Incident | SPEED AD News">
+  <defs>
+    <linearGradient id="incBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#edc9c4"/>
+      <stop offset="100%" stop-color="#dfa9a2"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#incBg)"/>
+  <g stroke="#7a221d" stroke-width="3" opacity="0.10" fill="none" stroke-linecap="round">
+    <line x1="1020" y1="60"  x2="1140" y2="60"/>
+    <line x1="1020" y1="90"  x2="1140" y2="90"/>
+    <line x1="1020" y1="120" x2="1140" y2="120"/>
+  </g>
+  <g transform="translate(600,250)" fill="#7a221d">
+    <path d="M 0 -110 L 116 96 L -116 96 Z" fill="none" stroke="#7a221d" stroke-width="14" stroke-linejoin="round"/>
+    <rect x="-12" y="-50" width="24" height="86" rx="8"/>
+    <circle cx="0" cy="66" r="14"/>
+  </g>
+  <line x1="560" y1="400" x2="640" y2="400" stroke="#b08544" stroke-width="2"/>
+  <text x="600" y="448" text-anchor="middle" font-family="'Cormorant Garamond','Noto Serif JP',serif" font-size="34" font-weight="500" letter-spacing="14" fill="#7a221d">INCIDENT</text>
+</svg>

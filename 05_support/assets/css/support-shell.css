@@ -9,7 +9,7 @@ html {
   padding: 0;
   min-height: 100%;
   background: #f5f9ff;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 body {
@@ -179,7 +179,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 .support-header {
