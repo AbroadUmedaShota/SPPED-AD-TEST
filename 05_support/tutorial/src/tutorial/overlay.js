@@ -1086,6 +1086,12 @@ function updateMaskAndSpotlight(targetEl, contextEl = null) {
   spotlightEl.style.width = `${w}px`;
   spotlightEl.style.height = `${h}px`;
   spotlightEl.style.borderRadius = `${SPOTLIGHT_RADIUS}px`;
+
+  // user-action 系ステップではスポットライト枠自体にリップル風アニメーションを付与し、
+  // 「クリックしてください」の誘導をターゲットの中央に被せる青ドットなしで成立させる。
+  const isUserAction = currentStep
+    && (currentStep.mode === 'user-action' || currentStep.mode === 'user-action-bridge');
+  spotlightEl.classList.toggle('tutorial-spotlight--clickable', !!isUserAction);
 }
 
 function updateCoachmark(step, targetEl) {
@@ -1301,24 +1307,12 @@ function adjustConnector(notch, placement, targetRect, cmLeft, cmTop, cmW, cmH) 
 }
 
 function updatePointer(step, targetEl) {
+  // 青ドット＋同心円パルス（旧 .tutorial-pointer）はターゲット中央被り問題を避けるため
+  // 右上寄せにしてみたものの違和感が残ったため、視線誘導は
+  // `.tutorial-spotlight--clickable` のリップル（updateMaskAndSpotlight で付与）へ
+  // 移管した。pointer 要素は DOM ファクトリの互換のため残置するが、常時非表示。
   if (!pointerEl) return;
-  const isUserAction = step.mode === 'user-action' || step.mode === 'user-action-bridge';
-  if (!isUserAction || !targetEl) {
-    pointerEl.style.opacity = '0';
-    pointerEl.style.pointerEvents = 'none';
-    return;
-  }
-  const rect = targetEl.getBoundingClientRect();
-  // ボタンの中央へ被せると文字に重なって読みにくいため、右上コーナー側へ寄せる。
-  // ターゲットが極端に小さい場合（icon 単独等）は inset を半分でクランプして中央寄りに留め、
-  // ポインタがターゲットの外側にはみ出さないようにする。
-  const inset = Math.min(12, rect.width / 2, rect.height / 2);
-  const cx = rect.right - inset;
-  const cy = rect.top + inset;
-  pointerEl.style.transition = `opacity ${POSITION_TRANSITION_MS}ms ease-out`;
-  pointerEl.style.opacity = '1';
-  pointerEl.style.left = `${cx - 24}px`;
-  pointerEl.style.top = `${cy - 24}px`;
+  pointerEl.style.opacity = '0';
   pointerEl.style.pointerEvents = 'none';
 }
 

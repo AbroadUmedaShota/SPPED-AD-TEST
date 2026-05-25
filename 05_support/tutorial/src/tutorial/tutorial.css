@@ -124,6 +124,36 @@
   transition: all 120ms ease-out;
 }
 
+/* user-action / user-action-bridge ステップでターゲットの「クリック誘導」を伝える
+   リップル風アニメーション。スポットライト枠の外側に同心リングが広がって消える。
+   旧実装はターゲット中央に青ドットを置いていたが、ボタン文字に被ったり右上ずらしも
+   違和感があったため、誘導をスポットライト枠自体に統合した。 */
+.tutorial-spotlight--clickable::before,
+.tutorial-spotlight--clickable::after {
+  content: '';
+  position: absolute;
+  inset: -3px; /* spotlight の 3px border の外側に重ねる */
+  border: 2px solid var(--tut-accent-cyan);
+  border-radius: inherit;
+  pointer-events: none;
+  animation: tutorial-spotlight-ripple 1.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.tutorial-spotlight--clickable::after {
+  animation-delay: 0.7s;
+}
+
+@keyframes tutorial-spotlight-ripple {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  100% {
+    transform: scale(1.12);
+    opacity: 0;
+  }
+}
+
 /* 視線誘導パルス（200ms × 2回）— 維持 */
 .tutorial-spotlight.is-attention-pulse {
   animation: tutorial-attention-pulse 200ms ease-in-out 2;
@@ -1125,6 +1155,8 @@
 @media (prefers-reduced-motion: reduce) {
   .tutorial-spotlight,
   .tutorial-spotlight.is-attention-pulse,
+  .tutorial-spotlight--clickable::before,
+  .tutorial-spotlight--clickable::after,
   .tutorial-coachmark,
   .tutorial-coachmark.is-attention-pulse,
   .tutorial-coachmark__title.is-step-changed,
