@@ -189,8 +189,8 @@ img {
 
 .site-top-header__logo {
   display: inline-flex;
-  width: 38px;
-  height: 34px;
+  width: 56px;
+  height: 48px;
   align-items: center;
   justify-content: center;
 }
@@ -2418,6 +2418,11 @@ img {
 
   .site-top-header__brand-name {
     font-size: 1.05rem;
+  }
+
+  .site-top-header__logo {
+    width: 48px;
+    height: 42px;
   }
 
   .site-top-header__cta {
