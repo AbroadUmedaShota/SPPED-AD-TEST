@@ -341,7 +341,7 @@ img {
 
 .hero__statement {
   margin: 28px 0 0;
-  font-family: var(--serif);
+  font-family: var(--sans);
   font-size: clamp(1.85rem, 3.1vw, 2.7rem);
   font-weight: 500;
   letter-spacing: 0.04em;
@@ -888,7 +888,7 @@ img {
 .form-container__title {
   margin: 0 0 18px;
   color: var(--login-panel-text, var(--white));
-  font-family: var(--serif);
+  font-family: var(--sans);
   font-size: 1.4rem;
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -1400,7 +1400,7 @@ img {
 .related-services__heading h2,
 .final-cta h2 {
   margin: 0;
-  font-family: var(--serif);
+  font-family: var(--sans);
   font-size: clamp(2rem, 4.2vw, 3.35rem);
   font-weight: 500;
   letter-spacing: 0;
@@ -1475,7 +1475,7 @@ img {
 .feature-card__number {
   display: block;
   color: var(--gold);
-  font-family: var(--serif);
+  font-family: var(--sans);
   font-size: 2rem;
   line-height: 1;
 }
@@ -1501,7 +1501,7 @@ img {
 .feature-card h3,
 .flow-list h3 {
   margin: 20px 0 12px;
-  font-family: var(--serif);
+  font-family: var(--sans);
   font-size: 1.28rem;
   font-weight: 600;
   line-break: strict;
@@ -1573,7 +1573,7 @@ img {
 .flow-list__number {
   display: block;
   margin-bottom: 10px;
-  font-family: var(--serif);
+  font-family: var(--sans);
   font-size: 1.22rem;
   color: var(--ink-soft);
 }
@@ -1647,7 +1647,7 @@ img {
 }
 
 .capability-item__number {
-  font-family: var(--serif);
+  font-family: var(--sans);
   font-size: 1.1rem;
   font-weight: 700;
   color: var(--ink-soft);
@@ -1660,7 +1660,7 @@ img {
 
 .capability-item h3 {
   margin: 0;
-  font-family: var(--serif);
+  font-family: var(--sans);
   font-size: 1rem;
   font-weight: 700;
   line-break: strict;
@@ -1737,7 +1737,7 @@ img {
 }
 
 .voice-teaser__title {
-  font-family: var(--serif);
+  font-family: var(--sans);
   font-weight: 500;
   font-size: clamp(2rem, 3.1vw, 2.6rem);
   line-height: 1.35;
@@ -1841,7 +1841,7 @@ img {
 
 .voice-teaser-card__title {
   margin: 0;
-  font-family: var(--serif);
+  font-family: var(--sans);
   font-size: clamp(1.1rem, 1.2vw, 1.28rem);
   font-weight: 600;
   line-height: 1.5;
@@ -2195,7 +2195,7 @@ img {
 
 .modal__title {
   margin: 0 0 24px;
-  font-family: var(--serif);
+  font-family: var(--sans);
   font-size: 1.7rem;
 }
 
