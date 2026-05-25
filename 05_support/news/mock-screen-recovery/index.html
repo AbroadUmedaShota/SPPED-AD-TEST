@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Noto+Serif+JP:wght@500;600;700&family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../../assets/css/support-shell.css?v=20260524-timeline-cool">
-  <link rel="stylesheet" href="../../assets/css/news.css?v=20260524-timeline-cool">
+  <link rel="stylesheet" href="../../assets/css/support-shell.css?v=20260525-phase1">
+  <link rel="stylesheet" href="../../assets/css/news.css?v=20260525-phase1">
 </head>
 <body data-page-id="news-detail">
 <div class="support-shell">
@@ -45,15 +45,30 @@
     <div class="article-grid">
       <article class="article-main">
 
-        <p class="article-lede">本番アプリ、公開LP、静的サブドメインに分けて、回収対象と参考保持対象を確認しています。</p>
+        <p class="article-lede">これまでの開発過程で増えてきたモック画面群を、本番運用へ回収する対象と参考保持として残す対象に仕分ける作業を継続しています。本番アプリ、公開LP、サポートサブドメインの3つに分けて、それぞれの所属と優先度を整理しています。</p>
 
         <div class="article-body">
-          <h2 id="section-1">現在の整理対象</h2>
+          <h2 id="section-1">仕分けの目的</h2>
+          <p>初期段階では「動くもの」を素早く作るために、本番想定外のモック画面も含めて1つのリポジトリ上で並走させてきました。本番運用が近づくにつれ、どの画面を残し、どれを撤去し、どれを参考として保持するのかの方針を明確にする必要が出てきています。</p>
+
+          <h2 id="section-2">3つの帰属先</h2>
           <ul>
-            <li>サポートサブドメインに移すページと、ログイン後アプリに残すページの切り分け</li>
-            <li>FAQ・ヘルプ・お知らせ・料金プランの公開導線</li>
-            <li>STGでの表示確認と本番公開前の残課題</li>
+            <li><b>本番アプリ（ログイン後）</b>：ダッシュボード、アンケート作成、回答確認、名刺撮影、グラフなど、契約者が日常的に使う機能群</li>
+            <li><b>公開LP（ログイン前）</b>：サービス紹介、料金、導入事例、ログイン・サインアップ導線など、未契約者向けの初接点</li>
+            <li><b>サポートサブドメイン</b>：ヘルプセンター、FAQ、お知らせ、利用規約、運営会社情報など、契約・未契約を問わず必要な情報</li>
           </ul>
+
+          <h2 id="section-3">現在の仕分け状況</h2>
+          <p>主要な画面群はすでに帰属先が確定しています。残作業として、以下の点を継続して確認しています。</p>
+          <ul>
+            <li>過去のデザインリビジョンとして残しているモック画面の整理（参考保持 / 削除）</li>
+            <li>FAQ・ヘルプ記事の構成と、サポートサブドメインへの移行スケジュール</li>
+            <li>料金プラン比較ページの公開LP / サブドメイン間の振り分け</li>
+            <li>STG での動作確認と、本番反映前のチェックリスト整備</li>
+          </ul>
+
+          <h2 id="section-4">スケジュール</h2>
+          <p>5月末を目処に整理を完了し、6月以降は本番運用の最終調整フェーズに入る予定です。途中で大きな構成変更があった場合は、本ページや関連お知らせで都度ご案内します。</p>
         </div>
 
         <footer class="article-foot">
@@ -98,7 +113,7 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite" hidden>URLをコピーしました</div>
 
-<script type="module" src="../../assets/js/support-shell.js?v=20260524-timeline-cool"></script>
-<script type="module" src="../../assets/js/news-detail.js?v=20260524-timeline-cool"></script>
+<script type="module" src="../../assets/js/support-shell.js?v=20260525-phase1"></script>
+<script type="module" src="../../assets/js/news-detail.js?v=20260525-phase1"></script>
 </body>
 </html>
