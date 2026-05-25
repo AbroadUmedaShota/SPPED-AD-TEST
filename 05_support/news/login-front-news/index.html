@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Noto+Serif+JP:wght@500;600;700&family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../../assets/css/support-shell.css?v=20260524-timeline-cool">
-  <link rel="stylesheet" href="../../assets/css/news.css?v=20260524-timeline-cool">
+  <link rel="stylesheet" href="../../assets/css/support-shell.css?v=20260525-phase1">
+  <link rel="stylesheet" href="../../assets/css/news.css?v=20260525-phase1">
 </head>
 <body data-page-id="news-detail">
 <div class="support-shell">
@@ -45,15 +45,31 @@
     <div class="article-grid">
       <article class="article-main">
 
-        <p class="article-lede">ログイン前トップに表示するお知らせは、将来的にサポートサブドメイン側の公開JSONを正本として扱う想定です。</p>
+        <p class="article-lede">ログイン前トップに表示するお知らせ欄について、本番運用に向けて構成と連携の整備を進めています。サブドメインの公開 JSON を正本とし、ログイン前ページには最新3件を抜粋表示する想定です。掲載基準・差し替え手順を含めて固まり次第、正式運用へ切り替えます。</p>
 
         <div class="article-body">
-          <h2 id="section-1">予定している連携</h2>
+          <h2 id="section-1">想定する正本構成</h2>
+          <p>お知らせの正本データは、サポートサブドメイン（support.speed-ad.com）配下の静的 JSON として配置する予定です。ログイン前ページからは fetch で読み込み、最新の上位3件のみを表示します。</p>
           <ul>
-            <li><code>/news.json</code> の上位3件をログイン前トップに表示します。</li>
-            <li>詳細リンクは <code>/news/&lt;slug&gt;/</code> に接続します。</li>
-            <li>取得失敗時はお知らせセクションを非表示にし、ログイン導線を妨げない構成にします。</li>
+            <li><code>/news.json</code> の <code>items</code> 配列を date 降順で取得</li>
+            <li>ログイン前ページには上位3件のみを抜粋（タイトル＋日付）</li>
+            <li>詳細リンクは <code>05_support/news/&lt;slug&gt;/</code> に接続</li>
+            <li>取得失敗時はお知らせセクションを非表示にし、ログイン導線を阻害しない</li>
           </ul>
+
+          <h2 id="section-2">掲載基準（運用ルール）</h2>
+          <p>すべてのお知らせを無条件に正本へ載せるのではなく、以下の基準で掲載対象を選別します。</p>
+          <ul>
+            <li>サービスの利用に直接関係する情報（アップデート・メンテナンス・障害情報）</li>
+            <li>導入企業・対外向けの広報情報（プレスリリース・出展案内）</li>
+            <li>内部進捗の報告・予告など、対外向けに整っていないものは原則対象外</li>
+          </ul>
+
+          <h2 id="section-3">差し替え・更新フロー</h2>
+          <p>正本 JSON の更新は、コンテンツ担当者がリポジトリの <code>05_support/assets/data/news.json</code> を編集し、PR レビューを経て本番反映する流れを想定しています。Push 後、CDN キャッシュは最大10分で切り替わります。</p>
+
+          <h2 id="section-4">現状の表示について</h2>
+          <p>本ページを含め、現時点のお知らせ各記事は本番運用のモックアップとして用意したものです。内容・日付・件数はいずれもサンプルであり、正式運用開始時に整理し直します。</p>
         </div>
 
         <footer class="article-foot">
@@ -98,7 +114,7 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite" hidden>URLをコピーしました</div>
 
-<script type="module" src="../../assets/js/support-shell.js?v=20260524-timeline-cool"></script>
-<script type="module" src="../../assets/js/news-detail.js?v=20260524-timeline-cool"></script>
+<script type="module" src="../../assets/js/support-shell.js?v=20260525-phase1"></script>
+<script type="module" src="../../assets/js/news-detail.js?v=20260525-phase1"></script>
 </body>
 </html>

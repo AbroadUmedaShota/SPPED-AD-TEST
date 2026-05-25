@@ -191,8 +191,67 @@ function initScrollSpy() {
   headings.forEach((h) => observer.observe(h));
 }
 
+/**
+ * 前/次の記事ナビゲーション描画。
+ * - date 降順の全件配列で現在の slug を探し、前後を取得。
+ * - 「前の記事」= 公開が古い（idx+1）、「次の記事」= 公開が新しい（idx-1）。
+ * - 両端では片側のみ表示し、グリッド側の配置クラスで左右を維持する。
+ */
+async function loadPrevNext() {
+  const main = document.querySelector('.article-main');
+  if (!main) return;
+  const foot = main.querySelector('.article-foot');
+
+  try {
+    const response = await fetch(resolveSupportDataPath('news.json'), { cache: 'no-store' });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    const items = Array.isArray(data?.items) ? data.items : [];
+    const valid = sortItemsByDateDesc(items.filter((item) => isValidNewsUrl(item?.url)));
+
+    const currentSlug = getCurrentSlug();
+    const idx = valid.findIndex((item) => getSlugFromUrl(item.url) === currentSlug);
+    if (idx === -1) return;
+
+    const newer = idx > 0 ? valid[idx - 1] : null;
+    const older = idx < valid.length - 1 ? valid[idx + 1] : null;
+    if (!newer && !older) return;
+
+    const base = resolveSupportBasePath();
+    const nav = document.createElement('nav');
+    nav.className = 'article-prev-next';
+    nav.setAttribute('aria-label', '記事ナビゲーション');
+    if (!older) nav.classList.add('only-newer');
+    if (!newer) nav.classList.add('only-older');
+
+    const prevHtml = older ? renderPrevNextLink(older, 'prev', base) : '';
+    const nextHtml = newer ? renderPrevNextLink(newer, 'next', base) : '';
+    nav.innerHTML = prevHtml + nextHtml;
+
+    if (foot) main.insertBefore(nav, foot);
+    else main.appendChild(nav);
+  } catch (error) {
+    console.error('[news-detail] Failed to load prev/next:', error);
+  }
+}
+
+function renderPrevNextLink(item, dir, base) {
+  const slug = getSlugFromUrl(item.url);
+  const href = escapeHtml(`${base}/05_support/news/${slug}/`);
+  const title = escapeHtml(item.title || '');
+  const dirLabel = dir === 'prev' ? '前の記事' : '次の記事';
+  const arrow = dir === 'prev' ? '←' : '→';
+  return `
+    <a class="pn-link pn-${dir}" href="${href}">
+      <span class="pn-dir">${dir === 'prev' ? `${arrow} ${dirLabel}` : `${dirLabel} ${arrow}`}</span>
+      <span class="pn-title">${title}</span>
+    </a>
+  `;
+}
+
 buildTOC();
 setReadMin();
 bindShareButtons();
 loadRelated();
+loadPrevNext();
 initScrollSpy();

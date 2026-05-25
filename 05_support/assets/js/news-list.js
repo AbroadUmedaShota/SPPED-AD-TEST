@@ -247,6 +247,101 @@ function hideFeatured() {
   if (featured) featured.setAttribute('hidden', '');
 }
 
+/* ============================================================
+   Category Filter
+   - 「すべて」＋ news.json 出現カテゴリで動的にチップを構築
+   - currentCategory=null は「すべて」を意味する
+   - 選択変更時は Featured / Timeline / tl-status を全て再描画
+   ============================================================ */
+
+const FILTER_LABEL_ALL = 'すべて';
+const CATEGORY_DISPLAY_ORDER = [
+  'アップデート',
+  'お知らせ',
+  'メンテナンス',
+  '障害情報',
+  'プレスリリース',
+];
+
+let allItems = [];
+let currentCategory = null;
+
+function getFilteredItems() {
+  if (!currentCategory) return allItems;
+  return allItems.filter((item) => resolveTagLabel(item) === currentCategory);
+}
+
+function countByCategory(items) {
+  const counts = new Map();
+  for (const item of items) {
+    const label = resolveTagLabel(item);
+    if (!label) continue;
+    counts.set(label, (counts.get(label) || 0) + 1);
+  }
+  return counts;
+}
+
+function renderChip(label, count, category, isActive) {
+  const variant = resolveTagVariant(label);
+  const dataAttr = category ? ` data-category="${escapeHtml(category)}"` : '';
+  const activeClass = isActive ? ' is-active' : '';
+  const variantClass = variant ? ` ${variant.replace('news-tag--', 'news-filter__chip--')}` : '';
+  return `
+    <button type="button" class="news-filter__chip${variantClass}${activeClass}"${dataAttr} aria-pressed="${isActive}">
+      <span class="news-filter__chip-label">${escapeHtml(label)}</span>
+      <span class="news-filter__chip-count">${count}</span>
+    </button>
+  `;
+}
+
+function renderFilterChips() {
+  const container = document.getElementById('news-filter');
+  if (!container) return;
+
+  const counts = countByCategory(allItems);
+  const chips = [];
+  chips.push(renderChip(FILTER_LABEL_ALL, allItems.length, null, currentCategory === null));
+  for (const label of CATEGORY_DISPLAY_ORDER) {
+    const c = counts.get(label);
+    if (c && c > 0) {
+      chips.push(renderChip(label, c, label, currentCategory === label));
+    }
+  }
+  container.innerHTML = chips.join('');
+  container.removeAttribute('hidden');
+
+  container.querySelectorAll('.news-filter__chip').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const cat = btn.dataset.category || null;
+      if (currentCategory === cat) return;
+      currentCategory = cat;
+      renderFilterChips();
+      renderFiltered();
+    });
+  });
+}
+
+function renderFiltered() {
+  const filtered = getFilteredItems();
+
+  const tlCount = document.getElementById('tl-count');
+  if (tlCount) tlCount.textContent = String(filtered.length);
+  const status = document.getElementById('tl-status');
+  if (status) {
+    if (filtered.length > 0) status.removeAttribute('hidden');
+    else status.setAttribute('hidden', '');
+  }
+
+  if (filtered.length === 0) {
+    hideFeatured();
+    renderEmptyState();
+    return;
+  }
+
+  renderFeatured(filtered[0]);
+  renderTimeline(filtered);
+}
+
 async function loadNewsList() {
   // resolveSupportBasePath は将来の絶対パス遷移に備えて参照（現状は相対遷移）。
   void resolveSupportBasePath();
@@ -260,23 +355,23 @@ async function loadNewsList() {
     const items = Array.isArray(data?.items) ? data.items : [];
 
     const sorted = sortItemsByDateDesc(items);
-    const validItems = sorted.filter((item) => isValidNewsUrl(item?.url));
+    allItems = sorted.filter((item) => isValidNewsUrl(item?.url));
 
-    const groups = groupByMonth(validItems);
+    const groups = groupByMonth(allItems);
     setMeta({
-      count: validItems.length,
+      count: allItems.length,
       updatedAt: data?.updatedAt,
       monthCount: groups.length,
     });
 
-    if (validItems.length === 0) {
+    if (allItems.length === 0) {
       hideFeatured();
       renderEmptyState();
       return;
     }
 
-    renderFeatured(validItems[0]);
-    renderTimeline(validItems);
+    renderFilterChips();
+    renderFiltered();
   } catch (error) {
     console.error('[news-list] Failed to load news.json:', error);
     setMeta({ count: 0, updatedAt: null, monthCount: 0 });

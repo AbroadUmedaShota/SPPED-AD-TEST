@@ -1125,6 +1125,7 @@ img {
 }
 
 .public-news-section {
+  padding: 12px 0 60px;
   background: linear-gradient(180deg, #fffefb 0%, var(--white) 100%);
 }
 
@@ -1140,7 +1141,7 @@ img {
 }
 
 .public-news-bar {
-  width: min(1160px, calc(100% - 112px));
+  width: min(1260px, calc(100% - 112px));
   min-height: 52px;
   margin: 0 auto;
   display: grid;
