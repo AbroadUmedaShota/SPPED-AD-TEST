@@ -91,11 +91,13 @@ col.c-iso{width:5.5%;} col.c-gen{width:14.5%;} col.c-jud{width:11%;} col.c-memo{
 
 <div class="toolbar">
   <span>採用語の選定：①②③のチップをクリックで【採用】欄に反映（再クリックで解除・複数選択可）。手入力可。メモも記入可。</span>
+  <button type="button" id="btn-fetch-server">最新を取得</button>
+  <button type="button" id="btn-migrate-local" title="このブラウザのlocalStorageの全採用語・メモをスプシへ一括送信（初回データ移行用）">localStorage→スプシへ移行</button>
   <button type="button" id="btn-export-csv">CSVダウンロード</button>
   <button type="button" id="btn-import-csv">CSV読み込み</button>
   <input type="file" id="csv-file" accept=".csv,text/csv" style="display:none">
   <button type="button" id="btn-clear-all" class="danger">全クリア</button>
-  <span class="hint">（保存先: このブラウザの localStorage）</span>
+  <span class="hint" id="sync-status">ローカル保存のみ（GAS未設定）</span>
   <span class="count" id="decision-count">採用済 0 / 455</span>
 </div>
 
@@ -573,17 +575,123 @@ col.c-iso{width:5.5%;} col.c-gen{width:14.5%;} col.c-jud{width:11%;} col.c-memo{
   var STORAGE_PREFIX = 'glossary-decision:v1:';
   var SOURCE_LABELS = ['①ユーザー画面', '②仕様書', '③Backlog wiki'];
 
+  // === 共同編集用 GAS Web App URL（デプロイ後に貼り付け） ===
+  // 空のままだとローカル保存のみ動作（オフライン互換モード）
+  var GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbz-TRcV-xJ_tvfMgZjhgxFXCbj9GtoAniLJA9o2560JOgLbWoFjvJdt0BD5Iff-PPqn/exec';
+  var EDITOR_NAME_KEY = 'glossary-decision:editor';
+
+  function getEditorName() {
+    var n = localStorage.getItem(EDITOR_NAME_KEY);
+    if (n) return n;
+    n = (prompt('編集者名を入力してください（スプシの「更新者」列に記録されます）') || '').trim();
+    if (n) localStorage.setItem(EDITOR_NAME_KEY, n);
+    return n || '匿名';
+  }
+  function setSyncStatus(t) {
+    var el = document.getElementById('sync-status');
+    if (el) el.textContent = t;
+  }
+
+  var pushQueue = {}, pushTimer = null;
+  function queuePush(id, adopt, memo) {
+    if (!GAS_WEB_APP_URL) return;
+    pushQueue[id] = { adopt: adopt, memo: memo };
+    if (pushTimer) clearTimeout(pushTimer);
+    pushTimer = setTimeout(flushPush, 500);
+  }
+  function flushPush() {
+    pushTimer = null;
+    if (!GAS_WEB_APP_URL) return;
+    var editor = getEditorName();
+    var ids = Object.keys(pushQueue);
+    if (!ids.length) return;
+    var ops = ids.map(function (id) {
+      return { id: id, adopt: pushQueue[id].adopt, memo: pushQueue[id].memo, editor: editor };
+    });
+    pushQueue = {};
+    setSyncStatus('保存中… ' + ops.length + '件');
+    fetch(GAS_WEB_APP_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ ops: ops })
+    }).then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (j && j.ok) setSyncStatus('保存済 ' + new Date().toLocaleTimeString());
+        else setSyncStatus('保存失敗: ' + (j && j.error || 'unknown'));
+      })
+      .catch(function (e) { setSyncStatus('保存失敗: ' + e); });
+  }
+
+  function fetchServer() {
+    if (!GAS_WEB_APP_URL) { setSyncStatus('ローカル保存のみ（GAS未設定）'); return Promise.resolve(); }
+    setSyncStatus('取得中…');
+    return fetch(GAS_WEB_APP_URL)
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (!j || !j.ok) throw new Error((j && j.error) || 'unknown');
+        var data = j.data || {};
+        var applied = 0;
+        Object.keys(data).forEach(function (id) {
+          var tr = document.querySelector('tr[data-row-id="' + id + '"]');
+          if (!tr) return;
+          var ai = tr.querySelector('.adopt-input');
+          var mi = tr.querySelector('.memo-input');
+          if (!ai || !mi) return;
+          var d = data[id];
+          ai.value = d.adopt || '';
+          mi.value = d.memo || '';
+          saveRowLocal(id, ai.value, mi.value);
+          updateChipHighlight(tr);
+          applied++;
+        });
+        updateCount();
+        setSyncStatus('取得完了 ' + applied + '件 ' + new Date().toLocaleTimeString());
+      })
+      .catch(function (e) { setSyncStatus('取得失敗: ' + e); });
+  }
+
+  function migrateLocalToServer() {
+    if (!GAS_WEB_APP_URL) { alert('GAS_WEB_APP_URL が未設定です。HTML 内の GAS_WEB_APP_URL に Web App URL を貼ってください。'); return; }
+    if (!confirm('このブラウザのlocalStorageに保存された採用語・メモを、スプシへ一括送信します。\nスプシ側の該当IDの既存内容は上書きされます。続行しますか？')) return;
+    var editor = getEditorName();
+    var ops = [];
+    Object.keys(localStorage).forEach(function (k) {
+      if (k.indexOf(STORAGE_PREFIX) !== 0) return;
+      var id = k.slice(STORAGE_PREFIX.length);
+      try {
+        var v = JSON.parse(localStorage.getItem(k));
+        ops.push({ id: id, adopt: v.adopt || '', memo: v.memo || '', editor: editor });
+      } catch (e) { /* skip */ }
+    });
+    if (!ops.length) { alert('移行対象がありません（このブラウザに保存データなし）'); return; }
+    setSyncStatus('移行中… ' + ops.length + '件');
+    fetch(GAS_WEB_APP_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ ops: ops })
+    }).then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (j && j.ok) { alert('スプシへ ' + ops.length + ' 件を移行しました'); setSyncStatus('移行完了 ' + ops.length + '件'); }
+        else { alert('失敗: ' + (j && j.error)); setSyncStatus('移行失敗'); }
+      })
+      .catch(function (e) { alert('失敗: ' + e); setSyncStatus('移行失敗'); });
+  }
+
   function loadRow(id) {
     var raw = localStorage.getItem(STORAGE_PREFIX + id);
     if (!raw) return null;
     try { return JSON.parse(raw); } catch (e) { return null; }
   }
-  function saveRow(id, adopt, memo) {
+  function saveRowLocal(id, adopt, memo) {
     if (!adopt && !memo) {
       localStorage.removeItem(STORAGE_PREFIX + id);
     } else {
       localStorage.setItem(STORAGE_PREFIX + id, JSON.stringify({ adopt: adopt || '', memo: memo || '' }));
     }
+  }
+  function saveRow(id, adopt, memo) {
+    saveRowLocal(id, adopt, memo);
+    queuePush(id, adopt || '', memo || '');
   }
   function updateCount() {
     var total = document.querySelectorAll('tr[data-row-id]').length;
@@ -768,7 +876,7 @@ col.c-iso{width:5.5%;} col.c-gen{width:14.5%;} col.c-jud{width:11%;} col.c-memo{
   }
 
   function clearAll() {
-    if (!confirm('全ての採用語・メモを削除します。よろしいですか？\n（この操作は取り消せません。先にCSVダウンロード推奨）')) return;
+    if (!confirm('全ての採用語・メモをこのブラウザのローカルキャッシュから削除します。\nスプシ側のデータは消えません（消したい場合はスプシで直接削除してください）。\n削除後「最新を取得」を押すとスプシから再取得されます。よろしいですか？\n（先にCSVダウンロード推奨）')) return;
     Object.keys(localStorage).forEach(function (k) {
       if (k.indexOf(STORAGE_PREFIX) === 0) localStorage.removeItem(k);
     });
@@ -796,6 +904,12 @@ col.c-iso{width:5.5%;} col.c-gen{width:14.5%;} col.c-jud{width:11%;} col.c-memo{
       }
     });
   }
+  var btnFetch = document.getElementById('btn-fetch-server');
+  if (btnFetch) btnFetch.addEventListener('click', fetchServer);
+  var btnMigrate = document.getElementById('btn-migrate-local');
+  if (btnMigrate) btnMigrate.addEventListener('click', migrateLocalToServer);
+
+  fetchServer();
 })();
 </script>
 </body></html>
