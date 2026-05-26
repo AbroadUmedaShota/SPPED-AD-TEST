@@ -16,21 +16,6 @@ function getCurrentSlug() {
   return last === 'index.html' ? segs[segs.length-2] : last;
 }
 
-function buildTOC() {
-  const toc = document.getElementById('article-toc');
-  if (!toc) return;
-  const headings = document.querySelectorAll('.article-body h2');
-  if (!headings.length) {
-    toc.closest('.aside-card')?.setAttribute('hidden', '');
-    return;
-  }
-  toc.innerHTML = Array.from(headings).map((h, i) => {
-    const id = h.id || `section-${i+1}`;
-    h.id = id;
-    return `<li><a href="#${esc(id)}">${esc(h.textContent)}</a></li>`;
-  }).join('');
-}
-
 function calculateReadMin() {
   const main = document.querySelector('.article-main');
   if (!main) return 1;
@@ -106,23 +91,6 @@ async function loadRelated() {
   }
 }
 
-function initScrollSpy() {
-  const headings = document.querySelectorAll('.article-body h2[id]');
-  const tocLinks = document.querySelectorAll('#article-toc a');
-  if (!headings.length || !tocLinks.length) return;
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        const id = entry.target.id;
-        tocLinks.forEach((link) => link.classList.toggle('on', link.getAttribute('href') === `#${id}`));
-      }
-    });
-  }, { rootMargin: '-30% 0px -50% 0px' });
-  headings.forEach(h => observer.observe(h));
-}
-
-buildTOC();
 setReadMin();
 bindShareButtons();
 loadRelated();
-initScrollSpy();
