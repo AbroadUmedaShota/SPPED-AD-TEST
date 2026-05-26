@@ -1,4 +1,4 @@
-import { resolveSupportDataPath, debounce } from './utils.js';
+import { resolveSupportBasePath, resolveSupportDataPath, debounce } from './utils.js';
 import { escapeHtml, highlightText } from './shared/escape.js';
 
 // カテゴリID → アクセントカラー / アイコン
@@ -19,9 +19,10 @@ function getIcon(categoryId, fallback) {
 }
 
 function linkSupportReferences(answerHtml) {
+    const plansPath = `${resolveSupportBasePath()}/plans/`;
     return answerHtml.replace(
         /料金プラン比較表/g,
-        '<a href="/plans/">料金プラン比較表</a>'
+        `<a href="${plansPath}">料金プラン比較表</a>`
     );
 }
 
