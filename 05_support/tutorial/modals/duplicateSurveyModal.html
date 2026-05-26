@@ -1,0 +1,63 @@
+<div id="duplicateSurveyModal" class="fixed inset-0 flex items-center justify-center p-4 modal-overlay hidden z-[60]"
+    data-state="closed">
+    <div class="bg-surface rounded-lg shadow-xl p-6 w-full max-w-xl modal-content-transition" data-state="closed">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-on-surface text-xl font-semibold">アンケートを複製</h3>
+            <button class="text-on-surface-variant hover:text-on-surface" id="closeDuplicateSurveyModalBtn"
+                aria-label="モーダルを閉じる">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+        <form class="space-y-4">
+            <div class="input-group">
+                <input class="input-field" id="duplicateSurveyName" name="duplicateSurveyName" placeholder=" "
+                    type="text" required />
+                <label class="input-label" for="duplicateSurveyName">アンケート名</label>
+                <p class="error-message hidden" id="duplicateSurveyName-error"></p>
+                <button type="button" class="help-trigger help-icon-button material-icons"
+                    data-help-key="surveyName" data-help-target="duplicate-survey-name"
+                    aria-label="アンケート名の説明を表示">help_outline</button>
+            </div>
+            <div class="input-group">
+                <input class="input-field" id="duplicateDisplayTitle" name="duplicateDisplayTitle" placeholder=" "
+                    type="text" required />
+                <label class="input-label" for="duplicateDisplayTitle">表示タイトル</label>
+                <p class="error-message hidden" id="duplicateDisplayTitle-error"></p>
+                <button type="button" class="help-trigger help-icon-button material-icons"
+                    data-help-key="surveyDisplayTitle" data-help-target="duplicate-display-title"
+                    aria-label="表示タイトルの説明を表示">help_outline</button>
+            </div>
+            <div class="input-group">
+                <textarea class="input-field" id="duplicateSurveyMemo" name="duplicateSurveyMemo" placeholder=" "
+                    rows="3"></textarea>
+                <label class="input-label" for="duplicateSurveyMemo">メモ（任意）</label>
+                <p class="error-message hidden" id="duplicateSurveyMemo-error"></p>
+                <button type="button" class="help-trigger help-icon-button material-icons" data-help-key="internalMemo"
+                    data-help-target="duplicate-survey-memo" aria-label="メモの説明を表示">help_outline</button>
+            </div>
+            <div class="input-group">
+                <div class="input-with-trailing-actions">
+                    <input type="text" id="duplicateSurveyPeriodRange" name="duplicateSurveyPeriodRange" placeholder=" "
+                        class="input-field pr-10" required>
+                    <label class="input-label" for="duplicateSurveyPeriodRange">回答期間</label>
+                    <div class="field-trailing-actions">
+                        <span class="field-action-button material-icons" aria-hidden="true">calendar_today</span>
+                        <button type="button" class="help-trigger help-icon-button material-icons" data-help-key="surveyPeriod"
+                            data-help-target="duplicate-survey-period" aria-label="回答期間の説明を表示">help_outline</button>
+                    </div>
+                </div>
+                <p class="error-message hidden" id="duplicateSurveyPeriodRange-error"></p>
+            </div>
+            <div class="flex justify-end gap-3 pt-4">
+                <button
+                    class="bg-secondary-container text-on-secondary-container py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal tracking-wide transition-colors"
+                    id="cancelDuplicateSurveyModalBtn" type="button" aria-label="キャンセル">キャンセル</button>
+                <button id="confirmDuplicateSurveyBtn"
+                    class="button-primary text-on-primary py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal transition-colors"
+                    type="submit" aria-label="アンケートを複製して作成">
+                    複製して作成
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

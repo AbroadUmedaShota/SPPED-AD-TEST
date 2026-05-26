@@ -91,7 +91,7 @@
             <div id="sidebar-placeholder"></div>
 
             <main class="flex-1 w-full ml-0 md:ml-64 px-4 py-8 md:py-12 flex justify-center">
-                <div class="max-w-3xl w-full">
+                <div id="premium-registration-shell" class="premium-registration-shell max-w-3xl w-full">
 
                     <!-- Breadcrumb -->
                     <nav aria-label="breadcrumb" class="mb-6">
@@ -332,6 +332,13 @@
                             <div id="billing-start-date-info" class="mt-4">
                                 <!-- ここに課金開始日に関する情報がJavaScriptによって挿入されます -->
                             </div>
+                            <div class="premium-registration-planned-note">
+                                <span class="material-icons" aria-hidden="true">schedule</span>
+                                <p>
+                                    <strong>近日対応の機能について</strong>
+                                    設問分岐、改ページ、進捗バー、SPEEDレビュー、独自ドメイン送信、ロゴ非表示、Slack/SFA/CRM連携は順次提供予定です。
+                                </p>
+                            </div>
                         </div>
 
                         <!-- Consent Text -->
@@ -384,32 +391,63 @@
 
                     <!-- Step 3: Completion -->
                     <section id="step-complete" class="hidden">
-                        <div class="premium-bg-effect">
-                            <div class="particle"></div>
-                            <div class="particle"></div>
-                            <div class="particle"></div>
-                            <div class="particle"></div>
-                        </div>
-
-                        <div class="premium-content">
-                            <div class="premium-badge-container">
-                                <div class="premium-badge-glow"></div>
-                                <div class="premium-badge-icon">
+                        <div class="premium-registration-complete-card">
+                            <p class="premium-registration-section-label">登録ありがとうございました</p>
+                            <div class="premium-registration-profile">
+                                <div class="premium-registration-status-icon" aria-hidden="true">
                                     <span class="material-icons">workspace_premium</span>
                                 </div>
+                                <div class="premium-registration-profile__body">
+                                    <p class="premium-registration-greeting">Welcome to Premium</p>
+                                    <h2>お申し込みありがとうございます</h2>
+                                    <div class="premium-registration-meta">
+                                        <span class="premium-registration-badge">
+                                            <span class="material-icons" aria-hidden="true">verified</span>
+                                            ACTIVE
+                                        </span>
+                                        <span>本日から利用可能なPremium機能を開始できます</span>
+                                    </div>
+                                </div>
                             </div>
-
-                            <h2 class="premium-title">Welcome to Premium</h2>
-
-                            <p class="premium-subtitle">
-                                プレミアムプランへの登録が完了しました。<br>
-                                あなただけの特別な体験が、今ここから始まります。
-                            </p>
-
-                            <div>
-                                <a href="index.html" class="btn-premium">
-                                    <span>ダッシュボードへ戻る</span>
-                                    <span class="material-icons">arrow_forward</span>
+                            <div class="premium-registration-celebration">
+                                <span class="material-icons" aria-hidden="true">auto_awesome</span>
+                                <div>
+                                    <h3>展示会後のリード活用を、ここから広げられます</h3>
+                                    <p>最長1年保存、CSV出力、多言語対応を使って、回答・名刺データを共有しやすい状態に整えられます。</p>
+                                </div>
+                            </div>
+                            <div class="premium-registration-notice">
+                                <span class="material-icons" aria-hidden="true">info</span>
+                                <p>
+                                    <strong>登録手続きが完了しました。</strong>
+                                    請求書は月末締めで発行され、管理画面から確認できます。
+                                </p>
+                            </div>
+                            <dl class="premium-registration-detail-list">
+                                <div>
+                                    <dt>すぐ使える価値</dt>
+                                    <dd>最長1年保存 / CSV出力 / 多言語対応</dd>
+                                </div>
+                                <div>
+                                    <dt>順次提供予定</dt>
+                                    <dd>設問分岐 / 改ページ / 進捗バー / SPEEDレビュー / 独自ドメイン送信 / ロゴ非表示 / Slack・SFA・CRM連携</dd>
+                                </div>
+                                <div>
+                                    <dt>請求書払い</dt>
+                                    <dd>月末締めで発行される請求書を管理画面から確認できます。</dd>
+                                </div>
+                            </dl>
+                            <div class="premium-registration-support-footer">
+                                <span class="material-icons" aria-hidden="true">support_agent</span>
+                                <p>
+                                    <strong>サポートが必要ですか？</strong>
+                                    ご利用についてのご質問は、<a href="bug-report.html">お問い合わせフォーム</a>または<a href="https://support.speed-ad.com/help/" target="_blank" rel="noopener noreferrer">サポートセンター</a>までお寄せください。
+                                </p>
+                            </div>
+                            <div class="premium-registration-actions">
+                                <a href="index.html" class="premium-registration-button premium-registration-button--primary">
+                                    <span>ダッシュボードで使い始める</span>
+                                    <span class="material-icons" aria-hidden="true">arrow_forward</span>
                                 </a>
                             </div>
                         </div>
@@ -430,10 +468,13 @@
 
     <!-- Account Info Check Modal -->
     <div id="account-check-modal"
-        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden opacity-0 transition-opacity duration-300">
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden opacity-0 transition-opacity duration-300"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="account-check-title">
         <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4 transform scale-95 transition-transform duration-300"
             id="account-check-content">
-            <h3 class="text-xl font-bold text-gray-900 mb-4">登録情報の確認</h3>
+            <h3 id="account-check-title" class="text-xl font-bold text-gray-900 mb-4">登録情報の確認</h3>
             <p class="text-gray-600 mb-6">
                 アカウントに登録されている以下の情報を使用して、プレミアムプランへの登録を行いますか？
             </p>
@@ -494,10 +535,13 @@
 
     <!-- Leave Prevention Modal -->
     <div id="prevent-leave-modal"
-        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden opacity-0 transition-opacity duration-300">
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden opacity-0 transition-opacity duration-300"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="prevent-leave-title">
         <div class="bg-white rounded-xl shadow-2xl p-8 max-w-sm w-full mx-4 transform scale-95 transition-transform duration-300"
             id="prevent-leave-content">
-            <h3 class="text-xl font-bold text-gray-900 mb-4">入力中の情報があります</h3>
+            <h3 id="prevent-leave-title" class="text-xl font-bold text-gray-900 mb-4">入力中の情報があります</h3>
             <p class="text-gray-600 mb-6">
                 このページを離れると、入力中の情報が失われますがよろしいですか？
             </p>

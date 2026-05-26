@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Maintenance | SPEED AD News">
+  <defs>
+    <linearGradient id="mntBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f1e2b8"/>
+      <stop offset="100%" stop-color="#e0cb8e"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#mntBg)"/>
+  <g stroke="#5e4413" stroke-width="3" opacity="0.10" fill="none" stroke-linecap="round">
+    <line x1="1020" y1="60"  x2="1140" y2="60"/>
+    <line x1="1020" y1="90"  x2="1140" y2="90"/>
+    <line x1="1020" y1="120" x2="1140" y2="120"/>
+  </g>
+  <g transform="translate(600,240)" fill="#5e4413">
+    <path d="
+      M -16 -110 L 16 -110 L 22 -78 L 50 -68 L 74 -88 L 96 -66 L 76 -42 L 86 -14 L 118 -8 L 118 24 L 86 30 L 76 58 L 96 82 L 74 104 L 50 84 L 22 94 L 16 126 L -16 126 L -22 94 L -50 84 L -74 104 L -96 82 L -76 58 L -86 30 L -118 24 L -118 -8 L -86 -14 L -76 -42 L -96 -66 L -74 -88 L -50 -68 L -22 -78 Z
+      M -44 8 a 44 44 0 1 0 88 0 a 44 44 0 1 0 -88 0 Z
+    " fill-rule="evenodd"/>
+  </g>
+  <line x1="560" y1="400" x2="640" y2="400" stroke="#b08544" stroke-width="2"/>
+  <text x="600" y="448" text-anchor="middle" font-family="'Cormorant Garamond','Noto Serif JP',serif" font-size="34" font-weight="500" letter-spacing="14" fill="#5e4413">MAINTENANCE</text>
+</svg>

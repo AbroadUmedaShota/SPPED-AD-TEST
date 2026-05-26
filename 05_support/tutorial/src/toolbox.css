@@ -1,0 +1,70 @@
+/* toolbox.css */
+.handwriting-container {
+    position: relative;
+}
+
+.toolbox {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    padding: 8px;
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+
+.tool-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 8px;
+}
+
+.tool-group:not(:last-child) {
+    border-right: 1px solid #ccc;
+}
+
+
+.tool-button {
+    background-color: transparent;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    padding: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tool-button:hover {
+    background-color: #e0e0e0;
+}
+
+.tool-button.active {
+    border-color: #007bff;
+    background-color: #cce5ff;
+}
+
+.color-palette {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+}
+.color-palette::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+.color-palette::-webkit-color-swatch {
+    border: 1px solid #999;
+    border-radius: 50%;
+}
+
+.thickness-slider {
+    width: 100px;
+}

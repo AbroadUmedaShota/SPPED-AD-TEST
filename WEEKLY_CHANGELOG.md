@@ -1,4 +1,18 @@
-# 変更履歴 (2025-10-08 〜 2026-03-17)
+# 変更履歴 (2025-10-08 〜 2026-04-02)
+
+## 2026-04-02 (木)
+- **AGENTS.md およびリポジトリガイドラインの更新**:
+    - AIエージェントが本リポジトリで活動する際の詳細な行動指針、コーディング標準、およびドキュメント管理ルールを `docs/AGENTS.md` に集約・更新。
+- **要件定義・画面設計ドキュメントの拡充と更新**:
+    - **新規要件定義の追加**: 名刺データ化設定 (`16_bizcard_settings_requirements.md`) およびお礼メール設定 (`17_thank_you_email_settings_requirements.md`) の詳細な画面要件定義書を新規作成。
+    - **ツールチップ仕様の包括的更新**: `docs/画面設計/仕様/tooltip_spec.md` を更新し、ダッシュボード全域のヘルプアイコン表示内容と表示ロジックを再定義。
+    - **既存要件のブラッシュアップ**: `thankYouEmailSettings_requirements.md` および `bizcardSettings_requirements.md` の記述を最新の実装方針に合わせて微調整。
+- **運用ハンドブックおよびガイドラインの整備**:
+    - `06_OPERATIONS_GUIDE.md` の記述を最新化し、新たにバックログ・イシュー管理に特化したガイド `07_BACKLOG_ISSUE_GUIDE.md` を作成。運用フローの透明性を向上。
+- **会議録の追加**:
+    - 2026-04-02 実施の定例/企画会議に関する資料を社内 private 管理先へ整理。
+- **プロジェクト戦略・企画ドキュメントの更新**:
+    - `03_spdad2026_planning_consultation_summary.md` (企画相談会まとめ)、`04_spdad2026_mock_review_resume.md` (モックレビュー結果)、`06_backlog_response_policy_2026-03-19.md` (バックログ対応方針) を更新し、次年度に向けた開発の方向性を明文化。
 
 ## 2026-03-19 (木)
 - **名刺データ化設定画面 (`bizcardSettings.html`) 「見込み枚数」UIの改善 (#276)**:
@@ -59,7 +73,7 @@
     - 各画面のヘルプアイコン内容を定義した `tooltip_spec.md` を新規作成。
 - **利用規約の更新および規約一覧ドキュメントの作成**:
     - `02_dashboard/terms-of-service.html` に、AWS障害や外部API（Google OCR等）障害に関する免責条項を追記。
-    - 各種規約（利用規約、プライバシーポリシー等）の所在と主要な免責事項をまとめた `docs/プロダクト/法務・規約/00_TERMS_SUMMARY.md` を作成。
+    - 各種規約の所在と主要な免責事項を社内 private 管理先で整理。
 - **サービス品質保証（SLA）の追記**:
     - `00_PROJECT_OVERVIEW.md` に、データ化の目標時間（送信から1時間以内）をSLAとして追記。
 
@@ -124,7 +138,7 @@
     - **Excelレポート出力**: `ExcelJS` を使用し、グラフと集計データをセットにしたExcel出力機能を実装。
 
 ## 2026-02-08 (日)
-- **プレミアム登録画面 要件定義書の作成**: 新規プレミアム登録画面の要件定義書（`docs/要件定義/premium_registration_requirements.md`）を作成したぺこ。
+- **プレミアム登録画面 要件定義書の作成**: 新規プレミアム登録画面の要件整理を行い、shared 正本は `docs/画面設計/仕様/premium/premium_registration_requirements.md` で管理する形にしたぺこ。
 
 ## 2026-02-06 (金)
 - **Visual Insight（画像ドリルダウン）機能の実装 (#236)**:

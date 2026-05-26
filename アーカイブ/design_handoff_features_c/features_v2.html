@@ -1,0 +1,767 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SPEEDAD Premium — Features セクション 表示3案</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="sections.css">
+<style>
+  body{margin:0;background:#eef1f5;font-family:'Noto Sans JP',sans-serif}
+  .v2-wrap{padding:24px}
+  .v2-stage{max-width: 1280px; margin: 0 auto 56px}
+  .v2-note{
+    margin: 0 0 12px;
+    font-family: 'Inter',sans-serif; font-size:11px; font-weight:700;
+    letter-spacing:.14em; color:#64748b; text-transform:uppercase;
+    display:flex; align-items:center; gap:12px;
+  }
+  .v2-note .num{
+    width:22px; height:22px; border-radius:50%;
+    background:#0f172a; color:#fff;
+    display:inline-flex; align-items:center; justify-content:center;
+    font-size:11px; font-family:'Inter',sans-serif;
+  }
+  .v2-note .ja{color:#334155; font-family:'Noto Sans JP',sans-serif; letter-spacing:0; font-weight:600; font-size:13px; text-transform:none}
+
+  /* ===== Variant A: 番号付き罫線リスト ===== */
+  .featA{
+    background:#fff; border:1px solid var(--slate-200);
+    border-radius: var(--r-2xl); padding: 36px 40px;
+  }
+  .featA .s-head{margin-bottom: 28px}
+  .featA .s-head .label{font-family: var(--font-en); font-size:11px; font-weight:700; letter-spacing:.14em; color: var(--blue-700); text-transform:uppercase}
+  .featA .s-head h2{font-size:26px; font-weight:800; letter-spacing:-.01em; margin: 8px 0 8px; color: var(--slate-950)}
+  .featA .s-head .sub{color: var(--slate-600); font-size:14px}
+
+  .featA-list{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 48px;
+  }
+  .featA-row{
+    display:grid;
+    grid-template-columns: 38px 1fr;
+    gap: 16px;
+    padding: 18px 0;
+    border-top:1px solid var(--slate-200);
+    align-items:start;
+  }
+  .featA-row:nth-last-child(-n+2){border-bottom:1px solid var(--slate-200)}
+  .featA-row .num{
+    font-family: var(--font-en);
+    font-size:12px; font-weight:700; color: var(--blue-700);
+    letter-spacing:.08em;
+    padding-top: 4px;
+  }
+  .featA-row .body .top{
+    display:flex; align-items:center; gap:10px; margin-bottom:6px;
+  }
+  .featA-row .body .top .icon{font-size:18px; color: var(--slate-500)}
+  .featA-row .body .top .t{font-size:15px; font-weight:700; color: var(--slate-950)}
+  .featA-row .body .top .tag{
+    margin-left:auto;
+    font-family: var(--font-en); font-size:10px; font-weight:700;
+    letter-spacing:.08em; color: var(--slate-500);
+    padding: 2px 7px; border-radius:4px; background: var(--slate-100);
+  }
+  .featA-row .body .d{
+    font-size:13px; color: var(--slate-600); line-height:1.7;
+  }
+
+  /* ===== Variant B: テーブル風 3カラム ===== */
+  .featB{
+    background:#fff; border:1px solid var(--slate-200);
+    border-radius: var(--r-2xl); padding: 36px 40px;
+  }
+  .featB .s-head{margin-bottom: 24px}
+  .featB .s-head .label{font-family: var(--font-en); font-size:11px; font-weight:700; letter-spacing:.14em; color: var(--blue-700); text-transform:uppercase}
+  .featB .s-head h2{font-size:26px; font-weight:800; letter-spacing:-.01em; margin: 8px 0 8px; color: var(--slate-950)}
+  .featB .s-head .sub{color: var(--slate-600); font-size:14px}
+
+  .featB-table{border-top:1px solid var(--slate-200)}
+  .featB-head{
+    display:grid; grid-template-columns: 220px 1fr 180px;
+    padding: 12px 0;
+    border-bottom:1px solid var(--slate-200);
+    font-family: var(--font-en);
+    font-size:10.5px; font-weight:700; letter-spacing:.14em;
+    text-transform:uppercase; color: var(--slate-500);
+  }
+  .featB-row{
+    display:grid; grid-template-columns: 220px 1fr 180px;
+    padding: 18px 0;
+    border-bottom:1px solid var(--slate-200);
+    align-items:start;
+  }
+  .featB-row .col-name{
+    display:flex; align-items:center; gap:12px;
+  }
+  .featB-row .col-name .ic{
+    width:32px; height:32px; border-radius:8px;
+    background: var(--blue-50); color: var(--blue-700);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .featB-row .col-name .ic .icon{font-size:18px}
+  .featB-row .col-name .t{font-size:14px; font-weight:700; color: var(--slate-950)}
+  .featB-row .col-desc{font-size:13px; color: var(--slate-600); line-height:1.7; padding-right: 24px}
+  .featB-row .col-spec{
+    font-family: var(--font-en);
+    font-size:11.5px; font-weight:600;
+    color: var(--slate-700);
+    letter-spacing:.04em;
+  }
+  .featB-row .col-spec .tag{
+    display:inline-block;
+    padding: 3px 8px; border-radius:4px;
+    background: var(--slate-100); color: var(--slate-700);
+    margin-right:6px; margin-bottom:4px;
+    font-size:10.5px; letter-spacing:.06em; font-weight:700;
+  }
+
+  /* ===== Variant C: 横タブ + UIモックプレビュー（揉み直し） ===== */
+  .featC{
+    background:#fff; border:1px solid var(--slate-200);
+    border-radius: var(--r-2xl); padding: 36px 40px;
+  }
+  .featC .s-head{margin-bottom: 24px; display:flex; align-items:flex-end; justify-content:space-between; gap:24px}
+  .featC .s-head .label{font-family: var(--font-en); font-size:11px; font-weight:700; letter-spacing:.14em; color: var(--blue-700); text-transform:uppercase}
+  .featC .s-head h2{font-size:26px; font-weight:800; letter-spacing:-.01em; margin: 8px 0 8px; color: var(--slate-950)}
+  .featC .s-head .sub{color: var(--slate-600); font-size:14px; max-width:560px}
+  .featC .s-head .counter{
+    font-family: var(--font-en); font-size:11px; font-weight:700;
+    letter-spacing:.14em; color: var(--slate-400); text-transform:uppercase;
+    white-space:nowrap;
+  }
+  .featC .s-head .counter .cur{color: var(--slate-950); font-size:14px}
+
+  /* horizontal tab bar */
+  .featC-tabbar{
+    display:grid; grid-template-columns: repeat(6, 1fr);
+    gap: 0;
+    border:1px solid var(--slate-200);
+    border-radius: 12px;
+    background: #f8fafc;
+    padding: 4px;
+    margin-bottom: 20px;
+    position:relative;
+  }
+  .featC-tab{
+    display:flex; align-items:center; gap:10px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    cursor:pointer;
+    background: transparent;
+    transition: background .15s ease, color .15s ease;
+    min-width: 0;
+  }
+  .featC-tab:hover{background: rgba(255,255,255,.6)}
+  .featC-tab.active{
+    background:#fff;
+    box-shadow: 0 1px 2px rgba(15,23,42,.06), 0 1px 3px rgba(15,23,42,.08);
+  }
+  .featC-tab .ic{
+    width:28px; height:28px; border-radius:7px;
+    background: var(--slate-100); color: var(--slate-500);
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+    transition: background .15s ease, color .15s ease;
+  }
+  .featC-tab.active .ic{background: var(--blue-50); color: var(--blue-700)}
+  .featC-tab .ic .icon{font-size:16px}
+  .featC-tab .t{
+    font-size:12.5px; font-weight:600; color: var(--slate-600);
+    line-height:1.35;
+    overflow:hidden; text-overflow: ellipsis; white-space: nowrap;
+    min-width: 0;
+  }
+  .featC-tab.active .t{color: var(--slate-950); font-weight:700}
+
+  /* main panel: 2 columns — left text, right visual */
+  .featC-panel{
+    background:#ffffff;
+    border:1px solid var(--slate-200);
+    border-radius: 14px;
+    padding: 0;
+    min-height: 420px;
+    display:grid;
+    grid-template-columns: 1fr 1.05fr;
+    overflow:hidden;
+    animation: featC-fade .35s ease;
+  }
+  @keyframes featC-fade{
+    from{opacity:0; transform: translateY(4px)}
+    to{opacity:1; transform: translateY(0)}
+  }
+  .featC-panel .left{
+    padding: 36px 36px 32px;
+    display:flex; flex-direction:column;
+  }
+  .featC-panel .ptag{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family: var(--font-en); font-size:10.5px; font-weight:700;
+    letter-spacing:.14em; color: var(--blue-700); text-transform:uppercase;
+    margin-bottom: 10px;
+  }
+  .featC-panel .ptag .num{
+    font-family: var(--font-en);
+    background: var(--blue-50); color: var(--blue-700);
+    padding: 3px 8px; border-radius:4px;
+    font-size:10px;
+  }
+  .featC-panel h3{
+    font-size:24px; font-weight:800; letter-spacing:-.01em; color: var(--slate-950);
+    margin: 0 0 14px; line-height:1.4;
+  }
+  .featC-panel .pdesc{
+    font-size:14px; color: var(--slate-700); line-height:1.85;
+    margin-bottom: 18px;
+  }
+  .featC-panel .scenario{
+    display:flex; gap:12px;
+    padding: 14px 16px;
+    background: var(--blue-50);
+    border-left: 3px solid var(--blue-700);
+    border-radius: 6px;
+    margin-bottom: 22px;
+  }
+  .featC-panel .scenario .ic{
+    color: var(--blue-700); flex-shrink:0; padding-top:1px;
+  }
+  .featC-panel .scenario .ic .icon{font-size:18px}
+  .featC-panel .scenario .body .lbl{
+    font-family: var(--font-en); font-size:10px; font-weight:700;
+    letter-spacing:.12em; color: var(--blue-700); text-transform:uppercase;
+    margin-bottom: 3px;
+  }
+  .featC-panel .scenario .body .txt{
+    font-size:13px; color: var(--slate-800); line-height:1.65;
+  }
+  .featC-panel .specs{
+    margin-top:auto;
+    display:grid; grid-template-columns: 1fr 1fr; gap: 14px 24px;
+    padding-top: 18px;
+    border-top: 1px solid var(--slate-200);
+  }
+  .featC-panel .specs .k{
+    font-family: var(--font-en); font-size:10.5px; font-weight:700;
+    letter-spacing:.12em; color: var(--slate-500); text-transform:uppercase;
+    margin-bottom: 4px;
+  }
+  .featC-panel .specs .v{font-size:13.5px; color: var(--slate-950); font-weight:600}
+
+  /* Right: visual mock area */
+  .featC-panel .right{
+    background: linear-gradient(180deg, #f1f5f9 0%, #e8eef5 100%);
+    border-left: 1px solid var(--slate-200);
+    padding: 28px;
+    position:relative;
+    overflow:hidden;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .featC-panel .right::before{
+    content:""; position:absolute; inset:0;
+    background-image:
+      linear-gradient(rgba(15,23,42,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(15,23,42,.04) 1px, transparent 1px);
+    background-size: 24px 24px;
+    pointer-events:none;
+  }
+  .featC-mock{
+    position:relative; z-index:1;
+    background:#fff; border:1px solid var(--slate-200);
+    border-radius: 10px;
+    box-shadow: 0 12px 32px rgba(15,23,42,.08), 0 4px 8px rgba(15,23,42,.04);
+    width: 100%;
+    max-width: 380px;
+    overflow:hidden;
+  }
+  .featC-mock-bar{
+    display:flex; align-items:center; gap:6px;
+    padding: 8px 12px;
+    border-bottom:1px solid var(--slate-200);
+    background:#fafbfc;
+  }
+  .featC-mock-bar .dot{width:8px; height:8px; border-radius:50%; background: var(--slate-300)}
+  .featC-mock-bar .dot:nth-child(2){background:#fbbf24}
+  .featC-mock-bar .dot:nth-child(3){background:#10b981}
+  .featC-mock-bar .ttl{
+    margin-left:8px; font-family: var(--font-en); font-size:10.5px; font-weight:600;
+    color: var(--slate-500); letter-spacing:.04em;
+  }
+  .featC-mock-body{padding: 16px}
+
+  /* Specific mock styles */
+  .mock-storage .row{display:flex; justify-content:space-between; align-items:center; padding: 10px 12px; border:1px solid var(--slate-200); border-radius:6px; margin-bottom:8px; font-size:12px}
+  .mock-storage .row .name{color: var(--slate-700); font-weight:500}
+  .mock-storage .row .date{color: var(--slate-500); font-family: var(--font-en); font-size:11px}
+  .mock-storage .row .badge{font-family: var(--font-en); font-size:9.5px; font-weight:700; padding:2px 6px; border-radius:3px; background: var(--blue-50); color: var(--blue-700); letter-spacing:.04em; margin-left:auto; margin-right:10px}
+  .mock-storage .meter{height:6px; border-radius:3px; background: var(--slate-100); overflow:hidden; margin-top:12px}
+  .mock-storage .meter > i{display:block; height:100%; background: var(--blue-700); border-radius:3px}
+  .mock-storage .meter-lbl{display:flex; justify-content:space-between; font-size:10.5px; color: var(--slate-500); margin-top:6px; font-family: var(--font-en)}
+
+  .mock-form .q{padding: 10px 12px; border:1px solid var(--slate-200); border-radius:6px; margin-bottom:8px; font-size:12px}
+  .mock-form .q .qlbl{font-size:10.5px; color: var(--slate-500); margin-bottom:4px; font-family: var(--font-en); font-weight:600; letter-spacing:.06em}
+  .mock-form .q.branch{background: var(--blue-50); border-color: var(--blue-100); color: var(--slate-800)}
+  .mock-form .q.branch .qlbl{color: var(--blue-700)}
+  .mock-form .q .opt{display:flex; align-items:center; gap:6px; color: var(--slate-700)}
+  .mock-form .q .radio{width:12px; height:12px; border-radius:50%; border:2px solid var(--slate-300); flex-shrink:0}
+  .mock-form .q .radio.on{border-color: var(--blue-700); background: var(--blue-700); box-shadow: inset 0 0 0 2px #fff}
+  .mock-form .arrow{text-align:center; color: var(--slate-400); margin: 4px 0; font-family: var(--font-en); font-size:10px}
+
+  .mock-excel{font-family: var(--font-en); font-size:10.5px}
+  .mock-excel .head{display:grid; grid-template-columns: 32px 1fr 1fr 70px; background: #f1f5f9; padding: 6px 8px; font-weight:700; color: var(--slate-600); border-bottom:1px solid var(--slate-200)}
+  .mock-excel .row{display:grid; grid-template-columns: 32px 1fr 1fr 70px; padding: 7px 8px; border-bottom:1px solid var(--slate-100); color: var(--slate-700)}
+  .mock-excel .row .num{color: var(--slate-400)}
+  .mock-excel .row.alt{background: #fafcff}
+  .mock-excel .toolbar{display:flex; gap:6px; padding:8px; background: #fafbfc; border-bottom:1px solid var(--slate-200); font-size:10px}
+  .mock-excel .tb-btn{padding: 4px 8px; background:#fff; border:1px solid var(--slate-200); border-radius:4px; color: var(--slate-600); font-weight:600}
+  .mock-excel .tb-btn.primary{background: var(--blue-700); color:#fff; border-color: var(--blue-700)}
+
+  .mock-review{display:grid; grid-template-columns: 1fr 1fr; gap:10px}
+  .mock-review .pane{border:1px solid var(--slate-200); border-radius:6px; overflow:hidden}
+  .mock-review .pane .ph{padding:6px 8px; font-size:10px; color: var(--slate-500); background: #f1f5f9; font-family: var(--font-en); font-weight:700; letter-spacing:.06em; border-bottom:1px solid var(--slate-200)}
+  .mock-review .pane.img .body{aspect-ratio: 1.6; background: linear-gradient(135deg, #fef3c7, #fde68a); display:flex; align-items:center; justify-content:center; color: var(--amber-700); font-family: var(--font-en); font-size:10px; font-weight:700; letter-spacing:.06em}
+  .mock-review .pane.data .body{padding: 10px; font-size:11px}
+  .mock-review .pane.data .row{display:flex; justify-content:space-between; padding: 4px 0; border-bottom:1px solid var(--slate-100); color: var(--slate-700)}
+  .mock-review .pane.data .row .k{color: var(--slate-500); font-size:10px}
+  .mock-review .pane.data .row .v{font-weight:600}
+  .mock-review .pane.data .row.edited{background: #fef9c3; margin: 0 -10px; padding: 4px 10px}
+  .mock-review .pane.data .row.edited .v{color: var(--amber-700)}
+  .mock-review .ftnote{grid-column:1/-1; font-size:10px; color: var(--slate-500); text-align:center; font-family: var(--font-en); margin-top:4px}
+
+  .mock-mail{font-size:11px}
+  .mock-mail .head{padding: 10px 12px; border:1px solid var(--slate-200); border-radius:6px; margin-bottom:8px}
+  .mock-mail .head .row{display:flex; justify-content:space-between; padding: 3px 0; font-size:10.5px}
+  .mock-mail .head .row .k{color: var(--slate-500); font-family: var(--font-en); font-weight:600; letter-spacing:.06em; text-transform:uppercase; font-size:9.5px}
+  .mock-mail .head .row .v{color: var(--slate-800); font-weight:600}
+  .mock-mail .head .domain{color: var(--blue-700)}
+  .mock-mail .body{padding: 12px; border:1px solid var(--slate-200); border-radius:6px; color: var(--slate-700); line-height:1.7; font-size:11px; background: #fafbfc}
+  .mock-mail .body .greet{margin-bottom:6px}
+  .mock-mail .body .sig{margin-top: 8px; padding-top:8px; border-top: 1px solid var(--slate-200); color: var(--slate-500); font-size:10px}
+
+  .mock-lang{}
+  .mock-lang .switcher{display:flex; gap:4px; margin-bottom:10px; padding:4px; background: var(--slate-50); border-radius:6px; border:1px solid var(--slate-200)}
+  .mock-lang .switcher .l{flex:1; padding: 5px 8px; border-radius:4px; font-family: var(--font-en); font-size:10.5px; font-weight:700; text-align:center; color: var(--slate-500); cursor:default; letter-spacing:.04em}
+  .mock-lang .switcher .l.on{background:#fff; color: var(--slate-950); box-shadow: 0 1px 2px rgba(15,23,42,.08)}
+  .mock-lang .form-row{padding: 8px 10px; border:1px solid var(--slate-200); border-radius:6px; margin-bottom: 6px; font-size:11px}
+  .mock-lang .form-row .lbl{font-size:10px; color: var(--slate-500); margin-bottom:3px; font-family: var(--font-en); font-weight:600}
+  .mock-lang .form-row .val{color: var(--slate-800); font-weight:500}
+  .mock-lang .form-row.cn .val{font-family:'Noto Sans JP',sans-serif}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel">
+const { useState } = React;
+
+const FEATURES = [
+  {
+    icon:'inventory_2',
+    t:'最長1年データ保存',
+    d:'短期確認で終わらせず、後続施策まで継続活用できます。',
+    spec:'365 DAYS',
+    short:'最長1年保存',
+    panelDesc:'契約期間中、回答データを最長1年間保管します。展示会後の確認だけでなく、四半期レビューや翌年の同イベント比較にも活用可能です。',
+    scenario:'展示会の半年後、営業から「あの会社の名刺もう一度見たい」と言われても即引き当て。',
+    mock:'storage',
+    specs:[
+      { k:'保存期間', v:'最長 365 日' },
+      { k:'対象データ', v:'回答 / 名刺 / 添付' },
+      { k:'エクスポート', v:'いつでも可能' },
+      { k:'契約終了後', v:'最大30日間保持' },
+    ]
+  },
+  {
+    icon:'gesture',
+    t:'設問分岐・画像・手書き',
+    d:'設問分岐、画像アップロード、手書き入力に対応します。',
+    spec:'ADVANCED',
+    short:'高度な入力',
+    panelDesc:'回答内容に応じた条件分岐、画像アップロード、タブレットでの手書き入力など、展示会ブースでの実運用に必要な高度な入力に対応します。',
+    scenario:'「業種で分岐させて、製造業だけ追加質問」をフォーム1つで完結。タブレット手書きにも対応。',
+    mock:'form',
+    specs:[
+      { k:'設問分岐', v:'最大 5 階層' },
+      { k:'画像形式', v:'JPG / PNG / HEIC' },
+      { k:'手書き', v:'タブレット対応' },
+      { k:'必須/任意', v:'設問単位で設定' },
+    ]
+  },
+  {
+    icon:'monitoring',
+    t:'Excel / CSV 出力',
+    d:'集計・共有・レポート作成に使いやすい形式で出力できます。',
+    spec:'XLSX / CSV',
+    short:'Excel/CSV出力',
+    panelDesc:'整形済みのExcel・CSV形式でいつでもエクスポート可能。営業部門への共有、CRMインポート、レポート作成にそのまま使えます。',
+    scenario:'展示会終了の翌朝、営業部にExcelで配布。CRMインポートも、整形不要でそのまま通せる。',
+    mock:'excel',
+    specs:[
+      { k:'出力形式', v:'XLSX / CSV / TSV' },
+      { k:'文字コード', v:'UTF-8 / SJIS' },
+      { k:'頻度', v:'制限なし' },
+      { k:'差分出力', v:'対応' },
+    ]
+  },
+  {
+    icon:'rate_review',
+    t:'SPEEDレビュー',
+    d:'入力データと画像を並べて確認し、修正作業を進めやすくします。',
+    spec:'REVIEW UI',
+    short:'SPEEDレビュー',
+    panelDesc:'OCR後のデータと元の名刺・回答画像を左右に並べて表示。修正・確認作業を素早く進められる専用UIです。',
+    scenario:'OCRの怪しい箇所だけ目視チェック。原本と並べて見るので、500枚を1人で1時間で完了。',
+    mock:'review',
+    specs:[
+      { k:'表示', v:'2ペイン同期' },
+      { k:'修正履歴', v:'保持・復元可' },
+      { k:'バルク操作', v:'対応' },
+      { k:'レビュー権限', v:'ロール別設定' },
+    ]
+  },
+  {
+    icon:'domain',
+    t:'独自ドメイン送信',
+    d:'お礼メールなどの送信元を、自社ドメインで整えられます。',
+    spec:'BRAND',
+    short:'独自ドメイン送信',
+    panelDesc:'お礼メール・通知メールの送信元を自社ドメインに設定可能。回答者の信頼を損なわず、ブランド体験を統一できます。',
+    scenario:'お礼メールの送信元が "noreply@speedad..." ではなく、自社ドメイン。回答者の信頼を保てる。',
+    mock:'mail',
+    specs:[
+      { k:'対応', v:'SPF / DKIM / DMARC' },
+      { k:'設定', v:'カスタマーサポート' },
+      { k:'ロゴ非表示', v:'回答画面/メール' },
+      { k:'独自URL', v:'対応' },
+    ]
+  },
+  {
+    icon:'language',
+    t:'多言語対応',
+    d:'作成画面・回答画面を多言語表示に対応させられます。',
+    spec:'4 LANG',
+    short:'多言語対応',
+    panelDesc:'回答画面・作成画面ともに、英語・中国語・韓国語・日本語の表示切替に対応。海外顧客の多い展示会・国際カンファレンスで活用できます。',
+    scenario:'国際展示会で英・中・韓の来場者が、自分の言語で回答。OCRも4言語の名刺に高精度で対応。',
+    mock:'lang',
+    specs:[
+      { k:'対応言語', v:'EN / ZH / KO / JA' },
+      { k:'切替方法', v:'回答者選択 / 自動' },
+      { k:'OCR言語', v:'4言語に対応' },
+      { k:'拡張', v:'要相談' },
+    ]
+  },
+];
+
+function MockStorage(){
+  return (
+    <div className="featC-mock">
+      <div className="featC-mock-bar"><span className="dot"></span><span className="dot"></span><span className="dot"></span><span className="ttl">storage / events</span></div>
+      <div className="featC-mock-body mock-storage">
+        <div className="row"><span className="name">Tokyo Big Sight 2026 Spring</span><span className="badge">ACTIVE</span><span className="date">D-285</span></div>
+        <div className="row"><span className="name">名古屋展示会 2025 Q4</span><span className="badge" style={{background:'#fef9c3',color:'#b45309'}}>180日</span><span className="date">D-185</span></div>
+        <div className="row"><span className="name">Osaka EXPO 2025 Autumn</span><span className="badge" style={{background:'#fef9c3',color:'#b45309'}}>240日</span><span className="date">D-125</span></div>
+        <div className="row"><span className="name">幕張メッセ 2025 Summer</span><span className="badge" style={{background:'#fee2e2',color:'#b91c1c'}}>340日</span><span className="date">D-25</span></div>
+        <div className="meter"><i style={{width:'34%'}}></i></div>
+        <div className="meter-lbl"><span>4 events / 1.2 GB</span><span>365 DAYS MAX</span></div>
+      </div>
+    </div>
+  );
+}
+
+function MockForm(){
+  return (
+    <div className="featC-mock">
+      <div className="featC-mock-bar"><span className="dot"></span><span className="dot"></span><span className="dot"></span><span className="ttl">survey / preview</span></div>
+      <div className="featC-mock-body mock-form">
+        <div className="q">
+          <div className="qlbl">Q1. 業種を選択</div>
+          <div className="opt"><span className="radio on"></span>製造業</div>
+          <div className="opt" style={{color:'var(--slate-400)'}}><span className="radio"></span>サービス業</div>
+        </div>
+        <div className="arrow">↓ branch</div>
+        <div className="q branch">
+          <div className="qlbl">Q2-A. 製造規模（製造業のみ）</div>
+          <div className="opt"><span className="radio on"></span>従業員 100〜500名</div>
+        </div>
+        <div className="q">
+          <div className="qlbl">Q3. 担当者サイン（手書き）</div>
+          <div style={{height:30,border:'1px dashed var(--slate-300)',borderRadius:4,display:'flex',alignItems:'center',justifyContent:'center',color:'var(--slate-400)',fontSize:10,fontFamily:'var(--font-en)'}}>signature pad</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MockExcel(){
+  return (
+    <div className="featC-mock">
+      <div className="featC-mock-bar"><span className="dot"></span><span className="dot"></span><span className="dot"></span><span className="ttl">export / leads.xlsx</span></div>
+      <div className="featC-mock-body" style={{padding:0}}>
+        <div className="mock-excel">
+          <div className="toolbar">
+            <span className="tb-btn primary">XLSX</span>
+            <span className="tb-btn">CSV</span>
+            <span className="tb-btn">TSV</span>
+            <span className="tb-btn" style={{marginLeft:'auto'}}>⬇ DL</span>
+          </div>
+          <div className="head"><div>#</div><div>会社名</div><div>担当者</div><div>業種</div></div>
+          <div className="row"><div className="num">001</div><div>株式会社アトリエ</div><div>田中 明子</div><div>製造</div></div>
+          <div className="row alt"><div className="num">002</div><div>大和テクノロジー</div><div>山田 武</div><div>IT</div></div>
+          <div className="row"><div className="num">003</div><div>北海道食品工業</div><div>佐藤 茂</div><div>食品</div></div>
+          <div className="row alt"><div className="num">004</div><div>京都リビング</div><div>中村 ゆり</div><div>建築</div></div>
+          <div className="row"><div className="num">005</div><div>福岡製作所</div><div>松本 健二</div><div>製造</div></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MockReview(){
+  return (
+    <div className="featC-mock">
+      <div className="featC-mock-bar"><span className="dot"></span><span className="dot"></span><span className="dot"></span><span className="ttl">review / lead #042</span></div>
+      <div className="featC-mock-body">
+        <div className="mock-review">
+          <div className="pane img">
+            <div className="ph">SOURCE</div>
+            <div className="body">名刺画像</div>
+          </div>
+          <div className="pane data">
+            <div className="ph">EXTRACTED</div>
+            <div className="body">
+              <div className="row"><span className="k">name</span><span className="v">田中 明子</span></div>
+              <div className="row edited"><span className="k">title</span><span className="v">部長 ✎</span></div>
+              <div className="row"><span className="k">tel</span><span className="v">03-1234-...</span></div>
+              <div className="row"><span className="k">email</span><span className="v">a.tanaka@...</span></div>
+            </div>
+          </div>
+          <div className="ftnote">42 / 500 reviewed · 1 edited</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MockMail(){
+  return (
+    <div className="featC-mock">
+      <div className="featC-mock-bar"><span className="dot"></span><span className="dot"></span><span className="dot"></span><span className="ttl">mail / preview</span></div>
+      <div className="featC-mock-body mock-mail">
+        <div className="head">
+          <div className="row"><span className="k">From</span><span className="v">marketing@<span className="domain">your-company.co.jp</span></span></div>
+          <div className="row"><span className="k">To</span><span className="v">a.tanaka@atelier.jp</span></div>
+          <div className="row"><span className="k">Subject</span><span className="v">展示会のご来場ありがとうございました</span></div>
+        </div>
+        <div className="body">
+          <div className="greet">田中様</div>
+          <div>本日は弊社ブースにお立ち寄りいただき、誠にありがとうございました。</div>
+          <div className="sig">— Your Company Marketing Team</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MockLang(){
+  return (
+    <div className="featC-mock">
+      <div className="featC-mock-bar"><span className="dot"></span><span className="dot"></span><span className="dot"></span><span className="ttl">survey / 简体中文</span></div>
+      <div className="featC-mock-body mock-lang">
+        <div className="switcher">
+          <div className="l">JA</div>
+          <div className="l">EN</div>
+          <div className="l on">ZH</div>
+          <div className="l">KO</div>
+        </div>
+        <div className="form-row cn">
+          <div className="lbl">Q1. 公司名</div>
+          <div className="val">请输入您的公司名称</div>
+        </div>
+        <div className="form-row cn">
+          <div className="lbl">Q2. 行业</div>
+          <div className="val">制造业 / 服务业 / IT 行业</div>
+        </div>
+        <div className="form-row cn">
+          <div className="lbl">Q3. 联系方式</div>
+          <div className="val">电子邮件地址</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FeatureMock({type}){
+  if (type === 'storage') return <MockStorage/>;
+  if (type === 'form')    return <MockForm/>;
+  if (type === 'excel')   return <MockExcel/>;
+  if (type === 'review')  return <MockReview/>;
+  if (type === 'mail')    return <MockMail/>;
+  if (type === 'lang')    return <MockLang/>;
+  return null;
+}
+
+function VariantA(){
+  return (
+    <section className="featA">
+      <div className="s-head">
+        <span className="label">FEATURES</span>
+        <h2>Premiumに含まれる機能</h2>
+        <p className="sub">保存・入力・出力・確認・対外表示・回答導線を、展示会後の運用に合わせて整えます。</p>
+      </div>
+      <div className="featA-list">
+        {FEATURES.map((f,i)=>(
+          <div className="featA-row" key={i}>
+            <div className="num">{String(i+1).padStart(2,'0')}</div>
+            <div className="body">
+              <div className="top">
+                <span className="icon">{f.icon}</span>
+                <span className="t">{f.t}</span>
+                <span className="tag">{f.spec}</span>
+              </div>
+              <div className="d">{f.d}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function VariantB(){
+  return (
+    <section className="featB">
+      <div className="s-head">
+        <span className="label">FEATURES</span>
+        <h2>Premiumに含まれる機能</h2>
+        <p className="sub">保存・入力・出力・確認・対外表示・回答導線を、展示会後の運用に合わせて整えます。</p>
+      </div>
+      <div className="featB-table">
+        <div className="featB-head">
+          <div>FEATURE</div>
+          <div>DESCRIPTION</div>
+          <div>SPEC</div>
+        </div>
+        {FEATURES.map((f,i)=>(
+          <div className="featB-row" key={i}>
+            <div className="col-name">
+              <span className="ic"><span className="icon">{f.icon}</span></span>
+              <span className="t">{f.t}</span>
+            </div>
+            <div className="col-desc">{f.d}</div>
+            <div className="col-spec">
+              <span className="tag">{f.spec}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function VariantC(){
+  const [active, setActive] = useState(0);
+  const f = FEATURES[active];
+  return (
+    <section className="featC">
+      <div className="s-head">
+        <div>
+          <span className="label">FEATURES</span>
+          <h2>Premiumに含まれる機能</h2>
+          <p className="sub">保存・入力・出力・確認・対外表示・回答導線を、展示会後の運用に合わせて整えます。</p>
+        </div>
+        <div className="counter"><span className="cur">{String(active+1).padStart(2,'0')}</span> / {String(FEATURES.length).padStart(2,'0')}</div>
+      </div>
+
+      <div className="featC-tabbar">
+        {FEATURES.map((it,i)=>(
+          <div
+            className={`featC-tab ${i===active?'active':''}`}
+            onClick={()=>setActive(i)}
+            key={i}
+          >
+            <span className="ic"><span className="icon">{it.icon}</span></span>
+            <span className="t">{it.short}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="featC-panel" key={active}>
+        <div className="left">
+          <div className="ptag">
+            <span className="num">{String(active+1).padStart(2,'0')}</span>
+            <span>{f.spec}</span>
+          </div>
+          <h3>{f.t}</h3>
+          <p className="pdesc">{f.panelDesc}</p>
+          <div className="scenario">
+            <span className="ic"><span className="icon">lightbulb</span></span>
+            <div className="body">
+              <div className="lbl">こんな場面で</div>
+              <div className="txt">{f.scenario}</div>
+            </div>
+          </div>
+          <div className="specs">
+            {f.specs.map((s,i)=>(
+              <div key={i}>
+                <div className="k">{s.k}</div>
+                <div className="v">{s.v}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="right">
+          <FeatureMock type={f.mock}/>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function App(){
+  return (
+    <div className="v2-wrap">
+      <div className="v2-stage">
+        <div className="v2-note">
+          <span className="num">A</span>
+          <span>Numbered List — 番号付き2カラム罫線リスト</span>
+          <span className="ja">"目次"のような落ち着いた質感。情報を整然と並べる</span>
+        </div>
+        <VariantA />
+      </div>
+
+      <div className="v2-stage">
+        <div className="v2-note">
+          <span className="num">B</span>
+          <span>Spec Table — FEATURE / DESCRIPTION / SPEC の3列テーブル</span>
+          <span className="ja">仕様書・データシート風。B2Bで意思決定者に向く</span>
+        </div>
+        <VariantB />
+      </div>
+
+      <div className="v2-stage">
+        <div className="v2-note">
+          <span className="num">C</span>
+          <span>Tabbed Detail — 左に機能リスト、右に詳細パネル</span>
+          <span className="ja">クリックで詳細スペックを切替。情報量を増やしつつ画面を散らかさない</span>
+        </div>
+        <VariantC />
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

@@ -1,8 +1,9 @@
-デモデータの配置先
-==================
+デモ資料の案内
+==============
 
-- アンケート定義: `docs/サンプル/demo_surveys/`
-- 回答データ: `docs/サンプル/demo_answers/`
-- 名刺データ: `docs/サンプル/demo_business-cards/`
+- 実装が参照するデモ JSON の正本は `data/demo/` です。
+- `data/demo/demo_surveys/`: アンケート定義
+- `data/demo/demo_answers/`: 回答データ
+- `data/demo/demo_business-cards/`: 名刺データ
 
-フロントエンドの `resolveDemoDataPath('surveys/...')`/`...('answers/...')` などから本ディレクトリを参照します。`data/demo_*` から移設済みのため、デモデータを追加・更新する際はこの場所を編集してください。
+`docs/サンプル/` は説明用の入口として残しています。デモデータを追加・更新する際は `data/demo/` 側を更新してください。

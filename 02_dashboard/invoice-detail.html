@@ -328,15 +328,16 @@
     }
 
     .invoice-sheet .details-table th {
-      padding: 4px 0;
+      padding: 4px 5px;
       border-bottom: 1px double #000;
       height: 20px;
     }
 
     .invoice-sheet .details-table td:nth-child(2),
     .invoice-sheet .details-table td:nth-child(3) {
-      word-break: break-word;
-      overflow-wrap: anywhere;
+      word-break: normal;
+      overflow-wrap: break-word;
+      line-break: strict;
     }
 
     /* 列幅設定 */
@@ -346,11 +347,11 @@
     }
 
     .invoice-sheet .col-item1 {
-      width: 25%;
+      width: 32%;
     }
 
     .invoice-sheet .col-item2 {
-      width: 25%;
+      width: 23%;
     }
 
     .invoice-sheet .col-qty {
@@ -375,6 +376,17 @@
       text-align: center;
     }
 
+    .invoice-sheet .details-table td.col-qty,
+    .invoice-sheet .details-table td.col-price,
+    .invoice-sheet .details-table td.col-amount {
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: 'tnum' 1;
+    }
+
+    .invoice-sheet .details-table td {
+      padding: 3px 5px;
+    }
+
     /* 行の高さ設定 */
     /* 1ページ目は項目が少ないので少し余裕を持たせる */
     .invoice-sheet.page-1 .details-table td {
@@ -393,13 +405,36 @@
 
     /* Subtotal Row */
     .invoice-sheet .details-table tr.subtotal-row td {
-      background-color: #f0f0f0;
+      background-color: #dbe8f4;
       font-weight: bold;
+      border-top: 1.5px solid #7ea6cc;
+    }
+
+    .invoice-sheet .details-table tr.subtotal-row td.col-no {
       text-align: center;
     }
 
-    .invoice-sheet .details-table tr.subtotal-row td.col-amount {
+    .invoice-sheet .details-table tr.subtotal-row td.col-item1,
+    .invoice-sheet .details-table tr.subtotal-row td.col-item2 {
+      text-align: left;
+    }
+
+    .invoice-sheet .details-table tr.subtotal-row td.col-qty,
+    .invoice-sheet .details-table tr.subtotal-row td.col-price {
       text-align: right;
+    }
+
+    .invoice-sheet .details-table tr.subtotal-row td.col-amount,
+    .invoice-sheet .details-table tr.subtotal-row td.subtotal-amount {
+      text-align: right;
+    }
+
+    .invoice-sheet .details-section-title {
+      font-size: 11pt;
+      font-weight: 700;
+      margin: 0 0 4px 0;
+      padding-bottom: 2px;
+      border-bottom: 1px solid #9bc2e6;
     }
 
     /* Actually usually invoice lines have vertical borders. If I remove borders it looks like a gap. */
@@ -586,7 +621,7 @@
                   <div style="width: 56%; text-align: right;">※お振込手数料は御社でご負担頂けますようお願い申し上げます。</div>
                   <div style="width: 42%; text-align: right;">※お支払期日が休日の場合、前営業日までにお支払いください。</div>
                 </div>
-                <div style="font-size: 10pt; font-weight: bold; margin-bottom: 2px;">ご請求明細</div>
+                <div class="details-section-title">ご請求明細</div>
                 <table class="details-table" id="sheet-details-table-1">
                   <thead>
                     <tr class="bg-header">

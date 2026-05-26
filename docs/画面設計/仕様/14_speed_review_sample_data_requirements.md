@@ -34,9 +34,9 @@ SPEEDレビュー画面と詳細画面の画面設計・検証に使う「模範
 
 ## 4. データ構成条件
 対象ファイルは以下3点を1セットとする。
-- `docs/サンプル/demo_surveys/<surveyId>.json`
-- `docs/サンプル/demo_answers/<surveyId>.json`
-- `docs/サンプル/demo_business-cards/<surveyId>.json`
+- `data/demo/demo_surveys/<surveyId>.json`
+- `data/demo/demo_answers/<surveyId>.json`
+- `data/demo/demo_business-cards/<surveyId>.json`
 
 整合条件:
 - `surveyId` が3ファイルで一致すること
@@ -74,4 +74,3 @@ SPEEDレビュー画面と詳細画面の画面設計・検証に使う「模範
 2. `S/M/L` 3セット（300/900/1,500件）を同一ロジックで生成する  
 3. 画像参照パスと欠損率を定義して回答/名刺データへ反映する  
 4. 画面で実表示確認し、受け入れ基準チェック結果を記録する
-

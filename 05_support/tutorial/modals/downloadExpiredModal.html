@@ -1,0 +1,14 @@
+<div id="downloadExpiredModal" class="fixed inset-0 flex items-center justify-center p-4 modal-overlay hidden z-[60]" data-state="closed" aria-labelledby="downloadExpiredTitle" aria-describedby="downloadExpiredMessage">
+    <div class="bg-surface rounded-lg shadow-xl p-6 w-full max-w-md modal-content-transition" data-state="closed">
+        <div class="flex justify-between items-center mb-4">
+            <h3 id="downloadExpiredTitle" class="text-on-surface text-xl font-semibold">ダウンロードできません</h3>
+            <button class="text-on-surface-variant hover:text-on-surface" aria-label="モーダルを閉じる" data-modal-close="downloadExpiredModal">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+        <p id="downloadExpiredMessage" class="text-on-surface-variant">ダウンロード期限を過ぎています。データを取得できる期間をご確認ください。</p>
+        <div class="flex justify-end gap-3 pt-6">
+            <button class="bg-secondary-container text-on-secondary-container py-2 px-4 rounded-md shadow-sm text-sm font-semibold leading-normal transition-colors" data-modal-close="downloadExpiredModal" aria-label="閉じる">閉じる</button>
+        </div>
+    </div>
+</div>

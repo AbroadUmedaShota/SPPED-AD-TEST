@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<title>お知らせ — 提案一覧 ｜ SPEED AD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500;600;700&family=Noto+Sans+JP:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --navy:#0c1a2e; --navy-deep:#070f1c;
+    --cream:#f5efe5; --paper:#faf6ee; --line:#e3dccb; --line-soft:#ece4d2;
+    --ink:#1a1a1a; --ink-2:#3a3a3a; --ink-3:#6b6b6b; --ink-4:#9a9489;
+    --gold:#b59561; --gold-2:#caa770;
+    --shell:#d9d2c2;
+    --serif:'Noto Serif JP','Hiragino Mincho ProN','Yu Mincho',serif;
+    --sans:'Noto Sans JP',-apple-system,'Hiragino Sans',sans-serif;
+    --latin-serif:'Cormorant Garamond','Noto Serif JP',serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--shell);color:var(--ink);font-family:var(--sans);line-height:1.7;-webkit-font-smoothing:antialiased;min-height:100vh;}
+  a{color:inherit;text-decoration:none}
+  .page{width:1200px;margin:0 auto;background:var(--cream);min-height:100vh;}
+
+  /* Hero */
+  .hero{position:relative;color:#fff;padding:64px 56px 64px;overflow:hidden;
+    background:
+      linear-gradient(180deg, rgba(8,18,32,.92) 0%, rgba(8,18,32,.86) 60%, rgba(8,18,32,.94) 100%),
+      radial-gradient(ellipse 80% 60% at 75% 40%, rgba(40,55,80,0.55) 0%, transparent 60%),
+      linear-gradient(135deg, #0a1626 0%, #11253f 50%, #0a1424 100%);
+  }
+  .hero::before{content:"";position:absolute;inset:0;pointer-events:none;
+    background-image:
+      radial-gradient(circle at 80% 28%, rgba(255,210,160,.20) 0, transparent 2.5%),
+      radial-gradient(circle at 88% 32%, rgba(255,220,180,.16) 0, transparent 1.6%);
+  }
+  .hero::after{content:"";position:absolute;left:48%;top:-220px;width:880px;height:880px;border:1px solid rgba(181,149,97,.16);border-radius:50%;pointer-events:none;}
+  .nav-bar{display:flex;align-items:center;gap:32px;margin-bottom:40px;position:relative;z-index:1;}
+  .brand{font-weight:700;letter-spacing:.04em;font-size:14px;color:#fff;}
+  .nav-links{display:flex;gap:24px;font-size:13px;color:rgba(255,255,255,.55);}
+  .nav-spacer{flex:1;}
+  .crumb{font-family:var(--latin-serif);font-size:12px;letter-spacing:.32em;color:rgba(255,255,255,.5);display:flex;align-items:center;gap:10px;margin-bottom:20px;text-transform:uppercase;position:relative;z-index:1;}
+  .crumb .dot{width:4px;height:4px;border-radius:50%;background:var(--gold);}
+  .eyebrow{font-family:var(--latin-serif);font-size:13px;letter-spacing:.45em;color:var(--gold-2);margin-bottom:12px;text-transform:uppercase;font-weight:500;position:relative;z-index:1;}
+  .hero h1{font-family:var(--serif);font-weight:600;font-size:54px;line-height:1.1;letter-spacing:.02em;color:#fff;margin-bottom:18px;position:relative;z-index:1;}
+  .hero .lede{font-size:14.5px;line-height:1.95;color:rgba(255,255,255,.78);max-width:780px;position:relative;z-index:1;}
+  .hero .lede b{color:#fff;font-weight:500;}
+
+  /* Status row */
+  .status-row{
+    background:var(--paper);border-bottom:1px solid var(--line);
+    padding:18px 56px;display:flex;align-items:center;gap:24px;font-size:12px;color:var(--ink-3);
+  }
+  .status-row .pill{
+    display:inline-flex;align-items:center;gap:8px;padding:5px 12px;
+    background:#fff;border:1px solid var(--line);font-family:var(--latin-serif);
+    font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  }
+  .status-row .pill.spec{color:var(--gold);border-color:var(--gold);background:#fbf2dc;}
+  .status-row .pill.spec::before{content:"◆";color:var(--gold);}
+  .status-row .pill.expl{color:var(--ink-3);}
+  .status-row .pill.expl::before{content:"○";color:var(--ink-4);}
+  .status-row .meta{font-family:var(--latin-serif);font-size:11px;letter-spacing:.18em;text-transform:uppercase;}
+  .status-row .meta b{color:var(--ink);font-weight:500;}
+
+  /* Section */
+  .section{padding:64px 56px 0;}
+  .section + .section{padding-top:80px;}
+  .sec-head{display:grid;grid-template-columns:200px 1fr;gap:32px;align-items:start;margin-bottom:36px;}
+  .sec-eyebrow{font-family:var(--latin-serif);font-size:13px;letter-spacing:.42em;color:var(--gold);text-transform:uppercase;padding-top:8px;}
+  .sec-head h2{font-family:var(--serif);font-weight:600;font-size:32px;line-height:1.4;color:var(--ink);letter-spacing:.02em;}
+  .sec-head h2 small{display:block;font-family:var(--sans);font-size:13.5px;color:var(--ink-2);font-weight:400;letter-spacing:.02em;margin-top:14px;line-height:1.95;max-width:780px;}
+
+  /* Primary cards (List + Detail) */
+  .primary-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:56px;}
+  .pcard{
+    background:#fff;border:1px solid var(--line);display:flex;flex-direction:column;
+    text-decoration:none;color:inherit;transition:transform .15s,box-shadow .15s;cursor:pointer;
+    border-top:3px solid var(--gold);
+  }
+  .pcard:hover{transform:translateY(-3px);box-shadow:0 16px 48px rgba(40,30,15,.10);}
+  .pcard:hover .arr{background:var(--gold);color:#fff;}
+  .pcard-preview{height:340px;background:var(--paper);border-bottom:1px solid var(--line);padding:14px;position:relative;overflow:hidden;}
+
+  /* mini list preview (left card) */
+  .mini-list{display:flex;flex-direction:column;background:#fff;border:1px solid var(--line);height:100%;}
+  .mini-list .mhead{height:24px;background:var(--navy-deep);display:flex;align-items:center;padding:0 10px;gap:6px;}
+  .mini-list .mhead::before{content:"SPEED AD";color:#fff;font-size:7px;font-weight:700;letter-spacing:.08em;}
+  .mini-list .mhead::after{content:"ヘルプ · お知らせ · FAQ";color:rgba(255,255,255,.4);font-size:6px;letter-spacing:.1em;margin-left:8px;}
+  .mini-list .mb{padding:8px 12px 4px;border-bottom:1px solid var(--line);background:var(--paper);font-size:6px;color:var(--ink-3);letter-spacing:.06em;}
+  .mini-list .mt{padding:10px 12px 6px;}
+  .mini-list .mt .me{font-family:var(--latin-serif);font-size:6px;color:var(--gold);letter-spacing:.32em;}
+  .mini-list .mt h3{font-family:var(--serif);font-size:14px;font-weight:600;color:var(--ink);line-height:1;margin-top:2px;}
+  .mini-list .mrow{
+    display:grid;grid-template-columns:50px 50px 1fr 14px;gap:8px;
+    padding:7px 12px;border-top:1px solid var(--line);align-items:start;
+  }
+  .mini-list .mrow .dt{font-family:var(--latin-serif);font-size:10px;color:var(--ink);font-weight:500;line-height:1;}
+  .mini-list .mrow .dt small{display:block;font-size:5px;color:var(--ink-3);letter-spacing:.18em;margin-top:2px;}
+  .mini-list .mrow .tg{font-size:5.5px;letter-spacing:.18em;padding:2px 4px;border:1px solid var(--navy);color:var(--navy);font-family:var(--latin-serif);text-align:center;line-height:1;height:fit-content;}
+  .mini-list .mrow .tg.mt{border-color:#c79338;color:#8a5a0c;background:#fbf2dc;}
+  .mini-list .mrow .tg.in{border-color:#a8312a;color:#a8312a;}
+  .mini-list .mrow .tg.pr{border-color:var(--gold);color:var(--gold);}
+  .mini-list .mrow .tg.if{border-color:#5b6a4e;color:#5b6a4e;}
+  .mini-list .mrow .ti{font-family:var(--serif);font-size:7.5px;color:var(--ink);line-height:1.4;font-weight:500;}
+  .mini-list .mrow .ti small{display:block;font-family:var(--sans);font-size:6px;color:var(--ink-3);margin-top:2px;line-height:1.4;font-weight:400;}
+  .mini-list .mrow .ar{color:var(--ink-4);font-family:var(--latin-serif);font-size:8px;text-align:right;}
+
+  /* mini detail preview (right card) */
+  .mini-detail{display:flex;flex-direction:column;background:#fff;border:1px solid var(--line);height:100%;}
+  .mini-detail .mhead{height:24px;background:var(--navy-deep);}
+  .mini-detail .mb{padding:8px 14px;border-bottom:1px solid var(--line);background:var(--paper);font-size:6px;color:var(--ink-3);letter-spacing:.06em;}
+  .mini-detail .body{padding:14px 16px;flex:1;display:flex;flex-direction:column;gap:6px;}
+  .mini-detail .me{font-family:var(--latin-serif);font-size:6px;color:var(--gold);letter-spacing:.32em;}
+  .mini-detail .mt{display:flex;align-items:center;gap:6px;}
+  .mini-detail .mt .tg{font-size:5.5px;letter-spacing:.18em;padding:2px 4px;border:1px solid var(--navy);color:var(--navy);font-family:var(--latin-serif);}
+  .mini-detail .mt time{font-family:var(--latin-serif);font-size:7px;color:var(--ink-2);}
+  .mini-detail h3{font-family:var(--serif);font-size:11px;font-weight:600;color:var(--ink);line-height:1.5;margin-bottom:4px;}
+  .mini-detail .lede{font-size:6.5px;color:var(--ink-2);line-height:1.7;border-bottom:1px solid var(--line-soft);padding-bottom:6px;margin-bottom:4px;}
+  .mini-detail .h2{font-family:var(--serif);font-size:8px;font-weight:600;color:var(--ink);border-left:2px solid var(--gold);padding-left:5px;margin-top:4px;}
+  .mini-detail .p{font-size:6px;color:var(--ink-3);line-height:1.7;}
+  .mini-detail .li{font-size:6px;color:var(--ink-3);line-height:1.7;padding-left:8px;position:relative;}
+  .mini-detail .li::before{content:"◆";color:var(--gold);position:absolute;left:0;font-size:4.5px;top:5px;}
+  .mini-detail .bk{margin-top:auto;display:inline-flex;align-items:center;gap:4px;font-family:var(--latin-serif);font-size:6px;letter-spacing:.18em;color:var(--ink);border:1px solid var(--ink);padding:4px 8px;text-transform:uppercase;align-self:flex-start;}
+
+  /* Card body */
+  .pcard-body{padding:24px 28px 24px;flex:1;display:flex;flex-direction:column;}
+  .pcard-label{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+  .pcard-num{font-family:var(--latin-serif);font-size:18px;color:var(--gold);font-weight:500;line-height:1;}
+  .pcard-tag{font-family:var(--latin-serif);font-size:10px;letter-spacing:.32em;color:var(--ink-3);text-transform:uppercase;border-left:1px solid var(--line);padding-left:8px;}
+  .pcard-tag.spec{color:var(--gold);}
+  .pcard h3{font-family:var(--serif);font-weight:600;font-size:21px;line-height:1.45;color:var(--ink);letter-spacing:.02em;margin-bottom:8px;}
+  .pcard .path{font-family:'JetBrains Mono','SF Mono',monospace;font-size:11px;color:var(--ink-3);background:var(--paper);padding:6px 10px;border:1px solid var(--line);margin-bottom:14px;display:inline-block;}
+  .pcard p{font-size:13px;color:var(--ink-2);line-height:1.95;flex:1;margin-bottom:14px;}
+  .pcard-foot{display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid var(--line-soft);}
+  .pcard-foot .link{font-family:var(--latin-serif);font-size:12px;letter-spacing:.24em;color:var(--ink-2);text-transform:uppercase;display:flex;align-items:center;gap:8px;}
+  .arr{width:36px;height:36px;border:1px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:14px;transition:all .15s;}
+
+  /* LP band preview */
+  .band-preview-wrap{
+    background:var(--paper);border:1px solid var(--line);padding:36px 40px;margin-bottom:64px;
+  }
+  .bpw-eyebrow{font-family:var(--latin-serif);font-size:11px;letter-spacing:.4em;color:var(--gold);text-transform:uppercase;margin-bottom:10px;}
+  .bpw-title{font-family:var(--serif);font-size:20px;font-weight:600;color:var(--ink);letter-spacing:.02em;margin-bottom:8px;}
+  .bpw-note{font-size:12.5px;color:var(--ink-3);margin-bottom:24px;max-width:700px;line-height:1.85;}
+  .band{
+    background:#fff;border:1px solid var(--line);padding:0;
+    display:grid;grid-template-columns:120px 1fr 1fr 1fr 130px;align-items:stretch;
+  }
+  .band .label-cell{display:flex;flex-direction:column;justify-content:center;padding:18px 20px;border-right:1px solid var(--line-soft);background:#fcf9f1;}
+  .band .label-cell .ey{font-family:var(--latin-serif);font-size:11px;letter-spacing:.42em;color:var(--gold);text-transform:uppercase;margin-bottom:4px;}
+  .band .label-cell .ja{font-family:var(--serif);font-size:14px;color:var(--ink);font-weight:600;}
+  .band-item{padding:18px 20px;border-right:1px solid var(--line-soft);display:flex;flex-direction:column;gap:6px;cursor:pointer;}
+  .band-item:hover{background:#fbf8f1;}
+  .band-item .meta{display:flex;align-items:center;gap:8px;}
+  .band-item .meta time{font-family:var(--latin-serif);font-size:13px;letter-spacing:.06em;color:var(--ink-2);font-weight:500;}
+  .band-item .meta .tg{font-size:9.5px;letter-spacing:.18em;padding:2px 7px;border:1px solid var(--navy);color:var(--navy);font-family:var(--latin-serif);text-transform:uppercase;}
+  .band-item .meta .tg.mt{border-color:#c79338;color:#8a5a0c;background:#fbf2dc;}
+  .band-item .meta .tg.pr{border-color:var(--gold);color:var(--gold);}
+  .band-item h4{font-family:var(--serif);font-size:13.5px;font-weight:600;color:var(--ink);line-height:1.55;letter-spacing:.02em;}
+  .band-item p{font-size:11.5px;color:var(--ink-3);line-height:1.75;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .band-go{display:flex;align-items:center;justify-content:center;font-family:var(--latin-serif);font-size:12px;letter-spacing:.16em;color:var(--ink-2);text-transform:uppercase;gap:8px;cursor:pointer;}
+  .band-go:hover{color:var(--gold);}
+  .band-go .arr-tiny{width:22px;height:22px;border:1px solid var(--gold);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:var(--gold);font-size:11px;}
+  .bpw-spec{margin-top:14px;font-size:11.5px;color:var(--ink-3);font-family:var(--latin-serif);letter-spacing:.08em;}
+  .bpw-spec b{color:var(--gold);font-weight:500;font-family:var(--sans);font-size:11px;letter-spacing:.18em;text-transform:uppercase;margin-right:8px;}
+
+  /* exploration grid (smaller) */
+  .opts-expl{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:80px;}
+  .opt-ex{background:#fff;border:1px solid var(--line);display:flex;flex-direction:column;text-decoration:none;color:inherit;transition:transform .15s,box-shadow .15s;cursor:pointer;opacity:.95;}
+  .opt-ex:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(40,30,15,.08);opacity:1;}
+  .opt-ex .pv{height:180px;background:var(--paper);border-bottom:1px solid var(--line);padding:12px;position:relative;overflow:hidden;}
+  .opt-ex-body{padding:18px 22px 20px;}
+  .opt-ex-lab{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .opt-ex-num{font-family:var(--latin-serif);font-size:14px;color:var(--ink-4);font-weight:500;}
+  .opt-ex-tag{font-family:var(--latin-serif);font-size:9.5px;letter-spacing:.32em;color:var(--ink-3);text-transform:uppercase;border-left:1px solid var(--line);padding-left:8px;}
+  .opt-ex h4{font-family:var(--serif);font-weight:600;font-size:15px;color:var(--ink);line-height:1.5;letter-spacing:.02em;margin-bottom:6px;}
+  .opt-ex p{font-size:11.5px;color:var(--ink-3);line-height:1.85;}
+  .opt-ex .open{margin-top:10px;font-family:var(--latin-serif);font-size:11px;letter-spacing:.2em;color:var(--gold);text-transform:uppercase;display:flex;align-items:center;gap:6px;}
+
+  /* tiny pv styles for exploration: reuse from old preview */
+  .pv-a-ex{display:flex;flex-direction:column;gap:4px;font-size:0;}
+  .pv-a-ex .ph{height:32px;background:linear-gradient(135deg,#0a1626 0%,#11253f 60%,#0a1424 100%);position:relative;padding:8px 10px;}
+  .pv-a-ex .ph::before{content:"NEWS";font-family:var(--latin-serif);font-size:6px;color:var(--gold-2);letter-spacing:.4em;}
+  .pv-a-ex .ph::after{content:"お知らせ";font-family:var(--serif);font-size:11px;color:#fff;position:absolute;left:42px;top:9px;font-weight:600;}
+  .pv-a-ex .pin{background:#fff;border:1px solid var(--line);padding:5px 8px;display:flex;gap:5px;align-items:center;}
+  .pv-a-ex .pin .d{font-family:var(--latin-serif);font-size:9px;color:var(--ink);font-weight:500;line-height:1;width:28px;}
+  .pv-a-ex .pin .tg{font-size:5px;letter-spacing:.18em;padding:1px 3px;border:1px solid var(--gold);color:var(--gold);font-family:var(--latin-serif);}
+  .pv-a-ex .pin .ti{font-family:var(--serif);font-size:6.5px;color:var(--ink);line-height:1.3;flex:1;}
+  .pv-a-ex .pin .c{width:14px;height:14px;border-radius:50%;border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:7px;}
+  .pv-a-ex .row{display:grid;grid-template-columns:24px 22px 1fr 8px;gap:5px;padding:4px 8px;border-bottom:1px solid var(--line);align-items:center;}
+  .pv-a-ex .row .d{font-family:var(--latin-serif);font-weight:500;color:var(--ink);font-size:6.5px;}
+  .pv-a-ex .row .tg{font-size:4.5px;letter-spacing:.16em;padding:1px 2px;border:1px solid var(--navy);color:var(--navy);font-family:var(--latin-serif);text-align:center;}
+  .pv-a-ex .row .ti{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--serif);font-size:6px;}
+  .pv-a-ex .row .ar{color:var(--ink-4);font-family:var(--latin-serif);text-align:right;font-size:6px;}
+
+  /* timeline preview */
+  .pv-b-ex{display:grid;grid-template-columns:54px 1fr;gap:6px;height:100%;}
+  .pv-b-ex .idx{padding:4px 0;}
+  .pv-b-ex .idx .l{font-family:var(--latin-serif);font-size:5.5px;letter-spacing:.3em;color:var(--gold);margin-bottom:4px;}
+  .pv-b-ex .idx .mo{display:flex;align-items:baseline;gap:4px;padding:3px 0;border-bottom:1px solid var(--line);font-size:6px;color:var(--ink-3);}
+  .pv-b-ex .idx .mo b{font-family:var(--latin-serif);font-size:9px;color:var(--ink);font-weight:500;}
+  .pv-b-ex .idx .mo.on b{color:var(--gold);}
+  .pv-b-ex .tl{position:relative;padding-left:14px;}
+  .pv-b-ex .tl::before{content:"";position:absolute;left:3px;top:5px;bottom:0;width:1px;background:linear-gradient(180deg,var(--gold) 0%,var(--line) 30%,var(--line) 100%);}
+  .pv-b-ex .mh{font-family:var(--serif);font-size:13px;font-weight:600;color:var(--ink);margin-bottom:8px;position:relative;line-height:1;}
+  .pv-b-ex .mh::before{content:"";position:absolute;left:-13px;top:4px;width:6px;height:6px;background:var(--cream);border:1px solid var(--gold);border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--gold);}
+  .pv-b-ex .en{position:relative;padding-bottom:6px;font-size:6px;line-height:1.4;}
+  .pv-b-ex .en::before{content:"";position:absolute;left:-11px;top:3px;width:3px;height:3px;background:var(--cream);border:1px solid var(--ink-4);border-radius:50%;}
+  .pv-b-ex .en .dt{font-family:var(--latin-serif);font-size:6px;color:var(--ink-2);font-weight:500;margin-bottom:1px;}
+  .pv-b-ex .en .ti{font-family:var(--serif);color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+  /* magazine preview */
+  .pv-c-ex{display:grid;grid-template-columns:1.4fr 1fr;gap:5px;height:100%;}
+  .pv-c-ex .big{background:#fff;border:1px solid var(--line);display:flex;flex-direction:column;}
+  .pv-c-ex .big .cv{height:46px;background:linear-gradient(135deg,#11253f 0%,#1c3a5f 50%,#0a1424 100%);position:relative;}
+  .pv-c-ex .big .cv::after{content:"QR.";position:absolute;left:6px;top:4px;font-family:var(--serif);color:rgba(255,255,255,.1);font-size:30px;font-weight:600;line-height:1;}
+  .pv-c-ex .big .cv::before{content:"";position:absolute;right:-22px;top:-22px;width:80px;height:80px;border:1px solid rgba(181,149,97,.3);border-radius:50%;}
+  .pv-c-ex .big .bd{padding:6px;flex:1;display:flex;flex-direction:column;gap:2px;}
+  .pv-c-ex .big .tg{font-size:4.5px;letter-spacing:.16em;padding:1px 3px;border:1px solid var(--navy);color:var(--navy);font-family:var(--latin-serif);align-self:flex-start;}
+  .pv-c-ex .big .ti{font-family:var(--serif);font-size:6.5px;color:var(--ink);line-height:1.35;font-weight:600;}
+  .pv-c-ex .stk{display:flex;flex-direction:column;gap:4px;}
+  .pv-c-ex .sm{background:#fff;border:1px solid var(--line);display:grid;grid-template-columns:24px 1fr;gap:4px;flex:1;}
+  .pv-c-ex .sm .cv{background:linear-gradient(135deg,#4a3a14 0%,#6b4f1a 50%,#2a1f08 100%);}
+  .pv-c-ex .sm:nth-child(2) .cv{background:linear-gradient(135deg,#1f3a2a 0%,#305c3f 50%,#0e1f15 100%);}
+  .pv-c-ex .sm:nth-child(3) .cv{background:linear-gradient(135deg,#1a2030 0%,#2a3550 50%,#0e1320 100%);}
+  .pv-c-ex .sm .b{padding:4px 6px;display:flex;flex-direction:column;justify-content:center;gap:1px;}
+  .pv-c-ex .sm .dt{font-family:var(--latin-serif);font-size:4.5px;color:var(--ink-3);}
+  .pv-c-ex .sm .ti{font-family:var(--serif);font-size:5.5px;color:var(--ink);line-height:1.3;font-weight:600;}
+
+  /* footer */
+  .foot{background:var(--navy-deep);color:rgba(255,255,255,.55);padding:36px 56px;font-size:12px;display:flex;align-items:center;gap:32px;letter-spacing:.04em;}
+  .foot .brand{color:#fff;font-weight:700;}
+  .foot-links{display:flex;gap:24px;}
+  .foot-links a:hover{color:#fff;}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <section class="hero">
+    <div class="nav-bar">
+      <div class="brand">SPEED AD</div>
+      <div class="nav-links">
+        <span>Design Proposal</span><span style="color:rgba(255,255,255,.3);">/</span><span style="color:#fff;">News Flow</span>
+      </div>
+      <div class="nav-spacer"></div>
+      <div style="font-family:var(--latin-serif);font-size:11px;letter-spacing:.32em;color:var(--gold-2);text-transform:uppercase;">v1.0 · 2026.05.24</div>
+    </div>
+
+    <div class="crumb"><span>DESIGN PROPOSAL</span><span style="opacity:.4">/</span><span class="dot"></span><span style="color:#fff">NEWS FLOW — 5 ARTIFACTS</span></div>
+    <div class="eyebrow">News Flow Proposal · v1.0</div>
+    <h1>お知らせ動線 — 提案一式</h1>
+    <p class="lede">
+      <b>要件定義書（ログイン前お知らせ動線）</b>に準拠した本番想定の 3 画面（LP帯／一覧／詳細）と、
+      その上で「お知らせの見せ方」のバリエーションを 3 案（A 社報 ／ B タイムライン ／ C マガジン）にまとめました。
+      まずは<b style="color:var(--gold-2);">仕様準拠版</b>を確認し、必要に応じて拡張案からデザインの要素を取り込む構成です。
+    </p>
+  </section>
+
+  <div class="status-row">
+    <span class="pill spec">Spec-Aligned · 仕様準拠</span>
+    <span style="color:var(--ink-4);">·</span>
+    <span class="pill expl">Exploration · 拡張案</span>
+    <div style="flex:1;"></div>
+    <span class="meta">Spec ref: <b>ログイン前お知らせ動線 要件定義書</b> §3 / §4 / §5</span>
+  </div>
+
+  <!-- ───── PRIMARY: Spec-aligned ───── -->
+  <section class="section">
+    <div class="sec-head">
+      <div class="sec-eyebrow">Primary</div>
+      <h2>仕様準拠版 ― 本番組み込み想定
+        <small>要件定義書 §3.1 〜 §3.3 に従って組まれた 3 画面。フィルタや注目記事の特別扱いは設けず、データ正本 <code style="background:var(--paper);padding:1px 5px;font-family:'JetBrains Mono',monospace;font-size:12px;">data/news.json</code> を直接 fetch する前提です。0 件 / 取得失敗の状態 UI も用意しています。</small>
+      </h2>
+    </div>
+
+    <div class="primary-grid">
+      <!-- LIST CARD -->
+      <a class="pcard" href="News List (Spec).html">
+        <div class="pcard-preview">
+          <div class="mini-list">
+            <div class="mhead"></div>
+            <div class="mb">ヘルプセンター › お知らせ</div>
+            <div class="mt"><div class="me">NEWS &amp; UPDATES</div><h3>お知らせ</h3></div>
+            <div class="mrow">
+              <span class="dt">05.21<small>WED·MAY</small></span>
+              <span class="tg">UPDATE</span>
+              <span class="ti">QR回答フローを刷新 ― 離脱率を 32% 改善
+                <small>会場でのQR読み取り後の導線を全面刷新。自動保存と多言語対応を追加…</small>
+              </span>
+              <span class="ar">→</span>
+            </div>
+            <div class="mrow">
+              <span class="dt">05.18<small>SUN·MAY</small></span>
+              <span class="tg">UPDATE</span>
+              <span class="ti">名刺データのCSV書き出しでカスタム列定義に対応
+                <small>エクスポート時の列を任意の順序で指定可能に。</small>
+              </span>
+              <span class="ar">→</span>
+            </div>
+            <div class="mrow">
+              <span class="dt">05.15<small>THU·MAY</small></span>
+              <span class="tg mt">MAINT</span>
+              <span class="ti">【予定】5/25 ストレージ拡張に伴うサービス停止
+                <small>該当時間帯はログイン・回答画面ともに利用不可となります。</small>
+              </span>
+              <span class="ar">→</span>
+            </div>
+            <div class="mrow">
+              <span class="dt">05.12<small>MON·MAY</small></span>
+              <span class="tg pr">PRESS</span>
+              <span class="ti">販促 EXPO 2026 に出展いたします
+                <small>ブース番号: E2-32 / 6月10日(水)–12日(金)。</small>
+              </span>
+              <span class="ar">→</span>
+            </div>
+          </div>
+        </div>
+        <div class="pcard-body">
+          <div class="pcard-label">
+            <span class="pcard-num">P1</span>
+            <span class="pcard-tag spec">◆ Spec-Aligned · List Page</span>
+          </div>
+          <h3>一覧ページ（仕様 §3.2）</h3>
+          <span class="path">05_support/news/index.html</span>
+          <p>data/news.json を fetch して全件を新しい順に描画。各カードは <b>日付 / タグ（tags[0] または category）／ タイトル / 要約</b> の 4 要素のみ。0 件・取得失敗時の状態 UI も同セクション内に用意しています。</p>
+          <div class="pcard-foot">
+            <span class="link">プレビューを開く →</span>
+            <span class="arr">→</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- DETAIL CARD -->
+      <a class="pcard" href="News Detail (Spec).html">
+        <div class="pcard-preview">
+          <div class="mini-detail">
+            <div class="mhead"></div>
+            <div class="mb">ヘルプセンター › お知らせ › QR回答フローを刷新…</div>
+            <div class="body">
+              <div class="me">NEWS &amp; UPDATES</div>
+              <div class="mt"><span class="tg">UPDATE</span><time>2026.05.21</time></div>
+              <h3>QR回答フローを刷新 ― 来場者の離脱率を約 32% 改善する新UIをリリースしました</h3>
+              <div class="lede">会場で来場者が QR コードを読み込んでから回答完了に至るまでの導線を、SPEED AD として初めて全面的に見直しました。</div>
+              <div class="h2">背景 ― 構造的な課題</div>
+              <div class="p">展示会の回答フローには、紙アンケートの体験から生まれた前提が数多く残っていました…</div>
+              <div class="h2">主な変更点</div>
+              <div class="li">ステップ式の設問遷移</div>
+              <div class="li">自動保存と中断 / 再開</div>
+              <div class="li">テーマカラーと多言語対応</div>
+              <span class="bk">← お知らせ一覧へ</span>
+            </div>
+          </div>
+        </div>
+        <div class="pcard-body">
+          <div class="pcard-label">
+            <span class="pcard-num">P2</span>
+            <span class="pcard-tag spec">◆ Spec-Aligned · Detail Page</span>
+          </div>
+          <h3>詳細ページ（仕様 §3.3）</h3>
+          <span class="path">05_support/news/&lt;slug&gt;/index.html</span>
+          <p>記事 1 = ディレクトリ 1 = HTML 1 ファイル。テンプレート骨格を統一し、編集者が差し替えるのは <b>title / breadcrumb / date / tag / 本文</b> の 5 箇所のみ。末尾に「お知らせ一覧へ」リンクを配置しています。</p>
+          <div class="pcard-foot">
+            <span class="link">プレビューを開く →</span>
+            <span class="arr">→</span>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <!-- LP BAND PREVIEW -->
+    <div class="band-preview-wrap">
+      <div class="bpw-eyebrow">◆ Spec-Aligned · P3 · LP Hero Band</div>
+      <div class="bpw-title">ログイン前トップ・お知らせ帯（仕様 §3.1）</div>
+      <p class="bpw-note">
+        現状の LP は日付＋タイトルのみですが、仕様 §3.1 では <b style="color:var(--ink);">date / title / summary</b> の 3 要素を最大 3 件まで表示するよう規定されています。下記が要約付きに刷新した帯のプレビューです。
+        既存の <code style="background:#fff;padding:1px 5px;font-family:'JetBrains Mono',monospace;font-size:11px;">#public-news-section</code> に差し込みます。
+      </p>
+      <div class="band">
+        <div class="label-cell">
+          <span class="ey">News</span>
+          <span class="ja">お知らせ</span>
+        </div>
+        <div class="band-item">
+          <div class="meta"><time datetime="2026-05-21">2026.05.21</time><span class="tg">UPDATE</span></div>
+          <h4>QR回答フローを刷新 ― 離脱率を 32% 改善</h4>
+          <p>会場での QR 読み取り後の導線を全面刷新。自動保存と多言語対応を追加しました。</p>
+        </div>
+        <div class="band-item">
+          <div class="meta"><time datetime="2026-05-18">2026.05.18</time><span class="tg">UPDATE</span></div>
+          <h4>名刺CSV書き出しでカスタム列定義に対応</h4>
+          <p>エクスポート時に出力する列を任意の順序で指定できるようになりました。</p>
+        </div>
+        <div class="band-item">
+          <div class="meta"><time datetime="2026-05-15">2026.05.15</time><span class="tg mt">MAINT</span></div>
+          <h4>5/25 ストレージ拡張に伴うサービス停止</h4>
+          <p>該当時間帯はログイン・回答画面ともに利用不可となります。事前にご確認ください。</p>
+        </div>
+        <div class="band-go">一覧を見る<span class="arr-tiny">→</span></div>
+      </div>
+      <div class="bpw-spec">
+        <b>Spec</b>items 配列の先頭から最大 3 件 / クリックで詳細遷移 / 0 件または取得失敗時はセクション全体を非表示 / 既存 <code>loadPublicNews()</code> 踏襲
+      </div>
+    </div>
+  </section>
+
+  <!-- ───── EXPLORATION: A/B/C variants ───── -->
+  <section class="section" style="padding-bottom:80px;">
+    <div class="sec-head">
+      <div class="sec-eyebrow">Exploration</div>
+      <h2>拡張案 — 将来検討用
+        <small>仕様の枠を超え、お知らせの「見せ方」の幅を探った 3 案です。フィルタ／注目記事／タイムライン／マガジン的グリッドなどを含みます。
+          このまま採用ではなく、ここから採用したい要素を選び、仕様準拠版へ取り込む使い方を想定しています。</small>
+      </h2>
+    </div>
+
+    <div class="opts-expl">
+      <a class="opt-ex" href="News - A Editorial.html">
+        <div class="pv">
+          <div class="pv-a-ex">
+            <div class="ph"></div>
+            <div class="pin">
+              <span class="d">05<br>21</span>
+              <span class="tg">PIN</span>
+              <span class="ti">QR回答フローを刷新</span>
+              <span class="c">→</span>
+            </div>
+            <div class="row"><span class="d">05.18</span><span class="tg">UPDATE</span><span class="ti">CSV書き出し列定義</span><span class="ar">→</span></div>
+            <div class="row"><span class="d">05.15</span><span class="tg" style="border-color:#c79338;color:#8a5a0c;background:#fbf2dc;">MAINT</span><span class="ti">5/25 ストレージ拡張</span><span class="ar">→</span></div>
+            <div class="row"><span class="d">05.12</span><span class="tg" style="border-color:var(--gold);color:var(--gold);">PRESS</span><span class="ti">販促 EXPO 出展</span><span class="ar">→</span></div>
+          </div>
+        </div>
+        <div class="opt-ex-body">
+          <div class="opt-ex-lab">
+            <span class="opt-ex-num">A</span>
+            <span class="opt-ex-tag">○ Editorial · 社報</span>
+          </div>
+          <h4>A. 社報スタイル + ピン留め + カテゴリフィルタ</h4>
+          <p>フォーマルなリストにピン留め記事とカテゴリチップを足したコーポレート IR 寄りの構成。</p>
+          <div class="open">プレビューを開く →</div>
+        </div>
+      </a>
+
+      <a class="opt-ex" href="News - B Timeline.html">
+        <div class="pv">
+          <div class="pv-b-ex">
+            <div class="idx">
+              <div class="l">2026</div>
+              <div class="mo on"><b>05</b><span>MAY</span></div>
+              <div class="mo"><b>04</b><span>APR</span></div>
+              <div class="mo"><b>03</b><span>MAR</span></div>
+            </div>
+            <div class="tl">
+              <div class="mh">5月</div>
+              <div class="en"><div class="dt">05.21 · UPDATE</div><div class="ti">QR回答フローを刷新…</div></div>
+              <div class="en"><div class="dt">05.18 · UPDATE</div><div class="ti">CSV書き出し列定義…</div></div>
+              <div class="en"><div class="dt">05.15 · MAINT</div><div class="ti">ストレージ拡張</div></div>
+              <div class="en"><div class="dt">05.12 · PRESS</div><div class="ti">販促 EXPO 出展</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="opt-ex-body">
+          <div class="opt-ex-lab">
+            <span class="opt-ex-num">B</span>
+            <span class="opt-ex-tag">○ Timeline · 年表</span>
+          </div>
+          <h4>B. タイムライン + 月別アーカイブ</h4>
+          <p>サイドの月別索引とゴールドの時間軸スパイン。サービスの歩みを語るストーリー型。</p>
+          <div class="open">プレビューを開く →</div>
+        </div>
+      </a>
+
+      <a class="opt-ex" href="News - C Magazine.html">
+        <div class="pv">
+          <div class="pv-c-ex">
+            <div class="big">
+              <div class="cv"></div>
+              <div class="bd"><span class="tg">UPDATE</span><div class="ti">QR回答フローを刷新</div></div>
+            </div>
+            <div class="stk">
+              <div class="sm"><div class="cv"></div><div class="b"><span class="dt">2026.05.15</span><div class="ti">ストレージ拡張</div></div></div>
+              <div class="sm"><div class="cv"></div><div class="b"><span class="dt">2026.05.12</span><div class="ti">販促 EXPO 出展</div></div></div>
+              <div class="sm"><div class="cv"></div><div class="b"><span class="dt">2026.05.08</span><div class="ti">テンプレ機能追加</div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="opt-ex-body">
+          <div class="opt-ex-lab">
+            <span class="opt-ex-num">C</span>
+            <span class="opt-ex-tag">○ Magazine · 雑誌</span>
+          </div>
+          <h4>C. マガジン型グリッド + カバー</h4>
+          <p>カテゴリごとに色分けしたカバー付きカード。読み物を多く扱う将来想定。</p>
+          <div class="open">プレビューを開く →</div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span class="brand">SPEED AD</span>
+    <span>© 2026 SPEED AD Inc.</span>
+    <div class="foot-links">
+      <a href="News List (Spec).html">一覧（仕様準拠）</a>
+      <a href="News Detail (Spec).html">詳細（仕様準拠）</a>
+      <a href="News - A Editorial.html">拡張 A</a>
+      <a href="News - B Timeline.html">拡張 B</a>
+      <a href="News - C Magazine.html">拡張 C</a>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>

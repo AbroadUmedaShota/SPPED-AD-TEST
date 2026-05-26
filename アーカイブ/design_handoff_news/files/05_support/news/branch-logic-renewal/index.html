@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>アンケートエディタの分岐ロジックを刷新しました｜SPEED-AD Support</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/css/news.css">
+</head>
+<body data-screen-label="News Detail">
+
+<!-- ===== Support Header ===== -->
+<header class="support-header">
+  <a class="support-header__brand" href="../../../index.html">
+    <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="#111827" d="M12 2 L22 20 H2 Z"/>
+    </svg>
+    <span>SPEED-AD Support</span>
+  </a>
+  <nav class="support-header__nav" aria-label="サポートナビ">
+    <a href="#">ヘルプ</a>
+    <a href="#">FAQ</a>
+    <a href="../" class="is-active">お知らせ</a>
+    <a href="#">お問い合わせ</a>
+  </nav>
+</header>
+
+<!-- ===== Breadcrumb ===== -->
+<div class="tint-band">
+  <nav class="breadcrumb" aria-label="パンくず">
+    <a href="#">ヘルプセンター</a>
+    <span class="breadcrumb__sep">/</span>
+    <a href="../">お知らせ</a>
+    <span class="breadcrumb__sep">/</span>
+    <span class="breadcrumb__current">アンケートエディタの分岐ロジックを刷新しました</span>
+  </nav>
+</div>
+
+<main class="page">
+
+  <!-- ===== Article Hero ===== -->
+  <section class="article-hero">
+    <div class="article-hero__eyebrow">News &amp; Updates · Article</div>
+    <div class="article-hero__meta">
+      <time datetime="2026-05-22">2026.05.22 FRI</time>
+      <span class="dot" aria-hidden="true"></span>
+      <span class="tag">アップデート</span>
+      <span class="dot" aria-hidden="true"></span>
+      <span id="read-min">READ — MIN</span>
+    </div>
+    <h1 class="article-hero__title">アンケートエディタの分岐ロジックを刷新しました</h1>
+  </section>
+
+  <!-- ===== Article Grid ===== -->
+  <div class="article-grid">
+
+    <article class="article-main">
+      <p class="article-lede" id="article-lede">条件分岐の設定UIを刷新し、複数条件のグルーピングと差し戻し履歴を一画面で確認できるようになりました。既存設問への影響はなく、移行作業も不要です。</p>
+
+      <div class="article-body" id="article-body">
+
+        <h2>概要</h2>
+        <p>これまで設問単位で個別に設定していた分岐ロジックを、エディタ右ペインに統合しました。条件のグルーピング・並べ替え・差し戻し履歴の確認を、同一画面で行えます。</p>
+
+        <h2>主な変更点</h2>
+        <ul>
+          <li>条件のグルーピング（AND / OR）を最大3階層までネスト可能に</li>
+          <li>変更履歴を <code>差し戻し</code> ボタンから即時復元できるように</li>
+          <li>プレビュー時にどの条件で分岐したかをハイライト表示</li>
+        </ul>
+        <p>キーボード操作のみで条件追加・並べ替えが完結するよう、ショートカットも追加しています。</p>
+
+        <h2>影響範囲と移行のお願い</h2>
+        <p>既存の分岐設定は自動的に新エディタへ引き継がれます。設問IDや回答データの構造に変更はありません。</p>
+        <blockquote>外部BIツールから条件分岐の中間データを参照している場合のみ、参照先キー <code>branch.legacy</code> を <code>branch.v2</code> に更新してください。</blockquote>
+        <p>不明点はサポートまでお問い合わせください。</p>
+
+      </div>
+
+      <!-- ===== Article Foot ===== -->
+      <div class="article-foot">
+        <a class="back-link" href="../">
+          <span aria-hidden="true">←</span> お知らせ一覧へ
+        </a>
+        <div class="share" role="group" aria-label="この記事を共有">
+          <button type="button" data-share="native" aria-label="共有">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          </button>
+          <button type="button" data-share="twitter" aria-label="Xで共有">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2H21.5l-7.5 8.57L22.75 22h-6.95l-5.42-7.07L4.13 22H.87l8.02-9.17L1.25 2H8.4l4.89 6.46L18.24 2zm-1.22 18.2h1.86L7.06 3.7H5.06l11.96 16.5z"/></svg>
+          </button>
+          <button type="button" data-share="linkedin" aria-label="LinkedInで共有">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.55V9h3.57v11.45z"/></svg>
+          </button>
+          <button type="button" data-share="copy" aria-label="URLをコピー">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.51 1.51"/><path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.51-1.51"/></svg>
+          </button>
+        </div>
+      </div>
+    </article>
+
+    <!-- ===== Aside ===== -->
+    <aside class="article-aside">
+      <div class="aside-card" id="toc-card">
+        <h3 class="aside-card__title">Contents</h3>
+        <ul class="toc" id="toc-list"></ul>
+      </div>
+      <div class="aside-card" id="related-card" hidden>
+        <h3 class="aside-card__title">Related</h3>
+        <ul class="related-list" id="related-list"></ul>
+      </div>
+    </aside>
+
+  </div>
+
+</main>
+
+<footer class="support-footer">© 2026 SPEED-AD. All rights reserved.</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite">URLをコピーしました</div>
+
+<script>
+/* ============== Read minutes ============== */
+function calculateReadMin(){
+  const body = document.getElementById("article-body");
+  const lede = document.getElementById("article-lede");
+  const text = (lede.textContent + " " + body.textContent).replace(/\s+/g, "");
+  const min = Math.max(1, Math.round(text.length / 450));
+  document.getElementById("read-min").textContent = `READ ${min} MIN`;
+}
+
+/* ============== TOC ============== */
+function buildTOC(){
+  const list = document.getElementById("toc-list");
+  const h2s = document.querySelectorAll("#article-body > h2");
+  if(!h2s.length){ document.getElementById("toc-card").hidden = true; return; }
+  h2s.forEach((h, i) => {
+    const id = "section-" + (i+1);
+    h.id = id;
+    const li = document.createElement("li");
+    const a = document.createElement("a");
+    a.href = "#" + id;
+    a.textContent = h.textContent;
+    li.appendChild(a);
+    list.appendChild(li);
+  });
+}
+
+/* ============== Scroll-spy ============== */
+function initScrollSpy(){
+  const links = [...document.querySelectorAll("#toc-list a")];
+  if(!links.length) return;
+  const map = new Map();
+  links.forEach(a => {
+    const tgt = document.querySelector(a.getAttribute("href"));
+    if(tgt) map.set(tgt, a);
+  });
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      const a = map.get(e.target);
+      if(!a) return;
+      if(e.isIntersecting){
+        links.forEach(l => l.classList.remove("on"));
+        a.classList.add("on");
+      }
+    });
+  }, { rootMargin: "-30% 0px -50% 0px" });
+  map.forEach((_, h) => io.observe(h));
+}
+
+/* ============== Related ============== */
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[c])); }
+function isValidRel(u){ return typeof u === "string" && /^05_support\/news\/[\w\-]+\/$/.test(u); }
+async function loadRelated(){
+  const card = document.getElementById("related-card");
+  const list = document.getElementById("related-list");
+  try {
+    const r = await fetch("../../assets/data/news.json", { cache: "no-cache" });
+    if(!r.ok) throw new Error();
+    const data = await r.json();
+    const segs = location.pathname.replace(/\/$/, "").split("/");
+    const self = segs[segs.length-1] === "index.html" ? segs[segs.length-2] : segs[segs.length-1];
+    const items = (data.items || [])
+      .filter(it => isValidRel(it.url) && !it.url.includes("/" + self + "/"))
+      .sort((a,b) => b.date.localeCompare(a.date))
+      .slice(0, 4);
+    if(!items.length) return;
+    list.innerHTML = items.map(it => {
+      const href = "../" + it.url.replace(/^05_support\/news\//, "");
+      return `<li><a href="${esc(href)}">
+        <div class="r-date">${esc(it.displayDate)}</div>
+        <div class="r-title">${esc(it.title)}</div>
+      </a></li>`;
+    }).join("");
+    card.hidden = false;
+  } catch(e){ /* hide on failure */ }
+}
+
+/* ============== Share ============== */
+function showToast(){
+  const t = document.getElementById("toast");
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 1600);
+}
+function bindShare(){
+  document.querySelectorAll(".share button").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const kind = btn.dataset.share;
+      const url = location.href;
+      const title = document.title;
+      if(kind === "native"){
+        if(navigator.share){
+          try { await navigator.share({ title, url }); } catch(e){}
+        } else {
+          try { await navigator.clipboard.writeText(url); showToast(); } catch(e){}
+        }
+      } else if(kind === "twitter"){
+        window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`, "_blank", "noopener");
+      } else if(kind === "linkedin"){
+        window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, "_blank", "noopener");
+      } else if(kind === "copy"){
+        try { await navigator.clipboard.writeText(url); showToast(); } catch(e){}
+      }
+    });
+  });
+}
+
+calculateReadMin();
+buildTOC();
+initScrollSpy();
+loadRelated();
+bindShare();
+</script>
+</body>
+</html>

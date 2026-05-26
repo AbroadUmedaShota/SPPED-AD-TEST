@@ -1,0 +1,1196 @@
+/* tutorial.css
+ * SPEED AD チュートリアル UI
+ *   - サービス本体の配色（白基調 + Google Blue #4285F4 のフラットな Material デザイン）に準拠
+ *   - service-top-style.css の CSS カスタムプロパティ（--color-*）を var() 参照し、
+ *     サービスがダークモード（body.dark-mode）のときは自動追従する
+ *   - マスク + スポットライト枠（青リング & パルス）
+ *   - コーチマーク（カード + 青枠）
+ *   - 青ドット型ポインタ（同心円パルス）
+ *   - 進行バー + 練習モードバッジ
+ *   - スキップ確認モーダル
+ */
+
+:root {
+  /* ----- サービス配色準拠パレット -----
+     service-top-style.css の --color-* トークンを参照。
+     サービス未読込環境でも破綻しないようフォールバック値を併記する。 */
+  --tut-bg-deep: var(--color-base-background-main, #FFFFFF);
+  --tut-glass: var(--color-base-card, #FFFFFF);
+  --tut-glass-light: var(--color-base-card, #FFFFFF);
+  --tut-surface-sub: var(--color-base-background-sub, #F8F8F8);
+  --tut-border: var(--color-base-border-divider, #E0E0E0);
+  --tut-stroke-cyan: var(--color-brand-base-primary, #4285F4);
+  --tut-stroke-violet: var(--color-button-primary-hover-bg, #3367D6);
+  --tut-accent-cyan: var(--color-brand-base-primary, #4285F4);
+  --tut-accent-cyan-glow: rgba(66, 133, 244, 0.30);
+  --tut-accent-violet: var(--color-button-primary-hover-bg, #3367D6);
+  --tut-accent-violet-glow: rgba(51, 103, 214, 0.22);
+  --tut-on-accent: var(--color-button-primary-text, #FFFFFF);
+  --tut-text: var(--color-text-main, #1A1A1A);
+  --tut-text-sub: var(--color-text-sub, #6B6B6B);
+  --tut-scrim: var(--color-scrim, rgba(0, 0, 0, 0.15));
+  --tut-shadow-soft: var(--color-base-shadow-soft, 0 1px 2px 0 rgba(0, 0, 0, 0.05));
+  --tut-mono: 'JetBrains Mono', 'Inter', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* ----- 後方互換用エイリアス ----- */
+  --tutorial-primary: var(--tut-accent-cyan);
+  --tutorial-primary-glow: var(--tut-accent-cyan-glow);
+  --tutorial-mask-color: var(--tut-scrim);
+  --tutorial-bubble-bg: var(--tut-glass);
+  --tutorial-bubble-text: var(--tut-text);
+  --tutorial-bubble-subtext: var(--tut-text-sub);
+}
+
+/* ----- Root ----- */
+.tutorial-root {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  pointer-events: none; /* 子要素ごとに pointer-events を制御 */
+  font-family: inherit;
+}
+
+/* ----- スクリーンリーダー専用（視覚的に隠す）-----
+   overlay.js の aria-live 領域がこのクラスを使用する。 */
+.tutorial-sr-only {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ============================================================
+   マスク
+   ============================================================ */
+.tutorial-mask {
+  position: fixed;
+  inset: 0;
+  pointer-events: none; /* SVG 自体はクリック透過。対象外クリックは overlay.js の window レベル capture で判定 */
+  z-index: 9020;
+  /* サービスのモーダル scrim 準拠の無彩色。ごく薄い青みのみ残す */
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(66, 133, 244, 0.04), transparent 70%),
+    radial-gradient(ellipse 60% 50% at 100% 100%, rgba(66, 133, 244, 0.03), transparent 70%);
+}
+
+/* ============================================================
+   スポットライト枠（青リング + パルス）
+   ============================================================ */
+.tutorial-spotlight {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9030;
+  border: 3px solid var(--tut-accent-cyan);
+  border-radius: 8px;
+  box-shadow:
+    0 0 0 2px rgba(66, 133, 244, 0.50),
+    0 0 8px 3px var(--tut-accent-cyan-glow),
+    0 0 16px 6px rgba(66, 133, 244, 0.35);
+  animation: tutorial-spotlight-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes tutorial-spotlight-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 2px rgba(66, 133, 244, 0.50),
+      0 0 8px 3px var(--tut-accent-cyan-glow),
+      0 0 14px 5px rgba(66, 133, 244, 0.32);
+  }
+  50% {
+    box-shadow:
+      0 0 0 2px rgba(66, 133, 244, 0.75),
+      0 0 14px 5px var(--tut-accent-cyan-glow),
+      0 0 24px 9px rgba(66, 133, 244, 0.48);
+  }
+}
+
+/* ----- 外側 弱ハイライト枠（contextTarget 用） -----
+   内側スポットライトより控えめな見た目。z-index は内側と同等以下に揃え、
+   pulse アニメーションは付けない（注目は内側に集中させる）。 */
+.tutorial-spotlight--context {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9030;
+  border: 1px dashed rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+  background: transparent;
+  box-shadow: none;
+  transition: all 120ms ease-out;
+}
+
+/* user-action / user-action-bridge ステップでターゲットの「クリック誘導」を伝える
+   リップル風アニメーション。スポットライト枠の外側に同心リングが広がって消える。
+   旧実装はターゲット中央に青ドットを置いていたが、ボタン文字に被ったり右上ずらしも
+   違和感があったため、誘導をスポットライト枠自体に統合した。 */
+.tutorial-spotlight--clickable::before,
+.tutorial-spotlight--clickable::after {
+  content: '';
+  position: absolute;
+  inset: -3px; /* spotlight の 3px border の外側に重ねる */
+  border: 2px solid var(--tut-accent-cyan);
+  border-radius: inherit;
+  pointer-events: none;
+  animation: tutorial-spotlight-ripple 1.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.tutorial-spotlight--clickable::after {
+  animation-delay: 0.7s;
+}
+
+@keyframes tutorial-spotlight-ripple {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  100% {
+    transform: scale(1.12);
+    opacity: 0;
+  }
+}
+
+/* 視線誘導パルス（200ms × 2回）— 維持 */
+.tutorial-spotlight.is-attention-pulse {
+  animation: tutorial-attention-pulse 200ms ease-in-out 2;
+}
+
+.tutorial-coachmark.is-attention-pulse {
+  animation: tutorial-attention-pulse 200ms ease-in-out 2;
+}
+
+@keyframes tutorial-attention-pulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.03);
+    filter: brightness(1.08);
+  }
+}
+
+/* ============================================================
+   コーチマーク（白カード + 青枠）
+   ============================================================ */
+.tutorial-coachmark {
+  position: fixed;
+  width: 400px;
+  padding: 24px;
+  border-radius: 12px;
+  background: var(--tut-glass);
+  color: var(--tut-text);
+  z-index: 9050;
+  pointer-events: auto;
+  font-size: 15px;
+  line-height: 1.7;
+  border: 1px solid var(--tut-border);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.16),
+    0 0 0 1px rgba(66, 133, 244, 0.10);
+  /* ステップ切替フェード用：transition で確実に opacity/transform を補間する。
+     keyframe animation だと inline style と競合するため transition に統一。
+     left/top は positionCoachmark で別途扱う（POSITION_TRANSITION_MS と同期）。
+     旧 500ms はもっさり感が強かったため 180ms（COACHMARK_FADE_MS）に圧縮。 */
+  transition: opacity 180ms ease-out, transform 180ms ease-out;
+}
+
+/* 右上のクローズ（×）ボタン。スキップ動線の発見性を高めるための独立 UI。 */
+.tutorial-coachmark__close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--tut-text-sub);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+.tutorial-coachmark__close:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--tut-text);
+}
+
+.tutorial-coachmark__close:focus-visible {
+  outline: 2px solid var(--tut-accent-cyan);
+  outline-offset: 1px;
+}
+
+/* tutorial-coachmark-in keyframe は inline style と競合するため削除。
+   フェードイン/フェードアウトは inline style.opacity / transform を切り替えて
+   base transition で補間する方式に統一済み（renderStep を参照）。 */
+
+@media (max-width: 768px) {
+  .tutorial-coachmark {
+    /* モバイルでは中央寄せの固定幅に収め、画面端からのはみ出しを防ぐ */
+    width: calc(100vw - 24px);
+    max-width: calc(100vw - 24px);
+    left: 12px !important;
+    right: 12px !important;
+    padding: 18px;
+    /* 縦長狭幅でも本文を読めるよう、ビューポート高さに応じて中身をスクロール可に */
+    max-height: calc(100vh - 96px);
+    overflow-y: auto;
+  }
+  .tutorial-coachmark__title {
+    font-size: 18px;
+  }
+  .tutorial-coachmark__body {
+    font-size: 14px;
+    line-height: 1.65;
+    margin-bottom: 16px;
+  }
+  .tutorial-coachmark__footer {
+    gap: 6px;
+  }
+  .tutorial-coachmark__prev,
+  .tutorial-coachmark__next {
+    font-size: 13px;
+    padding: 6px 12px;
+  }
+}
+
+@media (max-width: 380px) {
+  .tutorial-coachmark {
+    padding: 14px;
+  }
+  .tutorial-coachmark__title {
+    font-size: 17px;
+  }
+  /* ボタンが2段になったときに右寄せされるよう spacer を消す */
+  .tutorial-coachmark__spacer {
+    display: none;
+  }
+}
+
+/* ----- ヘッダー ----- */
+.tutorial-coachmark__header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.tutorial-coachmark__title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--tut-text);
+}
+
+.tutorial-coachmark__body {
+  margin: 0 0 20px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--tut-text-sub);
+  /* steps.js の body 文字列に含まれる \n を「視覚的な改行」として描画する。
+     連続スペースは折り返し用に collapse、改行のみ保持する pre-line を採用。 */
+  white-space: pre-line;
+}
+
+/* ステップ切替フェードは base transition + inline style で実装（renderStep）。
+   旧 is-fading-out/in クラスは削除済み。pointer-events のみ JS で制御する必要がない
+   ため、フェードアウト中に二重クリック防止が必要ならこのコメント以下にセレクタを足す。 */
+
+/* title/body 個別フェードは coachmark 全体のフェードに統一済み（forced reflow削減）。 */
+
+/* ----- フッター ----- */
+.tutorial-coachmark__footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  gap: 8px;
+}
+
+.tutorial-coachmark__spacer {
+  flex: 1;
+}
+
+.tutorial-coachmark__skip {
+  background: transparent;
+  border: none;
+  color: var(--tut-text-sub);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 4px 0;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.tutorial-coachmark__skip:hover {
+  color: var(--tut-text);
+  text-decoration: underline;
+}
+
+.tutorial-coachmark__prev {
+  background: var(--tut-surface-sub);
+  border: 1px solid var(--tut-border);
+  color: var(--tut-text);
+  font-size: 14px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 160ms ease, border-color 160ms ease;
+}
+
+.tutorial-coachmark__prev:hover {
+  background: var(--tut-border);
+  border-color: var(--tut-border);
+}
+
+.tutorial-coachmark__next {
+  background: var(--tut-accent-cyan);
+  border: none;
+  color: var(--tut-on-accent);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 6px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 200ms ease, transform 160ms ease;
+}
+
+.tutorial-coachmark__next:hover {
+  background: var(--tut-accent-violet);
+}
+
+/* .tutorial-coachmark__hint は廃止（overlay.js から要素生成を削除）。
+   - body 指示文と内容が重複
+   - 「次へ」常時表示により、クリック誘導は唯一の進行手段ではなくなった */
+
+/* G4: 6秒間クリック検出が無いときに表示する救済ヒント。
+   フッターから少し下に出し、控えめに左寄せで表示する。 */
+.tutorial-coachmark__stuck-hint {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--tut-text-sub);
+  text-align: left;
+  line-height: 1.5;
+  opacity: 0.9;
+}
+
+/* ============================================================
+   コネクタ（細線）
+   - 新規: .tutorial-coachmark__connector
+   - 後方互換: .tutorial-coachmark__notch（同スタイルを適用）
+   ============================================================ */
+.tutorial-coachmark__connector,
+.tutorial-coachmark__notch {
+  position: absolute;
+  background: var(--tut-accent-cyan);
+  pointer-events: none;
+  /* デフォルトでは旧三角形の border ハックを無効化 */
+  border: none;
+  width: 0;
+  height: 0;
+}
+
+/* top: コーチマーク下端から下に伸びる縦線。
+   スポットライトの視覚エッジ（pad 4 + border 3 + outline 2 = 9px）を
+   突き抜けないよう、gap 26 と合わせて先端 +16 = エッジ外側 +7px で止まる長さ。 */
+.tutorial-coachmark__connector[data-placement="top"],
+.tutorial-coachmark__notch[data-placement="top"] {
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 10px;
+}
+
+/* bottom: コーチマーク上端から上に伸びる縦線 */
+.tutorial-coachmark__connector[data-placement="bottom"],
+.tutorial-coachmark__notch[data-placement="bottom"] {
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 10px;
+}
+
+/* left: コーチマーク右端から右に伸びる横線 */
+.tutorial-coachmark__connector[data-placement="left"],
+.tutorial-coachmark__notch[data-placement="left"] {
+  right: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 2px;
+}
+
+/* right: コーチマーク左端から左に伸びる横線 */
+.tutorial-coachmark__connector[data-placement="right"],
+.tutorial-coachmark__notch[data-placement="right"] {
+  left: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 2px;
+}
+
+/* モバイルではさらに短くする */
+@media (max-width: 768px) {
+  .tutorial-coachmark__connector[data-placement="top"],
+  .tutorial-coachmark__notch[data-placement="top"],
+  .tutorial-coachmark__connector[data-placement="bottom"],
+  .tutorial-coachmark__notch[data-placement="bottom"] {
+    height: 8px;
+  }
+  .tutorial-coachmark__connector[data-placement="top"],
+  .tutorial-coachmark__notch[data-placement="top"] {
+    bottom: -8px;
+  }
+  .tutorial-coachmark__connector[data-placement="bottom"],
+  .tutorial-coachmark__notch[data-placement="bottom"] {
+    top: -8px;
+  }
+  .tutorial-coachmark__connector[data-placement="left"],
+  .tutorial-coachmark__notch[data-placement="left"],
+  .tutorial-coachmark__connector[data-placement="right"],
+  .tutorial-coachmark__notch[data-placement="right"] {
+    width: 8px;
+  }
+  .tutorial-coachmark__connector[data-placement="left"],
+  .tutorial-coachmark__notch[data-placement="left"] {
+    right: -8px;
+  }
+  .tutorial-coachmark__connector[data-placement="right"],
+  .tutorial-coachmark__notch[data-placement="right"] {
+    left: -8px;
+  }
+}
+
+/* ============================================================
+   ポインタ（青ドット + 同心円パルス 3層）
+   ============================================================ */
+.tutorial-pointer {
+  position: fixed;
+  width: 48px;
+  height: 48px;
+  z-index: 9060;
+  pointer-events: none;
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 中央の青ドット */
+.tutorial-pointer::after {
+  content: "";
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--tut-accent-cyan);
+  box-shadow:
+    0 0 12px var(--tut-accent-cyan-glow),
+    0 0 4px rgba(255, 255, 255, 0.8) inset;
+  z-index: 2;
+}
+
+/* 同心円パルスリング 3層 */
+.tutorial-pointer__ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 24px;
+  height: 24px;
+  margin-top: -12px;
+  margin-left: -12px;
+  border-radius: 50%;
+  border: 2px solid var(--tut-accent-cyan);
+  background: transparent;
+  opacity: 0;
+  animation: tutorial-pointer-ring 1.4s ease-out infinite;
+}
+
+.tutorial-pointer__ring:nth-of-type(1) {
+  animation-delay: 0s;
+}
+
+.tutorial-pointer__ring:nth-of-type(2) {
+  animation-delay: 0.4s;
+}
+
+.tutorial-pointer__ring:nth-of-type(3) {
+  animation-delay: 0.8s;
+}
+
+@keyframes tutorial-pointer-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+/* 旧 touch_app アイコンが残っていても見えなくする */
+.tutorial-pointer__icon {
+  display: none;
+}
+
+/* ============================================================
+   進行バー
+   ============================================================ */
+.tutorial-progressbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  background: var(--tut-glass);
+  color: var(--tut-text);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 20px;
+  z-index: 9100;
+  pointer-events: auto;
+  border-bottom: 1px solid var(--tut-border);
+  box-shadow: var(--tut-shadow-soft);
+}
+
+.tutorial-progressbar::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--tut-accent-cyan);
+  pointer-events: none;
+}
+
+.tutorial-progressbar__badge {
+  font-family: var(--tut-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--tut-on-accent);
+  background: var(--tut-accent-cyan);
+  border: 1px solid var(--tut-accent-cyan);
+  padding: 3px 10px;
+  border-radius: 4px;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  white-space: nowrap;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.tutorial-progressbar__step {
+  font-family: var(--tut-mono);
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: var(--tut-text);
+}
+
+.tutorial-progressbar__note {
+  font-size: 12px;
+  color: var(--tut-text-sub);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* モバイルでは note を折り返し可にし、「保存されません」が省略で消えないようにする */
+@media (max-width: 768px) {
+  .tutorial-progressbar {
+    height: auto;
+    min-height: 48px;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    padding: 8px 16px;
+  }
+  .tutorial-progressbar__note {
+    flex-basis: 100%;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    line-height: 1.4;
+  }
+  /* バー幅を画面に応じて縮める。flex-basis 100% で行をまたぐ場合がある */
+  .tutorial-progressbar__bar {
+    width: 160px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tutorial-progressbar {
+    padding: 6px 12px;
+    gap: 6px 8px;
+  }
+  .tutorial-progressbar__badge {
+    font-size: 10px;
+    padding: 2px 8px;
+  }
+  .tutorial-progressbar__step {
+    font-size: 13px;
+  }
+  .tutorial-progressbar__note {
+    font-size: 11px;
+  }
+  /* 進捗バーは行をまたいでフル幅まで伸ばす */
+  .tutorial-progressbar__bar {
+    width: 100%;
+    flex-basis: 100%;
+  }
+}
+
+.tutorial-progressbar__bar {
+  width: 220px;
+  height: 4px;
+  background: var(--tut-surface-sub);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.tutorial-progressbar__fill {
+  height: 100%;
+  width: 0%;
+  background: var(--tut-accent-cyan);
+  border-radius: inherit;
+  transition: width 220ms ease-out;
+}
+
+/* ============================================================
+   スキップ確認モーダル
+   ============================================================ */
+.tutorial-skip-modal {
+  position: fixed;
+  inset: 0;
+  background: var(--tut-scrim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9200;
+  pointer-events: auto;
+}
+
+.tutorial-skip-modal__panel {
+  position: relative;
+  background: var(--tut-glass);
+  color: var(--tut-text);
+  width: min(420px, calc(100vw - 32px));
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px solid var(--tut-border);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.22),
+    0 0 0 1px rgba(66, 133, 244, 0.10);
+  animation: tutorial-coachmark-in 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.tutorial-skip-modal__title {
+  margin: 0 0 12px;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--tut-text);
+}
+
+.tutorial-skip-modal__body {
+  margin: 0 0 20px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--tut-text-sub);
+}
+
+.tutorial-skip-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* 「終了する」(.confirm) を控えめスタイルに、
+   「続ける」(.cancel) をプライマリ強調スタイルに入れ替え。 */
+.tutorial-skip-modal__cancel {
+  background: var(--tut-accent-cyan);
+  border: none;
+  color: var(--tut-on-accent);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 200ms ease;
+}
+
+.tutorial-skip-modal__cancel:hover {
+  background: var(--tut-accent-violet);
+}
+
+.tutorial-skip-modal__confirm {
+  background: var(--tut-surface-sub);
+  border: 1px solid var(--tut-border);
+  color: var(--tut-text);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease;
+}
+
+.tutorial-skip-modal__confirm:hover {
+  background: var(--tut-border);
+  border-color: var(--tut-border);
+}
+
+/* ============================================================
+   ようこそ画面（チュートリアル開始前のオープニング）
+   ============================================================ */
+.tutorial-welcome {
+  position: fixed;
+  inset: 0;
+  z-index: 9300;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  /* 無彩色スクリム + ごく薄い青みのみ */
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 35%, rgba(66, 133, 244, 0.06), transparent 70%),
+    var(--tut-scrim);
+  animation: tutorial-welcome-fade 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes tutorial-welcome-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.tutorial-welcome__panel {
+  position: relative;
+  width: min(520px, 100%);
+  /* 縦に長くなりすぎないよう、ビューポート高さ以下に収めて内部スクロールを許容 */
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  padding: 48px 40px;
+  border-radius: 16px;
+  background: var(--tut-glass);
+  color: var(--tut-text);
+  text-align: center;
+  border: 1px solid var(--tut-border);
+  box-shadow:
+    0 24px 48px rgba(0, 0, 0, 0.24),
+    0 0 0 1px rgba(66, 133, 244, 0.10);
+  animation: tutorial-welcome-panel-in 360ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (max-width: 480px) {
+  .tutorial-welcome {
+    padding: 12px;
+  }
+  .tutorial-welcome__panel {
+    padding: 32px 20px;
+    border-radius: 12px;
+  }
+  .tutorial-welcome__title {
+    font-size: 26px;
+  }
+  .tutorial-welcome__body {
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  .tutorial-welcome__actions {
+    flex-direction: column-reverse;
+    gap: 10px;
+  }
+  .tutorial-welcome__skip,
+  .tutorial-welcome__start {
+    width: 100%;
+  }
+  .tutorial-welcome__start {
+    padding: 12px 16px;
+  }
+}
+
+@keyframes tutorial-welcome-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.tutorial-welcome__eyebrow {
+  font-family: var(--tut-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  color: var(--tut-accent-cyan);
+  margin-bottom: 16px;
+}
+
+.tutorial-welcome__title {
+  margin: 0 0 20px;
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--tut-text);
+}
+
+.tutorial-welcome__body {
+  margin: 0 0 32px;
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--tut-text-sub);
+}
+
+/* 2 行構成時の段間調整。1 行目（lead）は本文色を少し濃く、2 行目（invite）は通常の sub 色。 */
+.tutorial-welcome__body--lead {
+  margin: 0 0 12px;
+  color: var(--tut-text);
+}
+
+.tutorial-welcome__body--invite {
+  margin: 0 0 20px;
+  color: var(--tut-text-sub);
+}
+
+/* 開発中バージョンの注意書き。控えめなトーンで body の下、actions の上に置く。 */
+.tutorial-welcome__notice {
+  margin: 0 0 24px;
+  padding: 10px 14px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--tut-text-sub);
+  background: var(--tut-surface-sub);
+  border: 1px solid var(--tut-border);
+  border-radius: 8px;
+  text-align: left;
+}
+
+@media (max-width: 480px) {
+  .tutorial-welcome__notice {
+    font-size: 11px;
+    padding: 8px 12px;
+    margin-bottom: 18px;
+  }
+}
+
+/* welcome 画面の kbd ショートカット案内。actions の下に控えめに置く。 */
+.tutorial-welcome__kbd-hint {
+  margin: 16px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--tut-text-sub);
+  text-align: center;
+}
+
+/* kbd バッジ。welcome / 進行バー / コーチマーク内で共通で使えるよう汎用クラス。 */
+.tutorial-kbd {
+  display: inline-block;
+  padding: 1px 6px;
+  margin: 0 1px;
+  font-family: var(--tut-mono);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--tut-text);
+  background: var(--tut-surface-sub);
+  border: 1px solid var(--tut-border);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  vertical-align: baseline;
+}
+
+.tutorial-welcome__actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+}
+
+.tutorial-welcome__skip {
+  background: transparent;
+  border: none;
+  color: var(--tut-text-sub);
+  font-size: 14px;
+  padding: 10px 16px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: color 160ms ease;
+}
+
+.tutorial-welcome__skip:hover {
+  color: var(--tut-text);
+  text-decoration: underline;
+}
+
+.tutorial-welcome__start {
+  background: var(--tut-accent-cyan);
+  border: none;
+  color: var(--tut-on-accent);
+  font-size: 16px;
+  font-weight: 600;
+  padding: 12px 32px;
+  border-radius: 10px;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 12px rgba(66, 133, 244, 0.28);
+  transition: background-color 200ms ease, box-shadow 200ms ease, transform 160ms ease;
+}
+
+.tutorial-welcome__start:hover {
+  background: var(--tut-accent-violet);
+  box-shadow: 0 6px 18px rgba(66, 133, 244, 0.36);
+  transform: translateY(-1px);
+}
+
+/* ============================================================
+   アカウント作成 CTA 画面（チュートリアル完了 / スキップ後）
+   - ようこそ画面（.tutorial-welcome）と同系統の見た目で構成
+   ============================================================ */
+.tutorial-account-cta {
+  position: fixed;
+  inset: 0;
+  z-index: 9300;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  /* 無彩色スクリム + ごく薄い青みのみ */
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 35%, rgba(66, 133, 244, 0.06), transparent 70%),
+    var(--tut-scrim);
+  animation: tutorial-welcome-fade 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.tutorial-account-cta__panel {
+  position: relative;
+  width: min(520px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  padding: 48px 40px;
+  border-radius: 16px;
+  background: var(--tut-glass);
+  color: var(--tut-text);
+  text-align: center;
+  border: 1px solid var(--tut-border);
+  box-shadow:
+    0 24px 48px rgba(0, 0, 0, 0.24),
+    0 0 0 1px rgba(66, 133, 244, 0.10);
+  animation: tutorial-welcome-panel-in 360ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (max-width: 480px) {
+  .tutorial-account-cta {
+    padding: 12px;
+  }
+  .tutorial-account-cta__panel {
+    padding: 32px 20px;
+    border-radius: 12px;
+  }
+  .tutorial-account-cta__title {
+    font-size: 26px;
+  }
+  .tutorial-account-cta__body {
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  .tutorial-account-cta__features li {
+    font-size: 13px;
+  }
+  .tutorial-account-cta__actions {
+    flex-direction: column-reverse;
+    gap: 10px;
+  }
+  .tutorial-account-cta__create,
+  .tutorial-account-cta__close {
+    width: 100%;
+  }
+  .tutorial-account-cta__create {
+    padding: 12px 16px;
+  }
+}
+
+.tutorial-account-cta__eyebrow {
+  font-family: var(--tut-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  color: var(--tut-accent-cyan);
+  margin-bottom: 16px;
+}
+
+.tutorial-account-cta__title {
+  margin: 0 0 20px;
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--tut-text);
+}
+
+.tutorial-account-cta__body {
+  margin: 0 0 20px;
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--tut-text-sub);
+  /* overlay.js が body 文字列に含める \n を改行として描画する。 */
+  white-space: pre-line;
+}
+
+/* 体験した機能の箇条書き。チェックマークは ::before で付与する。 */
+.tutorial-account-cta__features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 28px;
+  text-align: left;
+  display: inline-block;
+}
+
+.tutorial-account-cta__features li {
+  position: relative;
+  padding-left: 24px;
+  margin: 0 0 8px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--tut-text);
+}
+
+.tutorial-account-cta__features li:last-child {
+  margin-bottom: 0;
+}
+
+.tutorial-account-cta__features li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--tut-accent-cyan);
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.tutorial-account-cta__actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+}
+
+.tutorial-account-cta__close {
+  background: transparent;
+  border: none;
+  color: var(--tut-text-sub);
+  font-size: 14px;
+  padding: 10px 16px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: color 160ms ease;
+}
+
+.tutorial-account-cta__close:hover {
+  color: var(--tut-text);
+  text-decoration: underline;
+}
+
+.tutorial-account-cta__create {
+  background: var(--tut-accent-cyan);
+  border: none;
+  color: var(--tut-on-accent);
+  font-size: 16px;
+  font-weight: 600;
+  padding: 12px 32px;
+  border-radius: 10px;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 12px rgba(66, 133, 244, 0.28);
+  transition: background-color 200ms ease, box-shadow 200ms ease, transform 160ms ease;
+}
+
+.tutorial-account-cta__create:hover {
+  background: var(--tut-accent-violet);
+  box-shadow: 0 6px 18px rgba(66, 133, 244, 0.36);
+  transform: translateY(-1px);
+}
+
+/* 不安解消note: actions の下に小さく弱めの色で表示する。 */
+.tutorial-account-cta__note {
+  margin: 16px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--tut-text-sub);
+  opacity: 0.85;
+}
+
+/* ============================================================
+   prefers-reduced-motion: アニメーションを抑制
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .tutorial-spotlight,
+  .tutorial-spotlight.is-attention-pulse,
+  .tutorial-spotlight--clickable::before,
+  .tutorial-spotlight--clickable::after,
+  .tutorial-coachmark,
+  .tutorial-coachmark.is-attention-pulse,
+  .tutorial-coachmark__title.is-step-changed,
+  .tutorial-coachmark__body.is-step-changed,
+  .tutorial-pointer__ring,
+  .tutorial-skip-modal__panel,
+  .tutorial-welcome,
+  .tutorial-welcome__panel,
+  .tutorial-account-cta,
+  .tutorial-account-cta__panel {
+    animation: none !important;
+  }
+
+  .tutorial-coachmark__next,
+  .tutorial-coachmark__prev,
+  .tutorial-skip-modal__cancel,
+  .tutorial-skip-modal__confirm,
+  .tutorial-welcome__start,
+  .tutorial-welcome__skip,
+  .tutorial-account-cta__create,
+  .tutorial-account-cta__close,
+  .tutorial-progressbar__fill,
+  .tutorial-spotlight--context {
+    transition: none !important;
+  }
+
+  /* ステップ切替時のフェード遷移を抑制：即時に表示状態へ戻す */
+  .tutorial-coachmark.is-fading-out {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* パルスリングは静止表示にせず非表示にする（残像防止） */
+  .tutorial-pointer__ring {
+    opacity: 0 !important;
+  }
+}

@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1280" />
+<title>お知らせ｜ヘルプセンター — SPEED AD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500;600;700&family=Noto+Sans+JP:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --navy:#0c1a2e; --navy-2:#0a1626; --navy-deep:#070f1c;
+    --cream:#f5efe5; --cream-2:#efe7d8; --paper:#faf6ee;
+    --line:#e3dccb; --line-soft:#ece4d2;
+    --ink:#1a1a1a; --ink-2:#3a3a3a; --ink-3:#6b6b6b; --ink-4:#9a9489;
+    --gold:#b59561; --gold-2:#caa770;
+    --shell:#d9d2c2;
+    --serif:'Noto Serif JP','Hiragino Mincho ProN','Yu Mincho',serif;
+    --sans:'Noto Sans JP',-apple-system,'Hiragino Sans',sans-serif;
+    --latin-serif:'Cormorant Garamond','Noto Serif JP',serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--shell);color:var(--ink);font-family:var(--sans);line-height:1.7;-webkit-font-smoothing:antialiased;}
+  a{color:inherit;text-decoration:none}
+  button{font-family:inherit;cursor:pointer;background:none;border:none;color:inherit}
+  .page{width:1200px;margin:0 auto;background:var(--cream);overflow:hidden;}
+
+  /* ─── Help Center common header (injected by support-shell.js) ─── */
+  .help-header{
+    background:var(--navy-deep);color:#fff;
+    display:flex;align-items:center;gap:0;height:60px;padding:0 56px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .help-header .brand{font-weight:700;letter-spacing:.04em;font-size:14px;color:#fff;}
+  .help-header .sep{width:1px;height:18px;background:rgba(255,255,255,.18);margin:0 18px;}
+  .help-header .center-label{font-family:var(--latin-serif);font-size:12px;letter-spacing:.32em;color:var(--gold-2);text-transform:uppercase;}
+  .help-header .nav{display:flex;gap:0;margin-left:48px;}
+  .help-header .nav a{
+    font-size:13px;color:rgba(255,255,255,.7);padding:0 18px;height:60px;
+    display:flex;align-items:center;letter-spacing:.04em;
+    border-bottom:2px solid transparent;
+  }
+  .help-header .nav a:hover{color:#fff;}
+  .help-header .nav a.on{color:#fff;border-bottom-color:var(--gold);}
+  .help-header .spacer{flex:1;}
+  .help-header .right{display:flex;align-items:center;gap:18px;font-size:12.5px;color:rgba(255,255,255,.7);}
+  .help-header .right .search-ico{width:32px;height:32px;border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;cursor:pointer;}
+  .help-header .right .search-ico:hover{border-color:var(--gold);}
+  .help-header .right .login{font-size:12px;letter-spacing:.08em;color:#fff;border:1px solid rgba(255,255,255,.35);padding:8px 18px;}
+  .help-header .right .login:hover{background:rgba(255,255,255,.06);}
+
+  /* ─── Breadcrumb strip (cream) ─── */
+  .breadcrumb{
+    padding:18px 56px;border-bottom:1px solid var(--line);background:var(--paper);
+    font-size:12px;color:var(--ink-3);display:flex;align-items:center;gap:10px;letter-spacing:.04em;
+  }
+  .breadcrumb a{color:var(--ink-2);}
+  .breadcrumb a:hover{color:var(--gold);}
+  .breadcrumb .sep{color:var(--ink-4);}
+  .breadcrumb .current{color:var(--ink);}
+
+  /* ─── Page header (compact) ─── */
+  .page-head{
+    padding:56px 56px 36px;display:grid;grid-template-columns:200px 1fr auto;
+    gap:32px;align-items:end;
+  }
+  .ph-eyebrow{font-family:var(--latin-serif);font-size:13px;letter-spacing:.42em;color:var(--gold);text-transform:uppercase;padding-bottom:14px;}
+  .page-head h1{font-family:var(--serif);font-weight:600;font-size:48px;line-height:1.15;letter-spacing:.02em;color:var(--ink);}
+  .page-head h1 small{display:block;font-family:var(--sans);font-size:14px;color:var(--ink-3);font-weight:400;letter-spacing:.04em;margin-top:12px;line-height:1.85;}
+  .ph-meta{
+    display:flex;flex-direction:column;align-items:flex-end;gap:6px;padding-bottom:6px;
+    font-size:12px;color:var(--ink-3);
+  }
+  .ph-meta .row{display:flex;align-items:baseline;gap:8px;}
+  .ph-meta .row b{font-family:var(--latin-serif);color:var(--ink);font-size:18px;font-weight:500;letter-spacing:.04em;}
+  .ph-meta .row span{font-family:var(--latin-serif);font-size:10.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--ink-4);}
+  .ph-meta a{color:var(--gold);font-size:11px;letter-spacing:.18em;font-family:var(--latin-serif);text-transform:uppercase;border-bottom:1px solid var(--line);padding-bottom:2px;margin-top:4px;}
+
+  /* ─── News list — spec-aligned: date / single tag / title / summary ─── */
+  .news-region{padding:0 56px 80px;}
+  .news-region-status{font-size:11px;color:var(--ink-4);letter-spacing:.24em;text-transform:uppercase;font-family:var(--latin-serif);padding:6px 0 18px;border-top:1px solid var(--line);display:flex;align-items:center;gap:14px;}
+  .news-region-status::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--gold);}
+  .news-region-status b{color:var(--ink-2);font-weight:500;}
+
+  .news-list{display:flex;flex-direction:column;}
+  .news-item{
+    display:grid;grid-template-columns:140px 110px 1fr 40px;
+    gap:32px;align-items:start;padding:28px 8px 28px;
+    border-bottom:1px solid var(--line);cursor:pointer;
+    transition:background .15s;
+  }
+  .news-item:hover{background:#fbf8f1;}
+  .news-item:hover .ni-arrow{color:var(--gold);transform:translateX(4px);}
+  .news-item:hover .ni-title{color:var(--gold);}
+  .ni-date{padding-top:2px;}
+  .ni-date time{
+    font-family:var(--latin-serif);font-size:22px;font-weight:500;letter-spacing:.04em;
+    color:var(--ink);display:block;line-height:1;
+  }
+  .ni-date .ymd{font-family:var(--latin-serif);font-size:11px;color:var(--ink-3);letter-spacing:.18em;text-transform:uppercase;margin-top:6px;display:block;}
+  .ni-tag{padding-top:4px;}
+  .news-tag{
+    display:inline-block;font-size:10.5px;letter-spacing:.18em;padding:4px 10px;
+    color:var(--gold);border:1px solid var(--gold);text-transform:uppercase;
+    font-family:var(--latin-serif);font-weight:500;
+  }
+  .news-tag.update{color:var(--navy);border-color:var(--navy);}
+  .news-tag.info{color:#5b6a4e;border-color:#5b6a4e;}
+  .news-tag.maint{color:#8a5a0c;border-color:#c79338;background:#fbf2dc;}
+  .news-tag.incident{color:#a8312a;border-color:#a8312a;background:#fbe9e6;}
+  .news-tag.press{color:var(--gold);border-color:var(--gold);}
+  .ni-body{min-width:0;}
+  .ni-title{
+    font-family:var(--serif);font-weight:600;font-size:18px;line-height:1.55;
+    color:var(--ink);letter-spacing:.02em;margin-bottom:8px;transition:color .15s;
+  }
+  .ni-summary{font-size:13px;line-height:1.9;color:var(--ink-2);max-width:760px;}
+  .ni-arrow{
+    font-family:var(--latin-serif);font-size:22px;color:var(--ink-4);
+    text-align:right;padding-top:4px;transition:all .15s;
+  }
+
+  /* ─── Empty state (spec §3.2: "現在お知らせはありません") ─── */
+  .state-block{
+    margin:0 56px 24px;padding:60px 40px;background:#fff;border:1px dashed var(--line);
+    display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;
+  }
+  .state-eyebrow{font-family:var(--latin-serif);font-size:10.5px;letter-spacing:.42em;color:var(--ink-4);text-transform:uppercase;}
+  .state-block h3{font-family:var(--serif);font-weight:600;font-size:20px;color:var(--ink);letter-spacing:.02em;}
+  .state-block p{font-size:13px;color:var(--ink-3);max-width:520px;line-height:1.9;}
+
+  /* ─── Bottom: state previews (for spec review only) ─── */
+  .state-previews{
+    margin:24px 56px 96px;padding:32px;background:rgba(0,0,0,.025);border:1px dashed var(--line);
+  }
+  .sp-eyebrow{font-family:var(--latin-serif);font-size:11px;letter-spacing:.4em;color:var(--gold);text-transform:uppercase;margin-bottom:6px;}
+  .sp-title{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--ink);letter-spacing:.02em;margin-bottom:6px;}
+  .sp-note{font-size:12px;color:var(--ink-3);margin-bottom:24px;}
+  .sp-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .sp-card{background:#fff;border:1px solid var(--line);padding:36px 28px;display:flex;flex-direction:column;gap:10px;}
+  .sp-card .lab{font-family:var(--latin-serif);font-size:10px;letter-spacing:.4em;color:var(--ink-4);text-transform:uppercase;}
+  .sp-card h4{font-family:var(--serif);font-weight:600;font-size:17px;color:var(--ink);letter-spacing:.02em;}
+  .sp-card p{font-size:12.5px;color:var(--ink-3);line-height:1.85;}
+  .sp-card.error h4{color:#a8312a;}
+  .sp-card.error::before{content:"!";width:24px;height:24px;border:1px solid #a8312a;color:#a8312a;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--latin-serif);font-weight:500;}
+
+  /* ─── Footer ─── */
+  .foot{
+    background:var(--navy-deep);color:rgba(255,255,255,.55);padding:36px 56px;
+    font-size:12px;display:flex;align-items:center;gap:32px;letter-spacing:.04em;
+    border-top:1px solid rgba(255,255,255,.08);
+  }
+  .foot .brand{color:#fff;font-weight:700;}
+  .foot-links{display:flex;gap:24px;}
+  .foot-links a:hover{color:#fff;}
+  .foot-back{margin-left:auto;display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.7);font-family:var(--latin-serif)}
+  .foot-back .arr{width:30px;height:30px;border:1px solid rgba(255,255,255,.3);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Common Help Center header (support-shell.js injects this from /common/header.html) -->
+  <header class="help-header">
+    <span class="brand">SPEED AD</span>
+    <span class="sep"></span>
+    <span class="center-label">Help Center</span>
+    <nav class="nav">
+      <a href="/help/">ヘルプホーム</a>
+      <a href="/help/faq/">よくある質問</a>
+      <a class="on" href="/05_support/news/">お知らせ</a>
+      <a href="/help/contact/">お問い合わせ</a>
+    </nav>
+    <span class="spacer"></span>
+    <div class="right">
+      <span class="search-ico" title="検索">⌕</span>
+      <a class="login">ログイン →</a>
+    </div>
+  </header>
+
+  <!-- Breadcrumb (spec §3.2, §5.2) -->
+  <nav class="breadcrumb" aria-label="パンくず">
+    <a href="/help/">ヘルプセンター</a>
+    <span class="sep">›</span>
+    <span class="current">お知らせ</span>
+  </nav>
+
+  <!-- Page header -->
+  <header class="page-head">
+    <div class="ph-eyebrow">News &amp; Updates</div>
+    <div>
+      <h1>お知らせ
+        <small>SPEED AD のアップデート情報、メンテナンス予定、サービスに関するお知らせをお届けします。</small>
+      </h1>
+    </div>
+    <div class="ph-meta">
+      <div class="row"><b>12</b><span>Articles</span></div>
+      <div class="row"><b>2026.05.21</b><span>Last Updated</span></div>
+      <a>◆ RSS Feed</a>
+    </div>
+  </header>
+
+  <!-- ───── NEWS LIST ─────
+       Renders all items from data/news.json, newest first.
+       Per spec §3.2: date / tag (tags[0] or category) / title / summary.
+       Single click target per article. -->
+  <section class="news-region" id="public-news-list" aria-live="polite" aria-label="お知らせ一覧">
+
+    <div class="news-region-status">
+      <span>全 <b>12</b> 件</span>
+      <span style="color:var(--ink-4);">·</span>
+      <span>新しい順</span>
+    </div>
+
+    <div class="news-list">
+
+      <article class="news-item" data-url="/05_support/news/qr-flow-refresh-2026/">
+        <div class="ni-date">
+          <time datetime="2026-05-21">2026.05.21</time>
+          <span class="ymd">Wed · MAY</span>
+        </div>
+        <div class="ni-tag"><span class="news-tag update">アップデート</span></div>
+        <div class="ni-body">
+          <h2 class="ni-title">QR回答フローを刷新 ― 来場者の離脱率を約 32% 改善する新UIをリリースしました</h2>
+          <p class="ni-summary">会場でのQR読み取り後の導線を全面刷新。設問遷移・自動保存・回答中断/再開に対応し、テーマカラー設定と多言語対応（日・英・中）を追加しました。</p>
+        </div>
+        <div class="ni-arrow">→</div>
+      </article>
+
+      <article class="news-item" data-url="/05_support/news/csv-export-custom-columns/">
+        <div class="ni-date">
+          <time datetime="2026-05-18">2026.05.18</time>
+          <span class="ymd">Sun · MAY</span>
+        </div>
+        <div class="ni-tag"><span class="news-tag update">アップデート</span></div>
+        <div class="ni-body">
+          <h2 class="ni-title">名刺データのCSV書き出しでカスタム列定義に対応しました</h2>
+          <p class="ni-summary">エクスポート時に出力する列を任意の順序で指定可能になりました。組織テンプレートとしての保存にも対応しています（管理者権限）。</p>
+        </div>
+        <div class="ni-arrow">→</div>
+      </article>
+
+      <article class="news-item" data-url="/05_support/news/maintenance-2026-05-25/">
+        <div class="ni-date">
+          <time datetime="2026-05-15">2026.05.15</time>
+          <span class="ymd">Thu · MAY</span>
+        </div>
+        <div class="ni-tag"><span class="news-tag maint">メンテナンス</span></div>
+        <div class="ni-body">
+          <h2 class="ni-title">【予定】5月25日(月) 2:00–4:00 ストレージ拡張に伴うサービス停止のお知らせ</h2>
+          <p class="ni-summary">対象: 全プラン。該当時間帯はログイン・回答画面ともに利用不可となります。回答中のデータは中断/再開機能により保護されます。</p>
+        </div>
+        <div class="ni-arrow">→</div>
+      </article>
+
+      <article class="news-item" data-url="/05_support/news/expo-2026-spring/">
+        <div class="ni-date">
+          <time datetime="2026-05-12">2026.05.12</time>
+          <span class="ymd">Mon · MAY</span>
+        </div>
+        <div class="ni-tag"><span class="news-tag press">プレスリリース</span></div>
+        <div class="ni-body">
+          <h2 class="ni-title">SPEED AD、東京ビッグサイト「販促 EXPO 2026」に出展いたします</h2>
+          <p class="ni-summary">ブース番号: E2-32 / 6月10日(水)–12日(金)。来場登録受付中です。当日はライブデモと個別相談会を実施します。</p>
+        </div>
+        <div class="ni-arrow">→</div>
+      </article>
+
+      <article class="news-item" data-url="/05_support/news/email-template-preview/">
+        <div class="ni-date">
+          <time datetime="2026-05-08">2026.05.08</time>
+          <span class="ymd">Fri · MAY</span>
+        </div>
+        <div class="ni-tag"><span class="news-tag update">アップデート</span></div>
+        <div class="ni-body">
+          <h2 class="ni-title">御礼メールテンプレートに「差し込み変数のプレビュー」機能を追加</h2>
+          <p class="ni-summary">編集中に実際の差し込み結果を確認できるようになりました。氏名・会社名・回答内容に対応しています。</p>
+        </div>
+        <div class="ni-arrow">→</div>
+      </article>
+
+      <article class="news-item" data-url="/05_support/news/incident-login-2026-04-30/">
+        <div class="ni-date">
+          <time datetime="2026-04-30">2026.04.30</time>
+          <span class="ymd">Tue · APR</span>
+        </div>
+        <div class="ni-tag"><span class="news-tag incident">障害情報</span></div>
+        <div class="ni-body">
+          <h2 class="ni-title">【復旧済】4月30日(火) 14:18–14:42 一部ユーザーのログイン障害について</h2>
+          <p class="ni-summary">原因: 認証基盤の負荷上昇 / 影響範囲: 全体の約 6% / 再発防止策として、認証経路の自動フェイルオーバー設定を実施しました。</p>
+        </div>
+        <div class="ni-arrow">→</div>
+      </article>
+
+      <article class="news-item" data-url="/05_support/news/kanban-board-2026/">
+        <div class="ni-date">
+          <time datetime="2026-04-28">2026.04.28</time>
+          <span class="ymd">Sun · APR</span>
+        </div>
+        <div class="ni-tag"><span class="news-tag update">アップデート</span></div>
+        <div class="ni-body">
+          <h2 class="ni-title">SPEED AD の新機能リリース ― リード管理ボードのカンバンビュー</h2>
+          <p class="ni-summary">追客状況をステータス別に可視化できる新ビューを公開しました。ドラッグ操作で状態変更が可能で、フィルタ条件は保存できます。</p>
+        </div>
+        <div class="ni-arrow">→</div>
+      </article>
+
+      <article class="news-item" data-url="/05_support/news/support-sla-update/">
+        <div class="ni-date">
+          <time datetime="2026-04-22">2026.04.22</time>
+          <span class="ymd">Mon · APR</span>
+        </div>
+        <div class="ni-tag"><span class="news-tag info">お知らせ</span></div>
+        <div class="ni-body">
+          <h2 class="ni-title">サポート窓口の応答時間目安を更新しました</h2>
+          <p class="ni-summary">平日 9:00–18:00 / 平均初回返信時間: 約 1.6 営業時間（直近 30 日実績）。優先サポートは約 0.4 営業時間です。</p>
+        </div>
+        <div class="ni-arrow">→</div>
+      </article>
+
+      <article class="news-item" data-url="/05_support/news/golden-week-2026/">
+        <div class="ni-date">
+          <time datetime="2026-04-15">2026.04.15</time>
+          <span class="ymd">Mon · APR</span>
+        </div>
+        <div class="ni-tag"><span class="news-tag maint">メンテナンス</span></div>
+        <div class="ni-body">
+          <h2 class="ni-title">ゴールデンウィーク期間のサポート体制について</h2>
+          <p class="ni-summary">4月29日(月)〜5月6日(月)はメール対応のみとなります。緊急時は契約者様向け緊急連絡先までご連絡ください。</p>
+        </div>
+        <div class="ni-arrow">→</div>
+      </article>
+
+      <article class="news-item" data-url="/05_support/news/ocr-v3-release/">
+        <div class="ni-date">
+          <time datetime="2026-04-10">2026.04.10</time>
+          <span class="ymd">Wed · APR</span>
+        </div>
+        <div class="ni-tag"><span class="news-tag update">アップデート</span></div>
+        <div class="ni-body">
+          <h2 class="ni-title">名刺OCRエンジンを v3 に更新 ― 縦書き・英字混在レイアウトの認識精度が向上</h2>
+          <p class="ni-summary">手書き名刺の認識率は当社測定で 78% → 91% に改善。プラン問わずご利用いただけます。既存データの再OCRも可能です。</p>
+        </div>
+        <div class="ni-arrow">→</div>
+      </article>
+
+      <article class="news-item" data-url="/05_support/news/privacy-policy-2026-05/">
+        <div class="ni-date">
+          <time datetime="2026-04-01">2026.04.01</time>
+          <span class="ymd">Wed · APR</span>
+        </div>
+        <div class="ni-tag"><span class="news-tag info">お知らせ</span></div>
+        <div class="ni-body">
+          <h2 class="ni-title">プライバシーポリシーを改定しました</h2>
+          <p class="ni-summary">第三者提供に関する記載を明確化しました。施行日は 2026 年 5 月 1 日です。改定内容の概要も併せてご確認ください。</p>
+        </div>
+        <div class="ni-arrow">→</div>
+      </article>
+
+      <article class="news-item" data-url="/05_support/news/role-viewer-limited/">
+        <div class="ni-date">
+          <time datetime="2026-03-28">2026.03.28</time>
+          <span class="ymd">Sat · MAR</span>
+        </div>
+        <div class="ni-tag"><span class="news-tag update">アップデート</span></div>
+        <div class="ni-body">
+          <h2 class="ni-title">権限ロール「閲覧者(限定)」を追加 ― 個人情報を伏せた状態での共有が可能に</h2>
+          <p class="ni-summary">メールアドレス・電話番号などをマスクした状態でレポートを共有できる新ロールを追加しました。社外パートナーとのレビューに最適です。</p>
+        </div>
+        <div class="ni-arrow">→</div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- State previews — for spec review (would not appear in production). Shows §3.2 0-state and error-state. -->
+  <div class="state-previews">
+    <div class="sp-eyebrow">State Previews · for design review only</div>
+    <div class="sp-title">空状態 ／ エラー状態</div>
+    <div class="sp-note">仕様 §3.2: 0 件時は「現在お知らせはありません」を同セクション内に表示 ／ 取得失敗時はエラーメッセージを同セクション内に表示し、ヘルプセンター動線は維持。</div>
+    <div class="sp-grid">
+      <div class="sp-card">
+        <span class="lab">Empty State · 0 items</span>
+        <h4>現在お知らせはありません</h4>
+        <p>新しいお知らせが公開され次第、こちらに表示されます。サービスのアップデート情報はメールでもお届けしています。</p>
+      </div>
+      <div class="sp-card error">
+        <span class="lab">Error State · fetch failed</span>
+        <h4>お知らせの取得に失敗しました</h4>
+        <p>時間をおいてもう一度お試しください。問題が解消しない場合は、ヘルプセンター上部の「お問い合わせ」よりご連絡ください。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Common Help Center footer (support-shell.js injects this from /common/footer.html) -->
+  <footer class="foot">
+    <span class="brand">SPEED AD</span>
+    <span>© 2026 SPEED AD Inc.</span>
+    <div class="foot-links">
+      <a href="/help/">ヘルプセンター</a>
+      <a href="/05_support/news/">お知らせ</a>
+      <a href="/help/contact/">お問い合わせ</a>
+      <a href="/privacy/">プライバシーポリシー</a>
+      <a href="/terms/">利用規約</a>
+      <a href="/company/">会社概要</a>
+    </div>
+    <a class="foot-back" href="#top">
+      <span>Back to top</span><span class="arr">↑</span>
+    </a>
+  </footer>
+
+</div>
+</body>
+</html>

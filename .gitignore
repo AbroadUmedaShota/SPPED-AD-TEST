@@ -18,6 +18,9 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+error.log
+.codex-http-server.log
+.codex-http-server.err.log
 
 # Editor directories and files
 .idea
@@ -31,8 +34,26 @@ yarn-error.log*
 # Custom
 *.bak
 tmp_marker.txt
-data/dashboard/user_credentials.json 
+data/dashboard/user_credentials.json
+data/chatwork.sqlite
+
+# Claude Code / MCP (個人環境用)
+.mcp.json
+.playwright-mcp/
+.playwright-cli/
+check-*.png
+tmp-*.png
+.tmp_backlog/
+.claude/worktrees/
 
 # Build and test outputs
 /output/
 /test-results/
+
+# Local reference materials
+/00_Abroad⇔Rep/SPEEDレビュー・グラフ分析・請求書関連QA.xlsx
+/docs/プロダクト/*
+!/docs/プロダクト/README.md
+/docs/プロダクト/サービス企画/backlog_wiki_drafts/
+/docs/プロダクト/ロゴ制作/
+/docs/メモ/meetings/2026-03-26_abroad_regular_mtg_minutes.md

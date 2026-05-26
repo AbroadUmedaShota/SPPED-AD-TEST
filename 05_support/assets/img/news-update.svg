@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Update | SPEED AD News">
+  <defs>
+    <linearGradient id="updBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e6eff6"/>
+      <stop offset="100%" stop-color="#cddbe9"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#updBg)"/>
+  <g fill="#1f3144" opacity="0.08">
+    <circle cx="1040" cy="80" r="4"/>
+    <circle cx="1075" cy="80" r="4"/>
+    <circle cx="1110" cy="80" r="4"/>
+    <circle cx="1040" cy="115" r="4"/>
+    <circle cx="1075" cy="115" r="4"/>
+    <circle cx="1040" cy="150" r="4"/>
+  </g>
+  <g transform="translate(600,240)" fill="none" stroke="#1f3144" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="0" cy="0" r="108" stroke-width="6" opacity="0.6"/>
+    <path d="M -52 22 L 0 -46 L 52 22" stroke-width="18"/>
+    <line x1="0" y1="-40" x2="0" y2="52" stroke-width="18"/>
+  </g>
+  <line x1="560" y1="400" x2="640" y2="400" stroke="#b08544" stroke-width="2"/>
+  <text x="600" y="448" text-anchor="middle" font-family="'Cormorant Garamond','Noto Serif JP',serif" font-size="34" font-weight="500" letter-spacing="14" fill="#1f3144">UPDATE</text>
+</svg>

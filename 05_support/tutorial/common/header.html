@@ -1,0 +1,19 @@
+<header class="fixed top-0 left-0 right-0 z-50 flex h-16 items-center justify-between px-6  gradient-primary-bg">
+        <div class="flex items-center gap-3">
+            <!-- モバイル用サイドバートグル -->
+            <button class="lg:hidden text-on-primary hover:text-primary-container" id="sidebarToggleMobile" aria-label="モバイルメニューを開く">
+                <span class="material-icons text-3xl">menu</span>
+            </button>
+            <!-- ブランドロゴ -->
+            <div class="flex items-center gap-2">
+                <div class="h-8 w-8 text-on-primary" role="img" aria-label="SpeedAdロゴ">
+                    <img src="assets/svg/speedad_logo.svg" alt="SpeedAdロゴ" class="h-full w-full">
+                </div>
+                <span class="text-on-primary text-xl font-bold leading-tight tracking-tight">SPEED-AD</span>
+            </div>
+        </div>
+        <div class="flex items-center gap-x-3 sm:gap-x-4">
+            <!-- ユーザー情報 -->
+            <a href="#" class="text-on-primary font-bold transition-opacity" aria-label="現在のユーザー情報" onclick="window.openAccountInfoModal(window.dummyUserData);">user@example.comさん</a>
+        </div>
+    </header>

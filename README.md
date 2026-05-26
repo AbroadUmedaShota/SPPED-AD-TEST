@@ -14,8 +14,15 @@ SPEED AD is an all-in-one web application designed to streamline the lead manage
 - `02_dashboard/`: User-facing marketing dashboard and survey management.
 - `03_admin/`: Backend operations console for data entry and operator management.
 - `04_first-login/`: Onboarding tutorial for new users.
+- `05_support/`: Static support site intended to be served as the document root for `support.speed-ad.com`.
 - `data/`: Mock JSON datasets for the frontend.
 - `docs/`: Comprehensive project documentation.
+
+## Local Preview
+- Repository-wide preview: `python -m http.server 8000`
+- Support-site production-equivalent preview: `python -m http.server 8001 --directory 05_support`
+
+When checking support pages, use URLs such as `http://localhost:8001/plans/` for production-equivalent behavior. GitHub Pages previews under `/SPPED-AD-TEST/05_support/...` are subpath previews, so support pages that must be checked there should use deploy-compatible relative references for page-local CSS, JavaScript, and nearby support links.
 
 ## Documentation Index
 - **[Project Overview](docs/プロダクト/概要/00_PROJECT_OVERVIEW.md)**: Vision, scope, and core requirements.

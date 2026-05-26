@@ -39,10 +39,6 @@ function sortSurveysByIdDesc(surveys) {
     });
 }
 
-function shouldSkipInitialSurveyLoad() {
-    const status = localStorage.getItem('speedad-tutorial-status');
-    return ['pending', 'main-running', 'modal-running'].includes(status);
-}
 const SURVEY_ID_PATTERN = /^sv_(\d{4})_(\d{2})(\d{3})$/;
 const SURVEY_ID_DEFAULT_USER = '0001';
 const SURVEY_ID_MAX_SEQUENCE = 999;
@@ -147,7 +143,7 @@ function sortByHeader(header) {
 
         // Sorting on currentFilteredData directly
         currentFilteredData.sort((a, b) => {
-            const lang = window.getCurrentLanguage();
+            const lang = typeof window.getCurrentLanguage === 'function' ? window.getCurrentLanguage() : 'ja';
             let aValue, bValue;
 
             // Get values based on sortKey, handling multi-language names
@@ -330,7 +326,7 @@ function renderTableRows(surveysToRender) {
     }
 
     const fragment = document.createDocumentFragment();
-    const lang = window.getCurrentLanguage();
+    const lang = typeof window.getCurrentLanguage === 'function' ? window.getCurrentLanguage() : 'ja';
 
 
     surveysToRender.forEach(survey => {
@@ -716,7 +712,7 @@ export function applyFiltersAndPagination() {
 
         const startDate = startDateInputVal ? new Date(startDateInputVal) : null;
         const endDate = endDateInputVal ? new Date(endDateInputVal) : null;
-        const lang = window.getCurrentLanguage();
+        const lang = typeof window.getCurrentLanguage === 'function' ? window.getCurrentLanguage() : 'ja';
 
         currentFilteredData = allSurveyData.filter(survey => {
             const surveyName = (survey.name && typeof survey.name === 'object')
@@ -838,14 +834,9 @@ export function initTableManager() {
     }
 
     // Initial data fetch and render
-    if (shouldSkipInitialSurveyLoad()) {
-        allSurveyData = [];
-        applyFiltersAndPagination();
-    } else {
-        loadAndRenderSurveyData().catch(error => {
-            console.error('DEBUG: Error during initial data fetch or rendering:', error);
-        });
-    }
+    loadAndRenderSurveyData().catch(error => {
+        console.error('DEBUG: Error during initial data fetch or rendering:', error);
+    });
 }
 
 export async function reloadSurveyData() {

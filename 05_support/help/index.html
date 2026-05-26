@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>SPEED AD - ヘルプセンター</title>
+  <link rel="icon" href="/assets/img/speedad_logo.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/service-top-style.css">
+  <link rel="stylesheet" href="/assets/css/help-center.css?v=20260519-hero-label">
+  <link rel="stylesheet" href="/assets/css/support-shell.css?v=20260521-main-domain-link">
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+  <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+</head>
+<body data-page-id="help-center" data-support-section="help">
+<div class="support-shell">
+  <div id="support-header-placeholder"></div>
+
+  <main class="support-main" id="main-content" aria-label="ヘルプセンター">
+    <div id="hc-sticky-search" class="hc-sticky-search" hidden>
+      <div class="hc-sticky-search__inner">
+        <form action="/help-content/" method="GET" role="search" class="hc-sticky-search__form">
+          <span class="material-icons hc-sticky-search__icon" aria-hidden="true">search</span>
+          <input type="search" name="search" aria-label="ヘルプを検索（常に表示）" placeholder="ヘルプを検索..." class="hc-sticky-search__input">
+        </form>
+      </div>
+    </div>
+
+    <div class="hc-breadcrumb-top">
+      <nav aria-label="Breadcrumb">
+        <ol>
+          <li><span>ヘルプセンター</span></li>
+        </ol>
+      </nav>
+    </div>
+
+    <section class="hc-hero" aria-labelledby="hc-hero-title">
+      <div class="hc-hero__bg" aria-hidden="true">
+        <div class="hc-hero__grid"></div>
+        <div class="hc-hero__glow hc-hero__glow--1"></div>
+        <div class="hc-hero__glow hc-hero__glow--2"></div>
+      </div>
+      <div class="hc-hero__inner">
+        <h1 id="hc-hero-title" class="hc-hero__title">どんなことでお困りですか？</h1>
+        <p class="hc-hero__subtitle">キーワード検索、またはカテゴリから記事を探せます。</p>
+
+        <form action="/help-content/" method="GET" role="search" class="hc-search">
+          <span class="material-icons hc-search__icon" aria-hidden="true">search</span>
+          <input type="search" id="hc-search-input" name="search" role="combobox" aria-label="ヘルプを検索" aria-controls="hc-suggestions" aria-expanded="false" aria-autocomplete="list" aria-haspopup="listbox" placeholder="例：配信停止、料金、レポートの見方" class="hc-search__input" autocomplete="off">
+          <div id="hc-suggestions" class="hc-suggestions" role="listbox" aria-live="polite" aria-atomic="false" aria-label="検索候補" hidden></div>
+        </form>
+
+        <div id="hc-popular-keywords" class="hc-keywords" aria-label="よく検索されるキーワード"></div>
+      </div>
+    </section>
+
+    <div class="hc-main">
+      <section class="hc-categories" aria-labelledby="hc-categories-title">
+        <div class="hc-section-heading">
+          <h2 id="hc-categories-title" class="hc-section-heading__title">カテゴリから探す</h2>
+          <p class="hc-section-heading__subtitle">目的別に記事をまとめました</p>
+        </div>
+        <div id="hc-category-grid" class="hc-category-grid"></div>
+      </section>
+
+      <section class="hc-popular" aria-labelledby="hc-popular-title">
+        <div class="hc-section-heading">
+          <h2 id="hc-popular-title" class="hc-section-heading__title">よく読まれている記事</h2>
+          <p class="hc-section-heading__subtitle">多くのユーザーに選ばれた記事</p>
+        </div>
+        <div id="hc-popular-articles" class="hc-popular-grid"></div>
+        <p id="hc-popular-empty" class="hc-popular-empty" role="status" hidden>記事を読み込み中...</p>
+      </section>
+
+      <section class="hc-cta" aria-labelledby="hc-cta-title">
+        <div class="hc-cta__text">
+          <h2 id="hc-cta-title" class="hc-cta__title">お探しの答えは見つかりましたか？</h2>
+          <p class="hc-cta__subtitle">解決しなかった場合は、サポートチームがお手伝いします。</p>
+        </div>
+        <div class="hc-cta__actions">
+          <a href="/bug-report/" class="hc-cta__btn hc-cta__btn--primary"><span class="material-icons" aria-hidden="true">mail</span>お問い合わせ</a>
+          <a href="/faq/" class="hc-cta__btn hc-cta__btn--ghost"><span class="material-icons" aria-hidden="true">help_outline</span>よくある質問を見る</a>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div id="support-footer-placeholder"></div>
+</div>
+<script type="module" src="/assets/js/support-shell.js?v=20260519-plans-news"></script>
+<script type="module" src="/assets/js/help-center.js"></script>
+</body>
+</html>

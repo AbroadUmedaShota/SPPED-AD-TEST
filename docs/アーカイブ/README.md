@@ -9,3 +9,4 @@
 
 ## 移動ログ
 - 2025-11-26: `99.フロント画面の共有/注意事項2025-10-21.txt` → `front-share-2025-10/2025-10-21_front-share-notes.txt`
+- 2026-03-24: Backlog wiki `SPDAD/Home` を `speedad-backlog-wiki-2026-03-24/` として旧資料アーカイブ化（機微情報ページは縮退保存）
