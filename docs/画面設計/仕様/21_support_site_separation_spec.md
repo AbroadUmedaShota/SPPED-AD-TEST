@@ -346,7 +346,7 @@ SPPED-AD-TEST/
 python -m http.server 8001 --directory 05_support
 ```
 
-確認URLは `http://localhost:8001/plans/` のように本番URL構造と同じパスを使う。`http://localhost:8000/05_support/plans/index.html` は、`/assets/...` や `/common/...` がリポジトリルート側へ解決されるため、本番同等確認には使わない。
+確認URLは `http://localhost:8001/plans/` のように本番URL構造と同じパスを使う。GitHub Pages の `https://abroadumedashota.github.io/SPPED-AD-TEST/05_support/...` はサブパス配信のプレビューであり、本番同等確認ではない。ただし公開レビューで使うページは、CSS/JavaScriptなどページ直下から解決できる参照を相対パスにして、GitHub Pagesでも最低限の表示確認ができるようにする。
 
 ### 5.1 共有アセットの取り扱い
 
@@ -511,11 +511,11 @@ python -m http.server 8001 --directory 05_support
 
 ## 8. サポートサイト内の相互リンク
 
-**この章のサマリ：** サポートサイト内部の遷移はルート相対パスで記述。デプロイ構成変更で崩れた場合の対応方針を添える。
+**この章のサマリ：** サポートサイト内部の遷移は本番ドキュメントルートを基準に記述する。GitHub Pages等のサブパスプレビュー対象ページでは、表示確認のため相対パスも許容する。
 
-サポートサイト内部の遷移は同一サブドメインゆえ、ルート相対パスで記述する。ネストされた `/news/<slug>/` や将来の `/help-content/<slug>/` でもリンク解決を安定させるため、`../faq/` などの階層相対は原則使わない。
+サポートサイト内部の遷移は同一サブドメインゆえ、原則として本番ドキュメントルート基準で記述する。ネストされた `/news/<slug>/` や将来の `/help-content/<slug>/` でもリンク解決を安定させるため、共通フラグメントや動的描画ではルート相対パスを基本とする。
 
-CSS・JavaScript・画像・共通HTMLも同じ前提で、`/assets/...` と `/common/...` のルート相対パスを標準とする。これは `05_support/` を本番ドキュメントルートとして配信する前提のため、ローカル確認の都合で `../assets/...` へ寄せない。
+一方、GitHub Pages のようにリポジトリ名を含むサブパスで公開レビューする静的HTMLでは、`/assets/...` がドメイン直下へ解決されCSS/JSが404になる。公開レビュー対象ページでは、`../assets/...` や `../help/` などページ階層に応じた相対パスを許容する。`support.speed-ad.com` では `05_support/` がドキュメントルートになるため、`/plans/index.html` からの `../assets/...` は `/assets/...` として解決され、本番表示とも両立する。
 
 - ヘルプ → FAQ：`/faq/`
 - ヘルプ → お問い合わせ：`/bug-report/`
