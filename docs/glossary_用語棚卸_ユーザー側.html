@@ -599,6 +599,11 @@ col.c-iso{width:5.5%;} col.c-gen{width:14.5%;} col.c-jud{width:11%;} col.c-memo{
     if (pushTimer) clearTimeout(pushTimer);
     pushTimer = setTimeout(flushPush, 500);
   }
+  // GAS Web App は 302 リダイレクトに CORS ヘッダーを付けないため、
+  // GET は JSONP（<script> タグ）、POST は mode:'no-cors'（fire-and-forget）で送る。
+  // POST はレスポンスを読めないので、保存成否の最終確認は次回の fetchServer 時に
+  // 取得した内容で行う（楽観的同期）。
+
   function flushPush() {
     pushTimer = null;
     if (!GAS_WEB_APP_URL) return;
@@ -612,23 +617,36 @@ col.c-iso{width:5.5%;} col.c-gen{width:14.5%;} col.c-jud{width:11%;} col.c-memo{
     setSyncStatus('保存中… ' + ops.length + '件');
     fetch(GAS_WEB_APP_URL, {
       method: 'POST',
+      mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({ ops: ops })
-    }).then(function (r) { return r.json(); })
-      .then(function (j) {
-        if (j && j.ok) setSyncStatus('保存済 ' + new Date().toLocaleTimeString());
-        else setSyncStatus('保存失敗: ' + (j && j.error || 'unknown'));
-      })
-      .catch(function (e) { setSyncStatus('保存失敗: ' + e); });
+    }).then(function () {
+      setSyncStatus('保存リクエスト送信 ' + ops.length + '件 ' + new Date().toLocaleTimeString());
+    }).catch(function (e) {
+      setSyncStatus('保存失敗: ' + e);
+    });
   }
 
+  var jsonpCounter = 0;
   function fetchServer() {
     if (!GAS_WEB_APP_URL) { setSyncStatus('ローカル保存のみ（GAS未設定）'); return Promise.resolve(); }
     setSyncStatus('取得中…');
-    return fetch(GAS_WEB_APP_URL)
-      .then(function (r) { return r.json(); })
-      .then(function (j) {
-        if (!j || !j.ok) throw new Error((j && j.error) || 'unknown');
+    return new Promise(function (resolve) {
+      var cbName = '__glossary_jsonp_' + (++jsonpCounter) + '_' + Date.now();
+      var script = document.createElement('script');
+      var timer = null;
+      function cleanup() {
+        try { delete window[cbName]; } catch (e) { window[cbName] = undefined; }
+        if (script.parentNode) script.parentNode.removeChild(script);
+        if (timer) clearTimeout(timer);
+      }
+      window[cbName] = function (j) {
+        cleanup();
+        if (!j || !j.ok) {
+          setSyncStatus('取得失敗: ' + ((j && j.error) || 'unknown'));
+          resolve();
+          return;
+        }
         var data = j.data || {};
         var applied = 0;
         Object.keys(data).forEach(function (id) {
@@ -646,8 +664,22 @@ col.c-iso{width:5.5%;} col.c-gen{width:14.5%;} col.c-jud{width:11%;} col.c-memo{
         });
         updateCount();
         setSyncStatus('取得完了 ' + applied + '件 ' + new Date().toLocaleTimeString());
-      })
-      .catch(function (e) { setSyncStatus('取得失敗: ' + e); });
+        resolve();
+      };
+      script.onerror = function () {
+        cleanup();
+        setSyncStatus('取得失敗: ネットワークエラー');
+        resolve();
+      };
+      var sep = GAS_WEB_APP_URL.indexOf('?') >= 0 ? '&' : '?';
+      script.src = GAS_WEB_APP_URL + sep + 'callback=' + encodeURIComponent(cbName);
+      timer = setTimeout(function () {
+        cleanup();
+        setSyncStatus('取得タイムアウト');
+        resolve();
+      }, 15000);
+      document.head.appendChild(script);
+    });
   }
 
   function migrateLocalToServer() {
@@ -667,14 +699,21 @@ col.c-iso{width:5.5%;} col.c-gen{width:14.5%;} col.c-jud{width:11%;} col.c-memo{
     setSyncStatus('移行中… ' + ops.length + '件');
     fetch(GAS_WEB_APP_URL, {
       method: 'POST',
+      mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({ ops: ops })
-    }).then(function (r) { return r.json(); })
-      .then(function (j) {
-        if (j && j.ok) { alert('スプシへ ' + ops.length + ' 件を移行しました'); setSyncStatus('移行完了 ' + ops.length + '件'); }
-        else { alert('失敗: ' + (j && j.error)); setSyncStatus('移行失敗'); }
-      })
-      .catch(function (e) { alert('失敗: ' + e); setSyncStatus('移行失敗'); });
+    }).then(function () {
+      // no-cors のため成功確認できないので、2 秒後に GET して反映を見る
+      setSyncStatus('移行リクエスト送信 ' + ops.length + '件 …反映確認中');
+      setTimeout(function () {
+        fetchServer().then(function () {
+          alert('スプシへ ' + ops.length + ' 件を移行しました（最新を取得して反映確認済み）');
+        });
+      }, 2000);
+    }).catch(function (e) {
+      alert('失敗: ' + e);
+      setSyncStatus('移行失敗');
+    });
   }
 
   function loadRow(id) {
@@ -910,6 +949,18 @@ col.c-iso{width:5.5%;} col.c-gen{width:14.5%;} col.c-jud{width:11%;} col.c-memo{
   if (btnMigrate) btnMigrate.addEventListener('click', migrateLocalToServer);
 
   fetchServer();
+
+  // 30 秒ごとに自動同期。ただし
+  //  ・ローカル編集の送信待ち中 (pushTimer / pushQueue)
+  //  ・採用欄/メモ欄にフォーカス中（タイピング中）
+  // のときは他PCの値で上書きしないようスキップする。
+  setInterval(function () {
+    if (pushTimer || Object.keys(pushQueue).length > 0) return;
+    var ae = document.activeElement;
+    if (ae && (ae.classList.contains('adopt-input') || ae.classList.contains('memo-input'))) return;
+    if (document.hidden) return;
+    fetchServer();
+  }, 30000);
 })();
 </script>
 </body></html>

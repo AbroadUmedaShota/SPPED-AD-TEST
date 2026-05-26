@@ -82,18 +82,29 @@ function getSheet_() {
 }
 
 /**
- * JSON レスポンス生成ヘルパー。
+ * JSON レスポンス生成ヘルパー。callback パラメタがあれば JSONP で返す。
+ * GAS Web App の 302 リダイレクトに CORS ヘッダーが付かない既知の制約を
+ * 回避するため、GET は JSONP で受ける運用にしている。
  */
-function jsonOut_(obj) {
+function jsonOut_(obj, callback) {
+  var body = JSON.stringify(obj);
+  if (callback) {
+    return ContentService
+      .createTextOutput(callback + '(' + body + ');')
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
+  }
   return ContentService
-    .createTextOutput(JSON.stringify(obj))
+    .createTextOutput(body)
     .setMimeType(ContentService.MimeType.JSON);
 }
 
 /**
- * GET: 全行を ID キーの map で返す。
+ * GET: 全行を ID キーの map で返す。?callback=xxx 付きなら JSONP。
  */
 function doGet(e) {
+  var callback = (e && e.parameter && e.parameter.callback) ? String(e.parameter.callback) : '';
+  // JSONP 関数名のサニタイズ（英数_$.のみ許可）
+  if (callback && !/^[A-Za-z_$][A-Za-z0-9_$.]*$/.test(callback)) callback = '';
   try {
     var sheet = getSheet_();
     var lastRow = sheet.getLastRow();
@@ -118,9 +129,9 @@ function doGet(e) {
         };
       }
     }
-    return jsonOut_({ ok: true, data: data, fetchedAt: new Date().toISOString() });
+    return jsonOut_({ ok: true, data: data, fetchedAt: new Date().toISOString() }, callback);
   } catch (err) {
-    return jsonOut_({ ok: false, error: String(err) });
+    return jsonOut_({ ok: false, error: String(err) }, callback);
   }
 }
 
