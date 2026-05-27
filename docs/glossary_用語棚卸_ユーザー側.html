@@ -124,7 +124,7 @@ h2.deferred-section .h2-sub { font-weight:normal; font-size:9pt; opacity:.85; }
 </ul>
 
 <div class="toolbar">
-  <span>レビュー判定/最終推奨/コメント/対応ステータスを記入してください。GASスプシへ自動保存（最終推奨・コメントのみ／30秒ごとに同期）。</span>
+  <span>レビュー判定/最終推奨/コメント/対応ステータスを記入してください。GASスプシへ自動保存（全4フィールド／30秒ごとに同期）。</span>
   <button type="button" id="btn-fetch-server">最新を取得</button>
   <label class="hint">絞り込み:
     <select id="filter-judge">
@@ -149,6 +149,7 @@ h2.deferred-section .h2-sub { font-weight:normal; font-size:9pt; opacity:.85; }
   <button type="button" id="btn-export-csv">CSVダウンロード</button>
   <button type="button" id="btn-import-csv">CSV読み込み</button>
   <input type="file" id="csv-file" accept=".csv,text/csv" style="display:none">
+  <button type="button" id="btn-migrate-local" title="このブラウザのlocalStorageに溜まった4フィールド全部をスプシへ一括送信（新スプシ移行時に1回押す）">localStorage→スプシ移行</button>
   <button type="button" id="btn-clear-local" class="danger">ローカル全クリア</button>
   <span class="hint" id="sync-status">ローカル保存のみ</span>
   <span class="count" id="decision-count">判定済 0 / 323</span>
@@ -542,9 +543,10 @@ h2.deferred-section .h2-sub { font-weight:normal; font-size:9pt; opacity:.85; }
   var JUDGE_OPTIONS = ['', '統一する', '別概念として残す', '要確認', '対象外', 'ルール化', '保留'];
   var STATUS_OPTIONS = ['', '検討中', '修正待ち', '修正中', '修正済み', '完了', '保留'];
 
-  // === 共同編集用 GAS Web App URL（v1 と共用） ===
-  // 最終推奨表記（旧adopt）・レビューコメント（旧memo）は GAS スプシへ同期。
-  // レビュー判定・対応ステータスはローカルのみ保存。
+  // === 共同編集用 GAS Web App URL（v2: 7列スキーマ対応） ===
+  // 最終推奨表記・レビューコメント・レビュー判定・対応ステータスの 4 フィールドを
+  // GAS スプシへ自動同期。新スプシ作成時は docs/glossary_gas/Code.gs を参照。
+  // 注: 旧 URL は v1 5列スキーマのため、新スプシ + 新 GAS デプロイ後に URL を差し替えること。
   var GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbz-TRcV-xJ_tvfMgZjhgxFXCbj9GtoAniLJA9o2560JOgLbWoFjvJdt0BD5Iff-PPqn/exec';
   var EDITOR_NAME_KEY = 'glossary-decision:editor';
 
@@ -561,9 +563,9 @@ h2.deferred-section .h2-sub { font-weight:normal; font-size:9pt; opacity:.85; }
   }
 
   var pushQueue = {}, pushTimer = null;
-  function queuePush(id, adopt, memo) {
+  function queuePushAll(id, adopt, memo, judge, status) {
     if (!GAS_WEB_APP_URL) return;
-    pushQueue[id] = { adopt: adopt, memo: memo };
+    pushQueue[id] = { adopt: adopt || '', memo: memo || '', judge: judge || '', status: status || '' };
     if (pushTimer) clearTimeout(pushTimer);
     pushTimer = setTimeout(flushPush, 500);
   }
@@ -574,7 +576,8 @@ h2.deferred-section .h2-sub { font-weight:normal; font-size:9pt; opacity:.85; }
     var ids = Object.keys(pushQueue);
     if (!ids.length) return;
     var ops = ids.map(function (id) {
-      return { id: id, adopt: pushQueue[id].adopt, memo: pushQueue[id].memo, editor: editor };
+      var v = pushQueue[id];
+      return { id: id, adopt: v.adopt, memo: v.memo, judge: v.judge, status: v.status, editor: editor };
     });
     pushQueue = {};
     setSyncStatus('保存中… ' + ops.length + '件');
@@ -617,15 +620,20 @@ h2.deferred-section .h2-sub { font-weight:normal; font-size:9pt; opacity:.85; }
           if (!tr) return;
           var fi = tr.querySelector('.final-input');
           var ci = tr.querySelector('.comment-input');
+          var js = tr.querySelector('.judge-select');
+          var ss = tr.querySelector('.status-select');
           if (!fi || !ci) return;
           var d = data[id];
           fi.value = d.adopt || '';
           ci.value = d.memo || '';
-          saveRowLocal(id, fi.value, ci.value);
+          if (js) js.value = d.judge || '';
+          if (ss) ss.value = d.status || '';
+          saveAllLocal(id, fi.value, ci.value, js ? js.value : '', ss ? ss.value : '');
           highlightInputs(tr);
           applied++;
         });
         updateCount();
+        if (typeof applyFilter === 'function') applyFilter();
         setSyncStatus('取得完了 ' + applied + '件 ' + new Date().toLocaleTimeString());
         resolve();
       };
@@ -645,32 +653,75 @@ h2.deferred-section .h2-sub { font-weight:normal; font-size:9pt; opacity:.85; }
     });
   }
 
+  function migrateLocalToServer() {
+    if (!GAS_WEB_APP_URL) { alert('GAS_WEB_APP_URL が未設定です。HTML 内の定数に Web App URL を貼ってください。'); return; }
+    if (!confirm('このブラウザに保存された判定/最終推奨表記/コメント/ステータスをスプシへ一括送信します。\nスプシ側の該当ID既存内容は上書きされます。続行しますか？\n（先にCSVダウンロード推奨）')) return;
+    var editor = getEditorName();
+    var ops = [];
+    Object.keys(localStorage).forEach(function (k) {
+      if (k.indexOf(STORAGE_PREFIX) !== 0) return;
+      var id = k.slice(STORAGE_PREFIX.length);
+      try {
+        var v = JSON.parse(localStorage.getItem(k));
+        ops.push({
+          id: id,
+          adopt:  v.adopt  || '',
+          memo:   v.memo   || '',
+          judge:  v.judge  || '',
+          status: v.status || '',
+          editor: editor
+        });
+      } catch (e) { /* skip */ }
+    });
+    if (!ops.length) { alert('移行対象がありません（このブラウザに保存データなし）'); return; }
+    setSyncStatus('移行中… ' + ops.length + '件');
+    fetch(GAS_WEB_APP_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ ops: ops })
+    }).then(function () {
+      setSyncStatus('移行リクエスト送信 ' + ops.length + '件 …反映確認中');
+      setTimeout(function () {
+        fetchServer().then(function () {
+          alert('スプシへ ' + ops.length + ' 件を移行しました（最新を取得して反映確認済み）');
+        });
+      }, 2000);
+    }).catch(function (e) {
+      alert('失敗: ' + e);
+      setSyncStatus('移行失敗');
+    });
+  }
+
   function loadRow(id) {
     var raw = localStorage.getItem(STORAGE_PREFIX + id);
     if (!raw) return null;
     try { return JSON.parse(raw); } catch (e) { return null; }
   }
-  function saveRowLocal(id, adopt, memo) {
-    var prev = loadRow(id) || {};
-    var next = { adopt: adopt || '', memo: memo || '', judge: prev.judge || '', status: prev.status || '' };
+  function saveAllLocal(id, adopt, memo, judge, status) {
+    var next = { adopt: adopt || '', memo: memo || '', judge: judge || '', status: status || '' };
     if (!next.adopt && !next.memo && !next.judge && !next.status) {
       localStorage.removeItem(STORAGE_PREFIX + id);
     } else {
       localStorage.setItem(STORAGE_PREFIX + id, JSON.stringify(next));
     }
   }
-  function saveRowField(id, field, value) {
-    var prev = loadRow(id) || {};
-    prev[field] = value || '';
-    if (!prev.adopt && !prev.memo && !prev.judge && !prev.status) {
-      localStorage.removeItem(STORAGE_PREFIX + id);
-    } else {
-      localStorage.setItem(STORAGE_PREFIX + id, JSON.stringify(prev));
-    }
+  function readRowFromDom(tr) {
+    var fi = tr.querySelector('.final-input');
+    var ci = tr.querySelector('.comment-input');
+    var js = tr.querySelector('.judge-select');
+    var ss = tr.querySelector('.status-select');
+    return {
+      adopt:  fi ? fi.value : '',
+      memo:   ci ? ci.value : '',
+      judge:  js ? js.value : '',
+      status: ss ? ss.value : ''
+    };
   }
-  function saveRow(id, adopt, memo) {
-    saveRowLocal(id, adopt, memo);
-    queuePush(id, adopt || '', memo || '');
+  function saveAndQueue(id, tr) {
+    var v = readRowFromDom(tr);
+    saveAllLocal(id, v.adopt, v.memo, v.judge, v.status);
+    queuePushAll(id, v.adopt, v.memo, v.judge, v.status);
   }
   function updateCount() {
     var total = document.querySelectorAll('tr[data-row-id]').length;
@@ -716,7 +767,7 @@ h2.deferred-section .h2-sub { font-weight:normal; font-size:9pt; opacity:.85; }
       judgeCell.innerHTML = '';
       var js = mkSelect(JUDGE_OPTIONS, 'judge-select', '未判定');
       js.addEventListener('change', function () {
-        saveRowField(id, 'judge', js.value);
+        saveAndQueue(id, tr);
         highlightInputs(tr);
         updateCount();
         applyFilter();
@@ -733,8 +784,7 @@ h2.deferred-section .h2-sub { font-weight:normal; font-size:9pt; opacity:.85; }
       fi.className = 'final-input';
       fi.placeholder = '最終表記…';
       fi.addEventListener('input', function () {
-        var ci = tr.querySelector('.comment-input');
-        saveRow(id, fi.value, ci ? ci.value : '');
+        saveAndQueue(id, tr);
         highlightInputs(tr);
       });
       finalCell.appendChild(fi);
@@ -749,8 +799,7 @@ h2.deferred-section .h2-sub { font-weight:normal; font-size:9pt; opacity:.85; }
       ci.placeholder = 'コメント…';
       ci.rows = 2;
       ci.addEventListener('input', function () {
-        var fi2 = tr.querySelector('.final-input');
-        saveRow(id, fi2 ? fi2.value : '', ci.value);
+        saveAndQueue(id, tr);
         highlightInputs(tr);
       });
       commentCell.appendChild(ci);
@@ -762,7 +811,7 @@ h2.deferred-section .h2-sub { font-weight:normal; font-size:9pt; opacity:.85; }
       statusCell.innerHTML = '';
       var ss = mkSelect(STATUS_OPTIONS, 'status-select', '未着手');
       ss.addEventListener('change', function () {
-        saveRowField(id, 'status', ss.value);
+        saveAndQueue(id, tr);
         highlightInputs(tr);
       });
       statusCell.appendChild(ss);
@@ -878,10 +927,7 @@ h2.deferred-section .h2-sub { font-weight:normal; font-size:9pt; opacity:.85; }
         if (fi && fIdx >= 0) fi.value = row[fIdx] || '';
         if (ci && cIdx >= 0) ci.value = row[cIdx] || '';
         if (ss && sIdx >= 0) ss.value = row[sIdx] || '';
-        saveRowLocal(id, fi ? fi.value : '', ci ? ci.value : '');
-        saveRowField(id, 'judge', js ? js.value : '');
-        saveRowField(id, 'status', ss ? ss.value : '');
-        queuePush(id, fi ? fi.value : '', ci ? ci.value : '');
+        saveAndQueue(id, tr);
         highlightInputs(tr);
         count++;
       }
@@ -950,6 +996,8 @@ h2.deferred-section .h2-sub { font-weight:normal; font-size:9pt; opacity:.85; }
   }
   var btnFetch = document.getElementById('btn-fetch-server');
   if (btnFetch) btnFetch.addEventListener('click', fetchServer);
+  var btnMigrate = document.getElementById('btn-migrate-local');
+  if (btnMigrate) btnMigrate.addEventListener('click', migrateLocalToServer);
 
   var fj = document.getElementById('filter-judge');
   if (fj) fj.addEventListener('change', applyFilter);

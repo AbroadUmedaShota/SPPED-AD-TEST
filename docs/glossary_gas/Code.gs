@@ -1,5 +1,5 @@
 /**
- * SPEED AD 用語棚卸 共有バックエンド (Google Apps Script Web App)
+ * SPEED AD 用語棚卸 共有バックエンド (Google Apps Script Web App)  v2 スキーマ
  *
  * 役割:
  *   フロント側 HTML (glossary 用語棚卸ユーザー側) は従来 localStorage に
@@ -7,17 +7,24 @@
  *   本 GAS をシート連携 API として挟むことで、複数人レビューを同一スプレッド
  *   シート上で同期する。
  *
+ *   v2 では「レビュー判定」「対応ステータス」もスプシへ同期するよう
+ *   列数を 5 → 7 に拡張した。旧 5 列スキーマの sheet には対応しない
+ *   （新しい sheet を作成する想定）。
+ *
  * --- セットアップ手順 ---
  *
  * 1. Google スプレッドシートを新規作成し、シート名を `decisions` に変更。
- *    1 行目 (A1〜E1) に次のヘッダーを入力する:
+ *    1 行目 (A1〜G1) に次のヘッダーを入力する:
  *      A1: ID
- *      B1: 採用
- *      C1: メモ
- *      D1: 更新者
- *      E1: 更新日時
+ *      B1: 採用            （= フロントの「最終推奨表記」）
+ *      C1: メモ            （= フロントの「レビューコメント」）
+ *      D1: レビュー判定    （統一する/別概念として残す/要確認/対象外/ルール化/保留）
+ *      E1: 対応ステータス  （検討中/修正待ち/修正中/修正済み/完了/保留）
+ *      F1: 更新者
+ *      G1: 更新日時
  *    URL 内 (https://docs.google.com/spreadsheets/d/【ここ】/edit) の
  *    スプレッドシート ID を控える。
+ *    （シートが空ならコード側が初回 GET/POST 時に自動でヘッダーを書き込みます）
  *
  * 2. https://script.google.com を開き、新規プロジェクトを作成。
  *    本ファイル (Code.gs) の内容を全部貼り付ける。
@@ -43,7 +50,7 @@
  *   レスポンス: {
  *     ok: true,
  *     data: {
- *       "G-0001": { adopt, memo, editor, updatedAt },
+ *       "G-0001": { adopt, memo, judge, status, editor, updatedAt },
  *       "G-0002": { ... },
  *       ...
  *     },
@@ -52,9 +59,9 @@
  *
  * POST /exec
  *   リクエストボディ (JSON 文字列):
- *     { ops: [ { id, adopt, memo, editor }, ... ] }
+ *     { ops: [ { id, adopt, memo, judge, status, editor }, ... ] }
  *   または単一オブジェクト:
- *     { id, adopt, memo, editor }    // 内部で [body] にラップ
+ *     { id, adopt, memo, judge, status, editor }    // 内部で [body] にラップ
  *
  *   Content-Type は `text/plain` で送信すること。
  *   (application/json だと CORS プリフライト OPTIONS が発生し GAS では受けられない)
@@ -64,8 +71,10 @@
  *   ロック競合: { ok: false, error: "busy" }
  */
 
-var SPREADSHEET_ID = '1cL4_uoEUbypGB9amgPHrg6FsdwNqTzT4jh4h29_Smbs';
+var SPREADSHEET_ID = '1cL4_uoEUbypGB9amgPHrg6FsdwNqTzT4jh4h29_Smbs';  // ← 新スプシID に置換
 var SHEET_NAME = 'decisions';
+var HEADERS = ['ID', '採用', 'メモ', 'レビュー判定', '対応ステータス', '更新者', '更新日時'];
+var COL_COUNT = HEADERS.length;  // 7
 
 /**
  * シートを開く。存在しなければ作成してヘッダーを書き込む。
@@ -75,7 +84,7 @@ function getSheet_() {
   var sheet = ss.getSheetByName(SHEET_NAME);
   if (!sheet) {
     sheet = ss.insertSheet(SHEET_NAME);
-    sheet.getRange(1, 1, 1, 5).setValues([['ID', '採用', 'メモ', '更新者', '更新日時']]);
+    sheet.getRange(1, 1, 1, COL_COUNT).setValues([HEADERS]);
     sheet.setFrozenRows(1);
   }
   return sheet;
@@ -110,21 +119,23 @@ function doGet(e) {
     var lastRow = sheet.getLastRow();
     var data = {};
     if (lastRow >= 2) {
-      var values = sheet.getRange(2, 1, lastRow - 1, 5).getValues();
+      var values = sheet.getRange(2, 1, lastRow - 1, COL_COUNT).getValues();
       for (var i = 0; i < values.length; i++) {
         var row = values[i];
         var id = String(row[0] == null ? '' : row[0]).trim();
         if (!id) continue;
-        var updatedAtCell = row[4];
+        var updatedAtCell = row[6];
         var updatedAt = '';
-        // E 列が日付なら ISO 文字列化、それ以外は空文字
+        // G 列 (更新日時) が日付なら ISO 文字列化、それ以外は空文字
         if (updatedAtCell instanceof Date && !isNaN(updatedAtCell.getTime())) {
           updatedAt = updatedAtCell.toISOString();
         }
         data[id] = {
-          adopt: row[1],
-          memo: row[2] == null ? '' : String(row[2]),
-          editor: row[3] == null ? '' : String(row[3]),
+          adopt:  row[1] == null ? '' : String(row[1]),
+          memo:   row[2] == null ? '' : String(row[2]),
+          judge:  row[3] == null ? '' : String(row[3]),
+          status: row[4] == null ? '' : String(row[4]),
+          editor: row[5] == null ? '' : String(row[5]),
           updatedAt: updatedAt
         };
       }
@@ -180,22 +191,26 @@ function doPost(e) {
       var op = ops[j] || {};
       var id = String(op.id == null ? '' : op.id).trim();
       if (!id) continue;
-      var adopt = op.adopt == null ? '' : op.adopt;
-      var memo = op.memo == null ? '' : String(op.memo);
+      var adopt  = op.adopt  == null ? '' : String(op.adopt);
+      var memo   = op.memo   == null ? '' : String(op.memo);
+      var judge  = op.judge  == null ? '' : String(op.judge);
+      var status = op.status == null ? '' : String(op.status);
       var editor = op.editor == null ? '' : String(op.editor);
 
       if (idToRow[id]) {
-        sheet.getRange(idToRow[id], 2, 1, 4).setValues([[adopt, memo, editor, now]]);
+        // 既存行: B〜G (採用/メモ/判定/ステータス/更新者/更新日時) を上書き
+        sheet.getRange(idToRow[id], 2, 1, 6).setValues([[adopt, memo, judge, status, editor, now]]);
         updated++;
       } else {
-        appended.push([id, adopt, memo, editor, now]);
+        // 新規行: A〜G の 7 列分を末尾に追加
+        appended.push([id, adopt, memo, judge, status, editor, now]);
       }
     }
 
     // 追記分はまとめて 1 回で書き込み
     if (appended.length > 0) {
       var startRow = sheet.getLastRow() + 1;
-      sheet.getRange(startRow, 1, appended.length, 5).setValues(appended);
+      sheet.getRange(startRow, 1, appended.length, COL_COUNT).setValues(appended);
     }
 
     return jsonOut_({ ok: true, updated: updated, inserted: appended.length });
