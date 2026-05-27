@@ -1170,6 +1170,8 @@
     animation: none !important;
   }
 
+  .tutorial-coachmark,
+  .tutorial-coachmark__close,
   .tutorial-coachmark__next,
   .tutorial-coachmark__prev,
   .tutorial-skip-modal__cancel,
@@ -1179,6 +1181,7 @@
   .tutorial-account-cta__create,
   .tutorial-account-cta__close,
   .tutorial-progressbar__fill,
+  .tutorial-progressbar__bar,
   .tutorial-spotlight--context {
     transition: none !important;
   }

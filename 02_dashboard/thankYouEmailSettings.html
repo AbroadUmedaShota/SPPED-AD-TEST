@@ -128,6 +128,7 @@
                     <!-- デモ用シナリオ切替 (目立たないように配置調整) -->
                     <div class="flex items-center gap-2 bg-white px-3 py-1.5 rounded-full border border-outline-variant shadow-sm opacity-60 hover:opacity-100 transition-opacity">
                         <span class="material-icons text-on-surface-variant text-xs cursor-help" title="動作検証用シナリオ切替">science</span>
+                        <label for="scenarioSelector" class="sr-only">シナリオ切替</label>
                         <select id="scenarioSelector" class="bg-transparent text-on-surface-variant border-none text-[10px] font-bold focus:ring-0 cursor-pointer py-0 pl-1 pr-4">
                             <option value="before_or_during_event">STEP 1 会期前・会期中</option>
                             <option value="after_event_processing">STEP 2 データ化処理中</option>
@@ -344,7 +345,7 @@
                             <thead class="bg-surface-container-low text-on-surface-variant text-[10px] font-black uppercase tracking-[0.15em] border-b border-outline-variant">
                                 <tr>
                                     <th class="p-5 w-14 text-center">
-                                        <input type="checkbox" id="selectAllRecipients" class="form-checkbox text-primary rounded-md focus:ring-primary h-5 w-5 cursor-pointer border-outline-variant">
+                                        <input type="checkbox" id="selectAllRecipients" aria-label="全員を選択" class="form-checkbox text-primary rounded-md focus:ring-primary h-5 w-5 cursor-pointer border-outline-variant">
                                     </th>
                                     <th class="p-5">企業名</th>
                                     <th class="p-5">氏名</th>
@@ -402,7 +403,7 @@
                     </div>
 
                 <div id="estimateSidebarOverlay" class="estimate-sidebar-overlay"></div>
-                <aside id="estimateSidebar" class="estimate-drawer w-full xl:w-[35%] xl:sticky xl:top-24 xl:self-start">
+                <aside id="estimateSidebar" aria-label="料金見積もり" class="estimate-drawer w-full xl:w-[35%] xl:sticky xl:top-24 xl:self-start">
                     <button id="estimateSidebarToggleBtn" type="button" class="estimate-drawer-toggle" aria-label="料金見積もりを開閉する" aria-expanded="false">
                         <span class="material-icons transition-transform duration-300">chevron_left</span>
                     </button>
@@ -600,12 +601,12 @@
     </dialog>
 
     <!-- 確認モーダル -->
-    <div id="sendConfirmModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center">
+    <div id="sendConfirmModal" role="dialog" aria-modal="true" aria-labelledby="sendConfirmModalTitle" aria-hidden="true" class="fixed inset-0 z-[100] hidden flex items-center justify-center">
         <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="sendConfirmModalBackdrop"></div>
         <div class="relative bg-surface rounded-3xl p-8 max-w-sm w-full mx-4 shadow-2xl space-y-6 transform transition-all">
             <div class="text-center space-y-2">
-                <span class="material-icons text-5xl text-primary">send</span>
-                <h3 class="text-xl font-bold text-on-surface">お礼メール送信確認</h3>
+                <span class="material-icons text-5xl text-primary" aria-hidden="true">send</span>
+                <h3 id="sendConfirmModalTitle" class="text-xl font-bold text-on-surface">お礼メール送信確認</h3>
                 <p class="text-sm text-on-surface-variant leading-relaxed">
                     お礼メールを <span id="modalActiveCount" class="font-bold text-primary text-base">0</span> 件送信します。<br>
                     お礼メール分（予想）: <span id="modalCost" class="font-bold text-primary text-base">¥0</span> (税込)
@@ -615,14 +616,14 @@
                 </p>
             </div>
             <div class="bg-surface-container-low p-4 rounded-2xl border border-warning/30 bg-warning/5 text-warning text-sm font-medium flex items-start gap-2">
-                <span class="material-icons text-base">warning</span>
+                <span class="material-icons text-base" aria-hidden="true">warning</span>
                 <p>この操作は取り消せません。本当によろしいですか？</p>
             </div>
             <div class="flex items-center gap-3 pt-2">
                 <button id="sendConfirmCancelBtn" class="flex-1 px-4 py-3 rounded-xl border border-outline-variant font-bold text-on-surface hover:bg-surface-container-low transition-colors">キャンセル</button>
                 <button id="sendConfirmExecuteBtn" class="flex-1 px-4 py-3 rounded-xl bg-primary text-on-primary font-bold shadow-md hover:bg-primary/90 transition-colors flex justify-center items-center gap-2">
                     <span>送信する</span>
-                    <span id="sendConfirmExecuteBtnLoading" class="hidden material-icons animate-spin text-sm">sync</span>
+                    <span id="sendConfirmExecuteBtnLoading" class="hidden material-icons animate-spin text-sm" aria-hidden="true">sync</span>
                 </button>
             </div>
         </div>

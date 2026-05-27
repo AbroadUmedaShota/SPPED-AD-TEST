@@ -34,6 +34,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!selector) return;
     selector.value = 'after_event_ready';
     selector.dispatchEvent(new Event('change', { bubbles: true }));
+    // チュートリアル中はシナリオセレクタを無効化（誤操作防止）
+    selector.disabled = true;
+    selector.setAttribute('aria-disabled', 'true');
+    selector.title = 'チュートリアル中はシナリオを変更できません';
   }, 0);
 });
 

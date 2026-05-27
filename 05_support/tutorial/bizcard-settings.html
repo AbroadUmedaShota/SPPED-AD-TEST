@@ -116,16 +116,16 @@
                                 <div class="space-y-5">
                                     <div class="flex items-center justify-between border-b border-outline-variant pb-2">
                                         <div class="flex items-center gap-2" data-help-target="bizcard-plan">
-                                            <h2 class="text-on-surface text-xl font-bold">1. データ化プランと見込み枚数</h2>
+                                            <h2 id="dataConversionPlanHeading" class="text-on-surface text-xl font-bold">1. データ化プランと見込み枚数</h2>
                                             <button type="button" class="help-trigger help-inline-button material-icons text-on-surface-variant hover:text-primary transition-colors" data-help-key="bizcardPlanAndSpeed" aria-label="データ化項目プランの説明を表示">help_outline</button>
                                         </div>
-                                        <button type="button" id="openBizcardDetailsModalBtn" class="text-primary text-sm font-semibold hover:underline flex items-center gap-1 focus:outline-none bg-primary/10 hover:bg-primary/20 px-3 py-1.5 rounded-full transition-colors">
+                                        <button type="button" id="openBizcardDetailsModalBtn" class="text-primary text-sm font-semibold hover:underline flex items-center gap-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 bg-primary/10 hover:bg-primary/20 px-3 py-1.5 rounded-full transition-colors">
                                             <span class="material-icons text-sm">info</span> 詳細仕様を見る
                                         </button>
                                     </div>
 
                                     <!-- プラン選択 -->
-                                    <div id="dataConversionPlanSelection" role="radiogroup" class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4"></div>
+                                    <div id="dataConversionPlanSelection" role="radiogroup" aria-labelledby="dataConversionPlanHeading" class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4"></div>
 
                                     <!-- 見込み枚数（スライダー＋ステッパー） -->
                                     <div class="rounded-2xl bg-gradient-to-br from-surface-container-lowest to-primary/5 p-6 border border-outline-variant/80 border-l-4 border-l-primary/40 mt-4 flex flex-col gap-5 relative" data-help-target="bizcard-request">
@@ -193,7 +193,7 @@
 
                                 <!-- STEP 3: メモ -->
                                 <div class="pt-2 border-t border-outline-variant">
-                                    <button id="toggleMemoSection" class="flex justify-between items-center w-full text-left p-3 hover:bg-surface-variant rounded-xl transition-colors focus:outline-none">
+                                    <button id="toggleMemoSection" class="flex justify-between items-center w-full text-left p-3 hover:bg-surface-variant rounded-xl transition-colors focus:outline-none" aria-expanded="false" aria-controls="memoSection">
                                         <span class="text-on-surface font-semibold text-sm">社内管理用メモ（任意）</span>
                                         <span class="material-icons transition-transform text-on-surface-variant" id="memoExpandIcon">expand_more</span>
                                     </button>
@@ -220,7 +220,7 @@
 
                     <!-- ====== 右カラム (サマリー・アクションエリア 35%) ====== -->
                     <div id="estimateSidebarOverlay" class="estimate-sidebar-overlay"></div>
-                    <aside id="estimateSidebar" class="estimate-drawer w-full xl:w-[35%] xl:sticky xl:top-24 xl:self-start">
+                    <aside id="estimateSidebar" aria-label="料金見積もり" class="estimate-drawer w-full xl:w-[35%] xl:sticky xl:top-24 xl:self-start">
                         <button id="estimateSidebarToggleBtn" type="button" class="estimate-drawer-toggle" aria-label="料金見積もりを開閉する" aria-expanded="false">
                             <span class="material-icons transition-transform duration-300">chevron_left</span>
                         </button>
@@ -326,7 +326,7 @@
                                     ※クーポン値引きはアンケート全体の料金に対して1回適用されます
                                 </p>
 
-                                <button type="button" id="openBillingNotesModalBtn" class="text-primary text-xs font-semibold hover:underline flex items-center gap-1 focus:outline-none">
+                                <button type="button" id="openBillingNotesModalBtn" class="text-primary text-xs font-semibold hover:underline flex items-center gap-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
                                     <span class="material-icons text-[14px]">info</span>
                                     ご請求・お支払いに関する注意事項
                                 </button>
