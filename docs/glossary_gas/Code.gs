@@ -71,7 +71,7 @@
  *   ロック競合: { ok: false, error: "busy" }
  */
 
-var SPREADSHEET_ID = '1cL4_uoEUbypGB9amgPHrg6FsdwNqTzT4jh4h29_Smbs';  // ← 新スプシID に置換
+var SPREADSHEET_ID = '1AqbmCBGfMdhleb69JibDUNbUa6Cb5J-DtEKjimzrsmA';  // glossary v2 用スプシ
 var SHEET_NAME = 'decisions';
 var HEADERS = ['ID', '採用', 'メモ', 'レビュー判定', '対応ステータス', '更新者', '更新日時'];
 var COL_COUNT = HEADERS.length;  // 7
