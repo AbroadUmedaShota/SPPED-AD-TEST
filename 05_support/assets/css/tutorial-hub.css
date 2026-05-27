@@ -1,0 +1,167 @@
+/* ============================================================
+   SPEED-AD Support / Tutorial Hub
+   - 適用範囲: body[data-page-id="tutorial-hub"]
+   - CSS カスタムプロパティは news.css の :root 定義に依存:
+     --brand, --brand-ink, --brand-soft,
+     --ink, --ink-2, --muted, --muted-2, --line, --bg,
+     --tag-bg, --tag-ink, --shadow-sm, --shadow-md, --radius
+   - support-shell.css の管理領域には触らない
+   ============================================================ */
+
+/* ===== Grid Section ============================================== */
+.th-grid-section {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 48px 32px 80px;
+}
+
+.th-grid-section__heading {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--ink-2);
+  text-transform: uppercase;
+  margin: 0 0 24px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+/* ===== Grid ====================================================== */
+.th-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+/* ===== Card ====================================================== */
+.th-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+
+.th-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--brand-soft);
+}
+
+/* ===== Card Header =============================================== */
+.th-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 0;
+}
+
+.th-card__category {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: var(--tag-bg);
+  color: var(--tag-ink);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ===== Card Badge ================================================ */
+.th-card__badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 2px 7px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.th-card__badge--new {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+/* ===== Card Body ================================================= */
+.th-card__body {
+  flex: 1;
+  padding: 14px 20px 16px;
+}
+
+.th-card__title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0 0 8px;
+  line-height: 1.45;
+}
+
+.th-card__desc {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.7;
+}
+
+/* ===== Card Meta ================================================= */
+.th-card__meta {
+  display: flex;
+  gap: 16px;
+  padding: 0 20px 14px;
+  flex-wrap: wrap;
+}
+
+.th-card__meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--muted-2);
+}
+
+.th-card__meta-item .material-icons {
+  font-size: 14px !important;
+  color: var(--muted-2);
+}
+
+/* ===== Card CTA ================================================== */
+.th-card__cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  border-top: 1px solid var(--line);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--brand);
+  transition: color 0.15s ease;
+}
+
+.th-card__cta .material-icons {
+  font-size: 18px !important;
+  transition: transform 0.15s ease;
+}
+
+.th-card:hover .th-card__cta { color: var(--brand-ink); }
+.th-card:hover .th-card__cta .material-icons { transform: translateX(3px); }
+
+/* ===== Responsive ================================================ */
+@media (max-width: 640px) {
+  .th-grid-section {
+    padding: 32px 20px 60px;
+  }
+
+  .th-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .b-hero { padding: 36px 20px 20px; }
+  .b-hero__title { font-size: 28px; }
+}
