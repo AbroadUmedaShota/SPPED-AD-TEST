@@ -42,10 +42,10 @@
       </header>
       <div class="hero__inner">
         <div class="hero__copy">
-          <h1 id="hero-title">SPEED<br>AD</h1>
-          <p class="hero__statement" id="hero-statement">営業プロセスの無駄をゼロにする<br>次世代のリード獲得ツール。</p>
-          <p class="hero__lead" id="hero-lead">
-            Webアンケートで来場者情報を集め、<br>名刺データ化と御礼メールで展示会後の追客をスムーズに。
+          <h1 id="hero-title" data-hero-font-object="brand">SPEED<br>AD</h1>
+          <p class="hero__statement" id="hero-statement" data-hero-font-object="statement">スピードをアドバンテージに。</p>
+          <p class="hero__lead" id="hero-lead" data-hero-font-object="lead">
+            展示会やイベントのリード獲得フォローを最適化する<br>次世代WEBアンケート作成ツール
           </p>
           <div class="hero__actions" aria-label="主要導線">
             <a class="cta-button cta-button--primary" href="?intent=signup#top" data-signup-trigger>
@@ -497,6 +497,18 @@
           <textarea id="hero-copy-picker-custom-lead" class="hero-copy-picker__textarea" rows="3" placeholder="例：Webアンケートで来場者情報を集め、&#10;名刺データ化と御礼メールで展示会後の追客をスムーズに。"></textarea>
         </label>
       </div>
+      <div class="hero-copy-picker__font-controls" aria-label="フォントオブジェクト調整">
+        <div class="hero-copy-picker__font-header">
+          <p class="hero-copy-picker__reason-title">TEXT EDIT</p>
+          <label class="hero-copy-picker__switch" for="hero-font-edit-mode">
+            <input id="hero-font-edit-mode" type="checkbox">
+            <span>編集モード</span>
+          </label>
+        </div>
+        <p id="hero-font-selection-label" class="hero-copy-picker__selection">編集モードをONにして、文字を直接つかんで調整できます。</p>
+        <button type="button" id="hero-font-reset-button" class="hero-copy-picker__reset">選択中の調整をリセット</button>
+        <pre id="hero-font-value-memo" class="hero-copy-picker__value-memo" aria-live="polite"></pre>
+      </div>
       <div class="hero-copy-picker__reason-wrap">
         <p class="hero-copy-picker__reason-title" lang="en">DIRECTION &amp; RATIONALE</p>
         <p id="hero-copy-picker-reason" class="hero-copy-picker__reason"></p>
@@ -504,6 +516,6 @@
     </div>
   </div>
 
-  <script src="js/login-front.js?v=20260525-floating-mock-tool" defer></script>
+  <script src="js/login-front.js?v=20260527-inline-text-edit" defer></script>
 </body>
 </html>

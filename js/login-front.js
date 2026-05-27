@@ -790,18 +790,70 @@
     const customBlock = document.getElementById('hero-copy-picker-custom');
     const customStatementInput = document.getElementById('hero-copy-picker-custom-statement');
     const customLeadInput = document.getElementById('hero-copy-picker-custom-lead');
+    const fontEditModeInput = document.getElementById('hero-font-edit-mode');
+    const fontSelectionLabel = document.getElementById('hero-font-selection-label');
+    const fontValueMemo = document.getElementById('hero-font-value-memo');
+    const fontResetButton = document.getElementById('hero-font-reset-button');
 
     const STORAGE_KEY = 'speedad-hero-copy-variant';
     const POSITION_STORAGE_KEY = 'speedad-mock-tool-position';
     const CUSTOM_ID = 'custom';
     const CUSTOM_STATEMENT_KEY = 'speedad-hero-copy-custom-statement';
     const CUSTOM_LEAD_KEY = 'speedad-hero-copy-custom-lead';
+    const BRAND_TEXT_KEY = 'speedad-hero-brand-text';
+    const FONT_OBJECT_STORAGE_KEY = 'speedad-hero-font-objects';
+    const FONT_EDIT_MODE_STORAGE_KEY = 'speedad-hero-font-edit-mode';
+    const DEFAULT_BRAND_TEXT = 'SPEED\nAD';
+    const DEFAULT_CUSTOM_STATEMENT = 'スピードをアドバンテージに。';
+    const DEFAULT_CUSTOM_LEAD = '展示会やイベントのリード獲得フォローを最適化する\n次世代WEBアンケート作成ツール';
     const DEFAULT_VARIANT = {
       id: 'default',
-      statement: '営業プロセスの無駄をゼロにする<br>次世代のリード獲得ツール。',
-      lead: 'Webアンケートで来場者情報を集め、<br>名刺データ化と御礼メールで展示会後の追客をスムーズに。',
+      statement: 'スピードをアドバンテージに。',
+      lead: '展示会やイベントのリード獲得フォローを最適化する<br>次世代WEBアンケート作成ツール',
       reason: 'デフォルト（現行コピー）。営業プロセスの無駄を減らすリード獲得ツールとして訴求。'
     };
+    const fontObjects = {
+      brand: {
+        el: document.getElementById('hero-title'),
+        label: 'SPEED AD',
+        sizeVar: '--hero-brand-size',
+        xVar: '--hero-brand-x',
+        yVar: '--hero-brand-y',
+        minSize: 48,
+        maxSize: 200
+      },
+      statement: {
+        el: statementEl,
+        label: '見出し',
+        sizeVar: '--hero-statement-size',
+        xVar: '--hero-statement-x',
+        yVar: '--hero-statement-y',
+        minSize: 18,
+        maxSize: 96
+      },
+      lead: {
+        el: leadEl,
+        label: 'リード文',
+        sizeVar: '--hero-lead-size',
+        xVar: '--hero-lead-x',
+        yVar: '--hero-lead-y',
+        minSize: 12,
+        maxSize: 48
+      }
+    };
+    const fontObjectDefaults = new Map();
+    Object.entries(fontObjects).forEach(([id, config]) => {
+      const size = parseFloat(window.getComputedStyle(config.el).fontSize);
+      fontObjectDefaults.set(id, {
+        size: Number.isFinite(size) ? Math.round(size) : 16,
+        x: 0,
+        y: 0
+      });
+    });
+    const fontObjectSettings = loadFontObjectSettings();
+    const fontOverlay = createFontObjectOverlay();
+    let selectedFontObjectId = '';
+    let fontEditGesture = null;
 
     const allVariants = new Map();
     allVariants.set(DEFAULT_VARIANT.id, DEFAULT_VARIANT);
@@ -844,12 +896,371 @@
       return String(html ?? '').replace(/<br\s*\/?>/gi, '\n');
     }
 
+    function elementToMultiline(element) {
+      const walk = (node) => {
+        if (node.nodeType === Node.TEXT_NODE) {
+          return node.nodeValue || '';
+        }
+        if (node.nodeName === 'BR') {
+          return '\n';
+        }
+        return Array.from(node.childNodes).map(walk).join('');
+      };
+      return walk(element).replace(/\u00a0/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
+    }
+
+    function focusEditableText(element) {
+      const range = document.createRange();
+      const selection = window.getSelection();
+      range.selectNodeContents(element);
+      range.collapse(false);
+      selection.removeAllRanges();
+      selection.addRange(range);
+      element.focus();
+    }
+
+    function clampNumber(value, min, max) {
+      return Math.min(Math.max(value, min), max);
+    }
+
+    function normalizeFontValue(value, fallback) {
+      const number = Number(value);
+      return Number.isFinite(number) ? number : fallback;
+    }
+
+    function loadFontObjectSettings() {
+      try {
+        const rawSettings = window.localStorage.getItem(FONT_OBJECT_STORAGE_KEY);
+        if (!rawSettings) {
+          return {};
+        }
+        const parsed = JSON.parse(rawSettings);
+        if (!parsed || typeof parsed !== 'object') {
+          return {};
+        }
+        return parsed;
+      } catch (_error) {
+        return {};
+      }
+    }
+
+    function saveFontObjectSettings() {
+      try {
+        window.localStorage.setItem(FONT_OBJECT_STORAGE_KEY, JSON.stringify(fontObjectSettings));
+      } catch (_error) {
+        /* localStorage unavailable */
+      }
+    }
+
+    function createFontObjectOverlay() {
+      const root = document.createElement('div');
+      root.className = 'hero-font-object-overlay';
+      root.hidden = true;
+      root.innerHTML = '<span class="hero-font-object-overlay__label"></span><span class="hero-font-object-overlay__handle" aria-hidden="true"></span>';
+      document.body.appendChild(root);
+      return {
+        root,
+        label: root.querySelector('.hero-font-object-overlay__label'),
+        handle: root.querySelector('.hero-font-object-overlay__handle')
+      };
+    }
+
+    function getFontObjectSetting(id) {
+      const defaults = fontObjectDefaults.get(id) || { size: 16, x: 0, y: 0 };
+      const saved = fontObjectSettings[id] || {};
+      return {
+        size: Math.round(normalizeFontValue(saved.size, defaults.size)),
+        x: Math.round(normalizeFontValue(saved.x, defaults.x)),
+        y: Math.round(normalizeFontValue(saved.y, defaults.y))
+      };
+    }
+
+    function setFontObjectSetting(id, nextSetting) {
+      const config = fontObjects[id];
+      if (!config?.el) {
+        return;
+      }
+      const current = getFontObjectSetting(id);
+      fontObjectSettings[id] = {
+        size: clampNumber(Math.round(normalizeFontValue(nextSetting.size, current.size)), config.minSize, config.maxSize),
+        x: Math.round(normalizeFontValue(nextSetting.x, current.x)),
+        y: Math.round(normalizeFontValue(nextSetting.y, current.y))
+      };
+      applyFontObjectSetting(id);
+      saveFontObjectSettings();
+      updateFontOverlayPosition();
+      updateFontSelectionUi();
+    }
+
+    function applyFontObjectSetting(id) {
+      const config = fontObjects[id];
+      if (!config?.el) {
+        return;
+      }
+      if (!Object.prototype.hasOwnProperty.call(fontObjectSettings, id)) {
+        config.el.style.removeProperty(config.sizeVar);
+        config.el.style.removeProperty(config.xVar);
+        config.el.style.removeProperty(config.yVar);
+        return;
+      }
+      const setting = getFontObjectSetting(id);
+      config.el.style.setProperty(config.sizeVar, `${setting.size}px`);
+      config.el.style.setProperty(config.xVar, `${setting.x}px`);
+      config.el.style.setProperty(config.yVar, `${setting.y}px`);
+    }
+
+    function applyAllFontObjectSettings() {
+      Object.keys(fontObjects).forEach((id) => applyFontObjectSetting(id));
+    }
+
+    function exportFontObjectSettings() {
+      return Object.entries(fontObjects).reduce((result, [id, config]) => {
+        const setting = getFontObjectSetting(id);
+        result[id] = {
+          label: config.label,
+          size: `${setting.size}px`,
+          x: `${setting.x}px`,
+          y: `${setting.y}px`,
+          css: {
+            [config.sizeVar]: `${setting.size}px`,
+            [config.xVar]: `${setting.x}px`,
+            [config.yVar]: `${setting.y}px`
+          }
+        };
+        return result;
+      }, {});
+    }
+
+    function formatFontObjectMemo() {
+      return Object.entries(fontObjects).map(([id, config]) => {
+        const setting = getFontObjectSetting(id);
+        const selectedMark = id === selectedFontObjectId ? '* ' : '';
+        return `${selectedMark}${config.label}: ${setting.size}px / x ${setting.x}px / y ${setting.y}px`;
+      }).join('\n');
+    }
+
+    function updateFontSelectionUi() {
+      const config = fontObjects[selectedFontObjectId];
+      if (fontSelectionLabel) {
+        fontSelectionLabel.textContent = config
+          ? `選択中: ${config.label}。ドラッグで移動、右下ハンドルでサイズ調整、ダブルクリックで文言を編集できます。`
+          : '編集モードをONにして、文字を直接つかんで調整できます。文字のダブルクリックで文言編集に入れます。';
+      }
+      if (fontValueMemo) {
+        fontValueMemo.textContent = formatFontObjectMemo();
+      }
+      if (fontResetButton) {
+        fontResetButton.disabled = !config;
+      }
+      Object.entries(fontObjects).forEach(([id, item]) => {
+        item.el.classList.toggle('is-hero-font-selected', id === selectedFontObjectId);
+      });
+    }
+
+    function updateFontOverlayPosition() {
+      const config = fontObjects[selectedFontObjectId];
+      if (!config?.el || !document.body.classList.contains('is-hero-font-editing')) {
+        fontOverlay.root.hidden = true;
+        return;
+      }
+      const rect = config.el.getBoundingClientRect();
+      const margin = 8;
+      fontOverlay.root.hidden = false;
+      fontOverlay.root.style.left = `${rect.left - margin}px`;
+      fontOverlay.root.style.top = `${rect.top - margin}px`;
+      fontOverlay.root.style.width = `${rect.width + margin * 2}px`;
+      fontOverlay.root.style.height = `${rect.height + margin * 2}px`;
+      if (fontOverlay.label) {
+        const setting = getFontObjectSetting(selectedFontObjectId);
+        fontOverlay.label.textContent = `${config.label} ${setting.size}px`;
+      }
+    }
+
+    function selectFontObject(id) {
+      if (!fontObjects[id]) {
+        return;
+      }
+      selectedFontObjectId = id;
+      updateFontSelectionUi();
+      updateFontOverlayPosition();
+    }
+
+    function resetFontObject(id) {
+      const config = fontObjects[id];
+      if (!config?.el) {
+        return;
+      }
+      delete fontObjectSettings[id];
+      config.el.style.removeProperty(config.sizeVar);
+      config.el.style.removeProperty(config.xVar);
+      config.el.style.removeProperty(config.yVar);
+      saveFontObjectSettings();
+      updateFontSelectionUi();
+      updateFontOverlayPosition();
+    }
+
+    function resetSelectedFontObject() {
+      if (selectedFontObjectId) {
+        resetFontObject(selectedFontObjectId);
+      }
+    }
+
+    function syncCustomCopyFromHero() {
+      if (!customStatementInput || !customLeadInput) {
+        return;
+      }
+      customStatementInput.value = elementToMultiline(statementEl);
+      customLeadInput.value = elementToMultiline(leadEl);
+      select.value = CUSTOM_ID;
+      if (customBlock) {
+        customBlock.hidden = false;
+      }
+      try {
+        window.localStorage.setItem(STORAGE_KEY, CUSTOM_ID);
+      } catch (_error) {
+        /* localStorage unavailable */
+      }
+      saveCustom();
+      reasonEl.textContent = 'カスタム入力モード。見出しとリード文を自由に編集できます（入力内容はブラウザに保存されます）。';
+    }
+
+    function saveInlineTextEdit(id, text) {
+      const config = fontObjects[id];
+      if (!config?.el) {
+        return;
+      }
+      const nextText = text.trim() || (id === 'brand' ? DEFAULT_BRAND_TEXT : elementToMultiline(config.el));
+      config.el.innerHTML = multilineToHtml(nextText);
+      if (id === 'brand') {
+        try {
+          window.localStorage.setItem(BRAND_TEXT_KEY, nextText);
+        } catch (_error) {
+          /* localStorage unavailable */
+        }
+      } else {
+        syncCustomCopyFromHero();
+      }
+      updateFontOverlayPosition();
+      updateFontSelectionUi();
+    }
+
+    function finishInlineTextEdit(id, shouldCommit = true) {
+      const config = fontObjects[id];
+      if (!config?.el || !config.el.classList.contains('is-hero-text-editing')) {
+        return;
+      }
+      const originalText = config.el.dataset.inlineEditOriginal || '';
+      const nextText = shouldCommit ? elementToMultiline(config.el) : originalText;
+      config.el.removeAttribute('contenteditable');
+      config.el.classList.remove('is-hero-text-editing');
+      delete config.el.dataset.inlineEditOriginal;
+      document.body.classList.remove('is-hero-text-editing');
+      saveInlineTextEdit(id, nextText);
+    }
+
+    function startInlineTextEdit(id) {
+      const config = fontObjects[id];
+      if (!config?.el) {
+        return;
+      }
+      if (fontEditGesture) {
+        finishFontEditGesture();
+      }
+      setFontEditMode(true);
+      try {
+        window.localStorage.setItem(FONT_EDIT_MODE_STORAGE_KEY, 'true');
+      } catch (_error) {
+        /* localStorage unavailable */
+      }
+      selectFontObject(id);
+      config.el.dataset.inlineEditOriginal = elementToMultiline(config.el);
+      config.el.setAttribute('contenteditable', 'plaintext-only');
+      config.el.classList.add('is-hero-text-editing');
+      document.body.classList.add('is-hero-text-editing');
+      fontOverlay.root.hidden = true;
+      if (fontSelectionLabel) {
+        fontSelectionLabel.textContent = `入力中: ${config.label}。Enterで確定、Shift+Enterで改行、Escでキャンセルできます。`;
+      }
+      focusEditableText(config.el);
+    }
+
+    function beginFontEditGesture(event, id, type) {
+      if (document.body.classList.contains('is-hero-text-editing')) {
+        return;
+      }
+      if (event.button !== 0 && event.pointerType === 'mouse') {
+        return;
+      }
+      selectFontObject(id);
+      const setting = getFontObjectSetting(id);
+      fontEditGesture = {
+        id,
+        type,
+        startX: event.clientX,
+        startY: event.clientY,
+        base: setting
+      };
+      document.body.classList.add('is-hero-font-dragging');
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
+    function updateFontEditGesture(event) {
+      if (!fontEditGesture) {
+        return;
+      }
+      const dx = event.clientX - fontEditGesture.startX;
+      const dy = event.clientY - fontEditGesture.startY;
+      const config = fontObjects[fontEditGesture.id];
+      if (!config) {
+        return;
+      }
+      if (fontEditGesture.type === 'resize') {
+        const delta = (dx + dy) * 0.42;
+        setFontObjectSetting(fontEditGesture.id, {
+          ...fontEditGesture.base,
+          size: clampNumber(fontEditGesture.base.size + delta, config.minSize, config.maxSize)
+        });
+        return;
+      }
+      setFontObjectSetting(fontEditGesture.id, {
+        ...fontEditGesture.base,
+        x: fontEditGesture.base.x + dx,
+        y: fontEditGesture.base.y + dy
+      });
+    }
+
+    function finishFontEditGesture() {
+      if (!fontEditGesture) {
+        return;
+      }
+      fontEditGesture = null;
+      document.body.classList.remove('is-hero-font-dragging');
+    }
+
+    function setFontEditMode(isEnabled) {
+      document.body.classList.toggle('is-hero-font-editing', isEnabled);
+      if (fontEditModeInput) {
+        fontEditModeInput.checked = isEnabled;
+      }
+      Object.values(fontObjects).forEach((config) => {
+        config.el.tabIndex = isEnabled ? 0 : -1;
+      });
+      if (!isEnabled) {
+        fontOverlay.root.hidden = true;
+      } else {
+        updateFontOverlayPosition();
+      }
+      updateFontSelectionUi();
+    }
+
     function applyCustom() {
       if (!customStatementInput || !customLeadInput) {
         return;
       }
       statementEl.innerHTML = multilineToHtml(customStatementInput.value);
       leadEl.innerHTML = multilineToHtml(customLeadInput.value);
+      updateFontOverlayPosition();
     }
 
     function saveCustom() {
@@ -868,8 +1279,8 @@
       if (id === CUSTOM_ID && customBlock && customStatementInput && customLeadInput) {
         customBlock.hidden = false;
         if (!customStatementInput.value && !customLeadInput.value) {
-          customStatementInput.value = htmlToMultiline(DEFAULT_VARIANT.statement);
-          customLeadInput.value = htmlToMultiline(DEFAULT_VARIANT.lead);
+          customStatementInput.value = DEFAULT_CUSTOM_STATEMENT;
+          customLeadInput.value = DEFAULT_CUSTOM_LEAD;
           saveCustom();
         }
         applyCustom();
@@ -885,6 +1296,7 @@
         leadEl.innerHTML = variant.lead;
       }
       reasonEl.textContent = variant.reason;
+      updateFontOverlayPosition();
     }
 
     function setExpanded(isOpen) {
@@ -1030,12 +1442,103 @@
         });
       });
     }
+    Object.entries(fontObjects).forEach(([id, config]) => {
+      if (!config.el) {
+        return;
+      }
+      config.el.classList.add('hero-font-object');
+      config.el.tabIndex = -1;
+      config.el.addEventListener('pointerdown', (event) => {
+        if (!document.body.classList.contains('is-hero-font-editing')) {
+          return;
+        }
+        beginFontEditGesture(event, id, 'move');
+      });
+      config.el.addEventListener('dblclick', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        startInlineTextEdit(id);
+      });
+      config.el.addEventListener('keydown', (event) => {
+        if (config.el.classList.contains('is-hero-text-editing')) {
+          if (event.key === 'Escape') {
+            event.preventDefault();
+            finishInlineTextEdit(id, false);
+            return;
+          }
+          if (event.key === 'Enter' && event.shiftKey) {
+            event.preventDefault();
+            document.execCommand?.('insertLineBreak');
+            return;
+          }
+          if (event.key === 'Enter') {
+            event.preventDefault();
+            finishInlineTextEdit(id, true);
+            return;
+          }
+          return;
+        }
+        if (!document.body.classList.contains('is-hero-font-editing')) {
+          return;
+        }
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          selectFontObject(id);
+        }
+        if ((event.key === 'Backspace' || event.key === 'Delete') && selectedFontObjectId === id) {
+          event.preventDefault();
+          resetFontObject(id);
+        }
+      });
+      config.el.addEventListener('blur', () => {
+        if (config.el.classList.contains('is-hero-text-editing')) {
+          finishInlineTextEdit(id, true);
+        }
+      });
+    });
+    if (fontEditModeInput) {
+      fontEditModeInput.addEventListener('change', (event) => {
+        const isEnabled = event.target.checked;
+        setFontEditMode(isEnabled);
+        try {
+          window.localStorage.setItem(FONT_EDIT_MODE_STORAGE_KEY, String(isEnabled));
+        } catch (_error) {
+          /* localStorage unavailable */
+        }
+      });
+    }
+    fontOverlay.root.addEventListener('pointerdown', (event) => {
+      if (!selectedFontObjectId || !document.body.classList.contains('is-hero-font-editing')) {
+        return;
+      }
+      const isHandle = event.target === fontOverlay.handle;
+      beginFontEditGesture(event, selectedFontObjectId, isHandle ? 'resize' : 'move');
+    });
+    fontOverlay.root.addEventListener('dblclick', (event) => {
+      if (!selectedFontObjectId || !document.body.classList.contains('is-hero-font-editing')) {
+        return;
+      }
+      event.preventDefault();
+      event.stopPropagation();
+      startInlineTextEdit(selectedFontObjectId);
+    });
+    document.addEventListener('pointermove', updateFontEditGesture);
+    document.addEventListener('pointerup', finishFontEditGesture);
+    document.addEventListener('pointercancel', finishFontEditGesture);
+    if (fontResetButton) {
+      fontResetButton.addEventListener('click', resetSelectedFontObject);
+    }
 
     document.addEventListener('click', (event) => {
       if (toggle.getAttribute('aria-expanded') !== 'true') {
         return;
       }
-      if (toggle.contains(event.target) || panel.contains(event.target)) {
+      if (
+        toggle.contains(event.target) ||
+        panel.contains(event.target) ||
+        fontOverlay.root.contains(event.target) ||
+        event.target.closest?.('[data-hero-font-object]')
+      ) {
         return;
       }
       setExpanded(false);
@@ -1053,21 +1556,33 @@
       if (picker.style.left && picker.style.top) {
         applyPickerPosition({ left: rect.left, top: rect.top });
         savePickerPosition();
+        updateFontOverlayPosition();
         return;
       }
       updatePanelPlacement();
+      updateFontOverlayPosition();
     });
+    window.addEventListener('scroll', updateFontOverlayPosition, { passive: true });
 
-    let savedId = DEFAULT_VARIANT.id;
     try {
-      savedId = window.localStorage.getItem(STORAGE_KEY) || DEFAULT_VARIANT.id;
+      const savedBrandText = window.localStorage.getItem(BRAND_TEXT_KEY);
+      if (savedBrandText) {
+        fontObjects.brand.el.innerHTML = multilineToHtml(savedBrandText);
+      }
+    } catch (_error) {
+      /* localStorage unavailable */
+    }
+
+    let savedId = CUSTOM_ID;
+    try {
+      savedId = window.localStorage.getItem(STORAGE_KEY) || CUSTOM_ID;
     } catch (_error) {
       /* localStorage unavailable */
     }
     if (customStatementInput && customLeadInput) {
       try {
-        customStatementInput.value = window.localStorage.getItem(CUSTOM_STATEMENT_KEY) || '';
-        customLeadInput.value = window.localStorage.getItem(CUSTOM_LEAD_KEY) || '';
+        customStatementInput.value = window.localStorage.getItem(CUSTOM_STATEMENT_KEY) || DEFAULT_CUSTOM_STATEMENT;
+        customLeadInput.value = window.localStorage.getItem(CUSTOM_LEAD_KEY) || DEFAULT_CUSTOM_LEAD;
       } catch (_error) {
         /* localStorage unavailable */
       }
@@ -1076,6 +1591,14 @@
     if (allVariants.has(savedId) || (savedId === CUSTOM_ID && canUseCustom)) {
       select.value = savedId;
       applyVariant(savedId);
+    }
+    applyAllFontObjectSettings();
+    window.__speedadHeroFontObjectSettings = exportFontObjectSettings;
+    updateFontSelectionUi();
+    try {
+      setFontEditMode(window.localStorage.getItem(FONT_EDIT_MODE_STORAGE_KEY) === 'true');
+    } catch (_error) {
+      setFontEditMode(false);
     }
     restorePickerPosition();
   }
@@ -1110,9 +1633,9 @@
     });
 
     try {
-      applyTheme(window.localStorage.getItem(STORAGE_KEY) || '');
+      applyTheme(window.localStorage.getItem(STORAGE_KEY) || 'e2');
     } catch (_error) {
-      applyTheme('');
+      applyTheme('e2');
     }
   }
 
