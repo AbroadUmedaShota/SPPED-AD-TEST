@@ -38,12 +38,12 @@ export const TUTORIAL_STEPS = [
     id: 4, block: 'B', target: '#skipBizcardToggle', mode: 'user-action', placement: 'right',
     title: 'トグルを ON にする',
     body:
-      'チェックボックスをクリックして、データ化を ON にしてください。\n'
+      'チェックボックスをオンにして、データ化を ON にしてください。\n'
       + 'このチュートリアルでは ON のまま進みます。',
   },
   {
     id: 5, block: 'B', target: '#bizcardSettingsFields', mode: 'info', placement: 'top',
-    title: '社内管理用メモについて',
+    title: '画面にある他の項目について',
     body:
       '画面には『社内管理用メモ』欄もありますが、こちらは別の機会にご確認ください。\n'
       + 'このチュートリアルでは扱いません。\n\n'
@@ -115,7 +115,7 @@ export const TUTORIAL_STEPS = [
     title: '最低請求バッジについて',
     body:
       '枚数によっては最低請求ラインの案内が表示されることがあります。\n'
-      + '実際の枚数がご要望を下回る場合も最低保証分の請求が発生します。\n'
+      + '実際の枚数が見込み枚数を下回る場合も、最低保証枚数分の請求が発生します。\n'
       + '詳しくは右カラムの注意事項をご確認ください。\n\n'
       + '確認できたら、下の『次へ』ボタンを押してください。',
   },

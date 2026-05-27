@@ -40,7 +40,7 @@ export const TUTORIAL_STEPS = [
     id: 4, block: 'B', target: '.send-method-card', mode: 'user-action', placement: 'bottom',
     title: '送信方法を選択する',
     body:
-      'いずれかの送信方法カードをクリックして選択してください。\n'
+      'いずれかの送信方法カードを選んでください。\n'
       + 'このチュートリアルでは『手動送信』を選んで進めます。',
   },
   {
@@ -67,7 +67,7 @@ export const TUTORIAL_STEPS = [
     id: 7, block: 'C', target: '#emailTemplate', mode: 'user-action', placement: 'bottom',
     title: 'テンプレートを選択する',
     body:
-      'ドロップダウンをクリックしてテンプレートを選択してください。\n\n'
+      'ドロップダウンからテンプレートを選んでください。\n\n'
       + 'テンプレートを選ぶと、現在の件名と本文が上書きされます。\n'
       + '編集済みの内容がある場合はご注意ください。',
   },
@@ -94,7 +94,7 @@ export const TUTORIAL_STEPS = [
     title: '件名を入力',
     body:
       'ここが**件名**の入力欄です。\n'
-      + '練習のため件名を自動入力しました。\n\n'
+      + '練習のため『この度はご来場いただきありがとうございました』を自動入力しました。\n\n'
       + '確認できたら、下の『次へ』ボタンを押してください。',
     autoInput: { kind: 'text', value: 'この度はご来場いただきありがとうございました' },
   },
