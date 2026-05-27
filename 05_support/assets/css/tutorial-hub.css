@@ -89,6 +89,33 @@
   color: #16a34a;
 }
 
+.th-card__badge--soon {
+  background: var(--line);
+  color: var(--muted);
+}
+
+/* ===== Coming Soon Card ========================================== */
+.th-card--coming-soon {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.th-card--coming-soon:hover {
+  box-shadow: var(--shadow-sm);
+  transform: none;
+  border-color: var(--line);
+}
+
+.th-card__cta--disabled {
+  color: var(--muted-2);
+  cursor: default;
+  justify-content: center;
+}
+
+.th-card--coming-soon:hover .th-card__cta--disabled {
+  color: var(--muted-2);
+}
+
 /* ===== Card Body ================================================= */
 .th-card__body {
   flex: 1;
