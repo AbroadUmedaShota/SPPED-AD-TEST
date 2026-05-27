@@ -9,6 +9,24 @@
       "url": "05_support/news/official-release-2026-06-01/",
       "category": "プレスリリース",
       "tags": ["プレスリリース"]
+    },
+    {
+      "date": "2026-06-01",
+      "displayDate": "2026.06.01",
+      "title": "SPEED AD の基本的な使い方 — 展示会の準備から追客までの流れ",
+      "summary": "SPEED AD は、展示会やイベントでの来場者情報の収集から、御礼メールでの追客までを 1 つの管理画面で扱える Web サービスです。アンケート準備・QR 回答・名刺データ化・御礼メール送信という基本的な利用の流れをご紹介します。",
+      "url": "05_support/news/how-to-use-speedad/",
+      "category": "プレスリリース",
+      "tags": ["プレスリリース"]
+    },
+    {
+      "date": "2026-06-01",
+      "displayDate": "2026.06.01",
+      "title": "SPEED AD を提供する運営会社のご紹介",
+      "summary": "SPEED AD は、アブロードアウトソーシング株式会社（東京都千代田区）が提供する Web サービスです。BPO 事業を基盤に、アンケート集計や名刺データ化を運用している運営会社の概要と事業内容をご案内します。",
+      "url": "05_support/news/about-abroad-outsourcing/",
+      "category": "プレスリリース",
+      "tags": ["プレスリリース"]
     }
   ]
 }

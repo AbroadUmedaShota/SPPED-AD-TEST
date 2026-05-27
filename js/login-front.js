@@ -575,7 +575,7 @@
           if (userEmail === 'admin') {
             targetUrl = resolveAppPath('03_admin/index.html');
           } else if (userEmail === 'new') {
-            targetUrl = resolveAppPath('05_support/tutorial/index.html?tutorial=1&step=1');
+            targetUrl = resolveAppPath('05_support/tutorial/survey-creation.html?tutorial=1&step=1');
             isNewUser = true;
           }
           try {

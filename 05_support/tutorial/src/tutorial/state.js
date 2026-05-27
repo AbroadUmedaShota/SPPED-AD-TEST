@@ -3,9 +3,12 @@
 //
 // 進行状態  : speedad-tutorial-progress  { step: number, updatedAt: ISO8601 }
 // 完了フラグ: speedad-tutorial-completed boolean 相当（'1' / null）
+//
+// 引数化により名刺データ化・お礼メール等の別チュートリアルでも同じ関数を使い回せる。
+// デフォルト引数でアンケート作成チュートリアル用キーが補われるため、既存呼び出しはそのまま動く。
 
-const PROGRESS_KEY = 'speedad-tutorial-progress';
-const COMPLETED_KEY = 'speedad-tutorial-completed';
+const DEFAULT_PROGRESS_KEY = 'speedad-tutorial-progress';
+const DEFAULT_COMPLETED_KEY = 'speedad-tutorial-completed';
 
 function safeGetItem(key) {
   try {
@@ -31,8 +34,8 @@ function safeRemoveItem(key) {
   }
 }
 
-export function readProgress() {
-  const raw = safeGetItem(PROGRESS_KEY);
+export function readProgress(progressKey = DEFAULT_PROGRESS_KEY) {
+  const raw = safeGetItem(progressKey);
   if (!raw) return null;
   try {
     const data = JSON.parse(raw);
@@ -43,30 +46,40 @@ export function readProgress() {
   }
 }
 
-export function writeProgress(step) {
+export function writeProgress(step, progressKey = DEFAULT_PROGRESS_KEY) {
   const payload = {
     step,
     updatedAt: new Date().toISOString(),
   };
-  safeSetItem(PROGRESS_KEY, JSON.stringify(payload));
+  safeSetItem(progressKey, JSON.stringify(payload));
 }
 
-export function clearProgress() {
-  safeRemoveItem(PROGRESS_KEY);
+export function clearProgress(progressKey = DEFAULT_PROGRESS_KEY) {
+  safeRemoveItem(progressKey);
 }
 
-export function markCompleted() {
-  safeSetItem(COMPLETED_KEY, '1');
-  clearProgress();
+export function markCompleted(
+  progressKey = DEFAULT_PROGRESS_KEY,
+  completedKey = DEFAULT_COMPLETED_KEY
+) {
+  safeSetItem(completedKey, '1');
+  clearProgress(progressKey);
 }
 
-export function isCompleted() {
-  return safeGetItem(COMPLETED_KEY) === '1';
+export function isCompleted(completedKey = DEFAULT_COMPLETED_KEY) {
+  return safeGetItem(completedKey) === '1';
 }
 
 export function resetAll() {
-  safeRemoveItem(PROGRESS_KEY);
-  safeRemoveItem(COMPLETED_KEY);
+  // アンケート作成チュートリアル
+  safeRemoveItem(DEFAULT_PROGRESS_KEY);
+  safeRemoveItem(DEFAULT_COMPLETED_KEY);
+  // 名刺データ化チュートリアル
+  safeRemoveItem('speedad-tutorial-bizcard-progress');
+  safeRemoveItem('speedad-tutorial-bizcard-completed');
+  // お礼メールチュートリアル
+  safeRemoveItem('speedad-tutorial-thankyou-progress');
+  safeRemoveItem('speedad-tutorial-thankyou-completed');
   // 旧バージョンで保存されたエントリ種別キーの掃除（現在は未使用）
   safeRemoveItem('speedad-tutorial-entry');
 }
