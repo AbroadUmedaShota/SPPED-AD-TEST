@@ -1,0 +1,90 @@
+{
+  "meta": {
+    "id": "00_service-overview",
+    "title": "SPEED AD サービス概要",
+    "summary": "アンケート回収、名刺取得、データ化、会期後フォローを一連で扱うサービス全体の見取り図です。",
+    "sourceStatus": "既存仕様 / 営業資料 / 現行モック",
+    "hasUnconfirmed": true
+  },
+  "documents": [
+    {
+      "id": "OV-001",
+      "title": "サービス概要",
+      "category": "概要",
+      "sourceStatus": "既存資料から要約",
+      "path": "01_service-summary.md",
+      "summary": "SPEED ADが何を一連の流れとして扱うサービスかを整理します。",
+      "tags": ["サービス概要", "全体像", "SPEED AD"],
+      "hasUnconfirmed": false,
+      "relatedSources": ["docs/プロダクト/営業展開資料/01_サービス概要", "03_admin/00.要件定義書.txt"]
+    },
+    {
+      "id": "OV-002",
+      "title": "主要ドメインモデル",
+      "category": "ドメイン",
+      "sourceStatus": "既存仕様から整理",
+      "path": "02_domain-model.md",
+      "summary": "アンケート案件を中心に、ユーザー、グループ、回答、名刺、請求の関係を整理します。",
+      "tags": ["ドメイン", "アンケート案件", "関係"],
+      "hasUnconfirmed": true,
+      "relatedSources": ["docs/画面設計/仕様/admin/01_admin_service_structure.md", "03_admin/00.要件定義書.txt"]
+    },
+    {
+      "id": "OV-003",
+      "title": "全体業務フロー",
+      "category": "業務フロー",
+      "sourceStatus": "既存仕様から整理",
+      "path": "03_end-to-end-flow.md",
+      "summary": "受注後準備から会期、データ化、納品、請求までの流れを整理します。",
+      "tags": ["業務フロー", "会期", "データ化", "請求"],
+      "hasUnconfirmed": true,
+      "relatedSources": ["docs/画面設計/仕様/admin/20_admin_survey_management.md", "docs/アーカイブ/speedad-backlog-wiki-2026-03-24/pages/19_1107907_batch-processing.md"]
+    },
+    {
+      "id": "OV-004",
+      "title": "情報源マップ",
+      "category": "情報源",
+      "sourceStatus": "整理ルール",
+      "path": "04_source-map.md",
+      "summary": "この資料群で参照する正本、補助資料、旧Wiki、観測資料の扱いを整理します。",
+      "tags": ["情報源", "正本", "補助資料"],
+      "hasUnconfirmed": false,
+      "relatedSources": ["docs/README.md", "docs/画面設計/仕様/README.md", "docs/リファレンス/共有規約/02_SHARED_DOC_BOUNDARY_RULES.md"]
+    }
+  ],
+  "flow": [
+    {
+      "group": "サービス全体",
+      "items": [
+        {
+          "id": "OV-001",
+          "documentId": "OV-001",
+          "timing": "最初に確認",
+          "label": "サービス概要",
+          "summary": "SPEED ADが扱う業務範囲を確認します。"
+        },
+        {
+          "id": "OV-002",
+          "documentId": "OV-002",
+          "timing": "設計前提",
+          "label": "主要ドメイン",
+          "summary": "アンケート案件を中心に関係する情報を確認します。"
+        },
+        {
+          "id": "OV-003",
+          "documentId": "OV-003",
+          "timing": "業務理解",
+          "label": "全体フロー",
+          "summary": "会期前から請求までの大きな流れを確認します。"
+        },
+        {
+          "id": "OV-004",
+          "documentId": "OV-004",
+          "timing": "根拠確認",
+          "label": "情報源",
+          "summary": "どの資料を正本・補助として扱うか確認します。"
+        }
+      ]
+    }
+  ]
+}

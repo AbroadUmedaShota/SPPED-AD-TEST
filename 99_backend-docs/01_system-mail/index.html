@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPEED AD システムメール検討資料</title>
+    <link rel="icon" href="../../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="../../02_dashboard/service-top-style.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+</head>
+<body class="bg-background text-on-background">
+<div class="min-h-screen bg-background">
+    <header class="border-b border-outline-variant bg-surface">
+        <div class="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+            <div>
+                <p class="text-sm font-semibold text-primary">HOME / 01_system-mail</p>
+                <h1 class="text-headline-medium font-bold leading-tight text-on-surface">SPEED AD システムメール検討資料</h1>
+                <p class="mt-1 text-sm text-on-surface-variant">バックエンド側の通知処理を整理するため、Excel版とGmail実配信版を並記した検討資料です。実送信、認可、履歴DBは対象外です。</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <a class="inline-flex items-center gap-2 rounded-lg border border-outline px-3 py-2 text-sm text-on-surface hover:bg-surface-variant" href="../index.html">
+                    <span class="material-icons text-base">home</span>
+                    HOMEへ戻る
+                </a>
+                <a class="inline-flex items-center gap-2 rounded-lg border border-outline px-3 py-2 text-sm text-on-surface hover:bg-surface-variant" href="./README.md" target="_blank" rel="noopener">
+                    <span class="material-icons text-base">open_in_new</span>
+                    READMEを開く
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <section class="mx-auto w-full max-w-7xl px-4 pt-6 sm:px-6 lg:px-8" aria-labelledby="mail-flow-title">
+        <div class="rounded-lg border border-outline-variant bg-surface p-5">
+            <div class="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                    <p class="text-sm font-semibold text-primary">送信タイミングフロー</p>
+                    <h2 id="mail-flow-title" class="mt-1 text-title-large font-bold text-on-surface">いつ送られるかを流れで確認する</h2>
+                    <p class="mt-1 text-sm text-on-surface-variant">各カードをクリックすると、該当するメール資料を右側の本文ビューで確認できます。</p>
+                </div>
+                <span class="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
+                    <span class="material-icons text-base">account_tree</span>
+                    操作起点 / 会期起点 / 請求起点
+                </span>
+            </div>
+
+            <div class="mt-5 space-y-5">
+                <div>
+                    <h3 class="text-sm font-bold text-on-surface">操作起点</h3>
+                    <div class="mt-3 grid gap-3 md:grid-cols-3">
+                        <button type="button" class="flow-card rounded-lg border border-outline-variant bg-background p-4 text-left hover:border-primary hover:bg-surface-variant" data-mail-doc-id="SM-001">
+                            <span class="text-xs font-semibold text-primary">随時</span>
+                            <span class="mt-1 block text-sm font-bold text-on-surface">新規アカウント作成</span>
+                            <span class="mt-1 block text-xs leading-5 text-on-surface-variant">メールアドレス登録後に、パスワード設定URLを送信。</span>
+                        </button>
+                        <button type="button" class="flow-card rounded-lg border border-outline-variant bg-background p-4 text-left hover:border-primary hover:bg-surface-variant" data-mail-doc-id="SM-002">
+                            <span class="text-xs font-semibold text-primary">随時</span>
+                            <span class="mt-1 block text-sm font-bold text-on-surface">パスワード再設定</span>
+                            <span class="mt-1 block text-xs leading-5 text-on-surface-variant">再設定依頼時に、再設定URLを送信。</span>
+                        </button>
+                        <button type="button" class="flow-card rounded-lg border border-outline-variant bg-background p-4 text-left hover:border-primary hover:bg-surface-variant" data-mail-doc-id="SM-012">
+                            <span class="text-xs font-semibold text-primary">随時</span>
+                            <span class="mt-1 block text-sm font-bold text-on-surface">グループ招待</span>
+                            <span class="mt-1 block text-xs leading-5 text-on-surface-variant">既存ユーザーは招待承認URL、新規ユーザーはアカウント作成案内を送信。</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-sm font-bold text-on-surface">アンケート会期・名刺データ化起点</h3>
+                    <div class="mt-3 overflow-x-auto pb-2">
+                        <div class="grid gap-2 sm:grid-cols-2 lg:min-w-[980px] lg:grid-cols-[repeat(8,minmax(110px,1fr))]">
+                            <button type="button" class="flow-card rounded-lg border border-outline-variant bg-background p-3 text-left hover:border-primary hover:bg-surface-variant" data-mail-doc-id="SM-003">
+                                <span class="text-xs font-semibold text-primary">申込保存時</span>
+                                <span class="mt-1 block text-sm font-bold text-on-surface">名刺データ化申込</span>
+                            </button>
+                            <button type="button" class="flow-card rounded-lg border border-outline-variant bg-background p-3 text-left hover:border-primary hover:bg-surface-variant" data-mail-doc-id="SM-004">
+                                <span class="text-xs font-semibold text-primary">会期前日 0:00</span>
+                                <span class="mt-1 block text-sm font-bold text-on-surface">会期前日</span>
+                            </button>
+                            <button type="button" class="flow-card rounded-lg border border-outline-variant bg-background p-3 text-left hover:border-primary hover:bg-surface-variant" data-mail-doc-id="SM-005">
+                                <span class="text-xs font-semibold text-primary">会期開始日 0:00</span>
+                                <span class="mt-1 block text-sm font-bold text-on-surface">会期開始</span>
+                            </button>
+                            <button type="button" class="flow-card rounded-lg border border-outline-variant bg-background p-3 text-left hover:border-primary hover:bg-surface-variant" data-mail-doc-id="SM-010">
+                                <span class="text-xs font-semibold text-primary">会期中 随時</span>
+                                <span class="mt-1 block text-sm font-bold text-on-surface">想定件数80/100%</span>
+                            </button>
+                            <button type="button" class="flow-card rounded-lg border border-outline-variant bg-background p-3 text-left hover:border-primary hover:bg-surface-variant" data-mail-doc-id="SM-006">
+                                <span class="text-xs font-semibold text-primary">会期終了日 23:59</span>
+                                <span class="mt-1 block text-sm font-bold text-on-surface">会期終了</span>
+                            </button>
+                            <button type="button" class="flow-card rounded-lg border border-outline-variant bg-background p-3 text-left hover:border-primary hover:bg-surface-variant" data-mail-doc-id="SM-007">
+                                <span class="text-xs font-semibold text-primary">完了予定日10:00 または随時</span>
+                                <span class="mt-1 block text-sm font-bold text-on-surface">名刺データ化完了</span>
+                            </button>
+                            <button type="button" class="flow-card rounded-lg border border-outline-variant bg-background p-3 text-left hover:border-primary hover:bg-surface-variant" data-mail-doc-id="SM-011">
+                                <span class="text-xs font-semibold text-primary">データ化完了直後</span>
+                                <span class="mt-1 block text-sm font-bold text-on-surface">御礼メール送信依頼</span>
+                            </button>
+                            <button type="button" class="flow-card rounded-lg border border-outline-variant bg-background p-3 text-left hover:border-primary hover:bg-surface-variant" data-mail-doc-id="SM-008">
+                                <span class="text-xs font-semibold text-primary">DL期限7日前 / 当日0:00</span>
+                                <span class="mt-1 block text-sm font-bold text-on-surface">ダウンロード期限</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-2 hidden min-w-[980px] grid-cols-[repeat(8,minmax(110px,1fr))] gap-2 text-center text-xs text-on-surface-variant lg:grid">
+                        <span>設定確定</span>
+                        <span>会期前チェック</span>
+                        <span>回答受付</span>
+                        <span>件数監視</span>
+                        <span>受付終了</span>
+                        <span>納品</span>
+                        <span>送信操作依頼</span>
+                        <span>取得期限</span>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-sm font-bold text-on-surface">請求起点</h3>
+                    <div class="mt-3 grid gap-3 md:grid-cols-2">
+                        <button type="button" class="flow-card rounded-lg border border-outline-variant bg-background p-4 text-left hover:border-primary hover:bg-surface-variant" data-mail-doc-id="SM-009">
+                            <span class="text-xs font-semibold text-primary">月次請求確定時 または 随時</span>
+                            <span class="mt-1 block text-sm font-bold text-on-surface">請求書送付</span>
+                            <span class="mt-1 block text-xs leading-5 text-on-surface-variant">請求金額、支払期日、請求書URL、PDF添付を送信。</span>
+                        </button>
+                        <button type="button" class="flow-card rounded-lg border border-outline-variant bg-background p-4 text-left hover:border-primary hover:bg-surface-variant" data-mail-doc-id="SM-014">
+                            <span class="text-xs font-semibold text-primary">各メール共通</span>
+                            <span class="mt-1 block text-sm font-bold text-on-surface">共通フッター</span>
+                            <span class="mt-1 block text-xs leading-5 text-on-surface-variant">問い合わせ先、送信専用注記、運営会社情報を付与。</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main class="mx-auto grid w-full max-w-7xl gap-4 px-4 py-6 sm:px-6 lg:grid-cols-[360px_minmax(0,1fr)] lg:px-8">
+        <aside class="h-fit rounded-lg border border-outline-variant bg-surface p-4 lg:sticky lg:top-4">
+            <div class="space-y-3">
+                <label class="flex flex-col gap-1 text-sm text-on-surface-variant">
+                    <span>検索</span>
+                    <input id="mailDocsSearch" type="search" class="form-input" placeholder="件名・カテゴリ・本文で検索">
+                </label>
+                <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                    <label class="flex flex-col gap-1 text-sm text-on-surface-variant">
+                        <span>カテゴリ</span>
+                        <select id="mailDocsCategory" class="form-select">
+                            <option value="">すべて</option>
+                        </select>
+                    </label>
+                    <label class="flex flex-col gap-1 text-sm text-on-surface-variant">
+                        <span>ソース状態</span>
+                        <select id="mailDocsSourceStatus" class="form-select">
+                            <option value="">すべて</option>
+                        </select>
+                    </label>
+                </div>
+                <label class="flex items-center gap-2 text-sm text-on-surface">
+                    <input id="mailDocsDiffOnly" type="checkbox" class="form-checkbox rounded border-outline">
+                    差分・未確認のみ
+                </label>
+            </div>
+            <div class="mt-4 flex items-center justify-between text-xs text-on-surface-variant">
+                <span id="mailDocsCount">0件</span>
+                <button id="mailDocsReset" type="button" class="inline-flex items-center gap-1 text-primary hover:underline">
+                    <span class="material-icons text-sm">restart_alt</span>
+                    条件リセット
+                </button>
+            </div>
+            <div id="mailDocsList" class="mt-3 max-h-[60vh] space-y-2 overflow-y-auto pr-1" aria-label="システムメール資料一覧"></div>
+        </aside>
+
+        <article class="min-w-0 overflow-hidden rounded-lg border border-outline-variant bg-surface">
+            <div class="border-b border-outline-variant p-4">
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                        <p id="mailDocsMeta" class="text-sm text-on-surface-variant">資料を読み込み中です。</p>
+                        <h2 id="mailDocsTitle" class="mt-1 text-title-large font-bold text-on-surface">システムメール検討資料</h2>
+                    </div>
+                    <button id="mailDocsCopy" type="button" class="inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-on disabled:opacity-50" disabled>
+                        <span class="material-icons text-base">content_copy</span>
+                        Markdownをコピー
+                    </button>
+                </div>
+                <div id="mailDocsBadges" class="mt-3 flex flex-wrap gap-2"></div>
+            </div>
+            <pre id="mailDocsContent" class="m-0 min-h-[520px] whitespace-pre-wrap break-words overflow-x-auto bg-surface p-5 font-mono text-sm leading-7 text-on-surface"></pre>
+        </article>
+    </main>
+</div>
+<script type="module" src="./viewer.js"></script>
+</body>
+</html>

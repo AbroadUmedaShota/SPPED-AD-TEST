@@ -1,0 +1,86 @@
+{
+  "meta": {
+    "id": "02_survey-lifecycle",
+    "title": "会期・ステータス・DL期限",
+    "summary": "アンケート案件の会期、状態、データ化完了、ダウンロード期限の見方を整理します。",
+    "sourceStatus": "既存仕様 / 現行モック",
+    "hasUnconfirmed": true
+  },
+  "documents": [
+    {
+      "id": "LIF-001",
+      "title": "ステータス判定の全体像",
+      "category": "ステータス",
+      "sourceStatus": "現行モック確認",
+      "path": "01_status-lifecycle.md",
+      "summary": "会期前、会期中、データ化中、データ化完了、DL期限終了の判定を整理します。",
+      "tags": ["ステータス", "会期", "statusService"],
+      "hasUnconfirmed": true,
+      "relatedSources": ["02_dashboard/src/services/statusService.js", "docs/画面設計/仕様/admin/20_admin_survey_management.md"]
+    },
+    {
+      "id": "LIF-002",
+      "title": "ダウンロード期限",
+      "category": "期限",
+      "sourceStatus": "現行モック確認・旧資料補助",
+      "path": "02_download-deadline.md",
+      "summary": "会期終了後のデータ保存期間とDL期限通知の扱いを整理します。",
+      "tags": ["DL期限", "保存期間", "期限通知"],
+      "hasUnconfirmed": true,
+      "relatedSources": ["02_dashboard/src/services/statusService.js", "docs/アーカイブ/speedad-backlog-wiki-2026-03-24/pages/18_1106619_plan-pricing.md"]
+    },
+    {
+      "id": "LIF-003",
+      "title": "状態遷移と通知の接点",
+      "category": "通知接点",
+      "sourceStatus": "既存資料から整理",
+      "path": "03_transition-notification-map.md",
+      "summary": "状態遷移とシステムメール、バッチ処理の接点を整理します。",
+      "tags": ["通知", "バッチ", "会期"],
+      "hasUnconfirmed": true,
+      "relatedSources": ["99_backend-docs/01_system-mail", "docs/アーカイブ/speedad-backlog-wiki-2026-03-24/pages/19_1107907_batch-processing.md"]
+    }
+  ],
+  "flow": [
+    {
+      "group": "アンケート案件の状態",
+      "items": [
+        {
+          "id": "LIF-001-A",
+          "documentId": "LIF-001",
+          "timing": "会期開始前",
+          "label": "会期前",
+          "summary": "開始日を迎えるまで。設定・準備の状態。"
+        },
+        {
+          "id": "LIF-001-B",
+          "documentId": "LIF-001",
+          "timing": "会期中",
+          "label": "会期中",
+          "summary": "回答受付や来場者対応がアクティブな状態。"
+        },
+        {
+          "id": "LIF-001-C",
+          "documentId": "LIF-003",
+          "timing": "会期終了後",
+          "label": "データ化中",
+          "summary": "名刺データ化対象の場合、完了判定まで待機。"
+        },
+        {
+          "id": "LIF-001-D",
+          "documentId": "LIF-002",
+          "timing": "納品後",
+          "label": "DL期限内",
+          "summary": "データ化完了後、期限内であれば取得可能。"
+        },
+        {
+          "id": "LIF-001-E",
+          "documentId": "LIF-002",
+          "timing": "期限後",
+          "label": "DL期限終了",
+          "summary": "期限超過後は名刺データ取得不可として扱う。"
+        }
+      ]
+    }
+  ]
+}

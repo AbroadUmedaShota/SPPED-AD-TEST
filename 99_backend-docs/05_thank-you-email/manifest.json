@@ -1,0 +1,79 @@
+{
+  "meta": {
+    "id": "05_thank-you-email",
+    "title": "お礼メール",
+    "summary": "お礼メール設定、送信対象、送信期限、実行条件、失敗時論点を整理します。",
+    "sourceStatus": "正本仕様 / 旧Wiki補助",
+    "hasUnconfirmed": true
+  },
+  "documents": [
+    {
+      "id": "THK-001",
+      "title": "お礼メールの位置づけ",
+      "category": "概要",
+      "sourceStatus": "正本仕様確認",
+      "path": "01_thank-you-overview.md",
+      "summary": "お礼メールを主要機能として、名刺データ化完了後のフォローに接続する整理。",
+      "tags": ["お礼メール", "主要機能", "フォロー"],
+      "hasUnconfirmed": false,
+      "relatedSources": ["docs/画面設計/仕様/17_thank_you_email_settings_requirements.md"]
+    },
+    {
+      "id": "THK-002",
+      "title": "送信対象と期限",
+      "category": "期限",
+      "sourceStatus": "正本仕様 / 旧Wiki補助",
+      "path": "02_recipients-deadline.md",
+      "summary": "送信対象者、名刺データ化状態、送信期限の考え方を整理します。",
+      "tags": ["送信対象", "送信期限", "営業日"],
+      "hasUnconfirmed": true,
+      "relatedSources": ["docs/画面設計/仕様/17_thank_you_email_settings_requirements.md", "docs/アーカイブ/speedad-backlog-wiki-2026-03-24/pages/18_1106619_plan-pricing.md"]
+    },
+    {
+      "id": "THK-003",
+      "title": "送信実行と失敗系",
+      "category": "実行",
+      "sourceStatus": "正本仕様確認・実装未確認",
+      "path": "03_send-execution.md",
+      "summary": "手動送信、送信結果、再送禁止、部分失敗などのバックエンド論点を整理します。",
+      "tags": ["送信実行", "冪等性", "失敗系"],
+      "hasUnconfirmed": true,
+      "relatedSources": ["docs/画面設計/仕様/17_thank_you_email_settings_requirements.md", "03_admin/00.要件定義書.txt"]
+    }
+  ],
+  "flow": [
+    {
+      "group": "お礼メール送信まで",
+      "items": [
+        {
+          "id": "THK-F01",
+          "documentId": "THK-001",
+          "timing": "会期前",
+          "label": "メール設定",
+          "summary": "送信するか、件名・本文・送信方法を設定します。"
+        },
+        {
+          "id": "THK-F02",
+          "documentId": "THK-002",
+          "timing": "データ化中",
+          "label": "対象者準備",
+          "summary": "名刺データ化や対象者確定処理を待ちます。"
+        },
+        {
+          "id": "THK-F03",
+          "documentId": "THK-002",
+          "timing": "データ化完了後",
+          "label": "送信期限内",
+          "summary": "送信対象を確認し、期限内に実行します。"
+        },
+        {
+          "id": "THK-F04",
+          "documentId": "THK-003",
+          "timing": "手動実行",
+          "label": "送信実行",
+          "summary": "送信結果、再送禁止、部分失敗を管理します。"
+        }
+      ]
+    }
+  ]
+}
