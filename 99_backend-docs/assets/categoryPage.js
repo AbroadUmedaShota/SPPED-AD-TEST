@@ -4,7 +4,7 @@ document.body.className = 'bg-background text-on-background';
 document.body.innerHTML = `
 <div class="min-h-screen bg-background">
   <header class="border-b border-outline-variant bg-surface">
-    <div class="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+    <div class="flex w-full flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
       <div>
         <p id="docViewerBreadcrumb" class="text-sm font-semibold text-primary">HOME / 読み込み中</p>
         <h1 id="docViewerPageTitle" class="text-headline-medium font-bold leading-tight text-on-surface">バックエンド資料</h1>
@@ -27,7 +27,7 @@ document.body.innerHTML = `
     </div>
   </header>
 
-  <section id="docViewerFlowSection" class="hidden mx-auto w-full max-w-7xl px-4 pt-6 sm:px-6 lg:px-8" aria-labelledby="doc-flow-title">
+  <section id="docViewerFlowSection" class="hidden w-full px-4 pt-6 sm:px-6 lg:px-8" aria-labelledby="doc-flow-title">
     <div class="rounded-lg border border-outline-variant bg-surface p-5">
       <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
@@ -44,7 +44,7 @@ document.body.innerHTML = `
     </div>
   </section>
 
-  <main class="mx-auto grid w-full max-w-7xl gap-4 px-4 py-6 sm:px-6 lg:grid-cols-[360px_minmax(0,1fr)] lg:px-8">
+  <main class="grid w-full gap-4 px-4 py-6 sm:px-6 lg:grid-cols-[360px_minmax(0,1fr)] lg:px-8">
     <aside class="h-fit rounded-lg border border-outline-variant bg-surface p-4 lg:sticky lg:top-4">
       <div class="space-y-3">
         <label class="flex flex-col gap-1 text-sm text-on-surface-variant">
@@ -94,7 +94,7 @@ document.body.innerHTML = `
         </div>
         <div id="docViewerBadges" class="mt-3 flex flex-wrap gap-2"></div>
       </div>
-      <pre id="docViewerContent" class="m-0 min-h-[520px] whitespace-pre-wrap break-words overflow-x-auto bg-surface p-5 font-mono text-sm leading-7 text-on-surface"></pre>
+      <div id="docViewerContent" class="min-h-[520px] overflow-x-hidden bg-surface p-5 text-on-surface"></div>
     </article>
   </main>
 </div>

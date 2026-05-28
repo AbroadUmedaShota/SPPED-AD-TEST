@@ -33,6 +33,255 @@ function setText(element, value) {
   }
 }
 
+function setHtml(element, value) {
+  if (element) {
+    element.innerHTML = value;
+  }
+}
+
+function escapeHtml(value) {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function stripFrontmatter(markdown) {
+  const normalized = String(markdown || '').replace(/\r\n/g, '\n');
+  if (!normalized.startsWith('---\n')) {
+    return normalized;
+  }
+
+  const endIndex = normalized.indexOf('\n---', 4);
+  if (endIndex === -1) {
+    return normalized;
+  }
+
+  const afterEnd = normalized.slice(endIndex + 4);
+  return afterEnd.startsWith('\n') ? afterEnd.slice(1) : afterEnd;
+}
+
+function isAllowedHref(href) {
+  return /^(https?:|mailto:|\.{0,2}\/|#)/i.test(href);
+}
+
+function renderInlinePlain(value) {
+  return escapeHtml(value).replace(/\*\*([^*]+)\*\*/g, '<strong class="font-bold text-on-surface">$1</strong>');
+}
+
+function renderInlineText(value) {
+  const segments = String(value || '').split(/(`[^`]+`)/g);
+
+  return segments.map(segment => {
+    if (segment.startsWith('`') && segment.endsWith('`')) {
+      return `<code class="rounded bg-surface-variant px-1.5 py-0.5 font-mono text-[0.92em] text-on-surface">${escapeHtml(segment.slice(1, -1))}</code>`;
+    }
+
+    let result = '';
+    let cursor = 0;
+    const linkPattern = /\[([^\]]+)\]\(([^)]+)\)/g;
+    let match = linkPattern.exec(segment);
+
+    while (match) {
+      result += renderInlinePlain(segment.slice(cursor, match.index));
+      const href = match[2].trim();
+      const safeHref = isAllowedHref(href) ? escapeHtml(href) : '#';
+      const targetAttrs = /^https?:/i.test(href) ? ' target="_blank" rel="noopener"' : '';
+      result += `<a class="font-medium text-primary underline underline-offset-2 hover:no-underline" href="${safeHref}"${targetAttrs}>${renderInlinePlain(match[1])}</a>`;
+      cursor = match.index + match[0].length;
+      match = linkPattern.exec(segment);
+    }
+
+    result += renderInlinePlain(segment.slice(cursor));
+    return result;
+  }).join('');
+}
+
+function isTableRow(line) {
+  return /^\s*\|.+\|\s*$/.test(line);
+}
+
+function isTableSeparator(line) {
+  if (!isTableRow(line)) {
+    return false;
+  }
+
+  return splitTableRow(line).every(cell => /^:?-{3,}:?$/.test(cell.trim()));
+}
+
+function splitTableRow(line) {
+  const trimmed = line.trim().replace(/^\|/, '').replace(/\|$/, '');
+  return trimmed.split('|').map(cell => cell.trim());
+}
+
+function getTableAlignClass(separator) {
+  if (/^:-+:$/.test(separator)) {
+    return 'text-center';
+  }
+  if (/^-+:$/.test(separator)) {
+    return 'text-right';
+  }
+  return 'text-left';
+}
+
+function renderTable(lines, startIndex) {
+  const headers = splitTableRow(lines[startIndex]);
+  const separators = splitTableRow(lines[startIndex + 1]);
+  const rows = [];
+  let index = startIndex + 2;
+
+  while (index < lines.length && isTableRow(lines[index])) {
+    rows.push(splitTableRow(lines[index]));
+    index += 1;
+  }
+
+  const headerHtml = headers.map((header, columnIndex) => {
+    const alignClass = getTableAlignClass(separators[columnIndex] || '');
+    return `<th class="whitespace-nowrap border-b border-outline-variant bg-surface-variant px-3 py-2 align-top font-bold text-on-surface ${alignClass}">${renderInlineText(header)}</th>`;
+  }).join('');
+
+  const rowHtml = rows.map(row => {
+    const cells = headers.map((_, columnIndex) => {
+      const alignClass = getTableAlignClass(separators[columnIndex] || '');
+      return `<td class="border-b border-outline-variant px-3 py-2 align-top text-on-surface-variant ${alignClass}">${renderInlineText(row[columnIndex] || '')}</td>`;
+    }).join('');
+
+    return `<tr>${cells}</tr>`;
+  }).join('');
+
+  return {
+    html: [
+      '<div class="my-4 overflow-x-auto rounded-lg border border-outline-variant">',
+      '<table class="min-w-full border-collapse text-sm leading-6">',
+      `<thead><tr>${headerHtml}</tr></thead>`,
+      `<tbody>${rowHtml}</tbody>`,
+      '</table>',
+      '</div>'
+    ].join(''),
+    nextIndex: index
+  };
+}
+
+function isBlockStart(lines, index) {
+  const line = lines[index] || '';
+  const nextLine = lines[index + 1] || '';
+
+  return [
+    /^#{1,6}\s+/.test(line),
+    /^```/.test(line),
+    /^>\s?/.test(line),
+    /^[-*+]\s+/.test(line),
+    /^\d+\.\s+/.test(line),
+    /^-{3,}\s*$/.test(line),
+    isTableRow(line) && isTableSeparator(nextLine)
+  ].some(Boolean);
+}
+
+function renderMarkdown(markdown) {
+  const lines = stripFrontmatter(markdown).split('\n');
+  const blocks = [];
+  let index = 0;
+
+  while (index < lines.length) {
+    const line = lines[index];
+    const trimmed = line.trim();
+
+    if (!trimmed) {
+      index += 1;
+      continue;
+    }
+
+    const fenceMatch = trimmed.match(/^```([^`]*)$/);
+    if (fenceMatch) {
+      const language = fenceMatch[1].trim();
+      const codeLines = [];
+      index += 1;
+
+      while (index < lines.length && !/^```/.test(lines[index].trim())) {
+        codeLines.push(lines[index]);
+        index += 1;
+      }
+
+      if (index < lines.length) {
+        index += 1;
+      }
+
+      const languageLabel = language
+        ? `<span class="mb-2 block text-xs font-semibold text-on-surface-variant">${escapeHtml(language)}</span>`
+        : '';
+      blocks.push(`<pre class="my-4 overflow-x-auto rounded-lg bg-surface-variant p-4 text-xs leading-6 text-on-surface"><code>${languageLabel}${escapeHtml(codeLines.join('\n'))}</code></pre>`);
+      continue;
+    }
+
+    if (isTableRow(line) && isTableSeparator(lines[index + 1] || '')) {
+      const table = renderTable(lines, index);
+      blocks.push(table.html);
+      index = table.nextIndex;
+      continue;
+    }
+
+    const headingMatch = trimmed.match(/^(#{1,6})\s+(.+)$/);
+    if (headingMatch) {
+      const level = Math.min(headingMatch[1].length, 6);
+      const headingClass = {
+        1: 'mt-1 text-2xl font-bold leading-tight text-on-surface',
+        2: 'mt-8 border-b border-outline-variant pb-2 text-xl font-bold leading-tight text-on-surface',
+        3: 'mt-6 text-lg font-bold leading-tight text-on-surface',
+        4: 'mt-5 text-base font-bold leading-tight text-on-surface',
+        5: 'mt-4 text-sm font-bold leading-tight text-on-surface',
+        6: 'mt-4 text-xs font-bold uppercase leading-tight text-on-surface-variant'
+      }[level];
+      blocks.push(`<h${level} class="${headingClass}">${renderInlineText(headingMatch[2])}</h${level}>`);
+      index += 1;
+      continue;
+    }
+
+    if (/^-{3,}\s*$/.test(trimmed)) {
+      blocks.push('<hr class="my-6 border-outline-variant">');
+      index += 1;
+      continue;
+    }
+
+    if (/^>\s?/.test(line)) {
+      const quoteLines = [];
+      while (index < lines.length && /^>\s?/.test(lines[index])) {
+        quoteLines.push(lines[index].replace(/^>\s?/, ''));
+        index += 1;
+      }
+      blocks.push(`<blockquote class="my-4 border-l-4 border-primary/50 bg-primary/5 px-4 py-3 text-sm leading-7 text-on-surface-variant">${renderInlineText(quoteLines.join(' '))}</blockquote>`);
+      continue;
+    }
+
+    if (/^[-*+]\s+/.test(line) || /^\d+\.\s+/.test(line)) {
+      const ordered = /^\d+\.\s+/.test(line);
+      const items = [];
+      const itemPattern = ordered ? /^\d+\.\s+/ : /^[-*+]\s+/;
+
+      while (index < lines.length && itemPattern.test(lines[index])) {
+        items.push(lines[index].replace(itemPattern, ''));
+        index += 1;
+      }
+
+      const tag = ordered ? 'ol' : 'ul';
+      const listClass = ordered ? 'list-decimal' : 'list-disc';
+      const itemHtml = items.map(item => `<li class="pl-1">${renderInlineText(item)}</li>`).join('');
+      blocks.push(`<${tag} class="my-4 ${listClass} space-y-1 pl-6 text-sm leading-7 text-on-surface-variant">${itemHtml}</${tag}>`);
+      continue;
+    }
+
+    const paragraphLines = [];
+    while (index < lines.length && lines[index].trim() && !isBlockStart(lines, index)) {
+      paragraphLines.push(lines[index].trim());
+      index += 1;
+    }
+    blocks.push(`<p class="my-4 text-sm leading-7 text-on-surface-variant">${renderInlineText(paragraphLines.join(' '))}</p>`);
+  }
+
+  return `<div class="markdown-view space-y-1">${blocks.join('')}</div>`;
+}
+
 function createBadge(text, tone = 'default') {
   const badge = document.createElement('span');
   const toneClass = {
@@ -214,7 +463,7 @@ function renderSelectedDocument(state, elements) {
 
   setText(elements.title, selectedDocument.title);
   setText(elements.meta, `${selectedDocument.id} / ${selectedDocument.path}`);
-  setText(elements.content, selectedDocument.markdown);
+  setHtml(elements.content, renderMarkdown(selectedDocument.markdown));
   if (elements.copy) elements.copy.disabled = false;
   if (!elements.badges) return;
 
