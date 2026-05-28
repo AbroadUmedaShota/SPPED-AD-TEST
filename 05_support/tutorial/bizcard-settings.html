@@ -6,9 +6,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SPEED-AD - 名刺データ化設定</title>
     <script>
-      // チュートリアル専用ページ。?tutorial=1 が無い場合でも手動 URL から開いた際に起動するよう自動付与する。
-      // ハブ（index.html）からの明示的なリンクで tutorial=1&step=1 が渡されるため、通常はここでは何もしない。
-      // 万一 tutorial=1 が無い場合は付与しない（強制チュートリアルではないため）。
+      // チュートリアル専用ページ。ハブ（index.html）から tutorial=1&step=1 で開かれる。
+      // surveyId も tempSurveyData も無いと bizcardSettings.js は描画せず中断するため、
+      // チュートリアル時はデモ用のアンケート文脈を用意してフォーム（プラン等）を表示できるようにする。
+      // 保存・課金はされない。既存データがあれば尊重する（上書きしない）。
+      (function () {
+        try {
+          var p = new URLSearchParams(location.search);
+          if (p.get('tutorial') === '1' && !p.get('surveyId') && !localStorage.getItem('tempSurveyData')) {
+            var s = new Date(); s.setDate(s.getDate() + 1); s.setHours(0, 0, 0, 0);
+            var e = new Date(s); e.setDate(e.getDate() + 3);
+            var fmt = function (d) {
+              return d.getFullYear() + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + String(d.getDate()).padStart(2, '0');
+            };
+            localStorage.setItem('tempSurveyData', JSON.stringify({
+              // renderSurveyInfo は name.ja を参照するため多言語オブジェクト形式で渡す
+              name: { ja: 'チュートリアル用アンケート' },
+              displayTitle: { ja: '製品Aに関する満足度調査' },
+              periodStart: fmt(s),
+              periodEnd: fmt(e),
+              // データ化は OFF 始まり（step4 でユーザーが ON にする流れに合わせる）
+              settings: { bizcard: { bizcardEnabled: false }, thankYouEmail: {} }
+            }));
+          }
+        } catch (_e) { /* localStorage 不可環境では何もしない */ }
+      })();
     </script>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com/3.4.17?plugins=forms,container-queries"></script>

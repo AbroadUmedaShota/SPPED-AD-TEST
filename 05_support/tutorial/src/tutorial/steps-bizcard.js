@@ -2,12 +2,15 @@
 // 名刺データ化設定チュートリアル ステップ定義（仕様書 §4.5・全 19 ステップ）。
 //
 // 各ステップフィールドは既存 steps.js と同じフォーマット（id, target, mode, placement, title, body 等）を使用。
-// 完了・スキップ時はハブ（index.html）へ戻る。アカウント作成 CTA 画面は表示しない。
+// 完了・スキップ時はハブ（index.html）へ戻る。ただし復帰コンテキスト（RETURN_KEY）がある場合は
+// 作成チュートリアルの指定ステップへ戻る。アカウント作成 CTA 画面は表示しない。
+
+import { readReturn, clearReturn } from './state.js';
 
 export const TUTORIAL_STEPS = [
   // ブロック A: 画面オリエンテーション
   {
-    id: 1, block: 'A', target: '#main-content', mode: 'info', placement: 'center',
+    id: 1, block: 'A', target: null, mode: 'info', placement: 'center',
     title: '名刺データ化設定の画面',
     body:
       'ここが名刺データ化設定の画面です。\n'
@@ -43,11 +46,12 @@ export const TUTORIAL_STEPS = [
   },
   {
     id: 5, block: 'B', target: '#bizcardSettingsFields', mode: 'info', placement: 'top',
-    title: '画面にある他の項目について',
+    title: '社内管理用メモ（任意）について',
     body:
-      '画面には『社内管理用メモ』欄もありますが、こちらは別の機会にご確認ください。\n'
-      + 'このチュートリアルでは扱いません。\n\n'
-      + '確認できたら、下の『次へ』ボタンを押してください。',
+      'この画面の下の方には『社内管理用メモ（任意）』欄もあります。\n'
+      + 'この名刺データ化依頼について、社内の備忘や引き継ぎ用に自由にメモを残せる欄です。\n'
+      + '入力しても回答者には表示されません。必要なときだけ開いて使ってください。\n\n'
+      + '今回は入力せず進みます。下の『次へ』ボタンを押してください。',
   },
 
   // ブロック C: プラン選択
@@ -56,20 +60,19 @@ export const TUTORIAL_STEPS = [
     title: 'データ化プランを選択',
     body:
       'ここでデータ化プランを選択します。\n'
-      + 'プランによってデータ化される項目数と料金が異なります。\n\n'
+      + 'プランは「納期の速さ」と「1枚あたりの単価」で分かれます。\n\n'
       + '【データ化プランとは】\n'
-      + '名刺からどの項目を取り出すかを決めるプランです。\n'
-      + '無料・スタンダード・プレミアムの 3 種類があります。\n'
-      + '迷ったら『スタンダード』がおすすめです。\n\n'
+      + 'お試し（無料・2項目）／通常（＠50円）／特急（＠100円）／超特急（＠150円）／オンデマンド（＠200円）の5つです。\n'
+      + '通常以上はいずれも標準10項目をデータ化でき、選ぶプランで納期（6営業日〜当日）と料金が変わります。\n'
+      + '迷ったら「通常」（おすすめ）が標準的です。\n\n'
       + '確認できたら、下の『次へ』ボタンを押してください。',
   },
   {
     id: 7, block: 'C', target: '#dataConversionPlanSelection', mode: 'user-action', placement: 'top',
     title: 'プランカードを選択する',
     body:
-      'いずれかのプランをクリックして選択してください。\n'
-      + 'どれを選ぶか迷う場合は『スタンダード』を選ぶと\n'
-      + '標準的な 10 項目をデータ化できます。',
+      'いずれかのプランカードをクリックして選択してください。\n'
+      + '迷う場合は「通常」を選ぶと、標準10項目を＠50円・6営業日でデータ化できます。',
   },
   {
     id: 8, block: 'C', target: '#estimatedAmount', mode: 'info', placement: 'left',
@@ -127,10 +130,10 @@ export const TUTORIAL_STEPS = [
     body:
       'ここで追加のデータ化オプションを選べます。\n\n'
       + '【プレミアムオプションとは】\n'
-      + '標準プランに加えて、名刺の追加項目（外資系役職名・ふりがななど）を\n'
-      + 'データ化する有料オプションです。\n'
-      + '必要な項目がある場合のみ選択してください。\n'
-      + '不要な場合はチェックを付けなくて構いません。\n\n'
+      + '標準プランに加えて、名刺の追加情報をデータ化する有料オプションです。\n'
+      + '「多言語対応」（中国語など複数言語の翻訳入力）や、\n'
+      + '「電話番号2つ目」「住所2つめ」「手書きメモ」などの追加項目を選べます。\n'
+      + '必要な項目がある場合のみ選択してください。不要ならそのままで構いません。\n\n'
       + '確認できたら、下の『次へ』ボタンを押してください。',
   },
   {
@@ -185,7 +188,7 @@ export const TUTORIAL_STEPS = [
     body:
       'お疲れさまでした！\n'
       + '名刺データ化設定の基本操作はこれで完了です。\n\n'
-      + '『完了』を押すとチュートリアル一覧に戻ります。',
+      + '『完了』を押してください。',
     completeButtonLabel: '完了',
   },
 ];
@@ -200,6 +203,17 @@ export const TUTORIAL_CONFIG = {
   id: 'bizcard',
   progressKey: 'speedad-tutorial-bizcard-progress',
   completedKey: 'speedad-tutorial-bizcard-completed',
-  onComplete: () => window.location.assign('index.html'),
-  onSkip: () => window.location.assign('index.html'),
+  // 完了時: 復帰コンテキスト（チェーン元）があれば作成チュートリアルの該当ステップへ戻り、
+  // 無ければ従来どおりハブ（index.html）へ。スキップ(終了)経路は index-bizcard.js の
+  // handleSkipConfirm が先に clearReturn() するため、ここを通っても return 無し＝ハブへ向かう。
+  onComplete: () => {
+    const ret = readReturn();
+    if (ret) {
+      clearReturn();
+      const sep = ret.url.includes('?') ? '&' : '?';
+      window.location.assign(`${ret.url}${sep}tutorial=1&step=${ret.step}`);
+    } else {
+      window.location.assign('index.html');
+    }
+  },
 };

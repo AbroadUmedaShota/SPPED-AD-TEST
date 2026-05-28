@@ -384,9 +384,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             initInvoiceListPage();
             break;
         case 'bizcardSettings.html':
+        case 'bizcard-settings.html': // チュートリアル用バンドルのページ名（kebab）
             initBizcardSettings();
             break;
         case 'thankYouEmailSettings.html':
+        case 'thank-you-email.html': // チュートリアル用バンドルのページ名（kebab）
             initThankYouEmailSettings();
             break;
         case 'thankYouScreenSettings.html':

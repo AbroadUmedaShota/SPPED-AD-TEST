@@ -2,13 +2,16 @@
 // お礼メール設定チュートリアル ステップ定義（仕様書 §4.6・全 21 ステップ）。
 //
 // 各ステップフィールドは既存 steps.js と同じフォーマット（id, target, mode, placement, title, body 等）を使用。
-// 完了・スキップ時はハブ（index.html）へ戻る。アカウント作成 CTA 画面は表示しない。
+// 完了・スキップ時はハブ（index.html）へ戻る。ただし復帰コンテキスト（RETURN_KEY）がある場合は
+// 作成チュートリアルの指定ステップへ戻る。アカウント作成 CTA 画面は表示しない。
 // 起動時は after_event_ready 状態固定（guards-thankyou.js の DOMContentLoaded 後に強制設定）。
+
+import { readReturn, clearReturn } from './state.js';
 
 export const TUTORIAL_STEPS = [
   // ブロック A: 画面オリエンテーション
   {
-    id: 1, block: 'A', target: '#main-content', mode: 'info', placement: 'center',
+    id: 1, block: 'A', target: null, mode: 'info', placement: 'center',
     title: 'お礼メール設定の画面',
     body:
       'ここがお礼メール設定の画面です。\n'
@@ -207,7 +210,7 @@ export const TUTORIAL_STEPS = [
     body:
       'お疲れさまでした！\n'
       + 'お礼メール設定の基本操作はこれで完了です。\n\n'
-      + '『完了』を押すとチュートリアル一覧に戻ります。',
+      + '『完了』を押してください。',
     completeButtonLabel: '完了',
   },
 ];
@@ -222,6 +225,17 @@ export const TUTORIAL_CONFIG = {
   id: 'thankyou',
   progressKey: 'speedad-tutorial-thankyou-progress',
   completedKey: 'speedad-tutorial-thankyou-completed',
-  onComplete: () => window.location.assign('index.html'),
-  onSkip: () => window.location.assign('index.html'),
+  // 完了時: 復帰コンテキスト（チェーン元）があれば作成チュートリアルの該当ステップへ戻り、
+  // 無ければ従来どおりハブ（index.html）へ。スキップ(終了)経路は index-thankyou.js の
+  // handleSkipConfirm が先に clearReturn() するため、ここを通っても return 無し＝ハブへ向かう。
+  onComplete: () => {
+    const ret = readReturn();
+    if (ret) {
+      clearReturn();
+      const sep = ret.url.includes('?') ? '&' : '?';
+      window.location.assign(`${ret.url}${sep}tutorial=1&step=${ret.step}`);
+    } else {
+      window.location.assign('index.html');
+    }
+  },
 };

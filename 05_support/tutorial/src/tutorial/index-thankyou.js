@@ -26,6 +26,7 @@ import {
   writeProgress,
   clearProgress,
   markCompleted,
+  clearReturn,
 } from './state.js';
 import { installGlobalApi, enableTargetForTutorial } from './guards-thankyou.js';
 import { waitForCommonHtml, waitForSelector } from './tutorial-core.js';
@@ -261,6 +262,8 @@ function handlePrev() {
 function handleSkipConfirm(stage) {
   if (stage === 'confirmed') {
     hideSkipConfirm();
+    // スキップ(終了)は復帰せずハブへ退出する。return を消すことで onComplete がハブへ向かう。
+    clearReturn();
     finishAndExit({ markComplete: true });
   } else {
     showSkipConfirm();

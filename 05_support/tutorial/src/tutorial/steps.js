@@ -120,21 +120,21 @@ export const TUTORIAL_STEPS = [
   },
   {
     id: 11, block: 'C', target: '#openBizcardSettingsBtn', contextTarget: '#relatedSettingsCardBody',
-    mode: 'info', placement: 'left',
+    mode: 'user-action-bridge', placement: 'left',
     title: '名刺データ化設定',
     body:
-      '収集した名刺画像をテキスト情報に変換（データ化）する際の精度や納期などを設定する画面へのリンクです。\n'
-      + '展示会後の名刺データ入力作業を丸ごと巻き取れます。\n\n'
-      + '今回は開かずに進みます。下の『次へ』ボタンを押してください。',
+      '収集した名刺画像をテキスト情報に変換（データ化）する設定です。\n'
+      + '展示会後の名刺入力作業をまるごと任せられます。\n\n'
+      + 'このボタンを押して、名刺データ化設定の使い方を続けて体験しましょう。',
   },
   {
     id: 12, block: 'C', target: '#openThankYouEmailSettingsBtn', contextTarget: '#relatedSettingsCardBody',
-    mode: 'info', placement: 'left',
+    mode: 'user-action-bridge', placement: 'left',
     title: 'お礼メール設定',
     body:
-      '回答完了後に回答者へ自動送信されるお礼メールの内容や送信タイミングを設定できます。\n'
+      '回答完了後に回答者へ自動送信するお礼メールを設定できます。\n'
       + '回答直後にフォローの第一接点を作れます。\n\n'
-      + '今回は開かずに進みます。下の『次へ』ボタンを押してください。',
+      + 'このボタンを押して、お礼メール設定の使い方を続けて体験しましょう。',
   },
   {
     id: 13, block: 'C', target: '#openThankYouScreenSettingsBtn', contextTarget: '#relatedSettingsCardBody',

@@ -423,10 +423,10 @@ export function hideSkipConfirm() {
   }
 }
 
-export function showWelcome({ onStart, onSkip } = {}) {
+export function showWelcome({ onStart, onSkip, ...welcomeText } = {}) {
   if (welcomeScreenEl) return;
   ensureRoot();
-  welcomeScreenEl = buildWelcomeScreen();
+  welcomeScreenEl = buildWelcomeScreen(welcomeText);
   rootEl.appendChild(welcomeScreenEl);
   // #27: welcome 自身が dialog/aria-modal を持つ間、rootEl の dialog ロールは外して
   // モーダルの二重ネストを解消する（#11 と整合）。
@@ -825,7 +825,7 @@ function buildSkipModal() {
   return overlay;
 }
 
-function buildWelcomeScreen() {
+function buildWelcomeScreen(opts = {}) {
   const overlay = document.createElement('div');
   overlay.className = 'tutorial-welcome';
   overlay.setAttribute('role', 'dialog');
@@ -837,26 +837,26 @@ function buildWelcomeScreen() {
 
   const eyebrow = document.createElement('div');
   eyebrow.className = 'tutorial-welcome__eyebrow';
-  eyebrow.textContent = '展示会・イベント出展のご担当者さま向け';
+  eyebrow.textContent = opts.eyebrow || '展示会・イベント出展のご担当者さま向け';
   panel.appendChild(eyebrow);
 
   const title = document.createElement('h1');
   title.className = 'tutorial-welcome__title';
   title.id = 'tutorial-welcome-title';
-  title.textContent = 'ようこそ';
+  title.textContent = opts.title || 'ようこそ';
   panel.appendChild(title);
 
   // body は 2 行構成。1 行目はサービス説明、2 行目は体験予告。
   const bodyLead = document.createElement('p');
   bodyLead.className = 'tutorial-welcome__body tutorial-welcome__body--lead';
-  bodyLead.textContent =
-    'SPEED ADは、展示会アンケートと名刺データ化をQR1枚で完結できるサービスです。'
+  bodyLead.textContent = opts.lead
+    || 'SPEED ADは、展示会アンケートと名刺データ化をQR1枚で完結できるサービスです。'
     + 'QRを配るだけで、アンケート回答と名刺データ化が同時に完了します。';
   panel.appendChild(bodyLead);
 
   const bodyInvite = document.createElement('p');
   bodyInvite.className = 'tutorial-welcome__body tutorial-welcome__body--invite';
-  bodyInvite.textContent = 'アンケート作成からQR発行までの基本フローを、数分で体験しましょう。';
+  bodyInvite.textContent = opts.invite || 'アンケート作成からQR発行までの基本フローを、数分で体験しましょう。';
   panel.appendChild(bodyInvite);
 
   // 開発中バージョンの注意書き。リリース版との差分を着手前に明示する。
@@ -874,7 +874,7 @@ function buildWelcomeScreen() {
   skipBtn.type = 'button';
   skipBtn.className = 'tutorial-welcome__skip';
   skipBtn.dataset.welcomeAction = 'skip';
-  skipBtn.textContent = 'サービス概要を見る';
+  skipBtn.textContent = opts.skipLabel || 'サービス概要を見る';
   actions.appendChild(skipBtn);
 
   const startBtn = document.createElement('button');

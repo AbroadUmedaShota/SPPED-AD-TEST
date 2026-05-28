@@ -28,6 +28,7 @@ import {
   clearProgress,
   markCompleted,
   isCompleted,
+  writeReturn,
 } from './state.js';
 import { installGlobalApi, enableTargetForTutorial } from './guards.js';
 import { loadCommonHtml } from '../utils.js';
@@ -64,7 +65,58 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
+  // クロスチュートリアル遷移インターセプタ（capture フェーズ）。
+  // step11/12 は user-action-bridge のため、ボタン直接クリックでも「次へ」代行クリック
+  // (escapeTargetEl.click()) でもこの capture が先に発火し、本番 href 遷移を止めて
+  // サブチュートリアルへ送る。本番 DOM の href は書き換えない。
+  // どちらの分岐も直後に location.assign でページ遷移するため、進行中ステップの
+  // リスナー解放（cleanupActiveStep）は不要（遷移で DOM ごと破棄される）。
+  // start パラメータ付き（ハブからの単体起動・入口ステップ）では復帰コンテキストを書かない
+  // → サブチュートリアル完了後はハブへ戻る。step11/12 からのチェーン時のみ復帰を書く。
+  const isLeadInLaunch = !!new URLSearchParams(window.location.search).get('start');
+  document.addEventListener('click', (ev) => {
+    if (!api.isActive()) return;
+    const bizBtn = ev.target.closest && ev.target.closest('#openBizcardSettingsBtn');
+    if (bizBtn) {
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+      if (!isLeadInLaunch) writeReturn({ url: 'surveyCreation.html', step: 12 });
+      window.location.assign('bizcard-settings.html?tutorial=1&step=1');
+      return;
+    }
+    const tyBtn = ev.target.closest && ev.target.closest('#openThankYouEmailSettingsBtn');
+    if (tyBtn) {
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+      if (!isLeadInLaunch) writeReturn({ url: 'surveyCreation.html', step: 13 });
+      window.location.assign('thank-you-email.html?tutorial=1&step=1');
+      return;
+    }
+  }, true);
+
   await waitForCommonHtml();
+
+  // ハブから名刺/お礼メールカードで起動した場合（?start=...）は、編集画面で「設定ボタンを指す
+  // 入口ステップ」だけを見せ、クリックでサブチュートリアルへ送る。本編28ステップは実行しない。
+  const leadInKind = new URLSearchParams(window.location.search).get('start');
+  if (leadInKind === 'bizcard' || leadInKind === 'thankyou') {
+    initOverlay({ total: 1 });
+    setCallbacks({
+      onNext: handleNext,
+      onPrev: handlePrev,
+      onSkipConfirm: leadInSkipConfirm,
+      onSkipCancel: handleSkipCancel,
+      onComplete: () => window.location.assign('index.html'),
+    });
+    bootstrapped = true;
+    // 唐突に始まらないよう、まず「ようこそ画面」でワンクッション置いてから入口ステップへ。
+    showWelcome({
+      ...LEAD_IN_WELCOME[leadInKind],
+      onStart: () => renderLeadIn(leadInKind),
+      onSkip: () => window.location.assign('index.html'),
+    });
+    return;
+  }
 
   initOverlay({ total: TOTAL_STEPS });
   setCallbacks({
@@ -258,6 +310,70 @@ function applyBasicInfoHandoff() {
       const fmt = (d) => `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
       setInputValue(periodInput, `${fmt(periodStart)} 〜 ${fmt(periodEnd)}`);
     }
+  }
+}
+
+// ---------- 入口ステップ（ハブ単体起動用） ----------
+
+const LEAD_IN_DEFS = {
+  bizcard: {
+    target: '#openBizcardSettingsBtn',
+    title: '名刺データ化設定を開く',
+    body:
+      '名刺データ化の設定は、この「名刺データ化設定」ボタンから開きます。\n'
+      + 'ボタンを押して設定画面へ進みましょう。',
+  },
+  thankyou: {
+    target: '#openThankYouEmailSettingsBtn',
+    title: 'お礼メール設定を開く',
+    body:
+      'お礼メールの設定は、この「お礼メール設定」ボタンから開きます。\n'
+      + 'ボタンを押して設定画面へ進みましょう。',
+  },
+};
+
+// 入口（ようこそ画面）の文言。唐突な開始を避けるワンクッション。
+const LEAD_IN_WELCOME = {
+  bizcard: {
+    eyebrow: '名刺データ化設定チュートリアル',
+    title: 'ようこそ',
+    lead: '展示会で集めた名刺を、SPEED AD が自動でデータ化します。',
+    invite: 'これから名刺データ化設定の使い方を、数分で体験しましょう。',
+    skipLabel: 'スキップ',
+  },
+  thankyou: {
+    eyebrow: 'お礼メール設定チュートリアル',
+    title: 'ようこそ',
+    lead: '回答完了後に、来場者へお礼メールを自動で送れます。',
+    invite: 'これからお礼メール設定の使い方を、数分で体験しましょう。',
+    skipLabel: 'スキップ',
+  },
+};
+
+// ハブからの単体起動時に編集画面で見せる入口ステップ。対象ボタンを指し、クリック（または
+// 「次へ」の代行クリック）で capture インターセプタがサブチュートリアルへ送る。本編は実行しない。
+function renderLeadIn(kind) {
+  const def = LEAD_IN_DEFS[kind];
+  if (!def) return;
+  currentStepIndex = 0;
+  resolveTargetAndRender({
+    id: 1,
+    mode: 'user-action-bridge',
+    placement: 'left',
+    target: def.target,
+    contextTarget: '#relatedSettingsCardBody',
+    title: def.title,
+    body: def.body,
+  });
+}
+
+// 入口ステップでのスキップ（終了）はハブへ戻す（作成チュートリアルの完了CTAは出さない）。
+function leadInSkipConfirm(stage) {
+  if (stage === 'confirmed') {
+    hideSkipConfirm();
+    window.location.assign('index.html');
+  } else {
+    showSkipConfirm();
   }
 }
 

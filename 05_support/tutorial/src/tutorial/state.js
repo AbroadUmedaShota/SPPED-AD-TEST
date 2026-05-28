@@ -9,6 +9,7 @@
 
 const DEFAULT_PROGRESS_KEY = 'speedad-tutorial-progress';
 const DEFAULT_COMPLETED_KEY = 'speedad-tutorial-completed';
+const RETURN_KEY = 'speedad-tutorial-return';
 
 function safeGetItem(key) {
   try {
@@ -70,6 +71,31 @@ export function isCompleted(completedKey = DEFAULT_COMPLETED_KEY) {
   return safeGetItem(completedKey) === '1';
 }
 
+// 復帰コンテキスト: サブチュートリアル完了後にどのURLのどのステップへ戻るかを保存する。
+// { url: string, step: number } の形式で保存。
+
+export function writeReturn(ctx) {
+  safeSetItem(RETURN_KEY, JSON.stringify(ctx));
+}
+
+export function readReturn() {
+  const d = safeGetItem(RETURN_KEY);
+  if (!d) return null;
+  try {
+    const parsed = JSON.parse(d);
+    if (parsed && typeof parsed.step === 'number' && typeof parsed.url === 'string') {
+      return parsed;
+    }
+    return null;
+  } catch (_e) {
+    return null;
+  }
+}
+
+export function clearReturn() {
+  safeRemoveItem(RETURN_KEY);
+}
+
 export function resetAll() {
   // アンケート作成チュートリアル
   safeRemoveItem(DEFAULT_PROGRESS_KEY);
@@ -82,4 +108,6 @@ export function resetAll() {
   safeRemoveItem('speedad-tutorial-thankyou-completed');
   // 旧バージョンで保存されたエントリ種別キーの掃除（現在は未使用）
   safeRemoveItem('speedad-tutorial-entry');
+  // 復帰コンテキスト
+  safeRemoveItem(RETURN_KEY);
 }
