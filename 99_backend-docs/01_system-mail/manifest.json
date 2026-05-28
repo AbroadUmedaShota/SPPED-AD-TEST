@@ -9,15 +9,15 @@
   "documents": [
     {
       "id": "SM-001",
-      "title": "新規アカウント作成時",
+      "title": "新規アカウント作成時（配信なし）",
       "category": "アカウント",
-      "sourceStatus": "両方確認・概ね一致",
+      "sourceStatus": "要件変更により配信なし",
       "path": "01_account-registration.md",
-      "summary": "メールアドレス登録後にパスワード設定URLを送る通知。",
-      "tags": ["アカウント", "登録", "操作起点"],
-      "hasUnconfirmed": false,
-      "relatedSources": ["ログメールテンプレートExcel", "Gmail実配信例"],
-      "hasGmailObserved": true,
+      "summary": "過去資料では登録後通知が確認されたが、現行要件では配信しない。",
+      "tags": ["アカウント", "登録", "配信なし", "要件変更"],
+      "hasUnconfirmed": true,
+      "relatedSources": ["ログメールテンプレートExcel", "Gmail実配信例", "要件変更"],
+      "hasGmailObserved": false,
       "hasExcelTemplate": true
     },
     {
