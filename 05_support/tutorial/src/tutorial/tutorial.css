@@ -26,6 +26,19 @@
   --tut-accent-violet: var(--color-button-primary-hover-bg, #3367D6);
   --tut-accent-violet-glow: rgba(51, 103, 214, 0.22);
   --tut-on-accent: var(--color-button-primary-text, #FFFFFF);
+
+  /* チュートリアル専用ボタン色（群青）。本体サービスの主要ボタン #4285F4 とは別系統にして
+     「画面内のボタン」と「チュートリアルのボタン」の押し分け混同を防ぐ。
+     サービス公開ページ css/page.css の群青(#2138BC)をやや濃くした値。白文字で 9:1 超、
+     ライト/ダーク両モードとも本体ボタンと色相が分かれる。 */
+  --tut-btn-bg: #1C30A0;
+  /* ホバーは「濃く」ではなく「明るく」する。色の変化はアニメ低減設定（reduced-motion）でも
+     瞬時に切り替わって知覚できるため、浮き上がり（動き）が無効化されても分かる。白文字で約6.4:1。 */
+  --tut-btn-bg-hover: #3A52CD;
+  --tut-btn-on: #FFFFFF;
+  --tut-btn-glow: rgba(28, 48, 160, 0.32);
+  --tut-btn-hairline: transparent; /* ライトでは縁取り無し（白カード上で輪郭が出る） */
+
   --tut-text: var(--color-text-main, #1A1A1A);
   --tut-text-sub: var(--color-text-sub, #6B6B6B);
   --tut-scrim: var(--color-scrim, rgba(0, 0, 0, 0.15));
@@ -39,6 +52,11 @@
   --tutorial-bubble-bg: var(--tut-glass);
   --tutorial-bubble-text: var(--tut-text);
   --tutorial-bubble-subtext: var(--tut-text-sub);
+}
+
+/* ダークモードでは群青ボタンが暗いカード上で輪郭が沈むため、薄い縁取りで視認性を確保する */
+body.dark-mode {
+  --tut-btn-hairline: rgba(255, 255, 255, 0.20);
 }
 
 /* ----- Root ----- */
@@ -357,21 +375,54 @@
   border-color: var(--tut-border);
 }
 
+/* 進行ボタンは群青の塗り。本体サービスの主要ボタン（#4285F4）とは別色にして、
+   スポットライトで示す本体ボタンとの押し分け混同を防ぐ。 */
 .tutorial-coachmark__next {
-  background: var(--tut-accent-cyan);
-  border: none;
-  color: var(--tut-on-accent);
+  background: var(--tut-btn-bg);
+  border: 1px solid var(--tut-btn-hairline);
+  color: var(--tut-btn-on);
   font-size: 14px;
   font-weight: 600;
   padding: 6px 16px;
   border-radius: 8px;
   cursor: pointer;
   white-space: nowrap;
-  transition: background-color 200ms ease, transform 160ms ease;
+  box-shadow: 0 1px 2px rgba(28, 48, 160, 0.20);
+  /* 強調はホバー/フォーカス時のみ。常時ループのアニメは付けない
+     （スポットライトと注目が競合して「どちらを押すか」が再び曖昧になるため）。 */
+  transition: background-color 200ms ease, box-shadow 200ms ease, transform 160ms ease;
 }
 
 .tutorial-coachmark__next:hover {
-  background: var(--tut-accent-violet);
+  background: var(--tut-btn-bg-hover);
+  box-shadow: 0 6px 16px rgba(28, 48, 160, 0.40);
+  transform: translateY(-2px);
+}
+
+.tutorial-coachmark__next:focus-visible {
+  outline: 2px solid var(--tut-accent-cyan);
+  outline-offset: 2px;
+}
+
+/* info / autofill ステップでは「次へ」が押すべき主導線なので注目グローを付ける。
+   user-action 系（画面内ボタンをスポットライトで示すステップ）では付けず、二重強調を避ける。
+   クラスのベースに静的なリング影を持たせ、reduced-motion でも（動かず）目立つようにする。 */
+.tutorial-coachmark__next--primary {
+  box-shadow: 0 1px 2px rgba(28, 48, 160, 0.20), 0 0 0 3px rgba(28, 48, 160, 0.16);
+  animation: tutorial-next-glow 1.8s ease-in-out infinite;
+}
+
+.tutorial-coachmark__next--primary:hover {
+  animation: none; /* ホバー中はパルスを止め、ホバー表現（明色化＋浮き上がり）を優先 */
+}
+
+@keyframes tutorial-next-glow {
+  0%, 100% {
+    box-shadow: 0 1px 2px rgba(28, 48, 160, 0.20), 0 0 0 2px rgba(28, 48, 160, 0.10);
+  }
+  50% {
+    box-shadow: 0 1px 2px rgba(28, 48, 160, 0.20), 0 0 0 6px rgba(28, 48, 160, 0.26);
+  }
 }
 
 /* .tutorial-coachmark__hint は廃止（overlay.js から要素生成を削除）。
@@ -731,9 +782,9 @@
 /* 「終了する」(.confirm) を控えめスタイルに、
    「続ける」(.cancel) をプライマリ強調スタイルに入れ替え。 */
 .tutorial-skip-modal__cancel {
-  background: var(--tut-accent-cyan);
-  border: none;
-  color: var(--tut-on-accent);
+  background: var(--tut-btn-bg);
+  border: 1px solid var(--tut-btn-hairline);
+  color: var(--tut-btn-on);
   padding: 8px 16px;
   border-radius: 8px;
   font-size: 14px;
@@ -743,7 +794,7 @@
 }
 
 .tutorial-skip-modal__cancel:hover {
-  background: var(--tut-accent-violet);
+  background: var(--tut-btn-bg-hover);
 }
 
 .tutorial-skip-modal__confirm {
@@ -950,22 +1001,22 @@
 }
 
 .tutorial-welcome__start {
-  background: var(--tut-accent-cyan);
-  border: none;
-  color: var(--tut-on-accent);
+  background: var(--tut-btn-bg);
+  border: 1px solid var(--tut-btn-hairline);
+  color: var(--tut-btn-on);
   font-size: 16px;
   font-weight: 600;
   padding: 12px 32px;
   border-radius: 10px;
   cursor: pointer;
   letter-spacing: 0.02em;
-  box-shadow: 0 4px 12px rgba(66, 133, 244, 0.28);
+  box-shadow: 0 4px 12px var(--tut-btn-glow);
   transition: background-color 200ms ease, box-shadow 200ms ease, transform 160ms ease;
 }
 
 .tutorial-welcome__start:hover {
-  background: var(--tut-accent-violet);
-  box-shadow: 0 6px 18px rgba(66, 133, 244, 0.36);
+  background: var(--tut-btn-bg-hover);
+  box-shadow: 0 6px 18px var(--tut-btn-glow);
   transform: translateY(-1px);
 }
 
@@ -1121,22 +1172,22 @@
 }
 
 .tutorial-account-cta__create {
-  background: var(--tut-accent-cyan);
-  border: none;
-  color: var(--tut-on-accent);
+  background: var(--tut-btn-bg);
+  border: 1px solid var(--tut-btn-hairline);
+  color: var(--tut-btn-on);
   font-size: 16px;
   font-weight: 600;
   padding: 12px 32px;
   border-radius: 10px;
   cursor: pointer;
   letter-spacing: 0.02em;
-  box-shadow: 0 4px 12px rgba(66, 133, 244, 0.28);
+  box-shadow: 0 4px 12px var(--tut-btn-glow);
   transition: background-color 200ms ease, box-shadow 200ms ease, transform 160ms ease;
 }
 
 .tutorial-account-cta__create:hover {
-  background: var(--tut-accent-violet);
-  box-shadow: 0 6px 18px rgba(66, 133, 244, 0.36);
+  background: var(--tut-btn-bg-hover);
+  box-shadow: 0 6px 18px var(--tut-btn-glow);
   transform: translateY(-1px);
 }
 
@@ -1162,6 +1213,7 @@
   .tutorial-coachmark__title.is-step-changed,
   .tutorial-coachmark__body.is-step-changed,
   .tutorial-pointer__ring,
+  .tutorial-coachmark__next--primary,
   .tutorial-skip-modal__panel,
   .tutorial-welcome,
   .tutorial-welcome__panel,

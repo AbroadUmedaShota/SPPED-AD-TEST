@@ -716,6 +716,8 @@ function buildCoachmark() {
   prevBtn.type = 'button';
   prevBtn.className = 'tutorial-coachmark__prev';
   prevBtn.textContent = '戻る';
+  // SR 利用者に本体ボタンとの役割差を伝える（視覚は塗り/枠線で区別するが色・形は読み上げられない）
+  prevBtn.setAttribute('aria-label', 'チュートリアル: 戻る');
   prevBtn.addEventListener('click', () => onPrevCb && onPrevCb());
   footer.appendChild(prevBtn);
 
@@ -723,6 +725,7 @@ function buildCoachmark() {
   nextBtn.type = 'button';
   nextBtn.className = 'tutorial-coachmark__next';
   nextBtn.textContent = '次へ';
+  nextBtn.setAttribute('aria-label', 'チュートリアル: 次へ');
   nextBtn.addEventListener('click', () => {
     if (currentStep?.mode === 'user-action-bridge' && currentStep.completeButtonLabel) {
       onCompleteCb && onCompleteCb();
@@ -1111,7 +1114,14 @@ function updateCoachmark(step, targetEl) {
   // 本来のアクション（モーダルを開く・ページ遷移など）を発火させつつ進行を継続する。
   if (nextBtn) {
     nextBtn.style.display = '';
-    nextBtn.textContent = step.completeButtonLabel || '次へ';
+    const nextLabel = step.completeButtonLabel || '次へ';
+    nextBtn.textContent = nextLabel;
+    // 可視ラベルと同期（completeButtonLabel 時も SR にチュートリアル文脈を保つ）
+    nextBtn.setAttribute('aria-label', `チュートリアル: ${nextLabel}`);
+    // info / autofill では「次へ」が押すべき主導線なので注目グローを付ける。
+    // user-action 系は画面内ボタンをスポットライトで示すため、ここは静かにして二重強調を避ける。
+    const nextIsPrimary = step.mode === 'info' || step.mode === 'autofill';
+    nextBtn.classList.toggle('tutorial-coachmark__next--primary', nextIsPrimary);
   }
 
   // 「戻る」は先頭以外で表示。M-2: ページ境界ステップ（step.hideBack）では非表示。
