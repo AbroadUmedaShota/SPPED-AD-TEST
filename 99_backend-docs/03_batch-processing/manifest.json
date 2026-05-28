@@ -1,0 +1,79 @@
+{
+  "meta": {
+    "id": "03_batch-processing",
+    "title": "バッチ処理",
+    "summary": "会期開始、会期終了、通知、データ化完了、請求作成などの定時処理を整理します。",
+    "sourceStatus": "旧Wiki補助 / 現行資料",
+    "hasUnconfirmed": true
+  },
+  "documents": [
+    {
+      "id": "BAT-001",
+      "title": "バッチ処理一覧",
+      "category": "スケジュール",
+      "sourceStatus": "旧Wiki確認",
+      "path": "01_batch-schedule.md",
+      "summary": "旧Wikiで確認できる代表的な定時処理と時刻を整理します。",
+      "tags": ["バッチ", "スケジュール", "旧Wiki"],
+      "hasUnconfirmed": true,
+      "relatedSources": ["docs/アーカイブ/speedad-backlog-wiki-2026-03-24/pages/19_1107907_batch-processing.md"]
+    },
+    {
+      "id": "BAT-002",
+      "title": "通知起点",
+      "category": "通知",
+      "sourceStatus": "旧Wiki / システムメール資料",
+      "path": "02_notification-triggers.md",
+      "summary": "バッチが通知送信に関わる箇所をシステムメール資料と対応付けます。",
+      "tags": ["通知", "システムメール", "起点"],
+      "hasUnconfirmed": true,
+      "relatedSources": ["99_backend-docs/01_system-mail", "docs/アーカイブ/speedad-backlog-wiki-2026-03-24/pages/19_1107907_batch-processing.md"]
+    },
+    {
+      "id": "BAT-003",
+      "title": "未確認の実装論点",
+      "category": "未確認",
+      "sourceStatus": "要確認",
+      "path": "03_unconfirmed-implementation.md",
+      "summary": "本番ジョブ実装として確認が必要な論点を整理します。",
+      "tags": ["未確認", "リトライ", "監視"],
+      "hasUnconfirmed": true,
+      "relatedSources": ["03_admin/00.要件定義書.txt"]
+    }
+  ],
+  "flow": [
+    {
+      "group": "代表的な定時処理",
+      "items": [
+        {
+          "id": "BAT-F01",
+          "documentId": "BAT-001",
+          "timing": "毎日0:00",
+          "label": "会期開始・期限通知",
+          "summary": "会期開始、会期前日、DL期限系通知の起点。"
+        },
+        {
+          "id": "BAT-F02",
+          "documentId": "BAT-001",
+          "timing": "毎日23:59",
+          "label": "会期終了",
+          "summary": "利用期間が本日までのアンケートへ終了通知。"
+        },
+        {
+          "id": "BAT-F03",
+          "documentId": "BAT-002",
+          "timing": "完了予定日",
+          "label": "データ化完了通知",
+          "summary": "名刺データ化完了や御礼メール送信依頼に接続。"
+        },
+        {
+          "id": "BAT-F04",
+          "documentId": "BAT-001",
+          "timing": "月末",
+          "label": "請求書作成",
+          "summary": "月末請求書作成とメール送信処理の起点。"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "meta": {
+    "id": "07_accounts-groups",
+    "title": "アカウント・グループ",
+    "summary": "ユーザー、グループ、招待、認証、請求先の関係を整理します。",
+    "sourceStatus": "既存仕様 / システムメール資料",
+    "hasUnconfirmed": true
+  },
+  "documents": [
+    {
+      "id": "ACC-001",
+      "title": "アカウントと認証通知",
+      "category": "アカウント",
+      "sourceStatus": "既存仕様 / Gmail確認",
+      "path": "01_account-auth.md",
+      "summary": "新規アカウント作成、パスワード再設定、認証メールの接点を整理します。",
+      "tags": ["アカウント", "認証", "パスワード"],
+      "hasUnconfirmed": true,
+      "relatedSources": ["99_backend-docs/01_system-mail/01_account-registration.md", "99_backend-docs/01_system-mail/02_password-reset.md", "docs/画面設計/仕様/10_password_reset_feature.md"]
+    },
+    {
+      "id": "ACC-002",
+      "title": "グループ招待と請求関係",
+      "category": "グループ",
+      "sourceStatus": "既存仕様 / Gmail確認",
+      "path": "02_group-invitation-billing.md",
+      "summary": "既存ユーザー招待、新規ユーザー招待、グループ請求の関係を整理します。",
+      "tags": ["グループ", "招待", "請求"],
+      "hasUnconfirmed": true,
+      "relatedSources": ["99_backend-docs/01_system-mail/12_group-invitation-existing.md", "99_backend-docs/01_system-mail/13_group-invitation-new-user.md", "docs/画面設計/仕様/admin/10_admin_account_management.md"]
+    }
+  ],
+  "flow": [
+    {
+      "group": "アカウント・グループ操作",
+      "items": [
+        {
+          "id": "ACC-F01",
+          "documentId": "ACC-001",
+          "timing": "初回登録",
+          "label": "アカウント作成",
+          "summary": "登録メールからパスワード設定へ進みます。"
+        },
+        {
+          "id": "ACC-F02",
+          "documentId": "ACC-001",
+          "timing": "随時",
+          "label": "パスワード再設定",
+          "summary": "再設定依頼からURL通知へ進みます。"
+        },
+        {
+          "id": "ACC-F03",
+          "documentId": "ACC-002",
+          "timing": "グループ追加時",
+          "label": "既存ユーザー招待",
+          "summary": "既存アカウントへ参加承認URLを送ります。"
+        },
+        {
+          "id": "ACC-F04",
+          "documentId": "ACC-002",
+          "timing": "グループ追加時",
+          "label": "新規ユーザー招待",
+          "summary": "アカウント作成依頼と招待を接続します。"
+        }
+      ]
+    }
+  ]
+}

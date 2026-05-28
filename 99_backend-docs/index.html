@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HOME / バックエンド仕組み整理</title>
+  <link rel="icon" href="../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="../02_dashboard/service-top-style.css">
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+  <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+</head>
+<body class="bg-background text-on-background">
+<div class="min-h-screen bg-background">
+  <header class="border-b border-outline-variant bg-surface">
+    <div class="flex w-full flex-wrap items-center justify-between gap-4 px-4 py-5 sm:px-6 lg:px-8">
+      <div>
+        <p class="text-sm font-semibold text-primary">HOME</p>
+        <h1 class="text-headline-medium font-bold leading-tight text-on-surface">バックエンド仕組み整理</h1>
+        <p class="mt-1 max-w-4xl text-sm leading-6 text-on-surface-variant">SPEED AD全体のサービス概要、業務フロー、主要ロジック、通知・期限・請求などのバックエンド側の動きを横断して確認するための入口です。</p>
+      </div>
+      <a class="inline-flex items-center gap-2 rounded-lg border border-outline px-3 py-2 text-sm text-on-surface hover:bg-surface-variant" href="./README.md" target="_blank" rel="noopener">
+        <span class="material-icons text-base">open_in_new</span>
+        READMEを開く
+      </a>
+    </div>
+  </header>
+
+  <main class="w-full px-4 py-6 sm:px-6 lg:px-8">
+    <section aria-labelledby="service-overview-title">
+      <div class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p class="text-sm font-semibold text-primary">SPEED ADとは</p>
+          <h2 id="service-overview-title" class="mt-1 text-title-large font-bold text-on-surface">アンケート回収から会期後フォローまでを一連で扱うサービス</h2>
+          <p class="mt-2 max-w-4xl text-sm leading-6 text-on-surface-variant">展示会・セミナーで発生するWEBアンケート、名刺取得、名刺データ化、CSVダウンロード、お礼メール、請求確認を、アンケート案件を中心に整理します。このページは正式仕様ではなく、正本仕様・現行モック・旧Wiki・実配信観測を横断する見取り図です。</p>
+        </div>
+        <a class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-on hover:opacity-90" href="./00_service-overview/index.html">
+          <span class="material-icons text-base">article</span>
+          サービス概要へ
+        </a>
+      </div>
+
+      <div class="mt-5 grid gap-4 md:grid-cols-3">
+        <div class="rounded-lg border border-outline-variant bg-surface p-4">
+          <p class="text-sm font-bold text-on-surface">中心単位</p>
+          <p class="mt-2 text-sm leading-6 text-on-surface-variant">アンケート案件を中心に、回答、名刺、メール、ダウンロード、請求がつながります。</p>
+        </div>
+        <div class="rounded-lg border border-outline-variant bg-surface p-4">
+          <p class="text-sm font-bold text-on-surface">主要機能</p>
+          <p class="mt-2 text-sm leading-6 text-on-surface-variant">WEBアンケート、名刺画像のデータ化、お礼メール送信を中核として扱います。</p>
+        </div>
+        <div class="rounded-lg border border-outline-variant bg-surface p-4">
+          <p class="text-sm font-bold text-on-surface">整理対象</p>
+          <p class="mt-2 text-sm leading-6 text-on-surface-variant">画面ではなく、状態判定、バッチ、通知、期限、請求、招待などの裏側の動きです。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="mt-8" aria-labelledby="service-flow-title">
+      <div class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p class="text-sm font-semibold text-primary">全体フロー</p>
+          <h2 id="service-flow-title" class="mt-1 text-title-large font-bold text-on-surface">受注後準備から請求までの流れ</h2>
+        </div>
+        <span class="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
+          <span class="material-icons text-base">account_tree</span>
+          7フェーズ
+        </span>
+      </div>
+      <div class="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-7">
+        <a class="group rounded-lg border border-outline-variant bg-surface p-4 hover:border-primary hover:bg-surface-variant" href="./00_service-overview/index.html">
+          <span class="text-xs font-semibold text-primary">P01</span>
+          <span class="mt-1 block text-sm font-bold text-on-surface">受注後準備</span>
+          <span class="mt-2 block text-xs leading-5 text-on-surface-variant">アンケート、名刺、お礼メール、グループを設定。</span>
+        </a>
+        <a class="group rounded-lg border border-outline-variant bg-surface p-4 hover:border-primary hover:bg-surface-variant" href="./02_survey-lifecycle/index.html">
+          <span class="text-xs font-semibold text-primary">P02</span>
+          <span class="mt-1 block text-sm font-bold text-on-surface">会期前</span>
+          <span class="mt-2 block text-xs leading-5 text-on-surface-variant">会期前日通知、開始前チェック。</span>
+        </a>
+        <a class="group rounded-lg border border-outline-variant bg-surface p-4 hover:border-primary hover:bg-surface-variant" href="./02_survey-lifecycle/index.html">
+          <span class="text-xs font-semibold text-primary">P03</span>
+          <span class="mt-1 block text-sm font-bold text-on-surface">会期中</span>
+          <span class="mt-2 block text-xs leading-5 text-on-surface-variant">回答受付、名刺登録、件数監視。</span>
+        </a>
+        <a class="group rounded-lg border border-outline-variant bg-surface p-4 hover:border-primary hover:bg-surface-variant" href="./03_batch-processing/index.html">
+          <span class="text-xs font-semibold text-primary">P04</span>
+          <span class="mt-1 block text-sm font-bold text-on-surface">会期終了</span>
+          <span class="mt-2 block text-xs leading-5 text-on-surface-variant">終了通知、受付終了、対象確定。</span>
+        </a>
+        <a class="group rounded-lg border border-outline-variant bg-surface p-4 hover:border-primary hover:bg-surface-variant" href="./04_bizcard-processing/index.html">
+          <span class="text-xs font-semibold text-primary">P05</span>
+          <span class="mt-1 block text-sm font-bold text-on-surface">データ化中</span>
+          <span class="mt-2 block text-xs leading-5 text-on-surface-variant">OCR、入力、照合、CSV作成。</span>
+        </a>
+        <a class="group rounded-lg border border-outline-variant bg-surface p-4 hover:border-primary hover:bg-surface-variant" href="./05_thank-you-email/index.html">
+          <span class="text-xs font-semibold text-primary">P06</span>
+          <span class="mt-1 block text-sm font-bold text-on-surface">納品・送信</span>
+          <span class="mt-2 block text-xs leading-5 text-on-surface-variant">DL、お礼メール、期限管理。</span>
+        </a>
+        <a class="group rounded-lg border border-outline-variant bg-surface p-4 hover:border-primary hover:bg-surface-variant" href="./06_billing-rules/index.html">
+          <span class="text-xs font-semibold text-primary">P07</span>
+          <span class="mt-1 block text-sm font-bold text-on-surface">請求</span>
+          <span class="mt-2 block text-xs leading-5 text-on-surface-variant">明細作成、請求通知、入金管理。</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="mt-8" aria-labelledby="environment-links-title">
+      <div class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p class="text-sm font-semibold text-primary">環境リンク</p>
+          <h2 id="environment-links-title" class="mt-1 text-title-large font-bold text-on-surface">SPEED AD 各環境</h2>
+          <p class="mt-2 max-w-4xl text-sm leading-6 text-on-surface-variant">本番、ステージング、開発環境を直接確認するための導線です。別タブで開きます。</p>
+        </div>
+      </div>
+      <div class="mt-5 grid gap-4 md:grid-cols-3">
+        <a class="group rounded-lg border border-outline-variant bg-surface p-5 transition-colors hover:border-primary hover:bg-surface-variant" href="https://speed-ad.com/" target="_blank" rel="noopener">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="text-sm font-semibold text-primary">Production</p>
+              <h3 class="mt-1 text-title-medium font-bold text-on-surface">本番環境</h3>
+            </div>
+            <span class="material-icons text-primary transition-transform group-hover:translate-x-1">open_in_new</span>
+          </div>
+          <p class="mt-3 break-all text-sm text-on-surface-variant">https://speed-ad.com/</p>
+        </a>
+        <a class="group rounded-lg border border-outline-variant bg-surface p-5 transition-colors hover:border-primary hover:bg-surface-variant" href="https://stg.speed-ad.com/" target="_blank" rel="noopener">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="text-sm font-semibold text-primary">Staging</p>
+              <h3 class="mt-1 text-title-medium font-bold text-on-surface">ステージング環境</h3>
+            </div>
+            <span class="material-icons text-primary transition-transform group-hover:translate-x-1">open_in_new</span>
+          </div>
+          <p class="mt-3 break-all text-sm text-on-surface-variant">https://stg.speed-ad.com/</p>
+        </a>
+        <a class="group rounded-lg border border-outline-variant bg-surface p-5 transition-colors hover:border-primary hover:bg-surface-variant" href="https://dev.speed-ad.com/" target="_blank" rel="noopener">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="text-sm font-semibold text-primary">Development</p>
+              <h3 class="mt-1 text-title-medium font-bold text-on-surface">開発環境</h3>
+            </div>
+            <span class="material-icons text-primary transition-transform group-hover:translate-x-1">open_in_new</span>
+          </div>
+          <p class="mt-3 break-all text-sm text-on-surface-variant">https://dev.speed-ad.com/</p>
+        </a>
+      </div>
+    </section>
+
+    <section class="mt-8" aria-labelledby="logic-index-title">
+      <p class="text-sm font-semibold text-primary">主要ロジック早見</p>
+      <h2 id="logic-index-title" class="mt-1 text-title-large font-bold text-on-surface">どの資料から確認するか</h2>
+      <div class="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <a class="rounded-lg border border-outline-variant bg-surface p-4 hover:border-primary hover:bg-surface-variant" href="./02_survey-lifecycle/index.html">
+          <span class="material-icons text-primary">timeline</span>
+          <h3 class="mt-2 text-sm font-bold text-on-surface">ステータス判定</h3>
+          <p class="mt-2 text-sm leading-6 text-on-surface-variant">会期前、会期中、データ化中、データ化完了、DL期限終了。</p>
+        </a>
+        <a class="rounded-lg border border-outline-variant bg-surface p-4 hover:border-primary hover:bg-surface-variant" href="./03_batch-processing/index.html">
+          <span class="material-icons text-primary">schedule</span>
+          <h3 class="mt-2 text-sm font-bold text-on-surface">バッチ・時刻</h3>
+          <p class="mt-2 text-sm leading-6 text-on-surface-variant">0:00、23:59、月末などの定時処理と未確認論点。</p>
+        </a>
+        <a class="rounded-lg border border-outline-variant bg-surface p-4 hover:border-primary hover:bg-surface-variant" href="./01_system-mail/index.html">
+          <span class="material-icons text-primary">mail</span>
+          <h3 class="mt-2 text-sm font-bold text-on-surface">システムメール</h3>
+          <p class="mt-2 text-sm leading-6 text-on-surface-variant">送信タイミング、Excel版、Gmail実配信版、差分。</p>
+        </a>
+        <a class="rounded-lg border border-outline-variant bg-surface p-4 hover:border-primary hover:bg-surface-variant" href="./04_bizcard-processing/index.html">
+          <span class="material-icons text-primary">badge</span>
+          <h3 class="mt-2 text-sm font-bold text-on-surface">名刺データ化</h3>
+          <p class="mt-2 text-sm leading-6 text-on-surface-variant">見積、申込、入力・照合、納品、完了通知。</p>
+        </a>
+        <a class="rounded-lg border border-outline-variant bg-surface p-4 hover:border-primary hover:bg-surface-variant" href="./05_thank-you-email/index.html">
+          <span class="material-icons text-primary">outgoing_mail</span>
+          <h3 class="mt-2 text-sm font-bold text-on-surface">お礼メール</h3>
+          <p class="mt-2 text-sm leading-6 text-on-surface-variant">送信対象、送信期限、送信実行、失敗系。</p>
+        </a>
+        <a class="rounded-lg border border-outline-variant bg-surface p-4 hover:border-primary hover:bg-surface-variant" href="./06_billing-rules/index.html">
+          <span class="material-icons text-primary">receipt_long</span>
+          <h3 class="mt-2 text-sm font-bold text-on-surface">請求</h3>
+          <p class="mt-2 text-sm leading-6 text-on-surface-variant">請求対象、明細計算、通知、正本参照先。</p>
+        </a>
+        <a class="rounded-lg border border-outline-variant bg-surface p-4 hover:border-primary hover:bg-surface-variant" href="./07_accounts-groups/index.html">
+          <span class="material-icons text-primary">group</span>
+          <h3 class="mt-2 text-sm font-bold text-on-surface">アカウント・グループ</h3>
+          <p class="mt-2 text-sm leading-6 text-on-surface-variant">登録、再設定、招待、請求先との関係。</p>
+        </a>
+        <a class="rounded-lg border border-outline-variant bg-surface p-4 hover:border-primary hover:bg-surface-variant" href="./00_service-overview/index.html">
+          <span class="material-icons text-primary">map</span>
+          <h3 class="mt-2 text-sm font-bold text-on-surface">情報源マップ</h3>
+          <p class="mt-2 text-sm leading-6 text-on-surface-variant">正本、補助資料、旧Wiki、観測資料の扱い。</p>
+        </a>
+      </div>
+    </section>
+
+    <section class="mt-8" aria-labelledby="category-list-title">
+      <div class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p class="text-sm font-semibold text-primary">資料カテゴリ</p>
+          <h2 id="category-list-title" class="mt-1 text-title-large font-bold text-on-surface">カテゴリ別の詳細資料</h2>
+        </div>
+        <span class="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
+          <span class="material-icons text-base">folder_open</span>
+          8カテゴリ
+        </span>
+      </div>
+
+      <div class="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <a class="group flex h-full flex-col justify-between rounded-lg border border-outline-variant bg-surface p-5 transition-colors hover:border-primary hover:bg-surface-variant" href="./00_service-overview/index.html">
+          <div>
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-sm font-semibold text-primary">00_service-overview</p>
+                <h3 class="mt-1 text-title-medium font-bold text-on-surface">サービス概要</h3>
+              </div>
+              <span class="material-icons text-primary transition-transform group-hover:translate-x-1">arrow_forward</span>
+            </div>
+            <p class="mt-3 text-sm leading-6 text-on-surface-variant">サービス全体、ドメイン、業務フロー、情報源マップ。</p>
+          </div>
+          <p class="mt-5 text-xs font-semibold text-on-surface-variant">4件 / 既存資料 / 未確認あり</p>
+        </a>
+        <a class="group flex h-full flex-col justify-between rounded-lg border border-outline-variant bg-surface p-5 transition-colors hover:border-primary hover:bg-surface-variant" href="./01_system-mail/index.html">
+          <div>
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-sm font-semibold text-primary">01_system-mail</p>
+                <h3 class="mt-1 text-title-medium font-bold text-on-surface">システムメール</h3>
+              </div>
+              <span class="material-icons text-primary transition-transform group-hover:translate-x-1">arrow_forward</span>
+            </div>
+            <p class="mt-3 text-sm leading-6 text-on-surface-variant">送信タイミング、Excel版、Gmail実配信版、差分。</p>
+          </div>
+          <p class="mt-5 text-xs font-semibold text-on-surface-variant">14件 / Excel・Gmail / 未確認あり</p>
+        </a>
+        <a class="group flex h-full flex-col justify-between rounded-lg border border-outline-variant bg-surface p-5 transition-colors hover:border-primary hover:bg-surface-variant" href="./02_survey-lifecycle/index.html">
+          <div>
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-sm font-semibold text-primary">02_survey-lifecycle</p>
+                <h3 class="mt-1 text-title-medium font-bold text-on-surface">会期・ステータス</h3>
+              </div>
+              <span class="material-icons text-primary transition-transform group-hover:translate-x-1">arrow_forward</span>
+            </div>
+            <p class="mt-3 text-sm leading-6 text-on-surface-variant">会期判定、データ化状態、DL期限、通知接点。</p>
+          </div>
+          <p class="mt-5 text-xs font-semibold text-on-surface-variant">3件 / 現行モック / 未確認あり</p>
+        </a>
+        <a class="group flex h-full flex-col justify-between rounded-lg border border-outline-variant bg-surface p-5 transition-colors hover:border-primary hover:bg-surface-variant" href="./03_batch-processing/index.html">
+          <div>
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-sm font-semibold text-primary">03_batch-processing</p>
+                <h3 class="mt-1 text-title-medium font-bold text-on-surface">バッチ処理</h3>
+              </div>
+              <span class="material-icons text-primary transition-transform group-hover:translate-x-1">arrow_forward</span>
+            </div>
+            <p class="mt-3 text-sm leading-6 text-on-surface-variant">夜間・定時処理、通知起点、請求作成起点。</p>
+          </div>
+          <p class="mt-5 text-xs font-semibold text-on-surface-variant">3件 / 旧Wiki補助 / 要確認</p>
+        </a>
+        <a class="group flex h-full flex-col justify-between rounded-lg border border-outline-variant bg-surface p-5 transition-colors hover:border-primary hover:bg-surface-variant" href="./04_bizcard-processing/index.html">
+          <div>
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-sm font-semibold text-primary">04_bizcard-processing</p>
+                <h3 class="mt-1 text-title-medium font-bold text-on-surface">名刺データ化</h3>
+              </div>
+              <span class="material-icons text-primary transition-transform group-hover:translate-x-1">arrow_forward</span>
+            </div>
+            <p class="mt-3 text-sm leading-6 text-on-surface-variant">見積、申込、入力・照合、CSV納品、通知接続。</p>
+          </div>
+          <p class="mt-5 text-xs font-semibold text-on-surface-variant">3件 / 既存仕様 / 未確認あり</p>
+        </a>
+        <a class="group flex h-full flex-col justify-between rounded-lg border border-outline-variant bg-surface p-5 transition-colors hover:border-primary hover:bg-surface-variant" href="./05_thank-you-email/index.html">
+          <div>
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-sm font-semibold text-primary">05_thank-you-email</p>
+                <h3 class="mt-1 text-title-medium font-bold text-on-surface">お礼メール</h3>
+              </div>
+              <span class="material-icons text-primary transition-transform group-hover:translate-x-1">arrow_forward</span>
+            </div>
+            <p class="mt-3 text-sm leading-6 text-on-surface-variant">送信対象、送信期限、送信実行、失敗系。</p>
+          </div>
+          <p class="mt-5 text-xs font-semibold text-on-surface-variant">3件 / 正本仕様 / 未確認あり</p>
+        </a>
+        <a class="group flex h-full flex-col justify-between rounded-lg border border-outline-variant bg-surface p-5 transition-colors hover:border-primary hover:bg-surface-variant" href="./06_billing-rules/index.html">
+          <div>
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-sm font-semibold text-primary">06_billing-rules</p>
+                <h3 class="mt-1 text-title-medium font-bold text-on-surface">請求ロジック</h3>
+              </div>
+              <span class="material-icons text-primary transition-transform group-hover:translate-x-1">arrow_forward</span>
+            </div>
+            <p class="mt-3 text-sm leading-6 text-on-surface-variant">請求対象、明細計算、請求書、通知、正本境界。</p>
+          </div>
+          <p class="mt-5 text-xs font-semibold text-on-surface-variant">3件 / 正本仕様 / 未確認あり</p>
+        </a>
+        <a class="group flex h-full flex-col justify-between rounded-lg border border-outline-variant bg-surface p-5 transition-colors hover:border-primary hover:bg-surface-variant" href="./07_accounts-groups/index.html">
+          <div>
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-sm font-semibold text-primary">07_accounts-groups</p>
+                <h3 class="mt-1 text-title-medium font-bold text-on-surface">アカウント・グループ</h3>
+              </div>
+              <span class="material-icons text-primary transition-transform group-hover:translate-x-1">arrow_forward</span>
+            </div>
+            <p class="mt-3 text-sm leading-6 text-on-surface-variant">登録、再設定、招待、所属、請求先との関係。</p>
+          </div>
+          <p class="mt-5 text-xs font-semibold text-on-surface-variant">2件 / 既存仕様 / 未確認あり</p>
+        </a>
+      </div>
+    </section>
+
+    <section class="mt-8 rounded-lg border border-outline-variant bg-surface p-5" aria-labelledby="handling-title">
+      <h2 id="handling-title" class="text-title-medium font-bold text-on-surface">扱い</h2>
+      <p class="mt-2 text-sm leading-6 text-on-surface-variant">この資料群は、サービス全体に関わるバックエンドの仕組みを理解するための整理ビューです。正式仕様へ昇格する場合は、背景や観測ログではなく、実装に必要な結論だけを `docs/画面設計/仕様/` へ移します。実名、実トークン、GmailメッセージID、個人宛先、非共有の契約判断は記載しません。</p>
+    </section>
+  </main>
+</div>
+</body>
+</html>

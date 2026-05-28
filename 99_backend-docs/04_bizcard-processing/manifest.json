@@ -1,0 +1,79 @@
+{
+  "meta": {
+    "id": "04_bizcard-processing",
+    "title": "名刺データ化",
+    "summary": "名刺撮影、データ化依頼、進捗、納品、請求・お礼メールへの接続を整理します。",
+    "sourceStatus": "既存仕様 / 現行モック",
+    "hasUnconfirmed": true
+  },
+  "documents": [
+    {
+      "id": "BIZ-001",
+      "title": "名刺データ化の位置づけ",
+      "category": "概要",
+      "sourceStatus": "既存仕様から整理",
+      "path": "01_bizcard-overview.md",
+      "summary": "回答者の名刺画像を回答と紐づけ、会期後フォローに使えるデータへ整える流れ。",
+      "tags": ["名刺", "データ化", "回答"],
+      "hasUnconfirmed": false,
+      "relatedSources": ["docs/画面設計/仕様/16_bizcard_settings_requirements.md", "03_admin/00.要件定義書.txt"]
+    },
+    {
+      "id": "BIZ-002",
+      "title": "見積・設定ロジック",
+      "category": "見積",
+      "sourceStatus": "現行モック確認",
+      "path": "02_estimate-settings.md",
+      "summary": "名刺データ化を行うか、プラン、想定枚数、最低請求などの設定観点を整理します。",
+      "tags": ["見積", "プラン", "最低請求"],
+      "hasUnconfirmed": true,
+      "relatedSources": ["02_dashboard/src/services/bizcardCalculator.js", "docs/画面設計/仕様/16_bizcard_settings_requirements.md"]
+    },
+    {
+      "id": "BIZ-003",
+      "title": "進捗・納品・通知",
+      "category": "納品",
+      "sourceStatus": "既存資料から整理",
+      "path": "03_progress-delivery.md",
+      "summary": "データ化中、データ化完了、CSVアップロード、完了通知の接続を整理します。",
+      "tags": ["進捗", "納品", "CSV", "通知"],
+      "hasUnconfirmed": true,
+      "relatedSources": ["docs/画面設計/仕様/admin/30_admin_data_operation.md", "99_backend-docs/01_system-mail/07_bizcard-completed.md"]
+    }
+  ],
+  "flow": [
+    {
+      "group": "名刺データ化の流れ",
+      "items": [
+        {
+          "id": "BIZ-F01",
+          "documentId": "BIZ-001",
+          "timing": "会期前設定",
+          "label": "データ化方針",
+          "summary": "名刺データ化を行うか、対象や方針を決めます。"
+        },
+        {
+          "id": "BIZ-F02",
+          "documentId": "BIZ-002",
+          "timing": "申込保存",
+          "label": "見積・申込",
+          "summary": "プラン、想定枚数、請求見込みを整理します。"
+        },
+        {
+          "id": "BIZ-F03",
+          "documentId": "BIZ-003",
+          "timing": "会期後",
+          "label": "入力・照合",
+          "summary": "OCR、手入力、照合、CSV作成の工程です。"
+        },
+        {
+          "id": "BIZ-F04",
+          "documentId": "BIZ-003",
+          "timing": "完了後",
+          "label": "納品・通知",
+          "summary": "完了CSV、DL、お礼メール送信依頼へ接続します。"
+        }
+      ]
+    }
+  ]
+}

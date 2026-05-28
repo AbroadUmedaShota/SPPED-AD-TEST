@@ -1,0 +1,79 @@
+{
+  "meta": {
+    "id": "06_billing-rules",
+    "title": "請求ロジック",
+    "summary": "請求作成、請求明細、課金計算の考え方、通知との接続を整理します。",
+    "sourceStatus": "正本仕様 / 現行モック / 旧Wiki補助",
+    "hasUnconfirmed": true
+  },
+  "documents": [
+    {
+      "id": "BIL-001",
+      "title": "請求の流れ",
+      "category": "請求",
+      "sourceStatus": "既存仕様から整理",
+      "path": "01_billing-flow.md",
+      "summary": "アンケート案件から請求書作成、通知、支払期日確認までの流れを整理します。",
+      "tags": ["請求", "請求書", "月次"],
+      "hasUnconfirmed": true,
+      "relatedSources": ["docs/画面設計/仕様/請求関連仕様マップ.md", "docs/画面設計/仕様/admin/40_admin_billing_and_rules.md"]
+    },
+    {
+      "id": "BIL-002",
+      "title": "課金計算の考え方",
+      "category": "計算",
+      "sourceStatus": "既存ルールから要約",
+      "path": "02_charge-calculation.md",
+      "summary": "名刺データ化、お礼メール、追加アカウントなどの請求明細の考え方を整理します。",
+      "tags": ["課金", "名刺データ化", "お礼メール", "無料枠"],
+      "hasUnconfirmed": true,
+      "relatedSources": ["docs/画面設計/仕様/04_invoice_screen.md", "docs/画面設計/仕様/05_invoice_document.md", "data/core/invoices.json"]
+    },
+    {
+      "id": "BIL-003",
+      "title": "正本参照先と境界",
+      "category": "情報源",
+      "sourceStatus": "整理ルール",
+      "path": "03_source-boundary.md",
+      "summary": "請求表示、課金ポリシー、テンプレート、管理者画面の正本を分けます。",
+      "tags": ["正本", "境界", "請求仕様"],
+      "hasUnconfirmed": false,
+      "relatedSources": ["docs/画面設計/仕様/請求関連仕様マップ.md", "docs/リファレンス/共有規約/02_SHARED_DOC_BOUNDARY_RULES.md"]
+    }
+  ],
+  "flow": [
+    {
+      "group": "請求までの流れ",
+      "items": [
+        {
+          "id": "BIL-F01",
+          "documentId": "BIL-001",
+          "timing": "会期・データ化後",
+          "label": "請求対象確定",
+          "summary": "名刺件数、送信対象、契約状態を請求対象として整理。"
+        },
+        {
+          "id": "BIL-F02",
+          "documentId": "BIL-002",
+          "timing": "月次集計",
+          "label": "明細計算",
+          "summary": "具体課金名、数量、単価、値引き、税を組み立てる。"
+        },
+        {
+          "id": "BIL-F03",
+          "documentId": "BIL-001",
+          "timing": "月末",
+          "label": "請求書作成",
+          "summary": "月末バッチまたは管理操作で請求書を作成。"
+        },
+        {
+          "id": "BIL-F04",
+          "documentId": "BIL-003",
+          "timing": "送付・確認",
+          "label": "通知・支払期日",
+          "summary": "請求通知メールと利用者向け請求書表示へ接続。"
+        }
+      ]
+    }
+  ]
+}
