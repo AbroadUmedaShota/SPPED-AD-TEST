@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E2Eテスト管理 / バックエンド仕組み整理</title>
+  <link rel="icon" href="../../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="../../02_dashboard/service-top-style.css">
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+  <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', 'Noto Sans JP', sans-serif;
+    }
+
+    .e2e-shell {
+      background:
+        linear-gradient(180deg, rgba(66, 133, 244, 0.05) 0%, rgba(255, 255, 255, 0) 260px),
+        var(--color-base-background-main);
+    }
+
+    .anchor-nav {
+      scrollbar-width: thin;
+    }
+
+    .case-table th,
+    .case-table td {
+      vertical-align: top;
+    }
+
+    .case-row[hidden],
+    .case-detail[hidden] {
+      display: none;
+    }
+
+    .status-dot {
+      display: inline-block;
+      width: 0.55rem;
+      height: 0.55rem;
+      border-radius: 9999px;
+      background: currentColor;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      border-radius: 9999px;
+      padding: 0.125rem 0.55rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      line-height: 1.5;
+      white-space: nowrap;
+    }
+
+    .badge-p0 {
+      background: rgba(211, 47, 47, 0.1);
+      color: var(--color-state-error);
+    }
+
+    .badge-p1 {
+      background: rgba(66, 133, 244, 0.12);
+      color: var(--color-primary);
+    }
+
+    .badge-p2 {
+      background: rgba(107, 107, 107, 0.12);
+      color: var(--color-text-sub);
+    }
+
+    .copy-target {
+      user-select: all;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background">
+  <div class="e2e-shell min-h-screen">
+    <header class="border-b border-outline-variant bg-surface">
+      <div class="flex w-full flex-wrap items-start justify-between gap-4 px-4 py-5 sm:px-6 lg:px-8">
+        <div class="max-w-5xl">
+          <p class="text-sm font-semibold text-primary">HOME / 08_e2e-testing</p>
+          <h1 class="mt-1 text-headline-medium font-bold leading-tight text-on-surface">SPEED AD E2Eテスト管理</h1>
+          <p class="mt-2 text-sm leading-6 text-on-surface-variant">
+            ステージング環境で実施する正常系テストの項目、確認手順、証跡、将来のSpreadsheet DB連携仕様を1ページで管理します。実API接続は未実装で、GitHub Pages公開を前提に静的HTMLとして閲覧できます。
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <a class="inline-flex items-center gap-2 rounded-lg border border-outline px-3 py-2 text-sm text-on-surface hover:bg-surface-variant" href="../index.html">
+            <span class="material-icons text-base">home</span>
+            HOMEへ戻る
+          </a>
+          <a class="inline-flex items-center gap-2 rounded-lg border border-outline px-3 py-2 text-sm text-on-surface hover:bg-surface-variant" href="./README.md" target="_blank" rel="noopener">
+            <span class="material-icons text-base">open_in_new</span>
+            README
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <nav class="anchor-nav sticky top-0 z-10 overflow-x-auto border-b border-outline-variant bg-surface/95 px-4 py-2 backdrop-blur sm:px-6 lg:px-8" aria-label="ページ内ナビゲーション">
+      <div class="flex min-w-max gap-2 text-sm">
+        <a class="rounded-full px-3 py-1.5 font-semibold text-on-surface hover:bg-surface-variant" href="#overview">概要</a>
+        <a class="rounded-full px-3 py-1.5 font-semibold text-on-surface hover:bg-surface-variant" href="#environments">環境リンク</a>
+        <a class="rounded-full px-3 py-1.5 font-semibold text-on-surface hover:bg-surface-variant" href="#test-cases">画面別テスト項目</a>
+        <a class="rounded-full px-3 py-1.5 font-semibold text-on-surface hover:bg-surface-variant" href="#procedures">詳細確認手順</a>
+        <a class="rounded-full px-3 py-1.5 font-semibold text-on-surface hover:bg-surface-variant" href="#database">Spreadsheet DB仕様</a>
+        <a class="rounded-full px-3 py-1.5 font-semibold text-on-surface hover:bg-surface-variant" href="#operations">運用ルール</a>
+        <a class="rounded-full px-3 py-1.5 font-semibold text-on-surface hover:bg-surface-variant" href="#sources">既存資料リンク</a>
+      </div>
+    </nav>
+
+    <main class="w-full px-4 py-6 sm:px-6 lg:px-8">
+      <section id="overview" class="rounded-lg border border-outline-variant bg-surface p-5" aria-labelledby="overview-title">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p class="text-sm font-semibold text-primary">概要</p>
+            <h2 id="overview-title" class="mt-1 text-title-large font-bold text-on-surface">ステージング正常系テストの項目出しと実行管理</h2>
+            <p class="mt-2 max-w-5xl text-sm leading-6 text-on-surface-variant">
+              対象はユーザー画面中心です。開発環境で確認済みの導線を元に、ステージングで「表示される」「遷移できる」「保存できる」「ダウンロードできる」「証跡を残せる」ことを確認します。
+            </p>
+          </div>
+          <span class="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
+            <span class="status-dot"></span>
+            実API未接続 / 仕様反映済み
+          </span>
+        </div>
+
+        <div class="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <div class="rounded-lg border border-outline-variant bg-background p-4">
+            <p class="text-sm font-bold text-on-surface">対象環境</p>
+            <p class="mt-2 text-2xl font-bold text-primary">stg</p>
+            <p class="mt-1 text-sm leading-6 text-on-surface-variant">ステージングを主対象、devは項目設計の参照元として扱う。</p>
+          </div>
+          <div class="rounded-lg border border-outline-variant bg-background p-4">
+            <p class="text-sm font-bold text-on-surface">テスト範囲</p>
+            <p class="mt-2 text-2xl font-bold text-primary" id="caseTotal">0</p>
+            <p class="mt-1 text-sm leading-6 text-on-surface-variant">ユーザー画面中心の正常系ケース。</p>
+          </div>
+          <div class="rounded-lg border border-outline-variant bg-background p-4">
+            <p class="text-sm font-bold text-on-surface">DB方式</p>
+            <p class="mt-2 text-2xl font-bold text-primary">Sheet + GAS</p>
+            <p class="mt-1 text-sm leading-6 text-on-surface-variant">GitHub Pagesは静的、編集データはSpreadsheetで管理。</p>
+          </div>
+          <div class="rounded-lg border border-outline-variant bg-background p-4">
+            <p class="text-sm font-bold text-on-surface">完了条件</p>
+            <p class="mt-2 text-2xl font-bold text-primary">Pass証跡</p>
+            <p class="mt-1 text-sm leading-6 text-on-surface-variant">画面、操作、期待結果、証跡URLを残す。</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="environments" class="mt-6" aria-labelledby="environment-title">
+        <div class="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p class="text-sm font-semibold text-primary">環境リンク</p>
+            <h2 id="environment-title" class="mt-1 text-title-large font-bold text-on-surface">確認対象URL</h2>
+          </div>
+          <p class="text-sm text-on-surface-variant">実送信、実請求、データ削除を伴う操作は除外します。</p>
+        </div>
+        <div class="mt-4 grid gap-4 md:grid-cols-3">
+          <a class="group rounded-lg border border-outline-variant bg-surface p-5 transition-colors hover:border-primary hover:bg-surface-variant" href="https://dev.speed-ad.com/" target="_blank" rel="noopener">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-sm font-semibold text-primary">Development</p>
+                <h3 class="mt-1 text-title-medium font-bold text-on-surface">開発環境</h3>
+              </div>
+              <span class="material-icons text-primary transition-transform group-hover:translate-x-1">open_in_new</span>
+            </div>
+            <p class="mt-3 break-all text-sm text-on-surface-variant">https://dev.speed-ad.com/</p>
+          </a>
+          <a class="group rounded-lg border border-outline-variant bg-surface p-5 transition-colors hover:border-primary hover:bg-surface-variant" href="https://stg.speed-ad.com/" target="_blank" rel="noopener">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-sm font-semibold text-primary">Staging</p>
+                <h3 class="mt-1 text-title-medium font-bold text-on-surface">ステージング環境</h3>
+              </div>
+              <span class="material-icons text-primary transition-transform group-hover:translate-x-1">open_in_new</span>
+            </div>
+            <p class="mt-3 break-all text-sm text-on-surface-variant">https://stg.speed-ad.com/</p>
+          </a>
+          <a class="group rounded-lg border border-outline-variant bg-surface p-5 transition-colors hover:border-primary hover:bg-surface-variant" href="https://speed-ad.com/" target="_blank" rel="noopener">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-sm font-semibold text-primary">Production</p>
+                <h3 class="mt-1 text-title-medium font-bold text-on-surface">本番環境</h3>
+              </div>
+              <span class="material-icons text-primary transition-transform group-hover:translate-x-1">open_in_new</span>
+            </div>
+            <p class="mt-3 break-all text-sm text-on-surface-variant">https://speed-ad.com/</p>
+          </a>
+        </div>
+      </section>
+
+      <section id="test-cases" class="mt-8 rounded-lg border border-outline-variant bg-surface p-5" aria-labelledby="test-cases-title">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p class="text-sm font-semibold text-primary">画面別テスト項目</p>
+            <h2 id="test-cases-title" class="mt-1 text-title-large font-bold text-on-surface">正常系ケース一覧</h2>
+            <p class="mt-2 max-w-5xl text-sm leading-6 text-on-surface-variant">
+              各ケースは `case_id / 画面 / URL / 前提 / 操作 / 期待結果 / 優先度 / 副作用 / 証跡` の列で管理します。現在はページ内データを表示し、将来はSpreadsheetの `cases` タブから取得します。
+            </p>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button id="copyTsvButton" type="button" class="inline-flex items-center gap-2 rounded-lg border border-outline px-3 py-2 text-sm font-semibold text-on-surface hover:bg-surface-variant">
+              <span class="material-icons text-base">content_copy</span>
+              TSVコピー
+            </button>
+            <button id="copyCsvButton" type="button" class="inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-on-primary hover:opacity-90">
+              <span class="material-icons text-base">download</span>
+              CSVコピー
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-5 grid gap-3 lg:grid-cols-[minmax(220px,1fr)_220px_180px_180px]">
+          <label class="block text-sm text-on-surface-variant">
+            <span class="font-semibold text-on-surface">検索</span>
+            <span class="relative mt-1 block">
+              <span class="material-icons pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-base text-on-surface-variant">search</span>
+              <input id="caseSearch" type="search" class="form-input w-full rounded-lg border-outline pl-10" placeholder="ID、画面、URL、手順、期待結果で検索">
+            </span>
+          </label>
+          <label class="block text-sm text-on-surface-variant">
+            <span class="font-semibold text-on-surface">画面カテゴリ</span>
+            <select id="groupFilter" class="form-select mt-1 w-full rounded-lg border-outline">
+              <option value="">すべて</option>
+            </select>
+          </label>
+          <label class="block text-sm text-on-surface-variant">
+            <span class="font-semibold text-on-surface">優先度</span>
+            <select id="priorityFilter" class="form-select mt-1 w-full rounded-lg border-outline">
+              <option value="">すべて</option>
+              <option value="P0">P0</option>
+              <option value="P1">P1</option>
+              <option value="P2">P2</option>
+            </select>
+          </label>
+          <label class="block text-sm text-on-surface-variant">
+            <span class="font-semibold text-on-surface">副作用</span>
+            <select id="sideEffectFilter" class="form-select mt-1 w-full rounded-lg border-outline">
+              <option value="">すべて</option>
+              <option value="none">なし</option>
+              <option value="low">低</option>
+              <option value="medium">中</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="mt-4 flex flex-wrap items-center justify-between gap-3 border-y border-outline-variant py-3 text-sm">
+          <p class="font-semibold text-on-surface"><span id="visibleCount">0</span>件表示中</p>
+          <div class="flex flex-wrap items-center gap-2">
+            <span id="copyStatus" class="text-on-surface-variant" aria-live="polite"></span>
+            <button id="resetFiltersButton" type="button" class="inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-semibold text-primary hover:bg-primary/10">
+              <span class="material-icons text-base">restart_alt</span>
+              絞り込みを解除
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-4 overflow-x-auto rounded-lg border border-outline-variant">
+          <table class="case-table min-w-[1080px] w-full border-collapse text-sm">
+            <thead class="bg-surface-variant text-left text-on-surface">
+              <tr>
+                <th class="border-b border-outline-variant px-3 py-3">ID</th>
+                <th class="border-b border-outline-variant px-3 py-3">画面</th>
+                <th class="border-b border-outline-variant px-3 py-3">URL</th>
+                <th class="border-b border-outline-variant px-3 py-3">確認内容</th>
+                <th class="border-b border-outline-variant px-3 py-3">優先度</th>
+                <th class="border-b border-outline-variant px-3 py-3">副作用</th>
+                <th class="border-b border-outline-variant px-3 py-3">証跡</th>
+              </tr>
+            </thead>
+            <tbody id="caseTableBody" class="divide-y divide-outline-variant bg-surface"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="procedures" class="mt-8" aria-labelledby="procedures-title">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p class="text-sm font-semibold text-primary">詳細確認手順</p>
+            <h2 id="procedures-title" class="mt-1 text-title-large font-bold text-on-surface">ケース別の前提・操作・期待結果</h2>
+          </div>
+          <p class="text-sm text-on-surface-variant">一覧の絞り込み条件と連動します。</p>
+        </div>
+        <div id="caseDetailList" class="mt-4 grid gap-4"></div>
+      </section>
+
+      <section id="database" class="mt-8 rounded-lg border border-outline-variant bg-surface p-5" aria-labelledby="database-title">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p class="text-sm font-semibold text-primary">Spreadsheet DB仕様</p>
+            <h2 id="database-title" class="mt-1 text-title-large font-bold text-on-surface">GitHub Pages + Google Spreadsheet + Apps Script API</h2>
+            <p class="mt-2 max-w-5xl text-sm leading-6 text-on-surface-variant">
+              GitHub Pagesには秘密情報を置かず、静的ページからApps Script Web Appへ読み書きします。Spreadsheetは複数人編集とレビューに使い、ページ側は初期ロード一括取得と実行結果保存だけを行います。
+            </p>
+          </div>
+          <span class="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
+            <span class="material-icons text-base">table_chart</span>
+            未接続仕様
+          </span>
+        </div>
+
+        <div class="mt-5 grid gap-4 lg:grid-cols-2">
+          <div class="rounded-lg border border-outline-variant bg-background p-4">
+            <h3 class="text-base font-bold text-on-surface">シート構成</h3>
+            <div class="mt-3 overflow-x-auto">
+              <table class="min-w-full border-collapse text-sm">
+                <thead class="bg-surface-variant text-left">
+                  <tr>
+                    <th class="border-b border-outline-variant px-3 py-2">Tab</th>
+                    <th class="border-b border-outline-variant px-3 py-2">用途</th>
+                    <th class="border-b border-outline-variant px-3 py-2">主な列</th>
+                  </tr>
+                </thead>
+                <tbody id="schemaTableBody" class="divide-y divide-outline-variant"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="rounded-lg border border-outline-variant bg-background p-4">
+            <h3 class="text-base font-bold text-on-surface">API契約</h3>
+            <div class="mt-3 space-y-3 text-sm text-on-surface-variant">
+              <div class="rounded-lg border border-outline-variant bg-surface p-3">
+                <p class="font-mono text-xs text-on-surface">GET ?resource=cases|screens|runs|results</p>
+                <p class="mt-1 leading-6">一覧取得。ページ初期表示時に `cases` と `screens` を一括取得する。</p>
+              </div>
+              <div class="rounded-lg border border-outline-variant bg-surface p-3">
+                <p class="font-mono text-xs text-on-surface">POST { action: "createRun", payload: {...} }</p>
+                <p class="mt-1 leading-6">環境、テスター、ブラウザ、Viewportを指定して実行回を作成する。</p>
+              </div>
+              <div class="rounded-lg border border-outline-variant bg-surface p-3">
+                <p class="font-mono text-xs text-on-surface">POST { action: "upsertResult", payload: {...} }</p>
+                <p class="mt-1 leading-6">`run_id` と `case_id` をキーに結果、実績、証跡URL、Backlog等の不具合リンクを更新する。</p>
+              </div>
+              <div class="rounded-lg border border-outline-variant bg-surface p-3">
+                <p class="font-mono text-xs text-on-surface">{ ok: boolean, data?: any, error?: string, updatedAt?: string }</p>
+                <p class="mt-1 leading-6">成功・失敗を同じ形で返す。エラー時はページ側で再試行せず、手動保存を案内する。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-5 grid gap-4 md:grid-cols-3">
+          <div class="rounded-lg border border-outline-variant bg-background p-4">
+            <p class="text-sm font-bold text-on-surface">公開方式</p>
+            <p class="mt-2 text-sm leading-6 text-on-surface-variant">GitHub PagesはHTML/CSS/JavaScriptの静的公開。動的な保存処理はApps Script Web Appへ委譲する。</p>
+            <a class="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline" href="https://docs.github.com/en/pages/getting-started-with-github-pages/about-github-pages" target="_blank" rel="noopener">
+              GitHub Pages docs
+              <span class="material-icons text-base">open_in_new</span>
+            </a>
+          </div>
+          <div class="rounded-lg border border-outline-variant bg-background p-4">
+            <p class="text-sm font-bold text-on-surface">Apps Script境界</p>
+            <p class="mt-2 text-sm leading-6 text-on-surface-variant">Web Appとして `doGet(e)` と `doPost(e)` を実装し、Spreadsheetへの読み書きとバリデーションを担う。</p>
+            <a class="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline" href="https://developers.google.com/apps-script/guides/web" target="_blank" rel="noopener">
+              Apps Script Web Apps
+              <span class="material-icons text-base">open_in_new</span>
+            </a>
+          </div>
+          <div class="rounded-lg border border-outline-variant bg-background p-4">
+            <p class="text-sm font-bold text-on-surface">制限への対応</p>
+            <p class="mt-2 text-sm leading-6 text-on-surface-variant">Sheets/APIの割当を避けるため、初期ロード一括取得、結果保存単位の更新、指数バックオフ検討を前提にする。</p>
+            <a class="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline" href="https://developers.google.com/workspace/sheets/api/limits" target="_blank" rel="noopener">
+              Sheets API limits
+              <span class="material-icons text-base">open_in_new</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section id="operations" class="mt-8" aria-labelledby="operations-title">
+        <div>
+          <p class="text-sm font-semibold text-primary">運用ルール</p>
+          <h2 id="operations-title" class="mt-1 text-title-large font-bold text-on-surface">ステージング実行時の扱い</h2>
+        </div>
+        <div class="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <div class="rounded-lg border border-outline-variant bg-surface p-4">
+            <span class="material-icons text-primary">verified_user</span>
+            <h3 class="mt-2 text-sm font-bold text-on-surface">正常系のみ</h3>
+            <p class="mt-2 text-sm leading-6 text-on-surface-variant">今回の項目出しは正常系に限定し、例外入力、権限違反、破壊的操作は別フェーズに分ける。</p>
+          </div>
+          <div class="rounded-lg border border-outline-variant bg-surface p-4">
+            <span class="material-icons text-primary">outgoing_mail</span>
+            <h3 class="mt-2 text-sm font-bold text-on-surface">実送信を避ける</h3>
+            <p class="mt-2 text-sm leading-6 text-on-surface-variant">メール送信、請求確定、外部通知は送信直前の表示確認までを基本にする。</p>
+          </div>
+          <div class="rounded-lg border border-outline-variant bg-surface p-4">
+            <span class="material-icons text-primary">photo_camera</span>
+            <h3 class="mt-2 text-sm font-bold text-on-surface">証跡を残す</h3>
+            <p class="mt-2 text-sm leading-6 text-on-surface-variant">テスト結果は画面スクリーンショット、CSV名、URL、ブラウザ、実行日時をセットで残す。</p>
+          </div>
+          <div class="rounded-lg border border-outline-variant bg-surface p-4">
+            <span class="material-icons text-primary">bug_report</span>
+            <h3 class="mt-2 text-sm font-bold text-on-surface">不具合は分離</h3>
+            <p class="mt-2 text-sm leading-6 text-on-surface-variant">不具合が出たケースはテスト結果にリンクを残し、再テスト対象として別Runに引き継ぐ。</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="sources" class="mt-8 rounded-lg border border-outline-variant bg-surface p-5" aria-labelledby="sources-title">
+        <div>
+          <p class="text-sm font-semibold text-primary">既存資料リンク</p>
+          <h2 id="sources-title" class="mt-1 text-title-large font-bold text-on-surface">参照元と補助資料</h2>
+        </div>
+        <div class="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          <a class="rounded-lg border border-outline-variant bg-background p-4 hover:border-primary hover:bg-surface-variant" href="./01_e2e-overview.md" target="_blank" rel="noopener">
+            <p class="text-sm font-bold text-on-surface">E2Eテスト概要</p>
+            <p class="mt-1 text-sm leading-6 text-on-surface-variant">手動テスト、E2E、自動化の位置づけ。</p>
+          </a>
+          <a class="rounded-lg border border-outline-variant bg-background p-4 hover:border-primary hover:bg-surface-variant" href="./02_target-flows.md" target="_blank" rel="noopener">
+            <p class="text-sm font-bold text-on-surface">対象フロー</p>
+            <p class="mt-1 text-sm leading-6 text-on-surface-variant">ログインから請求までの代表導線。</p>
+          </a>
+          <a class="rounded-lg border border-outline-variant bg-background p-4 hover:border-primary hover:bg-surface-variant" href="./03_environment-and-fixtures.md" target="_blank" rel="noopener">
+            <p class="text-sm font-bold text-on-surface">実行環境と前提データ</p>
+            <p class="mt-1 text-sm leading-6 text-on-surface-variant">local/dev/stg/prodとブラウザの扱い。</p>
+          </a>
+          <a class="rounded-lg border border-outline-variant bg-background p-4 hover:border-primary hover:bg-surface-variant" href="./04_automation-considerations.md" target="_blank" rel="noopener">
+            <p class="text-sm font-bold text-on-surface">自動化検討</p>
+            <p class="mt-1 text-sm leading-6 text-on-surface-variant">Playwright/Cypress化時の論点。</p>
+          </a>
+          <a class="rounded-lg border border-outline-variant bg-background p-4 hover:border-primary hover:bg-surface-variant" href="../../docs/ハンドブック/テスト/03_TESTING_GUIDELINES.md" target="_blank" rel="noopener">
+            <p class="text-sm font-bold text-on-surface">テストハンドブック</p>
+            <p class="mt-1 text-sm leading-6 text-on-surface-variant">手動確認の基準。</p>
+          </a>
+          <a class="rounded-lg border border-outline-variant bg-background p-4 hover:border-primary hover:bg-surface-variant" href="../../docs/画面設計/仕様/18_screen_inventory_current.md" target="_blank" rel="noopener">
+            <p class="text-sm font-bold text-on-surface">画面棚卸し</p>
+            <p class="mt-1 text-sm leading-6 text-on-surface-variant">画面IDと対象範囲の確認。</p>
+          </a>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const TEST_CASES = [
+      {
+        id: 'LGN-001',
+        group: '認証・アカウント',
+        screen: 'ログイン',
+        route: '/',
+        title: 'ログイン成功',
+        preconditions: 'ステージングで利用可能な企業ユーザーアカウントがあり、パスワードが共有済みである。',
+        steps: ['ログイン画面を開く', 'メールアドレスとパスワードを入力する', 'ログインボタンを押す'],
+        expected: 'ダッシュボードへ遷移し、アンケート一覧が表示される。ログイン後にLaravel Debugbar等の開発用UIが表示されない。',
+        priority: 'P0',
+        sideEffect: 'none',
+        evidence: 'ログイン後のダッシュボード全体スクリーンショット'
+      },
+      {
+        id: 'PWR-001',
+        group: '認証・アカウント',
+        screen: 'パスワード再設定',
+        route: '/forgot-password',
+        title: 'パスワード再設定導線',
+        preconditions: 'ログアウト状態で確認する。実メール送信が発生する場合はテスト用宛先のみ使用する。',
+        steps: ['パスワード再設定画面を開く', 'テスト用メールアドレスを入力する', '送信ボタン直前または送信後メッセージを確認する'],
+        expected: '再設定依頼画面が表示され、送信後はユーザーに次の操作が分かる完了メッセージが表示される。',
+        priority: 'P1',
+        sideEffect: 'low',
+        evidence: '再設定画面と完了メッセージのスクリーンショット'
+      },
+      {
+        id: 'ACC-001',
+        group: '認証・アカウント',
+        screen: 'パスワード変更',
+        route: '/user/password/change',
+        title: 'パスワード変更画面表示',
+        preconditions: 'ログイン済み。実際の変更が不要な場合は保存直前までで止める。',
+        steps: ['アカウント関連メニューからパスワード変更画面を開く', '現在のパスワード、新パスワード、確認欄が表示されることを確認する'],
+        expected: 'パスワード変更フォームが表示され、ログインユーザー向けの画面として遷移できる。',
+        priority: 'P2',
+        sideEffect: 'medium',
+        evidence: 'パスワード変更画面のスクリーンショット'
+      },
+      {
+        id: 'DSH-001',
+        group: 'ダッシュボード',
+        screen: 'アンケート一覧',
+        route: '/dashboard',
+        title: '一覧表示',
+        preconditions: 'ログイン済み。テストアカウントにアンケートが1件以上紐づいている。',
+        steps: ['ダッシュボードを開く', 'アンケート一覧の件数、名称、会期、ステータスを確認する'],
+        expected: '一覧が空白崩れなく表示され、各行の主要情報と操作ボタンが確認できる。',
+        priority: 'P0',
+        sideEffect: 'none',
+        evidence: '一覧上部と1行以上が入ったスクリーンショット'
+      },
+      {
+        id: 'DSH-002',
+        group: 'ダッシュボード',
+        screen: 'アンケート一覧',
+        route: '/dashboard',
+        title: '検索・絞り込み',
+        preconditions: '一覧に検索対象となるアンケートが複数存在する。',
+        steps: ['検索欄にアンケート名の一部を入力する', 'ステータスや期間条件がある場合は変更する', '一覧結果を確認する'],
+        expected: '条件に一致する行だけが表示され、条件解除で元の一覧へ戻る。',
+        priority: 'P1',
+        sideEffect: 'none',
+        evidence: '絞り込み前後のスクリーンショット'
+      },
+      {
+        id: 'DSH-003',
+        group: 'ダッシュボード',
+        screen: 'アンケート一覧',
+        route: '/dashboard',
+        title: '行アクション表示',
+        preconditions: '一覧に既存アンケートが表示されている。',
+        steps: ['任意のアンケート行を確認する', '編集、QR、コピー、SPEEDレビュー、ダウンロード等の操作ボタンを確認する'],
+        expected: '対象ステータスに応じた操作ボタンが表示され、ボタン文言やアイコンが欠落していない。',
+        priority: 'P1',
+        sideEffect: 'none',
+        evidence: '行アクション部分のスクリーンショット'
+      },
+      {
+        id: 'DSH-004',
+        group: 'ダッシュボード',
+        screen: 'アンケート一覧',
+        route: '/dashboard',
+        title: '各詳細画面遷移',
+        preconditions: '一覧に既存アンケートが表示されている。',
+        steps: ['編集、QR、SPEEDレビュー、名刺設定、お礼メール設定などの導線を順に開く', '戻る操作で一覧へ戻る'],
+        expected: '各導線が404にならず、対象アンケートの情報を持った画面へ遷移する。',
+        priority: 'P0',
+        sideEffect: 'none',
+        evidence: '遷移先URLと画面見出しが分かるスクリーンショット'
+      },
+      {
+        id: 'CRT-001',
+        group: 'アンケート作成・編集',
+        screen: 'アンケート新規作成',
+        route: '/survey/create',
+        title: '新規作成',
+        preconditions: 'ログイン済み。ステージングで新規アンケート作成が許可されている。',
+        steps: ['新規作成導線を開く', 'アンケート名、会期、基本情報を入力する', '保存または次へ進む'],
+        expected: 'アンケート作成画面が表示され、入力値が保存される。保存後は編集画面または一覧に戻れる。',
+        priority: 'P0',
+        sideEffect: 'medium',
+        evidence: '作成画面、保存後URL、一覧反映のスクリーンショット'
+      },
+      {
+        id: 'EDT-001',
+        group: 'アンケート作成・編集',
+        screen: 'アンケート編集',
+        route: '/survey/{surveyId}',
+        title: '基本情報保存',
+        preconditions: '既存または新規作成したテスト用アンケートがある。',
+        steps: ['アンケート編集画面を開く', '基本情報セクションを変更する', '保存する', '再読み込みして値を確認する'],
+        expected: '保存成功メッセージが表示され、再読み込み後も変更内容が保持される。',
+        priority: 'P0',
+        sideEffect: 'medium',
+        evidence: '保存前後と再読み込み後のスクリーンショット'
+      },
+      {
+        id: 'EDT-002',
+        group: 'アンケート作成・編集',
+        screen: '設問設定',
+        route: '/survey/{surveyId}',
+        title: '設問追加・並び',
+        preconditions: 'テスト用アンケートの編集画面を開ける。',
+        steps: ['設問設定セクションを開く', '設問を追加する', '選択肢や必須設定を入力する', '並び替えがある場合は順序を変更する'],
+        expected: '追加した設問が画面上に表示され、保存後も順序と設定が維持される。',
+        priority: 'P0',
+        sideEffect: 'medium',
+        evidence: '設問設定と保存後表示のスクリーンショット'
+      },
+      {
+        id: 'EDT-003',
+        group: 'アンケート作成・編集',
+        screen: '多言語対応',
+        route: '/survey/{surveyId}',
+        title: '多言語設定',
+        preconditions: '多言語設定欄が利用可能なアンケートを開く。',
+        steps: ['多言語対応セクションを開く', '対象言語を有効にする', '翻訳文言入力欄が表示されることを確認する'],
+        expected: '言語別の入力欄が表示され、保存対象として扱われる。',
+        priority: 'P1',
+        sideEffect: 'medium',
+        evidence: '多言語設定欄のスクリーンショット'
+      },
+      {
+        id: 'EDT-004',
+        group: 'アンケート作成・編集',
+        screen: '連携・追加設定',
+        route: '/survey/{surveyId}',
+        title: '連携・追加設定',
+        preconditions: 'テスト用アンケートの編集画面を開ける。',
+        steps: ['連携設定、名刺画像添付、追加設定、メモを順に確認する', '必要な項目を入力または切り替える', '保存する'],
+        expected: '各セクションが開閉または入力でき、保存後に表示崩れやエラーが発生しない。',
+        priority: 'P1',
+        sideEffect: 'medium',
+        evidence: '各セクションと保存後メッセージのスクリーンショット'
+      },
+      {
+        id: 'QR-001',
+        group: 'QR・回答',
+        screen: 'QR / 回答URL',
+        route: '/survey/{surveyId}/qr',
+        title: 'QR/回答URL確認',
+        preconditions: '公開可能なテスト用アンケートがある。',
+        steps: ['QRまたはURL確認導線を開く', '回答URL、QR表示、コピー操作を確認する'],
+        expected: '回答URLとQRが表示され、コピー操作後に回答ページへアクセスできる。',
+        priority: 'P0',
+        sideEffect: 'none',
+        evidence: 'QR表示と回答URLのスクリーンショット'
+      },
+      {
+        id: 'ANS-001',
+        group: 'QR・回答',
+        screen: '回答画面',
+        route: '/questionnaire_answer?id={surveyId}',
+        title: '回答画面表示',
+        preconditions: '回答URLが取得済みで、対象アンケートが回答可能状態である。',
+        steps: ['回答URLを別タブで開く', '設問、説明文、必須表示、送信ボタンを確認する'],
+        expected: '来場者向け回答画面が表示され、対象アンケートの設問が反映される。',
+        priority: 'P0',
+        sideEffect: 'none',
+        evidence: '回答画面上部と設問一覧のスクリーンショット'
+      },
+      {
+        id: 'ANS-002',
+        group: 'QR・回答',
+        screen: '回答画面',
+        route: '/questionnaire_answer?id={surveyId}',
+        title: '必須入力送信',
+        preconditions: '回答可能なテスト用アンケートを開いている。',
+        steps: ['必須設問を入力する', '任意項目も代表値を入力する', '送信する'],
+        expected: '送信が成功し、完了画面またはサンクス表示へ遷移する。重複送信や入力消失が起きない。',
+        priority: 'P0',
+        sideEffect: 'medium',
+        evidence: '入力済み画面と送信後画面のスクリーンショット'
+      },
+      {
+        id: 'ANS-003',
+        group: 'QR・回答',
+        screen: '回答完了',
+        route: '/questionnaire_answer?id={surveyId}',
+        title: '完了画面表示',
+        preconditions: '回答送信済み。',
+        steps: ['送信後の完了画面を確認する', 'サンクスメッセージや戻り導線を確認する'],
+        expected: '設定済みのサンクスメッセージが表示され、回答者が完了を認識できる。',
+        priority: 'P1',
+        sideEffect: 'none',
+        evidence: '完了画面のスクリーンショット'
+      },
+      {
+        id: 'REV-001',
+        group: 'SPEEDレビュー',
+        screen: 'SPEEDレビュー',
+        route: '/survey/{surveyId}/speed-review',
+        title: '回答一覧表示',
+        preconditions: '回答データが1件以上あるアンケートを対象にする。',
+        steps: ['SPEEDレビュー画面を開く', '回答総数、回答者一覧、回答日時を確認する'],
+        expected: '回答一覧が表示され、総数と一覧件数に大きな不整合がない。',
+        priority: 'P0',
+        sideEffect: 'none',
+        evidence: 'SPEEDレビュー一覧のスクリーンショット'
+      },
+      {
+        id: 'REV-002',
+        group: 'SPEEDレビュー',
+        screen: 'SPEEDレビュー',
+        route: '/survey/{surveyId}/speed-review',
+        title: '回答詳細確認',
+        preconditions: '回答一覧が表示されている。',
+        steps: ['任意の回答行を開く', '設問ごとの回答内容を確認する', '一覧へ戻る'],
+        expected: '回答詳細が表示され、回答画面で送信した内容と対応する。',
+        priority: 'P1',
+        sideEffect: 'none',
+        evidence: '回答詳細のスクリーンショット'
+      },
+      {
+        id: 'REV-003',
+        group: 'SPEEDレビュー',
+        screen: 'SPEEDレビュー',
+        route: '/survey/{surveyId}/speed-review',
+        title: '集計値更新確認',
+        preconditions: '直前にテスト回答を1件送信している。',
+        steps: ['SPEEDレビューを再読み込みする', '回答総数や一覧の増加を確認する'],
+        expected: '新規回答がレビュー画面に反映され、件数が更新される。',
+        priority: 'P1',
+        sideEffect: 'none',
+        evidence: '送信前後の件数比較スクリーンショット'
+      },
+      {
+        id: 'BIZ-001',
+        group: '名刺・お礼メール',
+        screen: '名刺データ化設定',
+        route: '/survey/{surveyId}/bizcard-settings',
+        title: '名刺データ化設定',
+        preconditions: '名刺機能が利用可能なテスト用アンケートを対象にする。',
+        steps: ['名刺データ化設定画面を開く', '有無、プラン、想定件数、納品条件を確認する'],
+        expected: '設定画面が表示され、名刺データ化の申込状態と設定値が確認できる。',
+        priority: 'P0',
+        sideEffect: 'medium',
+        evidence: '名刺データ化設定画面のスクリーンショット'
+      },
+      {
+        id: 'BIZ-002',
+        group: '名刺・お礼メール',
+        screen: '名刺データ化設定',
+        route: '/survey/{surveyId}/bizcard-settings',
+        title: '見積表示',
+        preconditions: '名刺データ化設定画面を開いている。',
+        steps: ['プランや件数を変更する', '見積金額または確認エリアを確認する'],
+        expected: '設定値に応じて見積や確認表示が更新され、保存前に内容を把握できる。',
+        priority: 'P1',
+        sideEffect: 'medium',
+        evidence: '見積表示部分のスクリーンショット'
+      },
+      {
+        id: 'THX-001',
+        group: '名刺・お礼メール',
+        screen: 'サンクス画面設定',
+        route: '/survey/{surveyId}/thankyou-settings',
+        title: 'サンクス画面設定',
+        preconditions: 'テスト用アンケートのサンクス画面設定を開ける。',
+        steps: ['サンクス画面設定を開く', '完了文言、リンク、補足情報を確認または入力する', 'プレビューがある場合は確認する'],
+        expected: '回答完了時に表示する内容を設定でき、プレビューまたは保存後表示が確認できる。',
+        priority: 'P1',
+        sideEffect: 'medium',
+        evidence: 'サンクス画面設定とプレビューのスクリーンショット'
+      },
+      {
+        id: 'MAIL-001',
+        group: '名刺・お礼メール',
+        screen: 'お礼メール設定',
+        route: '/survey/{surveyId}/thank-you-email-settings',
+        title: 'お礼メール本文保存',
+        preconditions: 'お礼メール設定画面を開ける。実送信はしない。',
+        steps: ['送信設定とメール内容を開く', '件名、本文、差し込み項目、署名を確認または入力する', '保存する'],
+        expected: 'メール本文が保存され、プレビューに反映される。送信操作を実行しなくても設定確認が完了できる。',
+        priority: 'P0',
+        sideEffect: 'medium',
+        evidence: 'メール内容、保存メッセージ、プレビューのスクリーンショット'
+      },
+      {
+        id: 'MAIL-002',
+        group: '名刺・お礼メール',
+        screen: 'お礼メール設定',
+        route: '/survey/{surveyId}/thank-you-email-settings',
+        title: '送信対象・見積確認',
+        preconditions: '回答または名刺データがあるアンケートを対象にする。',
+        steps: ['送信対象セクションを確認する', '対象件数、除外条件、見積表示を確認する'],
+        expected: '送信対象と見積が表示され、実送信前に対象件数を確認できる。',
+        priority: 'P1',
+        sideEffect: 'none',
+        evidence: '送信対象と見積表示のスクリーンショット'
+      },
+      {
+        id: 'DL-001',
+        group: 'ダウンロード・請求',
+        screen: 'データダウンロード',
+        route: '/dashboard',
+        title: '回答CSV取得',
+        preconditions: '回答データがあるアンケートを対象にする。',
+        steps: ['ダッシュボードのダウンロード導線を開く', '回答CSVの取得操作を行う', 'ファイル名と内容の先頭行を確認する'],
+        expected: 'CSVがダウンロードされ、文字化けや空ファイルではないことを確認できる。',
+        priority: 'P0',
+        sideEffect: 'none',
+        evidence: 'ダウンロード操作画面、ファイル名、CSV先頭行'
+      },
+      {
+        id: 'DL-002',
+        group: 'ダウンロード・請求',
+        screen: 'データダウンロード',
+        route: '/dashboard',
+        title: '名刺データ取得導線',
+        preconditions: '名刺データ化完了相当のアンケートまたはダウンロード導線がある。',
+        steps: ['名刺データのダウンロード導線を確認する', '取得可能な状態表示、期限表示、ボタンを確認する'],
+        expected: '名刺データの取得導線が表示され、期限や状態が分かる。',
+        priority: 'P1',
+        sideEffect: 'none',
+        evidence: '名刺データ取得導線のスクリーンショット'
+      },
+      {
+        id: 'INV-001',
+        group: 'ダウンロード・請求',
+        screen: '請求一覧',
+        route: '/invoices',
+        title: '請求一覧',
+        preconditions: '請求データが1件以上あるアカウントでログインしている。',
+        steps: ['請求一覧を開く', '請求月、金額、ステータス、詳細導線を確認する'],
+        expected: '請求一覧が表示され、各行から詳細へ遷移できる。',
+        priority: 'P0',
+        sideEffect: 'none',
+        evidence: '請求一覧のスクリーンショット'
+      },
+      {
+        id: 'INV-002',
+        group: 'ダウンロード・請求',
+        screen: '請求詳細',
+        route: '/invoices/{invoiceId}',
+        title: '請求詳細',
+        preconditions: '請求一覧に表示される請求がある。',
+        steps: ['請求一覧から詳細を開く', '請求先、明細、合計金額、支払期日を確認する'],
+        expected: '請求詳細が表示され、一覧の金額と詳細合計に不整合がない。',
+        priority: 'P1',
+        sideEffect: 'none',
+        evidence: '請求詳細のスクリーンショット'
+      },
+      {
+        id: 'INV-003',
+        group: 'ダウンロード・請求',
+        screen: '請求印刷',
+        route: '/invoices/{invoiceId}/print',
+        title: '印刷ビュー',
+        preconditions: '請求詳細を開ける。',
+        steps: ['印刷またはPDF出力導線を開く', '印刷用レイアウトを確認する'],
+        expected: '印刷に必要な情報が1画面に整理され、ブラウザ印刷で崩れない。',
+        priority: 'P2',
+        sideEffect: 'none',
+        evidence: '印刷プレビューまたは印刷画面のスクリーンショット'
+      },
+      {
+        id: 'LEG-001',
+        group: '公開・共通',
+        screen: '利用規約',
+        route: '/kiyaku',
+        title: '利用規約',
+        preconditions: 'ログアウト状態でも確認する。',
+        steps: ['利用規約ページを開く', '見出し、本文、スクロール、フッターを確認する'],
+        expected: '利用規約が表示され、主要テキストが読める。',
+        priority: 'P2',
+        sideEffect: 'none',
+        evidence: '利用規約ページのスクリーンショット'
+      },
+      {
+        id: 'LEG-002',
+        group: '公開・共通',
+        screen: '特定商取引法表記',
+        route: '/tokushou',
+        title: '特商法',
+        preconditions: 'ログアウト状態でも確認する。',
+        steps: ['特商法ページを開く', '会社情報、連絡先、料金関連の表示を確認する'],
+        expected: '特商法ページが表示され、表や長文が崩れず読める。',
+        priority: 'P2',
+        sideEffect: 'none',
+        evidence: '特商法ページのスクリーンショット'
+      },
+      {
+        id: 'COM-001',
+        group: '公開・共通',
+        screen: '共通遷移',
+        route: '/dashboard',
+        title: '未認証時リダイレクト',
+        preconditions: 'ログアウト状態で確認する。',
+        steps: ['認証が必要なURLを直接開く', '遷移先とメッセージを確認する'],
+        expected: 'ログイン画面へ誘導され、認証が必要な画面を直接表示しない。',
+        priority: 'P0',
+        sideEffect: 'none',
+        evidence: '直接アクセス時の遷移先URLと画面スクリーンショット'
+      },
+      {
+        id: 'COM-002',
+        group: '公開・共通',
+        screen: '共通品質',
+        route: '全ユーザー画面',
+        title: 'コンソール・ネットワークエラーなし',
+        preconditions: '各主要ケースの実行中にDevToolsを開ける。',
+        steps: ['各主要画面を表示する', 'ConsoleとNetworkを確認する', '404、500、JavaScriptエラーの有無を記録する'],
+        expected: '主要画面で致命的なJavaScriptエラー、JSON取得失敗、404/500が発生しない。',
+        priority: 'P0',
+        sideEffect: 'none',
+        evidence: 'ConsoleとNetworkのエラーなし状態のスクリーンショット'
+      }
+    ];
+
+    const SHEET_SCHEMAS = [
+      {
+        tab: 'cases',
+        purpose: 'テスト項目マスタ',
+        columns: ['case_id', 'screen_group', 'route', 'title', 'preconditions', 'steps', 'expected', 'priority', 'active']
+      },
+      {
+        tab: 'runs',
+        purpose: '実行単位',
+        columns: ['run_id', 'environment', 'base_url', 'tester', 'browser', 'viewport', 'started_at', 'ended_at']
+      },
+      {
+        tab: 'results',
+        purpose: '実行結果',
+        columns: ['run_id', 'case_id', 'status', 'actual', 'evidence_url', 'checked_at', 'checked_by', 'defect_link']
+      },
+      {
+        tab: 'screens',
+        purpose: '画面マスタ',
+        columns: ['screen_id', 'screen_name', 'route_dev', 'route_stg', 'source_status']
+      }
+    ];
+
+    const elements = {
+      caseTotal: document.getElementById('caseTotal'),
+      visibleCount: document.getElementById('visibleCount'),
+      search: document.getElementById('caseSearch'),
+      group: document.getElementById('groupFilter'),
+      priority: document.getElementById('priorityFilter'),
+      sideEffect: document.getElementById('sideEffectFilter'),
+      tableBody: document.getElementById('caseTableBody'),
+      detailList: document.getElementById('caseDetailList'),
+      reset: document.getElementById('resetFiltersButton'),
+      copyTsv: document.getElementById('copyTsvButton'),
+      copyCsv: document.getElementById('copyCsvButton'),
+      copyStatus: document.getElementById('copyStatus'),
+      schemaTableBody: document.getElementById('schemaTableBody')
+    };
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function normalize(value) {
+      return String(value || '').toLowerCase();
+    }
+
+    function getPriorityClass(priority) {
+      return {
+        P0: 'badge-p0',
+        P1: 'badge-p1',
+        P2: 'badge-p2'
+      }[priority] || 'badge-p2';
+    }
+
+    function getSideEffectLabel(value) {
+      return {
+        none: 'なし',
+        low: '低',
+        medium: '中'
+      }[value] || value;
+    }
+
+    function getSearchBlob(testCase) {
+      return [
+        testCase.id,
+        testCase.group,
+        testCase.screen,
+        testCase.route,
+        testCase.title,
+        testCase.preconditions,
+        testCase.steps.join(' '),
+        testCase.expected,
+        testCase.evidence
+      ].join(' ');
+    }
+
+    function getFilteredCases() {
+      const keyword = normalize(elements.search.value.trim());
+      const group = elements.group.value;
+      const priority = elements.priority.value;
+      const sideEffect = elements.sideEffect.value;
+
+      return TEST_CASES.filter(testCase => {
+        if (group && testCase.group !== group) {
+          return false;
+        }
+        if (priority && testCase.priority !== priority) {
+          return false;
+        }
+        if (sideEffect && testCase.sideEffect !== sideEffect) {
+          return false;
+        }
+        if (keyword && !normalize(getSearchBlob(testCase)).includes(keyword)) {
+          return false;
+        }
+        return true;
+      });
+    }
+
+    function renderGroupOptions() {
+      const groups = [...new Set(TEST_CASES.map(testCase => testCase.group))];
+      groups.forEach(group => {
+        const option = document.createElement('option');
+        option.value = group;
+        option.textContent = group;
+        elements.group.append(option);
+      });
+    }
+
+    function renderSchema() {
+      elements.schemaTableBody.innerHTML = SHEET_SCHEMAS.map(schema => `
+        <tr>
+          <td class="whitespace-nowrap px-3 py-3 font-mono text-xs font-bold text-on-surface">${escapeHtml(schema.tab)}</td>
+          <td class="px-3 py-3 text-on-surface">${escapeHtml(schema.purpose)}</td>
+          <td class="px-3 py-3 text-on-surface-variant">${escapeHtml(schema.columns.join(', '))}</td>
+        </tr>
+      `).join('');
+    }
+
+    function renderCases() {
+      const visibleCases = getFilteredCases();
+      elements.visibleCount.textContent = visibleCases.length;
+
+      if (!visibleCases.length) {
+        elements.tableBody.innerHTML = `
+          <tr>
+            <td colspan="7" class="px-3 py-8 text-center text-on-surface-variant">条件に一致するテスト項目がありません。</td>
+          </tr>
+        `;
+        elements.detailList.innerHTML = '<div class="rounded-lg border border-outline-variant bg-surface p-5 text-sm text-on-surface-variant">条件に一致する詳細手順がありません。</div>';
+        return;
+      }
+
+      elements.tableBody.innerHTML = visibleCases.map(testCase => `
+        <tr class="case-row hover:bg-surface-variant/70">
+          <td class="whitespace-nowrap px-3 py-3 font-mono text-xs font-bold text-primary">${escapeHtml(testCase.id)}</td>
+          <td class="px-3 py-3">
+            <p class="font-semibold text-on-surface">${escapeHtml(testCase.group)}</p>
+            <p class="mt-1 text-xs text-on-surface-variant">${escapeHtml(testCase.screen)}</p>
+          </td>
+          <td class="px-3 py-3 font-mono text-xs text-on-surface-variant">${escapeHtml(testCase.route)}</td>
+          <td class="px-3 py-3">
+            <p class="font-semibold text-on-surface">${escapeHtml(testCase.title)}</p>
+            <p class="mt-1 line-clamp-2 text-xs leading-5 text-on-surface-variant">${escapeHtml(testCase.expected)}</p>
+          </td>
+          <td class="px-3 py-3"><span class="badge ${getPriorityClass(testCase.priority)}">${escapeHtml(testCase.priority)}</span></td>
+          <td class="px-3 py-3 text-sm text-on-surface-variant">${escapeHtml(getSideEffectLabel(testCase.sideEffect))}</td>
+          <td class="px-3 py-3 text-sm text-on-surface-variant">${escapeHtml(testCase.evidence)}</td>
+        </tr>
+      `).join('');
+
+      elements.detailList.innerHTML = visibleCases.map(testCase => `
+        <details class="case-detail rounded-lg border border-outline-variant bg-surface p-4" open>
+          <summary class="cursor-pointer list-none">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p class="font-mono text-xs font-bold text-primary">${escapeHtml(testCase.id)}</p>
+                <h3 class="mt-1 text-base font-bold text-on-surface">${escapeHtml(testCase.title)}</h3>
+                <p class="mt-1 text-sm text-on-surface-variant">${escapeHtml(testCase.group)} / ${escapeHtml(testCase.screen)} / <span class="font-mono">${escapeHtml(testCase.route)}</span></p>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <span class="badge ${getPriorityClass(testCase.priority)}">${escapeHtml(testCase.priority)}</span>
+                <span class="badge bg-surface-variant text-on-surface-variant">副作用: ${escapeHtml(getSideEffectLabel(testCase.sideEffect))}</span>
+              </div>
+            </div>
+          </summary>
+          <div class="mt-4 grid gap-4 lg:grid-cols-3">
+            <div>
+              <p class="text-sm font-bold text-on-surface">前提</p>
+              <p class="mt-2 text-sm leading-6 text-on-surface-variant">${escapeHtml(testCase.preconditions)}</p>
+            </div>
+            <div>
+              <p class="text-sm font-bold text-on-surface">操作</p>
+              <ol class="mt-2 list-decimal space-y-1 pl-5 text-sm leading-6 text-on-surface-variant">
+                ${testCase.steps.map(step => `<li>${escapeHtml(step)}</li>`).join('')}
+              </ol>
+            </div>
+            <div>
+              <p class="text-sm font-bold text-on-surface">期待結果・証跡</p>
+              <p class="mt-2 text-sm leading-6 text-on-surface-variant">${escapeHtml(testCase.expected)}</p>
+              <p class="mt-2 rounded-lg bg-surface-variant px-3 py-2 text-xs leading-5 text-on-surface-variant">${escapeHtml(testCase.evidence)}</p>
+            </div>
+          </div>
+        </details>
+      `).join('');
+    }
+
+    function toRows(testCases) {
+      const headers = ['case_id', '画面', 'URL', '前提', '操作', '期待結果', '優先度', '副作用', '証跡'];
+      const rows = testCases.map(testCase => [
+        testCase.id,
+        `${testCase.group} / ${testCase.screen}`,
+        testCase.route,
+        testCase.preconditions,
+        testCase.steps.join(' / '),
+        testCase.expected,
+        testCase.priority,
+        getSideEffectLabel(testCase.sideEffect),
+        testCase.evidence
+      ]);
+      return [headers, ...rows];
+    }
+
+    function toTsv(testCases) {
+      return toRows(testCases)
+        .map(row => row.map(cell => String(cell).replace(/\t/g, ' ').replace(/\r?\n/g, ' ')).join('\t'))
+        .join('\n');
+    }
+
+    function toCsv(testCases) {
+      return toRows(testCases)
+        .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""').replace(/\r?\n/g, ' ')}"`).join(','))
+        .join('\n');
+    }
+
+    function fallbackCopyText(text) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'fixed';
+      textarea.style.left = '-9999px';
+      document.body.append(textarea);
+      textarea.select();
+      const copied = document.execCommand('copy');
+      textarea.remove();
+      return copied;
+    }
+
+    async function copyText(text, label) {
+      try {
+        let copied = false;
+        if (navigator.clipboard && window.isSecureContext) {
+          try {
+            await navigator.clipboard.writeText(text);
+            copied = true;
+          } catch (error) {
+            copied = fallbackCopyText(text);
+          }
+        } else {
+          copied = fallbackCopyText(text);
+        }
+
+        if (!copied) {
+          throw new Error('copy failed');
+        }
+
+        elements.copyStatus.textContent = `${label}をコピーしました`;
+      } catch (error) {
+        elements.copyStatus.textContent = 'コピーに失敗しました。ブラウザ設定を確認してください。';
+      }
+    }
+
+    function resetFilters() {
+      elements.search.value = '';
+      elements.group.value = '';
+      elements.priority.value = '';
+      elements.sideEffect.value = '';
+      elements.copyStatus.textContent = '';
+      renderCases();
+    }
+
+    function bindEvents() {
+      [elements.search, elements.group, elements.priority, elements.sideEffect].forEach(element => {
+        element.addEventListener('input', renderCases);
+        element.addEventListener('change', renderCases);
+      });
+      elements.reset.addEventListener('click', resetFilters);
+      elements.copyTsv.addEventListener('click', () => copyText(toTsv(getFilteredCases()), 'TSV'));
+      elements.copyCsv.addEventListener('click', () => copyText(toCsv(getFilteredCases()), 'CSV'));
+    }
+
+    elements.caseTotal.textContent = TEST_CASES.length;
+    renderGroupOptions();
+    renderSchema();
+    bindEvents();
+    renderCases();
+  </script>
+</body>
+</html>

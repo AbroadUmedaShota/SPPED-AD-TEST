@@ -1,0 +1,106 @@
+{
+  "meta": {
+    "id": "08_e2e-testing",
+    "title": "E2Eテスト",
+    "summary": "SPEED ADの主要業務フローを、どの利用者導線で検証するかを整理します。",
+    "sourceStatus": "テストハンドブック / 画面仕様 / 現行モック",
+    "hasUnconfirmed": true
+  },
+  "documents": [
+    {
+      "id": "E2E-001",
+      "title": "E2Eテスト概要",
+      "category": "概要",
+      "sourceStatus": "既存テスト方針から整理",
+      "path": "01_e2e-overview.md",
+      "summary": "手動テスト、E2E、自動化の違いと現状の位置づけを整理します。",
+      "tags": ["E2E", "手動テスト", "自動化", "品質"],
+      "hasUnconfirmed": false,
+      "relatedSources": [
+        "docs/ハンドブック/テスト/03_TESTING_GUIDELINES.md",
+        "docs/画面設計/仕様/00_screen_requirements.md"
+      ]
+    },
+    {
+      "id": "E2E-002",
+      "title": "対象フロー",
+      "category": "対象導線",
+      "sourceStatus": "既存フローから整理",
+      "path": "02_target-flows.md",
+      "summary": "ログイン、アンケート作成、回答、名刺データ化、お礼メール、請求までの代表導線を整理します。",
+      "tags": ["対象フロー", "ログイン", "アンケート", "回答", "名刺データ化", "請求"],
+      "hasUnconfirmed": true,
+      "relatedSources": [
+        "docs/フロー定義/01_user_flow.md",
+        "docs/ハンドブック/テスト/login_to_survey_answer_scenario.md",
+        "docs/画面設計/仕様/00_screen_requirements.md"
+      ]
+    },
+    {
+      "id": "E2E-003",
+      "title": "実行環境と前提データ",
+      "category": "実行前提",
+      "sourceStatus": "既存資料 / 現行モック",
+      "path": "03_environment-and-fixtures.md",
+      "summary": "local/dev/stg/prod、ブラウザ、モックJSON、テスト用シナリオの扱いを整理します。",
+      "tags": ["実行環境", "前提データ", "ブラウザ", "モックJSON", "シナリオ"],
+      "hasUnconfirmed": true,
+      "relatedSources": [
+        "docs/ハンドブック/テスト/03_TESTING_GUIDELINES.md",
+        "docs/ハンドブック/テスト/login_to_survey_answer_scenario.md",
+        "02_dashboard/src/testScenarioOverlay.js",
+        "05_support/tutorial/src/testScenarioOverlay.js"
+      ]
+    },
+    {
+      "id": "E2E-004",
+      "title": "自動化検討",
+      "category": "自動化",
+      "sourceStatus": "検討メモ",
+      "path": "04_automation-considerations.md",
+      "summary": "Playwright/Cypress化する場合の優先順位、安定セレクタ、未確認事項を整理します。",
+      "tags": ["Playwright", "Cypress", "CI", "安定セレクタ", "未確認"],
+      "hasUnconfirmed": true,
+      "relatedSources": [
+        "docs/ハンドブック/テスト/03_TESTING_GUIDELINES.md",
+        "docs/画面設計/仕様/11_plan_feature_restrictions.md",
+        "docs/画面設計/仕様/00_screen_requirements.md"
+      ]
+    }
+  ],
+  "flow": [
+    {
+      "group": "E2E確認の流れ",
+      "items": [
+        {
+          "id": "E2E-F01",
+          "documentId": "E2E-001",
+          "timing": "最初に確認",
+          "label": "概要確認",
+          "summary": "現状の手動テスト中心方針とE2Eの扱いを確認します。"
+        },
+        {
+          "id": "E2E-F02",
+          "documentId": "E2E-002",
+          "timing": "シナリオ設計",
+          "label": "対象フロー確認",
+          "summary": "どの業務導線をE2E対象にするか確認します。"
+        },
+        {
+          "id": "E2E-F03",
+          "documentId": "E2E-003",
+          "timing": "実行前準備",
+          "label": "環境確認",
+          "summary": "local/dev/stg/prodと前提データの扱いを確認します。"
+        },
+        {
+          "id": "E2E-F04",
+          "documentId": "E2E-004",
+          "timing": "将来検討",
+          "label": "自動化検討",
+          "summary": "Playwright/Cypress化する場合の優先順位を確認します。"
+        }
+      ]
+    }
+  ]
+}
