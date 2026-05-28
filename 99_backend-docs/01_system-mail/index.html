@@ -138,40 +138,60 @@
         </div>
     </section>
 
-    <main class="grid w-full gap-4 px-4 py-6 sm:px-6 lg:grid-cols-[360px_minmax(0,1fr)] lg:px-8">
-        <aside class="h-fit rounded-lg border border-outline-variant bg-surface p-4 lg:sticky lg:top-4">
-            <div class="space-y-3">
-                <label class="flex flex-col gap-1 text-sm text-on-surface-variant">
-                    <span>検索</span>
-                    <input id="mailDocsSearch" type="search" class="form-input" placeholder="件名・カテゴリ・本文で検索">
-                </label>
-                <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1">
-                    <label class="flex flex-col gap-1 text-sm text-on-surface-variant">
-                        <span>カテゴリ</span>
-                        <select id="mailDocsCategory" class="form-select">
-                            <option value="">すべて</option>
-                        </select>
-                    </label>
-                    <label class="flex flex-col gap-1 text-sm text-on-surface-variant">
-                        <span>ソース状態</span>
-                        <select id="mailDocsSourceStatus" class="form-select">
-                            <option value="">すべて</option>
-                        </select>
-                    </label>
-                </div>
-                <label class="flex items-center gap-2 text-sm text-on-surface">
-                    <input id="mailDocsDiffOnly" type="checkbox" class="form-checkbox rounded border-outline">
-                    差分・未確認のみ
-                </label>
+    <main class="grid w-full gap-5 px-4 py-6 sm:px-6 lg:grid-cols-[390px_minmax(0,1fr)] lg:px-8">
+        <aside class="h-fit rounded-lg border border-outline-variant bg-surface p-4 shadow-sm lg:sticky lg:top-4">
+            <div class="border-b border-outline-variant pb-4">
+                <p class="text-xs font-bold uppercase tracking-wide text-primary">資料ナビ</p>
+                <h2 class="mt-1 text-base font-bold text-on-surface">絞り込みと資料一覧</h2>
+                <p class="mt-1 text-xs leading-5 text-on-surface-variant">検索条件を変えると、表示対象のメール資料と本文が切り替わります。</p>
             </div>
-            <div class="mt-4 flex items-center justify-between text-xs text-on-surface-variant">
-                <span id="mailDocsCount">0件</span>
-                <button id="mailDocsReset" type="button" class="inline-flex items-center gap-1 text-primary hover:underline">
-                    <span class="material-icons text-sm">restart_alt</span>
-                    条件リセット
-                </button>
+
+            <div class="mt-4 space-y-4">
+                <label class="block text-sm text-on-surface-variant">
+                    <span class="font-semibold text-on-surface">検索</span>
+                    <span class="relative mt-1 block">
+                        <span class="material-icons pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-base text-on-surface-variant">search</span>
+                        <input id="mailDocsSearch" type="search" class="form-input w-full rounded-lg border-outline pl-10" placeholder="件名・カテゴリ・本文で検索">
+                    </span>
+                </label>
+
+                <section class="rounded-lg border border-outline-variant bg-background p-3" aria-label="システムメール資料フィルタ">
+                    <div class="mb-3 flex items-center justify-between gap-2">
+                        <h3 class="text-sm font-bold text-on-surface">フィルタ</h3>
+                        <button id="mailDocsReset" type="button" class="inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-semibold text-primary hover:bg-primary/10">
+                            <span class="material-icons text-sm">restart_alt</span>
+                            リセット
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                        <label class="flex flex-col gap-1 text-sm text-on-surface-variant">
+                            <span>カテゴリ</span>
+                            <select id="mailDocsCategory" class="form-select rounded-lg border-outline">
+                                <option value="">すべて</option>
+                            </select>
+                        </label>
+                        <label class="flex flex-col gap-1 text-sm text-on-surface-variant">
+                            <span>ソース状態</span>
+                            <select id="mailDocsSourceStatus" class="form-select rounded-lg border-outline">
+                                <option value="">すべて</option>
+                            </select>
+                        </label>
+                    </div>
+                    <label class="mt-3 flex items-start gap-2 rounded-lg bg-surface px-3 py-2 text-sm text-on-surface">
+                        <input id="mailDocsDiffOnly" type="checkbox" class="form-checkbox mt-0.5 rounded border-outline">
+                        <span>
+                            <span class="block font-semibold">差分・未確認のみ</span>
+                            <span class="block text-xs leading-5 text-on-surface-variant">確認待ちの論点を含む資料だけに絞ります。</span>
+                        </span>
+                    </label>
+                </section>
             </div>
-            <div id="mailDocsList" class="mt-3 max-h-[60vh] space-y-2 overflow-y-auto pr-1" aria-label="システムメール資料一覧"></div>
+
+            <div class="mt-4 flex items-center justify-between gap-3">
+                <h3 class="text-sm font-bold text-on-surface">資料一覧</h3>
+                <span id="mailDocsCount" class="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary">0件</span>
+            </div>
+            <div id="mailDocsList" class="mt-3 max-h-[calc(100vh-18rem)] min-h-[12rem] space-y-2 overflow-y-auto pr-1" aria-label="システムメール資料一覧"></div>
         </aside>
 
         <article class="min-w-0 overflow-hidden rounded-lg border border-outline-variant bg-surface">

@@ -112,40 +112,85 @@
         <div>
           <p class="text-sm font-semibold text-primary">環境リンク</p>
           <h2 id="environment-links-title" class="mt-1 text-title-large font-bold text-on-surface">SPEED AD 各環境</h2>
-          <p class="mt-2 max-w-4xl text-sm leading-6 text-on-surface-variant">本番、ステージング、開発環境を直接確認するための導線です。別タブで開きます。</p>
+          <p class="mt-2 max-w-4xl text-sm leading-6 text-on-surface-variant">本番、ステージング、開発環境の通常画面と管理者画面を直接確認するための導線です。別タブで開きます。</p>
         </div>
       </div>
       <div class="mt-5 grid gap-4 md:grid-cols-3">
-        <a class="group rounded-lg border border-outline-variant bg-surface p-5 transition-colors hover:border-primary hover:bg-surface-variant" href="https://speed-ad.com/" target="_blank" rel="noopener">
+        <article class="rounded-lg border border-outline-variant bg-surface p-5">
           <div class="flex items-start justify-between gap-3">
             <div>
               <p class="text-sm font-semibold text-primary">Production</p>
               <h3 class="mt-1 text-title-medium font-bold text-on-surface">本番環境</h3>
             </div>
-            <span class="material-icons text-primary transition-transform group-hover:translate-x-1">open_in_new</span>
+            <span class="material-icons text-primary">public</span>
           </div>
-          <p class="mt-3 break-all text-sm text-on-surface-variant">https://speed-ad.com/</p>
-        </a>
-        <a class="group rounded-lg border border-outline-variant bg-surface p-5 transition-colors hover:border-primary hover:bg-surface-variant" href="https://stg.speed-ad.com/" target="_blank" rel="noopener">
+          <div class="mt-4 space-y-2">
+            <a class="group flex items-center justify-between gap-3 rounded-lg border border-outline-variant px-3 py-2 text-sm text-on-surface hover:border-primary hover:bg-surface-variant" href="https://speed-ad.com/" target="_blank" rel="noopener">
+              <span>
+                <span class="block font-semibold">通常画面</span>
+                <span class="block break-all text-xs text-on-surface-variant">https://speed-ad.com/</span>
+              </span>
+              <span class="material-icons text-base text-primary transition-transform group-hover:translate-x-1">open_in_new</span>
+            </a>
+            <a class="group flex items-center justify-between gap-3 rounded-lg border border-outline-variant px-3 py-2 text-sm text-on-surface hover:border-primary hover:bg-surface-variant" href="https://speed-ad.com/admin" target="_blank" rel="noopener">
+              <span>
+                <span class="block font-semibold">管理者画面</span>
+                <span class="block break-all text-xs text-on-surface-variant">https://speed-ad.com/admin</span>
+              </span>
+              <span class="material-icons text-base text-primary transition-transform group-hover:translate-x-1">admin_panel_settings</span>
+            </a>
+          </div>
+        </article>
+        <article class="rounded-lg border border-outline-variant bg-surface p-5">
           <div class="flex items-start justify-between gap-3">
             <div>
               <p class="text-sm font-semibold text-primary">Staging</p>
               <h3 class="mt-1 text-title-medium font-bold text-on-surface">ステージング環境</h3>
             </div>
-            <span class="material-icons text-primary transition-transform group-hover:translate-x-1">open_in_new</span>
+            <span class="material-icons text-primary">science</span>
           </div>
-          <p class="mt-3 break-all text-sm text-on-surface-variant">https://stg.speed-ad.com/</p>
-        </a>
-        <a class="group rounded-lg border border-outline-variant bg-surface p-5 transition-colors hover:border-primary hover:bg-surface-variant" href="https://dev.speed-ad.com/" target="_blank" rel="noopener">
+          <div class="mt-4 space-y-2">
+            <a class="group flex items-center justify-between gap-3 rounded-lg border border-outline-variant px-3 py-2 text-sm text-on-surface hover:border-primary hover:bg-surface-variant" href="https://stg.speed-ad.com/" target="_blank" rel="noopener">
+              <span>
+                <span class="block font-semibold">通常画面</span>
+                <span class="block break-all text-xs text-on-surface-variant">https://stg.speed-ad.com/</span>
+              </span>
+              <span class="material-icons text-base text-primary transition-transform group-hover:translate-x-1">open_in_new</span>
+            </a>
+            <a class="group flex items-center justify-between gap-3 rounded-lg border border-outline-variant px-3 py-2 text-sm text-on-surface hover:border-primary hover:bg-surface-variant" href="https://stg.speed-ad.com/admin" target="_blank" rel="noopener">
+              <span>
+                <span class="block font-semibold">管理者画面</span>
+                <span class="block break-all text-xs text-on-surface-variant">https://stg.speed-ad.com/admin</span>
+              </span>
+              <span class="material-icons text-base text-primary transition-transform group-hover:translate-x-1">admin_panel_settings</span>
+            </a>
+          </div>
+        </article>
+        <article class="rounded-lg border border-outline-variant bg-surface p-5">
           <div class="flex items-start justify-between gap-3">
             <div>
               <p class="text-sm font-semibold text-primary">Development</p>
               <h3 class="mt-1 text-title-medium font-bold text-on-surface">開発環境</h3>
             </div>
-            <span class="material-icons text-primary transition-transform group-hover:translate-x-1">open_in_new</span>
+            <span class="material-icons text-primary">code</span>
           </div>
-          <p class="mt-3 break-all text-sm text-on-surface-variant">https://dev.speed-ad.com/</p>
-        </a>
+          <div class="mt-4 space-y-2">
+            <a class="group flex items-center justify-between gap-3 rounded-lg border border-outline-variant px-3 py-2 text-sm text-on-surface hover:border-primary hover:bg-surface-variant" href="https://dev.speed-ad.com/" target="_blank" rel="noopener">
+              <span>
+                <span class="block font-semibold">通常画面</span>
+                <span class="block break-all text-xs text-on-surface-variant">https://dev.speed-ad.com/</span>
+              </span>
+              <span class="material-icons text-base text-primary transition-transform group-hover:translate-x-1">open_in_new</span>
+            </a>
+            <a class="group flex items-center justify-between gap-3 rounded-lg border border-outline-variant px-3 py-2 text-sm text-on-surface hover:border-primary hover:bg-surface-variant" href="https://dev.speed-ad.com/admin" target="_blank" rel="noopener">
+              <span>
+                <span class="block font-semibold">管理者画面</span>
+                <span class="block break-all text-xs text-on-surface-variant">https://dev.speed-ad.com/admin</span>
+              </span>
+              <span class="material-icons text-base text-primary transition-transform group-hover:translate-x-1">admin_panel_settings</span>
+            </a>
+          </div>
+        </article>
       </div>
     </section>
 
@@ -193,6 +238,11 @@
           <h3 class="mt-2 text-sm font-bold text-on-surface">情報源マップ</h3>
           <p class="mt-2 text-sm leading-6 text-on-surface-variant">正本、補助資料、旧Wiki、観測資料の扱い。</p>
         </a>
+        <a class="rounded-lg border border-outline-variant bg-surface p-4 hover:border-primary hover:bg-surface-variant" href="./08_e2e-testing/index.html">
+          <span class="material-icons text-primary">fact_check</span>
+          <h3 class="mt-2 text-sm font-bold text-on-surface">E2Eテスト</h3>
+          <p class="mt-2 text-sm leading-6 text-on-surface-variant">主要業務フロー、実行環境、前提データ、自動化候補。</p>
+        </a>
       </div>
     </section>
 
@@ -204,7 +254,7 @@
         </div>
         <span class="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
           <span class="material-icons text-base">folder_open</span>
-          8カテゴリ
+          9カテゴリ
         </span>
       </div>
 
@@ -312,6 +362,19 @@
             <p class="mt-3 text-sm leading-6 text-on-surface-variant">登録、再設定、招待、所属、請求先との関係。</p>
           </div>
           <p class="mt-5 text-xs font-semibold text-on-surface-variant">2件 / 既存仕様 / 未確認あり</p>
+        </a>
+        <a class="group flex h-full flex-col justify-between rounded-lg border border-outline-variant bg-surface p-5 transition-colors hover:border-primary hover:bg-surface-variant" href="./08_e2e-testing/index.html">
+          <div>
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-sm font-semibold text-primary">08_e2e-testing</p>
+                <h3 class="mt-1 text-title-medium font-bold text-on-surface">E2Eテスト</h3>
+              </div>
+              <span class="material-icons text-primary transition-transform group-hover:translate-x-1">arrow_forward</span>
+            </div>
+            <p class="mt-3 text-sm leading-6 text-on-surface-variant">主要業務フロー、環境、前提データ、自動化検討。</p>
+          </div>
+          <p class="mt-5 text-xs font-semibold text-on-surface-variant">4件 / テスト資料 / 未確認あり</p>
         </a>
       </div>
     </section>

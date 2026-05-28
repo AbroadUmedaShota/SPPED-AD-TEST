@@ -410,21 +410,27 @@ function renderDocumentList(state, elements) {
   setText(elements.count, `${state.filteredDocuments.length}件`);
 
   if (state.filteredDocuments.length === 0) {
-    const empty = document.createElement('p');
-    empty.className = 'rounded-lg border border-dashed border-outline-variant p-4 text-sm text-on-surface-variant';
-    empty.textContent = '条件に一致する資料がありません。';
+    const empty = document.createElement('div');
+    empty.className = 'rounded-lg border border-dashed border-outline-variant bg-background p-4 text-sm text-on-surface-variant';
+    empty.innerHTML = [
+      '<span class="material-icons mb-2 block text-xl text-on-surface-variant">manage_search</span>',
+      '<p class="font-semibold text-on-surface">条件に一致する資料がありません。</p>',
+      '<p class="mt-1 text-xs leading-5">検索語やフィルタ条件を変えて確認してください。</p>'
+    ].join('');
     elements.list.appendChild(empty);
     return;
   }
 
   state.filteredDocuments.forEach(documentItem => {
+    const isSelected = documentItem.id === state.selectedId;
     const button = document.createElement('button');
     button.type = 'button';
+    button.setAttribute('aria-current', isSelected ? 'true' : 'false');
     button.className = [
-      'w-full rounded-lg border p-3 text-left transition-colors',
-      documentItem.id === state.selectedId
-        ? 'border-primary bg-primary/10 text-on-surface'
-        : 'border-outline-variant bg-surface text-on-surface hover:bg-surface-variant'
+      'group w-full rounded-lg border p-3 text-left transition focus:outline-none focus:ring-2 focus:ring-primary/40',
+      isSelected
+        ? 'border-primary bg-primary/10 text-on-surface shadow-sm'
+        : 'border-outline-variant bg-background text-on-surface hover:border-primary/60 hover:bg-surface-variant'
     ].join(' ');
     button.addEventListener('click', () => {
       state.selectedId = documentItem.id;
@@ -432,19 +438,43 @@ function renderDocumentList(state, elements) {
       renderSelectedDocument(state, elements);
     });
 
+    const header = document.createElement('span');
+    header.className = 'flex flex-wrap items-center gap-2';
+
+    const idBadge = document.createElement('span');
+    idBadge.className = [
+      'inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-bold',
+      isSelected ? 'bg-primary text-primary-on' : 'bg-surface-variant text-on-surface-variant'
+    ].join(' ');
+    idBadge.textContent = documentItem.id;
+    header.appendChild(idBadge);
+
+    if (isSelected) {
+      const selectedBadge = document.createElement('span');
+      selectedBadge.className = 'inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-bold text-primary';
+      selectedBadge.textContent = '表示中';
+      header.appendChild(selectedBadge);
+    }
+
     const title = document.createElement('span');
-    title.className = 'block text-sm font-semibold leading-5';
-    title.textContent = `${documentItem.id} ${documentItem.title}`;
+    title.className = 'mt-2 block text-sm font-bold leading-5 text-on-surface';
+    title.textContent = documentItem.title;
 
     const meta = document.createElement('span');
-    meta.className = 'mt-1 block text-xs text-on-surface-variant';
-    meta.textContent = `${documentItem.category || '-'} / ${documentItem.sourceStatus || '-'}`;
+    meta.className = 'mt-2 flex flex-wrap gap-1.5 text-[11px] font-semibold text-on-surface-variant';
+    const category = document.createElement('span');
+    category.className = 'rounded-full bg-surface px-2 py-0.5';
+    category.textContent = documentItem.category || '未分類';
+    const sourceStatus = document.createElement('span');
+    sourceStatus.className = 'rounded-full bg-surface px-2 py-0.5';
+    sourceStatus.textContent = documentItem.sourceStatus || 'ソース未設定';
+    meta.append(category, sourceStatus);
 
     const summary = document.createElement('span');
     summary.className = 'mt-2 block text-xs leading-5 text-on-surface-variant';
     summary.textContent = documentItem.summary || '';
 
-    button.append(title, meta, summary);
+    button.append(header, title, meta, summary);
     elements.list.appendChild(button);
   });
 }
