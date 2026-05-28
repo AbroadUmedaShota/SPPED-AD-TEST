@@ -1,5 +1,8 @@
-import { resolveSupportDataPath } from './utils.js';
+import { resolveSupportDataPath, resolveSupportBasePath } from './utils.js';
 import { resolveLocalizedValue } from './services/i18n/messages.js';
+
+// 本番(ルート)では ''、サブパス配信(GitHub Pages 等)では '/.../05_support' を前置する
+const BASE = resolveSupportBasePath();
 
 // カテゴリごとの表示メタ (help-center.js と同期)
 const CATEGORY_META = {
@@ -33,13 +36,13 @@ const FEEDBACK_STORAGE_KEY = 'helpArticleFeedback';
 function normalizeSupportHref(url) {
     const cleaned = String(url || '').replace(/["'<>]/g, '');
     if (/^(https?:|mailto:|tel:|#)/i.test(cleaned)) return cleaned;
-    if (cleaned.startsWith('/')) return cleaned;
+    if (cleaned.startsWith('/')) return `${BASE}${cleaned}`;
     if (cleaned.startsWith('help-content.html')) {
-        return cleaned.replace(/^help-content\.html/, '/help-content/');
+        return cleaned.replace(/^help-content\.html/, `${BASE}/help-content/`);
     }
-    if (cleaned === 'help.html') return '/help/';
-    if (cleaned === 'faq.html') return '/faq/';
-    if (cleaned === 'bug-report.html') return '/bug-report/';
+    if (cleaned === 'help.html') return `${BASE}/help/`;
+    if (cleaned === 'faq.html') return `${BASE}/faq/`;
+    if (cleaned === 'bug-report.html') return `${BASE}/bug-report/`;
     return cleaned;
 }
 
@@ -249,13 +252,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         renderBreadcrumbs() {
             let items = [
-                { name: 'ヘルプセンター', link: '/help/' }
+                { name: 'ヘルプセンター', link: `${BASE}/help/` }
             ];
 
             if (this.state.searchTerm) {
                 items.push({ name: `検索結果: "${this.state.searchTerm}"` });
             } else if (this.state.currentCategory) {
-                items.push({ name: loc(this.state.currentCategory.name), link: `/help-content/?category=${this.state.currentCategory.id}` });
+                items.push({ name: loc(this.state.currentCategory.name), link: `${BASE}/help-content/?category=${this.state.currentCategory.id}` });
                 if (this.state.currentArticle) {
                     items.push({ name: loc(this.state.currentArticle.question) });
                 }
@@ -371,7 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             return `
-                <a class="hc-content-item" href="/help-content/?article=${encodeURIComponent(article.id)}" style="--hc-accent: ${meta.accent};" aria-label="${escapeHtml(title)}">
+                <a class="hc-content-item" href="${BASE}/help-content/?article=${encodeURIComponent(article.id)}" style="--hc-accent: ${meta.accent};" aria-label="${escapeHtml(title)}">
                     <div class="hc-content-item__body">
                         ${metaHtml.length ? `<div class="hc-content-item__meta">${metaHtml.join('')}</div>` : ''}
                         <h2 class="hc-content-item__title">${escapeHtml(title)}</h2>
@@ -388,7 +391,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 .slice(0, 4);
             const links = otherCats.map(c => {
                 const m = getCategoryMeta(c.id);
-                return `<a class="hc-content-empty__link" href="/help-content/?category=${encodeURIComponent(c.id)}" style="color:${m.accent};border-color:${m.accent};"><span class="material-icons" aria-hidden="true">${m.icon}</span>${escapeHtml(loc(c.name))}</a>`;
+                return `<a class="hc-content-empty__link" href="${BASE}/help-content/?category=${encodeURIComponent(c.id)}" style="color:${m.accent};border-color:${m.accent};"><span class="material-icons" aria-hidden="true">${m.icon}</span>${escapeHtml(loc(c.name))}</a>`;
             }).join('');
             const isFiltered = !!this.state.filterTerm;
             return `
@@ -456,7 +459,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${this.renderFeedbackUI()}
                 </section>
                 <div style="margin-top:1.5rem;">
-                    <a href="/help-content/?category=${escapeHtml(cat?.id || '')}" class="hc-article-back">
+                    <a href="${BASE}/help-content/?category=${escapeHtml(cat?.id || '')}" class="hc-article-back">
                         <span class="material-icons" aria-hidden="true">arrow_back</span>
                         ${escapeHtml(loc(cat?.name) || 'カテゴリ一覧')}に戻る
                     </a>
@@ -501,7 +504,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const title = loc(article.question);
                 const summary = loc(article.summary) || (loc(article.answer) ? loc(article.answer).replace(/\s+/g, ' ').slice(0, 80) : '');
                 return `
-                    <a class="hc-content-item" href="/help-content/?article=${encodeURIComponent(article.id)}" style="--hc-accent: ${m.accent};" aria-label="${escapeHtml(title)}">
+                    <a class="hc-content-item" href="${BASE}/help-content/?article=${encodeURIComponent(article.id)}" style="--hc-accent: ${m.accent};" aria-label="${escapeHtml(title)}">
                         <div class="hc-content-item__body">
                             <h3 class="hc-content-item__title">${escapeHtml(title)}</h3>
                             ${summary ? `<p class="hc-content-item__summary">${escapeHtml(summary)}</p>` : ''}
@@ -556,7 +559,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     highlightedSummary = highlightedSummary.replace(re, '<mark>$&</mark>');
                 });
                 return `
-                    <a class="hc-content-item" href="/help-content/?article=${encodeURIComponent(article.id)}" style="--hc-accent: ${m.accent};" aria-label="${escapeHtml(loc(article.question))}">
+                    <a class="hc-content-item" href="${BASE}/help-content/?article=${encodeURIComponent(article.id)}" style="--hc-accent: ${m.accent};" aria-label="${escapeHtml(loc(article.question))}">
                         <div class="hc-content-item__body">
                             <div class="hc-content-item__meta">
                                 <span class="hc-content-item__badge hc-content-item__badge--featured"><span class="material-icons" aria-hidden="true">${m.icon}</span>${escapeHtml(article._categoryName)}</span>
@@ -585,7 +588,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <p class="hc-content-empty__title">お探しのページは見つかりませんでした</p>
                     <p class="hc-content-empty__desc">ヘルプセンターのトップから再度お探しください。</p>
                     <div class="hc-content-empty__actions">
-                        <a href="/help/" class="hc-content-empty__link"><span class="material-icons" aria-hidden="true">home</span>ヘルプセンターへ</a>
+                        <a href="${BASE}/help/" class="hc-content-empty__link"><span class="material-icons" aria-hidden="true">home</span>ヘルプセンターへ</a>
                     </div>
                 </div>
             `;

@@ -1,6 +1,9 @@
-import { resolveSupportDataPath } from './utils.js';
+import { resolveSupportDataPath, resolveSupportBasePath } from './utils.js';
 import { resolveLocalizedValue } from './services/i18n/messages.js';
 import { escapeHtml, escapeRegex } from './shared/escape.js';
+
+// 本番(ルート)では ''、サブパス配信(GitHub Pages 等)では '/.../05_support' を前置する
+const BASE = resolveSupportBasePath();
 
 function loc(value) {
     const lang = (typeof window !== 'undefined' && window.getCurrentLanguage) ? window.getCurrentLanguage() : 'ja';
@@ -34,7 +37,7 @@ const FAQ_CARD = {
     id: 'faq',
     name: 'よくある質問',
     description: 'サービス全般に関するご質問',
-    href: '/faq/',
+    href: `${BASE}/faq/`,
     icon: 'help_outline',
     accent: '#D68A3A',
     previewArticles: [],
@@ -121,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
             event.preventDefault();
             const keyword = this.elements.heroSearchInput.value.trim();
             if (!keyword) return;
-            window.location.href = `/help-content/?search=${encodeURIComponent(keyword)}`;
+            window.location.href = `${BASE}/help-content/?search=${encodeURIComponent(keyword)}`;
         },
 
         handleSearchInput() {
@@ -169,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const idx = Number(el.dataset.index);
                     const chosen = this.state.suggestions[idx];
                     if (chosen) {
-                        window.location.href = `/help-content/?article=${encodeURIComponent(chosen.id)}`;
+                        window.location.href = `${BASE}/help-content/?article=${encodeURIComponent(chosen.id)}`;
                     }
                 });
             });
@@ -239,7 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (this.state.activeIndex >= 0 && this.state.suggestions[this.state.activeIndex]) {
                     event.preventDefault();
                     const chosen = this.state.suggestions[this.state.activeIndex];
-                    window.location.href = `/help-content/?article=${encodeURIComponent(chosen.id)}`;
+                    window.location.href = `${BASE}/help-content/?article=${encodeURIComponent(chosen.id)}`;
                 }
             } else if (event.key === 'Home') {
                 event.preventDefault();
@@ -284,7 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const kws = (this.state.popularKeywords || []).slice(0, 5);
             if (kws.length === 0) { wrap.innerHTML = ''; return; }
             wrap.innerHTML = `
-                ${kws.map(k => `<a href="/help-content/?search=${encodeURIComponent(k)}" class="hc-keywords__chip">${escapeHtml(k)}</a>`).join('')}
+                ${kws.map(k => `<a href="${BASE}/help-content/?search=${encodeURIComponent(k)}" class="hc-keywords__chip">${escapeHtml(k)}</a>`).join('')}
             `;
         },
 
@@ -302,7 +305,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         id: cat.id,
                         name: loc(cat.name),
                         description: loc(cat.description) || '',
-                        href: `/help-content/?category=${encodeURIComponent(cat.id)}`,
+                        href: `${BASE}/help-content/?category=${encodeURIComponent(cat.id)}`,
                         icon: meta.icon,
                         accent: meta.accent,
                         previewArticles: (cat.questions || []).slice(0, 2),
@@ -368,7 +371,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (empty) empty.hidden = true;
 
             list.innerHTML = featured.map(article => `
-                <a href="/help-content/?article=${encodeURIComponent(article.id)}" class="hc-pop-card">
+                <a href="${BASE}/help-content/?article=${encodeURIComponent(article.id)}" class="hc-pop-card">
                     <div class="hc-pop-card__body">
                         <p class="hc-pop-card__category">${escapeHtml(loc(article.categoryName))}</p>
                         <h3 class="hc-pop-card__title">${escapeHtml(loc(article.question))}</h3>

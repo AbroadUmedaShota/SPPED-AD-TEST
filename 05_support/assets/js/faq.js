@@ -421,6 +421,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         handleSearch() {
+            if (!this.elements.searchBox) return;
             const enteringSearch = !this.state.searchTerm && !!this.elements.searchBox.value.trim();
             if (enteringSearch) {
                 this.state.preSearchActiveQuestionId = this.state.activeQuestionId;
@@ -432,16 +433,16 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         clearSearch() {
-            this.elements.searchBox.value = '';
+            if (this.elements.searchBox) this.elements.searchBox.value = '';
             if (this.elements.stickySearchInput) {
                 this.elements.stickySearchInput.value = '';
             }
             this.state.searchTerm = '';
-            this.elements.clearSearchBtn.classList.add('hidden');
+            if (this.elements.clearSearchBtn) this.elements.clearSearchBtn.classList.add('hidden');
             this.state.activeQuestionId = this.state.preSearchActiveQuestionId || null;
             this.state.preSearchActiveQuestionId = null;
             this.renderUI();
-            this.elements.searchBox.focus();
+            if (this.elements.searchBox) this.elements.searchBox.focus();
             if (this.state.activeQuestionId) {
                 queueMicrotask(() => {
                     const item = document.querySelector(`.faq-item[data-id="${CSS.escape(this.state.activeQuestionId)}"]`);
@@ -538,27 +539,29 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             let searchTimeout;
-            searchBox.addEventListener('input', () => {
-                if (this.state.isComposing) return;
-                clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(() => this.handleSearch(), 250);
-            });
-            searchBox.addEventListener('compositionstart', () => {
-                this.state.isComposing = true;
-            });
-            searchBox.addEventListener('compositionend', () => {
-                this.state.isComposing = false;
-                clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(() => this.handleSearch(), 250);
-            });
-            searchBox.addEventListener('keydown', (event) => {
-                if (event.key === 'Escape' && this.elements.searchBox.value) {
-                    event.preventDefault();
-                    this.clearSearch();
-                }
-            });
+            if (searchBox) {
+                searchBox.addEventListener('input', () => {
+                    if (this.state.isComposing) return;
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => this.handleSearch(), 250);
+                });
+                searchBox.addEventListener('compositionstart', () => {
+                    this.state.isComposing = true;
+                });
+                searchBox.addEventListener('compositionend', () => {
+                    this.state.isComposing = false;
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => this.handleSearch(), 250);
+                });
+                searchBox.addEventListener('keydown', (event) => {
+                    if (event.key === 'Escape' && this.elements.searchBox.value) {
+                        event.preventDefault();
+                        this.clearSearch();
+                    }
+                });
+            }
 
-            clearSearchBtn.addEventListener('click', () => {
+            clearSearchBtn?.addEventListener('click', () => {
                 this.clearSearch();
             });
             resetSearchBtn?.addEventListener('click', () => {
