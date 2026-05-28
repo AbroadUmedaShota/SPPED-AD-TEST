@@ -58,7 +58,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px 0;
+  padding: 16px 20px 10px;
 }
 
 .th-card__category {
@@ -74,6 +74,12 @@
   text-transform: uppercase;
 }
 
+/* カテゴリ「はじめに」修飾クラス: 青系の区別色で最初の 1 枚を際立たせる */
+.th-card__category--start {
+  background: #EFF6FF;
+  color: #1E40AF;
+}
+
 /* ===== Card Badge ================================================ */
 .th-card__badge {
   font-size: 10px;
@@ -87,6 +93,12 @@
 .th-card__badge--new {
   background: #dcfce7;
   color: #16a34a;
+}
+
+/* 「まずここから」誘導バッジ: ブランド塗りで最初の 1 枚を強調 */
+.th-card__badge--start {
+  background: var(--brand);
+  color: #fff;
 }
 
 .th-card__badge--soon {
@@ -130,6 +142,15 @@
   line-height: 1.45;
 }
 
+/* 価値サブタイトル: タイトル直下の「何ができるか」一文。説明文より目立つが控えめに */
+.th-card__lead {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-2);
+  margin: 0 0 8px;
+  line-height: 1.65;
+}
+
 .th-card__desc {
   font-size: 13px;
   color: var(--muted);
@@ -163,12 +184,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 20px;
+  padding: 11px 20px;
   border-top: 1px solid var(--line);
   font-size: 13.5px;
   font-weight: 600;
   color: var(--brand);
-  transition: color 0.15s ease;
+  background: var(--brand-soft);
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 .th-card__cta .material-icons {
@@ -176,8 +198,18 @@
   transition: transform 0.15s ease;
 }
 
-.th-card:hover .th-card__cta { color: var(--brand-ink); }
+.th-card:hover .th-card__cta {
+  background: var(--brand);
+  color: #fff;
+}
 .th-card:hover .th-card__cta .material-icons { transform: translateX(3px); }
+
+/* カード全体が <a> のためフォーカスリング: カード枠で表現、CTA 行には干渉させない */
+.th-card:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.18);
+}
 
 /* ===== Responsive ================================================ */
 @media (max-width: 640px) {
@@ -354,11 +386,15 @@
 
 /* モーション低減対応 */
 @media (prefers-reduced-motion: reduce) {
+  .th-card,
+  .th-card__cta,
+  .th-card__cta .material-icons,
   .th-cta,
   .th-cta__btn {
     transition: none;
   }
 
+  .th-card:hover,
   .th-cta:hover,
   .th-cta__btn--primary:hover,
   .th-cta__btn--ghost:hover {
