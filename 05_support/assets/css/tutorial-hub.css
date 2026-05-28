@@ -2,9 +2,9 @@
    SPEED-AD Support / Tutorial Hub
    - 適用範囲: body[data-page-id="tutorial-hub"]
    - CSS カスタムプロパティは news.css の :root 定義に依存:
-     --brand, --brand-ink, --brand-soft,
-     --ink, --ink-2, --muted, --muted-2, --line, --bg,
-     --tag-bg, --tag-ink, --shadow-sm, --shadow-md, --radius
+     --brand, --brand-ink, --brand-soft, --brand-softer,
+     --ink, --ink-2, --muted, --muted-2, --line, --line-2,
+     --bg, --tag-bg, --tag-ink, --shadow-sm, --shadow-md, --radius
    - support-shell.css の管理領域には触らない
    ============================================================ */
 
@@ -191,4 +191,177 @@
 
   .b-hero { padding: 36px 20px 20px; }
   .b-hero__title { font-size: 28px; }
+}
+
+/* ===== CTA Section ===============================================
+   .th-cta: チュートリアルハブ専用の「お困りですか？」CTAブロック
+   ※ help-center.css の .hc-cta とは独立した定義
+   ============================================================== */
+
+.th-cta-section {
+  padding-top: 0;
+  padding-bottom: 80px;
+}
+
+.th-cta {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  background: var(--brand-softer);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 28px 32px;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.th-cta:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+/* アイコンサークル */
+.th-cta__icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+.th-cta__icon .material-icons {
+  font-size: 26px !important;
+}
+
+/* テキストエリア */
+.th-cta__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.th-cta__title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0 0 4px;
+  line-height: 1.4;
+}
+
+.th-cta__subtitle {
+  font-size: 13.5px;
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.65;
+}
+
+/* ボタン群 */
+.th-cta__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+/* 共通ボタン */
+.th-cta__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  border-radius: 9999px;
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease,
+              box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.th-cta__btn .material-icons {
+  font-size: 17px !important;
+}
+
+.th-cta__btn:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.18);
+}
+
+/* Primary ボタン（塗り） */
+.th-cta__btn--primary {
+  background: var(--brand);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.22);
+}
+
+.th-cta__btn--primary:hover {
+  background: var(--brand-ink);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.32);
+  transform: translateY(-1px);
+}
+
+.th-cta__btn--primary:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(37, 99, 235, 0.18);
+}
+
+/* Ghost ボタン（枠線） */
+.th-cta__btn--ghost {
+  background: var(--bg);
+  color: var(--brand);
+  border: 1.5px solid var(--brand);
+}
+
+.th-cta__btn--ghost:hover {
+  background: var(--brand-soft);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.12);
+  transform: translateY(-1px);
+}
+
+.th-cta__btn--ghost:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* CTA レスポンシブ */
+@media (max-width: 640px) {
+  .th-cta-section {
+    padding-bottom: 60px;
+  }
+
+  .th-cta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 24px 20px;
+  }
+
+  .th-cta__actions {
+    width: 100%;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .th-cta__btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* モーション低減対応 */
+@media (prefers-reduced-motion: reduce) {
+  .th-cta,
+  .th-cta__btn {
+    transition: none;
+  }
+
+  .th-cta:hover,
+  .th-cta__btn--primary:hover,
+  .th-cta__btn--ghost:hover {
+    transform: none;
+  }
 }
