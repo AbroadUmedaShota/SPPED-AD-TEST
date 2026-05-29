@@ -26,6 +26,8 @@
 - `運用/07_BACKLOG_ISSUE_GUIDE.md`: Backlog 起票手順と `SPDAD_SCD` 展示会スケジュール起票ルール。
 - `セキュリティ/07_SECURITY_GUIDELINES.md`: セキュリティポリシーと権限管理。
 - `テスト/`: 手動テストガイドラインとチェックリスト群。
+  - `テスト/admin_screen_e2e_observed_requirements.md`: 管理者画面のstg実画面観測ベースE2E項目候補。
+  - `テスト/admin_screen_e2e_execution_checklist.md`: 管理者画面E2Eのstg実行用チェックリスト。
 
 ### 参照資料 (`docs/リファレンス/`)
 - `テンプレート/`: Issue / PR テンプレートの正規版（正本）。
