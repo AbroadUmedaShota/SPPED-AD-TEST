@@ -25,16 +25,6 @@
       scrollbar-width: thin;
     }
 
-    .case-table th,
-    .case-table td {
-      vertical-align: top;
-    }
-
-    .case-row[hidden],
-    .case-detail[hidden] {
-      display: none;
-    }
-
     .status-dot {
       display: inline-block;
       width: 0.55rem;
@@ -73,6 +63,75 @@
     .copy-target {
       user-select: all;
     }
+
+    .e2e-filter-bar {
+      position: sticky;
+      top: 3.25rem;
+      z-index: 9;
+      box-shadow: 0 14px 28px rgba(15, 23, 42, 0.08);
+    }
+
+    .e2e-workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(360px, 0.8fr);
+      gap: 1rem;
+      align-items: start;
+    }
+
+    .case-queue-list {
+      max-height: min(76vh, 760px);
+      overflow: auto;
+      padding-right: 0.25rem;
+      scrollbar-width: thin;
+    }
+
+    .case-select-card {
+      transition: border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
+    }
+
+    .case-select-card[aria-pressed='true'] {
+      border-color: var(--color-primary);
+      background: rgba(66, 133, 244, 0.08);
+      box-shadow: inset 3px 0 0 var(--color-primary);
+    }
+
+    .case-detail-panel {
+      position: sticky;
+      top: 11.5rem;
+      max-height: calc(100vh - 12.5rem);
+      overflow: auto;
+      scrollbar-width: thin;
+    }
+
+    .database-panel summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .database-panel summary::marker {
+      content: '';
+    }
+
+    @media (max-width: 767px) {
+      .e2e-filter-bar {
+        top: 2.75rem;
+      }
+    }
+
+    @media (max-width: 1023px) {
+      .e2e-workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .case-queue-list,
+      .case-detail-panel {
+        max-height: none;
+        overflow: visible;
+      }
+
+      .case-detail-panel {
+        position: static;
+      }
+    }
   </style>
 </head>
 <body class="bg-background text-on-background">
@@ -83,7 +142,7 @@
           <p class="text-sm font-semibold text-primary">HOME / 08_e2e-testing</p>
           <h1 class="mt-1 text-headline-medium font-bold leading-tight text-on-surface">SPEED AD E2Eテスト管理</h1>
           <p class="mt-2 text-sm leading-6 text-on-surface-variant">
-            ステージング環境で実施する正常系テストの項目、確認手順、証跡、将来のSpreadsheet DB連携仕様を1ページで管理します。実API接続は未実装で、GitHub Pages公開を前提に静的HTMLとして閲覧できます。
+            ステージング環境で実施する正常系テストを、件数、優先度、カテゴリ、副作用リスクからすばやく絞り込み、必要なケースを選択して確認します。実API接続は未実装で、GitHub Pages公開を前提に静的HTMLとして閲覧できます。
           </p>
         </div>
         <div class="flex flex-wrap gap-2">
@@ -104,7 +163,6 @@
         <a class="rounded-full px-3 py-1.5 font-semibold text-on-surface hover:bg-surface-variant" href="#overview">概要</a>
         <a class="rounded-full px-3 py-1.5 font-semibold text-on-surface hover:bg-surface-variant" href="#environments">環境リンク</a>
         <a class="rounded-full px-3 py-1.5 font-semibold text-on-surface hover:bg-surface-variant" href="#test-cases">画面別テスト項目</a>
-        <a class="rounded-full px-3 py-1.5 font-semibold text-on-surface hover:bg-surface-variant" href="#procedures">詳細確認手順</a>
         <a class="rounded-full px-3 py-1.5 font-semibold text-on-surface hover:bg-surface-variant" href="#database">Spreadsheet DB仕様</a>
         <a class="rounded-full px-3 py-1.5 font-semibold text-on-surface hover:bg-surface-variant" href="#operations">運用ルール</a>
         <a class="rounded-full px-3 py-1.5 font-semibold text-on-surface hover:bg-surface-variant" href="#sources">既存資料リンク</a>
@@ -115,10 +173,10 @@
       <section id="overview" class="rounded-lg border border-outline-variant bg-surface p-5" aria-labelledby="overview-title">
         <div class="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p class="text-sm font-semibold text-primary">概要</p>
-            <h2 id="overview-title" class="mt-1 text-title-large font-bold text-on-surface">ステージング正常系テストの項目出しと実行管理</h2>
+            <p class="text-sm font-semibold text-primary">実行ハブ</p>
+            <h2 id="overview-title" class="mt-1 text-title-large font-bold text-on-surface">ステージング正常系テストの全体状況</h2>
             <p class="mt-2 max-w-5xl text-sm leading-6 text-on-surface-variant">
-              対象はユーザー画面中心です。開発環境で確認済みの導線を元に、ステージングで「表示される」「遷移できる」「保存できる」「ダウンロードできる」「証跡を残せる」ことを確認します。
+              対象はユーザー画面中心です。総件数、優先度、画面カテゴリ、副作用ありの件数を確認し、下の実行キューから必要なケースを選択して実行します。
             </p>
           </div>
           <span class="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
@@ -127,26 +185,36 @@
           </span>
         </div>
 
-        <div class="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div class="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-6">
           <div class="rounded-lg border border-outline-variant bg-background p-4">
             <p class="text-sm font-bold text-on-surface">対象環境</p>
             <p class="mt-2 text-2xl font-bold text-primary">stg</p>
-            <p class="mt-1 text-sm leading-6 text-on-surface-variant">ステージングを主対象、devは項目設計の参照元として扱う。</p>
+            <p class="mt-1 text-sm leading-6 text-on-surface-variant">正常系の主対象。</p>
           </div>
           <div class="rounded-lg border border-outline-variant bg-background p-4">
-            <p class="text-sm font-bold text-on-surface">テスト範囲</p>
+            <p class="text-sm font-bold text-on-surface">総ケース数</p>
             <p class="mt-2 text-2xl font-bold text-primary" id="caseTotal">0</p>
-            <p class="mt-1 text-sm leading-6 text-on-surface-variant">ユーザー画面中心の正常系ケース。</p>
+            <p class="mt-1 text-sm leading-6 text-on-surface-variant">表示対象の母数。</p>
           </div>
           <div class="rounded-lg border border-outline-variant bg-background p-4">
-            <p class="text-sm font-bold text-on-surface">DB方式</p>
-            <p class="mt-2 text-2xl font-bold text-primary">Sheet + GAS</p>
-            <p class="mt-1 text-sm leading-6 text-on-surface-variant">GitHub Pagesは静的、編集データはSpreadsheetで管理。</p>
+            <p class="text-sm font-bold text-on-surface">優先度</p>
+            <p class="mt-2 text-xl font-bold text-primary"><span id="p0Count">0</span> / <span id="p1Count">0</span> / <span id="p2Count">0</span></p>
+            <p class="mt-1 text-sm leading-6 text-on-surface-variant">P0 / P1 / P2。</p>
           </div>
           <div class="rounded-lg border border-outline-variant bg-background p-4">
-            <p class="text-sm font-bold text-on-surface">完了条件</p>
-            <p class="mt-2 text-2xl font-bold text-primary">Pass証跡</p>
-            <p class="mt-1 text-sm leading-6 text-on-surface-variant">画面、操作、期待結果、証跡URLを残す。</p>
+            <p class="text-sm font-bold text-on-surface">カテゴリ</p>
+            <p class="mt-2 text-2xl font-bold text-primary" id="categoryTotal">0</p>
+            <p class="mt-1 text-sm leading-6 text-on-surface-variant">画面グループ数。</p>
+          </div>
+          <div class="rounded-lg border border-outline-variant bg-background p-4">
+            <p class="text-sm font-bold text-on-surface">副作用あり</p>
+            <p class="mt-2 text-2xl font-bold text-primary" id="sideEffectTotal">0</p>
+            <p class="mt-1 text-sm leading-6 text-on-surface-variant">low / medium。</p>
+          </div>
+          <div class="rounded-lg border border-outline-variant bg-background p-4">
+            <p class="text-sm font-bold text-on-surface">DB連携</p>
+            <p class="mt-2 text-2xl font-bold text-primary">未接続</p>
+            <p class="mt-1 text-sm leading-6 text-on-surface-variant">仕様のみ表示。</p>
           </div>
         </div>
       </section>
@@ -199,108 +267,109 @@
             <p class="text-sm font-semibold text-primary">画面別テスト項目</p>
             <h2 id="test-cases-title" class="mt-1 text-title-large font-bold text-on-surface">正常系ケース一覧</h2>
             <p class="mt-2 max-w-5xl text-sm leading-6 text-on-surface-variant">
-              各ケースは `case_id / 画面 / URL / 前提 / 操作 / 期待結果 / 優先度 / 副作用 / 証跡` の列で管理します。現在はページ内データを表示し、将来はSpreadsheetの `cases` タブから取得します。
+              左の実行キューでカードを選択すると、右の詳細ペインで `case_id / 画面 / URL / 前提 / 操作 / 期待結果 / 優先度 / 副作用 / 証跡` を確認できます。現在はページ内データを表示し、将来はSpreadsheetの `cases` タブから取得します。
             </p>
           </div>
-          <div class="flex flex-wrap gap-2">
-            <button id="copyTsvButton" type="button" class="inline-flex items-center gap-2 rounded-lg border border-outline px-3 py-2 text-sm font-semibold text-on-surface hover:bg-surface-variant">
-              <span class="material-icons text-base">content_copy</span>
-              TSVコピー
-            </button>
-            <button id="copyCsvButton" type="button" class="inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-on-primary hover:opacity-90">
-              <span class="material-icons text-base">download</span>
-              CSVコピー
-            </button>
+        </div>
+
+        <div class="e2e-filter-bar mt-5 rounded-lg border border-outline-variant bg-surface p-4">
+          <div class="grid gap-3 lg:grid-cols-[minmax(220px,1fr)_220px_180px_180px]">
+            <label class="block text-sm text-on-surface-variant">
+              <span class="font-semibold text-on-surface">検索</span>
+              <span class="relative mt-1 block">
+                <span class="material-icons pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-base text-on-surface-variant">search</span>
+                <input id="caseSearch" type="search" class="form-input w-full rounded-lg border-outline pl-10" placeholder="ID、画面、URL、手順、期待結果で検索">
+              </span>
+            </label>
+            <label class="block text-sm text-on-surface-variant">
+              <span class="font-semibold text-on-surface">画面カテゴリ</span>
+              <select id="groupFilter" class="form-select mt-1 w-full rounded-lg border-outline">
+                <option value="">すべて</option>
+              </select>
+            </label>
+            <label class="block text-sm text-on-surface-variant">
+              <span class="font-semibold text-on-surface">優先度</span>
+              <select id="priorityFilter" class="form-select mt-1 w-full rounded-lg border-outline">
+                <option value="">すべて</option>
+                <option value="P0">P0</option>
+                <option value="P1">P1</option>
+                <option value="P2">P2</option>
+              </select>
+            </label>
+            <label class="block text-sm text-on-surface-variant">
+              <span class="font-semibold text-on-surface">副作用</span>
+              <select id="sideEffectFilter" class="form-select mt-1 w-full rounded-lg border-outline">
+                <option value="">すべて</option>
+                <option value="none">なし</option>
+                <option value="low">低</option>
+                <option value="medium">中</option>
+              </select>
+            </label>
           </div>
-        </div>
 
-        <div class="mt-5 grid gap-3 lg:grid-cols-[minmax(220px,1fr)_220px_180px_180px]">
-          <label class="block text-sm text-on-surface-variant">
-            <span class="font-semibold text-on-surface">検索</span>
-            <span class="relative mt-1 block">
-              <span class="material-icons pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-base text-on-surface-variant">search</span>
-              <input id="caseSearch" type="search" class="form-input w-full rounded-lg border-outline pl-10" placeholder="ID、画面、URL、手順、期待結果で検索">
-            </span>
-          </label>
-          <label class="block text-sm text-on-surface-variant">
-            <span class="font-semibold text-on-surface">画面カテゴリ</span>
-            <select id="groupFilter" class="form-select mt-1 w-full rounded-lg border-outline">
-              <option value="">すべて</option>
-            </select>
-          </label>
-          <label class="block text-sm text-on-surface-variant">
-            <span class="font-semibold text-on-surface">優先度</span>
-            <select id="priorityFilter" class="form-select mt-1 w-full rounded-lg border-outline">
-              <option value="">すべて</option>
-              <option value="P0">P0</option>
-              <option value="P1">P1</option>
-              <option value="P2">P2</option>
-            </select>
-          </label>
-          <label class="block text-sm text-on-surface-variant">
-            <span class="font-semibold text-on-surface">副作用</span>
-            <select id="sideEffectFilter" class="form-select mt-1 w-full rounded-lg border-outline">
-              <option value="">すべて</option>
-              <option value="none">なし</option>
-              <option value="low">低</option>
-              <option value="medium">中</option>
-            </select>
-          </label>
-        </div>
-
-        <div class="mt-4 flex flex-wrap items-center justify-between gap-3 border-y border-outline-variant py-3 text-sm">
-          <p class="font-semibold text-on-surface"><span id="visibleCount">0</span>件表示中</p>
-          <div class="flex flex-wrap items-center gap-2">
-            <span id="copyStatus" class="text-on-surface-variant" aria-live="polite"></span>
-            <button id="resetFiltersButton" type="button" class="inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-semibold text-primary hover:bg-primary/10">
-              <span class="material-icons text-base">restart_alt</span>
-              絞り込みを解除
-            </button>
+          <div class="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-outline-variant pt-3 text-sm">
+            <div>
+              <p class="font-semibold text-on-surface"><span id="visibleCount">0</span>件表示中</p>
+              <p id="activeFilterSummary" class="mt-1 text-xs text-on-surface-variant">全ケースを表示中</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span id="copyStatus" class="text-on-surface-variant" aria-live="polite"></span>
+              <button id="resetFiltersButton" type="button" class="inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-semibold text-primary hover:bg-primary/10">
+                <span class="material-icons text-base">restart_alt</span>
+                絞り込みを解除
+              </button>
+              <button id="copyTsvButton" type="button" class="inline-flex items-center gap-2 rounded-lg border border-outline px-3 py-2 text-sm font-semibold text-on-surface hover:bg-surface-variant">
+                <span class="material-icons text-base">content_copy</span>
+                TSVコピー
+              </button>
+              <button id="copyCsvButton" type="button" class="inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-on-primary hover:opacity-90">
+                <span class="material-icons text-base">download</span>
+                CSVコピー
+              </button>
+            </div>
           </div>
+          <textarea id="copyFallbackBuffer" class="mt-3 hidden w-full rounded-lg border border-outline bg-background p-3 font-mono text-xs leading-5 text-on-surface-variant" rows="4" readonly aria-label="手動コピー用テキスト"></textarea>
         </div>
 
-        <div class="mt-4 overflow-x-auto rounded-lg border border-outline-variant">
-          <table class="case-table min-w-[1080px] w-full border-collapse text-sm">
-            <thead class="bg-surface-variant text-left text-on-surface">
-              <tr>
-                <th class="border-b border-outline-variant px-3 py-3">ID</th>
-                <th class="border-b border-outline-variant px-3 py-3">画面</th>
-                <th class="border-b border-outline-variant px-3 py-3">URL</th>
-                <th class="border-b border-outline-variant px-3 py-3">確認内容</th>
-                <th class="border-b border-outline-variant px-3 py-3">優先度</th>
-                <th class="border-b border-outline-variant px-3 py-3">副作用</th>
-                <th class="border-b border-outline-variant px-3 py-3">証跡</th>
-              </tr>
-            </thead>
-            <tbody id="caseTableBody" class="divide-y divide-outline-variant bg-surface"></tbody>
-          </table>
+        <div id="caseWorkspace" class="e2e-workspace mt-4">
+          <div class="rounded-lg border border-outline-variant bg-background p-4">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p class="text-sm font-bold text-on-surface">実行キュー</p>
+                <p id="queueSummary" class="mt-1 text-xs text-on-surface-variant">絞り込み結果を表示します。</p>
+              </div>
+              <span class="badge bg-surface-variant text-on-surface-variant">カードを選択</span>
+            </div>
+            <div id="caseQueueList" class="case-queue-list mt-3 grid gap-2"></div>
+          </div>
+          <aside id="caseDetailPanel" class="case-detail-panel rounded-lg border border-outline-variant bg-background p-5" tabindex="-1" aria-live="polite"></aside>
         </div>
       </section>
 
-      <section id="procedures" class="mt-8" aria-labelledby="procedures-title">
-        <div class="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <p class="text-sm font-semibold text-primary">詳細確認手順</p>
-            <h2 id="procedures-title" class="mt-1 text-title-large font-bold text-on-surface">ケース別の前提・操作・期待結果</h2>
+      <details id="database" class="database-panel mt-8 rounded-lg border border-outline-variant bg-surface p-5">
+        <summary class="cursor-pointer list-none">
+          <div class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p class="text-sm font-semibold text-primary">Spreadsheet DB仕様</p>
+              <h2 id="database-title" class="mt-1 text-title-large font-bold text-on-surface">GitHub Pages + Google Spreadsheet + Apps Script API</h2>
+              <p class="mt-2 max-w-5xl text-sm leading-6 text-on-surface-variant">
+                未接続の将来仕様です。テスト実行時に見るケース一覧とは分け、必要なときだけ展開して確認します。
+              </p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
+                <span class="material-icons text-base">table_chart</span>
+                未接続仕様
+              </span>
+              <span class="material-icons text-primary">expand_more</span>
+            </div>
           </div>
-          <p class="text-sm text-on-surface-variant">一覧の絞り込み条件と連動します。</p>
-        </div>
-        <div id="caseDetailList" class="mt-4 grid gap-4"></div>
-      </section>
+        </summary>
 
-      <section id="database" class="mt-8 rounded-lg border border-outline-variant bg-surface p-5" aria-labelledby="database-title">
-        <div class="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <p class="text-sm font-semibold text-primary">Spreadsheet DB仕様</p>
-            <h2 id="database-title" class="mt-1 text-title-large font-bold text-on-surface">GitHub Pages + Google Spreadsheet + Apps Script API</h2>
-            <p class="mt-2 max-w-5xl text-sm leading-6 text-on-surface-variant">
-              GitHub Pagesには秘密情報を置かず、静的ページからApps Script Web Appへ読み書きします。Spreadsheetは複数人編集とレビューに使い、ページ側は初期ロード一括取得と実行結果保存だけを行います。
-            </p>
+        <div class="mt-5 border-t border-outline-variant pt-5">
+          <div class="mb-5 max-w-5xl text-sm leading-6 text-on-surface-variant">
+            GitHub Pagesには秘密情報を置かず、静的ページからApps Script Web Appへ読み書きします。Spreadsheetは複数人編集とレビューに使い、ページ側は初期ロード一括取得と実行結果保存だけを行います。
           </div>
-          <span class="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
-            <span class="material-icons text-base">table_chart</span>
-            未接続仕様
-          </span>
         </div>
 
         <div class="mt-5 grid gap-4 lg:grid-cols-2">
@@ -369,7 +438,7 @@
             </a>
           </div>
         </div>
-      </section>
+      </details>
 
       <section id="operations" class="mt-8" aria-labelledby="operations-title">
         <div>
@@ -1688,19 +1757,29 @@
 
     const elements = {
       caseTotal: document.getElementById('caseTotal'),
+      p0Count: document.getElementById('p0Count'),
+      p1Count: document.getElementById('p1Count'),
+      p2Count: document.getElementById('p2Count'),
+      categoryTotal: document.getElementById('categoryTotal'),
+      sideEffectTotal: document.getElementById('sideEffectTotal'),
       visibleCount: document.getElementById('visibleCount'),
+      activeFilterSummary: document.getElementById('activeFilterSummary'),
       search: document.getElementById('caseSearch'),
       group: document.getElementById('groupFilter'),
       priority: document.getElementById('priorityFilter'),
       sideEffect: document.getElementById('sideEffectFilter'),
-      tableBody: document.getElementById('caseTableBody'),
-      detailList: document.getElementById('caseDetailList'),
+      queueSummary: document.getElementById('queueSummary'),
+      queueList: document.getElementById('caseQueueList'),
+      detailPanel: document.getElementById('caseDetailPanel'),
       reset: document.getElementById('resetFiltersButton'),
       copyTsv: document.getElementById('copyTsvButton'),
       copyCsv: document.getElementById('copyCsvButton'),
       copyStatus: document.getElementById('copyStatus'),
+      copyFallback: document.getElementById('copyFallbackBuffer'),
       schemaTableBody: document.getElementById('schemaTableBody')
     };
+
+    let selectedCaseId = '';
 
     function escapeHtml(value) {
       return String(value || '')
@@ -1729,6 +1808,54 @@
         low: '低',
         medium: '中'
       }[value] || value;
+    }
+
+    function getSideEffectClass(value) {
+      return {
+        none: 'bg-surface-variant text-on-surface-variant',
+        low: 'bg-primary/10 text-primary',
+        medium: 'badge-p0'
+      }[value] || 'bg-surface-variant text-on-surface-variant';
+    }
+
+    function getCaseMeta(testCase) {
+      return [
+        testCase.parentId ? `親ケース: ${testCase.parentId}` : '',
+        testCase.dataSource ? `参照データ: ${testCase.dataSource}` : '',
+        testCase.note ? `備考: ${testCase.note}` : ''
+      ].filter(Boolean);
+    }
+
+    function renderHubStats() {
+      const priorityCounts = TEST_CASES.reduce((counts, testCase) => {
+        counts[testCase.priority] = (counts[testCase.priority] || 0) + 1;
+        return counts;
+      }, {});
+
+      elements.caseTotal.textContent = TEST_CASES.length;
+      elements.p0Count.textContent = priorityCounts.P0 || 0;
+      elements.p1Count.textContent = priorityCounts.P1 || 0;
+      elements.p2Count.textContent = priorityCounts.P2 || 0;
+      elements.categoryTotal.textContent = new Set(TEST_CASES.map(testCase => testCase.group)).size;
+      elements.sideEffectTotal.textContent = TEST_CASES.filter(testCase => testCase.sideEffect !== 'none').length;
+    }
+
+    function getActiveFilterSummary() {
+      const filters = [];
+      const keyword = elements.search.value.trim();
+      if (keyword) {
+        filters.push(`検索: ${keyword}`);
+      }
+      if (elements.group.value) {
+        filters.push(`カテゴリ: ${elements.group.value}`);
+      }
+      if (elements.priority.value) {
+        filters.push(`優先度: ${elements.priority.value}`);
+      }
+      if (elements.sideEffect.value) {
+        filters.push(`副作用: ${getSideEffectLabel(elements.sideEffect.value)}`);
+      }
+      return filters.length ? filters.join(' / ') : '全ケースを表示中';
     }
 
     function getSearchBlob(testCase) {
@@ -1791,73 +1918,103 @@
       `).join('');
     }
 
+    function renderEmptyCases() {
+      elements.queueSummary.textContent = '0件 / 条件を変更してください。';
+      elements.queueList.innerHTML = `
+        <div class="rounded-lg border border-outline-variant bg-surface p-4 text-sm leading-6 text-on-surface-variant">
+          条件に一致するケースがありません。
+        </div>
+      `;
+      elements.detailPanel.innerHTML = `
+        <div>
+          <p class="text-sm font-semibold text-primary">選択ケース詳細</p>
+          <h3 class="mt-2 text-title-medium font-bold text-on-surface">条件に一致するケースがありません</h3>
+          <p class="mt-2 text-sm leading-6 text-on-surface-variant">検索条件または絞り込み条件を変更してください。</p>
+        </div>
+      `;
+    }
+
+    function renderCaseQueue(visibleCases, selectedCase) {
+      elements.queueSummary.textContent = `${visibleCases.length}件 / 選択中: ${selectedCase.id}`;
+      elements.queueList.innerHTML = visibleCases.map(testCase => {
+        const isSelected = testCase.id === selectedCase.id;
+        return `
+          <button type="button" class="case-select-card w-full rounded-lg border border-outline-variant bg-surface p-3 text-left hover:border-primary hover:bg-surface-variant" data-case-id="${escapeHtml(testCase.id)}" aria-pressed="${isSelected}">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="font-mono text-xs font-bold text-primary">${escapeHtml(testCase.id)}</span>
+              <span class="badge ${getPriorityClass(testCase.priority)}">${escapeHtml(testCase.priority)}</span>
+              <span class="badge ${getSideEffectClass(testCase.sideEffect)}">副作用: ${escapeHtml(getSideEffectLabel(testCase.sideEffect))}</span>
+            </div>
+            <h3 class="mt-2 text-sm font-bold leading-5 text-on-surface">${escapeHtml(testCase.title)}</h3>
+            <p class="mt-1 line-clamp-2 text-xs leading-5 text-on-surface-variant">${escapeHtml(testCase.expected)}</p>
+            <div class="mt-3 grid gap-1 text-xs text-on-surface-variant sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+              <span class="font-semibold text-on-surface">${escapeHtml(testCase.group)}</span>
+              <span class="break-all font-mono">${escapeHtml(testCase.route)}</span>
+            </div>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function renderSelectedCase(testCase) {
+      const meta = getCaseMeta(testCase);
+      elements.detailPanel.innerHTML = `
+        <div class="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p class="text-sm font-semibold text-primary">選択ケース詳細</p>
+            <p class="mt-1 font-mono text-xs font-bold text-primary">${escapeHtml(testCase.id)}</p>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <span class="badge ${getPriorityClass(testCase.priority)}">${escapeHtml(testCase.priority)}</span>
+            <span class="badge ${getSideEffectClass(testCase.sideEffect)}">副作用: ${escapeHtml(getSideEffectLabel(testCase.sideEffect))}</span>
+          </div>
+        </div>
+        <h3 class="mt-3 text-title-medium font-bold leading-7 text-on-surface">${escapeHtml(testCase.title)}</h3>
+        <p class="mt-2 text-sm leading-6 text-on-surface-variant">
+          ${escapeHtml(testCase.group)} / ${escapeHtml(testCase.screen)} / <span class="font-mono">${escapeHtml(testCase.route)}</span>
+        </p>
+        ${meta.length ? `<div class="mt-4 flex flex-wrap gap-2">${meta.map(item => `<span class="rounded-full bg-surface-variant px-3 py-1 text-xs font-semibold text-on-surface-variant">${escapeHtml(item)}</span>`).join('')}</div>` : ''}
+        <div class="mt-5 grid gap-4">
+          <section class="rounded-lg border border-outline-variant bg-surface p-4">
+            <p class="text-sm font-bold text-on-surface">前提</p>
+            <p class="mt-2 text-sm leading-6 text-on-surface-variant">${escapeHtml(testCase.preconditions)}</p>
+          </section>
+          <section class="rounded-lg border border-outline-variant bg-surface p-4">
+            <p class="text-sm font-bold text-on-surface">操作</p>
+            <ol class="mt-2 list-decimal space-y-1 pl-5 text-sm leading-6 text-on-surface-variant">
+              ${testCase.steps.map(step => `<li>${escapeHtml(step)}</li>`).join('')}
+            </ol>
+          </section>
+          <section class="rounded-lg border border-outline-variant bg-surface p-4">
+            <p class="text-sm font-bold text-on-surface">期待結果</p>
+            <p class="mt-2 text-sm leading-6 text-on-surface-variant">${escapeHtml(testCase.expected)}</p>
+          </section>
+          <section class="rounded-lg bg-surface-variant p-4">
+            <p class="text-sm font-bold text-on-surface">証跡</p>
+            <p class="mt-2 text-xs leading-5 text-on-surface-variant">${escapeHtml(testCase.evidence)}</p>
+          </section>
+        </div>
+      `;
+    }
+
     function renderCases() {
       const visibleCases = getFilteredCases();
       elements.visibleCount.textContent = visibleCases.length;
+      elements.activeFilterSummary.textContent = getActiveFilterSummary();
 
       if (!visibleCases.length) {
-        elements.tableBody.innerHTML = `
-          <tr>
-            <td colspan="7" class="px-3 py-8 text-center text-on-surface-variant">条件に一致するテスト項目がありません。</td>
-          </tr>
-        `;
-        elements.detailList.innerHTML = '<div class="rounded-lg border border-outline-variant bg-surface p-5 text-sm text-on-surface-variant">条件に一致する詳細手順がありません。</div>';
+        selectedCaseId = '';
+        renderEmptyCases();
         return;
       }
 
-      elements.tableBody.innerHTML = visibleCases.map(testCase => `
-        <tr class="case-row hover:bg-surface-variant/70">
-          <td class="whitespace-nowrap px-3 py-3 font-mono text-xs font-bold text-primary">${escapeHtml(testCase.id)}${testCase.parentId ? `<br><span class="font-normal text-on-surface-variant">←${escapeHtml(testCase.parentId)}</span>` : ''}</td>
-          <td class="px-3 py-3">
-            <p class="font-semibold text-on-surface">${escapeHtml(testCase.group)}</p>
-            <p class="mt-1 text-xs text-on-surface-variant">${escapeHtml(testCase.screen)}</p>
-          </td>
-          <td class="px-3 py-3 font-mono text-xs text-on-surface-variant">${escapeHtml(testCase.route)}</td>
-          <td class="px-3 py-3">
-            <p class="font-semibold text-on-surface">${escapeHtml(testCase.title)}</p>
-            <p class="mt-1 line-clamp-2 text-xs leading-5 text-on-surface-variant">${escapeHtml(testCase.expected)}</p>
-          </td>
-          <td class="px-3 py-3"><span class="badge ${getPriorityClass(testCase.priority)}">${escapeHtml(testCase.priority)}</span></td>
-          <td class="px-3 py-3 text-sm text-on-surface-variant">${escapeHtml(getSideEffectLabel(testCase.sideEffect))}</td>
-          <td class="px-3 py-3 text-sm text-on-surface-variant">${escapeHtml(testCase.evidence)}</td>
-        </tr>
-      `).join('');
+      if (!selectedCaseId || !visibleCases.some(testCase => testCase.id === selectedCaseId)) {
+        selectedCaseId = visibleCases[0].id;
+      }
 
-      elements.detailList.innerHTML = visibleCases.map(testCase => `
-        <details class="case-detail rounded-lg border border-outline-variant bg-surface p-4" open>
-          <summary class="cursor-pointer list-none">
-            <div class="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <p class="font-mono text-xs font-bold text-primary">${escapeHtml(testCase.id)}</p>
-                <h3 class="mt-1 text-base font-bold text-on-surface">${escapeHtml(testCase.title)}</h3>
-                <p class="mt-1 text-sm text-on-surface-variant">${escapeHtml(testCase.group)} / ${escapeHtml(testCase.screen)} / <span class="font-mono">${escapeHtml(testCase.route)}</span></p>
-                ${(testCase.parentId || testCase.dataSource || testCase.note) ? `<p class="mt-1 text-xs text-on-surface-variant">${[testCase.parentId ? `親ケース: ${escapeHtml(testCase.parentId)}` : '', testCase.dataSource ? `参照データ: ${escapeHtml(testCase.dataSource)}` : '', testCase.note ? `備考: ${escapeHtml(testCase.note)}` : ''].filter(Boolean).join(' ／ ')}</p>` : ''}
-              </div>
-              <div class="flex flex-wrap gap-2">
-                <span class="badge ${getPriorityClass(testCase.priority)}">${escapeHtml(testCase.priority)}</span>
-                <span class="badge bg-surface-variant text-on-surface-variant">副作用: ${escapeHtml(getSideEffectLabel(testCase.sideEffect))}</span>
-              </div>
-            </div>
-          </summary>
-          <div class="mt-4 grid gap-4 lg:grid-cols-3">
-            <div>
-              <p class="text-sm font-bold text-on-surface">前提</p>
-              <p class="mt-2 text-sm leading-6 text-on-surface-variant">${escapeHtml(testCase.preconditions)}</p>
-            </div>
-            <div>
-              <p class="text-sm font-bold text-on-surface">操作</p>
-              <ol class="mt-2 list-decimal space-y-1 pl-5 text-sm leading-6 text-on-surface-variant">
-                ${testCase.steps.map(step => `<li>${escapeHtml(step)}</li>`).join('')}
-              </ol>
-            </div>
-            <div>
-              <p class="text-sm font-bold text-on-surface">期待結果・証跡</p>
-              <p class="mt-2 text-sm leading-6 text-on-surface-variant">${escapeHtml(testCase.expected)}</p>
-              <p class="mt-2 rounded-lg bg-surface-variant px-3 py-2 text-xs leading-5 text-on-surface-variant">${escapeHtml(testCase.evidence)}</p>
-            </div>
-          </div>
-        </details>
-      `).join('');
+      const selectedCase = visibleCases.find(testCase => testCase.id === selectedCaseId);
+      renderCaseQueue(visibleCases, selectedCase);
+      renderSelectedCase(selectedCase);
     }
 
     function toRows(testCases) {
@@ -1904,6 +2061,19 @@
       return copied;
     }
 
+    function hideCopyFallback() {
+      elements.copyFallback.value = '';
+      elements.copyFallback.classList.add('hidden');
+    }
+
+    function showCopyFallback(text, label) {
+      elements.copyFallback.value = text;
+      elements.copyFallback.classList.remove('hidden');
+      elements.copyFallback.focus();
+      elements.copyFallback.select();
+      elements.copyStatus.textContent = `${label}を手動コピー欄に表示しました。Ctrl+Cでコピーしてください。`;
+    }
+
     async function copyText(text, label) {
       try {
         let copied = false;
@@ -1922,9 +2092,10 @@
           throw new Error('copy failed');
         }
 
+        hideCopyFallback();
         elements.copyStatus.textContent = `${label}をコピーしました`;
       } catch (error) {
-        elements.copyStatus.textContent = 'コピーに失敗しました。ブラウザ設定を確認してください。';
+        showCopyFallback(text, label);
       }
     }
 
@@ -1934,6 +2105,7 @@
       elements.priority.value = '';
       elements.sideEffect.value = '';
       elements.copyStatus.textContent = '';
+      hideCopyFallback();
       renderCases();
     }
 
@@ -1943,11 +2115,23 @@
         element.addEventListener('change', renderCases);
       });
       elements.reset.addEventListener('click', resetFilters);
+      elements.queueList.addEventListener('click', event => {
+        const button = event.target.closest('[data-case-id]');
+        if (!button) {
+          return;
+        }
+        selectedCaseId = button.dataset.caseId;
+        renderCases();
+        elements.detailPanel.focus({ preventScroll: true });
+        if (window.matchMedia('(max-width: 1023px)').matches) {
+          elements.detailPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
       elements.copyTsv.addEventListener('click', () => copyText(toTsv(getFilteredCases()), 'TSV'));
       elements.copyCsv.addEventListener('click', () => copyText(toCsv(getFilteredCases()), 'CSV'));
     }
 
-    elements.caseTotal.textContent = TEST_CASES.length;
+    renderHubStats();
     renderGroupOptions();
     renderSchema();
     bindEvents();
