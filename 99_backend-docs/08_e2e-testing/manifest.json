@@ -66,6 +66,33 @@
         "docs/画面設計/仕様/11_plan_feature_restrictions.md",
         "docs/画面設計/仕様/00_screen_requirements.md"
       ]
+    },
+    {
+      "id": "E2E-005",
+      "title": "細粒度テストケース",
+      "category": "テストケース",
+      "sourceStatus": "既存E2Eケースから細粒度化",
+      "path": "05_fine-grained-cases.md",
+      "summary": "正常系ケースをフィールド単位・設問タイプ単位・操作単位に分解します。",
+      "tags": ["E2E", "正常系", "細粒度ケース", "回答", "アンケート作成"],
+      "hasUnconfirmed": true,
+      "relatedSources": [
+        "99_backend-docs/08_e2e-testing/index.html"
+      ]
+    },
+    {
+      "id": "E2E-SCENARIOS",
+      "title": "シナリオテスト管理",
+      "category": "シナリオ実行",
+      "sourceStatus": "stg実行管理ページ",
+      "path": "scenarios.html",
+      "summary": "stgのユーザー画面・管理者画面・横断フローを通し実行するシナリオと結果保存を管理します。",
+      "tags": ["E2E", "シナリオ", "stg", "Spreadsheet", "GAS"],
+      "hasUnconfirmed": true,
+      "relatedSources": [
+        "99_backend-docs/08_e2e-testing/index.html",
+        "docs/ハンドブック/テスト/admin_screen_e2e_observed_requirements.md"
+      ]
     }
   ],
   "flow": [
@@ -99,6 +126,13 @@
           "timing": "将来検討",
           "label": "自動化検討",
           "summary": "Playwright/Cypress化する場合の優先順位を確認します。"
+        },
+        {
+          "id": "E2E-F05",
+          "documentId": "E2E-SCENARIOS",
+          "timing": "stg実行",
+          "label": "シナリオ実行",
+          "summary": "stg通し実行シナリオを選び、実行回とステップ結果を記録します。"
         }
       ]
     }
