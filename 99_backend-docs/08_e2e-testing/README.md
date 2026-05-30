@@ -3,3 +3,7 @@
 SPEED AD の主要業務フローを、どの利用者導線で検証するかを整理する資料です。
 
 現状は静的モック開発フェーズのため、品質確認は手動テスト中心です。このカテゴリでは、将来のPlaywright/Cypress等による自動化を前提に、E2E化しやすい確認観点、前提データ、未確認事項を整理します。
+
+- `index.html`: 画面別の細目E2Eケース一覧。
+- `scenarios.html`: stg通し実行シナリオとSpreadsheet/GAS結果管理。
+- `gas/`: シナリオ実行管理用のApps Script Web Appコード。

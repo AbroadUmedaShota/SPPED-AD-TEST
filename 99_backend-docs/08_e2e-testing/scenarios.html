@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E2Eシナリオテスト管理 / SPEED AD</title>
+  <link rel="icon" href="../../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="../../02_dashboard/service-top-style.css">
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+  <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', 'Noto Sans JP', sans-serif;
+    }
+
+    .scenario-shell {
+      --md-sys-color-primary: #0f62fe;
+      --md-sys-color-on-primary: #ffffff;
+      --md-sys-color-surface: #ffffff;
+      --md-sys-color-surface-variant: #f4f7fb;
+      --md-sys-color-background: #f7f9fc;
+      --md-sys-color-on-surface: #172033;
+      --md-sys-color-on-surface-variant: #5d667a;
+      --md-sys-color-outline: #9aa6bd;
+      --md-sys-color-outline-variant: #d8deea;
+    }
+
+    .scenario-filter-bar {
+      position: sticky;
+      top: 45px;
+      z-index: 9;
+    }
+
+    .scenario-workspace {
+      display: grid;
+      grid-template-columns: minmax(280px, 420px) minmax(0, 1fr);
+      gap: 1rem;
+      align-items: start;
+    }
+
+    .scenario-detail {
+      position: sticky;
+      top: 155px;
+      max-height: calc(100vh - 175px);
+      overflow: auto;
+    }
+
+    .scenario-select-card[aria-pressed="true"] {
+      border-color: var(--md-sys-color-primary);
+      background: #eef5ff;
+      box-shadow: inset 3px 0 0 var(--md-sys-color-primary);
+    }
+
+    .anchor-nav {
+      scrollbar-width: thin;
+    }
+
+    .step-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 140px;
+      gap: 0.75rem;
+    }
+
+    @media (max-width: 1023px) {
+      .scenario-filter-bar {
+        position: static;
+      }
+
+      .scenario-workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .scenario-detail {
+        position: static;
+        max-height: none;
+      }
+    }
+
+    @media (max-width: 767px) {
+      .step-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background">
+  <div class="scenario-shell min-h-screen">
+    <header class="border-b border-outline-variant bg-surface">
+      <div class="flex w-full flex-wrap items-start justify-between gap-4 px-4 py-5 sm:px-6 lg:px-8">
+        <div class="max-w-5xl">
+          <p class="text-sm font-semibold text-primary">HOME / 08_e2e-testing / scenarios</p>
+          <h1 class="mt-1 text-headline-medium font-bold leading-tight text-on-surface">SPEED AD E2Eシナリオテスト管理</h1>
+          <p class="mt-2 text-sm leading-6 text-on-surface-variant">
+            stgで通し実行するシナリオを、ユーザー側、管理者側、横断フローに分けて管理します。Spreadsheet/GAS接続時は実行回とステップ結果を保存し、未接続時はページ内フォールバックデータで閲覧できます。
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <a class="inline-flex items-center gap-2 rounded-lg border border-outline px-3 py-2 text-sm text-on-surface hover:bg-surface-variant" href="../index.html">
+            <span class="material-icons text-base">home</span>
+            ドキュメントTOP
+          </a>
+          <a class="inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-on-primary hover:bg-blue-700" href="./index.html#test-cases">
+            <span class="material-icons text-base">checklist</span>
+            細目ケース一覧
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <nav class="anchor-nav sticky top-0 z-10 overflow-x-auto border-b border-outline-variant bg-surface/95 px-4 py-2 backdrop-blur sm:px-6 lg:px-8" aria-label="ページ内ナビゲーション">
+      <div class="flex min-w-max gap-2 text-sm">
+        <a class="rounded-full px-3 py-1.5 font-semibold text-on-surface hover:bg-surface-variant" href="#overview">概要</a>
+        <a class="rounded-full px-3 py-1.5 font-semibold text-on-surface hover:bg-surface-variant" href="#connection">DB接続</a>
+        <a class="rounded-full px-3 py-1.5 font-semibold text-on-surface hover:bg-surface-variant" href="#scenarios">シナリオ</a>
+        <a class="rounded-full px-3 py-1.5 font-semibold text-on-surface hover:bg-surface-variant" href="#schema">Spreadsheet仕様</a>
+      </div>
+    </nav>
+
+    <main class="w-full px-4 py-6 sm:px-6 lg:px-8">
+      <section id="overview" class="rounded-lg border border-outline-variant bg-surface p-5" aria-labelledby="overview-title">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p class="text-sm font-semibold text-primary">実行ハブ</p>
+            <h2 id="overview-title" class="mt-1 text-title-large font-bold text-on-surface">stgシナリオ概要</h2>
+          </div>
+          <span id="dataSourceBadge" class="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
+            <span class="h-2 w-2 rounded-full bg-primary"></span>
+            フォールバックデータ
+          </span>
+        </div>
+
+        <div class="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-6">
+          <div class="rounded-lg border border-outline-variant bg-background p-4">
+            <p class="text-sm text-on-surface-variant">シナリオ総数</p>
+            <p id="scenarioTotal" class="mt-2 text-3xl font-bold text-on-surface">0</p>
+          </div>
+          <div class="rounded-lg border border-outline-variant bg-background p-4">
+            <p class="text-sm text-on-surface-variant">P0</p>
+            <p id="p0Total" class="mt-2 text-3xl font-bold text-on-surface">0</p>
+          </div>
+          <div class="rounded-lg border border-outline-variant bg-background p-4">
+            <p class="text-sm text-on-surface-variant">P1/P2</p>
+            <p id="p1p2Total" class="mt-2 text-3xl font-bold text-on-surface">0</p>
+          </div>
+          <div class="rounded-lg border border-outline-variant bg-background p-4">
+            <p class="text-sm text-on-surface-variant">対象ロール</p>
+            <p id="roleTotal" class="mt-2 text-3xl font-bold text-on-surface">0</p>
+          </div>
+          <div class="rounded-lg border border-outline-variant bg-background p-4">
+            <p class="text-sm text-on-surface-variant">副作用あり</p>
+            <p id="sideEffectTotal" class="mt-2 text-3xl font-bold text-on-surface">0</p>
+          </div>
+          <div class="rounded-lg border border-outline-variant bg-background p-4">
+            <p class="text-sm text-on-surface-variant">表示中</p>
+            <p id="visibleTotal" class="mt-2 text-3xl font-bold text-on-surface">0</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="connection" class="mt-8 rounded-lg border border-outline-variant bg-surface p-5" aria-labelledby="connection-title">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p class="text-sm font-semibold text-primary">Spreadsheet/GAS</p>
+            <h2 id="connection-title" class="mt-1 text-title-large font-bold text-on-surface">実行回と結果保存</h2>
+          </div>
+          <p id="dbStatus" class="rounded-full border border-outline-variant px-3 py-1 text-sm font-semibold text-on-surface-variant">未接続</p>
+        </div>
+
+        <div class="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+          <div class="grid gap-3 md:grid-cols-2">
+            <label class="block text-sm text-on-surface-variant md:col-span-2">
+              <span class="font-semibold text-on-surface">GAS Web App URL</span>
+              <input id="gasUrlInput" type="url" class="form-input mt-1 w-full rounded-lg border-outline" placeholder="https://script.google.com/macros/s/.../exec">
+            </label>
+            <label class="block text-sm text-on-surface-variant">
+              <span class="font-semibold text-on-surface">テスター</span>
+              <input id="testerInput" type="text" class="form-input mt-1 w-full rounded-lg border-outline" placeholder="QA担当者名">
+            </label>
+            <label class="block text-sm text-on-surface-variant">
+              <span class="font-semibold text-on-surface">ブラウザ/幅</span>
+              <input id="environmentInput" type="text" class="form-input mt-1 w-full rounded-lg border-outline" placeholder="Chrome / 1280px">
+            </label>
+          </div>
+          <div class="rounded-lg border border-outline-variant bg-background p-4">
+            <p class="text-sm font-bold text-on-surface">現在の実行回</p>
+            <p id="activeRunId" class="mt-2 break-all font-mono text-sm text-primary">未作成</p>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <button id="loadDbButton" type="button" class="inline-flex items-center gap-2 rounded-lg border border-outline px-3 py-2 text-sm font-semibold text-on-surface hover:bg-surface-variant">
+                <span class="material-icons text-base">sync</span>
+                DB取得
+              </button>
+              <button id="createRunButton" type="button" class="inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-on-primary hover:bg-blue-700">
+                <span class="material-icons text-base">play_circle</span>
+                実行回作成
+              </button>
+            </div>
+          </div>
+        </div>
+        <p id="connectionMessage" class="mt-3 min-h-6 text-sm leading-6 text-on-surface-variant"></p>
+      </section>
+
+      <section id="scenarios" class="mt-8 rounded-lg border border-outline-variant bg-surface p-5" aria-labelledby="scenarios-title">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p class="text-sm font-semibold text-primary">シナリオ</p>
+            <h2 id="scenarios-title" class="mt-1 text-title-large font-bold text-on-surface">通し実行キュー</h2>
+            <p id="activeFilterSummary" class="mt-2 text-sm leading-6 text-on-surface-variant">条件なし</p>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button id="copyTsvButton" type="button" class="inline-flex items-center gap-2 rounded-lg border border-outline px-3 py-2 text-sm font-semibold text-on-surface hover:bg-surface-variant">
+              <span class="material-icons text-base">content_copy</span>
+              TSVコピー
+            </button>
+            <button id="copyCsvButton" type="button" class="inline-flex items-center gap-2 rounded-lg border border-outline px-3 py-2 text-sm font-semibold text-on-surface hover:bg-surface-variant">
+              <span class="material-icons text-base">download</span>
+              CSVコピー
+            </button>
+          </div>
+        </div>
+
+        <div class="scenario-filter-bar mt-5 rounded-lg border border-outline-variant bg-surface p-4">
+          <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-6">
+            <label class="block text-sm text-on-surface-variant md:col-span-2">
+              <span class="font-semibold text-on-surface">検索</span>
+              <span class="relative mt-1 block">
+                <span class="material-icons pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-base text-on-surface-variant">search</span>
+                <input id="scenarioSearch" type="search" class="form-input w-full rounded-lg border-outline pl-10" placeholder="ID、タイトル、目的、手順で検索">
+              </span>
+            </label>
+            <label class="block text-sm text-on-surface-variant">
+              <span class="font-semibold text-on-surface">ロール</span>
+              <select id="roleFilter" class="form-select mt-1 w-full rounded-lg border-outline">
+                <option value="">すべて</option>
+              </select>
+            </label>
+            <label class="block text-sm text-on-surface-variant">
+              <span class="font-semibold text-on-surface">グループ</span>
+              <select id="groupFilter" class="form-select mt-1 w-full rounded-lg border-outline">
+                <option value="">すべて</option>
+              </select>
+            </label>
+            <label class="block text-sm text-on-surface-variant">
+              <span class="font-semibold text-on-surface">優先度</span>
+              <select id="priorityFilter" class="form-select mt-1 w-full rounded-lg border-outline">
+                <option value="">すべて</option>
+                <option value="P0">P0</option>
+                <option value="P1">P1</option>
+                <option value="P2">P2</option>
+              </select>
+            </label>
+            <label class="block text-sm text-on-surface-variant">
+              <span class="font-semibold text-on-surface">副作用</span>
+              <select id="sideEffectFilter" class="form-select mt-1 w-full rounded-lg border-outline">
+                <option value="">すべて</option>
+                <option value="none">なし</option>
+                <option value="low">低</option>
+                <option value="medium">中以上</option>
+              </select>
+            </label>
+          </div>
+          <div class="mt-3 flex flex-wrap items-center gap-2">
+            <button id="resetFiltersButton" type="button" class="inline-flex items-center gap-2 rounded-lg border border-outline px-3 py-2 text-sm font-semibold text-on-surface hover:bg-surface-variant">
+              <span class="material-icons text-base">restart_alt</span>
+              絞り込みを解除
+            </button>
+            <span id="copyStatus" class="text-sm text-on-surface-variant"></span>
+          </div>
+        </div>
+
+        <div id="copyFallback" class="mt-4 hidden rounded-lg border border-outline-variant bg-background p-4">
+          <label class="block text-sm font-semibold text-on-surface" for="copyFallbackText">コピー用テキスト</label>
+          <textarea id="copyFallbackText" class="form-textarea mt-2 min-h-32 w-full rounded-lg border-outline font-mono text-xs" readonly></textarea>
+        </div>
+
+        <div class="scenario-workspace mt-4">
+          <div class="rounded-lg border border-outline-variant bg-background p-4">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p class="text-sm font-bold text-on-surface">実行キュー</p>
+                <p id="queueSummary" class="mt-1 text-sm text-on-surface-variant">0件</p>
+              </div>
+            </div>
+            <div id="scenarioQueueList" class="mt-4 grid max-h-[760px] gap-2 overflow-auto pr-1"></div>
+          </div>
+
+          <article id="scenarioDetailPanel" class="scenario-detail rounded-lg border border-outline-variant bg-background p-5" tabindex="-1" aria-live="polite"></article>
+        </div>
+      </section>
+
+      <section id="schema" class="mt-8 rounded-lg border border-outline-variant bg-surface p-5" aria-labelledby="schema-title">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p class="text-sm font-semibold text-primary">Spreadsheet仕様</p>
+            <h2 id="schema-title" class="mt-1 text-title-large font-bold text-on-surface">追加タブとAPI契約</h2>
+          </div>
+          <a class="inline-flex items-center gap-2 rounded-lg border border-outline px-3 py-2 text-sm font-semibold text-on-surface hover:bg-surface-variant" href="./gas/Code.gs" target="_blank" rel="noopener">
+            <span class="material-icons text-base">code</span>
+            GASコード
+          </a>
+        </div>
+        <div class="mt-4 overflow-x-auto rounded-lg border border-outline-variant">
+          <table class="min-w-full divide-y divide-outline-variant text-left text-sm">
+            <thead class="bg-background text-on-surface">
+              <tr>
+                <th class="px-3 py-3 font-bold">タブ</th>
+                <th class="px-3 py-3 font-bold">用途</th>
+                <th class="px-3 py-3 font-bold">列</th>
+              </tr>
+            </thead>
+            <tbody id="schemaTableBody" class="divide-y divide-outline-variant bg-surface"></tbody>
+          </table>
+        </div>
+        <div class="mt-4 grid gap-3 md:grid-cols-2">
+          <div class="rounded-lg border border-outline-variant bg-background p-4">
+            <p class="text-sm font-bold text-on-surface">GET</p>
+            <p class="mt-2 font-mono text-xs text-on-surface">?resource=scenarios|scenario_steps|scenario_runs|scenario_step_results</p>
+          </div>
+          <div class="rounded-lg border border-outline-variant bg-background p-4">
+            <p class="text-sm font-bold text-on-surface">POST</p>
+            <p class="mt-2 font-mono text-xs text-on-surface">{ action: "createScenarioRun" | "upsertScenarioStepResult", payload: {...} }</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="./scenario-data.js"></script>
+  <script>
+    const STATUS_OPTIONS = ['未実行', 'OK', 'NG', '保留', '要許可', '対象外'];
+    const DEFAULT_GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyqxKWAQFpOR6afaVIYflnddewWrGY-UvqxXQBIELsNfT45gXZMTB4THBCnm8Ki0U-6mA/exec';
+    const SIDE_EFFECT_LABELS = {
+      none: 'なし',
+      low: '低',
+      medium: '中'
+    };
+    const STORAGE_KEYS = {
+      gasUrl: 'speedad-e2e-scenario:gas-url',
+      tester: 'speedad-e2e-scenario:tester',
+      environment: 'speedad-e2e-scenario:environment',
+      activeRunId: 'speedad-e2e-scenario:active-run-id',
+      results: 'speedad-e2e-scenario:results'
+    };
+
+    const state = {
+      scenarios: Array.isArray(window.E2E_SCENARIOS) ? [...window.E2E_SCENARIOS] : [],
+      steps: Array.isArray(window.E2E_SCENARIO_STEPS) ? [...window.E2E_SCENARIO_STEPS] : [],
+      schemas: Array.isArray(window.E2E_SCENARIO_SHEET_SCHEMAS) ? [...window.E2E_SCENARIO_SHEET_SCHEMAS] : [],
+      selectedScenarioId: '',
+      dataSource: 'fallback',
+      activeRunId: localStorage.getItem(STORAGE_KEYS.activeRunId) || '',
+      results: readStoredResults()
+    };
+
+    const elements = {
+      dataSourceBadge: document.getElementById('dataSourceBadge'),
+      dbStatus: document.getElementById('dbStatus'),
+      connectionMessage: document.getElementById('connectionMessage'),
+      gasUrl: document.getElementById('gasUrlInput'),
+      tester: document.getElementById('testerInput'),
+      environment: document.getElementById('environmentInput'),
+      activeRunId: document.getElementById('activeRunId'),
+      loadDb: document.getElementById('loadDbButton'),
+      createRun: document.getElementById('createRunButton'),
+      scenarioTotal: document.getElementById('scenarioTotal'),
+      p0Total: document.getElementById('p0Total'),
+      p1p2Total: document.getElementById('p1p2Total'),
+      roleTotal: document.getElementById('roleTotal'),
+      sideEffectTotal: document.getElementById('sideEffectTotal'),
+      visibleTotal: document.getElementById('visibleTotal'),
+      search: document.getElementById('scenarioSearch'),
+      role: document.getElementById('roleFilter'),
+      group: document.getElementById('groupFilter'),
+      priority: document.getElementById('priorityFilter'),
+      sideEffect: document.getElementById('sideEffectFilter'),
+      activeFilterSummary: document.getElementById('activeFilterSummary'),
+      resetFilters: document.getElementById('resetFiltersButton'),
+      copyTsv: document.getElementById('copyTsvButton'),
+      copyCsv: document.getElementById('copyCsvButton'),
+      copyStatus: document.getElementById('copyStatus'),
+      copyFallback: document.getElementById('copyFallback'),
+      copyFallbackText: document.getElementById('copyFallbackText'),
+      queueSummary: document.getElementById('queueSummary'),
+      queueList: document.getElementById('scenarioQueueList'),
+      detailPanel: document.getElementById('scenarioDetailPanel'),
+      schemaTableBody: document.getElementById('schemaTableBody')
+    };
+
+    elements.gasUrl.value = localStorage.getItem(STORAGE_KEYS.gasUrl) || DEFAULT_GAS_WEB_APP_URL;
+    elements.tester.value = localStorage.getItem(STORAGE_KEYS.tester) || '';
+    elements.environment.value = localStorage.getItem(STORAGE_KEYS.environment) || `${detectBrowser()} / ${window.innerWidth}px`;
+
+    function readStoredResults() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEYS.results) || '{}');
+      } catch (error) {
+        return {};
+      }
+    }
+
+    function persistResults() {
+      localStorage.setItem(STORAGE_KEYS.results, JSON.stringify(state.results));
+    }
+
+    function normalize(value) {
+      return String(value || '').toLowerCase().replace(/\s+/g, ' ');
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function shortText(value, maxLength = 120) {
+      const text = String(value || '');
+      return text.length > maxLength ? `${text.slice(0, maxLength - 1)}…` : text;
+    }
+
+    function detectBrowser() {
+      const agent = navigator.userAgent;
+      if (agent.includes('Edg/')) return 'Edge';
+      if (agent.includes('Firefox/')) return 'Firefox';
+      if (agent.includes('Chrome/')) return 'Chrome';
+      if (agent.includes('Safari/')) return 'Safari';
+      return 'Browser';
+    }
+
+    function getScenarioSteps(scenarioId) {
+      return state.steps
+        .filter(step => step.scenario_id === scenarioId)
+        .sort((a, b) => Number(a.step_no) - Number(b.step_no));
+    }
+
+    function getResultKey(step) {
+      return `${state.activeRunId || 'local'}:${step.scenario_id}:${step.step_id}`;
+    }
+
+    function getStepResult(step) {
+      const key = getResultKey(step);
+      if (!state.results[key]) {
+        state.results[key] = {
+          run_id: state.activeRunId || '',
+          scenario_id: step.scenario_id,
+          step_id: step.step_id,
+          status: '未実行',
+          actual: '',
+          evidence_url: '',
+          checked_at: '',
+          checked_by: '',
+          defect_link: '',
+          note: ''
+        };
+      }
+      return state.results[key];
+    }
+
+    function renderStats() {
+      const p0 = state.scenarios.filter(scenario => scenario.priority === 'P0').length;
+      const p1p2 = state.scenarios.filter(scenario => scenario.priority !== 'P0').length;
+      elements.scenarioTotal.textContent = state.scenarios.length;
+      elements.p0Total.textContent = p0;
+      elements.p1p2Total.textContent = p1p2;
+      elements.roleTotal.textContent = new Set(state.scenarios.map(scenario => scenario.role_scope)).size;
+      elements.sideEffectTotal.textContent = state.scenarios.filter(scenario => scenario.side_effect !== 'none').length;
+      elements.dataSourceBadge.innerHTML = `
+        <span class="h-2 w-2 rounded-full bg-primary"></span>
+        ${state.dataSource === 'spreadsheet' ? 'Spreadsheetデータ' : 'フォールバックデータ'}
+      `;
+    }
+
+    function renderOptions(selectElement, values) {
+      const current = selectElement.value;
+      const firstOption = selectElement.querySelector('option[value=""]')?.outerHTML || '<option value="">すべて</option>';
+      selectElement.innerHTML = firstOption + values.map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join('');
+      if (values.includes(current)) {
+        selectElement.value = current;
+      }
+    }
+
+    function renderFilterOptions() {
+      renderOptions(elements.role, [...new Set(state.scenarios.map(scenario => scenario.role_scope))]);
+      renderOptions(elements.group, [...new Set(state.scenarios.map(scenario => scenario.scenario_group))]);
+    }
+
+    function getFilteredScenarios() {
+      const keyword = normalize(elements.search.value.trim());
+      const role = elements.role.value;
+      const group = elements.group.value;
+      const priority = elements.priority.value;
+      const sideEffect = elements.sideEffect.value;
+
+      return state.scenarios.filter(scenario => {
+        if (role && scenario.role_scope !== role) return false;
+        if (group && scenario.scenario_group !== group) return false;
+        if (priority && scenario.priority !== priority) return false;
+        if (sideEffect && scenario.side_effect !== sideEffect) return false;
+        if (!keyword) return true;
+
+        const steps = getScenarioSteps(scenario.scenario_id);
+        const haystack = normalize([
+          scenario.scenario_id,
+          scenario.title,
+          scenario.role_scope,
+          scenario.scenario_group,
+          scenario.start_url,
+          scenario.objective,
+          scenario.expected_outcome,
+          scenario.evidence_policy,
+          scenario.notes,
+          scenario.linked_case_ids.join(' '),
+          steps.map(step => `${step.action} ${step.expected}`).join(' ')
+        ].join(' '));
+        return haystack.includes(keyword);
+      });
+    }
+
+    function getActiveFilterSummary() {
+      const parts = [];
+      if (elements.search.value.trim()) parts.push(`検索: ${elements.search.value.trim()}`);
+      if (elements.role.value) parts.push(`ロール: ${elements.role.value}`);
+      if (elements.group.value) parts.push(`グループ: ${elements.group.value}`);
+      if (elements.priority.value) parts.push(`優先度: ${elements.priority.value}`);
+      if (elements.sideEffect.value) parts.push(`副作用: ${SIDE_EFFECT_LABELS[elements.sideEffect.value] || elements.sideEffect.value}`);
+      return parts.length ? parts.join(' / ') : '条件なし';
+    }
+
+    function renderEmptyScenarios() {
+      elements.queueSummary.textContent = '0件 / 条件を変更してください。';
+      elements.queueList.innerHTML = `
+        <div class="rounded-lg border border-outline-variant bg-surface p-4 text-sm leading-6 text-on-surface-variant">
+          条件に一致するシナリオがありません。
+        </div>
+      `;
+      elements.detailPanel.innerHTML = `
+        <div class="rounded-lg border border-dashed border-outline p-6 text-sm leading-6 text-on-surface-variant">
+          条件に一致するシナリオがありません。
+        </div>
+      `;
+    }
+
+    function renderScenarioQueue(visibleScenarios, selectedScenario) {
+      elements.queueSummary.textContent = `${visibleScenarios.length}件 / 選択中: ${selectedScenario.scenario_id}`;
+      elements.queueList.innerHTML = visibleScenarios.map(scenario => {
+        const isSelected = scenario.scenario_id === selectedScenario.scenario_id;
+        const steps = getScenarioSteps(scenario.scenario_id);
+        const sideEffectLabel = SIDE_EFFECT_LABELS[scenario.side_effect] || scenario.side_effect;
+        return `
+          <button type="button" class="scenario-select-card w-full rounded-lg border border-outline-variant bg-surface p-3 text-left hover:border-primary hover:bg-surface-variant" data-scenario-id="${escapeHtml(scenario.scenario_id)}" aria-pressed="${isSelected}">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="font-mono text-xs font-bold text-primary">${escapeHtml(scenario.scenario_id)}</span>
+              <span class="rounded-full bg-background px-2 py-0.5 text-xs font-semibold text-on-surface">${escapeHtml(scenario.priority)}</span>
+              <span class="rounded-full bg-background px-2 py-0.5 text-xs font-semibold text-on-surface">副作用 ${escapeHtml(sideEffectLabel)}</span>
+            </div>
+            <p class="mt-2 text-sm font-bold leading-5 text-on-surface">${escapeHtml(scenario.title)}</p>
+            <p class="mt-1 text-xs leading-5 text-on-surface-variant">${escapeHtml(scenario.role_scope)} / ${escapeHtml(scenario.scenario_group)} / ${steps.length} steps</p>
+            <p class="mt-2 text-xs leading-5 text-on-surface-variant">${escapeHtml(shortText(scenario.expected_outcome, 96))}</p>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function renderLinkedCases(caseIds) {
+      if (!caseIds || !caseIds.length) {
+        return '<span class="text-sm text-on-surface-variant">なし</span>';
+      }
+      return caseIds.map(caseId => `
+        <span class="rounded-full border border-outline-variant bg-surface px-2 py-0.5 font-mono text-xs font-semibold text-primary">${escapeHtml(caseId)}</span>
+      `).join('');
+    }
+
+    function renderStatusOptions(selectedStatus) {
+      return STATUS_OPTIONS.map(status => `
+        <option value="${escapeHtml(status)}"${status === selectedStatus ? ' selected' : ''}>${escapeHtml(status)}</option>
+      `).join('');
+    }
+
+    function renderStepCard(step) {
+      const result = getStepResult(step);
+      const requiresPermission = step.requires_permission === true || step.requires_permission === 'true';
+      return `
+        <section class="rounded-lg border border-outline-variant bg-surface p-4" data-step-card="${escapeHtml(step.step_id)}">
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p class="font-mono text-xs font-bold text-primary">${escapeHtml(step.step_id)}</p>
+              <h4 class="mt-1 text-sm font-bold text-on-surface">Step ${escapeHtml(step.step_no)}</h4>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <span class="rounded-full bg-background px-2 py-0.5 text-xs font-semibold text-on-surface">副作用 ${escapeHtml(SIDE_EFFECT_LABELS[step.side_effect] || step.side_effect)}</span>
+              ${requiresPermission ? '<span class="rounded-full bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-700">要許可</span>' : ''}
+            </div>
+          </div>
+          <div class="mt-3 grid gap-3 md:grid-cols-2">
+            <div>
+              <p class="text-xs font-bold text-on-surface-variant">操作</p>
+              <p class="mt-1 text-sm leading-6 text-on-surface">${escapeHtml(step.action)}</p>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-on-surface-variant">期待結果</p>
+              <p class="mt-1 text-sm leading-6 text-on-surface">${escapeHtml(step.expected)}</p>
+            </div>
+          </div>
+          <div class="mt-3 flex flex-wrap gap-2">${renderLinkedCases(step.linked_case_ids)}</div>
+          <div class="mt-4 grid gap-3">
+            <div class="step-grid">
+              <label class="block text-sm text-on-surface-variant">
+                <span class="font-semibold text-on-surface">実績メモ</span>
+                <textarea class="form-textarea mt-1 min-h-20 w-full rounded-lg border-outline" data-step-field="actual" data-step-id="${escapeHtml(step.step_id)}">${escapeHtml(result.actual)}</textarea>
+              </label>
+              <label class="block text-sm text-on-surface-variant">
+                <span class="font-semibold text-on-surface">結果</span>
+                <select class="form-select mt-1 w-full rounded-lg border-outline" data-step-field="status" data-step-id="${escapeHtml(step.step_id)}">
+                  ${renderStatusOptions(result.status)}
+                </select>
+              </label>
+            </div>
+            <div class="grid gap-3 md:grid-cols-2">
+              <label class="block text-sm text-on-surface-variant">
+                <span class="font-semibold text-on-surface">証跡URL</span>
+                <input type="url" class="form-input mt-1 w-full rounded-lg border-outline" value="${escapeHtml(result.evidence_url)}" data-step-field="evidence_url" data-step-id="${escapeHtml(step.step_id)}">
+              </label>
+              <label class="block text-sm text-on-surface-variant">
+                <span class="font-semibold text-on-surface">不具合リンク</span>
+                <input type="url" class="form-input mt-1 w-full rounded-lg border-outline" value="${escapeHtml(result.defect_link)}" data-step-field="defect_link" data-step-id="${escapeHtml(step.step_id)}">
+              </label>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderSelectedScenario(scenario) {
+      const steps = getScenarioSteps(scenario.scenario_id);
+      elements.detailPanel.innerHTML = `
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p class="font-mono text-sm font-bold text-primary">${escapeHtml(scenario.scenario_id)}</p>
+            <h3 class="mt-1 text-title-large font-bold text-on-surface">${escapeHtml(scenario.title)}</h3>
+            <p class="mt-2 text-sm leading-6 text-on-surface-variant">${escapeHtml(scenario.objective)}</p>
+          </div>
+          <button id="saveScenarioButton" type="button" class="inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-on-primary hover:bg-blue-700">
+            <span class="material-icons text-base">save</span>
+            結果保存
+          </button>
+        </div>
+
+        <div class="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          <div class="rounded-lg border border-outline-variant bg-surface p-3">
+            <p class="text-xs font-bold text-on-surface-variant">ロール</p>
+            <p class="mt-1 text-sm font-semibold text-on-surface">${escapeHtml(scenario.role_scope)}</p>
+          </div>
+          <div class="rounded-lg border border-outline-variant bg-surface p-3">
+            <p class="text-xs font-bold text-on-surface-variant">優先度/副作用</p>
+            <p class="mt-1 text-sm font-semibold text-on-surface">${escapeHtml(scenario.priority)} / ${escapeHtml(SIDE_EFFECT_LABELS[scenario.side_effect] || scenario.side_effect)}</p>
+          </div>
+          <div class="rounded-lg border border-outline-variant bg-surface p-3">
+            <p class="text-xs font-bold text-on-surface-variant">stg観測</p>
+            <p class="mt-1 text-sm font-semibold text-on-surface">${escapeHtml(scenario.stg_observation_status)}</p>
+          </div>
+          <div class="rounded-lg border border-outline-variant bg-surface p-3">
+            <p class="text-xs font-bold text-on-surface-variant">手順数</p>
+            <p class="mt-1 text-sm font-semibold text-on-surface">${steps.length}</p>
+          </div>
+        </div>
+
+        <div class="mt-4 rounded-lg border border-outline-variant bg-surface p-4">
+          <p class="text-xs font-bold text-on-surface-variant">開始URL</p>
+          <p class="mt-1 break-all font-mono text-sm text-on-surface">${escapeHtml(scenario.start_url)}</p>
+        </div>
+
+        <div class="mt-4 grid gap-4 md:grid-cols-2">
+          <div class="rounded-lg border border-outline-variant bg-surface p-4">
+            <p class="text-sm font-bold text-on-surface">期待結果</p>
+            <p class="mt-2 text-sm leading-6 text-on-surface-variant">${escapeHtml(scenario.expected_outcome)}</p>
+          </div>
+          <div class="rounded-lg border border-outline-variant bg-surface p-4">
+            <p class="text-sm font-bold text-on-surface">証跡方針</p>
+            <p class="mt-2 text-sm leading-6 text-on-surface-variant">${escapeHtml(scenario.evidence_policy)}</p>
+          </div>
+        </div>
+
+        <div class="mt-4 rounded-lg border border-outline-variant bg-surface p-4">
+          <p class="text-sm font-bold text-on-surface">関連ケースID</p>
+          <div class="mt-2 flex flex-wrap gap-2">${renderLinkedCases(scenario.linked_case_ids)}</div>
+        </div>
+
+        <div class="mt-5 grid gap-3">
+          ${steps.map(renderStepCard).join('')}
+        </div>
+
+        <div class="mt-4 rounded-lg border border-outline-variant bg-surface p-4">
+          <p class="text-sm font-bold text-on-surface">備考</p>
+          <p class="mt-2 text-sm leading-6 text-on-surface-variant">${escapeHtml(scenario.notes || 'なし')}</p>
+        </div>
+      `;
+    }
+
+    function renderScenarios() {
+      const visibleScenarios = getFilteredScenarios();
+      elements.visibleTotal.textContent = visibleScenarios.length;
+      elements.activeFilterSummary.textContent = getActiveFilterSummary();
+
+      if (!visibleScenarios.length) {
+        state.selectedScenarioId = '';
+        renderEmptyScenarios();
+        return;
+      }
+
+      if (!state.selectedScenarioId || !visibleScenarios.some(scenario => scenario.scenario_id === state.selectedScenarioId)) {
+        state.selectedScenarioId = visibleScenarios[0].scenario_id;
+      }
+
+      const selectedScenario = visibleScenarios.find(scenario => scenario.scenario_id === state.selectedScenarioId);
+      renderScenarioQueue(visibleScenarios, selectedScenario);
+      renderSelectedScenario(selectedScenario);
+    }
+
+    function renderSchema() {
+      elements.schemaTableBody.innerHTML = state.schemas.map(schema => `
+        <tr>
+          <td class="whitespace-nowrap px-3 py-3 font-mono text-xs font-bold text-on-surface">${escapeHtml(schema.tab)}</td>
+          <td class="px-3 py-3 text-on-surface">${escapeHtml(schema.purpose)}</td>
+          <td class="px-3 py-3 font-mono text-xs text-on-surface-variant">${escapeHtml(schema.columns.join(', '))}</td>
+        </tr>
+      `).join('');
+    }
+
+    function renderRun() {
+      elements.activeRunId.textContent = state.activeRunId || '未作成';
+    }
+
+    function setConnectionMessage(message, isError = false) {
+      elements.connectionMessage.textContent = message;
+      elements.connectionMessage.className = `mt-3 min-h-6 text-sm leading-6 ${isError ? 'text-red-700' : 'text-on-surface-variant'}`;
+      elements.dbStatus.textContent = state.dataSource === 'spreadsheet' ? 'DB接続済み' : '未接続';
+    }
+
+    function resetFilters() {
+      elements.search.value = '';
+      elements.role.value = '';
+      elements.group.value = '';
+      elements.priority.value = '';
+      elements.sideEffect.value = '';
+      hideCopyFallback();
+      renderScenarios();
+    }
+
+    function toScenarioRows(scenarios) {
+      const headers = ['scenario_id', 'title', 'role_scope', 'scenario_group', 'priority', 'side_effect', 'start_url', 'objective', 'linked_case_ids', 'stg_observation_status', 'expected_outcome', 'evidence_policy', 'notes'];
+      const rows = scenarios.map(scenario => headers.map(header => {
+        const value = scenario[header];
+        return Array.isArray(value) ? value.join(',') : value;
+      }));
+      return [headers, ...rows];
+    }
+
+    function toTsv(scenarios) {
+      return toScenarioRows(scenarios)
+        .map(row => row.map(cell => String(cell ?? '').replace(/\t/g, ' ').replace(/\r?\n/g, ' ')).join('\t'))
+        .join('\n');
+    }
+
+    function toCsv(scenarios) {
+      return toScenarioRows(scenarios)
+        .map(row => row.map(cell => `"${String(cell ?? '').replace(/"/g, '""').replace(/\r?\n/g, ' ')}"`).join(','))
+        .join('\n');
+    }
+
+    function fallbackCopyText(text) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'fixed';
+      textarea.style.top = '-9999px';
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      let copied = false;
+      try {
+        copied = document.execCommand('copy');
+      } catch (error) {
+        copied = false;
+      }
+      textarea.remove();
+      if (!copied) {
+        elements.copyFallbackText.value = text;
+        elements.copyFallback.classList.remove('hidden');
+      }
+      return copied;
+    }
+
+    function hideCopyFallback() {
+      elements.copyFallback.classList.add('hidden');
+      elements.copyFallbackText.value = '';
+    }
+
+    async function copyText(text, label) {
+      try {
+        let copied = false;
+        if (navigator.clipboard && window.isSecureContext) {
+          try {
+            await navigator.clipboard.writeText(text);
+            copied = true;
+          } catch (error) {
+            copied = fallbackCopyText(text);
+          }
+        } else {
+          copied = fallbackCopyText(text);
+        }
+        elements.copyStatus.textContent = copied ? `${label}をコピーしました。` : `${label}を下のテキスト欄に出力しました。`;
+      } catch (error) {
+        elements.copyStatus.textContent = `${label}のコピーに失敗しました。`;
+      }
+    }
+
+    function buildUrl(baseUrl, params) {
+      const url = new URL(baseUrl);
+      Object.entries(params).forEach(([key, value]) => url.searchParams.set(key, value));
+      return url.toString();
+    }
+
+    function loadJsonp(baseUrl, params) {
+      return new Promise((resolve, reject) => {
+        const callbackName = `__speedad_e2e_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+        const script = document.createElement('script');
+        const timer = window.setTimeout(() => {
+          cleanup();
+          reject(new Error('GAS取得がタイムアウトしました。'));
+        }, 15000);
+
+        function cleanup() {
+          window.clearTimeout(timer);
+          delete window[callbackName];
+          script.remove();
+        }
+
+        window[callbackName] = payload => {
+          cleanup();
+          resolve(payload);
+        };
+
+        script.onerror = () => {
+          cleanup();
+          reject(new Error('GAS取得に失敗しました。'));
+        };
+        script.src = buildUrl(baseUrl, { ...params, callback: callbackName });
+        document.body.appendChild(script);
+      });
+    }
+
+    function normalizeListResponse(response) {
+      if (!response || response.ok === false) {
+        throw new Error(response?.error || 'GAS応答が不正です。');
+      }
+      return Array.isArray(response.data) ? response.data : [];
+    }
+
+    function splitCsvLike(value) {
+      if (Array.isArray(value)) return value;
+      return String(value || '').split(',').map(item => item.trim()).filter(Boolean);
+    }
+
+    function normalizeScenario(row) {
+      return {
+        scenario_id: row.scenario_id,
+        title: row.title,
+        role_scope: row.role_scope,
+        scenario_group: row.scenario_group,
+        priority: row.priority,
+        side_effect: row.side_effect,
+        start_url: row.start_url,
+        objective: row.objective,
+        linked_case_ids: splitCsvLike(row.linked_case_ids),
+        stg_observation_status: row.stg_observation_status,
+        expected_outcome: row.expected_outcome,
+        evidence_policy: row.evidence_policy,
+        notes: row.notes || ''
+      };
+    }
+
+    function normalizeStep(row) {
+      return {
+        scenario_id: row.scenario_id,
+        step_id: row.step_id,
+        step_no: Number(row.step_no),
+        action: row.action,
+        expected: row.expected,
+        side_effect: row.side_effect,
+        requires_permission: row.requires_permission === true || row.requires_permission === 'TRUE' || row.requires_permission === 'true',
+        linked_case_ids: splitCsvLike(row.linked_case_ids)
+      };
+    }
+
+    async function loadFromDb() {
+      const gasUrl = elements.gasUrl.value.trim();
+      if (!gasUrl) {
+        setConnectionMessage('GAS Web App URLを入力してください。', true);
+        return;
+      }
+      localStorage.setItem(STORAGE_KEYS.gasUrl, gasUrl);
+      setConnectionMessage('DBから取得中です。');
+      try {
+        const [scenarioResponse, stepResponse] = await Promise.all([
+          loadJsonp(gasUrl, { resource: 'scenarios' }),
+          loadJsonp(gasUrl, { resource: 'scenario_steps' })
+        ]);
+        const nextScenarios = normalizeListResponse(scenarioResponse).map(normalizeScenario).filter(item => item.scenario_id);
+        const nextSteps = normalizeListResponse(stepResponse).map(normalizeStep).filter(item => item.scenario_id && item.step_id);
+
+        if (!nextScenarios.length || !nextSteps.length) {
+          throw new Error('Spreadsheetにシナリオまたは手順データがありません。');
+        }
+
+        state.scenarios = nextScenarios;
+        state.steps = nextSteps;
+        state.dataSource = 'spreadsheet';
+        renderStats();
+        renderFilterOptions();
+        renderScenarios();
+        setConnectionMessage(`Spreadsheetから${nextScenarios.length}件のシナリオを取得しました。`);
+      } catch (error) {
+        state.dataSource = 'fallback';
+        renderStats();
+        setConnectionMessage(`${error.message} フォールバックデータを表示しています。`, true);
+      }
+    }
+
+    function postToGas(action, payload) {
+      const gasUrl = elements.gasUrl.value.trim();
+      if (!gasUrl) {
+        setConnectionMessage('GAS Web App URLが未設定のためローカル保存のみです。', true);
+        return Promise.resolve(false);
+      }
+      localStorage.setItem(STORAGE_KEYS.gasUrl, gasUrl);
+      return fetch(gasUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action, payload })
+      }).then(() => true);
+    }
+
+    function createRunId() {
+      const now = new Date();
+      const stamp = now.toISOString().replace(/[-:T.Z]/g, '').slice(0, 14);
+      const suffix = Math.random().toString(36).slice(2, 7).toUpperCase();
+      return `SRUN-${stamp}-${suffix}`;
+    }
+
+    async function createScenarioRun() {
+      state.activeRunId = createRunId();
+      localStorage.setItem(STORAGE_KEYS.activeRunId, state.activeRunId);
+      localStorage.setItem(STORAGE_KEYS.tester, elements.tester.value.trim());
+      localStorage.setItem(STORAGE_KEYS.environment, elements.environment.value.trim());
+      renderRun();
+      const payload = {
+        run_id: state.activeRunId,
+        environment: 'stg',
+        base_url: 'https://stg.speed-ad.com/',
+        tester: elements.tester.value.trim(),
+        browser: detectBrowser(),
+        viewport: elements.environment.value.trim() || `${window.innerWidth}px`,
+        started_at: new Date().toISOString(),
+        ended_at: '',
+        note: 'scenarios.htmlから作成'
+      };
+      const sent = await postToGas('createScenarioRun', payload);
+      setConnectionMessage(sent ? `実行回 ${state.activeRunId} を送信しました。` : `実行回 ${state.activeRunId} をローカルに作成しました。`);
+      renderScenarios();
+    }
+
+    function updateResultFromInput(input) {
+      const stepId = input.dataset.stepId;
+      const field = input.dataset.stepField;
+      const step = state.steps.find(item => item.step_id === stepId);
+      if (!step || !field) return;
+      const result = getStepResult(step);
+      result[field] = input.value;
+      result.run_id = state.activeRunId || '';
+      result.checked_by = elements.tester.value.trim();
+      result.checked_at = new Date().toISOString();
+      persistResults();
+    }
+
+    async function saveSelectedScenario() {
+      const scenario = state.scenarios.find(item => item.scenario_id === state.selectedScenarioId);
+      if (!scenario) return;
+      if (!state.activeRunId) {
+        await createScenarioRun();
+      }
+      const steps = getScenarioSteps(scenario.scenario_id);
+      const results = steps.map(step => {
+        const result = getStepResult(step);
+        return {
+          ...result,
+          run_id: state.activeRunId,
+          scenario_id: step.scenario_id,
+          step_id: step.step_id,
+          checked_by: elements.tester.value.trim(),
+          checked_at: result.checked_at || new Date().toISOString()
+        };
+      });
+      persistResults();
+      const sent = await postToGas('upsertScenarioStepResult', { results });
+      setConnectionMessage(sent ? `${scenario.scenario_id} の結果を送信しました。再取得して反映を確認してください。` : `${scenario.scenario_id} の結果をローカル保存しました。`);
+    }
+
+    function bindEvents() {
+      [elements.search, elements.role, elements.group, elements.priority, elements.sideEffect].forEach(element => {
+        element.addEventListener('input', renderScenarios);
+        element.addEventListener('change', renderScenarios);
+      });
+      elements.resetFilters.addEventListener('click', resetFilters);
+      elements.copyTsv.addEventListener('click', () => copyText(toTsv(getFilteredScenarios()), 'TSV'));
+      elements.copyCsv.addEventListener('click', () => copyText(toCsv(getFilteredScenarios()), 'CSV'));
+      elements.loadDb.addEventListener('click', loadFromDb);
+      elements.createRun.addEventListener('click', createScenarioRun);
+      elements.gasUrl.addEventListener('change', () => localStorage.setItem(STORAGE_KEYS.gasUrl, elements.gasUrl.value.trim()));
+      elements.tester.addEventListener('change', () => localStorage.setItem(STORAGE_KEYS.tester, elements.tester.value.trim()));
+      elements.environment.addEventListener('change', () => localStorage.setItem(STORAGE_KEYS.environment, elements.environment.value.trim()));
+      elements.queueList.addEventListener('click', event => {
+        const button = event.target.closest('[data-scenario-id]');
+        if (!button) return;
+        state.selectedScenarioId = button.dataset.scenarioId;
+        renderScenarios();
+        elements.detailPanel.focus({ preventScroll: true });
+        if (window.matchMedia('(max-width: 1023px)').matches) {
+          elements.detailPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+      elements.detailPanel.addEventListener('input', event => {
+        const input = event.target.closest('[data-step-field]');
+        if (input) updateResultFromInput(input);
+      });
+      elements.detailPanel.addEventListener('change', event => {
+        const input = event.target.closest('[data-step-field]');
+        if (input) updateResultFromInput(input);
+      });
+      elements.detailPanel.addEventListener('click', event => {
+        if (event.target.closest('#saveScenarioButton')) {
+          saveSelectedScenario();
+        }
+      });
+    }
+
+    renderStats();
+    renderFilterOptions();
+    renderSchema();
+    renderRun();
+    bindEvents();
+    renderScenarios();
+  </script>
+</body>
+</html>
