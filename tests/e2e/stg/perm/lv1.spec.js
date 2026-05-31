@@ -22,3 +22,11 @@ e2eTest({ caseId: 'STG-ADM-07-01', scenarioId: 'STG-SCN-029', stepId: 'STG-SCN-0
     await page.goto('/admin/data_input_list');
     await expect(page).toHaveURL(/data_input_list/);
   });
+
+e2eTest({ caseId: 'STG-ADM-PERM-01' }, '権限: Lv1の到達範囲（名刺入力のみ・他は遮断）', async ({ page }) => {
+  await page.goto('/admin/top');
+  await expect(page.getByRole('link', { name: '名刺入力画面' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'ユーザー(利用者)管理' })).toHaveCount(0);
+  await page.goto('/admin/user');
+  await expect(page).toHaveURL(/\/login/);
+});

@@ -91,8 +91,5 @@ e2eTest({ caseId: 'LEG-002' }, '[thin] LEG-002 プライバシー導線', async 
   await expect(page.getByRole('link', { name: 'プライバシーポリシー' }).first()).toBeVisible();
 });
 
-// 到達不可・要状態のため保留（理由付き記録）
-e2eTest.skip({ caseId: 'PWR-001' }, 'PWR-001 パスワード再設定（要ログアウト状態のため保留）', async () => {});
-e2eTest.skip({ caseId: 'ACC-001' }, 'ACC-001 パスワード変更（導線未確認のため保留）', async () => {});
-e2eTest.skip({ caseId: 'COM-001' }, 'COM-001 未認証リダイレクト（要ログアウト状態のため保留）', async () => {});
-e2eTest.skip({ caseId: 'COM-002' }, 'COM-002 コンソールエラーなし（reporter/traceで担保）', async () => {});
+// PWR-001 / COM-001 / COM-002 は stg/public（無認証）で実施。
+// ACC-001（パスワード変更）は user-cases のアカウント情報モーダルで実施。

@@ -12,29 +12,46 @@ async function openDetail(page) {
   await expect(page.getByRole('button', { name: 'モーダルを閉じる' })).toBeVisible();
 }
 
-async function openAccountPanel(page) {
+// サイドバーは折りたたみ式。ホバーで展開するとグループ切替(#user_select)が可視化される。
+async function expandSidebar(page) {
   await page.goto('/dashboard');
-  // クリックがオーバーレイに阻害されるため、ハンドラを直接発火
-  await page.locator('#account-infoButton').evaluate((el) => el.click());
-  await expect(page.getByRole('combobox', { name: 'ユーザーグループを選択' })).toBeVisible({ timeout: 5000 });
+  await page.locator('#sidebar').hover();
+  await expect(page.locator('#user_select')).toBeVisible({ timeout: 5000 });
+}
+
+// 「アカウント情報」はプロフィールモーダル(#accountInfoModal)を開く。
+async function openAccountModal(page) {
+  await page.goto('/dashboard');
+  await page.locator('#sidebar').hover();
+  await page.locator('#account-infoButton').click();
+  await expect(page.getByText('パスワードを変更する').first()).toBeVisible({ timeout: 5000 });
 }
 
 // ===== ダッシュボード（DSH-005〜010）=====
-e2eTest({ caseId: 'DSH-005' }, 'ダッシュボード: 列ソート見出しが存在', async ({ page }) => {
+e2eTest({ caseId: 'DSH-005' }, 'ダッシュボード: ソート可能な列見出しが揃う', async ({ page }) => {
   await page.goto('/dashboard');
-  await expect(page.getByText('回答数').first()).toBeVisible();
+  for (const c of ['アンケートID', 'アンケート名', 'ステータス', '回答数', '展示会会期']) {
+    await expect(page.getByRole('columnheader', { name: new RegExp(c) })).toBeVisible();
+  }
 });
-e2eTest({ caseId: 'DSH-006' }, 'ダッシュボード: ステータスフィルタ', async ({ page }) => {
+e2eTest({ caseId: 'DSH-006' }, 'ダッシュボード: ステータスフィルタの選択肢が揃う', async ({ page }) => {
   await page.goto('/dashboard');
-  await expect(page.getByRole('combobox', { name: 'ステータス' })).toBeVisible();
+  // ステータスselectは aria-label 無し。会期前/会期中/会期終了 を持つselectで判定
+  const statusSelect = page.locator('select').filter({ has: page.locator('option', { hasText: '会期終了' }) }).first();
+  await expect(statusSelect).toBeVisible();
+  await expect(statusSelect.locator('option', { hasText: '会期前' })).toHaveCount(1);
+  await expect(statusSelect.locator('option', { hasText: '会期中' })).toHaveCount(1);
 });
 e2eTest({ caseId: 'DSH-007' }, 'ダッシュボード: 日付範囲フィルタ', async ({ page }) => {
   await page.goto('/dashboard');
   await expect(page.getByRole('textbox', { name: '開始日' })).toBeVisible();
 });
-e2eTest({ caseId: 'DSH-008' }, 'ダッシュボード: フィルターをリセット', async ({ page }) => {
+e2eTest({ caseId: 'DSH-008' }, 'ダッシュボード: 検索入力とリセットが操作できる', async ({ page }) => {
   await page.goto('/dashboard');
-  await expect(page.getByRole('button', { name: 'フィルターをリセット' })).toBeVisible();
+  await page.getByRole('textbox', { name: 'キーワードで検索' }).fill('ABC');
+  await expect(page.getByRole('textbox', { name: 'キーワードで検索' })).toHaveValue('ABC');
+  await page.getByRole('button', { name: 'フィルターをリセット' }).click();
+  await expect(page.getByRole('textbox', { name: 'キーワードで検索' })).toHaveValue('');
 });
 e2eTest({ caseId: 'DSH-009' }, 'ダッシュボード: 表示件数切替', async ({ page }) => {
   await page.goto('/dashboard');
@@ -107,13 +124,23 @@ e2eTest({ caseId: 'EDT-043' }, '編集: 追加設定の各導線', async ({ page
   await page.goto(`/survey/${SID}`);
   await expect(page.getByRole('link', { name: 'サンクス画面設定' })).toBeVisible();
 });
-// 設問タイプ追加（尺度/手書き/説明カード）は追加メニュー操作。到達＋追加導線存在まで。
-e2eTest({ caseId: 'EDT-039' }, '編集: 設問追加導線が存在', async ({ page }) => {
+// 設問タイプ追加メニュー（尺度/手書き/説明カード）。メニューを開いて対象タイプが選べることまで（保存しない）。
+async function openTypeMenu(page) {
   await page.goto(`/survey/${SID}`);
-  await expect(page.getByRole('button', { name: '設問を追加' }).first()).toBeVisible();
+  await page.getByRole('button', { name: /設問を追加/ }).first().click();
+}
+e2eTest({ caseId: 'EDT-039' }, '設問追加メニュー: 尺度/評定尺度', async ({ page }) => {
+  await openTypeMenu(page);
+  await expect(page.getByText('尺度/評定尺度').first()).toBeVisible();
 });
-e2eTest.skip({ caseId: 'EDT-040' }, '設問追加-手書きスペース（追加メニュー操作・別途）', async () => {});
-e2eTest.skip({ caseId: 'EDT-041' }, '設問追加-説明カード（追加メニュー操作・別途）', async () => {});
+e2eTest({ caseId: 'EDT-040' }, '設問追加メニュー: 手書きスペース', async ({ page }) => {
+  await openTypeMenu(page);
+  await expect(page.getByText('手書きスペース').first()).toBeVisible();
+});
+e2eTest({ caseId: 'EDT-041' }, '設問追加メニュー: 説明カード', async ({ page }) => {
+  await openTypeMenu(page);
+  await expect(page.getByText('説明カード').first()).toBeVisible();
+});
 
 // ===== 回答画面（ANS-027〜031）=====
 e2eTest({ caseId: 'ANS-027' }, '回答: 設問アコーディオン', async ({ page }) => {
@@ -255,11 +282,36 @@ e2eTest({ caseId: 'REV-011' }, 'レビュー: フィルタサイドバー', asyn
 });
 
 // ===== アカウント/グループ・共通（ACC/GRP/COM）=====
-// ⚠️ アカウント情報パネルの展開がPlaywright自動操作で不安定（stg側トグル挙動）。保留＝要セレクタ調整。
-e2eTest.skip({ caseId: 'ACC-002', scenarioId: 'STG-SCN-015', stepId: 'STG-SCN-015-01' }, 'アカウント情報パネル開閉（パネル展開不安定のため保留）', async () => {});
-e2eTest.skip({ caseId: 'GRP-001', scenarioId: 'STG-SCN-015', stepId: 'STG-SCN-015-02' }, 'グループ切替コンボ（パネル展開不安定のため保留）', async () => {});
-e2eTest.skip({ caseId: 'GRP-002' }, 'グループ新規作成導線（パネル展開不安定のため保留）', async () => {});
-e2eTest.skip({ caseId: 'GRP-003' }, '個人/グループの選択肢（パネル展開不安定のため保留）', async () => {});
+e2eTest({ caseId: 'ACC-002', scenarioId: 'STG-SCN-015', stepId: 'STG-SCN-015-01' }, 'アカウント情報モーダル開閉', async ({ page }) => {
+  await openAccountModal(page);
+  await expect(page.getByText('アカウント基本情報').first()).toBeVisible();
+});
+e2eTest({ caseId: 'ACC-001' }, 'パスワード変更導線（アカウント情報モーダル内）', async ({ page }) => {
+  await openAccountModal(page);
+  await expect(page.getByText('パスワードを変更する').first()).toBeVisible();
+});
+// テスト要件の抜けだった「アカウント情報の保存→永続化」。現状はBUG-USR-02で保存されない。
+// 特性化テスト: 現状（空のまま=未保存）をアサート。修正されると失敗し、期待値更新を促す。
+e2eTest({ caseId: 'ACC-003' }, 'アカウント情報の保存→永続化（BUG-USR-02: 現状保存されない）', async ({ page }, testInfo) => {
+  testInfo.annotations.push({ type: 'bug', description: 'BUG-USR-02: アカウント情報モーダルの保存が永続化されない' });
+  await openAccountModal(page);
+  await page.locator('#accountInfoModal input[name="companyName"]').fill('E2E保存確認');
+  await page.locator('#accountInfoModal button:has-text("保存する")').click();
+  await openAccountModal(page); // /dashboard 経由でリロード→再オープン
+  await expect(page.locator('#accountInfoModal input[name="companyName"]')).toHaveValue('');
+});
+e2eTest({ caseId: 'GRP-001', scenarioId: 'STG-SCN-015', stepId: 'STG-SCN-015-02' }, 'グループ切替コンボ（サイドバー展開）', async ({ page }) => {
+  await expandSidebar(page);
+  await expect(page.locator('#user_select')).toBeVisible();
+});
+e2eTest({ caseId: 'GRP-002' }, 'グループ新規作成導線', async ({ page }) => {
+  await expandSidebar(page);
+  await expect(page.getByRole('button', { name: 'グループを新規作成' })).toBeVisible();
+});
+e2eTest({ caseId: 'GRP-003' }, '個人/グループの選択肢が存在', async ({ page }) => {
+  await expandSidebar(page);
+  await expect(page.locator('#user_select')).toContainText('個人アカウント');
+});
 e2eTest({ caseId: 'COM-003' }, '共通: テーマ切替導線', async ({ page }) => {
   await page.goto('/dashboard');
   await expect(page.getByRole('link', { name: 'テーマを切り替える' })).toBeVisible();

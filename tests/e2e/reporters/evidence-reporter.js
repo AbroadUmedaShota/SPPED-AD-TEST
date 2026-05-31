@@ -19,6 +19,7 @@ const { gasPost, PW_TO_DB_STATUS } = require('../helpers/gas');
 class EvidenceReporter {
   constructor() {
     this.rows = [];
+    this.byId = new Map(); // test.id 単位で最新attemptのみ保持（flakyのリトライ重複・誤検知defectを防ぐ）
     this.startedAt = new Date().toISOString();
     this.runId = 'SRUN-' + this.startedAt.replace(/[-:T.Z]/g, '').slice(0, 14) + '-PW';
     this.outDir = path.join('output', 'e2e-results', this.runId);
@@ -37,11 +38,27 @@ class EvidenceReporter {
     return '';
   }
 
+  _scenarioSteps(result) {
+    // test.step('STEP:<step_id>') で刻んだ各シナリオ手順を抽出する
+    const out = [];
+    const walk = (steps) => {
+      for (const s of steps || []) {
+        if (s.title && s.title.startsWith('STEP:')) {
+          out.push({ step_id: s.title.slice(5), status: s.error ? 'NG' : 'OK', actual: s.error ? String(s.error.message || '').replace(/\[[0-9;]*m/g, '').split('\n')[0].slice(0, 300) : '' });
+        }
+        if (s.steps) walk(s.steps);
+      }
+    };
+    walk(result.steps);
+    return out;
+  }
+
   onTestEnd(test, result) {
     const evidence = (result.attachments || [])
       .map((a) => a.path || a.name)
       .filter(Boolean);
-    this.rows.push({
+    this.byId.set(test.id, {
+      scenarioSteps: this._scenarioSteps(result),
       run_id: this.runId,
       project: this._projectOf(test),
       case_ids: this._ann(test, 'case'),
@@ -120,6 +137,7 @@ class EvidenceReporter {
   }
 
   async onEnd(result) {
+    this.rows = [...this.byId.values()]; // 各testの最終attemptのみ
     const { coveredCount, masterTotal, defects } = this._writeLocal();
     const total = this.rows.length;
     const ng = this.rows.filter((r) => r.status === 'NG').length;
@@ -152,26 +170,48 @@ class EvidenceReporter {
     });
     process.stdout.write(`[evidence-reporter] createScenarioRun: ${JSON.stringify(runRes).slice(0, 160)}\n`);
 
-    // 2) scenario_id/step_id を持つ結果のみ step_results へ
-    const stepRows = this.rows
-      .filter((r) => r.scenario_id && r.step_id)
-      .map((r) => ({
-        run_id: this.runId,
-        scenario_id: r.scenario_id,
-        step_id: r.step_id,
-        status: r.status,
-        actual: r.actual || (r.case_ids.length ? `case: ${r.case_ids.join(',')}` : ''),
-        evidence_url: r.evidence_url,
-        checked_at: r.checked_at,
-        checked_by: r.checked_by,
-        defect_link: '',
-        note: r.title,
-      }));
+    // 2) 全結果（認証setupを除く）を step_results へ。
+    //    シナリオ未紐付けのケースは scenario_id="CASE" / step_id=case_id で保存する。
+    const stepRows = [];
+    for (const r of this.rows) {
+      if (r.project === 'setup') continue;
+      if (r.scenario_id && r.scenarioSteps && r.scenarioSteps.length) {
+        // シナリオ駆動: test.step ごとに scenario_step_results 行を出す
+        for (const s of r.scenarioSteps) {
+          stepRows.push({
+            run_id: this.runId,
+            scenario_id: r.scenario_id,
+            step_id: s.step_id,
+            status: s.status,
+            actual: s.actual,
+            evidence_url: r.evidence_url,
+            checked_at: r.checked_at,
+            checked_by: r.checked_by,
+            defect_link: '',
+            note: r.title,
+          });
+        }
+      } else if (r.case_ids.length || (r.scenario_id && r.step_id)) {
+        // ケース駆動: scenario未紐付けは scenario_id="CASE" / step_id=case_id
+        stepRows.push({
+          run_id: this.runId,
+          scenario_id: r.scenario_id || 'CASE',
+          step_id: r.step_id || r.case_ids[0] || `${r.project}:${r.title}`,
+          status: r.status,
+          actual: r.actual || (r.case_ids.length ? `case: ${r.case_ids.join(',')}` : ''),
+          evidence_url: r.evidence_url,
+          checked_at: r.checked_at,
+          checked_by: r.checked_by,
+          defect_link: '',
+          note: `${r.case_ids.join(',')} ${r.title}`.trim(),
+        });
+      }
+    }
     if (stepRows.length) {
       const upRes = await gasPost('upsertScenarioStepResult', { results: stepRows });
       process.stdout.write(`[evidence-reporter] upsertScenarioStepResult(${stepRows.length}件): ${JSON.stringify(upRes).slice(0, 160)}\n`);
     } else {
-      process.stdout.write('[evidence-reporter] scenario_id/step_id付きの結果が無いため step_results 送信なし\n');
+      process.stdout.write('[evidence-reporter] 送信対象の結果が無いため step_results 送信なし\n');
     }
 
     // 3) 失敗を AI観測として登録
