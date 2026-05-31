@@ -50,6 +50,8 @@ tmp-*.png
 /output/
 /test-results/
 /.pwtest/
+/playwright-report/
+/blob-report/
 
 # Local reference materials
 /00_Abroad⇔Rep/SPEEDレビュー・グラフ分析・請求書関連QA.xlsx
