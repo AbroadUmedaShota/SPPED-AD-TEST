@@ -1,0 +1,101 @@
+{
+  "meta": {
+    "id": "09_bug-reporting",
+    "title": "バグ報告DB",
+    "summary": "人間の報告とAIエージェントの調査結果を受付DBに集約し、Backlog起票前の重複整理と証跡確認を行います。",
+    "sourceStatus": "運用設計 / Backlog起票補助 / AI観測",
+    "hasUnconfirmed": true
+  },
+  "documents": [
+    {
+      "id": "BUG-001",
+      "title": "バグ報告DBの位置づけ",
+      "category": "概要",
+      "sourceStatus": "運用設計",
+      "path": "01_bug-report-overview.md",
+      "summary": "DB受付正本、Backlog対応正本、1不具合1代表ケースの境界を整理します。",
+      "tags": ["バグ報告", "受付DB", "Backlog", "重複整理"],
+      "hasUnconfirmed": true,
+      "relatedSources": [
+        "docs/ハンドブック/運用/07_BACKLOG_ISSUE_GUIDE.md",
+        "docs/リファレンス/共有規約/02_SHARED_DOC_BOUNDARY_RULES.md",
+        "docs/リファレンス/共有規約/04_AI_RESPONSIBILITY_BOUNDARY.md"
+      ]
+    },
+    {
+      "id": "BUG-002",
+      "title": "Backlog起票テンプレート",
+      "category": "Backlog",
+      "sourceStatus": "起票補助",
+      "path": "02_backlog-ticket-template.md",
+      "summary": "代表ケースからBacklog課題へ転記する件名、本文、追加報告コメントの標準形です。",
+      "tags": ["Backlog", "テンプレート", "代表ケース"],
+      "hasUnconfirmed": true,
+      "relatedSources": [
+        "docs/ハンドブック/運用/07_BACKLOG_ISSUE_GUIDE.md"
+      ]
+    },
+    {
+      "id": "BUG-003",
+      "title": "AI観測ルール",
+      "category": "AI観測",
+      "sourceStatus": "AI責任分界から整理",
+      "path": "03_ai-observation-rules.md",
+      "summary": "AIエージェントの調査結果を未確認観測として保存し、人間確認後に代表ケースへ昇格するルールです。",
+      "tags": ["AI agent", "観測", "未確認", "証跡"],
+      "hasUnconfirmed": true,
+      "relatedSources": [
+        "docs/リファレンス/共有規約/04_AI_RESPONSIBILITY_BOUNDARY.md"
+      ]
+    },
+    {
+      "id": "BUG-004",
+      "title": "トリアージと重複確認",
+      "category": "トリアージ",
+      "sourceStatus": "運用設計",
+      "path": "04_triage-and-duplicate-check.md",
+      "summary": "複数報告を代表ケースへ集約し、Backlog起票、重複統合、却下、保留を判断する流れです。",
+      "tags": ["トリアージ", "重複確認", "代表ケース", "証跡"],
+      "hasUnconfirmed": true,
+      "relatedSources": [
+        "99_backend-docs/09_bug-reporting/reports.html",
+        "99_backend-docs/09_bug-reporting/gas/README.md"
+      ]
+    }
+  ],
+  "flow": [
+    {
+      "group": "バグ報告DB運用フロー",
+      "items": [
+        {
+          "id": "BUG-F01",
+          "documentId": "BUG-001",
+          "timing": "受付",
+          "label": "報告受付",
+          "summary": "人間報告とAI観測を個別 observation として受付DBへ保存します。"
+        },
+        {
+          "id": "BUG-F02",
+          "documentId": "BUG-003",
+          "timing": "AI調査後",
+          "label": "AI観測登録",
+          "summary": "AI結果は未確認観測として保存し、人間確認を待ちます。"
+        },
+        {
+          "id": "BUG-F03",
+          "documentId": "BUG-004",
+          "timing": "切り分け",
+          "label": "重複確認",
+          "summary": "同じ現象は代表ケースに集約し、別原因なら別ケース化します。"
+        },
+        {
+          "id": "BUG-F04",
+          "documentId": "BUG-002",
+          "timing": "対応開始",
+          "label": "Backlog起票",
+          "summary": "人間確認済みの代表ケースだけをBacklog本文生成対象にします。"
+        }
+      ]
+    }
+  ]
+}

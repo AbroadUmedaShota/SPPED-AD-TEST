@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>バグ報告DB管理 / SPEED AD</title>
+  <link rel="icon" href="../../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="../../02_dashboard/service-top-style.css">
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+  <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', 'Noto Sans JP', sans-serif;
+    }
+
+    .bug-shell {
+      --md-sys-color-primary: #0f62fe;
+      --md-sys-color-primary-on: #ffffff;
+      --md-sys-color-surface: #ffffff;
+      --md-sys-color-surface-variant: #f4f7fb;
+      --md-sys-color-background: #f7f9fc;
+      --md-sys-color-on-surface: #172033;
+      --md-sys-color-on-surface-variant: #5d667a;
+      --md-sys-color-outline: #9aa6bd;
+      --md-sys-color-outline-variant: #d8deea;
+    }
+
+    .case-workspace {
+      display: grid;
+      grid-template-columns: minmax(320px, 430px) minmax(0, 1fr);
+      gap: 1rem;
+      align-items: start;
+    }
+
+    .case-detail {
+      position: sticky;
+      top: 1rem;
+      max-height: calc(100vh - 2rem);
+      overflow: auto;
+    }
+
+    .case-card[aria-pressed="true"] {
+      border-color: var(--md-sys-color-primary);
+      background: #eef5ff;
+      box-shadow: inset 3px 0 0 var(--md-sys-color-primary);
+    }
+
+    @media (max-width: 1023px) {
+      .case-workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .case-detail {
+        position: static;
+        max-height: none;
+      }
+    }
+  </style>
+</head>
+<body class="bug-shell bg-background text-on-background">
+<div class="min-h-screen bg-background">
+  <header class="border-b border-outline-variant bg-surface">
+    <div class="flex w-full flex-wrap items-center justify-between gap-4 px-4 py-5 sm:px-6 lg:px-8">
+      <div>
+        <p class="text-sm font-semibold text-primary">09_bug-reporting</p>
+        <h1 class="text-headline-medium font-bold leading-tight text-on-surface">バグ報告DB管理</h1>
+        <p class="mt-1 max-w-4xl text-sm leading-6 text-on-surface-variant">人間報告とAI観測をSpreadsheet受付DBに集約し、代表ケース化、重複整理、Backlog本文コピーまでを支援します。</p>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <a class="inline-flex items-center gap-2 rounded-lg border border-outline px-3 py-2 text-sm text-on-surface hover:bg-surface-variant" href="./index.html">
+          <span class="material-icons text-base">article</span>
+          仕様へ
+        </a>
+        <a class="inline-flex items-center gap-2 rounded-lg border border-outline px-3 py-2 text-sm text-on-surface hover:bg-surface-variant" href="../index.html">
+          <span class="material-icons text-base">home</span>
+          HOMEへ
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="w-full px-4 py-6 sm:px-6 lg:px-8">
+    <section class="rounded-lg border border-outline-variant bg-surface p-5" aria-labelledby="settings-title">
+      <div class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p class="text-sm font-semibold text-primary">GAS Web App</p>
+          <h2 id="settings-title" class="mt-1 text-title-large font-bold text-on-surface">受付DB接続</h2>
+          <p class="mt-1 max-w-4xl text-sm leading-6 text-on-surface-variant">GAS未設定時はブラウザ内DB（localStorage）で保存します。GAS URLを設定するとSpreadsheet受付DBへ切り替えます。</p>
+        </div>
+        <span id="connectionBadge" class="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-3 py-1 text-sm font-semibold text-yellow-800">
+          <span class="material-icons text-base">settings</span>
+          未設定
+        </span>
+      </div>
+      <div class="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto_auto_auto_auto_auto]">
+        <label class="block text-sm text-on-surface-variant">
+          <span class="font-semibold text-on-surface">GAS Web App URL</span>
+          <input id="gasUrlInput" class="form-input mt-1 w-full rounded-lg border-outline" type="url" placeholder="https://script.google.com/macros/s/.../exec">
+        </label>
+        <button id="saveGasUrlBtn" type="button" class="self-end inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-on hover:opacity-90">
+          <span class="material-icons text-base">save</span>
+          保存
+        </button>
+        <button id="reloadBtn" type="button" class="self-end inline-flex items-center justify-center gap-2 rounded-lg border border-outline px-4 py-2 text-sm font-semibold text-on-surface hover:bg-surface-variant">
+          <span class="material-icons text-base">sync</span>
+          読み込み
+        </button>
+        <button id="seedDemoBtn" type="button" class="self-end inline-flex items-center justify-center gap-2 rounded-lg border border-outline px-4 py-2 text-sm font-semibold text-on-surface hover:bg-surface-variant">
+          <span class="material-icons text-base">dataset</span>
+          サンプル
+        </button>
+        <button id="exportJsonBtn" type="button" class="self-end inline-flex items-center justify-center gap-2 rounded-lg border border-outline px-4 py-2 text-sm font-semibold text-on-surface hover:bg-surface-variant">
+          <span class="material-icons text-base">download</span>
+          JSON
+        </button>
+        <button id="clearLocalBtn" type="button" class="self-end inline-flex items-center justify-center gap-2 rounded-lg border border-red-200 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50">
+          <span class="material-icons text-base">delete</span>
+          初期化
+        </button>
+      </div>
+      <div id="statusMessage" class="mt-4 rounded-lg border border-outline-variant bg-background px-4 py-3 text-sm leading-6 text-on-surface-variant">ローカルDBで利用できます。GAS Web App URLを設定するとSpreadsheetへ切り替わります。</div>
+    </section>
+
+    <section class="mt-5 grid gap-4 md:grid-cols-4" aria-label="集計">
+      <div class="rounded-lg border border-outline-variant bg-surface p-4">
+        <p class="text-xs font-semibold text-primary">代表ケース</p>
+        <p id="caseCount" class="mt-2 text-2xl font-bold text-on-surface">0</p>
+      </div>
+      <div class="rounded-lg border border-outline-variant bg-surface p-4">
+        <p class="text-xs font-semibold text-primary">観測</p>
+        <p id="observationCount" class="mt-2 text-2xl font-bold text-on-surface">0</p>
+      </div>
+      <div class="rounded-lg border border-outline-variant bg-surface p-4">
+        <p class="text-xs font-semibold text-primary">AI未確認</p>
+        <p id="unverifiedAiCount" class="mt-2 text-2xl font-bold text-on-surface">0</p>
+      </div>
+      <div class="rounded-lg border border-outline-variant bg-surface p-4">
+        <p class="text-xs font-semibold text-primary">Backlog連携</p>
+        <p id="backlogLinkedCount" class="mt-2 text-2xl font-bold text-on-surface">0</p>
+      </div>
+    </section>
+
+    <section class="mt-5 case-workspace">
+      <aside class="rounded-lg border border-outline-variant bg-surface p-4">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <p class="text-xs font-bold uppercase text-primary">Cases</p>
+            <h2 class="mt-1 text-base font-bold text-on-surface">代表ケース</h2>
+          </div>
+          <span id="filteredCaseCount" class="inline-flex rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary">0件</span>
+        </div>
+        <label class="mt-4 block text-sm text-on-surface-variant">
+          <span class="font-semibold text-on-surface">検索</span>
+          <span class="relative mt-1 block">
+            <span class="material-icons pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-base text-on-surface-variant">search</span>
+            <input id="caseSearch" class="form-input w-full rounded-lg border-outline pl-10" type="search" placeholder="case_id・画面・症状・Backlogで検索">
+          </span>
+        </label>
+        <div id="caseList" class="mt-4 max-h-[42rem] space-y-2 overflow-y-auto pr-1"></div>
+      </aside>
+
+      <article class="case-detail rounded-lg border border-outline-variant bg-surface">
+        <div class="border-b border-outline-variant p-4">
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p id="selectedCaseMeta" class="text-sm text-on-surface-variant">代表ケースを選択してください。</p>
+              <h2 id="selectedCaseTitle" class="mt-1 text-title-large font-bold text-on-surface">未選択</h2>
+              <div id="selectedCaseBadges" class="mt-3 flex flex-wrap gap-2"></div>
+            </div>
+            <button id="copyBacklogBtn" type="button" class="inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-on disabled:opacity-50" disabled>
+              <span class="material-icons text-base">content_copy</span>
+              Backlog本文をコピー
+            </button>
+          </div>
+          <p id="backlogBlockReason" class="mt-3 text-sm leading-6 text-on-surface-variant"></p>
+        </div>
+        <div id="selectedCaseContent" class="space-y-5 p-5 text-sm leading-6 text-on-surface-variant"></div>
+      </article>
+    </section>
+
+    <section class="mt-5 grid gap-5 xl:grid-cols-2" aria-label="登録フォーム">
+      <form id="observationForm" class="rounded-lg border border-outline-variant bg-surface p-5">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <p class="text-sm font-semibold text-primary">Observation</p>
+            <h2 class="mt-1 text-title-large font-bold text-on-surface">観測を登録</h2>
+          </div>
+          <span class="material-icons text-primary">visibility</span>
+        </div>
+        <div class="mt-4 grid gap-3 md:grid-cols-2">
+          <label class="block text-sm text-on-surface-variant">
+            <span>紐づける case_id</span>
+            <input name="case_id" class="form-input mt-1 w-full rounded-lg border-outline" placeholder="BUG-... / 空欄可">
+          </label>
+          <label class="block text-sm text-on-surface-variant">
+            <span>source_type</span>
+            <select name="source_type" class="form-select mt-1 w-full rounded-lg border-outline">
+              <option value="human">human</option>
+              <option value="ai">ai</option>
+            </select>
+          </label>
+          <label class="block text-sm text-on-surface-variant">
+            <span>source_role</span>
+            <select name="source_role" class="form-select mt-1 w-full rounded-lg border-outline">
+              <option value="QA">QA</option>
+              <option value="開発">開発</option>
+              <option value="管理者">管理者</option>
+              <option value="営業">営業</option>
+              <option value="顧客担当">顧客担当</option>
+              <option value="AI agent">AI agent</option>
+            </select>
+          </label>
+          <label class="block text-sm text-on-surface-variant">
+            <span>agent_run_id</span>
+            <input name="agent_run_id" class="form-input mt-1 w-full rounded-lg border-outline" placeholder="AI観測時のみ">
+          </label>
+          <label class="block text-sm text-on-surface-variant">
+            <span>reproduce_status</span>
+            <select name="reproduce_status" class="form-select mt-1 w-full rounded-lg border-outline">
+              <option value="reported">reported</option>
+              <option value="reproduced">reproduced</option>
+              <option value="not_reproduced">not_reproduced</option>
+              <option value="unknown">unknown</option>
+            </select>
+          </label>
+          <label class="block text-sm text-on-surface-variant">
+            <span>verification_status</span>
+            <select name="verification_status" class="form-select mt-1 w-full rounded-lg border-outline">
+              <option value="unverified">unverified</option>
+              <option value="confirmed">confirmed</option>
+              <option value="rejected">rejected</option>
+            </select>
+          </label>
+          <label class="block text-sm text-on-surface-variant">
+            <span>confidence</span>
+            <input name="confidence" class="form-input mt-1 w-full rounded-lg border-outline" placeholder="例: high / 0.82">
+          </label>
+          <label class="block text-sm text-on-surface-variant">
+            <span>observed_at</span>
+            <input name="observed_at" class="form-input mt-1 w-full rounded-lg border-outline" type="datetime-local">
+          </label>
+        </div>
+        <label class="mt-3 block text-sm text-on-surface-variant">
+          <span>note</span>
+          <textarea name="note" class="form-textarea mt-1 min-h-28 w-full rounded-lg border-outline" placeholder="人間報告: 再現手順や補足。AI観測: 調査対象 / 実行環境 / 確認手順 / 根拠 / 推論 / 限界 を分けて記録。"></textarea>
+        </label>
+        <div class="mt-4 rounded-lg border border-outline-variant bg-background p-3">
+          <p class="text-sm font-bold text-on-surface">証跡メタ情報（任意）</p>
+          <div class="mt-3 grid gap-3 md:grid-cols-2">
+            <label class="block text-sm text-on-surface-variant">
+              <span>type</span>
+              <select name="evidence_type" class="form-select mt-1 w-full rounded-lg border-outline">
+                <option value="">なし</option>
+                <option value="screenshot">screenshot</option>
+                <option value="video">video</option>
+                <option value="console">console</option>
+                <option value="network">network</option>
+                <option value="html">html</option>
+                <option value="note">note</option>
+              </select>
+            </label>
+            <label class="block text-sm text-on-surface-variant">
+              <span>redaction_status</span>
+              <select name="redaction_status" class="form-select mt-1 w-full rounded-lg border-outline">
+                <option value="unknown">unknown</option>
+                <option value="redacted">redacted</option>
+                <option value="not_required">not_required</option>
+              </select>
+            </label>
+          </div>
+          <label class="mt-3 block text-sm text-on-surface-variant">
+            <span>URLまたはパス</span>
+            <input name="url_or_path" class="form-input mt-1 w-full rounded-lg border-outline" placeholder="Drive / Backlog / ローカル証跡パス">
+          </label>
+          <label class="mt-3 block text-sm text-on-surface-variant">
+            <span>証跡概要</span>
+            <input name="evidence_summary" class="form-input mt-1 w-full rounded-lg border-outline">
+          </label>
+        </div>
+        <button type="submit" class="mt-4 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-on hover:opacity-90">
+          <span class="material-icons text-base">add</span>
+          observationを保存
+        </button>
+      </form>
+
+      <div class="space-y-5">
+        <form id="caseForm" class="rounded-lg border border-outline-variant bg-surface p-5">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="text-sm font-semibold text-primary">Case</p>
+              <h2 class="mt-1 text-title-large font-bold text-on-surface">代表ケースへ昇格</h2>
+            </div>
+            <span class="material-icons text-primary">flag</span>
+          </div>
+          <div class="mt-4 grid gap-3 md:grid-cols-2">
+            <label class="block text-sm text-on-surface-variant">
+              <span>元 observation_id</span>
+              <input name="observation_id" class="form-input mt-1 w-full rounded-lg border-outline" placeholder="OBS-...">
+            </label>
+            <label class="block text-sm text-on-surface-variant">
+              <span>case_id</span>
+              <input name="case_id" class="form-input mt-1 w-full rounded-lg border-outline" placeholder="空欄なら自動">
+            </label>
+            <label class="block text-sm text-on-surface-variant md:col-span-2">
+              <span>title</span>
+              <input name="title" class="form-input mt-1 w-full rounded-lg border-outline" required>
+            </label>
+            <label class="block text-sm text-on-surface-variant">
+              <span>status</span>
+              <select name="status" class="form-select mt-1 w-full rounded-lg border-outline">
+                <option value="confirmed">confirmed</option>
+                <option value="triage">triage</option>
+                <option value="draft">draft</option>
+              </select>
+            </label>
+            <label class="block text-sm text-on-surface-variant">
+              <span>severity</span>
+              <select name="severity" class="form-select mt-1 w-full rounded-lg border-outline">
+                <option value="Medium">Medium</option>
+                <option value="Critical">Critical</option>
+                <option value="High">High</option>
+                <option value="Low">Low</option>
+              </select>
+            </label>
+            <label class="block text-sm text-on-surface-variant">
+              <span>environment</span>
+              <input name="environment" class="form-input mt-1 w-full rounded-lg border-outline" placeholder="stg / production / local">
+            </label>
+            <label class="block text-sm text-on-surface-variant">
+              <span>screen</span>
+              <input name="screen" class="form-input mt-1 w-full rounded-lg border-outline">
+            </label>
+            <label class="block text-sm text-on-surface-variant md:col-span-2">
+              <span>symptom_key</span>
+              <input name="symptom_key" class="form-input mt-1 w-full rounded-lg border-outline" placeholder="重複判定用の短いキー">
+            </label>
+          </div>
+          <label class="mt-3 block text-sm text-on-surface-variant">
+            <span>summary</span>
+            <textarea name="summary" class="form-textarea mt-1 min-h-20 w-full rounded-lg border-outline"></textarea>
+          </label>
+          <div class="mt-3 grid gap-3 md:grid-cols-2">
+            <label class="block text-sm text-on-surface-variant">
+              <span>expected</span>
+              <textarea name="expected" class="form-textarea mt-1 min-h-20 w-full rounded-lg border-outline"></textarea>
+            </label>
+            <label class="block text-sm text-on-surface-variant">
+              <span>actual</span>
+              <textarea name="actual" class="form-textarea mt-1 min-h-20 w-full rounded-lg border-outline"></textarea>
+            </label>
+          </div>
+          <button type="submit" class="mt-4 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-on hover:opacity-90">
+            <span class="material-icons text-base">upgrade</span>
+            代表ケース化
+          </button>
+        </form>
+
+        <div class="grid gap-5 md:grid-cols-2">
+          <form id="backlogForm" class="rounded-lg border border-outline-variant bg-surface p-5">
+            <p class="text-sm font-semibold text-primary">Backlog</p>
+            <h2 class="mt-1 text-title-medium font-bold text-on-surface">Backlogキー紐づけ</h2>
+            <label class="mt-4 block text-sm text-on-surface-variant">
+              <span>case_id</span>
+              <input name="case_id" class="form-input mt-1 w-full rounded-lg border-outline" required>
+            </label>
+            <label class="mt-3 block text-sm text-on-surface-variant">
+              <span>backlog_key</span>
+              <input name="backlog_key" class="form-input mt-1 w-full rounded-lg border-outline" placeholder="SPDAD2026-..." required>
+            </label>
+            <button type="submit" class="mt-4 inline-flex items-center gap-2 rounded-lg border border-outline px-4 py-2 text-sm font-semibold text-on-surface hover:bg-surface-variant">
+              <span class="material-icons text-base">link</span>
+              紐づけ保存
+            </button>
+          </form>
+
+          <form id="mergeForm" class="rounded-lg border border-outline-variant bg-surface p-5">
+            <p class="text-sm font-semibold text-primary">Duplicate</p>
+            <h2 class="mt-1 text-title-medium font-bold text-on-surface">重複ケース統合</h2>
+            <label class="mt-4 block text-sm text-on-surface-variant">
+              <span>統合元 case_id</span>
+              <input name="source_case_id" class="form-input mt-1 w-full rounded-lg border-outline" required>
+            </label>
+            <label class="mt-3 block text-sm text-on-surface-variant">
+              <span>代表 case_id</span>
+              <input name="target_case_id" class="form-input mt-1 w-full rounded-lg border-outline" required>
+            </label>
+            <label class="mt-3 block text-sm text-on-surface-variant">
+              <span>統合理由</span>
+              <input name="note" class="form-input mt-1 w-full rounded-lg border-outline">
+            </label>
+            <button type="submit" class="mt-4 inline-flex items-center gap-2 rounded-lg border border-outline px-4 py-2 text-sm font-semibold text-on-surface hover:bg-surface-variant">
+              <span class="material-icons text-base">call_merge</span>
+              統合保存
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script type="module">
+  import {
+    DEFECT_RESOURCES,
+    SEVERITY_LABELS,
+    STATUS_LABELS,
+    VERIFICATION_LABELS,
+    applyAppendObservation,
+    applyAppendTriageEvent,
+    applyLinkBacklogIssue,
+    applyMergeCases,
+    applyPromoteObservationToCase,
+    buildBacklogBody,
+    buildJsonpUrl,
+    buildPostBody,
+    createLocalId,
+    createEmptyDefectDataSet,
+    evidenceByObservationId,
+    filterCases,
+    getBacklogBlockReason,
+    getRowsForResource,
+    groupByCaseId,
+    isAiObservation,
+    isBacklogEligible,
+    isConfirmedObservation,
+    makeBacklogTitle,
+    makeDemoDefectDataSet,
+    normalizeCase,
+    normalizeDefectDataSet,
+    normalizeEvidence,
+    normalizeObservation,
+    normalizeTriageEvent
+  } from './reports-model.js';
+
+  const STORAGE_KEY = 'speedad_bug_reporting_gas_url';
+  const LOCAL_DB_KEY = 'speedad_bug_reporting_local_db';
+  const state = {
+    gasUrl: '',
+    storageMode: 'local',
+    cases: [],
+    observations: [],
+    evidence: [],
+    triageEvents: [],
+    selectedCaseId: '',
+    search: ''
+  };
+
+  const elements = {
+    gasUrlInput: document.getElementById('gasUrlInput'),
+    saveGasUrlBtn: document.getElementById('saveGasUrlBtn'),
+    reloadBtn: document.getElementById('reloadBtn'),
+    seedDemoBtn: document.getElementById('seedDemoBtn'),
+    exportJsonBtn: document.getElementById('exportJsonBtn'),
+    clearLocalBtn: document.getElementById('clearLocalBtn'),
+    connectionBadge: document.getElementById('connectionBadge'),
+    statusMessage: document.getElementById('statusMessage'),
+    caseCount: document.getElementById('caseCount'),
+    observationCount: document.getElementById('observationCount'),
+    unverifiedAiCount: document.getElementById('unverifiedAiCount'),
+    backlogLinkedCount: document.getElementById('backlogLinkedCount'),
+    filteredCaseCount: document.getElementById('filteredCaseCount'),
+    caseSearch: document.getElementById('caseSearch'),
+    caseList: document.getElementById('caseList'),
+    selectedCaseMeta: document.getElementById('selectedCaseMeta'),
+    selectedCaseTitle: document.getElementById('selectedCaseTitle'),
+    selectedCaseBadges: document.getElementById('selectedCaseBadges'),
+    selectedCaseContent: document.getElementById('selectedCaseContent'),
+    copyBacklogBtn: document.getElementById('copyBacklogBtn'),
+    backlogBlockReason: document.getElementById('backlogBlockReason'),
+    observationForm: document.getElementById('observationForm'),
+    caseForm: document.getElementById('caseForm'),
+    backlogForm: document.getElementById('backlogForm'),
+    mergeForm: document.getElementById('mergeForm')
+  };
+
+  function escapeHtml(value) {
+    return String(value || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function setStatus(message, tone = 'info') {
+    const toneClass = {
+      info: 'border-outline-variant bg-background text-on-surface-variant',
+      success: 'border-green-200 bg-green-50 text-green-800',
+      warning: 'border-yellow-200 bg-yellow-50 text-yellow-800',
+      danger: 'border-red-200 bg-red-50 text-red-800'
+    }[tone] || 'border-outline-variant bg-background text-on-surface-variant';
+    elements.statusMessage.className = `mt-4 rounded-lg border px-4 py-3 text-sm leading-6 ${toneClass}`;
+    elements.statusMessage.textContent = message;
+  }
+
+  function setConnectionBadge(label, tone = 'warning') {
+    const toneClass = {
+      success: 'bg-green-100 text-green-800',
+      warning: 'bg-yellow-100 text-yellow-800',
+      danger: 'bg-red-100 text-red-800'
+    }[tone] || 'bg-yellow-100 text-yellow-800';
+    elements.connectionBadge.className = `inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-semibold ${toneClass}`;
+    elements.connectionBadge.innerHTML = `<span class="material-icons text-base">${tone === 'success' ? 'cloud_done' : 'settings'}</span>${escapeHtml(label)}`;
+  }
+
+  function applyDataSet(dataSet) {
+    const normalized = normalizeDefectDataSet(dataSet);
+    state.cases = normalized.defect_cases;
+    state.observations = normalized.defect_observations;
+    state.evidence = normalized.defect_evidence;
+    state.triageEvents = normalized.triage_events;
+    if (!state.selectedCaseId && state.cases.length) {
+      state.selectedCaseId = state.cases[0].case_id;
+    }
+    if (state.selectedCaseId && !state.cases.some(defectCase => defectCase.case_id === state.selectedCaseId)) {
+      state.selectedCaseId = state.cases[0]?.case_id || '';
+    }
+  }
+
+  function currentDataSet() {
+    return normalizeDefectDataSet({
+      defect_cases: state.cases,
+      defect_observations: state.observations,
+      defect_evidence: state.evidence,
+      triage_events: state.triageEvents
+    });
+  }
+
+  function loadLocalDataSet() {
+    try {
+      const raw = localStorage.getItem(LOCAL_DB_KEY);
+      return raw ? normalizeDefectDataSet(JSON.parse(raw)) : createEmptyDefectDataSet();
+    } catch (error) {
+      console.warn('Local bug DB parse failed:', error);
+      return createEmptyDefectDataSet();
+    }
+  }
+
+  function saveLocalDataSet(dataSet) {
+    const normalized = normalizeDefectDataSet(dataSet);
+    localStorage.setItem(LOCAL_DB_KEY, JSON.stringify(normalized));
+    applyDataSet(normalized);
+  }
+
+  function createBadge(text, tone = 'default') {
+    const toneClass = {
+      default: 'bg-surface-variant text-on-surface',
+      success: 'bg-green-100 text-green-800',
+      warning: 'bg-yellow-100 text-yellow-800',
+      danger: 'bg-red-100 text-red-800',
+      info: 'bg-blue-100 text-blue-800'
+    }[tone] || 'bg-surface-variant text-on-surface';
+    return `<span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${toneClass}">${escapeHtml(text)}</span>`;
+  }
+
+  function loadJsonp(baseUrl, resource) {
+    return new Promise((resolve, reject) => {
+      const callbackName = `__speedad_bug_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+      const script = document.createElement('script');
+      const timer = window.setTimeout(() => {
+        cleanup();
+        reject(new Error(`${resource} の取得がタイムアウトしました。`));
+      }, 12000);
+
+      function cleanup() {
+        window.clearTimeout(timer);
+        delete window[callbackName];
+        script.remove();
+      }
+
+      window[callbackName] = payload => {
+        cleanup();
+        resolve(payload);
+      };
+
+      script.onerror = () => {
+        cleanup();
+        reject(new Error(`${resource} の取得に失敗しました。`));
+      };
+      script.src = buildJsonpUrl(baseUrl, resource, callbackName);
+      document.head.appendChild(script);
+    });
+  }
+
+  async function postGas(action, payload) {
+    if (!state.gasUrl) {
+      throw new Error('GAS Web App URLが未設定です。');
+    }
+    localStorage.setItem(STORAGE_KEY, state.gasUrl);
+    await fetch(state.gasUrl, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: buildPostBody(action, payload)
+    });
+  }
+
+  async function persistAction(action, payload) {
+    if (state.storageMode === 'gas') {
+      await postGas(action, payload);
+      return;
+    }
+
+    const dataSet = currentDataSet();
+    const nextDataSet = {
+      appendObservation: () => applyAppendObservation(dataSet, payload),
+      promoteObservationToCase: () => applyPromoteObservationToCase(dataSet, payload),
+      linkBacklogIssue: () => applyLinkBacklogIssue(dataSet, payload),
+      mergeCases: () => applyMergeCases(dataSet, payload),
+      appendTriageEvent: () => applyAppendTriageEvent(dataSet, payload)
+    }[action]?.();
+
+    if (!nextDataSet) {
+      throw new Error(`未対応のローカル操作です: ${action}`);
+    }
+    saveLocalDataSet(nextDataSet);
+  }
+
+  function extractRows(response, resource) {
+    if (!response || response.ok === false) {
+      throw new Error(response?.error || `${resource} の取得に失敗しました。`);
+    }
+    return Array.isArray(response.data) ? response.data : [];
+  }
+
+  async function loadAllResources() {
+    if (!state.gasUrl) {
+      state.storageMode = 'local';
+      applyDataSet(loadLocalDataSet());
+      setConnectionBadge('ローカルDB', 'success');
+      setStatus('ローカルDBで利用中です。GAS Web App URLを設定するとSpreadsheetへ切り替えます。', 'success');
+      render();
+      return;
+    }
+
+    state.storageMode = 'gas';
+    setStatus('受付DBを読み込んでいます。', 'info');
+    const responses = await Promise.all(DEFECT_RESOURCES.map(resource => loadJsonp(state.gasUrl, resource)));
+    const [cases, observations, evidence, triageEvents] = responses.map((response, index) => extractRows(response, DEFECT_RESOURCES[index]));
+    applyDataSet({
+      defect_cases: cases.map(normalizeCase).filter(row => row.case_id),
+      defect_observations: observations.map(normalizeObservation).filter(row => row.observation_id),
+      defect_evidence: evidence.map(normalizeEvidence).filter(row => row.evidence_id),
+      triage_events: triageEvents.map(normalizeTriageEvent).filter(row => row.event_id)
+    });
+    setConnectionBadge('接続済み', 'success');
+    setStatus(`受付DBを読み込みました。代表ケース ${state.cases.length} 件、観測 ${state.observations.length} 件。`, 'success');
+    render();
+  }
+
+  function renderStats() {
+    const unverifiedAi = state.observations.filter(observation => isAiObservation(observation) && !isConfirmedObservation(observation));
+    elements.caseCount.textContent = state.cases.length;
+    elements.observationCount.textContent = state.observations.length;
+    elements.unverifiedAiCount.textContent = unverifiedAi.length;
+    elements.backlogLinkedCount.textContent = state.cases.filter(defectCase => defectCase.backlog_key).length;
+  }
+
+  function renderCaseList() {
+    const filtered = filterCases(state.cases, state.search);
+    const observationsByCase = groupByCaseId(state.observations);
+    elements.filteredCaseCount.textContent = `${filtered.length}件`;
+
+    if (!filtered.length) {
+      elements.caseList.innerHTML = '<div class="rounded-lg border border-dashed border-outline-variant bg-background p-4 text-sm text-on-surface-variant">代表ケースがありません。観測を登録し、必要なものを代表ケースへ昇格してください。</div>';
+      return;
+    }
+
+    elements.caseList.innerHTML = filtered.map(defectCase => {
+      const linkedObservations = observationsByCase[defectCase.case_id] || [];
+      const eligible = isBacklogEligible(defectCase, linkedObservations);
+      const selected = defectCase.case_id === state.selectedCaseId;
+      const statusLabel = STATUS_LABELS[defectCase.status] || defectCase.status || '受付';
+      return `
+        <button type="button" class="case-card w-full rounded-lg border border-outline-variant bg-background p-4 text-left hover:border-primary hover:bg-surface-variant" data-case-id="${escapeHtml(defectCase.case_id)}" aria-pressed="${selected ? 'true' : 'false'}">
+          <span class="flex items-start justify-between gap-3">
+            <span>
+              <span class="block text-xs font-semibold text-primary">${escapeHtml(defectCase.case_id)}</span>
+              <span class="mt-1 block text-sm font-bold text-on-surface">${escapeHtml(defectCase.title || '(no title)')}</span>
+            </span>
+            <span class="text-xs font-semibold ${eligible ? 'text-green-700' : 'text-yellow-700'}">${eligible ? 'Backlog可' : '要確認'}</span>
+          </span>
+          <span class="mt-2 flex flex-wrap gap-1">
+            ${createBadge(statusLabel, defectCase.status === 'confirmed' || defectCase.status === 'backlog_linked' ? 'success' : 'default')}
+            ${createBadge(SEVERITY_LABELS[defectCase.severity] || defectCase.severity || '中', defectCase.severity === 'Critical' || defectCase.severity === 'High' ? 'danger' : 'info')}
+            ${createBadge(`${linkedObservations.length}観測`, 'default')}
+          </span>
+          <span class="mt-2 block text-xs leading-5 text-on-surface-variant">${escapeHtml(defectCase.summary || defectCase.symptom_key || '')}</span>
+        </button>
+      `;
+    }).join('');
+
+    elements.caseList.querySelectorAll('[data-case-id]').forEach(button => {
+      button.addEventListener('click', () => {
+        state.selectedCaseId = button.dataset.caseId || '';
+        render();
+      });
+    });
+  }
+
+  function renderSelectedCase() {
+    const selected = state.cases.find(defectCase => defectCase.case_id === state.selectedCaseId);
+    const observationsByCase = groupByCaseId(state.observations);
+    const evidenceByObservation = evidenceByObservationId(state.evidence);
+
+    if (!selected) {
+      elements.selectedCaseMeta.textContent = '代表ケースを選択してください。';
+      elements.selectedCaseTitle.textContent = '未選択';
+      elements.selectedCaseBadges.innerHTML = '';
+      elements.selectedCaseContent.innerHTML = '<p>代表ケースが未登録です。</p>';
+      elements.copyBacklogBtn.disabled = true;
+      elements.backlogBlockReason.textContent = '';
+      return;
+    }
+
+    const linkedObservations = observationsByCase[selected.case_id] || [];
+    const blockReason = getBacklogBlockReason(selected, linkedObservations);
+    const eligible = isBacklogEligible(selected, linkedObservations);
+    elements.selectedCaseMeta.textContent = `${selected.case_id} / ${selected.environment || '-'} / ${selected.screen || '-'}`;
+    elements.selectedCaseTitle.textContent = selected.title || '(no title)';
+    elements.selectedCaseBadges.innerHTML = [
+      createBadge(STATUS_LABELS[selected.status] || selected.status || '受付', selected.status === 'confirmed' || selected.status === 'backlog_linked' ? 'success' : 'default'),
+      createBadge(SEVERITY_LABELS[selected.severity] || selected.severity || '中', selected.severity === 'Critical' || selected.severity === 'High' ? 'danger' : 'info'),
+      createBadge(selected.backlog_key || 'Backlog未連携', selected.backlog_key ? 'success' : 'warning')
+    ].join('');
+    elements.copyBacklogBtn.disabled = !eligible;
+    elements.backlogBlockReason.textContent = blockReason || `件名: ${makeBacklogTitle(selected)}`;
+
+    const observationHtml = linkedObservations.length
+      ? linkedObservations.map(observation => {
+        const evidenceRows = evidenceByObservation[observation.observation_id] || [];
+        const sourceLabel = observation.source_type === 'ai'
+          ? `AI agent${observation.agent_run_id ? ` / ${observation.agent_run_id}` : ''}`
+          : observation.source_role || 'human';
+        return `
+          <article class="rounded-lg border border-outline-variant bg-background p-4">
+            <div class="flex flex-wrap items-start justify-between gap-2">
+              <div>
+                <p class="text-xs font-semibold text-primary">${escapeHtml(observation.observation_id)}</p>
+                <h4 class="mt-1 text-sm font-bold text-on-surface">${escapeHtml(sourceLabel)}</h4>
+              </div>
+              <div class="flex flex-wrap gap-1">
+                ${createBadge(VERIFICATION_LABELS[observation.verification_status] || observation.verification_status || '未確認', observation.verification_status === 'confirmed' ? 'success' : observation.verification_status === 'rejected' ? 'danger' : 'warning')}
+                ${createBadge(observation.reproduce_status || 'reported', 'default')}
+              </div>
+            </div>
+            <p class="mt-3 whitespace-pre-wrap text-sm leading-6 text-on-surface-variant">${escapeHtml(observation.note || '')}</p>
+            ${evidenceRows.length ? `<div class="mt-3 space-y-2">${evidenceRows.map(evidence => `
+              <div class="rounded-lg border border-outline-variant bg-surface px-3 py-2 text-xs leading-5">
+                <span class="font-bold text-on-surface">${escapeHtml(evidence.type || 'evidence')}</span>
+                <span class="ml-2 text-on-surface-variant">${escapeHtml(evidence.summary || '')}</span>
+                <div class="break-all text-primary">${escapeHtml(evidence.url_or_path || '')}</div>
+                <div class="text-on-surface-variant">mask: ${escapeHtml(evidence.redaction_status || 'unknown')}</div>
+              </div>`).join('')}</div>` : ''}
+          </article>
+        `;
+      }).join('')
+      : '<div class="rounded-lg border border-dashed border-outline-variant bg-background p-4">この代表ケースに紐づく観測はありません。</div>';
+
+    elements.selectedCaseContent.innerHTML = `
+      <section>
+        <h3 class="text-base font-bold text-on-surface">概要</h3>
+        <p class="mt-2 whitespace-pre-wrap">${escapeHtml(selected.summary || '')}</p>
+      </section>
+      <section class="grid gap-3 md:grid-cols-2">
+        <div class="rounded-lg border border-outline-variant bg-background p-3">
+          <p class="text-xs font-bold text-primary">期待結果</p>
+          <p class="mt-2 whitespace-pre-wrap">${escapeHtml(selected.expected || '-')}</p>
+        </div>
+        <div class="rounded-lg border border-outline-variant bg-background p-3">
+          <p class="text-xs font-bold text-primary">実際結果</p>
+          <p class="mt-2 whitespace-pre-wrap">${escapeHtml(selected.actual || '-')}</p>
+        </div>
+      </section>
+      <section>
+        <h3 class="text-base font-bold text-on-surface">観測</h3>
+        <div class="mt-3 space-y-3">${observationHtml}</div>
+      </section>
+    `;
+  }
+
+  function render() {
+    renderStats();
+    renderCaseList();
+    renderSelectedCase();
+  }
+
+  function formValues(form) {
+    return Object.fromEntries(new FormData(form).entries());
+  }
+
+  function nowLocalInputValue() {
+    const now = new Date();
+    const offset = now.getTimezoneOffset() * 60000;
+    return new Date(now.getTime() - offset).toISOString().slice(0, 16);
+  }
+
+  async function handleObservationSubmit(event) {
+    event.preventDefault();
+    const values = formValues(elements.observationForm);
+    const sourceType = values.source_type === 'ai' ? 'ai' : 'human';
+    const observation = {
+      observation_id: createLocalId('OBS'),
+      case_id: values.case_id || '',
+      source_type: sourceType,
+      source_role: sourceType === 'ai' ? 'AI agent' : values.source_role,
+      agent_run_id: sourceType === 'ai' ? values.agent_run_id : '',
+      observed_at: values.observed_at || new Date().toISOString(),
+      reproduce_status: values.reproduce_status || 'reported',
+      confidence: values.confidence || '',
+      verification_status: sourceType === 'ai' ? 'unverified' : values.verification_status,
+      note: values.note || ''
+    };
+    const evidence = values.url_or_path ? [{
+      evidence_id: createLocalId('EVD'),
+      observation_id: observation.observation_id,
+      type: values.evidence_type || 'note',
+      url_or_path: values.url_or_path,
+      summary: values.evidence_summary || '',
+      redaction_status: values.redaction_status || 'unknown'
+    }] : [];
+
+    await persistAction('appendObservation', { observation, evidence });
+    setStatus(state.storageMode === 'gas' ? 'observationを保存しました。DBを再読み込みします。' : 'observationをローカルDBに保存しました。', 'success');
+    elements.observationForm.reset();
+    elements.observationForm.elements.observed_at.value = nowLocalInputValue();
+    if (state.storageMode === 'gas') {
+      await loadAllResources();
+    } else {
+      render();
+    }
+  }
+
+  async function handleCaseSubmit(event) {
+    event.preventDefault();
+    const values = formValues(elements.caseForm);
+    const defectCase = {
+      case_id: values.case_id || createLocalId('BUG'),
+      title: values.title,
+      status: values.status || 'confirmed',
+      severity: values.severity || 'Medium',
+      environment: values.environment || '',
+      screen: values.screen || '',
+      symptom_key: values.symptom_key || '',
+      summary: values.summary || '',
+      expected: values.expected || '',
+      actual: values.actual || ''
+    };
+    await persistAction('promoteObservationToCase', {
+      observation_id: values.observation_id || '',
+      case: defectCase,
+      actor_role: 'QA'
+    });
+    state.selectedCaseId = defectCase.case_id;
+    setStatus(state.storageMode === 'gas' ? '代表ケースを保存しました。DBを再読み込みします。' : '代表ケースをローカルDBに保存しました。', 'success');
+    elements.caseForm.reset();
+    if (state.storageMode === 'gas') {
+      await loadAllResources();
+    } else {
+      render();
+    }
+  }
+
+  async function handleBacklogSubmit(event) {
+    event.preventDefault();
+    const values = formValues(elements.backlogForm);
+    await persistAction('linkBacklogIssue', {
+      case_id: values.case_id,
+      backlog_key: values.backlog_key,
+      actor_role: 'QA'
+    });
+    setStatus(state.storageMode === 'gas' ? 'Backlogキーを紐づけました。DBを再読み込みします。' : 'BacklogキーをローカルDBに紐づけました。', 'success');
+    elements.backlogForm.reset();
+    if (state.storageMode === 'gas') {
+      await loadAllResources();
+    } else {
+      render();
+    }
+  }
+
+  async function handleMergeSubmit(event) {
+    event.preventDefault();
+    const values = formValues(elements.mergeForm);
+    await persistAction('mergeCases', {
+      source_case_id: values.source_case_id,
+      target_case_id: values.target_case_id,
+      note: values.note || '',
+      actor_role: 'QA'
+    });
+    state.selectedCaseId = values.target_case_id;
+    setStatus(state.storageMode === 'gas' ? '重複ケースを統合しました。DBを再読み込みします。' : '重複ケースをローカルDBで統合しました。', 'success');
+    elements.mergeForm.reset();
+    if (state.storageMode === 'gas') {
+      await loadAllResources();
+    } else {
+      render();
+    }
+  }
+
+  async function copyBacklogBody() {
+    const selected = state.cases.find(defectCase => defectCase.case_id === state.selectedCaseId);
+    if (!selected) return;
+    const body = [
+      makeBacklogTitle(selected),
+      '',
+      buildBacklogBody(selected, state.observations, state.evidence)
+    ].join('\n');
+    await navigator.clipboard.writeText(body);
+    elements.copyBacklogBtn.innerHTML = '<span class="material-icons text-base">done</span>コピーしました';
+    window.setTimeout(() => {
+      elements.copyBacklogBtn.innerHTML = '<span class="material-icons text-base">content_copy</span>Backlog本文をコピー';
+    }, 1600);
+  }
+
+  function bindEvents() {
+    elements.saveGasUrlBtn.addEventListener('click', () => {
+      state.gasUrl = elements.gasUrlInput.value.trim();
+      if (state.gasUrl) {
+        localStorage.setItem(STORAGE_KEY, state.gasUrl);
+        state.storageMode = 'gas';
+        setConnectionBadge('保存済み', 'success');
+        setStatus('GAS Web App URLを保存しました。読み込みを実行してください。', 'success');
+      } else {
+        localStorage.removeItem(STORAGE_KEY);
+        state.storageMode = 'local';
+        applyDataSet(loadLocalDataSet());
+        setConnectionBadge('ローカルDB', 'success');
+        setStatus('ローカルDBへ切り替えました。', 'success');
+        render();
+      }
+    });
+    elements.reloadBtn.addEventListener('click', () => {
+      state.gasUrl = elements.gasUrlInput.value.trim();
+      loadAllResources().catch(error => {
+        setConnectionBadge('接続失敗', 'danger');
+        setStatus(error.message, 'danger');
+      });
+    });
+    elements.seedDemoBtn.addEventListener('click', () => {
+      if (state.storageMode === 'gas') {
+        setStatus('サンプル投入はローカルDB専用です。GAS URL欄を空にして読み込み直してください。', 'warning');
+        return;
+      }
+      saveLocalDataSet(makeDemoDefectDataSet());
+      state.selectedCaseId = 'BUG-DEMO-001';
+      setConnectionBadge('ローカルDB', 'success');
+      setStatus('ローカルDBにサンプルを投入しました。Backlog本文コピーまで試せます。', 'success');
+      render();
+    });
+    elements.exportJsonBtn.addEventListener('click', async () => {
+      const json = JSON.stringify(currentDataSet(), null, 2);
+      try {
+        await navigator.clipboard.writeText(json);
+        setStatus('現在のDB内容をJSONとしてクリップボードへコピーしました。', 'success');
+      } catch (error) {
+        setStatus(`JSONコピーに失敗しました: ${error.message}`, 'danger');
+      }
+    });
+    elements.clearLocalBtn.addEventListener('click', () => {
+      if (!window.confirm('ローカルDBを初期化します。GAS側のSpreadsheetには影響しません。')) {
+        return;
+      }
+      localStorage.removeItem(LOCAL_DB_KEY);
+      applyDataSet(createEmptyDefectDataSet());
+      state.selectedCaseId = '';
+      setConnectionBadge('ローカルDB', 'success');
+      setStatus('ローカルDBを初期化しました。', 'success');
+      render();
+    });
+    elements.caseSearch.addEventListener('input', event => {
+      state.search = event.target.value;
+      render();
+    });
+    elements.observationForm.addEventListener('submit', event => {
+      handleObservationSubmit(event).catch(error => setStatus(error.message, 'danger'));
+    });
+    elements.caseForm.addEventListener('submit', event => {
+      handleCaseSubmit(event).catch(error => setStatus(error.message, 'danger'));
+    });
+    elements.backlogForm.addEventListener('submit', event => {
+      handleBacklogSubmit(event).catch(error => setStatus(error.message, 'danger'));
+    });
+    elements.mergeForm.addEventListener('submit', event => {
+      handleMergeSubmit(event).catch(error => setStatus(error.message, 'danger'));
+    });
+    elements.copyBacklogBtn.addEventListener('click', () => {
+      copyBacklogBody().catch(error => setStatus(error.message, 'danger'));
+    });
+    elements.observationForm.elements.source_type.addEventListener('change', event => {
+      if (event.target.value === 'ai') {
+        elements.observationForm.elements.source_role.value = 'AI agent';
+        elements.observationForm.elements.verification_status.value = 'unverified';
+      }
+    });
+  }
+
+  function init() {
+    state.gasUrl = localStorage.getItem(STORAGE_KEY) || '';
+    elements.gasUrlInput.value = state.gasUrl;
+    elements.observationForm.elements.observed_at.value = nowLocalInputValue();
+    bindEvents();
+    if (state.gasUrl) {
+      state.storageMode = 'gas';
+      setConnectionBadge('保存済み', 'success');
+      loadAllResources().catch(error => {
+        setConnectionBadge('接続失敗', 'danger');
+        setStatus(error.message, 'danger');
+      });
+    } else {
+      state.storageMode = 'local';
+      applyDataSet(loadLocalDataSet());
+      setConnectionBadge('ローカルDB', 'success');
+      setStatus('ローカルDBで利用中です。GAS Web App URLを設定するとSpreadsheetへ切り替えます。', 'success');
+      render();
+    }
+  }
+
+  init();
+</script>
+</body>
+</html>
