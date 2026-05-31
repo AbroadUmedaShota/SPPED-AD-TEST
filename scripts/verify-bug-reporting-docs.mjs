@@ -38,11 +38,25 @@ assert.ok(manifest.flow?.[0]?.items?.some(item => item.label === 'AI観測登録
 const rootReadme = read('99_backend-docs/README.md');
 assert.match(rootReadme, /09_bug-reporting/);
 assert.match(rootReadme, /バグ報告DB/);
+assert.match(rootReadme, /共有モックDB/);
 
 const rootIndex = read('99_backend-docs/index.html');
 assert.match(rootIndex, /10カテゴリ/);
 assert.match(rootIndex, /\.\/09_bug-reporting\/index\.html/);
 assert.match(rootIndex, /バグ報告DB/);
+
+const e2eGasReadme = read('99_backend-docs/08_e2e-testing/gas/README.md');
+assert.match(e2eGasReadme, /SPEED AD共有モックDB GAS/);
+assert.match(e2eGasReadme, /defect_cases/);
+assert.match(e2eGasReadme, /appendObservation/);
+
+const bugReadme = read('99_backend-docs/09_bug-reporting/README.md');
+assert.match(bugReadme, /共有モックDB/);
+assert.match(bugReadme, /AKfycbx3ait9hRE5NkEJUhMWh7o7jFoZ2DAxceibZ4JkH0rORp6a95VO-CZunQGsySF2sQ_aDw/);
+
+const reportsHtml = read('99_backend-docs/09_bug-reporting/reports.html');
+assert.match(reportsHtml, /DEFAULT_GAS_WEB_APP_URL/);
+assert.match(reportsHtml, /共有モックDB接続/);
 
 const gasCode = read('99_backend-docs/09_bug-reporting/gas/Code.gs');
 [

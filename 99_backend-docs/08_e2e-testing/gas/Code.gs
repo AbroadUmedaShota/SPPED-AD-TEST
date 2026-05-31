@@ -1,8 +1,8 @@
 /**
- * SPEED AD E2E scenario execution backend.
+ * SPEED AD shared mock DB backend.
  *
  * Setup:
- * 1. Create a Google Spreadsheet for scenario execution management.
+ * 1. Use the SPEED AD shared mock DB Spreadsheet.
  * 2. Deploy as a Web App.
  *
  * GET:

@@ -7,15 +7,16 @@
 - Script ID: `1T8nXB2MQJJkrRIAXR23m33wzabRWw-a83k51IVGBVab1JUlW-4tArxqb`
 - Latest dedicated deployment: `AKfycbwn_0ROYUKCZ5ptrvSsGSIEcNRnShbGaZiINRJbb0c487G005vLlGkpA2TKP0FeHFEC5Q`
 
-## Current Workaround
+## Current Role
 
-Existing E2E scenario GAS works and has already been authorized as a Web App. The working E2E GAS has been extended with the bug-reporting resources and actions, while preserving the existing scenario APIs.
+Existing E2E scenario GAS works and has already been authorized as a Web App. This Spreadsheet is now treated as the shared mock DB for this SPEED AD mock workspace. The working E2E GAS has been extended with the bug-reporting resources and actions, while preserving the existing scenario APIs.
 
 - Shared Web App URL: `https://script.google.com/macros/s/AKfycbx3ait9hRE5NkEJUhMWh7o7jFoZ2DAxceibZ4JkH0rORp6a95VO-CZunQGsySF2sQ_aDw/exec`
 - Shared Spreadsheet ID: `16aPp9PVFlkfBhhirmP0nG7P09oImGXhrSTrraLLYK9M`
-- Added tabs: `defect_cases`, `defect_observations`, `defect_evidence`, `triage_events`
+- E2E tabs: `scenarios`, `scenario_steps`, `scenario_runs`, `scenario_step_results`
+- Bug-reporting tabs: `defect_cases`, `defect_observations`, `defect_evidence`, `triage_events`
 
-This is a temporary backend until a dedicated spreadsheet or dedicated Apps Script Web App can be authorized.
+Dedicated bug-reporting GAS can still be recreated later, but it is no longer the v1 operating path.
 
 ## Verified
 
@@ -26,7 +27,7 @@ This is a temporary backend until a dedicated spreadsheet or dedicated Apps Scri
 
 ## Blocked Items
 
-Google OAuth / Workspace policy blocked the dedicated spreadsheet creation/final authorization path.
+Google OAuth / Workspace policy blocked the dedicated spreadsheet creation/final authorization path. This does not block current mock DB operation because the shared E2E Web App is the v1 backend.
 
 Observed errors:
 
@@ -37,7 +38,7 @@ Observed errors:
 
 ## Local Fallback
 
-`reports.html` now works without GAS by using browser localStorage as the temporary DB.
+`reports.html` also works without GAS by using browser localStorage as an offline fallback.
 
 Use it for:
 

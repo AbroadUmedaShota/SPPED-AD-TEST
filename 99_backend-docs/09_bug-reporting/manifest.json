@@ -2,7 +2,7 @@
   "meta": {
     "id": "09_bug-reporting",
     "title": "バグ報告DB",
-    "summary": "人間の報告とAIエージェントの調査結果を受付DBに集約し、Backlog起票前の重複整理と証跡確認を行います。",
+    "summary": "人間の報告とAIエージェントの調査結果を共有モックDBに集約し、Backlog起票前の重複整理と証跡確認を行います。",
     "sourceStatus": "運用設計 / Backlog起票補助 / AI観測",
     "hasUnconfirmed": true
   },
@@ -13,7 +13,7 @@
       "category": "概要",
       "sourceStatus": "運用設計",
       "path": "01_bug-report-overview.md",
-      "summary": "DB受付正本、Backlog対応正本、1不具合1代表ケースの境界を整理します。",
+      "summary": "共有モックDB、Backlog対応正本、1不具合1代表ケースの境界を整理します。",
       "tags": ["バグ報告", "受付DB", "Backlog", "重複整理"],
       "hasUnconfirmed": true,
       "relatedSources": [
@@ -72,7 +72,7 @@
           "documentId": "BUG-001",
           "timing": "受付",
           "label": "報告受付",
-          "summary": "人間報告とAI観測を個別 observation として受付DBへ保存します。"
+          "summary": "人間報告とAI観測を個別 observation として共有モックDBへ保存します。"
         },
         {
           "id": "BUG-F02",

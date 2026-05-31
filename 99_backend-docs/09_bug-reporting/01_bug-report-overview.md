@@ -10,13 +10,13 @@ last_reviewed: 2026-05-31
 
 人間の報告、テスト中の発見、AIエージェントの調査結果を、Backlog起票前に同じ受付DBへ集約します。
 
-v1では Google Spreadsheet + Apps Script Web App を使い、既存のE2Eシナリオ管理と同じ軽量な構成で始めます。
+v1では `SPEED AD E2Eシナリオ実行管理` Spreadsheetを、本モックで使用する共有モックDBとして扱います。Apps Script Web AppはE2Eシナリオ管理とバグ報告DBの両方を担当します。
 
 ## 正本の分け方
 
 | 対象 | 正本 | 役割 |
 | --- | --- | --- |
-| 受付・観測・重複整理 | バグ報告DB | 報告、AI観測、証跡、代表ケースを管理する |
+| 受付・観測・重複整理 | 共有モックDB内のバグ報告タブ | 報告、AI観測、証跡、代表ケースを管理する |
 | 修正・調査の進行 | Backlog | 開発会社との対応課題、コメント、ステータスを管理する |
 | UI仕様・送信方式 | `docs/画面設計/仕様/` | 画面仕様や正式なAPI仕様を管理する |
 | 社内判断・個人連絡先 | private管理 | shared repoには残さない |
@@ -44,6 +44,8 @@ v1では Google Spreadsheet + Apps Script Web App を使い、既存のE2Eシナ
 - 価格、契約、非公開プラン、社内判断の経緯。
 
 ## DBの最小構成
+
+共有モックDBでは、E2E管理タブとバグ報告タブを同じSpreadsheetに置きます。E2E側の `scenarios`, `scenario_steps`, `scenario_runs`, `scenario_step_results` はテスト実行管理、以下の `defect_*` タブは不具合受付管理を担当します。
 
 | タブ | 用途 |
 | --- | --- |
