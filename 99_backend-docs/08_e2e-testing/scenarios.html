@@ -189,12 +189,21 @@
             <div class="mt-4 flex flex-wrap gap-2">
               <button id="loadDbButton" type="button" class="inline-flex items-center gap-2 rounded-lg border border-outline px-3 py-2 text-sm font-semibold text-on-surface hover:bg-surface-variant">
                 <span class="material-icons text-base">sync</span>
-                DB取得
+                今すぐ同期
               </button>
               <button id="createRunButton" type="button" class="inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-on-primary hover:bg-blue-700">
                 <span class="material-icons text-base">play_circle</span>
                 実行回作成
               </button>
+            </div>
+            <div class="mt-4 grid gap-2 text-xs leading-5 text-on-surface-variant">
+              <label class="inline-flex items-center gap-2 font-semibold text-on-surface">
+                <input id="autoSyncToggle" type="checkbox" class="form-checkbox rounded border-outline text-primary">
+                自動同期
+              </label>
+              <p>同期状態: <span id="syncStateText" class="font-semibold text-on-surface">待機中</span></p>
+              <p>最終同期: <span id="lastSyncText" class="font-semibold text-on-surface">未実行</span></p>
+              <p>次回同期: <span id="nextSyncText" class="font-semibold text-on-surface">未設定</span></p>
             </div>
           </div>
         </div>
@@ -330,6 +339,7 @@
   <script>
     const STATUS_OPTIONS = ['未実行', 'OK', 'NG', '保留', '要許可', '対象外'];
     const DEFAULT_GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyqxKWAQFpOR6afaVIYflnddewWrGY-UvqxXQBIELsNfT45gXZMTB4THBCnm8Ki0U-6mA/exec';
+    const SYNC_INTERVAL_MS = 60000;
     const SIDE_EFFECT_LABELS = {
       none: 'なし',
       low: '低',
@@ -340,7 +350,9 @@
       tester: 'speedad-e2e-scenario:tester',
       environment: 'speedad-e2e-scenario:environment',
       activeRunId: 'speedad-e2e-scenario:active-run-id',
-      results: 'speedad-e2e-scenario:results'
+      results: 'speedad-e2e-scenario:results',
+      autoSyncEnabled: 'speedad-e2e-scenario:auto-sync-enabled',
+      lastSyncAt: 'speedad-e2e-scenario:last-sync-at'
     };
 
     const state = {
@@ -350,7 +362,15 @@
       selectedScenarioId: '',
       dataSource: 'fallback',
       activeRunId: localStorage.getItem(STORAGE_KEYS.activeRunId) || '',
-      results: readStoredResults()
+      results: readStoredResults(),
+      autoSyncEnabled: localStorage.getItem(STORAGE_KEYS.autoSyncEnabled) !== 'false',
+      lastSyncAt: localStorage.getItem(STORAGE_KEYS.lastSyncAt) || '',
+      nextSyncAt: '',
+      syncTimerId: null,
+      syncInFlight: false,
+      masterSignature: '',
+      saveDirty: false,
+      lastSavedAt: ''
     };
 
     const elements = {
@@ -363,6 +383,10 @@
       activeRunId: document.getElementById('activeRunId'),
       loadDb: document.getElementById('loadDbButton'),
       createRun: document.getElementById('createRunButton'),
+      autoSync: document.getElementById('autoSyncToggle'),
+      syncState: document.getElementById('syncStateText'),
+      lastSync: document.getElementById('lastSyncText'),
+      nextSync: document.getElementById('nextSyncText'),
       scenarioTotal: document.getElementById('scenarioTotal'),
       p0Total: document.getElementById('p0Total'),
       p1p2Total: document.getElementById('p1p2Total'),
@@ -390,6 +414,8 @@
     elements.gasUrl.value = localStorage.getItem(STORAGE_KEYS.gasUrl) || DEFAULT_GAS_WEB_APP_URL;
     elements.tester.value = localStorage.getItem(STORAGE_KEYS.tester) || '';
     elements.environment.value = localStorage.getItem(STORAGE_KEYS.environment) || `${detectBrowser()} / ${window.innerWidth}px`;
+    elements.autoSync.checked = state.autoSyncEnabled;
+    state.masterSignature = buildMasterSignature(state.scenarios, state.steps);
 
     function readStoredResults() {
       try {
@@ -401,6 +427,49 @@
 
     function persistResults() {
       localStorage.setItem(STORAGE_KEYS.results, JSON.stringify(state.results));
+    }
+
+    function buildMasterSignature(scenarios, steps) {
+      return JSON.stringify({
+        scenarios: scenarios.map(scenario => ({
+          scenario_id: scenario.scenario_id,
+          title: scenario.title,
+          role_scope: scenario.role_scope,
+          scenario_group: scenario.scenario_group,
+          priority: scenario.priority,
+          side_effect: scenario.side_effect,
+          start_url: scenario.start_url,
+          objective: scenario.objective,
+          linked_case_ids: scenario.linked_case_ids,
+          stg_observation_status: scenario.stg_observation_status,
+          expected_outcome: scenario.expected_outcome,
+          evidence_policy: scenario.evidence_policy,
+          notes: scenario.notes
+        })),
+        steps: steps.map(step => ({
+          scenario_id: step.scenario_id,
+          step_id: step.step_id,
+          step_no: Number(step.step_no),
+          action: step.action,
+          expected: step.expected,
+          side_effect: step.side_effect,
+          requires_permission: step.requires_permission,
+          linked_case_ids: step.linked_case_ids
+        }))
+      });
+    }
+
+    function formatClock(value) {
+      if (!value) return '';
+      const date = value instanceof Date ? value : new Date(value);
+      if (Number.isNaN(date.getTime())) return '';
+      return date.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+
+    function formatRemaining(timestamp) {
+      if (!timestamp) return '未設定';
+      const remainingSeconds = Math.max(0, Math.ceil((Number(timestamp) - Date.now()) / 1000));
+      return `約${remainingSeconds}秒後`;
     }
 
     function normalize(value) {
@@ -642,10 +711,13 @@
             <h3 class="mt-1 text-title-large font-bold text-on-surface">${escapeHtml(scenario.title)}</h3>
             <p class="mt-2 text-sm leading-6 text-on-surface-variant">${escapeHtml(scenario.objective)}</p>
           </div>
-          <button id="saveScenarioButton" type="button" class="inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-on-primary hover:bg-blue-700">
-            <span class="material-icons text-base">save</span>
-            結果保存
-          </button>
+          <div class="flex flex-col items-start gap-2 sm:items-end">
+            <button id="saveScenarioButton" type="button" class="inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-on-primary hover:bg-blue-700">
+              <span class="material-icons text-base">save</span>
+              結果保存
+            </button>
+            <p id="saveStatusText" class="rounded-full bg-background px-3 py-1 text-xs font-semibold text-on-surface-variant">${escapeHtml(getSaveStatusText())}</p>
+          </div>
         </div>
 
         <div class="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
@@ -733,10 +805,31 @@
       elements.activeRunId.textContent = state.activeRunId || '未作成';
     }
 
+    function getSaveStatusText() {
+      if (state.saveDirty) return '未保存';
+      if (state.lastSavedAt) return `保存済み ${formatClock(state.lastSavedAt)}`;
+      return '保存前';
+    }
+
+    function updateSaveStatus() {
+      const saveStatus = document.getElementById('saveStatusText');
+      if (!saveStatus) return;
+      saveStatus.textContent = getSaveStatusText();
+      saveStatus.className = `rounded-full px-3 py-1 text-xs font-semibold ${state.saveDirty ? 'bg-amber-50 text-amber-700' : 'bg-background text-on-surface-variant'}`;
+    }
+
+    function renderSyncStatus() {
+      elements.autoSync.checked = state.autoSyncEnabled;
+      elements.syncState.textContent = state.syncInFlight ? '同期中' : (state.autoSyncEnabled ? '待機中' : '自動同期OFF');
+      elements.lastSync.textContent = state.lastSyncAt ? formatClock(state.lastSyncAt) : '未実行';
+      elements.nextSync.textContent = state.autoSyncEnabled ? formatRemaining(state.nextSyncAt) : '未設定';
+      elements.dbStatus.textContent = state.syncInFlight ? '同期中' : (state.dataSource === 'spreadsheet' ? 'DB接続済み' : '未接続');
+    }
+
     function setConnectionMessage(message, isError = false) {
       elements.connectionMessage.textContent = message;
       elements.connectionMessage.className = `mt-3 min-h-6 text-sm leading-6 ${isError ? 'text-red-700' : 'text-on-surface-variant'}`;
-      elements.dbStatus.textContent = state.dataSource === 'spreadsheet' ? 'DB接続済み' : '未接続';
+      renderSyncStatus();
     }
 
     function resetFilters() {
@@ -895,14 +988,34 @@
       };
     }
 
-    async function loadFromDb() {
+    function applyMasterData(nextScenarios, nextSteps) {
+      const nextSignature = buildMasterSignature(nextScenarios, nextSteps);
+      const hasChanged = nextSignature !== state.masterSignature || state.dataSource !== 'spreadsheet';
+      state.scenarios = nextScenarios;
+      state.steps = nextSteps;
+      state.dataSource = 'spreadsheet';
+      state.masterSignature = nextSignature;
+      if (hasChanged) {
+        renderStats();
+        renderFilterOptions();
+        renderScenarios();
+      }
+      return hasChanged;
+    }
+
+    async function syncMasters(source = 'manual') {
       const gasUrl = elements.gasUrl.value.trim();
       if (!gasUrl) {
         setConnectionMessage('GAS Web App URLを入力してください。', true);
-        return;
+        return false;
+      }
+      if (state.syncInFlight) {
+        setConnectionMessage('同期処理中のため今回の同期をスキップしました。');
+        return false;
       }
       localStorage.setItem(STORAGE_KEYS.gasUrl, gasUrl);
-      setConnectionMessage('DBから取得中です。');
+      state.syncInFlight = true;
+      setConnectionMessage(source === 'auto' ? '自動同期中です。' : 'DBから取得中です。');
       try {
         const [scenarioResponse, stepResponse] = await Promise.all([
           loadJsonp(gasUrl, { resource: 'scenarios' }),
@@ -915,18 +1028,49 @@
           throw new Error('Spreadsheetにシナリオまたは手順データがありません。');
         }
 
-        state.scenarios = nextScenarios;
-        state.steps = nextSteps;
-        state.dataSource = 'spreadsheet';
-        renderStats();
-        renderFilterOptions();
-        renderScenarios();
-        setConnectionMessage(`Spreadsheetから${nextScenarios.length}件のシナリオを取得しました。`);
+        const hasChanged = applyMasterData(nextScenarios, nextSteps);
+        state.lastSyncAt = new Date().toISOString();
+        localStorage.setItem(STORAGE_KEYS.lastSyncAt, state.lastSyncAt);
+        setConnectionMessage(hasChanged ? `Spreadsheetから${nextScenarios.length}件のシナリオを取得しました。` : `Spreadsheetは最新です。${nextScenarios.length}件のシナリオを確認しました。`);
+        return true;
       } catch (error) {
         state.dataSource = 'fallback';
         renderStats();
-        setConnectionMessage(`${error.message} フォールバックデータを表示しています。`, true);
+        const lastSync = state.lastSyncAt ? ` 最終成功: ${formatClock(state.lastSyncAt)}。` : '';
+        setConnectionMessage(`${error.message} フォールバックデータを表示しています。${lastSync}`, true);
+        return false;
+      } finally {
+        state.syncInFlight = false;
+        renderSyncStatus();
       }
+    }
+
+    function clearAutoSyncTimer() {
+      if (state.syncTimerId) {
+        window.clearTimeout(state.syncTimerId);
+        state.syncTimerId = null;
+      }
+      state.nextSyncAt = '';
+      renderSyncStatus();
+    }
+
+    function scheduleAutoSync() {
+      clearAutoSyncTimer();
+      if (!state.autoSyncEnabled || !elements.gasUrl.value.trim()) {
+        return;
+      }
+      state.nextSyncAt = Date.now() + SYNC_INTERVAL_MS;
+      renderSyncStatus();
+      state.syncTimerId = window.setTimeout(async () => {
+        state.syncTimerId = null;
+        await syncMasters('auto');
+        scheduleAutoSync();
+      }, SYNC_INTERVAL_MS);
+    }
+
+    async function loadFromDb() {
+      await syncMasters('manual');
+      scheduleAutoSync();
     }
 
     function postToGas(action, payload) {
@@ -983,7 +1127,9 @@
       result.run_id = state.activeRunId || '';
       result.checked_by = elements.tester.value.trim();
       result.checked_at = new Date().toISOString();
+      state.saveDirty = true;
       persistResults();
+      updateSaveStatus();
     }
 
     async function saveSelectedScenario() {
@@ -1005,8 +1151,15 @@
         };
       });
       persistResults();
-      const sent = await postToGas('upsertScenarioStepResult', { results });
-      setConnectionMessage(sent ? `${scenario.scenario_id} の結果を送信しました。再取得して反映を確認してください。` : `${scenario.scenario_id} の結果をローカル保存しました。`);
+      try {
+        const sent = await postToGas('upsertScenarioStepResult', { results });
+        state.saveDirty = false;
+        state.lastSavedAt = new Date().toISOString();
+        updateSaveStatus();
+        setConnectionMessage(sent ? `${scenario.scenario_id} の結果を送信しました。保存済み ${formatClock(state.lastSavedAt)}。` : `${scenario.scenario_id} の結果をローカル保存しました。保存済み ${formatClock(state.lastSavedAt)}。`);
+      } catch (error) {
+        setConnectionMessage(`${scenario.scenario_id} の結果保存に失敗しました。${error.message}`, true);
+      }
     }
 
     function bindEvents() {
@@ -1019,7 +1172,21 @@
       elements.copyCsv.addEventListener('click', () => copyText(toCsv(getFilteredScenarios()), 'CSV'));
       elements.loadDb.addEventListener('click', loadFromDb);
       elements.createRun.addEventListener('click', createScenarioRun);
-      elements.gasUrl.addEventListener('change', () => localStorage.setItem(STORAGE_KEYS.gasUrl, elements.gasUrl.value.trim()));
+      elements.autoSync.addEventListener('change', () => {
+        state.autoSyncEnabled = elements.autoSync.checked;
+        localStorage.setItem(STORAGE_KEYS.autoSyncEnabled, String(state.autoSyncEnabled));
+        if (state.autoSyncEnabled) {
+          scheduleAutoSync();
+          setConnectionMessage('自動同期をONにしました。');
+        } else {
+          clearAutoSyncTimer();
+          setConnectionMessage('自動同期をOFFにしました。');
+        }
+      });
+      elements.gasUrl.addEventListener('change', () => {
+        localStorage.setItem(STORAGE_KEYS.gasUrl, elements.gasUrl.value.trim());
+        scheduleAutoSync();
+      });
       elements.tester.addEventListener('change', () => localStorage.setItem(STORAGE_KEYS.tester, elements.tester.value.trim()));
       elements.environment.addEventListener('change', () => localStorage.setItem(STORAGE_KEYS.environment, elements.environment.value.trim()));
       elements.queueList.addEventListener('click', event => {
@@ -1053,6 +1220,10 @@
     renderRun();
     bindEvents();
     renderScenarios();
+    renderSyncStatus();
+    if (state.autoSyncEnabled && elements.gasUrl.value.trim()) {
+      syncMasters('initial').finally(scheduleAutoSync);
+    }
   </script>
 </body>
 </html>
