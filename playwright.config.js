@@ -52,6 +52,13 @@ module.exports = defineConfig({
     // --- stg ログイン → 権限レベル別 storageState 生成 ---
     { name: 'setup', testMatch: /auth\.setup\.js/ },
 
+    // --- stg 未ログイン（公開ページ・リダイレクト確認）---
+    {
+      name: 'stg-public',
+      testMatch: '**/stg/public/**',
+      use: { ...devices['Desktop Chrome'], baseURL: STG },
+    },
+
     // --- stg ユーザー画面（企業ユーザー）---
     {
       name: 'stg-user',
