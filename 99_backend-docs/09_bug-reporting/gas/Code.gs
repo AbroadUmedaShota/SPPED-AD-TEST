@@ -16,7 +16,7 @@
  *   { action: "appendTriageEvent", payload: { event: {...} } }
  */
 
-var DEFAULT_SPREADSHEET_ID = '';
+var DEFAULT_SPREADSHEET_ID = '16aPp9PVFlkfBhhirmP0nG7P09oImGXhrSTrraLLYK9M';
 
 var SHEET_DEFINITIONS = {
   defect_cases: {
@@ -386,9 +386,7 @@ function createId_(prefix) {
 function getSpreadsheet_() {
   var spreadsheetId = PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID') || DEFAULT_SPREADSHEET_ID;
   if (!spreadsheetId) {
-    var createdSpreadsheet = SpreadsheetApp.create('SPEED AD バグ報告DB');
-    PropertiesService.getScriptProperties().setProperty('SPREADSHEET_ID', createdSpreadsheet.getId());
-    return createdSpreadsheet;
+    throw new Error('Script property SPREADSHEET_ID is not set.');
   }
   return SpreadsheetApp.openById(spreadsheetId);
 }

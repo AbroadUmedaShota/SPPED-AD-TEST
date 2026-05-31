@@ -4,13 +4,19 @@
 
 ## 前提
 
-- Spreadsheet: `SPEED AD バグ報告DB`
+- Spreadsheet: `SPEED AD E2Eシナリオ実行管理`（暫定。`SPREADSHEET_ID` を設定すれば別Spreadsheetへ切替可能）
+- 当面の利用URL: `https://script.google.com/macros/s/AKfycbx3ait9hRE5NkEJUhMWh7o7jFoZ2DAxceibZ4JkH0rORp6a95VO-CZunQGsySF2sQ_aDw/exec`
 - 必須タブ: `defect_cases`, `defect_observations`, `defect_evidence`, `triage_events`
-- Spreadsheet ID は Script Property `SPREADSHEET_ID` に設定します。未設定のまま初回実行した場合は、GASが `SPEED AD バグ報告DB` を自動作成して `SPREADSHEET_ID` に保存します。
+- 既定のSpreadsheet IDは `Code.gs` の `DEFAULT_SPREADSHEET_ID` に定義します。
+- 別のSpreadsheetへ向ける場合は Script Property `SPREADSHEET_ID` に設定します。
 - 画像、動画、ログなどのbinary添付はSpreadsheetに保存しません。Drive、Backlog、ローカル証跡へのURLまたはパスだけを `defect_evidence` に保存します。
 - Web App は `executeAs: USER_DEPLOYING` / `access: ANYONE_ANONYMOUS` で配備します。URLを知っている利用者が書き込めるため、URLは内部運用向けとして扱います。
 
 ## clasp配備手順
+
+Google Workspace/OAuthの制限により専用GASのWeb App公開がブロックされる場合は、既存E2E GASの共用Web Appを使います。共用側のコードは `99_backend-docs/08_e2e-testing/gas/Code.gs` にあり、既存E2E APIに `defect_*` リソースを追加しています。
+
+専用GASを作る場合は次の手順です。
 
 ```powershell
 npx --yes @google/clasp login
@@ -27,7 +33,7 @@ npx --yes @google/clasp run setSpreadsheetId --params '["<spreadsheetId>"]'
 
 `clasp run` で権限エラーになる場合は、Apps ScriptエディタのProject SettingsからScript Propertiesへ `SPREADSHEET_ID` を手動設定してください。
 
-SpreadsheetをGAS側で自動作成する場合は、初回に次を実行します。
+タブ初期化を行う場合は、初回に次を実行します。
 
 ```powershell
 npx --yes @google/clasp run initializeDefectDb
