@@ -246,7 +246,7 @@
             </label>
             <label class="block text-sm text-on-surface-variant">
               <span class="font-semibold text-on-surface">フェーズ</span>
-              <select id="groupFilter" class="form-select mt-1 w-full rounded-lg border-outline">
+              <select id="phaseFilter" class="form-select mt-1 w-full rounded-lg border-outline">
                 <option value="">すべて</option>
               </select>
             </label>
@@ -395,7 +395,7 @@
       visibleTotal: document.getElementById('visibleTotal'),
       search: document.getElementById('scenarioSearch'),
       role: document.getElementById('roleFilter'),
-      group: document.getElementById('groupFilter'),
+      phase: document.getElementById('phaseFilter'),
       priority: document.getElementById('priorityFilter'),
       sideEffect: document.getElementById('sideEffectFilter'),
       activeFilterSummary: document.getElementById('activeFilterSummary'),
@@ -553,19 +553,19 @@
 
     function renderFilterOptions() {
       renderOptions(elements.role, [...new Set(state.scenarios.map(scenario => scenario.role_scope))]);
-      renderOptions(elements.group, [...new Set(state.scenarios.map(scenario => scenario.scenario_group))]);
+      renderOptions(elements.phase, [...new Set(state.scenarios.map(scenario => scenario.scenario_group))]);
     }
 
     function getFilteredScenarios() {
       const keyword = normalize(elements.search.value.trim());
       const role = elements.role.value;
-      const group = elements.group.value;
+      const phase = elements.phase.value;
       const priority = elements.priority.value;
       const sideEffect = elements.sideEffect.value;
 
       return state.scenarios.filter(scenario => {
         if (role && scenario.role_scope !== role) return false;
-        if (group && scenario.scenario_group !== group) return false;
+        if (phase && scenario.scenario_group !== phase) return false;
         if (priority && scenario.priority !== priority) return false;
         if (sideEffect && scenario.side_effect !== sideEffect) return false;
         if (!keyword) return true;
@@ -592,7 +592,7 @@
       const parts = [];
       if (elements.search.value.trim()) parts.push(`検索: ${elements.search.value.trim()}`);
       if (elements.role.value) parts.push(`ロール: ${elements.role.value}`);
-      if (elements.group.value) parts.push(`フェーズ: ${elements.group.value}`);
+      if (elements.phase.value) parts.push(`フェーズ: ${elements.phase.value}`);
       if (elements.priority.value) parts.push(`優先度: ${elements.priority.value}`);
       if (elements.sideEffect.value) parts.push(`副作用: ${SIDE_EFFECT_LABELS[elements.sideEffect.value] || elements.sideEffect.value}`);
       return parts.length ? parts.join(' / ') : '条件なし';
@@ -835,7 +835,7 @@
     function resetFilters() {
       elements.search.value = '';
       elements.role.value = '';
-      elements.group.value = '';
+      elements.phase.value = '';
       elements.priority.value = '';
       elements.sideEffect.value = '';
       hideCopyFallback();
@@ -1163,7 +1163,7 @@
     }
 
     function bindEvents() {
-      [elements.search, elements.role, elements.group, elements.priority, elements.sideEffect].forEach(element => {
+      [elements.search, elements.role, elements.phase, elements.priority, elements.sideEffect].forEach(element => {
         element.addEventListener('input', renderScenarios);
         element.addEventListener('change', renderScenarios);
       });

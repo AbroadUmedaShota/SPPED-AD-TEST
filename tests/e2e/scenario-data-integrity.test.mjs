@@ -13,6 +13,7 @@ vm.runInContext(scenarioSource, context, { filename: scenarioDataPath });
 
 const scenarios = context.window.E2E_SCENARIOS;
 const steps = context.window.E2E_SCENARIO_STEPS;
+const stgTestDir = path.join(repoRoot, 'tests', 'e2e', 'stg');
 
 const expectedPhases = new Set([
   '01_準備',
@@ -23,6 +24,14 @@ const expectedPhases = new Set([
   '06_フォロー・請求',
   '90_管理者運用'
 ]);
+
+function collectFiles(dir) {
+  return fs.readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
+    const entryPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) return collectFiles(entryPath);
+    return entry.isFile() ? [entryPath] : [];
+  });
+}
 
 test('scenario masters use lifecycle phases and keep existing ids stable', () => {
   assert.equal(scenarios.length, 34);
@@ -73,5 +82,29 @@ test('scenario steps are uniquely keyed and attached to known scenarios', () => 
   for (const step of steps) {
     assert.ok(scenarioIds.has(step.scenario_id), `${step.step_id} points to unknown scenario ${step.scenario_id}`);
     assert.match(step.step_id, new RegExp(`^${step.scenario_id}-\\d{2}$`));
+  }
+});
+
+test('Playwright scenario annotations still point to known masters', () => {
+  const scenarioIds = new Set(scenarios.map(scenario => scenario.scenario_id));
+  const stepIds = new Set(steps.map(step => step.step_id));
+  const referencedScenarios = new Set();
+  const referencedSteps = new Set();
+
+  for (const filePath of collectFiles(stgTestDir)) {
+    const source = fs.readFileSync(filePath, 'utf8');
+    for (const match of source.matchAll(/STG-SCN-\d{3}(?!-\d{2})/g)) {
+      referencedScenarios.add(match[0]);
+    }
+    for (const match of source.matchAll(/STG-SCN-\d{3}-\d{2}/g)) {
+      referencedSteps.add(match[0]);
+    }
+  }
+
+  for (const scenarioId of referencedScenarios) {
+    assert.ok(scenarioIds.has(scenarioId), `Playwright references unknown scenario ${scenarioId}`);
+  }
+  for (const stepId of referencedSteps) {
+    assert.ok(stepIds.has(stepId), `Playwright references unknown step ${stepId}`);
   }
 });
