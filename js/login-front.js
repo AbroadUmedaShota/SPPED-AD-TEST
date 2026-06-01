@@ -74,8 +74,6 @@
     const passwordToggle = document.querySelector('.password-toggle');
     const emailError = document.getElementById('email-error');
     const passwordError = document.getElementById('password-error');
-    const loginTermsAgreeCheckbox = document.getElementById('login-terms-agree');
-    const loginTermsAgreeError = document.getElementById('login-terms-agree-error');
     const rememberAccountCheckbox = document.getElementById('remember-account');
     const loginButton = loginForm?.querySelector('.button--filled');
     const googleButtonMain = document.querySelector('.form-container > .button--google');
@@ -311,9 +309,6 @@
     function clearLoginFormErrors() {
       clearError(emailInput, emailError);
       clearError(passwordInput, passwordError);
-      if (loginTermsAgreeCheckbox) {
-        clearError(loginTermsAgreeCheckbox, loginTermsAgreeError);
-      }
     }
 
     function restoreRememberedAccount() {
@@ -419,10 +414,6 @@
           displayError(passwordInput, passwordError, 'パスワードは8文字以上である必要があります。');
           isValid = false;
         }
-      }
-      if (loginTermsAgreeCheckbox && !loginTermsAgreeCheckbox.checked) {
-        displayError(loginTermsAgreeCheckbox, loginTermsAgreeError, '利用規約とプライバシーポリシーへの同意が必要です。');
-        isValid = false;
       }
       return isValid;
     }
@@ -637,7 +628,6 @@
     const inputsToClear = [
       emailInput,
       passwordInput,
-      loginTermsAgreeCheckbox,
       signupNameInput,
       signupEmailInput,
       signupPasswordInput,
@@ -655,8 +645,6 @@
           errorElement = emailError;
         } else if (input === passwordInput) {
           errorElement = passwordError;
-        } else if (input === loginTermsAgreeCheckbox) {
-          errorElement = loginTermsAgreeError;
         } else if (input === signupNameInput) {
           errorElement = signupNameError;
         } else if (input === signupEmailInput) {
@@ -685,8 +673,7 @@
       if (input.type === 'checkbox') {
         input.addEventListener('change', () => {
           if (input.checked && input.getAttribute('aria-invalid') === 'true') {
-            const errorElement = input === loginTermsAgreeCheckbox ? loginTermsAgreeError : termsAgreeError;
-            clearError(input, errorElement);
+            clearError(input, termsAgreeError);
           }
         });
       }
