@@ -1335,6 +1335,10 @@ body.is-hero-font-dragging * {
   height: 20px;
 }
 
+.login-panel__signup-button {
+  margin-top: 10px;
+}
+
 .button__spinner {
   display: none;
   width: 18px;
