@@ -199,12 +199,12 @@ function handleGroupChange(selectedId) {
     // Dispatch custom event with the new account type
     document.dispatchEvent(new CustomEvent('accountTypeChanged', { detail: { accountType } }));
 
+    if (newGroupButton) newGroupButton.style.display = '';
+
     if (selectedId === 'personal') {
-        if (newGroupButton) newGroupButton.style.display = 'none';
         if (groupManagementNav) groupManagementNav.style.display = 'none';
         if (currentGroupLabel) currentGroupLabel.style.display = 'none';
     } else {
-        if (newGroupButton) newGroupButton.style.display = '';
         if (groupManagementNav) groupManagementNav.style.display = '';
         if (currentGroupLabel) currentGroupLabel.style.display = '';
         if (selectedGroup) {
