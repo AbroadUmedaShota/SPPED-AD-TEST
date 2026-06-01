@@ -805,11 +805,11 @@
     const FONT_EDIT_MODE_STORAGE_KEY = 'speedad-hero-font-edit-mode';
     const DEFAULT_BRAND_TEXT = 'SPEED\nAD';
     const DEFAULT_CUSTOM_STATEMENT = 'スピードをアドバンテージに。';
-    const DEFAULT_CUSTOM_LEAD = '展示会やイベントのリード獲得フォローを最適化する\n次世代WEBアンケート作成ツール';
+    const DEFAULT_CUSTOM_LEAD = '展示会やイベントのリード獲得フォローを最適化する、\n次世代WEBアンケート作成ツール。';
     const DEFAULT_VARIANT = {
       id: 'default',
       statement: 'スピードをアドバンテージに。',
-      lead: '展示会やイベントのリード獲得フォローを最適化する<br>次世代WEBアンケート作成ツール',
+      lead: '展示会やイベントのリード獲得フォローを最適化する、<br>次世代WEBアンケート作成ツール。',
       reason: 'デフォルト（現行コピー）。営業プロセスの無駄を減らすリード獲得ツールとして訴求。'
     };
     const fontObjects = {

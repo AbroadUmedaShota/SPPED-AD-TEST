@@ -425,8 +425,8 @@ body.is-hero-font-dragging * {
 
 .hero__statement {
   margin: 28px 0 0;
-  font-family: var(--sans);
-  font-size: var(--hero-statement-size, clamp(1.85rem, 3.1vw, 2.7rem));
+  font-family: var(--serif);
+  font-size: 36px;
   font-weight: 500;
   letter-spacing: 0.04em;
   line-height: 1.48;
@@ -753,7 +753,7 @@ body.is-hero-font-dragging * {
 .hero__lead {
   max-width: 520px;
   margin: 18px 0 0;
-  font-size: var(--hero-lead-size, clamp(0.98rem, 1.25vw, 1.08rem));
+  font-size: 16px;
   font-weight: 500;
   letter-spacing: 0.02em;
   line-height: 1.8;
