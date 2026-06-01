@@ -1434,6 +1434,14 @@ body.is-hero-font-dragging * {
 
 @media (min-width: 1101px) {
   /* ログイン前LP: 各ブロックを1ビューポート単位で表示（フルHD 1920x1080想定） */
+  /* スクロール吸い寄せ（中: proximity＝自由スクロールを保ちつつ各ページに緩く吸着） */
+  html {
+    scroll-snap-type: y proximity;
+  }
+
+  .lp-page {
+    scroll-snap-align: start;
+  }
 
   /* 1枚目: ヒーロー ＋ お知らせ */
   .lp-page--first {
@@ -1493,9 +1501,9 @@ body.is-hero-font-dragging * {
     justify-content: center;
   }
 
-  /* 4枚目: 導入事例（既に100vh設計） */
+  /* 4枚目: 導入事例（100vh + 約1cm 下方向に余裕を持たせる） */
   .lp-page--voice .voice-teaser-section {
-    min-height: 100vh;
+    min-height: calc(100vh + 38px);
   }
 }
 
