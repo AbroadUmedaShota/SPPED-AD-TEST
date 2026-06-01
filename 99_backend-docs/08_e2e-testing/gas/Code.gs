@@ -6,7 +6,7 @@
  * 2. Deploy as a Web App.
  *
  * GET:
- *   ?resource=scenarios|scenario_steps|scenario_runs|scenario_step_results
+ *   ?resource=e2e_cases|scenarios|scenario_steps|scenario_runs|scenario_step_results
  *   ?resource=defect_cases|defect_observations|defect_evidence|triage_events
  *   Optional JSONP: ?callback=callbackName
  *
@@ -14,6 +14,7 @@
  *   text/plain;charset=utf-8
  *
  * POST actions:
+ *   { action: "replaceE2eCaseMasters", payload: { cases: [...] } }
  *   { action: "createScenarioRun", payload: {...} }
  *   { action: "upsertScenarioStepResult", payload: { results: [...] } }
  *   { action: "replaceScenarioMasters", payload: { scenarios: [...], steps: [...] } }
@@ -27,6 +28,27 @@
 var DEFAULT_SPREADSHEET_ID = '16aPp9PVFlkfBhhirmP0nG7P09oImGXhrSTrraLLYK9M';
 
 var SHEET_DEFINITIONS = {
+  e2e_cases: {
+    name: 'e2e_cases',
+    headers: [
+      'case_id',
+      'group',
+      'screen',
+      'route',
+      'title',
+      'preconditions',
+      'steps',
+      'expected',
+      'priority',
+      'side_effect',
+      'evidence',
+      'parent_case_id',
+      'data_source',
+      'note',
+      'active'
+    ],
+    keyColumns: ['case_id']
+  },
   scenarios: {
     name: 'scenarios',
     headers: [
@@ -208,6 +230,11 @@ function doPost(e) {
       });
       upsertRows_(SHEET_DEFINITIONS.scenario_step_results, rows);
       return jsonOut_({ ok: true, action: action, updated: rows.length, updatedAt: new Date().toISOString() });
+    }
+
+    if (action === 'replaceE2eCaseMasters') {
+      replaceRows_(SHEET_DEFINITIONS.e2e_cases, (payload.cases || payload.test_cases || []).map(normalizeE2eCase_));
+      return jsonOut_({ ok: true, action: action, updatedAt: new Date().toISOString() });
     }
 
     if (action === 'replaceScenarioMasters') {
@@ -414,6 +441,26 @@ function normalizeScenario_(row) {
     expected_outcome: row.expected_outcome || '',
     evidence_policy: row.evidence_policy || '',
     notes: row.notes || '',
+    active: row.active == null ? 'TRUE' : row.active
+  };
+}
+
+function normalizeE2eCase_(row) {
+  return {
+    case_id: row.case_id || row.id || '',
+    group: row.group || '',
+    screen: row.screen || '',
+    route: row.route || '',
+    title: row.title || '',
+    preconditions: row.preconditions || '',
+    steps: Array.isArray(row.steps) ? row.steps.join('\n') : (row.steps || ''),
+    expected: row.expected || '',
+    priority: row.priority || 'P2',
+    side_effect: row.side_effect || row.sideEffect || 'none',
+    evidence: row.evidence || '',
+    parent_case_id: row.parent_case_id || row.parentId || '',
+    data_source: row.data_source || row.dataSource || '',
+    note: row.note || '',
     active: row.active == null ? 'TRUE' : row.active
   };
 }
