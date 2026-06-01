@@ -179,6 +179,37 @@ function isBlockStart(lines, index) {
   ].some(Boolean);
 }
 
+// mermaid モジュールのキャッシュ（動的 import の二重ロードを防ぐ）
+let mermaidModule = null;
+let mermaidInitialized = false;
+
+/**
+ * コンテナ要素内の .mermaid ノードを mermaid で描画する。
+ * .mermaid ノードが 0 個の場合は何もしない（不要な import を避ける）。
+ * fire-and-forget で呼び出すことを前提とし、内部で例外を catch する。
+ */
+async function renderMermaidInContainer(container) {
+  const nodes = Array.from(container.querySelectorAll('.mermaid'));
+  if (nodes.length === 0) return;
+
+  try {
+    if (!mermaidModule) {
+      mermaidModule = await import('https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs');
+    }
+
+    const mermaid = mermaidModule.default;
+
+    if (!mermaidInitialized) {
+      mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', theme: 'neutral' });
+      mermaidInitialized = true;
+    }
+
+    await mermaid.run({ nodes });
+  } catch (error) {
+    console.error('[docViewer] mermaid 描画に失敗しました:', error);
+  }
+}
+
 function renderMarkdown(markdown) {
   const lines = stripFrontmatter(markdown).split('\n');
   const blocks = [];
@@ -206,6 +237,12 @@ function renderMarkdown(markdown) {
 
       if (index < lines.length) {
         index += 1;
+      }
+
+      // mermaid フェンスは専用コンテナとして出力し、後から描画する
+      if (language === 'mermaid') {
+        blocks.push(`<div class="mermaid my-4">${escapeHtml(codeLines.join('\n'))}</div>`);
+        continue;
       }
 
       const languageLabel = language
@@ -494,6 +531,8 @@ function renderSelectedDocument(state, elements) {
   setText(elements.title, selectedDocument.title);
   setText(elements.meta, `${selectedDocument.id} / ${selectedDocument.path}`);
   setHtml(elements.content, renderMarkdown(selectedDocument.markdown));
+  // mermaid 図が含まれる場合は非同期で描画（fire-and-forget、例外は関数内で catch）
+  renderMermaidInContainer(elements.content);
   if (elements.copy) elements.copy.disabled = false;
   if (!elements.badges) return;
 

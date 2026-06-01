@@ -39,12 +39,30 @@
       "tags": ["進捗", "納品", "CSV", "通知"],
       "hasUnconfirmed": true,
       "relatedSources": ["docs/画面設計/仕様/admin/30_admin_data_operation.md", "99_backend-docs/01_system-mail/07_bizcard-completed.md"]
+    },
+    {
+      "id": "BIZ-004",
+      "title": "名刺データ化のフロー",
+      "category": "フロー図",
+      "sourceStatus": "現行モック・既存仕様から整理",
+      "path": "04_data-flow.md",
+      "summary": "設定・申込から会期中の名刺登録、データ化、納品、ダウンロード、請求接続までを一枚で見渡すフロー図（mermaid）。",
+      "tags": ["フロー図", "ステータス", "全体", "照合", "ベリファイ入力"],
+      "hasUnconfirmed": true,
+      "relatedSources": ["02_dashboard/src/services/statusService.js", "docs/画面設計/仕様/admin/30_admin_data_operation.md", "docs/アーカイブ/speedad-backlog-wiki-2026-03-24/pages/21_1111547_input-screen-logic.md", "docs/アーカイブ/speedad-backlog-wiki-2026-03-24/pages/22_1111789_lock-control.md", "03_admin/00.要件定義書.txt"]
     }
   ],
   "flow": [
     {
       "group": "名刺データ化の流れ",
       "items": [
+        {
+          "id": "BIZ-F00",
+          "documentId": "BIZ-004",
+          "timing": "全体",
+          "label": "フロー図",
+          "summary": "設定から請求までの名刺データ化フロー全体図を確認します。"
+        },
         {
           "id": "BIZ-F01",
           "documentId": "BIZ-001",
