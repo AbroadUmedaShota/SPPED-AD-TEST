@@ -694,9 +694,6 @@
 
     restoreRememberedAccount();
     setupSiteTopHamburger();
-    setupHeroCopyPicker();
-    setupLoginPanelThemePicker();
-
     if (loginForm && emailInput) {
       emailInput.focus();
     }

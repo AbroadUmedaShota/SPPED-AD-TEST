@@ -10,9 +10,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&family=Noto+Serif+JP:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/login-front.css?v=20260601-hero-copy">
+  <link rel="stylesheet" href="css/login-front.css?v=20260601-remove-mock-preview">
 </head>
-<body id="before-login">
+<body id="before-login" data-login-panel-theme="e2">
   <a class="skip-link" href="#top">本文へスキップ</a>
   <main id="top">
     <section class="hero" aria-labelledby="hero-title">
@@ -460,62 +460,6 @@
     </div>
   </div>
 
-  <div class="hero-copy-picker" data-mock-tool>
-    <button type="button" id="hero-copy-picker-toggle" class="hero-copy-picker__gear" aria-expanded="false" aria-controls="hero-copy-picker-panel" aria-label="ログイン前画面のモックアップを切り替える" title="ログイン前画面のモックアップを切り替える">
-      <svg class="hero-copy-picker__gear-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94L14.4 2.81c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41L9.25 5.35c-.59.24-1.13.57-1.62.94L5.24 5.33c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.05-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
-      </svg>
-    </button>
-    <div id="hero-copy-picker-panel" class="hero-copy-picker__panel" hidden>
-      <div class="hero-copy-picker__heading">
-        <p class="hero-copy-picker__label" lang="en">MOCKUP PREVIEW</p>
-        <p class="hero-copy-picker__hint">キャッチコピーとログインパネル色を切り替えます / 選択はブラウザに保存されます</p>
-      </div>
-      <label class="hero-copy-picker__field" for="hero-copy-picker-select">
-        <span class="hero-copy-picker__field-label">キャッチコピー</span>
-      </label>
-      <select id="hero-copy-picker-select" class="hero-copy-picker__select" aria-label="キャッチコピー候補"></select>
-      <label class="hero-copy-picker__field hero-copy-picker__theme-field" for="login-panel-theme-select">
-        <span class="hero-copy-picker__field-label">ログインパネル色</span>
-        <select id="login-panel-theme-select" class="hero-copy-picker__select" aria-label="ログインパネル色">
-          <option value="">現行</option>
-          <option value="a1">A1 深紺</option>
-          <option value="e1">E1 シャンパン</option>
-          <option value="d1">D1 グラファイト</option>
-          <option value="e2">E2 アイボリー</option>
-          <option value="g6">G6 プレミアムグラデーション</option>
-        </select>
-      </label>
-      <div id="hero-copy-picker-custom" class="hero-copy-picker__custom" hidden>
-        <p class="hero-copy-picker__custom-note">改行はそのまま反映されます。「カスタム入力」を選ぶと現在のコピーが初期値として入ります。</p>
-        <label class="hero-copy-picker__field">
-          <span class="hero-copy-picker__field-label">見出し</span>
-          <textarea id="hero-copy-picker-custom-statement" class="hero-copy-picker__textarea" rows="2" placeholder="例：営業プロセスの無駄をゼロにする&#10;次世代のリード獲得ツール。"></textarea>
-        </label>
-        <label class="hero-copy-picker__field">
-          <span class="hero-copy-picker__field-label">リード文</span>
-          <textarea id="hero-copy-picker-custom-lead" class="hero-copy-picker__textarea" rows="3" placeholder="例：Webアンケートで来場者情報を集め、&#10;名刺データ化と御礼メールで展示会後の追客をスムーズに。"></textarea>
-        </label>
-      </div>
-      <div class="hero-copy-picker__font-controls" aria-label="フォントオブジェクト調整">
-        <div class="hero-copy-picker__font-header">
-          <p class="hero-copy-picker__reason-title">TEXT EDIT</p>
-          <label class="hero-copy-picker__switch" for="hero-font-edit-mode">
-            <input id="hero-font-edit-mode" type="checkbox">
-            <span>編集モード</span>
-          </label>
-        </div>
-        <p id="hero-font-selection-label" class="hero-copy-picker__selection">編集モードをONにして、文字を直接つかんで調整できます。</p>
-        <button type="button" id="hero-font-reset-button" class="hero-copy-picker__reset">選択中の調整をリセット</button>
-        <pre id="hero-font-value-memo" class="hero-copy-picker__value-memo" aria-live="polite"></pre>
-      </div>
-      <div class="hero-copy-picker__reason-wrap">
-        <p class="hero-copy-picker__reason-title" lang="en">DIRECTION &amp; RATIONALE</p>
-        <p id="hero-copy-picker-reason" class="hero-copy-picker__reason"></p>
-      </div>
-    </div>
-  </div>
-
-  <script src="js/login-front.js?v=20260601-hero-copy" defer></script>
+  <script src="js/login-front.js?v=20260601-remove-mock-preview" defer></script>
 </body>
 </html>
