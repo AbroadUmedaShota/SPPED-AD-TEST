@@ -1433,9 +1433,69 @@ body.is-hero-font-dragging * {
 }
 
 @media (min-width: 1101px) {
-  .hero,
-  .hero__inner {
-    min-height: calc(100vh - 85px);
+  /* ログイン前LP: 各ブロックを1ビューポート単位で表示（フルHD 1920x1080想定） */
+
+  /* 1枚目: ヒーロー ＋ お知らせ */
+  .lp-page--first {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .lp-page--first .hero {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+  }
+
+  .lp-page--first .hero__inner {
+    min-height: 0;
+    padding-top: 84px;
+    padding-bottom: 60px;
+  }
+
+  .lp-page--first .public-news-section {
+    flex: 0 0 auto;
+    padding-top: 10px;
+    padding-bottom: 22px;
+  }
+
+  /* 2枚目: SPEED ADでできること ＋ 展示会の流れ（上下2バンドで1画面） */
+  .lp-page--duo {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .lp-page--duo .features-section {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .lp-page--duo .flow-section {
+    flex: 1 1 0;
+    align-content: center;
+  }
+
+  /* 3枚目: 選ばれる理由（セクション自体を画面いっぱいに伸ばし、中身を中央寄せ） */
+  .lp-page--solo {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .lp-page--solo .capabilities-section {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  /* 4枚目: 導入事例（既に100vh設計） */
+  .lp-page--voice .voice-teaser-section {
+    min-height: 100vh;
   }
 }
 
