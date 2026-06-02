@@ -26,16 +26,19 @@
 
   function currentIndex(list) {
     var y = window.scrollY || window.pageYOffset || 0;
-    var best = 0;
-    var bestDist = Infinity;
+    var maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    var current = 0;
+    if (y >= maxScroll - 2) {
+      return list.length - 1;
+    }
     for (var i = 0; i < list.length; i++) {
-      var dist = Math.abs(list[i].offsetTop - y);
-      if (dist < bestDist) {
-        bestDist = dist;
-        best = i;
+      if (list[i].offsetTop <= y + 1) {
+        current = i;
+      } else {
+        break;
       }
     }
-    return best;
+    return current;
   }
 
   function goTo(list, index) {
