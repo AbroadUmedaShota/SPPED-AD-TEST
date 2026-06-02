@@ -1886,6 +1886,8 @@ body.is-hero-font-dragging * {
   grid-template-columns: 44px minmax(0, 1fr);
   gap: 0 16px;
   align-items: start;
+  border-right: 1px solid rgba(110, 100, 87, 0.18);
+  border-bottom: 1px solid rgba(110, 100, 87, 0.18);
   color: var(--ink);
 }
 
@@ -2622,7 +2624,7 @@ body.is-hero-font-dragging * {
   }
 
   .capability-item:nth-child(3n) {
-    border-right: 0;
+    border-right: 1px solid rgba(110, 100, 87, 0.18);
   }
 
   .capability-item:nth-child(2n) {
@@ -2630,7 +2632,7 @@ body.is-hero-font-dragging * {
   }
 
   .capability-item:nth-last-child(-n + 3) {
-    border-bottom: 0;
+    border-bottom: 1px solid rgba(110, 100, 87, 0.18);
   }
 
   .capability-item:nth-last-child(-n + 1) {
@@ -2639,6 +2641,7 @@ body.is-hero-font-dragging * {
 
   .capability-item:nth-child(9) {
     grid-column: 1 / -1;
+    border-right: 0;
   }
 }
 
@@ -2774,6 +2777,11 @@ body.is-hero-font-dragging * {
     grid-template-columns: 38px minmax(0, 1fr);
     gap: 0 13px;
     padding: 21px 18px;
+    border-bottom: 1px solid rgba(110, 100, 87, 0.18);
+  }
+
+  .capability-item:nth-last-child(-n + 1) {
+    border-bottom: 0;
   }
 
   .capability-item__icon {
