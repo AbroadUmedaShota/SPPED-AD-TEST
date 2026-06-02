@@ -1353,7 +1353,13 @@ function handleCoachmarkTab(ev) {
   const isUserAction = currentStep
     && (currentStep.mode === 'user-action' || currentStep.mode === 'user-action-bridge');
   if (isUserAction && currentTargetEl && document.contains(currentTargetEl)) {
-    focusable.push(currentTargetEl);
+    // <label> 自身はフォーカス不可のため、紐づくフォームコントロール（checkbox 等）を
+    // 循環に含める。スポットライトは見える <label>（スイッチ全体）に当てつつ、
+    // キーボードフォーカスは実際に操作可能な control に渡す。
+    const focusTargetEl = (currentTargetEl.tagName === 'LABEL' && currentTargetEl.control)
+      ? currentTargetEl.control
+      : currentTargetEl;
+    if (focusable.indexOf(focusTargetEl) === -1) focusable.push(focusTargetEl);
   }
   if (focusable.length === 0) {
     // フォーカス可能要素が無ければコーチマーク本体に留める。

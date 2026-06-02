@@ -38,14 +38,14 @@ export const TUTORIAL_STEPS = [
       + '確認できたら、下の『次へ』ボタンを押してください。',
   },
   {
-    id: 4, block: 'B', target: '#skipBizcardToggle', mode: 'user-action', placement: 'right',
+    id: 4, block: 'B', target: 'label:has(#skipBizcardToggle)', mode: 'user-action', placement: 'left',
     title: 'トグルを ON にする',
     body:
       'チェックボックスをオンにして、データ化を ON にしてください。\n'
       + 'このチュートリアルでは ON のまま進みます。',
   },
   {
-    id: 5, block: 'B', target: '#bizcardSettingsFields', mode: 'info', placement: 'top',
+    id: 5, block: 'B', target: '#toggleMemoSection', mode: 'info', placement: 'top',
     title: '社内管理用メモ（任意）について',
     body:
       'この画面の下の方には『社内管理用メモ（任意）』欄もあります。\n'
