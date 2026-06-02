@@ -1,7 +1,7 @@
 ---
 owner: product
 status: draft
-last_reviewed: 2026-04-24
+last_reviewed: 2026-06-01
 ---
 
 # 不具合報告フォーム 要件定義書
@@ -11,7 +11,7 @@ last_reviewed: 2026-04-24
 | 対象画面 | `02_dashboard/bug-report.html` |
 | 正本区分 | 本書を正本とする |
 | owner | product |
-| last_reviewed | 2026-04-24 |
+| last_reviewed | 2026-06-01 |
 
 ## 1. 文書目的
 
@@ -106,6 +106,7 @@ last_reviewed: 2026-04-24
 ### 3.9 送信完了画面
 
 - 送信成功後は入力フォームを隠し、完了メッセージ（「ご報告ありがとうございました！」）を表示する。
+- 完了画面には受付ID（`observation_id`）を表示する。
 - 「別の不具合を報告する」ボタンからフォーム状態を初期化して再入力できるようにする。
 
 ## 4. 状態と挙動
@@ -141,15 +142,17 @@ last_reviewed: 2026-04-24
 ### 4.4 送信処理
 
 - 送信ボタン押下時は、二重送信防止のためボタンを非活性化し「処理中...」表示に切替える。
-- Simple モードでは詳細セクションの値は送信しない。
-- 選択肢（種別・深刻度・デバイス・OS 等）は日本語ラベルに変換して送信する。
-- 発生日と発生時刻は 1 つの日時文字列（`YYYY-MM-DD HH:MM`）に統合して送信する。
-- スクリーンショットは Data URI 化して送信する。
-- タイムアウトは 15 秒とし、タイムアウト時は「送信がタイムアウトしました」とエラー表示する。
+- クライアントで `observation_id` を生成し、共有GAS受付DBの `appendObservation` へ匿名化ペイロードを送信する。
+- 選択肢（種別・深刻度・デバイス・OS 等）は日本語ラベルに変換し、重複判定に必要な項目だけを `defect_observations` へ保存する。
+- 発生日と発生時刻は受付DBの `note` に匿名化メタ情報として含める。
+- 氏名、メールアドレス、会社名、社内メモ、担当者候補、スクリーンショットData URIは共有DBへ保存しない。
+- POST後、JSONP GETで同じ `observation_id` が `defect_observations` に存在することを確認する。
+- タイムアウトは 15 秒とし、保存確認できない場合は送信失敗としてエラー表示する。
 
 ### 4.5 送信成功時
 
 - 入力フォームを隠し、送信完了画面を表示する。
+- 受付IDを表示し、運用側では `99_backend-docs/09_bug-reporting/reports.html` の「未紐づけ投稿」から確認できるようにする。
 - 「別の不具合を報告する」押下時はフォーム状態を初期化し、入力フォームを再表示する。
 
 ## 5. データモデル
@@ -187,34 +190,36 @@ last_reviewed: 2026-04-24
 | 許容 MIME | image/png, image/jpeg, image/gif |
 | サイズ上限 | 5 MB |
 | ファイル数 | 1 件のみ |
-| エンコード | Data URI（Base64） |
+| エンコード | 画面プレビュー用にData URI化するが、共有DBには保存しない |
 
 ## 6. 送信方式
 
 ### 6.1 送信先
 
-- 自社バックエンドまたは正式に採用した受付基盤への送信方式は、画面外の確認事項とする。
-- 送信先、保存先、通知先、閲覧権限は開発会社と確認して固定する。
-- フォーム ID、各フィールドのエントリ ID、運用担当者は社内運用資料を別途参照する。
+- 送信先は共有GAS受付DBのWeb App URLとする。
+- 現行モックの既定URLは `99_backend-docs/08_e2e-testing/gas/Code.gs` と同じ共有GASを使用する。
+- 保存先はSpreadsheetの `defect_observations` とし、投稿フォームからの新規投稿は代表ケース未紐づけの `unverified` observation として保存する。
+- 運用担当者は `99_backend-docs/09_bug-reporting/reports.html` で未紐づけ投稿を確認する。
 
 ### 6.2 送信方式
 
-- 送信は API 通信で行い、サーバーからの成功/失敗レスポンスをもとに画面を切り替える。
+- 送信は `text/plain` POSTで `{ action: "appendObservation", payload }` をGASへ送る。
 - 送信中はボタンを無効化し、二重送信を防ぐ。
-- 送信成功後、完了画面を表示する。
-- 15 秒以内に応答がない場合はタイムアウトエラーを表示する。
+- GAS POST後、JSONP GETで同一 `observation_id` の保存確認ができた場合だけ完了画面を表示する。
+- 15 秒以内に保存確認できない場合はタイムアウトエラーを表示する。
 
 ### 6.3 送信結果の扱い
 
-- サーバーが受理した場合のみ成功扱いとする。
-- 入力不備、容量超過、通信失敗、受付停止の場合は、理由が分かるメッセージを表示する。
+- 受付DBに同一 `observation_id` が保存された場合のみ成功扱いとする。
+- 入力不備、容量超過、通信失敗、受付停止、保存確認失敗の場合は、理由が分かるメッセージを表示する。
 - 送信に失敗しても、入力内容と添付内容は可能な範囲で保持する。
 
 ### 6.4 送信ペイロードの取り扱い
 
-- Content-Type は `application/x-www-form-urlencoded`（標準 form POST の既定）。
-- 空文字・未入力値は送信対象から除外する。
-- スクリーンショットはファイルとして送信し、サーバー側または外部ストレージに保存する。
+- Content-Type はGAS CORS制約を避けるため `text/plain;charset=utf-8` とする。
+- 共有DBに保存する主項目は `report_type`, `category`, `environment`, `screen`, `questionnaire_ref`, `summary`, `reproduction_steps`, `expected`, `actual`, `affected_module`, `severity`, `dedupe_key`, `source_ref` とする。
+- `source_type` は `human`、`source_role` は `user_submission`、`verification_status` は `unverified` とする。
+- スクリーンショット実体とData URIは送信しない。必要になった場合はDrive/S3等の非公開保管設計を別途行う。
 
 ## 7. 画面遷移
 
@@ -229,7 +234,7 @@ last_reviewed: 2026-04-24
 ### 7.2 本画面からの外部遷移
 
 - プライバシーポリシー（`abroad-o.com/rule.html`、別タブ）
-- 送信先（Google Forms、iframe 内）
+- GAS Web App（画面遷移なし。POST後にJSONPで保存確認）
 
 ## 8. 非機能要件
 
@@ -242,14 +247,16 @@ last_reviewed: 2026-04-24
 ### 8.2 セキュリティ・プライバシー
 
 - プライバシーポリシー表示は送信ボタン直上に固定掲示とする。
-- 報告者情報・社内メモは PII（個人識別情報）を含み得る。現状は Google Workspace 側のアクセス権・保存期間ポリシーに従う（運用定義は開発会社と確認して整理）。
+- 報告者情報・社内メモは PII（個人識別情報）を含み得るため、共有DBへ保存しない。
+- 共有DBには重複判定と代表ケース化に必要な匿名化情報のみ保存する。
 - 添付ファイルは MIME とサイズの 2 段検証のみ。マジックバイト検証は行わない。
-- 送信先 URL はハードコードで環境別分岐は持たない。
-- CSRF トークンは Google Forms 方式の特性上持たない。自社バックエンド化時に別途設計する。
+- 送信先 URL は現行モックでは既定GAS URLを利用し、テスト時は `window.__BUG_REPORT_GAS_URL__` で差し替える。
+- CSRF トークンは現行GAS方式では持たない。本番バックエンド化時に別途設計する。
 
 ### 8.3 外部依存
 
-- Google Forms: フォーム削除・エントリ ID 再発行時は全送信が無効化される。運用上の監視が必要。
+- Google Apps Script Web App: Web App URL再デプロイ、実行権限、Spreadsheet列変更の影響を受ける。
+- Spreadsheet共有モックDB: `defect_observations` の列定義はGAS `Code.gs` と管理ページのモデルを同期する。
 - 外部 CDN（Tailwind、Material Icons ほか）: 障害時はスタイルが破綻する可能性がある。送信ロジック自体は同一オリジン JS に実装されているため、CDN 障害下でも動作見込み。
 
 ### 8.4 レスポンシブ
@@ -273,17 +280,18 @@ last_reviewed: 2026-04-24
 
 ## 11. 本番化要件
 
-本書は本番移行前の現行仕様（Google Forms 依存）を記述したものである。本セクションは、自社バックエンド化に踏み切った際の本番実装に必要な情報を集約する。現行 Google Forms 方式で運用継続する期間は §11.1〜§11.5 のうち適用可能な部分（ブラウザ対応・受け入れ基準）のみを参照し、バックエンド化は §12 画面外の確認事項と連動する。
+本書は本番移行前の現行モック仕様（共有GAS受付DB）を記述したものである。本セクションは、本番バックエンド化または非公開ストレージ連携に踏み切った際の追加要件を集約する。現行GAS方式で運用継続する期間は、匿名化DB保存、未紐づけ投稿キュー、CSV一回取込を前提に運用する。
 
 ### 11.1 API 契約（自社バックエンド化時の想定）
 
-現行は Google Forms `formResponse` 直接 POST（§6.1）。自社バックエンド化を採用する場合の確認用エンドポイント：
+現行はGAS `appendObservation` 直接POST（§6.1）。自社バックエンド化を採用する場合の確認用エンドポイント：
 
 | エンドポイント | 用途 | リクエスト | 主要レスポンス |
 | --- | --- | --- | --- |
-| `POST /api/bug-report` | 不具合報告の受信 | `multipart/form-data`: 報告本体 JSON ＋ スクリーンショット（任意） | 200 `{ ok: true, ticketId: string }` ／ 400 バリデーション失敗 ／ 413 ファイル容量超過 ／ 429 レート超過 |
+| `POST /api/bug-report` | 不具合報告の受信 | JSON: 匿名化済み observation 本体 | 200 `{ ok: true, observationId: string }` ／ 400 バリデーション失敗 ／ 429 レート超過 |
+| `GET /api/bug-report/:observationId` | 保存確認 | なし | 200 `{ ok: true, observation: {...} }` ／ 404 未保存 |
 
-- スクリーンショットは Data URI ではなく multipart の file パートで受信し、S3 等の外部ストレージに保管する（§12 参照）。
+- スクリーンショットを扱う場合は、投稿受付DBとは別の非公開ストレージに保管し、共有DBへは本文・個人情報を入れない。
 - CSRF トークンをフォームごとに発行・検証する。
 - レート制限を設ける（同一 IP / 同一セッションあたりの一定時間内の上限）。具体値は実装時確定。
 - 社内通知（Slack / メール）連携はサーバ側から非同期で行う。
@@ -306,13 +314,15 @@ last_reviewed: 2026-04-24
 | タイムアウト（15 秒、§4.4） | 「送信がタイムアウトしました」 | フォーム状態保持 |
 | ファイル容量超過（413） | 「添付ファイルのサイズが上限を超えています（5 MB）」 | 添付欄をクリア |
 | レート超過（429） | 「しばらく時間をおいてから再度お試しください。」 | 自動リトライなし |
-| 送信成功判定の偽陽性（現行 Google Forms 方式） | 完了画面表示 | 受理可否は原理的に判定不能（§6.3）。自社バックエンド化で解消 |
+| 保存確認失敗（現行GAS方式） | 「受付DBへの保存確認に失敗しました。」 | 完了画面へ進めず、フォーム状態保持 |
 
 ### 11.4 データ永続化
 
-- 保存先は、受付基盤、DB、チケット管理システムのいずれかに統一する。
-- 自社バックエンド化時: 不具合報告テーブルを新設。主項目: `ticket_id`（主キー）／`report_type`（Simple / Detailed）／`bug_category`／`summary`／`reproduce_steps`／`actual_behavior`／`expected_behavior`／`severity`／`reporter_name`／`reporter_email`／`company`／`occurred_at`／`environment`（デバイス・OS・ブラウザ等の JSON）／`screenshot_url`／`internal_memo`／`created_at`／`client_ip`。
-- スクリーンショット実体は外部ストレージ（S3 等）に保管、DB には URL のみを保持する。
+- 保存先は共有GAS受付DBの `defect_observations` に統一する。
+- 主項目: `observation_id`（主キー）／`source_type`／`source_role`／`observed_at`／`verification_status`／`report_type`／`category`／`environment`／`screen`／`questionnaire_ref`／`summary`／`reproduction_steps`／`expected`／`actual`／`affected_module`／`severity`／`dedupe_key`／`source_ref`。
+- 氏名、メールアドレス、会社名、社内メモ、担当者候補、スクリーンショットData URIは共有DBへ保存しない。
+- 既存Google Forms投稿分はCSVから一回だけ `appendObservation` ペイロードへ変換して投入する。CSV取込時もPII列は破棄する。
+- スクリーンショット実体は今回対象外。必要時は外部ストレージ（Drive/S3 等）に保管し、共有DBには非公開保管先の扱いだけを別途設計する。
 
 ### 11.5 ログ・監査
 
@@ -341,6 +351,10 @@ last_reviewed: 2026-04-24
 - [ ] スクリーンショットは PNG / JPEG / GIF 以外および 5 MB 超を拒否する
 - [ ] 二重送信防止（送信中ボタン非活性＋「処理中...」表示）が動作する
 - [ ] タイムアウト 15 秒でエラー表示される
+- [ ] 完了画面に受付IDが表示される
+- [ ] 送信後、同じ `observation_id` が `defect_observations` に保存確認される
+- [ ] 氏名、メール、会社名、社内メモ、担当者候補、スクリーンショットData URIが共有DBへ保存されない
+- [ ] 管理ページの未紐づけ投稿キューで投稿内容と候補代表ケースを確認できる
 - [ ] プライバシーポリシーリンクが送信ボタン直上に表示され、`rel="noopener noreferrer"` 付き別タブで開く
 - [ ] 送信完了画面から「別の不具合を報告する」でフォーム状態が初期化される
 - [ ] （自社バックエンド化時）CSRF トークン検証・レート制限・社内通知連携が動作する
@@ -349,9 +363,8 @@ last_reviewed: 2026-04-24
 
 現行実装のギャップ・改善候補を集約する。本書で仕様として保証しない項目。
 
-- **送信先の自社バックエンド化**: Google Forms 依存を解消する。エンドポイント、認証、レート制限、JSON 応答、スクリーンショットの multipart/form-data 受信、CSRF 対策を設計する。
-- **送信成功判定の堅牢化**: 自社中継または Google Apps Script Web App によるラップで、JSON 応答ベースの正否判定を可能にする。
-- **スクリーンショット送信方式の見直し**: Google Drive 直アップロード＋ URL 送信、または自社バックエンド＋ S3 保管に切替える。現行の Data URI 丸ごと送信は Google Forms 側のテキスト上限に抵触するリスクがある。
+- **本番バックエンド化**: 現行GAS受付DBを本番APIへ置換する場合、認証、レート制限、CSRF対策、監査ログ、レスポンス契約を設計する。
+- **スクリーンショット送信方式の見直し**: Google Drive 直アップロード、または自社バックエンド＋S3保管に切替える。共有DBにはData URIを入れない。
 - **ドラッグ＆ドロップ実装**: HTML に文言はあるが現在未対応。DnD を実装するか、文言を削除する。
 - **文字数上限（maxlength）の整備**: 全 textarea / input で未設定。巨大貼り付けによる送信破綻を防止する。
 - **メール書式検証**: 報告者メールアドレスの形式検証を追加する。

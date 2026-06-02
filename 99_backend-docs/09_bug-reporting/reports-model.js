@@ -28,6 +28,22 @@ export const VERIFICATION_LABELS = {
   rejected: '却下'
 };
 
+export const OBSERVATION_FORM_FIELDS = [
+  'report_type',
+  'category',
+  'environment',
+  'screen',
+  'questionnaire_ref',
+  'summary',
+  'reproduction_steps',
+  'expected',
+  'actual',
+  'affected_module',
+  'severity',
+  'dedupe_key',
+  'source_ref'
+];
+
 const RESOURCE_TO_STATE_KEY = {
   defect_cases: 'defect_cases',
   defect_observations: 'defect_observations',
@@ -49,6 +65,13 @@ function splitLines(value) {
     .split(/\r?\n/)
     .map(line => line.trim())
     .filter(Boolean);
+}
+
+function compactTokens(value) {
+  return normalizeText(value)
+    .replace(/[^\p{L}\p{N}\s_-]/gu, ' ')
+    .split(/\s+/)
+    .filter(token => token.length >= 2);
 }
 
 function nowIso() {
@@ -120,7 +143,20 @@ export function normalizeObservation(row = {}) {
     reproduce_status: String(row.reproduce_status || '').trim(),
     confidence: String(row.confidence || '').trim(),
     verification_status: String(row.verification_status || 'unverified').trim(),
-    note: String(row.note || '').trim()
+    note: String(row.note || '').trim(),
+    report_type: String(row.report_type || '').trim(),
+    category: String(row.category || '').trim(),
+    environment: String(row.environment || '').trim(),
+    screen: String(row.screen || '').trim(),
+    questionnaire_ref: String(row.questionnaire_ref || '').trim(),
+    summary: String(row.summary || '').trim(),
+    reproduction_steps: String(row.reproduction_steps || '').trim(),
+    expected: String(row.expected || '').trim(),
+    actual: String(row.actual || '').trim(),
+    affected_module: String(row.affected_module || '').trim(),
+    severity: String(row.severity || '').trim(),
+    dedupe_key: String(row.dedupe_key || '').trim(),
+    source_ref: String(row.source_ref || '').trim()
   };
 }
 
@@ -278,9 +314,11 @@ export function applyPromoteObservationToCase(dataSet, payload = {}) {
     return normalizeObservation({
       ...observation,
       case_id: defectCase.case_id,
-      verification_status: observation.source_type === 'ai'
-        ? observation.verification_status || 'unverified'
-        : observation.verification_status || 'confirmed'
+      verification_status: payload.verification_status || (
+        observation.source_type === 'ai'
+          ? observation.verification_status || 'unverified'
+          : observation.verification_status || 'confirmed'
+      )
     });
   });
   return appendLocalEvent({
@@ -293,6 +331,32 @@ export function applyPromoteObservationToCase(dataSet, payload = {}) {
     event_type: 'case_promoted',
     actor_role: payload.actor_role || 'QA',
     note: 'Observation promoted to representative defect case.'
+  });
+}
+
+export function applyLinkObservationToCase(dataSet, payload = {}) {
+  const nextDataSet = cloneDataSet(dataSet);
+  const observationId = String(payload.observation_id || '').trim();
+  const caseId = String(payload.case_id || '').trim();
+  const targetCase = nextDataSet.defect_cases.find(item => item.case_id === caseId);
+  const observation = nextDataSet.defect_observations.find(item => item.observation_id === observationId);
+  if (!targetCase || !observation) {
+    return nextDataSet;
+  }
+  const linkedObservation = normalizeObservation({
+    ...observation,
+    case_id: caseId,
+    verification_status: String(payload.verification_status || observation.verification_status || 'unverified').trim()
+  });
+  return appendLocalEvent({
+    ...nextDataSet,
+    defect_observations: upsertByKey(nextDataSet.defect_observations, linkedObservation, 'observation_id')
+  }, {
+    case_id: caseId,
+    observation_id: observationId,
+    event_type: 'observation_linked',
+    actor_role: payload.actor_role || 'QA',
+    note: payload.note || `linked to ${caseId}`
   });
 }
 
@@ -361,6 +425,65 @@ export function isConfirmedObservation(observation) {
 
 export function isHumanObservation(observation) {
   return normalizeText(observation?.source_type) === 'human';
+}
+
+export function getUnlinkedObservations(observations = []) {
+  return observations
+    .map(normalizeObservation)
+    .filter(observation => observation.observation_id && !observation.case_id);
+}
+
+export function makeObservationDedupeKey(input = {}) {
+  const normalized = normalizeObservation(input);
+  return [
+    normalized.screen,
+    normalized.category,
+    normalized.summary,
+    normalized.actual
+  ]
+    .map(value => normalizeText(value))
+    .filter(Boolean)
+    .join('|');
+}
+
+export function findDuplicateCandidates(observation, cases = []) {
+  const normalizedObservation = normalizeObservation(observation);
+  if (!normalizedObservation.observation_id && !normalizedObservation.summary && !normalizedObservation.actual) {
+    return [];
+  }
+
+  const observationDedupe = normalizeText(normalizedObservation.dedupe_key || makeObservationDedupeKey(normalizedObservation));
+  const observationTokens = new Set(compactTokens([
+    normalizedObservation.summary,
+    normalizedObservation.actual,
+    normalizedObservation.reproduction_steps,
+    normalizedObservation.note
+  ].join(' ')));
+
+  return cases
+    .map(normalizeCase)
+    .map(defectCase => {
+      const caseDedupe = normalizeText(defectCase.symptom_key || [
+        defectCase.screen,
+        defectCase.summary,
+        defectCase.actual
+      ].filter(Boolean).join('|'));
+      const caseTokens = new Set(compactTokens([
+        defectCase.title,
+        defectCase.summary,
+        defectCase.actual,
+        defectCase.symptom_key
+      ].join(' ')));
+      const overlap = [...observationTokens].filter(token => caseTokens.has(token)).length;
+      let score = 0;
+      if (observationDedupe && observationDedupe === caseDedupe) score += 100;
+      if (normalizeText(normalizedObservation.screen) && normalizeText(normalizedObservation.screen) === normalizeText(defectCase.screen)) score += 40;
+      if (normalizeText(normalizedObservation.severity) && normalizeText(normalizedObservation.severity) === normalizeText(defectCase.severity)) score += 5;
+      score += Math.min(overlap * 8, 48);
+      return { ...defectCase, duplicate_score: score };
+    })
+    .filter(defectCase => defectCase.duplicate_score > 0)
+    .sort((a, b) => b.duplicate_score - a.duplicate_score || a.case_id.localeCompare(b.case_id));
 }
 
 export function isBacklogEligible(defectCase, observations = []) {

@@ -1,3 +1,8 @@
+import {
+  DEFAULT_BUG_REPORT_GAS_URL,
+  submitBugReportToDb
+} from './services/bugReportDbService.js';
+
 const ReportType = {
     Simple: 'Simple',
     Detailed: 'Detailed',
@@ -115,36 +120,6 @@ const AFFECTED_MODULE_OPTIONS = [
   { value: 'user_management', label: 'ユーザー管理' },
   { value: 'other', label: 'その他' },
 ];
-
-const GOOGLE_FORM_RESPONSE_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSck94R-6gC24A-a4-3gUhEOHsEq-w4jjNw7lNxrWae0JYSflQ/formResponse';
-
-const GOOGLE_FORM_ENTRY_MAP = {
-  reportType: 'entry.380334184',
-  bugCategory: 'entry.2115928213',
-  bugSummary: 'entry.62193751',
-  questionnaireId: 'entry.190511267',
-  reproductionSteps: 'entry.1520710833',
-  actualBehavior: 'entry.1082578203',
-  expectedBehavior: 'entry.213381702',
-  errorMessage: 'entry.484776830',
-  reporterName: 'entry.908834656',
-  reporterEmail: 'entry.1094668055',
-  reporterCompany: 'entry.1579476750',
-  occurrenceDateTime: 'entry.1132942488',
-  device: 'entry.1209857462',
-  os: 'entry.1190375092',
-  browser: 'entry.1884963090',
-  speedAdEnvironment: 'entry.130013099',
-  internalProjectId: 'entry.2098474443',
-  affectedModule: 'entry.233073011',
-  severity: 'entry.304064915',
-  internalNotes: 'entry.2135905601',
-  assigneeSuggestion: 'entry.677635520',
-  deviceName: 'entry.1599683027',
-  browserVersion: 'entry.1153774805',
-  screenshotFilename: 'entry.1454262670',
-  screenshot: 'entry.1559286548',
-};
 
 const initialFormData = {
     reportType: ReportType.Simple,
@@ -427,7 +402,36 @@ function validateForm() {
     return isValid;
 }
 
-function handleSubmit(e) {
+function getSelectValueAsText(fieldKey, otherFieldKey, options) {
+    const value = formData[fieldKey];
+    if (value === 'other') {
+        return formData[otherFieldKey];
+    }
+    const option = options.find(o => o.value === value);
+    return option ? option.label : '';
+}
+
+function buildSubmitLabels() {
+    return {
+        reportType: REPORT_TYPE_OPTIONS.find(o => o.value === formData.reportType)?.label || formData.reportType,
+        bugCategory: BUG_CATEGORY_OPTIONS.find(o => o.value === formData.bugCategory)?.label || formData.bugCategory,
+        device: getSelectValueAsText('device', 'deviceOther', DEVICE_OPTIONS),
+        os: getSelectValueAsText('os', 'osOther', OS_OPTIONS),
+        browser: getSelectValueAsText('browser', 'browserOther', BROWSER_OPTIONS),
+        speedAdEnvironment: getSelectValueAsText('speedAdEnvironment', 'speedAdEnvironmentOther', AFFECTED_SCREEN_OPTIONS),
+        affectedModule: getSelectValueAsText('affectedModule', 'affectedModuleOther', AFFECTED_MODULE_OPTIONS),
+        severity: SEVERITY_OPTIONS.find(o => o.value === formData.severity)?.label || formData.severity
+    };
+}
+
+function setReceiptId(observationId) {
+    const receiptEl = document.getElementById('bug-report-receipt-id');
+    if (!receiptEl) return;
+    receiptEl.textContent = observationId ? `受付ID: ${observationId}` : '';
+    receiptEl.classList.toggle('hidden', !observationId);
+}
+
+async function handleSubmit(e) {
     e.preventDefault();
     if (!validateForm()) {
         showError('form', '入力内容にエラーがあります。各項目をご確認ください。');
@@ -445,114 +449,21 @@ function handleSubmit(e) {
     btnSpinner.classList.remove('hidden');
     hideError('form');
 
-    const iframeName = `hidden_iframe_${new Date().getTime()}`;
-    const iframe = document.createElement('iframe');
-    iframe.name = iframeName;
-    iframe.id = iframeName;
-    iframe.style.display = 'none';
-    document.body.appendChild(iframe);
-
-    const form = document.createElement('form');
-    form.action = GOOGLE_FORM_RESPONSE_URL;
-    form.method = 'POST';
-    form.target = iframeName;
-    
-    const appendInput = (name, value) => {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = name;
-        input.value = value;
-        form.appendChild(input);
-    };
-
-    const appendParam = (key, value) => {
-        if (typeof value === 'string' && value && GOOGLE_FORM_ENTRY_MAP[key]) {
-            appendInput(GOOGLE_FORM_ENTRY_MAP[key], value);
-        }
-    };
-
-    const getSelectValueAsText = (fieldKey, otherFieldKey, options) => {
-        const value = formData[fieldKey];
-        if (value === 'other') {
-            return formData[otherFieldKey];
-        }
-        const option = options.find(o => o.value === value);
-        return option ? option.label : '';
-    };
-
-    const reportTypeLabel = REPORT_TYPE_OPTIONS.find(o => o.value === formData.reportType)?.label;
-    appendParam('reportType', reportTypeLabel || formData.reportType);
-
-    const bugCategoryLabel = BUG_CATEGORY_OPTIONS.find(o => o.value === formData.bugCategory)?.label;
-    appendParam('bugCategory', bugCategoryLabel || formData.bugCategory);
-    
-    appendParam('bugSummary', formData.bugSummary);
-    appendParam('questionnaireId', formData.questionnaireId);
-    appendParam('reproductionSteps', formData.reproductionSteps);
-    appendParam('actualBehavior', formData.actualBehavior);
-
-    if (formData.reportType === ReportType.Detailed) {
-        appendParam('reporterName', formData.reporterName);
-        appendParam('reporterEmail', formData.reporterEmail);
-        appendParam('reporterCompany', formData.reporterCompany);
-
-        if (formData.occurrenceDate && formData.occurrenceTime) {
-            appendParam('occurrenceDateTime', `${formData.occurrenceDate} ${formData.occurrenceTime}`);
-        } else if (formData.occurrenceDate) {
-            appendParam('occurrenceDateTime', formData.occurrenceDate);
-        } else {
-             appendParam('occurrenceDateTime', '');
-        }
-
-        appendParam('device', getSelectValueAsText('device', 'deviceOther', DEVICE_OPTIONS));
-        appendParam('deviceName', formData.deviceName);
-        appendParam('os', getSelectValueAsText('os', 'osOther', OS_OPTIONS));
-        const browserText = getSelectValueAsText('browser', 'browserOther', BROWSER_OPTIONS);
-        appendParam('browser', browserText);
-        appendParam('browserVersion', formData.browserVersion);
-        appendParam('speedAdEnvironment', getSelectValueAsText('speedAdEnvironment', 'speedAdEnvironmentOther', AFFECTED_SCREEN_OPTIONS));
-        
-        appendParam('expectedBehavior', formData.expectedBehavior);
-        
-        appendParam('errorMessage', formData.hasErrorMessage ? formData.errorMessage : '');
-
-        appendParam('screenshot', formData.screenshot);
-        appendParam('screenshotFilename', formData.screenshotFilename);
-        
-        appendParam('internalProjectId', formData.internalProjectId);
-        
-        appendParam('affectedModule', getSelectValueAsText('affectedModule', 'affectedModuleOther', AFFECTED_MODULE_OPTIONS));
-
-        const severityLabel = SEVERITY_OPTIONS.find(o => o.value === formData.severity)?.label;
-        appendParam('severity', severityLabel || formData.severity);
-        
-        appendParam('internalNotes', formData.internalNotes);
-        appendParam('assigneeSuggestion', formData.assigneeSuggestion);
-    }
-    
-    document.body.appendChild(form);
-
-    const timeout = setTimeout(() => {
-        submitBtn.disabled = false;
-        btnText.classList.remove('hidden');
-        btnSpinner.classList.add('hidden');
-        showError('form', '送信がタイムアウトしました。インターネット接続を確認し、再度お試しください。');
-        if (document.body.contains(iframe)) document.body.removeChild(iframe);
-        if (document.body.contains(form)) document.body.removeChild(form);
-    }, 15000);
-
-    iframe.onload = () => {
-        clearTimeout(timeout);
-        submitBtn.disabled = false;
-        btnText.classList.remove('hidden');
-        btnSpinner.classList.add('hidden');
+    try {
+        const { observationId } = await submitBugReportToDb(formData, {
+            gasUrl: window.__BUG_REPORT_GAS_URL__ || DEFAULT_BUG_REPORT_GAS_URL,
+            labels: buildSubmitLabels()
+        });
         document.getElementById('form-container').classList.add('hidden');
         document.getElementById('success-message').classList.remove('hidden');
-        if (document.body.contains(iframe)) document.body.removeChild(iframe);
-        if (document.body.contains(form)) document.body.removeChild(form);
-    };
-    
-    form.submit();
+        setReceiptId(observationId);
+    } catch (error) {
+        showError('form', error.message || '送信に失敗しました。時間をおいて再度お試しください。');
+    } finally {
+        submitBtn.disabled = false;
+        btnText.classList.remove('hidden');
+        btnSpinner.classList.add('hidden');
+    }
 }
 
 function resetForm() {
@@ -567,6 +478,7 @@ function resetForm() {
     
     document.getElementById('form-container').classList.remove('hidden');
     document.getElementById('success-message').classList.add('hidden');
+    setReceiptId('');
     
     // Re-initialize radio buttons to default state
     createRadioGroup('reportType-group', 'reportType', REPORT_TYPE_OPTIONS, formData.reportType);

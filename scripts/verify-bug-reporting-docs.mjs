@@ -26,7 +26,9 @@ function assertExists(relativePath) {
   '99_backend-docs/09_bug-reporting/01_bug-report-overview.md',
   '99_backend-docs/09_bug-reporting/02_backlog-ticket-template.md',
   '99_backend-docs/09_bug-reporting/03_ai-observation-rules.md',
-  '99_backend-docs/09_bug-reporting/04_triage-and-duplicate-check.md'
+  '99_backend-docs/09_bug-reporting/04_triage-and-duplicate-check.md',
+  '02_dashboard/src/services/bugReportDbService.js',
+  'scripts/import-bug-report-form-csv.mjs'
 ].forEach(assertExists);
 
 const manifest = JSON.parse(read('99_backend-docs/09_bug-reporting/manifest.json'));
@@ -66,12 +68,60 @@ const gasCode = read('99_backend-docs/09_bug-reporting/gas/Code.gs');
   'triage_events',
   'appendObservation',
   'promoteObservationToCase',
+  'linkObservationToCase',
   'linkBacklogIssue',
   'mergeCases',
   'appendTriageEvent'
 ].forEach(token => assert.match(gasCode, new RegExp(token)));
 
+const e2eGasCode = read('99_backend-docs/08_e2e-testing/gas/Code.gs');
+[
+  'linkObservationToCase',
+  'report_type',
+  'questionnaire_ref',
+  'reproduction_steps',
+  'dedupe_key',
+  'source_ref'
+].forEach(token => {
+  assert.match(gasCode, new RegExp(token));
+  assert.match(e2eGasCode, new RegExp(token));
+});
+
+const dashboardBugReport = read('02_dashboard/src/bug-report.js');
+const dashboardBugReportService = read('02_dashboard/src/services/bugReportDbService.js');
+assert.match(`${dashboardBugReport}\n${dashboardBugReportService}`, /appendObservation/);
+assert.match(`${dashboardBugReport}\n${dashboardBugReportService}`, /DEFAULT_BUG_REPORT_GAS_URL/);
+assert.match(`${dashboardBugReport}\n${dashboardBugReportService}`, /verification_status:\s*'unverified'/);
+assert.doesNotMatch(dashboardBugReport, /GOOGLE_FORM_RESPONSE_URL/);
+
+const packageJson = JSON.parse(read('package.json'));
+assert.ok(packageJson.devDependencies?.['csv-parse'], 'csv-parse should be registered as devDependency');
+
 const model = await import(pathToFileURL(path.join(bugDir, 'reports-model.js')).href);
+const csvImporter = await import(pathToFileURL(path.join(repoRoot, 'scripts', 'import-bug-report-form-csv.mjs')).href);
+
+const anonymousObservation = model.normalizeObservation({
+  observation_id: 'OBS-FORM-001',
+  source_type: 'human',
+  source_role: 'user_submission',
+  report_type: 'Simple',
+  category: '機能しない',
+  environment: 'dashboard',
+  screen: 'アンケート回答画面',
+  questionnaire_ref: 'survey/301',
+  summary: '送信できない',
+  reproduction_steps: '回答して送信する',
+  expected: '',
+  actual: 'ボタンが反応しない',
+  affected_module: '',
+  severity: '',
+  dedupe_key: 'アンケート回答画面|機能しない|送信できない|ボタンが反応しない',
+  source_ref: 'dashboard_bug_report'
+});
+assert.equal(anonymousObservation.report_type, 'Simple');
+assert.equal(anonymousObservation.questionnaire_ref, 'survey/301');
+assert.equal(anonymousObservation.dedupe_key.includes('送信できない'), true);
+assert.equal('reporterEmail' in anonymousObservation, false);
 
 let localData = model.createEmptyDefectDataSet();
 localData = model.applyAppendObservation(localData, {
@@ -107,6 +157,35 @@ localData = model.applyPromoteObservationToCase(localData, {
 assert.equal(localData.defect_cases.length, 1);
 assert.equal(localData.defect_observations[0].case_id, 'BUG-LOCAL-001');
 assert.equal(model.isBacklogEligible(localData.defect_cases[0], localData.defect_observations), true);
+
+localData = model.applyAppendObservation(localData, {
+  observation: {
+    observation_id: 'OBS-UNLINKED-001',
+    source_type: 'human',
+    source_role: 'user_submission',
+    verification_status: 'unverified',
+    summary: 'Local mode should persist usable data.',
+    actual: 'Local mode should persist usable data.',
+    screen: 'バグ報告DB',
+    dedupe_key: 'local-mode'
+  }
+});
+assert.equal(model.getUnlinkedObservations(localData.defect_observations).length, 1);
+const candidates = model.findDuplicateCandidates(
+  localData.defect_observations.find(observation => observation.observation_id === 'OBS-UNLINKED-001'),
+  localData.defect_cases
+);
+assert.equal(candidates[0].case_id, 'BUG-LOCAL-001');
+localData = model.applyLinkObservationToCase(localData, {
+  observation_id: 'OBS-UNLINKED-001',
+  case_id: 'BUG-LOCAL-001',
+  verification_status: 'confirmed',
+  actor_role: 'QA'
+});
+const linkedObservation = localData.defect_observations.find(observation => observation.observation_id === 'OBS-UNLINKED-001');
+assert.equal(linkedObservation.case_id, 'BUG-LOCAL-001');
+assert.equal(linkedObservation.verification_status, 'confirmed');
+assert.ok(localData.triage_events.some(event => event.event_type === 'observation_linked'));
 
 localData = model.applyLinkBacklogIssue(localData, {
   case_id: 'BUG-LOCAL-001',
@@ -192,5 +271,46 @@ const backlogBody = model.buildBacklogBody(
   '## 証跡',
   '## 関連DB'
 ].forEach(section => assert.match(backlogBody, new RegExp(section)));
+
+const csvPayload = csvImporter.mapCsvRecordToObservationPayload({
+  'タイムスタンプ': '2026-05-31 09:00:00',
+  '報告タイプ': '詳細報告',
+  '不具合の種別': '機能しない',
+  '不具合の概要': '送信できない',
+  'アンケートID': 'survey/301',
+  '再現手順': '回答して送信する',
+  '実際の動作': 'ボタンが反応しない',
+  '期待される動作': '完了画面へ遷移する',
+  '利用画面': 'アンケート回答画面',
+  '重要度': '高',
+  '氏名': '山田 太郎',
+  'メールアドレス': 'taro@example.test',
+  '会社名': 'テスト株式会社',
+  '社内メモ': '社内だけのメモ',
+  '担当者候補': '担当A',
+  'スクリーンショットData URI': 'data:image/png;base64,AAAA'
+}, {
+  rowIndex: 1,
+  now: new Date('2026-05-31T00:00:00.000Z')
+});
+const csvObservationJson = JSON.stringify(csvPayload.observation);
+assert.equal(csvPayload.observation.source_ref, 'google_forms_csv_import');
+assert.equal(csvPayload.observation.verification_status, 'unverified');
+assert.equal(csvPayload.observation.category, '機能しない');
+assert.doesNotMatch(csvObservationJson, /taro@example\.test/);
+assert.doesNotMatch(csvObservationJson, /テスト株式会社/);
+assert.doesNotMatch(csvObservationJson, /山田 太郎/);
+assert.doesNotMatch(csvObservationJson, /data:image\/png/);
+assert.equal(csvPayload.evidence.length, 0);
+
+const csvPreview = csvImporter.buildImportPreview([{
+  '不具合の種別': '表示崩れ',
+  '不具合の概要': 'ボタンが欠ける',
+  '再現手順': '画面を開く',
+  '実際の動作': '右端が見切れる',
+  'メールアドレス': 'ignored@example.test'
+}]);
+assert.equal(csvPreview.validPayloads.length, 1);
+assert.ok(csvPreview.ignoredPiiFields.includes('reporterEmail'));
 
 console.log('bug-reporting docs verification passed');

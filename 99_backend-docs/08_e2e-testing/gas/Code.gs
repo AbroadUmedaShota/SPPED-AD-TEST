@@ -20,6 +20,7 @@
  *   { action: "replaceScenarioMasters", payload: { scenarios: [...], steps: [...] } }
  *   { action: "appendObservation", payload: { observation: {...}, evidence: [...] } }
  *   { action: "promoteObservationToCase", payload: { observation_id, case: {...}, actor_role } }
+ *   { action: "linkObservationToCase", payload: { observation_id, case_id, verification_status, actor_role } }
  *   { action: "linkBacklogIssue", payload: { case_id, backlog_key, actor_role } }
  *   { action: "mergeCases", payload: { source_case_id, target_case_id, note, actor_role } }
  *   { action: "appendTriageEvent", payload: { event: {...} } }
@@ -147,7 +148,20 @@ var SHEET_DEFINITIONS = {
       'reproduce_status',
       'confidence',
       'verification_status',
-      'note'
+      'note',
+      'report_type',
+      'category',
+      'environment',
+      'screen',
+      'questionnaire_ref',
+      'summary',
+      'reproduction_steps',
+      'expected',
+      'actual',
+      'affected_module',
+      'severity',
+      'dedupe_key',
+      'source_ref'
     ],
     keyColumns: ['observation_id']
   },
@@ -249,6 +263,10 @@ function doPost(e) {
 
     if (action === 'promoteObservationToCase') {
       return handlePromoteObservationToCase_(payload);
+    }
+
+    if (action === 'linkObservationToCase') {
+      return handleLinkObservationToCase_(payload);
     }
 
     if (action === 'linkBacklogIssue') {
@@ -550,9 +568,7 @@ function handlePromoteObservationToCase_(payload) {
     var observation = findRowByKey_(SHEET_DEFINITIONS.defect_observations, observationId);
     if (observation) {
       observation.case_id = defectCase.case_id;
-      if (observation.source_type !== 'ai' && !observation.verification_status) {
-        observation.verification_status = 'confirmed';
-      }
+      observation.verification_status = payload.verification_status || (observation.source_type === 'ai' ? (observation.verification_status || 'unverified') : (observation.verification_status || 'confirmed'));
       upsertRows_(SHEET_DEFINITIONS.defect_observations, [normalizeObservation_(observation)]);
     }
   }
@@ -570,6 +586,41 @@ function handlePromoteObservationToCase_(payload) {
     action: 'promoteObservationToCase',
     case_id: defectCase.case_id,
     updatedAt: now
+  });
+}
+
+function handleLinkObservationToCase_(payload) {
+  var observationId = String(payload.observation_id || '').trim();
+  var caseId = String(payload.case_id || '').trim();
+  if (!observationId || !caseId) {
+    throw new Error('observation_id and case_id are required.');
+  }
+  if (!findRowByKey_(SHEET_DEFINITIONS.defect_cases, caseId)) {
+    throw new Error('case not found: ' + caseId);
+  }
+  var observation = findRowByKey_(SHEET_DEFINITIONS.defect_observations, observationId);
+  if (!observation) {
+    throw new Error('observation not found: ' + observationId);
+  }
+
+  observation.case_id = caseId;
+  observation.verification_status = String(payload.verification_status || observation.verification_status || 'unverified').trim();
+  upsertRows_(SHEET_DEFINITIONS.defect_observations, [normalizeObservation_(observation)]);
+
+  appendDefectEvent_({
+    case_id: caseId,
+    observation_id: observationId,
+    event_type: 'observation_linked',
+    actor_role: payload.actor_role || 'QA',
+    note: payload.note || ('linked to ' + caseId)
+  });
+
+  return jsonOut_({
+    ok: true,
+    action: 'linkObservationToCase',
+    observation_id: observationId,
+    case_id: caseId,
+    updatedAt: new Date().toISOString()
   });
 }
 
@@ -676,7 +727,20 @@ function normalizeObservation_(row) {
     reproduce_status: String(row.reproduce_status || 'reported').trim(),
     confidence: String(row.confidence || '').trim(),
     verification_status: String(sourceType === 'ai' ? 'unverified' : (row.verification_status || 'unverified')).trim(),
-    note: String(row.note || '').trim()
+    note: String(row.note || '').trim(),
+    report_type: String(row.report_type || '').trim(),
+    category: String(row.category || '').trim(),
+    environment: String(row.environment || '').trim(),
+    screen: String(row.screen || '').trim(),
+    questionnaire_ref: String(row.questionnaire_ref || '').trim(),
+    summary: String(row.summary || '').trim(),
+    reproduction_steps: String(row.reproduction_steps || '').trim(),
+    expected: String(row.expected || '').trim(),
+    actual: String(row.actual || '').trim(),
+    affected_module: String(row.affected_module || '').trim(),
+    severity: String(row.severity || '').trim(),
+    dedupe_key: String(row.dedupe_key || '').trim(),
+    source_ref: String(row.source_ref || '').trim()
   };
 }
 

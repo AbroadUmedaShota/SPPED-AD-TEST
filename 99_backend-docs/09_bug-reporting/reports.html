@@ -142,6 +142,32 @@
       </div>
     </section>
 
+    <section class="mt-5 rounded-lg border border-outline-variant bg-surface p-5" aria-labelledby="unlinked-observation-title">
+      <div class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p class="text-sm font-semibold text-primary">Unlinked submissions</p>
+          <h2 id="unlinked-observation-title" class="mt-1 text-title-large font-bold text-on-surface">未紐づけ投稿</h2>
+          <p class="mt-1 max-w-4xl text-sm leading-6 text-on-surface-variant">投稿フォームから受付DBへ入った匿名化投稿を確認し、既存代表ケースへの紐づけ、代表ケース化、確認済み化を管理者が判断します。</p>
+        </div>
+        <span id="unlinkedObservationCount" class="inline-flex rounded-full bg-primary/10 px-3 py-1 text-sm font-bold text-primary">0件</span>
+      </div>
+      <div class="mt-4 grid gap-4 lg:grid-cols-[minmax(280px,420px)_minmax(0,1fr)]">
+        <div id="unlinkedObservationList" class="max-h-[30rem] space-y-2 overflow-y-auto pr-1"></div>
+        <div class="rounded-lg border border-outline-variant bg-background p-4">
+          <div id="selectedObservationContent" class="text-sm leading-6 text-on-surface-variant">未紐づけ投稿を選択してください。</div>
+          <div class="mt-4 border-t border-outline-variant pt-4">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p class="text-xs font-bold uppercase text-primary">Duplicate candidates</p>
+                <h3 class="mt-1 text-base font-bold text-on-surface">候補代表ケース</h3>
+              </div>
+            </div>
+            <div id="duplicateCandidateList" class="mt-3 space-y-2"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="mt-5 case-workspace">
       <aside class="rounded-lg border border-outline-variant bg-surface p-4">
         <div class="flex items-start justify-between gap-3">
@@ -410,6 +436,7 @@
     applyAppendObservation,
     applyAppendTriageEvent,
     applyLinkBacklogIssue,
+    applyLinkObservationToCase,
     applyMergeCases,
     applyPromoteObservationToCase,
     buildBacklogBody,
@@ -419,7 +446,9 @@
     createEmptyDefectDataSet,
     evidenceByObservationId,
     filterCases,
+    findDuplicateCandidates,
     getBacklogBlockReason,
+    getUnlinkedObservations,
     getRowsForResource,
     groupByCaseId,
     isAiObservation,
@@ -445,6 +474,7 @@
     evidence: [],
     triageEvents: [],
     selectedCaseId: '',
+    selectedObservationId: '',
     search: ''
   };
 
@@ -461,6 +491,10 @@
     observationCount: document.getElementById('observationCount'),
     unverifiedAiCount: document.getElementById('unverifiedAiCount'),
     backlogLinkedCount: document.getElementById('backlogLinkedCount'),
+    unlinkedObservationCount: document.getElementById('unlinkedObservationCount'),
+    unlinkedObservationList: document.getElementById('unlinkedObservationList'),
+    selectedObservationContent: document.getElementById('selectedObservationContent'),
+    duplicateCandidateList: document.getElementById('duplicateCandidateList'),
     filteredCaseCount: document.getElementById('filteredCaseCount'),
     caseSearch: document.getElementById('caseSearch'),
     caseList: document.getElementById('caseList'),
@@ -517,6 +551,10 @@
     }
     if (state.selectedCaseId && !state.cases.some(defectCase => defectCase.case_id === state.selectedCaseId)) {
       state.selectedCaseId = state.cases[0]?.case_id || '';
+    }
+    const unlinked = getUnlinkedObservations(state.observations);
+    if (state.selectedObservationId && !unlinked.some(observation => observation.observation_id === state.selectedObservationId)) {
+      state.selectedObservationId = unlinked[0]?.observation_id || '';
     }
   }
 
@@ -609,6 +647,7 @@
       appendObservation: () => applyAppendObservation(dataSet, payload),
       promoteObservationToCase: () => applyPromoteObservationToCase(dataSet, payload),
       linkBacklogIssue: () => applyLinkBacklogIssue(dataSet, payload),
+      linkObservationToCase: () => applyLinkObservationToCase(dataSet, payload),
       mergeCases: () => applyMergeCases(dataSet, payload),
       appendTriageEvent: () => applyAppendTriageEvent(dataSet, payload)
     }[action]?.();
@@ -653,10 +692,157 @@
 
   function renderStats() {
     const unverifiedAi = state.observations.filter(observation => isAiObservation(observation) && !isConfirmedObservation(observation));
+    const unlinked = getUnlinkedObservations(state.observations);
     elements.caseCount.textContent = state.cases.length;
     elements.observationCount.textContent = state.observations.length;
     elements.unverifiedAiCount.textContent = unverifiedAi.length;
     elements.backlogLinkedCount.textContent = state.cases.filter(defectCase => defectCase.backlog_key).length;
+    elements.unlinkedObservationCount.textContent = `${unlinked.length}件`;
+  }
+
+  function observationTitle(observation) {
+    return observation.summary || observation.actual || observation.note || '(no summary)';
+  }
+
+  function selectedObservation() {
+    return getUnlinkedObservations(state.observations)
+      .find(observation => observation.observation_id === state.selectedObservationId);
+  }
+
+  function observationFieldRows(observation) {
+    return [
+      ['受付ID', observation.observation_id],
+      ['種別', observation.report_type],
+      ['カテゴリ', observation.category],
+      ['環境', observation.environment],
+      ['画面', observation.screen],
+      ['アンケート参照', observation.questionnaire_ref],
+      ['影響モジュール', observation.affected_module],
+      ['重要度', observation.severity],
+      ['重複キー', observation.dedupe_key],
+      ['参照元', observation.source_ref]
+    ]
+      .filter(([, value]) => value)
+      .map(([label, value]) => `
+        <div class="rounded-lg border border-outline-variant bg-surface px-3 py-2">
+          <p class="text-xs font-bold text-primary">${escapeHtml(label)}</p>
+          <p class="mt-1 break-words text-sm text-on-surface">${escapeHtml(value)}</p>
+        </div>
+      `)
+      .join('');
+  }
+
+  function observationTextBlocks(observation, options = {}) {
+    const includeNote = options.includeNote !== false;
+    return [
+      ['概要', observation.summary],
+      ['再現手順', observation.reproduction_steps],
+      ['期待結果', observation.expected],
+      ['実際結果', observation.actual],
+      ['補足', observation.note]
+    ]
+      .filter(([label]) => includeNote || label !== '補足')
+      .filter(([, value]) => value)
+      .map(([label, value]) => `
+        <section class="rounded-lg border border-outline-variant bg-surface px-3 py-2">
+          <h4 class="text-xs font-bold text-primary">${escapeHtml(label)}</h4>
+          <p class="mt-1 whitespace-pre-wrap text-sm leading-6 text-on-surface-variant">${escapeHtml(value)}</p>
+        </section>
+      `)
+      .join('');
+  }
+
+  function renderUnlinkedObservationQueue() {
+    const unlinked = getUnlinkedObservations(state.observations);
+    if (!state.selectedObservationId && unlinked.length) {
+      state.selectedObservationId = unlinked[0].observation_id;
+    }
+
+    if (!unlinked.length) {
+      elements.unlinkedObservationList.innerHTML = '<div class="rounded-lg border border-dashed border-outline-variant bg-background p-4 text-sm text-on-surface-variant">未紐づけ投稿はありません。</div>';
+      elements.selectedObservationContent.textContent = '未紐づけ投稿はありません。';
+      elements.duplicateCandidateList.innerHTML = '<div class="rounded-lg border border-dashed border-outline-variant bg-surface p-3 text-sm text-on-surface-variant">候補はありません。</div>';
+      return;
+    }
+
+    elements.unlinkedObservationList.innerHTML = unlinked.map(observation => {
+      const selected = observation.observation_id === state.selectedObservationId;
+      return `
+        <button type="button" class="w-full rounded-lg border border-outline-variant bg-background p-4 text-left hover:border-primary hover:bg-surface-variant" data-observation-id="${escapeHtml(observation.observation_id)}" aria-pressed="${selected ? 'true' : 'false'}">
+          <span class="block text-xs font-semibold text-primary">${escapeHtml(observation.observation_id)}</span>
+          <span class="mt-1 block text-sm font-bold text-on-surface">${escapeHtml(observationTitle(observation))}</span>
+          <span class="mt-2 flex flex-wrap gap-1">
+            ${createBadge(VERIFICATION_LABELS[observation.verification_status] || observation.verification_status || '未確認', observation.verification_status === 'confirmed' ? 'success' : observation.verification_status === 'rejected' ? 'danger' : 'warning')}
+            ${observation.category ? createBadge(observation.category, 'default') : ''}
+            ${observation.screen ? createBadge(observation.screen, 'info') : ''}
+          </span>
+        </button>
+      `;
+    }).join('');
+
+    elements.unlinkedObservationList.querySelectorAll('[data-observation-id]').forEach(button => {
+      button.addEventListener('click', () => {
+        state.selectedObservationId = button.dataset.observationId || '';
+        renderUnlinkedObservationQueue();
+      });
+    });
+
+    const observation = selectedObservation() || unlinked[0];
+    const candidates = findDuplicateCandidates(observation, state.cases);
+    elements.selectedObservationContent.innerHTML = `
+      <div class="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <p class="text-xs font-semibold text-primary">${escapeHtml(observation.observation_id)}</p>
+          <h3 class="mt-1 text-base font-bold text-on-surface">${escapeHtml(observationTitle(observation))}</h3>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button type="button" class="inline-flex items-center gap-2 rounded-lg border border-outline px-3 py-2 text-xs font-semibold text-on-surface hover:bg-surface-variant" data-confirm-observation-id="${escapeHtml(observation.observation_id)}">
+            <span class="material-icons text-base">task_alt</span>
+            確認済みにする
+          </button>
+          <button type="button" class="inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-primary-on hover:opacity-90" data-promote-observation-id="${escapeHtml(observation.observation_id)}">
+            <span class="material-icons text-base">upgrade</span>
+            代表ケースへ昇格
+          </button>
+        </div>
+      </div>
+      <div class="mt-4 grid gap-2 md:grid-cols-2">${observationFieldRows(observation) || '<p class="text-sm text-on-surface-variant">構造化メタ情報はありません。</p>'}</div>
+      <div class="mt-4 space-y-3">${observationTextBlocks(observation) || '<p class="text-sm text-on-surface-variant">本文はありません。</p>'}</div>
+    `;
+
+    elements.duplicateCandidateList.innerHTML = candidates.length
+      ? candidates.map(candidate => `
+        <div class="rounded-lg border border-outline-variant bg-surface p-3">
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p class="text-xs font-semibold text-primary">${escapeHtml(candidate.case_id)} / score ${escapeHtml(candidate.duplicate_score)}</p>
+              <h4 class="mt-1 text-sm font-bold text-on-surface">${escapeHtml(candidate.title || '(no title)')}</h4>
+              <p class="mt-1 text-xs leading-5 text-on-surface-variant">${escapeHtml(candidate.summary || candidate.symptom_key || '')}</p>
+            </div>
+            <button type="button" class="inline-flex items-center gap-2 rounded-lg border border-outline px-3 py-2 text-xs font-semibold text-on-surface hover:bg-surface-variant" data-link-case-id="${escapeHtml(candidate.case_id)}">
+              <span class="material-icons text-base">link</span>
+              既存ケースへ紐づけ
+            </button>
+          </div>
+          <div class="mt-2 flex flex-wrap gap-1">
+            ${candidate.screen ? createBadge(candidate.screen, 'info') : ''}
+            ${candidate.severity ? createBadge(SEVERITY_LABELS[candidate.severity] || candidate.severity, candidate.severity === 'Critical' || candidate.severity === 'High' ? 'danger' : 'default') : ''}
+          </div>
+        </div>
+      `).join('')
+      : '<div class="rounded-lg border border-dashed border-outline-variant bg-surface p-3 text-sm text-on-surface-variant">候補代表ケースはありません。内容を確認して代表ケースへ昇格してください。</div>';
+
+    elements.selectedObservationContent.querySelector('[data-confirm-observation-id]')?.addEventListener('click', () => {
+      confirmObservation(observation.observation_id).catch(error => setStatus(error.message, 'danger'));
+    });
+    elements.selectedObservationContent.querySelector('[data-promote-observation-id]')?.addEventListener('click', () => {
+      promoteObservation(observation.observation_id).catch(error => setStatus(error.message, 'danger'));
+    });
+    elements.duplicateCandidateList.querySelectorAll('[data-link-case-id]').forEach(button => {
+      button.addEventListener('click', () => {
+        linkObservationToCase(button.dataset.linkCaseId || '').catch(error => setStatus(error.message, 'danger'));
+      });
+    });
   }
 
   function renderCaseList() {
@@ -745,9 +931,12 @@
               <div class="flex flex-wrap gap-1">
                 ${createBadge(VERIFICATION_LABELS[observation.verification_status] || observation.verification_status || '未確認', observation.verification_status === 'confirmed' ? 'success' : observation.verification_status === 'rejected' ? 'danger' : 'warning')}
                 ${createBadge(observation.reproduce_status || 'reported', 'default')}
+                ${observation.category ? createBadge(observation.category, 'default') : ''}
+                ${observation.screen ? createBadge(observation.screen, 'info') : ''}
               </div>
             </div>
-            <p class="mt-3 whitespace-pre-wrap text-sm leading-6 text-on-surface-variant">${escapeHtml(observation.note || '')}</p>
+            ${observation.note ? `<p class="mt-3 whitespace-pre-wrap text-sm leading-6 text-on-surface-variant">${escapeHtml(observation.note)}</p>` : ''}
+            ${observationTextBlocks(observation, { includeNote: false }) ? `<div class="mt-3 space-y-2">${observationTextBlocks(observation, { includeNote: false })}</div>` : ''}
             ${evidenceRows.length ? `<div class="mt-3 space-y-2">${evidenceRows.map(evidence => `
               <div class="rounded-lg border border-outline-variant bg-surface px-3 py-2 text-xs leading-5">
                 <span class="font-bold text-on-surface">${escapeHtml(evidence.type || 'evidence')}</span>
@@ -784,6 +973,7 @@
 
   function render() {
     renderStats();
+    renderUnlinkedObservationQueue();
     renderCaseList();
     renderSelectedCase();
   }
@@ -852,11 +1042,94 @@
     await persistAction('promoteObservationToCase', {
       observation_id: values.observation_id || '',
       case: defectCase,
-      actor_role: 'QA'
+      actor_role: 'QA',
+      verification_status: values.observation_id ? 'confirmed' : undefined
     });
     state.selectedCaseId = defectCase.case_id;
+    if (values.observation_id === state.selectedObservationId) {
+      state.selectedObservationId = '';
+    }
     setStatus(state.storageMode === 'gas' ? '代表ケースを保存しました。DBを再読み込みします。' : '代表ケースをローカルDBに保存しました。', 'success');
     elements.caseForm.reset();
+    if (state.storageMode === 'gas') {
+      await loadAllResources();
+    } else {
+      render();
+    }
+  }
+
+  async function confirmObservation(observationId) {
+    const observation = getUnlinkedObservations(state.observations)
+      .find(item => item.observation_id === observationId);
+    if (!observation) {
+      throw new Error('確認対象の未紐づけ投稿が見つかりません。');
+    }
+    await persistAction('appendObservation', {
+      observation: {
+        ...observation,
+        verification_status: 'confirmed'
+      },
+      evidence: []
+    });
+    setStatus(state.storageMode === 'gas' ? '投稿を確認済みにしました。DBを再読み込みします。' : '投稿をローカルDBで確認済みにしました。', 'success');
+    if (state.storageMode === 'gas') {
+      await loadAllResources();
+    } else {
+      render();
+    }
+  }
+
+  async function promoteObservation(observationId) {
+    const observation = getUnlinkedObservations(state.observations)
+      .find(item => item.observation_id === observationId);
+    if (!observation) {
+      throw new Error('代表ケース化する未紐づけ投稿が見つかりません。');
+    }
+    const defectCase = {
+      case_id: createLocalId('BUG'),
+      title: observation.summary || observation.actual || observation.note.slice(0, 80) || observation.observation_id,
+      status: 'confirmed',
+      severity: observation.severity || 'Medium',
+      environment: observation.environment || '',
+      screen: observation.screen || '',
+      symptom_key: observation.dedupe_key || [observation.screen, observation.category, observation.summary].filter(Boolean).join('|'),
+      summary: observation.summary || observation.note || '',
+      expected: observation.expected || '',
+      actual: observation.actual || ''
+    };
+    await persistAction('promoteObservationToCase', {
+      observation_id: observation.observation_id,
+      case: defectCase,
+      actor_role: 'QA',
+      verification_status: 'confirmed'
+    });
+    state.selectedCaseId = defectCase.case_id;
+    state.selectedObservationId = '';
+    setStatus(state.storageMode === 'gas' ? '未紐づけ投稿を代表ケースへ昇格しました。DBを再読み込みします。' : '未紐づけ投稿をローカルDBで代表ケース化しました。', 'success');
+    if (state.storageMode === 'gas') {
+      await loadAllResources();
+    } else {
+      render();
+    }
+  }
+
+  async function linkObservationToCase(caseId) {
+    const observation = selectedObservation();
+    if (!observation) {
+      throw new Error('紐づける未紐づけ投稿を選択してください。');
+    }
+    if (!caseId) {
+      throw new Error('紐づけ先の代表ケースがありません。');
+    }
+    await persistAction('linkObservationToCase', {
+      observation_id: observation.observation_id,
+      case_id: caseId,
+      verification_status: 'confirmed',
+      actor_role: 'QA'
+    });
+    state.selectedCaseId = caseId;
+    state.selectedObservationId = '';
+    setStatus(state.storageMode === 'gas' ? '投稿を既存代表ケースへ紐づけました。DBを再読み込みします。' : '投稿をローカルDBで既存代表ケースへ紐づけました。', 'success');
     if (state.storageMode === 'gas') {
       await loadAllResources();
     } else {

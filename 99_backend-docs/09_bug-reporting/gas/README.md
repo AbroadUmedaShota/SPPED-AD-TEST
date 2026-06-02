@@ -46,11 +46,21 @@ npx --yes @google/clasp run initializeDefectDb
 - `GET ?resource=defect_cases|defect_observations|defect_evidence|triage_events`
 - `POST { action: "appendObservation", payload: { observation: {...}, evidence: [...] } }`
 - `POST { action: "promoteObservationToCase", payload: { observation_id, case: {...}, actor_role } }`
+- `POST { action: "linkObservationToCase", payload: { observation_id, case_id, verification_status, actor_role } }`
 - `POST { action: "linkBacklogIssue", payload: { case_id, backlog_key, actor_role } }`
 - `POST { action: "mergeCases", payload: { source_case_id, target_case_id, note, actor_role } }`
 - `POST { action: "appendTriageEvent", payload: { event: {...} } }`
 
 GET は JSONP の `callback` パラメータに対応します。POST は GAS の CORS 制約を避けるため `text/plain` で送信し、フロント側では送信後に再読み込みして結果を確認します。
+
+## 投稿フォーム由来 observation
+
+`02_dashboard/bug-report.html` からの投稿は `appendObservation` で `defect_observations` に保存します。共有DBに入れるのは重複判定に必要な匿名化情報のみです。
+
+- 追加列: `report_type`, `category`, `environment`, `screen`, `questionnaire_ref`, `summary`, `reproduction_steps`, `expected`, `actual`, `affected_module`, `severity`, `dedupe_key`, `source_ref`
+- `source_type=human`, `source_role=user_submission`, `verification_status=unverified` で受け付けます。
+- 氏名、メールアドレス、会社名、社内メモ、担当者候補、スクリーンショットData URIは保存しません。
+- `linkObservationToCase` は管理者が未紐づけ投稿を既存代表ケースへ紐づけるための操作です。自動重複確定には使いません。
 
 ## AI観測の扱い
 

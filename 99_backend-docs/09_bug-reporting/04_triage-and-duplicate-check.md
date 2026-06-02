@@ -8,12 +8,14 @@ last_reviewed: 2026-05-31
 
 ## 判断順
 
-1. observationを登録する。
-2. 同じ画面、環境、発生条件、実際結果の代表ケースがないか検索する。
-3. 同一なら既存 `case_id` に紐づける。
-4. 別原因または別条件なら新しい代表ケースに昇格する。
-5. 人間確認済み observation がある場合だけBacklog本文生成対象にする。
-6. Backlog起票後は `backlog_key` をDBへ戻す。
+1. 投稿フォーム、AI観測、手動入力のいずれかで observation を登録する。
+2. `reports.html` の「未紐づけ投稿」で、`case_id` が空の投稿を選択する。
+3. 候補代表ケースを確認する。候補は `dedupe_key` 完全一致、同じ画面/カテゴリ、本文キーワード一致の順で見る。
+4. 同一なら `linkObservationToCase` で既存 `case_id` に紐づける。
+5. 別原因または別条件なら `promoteObservationToCase` で新しい代表ケースに昇格する。
+6. 代表ケース化せず確認だけ済ませる場合は `verification_status=confirmed` に更新する。
+7. 人間確認済み observation がある場合だけBacklog本文生成対象にする。
+8. Backlog起票後は `backlog_key` をDBへ戻す。
 
 ## 同一判定の目安
 
@@ -23,6 +25,16 @@ last_reviewed: 2026-05-31
 | 環境 | 同じ環境、または環境差分が原因に影響しない |
 | 発生条件 | 入力値、権限、状態、操作順が概ね一致 |
 | 実際結果 | 同じエラー、同じ表示崩れ、同じデータ不整合 |
+
+## 候補表示の優先順
+
+| 優先 | 条件 | 管理者操作 |
+| --- | --- | --- |
+| 1 | 投稿の `dedupe_key` と代表ケースの `symptom_key` または算出キーが一致 | 原則として既存ケースへ紐づける |
+| 2 | `screen` と `category` が近く、概要や実際結果が類似 | 内容を読み、同一なら紐づける |
+| 3 | 本文キーワードの一致のみ | 参考候補として扱い、安易に確定しない |
+
+候補表示は自動確定ではない。必ず管理者が投稿本文、再現手順、実際結果、既存代表ケースの概要を見て判断する。
 
 ## 別ケースにする条件
 
@@ -52,6 +64,7 @@ last_reviewed: 2026-05-31
 ## 記録するイベント
 
 - `observation_appended`
+- `observation_linked`
 - `case_promoted`
 - `backlog_linked`
 - `case_merged`

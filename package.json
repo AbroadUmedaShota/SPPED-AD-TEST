@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@playwright/test": "1.59.1",
+    "csv-parse": "^6.2.1",
     "dotenv": "16.4.7"
   }
 }
