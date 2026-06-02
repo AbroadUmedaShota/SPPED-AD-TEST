@@ -47,11 +47,11 @@ document_type: 画面要件定義
 ### 3.3. 遷移先
 
 - `無料ではじめる`: `?intent=signup#top`
-- 導入事例ティザーの詳細リンク: `customer-voices/index.html`
+- 導入事例ティザーの詳細リンク: `https://support.speed-ad.com/customer-voices/`
 - 料金プランリンク: `05_support/plans/index.html`
 - チュートリアルリンク: `05_support/tutorial/index.html`
 - ログイン成功モック: `user` は `02_dashboard/index.html`、`new` は `04_first-login/index.html`、`admin` は `03_admin/index.html`
-- フッターの `導入事例`: `customer-voices/index.html`
+- フッターの `導入事例`: `https://support.speed-ad.com/customer-voices/`
 
 ### 3.4. お知らせ表示
 
@@ -72,7 +72,7 @@ document_type: 画面要件定義
 
 - ティザーは `data/customer-voices.json` を参照する
 - 表示文言は `label` / `listingSummary` を基本とする
-- `customer-voices/` 配下で使う `voicePageLabel` / `voicePageSummary` は詳細ページ専用とし、トップでは汎用表現を維持する
+- `https://support.speed-ad.com/customer-voices/` 配下で使う `voicePageLabel` / `voicePageSummary` は詳細ページ専用とし、トップでは汎用表現を維持する
 
 ## 4. 受入条件
 

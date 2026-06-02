@@ -169,6 +169,6 @@
 | 画面 | 仕様書 | 完 |
 |------|--------|----|
 | [04_first-login/index.html](../../04_first-login/index.html) | [00_first-login_tutorial_requirements.md](仕様/00_first-login_tutorial_requirements.md) | ☐ |
-| [customer-voices/index.html](../../customer-voices/index.html) | [19_customer_voice_public_pages.md](仕様/19_customer_voice_public_pages.md) | ☐ |
-| [customer-voices/university-survey.html](../../customer-voices/university-survey.html) | 同上 | ☐ |
-| [customer-voices/company-monitor.html](../../customer-voices/company-monitor.html) | 同上 | ☐ |
+| [05_support/customer-voices/index.html](../../05_support/customer-voices/index.html) | [19_customer_voice_public_pages.md](仕様/19_customer_voice_public_pages.md) | ☐ |
+| [05_support/customer-voices/university-survey/index.html](../../05_support/customer-voices/university-survey/index.html) | 同上 | ☐ |
+| [05_support/customer-voices/company-monitor/index.html](../../05_support/customer-voices/company-monitor/index.html) | 同上 | ☐ |

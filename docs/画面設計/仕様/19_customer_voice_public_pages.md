@@ -171,7 +171,8 @@ last_reviewed: 2026-04-28
 ## 6. 実装メモ
 
 - 本番配置先は `05_support/customer-voices/`
-- 移行元のルート配下 `customer-voices/` は、公開切替時に `https://support.speed-ad.com/customer-voices/` へ 301 リダイレクトする
+- 移行元のルート配下 `customer-voices/` は、静的リダイレクトページとして `https://support.speed-ad.com/customer-voices/` へ接続する。本番公開時はホスティング設定でも 301 リダイレクトを設定する。
+- support サブドメインのデプロイ対象は `05_support/` であるため、公開用データと画像は `05_support/assets/data/customer-voices.json` と `05_support/assets/img/customer-voices/` に同梱する。編集時の正本は引き続き `data/customer-voices.json` とする。
 - スタイルは support 側へ移設後も `customer-voices/styles.css` 相当を維持する
 - 共通ロジックは `customer-voices/shared.js` 相当
 - 一覧描画は `customer-voices/index.js` 相当
