@@ -1164,6 +1164,24 @@ function computeRawPosition(placement, rect, coachmarkW, coachmarkH, gap) {
   return { left, top };
 }
 
+// ターゲットがモーダル/ダイアログ内にある場合、吹き出しを重ねたくない「パネル本体」
+// （ダイアログ内でターゲットを含む、全画面でない最外ノード = 実際のカード）を返す。
+// モーダル外のターゲットでは null を返し、従来どおりターゲット基準で配置する。
+function findDialogPanel(targetEl) {
+  if (!targetEl || typeof targetEl.closest !== 'function') return null;
+  const dialog = targetEl.closest('[role="dialog"], [aria-modal="true"]');
+  if (!dialog) return null;
+  let panel = null;
+  let node = targetEl;
+  while (node && node !== dialog) {
+    const r = node.getBoundingClientRect();
+    const nearFull = r.width >= window.innerWidth - 8 && r.height >= window.innerHeight - 8;
+    if (r.width > 0 && r.height > 0 && !nearFull) panel = node;
+    node = node.parentElement;
+  }
+  return panel;
+}
+
 // 2 つの矩形（left/top/width/height）が重なるか判定する。
 function rectsOverlap(a, b) {
   return (
@@ -1200,6 +1218,10 @@ function positionCoachmark(step, targetEl) {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
   const rect = targetEl.getBoundingClientRect();
+  // ターゲットがモーダル/ダイアログ内なら、吹き出しがダイアログ本体に重ならないよう
+  // 配置基準をパネル矩形にする（スポットライトは従来どおりターゲットに当たる）。
+  const panelEl = findDialogPanel(targetEl);
+  const baseRect = panelEl ? panelEl.getBoundingClientRect() : rect;
   const cmRect = coachmarkEl.getBoundingClientRect();
   // #8/#9: フォールバックを CSS 実寸（幅 400 / 高さ 200+）に合わせる。
   const coachmarkW = cmRect.width || COACHMARK_FALLBACK_W;
@@ -1231,17 +1253,17 @@ function positionCoachmark(step, targetEl) {
   const candidates = (fallbackOrder[placement] || [placement]).slice();
 
   const targetBox = {
-    left: rect.left,
-    top: rect.top,
-    width: rect.width,
-    height: rect.height,
+    left: baseRect.left,
+    top: baseRect.top,
+    width: baseRect.width,
+    height: baseRect.height,
   };
 
   let chosen = null;
   let firstPos = null;
   for (let i = 0; i < candidates.length; i += 1) {
     const cand = candidates[i];
-    const pos = computeRawPosition(cand, rect, coachmarkW, coachmarkH, gap);
+    const pos = computeRawPosition(cand, baseRect, coachmarkW, coachmarkH, gap);
     if (i === 0) firstPos = { placement: cand, ...pos };
     const onScreen =
       pos.left >= 8 &&
