@@ -48,6 +48,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const api = installGlobalApi();
   api._setInternalHooks({
     goToStep: (stepId) => goToStep(stepId),
+    advanceStep: () => advanceStep(),
   });
 
   if (!api.isActive()) return;

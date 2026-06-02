@@ -327,6 +327,16 @@ export function initBizcardSettings() {
 
     // Warn before unload if dirty
     window.addEventListener('beforeunload', (e) => {
+        // チュートリアル中は練習用の自動入力で変更扱いになるため、離脱警告は出さない
+        const isTutorialActive = (() => {
+            try {
+                if (window.SpeedAD?.tutorial?.isActive?.()) return true;
+                return new URLSearchParams(window.location.search).get('tutorial') === '1';
+            } catch (_e) {
+                return false;
+            }
+        })();
+        if (isTutorialActive) return;
         if (hasFormChanged()) {
             e.preventDefault();
             e.returnValue = '';

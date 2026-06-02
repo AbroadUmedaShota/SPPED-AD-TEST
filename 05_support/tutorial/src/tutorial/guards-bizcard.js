@@ -13,6 +13,7 @@ import { TUTORIAL_CONFIG } from './steps-bizcard.js';
 
 let internalHooks = {
   goToStep: null,
+  advanceStep: null,
 };
 
 function isActiveNow() {
@@ -37,11 +38,14 @@ const api = {
 
   /**
    * 「設定を保存して依頼を確定」差し替え。
-   * 本番保存処理を実行せずに完了ステップ（18）へ進行する。
+   * 本番保存処理を実行せず、保存ステップ（user-action-bridge）から次の完了ステップへ進行する。
+   * ステップ番号のハードコードを避け、現在ステップから相対的に前進させる。
    */
   handleSaveBizcardSettings() {
     if (!isActiveNow()) return;
-    if (typeof internalHooks.goToStep === 'function') {
+    if (typeof internalHooks.advanceStep === 'function') {
+      internalHooks.advanceStep();
+    } else if (typeof internalHooks.goToStep === 'function') {
       internalHooks.goToStep(18);
     }
   },
