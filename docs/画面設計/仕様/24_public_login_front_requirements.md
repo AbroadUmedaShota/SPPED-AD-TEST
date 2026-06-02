@@ -1,7 +1,7 @@
 ---
 owner: product
 status: draft
-last_reviewed: 2026-06-02
+last_reviewed: 2026-04-30
 document_type: 画面要件定義
 ---
 
@@ -74,14 +74,6 @@ document_type: 画面要件定義
 - 表示文言は `label` / `listingSummary` を基本とする
 - `https://support.speed-ad.com/customer-voices/` 配下で使う `voicePageLabel` / `voicePageSummary` は詳細ページ専用とし、トップでは汎用表現を維持する
 
-### 3.7. 制作補助エディタ
-
-- `tools/login-front-reasons-editor.html` は、`選ばれる理由` の文言微調整用の制作補助画面である
-- 制作補助エディタは `index.html` を複製プレビューとして読み込み、REASONS の9項目だけを画面上で直接編集できる
-- 編集対象は見出し、説明文、リンク表示文言に限定し、項目数、表示順、アイコン、リンクURLは変更しない
-- 編集内容はブラウザの `localStorage` に下書き保存し、本番HTMLファイルへ直接書き込まない
-- 編集結果は `JSONをコピー` から差分JSONとして出力し、Codexによる確認・反映作業で本体へ適用する
-
 ## 4. 受入条件
 
 - ファーストビューの `無料ではじめる` からモーダルが開く
@@ -101,10 +93,6 @@ document_type: 画面要件定義
 - トップのティザーが欠けてもレイアウト崩れや空ブロックが出ない
 - 2560 / 1440 / 1280 / 1024 / 768 / 640 / 390px でテキストやUIが重ならない
 - 1440pxを超える幅では、お知らせ、FEATURES、FLOW、REASONS、VOICE、RELATED SERVICES の主コンテンツが中央最大幅に収まり、横方向に間延びしない
-- `tools/login-front-reasons-editor.html` で `選ばれる理由` の見出し、説明文、リンク表示文言を複製画面上で直接編集できる
-- 制作補助エディタで保存した下書きは再読込後も復元され、リセットで現在の `index.html` の文言に戻せる
-- 制作補助エディタの差分JSONでは変更済み項目が `changed: true` で出力される
-- 本番 `index.html` を開いた場合、制作補助エディタのツールバーや編集UIは表示されない
 
 ## 5. 関連資料
 

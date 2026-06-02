@@ -19,7 +19,7 @@ root.
 from __future__ import annotations
 
 import sys
-from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+from http.server import HTTPServer, SimpleHTTPRequestHandler
 from urllib.parse import urlsplit
 
 DEFAULT_PORT = 8765
@@ -78,7 +78,7 @@ def parse_port(argv: list[str]) -> int:
 def main(argv: list[str]) -> None:
     """Start the development server bound to :data:`BIND_HOST`."""
     port = parse_port(argv)
-    server = ThreadingHTTPServer((BIND_HOST, port), SupportRewriteHandler)
+    server = HTTPServer((BIND_HOST, port), SupportRewriteHandler)
     print(f"Dev server listening on http://{BIND_HOST}:{port}/")
     print("Rewriting prefixes -> /05_support/: " + ", ".join(REWRITE_PREFIXES))
     print("LOCAL DEVELOPMENT ONLY. Do not use in production.")
