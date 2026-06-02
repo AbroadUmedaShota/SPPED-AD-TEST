@@ -3,7 +3,7 @@ import { resolveSupportBasePath } from './utils.js';
 const SUPPORT_COMMON_ROOT = '/common';
 const SUPPORT_COMMON_VERSION = '20260519-plans-news';
 
-const REWRITE_PREFIX_PATTERN = /(src|href)="\/(assets|common|news|help-content|help|faq|bug-report|plans|tutorial|terms|privacy|tokushoho)\//g;
+const REWRITE_PREFIX_PATTERN = /(src|href)="\/(assets|common|news|help-content|help|faq|bug-report|plans|tutorial|customer-voices|terms|privacy|tokushoho)\//g;
 
 /**
  * 注入する fragment HTML 内の `/assets/...` `/common/...` などの絶対パス参照を、

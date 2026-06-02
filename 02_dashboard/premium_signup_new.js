@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </p>
                 <div>
                     <a href="#" id="open-support-modal">お問い合わせ</a>
-                    <a href="https://support.speed-ad.com/help/" target="_blank" rel="noopener noreferrer">サポートセンター</a>
+                    <a href="../05_support/help/" target="_blank" rel="noopener noreferrer">サポートセンター</a>
                 </div>
             </div>
         `;

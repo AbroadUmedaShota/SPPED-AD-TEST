@@ -669,8 +669,9 @@ h2.deferred-section .h2-sub { font-weight:normal; font-size:9pt; opacity:.85; }
   function syncChipSelection(tr) {
     var fi = tr.querySelector('.final-input');
     var val = fi ? fi.value.trim() : '';
+    var tokens = val === '' ? [] : val.split(' / ').map(function (s) { return s.trim(); }).filter(Boolean);
     tr.querySelectorAll('.cand-chip').forEach(function (chip) {
-      chip.classList.toggle('is-selected', val !== '' && chip.dataset.value === val);
+      chip.classList.toggle('is-selected', tokens.indexOf(chip.dataset.value) >= 0);
     });
   }
   function highlightInputs(tr) {
@@ -696,10 +697,18 @@ h2.deferred-section .h2-sub { font-weight:normal; font-size:9pt; opacity:.85; }
       b.className = 'cand-chip';
       b.dataset.value = p;
       b.textContent = p;
-      b.title = 'クリックで最終推奨表記へ反映';
+      b.title = 'クリックで最終推奨表記へ追加／再クリックで解除（複数選択可）';
       b.addEventListener('click', function () {
         if (!finalInput) return;
-        finalInput.value = p;
+        var cur = finalInput.value.trim();
+        var tokens = cur === '' ? [] : cur.split(' / ').map(function (s) { return s.trim(); }).filter(Boolean);
+        var idx = tokens.indexOf(p);
+        if (idx >= 0) {
+          tokens.splice(idx, 1);   // 既に選択済みなら解除（トグルOFF）
+        } else {
+          tokens.push(p);          // 未選択なら追加（トグルON・複数選択対応）
+        }
+        finalInput.value = tokens.join(' / ');
         finalInput.dispatchEvent(new Event('input', { bubbles: true }));
       });
       cell.appendChild(b);

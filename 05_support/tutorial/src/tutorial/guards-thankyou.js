@@ -15,6 +15,7 @@ import { TUTORIAL_CONFIG } from './steps-thankyou.js';
 
 let internalHooks = {
   goToStep: null,
+  advanceStep: null,
 };
 
 function isActiveNow() {
@@ -29,16 +30,47 @@ function isActiveNow() {
 // after_event_ready 強制: DOMContentLoaded 後に setTimeout(0) で実行
 document.addEventListener('DOMContentLoaded', () => {
   if (!isActiveNow()) return;
-  window.setTimeout(() => {
+  // 本体の非同期初期化がシナリオ値を既定（会期前）へ戻すため、setTimeout(0) 1回の dispatch では
+  // 取りこぼされる。受信者リストが表示されるまでシナリオ適用をリトライする。
+  let attempts = 0;
+  const applyReady = () => {
+    attempts += 1;
+
+    // 差し込み変数パネルを開いた状態にする（ステップが閉じた状態に当たらないように）。
+    const varWrapper = document.getElementById('variableContainerWrapper');
+    if (varWrapper) varWrapper.classList.remove('hidden');
+    const varIcon = document.getElementById('variablesToggleIcon');
+    if (varIcon) varIcon.style.transform = 'rotate(180deg)';
+
     const selector = document.getElementById('scenarioSelector');
-    if (!selector) return;
-    selector.value = 'after_event_ready';
-    selector.dispatchEvent(new Event('change', { bubbles: true }));
-    // チュートリアル中はシナリオセレクタを無効化（誤操作防止）
-    selector.disabled = true;
-    selector.setAttribute('aria-disabled', 'true');
-    selector.title = 'チュートリアル中はシナリオを変更できません';
-  }, 0);
+    const wrapper = document.getElementById('recipientTableWrapper');
+    const ready = wrapper && !wrapper.classList.contains('hidden');
+
+    if (selector && !ready) {
+      // dispatch を妨げないよう、表示できるまでは無効化しない
+      selector.disabled = false;
+      selector.value = 'after_event_ready';
+      selector.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    if (ready) {
+      // 表示できたらシナリオセレクタを無効化（誤操作防止）
+      if (selector) {
+        selector.disabled = true;
+        selector.setAttribute('aria-disabled', 'true');
+        selector.title = 'チュートリアル中はシナリオを変更できません';
+      }
+      return;
+    }
+
+    if (attempts < 20) {
+      window.setTimeout(applyReady, 200);
+    } else if (selector) {
+      selector.disabled = true;
+      selector.setAttribute('aria-disabled', 'true');
+    }
+  };
+  window.setTimeout(applyReady, 0);
 });
 
 const api = {
@@ -54,23 +86,29 @@ const api = {
 
   /**
    * 「設定を保存する」差し替え。
-   * 本番保存処理を実行せずに完了ステップ（20）へ進行する。
+   * 本番保存処理を実行せず、保存ステップ（user-action-bridge）から次の完了ステップへ進行する。
+   * ステップ番号のハードコードを避け、現在ステップから相対的に前進させる。
    */
   handleSaveThankYouEmailSettings() {
     if (!isActiveNow()) return;
-    if (typeof internalHooks.goToStep === 'function') {
-      internalHooks.goToStep(20);
+    if (typeof internalHooks.advanceStep === 'function') {
+      internalHooks.advanceStep();
+    } else if (typeof internalHooks.goToStep === 'function') {
+      internalHooks.goToStep(14);
     }
   },
 
   /**
-   * 「お礼メールを送信する」差し替え（二重防御）。
-   * チュートリアル中は送信処理を実行しない。
+   * 送信確認ダイアログの「送信を実行」差し替え。
+   * 本番送信を実行せず、現在の送信実行ステップから次の完了ステップへ進行する。
    */
   handleSendThankYouEmail() {
-    // tutorial-guard: チュートリアル中は何もしない
     if (!isActiveNow()) return;
-    // noop: 送信処理をインターセプトして何も実行しない
+    if (typeof internalHooks.advanceStep === 'function') {
+      internalHooks.advanceStep();
+    } else if (typeof internalHooks.goToStep === 'function') {
+      internalHooks.goToStep(15);
+    }
   },
 
   isCompleted() {

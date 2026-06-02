@@ -76,7 +76,7 @@
     const passwordError = document.getElementById('password-error');
     const rememberAccountCheckbox = document.getElementById('remember-account');
     const loginButton = loginForm?.querySelector('.button--filled');
-    const googleButtonMain = document.querySelector('.form-container > .button--google');
+    const googleButtonMain = document.querySelector('.login-panel .button--google');
     const scenarioAccountLinks = Array.from(document.querySelectorAll('.scenario-accounts__link'));
     const signupTriggerButtons = Array.from(document.querySelectorAll('[data-signup-trigger]'));
     const fallbackSignupButton = document.querySelector('.button--tonal');
@@ -203,7 +203,7 @@
           const quoteText = voice.teaserQuote || (voice.quote?.text ? voice.quote.text.slice(0, 100) + (voice.quote.text.length > 100 ? '…' : '') : '') || voice.listingSummary || '';
           const author = voice.publicQuoteAuthor || voice.quote?.author || '';
           const descriptor = voice.organizationDescriptor || '';
-          const detailUrl = `customer-voices/${voice.slug || ''}.html`;
+          const detailUrl = `https://support.speed-ad.com/customer-voices/${voice.slug || ''}/`;
           const accent = voice.accent || '#f3e2c1';
           const accentStrong = voice.accentStrong || accent;
           const features = Array.isArray(voice.teaserTags) ? voice.teaserTags.slice(0, 4) : (Array.isArray(voice.usedFeatures) ? voice.usedFeatures.slice(0, 4) : []);
@@ -234,7 +234,7 @@
         console.warn('お客様のお声の読み込みに失敗しました:', error);
         customerVoiceTeaserStatus.textContent = '読み込み失敗';
         customerVoiceTeaserGrid.setAttribute('aria-busy', 'false');
-        customerVoiceTeaserGrid.innerHTML = '<p class="voice-teaser__empty">公開事例を表示できません。<a class="voice-teaser__inline-link" href="customer-voices/index.html">一覧ページから事例を見る</a></p>';
+        customerVoiceTeaserGrid.innerHTML = '<p class="voice-teaser__empty">公開事例を表示できません。<a class="voice-teaser__inline-link" href="https://support.speed-ad.com/customer-voices/">一覧ページから事例を見る</a></p>';
       }
     }
 
