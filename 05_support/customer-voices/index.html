@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SPEED AD の公開導入事例を紹介するページです。展示会やアンケート運用での活用イメージを確認できます。">
+  <title>SPEED AD | 導入事例</title>
+  <link rel="icon" href="../assets/img/speedad_logo.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;800&family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body class="voice-page">
+  <header class="voice-header">
+    <div class="voice-header__inner">
+      <a class="voice-brand" href="./">
+        <img class="voice-brand__mark" src="../assets/img/speedad_logo.svg" alt="SPEED AD">
+        <span class="voice-brand__copy">
+          <span class="voice-brand__eyebrow">お客様の声</span>
+          <span class="voice-brand__title">導入事例</span>
+        </span>
+      </a>
+      <nav class="voice-nav" aria-label="導入事例ページのナビゲーション">
+        <a class="voice-nav__link" href="https://app.speed-ad.com/#top">ログインはこちら</a>
+        <a class="voice-button voice-button--primary" href="https://app.speed-ad.com/?intent=signup#top">無料ではじめる</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="voice-shell">
+      <section class="voice-hero">
+        <div class="voice-hero__inner">
+          <div data-reveal>
+            <p class="voice-eyebrow">導入事例 / Public Stories</p>
+            <h1 class="voice-hero__title">導入事例から、現場での使い方を短時間でつかむ。</h1>
+            <p class="voice-hero__lead">
+              展示会運用やアンケート活用の流れを、導入事例ベースで確認できるページです。
+              まず全体像を見てから、自社に近い運用イメージの詳細へ進めます。
+            </p>
+            <div class="voice-hero__actions">
+              <a class="voice-button voice-button--primary" href="https://app.speed-ad.com/?intent=signup#top">無料ではじめる</a>
+              <a class="voice-button voice-button--secondary" href="https://app.speed-ad.com/#top">ログインはこちら</a>
+            </div>
+          </div>
+          <div class="voice-hero__art" data-reveal>
+            <figure class="voice-hero__photo voice-hero__photo--primary">
+              <img src="../assets/img/top-kv.jpg" alt="イベント会場イメージ">
+            </figure>
+            <figure class="voice-hero__photo voice-hero__photo--secondary">
+              <img src="../assets/img/pic3.jpg" alt="アンケート利用イメージ">
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="voice-section">
+        <div class="voice-section__head">
+          <div>
+            <p class="voice-eyebrow" style="color: var(--voice-muted);">公開中の導入事例</p>
+            <h2 class="voice-section__title">導入事例 一覧</h2>
+          </div>
+          <p class="voice-section__copy" id="voice-count">読み込み中</p>
+        </div>
+        <div class="voice-index__grid" id="voice-index-grid"></div>
+      </section>
+
+      <section class="voice-cta" data-reveal>
+        <h2>次は、自社の運用に置き換えて試す段階です。</h2>
+        <p>
+          まずは無料でアンケート導線を作り、必要に応じて名刺取得や会期後のレビュー運用へ広げられます。
+          ログイン前ページに戻れば、そのまま開始導線に接続できます。
+        </p>
+        <div class="voice-cta__actions">
+          <a class="voice-button voice-button--primary" href="https://app.speed-ad.com/?intent=signup#top">無料ではじめる</a>
+          <a class="voice-button voice-button--secondary" href="https://app.speed-ad.com/#top">ログインはこちら</a>
+        </div>
+      </section>
+
+      <footer class="voice-footer">
+        <p>掲載している内容は公開可能な範囲で匿名化・要約しています。</p>
+        <a class="voice-nav__link" href="../help/">ヘルプセンターを見る</a>
+      </footer>
+    </div>
+  </main>
+
+  <script type="module" src="./index.js"></script>
+</body>
+</html>
