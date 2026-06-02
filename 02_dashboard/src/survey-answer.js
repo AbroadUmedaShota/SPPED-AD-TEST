@@ -1320,26 +1320,34 @@ function createQuestionElement(question, index) {
 
     // 設問タイプに応じて入力コントロールを生成
     switch (question.type) {
-        case 'free_answer':
+        case 'free_answer': {
             const validation = question.meta?.validation?.text;
             const min = validation?.minLength;
             const max = validation?.maxLength;
+            const multiline = validation?.multiline !== false;
 
-            const textarea = document.createElement('textarea');
-            textarea.name = question.id;
-            textarea.className = 'w-full rounded-md border-gray-300 shadow-sm';
-            textarea.rows = 4;
-            if (min > 0) textarea.minLength = min;
+            const field = multiline
+                ? document.createElement('textarea')
+                : document.createElement('input');
+            field.name = question.id;
+            field.className = 'w-full rounded-md border-gray-300 shadow-sm';
+            if (multiline) {
+                field.rows = 4;
+                field.classList.add('resize-y');
+            } else {
+                field.type = 'text';
+            }
+            if (min > 0) field.minLength = min;
 
             const warningDiv = document.createElement('div');
             warningDiv.className = 'text-error text-sm mt-1';
             warningDiv.style.display = 'none';
 
-            controlArea.appendChild(textarea);
+            controlArea.appendChild(field);
             controlArea.appendChild(warningDiv);
 
-            textarea.addEventListener('input', () => {
-                const len = textarea.value.length;
+            field.addEventListener('input', () => {
+                const len = field.value.length;
                 let message = '';
 
                 if (max > 0 && len > max) {
@@ -1356,6 +1364,7 @@ function createQuestionElement(question, index) {
                 }
             });
             break;
+        }
         case 'single_answer':
             question.options.forEach(opt => {
                 controlArea.innerHTML += `

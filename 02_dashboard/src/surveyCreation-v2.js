@@ -487,7 +487,7 @@ function defaultQuestion(type) {
     base.config = { min: '', max: '', unit: '', step: '' };
   }
   if (type === 'free_answer') {
-    base.config = { minLength: '', maxLength: '' };
+    base.config = { multiline: true, minLength: '', maxLength: '' };
   }
   if (type === 'date_time') {
     base.config = { showDate: true, showTime: false };
@@ -1093,12 +1093,70 @@ function buildAnswerSection(q, typeLabel) {
   if (CHOICE_TYPES.has(q.type)) return buildChoiceSection(q, typeLabel);
   if (MATRIX_TYPES.has(q.type)) return buildMatrixSection(q, typeLabel);
   if (q.type === 'rating_scale') return buildRatingScaleSection(q, typeLabel);
+  if (q.type === 'free_answer') return buildFreeAnswerSection(q, typeLabel);
   const section = el('section', {class: 'px-5 pb-5 border-t border-gray-100 pt-4'});
   const hdr = el('div', {class: 'flex items-center justify-between gap-2 mb-3'});
   hdr.appendChild(el('h4', {class: 'text-sm font-bold text-gray-700 flex items-center gap-1.5'}, icon('tune', 'text-[18px] text-gray-400'), '回答設定'));
   if (typeLabel) hdr.appendChild(typeLabel);
   section.appendChild(hdr);
   section.appendChild(el('div', {class: 'bg-white border border-gray-200 rounded-xl p-4 text-center'}, el('p', {class: 'text-xs text-gray-500 font-bold'}, `${getTypeLabel(q.type)}の回答設定`)));
+  return section;
+}
+
+function buildFreeAnswerSection(q, typeLabel) {
+  if (!q.config) q.config = { multiline: true, minLength: '', maxLength: '' };
+  const cfg = q.config;
+  if (cfg.multiline === undefined) cfg.multiline = true;
+
+  const section = el('section', { class: 'px-5 pb-5 space-y-4 border-t border-gray-100 pt-4' });
+  const hdr = el('div', { class: 'flex items-center justify-between gap-2' });
+  hdr.appendChild(el('h4', { class: 'text-sm font-bold text-gray-700 flex items-center gap-1.5' }, icon('tune', 'text-[18px] text-gray-400'), '回答設定'));
+  if (typeLabel) hdr.appendChild(typeLabel);
+  section.appendChild(hdr);
+
+  // 入力形式トグル（単一行 / 複数行）
+  const ACTIVE   = 'flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-bold transition-colors bg-primary text-white shadow';
+  const INACTIVE = 'flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-bold transition-colors text-gray-600 hover:text-primary';
+
+  const singleBtn = el('button', { type: 'button' }, icon('short_text', 'text-[18px]'), '単一行');
+  const multiBtn  = el('button', { type: 'button' }, icon('notes', 'text-[18px]'), '複数行');
+
+  function syncMode() {
+    const multi = cfg.multiline !== false;
+    singleBtn.className = multi ? INACTIVE : ACTIVE;
+    multiBtn.className  = multi ? ACTIVE : INACTIVE;
+  }
+  singleBtn.addEventListener('click', () => { cfg.multiline = false; syncMode(); buildPreview(); });
+  multiBtn.addEventListener('click',  () => { cfg.multiline = true;  syncMode(); buildPreview(); });
+
+  const modeWrap = el('div', { class: 'flex gap-1 rounded-xl border border-gray-200 bg-gray-50 p-1' });
+  modeWrap.append(singleBtn, multiBtn);
+  section.appendChild(modeWrap);
+
+  // 文字数設定
+  function buildLimitInput(key, label) {
+    const wrap = el('div');
+    wrap.appendChild(el('label', { class: 'block text-xs font-semibold text-gray-600 mb-1' }, label));
+    const input = el('input', {
+      type: 'number', min: '0', inputmode: 'numeric',
+      class: 'w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors',
+      value: (cfg[key] === '' || cfg[key] == null) ? '' : String(cfg[key]),
+      placeholder: '指定なし',
+      oninput: (e) => {
+        const v = e.target.value.trim();
+        cfg[key] = v === '' ? '' : Math.max(0, parseInt(v, 10) || 0);
+        buildPreview();
+      }
+    });
+    wrap.appendChild(input);
+    return wrap;
+  }
+  const limitsGrid = el('div', { class: 'grid grid-cols-2 gap-3' });
+  limitsGrid.appendChild(buildLimitInput('minLength', '最小文字数'));
+  limitsGrid.appendChild(buildLimitInput('maxLength', '最大文字数'));
+  section.appendChild(limitsGrid);
+
+  syncMode();
   return section;
 }
 
@@ -2187,10 +2245,14 @@ function buildPreviewData() {
       }));
     }
 
-    if (q.type === 'free_answer' && (cfg.minLength || cfg.maxLength)) {
+    if (q.type === 'free_answer') {
       base.meta = {
         ...base.meta,
-        validation: { text: { minLength: cfg.minLength || 0, maxLength: cfg.maxLength || 0 } },
+        validation: { text: {
+          multiline: cfg.multiline !== false,
+          minLength: cfg.minLength || 0,
+          maxLength: cfg.maxLength || 0,
+        } },
       };
     }
 
