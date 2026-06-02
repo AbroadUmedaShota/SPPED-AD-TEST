@@ -1335,8 +1335,28 @@ body.is-hero-font-dragging * {
   height: 20px;
 }
 
-.login-panel__signup-button {
+.login-panel__google-button {
   margin-top: 10px;
+}
+
+.login-panel__signup-button {
+  border-color: color-mix(in srgb, var(--login-panel-text, #07182d) 16%, transparent);
+  color: var(--login-panel-text, #07182d);
+  background: color-mix(in srgb, var(--white, #ffffff) 72%, transparent);
+  transition: transform .15s ease, box-shadow .2s ease, background-color .2s ease, color .2s ease, border-color .2s ease;
+}
+
+.login-panel__signup-button:hover,
+.login-panel__signup-button:focus-visible {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--login-panel-accent, #9c7435) 42%, transparent);
+  background: color-mix(in srgb, var(--white, #ffffff) 88%, transparent);
+  box-shadow: 0 10px 24px -14px rgba(2, 17, 32, .32);
+}
+
+.login-panel__signup-button:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 10px -6px rgba(2, 17, 32, .24);
 }
 
 .button__spinner {

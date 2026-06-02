@@ -76,7 +76,7 @@
     const passwordError = document.getElementById('password-error');
     const rememberAccountCheckbox = document.getElementById('remember-account');
     const loginButton = loginForm?.querySelector('.button--filled');
-    const googleButtonMain = document.querySelector('.form-container > .button--google');
+    const googleButtonMain = document.querySelector('.login-panel .button--google');
     const scenarioAccountLinks = Array.from(document.querySelectorAll('.scenario-accounts__link'));
     const signupTriggerButtons = Array.from(document.querySelectorAll('[data-signup-trigger]'));
     const fallbackSignupButton = document.querySelector('.button--tonal');

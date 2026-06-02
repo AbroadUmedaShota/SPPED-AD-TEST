@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&family=Noto+Serif+JP:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/login-front.css?v=20260601-login-panel-signup-button">
+  <link rel="stylesheet" href="css/login-front.css?v=20260601-login-panel-auth-order">
 </head>
 <body id="before-login" data-login-panel-theme="e2">
   <a class="skip-link" href="#top">本文へスキップ</a>
@@ -81,16 +81,16 @@
               </label>
             </div>
             <button class="button button--filled" type="submit"><span class="button__spinner" aria-hidden="true"></span>ログイン <span aria-hidden="true">→</span></button>
+            <button class="button button--google login-panel__google-button" type="button">
+              <img class="button--google__logo" src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="">
+              Googleでログイン
+            </button>
             <a class="login-panel__forgot" href="02_dashboard/forgot-password.html">パスワードを忘れた方</a>
           </form>
           <div class="divider" role="separator" aria-label="または">
             <span class="divider__text">または</span>
           </div>
-          <button class="button button--google" type="button">
-            <img class="button--google__logo" src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="">
-            Googleでログイン
-          </button>
-          <button class="button button--filled login-panel__signup-button" type="button" data-signup-trigger>新規アカウント作成</button>
+          <button class="button login-panel__signup-button" type="button" data-signup-trigger>新規アカウント作成</button>
           <details class="scenario-accounts">
             <summary class="scenario-accounts__title">テスト用アカウントはこちら <span aria-hidden="true">→</span></summary>
             <ul class="scenario-accounts__list">
