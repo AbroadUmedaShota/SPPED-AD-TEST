@@ -49,6 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const api = installGlobalApi();
   api._setInternalHooks({
     goToStep: (stepId) => goToStep(stepId),
+    advanceStep: () => advanceStep(),
   });
 
   if (!api.isActive()) return;
@@ -63,9 +64,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       api.handleSaveThankYouEmailSettings();
       return;
     }
-    // #sendThankYouEmailBtn を capture フェーズでインターセプト（二重防御）
-    const sendBtn = ev.target.closest('#sendThankYouEmailBtn');
-    if (sendBtn) {
+    // #sendThankYouEmailBtn は送信確認ダイアログを開くため通す。
+    // 本番送信は #sendConfirmExecuteBtn（ダイアログ内の実行ボタン）で行われるため、こちらを
+    // capture フェーズでインターセプトして抑止し、チュートリアルを進行する。
+    const execBtn = ev.target.closest('#sendConfirmExecuteBtn');
+    if (execBtn) {
       ev.stopImmediatePropagation();
       ev.preventDefault();
       api.handleSendThankYouEmail();
