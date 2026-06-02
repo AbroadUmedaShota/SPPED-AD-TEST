@@ -61,7 +61,7 @@ export const TUTORIAL_STEPS = [
     title: '基本情報を入力する',
     body:
       'ここでアンケートの基本情報を入力します。\n'
-      + '今回は練習のため、こちらで自動入力していきます。\n\n'
+      + '練習のため、ここでは自動で入力します。\n\n'
       + '下の『次へ』ボタンを押してください。',
   },
   {
@@ -116,7 +116,7 @@ export const TUTORIAL_STEPS = [
       '回答時に名刺を撮影するステップを追加できる機能です。\n'
       + 'ONにすると、回答者は設問の途中で名刺画像を添付できます。\n'
       + '回答とリードの紐付けを1ステップで実現できる、本サービスならではの機能です。\n\n'
-      + '今回はそのまま進みます。下の『次へ』ボタンを押してください。',
+      + 'ここでは変更せずに『次へ』へ進みます。',
   },
   {
     id: 11, block: 'C', target: '#openBizcardSettingsBtn', contextTarget: '#relatedSettingsCardBody',
@@ -143,7 +143,7 @@ export const TUTORIAL_STEPS = [
     body:
       '回答完了画面（サンクス画面）の見た目やメッセージをカスタマイズできます。\n'
       + 'ブランドに合わせた画面で、回答後の印象まで整えられます。\n\n'
-      + '今回は開かずに進みます。下の『次へ』ボタンを押してください。',
+      + 'ここでは開かずに『次へ』へ進みます。',
   },
   {
     id: 14, block: 'C', target: '#addFirstQuestionBtn', mode: 'user-action', placement: 'top',
