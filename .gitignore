@@ -65,3 +65,8 @@ tmp-*.png
 /docs/プロダクト/サービス企画/backlog_wiki_drafts/
 /docs/プロダクト/ロゴ制作/
 /docs/メモ/meetings/2026-03-26_abroad_regular_mtg_minutes.md
+
+# QAテスト成果物: 証跡(report配下=スクショ/顧客PII含むクロールデータ)はコミットしない
+/テスト成果物/report/
+/テスト成果物_名刺フロー/report/
+/テスト成果物_全画面/report/
