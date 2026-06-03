@@ -430,7 +430,7 @@
       start_url: 'https://stg.speed-ad.com/admin/top',
       objective: '権限レベル1（オペレーター）でログイン後、到達できる画面が名刺入力に限定され、他画面はリダイレクト/非表示になることを検証する。',
       linked_case_ids: ['STG-ADM-00-01', 'STG-ADM-00-03', 'STG-ADM-07-01'],
-      stg_observation_status: 'stg実測済（Lv1相当アカウント）',
+      stg_observation_status: 'stg実測済（Lv1相当アカウント）/2026-06-03再確認: メニューは名刺入力のみ、matching_list・surveys直URLは/topへ遮断（正常）。名刺入力画面の名刺画像はORBで非表示（全レベル共通）',
       expected_outcome: 'トップのメニューが名刺入力のみで、他の管理画面URLへ直接アクセスすると/topへリダイレクトされる。',
       evidence_policy: 'トップのメニュー範囲、他画面アクセス時のリダイレクト、名刺入力到達を記録する。',
       notes: '到達範囲のみ確認し、作業画面の確定/スキップは実行しない。'
@@ -445,7 +445,7 @@
       start_url: 'https://stg.speed-ad.com/admin/top',
       objective: '権限レベル3（アブロードスタッフ）でログイン後、主要12メニューに到達し各操作部品が表示されることを検証する。',
       linked_case_ids: ['STG-ADM-00-01', 'STG-ADM-00-02'],
-      stg_observation_status: 'stg実測済（現アカウントLv3）',
+      stg_observation_status: 'stg実測済（現アカウントLv3）/2026-06-03再確認: 10メニュー表示、照合一覧の照合作業/完成データ確認/全レコードDLの操作コントロールはLv4と同一（レベル間の可否差なし）',
       expected_outcome: 'トップにフル12メニューが表示され、各画面へ遷移して戻れる。操作部品（検索/編集/新規作成等）が表示される。',
       evidence_policy: 'トップのメニュー、各画面の到達と戻り、操作部品の表示を記録する。',
       notes: '到達・表示まで確認。保存/削除/送信の実行はしない。'
@@ -460,7 +460,7 @@
       start_url: 'https://stg.speed-ad.com/admin/top',
       objective: 'Lv2でメニューが2項目に制限される一方、メニュー非表示の管理画面へ直URLで到達できないこと（サーバ側でアクセス制御が強制されること）を検証する。',
       linked_case_ids: ['STG-ADM-00-01', 'STG-ADM-00-03', 'STG-ADM-01-01', 'STG-ADM-03-01'],
-      stg_observation_status: 'stg実測済（2026-05-31・BUG-ADM-04検出）',
+      stg_observation_status: 'stg実測済（2026-05-31・BUG-ADM-04検出）/2026-06-03再確認: メニューは名刺入力＋実績確認の2項目だが、admin/surveysへ直URLで到達し全53行（全社データ）が描画される＝BUG-ADM-04継続（アクセス制御の穴・データ漏洩）',
       expected_outcome: 'Lv2のメニューは名刺入力＋実績確認のみ。メニュー非表示の管理画面（利用者/請求/オペレーター管理等）へ直URLアクセスするとログインへリダイレクトされ到達できないこと。現状は到達できてしまうため不備（BUG-ADM-04）。',
       evidence_policy: 'メニュー表示、各直URLアクセス時のリダイレクト有無を記録する。',
       notes: '回帰検証用。現状は全10画面へ到達できる不備を検出。閲覧のみでデータ更新はしない。実データはマスクする。'
