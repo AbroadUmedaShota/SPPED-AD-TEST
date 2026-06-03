@@ -33,6 +33,7 @@ source_status: 既存資料 / 現行モック
 | `data/core/plan-capabilities.json` | プラン制限 | Free/Premium等の機能可否 |
 | 回答系モックデータ | SPEEDレビュー、グラフ、DL導線 | 集計値や表示文言 |
 | シナリオ切替UI | モック上の状態再現 | 本番要件ではなく検証補助として扱う |
+| `fixtures/meishi_test.png` | 回答時の名刺画像アップロード（STG-SCN-034/035） | 全項目ダミーのテスト名刺。実顧客の名刺は使用しない |
 
 ## 事前準備
 
