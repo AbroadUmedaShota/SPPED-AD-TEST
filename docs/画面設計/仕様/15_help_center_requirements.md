@@ -501,7 +501,7 @@ URL 正規化・canonical タグ付与は Phase 2 で確定。
 
 ### 8.1 対象 URL / 配置 / 参照
 
-- 対象 URL: `/help/`, `/help-content/`, `/faq/`, `/bug-report/`, `/tutorial/`, `/plans/`, `/news/`, `/news/<slug>/`, `/news.json`。規約は `21_support_site_separation_spec.md` の移設対象として扱う。
+- 対象 URL: `/help/`, `/help-content/`, `/faq/`, `/bug-report/`, `/tutorial/`, `/plans/`, `/news/`, `/news/<slug>/`, `/news.json`, `/customer-voices/`, `/customer-voices/<slug>/`, `/terms/`, `/privacy/`, `/privacy/member-registration/`, `/tokushoho/`。URL正本は `21_support_site_separation_spec.md` とする。
 - `/tutorial/` はサブドメイン配下の独立ページとして扱う。`help_articles.json` のカテゴリ `tutorial` は、独立ページから接続する詳細記事群として維持する。
 - ページ本体は各配下、共通 `header.html` / `footer.html` は `/common/` 配下、共通 `css` / `js` / `img` は `/assets/` 配下に集約。機能専用リソースは `/assets/img/faq/` のように用途別で分ける。
 - HTML からの参照はルート相対で統一（例: `/assets/css/common.20260414.css`）。`../assets/...` のような相対参照は不採用。
@@ -540,7 +540,7 @@ URL 正規化・canonical タグ付与は Phase 2 で確定。
 - 本番・検証はドメイン分離のため、Cookie と localStorage は自動分離。
 - **CSP [Should]**: `default-src 'self'` を基本、外部リソースは明示許可。**理由**: 万一 XSS 混入時も外部ドメインへのリソース取得・外部送信を防ぐため。
 - **HSTS [Should]**: `max-age=31536000; includeSubDomains`。**理由**: HTTPS への強制接続で中間者攻撃を防ぐため。
-- **`<meta>` robots [Nice]**: `/help/`, `/help-content/`, `/faq/`, `/bug-report/`, `/tutorial/`, `/plans/`, `/news/` 配下の `<head>` に `<meta name="robots" content="noindex, nofollow">` を必須付与（外部検索エンジンインデックス防止）。
+- **`<meta>` robots [Nice]**: `/help/`, `/help-content/`, `/faq/`, `/bug-report/`, `/tutorial/`, `/plans/`, `/news/`, `/customer-voices/`, `/terms/`, `/privacy/`, `/tokushoho/` 配下の `<head>` に `<meta name="robots" content="noindex, nofollow">` を必須付与（外部検索エンジンインデックス防止）。
 - 第三者委託（CDN 等）運用は本要件書の対象外。
 
 ### 8.4 非採用方針

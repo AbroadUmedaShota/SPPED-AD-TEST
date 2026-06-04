@@ -628,9 +628,12 @@ grep -r 'target="_blank"' 02_dashboard/ index.html | grep -v 'rel="noopener nore
 | `robots.txt` | 存在・クロール許可範囲が適切 |
 | `rel="noopener noreferrer"` 漏れ | 0件 |
 | 法定表示ページ（`/privacy/`・`/terms/`・`/tokushoho/`） | HTTP 200・内容表示 |
+| 会員登録における個人情報の取扱い（`/privacy/member-registration/`） | HTTP 200・新規登録モーダルから到達可能 |
 | 料金プラン比較表（`/plans/`） | HTTP 200・FAQ/フッターから到達可能 |
 | お知らせ一覧/詳細（`/news/`・`/news/<slug>/`） | HTTP 200・一覧から詳細へ到達可能 |
 | お知らせフィード（`/news.json`） | HTTP 200・JSONとしてパース可能 |
+| チュートリアル（`/tutorial/`） | HTTP 200・初回ログイン導線から到達可能 |
+| 導入事例（`/customer-voices/`・`/customer-voices/<slug>/`） | HTTP 200・ログイン前トップから到達可能 |
 
 CI自動化可能項目は自動化、手動項目はチェックリスト化。
 

@@ -80,7 +80,7 @@ async function loadRelated() {
     const sorted = sortDesc(others).slice(0, RELATED_MAX);
     if (!sorted.length) { card?.setAttribute('hidden',''); return; }
     container.innerHTML = sorted.map(it => {
-      const href = esc(`${base}/05_support/news/${getSlug(it.url)}/`);
+      const href = esc(`${base}/news/${getSlug(it.url)}/`);
       const date = esc(it.displayDate || String(it.date||'').replace(/-/g,'.'));
       const title = esc(it.title || '');
       return `<li><a href="${href}"><div class="r-date">${date}</div><div class="r-title">${title}</div></a></li>`;

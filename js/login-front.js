@@ -68,12 +68,33 @@
     return typeof value === 'string' && /^05_support\/news\/([a-z0-9_-]+\/?)?$/i.test(value);
   }
 
+  function getRelativeNewsSlug(value) {
+    if (!isValidRelativeNewsPath(value)) {
+      return '';
+    }
+    return String(value).replace(/^05_support\/news\//i, '').replace(/^\/+/, '');
+  }
+
+  function resolvePublicNewsDetailUrl(baseUrl, slug) {
+    if (isHttpUrl(baseUrl)) {
+      try {
+        return new URL(slug, baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`).href;
+      } catch (error) {
+        return 'https://support.speed-ad.com/news/';
+      }
+    }
+    if (isValidRelativeNewsPath(baseUrl)) {
+      return resolveAppPath(`05_support/news/${slug}`);
+    }
+    return 'https://support.speed-ad.com/news/';
+  }
+
   function pickPublicNewsUrl(candidateUrl, fallbackUrl) {
     if (isHttpUrl(candidateUrl)) {
       return candidateUrl;
     }
     if (isValidRelativeNewsPath(candidateUrl)) {
-      return resolveAppPath(candidateUrl);
+      return resolvePublicNewsDetailUrl(fallbackUrl, getRelativeNewsSlug(candidateUrl));
     }
     if (isHttpUrl(fallbackUrl)) {
       return fallbackUrl;
@@ -667,7 +688,7 @@
           if (userEmail === 'admin') {
             targetUrl = resolveAppPath('03_admin/index.html');
           } else if (userEmail === 'new') {
-            targetUrl = resolveAppPath('05_support/tutorial/survey-creation.html?tutorial=1&step=1');
+            targetUrl = 'https://support.speed-ad.com/tutorial/survey-creation.html?tutorial=1&step=1';
             isNewUser = true;
           }
           try {
