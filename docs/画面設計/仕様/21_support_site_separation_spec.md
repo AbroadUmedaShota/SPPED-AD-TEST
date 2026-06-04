@@ -76,7 +76,7 @@ review_cycle: quarterly
 | 配置先 | 判断基準 | 代表例 |
 |---|---|---|
 | `app.speed-ad.com` | 認証、保存、申込、回答送信、集計、請求、設定変更など、ユーザー操作によりサービス状態が変わる動的機能画面 | ダッシュボード、アンケート作成、回答、分析、請求、プラン申込、アカウント設定 |
-| `support.speed-ad.com` | 公開説明、ヘルプ、FAQ、法務表示、お知らせ、導入事例、料金表、チュートリアル案内など、静的に閲覧できる情報提供画面 | ヘルプ、FAQ、規約、料金プラン比較表、お知らせ、導入事例、初回ログインチュートリアル案内 |
+| `support.speed-ad.com` | 公開説明、ヘルプ、FAQ、法務表示、お知らせ、導入事例、料金表、チュートリアル案内など、静的に閲覧できる情報提供画面 | ヘルプ、FAQ、規約、個人情報の取扱い、料金プラン比較表、お知らせ、導入事例、初回ログインチュートリアル案内 |
 
 初回ログインチュートリアルは、従来の `04_first-login/index.html` を本番の独立アプリ画面として維持せず、サポートサブドメインの `/tutorial/` に移行する。ログイン後アプリ側に残るものは、必要に応じて `/tutorial/` へ送る導線またはアプリ内の補助起動ポイントに限定する。
 
@@ -111,6 +111,7 @@ review_cycle: quarterly
 | 利用規約 | `02_dashboard/terms-of-service.html` | `https://support.speed-ad.com/terms/` |
 | 特定商取引法表示 | `02_dashboard/specified-commercial-transactions.html` | `https://support.speed-ad.com/tokushoho/` |
 | 個人情報保護方針 | `02_dashboard/personal-data-protection-policy.html` | `https://support.speed-ad.com/privacy/` |
+| 会員登録における個人情報の取扱い | 新規（ログイン前トップの新規アカウント作成モーダルから接続） | `https://support.speed-ad.com/privacy/member-registration/` |
 | お知らせ一覧/詳細 | 新規（ログイン前トップのティザーから接続） | `https://support.speed-ad.com/news/`, `https://support.speed-ad.com/news/<slug>/` |
 | お知らせJSON | 新規（ログイン前トップの最大3件表示で参照） | `https://support.speed-ad.com/news.json` |
 | ログイン前画面 | `index.html`（ルート） | **据え置き**（変更なし） |
@@ -316,6 +317,7 @@ SPPED-AD-TEST/
     ├── help/index.html
     ├── help-content/<slug>/index.html  # ビルド時生成 or rewrite
     ├── faq/index.html
+    ├── privacy/member-registration/index.html
     ├── bug-report/index.html
     ├── tutorial/index.html
     ├── plans/index.html

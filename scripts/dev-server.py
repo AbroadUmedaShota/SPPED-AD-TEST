@@ -35,6 +35,7 @@ REWRITE_PREFIXES = (
     "faq",
     "bug-report",
     "plans",
+    "privacy",
 )
 
 

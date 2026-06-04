@@ -94,11 +94,13 @@
     const signupPasswordInput = document.getElementById('signup-password');
     const signupPasswordConfirmInput = document.getElementById('signup-password-confirm');
     const termsAgreeCheckbox = document.getElementById('terms-agree');
+    const privacyHandlingAgreeCheckbox = document.getElementById('privacy-handling-agree');
     const signupNameError = document.getElementById('signup-name-error');
     const signupEmailError = document.getElementById('signup-email-error');
     const signupPasswordError = document.getElementById('signup-password-error');
     const signupPasswordConfirmError = document.getElementById('signup-password-confirm-error');
     const termsAgreeError = document.getElementById('terms-agree-error');
+    const privacyHandlingAgreeError = document.getElementById('privacy-handling-agree-error');
     const signupAccountButton = signupForm?.querySelector('.button--filled');
     const googleButtonModal = modalContent?.querySelector('.button--google');
     const customerVoiceTeaserGrid = document.getElementById('customer-voice-teaser-grid');
@@ -267,6 +269,7 @@
       clearError(signupPasswordInput, signupPasswordError);
       clearError(signupPasswordConfirmInput, signupPasswordConfirmError);
       clearError(termsAgreeCheckbox, termsAgreeError);
+      clearError(privacyHandlingAgreeCheckbox, privacyHandlingAgreeError);
     }
 
     function hideModal() {
@@ -452,6 +455,10 @@
         displayError(termsAgreeCheckbox, termsAgreeError, '利用規約とプライバシーポリシーへの同意が必要です。');
         isValid = false;
       }
+      if (privacyHandlingAgreeCheckbox && !privacyHandlingAgreeCheckbox.checked) {
+        displayError(privacyHandlingAgreeCheckbox, privacyHandlingAgreeError, '個人情報の取扱いへの同意が必要です。');
+        isValid = false;
+      }
       return isValid;
     }
 
@@ -632,7 +639,8 @@
       signupEmailInput,
       signupPasswordInput,
       signupPasswordConfirmInput,
-      termsAgreeCheckbox
+      termsAgreeCheckbox,
+      privacyHandlingAgreeCheckbox
     ];
 
     inputsToClear.forEach((input) => {
@@ -655,6 +663,8 @@
           errorElement = signupPasswordConfirmError;
         } else if (input === termsAgreeCheckbox) {
           errorElement = termsAgreeError;
+        } else if (input === privacyHandlingAgreeCheckbox) {
+          errorElement = privacyHandlingAgreeError;
         }
         if (errorElement && input.getAttribute('aria-invalid') === 'true') {
           clearError(input, errorElement);
@@ -673,7 +683,13 @@
       if (input.type === 'checkbox') {
         input.addEventListener('change', () => {
           if (input.checked && input.getAttribute('aria-invalid') === 'true') {
-            clearError(input, termsAgreeError);
+            let checkboxErrorElement;
+            if (input === termsAgreeCheckbox) {
+              checkboxErrorElement = termsAgreeError;
+            } else if (input === privacyHandlingAgreeCheckbox) {
+              checkboxErrorElement = privacyHandlingAgreeError;
+            }
+            clearError(input, checkboxErrorElement);
           }
         });
       }

@@ -1176,6 +1176,10 @@ body.is-hero-font-dragging * {
   margin: 2px 0 10px;
 }
 
+.form-check + .form-check {
+  margin-top: 8px;
+}
+
 .form-check__label {
   display: flex;
   align-items: flex-start;
@@ -2357,8 +2361,8 @@ body.is-hero-font-dragging * {
 .final-cta {
   display: grid;
   place-items: center;
-  gap: 8px;
   padding: 18px 28px 16px;
+  min-height: 140px;
   color: var(--white);
   background: linear-gradient(180deg, #08203d 0%, #031120 100%);
   border-top: 1px solid rgba(255, 255, 255, 0.08);
