@@ -1,0 +1,464 @@
+/* ============================================================
+   SPEED AD 料金プラン（案1・詳細度30%）— 表完結型 比較表
+   既存サポートシェル内に組み込むためのスコープ付きスタイル。
+   すべて .plans-v2 配下に閉じ込め、グローバルへ漏らさない。
+   カラー: スタンダード=ブルー / プレミアム=アンバー
+   ============================================================ */
+.plans-v2 {
+  --blue: #1d4ed8;
+  --blue-2: #2563eb;
+  --blue-d: #1746a8;
+  --blue-dd: #13357f;
+  --amber: #e0a72e;
+  --amber-2: #eab43c;
+  --amber-d: #c8901a;
+  --amber-dd: #a9760f;
+  --ink: #10294d;
+  --ink-2: #3f567a;
+  --muted: #90a3c0;
+  --line: #e3ebf6;
+  --line-2: #eef3fb;
+  --card: #ffffff;
+  --tint-blue: #eef4fd;
+  --tint-amber: #fdf6e8;
+  --no: #c4cfde;
+  color-scheme: light only;
+}
+
+.plans-v2 * {
+  box-sizing: border-box;
+}
+
+/* ---- 比較表 ---- */
+.plans-v2__table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.plans-v2 .cmp {
+  width: 100%;
+  min-width: 680px;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 48px -24px rgba(16, 41, 77, 0.22);
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.plans-v2 .cmp thead th {
+  vertical-align: bottom;
+  padding: 0;
+}
+
+.plans-v2 .cmp .corner {
+  text-align: left;
+  padding: 20px 22px;
+  font-weight: 700;
+  color: var(--ink-2);
+  font-size: 13px;
+  background: #f7faff;
+  border-bottom: 1px solid var(--line);
+  width: 42%;
+}
+
+.plans-v2 .cmp .ch {
+  width: 29%;
+  border-bottom: 1px solid var(--line);
+}
+
+.plans-v2 .planhead {
+  padding: 18px 18px 16px;
+  text-align: center;
+  color: #fff;
+}
+
+.plans-v2 .planhead.blue {
+  background: linear-gradient(135deg, var(--blue-2), var(--blue-dd));
+}
+
+.plans-v2 .planhead.amber {
+  background: linear-gradient(135deg, var(--amber-2), var(--amber-dd));
+}
+
+.plans-v2 .ph-name {
+  font-weight: 800;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.plans-v2 .ph-crown {
+  display: inline-flex;
+  opacity: 0.95;
+}
+
+.plans-v2 .ph-fee {
+  margin-top: 6px;
+}
+
+.plans-v2 .ph-fee b {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.plans-v2 .ph-fee span {
+  display: block;
+  font-size: 11px;
+  opacity: 0.85;
+  font-weight: 600;
+  margin-top: 1px;
+}
+
+.plans-v2 .ph-tag {
+  margin-top: 9px;
+  display: inline-block;
+  font-size: 11.5px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.22);
+  padding: 3px 11px;
+  border-radius: 20px;
+}
+
+.plans-v2 .cmp tbody td {
+  padding: 13px 20px;
+  border-bottom: 1px solid var(--line-2);
+  vertical-align: middle;
+}
+
+.plans-v2 .cmp tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.plans-v2 .cmp .lbl {
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 13.5px;
+  vertical-align: top;
+}
+
+.plans-v2 .cmp .c {
+  text-align: center;
+}
+
+.plans-v2 .cmp .c.blue {
+  background: rgba(238, 244, 253, 0.5);
+}
+
+.plans-v2 .cmp .c.amber {
+  background: rgba(253, 246, 232, 0.55);
+}
+
+.plans-v2 .cmp .vtxt {
+  font-size: 12.5px;
+  color: var(--ink-2);
+  font-weight: 600;
+  line-height: 1.45;
+  display: inline-block;
+}
+
+/* グループ見出し行 */
+.plans-v2 .grouprow td {
+  background: #f3f7fe;
+  font-weight: 800;
+  color: var(--ink);
+  font-size: 12.5px;
+  letter-spacing: 0.02em;
+  padding: 9px 20px;
+}
+
+.plans-v2 .grp-name {
+  font-weight: 800;
+}
+
+.plans-v2 .grp-desc {
+  display: block;
+  margin-top: 3px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: #6f86ad;
+  letter-spacing: 0;
+}
+
+/* 行ラベル補足 */
+.plans-v2 .lbl-main {
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 13.5px;
+}
+
+.plans-v2 .lbl-sub {
+  margin-top: 4px;
+  font-size: 11.5px;
+  color: var(--muted);
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+/* ◯ / — */
+.plans-v2 .ic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.plans-v2 .ic.yes {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  color: #fff;
+}
+
+.plans-v2 .ic.yes.blue {
+  background: var(--blue-2);
+}
+
+.plans-v2 .ic.yes.amber {
+  background: var(--amber-d);
+}
+
+.plans-v2 .ic.no {
+  color: var(--no);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* ---- 凡例・注記 ---- */
+.plans-v2 .legend {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  background: #f7faff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 13px 18px;
+}
+
+.plans-v2 .lg-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.plans-v2 .lg-yes {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--blue-2);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.plans-v2 .lg-no {
+  color: var(--no);
+  font-weight: 700;
+  font-size: 15px;
+  width: 20px;
+  text-align: center;
+}
+
+.plans-v2 .lg-note {
+  flex: 1;
+  min-width: 280px;
+  font-size: 11.5px;
+  color: var(--ink-2);
+  font-weight: 500;
+  line-height: 1.55;
+}
+
+/* ---- 速度カード ---- */
+.plans-v2 .spd-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+}
+
+.plans-v2 .spd {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 18px 14px;
+  text-align: center;
+  box-shadow: 0 8px 22px -16px rgba(16, 41, 77, 0.2);
+}
+
+.plans-v2 .spd.prem {
+  background: var(--tint-amber);
+  border-color: #f2dca8;
+}
+
+.plans-v2 .spd-ic {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 10px;
+}
+
+.plans-v2 .spd-ic.blue {
+  background: var(--tint-blue);
+  color: var(--blue);
+}
+
+.plans-v2 .spd-ic.amber {
+  background: #f7e6bd;
+  color: var(--amber-dd);
+}
+
+.plans-v2 .spd-name {
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.plans-v2 .spd-price {
+  margin: 7px 0 4px;
+}
+
+.plans-v2 .spd-price b {
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+}
+
+.plans-v2 .spd-price span {
+  font-size: 13px;
+  color: var(--ink-2);
+  font-weight: 700;
+  margin-left: 2px;
+}
+
+.plans-v2 .spd-meta {
+  font-size: 11.5px;
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+.plans-v2 .spd-flag {
+  margin-top: 10px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--blue-d);
+  background: var(--tint-blue);
+  border-radius: 20px;
+  padding: 3px 0;
+}
+
+.plans-v2 .spd-flag.amber {
+  color: var(--amber-dd);
+  background: #f7e6bd;
+}
+
+.plans-v2 .spd-scene {
+  margin-top: 10px;
+  padding-top: 9px;
+  border-top: 1px dashed var(--line);
+  font-size: 11px;
+  color: var(--ink-2);
+  font-weight: 500;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.plans-v2 .plans-v2__note {
+  margin: 14px 0 0;
+  font-size: 12px;
+  color: var(--ink-2);
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+/* ---- 追加料金 ---- */
+.plans-v2 .extra-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.plans-v2 .extra {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 20px 22px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  box-shadow: 0 8px 22px -18px rgba(16, 41, 77, 0.2);
+}
+
+.plans-v2 .ex-ic {
+  width: 44px;
+  height: 44px;
+  border-radius: 11px;
+  background: var(--tint-blue);
+  color: var(--blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+
+.plans-v2 .ex-label {
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.plans-v2 .ex-price {
+  margin: 2px 0 4px;
+  color: var(--ink-2);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.plans-v2 .ex-price b {
+  font-size: 26px;
+  color: var(--ink);
+  font-weight: 800;
+  margin-right: 3px;
+  letter-spacing: -0.02em;
+}
+
+.plans-v2 .ex-note {
+  font-size: 11.5px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+/* ---- レスポンシブ ---- */
+@media (max-width: 1023px) {
+  .plans-v2 .spd-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 639px) {
+  .plans-v2 .spd-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .plans-v2 .extra-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .plans-v2 .cmp .corner,
+  .plans-v2 .cmp tbody td {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+}

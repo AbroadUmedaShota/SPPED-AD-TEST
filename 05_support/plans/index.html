@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="../assets/css/help-center.css?v=20260519-hero-label">
   <link rel="stylesheet" href="../assets/css/support-info.css?v=20260529-plan-simplify">
   <link rel="stylesheet" href="../assets/css/support-shell.css?v=20260526-github-pages-path">
+  <link rel="stylesheet" href="../assets/css/plans-v2.css?v=20260605-plan-table">
   <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
   <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
 </head>
@@ -28,137 +29,146 @@
         <div class="plans-tax-pill"><span class="material-icons" aria-hidden="true">info</span>表示価格は税別です</div>
         <p class="support-page__label"><span class="material-icons" aria-hidden="true">workspace_premium</span>料金プラン</p>
         <h1 id="plans-title" class="support-page__title">料金プラン</h1>
-        <p class="plans-hero-kicker">まず違いだけ見る</p>
         <p class="support-page__lead">用途に合わせて、最適なプランをお選びください。</p>
       </section>
 
-      <article class="plans-article">
-        <section class="support-section plans-decision" aria-labelledby="plans-decision-title">
-          <div class="support-section__heading plans-section-heading--sr">
-            <h2 id="plans-decision-title">まず違いだけ見る</h2>
-            <p>細かな料金表を読む前に、運用で差が出るポイントだけを確認できます。</p>
-          </div>
-
-          <div class="plans-choice-grid" aria-label="スタンダードとプレミアムの簡易比較">
-            <article class="plan-choice-card plan-choice-card--standard" style="--plan-accent: #0b62c7;">
-              <div class="plan-choice-card__band">
-                <h3>スタンダード</h3>
-              </div>
-              <div class="plan-choice-card__body">
-                <div class="plan-choice-card__visual" aria-hidden="true"><span class="material-icons">person</span></div>
-                <p class="plan-choice-card__type">基本運用向け</p>
-                <p class="plan-choice-card__use">展示会後の標準的な運用に必要な機能をシンプルに。</p>
-                <p class="plan-choice-card__price"><span>月額利用料</span>なし</p>
-                <ul class="plan-choice-card__chips">
-                  <li><span class="material-icons" aria-hidden="true">check_circle</span>通常・特急・超特急のデータ化</li>
-                  <li><span class="material-icons" aria-hidden="true">check_circle</span>30日保存</li>
-                  <li><span class="material-icons" aria-hidden="true">check_circle</span>標準送信（独自ドメイン不可）</li>
-                </ul>
-                <a class="plan-choice-card__action" href="#plans-detail-title">詳細を確認する</a>
-              </div>
-            </article>
-
-            <article class="plan-choice-card plan-choice-card--featured" style="--plan-accent: #d89400;">
-              <div class="plan-choice-card__band">
-                <h3>プレミアム</h3>
-                <span class="material-icons" aria-hidden="true">workspace_premium</span>
-              </div>
-              <div class="plan-choice-card__body">
-                <div class="plan-choice-card__visual" aria-hidden="true"><span class="material-icons">bolt</span></div>
-                <p class="plan-choice-card__type">急ぎ・高度運用向け</p>
-                <p class="plan-choice-card__use">会期後すぐの確認や、自社ドメイン運用に最適。</p>
-                <p class="plan-choice-card__price"><span>月額</span>10,000円</p>
-                <ul class="plan-choice-card__chips">
-                  <li><span class="material-icons" aria-hidden="true">check_circle</span>オンデマンド対応</li>
-                  <li><span class="material-icons" aria-hidden="true">check_circle</span>最長1年保存</li>
-                  <li><span class="material-icons" aria-hidden="true">check_circle</span>自社ドメイン送信（設定後）</li>
-                </ul>
-                <a class="plan-choice-card__action" href="../bug-report/">料金について問い合わせる</a>
-              </div>
-            </article>
-          </div>
-
-          <div class="plans-difference-panel" aria-label="主な違い">
-            <div class="plans-difference-row">
-              <h3><span class="material-icons" aria-hidden="true">assignment</span>基本アンケート</h3>
-              <div><span class="material-icons" aria-hidden="true">check_circle</span>基本機能を利用可能</div>
-              <div class="is-premium"><span class="material-icons" aria-hidden="true">check_circle</span>多言語・条件分岐などに対応</div>
-            </div>
-            <div class="plans-difference-row">
-              <h3><span class="material-icons" aria-hidden="true">speed</span>データ化スピード</h3>
-              <div><span class="material-icons" aria-hidden="true">check_circle</span>通常・特急・超特急</div>
-              <div class="is-premium"><span class="material-icons" aria-hidden="true">check_circle</span>オンデマンド（当日対応）を追加</div>
-            </div>
-            <div class="plans-difference-row">
-              <h3><span class="material-icons" aria-hidden="true">mail</span>お礼メール</h3>
-              <div><span class="material-icons plans-muted-icon" aria-hidden="true">cancel</span>標準送信（独自ドメイン不可）</div>
-              <div class="is-premium"><span class="material-icons" aria-hidden="true">check_circle</span>自社ドメイン送信（設定後）</div>
-            </div>
-          </div>
-
-          <div class="plans-detail-preview" aria-labelledby="plans-detail-preview-title">
-            <div>
-              <h2 id="plans-detail-preview-title">詳しい比較</h2>
-              <p>料金、保存期間、利用できる速度などの主要条件を一覧で確認できます。</p>
-            </div>
-            <a class="support-button support-button--ghost" href="#plans-detail-title"><span class="material-icons" aria-hidden="true">chevron_right</span>すべての比較項目を見る</a>
-          </div>
-        </section>
-
+      <article class="plans-article plans-v2">
         <section class="support-section" aria-labelledby="plans-detail-title">
           <div class="support-section__heading">
             <h2 id="plans-detail-title">詳しい比較</h2>
-            <p>無料プラン、保存期間、請求・支払いなどの条件は必要に応じて確認してください。</p>
+            <p>料金、保存期間、利用できる速度などの主要条件を一覧で確認できます。</p>
           </div>
-          <div class="plan-compare plan-compare--plans">
-            <table>
+          <div class="plans-v2__table-scroll">
+            <table class="cmp" aria-label="スタンダードとプレミアムの比較">
               <thead>
                 <tr>
-                  <th scope="col">項目</th>
-                  <th scope="col">フリー</th>
-                  <th scope="col">スタンダード</th>
-                  <th scope="col">プレミアム</th>
+                  <th class="corner" scope="col">項目</th>
+                  <th class="ch blue" scope="col">
+                    <div class="planhead blue">
+                      <div class="ph-name">スタンダード</div>
+                      <div class="ph-fee"><b>なし</b><span>月額利用料</span></div>
+                      <div class="ph-tag">基本運用向け</div>
+                    </div>
+                  </th>
+                  <th class="ch amber" scope="col">
+                    <div class="planhead amber">
+                      <div class="ph-name">プレミアム<span class="ph-crown" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M3 7l4 4 5-7 5 7 4-4-1.6 11H4.6L3 7z"/></svg></span></div>
+                      <div class="ph-fee"><b>10,000円</b><span>月額利用料（税別）</span></div>
+                      <div class="ph-tag">急ぎ・高度運用向け</div>
+                    </div>
+                  </th>
                 </tr>
               </thead>
               <tbody>
+                <tr class="grouprow"><td colspan="3"><span class="grp-name">料金・契約</span><span class="grp-desc">初期費用なし。利用量に応じた実数精算が基本です。</span></td></tr>
                 <tr>
-                  <th scope="row">料金体系</th>
-                  <td data-label="フリー">無料</td>
-                  <td data-label="スタンダード">基本料金なし（実数精算）</td>
-                  <td data-label="プレミアム">実数精算 + プレミアム利用料 10,000円/月（税別）</td>
+                  <td class="lbl"><div class="lbl-main">料金体系</div><div class="lbl-sub">固定の基本料金はかからず、利用したデータ化件数などに応じて精算します。</div></td>
+                  <td class="c blue"><span class="vtxt">基本料金なし（実数精算）</span></td>
+                  <td class="c amber"><span class="vtxt">実数精算 + プレミアム利用料 10,000円/月（税別）</span></td>
                 </tr>
                 <tr>
-                  <th scope="row">名刺データ化の標準対象</th>
-                  <td data-label="フリー">2項目（メールアドレス / 氏名）</td>
-                  <td data-label="スタンダード">10項目 + テンプレート追加3項目まで無償</td>
-                  <td data-label="プレミアム">10項目 + 業種別テンプレート、追加10項目まで個別対応</td>
+                  <td class="lbl"><div class="lbl-main">請求・支払い</div><div class="lbl-sub">月末締め・翌月末払い。お支払いは銀行振込に対応しています。</div></td>
+                  <td class="c blue"><span class="vtxt">月末締め・翌月末払い、銀行振込</span></td>
+                  <td class="c amber"><span class="vtxt">月末締め・翌月末払い、銀行振込</span></td>
                 </tr>
                 <tr>
-                  <th scope="row">お礼メール</th>
-                  <td data-label="フリー">100通まで無料、SPEED ADドメイン送信</td>
-                  <td data-label="スタンダード">100通まで無料、101通目以降 1円/通（税別）、標準送信（独自ドメイン不可）</td>
-                  <td data-label="プレミアム">100通まで無料、101通目以降 1円/通（税別）、自社ドメイン送信可（設定完了後）</td>
+                  <td class="lbl"><div class="lbl-main">アカウントグループ作成</div><div class="lbl-sub">2アカウントまで無料。3アカウント目以降は1アカウントあたり月額＠300円。</div></td>
+                  <td class="c blue"><span class="vtxt">2アカウントまで無料／以降 月額＠300円</span></td>
+                  <td class="c amber"><span class="vtxt">2アカウントまで無料／以降 月額＠300円</span></td>
+                </tr>
+
+                <tr class="grouprow"><td colspan="3"><span class="grp-name">WEBアンケート</span><span class="grp-desc">展示会で使う回答フォームの作成・カスタマイズ範囲です。</span></td></tr>
+                <tr>
+                  <td class="lbl"><div class="lbl-main">基本的なWEBアンケートの作成</div><div class="lbl-sub">氏名・連絡先などの基本設問を備えたアンケートを作成できます。</div></td>
+                  <td class="c blue"><span class="ic yes blue" aria-label="対応"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></td>
+                  <td class="c amber"><span class="ic yes amber" aria-label="対応"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></td>
                 </tr>
                 <tr>
-                  <th scope="row">データ保存期間</th>
-                  <td data-label="フリー">30日間</td>
-                  <td data-label="スタンダード">30日間</td>
-                  <td data-label="プレミアム">最長1年</td>
+                  <td class="lbl"><div class="lbl-main">高度なWEBアンケートの作成</div><div class="lbl-sub">条件分岐・必須設定など、複雑な設問構成にも対応します。</div></td>
+                  <td class="c blue"><span class="ic no" aria-label="非対応">—</span></td>
+                  <td class="c amber"><span class="ic yes amber" aria-label="対応"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></td>
                 </tr>
                 <tr>
-                  <th scope="row">名刺データ化速度</th>
-                  <td data-label="フリー">お試し（2項目・6営業日目安）</td>
-                  <td data-label="スタンダード">通常 / 特急 / 超特急</td>
-                  <td data-label="プレミアム">通常 / 特急 / 超特急 / オンデマンド</td>
+                  <td class="lbl"><div class="lbl-main">アンケート回答画面の多言語切り替え</div><div class="lbl-sub">回答画面を複数言語で出し分け。海外来場者の多い展示会向け。</div></td>
+                  <td class="c blue"><span class="ic no" aria-label="非対応">—</span></td>
+                  <td class="c amber"><span class="ic yes amber" aria-label="対応"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></td>
                 </tr>
                 <tr>
-                  <th scope="row">請求・支払い</th>
-                  <td data-label="フリー">無料範囲内</td>
-                  <td data-label="スタンダード">月末締め・翌月末払い、銀行振込</td>
-                  <td data-label="プレミアム">月末締め・翌月末払い、銀行振込</td>
+                  <td class="lbl"><div class="lbl-main">アンケート回答後のサンクス画面カスタマイズ</div><div class="lbl-sub">回答完了後に表示する内容を自由に設定できます。</div></td>
+                  <td class="c blue"><span class="ic no" aria-label="非対応">—</span></td>
+                  <td class="c amber"><span class="ic yes amber" aria-label="対応"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></td>
+                </tr>
+
+                <tr class="grouprow"><td colspan="3"><span class="grp-name">名刺データ化・出力</span><span class="grp-desc">名刺のデータ化対象項目と、各種データの書き出し範囲です。</span></td></tr>
+                <tr>
+                  <td class="lbl"><div class="lbl-main">名刺データ化の標準対象</div><div class="lbl-sub">プレミアムは業種別テンプレートと、追加10項目までの個別対応が可能です。</div></td>
+                  <td class="c blue"><span class="vtxt">10項目 + テンプレート追加3項目まで無償</span></td>
+                  <td class="c amber"><span class="vtxt">10項目 + 業種別テンプレート、追加10項目まで個別対応</span></td>
+                </tr>
+                <tr>
+                  <td class="lbl"><div class="lbl-main">日本語以外の名刺のデータ化</div><div class="lbl-sub">英語・中国語などの名刺もデータ化対象に追加できます。</div></td>
+                  <td class="c blue"><span class="ic no" aria-label="非対応">—</span></td>
+                  <td class="c amber"><span class="ic yes amber" aria-label="対応"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></td>
+                </tr>
+                <tr>
+                  <td class="lbl"><div class="lbl-main">名刺画像データのダウンロード</div><div class="lbl-sub">スキャンした名刺画像をそのままダウンロードできます。</div></td>
+                  <td class="c blue"><span class="ic yes blue" aria-label="対応"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></td>
+                  <td class="c amber"><span class="ic yes amber" aria-label="対応"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></td>
+                </tr>
+                <tr>
+                  <td class="lbl"><div class="lbl-main">名刺入力データの CSV ダウンロード</div><div class="lbl-sub">データ化した名刺情報をCSV形式で書き出せます。</div></td>
+                  <td class="c blue"><span class="ic yes blue" aria-label="対応"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></td>
+                  <td class="c amber"><span class="ic yes amber" aria-label="対応"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></td>
+                </tr>
+                <tr>
+                  <td class="lbl"><div class="lbl-main">アンケート回答結果の CSV ダウンロード</div><div class="lbl-sub">アンケートの回答結果をCSV形式で書き出せます。</div></td>
+                  <td class="c blue"><span class="ic yes blue" aria-label="対応"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></td>
+                  <td class="c amber"><span class="ic yes amber" aria-label="対応"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></td>
+                </tr>
+                <tr>
+                  <td class="lbl"><div class="lbl-main">SPEEDレビュー（速報・集計）の表示</div><div class="lbl-sub">回答状況の速報と集計を管理画面上で確認できます。</div></td>
+                  <td class="c blue"><span class="ic yes blue" aria-label="対応"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></td>
+                  <td class="c amber"><span class="ic yes amber" aria-label="対応"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></td>
+                </tr>
+                <tr>
+                  <td class="lbl"><div class="lbl-main">SPEEDレビューの Excel ダウンロード</div><div class="lbl-sub">速報・集計データをExcel形式で書き出せます。</div></td>
+                  <td class="c blue"><span class="ic no" aria-label="非対応">—</span></td>
+                  <td class="c amber"><span class="ic yes amber" aria-label="対応"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></td>
+                </tr>
+                <tr>
+                  <td class="lbl"><div class="lbl-main">データ保存期間</div><div class="lbl-sub">スタンダードは30日間、プレミアムは最長1年間ダウンロード可能です。</div></td>
+                  <td class="c blue"><span class="vtxt">30日間</span></td>
+                  <td class="c amber"><span class="vtxt">最長1年</span></td>
+                </tr>
+
+                <tr class="grouprow"><td colspan="3"><span class="grp-name">お礼メール</span><span class="grp-desc">来場者へのフォローメールの送信・カスタマイズ範囲です。</span></td></tr>
+                <tr>
+                  <td class="lbl"><div class="lbl-main">お礼メール送信</div><div class="lbl-sub">100通まで無料。101通目以降は1通あたり＠1円（税別）。</div></td>
+                  <td class="c blue"><span class="vtxt">100通まで無料、101通目以降 1円/通（税別）</span></td>
+                  <td class="c amber"><span class="vtxt">100通まで無料、101通目以降 1円/通（税別）</span></td>
+                </tr>
+                <tr>
+                  <td class="lbl"><div class="lbl-main">送信ドメイン</div><div class="lbl-sub">プレミアムは設定完了後、自社ドメインからお礼メールを送信できます。</div></td>
+                  <td class="c blue"><span class="vtxt">標準送信（独自ドメイン不可）</span></td>
+                  <td class="c amber"><span class="vtxt">自社ドメイン送信可（設定完了後）</span></td>
+                </tr>
+                <tr>
+                  <td class="lbl"><div class="lbl-main">基本的なカスタマイズ</div><div class="lbl-sub">差出人名や本文など、基本的な内容を編集できます。</div></td>
+                  <td class="c blue"><span class="ic yes blue" aria-label="対応"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></td>
+                  <td class="c amber"><span class="ic yes amber" aria-label="対応"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></td>
+                </tr>
+                <tr>
+                  <td class="lbl"><div class="lbl-main">高度なカスタマイズ</div><div class="lbl-sub">差し込み・条件分岐など、メール内容を細かく調整できます。</div></td>
+                  <td class="c blue"><span class="ic no" aria-label="非対応">—</span></td>
+                  <td class="c amber"><span class="ic yes amber" aria-label="対応"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></td>
                 </tr>
               </tbody>
             </table>
+          </div>
+          <div class="legend">
+            <span class="lg-item"><span class="lg-yes" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none"><path d="M5 12.5l4.2 4.2L19 7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>対応</span>
+            <span class="lg-item"><span class="lg-no" aria-hidden="true">—</span>非対応</span>
+            <span class="lg-note">※ 表示価格は税別です。基本料金はかからず、実際の利用量に応じた実数精算が基本です。初月無料・個別見積もり等により請求条件が異なる場合があります。</span>
           </div>
         </section>
 
@@ -167,51 +177,49 @@
             <h2 id="plans-rate-title">名刺データ化の速度別単価</h2>
             <p>名刺データ化費用は、選択した速度プランとデータ化件数に応じて発生します。</p>
           </div>
-          <div class="plans-rate-strip" aria-label="速度別単価の要約">
-            <div><span class="material-icons" aria-hidden="true">schedule</span><strong>通常</strong><em>50円/枚</em><small>納期目安：6営業日</small></div>
-            <div><span class="material-icons" aria-hidden="true">speed</span><strong>特急</strong><em>100円/枚</em><small>納期目安：3営業日</small></div>
-            <div><span class="material-icons" aria-hidden="true">rocket_launch</span><strong>超特急</strong><em>150円/枚</em><small>納期目安：1営業日</small></div>
-            <div class="is-premium-only"><span class="material-icons" aria-hidden="true">bolt</span><strong>オンデマンド</strong><em>200円/枚</em><small>プレミアム対象</small></div>
+          <div class="spd-grid">
+            <div class="spd">
+              <div class="spd-ic blue" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 3h6M10 3v6l-4 8a2 2 0 002 3h8a2 2 0 002-3l-4-8V3" stroke-linejoin="round"/></svg></div>
+              <div class="spd-name">お試し</div>
+              <div class="spd-price"><b>0</b><span>円/枚</span></div>
+              <div class="spd-meta">2項目・納期 6営業日</div>
+              <div class="spd-flag">フリー</div>
+              <div class="spd-scene">初回の動作確認やお試し利用に適しています。</div>
+            </div>
+            <div class="spd">
+              <div class="spd-ic blue" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2" stroke-linecap="round"/></svg></div>
+              <div class="spd-name">通常</div>
+              <div class="spd-price"><b>50</b><span>円/枚</span></div>
+              <div class="spd-meta">10項目・納期 6営業日</div>
+              <div class="spd-flag">両プラン</div>
+              <div class="spd-scene">納期に余裕があり、コストを抑えて標準的にデータ化したい場合に適しています。</div>
+            </div>
+            <div class="spd">
+              <div class="spd-ic blue" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 16a8 8 0 1116 0" stroke-linecap="round"/><path d="M12 16l4-4" stroke-linecap="round"/></svg></div>
+              <div class="spd-name">特急</div>
+              <div class="spd-price"><b>100</b><span>円/枚</span></div>
+              <div class="spd-meta">10項目・納期 3営業日</div>
+              <div class="spd-flag">両プラン</div>
+              <div class="spd-scene">会期後の営業フォローを数営業日以内に始めたい場合に適しています。</div>
+            </div>
+            <div class="spd">
+              <div class="spd-ic blue" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 15c-1 2-1 4-1 4s2 0 4-1m1-3a7 7 0 019-9c1 5-3 9-8 9l-1-1z" stroke-linejoin="round"/><circle cx="14.5" cy="9.5" r="1.3" fill="currentColor" stroke="none"/></svg></div>
+              <div class="spd-name">超特急</div>
+              <div class="spd-price"><b>150</b><span>円/枚</span></div>
+              <div class="spd-meta">10項目・納期 1営業日</div>
+              <div class="spd-flag">両プラン</div>
+              <div class="spd-scene">翌営業日までに確認し、優先度の高い来場者から対応したい場合に適しています。</div>
+            </div>
+            <div class="spd prem">
+              <div class="spd-ic amber" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg></div>
+              <div class="spd-name">オンデマンド</div>
+              <div class="spd-price"><b>200</b><span>円/枚</span></div>
+              <div class="spd-meta">10項目・納期 当日</div>
+              <div class="spd-flag amber">プレミアム</div>
+              <div class="spd-scene">当日中に確認し、会期中の判断や即時フォローに活用したい場合に適しています。プレミアムプラン申込者が対象です。</div>
+            </div>
           </div>
-          <p class="plans-rate-note">名刺データ化費用は、選択した速度プランとデータ化件数に応じて発生します。オンデマンドはプレミアムプラン対象です。</p>
-          <div class="plan-compare">
-            <table>
-              <thead>
-                <tr>
-                  <th scope="col">速度プラン</th>
-                  <th scope="col">単価（税抜）</th>
-                  <th scope="col">納期目安</th>
-                  <th scope="col">主な利用シーン</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">通常作業プラン</th>
-                  <td data-label="単価（税抜）">50円/枚</td>
-                  <td data-label="納期目安">6営業日</td>
-                  <td data-label="主な利用シーン">納期に余裕があり、コストを抑えて標準的にデータ化したい場合に適しています。</td>
-                </tr>
-                <tr>
-                  <th scope="row">特急作業プラン</th>
-                  <td data-label="単価（税抜）">100円/枚</td>
-                  <td data-label="納期目安">3営業日</td>
-                  <td data-label="主な利用シーン">会期後の営業フォローを数営業日以内に始めたい場合に適しています。</td>
-                </tr>
-                <tr>
-                  <th scope="row">超特急作業プラン</th>
-                  <td data-label="単価（税抜）">150円/枚</td>
-                  <td data-label="納期目安">1営業日</td>
-                  <td data-label="主な利用シーン">翌営業日までに確認し、優先度の高い来場者から対応したい場合に適しています。</td>
-                </tr>
-                <tr class="is-premium-only">
-                  <th scope="row">オンデマンドプラン</th>
-                  <td data-label="単価（税抜）">200円/枚</td>
-                  <td data-label="納期目安">当日中</td>
-                  <td data-label="主な利用シーン">当日中に確認し、会期中の判断や即時フォローに活用したい場合に適しています。プレミアムプラン申込者が対象です。</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <p class="plans-v2__note">名刺データ化費用は、選択した速度プランとデータ化件数に応じて発生します。オンデマンドはプレミアムプラン対象です。</p>
         </section>
 
         <section class="support-section" aria-labelledby="plans-additional-title">
@@ -219,23 +227,23 @@
             <h2 id="plans-additional-title">追加料金・超過料金</h2>
             <p>上記の料金体系とは別に、利用量やグループ利用状況に応じて発生する料金です。</p>
           </div>
-          <div class="plans-fee-grid">
-            <article class="plans-fee-card">
-              <span class="material-icons" aria-hidden="true">groups</span>
-              <div>
-                <h3>追加アカウント料金</h3>
-                <p><strong>300円</strong>/アカウント（税別）</p>
-                <small>3アカウント目以降を請求対象。2アカウントまで無料。</small>
+          <div class="extra-grid">
+            <div class="extra">
+              <div class="ex-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="8" r="3"/><path d="M3 19c0-3 3-5 6-5s6 2 6 5" stroke-linecap="round"/><path d="M16 6a3 3 0 010 6M18 19c0-2-1-3.5-2.5-4.5" stroke-linecap="round"/></svg></div>
+              <div class="ex-body">
+                <div class="ex-label">追加アカウント料金</div>
+                <div class="ex-price"><b>300</b>円 / アカウント（税別）</div>
+                <div class="ex-note">3アカウント目以降を請求対象。2アカウントまで無料。</div>
               </div>
-            </article>
-            <article class="plans-fee-card">
-              <span class="material-icons" aria-hidden="true">mail</span>
-              <div>
-                <h3>お礼メール送信費用</h3>
-                <p><strong>1円</strong>/通（税別）</p>
-                <small>100通まで無料。101通目以降を請求対象。</small>
+            </div>
+            <div class="extra">
+              <div class="ex-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M4 7l8 6 8-6" stroke-linecap="round"/></svg></div>
+              <div class="ex-body">
+                <div class="ex-label">お礼メール送信費用</div>
+                <div class="ex-price"><b>1</b>円 / 通（税別）</div>
+                <div class="ex-note">100通まで無料。101通目以降を請求対象。</div>
               </div>
-            </article>
+            </div>
           </div>
         </section>
 
