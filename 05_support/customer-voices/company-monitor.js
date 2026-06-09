@@ -191,10 +191,24 @@ document.addEventListener('DOMContentLoaded', async () => {
       quoteSection.hidden = true;
     }
   } catch (error) {
+    console.warn('導入事例詳細の読み込みに失敗しました:', error);
     setText('voice-hero-company', '導入事例');
-    setText('voice-hero-headline', '事例を表示できませんでした');
-    setText('voice-hero-summary', '通信状態を確認し、時間をおいて再度お試しください。');
-    setText('voice-hero-caption', '導入事例データを一時的に表示できません。');
+    setText('voice-hero-headline', 'SPEED ADの活用事例を見る');
+    setText('voice-hero-summary', '展示会やアンケート運用での活用イメージを、公開可能な範囲で順次紹介しています。');
+    setText('voice-hero-caption', '導入事例の公開情報を案内するイメージです。');
+    const heroMeta = document.getElementById('voice-hero-meta');
+    if (heroMeta) {
+      heroMeta.innerHTML = `
+        <span class="voice-pill">導入事例</span>
+        <span class="voice-pill">活用イメージ</span>
+      `;
+    }
+    const heroImage = document.getElementById('voice-hero-image');
+    if (heroImage) {
+      heroImage.src = resolveAppRootPath('img/top-kv.jpg');
+      heroImage.alt = 'SPEED AD 導入事例のイメージ';
+      applyImageFallback(heroImage);
+    }
     hideSectionsOnError();
   }
 });

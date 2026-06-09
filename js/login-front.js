@@ -178,6 +178,28 @@
     }
   }
 
+  function renderGenericCustomerVoiceTeaserCard() {
+    const detailUrl = 'https://support.speed-ad.com/customer-voices/';
+    const title = 'SPEED ADの活用事例を見る';
+    return `
+      <a class="voice-teaser-card" href="${detailUrl}" style="--voice-accent: #2f80ed; --voice-accent-strong: #145cc7;" aria-label="${title}">
+        <span class="voice-teaser-card__stripe" aria-hidden="true"></span>
+        <div class="voice-teaser-card__media voice-teaser-card__media--skeleton" aria-hidden="true"></div>
+        <div class="voice-teaser-card__body">
+          <span class="voice-teaser-card__pill">導入事例</span>
+          <h3 class="voice-teaser-card__title">${title}</h3>
+          <blockquote class="voice-teaser-card__quote">展示会やアンケート運用での活用イメージを、公開可能な範囲で順次紹介しています。</blockquote>
+          <ul class="voice-teaser-card__chips" aria-label="確認できる内容">
+            <li>展示会運用</li>
+            <li>アンケート活用</li>
+            <li>導入イメージ</li>
+          </ul>
+          <span class="voice-teaser-card__more" aria-hidden="true">詳細を見る <span aria-hidden="true">→</span></span>
+        </div>
+      </a>
+    `;
+  }
+
   function getButtonTextNode(buttonElement) {
     return Array.from(buttonElement.childNodes)
       .find((node) => node.nodeType === Node.TEXT_NODE && node.nodeValue.trim() !== '');
@@ -298,15 +320,19 @@
       if (!customerVoiceTeaserGrid || !customerVoiceTeaserStatus) {
         return;
       }
+      const showGenericCustomerVoiceTeaser = () => {
+        customerVoiceTeaserStatus.textContent = '公開事例';
+        customerVoiceTeaserGrid.setAttribute('aria-busy', 'false');
+        customerVoiceTeaserGrid.innerHTML = renderGenericCustomerVoiceTeaserCard();
+      };
       try {
-        const payload = await fetchJsonWithRetry(resolveAppPath('data/customer-voices.json'));
+        const payload = await fetchJsonWithRetry(resolveAppPath('05_support/assets/data/customer-voices.json'));
         const voices = Array.isArray(payload?.voices)
           ? payload.voices.filter((voice) => voice?.publishStatus === 'published').slice(0, 2)
           : [];
         customerVoiceTeaserStatus.textContent = voices.length ? `${voices.length}件の公開事例` : '公開準備中';
         if (!voices.length) {
-          customerVoiceTeaserGrid.setAttribute('aria-busy', 'false');
-          customerVoiceTeaserGrid.innerHTML = '<p class="voice-teaser__empty">事例は順次公開予定です。一覧ページからもご確認いただけます。</p>';
+          showGenericCustomerVoiceTeaser();
           return;
         }
         customerVoiceTeaserGrid.setAttribute('aria-busy', 'false');
@@ -349,9 +375,7 @@
           .forEach((image) => applyImageFallback(image));
       } catch (error) {
         console.warn('お客様のお声の読み込みに失敗しました:', error);
-        customerVoiceTeaserStatus.textContent = '一時的に表示できません';
-        customerVoiceTeaserGrid.setAttribute('aria-busy', 'false');
-        customerVoiceTeaserGrid.innerHTML = '<p class="voice-teaser__empty">通信状態を確認し、時間をおいて再度お試しください。<a class="voice-teaser__inline-link" href="https://support.speed-ad.com/customer-voices/">一覧ページから事例を見る</a></p>';
+        showGenericCustomerVoiceTeaser();
       }
     }
 
