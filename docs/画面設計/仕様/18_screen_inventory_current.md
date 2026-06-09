@@ -42,7 +42,7 @@ last_reviewed: 2026-04-07
 
 | No | 区分 | 画面名 | 現行HTML/導線 | 関連仕様 | 仕様状態 | 実装状態 | 設計確認 | 備考 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| P-01 | 公開/ログイン前 | 導入事例 一覧 | `https://support.speed-ad.com/customer-voices/`（移行元: `customer-voices/index.html`）, `index.html`（刷新済みログイン前トップ）から導線接続 | `19_customer_voice_public_pages.md`, `21_support_site_separation_spec.md`, `24_public_login_front_requirements.md` | 正本あり | HTMLあり | 静的な信頼補強コンテンツとして support サブドメインに置き、一覧から各詳細へ分岐する | support側JSONを正本とし、ログイン前トップは同期ミラーを参照 |
+| P-01 | 公開/ログイン前 | 導入事例 一覧 | `https://support.speed-ad.com/customer-voices/`（移行元: `customer-voices/index.html`）, `index.html`（刷新済みログイン前トップ）から導線接続 | `19_customer_voice_public_pages.md`, `21_support_site_separation_spec.md`, `24_public_login_front_requirements.md` | 正本あり | HTMLあり | 静的な信頼補強コンテンツとして support サブドメインに置き、一覧から各詳細へ分岐する | `05_support/assets/data/customer-voices.json` を正本とし、ログイン前トップもsupport管理JSONを参照 |
 | P-02 | 公開/ログイン前 | 導入事例 詳細（モニター企業） | `https://support.speed-ad.com/customer-voices/company-monitor/`（移行元: `customer-voices/company-monitor.html`） | `19_customer_voice_public_pages.md`, `21_support_site_separation_spec.md` | 正本あり | HTMLあり | 先行利用モニター企業の利用価値を、課題・運用・変化の流れで伝える | support サブドメイン配下、匿名化・許諾確認前提 |
 | P-03 | 公開/ログイン前 | 導入事例 詳細（大学） | `https://support.speed-ad.com/customer-voices/university-survey/`（移行元: `customer-voices/university-survey.html`） | `19_customer_voice_public_pages.md`, `21_support_site_separation_spec.md` | 正本あり | HTMLあり | アンケート単機能利用でも成立する導入イメージを伝える | support サブドメイン配下、匿名化前提 |
 | U-01 | 利用者向け | アンケート一覧 | `02_dashboard/index.html` | `00_screen_requirements.md`, `12_dashboard_current_functional_requirements.md` | 正本あり | HTMLあり | ダッシュボードの中心画面として、一覧・詳細モーダル・作成入口・ダウンロード導線の責務を整理する |  |

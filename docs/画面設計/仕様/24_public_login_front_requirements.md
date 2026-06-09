@@ -1,7 +1,7 @@
 ---
 owner: product
 status: draft
-last_reviewed: 2026-06-02
+last_reviewed: 2026-06-09
 document_type: 画面要件定義
 ---
 
@@ -53,8 +53,8 @@ document_type: 画面要件定義
 - `無料ではじめる`: `?intent=signup#top`
 - 個人情報の取扱い: `05_support/privacy/member-registration/`（本番想定: `https://support.speed-ad.com/privacy/member-registration/`）
 - 導入事例ティザーの詳細リンク: `https://support.speed-ad.com/customer-voices/`
-- 料金プランリンク: `05_support/plans/index.html`
-- チュートリアルリンク: `05_support/tutorial/index.html`
+- 料金プランリンク: `https://support.speed-ad.com/plans/`
+- チュートリアルリンク: `https://support.speed-ad.com/tutorial/`
 - ログイン成功モック: `user` は `02_dashboard/index.html`、`new` は `04_first-login/index.html`、`admin` は `03_admin/index.html`
 - フッターの `導入事例`: `https://support.speed-ad.com/customer-voices/`
 
@@ -76,13 +76,14 @@ document_type: 画面要件定義
 ### 3.6. 導入事例ティザー
 
 - 導入事例全体の正本は `05_support/assets/data/customer-voices.json` と `05_support/assets/img/` 配下の画像とする
-- ティザーはCORSを避けるため、同一オリジンの同期済みミラー `data/customer-voices.json` を参照する
-- ミラー更新は `scripts/sync-customer-voices.ps1` でsupport正本から同期し、`-Check` で更新漏れを検知する
-- ティザー画像はミラー内の `heroImage` をsupport側アセットとして解決し、ローカルでは `05_support/assets/img/`、本番では `https://support.speed-ad.com/assets/img/` から取得する
+- ティザーはルート `data/customer-voices.json` ではなく、support管理データ `05_support/assets/data/customer-voices.json` を参照する
+- 直接 `https://support.speed-ad.com/...` をfetchせず、同一配信パス上のsupport管理JSONを読むことでCORS依存を避ける
+- ティザー画像はsupport管理JSON内の `heroImage` をsupport側アセットとして解決し、ローカルでは `05_support/assets/img/`、本番では `https://support.speed-ad.com/assets/img/` から取得する
 - 表示文言は `voicePageHeadline` / `voicePageLabel` / `label` と `publicQuoteAuthor` / `quote.author` を利用する
 - 詳細導線は `https://support.speed-ad.com/customer-voices/` 配下へ遷移する
 - JSON取得は5秒タイムアウト、600ms間隔で1回だけ自動再試行する
-- JSON取得の最終失敗時は `一時的に表示できません` とし、通信状態を確認して時間をおく案内と導入事例一覧へのリンクを表示する
+- JSON取得の最終失敗、JSON不正、公開データ0件の場合は企業名・担当者名・個別引用・個別画像を出さず、汎用の導入事例案内カードを表示する
+- 汎用カードは `導入事例` / `SPEED ADの活用事例を見る` / `展示会やアンケート運用での活用イメージを、公開可能な範囲で順次紹介しています。` を表示し、`https://support.speed-ad.com/customer-voices/` へ接続する
 - 画像取得に失敗した場合、カード本文とリンクは維持し、画像枠だけ `画像を表示できません` のプレースホルダーへ切り替える
 
 ## 4. 受入条件
@@ -99,7 +100,7 @@ document_type: 画面要件定義
 - `チュートリアルで迷わず使える` の `チュートリアルを見る` からチュートリアルページへ遷移できる
 - キーボードだけでログイン、CTA、モーダル開閉、フォーカス復帰ができる
 - フッターの `導入事例` から一覧へ遷移する
-- 導入事例JSONが取得できない場合でも、読み込み中表示が残り続けず、失敗文言と一覧リンクが表示される
+- 導入事例JSONが取得できない場合でも、読み込み中表示が残り続けず、企業名・担当者名を含まない汎用カードと一覧リンクが表示される
 - 導入事例画像が取得できない場合でも、カード本文・詳細リンクが残り、画像枠の高さが崩れない
 - PC幅のフルページホイールナビでは、ページ最下部から上方向に1回スクロールした時に `導入事例` セクションで停止する
 - `intent=signup` 付き URL で再読込してもモーダルの再表示が暴れない
