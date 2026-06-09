@@ -278,35 +278,53 @@
   line-height: 1.55;
 }
 
-/* ---- 速度カード ---- */
+/* ---- 速度カード（比較テーブル型・連結カラム） ---- */
 .plans-v2 .spd-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 14px;
+  gap: 0;
 }
 
 .plans-v2 .spd {
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 18px 14px;
+  border-radius: 0;
+  padding: 14px;
   text-align: center;
-  box-shadow: 0 8px 22px -16px rgba(16, 41, 77, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 隣接カードの枠線を重ねて距離0・二重線を防止 */
+.plans-v2 .spd + .spd {
+  margin-left: -1px;
+}
+
+.plans-v2 .spd:first-child {
+  border-top-left-radius: 14px;
+  border-bottom-left-radius: 14px;
+}
+
+.plans-v2 .spd:last-child {
+  border-top-right-radius: 14px;
+  border-bottom-right-radius: 14px;
 }
 
 .plans-v2 .spd.prem {
   background: var(--tint-amber);
-  border-color: #f2dca8;
+  position: relative;
+  z-index: 1;
 }
 
 .plans-v2 .spd-ic {
-  width: 42px;
-  height: 42px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 10px;
+  margin: 0 auto 7px;
 }
 
 .plans-v2 .spd-ic.blue {
@@ -315,64 +333,105 @@
 }
 
 .plans-v2 .spd-ic.amber {
-  background: #f7e6bd;
+  background: #f6e6bd;
   color: var(--amber-dd);
 }
 
 .plans-v2 .spd-name {
-  font-weight: 800;
-  font-size: 14px;
-  color: var(--ink);
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: 0.02em;
+  color: #27445e;
+  margin-bottom: 5px;
 }
 
 .plans-v2 .spd-price {
-  margin: 7px 0 4px;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 3px;
+  margin: 0 0 7px;
 }
 
 .plans-v2 .spd-price b {
-  font-size: 30px;
-  font-weight: 800;
+  font-size: 34px;
+  font-weight: 900;
   color: var(--ink);
+  line-height: 1;
   letter-spacing: -0.02em;
+}
+
+.plans-v2 .spd.prem .spd-price b {
+  color: var(--amber-dd);
 }
 
 .plans-v2 .spd-price span {
   font-size: 13px;
   color: var(--ink-2);
-  font-weight: 700;
-  margin-left: 2px;
+  font-weight: 500;
 }
 
-.plans-v2 .spd-meta {
-  font-size: 11.5px;
-  color: var(--ink-2);
-  font-weight: 600;
-}
-
-.plans-v2 .spd-flag {
-  margin-top: 10px;
-  font-size: 10.5px;
-  font-weight: 700;
-  color: var(--blue-d);
-  background: var(--tint-blue);
-  border-radius: 20px;
-  padding: 3px 0;
-}
-
-.plans-v2 .spd-flag.amber {
+/* プレミアム限定：オンデマンドカードの右上に絶対配置（フローを占めず整列に影響しない） */
+.plans-v2 .spd-gate {
+  position: absolute;
+  top: 11px;
+  right: 11px;
+  font-size: 10px;
+  font-weight: 800;
   color: var(--amber-dd);
-  background: #f7e6bd;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+.plans-v2 .spd-spec {
+  width: 100%;
+  text-align: left;
+}
+
+.plans-v2 .spd-top {
+  text-align: center;
+}
+
+.plans-v2 .spd-line {
+  font-size: 13px;
+  line-height: 1.6;
+  font-weight: 500;
+  color: #27445e;
+}
+
+.plans-v2 .spd-line b {
+  font-weight: 800;
+  font-size: 15px;
+}
+
+/* 納期行：5枚すべて1行に収め、説明文の開始位置を揃える */
+.plans-v2 .spd-line2 {
+  font-size: 12px;
+  letter-spacing: -0.02em;
+}
+
+.plans-v2 .spd.prem .spd-line2 {
+  text-align: center;
+}
+
+.plans-v2 .spd.prem .spd-line b {
+  color: var(--amber-dd);
+}
+
+.plans-v2 .spd-hr {
+  height: 1px;
+  background: var(--line);
+  margin: 7px 0;
 }
 
 .plans-v2 .spd-scene {
   margin-top: 10px;
-  padding-top: 9px;
-  border-top: 1px dashed var(--line);
-  font-size: 11px;
+  font-size: 12px;
   color: var(--ink-2);
   font-weight: 500;
-  line-height: 1.5;
+  line-height: 1.7;
   text-align: left;
+  text-wrap: pretty;
 }
 
 .plans-v2 .plans-v2__note {
@@ -441,15 +500,31 @@
 }
 
 /* ---- レスポンシブ ---- */
+/* 折り返したら連結をやめ、各カードを独立した角丸カード（余白＋淡い影）に切り替える */
 @media (max-width: 1023px) {
   .plans-v2 .spd-grid {
     grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+
+  .plans-v2 .spd {
+    border-radius: 14px;
+    box-shadow: 0 4px 14px rgba(16, 41, 77, 0.05);
+  }
+
+  .plans-v2 .spd + .spd {
+    margin-left: 0;
   }
 }
 
 @media (max-width: 639px) {
   .plans-v2 .spd-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* 2列時にあぶれるオンデマンドを最下段で全幅に */
+  .plans-v2 .spd.prem {
+    grid-column: 1 / -1;
   }
 
   .plans-v2 .extra-grid {
@@ -460,5 +535,11 @@
   .plans-v2 .cmp tbody td {
     padding-left: 14px;
     padding-right: 14px;
+  }
+}
+
+@media (max-width: 479px) {
+  .plans-v2 .spd-grid {
+    grid-template-columns: 1fr;
   }
 }
