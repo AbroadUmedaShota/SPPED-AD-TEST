@@ -10,6 +10,10 @@
     '[tabindex]:not([tabindex="-1"])'
   ].join(',');
 
+  const customerVoiceFetchTimeoutMs = 5000;
+  const customerVoiceRetryDelayMs = 600;
+  const customerVoiceFetchAttempts = 2;
+
   function resolveAppPath(relativePath) {
     if (!relativePath) {
       return relativePath;
@@ -27,6 +31,24 @@
       }
     }
     return `${basePath}${relativePath}`;
+  }
+
+  function resolveSupportAssetPath(relativePath) {
+    if (!relativePath) {
+      return relativePath;
+    }
+    if (/^(https?:)?\/\//.test(relativePath)) {
+      return relativePath;
+    }
+    const cleanPath = String(relativePath).replace(/^\/+/, '');
+    let supportAssetPath = cleanPath.replace(/^05_support\//, '');
+    if (!supportAssetPath.startsWith('assets/')) {
+      supportAssetPath = `assets/${supportAssetPath}`;
+    }
+    if (/^(localhost|127\.0\.0\.1|::1|\[::1\])$/i.test(window.location.hostname)) {
+      return resolveAppPath(`05_support/${supportAssetPath}`);
+    }
+    return `https://support.speed-ad.com/${supportAssetPath}`;
   }
 
   function escapeHtml(value) {
@@ -60,6 +82,79 @@
       return resolveAppPath(fallbackUrl);
     }
     return 'https://support.speed-ad.com/news/';
+  }
+
+  function delay(ms) {
+    return new Promise((resolve) => {
+      window.setTimeout(resolve, ms);
+    });
+  }
+
+  async function fetchWithTimeout(url, timeoutMs = customerVoiceFetchTimeoutMs) {
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      return await fetch(url, { signal: controller.signal });
+    } finally {
+      window.clearTimeout(timeoutId);
+    }
+  }
+
+  async function fetchJsonWithRetry(url, options = {}) {
+    const timeoutMs = options.timeoutMs || customerVoiceFetchTimeoutMs;
+    const retryDelayMs = options.retryDelayMs || customerVoiceRetryDelayMs;
+    const attempts = options.attempts || customerVoiceFetchAttempts;
+    let lastError = null;
+
+    for (let attempt = 0; attempt < attempts; attempt += 1) {
+      try {
+        const response = await fetchWithTimeout(url, timeoutMs);
+        if (!response.ok) {
+          throw new Error(`Failed to load JSON: ${response.status}`);
+        }
+        return response.json();
+      } catch (error) {
+        lastError = error;
+        if (attempt < attempts - 1) {
+          await delay(retryDelayMs);
+        }
+      }
+    }
+
+    throw lastError || new Error('Failed to load JSON.');
+  }
+
+  function applyImageFallback(image, label = '画像を表示できません') {
+    if (!image) {
+      return;
+    }
+    const frame = image.closest('[data-image-frame]') || image.parentElement;
+    if (!frame) {
+      return;
+    }
+    let fallback = frame.querySelector('[data-image-fallback]');
+    if (!fallback) {
+      fallback = document.createElement('span');
+      fallback.className = 'voice-teaser-card__image-fallback';
+      fallback.dataset.imageFallback = '';
+      fallback.hidden = true;
+      frame.appendChild(fallback);
+    }
+    fallback.textContent = label;
+    fallback.hidden = true;
+    frame.classList.remove('is-image-unavailable');
+    image.hidden = false;
+
+    const showFallback = () => {
+      frame.classList.add('is-image-unavailable');
+      image.hidden = true;
+      fallback.hidden = false;
+    };
+
+    image.addEventListener('error', showFallback, { once: true });
+    if (image.complete && image.naturalWidth === 0) {
+      showFallback();
+    }
   }
 
   function getButtonTextNode(buttonElement) {
@@ -183,11 +278,7 @@
         return;
       }
       try {
-        const response = await fetch(resolveAppPath('data/customer-voices.json'));
-        if (!response.ok) {
-          throw new Error(`Failed to load customer voices: ${response.status}`);
-        }
-        const payload = await response.json();
+        const payload = await fetchJsonWithRetry(resolveAppPath('data/customer-voices.json'));
         const voices = Array.isArray(payload?.voices)
           ? payload.voices.filter((voice) => voice?.publishStatus === 'published').slice(0, 2)
           : [];
@@ -199,7 +290,7 @@
         }
         customerVoiceTeaserGrid.setAttribute('aria-busy', 'false');
         customerVoiceTeaserGrid.innerHTML = voices.map((voice) => {
-          const heroImage = resolveAppPath(voice.heroImage || 'img/top-kv.jpg');
+          const heroImage = resolveSupportAssetPath(voice.heroImage || 'img/top-kv.jpg');
           const orgType = voice.organizationType || voice.label || '';
           const title = voice.voicePageHeadline || voice.voicePageLabel || voice.label || '';
           const quoteText = voice.teaserQuote || (voice.quote?.text ? voice.quote.text.slice(0, 100) + (voice.quote.text.length > 100 ? '…' : '') : '') || voice.listingSummary || '';
@@ -217,8 +308,9 @@
           return `
             <a class="voice-teaser-card" href="${escapeHtml(detailUrl)}" ${styleAttr} aria-label="${escapeHtml(title + ' の事例を読む')}">
               <span class="voice-teaser-card__stripe" aria-hidden="true"></span>
-              <div class="voice-teaser-card__media">
+              <div class="voice-teaser-card__media" data-image-frame>
                 <img src="${escapeHtml(heroImage)}" alt="${escapeHtml(altText)}" loading="lazy">
+                <span class="voice-teaser-card__image-fallback" data-image-fallback hidden>画像を表示できません</span>
               </div>
               <div class="voice-teaser-card__body">
                 ${orgType ? `<span class="voice-teaser-card__pill">${escapeHtml(orgType)}</span>` : ''}
@@ -232,11 +324,13 @@
             </a>
           `;
         }).join('');
+        customerVoiceTeaserGrid.querySelectorAll('.voice-teaser-card__media img')
+          .forEach((image) => applyImageFallback(image));
       } catch (error) {
         console.warn('お客様のお声の読み込みに失敗しました:', error);
-        customerVoiceTeaserStatus.textContent = '読み込み失敗';
+        customerVoiceTeaserStatus.textContent = '一時的に表示できません';
         customerVoiceTeaserGrid.setAttribute('aria-busy', 'false');
-        customerVoiceTeaserGrid.innerHTML = '<p class="voice-teaser__empty">公開事例を表示できません。<a class="voice-teaser__inline-link" href="https://support.speed-ad.com/customer-voices/">一覧ページから事例を見る</a></p>';
+        customerVoiceTeaserGrid.innerHTML = '<p class="voice-teaser__empty">通信状態を確認し、時間をおいて再度お試しください。<a class="voice-teaser__inline-link" href="https://support.speed-ad.com/customer-voices/">一覧ページから事例を見る</a></p>';
       }
     }
 

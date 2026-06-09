@@ -2103,6 +2103,31 @@ body.is-hero-font-dragging * {
   transition: transform 0.6s ease;
 }
 
+.voice-teaser-card__media.is-image-unavailable img {
+  display: none;
+}
+
+.voice-teaser-card__image-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background:
+    linear-gradient(135deg, rgba(9, 24, 42, 0.92), rgba(20, 41, 61, 0.84)),
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0 1px, transparent 1px 12px);
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
+.voice-teaser-card__image-fallback[hidden] {
+  display: none;
+}
+
 .voice-teaser-card:hover .voice-teaser-card__media img {
   transform: scale(1.05);
 }

@@ -7,5 +7,6 @@
 - `demo/demo_answers/` - answer datasets paired with demo surveys.
 - `demo/demo_business-cards/` - persona business-card data linked to demo answers.
 - `news.json` - mock public-news feed for the login-front page; production source is expected to move to `support.speed-ad.com/news.json`.
+- `customer-voices.json` - same-origin mirror for the login-front customer voice teaser. The source of truth is `05_support/assets/data/customer-voices.json`; update this file with `scripts/sync-customer-voices.ps1`.
 
 Large archival dumps live in `アーカイブ/data-dumps/` to keep runtime assets light.

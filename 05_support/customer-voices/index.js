@@ -1,4 +1,5 @@
 import {
+  applyImageFallback,
   escapeHtml,
   getPublishedVoices,
   loadVoiceCollection,
@@ -6,7 +7,7 @@ import {
   renderFeatureList,
   resolveAppRootPath,
   setupRevealAnimations,
-} from './shared.js';
+} from './shared.js?v=20260609-resilience';
 
 function getVoicePageLabel(voice = {}) {
   return voice.voicePageLabel || voice.label || '';
@@ -26,8 +27,9 @@ function renderVoiceCard(voice, index) {
       data-reveal
       style="transition-delay: ${index * 70}ms;"
     >
-      <div class="voice-listing-card__media">
+      <div class="voice-listing-card__media" data-image-frame>
         <img src="${resolveAppRootPath(voice.heroImage || 'img/top-kv.jpg')}" alt="${escapeHtml(label)}のイメージ">
+        <span class="voice-image-fallback" data-image-fallback hidden>画像を表示できません</span>
       </div>
       <div class="voice-listing-card__content">
         <div class="voice-listing-card__meta">
@@ -57,14 +59,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     const voices = getPublishedVoices(collection);
     count.textContent = `${voices.length}件の導入事例`;
     grid.innerHTML = voices.map(renderVoiceCard).join('');
+    grid.querySelectorAll('.voice-listing-card__media img')
+      .forEach((image) => applyImageFallback(image));
     refreshRevealAnimations(grid);
   } catch (error) {
-    count.textContent = '公開準備中';
+    count.textContent = '一時的に表示できません';
     grid.innerHTML = `
       <div class="voice-detail-card" data-reveal>
-        <h2>導入事例を準備しています</h2>
+        <h2>導入事例を表示できませんでした</h2>
         <div class="voice-detail-body">
-          <p>導入事例の読み込みに失敗しました。時間をおいて再度お試しください。</p>
+          <p>通信状態を確認し、時間をおいて再度お試しください。</p>
         </div>
       </div>
     `;

@@ -1,6 +1,9 @@
 import { resolveSupportBasePath } from '../assets/js/utils.js';
 
 const VOICE_COLLECTION_VERSION = '20260522-remove-primary-caption';
+const VOICE_FETCH_TIMEOUT_MS = 5000;
+const VOICE_RETRY_DELAY_MS = 600;
+const VOICE_FETCH_ATTEMPTS = 2;
 
 export function resolveAppRootPath(path) {
   if (!path) {
@@ -29,12 +32,82 @@ export function escapeHtml(value) {
     .replace(/'/g, '&#39;');
 }
 
-export async function loadVoiceCollection() {
-  const response = await fetch(resolveAppRootPath(`data/customer-voices.json?v=${VOICE_COLLECTION_VERSION}`));
-  if (!response.ok) {
-    throw new Error(`Failed to load customer voices: ${response.status}`);
+function delay(ms) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, ms);
+  });
+}
+
+async function fetchWithTimeout(url, timeoutMs = VOICE_FETCH_TIMEOUT_MS) {
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { signal: controller.signal });
+  } finally {
+    window.clearTimeout(timeoutId);
   }
-  return response.json();
+}
+
+export async function fetchJsonWithRetry(url, options = {}) {
+  const timeoutMs = options.timeoutMs || VOICE_FETCH_TIMEOUT_MS;
+  const retryDelayMs = options.retryDelayMs || VOICE_RETRY_DELAY_MS;
+  const attempts = options.attempts || VOICE_FETCH_ATTEMPTS;
+  let lastError = null;
+
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    try {
+      const response = await fetchWithTimeout(url, timeoutMs);
+      if (!response.ok) {
+        throw new Error(`Failed to load JSON: ${response.status}`);
+      }
+      return response.json();
+    } catch (error) {
+      lastError = error;
+      if (attempt < attempts - 1) {
+        await delay(retryDelayMs);
+      }
+    }
+  }
+
+  throw lastError || new Error('Failed to load JSON.');
+}
+
+export async function loadVoiceCollection() {
+  return fetchJsonWithRetry(resolveAppRootPath(`data/customer-voices.json?v=${VOICE_COLLECTION_VERSION}`));
+}
+
+export function applyImageFallback(image, label = '画像を表示できません') {
+  if (!image) {
+    return;
+  }
+  const frame = image.closest('[data-image-frame]') || image.parentElement;
+  if (!frame) {
+    return;
+  }
+  let fallback = frame.querySelector('[data-image-fallback]');
+  if (!fallback) {
+    fallback = document.createElement('span');
+    fallback.className = 'voice-image-fallback';
+    fallback.dataset.imageFallback = '';
+    fallback.hidden = true;
+    frame.appendChild(fallback);
+  }
+  fallback.textContent = label;
+  fallback.hidden = true;
+  frame.classList.remove('is-image-unavailable');
+  frame.classList.add('voice-image-frame');
+  image.hidden = false;
+
+  const showFallback = () => {
+    frame.classList.add('is-image-unavailable');
+    image.hidden = true;
+    fallback.hidden = false;
+  };
+
+  image.addEventListener('error', showFallback, { once: true });
+  if (image.complete && image.naturalWidth === 0) {
+    showFallback();
+  }
 }
 
 export function getPublishedVoices(collection) {

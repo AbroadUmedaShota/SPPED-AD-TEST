@@ -75,9 +75,15 @@ document_type: 画面要件定義
 
 ### 3.6. 導入事例ティザー
 
-- ティザーは `data/customer-voices.json` を参照する
-- 表示文言は `label` / `listingSummary` を基本とする
-- `https://support.speed-ad.com/customer-voices/` 配下で使う `voicePageLabel` / `voicePageSummary` は詳細ページ専用とし、トップでは汎用表現を維持する
+- 導入事例全体の正本は `05_support/assets/data/customer-voices.json` と `05_support/assets/img/` 配下の画像とする
+- ティザーはCORSを避けるため、同一オリジンの同期済みミラー `data/customer-voices.json` を参照する
+- ミラー更新は `scripts/sync-customer-voices.ps1` でsupport正本から同期し、`-Check` で更新漏れを検知する
+- ティザー画像はミラー内の `heroImage` をsupport側アセットとして解決し、ローカルでは `05_support/assets/img/`、本番では `https://support.speed-ad.com/assets/img/` から取得する
+- 表示文言は `voicePageHeadline` / `voicePageLabel` / `label` と `publicQuoteAuthor` / `quote.author` を利用する
+- 詳細導線は `https://support.speed-ad.com/customer-voices/` 配下へ遷移する
+- JSON取得は5秒タイムアウト、600ms間隔で1回だけ自動再試行する
+- JSON取得の最終失敗時は `一時的に表示できません` とし、通信状態を確認して時間をおく案内と導入事例一覧へのリンクを表示する
+- 画像取得に失敗した場合、カード本文とリンクは維持し、画像枠だけ `画像を表示できません` のプレースホルダーへ切り替える
 
 ## 4. 受入条件
 
@@ -93,6 +99,8 @@ document_type: 画面要件定義
 - `チュートリアルで迷わず使える` の `チュートリアルを見る` からチュートリアルページへ遷移できる
 - キーボードだけでログイン、CTA、モーダル開閉、フォーカス復帰ができる
 - フッターの `導入事例` から一覧へ遷移する
+- 導入事例JSONが取得できない場合でも、読み込み中表示が残り続けず、失敗文言と一覧リンクが表示される
+- 導入事例画像が取得できない場合でも、カード本文・詳細リンクが残り、画像枠の高さが崩れない
 - PC幅のフルページホイールナビでは、ページ最下部から上方向に1回スクロールした時に `導入事例` セクションで停止する
 - `intent=signup` 付き URL で再読込してもモーダルの再表示が暴れない
 - トップのティザーが欠けてもレイアウト崩れや空ブロックが出ない

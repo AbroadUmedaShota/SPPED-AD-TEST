@@ -295,7 +295,10 @@ EU域内ユーザーのアクセスを想定範囲に含める場合、reCAPTCHA
 - `/customer-voices/` は導入事例一覧、`/customer-voices/<slug>/` は導入事例詳細の正本URLとする。
 - 導入事例はログイン前トップの信頼補強コンテンツであり、ログイン・申込・保存などの動的機能を持たないため、supportサブドメイン配下に置く。
 - 既存の `customer-voices/*.html` は移行元として扱い、本番公開時は 301 リダイレクトまたは静的ホスティングのrewriteで新URLへ接続する。
-- `data/customer-voices.json` は公開表示用データに限定し、承認前情報、社内メモ、個人名、未公開数値を含めない。
+- 導入事例の公開データ正本は `05_support/assets/data/customer-voices.json`、画像正本は `05_support/assets/img/` 配下とし、承認前情報、社内メモ、個人名、未公開数値を含めない。
+- `data/customer-voices.json` はログイン前トップのティザー用にsupport正本から同期した同一オリジンミラーとする。更新漏れは `scripts/sync-customer-voices.ps1 -Check` で検知する。
+- 導入事例JSONの取得は5秒タイムアウト、600ms間隔で1回だけ自動再試行する。最終失敗時は読み込み中表示を残さず、失敗案内へ切り替える。
+- 導入事例画像の取得失敗時は、画像枠だけプレースホルダー表示にし、本文・CTA・リンクは維持する。画像をルート側ミラーへフォールバックする運用は行わない。
 - ログイン前トップからの「導入事例を見る」「詳細を見る」は、`https://support.speed-ad.com/customer-voices/` または各詳細URLへ接続する。
 
 ---

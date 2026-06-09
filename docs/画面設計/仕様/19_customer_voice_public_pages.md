@@ -59,7 +59,7 @@ last_reviewed: 2026-04-28
 ログイン前トップの現行実装状況は `24_public_login_front_requirements.md` を参照する。
 `/customer-voices/` 配下は、ログイン前トップから接続される公開の信頼補強導線として扱う。
 
-現行実装では、ログイン前トップのティザーは `data/customer-voices.json` の `voicePageHeadline` / `voicePageLabel` / `label` と `publicQuoteAuthor` / `quote.author` を使い、公開事例ページ側では `voicePageLabel` / `voicePageSummary` があればそちらを優先する。
+現行実装では、導入事例全体の編集正本は `05_support/assets/data/customer-voices.json` と `05_support/assets/img/` 配下の画像とする。ログイン前トップのティザーはCORSを避けるため、support正本から同期した `data/customer-voices.json` を参照し、`voicePageHeadline` / `voicePageLabel` / `label` と `publicQuoteAuthor` / `quote.author` を使う。公開事例ページ側では `voicePageLabel` / `voicePageSummary` があればそちらを優先する。
 このため、承認済みの実名掲載事例では、ログイン前トップのティザーを含む公開表示で敬称付き表記を維持できる。THK株式会社 様 事例では `THK株式会社 様` を標準表記とする。
 
 ## 4. 画面仕様
@@ -100,8 +100,13 @@ last_reviewed: 2026-04-28
 
 ### 5.1. データソース
 
-- 事例本文の正本は `data/customer-voices.json` とする
-- 一覧ページ、詳細ページ、ログイン前トップのティザーは同一 JSON を参照する
+- 事例本文の正本は `05_support/assets/data/customer-voices.json` とする
+- 事例画像の正本は `05_support/assets/img/` 配下とし、`heroImage` などのJSON内パスは `img/...` または `assets/img/...` の公開相対パスで管理する
+- support側の一覧ページ、詳細ページはsupport正本JSONを参照する
+- ログイン前トップのティザーはCORS回避のため、`scripts/sync-customer-voices.ps1` でsupport正本から同期した `data/customer-voices.json` を参照する
+- JSON取得は5秒タイムアウト、600ms間隔で1回だけ自動再試行する
+- JSON取得の最終失敗時は、一覧では失敗文言を表示し、詳細では本文セクションを非表示にして再試行を促す
+- 画像取得に失敗した場合は、本文・CTA・リンクを維持し、画像枠だけプレースホルダー表示へ切り替える
 - ログイン前トップのティザーは `voicePageHeadline` / `voicePageLabel` / `label` と `publicQuoteAuthor` / `quote.author` を使い、`/customer-voices/` 配下では `voicePageLabel` / `voicePageSummary` がある場合にそちらを優先する
 - 承認済みの実名掲載事例は、公開表示で会社名に敬称を付ける。例: `THK株式会社 様`
 - THK 事例の専用詳細ページでは、追加の任意項目を使ってヒーロー見出し・要点カード・公開用肩書きを描画する
@@ -172,7 +177,7 @@ last_reviewed: 2026-04-28
 
 - 本番配置先は `05_support/customer-voices/`
 - 移行元のルート配下 `customer-voices/` は、静的リダイレクトページとして `https://support.speed-ad.com/customer-voices/` へ接続する。本番公開時はホスティング設定でも 301 リダイレクトを設定する。
-- support サブドメインのデプロイ対象は `05_support/` であるため、公開用データと画像は `05_support/assets/data/customer-voices.json` と `05_support/assets/img/customer-voices/` に同梱する。編集時の正本は引き続き `data/customer-voices.json` とする。
+- support サブドメインのデプロイ対象は `05_support/` であるため、公開用データと画像は `05_support/assets/data/customer-voices.json` と `05_support/assets/img/` に同梱する。編集時の正本もsupport側とし、`data/customer-voices.json` はログイン前トップのティザー用ミラーに限定する。
 - スタイルは support 側へ移設後も `customer-voices/styles.css` 相当を維持する
 - 共通ロジックは `customer-voices/shared.js` 相当
 - 一覧描画は `customer-voices/index.js` 相当
@@ -185,7 +190,10 @@ last_reviewed: 2026-04-28
 - `index.html` の 3 導線から `https://support.speed-ad.com/customer-voices/` へ到達できること
 - 一覧ページの各カードから正しい詳細ページへ遷移できること
 - `https://app.speed-ad.com/?intent=signup#top` でサインアップモーダルが自動表示されること
-- `data/customer-voices.json` の任意項目が欠けてもレイアウト崩れや空セクションがないこと
+- `05_support/assets/data/customer-voices.json` の任意項目が欠けてもレイアウト崩れや空セクションがないこと
+- `scripts/sync-customer-voices.ps1 -Check` でsupport正本と `data/customer-voices.json` の同期状態を検知できること
+- JSON取得失敗時に `読み込み中` が残り続けず、失敗文言へ切り替わること
+- 画像取得失敗時にプレースホルダーが表示され、カード本文・詳細本文・CTAが操作可能なまま残ること
 - デスクトップ / タブレット / モバイルで表示崩れがないこと
 - コンソールエラー、リンク切れ、画像切れがないこと
 

@@ -1,4 +1,5 @@
 import {
+  applyImageFallback,
   escapeHtml,
   getPublishedVoices,
   getVoicePageLabel,
@@ -9,7 +10,7 @@ import {
   renderParagraphs,
   resolveAppRootPath,
   setupRevealAnimations,
-} from './shared.js?v=20260522-remove-primary-caption';
+} from './shared.js?v=20260609-resilience';
 
 function setHtml(sectionId, bodyId, html) {
   const section = document.getElementById(sectionId);
@@ -45,6 +46,7 @@ function setFigure(sectionId, imageId, captionId, path, caption, alt) {
   }
   image.src = resolveAppRootPath(path);
   image.alt = alt || '';
+  applyImageFallback(image);
   captionNode.textContent = caption || '';
   section.hidden = false;
 }
@@ -147,6 +149,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (heroImage) {
       heroImage.src = resolveAppRootPath(voice.heroImage || 'img/top-kv.jpg');
       heroImage.alt = `${label} 導入事例のキービジュアル`;
+      applyImageFallback(heroImage);
     }
 
     const heroMeta = document.getElementById('voice-hero-meta');
@@ -190,8 +193,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   } catch (error) {
     setText('voice-hero-company', '導入事例');
     setText('voice-hero-headline', '事例を表示できませんでした');
-    setText('voice-hero-summary', '読み込みに失敗したため、一覧ページから再度お試しください。');
-    setText('voice-hero-caption', '公開状態とデータ定義を確認してください。');
+    setText('voice-hero-summary', '通信状態を確認し、時間をおいて再度お試しください。');
+    setText('voice-hero-caption', '導入事例データを一時的に表示できません。');
     hideSectionsOnError();
   }
 });
