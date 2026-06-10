@@ -442,29 +442,21 @@
   line-height: 1.6;
 }
 
-/* ---- 追加料金 ---- */
-.plans-v2 .extra-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-.plans-v2 .extra {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 20px 22px;
+/* ---- 追加料金（注記・帯型） ---- */
+.plans-v2 .fee-band {
   display: flex;
-  gap: 16px;
+  gap: 14px;
   align-items: flex-start;
-  box-shadow: 0 8px 22px -18px rgba(16, 41, 77, 0.2);
+  background: #f3f7fd;
+  border-radius: 12px;
+  padding: 18px 24px;
 }
 
-.plans-v2 .ex-ic {
-  width: 44px;
-  height: 44px;
-  border-radius: 11px;
-  background: var(--tint-blue);
+.plans-v2 .fb-ic {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: var(--card);
   color: var(--blue);
   display: flex;
   align-items: center;
@@ -472,31 +464,26 @@
   flex: none;
 }
 
-.plans-v2 .ex-label {
-  font-weight: 800;
-  font-size: 14px;
-  color: var(--ink);
-}
-
-.plans-v2 .ex-price {
-  margin: 2px 0 4px;
+.plans-v2 .fb-txt {
+  margin: 1px 0 0;
+  font-size: 13px;
+  font-weight: 500;
   color: var(--ink-2);
-  font-size: 12.5px;
-  font-weight: 600;
+  line-height: 1.6;
 }
 
-.plans-v2 .ex-price b {
-  font-size: 26px;
-  color: var(--ink);
+.plans-v2 .fb-lbl {
+  display: block;
+  margin-bottom: 2px;
   font-weight: 800;
-  margin-right: 3px;
-  letter-spacing: -0.02em;
+  font-size: 14.5px;
+  color: var(--ink);
 }
 
-.plans-v2 .ex-note {
-  font-size: 11.5px;
-  color: var(--muted);
-  font-weight: 600;
+.plans-v2 .fb-yen {
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 800;
 }
 
 /* ---- レスポンシブ ---- */
@@ -525,10 +512,6 @@
   /* 2列時にあぶれるオンデマンドを最下段で全幅に */
   .plans-v2 .spd.prem {
     grid-column: 1 / -1;
-  }
-
-  .plans-v2 .extra-grid {
-    grid-template-columns: 1fr;
   }
 
   .plans-v2 .cmp .corner,
