@@ -1,0 +1,45 @@
+# help/FAQ 棚卸しDB スプシ即時同期（任意）
+# -----------------------------------------------------------------
+# help/FAQ のコンテンツ正本（JSON）を編集して main に push すると、
+# GitHub Pages の再ビルドを待ってから Apps Script のウェブアプリを叩き、
+# スプレッドシートを自動同期する。＝「HTMLを直したらスプシに自動反映」。
+#
+# 有効化の前提（1回だけ設定）:
+#   1) Apps Script を「デプロイ」→「ウェブアプリ」で公開し、URL を取得
+#      （アクセス権：全員 / 実行：自分）
+#   2) Apps Script のスクリプトプロパティに SYNC_TOKEN（任意の文字列）を設定
+#   3) GitHub リポジトリの Secrets に登録:
+#        GAS_SYNC_URL   … ウェブアプリの /exec URL
+#        GAS_SYNC_TOKEN … 上の SYNC_TOKEN と同じ値
+#
+# Secrets 未設定なら何もしない（毎日トリガー＋手動同期が引き続き動く）。
+name: sync-inventory
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '05_support/assets/data/faq.json'
+      - '05_support/assets/data/help_articles.json'
+      - '05_support/plans/index.html'
+  workflow_dispatch: {}
+
+jobs:
+  ping-gas:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for GitHub Pages to rebuild
+        run: sleep 90
+
+      - name: Trigger Apps Script sync
+        env:
+          URL: ${{ secrets.GAS_SYNC_URL }}
+          TOKEN: ${{ secrets.GAS_SYNC_TOKEN }}
+        run: |
+          if [ -z "$URL" ]; then
+            echo "GAS_SYNC_URL 未設定のためスキップ（毎日トリガーで同期されます）"
+            exit 0
+          fi
+          code=$(curl -s -L -o /dev/null -w "%{http_code}" -X POST "$URL?token=$TOKEN")
+          echo "Apps Script 応答: $code"
+          test "$code" = "200"
