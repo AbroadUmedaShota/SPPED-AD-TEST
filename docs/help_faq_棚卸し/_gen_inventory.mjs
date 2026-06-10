@@ -108,29 +108,58 @@ claims.forEach((c, i) => {
 });
 writeCsv('02_事実チェック.csv', fc);
 
-// 回答内容レビュー記入表（standalone HTML）をテンプレートから生成。
-// 単位＝help記事1本／FAQ1問。設問＋回答内容＋実画面リンクを1行ずつ（計63行）。
+// レビュー記入表（standalone HTML・2タブ）をテンプレートから生成。
+//   タブ1「回答内容レビュー」＝help記事1本/FAQ1問のカード（計63）
+//   タブ2「項目をまたいだ矛盾」＝横断比較の主張テーブル（計26）
 const htmlEsc = s => String(s == null ? '' : s)
   .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-const formRow = (id, type, cat, q, ans, link) =>
-  '<tr data-row-id="' + htmlEsc(id) + '">' +
-  '<td class="id">' + htmlEsc(id) + '</td>' +
-  '<td class="type">' + htmlEsc(type) + '</td>' +
-  '<td class="cat">' + htmlEsc(cat) + '</td>' +
-  '<td class="q">' + htmlEsc(q) + '</td>' +
-  '<td class="content">' + htmlEsc(ans) + '</td>' +
-  '<td class="link"><a href="' + htmlEsc(link) + '" target="_blank" rel="noopener">開く</a></td>' +
-  '<td class="fix"></td><td class="comment"></td><td class="done"></td></tr>';
-const formRows = [];
+
+// --- タブ1: カード ---
+const card = (id, type, cat, q, ans, link) =>
+  '<div class="card" data-row-id="' + htmlEsc(id) + '" data-type="' + htmlEsc(type) + '">' +
+    '<div class="card-head">' +
+      '<span class="badge">' + htmlEsc(id) + '</span>' +
+      '<span class="chip">' + htmlEsc(type) + '</span>' +
+      '<span class="chip">' + htmlEsc(cat) + '</span>' +
+      '<a class="open" href="' + htmlEsc(link) + '" target="_blank" rel="noopener">実画面を開く ↗</a>' +
+      '<label class="done-toggle"><input type="checkbox" class="done-box"> 確認OK</label>' +
+    '</div>' +
+    '<div class="q">' + htmlEsc(q) + '</div>' +
+    '<div class="content">' + htmlEsc(ans) + '</div>' +
+    '<div class="edit">' +
+      '<div class="col"><div class="lbl">修正後の内容（直す場合のみ）</div>' +
+        '<button type="button" class="copy-btn">原文コピー</button>' +
+        '<textarea class="fix-input" placeholder="正しければ空欄でOK"></textarea></div>' +
+      '<div class="col"><div class="lbl">レビューコメント</div>' +
+        '<textarea class="comment-input" placeholder="誤り・要確認・気づき"></textarea></div>' +
+    '</div>' +
+  '</div>';
+const cards = [];
 faq.categories.forEach(c => c.questions.forEach(q => {
-  formRows.push(formRow('FAQ-' + q.id, 'FAQ', c.name, q.question, collapse(q.answer), '/05_support/faq/#' + q.id));
+  cards.push(card('FAQ-' + q.id, 'FAQ', c.name, q.question, collapse(q.answer), '/05_support/faq/#' + q.id));
 }));
 help.categories.forEach(c => c.questions.forEach(q => {
-  formRows.push(formRow('HELP-' + q.id, 'ヘルプ', c.name, q.question, collapse(q.answer), '/05_support/help-content/?article=' + q.id));
+  cards.push(card('HELP-' + q.id, 'ヘルプ', c.name, q.question, collapse(q.answer), '/05_support/help-content/?article=' + q.id));
 }));
+
+// --- タブ2: 矛盾テーブル行 ---
+const clashRows = claims.map((c, i) =>
+  '<tr data-row-id="' + htmlEsc(STABLE[i]) + '">' +
+    '<td class="id">' + htmlEsc(STABLE[i]) + '</td>' +
+    '<td class="src">' + htmlEsc(c[0]) + '</td>' +
+    '<td class="claim">' + htmlEsc(c[1]) + '</td>' +
+    '<td class="kind">' + htmlEsc(c[2]) + '</td>' +
+    '<td class="note">' + htmlEsc(c[6]) + '</td>' +
+    '<td class="tcomment"><textarea class="t-comment-input" placeholder="気づき・対応"></textarea></td>' +
+    '<td class="tdone"><input type="checkbox" class="done-box"></td>' +
+  '</tr>');
+
 const tpl = fs.readFileSync(path.join(OUT, '_form_template.html'), 'utf8');
-fs.writeFileSync(path.join(OUT, '回答内容レビュー_記入表.html'), tpl.replace('<!--ROWS-->', formRows.join('\n')), 'utf8');
-console.log('wrote 回答内容レビュー_記入表.html', formRows.length, 'rows');
+const formHtml = tpl
+  .replace('<!--CARDS-->', cards.join('\n'))
+  .replace('<!--CLASHROWS-->', clashRows.join('\n'));
+fs.writeFileSync(path.join(OUT, 'レビュー記入表.html'), formHtml, 'utf8');
+console.log('wrote レビュー記入表.html', cards.length, 'cards +', clashRows.length, 'clash rows');
 
 // =========================================================
 // Tab C: 用語揺れ — バリエーションは原文ママ。出現数は実測。推奨表記は空欄。
