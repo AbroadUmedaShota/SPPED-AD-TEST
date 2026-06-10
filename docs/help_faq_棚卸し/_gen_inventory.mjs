@@ -6,6 +6,9 @@ const SUP = path.join(ROOT, '05_support');
 const OUT = path.join(ROOT, 'docs', 'help_faq_棚卸し');
 fs.mkdirSync(OUT, { recursive: true });
 
+// 公開URL（GitHub Pages）。記入表/台帳の「開く」リンクは配布先でも開けるよう公開URL基準にする。
+const PUB = 'https://abroadumedashota.github.io/SPPED-AD-TEST';
+
 const faq = JSON.parse(fs.readFileSync(path.join(SUP, 'assets/data/faq.json'), 'utf8'));
 const help = JSON.parse(fs.readFileSync(path.join(SUP, 'assets/data/help_articles.json'), 'utf8'));
 
@@ -41,7 +44,7 @@ faq.categories.forEach(c => {
     ledger.push([
       'FAQ-' + q.id, 'FAQ', c.id, c.name, q.id, q.question,
       '', collapse(q.answer), q.isFeatured ? '★' : '', '',
-      '/05_support/faq/#' + q.id, '', '', ''
+      PUB + '/05_support/faq/#' + q.id, '', '', ''
     ]);
   });
 });
@@ -50,7 +53,7 @@ help.categories.forEach(c => {
     ledger.push([
       'HELP-' + q.id, 'ヘルプ記事', c.id, c.name, q.id, q.question,
       collapse(q.summary), collapse(q.answer), q.isFeatured ? '★' : '', q.updatedAt || '',
-      '/05_support/help-content/?article=' + q.id, '', '', ''
+      PUB+'/05_support/help-content/?article=' + q.id, '', '', ''
     ]);
   });
 });
@@ -138,10 +141,10 @@ const card = (id, type, cat, q, ans, link) =>
   '</div>';
 const cards = [];
 faq.categories.forEach(c => c.questions.forEach(q => {
-  cards.push(card('FAQ-' + q.id, 'FAQ', c.name, q.question, collapse(q.answer), '/05_support/faq/#' + q.id));
+  cards.push(card('FAQ-' + q.id, 'FAQ', c.name, q.question, collapse(q.answer), PUB + '/05_support/faq/#' + q.id));
 }));
 help.categories.forEach(c => c.questions.forEach(q => {
-  cards.push(card('HELP-' + q.id, 'ヘルプ', c.name, q.question, collapse(q.answer), '/05_support/help-content/?article=' + q.id));
+  cards.push(card('HELP-' + q.id, 'ヘルプ', c.name, q.question, collapse(q.answer), PUB+'/05_support/help-content/?article=' + q.id));
 }));
 
 // --- タブ2: 矛盾テーブル行 ---
