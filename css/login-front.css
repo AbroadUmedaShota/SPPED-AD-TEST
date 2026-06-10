@@ -151,10 +151,20 @@ img {
 }
 
 .site-footer__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   font-family: var(--serif);
   font-size: 1.1rem;
   letter-spacing: 0.05em;
   text-decoration: none;
+}
+
+.site-footer__brand-mark {
+  width: 30px;
+  height: 26px;
+  flex: 0 0 auto;
+  object-fit: contain;
 }
 
 .site-top-header {
@@ -2411,8 +2421,8 @@ body.is-hero-font-dragging * {
   position: relative;
   min-height: 42px;
   display: grid;
-  grid-template-columns: minmax(210px, 260px) minmax(0, 620px) 34px;
-  gap: clamp(16px, 2.4vw, 44px);
+  grid-template-columns: minmax(280px, 340px) minmax(0, 760px) 34px;
+  gap: clamp(14px, 2vw, 36px);
   align-items: center;
   justify-content: center;
   padding: 5px clamp(32px, 5vw, 72px);
@@ -2424,7 +2434,7 @@ body.is-hero-font-dragging * {
 .site-footer__identity {
   display: flex;
   align-items: center;
-  gap: 22px;
+  gap: 18px;
   min-width: 0;
 }
 
@@ -2451,7 +2461,7 @@ body.is-hero-font-dragging * {
 }
 
 .site-footer nav a {
-  padding: 0 16px;
+  padding: 0 14px;
   color: rgba(255, 255, 255, 0.82);
   text-decoration: none;
   font-size: 0.7rem;
@@ -2883,7 +2893,7 @@ body.is-hero-font-dragging * {
   }
 
   .site-footer__identity {
-    gap: 14px;
+    gap: 12px;
   }
 
   .site-footer nav {
@@ -2946,6 +2956,11 @@ body.is-hero-font-dragging * {
   .site-footer__identity {
     flex-wrap: wrap;
     gap: 8px 14px;
+  }
+
+  .site-footer__brand-mark {
+    width: 26px;
+    height: 22px;
   }
 
   .site-footer nav a {
