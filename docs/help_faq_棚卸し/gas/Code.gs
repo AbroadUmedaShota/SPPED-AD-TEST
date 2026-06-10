@@ -28,7 +28,7 @@
  *   adopt=確認後の内容 / memo=判定メモ / judge=判定(○/△/×/要確認) / status=未使用 / editor=記入者
  */
 
-var SPREADSHEET_ID = '__PASTE_SPREADSHEET_ID__';   // ← 記入表用スプシのID
+var SPREADSHEET_ID = '1boTDALRBhl1-YZlWo9l8SuXy7NpC7-Q7KAlh8NW2zSU';   // ← 記入表用スプシのID
 var SHEET_NAME = 'factcheck_decisions';
 var HEADERS = ['ID', '確認後の内容', '判定メモ', '判定', '対応ステータス', '記入者', '更新日時'];
 var COL_COUNT = HEADERS.length;
