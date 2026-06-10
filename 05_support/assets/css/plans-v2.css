@@ -514,10 +514,103 @@
     grid-column: 1 / -1;
   }
 
-  .plans-v2 .cmp .corner,
-  .plans-v2 .cmp tbody td {
-    padding-left: 14px;
-    padding-right: 14px;
+  /* 比較表：横スクロールをやめ、1項目＝1カードへ分解する。
+     項目名＋説明を上段（全幅）に、2プランの値を下段に左右2列で並べる。
+     列の識別は先頭のプラン見出しと、青＝スタンダード／琥珀＝プレミアムの
+     背景色で担保する（各行にプラン名ラベルは付けない）。 */
+  .plans-v2 .cmp {
+    min-width: 0;
+    display: block;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: visible;
+  }
+
+  /* ヘッダー：項目セルを消し、2プラン名を左右2列の見出しに */
+  .plans-v2 .cmp thead {
+    display: block;
+  }
+
+  .plans-v2 .cmp thead tr {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .plans-v2 .cmp thead .corner {
+    display: none;
+  }
+
+  .plans-v2 .cmp thead .ch {
+    width: auto;
+    border: none;
+  }
+
+  .plans-v2 .planhead {
+    border-radius: 10px 10px 0 0;
+    padding: 12px 8px;
+  }
+
+  .plans-v2 .ph-tag {
+    display: none;
+  }
+
+  .plans-v2 .cmp tbody,
+  .plans-v2 .cmp tr {
+    display: block;
+  }
+
+  /* グループ見出し：帯型のセクションヘッダーに */
+  .plans-v2 .grouprow {
+    margin: 16px 0 8px;
+  }
+
+  .plans-v2 .grouprow td {
+    display: block;
+    padding: 9px 12px;
+    border-radius: 8px;
+    background: #eaf1fc;
+  }
+
+  /* 各項目カード：説明は全幅、値は下段2列 */
+  .plans-v2 .cmp tbody tr:not(.grouprow) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 6px;
+    padding: 10px 12px;
+    margin: 0 0 8px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+  }
+
+  .plans-v2 .cmp td.lbl {
+    grid-column: 1 / -1;
+    padding: 0 0 8px;
+    border: none;
+  }
+
+  .plans-v2 .cmp td.c {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 6px;
+    border: none;
+    border-radius: 8px;
+  }
+
+  .plans-v2 .cmp td.c.blue {
+    background: rgba(238, 244, 253, 0.7);
+  }
+
+  .plans-v2 .cmp td.c.amber {
+    background: rgba(253, 246, 232, 0.85);
+  }
+
+  .plans-v2 .cmp .vtxt {
+    text-align: center;
   }
 }
 
