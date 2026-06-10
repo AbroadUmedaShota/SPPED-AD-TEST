@@ -108,23 +108,29 @@ claims.forEach((c, i) => {
 });
 writeCsv('02_事実チェック.csv', fc);
 
-// 事実チェック記入表（standalone HTML・glossaryと同方式）をテンプレートから生成
+// 回答内容レビュー記入表（standalone HTML）をテンプレートから生成。
+// 単位＝help記事1本／FAQ1問。設問＋回答内容＋実画面リンクを1行ずつ（計63行）。
 const htmlEsc = s => String(s == null ? '' : s)
   .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const formRow = (id, type, cat, q, ans, link) =>
+  '<tr data-row-id="' + htmlEsc(id) + '">' +
+  '<td class="id">' + htmlEsc(id) + '</td>' +
+  '<td class="type">' + htmlEsc(type) + '</td>' +
+  '<td class="cat">' + htmlEsc(cat) + '</td>' +
+  '<td class="q">' + htmlEsc(q) + '</td>' +
+  '<td class="content">' + htmlEsc(ans) + '</td>' +
+  '<td class="link"><a href="' + htmlEsc(link) + '" target="_blank" rel="noopener">開く</a></td>' +
+  '<td class="fix"></td><td class="comment"></td><td class="done"></td></tr>';
+const formRows = [];
+faq.categories.forEach(c => c.questions.forEach(q => {
+  formRows.push(formRow('FAQ-' + q.id, 'FAQ', c.name, q.question, collapse(q.answer), '/05_support/faq/#' + q.id));
+}));
+help.categories.forEach(c => c.questions.forEach(q => {
+  formRows.push(formRow('HELP-' + q.id, 'ヘルプ', c.name, q.question, collapse(q.answer), '/05_support/help-content/?article=' + q.id));
+}));
 const tpl = fs.readFileSync(path.join(OUT, '_form_template.html'), 'utf8');
-const rowsHtml = claims.map((c, i) => {
-  const id = STABLE[i];
-  return '<tr data-row-id="' + htmlEsc(id) + '">' +
-    '<td class="id">' + htmlEsc(id) + '</td>' +
-    '<td class="src">' + htmlEsc(c[0]) + '</td>' +
-    '<td class="claim">' + htmlEsc(c[1]) + '</td>' +
-    '<td class="kind">' + htmlEsc(c[2]) + '</td>' +
-    '<td class="ref">' + htmlEsc(c[3]) + '</td>' +
-    '<td class="note">' + htmlEsc(c[6]) + '</td>' +
-    '<td class="final"></td><td class="judge"></td><td class="memo"></td></tr>';
-}).join('\n');
-fs.writeFileSync(path.join(OUT, '事実チェック_記入表.html'), tpl.replace('<!--ROWS-->', rowsHtml), 'utf8');
-console.log('wrote 事実チェック_記入表.html', claims.length, 'rows');
+fs.writeFileSync(path.join(OUT, '回答内容レビュー_記入表.html'), tpl.replace('<!--ROWS-->', formRows.join('\n')), 'utf8');
+console.log('wrote 回答内容レビュー_記入表.html', formRows.length, 'rows');
 
 // =========================================================
 // Tab C: 用語揺れ — バリエーションは原文ママ。出現数は実測。推奨表記は空欄。

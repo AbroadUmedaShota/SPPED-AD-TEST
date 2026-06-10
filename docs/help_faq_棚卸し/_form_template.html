@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>help/FAQ 事実チェック記入表（嘘棚卸し）</title>
+<title>help/FAQ 回答内容レビュー記入表</title>
 <style>
   *{box-sizing:border-box}
   body{font-family:"Yu Gothic","Meiryo","Hiragino Sans",sans-serif;font-size:13px;color:#1a2533;margin:0;padding:10px;background:#f5f8fd}
@@ -11,61 +11,68 @@
   th,td{border:1px solid #c9d6e5;padding:5px 7px;vertical-align:top;word-wrap:break-word;overflow-wrap:anywhere}
   th{background:#1f3a5f;color:#fff;font-size:11.5px;text-align:left;position:sticky;top:var(--toolbar-h,46px);z-index:5}
   tr:nth-child(even) td{background:#f6f9fc}
-  td.id{font-family:monospace;font-size:11px;white-space:nowrap}
-  td.src{font-size:11px;color:#46586f}
-  td.kind{font-size:11px;white-space:nowrap}
-  td.note{font-size:11px;color:#9a6a1a}
-  td.ref{font-size:11px;color:#54657d}
-  td.final{background:#fff7e6}
-  td.memo{background:#f4faf4}
-  col.c-id{width:8%} col.c-src{width:9%} col.c-claim{width:24%} col.c-kind{width:8%}
-  col.c-ref{width:9%} col.c-note{width:14%} col.c-final{width:14%} col.c-judge{width:8%} col.c-memo{width:14%}
+  td.id{font-family:monospace;font-size:10.5px;white-space:nowrap}
+  td.type{font-size:11px;white-space:nowrap}
+  td.cat{font-size:11px;color:#46586f}
+  td.q{font-size:12.5px;font-weight:700;color:#10294d}
+  td.content{font-size:11.5px;color:#33455c;white-space:pre-wrap;max-height:170px;overflow:auto;background:#fbfdff}
+  td.link{font-size:11px;text-align:center}
+  td.link a{color:#1d4ed8;font-weight:700;text-decoration:none}
+  td.link a:hover{text-decoration:underline}
+  td.fix{background:#fff7e6}
+  td.comment{background:#f4faf4}
+  td.done{text-align:center;background:#eef4fd}
+  col.c-id{width:6%} col.c-type{width:5%} col.c-cat{width:8%} col.c-q{width:15%} col.c-content{width:25%}
+  col.c-link{width:4%} col.c-fix{width:16%} col.c-comment{width:14%} col.c-done{width:7%}
 
-  .claim-chip{display:inline-block;text-align:left;font:inherit;font-size:12.5px;line-height:1.5;
-    color:#10294d;background:#eef3f9;border:1px solid #9aafc4;border-radius:8px;padding:6px 9px;cursor:pointer;width:100%}
-  .claim-chip:hover{background:#1f3a5f;color:#fff;border-color:#1f3a5f}
-  .claim-chip.is-selected{background:#fff2c4;border-color:#d6a93b;color:#1a1a1a}
-
-  .final-input{width:100%;padding:5px 7px;font:inherit;font-size:12.5px;border:1px solid #d6c89b;border-radius:5px;background:#fffefa;resize:vertical;min-height:54px}
-  .final-input:focus{outline:none;border-color:#1f3a5f;background:#fff}
-  .final-input.has-value{background:#fff7d8}
-  .judge-select{width:100%;padding:5px;font:inherit;font-size:12px;border:1px solid #c9d6e5;border-radius:5px;background:#fff}
-  .judge-select[data-v="○"]{border-color:#15803d;color:#15803d;background:#f0fdf4}
-  .judge-select[data-v="△"]{border-color:#b45309;color:#b45309;background:#fffbeb}
-  .judge-select[data-v="×"]{border-color:#b91c1c;color:#b91c1c;background:#fef2f2}
-  .judge-select[data-v="要確認"]{border-color:#1d4ed8;color:#1d4ed8;background:#eff6ff}
-  .memo-input{width:100%;padding:5px 7px;font:inherit;font-size:12px;border:1px solid #c5d9c5;border-radius:5px;background:#fafffa;resize:vertical;min-height:54px}
-  .memo-input:focus{outline:none;border-color:#2f7a3a;background:#fff}
+  .copy-btn{display:inline-block;font:inherit;font-size:10.5px;color:#1d4ed8;background:#fff;border:1px solid #c9d9f2;
+    border-radius:6px;padding:2px 7px;cursor:pointer;margin-bottom:4px}
+  .copy-btn:hover{background:#1d4ed8;color:#fff}
+  .fix-input{width:100%;padding:5px 7px;font:inherit;font-size:12px;border:1px solid #d6c89b;border-radius:5px;background:#fffefa;resize:vertical;min-height:60px}
+  .fix-input:focus{outline:none;border-color:#1f3a5f;background:#fff}
+  .fix-input.has-value{background:#fff3cf}
+  .comment-input{width:100%;padding:5px 7px;font:inherit;font-size:12px;border:1px solid #c5d9c5;border-radius:5px;background:#fafffa;resize:vertical;min-height:60px}
+  .comment-input:focus{outline:none;border-color:#2f7a3a;background:#fff}
+  .done-box{transform:scale(1.5);cursor:pointer;margin-top:6px}
+  .done-label{display:block;font-size:10px;color:#46586f;margin-top:3px}
+  tr.is-done td{background:#eefaf0}
+  tr.is-done td.fix{background:#fff7e6}
+  tr.is-done td.comment{background:#f4faf4}
 
   .toolbar{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:8px;flex-wrap:wrap;
     margin:6px 0 10px;padding:8px 10px;background:#1f3a5f;color:#fff;border-radius:6px;font-size:12px}
   .toolbar button{font:inherit;font-size:12px;padding:5px 10px;background:#fff;color:#1f3a5f;border:none;border-radius:4px;cursor:pointer;font-weight:700}
   .toolbar button:hover{background:#dce6f0}
   .toolbar input.who{font:inherit;font-size:12px;padding:5px 8px;border:none;border-radius:4px;width:140px}
+  .toolbar select{font:inherit;font-size:12px;padding:4px;border:none;border-radius:4px}
   .toolbar .count{margin-left:auto;font-weight:700}
   .toolbar .stat{font-size:11.5px;opacity:.9}
   .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#10294d;color:#fff;padding:9px 16px;border-radius:999px;font-size:12.5px;font-weight:700;opacity:0;transition:opacity .2s;z-index:30}
   .toast.show{opacity:1}
 </style></head>
 <body>
-<h1>help/FAQ 事実チェック記入表（嘘棚卸し）</h1>
-<p class="lead">各項目の「元の記載」を見て、正しければ主張をクリックして<b>確認後の内容にコピー＋判定○</b>、問題があれば<b>確認後の内容を手入力＋判定×/△</b>。
-入力は <b>15秒ごとに自動でスプシと同期</b>（共同編集可）。GAS未設定時はこのブラウザ内に自動保存されます。</p>
+<h1>help/FAQ 回答内容レビュー記入表</h1>
+<p class="lead">help記事1本／FAQ1問ごとに、<b>設問に対する回答内容が正しいか</b>を確認します。「開く」で実画面を確認。
+内容が正しければ<b>確認済みにチェック</b>、直すなら<b>「原文コピー」→修正後の内容を編集</b>。気づきは<b>レビューコメント</b>へ。
+入力は <b>15秒ごとに自動でスプシと同期</b>（共同編集可）。GAS未設定時はこのブラウザ内に自動保存。</p>
 
 <div class="toolbar">
   <label>記入者 <input class="who" id="who" placeholder="あなたの名前"></label>
+  <label>絞り込み:
+    <select id="filter-type"><option value="">種別（全て）</option><option value="FAQ">FAQ</option><option value="ヘルプ">ヘルプ記事</option></select>
+  </label>
   <button type="button" id="btn-fetch">最新を取得</button>
   <button type="button" id="btn-csv">CSVダウンロード</button>
   <span class="stat" id="sync-status">—</span>
-  <span class="count" id="count">判定済 0 / 0</span>
+  <span class="count" id="count">確認済 0 / 0</span>
 </div>
 
-<table id="fc-table">
+<table id="rv-table">
 <colgroup>
-<col class="c-id"><col class="c-src"><col class="c-claim"><col class="c-kind"><col class="c-ref"><col class="c-note"><col class="c-final"><col class="c-judge"><col class="c-memo">
+<col class="c-id"><col class="c-type"><col class="c-cat"><col class="c-q"><col class="c-content"><col class="c-link"><col class="c-fix"><col class="c-comment"><col class="c-done">
 </colgroup>
 <thead><tr>
-<th>チェックID</th><th>出典</th><th>主張内容（元の記載・クリックで採用）</th><th>種別</th><th>照合先候補</th><th>備考（事実のみ）</th><th>確認後の内容（正しい値）</th><th>判定</th><th>判定メモ</th>
+<th>ID</th><th>種別</th><th>カテゴリ</th><th>設問</th><th>内容（回答）</th><th>確認</th><th>修正後の内容（直す場合のみ）</th><th>レビューコメント</th><th>確認済み</th>
 </tr></thead>
 <tbody>
 <!--ROWS-->
@@ -77,17 +84,16 @@
 <script>
 (function(){
   // === GASウェブアプリURL（デプロイ後にここを差し替える）===
-  // glossary と同じ仕組み。docs/help_faq_棚卸し/gas/Code.gs を新規スプシにデプロイし、
-  // 発行された /exec URL をこの値に貼る。未設定の間はこのブラウザ内(localStorage)保存のみ。
+  // docs/help_faq_棚卸し/gas/Code.gs を新規スプシにデプロイし、/exec URL をここに貼る。
+  // 未設定の間はこのブラウザ内(localStorage)保存のみ。
   var GAS_WEB_APP_URL = '__GAS_URL__';
   if (GAS_WEB_APP_URL.indexOf('script.google.com') < 0) GAS_WEB_APP_URL = '';
 
-  var STORAGE_PREFIX = 'factcheck-decision:';
-  var EDITOR_NAME_KEY = 'factcheck:editor';
+  var STORAGE_PREFIX = 'hfreview:';
+  var EDITOR_NAME_KEY = 'hfreview:editor';
   var POLL_MS = 15000; // 15秒ごとに最新取得
 
   function setStat(t){ var el=document.getElementById('sync-status'); if(el) el.textContent=t; }
-  function toast(t){ var el=document.getElementById('toast'); el.textContent=t; el.classList.add('show'); clearTimeout(el._t); el._t=setTimeout(function(){el.classList.remove('show');},2000); }
   function getEditor(){
     var n=document.getElementById('who').value.trim();
     if(n){ localStorage.setItem(EDITOR_NAME_KEY,n); return n; }
@@ -96,17 +102,18 @@
 
   // ---- localStorage ----
   function loadRow(id){ var raw=localStorage.getItem(STORAGE_PREFIX+id); if(!raw) return null; try{return JSON.parse(raw);}catch(e){return null;} }
-  function saveLocal(id,adopt,memo,judge){
-    var next={adopt:adopt||'',memo:memo||'',judge:judge||''};
-    if(!next.adopt&&!next.memo&&!next.judge) localStorage.removeItem(STORAGE_PREFIX+id);
+  function saveLocal(id,fix,memo,done){
+    var next={fix:fix||'',memo:memo||'',done:done?'1':''};
+    if(!next.fix&&!next.memo&&!next.done) localStorage.removeItem(STORAGE_PREFIX+id);
     else localStorage.setItem(STORAGE_PREFIX+id,JSON.stringify(next));
   }
 
   // ---- 保存(POST no-cors, デバウンス) ----
+  // バックエンドのスキーマに合わせる: adopt=修正後 / memo=コメント / status=確認済み
   var pushQueue={}, pushTimer=null;
-  function queuePush(id,adopt,memo,judge){
+  function queuePush(id,fix,memo,done){
     if(!GAS_WEB_APP_URL){ setStat('ローカル保存のみ（GAS未設定）'); return; }
-    pushQueue[id]={adopt:adopt||'',memo:memo||'',judge:judge||''};
+    pushQueue[id]={fix:fix||'',memo:memo||'',done:done};
     if(pushTimer) clearTimeout(pushTimer);
     pushTimer=setTimeout(flushPush,600);
   }
@@ -114,7 +121,7 @@
     pushTimer=null;
     var ids=Object.keys(pushQueue); if(!ids.length) return;
     var editor=getEditor();
-    var ops=ids.map(function(id){ var v=pushQueue[id]; return {id:id,adopt:v.adopt,memo:v.memo,judge:v.judge,status:'',editor:editor}; });
+    var ops=ids.map(function(id){ var v=pushQueue[id]; return {id:id,adopt:v.fix,memo:v.memo,judge:'',status:v.done?'確認済み':'',editor:editor}; });
     pushQueue={};
     setStat('保存中… '+ops.length+'件');
     fetch(GAS_WEB_APP_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({ops:ops})})
@@ -127,7 +134,7 @@
   function fetchServer(){
     if(!GAS_WEB_APP_URL){ setStat('ローカル保存のみ（GAS未設定）'); return; }
     setStat('取得中…');
-    var cb='__fc_jsonp_'+(++jsonpN)+'_'+Date.now();
+    var cb='__hf_jsonp_'+(++jsonpN)+'_'+Date.now();
     var s=document.createElement('script'), timer=null;
     function cleanup(){ try{delete window[cb];}catch(e){window[cb]=undefined;} if(s.parentNode) s.parentNode.removeChild(s); if(timer) clearTimeout(timer); }
     window[cb]=function(j){
@@ -136,12 +143,12 @@
       var data=j.data||{}, applied=0;
       Object.keys(data).forEach(function(id){
         var tr=document.querySelector('tr[data-row-id="'+cssEsc(id)+'"]'); if(!tr) return;
-        var fi=tr.querySelector('.final-input'), js=tr.querySelector('.judge-select'), mi=tr.querySelector('.memo-input');
+        var fi=tr.querySelector('.fix-input'), mi=tr.querySelector('.comment-input'), db=tr.querySelector('.done-box');
         var d=data[id];
         if(fi) fi.value=d.adopt||'';
-        if(js) setJudge(js,d.judge||'');
         if(mi) mi.value=d.memo||'';
-        saveLocal(id,d.adopt||'',d.memo||'',d.judge||'');
+        if(db) db.checked=(d.status==='確認済み');
+        saveLocal(id,d.adopt||'',d.memo||'',db&&db.checked);
         highlight(tr); applied++;
       });
       updateCount();
@@ -156,107 +163,96 @@
 
   // ---- 行の処理 ----
   function readRow(tr){
-    var fi=tr.querySelector('.final-input'), js=tr.querySelector('.judge-select'), mi=tr.querySelector('.memo-input');
-    return { adopt: fi?fi.value:'', judge: js?js.value:'', memo: mi?mi.value:'' };
+    var fi=tr.querySelector('.fix-input'), mi=tr.querySelector('.comment-input'), db=tr.querySelector('.done-box');
+    return { fix: fi?fi.value:'', memo: mi?mi.value:'', done: db?db.checked:false };
   }
   function saveAndQueue(id,tr){
     var v=readRow(tr);
-    saveLocal(id,v.adopt,v.memo,v.judge);
-    queuePush(id,v.adopt,v.memo,v.judge);
+    saveLocal(id,v.fix,v.memo,v.done);
+    queuePush(id,v.fix,v.memo,v.done);
   }
-  function setJudge(sel,v){ sel.value=v||''; sel.setAttribute('data-v',v||''); }
   function highlight(tr){
-    var fi=tr.querySelector('.final-input');
-    if(fi) fi.classList.toggle('has-value',!!fi.value.trim());
-    var chip=tr.querySelector('.claim-chip'), js=tr.querySelector('.judge-select');
-    if(chip&&fi) chip.classList.toggle('is-selected', fi.value.trim()!=='' && fi.value.trim()===chip.dataset.value);
-    if(js) js.setAttribute('data-v',js.value||'');
+    var fi=tr.querySelector('.fix-input'); if(fi) fi.classList.toggle('has-value',!!fi.value.trim());
+    var db=tr.querySelector('.done-box'); tr.classList.toggle('is-done', !!(db&&db.checked));
   }
   function updateCount(){
     var total=document.querySelectorAll('tr[data-row-id]').length, n=0;
-    document.querySelectorAll('.judge-select').forEach(function(s){ if(s.value) n++; });
-    var el=document.getElementById('count'); if(el) el.textContent='判定済 '+n+' / '+total;
+    document.querySelectorAll('.done-box').forEach(function(b){ if(b.checked) n++; });
+    var el=document.getElementById('count'); if(el) el.textContent='確認済 '+n+' / '+total;
   }
 
   function processRow(tr){
     var id=tr.getAttribute('data-row-id'); if(!id) return;
-    // 主張内容をチップ化（クリックで確認後内容へコピー＋判定○）
-    var claimCell=tr.querySelector('td.claim');
-    var claimText=claimCell?claimCell.textContent.trim():'';
-    if(claimCell){
-      claimCell.innerHTML='';
-      var chip=document.createElement('button');
-      chip.type='button'; chip.className='claim-chip'; chip.dataset.value=claimText; chip.textContent=claimText;
-      chip.title='クリックで「確認後の内容」へコピー＋判定○';
-      claimCell.appendChild(chip);
-    }
-    // 確認後の内容
-    var finalCell=tr.querySelector('td.final'); var fi=null;
-    if(finalCell){
-      fi=document.createElement('textarea'); fi.className='final-input'; fi.placeholder='正しければ左の主張をクリック／違えば正しい内容を入力';
+    var contentCell=tr.querySelector('td.content');
+    var contentText=contentCell?contentCell.textContent:'';
+
+    // 修正後の内容（原文コピーボタン＋textarea）
+    var fixCell=tr.querySelector('td.fix');
+    if(fixCell){
+      var btn=document.createElement('button');
+      btn.type='button'; btn.className='copy-btn'; btn.textContent='原文コピー';
+      btn.title='内容（回答）をコピーして、ここで修正できます';
+      var fi=document.createElement('textarea'); fi.className='fix-input'; fi.placeholder='直す場合のみ。正しければ空欄でOK';
       fi.addEventListener('input',function(){ saveAndQueue(id,tr); highlight(tr); });
-      finalCell.appendChild(fi);
+      btn.addEventListener('click',function(){ fi.value=contentText; fi.dispatchEvent(new Event('input',{bubbles:true})); fi.focus(); });
+      fixCell.appendChild(btn); fixCell.appendChild(fi);
     }
-    // 判定
-    var judgeCell=tr.querySelector('td.judge'); var js=null;
-    if(judgeCell){
-      js=document.createElement('select'); js.className='judge-select';
-      ['','○','△','×','要確認'].forEach(function(v){
-        var o=document.createElement('option'); o.value=v; o.textContent=v===''?'—':({'○':'○ 正しい','△':'△ 一部','×':'× 誤り','要確認':'要確認'})[v]; js.appendChild(o);
-      });
-      js.addEventListener('change',function(){ setJudge(js,js.value); saveAndQueue(id,tr); highlight(tr); updateCount(); });
-      judgeCell.appendChild(js);
-    }
-    // 判定メモ
-    var memoCell=tr.querySelector('td.memo');
-    if(memoCell){
-      var mi=document.createElement('textarea'); mi.className='memo-input'; mi.placeholder='根拠・補足';
+    // レビューコメント
+    var commentCell=tr.querySelector('td.comment');
+    if(commentCell){
+      var mi=document.createElement('textarea'); mi.className='comment-input'; mi.placeholder='誤り・要確認・気づき';
       mi.addEventListener('input',function(){ saveAndQueue(id,tr); });
-      memoCell.appendChild(mi);
+      commentCell.appendChild(mi);
     }
-    // チップのクリック挙動
-    var chip2=tr.querySelector('.claim-chip');
-    if(chip2&&fi){
-      chip2.addEventListener('click',function(){
-        fi.value=chip2.dataset.value;
-        if(js) setJudge(js,'○');
-        saveAndQueue(id,tr); highlight(tr); updateCount();
-      });
+    // 確認済みチェック
+    var doneCell=tr.querySelector('td.done');
+    if(doneCell){
+      var db=document.createElement('input'); db.type='checkbox'; db.className='done-box';
+      var lbl=document.createElement('label'); lbl.className='done-label'; lbl.textContent='確認OK';
+      db.addEventListener('change',function(){ saveAndQueue(id,tr); highlight(tr); updateCount(); });
+      doneCell.appendChild(db); doneCell.appendChild(lbl);
     }
     // ローカル復元
     var saved=loadRow(id);
     if(saved){
-      if(fi) fi.value=saved.adopt||'';
-      if(js) setJudge(js,saved.judge||'');
-      var mi2=tr.querySelector('.memo-input'); if(mi2) mi2.value=saved.memo||'';
+      var fi2=tr.querySelector('.fix-input'); if(fi2) fi2.value=saved.fix||'';
+      var mi2=tr.querySelector('.comment-input'); if(mi2) mi2.value=saved.memo||'';
+      var db2=tr.querySelector('.done-box'); if(db2) db2.checked=!!saved.done;
     }
     highlight(tr);
+  }
+
+  // ---- 絞り込み ----
+  function applyFilter(){
+    var v=document.getElementById('filter-type').value;
+    document.querySelectorAll('tr[data-row-id]').forEach(function(tr){
+      var t=tr.querySelector('td.type'); var tv=t?t.textContent.trim():'';
+      tr.style.display=(v===''||tv===v)?'':'none';
+    });
   }
 
   // ---- CSV出力 ----
   function csvEsc(s){ return '"'+String(s==null?'':s).replace(/"/g,'""')+'"'; }
   function exportCsv(){
-    var header=['チェックID','出典','主張内容(原文)','種別','照合先候補','備考','確認後の内容','判定','判定メモ','記入者'];
+    var header=['ID','種別','カテゴリ','設問','内容(回答)','修正後の内容','レビューコメント','確認済み','記入者'];
     var lines=[header.map(csvEsc).join(',')], editor=getEditor();
     document.querySelectorAll('tr[data-row-id]').forEach(function(tr){
       var t=tr.querySelectorAll('td');
-      var chip=tr.querySelector('.claim-chip');
       lines.push([
         tr.getAttribute('data-row-id'),
         t[1]?t[1].textContent.trim():'',
-        chip?chip.dataset.value:'',
+        t[2]?t[2].textContent.trim():'',
         t[3]?t[3].textContent.trim():'',
         t[4]?t[4].textContent.trim():'',
-        t[5]?t[5].textContent.trim():'',
-        (tr.querySelector('.final-input')||{}).value||'',
-        (tr.querySelector('.judge-select')||{}).value||'',
-        (tr.querySelector('.memo-input')||{}).value||'',
+        (tr.querySelector('.fix-input')||{}).value||'',
+        (tr.querySelector('.comment-input')||{}).value||'',
+        (tr.querySelector('.done-box')&&tr.querySelector('.done-box').checked)?'確認済み':'',
         editor
       ].map(csvEsc).join(','));
     });
     var csv='﻿'+lines.join('\r\n');
     var a=document.createElement('a'), url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
-    a.href=url; a.download='factcheck_review_'+new Date().toISOString().slice(0,16).replace(/[-:T]/g,'')+'.csv';
+    a.href=url; a.download='hf_review_'+new Date().toISOString().slice(0,16).replace(/[-:T]/g,'')+'.csv';
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     setTimeout(function(){URL.revokeObjectURL(url);},1000);
   }
@@ -265,10 +261,11 @@
 
   // ---- 初期化 ----
   document.getElementById('who').value=localStorage.getItem(EDITOR_NAME_KEY)||'';
-  document.querySelectorAll('#fc-table tbody tr').forEach(processRow);
+  document.querySelectorAll('#rv-table tbody tr').forEach(processRow);
   updateCount();
   document.getElementById('btn-fetch').addEventListener('click',fetchServer);
   document.getElementById('btn-csv').addEventListener('click',exportCsv);
+  document.getElementById('filter-type').addEventListener('change',applyFilter);
 
   function setToolbarH(){ var tb=document.querySelector('.toolbar'); if(tb) document.documentElement.style.setProperty('--toolbar-h',tb.offsetHeight+'px'); }
   setToolbarH(); window.addEventListener('resize',setToolbarH);
@@ -280,7 +277,7 @@
     if(!GAS_WEB_APP_URL) return;
     if(pushTimer||Object.keys(pushQueue).length>0) return;
     var ae=document.activeElement;
-    if(ae&&(ae.classList.contains('final-input')||ae.classList.contains('memo-input')||ae.classList.contains('judge-select'))) return;
+    if(ae&&(ae.classList.contains('fix-input')||ae.classList.contains('comment-input'))) return;
     if(document.hidden) return;
     fetchServer();
   }, POLL_MS);
