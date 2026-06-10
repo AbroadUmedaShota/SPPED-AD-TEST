@@ -250,67 +250,8 @@ function doPost(e) {
   return ContentService.createTextOutput('ok').setMimeType(ContentService.MimeType.TEXT);
 }
 
-// ============ レビュー記入フォーム（HTMLサービス）============
-// GAS を「ウェブアプリ」としてデプロイすると、この doGet がフォーム画面を返す。
-// フォームは google.script.run で getReviewItems / saveReviewJudgment を直接呼ぶ
-// （同一オリジンなので CORS もトークンも不要）。
-// 書き込み先は「事実チェック」タブの判断列（同期で温存される列）。
-function doGet(e) {
-  return HtmlService.createHtmlOutputFromFile('Form')
-    .setTitle('棚卸しレビュー記入')
-    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
-}
-
-// 「事実チェック」タブの全項目＋現在の判定値を返す
-function getReviewItems() {
-  var sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SPEC.facts.tab);
-  if (!sh) return { error: '「' + SPEC.facts.tab + '」タブがありません。先にメニュー「棚卸しDB→今すぐ同期」を実行してください。', items: [] };
-  var data = sh.getDataRange().getValues();
-  if (data.length < 2) return { items: [] };
-  var h = data[0];
-  var c = {
-    id: h.indexOf('チェックID'), src: h.indexOf('出典台帳ID'),
-    claim: h.indexOf('主張内容(原文ママ抜粋)'), kind: h.indexOf('主張種別'),
-    ref: h.indexOf('照合先候補'), note: h.indexOf('備考(事実のみ)'),
-    val: h.indexOf('仕様上の値'), match: h.indexOf('一致(○/△/×/要確認)'),
-    memo: h.indexOf('判定メモ'), by: h.indexOf('判定者')
-  };
-  var items = [];
-  for (var r = 1; r < data.length; r++) {
-    var row = data[r];
-    if (!row[c.id]) continue;
-    items.push({
-      id: row[c.id], src: row[c.src], claim: row[c.claim], kind: row[c.kind],
-      ref: row[c.ref], note: row[c.note],
-      val: row[c.val], match: row[c.match], memo: row[c.memo], by: row[c.by]
-    });
-  }
-  return { items: items };
-}
-
-// 1件の判定を「事実チェック」タブへ書き込む（チェックIDで該当行を更新）
-function saveReviewJudgment(p) {
-  var sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SPEC.facts.tab);
-  if (!sh) return { ok: false, error: '「' + SPEC.facts.tab + '」タブがありません' };
-  var data = sh.getDataRange().getValues();
-  var h = data[0];
-  var idC = h.indexOf('チェックID');
-  var valC = h.indexOf('仕様上の値') + 1;
-  var matchC = h.indexOf('一致(○/△/×/要確認)') + 1;
-  var memoC = h.indexOf('判定メモ') + 1;
-  var byC = h.indexOf('判定者') + 1;
-  for (var r = 1; r < data.length; r++) {
-    if (String(data[r][idC]) === String(p.id)) {
-      var n = r + 1;
-      sh.getRange(n, valC).setValue(p.val == null ? '' : p.val);
-      sh.getRange(n, matchC).setValue(p.match == null ? '' : p.match);
-      sh.getRange(n, memoC).setValue(p.memo == null ? '' : p.memo);
-      sh.getRange(n, byC).setValue(p.by == null ? '' : p.by);
-      return { ok: true };
-    }
-  }
-  return { ok: false, error: 'IDが見つかりません: ' + p.id };
-}
+// ※ レビュー記入は独立HTML（事実チェック_記入表.html）＋ gas/Code.gs（decisions
+//    バックエンド）で行う。この Code.gs は「JSON→タブ」の同期専用。
 
 // ============ トリガー管理 ============
 function enableDailyTrigger() {

@@ -93,12 +93,38 @@ const claims = [
   ['HELP-misc005', '運営会社は株式会社 Abroad Outsourcing', '会社情報', 'フッター/特定商取引法に基づく表示', '', '', '正式社名・表記の整合要確認', ''],
   ['FAQ-plan001 / plansページ', 'お礼メール：100通まで無料・101通目以降1円/通（plansページ記載）', '料金', 'plansページ/料金仕様書', '', '', 'help/faqのお礼メール記事には100通無料/1円の料金条件の記載が無い（情報の非対称）', ''],
 ];
+// 安定ID（CSV / 記入表HTML / decisionsバックエンドGAS で共通。並び替えに強い）
+const STABLE = [
+  'gen001-svc', 'gen002-responsive', 'acc006-cancel', 'acc007-privacy', 'plan001-free-limits',
+  'plan002-domain', 'plan003-speed', 'bil004-payment', 'bil005-invoice', 'func002-csv',
+  'func003-branch', 'func005-autosave', 'func008-export', 'gs004-browser', 'acc003-2fa',
+  'acc004-password', 'acc005-group', 'ts004-domain', 'ts005-dltimeout', 'plan004-upgrade',
+  'plan005-noprorate', 'bil001-payment-help', 'bil005h-refund', 'misc004-enterprise',
+  'misc005-company', 'mail-pricing'
+];
 claims.forEach((c, i) => {
-  const id = 'FC-' + String(i + 1).padStart(3, '0');
   // c = [出典, 主張, 種別, 照合先, '', '', 備考, '']
-  fc.push([id, c[0], c[1], c[2], c[3], c[6], '', '', '', '']);
+  fc.push([STABLE[i], c[0], c[1], c[2], c[3], c[6], '', '', '', '']);
 });
 writeCsv('02_事実チェック.csv', fc);
+
+// 事実チェック記入表（standalone HTML・glossaryと同方式）をテンプレートから生成
+const htmlEsc = s => String(s == null ? '' : s)
+  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const tpl = fs.readFileSync(path.join(OUT, '_form_template.html'), 'utf8');
+const rowsHtml = claims.map((c, i) => {
+  const id = STABLE[i];
+  return '<tr data-row-id="' + htmlEsc(id) + '">' +
+    '<td class="id">' + htmlEsc(id) + '</td>' +
+    '<td class="src">' + htmlEsc(c[0]) + '</td>' +
+    '<td class="claim">' + htmlEsc(c[1]) + '</td>' +
+    '<td class="kind">' + htmlEsc(c[2]) + '</td>' +
+    '<td class="ref">' + htmlEsc(c[3]) + '</td>' +
+    '<td class="note">' + htmlEsc(c[6]) + '</td>' +
+    '<td class="final"></td><td class="judge"></td><td class="memo"></td></tr>';
+}).join('\n');
+fs.writeFileSync(path.join(OUT, '事実チェック_記入表.html'), tpl.replace('<!--ROWS-->', rowsHtml), 'utf8');
+console.log('wrote 事実チェック_記入表.html', claims.length, 'rows');
 
 // =========================================================
 // Tab C: 用語揺れ — バリエーションは原文ママ。出現数は実測。推奨表記は空欄。
