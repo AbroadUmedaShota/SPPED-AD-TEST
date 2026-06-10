@@ -127,10 +127,12 @@ const card = (id, type, cat, q, ans, link) =>
     '<div class="q">' + htmlEsc(q) + '</div>' +
     '<div class="content">' + htmlEsc(ans) + '</div>' +
     '<div class="edit">' +
-      '<div class="col"><div class="lbl">修正後の内容（直す場合のみ）</div>' +
-        '<button type="button" class="copy-btn">原文コピー</button>' +
+      '<div class="col">' +
+        '<div class="lbl-row"><span class="lbl">修正後の内容（直す場合のみ）</span>' +
+          '<button type="button" class="copy-btn">原文コピー</button></div>' +
         '<textarea class="fix-input" placeholder="正しければ空欄でOK"></textarea></div>' +
-      '<div class="col"><div class="lbl">レビューコメント</div>' +
+      '<div class="col">' +
+        '<div class="lbl-row"><span class="lbl">レビューコメント</span></div>' +
         '<textarea class="comment-input" placeholder="誤り・要確認・気づき"></textarea></div>' +
     '</div>' +
   '</div>';
