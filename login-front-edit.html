@@ -33,10 +33,10 @@
     body.login-front-edit--watermark .capabilities-section::before {
       content: '';
       position: absolute;
-      aspect-ratio: 1897 / 1616;
+      aspect-ratio: 1 / 1;
       pointer-events: none;
-      background: url("02_dashboard/assets/svg/speedad_emblem_color.svg") center / contain no-repeat;
-      filter: blur(7px) saturate(1.2);
+      background: url("img/speedad-watermark-logo.png") center / contain no-repeat;
+      filter: saturate(1.04);
     }
 
     body.login-front-edit--watermark .lp-page--duo::before {
@@ -44,8 +44,8 @@
       left: 50%;
       z-index: 2;
       width: min(70vw, 900px);
-      opacity: 0.075;
-      filter: blur(8px) saturate(1.08);
+      opacity: 0.2;
+      filter: saturate(1.04);
       transform: translate(-50%, -50%) rotate(-8deg);
     }
 
@@ -63,7 +63,7 @@
       left: 50%;
       z-index: 0;
       width: min(72vw, 920px);
-      opacity: 0.15;
+      opacity: 0.2;
       transform: translate(-50%, -50%) rotate(-8deg);
     }
 
@@ -82,16 +82,16 @@
         top: 50%;
         left: 50%;
         width: 620px;
-        opacity: 0.065;
-        filter: blur(9px) saturate(1.06);
+        opacity: 0.2;
+        filter: saturate(1.04);
       }
 
       body.login-front-edit--watermark .capabilities-section::before {
         top: 50%;
         left: 50%;
         width: 560px;
-        opacity: 0.13;
-        filter: blur(10px) saturate(1.12);
+        opacity: 0.2;
+        filter: saturate(1.04);
       }
     }
   </style>
