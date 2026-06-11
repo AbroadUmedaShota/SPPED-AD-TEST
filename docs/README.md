@@ -15,6 +15,13 @@
 - shared repo には本文を置かず、社内専用の private 保管先へ移管しています。
 - 事業方針、価格、契約、体制、会議判断、未公開検討事項は shared repo に含めません。
 
+### shared 側の設計導線
+- 画面仕様の正本: `docs/画面設計/仕様/README.md`
+- 共有コーディング規約: `docs/リファレンス/共有規約/01_SHARED_CODING_STANDARDS.md`
+- AI/実装責任分界: `docs/リファレンス/共有規約/04_AI_RESPONSIBILITY_BOUNDARY.md`
+- 実装の正本CSS: `02_dashboard/service-top-style.css`
+- 管理画面拡張CSS: `03_admin/src/admin-style.css`
+
 ### 画面設計ドキュメント (`docs/画面設計/`)
 - `仕様/`: 画面仕様・機能要件一式。`admin/` 配下に管理者画面資料の新ルール、`premium/` 配下にプレミアム契約関連要件。
 - `画面/`: 画面単位のUI設計メモ。
@@ -69,8 +76,10 @@
 - アーカイブ移動時は `docs/アーカイブ/README.md` に移動元と移動日を記録する。
 - shared/private の境界判断は `docs/リファレンス/共有規約/02_SHARED_DOC_BOUNDARY_RULES.md` を正本とする。
 - AI向けの責任分界ルールは `docs/リファレンス/共有規約/04_AI_RESPONSIBILITY_BOUNDARY.md` を参照する。
+- 画面仕様、共有規約、正本CSSの配置を変える場合は、README 導線（`docs/README.md` と関連 stub）も同時に更新する。
 
 ## 運用メモ
+- 実装の正本CSSは `02_dashboard/service-top-style.css`。管理画面向けの拡張CSSは `03_admin/src/admin-style.css` とし、UI仕様の参照時に混同しないこと。
 - 共通ヘッダーやサイドバーなどの HTML は `02_dashboard/common/` から `loadCommonHtml(...)` で読み込む。`window.__COMMON_BASE_PATH` を確認すること。
 - ダッシュボード用 JSON はリポジトリ直下の `data/` 配下に統一。新規データは `resolveDashboardDataPath` を経由して参照すること。
 - 実装が参照するデモ JSON は `data/demo/` を正本とし、`docs/サンプル/` には説明用の README や軽量な補助資料のみを残す。
