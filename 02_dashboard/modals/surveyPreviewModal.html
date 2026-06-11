@@ -1,35 +1,52 @@
 <div id="surveyPreviewModal" class="modal-overlay" data-state="closed">
-    <div class="modal-content-transition modal-content w-full max-w-3xl p-6 rounded-xl bg-surface shadow-lg relative">
-        <div class="flex justify-between items-center mb-4">
-            <h2 id="modalTitle" class="text-on-surface text-2xl font-bold" tabindex="-1">アンケートプレビュー</h2>
-
-            <!-- Preview Mode Switcher -->
-            <div id="preview-mode-switcher" class="absolute top-6 left-1/2 -translate-x-1/2 flex items-center border border-outline-variant rounded-full p-1 bg-surface-variant">
-                <button id="preview-mode-phone" title="スマートフォン表示" class="px-4 py-2 rounded-full flex items-center justify-center">
-                    <span class="material-icons text-base">smartphone</span>
-                </button>
-                <button id="preview-mode-tablet" title="タブレット表示" class="px-4 py-2 rounded-full flex items-center justify-center">
-                    <span class="material-icons text-base">tablet_mac</span>
-                </button>
-            </div>
-
-            <button data-modal-close="surveyPreviewModal">
-                <span class="material-icons text-3xl">close</span>
-            </button>
+  <div class="modal-content-transition modal-content w-full max-w-4xl rounded-xl bg-surface shadow-lg relative flex flex-col" style="height: 90vh; max-height: 90vh;">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant flex-shrink-0">
+      <h2 class="text-on-surface text-lg font-bold" tabindex="-1">アンケートプレビュー</h2>
+      <div class="flex items-center gap-2">
+        <div class="flex items-center border border-outline-variant rounded-full p-0.5 bg-surface-variant" id="preview-device-switcher">
+          <button id="preview-phone-btn" type="button" title="スマートフォン"
+            class="px-3 py-1.5 rounded-full flex items-center gap-1 text-xs font-bold transition-colors bg-surface text-on-surface shadow-sm">
+            <span class="material-icons text-[16px]">smartphone</span>
+          </button>
+          <button id="preview-tablet-btn" type="button" title="タブレット"
+            class="px-3 py-1.5 rounded-full flex items-center gap-1 text-xs font-bold transition-colors text-on-surface-variant hover:bg-surface">
+            <span class="material-icons text-[16px]">tablet_mac</span>
+          </button>
         </div>
-        <div class="modal-body flex justify-center">
-            <div class="survey-preview-viewport">
-                <div class="survey-preview-device">
-                    <div id="modalSurveyPreviewContainer" class="survey-preview-content">
-                        <p class="survey-preview-placeholder text-on-surface-variant">プレビューコンテンツがここに表示されます。</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="modal-footer flex justify-end gap-4 mt-6">
-            <button class="min-w-[100px] px-6 py-3 rounded-full bg-secondary-container text-on-secondary-container font-semibold transition-colors" data-modal-close="surveyPreviewModal">
-                閉じる
-            </button>
-        </div>
+        <button type="button" data-modal-close="surveyPreviewModal" class="text-on-surface-variant hover:text-on-surface transition-colors ml-2">
+          <span class="material-icons text-2xl">close</span>
+        </button>
+      </div>
     </div>
+
+    <div class="flex items-center justify-center gap-2 bg-amber-400 text-white text-xs font-bold px-4 py-1.5 flex-shrink-0">
+      <span class="material-icons text-[14px]">info</span>
+      プレビューモード - 回答データは送信されません
+    </div>
+
+    <div class="flex-1 overflow-auto flex items-center justify-center bg-gray-100 p-6 min-h-0">
+      <div id="preview-device-frame"
+        class="bg-white rounded-2xl shadow-xl overflow-hidden transition-all duration-300 flex flex-col flex-shrink-0"
+        style="width: 390px; height: 844px;">
+        <div class="bg-gray-800 flex-shrink-0 flex items-center justify-center py-1.5 gap-2">
+          <div class="w-16 h-1.5 bg-gray-600 rounded-full"></div>
+          <div class="w-2 h-2 bg-gray-600 rounded-full"></div>
+        </div>
+        <iframe
+          id="surveyPreviewIframe"
+          src="about:blank"
+          class="flex-1 border-none w-full"
+          style="min-height: 0;"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups">
+        </iframe>
+      </div>
+    </div>
+
+    <div class="flex justify-end px-6 py-3 border-t border-outline-variant flex-shrink-0">
+      <button type="button" data-modal-close="surveyPreviewModal"
+        class="px-6 py-2.5 rounded-full bg-secondary-container text-on-secondary-container text-sm font-bold transition-colors hover:opacity-90">
+        閉じる
+      </button>
+    </div>
+  </div>
 </div>
