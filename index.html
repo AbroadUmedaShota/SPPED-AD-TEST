@@ -13,8 +13,90 @@
   <link rel="stylesheet" href="css/login-front.css?v=20260602-reasons-matrix-a">
   <!-- emblem-tools（開発者向け・?emblemtools=1 で起動）。この行＋下部の script を消せば撤去完了 -->
   <link rel="stylesheet" href="css/emblem-tools.css">
+  <style>
+    body.login-front-edit--watermark {
+      position: relative;
+    }
+
+    body.login-front-edit--watermark .lp-page--duo,
+    body.login-front-edit--watermark .capabilities-section {
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    body.login-front-edit--watermark .lp-page--duo {
+      background: #ffffff;
+    }
+
+    body.login-front-edit--watermark .lp-page--duo::before,
+    body.login-front-edit--watermark .capabilities-section::before {
+      content: '';
+      position: absolute;
+      aspect-ratio: 2000 / 2000;
+      pointer-events: none;
+      background: url("img/speedad-watermark-logo.svg") center / contain no-repeat;
+      filter: saturate(1.04);
+    }
+
+    body.login-front-edit--watermark .lp-page--duo::before {
+      top: 50%;
+      left: 50%;
+      z-index: 2;
+      width: min(70vw, 900px);
+      opacity: 0.2;
+      filter: saturate(1.04);
+      transform: translate(-50%, -50%);
+    }
+
+    body.login-front-edit--watermark .flow-section {
+      background: linear-gradient(180deg, #fbfaf7 0%, #ffffff 10%, #ffffff 100%);
+      border-top-color: transparent;
+    }
+
+    body.login-front-edit--watermark .features-section {
+      background: linear-gradient(180deg, #fcfaf5 0%, #f7f2ea 100%);
+    }
+
+    body.login-front-edit--watermark .capabilities-section::before {
+      top: 50%;
+      left: 50%;
+      z-index: 0;
+      width: min(72vw, 920px);
+      opacity: 0.2;
+      transform: translate(-50%, -50%);
+    }
+
+    body.login-front-edit--watermark .lp-page--duo > *,
+    body.login-front-edit--watermark .capabilities-section > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    body.login-front-edit--watermark .modal {
+      z-index: 200;
+    }
+
+    @media (max-width: 768px) {
+      body.login-front-edit--watermark .lp-page--duo::before {
+        top: 50%;
+        left: 50%;
+        width: 620px;
+        opacity: 0.2;
+        filter: saturate(1.04);
+      }
+
+      body.login-front-edit--watermark .capabilities-section::before {
+        top: 50%;
+        left: 50%;
+        width: 560px;
+        opacity: 0.2;
+        filter: saturate(1.04);
+      }
+    }
+  </style>
 </head>
-<body id="before-login" data-login-panel-theme="e2">
+<body id="before-login" class="login-front-edit--watermark" data-login-panel-theme="e2">
   <a class="skip-link" href="#top">本文へスキップ</a>
   <main id="top">
     <div class="lp-page lp-page--first">
