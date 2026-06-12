@@ -42,7 +42,8 @@ function normalizeSupportHref(url) {
     }
     if (cleaned === 'help.html') return `${BASE}/help/`;
     if (cleaned === 'faq.html') return `${BASE}/faq/`;
-    if (cleaned === 'bug-report.html') return `${BASE}/bug-report/`;
+    if (cleaned === 'contact.html') return `${BASE}/contact/`;
+    if (cleaned === 'bug-report.html') return `${BASE}/contact/`;
     return cleaned;
 }
 

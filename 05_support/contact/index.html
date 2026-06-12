@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>SPEED AD - お問い合わせ</title>
+  <link rel="icon" href="../assets/img/speedad_logo.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/service-top-style.css">
+  <link rel="stylesheet" href="../assets/css/help-center.css?v=20260519-hero-label">
+  <link rel="stylesheet" href="../assets/css/support-shell.css?v=20260521-main-domain-link">
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+  <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+  <style>
+    /* お問い合わせ（案07: ミニマル・中央寄せ） */
+    .contact {
+      --c-navy: #16324c;
+      --c-navy-hover: #1d4368;
+      --c-blue: #2c5d97;
+      --c-label: #41566c;
+      --c-muted: #6b7c8f;
+      --c-muted-2: #8595a6;
+      --c-field-border: #d4dce6;
+      --c-required: #c0492f;
+      --c-dash: #c6d2df;
+      background: #f4f7fb;
+      padding: 56px 40px 64px;
+    }
+    .contact__inner { max-width: 520px; margin: 0 auto; }
+    .contact__eyebrow {
+      margin: 0 0 10px; color: var(--c-blue);
+      font-size: 12px; font-weight: 800; letter-spacing: .14em; text-align: center;
+    }
+    .contact__title {
+      margin: 0 0 8px; color: var(--c-navy);
+      font-size: 30px; font-weight: 800; text-align: center;
+    }
+    .contact__lead {
+      margin: 0 0 34px; color: var(--c-muted);
+      font-size: 13.5px; text-align: center; line-height: 1.8;
+    }
+
+    .contact-form { display: flex; flex-direction: column; gap: 18px; }
+    .contact-form[hidden] { display: none; }
+    .contact-field { display: flex; flex-direction: column; }
+    .contact-field__label {
+      font-size: 12.5px; font-weight: 700; color: var(--c-label); margin-bottom: 7px;
+    }
+    .contact-field__label .req { color: var(--c-required); margin-left: 2px; }
+    .contact-control {
+      width: 100%; border: 1px solid var(--c-field-border); border-radius: 9px;
+      padding: 13px 14px; font-size: 14px; color: var(--c-navy); background: #fff;
+      outline: none; font-family: inherit;
+    }
+    .contact-control:focus { border-color: var(--c-blue); }
+    .contact-control::placeholder { color: #9aa8b8; }
+    textarea.contact-control { min-height: 130px; resize: vertical; line-height: 1.7; }
+    .contact-control.is-invalid { border-color: var(--c-required); }
+    .contact-field__error {
+      margin: 6px 0 0; font-size: 12px; color: var(--c-required);
+    }
+    .contact-field__error[hidden] { display: none; }
+
+    .contact-submit {
+      margin-top: 6px; width: 100%; background: var(--c-navy); color: #fff;
+      font-size: 14.5px; font-weight: 700; padding: 15px; border: 0;
+      border-radius: 10px; cursor: pointer;
+    }
+    .contact-submit:hover { background: var(--c-navy-hover); }
+
+    /* 画像アップローダー */
+    .contact-uploader { font-family: inherit; }
+    .contact-dropzone {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 10px; text-align: center; cursor: pointer;
+      border: 1.5px dashed var(--c-dash); border-radius: 11px; background: #f7fafc;
+      padding: 26px 20px; transition: border-color .15s, background .15s;
+    }
+    .contact-dropzone.is-drag { border-color: var(--c-blue); background: #e7eff9; }
+    .contact-dropzone:focus-visible { outline: 2px solid var(--c-blue); outline-offset: 2px; }
+    .contact-dropzone__icon {
+      display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%;
+      background: #e7eff9; color: var(--c-blue); font-size: 18px; font-weight: 800; line-height: 1;
+    }
+    .contact-dropzone__title { color: var(--c-label); font-size: 13.5px; font-weight: 700; }
+    .contact-dropzone__sub { color: var(--c-muted-2); font-size: 12px; }
+
+    .contact-thumbs {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+      gap: 12px; margin-top: 14px;
+    }
+    .contact-thumb {
+      position: relative; border-radius: 10px; overflow: hidden;
+      border: 1px solid #e2e9f1; background: #fff;
+    }
+    .contact-thumb img { width: 100%; height: 92px; object-fit: cover; display: block; }
+    .contact-thumb__remove {
+      position: absolute; top: 6px; right: 6px; width: 22px; height: 22px; border-radius: 50%;
+      border: none; background: rgba(18,50,76,.78); color: #fff; font-size: 13px; line-height: 1;
+      cursor: pointer; display: grid; place-items: center;
+    }
+    .contact-thumb__name {
+      padding: 6px 8px; font-size: 11px; color: var(--c-muted);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .contact-uploader__count { margin-top: 10px; font-size: 12px; color: var(--c-muted-2); }
+    .contact-uploader__count[hidden] { display: none; }
+
+    /* 送信後の確認パネル */
+    .contact-done {
+      max-width: 520px; margin: 0 auto; text-align: center;
+      background: #fff; border: 1px solid #e2e9f1; border-radius: 12px;
+      padding: 40px 32px;
+    }
+    .contact-done__icon {
+      display: grid; place-items: center; width: 56px; height: 56px; margin: 0 auto 18px;
+      border-radius: 50%; background: #e7eff9; color: var(--c-blue);
+    }
+    .contact-done__icon .material-icons { font-size: 30px; }
+    .contact-done__title { margin: 0 0 10px; color: var(--c-navy); font-size: 20px; font-weight: 800; }
+    .contact-done__text { margin: 0; color: var(--c-muted); font-size: 13.5px; line-height: 1.9; }
+    .contact-done[hidden] { display: none; }
+
+    @media (max-width: 600px) {
+      .contact { padding: 40px 20px 48px; }
+      .contact__title { font-size: 25px; }
+    }
+  </style>
+</head>
+<body data-page-id="contact" data-support-section="contact">
+<div class="support-shell">
+  <div id="support-header-placeholder"></div>
+
+  <main class="support-main">
+    <div class="hc-breadcrumb-top">
+      <nav aria-label="Breadcrumb"><ol><li><a href="../help/">ヘルプセンター</a></li><li><span class="material-icons" aria-hidden="true">chevron_right</span></li><li><span>お問い合わせ</span></li></ol></nav>
+    </div>
+
+    <section class="contact" aria-labelledby="contact-title">
+      <div class="contact__inner">
+        <p class="contact__eyebrow">CONTACT</p>
+        <h1 class="contact__title" id="contact-title">お問い合わせ</h1>
+        <p class="contact__lead">お問い合わせ内容を確認のうえ、2〜3営業日以内に担当者よりご返信いたします。</p>
+
+        <form class="contact-form" id="contactForm" novalidate>
+          <div class="contact-field">
+            <label class="contact-field__label" for="f-name">お名前</label>
+            <input class="contact-control" id="f-name" name="name" type="text" placeholder="山田 太郎" autocomplete="name">
+          </div>
+
+          <div class="contact-field">
+            <label class="contact-field__label" for="f-email">メールアドレス</label>
+            <input class="contact-control" id="f-email" name="email" type="email" placeholder="name@example.com" autocomplete="email" aria-describedby="f-email-error">
+            <p class="contact-field__error" id="f-email-error" hidden>メールアドレスの形式をご確認ください。</p>
+          </div>
+
+          <div class="contact-field">
+            <label class="contact-field__label" for="f-subject">件名</label>
+            <input class="contact-control" id="f-subject" name="subject" type="text" placeholder="お問い合わせの件名">
+          </div>
+
+          <div class="contact-field">
+            <label class="contact-field__label" for="f-message">お問い合わせ内容<span class="req" aria-hidden="true">*</span></label>
+            <textarea class="contact-control" id="f-message" name="message" placeholder="ご質問・ご要望をご記入ください。" aria-describedby="f-message-error" required></textarea>
+            <p class="contact-field__error" id="f-message-error" hidden>お問い合わせ内容をご入力ください。</p>
+          </div>
+
+          <div class="contact-field">
+            <label class="contact-field__label" for="fileInput">添付ファイル（任意）</label>
+            <div class="contact-uploader" id="uploader">
+              <input type="file" id="fileInput" accept="image/*" multiple hidden>
+              <label class="contact-dropzone" id="dropzone" for="fileInput" tabindex="0" role="button">
+                <span class="contact-dropzone__icon" aria-hidden="true">&uarr;</span>
+                <span class="contact-dropzone__title">クリック、またはドラッグ＆ドロップ</span>
+                <span class="contact-dropzone__sub">PNG / JPG（複数添付できます） ・ 10MBまで</span>
+              </label>
+              <div class="contact-thumbs" id="thumbs"></div>
+              <div class="contact-uploader__count" id="count" hidden></div>
+            </div>
+          </div>
+
+          <button class="contact-submit" type="submit">送信する</button>
+        </form>
+
+        <div class="contact-done" id="contactDone" hidden role="status" aria-live="polite">
+          <div class="contact-done__icon"><span class="material-icons" aria-hidden="true">check</span></div>
+          <h2 class="contact-done__title">入力内容を受け付けました</h2>
+          <p class="contact-done__text">
+            現在お問い合わせの送信機能は準備中のため、内容はまだ送信されていません。<br>
+            送信機能の公開までいましばらくお待ちください。
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="support-footer-placeholder"></div>
+</div>
+<script type="module" src="../assets/js/support-shell.js?v=20260519-plans-news"></script>
+<script>
+/* お問い合わせフォーム — 画像添付（クリック / D&D / プレビュー / 削除）＋ 軽量バリデーション。
+   送信先バックエンド（SPDAD2026-103）は未確定のため実送信は行わない。
+   送信処理を有効化する際は handleSubmit 内の TODO 位置に FormData の送信を実装する。 */
+(function () {
+  var form = document.getElementById('contactForm');
+  var input = document.getElementById('fileInput');
+  var dropzone = document.getElementById('dropzone');
+  var thumbs = document.getElementById('thumbs');
+  var count = document.getElementById('count');
+  var done = document.getElementById('contactDone');
+  var emailEl = document.getElementById('f-email');
+  var emailError = document.getElementById('f-email-error');
+  var messageEl = document.getElementById('f-message');
+  var messageError = document.getElementById('f-message-error');
+  var files = []; // { id, name, url, file }
+  var seq = 0;
+
+  function render() {
+    thumbs.innerHTML = '';
+    files.forEach(function (it) {
+      var cell = document.createElement('div');
+      cell.className = 'contact-thumb';
+
+      var img = document.createElement('img');
+      img.src = it.url;
+      img.alt = it.name;
+
+      var rm = document.createElement('button');
+      rm.type = 'button';
+      rm.className = 'contact-thumb__remove';
+      rm.title = '削除';
+      rm.setAttribute('aria-label', it.name + ' を削除');
+      rm.textContent = '×';
+      rm.addEventListener('click', function () {
+        URL.revokeObjectURL(it.url);
+        files = files.filter(function (x) { return x.id !== it.id; });
+        render();
+      });
+
+      var name = document.createElement('div');
+      name.className = 'contact-thumb__name';
+      name.textContent = it.name;
+
+      cell.appendChild(img);
+      cell.appendChild(rm);
+      cell.appendChild(name);
+      thumbs.appendChild(cell);
+    });
+    if (files.length) {
+      count.hidden = false;
+      count.textContent = files.length + ' 件の画像を添付中';
+    } else {
+      count.hidden = true;
+    }
+  }
+
+  function addFiles(list) {
+    Array.prototype.slice.call(list || [])
+      .filter(function (f) { return f.type && f.type.indexOf('image/') === 0; })
+      .forEach(function (f) {
+        files.push({ id: 'f' + (seq++), name: f.name, url: URL.createObjectURL(f), file: f });
+      });
+    render();
+  }
+
+  input.addEventListener('change', function (e) { addFiles(e.target.files); e.target.value = ''; });
+  dropzone.addEventListener('dragover', function (e) { e.preventDefault(); dropzone.classList.add('is-drag'); });
+  dropzone.addEventListener('dragleave', function (e) { e.preventDefault(); dropzone.classList.remove('is-drag'); });
+  dropzone.addEventListener('drop', function (e) {
+    e.preventDefault();
+    dropzone.classList.remove('is-drag');
+    addFiles(e.dataTransfer.files);
+  });
+  // キーボード操作（Enter / Space でファイル選択を開く）
+  dropzone.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); input.click(); }
+  });
+
+  function isValidEmail(value) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+  }
+
+  function validate() {
+    var ok = true;
+
+    if (!messageEl.value.trim()) {
+      messageEl.classList.add('is-invalid');
+      messageError.hidden = false;
+      ok = false;
+    } else {
+      messageEl.classList.remove('is-invalid');
+      messageError.hidden = true;
+    }
+
+    var email = emailEl.value.trim();
+    if (email && !isValidEmail(email)) {
+      emailEl.classList.add('is-invalid');
+      emailError.hidden = false;
+      ok = false;
+    } else {
+      emailEl.classList.remove('is-invalid');
+      emailError.hidden = true;
+    }
+
+    return ok;
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!validate()) {
+      var firstInvalid = form.querySelector('.is-invalid');
+      if (firstInvalid) firstInvalid.focus();
+      return;
+    }
+
+    // TODO(SPDAD2026-103): 送信先（メール / API / Lambda）確定後、ここで FormData を送信する。
+    //   var fd = new FormData(form);
+    //   files.forEach(function (it) { fd.append('attachments[]', it.file); });
+    //   fetch(ENDPOINT, { method: 'POST', body: fd }) ...
+    form.hidden = true;
+    done.hidden = false;
+    done.focus && done.focus();
+  });
+})();
+</script>
+</body>
+</html>
