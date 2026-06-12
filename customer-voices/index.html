@@ -3,15 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="refresh" content="0; url=https://support.speed-ad.com/customer-voices/">
   <link rel="canonical" href="https://support.speed-ad.com/customer-voices/">
   <title>導入事例ページへ移動します | SPEED AD</title>
+  <noscript>
+    <meta http-equiv="refresh" content="0; url=https://support.speed-ad.com/customer-voices/">
+  </noscript>
 </head>
 <body>
   <p>導入事例ページはサポートサイトへ移動しました。</p>
-  <p><a href="https://support.speed-ad.com/customer-voices/">導入事例ページを開く</a></p>
+  <p><a id="redirect-link" href="https://support.speed-ad.com/customer-voices/">導入事例ページを開く</a></p>
   <script>
-    window.location.replace('https://support.speed-ad.com/customer-voices/');
+    (function () {
+      var isLocal = /^(localhost|127\.0\.0\.1|::1|\[::1\])$/i.test(window.location.hostname);
+      var target = isLocal ? '/05_support/customer-voices/' : 'https://support.speed-ad.com/customer-voices/';
+      var link = document.getElementById('redirect-link');
+      if (link) {
+        link.href = target;
+      }
+      window.location.replace(target);
+    }());
   </script>
 </body>
 </html>
