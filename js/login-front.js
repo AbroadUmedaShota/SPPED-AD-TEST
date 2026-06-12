@@ -182,7 +182,7 @@
     const detailUrl = 'https://support.speed-ad.com/customer-voices/';
     const title = 'SPEED ADの活用事例を見る';
     return `
-      <a class="voice-teaser-card" href="${detailUrl}" style="--voice-accent: #2f80ed; --voice-accent-strong: #145cc7;" aria-label="${title}">
+      <a class="voice-teaser-card" href="${detailUrl}" target="_blank" rel="noopener noreferrer" style="--voice-accent: #2f80ed; --voice-accent-strong: #145cc7;" aria-label="${title}">
         <span class="voice-teaser-card__stripe" aria-hidden="true"></span>
         <div class="voice-teaser-card__media voice-teaser-card__media--skeleton" aria-hidden="true"></div>
         <div class="voice-teaser-card__body">
@@ -353,7 +353,7 @@
             : '';
           const styleAttr = `style="--voice-accent: ${escapeHtml(accent)}; --voice-accent-strong: ${escapeHtml(accentStrong)};"`;
           return `
-            <a class="voice-teaser-card" href="${escapeHtml(detailUrl)}" ${styleAttr} aria-label="${escapeHtml(title + ' の事例を読む')}">
+            <a class="voice-teaser-card" href="${escapeHtml(detailUrl)}" target="_blank" rel="noopener noreferrer" ${styleAttr} aria-label="${escapeHtml(title + ' の事例を読む')}">
               <span class="voice-teaser-card__stripe" aria-hidden="true"></span>
               <div class="voice-teaser-card__media" data-image-frame>
                 <img src="${escapeHtml(heroImage)}" alt="${escapeHtml(altText)}" loading="lazy">
