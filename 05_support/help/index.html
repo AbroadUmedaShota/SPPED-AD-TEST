@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="../assets/css/service-top-style.css">
   <link rel="stylesheet" href="../assets/css/help-center.css?v=20260519-hero-label">
   <link rel="stylesheet" href="../assets/css/support-shell.css?v=20260521-main-domain-link">
+  <link rel="stylesheet" href="../assets/css/support-handoff.css?v=20260613-handoff-skin">
   <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
   <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
 </head>
@@ -26,12 +27,14 @@
       </nav>
     </div>
 
+    <header class="support-page-header">
+      <p class="support-page-header__eyebrow">HELP CENTER</p>
+      <h1 class="support-page-header__title">カテゴリから探す</h1>
+      <p class="support-page-header__lead">目的別に記事をまとめました。知りたいテーマからお進みください。</p>
+    </header>
+
     <div class="hc-main">
-      <section class="hc-categories" aria-labelledby="hc-categories-title">
-        <div class="hc-section-heading">
-          <h2 id="hc-categories-title" class="hc-section-heading__title">カテゴリから探す</h2>
-          <p class="hc-section-heading__subtitle">目的別に記事をまとめました</p>
-        </div>
+      <section class="hc-categories" aria-label="カテゴリ一覧">
         <div id="hc-category-grid" class="hc-category-grid"></div>
       </section>
 

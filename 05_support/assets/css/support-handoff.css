@@ -1,0 +1,565 @@
+/* ============================================================
+   Support redesign skin — Help Center / FAQ
+   design_handoff_support_pages のトークンに合わせた再スキン。
+   既存 help-center.css / faq.css を温存したまま、help / faq の
+   2ページ (body[data-support-section="help"|"faq"]) にだけ上書きで
+   適用する。ヘッダー・フッターには触れない。
+   ============================================================ */
+
+body[data-support-section="help"],
+body[data-support-section="faq"] {
+    --ho-text: #16324c;     /* 見出し・濃い文字 */
+    --ho-body: #50637a;     /* 本文 */
+    --ho-sub: #6b7c8f;      /* サブ文字 */
+    --ho-weak: #8595a6;     /* 弱い文字・件数 */
+    --ho-faint: #9aa8b8;    /* さらに薄い (eyebrow) */
+    --ho-accent: #2c5d97;   /* リンク・アイコン */
+    --ho-chev: #aebccd;     /* チェブロン薄 */
+    --ho-chev2: #c3cfdd;    /* hover 罫線 */
+    --ho-border: #e7ecf2;   /* 罫線・枠 */
+    --ho-btn-border: #d4dce6;
+    --ho-tile: #f1f4f8;     /* アイコンタイル面 */
+    --ho-surface: #f7f9fc;  /* 問い合わせ帯・FAQカード背景 */
+    --ho-navy: #16324c;     /* Primary ボタン */
+}
+
+/* 本文エリアを白背景に (handoff は全体 #fff)。ヘッダー/フッターは対象外 */
+body[data-support-section="help"] .support-main,
+body[data-support-section="faq"] .support-main {
+    background: #ffffff;
+}
+
+/* ============================================================
+   ページ見出し (eyebrow + H1 + リード) — 両ページ共通
+   ============================================================ */
+.support-page-header {
+    max-width: 72rem;
+    margin: 0 auto;
+    padding: 4rem 1rem 0;
+    text-align: center;
+}
+
+@media (min-width: 640px) {
+    .support-page-header { padding-left: 2rem; padding-right: 2rem; }
+}
+
+.support-page-header__eyebrow {
+    margin: 0 0 14px;
+    color: #9aa8b8;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .24em;
+}
+
+.support-page-header__title {
+    margin: 0 0 14px;
+    color: #16324c;
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: .01em;
+    line-height: 1.25;
+}
+
+.support-page-header__lead {
+    margin: 0 auto;
+    max-width: 460px;
+    color: #6b7c8f;
+    font-size: 14px;
+    line-height: 1.9;
+}
+
+@media (max-width: 640px) {
+    .support-page-header { padding-top: 2.5rem; }
+    .support-page-header__title { font-size: 26px; }
+}
+
+/* ============================================================
+   セクション見出し (よく読まれている記事 / すべての質問 ほか)
+   ============================================================ */
+body[data-support-section="help"] .hc-section-heading,
+body[data-support-section="faq"] .hc-section-heading {
+    margin-bottom: 28px;
+}
+body[data-support-section="help"] .hc-section-heading__title,
+body[data-support-section="faq"] .hc-section-heading__title {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--ho-text);
+    letter-spacing: 0;
+    margin-bottom: 8px;
+}
+body[data-support-section="help"] .hc-section-heading__subtitle,
+body[data-support-section="faq"] .hc-section-heading__subtitle {
+    font-size: 13px;
+    color: var(--ho-weak);
+}
+
+/* ============================================================
+   セクション間隔 (handoff: カテゴリ 40px / 人気 64px・罫線なし)
+   ============================================================ */
+body[data-support-section="help"] .hc-categories { padding: 40px 0 0; }
+body[data-support-section="help"] .hc-popular { padding: 64px 0 0; }
+body[data-support-section="help"] .hc-categories + .hc-popular { border-top: none; }
+body[data-support-section="help"] .hc-category-grid { gap: 16px; }
+body[data-support-section="help"] .hc-popular-grid { gap: 14px; }
+
+/* ============================================================
+   カテゴリカード (help: .hc-cat-card / faq: .faq-category-card)
+   ============================================================ */
+body[data-support-section="help"] .hc-cat-card,
+body[data-support-section="faq"] .faq-category-card {
+    border: 1px solid var(--ho-border);
+    border-radius: 14px;
+    padding: 24px;
+    background: #ffffff;
+    box-shadow: none;
+}
+body[data-support-section="help"] .hc-cat-card::before,
+body[data-support-section="faq"] .faq-category-card::before {
+    display: none;
+}
+body[data-support-section="help"] .hc-cat-card:hover,
+body[data-support-section="faq"] .faq-category-card:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: var(--ho-chev2);
+}
+body[data-support-section="help"] .hc-cat-card:focus-visible,
+body[data-support-section="faq"] .faq-category-card:focus-visible {
+    outline: 2px solid var(--ho-accent);
+}
+
+/* ヘッダー (アイコンタイル + タイトル/サブ) */
+body[data-support-section="help"] .hc-cat-card__header,
+body[data-support-section="faq"] .faq-category-card__header {
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 18px;
+}
+body[data-support-section="help"] .hc-cat-card__icon,
+body[data-support-section="faq"] .faq-category-card__icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 11px;
+    background: var(--ho-tile);
+    color: var(--ho-accent);
+}
+body[data-support-section="help"] .hc-cat-card__title,
+body[data-support-section="faq"] .faq-category-card__title {
+    font-size: 15.5px;
+    font-weight: 800;
+    color: var(--ho-text);
+    line-height: 1.35;
+}
+body[data-support-section="help"] .hc-cat-card__desc,
+body[data-support-section="faq"] .faq-category-card__desc {
+    font-size: 12px;
+    color: var(--ho-weak);
+    margin-top: 3px;
+}
+
+/* 質問プレビュー (› + テキスト) */
+body[data-support-section="help"] .hc-cat-card__articles,
+body[data-support-section="faq"] .faq-category-card__questions {
+    gap: 11px;
+    margin-bottom: 0;
+}
+body[data-support-section="help"] .hc-cat-card__article,
+body[data-support-section="faq"] .faq-category-card__question {
+    gap: 9px;
+    font-size: 13px;
+    color: var(--ho-body);
+    line-height: 1.5;
+}
+body[data-support-section="help"] .hc-cat-card__article .material-icons,
+body[data-support-section="faq"] .faq-category-card__question .material-icons {
+    color: var(--ho-chev);
+    margin-top: 1px;
+}
+
+/* 下段 CTA (○件の記事 → / すべて見る →) */
+body[data-support-section="help"] .hc-cat-card__more,
+body[data-support-section="faq"] .faq-category-card__more {
+    margin-top: 18px;
+    color: var(--ho-accent);
+    font-size: 12.5px;
+    font-weight: 700;
+}
+body[data-support-section="help"] .hc-cat-card:hover .hc-cat-card__more .material-icons,
+body[data-support-section="faq"] .faq-category-card:hover .faq-category-card__more .material-icons {
+    transform: none;
+}
+
+/* 件数バッジ (faq カテゴリカード) */
+body[data-support-section="faq"] .faq-category-card__count-badge {
+    background: var(--ho-tile);
+    color: var(--ho-accent);
+}
+
+/* よくある質問カード (help 末尾・特別扱い) */
+body[data-support-section="help"] .hc-cat-card--faq {
+    background: var(--ho-surface);
+}
+body[data-support-section="help"] .hc-cat-card--faq .hc-cat-card__icon {
+    background: #ffffff;
+    border: 1px solid var(--ho-border);
+}
+body[data-support-section="help"] .hc-cat-card__lead {
+    margin: 0;
+    flex: 1;
+    color: var(--ho-sub);
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+/* ============================================================
+   人気記事カード (help)
+   ============================================================ */
+body[data-support-section="help"] .hc-pop-card {
+    border: 1px solid var(--ho-border);
+    border-radius: 12px;
+    padding: 20px 22px;
+    box-shadow: none;
+}
+body[data-support-section="help"] .hc-pop-card:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: var(--ho-chev2);
+}
+body[data-support-section="help"] .hc-pop-card__category {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--ho-faint);
+    text-transform: none;
+    letter-spacing: 0;
+    margin-bottom: 6px;
+}
+body[data-support-section="help"] .hc-pop-card__title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ho-text);
+    line-height: 1.55;
+}
+body[data-support-section="help"] .hc-pop-card__chevron {
+    color: var(--ho-chev2);
+}
+
+/* ============================================================
+   問い合わせ帯 (CTA) — 両ページ共通
+   ============================================================ */
+body[data-support-section="help"] .hc-cta,
+body[data-support-section="faq"] .hc-cta {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    text-align: left;
+    gap: 24px;
+    flex-wrap: wrap;
+    background: var(--ho-surface);
+    border: 1px solid var(--ho-border);
+    border-radius: 16px;
+    padding: 32px 36px;
+    box-shadow: none;
+    margin-top: 48px;
+}
+body[data-support-section="help"] .hc-cta__title,
+body[data-support-section="faq"] .hc-cta__title {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--ho-text);
+    margin: 0;
+}
+body[data-support-section="help"] .hc-cta__subtitle,
+body[data-support-section="faq"] .hc-cta__subtitle {
+    font-size: 13.5px;
+    color: var(--ho-sub);
+    margin: 6px 0 0;
+}
+body[data-support-section="help"] .hc-cta__actions,
+body[data-support-section="faq"] .hc-cta__actions {
+    gap: 12px;
+}
+body[data-support-section="help"] .hc-cta__btn,
+body[data-support-section="faq"] .hc-cta__btn {
+    border-radius: 10px;
+    padding: 13px 26px;
+    font-size: 14px;
+    font-weight: 700;
+    box-shadow: none !important;
+}
+/* handoff のボタンはアイコンなし */
+body[data-support-section="help"] .hc-cta__btn .material-icons,
+body[data-support-section="faq"] .hc-cta__btn .material-icons {
+    display: none;
+}
+body[data-support-section="help"] .hc-cta__btn--primary,
+body[data-support-section="faq"] .hc-cta__btn--primary {
+    background: var(--ho-navy);
+    color: #ffffff;
+}
+body[data-support-section="help"] .hc-cta__btn--primary:hover,
+body[data-support-section="faq"] .hc-cta__btn--primary:hover {
+    background: #1d4163;
+    transform: none;
+}
+body[data-support-section="help"] .hc-cta__btn--ghost,
+body[data-support-section="faq"] .hc-cta__btn--ghost {
+    background: #ffffff;
+    color: var(--ho-navy);
+    border: 1px solid var(--ho-btn-border);
+}
+body[data-support-section="help"] .hc-cta__btn--ghost:hover,
+body[data-support-section="faq"] .hc-cta__btn--ghost:hover {
+    background: #ffffff;
+    transform: none;
+}
+
+/* ============================================================
+   FAQ カテゴリ見出し (カテゴリ別Q&Aブロック)
+   ============================================================ */
+body[data-support-section="faq"] .faq-category-heading {
+    border-left-color: var(--ho-accent);
+    color: var(--ho-text);
+    font-weight: 800;
+}
+body[data-support-section="faq"] .faq-category-heading .material-icons {
+    color: var(--ho-accent);
+}
+body[data-support-section="faq"] .faq-category-heading .faq-category-desc {
+    color: var(--ho-sub);
+}
+
+/* ============================================================
+   FAQ アコーディオン (フラットな罫線区切りに再スキン)
+   ============================================================ */
+body[data-support-section="faq"] .faq-category-block .space-y-3 > * + * {
+    margin-top: 0;
+}
+body[data-support-section="faq"] .faq-item {
+    border: none;
+    border-top: 1px solid var(--ho-border);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none !important;
+    animation: none;
+}
+body[data-support-section="faq"] .faq-item:last-child {
+    border-bottom: 1px solid var(--ho-border);
+}
+body[data-support-section="faq"] .faq-item:hover,
+body[data-support-section="faq"] .faq-item.is-open {
+    border-color: var(--ho-border);
+    box-shadow: none !important;
+}
+body[data-support-section="faq"] .faq-item:hover {
+    border-top-color: var(--ho-border);
+}
+
+/* 質問 (summary) */
+body[data-support-section="faq"] .faq-question {
+    padding: 24px 0;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.55;
+    color: var(--ho-text);
+    gap: 18px;
+}
+body[data-support-section="faq"] .faq-question:hover {
+    background: transparent;
+    color: var(--ho-text);
+}
+/* handoff には Q バッジ・Pick バッジが無いので非表示 */
+body[data-support-section="faq"] .faq-question .faq-q-mark {
+    display: none;
+}
+body[data-support-section="faq"] .faq-item.is-featured .faq-question::after {
+    display: none;
+}
+body[data-support-section="faq"] .faq-item.is-featured .faq-question {
+    padding-right: 0;
+}
+body[data-support-section="faq"] .faq-question .faq-question-label {
+    gap: 0;
+}
+
+/* 開閉アイコン */
+body[data-support-section="faq"] .faq-icon {
+    color: var(--ho-chev);
+}
+body[data-support-section="faq"] .faq-item.is-open .faq-icon {
+    color: var(--ho-chev);
+}
+
+/* 回答本文 */
+body[data-support-section="faq"] .faq-answer {
+    padding: 0;
+    color: var(--ho-body);
+}
+body[data-support-section="faq"] .faq-item.is-open .faq-answer {
+    padding: 0 0 28px;
+    border-top: none;
+    font-size: 14.5px;
+    line-height: 2;
+}
+
+/* フィードバックUI (handoff トーンに寄せる) */
+body[data-support-section="faq"] .feedback-thanks,
+body[data-support-section="faq"] .faq-question .faq-q-mark {
+    /* 何もしない (上で非表示済) */
+}
+
+/* ============================================================
+   help-content (カテゴリ一覧 / 記事詳細 / 検索結果)
+   handoff の参照は無いが、help / faq と同じトークンで統一する。
+   hc-content-* 系は help-content ページでのみ使用。
+   ============================================================ */
+
+/* カテゴリ/記事ヘッダー (上部カラーバーを廃し、淡い罫線カードに) */
+body[data-support-section="help"] .hc-content-header {
+    border: 1px solid var(--ho-border);
+    border-radius: 14px;
+    box-shadow: none;
+}
+body[data-support-section="help"] .hc-content-header::before {
+    display: none;
+}
+body[data-support-section="help"] .hc-content-header__eyebrow {
+    color: var(--ho-accent);
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 700;
+}
+body[data-support-section="help"] .hc-content-header__title {
+    color: var(--ho-text);
+    font-weight: 800;
+}
+body[data-support-section="help"] .hc-content-header__desc {
+    color: var(--ho-sub);
+}
+body[data-support-section="help"] .hc-count-pill {
+    background: var(--ho-tile);
+    color: var(--ho-accent);
+}
+
+/* ツールバー (カテゴリ内検索 + ソート) */
+body[data-support-section="help"] input.hc-content-toolbar__search-input[type="search"],
+body[data-support-section="help"] select.hc-content-toolbar__sort-select {
+    border-color: var(--ho-border);
+}
+body[data-support-section="help"] input.hc-content-toolbar__search-input[type="search"]:focus,
+body[data-support-section="help"] select.hc-content-toolbar__sort-select:focus {
+    border-color: var(--ho-accent);
+    box-shadow: 0 0 0 3px rgba(44, 93, 151, 0.18);
+}
+body[data-support-section="help"] .hc-content-toolbar__search .material-icons {
+    color: var(--ho-chev);
+}
+
+/* 記事リスト行 (左カラーバー廃止・淡い罫線カード) */
+body[data-support-section="help"] .hc-content-item {
+    border: 1px solid var(--ho-border);
+    border-radius: 12px;
+}
+body[data-support-section="help"] .hc-content-item::before {
+    display: none;
+}
+body[data-support-section="help"] .hc-content-item:hover {
+    border-color: var(--ho-chev2);
+    box-shadow: none;
+    transform: none;
+}
+body[data-support-section="help"] .hc-content-item:focus-visible {
+    outline-color: var(--ho-accent);
+}
+body[data-support-section="help"] .hc-content-item__title {
+    color: var(--ho-text);
+    font-weight: 700;
+}
+body[data-support-section="help"] .hc-content-item__summary {
+    color: var(--ho-body);
+}
+body[data-support-section="help"] .hc-content-item__chevron {
+    color: var(--ho-chev2);
+}
+body[data-support-section="help"] .hc-content-item:hover .hc-content-item__chevron {
+    color: var(--ho-accent);
+    transform: none;
+}
+body[data-support-section="help"] .hc-content-item__badge--featured {
+    background: var(--ho-tile);
+    color: var(--ho-accent);
+}
+body[data-support-section="help"] .hc-content-item mark {
+    background: var(--ho-tile);
+    color: var(--ho-accent);
+}
+
+/* 空状態 / 検索0件 */
+body[data-support-section="help"] .hc-content-empty {
+    border: 1px dashed var(--ho-border);
+}
+body[data-support-section="help"] .hc-content-empty__title {
+    color: var(--ho-text);
+}
+body[data-support-section="help"] .hc-content-empty__link {
+    /* インライン style で accent 指定があるためここでは触らない */
+    border-color: var(--ho-border);
+}
+
+/* 記事詳細: フィードバック / 関連記事 / 戻るリンク */
+body[data-support-section="help"] .hc-feedback {
+    background: var(--ho-surface);
+    border: 1px solid var(--ho-border);
+    border-radius: 16px;
+}
+body[data-support-section="help"] .hc-feedback__title {
+    color: var(--ho-text);
+}
+body[data-support-section="help"] .hc-feedback__btn {
+    border-color: var(--ho-btn-border);
+}
+body[data-support-section="help"] .hc-feedback__btn:hover {
+    background: rgba(44, 93, 151, 0.06);
+    color: var(--ho-accent);
+    border-color: var(--ho-accent);
+}
+body[data-support-section="help"] .hc-feedback__btn:focus-visible {
+    outline-color: var(--ho-accent);
+}
+body[data-support-section="help"] .hc-related__title {
+    color: var(--ho-text);
+    font-weight: 800;
+}
+body[data-support-section="help"] .hc-article-back {
+    color: var(--ho-accent);
+}
+body[data-support-section="help"] .hc-article-back:hover {
+    background: rgba(44, 93, 151, 0.08);
+}
+
+/* 記事本文内リンク */
+body[data-support-section="help"] .help-article-body a,
+body[data-support-section="help"] .prose a {
+    color: var(--ho-accent);
+}
+
+/* 記事本文の見出し / 引用をネイビー基調に */
+body[data-support-section="help"] .help-article-body h3 {
+    border-left-color: var(--ho-accent);
+    color: var(--ho-text);
+}
+body[data-support-section="help"] .help-article-body blockquote {
+    border-left-color: var(--ho-accent);
+    background-color: var(--ho-surface);
+    color: var(--ho-body);
+}
+body[data-support-section="help"] .help-article-body strong {
+    color: var(--ho-text);
+}
+
+/* ============================================================
+   モーション低減
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+    .support-page-header { scroll-behavior: auto; }
+}
