@@ -45,6 +45,7 @@ v1では `SPEED AD E2Eシナリオ実行管理` Spreadsheetを、本モックで
 | [07_accounts-groups](./07_accounts-groups/) | アカウント・グループ | 2件 | 既存仕様 / システムメール資料 | あり | アカウント通知、グループ招待、請求関係 |
 | [08_e2e-testing](./08_e2e-testing/) | E2Eテスト | 4件 | テストハンドブック / 画面仕様 / 現行モック | あり | 主要業務フロー、実行環境、前提データ、自動化検討 |
 | [09_bug-reporting](./09_bug-reporting/) | バグ報告DB | 4件 | 運用設計 / Backlog起票補助 / AI観測 | あり | 人間報告とAI観測を受付DBに集約し、代表ケースとBacklog起票を整理 |
+| [10_support-contact](./10_support-contact/) | サポートお問い合わせ受付 | 2件 | 画面仕様 / GAS実装案 | あり | 公開お問い合わせフォームの投稿保存、添付保存、受付メール送信を整理 |
 
 ## 共通ビュー仕様
 

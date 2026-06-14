@@ -27,6 +27,8 @@ Get-Content .\data\customer-voices.json | ConvertFrom-Json | Out-Null
 .\scripts\sync-customer-voices.ps1 -Check
 ```
 
+問い合わせフォームは専用GASを配備済みで、`05_support/contact/index.html` の `#contactForm[data-endpoint]` に Web App URL を反映する。未設定の場合、フォームは送信成功扱いにせず「送信先の設定が未完了」と表示する。本番反映前に、最新の Web App URL、Sheet保存、Drive添付保存、`customer@speed-ad.com` From の受付メール送信を再確認する。
+
 ## 3. STG デプロイ
 
 ```powershell
@@ -38,6 +40,8 @@ STG では最低限以下を確認する。
 - `https://stg.support.speed-ad.com/`
 - `https://stg.support.speed-ad.com/help/`
 - `https://stg.support.speed-ad.com/faq/`
+- `https://stg.support.speed-ad.com/contact/`
+- `https://stg.support.speed-ad.com/bug-report/` が `/contact/` へ転送されること
 - `https://stg.support.speed-ad.com/news/`
 - `https://stg.support.speed-ad.com/assets/data/news.json`
 - `https://stg.support.speed-ad.com/customer-voices/`
@@ -64,6 +68,8 @@ CloudFront distribution ID が分かっている場合は `-DistributionId <ID>`
 本番反映後は以下を確認する。
 
 - `https://support.speed-ad.com/news/` に新規お知らせが表示される
+- `https://support.speed-ad.com/contact/` の必須入力、同意チェック、送信先未設定時のエラー表示が意図通りである
+- `https://support.speed-ad.com/bug-report/` が `/contact/` へ転送される
 - `https://support.speed-ad.com/news/official-release-2026-06-15/` が 200
 - `https://support.speed-ad.com/customer-voices/` と2件の詳細ページが 200
 - `https://support.speed-ad.com/assets/data/customer-voices.json` が公開予定の匿名データと新規画像6枚を参照している
