@@ -40,14 +40,14 @@ last_reviewed: 2026-06-12
 3. 機能紹介後のティザーセクション: 2 事例の要約カード + `詳細を見る`
 4. フッター常設リンク: `導入事例`
 
-`導入事例` 関連導線の遷移先は `https://support.speed-ad.com/customer-voices/` とする。`無料ではじめる` は `https://app.speed-ad.com/?intent=signup#top` でログイン前トップの新規アカウント作成モーダルへ接続する。
+`導入事例` 関連導線の遷移先は `https://support.speed-ad.com/customer-voices/` とする。`無料ではじめる` は `https://speed-ad.com/?intent=signup#top` でSPEED ADトップページの新規アカウント作成モーダルへ接続する。
 
 ### 3.2. ページ間導線
 
 - 一覧ページから各詳細ページへ遷移できること
 - 各詳細ページ下部に `他の事例を見る` を配置し、一覧へ戻れること
-- 一覧ページおよび詳細ページの主 CTA は `無料ではじめる` とし、遷移先は `https://app.speed-ad.com/?intent=signup#top` とする
-- 副 CTA は `ログインはこちら` とし、遷移先は `https://app.speed-ad.com/#top` とする
+- 一覧ページおよび詳細ページの主 CTA は `無料ではじめる` とし、遷移先は `https://speed-ad.com/?intent=signup#top` とする
+- 副 CTA は `ログインはこちら` とし、遷移先は `https://speed-ad.com/#top` とする
 
 ### 3.3. ログイン前トップ復帰時の挙動
 
@@ -190,7 +190,7 @@ last_reviewed: 2026-06-12
 
 - `index.html` の 3 導線から `https://support.speed-ad.com/customer-voices/` へ到達できること
 - 一覧ページの各カードから正しい詳細ページへ遷移できること
-- `https://app.speed-ad.com/?intent=signup#top` でサインアップモーダルが自動表示されること
+- `https://speed-ad.com/?intent=signup#top` でサインアップモーダルが自動表示されること
 - `05_support/assets/data/customer-voices.json` の任意項目が欠けてもレイアウト崩れや空セクションがないこと
 - ログイン前トップの導入事例ティザーが `05_support/assets/data/customer-voices.json` の公開データを参照していること
 - JSON取得失敗時に `読み込み中` が残り続けず、企業名・担当者名を出さない汎用導線へ切り替わること
