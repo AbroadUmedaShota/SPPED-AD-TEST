@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>追加料金・超過料金 — 案5 注記・帯型（実装参照）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
+<style>
+  /* ============================================================
+     追加料金・超過料金 — 案5「注記・帯型」
+     既存の料金プランページ末尾セクションの差し替え用。
+     カラー／余白は既存ページ(plan-styles.css)のトークン準拠。
+     ============================================================ */
+  :root{
+    --blue:#1d4ed8;
+    --ink:#10294d;       /* 見出し・強調 */
+    --ink-2:#3f567a;     /* 本文 */
+    --muted:#90a3c0;     /* 補助テキスト */
+    --line:#e3ebf6;
+    --band:#f3f7fd;      /* 帯の背景 */
+    --card:#ffffff;
+    --font:"Noto Sans JP",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#fff;font-family:var(--font);-webkit-font-smoothing:antialiased;}
+
+  /* セクション外枠（既存ページ.wrap相当：max-width 1000px / 中央寄せ） */
+  .extra-section{max-width:1000px;margin:0 auto;padding:34px 40px 40px;color:var(--ink);line-height:1.6;}
+
+  .extra-section .sec{font-size:22px;font-weight:800;letter-spacing:-.01em;margin:0;}
+  .extra-section .sub{color:var(--ink-2);font-size:13.5px;margin:8px 0 20px;}
+
+  /* ---- 帯本体 ---- */
+  .fee-band{
+    display:flex;gap:14px;align-items:flex-start;
+    background:var(--band);border-radius:12px;padding:18px 24px;
+  }
+  .fee-band .ic{
+    width:36px;height:36px;border-radius:9px;background:var(--card);color:var(--blue);
+    display:flex;align-items:center;justify-content:center;flex:none;
+  }
+  .fee-band .txt{font-size:13px;color:var(--ink-2);font-weight:500;margin-top:1px;}
+  .fee-band .txt .lbl{display:block;margin-bottom:2px;font-weight:800;font-size:14.5px;color:var(--ink);}
+  .fee-band .txt .yen{color:var(--ink);font-size:15px;font-weight:800;}
+
+  /* ---- CTA（既存フッターのボタン流用。実装側に既にあれば省略可） ---- */
+  .extra-cta{display:flex;gap:14px;margin-top:30px;align-items:center;}
+  .extra-cta .btn{
+    display:inline-flex;align-items:center;gap:9px;font-weight:700;font-size:14px;
+    padding:12px 24px;border-radius:999px;cursor:pointer;text-decoration:none;
+  }
+  .extra-cta .btn.primary{background:var(--blue);color:#fff;box-shadow:0 8px 18px -10px rgba(29,78,216,.55);}
+  .extra-cta .btn.ghost{background:#fff;color:var(--blue);border:1.5px solid #c9d9f2;}
+</style>
+</head>
+<body>
+  <!-- ↓ このセクションを既存ページの「追加料金・超過料金」ブロックと差し替える -->
+  <section class="extra-section">
+    <h2 class="sec">追加料金・超過料金</h2>
+    <p class="sub">上記の料金体系とは別に、利用量やグループ利用状況に応じて発生する料金です。</p>
+
+    <div class="fee-band">
+      <div class="ic" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7">
+          <circle cx="9" cy="8" r="3"></circle>
+          <path d="M3 19c0-3 3-5 6-5s6 2 6 5" stroke-linecap="round"></path>
+          <path d="M16 6a3 3 0 010 6M18 19c0-2-1-3.5-2.5-4.5" stroke-linecap="round"></path>
+        </svg>
+      </div>
+      <p class="txt">
+        <span class="lbl">グループアカウントの追加料金</span>
+        グループ機能をご利用の場合、3アカウント目以降は 1アカウントあたり
+        <b class="yen">300円（税別）</b> が発生します。2アカウントまでは無料です。
+      </p>
+    </div>
+
+    <!-- CTA：実装側のページに既存のボタンがあればそちらを使う -->
+    <div class="extra-cta">
+      <a class="btn primary" href="#contact">✉&nbsp; 料金について問い合わせる</a>
+      <a class="btn ghost" href="#faq">?&nbsp; 料金FAQを見る</a>
+    </div>
+  </section>
+</body>
+</html>

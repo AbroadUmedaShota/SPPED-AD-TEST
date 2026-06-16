@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; background:#fff; }
+    .msym { font-family:'Material Symbols Outlined'; font-weight:normal; font-style:normal; line-height:1; letter-spacing:normal; text-transform:none; white-space:nowrap; word-wrap:normal; direction:ltr; -webkit-font-feature-settings:'liga'; font-feature-settings:'liga'; -webkit-font-smoothing:antialiased; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }
+    summary { list-style: none; }
+    summary::-webkit-details-marker { display: none; }
+    .faq-ico { transition:transform .22s ease; }
+    details[open] > summary .faq-ico { transform:rotate(180deg); }
+    details > div { animation:faqIn .22s ease; }
+    @keyframes faqIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:none; } }
+  </style>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0,0">
+</helmet>
+<div style="font-family:-apple-system,BlinkMacSystemFont,'Hiragino Kaku Gothic ProN','Yu Gothic',Meiryo,system-ui,sans-serif; background:#fff; min-height:100vh;">
+
+  <dc-import name="SpeedHeader" hint-size="100%,66px"></dc-import>
+
+  <!-- ヘッダー -->
+  <div style="max-width:820px; margin:0 auto; padding:64px 32px 0; text-align:center;">
+    <p style="margin:0 0 14px; color:#9aa8b8; font-size:12px; font-weight:800; letter-spacing:.24em;">FAQ</p>
+    <h1 style="margin:0 0 14px; color:#16324c; font-size:32px; font-weight:800; letter-spacing:.01em;">よくあるご質問</h1>
+    <p style="margin:0 auto; color:#6b7c8f; font-size:14px; line-height:1.9; max-width:460px;">SPEED AD のご利用にあたって、よくいただくご質問をまとめました。</p>
+  </div>
+
+  <!-- アコーディオン -->
+  <div style="max-width:820px; margin:0 auto; padding:40px 32px 0;">
+    <details open style="border-top:1px solid #e7ecf2;">
+      <summary style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:18px; padding:24px 0; color:#16324c; font-size:16px; font-weight:700; line-height:1.55;"><span>SPEED AD は無料で使えますか？</span><span class="faq-ico msym" style="font-size:24px; color:#aebccd; flex:0 0 auto;">expand_more</span></summary>
+      <div style="padding:0 0 28px; color:#50637a; font-size:14.5px; line-height:2;">無料の基本プランをご用意しています。アンケート作成・QR回答・名刺情報の整理まで、費用をかけずにお試しいただけます。より多くの送信数や高度な集計が必要な場合は、有料プランへ移行できます。</div>
+    </details>
+    <details style="border-top:1px solid #e7ecf2;">
+      <summary style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:18px; padding:24px 0; color:#16324c; font-size:16px; font-weight:700; line-height:1.55;"><span>無料プランと有料プランの違いは？</span><span class="faq-ico msym" style="font-size:24px; color:#aebccd; flex:0 0 auto;">expand_more</span></summary>
+      <div style="padding:0 0 28px; color:#50637a; font-size:14.5px; line-height:2;">無料プランでも基本機能をご利用いただけます。送信数や集計の上限、より高度な機能の有無が有料プランとの主な違いです。詳しくは料金プランのページをご覧ください。</div>
+    </details>
+    <details style="border-top:1px solid #e7ecf2;">
+      <summary style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:18px; padding:24px 0; color:#16324c; font-size:16px; font-weight:700; line-height:1.55;"><span>名刺のデータ化はどのくらい正確ですか？</span><span class="faq-ico msym" style="font-size:24px; color:#aebccd; flex:0 0 auto;">expand_more</span></summary>
+      <div style="padding:0 0 28px; color:#50637a; font-size:14.5px; line-height:2;">BPO 事業で培ったデータ入力の運用ノウハウをもとに、高い精度で名刺情報をデータ化します。読み取りづらい項目は確認プロセスを通して整えるため、安心してご利用いただけます。</div>
+    </details>
+    <details style="border-top:1px solid #e7ecf2;">
+      <summary style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:18px; padding:24px 0; color:#16324c; font-size:16px; font-weight:700; line-height:1.55;"><span>回答データは CSV で書き出せますか？</span><span class="faq-ico msym" style="font-size:24px; color:#aebccd; flex:0 0 auto;">expand_more</span></summary>
+      <div style="padding:0 0 28px; color:#50637a; font-size:14.5px; line-height:2;">集計したアンケート結果や名刺情報は、CSV 形式でエクスポートできます。書き出したデータは、他のツールでの分析や顧客管理にもご活用いただけます。</div>
+    </details>
+    <details style="border-top:1px solid #e7ecf2;">
+      <summary style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:18px; padding:24px 0; color:#16324c; font-size:16px; font-weight:700; line-height:1.55;"><span>御礼メールはまとめて送れますか？</span><span class="faq-ico msym" style="font-size:24px; color:#aebccd; flex:0 0 auto;">expand_more</span></summary>
+      <div style="padding:0 0 28px; color:#50637a; font-size:14.5px; line-height:2;">来場者リストから一括で御礼メールを送信できます。テンプレートを用意しておけば、イベント終了後すぐにお礼の連絡が可能です。</div>
+    </details>
+    <details style="border-top:1px solid #e7ecf2;">
+      <summary style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:18px; padding:24px 0; color:#16324c; font-size:16px; font-weight:700; line-height:1.55;"><span>スマートフォンからも操作できますか？</span><span class="faq-ico msym" style="font-size:24px; color:#aebccd; flex:0 0 auto;">expand_more</span></summary>
+      <div style="padding:0 0 28px; color:#50637a; font-size:14.5px; line-height:2;">ブラウザベースのサービスのため、PC・スマートフォンのどちらからでも同じ管理画面をご利用いただけます。外出先や会場でも操作が可能です。</div>
+    </details>
+    <details style="border-top:1px solid #e7ecf2; border-bottom:1px solid #e7ecf2;">
+      <summary style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:18px; padding:24px 0; color:#16324c; font-size:16px; font-weight:700; line-height:1.55;"><span>解約はいつでもできますか？</span><span class="faq-ico msym" style="font-size:24px; color:#aebccd; flex:0 0 auto;">expand_more</span></summary>
+      <div style="padding:0 0 28px; color:#50637a; font-size:14.5px; line-height:2;">管理画面の「プラン設定」からいつでも解約でき、日割りの追加請求は発生しません。再開もいつでも可能です。</div>
+    </details>
+  </div>
+
+  <!-- 問い合わせ帯 -->
+  <div style="max-width:820px; margin:0 auto; padding:48px 32px 80px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:24px; flex-wrap:wrap; border:1px solid #e7ecf2; border-radius:16px; padding:32px 36px; background:#f7f9fc;">
+      <div>
+        <div style="color:#16324c; font-size:18px; font-weight:800;">お探しの答えは見つかりましたか？</div>
+        <p style="margin:6px 0 0; color:#6b7c8f; font-size:13.5px;">解決しなかった場合は、サポートチームがお手伝いします。</p>
+      </div>
+      <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <a href="#" style="background:#16324c; color:#fff; font-size:14px; font-weight:700; padding:13px 26px; border-radius:10px; text-decoration:none;">お問い合わせ</a>
+        <a href="#" style="background:#fff; color:#16324c; font-size:14px; font-weight:700; padding:13px 26px; border-radius:10px; text-decoration:none; border:1px solid #d4dce6;">ヘルプセンター</a>
+      </div>
+    </div>
+  </div>
+
+  <dc-import name="SpeedFooter" hint-size="100%,190px"></dc-import>
+
+</div>
+</x-dc>
+</body>
+</html>
