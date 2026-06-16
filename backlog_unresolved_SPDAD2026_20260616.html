@@ -41,7 +41,8 @@ header .meta{font-size:13px;opacity:.9}
 .subpanel{display:none}
 .subpanel.active{display:block}
 table{width:100%;border-collapse:collapse;font-size:13px}
-th{text-align:left;background:#f8fafc;color:#475569;font-weight:600;padding:8px 10px;border-bottom:2px solid #e5e7eb;font-size:12px}
+thead th{position:sticky;top:var(--toolbarH,96px);z-index:40;box-shadow:0 2px 4px rgba(0,0,0,.07)}
+th{text-align:left;background:#eef2f7;color:#475569;font-weight:700;padding:9px 10px;border-bottom:2px solid #d8dee6;font-size:12px}
 td{padding:8px 10px;border-bottom:1px solid #eef2f7;vertical-align:top}
 tr.issue{cursor:pointer}
 tr.issue:hover{background:#eff6ff}
@@ -357,5 +358,11 @@ document.querySelectorAll('tr.issue[data-key]').forEach(tr=>{
 document.getElementById('mclose').addEventListener('click',()=>overlay.classList.remove('show'));
 overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.classList.remove('show');});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')overlay.classList.remove('show');});
+function setToolbarH(){
+  const tb=document.querySelector('.toolbar');
+  if(tb)document.documentElement.style.setProperty('--toolbarH',(tb.offsetHeight-1)+'px');
+}
+setToolbarH();
+window.addEventListener('resize',setToolbarH);
 recount();
 </script></body></html>
