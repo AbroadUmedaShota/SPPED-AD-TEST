@@ -165,17 +165,21 @@ const SCREENS = [
   },
   {
     id: 'dashboard', title: 'Dashboard', status: 'diff',
-    short: 'アクション列の複製ボタンが本番のみ（モックにない）',
+    short: '複製ボタンの配置が違う（モック=詳細モーダル／本番=一覧のアクション列）',
     pairs: [
       { label: '一覧', mock: 'dashboard_mock.png', prod: 'dashboard_prod.png', diff: [
-        F('ahead', 'アクション列に「複製（コピー）」ボタンが本番にあり、モックにない（モック4アイコン／本番5アイコン）'),
-        F('verify', 'ホバー時のツールチップ表示（位置・内容）は静止画で判定不可'),
+        F('ui', '複製（コピー）ボタンの配置が違う：本番は一覧のアクション列に複製アイコンがある（モックの一覧にはない）'),
+        F('verify', 'アクションボタンのホバー時ツールチップ（位置・内容）は静止画で判定不可。上記のボタン構成の差に連動するとみられる'),
       ] },
       { label: 'アクション列（複製ボタン）', zoom: true, mock: 'dashboard_action_mock.png', prod: 'dashboard_action_prod.png', diff: [
-        F('ahead', '本番だけ「複製」アイコンがある（編集／QR／複製／SPEEDレビュー／DL）。モックは複製なしの4アイコン'),
+        F('ui', '本番の一覧アクション列は複製アイコンを含む5つ（編集／QR／複製／SPEEDレビュー／DL）。モックは複製なしの4つ'),
       ] },
-      { label: 'メニュー / 詳細モーダル', mock: 'dashboard_mock_menu.png', prod: 'dashboard_prod_menu.png',
-        note: '詳細モーダルは両環境とも同構成（基本情報／データ＆請求／名刺データ化設定／お礼メール設定）。お礼メール設定はモック・本番の両方にある。スクショは別アンケートのため細部の比較は参考。' },
+      { label: 'メニュー / 詳細モーダル', mock: 'dashboard_mock_menu.png', prod: 'dashboard_prod_menu.png', diff: [
+        F('ui', '複製ボタンの配置が違う：モックは詳細モーダル下部に「複製」ボタンがある（本番のモーダルにはない）'),
+      ] },
+      { label: '詳細モーダルのボタン列', zoom: true, mock: 'dashboard_modalbtn_mock.png', prod: 'dashboard_modalbtn_prod.png', diff: [
+        F('ui', 'モックのモーダルは「…／データダウンロード／複製／閉じる」。本番は「…／データダウンロード／閉じる」で複製がない'),
+      ] },
       { label: 'アンケート作成モーダル', mock: 'dashboard_mock_create.png', prod: 'dashboard_prod_create.png', diff: [
         F('verify', 'アンケート名がモックは自動入力済み／本番は空欄（自動採番の有無は要実機）'),
       ] },
