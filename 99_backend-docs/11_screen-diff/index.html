@@ -258,17 +258,28 @@ const SCREENS = [
   {
     id: 'group', title: 'グループ作成・管理', status: 'ok',
     short: '目立った差分なし',
-    note: 'グループ作成モーダル／グループ管理は、目立った差分は見当たらず。',
+    note: 'グループ新規作成モーダルは、モック・本番でほぼ一致。',
+    pairs: [
+      { label: 'グループ新規作成モーダル', mock: 'group_mock.png', prod: 'group_prod.png', diff: [] },
+    ],
   },
   {
     id: 'premium', title: 'プレミアム画面', status: 'ok',
-    short: '目立った差分なし',
-    note: 'プレミアム画面は、目立った差分は見当たらず。',
+    short: '状態差あり（直接比較は要注意）',
+    note: '本番は契約中（解約予約中）の管理画面、モックは申込画面。アカウント状態が異なるため単純比較はできない。',
+    pairs: [
+      { label: 'プレミアム', mock: 'premium_mock.png', prod: 'premium_prod.png',
+        note: 'モック＝申込画面（未契約状態）／本番＝管理画面（契約中・解約予約中）。状態が異なるため単純比較不可。' },
+    ],
   },
   {
     id: 'pw-forgot', title: 'パスワード再設定（pw忘れ）', status: 'ok',
-    short: '目立った差分なし',
-    note: 'パスワードを忘れた場合の画面は、目立った差分は見当たらず。',
+    short: '差分なし（画像が完全一致）',
+    note: 'モック・本番でピクセル単位まで一致。差分なし。',
+    pairs: [
+      { label: 'パスワード再設定', mock: 'pw-forgot_mock.png', prod: 'pw-forgot_prod.png',
+        note: 'モック・本番でピクセル完全一致（差分なし）。' },
+    ],
   },
   {
     id: 'billing', title: '請求関連画面', status: 'na',
@@ -341,7 +352,9 @@ function renderPair(p) {
           ${p.diff.map(d => `<li>${esc(d)}</li>`).join('')}
         </ul>
       </div>`
-    : `<p class="mb-3 text-xs text-on-surface-variant">参考比較（特記差分なし）</p>`;
+    : (p.note
+        ? `<p class="mb-3 rounded-md border border-outline-variant bg-surface px-3 py-2 text-xs text-on-surface-variant">${esc(p.note)}</p>`
+        : `<p class="mb-3 text-xs text-on-surface-variant">参考比較（特記差分なし）</p>`);
   return `<div class="rounded-lg border border-outline-variant bg-background p-3">
     <p class="mb-2 text-sm font-bold text-on-surface">${esc(p.label)}</p>
     ${diffHtml}
@@ -372,9 +385,11 @@ function renderScreen(s) {
     const pairs = `<div class="space-y-4 p-4">${s.pairs.map(renderPair).join('')}</div>`;
     bodyHtml = diffList + pairs;
   } else {
-    bodyHtml = `<div class="p-4">
+    const noteHtml = `<div class="${s.pairs ? 'border-b border-outline-variant ' : ''}p-4">
       <p class="text-sm leading-6 text-on-surface-variant">${esc(s.note || s.short)}</p>
     </div>`;
+    const pairsHtml = s.pairs ? `<div class="space-y-4 p-4">${s.pairs.map(renderPair).join('')}</div>` : '';
+    bodyHtml = noteHtml + pairsHtml;
   }
 
   return `<article id="sec-${s.id}" class="scroll-mt-4 overflow-hidden rounded-lg border border-outline-variant bg-surface">
