@@ -265,14 +265,13 @@ const SCREENS = [
   },
   {
     id: 'account', title: 'アカウント情報モーダル', status: 'diff',
-    short: '見出し枠の微差／電話番号欄は要確認',
+    short: 'セクションの枠線・区切り線が若干違う',
     pairs: [
       { label: 'アカウント情報モーダル', mock: 'account_mock.png', prod: 'account_prod.png', diff: [
-        F('ui', 'セクション見出し下のアコーディオン「∧」の有無・区切り線/余白に差（本番は各見出しに∧）'),
-        F('verify', '個人連絡先の電話番号がモック1行／本番2行ぶん。2列構成か別項目追加かは要実機'),
+        F('ui', 'セクションの枠線・区切り線（枠の表示方法）が若干違う'),
       ] },
       { label: 'セクション見出し', zoom: true, mock: 'account_header_mock.png', prod: 'account_header_prod.png', diff: [
-        F('ui', '本番は見出し直下に「∧」アコーディオンボタンがあり、セクション間余白が詰まっている'),
+        F('ui', '見出し周りの枠線・区切り線/余白の表示が若干違う（本番は見出し直下に∧アコーディオン）'),
       ] },
     ],
   },
