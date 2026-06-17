@@ -28,8 +28,8 @@
         <p class="text-sm font-semibold text-primary">HOME / 11_screen-diff</p>
         <h1 class="text-headline-medium font-bold leading-tight text-on-surface">画面差分（モックアップ↔本番）</h1>
         <p class="mt-1 max-w-4xl text-sm leading-6 text-on-surface-variant">
-          モックアップと本番のスクリーンショットを画面ごとに左右で並べ、本番に足りない・異なる点を確認します。
-          前提は「本番から見て足りないもの」＝モックアップにはあって本番にはない／表示が異なる差分です。
+          モックアップと本番のスクリーンショットを画面ごとに左右で並べ、何がどう違うかを整理します。
+          差分は方向と性質で4分類（本番に不足／本番先行／UI差／要実機確認）し、画面ごと・画像ごとに記載します。
         </p>
         <div class="mt-3 flex flex-wrap gap-2">
           <span class="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
@@ -57,13 +57,20 @@
   </header>
 
   <main class="w-full px-4 py-6 sm:px-6 lg:px-8">
+    <!-- 凡例 -->
+    <section class="rounded-lg border border-outline-variant bg-surface p-4" aria-labelledby="legend-title">
+      <p id="legend-title" class="text-sm font-bold text-on-surface">差分の分類（凡例）</p>
+      <div id="legendBox" class="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4"></div>
+    </section>
+
     <!-- 集計 -->
-    <section aria-labelledby="summary-title">
+    <section class="mt-6" aria-labelledby="summary-title">
+      <h2 id="summary-title" class="sr-only">集計</h2>
       <div class="grid gap-4 sm:grid-cols-3">
         <div class="rounded-lg border border-outline-variant bg-surface p-4">
           <p class="text-sm font-bold text-on-surface">差分あり</p>
           <p class="mt-1 text-headline-medium font-bold text-primary" id="statDiff">–</p>
-          <p class="text-xs text-on-surface-variant">本番に未反映・表示差がある画面</p>
+          <p class="text-xs text-on-surface-variant">不足・先行・UI差・要実機のいずれかがある画面</p>
         </div>
         <div class="rounded-lg border border-outline-variant bg-surface p-4">
           <p class="text-sm font-bold text-on-surface">問題なし</p>
@@ -73,12 +80,12 @@
         <div class="rounded-lg border border-outline-variant bg-surface p-4">
           <p class="text-sm font-bold text-on-surface">確認不可</p>
           <p class="mt-1 text-headline-medium font-bold text-on-surface" id="statNa">–</p>
-          <p class="text-xs text-on-surface-variant">前提条件が未成立で比較できない画面</p>
+          <p class="text-xs text-on-surface-variant">状態差・前提未成立で比較できない画面</p>
         </div>
       </div>
     </section>
 
-    <!-- 一覧表（アコーディオン・デフォルト閉じ） -->
+    <!-- 画面別サマリ（アコーディオン・デフォルト閉じ） -->
     <section class="mt-8" aria-labelledby="overview-title">
       <details class="rounded-lg border border-outline-variant bg-surface">
         <summary class="flex cursor-pointer items-center justify-between gap-3 px-4 py-3 hover:bg-surface-variant">
@@ -89,13 +96,13 @@
           </span>
         </summary>
         <div class="overflow-x-auto border-t border-outline-variant">
-          <table class="w-full min-w-[640px] border-collapse text-sm">
+          <table class="w-full min-w-[720px] border-collapse text-sm">
             <thead>
               <tr class="border-b border-outline-variant text-left text-on-surface-variant">
                 <th class="px-4 py-3 font-semibold">画面</th>
                 <th class="px-4 py-3 font-semibold">状態</th>
-                <th class="px-4 py-3 font-semibold">差分</th>
-                <th class="px-4 py-3 font-semibold">主な差分</th>
+                <th class="px-4 py-3 font-semibold">差分内訳</th>
+                <th class="px-4 py-3 font-semibold">概要</th>
               </tr>
             </thead>
             <tbody id="overviewBody"></tbody>
@@ -113,8 +120,8 @@
     <section class="mt-8 rounded-lg border border-outline-variant bg-surface p-5">
       <h2 class="text-title-medium font-bold text-on-surface">扱い</h2>
       <p class="mt-2 text-sm leading-6 text-on-surface-variant">
-        目視比較による観測メモです。差分の解消可否・優先度・対応方針は別途判断します。実装の正本はモックアップ側の画面設計に置きます。
-        スクショは <code>アーカイブ/画面整理用フォルダ/</code> から取り込み、<code>images/</code> にファイル名を整理して格納しています。
+        目視比較による観測メモです。「本番に不足」はモックにあって本番にない要素、「本番先行」は本番にあってモックにない要素（モック未更新の可能性）、「UI差」はレイアウト・表示の違い、「要実機確認」は静止画では判定できない挙動です。差分の解消可否・優先度・対応方針は別途判断します。
+        スクショは <code>アーカイブ/画面整理用フォルダ/</code> 取り込み分と、本番をPlaywrightで撮影した分（読み取り専用）を <code>images/</code> に格納しています。
       </p>
     </section>
   </main>
@@ -134,142 +141,154 @@
 <script>
 const IMG = './images/';
 
-// status: 'diff' | 'ok' | 'na'
+// 差分の分類: lack=本番に不足(モックにあり/本番なし) ahead=本番先行(本番にあり/モックなし) ui=UI差 verify=要実機
+const CAT = {
+  lack:   { short: '不足',   label: '本番に不足', color: 'var(--color-state-error)',   desc: 'モックにあり／本番にない' },
+  ahead:  { short: '先行',   label: '本番先行',   color: 'var(--color-primary)',       desc: '本番にあり／モックにない' },
+  ui:     { short: 'UI差',   label: 'UI差',       color: 'var(--color-state-warning)', desc: 'レイアウト・表示の違い' },
+  verify: { short: '実機',   label: '要実機確認', color: 'var(--color-text-sub)',      desc: '静止画では判定不可' },
+};
+const F = (c, t) => ({ c, t });
+
 const SCREENS = [
   {
     id: 'login-front', title: 'ログイン前画面', status: 'diff',
-    short: 'Googleログイン／背景ロゴ／導入事例が本番に無い',
-    diffs: [
-      'Googleログインのボタンが本番に無い',
-      '背景のロゴが本番に表示されない',
-      '導入事例のセクションが本番に無い',
-    ],
+    short: 'Googleログイン・導入事例が不足／背景ロゴは要確認',
     pairs: [
-      { label: 'ログイン前画面', mock: 'login-front_mock.png', prod: 'login-front_prod.png',
-        diff: ['Googleログインのボタンが本番に無い', '背景のロゴが本番に表示されない', '導入事例のセクションが本番に無い'] },
+      { label: 'ログイン前画面', mock: 'login-front_mock.png', prod: 'login-front_prod.png', diff: [
+        F('lack', 'Googleログインボタンがモックのフォーム内にあり、本番にない'),
+        F('lack', '導入事例セクションがモック下部にあり、本番にない'),
+        F('ui', 'ヒーローのログインフォームの余白・高さが本番はやや広い'),
+        F('verify', '背景ロゴ：モック・本番とも類似要素あり。濃淡差は静止画で断定不可'),
+      ] },
     ],
   },
   {
     id: 'dashboard', title: 'Dashboard', status: 'diff',
-    short: '複製ボタンの位置、ツールチップの位置・内容',
-    diffs: [
-      '複製ボタンの位置が違う',
-      'ツールチップの表示が違う（位置・内容）',
-    ],
+    short: '複製ボタン位置・確認ボタン不足／「お礼メール設定」は本番先行',
     pairs: [
-      { label: '一覧', mock: 'dashboard_mock.png', prod: 'dashboard_prod.png',
-        diff: ['複製ボタンの位置が違う', 'ツールチップの表示が違う（位置・内容）'] },
-      { label: 'メニュー / モーダル', mock: 'dashboard_mock_menu.png', prod: 'dashboard_prod_menu.png', diff: [] },
-      { label: 'アンケート作成モーダル', mock: 'dashboard_mock_create.png', prod: 'dashboard_prod_create.png', diff: [] },
+      { label: '一覧', mock: 'dashboard_mock.png', prod: 'dashboard_prod.png', diff: [
+        F('ui', 'アクション列のアイコン数・種類・並びが違う（複製ボタンの位置ズレ含む）'),
+        F('lack', '左下「購入アカウント[Free]」情報カードがモックにあり、本番で確認できない'),
+        F('verify', 'ホバー時のツールチップ表示（位置・内容）は静止画で判定不可'),
+      ] },
+      { label: 'メニュー / 詳細モーダル', mock: 'dashboard_mock_menu.png', prod: 'dashboard_prod_menu.png', diff: [
+        F('lack', '詳細モーダルの「確認」ボタンがモックにあり、本番にない'),
+        F('ahead', '詳細モーダルに「お礼メール設定」セクションが本番にあり、モックにない'),
+      ] },
+      { label: 'アンケート作成モーダル', mock: 'dashboard_mock_create.png', prod: 'dashboard_prod_create.png', diff: [
+        F('verify', 'アンケート名がモックは自動入力済み／本番は空欄（自動採番の有無は要実機）'),
+      ] },
     ],
   },
   {
     id: 'survey-edit', title: 'アンケート作成・編集', status: 'diff',
-    short: 'UI全体、プレビュー、右下の＋、設問表示UI',
-    diffs: [
-      'UI全体が異なる',
-      'プレビュー表示が異なる',
-      '右下の＋ボタンが動かない',
-      '設問表示UIが異なる',
-    ],
+    short: 'UIが別物。設問ナビ等が不足、メモ欄等は本番先行',
     pairs: [
-      { label: '作成・編集画面', mock: 'survey-edit_mock.png', prod: 'survey-edit_prod.png',
-        diff: ['UI全体が異なる', '右下の＋ボタンが動かない'] },
-      { label: 'プレビュー', mock: 'survey-edit_mock_preview.png', prod: 'survey-edit_prod_preview.png',
-        diff: ['プレビュー表示が異なる'] },
-      { label: '設問表示UI', mock: 'survey-edit_mock_question.png', prod: 'survey-edit_prod_question.png',
-        diff: ['設問表示UIが異なる'] },
+      { label: '作成・編集画面', mock: 'survey-edit_mock.png', prod: 'survey-edit_prod.png', diff: [
+        F('ui', 'レイアウト：モック=2カラム（右に設問ナビ）／本番=シングルカラム（操作は最下部バー）'),
+        F('lack', '右「設問ナビ」パネル（未入力を赤ドットでリアルタイム表示）が本番にない'),
+        F('ui', '操作ボタンの名称・配置差（モック=右縦並び／本番=下部横並び）'),
+        F('ui', '多言語：モック=独立セクション「多言語機能 Premium」／本番=基本情報冒頭トグル（Premium表記なし）'),
+        F('lack', 'アンケートID（「発行前」）がモック上部にあり、本番の編集画面に出ない'),
+        F('ui', 'セクション名差（オプション機能/関連設定/設問リスト ↔ 連携設定/追加設定/設問設定）'),
+        F('ahead', '「メモ欄」が本番にあり、モックにない'),
+        F('ahead', '名刺連携オフ時の注記文が本番にあり、モックにない'),
+        F('verify', '右下の＋ボタンが動かない（挙動のため要実機）'),
+      ] },
+      { label: 'プレビュー', mock: 'survey-edit_mock_preview.png', prod: 'survey-edit_prod_preview.png', diff: [
+        F('ui', 'モック=編集画面上のモーダル overlay／本番=フルページ遷移'),
+        F('lack', 'プレビューの注意バナーが本番にない'),
+        F('lack', '「閉じる」ボタン・モーダルヘッダーが本番になく、閉じ方が分かりにくい'),
+      ] },
+      { label: '設問表示UI', mock: 'survey-edit_mock_question.png', prod: 'survey-edit_prod_question.png', diff: [
+        F('ui', '設問カード構造（モック=基本/回答/高度の3サブ展開／本番=タイプDD＋インライン）'),
+        F('lack', '「高度設定（条件分岐等）」アコーディオンが本番にない'),
+        F('ui', 'Q番号表示の有無・必須設定の位置差'),
+      ] },
     ],
   },
   {
     id: 'sidebar', title: 'サイドバー', status: 'diff',
-    short: 'テーマ切り替えが本番で使えない',
-    diffs: [
-      'テーマ切り替えが本番で使えない',
-    ],
+    short: '構成は一致。テーマ切替の実動作のみ要確認',
     pairs: [
-      { label: 'サイドバー', mock: 'sidebar_mock.png', prod: 'sidebar_prod.png',
-        diff: ['テーマ切り替えが本番で使えない'] },
+      { label: 'サイドバー', mock: 'sidebar_mock.png', prod: 'sidebar_prod.png', diff: [
+        F('verify', 'テーマ切替の項目は両方に存在。実際にテーマが変わるかは静止画で判定不可'),
+      ] },
     ],
   },
   {
     id: 'bizcard', title: '名刺データ化設定', status: 'diff',
-    short: 'UI全体',
-    diffs: [
-      'UI全体が異なる',
-    ],
+    short: 'UIが別物。利用案内等が不足、基本情報等は本番先行',
     pairs: [
-      { label: '名刺データ化設定', mock: 'bizcard_mock.png', prod: 'bizcard_prod.png',
-        diff: ['UI全体が異なる'] },
+      { label: '名刺データ化設定', mock: 'bizcard_mock.png', prod: 'bizcard_prod.png', diff: [
+        F('ui', 'レイアウト：モック=2カラム（右に利用案内）／本番=シングルカラム'),
+        F('lack', '右「利用案内」サイドバー（単価・料金表・残数・クーポン）が本番にない'),
+        F('lack', '「名刺のデータ化」ON/OFFトグル・「基盤利用テンプレート」選択が本番にない'),
+        F('ui', 'プラン選択：モック=スライダー数値入力／本番=5プランのラジオ（無料/通常/即日/超特急/オンデマンド）'),
+        F('ahead', '「アンケート基本情報」セクションが本番にあり、モックにない'),
+        F('ahead', '下部アコーディオン（注意書き/請求詳細/名刺詳細）が本番にあり、モックにない'),
+      ] },
     ],
   },
   {
     id: 'thankyou-email', title: 'お礼メール設定', status: 'diff',
-    short: 'UI全体',
-    diffs: [
-      'UI全体が異なる',
-    ],
+    short: 'テンプレ選択・SMARTが不足／費用明細は本番先行',
     pairs: [
-      { label: 'お礼メール設定', mock: 'thankyou-email_mock.png', prod: 'thankyou-email_prod.png',
-        diff: ['UI全体が異なる'] },
+      { label: 'お礼メール設定', mock: 'thankyou-email_mock.png', prod: 'thankyou-email_prod.png', diff: [
+        F('lack', 'テンプレート選択ドロップダウンが本番にない'),
+        F('lack', '「SMART（調査票品目内訳）」セクションが本番にない'),
+        F('ui', '差し込み変数：モック=折りたたみ／本番=タグボタン常時表示'),
+        F('ahead', '右パネルの費用明細が本番のほうが詳細（月別送信数/試用/クーポン等）'),
+        F('ui', '最下部ボタンの左右配置が逆'),
+      ] },
     ],
   },
   {
-    id: 'thankyou-screen', title: 'サンクス画面', status: 'diff',
-    short: 'UI全体',
-    diffs: [
-      'UI全体が異なる',
-    ],
+    id: 'thankyou-screen', title: 'サンクス画面設定', status: 'diff',
+    short: 'テストシナリオ選択が不足／バナー差・トグル既定は要確認',
     pairs: [
-      { label: 'サンクス画面設定', mock: 'thankyou-screen_mock.png', prod: 'thankyou-screen_prod.png',
-        diff: ['UI全体が異なる'] },
+      { label: 'サンクス画面設定', mock: 'thankyou-screen_mock.png', prod: 'thankyou-screen_prod.png', diff: [
+        F('lack', '「テストシナリオ」選択ドロップダウンが本番にない'),
+        F('ui', 'プレミアム機能バナーの色・バッジ・アイコンが違う'),
+        F('verify', '連続回答トグルがモックOFF／本番ON（データ差か既定差かは要実機）'),
+      ] },
     ],
   },
   {
     id: 'account', title: 'アカウント情報モーダル', status: 'diff',
-    short: '枠の表示方法が若干違う',
-    diffs: [
-      '枠の表示方法が若干違う',
-    ],
+    short: '見出し枠の微差／電話番号欄は要確認',
     pairs: [
-      { label: 'アカウント情報モーダル', mock: 'account_mock.png', prod: 'account_prod.png',
-        diff: ['枠の表示方法が若干違う'] },
+      { label: 'アカウント情報モーダル', mock: 'account_mock.png', prod: 'account_prod.png', diff: [
+        F('ui', 'セクション見出しの区切り線の太さ・セクション間余白に微差'),
+        F('verify', '個人連絡先の電話番号がモック1行／本番2行ぶん。2列構成か別項目追加かは要実機'),
+      ] },
     ],
   },
   {
     id: 'speed-review', title: 'スピードレビュー', status: 'diff',
-    short: 'サイドバー出しっぱなし、回答詳細なし、グラフ・設問表示',
-    diffs: [
-      'サイドバーが出しっぱなしになっている（本番）',
-      '回答詳細が本番に無い',
-      '時間別回答のグラフ表示が違う',
-      '各グラフの表示方法が違う',
-      '設問表示の方法が違う',
-    ],
+    short: '回答詳細が不足／サイドバー・グラフ・表のUI差が多い',
     pairs: [
-      { label: 'スピードレビュー画面', mock: 'speed-review_mock.png', prod: 'speed-review_prod.png',
-        diff: ['サイドバーが出しっぱなしになっている（本番）', '時間別回答のグラフ表示が違う', '各グラフの表示方法が違う'] },
-      { label: '回答詳細', mock: 'speed-review_mock_detail.png', prod: null,
-        diff: ['回答詳細が本番に無い（本番側に該当画面なし）'] },
-      { label: '設問表示', mock: 'speed-review_mock_question.png', prod: 'speed-review_prod_question.png',
-        diff: ['設問表示の方法が違う'] },
+      { label: 'スピードレビュー画面', mock: 'speed-review_mock.png', prod: 'speed-review_prod.png', diff: [
+        F('ui', '本番はサイドバーが常時展開でコンテンツ幅を圧迫'),
+        F('ui', '時間別回答グラフ：モック=折れ線（時刻帯）／本番=棒（数値列で時刻帯でない）'),
+        F('ui', '絞り込みフィルタ：モック=小ポップオーバー／本番=右「CLEAR FILTERS」＋属性パネル展開'),
+        F('ui', 'テーブル列：モック=回答者ID/調査ID/会社/氏名/業界 ↔ 本番=回答者番号/回答日時/氏名/会社名/設問回答全文'),
+      ] },
+      { label: '回答詳細', mock: 'speed-review_mock_detail.png', prod: null, diff: [
+        F('lack', '回答詳細モーダル（行クリックで名刺情報＋回答を表示）が本番にない'),
+      ] },
+      { label: '設問表示', mock: 'speed-review_mock_question.png', prod: 'speed-review_prod_question.png', diff: [
+        F('ui', '設問選択モーダルの選択中強調の方式・リスト表示構造が違う'),
+      ] },
     ],
   },
   {
     id: 'group', title: 'グループ作成・管理', status: 'ok',
-    short: '目立った差分なし',
-    note: 'グループ新規作成モーダルは、モック・本番でほぼ一致。',
+    short: '差分なし（新規作成モーダルはほぼ一致）',
+    note: 'グループ新規作成モーダルはモック・本番でほぼ一致。',
     pairs: [
       { label: 'グループ新規作成モーダル', mock: 'group_mock.png', prod: 'group_prod.png', diff: [] },
-    ],
-  },
-  {
-    id: 'premium', title: 'プレミアム画面', status: 'ok',
-    short: '状態差あり（直接比較は要注意）',
-    note: '本番は契約中（解約予約中）の管理画面、モックは申込画面。アカウント状態が異なるため単純比較はできない。',
-    pairs: [
-      { label: 'プレミアム', mock: 'premium_mock.png', prod: 'premium_prod.png',
-        note: 'モック＝申込画面（未契約状態）／本番＝管理画面（契約中・解約予約中）。状態が異なるため単純比較不可。' },
     ],
   },
   {
@@ -282,8 +301,16 @@ const SCREENS = [
     ],
   },
   {
+    id: 'premium', title: 'プレミアム画面', status: 'ok',
+    short: '差分なし（プラン画面はモック・本番でほぼ一致）',
+    note: '本番は管理画面から「プレミアムプラン画面へ戻る」で同じプラン画面に到達。モック・本番でほぼ一致（高さに軽微な差のみ）。',
+    pairs: [
+      { label: 'プレミアムプラン画面', mock: 'premium_mock.png', prod: 'premium_prod.png', diff: [] },
+    ],
+  },
+  {
     id: 'billing', title: '請求関連画面', status: 'na',
-    short: '現状、請求が立っていないため確認できず',
+    short: '請求未発生のため確認不可',
     note: '現状、請求が立っていないため比較できず。請求発生後に再確認が必要。',
   },
 ];
@@ -296,12 +323,38 @@ const STATUS = {
 
 function esc(s) { return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
+function catChip(c, extra) {
+  const k = CAT[c];
+  const tail = (extra != null) ? ` ${extra}` : '';
+  return `<span class="inline-flex items-center whitespace-nowrap rounded border px-1.5 py-0.5 text-xs font-bold" style="color:${k.color};border-color:${k.color}">${k.short}${tail}</span>`;
+}
+
+function screenCats(s) {
+  const n = { lack: 0, ahead: 0, ui: 0, verify: 0 };
+  (s.pairs || []).forEach(p => (p.diff || []).forEach(x => { if (n[x.c] != null) n[x.c]++; }));
+  return n;
+}
+function catSummaryHtml(s) {
+  const n = screenCats(s);
+  const order = ['lack', 'ahead', 'ui', 'verify'];
+  const chips = order.filter(c => n[c] > 0).map(c => catChip(c, n[c])).join(' ');
+  return chips || '<span class="text-xs text-on-surface-variant">差分なし</span>';
+}
+
 function statusChip(status) {
   const s = STATUS[status];
   const iconAttr = s.iconStyle ? ` style="${s.iconStyle}"` : '';
   const iconCls = s.iconCls ? ' ' + s.iconCls : '';
   return `<span class="inline-flex items-center gap-1 rounded-full border border-outline-variant bg-surface-variant px-2.5 py-1 text-xs font-bold text-on-surface">
     <span class="material-icons text-sm${iconCls}"${iconAttr}>${s.icon}</span>${s.label}</span>`;
+}
+
+function renderLegend() {
+  const order = ['lack', 'ahead', 'ui', 'verify'];
+  document.getElementById('legendBox').innerHTML = order.map(c => {
+    const k = CAT[c];
+    return `<div class="flex items-center gap-2">${catChip(c)}<span class="text-xs text-on-surface-variant">${esc(k.label)}：${esc(k.desc)}</span></div>`;
+  }).join('');
 }
 
 function renderStats() {
@@ -315,13 +368,14 @@ function renderStats() {
 function renderOverview() {
   const body = document.getElementById('overviewBody');
   body.innerHTML = SCREENS.map(s => {
-    const count = s.status === 'diff' ? `${s.diffs.length}件` : '–';
+    let cell;
+    if (s.status === 'diff') cell = `<div class="flex flex-wrap gap-1">${catSummaryHtml(s)}</div>`;
+    else if (s.status === 'ok') cell = '<span class="text-on-surface-variant">差分なし</span>';
+    else cell = '<span class="text-on-surface-variant">–</span>';
     return `<tr class="border-b border-outline-variant last:border-0 hover:bg-surface-variant">
-      <td class="px-4 py-3 font-semibold text-on-surface">
-        <a class="hover:text-primary" href="#sec-${s.id}">${esc(s.title)}</a>
-      </td>
+      <td class="px-4 py-3 font-semibold text-on-surface"><a class="hover:text-primary" href="#sec-${s.id}">${esc(s.title)}</a></td>
       <td class="px-4 py-3">${statusChip(s.status)}</td>
-      <td class="px-4 py-3 text-on-surface-variant">${count}</td>
+      <td class="px-4 py-3">${cell}</td>
       <td class="px-4 py-3 text-on-surface-variant">${esc(s.short)}</td>
     </tr>`;
   }).join('');
@@ -343,21 +397,17 @@ function shotCol(side, file, label) {
 
 function renderPair(p) {
   const hasDiff = p.diff && p.diff.length;
-  const diffHtml = hasDiff
-    ? `<div class="mb-3 rounded-md border border-outline-variant bg-surface px-3 py-2">
-        <p class="flex items-center gap-1 text-xs font-bold" style="color:var(--color-state-warning)">
-          <span class="material-icons text-sm">report_problem</span>この箇所の差分
-        </p>
-        <ul class="mt-1 list-disc space-y-0.5 pl-5 text-sm text-on-surface-variant">
-          ${p.diff.map(d => `<li>${esc(d)}</li>`).join('')}
-        </ul>
-      </div>`
+  const body = hasDiff
+    ? `<ul class="mb-3 space-y-1.5">
+        ${p.diff.map(x => `<li class="flex items-start gap-2 text-sm text-on-surface-variant">
+          <span class="mt-0.5">${catChip(x.c)}</span><span>${esc(x.t)}</span></li>`).join('')}
+      </ul>`
     : (p.note
         ? `<p class="mb-3 rounded-md border border-outline-variant bg-surface px-3 py-2 text-xs text-on-surface-variant">${esc(p.note)}</p>`
         : `<p class="mb-3 text-xs text-on-surface-variant">参考比較（特記差分なし）</p>`);
   return `<div class="rounded-lg border border-outline-variant bg-background p-3">
     <p class="mb-2 text-sm font-bold text-on-surface">${esc(p.label)}</p>
-    ${diffHtml}
+    ${body}
     <div class="grid gap-3 md:grid-cols-2">
       ${shotCol('mock', p.mock, p.label)}
       ${shotCol('prod', p.prod, p.label)}
@@ -376,14 +426,12 @@ function renderScreen(s) {
 
   let bodyHtml = '';
   if (s.status === 'diff') {
-    const diffList = `<div class="border-b border-outline-variant p-4">
-      <p class="text-sm font-bold text-on-surface">本番に足りない・異なる点</p>
-      <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-on-surface-variant">
-        ${s.diffs.map(d => `<li>${esc(d)}</li>`).join('')}
-      </ul>
+    const summary = `<div class="border-b border-outline-variant p-4">
+      <p class="text-sm font-bold text-on-surface">差分サマリ</p>
+      <div class="mt-2 flex flex-wrap gap-1.5">${catSummaryHtml(s)}</div>
     </div>`;
     const pairs = `<div class="space-y-4 p-4">${s.pairs.map(renderPair).join('')}</div>`;
-    bodyHtml = diffList + pairs;
+    bodyHtml = summary + pairs;
   } else {
     const noteHtml = `<div class="${s.pairs ? 'border-b border-outline-variant ' : ''}p-4">
       <p class="text-sm leading-6 text-on-surface-variant">${esc(s.note || s.short)}</p>
@@ -421,6 +469,7 @@ document.addEventListener('click', e => {
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
 
+renderLegend();
 renderStats();
 renderOverview();
 renderScreens();
