@@ -153,13 +153,13 @@ const F = (c, t) => ({ c, t });
 const SCREENS = [
   {
     id: 'login-front', title: 'ログイン前画面', status: 'diff',
-    short: 'Googleログイン・導入事例が不足／背景ロゴは要確認',
+    short: 'Googleログイン・導入事例・背景ロゴが本番に不足',
     pairs: [
       { label: 'ログイン前画面', mock: 'login-front_mock.png', prod: 'login-front_prod.png', diff: [
         F('lack', 'Googleログインボタンがモックのフォーム内にあり、本番にない'),
         F('lack', '導入事例セクションがモック下部にあり、本番にない'),
+        F('lack', '背景のロゴ（ウォーターマーク）がモックにあり、本番にない'),
         F('ui', 'ヒーローのログインフォームの余白・高さが本番はやや広い'),
-        F('verify', '背景ロゴ：モック・本番とも類似要素あり。濃淡差は静止画で断定不可'),
       ] },
     ],
   },
@@ -172,9 +172,15 @@ const SCREENS = [
         F('lack', '左下「購入アカウント[Free]」情報カードがモックにあり、本番で確認できない'),
         F('verify', 'ホバー時のツールチップ表示（位置・内容）は静止画で判定不可'),
       ] },
+      { label: '購入アカウントカード', zoom: true, mock: 'dashboard_card_mock.png', prod: 'dashboard_card_prod.png', diff: [
+        F('lack', '「購入アカウント[Free]」カード（プラン制限の案内）がモック左下にあり、本番にない'),
+      ] },
       { label: 'メニュー / 詳細モーダル', mock: 'dashboard_mock_menu.png', prod: 'dashboard_prod_menu.png', diff: [
         F('lack', '詳細モーダルの「確認」ボタンがモックにあり、本番にない'),
         F('ahead', '詳細モーダルに「お礼メール設定」セクションが本番にあり、モックにない'),
+      ] },
+      { label: '詳細モーダル下部', zoom: true, mock: 'dashboard_modal_mock.png', prod: 'dashboard_modal_prod.png', diff: [
+        F('ahead', '本番のモーダル下部に「お礼メール設定」セクションがある（モックにはない）'),
       ] },
       { label: 'アンケート作成モーダル', mock: 'dashboard_mock_create.png', prod: 'dashboard_prod_create.png', diff: [
         F('verify', 'アンケート名がモックは自動入力済み／本番は空欄（自動採番の有無は要実機）'),
@@ -244,6 +250,9 @@ const SCREENS = [
         F('ahead', '右パネルの費用明細が本番のほうが詳細（月別送信数/試用/クーポン等）'),
         F('ui', '最下部ボタンの左右配置が逆'),
       ] },
+      { label: '最下部ボタン', zoom: true, mock: 'thankyou-email_btn_mock.png', prod: 'thankyou-email_btn_prod.png', diff: [
+        F('ui', 'ボタンの左右配置が逆（モック=保存が左／本番=保存が右）'),
+      ] },
     ],
   },
   {
@@ -255,6 +264,9 @@ const SCREENS = [
         F('ui', 'プレミアム機能バナーの色・バッジ・アイコンが違う'),
         F('verify', '連続回答トグルがモックOFF／本番ON（データ差か既定差かは要実機）'),
       ] },
+      { label: 'プレミアムバナー', zoom: true, mock: 'thankyou-screen_banner_mock.png', prod: 'thankyou-screen_banner_prod.png', diff: [
+        F('ui', 'バナー：モック=オレンジ背景＋Premiumバッジ／本番=青背景＋丸インフォアイコン'),
+      ] },
     ],
   },
   {
@@ -262,8 +274,11 @@ const SCREENS = [
     short: '見出し枠の微差／電話番号欄は要確認',
     pairs: [
       { label: 'アカウント情報モーダル', mock: 'account_mock.png', prod: 'account_prod.png', diff: [
-        F('ui', 'セクション見出しの区切り線の太さ・セクション間余白に微差'),
+        F('ui', 'セクション見出し下のアコーディオン「∧」の有無・区切り線/余白に差（本番は各見出しに∧）'),
         F('verify', '個人連絡先の電話番号がモック1行／本番2行ぶん。2列構成か別項目追加かは要実機'),
+      ] },
+      { label: 'セクション見出し', zoom: true, mock: 'account_header_mock.png', prod: 'account_header_prod.png', diff: [
+        F('ui', '本番は見出し直下に「∧」アコーディオンボタンがあり、セクション間余白が詰まっている'),
       ] },
     ],
   },
@@ -276,6 +291,9 @@ const SCREENS = [
         F('ui', '時間別回答グラフ：モック=折れ線（時刻帯）／本番=棒（数値列で時刻帯でない）'),
         F('ui', '絞り込みフィルタ：モック=小ポップオーバー／本番=右「CLEAR FILTERS」＋属性パネル展開'),
         F('ui', 'テーブル列：モック=回答者ID/調査ID/会社/氏名/業界 ↔ 本番=回答者番号/回答日時/氏名/会社名/設問回答全文'),
+      ] },
+      { label: '時間別回答グラフ', zoom: true, mock: 'speed-review_graph_mock.png', prod: 'speed-review_graph_prod.png', diff: [
+        F('ui', '時間別回答グラフ：モック=折れ線（時刻帯）／本番=棒グラフ'),
       ] },
       { label: '回答詳細', mock: 'speed-review_mock_detail.png', prod: null, diff: [
         F('lack', '回答詳細モーダル（行クリックで名刺情報＋回答を表示）が本番にない'),
@@ -407,8 +425,9 @@ function renderPair(p) {
     : (p.note
         ? `<p class="mb-3 rounded-md border border-outline-variant bg-surface px-3 py-2 text-xs text-on-surface-variant">${esc(p.note)}</p>`
         : `<p class="mb-3 text-xs text-on-surface-variant">参考比較（特記差分なし）</p>`);
+  const zoomBadge = p.zoom ? '<span class="inline-flex items-center gap-0.5 rounded bg-primary/10 px-1.5 py-0.5 text-xs font-bold text-primary"><span class="material-icons text-sm">zoom_in</span>拡大</span>' : '';
   return `<div class="rounded-lg border border-outline-variant bg-background p-3">
-    <p class="mb-2 text-sm font-bold text-on-surface">${esc(p.label)}</p>
+    <p class="mb-2 flex items-center gap-2 text-sm font-bold text-on-surface">${zoomBadge}${esc(p.label)}</p>
     ${body}
     <div class="grid gap-3 md:grid-cols-2">
       ${shotCol('mock', p.mock, p.label)}
