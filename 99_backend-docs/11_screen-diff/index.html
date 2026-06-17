@@ -145,7 +145,8 @@ const SCREENS = [
       '導入事例のセクションが本番に無い',
     ],
     pairs: [
-      { label: 'ログイン前画面', mock: 'login-front_mock.png', prod: 'login-front_prod.png' },
+      { label: 'ログイン前画面', mock: 'login-front_mock.png', prod: 'login-front_prod.png',
+        diff: ['Googleログインのボタンが本番に無い', '背景のロゴが本番に表示されない', '導入事例のセクションが本番に無い'] },
     ],
   },
   {
@@ -156,9 +157,10 @@ const SCREENS = [
       'ツールチップの表示が違う（位置・内容）',
     ],
     pairs: [
-      { label: '一覧', mock: 'dashboard_mock.png', prod: 'dashboard_prod.png' },
-      { label: 'メニュー / モーダル', mock: 'dashboard_mock_menu.png', prod: 'dashboard_prod_menu.png' },
-      { label: 'アンケート作成モーダル', mock: 'dashboard_mock_create.png', prod: 'dashboard_prod_create.png' },
+      { label: '一覧', mock: 'dashboard_mock.png', prod: 'dashboard_prod.png',
+        diff: ['複製ボタンの位置が違う', 'ツールチップの表示が違う（位置・内容）'] },
+      { label: 'メニュー / モーダル', mock: 'dashboard_mock_menu.png', prod: 'dashboard_prod_menu.png', diff: [] },
+      { label: 'アンケート作成モーダル', mock: 'dashboard_mock_create.png', prod: 'dashboard_prod_create.png', diff: [] },
     ],
   },
   {
@@ -171,9 +173,12 @@ const SCREENS = [
       '設問表示UIが異なる',
     ],
     pairs: [
-      { label: '作成・編集画面', mock: 'survey-edit_mock.png', prod: 'survey-edit_prod.png' },
-      { label: 'プレビュー', mock: 'survey-edit_mock_preview.png', prod: 'survey-edit_prod_preview.png' },
-      { label: '設問表示UI', mock: 'survey-edit_mock_question.png', prod: 'survey-edit_prod_question.png' },
+      { label: '作成・編集画面', mock: 'survey-edit_mock.png', prod: 'survey-edit_prod.png',
+        diff: ['UI全体が異なる', '右下の＋ボタンが動かない'] },
+      { label: 'プレビュー', mock: 'survey-edit_mock_preview.png', prod: 'survey-edit_prod_preview.png',
+        diff: ['プレビュー表示が異なる'] },
+      { label: '設問表示UI', mock: 'survey-edit_mock_question.png', prod: 'survey-edit_prod_question.png',
+        diff: ['設問表示UIが異なる'] },
     ],
   },
   {
@@ -183,7 +188,8 @@ const SCREENS = [
       'テーマ切り替えが本番で使えない',
     ],
     pairs: [
-      { label: 'サイドバー', mock: 'sidebar_mock.png', prod: 'sidebar_prod.png' },
+      { label: 'サイドバー', mock: 'sidebar_mock.png', prod: 'sidebar_prod.png',
+        diff: ['テーマ切り替えが本番で使えない'] },
     ],
   },
   {
@@ -193,7 +199,8 @@ const SCREENS = [
       'UI全体が異なる',
     ],
     pairs: [
-      { label: '名刺データ化設定', mock: 'bizcard_mock.png', prod: 'bizcard_prod.png' },
+      { label: '名刺データ化設定', mock: 'bizcard_mock.png', prod: 'bizcard_prod.png',
+        diff: ['UI全体が異なる'] },
     ],
   },
   {
@@ -203,7 +210,8 @@ const SCREENS = [
       'UI全体が異なる',
     ],
     pairs: [
-      { label: 'お礼メール設定', mock: 'thankyou-email_mock.png', prod: 'thankyou-email_prod.png' },
+      { label: 'お礼メール設定', mock: 'thankyou-email_mock.png', prod: 'thankyou-email_prod.png',
+        diff: ['UI全体が異なる'] },
     ],
   },
   {
@@ -213,7 +221,8 @@ const SCREENS = [
       'UI全体が異なる',
     ],
     pairs: [
-      { label: 'サンクス画面設定', mock: 'thankyou-screen_mock.png', prod: 'thankyou-screen_prod.png' },
+      { label: 'サンクス画面設定', mock: 'thankyou-screen_mock.png', prod: 'thankyou-screen_prod.png',
+        diff: ['UI全体が異なる'] },
     ],
   },
   {
@@ -223,7 +232,8 @@ const SCREENS = [
       '枠の表示方法が若干違う',
     ],
     pairs: [
-      { label: 'アカウント情報モーダル', mock: 'account_mock.png', prod: 'account_prod.png' },
+      { label: 'アカウント情報モーダル', mock: 'account_mock.png', prod: 'account_prod.png',
+        diff: ['枠の表示方法が若干違う'] },
     ],
   },
   {
@@ -237,9 +247,12 @@ const SCREENS = [
       '設問表示の方法が違う',
     ],
     pairs: [
-      { label: 'スピードレビュー画面', mock: 'speed-review_mock.png', prod: 'speed-review_prod.png' },
-      { label: '回答詳細', mock: 'speed-review_mock_detail.png', prod: null },
-      { label: '設問表示', mock: 'speed-review_mock_question.png', prod: 'speed-review_prod_question.png' },
+      { label: 'スピードレビュー画面', mock: 'speed-review_mock.png', prod: 'speed-review_prod.png',
+        diff: ['サイドバーが出しっぱなしになっている（本番）', '時間別回答のグラフ表示が違う', '各グラフの表示方法が違う'] },
+      { label: '回答詳細', mock: 'speed-review_mock_detail.png', prod: null,
+        diff: ['回答詳細が本番に無い（本番側に該当画面なし）'] },
+      { label: '設問表示', mock: 'speed-review_mock_question.png', prod: 'speed-review_prod_question.png',
+        diff: ['設問表示の方法が違う'] },
     ],
   },
   {
@@ -318,8 +331,20 @@ function shotCol(side, file, label) {
 }
 
 function renderPair(p) {
+  const hasDiff = p.diff && p.diff.length;
+  const diffHtml = hasDiff
+    ? `<div class="mb-3 rounded-md border border-outline-variant bg-surface px-3 py-2">
+        <p class="flex items-center gap-1 text-xs font-bold" style="color:var(--color-state-warning)">
+          <span class="material-icons text-sm">report_problem</span>この箇所の差分
+        </p>
+        <ul class="mt-1 list-disc space-y-0.5 pl-5 text-sm text-on-surface-variant">
+          ${p.diff.map(d => `<li>${esc(d)}</li>`).join('')}
+        </ul>
+      </div>`
+    : `<p class="mb-3 text-xs text-on-surface-variant">参考比較（特記差分なし）</p>`;
   return `<div class="rounded-lg border border-outline-variant bg-background p-3">
     <p class="mb-2 text-sm font-bold text-on-surface">${esc(p.label)}</p>
+    ${diffHtml}
     <div class="grid gap-3 md:grid-cols-2">
       ${shotCol('mock', p.mock, p.label)}
       ${shotCol('prod', p.prod, p.label)}
