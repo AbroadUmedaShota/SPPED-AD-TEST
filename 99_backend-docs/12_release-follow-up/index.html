@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>6/15リリース後優先度整理 / バックエンド仕組み整理</title>
+  <title>6/15リリース後の未完了機能・優先度整理</title>
   <link rel="icon" href="../../02_dashboard/assets/svg/speedad_logo.svg" type="image/svg+xml">
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -11,7 +11,195 @@
   <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
   <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
 </head>
-<body>
-<script type="module" src="../assets/categoryPage.js"></script>
+<body class="bg-background text-on-background">
+<div class="min-h-screen bg-background">
+  <header class="border-b border-outline-variant bg-surface">
+    <div class="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-5 sm:px-6 lg:px-8">
+      <div>
+        <p class="text-sm font-semibold text-primary">BACKEND DOCS / 12_release-follow-up</p>
+        <h1 class="mt-1 text-headline-medium font-bold leading-tight text-on-surface">6/15リリース後の未完了機能・優先度整理</h1>
+        <p class="mt-2 max-w-4xl text-sm leading-6 text-on-surface-variant">部内共有とベンダー打合せ前の認識合わせ用に、未完了機能を「リリース必達」「短期導入」「通常ロードマップ」に分けた1ページ資料です。</p>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <a class="inline-flex items-center gap-2 rounded-lg border border-outline px-3 py-2 text-sm text-on-surface hover:bg-surface-variant" href="../index.html">
+          <span class="material-icons text-base">home</span>
+          HOME
+        </a>
+        <a class="inline-flex items-center gap-2 rounded-lg border border-outline px-3 py-2 text-sm text-on-surface hover:bg-surface-variant" href="./01_release-priority-classification.md" target="_blank" rel="noopener">
+          <span class="material-icons text-base">article</span>
+          Markdown
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
+    <section class="mt-6 grid gap-4 md:grid-cols-3" aria-label="分類サマリー">
+      <div class="rounded-lg border border-red-200 bg-red-50 p-4">
+        <p class="text-xs font-bold text-red-700">区分 1</p>
+        <h2 class="mt-1 text-base font-bold text-red-950">リリースに間に合わせたかった</h2>
+        <p class="mt-2 text-sm leading-6 text-red-900">リリース品質、DB移管品質、営業開始前提に関わるもの。</p>
+      </div>
+      <div class="rounded-lg border border-amber-200 bg-amber-50 p-4">
+        <p class="text-xs font-bold text-amber-700">区分 2</p>
+        <h2 class="mt-1 text-base font-bold text-amber-950">リリース後早く導入したい</h2>
+        <p class="mt-2 text-sm leading-6 text-amber-900">顧客利用、営業活動、運用価値への影響が大きいもの。</p>
+      </div>
+      <div class="rounded-lg border border-blue-200 bg-blue-50 p-4">
+        <p class="text-xs font-bold text-blue-700">区分 3</p>
+        <h2 class="mt-1 text-base font-bold text-blue-950">順次開発予定</h2>
+        <p class="mt-2 text-sm leading-6 text-blue-900">通常ロードマップとして順序と仕様確定時期を決めるもの。</p>
+      </div>
+    </section>
+
+    <section id="must-have" class="mt-8" aria-labelledby="must-have-title">
+      <div class="mb-3 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p class="text-sm font-semibold text-red-700">1. リリース必達だった残件</p>
+          <h2 id="must-have-title" class="mt-1 text-title-large font-bold text-on-surface">リリースに間に合わせたかったが、間に合わなかった機能</h2>
+        </div>
+        <span class="rounded-full bg-red-50 px-3 py-1 text-xs font-bold text-red-700">品質・移管対応として確認</span>
+      </div>
+      <div class="grid gap-3 lg:grid-cols-2">
+        <article class="rounded-lg border border-outline-variant bg-surface p-4">
+          <h3 class="text-sm font-bold text-on-surface">名刺画像・回答データ・CSVダウンロードの安定化</h3>
+          <p class="mt-2 text-sm leading-6 text-on-surface-variant">既存アンケートのデータ取得に直結。大容量DLは改善確認済みだが、処理時間や完了通知遅延は残論点。</p>
+          <p class="mt-2 text-xs font-semibold text-primary">関連: <a class="underline underline-offset-2 hover:text-primary/80" href="https://repinc.backlog.com/view/SPDAD2026-160" target="_blank" rel="noopener">SPDAD2026-160</a> / <a class="underline underline-offset-2 hover:text-primary/80" href="https://repinc.backlog.com/view/SPDAD2026-162" target="_blank" rel="noopener">SPDAD2026-162</a> / <a class="underline underline-offset-2 hover:text-primary/80" href="https://repinc.backlog.com/view/SPDAD2026-164" target="_blank" rel="noopener">SPDAD2026-164</a> / <a class="underline underline-offset-2 hover:text-primary/80" href="https://repinc.backlog.com/view/SPDAD2026-155" target="_blank" rel="noopener">SPDAD2026-155</a> / <a class="underline underline-offset-2 hover:text-primary/80" href="https://repinc.backlog.com/view/SPDAD2026-156" target="_blank" rel="noopener">SPDAD2026-156</a> / <a class="underline underline-offset-2 hover:text-primary/80" href="https://repinc.backlog.com/view/SPDAD2026-146" target="_blank" rel="noopener">SPDAD2026-146</a></p>
+        </article>
+        <article class="rounded-lg border border-outline-variant bg-surface p-4">
+          <h3 class="text-sm font-bold text-on-surface">名刺データ化設定まわり</h3>
+          <p class="mt-2 text-sm leading-6 text-on-surface-variant">営業開始、顧客利用、データ納品に関わる前提領域。設定、DL、権限制御の確認が必要。</p>
+          <p class="mt-2 text-xs font-semibold text-primary">関連: <a class="underline underline-offset-2 hover:text-primary/80" href="https://repinc.backlog.com/view/SPDAD2026-111" target="_blank" rel="noopener">SPDAD2026-111</a> / <a class="underline underline-offset-2 hover:text-primary/80" href="https://repinc.backlog.com/view/SPDAD2026-155" target="_blank" rel="noopener">SPDAD2026-155</a> / <a class="underline underline-offset-2 hover:text-primary/80" href="https://repinc.backlog.com/view/SPDAD2026-156" target="_blank" rel="noopener">SPDAD2026-156</a> / <a class="underline underline-offset-2 hover:text-primary/80" href="https://repinc.backlog.com/view/SPDAD2026-157" target="_blank" rel="noopener">SPDAD2026-157</a></p>
+        </article>
+        <article class="rounded-lg border border-outline-variant bg-surface p-4">
+          <h3 class="text-sm font-bold text-on-surface">ログイン後ダッシュボードTOP・主要導線</h3>
+          <p class="mt-2 text-sm leading-6 text-on-surface-variant">営業開始前に整えたかった領域。ダッシュボードTOPと主要導線の対象範囲、Backlog紐付けを確認する。</p>
+          <p class="mt-2 text-xs font-semibold text-primary">関連: 要Backlog紐付け確認</p>
+        </article>
+        <article class="rounded-lg border border-outline-variant bg-surface p-4">
+          <h3 class="text-sm font-bold text-on-surface">本番利用前に潰したかった基本不具合</h3>
+          <p class="mt-2 text-sm leading-6 text-on-surface-variant">アカウント情報モーダル保存など、6月上旬時点でリリース可否に影響していた項目。</p>
+          <p class="mt-2 text-xs font-semibold text-primary">関連: 要Backlog紐付け確認</p>
+        </article>
+        <article class="rounded-lg border border-outline-variant bg-surface p-4 lg:col-span-2">
+          <h3 class="text-sm font-bold text-on-surface">ログイン・サインアップ画面の本番化最低限対応</h3>
+          <p class="mt-2 text-sm leading-6 text-on-surface-variant">一部は反映済みだが、Googleログインや導入事例は非表示運用。復帰条件と残実装期限を確認する。</p>
+          <p class="mt-2 text-xs font-semibold text-primary">関連: <a class="underline underline-offset-2 hover:text-primary/80" href="https://repinc.backlog.com/view/SPDAD2026-147" target="_blank" rel="noopener">SPDAD2026-147</a></p>
+        </article>
+      </div>
+    </section>
+
+    <section id="early" class="mt-8" aria-labelledby="early-title">
+      <div class="mb-3 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p class="text-sm font-semibold text-amber-700">2. 短期導入したい機能</p>
+          <h2 id="early-title" class="mt-1 text-title-large font-bold text-on-surface">リリースには間に合わないと聞いていたが、早く導入したい機能</h2>
+        </div>
+        <span class="rounded-full bg-amber-50 px-3 py-1 text-xs font-bold text-amber-700">営業・顧客利用への影響順</span>
+      </div>
+      <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+        <article class="rounded-lg border border-outline-variant bg-surface p-4">
+          <h3 class="text-sm font-bold text-on-surface">Google認証</h3>
+          <p class="mt-2 text-sm leading-6 text-on-surface-variant">ログイン、会員登録のGoogle認証。導入可能時期と既存ログインとの併用を確認。</p>
+          <p class="mt-2 text-xs font-semibold text-primary"><a class="underline underline-offset-2 hover:text-primary/80" href="https://repinc.backlog.com/view/SPDAD2026-1" target="_blank" rel="noopener">SPDAD2026-1</a> / <a class="underline underline-offset-2 hover:text-primary/80" href="https://repinc.backlog.com/view/SPDAD2026-3" target="_blank" rel="noopener">SPDAD2026-3</a></p>
+        </article>
+        <article class="rounded-lg border border-outline-variant bg-surface p-4">
+          <h3 class="text-sm font-bold text-on-surface">導入事例表示・公開事例連携</h3>
+          <p class="mt-2 text-sm leading-6 text-on-surface-variant">公開NG記事の整理後、営業面で早めに復帰したい領域。</p>
+          <p class="mt-2 text-xs font-semibold text-primary"><a class="underline underline-offset-2 hover:text-primary/80" href="https://repinc.backlog.com/view/SPDAD2026-166" target="_blank" rel="noopener">SPDAD2026-166</a> / <a class="underline underline-offset-2 hover:text-primary/80" href="https://repinc.backlog.com/view/SPDAD2026-147" target="_blank" rel="noopener">SPDAD2026-147</a></p>
+        </article>
+        <article class="rounded-lg border border-outline-variant bg-surface p-4">
+          <h3 class="text-sm font-bold text-on-surface">プレミアムプランの未実装機能</h3>
+          <p class="mt-2 text-sm leading-6 text-on-surface-variant">サンクス文言設定、名刺データ化項目追加など。未実装表示のまま残す範囲も決める。</p>
+          <p class="mt-2 text-xs font-semibold text-primary"><a class="underline underline-offset-2 hover:text-primary/80" href="https://repinc.backlog.com/view/SPDAD2026-111" target="_blank" rel="noopener">SPDAD2026-111</a> / <a class="underline underline-offset-2 hover:text-primary/80" href="https://repinc.backlog.com/view/SPDAD2026-114" target="_blank" rel="noopener">SPDAD2026-114</a></p>
+        </article>
+        <article class="rounded-lg border border-outline-variant bg-surface p-4">
+          <h3 class="text-sm font-bold text-on-surface">お礼メール設定・自動送信・エラー検知</h3>
+          <p class="mt-2 text-sm leading-6 text-on-surface-variant">会期後フォロー品質に直結。送信条件、エラー時通知、手動運用との切替を確認。</p>
+          <p class="mt-2 text-xs font-semibold text-primary"><a class="underline underline-offset-2 hover:text-primary/80" href="https://repinc.backlog.com/view/SPDAD2026-108" target="_blank" rel="noopener">SPDAD2026-108</a></p>
+        </article>
+        <article class="rounded-lg border border-outline-variant bg-surface p-4">
+          <h3 class="text-sm font-bold text-on-surface">SPEEDレビュー機能</h3>
+          <p class="mt-2 text-sm leading-6 text-on-surface-variant">表示不具合は修正報告あり。機能としての本格導入と編集導線は確認が必要。</p>
+          <p class="mt-2 text-xs font-semibold text-primary"><a class="underline underline-offset-2 hover:text-primary/80" href="https://repinc.backlog.com/view/SPDAD2026-109" target="_blank" rel="noopener">SPDAD2026-109</a></p>
+        </article>
+        <article class="rounded-lg border border-outline-variant bg-surface p-4">
+          <h3 class="text-sm font-bold text-on-surface">ヘルプ・バグ報告の本番実装整理</h3>
+          <p class="mt-2 text-sm leading-6 text-on-surface-variant">実体は反映済みの可能性あり。Backlogクローズと運用開始条件を整理する。</p>
+          <p class="mt-2 text-xs font-semibold text-primary"><a class="underline underline-offset-2 hover:text-primary/80" href="https://repinc.backlog.com/view/SPDAD2026-103" target="_blank" rel="noopener">SPDAD2026-103</a> / <a class="underline underline-offset-2 hover:text-primary/80" href="https://repinc.backlog.com/view/SPDAD2026-105" target="_blank" rel="noopener">SPDAD2026-105</a></p>
+        </article>
+      </div>
+    </section>
+
+    <section id="roadmap" class="mt-8" aria-labelledby="roadmap-title">
+      <div class="mb-3 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p class="text-sm font-semibold text-blue-700">3. 通常ロードマップ</p>
+          <h2 id="roadmap-title" class="mt-1 text-title-large font-bold text-on-surface">リリース後に順次開発を予定していた機能</h2>
+        </div>
+        <span class="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">仕様確定時期と着手順を整理</span>
+      </div>
+      <div class="overflow-hidden rounded-lg border border-outline-variant bg-surface">
+        <div class="grid gap-px bg-outline-variant md:grid-cols-2 lg:grid-cols-3">
+          <div class="bg-surface p-4">
+            <p class="text-sm font-bold text-on-surface">アンケート作成プレビュー・PC/SP切替</p>
+            <p class="mt-1 text-xs font-semibold text-primary"><a class="underline underline-offset-2 hover:text-primary/80" href="https://repinc.backlog.com/view/SPDAD2026-32" target="_blank" rel="noopener">SPDAD2026-32</a></p>
+          </div>
+          <div class="bg-surface p-4">
+            <p class="text-sm font-bold text-on-surface">サンクス画面設定</p>
+            <p class="mt-1 text-xs font-semibold text-primary"><a class="underline underline-offset-2 hover:text-primary/80" href="https://repinc.backlog.com/view/SPDAD2026-34" target="_blank" rel="noopener">SPDAD2026-34</a></p>
+          </div>
+          <div class="bg-surface p-4">
+            <p class="text-sm font-bold text-on-surface">数値入力項目の追加</p>
+            <p class="mt-1 text-xs font-semibold text-primary"><a class="underline underline-offset-2 hover:text-primary/80" href="https://repinc.backlog.com/view/SPDAD2026-35" target="_blank" rel="noopener">SPDAD2026-35</a></p>
+          </div>
+          <div class="bg-surface p-4">
+            <p class="text-sm font-bold text-on-surface">アカウント情報・プロフィール画像</p>
+            <p class="mt-1 text-xs font-semibold text-primary"><a class="underline underline-offset-2 hover:text-primary/80" href="https://repinc.backlog.com/view/SPDAD2026-44" target="_blank" rel="noopener">SPDAD2026-44</a></p>
+          </div>
+          <div class="bg-surface p-4">
+            <p class="text-sm font-bold text-on-surface">アドレスエラー判定</p>
+            <p class="mt-1 text-xs font-semibold text-primary"><a class="underline underline-offset-2 hover:text-primary/80" href="https://repinc.backlog.com/view/SPDAD2026-68" target="_blank" rel="noopener">SPDAD2026-68</a></p>
+          </div>
+          <div class="bg-surface p-4">
+            <p class="text-sm font-bold text-on-surface">回答・名刺撮影モーダル最終仕様</p>
+            <p class="mt-1 text-xs font-semibold text-primary"><a class="underline underline-offset-2 hover:text-primary/80" href="https://repinc.backlog.com/view/SPDAD2026-95" target="_blank" rel="noopener">SPDAD2026-95</a></p>
+          </div>
+          <div class="bg-surface p-4 md:col-span-2 lg:col-span-3">
+            <p class="text-sm font-bold text-on-surface">ダッシュボードのアンケート詳細モーダル</p>
+            <p class="mt-1 text-xs font-semibold text-primary"><a class="underline underline-offset-2 hover:text-primary/80" href="https://repinc.backlog.com/view/SPDAD2026-15" target="_blank" rel="noopener">SPDAD2026-15</a></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mt-8 rounded-lg border border-outline-variant bg-surface p-5" aria-labelledby="meeting-title">
+      <p class="text-sm font-semibold text-primary">打合せ確認事項</p>
+      <h2 id="meeting-title" class="mt-1 text-title-large font-bold text-on-surface">明日の確認は4点に絞る</h2>
+      <div class="mt-4 grid gap-3 md:grid-cols-2">
+        <div class="flex gap-3 rounded-lg bg-background p-4">
+          <span class="material-icons text-primary">manage_search</span>
+          <p class="text-sm leading-6 text-on-surface-variant"><strong class="text-on-surface">リリース品質:</strong> 1の項目は、原因、恒久対応、再発防止、本番確認済み範囲を確認する。</p>
+        </div>
+        <div class="flex gap-3 rounded-lg bg-background p-4">
+          <span class="material-icons text-primary">sort</span>
+          <p class="text-sm leading-6 text-on-surface-variant"><strong class="text-on-surface">短期導入順:</strong> 2の項目は、営業開始と顧客利用への影響が大きい順に並べる。</p>
+        </div>
+        <div class="flex gap-3 rounded-lg bg-background p-4">
+          <span class="material-icons text-primary">event_note</span>
+          <p class="text-sm leading-6 text-on-surface-variant"><strong class="text-on-surface">通常ロードマップ:</strong> 3の項目は、仕様確定時期、着手順、リリース予定を確認する。</p>
+        </div>
+        <div class="flex gap-3 rounded-lg bg-background p-4">
+          <span class="material-icons text-primary">task_alt</span>
+          <p class="text-sm leading-6 text-on-surface-variant"><strong class="text-on-surface">Backlog整理:</strong> ステータスが実態とずれている可能性があるため、更新対象とクローズ条件を確認する。</p>
+        </div>
+      </div>
+    </section>
+
+    <footer class="mt-8 border-t border-outline-variant py-5 text-xs leading-6 text-on-surface-variant">
+      <p>共有用に再編集した資料です。Backlog番号は管理上の参照であり、現象の根拠そのものではありません。詳細仕様が必要な項目は、正式な画面仕様または運用手順へ昇格します。</p>
+    </footer>
+  </main>
+</div>
 </body>
 </html>
