@@ -210,11 +210,13 @@ const SCREENS = [
   },
   {
     id: 'sidebar', title: 'サイドバー', status: 'diff',
-    short: '構成は一致。テーマ切替の実動作のみ要確認',
+    short: 'テーマ切替が本番で機能しない',
     pairs: [
-      { label: 'サイドバー', mock: 'sidebar_mock.png', prod: 'sidebar_prod.png', diff: [
-        F('verify', 'テーマ切替の項目は両方に存在。実際にテーマが変わるかは静止画で判定不可'),
+      { label: 'サイドバー（全体）', mock: 'sidebar_mock.png', prod: 'sidebar_prod.png', diff: [
+        F('lack', 'テーマ切替が本番で機能しない（押しても切り替わらない）'),
       ] },
+      { label: 'テーマ切替（該当箇所を拡大）', mock: 'sidebar_crop_mock.png', prod: 'sidebar_crop_prod.png',
+        note: 'テーマ切替の位置（両環境とも項目は存在）。挙動の差：本番は押しても切り替わらない／モックは切り替わるが対応画面がまちまちで網羅されていない。' },
     ],
   },
   {
