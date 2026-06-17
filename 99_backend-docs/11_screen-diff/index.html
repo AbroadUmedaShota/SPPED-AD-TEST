@@ -165,23 +165,17 @@ const SCREENS = [
   },
   {
     id: 'dashboard', title: 'Dashboard', status: 'diff',
-    short: '複製ボタン位置・確認ボタン不足／「お礼メール設定」は本番先行',
+    short: 'アクション列の複製ボタンが本番のみ（モックにない）',
     pairs: [
       { label: '一覧', mock: 'dashboard_mock.png', prod: 'dashboard_prod.png', diff: [
-        F('ui', 'アクション列のアイコン数・種類・並びが違う（複製ボタンの位置ズレ含む）'),
-        F('lack', '左下「購入アカウント[Free]」情報カードがモックにあり、本番で確認できない'),
+        F('ahead', 'アクション列に「複製（コピー）」ボタンが本番にあり、モックにない（モック4アイコン／本番5アイコン）'),
         F('verify', 'ホバー時のツールチップ表示（位置・内容）は静止画で判定不可'),
       ] },
-      { label: '購入アカウントカード', zoom: true, mock: 'dashboard_card_mock.png', prod: 'dashboard_card_prod.png', diff: [
-        F('lack', '「購入アカウント[Free]」カード（プラン制限の案内）がモック左下にあり、本番にない'),
+      { label: 'アクション列（複製ボタン）', zoom: true, mock: 'dashboard_action_mock.png', prod: 'dashboard_action_prod.png', diff: [
+        F('ahead', '本番だけ「複製」アイコンがある（編集／QR／複製／SPEEDレビュー／DL）。モックは複製なしの4アイコン'),
       ] },
-      { label: 'メニュー / 詳細モーダル', mock: 'dashboard_mock_menu.png', prod: 'dashboard_prod_menu.png', diff: [
-        F('lack', '詳細モーダルの「確認」ボタンがモックにあり、本番にない'),
-        F('ahead', '詳細モーダルに「お礼メール設定」セクションが本番にあり、モックにない'),
-      ] },
-      { label: '詳細モーダル下部', zoom: true, mock: 'dashboard_modal_mock.png', prod: 'dashboard_modal_prod.png', diff: [
-        F('ahead', '本番のモーダル下部に「お礼メール設定」セクションがある（モックにはない）'),
-      ] },
+      { label: 'メニュー / 詳細モーダル', mock: 'dashboard_mock_menu.png', prod: 'dashboard_prod_menu.png',
+        note: '詳細モーダルは両環境とも同構成（基本情報／データ＆請求／名刺データ化設定／お礼メール設定）。お礼メール設定はモック・本番の両方にある。スクショは別アンケートのため細部の比較は参考。' },
       { label: 'アンケート作成モーダル', mock: 'dashboard_mock_create.png', prod: 'dashboard_prod_create.png', diff: [
         F('verify', 'アンケート名がモックは自動入力済み／本番は空欄（自動採番の有無は要実機）'),
       ] },
