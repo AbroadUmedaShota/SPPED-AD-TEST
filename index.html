@@ -6,6 +6,22 @@
   <meta name="description" content="SPEED AD - 営業プロセスの無駄をゼロにする次世代のリード獲得ツール">
   <meta name="keywords" content="SPEED AD, 展示会, WEBアンケート, 名刺データ化, 御礼メール, ログイン">
   <title>SPEED AD - 営業プロセスの無駄をゼロにする次世代のリード獲得ツール。</title>
+  <script>
+    (function(w, d, s, l, i) {
+      var productionHosts = ['speed-ad.com', 'www.speed-ad.com'];
+      if (productionHosts.indexOf(w.location.hostname) === -1) {
+        return;
+      }
+      w[l] = w[l] || [];
+      w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+      var firstScript = d.getElementsByTagName(s)[0];
+      var tagManagerScript = d.createElement(s);
+      var dataLayerParam = l !== 'dataLayer' ? '&l=' + l : '';
+      tagManagerScript.async = true;
+      tagManagerScript.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dataLayerParam;
+      firstScript.parentNode.insertBefore(tagManagerScript, firstScript);
+    })(window, document, 'script', 'dataLayer', 'GTM-NSC8G2DB');
+  </script>
   <link rel="icon" href="img/logo2.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -97,6 +113,17 @@
   </style>
 </head>
 <body id="before-login" class="login-front-edit--watermark" data-login-panel-theme="e2">
+  <script>
+    (function(w, d, i) {
+      var productionHosts = ['speed-ad.com', 'www.speed-ad.com'];
+      if (productionHosts.indexOf(w.location.hostname) === -1) {
+        return;
+      }
+      var tagManagerNoScript = d.createElement('noscript');
+      tagManagerNoScript.innerHTML = '<iframe src="https://www.googletagmanager.com/ns.html?id=' + i + '" height="0" width="0" style="display:none;visibility:hidden"></iframe>';
+      d.body.insertBefore(tagManagerNoScript, d.body.firstChild);
+    })(window, document, 'GTM-NSC8G2DB');
+  </script>
   <a class="skip-link" href="#top">本文へスキップ</a>
   <main id="top">
     <div class="lp-page lp-page--first">
