@@ -3,6 +3,7 @@ import { openDownloadModal } from './downloadOptionsModal.js';
 import { openDuplicateSurveyModal } from './duplicateSurveyModal.js';
 import { updateSurveyData } from './tableManager.js'; // tableManagerからインポート
 import { deriveSurveyLifecycleMeta, USER_STATUSES } from './services/statusService.js';
+import { isReadOnlySurvey } from './services/surveyDefaults.js';
 import { closeModal } from './modalHandler.js';
 import { buildSurveyAnswerUrl } from './qrCodeModal.js';
 import { initHelpPopovers } from './ui/helpPopover.js';
@@ -133,6 +134,10 @@ function handleDuplicateSurvey() {
 }
 
 function handleDeleteSurvey() {
+    if (isReadOnlySurvey(currentEditingSurvey)) {
+        showToast('サンプルアンケートは削除できません。', 'info');
+        return;
+    }
     if (currentEditingSurvey) {
         showToast(`アンケートID: ${currentEditingSurvey.id} を削除します。（実装はここから）`, 'info');
         // 削除処理後、モーダルを閉じるなどの処理が必要
@@ -148,6 +153,10 @@ function handleCancelEdit() {
 function handleSaveSurvey() {
     if (!currentEditingSurvey) {
         showToast('保存するアンケート情報がありません。', 'error');
+        return;
+    }
+    if (isReadOnlySurvey(currentEditingSurvey)) {
+        showToast('サンプルアンケートは保存できません。', 'info');
         return;
     }
 
@@ -235,6 +244,19 @@ export function populateSurveyDetails(survey) {
     const statusMeta = lifecycleMeta.statusMeta;
     const statusColorClass = statusMeta.badgeClass;
     const statusTooltip = statusMeta.description;
+    const readOnlySurvey = isReadOnlySurvey(survey);
+
+    const existingNotice = modal.querySelector('#sampleReadOnlyNotice');
+    if (existingNotice) {
+        existingNotice.remove();
+    }
+    if (readOnlySurvey) {
+        const notice = document.createElement('p');
+        notice.id = 'sampleReadOnlyNotice';
+        notice.className = 'mb-4 rounded-md border border-indigo-200 bg-indigo-50 px-4 py-2 text-sm font-semibold text-indigo-800';
+        notice.textContent = '標準機能確認用のサンプルです。編集・削除はできません。複製して通常アンケートとして利用できます。';
+        modal.querySelector('form')?.insertAdjacentElement('beforebegin', notice);
+    }
 
     surveyDetailName.textContent = surveyName;
     surveyDetailStatusBadge.className = `inline-flex items-center rounded-full text-xs px-2 py-1 ${statusColorClass}`;
@@ -297,10 +319,18 @@ export function populateSurveyDetails(survey) {
     // 編集ボタンの表示/非表示をステータスに基づいて制御
     const editSurveyBtn = modal.querySelector('#editSurveyBtn');
     if (editSurveyBtn) {
-        if (displayStatus === USER_STATUSES.PRE_PERIOD) {
+        if (!readOnlySurvey && displayStatus === USER_STATUSES.PRE_PERIOD) {
             editSurveyBtn.classList.remove('hidden');
         } else {
             editSurveyBtn.classList.add('hidden');
         }
+    }
+    const deleteSurveyBtn = modal.querySelector('#deleteSurveyBtn');
+    if (deleteSurveyBtn) {
+        deleteSurveyBtn.classList.toggle('hidden', readOnlySurvey);
+    }
+    const duplicateSurveyBtn = modal.querySelector('#duplicateSurveyBtn');
+    if (duplicateSurveyBtn) {
+        duplicateSurveyBtn.classList.remove('hidden');
     }
 };

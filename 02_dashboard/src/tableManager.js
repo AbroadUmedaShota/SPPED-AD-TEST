@@ -10,6 +10,7 @@ import {
     getStatusSortOrder,
     USER_STATUSES
 } from './services/statusService.js';
+import { isGlobalSampleSurvey, isReadOnlySurvey } from './services/surveyDefaults.js';
 
 const surveyTableBody = document.getElementById('surveyTableBody');
 const surveyFetchErrorOverlay = document.getElementById('survey-fetch-error');
@@ -30,12 +31,22 @@ function sanitizeSurveysForDisplay(surveys) {
 
 function sortSurveysByIdDesc(surveys) {
     if (!Array.isArray(surveys)) return [];
-    return [...surveys].sort((a, b) => {
+    return moveSampleSurveysToEnd([...surveys].sort((a, b) => {
         const idA = a?.id ?? '';
         const idB = b?.id ?? '';
         if (idA < idB) return 1;
         if (idA > idB) return -1;
         return 0;
+    }));
+}
+
+function moveSampleSurveysToEnd(surveys) {
+    if (!Array.isArray(surveys)) return [];
+    return [...surveys].sort((a, b) => {
+        const aIsSample = isGlobalSampleSurvey(a);
+        const bIsSample = isGlobalSampleSurvey(b);
+        if (aIsSample === bIsSample) return 0;
+        return aIsSample ? 1 : -1;
     });
 }
 
@@ -43,6 +54,12 @@ const SURVEY_ID_PATTERN = /^sv_(\d{4})_(\d{2})(\d{3})$/;
 const SURVEY_ID_DEFAULT_USER = '0001';
 const SURVEY_ID_MAX_SEQUENCE = 999;
 const HIDDEN_USER_STATUSES = new Set([USER_STATUSES.DELETED]);
+const GROUP_USER_ID_MAP = {
+    personal: '0001',
+    group_sales: '0002',
+    group_marketing: '0003',
+    group_bpo: '0004'
+};
 
 function setHeaderAriaSort(header, sortOrder = 'none') {
     if (!header) return;
@@ -179,6 +196,7 @@ function sortByHeader(header) {
 
             return sortOrder === 'asc' ? result : -result;
         });
+        currentFilteredData = moveSampleSurveysToEnd(currentFilteredData);
 
         updatePagination(); // Re-render table with sorted data and update pagination
     } finally {
@@ -200,7 +218,7 @@ export async function fetchSurveyData() {
 
     try {
         const coreUrl = resolveDashboardDataPath('core/surveys.json');
-        const response = await fetch(coreUrl);
+        const response = await fetch(coreUrl, { cache: 'no-store' });
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -358,12 +376,19 @@ function renderTableRows(surveysToRender) {
 
         const statusColorClass = statusMeta.badgeClass;
         const statusTitle = statusMeta.description;
+        const isSampleSurvey = isGlobalSampleSurvey(survey);
+        const isReadOnly = isReadOnlySurvey(survey);
+        const editButtonTitle = isReadOnly ? 'サンプルのため編集できません' : 'アンケートを編集';
+        const editButtonDisabledAttrs = isReadOnly ? 'disabled aria-disabled="true"' : '';
+        const editButtonClass = isReadOnly
+            ? 'bg-surface-variant text-on-surface-variant rounded-full p-2 w-9 h-9 transition-all border border-outline-variant flex items-center justify-center opacity-50 cursor-not-allowed'
+            : 'bg-secondary-container text-on-secondary-container hover:bg-secondary-container hover:text-on-secondary-container rounded-full p-2 w-9 h-9 transition-all shadow-sm shadow-lg border border-secondary flex items-center justify-center';
 
         const realtimeAnswersDisplay = '';
 
         row.innerHTML = `
             <td data-label="アクション" class="px-4 py-3 whitespace-nowrap actions-cell flex gap-1">
-                <button class="bg-secondary-container text-on-secondary-container hover:bg-secondary-container hover:text-on-secondary-container rounded-full p-2 w-9 h-9 transition-all shadow-sm shadow-lg border border-secondary flex items-center justify-center" title="アンケートを編集" aria-label="アンケートを編集"><span class="material-icons text-lg">edit</span></button>
+                <button class="${editButtonClass}" title="${editButtonTitle}" aria-label="${editButtonTitle}" data-action="edit-survey" ${editButtonDisabledAttrs}><span class="material-icons text-lg">edit</span></button>
                 <button class="bg-secondary-container text-on-secondary-container hover:bg-secondary-container hover:text-on-secondary-container rounded-full p-2 w-9 h-9 transition-all shadow-sm shadow-lg border border-secondary flex items-center justify-center" title="QRコードを表示" aria-label="QRコードを表示"><span class="material-icons text-lg">qr_code_2</span></button>
                 <button class="bg-secondary-container text-on-secondary-container hover:bg-secondary-container hover:text-on-secondary-container rounded-full p-2 w-9 h-9 transition-all shadow-sm shadow-lg border border-secondary flex items-center justify-center" title="SPEEDレビューを開く" aria-label="SPEEDレビューを開く"><span class="material-icons text-lg">bolt</span></button>
                 <button class="bg-secondary-container text-on-secondary-container hover:bg-secondary-container hover:text-on-secondary-container rounded-full p-2 w-9 h-9 transition-all shadow-sm shadow-lg border border-secondary flex items-center justify-center" title="データダウンロード" aria-label="データダウンロード"><span class="material-icons text-lg">download</span></button>
@@ -406,11 +431,14 @@ function renderTableRows(surveysToRender) {
             });
         }
 
-        row.querySelector('button[title="アンケートを編集"]').addEventListener('click', (e) => {
-            e.stopPropagation();
-            const surveyNameForUrl = encodeURIComponent(surveyName);
-            window.location.href = `surveyCreation.html?surveyId=${survey.id}&surveyName=${surveyNameForUrl}`;
-        });
+        const editButton = row.querySelector('[data-action="edit-survey"]');
+        if (editButton && !isReadOnly) {
+            editButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const surveyNameForUrl = encodeURIComponent(surveyName);
+                window.location.href = `surveyCreation.html?surveyId=${survey.id}&surveyName=${surveyNameForUrl}`;
+            });
+        }
 
         row.querySelector('button[title="QRコードを表示"]').addEventListener('click', (e) => {
             e.stopPropagation();
@@ -570,6 +598,41 @@ function generateNewSurveyId(referenceSurveyId = '') {
     return `sv_${userId}_${yearSuffix}${sequence}`;
 }
 
+function buildGroupScopedReferenceSurveyId(groupId) {
+    const userId = GROUP_USER_ID_MAP[groupId] || SURVEY_ID_DEFAULT_USER;
+    const now = new Date();
+    const yearSuffix = String(now.getFullYear() % 100).padStart(2, '0');
+    return `sv_${userId}_${yearSuffix}000`;
+}
+
+function resolveDuplicateGroupId(survey) {
+    if (isGlobalSampleSurvey(survey)) {
+        return currentGroupId || 'personal';
+    }
+    return survey.groupId || 'personal';
+}
+
+function resolveDuplicateReferenceSurveyId(survey, groupId) {
+    if (isGlobalSampleSurvey(survey)) {
+        return buildGroupScopedReferenceSurveyId(groupId);
+    }
+    return survey.id;
+}
+
+function buildLocalizedValue(value, fallback = '') {
+    if (value && typeof value === 'object') {
+        return {
+            ...value,
+            ja: value.ja || fallback,
+            en: value.en || value.ja || fallback
+        };
+    }
+    return {
+        ja: fallback || value || '',
+        en: fallback || value || ''
+    };
+}
+
 /**
  * Duplicates a survey.
  * @param {string} surveyId The ID of the survey to duplicate.
@@ -577,24 +640,48 @@ function generateNewSurveyId(referenceSurveyId = '') {
  * @param {string} newPeriodStart The new start date for the duplicated survey.
  * @param {string} newPeriodEnd The new end date for the duplicated survey.
  */
-export function duplicateSurvey(surveyId, newName, newPeriodStart, newPeriodEnd) {
+export function duplicateSurvey(surveyId, duplicateOptions = {}) {
     const surveyToDuplicate = allSurveyData.find(s => s.id === surveyId);
     if (!surveyToDuplicate) {
         showToast('複製対象のアンケートが見つかりません。', 'error');
-        return;
+        return null;
     }
+
+    const groupId = resolveDuplicateGroupId(surveyToDuplicate);
+    const referenceSurveyId = resolveDuplicateReferenceSurveyId(surveyToDuplicate, groupId);
+    const newName = duplicateOptions.name || '';
+    const newDisplayTitle = duplicateOptions.displayTitle || newName;
+    const newMemo = duplicateOptions.memo || '';
+    const newPeriodStart = duplicateOptions.periodStart || '';
+    const newPeriodEnd = duplicateOptions.periodEnd || '';
 
     const newSurvey = {
         ...surveyToDuplicate,
-        id: generateNewSurveyId(surveyToDuplicate.id),
-        name: newName,
+        id: generateNewSurveyId(referenceSurveyId),
+        groupId,
+        name: buildLocalizedValue(surveyToDuplicate.name, newName),
+        displayTitle: buildLocalizedValue(surveyToDuplicate.displayTitle, newDisplayTitle),
+        memo: newMemo,
         periodStart: newPeriodStart,
         periodEnd: newPeriodEnd,
         status: '会期前',
         answerCount: 0,
         realtimeAnswers: 0,
-        // 必要に応じて他のフィールドもリセット・変更
+        dataCompletionFlag: false,
+        dataCompletionDate: '',
+        bizcardCompletionCount: 0,
+        bypassDownloadDeadline: false,
+        isSample: false,
+        sampleVisibility: undefined,
+        readOnly: false,
+        sampleBadgeLabel: undefined,
+        deadline: '',
+        downloadDeadline: ''
     };
+    newSurvey.name.ja = newName;
+    newSurvey.name.en = newName;
+    newSurvey.displayTitle.ja = newDisplayTitle;
+    newSurvey.displayTitle.en = newDisplayTitle;
 
     // Add the new survey to the main data array
     allSurveyData.unshift(newSurvey); // Add to the beginning of the array
@@ -603,6 +690,7 @@ export function duplicateSurvey(surveyId, newName, newPeriodStart, newPeriodEnd)
     applyFiltersAndPagination();
 
     showToast(`「${newName}」を複製しました。`, 'success');
+    return newSurvey;
 }
 
 /** Updates the displayed rows and pagination controls. */
@@ -714,7 +802,7 @@ export function applyFiltersAndPagination() {
         const endDate = endDateInputVal ? new Date(endDateInputVal) : null;
         const lang = typeof window.getCurrentLanguage === 'function' ? window.getCurrentLanguage() : 'ja';
 
-        currentFilteredData = allSurveyData.filter(survey => {
+        currentFilteredData = moveSampleSurveysToEnd(allSurveyData.filter(survey => {
             const surveyName = (survey.name && typeof survey.name === 'object')
                 ? (survey.name[lang] || survey.name.ja || '').toLowerCase()
                 : (survey.name || '').toLowerCase();
@@ -728,7 +816,9 @@ export function applyFiltersAndPagination() {
 
             const matchesKeyword = keyword === '' || surveyName.includes(keyword) || survey.id.toLowerCase().includes(keyword);
             const matchesStatus = status === 'all' || displayStatus === status;
-            const matchesGroup = currentGroupId === 'personal'
+            const matchesGroup = isGlobalSampleSurvey(survey)
+                ? true
+                : currentGroupId === 'personal'
                 ? (!survey.groupId || survey.groupId === 'personal')
                 : (currentGroupId === null || survey.groupId === currentGroupId); // グループIDによるフィルタリング
 
@@ -737,7 +827,7 @@ export function applyFiltersAndPagination() {
                 (!endDate || !isValidDate(endDate) || (surveyPeriodEnd && surveyPeriodEnd <= endDate));
 
             return matchesKeyword && matchesStatus && matchesPeriod && matchesGroup;
-        });
+        }));
 
         currentPage = 1; // Reset to first page after filtering
         updatePagination(); // Re-render table with filtered data and update pagination

@@ -5019,13 +5019,13 @@
     "id": "sv_0003_26010",
     "groupId": "group_marketing",
     "name": {
-      "ja": "マーケティング部サンプルアンケート (全タイプ & プレミアム)",
-      "en": "Marketing Dept. Sample Survey (All Types & Premium)"
+      "ja": "SPEED AD サンプルアンケート（標準機能確認用）",
+      "en": "SPEED AD Sample Survey (Standard Feature Demo)"
     },
-    "status": "会期中",
-    "answerCount": 200,
-    "periodStart": "2026-02-01",
-    "periodEnd": "2026-02-28",
+    "status": "完了",
+    "answerCount": 10,
+    "periodStart": "2026-06-01",
+    "periodEnd": "2026-06-15",
     "plan": "Premium",
     "details": [
       {
@@ -5173,6 +5173,37 @@
         "text": "※アンケートにご協力いただきありがとうございました。",
         "type": "explanation"
       }
-    ]
+    ],
+    "displayTitle": {
+      "ja": "SPEED AD サンプルアンケート",
+      "en": "SPEED AD Sample Survey"
+    },
+    "description": {
+      "ja": "標準機能の確認用サンプルです。回答、名刺データ化、SPEEDレビュー、ダウンロード確認の流れを確認できます。",
+      "en": "Sample survey for reviewing standard features such as responses, business card data conversion, SPEED Review, and download availability."
+    },
+    "memo": "全アカウントで確認できる読取専用サンプルです。",
+    "realtimeAnswers": 0,
+    "deadline": "2026-09-13",
+    "downloadDeadline": "2026-09-13",
+    "dataCompletionDate": "2026-06-16",
+    "dataCompletionFlag": true,
+    "bizcardEnabled": true,
+    "bizcardRequest": 10,
+    "bizcardCompletionCount": 10,
+    "bypassDownloadDeadline": true,
+    "isSample": true,
+    "sampleVisibility": "all_accounts",
+    "readOnly": true,
+    "sampleBadgeLabel": "サンプル",
+    "dataConversionPlan": "standard",
+    "thankYouEmailSettings": "自動送信",
+    "estimatedBillingAmount": 3300,
+    "bizcardSettings": {
+      "bizcardEnabled": true,
+      "bizcardRequest": 10,
+      "dataConversionPlan": "standard",
+      "internalMemo": "全アカウント共通サンプル用の名刺データ化設定です。"
+    }
   }
 ]
