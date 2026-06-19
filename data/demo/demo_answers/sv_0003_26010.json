@@ -1,0 +1,734 @@
+[
+  {
+    "answerId": "ans-sv_0003_26010-00001",
+    "surveyId": "sv_0003_26010",
+    "answeredAt": "2026-06-01T10:00:00Z",
+    "details": [
+      {
+        "questionId": "Q1",
+        "answer": "Webサイト"
+      },
+      {
+        "questionId": "Q2",
+        "answer": [
+          "クラウドサービス",
+          "セキュリティ",
+          "VR/AR"
+        ]
+      },
+      {
+        "questionId": "Q3",
+        "answer": "田中 翔太"
+      },
+      {
+        "questionId": "Q4",
+        "answer": "デモを希望します"
+      },
+      {
+        "questionId": "Q5",
+        "answer": "2026-04-01"
+      },
+      {
+        "questionId": "Q6",
+        "answer": "14:00"
+      },
+      {
+        "questionId": "Q7",
+        "answer": 28
+      },
+      {
+        "questionId": "Q8",
+        "answer": {
+          "r1": "3",
+          "r2": "5",
+          "r3": "3",
+          "r4": "1"
+        }
+      },
+      {
+        "questionId": "Q9",
+        "answer": []
+      },
+      {
+        "questionId": "Q10",
+        "answer": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMzAwIDEwMCI+PHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IndoaXRlIiBzdHJva2U9IiNjY2MiIHN0cm9rZS13aWR0aD0iMSIvPjx0ZXh0IHg9IjE1MCIgeT0iNjAiIGZvbnQtZmFtaWx5PSJjdXJzaXZlIiBmb250LXNpemU9IjI0IiBmaWxsPSIjMDAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXN0eWxlPSJpdGFsaWMiPueUsOS4rSDnv5TlpKo8L3RleHQ+PHBhdGggZD0iTTUwLDgwIFExNTAsOTAgMjUwLDgwIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==",
+        "type": "handwriting"
+      },
+      {
+        "questionId": "Q11",
+        "answer": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgNDAwIDMwMCI+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9ImhzbCgzNTAsIDcwJSwgOTAlKSIvPjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE1MCIgcj0iNTAiIGZpbGw9ImhzbCgzNTAsIDcwJSwgODAlKSIvPjxyZWN0IHg9IjEwMCIgeT0iMjQwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwIiBmaWxsPSJyZ2JhKDAsMCwwLDAuMSkiLz48dGV4dCB4PSIyMDAiIHk9IjE1NSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjAiIGZpbGw9IiM1NTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlNpdGUgUGhvdG8gIzAwMDE8L3RleHQ+PC9zdmc+",
+        "type": "image"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00002",
+    "surveyId": "sv_0003_26010",
+    "answeredAt": "2026-06-02T10:30:00Z",
+    "details": [
+      {
+        "questionId": "Q1",
+        "answer": "SNS"
+      },
+      {
+        "questionId": "Q2",
+        "answer": [
+          "クラウドサービス",
+          "セキュリティ",
+          "IoT",
+          "VR/AR"
+        ]
+      },
+      {
+        "questionId": "Q3",
+        "answer": "田中 由佳"
+      },
+      {
+        "questionId": "Q4",
+        "answer": ""
+      },
+      {
+        "questionId": "Q5",
+        "answer": "2026-04-01"
+      },
+      {
+        "questionId": "Q6",
+        "answer": "14:00"
+      },
+      {
+        "questionId": "Q7",
+        "answer": 31
+      },
+      {
+        "questionId": "Q8",
+        "answer": {
+          "r1": "5",
+          "r2": "4",
+          "r3": "4",
+          "r4": "5"
+        }
+      },
+      {
+        "questionId": "Q9",
+        "answer": [
+          {
+            "row": "r1",
+            "value": "b"
+          },
+          {
+            "row": "r1",
+            "value": "c"
+          },
+          {
+            "row": "r1",
+            "value": "d"
+          },
+          {
+            "row": "r2",
+            "value": "b"
+          },
+          {
+            "row": "r2",
+            "value": "d"
+          }
+        ]
+      },
+      {
+        "questionId": "Q10",
+        "answer": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMzAwIDEwMCI+PHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IndoaXRlIiBzdHJva2U9IiNjY2MiIHN0cm9rZS13aWR0aD0iMSIvPjx0ZXh0IHg9IjE1MCIgeT0iNjAiIGZvbnQtZmFtaWx5PSJjdXJzaXZlIiBmb250LXNpemU9IjI0IiBmaWxsPSIjMDAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXN0eWxlPSJpdGFsaWMiPueUsOS4rSDnlLHkvbM8L3RleHQ+PHBhdGggZD0iTTUwLDgwIFExNTAsOTAgMjUwLDgwIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==",
+        "type": "handwriting"
+      },
+      {
+        "questionId": "Q11",
+        "answer": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgNDAwIDMwMCI+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9ImhzbCg1MiwgNzAlLCA5MCUpIi8+PGNpcmNsZSBjeD0iMjAwIiBjeT0iMTUwIiByPSI1MCIgZmlsbD0iaHNsKDUyLCA3MCUsIDgwJSkiLz48cmVjdCB4PSIxMDAiIHk9IjI0MCIgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMCIgZmlsbD0icmdiYSgwLDAsMCwwLjEpIi8+PHRleHQgeD0iMjAwIiB5PSIxNTUiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjIwIiBmaWxsPSIjNTU1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5TaXRlIFBob3RvICMwMDAyPC90ZXh0Pjwvc3ZnPg==",
+        "type": "image"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00003",
+    "surveyId": "sv_0003_26010",
+    "answeredAt": "2026-06-03T11:00:00Z",
+    "details": [
+      {
+        "questionId": "Q1",
+        "answer": "SNS"
+      },
+      {
+        "questionId": "Q2",
+        "answer": [
+          "AI・機械学習",
+          "クラウドサービス",
+          "セキュリティ",
+          "IoT",
+          "VR/AR"
+        ]
+      },
+      {
+        "questionId": "Q3",
+        "answer": "井上 大輔"
+      },
+      {
+        "questionId": "Q4",
+        "answer": "詳細を聞きたい"
+      },
+      {
+        "questionId": "Q5",
+        "answer": "2026-04-01"
+      },
+      {
+        "questionId": "Q6",
+        "answer": "14:00"
+      },
+      {
+        "questionId": "Q7",
+        "answer": 25
+      },
+      {
+        "questionId": "Q8",
+        "answer": {
+          "r1": "5",
+          "r2": "5",
+          "r3": "4",
+          "r4": "3"
+        }
+      },
+      {
+        "questionId": "Q9",
+        "answer": [
+          {
+            "row": "r1",
+            "value": "a"
+          },
+          {
+            "row": "r1",
+            "value": "b"
+          },
+          {
+            "row": "r2",
+            "value": "a"
+          },
+          {
+            "row": "r2",
+            "value": "b"
+          }
+        ]
+      },
+      {
+        "questionId": "Q10",
+        "answer": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMzAwIDEwMCI+PHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IndoaXRlIiBzdHJva2U9IiNjY2MiIHN0cm9rZS13aWR0aD0iMSIvPjx0ZXh0IHg9IjE1MCIgeT0iNjAiIGZvbnQtZmFtaWx5PSJjdXJzaXZlIiBmb250LXNpemU9IjI0IiBmaWxsPSIjMDAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXN0eWxlPSJpdGFsaWMiPuS6leS4iiDlpKfovJQ8L3RleHQ+PHBhdGggZD0iTTUwLDgwIFExNTAsOTAgMjUwLDgwIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==",
+        "type": "handwriting"
+      },
+      {
+        "questionId": "Q11",
+        "answer": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgNDAwIDMwMCI+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9ImhzbCgyMSwgNzAlLCA5MCUpIi8+PGNpcmNsZSBjeD0iMjAwIiBjeT0iMTUwIiByPSI1MCIgZmlsbD0iaHNsKDIxLCA3MCUsIDgwJSkiLz48cmVjdCB4PSIxMDAiIHk9IjI0MCIgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMCIgZmlsbD0icmdiYSgwLDAsMCwwLjEpIi8+PHRleHQgeD0iMjAwIiB5PSIxNTUiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjIwIiBmaWxsPSIjNTU1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5TaXRlIFBob3RvICMwMDAzPC90ZXh0Pjwvc3ZnPg==",
+        "type": "image"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00004",
+    "surveyId": "sv_0003_26010",
+    "answeredAt": "2026-06-04T11:30:00Z",
+    "details": [
+      {
+        "questionId": "Q1",
+        "answer": "その他"
+      },
+      {
+        "questionId": "Q2",
+        "answer": [
+          "セキュリティ",
+          "VR/AR"
+        ]
+      },
+      {
+        "questionId": "Q3",
+        "answer": "木村 健太"
+      },
+      {
+        "questionId": "Q4",
+        "answer": "導入コストについて知りたい"
+      },
+      {
+        "questionId": "Q5",
+        "answer": "2026-04-01"
+      },
+      {
+        "questionId": "Q6",
+        "answer": "14:00"
+      },
+      {
+        "questionId": "Q7",
+        "answer": 44
+      },
+      {
+        "questionId": "Q8",
+        "answer": {
+          "r1": "2",
+          "r2": "3",
+          "r3": "4",
+          "r4": "5"
+        }
+      },
+      {
+        "questionId": "Q9",
+        "answer": [
+          {
+            "row": "r1",
+            "value": "a"
+          },
+          {
+            "row": "r2",
+            "value": "b"
+          }
+        ]
+      },
+      {
+        "questionId": "Q10",
+        "answer": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMzAwIDEwMCI+PHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IndoaXRlIiBzdHJva2U9IiNjY2MiIHN0cm9rZS13aWR0aD0iMSIvPjx0ZXh0IHg9IjE1MCIgeT0iNjAiIGZvbnQtZmFtaWx5PSJjdXJzaXZlIiBmb250LXNpemU9IjI0IiBmaWxsPSIjMDAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXN0eWxlPSJpdGFsaWMiPuacqOadkSDlgaXlpKo8L3RleHQ+PHBhdGggZD0iTTUwLDgwIFExNTAsOTAgMjUwLDgwIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==",
+        "type": "handwriting"
+      },
+      {
+        "questionId": "Q11",
+        "answer": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgNDAwIDMwMCI+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9ImhzbCgzMTcsIDcwJSwgOTAlKSIvPjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE1MCIgcj0iNTAiIGZpbGw9ImhzbCgzMTcsIDcwJSwgODAlKSIvPjxyZWN0IHg9IjEwMCIgeT0iMjQwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwIiBmaWxsPSJyZ2JhKDAsMCwwLDAuMSkiLz48dGV4dCB4PSIyMDAiIHk9IjE1NSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjAiIGZpbGw9IiM1NTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlNpdGUgUGhvdG8gIzAwMDQ8L3RleHQ+PC9zdmc+",
+        "type": "image"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00005",
+    "surveyId": "sv_0003_26010",
+    "answeredAt": "2026-06-05T13:00:00Z",
+    "details": [
+      {
+        "questionId": "Q1",
+        "answer": "招待状"
+      },
+      {
+        "questionId": "Q2",
+        "answer": [
+          "クラウドサービス",
+          "セキュリティ"
+        ]
+      },
+      {
+        "questionId": "Q3",
+        "answer": "松本 健太"
+      },
+      {
+        "questionId": "Q4",
+        "answer": ""
+      },
+      {
+        "questionId": "Q5",
+        "answer": "2026-04-01"
+      },
+      {
+        "questionId": "Q6",
+        "answer": "14:00"
+      },
+      {
+        "questionId": "Q7",
+        "answer": 27
+      },
+      {
+        "questionId": "Q8",
+        "answer": {
+          "r1": "5",
+          "r2": "3",
+          "r3": "3",
+          "r4": "1"
+        }
+      },
+      {
+        "questionId": "Q9",
+        "answer": [
+          {
+            "row": "r1",
+            "value": "a"
+          },
+          {
+            "row": "r1",
+            "value": "d"
+          }
+        ]
+      },
+      {
+        "questionId": "Q10",
+        "answer": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMzAwIDEwMCI+PHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IndoaXRlIiBzdHJva2U9IiNjY2MiIHN0cm9rZS13aWR0aD0iMSIvPjx0ZXh0IHg9IjE1MCIgeT0iNjAiIGZvbnQtZmFtaWx5PSJjdXJzaXZlIiBmb250LXNpemU9IjI0IiBmaWxsPSIjMDAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXN0eWxlPSJpdGFsaWMiPuadvuacrCDlgaXlpKo8L3RleHQ+PHBhdGggZD0iTTUwLDgwIFExNTAsOTAgMjUwLDgwIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==",
+        "type": "handwriting"
+      },
+      {
+        "questionId": "Q11",
+        "answer": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgNDAwIDMwMCI+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9ImhzbCgyNzgsIDcwJSwgOTAlKSIvPjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE1MCIgcj0iNTAiIGZpbGw9ImhzbCgyNzgsIDcwJSwgODAlKSIvPjxyZWN0IHg9IjEwMCIgeT0iMjQwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwIiBmaWxsPSJyZ2JhKDAsMCwwLDAuMSkiLz48dGV4dCB4PSIyMDAiIHk9IjE1NSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjAiIGZpbGw9IiM1NTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlNpdGUgUGhvdG8gIzAwMDU8L3RleHQ+PC9zdmc+",
+        "type": "image"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00006",
+    "surveyId": "sv_0003_26010",
+    "answeredAt": "2026-06-08T13:30:00Z",
+    "details": [
+      {
+        "questionId": "Q1",
+        "answer": "招待状"
+      },
+      {
+        "questionId": "Q2",
+        "answer": [
+          "クラウドサービス",
+          "セキュリティ"
+        ]
+      },
+      {
+        "questionId": "Q3",
+        "answer": "伊藤 健一"
+      },
+      {
+        "questionId": "Q4",
+        "answer": ""
+      },
+      {
+        "questionId": "Q5",
+        "answer": "2026-04-01"
+      },
+      {
+        "questionId": "Q6",
+        "answer": "14:00"
+      },
+      {
+        "questionId": "Q7",
+        "answer": 9
+      },
+      {
+        "questionId": "Q8",
+        "answer": {
+          "r1": "4",
+          "r2": "3",
+          "r3": "5",
+          "r4": "3"
+        }
+      },
+      {
+        "questionId": "Q9",
+        "answer": [
+          {
+            "row": "r1",
+            "value": "d"
+          },
+          {
+            "row": "r2",
+            "value": "a"
+          },
+          {
+            "row": "r2",
+            "value": "d"
+          }
+        ]
+      },
+      {
+        "questionId": "Q10",
+        "answer": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMzAwIDEwMCI+PHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IndoaXRlIiBzdHJva2U9IiNjY2MiIHN0cm9rZS13aWR0aD0iMSIvPjx0ZXh0IHg9IjE1MCIgeT0iNjAiIGZvbnQtZmFtaWx5PSJjdXJzaXZlIiBmb250LXNpemU9IjI0IiBmaWxsPSIjMDAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXN0eWxlPSJpdGFsaWMiPuS8iuiXpCDlgaXkuIA8L3RleHQ+PHBhdGggZD0iTTUwLDgwIFExNTAsOTAgMjUwLDgwIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==",
+        "type": "handwriting"
+      },
+      {
+        "questionId": "Q11",
+        "answer": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgNDAwIDMwMCI+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9ImhzbCgxOTEsIDcwJSwgOTAlKSIvPjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE1MCIgcj0iNTAiIGZpbGw9ImhzbCgxOTEsIDcwJSwgODAlKSIvPjxyZWN0IHg9IjEwMCIgeT0iMjQwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwIiBmaWxsPSJyZ2JhKDAsMCwwLDAuMSkiLz48dGV4dCB4PSIyMDAiIHk9IjE1NSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjAiIGZpbGw9IiM1NTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlNpdGUgUGhvdG8gIzAwMDY8L3RleHQ+PC9zdmc+",
+        "type": "image"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00007",
+    "surveyId": "sv_0003_26010",
+    "answeredAt": "2026-06-09T14:00:00Z",
+    "details": [
+      {
+        "questionId": "Q1",
+        "answer": "招待状"
+      },
+      {
+        "questionId": "Q2",
+        "answer": [
+          "セキュリティ"
+        ]
+      },
+      {
+        "questionId": "Q3",
+        "answer": "山口 翼"
+      },
+      {
+        "questionId": "Q4",
+        "answer": ""
+      },
+      {
+        "questionId": "Q5",
+        "answer": "2026-04-01"
+      },
+      {
+        "questionId": "Q6",
+        "answer": "14:00"
+      },
+      {
+        "questionId": "Q7",
+        "answer": 14
+      },
+      {
+        "questionId": "Q8",
+        "answer": {
+          "r1": "3",
+          "r2": "4",
+          "r3": "5",
+          "r4": "1"
+        }
+      },
+      {
+        "questionId": "Q9",
+        "answer": [
+          {
+            "row": "r2",
+            "value": "b"
+          }
+        ]
+      },
+      {
+        "questionId": "Q10",
+        "answer": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMzAwIDEwMCI+PHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IndoaXRlIiBzdHJva2U9IiNjY2MiIHN0cm9rZS13aWR0aD0iMSIvPjx0ZXh0IHg9IjE1MCIgeT0iNjAiIGZvbnQtZmFtaWx5PSJjdXJzaXZlIiBmb250LXNpemU9IjI0IiBmaWxsPSIjMDAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXN0eWxlPSJpdGFsaWMiPuWxseWPoyDnv7w8L3RleHQ+PHBhdGggZD0iTTUwLDgwIFExNTAsOTAgMjUwLDgwIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==",
+        "type": "handwriting"
+      },
+      {
+        "questionId": "Q11",
+        "answer": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgNDAwIDMwMCI+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9ImhzbCgxMzgsIDcwJSwgOTAlKSIvPjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE1MCIgcj0iNTAiIGZpbGw9ImhzbCgxMzgsIDcwJSwgODAlKSIvPjxyZWN0IHg9IjEwMCIgeT0iMjQwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwIiBmaWxsPSJyZ2JhKDAsMCwwLDAuMSkiLz48dGV4dCB4PSIyMDAiIHk9IjE1NSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjAiIGZpbGw9IiM1NTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlNpdGUgUGhvdG8gIzAwMDc8L3RleHQ+PC9zdmc+",
+        "type": "image"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00008",
+    "surveyId": "sv_0003_26010",
+    "answeredAt": "2026-06-10T14:30:00Z",
+    "details": [
+      {
+        "questionId": "Q1",
+        "answer": "SNS"
+      },
+      {
+        "questionId": "Q2",
+        "answer": [
+          "AI・機械学習",
+          "クラウドサービス",
+          "IoT",
+          "VR/AR"
+        ]
+      },
+      {
+        "questionId": "Q3",
+        "answer": "林 美優"
+      },
+      {
+        "questionId": "Q4",
+        "answer": "詳細を聞きたい"
+      },
+      {
+        "questionId": "Q5",
+        "answer": "2026-04-01"
+      },
+      {
+        "questionId": "Q6",
+        "answer": "14:00"
+      },
+      {
+        "questionId": "Q7",
+        "answer": 25
+      },
+      {
+        "questionId": "Q8",
+        "answer": {
+          "r1": "4",
+          "r2": "2",
+          "r3": "5",
+          "r4": "4"
+        }
+      },
+      {
+        "questionId": "Q9",
+        "answer": [
+          {
+            "row": "r1",
+            "value": "c"
+          },
+          {
+            "row": "r1",
+            "value": "d"
+          },
+          {
+            "row": "r2",
+            "value": "d"
+          }
+        ]
+      },
+      {
+        "questionId": "Q10",
+        "answer": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMzAwIDEwMCI+PHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IndoaXRlIiBzdHJva2U9IiNjY2MiIHN0cm9rZS13aWR0aD0iMSIvPjx0ZXh0IHg9IjE1MCIgeT0iNjAiIGZvbnQtZmFtaWx5PSJjdXJzaXZlIiBmb250LXNpemU9IjI0IiBmaWxsPSIjMDAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXN0eWxlPSJpdGFsaWMiPuaelyDnvo7lhKo8L3RleHQ+PHBhdGggZD0iTTUwLDgwIFExNTAsOTAgMjUwLDgwIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==",
+        "type": "handwriting"
+      },
+      {
+        "questionId": "Q11",
+        "answer": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgNDAwIDMwMCI+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9ImhzbCgzNDMsIDcwJSwgOTAlKSIvPjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE1MCIgcj0iNTAiIGZpbGw9ImhzbCgzNDMsIDcwJSwgODAlKSIvPjxyZWN0IHg9IjEwMCIgeT0iMjQwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwIiBmaWxsPSJyZ2JhKDAsMCwwLDAuMSkiLz48dGV4dCB4PSIyMDAiIHk9IjE1NSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjAiIGZpbGw9IiM1NTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlNpdGUgUGhvdG8gIzAwMDg8L3RleHQ+PC9zdmc+",
+        "type": "image"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00009",
+    "surveyId": "sv_0003_26010",
+    "answeredAt": "2026-06-12T15:00:00Z",
+    "details": [
+      {
+        "questionId": "Q1",
+        "answer": "Webサイト"
+      },
+      {
+        "questionId": "Q2",
+        "answer": [
+          "AI・機械学習"
+        ]
+      },
+      {
+        "questionId": "Q3",
+        "answer": "加藤 太郎"
+      },
+      {
+        "questionId": "Q4",
+        "answer": ""
+      },
+      {
+        "questionId": "Q5",
+        "answer": "2026-04-01"
+      },
+      {
+        "questionId": "Q6",
+        "answer": "14:00"
+      },
+      {
+        "questionId": "Q7",
+        "answer": 4
+      },
+      {
+        "questionId": "Q8",
+        "answer": {
+          "r1": "4",
+          "r2": "3",
+          "r3": "3",
+          "r4": "3"
+        }
+      },
+      {
+        "questionId": "Q9",
+        "answer": [
+          {
+            "row": "r1",
+            "value": "a"
+          },
+          {
+            "row": "r1",
+            "value": "b"
+          },
+          {
+            "row": "r2",
+            "value": "c"
+          }
+        ]
+      },
+      {
+        "questionId": "Q10",
+        "answer": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMzAwIDEwMCI+PHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IndoaXRlIiBzdHJva2U9IiNjY2MiIHN0cm9rZS13aWR0aD0iMSIvPjx0ZXh0IHg9IjE1MCIgeT0iNjAiIGZvbnQtZmFtaWx5PSJjdXJzaXZlIiBmb250LXNpemU9IjI0IiBmaWxsPSIjMDAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXN0eWxlPSJpdGFsaWMiPuWKoOiXpCDlpKrpg448L3RleHQ+PHBhdGggZD0iTTUwLDgwIFExNTAsOTAgMjUwLDgwIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==",
+        "type": "handwriting"
+      },
+      {
+        "questionId": "Q11",
+        "answer": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgNDAwIDMwMCI+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9ImhzbCgxOTksIDcwJSwgOTAlKSIvPjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE1MCIgcj0iNTAiIGZpbGw9ImhzbCgxOTksIDcwJSwgODAlKSIvPjxyZWN0IHg9IjEwMCIgeT0iMjQwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwIiBmaWxsPSJyZ2JhKDAsMCwwLDAuMSkiLz48dGV4dCB4PSIyMDAiIHk9IjE1NSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjAiIGZpbGw9IiM1NTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlNpdGUgUGhvdG8gIzAwMDk8L3RleHQ+PC9zdmc+",
+        "type": "image"
+      }
+    ]
+  },
+  {
+    "answerId": "ans-sv_0003_26010-00010",
+    "surveyId": "sv_0003_26010",
+    "answeredAt": "2026-06-15T05:30:00Z",
+    "details": [
+      {
+        "questionId": "Q1",
+        "answer": "Webサイト"
+      },
+      {
+        "questionId": "Q2",
+        "answer": [
+          "IoT"
+        ]
+      },
+      {
+        "questionId": "Q3",
+        "answer": "清水 健太"
+      },
+      {
+        "questionId": "Q4",
+        "answer": "特になし"
+      },
+      {
+        "questionId": "Q5",
+        "answer": "2026-04-01"
+      },
+      {
+        "questionId": "Q6",
+        "answer": "14:00"
+      },
+      {
+        "questionId": "Q7",
+        "answer": 48
+      },
+      {
+        "questionId": "Q8",
+        "answer": {
+          "r1": "5",
+          "r2": "3",
+          "r3": "3",
+          "r4": "4"
+        }
+      },
+      {
+        "questionId": "Q9",
+        "answer": [
+          {
+            "row": "r1",
+            "value": "a"
+          },
+          {
+            "row": "r1",
+            "value": "c"
+          },
+          {
+            "row": "r1",
+            "value": "d"
+          },
+          {
+            "row": "r2",
+            "value": "c"
+          }
+        ]
+      },
+      {
+        "questionId": "Q10",
+        "answer": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMzAwIDEwMCI+PHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IndoaXRlIiBzdHJva2U9IiNjY2MiIHN0cm9rZS13aWR0aD0iMSIvPjx0ZXh0IHg9IjE1MCIgeT0iNjAiIGZvbnQtZmFtaWx5PSJjdXJzaXZlIiBmb250LXNpemU9IjI0IiBmaWxsPSIjMDAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXN0eWxlPSJpdGFsaWMiPua4heawtCDlgaXlpKo8L3RleHQ+PHBhdGggZD0iTTUwLDgwIFExNTAsOTAgMjUwLDgwIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==",
+        "type": "handwriting"
+      },
+      {
+        "questionId": "Q11",
+        "answer": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgNDAwIDMwMCI+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9ImhzbCgyOTksIDcwJSwgOTAlKSIvPjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE1MCIgcj0iNTAiIGZpbGw9ImhzbCgyOTksIDcwJSwgODAlKSIvPjxyZWN0IHg9IjEwMCIgeT0iMjQwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwIiBmaWxsPSJyZ2JhKDAsMCwwLDAuMSkiLz48dGV4dCB4PSIyMDAiIHk9IjE1NSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjAiIGZpbGw9IiM1NTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlNpdGUgUGhvdG8gIzAwMTA8L3RleHQ+PC9zdmc+",
+        "type": "image"
+      }
+    ]
+  }
+]

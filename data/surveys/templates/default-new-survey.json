@@ -1,0 +1,67 @@
+{
+  "namePrefix": "展示会サンプルアンケート",
+  "displayTitle": {
+    "ja": "ご来場者アンケート"
+  },
+  "description": {
+    "ja": "本アンケートは展示会でのご関心内容を確認するためのサンプルです。必要に応じて設問や選択肢を変更してください。"
+  },
+  "memo": "サンプル入力値です。必要に応じて編集してください。",
+  "periodOffsetDays": {
+    "start": 1,
+    "end": 7
+  },
+  "questions": [
+    {
+      "type": "single_answer",
+      "text": {
+        "ja": "ご来場の目的を教えてください"
+      },
+      "required": true,
+      "options": [
+        { "ja": "情報収集" },
+        { "ja": "導入検討" },
+        { "ja": "比較検討" },
+        { "ja": "その他" }
+      ]
+    },
+    {
+      "type": "multi_answer",
+      "text": {
+        "ja": "興味のあるサービスを選択してください"
+      },
+      "required": false,
+      "options": [
+        { "ja": "アンケート作成" },
+        { "ja": "名刺データ化" },
+        { "ja": "SPEEDレビュー" },
+        { "ja": "お礼メール" }
+      ]
+    },
+    {
+      "type": "dropdown",
+      "text": {
+        "ja": "導入予定時期を教えてください"
+      },
+      "required": false,
+      "options": [
+        { "ja": "1か月以内" },
+        { "ja": "3か月以内" },
+        { "ja": "6か月以内" },
+        { "ja": "未定" }
+      ]
+    },
+    {
+      "type": "free_answer",
+      "text": {
+        "ja": "ご意見・ご要望をご記入ください"
+      },
+      "required": false,
+      "config": {
+        "multiline": true,
+        "minLength": "",
+        "maxLength": ""
+      }
+    }
+  ]
+}
