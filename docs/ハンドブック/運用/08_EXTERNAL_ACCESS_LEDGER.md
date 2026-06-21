@@ -100,6 +100,7 @@ CONTACT_VIEWER_ACCESS_TOKEN=<Script Properties only>
 - 確認アプリの既存デプロイ `AKfycbxz4foQKPlgAeF5ShuM2RBudUpYD8VOvIi7riU1j4QtghnHzvpw9JSKQgfcm61hJKh3` をバージョン `7` (`support contact viewer fragment token`) へ redeploy した。
 - 公開投稿GASの既存デプロイ `AKfycbw6xaQvmfspOOxXEs4DMqfLxQ3Aev6Qi8RcfiFu7iFwOHos48eAPvmmjxSnteN1Lj0D` をバージョン `12` (`support contact viewer fragment token links`) へ redeploy した。
 - 確認アプリ公開HTMLに `location.hash` 読み取りが反映され、`?token=` ではなく `#token=` を使う構成であることを確認した。
+- 2026-06-21 の viewer 改修で、初期一覧の対応が必要フォーカス、件数表示、クイック状態更新、未保存変更ガード、添付ビューア、可視URLのトークン除去を追加した。未配備なら再デプロイ後に実画面確認する。
 - URLフラグメント方式反映後のテスト投稿 `51cbb89e-b7e8-42ea-8890-0b4ce7645474` は `storageStatus=stored` / `mailStatus=sent` で成功した。
 - AWS SSO profile `speed-ad` を `s-umeda` / account `816069150667` / `AdministratorAccess` として再認証した。
 - STG supportサイトを `s3://stg.support.speed-ad.com/` へ同期し、CloudFront `EDJ1GHHD1FP7Q` の invalidation `IAB5IWMWX11Z8NUFGB23APVZCS` を完了した。`https://stg.support.speed-ad.com/contact/` は 200、WEBP版JSと `data-webp-quality="0.82"` を確認済み。
