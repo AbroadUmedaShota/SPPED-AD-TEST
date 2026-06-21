@@ -1,7 +1,7 @@
 ---
 owner: support-contact
-status: draft
-last_reviewed: 2026-06-21
+status: confirmed
+last_reviewed: 2026-06-22
 ---
 
 # サポートお問い合わせフォーム仕様
@@ -172,6 +172,18 @@ Content-Type: text/plain;charset=utf-8
 | handled_by | 最終更新者メールアドレス |
 | handled_at | 最終更新日時 |
 | internal_note | 確認者向け内部メモ |
+
+### 5.1 問い合わせDB整理
+
+仕様確認後に作業DB上のテスト投稿を整理する場合は、確認者GASのDB整理関数を使う。整理前に同一Spreadsheet内へ `contact_submissions_backup_YYYYMMDD_HHMMSS` 形式のバックアップシートを作成し、削除候補行は下から順に削除する。
+
+自動削除対象は以下に限定する。
+
+- 既知テスト受付IDに一致する行。
+- 既知ID以外は、メールアドレスが `s-umeda@abroad-o.com` / `customer@speed-ad.com` / `t-hayashi@abroad-o.com` のいずれかで、件名・本文・名前・User-Agent・投稿元URLのいずれかに `テスト` / `test` / `Codex` / `テストモード` / `production-check` / `contactTestMode` を含む行。
+- 外部メールアドレスの行は、既知テスト受付IDに一致しない限り自動削除しない。
+
+添付ファイルは `attachment_refs` の `fileId:url` 形式から fileId を抽出し、Drive上のファイル名が削除対象 `submission_id` で始まる場合のみゴミ箱へ移動する。ファイル名が一致しない添付は誤削除防止のため削除せず、整理結果へ記録する。
 
 ## 6. 環境変数
 

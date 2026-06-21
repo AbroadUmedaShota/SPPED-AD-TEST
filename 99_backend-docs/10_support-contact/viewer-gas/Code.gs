@@ -11,6 +11,26 @@
 
 var DEFAULT_SHEET_NAME = 'contact_submissions';
 var VIEWER_STATUSES = ['未対応', '対応中', '対応済み', '保留'];
+var CONTACT_DB_CLEANUP_CONFIRMATION = 'DELETE_TEST_CONTACT_ROWS_20260622';
+var CONTACT_DB_CLEANUP_KNOWN_TEST_IDS = [
+  '3d6bd3bc-a065-4908-9f73-b0b048ad0b06',
+  '70a13837-4725-4b56-ab5f-22a5135ea3ca',
+  '93f9c46a-b306-4238-b14b-5169811b58f4',
+  '51cbb89e-b7e8-42ea-8890-0b4ce7645474'
+];
+var CONTACT_DB_CLEANUP_INTERNAL_EMAILS = [
+  's-umeda@abroad-o.com',
+  'customer@speed-ad.com',
+  't-hayashi@abroad-o.com'
+];
+var CONTACT_DB_CLEANUP_MARKERS = [
+  'テスト',
+  'test',
+  'Codex',
+  'テストモード',
+  'production-check',
+  'contactTestMode'
+];
 var CONTACT_HEADERS = [
   'submission_id',
   'submitted_at',
@@ -168,6 +188,251 @@ function updateContactSubmissionStatus(accessToken, submissionId, status, note) 
   });
 
   return getContactSubmission(accessToken, submissionId);
+}
+
+function previewContactDbCleanup() {
+  var operatorEmail = assertContactDbCleanupOperator_();
+  return buildContactDbCleanupPreview_(operatorEmail);
+}
+
+function executeContactDbCleanup(confirmation) {
+  var operatorEmail = assertContactDbCleanupOperator_();
+  assertContactDbCleanupConfirmation_(confirmation);
+  return executeContactDbCleanup_(operatorEmail);
+}
+
+function buildContactDbCleanupPreview_(operatorEmail) {
+  var plan = buildContactDbCleanupPlan_();
+  return {
+    ok: true,
+    mode: 'preview',
+    generatedAt: new Date().toISOString(),
+    operatorEmail: operatorEmail,
+    sheetName: plan.sheetName,
+    totalRows: plan.totalRows,
+    candidateCount: plan.candidates.length,
+    candidates: plan.candidates
+  };
+}
+
+function executeContactDbCleanup_(operatorEmail) {
+  var sheet = getSheet_();
+  var spreadsheet = sheet.getParent();
+  var plan = buildContactDbCleanupPlan_(sheet);
+  var result = {
+    ok: true,
+    mode: 'execute',
+    generatedAt: new Date().toISOString(),
+    operatorEmail: operatorEmail,
+    sheetName: plan.sheetName,
+    totalRowsBefore: plan.totalRows,
+    candidateCount: plan.candidates.length,
+    candidates: plan.candidates,
+    executed: false,
+    backupSheetName: '',
+    deletedRowNumbers: [],
+    attachments: {
+      trashedCount: 0,
+      skippedCount: 0,
+      errorCount: 0,
+      files: []
+    }
+  };
+
+  if (!plan.candidates.length) {
+    result.message = '削除対象はありません。';
+    return result;
+  }
+
+  result.backupSheetName = createContactDbCleanupBackup_(spreadsheet, sheet);
+  result.attachments = trashContactDbCleanupAttachments_(plan.candidates);
+  result.deletedRowNumbers = deleteContactDbCleanupRows_(sheet, plan.candidates);
+  result.totalRowsAfter = Math.max(sheet.getLastRow() - 1, 0);
+  result.executed = true;
+  return result;
+}
+
+function buildContactDbCleanupPlan_(sheet) {
+  sheet = sheet || getSheet_();
+  var headers = ensureHeaders_(sheet);
+  var values = sheet.getDataRange().getValues();
+  var candidates = [];
+
+  for (var rowIndex = 1; rowIndex < values.length; rowIndex++) {
+    var record = rowToRecord_(headers, values[rowIndex], rowIndex + 1);
+    var decision = getContactDbCleanupDecision_(record);
+    if (!decision.deleteTarget) continue;
+
+    candidates.push({
+      rowNumber: record.rowNumber,
+      submission_id: record.submission_id,
+      email: record.email,
+      subject: record.subject,
+      attachmentFileIds: getCleanupAttachmentFileIds_(record.attachment_refs),
+      reasons: decision.reasons
+    });
+  }
+
+  return {
+    sheetName: sheet.getName(),
+    totalRows: Math.max(values.length - 1, 0),
+    candidates: candidates
+  };
+}
+
+function getContactDbCleanupDecision_(record) {
+  var submissionId = String(record.submission_id || '').trim();
+  var email = String(record.email || '').trim().toLowerCase();
+  var reasons = [];
+
+  if (CONTACT_DB_CLEANUP_KNOWN_TEST_IDS.indexOf(submissionId) !== -1) {
+    reasons.push('known_test_submission_id');
+    return {
+      deleteTarget: true,
+      reasons: reasons
+    };
+  }
+
+  if (CONTACT_DB_CLEANUP_INTERNAL_EMAILS.indexOf(email) === -1) {
+    return {
+      deleteTarget: false,
+      reasons: ['external_email_not_auto_deleted']
+    };
+  }
+
+  var matchedMarkers = getContactDbCleanupMatchedMarkers_(record);
+  if (!matchedMarkers.length) {
+    return {
+      deleteTarget: false,
+      reasons: ['internal_email_without_test_marker']
+    };
+  }
+
+  matchedMarkers.forEach(function (marker) {
+    reasons.push('test_marker:' + marker);
+  });
+  return {
+    deleteTarget: true,
+    reasons: reasons
+  };
+}
+
+function getContactDbCleanupMatchedMarkers_(record) {
+  var target = [
+    record.subject,
+    record.message,
+    record.name,
+    record.user_agent,
+    record.source_url
+  ].join('\n').toLowerCase();
+  return CONTACT_DB_CLEANUP_MARKERS.filter(function (marker) {
+    return target.indexOf(String(marker).toLowerCase()) !== -1;
+  });
+}
+
+function getCleanupAttachmentFileIds_(attachmentRefs) {
+  var fileIds = [];
+  parseAttachmentRefs_(attachmentRefs).forEach(function (attachment) {
+    var fileId = String(attachment.fileId || '').trim();
+    if (fileId && fileIds.indexOf(fileId) === -1) {
+      fileIds.push(fileId);
+    }
+  });
+  return fileIds;
+}
+
+function createContactDbCleanupBackup_(spreadsheet, sheet) {
+  var timestamp = Utilities.formatDate(
+    new Date(),
+    Session.getScriptTimeZone() || 'Asia/Tokyo',
+    'yyyyMMdd_HHmmss'
+  );
+  var baseName = sheet.getName() + '_backup_' + timestamp;
+  var backupName = makeUniqueSheetName_(spreadsheet, baseName);
+  var backupSheet = sheet.copyTo(spreadsheet);
+  backupSheet.setName(backupName);
+  spreadsheet.setActiveSheet(sheet);
+  return backupName;
+}
+
+function makeUniqueSheetName_(spreadsheet, baseName) {
+  var name = baseName;
+  var suffix = 2;
+  while (spreadsheet.getSheetByName(name)) {
+    name = baseName + '_' + suffix;
+    suffix += 1;
+  }
+  return name;
+}
+
+function trashContactDbCleanupAttachments_(candidates) {
+  var result = {
+    trashedCount: 0,
+    skippedCount: 0,
+    errorCount: 0,
+    files: []
+  };
+
+  candidates.forEach(function (candidate) {
+    candidate.attachmentFileIds.forEach(function (fileId) {
+      var fileResult = {
+        submission_id: candidate.submission_id,
+        fileId: fileId,
+        name: '',
+        status: ''
+      };
+      try {
+        var file = DriveApp.getFileById(fileId);
+        var fileName = file.getName();
+        fileResult.name = fileName;
+        if (String(fileName || '').indexOf(candidate.submission_id + '-') !== 0) {
+          fileResult.status = 'skipped';
+          fileResult.reason = 'filename_does_not_start_with_submission_id';
+          result.skippedCount += 1;
+        } else {
+          file.setTrashed(true);
+          fileResult.status = 'trashed';
+          result.trashedCount += 1;
+        }
+      } catch (err) {
+        fileResult.status = 'error';
+        fileResult.error = String(err);
+        result.errorCount += 1;
+      }
+      result.files.push(fileResult);
+    });
+  });
+
+  return result;
+}
+
+function deleteContactDbCleanupRows_(sheet, candidates) {
+  var rowNumbers = candidates
+    .map(function (candidate) { return Number(candidate.rowNumber); })
+    .filter(function (rowNumber, index, rows) {
+      return rowNumber > 1 && rows.indexOf(rowNumber) === index;
+    })
+    .sort(function (a, b) { return b - a; });
+
+  rowNumbers.forEach(function (rowNumber) {
+    sheet.deleteRow(rowNumber);
+  });
+  return rowNumbers;
+}
+
+function assertContactDbCleanupOperator_() {
+  var email = getActiveUserEmail_();
+  var allowedEmails = getViewerEmails_();
+  if (!email || allowedEmails.indexOf(email) === -1) {
+    throw new Error('問い合わせDB整理は許可ユーザーの Apps Script 実行に限定されています。');
+  }
+  return email;
+}
+
+function assertContactDbCleanupConfirmation_(confirmation) {
+  if (String(confirmation || '') !== CONTACT_DB_CLEANUP_CONFIRMATION) {
+    throw new Error('問い合わせDB整理の確認フレーズが一致しません。');
+  }
 }
 
 function getViewerContext_(accessToken) {
