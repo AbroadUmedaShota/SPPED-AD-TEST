@@ -12,6 +12,7 @@
  *   CONTACT_NOTIFY_EMAIL
  *   CONTACT_SHEET_NAME
  *   CONTACT_MAX_ATTACHMENT_MB
+ *   CONTACT_VIEWER_BASE_URL
  */
 
 var DEFAULT_SHEET_NAME = 'contact_submissions';
@@ -34,7 +35,10 @@ var CONTACT_HEADERS = [
   'user_agent',
   'storage_status',
   'mail_status',
-  'handled_status'
+  'handled_status',
+  'handled_by',
+  'handled_at',
+  'internal_note'
 ];
 
 function initializeContactSheet() {
@@ -84,14 +88,14 @@ function checkContactConfiguration() {
     spreadsheet: checkSpreadsheet_(),
     driveFolder: checkDriveFolder_(),
     from: getFromState_(),
-    notifyEmail: checkRequiredProperty_('CONTACT_NOTIFY_EMAIL'),
+    notifyEmail: checkNotifyEmails_(),
     replyToEmail: checkOptionalProperty_('CONTACT_REPLY_TO_EMAIL'),
-    maxAttachmentMb: getMaxAttachmentMb_()
+    maxAttachmentMb: getMaxAttachmentMb_(),
+    viewerBaseUrl: checkOptionalProperty_('CONTACT_VIEWER_BASE_URL')
   };
 
   result.ok = result.spreadsheet.ok &&
     result.driveFolder.ok &&
-    result.from.available &&
     result.notifyEmail.ok;
 
   return logAndReturn_(result);
@@ -116,26 +120,12 @@ function submitContact_(payload) {
   var normalized = normalizePayload_(payload);
   var attachmentRefs = saveAttachments_(normalized.submissionId, normalized.attachments);
   var row = buildRow_(normalized, receivedAt, attachmentRefs, 'stored', 'pending');
-  appendRow_(row);
+  var sheetLink = appendRow_(row);
 
   var fromState = getFromState_();
-  if (!fromState.available) {
-    updateSubmission_(normalized.submissionId, {
-      mail_status: 'failed_from_not_available'
-    });
-    return jsonOut_({
-      ok: false,
-      submissionId: normalized.submissionId,
-      receivedAt: receivedAt,
-      storageStatus: 'stored',
-      mailStatus: 'failed_from_not_available',
-      error: 'customer@speed-ad.com を送信元にできないため送信を停止しました。'
-    });
-  }
-
   try {
+    sendInternalNotification_(normalized, attachmentRefs, sheetLink, fromState);
     sendUserReceipt_(normalized, fromState);
-    sendInternalNotification_(normalized, attachmentRefs, fromState);
     updateSubmission_(normalized.submissionId, {
       mail_status: 'sent'
     });
@@ -229,6 +219,13 @@ function saveAttachments_(submissionId, attachments) {
     var safeName = sanitizeFilename_(submissionId + '-' + (index + 1) + '-' + attachment.name);
     var blob = Utilities.newBlob(bytes, attachment.mimeType, safeName);
     var file = folder.createFile(blob);
+    file.setDescription(JSON.stringify({
+      originalName: String(attachment.originalName || attachment.name || ''),
+      originalMimeType: String(attachment.originalMimeType || ''),
+      originalSize: Number(attachment.originalSize || 0),
+      savedMimeType: String(attachment.mimeType || ''),
+      savedSize: Number(attachment.size || 0)
+    }));
     return file.getId() + ':' + file.getUrl();
   });
 }
@@ -248,7 +245,10 @@ function buildRow_(payload, receivedAt, attachmentRefs, storageStatus, mailStatu
     user_agent: payload.userAgent,
     storage_status: storageStatus,
     mail_status: mailStatus,
-    handled_status: '未対応'
+    handled_status: '未対応',
+    handled_by: '',
+    handled_at: '',
+    internal_note: ''
   };
 }
 
@@ -276,12 +276,15 @@ function sendUserReceipt_(payload, fromState) {
   sendEmail_(payload.email, subject, body, fromEmail, replyTo, fromState);
 }
 
-function sendInternalNotification_(payload, attachmentRefs, fromState) {
+function sendInternalNotification_(payload, attachmentRefs, sheetLink, fromState) {
   var fromEmail = getProperty_('CONTACT_FROM_EMAIL', DEFAULT_FROM_EMAIL);
-  var notifyEmail = getProperty_('CONTACT_NOTIFY_EMAIL', fromEmail);
-  var subject = '【SPEED AD】お問い合わせ: ' + payload.subject;
+  var notifyEmails = getNotifyEmails_();
+  var viewerDetailUrl = buildViewerDetailUrl_(payload.submissionId);
+  var subject = '【SPEED AD】お問い合わせ: [' + payload.contactTypeLabel + '] ' + payload.subject;
   var body = [
     'SPEED AD サポート問い合わせを受け付けました。',
+    '',
+    '確認アプリ: ' + (viewerDetailUrl || 'CONTACT_VIEWER_BASE_URL 未設定'),
     '',
     '受付ID: ' + payload.submissionId,
     '問い合わせ種別: ' + payload.contactTypeLabel + ' (' + payload.contactType + ')',
@@ -289,13 +292,25 @@ function sendInternalNotification_(payload, attachmentRefs, fromState) {
     'メールアドレス: ' + payload.email,
     '件名: ' + payload.subject,
     '投稿元URL: ' + (payload.sourceUrl || '-'),
-    '添付: ' + (attachmentRefs.length ? attachmentRefs.join('\n') : '-'),
     '',
     '--- 本文 ---',
-    payload.message
+    payload.message,
+    '',
+    '--- 予備情報 ---',
+    'Spreadsheet: ' + sheetLink.spreadsheetUrl,
+    '該当行: ' + sheetLink.rowUrl,
+    'シート: ' + sheetLink.sheetName + ' / ' + sheetLink.rowNumber + '行目',
+    '添付: ' + (attachmentRefs.length ? attachmentRefs.join('\n') : '-')
   ].join('\n');
 
-  sendEmail_(notifyEmail, subject, body, fromEmail, payload.email, fromState);
+  sendEmail_(notifyEmails, subject, body, fromEmail, payload.email, fromState);
+}
+
+function buildViewerDetailUrl_(submissionId) {
+  var baseUrl = String(getProperty_('CONTACT_VIEWER_BASE_URL', '') || '').trim();
+  if (!baseUrl) return '';
+  var separator = baseUrl.indexOf('?') === -1 ? '?' : '&';
+  return baseUrl + separator + 'id=' + encodeURIComponent(submissionId);
 }
 
 function sendEmail_(to, subject, body, fromEmail, replyTo, fromState) {
@@ -303,10 +318,12 @@ function sendEmail_(to, subject, body, fromEmail, replyTo, fromState) {
     name: 'SPEED AD Support',
     replyTo: replyTo
   };
+  // If the configured From is not available as the executing user or an alias,
+  // Gmail sends from the executing account while preserving Reply-To.
   if (fromState.mode === 'alias') {
     options.from = fromEmail;
   }
-  GmailApp.sendEmail(to, subject, body, options);
+  GmailApp.sendEmail(normalizeEmailList_(to).join(','), subject, body, options);
 }
 
 function getFromState_() {
@@ -361,6 +378,14 @@ function checkRequiredProperty_(key) {
   return value ? { ok: true, set: true } : { ok: false, set: false, error: key + ' is not set' };
 }
 
+function checkNotifyEmails_() {
+  var emails = normalizeEmailList_(getProperty_('CONTACT_NOTIFY_EMAIL', ''));
+  if (!emails.length) {
+    return { ok: false, set: false, count: 0, error: 'CONTACT_NOTIFY_EMAIL is not set' };
+  }
+  return { ok: true, set: true, count: emails.length };
+}
+
 function checkOptionalProperty_(key) {
   var value = getProperty_(key, '');
   return { ok: true, set: !!value };
@@ -371,7 +396,15 @@ function appendRow_(row) {
   var values = CONTACT_HEADERS.map(function (header) {
     return row[header] == null ? '' : row[header];
   });
-  sheet.getRange(sheet.getLastRow() + 1, 1, 1, CONTACT_HEADERS.length).setValues([values]);
+  var rowNumber = sheet.getLastRow() + 1;
+  sheet.getRange(rowNumber, 1, 1, CONTACT_HEADERS.length).setValues([values]);
+  var spreadsheet = sheet.getParent();
+  return {
+    spreadsheetUrl: spreadsheet.getUrl(),
+    sheetName: sheet.getName(),
+    rowNumber: rowNumber,
+    rowUrl: spreadsheet.getUrl() + '#gid=' + sheet.getSheetId() + '&range=A' + rowNumber
+  };
 }
 
 function updateSubmission_(submissionId, fields) {
@@ -421,6 +454,36 @@ function getMaxAttachmentMb_() {
 function getProperty_(key, fallback) {
   var value = PropertiesService.getScriptProperties().getProperty(key);
   return value == null || value === '' ? fallback : value;
+}
+
+function getNotifyEmails_() {
+  return normalizeEmailList_(getProperty_('CONTACT_NOTIFY_EMAIL', DEFAULT_FROM_EMAIL));
+}
+
+function normalizeEmailList_(value) {
+  if (Array.isArray(value)) {
+    value = value.join(',');
+  }
+  return String(value || '')
+    .split(/[,;\n]+/)
+    .map(function (email) {
+      return email.trim();
+    })
+    .filter(function (email, index, emails) {
+      return email && emails.indexOf(email) === index;
+    });
+}
+
+function setContactNotifyEmail(value) {
+  var emails = normalizeEmailList_(value);
+  if (!emails.length) {
+    throw new Error('CONTACT_NOTIFY_EMAIL requires at least one email address.');
+  }
+  PropertiesService.getScriptProperties().setProperty('CONTACT_NOTIFY_EMAIL', emails.join(','));
+  return logAndReturn_({
+    ok: true,
+    contactNotifyEmailCount: emails.length
+  });
 }
 
 function setDefaultProperty_(key, value) {

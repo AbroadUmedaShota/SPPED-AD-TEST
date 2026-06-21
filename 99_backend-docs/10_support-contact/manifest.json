@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "サポートお問い合わせ受付",
-    "summary": "公開お問い合わせフォームの投稿保存、添付保存、受付メール送信の仕組み整理。",
+    "summary": "公開お問い合わせフォームの投稿保存、WEBP添付保存、受付メール送信、確認者専用アプリの仕組み整理。",
     "status": "draft"
   },
   "documents": [
@@ -16,6 +16,12 @@
       "title": "GAS実装・配備手順",
       "path": "gas/README.md",
       "summary": "専用 Apps Script Web App のAPI、Script Properties、配備手順。"
+    },
+    {
+      "id": "support-contact-viewer-gas",
+      "title": "確認者専用GAS実装・配備手順",
+      "path": "viewer-gas/README.md",
+      "summary": "問い合わせ一覧、詳細、添付プレビュー、対応ステータス更新を行う確認者専用 Apps Script Web App。"
     }
   ]
 }

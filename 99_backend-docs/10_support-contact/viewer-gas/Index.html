@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f7f8fa;
+      --surface: #ffffff;
+      --line: #d8dde6;
+      --text: #17202a;
+      --muted: #667085;
+      --primary: #0f62fe;
+      --danger: #b42318;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 14px;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 20px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+    }
+    h1 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+    button, select, input, textarea {
+      font: inherit;
+    }
+    button {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      padding: 8px 12px;
+    }
+    button.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: #ffffff;
+    }
+    button:disabled {
+      cursor: not-allowed;
+      opacity: .6;
+    }
+    .muted { color: var(--muted); }
+    .error { color: var(--danger); }
+    .app {
+      display: grid;
+      grid-template-columns: minmax(320px, 42%) minmax(420px, 1fr);
+      min-height: calc(100vh - 58px);
+    }
+    .list-pane, .detail-pane {
+      padding: 16px;
+      overflow: auto;
+    }
+    .list-pane {
+      border-right: 1px solid var(--line);
+    }
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1fr 140px;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--surface);
+      color: var(--text);
+      padding: 9px 10px;
+    }
+    textarea {
+      min-height: 88px;
+      resize: vertical;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--line);
+    }
+    th, td {
+      border-bottom: 1px solid var(--line);
+      padding: 9px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    tr[data-id] {
+      cursor: pointer;
+    }
+    tr[data-id].selected {
+      background: #edf3ff;
+    }
+    .status {
+      display: inline-flex;
+      align-items: center;
+      min-width: 64px;
+      justify-content: center;
+      border-radius: 999px;
+      background: #eef2f6;
+      color: #344054;
+      padding: 3px 8px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .detail {
+      display: grid;
+      gap: 14px;
+    }
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .section h2 {
+      margin: 0 0 10px;
+      font-size: 15px;
+      letter-spacing: 0;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 8px 12px;
+    }
+    .label {
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .message {
+      white-space: pre-wrap;
+      line-height: 1.7;
+    }
+    .attachments {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+    }
+    .attachment {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      background: #fbfcfe;
+    }
+    .attachment img {
+      display: block;
+      width: 100%;
+      max-height: 240px;
+      object-fit: contain;
+      border-radius: 6px;
+      background: #ffffff;
+      border: 1px solid var(--line);
+      margin-bottom: 8px;
+    }
+    .actions {
+      display: grid;
+      grid-template-columns: 160px 1fr auto;
+      gap: 10px;
+      align-items: start;
+    }
+    .denied {
+      padding: 40px 20px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    [hidden] { display: none !important; }
+    @media (max-width: 900px) {
+      .app { grid-template-columns: 1fr; }
+      .list-pane { border-right: 0; border-bottom: 1px solid var(--line); }
+      .actions { grid-template-columns: 1fr; }
+      .toolbar { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>SPEED AD お問い合わせ確認</h1>
+    <div>
+      <span class="muted" id="viewerEmail"></span>
+      <button type="button" id="refreshButton">更新</button>
+    </div>
+  </header>
+
+  <main class="denied" id="deniedView" hidden>
+    <h2>アクセスできません</h2>
+    <p class="error" id="deniedMessage"></p>
+  </main>
+
+  <main class="app" id="appView" hidden>
+    <section class="list-pane" aria-label="問い合わせ一覧">
+      <div class="toolbar">
+        <input id="searchInput" type="search" placeholder="検索">
+        <select id="statusFilter">
+          <option value="">すべて</option>
+          <option value="未対応">未対応</option>
+          <option value="対応中">対応中</option>
+          <option value="対応済み">対応済み</option>
+          <option value="保留">保留</option>
+        </select>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>受付</th>
+            <th>内容</th>
+            <th>状態</th>
+          </tr>
+        </thead>
+        <tbody id="submissionRows"></tbody>
+      </table>
+    </section>
+
+    <section class="detail-pane" aria-label="問い合わせ詳細">
+      <div class="detail" id="detailView">
+        <div class="section">
+          <p class="muted">一覧から問い合わせを選択してください。</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    window.CONTACT_VIEWER_INITIAL_ID = <?!= JSON.stringify(initialSubmissionId) ?>;
+    window.CONTACT_VIEWER_CONTEXT = <?!= JSON.stringify(viewerContext) ?>;
+  </script>
+  <script>
+    const state = {
+      selectedId: window.CONTACT_VIEWER_INITIAL_ID || '',
+      submissions: [],
+      loading: false,
+      detail: null,
+    };
+
+    const appView = document.getElementById('appView');
+    const deniedView = document.getElementById('deniedView');
+    const deniedMessage = document.getElementById('deniedMessage');
+    const viewerEmail = document.getElementById('viewerEmail');
+    const refreshButton = document.getElementById('refreshButton');
+    const searchInput = document.getElementById('searchInput');
+    const statusFilter = document.getElementById('statusFilter');
+    const submissionRows = document.getElementById('submissionRows');
+    const detailView = document.getElementById('detailView');
+
+    function callServer(name, ...args) {
+      return new Promise((resolve, reject) => {
+        google.script.run
+          .withSuccessHandler(resolve)
+          .withFailureHandler(reject)[name](...args);
+      });
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function formatDate(value) {
+      if (!value) return '-';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return value;
+      return date.toLocaleString('ja-JP', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    }
+
+    function setBusy(isBusy) {
+      state.loading = isBusy;
+      refreshButton.disabled = isBusy;
+    }
+
+    function renderList() {
+      submissionRows.innerHTML = state.submissions.map((item) => `
+        <tr data-id="${escapeHtml(item.submission_id)}" class="${item.submission_id === state.selectedId ? 'selected' : ''}">
+          <td>${escapeHtml(formatDate(item.submitted_at))}</td>
+          <td>
+            <strong>${escapeHtml(item.subject || 'お問い合わせ')}</strong><br>
+            <span class="muted">${escapeHtml(item.email || '-')}</span><br>
+            <span class="muted">${escapeHtml(item.contact_type || '-')} / 添付 ${escapeHtml(item.attachment_count || 0)}</span>
+          </td>
+          <td><span class="status">${escapeHtml(item.handled_status || '未対応')}</span></td>
+        </tr>
+      `).join('');
+
+      submissionRows.querySelectorAll('tr[data-id]').forEach((row) => {
+        row.addEventListener('click', () => selectSubmission(row.dataset.id));
+      });
+    }
+
+    function renderDetailEmpty(message) {
+      detailView.innerHTML = `<div class="section"><p class="muted">${escapeHtml(message)}</p></div>`;
+    }
+
+    function renderDetail(submission) {
+      const attachments = submission.attachments || [];
+      detailView.innerHTML = `
+        <section class="section">
+          <h2>${escapeHtml(submission.subject || 'お問い合わせ')}</h2>
+          <div class="grid">
+            <div class="label">受付ID</div><div>${escapeHtml(submission.submission_id)}</div>
+            <div class="label">受付日時</div><div>${escapeHtml(formatDate(submission.submitted_at))}</div>
+            <div class="label">種別</div><div>${escapeHtml(submission.contact_type || '-')}</div>
+            <div class="label">投稿者</div><div>${escapeHtml(submission.name || '-')}</div>
+            <div class="label">メール</div><div><a href="mailto:${escapeHtml(submission.email)}">${escapeHtml(submission.email || '-')}</a></div>
+            <div class="label">投稿元</div><div>${submission.source_url ? `<a href="${escapeHtml(submission.source_url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(submission.source_url)}</a>` : '-'}</div>
+            <div class="label">User-Agent</div><div>${escapeHtml(submission.user_agent || '-')}</div>
+          </div>
+        </section>
+        <section class="section">
+          <h2>本文</h2>
+          <div class="message">${escapeHtml(submission.message || '-')}</div>
+        </section>
+        <section class="section">
+          <h2>対応</h2>
+          <div class="actions">
+            <select id="statusSelect">
+              ${['未対応', '対応中', '対応済み', '保留'].map((status) => `<option value="${status}" ${status === (submission.handled_status || '未対応') ? 'selected' : ''}>${status}</option>`).join('')}
+            </select>
+            <textarea id="internalNote" placeholder="内部メモ">${escapeHtml(submission.internal_note || '')}</textarea>
+            <button type="button" class="primary" id="saveStatusButton">保存</button>
+          </div>
+          <p class="muted" id="statusSaveMessage"></p>
+          <p class="muted">最終更新: ${escapeHtml(submission.handled_by || '-')} / ${escapeHtml(formatDate(submission.handled_at))}</p>
+        </section>
+        <section class="section">
+          <h2>添付</h2>
+          <div class="attachments" id="attachmentList">
+            ${attachments.length ? attachments.map(renderAttachmentShell).join('') : '<p class="muted">添付はありません。</p>'}
+          </div>
+        </section>
+      `;
+
+      document.getElementById('saveStatusButton').addEventListener('click', saveStatus);
+      attachments.forEach(loadAttachmentPreview);
+    }
+
+    function renderAttachmentShell(attachment) {
+      return `
+        <div class="attachment" data-file-id="${escapeHtml(attachment.fileId)}">
+          <div class="preview muted">読み込み中...</div>
+          <strong>${escapeHtml(attachment.name || attachment.fileId)}</strong><br>
+          <span class="muted">${escapeHtml(attachment.mimeType || '-')} / ${escapeHtml(attachment.size || '-')} bytes</span><br>
+          ${attachment.originalName ? `<span class="muted">元: ${escapeHtml(attachment.originalName)}</span><br>` : ''}
+          ${attachment.url ? `<a href="${escapeHtml(attachment.url)}" target="_blank" rel="noopener noreferrer">Driveで開く</a>` : ''}
+        </div>
+      `;
+    }
+
+    async function loadAttachmentPreview(attachment) {
+      const container = Array.from(detailView.querySelectorAll('[data-file-id]'))
+        .find((element) => element.dataset.fileId === attachment.fileId);
+      if (!container) return;
+      const preview = container.querySelector('.preview');
+      try {
+        const result = await callServer('getAttachmentPreview', attachment.fileId);
+        preview.innerHTML = `<img src="${escapeHtml(result.dataUrl)}" alt="${escapeHtml(result.name)}">`;
+      } catch (error) {
+        preview.textContent = String(error.message || error);
+        preview.classList.add('error');
+      }
+    }
+
+    async function loadList() {
+      setBusy(true);
+      try {
+        const result = await callServer('listContactSubmissions', {
+          query: searchInput.value,
+          status: statusFilter.value,
+          limit: 100,
+        });
+        state.submissions = result.submissions || [];
+        renderList();
+        if (state.selectedId) {
+          await selectSubmission(state.selectedId);
+        }
+      } catch (error) {
+        renderDetailEmpty(String(error.message || error));
+      } finally {
+        setBusy(false);
+      }
+    }
+
+    async function selectSubmission(id) {
+      state.selectedId = id;
+      renderList();
+      renderDetailEmpty('読み込み中...');
+      try {
+        const result = await callServer('getContactSubmission', id);
+        state.detail = result.submission;
+        renderDetail(state.detail);
+      } catch (error) {
+        renderDetailEmpty(String(error.message || error));
+      }
+    }
+
+    async function saveStatus() {
+      const status = document.getElementById('statusSelect').value;
+      const note = document.getElementById('internalNote').value;
+      const button = document.getElementById('saveStatusButton');
+      const message = document.getElementById('statusSaveMessage');
+      button.disabled = true;
+      message.textContent = '';
+      try {
+        const result = await callServer('updateContactSubmissionStatus', state.selectedId, status, note);
+        state.detail = result.submission;
+        await loadList();
+        renderDetail(state.detail);
+      } catch (error) {
+        message.textContent = String(error.message || error);
+        message.classList.add('error');
+      } finally {
+        button.disabled = false;
+      }
+    }
+
+    const context = window.CONTACT_VIEWER_CONTEXT || {};
+    viewerEmail.textContent = context.email || '';
+    if (!context.allowed) {
+      deniedMessage.textContent = context.email
+        ? `${context.email} は許可リストに含まれていません。`
+        : 'ログインユーザーを確認できません。Googleアカウントでログインしてください。';
+      deniedView.hidden = false;
+    } else {
+      appView.hidden = false;
+      refreshButton.addEventListener('click', loadList);
+      searchInput.addEventListener('input', () => {
+        window.clearTimeout(searchInput._timer);
+        searchInput._timer = window.setTimeout(loadList, 250);
+      });
+      statusFilter.addEventListener('change', loadList);
+      loadList();
+    }
+  </script>
+</body>
+</html>
