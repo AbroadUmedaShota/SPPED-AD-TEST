@@ -57,6 +57,8 @@ last_reviewed: 2026-06-21
 
 保存失敗時はメール送信せず、送信成功扱いにしない。`CONTACT_FROM_EMAIL` を From にできない場合でも送信は継続し、`CONTACT_REPLY_TO_EMAIL` を返信先として設定する。
 
+機能変更後の検証では、payload の `testMode: true` と `testModeToken` でテストモードを起動できる。`testModeToken` が GAS側 Script Property `CONTACT_TEST_MODE_TOKEN` と一致した場合のみ、社内通知先と投稿者向け受付メールの送信先を `s-umeda@abroad-o.com` のみに切り替える。不一致または未設定の場合は保存・メール送信前に拒否し、通常通知へフォールバックしない。
+
 ### 3.4 API
 
 ```http
@@ -130,6 +132,7 @@ Content-Type: text/plain;charset=utf-8
 - Reply-To: 投稿者が入力したメールアドレス
 - 件名: `【SPEED AD】お問い合わせ: [{問い合わせ種別}] {件名}`
 - 本文: 確認アプリ詳細URL、投稿内容、投稿日時、投稿者メールアドレス、保存先行 ID を含める。確認アプリ詳細URLには `id` と確認用 `#token` を付与する。確認用トークンはURLフラグメントに置き、Apps Script の初回リクエストやサーバー側アクセスログへ載せない。Spreadsheet URL と該当行リンクは予備情報とし、通常確認は確認アプリ上で完結させる。
+- テストモード時は社内通知メールと投稿者向け受付メールの To を `s-umeda@abroad-o.com` のみにし、件名へ `【TEST】`、本文へテスト投稿である旨を含める。
 
 ### 4.3 確認アプリ UX
 
@@ -182,6 +185,7 @@ Content-Type: text/plain;charset=utf-8
 - `SUPPORT_CONTACT_SUBMISSIONS_SHEET_NAME`
 - `SUPPORT_CONTACT_MAX_ATTACHMENT_MB`
 - `SUPPORT_CONTACT_WEBP_QUALITY`
+- `SUPPORT_CONTACT_TEST_MODE_TOKEN`
 
 GAS側 Script Properties:
 
@@ -194,6 +198,7 @@ GAS側 Script Properties:
 - `CONTACT_MAX_ATTACHMENT_MB`
 - `CONTACT_VIEWER_BASE_URL`
 - `CONTACT_VIEWER_ACCESS_TOKEN`
+- `CONTACT_TEST_MODE_TOKEN`
 
 確認者GAS側 Script Properties:
 

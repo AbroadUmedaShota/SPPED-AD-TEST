@@ -14,6 +14,7 @@
  *   CONTACT_MAX_ATTACHMENT_MB
  *   CONTACT_VIEWER_BASE_URL
  *   CONTACT_VIEWER_ACCESS_TOKEN
+ *   CONTACT_TEST_MODE_TOKEN
  */
 
 var DEFAULT_SHEET_NAME = 'contact_submissions';
@@ -21,6 +22,7 @@ var DEFAULT_FROM_EMAIL = 'customer@speed-ad.com';
 var DEFAULT_MAX_ATTACHMENT_MB = 10;
 var DEFAULT_SPREADSHEET_TITLE = 'SPEED AD サポートお問い合わせ';
 var DEFAULT_ATTACHMENT_FOLDER_NAME = 'SPEED AD サポートお問い合わせ添付';
+var TEST_NOTIFY_EMAIL = 's-umeda@abroad-o.com';
 var CONTACT_TYPES = ['general', 'bug', 'billing', 'plan', 'feature', 'other'];
 var CONTACT_HEADERS = [
   'submission_id',
@@ -93,7 +95,8 @@ function checkContactConfiguration() {
     replyToEmail: checkOptionalProperty_('CONTACT_REPLY_TO_EMAIL'),
     maxAttachmentMb: getMaxAttachmentMb_(),
     viewerBaseUrl: checkOptionalProperty_('CONTACT_VIEWER_BASE_URL'),
-    viewerAccessToken: checkOptionalProperty_('CONTACT_VIEWER_ACCESS_TOKEN')
+    viewerAccessToken: checkOptionalProperty_('CONTACT_VIEWER_ACCESS_TOKEN'),
+    testModeToken: checkOptionalProperty_('CONTACT_TEST_MODE_TOKEN')
   };
 
   result.ok = result.spreadsheet.ok &&
@@ -158,6 +161,7 @@ function normalizePayload_(payload) {
   var email = String(payload.email || '').trim();
   var message = String(payload.message || '').trim();
   var privacyConsent = payload.privacyConsent === true;
+  var testMode = validateTestMode_(payload);
 
   if (CONTACT_TYPES.indexOf(contactType) === -1) {
     throw new Error('問い合わせ種別を選択してください。');
@@ -185,9 +189,62 @@ function normalizePayload_(payload) {
     subject: String(payload.subject || '').trim() || 'お問い合わせ',
     message: message,
     attachments: attachments,
-    sourceUrl: String(payload.sourceUrl || '').trim(),
-    userAgent: String(payload.userAgent || '').trim()
+    sourceUrl: sanitizeSourceUrl_(payload.sourceUrl),
+    userAgent: String(payload.userAgent || '').trim(),
+    testMode: testMode.enabled
   };
+}
+
+function validateTestMode_(payload) {
+  var enabled = payload.testMode === true || String(payload.testMode || '').toLowerCase() === 'true';
+  if (!enabled) {
+    return { enabled: false };
+  }
+
+  var expectedToken = String(getProperty_('CONTACT_TEST_MODE_TOKEN', '') || '').trim();
+  var actualToken = String(payload.testModeToken || '').trim();
+  if (!expectedToken) {
+    throw new Error('CONTACT_TEST_MODE_TOKEN is not set.');
+  }
+  if (!actualToken || actualToken !== expectedToken) {
+    throw new Error('テストモードトークンが不正です。');
+  }
+  return { enabled: true };
+}
+
+function sanitizeSourceUrl_(value) {
+  var raw = String(value || '').trim();
+  if (!raw) return '';
+  var hashParts = raw.split('#');
+  var withoutHash = hashParts.shift();
+  var hash = hashParts.join('#');
+  var queryParts = withoutHash.split('?');
+  var base = queryParts.shift();
+  var query = queryParts.join('?');
+  var sanitizedQuery = stripContactTestParams_(query);
+  var sanitizedHash = stripContactTestParams_(hash);
+  return base +
+    (sanitizedQuery ? '?' + sanitizedQuery : '') +
+    (sanitizedHash ? '#' + sanitizedHash : '');
+}
+
+function stripContactTestParams_(value) {
+  if (!value) return '';
+  var blocked = {
+    contactTestMode: true,
+    contactTestToken: true,
+    testMode: true,
+    testModeToken: true
+  };
+  return String(value).split('&').filter(function (part) {
+    var key = String(part || '').split('=')[0];
+    try {
+      key = decodeURIComponent(key);
+    } catch (_err) {
+      // Keep the raw key when decoding fails.
+    }
+    return !blocked[key];
+  }).join('&');
 }
 
 function validateAttachments_(attachments) {
@@ -256,14 +313,24 @@ function buildRow_(payload, receivedAt, attachmentRefs, storageStatus, mailStatu
 
 function sendUserReceipt_(payload, fromState) {
   var fromEmail = getProperty_('CONTACT_FROM_EMAIL', DEFAULT_FROM_EMAIL);
-  var replyTo = getProperty_('CONTACT_REPLY_TO_EMAIL', fromEmail);
-  var subject = '【SPEED AD】お問い合わせを受け付けました';
-  var body = [
+  var replyTo = payload.testMode ? TEST_NOTIFY_EMAIL : getProperty_('CONTACT_REPLY_TO_EMAIL', fromEmail);
+  var subjectPrefix = payload.testMode ? '【TEST】' : '';
+  var subject = subjectPrefix + '【SPEED AD】お問い合わせを受け付けました';
+  var lines = [
     payload.name ? payload.name + ' 様' : 'SPEED AD ご利用者様',
     '',
     'SPEED AD サポートへのお問い合わせを受け付けました。',
     '内容を確認のうえ、2〜3営業日以内に担当者よりご返信いたします。',
-    '',
+    ''
+  ];
+  if (payload.testMode) {
+    lines = lines.concat([
+      '※テストモードのため、この受付メールは梅田さんのみに送信しています。',
+      '入力メールアドレス: ' + payload.email,
+      ''
+    ]);
+  }
+  var body = lines.concat([
     '--- お問い合わせ内容 ---',
     '受付ID: ' + payload.submissionId,
     '問い合わせ種別: ' + payload.contactTypeLabel,
@@ -273,18 +340,21 @@ function sendUserReceipt_(payload, fromState) {
     '',
     '------------------------',
     'SPEED AD Support'
-  ].join('\n');
+  ]).join('\n');
 
-  sendEmail_(payload.email, subject, body, fromEmail, replyTo, fromState);
+  sendEmail_(getUserReceiptEmail_(payload), subject, body, fromEmail, replyTo, fromState);
 }
 
 function sendInternalNotification_(payload, attachmentRefs, sheetLink, fromState) {
   var fromEmail = getProperty_('CONTACT_FROM_EMAIL', DEFAULT_FROM_EMAIL);
-  var notifyEmails = getNotifyEmails_();
+  var notifyEmails = getInternalNotifyEmails_(payload);
   var viewerDetailUrl = buildViewerDetailUrl_(payload.submissionId);
-  var subject = '【SPEED AD】お問い合わせ: [' + payload.contactTypeLabel + '] ' + payload.subject;
+  var subjectPrefix = payload.testMode ? '【TEST】【SPEED AD】' : '【SPEED AD】';
+  var subject = subjectPrefix + 'お問い合わせ: [' + payload.contactTypeLabel + '] ' + payload.subject;
   var body = [
-    'SPEED AD サポート問い合わせを受け付けました。',
+    payload.testMode
+      ? 'SPEED AD サポート問い合わせのテスト投稿を受け付けました。メール通知は梅田さんのみに送信しています。'
+      : 'SPEED AD サポート問い合わせを受け付けました。',
     '',
     '確認アプリ: ' + (viewerDetailUrl || 'CONTACT_VIEWER_BASE_URL 未設定'),
     '',
@@ -305,7 +375,15 @@ function sendInternalNotification_(payload, attachmentRefs, sheetLink, fromState
     '添付: ' + (attachmentRefs.length ? attachmentRefs.join('\n') : '-')
   ].join('\n');
 
-  sendEmail_(notifyEmails, subject, body, fromEmail, payload.email, fromState);
+  sendEmail_(notifyEmails, subject, body, fromEmail, payload.testMode ? TEST_NOTIFY_EMAIL : payload.email, fromState);
+}
+
+function getInternalNotifyEmails_(payload) {
+  return payload && payload.testMode ? [TEST_NOTIFY_EMAIL] : getNotifyEmails_();
+}
+
+function getUserReceiptEmail_(payload) {
+  return payload && payload.testMode ? TEST_NOTIFY_EMAIL : payload.email;
 }
 
 function buildViewerDetailUrl_(submissionId) {
@@ -490,6 +568,18 @@ function setContactNotifyEmail(value) {
   return logAndReturn_({
     ok: true,
     contactNotifyEmailCount: emails.length
+  });
+}
+
+function setContactTestModeToken(value) {
+  var token = String(value || '').trim();
+  if (!token) {
+    throw new Error('CONTACT_TEST_MODE_TOKEN requires a non-empty token.');
+  }
+  PropertiesService.getScriptProperties().setProperty('CONTACT_TEST_MODE_TOKEN', token);
+  return logAndReturn_({
+    ok: true,
+    contactTestModeTokenSet: true
   });
 }
 
