@@ -20,7 +20,7 @@ last_reviewed: 2026-06-21
 - 送信先は専用 Google Apps Script Web App とし、既存の E2E/不具合報告DB用GASは流用しない。
 - 送信先URL未設定時は成功扱いにせず、設定未完了のエラーを表示する。
 - 添付画像はフロントエンドでWEBPへ変換してから送信する。
-- 確認者向け画面は公開投稿GASと分離した専用 Google Apps Script Web App とする。
+- 確認者向け画面は公開投稿GASと分離した専用 Google Apps Script Web App とする。短期運用では閲覧者ごとのOAuth承認ループを避けるため、GASはデプロイユーザー権限で実行し、通知URL内の確認用トークンで表示を制御する。
 
 ## 3. 理想仕様
 
@@ -129,7 +129,7 @@ Content-Type: text/plain;charset=utf-8
 - To: `SUPPORT_CONTACT_NOTIFY_EMAIL`。カンマ、セミコロン、改行区切りで複数宛先を指定可能。
 - Reply-To: 投稿者が入力したメールアドレス
 - 件名: `【SPEED AD】お問い合わせ: [{問い合わせ種別}] {件名}`
-- 本文: 確認アプリ詳細URL、投稿内容、投稿日時、投稿者メールアドレス、保存先行 ID を含める。Spreadsheet URL と該当行リンクは予備情報とし、通常確認は確認アプリ上で完結させる。
+- 本文: 確認アプリ詳細URL、投稿内容、投稿日時、投稿者メールアドレス、保存先行 ID を含める。確認アプリ詳細URLには `id` と確認用 `token` を付与する。Spreadsheet URL と該当行リンクは予備情報とし、通常確認は確認アプリ上で完結させる。
 
 ## 5. 投稿内容の保存仕様
 
@@ -183,6 +183,7 @@ GAS側 Script Properties:
 - `CONTACT_SHEET_NAME`
 - `CONTACT_MAX_ATTACHMENT_MB`
 - `CONTACT_VIEWER_BASE_URL`
+- `CONTACT_VIEWER_ACCESS_TOKEN`
 
 確認者GAS側 Script Properties:
 
@@ -190,6 +191,7 @@ GAS側 Script Properties:
 - `DRIVE_FOLDER_ID`
 - `CONTACT_SHEET_NAME`
 - `CONTACT_VIEWER_EMAILS`
+- `CONTACT_VIEWER_ACCESS_TOKEN`
 
 ## 7. `customer@speed-ad.com` 受信・送信確認
 
@@ -222,7 +224,7 @@ GAS側 Script Properties:
 - bot 対策として reCAPTCHA v3 または同等の仕組みを検討する。
 - 添付ファイルは公開 URL にしない。必要に応じて権限付き URL または期限付き URL を使う。
 - スプレッドシートと添付保存先の閲覧権限は最小限にする。
-- 確認アプリは Google アカウントでのログインを必須とし、`CONTACT_VIEWER_EMAILS` の許可リストに含まれるユーザーだけに問い合わせ情報を表示する。
+- 確認アプリは短期運用では通知URLの確認用トークンで問い合わせ情報を表示する。中期的には `abroad-o.com` 所有のGASへ移行し、Google アカウント単位の許可リスト制御へ戻す。
 - `/privacy/` への同意文言または個人情報取扱いへのリンクをフォーム内に表示する。
 
 ## 9. 未確定事項

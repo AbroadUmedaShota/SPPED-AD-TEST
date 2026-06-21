@@ -242,11 +242,13 @@
 
   <script>
     window.CONTACT_VIEWER_INITIAL_ID = <?!= JSON.stringify(initialSubmissionId) ?>;
+    window.CONTACT_VIEWER_ACCESS_TOKEN = <?!= JSON.stringify(initialAccessToken) ?>;
     window.CONTACT_VIEWER_CONTEXT = <?!= JSON.stringify(viewerContext) ?>;
   </script>
   <script>
     const state = {
       selectedId: window.CONTACT_VIEWER_INITIAL_ID || '',
+      accessToken: window.CONTACT_VIEWER_ACCESS_TOKEN || '',
       submissions: [],
       loading: false,
       detail: null,
@@ -380,7 +382,7 @@
       if (!container) return;
       const preview = container.querySelector('.preview');
       try {
-        const result = await callServer('getAttachmentPreview', attachment.fileId);
+        const result = await callServer('getAttachmentPreview', state.accessToken, attachment.fileId);
         preview.innerHTML = `<img src="${escapeHtml(result.dataUrl)}" alt="${escapeHtml(result.name)}">`;
       } catch (error) {
         preview.textContent = String(error.message || error);
@@ -391,7 +393,7 @@
     async function loadList() {
       setBusy(true);
       try {
-        const result = await callServer('listContactSubmissions', {
+        const result = await callServer('listContactSubmissions', state.accessToken, {
           query: searchInput.value,
           status: statusFilter.value,
           limit: 100,
@@ -413,7 +415,7 @@
       renderList();
       renderDetailEmpty('読み込み中...');
       try {
-        const result = await callServer('getContactSubmission', id);
+        const result = await callServer('getContactSubmission', state.accessToken, id);
         state.detail = result.submission;
         renderDetail(state.detail);
       } catch (error) {
@@ -429,7 +431,7 @@
       button.disabled = true;
       message.textContent = '';
       try {
-        const result = await callServer('updateContactSubmissionStatus', state.selectedId, status, note);
+        const result = await callServer('updateContactSubmissionStatus', state.accessToken, state.selectedId, status, note);
         state.detail = result.submission;
         await loadList();
         renderDetail(state.detail);
@@ -444,9 +446,9 @@
     const context = window.CONTACT_VIEWER_CONTEXT || {};
     viewerEmail.textContent = context.email || '';
     if (!context.allowed) {
-      deniedMessage.textContent = context.email
-        ? `${context.email} は許可リストに含まれていません。`
-        : 'ログインユーザーを確認できません。Googleアカウントでログインしてください。';
+      deniedMessage.textContent = context.tokenConfigured
+        ? '確認用URLが無効です。通知メール内の確認アプリURLから開いてください。'
+        : '確認アプリのアクセストークンが未設定です。管理者に確認してください。';
       deniedView.hidden = false;
     } else {
       appView.hidden = false;
