@@ -71,7 +71,7 @@ test('support contact viewer GAS is token-gated and updates status', async () =>
   assert.match(code, /function validateViewerAccessToken/);
   assert.match(code, /function assertAttachmentFile_/);
   assert.match(code, /function requireViewer_/);
-  assert.match(code, /counts\s*=\s*\{/);
+  assert.match(code, /counts\.total \+= 1;[\s\S]*if \(query && !matchesQuery_\(record, query\)\) continue;/);
   assert.match(code, /isActiveStatus_/);
   assert.match(code, /getRequestToken_/);
   assert.match(code, /DRIVE_FOLDER_ID/);
@@ -86,6 +86,14 @@ test('support contact viewer GAS is token-gated and updates status', async () =>
   assert.match(html, /validateViewerAccessToken/);
   assert.match(html, /bootstrapViewer/);
   assert.match(html, /callServer\('validateViewerAccessToken', state\.accessToken\)/);
+  assert.match(html, /showApp\(\)[\s\S]*cleanAccessTokenFromUrl\(\);/);
+  assert.match(html, /showDenied\([\s\S]*true\);/);
+  assert.match(html, /showDenied\([\s\S]*false\);/);
+  assert.match(html, /ensureAttachmentPreviewLoaded/);
+  assert.match(html, /await ensureAttachmentPreviewLoaded\(state\.attachmentIndex\)/);
+  assert.match(html, /setAttachmentModalVisibility/);
+  assert.match(html, /removeAttribute\('aria-hidden'\)/);
+  assert.match(html, /setAttribute\('aria-hidden', 'true'\)/);
   assert.doesNotMatch(html, /context\.allowed\s*=\s*true/);
   assert.match(html, /statusSummary/);
   assert.match(html, /対応が必要/);

@@ -296,6 +296,8 @@
       gap: 12px;
       align-items: center;
       padding: 14px;
+      min-height: 56vh;
+      position: relative;
     }
     .attachment-modal__image {
       min-height: 50vh;
@@ -305,6 +307,17 @@
       background: #ffffff;
       border: 1px solid var(--line);
       border-radius: 8px;
+    }
+    .attachment-modal__loading {
+      position: absolute;
+      inset: 14px 60px 14px 60px;
+      display: grid;
+      place-items: center;
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--muted);
+      z-index: 1;
     }
     .attachment-modal__meta {
       padding: 0 14px 14px;
@@ -389,6 +402,7 @@
         </div>
       </div>
       <div class="attachment-modal__body">
+        <div class="attachment-modal__loading" id="attachmentModalLoading" hidden>読み込み中...</div>
         <button type="button" class="ghost attachment-modal__nav" id="attachmentModalPrev" aria-label="前の添付ファイル">←</button>
         <img class="attachment-modal__image" id="attachmentModalImage" alt="">
         <button type="button" class="ghost attachment-modal__nav" id="attachmentModalNext" aria-label="次の添付ファイル">→</button>
@@ -491,6 +505,7 @@
     const attachmentModalPrev = document.getElementById('attachmentModalPrev');
     const attachmentModalNext = document.getElementById('attachmentModalNext');
     const attachmentModalClose = document.getElementById('attachmentModalClose');
+    const attachmentModalLoading = document.getElementById('attachmentModalLoading');
 
     function callServer(name, ...args) {
       return new Promise((resolve, reject) => {
@@ -525,6 +540,15 @@
     function setBusy(isBusy) {
       state.loading = isBusy;
       refreshButton.disabled = isBusy;
+    }
+
+    function setAttachmentModalVisibility(isVisible) {
+      attachmentModal.hidden = !isVisible;
+      if (isVisible) {
+        attachmentModal.removeAttribute('aria-hidden');
+      } else {
+        attachmentModal.setAttribute('aria-hidden', 'true');
+      }
     }
 
     function renderStatusSummary() {
@@ -801,24 +825,58 @@
       }
     }
 
+    function setAttachmentLoading(isLoading, label) {
+      attachmentModalLoading.hidden = !isLoading;
+      attachmentModalImage.hidden = isLoading;
+      if (isLoading) {
+        attachmentModalLoading.textContent = label || '読み込み中...';
+      }
+    }
+
+    async function ensureAttachmentPreviewLoaded(index) {
+      const attachments = (state.detail && state.detail.attachments) || [];
+      const attachment = attachments[index];
+      if (!attachment) return null;
+      if (attachment.dataUrl) return attachment;
+      if (!attachment.previewPromise) {
+        attachment.previewPromise = callServer('getAttachmentPreview', state.accessToken, attachment.fileId)
+          .then((result) => {
+            attachment.dataUrl = result.dataUrl;
+            attachment.previewName = result.name;
+            delete attachment.previewError;
+            return attachment;
+          })
+          .finally(() => {
+            delete attachment.previewPromise;
+          });
+      }
+      setAttachmentLoading(true, `${attachment.name || attachment.fileId} を読み込み中...`);
+      try {
+        await attachment.previewPromise;
+      } catch (error) {
+        attachment.previewError = String(error.message || error);
+        setAttachmentLoading(true, attachment.previewError);
+        throw error;
+      }
+      return attachment;
+    }
+
     async function openAttachmentViewer(index) {
       const attachments = (state.detail && state.detail.attachments) || [];
       if (!attachments.length) return;
       state.attachmentIndex = Math.max(0, Math.min(index, attachments.length - 1));
-      const attachment = attachments[state.attachmentIndex];
-      if (attachment && !attachment.dataUrl && attachment.fileId) {
-        try {
-          attachment.dataUrl = (await callServer('getAttachmentPreview', state.accessToken, attachment.fileId)).dataUrl;
-        } catch (error) {
-          attachmentModalCaption.textContent = String(error.message || error);
-        }
+      setAttachmentModalVisibility(true);
+      setAttachmentLoading(true, `${attachments[state.attachmentIndex].name || attachments[state.attachmentIndex].fileId} を読み込み中...`);
+      try {
+        await ensureAttachmentPreviewLoaded(state.attachmentIndex);
+      } catch (_error) {
+        // keep the error visible in the modal
       }
       syncAttachmentModalControls();
-      attachmentModal.hidden = false;
     }
 
     function closeAttachmentViewer() {
-      attachmentModal.hidden = true;
+      setAttachmentModalVisibility(false);
     }
 
     function syncAttachmentModalControls() {
@@ -830,9 +888,17 @@
         attachmentModalImage.removeAttribute('src');
         attachmentModalCaption.textContent = '';
         attachmentModalCounter.textContent = '';
+        setAttachmentLoading(false);
         return;
       }
-      attachmentModalImage.src = attachment.dataUrl || '';
+      if (attachment.previewError && !attachment.dataUrl) {
+        setAttachmentLoading(true, attachment.previewError);
+        attachmentModalImage.removeAttribute('src');
+      } else {
+        setAttachmentLoading(false);
+        attachmentModalImage.hidden = false;
+        attachmentModalImage.src = attachment.dataUrl || '';
+      }
       attachmentModalImage.alt = attachment.name || attachment.fileId || '添付';
       attachmentModalCaption.textContent = [attachment.name || attachment.fileId, attachment.originalName ? `元: ${attachment.originalName}` : '', attachment.mimeType || '-']
         .filter(Boolean)
@@ -842,28 +908,37 @@
       attachmentModalNext.disabled = state.attachmentIndex >= attachments.length - 1;
     }
 
-    function moveAttachmentViewer(delta) {
+    async function moveAttachmentViewer(delta) {
       const attachments = (state.detail && state.detail.attachments) || [];
       const nextIndex = state.attachmentIndex + delta;
       if (nextIndex < 0 || nextIndex >= attachments.length) return;
       state.attachmentIndex = nextIndex;
+      setAttachmentModalVisibility(true);
+      try {
+        await ensureAttachmentPreviewLoaded(state.attachmentIndex);
+      } catch (_error) {
+        // keep modal open with loading/error state
+      }
       syncAttachmentModalControls();
     }
 
-    cleanAccessTokenFromUrl();
     let viewerContext = window.CONTACT_VIEWER_CONTEXT || {};
 
-    function showDenied(message) {
+    function showDenied(message, shouldCleanUrl) {
       viewerEmail.textContent = viewerContext.email || '';
       deniedMessage.textContent = message;
       deniedView.hidden = false;
       appView.hidden = true;
+      if (shouldCleanUrl) {
+        cleanAccessTokenFromUrl();
+      }
     }
 
     function showApp() {
       viewerEmail.textContent = viewerContext.email || '';
       deniedView.hidden = true;
       appView.hidden = false;
+      cleanAccessTokenFromUrl();
       refreshButton.addEventListener('click', loadList);
       searchInput.addEventListener('input', () => {
         window.clearTimeout(searchInput._timer);
@@ -882,7 +957,7 @@
       if (!state.accessToken) {
         showDenied(viewerContext.tokenConfigured
           ? '確認用URLが無効です。通知メール内の確認アプリURLから開いてください。'
-          : '確認アプリのアクセストークンが未設定です。管理者に確認してください。');
+          : '確認アプリのアクセストークンが未設定です。管理者に確認してください。', false);
         return;
       }
       try {
@@ -892,12 +967,14 @@
           showApp();
           return;
         }
+        showDenied(viewerContext.tokenConfigured
+          ? '確認用URLが無効です。通知メール内の確認アプリURLから開いてください。'
+          : '確認アプリのアクセストークンが未設定です。管理者に確認してください。', true);
+        return;
       } catch (_error) {
-        // fall through to denied state
+        showDenied('確認アプリの確認に一時的に失敗しました。再読み込みしてもう一度お試しください。', false);
+        return;
       }
-      showDenied(viewerContext.tokenConfigured
-        ? '確認用URLが無効です。通知メール内の確認アプリURLから開いてください。'
-        : '確認アプリのアクセストークンが未設定です。管理者に確認してください。');
     }
 
     attachmentModal.addEventListener('click', (event) => {
