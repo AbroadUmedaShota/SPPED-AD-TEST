@@ -47,6 +47,10 @@ function getViewerContext() {
   return getViewerContext_('');
 }
 
+function validateViewerAccessToken(accessToken) {
+  return getViewerContext_(accessToken);
+}
+
 function listContactSubmissions(accessToken, options) {
   var context = requireViewer_(accessToken);
   options = options || {};
