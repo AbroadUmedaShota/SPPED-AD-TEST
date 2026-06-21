@@ -72,7 +72,6 @@ function listContactSubmissions(accessToken, options) {
 
   for (var rowIndex = 1; rowIndex < values.length; rowIndex++) {
     var record = rowToRecord_(headers, values[rowIndex], rowIndex + 1);
-    if (query && !matchesQuery_(record, query)) continue;
     counts.total += 1;
     if (isActiveStatus_(record.handled_status)) {
       counts.active += 1;
@@ -80,6 +79,7 @@ function listContactSubmissions(accessToken, options) {
     if (counts[record.handled_status] != null) {
       counts[record.handled_status] += 1;
     }
+    if (query && !matchesQuery_(record, query)) continue;
     if (statusFilter === 'all') {
       records.push(toSummary_(record));
       continue;
