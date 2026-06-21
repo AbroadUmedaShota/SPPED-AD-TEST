@@ -135,6 +135,7 @@ test('support contact viewer GAS is token-gated and updates status', async () =>
 
   assert.equal(manifest.webapp.executeAs, 'USER_DEPLOYING');
   assert.equal(manifest.webapp.access, 'ANYONE_ANONYMOUS');
+  assert.ok(manifest.oauthScopes.includes('https://www.googleapis.com/auth/drive'));
   assert.match(code, /CONTACT_VIEWER_EMAILS/);
   assert.match(code, /CONTACT_VIEWER_ACCESS_TOKEN/);
   assert.match(code, /function doGet/);
@@ -142,6 +143,17 @@ test('support contact viewer GAS is token-gated and updates status', async () =>
   assert.match(code, /function getContactSubmission/);
   assert.match(code, /function getAttachmentPreview/);
   assert.match(code, /function updateContactSubmissionStatus/);
+  assert.match(code, /function previewContactDbCleanup/);
+  assert.match(code, /function executeContactDbCleanup/);
+  assert.match(code, /function buildContactDbCleanupPlan_/);
+  assert.match(code, /CONTACT_DB_CLEANUP_CONFIRMATION = 'DELETE_TEST_CONTACT_ROWS_20260622'/);
+  assert.match(code, /sheet\.getName\(\) \+ '_backup_'/);
+  assert.match(code, /yyyyMMdd_HHmmss/);
+  assert.match(code, /known_test_submission_id/);
+  assert.match(code, /external_email_not_auto_deleted/);
+  assert.match(code, /filename_does_not_start_with_submission_id/);
+  assert.match(code, /file\.setTrashed\(true\)/);
+  assert.match(code, /\.sort\(function \(a, b\) \{ return b - a; \}\)/);
   assert.match(code, /function validateViewerAccessToken/);
   assert.match(code, /function assertAttachmentFile_/);
   assert.match(code, /function requireViewer_/);

@@ -9,12 +9,13 @@
 - 閲覧者ごとの OAuth 承認ループを避けるため、通知URLのフラグメントに含める `CONTACT_VIEWER_ACCESS_TOKEN` で問い合わせ情報の表示を制御します。読み取り後は可視URLからトークンを消し、同じタブ内の再読み込みに限って `sessionStorage` から復帰します。
 - `CONTACT_VIEWER_EMAILS` は将来の Google アカウント単位制御へ戻す場合の許可ユーザー一覧として維持します。
 - 投稿データの正本は既存 Spreadsheet `contact_submissions`、添付本体は既存 Drive フォルダです。
+- 仕様確認後の作業DB整理では、プレビュー関数で削除候補を確認してからバックアップ作成付きで削除します。
 
 ## 現行デプロイ
 
 - Script ID: `1tG0AXoDPAG86OurWepwGnZRoZNbplnq_VsiYUINIrv_NbVnMl1Mj7NwW`
 - Web App URL: `https://script.google.com/macros/s/AKfycbxz4foQKPlgAeF5ShuM2RBudUpYD8VOvIi7riU1j4QtghnHzvpw9JSKQgfcm61hJKh3/exec`
-- Current version: `9` (`support contact viewer ux fixes`)
+- Current version: `12` (`support contact db cleanup safe`)
 - Owner: `customer@speed-ad.com`
 
 ## Script Properties
@@ -61,6 +62,19 @@ CONTACT_VIEWER_ACCESS_TOKEN=<Script Properties only>
 - 添付ビューアは開いた時に閉じるボタンへフォーカスし、閉じた時に元の添付サムネイルへ戻る。
 - 添付ファイルの Drive リンクはフォールバックとして開ける。
 
+## 問い合わせDB整理関数
+
+`contact_submissions` のテスト投稿を整理する場合は、確認者GASに追加した以下の関数を使います。
+
+| 関数 | 目的 |
+| --- | --- |
+| `previewContactDbCleanup` | 削除候補件数、対象 `submission_id`、添付ファイルID、判定理由を返します。 |
+| `executeContactDbCleanup` | 確認フレーズ `DELETE_TEST_CONTACT_ROWS_20260622` を引数に受け取り、バックアップ作成後に候補行を削除し、対象添付をDriveゴミ箱へ移動します。 |
+
+削除前には必ず `previewContactDbCleanup` の結果をレポートへ記録します。`executeContactDbCleanup` は同一Spreadsheet内に `contact_submissions_backup_YYYYMMDD_HHMMSS` 形式のバックアップシートを作成してから、削除候補行を下から順に削除します。添付ファイルは `attachment_refs` の fileId を参照し、Drive上のファイル名が削除対象 `submission_id` で始まる場合のみゴミ箱へ移動します。
+
+削除対象は、既知テスト受付ID、または内部メールアドレスかつテスト判定語を含む行に限定します。外部メールアドレスの行は、既知テスト受付IDに一致しない限り自動削除しません。
+
 2026-06-21 検証:
 
 - 公開投稿GASの通知メールに確認アプリ詳細URLが入ることを確認済み。
@@ -70,3 +84,8 @@ CONTACT_VIEWER_ACCESS_TOKEN=<Script Properties only>
 - 確認アプリURLのトークンをURLフラグメントへ移行し、公開HTMLに `location.hash` 読み取りが反映されていることを確認済み。
 - 確認アプリのUX改善をバージョン `8` へ反映し、公開HTMLに対応が必要フィルタ、ステータス件数、返信リンク、添付ビューア、サーバー側トークン検証が含まれることを確認済み。
 - 確認アプリのUX修正をバージョン `9` へ反映し、公開HTMLに `sessionStorage` 復帰、添付ビューアのフォーカス復帰、閉じるボタンへの初期フォーカスが含まれることを確認済み。
+- 2026-06-22 にDB整理関数を追加し、確認者GASの既存デプロイをバージョン `12` (`support contact db cleanup safe`) へ redeploy した。
+- 一時実行入口を使って `contact_submissions` の削除候補12件を削除し、バックアップシート `contact_submissions_backup_20260622_060551` を作成した。削除後プレビューで候補0件を確認済み。
+- 一時実行入口はバージョン `12` から削除済み。公開HTMLに `cleanupAction` と一時トークンが含まれないことを確認済み。
+- ローカルコードでは確認用トークン経由のDB整理補助関数も削除済み。`customer` / `default` のGoogleトークンが `invalid_rapt` になったため、追加ハードニングの再デプロイは再認証後に行う。
+- 添付4件のゴミ箱移動はDrive書き込み承認不足で未完了。対象 fileId と理由は `../db-cleanup-report-2026-06-22.md` に記録済み。
