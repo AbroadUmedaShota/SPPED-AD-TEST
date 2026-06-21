@@ -495,6 +495,25 @@
       };
     }
 
+    function buildAttachmentModalClosedState() {
+      return {
+        attachmentIndex: 0,
+        hidden: true,
+        ariaHidden: 'true',
+      };
+    }
+
+    function getDetailAttachmentModalState(_detailState) {
+      return buildAttachmentModalClosedState();
+    }
+
+    function resetAttachmentModalState() {
+      const closedState = getDetailAttachmentModalState('reset');
+      state.attachmentIndex = closedState.attachmentIndex;
+      setAttachmentLoading(false);
+      setAttachmentModalVisibility(!closedState.hidden);
+    }
+
     window.__CONTACT_VIEWER_TEST__ = {
       parseViewerAccessTokenFromUrl,
       buildViewerUrlWithoutTokens,
@@ -502,6 +521,9 @@
       clampAttachmentIndex,
       shouldResetAttachmentModal,
       getAttachmentModalVisibilityState,
+      buildAttachmentModalClosedState,
+      getDetailAttachmentModalState,
+      resetAttachmentModalState,
     };
     /* CONTACT_VIEWER_TEST_HELPERS_END */
 
@@ -698,15 +720,12 @@
     }
 
     function renderDetailEmpty(message) {
+      resetAttachmentModalState();
       detailView.innerHTML = `<div class="section"><p class="muted">${escapeHtml(message)}</p></div>`;
     }
 
     function renderDetail(submission) {
-      if (shouldResetAttachmentModal(state.detail && state.detail.submission_id, submission && submission.submission_id)) {
-        state.attachmentIndex = 0;
-        setAttachmentLoading(false);
-        setAttachmentModalVisibility(false);
-      }
+      resetAttachmentModalState();
       const attachments = submission.attachments || [];
       const replyMailHref = buildMailToHref(submission.email || '', submission.subject || 'お問い合わせ');
       const currentStatus = submission.handled_status || '未対応';
@@ -839,6 +858,7 @@
           renderDetailEmpty('一致するお問い合わせがありません。');
         }
       } catch (error) {
+        resetAttachmentModalState();
         renderDetailEmpty(String(error.message || error));
       } finally {
         setBusy(false);
@@ -858,6 +878,7 @@
         renderDetail(state.detail);
         setDetailSnapshot(state.detail);
       } catch (error) {
+        resetAttachmentModalState();
         renderDetailEmpty(String(error.message || error));
       }
     }
