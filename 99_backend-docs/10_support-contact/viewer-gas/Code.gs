@@ -6,6 +6,7 @@
  *   DRIVE_FOLDER_ID
  *   CONTACT_SHEET_NAME
  *   CONTACT_VIEWER_EMAILS
+ *   CONTACT_VIEWER_ACCESS_TOKEN
  */
 
 var DEFAULT_SHEET_NAME = 'contact_submissions';
@@ -32,8 +33,10 @@ var CONTACT_HEADERS = [
 
 function doGet(e) {
   var template = HtmlService.createTemplateFromFile('Index');
+  var accessToken = getRequestToken_(e);
   template.initialSubmissionId = String((e && e.parameter && e.parameter.id) || '');
-  template.viewerContext = getViewerContext_();
+  template.initialAccessToken = accessToken;
+  template.viewerContext = getViewerContext_(accessToken);
   return template
     .evaluate()
     .setTitle('SPEED AD お問い合わせ確認')
@@ -41,11 +44,11 @@ function doGet(e) {
 }
 
 function getViewerContext() {
-  return getViewerContext_();
+  return getViewerContext_('');
 }
 
-function listContactSubmissions(options) {
-  var context = requireViewer_();
+function listContactSubmissions(accessToken, options) {
+  var context = requireViewer_(accessToken);
   options = options || {};
   var statusFilter = String(options.status || '').trim();
   var query = String(options.query || '').toLowerCase().trim();
@@ -74,8 +77,8 @@ function listContactSubmissions(options) {
   };
 }
 
-function getContactSubmission(submissionId) {
-  requireViewer_();
+function getContactSubmission(accessToken, submissionId) {
+  requireViewer_(accessToken);
   var match = findSubmission_(submissionId);
   if (!match) {
     throw new Error('問い合わせが見つかりません。');
@@ -87,8 +90,8 @@ function getContactSubmission(submissionId) {
   };
 }
 
-function getAttachmentPreview(fileId) {
-  requireViewer_();
+function getAttachmentPreview(accessToken, fileId) {
+  requireViewer_(accessToken);
   var file = DriveApp.getFileById(String(fileId || ''));
   assertAttachmentFile_(file);
   var blob = file.getBlob();
@@ -106,8 +109,8 @@ function getAttachmentPreview(fileId) {
   };
 }
 
-function updateContactSubmissionStatus(submissionId, status, note) {
-  var context = requireViewer_();
+function updateContactSubmissionStatus(accessToken, submissionId, status, note) {
+  var context = requireViewer_(accessToken);
   var normalizedStatus = String(status || '').trim();
   if (VIEWER_STATUSES.indexOf(normalizedStatus) === -1) {
     throw new Error('対応ステータスが不正です。');
@@ -133,21 +136,23 @@ function updateContactSubmissionStatus(submissionId, status, note) {
     }
   });
 
-  return getContactSubmission(submissionId);
+  return getContactSubmission(accessToken, submissionId);
 }
 
-function getViewerContext_() {
+function getViewerContext_(accessToken) {
+  var configuredToken = getViewerAccessToken_();
+  var allowed = !!configuredToken && accessToken === configuredToken;
   var email = getActiveUserEmail_();
-  var allowedEmails = getViewerEmails_();
   return {
-    email: email,
-    allowed: !!email && allowedEmails.indexOf(email.toLowerCase()) !== -1,
-    allowedCount: allowedEmails.length
+    email: email || '確認リンク',
+    allowed: allowed,
+    authMode: 'token',
+    tokenConfigured: !!configuredToken
   };
 }
 
-function requireViewer_() {
-  var context = getViewerContext_();
+function requireViewer_(accessToken) {
+  var context = getViewerContext_(accessToken);
   if (!context.allowed) {
     throw new Error('このお問い合わせ確認アプリを利用する権限がありません。');
   }
@@ -164,6 +169,14 @@ function getActiveUserEmail_() {
 
 function getViewerEmails_() {
   return normalizeEmailList_(getProperty_('CONTACT_VIEWER_EMAILS', ''));
+}
+
+function getViewerAccessToken_() {
+  return String(getProperty_('CONTACT_VIEWER_ACCESS_TOKEN', '') || '').trim();
+}
+
+function getRequestToken_(e) {
+  return String((e && e.parameter && (e.parameter.token || e.parameter.accessToken)) || '').trim();
 }
 
 function getSheet_() {

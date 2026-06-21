@@ -13,6 +13,7 @@
  *   CONTACT_SHEET_NAME
  *   CONTACT_MAX_ATTACHMENT_MB
  *   CONTACT_VIEWER_BASE_URL
+ *   CONTACT_VIEWER_ACCESS_TOKEN
  */
 
 var DEFAULT_SHEET_NAME = 'contact_submissions';
@@ -91,7 +92,8 @@ function checkContactConfiguration() {
     notifyEmail: checkNotifyEmails_(),
     replyToEmail: checkOptionalProperty_('CONTACT_REPLY_TO_EMAIL'),
     maxAttachmentMb: getMaxAttachmentMb_(),
-    viewerBaseUrl: checkOptionalProperty_('CONTACT_VIEWER_BASE_URL')
+    viewerBaseUrl: checkOptionalProperty_('CONTACT_VIEWER_BASE_URL'),
+    viewerAccessToken: checkOptionalProperty_('CONTACT_VIEWER_ACCESS_TOKEN')
   };
 
   result.ok = result.spreadsheet.ok &&
@@ -310,7 +312,12 @@ function buildViewerDetailUrl_(submissionId) {
   var baseUrl = String(getProperty_('CONTACT_VIEWER_BASE_URL', '') || '').trim();
   if (!baseUrl) return '';
   var separator = baseUrl.indexOf('?') === -1 ? '?' : '&';
-  return baseUrl + separator + 'id=' + encodeURIComponent(submissionId);
+  var token = String(getProperty_('CONTACT_VIEWER_ACCESS_TOKEN', '') || '').trim();
+  var url = baseUrl + separator + 'id=' + encodeURIComponent(submissionId);
+  if (token) {
+    url += '&token=' + encodeURIComponent(token);
+  }
+  return url;
 }
 
 function sendEmail_(to, subject, body, fromEmail, replyTo, fromState) {

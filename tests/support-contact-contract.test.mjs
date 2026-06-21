@@ -42,13 +42,15 @@ test('public support contact GAS advertises viewer detail links', async () => {
   const code = await readFile(PUBLIC_GAS_CODE, 'utf8');
 
   assert.match(code, /CONTACT_VIEWER_BASE_URL/);
+  assert.match(code, /CONTACT_VIEWER_ACCESS_TOKEN/);
   assert.match(code, /function buildViewerDetailUrl_/);
+  assert.match(code, /token=/);
   assert.match(code, /確認アプリ/);
   assert.match(code, /handled_by/);
   assert.match(code, /internal_note/);
 });
 
-test('support contact viewer GAS is login-gated and updates status', async () => {
+test('support contact viewer GAS is token-gated and updates status', async () => {
   const [code, html, manifestText] = await Promise.all([
     readFile(VIEWER_GAS_CODE, 'utf8'),
     readFile(VIEWER_GAS_HTML, 'utf8'),
@@ -56,17 +58,20 @@ test('support contact viewer GAS is login-gated and updates status', async () =>
   ]);
   const manifest = JSON.parse(manifestText);
 
-  assert.equal(manifest.webapp.executeAs, 'USER_ACCESSING');
-  assert.equal(manifest.webapp.access, 'ANYONE');
+  assert.equal(manifest.webapp.executeAs, 'USER_DEPLOYING');
+  assert.equal(manifest.webapp.access, 'ANYONE_ANONYMOUS');
   assert.match(code, /CONTACT_VIEWER_EMAILS/);
+  assert.match(code, /CONTACT_VIEWER_ACCESS_TOKEN/);
   assert.match(code, /function doGet/);
   assert.match(code, /function listContactSubmissions/);
   assert.match(code, /function getContactSubmission/);
   assert.match(code, /function getAttachmentPreview/);
   assert.match(code, /function updateContactSubmissionStatus/);
   assert.match(code, /function assertAttachmentFile_/);
+  assert.match(code, /function requireViewer_/);
+  assert.match(code, /getRequestToken_/);
   assert.match(code, /DRIVE_FOLDER_ID/);
-  assert.match(code, /Session\.getActiveUser\(\)\.getEmail\(\)/);
+  assert.match(html, /CONTACT_VIEWER_ACCESS_TOKEN/);
   assert.match(html, /未対応/);
   assert.match(html, /対応中/);
   assert.match(html, /対応済み/);

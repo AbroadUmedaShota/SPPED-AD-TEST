@@ -13,8 +13,8 @@
 
 - Script ID: `1qODYRRKo8X2ps9V6TI5Q8RzR-TswCUS7sx8gZYDEpfgaKeqJhHDl10KT`
 - Web App URL: `https://script.google.com/macros/s/AKfycbw6xaQvmfspOOxXEs4DMqfLxQ3Aev6Qi8RcfiFu7iFwOHos48eAPvmmjxSnteN1Lj0D/exec`
-- Current version: `9` (`support contact viewer link and webp metadata`)
-- Rollback candidate: version `7` (`support contact reply-to fallback for ops owner migration`)
+- Current version: `11` (`support contact viewer token links`)
+- Rollback candidate: version `9` (`support contact viewer link and webp metadata`)
 - Owner: `customer@speed-ad.com`
 
 ## Script Properties
@@ -29,12 +29,14 @@
 | `CONTACT_SHEET_NAME` | 任意 | 既定は `contact_submissions` |
 | `CONTACT_MAX_ATTACHMENT_MB` | 任意 | 既定は `10` |
 | `CONTACT_VIEWER_BASE_URL` | 任意 | 確認者専用GAS Web App URL。設定時は社内通知の主リンクになります。 |
+| `CONTACT_VIEWER_ACCESS_TOKEN` | 確認アプリ利用時必須 | 確認アプリURLに付与する共有トークン。確認者GAS側と同じ値を設定し、repoには実値を記録しません。 |
 
 2026-06-21 時点の追加運用値:
 
 ```text
 CONTACT_NOTIFY_EMAIL=customer@speed-ad.com,s-umeda@abroad-o.com,t-hayashi@abroad-o.com
 CONTACT_VIEWER_BASE_URL=https://script.google.com/macros/s/AKfycbxz4foQKPlgAeF5ShuM2RBudUpYD8VOvIi7riU1j4QtghnHzvpw9JSKQgfcm61hJKh3/exec
+CONTACT_VIEWER_ACCESS_TOKEN=<Script Properties only>
 ```
 
 ## OAuth scopes
@@ -115,7 +117,7 @@ Apps Script エディタ上で、Web App 公開前に以下の関数を手動実
 
 `CONTACT_FROM_EMAIL`、`CONTACT_REPLY_TO_EMAIL`、`CONTACT_NOTIFY_EMAIL` は未設定の場合 `customer@speed-ad.com` で初期化されます。社内通知先を追加する場合は、初期化後に `CONTACT_NOTIFY_EMAIL` をカンマ、セミコロン、または改行区切りの複数宛先へ変更します。`setContactNotifyEmail` を使う場合は、メールアドレスリストを引数に渡すと Script Properties の `CONTACT_NOTIFY_EMAIL` を更新できます。
 
-確認者専用GASを配備した後は、公開投稿GASの `CONTACT_VIEWER_BASE_URL` に確認者専用GAS Web App URLを設定します。設定済みの場合、社内通知メールの主導線は `CONTACT_VIEWER_BASE_URL?id=<submission_id>` になります。
+確認者専用GASを配備した後は、公開投稿GASの `CONTACT_VIEWER_BASE_URL` に確認者専用GAS Web App URLを設定します。`CONTACT_VIEWER_ACCESS_TOKEN` も設定済みの場合、社内通知メールの主導線は `CONTACT_VIEWER_BASE_URL?id=<submission_id>&token=<token>` になります。
 
 `checkContactConfiguration` の戻り値で `ok: true` になることを本番有効化条件にします。`from.available` が `false` の場合は From 表示がGAS実行ユーザーになるため、メール実着信時に Reply-To が `CONTACT_REPLY_TO_EMAIL` になっていることを確認します。
 
@@ -139,3 +141,5 @@ Apps Script エディタ上で、Web App 公開前に以下の関数を手動実
 - テスト受付ID: `70a13837-4725-4b56-ab5f-22a5135ea3ca`
 - Drive保存ファイル: `1tAxw8xgyF5mvt762VMd3fHcpYTBnAUjh`、MIME `image/webp`
 - `s-umeda@abroad-o.com` のGmailで社内通知を確認済み。To は `customer@speed-ad.com,s-umeda@abroad-o.com,t-hayashi@abroad-o.com`、本文に確認アプリ詳細URL、Spreadsheet URL、該当行リンク、添付Driveリンクを含む。
+- 確認アプリ短期認証方式の反映後、テスト投稿 `93f9c46a-b306-4238-b14b-5169811b58f4` が `storageStatus=stored` / `mailStatus=sent` で成功することを確認済み。
+- 確認アプリのトークンなしURLは Google 認証へリダイレクトせず、アプリ内で無効URLとして表示されることを確認済み。
