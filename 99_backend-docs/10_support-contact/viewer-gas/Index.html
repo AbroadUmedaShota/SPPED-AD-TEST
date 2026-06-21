@@ -53,12 +53,16 @@
       background: var(--primary);
       color: #ffffff;
     }
+    button.ghost {
+      background: #f9fafb;
+    }
     button:disabled {
       cursor: not-allowed;
       opacity: .6;
     }
     .muted { color: var(--muted); }
     .error { color: var(--danger); }
+    .success { color: #067647; }
     .app {
       display: grid;
       grid-template-columns: minmax(320px, 42%) minmax(420px, 1fr);
@@ -76,6 +80,34 @@
       grid-template-columns: 1fr 140px;
       gap: 8px;
       margin-bottom: 12px;
+    }
+    .status-summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0 0 12px;
+    }
+    .summary-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface);
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .summary-chip strong {
+      color: var(--text);
+      font-size: 13px;
+    }
+    .summary-chip button {
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--primary);
+      border-radius: 0;
     }
     input, select, textarea {
       width: 100%;
@@ -111,6 +143,17 @@
     }
     tr[data-id].selected {
       background: #edf3ff;
+    }
+    .row-main {
+      display: grid;
+      gap: 4px;
+    }
+    .row-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 10px;
+      color: var(--muted);
+      font-size: 12px;
     }
     .status {
       display: inline-flex;
@@ -158,12 +201,21 @@
       gap: 12px;
     }
     .attachment {
+      display: grid;
+      gap: 8px;
       border: 1px solid var(--line);
       border-radius: 8px;
       padding: 10px;
       background: #fbfcfe;
     }
-    .attachment img {
+    .attachment button {
+      padding: 0;
+      border: 0;
+      background: transparent;
+      text-align: left;
+    }
+    .attachment img,
+    .attachment .preview-fallback {
       display: block;
       width: 100%;
       max-height: 240px;
@@ -171,13 +223,96 @@
       border-radius: 6px;
       background: #ffffff;
       border: 1px solid var(--line);
-      margin-bottom: 8px;
+    }
+    .attachment .preview-fallback {
+      padding: 12px;
+      min-height: 96px;
+      color: var(--muted);
+      white-space: pre-wrap;
+    }
+    .attachment .preview-button {
+      cursor: zoom-in;
     }
     .actions {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .quick-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .action-row {
       display: grid;
       grid-template-columns: 160px 1fr auto;
       gap: 10px;
       align-items: start;
+    }
+    .save-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .save-row .status-note {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    .save-row a {
+      white-space: nowrap;
+    }
+    .attachment-modal {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: rgba(15, 23, 42, 0.72);
+      z-index: 20;
+    }
+    .attachment-modal__dialog {
+      width: min(1100px, 100%);
+      background: var(--surface);
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      box-shadow: 0 18px 48px rgba(15, 23, 42, 0.28);
+      overflow: hidden;
+    }
+    .attachment-modal__toolbar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .attachment-modal__body {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      padding: 14px;
+    }
+    .attachment-modal__image {
+      min-height: 50vh;
+      max-height: 76vh;
+      width: 100%;
+      object-fit: contain;
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+    .attachment-modal__meta {
+      padding: 0 14px 14px;
+    }
+    .attachment-modal__nav {
+      min-width: 44px;
+      height: 44px;
+      border-radius: 999px;
     }
     .denied {
       padding: 40px 20px;
@@ -188,7 +323,9 @@
     @media (max-width: 900px) {
       .app { grid-template-columns: 1fr; }
       .list-pane { border-right: 0; border-bottom: 1px solid var(--line); }
-      .actions { grid-template-columns: 1fr; }
+      .action-row { grid-template-columns: 1fr; }
+      .save-row { flex-direction: column; align-items: stretch; }
+      .attachment-modal__body { grid-template-columns: 1fr; }
       .toolbar { grid-template-columns: 1fr; }
     }
   </style>
@@ -209,20 +346,22 @@
 
   <main class="app" id="appView" hidden>
     <section class="list-pane" aria-label="問い合わせ一覧">
+      <div class="status-summary" id="statusSummary"></div>
       <div class="toolbar">
         <input id="searchInput" type="search" placeholder="検索">
         <select id="statusFilter">
-          <option value="">すべて</option>
+          <option value="active" selected>対応が必要</option>
+          <option value="all">すべて</option>
           <option value="未対応">未対応</option>
           <option value="対応中">対応中</option>
-          <option value="対応済み">対応済み</option>
           <option value="保留">保留</option>
+          <option value="対応済み">対応済み</option>
         </select>
       </div>
       <table>
         <thead>
           <tr>
-            <th>受付</th>
+            <th>受付 / 経過</th>
             <th>内容</th>
             <th>状態</th>
           </tr>
@@ -240,6 +379,26 @@
     </section>
   </main>
 
+  <div class="attachment-modal" id="attachmentModal" hidden aria-hidden="true">
+    <div class="attachment-modal__dialog" role="dialog" aria-modal="true" aria-label="添付ファイルビューア">
+      <div class="attachment-modal__toolbar">
+        <strong>添付ファイル</strong>
+        <div>
+          <span class="muted" id="attachmentModalCounter"></span>
+          <button type="button" class="ghost" id="attachmentModalClose">閉じる</button>
+        </div>
+      </div>
+      <div class="attachment-modal__body">
+        <button type="button" class="ghost attachment-modal__nav" id="attachmentModalPrev" aria-label="前の添付ファイル">←</button>
+        <img class="attachment-modal__image" id="attachmentModalImage" alt="">
+        <button type="button" class="ghost attachment-modal__nav" id="attachmentModalNext" aria-label="次の添付ファイル">→</button>
+      </div>
+      <div class="attachment-modal__meta">
+        <p class="muted" id="attachmentModalCaption"></p>
+      </div>
+    </div>
+  </div>
+
   <script>
     window.CONTACT_VIEWER_INITIAL_ID = <?!= JSON.stringify(initialSubmissionId) ?>;
     window.CONTACT_VIEWER_ACCESS_TOKEN = <?!= JSON.stringify(initialAccessToken) ?>;
@@ -249,18 +408,70 @@
     function getAccessTokenFromUrl() {
       const serverToken = window.CONTACT_VIEWER_ACCESS_TOKEN || '';
       if (serverToken) return serverToken;
-      const hash = String(window.location.hash || '').replace(/^#/, '');
+      const url = new URL(window.location.href);
+      const searchToken = url.searchParams.get('token') || url.searchParams.get('accessToken') || '';
+      if (searchToken) return searchToken;
+      const hash = String(url.hash || '').replace(/^#/, '');
       if (!hash) return '';
       const params = new URLSearchParams(hash);
       return params.get('token') || params.get('accessToken') || '';
+    }
+
+    function cleanAccessTokenFromUrl() {
+      const url = new URL(window.location.href);
+      let changed = false;
+      ['token', 'accessToken'].forEach((key) => {
+        if (url.searchParams.has(key)) {
+          url.searchParams.delete(key);
+          changed = true;
+        }
+      });
+      const hash = String(url.hash || '').replace(/^#/, '');
+      if (hash) {
+        const params = new URLSearchParams(hash);
+        if (params.has('token') || params.has('accessToken')) {
+          params.delete('token');
+          params.delete('accessToken');
+          url.hash = params.toString() ? `#${params.toString()}` : '';
+          changed = true;
+        }
+      }
+      if (changed) {
+        window.history.replaceState({}, document.title, url.toString());
+      }
+    }
+
+    function formatElapsedTime(value) {
+      if (!value) return '-';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return '-';
+      const diffMs = Date.now() - date.getTime();
+      const diffMinutes = Math.max(Math.floor(diffMs / 60000), 0);
+      if (diffMinutes < 1) return 'たった今';
+      if (diffMinutes < 60) return `${diffMinutes}分前`;
+      const diffHours = Math.floor(diffMinutes / 60);
+      if (diffHours < 24) return `${diffHours}時間前`;
+      const diffDays = Math.floor(diffHours / 24);
+      return `${diffDays}日前`;
+    }
+
+    function buildMailToHref(email, subject) {
+      if (!email) return '';
+      const params = new URLSearchParams();
+      if (subject) params.set('subject', subject);
+      return `mailto:${encodeURIComponent(email)}${params.toString() ? `?${params.toString()}` : ''}`;
     }
 
     const state = {
       selectedId: window.CONTACT_VIEWER_INITIAL_ID || '',
       accessToken: getAccessTokenFromUrl(),
       submissions: [],
+      counts: { total: 0, active: 0, 未対応: 0, 対応中: 0, 保留: 0, 対応済み: 0 },
       loading: false,
       detail: null,
+      detailSnapshot: { handled_status: '', internal_note: '' },
+      dirty: false,
+      attachmentIndex: 0,
     };
 
     const appView = document.getElementById('appView');
@@ -272,6 +483,14 @@
     const statusFilter = document.getElementById('statusFilter');
     const submissionRows = document.getElementById('submissionRows');
     const detailView = document.getElementById('detailView');
+    const statusSummary = document.getElementById('statusSummary');
+    const attachmentModal = document.getElementById('attachmentModal');
+    const attachmentModalImage = document.getElementById('attachmentModalImage');
+    const attachmentModalCaption = document.getElementById('attachmentModalCaption');
+    const attachmentModalCounter = document.getElementById('attachmentModalCounter');
+    const attachmentModalPrev = document.getElementById('attachmentModalPrev');
+    const attachmentModalNext = document.getElementById('attachmentModalNext');
+    const attachmentModalClose = document.getElementById('attachmentModalClose');
 
     function callServer(name, ...args) {
       return new Promise((resolve, reject) => {
@@ -308,14 +527,78 @@
       refreshButton.disabled = isBusy;
     }
 
+    function renderStatusSummary() {
+      const chips = [
+        { label: '全件', value: state.counts.total || 0 },
+        { label: '対応が必要', value: state.counts.active || 0 },
+        { label: '未対応', value: state.counts['未対応'] || 0 },
+        { label: '対応中', value: state.counts['対応中'] || 0 },
+        { label: '保留', value: state.counts['保留'] || 0 },
+        { label: '対応済み', value: state.counts['対応済み'] || 0 },
+      ];
+      statusSummary.innerHTML = chips.map((chip) => `
+        <span class="summary-chip">
+          <strong>${escapeHtml(chip.value)}</strong>
+          ${escapeHtml(chip.label)}
+        </span>
+      `).join('');
+    }
+
+    function getStatusFilterLabel(value) {
+      const option = Array.from(statusFilter.options).find((item) => item.value === value);
+      return option ? option.textContent : value;
+    }
+
+    function isDirty() {
+      return state.dirty;
+    }
+
+    function markDirty() {
+      if (!state.detail) return;
+      const statusSelect = document.getElementById('statusSelect');
+      const internalNote = document.getElementById('internalNote');
+      state.dirty = Boolean(
+        statusSelect && internalNote &&
+          (statusSelect.value !== state.detailSnapshot.handled_status ||
+            internalNote.value !== state.detailSnapshot.internal_note)
+      );
+      const statusSaveMessage = document.getElementById('statusSaveMessage');
+      if (statusSaveMessage && state.dirty) {
+        statusSaveMessage.textContent = '未保存の変更があります。';
+        statusSaveMessage.classList.remove('success');
+        statusSaveMessage.classList.add('muted');
+      }
+    }
+
+    function confirmDiscardChanges() {
+      if (!isDirty()) return true;
+      return window.confirm('未保存の変更があります。破棄して別の問い合わせへ移動しますか？');
+    }
+
+    function setDetailSnapshot(submission) {
+      state.detailSnapshot = {
+        handled_status: submission.handled_status || '未対応',
+        internal_note: submission.internal_note || '',
+      };
+      state.dirty = false;
+    }
+
     function renderList() {
       submissionRows.innerHTML = state.submissions.map((item) => `
         <tr data-id="${escapeHtml(item.submission_id)}" class="${item.submission_id === state.selectedId ? 'selected' : ''}">
-          <td>${escapeHtml(formatDate(item.submitted_at))}</td>
+          <td>
+            <div class="row-main">
+              <strong>${escapeHtml(formatDate(item.submitted_at))}</strong>
+              <span class="muted">${escapeHtml(formatElapsedTime(item.submitted_at))}</span>
+            </div>
+          </td>
           <td>
             <strong>${escapeHtml(item.subject || 'お問い合わせ')}</strong><br>
-            <span class="muted">${escapeHtml(item.email || '-')}</span><br>
-            <span class="muted">${escapeHtml(item.contact_type || '-')} / 添付 ${escapeHtml(item.attachment_count || 0)}</span>
+            <div class="row-meta">
+              <span>${escapeHtml(item.email || '-')}</span>
+              <span>${escapeHtml(item.contact_type || '-')}</span>
+              <span>${Number(item.attachment_count || 0) > 0 ? `添付 ${escapeHtml(item.attachment_count)}件` : '添付なし'}</span>
+            </div>
           </td>
           <td><span class="status">${escapeHtml(item.handled_status || '未対応')}</span></td>
         </tr>
@@ -332,6 +615,8 @@
 
     function renderDetail(submission) {
       const attachments = submission.attachments || [];
+      const replyMailHref = buildMailToHref(submission.email || '', submission.subject || 'お問い合わせ');
+      const currentStatus = submission.handled_status || '未対応';
       detailView.innerHTML = `
         <section class="section">
           <h2>${escapeHtml(submission.subject || 'お問い合わせ')}</h2>
@@ -352,31 +637,60 @@
         <section class="section">
           <h2>対応</h2>
           <div class="actions">
-            <select id="statusSelect">
-              ${['未対応', '対応中', '対応済み', '保留'].map((status) => `<option value="${status}" ${status === (submission.handled_status || '未対応') ? 'selected' : ''}>${status}</option>`).join('')}
-            </select>
-            <textarea id="internalNote" placeholder="内部メモ">${escapeHtml(submission.internal_note || '')}</textarea>
-            <button type="button" class="primary" id="saveStatusButton">保存</button>
+            <div class="quick-actions">
+              ${[
+                ['対応中', '対応中にする'],
+                ['対応済み', '対応済みにする'],
+                ['保留', '保留にする'],
+              ].map(([status, label]) => `<button type="button" class="ghost quick-status" data-status="${status}">${label}</button>`).join('')}
+            </div>
+            <div class="action-row">
+              <select id="statusSelect">
+                ${['未対応', '対応中', '対応済み', '保留'].map((status) => `<option value="${status}" ${status === currentStatus ? 'selected' : ''}>${status}</option>`).join('')}
+              </select>
+              <textarea id="internalNote" placeholder="内部メモ">${escapeHtml(submission.internal_note || '')}</textarea>
+              <button type="button" class="primary" id="saveStatusButton">保存</button>
+            </div>
+            <div class="save-row">
+              <div class="status-note">
+                <p class="muted" id="statusSaveMessage"></p>
+                <a href="${escapeHtml(replyMailHref)}" target="_blank" rel="noopener noreferrer" id="replyMailLink">返信メールを作成</a>
+              </div>
+              <span class="muted">最終更新: ${escapeHtml(submission.handled_by || '-')} / ${escapeHtml(formatDate(submission.handled_at))}</span>
+            </div>
           </div>
-          <p class="muted" id="statusSaveMessage"></p>
-          <p class="muted">最終更新: ${escapeHtml(submission.handled_by || '-')} / ${escapeHtml(formatDate(submission.handled_at))}</p>
         </section>
         <section class="section">
           <h2>添付</h2>
           <div class="attachments" id="attachmentList">
-            ${attachments.length ? attachments.map(renderAttachmentShell).join('') : '<p class="muted">添付はありません。</p>'}
+            ${attachments.length ? attachments.map((attachment, index) => renderAttachmentShell(attachment, index)).join('') : '<p class="muted">添付はありません。</p>'}
           </div>
         </section>
       `;
 
       document.getElementById('saveStatusButton').addEventListener('click', saveStatus);
-      attachments.forEach(loadAttachmentPreview);
+      document.querySelectorAll('.quick-status').forEach((button) => {
+        button.addEventListener('click', () => saveStatus(button.dataset.status));
+      });
+      const statusSelect = document.getElementById('statusSelect');
+      const internalNote = document.getElementById('internalNote');
+      statusSelect.addEventListener('change', markDirty);
+      internalNote.addEventListener('input', markDirty);
+      document.querySelectorAll('.preview-button').forEach((button) => {
+        button.addEventListener('click', () => openAttachmentViewer(Number(button.dataset.attachmentIndex || 0)));
+      });
+      attachments.forEach((attachment, index) => loadAttachmentPreview(attachment, index));
+      setDetailSnapshot(submission);
+      markDirty();
+      syncAttachmentModalControls();
     }
 
-    function renderAttachmentShell(attachment) {
+    function renderAttachmentShell(attachment, index) {
       return `
         <div class="attachment" data-file-id="${escapeHtml(attachment.fileId)}">
-          <div class="preview muted">読み込み中...</div>
+          <button type="button" class="preview-button" data-attachment-index="${index}">
+            <div class="preview muted">読み込み中...</div>
+          </button>
           <strong>${escapeHtml(attachment.name || attachment.fileId)}</strong><br>
           <span class="muted">${escapeHtml(attachment.mimeType || '-')} / ${escapeHtml(attachment.size || '-')} bytes</span><br>
           ${attachment.originalName ? `<span class="muted">元: ${escapeHtml(attachment.originalName)}</span><br>` : ''}
@@ -385,13 +699,15 @@
       `;
     }
 
-    async function loadAttachmentPreview(attachment) {
+    async function loadAttachmentPreview(attachment, index) {
       const container = Array.from(detailView.querySelectorAll('[data-file-id]'))
         .find((element) => element.dataset.fileId === attachment.fileId);
       if (!container) return;
       const preview = container.querySelector('.preview');
       try {
         const result = await callServer('getAttachmentPreview', state.accessToken, attachment.fileId);
+        attachment.dataUrl = result.dataUrl;
+        attachment.previewName = result.name;
         preview.innerHTML = `<img src="${escapeHtml(result.dataUrl)}" alt="${escapeHtml(result.name)}">`;
       } catch (error) {
         preview.textContent = String(error.message || error);
@@ -399,7 +715,14 @@
       }
     }
 
+    function renderStatusFilterLabel() {
+      statusFilter.title = getStatusFilterLabel(statusFilter.value);
+    }
+
     async function loadList() {
+      if (isDirty() && !confirmDiscardChanges()) {
+        return;
+      }
       setBusy(true);
       try {
         const result = await callServer('listContactSubmissions', state.accessToken, {
@@ -408,9 +731,19 @@
           limit: 100,
         });
         state.submissions = result.submissions || [];
+        state.counts = result.counts || state.counts;
+        renderStatusSummary();
+        renderStatusFilterLabel();
         renderList();
-        if (state.selectedId) {
+        if (state.selectedId && state.submissions.some((item) => item.submission_id === state.selectedId)) {
           await selectSubmission(state.selectedId);
+        } else if (state.submissions.length) {
+          await selectSubmission(state.submissions[0].submission_id);
+        } else {
+          state.selectedId = '';
+          state.detail = null;
+          state.dirty = false;
+          renderDetailEmpty('一致するお問い合わせがありません。');
         }
       } catch (error) {
         renderDetailEmpty(String(error.message || error));
@@ -420,6 +753,9 @@
     }
 
     async function selectSubmission(id) {
+      if (id !== state.selectedId && isDirty() && !confirmDiscardChanges()) {
+        return;
+      }
       state.selectedId = id;
       renderList();
       renderDetailEmpty('読み込み中...');
@@ -427,23 +763,36 @@
         const result = await callServer('getContactSubmission', state.accessToken, id);
         state.detail = result.submission;
         renderDetail(state.detail);
+        setDetailSnapshot(state.detail);
       } catch (error) {
         renderDetailEmpty(String(error.message || error));
       }
     }
 
-    async function saveStatus() {
-      const status = document.getElementById('statusSelect').value;
+    async function saveStatus(nextStatus) {
+      const statusSelect = document.getElementById('statusSelect');
+      if (nextStatus) {
+        statusSelect.value = nextStatus;
+      }
+      const status = statusSelect.value;
       const note = document.getElementById('internalNote').value;
       const button = document.getElementById('saveStatusButton');
       const message = document.getElementById('statusSaveMessage');
       button.disabled = true;
-      message.textContent = '';
+      message.textContent = '保存中...';
+      message.classList.remove('error', 'success');
       try {
         const result = await callServer('updateContactSubmissionStatus', state.accessToken, state.selectedId, status, note);
         state.detail = result.submission;
-        await loadList();
         renderDetail(state.detail);
+        setDetailSnapshot(state.detail);
+        await loadList();
+        const successMessage = document.getElementById('statusSaveMessage');
+        if (successMessage) {
+          successMessage.textContent = '保存しました。';
+          successMessage.classList.remove('error');
+          successMessage.classList.add('success');
+        }
       } catch (error) {
         message.textContent = String(error.message || error);
         message.classList.add('error');
@@ -452,10 +801,60 @@
       }
     }
 
+    async function openAttachmentViewer(index) {
+      const attachments = (state.detail && state.detail.attachments) || [];
+      if (!attachments.length) return;
+      state.attachmentIndex = Math.max(0, Math.min(index, attachments.length - 1));
+      const attachment = attachments[state.attachmentIndex];
+      if (attachment && !attachment.dataUrl && attachment.fileId) {
+        try {
+          attachment.dataUrl = (await callServer('getAttachmentPreview', state.accessToken, attachment.fileId)).dataUrl;
+        } catch (error) {
+          attachmentModalCaption.textContent = String(error.message || error);
+        }
+      }
+      syncAttachmentModalControls();
+      attachmentModal.hidden = false;
+    }
+
+    function closeAttachmentViewer() {
+      attachmentModal.hidden = true;
+    }
+
+    function syncAttachmentModalControls() {
+      const attachments = (state.detail && state.detail.attachments) || [];
+      const attachment = attachments[state.attachmentIndex];
+      if (!attachment) {
+        attachmentModalPrev.disabled = true;
+        attachmentModalNext.disabled = true;
+        attachmentModalImage.removeAttribute('src');
+        attachmentModalCaption.textContent = '';
+        attachmentModalCounter.textContent = '';
+        return;
+      }
+      attachmentModalImage.src = attachment.dataUrl || '';
+      attachmentModalImage.alt = attachment.name || attachment.fileId || '添付';
+      attachmentModalCaption.textContent = [attachment.name || attachment.fileId, attachment.originalName ? `元: ${attachment.originalName}` : '', attachment.mimeType || '-']
+        .filter(Boolean)
+        .join(' / ');
+      attachmentModalCounter.textContent = `${state.attachmentIndex + 1} / ${attachments.length}`;
+      attachmentModalPrev.disabled = state.attachmentIndex <= 0;
+      attachmentModalNext.disabled = state.attachmentIndex >= attachments.length - 1;
+    }
+
+    function moveAttachmentViewer(delta) {
+      const attachments = (state.detail && state.detail.attachments) || [];
+      const nextIndex = state.attachmentIndex + delta;
+      if (nextIndex < 0 || nextIndex >= attachments.length) return;
+      state.attachmentIndex = nextIndex;
+      syncAttachmentModalControls();
+    }
+
     const context = window.CONTACT_VIEWER_CONTEXT || {};
     if (state.accessToken && context.tokenConfigured) {
       context.allowed = true;
     }
+    cleanAccessTokenFromUrl();
     viewerEmail.textContent = context.email || '';
     if (!context.allowed) {
       deniedMessage.textContent = context.tokenConfigured
@@ -472,6 +871,21 @@
       statusFilter.addEventListener('change', loadList);
       loadList();
     }
+
+    attachmentModal.addEventListener('click', (event) => {
+      if (event.target === attachmentModal) {
+        closeAttachmentViewer();
+      }
+    });
+    attachmentModalClose.addEventListener('click', closeAttachmentViewer);
+    attachmentModalPrev.addEventListener('click', () => moveAttachmentViewer(-1));
+    attachmentModalNext.addEventListener('click', () => moveAttachmentViewer(1));
+    document.addEventListener('keydown', (event) => {
+      if (attachmentModal.hidden) return;
+      if (event.key === 'Escape') closeAttachmentViewer();
+      if (event.key === 'ArrowLeft') moveAttachmentViewer(-1);
+      if (event.key === 'ArrowRight') moveAttachmentViewer(1);
+    });
   </script>
 </body>
 </html>

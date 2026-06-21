@@ -57,11 +57,36 @@ function listContactSubmissions(accessToken, options) {
   var headers = ensureHeaders_(sheet);
   var values = sheet.getDataRange().getValues();
   var records = [];
+  var counts = {
+    total: 0,
+    active: 0
+  };
+
+  VIEWER_STATUSES.forEach(function (status) {
+    counts[status] = 0;
+  });
 
   for (var rowIndex = 1; rowIndex < values.length; rowIndex++) {
     var record = rowToRecord_(headers, values[rowIndex], rowIndex + 1);
-    if (statusFilter && record.handled_status !== statusFilter) continue;
     if (query && !matchesQuery_(record, query)) continue;
+    counts.total += 1;
+    if (isActiveStatus_(record.handled_status)) {
+      counts.active += 1;
+    }
+    if (counts[record.handled_status] != null) {
+      counts[record.handled_status] += 1;
+    }
+    if (statusFilter === 'all') {
+      records.push(toSummary_(record));
+      continue;
+    }
+    if (statusFilter === 'active') {
+      if (isActiveStatus_(record.handled_status)) {
+        records.push(toSummary_(record));
+      }
+      continue;
+    }
+    if (statusFilter && record.handled_status !== statusFilter) continue;
     records.push(toSummary_(record));
   }
 
@@ -73,6 +98,7 @@ function listContactSubmissions(accessToken, options) {
     ok: true,
     viewerEmail: context.email,
     statuses: VIEWER_STATUSES,
+    counts: counts,
     submissions: records.slice(0, limit)
   };
 }
@@ -273,6 +299,10 @@ function matchesQuery_(record, query) {
     record.subject,
     record.message
   ].join(' ').toLowerCase().indexOf(query) !== -1;
+}
+
+function isActiveStatus_(status) {
+  return ['未対応', '対応中'].indexOf(String(status || '')) !== -1;
 }
 
 function parseAttachmentRefs_(value) {
