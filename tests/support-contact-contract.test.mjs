@@ -44,7 +44,8 @@ test('public support contact GAS advertises viewer detail links', async () => {
   assert.match(code, /CONTACT_VIEWER_BASE_URL/);
   assert.match(code, /CONTACT_VIEWER_ACCESS_TOKEN/);
   assert.match(code, /function buildViewerDetailUrl_/);
-  assert.match(code, /token=/);
+  assert.match(code, /#token=/);
+  assert.doesNotMatch(code, /[&?]token=/);
   assert.match(code, /確認アプリ/);
   assert.match(code, /handled_by/);
   assert.match(code, /internal_note/);
@@ -72,6 +73,8 @@ test('support contact viewer GAS is token-gated and updates status', async () =>
   assert.match(code, /getRequestToken_/);
   assert.match(code, /DRIVE_FOLDER_ID/);
   assert.match(html, /CONTACT_VIEWER_ACCESS_TOKEN/);
+  assert.match(html, /window\.location\.hash/);
+  assert.match(html, /URLSearchParams/);
   assert.match(html, /未対応/);
   assert.match(html, /対応中/);
   assert.match(html, /対応済み/);

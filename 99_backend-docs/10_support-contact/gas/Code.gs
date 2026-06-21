@@ -315,7 +315,7 @@ function buildViewerDetailUrl_(submissionId) {
   var token = String(getProperty_('CONTACT_VIEWER_ACCESS_TOKEN', '') || '').trim();
   var url = baseUrl + separator + 'id=' + encodeURIComponent(submissionId);
   if (token) {
-    url += '&token=' + encodeURIComponent(token);
+    url += '#token=' + encodeURIComponent(token);
   }
   return url;
 }

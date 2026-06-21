@@ -246,9 +246,18 @@
     window.CONTACT_VIEWER_CONTEXT = <?!= JSON.stringify(viewerContext) ?>;
   </script>
   <script>
+    function getAccessTokenFromUrl() {
+      const serverToken = window.CONTACT_VIEWER_ACCESS_TOKEN || '';
+      if (serverToken) return serverToken;
+      const hash = String(window.location.hash || '').replace(/^#/, '');
+      if (!hash) return '';
+      const params = new URLSearchParams(hash);
+      return params.get('token') || params.get('accessToken') || '';
+    }
+
     const state = {
       selectedId: window.CONTACT_VIEWER_INITIAL_ID || '',
-      accessToken: window.CONTACT_VIEWER_ACCESS_TOKEN || '',
+      accessToken: getAccessTokenFromUrl(),
       submissions: [],
       loading: false,
       detail: null,
@@ -444,6 +453,9 @@
     }
 
     const context = window.CONTACT_VIEWER_CONTEXT || {};
+    if (state.accessToken && context.tokenConfigured) {
+      context.allowed = true;
+    }
     viewerEmail.textContent = context.email || '';
     if (!context.allowed) {
       deniedMessage.textContent = context.tokenConfigured

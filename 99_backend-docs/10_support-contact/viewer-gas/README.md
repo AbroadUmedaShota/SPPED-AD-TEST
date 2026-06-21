@@ -6,7 +6,7 @@
 
 - 公開投稿用 GAS とは別プロジェクトとして作成します。
 - 短期運用では Web App を `executeAs: USER_DEPLOYING` / `access: ANYONE_ANONYMOUS` で配備します。
-- 閲覧者ごとの OAuth 承認ループを避けるため、通知URLに含める `CONTACT_VIEWER_ACCESS_TOKEN` で問い合わせ情報の表示を制御します。
+- 閲覧者ごとの OAuth 承認ループを避けるため、通知URLのフラグメントに含める `CONTACT_VIEWER_ACCESS_TOKEN` で問い合わせ情報の表示を制御します。
 - `CONTACT_VIEWER_EMAILS` は将来の Google アカウント単位制御へ戻す場合の許可ユーザー一覧として維持します。
 - 投稿データの正本は既存 Spreadsheet `contact_submissions`、添付本体は既存 Drive フォルダです。
 
@@ -14,7 +14,7 @@
 
 - Script ID: `1tG0AXoDPAG86OurWepwGnZRoZNbplnq_VsiYUINIrv_NbVnMl1Mj7NwW`
 - Web App URL: `https://script.google.com/macros/s/AKfycbxz4foQKPlgAeF5ShuM2RBudUpYD8VOvIi7riU1j4QtghnHzvpw9JSKQgfcm61hJKh3/exec`
-- Current version: `6` (`support contact viewer token access`)
+- Current version: `7` (`support contact viewer fragment token`)
 - Owner: `customer@speed-ad.com`
 
 ## Script Properties
@@ -25,7 +25,7 @@
 | `DRIVE_FOLDER_ID` | 必須 | 添付画像保存先 Drive フォルダ ID |
 | `CONTACT_SHEET_NAME` | 任意 | 既定は `contact_submissions` |
 | `CONTACT_VIEWER_EMAILS` | 必須 | 確認アプリ利用者。カンマ、セミコロン、改行区切りで複数指定可能 |
-| `CONTACT_VIEWER_ACCESS_TOKEN` | 必須 | 通知URLに付与する確認用トークン。repoには実値を記録しない |
+| `CONTACT_VIEWER_ACCESS_TOKEN` | 必須 | 通知URLの `#token=` に付与する確認用トークン。repoには実値を記録しない |
 
 初期値:
 
@@ -48,7 +48,7 @@ CONTACT_VIEWER_ACCESS_TOKEN=<Script Properties only>
 1. 確認アプリの Web App URL を発行する。
 2. 確認アプリと公開投稿用 GAS の Script Property `CONTACT_VIEWER_ACCESS_TOKEN` に同じ値を設定する。
 3. 公開投稿用 GAS の Script Property `CONTACT_VIEWER_BASE_URL` に確認アプリの Web App URL を設定する。
-4. 公開投稿用 GAS を再デプロイし、社内通知メールの `確認アプリ` リンクに `id` と `token` が含まれ、詳細を開けることを確認する。
+4. 公開投稿用 GAS を再デプロイし、社内通知メールの `確認アプリ` リンクに `id` と `#token` が含まれ、詳細を開けることを確認する。
 
 ## 確認項目
 
@@ -63,3 +63,4 @@ CONTACT_VIEWER_ACCESS_TOKEN=<Script Properties only>
 - テスト受付ID `70a13837-4725-4b56-ab5f-22a5135ea3ca` で `storageStatus=stored` / `mailStatus=sent` を確認済み。
 - 添付ファイル `70a13837-4725-4b56-ab5f-22a5135ea3ca-1-codex-production-check.webp` が Drive に `image/webp` として保存されることを確認済み。
 - トークンなしの確認アプリURLはGoogle認証へリダイレクトせず、アプリ内で無効URL表示になることを確認済み。
+- 確認アプリURLのトークンをURLフラグメントへ移行し、公開HTMLに `location.hash` 読み取りが反映されていることを確認済み。
