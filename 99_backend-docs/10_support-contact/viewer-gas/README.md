@@ -6,7 +6,7 @@
 
 - 公開投稿用 GAS とは別プロジェクトとして作成します。
 - 短期運用では Web App を `executeAs: USER_DEPLOYING` / `access: ANYONE_ANONYMOUS` で配備します。
-- 閲覧者ごとの OAuth 承認ループを避けるため、通知URLのフラグメントに含める `CONTACT_VIEWER_ACCESS_TOKEN` で問い合わせ情報の表示を制御します。
+- 閲覧者ごとの OAuth 承認ループを避けるため、通知URLのフラグメントに含める `CONTACT_VIEWER_ACCESS_TOKEN` で問い合わせ情報の表示を制御します。読み取り後は可視URLからトークンを消し、同じタブ内の再読み込みに限って `sessionStorage` から復帰します。
 - `CONTACT_VIEWER_EMAILS` は将来の Google アカウント単位制御へ戻す場合の許可ユーザー一覧として維持します。
 - 投稿データの正本は既存 Spreadsheet `contact_submissions`、添付本体は既存 Drive フォルダです。
 
@@ -14,7 +14,7 @@
 
 - Script ID: `1tG0AXoDPAG86OurWepwGnZRoZNbplnq_VsiYUINIrv_NbVnMl1Mj7NwW`
 - Web App URL: `https://script.google.com/macros/s/AKfycbxz4foQKPlgAeF5ShuM2RBudUpYD8VOvIi7riU1j4QtghnHzvpw9JSKQgfcm61hJKh3/exec`
-- Current version: `8` (`support contact viewer ux improvements`)
+- Current version: `9` (`support contact viewer ux fixes`)
 - Owner: `customer@speed-ad.com`
 
 ## Script Properties
@@ -57,7 +57,8 @@ CONTACT_VIEWER_ACCESS_TOKEN=<Script Properties only>
 - `未対応` / `対応中` / `対応済み` / `保留` と内部メモを更新できる。対応中・対応済み・保留のクイック操作も使える。
 - 添付はその場で大きく開け、複数添付は前後移動できる。
 - `token` がない、または不正なURLでは問い合わせ情報が表示されない。
-- `token` / `accessToken` のクエリやフラグメントは読み取り後に可視URLから消える。
+- `token` / `accessToken` のクエリやフラグメントは読み取り後に可視URLから消える。同じタブ内の再読み込みでは保持済みトークンで復帰し、不正トークン判定時は保持値を消す。
+- 添付ビューアは開いた時に閉じるボタンへフォーカスし、閉じた時に元の添付サムネイルへ戻る。
 - 添付ファイルの Drive リンクはフォールバックとして開ける。
 
 2026-06-21 検証:
@@ -68,3 +69,4 @@ CONTACT_VIEWER_ACCESS_TOKEN=<Script Properties only>
 - トークンなしの確認アプリURLはGoogle認証へリダイレクトせず、アプリ内で無効URL表示になることを確認済み。
 - 確認アプリURLのトークンをURLフラグメントへ移行し、公開HTMLに `location.hash` 読み取りが反映されていることを確認済み。
 - 確認アプリのUX改善をバージョン `8` へ反映し、公開HTMLに対応が必要フィルタ、ステータス件数、返信リンク、添付ビューア、サーバー側トークン検証が含まれることを確認済み。
+- 確認アプリのUX修正をバージョン `9` へ反映し、公開HTMLに `sessionStorage` 復帰、添付ビューアのフォーカス復帰、閉じるボタンへの初期フォーカスが含まれることを確認済み。

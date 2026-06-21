@@ -420,6 +420,8 @@
   </script>
   <script>
     /* CONTACT_VIEWER_TEST_HELPERS_START */
+    const VIEWER_ACCESS_TOKEN_STORAGE_KEY = 'speed-ad-contact-viewer-access-token';
+
     function parseViewerAccessTokenFromUrl(href) {
       const url = new URL(href);
       const searchToken = url.searchParams.get('token') || url.searchParams.get('accessToken') || '';
@@ -453,6 +455,30 @@
         href: url.toString(),
         changed,
       };
+    }
+
+    function readViewerAccessTokenFromSession(storage) {
+      try {
+        return storage ? String(storage.getItem(VIEWER_ACCESS_TOKEN_STORAGE_KEY) || '') : '';
+      } catch (_error) {
+        return '';
+      }
+    }
+
+    function writeViewerAccessTokenToSession(storage, token) {
+      try {
+        if (storage && token) storage.setItem(VIEWER_ACCESS_TOKEN_STORAGE_KEY, token);
+      } catch (_error) {
+        // Session storage is optional. The URL token still works for the first load.
+      }
+    }
+
+    function clearViewerAccessTokenFromSession(storage) {
+      try {
+        if (storage) storage.removeItem(VIEWER_ACCESS_TOKEN_STORAGE_KEY);
+      } catch (_error) {
+        // Ignore unavailable storage.
+      }
     }
 
     function computeQueueCounts(submissions) {
@@ -549,6 +575,7 @@
       const closedState = getDetailLifecycleResetState('reset');
       state.attachmentIndex = closedState.attachmentIndex;
       state.dirty = closedState.dirty;
+      state.attachmentReturnFocus = null;
       setAttachmentLoading(false);
       setAttachmentModalVisibility(!closedState.hidden);
     }
@@ -565,6 +592,9 @@
     window.__CONTACT_VIEWER_TEST__ = {
       parseViewerAccessTokenFromUrl,
       buildViewerUrlWithoutTokens,
+      readViewerAccessTokenFromSession,
+      writeViewerAccessTokenToSession,
+      clearViewerAccessTokenFromSession,
       computeQueueCounts,
       clampAttachmentIndex,
       normalizeViewerHandledStatus,
@@ -582,6 +612,17 @@
       const serverToken = window.CONTACT_VIEWER_ACCESS_TOKEN || '';
       if (serverToken) return serverToken;
       return parseViewerAccessTokenFromUrl(window.location.href);
+    }
+
+    function getAccessTokenForViewer() {
+      const serverToken = window.CONTACT_VIEWER_ACCESS_TOKEN || '';
+      if (serverToken) return serverToken;
+      const urlToken = parseViewerAccessTokenFromUrl(window.location.href);
+      if (urlToken) {
+        writeViewerAccessTokenToSession(window.sessionStorage, urlToken);
+        return urlToken;
+      }
+      return readViewerAccessTokenFromSession(window.sessionStorage);
     }
 
     function cleanAccessTokenFromUrl() {
@@ -614,7 +655,7 @@
 
     const state = {
       selectedId: window.CONTACT_VIEWER_INITIAL_ID || '',
-      accessToken: getAccessTokenFromUrl(),
+      accessToken: getAccessTokenForViewer(),
       submissions: [],
       counts: { total: 0, active: 0, 未対応: 0, 対応中: 0, 保留: 0, 対応済み: 0 },
       loading: false,
@@ -623,6 +664,7 @@
       dirty: false,
       attachmentIndex: 0,
       attachmentRequestSerial: 0,
+      attachmentReturnFocus: null,
     };
 
     const appView = document.getElementById('appView');
@@ -1014,6 +1056,7 @@
     async function openAttachmentViewer(index) {
       const attachments = (state.detail && state.detail.attachments) || [];
       if (!attachments.length) return;
+      state.attachmentReturnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
       state.attachmentIndex = clampAttachmentIndex(index, attachments);
       if (state.attachmentIndex < 0) return;
       const attachment = attachments[state.attachmentIndex];
@@ -1024,6 +1067,7 @@
       setAttachmentModalVisibility(true);
       setAttachmentLoading(true, `${attachment.name || attachment.fileId} を読み込み中...`);
       syncAttachmentModalControls();
+      attachmentModalClose.focus();
       try {
         await ensureAttachmentPreviewLoaded(state.attachmentIndex);
       } catch (_error) {
@@ -1038,6 +1082,11 @@
 
     function closeAttachmentViewer() {
       setAttachmentModalVisibility(false);
+      const target = state.attachmentReturnFocus;
+      state.attachmentReturnFocus = null;
+      if (target && typeof target.focus === 'function' && document.contains(target)) {
+        target.focus();
+      }
     }
 
     function syncAttachmentModalControls() {
@@ -1105,6 +1154,8 @@
       deniedView.hidden = false;
       appView.hidden = true;
       if (shouldCleanUrl) {
+        clearViewerAccessTokenFromSession(window.sessionStorage);
+        state.accessToken = '';
         cleanAccessTokenFromUrl();
       }
     }

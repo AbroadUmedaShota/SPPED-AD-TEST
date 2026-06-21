@@ -116,6 +116,11 @@ test('public support contact GAS advertises viewer detail links', async () => {
   assert.match(code, /handled_by/);
   assert.match(code, /internal_note/);
   assert.match(formScript, /getContactTestModeFromUrl/);
+  assert.match(formScript, /TEST_MODE_MISSING_TOKEN_MESSAGE/);
+  assert.match(formScript, /TEST_MODE_REJECTED_MESSAGE/);
+  assert.match(formScript, /function validateTestModeBeforeSubmit/);
+  assert.match(formScript, /submit\.disabled = isProcessingFiles \|\| isSubmitting \|\| isTestModeTokenMissing\(\)/);
+  assert.match(formScript, /テストモードURLが不完全です。/);
   assert.match(formScript, /testModeToken = testModeState\.token|payload\.testModeToken = testModeState\.token/);
   assert.match(formScript, /sourceUrl: window\.location\.href/);
 });
@@ -148,6 +153,12 @@ test('support contact viewer GAS is token-gated and updates status', async () =>
   assert.match(html, /CONTACT_VIEWER_ACCESS_TOKEN/);
   assert.match(html, /history\.replaceState/);
   assert.match(html, /cleanAccessTokenFromUrl/);
+  assert.match(html, /VIEWER_ACCESS_TOKEN_STORAGE_KEY/);
+  assert.match(html, /getAccessTokenForViewer/);
+  assert.match(html, /sessionStorage/);
+  assert.match(html, /attachmentReturnFocus/);
+  assert.match(html, /attachmentModalClose\.focus\(\)/);
+  assert.match(html, /target\.focus\(\)/);
   assert.match(html, /showApp\(\)[\s\S]*cleanAccessTokenFromUrl\(\);/);
   assert.match(html, /validateViewerAccessToken/);
   assert.match(html, /bootstrapViewer/);
@@ -176,6 +187,16 @@ test('viewer helper functions cover token parsing, cleanup, queue counts, modal 
   assert.equal(helpers.parseViewerAccessTokenFromUrl('https://example.com/view?id=9&accessToken=query-token'), 'query-token');
   assert.equal(helpers.parseViewerAccessTokenFromUrl('https://example.com/view?id=9#token=hash-token'), 'hash-token');
   assert.equal(helpers.parseViewerAccessTokenFromUrl('https://example.com/view?id=9'), '');
+  const storage = new Map();
+  const mockStorage = {
+    getItem: (key) => storage.get(key) || null,
+    setItem: (key, value) => storage.set(key, value),
+    removeItem: (key) => storage.delete(key),
+  };
+  helpers.writeViewerAccessTokenToSession(mockStorage, 'session-token');
+  assert.equal(helpers.readViewerAccessTokenFromSession(mockStorage), 'session-token');
+  helpers.clearViewerAccessTokenFromSession(mockStorage);
+  assert.equal(helpers.readViewerAccessTokenFromSession(mockStorage), '');
   assert.equal(helpers.normalizeViewerHandledStatus(''), '未対応');
   assert.equal(helpers.normalizeViewerHandledStatus('  '), '未対応');
   assert.equal(helpers.normalizeViewerHandledStatus('対応中'), '対応中');
