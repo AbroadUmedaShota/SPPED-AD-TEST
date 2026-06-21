@@ -72,6 +72,7 @@ function listContactSubmissions(accessToken, options) {
 
   for (var rowIndex = 1; rowIndex < values.length; rowIndex++) {
     var record = rowToRecord_(headers, values[rowIndex], rowIndex + 1);
+    record.handled_status = normalizeHandledStatus_(record.handled_status);
     counts.total += 1;
     if (isActiveStatus_(record.handled_status)) {
       counts.active += 1;
@@ -306,7 +307,12 @@ function matchesQuery_(record, query) {
 }
 
 function isActiveStatus_(status) {
-  return ['未対応', '対応中'].indexOf(String(status || '')) !== -1;
+  return ['未対応', '対応中'].indexOf(normalizeHandledStatus_(status)) !== -1;
+}
+
+function normalizeHandledStatus_(status) {
+  var normalized = String(status || '').trim();
+  return normalized || '未対応';
 }
 
 function parseAttachmentRefs_(value) {
