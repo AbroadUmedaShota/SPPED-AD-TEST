@@ -7,8 +7,9 @@
 - 公開問い合わせフォーム専用の Apps Script Web App を作成します。
 - 既存の E2E/バグ報告DB用GASとは分離します。
 - 投稿内容は Spreadsheet の `contact_submissions` に保存します。
-- 添付画像は Drive フォルダに保存し、Spreadsheet にはファイルID/URLを保存します。
+- 添付画像はフロントエンドでWEBPへ変換してから Drive フォルダに保存し、Spreadsheet にはファイルID/URLを保存します。
 - 投稿者向け受付メールは `customer@speed-ad.com` を From にできる場合のみ送信します。
+- 確認者向けの閲覧・ステータス更新は、公開投稿用GASとは別の確認者専用GASで行います。
 
 ## 現在の進行状態
 
@@ -23,10 +24,12 @@ Apps Script エディタで `initializeContactStorage` と `checkContactConfigur
 - Verification: `submitContact` のテスト投稿で `storageStatus=stored` / `mailStatus=sent` を確認済み。
 - Verification: ローカルHTTP環境の `/05_support/contact/` から画面送信し、完了パネル表示まで確認済み。
 - Verification: 添付画像ありの `submitContact` テスト投稿で `storageStatus=stored` / `mailStatus=sent` を確認済み。
+- Viewer: 確認者専用GASは `viewer-gas/` に分離し、許可ユーザーだけが一覧、詳細、添付プレビュー、対応ステータス更新を行います。
 
 ## 資料
 
 - [GAS実装・配備手順](./gas/README.md)
+- [確認者専用GAS実装・配備手順](./viewer-gas/README.md)
 
 ## 仕様正本
 

@@ -1,3 +1,9 @@
+import {
+  buildWebpAttachmentPayload,
+  convertImageFileToWebp,
+  normalizeWebpQuality,
+} from './contact-attachment-utils.js';
+
 const CONTACT_TYPE_LABELS = {
   general: '一般的なお問い合わせ',
   bug: '不具合・障害',
@@ -33,24 +39,21 @@ function getMaxAttachmentMb(form) {
   return Number.isFinite(configured) && configured > 0 ? configured : 10;
 }
 
+function getWebpQuality(form) {
+  return normalizeWebpQuality(
+    form.dataset.webpQuality ||
+    window.SUPPORT_CONTACT_WEBP_QUALITY ||
+    getMetaContent('support-contact-webp-quality') ||
+    ''
+  );
+}
+
 function setInvalid(control, error, isInvalid, message) {
   control.classList.toggle('is-invalid', isInvalid);
   if (error) {
     if (message) error.textContent = message;
     error.hidden = !isInvalid;
   }
-}
-
-function readFileAsBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.addEventListener('load', () => {
-      const result = String(reader.result || '');
-      resolve(result.includes(',') ? result.split(',')[1] : result);
-    });
-    reader.addEventListener('error', () => reject(reader.error || new Error('file_read_failed')));
-    reader.readAsDataURL(file);
-  });
 }
 
 function initContactForm() {
@@ -77,8 +80,11 @@ function initContactForm() {
 
   const maxAttachmentMb = getMaxAttachmentMb(form);
   const maxAttachmentBytes = maxAttachmentMb * 1024 * 1024;
+  const webpQuality = getWebpQuality(form);
   let files = [];
   let seq = 0;
+  let isProcessingFiles = false;
+  let isSubmitting = false;
 
   function showStatus(message) {
     status.textContent = message;
@@ -88,6 +94,11 @@ function initContactForm() {
   function clearFileError() {
     fileError.textContent = '';
     fileError.hidden = true;
+  }
+
+  function updateSubmitState() {
+    submit.disabled = isProcessingFiles || isSubmitting;
+    submit.textContent = isProcessingFiles ? '画像変換中...' : isSubmitting ? '送信中...' : '送信する';
   }
 
   function render() {
@@ -114,7 +125,7 @@ function initContactForm() {
 
       const name = document.createElement('div');
       name.className = 'contact-thumb__name';
-      name.textContent = item.name;
+      name.textContent = item.originalName ? `${item.originalName} → ${item.name}` : item.name;
 
       cell.append(img, remove, name);
       thumbs.appendChild(cell);
@@ -124,28 +135,52 @@ function initContactForm() {
     count.textContent = files.length ? `${files.length} 件の画像を添付中` : '';
   }
 
-  function addFiles(list) {
+  async function addFiles(list) {
     clearFileError();
     const rejected = [];
+    const incoming = Array.from(list || []);
+    if (!incoming.length) return;
 
-    Array.from(list || []).forEach((file) => {
+    isProcessingFiles = true;
+    updateSubmitState();
+    showStatus('画像をWEBPへ変換しています...');
+
+    for (const file of incoming) {
       if (!file.type || !file.type.startsWith('image/')) {
         rejected.push(`${file.name} は画像ファイルではありません。`);
-        return;
+        continue;
       }
       if (file.size > maxAttachmentBytes) {
         rejected.push(`${file.name} は ${maxAttachmentMb}MB を超えています。`);
-        return;
+        continue;
       }
-      files.push({
-        id: `f${seq++}`,
-        name: file.name,
-        size: file.size,
-        mimeType: file.type,
-        url: URL.createObjectURL(file),
-        file,
-      });
-    });
+
+      try {
+        const converted = await convertImageFileToWebp(file, webpQuality);
+        const payload = buildWebpAttachmentPayload(converted);
+        if (payload.size > maxAttachmentBytes) {
+          rejected.push(`${file.name} は圧縮後も ${maxAttachmentMb}MB を超えています。`);
+          continue;
+        }
+        files.push({
+          id: `f${seq++}`,
+          name: payload.name,
+          size: payload.size,
+          mimeType: payload.mimeType,
+          originalName: payload.originalName,
+          originalMimeType: payload.originalMimeType,
+          originalSize: payload.originalSize,
+          base64: payload.data,
+          url: URL.createObjectURL(converted.webpBlob),
+        });
+      } catch (_error) {
+        rejected.push(`${file.name} はWEBPへ変換できませんでした。`);
+      }
+    }
+
+    isProcessingFiles = false;
+    showStatus('');
+    updateSubmitState();
 
     if (rejected.length) {
       fileError.textContent = rejected.join(' ');
@@ -179,16 +214,24 @@ function initContactForm() {
     setInvalid(privacyEl, privacyError, !privacyEl.checked);
     if (!privacyEl.checked) ok = false;
 
+    if (isProcessingFiles) {
+      showStatus('画像変換が完了してから送信してください。');
+      ok = false;
+    }
+
     return ok;
   }
 
   async function buildAttachments() {
-    return Promise.all(files.map(async (item) => ({
+    return files.map((item) => ({
       name: item.name,
       mimeType: item.mimeType,
       size: item.size,
-      data: await readFileAsBase64(item.file),
-    })));
+      data: item.base64,
+      originalName: item.originalName,
+      originalMimeType: item.originalMimeType,
+      originalSize: item.originalSize,
+    }));
   }
 
   function buildPayload(attachments) {
@@ -231,8 +274,8 @@ function initContactForm() {
     }
   }
 
-  input.addEventListener('change', (event) => {
-    addFiles(event.target.files);
+  input.addEventListener('change', async (event) => {
+    await addFiles(event.target.files);
     event.target.value = '';
   });
 
@@ -246,10 +289,10 @@ function initContactForm() {
     dropzone.classList.remove('is-drag');
   });
 
-  dropzone.addEventListener('drop', (event) => {
+  dropzone.addEventListener('drop', async (event) => {
     event.preventDefault();
     dropzone.classList.remove('is-drag');
-    addFiles(event.dataTransfer.files);
+    await addFiles(event.dataTransfer.files);
   });
 
   dropzone.addEventListener('keydown', (event) => {
@@ -269,8 +312,8 @@ function initContactForm() {
       return;
     }
 
-    submit.disabled = true;
-    submit.textContent = '送信中...';
+    isSubmitting = true;
+    updateSubmitState();
 
     try {
       const attachments = await buildAttachments();
@@ -286,10 +329,14 @@ function initContactForm() {
     } catch (error) {
       showStatus(`送信できませんでした。${String(error).slice(0, 120)}`);
     } finally {
-      submit.disabled = false;
-      submit.textContent = '送信する';
+      isSubmitting = false;
+      updateSubmitState();
     }
   });
 }
 
-initContactForm();
+if (typeof document !== 'undefined') {
+  initContactForm();
+}
+
+export { getWebpQuality };
