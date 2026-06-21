@@ -139,6 +139,18 @@ test('viewer helper functions cover token parsing, cleanup, queue counts, modal 
   assert.equal(helpers.clampAttachmentIndex(1, []), -1);
   assert.equal(helpers.shouldResetAttachmentModal('abc', 'abc'), false);
   assert.equal(helpers.shouldResetAttachmentModal('abc', 'def'), true);
+  assert.deepEqual({ ...helpers.buildAttachmentModalClosedState() }, {
+    attachmentIndex: 0,
+    hidden: true,
+    ariaHidden: 'true',
+  });
+  ['empty', 'error', 'loading', 'detail'].forEach((transition) => {
+    assert.deepEqual({ ...helpers.getDetailAttachmentModalState(transition) }, {
+      attachmentIndex: 0,
+      hidden: true,
+      ariaHidden: 'true',
+    });
+  });
 
   assert.deepEqual(
     { ...helpers.computeQueueCounts([
