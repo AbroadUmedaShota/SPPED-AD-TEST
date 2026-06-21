@@ -14,7 +14,7 @@
 
 - Script ID: `1tG0AXoDPAG86OurWepwGnZRoZNbplnq_VsiYUINIrv_NbVnMl1Mj7NwW`
 - Web App URL: `https://script.google.com/macros/s/AKfycbxz4foQKPlgAeF5ShuM2RBudUpYD8VOvIi7riU1j4QtghnHzvpw9JSKQgfcm61hJKh3/exec`
-- Current version: `7` (`support contact viewer fragment token`)
+- Current version: `8` (`support contact viewer ux improvements`)
 - Owner: `customer@speed-ad.com`
 
 ## Script Properties
@@ -67,3 +67,4 @@ CONTACT_VIEWER_ACCESS_TOKEN=<Script Properties only>
 - 添付ファイル `70a13837-4725-4b56-ab5f-22a5135ea3ca-1-codex-production-check.webp` が Drive に `image/webp` として保存されることを確認済み。
 - トークンなしの確認アプリURLはGoogle認証へリダイレクトせず、アプリ内で無効URL表示になることを確認済み。
 - 確認アプリURLのトークンをURLフラグメントへ移行し、公開HTMLに `location.hash` 読み取りが反映されていることを確認済み。
+- 確認アプリのUX改善をバージョン `8` へ反映し、公開HTMLに対応が必要フィルタ、ステータス件数、返信リンク、添付ビューア、サーバー側トークン検証が含まれることを確認済み。
