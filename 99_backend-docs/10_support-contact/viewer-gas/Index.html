@@ -465,7 +465,7 @@
         対応済み: 0,
       };
       (submissions || []).forEach((submission) => {
-        const status = String((submission && submission.handled_status) || '未対応');
+        const status = normalizeViewerHandledStatus(submission && submission.handled_status);
         counts.total += 1;
         if (status === '未対応' || status === '対応中') {
           counts.active += 1;
@@ -484,6 +484,11 @@
       return Math.max(0, Math.min(Math.floor(numericIndex), attachments.length - 1));
     }
 
+    function normalizeViewerHandledStatus(status) {
+      const normalized = String(status || '').trim();
+      return normalized || '未対応';
+    }
+
     function shouldResetAttachmentModal(previousSubmissionId, nextSubmissionId) {
       return String(previousSubmissionId || '') !== String(nextSubmissionId || '');
     }
@@ -492,6 +497,39 @@
       return {
         hidden: !isVisible,
         ariaHidden: isVisible ? null : 'true',
+      };
+    }
+
+    function buildAttachmentModalViewState(attachments, selectedIndex) {
+      const attachmentIndex = clampAttachmentIndex(selectedIndex, attachments);
+      if (attachmentIndex < 0) {
+        return {
+          attachmentIndex,
+          hidden: true,
+          ariaHidden: 'true',
+          loading: false,
+          error: '',
+          imageSrc: '',
+          caption: '',
+          prevDisabled: true,
+          nextDisabled: true,
+        };
+      }
+      const attachment = attachments[attachmentIndex];
+      const loading = !!attachment.previewLoading && !attachment.dataUrl;
+      const error = !loading && attachment.previewError && !attachment.dataUrl ? String(attachment.previewError) : '';
+      return {
+        attachmentIndex,
+        hidden: false,
+        ariaHidden: null,
+        loading,
+        error,
+        imageSrc: loading || error ? '' : (attachment.dataUrl || ''),
+        caption: [attachment.name || attachment.fileId, attachment.originalName ? `元: ${attachment.originalName}` : '', attachment.mimeType || '-']
+          .filter(Boolean)
+          .join(' / '),
+        prevDisabled: attachmentIndex <= 0,
+        nextDisabled: attachmentIndex >= attachments.length - 1,
       };
     }
 
@@ -508,10 +546,20 @@
     }
 
     function resetAttachmentModalState() {
-      const closedState = getDetailAttachmentModalState('reset');
+      const closedState = getDetailLifecycleResetState('reset');
       state.attachmentIndex = closedState.attachmentIndex;
+      state.dirty = closedState.dirty;
       setAttachmentLoading(false);
       setAttachmentModalVisibility(!closedState.hidden);
+    }
+
+    function getDetailLifecycleResetState(_detailState) {
+      return {
+        attachmentIndex: 0,
+        hidden: true,
+        ariaHidden: 'true',
+        dirty: false,
+      };
     }
 
     window.__CONTACT_VIEWER_TEST__ = {
@@ -519,10 +567,13 @@
       buildViewerUrlWithoutTokens,
       computeQueueCounts,
       clampAttachmentIndex,
+      normalizeViewerHandledStatus,
       shouldResetAttachmentModal,
       getAttachmentModalVisibilityState,
+      buildAttachmentModalViewState,
       buildAttachmentModalClosedState,
       getDetailAttachmentModalState,
+      getDetailLifecycleResetState,
       resetAttachmentModalState,
     };
     /* CONTACT_VIEWER_TEST_HELPERS_END */
@@ -571,6 +622,7 @@
       detailSnapshot: { handled_status: '', internal_note: '' },
       dirty: false,
       attachmentIndex: 0,
+      attachmentRequestSerial: 0,
     };
 
     const appView = document.getElementById('appView');
@@ -721,11 +773,15 @@
 
     function renderDetailEmpty(message) {
       resetAttachmentModalState();
+      state.detail = null;
+      state.dirty = false;
       detailView.innerHTML = `<div class="section"><p class="muted">${escapeHtml(message)}</p></div>`;
     }
 
     function renderDetail(submission) {
       resetAttachmentModalState();
+      state.detail = submission;
+      state.dirty = false;
       const attachments = submission.attachments || [];
       const replyMailHref = buildMailToHref(submission.email || '', submission.subject || 'お問い合わせ');
       const currentStatus = submission.handled_status || '未対応';
@@ -816,12 +872,17 @@
         .find((element) => element.dataset.fileId === attachment.fileId);
       if (!container) return;
       const preview = container.querySelector('.preview');
+      attachment.previewLoading = true;
+      attachment.previewError = '';
       try {
         const result = await callServer('getAttachmentPreview', state.accessToken, attachment.fileId);
         attachment.dataUrl = result.dataUrl;
         attachment.previewName = result.name;
+        attachment.previewLoading = false;
         preview.innerHTML = `<img src="${escapeHtml(result.dataUrl)}" alt="${escapeHtml(result.name)}">`;
       } catch (error) {
+        attachment.previewLoading = false;
+        attachment.previewError = String(error.message || error);
         preview.textContent = String(error.message || error);
         preview.classList.add('error');
       }
@@ -849,12 +910,11 @@
         renderList();
         if (state.selectedId && state.submissions.some((item) => item.submission_id === state.selectedId)) {
           await selectSubmission(state.selectedId);
-        } else if (state.submissions.length) {
+      } else if (state.submissions.length) {
           await selectSubmission(state.submissions[0].submission_id);
         } else {
           state.selectedId = '';
           state.detail = null;
-          state.dirty = false;
           renderDetailEmpty('一致するお問い合わせがありません。');
         }
       } catch (error) {
@@ -956,13 +1016,23 @@
       if (!attachments.length) return;
       state.attachmentIndex = clampAttachmentIndex(index, attachments);
       if (state.attachmentIndex < 0) return;
+      const attachment = attachments[state.attachmentIndex];
+      const requestSerial = ++state.attachmentRequestSerial;
+      attachment.previewLoading = true;
+      attachment.previewError = '';
+      attachment.previewRequestSerial = requestSerial;
       setAttachmentModalVisibility(true);
-      setAttachmentLoading(true, `${attachments[state.attachmentIndex].name || attachments[state.attachmentIndex].fileId} を読み込み中...`);
+      setAttachmentLoading(true, `${attachment.name || attachment.fileId} を読み込み中...`);
+      syncAttachmentModalControls();
       try {
         await ensureAttachmentPreviewLoaded(state.attachmentIndex);
       } catch (_error) {
         // keep the error visible in the modal
       }
+      if (!state.detail || state.detail.attachments[state.attachmentIndex] !== attachment || attachment.previewRequestSerial !== requestSerial) {
+        return;
+      }
+      attachment.previewLoading = false;
       syncAttachmentModalControls();
     }
 
@@ -972,8 +1042,9 @@
 
     function syncAttachmentModalControls() {
       const attachments = (state.detail && state.detail.attachments) || [];
-      const attachmentIndex = clampAttachmentIndex(state.attachmentIndex, attachments);
-      if (attachmentIndex < 0) {
+      const viewState = buildAttachmentModalViewState(attachments, state.attachmentIndex);
+      state.attachmentIndex = viewState.attachmentIndex;
+      if (viewState.attachmentIndex < 0) {
         attachmentModalPrev.disabled = true;
         attachmentModalNext.disabled = true;
         attachmentModalImage.removeAttribute('src');
@@ -983,23 +1054,23 @@
         setAttachmentLoading(false);
         return;
       }
-      state.attachmentIndex = attachmentIndex;
-      const attachment = attachments[attachmentIndex];
-      if (attachment.previewError && !attachment.dataUrl) {
-        setAttachmentLoading(true, attachment.previewError);
+      if (viewState.loading) {
+        setAttachmentLoading(true, `${attachments[viewState.attachmentIndex].name || attachments[viewState.attachmentIndex].fileId} を読み込み中...`);
+        attachmentModalImage.hidden = true;
+        attachmentModalImage.removeAttribute('src');
+      } else if (viewState.error) {
+        setAttachmentLoading(true, viewState.error);
         attachmentModalImage.removeAttribute('src');
       } else {
         setAttachmentLoading(false);
         attachmentModalImage.hidden = false;
-        attachmentModalImage.src = attachment.dataUrl || '';
+        attachmentModalImage.src = viewState.imageSrc || '';
       }
-      attachmentModalImage.alt = attachment.name || attachment.fileId || '添付';
-      attachmentModalCaption.textContent = [attachment.name || attachment.fileId, attachment.originalName ? `元: ${attachment.originalName}` : '', attachment.mimeType || '-']
-        .filter(Boolean)
-        .join(' / ');
-      attachmentModalCounter.textContent = `${attachmentIndex + 1} / ${attachments.length}`;
-      attachmentModalPrev.disabled = attachmentIndex <= 0;
-      attachmentModalNext.disabled = attachmentIndex >= attachments.length - 1;
+      attachmentModalImage.alt = attachments[viewState.attachmentIndex].name || attachments[viewState.attachmentIndex].fileId || '添付';
+      attachmentModalCaption.textContent = viewState.caption;
+      attachmentModalCounter.textContent = `${viewState.attachmentIndex + 1} / ${attachments.length}`;
+      attachmentModalPrev.disabled = viewState.prevDisabled;
+      attachmentModalNext.disabled = viewState.nextDisabled;
     }
 
     async function moveAttachmentViewer(delta) {
@@ -1007,12 +1078,22 @@
       const nextIndex = clampAttachmentIndex(state.attachmentIndex + delta, attachments);
       if (nextIndex < 0 || nextIndex >= attachments.length) return;
       state.attachmentIndex = nextIndex;
+      const attachment = attachments[nextIndex];
+      const requestSerial = ++state.attachmentRequestSerial;
+      attachment.previewLoading = true;
+      attachment.previewError = '';
+      attachment.previewRequestSerial = requestSerial;
       setAttachmentModalVisibility(true);
+      syncAttachmentModalControls();
       try {
         await ensureAttachmentPreviewLoaded(state.attachmentIndex);
       } catch (_error) {
         // keep modal open with loading/error state
       }
+      if (!state.detail || state.detail.attachments[state.attachmentIndex] !== attachment || attachment.previewRequestSerial !== requestSerial) {
+        return;
+      }
+      attachment.previewLoading = false;
       syncAttachmentModalControls();
     }
 

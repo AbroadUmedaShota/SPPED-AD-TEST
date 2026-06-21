@@ -91,6 +91,7 @@ test('support contact viewer GAS is token-gated and updates status', async () =>
   assert.match(code, /function validateViewerAccessToken/);
   assert.match(code, /function assertAttachmentFile_/);
   assert.match(code, /function requireViewer_/);
+  assert.match(code, /normalizeHandledStatus_/);
   assert.match(code, /counts\.total \+= 1;[\s\S]*if \(query && !matchesQuery_\(record, query\)\) continue;/);
   assert.match(code, /isActiveStatus_/);
   assert.match(code, /getRequestToken_/);
@@ -126,6 +127,9 @@ test('viewer helper functions cover token parsing, cleanup, queue counts, modal 
   assert.equal(helpers.parseViewerAccessTokenFromUrl('https://example.com/view?id=9&accessToken=query-token'), 'query-token');
   assert.equal(helpers.parseViewerAccessTokenFromUrl('https://example.com/view?id=9#token=hash-token'), 'hash-token');
   assert.equal(helpers.parseViewerAccessTokenFromUrl('https://example.com/view?id=9'), '');
+  assert.equal(helpers.normalizeViewerHandledStatus(''), '未対応');
+  assert.equal(helpers.normalizeViewerHandledStatus('  '), '未対応');
+  assert.equal(helpers.normalizeViewerHandledStatus('対応中'), '対応中');
 
   const cleanedQuery = helpers.buildViewerUrlWithoutTokens('https://example.com/view?id=9&foo=bar&token=query-token');
   assert.equal(cleanedQuery.changed, true);
@@ -144,6 +148,12 @@ test('viewer helper functions cover token parsing, cleanup, queue counts, modal 
     hidden: true,
     ariaHidden: 'true',
   });
+  assert.deepEqual({ ...helpers.getDetailLifecycleResetState('empty') }, {
+    attachmentIndex: 0,
+    hidden: true,
+    ariaHidden: 'true',
+    dirty: false,
+  });
   ['empty', 'error', 'loading', 'detail'].forEach((transition) => {
     assert.deepEqual({ ...helpers.getDetailAttachmentModalState(transition) }, {
       attachmentIndex: 0,
@@ -151,6 +161,54 @@ test('viewer helper functions cover token parsing, cleanup, queue counts, modal 
       ariaHidden: 'true',
     });
   });
+  assert.deepEqual(
+    { ...helpers.buildAttachmentModalViewState([
+      { fileId: 'a', name: 'A', dataUrl: 'data:a' },
+      { fileId: 'b', name: 'B', previewLoading: true },
+    ], 1) },
+    {
+      attachmentIndex: 1,
+      hidden: false,
+      ariaHidden: null,
+      loading: true,
+      error: '',
+      imageSrc: '',
+      caption: 'B / -',
+      prevDisabled: false,
+      nextDisabled: true,
+    }
+  );
+  assert.deepEqual(
+    { ...helpers.buildAttachmentModalViewState([
+      { fileId: 'a', name: 'A', dataUrl: 'data:a' },
+      { fileId: 'b', name: 'B', previewLoading: false, dataUrl: 'data:b', mimeType: 'image/webp' },
+    ], 1) },
+    {
+      attachmentIndex: 1,
+      hidden: false,
+      ariaHidden: null,
+      loading: false,
+      error: '',
+      imageSrc: 'data:b',
+      caption: 'B / image/webp',
+      prevDisabled: false,
+      nextDisabled: true,
+    }
+  );
+  assert.deepEqual(
+    { ...helpers.buildAttachmentModalViewState([], 0) },
+    {
+      attachmentIndex: -1,
+      hidden: true,
+      ariaHidden: 'true',
+      loading: false,
+      error: '',
+      imageSrc: '',
+      caption: '',
+      prevDisabled: true,
+      nextDisabled: true,
+    }
+  );
 
   assert.deepEqual(
     { ...helpers.computeQueueCounts([
