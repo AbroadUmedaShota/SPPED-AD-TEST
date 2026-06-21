@@ -419,10 +419,9 @@
     window.CONTACT_VIEWER_CONTEXT = <?!= JSON.stringify(viewerContext) ?>;
   </script>
   <script>
-    function getAccessTokenFromUrl() {
-      const serverToken = window.CONTACT_VIEWER_ACCESS_TOKEN || '';
-      if (serverToken) return serverToken;
-      const url = new URL(window.location.href);
+    /* CONTACT_VIEWER_TEST_HELPERS_START */
+    function parseViewerAccessTokenFromUrl(href) {
+      const url = new URL(href);
       const searchToken = url.searchParams.get('token') || url.searchParams.get('accessToken') || '';
       if (searchToken) return searchToken;
       const hash = String(url.hash || '').replace(/^#/, '');
@@ -431,8 +430,8 @@
       return params.get('token') || params.get('accessToken') || '';
     }
 
-    function cleanAccessTokenFromUrl() {
-      const url = new URL(window.location.href);
+    function buildViewerUrlWithoutTokens(href) {
+      const url = new URL(href);
       let changed = false;
       ['token', 'accessToken'].forEach((key) => {
         if (url.searchParams.has(key)) {
@@ -450,8 +449,72 @@
           changed = true;
         }
       }
-      if (changed) {
-        window.history.replaceState({}, document.title, url.toString());
+      return {
+        href: url.toString(),
+        changed,
+      };
+    }
+
+    function computeQueueCounts(submissions) {
+      const counts = {
+        total: 0,
+        active: 0,
+        未対応: 0,
+        対応中: 0,
+        保留: 0,
+        対応済み: 0,
+      };
+      (submissions || []).forEach((submission) => {
+        const status = String((submission && submission.handled_status) || '未対応');
+        counts.total += 1;
+        if (status === '未対応' || status === '対応中') {
+          counts.active += 1;
+        }
+        if (Object.prototype.hasOwnProperty.call(counts, status)) {
+          counts[status] += 1;
+        }
+      });
+      return counts;
+    }
+
+    function clampAttachmentIndex(index, attachments) {
+      if (!Array.isArray(attachments) || !attachments.length) return -1;
+      const numericIndex = Number(index);
+      if (!Number.isFinite(numericIndex)) return 0;
+      return Math.max(0, Math.min(Math.floor(numericIndex), attachments.length - 1));
+    }
+
+    function shouldResetAttachmentModal(previousSubmissionId, nextSubmissionId) {
+      return String(previousSubmissionId || '') !== String(nextSubmissionId || '');
+    }
+
+    function getAttachmentModalVisibilityState(isVisible) {
+      return {
+        hidden: !isVisible,
+        ariaHidden: isVisible ? null : 'true',
+      };
+    }
+
+    window.__CONTACT_VIEWER_TEST__ = {
+      parseViewerAccessTokenFromUrl,
+      buildViewerUrlWithoutTokens,
+      computeQueueCounts,
+      clampAttachmentIndex,
+      shouldResetAttachmentModal,
+      getAttachmentModalVisibilityState,
+    };
+    /* CONTACT_VIEWER_TEST_HELPERS_END */
+
+    function getAccessTokenFromUrl() {
+      const serverToken = window.CONTACT_VIEWER_ACCESS_TOKEN || '';
+      if (serverToken) return serverToken;
+      return parseViewerAccessTokenFromUrl(window.location.href);
+    }
+
+    function cleanAccessTokenFromUrl() {
+      const result = buildViewerUrlWithoutTokens(window.location.href);
+      if (result.changed) {
+        window.history.replaceState({}, document.title, result.href);
       }
     }
 
@@ -543,11 +606,12 @@
     }
 
     function setAttachmentModalVisibility(isVisible) {
-      attachmentModal.hidden = !isVisible;
-      if (isVisible) {
+      const visibilityState = getAttachmentModalVisibilityState(isVisible);
+      attachmentModal.hidden = visibilityState.hidden;
+      if (visibilityState.ariaHidden == null) {
         attachmentModal.removeAttribute('aria-hidden');
       } else {
-        attachmentModal.setAttribute('aria-hidden', 'true');
+        attachmentModal.setAttribute('aria-hidden', visibilityState.ariaHidden);
       }
     }
 
@@ -638,6 +702,11 @@
     }
 
     function renderDetail(submission) {
+      if (shouldResetAttachmentModal(state.detail && state.detail.submission_id, submission && submission.submission_id)) {
+        state.attachmentIndex = 0;
+        setAttachmentLoading(false);
+        setAttachmentModalVisibility(false);
+      }
       const attachments = submission.attachments || [];
       const replyMailHref = buildMailToHref(submission.email || '', submission.subject || 'お問い合わせ');
       const currentStatus = submission.handled_status || '未対応';
@@ -864,7 +933,8 @@
     async function openAttachmentViewer(index) {
       const attachments = (state.detail && state.detail.attachments) || [];
       if (!attachments.length) return;
-      state.attachmentIndex = Math.max(0, Math.min(index, attachments.length - 1));
+      state.attachmentIndex = clampAttachmentIndex(index, attachments);
+      if (state.attachmentIndex < 0) return;
       setAttachmentModalVisibility(true);
       setAttachmentLoading(true, `${attachments[state.attachmentIndex].name || attachments[state.attachmentIndex].fileId} を読み込み中...`);
       try {
@@ -881,16 +951,19 @@
 
     function syncAttachmentModalControls() {
       const attachments = (state.detail && state.detail.attachments) || [];
-      const attachment = attachments[state.attachmentIndex];
-      if (!attachment) {
+      const attachmentIndex = clampAttachmentIndex(state.attachmentIndex, attachments);
+      if (attachmentIndex < 0) {
         attachmentModalPrev.disabled = true;
         attachmentModalNext.disabled = true;
         attachmentModalImage.removeAttribute('src');
+        attachmentModalImage.hidden = false;
         attachmentModalCaption.textContent = '';
         attachmentModalCounter.textContent = '';
         setAttachmentLoading(false);
         return;
       }
+      state.attachmentIndex = attachmentIndex;
+      const attachment = attachments[attachmentIndex];
       if (attachment.previewError && !attachment.dataUrl) {
         setAttachmentLoading(true, attachment.previewError);
         attachmentModalImage.removeAttribute('src');
@@ -903,14 +976,14 @@
       attachmentModalCaption.textContent = [attachment.name || attachment.fileId, attachment.originalName ? `元: ${attachment.originalName}` : '', attachment.mimeType || '-']
         .filter(Boolean)
         .join(' / ');
-      attachmentModalCounter.textContent = `${state.attachmentIndex + 1} / ${attachments.length}`;
-      attachmentModalPrev.disabled = state.attachmentIndex <= 0;
-      attachmentModalNext.disabled = state.attachmentIndex >= attachments.length - 1;
+      attachmentModalCounter.textContent = `${attachmentIndex + 1} / ${attachments.length}`;
+      attachmentModalPrev.disabled = attachmentIndex <= 0;
+      attachmentModalNext.disabled = attachmentIndex >= attachments.length - 1;
     }
 
     async function moveAttachmentViewer(delta) {
       const attachments = (state.detail && state.detail.attachments) || [];
-      const nextIndex = state.attachmentIndex + delta;
+      const nextIndex = clampAttachmentIndex(state.attachmentIndex + delta, attachments);
       if (nextIndex < 0 || nextIndex >= attachments.length) return;
       state.attachmentIndex = nextIndex;
       setAttachmentModalVisibility(true);

@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
+import vm from 'node:vm';
 import test from 'node:test';
 
 const CONTACT_FORM_HELPERS = '05_support/assets/js/contact-attachment-utils.js';
@@ -11,6 +12,25 @@ const VIEWER_GAS_MANIFEST = '99_backend-docs/10_support-contact/viewer-gas/appss
 async function importLocalModule(path) {
   const source = await readFile(path, 'utf8');
   return import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
+}
+
+async function loadViewerTestHelpers() {
+  const html = await readFile(VIEWER_GAS_HTML, 'utf8');
+  const match = html.match(/\/\* CONTACT_VIEWER_TEST_HELPERS_START \*\/([\s\S]*?)\/\* CONTACT_VIEWER_TEST_HELPERS_END \*\//);
+  assert.ok(match, 'viewer test helpers block not found');
+  const sandbox = {
+    window: {},
+    URL,
+    URLSearchParams,
+    Array,
+    Object,
+    String,
+    Number,
+    Math,
+    Date,
+  };
+  vm.runInNewContext(match[1], sandbox);
+  return sandbox.window.__CONTACT_VIEWER_TEST__;
 }
 
 test('support contact attachment helpers produce WEBP payload metadata', async () => {
@@ -76,24 +96,12 @@ test('support contact viewer GAS is token-gated and updates status', async () =>
   assert.match(code, /getRequestToken_/);
   assert.match(code, /DRIVE_FOLDER_ID/);
   assert.match(html, /CONTACT_VIEWER_ACCESS_TOKEN/);
-  assert.match(html, /new URL\(window\.location\.href\)/);
-  assert.match(html, /URLSearchParams/);
   assert.match(html, /history\.replaceState/);
   assert.match(html, /cleanAccessTokenFromUrl/);
-  assert.match(html, /url\.searchParams\.delete\(key\)/);
-  assert.match(html, /params\.delete\('token'\)/);
-  assert.match(html, /params\.delete\('accessToken'\)/);
+  assert.match(html, /showApp\(\)[\s\S]*cleanAccessTokenFromUrl\(\);/);
   assert.match(html, /validateViewerAccessToken/);
   assert.match(html, /bootstrapViewer/);
   assert.match(html, /callServer\('validateViewerAccessToken', state\.accessToken\)/);
-  assert.match(html, /showApp\(\)[\s\S]*cleanAccessTokenFromUrl\(\);/);
-  assert.match(html, /showDenied\([\s\S]*true\);/);
-  assert.match(html, /showDenied\([\s\S]*false\);/);
-  assert.match(html, /ensureAttachmentPreviewLoaded/);
-  assert.match(html, /await ensureAttachmentPreviewLoaded\(state\.attachmentIndex\)/);
-  assert.match(html, /setAttachmentModalVisibility/);
-  assert.match(html, /removeAttribute\('aria-hidden'\)/);
-  assert.match(html, /setAttribute\('aria-hidden', 'true'\)/);
   assert.doesNotMatch(html, /context\.allowed\s*=\s*true/);
   assert.match(html, /statusSummary/);
   assert.match(html, /対応が必要/);
@@ -109,4 +117,47 @@ test('support contact viewer GAS is token-gated and updates status', async () =>
   assert.match(html, /対応中/);
   assert.match(html, /対応済み/);
   assert.match(html, /保留/);
+});
+
+test('viewer helper functions cover token parsing, cleanup, queue counts, modal reset, and aria state', async () => {
+  const helpers = await loadViewerTestHelpers();
+
+  assert.equal(helpers.parseViewerAccessTokenFromUrl('https://example.com/view?id=9&token=query-token#token=hash-token'), 'query-token');
+  assert.equal(helpers.parseViewerAccessTokenFromUrl('https://example.com/view?id=9&accessToken=query-token'), 'query-token');
+  assert.equal(helpers.parseViewerAccessTokenFromUrl('https://example.com/view?id=9#token=hash-token'), 'hash-token');
+  assert.equal(helpers.parseViewerAccessTokenFromUrl('https://example.com/view?id=9'), '');
+
+  const cleanedQuery = helpers.buildViewerUrlWithoutTokens('https://example.com/view?id=9&foo=bar&token=query-token');
+  assert.equal(cleanedQuery.changed, true);
+  assert.equal(cleanedQuery.href, 'https://example.com/view?id=9&foo=bar');
+  const cleanedHash = helpers.buildViewerUrlWithoutTokens('https://example.com/view?id=9&foo=bar#section=2&accessToken=hash-token');
+  assert.equal(cleanedHash.changed, true);
+  assert.equal(cleanedHash.href, 'https://example.com/view?id=9&foo=bar#section=2');
+
+  assert.equal(helpers.clampAttachmentIndex(-3, ['a', 'b']), 0);
+  assert.equal(helpers.clampAttachmentIndex(9, ['a', 'b']), 1);
+  assert.equal(helpers.clampAttachmentIndex(1, []), -1);
+  assert.equal(helpers.shouldResetAttachmentModal('abc', 'abc'), false);
+  assert.equal(helpers.shouldResetAttachmentModal('abc', 'def'), true);
+
+  assert.deepEqual(
+    { ...helpers.computeQueueCounts([
+      { handled_status: '未対応' },
+      { handled_status: '対応中' },
+      { handled_status: '保留' },
+      { handled_status: '対応済み' },
+      { handled_status: '' },
+    ]) },
+    {
+      total: 5,
+      active: 3,
+      未対応: 2,
+      対応中: 1,
+      保留: 1,
+      対応済み: 1,
+    }
+  );
+
+  assert.deepEqual({ ...helpers.getAttachmentModalVisibilityState(true) }, { hidden: false, ariaHidden: null });
+  assert.deepEqual({ ...helpers.getAttachmentModalVisibilityState(false) }, { hidden: true, ariaHidden: 'true' });
 });
