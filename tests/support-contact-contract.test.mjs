@@ -68,6 +68,7 @@ test('support contact viewer GAS is token-gated and updates status', async () =>
   assert.match(code, /function getContactSubmission/);
   assert.match(code, /function getAttachmentPreview/);
   assert.match(code, /function updateContactSubmissionStatus/);
+  assert.match(code, /function validateViewerAccessToken/);
   assert.match(code, /function assertAttachmentFile_/);
   assert.match(code, /function requireViewer_/);
   assert.match(code, /counts\s*=\s*\{/);
@@ -82,6 +83,10 @@ test('support contact viewer GAS is token-gated and updates status', async () =>
   assert.match(html, /url\.searchParams\.delete\(key\)/);
   assert.match(html, /params\.delete\('token'\)/);
   assert.match(html, /params\.delete\('accessToken'\)/);
+  assert.match(html, /validateViewerAccessToken/);
+  assert.match(html, /bootstrapViewer/);
+  assert.match(html, /callServer\('validateViewerAccessToken', state\.accessToken\)/);
+  assert.doesNotMatch(html, /context\.allowed\s*=\s*true/);
   assert.match(html, /statusSummary/);
   assert.match(html, /対応が必要/);
   assert.match(html, /value="active" selected/);

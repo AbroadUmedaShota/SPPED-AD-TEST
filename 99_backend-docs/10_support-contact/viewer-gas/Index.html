@@ -850,18 +850,19 @@
       syncAttachmentModalControls();
     }
 
-    const context = window.CONTACT_VIEWER_CONTEXT || {};
-    if (state.accessToken && context.tokenConfigured) {
-      context.allowed = true;
-    }
     cleanAccessTokenFromUrl();
-    viewerEmail.textContent = context.email || '';
-    if (!context.allowed) {
-      deniedMessage.textContent = context.tokenConfigured
-        ? '確認用URLが無効です。通知メール内の確認アプリURLから開いてください。'
-        : '確認アプリのアクセストークンが未設定です。管理者に確認してください。';
+    let viewerContext = window.CONTACT_VIEWER_CONTEXT || {};
+
+    function showDenied(message) {
+      viewerEmail.textContent = viewerContext.email || '';
+      deniedMessage.textContent = message;
       deniedView.hidden = false;
-    } else {
+      appView.hidden = true;
+    }
+
+    function showApp() {
+      viewerEmail.textContent = viewerContext.email || '';
+      deniedView.hidden = true;
       appView.hidden = false;
       refreshButton.addEventListener('click', loadList);
       searchInput.addEventListener('input', () => {
@@ -870,6 +871,33 @@
       });
       statusFilter.addEventListener('change', loadList);
       loadList();
+    }
+
+    async function bootstrapViewer() {
+      viewerContext = window.CONTACT_VIEWER_CONTEXT || {};
+      if (viewerContext.allowed) {
+        showApp();
+        return;
+      }
+      if (!state.accessToken) {
+        showDenied(viewerContext.tokenConfigured
+          ? '確認用URLが無効です。通知メール内の確認アプリURLから開いてください。'
+          : '確認アプリのアクセストークンが未設定です。管理者に確認してください。');
+        return;
+      }
+      try {
+        const validatedContext = await callServer('validateViewerAccessToken', state.accessToken);
+        viewerContext = validatedContext || viewerContext;
+        if (validatedContext && validatedContext.allowed) {
+          showApp();
+          return;
+        }
+      } catch (_error) {
+        // fall through to denied state
+      }
+      showDenied(viewerContext.tokenConfigured
+        ? '確認用URLが無効です。通知メール内の確認アプリURLから開いてください。'
+        : '確認アプリのアクセストークンが未設定です。管理者に確認してください。');
     }
 
     attachmentModal.addEventListener('click', (event) => {
@@ -886,6 +914,7 @@
       if (event.key === 'ArrowLeft') moveAttachmentViewer(-1);
       if (event.key === 'ArrowRight') moveAttachmentViewer(1);
     });
+    bootstrapViewer();
   </script>
 </body>
 </html>
