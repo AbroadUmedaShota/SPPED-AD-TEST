@@ -15,6 +15,8 @@ const CONTACT_TYPE_LABELS = {
 };
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const TEST_MODE_MISSING_TOKEN_MESSAGE = 'テストモードURLが不完全です。テスト用URLを発行し直してください。';
+const TEST_MODE_REJECTED_MESSAGE = 'テストモードの設定を確認できませんでした。テスト用URLとScript Propertyを確認してください。';
 function cleanContactTestModeUrl(state) {
   if (!state || !state.cleanedUrl || typeof window === 'undefined' || !window.history) return;
   if (state.cleanedUrl !== window.location.href) {
@@ -104,15 +106,39 @@ function initContactForm() {
     status.hidden = !message;
   }
 
+  function getDisplayErrorMessage(message) {
+    const value = String(message || '');
+    if (value.includes('CONTACT_TEST_MODE_TOKEN') || value.includes('テストモードトークン')) {
+      return TEST_MODE_REJECTED_MESSAGE;
+    }
+    return value || '送信できませんでした。時間をおいて再度お試しください。';
+  }
+
+  function isTestModeTokenMissing() {
+    return testModeState.enabled && !testModeState.token;
+  }
+
+  function validateTestModeBeforeSubmit() {
+    if (!isTestModeTokenMissing()) return true;
+    showStatus(TEST_MODE_MISSING_TOKEN_MESSAGE);
+    if (testModeNotice) testModeNotice.focus && testModeNotice.focus();
+    return false;
+  }
+
+  if (isTestModeTokenMissing()) {
+    showStatus(TEST_MODE_MISSING_TOKEN_MESSAGE);
+  }
+
   function clearFileError() {
     fileError.textContent = '';
     fileError.hidden = true;
   }
 
   function updateSubmitState() {
-    submit.disabled = isProcessingFiles || isSubmitting;
+    submit.disabled = isProcessingFiles || isSubmitting || isTestModeTokenMissing();
     submit.textContent = isProcessingFiles ? '画像変換中...' : isSubmitting ? '送信中...' : '送信する';
   }
+  updateSubmitState();
 
   function render() {
     thumbs.innerHTML = '';
@@ -329,6 +355,9 @@ function initContactForm() {
       if (firstInvalid) firstInvalid.focus();
       return;
     }
+    if (!validateTestModeBeforeSubmit()) {
+      return;
+    }
 
     isSubmitting = true;
     updateSubmitState();
@@ -337,7 +366,7 @@ function initContactForm() {
       const attachments = await buildAttachments();
       const result = await submitContact(buildPayload(attachments));
       if (!result.ok) {
-        showStatus(result.error || '送信できませんでした。時間をおいて再度お試しください。');
+        showStatus(getDisplayErrorMessage(result.error));
         return;
       }
 

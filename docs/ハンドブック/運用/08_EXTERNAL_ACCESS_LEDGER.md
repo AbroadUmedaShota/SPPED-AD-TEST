@@ -55,7 +55,7 @@ SPEED AD の運用面について、`s-umeda@abroad-o.com` が日常確認、編
 | 環境 | 対象リソース | 所有者境界 | 付与グループ | `s-umeda@abroad-o.com` の操作範囲 | 危険操作 | 戻し手順 | 最終確認日 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Apps Script | サポートお問い合わせ受付 `1qODYRRKo8X2ps9V6TI5Q8RzR-TswCUS7sx8gZYDEpfgaKeqJhHDl10KT` | 現状は `customer@speed-ad.com` 所有 | 未設定 | `clasp list`、`clasp push --force`、バージョン作成、デプロイ一覧確認 | 既存 Web App の更新、通知先、テストモードトークン変更 | 公開デプロイ `AKfycbw6xaQvmfspOOxXEs4DMqfLxQ3Aev6Qi8RcfiFu7iFwOHos48eAPvmmjxSnteN1Lj0D` はバージョン `16`。戻しは直前安定版 `12` へ redeploy する。 | 2026-06-22 |
-| Apps Script | サポートお問い合わせ確認アプリ `1tG0AXoDPAG86OurWepwGnZRoZNbplnq_VsiYUINIrv_NbVnMl1Mj7NwW` | 現状は `customer@speed-ad.com` 所有 | 未設定 | 短期運用では通知URLフラグメント内の確認用トークンで一覧、詳細、添付プレビュー、対応ステータス更新が可能。Googleアカウント単位制御は中期対応 | Web App URL変更、確認用トークン変更、Spreadsheet/Drive参照先変更 | 現行デプロイ `AKfycbxz4foQKPlgAeF5ShuM2RBudUpYD8VOvIi7riU1j4QtghnHzvpw9JSKQgfcm61hJKh3` はバージョン `8`。不具合時は公開投稿GASの `CONTACT_VIEWER_BASE_URL` を空に戻し、通知内のSpreadsheetリンクをフォールバックにする。 | 2026-06-21 |
+| Apps Script | サポートお問い合わせ確認アプリ `1tG0AXoDPAG86OurWepwGnZRoZNbplnq_VsiYUINIrv_NbVnMl1Mj7NwW` | 現状は `customer@speed-ad.com` 所有 | 未設定 | 短期運用では通知URLフラグメント内の確認用トークンで一覧、詳細、添付プレビュー、対応ステータス更新が可能。Googleアカウント単位制御は中期対応 | Web App URL変更、確認用トークン変更、Spreadsheet/Drive参照先変更 | 現行デプロイ `AKfycbxz4foQKPlgAeF5ShuM2RBudUpYD8VOvIi7riU1j4QtghnHzvpw9JSKQgfcm61hJKh3` はバージョン `9`。不具合時は公開投稿GASの `CONTACT_VIEWER_BASE_URL` を空に戻し、通知内のSpreadsheetリンクをフォールバックにする。 | 2026-06-22 |
 | Spreadsheet | お問い合わせ保存先 `1tv6xEckXPd8bIwbGfE-aJ-XxkIUDreglmcioCpkH-98` | 現状は `customer@speed-ad.com` owner | 個人 writer で暫定付与 | `s-umeda@abroad-o.com` / `t-hayashi@abroad-o.com` は writer。API 読取確認済み | 共有権限変更 | `customer@speed-ad.com` で共有権限を戻す | 2026-06-21 |
 | Drive | 添付保存フォルダ `1rcFGJh9l3NwUeYt2MIR8p2A-DVYxxEwY` | 現状は `customer@speed-ad.com` owner | 個人 writer で暫定付与 | `s-umeda@abroad-o.com` / `t-hayashi@abroad-o.com` は writer。Drive UI で付与し API 読取確認済み | 添付削除、共有範囲変更 | フォルダ共有を `customer@speed-ad.com` owner 側で戻す | 2026-06-21 |
 | Google Workspace | Groups / Gmail alias / Drive / Apps Script | `abroad-o.com` 管理へ寄せる | `speed-ad-ops-admin` 予定 | 管理コンソール権限は未確認 | ユーザー、グループ、メール認証、Alias 変更 | 管理コンソール監査ログと変更前値で戻す | 未確認 |
@@ -114,6 +114,9 @@ CONTACT_TEST_MODE_TOKEN=<Script Properties only>
 - `CONTACT_TEST_MODE_TOKEN` 未設定状態のテスト投稿は `ok:false` / `Error: CONTACT_TEST_MODE_TOKEN is not set.` で終了し、`submissionId`、`storageStatus`、`mailStatus` が空であることを確認した。
 - STG supportサイトを `s3://stg.support.speed-ad.com/` へ同期し、CloudFront `EDJ1GHHD1FP7Q` の invalidation `I1YSR3NK6QR43Y7PTGK1QHOHFZ` を完了した。`https://stg.support.speed-ad.com/contact/` は 200、新テストモード表示と `contact-form-utils.js` / `contact-form.js` の反映を確認済み。
 - 本番 supportサイトを `s3://support.speed-ad.com/` へ同期し、CloudFront `E2ESLIURIYZA6G` の invalidation `I92EVTRZMA5XUMRKCQK5CLVIGG` を完了した。`https://support.speed-ad.com/contact/` は 200、新テストモード表示と `contact-form-utils.js` / `contact-form.js` の反映を確認済み。
+- 確認アプリの既存デプロイ `AKfycbxz4foQKPlgAeF5ShuM2RBudUpYD8VOvIi7riU1j4QtghnHzvpw9JSKQgfcm61hJKh3` をバージョン `9` (`support contact viewer ux fixes`) へ redeploy した。公開HTMLに `sessionStorage` 復帰、添付ビューアのフォーカス復帰、閉じるボタンへの初期フォーカスが含まれることを確認した。
+- STG supportサイトを `s3://stg.support.speed-ad.com/` へ同期し、CloudFront `EDJ1GHHD1FP7Q` の invalidation `I3RL1KPW9OHCAPX1F6707VFANA` を完了した。`https://stg.support.speed-ad.com/contact/` は 200、テストモードのメール通知文言、トークン不備エラー文言、送信ボタン制御のJS反映を確認済み。
+- 本番 supportサイトを `s3://support.speed-ad.com/` へ同期し、CloudFront `E2ESLIURIYZA6G` の invalidation `IA62JJQE5VPAJ2WY1HS352AJJ0` を完了した。`https://support.speed-ad.com/contact/` は 200、テストモードのメール通知文言、トークン不備エラー文言、送信ボタン制御のJS反映を確認済み。
 
 ### 5.2 `abroad-o.com` 側への移行手順
 
