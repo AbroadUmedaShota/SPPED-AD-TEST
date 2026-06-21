@@ -60,7 +60,7 @@ SPEED AD の運用面について、`s-umeda@abroad-o.com` が日常確認、編
 | Drive | 添付保存フォルダ `1rcFGJh9l3NwUeYt2MIR8p2A-DVYxxEwY` | 現状は `customer@speed-ad.com` owner | 個人 writer で暫定付与 | `s-umeda@abroad-o.com` / `t-hayashi@abroad-o.com` は writer。Drive UI で付与し API 読取確認済み | 添付削除、共有範囲変更 | フォルダ共有を `customer@speed-ad.com` owner 側で戻す | 2026-06-21 |
 | Google Workspace | Groups / Gmail alias / Drive / Apps Script | `abroad-o.com` 管理へ寄せる | `speed-ad-ops-admin` 予定 | 管理コンソール権限は未確認 | ユーザー、グループ、メール認証、Alias 変更 | 管理コンソール監査ログと変更前値で戻す | 未確認 |
 | Google Cloud | Apps Script連携、API、ログ、IAM | 対象プロジェクト未特定 | `speed-ad-ops-admin` 予定 | `gcloud auth list` で `s-umeda@abroad-o.com` がアクティブ。`gcloud projects list` は再認証要求で未確認 | IAM、課金、OAuth、API有効化 | 変更前 IAM policy / API 状態へ戻す | 2026-06-21 |
-| AWS | support サイト配信、S3、CloudFront、Route 53 | 対象アカウント未特定 | `speed-ad-ops-admin` 相当を作成予定 | CLI は `ap-northeast-1` のリージョン設定のみ確認済み。認証情報なし、`sts get-caller-identity` は失敗 | IAM、Route 53、CloudFront、S3公開設定、請求 | 変更前ポリシー、DNSレコード、S3/CloudFront設定へ戻す | 2026-06-21 |
+| AWS | support サイト配信、S3、CloudFront、Route 53 | AWS account `816069150667` | `AdministratorAccess` / SSO `s-umeda` | `s-umeda@abroad-o.com` で AWS SSO ログイン、S3 sync、CloudFront invalidation を確認済み。STG distribution `EDJ1GHHD1FP7Q`、prod distribution `E2ESLIURIYZA6G` | IAM、Route 53、CloudFront、S3公開設定、請求 | 変更前ポリシー、DNSレコード、S3/CloudFront設定へ戻す。supportサイト静的配信は直前コミットまたはS3同期元を戻し、CloudFront `/*` invalidation を実行する。 | 2026-06-21 |
 | さくらサーバー | corporate site / サーバー公開面 | 契約未確認 | 未設定 | 未確認 | 本番ファイル、SSL、メール、SSH/SFTP | 変更前バックアップから戻す | 未確認 |
 | お名前.com | ドメイン/DNS管理 | 対象ドメイン未確認 | 未設定 | 未確認 | DNS/NS変更、更新設定 | 変更前レコード、TTL、NSへ戻す | 未確認 |
 
@@ -91,6 +91,10 @@ CONTACT_VIEWER_BASE_URL=https://script.google.com/macros/s/AKfycbxz4foQKPlgAeF5S
 - Script Properties の `CONTACT_NOTIFY_EMAIL` と `CONTACT_VIEWER_BASE_URL` は OAuth 再認証がGoogle側でブロックされたため、最小スコープの一時デプロイで設定後、一時デプロイを削除した。
 - 添付ありテスト投稿 `70a13837-4725-4b56-ab5f-22a5135ea3ca` は `storageStatus=stored` / `mailStatus=sent` で成功した。Drive保存ファイル `1tAxw8xgyF5mvt762VMd3fHcpYTBnAUjh` は MIME `image/webp`。
 - `s-umeda@abroad-o.com` のGmailで社内通知を確認し、To に `customer@speed-ad.com` / `s-umeda@abroad-o.com` / `t-hayashi@abroad-o.com`、本文に確認アプリ詳細URLが含まれることを確認した。
+- AWS SSO profile `speed-ad` を `s-umeda` / account `816069150667` / `AdministratorAccess` として再認証した。
+- STG supportサイトを `s3://stg.support.speed-ad.com/` へ同期し、CloudFront `EDJ1GHHD1FP7Q` の invalidation `IAB5IWMWX11Z8NUFGB23APVZCS` を完了した。`https://stg.support.speed-ad.com/contact/` は 200、WEBP版JSと `data-webp-quality="0.82"` を確認済み。
+- 本番 supportサイトを `s3://support.speed-ad.com/` へ同期し、CloudFront `E2ESLIURIYZA6G` の invalidation `I5RY8OBBI0T0EAQGNN6DVJGDD2` を完了した。`https://support.speed-ad.com/contact/` は 200、WEBP版JSと `data-webp-quality="0.82"` を確認済み。
+- STG / 本番とも、画面上でPNG添付が `*.png → *.webp` と表示されること、ブラウザコンソールエラーがないことを確認した。
 
 ### 5.2 `abroad-o.com` 側への移行手順
 
