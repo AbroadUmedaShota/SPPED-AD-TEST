@@ -80,6 +80,17 @@
       font-size: 12.5px; line-height: 1.7;
     }
     .contact-status[hidden] { display: none; }
+    .contact-test-mode {
+      margin: -4px 0 18px;
+      border-radius: 9px;
+      padding: 10px 12px;
+      background: #fff6d8;
+      color: #6d4b00;
+      border: 1px solid #f0d37a;
+      font-size: 12.5px;
+      line-height: 1.7;
+    }
+    .contact-test-mode[hidden] { display: none; }
 
     .contact-submit {
       margin-top: 6px; width: 100%; background: var(--c-navy); color: #fff;
@@ -162,6 +173,7 @@
         <p class="contact__eyebrow">CONTACT</p>
         <h1 class="contact__title" id="contact-title">お問い合わせ</h1>
         <p class="contact__lead">お問い合わせ内容を確認のうえ、2〜3営業日以内に担当者よりご返信いたします。</p>
+        <p class="contact-test-mode" id="contactTestModeNotice" hidden>テストモードで送信します。社内通知は梅田さんのみに送信されます。</p>
 
         <form class="contact-form" id="contactForm" data-endpoint="https://script.google.com/macros/s/AKfycbw6xaQvmfspOOxXEs4DMqfLxQ3Aev6Qi8RcfiFu7iFwOHos48eAPvmmjxSnteN1Lj0D/exec" data-max-attachment-mb="10" data-webp-quality="0.82" novalidate>
           <div class="contact-field">

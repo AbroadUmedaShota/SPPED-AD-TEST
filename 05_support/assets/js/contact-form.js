@@ -3,6 +3,7 @@ import {
   convertImageFileToWebp,
   normalizeWebpQuality,
 } from './contact-attachment-utils.js';
+import { getContactTestModeFromUrl } from './contact-form-utils.js';
 
 const CONTACT_TYPE_LABELS = {
   general: '一般的なお問い合わせ',
@@ -14,6 +15,12 @@ const CONTACT_TYPE_LABELS = {
 };
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+function cleanContactTestModeUrl(state) {
+  if (!state || !state.cleanedUrl || typeof window === 'undefined' || !window.history) return;
+  if (state.cleanedUrl !== window.location.href) {
+    window.history.replaceState({}, document.title, state.cleanedUrl);
+  }
+}
 
 function getMetaContent(name) {
   const meta = document.querySelector(`meta[name="${name}"]`);
@@ -67,6 +74,12 @@ function initContactForm() {
   const done = document.getElementById('contactDone');
   const status = document.getElementById('contactStatus');
   const submit = form.querySelector('.contact-submit');
+  const testModeNotice = document.getElementById('contactTestModeNotice');
+  const testModeState = getContactTestModeFromUrl(window.location.href);
+  cleanContactTestModeUrl(testModeState);
+  if (testModeNotice && testModeState.enabled) {
+    testModeNotice.hidden = false;
+  }
 
   const typeEl = document.getElementById('f-contact-type');
   const typeError = document.getElementById('f-contact-type-error');
@@ -237,7 +250,7 @@ function initContactForm() {
   function buildPayload(attachments) {
     const formData = new FormData(form);
     const contactType = String(formData.get('contactType') || '').trim();
-    return {
+    const payload = {
       contactType,
       contactTypeLabel: CONTACT_TYPE_LABELS[contactType] || contactType,
       name: String(formData.get('name') || '').trim(),
@@ -249,6 +262,11 @@ function initContactForm() {
       userAgent: window.navigator.userAgent,
       privacyConsent: formData.get('privacyConsent') === 'on',
     };
+    if (testModeState.enabled) {
+      payload.testMode = true;
+      payload.testModeToken = testModeState.token;
+    }
+    return payload;
   }
 
   async function submitContact(payload) {

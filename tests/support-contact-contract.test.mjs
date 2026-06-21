@@ -4,6 +4,8 @@ import vm from 'node:vm';
 import test from 'node:test';
 
 const CONTACT_FORM_HELPERS = '05_support/assets/js/contact-attachment-utils.js';
+const CONTACT_FORM_UTILS = '05_support/assets/js/contact-form-utils.js';
+const CONTACT_FORM_SCRIPT = '05_support/assets/js/contact-form.js';
 const PUBLIC_GAS_CODE = '99_backend-docs/10_support-contact/gas/Code.gs';
 const VIEWER_GAS_CODE = '99_backend-docs/10_support-contact/viewer-gas/Code.gs';
 const VIEWER_GAS_HTML = '99_backend-docs/10_support-contact/viewer-gas/Index.html';
@@ -58,17 +60,64 @@ test('support contact attachment helpers produce WEBP payload metadata', async (
   );
 });
 
+test('support contact form test mode URL helpers protect test tokens', async () => {
+  const helpers = await importLocalModule(CONTACT_FORM_UTILS);
+
+  assert.deepEqual(
+    helpers.getContactTestModeFromUrl('https://support.speed-ad.com/contact/?foo=bar#contactTestMode=1&contactTestToken=secret'),
+    {
+      enabled: true,
+      token: 'secret',
+      cleanedUrl: 'https://support.speed-ad.com/contact/?foo=bar',
+    }
+  );
+  assert.deepEqual(
+    helpers.getContactTestModeFromUrl('https://support.speed-ad.com/contact/?contactTestMode=true&contactTestToken=query-secret&foo=bar#section=1'),
+    {
+      enabled: true,
+      token: 'query-secret',
+      cleanedUrl: 'https://support.speed-ad.com/contact/?foo=bar#section=1',
+    }
+  );
+  assert.deepEqual(
+    helpers.getContactTestModeFromUrl('https://support.speed-ad.com/contact/#contactTestMode=0&contactTestToken=secret'),
+    {
+      enabled: false,
+      token: '',
+      cleanedUrl: 'https://support.speed-ad.com/contact/',
+    }
+  );
+});
+
 test('public support contact GAS advertises viewer detail links', async () => {
-  const code = await readFile(PUBLIC_GAS_CODE, 'utf8');
+  const [code, formScript] = await Promise.all([
+    readFile(PUBLIC_GAS_CODE, 'utf8'),
+    readFile(CONTACT_FORM_SCRIPT, 'utf8'),
+  ]);
 
   assert.match(code, /CONTACT_VIEWER_BASE_URL/);
   assert.match(code, /CONTACT_VIEWER_ACCESS_TOKEN/);
+  assert.match(code, /CONTACT_TEST_MODE_TOKEN/);
+  assert.match(code, /TEST_NOTIFY_EMAIL = 's-umeda@abroad-o\.com'/);
+  assert.match(code, /function validateTestMode_/);
+  assert.match(code, /function setContactTestModeToken/);
+  assert.match(code, /throw new Error\('テストモードトークンが不正です。'\)/);
+  assert.match(code, /function getInternalNotifyEmails_/);
+  assert.match(code, /payload && payload\.testMode \? \[TEST_NOTIFY_EMAIL\] : getNotifyEmails_\(\)/);
+  assert.match(code, /function getUserReceiptEmail_/);
+  assert.match(code, /payload && payload\.testMode \? TEST_NOTIFY_EMAIL : payload\.email/);
+  assert.match(code, /この受付メールは梅田さんのみに送信しています。/);
+  assert.match(code, /function sanitizeSourceUrl_/);
   assert.match(code, /function buildViewerDetailUrl_/);
   assert.match(code, /#token=/);
   assert.doesNotMatch(code, /[&?]token=/);
   assert.match(code, /確認アプリ/);
+  assert.match(code, /【TEST】/);
   assert.match(code, /handled_by/);
   assert.match(code, /internal_note/);
+  assert.match(formScript, /getContactTestModeFromUrl/);
+  assert.match(formScript, /testModeToken = testModeState\.token|payload\.testModeToken = testModeState\.token/);
+  assert.match(formScript, /sourceUrl: window\.location\.href/);
 });
 
 test('support contact viewer GAS is token-gated and updates status', async () => {
