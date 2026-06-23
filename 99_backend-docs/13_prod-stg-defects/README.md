@@ -9,8 +9,7 @@
 ## 資料
 
 - HTML入口: [index.html](./index.html)
-- [01_overview.md](./01_overview.md): 整理の前提・抽出条件・凡例
-- [02_defect-matrix.md](./02_defect-matrix.md): 本番・STG 不具合一覧（6/23）
+- [01_prod-stg-defects.md](./01_prod-stg-defects.md): 本番・STG 不具合一覧（6/23）。前提・凡例・一覧・集計を1ページに統合
 
 ## 扱い
 

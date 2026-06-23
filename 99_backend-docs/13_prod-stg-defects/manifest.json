@@ -9,25 +9,12 @@
   "documents": [
     {
       "id": "DEF-001",
-      "title": "整理の前提と凡例",
-      "category": "概要",
-      "sourceStatus": "Backlog観測",
-      "path": "01_overview.md",
-      "summary": "6/23整理の対象範囲、抽出条件、本番／STG列の凡例をまとめます。",
-      "tags": ["不具合整理", "本番", "STG", "環境差"],
-      "hasUnconfirmed": true,
-      "relatedSources": [
-        "99_backend-docs/09_bug-reporting/index.html"
-      ]
-    },
-    {
-      "id": "DEF-002",
       "title": "本番・STG 不具合一覧（6/23）",
       "category": "一覧",
       "sourceStatus": "Backlog観測 / 手動・自動E2E確認",
-      "path": "02_defect-matrix.md",
-      "summary": "未対応の不具合を優先度順に並べ、本番／STGそれぞれの再現状況と経緯を整理した一覧です。",
-      "tags": ["不具合一覧", "優先度", "本番", "STG", "未対応"],
+      "path": "01_prod-stg-defects.md",
+      "summary": "未対応の不具合を優先度順に並べ、本番／STGそれぞれの再現状況・経緯と凡例を1ページにまとめた一覧です。",
+      "tags": ["不具合一覧", "優先度", "本番", "STG", "未対応", "環境差"],
       "hasUnconfirmed": true,
       "relatedSources": [
         "99_backend-docs/09_bug-reporting/index.html"

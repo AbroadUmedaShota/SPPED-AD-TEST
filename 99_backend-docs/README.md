@@ -48,7 +48,7 @@ v1では `SPEED AD E2Eシナリオ実行管理` Spreadsheetを、本モックで
 | [10_support-contact](./10_support-contact/) | サポートお問い合わせ受付 | 2件 | 画面仕様 / GAS実装案 | あり | 公開お問い合わせフォームの投稿保存、添付保存、受付メール送信を整理 |
 | [11_screen-diff](./11_screen-diff/) | 画面差分（モックアップ↔本番） | 1件 | 観測スクショ / 目視比較 / 未確認あり | あり | モックアップと本番のスクショを画面ごとに左右比較し、本番に足りない・異なる点を整理 |
 | [12_release-follow-up](./12_release-follow-up/) | 6/15リリース後優先度整理 | 1件 | Backlog / Chatwork / Gmail要旨 / 共有向け再編集 | あり | 未完了機能をリリース必達、短期導入、通常ロードマップに分類 |
-| [13_prod-stg-defects](./13_prod-stg-defects/) | 本番・STG 不具合整理 | 2件 | Backlog観測 / 手動・自動E2E確認 | あり | 未対応の本番・STG不具合を環境差の観点で一覧化（6/23時点） |
+| [13_prod-stg-defects](./13_prod-stg-defects/) | 本番・STG 不具合整理 | 1件 | Backlog観測 / 手動・自動E2E確認 | あり | 未対応の本番・STG不具合を環境差の観点で一覧化（6/23時点） |
 
 ## 共通ビュー仕様
 
