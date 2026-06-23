@@ -2,7 +2,7 @@
   "meta": {
     "id": "13_prod-stg-defects",
     "title": "本番・STG 不具合整理",
-    "summary": "6/23時点で未対応の本番・STG不具合を、環境差（どちらで再現するか）の観点で一覧化した検討ビューです。行クリックで該当Backlogを開けます。",
+    "summary": "6/23時点で未対応の本番・STG不具合を、環境差（どちらで再現するか）の観点で一覧化した検討ビューです。行クリックで詳細モーダルを開き、そこからBacklogへ遷移できます。",
     "sourceStatus": "Backlog観測 / 手動・自動E2E確認",
     "hasUnconfirmed": true
   },
@@ -13,7 +13,7 @@
       "category": "一覧",
       "sourceStatus": "Backlog観測 / 手動・自動E2E確認",
       "path": "index.html",
-      "summary": "未対応の不具合を優先度順に並べ、本番／STGの再現状況・経緯と凡例・集計を1ページに統合。各行クリックで該当Backlogへ遷移します。",
+      "summary": "未対応の不具合を優先度順に並べ、本番／STGの再現状況・経緯と凡例・集計を1ページに統合。各行クリックで詳細モーダルを開き、Backlogへ遷移できます。",
       "tags": ["不具合一覧", "優先度", "本番", "STG", "未対応", "環境差"],
       "hasUnconfirmed": true
     }
