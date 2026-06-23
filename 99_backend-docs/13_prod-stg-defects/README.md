@@ -8,8 +8,7 @@
 
 ## 資料
 
-- HTML入口: [index.html](./index.html)
-- [01_prod-stg-defects.md](./01_prod-stg-defects.md): 本番・STG 不具合一覧（6/23）。前提・凡例・一覧・集計を1ページに統合
+- [index.html](./index.html): 本番・STG 不具合一覧（6/23）。前提・凡例・集計・一覧を1ページに統合した一体型ページ。各行をクリックすると該当Backlog課題が別タブで開く。
 
 ## 扱い
 

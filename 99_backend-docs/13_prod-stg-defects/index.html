@@ -10,8 +10,197 @@
   <link rel="stylesheet" href="../../02_dashboard/service-top-style.css">
   <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
   <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Inter%3Awght%40400%3B500%3B700%3B900&family=Noto+Sans+JP%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet">
+  <style>
+    .defect-row { cursor: pointer; }
+    .defect-row:hover { background: var(--md-sys-color-surface-variant, #f4f7fb); }
+    .defect-row:focus-visible { outline: 2px solid var(--md-sys-color-primary, #0f62fe); outline-offset: -2px; }
+  </style>
 </head>
-<body>
-<script type="module" src="../assets/categoryPage.js"></script>
+<body class="bg-background text-on-background">
+<div class="min-h-screen bg-background">
+  <header class="border-b border-outline-variant bg-surface">
+    <div class="flex w-full flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+      <div>
+        <p class="text-sm font-semibold text-primary">HOME / 13_prod-stg-defects</p>
+        <h1 class="text-headline-medium font-bold leading-tight text-on-surface">本番・STG 不具合整理（6/23）</h1>
+        <p class="mt-1 max-w-4xl text-sm leading-6 text-on-surface-variant">
+          Backlog SPDAD2026 から、STG/本番環境の不具合・挙動不正・環境差に該当する未対応課題を抽出した6/23時点の整理です。
+          タイトルに「バグ」と入っていなくても、本文が不具合性を持つものは含めています。ステータスは全件「未対応」。
+        </p>
+        <div class="mt-3 flex flex-wrap gap-2">
+          <span class="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+            <span class="material-icons text-sm">touch_app</span>行クリックで該当Backlogを開く
+          </span>
+          <span class="inline-flex items-center gap-1 rounded-full bg-surface-variant px-3 py-1 text-xs font-semibold text-on-surface">
+            <span class="material-icons text-sm">info</span>担当はBacklog側で管理（実名は本ページに非掲載）
+          </span>
+        </div>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <a class="inline-flex items-center gap-2 rounded-lg border border-outline px-3 py-2 text-sm text-on-surface hover:bg-surface-variant" href="../index.html">
+          <span class="material-icons text-base">home</span>
+          HOMEへ戻る
+        </a>
+        <a class="inline-flex items-center gap-2 rounded-lg border border-outline px-3 py-2 text-sm text-on-surface hover:bg-surface-variant" href="./README.md" target="_blank" rel="noopener">
+          <span class="material-icons text-base">open_in_new</span>
+          READMEを開く
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="w-full px-4 py-6 sm:px-6 lg:px-8">
+    <!-- 集計 -->
+    <section aria-label="集計" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="rounded-lg border border-outline-variant bg-surface p-4">
+        <p class="text-xs font-semibold text-primary">本番・STGともにあり</p>
+        <p class="mt-1 text-headline-medium font-bold text-on-surface">14</p>
+      </div>
+      <div class="rounded-lg border border-outline-variant bg-surface p-4">
+        <p class="text-xs font-semibold text-primary">本番のみ</p>
+        <p class="mt-1 text-headline-medium font-bold text-on-surface">3</p>
+        <p class="text-xs text-on-surface-variant">STGなし／未確認</p>
+      </div>
+      <div class="rounded-lg border border-outline-variant bg-surface p-4">
+        <p class="text-xs font-semibold text-primary">STGのみ</p>
+        <p class="mt-1 text-headline-medium font-bold text-on-surface">1</p>
+        <p class="text-xs text-on-surface-variant">本番未確認</p>
+      </div>
+      <div class="rounded-lg border border-outline-variant bg-surface p-4">
+        <p class="text-xs font-semibold text-primary">環境特定中</p>
+        <p class="mt-1 text-headline-medium font-bold text-on-surface">1</p>
+      </div>
+    </section>
+
+    <!-- 凡例 -->
+    <section class="mt-6 rounded-lg border border-outline-variant bg-surface p-4" aria-labelledby="legend-title">
+      <p id="legend-title" class="text-sm font-bold text-on-surface">本番／STG列の凡例</p>
+      <div class="mt-3 flex flex-wrap gap-x-6 gap-y-2 text-sm text-on-surface-variant">
+        <span><span class="mr-1 inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-bold text-green-700">あり</span>その環境で再現を確認</span>
+        <span><span class="mr-1 inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs font-bold text-slate-500">なし</span>その環境では発生しない（確認済み）</span>
+        <span><span class="mr-1 inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-800">未確認</span>その環境ではまだ検証していない</span>
+        <span><span class="mr-1 inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-bold text-blue-700">要確認</span>発生環境を特定中</span>
+      </div>
+      <p class="mt-3 text-xs leading-5 text-on-surface-variant">ステータスはBacklog 6/23時点の値です。Backlog側で状態が動いたら本ページも追従が必要です。備考は本番／STG列から読み取れない情報（経緯・条件・理由・リスク）のみ記載しています。</p>
+    </section>
+
+    <!-- 一覧 -->
+    <section class="mt-6" aria-labelledby="list-title">
+      <div class="flex flex-wrap items-end justify-between gap-3">
+        <h2 id="list-title" class="text-title-large font-bold text-on-surface">不具合一覧（優先度順）</h2>
+        <span id="rowCount" class="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-sm font-bold text-primary">0件</span>
+      </div>
+      <div class="mt-4 overflow-x-auto rounded-lg border border-outline-variant bg-surface">
+        <table class="w-full min-w-[860px] border-collapse text-sm">
+          <thead>
+            <tr class="border-b border-outline-variant bg-surface-variant text-left text-on-surface">
+              <th class="px-3 py-2 font-bold">優先</th>
+              <th class="px-3 py-2 font-bold">Backlog</th>
+              <th class="px-3 py-2 font-bold">本番</th>
+              <th class="px-3 py-2 font-bold">STG</th>
+              <th class="px-3 py-2 font-bold">内容要約</th>
+              <th class="px-3 py-2 font-bold">備考</th>
+              <th class="px-3 py-2 font-bold"></th>
+            </tr>
+          </thead>
+          <tbody id="defectBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+  const BACKLOG_BASE = 'https://repinc.backlog.com/view/';
+
+  const DEFECTS = [
+    { p: '高', key: 'SPDAD2026-167', prod: 'あり', stg: 'あり', sum: '各グループを開いても入力対象の名刺が表示されず入力できない', note: '当初STGでは正常に入力できていたが、現在はstg=本番で同症状' },
+    { p: '高', key: 'SPDAD2026-168', prod: 'あり', stg: '未確認', sum: 'Enter連打で1人が複数回入力でき、複数人での照合が成立してしまう', note: '' },
+    { p: '中', key: 'SPDAD2026-124', prod: 'あり', stg: 'あり', sum: '新規アカウント作成で氏名入力が「会社名」に登録される', note: '' },
+    { p: '中', key: 'SPDAD2026-125', prod: 'あり', stg: 'あり', sum: '実在しないメールでもアカウント作成・ログインができる', note: '二段階認証なし' },
+    { p: '中', key: 'SPDAD2026-127', prod: 'あり', stg: 'あり', sum: '単日作成で新規は開始日のみ可・複製は開始終了とも必須で挙動が不一致', note: '' },
+    { p: '中', key: 'SPDAD2026-128', prod: 'あり', stg: '未確認', sum: '説明文を空で保存すると回答画面に「[object Object]」が表示される', note: '本番は回答画面で発生（プレビューでは出ない）' },
+    { p: '中', key: 'SPDAD2026-135', prod: 'あり', stg: 'あり', sum: 'Lv2が権限外の管理画面（利用者管理等）に直URLで到達できる', note: '' },
+    { p: '中', key: 'SPDAD2026-137', prod: 'あり', stg: 'あり', sum: '請求書管理画面を開いた直後にエラーアラートが表示される', note: '' },
+    { p: '中', key: 'SPDAD2026-139', prod: 'あり', stg: 'あり', sum: 'Lv1がメニュー外の実績確認画面に直URLから到達できる', note: '対象URL: /admin/achievements' },
+    { p: '中', key: 'SPDAD2026-143', prod: 'あり', stg: 'あり', sum: 'グループ作成導線が個人アカウント選択時のみ／削除導線が見当たらない', note: '要仕様確認' },
+    { p: '中', key: 'SPDAD2026-144', prod: 'あり', stg: 'あり', sum: '入力欄でEnter押下→エラー画面に遷移（405・スタックトレース露出）', note: 'STG=例外（カーネル）画面へ遷移／本番=別のエラー画面へ' },
+    { p: '中', key: 'SPDAD2026-149', prod: 'あり', stg: 'あり', sum: 'アカウント情報未登録時のアンケート作成可否が環境で異なる', note: '環境差の仕様確認（どちらに寄せるか要判断）' },
+    { p: '中', key: 'SPDAD2026-166', prod: 'あり', stg: 'あり', sum: '公開NGのTHK導入事例記事への導線が残存', note: '' },
+    { p: '中', key: 'SPDAD2026-170', prod: 'あり', stg: 'あり', sum: '名刺入力でCtrl+Enter（確定）しても次の名刺へ推移しない', note: 'サーバ移管直後はなかった印象' },
+    { p: '中', key: 'SPDAD2026-171', prod: 'あり', stg: 'なし', sum: '入力可能な名刺がないのに作業可能件数が0にならない', note: '' },
+    { p: '中', key: 'SPDAD2026-172', prod: '要確認', stg: '未確認', sum: 'Firefoxで一部画面・操作が正常に動作しない場合がある', note: '発生環境を特定中' },
+    { p: '低', key: 'SPDAD2026-136', prod: 'あり', stg: 'あり', sum: '利用者管理一覧の会社名・メール列にDB接続エラー文字列が露出する', note: '情報露出リスク' },
+    { p: '低', key: 'SPDAD2026-153', prod: '未確認', stg: 'あり', sum: '請求書PDFが1ページ収まる場合でも白紙の2ページ目が付与される', note: '本番は請求書機能がないため未確認' },
+    { p: '低', key: 'SPDAD2026-154', prod: 'あり', stg: 'あり', sum: 'オペレーター管理で自分自身の権限変更・無効化ができ、無効化が効かない疑い', note: '' }
+  ];
+
+  function escapeHtml(value) {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  const PRIORITY_CLASS = {
+    '高': 'bg-red-100 text-red-700',
+    '中': 'bg-amber-100 text-amber-800',
+    '低': 'bg-slate-100 text-slate-600'
+  };
+
+  const ENV_CLASS = {
+    'あり': 'bg-green-100 text-green-700',
+    'なし': 'bg-slate-100 text-slate-500',
+    '未確認': 'bg-amber-100 text-amber-800',
+    '要確認': 'bg-blue-100 text-blue-700'
+  };
+
+  function chip(value, classMap) {
+    const cls = classMap[value] || 'bg-slate-100 text-slate-600';
+    return `<span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-bold ${cls}">${escapeHtml(value)}</span>`;
+  }
+
+  function render() {
+    const body = document.getElementById('defectBody');
+    body.innerHTML = DEFECTS.map(d => {
+      const url = BACKLOG_BASE + d.key;
+      return `
+        <tr class="defect-row border-b border-outline-variant" data-url="${escapeHtml(url)}" tabindex="0" role="link" aria-label="${escapeHtml(d.key)} をBacklogで開く">
+          <td class="px-3 py-2 align-top">${chip(d.p, PRIORITY_CLASS)}</td>
+          <td class="whitespace-nowrap px-3 py-2 align-top">
+            <a class="inline-flex items-center gap-1 font-medium text-primary underline underline-offset-2 hover:no-underline" href="${escapeHtml(url)}" target="_blank" rel="noopener">
+              ${escapeHtml(d.key)}<span class="material-icons text-sm">open_in_new</span>
+            </a>
+          </td>
+          <td class="px-3 py-2 align-top">${chip(d.prod, ENV_CLASS)}</td>
+          <td class="px-3 py-2 align-top">${chip(d.stg, ENV_CLASS)}</td>
+          <td class="px-3 py-2 align-top leading-6 text-on-surface">${escapeHtml(d.sum)}</td>
+          <td class="px-3 py-2 align-top leading-6 text-on-surface-variant">${escapeHtml(d.note) || '<span class="text-outline">—</span>'}</td>
+          <td class="px-3 py-2 align-top text-right"><span class="material-icons text-base text-on-surface-variant">chevron_right</span></td>
+        </tr>
+      `;
+    }).join('');
+
+    document.getElementById('rowCount').textContent = `${DEFECTS.length}件`;
+
+    body.querySelectorAll('.defect-row').forEach(row => {
+      const open = () => window.open(row.dataset.url, '_blank', 'noopener');
+      row.addEventListener('click', event => {
+        if (event.target.closest('a')) return;
+        open();
+      });
+      row.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          open();
+        }
+      });
+    });
+  }
+
+  render();
+</script>
 </body>
 </html>
